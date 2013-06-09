@@ -1,0 +1,3 @@
+FILE(GLOB c_HEADERS "*.h")
+FILE(GLOB cxx_HEADERS "*.hpp")
+INSTALL(FILES ${c_HEADERS} ${cxx_HEADERS} DESTINATION include/dbr)
