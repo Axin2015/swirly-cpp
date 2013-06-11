@@ -216,8 +216,8 @@ format_escape(void)
 void
 instrcpy(void)
 {
-    DbrCtx ctx = dbr_ctx_create(1);
-    DbrModel model = model_create(ctx);
+    DbrCtx ctx = dbr_ctx_create();
+    DbrModel model = model_create(ctx, 1);
     DbrEnv env = dbr_env_create(ctx, model);
 
     struct DbrRec* irec = get_rec_mnem(env, DBR_INSTR, "EURUSD.SPOTFWD");

@@ -22,13 +22,13 @@
 #include <stdlib.h> // malloc()
 
 DBR_API DbrCtx
-dbr_ctx_create(long seedid)
+dbr_ctx_create(void)
 {
     DbrCtx ctx = malloc(sizeof(struct ElmCtx));
     if (dbr_unlikely(!ctx))
         goto fail1;
 
-    if (dbr_unlikely(!elm_ctx_init(ctx, seedid)))
+    if (dbr_unlikely(!elm_ctx_init(ctx)))
         goto fail2;
 
     return ctx;
@@ -45,12 +45,6 @@ dbr_ctx_destroy(DbrCtx ctx)
         elm_ctx_term(ctx);
         free(ctx);
     }
-}
-
-DBR_API long
-dbr_ctx_next_id(DbrCtx ctx)
-{
-    return ctx->id++;
 }
 
 DBR_API struct DbrErr*

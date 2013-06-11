@@ -40,8 +40,8 @@ get_rec_mnem(DbrEnv env, int type, const char* mnem)
 void
 find_instr(void)
 {
-    DbrCtx ctx = dbr_ctx_create(1);
-    DbrModel model = model_create(ctx);
+    DbrCtx ctx = dbr_ctx_create();
+    DbrModel model = model_create(ctx, 1);
     DbrEnv env = dbr_env_create(ctx, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_INSTR, "BAD");
@@ -74,8 +74,8 @@ find_instr(void)
 void
 find_market(void)
 {
-    DbrCtx ctx = dbr_ctx_create(1);
-    DbrModel model = model_create(ctx);
+    DbrCtx ctx = dbr_ctx_create();
+    DbrModel model = model_create(ctx, 1);
     DbrEnv env = dbr_env_create(ctx, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_MARKET, "BAD");
@@ -96,8 +96,8 @@ find_market(void)
 void
 find_accnt(void)
 {
-    DbrCtx ctx = dbr_ctx_create(1);
-    DbrModel model = model_create(ctx);
+    DbrCtx ctx = dbr_ctx_create();
+    DbrModel model = model_create(ctx, 1);
     DbrEnv env = dbr_env_create(ctx, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_ACCNT, "BAD");
@@ -119,8 +119,8 @@ find_accnt(void)
 void
 find_trader(void)
 {
-    DbrCtx ctx = dbr_ctx_create(1);
-    DbrModel model = model_create(ctx);
+    DbrCtx ctx = dbr_ctx_create();
+    DbrModel model = model_create(ctx, 1);
     DbrEnv env = dbr_env_create(ctx, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_TRADER, "BAD");

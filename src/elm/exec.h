@@ -23,12 +23,12 @@
 
 struct ElmExec {
     struct ElmCtx* ctx;
-    struct ElmIndex* index;
     DbrModel model;
+    struct ElmIndex* index;
 };
 
 DBR_EXTERN void
-elm_exec_init(struct ElmExec* exec, struct ElmCtx* ctx, struct ElmIndex* index, DbrModel model);
+elm_exec_init(struct ElmExec* exec, struct ElmCtx* ctx, DbrModel model, struct ElmIndex* index);
 
 DBR_EXTERN struct DbrOrder*
 elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, const char* ref,

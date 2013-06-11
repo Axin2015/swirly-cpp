@@ -29,17 +29,10 @@
 typedef struct ElmCtx* DbrCtx;
 
 DBR_API DbrCtx
-dbr_ctx_create(long seedid);
+dbr_ctx_create(void);
 
 DBR_API void
 dbr_ctx_destroy(DbrCtx ctx);
-
-/**
- * @brief Next sequential identifier.
- */
-
-DBR_API long
-dbr_ctx_next_id(DbrCtx ctx);
 
 /** @} */
 

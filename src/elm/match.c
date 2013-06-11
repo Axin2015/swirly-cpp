@@ -24,6 +24,7 @@
 #include <ash/queue.h>
 
 #include <dbr/conv.h>
+#include <dbr/model.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -70,7 +71,7 @@ lazy_posn(struct DbrOrder* order, struct ElmCtx* ctx)
 }
 
 static DbrBool
-match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* taker,
+match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market, struct DbrOrder* taker,
              const struct ElmSide* side, int direct, struct DbrTrans* trans)
 {
     struct AshQueue mq;
@@ -93,7 +94,7 @@ match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* take
         if (spread(taker, maker, direct) > 0)
             break;
 
-        const DbrIden match_id = ctx->id++;
+        const DbrIden match_id = dbr_model_alloc_id(model);
         struct DbrMatch* match = elm_ctx_alloc_match(ctx);
         if (!match)
             goto fail1;
@@ -105,7 +106,7 @@ match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* take
             goto fail1;
         }
 
-        const DbrIden taker_id = ctx->id++;
+        const DbrIden taker_id = dbr_model_alloc_id(model);
         struct DbrTrade* taker_trade = elm_ctx_alloc_trade(ctx, taker_id);
         if (!taker_trade) {
             // No need to free accnt or posn.
@@ -113,7 +114,7 @@ match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* take
             goto fail1;
         }
 
-        const DbrIden maker_id = ctx->id++;
+        const DbrIden maker_id = dbr_model_alloc_id(model);
         struct DbrTrade* maker_trade = elm_ctx_alloc_trade(ctx, maker_id);
         if (!maker_trade) {
             elm_ctx_free_trade(ctx, taker_trade);
@@ -200,8 +201,8 @@ match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* take
 }
 
 DBR_EXTERN DbrBool
-elm_match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* taker,
-                 struct DbrTrans* trans)
+elm_match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market,
+                 struct DbrOrder* taker, struct DbrTrans* trans)
 {
     struct ElmSide* side;
     int direct;
@@ -217,5 +218,5 @@ elm_match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* 
         direct = DBR_GIVEN;
     }
 
-    return match_orders(ctx, market, taker, side, direct, trans);
+    return match_orders(ctx, model, market, taker, side, direct, trans);
 }

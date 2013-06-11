@@ -29,8 +29,7 @@ struct ElmSmallBlock;
 struct ElmLargeBlock;
 
 struct ElmCtx {
-    long id;
-    struct DbrErr err;
+     struct DbrErr err;
     struct {
         size_t nodes_per_block;
         // List of allocated memory blocks.
@@ -106,7 +105,7 @@ struct ElmLargeBlock {
 // Error fields are set on failure.
 
 DBR_EXTERN DbrBool
-elm_ctx_init(struct ElmCtx* ctx, long seedid);
+elm_ctx_init(struct ElmCtx* ctx);
 
 // Assumes that pointer is not null.
 

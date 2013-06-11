@@ -24,6 +24,7 @@
 #include <stdlib.h> // malloc()
 
 struct SqliteImpl {
+    DbrIden id;
     struct FigSqlite sqlite;
     struct DbrIModel model_;
 };
@@ -32,6 +33,13 @@ static inline struct SqliteImpl*
 sqlite_impl(DbrModel model)
 {
     return dbr_implof(struct SqliteImpl, model_, model);
+}
+
+static DbrIden
+alloc_id(DbrModel model)
+{
+    struct SqliteImpl* impl = sqlite_impl(model);
+    return impl->id++;
 }
 
 static DbrBool
@@ -116,6 +124,7 @@ end(DbrModel model)
 }
 
 static const struct DbrModelVtbl SQLITE_MODEL_VTBL = {
+    .alloc_id = alloc_id,
     .begin = begin,
     .commit = commit,
     .rollback = rollback,
@@ -129,11 +138,14 @@ static const struct DbrModelVtbl SQLITE_MODEL_VTBL = {
 };
 
 DBR_API DbrModel
-dbr_sqlite_create(DbrCtx ctx, const char* path)
+dbr_sqlite_create(DbrCtx ctx, DbrIden seed, const char* path)
 {
     struct SqliteImpl* impl = malloc(sizeof(struct SqliteImpl));
     if (dbr_unlikely(!impl))
         goto fail1;
+
+    // Seed identity.
+    impl->id = seed;
 
     struct FigSqlite* sqlite = &impl->sqlite;
     if (!fig_sqlite_init(sqlite, ctx, path))

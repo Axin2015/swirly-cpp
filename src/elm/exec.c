@@ -130,11 +130,11 @@ apply_trades(struct ElmExec* exec, struct ElmMarket* market, const struct DbrTra
 }
 
 DBR_EXTERN void
-elm_exec_init(struct ElmExec* exec, struct ElmCtx* ctx, struct ElmIndex* index, DbrModel model)
+elm_exec_init(struct ElmExec* exec, struct ElmCtx* ctx, DbrModel model, struct ElmIndex* index)
 {
     exec->ctx = ctx;
-    exec->index = index;
     exec->model = model;
+    exec->index = index;
 }
 
 DBR_EXTERN struct DbrOrder*
@@ -150,7 +150,7 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     if (!market)
         goto fail1;
 
-    const DbrIden id = exec->ctx->id++;
+    const DbrIden id = dbr_model_alloc_id(exec->model);
     struct DbrOrder* new_order = elm_ctx_alloc_order(exec->ctx, id);
     if (!new_order)
         goto fail1;
@@ -184,7 +184,7 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
         goto fail2;
 
     if (!dbr_model_insert_order(exec->model, new_order)
-        || !elm_match_orders(exec->ctx, market, new_order, trans))
+        || !elm_match_orders(exec->ctx, exec->model, market, new_order, trans))
         goto fail3;
 
     if (trans->count > 0) {

@@ -27,6 +27,9 @@
  */
 
 struct DbrModelVtbl {
+    DbrIden
+    (*alloc_id)(DbrModel model);
+
     DbrBool
     (*begin)(DbrModel model);
 
@@ -58,6 +61,12 @@ struct DbrModelVtbl {
     struct DbrSlNode*
     (*end)(DbrModel model);
 };
+
+static inline DbrIden
+dbr_model_alloc_id(DbrModel model)
+{
+    return model->vtbl->alloc_id(model);
+}
 
 static inline DbrBool
 dbr_model_begin(DbrModel model)
@@ -132,13 +141,15 @@ dbr_model_end(DbrModel model)
  *
  * @param ctx Context.
  *
+ * @param seed Seed identifier.
+ *
  * @param path Path to the database.
  *
  * @return Handle to newly created model or null on failure.
  */
 
 DBR_API DbrModel
-dbr_sqlite_create(DbrCtx ctx, const char* path);
+dbr_sqlite_create(DbrCtx ctx, DbrIden seed, const char* path);
 
 DBR_API void
 dbr_sqlite_destroy(DbrModel model);

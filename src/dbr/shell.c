@@ -347,12 +347,12 @@ int
 main(int argc, char* argv[])
 {
     atexit(destroy);
-    if (!(ctx = dbr_ctx_create(dbr_millis()))) {
+    if (!(ctx = dbr_ctx_create())) {
         fprintf(stderr, "dbr_ctx_create() failed\n");
         return 1;
     }
 
-    if (!(model = dbr_sqlite_create(ctx, "test.db"))) {
+    if (!(model = dbr_sqlite_create(ctx, dbr_millis(), "test.db"))) {
         dbr_ctx_perror(ctx, stderr, "dbr_sqlite_create() failed");
         return 1;
     }

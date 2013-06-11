@@ -242,6 +242,7 @@ select_posn(DbrCtx ctx, struct DbrSlNode** first)
 
 struct TestImpl {
     DbrCtx ctx;
+    DbrIden id;
     struct DbrIModel model_;
 };
 
@@ -249,6 +250,13 @@ static inline struct TestImpl*
 test_impl(DbrModel model)
 {
     return dbr_implof(struct TestImpl, model_, model);
+}
+
+static DbrIden
+alloc_id(DbrModel model)
+{
+    struct TestImpl* impl = test_impl(model);
+    return impl->id++;
 }
 
 static DbrBool
@@ -345,6 +353,7 @@ end(DbrModel model)
 }
 
 static const struct DbrModelVtbl TEST_MODEL_VTBL = {
+    .alloc_id = alloc_id,
     .begin = begin,
     .commit = commit,
     .rollback = rollback,
@@ -358,11 +367,14 @@ static const struct DbrModelVtbl TEST_MODEL_VTBL = {
 };
 
 DBR_EXTERN DbrModel
-model_create(DbrCtx ctx)
+model_create(DbrCtx ctx, DbrIden seed)
 {
     struct TestImpl* impl = malloc(sizeof(struct TestImpl));
     if (dbr_unlikely(!impl))
         goto fail1;
+
+    // Seed identity.
+    impl->id = seed;
 
     impl->ctx = ctx;
     impl->model_.vtbl = &TEST_MODEL_VTBL;

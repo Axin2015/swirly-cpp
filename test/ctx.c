@@ -22,7 +22,7 @@
 void
 create_ctx(void)
 {
-    DbrCtx ctx = dbr_ctx_create(1);
+    DbrCtx ctx = dbr_ctx_create();
     dbr_ctx_destroy(ctx);
 }
 

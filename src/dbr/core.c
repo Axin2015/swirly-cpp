@@ -216,7 +216,7 @@ dbr_env_create(DbrCtx ctx, DbrModel model)
     env->model = model;
     elm_cache_init(&env->cache, ctx);
     elm_index_init(&env->index);
-    elm_exec_init(&env->exec, ctx, &env->index, model);
+    elm_exec_init(&env->exec, ctx, model, &env->index);
 
     // Data structures are fully initialised at this point.
 

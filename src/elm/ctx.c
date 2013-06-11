@@ -103,11 +103,8 @@ alloc_large_nodes(struct ElmCtx* ctx)
 }
 
 DBR_EXTERN DbrBool
-elm_ctx_init(struct ElmCtx* ctx, DbrIden seedid)
+elm_ctx_init(struct ElmCtx* ctx)
 {
-    // Seed identity.
-    ctx->id = seedid;
-
     dbr_err_clear(&ctx->err);
 
     // Slightly less than one page of items.

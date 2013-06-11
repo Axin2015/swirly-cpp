@@ -30,7 +30,7 @@ struct ElmMarket;
 // Match taker with list of maker orders.
 
 DBR_EXTERN DbrBool
-elm_match_orders(struct ElmCtx* ctx, struct ElmMarket* market, struct DbrOrder* taker,
-                 struct DbrTrans* trans);
+elm_match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market,
+                 struct DbrOrder* taker, struct DbrTrans* trans);
 
 #endif // ELM_MATCH_H
