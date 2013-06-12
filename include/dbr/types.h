@@ -51,6 +51,18 @@ typedef DbrIncs DbrLots;
 typedef DbrIncs DbrTicks;
 typedef DbrIncs DbrLicks;
 
+enum DbrEntity {
+    DBR_INSTR = 1,
+    DBR_MARKET,
+    DBR_TRADER,
+    DBR_ACCNT,
+    DBR_DEPTH,
+    DBR_ORDER,
+    DBR_MEMB,
+    DBR_TRADE,
+    DBR_POSN
+};
+
 enum {
     DBR_DISPLAY_MAX = 64,
     DBR_EMAIL_MAX = 64,
@@ -84,32 +96,6 @@ enum DbrAction {
     DBR_BUY = 1,
     DBR_SELL = -1
 };
-
-enum DbrMethod {
-    // See dbr_rest.h for details.
-    DBR_DELETE = 1,
-    DBR_GET    = 2,
-    DBR_HEAD   = 3,
-    DBR_POST   = 4,
-    DBR_PUT    = 5,
-};
-
-#define DBR_METHOD_MASK 0x000000FF
-
-enum DbrEntity {
-    // See dbr_rest.h for details.
-    DBR_INSTR  = 1 << 8,
-    DBR_MARKET = 2 << 8,
-    DBR_TRADER = 3 << 8,
-    DBR_ACCNT  = 4 << 8,
-    DBR_DEPTH  = 5 << 8,
-    DBR_ORDER  = 6 << 8,
-    DBR_MEMB   = 7 << 8,
-    DBR_TRADE  = 8 << 8,
-    DBR_POSN   = 9 << 8
-};
-
-#define DBR_ENTITY_MASK 0x0000FF00
 
 /** @} */
 
@@ -238,13 +224,13 @@ struct DbrRec {
         struct {
             DbrDisplay display;
             DbrEmail email;
-            DbrAccnt state;
-        } accnt;
+            DbrTrader state;
+        } trader;
         struct {
             DbrDisplay display;
             DbrEmail email;
-            DbrTrader state;
-        } trader;
+            DbrAccnt state;
+        } accnt;
     };
     /**
      * @privatesection

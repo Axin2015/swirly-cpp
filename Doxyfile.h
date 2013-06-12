@@ -154,8 +154,3 @@
  * @defgroup String String
  * @ingroup Util
  */
-
-/**
- * @defgroup Req Request
- * @ingroup Util
- */

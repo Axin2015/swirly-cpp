@@ -31,6 +31,18 @@ dbr_intdig(int i);
 DBR_API int
 dbr_longdig(long l);
 
+static inline size_t
+dbr_intlen(int i)
+{
+    return dbr_intdig(i) + (i < 0 ? 1 : 0);
+}
+
+static inline size_t
+dbr_longlen(long l)
+{
+    return dbr_longdig(l) + (l < 0 ? 1 : 0);
+}
+
 /**
  * @brief Milliseconds since Unix epoch.
  */
