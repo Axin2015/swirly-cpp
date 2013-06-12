@@ -18,8 +18,8 @@
 #include "cache.h"
 
 #include "accnt.h"
-#include "ctx.h"
 #include "market.h"
+#include "pool.h"
 #include "trader.h"
 
 #include <assert.h>
@@ -44,13 +44,13 @@ noterm(struct DbrRec* rec)
 }
 
 static inline void
-free_recs(struct ElmCtx* ctx, struct DbrSlNode* node, void (*term)(struct DbrRec*))
+free_recs(struct ElmPool* pool, struct DbrSlNode* node, void (*term)(struct DbrRec*))
 {
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
         term(rec);
-        elm_ctx_free_rec(ctx, rec);
+        elm_pool_free_rec(pool, rec);
     }
 }
 
@@ -161,9 +161,9 @@ emplace_accnt(struct ElmCache* cache, struct DbrSlNode* first, size_t size)
 }
 
 DBR_EXTERN void
-elm_cache_init(struct ElmCache* cache, struct ElmCtx* ctx)
+elm_cache_init(struct ElmCache* cache, struct ElmPool* pool)
 {
-    cache->ctx = ctx;
+    cache->pool = pool;
     cache->first_instr = NULL;
     cache->instr_size = 0;
     cache->first_market = NULL;
@@ -180,10 +180,10 @@ DBR_EXTERN void
 elm_cache_term(struct ElmCache* cache)
 {
     // Traders must be released before markets, because traders subscribe to markets.
-    free_recs(cache->ctx, cache->first_trader, elm_trader_term);
-    free_recs(cache->ctx, cache->first_accnt, elm_accnt_term);
-    free_recs(cache->ctx, cache->first_market, elm_market_term);
-    free_recs(cache->ctx, cache->first_instr, noterm);
+    free_recs(cache->pool, cache->first_trader, elm_trader_term);
+    free_recs(cache->pool, cache->first_accnt, elm_accnt_term);
+    free_recs(cache->pool, cache->first_market, elm_market_term);
+    free_recs(cache->pool, cache->first_instr, noterm);
 }
 
 DBR_EXTERN void

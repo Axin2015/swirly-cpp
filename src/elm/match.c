@@ -18,8 +18,8 @@
 #include "match.h"
 
 #include "accnt.h"
-#include "ctx.h"
 #include "market.h"
+#include "pool.h"
 
 #include <ash/queue.h>
 
@@ -64,14 +64,14 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 }
 
 static inline struct DbrPosn*
-lazy_posn(struct DbrOrder* order, struct ElmCtx* ctx)
+lazy_posn(struct DbrOrder* order, struct ElmPool* pool)
 {
     struct DbrRec* mrec = order->market.rec;
-    return elm_accnt_posn(order->accnt.rec, mrec->market.instr.rec, mrec->market.settl_date, ctx);
+    return elm_accnt_posn(order->accnt.rec, mrec->market.instr.rec, mrec->market.settl_date, pool);
 }
 
 static DbrBool
-match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market, struct DbrOrder* taker,
+match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market, struct DbrOrder* taker,
              const struct ElmSide* side, int direct, struct DbrTrans* trans)
 {
     struct AshQueue mq;
@@ -95,30 +95,30 @@ match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market, struc
             break;
 
         const DbrIden match_id = dbr_model_alloc_id(model);
-        struct DbrMatch* match = elm_ctx_alloc_match(ctx);
+        struct DbrMatch* match = elm_pool_alloc_match(pool);
         if (!match)
             goto fail1;
 
-        struct DbrPosn* posn = elm_accnt_posn(maker->accnt.rec, irec, settl_date, ctx);
+        struct DbrPosn* posn = elm_accnt_posn(maker->accnt.rec, irec, settl_date, pool);
         if (!posn) {
             // No need to free accnt or posn.
-            elm_ctx_free_match(ctx, match);
+            elm_pool_free_match(pool, match);
             goto fail1;
         }
 
         const DbrIden taker_id = dbr_model_alloc_id(model);
-        struct DbrTrade* taker_trade = elm_ctx_alloc_trade(ctx, taker_id);
+        struct DbrTrade* taker_trade = elm_pool_alloc_trade(pool, taker_id);
         if (!taker_trade) {
             // No need to free accnt or posn.
-            elm_ctx_free_match(ctx, match);
+            elm_pool_free_match(pool, match);
             goto fail1;
         }
 
         const DbrIden maker_id = dbr_model_alloc_id(model);
-        struct DbrTrade* maker_trade = elm_ctx_alloc_trade(ctx, maker_id);
+        struct DbrTrade* maker_trade = elm_pool_alloc_trade(pool, maker_id);
         if (!maker_trade) {
-            elm_ctx_free_trade(ctx, taker_trade);
-            elm_ctx_free_match(ctx, match);
+            elm_pool_free_trade(pool, taker_trade);
+            elm_pool_free_match(pool, match);
             goto fail1;
         }
 
@@ -182,7 +182,7 @@ match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market, struc
     struct DbrPosn* posn;
     // Avoid allocating position when there are no matches.
     if (count > 0) {
-        if (!(posn = elm_accnt_posn(taker->accnt.rec, irec, settl_date, ctx)))
+        if (!(posn = elm_accnt_posn(taker->accnt.rec, irec, settl_date, pool)))
             goto fail1;
     } else
         posn = NULL;
@@ -196,12 +196,12 @@ match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market, struc
 
     return true;
  fail1:
-    elm_ctx_free_matches(ctx, mq.first);
+    elm_pool_free_matches(pool, mq.first);
     return false;
 }
 
 DBR_EXTERN DbrBool
-elm_match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market,
+elm_match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
     struct ElmSide* side;
@@ -218,5 +218,5 @@ elm_match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market,
         direct = DBR_GIVEN;
     }
 
-    return match_orders(ctx, model, market, taker, side, direct, trans);
+    return match_orders(pool, model, market, taker, side, direct, trans);
 }

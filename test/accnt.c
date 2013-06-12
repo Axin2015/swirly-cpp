@@ -24,9 +24,9 @@
 void
 accnt_id(void)
 {
-    DbrCtx ctx = dbr_ctx_create();
-    DbrModel model = model_create(ctx, 1);
-    DbrEnv env = dbr_env_create(ctx, model);
+    DbrPool pool = dbr_pool_create();
+    DbrModel model = model_create(pool, 1);
+    DbrEnv env = dbr_env_create(pool, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_ACCNT, "DBRA");
     check(node != NULL);
@@ -38,5 +38,5 @@ accnt_id(void)
 
     dbr_env_destroy(env);
     model_destroy(model);
-    dbr_ctx_destroy(ctx);
+    dbr_pool_destroy(pool);
 }

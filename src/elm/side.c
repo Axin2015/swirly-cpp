@@ -17,8 +17,8 @@
  */
 #include "side.h"
 
-#include "ctx.h"
 #include "err.h"
+#include "pool.h"
 
 #include <dbr/conv.h>
 
@@ -32,7 +32,7 @@ lazy_level(struct ElmSide* side, struct DbrOrder* order)
 
 	struct DbrLevel* level;
     if (!node || node->key != key) {
-        if (!(level = elm_ctx_alloc_level(side->ctx, key)))
+        if (!(level = elm_pool_alloc_level(side->pool, key)))
             return NULL;
 
         level->first_order = order;
@@ -71,9 +71,9 @@ reduce(struct ElmSide* side, struct DbrOrder* order, DbrLots delta)
 }
 
 DBR_EXTERN void
-elm_side_init(struct ElmSide* side, struct ElmCtx* ctx)
+elm_side_init(struct ElmSide* side, struct ElmPool* pool)
 {
-    side->ctx = ctx;
+    side->pool = pool;
     ash_tree_init(&side->levels);
     ash_list_init(&side->orders);
 
@@ -131,7 +131,7 @@ elm_side_remove_order(struct ElmSide* side, struct DbrOrder* order)
         DBR_DEBUG2F("remove level: market=%.16s,ticks=%ld", order->market.rec->mnem,
                     order->ticks);
         ash_tree_remove(&side->levels, &level->side_node_);
-        elm_ctx_free_level(side->ctx, level);
+        elm_pool_free_level(side->pool, level);
     } else if (level->first_order == order) {
         // First order at this level is being removed.
         level->first_order = dbr_side_order_entry(order->side_node_.next);

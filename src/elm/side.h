@@ -27,7 +27,7 @@
 #include <stdbool.h>
 
 struct ElmSide {
-    struct ElmCtx* ctx;
+    struct ElmPool* pool;
     struct AshTree levels;
     struct AshList orders;
     // Last trade information.
@@ -37,7 +37,7 @@ struct ElmSide {
 };
 
 DBR_EXTERN void
-elm_side_init(struct ElmSide* side, struct ElmCtx* ctx);
+elm_side_init(struct ElmSide* side, struct ElmPool* pool);
 
 // Levels associated with side are also freed.
 // Assumes that pointer is not null.

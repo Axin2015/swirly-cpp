@@ -17,8 +17,8 @@
  */
 #include "accnt.h"
 
-#include "ctx.h"
 #include "err.h"
+#include "pool.h"
 
 #include <dbr/conv.h>
 #include <dbr/sess.h>
@@ -47,7 +47,7 @@ free_membs(struct ElmAccnt* accnt)
     while ((node = accnt->membs.root)) {
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
         ash_tree_remove(&accnt->membs, node);
-        elm_ctx_free_memb(accnt->ctx, memb);
+        elm_pool_free_memb(accnt->pool, memb);
     }
 }
 
@@ -59,7 +59,7 @@ free_trades(struct ElmAccnt* accnt)
     while ((node = accnt->trades.root)) {
         struct DbrTrade* trade = dbr_accnt_trade_entry(node);
         ash_tree_remove(&accnt->trades, node);
-        elm_ctx_free_trade(accnt->ctx, trade);
+        elm_pool_free_trade(accnt->pool, trade);
     }
 }
 
@@ -71,12 +71,12 @@ free_posns(struct ElmAccnt* accnt)
     while ((node = accnt->posns.root)) {
         struct DbrPosn* posn = dbr_accnt_posn_entry(node);
         ash_tree_remove(&accnt->posns, node);
-        elm_ctx_free_posn(accnt->ctx, posn);
+        elm_pool_free_posn(accnt->pool, posn);
     }
 }
 
 DBR_EXTERN struct ElmAccnt*
-elm_accnt_lazy(struct DbrRec* arec, struct ElmCtx* ctx)
+elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
@@ -88,7 +88,7 @@ elm_accnt_lazy(struct DbrRec* arec, struct ElmCtx* ctx)
             return NULL;
         }
         accnt->id = arec->id;
-        accnt->ctx = ctx;
+        accnt->pool = pool;
         ash_tree_init(&accnt->membs);
         ash_tree_init(&accnt->trades);
         ash_tree_init(&accnt->posns);
@@ -115,7 +115,7 @@ elm_accnt_term(struct DbrRec* arec)
 }
 
 DBR_EXTERN struct DbrPosn*
-elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct ElmCtx* ctx)
+elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct ElmPool* pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
@@ -126,14 +126,14 @@ elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
     // Synthentic id from instrument and settlment date.
     const DbrIden id = irec->id * 100000000L + settl_date;
 
-    struct ElmAccnt* accnt = elm_accnt_lazy(arec, ctx);
+    struct ElmAccnt* accnt = elm_accnt_lazy(arec, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
 
     struct DbrPosn* posn;
 	struct DbrRbNode* node = ash_tree_pfind(&accnt->posns, id);
     if (!node || node->key != id) {
-        if (!(posn = elm_ctx_alloc_posn(accnt->ctx, id)))
+        if (!(posn = elm_pool_alloc_posn(accnt->pool, id)))
             return NULL;
 
         posn->id = id;

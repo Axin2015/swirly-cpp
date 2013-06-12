@@ -34,7 +34,7 @@
 #endif // ELM_CACHE_BUCKETS
 
 struct ElmCache {
-    struct ElmCtx* ctx;
+    struct ElmPool* pool;
     // Must be set before first_market.
     struct DbrSlNode* first_instr;
     size_t instr_size;
@@ -52,7 +52,7 @@ struct ElmCache {
 };
 
 DBR_EXTERN void
-elm_cache_init(struct ElmCache* cache, struct ElmCtx* ctx);
+elm_cache_init(struct ElmCache* cache, struct ElmPool* pool);
 
 DBR_EXTERN void
 elm_cache_term(struct ElmCache* cache);

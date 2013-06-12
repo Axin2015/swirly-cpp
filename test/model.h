@@ -21,7 +21,7 @@
 #include <dbr/model.h>
 
 DBR_EXTERN DbrModel
-model_create(DbrCtx ctx, DbrIden seed);
+model_create(DbrPool pool, DbrIden seed);
 
 DBR_EXTERN void
 model_destroy(DbrModel model);

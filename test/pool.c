@@ -17,17 +17,17 @@
  */
 #include "test.h"
 
-#include <dbr/ctx.h>
+#include <dbr/pool.h>
 
 void
-create_ctx(void)
+create_pool(void)
 {
-    DbrCtx ctx = dbr_ctx_create();
-    dbr_ctx_destroy(ctx);
+    DbrPool pool = dbr_pool_create();
+    dbr_pool_destroy(pool);
 }
 
 void
-destroy_ctx(void)
+destroy_pool(void)
 {
-    dbr_ctx_destroy(NULL);
+    dbr_pool_destroy(NULL);
 }

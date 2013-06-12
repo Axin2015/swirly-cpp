@@ -18,7 +18,7 @@
 #ifndef DBR_MODEL_H
 #define DBR_MODEL_H
 
-#include <dbr/ctx.h>
+#include <dbr/pool.h>
 #include <dbr/types.h>
 
 /**
@@ -139,7 +139,7 @@ dbr_model_end(DbrModel model)
 /**
  * @brief Create SQLite3 model.
  *
- * @param ctx Context.
+ * @param pool Pool.
  *
  * @param seed Seed identifier.
  *
@@ -149,7 +149,7 @@ dbr_model_end(DbrModel model)
  */
 
 DBR_API DbrModel
-dbr_sqlite_create(DbrCtx ctx, DbrIden seed, const char* path);
+dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path);
 
 DBR_API void
 dbr_sqlite_destroy(DbrModel model);

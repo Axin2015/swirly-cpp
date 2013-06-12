@@ -50,21 +50,21 @@ set_instr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
 }
 
 static ssize_t
-select_instr(DbrCtx ctx, struct DbrSlNode** first)
+select_instr(DbrPool pool, struct DbrSlNode** first)
 {
     ssize_t size = 0;
 
     struct AshQueue rq;
     ash_queue_init(&rq);
 
-    struct DbrRec* rec = dbr_ctx_alloc_rec(ctx);
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_instr(rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
     ash_queue_push(&rq, &rec->model_node_);
     ++size;
 
-    rec = dbr_ctx_alloc_rec(ctx);
+    rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_instr(rec, 2, "GBPUSD.SPOTFWD", "GBPUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "GBP", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
@@ -89,20 +89,20 @@ set_market(struct DbrRec* rec, DbrIden id, const char* mnem, DbrIden instr, cons
 }
 
 static ssize_t
-select_market(DbrCtx ctx, struct DbrSlNode** first)
+select_market(DbrPool pool, struct DbrSlNode** first)
 {
     ssize_t size = 0;
 
     struct AshQueue rq;
     ash_queue_init(&rq);
 
-    struct DbrRec* rec = dbr_ctx_alloc_rec(ctx);
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_market(rec, 1, "EURUSD", 1, "SP", 20130417);
     ash_queue_push(&rq, &rec->model_node_);
     ++size;
 
-    rec = dbr_ctx_alloc_rec(ctx);
+    rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_market(rec, 2, "GBPUSD", 2, "SP", 20130417);
     ash_queue_push(&rq, &rec->model_node_);
@@ -124,20 +124,20 @@ set_trader(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display
 }
 
 static ssize_t
-select_trader(DbrCtx ctx, struct DbrSlNode** first)
+select_trader(DbrPool pool, struct DbrSlNode** first)
 {
     ssize_t size = 0;
 
     struct AshQueue rq;
     ash_queue_init(&rq);
 
-    struct DbrRec* rec = dbr_ctx_alloc_rec(ctx);
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_trader(rec, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
     ash_queue_push(&rq, &rec->model_node_);
     ++size;
 
-    rec = dbr_ctx_alloc_rec(ctx);
+    rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_trader(rec, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
     ash_queue_push(&rq, &rec->model_node_);
@@ -159,20 +159,20 @@ set_accnt(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
 }
 
 static ssize_t
-select_accnt(DbrCtx ctx, struct DbrSlNode** first)
+select_accnt(DbrPool pool, struct DbrSlNode** first)
 {
     ssize_t size = 0;
 
     struct AshQueue rq;
     ash_queue_init(&rq);
 
-    struct DbrRec* rec = dbr_ctx_alloc_rec(ctx);
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_accnt(rec, 1, "DBRA", "Account A", "dbra@doobry.org");
     ash_queue_push(&rq, &rec->model_node_);
     ++size;
 
-    rec = dbr_ctx_alloc_rec(ctx);
+    rec = dbr_pool_alloc_rec(pool);
     check(rec);
     set_accnt(rec, 2, "DBRB", "Account B", "dbrb@doobry.org");
     ash_queue_push(&rq, &rec->model_node_);
@@ -183,7 +183,7 @@ select_accnt(DbrCtx ctx, struct DbrSlNode** first)
 }
 
 static ssize_t
-select_order(DbrCtx ctx, struct DbrSlNode** first)
+select_order(DbrPool pool, struct DbrSlNode** first)
 {
     *first = NULL;
     return 0;
@@ -197,26 +197,26 @@ set_memb(struct DbrMemb* memb, DbrIden accnt, DbrIden trader)
 }
 
 static ssize_t
-select_memb(DbrCtx ctx, struct DbrSlNode** first)
+select_memb(DbrPool pool, struct DbrSlNode** first)
 {
     ssize_t size = 0;
 
     struct AshQueue rq;
     ash_queue_init(&rq);
 
-    struct DbrMemb* memb = dbr_ctx_alloc_memb(ctx, 1);
+    struct DbrMemb* memb = dbr_pool_alloc_memb(pool, 1);
     check(memb);
     set_memb(memb, 1, 1);
     ash_queue_push(&rq, &memb->model_node_);
     ++size;
 
-    memb = dbr_ctx_alloc_memb(ctx, 1);
+    memb = dbr_pool_alloc_memb(pool, 1);
     check(memb);
     set_memb(memb, 2, 1);
     ash_queue_push(&rq, &memb->model_node_);
     ++size;
 
-    memb = dbr_ctx_alloc_memb(ctx, 2);
+    memb = dbr_pool_alloc_memb(pool, 2);
     check(memb);
     set_memb(memb, 2, 2);
     ash_queue_push(&rq, &memb->model_node_);
@@ -227,21 +227,21 @@ select_memb(DbrCtx ctx, struct DbrSlNode** first)
 }
 
 static ssize_t
-select_trade(DbrCtx ctx, struct DbrSlNode** first)
+select_trade(DbrPool pool, struct DbrSlNode** first)
 {
     *first = NULL;
     return 0;
 }
 
 static ssize_t
-select_posn(DbrCtx ctx, struct DbrSlNode** first)
+select_posn(DbrPool pool, struct DbrSlNode** first)
 {
     *first = NULL;
     return 0;
 }
 
 struct TestImpl {
-    DbrCtx ctx;
+    DbrPool pool;
     DbrIden id;
     struct DbrIModel model_;
 };
@@ -315,28 +315,28 @@ select(DbrModel model, int type, struct DbrSlNode** first)
     ssize_t ret;
     switch (type) {
     case DBR_INSTR:
-        ret = select_instr(impl->ctx, first);
+        ret = select_instr(impl->pool, first);
         break;
     case DBR_MARKET:
-        ret = select_market(impl->ctx, first);
+        ret = select_market(impl->pool, first);
         break;
     case DBR_TRADER:
-        ret = select_trader(impl->ctx, first);
+        ret = select_trader(impl->pool, first);
         break;
     case DBR_ACCNT:
-        ret = select_accnt(impl->ctx, first);
+        ret = select_accnt(impl->pool, first);
         break;
     case DBR_ORDER:
-        ret = select_order(impl->ctx, first);
+        ret = select_order(impl->pool, first);
         break;
     case DBR_MEMB:
-        ret = select_memb(impl->ctx, first);
+        ret = select_memb(impl->pool, first);
         break;
     case DBR_TRADE:
-        ret = select_trade(impl->ctx, first);
+        ret = select_trade(impl->pool, first);
         break;
     case DBR_POSN:
-        ret = select_posn(impl->ctx, first);
+        ret = select_posn(impl->pool, first);
         break;
     default:
         assert(false);
@@ -367,7 +367,7 @@ static const struct DbrModelVtbl TEST_MODEL_VTBL = {
 };
 
 DBR_EXTERN DbrModel
-model_create(DbrCtx ctx, DbrIden seed)
+model_create(DbrPool pool, DbrIden seed)
 {
     struct TestImpl* impl = malloc(sizeof(struct TestImpl));
     if (dbr_unlikely(!impl))
@@ -376,7 +376,7 @@ model_create(DbrCtx ctx, DbrIden seed)
     // Seed identity.
     impl->id = seed;
 
-    impl->ctx = ctx;
+    impl->pool = pool;
     impl->model_.vtbl = &TEST_MODEL_VTBL;
     return &impl->model_;
  fail1:

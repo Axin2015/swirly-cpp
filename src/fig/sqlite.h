@@ -30,7 +30,7 @@ struct FigSqlite {
     /**
      * @publicsection
      */
-    struct ElmCtx* ctx;
+    struct ElmPool* pool;
     struct sqlite3* db;
     struct sqlite3_stmt* insert_order;
     struct sqlite3_stmt* update_order;
@@ -44,7 +44,7 @@ struct FigSqlite {
 };
 
 DBR_EXTERN DbrBool
-fig_sqlite_init(struct FigSqlite* sqlite, struct ElmCtx* ctx, const char* path);
+fig_sqlite_init(struct FigSqlite* sqlite, struct ElmPool* pool, const char* path);
 
 // Assumes that pointer is not null.
 

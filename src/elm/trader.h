@@ -28,7 +28,7 @@
 
 struct ElmTrader {
     DbrIden id;
-    struct ElmCtx* ctx;
+    struct ElmPool* pool;
     struct ElmIndex* index;
     struct AshTree orders;
     struct AshTree subs;
@@ -36,7 +36,7 @@ struct ElmTrader {
 };
 
 DBR_EXTERN struct ElmTrader*
-elm_trader_lazy(struct DbrRec* trec, struct ElmCtx* ctx, struct ElmIndex* index);
+elm_trader_lazy(struct DbrRec* trec, struct ElmPool* pool, struct ElmIndex* index);
 
 // Assumes that trec pointer is not null.
 

@@ -24,7 +24,7 @@
 
 struct ElmAccnt {
     DbrIden id;
-    struct ElmCtx* ctx;
+    struct ElmPool* pool;
     struct AshTree membs;
     struct AshTree trades;
     struct AshTree posns;
@@ -33,7 +33,7 @@ struct ElmAccnt {
 };
 
 DBR_EXTERN struct ElmAccnt*
-elm_accnt_lazy(struct DbrRec* arec, struct ElmCtx* ctx);
+elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool);
 
 // Assumes that arec pointer is not null.
 
@@ -124,7 +124,7 @@ elm_accnt_emplace_posn(struct ElmAccnt* accnt, struct DbrPosn* posn)
 }
 
 DBR_EXTERN struct DbrPosn*
-elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct ElmCtx* ctx);
+elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct ElmPool* pool);
 
 static inline struct DbrRbNode*
 elm_accnt_find_posn_id(const struct ElmAccnt* accnt, DbrIden id)

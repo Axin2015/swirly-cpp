@@ -18,11 +18,11 @@
 #include "exec.h"
 
 #include "accnt.h"
-#include "ctx.h"
 #include "err.h"
 #include "index.h"
 #include "match.h"
 #include "market.h"
+#include "pool.h"
 #include "trader.h"
 
 #include <dbr/sess.h>
@@ -101,7 +101,7 @@ apply_trades(struct ElmExec* exec, struct ElmMarket* market, const struct DbrTra
 {
     const struct DbrOrder* taker_order = trans->new_order;
     // Must succeed because new_posn exists.
-    struct ElmAccnt* taker_accnt = elm_accnt_lazy(taker_order->accnt.rec, exec->ctx);
+    struct ElmAccnt* taker_accnt = elm_accnt_lazy(taker_order->accnt.rec, exec->pool);
     assert(taker_accnt);
 
     for (struct DbrSlNode* node = trans->first_match; node; node = node->next) {
@@ -113,7 +113,7 @@ apply_trades(struct ElmExec* exec, struct ElmMarket* market, const struct DbrTra
         elm_market_take(market, maker_order, match->lots, now);
 
         // Must succeed because maker_posn exists.
-        struct ElmAccnt* maker_accnt = elm_accnt_lazy(maker_order->accnt.rec, exec->ctx);
+        struct ElmAccnt* maker_accnt = elm_accnt_lazy(maker_order->accnt.rec, exec->pool);
         assert(maker_accnt);
 
         // Update taker.
@@ -130,9 +130,9 @@ apply_trades(struct ElmExec* exec, struct ElmMarket* market, const struct DbrTra
 }
 
 DBR_EXTERN void
-elm_exec_init(struct ElmExec* exec, struct ElmCtx* ctx, DbrModel model, struct ElmIndex* index)
+elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrModel model, struct ElmIndex* index)
 {
-    exec->ctx = ctx;
+    exec->pool = pool;
     exec->model = model;
     exec->index = index;
 }
@@ -142,16 +142,16 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
                 struct DbrRec* mrec, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                 DbrFlags flags, DbrMillis now, struct DbrTrans* trans)
 {
-    struct ElmTrader* trader = elm_trader_lazy(trec, exec->ctx, exec->index);
+    struct ElmTrader* trader = elm_trader_lazy(trec, exec->pool, exec->index);
     if (!trader)
         goto fail1;
 
-    struct ElmMarket* market = elm_market_lazy(mrec, exec->ctx);
+    struct ElmMarket* market = elm_market_lazy(mrec, exec->pool);
     if (!market)
         goto fail1;
 
     const DbrIden id = dbr_model_alloc_id(exec->model);
-    struct DbrOrder* new_order = elm_ctx_alloc_order(exec->ctx, id);
+    struct DbrOrder* new_order = elm_pool_alloc_order(exec->pool, id);
     if (!new_order)
         goto fail1;
 
@@ -184,7 +184,7 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
         goto fail2;
 
     if (!dbr_model_insert_order(exec->model, new_order)
-        || !elm_match_orders(exec->ctx, exec->model, market, new_order, trans))
+        || !elm_match_orders(exec->pool, exec->model, market, new_order, trans))
         goto fail3;
 
     if (trans->count > 0) {
@@ -211,12 +211,12 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     dbr_model_commit(exec->model);
     return new_order;
  fail4:
-    elm_ctx_free_matches(exec->ctx, trans->first_match);
+    elm_pool_free_matches(exec->pool, trans->first_match);
     memset(trans, 0, sizeof(*trans));
  fail3:
     dbr_model_rollback(exec->model);
  fail2:
-    elm_ctx_free_order(exec->ctx, new_order);
+    elm_pool_free_order(exec->pool, new_order);
  fail1:
     trans->new_order = NULL;
     trans->new_posn = NULL;
@@ -250,7 +250,7 @@ elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
         goto fail2;
 
     // Must succeed because order exists.
-    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->ctx);
+    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->pool);
     assert(market);
 
     if (!elm_market_revise(market, order, lots, now))
@@ -286,7 +286,7 @@ elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
                                 order->exec, lots, now))
         goto fail2;
 
-    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->ctx);
+    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->pool);
     assert(market);
     if (!elm_market_revise(market, order, lots, now))
         goto fail2;
@@ -318,7 +318,7 @@ elm_exec_cancel_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
                                 order->exec, order->lots, now))
         goto fail1;
 
-    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->ctx);
+    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->pool);
     assert(market);
     elm_market_cancel(market, order, now);
     return order;
@@ -344,7 +344,7 @@ elm_exec_cancel_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
                                 order->exec, order->lots, now))
         goto fail1;
 
-    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->ctx);
+    struct ElmMarket* market = elm_market_lazy(order->market.rec, exec->pool);
     assert(market);
     elm_market_cancel(market, order, now);
     return order;
@@ -366,7 +366,7 @@ elm_exec_archive_order(struct ElmExec* exec, struct ElmTrader* trader, DbrIden i
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     elm_trader_release_order(trader, order);
-    elm_ctx_free_order(exec->ctx, order);
+    elm_pool_free_order(exec->pool, order);
     return true;
  fail1:
     return false;
@@ -386,7 +386,7 @@ elm_exec_archive_trade(struct ElmExec* exec, struct ElmAccnt* accnt, DbrIden id,
 
     struct DbrTrade* trade = dbr_accnt_trade_entry(node);
     elm_accnt_release_trade(accnt, trade);
-    elm_ctx_free_trade(exec->ctx, trade);
+    elm_pool_free_trade(exec->pool, trade);
     return true;
  fail1:
     return false;
@@ -399,6 +399,6 @@ elm_exec_free_matches(struct ElmExec* exec, struct DbrSlNode* first)
     while (node) {
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
-        elm_ctx_free_match(exec->ctx, match);
+        elm_pool_free_match(exec->pool, match);
     }
 }

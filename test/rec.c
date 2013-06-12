@@ -40,9 +40,9 @@ get_rec_mnem(DbrEnv env, int type, const char* mnem)
 void
 find_instr(void)
 {
-    DbrCtx ctx = dbr_ctx_create();
-    DbrModel model = model_create(ctx, 1);
-    DbrEnv env = dbr_env_create(ctx, model);
+    DbrPool pool = dbr_pool_create();
+    DbrModel model = model_create(pool, 1);
+    DbrEnv env = dbr_env_create(pool, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_INSTR, "BAD");
     check(node == NULL);
@@ -68,15 +68,15 @@ find_instr(void)
 
     dbr_env_destroy(env);
     model_destroy(model);
-    dbr_ctx_destroy(ctx);
+    dbr_pool_destroy(pool);
 }
 
 void
 find_market(void)
 {
-    DbrCtx ctx = dbr_ctx_create();
-    DbrModel model = model_create(ctx, 1);
-    DbrEnv env = dbr_env_create(ctx, model);
+    DbrPool pool = dbr_pool_create();
+    DbrModel model = model_create(pool, 1);
+    DbrEnv env = dbr_env_create(pool, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_MARKET, "BAD");
     check(node == NULL);
@@ -90,15 +90,15 @@ find_market(void)
 
     dbr_env_destroy(env);
     model_destroy(model);
-    dbr_ctx_destroy(ctx);
+    dbr_pool_destroy(pool);
 }
 
 void
 find_accnt(void)
 {
-    DbrCtx ctx = dbr_ctx_create();
-    DbrModel model = model_create(ctx, 1);
-    DbrEnv env = dbr_env_create(ctx, model);
+    DbrPool pool = dbr_pool_create();
+    DbrModel model = model_create(pool, 1);
+    DbrEnv env = dbr_env_create(pool, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_ACCNT, "BAD");
     check(node == NULL);
@@ -113,15 +113,15 @@ find_accnt(void)
 
     dbr_env_destroy(env);
     model_destroy(model);
-    dbr_ctx_destroy(ctx);
+    dbr_pool_destroy(pool);
 }
 
 void
 find_trader(void)
 {
-    DbrCtx ctx = dbr_ctx_create();
-    DbrModel model = model_create(ctx, 1);
-    DbrEnv env = dbr_env_create(ctx, model);
+    DbrPool pool = dbr_pool_create();
+    DbrModel model = model_create(pool, 1);
+    DbrEnv env = dbr_env_create(pool, model);
 
     struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_TRADER, "BAD");
     check(node == NULL);
@@ -136,5 +136,5 @@ find_trader(void)
 
     dbr_env_destroy(env);
     model_destroy(model);
-    dbr_ctx_destroy(ctx);
+    dbr_pool_destroy(pool);
 }

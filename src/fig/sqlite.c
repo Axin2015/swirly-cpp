@@ -22,8 +22,8 @@
 
 #include <dbr/conv.h>
 
-#include <elm/ctx.h>
 #include <elm/err.h>
+#include <elm/pool.h>
 
 #include <ash/queue.h>
 
@@ -97,46 +97,46 @@
 // not have been allocated.
 
 static inline void
-free_recs(struct ElmCtx* ctx, struct AshQueue* rq)
+free_recs(struct ElmPool* pool, struct AshQueue* rq)
 {
     struct DbrSlNode* node = ash_queue_first(rq);
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
-        elm_ctx_free_rec(ctx, rec);
+        elm_pool_free_rec(pool, rec);
     }
 }
 
 static inline void
-free_orders(struct ElmCtx* ctx, struct AshQueue* oq)
+free_orders(struct ElmPool* pool, struct AshQueue* oq)
 {
     struct DbrSlNode* node = ash_queue_first(oq);
     while (node) {
         struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
-        elm_ctx_free_order(ctx, order);
+        elm_pool_free_order(pool, order);
     }
 }
 
 static inline void
-free_trades(struct ElmCtx* ctx, struct AshQueue* tq)
+free_trades(struct ElmPool* pool, struct AshQueue* tq)
 {
     struct DbrSlNode* node = ash_queue_first(tq);
     while (node) {
         struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
-        elm_ctx_free_trade(ctx, trade);
+        elm_pool_free_trade(pool, trade);
     }
 }
 
 static inline void
-free_posns(struct ElmCtx* ctx, struct AshQueue* pq)
+free_posns(struct ElmPool* pool, struct AshQueue* pq)
 {
     struct DbrSlNode* node = ash_queue_first(pq);
     while (node) {
         struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
-        elm_ctx_free_posn(ctx, posn);
+        elm_pool_free_posn(pool, posn);
     }
 }
 
@@ -507,7 +507,7 @@ select_instr(struct FigSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = elm_ctx_alloc_rec(sqlite->ctx);
+            struct DbrRec* rec = elm_pool_alloc_rec(sqlite->pool);
             if (!rec)
                 goto fail2;
 
@@ -580,7 +580,7 @@ select_instr(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->ctx, &rq);
+    free_recs(sqlite->pool, &rq);
     *first = NULL;
  fail1:
     return -1;
@@ -609,7 +609,7 @@ select_market(struct FigSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = elm_ctx_alloc_rec(sqlite->ctx);
+            struct DbrRec* rec = elm_pool_alloc_rec(sqlite->pool);
             if (!rec)
                 goto fail2;
 
@@ -649,7 +649,7 @@ select_market(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->ctx, &rq);
+    free_recs(sqlite->pool, &rq);
     *first = NULL;
  fail1:
     return -1;
@@ -677,7 +677,7 @@ select_trader(struct FigSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = elm_ctx_alloc_rec(sqlite->ctx);
+            struct DbrRec* rec = elm_pool_alloc_rec(sqlite->pool);
             if (!rec)
                 goto fail2;
 
@@ -717,7 +717,7 @@ select_trader(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->ctx, &rq);
+    free_recs(sqlite->pool, &rq);
     *first = NULL;
  fail1:
     return -1;
@@ -745,7 +745,7 @@ select_accnt(struct FigSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = elm_ctx_alloc_rec(sqlite->ctx);
+            struct DbrRec* rec = elm_pool_alloc_rec(sqlite->pool);
             if (!rec)
                 goto fail2;
 
@@ -785,7 +785,7 @@ select_accnt(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->ctx, &rq);
+    free_recs(sqlite->pool, &rq);
     *first = NULL;
  fail1:
     return -1;
@@ -826,7 +826,7 @@ select_order(struct FigSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden id = sqlite3_column_int64(stmt, ID);
-            struct DbrOrder* order = elm_ctx_alloc_order(sqlite->ctx, id);
+            struct DbrOrder* order = elm_pool_alloc_order(sqlite->pool, id);
             if (!order)
                 goto fail2;
 
@@ -878,7 +878,7 @@ select_order(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_orders(sqlite->ctx, &oq);
+    free_orders(sqlite->pool, &oq);
     *first = NULL;
  fail1:
     return -1;
@@ -905,7 +905,7 @@ select_memb(struct FigSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden trader = sqlite3_column_int64(stmt, TRADER);
-            struct DbrMemb* memb = elm_ctx_alloc_memb(sqlite->ctx, trader);
+            struct DbrMemb* memb = elm_pool_alloc_memb(sqlite->pool, trader);
             if (!memb)
                 goto fail2;
 
@@ -932,7 +932,7 @@ select_memb(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_orders(sqlite->ctx, &mq);
+    free_orders(sqlite->pool, &mq);
     *first = NULL;
  fail1:
     return -1;
@@ -975,7 +975,7 @@ select_trade(struct FigSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden id = sqlite3_column_int64(stmt, ID);
-            struct DbrTrade* trade = elm_ctx_alloc_trade(sqlite->ctx, id);
+            struct DbrTrade* trade = elm_pool_alloc_trade(sqlite->pool, id);
             if (!trade)
                 goto fail2;
 
@@ -1028,7 +1028,7 @@ select_trade(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_trades(sqlite->ctx, &tq);
+    free_trades(sqlite->pool, &tq);
     *first = NULL;
  fail1:
     return -1;
@@ -1081,7 +1081,7 @@ select_posn(struct FigSqlite* sqlite, struct DbrSlNode** first)
                 continue;
             }
 
-            posn = elm_ctx_alloc_posn(sqlite->ctx, id);
+            posn = elm_pool_alloc_posn(sqlite->pool, id);
             if (dbr_unlikely(!posn))
                 goto fail2;
 
@@ -1122,14 +1122,14 @@ select_posn(struct FigSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_posns(sqlite->ctx, &pq);
+    free_posns(sqlite->pool, &pq);
     *first = NULL;
  fail1:
     return -1;
 }
 
 DBR_EXTERN DbrBool
-fig_sqlite_init(struct FigSqlite* sqlite, struct ElmCtx* ctx, const char* path)
+fig_sqlite_init(struct FigSqlite* sqlite, struct ElmPool* pool, const char* path)
 {
     sqlite3* db;
     int rc = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE, NULL);
@@ -1178,7 +1178,7 @@ fig_sqlite_init(struct FigSqlite* sqlite, struct ElmCtx* ctx, const char* path)
     if (!archive_trade)
         goto fail5;
 
-    sqlite->ctx = ctx;
+    sqlite->pool = pool;
     sqlite->db = db;
     sqlite->insert_order = insert_order;
     sqlite->update_order = update_order;

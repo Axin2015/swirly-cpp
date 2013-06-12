@@ -30,7 +30,7 @@ typedef struct DbrEnv_* DbrEnv;
 /**
  * @brief Create environment.
  *
- * @param ctx Context.
+ * @param pool Pool.
  *
  * @param model Model.
  *
@@ -38,7 +38,7 @@ typedef struct DbrEnv_* DbrEnv;
  */
 
 DBR_API DbrEnv
-dbr_env_create(DbrCtx ctx, DbrModel model);
+dbr_env_create(DbrPool pool, DbrModel model);
 
 // No-op if env is null.
 

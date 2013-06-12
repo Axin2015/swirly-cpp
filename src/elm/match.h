@@ -21,7 +21,7 @@
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
-struct ElmCtx;
+struct ElmPool;
 struct ElmIndex;
 struct ElmMarket;
 
@@ -30,7 +30,7 @@ struct ElmMarket;
 // Match taker with list of maker orders.
 
 DBR_EXTERN DbrBool
-elm_match_orders(struct ElmCtx* ctx, DbrModel model, struct ElmMarket* market,
+elm_match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market,
                  struct DbrOrder* taker, struct DbrTrans* trans);
 
 #endif // ELM_MATCH_H

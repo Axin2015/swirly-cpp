@@ -17,9 +17,9 @@
  */
 #include "trader.h"
 
-#include "ctx.h"
 #include "err.h"
 #include "market.h"
+#include "pool.h"
 
 #include <dbr/sess.h>
 
@@ -40,7 +40,7 @@ free_orders(struct ElmTrader* trader)
     while ((node = trader->orders.root)) {
         struct DbrOrder* order = dbr_trader_order_entry(node);
         elm_trader_release_order(trader, order);
-        elm_ctx_free_order(trader->ctx, order);
+        elm_pool_free_order(trader->pool, order);
     }
 }
 
@@ -53,12 +53,12 @@ free_subs(struct ElmTrader* trader)
         struct DbrSub* sub = dbr_trader_sub_entry(node);
         elm_market_unsub(sub);
         ash_tree_remove(&trader->subs, node);
-        elm_ctx_free_sub(trader->ctx, sub);
+        elm_pool_free_sub(trader->pool, sub);
     }
 }
 
 DBR_EXTERN struct ElmTrader*
-elm_trader_lazy(struct DbrRec* trec, struct ElmCtx* ctx, struct ElmIndex* index)
+elm_trader_lazy(struct DbrRec* trec, struct ElmPool* pool, struct ElmIndex* index)
 {
     assert(trec);
     assert(trec->type == DBR_TRADER);
@@ -70,7 +70,7 @@ elm_trader_lazy(struct DbrRec* trec, struct ElmCtx* ctx, struct ElmIndex* index)
             return NULL;
         }
         trader->id = trec->id;
-        trader->ctx = ctx;
+        trader->pool = pool;
         trader->index = index;
         ash_tree_init(&trader->orders);
         ash_tree_init(&trader->subs);
@@ -98,13 +98,13 @@ elm_trader_term(struct DbrRec* trec)
 DBR_EXTERN DbrBool
 elm_trader_sub(struct ElmTrader* trader, struct ElmMarket* market)
 {
-    struct ElmCtx* ctx = trader->ctx;
+    struct ElmPool* pool = trader->pool;
 	struct DbrRbNode* node = ash_tree_pfind(&trader->subs, market->id);
     if (node && node->key == market->id) {
         elm_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
-    struct DbrSub* sub = elm_ctx_alloc_sub(ctx, market->id);
+    struct DbrSub* sub = elm_pool_alloc_sub(pool, market->id);
     if (!sub)
         goto fail1;
 
@@ -128,7 +128,7 @@ elm_trader_unsub(struct ElmTrader* trader, DbrIden mrid)
         struct DbrSub* sub = dbr_trader_sub_entry(node);
         elm_market_unsub(sub);
         ash_tree_remove(&trader->subs, node);
-        elm_ctx_free_sub(trader->ctx, sub);
+        elm_pool_free_sub(trader->pool, sub);
     }
 }
 

@@ -21,18 +21,18 @@
 
 #include <elm/accnt.h>
 #include <elm/cache.h>
-#include <elm/ctx.h>
 #include <elm/err.h>
 #include <elm/exec.h>
 #include <elm/index.h>
 #include <elm/market.h>
+#include <elm/pool.h>
 #include <elm/trader.h>
 
 #include <stdbool.h>
 #include <stdlib.h> // malloc()
 
 struct DbrEnv_ {
-    DbrCtx ctx;
+    DbrPool pool;
     DbrModel model;
     struct ElmCache cache;
     struct ElmIndex index;
@@ -75,7 +75,7 @@ emplace_orders(DbrEnv env)
         struct ElmMarket* market;
         if (!dbr_order_done(order)) {
 
-            struct ElmMarket* market = elm_market_lazy(order->market.rec, env->ctx);
+            struct ElmMarket* market = elm_market_lazy(order->market.rec, env->pool);
             if (dbr_unlikely(!market))
                 goto fail2;
 
@@ -84,7 +84,7 @@ emplace_orders(DbrEnv env)
         } else
             market = NULL;
 
-        struct ElmTrader* trader = elm_trader_lazy(order->trader.rec, env->ctx, &env->index);
+        struct ElmTrader* trader = elm_trader_lazy(order->trader.rec, env->pool, &env->index);
         if (dbr_unlikely(!trader)) {
             if (market)
                 elm_market_remove(market, order);
@@ -100,7 +100,7 @@ emplace_orders(DbrEnv env)
     do {
         struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
-        elm_ctx_free_order(env->ctx, order);
+        elm_pool_free_order(env->pool, order);
     } while (node);
  fail1:
     return false;
@@ -118,7 +118,7 @@ emplace_membs(DbrEnv env)
         memb->accnt.rec = get_id(env, DBR_ACCNT, memb->accnt.id);
         memb->trader.rec = get_id(env, DBR_TRADER, memb->trader.id);
 
-        struct ElmAccnt* accnt = elm_accnt_lazy(memb->accnt.rec, env->ctx);
+        struct ElmAccnt* accnt = elm_accnt_lazy(memb->accnt.rec, env->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -131,7 +131,7 @@ emplace_membs(DbrEnv env)
     do {
         struct DbrMemb* memb = dbr_memb_entry(node);
         node = node->next;
-        elm_ctx_free_memb(env->ctx, memb);
+        elm_pool_free_memb(env->pool, memb);
     } while (node);
  fail1:
     return false;
@@ -151,7 +151,7 @@ emplace_trades(DbrEnv env)
         trade->market.rec = get_id(env, DBR_MARKET, trade->market.id);
         trade->cpty.rec = get_id(env, DBR_ACCNT, trade->cpty.id);
 
-        struct ElmAccnt* accnt = elm_accnt_lazy(trade->accnt.rec, env->ctx);
+        struct ElmAccnt* accnt = elm_accnt_lazy(trade->accnt.rec, env->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -164,7 +164,7 @@ emplace_trades(DbrEnv env)
     do {
         struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
-        elm_ctx_free_trade(env->ctx, trade);
+        elm_pool_free_trade(env->pool, trade);
     } while (node);
  fail1:
     return false;
@@ -182,7 +182,7 @@ emplace_posns(DbrEnv env)
         posn->accnt.rec = get_id(env, DBR_ACCNT, posn->accnt.id);
         posn->instr.rec = get_id(env, DBR_INSTR, posn->instr.id);
 
-        struct ElmAccnt* accnt = elm_accnt_lazy(posn->accnt.rec, env->ctx);
+        struct ElmAccnt* accnt = elm_accnt_lazy(posn->accnt.rec, env->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -195,16 +195,16 @@ emplace_posns(DbrEnv env)
     do {
         struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
-        elm_ctx_free_posn(env->ctx, posn);
+        elm_pool_free_posn(env->pool, posn);
     } while (node);
  fail1:
     return false;
 }
 
-// Context
+// Environment
 
 DBR_API DbrEnv
-dbr_env_create(DbrCtx ctx, DbrModel model)
+dbr_env_create(DbrPool pool, DbrModel model)
 {
     DbrEnv env = malloc(sizeof(struct DbrEnv_));
     if (dbr_unlikely(!env)) {
@@ -212,11 +212,11 @@ dbr_env_create(DbrCtx ctx, DbrModel model)
         goto fail1;
     }
 
-    env->ctx = ctx;
+    env->pool = pool;
     env->model = model;
-    elm_cache_init(&env->cache, ctx);
+    elm_cache_init(&env->cache, pool);
     elm_index_init(&env->index);
-    elm_exec_init(&env->exec, ctx, model, &env->index);
+    elm_exec_init(&env->exec, pool, model, &env->index);
 
     // Data structures are fully initialised at this point.
 
@@ -277,7 +277,7 @@ dbr_rec_end(DbrEnv env)
 DBR_API DbrMarket
 dbr_market_lazy(DbrEnv env, struct DbrRec* mrec)
 {
-    return elm_market_lazy(mrec, env->ctx);
+    return elm_market_lazy(mrec, env->pool);
 }
 
 DBR_API DbrIden
@@ -389,7 +389,7 @@ dbr_side_last_time(DbrSide side)
 DBR_API DbrTrader
 dbr_trader_lazy(DbrEnv env, struct DbrRec* trec)
 {
-    return elm_trader_lazy(trec, env->ctx, &env->index);
+    return elm_trader_lazy(trec, env->pool, &env->index);
 }
 
 DBR_API DbrIden
@@ -469,7 +469,7 @@ dbr_trader_sess(DbrTrader trader)
 DBR_API DbrAccnt
 dbr_accnt_lazy(DbrEnv env, struct DbrRec* arec)
 {
-    return elm_accnt_lazy(arec, env->ctx);
+    return elm_accnt_lazy(arec, env->pool);
 }
 
 DBR_API DbrIden

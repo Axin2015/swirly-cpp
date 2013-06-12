@@ -17,7 +17,7 @@
  */
 #include <dbr/model.h>
 
-#include <dbr/ctx.h>
+#include <dbr/pool.h>
 
 #include <fig/sqlite.h>
 
@@ -138,7 +138,7 @@ static const struct DbrModelVtbl SQLITE_MODEL_VTBL = {
 };
 
 DBR_API DbrModel
-dbr_sqlite_create(DbrCtx ctx, DbrIden seed, const char* path)
+dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path)
 {
     struct SqliteImpl* impl = malloc(sizeof(struct SqliteImpl));
     if (dbr_unlikely(!impl))
@@ -148,7 +148,7 @@ dbr_sqlite_create(DbrCtx ctx, DbrIden seed, const char* path)
     impl->id = seed;
 
     struct FigSqlite* sqlite = &impl->sqlite;
-    if (!fig_sqlite_init(sqlite, ctx, path))
+    if (!fig_sqlite_init(sqlite, pool, path))
         goto fail2;
 
     impl->model_.vtbl = &SQLITE_MODEL_VTBL;

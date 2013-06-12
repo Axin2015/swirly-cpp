@@ -27,17 +27,11 @@
  */
 
 /**
- * @defgroup Ctx Context
- */
-
-/**
  * @defgroup Err Error
- * @ingroup Ctx
  */
 
 /**
- * @defgroup Alloc Allocator
- * @ingroup Ctx
+ * @defgroup Pool Pool
  */
 
 /**

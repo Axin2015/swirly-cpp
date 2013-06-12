@@ -330,7 +330,7 @@ post_order(DbrEnv env, const char* trader, const char* accnt, const char* market
     dbr_exec_free_matches(env, trans.first_match);
 }
 
-static DbrCtx ctx = NULL;
+static DbrPool pool = NULL;
 static DbrModel model = NULL;
 static DbrEnv env = NULL;
 static char* line = NULL;
@@ -341,24 +341,24 @@ destroy(void)
     free(line);
     dbr_env_destroy(env);
     dbr_sqlite_destroy(model);
-    dbr_ctx_destroy(ctx);
+    dbr_pool_destroy(pool);
 }
 
 int
 main(int argc, char* argv[])
 {
     atexit(destroy);
-    if (!(ctx = dbr_ctx_create())) {
-        fprintf(stderr, "dbr_ctx_create() failed\n");
+    if (!(pool = dbr_pool_create())) {
+        fprintf(stderr, "dbr_pool_create() failed\n");
         return 1;
     }
 
-    if (!(model = dbr_sqlite_create(ctx, dbr_millis(), "test.db"))) {
+    if (!(model = dbr_sqlite_create(pool, dbr_millis(), "test.db"))) {
         dbr_err_print(stderr, "dbr_sqlite_create() failed");
         return 1;
     }
 
-    if (!(env = dbr_env_create(ctx, model))) {
+    if (!(env = dbr_env_create(pool, model))) {
         dbr_err_print(stderr, "dbr_env_create() failed");
         return 1;
     }

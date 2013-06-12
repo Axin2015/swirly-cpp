@@ -34,7 +34,7 @@ elm_market_side(struct ElmMarket* market, int action)
 }
 
 DBR_EXTERN struct ElmMarket*
-elm_market_lazy(struct DbrRec* mrec, struct ElmCtx* ctx);
+elm_market_lazy(struct DbrRec* mrec, struct ElmPool* pool);
 
 // Assumes that mrec pointer is not null.
 

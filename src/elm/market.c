@@ -17,15 +17,15 @@
  */
 #include "market.h"
 
-#include "ctx.h"
 #include "err.h"
+#include "pool.h"
 
 #include <dbr/conv.h>
 
 #include <stdlib.h>
 
 DBR_EXTERN struct ElmMarket*
-elm_market_lazy(struct DbrRec* mrec, struct ElmCtx* ctx)
+elm_market_lazy(struct DbrRec* mrec, struct ElmPool* pool)
 {
     assert(mrec);
     assert(mrec->type == DBR_MARKET);
@@ -37,8 +37,8 @@ elm_market_lazy(struct DbrRec* mrec, struct ElmCtx* ctx)
             return NULL;
         }
         market->id = mrec->id;
-        elm_side_init(&market->bid_side, ctx);
-        elm_side_init(&market->ask_side, ctx);
+        elm_side_init(&market->bid_side, pool);
+        elm_side_init(&market->ask_side, pool);
         ash_list_init(&market->subs);
         mrec->market.state = market;
     }
