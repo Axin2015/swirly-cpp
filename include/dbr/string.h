@@ -112,10 +112,10 @@ DBR_API size_t
 dbr_posnlen(const struct DbrPosn* posn);
 
 DBR_API char*
-dbr_errcpy(char* buf, const struct DbrErr* err);
+dbr_errcpy(char* buf, int num, const char* msg);
 
 DBR_API size_t
-dbr_errlen(const struct DbrErr* err);
+dbr_errlen(int num, const char* msg);
 
 /** @} */
 

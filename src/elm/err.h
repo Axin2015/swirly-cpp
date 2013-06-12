@@ -15,18 +15,30 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
+#ifndef ELM_ERR_H
+#define ELM_ERR_H
 
-#include <dbr/err.h>
+#include <dbr/defs.h>
 
-/**
- * @test Clear error.
- */
+#include <stdarg.h> // va_list
+#include <stdio.h>
 
-void
-clear_err(void)
-{
-    dbr_err_clear();
-    check(dbr_err_num() == 0);
-    check(*dbr_err_msg() == '\0');
-}
+DBR_EXTERN void
+elm_err_clear(void);
+
+DBR_EXTERN void
+elm_err_print(FILE* stream, const char* s);
+
+DBR_EXTERN void
+elm_err_vset(int num, const char* format, va_list args);
+
+DBR_EXTERN void
+elm_err_set(int num, const char* format, ...);
+
+DBR_EXTERN int
+elm_err_num(void);
+
+DBR_EXTERN const char*
+elm_err_msg(void);
+
+#endif // ELM_ERR_H

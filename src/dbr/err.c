@@ -15,18 +15,45 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
-
 #include <dbr/err.h>
 
-/**
- * @test Clear error.
- */
+#include <elm/err.h>
 
-void
-clear_err(void)
+DBR_API void
+dbr_err_clear(void)
 {
-    dbr_err_clear();
-    check(dbr_err_num() == 0);
-    check(*dbr_err_msg() == '\0');
+    elm_err_clear();
+}
+
+DBR_API void
+dbr_err_print(FILE* stream, const char* s)
+{
+    elm_err_print(stream, s);
+}
+
+DBR_API void
+dbr_err_vset(int num, const char* format, va_list args)
+{
+    elm_err_vset(num, format, args);
+}
+
+DBR_API void
+dbr_err_set(int num, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    elm_err_vset(num, format, args);
+    va_end(args);
+}
+
+DBR_API int
+dbr_err_num(void)
+{
+    return elm_err_num();
+}
+
+DBR_API const char*
+dbr_err_msg(void)
+{
+    return elm_err_msg();
 }

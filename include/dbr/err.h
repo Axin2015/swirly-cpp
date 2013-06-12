@@ -18,84 +18,33 @@
 #ifndef DBR_ERR_H
 #define DBR_ERR_H
 
+#include <dbr/defs.h>
+
 #include <stdarg.h> // va_list
-#include <stdio.h>  // vsnprintf()
-#include <string.h> // strcpy()
+#include <stdio.h>
 
 /**
  * @addtogroup Err
  * @{
  */
 
-enum DbrErrno {
-    /**
-     * @brief Out of memory.
-     */
-    DBR_ENOMEM = 1,
-    /**
-     * @brief Access denied.
-     */
-    DBR_EACCES,
-    /**
-     * @brief Invalid argument.
-     */
-    DBR_EINVAL,
-    /**
-     * @brief SQL error.
-     */
-    DBR_EDBSQL,
-    /**
-     * @brief Is null.
-     */
-    DBR_ENULL,
-    /**
-     * @brief User-defined errors must be >=0x400.
-     */
-    DBR_EUSER = 0x400
-};
+DBR_API void
+dbr_err_clear(void);
 
-enum {
-    DBR_ERROR_MAX = 255
-};
+DBR_API void
+dbr_err_print(FILE* stream, const char* s);
 
-struct DbrErr {
-    /**
-     * @brief Error number.
-     * @sa enum DbrErrno
-     */
-    int num;
-    /**
-     * @brief Null terminated error message.
-     */
-    char msg[DBR_ERROR_MAX + 1];
-};
+DBR_API void
+dbr_err_vset(int num, const char* format, va_list args);
 
-static inline void
-dbr_err_clear(struct DbrErr* err)
-{
-    err->num = 0;
-    err->msg[0] = '\0';
-}
+DBR_API void
+dbr_err_set(int num, const char* format, ...);
 
-static inline void
-dbr_err_vset(struct DbrErr* err, int num, const char* format, va_list args)
-{
-    err->num = num;
-    const int ret = vsnprintf(err->msg, DBR_ERROR_MAX, format, args);
-    // Null termination is _not_ guaranteed by snprintf().
-    err->msg[DBR_ERROR_MAX] = '\0';
-    if (ret < 0)
-        strcpy(err->msg, "bad format");
-}
+DBR_API int
+dbr_err_num(void);
 
-static inline void
-dbr_err_set(struct DbrErr* err, int num, const char* format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    dbr_err_vset(err, num, format, args);
-    va_end(args);
-}
+DBR_API const char*
+dbr_err_msg(void);
 
 /** @} */
 

@@ -19,7 +19,6 @@
 #include <dbr/string.h>
 
 #include <dbr/conv.h>
-#include <dbr/err.h>
 #include <dbr/util.h>
 
 #include <elm/market.h>
@@ -804,19 +803,19 @@ dbr_posnlen(const struct DbrPosn* posn)
 }
 
 DBR_API char*
-dbr_errcpy(char* buf, const struct DbrErr* err)
+dbr_errcpy(char* buf, int num, const char* msg)
 {
     static const char ERR_FORMAT[] =
         "{\"num\":\"%d\","
         "\"msg\":\"%s\"}";
 
     return dbr_format(buf, ERR_FORMAT,
-                      err->num,
-                      DBR_ERROR_MAX, err->msg);
+                      num,
+                      DBR_ERROR_MAX, msg);
 }
 
 DBR_API size_t
-dbr_errlen(const struct DbrErr* err)
+dbr_errlen(int num, const char* msg)
 {
     enum {
         ERR_SIZE =
@@ -825,6 +824,6 @@ dbr_errlen(const struct DbrErr* err)
     };
 
     return ERR_SIZE
-        + dbr_intlen(err->num)
-        + strnlen(err->msg, DBR_ERROR_MAX);
+        + dbr_intlen(num)
+        + strnlen(msg, DBR_ERROR_MAX);
 }

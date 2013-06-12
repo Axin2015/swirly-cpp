@@ -37,23 +37,6 @@ dbr_ctx_destroy(DbrCtx ctx);
 /** @} */
 
 /**
- * @addtogroup Err
- * @{
- */
-
-/**
- * @brief Error from context.
- */
-
-DBR_API struct DbrErr*
-dbr_ctx_err(DbrCtx ctx);
-
-DBR_API void
-dbr_ctx_perror(DbrCtx ctx, FILE* stream, const char* s);
-
-/** @} */
-
-/**
  * @addtogroup Alloc
  * @{
  */

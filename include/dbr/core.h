@@ -48,19 +48,6 @@ dbr_env_destroy(DbrEnv env);
 /** @} */
 
 /**
- * @addtogroup Err
- * @{
- */
-
-DBR_API struct DbrErr*
-dbr_env_err(DbrEnv env);
-
-DBR_API void
-dbr_env_perror(DbrEnv env, FILE* stream, const char* s);
-
-/** @} */
-
-/**
  * @addtogroup Rec
  * @{
  */

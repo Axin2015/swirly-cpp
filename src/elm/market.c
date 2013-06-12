@@ -18,9 +18,9 @@
 #include "market.h"
 
 #include "ctx.h"
+#include "err.h"
 
 #include <dbr/conv.h>
-#include <dbr/err.h>
 
 #include <stdlib.h>
 
@@ -33,7 +33,7 @@ elm_market_lazy(struct DbrRec* mrec, struct ElmCtx* ctx)
     if (dbr_unlikely(!market)) {
         market = malloc(sizeof(struct ElmMarket));
         if (dbr_unlikely(!market)) {
-            dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+            elm_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         market->id = mrec->id;

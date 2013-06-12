@@ -18,7 +18,6 @@
 #ifndef ELM_CTX_H
 #define ELM_CTX_H
 
-#include <dbr/err.h>
 #include <dbr/types.h>
 
 #include <ash/dlnode.h>
@@ -29,7 +28,6 @@ struct ElmSmallBlock;
 struct ElmLargeBlock;
 
 struct ElmCtx {
-     struct DbrErr err;
     struct {
         size_t nodes_per_block;
         // List of allocated memory blocks.
@@ -201,7 +199,7 @@ elm_ctx_free_order(struct ElmCtx* ctx, struct DbrOrder* order)
 }
 
 static inline struct DbrMemb*
-elm_ctx_alloc_memb(struct ElmCtx* ctx)
+elm_ctx_alloc_memb(struct ElmCtx* ctx, DbrKey key)
 {
     struct ElmSmallNode* node = elm_ctx_alloc_small(ctx);
     if (!node)
@@ -227,7 +225,7 @@ elm_ctx_alloc_trade(struct ElmCtx* ctx, DbrKey key)
         return NULL;
     struct DbrTrade* trade = &node->trade;
     ash_slnode_init(&trade->model_node_);
-    ash_rbnode_init(&trade->trader_node_, key);
+    ash_rbnode_init(&trade->accnt_node_, key);
     return trade;
 }
 

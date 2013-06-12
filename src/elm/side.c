@@ -18,9 +18,9 @@
 #include "side.h"
 
 #include "ctx.h"
+#include "err.h"
 
 #include <dbr/conv.h>
-#include <dbr/err.h>
 
 #include <stdlib.h>
 
@@ -174,7 +174,7 @@ elm_side_revise_order(struct ElmSide* side, struct DbrOrder* order, DbrLots lots
     // 3. greater than original lots.
 
     if (lots < order->exec || lots < order->min || lots > order->lots) {
-        dbr_err_set(&side->ctx->err, DBR_EINVAL, "invalid revision lots");
+        elm_err_set(DBR_EINVAL, "invalid revision lots");
         return false;
     }
 

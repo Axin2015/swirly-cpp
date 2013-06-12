@@ -18,8 +18,8 @@
 #include "accnt.h"
 
 #include "ctx.h"
+#include "err.h"
 
-#include <dbr/err.h>
 #include <dbr/conv.h>
 #include <dbr/sess.h>
 
@@ -84,7 +84,7 @@ elm_accnt_lazy(struct DbrRec* arec, struct ElmCtx* ctx)
     if (dbr_unlikely(!accnt)) {
         accnt = malloc(sizeof(struct ElmAccnt));
         if (dbr_unlikely(!accnt)) {
-            dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+            elm_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         accnt->id = arec->id;

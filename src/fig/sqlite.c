@@ -21,9 +21,9 @@
 #include "sqlite3.h"
 
 #include <dbr/conv.h>
-#include <dbr/err.h>
 
 #include <elm/ctx.h>
+#include <elm/err.h>
 
 #include <ash/queue.h>
 
@@ -141,21 +141,21 @@ free_posns(struct ElmCtx* ctx, struct AshQueue* pq)
 }
 
 static sqlite3_stmt*
-prepare(struct ElmCtx* ctx, sqlite3* db, const char* sql)
+prepare(sqlite3* db, const char* sql)
 {
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare(db, sql, -1, &stmt, NULL);
     if (dbr_unlikely(rc != SQLITE_OK)) {
-        dbr_err_set(&ctx->err, DBR_EDBSQL, sqlite3_errmsg(db));
+        elm_err_set(DBR_EDBSQL, sqlite3_errmsg(db));
         stmt = NULL;
     }
     return stmt;
 }
 
 static DbrBool
-exec_sql(struct ElmCtx* ctx, sqlite3* db, const char* sql)
+exec_sql(sqlite3* db, const char* sql)
 {
-    sqlite3_stmt* stmt = prepare(ctx, db, sql);
+    sqlite3_stmt* stmt = prepare(db, sql);
     if (!stmt)
         goto fail1;
 
@@ -163,7 +163,7 @@ exec_sql(struct ElmCtx* ctx, sqlite3* db, const char* sql)
     // SQLITE_DONE 101
 
     if (dbr_unlikely(sqlite3_step(stmt) < SQLITE_ROW)) {
-        dbr_err_set(&ctx->err, DBR_EDBSQL, sqlite3_errmsg(db));
+        elm_err_set(DBR_EDBSQL, sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
         goto fail1;
     }
@@ -175,13 +175,13 @@ exec_sql(struct ElmCtx* ctx, sqlite3* db, const char* sql)
 }
 
 static DbrBool
-exec_stmt(struct ElmCtx* ctx, sqlite3* db, sqlite3_stmt* stmt)
+exec_stmt(sqlite3* db, sqlite3_stmt* stmt)
 {
     int rc = sqlite3_step(stmt);
     sqlite3_clear_bindings(stmt);
     sqlite3_reset(stmt);
     if (dbr_unlikely(rc != SQLITE_DONE)) {
-        dbr_err_set(&ctx->err, DBR_EDBSQL, sqlite3_errmsg(db));
+        elm_err_set(DBR_EDBSQL, sqlite3_errmsg(db));
         return false;
     }
     return true;
@@ -292,7 +292,7 @@ bind_insert_order(struct FigSqlite* sqlite, const struct DbrOrder* order)
 
     return true;
  fail1:
-    dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+    elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
@@ -341,7 +341,7 @@ bind_update_order(struct FigSqlite* sqlite, DbrIden id, int rev, int status,
 
     return true;
  fail1:
-    dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+    elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
@@ -364,7 +364,7 @@ bind_archive_order(struct FigSqlite* sqlite, DbrIden id, DbrMillis now)
 
     return true;
  fail1:
-    dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+    elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
@@ -447,7 +447,7 @@ bind_insert_trade(struct FigSqlite* sqlite, const struct DbrTrade* trade)
 
     return true;
  fail1:
-    dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+    elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
@@ -470,7 +470,7 @@ bind_archive_trade(struct FigSqlite* sqlite, DbrIden id, DbrMillis now)
 
     return true;
  fail1:
-    dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+    elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
@@ -495,7 +495,7 @@ select_instr(struct FigSqlite* sqlite, struct DbrSlNode** first)
         MAX_LOTS
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_INSTR_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_INSTR_SQL);
     if (!stmt)
         goto fail1;
 
@@ -568,7 +568,7 @@ select_instr(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -597,7 +597,7 @@ select_market(struct FigSqlite* sqlite, struct DbrSlNode** first)
         SETTL_DATE
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_MARKET_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_MARKET_SQL);
     if (!stmt)
         goto fail1;
 
@@ -637,7 +637,7 @@ select_market(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -665,7 +665,7 @@ select_trader(struct FigSqlite* sqlite, struct DbrSlNode** first)
         EMAIL
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_TRADER_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_TRADER_SQL);
     if (!stmt)
         goto fail1;
 
@@ -705,7 +705,7 @@ select_trader(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -733,7 +733,7 @@ select_accnt(struct FigSqlite* sqlite, struct DbrSlNode** first)
         EMAIL
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_ACCNT_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_ACCNT_SQL);
     if (!stmt)
         goto fail1;
 
@@ -773,7 +773,7 @@ select_accnt(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -813,7 +813,7 @@ select_order(struct FigSqlite* sqlite, struct DbrSlNode** first)
         MODIFIED
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_ORDER_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_ORDER_SQL);
     if (!stmt)
         goto fail1;
 
@@ -866,7 +866,7 @@ select_order(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -892,7 +892,7 @@ select_memb(struct FigSqlite* sqlite, struct DbrSlNode** first)
         TRADER
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_MEMB_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_MEMB_SQL);
     if (!stmt)
         goto fail1;
 
@@ -920,7 +920,7 @@ select_memb(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -962,7 +962,7 @@ select_trade(struct FigSqlite* sqlite, struct DbrSlNode** first)
         MODIFIED
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_TRADE_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_TRADE_SQL);
     if (!stmt)
         goto fail1;
 
@@ -1016,7 +1016,7 @@ select_trade(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -1047,7 +1047,7 @@ select_posn(struct FigSqlite* sqlite, struct DbrSlNode** first)
         LOTS
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->ctx, sqlite->db, SELECT_POSN_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_POSN_SQL);
     if (!stmt)
         goto fail1;
 
@@ -1110,7 +1110,7 @@ select_posn(struct FigSqlite* sqlite, struct DbrSlNode** first)
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(&sqlite->ctx->err, DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
+            elm_err_set(DBR_EDBSQL, sqlite3_errmsg(sqlite->db));
             goto fail2;
         }
     }
@@ -1134,7 +1134,7 @@ fig_sqlite_init(struct FigSqlite* sqlite, struct ElmCtx* ctx, const char* path)
     sqlite3* db;
     int rc = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE, NULL);
     if (dbr_unlikely(rc != SQLITE_OK)) {
-        dbr_err_set(&ctx->err, DBR_EDBSQL, sqlite3_errmsg(db));
+        elm_err_set(DBR_EDBSQL, sqlite3_errmsg(db));
         // Must close even if open failed.
         goto fail1;
     }
@@ -1147,34 +1147,34 @@ fig_sqlite_init(struct FigSqlite* sqlite, struct ElmCtx* ctx, const char* path)
 #if DBR_DEBUG_LEVEL >= 1
     rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, NULL);
     if (dbr_unlikely(rc != SQLITE_OK)) {
-        dbr_err_set(&ctx->err, DBR_EDBSQL, sqlite3_errmsg(db));
+        elm_err_set(DBR_EDBSQL, sqlite3_errmsg(db));
         goto fail1;
     }
 #endif // DBR_DEBUG_LEVEL >= 1
 
-    if (dbr_unlikely(!exec_sql(ctx, db, "PRAGMA synchronous = OFF")
-                     || !exec_sql(ctx, db, "PRAGMA journal_mode = MEMORY"))) {
-        dbr_err_set(&ctx->err, DBR_EDBSQL, sqlite3_errmsg(db));
+    if (dbr_unlikely(!exec_sql(db, "PRAGMA synchronous = OFF")
+                     || !exec_sql(db, "PRAGMA journal_mode = MEMORY"))) {
+        elm_err_set(DBR_EDBSQL, sqlite3_errmsg(db));
         goto fail1;
     }
 
-    sqlite3_stmt* insert_order = prepare(ctx, db, INSERT_ORDER_SQL);
+    sqlite3_stmt* insert_order = prepare(db, INSERT_ORDER_SQL);
     if (!insert_order)
         goto fail1;
 
-    sqlite3_stmt* update_order = prepare(ctx, db, UPDATE_ORDER_SQL);
+    sqlite3_stmt* update_order = prepare(db, UPDATE_ORDER_SQL);
     if (!update_order)
         goto fail2;
 
-    sqlite3_stmt* archive_order = prepare(ctx, db, ARCHIVE_ORDER_SQL);
+    sqlite3_stmt* archive_order = prepare(db, ARCHIVE_ORDER_SQL);
     if (!archive_order)
         goto fail3;
 
-    sqlite3_stmt* insert_trade = prepare(ctx, db, INSERT_TRADE_SQL);
+    sqlite3_stmt* insert_trade = prepare(db, INSERT_TRADE_SQL);
     if (!insert_trade)
         goto fail4;
 
-    sqlite3_stmt* archive_trade = prepare(ctx, db, ARCHIVE_TRADE_SQL);
+    sqlite3_stmt* archive_trade = prepare(db, ARCHIVE_TRADE_SQL);
     if (!archive_trade)
         goto fail5;
 
@@ -1215,26 +1215,26 @@ fig_sqlite_term(struct FigSqlite* sqlite)
 DBR_EXTERN DbrBool
 fig_sqlite_begin(struct FigSqlite* sqlite)
 {
-    return exec_sql(sqlite->ctx, sqlite->db, "BEGIN TRANSACTION");
+    return exec_sql(sqlite->db, "BEGIN TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
 fig_sqlite_commit(struct FigSqlite* sqlite)
 {
-    return exec_sql(sqlite->ctx, sqlite->db, "COMMIT TRANSACTION");
+    return exec_sql(sqlite->db, "COMMIT TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
 fig_sqlite_rollback(struct FigSqlite* sqlite)
 {
-    return exec_sql(sqlite->ctx, sqlite->db, "ROLLBACK TRANSACTION");
+    return exec_sql(sqlite->db, "ROLLBACK TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
 fig_sqlite_insert_order(struct FigSqlite* sqlite, const struct DbrOrder* order)
 {
     return bind_insert_order(sqlite, order)
-        && exec_stmt(sqlite->ctx, sqlite->db, sqlite->insert_order);
+        && exec_stmt(sqlite->db, sqlite->insert_order);
 }
 
 DBR_EXTERN DbrBool
@@ -1242,28 +1242,28 @@ fig_sqlite_update_order(struct FigSqlite* sqlite, DbrIden id, int rev, int statu
                         DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
 {
     return bind_update_order(sqlite, id, rev, status, resd, exec, lots, now)
-        && exec_stmt(sqlite->ctx, sqlite->db, sqlite->update_order);
+        && exec_stmt(sqlite->db, sqlite->update_order);
 }
 
 DBR_EXTERN DbrBool
 fig_sqlite_archive_order(struct FigSqlite* sqlite, DbrIden id, DbrMillis now)
 {
     return bind_archive_order(sqlite, id, now)
-        && exec_stmt(sqlite->ctx, sqlite->db, sqlite->archive_order);
+        && exec_stmt(sqlite->db, sqlite->archive_order);
 }
 
 DBR_EXTERN DbrBool
 fig_sqlite_insert_trade(struct FigSqlite* sqlite, const struct DbrTrade* trade)
 {
     return bind_insert_trade(sqlite, trade)
-        && exec_stmt(sqlite->ctx, sqlite->db, sqlite->insert_trade);
+        && exec_stmt(sqlite->db, sqlite->insert_trade);
 }
 
 DBR_EXTERN DbrBool
 fig_sqlite_archive_trade(struct FigSqlite* sqlite, DbrIden id, DbrMillis now)
 {
     return bind_archive_trade(sqlite, id, now)
-        && exec_stmt(sqlite->ctx, sqlite->db, sqlite->archive_trade);
+        && exec_stmt(sqlite->db, sqlite->archive_trade);
 }
 
 DBR_EXTERN ssize_t

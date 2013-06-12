@@ -17,8 +17,9 @@
  */
 #include "ctx.h"
 
+#include "err.h"
+
 #include <dbr/conv.h>
-#include <dbr/err.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -33,7 +34,7 @@ alloc_small_nodes(struct ElmCtx* ctx)
                                          + ctx->small.nodes_per_block
                                          * sizeof(struct ElmSmallNode));
     if (dbr_unlikely(!block)) {
-        dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+        elm_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
 
@@ -71,7 +72,7 @@ alloc_large_nodes(struct ElmCtx* ctx)
                                          + ctx->large.nodes_per_block
                                          * sizeof(struct ElmLargeNode));
     if (dbr_unlikely(!block)) {
-        dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+        elm_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
 
@@ -105,8 +106,6 @@ alloc_large_nodes(struct ElmCtx* ctx)
 DBR_EXTERN DbrBool
 elm_ctx_init(struct ElmCtx* ctx)
 {
-    dbr_err_clear(&ctx->err);
-
     // Slightly less than one page of items.
     // ((page_size - header_size) / item_size) - 1
 
@@ -211,7 +210,7 @@ elm_ctx_alloc_small(struct ElmCtx* ctx, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!ctx->small.first_node && !alloc_small_nodes(ctx))) {
-        dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+        elm_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
     struct ElmSmallNode* node = ctx->small.first_node;
@@ -235,7 +234,7 @@ elm_ctx_alloc_large(struct ElmCtx* ctx, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!ctx->large.first_node && !alloc_large_nodes(ctx))) {
-        dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+        elm_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
     struct ElmLargeNode* node = ctx->large.first_node;

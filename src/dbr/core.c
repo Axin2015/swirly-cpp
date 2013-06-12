@@ -17,12 +17,12 @@
  */
 #include <dbr/core.h>
 
-#include <dbr/err.h>
 #include <dbr/util.h>
 
 #include <elm/accnt.h>
 #include <elm/cache.h>
 #include <elm/ctx.h>
+#include <elm/err.h>
 #include <elm/exec.h>
 #include <elm/index.h>
 #include <elm/market.h>
@@ -208,7 +208,7 @@ dbr_env_create(DbrCtx ctx, DbrModel model)
 {
     DbrEnv env = malloc(sizeof(struct DbrEnv_));
     if (dbr_unlikely(!env)) {
-        dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+        elm_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
 
@@ -244,18 +244,6 @@ dbr_env_destroy(DbrEnv env)
         elm_cache_term(&env->cache);
         free(env);
     }
-}
-
-DBR_API struct DbrErr*
-dbr_env_err(DbrEnv env)
-{
-    return &env->ctx->err;
-}
-
-DBR_API void
-dbr_env_perror(DbrEnv env, FILE* stream, const char* s)
-{
-    fprintf(stream, "%s: %s (%d)\n", s, env->ctx->err.msg, env->ctx->err.num);
 }
 
 // Rec

@@ -18,9 +18,9 @@
 #include "trader.h"
 
 #include "ctx.h"
+#include "err.h"
 #include "market.h"
 
-#include <dbr/err.h>
 #include <dbr/sess.h>
 
 #include <stdlib.h>
@@ -66,7 +66,7 @@ elm_trader_lazy(struct DbrRec* trec, struct ElmCtx* ctx, struct ElmIndex* index)
     if (dbr_unlikely(!trader)) {
         trader = malloc(sizeof(struct ElmTrader));
         if (dbr_unlikely(!trader)) {
-            dbr_err_set(&ctx->err, DBR_ENOMEM, "out of memory");
+            elm_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         trader->id = trec->id;
@@ -101,7 +101,7 @@ elm_trader_sub(struct ElmTrader* trader, struct ElmMarket* market)
     struct ElmCtx* ctx = trader->ctx;
 	struct DbrRbNode* node = ash_tree_pfind(&trader->subs, market->id);
     if (node && node->key == market->id) {
-        dbr_err_set(&ctx->err, DBR_EINVAL, "subscription already exists");
+        elm_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
     struct DbrSub* sub = elm_ctx_alloc_sub(ctx, market->id);

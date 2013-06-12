@@ -16,6 +16,7 @@ ENDIF(RAGEL)
 SET(dbr_SOURCES
   core.c
   ctx.c
+  err.c
   model.c
   rest.c
   string.c

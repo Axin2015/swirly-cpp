@@ -47,18 +47,6 @@ dbr_ctx_destroy(DbrCtx ctx)
     }
 }
 
-DBR_API struct DbrErr*
-dbr_ctx_err(DbrCtx ctx)
-{
-    return &ctx->err;
-}
-
-DBR_API void
-dbr_ctx_perror(DbrCtx ctx, FILE* stream, const char* s)
-{
-    fprintf(stream, "%s: %s (%d)\n", s, ctx->err.msg, ctx->err.num);
-}
-
 DBR_API struct DbrRec*
 dbr_ctx_alloc_rec(DbrCtx ctx)
 {

@@ -19,6 +19,7 @@
 
 #include <dbr/conv.h>
 #include <dbr/core.h>
+#include <dbr/err.h>
 #include <dbr/rest.h>
 #include <dbr/string.h>
 #include <dbr/util.h>
@@ -321,7 +322,7 @@ post_order(DbrEnv env, const char* trader, const char* accnt, const char* market
 
     struct DbrTrans trans;
     if (!dbr_exec_submit(env, trec, arec, NULL, mrec, action, ticks, lots, 0, 0, &trans)) {
-        dbr_env_perror(env, stderr, "dbr_exec_submit() failed");
+        dbr_err_print(stderr, "dbr_exec_submit() failed");
         return;
     }
 
@@ -353,12 +354,12 @@ main(int argc, char* argv[])
     }
 
     if (!(model = dbr_sqlite_create(ctx, dbr_millis(), "test.db"))) {
-        dbr_ctx_perror(ctx, stderr, "dbr_sqlite_create() failed");
+        dbr_err_print(stderr, "dbr_sqlite_create() failed");
         return 1;
     }
 
     if (!(env = dbr_env_create(ctx, model))) {
-        dbr_ctx_perror(ctx, stderr, "dbr_env_create() failed");
+        dbr_err_print(stderr, "dbr_env_create() failed");
         return 1;
     }
 
