@@ -17,10 +17,11 @@
  */
 #include "side.h"
 
-#include "err.h"
 #include "pool.h"
 
 #include <dbr/conv.h>
+
+#include <ash/err.h>
 
 #include <stdlib.h>
 
@@ -174,7 +175,7 @@ elm_side_revise_order(struct ElmSide* side, struct DbrOrder* order, DbrLots lots
     // 3. greater than original lots.
 
     if (lots < order->exec || lots < order->min || lots > order->lots) {
-        elm_err_set(DBR_EINVAL, "invalid revision lots");
+        ash_err_set(DBR_EINVAL, "invalid revision lots");
         return false;
     }
 

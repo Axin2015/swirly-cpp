@@ -17,11 +17,12 @@
  */
 #include "trader.h"
 
-#include "err.h"
 #include "market.h"
 #include "pool.h"
 
 #include <dbr/sess.h>
+
+#include <ash/err.h>
 
 #include <stdlib.h>
 
@@ -66,7 +67,7 @@ elm_trader_lazy(struct DbrRec* trec, struct ElmPool* pool, struct ElmIndex* inde
     if (dbr_unlikely(!trader)) {
         trader = malloc(sizeof(struct ElmTrader));
         if (dbr_unlikely(!trader)) {
-            elm_err_set(DBR_ENOMEM, "out of memory");
+            ash_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         trader->id = trec->id;
@@ -101,7 +102,7 @@ elm_trader_sub(struct ElmTrader* trader, struct ElmMarket* market)
     struct ElmPool* pool = trader->pool;
 	struct DbrRbNode* node = ash_tree_pfind(&trader->subs, market->id);
     if (node && node->key == market->id) {
-        elm_err_set(DBR_EINVAL, "subscription already exists");
+        ash_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
     struct DbrSub* sub = elm_pool_alloc_sub(pool, market->id);

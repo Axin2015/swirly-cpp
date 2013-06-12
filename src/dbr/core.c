@@ -21,12 +21,13 @@
 
 #include <elm/accnt.h>
 #include <elm/cache.h>
-#include <elm/err.h>
 #include <elm/exec.h>
 #include <elm/index.h>
 #include <elm/market.h>
 #include <elm/pool.h>
 #include <elm/trader.h>
+
+#include <ash/err.h>
 
 #include <stdbool.h>
 #include <stdlib.h> // malloc()
@@ -208,7 +209,7 @@ dbr_ctx_create(DbrPool pool, DbrModel model)
 {
     DbrCtx ctx = malloc(sizeof(struct DbrCtx_));
     if (dbr_unlikely(!ctx)) {
-        elm_err_set(DBR_ENOMEM, "out of memory");
+        ash_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
 

@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_ERR_H
-#define ELM_ERR_H
+#ifndef ASH_ERR_H
+#define ASH_ERR_H
 
 #include <dbr/defs.h>
 
@@ -24,21 +24,21 @@
 #include <stdio.h>
 
 DBR_EXTERN void
-elm_err_clear(void);
+ash_err_clear(void);
 
 DBR_EXTERN void
-elm_err_print(FILE* stream, const char* s);
+ash_err_print(FILE* stream, const char* s);
 
 DBR_EXTERN void
-elm_err_vset(int num, const char* format, va_list args);
+ash_err_vset(int num, const char* format, va_list args);
 
 DBR_EXTERN void
-elm_err_set(int num, const char* format, ...);
+ash_err_set(int num, const char* format, ...);
 
 DBR_EXTERN int
-elm_err_num(void);
+ash_err_num(void);
 
 DBR_EXTERN const char*
-elm_err_msg(void);
+ash_err_msg(void);
 
-#endif // ELM_ERR_H
+#endif // ASH_ERR_H

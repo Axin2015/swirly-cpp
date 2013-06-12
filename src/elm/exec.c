@@ -18,7 +18,6 @@
 #include "exec.h"
 
 #include "accnt.h"
-#include "err.h"
 #include "index.h"
 #include "match.h"
 #include "market.h"
@@ -26,6 +25,8 @@
 #include "trader.h"
 
 #include <dbr/sess.h>
+
+#include <ash/err.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -232,13 +233,13 @@ elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
 {
     struct DbrRbNode* node = elm_trader_find_order_id(trader, id);
     if (!node) {
-        elm_err_set(DBR_EINVAL, "no such order '%ld'", id);
+        ash_err_set(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     if (dbr_order_done(order)) {
-        elm_err_set(DBR_EINVAL, "order complete '%ld'", id);
+        ash_err_set(DBR_EINVAL, "order complete '%ld'", id);
         goto fail1;
     }
 
@@ -270,12 +271,12 @@ elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
 {
     struct DbrOrder* order = elm_trader_find_order_ref(trader, ref);
     if (!order) {
-        elm_err_set(DBR_EINVAL, "no such order '%.64s'", ref);
+        ash_err_set(DBR_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
     }
 
     if (dbr_order_done(order)) {
-        elm_err_set(DBR_EINVAL, "order complete '%.64s'", ref);
+        ash_err_set(DBR_EINVAL, "order complete '%.64s'", ref);
         goto fail1;
     }
 
@@ -304,13 +305,13 @@ elm_exec_cancel_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
 {
     struct DbrRbNode* node = elm_trader_find_order_id(trader, id);
     if (!node) {
-        elm_err_set(DBR_EINVAL, "no such order '%ld'", id);
+        ash_err_set(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     if (dbr_order_done(order)) {
-        elm_err_set(DBR_EINVAL, "order complete '%ld'", id);
+        ash_err_set(DBR_EINVAL, "order complete '%ld'", id);
         goto fail1;
     }
 
@@ -331,12 +332,12 @@ elm_exec_cancel_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
 {
     struct DbrOrder* order = elm_trader_find_order_ref(trader, ref);
     if (!order) {
-        elm_err_set(DBR_EINVAL, "no such order '%.64s'", ref);
+        ash_err_set(DBR_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
     }
 
     if (dbr_order_done(order)) {
-        elm_err_set(DBR_EINVAL, "order complete '%.64s'", ref);
+        ash_err_set(DBR_EINVAL, "order complete '%.64s'", ref);
         goto fail1;
     }
 

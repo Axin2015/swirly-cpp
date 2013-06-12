@@ -17,10 +17,11 @@
  */
 #include "market.h"
 
-#include "err.h"
 #include "pool.h"
 
 #include <dbr/conv.h>
+
+#include <ash/err.h>
 
 #include <stdlib.h>
 
@@ -33,7 +34,7 @@ elm_market_lazy(struct DbrRec* mrec, struct ElmPool* pool)
     if (dbr_unlikely(!market)) {
         market = malloc(sizeof(struct ElmMarket));
         if (dbr_unlikely(!market)) {
-            elm_err_set(DBR_ENOMEM, "out of memory");
+            ash_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         market->id = mrec->id;

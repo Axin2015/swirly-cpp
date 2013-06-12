@@ -27,20 +27,20 @@ static __thread struct {
 } err;
 
 DBR_EXTERN void
-elm_err_clear(void)
+ash_err_clear(void)
 {
     err.num = 0;
     err.msg[0] = '\0';
 }
 
 DBR_EXTERN void
-elm_err_print(FILE* stream, const char* s)
+ash_err_print(FILE* stream, const char* s)
 {
     fprintf(stream, "%s: %s (%d)\n", s, err.msg, err.num);
 }
 
 DBR_EXTERN void
-elm_err_vset(int num, const char* format, va_list args)
+ash_err_vset(int num, const char* format, va_list args)
 {
     err.num = num;
     const int ret = vsnprintf(err.msg, DBR_ERROR_MAX, format, args);
@@ -51,22 +51,22 @@ elm_err_vset(int num, const char* format, va_list args)
 }
 
 DBR_EXTERN void
-elm_err_set(int num, const char* format, ...)
+ash_err_set(int num, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    elm_err_vset(num, format, args);
+    ash_err_vset(num, format, args);
     va_end(args);
 }
 
 DBR_EXTERN int
-elm_err_num(void)
+ash_err_num(void)
 {
     return err.num;
 }
 
 DBR_EXTERN const char*
-elm_err_msg(void)
+ash_err_msg(void)
 {
     return err.msg;
 }

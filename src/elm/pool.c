@@ -17,9 +17,9 @@
  */
 #include "pool.h"
 
-#include "err.h"
-
 #include <dbr/conv.h>
+
+#include <ash/err.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -34,7 +34,7 @@ alloc_small_nodes(struct ElmPool* pool)
                                          + pool->small.nodes_per_block
                                          * sizeof(struct ElmSmallNode));
     if (dbr_unlikely(!block)) {
-        elm_err_set(DBR_ENOMEM, "out of memory");
+        ash_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
 
@@ -72,7 +72,7 @@ alloc_large_nodes(struct ElmPool* pool)
                                          + pool->large.nodes_per_block
                                          * sizeof(struct ElmLargeNode));
     if (dbr_unlikely(!block)) {
-        elm_err_set(DBR_ENOMEM, "out of memory");
+        ash_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
 
@@ -210,7 +210,7 @@ elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!pool->small.first_node && !alloc_small_nodes(pool))) {
-        elm_err_set(DBR_ENOMEM, "out of memory");
+        ash_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
     struct ElmSmallNode* node = pool->small.first_node;
@@ -234,7 +234,7 @@ elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!pool->large.first_node && !alloc_large_nodes(pool))) {
-        elm_err_set(DBR_ENOMEM, "out of memory");
+        ash_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
     struct ElmLargeNode* node = pool->large.first_node;

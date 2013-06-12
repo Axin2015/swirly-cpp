@@ -17,24 +17,24 @@
  */
 #include <dbr/err.h>
 
-#include <elm/err.h>
+#include <ash/err.h>
 
 DBR_API void
 dbr_err_clear(void)
 {
-    elm_err_clear();
+    ash_err_clear();
 }
 
 DBR_API void
 dbr_err_print(FILE* stream, const char* s)
 {
-    elm_err_print(stream, s);
+    ash_err_print(stream, s);
 }
 
 DBR_API void
 dbr_err_vset(int num, const char* format, va_list args)
 {
-    elm_err_vset(num, format, args);
+    ash_err_vset(num, format, args);
 }
 
 DBR_API void
@@ -42,18 +42,18 @@ dbr_err_set(int num, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    elm_err_vset(num, format, args);
+    ash_err_vset(num, format, args);
     va_end(args);
 }
 
 DBR_API int
 dbr_err_num(void)
 {
-    return elm_err_num();
+    return ash_err_num();
 }
 
 DBR_API const char*
 dbr_err_msg(void)
 {
-    return elm_err_msg();
+    return ash_err_msg();
 }

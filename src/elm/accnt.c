@@ -17,11 +17,12 @@
  */
 #include "accnt.h"
 
-#include "err.h"
 #include "pool.h"
 
 #include <dbr/conv.h>
 #include <dbr/sess.h>
+
+#include <ash/err.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -84,7 +85,7 @@ elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool)
     if (dbr_unlikely(!accnt)) {
         accnt = malloc(sizeof(struct ElmAccnt));
         if (dbr_unlikely(!accnt)) {
-            elm_err_set(DBR_ENOMEM, "out of memory");
+            ash_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         accnt->id = arec->id;
