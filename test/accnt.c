@@ -26,17 +26,17 @@ accnt_id(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_ACCNT, "DBRA");
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_ACCNT, "DBRA");
     check(node != NULL);
     struct DbrRec* arec = dbr_rec_entry(node);
     check(arec != NULL);
-    DbrAccnt accnt = dbr_accnt_lazy(env, arec);
+    DbrAccnt accnt = dbr_accnt_lazy(ctx, arec);
     check(accnt != NULL);
     check(dbr_accnt_id(accnt) ==  arec->id);
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }

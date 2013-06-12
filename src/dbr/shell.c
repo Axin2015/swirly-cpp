@@ -97,33 +97,33 @@ print_posn(const struct DbrPosn* posn)
 }
 
 static DbrTrader
-find_trader_mnem(DbrEnv env, const char* mnem)
+find_trader_mnem(DbrCtx ctx, const char* mnem)
 {
-    struct DbrSlNode* it = dbr_rec_find_mnem(env, DBR_TRADER, mnem);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_find_mnem(ctx, DBR_TRADER, mnem);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     if (it == end)
         return NULL;
 
-    return dbr_trader_lazy(env, dbr_rec_entry(it));
+    return dbr_trader_lazy(ctx, dbr_rec_entry(it));
 }
 
 static DbrAccnt
-find_accnt_mnem(DbrEnv env, const char* mnem)
+find_accnt_mnem(DbrCtx ctx, const char* mnem)
 {
-    struct DbrSlNode* it = dbr_rec_find_mnem(env, DBR_ACCNT, mnem);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_find_mnem(ctx, DBR_ACCNT, mnem);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     if (it == end)
         return NULL;
 
-    return dbr_accnt_lazy(env, dbr_rec_entry(it));
+    return dbr_accnt_lazy(ctx, dbr_rec_entry(it));
 }
 
 static void
-get_instr_list(DbrEnv env)
+get_instr_list(DbrCtx ctx)
 {
     size_t size;
-    struct DbrSlNode* it = dbr_rec_entries(env, DBR_INSTR, &size);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_entries(ctx, DBR_INSTR, &size);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     for (; it != end; it = it->next) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_instr(rec);
@@ -131,10 +131,10 @@ get_instr_list(DbrEnv env)
 }
 
 static void
-get_instr_mnem(DbrEnv env, const char* mnem)
+get_instr_mnem(DbrCtx ctx, const char* mnem)
 {
-    struct DbrSlNode* it = dbr_rec_find_mnem(env, DBR_INSTR, mnem);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_find_mnem(ctx, DBR_INSTR, mnem);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     if (it != end) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_instr(rec);
@@ -142,11 +142,11 @@ get_instr_mnem(DbrEnv env, const char* mnem)
 }
 
 static void
-get_market_list(DbrEnv env)
+get_market_list(DbrCtx ctx)
 {
     size_t size;
-    struct DbrSlNode* it = dbr_rec_entries(env, DBR_MARKET, &size);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_entries(ctx, DBR_MARKET, &size);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     for (; it != end; it = it->next) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_market(rec);
@@ -154,10 +154,10 @@ get_market_list(DbrEnv env)
 }
 
 static void
-get_market_mnem(DbrEnv env, const char* mnem)
+get_market_mnem(DbrCtx ctx, const char* mnem)
 {
-    struct DbrSlNode* it = dbr_rec_find_mnem(env, DBR_MARKET, mnem);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_find_mnem(ctx, DBR_MARKET, mnem);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     if (it != end) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_market(rec);
@@ -165,11 +165,11 @@ get_market_mnem(DbrEnv env, const char* mnem)
 }
 
 static void
-get_trader_list(DbrEnv env)
+get_trader_list(DbrCtx ctx)
 {
     size_t size;
-    struct DbrSlNode* it = dbr_rec_entries(env, DBR_TRADER, &size);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_entries(ctx, DBR_TRADER, &size);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     for (; it != end; it = it->next) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_trader(rec);
@@ -177,10 +177,10 @@ get_trader_list(DbrEnv env)
 }
 
 static void
-get_trader_mnem(DbrEnv env, const char* mnem)
+get_trader_mnem(DbrCtx ctx, const char* mnem)
 {
-    struct DbrSlNode* it = dbr_rec_find_mnem(env, DBR_TRADER, mnem);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_find_mnem(ctx, DBR_TRADER, mnem);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     if (it != end) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_trader(rec);
@@ -188,11 +188,11 @@ get_trader_mnem(DbrEnv env, const char* mnem)
 }
 
 static void
-get_accnt_list(DbrEnv env)
+get_accnt_list(DbrCtx ctx)
 {
     size_t size;
-    struct DbrSlNode* it = dbr_rec_entries(env, DBR_ACCNT, &size);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_entries(ctx, DBR_ACCNT, &size);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     for (; it != end; it = it->next) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_accnt(rec);
@@ -200,10 +200,10 @@ get_accnt_list(DbrEnv env)
 }
 
 static void
-get_accnt_mnem(DbrEnv env, const char* mnem)
+get_accnt_mnem(DbrCtx ctx, const char* mnem)
 {
-    struct DbrSlNode* it = dbr_rec_find_mnem(env, DBR_ACCNT, mnem);
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* it = dbr_rec_find_mnem(ctx, DBR_ACCNT, mnem);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
     if (it != end) {
         struct DbrRec* rec = dbr_rec_entry(it);
         print_accnt(rec);
@@ -211,9 +211,9 @@ get_accnt_mnem(DbrEnv env, const char* mnem)
 }
 
 static void
-get_order_list(DbrEnv env, const char* mnem)
+get_order_list(DbrCtx ctx, const char* mnem)
 {
-    DbrTrader trader = find_trader_mnem(env, mnem);
+    DbrTrader trader = find_trader_mnem(ctx, mnem);
     if (!trader) {
         fprintf(stderr, "invalid trader: %.16s\n", mnem);
         return;
@@ -228,9 +228,9 @@ get_order_list(DbrEnv env, const char* mnem)
 }
 
 static void
-get_order_id(DbrEnv env, const char* mnem, DbrIden id)
+get_order_id(DbrCtx ctx, const char* mnem, DbrIden id)
 {
-    DbrTrader trader = find_trader_mnem(env, mnem);
+    DbrTrader trader = find_trader_mnem(ctx, mnem);
     if (!trader) {
         fprintf(stderr, "invalid trader: %.16s\n", mnem);
         return;
@@ -245,9 +245,9 @@ get_order_id(DbrEnv env, const char* mnem, DbrIden id)
 }
 
 static void
-get_trade_list(DbrEnv env, const char* mnem)
+get_trade_list(DbrCtx ctx, const char* mnem)
 {
-    DbrAccnt accnt = find_accnt_mnem(env, mnem);
+    DbrAccnt accnt = find_accnt_mnem(ctx, mnem);
     if (!accnt) {
         fprintf(stderr, "invalid accnt: %.16s\n", mnem);
         return;
@@ -262,9 +262,9 @@ get_trade_list(DbrEnv env, const char* mnem)
 }
 
 static void
-get_trade_id(DbrEnv env, const char* mnem, DbrIden id)
+get_trade_id(DbrCtx ctx, const char* mnem, DbrIden id)
 {
-    DbrAccnt accnt = find_accnt_mnem(env, mnem);
+    DbrAccnt accnt = find_accnt_mnem(ctx, mnem);
     if (!accnt) {
         fprintf(stderr, "invalid accnt: %.16s\n", mnem);
         return;
@@ -279,9 +279,9 @@ get_trade_id(DbrEnv env, const char* mnem, DbrIden id)
 }
 
 static void
-get_posn_list(DbrEnv env, const char* mnem)
+get_posn_list(DbrCtx ctx, const char* mnem)
 {
-    DbrAccnt accnt = find_accnt_mnem(env, mnem);
+    DbrAccnt accnt = find_accnt_mnem(ctx, mnem);
     if (!accnt) {
         fprintf(stderr, "invalid accnt: %.16s\n", mnem);
         return;
@@ -296,50 +296,50 @@ get_posn_list(DbrEnv env, const char* mnem)
 }
 
 static void
-post_order(DbrEnv env, const char* trader, const char* accnt, const char* market,
+post_order(DbrCtx ctx, const char* trader, const char* accnt, const char* market,
            int action, DbrTicks ticks, DbrLots lots)
 {
     struct DbrSlNode* it;
-    struct DbrSlNode* end = dbr_rec_end(env);
+    struct DbrSlNode* end = dbr_rec_end(ctx);
 
-    if ((it = dbr_rec_find_mnem(env, DBR_TRADER, trader)) == end) {
+    if ((it = dbr_rec_find_mnem(ctx, DBR_TRADER, trader)) == end) {
         fprintf(stderr, "invalid trader: %.16s\n", trader);
         return;
     }
     struct DbrRec* trec = dbr_rec_entry(it);
 
-    if ((it = dbr_rec_find_mnem(env, DBR_ACCNT, accnt)) == end) {
+    if ((it = dbr_rec_find_mnem(ctx, DBR_ACCNT, accnt)) == end) {
         fprintf(stderr, "invalid accnt: %.16s\n", accnt);
         return;
     }
     struct DbrRec* arec = dbr_rec_entry(it);
 
-    if ((it = dbr_rec_find_mnem(env, DBR_MARKET, market)) == end) {
+    if ((it = dbr_rec_find_mnem(ctx, DBR_MARKET, market)) == end) {
         fprintf(stderr, "invalid market: %.16s\n", market);
         return;
     }
     struct DbrRec* mrec = dbr_rec_entry(it);
 
     struct DbrTrans trans;
-    if (!dbr_exec_submit(env, trec, arec, NULL, mrec, action, ticks, lots, 0, 0, &trans)) {
+    if (!dbr_exec_submit(ctx, trec, arec, NULL, mrec, action, ticks, lots, 0, 0, &trans)) {
         dbr_err_print(stderr, "dbr_exec_submit() failed");
         return;
     }
 
     print_order(trans.new_order);
-    dbr_exec_free_matches(env, trans.first_match);
+    dbr_exec_free_matches(ctx, trans.first_match);
 }
 
 static DbrPool pool = NULL;
 static DbrModel model = NULL;
-static DbrEnv env = NULL;
+static DbrCtx ctx = NULL;
 static char* line = NULL;
 
 static void
 destroy(void)
 {
     free(line);
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     dbr_sqlite_destroy(model);
     dbr_pool_destroy(pool);
 }
@@ -358,8 +358,8 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    if (!(env = dbr_env_create(pool, model))) {
-        dbr_err_print(stderr, "dbr_env_create() failed");
+    if (!(ctx = dbr_ctx_create(pool, model))) {
+        dbr_err_print(stderr, "dbr_ctx_create() failed");
         return 1;
     }
 
@@ -387,47 +387,47 @@ main(int argc, char* argv[])
         }
         switch (rest.func) {
         case DBR_GET | DBR_INSTR:
-            get_instr_list(env);
+            get_instr_list(ctx);
             break;
         case DBR_GET | DBR_INSTR | DBR_MNEM_PARAM:
-            get_instr_mnem(env, rest.mnem);
+            get_instr_mnem(ctx, rest.mnem);
             break;
         case DBR_GET | DBR_MARKET:
-            get_market_list(env);
+            get_market_list(ctx);
             break;
         case DBR_GET | DBR_MARKET | DBR_MNEM_PARAM:
-            get_market_mnem(env, rest.mnem);
+            get_market_mnem(ctx, rest.mnem);
             break;
         case DBR_GET | DBR_TRADER:
-            get_trader_list(env);
+            get_trader_list(ctx);
             break;
         case DBR_GET | DBR_TRADER | DBR_MNEM_PARAM:
-            get_trader_mnem(env, rest.mnem);
+            get_trader_mnem(ctx, rest.mnem);
             break;
         case DBR_GET | DBR_ACCNT:
-            get_accnt_list(env);
+            get_accnt_list(ctx);
             break;
         case DBR_GET | DBR_ACCNT | DBR_MNEM_PARAM:
-            get_accnt_mnem(env, rest.mnem);
+            get_accnt_mnem(ctx, rest.mnem);
             break;
         case DBR_GET | DBR_ORDER | DBR_TRADER_PARAM:
-            get_order_list(env, rest.trader);
+            get_order_list(ctx, rest.trader);
             break;
         case DBR_GET | DBR_ORDER | DBR_TRADER_PARAM | DBR_ID_PARAM:
-            get_order_id(env, rest.trader, rest.id);
+            get_order_id(ctx, rest.trader, rest.id);
             break;
         case DBR_GET | DBR_TRADE | DBR_ACCNT_PARAM:
-            get_trade_list(env, rest.accnt);
+            get_trade_list(ctx, rest.accnt);
             break;
         case DBR_GET | DBR_TRADE | DBR_ACCNT_PARAM | DBR_ID_PARAM:
-            get_trade_id(env, rest.accnt, rest.id);
+            get_trade_id(ctx, rest.accnt, rest.id);
             break;
         case DBR_GET | DBR_POSN | DBR_ACCNT_PARAM:
-            get_posn_list(env, rest.accnt);
+            get_posn_list(ctx, rest.accnt);
             break;
         case DBR_POST | DBR_ORDER | DBR_TRADER_PARAM | DBR_ACCNT_PARAM | DBR_MARKET_PARAM
             | DBR_ACTION_PARAM | DBR_TICKS_PARAM | DBR_LOTS_PARAM:
-            post_order(env, rest.trader, rest.accnt, rest.market, rest.action,
+            post_order(ctx, rest.trader, rest.accnt, rest.market, rest.action,
                        rest.ticks, rest.lots);
             break;
         default:

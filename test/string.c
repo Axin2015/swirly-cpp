@@ -25,9 +25,9 @@
 #include <limits.h>
 
 static struct DbrRec*
-get_rec_mnem(DbrEnv env, int type, const char* mnem)
+get_rec_mnem(DbrCtx ctx, int type, const char* mnem)
 {
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, type, mnem);
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, type, mnem);
     check(node != NULL);
     return dbr_rec_entry(node);
 }
@@ -218,9 +218,9 @@ instrcpy(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrRec* irec = get_rec_mnem(env, DBR_INSTR, "EURUSD.SPOTFWD");
+    struct DbrRec* irec = get_rec_mnem(ctx, DBR_INSTR, "EURUSD.SPOTFWD");
     check(irec != NULL);
 
     const size_t len = dbr_instrlen(irec);
@@ -231,7 +231,7 @@ instrcpy(void)
     check(len == end - begin);
     check(strcmp(buf, "{\"mnem\":\"EURUSD.SPOTFWD\",\"display\":\"EURUSD.SPOTFWD\",\"asset_type\":\"CURRENCY\",\"instr_type\":\"SPOTFWD\",\"asset\":\"EUR\",\"ccy\":\"USD\",\"tick_numer\":0,\"tick_denom\":0,\"lot_numer\":0,\"lot_denom\":0,\"price_dp\":4,\"pip_dp\":4,\"qty_dp\":0,\"min_lots\":1,\"max_lots\":10}") == 0);
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }

@@ -26,17 +26,17 @@ trader_id(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_TRADER, "WRAMIREZ");
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_TRADER, "WRAMIREZ");
     check(node != NULL);
     struct DbrRec* trec = dbr_rec_entry(node);
     check(trec != NULL);
-    DbrTrader trader = dbr_trader_lazy(env, trec);
+    DbrTrader trader = dbr_trader_lazy(ctx, trec);
     check(trader != NULL);
     check(dbr_trader_id(trader) ==  trec->id);
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }

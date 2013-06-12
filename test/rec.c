@@ -22,17 +22,17 @@
 #include <dbr/core.h>
 
 static struct DbrRec*
-get_rec_id(DbrEnv env, int type, DbrIden id)
+get_rec_id(DbrCtx ctx, int type, DbrIden id)
 {
-    struct DbrSlNode* node = dbr_rec_find_id(env, type, id);
+    struct DbrSlNode* node = dbr_rec_find_id(ctx, type, id);
     check(node != NULL);
     return dbr_rec_entry(node);
 }
 
 static struct DbrRec*
-get_rec_mnem(DbrEnv env, int type, const char* mnem)
+get_rec_mnem(DbrCtx ctx, int type, const char* mnem)
 {
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, type, mnem);
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, type, mnem);
     check(node != NULL);
     return dbr_rec_entry(node);
 }
@@ -42,15 +42,15 @@ find_instr(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_INSTR, "BAD");
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_INSTR, "BAD");
     check(node == NULL);
 
-    struct DbrRec* irec = get_rec_mnem(env, DBR_INSTR, "EURUSD.SPOTFWD");
+    struct DbrRec* irec = get_rec_mnem(ctx, DBR_INSTR, "EURUSD.SPOTFWD");
     check(irec != NULL);
 
-    check(irec == get_rec_id(env, DBR_INSTR, irec->id));
+    check(irec == get_rec_id(ctx, DBR_INSTR, irec->id));
     check(sequal(irec->mnem, "EURUSD.SPOTFWD", DBR_MNEM_MAX));
     // Body.
     check(sequal(irec->instr.display, "EURUSD.SPOTFWD", DBR_DISPLAY_MAX));
@@ -66,7 +66,7 @@ find_instr(void)
     check(irec->instr.min_lots == 1);
     check(irec->instr.max_lots == 10);
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }
@@ -76,19 +76,19 @@ find_market(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_MARKET, "BAD");
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_MARKET, "BAD");
     check(node == NULL);
 
-    struct DbrRec* mrec = get_rec_mnem(env, DBR_MARKET, "EURUSD");
+    struct DbrRec* mrec = get_rec_mnem(ctx, DBR_MARKET, "EURUSD");
     check(mrec != NULL);
-    check(mrec == get_rec_id(env, DBR_MARKET, mrec->id));
+    check(mrec == get_rec_id(ctx, DBR_MARKET, mrec->id));
     check(sequal(mrec->mnem, "EURUSD", DBR_MNEM_MAX));
     // Body.
     check(sequal(mrec->market.tenor, "SP", DBR_TENOR_MAX));
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }
@@ -98,20 +98,20 @@ find_accnt(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_ACCNT, "BAD");
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_ACCNT, "BAD");
     check(node == NULL);
 
-    struct DbrRec* arec = get_rec_mnem(env, DBR_ACCNT, "DBRA");
+    struct DbrRec* arec = get_rec_mnem(ctx, DBR_ACCNT, "DBRA");
     check(arec != NULL);
-    check(arec == get_rec_id(env, DBR_ACCNT, arec->id));
+    check(arec == get_rec_id(ctx, DBR_ACCNT, arec->id));
     check(sequal(arec->mnem, "DBRA", DBR_MNEM_MAX));
     // Body.
     check(sequal(arec->accnt.display, "Account A", DBR_DISPLAY_MAX));
     check(sequal(arec->accnt.email, "dbra@doobry.org", DBR_EMAIL_MAX));
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }
@@ -121,20 +121,20 @@ find_trader(void)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
-    DbrEnv env = dbr_env_create(pool, model);
+    DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(env, DBR_TRADER, "BAD");
+    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_TRADER, "BAD");
     check(node == NULL);
 
-    struct DbrRec* trec = get_rec_mnem(env, DBR_TRADER, "WRAMIREZ");
+    struct DbrRec* trec = get_rec_mnem(ctx, DBR_TRADER, "WRAMIREZ");
     check(trec != NULL);
-    check(trec == get_rec_id(env, DBR_TRADER, trec->id));
+    check(trec == get_rec_id(ctx, DBR_TRADER, trec->id));
     check(sequal(trec->mnem, "WRAMIREZ", DBR_MNEM_MAX));
     // Body.
     check(sequal(trec->trader.display, "Wayne Ramirez", DBR_DISPLAY_MAX));
     check(sequal(trec->trader.email, "wayne.ramirez@doobry.org", DBR_EMAIL_MAX));
 
-    dbr_env_destroy(env);
+    dbr_ctx_destroy(ctx);
     model_destroy(model);
     dbr_pool_destroy(pool);
 }

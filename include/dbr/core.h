@@ -21,29 +21,29 @@
 #include <dbr/model.h>
 
 /**
- * @addtogroup Env
+ * @addtogroup Ctx
  * @{
  */
 
-typedef struct DbrEnv_* DbrEnv;
+typedef struct DbrCtx_* DbrCtx;
 
 /**
- * @brief Create environment.
+ * @brief Create context.
  *
  * @param pool Pool.
  *
  * @param model Model.
  *
- * @return Handle to newly created environment or null on failure.
+ * @return Handle to newly created context or null on failure.
  */
 
-DBR_API DbrEnv
-dbr_env_create(DbrPool pool, DbrModel model);
+DBR_API DbrCtx
+dbr_ctx_create(DbrPool pool, DbrModel model);
 
-// No-op if env is null.
+// No-op if ctx is null.
 
 DBR_API void
-dbr_env_destroy(DbrEnv env);
+dbr_ctx_destroy(DbrCtx ctx);
 
 /** @} */
 
@@ -59,21 +59,21 @@ dbr_env_destroy(DbrEnv env);
 // Size is optional.
 
 DBR_API struct DbrSlNode*
-dbr_rec_entries(DbrEnv env, int type, size_t* size);
+dbr_rec_entries(DbrCtx ctx, int type, size_t* size);
 
 // Null if record does not exist.
 
 DBR_API struct DbrSlNode*
-dbr_rec_find_id(DbrEnv env, int type, DbrIden id);
+dbr_rec_find_id(DbrCtx ctx, int type, DbrIden id);
 
 // Null if record does not exist.
 // This function compares DBR_MNEM_MAX characters of mnem at most.
 
 DBR_API struct DbrSlNode*
-dbr_rec_find_mnem(DbrEnv env, int type, const char* mnem);
+dbr_rec_find_mnem(DbrCtx ctx, int type, const char* mnem);
 
 DBR_API struct DbrSlNode*
-dbr_rec_end(DbrEnv env);
+dbr_rec_end(DbrCtx ctx);
 
 /** @} */
 
@@ -83,7 +83,7 @@ dbr_rec_end(DbrEnv env);
  */
 
 DBR_API DbrMarket
-dbr_market_lazy(DbrEnv env, struct DbrRec* mrec);
+dbr_market_lazy(DbrCtx ctx, struct DbrRec* mrec);
 
 // Returns the market-id for state.
 
@@ -164,7 +164,7 @@ dbr_side_last_time(DbrSide side);
  */
 
 DBR_API DbrTrader
-dbr_trader_lazy(DbrEnv env, struct DbrRec* trec);
+dbr_trader_lazy(DbrCtx ctx, struct DbrRec* trec);
 
 // Returns the trader-id for state.
 
@@ -238,7 +238,7 @@ dbr_trader_sess(DbrTrader trader);
  */
 
 DBR_API DbrAccnt
-dbr_accnt_lazy(DbrEnv env, struct DbrRec* arec);
+dbr_accnt_lazy(DbrCtx ctx, struct DbrRec* arec);
 
 // Returns the account-id for state.
 
@@ -310,7 +310,7 @@ dbr_accnt_sess(DbrAccnt accnt);
  */
 
 DBR_API struct DbrOrder*
-dbr_exec_submit(DbrEnv env, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
+dbr_exec_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
                 struct DbrRec* mrec, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                 DbrFlags flags, struct DbrTrans* trans);
 
@@ -321,26 +321,26 @@ dbr_exec_submit(DbrEnv env, struct DbrRec* trec, struct DbrRec* arec, const char
 // 3. greater than original lots.
 
 DBR_API struct DbrOrder*
-dbr_exec_revise_id(DbrEnv env, DbrTrader trader, DbrIden id, DbrLots lots);
+dbr_exec_revise_id(DbrCtx ctx, DbrTrader trader, DbrIden id, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_exec_revise_ref(DbrEnv env, DbrTrader trader, const char* ref, DbrLots lots);
+dbr_exec_revise_ref(DbrCtx ctx, DbrTrader trader, const char* ref, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_exec_cancel_id(DbrEnv env, DbrTrader trader, DbrIden id);
+dbr_exec_cancel_id(DbrCtx ctx, DbrTrader trader, DbrIden id);
 
 DBR_API struct DbrOrder*
-dbr_exec_cancel_ref(DbrEnv env, DbrTrader trader, const char* ref);
+dbr_exec_cancel_ref(DbrCtx ctx, DbrTrader trader, const char* ref);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_exec_archive_order(DbrEnv env, DbrTrader trader, DbrIden id);
+dbr_exec_archive_order(DbrCtx ctx, DbrTrader trader, DbrIden id);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_exec_archive_trade(DbrEnv env, DbrAccnt accnt, DbrIden id);
+dbr_exec_archive_trade(DbrCtx ctx, DbrAccnt accnt, DbrIden id);
 
 /** @} */
 
@@ -350,7 +350,7 @@ dbr_exec_archive_trade(DbrEnv env, DbrAccnt accnt, DbrIden id);
  */
 
 DBR_API void
-dbr_exec_free_matches(DbrEnv env, struct DbrSlNode* first);
+dbr_exec_free_matches(DbrCtx ctx, struct DbrSlNode* first);
 
 /** @} */
 
