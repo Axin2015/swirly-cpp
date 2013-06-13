@@ -18,6 +18,8 @@
 #ifndef DBR_UTIL_H
 #define DBR_UTIL_H
 
+#if !defined(DBR_HIDE_API)
+
 #include <dbr/defs.h>
 
 /**
@@ -51,5 +53,7 @@ DBR_API long
 dbr_millis();
 
 /** @} */
+
+#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_UTIL_H

@@ -60,6 +60,15 @@ struct DbrRbNode {
     int color;
 };
 
+/** @} */
+
+#if !defined(DBR_HIDE_API)
+
+/**
+ * @addtogroup Node
+ * @{
+ */
+
 /**
  * @brief Next node from current node.
  */
@@ -75,5 +84,7 @@ DBR_API struct DbrRbNode*
 dbr_rbnode_prev(struct DbrRbNode* node);
 
 /** @} */
+
+#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_NODE_H

@@ -33,9 +33,20 @@ struct DbrPriceString {
     char* big;
 };
 
+/** @} */
+
+#if !defined(DBR_HIDE_API)
+
+/**
+ * @addtogroup String
+ * @{
+ */
+
 DBR_API void
 dbr_format_price(double price, int price_dp, int pip_dp, struct DbrPriceString* ps);
 
 /** @} */
+
+#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_STRING_H

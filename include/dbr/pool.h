@@ -18,6 +18,8 @@
 #ifndef DBR_POOL_H
 #define DBR_POOL_H
 
+#if !defined(DBR_HIDE_API)
+
 #include <dbr/node.h>
 
 /**
@@ -82,5 +84,7 @@ DBR_API void
 dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub);
 
 /** @} */
+
+#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_POOL_H

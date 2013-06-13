@@ -59,6 +59,15 @@ enum {
     DBR_ERROR_MAX = 255
 };
 
+/** @} */
+
+#if !defined(DBR_HIDE_API)
+
+/**
+ * @addtogroup Err
+ * @{
+ */
+
 DBR_API void
 dbr_err_clear(void);
 
@@ -78,5 +87,7 @@ DBR_API const char*
 dbr_err_msg(void);
 
 /** @} */
+
+#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_ERR_H

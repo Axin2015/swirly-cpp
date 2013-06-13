@@ -131,6 +131,8 @@ dbr_model_end(DbrModel model)
 
 /** @} */
 
+#if !defined(DBR_HIDE_API)
+
 /**
  * @addtogroup Sqlite
  * @{
@@ -155,5 +157,7 @@ DBR_API void
 dbr_sqlite_destroy(DbrModel model);
 
 /** @} */
+
+#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_MODEL_H
