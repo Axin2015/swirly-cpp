@@ -15,65 +15,16 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_NODE_H
-#define DBR_NODE_H
-
-#include <dbr/defs.h>
-
-/**
- * @addtogroup Types
- * @{
- */
-
-typedef long DbrKey;
-
-/** @} */
-
-/**
- * @addtogroup Node
- * @{
- */
-
-/**
- * @brief Singly-linked node.
- */
-struct DbrSlNode {
-    struct DbrSlNode* next;
-};
-
-/**
- * @brief Doubly-linked node.
- */
-struct DbrDlNode {
-    struct DbrDlNode* prev;
-    struct DbrDlNode* next;
-};
-
-/**
- * @brief Red-black node.
- */
-struct DbrRbNode {
-    DbrKey key;
-    struct DbrRbNode* left;
-    struct DbrRbNode* right;
-    struct DbrRbNode* parent;
-    int color;
-};
-
-/**
- * @brief Next node from current node.
- */
+#include <ash/rbnode.h>
 
 DBR_API struct DbrRbNode*
-dbr_rbnode_next(struct DbrRbNode* node);
-
-/**
- * @brief Previous node from current node.
- */
+dbr_rbnode_next(struct DbrRbNode* node)
+{
+    return ash_rbnode_next(node);
+}
 
 DBR_API struct DbrRbNode*
-dbr_rbnode_prev(struct DbrRbNode* node);
-
-/** @} */
-
-#endif // DBR_NODE_H
+dbr_rbnode_prev(struct DbrRbNode* node)
+{
+    return ash_rbnode_prev(node);
+}

@@ -52,25 +52,4 @@ dbr_millis();
 
 /** @} */
 
-/**
- * @addtogroup Node
- * @{
- */
-
-/**
- * @brief Next node from current node.
- */
-
-DBR_API struct DbrRbNode*
-dbr_rbnode_next(struct DbrRbNode* node);
-
-/**
- * @brief Previous node from current node.
- */
-
-DBR_API struct DbrRbNode*
-dbr_rbnode_prev(struct DbrRbNode* node);
-
-/** @} */
-
 #endif // DBR_UTIL_H

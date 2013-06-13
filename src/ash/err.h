@@ -18,10 +18,7 @@
 #ifndef ASH_ERR_H
 #define ASH_ERR_H
 
-#include <dbr/defs.h>
-
-#include <stdarg.h> // va_list
-#include <stdio.h>
+#include <dbr/err.h>
 
 DBR_EXTERN void
 ash_err_clear(void);

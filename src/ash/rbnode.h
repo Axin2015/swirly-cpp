@@ -18,7 +18,6 @@
 #ifndef ASH_RBNODE_H
 #define ASH_RBNODE_H
 
-#include <dbr/defs.h>
 #include <dbr/node.h>
 
 #include <assert.h>

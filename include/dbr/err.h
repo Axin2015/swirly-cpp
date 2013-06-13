@@ -28,6 +28,37 @@
  * @{
  */
 
+enum DbrErrno {
+    /**
+     * @brief Out of memory.
+     */
+    DBR_ENOMEM = 1,
+    /**
+     * @brief Access denied.
+     */
+    DBR_EACCES,
+    /**
+     * @brief Invalid argument.
+     */
+    DBR_EINVAL,
+    /**
+     * @brief SQL error.
+     */
+    DBR_EDBSQL,
+    /**
+     * @brief Is null.
+     */
+    DBR_ENULL,
+    /**
+     * @brief User-defined errors must be >=0x400.
+     */
+    DBR_EUSER = 0x400
+};
+
+enum {
+    DBR_ERROR_MAX = 255
+};
+
 DBR_API void
 dbr_err_clear(void);
 

@@ -19,7 +19,6 @@
 #define ASH_STACK_H
 
 #include <dbr/bool.h>
-#include <dbr/defs.h>
 #include <dbr/node.h>
 
 #include <assert.h>

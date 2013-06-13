@@ -18,7 +18,6 @@
 #ifndef DBR_POOL_H
 #define DBR_POOL_H
 
-#include <dbr/defs.h>
 #include <dbr/node.h>
 
 /**

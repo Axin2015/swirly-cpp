@@ -19,7 +19,6 @@
 #define ASH_TREE_H
 
 #include <dbr/bool.h>
-#include <dbr/defs.h>
 #include <dbr/node.h>
 
 #include <stddef.h> // NULL

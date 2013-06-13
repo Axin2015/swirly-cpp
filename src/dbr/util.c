@@ -17,8 +17,6 @@
  */
 #include <dbr/util.h>
 
-#include <ash/rbnode.h>
-
 #include <limits.h>
 #include <sys/time.h>
 
@@ -101,18 +99,4 @@ dbr_millis()
     long ms = tv.tv_sec * 1000L;
     ms += (tv.tv_usec + 500L) / 1000L;
     return ms;
-}
-
-// Red-black
-
-DBR_API struct DbrRbNode*
-dbr_rbnode_next(struct DbrRbNode* node)
-{
-    return ash_rbnode_next(node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_rbnode_prev(struct DbrRbNode* node)
-{
-    return ash_rbnode_prev(node);
 }
