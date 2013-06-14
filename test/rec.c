@@ -19,12 +19,12 @@
 #include "model.h"
 
 #include <dbr/conv.h>
-#include <dbr/core.h>
+#include <dbr/ctx.h>
 
 static struct DbrRec*
 get_rec_id(DbrCtx ctx, int type, DbrIden id)
 {
-    struct DbrSlNode* node = dbr_rec_find_id(ctx, type, id);
+    struct DbrSlNode* node = dbr_ctx_find_id(ctx, type, id);
     check(node != NULL);
     return dbr_rec_entry(node);
 }
@@ -32,7 +32,7 @@ get_rec_id(DbrCtx ctx, int type, DbrIden id)
 static struct DbrRec*
 get_rec_mnem(DbrCtx ctx, int type, const char* mnem)
 {
-    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, type, mnem);
+    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, type, mnem);
     check(node != NULL);
     return dbr_rec_entry(node);
 }
@@ -44,7 +44,7 @@ find_instr(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_INSTR, "BAD");
+    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_INSTR, "BAD");
     check(node == NULL);
 
     struct DbrRec* irec = get_rec_mnem(ctx, DBR_INSTR, "EURUSD.SPOTFWD");
@@ -78,7 +78,7 @@ find_market(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_MARKET, "BAD");
+    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_MARKET, "BAD");
     check(node == NULL);
 
     struct DbrRec* mrec = get_rec_mnem(ctx, DBR_MARKET, "EURUSD");
@@ -100,7 +100,7 @@ find_accnt(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_ACCNT, "BAD");
+    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_ACCNT, "BAD");
     check(node == NULL);
 
     struct DbrRec* arec = get_rec_mnem(ctx, DBR_ACCNT, "DBRA");
@@ -123,7 +123,7 @@ find_trader(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_TRADER, "BAD");
+    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_TRADER, "BAD");
     check(node == NULL);
 
     struct DbrRec* trec = get_rec_mnem(ctx, DBR_TRADER, "WRAMIREZ");

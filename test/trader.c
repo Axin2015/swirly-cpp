@@ -19,7 +19,8 @@
 #include "model.h"
 
 #include <dbr/conv.h>
-#include <dbr/core.h>
+#include <dbr/ctx.h>
+#include <dbr/trader.h>
 
 void
 trader_id(void)
@@ -28,11 +29,11 @@ trader_id(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_rec_find_mnem(ctx, DBR_TRADER, "WRAMIREZ");
+    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_TRADER, "WRAMIREZ");
     check(node != NULL);
     struct DbrRec* trec = dbr_rec_entry(node);
     check(trec != NULL);
-    DbrTrader trader = dbr_trader_lazy(ctx, trec);
+    DbrTrader trader = dbr_ctx_trader(ctx, trec);
     check(trader != NULL);
     check(dbr_trader_id(trader) ==  trec->id);
 

@@ -125,16 +125,16 @@ struct DbrBest {
 typedef struct ElmSide* DbrSide;
 
 /**
- * @addtogroup Accnt
- */
-
-typedef struct ElmAccnt* DbrAccnt;
-
-/**
  * @addtogroup Trader
  */
 
 typedef struct ElmTrader* DbrTrader;
+
+/**
+ * @addtogroup Accnt
+ */
+
+typedef struct ElmAccnt* DbrAccnt;
 
 /**
  * @addtogroup Rec
@@ -238,6 +238,96 @@ struct DbrLevel {
      */
     struct DbrRbNode side_node_;
 };
+
+/** @} */
+
+/**
+ * @addtogroup TraderSub
+ * @{
+ */
+
+struct DbrSub {
+    /**
+     * @publicsection
+     */
+    DbrMarket market;
+    DbrTrader trader;
+    /**
+     * @privatesection
+     */
+    struct DbrDlNode market_node_;
+    struct DbrRbNode trader_node_;
+};
+
+/** @} */
+
+/**
+ * @addtogroup TraderSess
+ * @{
+ */
+
+typedef struct DbrITraderSess {
+    const struct DbrTraderSessVtbl* vtbl;
+}* DbrTraderSess;
+
+/** @} */
+
+/**
+ * @addtogroup AccntMemb
+ * @{
+ */
+
+struct DbrMemb {
+    /**
+     * @publicsection
+     */
+    union DbrURec accnt;
+    union DbrURec trader;
+    /**
+     * @privatesection
+     */
+    // Singly-linked for data model.
+    struct DbrSlNode model_node_;
+    struct DbrRbNode accnt_node_;
+};
+
+/** @} */
+
+/**
+ * @addtogroup AccntPosn
+ * @{
+ */
+
+struct DbrPosn {
+    /**
+     * @publicsection
+     */
+    DbrIden id;
+    union DbrURec accnt;
+    union DbrURec instr;
+    DbrDate settl_date;
+    DbrLicks buy_licks;
+    DbrLots buy_lots;
+    DbrLicks sell_licks;
+    DbrLots sell_lots;
+    /**
+     * @privatesection
+     */
+    // Singly-linked for data model.
+    struct DbrSlNode model_node_;
+    struct DbrRbNode accnt_node_;
+};
+
+/** @} */
+
+/**
+ * @addtogroup AccntSess
+ * @{
+ */
+
+typedef struct DbrIAccntSess {
+    const struct DbrAccntSessVtbl* vtbl;
+}* DbrAccntSess;
 
 /** @} */
 
@@ -346,13 +436,6 @@ struct DbrTrade {
     struct DbrRbNode accnt_node_;
 };
 
-/** @} */
-
-/**
- * @addtogroup Trans
- * @{
- */
-
 struct DbrMatch {
     /**
      * @publicsection
@@ -390,96 +473,6 @@ struct DbrTrans {
      */
     DbrLots taken;
 };
-
-/** @} */
-
-/**
- * @addtogroup AccntMemb
- * @{
- */
-
-struct DbrMemb {
-    /**
-     * @publicsection
-     */
-    union DbrURec accnt;
-    union DbrURec trader;
-    /**
-     * @privatesection
-     */
-    // Singly-linked for data model.
-    struct DbrSlNode model_node_;
-    struct DbrRbNode accnt_node_;
-};
-
-/** @} */
-
-/**
- * @addtogroup AccntPosn
- * @{
- */
-
-struct DbrPosn {
-    /**
-     * @publicsection
-     */
-    DbrIden id;
-    union DbrURec accnt;
-    union DbrURec instr;
-    DbrDate settl_date;
-    DbrLicks buy_licks;
-    DbrLots buy_lots;
-    DbrLicks sell_licks;
-    DbrLots sell_lots;
-    /**
-     * @privatesection
-     */
-    // Singly-linked for data model.
-    struct DbrSlNode model_node_;
-    struct DbrRbNode accnt_node_;
-};
-
-/** @} */
-
-/**
- * @addtogroup AccntSess
- * @{
- */
-
-typedef struct DbrIAccntSess {
-    const struct DbrAccntSessVtbl* vtbl;
-}* DbrAccntSess;
-
-/** @} */
-
-/**
- * @addtogroup TraderSub
- * @{
- */
-
-struct DbrSub {
-    /**
-     * @publicsection
-     */
-    DbrMarket market;
-    DbrTrader trader;
-    /**
-     * @privatesection
-     */
-    struct DbrDlNode market_node_;
-    struct DbrRbNode trader_node_;
-};
-
-/** @} */
-
-/**
- * @addtogroup TraderSess
- * @{
- */
-
-typedef struct DbrITraderSess {
-    const struct DbrTraderSessVtbl* vtbl;
-}* DbrTraderSess;
 
 /** @} */
 

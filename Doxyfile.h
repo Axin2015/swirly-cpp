@@ -27,11 +27,27 @@
  */
 
 /**
+ * @defgroup Conv Conversion
+ */
+
+/**
  * @defgroup Err Error
  */
 
 /**
+ * @defgroup Node Node
+ */
+
+/**
  * @defgroup Pool Pool
+ */
+
+/**
+ * @defgroup String String
+ */
+
+/**
+ * @defgroup Util Utility
  */
 
 /**
@@ -41,14 +57,6 @@
 /**
  * @defgroup Sqlite SQLite
  * @ingroup Model
- */
-
-/**
- * @defgroup Ctx Context
- */
-
-/**
- * @defgroup Rec Record
  */
 
 /**
@@ -128,29 +136,15 @@
  */
 
 /**
+ * @defgroup Ctx Context
+ */
+
+/**
+ * @defgroup Rec Record
+ * @ingroup Ctx
+ */
+
+/**
  * @defgroup Exec Execution
- */
-
-/**
- * @defgroup Trans Transaction
- * @ingroup Exec
- */
-
-/**
- * @defgroup Util Utility
- */
-
-/**
- * @defgroup Conv Conversion
- * @ingroup Util
- */
-
-/**
- * @defgroup Node Node
- * @ingroup Util
- */
-
-/**
- * @defgroup String String
- * @ingroup Util
+ * @ingroup Ctx
  */

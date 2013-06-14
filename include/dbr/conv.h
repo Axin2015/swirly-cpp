@@ -81,37 +81,31 @@ dbr_side_order_entry(struct DbrDlNode* node)
 /** @} */
 
 /**
- * @private
- */
-
-static inline struct DbrOrder*
-dbr_order_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrOrder, model_node_, node);
-}
-
-/**
- * @addtogroup Exec
+ * @addtogroup TraderOrder
  * @{
  */
 
-static inline DbrBool
-dbr_order_done(const struct DbrOrder* order)
+static inline struct DbrOrder*
+dbr_trader_order_entry(struct DbrRbNode* node)
 {
-    return order->resd == 0;
+    return dbr_implof(struct DbrOrder, trader_node_, node);
 }
 
 /** @} */
 
 /**
- * @addtogroup Trans
+ * @addtogroup TraderSub
  * @{
  */
 
-static inline struct DbrMatch*
-dbr_trans_match_entry(struct DbrSlNode* node)
+/**
+ * @brief Subscription from trader node.
+ */
+
+static inline struct DbrSub*
+dbr_trader_sub_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrMatch, trans_node_, node);
+    return dbr_implof(struct DbrSub, trader_node_, node);
 }
 
 /** @} */
@@ -186,31 +180,37 @@ dbr_accnt_trade_entry(struct DbrRbNode* node)
 /** @} */
 
 /**
- * @addtogroup TraderOrder
- * @{
+ * @private
  */
 
 static inline struct DbrOrder*
-dbr_trader_order_entry(struct DbrRbNode* node)
+dbr_order_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrOrder, trader_node_, node);
+    return dbr_implof(struct DbrOrder, model_node_, node);
+}
+
+/**
+ * @addtogroup Exec
+ * @{
+ */
+
+static inline DbrBool
+dbr_order_done(const struct DbrOrder* order)
+{
+    return order->resd == 0;
 }
 
 /** @} */
 
 /**
- * @addtogroup TraderSub
+ * @addtogroup Exec
  * @{
  */
 
-/**
- * @brief Subscription from trader node.
- */
-
-static inline struct DbrSub*
-dbr_trader_sub_entry(struct DbrRbNode* node)
+static inline struct DbrMatch*
+dbr_trans_match_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrSub, trader_node_, node);
+    return dbr_implof(struct DbrMatch, trans_node_, node);
 }
 
 /** @} */

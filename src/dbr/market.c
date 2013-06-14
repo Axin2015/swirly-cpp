@@ -15,6 +15,30 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
+#include <dbr/market.h>
 
-#include <dbr/ctx.h>
+#include <elm/market.h>
+
+DBR_API DbrIden
+dbr_market_id(DbrMarket market)
+{
+    return elm_market_id(market);
+}
+
+DBR_API DbrSide
+dbr_market_bid_side(DbrMarket market)
+{
+    return elm_market_bid_side(market);
+}
+
+DBR_API DbrSide
+dbr_market_ask_side(DbrMarket market)
+{
+    return elm_market_ask_side(market);
+}
+
+DBR_API struct DbrBest*
+dbr_market_best(struct DbrRec* mrec, struct DbrBest* best)
+{
+    return elm_market_best(mrec, best);
+}
