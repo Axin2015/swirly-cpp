@@ -18,6 +18,8 @@
 #ifndef DBR_SESS_H
 #define DBR_SESS_H
 
+#include <dbr/types.h>
+
 /**
  * @addtogroup AccntSess
  * @{
