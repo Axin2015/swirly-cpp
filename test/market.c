@@ -29,7 +29,7 @@ market_id(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_MARKET, "EURUSD");
+    struct DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_MARKET, "EURUSD");
     check(node != NULL);
     struct DbrRec* mrec = dbr_rec_entry(node);
     check(mrec != NULL);

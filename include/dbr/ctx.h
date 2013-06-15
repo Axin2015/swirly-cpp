@@ -61,21 +61,21 @@ dbr_ctx_destroy(DbrCtx ctx);
 // Size is optional.
 
 DBR_API struct DbrSlNode*
-dbr_ctx_entries(DbrCtx ctx, int type, size_t* size);
+dbr_ctx_first_rec(DbrCtx ctx, int type, size_t* size);
 
 // Null if record does not exist.
 
 DBR_API struct DbrSlNode*
-dbr_ctx_find_id(DbrCtx ctx, int type, DbrIden id);
+dbr_ctx_find_rec_id(DbrCtx ctx, int type, DbrIden id);
 
 // Null if record does not exist.
 // This function compares DBR_MNEM_MAX characters of mnem at most.
 
 DBR_API struct DbrSlNode*
-dbr_ctx_find_mnem(DbrCtx ctx, int type, const char* mnem);
+dbr_ctx_find_rec_mnem(DbrCtx ctx, int type, const char* mnem);
 
 DBR_API struct DbrSlNode*
-dbr_ctx_end(DbrCtx ctx);
+dbr_ctx_end_rec(DbrCtx ctx);
 
 /** @} */
 

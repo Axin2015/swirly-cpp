@@ -86,8 +86,8 @@ hash_mnem(int type, const char* mnem)
 static inline struct DbrRec*
 get_id(const struct ElmCache* cache, int type, DbrIden id)
 {
-    struct DbrSlNode* node = elm_cache_find_id(cache, type, id);
-    assert(node != elm_cache_end(cache));
+    struct DbrSlNode* node = elm_cache_find_rec_id(cache, type, id);
+    assert(node != elm_cache_end_rec(cache));
     return dbr_rec_entry(node);
 }
 
@@ -187,7 +187,7 @@ elm_cache_term(struct ElmCache* cache)
 }
 
 DBR_EXTERN void
-elm_cache_emplace(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size)
+elm_cache_emplace_recs(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {
     case DBR_INSTR:
@@ -209,7 +209,7 @@ elm_cache_emplace(struct ElmCache* cache, int type, struct DbrSlNode* first, siz
 }
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_entries(struct ElmCache* cache, int type, size_t* size)
+elm_cache_first_rec(struct ElmCache* cache, int type, size_t* size)
 {
     struct DbrSlNode* first;
     switch (type) {
@@ -243,7 +243,7 @@ elm_cache_entries(struct ElmCache* cache, int type, size_t* size)
 }
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_find_id(const struct ElmCache* cache, int type, DbrIden id)
+elm_cache_find_rec_id(const struct ElmCache* cache, int type, DbrIden id)
 {
     const size_t bucket = hash_id(type, id) % ELM_CACHE_BUCKETS;
     for (struct DbrSlNode* node = ash_stack_first(&cache->buckets[bucket].ids);
@@ -256,7 +256,7 @@ elm_cache_find_id(const struct ElmCache* cache, int type, DbrIden id)
 }
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_find_mnem(const struct ElmCache* cache, int type, const char* mnem)
+elm_cache_find_rec_mnem(const struct ElmCache* cache, int type, const char* mnem)
 {
     assert(mnem);
     const size_t bucket = hash_mnem(type, mnem) % ELM_CACHE_BUCKETS;

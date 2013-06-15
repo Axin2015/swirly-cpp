@@ -43,8 +43,8 @@ struct DbrCtx_ {
 static inline struct DbrRec*
 get_id(DbrCtx ctx, int type, DbrIden id)
 {
-    struct DbrSlNode* node = elm_cache_find_id(&ctx->cache, type, id);
-    assert(node != elm_cache_end(&ctx->cache));
+    struct DbrSlNode* node = elm_cache_find_rec_id(&ctx->cache, type, id);
+    assert(node != elm_cache_end_rec(&ctx->cache));
     return dbr_rec_entry(node);
 }
 
@@ -56,7 +56,7 @@ emplace_recs(DbrCtx ctx, int type)
     if (size == -1)
         return false;
 
-    elm_cache_emplace(&ctx->cache, type, node, size);
+    elm_cache_emplace_recs(&ctx->cache, type, node, size);
     return true;
 }
 
@@ -248,27 +248,27 @@ dbr_ctx_destroy(DbrCtx ctx)
 // Cache
 
 DBR_API struct DbrSlNode*
-dbr_ctx_entries(DbrCtx ctx, int type, size_t* size)
+dbr_ctx_first_rec(DbrCtx ctx, int type, size_t* size)
 {
-    return elm_cache_entries(&ctx->cache, type, size);
+    return elm_cache_first_rec(&ctx->cache, type, size);
 }
 
 DBR_API struct DbrSlNode*
-dbr_ctx_find_id(DbrCtx ctx, int type, DbrIden id)
+dbr_ctx_find_rec_id(DbrCtx ctx, int type, DbrIden id)
 {
-    return elm_cache_find_id(&ctx->cache, type, id);
+    return elm_cache_find_rec_id(&ctx->cache, type, id);
 }
 
 DBR_API struct DbrSlNode*
-dbr_ctx_find_mnem(DbrCtx ctx, int type, const char* mnem)
+dbr_ctx_find_rec_mnem(DbrCtx ctx, int type, const char* mnem)
 {
-    return elm_cache_find_mnem(&ctx->cache, type, mnem);
+    return elm_cache_find_rec_mnem(&ctx->cache, type, mnem);
 }
 
 DBR_API struct DbrSlNode*
-dbr_ctx_end(DbrCtx ctx)
+dbr_ctx_end_rec(DbrCtx ctx)
 {
-    return elm_cache_end(&ctx->cache);
+    return elm_cache_end_rec(&ctx->cache);
 }
 
 // Pool

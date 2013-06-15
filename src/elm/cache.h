@@ -60,19 +60,19 @@ elm_cache_term(struct ElmCache* cache);
 // Transfer ownership to cache.
 
 DBR_EXTERN void
-elm_cache_emplace(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size);
+elm_cache_emplace_recs(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size);
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_entries(struct ElmCache* cache, int type, size_t* size);
+elm_cache_first_rec(struct ElmCache* cache, int type, size_t* size);
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_find_id(const struct ElmCache* cache, int type, DbrIden id);
+elm_cache_find_rec_id(const struct ElmCache* cache, int type, DbrIden id);
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_find_mnem(const struct ElmCache* cache, int type, const char* mnem);
+elm_cache_find_rec_mnem(const struct ElmCache* cache, int type, const char* mnem);
 
 static inline struct DbrSlNode*
-elm_cache_end(const struct ElmCache* cache)
+elm_cache_end_rec(const struct ElmCache* cache)
 {
     return NULL;
 }

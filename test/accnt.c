@@ -29,7 +29,7 @@ accnt_id(void)
     DbrModel model = model_create(pool, 1);
     DbrCtx ctx = dbr_ctx_create(pool, model);
 
-    struct DbrSlNode* node = dbr_ctx_find_mnem(ctx, DBR_ACCNT, "DBRA");
+    struct DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_ACCNT, "DBRA");
     check(node != NULL);
     struct DbrRec* arec = dbr_rec_entry(node);
     check(arec != NULL);
