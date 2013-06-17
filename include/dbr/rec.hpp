@@ -163,6 +163,248 @@ typedef Recs<DBR_MARKET> MarketRecs;
 typedef Recs<DBR_TRADER> TraderRecs;
 typedef Recs<DBR_ACCNT> AccntRecs;
 
+class RecBase {
+protected:
+    const DbrRec& rec_;
+    // Non-virtual is protected.
+    ~RecBase() noexcept
+    {
+    }
+    explicit
+    RecBase(const DbrRec& rec) noexcept
+        : rec_(rec)
+    {
+    }
+public:
+    bool
+    operator ==(const RecBase& rhs) const noexcept
+    {
+        return rec_.type == rhs.rec_.type && rec_.id == rhs.rec_.id;
+    }
+    bool
+    operator !=(const RecBase& rhs) const noexcept
+    {
+        return !(*this == rhs);
+    }
+    int
+    type() const noexcept
+    {
+        return rec_.type;
+    }
+    DbrIden
+    id() const noexcept
+    {
+        return rec_.id;
+    }
+    Mnem
+    mnem() const noexcept
+    {
+        return Mnem(rec_.mnem);
+    }
+};
+
+class InstrRec : public RecBase {
+public:
+    explicit
+    InstrRec(const DbrRec& rec) noexcept
+    : RecBase(rec)
+    {
+    }
+    Display
+    display() const noexcept
+    {
+        return Display(rec_.instr.display);
+    }
+    Mnem
+    asset_type() const noexcept
+    {
+        return Mnem(rec_.instr.asset_type);
+    }
+    Mnem
+    instr_type() const noexcept
+    {
+        return Mnem(rec_.instr.instr_type);
+    }
+    Mnem
+    asset() const noexcept
+    {
+        return Mnem(rec_.instr.asset);
+    }
+    Mnem
+    ccy() const noexcept
+    {
+        return Mnem(rec_.instr.ccy);
+    }
+    int
+    tick_numer() const noexcept
+    {
+        return rec_.instr.tick_numer;
+    }
+    int
+    tick_denom() const noexcept
+    {
+        return rec_.instr.tick_denom;
+    }
+    double
+    price_inc() const noexcept
+    {
+        return rec_.instr.price_inc;
+    }
+    int
+    lot_numer() const noexcept
+    {
+        return rec_.instr.lot_numer;
+    }
+    int
+    lot_denom() const noexcept
+    {
+        return rec_.instr.lot_denom;
+    }
+    double
+    qty_inc() const noexcept
+    {
+        return rec_.instr.qty_inc;
+    }
+    int
+    price_dp() const noexcept
+    {
+        return rec_.instr.price_dp;
+    }
+    int
+    pip_dp() const noexcept
+    {
+        return rec_.instr.pip_dp;
+    }
+    int
+    qty_dp() const noexcept
+    {
+        return rec_.instr.qty_dp;
+    }
+    DbrLots
+    min_lots() const noexcept
+    {
+        return rec_.instr.min_lots;
+    }
+    DbrLots
+    max_lots() const noexcept
+    {
+        return rec_.instr.max_lots;
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, InstrRec irec)
+{
+    return os << "id=" << irec.id()
+              << ",mnem=" << irec.mnem()
+              << ",display=" << irec.display()
+              << ",asset_type=" << irec.asset_type()
+              << ",instr_type=" << irec.instr_type()
+              << ",asset=" << irec.asset()
+              << ",ccy=" << irec.ccy()
+              << ",tick_numer=" << irec.tick_numer()
+              << ",tick_denom=" << irec.tick_denom()
+              << ",price_inc=" << irec.price_inc()
+              << ",lot_numer=" << irec.lot_numer()
+              << ",lot_denom=" << irec.lot_denom()
+              << ",qty_inc=" << irec.qty_inc()
+              << ",price_dp=" << irec.price_dp()
+              << ",pip_dp=" << irec.pip_dp()
+              << ",qty_dp=" << irec.qty_dp()
+              << ",min_lots=" << irec.min_lots()
+              << ",max_lots=" << irec.max_lots();
+}
+
+class MarketRec : public RecBase {
+public:
+    explicit
+    MarketRec(const DbrRec& rec) noexcept
+    : RecBase(rec)
+    {
+    }
+    InstrRec
+    irec() const noexcept
+    {
+        return InstrRec(*rec_.market.instr.rec);
+    }
+    Tenor
+    tenor() const noexcept
+    {
+        return rec_.market.tenor;
+    }
+    DbrDate
+    settl_date() const noexcept
+    {
+        return rec_.market.settl_date;
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, MarketRec mrec)
+{
+    return os << "id=" << mrec.id()
+              << ",mnem=" << mrec.mnem()
+              << ",instr=" << mrec.irec().mnem()
+              << ",tenor=" << mrec.tenor()
+              << ",settl_date=" << mrec.settl_date();
+}
+
+class TraderRec : public RecBase {
+public:
+    explicit
+    TraderRec(const DbrRec& rec) noexcept
+    : RecBase(rec)
+    {
+    }
+    Display
+    display() const noexcept
+    {
+        return Display(rec_.trader.display);
+    }
+    Email
+    email() const noexcept
+    {
+        return Email(rec_.trader.email);
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, TraderRec trec)
+{
+    return os << "id=" << trec.id()
+              << ",mnem=" << trec.mnem()
+              << ",display=" << trec.display()
+              << ",email=" << trec.email();
+}
+
+class AccntRec : public RecBase {
+public:
+    explicit
+    AccntRec(const DbrRec& rec) noexcept
+    : RecBase(rec)
+    {
+    }
+    Display
+    display() const noexcept
+    {
+        return Display(rec_.accnt.display);
+    }
+    Email
+    email() const noexcept
+    {
+        return Email(rec_.accnt.email);
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, AccntRec arec)
+{
+    return os << "id=" << arec.id()
+              << ",mnem=" << arec.mnem()
+              << ",display=" << arec.display()
+              << ",email=" << arec.email();
+}
+
 } // dbr
 
 #endif // DBR_REC_HPP

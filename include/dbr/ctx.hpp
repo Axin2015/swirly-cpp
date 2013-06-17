@@ -77,22 +77,22 @@ public:
         return impl_;
     }
     InstrRecs
-    instr_recs() const noexcept
+    irecs() const noexcept
     {
         return InstrRecs(impl_);
     }
     MarketRecs
-    market_recs() const noexcept
+    mrecs() const noexcept
     {
         return MarketRecs(impl_);
     }
     TraderRecs
-    trader_recs() const noexcept
+    trecs() const noexcept
     {
         return TraderRecs(impl_);
     }
     AccntRecs
-    accnt_recs() const noexcept
+    arecs() const noexcept
     {
         return AccntRecs(impl_);
     }
