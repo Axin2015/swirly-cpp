@@ -20,6 +20,7 @@
 
 #include <dbr/iter.hpp>
 #include <dbr/node.hpp>
+#include <dbr/types.hpp>
 
 #include <dbr/conv.h>
 #include <dbr/ctx.h>
