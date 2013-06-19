@@ -15,28 +15,28 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_ORDER_HPP
-#define DBR_ORDER_HPP
+#ifndef DBR_TRADE_HPP
+#define DBR_TRADE_HPP
 
 #include <dbr/rec.hpp>
 
 namespace dbr {
 
-class Order {
-    const DbrOrder& impl_;
+class Trade {
+    const DbrTrade& impl_;
 public:
     explicit
-    Order(const DbrOrder& impl) noexcept
+    Trade(const DbrTrade& impl) noexcept
         : impl_(impl)
     {
     }
     bool
-    operator ==(Order rhs) const noexcept
+    operator ==(Trade rhs) const noexcept
     {
         return impl_.id == rhs.impl_.id;
     }
     bool
-    operator !=(Order rhs) const noexcept
+    operator !=(Trade rhs) const noexcept
     {
         return impl_.id != rhs.impl_.id;
     }
@@ -45,15 +45,20 @@ public:
     {
         return impl_.id;
     }
-    int
-    rev() const noexcept
+    DbrIden
+    match() const noexcept
     {
-        return impl_.rev;
+        return impl_.match;
+    }
+    DbrIden
+    order() const noexcept
+    {
+        return impl_.order;
     }
     int
-    status() const noexcept
+    order_rev() const noexcept
     {
-        return impl_.status;
+        return impl_.order_rev;
     }
     TraderRec
     trec() const noexcept
@@ -74,6 +79,16 @@ public:
     mrec() const noexcept
     {
         return MarketRec(*impl_.market.rec);
+    }
+    AccntRec
+    cpty() const noexcept
+    {
+        return AccntRec(*impl_.cpty.rec);
+    }
+    int
+    role() const noexcept
+    {
+        return impl_.role;
     }
     int
     action() const noexcept
@@ -100,15 +115,10 @@ public:
     {
         return impl_.lots;
     }
-    DbrLots
-    min() const noexcept
+    DbrDate
+    settl_date() const noexcept
     {
-        return impl_.min;
-    }
-    DbrFlags
-    flags() const noexcept
-    {
-        return impl_.flags;
+        return impl_.settl_date;
     }
     DbrMillis
     created() const noexcept
@@ -120,33 +130,30 @@ public:
     {
         return impl_.modified;
     }
-    bool
-    done() const noexcept
-    {
-        return impl_.resd == 0;
-    }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Order order)
+operator <<(std::ostream& os, Trade trade)
 {
-    return os << "id=" << order.id()
-              << ",rev=" << order.rev()
-              << ",status=" << order.status()
-              << ",trec=" << order.trec().mnem()
-              << ",arec=" << order.arec().mnem()
-              << ",ref=" << order.ref()
-              << ",mrec=" << order.mrec().mnem()
-              << ",action=" << order.action()
-              << ",ticks=" << order.ticks()
-              << ",resd=" << order.resd()
-              << ",exec=" << order.exec()
-              << ",lots=" << order.lots()
-              << ",min=" << order.min()
-              << ",flags=" << order.flags()
-              << ",created=" << order.created()
-              << ",modified=" << order.modified();
+    return os << "id=" << trade.id()
+              << ",match=" << trade.match()
+              << ",order=" << trade.order()
+              << ",order_rev=" << trade.order_rev()
+              << ",trec=" << trade.trec().mnem()
+              << ",arec=" << trade.arec().mnem()
+              << ",ref=" << trade.ref()
+              << ",mrec=" << trade.mrec().mnem()
+              << ",cpty=" << trade.cpty().mnem()
+              << ",role=" << trade.role()
+              << ",action=" << trade.action()
+              << ",ticks=" << trade.ticks()
+              << ",resd=" << trade.resd()
+              << ",exec=" << trade.exec()
+              << ",lots=" << trade.lots()
+              << ",settl_date=" << trade.settl_date()
+              << ",created=" << trade.created()
+              << ",modified=" << trade.modified();
 }
 } // dbr
 
-#endif // DBR_ORDER_HPP
+#endif // DBR_TRADE_HPP
