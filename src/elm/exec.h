@@ -30,6 +30,8 @@ struct ElmExec {
 DBR_EXTERN void
 elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrModel model, struct ElmIndex* index);
 
+// All members of trans are set to zero on failure.
+
 DBR_EXTERN struct DbrOrder*
 elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
                 struct DbrRec* mrec, int action, DbrTicks ticks, DbrLots lots, DbrLots min,

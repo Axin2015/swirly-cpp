@@ -219,11 +219,7 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
  fail2:
     elm_pool_free_order(exec->pool, new_order);
  fail1:
-    trans->new_order = NULL;
-    trans->new_posn = NULL;
-    trans->first_match = NULL;
-    trans->count = 0;
-    trans->taken = 0;
+    memset(trans, 0, sizeof(*trans));
     return NULL;
 }
 

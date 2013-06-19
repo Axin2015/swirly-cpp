@@ -19,7 +19,7 @@
 #define DBR_CTX_HPP
 
 #include <dbr/except.hpp>
-#include <dbr/rec.hpp>
+#include <dbr/order.hpp>
 
 namespace dbr {
 
@@ -95,6 +95,89 @@ public:
     arecs() const noexcept
     {
         return AccntRecs(impl_);
+    }
+    DbrMarket
+    market(DbrRec& mrec)
+    {
+        DbrMarket market = dbr_ctx_market(impl_, &mrec);
+        if (!market)
+            throw_exception();
+        return market;
+    }
+    DbrTrader
+    trader(DbrRec& trec)
+    {
+        DbrTrader trader = dbr_ctx_trader(impl_, &trec);
+        if (!trader)
+            throw_exception();
+        return trader;
+    }
+    DbrAccnt
+    accnt(DbrRec& arec)
+    {
+        DbrAccnt accnt = dbr_ctx_accnt(impl_, &arec);
+        if (!accnt)
+            throw_exception();
+        return accnt;
+    }
+    Order
+    submit(DbrRec& trec, DbrRec& arec, const char* ref, DbrRec& mrec, int action,
+           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, DbrTrans& trans)
+    {
+        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, ref, &mrec, action,
+                                               ticks, lots, min, flags, &trans);
+        if (!order)
+            throw_exception();
+        return Order(*order);
+    }
+    Order
+    revise(DbrTrader trader, DbrIden id, DbrLots lots)
+    {
+        DbrOrder* const order = dbr_ctx_revise_id(impl_, trader, id, lots);
+        if (!order)
+            throw_exception();
+        return Order(*order);
+    }
+    Order
+    revise(DbrTrader trader, const char* ref, DbrLots lots)
+    {
+        DbrOrder* const order = dbr_ctx_revise_ref(impl_, trader, ref, lots);
+        if (!order)
+            throw_exception();
+        return Order(*order);
+    }
+    Order
+    cancel(DbrTrader trader, DbrIden id)
+    {
+        DbrOrder* const order = dbr_ctx_cancel_id(impl_, trader, id);
+        if (!order)
+            throw_exception();
+        return Order(*order);
+    }
+    Order
+    cancel(DbrTrader trader, const char* ref)
+    {
+        DbrOrder* const order = dbr_ctx_cancel_ref(impl_, trader, ref);
+        if (!order)
+            throw_exception();
+        return Order(*order);
+    }
+    void
+    archive_order(DbrTrader trader, DbrIden id)
+    {
+        if (!dbr_ctx_archive_order(impl_, trader, id))
+            throw_exception();
+    }
+    void
+    archive_trade(DbrAccnt accnt, DbrIden id)
+    {
+        if (!dbr_ctx_archive_trade(impl_, accnt, id))
+            throw_exception();
+    }
+    void
+    free_matches(struct DbrSlNode* first) noexcept
+    {
+        dbr_ctx_free_matches(impl_, first);
     }
 };
 

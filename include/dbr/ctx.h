@@ -114,6 +114,11 @@ dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec);
  * @{
  */
 
+/**
+ * @brief Submit order.
+ * All members of trans are set to zero on failure.
+ */
+
 DBR_API struct DbrOrder*
 dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
                struct DbrRec* mrec, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
