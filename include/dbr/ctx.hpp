@@ -97,7 +97,7 @@ public:
         return AccntRecs(impl_);
     }
     DbrMarket
-    market(DbrRec& mrec)
+    market(DbrRec& mrec) const
     {
         DbrMarket market = dbr_ctx_market(impl_, &mrec);
         if (!market)
@@ -105,7 +105,7 @@ public:
         return market;
     }
     DbrTrader
-    trader(DbrRec& trec)
+    trader(DbrRec& trec) const
     {
         DbrTrader trader = dbr_ctx_trader(impl_, &trec);
         if (!trader)
@@ -113,7 +113,7 @@ public:
         return trader;
     }
     DbrAccnt
-    accnt(DbrRec& arec)
+    accnt(DbrRec& arec) const
     {
         DbrAccnt accnt = dbr_ctx_accnt(impl_, &arec);
         if (!accnt)

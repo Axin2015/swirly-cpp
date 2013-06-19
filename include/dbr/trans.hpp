@@ -19,7 +19,7 @@
 #define DBR_TRANS_HPP
 
 #include <dbr/ctx.hpp>
-#include <dbr/posn.hpp>
+#include <dbr/match.hpp>
 
 namespace dbr {
 
@@ -69,6 +69,11 @@ public:
     new_posn() const noexcept
     {
         return Posn(*impl_.new_posn);
+    }
+    Matches
+    matches() const noexcept
+    {
+        return Matches(impl_);
     }
     size_t
     count() const noexcept

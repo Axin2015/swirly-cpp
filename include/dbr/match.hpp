@@ -24,6 +24,113 @@
 
 namespace dbr {
 
+struct MatchPolicy : NodeTraits<DbrSlNode> {
+    typedef DbrMatch Entry;
+    static Entry*
+    entry(Node* node)
+    {
+        return dbr_trans_match_entry(node);
+    }
+    static const Entry*
+    entry(const Node* node)
+    {
+        return dbr_trans_match_entry(const_cast<Node*>(node));
+    }
+};
+
+class Matches {
+    DbrTrans trans_;
+public:
+    typedef MatchPolicy::Entry ValueType;
+    typedef MatchPolicy::Entry* Pointer;
+    typedef MatchPolicy::Entry& Reference;
+    typedef const MatchPolicy::Entry* ConstPointer;
+    typedef const MatchPolicy::Entry& ConstReference;
+
+    typedef ForwardIterator<MatchPolicy> Iterator;
+    typedef ConstForwardIterator<MatchPolicy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    Matches(DbrTrans trans) noexcept
+    : trans_(trans)
+    {
+    }
+    void
+    swap(Matches& rhs) noexcept
+    {
+        std::swap(trans_, rhs.trans_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return Iterator(trans_.first_match);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return ConstIterator(trans_.first_match);
+    }
+    Iterator
+    end() noexcept
+    {
+        return Iterator();
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return ConstIterator();
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return begin() == end();
+    }
+};
+
 class Match {
     const DbrMatch& impl_;
 public:
