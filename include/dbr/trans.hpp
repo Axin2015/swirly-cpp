@@ -19,6 +19,7 @@
 #define DBR_TRANS_HPP
 
 #include <dbr/ctx.hpp>
+#include <dbr/posn.hpp>
 
 namespace dbr {
 
@@ -58,6 +59,16 @@ public:
     {
         reset();
         return ctx_.submit(trec, arec, ref, mrec, action, ticks, lots, min, flags, impl_);
+    }
+    Order
+    new_order() const noexcept
+    {
+        return Order(*impl_.new_order);
+    }
+    Posn
+    new_posn() const noexcept
+    {
+        return Posn(*impl_.new_posn);
     }
     size_t
     count() const noexcept
