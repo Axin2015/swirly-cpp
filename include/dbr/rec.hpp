@@ -18,151 +18,9 @@
 #ifndef DBR_REC_HPP
 #define DBR_REC_HPP
 
-#include <dbr/iter.hpp>
-#include <dbr/node.hpp>
 #include <dbr/types.hpp>
 
-#include <dbr/conv.h>
-#include <dbr/ctx.h>
-
-#include <limits>
-
 namespace dbr {
-
-struct RecPolicy : NodeTraits<DbrSlNode> {
-    typedef DbrRec Entry;
-    static Entry*
-    entry(Node* node)
-    {
-        return dbr_rec_entry(node);
-    }
-    static const Entry*
-    entry(const Node* node)
-    {
-        return dbr_rec_entry(const_cast<Node*>(node));
-    }
-};
-
-template <int TypeN>
-class Recs {
-    DbrCtx ctx_;
-public:
-    typedef RecPolicy::Entry ValueType;
-    typedef RecPolicy::Entry* Pointer;
-    typedef RecPolicy::Entry& Reference;
-    typedef const RecPolicy::Entry* ConstPointer;
-    typedef const RecPolicy::Entry& ConstReference;
-
-    typedef ForwardIterator<RecPolicy> Iterator;
-    typedef ConstForwardIterator<RecPolicy> ConstIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef Pointer pointer;
-    typedef Reference reference;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef Iterator iterator;
-    typedef ConstIterator const_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-
-    explicit
-    Recs(DbrCtx ctx) noexcept
-    : ctx_(ctx)
-    {
-    }
-    void
-    swap(Recs& rhs) noexcept
-    {
-        std::swap(ctx_, rhs.ctx_);
-    }
-
-    // Iterator.
-
-    Iterator
-    begin() noexcept
-    {
-        return Iterator(dbr_ctx_first_rec(ctx_, TypeN, nullptr));
-    }
-    ConstIterator
-    begin() const noexcept
-    {
-        return ConstIterator(dbr_ctx_first_rec(ctx_, TypeN, nullptr));
-    }
-    Iterator
-    end() noexcept
-    {
-        return Iterator(dbr_ctx_end_rec(ctx_));
-    }
-    ConstIterator
-    end() const noexcept
-    {
-        return ConstIterator(dbr_ctx_end_rec(ctx_));
-    }
-    Iterator
-    find(DbrIden id) noexcept
-    {
-        return Iterator(dbr_ctx_find_rec_id(ctx_, TypeN, id));
-    }
-    ConstIterator
-    find(DbrIden id) const noexcept
-    {
-        return ConstIterator(dbr_ctx_find_rec_id(ctx_, TypeN, id));
-    }
-    Iterator
-    find(const char* mnem) noexcept
-    {
-        return Iterator(dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem));
-    }
-    ConstIterator
-    find(const char* mnem) const noexcept
-    {
-        return ConstIterator(dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem));
-    }
-
-    // Accessor.
-
-    Reference
-    front() noexcept
-    {
-        return *begin();
-    }
-    ConstReference
-    front() const noexcept
-    {
-        return *begin();
-    }
-    SizeType
-    size() const noexcept
-    {
-        size_t size;
-        dbr_ctx_first_rec(ctx_, TypeN, &size);
-        return size;
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return std::numeric_limits<SizeType>::max();
-    }
-    bool
-    empty() const noexcept
-    {
-        return size() == 0;
-    }
-};
-
-typedef Recs<DBR_INSTR> InstrRecs;
-typedef Recs<DBR_MARKET> MarketRecs;
-typedef Recs<DBR_TRADER> TraderRecs;
-typedef Recs<DBR_ACCNT> AccntRecs;
 
 class RecBase {
 protected:
@@ -171,7 +29,6 @@ protected:
     ~RecBase() noexcept
     {
     }
-    explicit
     RecBase(const DbrRec& impl) noexcept
         : impl_(impl)
     {
@@ -206,7 +63,6 @@ public:
 
 class InstrRec : public RecBase {
 public:
-    explicit
     InstrRec(const DbrRec& impl) noexcept
     : RecBase(impl)
     {
@@ -318,7 +174,6 @@ operator <<(std::ostream& os, InstrRec irec)
 
 class MarketRec : public RecBase {
 public:
-    explicit
     MarketRec(const DbrRec& impl) noexcept
     : RecBase(impl)
     {
@@ -352,7 +207,6 @@ operator <<(std::ostream& os, MarketRec mrec)
 
 class TraderRec : public RecBase {
 public:
-    explicit
     TraderRec(const DbrRec& impl) noexcept
     : RecBase(impl)
     {
@@ -380,7 +234,6 @@ operator <<(std::ostream& os, TraderRec trec)
 
 class AccntRec : public RecBase {
 public:
-    explicit
     AccntRec(const DbrRec& impl) noexcept
     : RecBase(impl)
     {

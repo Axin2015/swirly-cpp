@@ -25,7 +25,6 @@ namespace dbr {
 class Order {
     const DbrOrder& impl_;
 public:
-    explicit
     Order(const DbrOrder& impl) noexcept
         : impl_(impl)
     {

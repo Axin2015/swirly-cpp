@@ -25,7 +25,6 @@ namespace dbr {
 class Posn {
     const DbrPosn& impl_;
 public:
-    explicit
     Posn(const DbrPosn& impl) noexcept
         : impl_(impl)
     {

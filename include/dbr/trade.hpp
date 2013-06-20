@@ -25,7 +25,6 @@ namespace dbr {
 class Trade {
     const DbrTrade& impl_;
 public:
-    explicit
     Trade(const DbrTrade& impl) noexcept
         : impl_(impl)
     {

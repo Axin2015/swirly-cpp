@@ -48,7 +48,6 @@ public:
     typedef Pointer pointer;
     typedef Reference reference;
 
-    explicit
     BiDirectionalIterator(Node* node = nullptr) noexcept
     : node_(node)
     {
@@ -123,7 +122,6 @@ public:
     typedef Pointer pointer;
     typedef Reference reference;
 
-    explicit
     ConstBiDirectionalIterator(const Node* node = nullptr) noexcept
     : node_(node)
     {
@@ -268,7 +266,6 @@ public:
     typedef Pointer pointer;
     typedef Reference reference;
 
-    explicit
     ForwardIterator(Node* node = nullptr) noexcept
     : node_(node)
     {
@@ -330,7 +327,6 @@ public:
     typedef Pointer pointer;
     typedef Reference reference;
 
-    explicit
     ConstForwardIterator(const Node* node = nullptr) noexcept
     : node_(node)
     {

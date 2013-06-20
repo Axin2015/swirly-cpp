@@ -18,10 +18,153 @@
 #ifndef DBR_CTX_HPP
 #define DBR_CTX_HPP
 
+#include <dbr/accnt.hpp>
 #include <dbr/except.hpp>
+#include <dbr/iter.hpp>
+#include <dbr/market.hpp>
+#include <dbr/node.hpp>
 #include <dbr/order.hpp>
+#include <dbr/trader.hpp>
+
+#include <dbr/conv.h>
+#include <dbr/ctx.h>
 
 namespace dbr {
+
+struct RecPolicy : NodeTraits<DbrSlNode> {
+    typedef DbrRec Entry;
+    static Entry*
+    entry(Node* node)
+    {
+        return dbr_rec_entry(node);
+    }
+    static const Entry*
+    entry(const Node* node)
+    {
+        return dbr_rec_entry(const_cast<Node*>(node));
+    }
+};
+
+template <int TypeN>
+class Recs {
+    DbrCtx ctx_;
+public:
+    typedef RecPolicy::Entry ValueType;
+    typedef RecPolicy::Entry* Pointer;
+    typedef RecPolicy::Entry& Reference;
+    typedef const RecPolicy::Entry* ConstPointer;
+    typedef const RecPolicy::Entry& ConstReference;
+
+    typedef ForwardIterator<RecPolicy> Iterator;
+    typedef ConstForwardIterator<RecPolicy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    Recs(DbrCtx ctx) noexcept
+    : ctx_(ctx)
+    {
+    }
+    void
+    swap(Recs& rhs) noexcept
+    {
+        std::swap(ctx_, rhs.ctx_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return Iterator(dbr_ctx_first_rec(ctx_, TypeN, nullptr));
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return ConstIterator(dbr_ctx_first_rec(ctx_, TypeN, nullptr));
+    }
+    Iterator
+    end() noexcept
+    {
+        return Iterator(dbr_ctx_end_rec(ctx_));
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return ConstIterator(dbr_ctx_end_rec(ctx_));
+    }
+    Iterator
+    find(DbrIden id) noexcept
+    {
+        return Iterator(dbr_ctx_find_rec_id(ctx_, TypeN, id));
+    }
+    ConstIterator
+    find(DbrIden id) const noexcept
+    {
+        return ConstIterator(dbr_ctx_find_rec_id(ctx_, TypeN, id));
+    }
+    Iterator
+    find(const char* mnem) noexcept
+    {
+        return Iterator(dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem));
+    }
+    ConstIterator
+    find(const char* mnem) const noexcept
+    {
+        return ConstIterator(dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem));
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        size_t size;
+        dbr_ctx_first_rec(ctx_, TypeN, &size);
+        return size;
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return size() == 0;
+    }
+};
+
+typedef Recs<DBR_INSTR> InstrRecs;
+typedef Recs<DBR_MARKET> MarketRecs;
+typedef Recs<DBR_TRADER> TraderRecs;
+typedef Recs<DBR_ACCNT> AccntRecs;
 
 class Ctx {
     DbrCtx impl_;
@@ -96,7 +239,7 @@ public:
     {
         return AccntRecs(impl_);
     }
-    DbrMarket
+    Market
     market(DbrRec& mrec) const
     {
         DbrMarket market = dbr_ctx_market(impl_, &mrec);
@@ -104,7 +247,7 @@ public:
             throw_exception();
         return market;
     }
-    DbrTrader
+    Trader
     trader(DbrRec& trec) const
     {
         DbrTrader trader = dbr_ctx_trader(impl_, &trec);
@@ -112,7 +255,7 @@ public:
             throw_exception();
         return trader;
     }
-    DbrAccnt
+    Accnt
     accnt(DbrRec& arec) const
     {
         DbrAccnt accnt = dbr_ctx_accnt(impl_, &arec);
@@ -128,7 +271,7 @@ public:
                                                ticks, lots, min, flags, &trans);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return *order;
     }
     Order
     revise(DbrTrader trader, DbrIden id, DbrLots lots)
@@ -136,7 +279,7 @@ public:
         DbrOrder* const order = dbr_ctx_revise_id(impl_, trader, id, lots);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return *order;
     }
     Order
     revise(DbrTrader trader, const char* ref, DbrLots lots)
@@ -144,7 +287,7 @@ public:
         DbrOrder* const order = dbr_ctx_revise_ref(impl_, trader, ref, lots);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return *order;
     }
     Order
     cancel(DbrTrader trader, DbrIden id)
@@ -152,7 +295,7 @@ public:
         DbrOrder* const order = dbr_ctx_cancel_id(impl_, trader, id);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return *order;
     }
     Order
     cancel(DbrTrader trader, const char* ref)
@@ -160,7 +303,7 @@ public:
         DbrOrder* const order = dbr_ctx_cancel_ref(impl_, trader, ref);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return *order;
     }
     void
     archive_order(DbrTrader trader, DbrIden id)

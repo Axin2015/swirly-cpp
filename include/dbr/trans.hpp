@@ -23,6 +23,113 @@
 
 namespace dbr {
 
+struct TransMatchPolicy : NodeTraits<DbrSlNode> {
+    typedef DbrMatch Entry;
+    static Entry*
+    entry(Node* node)
+    {
+        return dbr_trans_match_entry(node);
+    }
+    static const Entry*
+    entry(const Node* node)
+    {
+        return dbr_trans_match_entry(const_cast<Node*>(node));
+    }
+};
+
+class TransMatches {
+    DbrTrans trans_;
+public:
+    typedef TransMatchPolicy::Entry ValueType;
+    typedef TransMatchPolicy::Entry* Pointer;
+    typedef TransMatchPolicy::Entry& Reference;
+    typedef const TransMatchPolicy::Entry* ConstPointer;
+    typedef const TransMatchPolicy::Entry& ConstReference;
+
+    typedef ForwardIterator<TransMatchPolicy> Iterator;
+    typedef ConstForwardIterator<TransMatchPolicy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    TransMatches(DbrTrans trans) noexcept
+    : trans_(trans)
+    {
+    }
+    void
+    swap(TransMatches& rhs) noexcept
+    {
+        std::swap(trans_, rhs.trans_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return Iterator(trans_.first_match);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return ConstIterator(trans_.first_match);
+    }
+    Iterator
+    end() noexcept
+    {
+        return Iterator();
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return ConstIterator();
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return begin() == end();
+    }
+};
+
 class Trans {
     Ctx& ctx_;
     DbrTrans impl_;
@@ -63,17 +170,17 @@ public:
     Order
     new_order() const noexcept
     {
-        return Order(*impl_.new_order);
+        return *impl_.new_order;
     }
     Posn
     new_posn() const noexcept
     {
-        return Posn(*impl_.new_posn);
+        return *impl_.new_posn;
     }
-    Matches
+    TransMatches
     matches() const noexcept
     {
-        return Matches(impl_);
+        return TransMatches(impl_);
     }
     size_t
     count() const noexcept
