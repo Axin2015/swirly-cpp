@@ -18,11 +18,160 @@
 #ifndef DBR_SIDE_HPP
 #define DBR_SIDE_HPP
 
+#include <dbr/iter.hpp>
+#include <dbr/node.hpp>
+
+#include <dbr/conv.h>
 #include <dbr/side.h>
 
 #include <iostream>
+#include <limits>
 
 namespace dbr {
+
+struct SideOrderPolicy : NodeTraits<DbrDlNode> {
+    typedef DbrOrder Entry;
+    static Entry*
+    entry(Node* node)
+    {
+        return dbr_side_order_entry(node);
+    }
+    static const Entry*
+    entry(const Node* node)
+    {
+        return dbr_side_order_entry(const_cast<Node*>(node));
+    }
+};
+
+class SideOrders {
+    DbrSide side_;
+public:
+    typedef SideOrderPolicy::Entry ValueType;
+    typedef SideOrderPolicy::Entry* Pointer;
+    typedef SideOrderPolicy::Entry& Reference;
+    typedef const SideOrderPolicy::Entry* ConstPointer;
+    typedef const SideOrderPolicy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<SideOrderPolicy> Iterator;
+    typedef ConstBiDirectionalIterator<SideOrderPolicy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<SideOrderPolicy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<SideOrderPolicy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    SideOrders(DbrSide side) noexcept
+    : side_(side)
+    {
+    }
+    void
+    swap(SideOrders& rhs) noexcept
+    {
+        std::swap(side_, rhs.side_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_side_first_order(side_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_side_first_order(side_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return dbr_side_end_order(side_);
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return dbr_side_end_order(side_);
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_side_last_order(side_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_side_last_order(side_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return dbr_side_end_order(side_);
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return dbr_side_end_order(side_);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return begin() == end();
+    }
+};
 
 class Side {
     DbrSide impl_;

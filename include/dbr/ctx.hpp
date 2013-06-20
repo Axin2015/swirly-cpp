@@ -88,42 +88,42 @@ public:
     Iterator
     begin() noexcept
     {
-        return Iterator(dbr_ctx_first_rec(ctx_, TypeN, nullptr));
+        return dbr_ctx_first_rec(ctx_, TypeN, nullptr);
     }
     ConstIterator
     begin() const noexcept
     {
-        return ConstIterator(dbr_ctx_first_rec(ctx_, TypeN, nullptr));
+        return dbr_ctx_first_rec(ctx_, TypeN, nullptr);
     }
     Iterator
     end() noexcept
     {
-        return Iterator(dbr_ctx_end_rec(ctx_));
+        return dbr_ctx_end_rec(ctx_);
     }
     ConstIterator
     end() const noexcept
     {
-        return ConstIterator(dbr_ctx_end_rec(ctx_));
+        return dbr_ctx_end_rec(ctx_);
     }
     Iterator
     find(DbrIden id) noexcept
     {
-        return Iterator(dbr_ctx_find_rec_id(ctx_, TypeN, id));
+        return dbr_ctx_find_rec_id(ctx_, TypeN, id);
     }
     ConstIterator
     find(DbrIden id) const noexcept
     {
-        return ConstIterator(dbr_ctx_find_rec_id(ctx_, TypeN, id));
+        return dbr_ctx_find_rec_id(ctx_, TypeN, id);
     }
     Iterator
     find(const char* mnem) noexcept
     {
-        return Iterator(dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem));
+        return dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem);
     }
     ConstIterator
     find(const char* mnem) const noexcept
     {
-        return ConstIterator(dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem));
+        return dbr_ctx_find_rec_mnem(ctx_, TypeN, mnem);
     }
 
     // Accessor.

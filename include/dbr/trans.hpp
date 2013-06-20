@@ -87,22 +87,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return Iterator(trans_.first_match);
+        return trans_.first_match;
     }
     ConstIterator
     begin() const noexcept
     {
-        return ConstIterator(trans_.first_match);
+        return trans_.first_match;
     }
     Iterator
     end() noexcept
     {
-        return Iterator();
+        return nullptr;
     }
     ConstIterator
     end() const noexcept
     {
-        return ConstIterator();
+        return nullptr;
     }
 
     // Accessor.
@@ -120,7 +120,7 @@ public:
     SizeType
     size() const noexcept
     {
-        return std::distance(begin(), end());
+        return trans_.taken;
     }
     SizeType
     max_size() const noexcept
@@ -130,7 +130,7 @@ public:
     bool
     empty() const noexcept
     {
-        return begin() == end();
+        return size() == 0;
     }
 };
 
