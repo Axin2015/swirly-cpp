@@ -20,14 +20,10 @@
 
 #include <dbr/accnt.hpp>
 #include <dbr/except.hpp>
-#include <dbr/iter.hpp>
 #include <dbr/market.hpp>
-#include <dbr/node.hpp>
 #include <dbr/order.hpp>
 #include <dbr/trader.hpp>
-
-#include <dbr/conv.h>
-#include <dbr/ctx.h>
+#include <dbr/trans.hpp>
 
 namespace dbr {
 
@@ -265,10 +261,11 @@ public:
     }
     Order
     submit(DbrRec& trec, DbrRec& arec, const char* ref, DbrRec& mrec, int action,
-           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, DbrTrans& trans)
+           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
     {
-        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, ref, &mrec, action,
-                                               ticks, lots, min, flags, &trans);
+        trans.reset();
+        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, ref, &mrec, action, ticks,
+                                               lots, min, flags, static_cast<DbrTrans*>(trans));
         if (!order)
             throw_exception();
         return *order;
@@ -316,11 +313,6 @@ public:
     {
         if (!dbr_ctx_archive_trade(impl_, accnt, id))
             throw_exception();
-    }
-    void
-    free_matches(struct DbrSlNode* first) noexcept
-    {
-        dbr_ctx_free_matches(impl_, first);
     }
 };
 

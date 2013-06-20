@@ -18,8 +18,12 @@
 #ifndef DBR_TRANS_HPP
 #define DBR_TRANS_HPP
 
-#include <dbr/ctx.hpp>
+#include <dbr/iter.hpp>
 #include <dbr/match.hpp>
+#include <dbr/node.hpp>
+
+#include <dbr/conv.h>
+#include <dbr/ctx.h>
 
 namespace dbr {
 
@@ -131,7 +135,7 @@ public:
 };
 
 class Trans {
-    Ctx& ctx_;
+    DbrCtx ctx_;
     DbrTrans impl_;
 public:
     ~Trans() noexcept
@@ -139,7 +143,7 @@ public:
         reset();
     }
     explicit
-    Trans(Ctx& ctx) noexcept
+    Trans(DbrCtx ctx) noexcept
     : ctx_(ctx)
     {
         impl_.first_match = nullptr;
@@ -152,20 +156,18 @@ public:
     Trans&
     operator =(const Trans&) = delete;
 
+    explicit
+    operator DbrTrans*() noexcept
+    {
+        return &impl_;
+    }
     void
     reset() noexcept
     {
         if (impl_.first_match) {
-            ctx_.free_matches(impl_.first_match);
+            dbr_ctx_free_matches(ctx_, impl_.first_match);
             impl_.first_match = nullptr;
         }
-    }
-    Order
-    submit(DbrRec& trec, DbrRec& arec, const char* ref, DbrRec& mrec, int action,
-           DbrTicks ticks, DbrLots lots, DbrLots min = 0, DbrFlags flags = 0)
-    {
-        reset();
-        return ctx_.submit(trec, arec, ref, mrec, action, ticks, lots, min, flags, impl_);
     }
     Order
     new_order() const noexcept
