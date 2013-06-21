@@ -27,31 +27,30 @@
 
 namespace dbr {
 
-struct TransMatchPolicy : NodeTraits<DbrSlNode> {
-    typedef DbrMatch Entry;
-    static Entry*
-    entry(Node* node)
-    {
-        return dbr_trans_match_entry(node);
-    }
-    static const Entry*
-    entry(const Node* node)
-    {
-        return dbr_trans_match_entry(const_cast<Node*>(node));
-    }
-};
-
 class TransMatches {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrMatch Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_trans_match_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_trans_match_entry(const_cast<Node*>(node));
+        }
+    };
     DbrTrans trans_;
 public:
-    typedef TransMatchPolicy::Entry ValueType;
-    typedef TransMatchPolicy::Entry* Pointer;
-    typedef TransMatchPolicy::Entry& Reference;
-    typedef const TransMatchPolicy::Entry* ConstPointer;
-    typedef const TransMatchPolicy::Entry& ConstReference;
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
 
-    typedef ForwardIterator<TransMatchPolicy> Iterator;
-    typedef ConstForwardIterator<TransMatchPolicy> ConstIterator;
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
 
     typedef std::ptrdiff_t DifferenceType;
     typedef size_t SizeType;

@@ -29,33 +29,32 @@
 
 namespace dbr {
 
-struct SideOrderPolicy : NodeTraits<DbrDlNode> {
-    typedef DbrOrder Entry;
-    static Entry*
-    entry(Node* node)
-    {
-        return dbr_side_order_entry(node);
-    }
-    static const Entry*
-    entry(const Node* node)
-    {
-        return dbr_side_order_entry(const_cast<Node*>(node));
-    }
-};
-
 class SideOrders {
+    struct Policy : NodeTraits<DbrDlNode> {
+        typedef DbrOrder Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_side_order_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_side_order_entry(const_cast<Node*>(node));
+        }
+    };
     DbrSide side_;
 public:
-    typedef SideOrderPolicy::Entry ValueType;
-    typedef SideOrderPolicy::Entry* Pointer;
-    typedef SideOrderPolicy::Entry& Reference;
-    typedef const SideOrderPolicy::Entry* ConstPointer;
-    typedef const SideOrderPolicy::Entry& ConstReference;
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
 
-    typedef BiDirectionalIterator<SideOrderPolicy> Iterator;
-    typedef ConstBiDirectionalIterator<SideOrderPolicy> ConstIterator;
-    typedef ReverseBiDirectionalIterator<SideOrderPolicy> ReverseIterator;
-    typedef ConstReverseBiDirectionalIterator<SideOrderPolicy> ConstReverseIterator;
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
 
     typedef std::ptrdiff_t DifferenceType;
     typedef size_t SizeType;
@@ -173,12 +172,178 @@ public:
     }
 };
 
+class SideLevels {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrLevel Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_side_level_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_side_level_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrSide side_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    SideLevels(DbrSide side) noexcept
+    : side_(side)
+    {
+    }
+    void
+    swap(SideLevels& rhs) noexcept
+    {
+        std::swap(side_, rhs.side_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_side_first_level(side_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_side_first_level(side_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return dbr_side_end_level(side_);
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return dbr_side_end_level(side_);
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_side_last_level(side_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_side_last_level(side_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return dbr_side_end_level(side_);
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return dbr_side_end_level(side_);
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrTicks ticks) noexcept
+    {
+        return dbr_side_find_level(side_, ticks);
+    }
+    ConstIterator
+    find(DbrTicks ticks) const noexcept
+    {
+        return dbr_side_find_level(side_, ticks);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_side_empty_level(side_);
+    }
+};
+
 class Side {
     DbrSide impl_;
 public:
     Side(DbrSide impl) noexcept
         : impl_(impl)
     {
+    }
+    SideOrders
+    orders() const noexcept
+    {
+        return SideOrders(impl_);
+    }
+    SideLevels
+    levels() const noexcept
+    {
+        return SideLevels(impl_);
     }
     DbrTicks
     last_ticks() const noexcept

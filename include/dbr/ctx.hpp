@@ -27,32 +27,31 @@
 
 namespace dbr {
 
-struct RecPolicy : NodeTraits<DbrSlNode> {
-    typedef DbrRec Entry;
-    static Entry*
-    entry(Node* node)
-    {
-        return dbr_rec_entry(node);
-    }
-    static const Entry*
-    entry(const Node* node)
-    {
-        return dbr_rec_entry(const_cast<Node*>(node));
-    }
-};
-
 template <int TypeN>
 class Recs {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrRec Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_rec_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_rec_entry(const_cast<Node*>(node));
+        }
+    };
     DbrCtx ctx_;
 public:
-    typedef RecPolicy::Entry ValueType;
-    typedef RecPolicy::Entry* Pointer;
-    typedef RecPolicy::Entry& Reference;
-    typedef const RecPolicy::Entry* ConstPointer;
-    typedef const RecPolicy::Entry& ConstReference;
+    typedef typename Policy::Entry ValueType;
+    typedef typename Policy::Entry* Pointer;
+    typedef typename Policy::Entry& Reference;
+    typedef const typename Policy::Entry* ConstPointer;
+    typedef const typename Policy::Entry& ConstReference;
 
-    typedef ForwardIterator<RecPolicy> Iterator;
-    typedef ConstForwardIterator<RecPolicy> ConstIterator;
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
 
     typedef std::ptrdiff_t DifferenceType;
     typedef size_t SizeType;
