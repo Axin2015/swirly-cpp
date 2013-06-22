@@ -19,15 +19,13 @@
 
 #include <dbr/pool.h>
 
-void
-create_pool(void)
+TEST_CASE(create_pool)
 {
     DbrPool pool = dbr_pool_create();
     dbr_pool_destroy(pool);
 }
 
-void
-destroy_pool(void)
+TEST_CASE(destroy_pool)
 {
     dbr_pool_destroy(NULL);
 }

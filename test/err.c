@@ -23,8 +23,7 @@
  * @test Clear error.
  */
 
-void
-clear_err(void)
+TEST_CASE(clear_err)
 {
     dbr_err_clear();
     check(dbr_err_num() == 0);

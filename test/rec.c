@@ -37,8 +37,7 @@ get_rec_mnem(DbrCtx ctx, int type, const char* mnem)
     return dbr_rec_entry(node);
 }
 
-void
-find_instr(void)
+TEST_CASE(find_instr)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
@@ -71,8 +70,7 @@ find_instr(void)
     dbr_pool_destroy(pool);
 }
 
-void
-find_market(void)
+TEST_CASE(find_market)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
@@ -93,8 +91,7 @@ find_market(void)
     dbr_pool_destroy(pool);
 }
 
-void
-find_accnt(void)
+TEST_CASE(find_accnt)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);
@@ -116,8 +113,7 @@ find_accnt(void)
     dbr_pool_destroy(pool);
 }
 
-void
-find_trader(void)
+TEST_CASE(find_trader)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);

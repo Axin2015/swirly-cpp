@@ -45,4 +45,6 @@ sequal(const char* lhs, const char* rhs, size_t n)
     return strncmp(lhs, rhs, n) == 0;
 }
 
+#define TEST_CASE(name) void name(void)
+
 #endif // TEST_H

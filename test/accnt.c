@@ -22,8 +22,7 @@
 #include <dbr/conv.h>
 #include <dbr/ctx.h>
 
-void
-accnt_id(void)
+TEST_CASE(accnt_id)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);

@@ -25,8 +25,7 @@
  * @test Int length.
  */
 
-void
-intlen(void)
+TEST_CASE(intlen)
 {
     check(dbr_intlen(0) == 1);
     check(dbr_intlen(1) == 1);
@@ -50,8 +49,7 @@ intlen(void)
  * @test Int length.
  */
 
-void
-longlen(void)
+TEST_CASE(longlen)
 {
     check(dbr_longlen(0L) == 1);
     check(dbr_longlen(1L) == 1);

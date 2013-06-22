@@ -19,7 +19,7 @@
 
 #undef  TEST_CASE
 #define TEST_CASE(x) void x(void);
-#include "test_cases.txt"
+#include <test_cases.txt>
 
 #undef  TEST_CASE
 #define TEST_CASE(x) { .name = #x, .fn = x },
@@ -28,7 +28,7 @@ static const struct TestCase {
     const char* name;
     void (*fn)(void);
 } TEST_CASES[] = {
-#include "test_cases.txt"
+#include <test_cases.txt>
 };
 
 static bool running = false;

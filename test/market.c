@@ -22,8 +22,7 @@
 #include <dbr/ctx.h>
 #include <dbr/market.h>
 
-void
-market_id(void)
+TEST_CASE(market_id)
 {
     DbrPool pool = dbr_pool_create();
     DbrModel model = model_create(pool, 1);

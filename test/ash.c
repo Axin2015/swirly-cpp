@@ -33,8 +33,7 @@ dbr_elem_from_node(struct DbrSlNode* node)
     return dbr_implof(struct SlElem, node, node);
 }
 
-void
-ash_list(void)
+TEST_CASE(ash_list)
 {
     struct AshList l = ASH_LIST_INIT(l);
 
@@ -42,8 +41,7 @@ ash_list(void)
     check(ash_list_first(&l) == ash_list_end(&l));
 }
 
-void
-ash_queue(void)
+TEST_CASE(ash_queue)
 {
     struct AshQueue q = ASH_QUEUE_INIT(q);
 
@@ -90,8 +88,7 @@ ash_queue(void)
     check(ash_queue_first(&q)->next->next->next == ash_queue_end(&q));
 }
 
-void
-ash_stack(void)
+TEST_CASE(ash_stack)
 {
     struct AshStack s = ASH_STACK_INIT(s);
 
