@@ -19,11 +19,97 @@
 #define DBR_MODEL_HPP
 
 #include <dbr/except.hpp>
+#include <dbr/order.hpp>
+#include <dbr/trade.hpp>
+
 #include <dbr/model.h>
 
 #include <cstddef>
 
 namespace dbr {
+
+template <class DerivedT>
+class IModel : public DbrIModel {
+    static DbrIden
+    alloc_id(DbrModel model) noexcept
+    {
+        return static_cast<DerivedT*>(model)->alloc_id();
+    }
+    static DbrBool
+    begin(DbrModel model) noexcept
+    {
+        return static_cast<DerivedT*>(model)->begin();
+    }
+    static DbrBool
+    commit(DbrModel model) noexcept
+    {
+        return static_cast<DerivedT*>(model)->commit();
+    }
+    static DbrBool
+    rollback(DbrModel model) noexcept
+    {
+        return static_cast<DerivedT*>(model)->rollback();
+    }
+    static DbrBool
+    insert_order(DbrModel model, const DbrOrder* order) noexcept
+    {
+        return static_cast<DerivedT*>(model)->insert_order(Order(*order));
+    }
+    static DbrBool
+    update_order(DbrModel model, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
+                 DbrLots lots, DbrMillis now) noexcept
+    {
+        return static_cast<DerivedT*>(model)->update_order(id, rev, status, resd, exec, lots, now);
+    }
+    static DbrBool
+    archive_order(DbrModel model, DbrIden id, DbrMillis now) noexcept
+    {
+        return static_cast<DerivedT*>(model)->archive_order(id, now);
+    }
+    static DbrBool
+    insert_trade(DbrModel model, const DbrTrade* trade) noexcept
+    {
+        return static_cast<DerivedT*>(model)->insert_trade(Trade(*trade));
+    }
+    static DbrBool
+    archive_trade(DbrModel model, DbrIden id, DbrMillis now) noexcept
+    {
+        return static_cast<DerivedT*>(model)->archive_trade(id, now);
+    }
+    static ssize_t
+    select(DbrModel model, int type, DbrSlNode** first) noexcept
+    {
+        return static_cast<DerivedT*>(model)->select(type, *first);
+    }
+    static DbrSlNode*
+    end(DbrModel model) noexcept
+    {
+        return static_cast<DerivedT*>(model)->end();
+    }
+    static const DbrModelVtbl*
+    vtbl() noexcept
+    {
+        static const DbrModelVtbl VTBL = {
+            alloc_id,
+            begin,
+            commit,
+            rollback,
+            insert_order,
+            update_order,
+            archive_order,
+            insert_trade,
+            archive_trade,
+            select,
+            end
+        };
+        return &VTBL;
+    }
+public:
+    IModel()
+        : DbrIModel{ vtbl() }
+    {
+    }
+};
 
 class SqliteModel {
     DbrModel impl_;
