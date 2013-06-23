@@ -77,6 +77,86 @@ public:
     {
         return impl_;
     }
+    DbrRec*
+    alloc_rec()
+    {
+        return dbr_pool_alloc_rec(impl_);
+    }
+    void
+    free_rec(DbrRec* rec)
+    {
+        return dbr_pool_free_rec(impl_, rec);
+    }
+    DbrLevel*
+    alloc_level(DbrKey key)
+    {
+        return dbr_pool_alloc_level(impl_, key);
+    }
+    void
+    free_level(DbrLevel* level)
+    {
+        return dbr_pool_free_level(impl_, level);
+    }
+    DbrMatch*
+    alloc_match()
+    {
+        return dbr_pool_alloc_match(impl_);
+    }
+    void
+    free_match(DbrMatch* match)
+    {
+        return dbr_pool_free_match(impl_, match);
+    }
+    DbrOrder*
+    alloc_order(DbrKey key)
+    {
+        return dbr_pool_alloc_order(impl_, key);
+    }
+    void
+    free_order(DbrOrder* order)
+    {
+        return dbr_pool_free_order(impl_, order);
+    }
+    DbrMemb*
+    alloc_memb(DbrKey key)
+    {
+        return dbr_pool_alloc_memb(impl_, key);
+    }
+    void
+    free_memb(DbrMemb* memb)
+    {
+        return dbr_pool_free_memb(impl_, memb);
+    }
+    DbrTrade*
+    alloc_trade(DbrKey key)
+    {
+        return dbr_pool_alloc_trade(impl_, key);
+    }
+    void
+    free_trade(DbrTrade* trade)
+    {
+        return dbr_pool_free_trade(impl_, trade);
+    }
+    DbrPosn*
+    alloc_posn(DbrKey key)
+    {
+        return dbr_pool_alloc_posn(impl_, key);
+    }
+    void
+    free_posn(DbrPosn* posn)
+    {
+        return dbr_pool_free_posn(impl_, posn);
+    }
+    DbrSub*
+    alloc_sub(DbrKey key)
+    {
+        return dbr_pool_alloc_sub(impl_, key);
+    }
+    void
+    free_sub(DbrSub* sub)
+    {
+        return dbr_pool_free_sub(impl_, sub);
+    }
 };
 
 } // dbr
