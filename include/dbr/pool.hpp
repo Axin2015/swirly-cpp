@@ -80,82 +80,106 @@ public:
     DbrRec*
     alloc_rec()
     {
-        return dbr_pool_alloc_rec(impl_);
+        DbrRec* const rec = dbr_pool_alloc_rec(impl_);
+        if (!rec)
+            throw_exception();
+        return rec;
     }
     void
     free_rec(DbrRec* rec)
     {
-        return dbr_pool_free_rec(impl_, rec);
+        dbr_pool_free_rec(impl_, rec);
     }
     DbrLevel*
     alloc_level(DbrKey key)
     {
-        return dbr_pool_alloc_level(impl_, key);
+        DbrLevel* const level = dbr_pool_alloc_level(impl_, key);
+        if (!level)
+            throw_exception();
+        return level;
     }
     void
     free_level(DbrLevel* level)
     {
-        return dbr_pool_free_level(impl_, level);
+        dbr_pool_free_level(impl_, level);
     }
     DbrMatch*
     alloc_match()
     {
-        return dbr_pool_alloc_match(impl_);
+        DbrMatch* const match = dbr_pool_alloc_match(impl_);
+        if (!match)
+            throw_exception();
+        return match;
     }
     void
     free_match(DbrMatch* match)
     {
-        return dbr_pool_free_match(impl_, match);
+        dbr_pool_free_match(impl_, match);
     }
     DbrOrder*
     alloc_order(DbrKey key)
     {
-        return dbr_pool_alloc_order(impl_, key);
+        DbrOrder* const order = dbr_pool_alloc_order(impl_, key);
+        if (!order)
+            throw_exception();
+        return order;
     }
     void
     free_order(DbrOrder* order)
     {
-        return dbr_pool_free_order(impl_, order);
+        dbr_pool_free_order(impl_, order);
     }
     DbrMemb*
     alloc_memb(DbrKey key)
     {
-        return dbr_pool_alloc_memb(impl_, key);
+        DbrMemb* const memb = dbr_pool_alloc_memb(impl_, key);
+        if (!memb)
+            throw_exception();
+        return memb;
     }
     void
     free_memb(DbrMemb* memb)
     {
-        return dbr_pool_free_memb(impl_, memb);
+        dbr_pool_free_memb(impl_, memb);
     }
     DbrTrade*
     alloc_trade(DbrKey key)
     {
-        return dbr_pool_alloc_trade(impl_, key);
+        DbrTrade* const trade = dbr_pool_alloc_trade(impl_, key);
+        if (!trade)
+            throw_exception();
+        return trade;
     }
     void
     free_trade(DbrTrade* trade)
     {
-        return dbr_pool_free_trade(impl_, trade);
+        dbr_pool_free_trade(impl_, trade);
     }
     DbrPosn*
     alloc_posn(DbrKey key)
     {
-        return dbr_pool_alloc_posn(impl_, key);
+        DbrPosn* const posn = dbr_pool_alloc_posn(impl_, key);
+        if (!posn)
+            throw_exception();
+        return posn;
     }
     void
     free_posn(DbrPosn* posn)
     {
-        return dbr_pool_free_posn(impl_, posn);
+        dbr_pool_free_posn(impl_, posn);
     }
     DbrSub*
     alloc_sub(DbrKey key)
     {
-        return dbr_pool_alloc_sub(impl_, key);
+        DbrSub* const sub = dbr_pool_alloc_sub(impl_, key);
+        if (!sub)
+            throw_exception();
+        return sub;
     }
     void
     free_sub(DbrSub* sub)
     {
-        return dbr_pool_free_sub(impl_, sub);
+        dbr_pool_free_sub(impl_, sub);
     }
 };
 
