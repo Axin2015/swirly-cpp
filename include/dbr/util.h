@@ -22,6 +22,8 @@
 
 #include <dbr/defs.h>
 
+#include <stddef.h> // size_t
+
 /**
  * @addtogroup Util
  * @{
