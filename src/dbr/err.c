@@ -32,17 +32,17 @@ dbr_err_print(FILE* stream, const char* s)
 }
 
 DBR_API void
-dbr_err_vset(int num, const char* format, va_list args)
+dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args)
 {
-    ash_err_vset(num, format, args);
+    ash_err_vset_(num, file, line, format, args);
 }
 
 DBR_API void
-dbr_err_set(int num, const char* format, ...)
+dbr_err_set_(int num, const char* file, int line, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    ash_err_vset(num, format, args);
+    ash_err_vset_(num, file, line, format, args);
     va_end(args);
 }
 
@@ -50,6 +50,18 @@ DBR_API int
 dbr_err_num(void)
 {
     return ash_err_num();
+}
+
+DBR_API const char*
+dbr_err_file(void)
+{
+    return ash_err_file();
+}
+
+DBR_API int
+dbr_err_line(void)
+{
+    return ash_err_line();
 }
 
 DBR_API const char*

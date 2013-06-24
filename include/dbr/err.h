@@ -50,6 +50,10 @@ enum DbrErrno {
      */
     DBR_ENULL,
     /**
+     * @brief Assertion failed.
+     */
+    DBR_EASSRT,
+    /**
      * @brief User-defined errors must be >=0x400.
      */
     DBR_EUSER = 0x400
@@ -75,16 +79,28 @@ DBR_API void
 dbr_err_print(FILE* stream, const char* s);
 
 DBR_API void
-dbr_err_vset(int num, const char* format, va_list args);
+dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args);
 
 DBR_API void
-dbr_err_set(int num, const char* format, ...);
+dbr_err_set_(int num, const char* file, int line, const char* format, ...);
 
 DBR_API int
 dbr_err_num(void);
 
 DBR_API const char*
+dbr_err_file(void);
+
+DBR_API int
+dbr_err_line(void);
+
+DBR_API const char*
 dbr_err_msg(void);
+
+#define dbr_err_vset(num, format, args)                 \
+    dbr_err_vset_(num, __FILE__, __LINE__, format, args)
+
+#define dbr_err_set(num, ...)                           \
+    dbr_err_set_(num, __FILE__, __LINE__, __VA_ARGS__)
 
 /** @} */
 

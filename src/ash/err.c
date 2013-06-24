@@ -23,6 +23,8 @@
 
 static __thread struct {
     int num;
+    const char* file;
+    int line;
     char msg[DBR_ERROR_MAX + 1];
 } err;
 
@@ -30,19 +32,23 @@ DBR_EXTERN void
 ash_err_clear(void)
 {
     err.num = 0;
+    err.file = NULL;
+    err.line = 0;
     err.msg[0] = '\0';
 }
 
 DBR_EXTERN void
 ash_err_print(FILE* stream, const char* s)
 {
-    fprintf(stream, "%s: %s (%d)\n", s, err.msg, err.num);
+    fprintf(stream, "%s:%d: %s: %s (%d)\n", err.file, err.line, s, err.msg, err.num);
 }
 
 DBR_EXTERN void
-ash_err_vset(int num, const char* format, va_list args)
+ash_err_vset_(int num, const char* file, int line, const char* format, va_list args)
 {
     err.num = num;
+    err.file = file;
+    err.line = line;
     const int ret = vsnprintf(err.msg, DBR_ERROR_MAX, format, args);
     // Null termination is _not_ guaranteed by snprintf().
     err.msg[DBR_ERROR_MAX] = '\0';
@@ -51,11 +57,11 @@ ash_err_vset(int num, const char* format, va_list args)
 }
 
 DBR_EXTERN void
-ash_err_set(int num, const char* format, ...)
+ash_err_set_(int num, const char* file, int line, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    ash_err_vset(num, format, args);
+    ash_err_vset_(num, file, line, format, args);
     va_end(args);
 }
 
@@ -63,6 +69,18 @@ DBR_EXTERN int
 ash_err_num(void)
 {
     return err.num;
+}
+
+DBR_EXTERN const char*
+ash_err_file(void)
+{
+    return err.file;
+}
+
+DBR_EXTERN int
+ash_err_line(void)
+{
+    return err.line;
 }
 
 DBR_EXTERN const char*

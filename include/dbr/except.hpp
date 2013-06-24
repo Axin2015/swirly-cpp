@@ -27,20 +27,24 @@ namespace dbr {
 
 class DbrException : public std::exception {
     int num_;
+    const char* file_;
+    int line_;
     char msg_[DBR_ERROR_MAX + 1];
 public:
     virtual
     ~DbrException() noexcept
     {
     }
-    DbrException(int num, const char* msg) noexcept
+    DbrException(int num, const char* file, int line, const char* msg) noexcept
     {
         num_ = num;
+        file_ = file;
+        line_ = line;
         strncpy(msg_, msg, DBR_ERROR_MAX);
         msg_[DBR_ERROR_MAX] = '\0';
     }
     DbrException() noexcept
-    : DbrException(dbr_err_num(), dbr_err_msg())
+    : DbrException(dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg())
     {
     }
     virtual const char*
@@ -53,17 +57,27 @@ public:
     {
         return num_;
     }
+    const char*
+    file() const noexcept
+    {
+        return file_;
+    }
+    int
+    line() const noexcept
+    {
+        return line_;
+    }
 };
 
-template <int E>
+template <int Num>
 class BasicException : public DbrException {
 public:
     virtual
     ~BasicException() noexcept
     {
     }
-    BasicException(const char* errmsg) noexcept
-    : DbrException(E, errmsg)
+    BasicException(const char* file, int line, const char* msg) noexcept
+    : DbrException(Num, file, line, msg)
     {
     }
 };
@@ -72,29 +86,33 @@ typedef BasicException<DBR_ENOMEM> NoMemException;
 typedef BasicException<DBR_EACCES> AccesException;
 typedef BasicException<DBR_EINVAL> InvalException;
 typedef BasicException<DBR_EDBSQL> DbSqlException;
-typedef BasicException<DBR_ENULL> NullException;
+typedef BasicException<DBR_ENULL>  NullException;
+typedef BasicException<DBR_EASSRT> AssrtException;
 
 inline void
-throw_exception(int num, const char* msg)
+throw_exception(int num, const char* file, int line, const char* msg)
 {
     switch (num) {
     case DBR_ENOMEM:
-        throw NoMemException(msg);
+        throw NoMemException(file, line, msg);
         break;
     case DBR_EACCES:
-        throw AccesException(msg);
+        throw AccesException(file, line, msg);
         break;
     case DBR_EINVAL:
-        throw InvalException(msg);
+        throw InvalException(file, line, msg);
         break;
     case DBR_EDBSQL:
-        throw DbSqlException(msg);
+        throw DbSqlException(file, line, msg);
         break;
     case DBR_ENULL:
-        throw NullException(msg);
+        throw NullException(file, line, msg);
+        break;
+    case DBR_EASSRT:
+        throw NullException(file, line, msg);
         break;
     default:
-        throw DbrException(num, msg);
+        throw DbrException(num, file, line, msg);
         break;
     }
 }
@@ -102,7 +120,7 @@ throw_exception(int num, const char* msg)
 inline void
 throw_exception()
 {
-    throw_exception(dbr_err_num(), dbr_err_msg());
+    throw_exception(dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg());
 }
 } // dbr
 
