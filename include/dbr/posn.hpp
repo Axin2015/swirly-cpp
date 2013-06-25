@@ -39,6 +39,11 @@ public:
     {
         return impl_.id != rhs.impl_.id;
     }
+    explicit
+    operator const DbrPosn*() noexcept
+    {
+        return &impl_;
+    }
     DbrIden
     id() const noexcept
     {

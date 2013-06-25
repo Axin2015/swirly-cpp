@@ -111,6 +111,87 @@ public:
     }
 };
 
+inline DbrIden
+alloc_id(DbrModel model)
+{
+    const auto id = model->vtbl->alloc_id(model);
+    if (id < 0)
+        throw_exception();
+    return id;
+}
+
+inline void
+begin_trans(DbrModel model)
+{
+    if (!model->vtbl->begin_trans(model))
+        throw_exception();
+}
+
+inline void
+commit_trans(DbrModel model)
+{
+    if (!model->vtbl->commit_trans(model))
+        throw_exception();
+}
+
+inline void
+rollback_trans(DbrModel model)
+{
+    if (!model->vtbl->rollback_trans(model))
+        throw_exception();
+}
+
+inline void
+insert_order(DbrModel model, Order order)
+{
+    if (!model->vtbl->insert_order(model, static_cast<const DbrOrder*>(order)))
+        throw_exception();
+}
+
+inline void
+update_order(DbrModel model, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
+             DbrLots lots, DbrMillis now)
+{
+    if (!model->vtbl->update_order(model, id, rev, status, resd, exec, lots, now))
+        throw_exception();
+}
+
+inline void
+archive_order(DbrModel model, DbrIden id, DbrMillis now)
+{
+    if (!model->vtbl->archive_order(model, id, now))
+        throw_exception();
+}
+
+inline void
+insert_trade(DbrModel model, Trade trade)
+{
+    if (!model->vtbl->insert_trade(model, static_cast<const DbrTrade*>(trade)))
+        throw_exception();
+}
+
+inline void
+archive_trade(DbrModel model, DbrIden id, DbrMillis now)
+{
+    if (!model->vtbl->archive_trade(model, id, now))
+        throw_exception();
+}
+
+inline size_t
+select_entity(DbrModel model, int type, DbrSlNode*& first)
+{
+    const auto size = model->vtbl->select_entity(model, type, &first);
+    if (size < 0)
+        throw_exception();
+    return size;
+}
+
+inline DbrSlNode*
+end_entity(DbrModel model) noexcept
+{
+    return model->vtbl->end_entity(model);
+}
+
 class SqliteModel {
     DbrModel impl_;
 public:
