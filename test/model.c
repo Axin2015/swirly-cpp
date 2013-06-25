@@ -309,7 +309,7 @@ archive_trade(DbrModel model, DbrIden id, DbrMillis now)
 }
 
 static ssize_t
-select(DbrModel model, int type, struct DbrSlNode** first)
+select_entity(DbrModel model, int type, struct DbrSlNode** first)
 {
     struct TestImpl* impl = test_impl(model);
     ssize_t ret;
@@ -347,7 +347,7 @@ select(DbrModel model, int type, struct DbrSlNode** first)
 }
 
 static struct DbrSlNode*
-end(DbrModel model)
+end_entity(DbrModel model)
 {
     return NULL;
 }
@@ -362,8 +362,8 @@ static const struct DbrModelVtbl TEST_MODEL_VTBL = {
     .archive_order = archive_order,
     .insert_trade = insert_trade,
     .archive_trade = archive_trade,
-    .select = select,
-    .end = end
+    .select_entity = select_entity,
+    .end_entity = end_entity
 };
 
 DBR_EXTERN DbrModel

@@ -56,10 +56,10 @@ struct DbrModelVtbl {
     (*archive_trade)(DbrModel model, DbrIden id, DbrMillis now);
 
     ssize_t
-    (*select)(DbrModel model, int type, struct DbrSlNode** first);
+    (*select_entity)(DbrModel model, int type, struct DbrSlNode** first);
 
     struct DbrSlNode*
-    (*end)(DbrModel model);
+    (*end_entity)(DbrModel model);
 };
 
 static inline DbrIden
@@ -118,15 +118,15 @@ dbr_model_archive_trade(DbrModel model, DbrIden id, DbrMillis now)
 }
 
 static inline ssize_t
-dbr_model_select(DbrModel model, int type, struct DbrSlNode** first)
+dbr_model_select_entity(DbrModel model, int type, struct DbrSlNode** first)
 {
-    return model->vtbl->select(model, type, first);
+    return model->vtbl->select_entity(model, type, first);
 }
 
 static inline struct DbrSlNode*
-dbr_model_end(DbrModel model)
+dbr_model_end_entity(DbrModel model)
 {
-    return model->vtbl->end(model);
+    return model->vtbl->end_entity(model);
 }
 
 /** @} */

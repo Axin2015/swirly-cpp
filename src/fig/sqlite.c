@@ -1267,7 +1267,7 @@ fig_sqlite_archive_trade(struct FigSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 DBR_EXTERN ssize_t
-fig_sqlite_select(struct FigSqlite* sqlite, int type, struct DbrSlNode** first)
+fig_sqlite_select_entity(struct FigSqlite* sqlite, int type, struct DbrSlNode** first)
 {
     ssize_t ret;
     switch (type) {
@@ -1304,7 +1304,7 @@ fig_sqlite_select(struct FigSqlite* sqlite, int type, struct DbrSlNode** first)
 }
 
 DBR_EXTERN struct DbrSlNode*
-fig_sqlite_end(struct FigSqlite* sqlite)
+fig_sqlite_end_entity(struct FigSqlite* sqlite)
 {
     return NULL;
 }
