@@ -77,14 +77,14 @@ class IModel : public DbrIModel {
         return static_cast<DerivedT*>(model)->archive_trade(id, now);
     }
     static ssize_t
-    select(DbrModel model, int type, DbrSlNode** first) noexcept
+    select_entity(DbrModel model, int type, DbrSlNode** first) noexcept
     {
-        return static_cast<DerivedT*>(model)->select(type, *first);
+        return static_cast<DerivedT*>(model)->select_entity(type, *first);
     }
     static DbrSlNode*
-    end(DbrModel model) noexcept
+    end_entity(DbrModel model) noexcept
     {
-        return static_cast<DerivedT*>(model)->end();
+        return static_cast<DerivedT*>(model)->end_entity();
     }
     static const DbrModelVtbl*
     vtbl() noexcept
@@ -99,8 +99,8 @@ class IModel : public DbrIModel {
             archive_order,
             insert_trade,
             archive_trade,
-            select,
-            end
+            select_entity,
+            end_entity
         };
         return &VTBL;
     }
