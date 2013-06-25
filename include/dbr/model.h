@@ -31,13 +31,13 @@ struct DbrModelVtbl {
     (*alloc_id)(DbrModel model);
 
     DbrBool
-    (*begin)(DbrModel model);
+    (*begin_trans)(DbrModel model);
 
     DbrBool
-    (*commit)(DbrModel model);
+    (*commit_trans)(DbrModel model);
 
     DbrBool
-    (*rollback)(DbrModel model);
+    (*rollback_trans)(DbrModel model);
 
     DbrBool
     (*insert_order)(DbrModel model, const struct DbrOrder* order);
@@ -69,21 +69,21 @@ dbr_model_alloc_id(DbrModel model)
 }
 
 static inline DbrBool
-dbr_model_begin(DbrModel model)
+dbr_model_begin_trans(DbrModel model)
 {
-    return model->vtbl->begin(model);
+    return model->vtbl->begin_trans(model);
 }
 
 static inline DbrBool
-dbr_model_commit(DbrModel model)
+dbr_model_commit_trans(DbrModel model)
 {
-    return model->vtbl->commit(model);
+    return model->vtbl->commit_trans(model);
 }
 
 static inline DbrBool
-dbr_model_rollback(DbrModel model)
+dbr_model_rollback_trans(DbrModel model)
 {
-    return model->vtbl->rollback(model);
+    return model->vtbl->rollback_trans(model);
 }
 
 static inline DbrBool

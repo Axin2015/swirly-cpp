@@ -181,7 +181,7 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     trans->new_order = new_order;
     trans->new_posn = NULL;
 
-    if (!dbr_model_begin(exec->model))
+    if (!dbr_model_begin_trans(exec->model))
         goto fail2;
 
     if (!dbr_model_insert_order(exec->model, new_order)
@@ -209,13 +209,13 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     // Commit phase cannot fail.
     elm_trader_emplace_order(trader, new_order);
     apply_trades(exec, market, trans, now);
-    dbr_model_commit(exec->model);
+    dbr_model_commit_trans(exec->model);
     return new_order;
  fail4:
     elm_pool_free_matches(exec->pool, trans->first_match);
     memset(trans, 0, sizeof(*trans));
  fail3:
-    dbr_model_rollback(exec->model);
+    dbr_model_rollback_trans(exec->model);
  fail2:
     elm_pool_free_order(exec->pool, new_order);
  fail1:
@@ -239,7 +239,7 @@ elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
         goto fail1;
     }
 
-    if (!dbr_model_begin(exec->model))
+    if (!dbr_model_begin_trans(exec->model))
         goto fail1;
 
     if (!dbr_model_update_order(exec->model, id, order->rev + 1, DBR_REVISED, order->resd,
@@ -253,10 +253,10 @@ elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
     if (!elm_market_revise(market, order, lots, now))
         goto fail2;
 
-    dbr_model_commit(exec->model);
+    dbr_model_commit_trans(exec->model);
     return order;
  fail2:
-    dbr_model_rollback(exec->model);
+    dbr_model_rollback_trans(exec->model);
  fail1:
     return NULL;
 }
@@ -276,7 +276,7 @@ elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
         goto fail1;
     }
 
-    if (!dbr_model_begin(exec->model))
+    if (!dbr_model_begin_trans(exec->model))
         goto fail1;
 
     if (!dbr_model_update_order(exec->model, order->id, order->rev + 1, DBR_REVISED, order->resd,
@@ -288,10 +288,10 @@ elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
     if (!elm_market_revise(market, order, lots, now))
         goto fail2;
 
-    dbr_model_commit(exec->model);
+    dbr_model_commit_trans(exec->model);
     return order;
  fail2:
-    dbr_model_rollback(exec->model);
+    dbr_model_rollback_trans(exec->model);
  fail1:
     return NULL;
 }

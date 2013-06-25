@@ -36,19 +36,19 @@ class IModel : public DbrIModel {
         return static_cast<DerivedT*>(model)->alloc_id();
     }
     static DbrBool
-    begin(DbrModel model) noexcept
+    begin_trans(DbrModel model) noexcept
     {
-        return static_cast<DerivedT*>(model)->begin();
+        return static_cast<DerivedT*>(model)->begin_trans();
     }
     static DbrBool
-    commit(DbrModel model) noexcept
+    commit_trans(DbrModel model) noexcept
     {
-        return static_cast<DerivedT*>(model)->commit();
+        return static_cast<DerivedT*>(model)->commit_trans();
     }
     static DbrBool
-    rollback(DbrModel model) noexcept
+    rollback_trans(DbrModel model) noexcept
     {
-        return static_cast<DerivedT*>(model)->rollback();
+        return static_cast<DerivedT*>(model)->rollback_trans();
     }
     static DbrBool
     insert_order(DbrModel model, const DbrOrder* order) noexcept
@@ -91,9 +91,9 @@ class IModel : public DbrIModel {
     {
         static const DbrModelVtbl VTBL = {
             alloc_id,
-            begin,
-            commit,
-            rollback,
+            begin_trans,
+            commit_trans,
+            rollback_trans,
             insert_order,
             update_order,
             archive_order,

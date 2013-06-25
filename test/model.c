@@ -260,19 +260,19 @@ alloc_id(DbrModel model)
 }
 
 static DbrBool
-begin(DbrModel model)
+begin_trans(DbrModel model)
 {
     return true;
 }
 
 static DbrBool
-commit(DbrModel model)
+commit_trans(DbrModel model)
 {
     return true;
 }
 
 static DbrBool
-rollback(DbrModel model)
+rollback_trans(DbrModel model)
 {
     return true;
 }
@@ -354,9 +354,9 @@ end_entity(DbrModel model)
 
 static const struct DbrModelVtbl TEST_MODEL_VTBL = {
     .alloc_id = alloc_id,
-    .begin = begin,
-    .commit = commit,
-    .rollback = rollback,
+    .begin_trans = begin_trans,
+    .commit_trans = commit_trans,
+    .rollback_trans = rollback_trans,
     .insert_order = insert_order,
     .update_order = update_order,
     .archive_order = archive_order,

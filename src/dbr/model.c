@@ -43,27 +43,27 @@ alloc_id(DbrModel model)
 }
 
 static DbrBool
-begin(DbrModel model)
+begin_trans(DbrModel model)
 {
     struct SqliteImpl* impl = sqlite_impl(model);
     struct FigSqlite* sqlite = &impl->sqlite;
-    return fig_sqlite_begin(sqlite);
+    return fig_sqlite_begin_trans(sqlite);
 }
 
 static DbrBool
-commit(DbrModel model)
+commit_trans(DbrModel model)
 {
     struct SqliteImpl* impl = sqlite_impl(model);
     struct FigSqlite* sqlite = &impl->sqlite;
-    return fig_sqlite_commit(sqlite);
+    return fig_sqlite_commit_trans(sqlite);
 }
 
 static DbrBool
-rollback(DbrModel model)
+rollback_trans(DbrModel model)
 {
     struct SqliteImpl* impl = sqlite_impl(model);
     struct FigSqlite* sqlite = &impl->sqlite;
-    return fig_sqlite_rollback(sqlite);
+    return fig_sqlite_rollback_trans(sqlite);
 }
 
 static DbrBool
@@ -125,9 +125,9 @@ end_entity(DbrModel model)
 
 static const struct DbrModelVtbl SQLITE_MODEL_VTBL = {
     .alloc_id = alloc_id,
-    .begin = begin,
-    .commit = commit,
-    .rollback = rollback,
+    .begin_trans = begin_trans,
+    .commit_trans = commit_trans,
+    .rollback_trans = rollback_trans,
     .insert_order = insert_order,
     .update_order = update_order,
     .archive_order = archive_order,

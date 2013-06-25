@@ -55,13 +55,13 @@ DBR_EXTERN DbrBool
 fig_sqlite_load(struct FigSqlite* sqlite);
 
 DBR_EXTERN DbrBool
-fig_sqlite_begin(struct FigSqlite* sqlite);
+fig_sqlite_begin_trans(struct FigSqlite* sqlite);
 
 DBR_EXTERN DbrBool
-fig_sqlite_commit(struct FigSqlite* sqlite);
+fig_sqlite_commit_trans(struct FigSqlite* sqlite);
 
 DBR_EXTERN DbrBool
-fig_sqlite_rollback(struct FigSqlite* sqlite);
+fig_sqlite_rollback_trans(struct FigSqlite* sqlite);
 
 DBR_EXTERN DbrBool
 fig_sqlite_insert_order(struct FigSqlite* sqlite, const struct DbrOrder* order);

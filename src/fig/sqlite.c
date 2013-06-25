@@ -1213,19 +1213,19 @@ fig_sqlite_term(struct FigSqlite* sqlite)
 }
 
 DBR_EXTERN DbrBool
-fig_sqlite_begin(struct FigSqlite* sqlite)
+fig_sqlite_begin_trans(struct FigSqlite* sqlite)
 {
     return exec_sql(sqlite->db, "BEGIN TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
-fig_sqlite_commit(struct FigSqlite* sqlite)
+fig_sqlite_commit_trans(struct FigSqlite* sqlite)
 {
     return exec_sql(sqlite->db, "COMMIT TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
-fig_sqlite_rollback(struct FigSqlite* sqlite)
+fig_sqlite_rollback_trans(struct FigSqlite* sqlite)
 {
     return exec_sql(sqlite->db, "ROLLBACK TRANSACTION");
 }
