@@ -25,20 +25,45 @@
 
 using namespace dbr;
 
-static DbrRec*
-get_rec_id(DbrCtx ctx, int type, DbrIden id)
+template <int TypeN>
+struct TypeTraits;
+
+template <>
+struct TypeTraits<DBR_INSTR> {
+    typedef InstrRec TypeRec;
+};
+
+template <>
+struct TypeTraits<DBR_MARKET> {
+    typedef MarketRec TypeRec;
+};
+
+template <>
+struct TypeTraits<DBR_TRADER> {
+    typedef TraderRec TypeRec;
+};
+
+template <>
+struct TypeTraits<DBR_ACCNT> {
+    typedef AccntRec TypeRec;
+};
+
+template <int TypeN>
+static typename TypeTraits<TypeN>::TypeRec
+get_rec_id(Ctx& ctx, DbrIden id)
 {
-    DbrSlNode* node = dbr_ctx_find_rec_id(ctx, type, id);
-    check(node != NULL);
-    return dbr_rec_entry(node);
+    auto it = ctx.recs<TypeN>().find(id);
+    check(it != ctx.recs<TypeN>().end());
+    return typename TypeTraits<TypeN>::TypeRec(*it);
 }
 
-static DbrRec*
-get_rec_mnem(DbrCtx ctx, int type, const char* mnem)
+template <int TypeN>
+static typename TypeTraits<TypeN>::TypeRec
+get_rec_mnem(Ctx& ctx, const char* mnem)
 {
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, type, mnem);
-    check(node != NULL);
-    return dbr_rec_entry(node);
+    auto it = ctx.recs<TypeN>().find(mnem);
+    check(it != ctx.recs<TypeN>().end());
+    return typename TypeTraits<TypeN>::TypeRec(*it);
 }
 
 TEST_CASE(find_instr)
@@ -47,27 +72,25 @@ TEST_CASE(find_instr)
     Model model(pool, 1);
     Ctx ctx(pool, &model);
 
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_INSTR, "BAD");
-    check(node == NULL);
+    check(ctx.irecs().find("BAD") == ctx.irecs().end());
 
-    DbrRec* irec = get_rec_mnem(ctx, DBR_INSTR, "EURUSD.SPOTFWD");
-    check(irec != NULL);
+    InstrRec irec = get_rec_mnem<DBR_INSTR>(ctx, "EURUSD.SPOTFWD");
+    check(irec == get_rec_id<DBR_INSTR>(ctx, irec.id()));
+    check(irec.mnem() == Mnem("EURUSD.SPOTFWD"));
 
-    check(irec == get_rec_id(ctx, DBR_INSTR, irec->id));
-    check(sequal(irec->mnem, "EURUSD.SPOTFWD", DBR_MNEM_MAX));
     // Body.
-    check(sequal(irec->instr.display, "EURUSD.SPOTFWD", DBR_DISPLAY_MAX));
-    check(sequal(irec->instr.asset_type, "CURRENCY", DBR_MNEM_MAX));
-    check(sequal(irec->instr.instr_type, "SPOTFWD", DBR_MNEM_MAX));
-    check(sequal(irec->instr.asset, "EUR", DBR_MNEM_MAX));
-    check(sequal(irec->instr.ccy, "USD", DBR_MNEM_MAX));
-    check(fequal(irec->instr.price_inc, 0.0001));
-    check(fequal(irec->instr.qty_inc, 1e6));
-    check(irec->instr.price_dp == 4);
-    check(irec->instr.pip_dp == 4);
-    check(irec->instr.qty_dp == 0);
-    check(irec->instr.min_lots == 1);
-    check(irec->instr.max_lots == 10);
+    check(irec.display() == Display("EURUSD.SPOTFWD"));
+    check(irec.asset_type() == Mnem("CURRENCY"));
+    check(irec.instr_type() == Mnem("SPOTFWD"));
+    check(irec.asset() == Mnem("EUR"));
+    check(irec.ccy() == Mnem("USD"));
+    check(fequal(irec.price_inc(), 0.0001));
+    check(fequal(irec.qty_inc(), 1e6));
+    check(irec.price_dp() == 4);
+    check(irec.pip_dp() == 4);
+    check(irec.qty_dp() == 0);
+    check(irec.min_lots() == 1);
+    check(irec.max_lots() == 10);
 }
 
 TEST_CASE(find_market)
@@ -76,33 +99,14 @@ TEST_CASE(find_market)
     Model model(pool, 1);
     Ctx ctx(pool, &model);
 
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_MARKET, "BAD");
-    check(node == NULL);
+    check(ctx.mrecs().find("BAD") == ctx.mrecs().end());
 
-    DbrRec* mrec = get_rec_mnem(ctx, DBR_MARKET, "EURUSD");
-    check(mrec != NULL);
-    check(mrec == get_rec_id(ctx, DBR_MARKET, mrec->id));
-    check(sequal(mrec->mnem, "EURUSD", DBR_MNEM_MAX));
+    MarketRec mrec = get_rec_mnem<DBR_MARKET>(ctx, "EURUSD");
+    check(mrec == get_rec_id<DBR_MARKET>(ctx, mrec.id()));
+    check(mrec.mnem() == Mnem("EURUSD"));
+
     // Body.
-    check(sequal(mrec->market.tenor, "SP", DBR_TENOR_MAX));
-}
-
-TEST_CASE(find_accnt)
-{
-    Pool pool;
-    Model model(pool, 1);
-    Ctx ctx(pool, &model);
-
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_ACCNT, "BAD");
-    check(node == NULL);
-
-    DbrRec* arec = get_rec_mnem(ctx, DBR_ACCNT, "DBRA");
-    check(arec != NULL);
-    check(arec == get_rec_id(ctx, DBR_ACCNT, arec->id));
-    check(sequal(arec->mnem, "DBRA", DBR_MNEM_MAX));
-    // Body.
-    check(sequal(arec->accnt.display, "Account A", DBR_DISPLAY_MAX));
-    check(sequal(arec->accnt.email, "dbra@doobry.org", DBR_EMAIL_MAX));
+    check(mrec.tenor() == Tenor("SP"));
 }
 
 TEST_CASE(find_trader)
@@ -111,14 +115,30 @@ TEST_CASE(find_trader)
     Model model(pool, 1);
     Ctx ctx(pool, &model);
 
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_TRADER, "BAD");
-    check(node == NULL);
+    check(ctx.trecs().find("BAD") == ctx.trecs().end());
 
-    DbrRec* trec = get_rec_mnem(ctx, DBR_TRADER, "WRAMIREZ");
-    check(trec != NULL);
-    check(trec == get_rec_id(ctx, DBR_TRADER, trec->id));
-    check(sequal(trec->mnem, "WRAMIREZ", DBR_MNEM_MAX));
+    TraderRec trec = get_rec_mnem<DBR_TRADER>(ctx, "WRAMIREZ");
+    check(trec == get_rec_id<DBR_TRADER>(ctx, trec.id()));
+    check(trec.mnem() == Mnem("WRAMIREZ"));
+
     // Body.
-    check(sequal(trec->trader.display, "Wayne Ramirez", DBR_DISPLAY_MAX));
-    check(sequal(trec->trader.email, "wayne.ramirez@doobry.org", DBR_EMAIL_MAX));
+    check(trec.display() == Display("Wayne Ramirez"));
+    check(trec.email() == Email("wayne.ramirez@doobry.org"));
+}
+
+TEST_CASE(find_accnt)
+{
+    Pool pool;
+    Model model(pool, 1);
+    Ctx ctx(pool, &model);
+
+    check(ctx.arecs().find("BAD") == ctx.arecs().end());
+
+    AccntRec arec = get_rec_mnem<DBR_ACCNT>(ctx, "DBRA");
+    check(arec == get_rec_id<DBR_ACCNT>(ctx, arec.id()));
+    check(arec.mnem() == Mnem("DBRA"));
+
+    // Body.
+    check(arec.display() == Display("Account A"));
+    check(arec.email() == Email("dbra@doobry.org"));
 }

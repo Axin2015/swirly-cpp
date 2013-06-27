@@ -215,6 +215,12 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    template <int TypeN>
+    Recs<TypeN>
+    recs() const noexcept
+    {
+        return Recs<TypeN>(impl_);
+    }
     InstrRecs
     irecs() const noexcept
     {
