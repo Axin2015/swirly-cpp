@@ -32,11 +32,10 @@ TEST_CASE(trader_id)
     Model model(pool, 1);
     Ctx ctx(pool, &model);
 
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_TRADER, "WRAMIREZ");
-    check(node != NULL);
-    DbrRec* trec = dbr_rec_entry(node);
-    check(trec != NULL);
-    DbrTrader trader = dbr_ctx_trader(ctx, trec);
-    check(trader != NULL);
-    check(dbr_trader_id(trader) ==  trec->id);
+    TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
+    check(it != ctx.trecs().end());
+
+    TraderRec trec(*it);
+    Trader trader = ctx.trader(*it);
+    check(trader.id() == trec.id());
 }

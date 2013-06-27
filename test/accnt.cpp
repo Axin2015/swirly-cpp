@@ -32,11 +32,10 @@ TEST_CASE(accnt_id)
     Model model(pool, 1);
     Ctx ctx(pool, &model);
 
-    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_ACCNT, "DBRA");
-    check(node != NULL);
-    DbrRec* arec = dbr_rec_entry(node);
-    check(arec != NULL);
-    DbrAccnt accnt = dbr_ctx_accnt(ctx, arec);
-    check(accnt != NULL);
-    check(dbr_accnt_id(accnt) ==  arec->id);
+    AccntRecs::Iterator it = ctx.arecs().find("DBRA");
+    check(it != ctx.arecs().end());
+
+    AccntRec arec(*it);
+    Accnt accnt = ctx.accnt(*it);
+    check(accnt.id() == arec.id());
 }
