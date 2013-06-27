@@ -15,28 +15,17 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
-#include "model.h"
+#include "test.hpp"
 
-#include <dbr/conv.h>
-#include <dbr/ctx.h>
-#include <dbr/market.h>
+#include <dbr/err.h>
 
-TEST_CASE(market_id)
+/**
+ * @test Clear error.
+ */
+
+TEST_CASE(clear_err)
 {
-    DbrPool pool = dbr_pool_create();
-    DbrModel model = model_create(pool, 1);
-    DbrCtx ctx = dbr_ctx_create(pool, model);
-
-    struct DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_MARKET, "EURUSD");
-    check(node != NULL);
-    struct DbrRec* mrec = dbr_rec_entry(node);
-    check(mrec != NULL);
-    DbrMarket market = dbr_ctx_market(ctx, mrec);
-    check(market != NULL);
-    check(dbr_market_id(market) ==  mrec->id);
-
-    dbr_ctx_destroy(ctx);
-    model_destroy(model);
-    dbr_pool_destroy(pool);
+    dbr_err_clear();
+    check(dbr_err_num() == 0);
+    check(*dbr_err_msg() == '\0');
 }

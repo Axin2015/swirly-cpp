@@ -15,28 +15,18 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
-#include "model.h"
+#include "test.hpp"
 
-#include <dbr/conv.h>
-#include <dbr/ctx.h>
-#include <dbr/trader.h>
+#include <dbr/pool.hpp>
 
-TEST_CASE(trader_id)
+using namespace dbr;
+
+TEST_CASE(create_pool)
 {
-    DbrPool pool = dbr_pool_create();
-    DbrModel model = model_create(pool, 1);
-    DbrCtx ctx = dbr_ctx_create(pool, model);
+    Pool pool;
+}
 
-    struct DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_TRADER, "WRAMIREZ");
-    check(node != NULL);
-    struct DbrRec* trec = dbr_rec_entry(node);
-    check(trec != NULL);
-    DbrTrader trader = dbr_ctx_trader(ctx, trec);
-    check(trader != NULL);
-    check(dbr_trader_id(trader) ==  trec->id);
-
-    dbr_ctx_destroy(ctx);
-    model_destroy(model);
-    dbr_pool_destroy(pool);
+TEST_CASE(destroy_pool)
+{
+    dbr_pool_destroy(NULL);
 }

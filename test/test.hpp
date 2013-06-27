@@ -15,28 +15,35 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
-#include "model.h"
+#ifndef TEST_HPP
+#define TEST_HPP
 
-#include <dbr/accnt.h>
-#include <dbr/conv.h>
-#include <dbr/ctx.h>
+#include <dbr/except.hpp>
 
-TEST_CASE(accnt_id)
+#include <cmath>    // fabs()
+#include <cstring>  // strcmp()
+
+#define die_(file, line, what)                                          \
+    throw dbr::AssrtException(file, line, what)
+
+#define die(what)                               \
+    die_(__FILE__, __LINE__, what)
+
+#define check(expr)                                     \
+    (expr) ? (void)0 : die("check [" #expr "] failed.")
+
+inline bool
+fequal(double lhs, double rhs)
 {
-    DbrPool pool = dbr_pool_create();
-    DbrModel model = model_create(pool, 1);
-    DbrCtx ctx = dbr_ctx_create(pool, model);
-
-    struct DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_ACCNT, "DBRA");
-    check(node != NULL);
-    struct DbrRec* arec = dbr_rec_entry(node);
-    check(arec != NULL);
-    DbrAccnt accnt = dbr_ctx_accnt(ctx, arec);
-    check(accnt != NULL);
-    check(dbr_accnt_id(accnt) ==  arec->id);
-
-    dbr_ctx_destroy(ctx);
-    model_destroy(model);
-    dbr_pool_destroy(pool);
+    return fabs(lhs - rhs) < 0.0000001;
 }
+
+inline bool
+sequal(const char* lhs, const char* rhs, size_t n)
+{
+    return strncmp(lhs, rhs, n) == 0;
+}
+
+#define TEST_CASE(name) void name(void)
+
+#endif // TEST_HPP

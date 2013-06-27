@@ -15,7 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
+#include "test.hpp"
+
+#include <iostream>
 
 #undef  TEST_CASE
 #define TEST_CASE(x) void x(void);
@@ -31,45 +33,48 @@ static const struct TestCase {
 #include <test_cases.txt>
 };
 
-static bool running = false;
+using namespace std;
 
 static void
-exit_handler(void)
+run(const TestCase& tc)
 {
-    if (running)
-        printf("fail\n");
-}
-
-static void
-run(const struct TestCase* tc)
-{
-    printf("%s: ", tc->name);
-    running = true;
-    tc->fn();
-    running = false;
-    printf("pass\n");
+    cout << tc.name << ':';
+    cout.flush();
+    try {
+        tc.fn();
+    } catch (const dbr::DbrException& e) {
+        cout << " fail" << endl;
+        cerr << e.file() << ':' << e.line() << ": " << e.what() << " (" << e.num() << ')' << endl;
+        exit(1);
+    } catch (const exception& e) {
+        cout << " fail" << endl;
+        cerr << "exception: " << e.what() << endl;
+        exit(1);
+    }
+    cout << " pass" << endl;
 }
 
 int
 main(int argc, char* argv[])
 {
-    atexit(exit_handler);
     if (argc > 1) {
         // Run specific test-cases according to arguments.
         int n = 0;
         for (int i = 1; i < argc; ++i) {
-            for (int j = 0; j < sizeof(TEST_CASES) / sizeof(TEST_CASES[0]); ++j)
+            for (size_t j = 0; j < sizeof(TEST_CASES) / sizeof(TEST_CASES[0]); ++j)
                 if (strcmp(argv[i], TEST_CASES[j].name) == 0) {
-                    run(TEST_CASES + j);
+                    run(TEST_CASES[j]);
                     ++n;
                 }
         }
-        if (n == 0)
-            die("no test found");
+        if (n == 0) {
+            cerr << "no test found\n";
+            exit(1);
+        }
     } else {
         // Run all test-cases.
-        for (int j = 0; j < sizeof(TEST_CASES) / sizeof(TEST_CASES[0]); ++j)
-            run(TEST_CASES + j);
+        for (size_t j = 0; j < sizeof(TEST_CASES) / sizeof(TEST_CASES[0]); ++j)
+            run(TEST_CASES [j]);
     }
     return 0;
 }

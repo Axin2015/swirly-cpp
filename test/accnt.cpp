@@ -15,17 +15,28 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
+#include "test.hpp"
+#include "model.hpp"
 
-#include <dbr/err.h>
+#include <dbr/ctx.hpp>
+#include <dbr/pool.hpp>
 
-/**
- * @test Clear error.
- */
+#include <dbr/accnt.h>
+#include <dbr/conv.h>
 
-TEST_CASE(clear_err)
+using namespace dbr;
+
+TEST_CASE(accnt_id)
 {
-    dbr_err_clear();
-    check(dbr_err_num() == 0);
-    check(*dbr_err_msg() == '\0');
+    Pool pool;
+    Model model(pool, 1);
+    Ctx ctx(pool, &model);
+
+    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_ACCNT, "DBRA");
+    check(node != NULL);
+    DbrRec* arec = dbr_rec_entry(node);
+    check(arec != NULL);
+    DbrAccnt accnt = dbr_ctx_accnt(ctx, arec);
+    check(accnt != NULL);
+    check(dbr_accnt_id(accnt) ==  arec->id);
 }

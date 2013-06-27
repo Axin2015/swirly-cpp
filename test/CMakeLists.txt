@@ -5,7 +5,7 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 # Locate generated source.
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-FILE(GLOB test_SOURCES "*.c")
+FILE(GLOB test_SOURCES "*.cpp")
 
 ADD_EXECUTABLE(dbr_test ${test_SOURCES})
 TARGET_LINK_LIBRARIES(dbr_test dbr_static m)

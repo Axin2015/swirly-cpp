@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.h"
+#include "test.hpp"
 
 #include <ash/list.h>
 #include <ash/queue.h>
@@ -24,18 +24,18 @@
 
 struct SlElem {
     int id;
-    struct DbrSlNode node;
+    DbrSlNode node;
 };
 
-static inline struct SlElem*
-dbr_elem_from_node(struct DbrSlNode* node)
+static inline SlElem*
+dbr_elem_from_node(DbrSlNode* node)
 {
-    return dbr_implof(struct SlElem, node, node);
+    return dbr_implof(SlElem, node, node);
 }
 
 TEST_CASE(ash_list)
 {
-    struct AshList l = ASH_LIST_INIT(l);
+    AshList l = ASH_LIST_INIT(l);
 
     check(ash_list_empty(&l));
     check(ash_list_first(&l) == ash_list_end(&l));
@@ -43,14 +43,14 @@ TEST_CASE(ash_list)
 
 TEST_CASE(ash_queue)
 {
-    struct AshQueue q = ASH_QUEUE_INIT(q);
+    AshQueue q = ASH_QUEUE_INIT(q);
 
     check(ash_queue_empty(&q));
     check(ash_queue_first(&q) == ash_queue_end(&q));
 
-    struct SlElem e1 = { .id = 1, .node = { .next = NULL } };
-    struct SlElem e2 = { .id = 2, .node = { .next = NULL } };
-    struct SlElem e3 = { .id = 3, .node = { .next = NULL } };
+    SlElem e1 = { .id = 1, .node = { .next = NULL } };
+    SlElem e2 = { .id = 2, .node = { .next = NULL } };
+    SlElem e3 = { .id = 3, .node = { .next = NULL } };
 
     ash_queue_insert_front(&q, &e1.node);
     ash_queue_insert_front(&q, &e2.node);
@@ -90,7 +90,7 @@ TEST_CASE(ash_queue)
 
 TEST_CASE(ash_stack)
 {
-    struct AshStack s = ASH_STACK_INIT(s);
+    AshStack s = ASH_STACK_INIT(s);
 
     check(ash_stack_empty(&s));
     check(ash_stack_first(&s) == ash_stack_end(&s));

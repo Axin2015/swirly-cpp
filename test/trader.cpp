@@ -15,15 +15,28 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef MODEL_H
-#define MODEL_H
+#include "test.hpp"
+#include "model.hpp"
 
-#include <dbr/model.h>
+#include <dbr/ctx.hpp>
+#include <dbr/pool.hpp>
 
-DBR_EXTERN DbrModel
-model_create(DbrPool pool, DbrIden seed);
+#include <dbr/conv.h>
+#include <dbr/trader.h>
 
-DBR_EXTERN void
-model_destroy(DbrModel model);
+using namespace dbr;
 
-#endif // MODEL_H
+TEST_CASE(trader_id)
+{
+    Pool pool;
+    Model model(pool, 1);
+    Ctx ctx(pool, &model);
+
+    DbrSlNode* node = dbr_ctx_find_rec_mnem(ctx, DBR_TRADER, "WRAMIREZ");
+    check(node != NULL);
+    DbrRec* trec = dbr_rec_entry(node);
+    check(trec != NULL);
+    DbrTrader trader = dbr_ctx_trader(ctx, trec);
+    check(trader != NULL);
+    check(dbr_trader_id(trader) ==  trec->id);
+}

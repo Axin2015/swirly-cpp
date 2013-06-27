@@ -15,36 +15,27 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef TEST_H
-#define TEST_H
+#include "test.hpp"
+#include "model.hpp"
 
-#include <math.h>    // fabs()
-#include <stdbool.h> // bool
-#include <stdio.h>   // fprintf()
-#include <stdlib.h>  // exit()
-#include <string.h>  // strcmp()
+#include <dbr/ctx.hpp>
+#include <dbr/pool.hpp>
 
-#define die_(file, line, what)                                          \
-    (fprintf(stderr, "%s:%d: %s\n", file, line, what), fflush(NULL), exit(1))
+#include <dbr/conv.h>
+#include <dbr/market.h>
 
-#define die(what)                               \
-    die_(__FILE__, __LINE__, what)
+using namespace dbr;
 
-#define check(expr)                                     \
-    (expr) ? (void)0 : die("check [" #expr "] failed.")
-
-static inline bool
-fequal(double lhs, double rhs)
+TEST_CASE(market_id)
 {
-    return fabs(lhs - rhs) < 0.0000001;
+    Pool pool;
+    Model model(pool, 1);
+    Ctx ctx(pool, &model);
+
+    MarketRecs::Iterator it = ctx.mrecs().find("EURUSD");
+    check(it != ctx.mrecs().end());
+
+    MarketRec mrec(*it);
+    Market market = ctx.market(*it);
+    check(market.id() == mrec.id());
 }
-
-static inline bool
-sequal(const char* lhs, const char* rhs, size_t n)
-{
-    return strncmp(lhs, rhs, n) == 0;
-}
-
-#define TEST_CASE(name) void name(void)
-
-#endif // TEST_H
