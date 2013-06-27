@@ -200,17 +200,23 @@ public:
 class Trader {
     DbrTrader impl_;
 public:
+    explicit
     Trader(DbrTrader impl) noexcept
         : impl_(impl)
     {
     }
+    explicit
+    operator DbrTrader() const noexcept
+    {
+        return impl_;
+    }
     bool
-    operator ==(const Trader& rhs) const noexcept
+    operator ==(Trader rhs) const noexcept
     {
         return id() == rhs.id();
     }
     bool
-    operator !=(const Trader& rhs) const noexcept
+    operator !=(Trader rhs) const noexcept
     {
         return id() != rhs.id();
     }

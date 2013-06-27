@@ -107,11 +107,11 @@ public:
     typedef std::ptrdiff_t DifferenceType;
     typedef typename PolicyT::Node Node;
     typedef typename PolicyT::Entry ValueType;
-    typedef const typename PolicyT::Entry* Pointer;
-    typedef const typename PolicyT::Entry& Reference;
+    typedef /*const*/ typename PolicyT::Entry* Pointer;
+    typedef /*const*/ typename PolicyT::Entry& Reference;
 
 private:
-    const Node* node_;
+    /*const*/ Node* node_;
 
 public:
     // Standard typedefs.
@@ -122,7 +122,7 @@ public:
     typedef Pointer pointer;
     typedef Reference reference;
 
-    ConstBiDirectionalIterator(const Node* node = nullptr) noexcept
+    ConstBiDirectionalIterator(/*const*/ Node* node = nullptr) noexcept
     : node_(node)
     {
     }
@@ -312,11 +312,11 @@ public:
     typedef std::ptrdiff_t DifferenceType;
     typedef typename PolicyT::Node Node;
     typedef typename PolicyT::Entry ValueType;
-    typedef const typename PolicyT::Entry* Pointer;
-    typedef const typename PolicyT::Entry& Reference;
+    typedef /*const*/ typename PolicyT::Entry* Pointer;
+    typedef /*const*/ typename PolicyT::Entry& Reference;
 
 private:
-    const Node* node_;
+    /*const*/ Node* node_;
 
 public:
     // Standard typedefs.
@@ -327,7 +327,7 @@ public:
     typedef Pointer pointer;
     typedef Reference reference;
 
-    ConstForwardIterator(const Node* node = nullptr) noexcept
+    ConstForwardIterator(/*const*/ Node* node = nullptr) noexcept
     : node_(node)
     {
     }

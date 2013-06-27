@@ -40,7 +40,7 @@ struct DbrModelVtbl {
     (*rollback_trans)(DbrModel model);
 
     DbrBool
-    (*insert_order)(DbrModel model, const struct DbrOrder* order);
+    (*insert_order)(DbrModel model, struct DbrOrder* order);
 
     DbrBool
     (*update_order)(DbrModel model, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
@@ -50,7 +50,7 @@ struct DbrModelVtbl {
     (*archive_order)(DbrModel model, DbrIden id, DbrMillis now);
 
     DbrBool
-    (*insert_trade)(DbrModel model, const struct DbrTrade* trade);
+    (*insert_trade)(DbrModel model, struct DbrTrade* trade);
 
     DbrBool
     (*archive_trade)(DbrModel model, DbrIden id, DbrMillis now);
@@ -87,7 +87,7 @@ dbr_model_rollback_trans(DbrModel model)
 }
 
 static inline DbrBool
-dbr_model_insert_order(DbrModel model, const struct DbrOrder* order)
+dbr_model_insert_order(DbrModel model, struct DbrOrder* order)
 {
     return model->vtbl->insert_order(model, order);
 }
@@ -106,7 +106,7 @@ dbr_model_archive_order(DbrModel model, DbrIden id, DbrMillis now)
 }
 
 static inline DbrBool
-dbr_model_insert_trade(DbrModel model, const struct DbrTrade* trade)
+dbr_model_insert_trade(DbrModel model, struct DbrTrade* trade)
 {
     return model->vtbl->insert_trade(model, trade);
 }

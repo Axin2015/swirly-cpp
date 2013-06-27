@@ -27,6 +27,11 @@ namespace dbr {
 class Best {
     DbrBest impl_;
 public:
+    explicit
+    operator DbrBest*() noexcept
+    {
+        return &impl_;
+    }
     DbrTicks
     bid_ticks() const noexcept
     {

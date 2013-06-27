@@ -180,6 +180,10 @@ public:
         if (!impl_)
             throw_exception();
     }
+    operator DbrCtx() const noexcept
+    {
+        return impl_;
+    }
 
     // Copy semantics.
 
@@ -205,14 +209,11 @@ public:
         std::swap(impl_, rhs.impl_);
         return *this;
     }
+
     void
     swap(Ctx& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
-    }
-    operator DbrCtx() noexcept
-    {
-        return impl_;
     }
     InstrRecs
     irecs() const noexcept
@@ -240,7 +241,7 @@ public:
         DbrMarket market = dbr_ctx_market(impl_, &mrec);
         if (!market)
             throw_exception();
-        return market;
+        return Market(market);
     }
     Trader
     trader(DbrRec& trec) const
@@ -248,7 +249,7 @@ public:
         DbrTrader trader = dbr_ctx_trader(impl_, &trec);
         if (!trader)
             throw_exception();
-        return trader;
+        return Trader(trader);
     }
     Accnt
     accnt(DbrRec& arec) const
@@ -256,7 +257,7 @@ public:
         DbrAccnt accnt = dbr_ctx_accnt(impl_, &arec);
         if (!accnt)
             throw_exception();
-        return accnt;
+        return Accnt(accnt);
     }
     Order
     submit(DbrRec& trec, DbrRec& arec, const char* ref, DbrRec& mrec, int action,
@@ -267,7 +268,7 @@ public:
                                                lots, min, flags, static_cast<DbrTrans*>(trans));
         if (!order)
             throw_exception();
-        return *order;
+        return Order(*order);
     }
     Order
     revise(DbrTrader trader, DbrIden id, DbrLots lots)
@@ -275,7 +276,7 @@ public:
         DbrOrder* const order = dbr_ctx_revise_id(impl_, trader, id, lots);
         if (!order)
             throw_exception();
-        return *order;
+        return Order(*order);
     }
     Order
     revise(DbrTrader trader, const char* ref, DbrLots lots)
@@ -283,7 +284,7 @@ public:
         DbrOrder* const order = dbr_ctx_revise_ref(impl_, trader, ref, lots);
         if (!order)
             throw_exception();
-        return *order;
+        return Order(*order);
     }
     Order
     cancel(DbrTrader trader, DbrIden id)
@@ -291,7 +292,7 @@ public:
         DbrOrder* const order = dbr_ctx_cancel_id(impl_, trader, id);
         if (!order)
             throw_exception();
-        return *order;
+        return Order(*order);
     }
     Order
     cancel(DbrTrader trader, const char* ref)
@@ -299,7 +300,7 @@ public:
         DbrOrder* const order = dbr_ctx_cancel_ref(impl_, trader, ref);
         if (!order)
             throw_exception();
-        return *order;
+        return Order(*order);
     }
     void
     archive_order(DbrTrader trader, DbrIden id)

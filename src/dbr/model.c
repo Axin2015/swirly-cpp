@@ -67,7 +67,7 @@ rollback_trans(DbrModel model)
 }
 
 static DbrBool
-insert_order(DbrModel model, const struct DbrOrder* order)
+insert_order(DbrModel model, struct DbrOrder* order)
 {
     struct SqliteImpl* impl = sqlite_impl(model);
     struct FigSqlite* sqlite = &impl->sqlite;
@@ -92,7 +92,7 @@ archive_order(DbrModel model, DbrIden id, DbrMillis now)
 }
 
 static DbrBool
-insert_trade(DbrModel model, const struct DbrTrade* trade)
+insert_trade(DbrModel model, struct DbrTrade* trade)
 {
     struct SqliteImpl* impl = sqlite_impl(model);
     struct FigSqlite* sqlite = &impl->sqlite;

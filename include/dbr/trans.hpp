@@ -147,6 +147,11 @@ public:
     {
         impl_.first_match = nullptr;
     }
+    explicit
+    operator DbrTrans*() noexcept
+    {
+        return &impl_;
+    }
 
     // Copy semantics.
 
@@ -155,11 +160,6 @@ public:
     Trans&
     operator =(const Trans&) = delete;
 
-    explicit
-    operator DbrTrans*() noexcept
-    {
-        return &impl_;
-    }
     void
     reset() noexcept
     {
@@ -171,12 +171,12 @@ public:
     Order
     new_order() const noexcept
     {
-        return *impl_.new_order;
+        return Order(*impl_.new_order);
     }
     Posn
     new_posn() const noexcept
     {
-        return *impl_.new_posn;
+        return Posn(*impl_.new_posn);
     }
     TransMatches
     matches() const noexcept

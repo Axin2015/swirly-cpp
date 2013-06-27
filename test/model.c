@@ -20,6 +20,7 @@
 
 #include <dbr/conv.h>
 
+#include <ash/err.h>
 #include <ash/queue.h>
 
 #include <stdbool.h>
@@ -278,7 +279,7 @@ rollback_trans(DbrModel model)
 }
 
 static DbrBool
-insert_order(DbrModel model, const struct DbrOrder* order)
+insert_order(DbrModel model, struct DbrOrder* order)
 {
     return true;
 }
@@ -297,7 +298,7 @@ archive_order(DbrModel model, DbrIden id, DbrMillis now)
 }
 
 static DbrBool
-insert_trade(DbrModel model, const struct DbrTrade* trade)
+insert_trade(DbrModel model, struct DbrTrade* trade)
 {
     return true;
 }
@@ -339,9 +340,9 @@ select_entity(DbrModel model, int type, struct DbrSlNode** first)
         ret = select_posn(impl->pool, first);
         break;
     default:
-        assert(false);
+        ash_err_set(DBR_EINVAL, "invalid type '%d'", type);
         *first = NULL;
-        ret = 0;
+        ret = -1;
     }
     return ret;
 }

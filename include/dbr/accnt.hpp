@@ -292,14 +292,14 @@ public:
     // Find.
 
     Iterator
-    find(DbrTicks ticks) noexcept
+    find(DbrIden id) noexcept
     {
-        return dbr_accnt_find_posn_id(accnt_, ticks);
+        return dbr_accnt_find_posn_id(accnt_, id);
     }
     ConstIterator
-    find(DbrTicks ticks) const noexcept
+    find(DbrIden id) const noexcept
     {
-        return dbr_accnt_find_posn_id(accnt_, ticks);
+        return dbr_accnt_find_posn_id(accnt_, id);
     }
 
     // Accessor.
@@ -344,17 +344,23 @@ public:
 class Accnt {
     DbrAccnt impl_;
 public:
+    explicit
     Accnt(DbrAccnt impl) noexcept
         : impl_(impl)
     {
     }
+    explicit
+    operator DbrAccnt() const noexcept
+    {
+        return impl_;
+    }
     bool
-    operator ==(const Accnt& rhs) const noexcept
+    operator ==(Accnt rhs) const noexcept
     {
         return id() == rhs.id();
     }
     bool
-    operator !=(const Accnt& rhs) const noexcept
+    operator !=(Accnt rhs) const noexcept
     {
         return id() != rhs.id();
     }

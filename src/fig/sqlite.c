@@ -1296,9 +1296,9 @@ fig_sqlite_select_entity(struct FigSqlite* sqlite, int type, struct DbrSlNode** 
         ret = select_posn(sqlite, first);
         break;
     default:
-        assert(false);
+        ash_err_set(DBR_EINVAL, "invalid type '%d'", type);
         *first = NULL;
-        ret = 0;
+        ret = -1;
     }
     return ret;
 }

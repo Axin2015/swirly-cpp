@@ -331,9 +331,15 @@ public:
 class Side {
     DbrSide impl_;
 public:
+    explicit
     Side(DbrSide impl) noexcept
         : impl_(impl)
     {
+    }
+    explicit
+    operator DbrSide() const noexcept
+    {
+        return impl_;
     }
     SideOrders
     orders() const noexcept

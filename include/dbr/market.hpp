@@ -29,17 +29,23 @@ namespace dbr {
 class Market {
     DbrMarket impl_;
 public:
+    explicit
     Market(DbrMarket impl) noexcept
         : impl_(impl)
     {
     }
+    explicit
+    operator DbrMarket() const noexcept
+    {
+        return impl_;
+    }
     bool
-    operator ==(const Market& rhs) const noexcept
+    operator ==(Market rhs) const noexcept
     {
         return id() == rhs.id();
     }
     bool
-    operator !=(const Market& rhs) const noexcept
+    operator !=(Market rhs) const noexcept
     {
         return id() != rhs.id();
     }
@@ -51,12 +57,12 @@ public:
     Side
     bid_side() const noexcept
     {
-        return dbr_market_bid_side(impl_);
+        return Side(dbr_market_bid_side(impl_));
     }
     Side
     ask_side() const noexcept
     {
-        return dbr_market_ask_side(impl_);
+        return Side(dbr_market_ask_side(impl_));
     }
 };
 

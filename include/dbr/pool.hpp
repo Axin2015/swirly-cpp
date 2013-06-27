@@ -43,6 +43,10 @@ public:
         if (!impl_)
             throw_exception();
     }
+    operator DbrPool() const noexcept
+    {
+        return impl_;
+    }
 
     // Copy semantics.
 
@@ -72,10 +76,6 @@ public:
     swap(Pool& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
-    }
-    operator DbrPool() noexcept
-    {
-        return impl_;
     }
     DbrRec*
     alloc_rec()

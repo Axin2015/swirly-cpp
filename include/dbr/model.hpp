@@ -51,7 +51,7 @@ class IModel : public DbrIModel {
         return static_cast<DerivedT*>(model)->rollback_trans();
     }
     static DbrBool
-    insert_order(DbrModel model, const DbrOrder* order) noexcept
+    insert_order(DbrModel model, DbrOrder* order) noexcept
     {
         return static_cast<DerivedT*>(model)->insert_order(Order(*order));
     }
@@ -67,7 +67,7 @@ class IModel : public DbrIModel {
         return static_cast<DerivedT*>(model)->archive_order(id, now);
     }
     static DbrBool
-    insert_trade(DbrModel model, const DbrTrade* trade) noexcept
+    insert_trade(DbrModel model, DbrTrade* trade) noexcept
     {
         return static_cast<DerivedT*>(model)->insert_trade(Trade(*trade));
     }
@@ -144,7 +144,7 @@ rollback_trans(DbrModel model)
 inline void
 insert_order(DbrModel model, Order order)
 {
-    if (!model->vtbl->insert_order(model, static_cast<const DbrOrder*>(order)))
+    if (!model->vtbl->insert_order(model, static_cast<DbrOrder*>(order)))
         throw_exception();
 }
 
@@ -166,7 +166,7 @@ archive_order(DbrModel model, DbrIden id, DbrMillis now)
 inline void
 insert_trade(DbrModel model, Trade trade)
 {
-    if (!model->vtbl->insert_trade(model, static_cast<const DbrTrade*>(trade)))
+    if (!model->vtbl->insert_trade(model, static_cast<DbrTrade*>(trade)))
         throw_exception();
 }
 
@@ -211,6 +211,11 @@ public:
         if (!impl_)
             throw_exception();
     }
+    explicit
+    operator DbrModel() const noexcept
+    {
+        return impl_;
+    }
 
     // Copy semantics.
 
@@ -240,10 +245,6 @@ public:
     swap(SqliteModel& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
-    }
-    operator DbrModel() noexcept
-    {
-        return impl_;
     }
 };
 

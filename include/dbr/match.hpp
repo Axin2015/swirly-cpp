@@ -25,56 +25,62 @@
 namespace dbr {
 
 class Match {
-    const DbrMatch& impl_;
+    DbrMatch* impl_;
 public:
-    Match(const DbrMatch& impl) noexcept
-        : impl_(impl)
+    explicit
+    Match(DbrMatch& impl) noexcept
+        : impl_(&impl)
     {
+    }
+    explicit
+    operator DbrMatch*() const noexcept
+    {
+        return impl_;
     }
     bool
     operator ==(Match rhs) const noexcept
     {
-        return impl_.id == rhs.impl_.id;
+        return impl_->id == rhs.impl_->id;
     }
     bool
     operator !=(Match rhs) const noexcept
     {
-        return impl_.id != rhs.impl_.id;
+        return impl_->id != rhs.impl_->id;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_.id;
+        return impl_->id;
     }
     Order
     maker_order() const noexcept
     {
-        return *impl_.maker_order;
+        return Order(*impl_->maker_order);
     }
     Posn
     maker_posn() const noexcept
     {
-        return *impl_.maker_posn;
+        return Posn(*impl_->maker_posn);
     }
     DbrTicks
     ticks() const noexcept
     {
-        return impl_.ticks;
+        return impl_->ticks;
     }
     DbrLots
     lots() const noexcept
     {
-        return impl_.lots;
+        return impl_->lots;
     }
     Trade
     taker_trade() const noexcept
     {
-        return Trade(*impl_.taker_trade);
+        return Trade(*impl_->taker_trade);
     }
     Trade
     maker_trade() const noexcept
     {
-        return Trade(*impl_.maker_trade);
+        return Trade(*impl_->maker_trade);
     }
 };
 

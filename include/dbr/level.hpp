@@ -27,9 +27,15 @@ namespace dbr {
 class Level {
     DbrLevel impl_;
 public:
+    explicit
     Level(DbrLevel impl) noexcept
         : impl_(impl)
     {
+    }
+    explicit
+    operator DbrLevel() const noexcept
+    {
+        return impl_;
     }
     size_t
     count() const noexcept
