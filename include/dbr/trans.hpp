@@ -147,8 +147,12 @@ public:
     {
         impl_.first_match = nullptr;
     }
-    explicit
-    operator DbrTrans*() noexcept
+    operator DbrTrans&() noexcept
+    {
+        return impl_;
+    }
+    DbrTrans*
+    c_arg() noexcept
     {
         return &impl_;
     }

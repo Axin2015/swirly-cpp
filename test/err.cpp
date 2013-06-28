@@ -19,10 +19,6 @@
 
 #include <dbr/err.h>
 
-/**
- * @test Clear error.
- */
-
 TEST_CASE(clear_err)
 {
     dbr_err_clear();

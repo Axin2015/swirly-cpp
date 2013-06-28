@@ -16,5 +16,30 @@
  *  02110-1301 USA.
  */
 #include "test.hpp"
+#include "model.hpp"
 
-#include <dbr/ctx.h>
+#include <dbr/ctx.hpp>
+#include <dbr/pool.hpp>
+
+using namespace dbr;
+using namespace std;
+
+TEST_CASE(submit)
+{
+    Pool pool;
+    Model model(pool, 1);
+    Ctx ctx(pool, &model);
+
+    auto tit = ctx.trecs().find("WRAMIREZ");
+    check(tit != ctx.trecs().end());
+
+    auto ait = ctx.arecs().find("DBRA");
+    check(ait != ctx.arecs().end());
+
+    auto mit = ctx.mrecs().find("EURUSD");
+    check(mit != ctx.mrecs().end());
+
+    Trans trans(ctx);
+    ctx.submit(TraderRec(*tit), AccntRec(*ait), nullptr, MarketRec(*mit),
+               DBR_BUY, 12345, 1, 0, 0, trans);
+}

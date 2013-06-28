@@ -144,7 +144,7 @@ rollback_trans(DbrModel model)
 inline void
 insert_order(DbrModel model, Order order)
 {
-    if (!model->vtbl->insert_order(model, static_cast<DbrOrder*>(order)))
+    if (!model->vtbl->insert_order(model, order.c_arg()))
         throw_exception();
 }
 
@@ -166,7 +166,7 @@ archive_order(DbrModel model, DbrIden id, DbrMillis now)
 inline void
 insert_trade(DbrModel model, Trade trade)
 {
-    if (!model->vtbl->insert_trade(model, static_cast<DbrTrade*>(trade)))
+    if (!model->vtbl->insert_trade(model, trade.c_arg()))
         throw_exception();
 }
 

@@ -23,67 +23,71 @@
 namespace dbr {
 
 class Posn {
-    DbrPosn* impl_;
+    DbrPosn& impl_;
 public:
     explicit
     Posn(DbrPosn& impl) noexcept
-        : impl_(&impl)
+        : impl_(impl)
     {
     }
-    explicit
-    operator DbrPosn*() const noexcept
+    operator DbrPosn&() const noexcept
     {
         return impl_;
+    }
+    DbrPosn*
+    c_arg() noexcept
+    {
+        return &impl_;
     }
     bool
     operator ==(Posn rhs) const noexcept
     {
-        return impl_->id == rhs.impl_->id;
+        return impl_.id == rhs.impl_.id;
     }
     bool
     operator !=(Posn rhs) const noexcept
     {
-        return impl_->id != rhs.impl_->id;
+        return impl_.id != rhs.impl_.id;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_->id;
+        return impl_.id;
     }
     AccntRec
     arec() const noexcept
     {
-        return AccntRec(*impl_->accnt.rec);
+        return AccntRec(*impl_.accnt.rec);
     }
     InstrRec
     irec() const noexcept
     {
-        return InstrRec(*impl_->instr.rec);
+        return InstrRec(*impl_.instr.rec);
     }
     DbrDate
     settl_date() const noexcept
     {
-        return impl_->settl_date;
+        return impl_.settl_date;
     }
     DbrLicks
     buy_licks() const noexcept
     {
-        return impl_->buy_licks;
+        return impl_.buy_licks;
     }
     DbrLots
     buy_lots() const noexcept
     {
-        return impl_->buy_lots;
+        return impl_.buy_lots;
     }
     DbrLicks
     sell_licks() const noexcept
     {
-        return impl_->sell_licks;
+        return impl_.sell_licks;
     }
     DbrLots
     sell_lots() const noexcept
     {
-        return impl_->sell_lots;
+        return impl_.sell_lots;
     }
 };
 

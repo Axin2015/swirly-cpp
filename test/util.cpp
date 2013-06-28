@@ -21,10 +21,6 @@
 
 #include <limits.h>
 
-/**
- * @test Int length.
- */
-
 TEST_CASE(intlen)
 {
     check(dbr_intlen(0) == 1);
@@ -44,10 +40,6 @@ TEST_CASE(intlen)
     check(dbr_intlen(INT_MIN) == 11);
     check(dbr_intlen(INT_MAX) == 10);
 }
-
-/**
- * @test Int length.
- */
 
 TEST_CASE(longlen)
 {

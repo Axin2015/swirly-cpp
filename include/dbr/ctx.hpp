@@ -271,7 +271,7 @@ public:
     {
         trans.reset();
         DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, ref, &mrec, action, ticks,
-                                               lots, min, flags, static_cast<DbrTrans*>(trans));
+                                               lots, min, flags, trans.c_arg());
         if (!order)
             throw_exception();
         return Order(*order);

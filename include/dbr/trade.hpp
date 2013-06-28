@@ -23,117 +23,121 @@
 namespace dbr {
 
 class Trade {
-    DbrTrade* impl_;
+    DbrTrade& impl_;
 public:
     explicit
     Trade(DbrTrade& impl) noexcept
-        : impl_(&impl)
+        : impl_(impl)
     {
     }
-    explicit
-    operator DbrTrade*() const noexcept
+    operator DbrTrade&() const noexcept
     {
         return impl_;
+    }
+    DbrTrade*
+    c_arg() const noexcept
+    {
+        return &impl_;
     }
     bool
     operator ==(Trade rhs) const noexcept
     {
-        return impl_->id == rhs.impl_->id;
+        return impl_.id == rhs.impl_.id;
     }
     bool
     operator !=(Trade rhs) const noexcept
     {
-        return impl_->id != rhs.impl_->id;
+        return impl_.id != rhs.impl_.id;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_->id;
+        return impl_.id;
     }
     DbrIden
     match() const noexcept
     {
-        return impl_->match;
+        return impl_.match;
     }
     DbrIden
     order() const noexcept
     {
-        return impl_->order;
+        return impl_.order;
     }
     int
     order_rev() const noexcept
     {
-        return impl_->order_rev;
+        return impl_.order_rev;
     }
     TraderRec
     trec() const noexcept
     {
-        return TraderRec(*impl_->trader.rec);
+        return TraderRec(*impl_.trader.rec);
     }
     AccntRec
     arec() const noexcept
     {
-        return AccntRec(*impl_->accnt.rec);
+        return AccntRec(*impl_.accnt.rec);
     }
     Ref
     ref() const noexcept
     {
-        return Ref(impl_->ref);
+        return Ref(impl_.ref);
     }
     MarketRec
     mrec() const noexcept
     {
-        return MarketRec(*impl_->market.rec);
+        return MarketRec(*impl_.market.rec);
     }
     AccntRec
     cpty() const noexcept
     {
-        return AccntRec(*impl_->cpty.rec);
+        return AccntRec(*impl_.cpty.rec);
     }
     int
     role() const noexcept
     {
-        return impl_->role;
+        return impl_.role;
     }
     int
     action() const noexcept
     {
-        return impl_->action;
+        return impl_.action;
     }
     DbrTicks
     ticks() const noexcept
     {
-        return impl_->ticks;
+        return impl_.ticks;
     }
     DbrLots
     resd() const noexcept
     {
-        return impl_->resd;
+        return impl_.resd;
     }
     DbrLots
     exec() const noexcept
     {
-        return impl_->exec;
+        return impl_.exec;
     }
     DbrLots
     lots() const noexcept
     {
-        return impl_->lots;
+        return impl_.lots;
     }
     DbrDate
     settl_date() const noexcept
     {
-        return impl_->settl_date;
+        return impl_.settl_date;
     }
     DbrMillis
     created() const noexcept
     {
-        return impl_->created;
+        return impl_.created;
     }
     DbrMillis
     modified() const noexcept
     {
-        return impl_->modified;
+        return impl_.modified;
     }
 };
 

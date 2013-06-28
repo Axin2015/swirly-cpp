@@ -27,8 +27,12 @@ namespace dbr {
 class Best {
     DbrBest impl_;
 public:
-    explicit
-    operator DbrBest*() noexcept
+    operator DbrBest&() noexcept
+    {
+        return impl_;
+    }
+    DbrBest*
+    c_arg() noexcept
     {
         return &impl_;
     }

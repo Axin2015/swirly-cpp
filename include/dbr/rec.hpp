@@ -24,25 +24,30 @@ namespace dbr {
 
 class RecBase {
 protected:
-    DbrRec* impl_;
+    DbrRec& impl_;
     // Non-virtual is protected.
     ~RecBase() noexcept
     {
     }
     explicit
     RecBase(DbrRec& impl) noexcept
-        : impl_(&impl)
+        : impl_(impl)
     {
     }
 public:
-    operator DbrRec*() const noexcept
+    operator DbrRec&() const noexcept
     {
         return impl_;
+    }
+    DbrRec*
+    c_arg() noexcept
+    {
+        return &impl_;
     }
     bool
     operator ==(const RecBase& rhs) const noexcept
     {
-        return impl_->type == rhs.impl_->type && impl_->id == rhs.impl_->id;
+        return impl_.type == rhs.impl_.type && impl_.id == rhs.impl_.id;
     }
     bool
     operator !=(const RecBase& rhs) const noexcept
@@ -52,17 +57,17 @@ public:
     int
     type() const noexcept
     {
-        return impl_->type;
+        return impl_.type;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_->id;
+        return impl_.id;
     }
     Mnem
     mnem() const noexcept
     {
-        return Mnem(impl_->mnem);
+        return Mnem(impl_.mnem);
     }
 };
 
@@ -76,82 +81,82 @@ public:
     Display
     display() const noexcept
     {
-        return Display(impl_->instr.display);
+        return Display(impl_.instr.display);
     }
     Mnem
     asset_type() const noexcept
     {
-        return Mnem(impl_->instr.asset_type);
+        return Mnem(impl_.instr.asset_type);
     }
     Mnem
     instr_type() const noexcept
     {
-        return Mnem(impl_->instr.instr_type);
+        return Mnem(impl_.instr.instr_type);
     }
     Mnem
     asset() const noexcept
     {
-        return Mnem(impl_->instr.asset);
+        return Mnem(impl_.instr.asset);
     }
     Mnem
     ccy() const noexcept
     {
-        return Mnem(impl_->instr.ccy);
+        return Mnem(impl_.instr.ccy);
     }
     int
     tick_numer() const noexcept
     {
-        return impl_->instr.tick_numer;
+        return impl_.instr.tick_numer;
     }
     int
     tick_denom() const noexcept
     {
-        return impl_->instr.tick_denom;
+        return impl_.instr.tick_denom;
     }
     double
     price_inc() const noexcept
     {
-        return impl_->instr.price_inc;
+        return impl_.instr.price_inc;
     }
     int
     lot_numer() const noexcept
     {
-        return impl_->instr.lot_numer;
+        return impl_.instr.lot_numer;
     }
     int
     lot_denom() const noexcept
     {
-        return impl_->instr.lot_denom;
+        return impl_.instr.lot_denom;
     }
     double
     qty_inc() const noexcept
     {
-        return impl_->instr.qty_inc;
+        return impl_.instr.qty_inc;
     }
     int
     price_dp() const noexcept
     {
-        return impl_->instr.price_dp;
+        return impl_.instr.price_dp;
     }
     int
     pip_dp() const noexcept
     {
-        return impl_->instr.pip_dp;
+        return impl_.instr.pip_dp;
     }
     int
     qty_dp() const noexcept
     {
-        return impl_->instr.qty_dp;
+        return impl_.instr.qty_dp;
     }
     DbrLots
     min_lots() const noexcept
     {
-        return impl_->instr.min_lots;
+        return impl_.instr.min_lots;
     }
     DbrLots
     max_lots() const noexcept
     {
-        return impl_->instr.max_lots;
+        return impl_.instr.max_lots;
     }
 };
 
@@ -188,17 +193,17 @@ public:
     InstrRec
     irec() const noexcept
     {
-        return InstrRec(*impl_->market.instr.rec);
+        return InstrRec(*impl_.market.instr.rec);
     }
     Tenor
     tenor() const noexcept
     {
-        return impl_->market.tenor;
+        return impl_.market.tenor;
     }
     DbrDate
     settl_date() const noexcept
     {
-        return impl_->market.settl_date;
+        return impl_.market.settl_date;
     }
 };
 
@@ -222,12 +227,12 @@ public:
     Display
     display() const noexcept
     {
-        return Display(impl_->trader.display);
+        return Display(impl_.trader.display);
     }
     Email
     email() const noexcept
     {
-        return Email(impl_->trader.email);
+        return Email(impl_.trader.email);
     }
 };
 
@@ -250,12 +255,12 @@ public:
     Display
     display() const noexcept
     {
-        return Display(impl_->accnt.display);
+        return Display(impl_.accnt.display);
     }
     Email
     email() const noexcept
     {
-        return Email(impl_->accnt.email);
+        return Email(impl_.accnt.email);
     }
 };
 
