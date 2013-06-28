@@ -18,7 +18,11 @@
 #ifndef DBR_REC_HPP
 #define DBR_REC_HPP
 
+#include <dbr/best.hpp>
 #include <dbr/types.hpp>
+
+#include <dbr/conv.h>
+#include <dbr/string.h>
 
 namespace dbr {
 
@@ -157,6 +161,34 @@ public:
     max_lots() const noexcept
     {
         return impl_.instr.max_lots;
+    }
+    // Conversion functions.
+    DbrLots
+    qty_to_lots(double qty) const noexcept
+    {
+        return dbr_real_to_incs(qty, qty_inc());
+    }
+    double
+    lots_to_qty(DbrLots lots) const noexcept
+    {
+        return dbr_incs_to_real(lots, qty_inc());
+    }
+    DbrTicks
+    price_to_ticks(double price) const noexcept
+    {
+        return dbr_real_to_incs(price, price_inc());
+    }
+    double
+    ticks_to_price(DbrTicks ticks) const noexcept
+    {
+        return dbr_incs_to_real(ticks, price_inc());
+    }
+    DbrPriceString
+    format_price(double price) const noexcept
+    {
+        DbrPriceString ps;
+        dbr_format_price(price, price_dp(), pip_dp(), &ps);
+        return ps;
     }
 };
 

@@ -18,7 +18,7 @@
 #ifndef DBR_BEST_HPP
 #define DBR_BEST_HPP
 
-#include <dbr/types.h>
+#include <dbr/market.h>
 
 #include <iostream>
 
@@ -65,6 +65,14 @@ operator <<(std::ostream& os, const Best& best)
               << ",bid_resd=" << best.bid_resd()
               << ",ask_ticks=" << best.ask_ticks()
               << ",ask_resd=" << best.ask_resd();
+}
+
+inline Best
+best(DbrRec& mrec)
+{
+    Best best;
+    dbr_market_best(&mrec, best.c_arg());
+    return best;
 }
 } // dbr
 
