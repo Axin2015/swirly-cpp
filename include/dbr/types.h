@@ -218,6 +218,17 @@ typedef struct DbrIModel {
 /** @} */
 
 /**
+ * @addtogroup Journ
+ * @{
+ */
+
+typedef struct DbrIJourn {
+    const struct DbrJournVtbl* vtbl;
+}* DbrJourn;
+
+/** @} */
+
+/**
  * @addtogroup SideLevel
  * @{
  */

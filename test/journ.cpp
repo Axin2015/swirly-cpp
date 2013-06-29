@@ -16,28 +16,61 @@
  *  02110-1301 USA.
  */
 #include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
-
-#include <dbr/ctx.hpp>
-#include <dbr/pool.hpp>
-
-#include <dbr/accnt.h>
-#include <dbr/conv.h>
 
 using namespace dbr;
+using namespace std;
 
-TEST_CASE(accnt_id)
+DbrIden
+Journ::alloc_id() noexcept
 {
-    Pool pool;
-    Model model(pool);
-    Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
+    return id_++;
+}
 
-    AccntRecs::Iterator it = ctx.arecs().find("DBRA");
-    check(it != ctx.arecs().end());
+DbrBool
+Journ::begin_trans() noexcept
+{
+    return 1;
+}
 
-    AccntRec arec(*it);
-    Accnt accnt = ctx.accnt(*it);
-    check(accnt.id() == arec.id());
+DbrBool
+Journ::commit_trans() noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::rollback_trans() noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::insert_order(Order order) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
+                    DbrLots lots, DbrMillis now) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::archive_order(DbrIden id, DbrMillis now) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::insert_trade(Trade trade) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::archive_trade(DbrIden id, DbrMillis now) noexcept
+{
+    return 1;
 }

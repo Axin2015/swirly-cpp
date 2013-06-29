@@ -15,8 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.hpp"
+#include "journ.hpp"
 #include "model.hpp"
+#include "test.hpp"
 
 #include <dbr/ctx.hpp>
 #include <dbr/pool.hpp>
@@ -27,8 +28,9 @@ using namespace std;
 TEST_CASE(submit)
 {
     Pool pool;
-    Model model(pool, 1);
-    Ctx ctx(pool, &model);
+    Model model(pool);
+    Journ journ(1);
+    Ctx ctx(pool, &model, &journ);
 
     auto tit = ctx.trecs().find("WRAMIREZ");
     check(tit != ctx.trecs().end());

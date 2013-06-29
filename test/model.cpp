@@ -15,6 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
+#include "journ.hpp"
 #include "model.hpp"
 #include "test.hpp"
 
@@ -234,61 +235,6 @@ select_posn(DbrPool pool, DbrSlNode*& first) noexcept
     return 0;
 }
 } // anonymous
-
-DbrIden
-Model::alloc_id() noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::begin_trans() noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::commit_trans() noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::rollback_trans() noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::insert_order(Order order) noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
-                    DbrLots lots, DbrMillis now) noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::archive_order(DbrIden id, DbrMillis now) noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::insert_trade(Trade trade) noexcept
-{
-    return 1;
-}
-
-DbrBool
-Model::archive_trade(DbrIden id, DbrMillis now) noexcept
-{
-    return 1;
-}
 
 ssize_t
 Model::select_entity(int type, DbrSlNode*& first) noexcept

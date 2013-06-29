@@ -19,16 +19,16 @@
 #define ELM_EXEC_H
 
 #include <dbr/defs.h>
-#include <dbr/model.h>
+#include <dbr/journ.h>
 
 struct ElmExec {
     struct ElmPool* pool;
-    DbrModel model;
+    DbrJourn journ;
     struct ElmIndex* index;
 };
 
 DBR_EXTERN void
-elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrModel model, struct ElmIndex* index);
+elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrJourn journ, struct ElmIndex* index);
 
 // All members of trans are set to zero on failure.
 

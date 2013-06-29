@@ -203,7 +203,7 @@ emplace_posns(DbrCtx ctx)
 }
 
 DBR_API DbrCtx
-dbr_ctx_create(DbrPool pool, DbrModel model)
+dbr_ctx_create(DbrPool pool, DbrModel model, DbrJourn journ)
 {
     DbrCtx ctx = malloc(sizeof(struct DbrCtx_));
     if (dbr_unlikely(!ctx)) {
@@ -215,7 +215,7 @@ dbr_ctx_create(DbrPool pool, DbrModel model)
     ctx->model = model;
     elm_cache_init(&ctx->cache, pool);
     elm_index_init(&ctx->index);
-    elm_exec_init(&ctx->exec, pool, model, &ctx->index);
+    elm_exec_init(&ctx->exec, pool, journ, &ctx->index);
 
     // Data structures are fully initialised at this point.
 

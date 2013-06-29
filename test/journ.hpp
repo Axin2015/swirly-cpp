@@ -15,21 +15,49 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef MODEL_HPP
-#define MODEL_HPP
+#ifndef JOURN_HPP
+#define JOURN_HPP
 
-#include <dbr/model.hpp>
+#include <dbr/journ.hpp>
 
 #include <dbr/pool.h>
 
-class Model : public dbr::IModel<Model> {
-    DbrPool pool_;
+class Journ : public dbr::IJourn<Journ> {
+    DbrIden id_;
 public:
     explicit
-    Model(DbrPool pool)
-        : pool_(pool)
+    Journ(DbrIden seed)
+        : id_(seed)
     {
     }
+    DbrIden
+    alloc_id() noexcept;
+
+    DbrBool
+    begin_trans() noexcept;
+
+    DbrBool
+    commit_trans() noexcept;
+
+    DbrBool
+    rollback_trans() noexcept;
+
+    DbrBool
+    insert_order(dbr::Order order) noexcept;
+
+    DbrBool
+    update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
+                 DbrLots lots, DbrMillis now) noexcept;
+
+    DbrBool
+    archive_order(DbrIden id, DbrMillis now) noexcept;
+
+    DbrBool
+    insert_trade(dbr::Trade trade) noexcept;
+
+    DbrBool
+    archive_trade(DbrIden id, DbrMillis now) noexcept;
+
     ssize_t
     select_entity(int type, DbrSlNode*& first) noexcept;
 
@@ -37,4 +65,4 @@ public:
     end_entity() noexcept;
 };
 
-#endif // MODEL_HPP
+#endif // JOURN_HPP

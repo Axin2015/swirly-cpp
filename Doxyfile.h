@@ -55,6 +55,10 @@
  */
 
 /**
+ * @defgroup Journ Journal
+ */
+
+/**
  * @defgroup Instr Instrument
  */
 

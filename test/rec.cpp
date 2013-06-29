@@ -15,8 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "test.hpp"
+#include "journ.hpp"
 #include "model.hpp"
+#include "test.hpp"
 
 #include <dbr/ctx.hpp>
 #include <dbr/pool.hpp>
@@ -69,8 +70,9 @@ get_rec_mnem(Ctx& ctx, const char* mnem)
 TEST_CASE(find_instr)
 {
     Pool pool;
-    Model model(pool, 1);
-    Ctx ctx(pool, &model);
+    Model model(pool);
+    Journ journ(1);
+    Ctx ctx(pool, &model, &journ);
 
     check(ctx.irecs().find("BAD") == ctx.irecs().end());
 
@@ -96,8 +98,9 @@ TEST_CASE(find_instr)
 TEST_CASE(find_market)
 {
     Pool pool;
-    Model model(pool, 1);
-    Ctx ctx(pool, &model);
+    Model model(pool);
+    Journ journ(1);
+    Ctx ctx(pool, &model, &journ);
 
     check(ctx.mrecs().find("BAD") == ctx.mrecs().end());
 
@@ -112,8 +115,9 @@ TEST_CASE(find_market)
 TEST_CASE(find_trader)
 {
     Pool pool;
-    Model model(pool, 1);
-    Ctx ctx(pool, &model);
+    Model model(pool);
+    Journ journ(1);
+    Ctx ctx(pool, &model, &journ);
 
     check(ctx.trecs().find("BAD") == ctx.trecs().end());
 
@@ -129,8 +133,9 @@ TEST_CASE(find_trader)
 TEST_CASE(find_accnt)
 {
     Pool pool;
-    Model model(pool, 1);
-    Ctx ctx(pool, &model);
+    Model model(pool);
+    Journ journ(1);
+    Ctx ctx(pool, &model, &journ);
 
     check(ctx.arecs().find("BAD") == ctx.arecs().end());
 

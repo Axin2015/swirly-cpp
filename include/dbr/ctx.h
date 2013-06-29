@@ -21,6 +21,7 @@
 #if !defined(DBR_HIDE_API)
 
 #include <dbr/model.h>
+#include <dbr/pool.h>
 
 /**
  * @addtogroup Ctx
@@ -36,11 +37,13 @@ typedef struct DbrCtx_* DbrCtx;
  *
  * @param model Model.
  *
+ * @param journ Journal.
+ *
  * @return Handle to newly created context or null on failure.
  */
 
 DBR_API DbrCtx
-dbr_ctx_create(DbrPool pool, DbrModel model);
+dbr_ctx_create(DbrPool pool, DbrModel model, DbrJourn journ);
 
 // No-op if ctx is null.
 

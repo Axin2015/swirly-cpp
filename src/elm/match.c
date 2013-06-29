@@ -24,7 +24,7 @@
 #include <ash/queue.h>
 
 #include <dbr/conv.h>
-#include <dbr/model.h>
+#include <dbr/journ.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -71,7 +71,7 @@ lazy_posn(struct DbrOrder* order, struct ElmPool* pool)
 }
 
 static DbrBool
-match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market, struct DbrOrder* taker,
+match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, struct DbrOrder* taker,
              const struct ElmSide* side, int direct, struct DbrTrans* trans)
 {
     struct AshQueue mq;
@@ -94,7 +94,7 @@ match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market, str
         if (spread(taker, maker, direct) > 0)
             break;
 
-        const DbrIden match_id = dbr_model_alloc_id(model);
+        const DbrIden match_id = dbr_journ_alloc_id(journ);
         struct DbrMatch* match = elm_pool_alloc_match(pool);
         if (!match)
             goto fail1;
@@ -106,7 +106,7 @@ match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market, str
             goto fail1;
         }
 
-        const DbrIden taker_id = dbr_model_alloc_id(model);
+        const DbrIden taker_id = dbr_journ_alloc_id(journ);
         struct DbrTrade* taker_trade = elm_pool_alloc_trade(pool, taker_id);
         if (!taker_trade) {
             // No need to free accnt or posn.
@@ -114,7 +114,7 @@ match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market, str
             goto fail1;
         }
 
-        const DbrIden maker_id = dbr_model_alloc_id(model);
+        const DbrIden maker_id = dbr_journ_alloc_id(journ);
         struct DbrTrade* maker_trade = elm_pool_alloc_trade(pool, maker_id);
         if (!maker_trade) {
             elm_pool_free_trade(pool, taker_trade);
@@ -201,7 +201,7 @@ match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market, str
 }
 
 DBR_EXTERN DbrBool
-elm_match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market,
+elm_match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
     struct ElmSide* side;
@@ -218,5 +218,5 @@ elm_match_orders(struct ElmPool* pool, DbrModel model, struct ElmMarket* market,
         direct = DBR_GIVEN;
     }
 
-    return match_orders(pool, model, market, taker, side, direct, trans);
+    return match_orders(pool, journ, market, taker, side, direct, trans);
 }

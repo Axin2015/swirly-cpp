@@ -15,29 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
-
-#include <dbr/ctx.hpp>
-#include <dbr/pool.hpp>
-
-#include <dbr/accnt.h>
-#include <dbr/conv.h>
-
-using namespace dbr;
-
-TEST_CASE(accnt_id)
-{
-    Pool pool;
-    Model model(pool);
-    Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
-
-    AccntRecs::Iterator it = ctx.arecs().find("DBRA");
-    check(it != ctx.arecs().end());
-
-    AccntRec arec(*it);
-    Accnt accnt = ctx.accnt(*it);
-    check(accnt.id() == arec.id());
-}
+#include <dbr/journ.h>

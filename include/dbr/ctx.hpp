@@ -174,8 +174,8 @@ public:
     : impl_(nullptr)
     {
     }
-    Ctx(DbrPool pool, DbrModel model)
-        : impl_(dbr_ctx_create(pool, model))
+    Ctx(DbrPool pool, DbrModel model, DbrJourn journ)
+        : impl_(dbr_ctx_create(pool, model, journ))
     {
         if (!impl_)
             throw_exception();

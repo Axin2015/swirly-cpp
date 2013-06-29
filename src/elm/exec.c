@@ -48,7 +48,7 @@ apply_posn(struct DbrPosn* posn, const struct DbrTrade* trade)
 static inline DbrBool
 update_order(struct ElmExec* exec, struct DbrOrder* order, DbrMillis now)
 {
-    return dbr_model_update_order(exec->model, order->id, order->rev, order->status,
+    return dbr_journ_update_order(exec->journ, order->id, order->rev, order->status,
                                   order->resd, order->exec, order->lots, now);
 }
 
@@ -72,9 +72,9 @@ insert_trans(struct ElmExec* exec, const struct DbrTrans* trans, DbrMillis now)
         taker_exec += match->lots;
 
         const int taker_status = taker_resd == 0 ? DBR_FILLED : DBR_PARTIAL;
-        if (!dbr_model_update_order(exec->model, taker_order->id, taker_rev, taker_status,
+        if (!dbr_journ_update_order(exec->journ, taker_order->id, taker_rev, taker_status,
                                     taker_resd, taker_exec, taker_order->lots, now)
-            || !dbr_model_insert_trade(exec->model, match->taker_trade))
+            || !dbr_journ_insert_trade(exec->journ, match->taker_trade))
             goto fail1;
 
         // Maker revision.
@@ -83,9 +83,9 @@ insert_trans(struct ElmExec* exec, const struct DbrTrans* trans, DbrMillis now)
         const DbrLots maker_resd = maker->resd - match->lots;
         const DbrLots maker_exec = maker->exec + match->lots;
         const int maker_status = maker_resd == 0 ? DBR_FILLED : DBR_PARTIAL;
-        if (!dbr_model_update_order(exec->model, maker->id, maker_rev, maker_status,
+        if (!dbr_journ_update_order(exec->journ, maker->id, maker_rev, maker_status,
                                     maker_resd, maker_exec, maker->lots, now)
-            || !dbr_model_insert_trade(exec->model, match->maker_trade))
+            || !dbr_journ_insert_trade(exec->journ, match->maker_trade))
             goto fail1;
 
     } while ((node = node->next));
@@ -131,10 +131,10 @@ apply_trades(struct ElmExec* exec, struct ElmMarket* market, const struct DbrTra
 }
 
 DBR_EXTERN void
-elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrModel model, struct ElmIndex* index)
+elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrJourn journ, struct ElmIndex* index)
 {
     exec->pool = pool;
-    exec->model = model;
+    exec->journ = journ;
     exec->index = index;
 }
 
@@ -151,7 +151,7 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     if (!market)
         goto fail1;
 
-    const DbrIden id = dbr_model_alloc_id(exec->model);
+    const DbrIden id = dbr_journ_alloc_id(exec->journ);
     struct DbrOrder* new_order = elm_pool_alloc_order(exec->pool, id);
     if (!new_order)
         goto fail1;
@@ -181,11 +181,11 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     trans->new_order = new_order;
     trans->new_posn = NULL;
 
-    if (!dbr_model_begin_trans(exec->model))
+    if (!dbr_journ_begin_trans(exec->journ))
         goto fail2;
 
-    if (!dbr_model_insert_order(exec->model, new_order)
-        || !elm_match_orders(exec->pool, exec->model, market, new_order, trans))
+    if (!dbr_journ_insert_order(exec->journ, new_order)
+        || !elm_match_orders(exec->pool, exec->journ, market, new_order, trans))
         goto fail3;
 
     if (trans->count > 0) {
@@ -209,13 +209,13 @@ elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     // Commit phase cannot fail.
     elm_trader_emplace_order(trader, new_order);
     apply_trades(exec, market, trans, now);
-    dbr_model_commit_trans(exec->model);
+    dbr_journ_commit_trans(exec->journ);
     return new_order;
  fail4:
     elm_pool_free_matches(exec->pool, trans->first_match);
     memset(trans, 0, sizeof(*trans));
  fail3:
-    dbr_model_rollback_trans(exec->model);
+    dbr_journ_rollback_trans(exec->journ);
  fail2:
     elm_pool_free_order(exec->pool, new_order);
  fail1:
@@ -239,10 +239,10 @@ elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
         goto fail1;
     }
 
-    if (!dbr_model_begin_trans(exec->model))
+    if (!dbr_journ_begin_trans(exec->journ))
         goto fail1;
 
-    if (!dbr_model_update_order(exec->model, id, order->rev + 1, DBR_REVISED, order->resd,
+    if (!dbr_journ_update_order(exec->journ, id, order->rev + 1, DBR_REVISED, order->resd,
                                 order->exec, lots, now))
         goto fail2;
 
@@ -253,10 +253,10 @@ elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
     if (!elm_market_revise(market, order, lots, now))
         goto fail2;
 
-    dbr_model_commit_trans(exec->model);
+    dbr_journ_commit_trans(exec->journ);
     return order;
  fail2:
-    dbr_model_rollback_trans(exec->model);
+    dbr_journ_rollback_trans(exec->journ);
  fail1:
     return NULL;
 }
@@ -276,10 +276,10 @@ elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
         goto fail1;
     }
 
-    if (!dbr_model_begin_trans(exec->model))
+    if (!dbr_journ_begin_trans(exec->journ))
         goto fail1;
 
-    if (!dbr_model_update_order(exec->model, order->id, order->rev + 1, DBR_REVISED, order->resd,
+    if (!dbr_journ_update_order(exec->journ, order->id, order->rev + 1, DBR_REVISED, order->resd,
                                 order->exec, lots, now))
         goto fail2;
 
@@ -288,10 +288,10 @@ elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
     if (!elm_market_revise(market, order, lots, now))
         goto fail2;
 
-    dbr_model_commit_trans(exec->model);
+    dbr_journ_commit_trans(exec->journ);
     return order;
  fail2:
-    dbr_model_rollback_trans(exec->model);
+    dbr_journ_rollback_trans(exec->journ);
  fail1:
     return NULL;
 }
@@ -311,7 +311,7 @@ elm_exec_cancel_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, D
         goto fail1;
     }
 
-    if (!dbr_model_update_order(exec->model, id, order->rev + 1, DBR_CANCELLED, 0,
+    if (!dbr_journ_update_order(exec->journ, id, order->rev + 1, DBR_CANCELLED, 0,
                                 order->exec, order->lots, now))
         goto fail1;
 
@@ -337,7 +337,7 @@ elm_exec_cancel_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* 
         goto fail1;
     }
 
-    if (!dbr_model_update_order(exec->model, order->id, order->rev + 1, DBR_CANCELLED, 0,
+    if (!dbr_journ_update_order(exec->journ, order->id, order->rev + 1, DBR_CANCELLED, 0,
                                 order->exec, order->lots, now))
         goto fail1;
 
@@ -356,7 +356,7 @@ elm_exec_archive_order(struct ElmExec* exec, struct ElmTrader* trader, DbrIden i
     if (!node)
         goto fail1;
 
-    if (!dbr_model_archive_order(exec->model, node->key, now))
+    if (!dbr_journ_archive_order(exec->journ, node->key, now))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
@@ -376,7 +376,7 @@ elm_exec_archive_trade(struct ElmExec* exec, struct ElmAccnt* accnt, DbrIden id,
     if (!node)
         goto fail1;
 
-    if (!dbr_model_archive_trade(exec->model, node->key, now))
+    if (!dbr_journ_archive_trade(exec->journ, node->key, now))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
