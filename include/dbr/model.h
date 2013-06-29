@@ -131,33 +131,4 @@ dbr_model_end_entity(DbrModel model)
 
 /** @} */
 
-#if !defined(DBR_HIDE_API)
-
-/**
- * @addtogroup Sqlite
- * @{
- */
-
-/**
- * @brief Create SQLite3 model.
- *
- * @param pool Pool.
- *
- * @param seed Seed identifier.
- *
- * @param path Path to the database.
- *
- * @return Handle to newly created model or null on failure.
- */
-
-DBR_API DbrModel
-dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path);
-
-DBR_API void
-dbr_sqlite_destroy(DbrModel model);
-
-/** @} */
-
-#endif // !defined(DBR_HIDE_API)
-
 #endif // DBR_MODEL_H

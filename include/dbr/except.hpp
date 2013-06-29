@@ -82,10 +82,10 @@ public:
     }
 };
 
+typedef BasicException<DBR_EIO> IoException;
 typedef BasicException<DBR_ENOMEM> NoMemException;
 typedef BasicException<DBR_EACCES> AccesException;
 typedef BasicException<DBR_EINVAL> InvalException;
-typedef BasicException<DBR_EDBSQL> DbSqlException;
 typedef BasicException<DBR_ENULL>  NullException;
 typedef BasicException<DBR_EASSRT> AssrtException;
 
@@ -93,6 +93,9 @@ inline void
 throw_exception(int num, const char* file, int line, const char* msg)
 {
     switch (num) {
+    case DBR_EIO:
+        throw IoException(file, line, msg);
+        break;
     case DBR_ENOMEM:
         throw NoMemException(file, line, msg);
         break;
@@ -102,14 +105,11 @@ throw_exception(int num, const char* file, int line, const char* msg)
     case DBR_EINVAL:
         throw InvalException(file, line, msg);
         break;
-    case DBR_EDBSQL:
-        throw DbSqlException(file, line, msg);
-        break;
     case DBR_ENULL:
         throw NullException(file, line, msg);
         break;
     case DBR_EASSRT:
-        throw NullException(file, line, msg);
+        throw AssrtException(file, line, msg);
         break;
     default:
         throw DbrException(num, file, line, msg);

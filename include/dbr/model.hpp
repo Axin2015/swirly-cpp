@@ -192,62 +192,6 @@ end_entity(DbrModel model) noexcept
     return model->vtbl->end_entity(model);
 }
 
-class SqliteModel {
-    DbrModel impl_;
-public:
-    ~SqliteModel() noexcept
-    {
-        if (impl_)
-            dbr_sqlite_destroy(impl_);
-    }
-    constexpr
-    SqliteModel(std::nullptr_t) noexcept
-    : impl_(nullptr)
-    {
-    }
-    SqliteModel(DbrPool pool, DbrIden seed, const char* path)
-        : impl_(dbr_sqlite_create(pool, seed, path))
-    {
-        if (!impl_)
-            throw_exception();
-    }
-    explicit
-    operator DbrModel() const noexcept
-    {
-        return impl_;
-    }
-
-    // Copy semantics.
-
-    SqliteModel(const SqliteModel&) = delete;
-
-    SqliteModel&
-    operator =(const SqliteModel&) = delete;
-
-    // Move semantics.
-
-    SqliteModel(SqliteModel&& rhs) noexcept
-    : impl_(nullptr)
-    {
-        std::swap(impl_, rhs.impl_);
-    }
-    SqliteModel&
-    operator =(SqliteModel&& rhs) noexcept
-    {
-        if (impl_) {
-            dbr_sqlite_destroy(impl_);
-            impl_ = nullptr;
-        }
-        std::swap(impl_, rhs.impl_);
-        return *this;
-    }
-    void
-    swap(SqliteModel& rhs) noexcept
-    {
-        std::swap(impl_, rhs.impl_);
-    }
-};
-
 } // dbr
 
 #endif // DBR_MODEL_HPP

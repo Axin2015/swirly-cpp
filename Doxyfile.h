@@ -55,11 +55,6 @@
  */
 
 /**
- * @defgroup Sqlite SQLite
- * @ingroup Model
- */
-
-/**
  * @defgroup Instr Instrument
  */
 

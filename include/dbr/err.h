@@ -30,9 +30,13 @@
 
 enum DbrErrno {
     /**
+     * @brief I/O error.
+     */
+    DBR_EIO = 1,
+    /**
      * @brief Out of memory.
      */
-    DBR_ENOMEM = 1,
+    DBR_ENOMEM,
     /**
      * @brief Access denied.
      */
@@ -41,10 +45,6 @@ enum DbrErrno {
      * @brief Invalid argument.
      */
     DBR_EINVAL,
-    /**
-     * @brief SQL error.
-     */
-    DBR_EDBSQL,
     /**
      * @brief Is null.
      */
