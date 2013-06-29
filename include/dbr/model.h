@@ -27,16 +27,16 @@
 
 struct DbrModelVtbl {
     ssize_t
-    (*select_entity)(DbrModel model, int type, struct DbrSlNode** first);
+    (*read_entity)(DbrModel model, int type, struct DbrSlNode** first);
 
     struct DbrSlNode*
     (*end_entity)(DbrModel model);
 };
 
 static inline ssize_t
-dbr_model_select_entity(DbrModel model, int type, struct DbrSlNode** first)
+dbr_model_read_entity(DbrModel model, int type, struct DbrSlNode** first)
 {
-    return model->vtbl->select_entity(model, type, first);
+    return model->vtbl->read_entity(model, type, first);
 }
 
 static inline struct DbrSlNode*

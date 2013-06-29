@@ -75,9 +75,9 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->archive_trade(id, now);
     }
     static ssize_t
-    select_entity(DbrJourn journ, int type, DbrSlNode** first) noexcept
+    read_entity(DbrJourn journ, int type, DbrSlNode** first) noexcept
     {
-        return static_cast<DerivedT*>(journ)->select_entity(type, *first);
+        return static_cast<DerivedT*>(journ)->read_entity(type, *first);
     }
     static DbrSlNode*
     end_entity(DbrJourn journ) noexcept

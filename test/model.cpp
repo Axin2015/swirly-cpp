@@ -54,7 +54,7 @@ set_instr(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
 }
 
 ssize_t
-select_instr(DbrPool pool, DbrSlNode*& first) noexcept
+read_instr(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
@@ -91,7 +91,7 @@ set_market(DbrRec& rec, DbrIden id, const char* mnem, DbrIden instr, const char*
 }
 
 ssize_t
-select_market(DbrPool pool, DbrSlNode*& first) noexcept
+read_market(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
@@ -125,7 +125,7 @@ set_trader(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
 }
 
 ssize_t
-select_trader(DbrPool pool, DbrSlNode*& first) noexcept
+read_trader(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
@@ -159,7 +159,7 @@ set_accnt(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
 }
 
 ssize_t
-select_accnt(DbrPool pool, DbrSlNode*& first) noexcept
+read_accnt(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
@@ -181,7 +181,7 @@ select_accnt(DbrPool pool, DbrSlNode*& first) noexcept
 }
 
 ssize_t
-select_order(DbrPool pool, DbrSlNode*& first) noexcept
+read_order(DbrPool pool, DbrSlNode*& first) noexcept
 {
     first = nullptr;
     return 0;
@@ -195,7 +195,7 @@ set_memb(DbrMemb& memb, DbrIden accnt, DbrIden trader) noexcept
 }
 
 ssize_t
-select_memb(DbrPool pool, DbrSlNode*& first) noexcept
+read_memb(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
@@ -222,14 +222,14 @@ select_memb(DbrPool pool, DbrSlNode*& first) noexcept
 }
 
 ssize_t
-select_trade(DbrPool pool, DbrSlNode*& first) noexcept
+read_trade(DbrPool pool, DbrSlNode*& first) noexcept
 {
     first = nullptr;
     return 0;
 }
 
 ssize_t
-select_posn(DbrPool pool, DbrSlNode*& first) noexcept
+read_posn(DbrPool pool, DbrSlNode*& first) noexcept
 {
     first = nullptr;
     return 0;
@@ -237,33 +237,33 @@ select_posn(DbrPool pool, DbrSlNode*& first) noexcept
 } // anonymous
 
 ssize_t
-Model::select_entity(int type, DbrSlNode*& first) noexcept
+Model::read_entity(int type, DbrSlNode*& first) noexcept
 {
     ssize_t ret;
     switch (type) {
     case DBR_INSTR:
-        ret = select_instr(pool_, first);
+        ret = read_instr(pool_, first);
         break;
     case DBR_MARKET:
-        ret = select_market(pool_, first);
+        ret = read_market(pool_, first);
         break;
     case DBR_TRADER:
-        ret = select_trader(pool_, first);
+        ret = read_trader(pool_, first);
         break;
     case DBR_ACCNT:
-        ret = select_accnt(pool_, first);
+        ret = read_accnt(pool_, first);
         break;
     case DBR_ORDER:
-        ret = select_order(pool_, first);
+        ret = read_order(pool_, first);
         break;
     case DBR_MEMB:
-        ret = select_memb(pool_, first);
+        ret = read_memb(pool_, first);
         break;
     case DBR_TRADE:
-        ret = select_trade(pool_, first);
+        ret = read_trade(pool_, first);
         break;
     case DBR_POSN:
-        ret = select_posn(pool_, first);
+        ret = read_posn(pool_, first);
         break;
     default:
         ash_err_set(DBR_EINVAL, "invalid type '%d'", type);

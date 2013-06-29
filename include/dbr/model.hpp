@@ -27,9 +27,9 @@ namespace dbr {
 template <class DerivedT>
 class IModel : public DbrIModel {
     static ssize_t
-    select_entity(DbrModel model, int type, DbrSlNode** first) noexcept
+    read_entity(DbrModel model, int type, DbrSlNode** first) noexcept
     {
-        return static_cast<DerivedT*>(model)->select_entity(type, *first);
+        return static_cast<DerivedT*>(model)->read_entity(type, *first);
     }
     static DbrSlNode*
     end_entity(DbrModel model) noexcept
@@ -40,7 +40,7 @@ class IModel : public DbrIModel {
     vtbl() noexcept
     {
         static const DbrModelVtbl VTBL = {
-            select_entity,
+            read_entity,
             end_entity
         };
         return &VTBL;
@@ -53,9 +53,9 @@ public:
 };
 
 inline size_t
-select_entity(DbrModel model, int type, DbrSlNode*& first)
+read_entity(DbrModel model, int type, DbrSlNode*& first)
 {
-    const auto size = model->vtbl->select_entity(model, type, &first);
+    const auto size = model->vtbl->read_entity(model, type, &first);
     if (size < 0)
         throw_exception();
     return size;

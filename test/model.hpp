@@ -31,7 +31,7 @@ public:
     {
     }
     ssize_t
-    select_entity(int type, DbrSlNode*& first) noexcept;
+    read_entity(int type, DbrSlNode*& first) noexcept;
 
     DbrSlNode*
     end_entity() noexcept;
