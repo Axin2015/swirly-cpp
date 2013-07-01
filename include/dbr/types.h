@@ -38,7 +38,6 @@ typedef long DbrIden;
 
 typedef int DbrDate;
 typedef long DbrIncs;
-typedef long DbrIncs;
 typedef unsigned long DbrFlags;
 
 /**
