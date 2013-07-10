@@ -25,6 +25,11 @@
 
 typedef int DbrBool;
 
+enum {
+    DBR_FALSE,
+    DBR_TRUE
+};
+
 /** @} */
 
 #endif // DBR_BOOL_H
