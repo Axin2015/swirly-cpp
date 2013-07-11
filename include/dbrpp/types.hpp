@@ -15,29 +15,21 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
+#ifndef DBRPP_TYPES_HPP
+#define DBRPP_TYPES_HPP
 
-#include <dbrpp/ctx.hpp>
-#include <dbrpp/pool.hpp>
+#include <dbrpp/string.hpp>
 
-#include <dbr/conv.h>
-#include <dbr/trader.h>
+#include <dbr/types.h>
 
-using namespace dbr;
+namespace dbr {
 
-TEST_CASE(trader_id)
-{
-    Pool pool;
-    Model model(pool);
-    Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
+typedef NString<DBR_DISPLAY_MAX> Display;
+typedef NString<DBR_EMAIL_MAX> Email;
+typedef NString<DBR_MNEM_MAX> Mnem;
+typedef NString<DBR_REF_MAX> Ref;
+typedef NString<DBR_TENOR_MAX> Tenor;
 
-    TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
-    check(it != ctx.trecs().end());
+} // dbr
 
-    TraderRec trec(*it);
-    Trader trader = ctx.trader(*it);
-    check(trader.id() == trec.id());
-}
+#endif // DBRPP_TYPES_HPP

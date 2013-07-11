@@ -15,29 +15,36 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
+#ifndef DBRPP_SESS_HPP
+#define DBRPP_SESS_HPP
 
-#include <dbrpp/ctx.hpp>
-#include <dbrpp/pool.hpp>
+#include <dbrpp/order.hpp>
+#include <dbrpp/posn.hpp>
+#include <dbrpp/trade.hpp>
 
-#include <dbr/conv.h>
-#include <dbr/trader.h>
+namespace dbr {
 
-using namespace dbr;
+template <class DerivedT>
+class IAccntSess : public DbrIAccntSess {
+    static void
+    trade(DbrAccntSess sess, DbrOrder* order, DbrTrade* trade, DbrPosn* posn) noexcept
+    {
+        static_cast<DerivedT*>(sess)->trade(Order(*order), Trade(*trade), Posn(*posn));
+    }
+    static const DbrAccntSessVtbl*
+    vtbl() noexcept
+    {
+        static const DbrAccntSessVtbl VTBL = {
+            trade
+        };
+        return &VTBL;
+    }
+public:
+    IAccntSess()
+        : DbrIAccntSess{ vtbl() }
+    {
+    }
+};
+} // dbr
 
-TEST_CASE(trader_id)
-{
-    Pool pool;
-    Model model(pool);
-    Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
-
-    TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
-    check(it != ctx.trecs().end());
-
-    TraderRec trec(*it);
-    Trader trader = ctx.trader(*it);
-    check(trader.id() == trec.id());
-}
+#endif // DBRPP_SESS_HPP

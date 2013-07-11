@@ -18,7 +18,7 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <dbr/model.hpp>
+#include <dbrpp/model.hpp>
 
 #include <dbr/pool.h>
 

@@ -15,29 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
-
-#include <dbrpp/ctx.hpp>
-#include <dbrpp/pool.hpp>
-
-#include <dbr/conv.h>
-#include <dbr/trader.h>
-
-using namespace dbr;
-
-TEST_CASE(trader_id)
-{
-    Pool pool;
-    Model model(pool);
-    Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
-
-    TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
-    check(it != ctx.trecs().end());
-
-    TraderRec trec(*it);
-    Trader trader = ctx.trader(*it);
-    check(trader.id() == trec.id());
-}
+#include <dbrpp/trans.hpp>

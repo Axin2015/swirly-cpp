@@ -15,29 +15,53 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
+#ifndef DBRPP_LEVEL_HPP
+#define DBRPP_LEVEL_HPP
 
-#include <dbrpp/ctx.hpp>
-#include <dbrpp/pool.hpp>
+#include <dbr/types.h>
 
-#include <dbr/conv.h>
-#include <dbr/trader.h>
+#include <iostream>
 
-using namespace dbr;
+namespace dbr {
 
-TEST_CASE(trader_id)
+class Level {
+    DbrLevel impl_;
+public:
+    explicit
+    Level(DbrLevel impl) noexcept
+        : impl_(impl)
+    {
+    }
+    explicit
+    operator DbrLevel() const noexcept
+    {
+        return impl_;
+    }
+    size_t
+    count() const noexcept
+    {
+        return impl_.count;
+    }
+    DbrTicks
+    ticks() const noexcept
+    {
+        return impl_.ticks;
+    }
+    // Must be greater than zero.
+    DbrLots
+    resd() const noexcept
+    {
+        return impl_.resd;
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, Level level)
 {
-    Pool pool;
-    Model model(pool);
-    Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
-
-    TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
-    check(it != ctx.trecs().end());
-
-    TraderRec trec(*it);
-    Trader trader = ctx.trader(*it);
-    check(trader.id() == trec.id());
+    return os << "count=" << level.count()
+              << ",ticks=" << level.ticks()
+              << ",resd=" << level.resd();
 }
+} // dbr
+
+#endif // DBRPP_LEVEL_HPP

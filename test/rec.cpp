@@ -19,8 +19,8 @@
 #include "model.hpp"
 #include "test.hpp"
 
-#include <dbr/ctx.hpp>
-#include <dbr/pool.hpp>
+#include <dbrpp/ctx.hpp>
+#include <dbrpp/pool.hpp>
 
 #include <dbr/conv.h>
 

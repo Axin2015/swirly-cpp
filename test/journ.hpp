@@ -18,7 +18,7 @@
 #ifndef JOURN_HPP
 #define JOURN_HPP
 
-#include <dbr/journ.hpp>
+#include <dbrpp/journ.hpp>
 
 #include <dbr/pool.h>
 

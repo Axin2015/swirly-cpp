@@ -18,7 +18,7 @@
 #ifndef TEST_HPP
 #define TEST_HPP
 
-#include <dbr/except.hpp>
+#include <dbrpp/except.hpp>
 
 #include <cmath>    // fabs()
 #include <cstring>  // strcmp()

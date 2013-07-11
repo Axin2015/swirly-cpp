@@ -17,7 +17,7 @@
  */
 #include "test.hpp"
 
-#include <dbr/pool.hpp>
+#include <dbrpp/pool.hpp>
 
 using namespace dbr;
 
