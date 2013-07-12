@@ -35,28 +35,28 @@ ash_tree_init(struct AshTree* tree)
     tree->root = NULL;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_insert(struct AshTree* tree, struct DbrRbNode* node);
 
-DBR_EXTERN void
+DBR_API void
 ash_tree_pinsert(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_remove(struct AshTree* tree, struct DbrRbNode* node);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_find(const struct AshTree* tree, DbrKey key);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_nfind(const struct AshTree* tree, DbrKey key);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_pfind(const struct AshTree* tree, DbrKey key);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_first(const struct AshTree* tree);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_last(const struct AshTree* tree);
 
 static inline struct DbrRbNode*

@@ -5,4 +5,3 @@ FILE(GLOB dbrpp_SOURCES "*.cpp")
 
 ADD_LIBRARY(dbrpp_static STATIC ${dbrpp_SOURCES})
 SET_TARGET_PROPERTIES(dbrpp_static PROPERTIES OUTPUT_NAME dbrpp)
-TARGET_LINK_LIBRARIES(dbrpp_static dbr_static)

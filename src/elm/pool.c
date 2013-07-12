@@ -17,9 +17,10 @@
  */
 #include "pool.h"
 
-#include <dbr/conv.h>
-
 #include <ash/err.h>
+
+#include <dbr/conv.h>
+#include <dbr/pool.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -302,4 +303,126 @@ elm_pool_free_matches(struct ElmPool* pool, struct DbrSlNode* first)
         elm_pool_free_trade(pool, match->maker_trade);
         elm_pool_free_match(pool, match);
     }
+}
+
+DBR_API DbrPool
+dbr_pool_create(void)
+{
+    DbrPool pool = malloc(sizeof(struct ElmPool));
+    if (dbr_unlikely(!pool))
+        goto fail1;
+
+    if (dbr_unlikely(!elm_pool_init(pool)))
+        goto fail2;
+
+    return pool;
+ fail2:
+    free(pool);
+ fail1:
+    return NULL;
+}
+
+DBR_API void
+dbr_pool_destroy(DbrPool pool)
+{
+    if (pool) {
+        elm_pool_term(pool);
+        free(pool);
+    }
+}
+
+DBR_API struct DbrRec*
+dbr_pool_alloc_rec(DbrPool pool)
+{
+    return elm_pool_alloc_rec(pool);
+}
+
+DBR_API void
+dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
+{
+    elm_pool_free_rec(pool, rec);
+}
+
+DBR_API struct DbrLevel*
+dbr_pool_alloc_level(DbrPool pool, DbrKey key)
+{
+    return elm_pool_alloc_level(pool, key);
+}
+
+DBR_API void
+dbr_pool_free_level(DbrPool pool, struct DbrLevel* level)
+{
+    elm_pool_free_level(pool, level);
+}
+
+DBR_API struct DbrMatch*
+dbr_pool_alloc_match(DbrPool pool)
+{
+    return elm_pool_alloc_match(pool);
+}
+
+DBR_API void
+dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
+{
+    elm_pool_free_match(pool, match);
+}
+
+DBR_API struct DbrOrder*
+dbr_pool_alloc_order(DbrPool pool, DbrKey key)
+{
+    return elm_pool_alloc_order(pool, key);
+}
+
+DBR_API void
+dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
+{
+    elm_pool_free_order(pool, order);
+}
+
+DBR_API struct DbrMemb*
+dbr_pool_alloc_memb(DbrPool pool, DbrKey key)
+{
+    return elm_pool_alloc_memb(pool, key);
+}
+
+DBR_API void
+dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
+{
+    elm_pool_free_memb(pool, memb);
+}
+
+DBR_API struct DbrTrade*
+dbr_pool_alloc_trade(DbrPool pool, DbrKey key)
+{
+    return elm_pool_alloc_trade(pool, key);
+}
+
+DBR_API void
+dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade)
+{
+    elm_pool_free_trade(pool, trade);
+}
+
+DBR_API struct DbrPosn*
+dbr_pool_alloc_posn(DbrPool pool, DbrKey key)
+{
+    return elm_pool_alloc_posn(pool, key);
+}
+
+DBR_API void
+dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
+{
+    elm_pool_free_posn(pool, posn);
+}
+
+DBR_API struct DbrSub*
+dbr_pool_alloc_sub(DbrPool pool, DbrKey key)
+{
+    return elm_pool_alloc_sub(pool, key);
+}
+
+DBR_API void
+dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
+{
+    elm_pool_free_sub(pool, sub);
 }

@@ -33,10 +33,10 @@ ash_rbnode_init(struct DbrRbNode* node, DbrKey key)
     node->color = 0;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_rbnode_next(struct DbrRbNode* node);
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_rbnode_prev(struct DbrRbNode* node);
 
 #endif // ASH_RBNODE_H

@@ -28,7 +28,7 @@ static __thread struct {
     char msg[DBR_ERROR_MAX + 1];
 } err;
 
-DBR_EXTERN void
+DBR_API void
 ash_err_clear(void)
 {
     err.num = 0;
@@ -37,13 +37,13 @@ ash_err_clear(void)
     err.msg[0] = '\0';
 }
 
-DBR_EXTERN void
+DBR_API void
 ash_err_print(FILE* stream, const char* s)
 {
     fprintf(stream, "%s:%d: %s: %s (%d)\n", err.file, err.line, s, err.msg, err.num);
 }
 
-DBR_EXTERN void
+DBR_API void
 ash_err_vset_(int num, const char* file, int line, const char* format, va_list args)
 {
     err.num = num;
@@ -56,7 +56,7 @@ ash_err_vset_(int num, const char* file, int line, const char* format, va_list a
         strcpy(err.msg, "bad format");
 }
 
-DBR_EXTERN void
+DBR_API void
 ash_err_set_(int num, const char* file, int line, const char* format, ...)
 {
     va_list args;
@@ -65,25 +65,25 @@ ash_err_set_(int num, const char* file, int line, const char* format, ...)
     va_end(args);
 }
 
-DBR_EXTERN int
+DBR_API int
 ash_err_num(void)
 {
     return err.num;
 }
 
-DBR_EXTERN const char*
+DBR_API const char*
 ash_err_file(void)
 {
     return err.file;
 }
 
-DBR_EXTERN int
+DBR_API int
 ash_err_line(void)
 {
     return err.line;
 }
 
-DBR_EXTERN const char*
+DBR_API const char*
 ash_err_msg(void)
 {
     return err.msg;

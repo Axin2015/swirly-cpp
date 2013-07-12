@@ -205,7 +205,7 @@ remove_color(struct AshTree* tree, struct DbrRbNode* parent, struct DbrRbNode* n
         node->color = BLACK;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_insert(struct AshTree* tree, struct DbrRbNode* node)
 {
     struct DbrRbNode* tmp;
@@ -234,7 +234,7 @@ ash_tree_insert(struct AshTree* tree, struct DbrRbNode* node)
     return NULL;
 }
 
-DBR_EXTERN void
+DBR_API void
 ash_tree_pinsert(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent)
 {
     set(node, parent);
@@ -249,7 +249,7 @@ ash_tree_pinsert(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode*
     insert_color(tree, node);
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_remove(struct AshTree* tree, struct DbrRbNode* node)
 {
     struct DbrRbNode* child, * parent, * old = node;
@@ -312,7 +312,7 @@ ash_tree_remove(struct AshTree* tree, struct DbrRbNode* node)
     return old;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_find(const struct AshTree* tree, DbrKey key)
 {
     struct DbrRbNode* tmp = tree->root;
@@ -329,7 +329,7 @@ ash_tree_find(const struct AshTree* tree, DbrKey key)
     return NULL;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_nfind(const struct AshTree* tree, DbrKey key)
 {
     struct DbrRbNode* tmp = tree->root;
@@ -349,7 +349,7 @@ ash_tree_nfind(const struct AshTree* tree, DbrKey key)
     return res;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_pfind(const struct AshTree* tree, DbrKey key)
 {
     struct DbrRbNode* tmp = tree->root;
@@ -368,7 +368,7 @@ ash_tree_pfind(const struct AshTree* tree, DbrKey key)
     return parent;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_first(const struct AshTree* tree)
 {
     struct DbrRbNode* tmp = tree->root;
@@ -380,7 +380,7 @@ ash_tree_first(const struct AshTree* tree)
     return parent;
 }
 
-DBR_EXTERN struct DbrRbNode*
+DBR_API struct DbrRbNode*
 ash_tree_last(const struct AshTree* tree)
 {
     struct DbrRbNode* tmp = tree->root;
