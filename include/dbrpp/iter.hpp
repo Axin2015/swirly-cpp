@@ -20,7 +20,7 @@
 
 #include <iterator>
 
-namespace dbr {
+namespace dbrpp {
 
 template <class PolicyT>
 class ConstBiDirectionalIterator;
@@ -397,6 +397,6 @@ operator !=(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noe
 {
     return lhs != ConstForwardIterator<PolicyT>(rhs);
 }
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_ITER_HPP

@@ -22,7 +22,7 @@
 #include <dbrpp/posn.hpp>
 #include <dbrpp/trade.hpp>
 
-namespace dbr {
+namespace dbrpp {
 
 class Match {
     DbrMatch& impl_;
@@ -99,6 +99,6 @@ operator <<(std::ostream& os, Match match)
               << ",taker_trade=" << match.taker_trade().id()
               << ",maker_trade=" << match.maker_trade().id();
 }
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_MATCH_HPP

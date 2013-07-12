@@ -15,28 +15,31 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_RBNODE_H
-#define ASH_RBNODE_H
+#ifndef DBRPP_SLNODE_HPP
+#define DBRPP_SLNODE_HPP
 
-#include <dbr/node.h>
+#include <dbr/slnode.h>
 
-#include <assert.h>
-#include <stddef.h>
+namespace dbrpp {
 
-#define ASH_RBNODE_INIT(n, k) { .key = k, .left = NULL, .right = NULL, .parent = NULL, .color = 0 }
+template <typename NodeT>
+struct NodeTraits;
 
-static inline void
-ash_rbnode_init(struct DbrRbNode* node, DbrKey key)
-{
-    node->key = key;
-    node->left = node->right = node->parent = NULL;
-    node->color = 0;
-}
+template<>
+struct NodeTraits<DbrSlNode> {
+    typedef DbrSlNode Node;
+    static Node*
+    next(Node* node) noexcept
+    {
+        return node->next;
+    }
+    static const Node*
+    next(const Node* node) noexcept
+    {
+        return node->next;
+    }
+};
 
-DBR_API struct DbrRbNode*
-ash_rbnode_next(struct DbrRbNode* node);
+} // dbrpp
 
-DBR_API struct DbrRbNode*
-ash_rbnode_prev(struct DbrRbNode* node);
-
-#endif // ASH_RBNODE_H
+#endif // DBRPP_SLNODE_HPP

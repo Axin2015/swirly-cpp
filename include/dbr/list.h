@@ -15,88 +15,87 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_LIST_H
-#define ASH_LIST_H
+#ifndef DBR_LIST_H
+#define DBR_LIST_H
 
-#include <ash/dlnode.h>
+#include <dbr/defs.h>
+#include <dbr/dlnode.h>
 
-#include <dbr/bool.h>
-
-struct AshList {
+struct DbrList {
     struct DbrDlNode end;
 };
 
-#define ASH_LIST_INIT(l) { .end = { .prev = &l.end, .next = &l.end } }
+#define DBR_LIST_INIT(l) { .end = { .prev = &l.end, .next = &l.end } }
 
 static inline void
-ash_list_init(struct AshList* list)
+dbr_list_init(struct DbrList* list)
 {
     list->end.prev = &list->end;
     list->end.next = &list->end;
 }
 
 static inline void
-ash_list_insert_front(struct AshList* list, struct DbrDlNode* new_node)
+dbr_list_insert_front(struct DbrList* list, struct DbrDlNode* new_node)
 {
-    ash_dlnode_insert_before(list->end.next, new_node);
+    dbr_dlnode_insert_before(list->end.next, new_node);
 }
 
 static inline void
-ash_list_insert_back(struct AshList* list, struct DbrDlNode* new_node)
+dbr_list_insert_back(struct DbrList* list, struct DbrDlNode* new_node)
 {
-    ash_dlnode_insert_after(list->end.prev, new_node);
+    dbr_dlnode_insert_after(list->end.prev, new_node);
 }
 
 static inline struct DbrDlNode*
-ash_list_remove_first(struct AshList* list)
+dbr_list_remove_first(struct DbrList* list)
 {
     struct DbrDlNode* node = list->end.next;
-    ash_dlnode_remove(node);
+    dbr_dlnode_remove(node);
     return node;
 }
 
 static inline struct DbrDlNode*
-ash_list_remove_last(struct AshList* list)
+dbr_list_remove_last(struct DbrList* list)
 {
     struct DbrDlNode* node = list->end.prev;
-    ash_dlnode_remove(node);
+    dbr_dlnode_remove(node);
     return node;
 }
 
 static inline struct DbrDlNode*
-ash_list_pop(struct AshList* list)
+dbr_list_pop(struct DbrList* list)
 {
-    return ash_list_remove_first(list);
+    return dbr_list_remove_first(list);
 }
 
 static inline void
-ash_list_push(struct AshList* list, struct DbrDlNode* new_node)
+dbr_list_push(struct DbrList* list, struct DbrDlNode* new_node)
 {
-    ash_list_insert_front(list, new_node);
+    dbr_list_insert_front(list, new_node);
 }
 
 static inline struct DbrDlNode*
-ash_list_first(const struct AshList* list)
+dbr_list_first(const struct DbrList* list)
 {
     return list->end.next;
 }
 
 static inline struct DbrDlNode*
-ash_list_last(const struct AshList* list)
+dbr_list_last(const struct DbrList* list)
 {
     return list->end.prev;
 }
 
 static inline struct DbrDlNode*
-ash_list_end(const struct AshList* list)
+dbr_list_end(const struct DbrList* list)
 {
     return (struct DbrDlNode*)&list->end;
 }
 
 static inline DbrBool
-ash_list_empty(const struct AshList* list)
+dbr_list_empty(const struct DbrList* list)
 {
     return list->end.next == &list->end;
 }
 
-#endif // ASH_LIST_H
+#endif // DBR_LIST_H

@@ -22,7 +22,7 @@
 
 #include <dbr/pool.h>
 
-class Journ : public dbr::IJourn<Journ> {
+class Journ : public dbrpp::IJourn<Journ> {
     DbrIden id_;
 public:
     explicit
@@ -43,7 +43,7 @@ public:
     rollback_trans() noexcept;
 
     DbrBool
-    insert_order(dbr::Order order) noexcept;
+    insert_order(dbrpp::Order order) noexcept;
 
     DbrBool
     update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
@@ -53,7 +53,7 @@ public:
     archive_order(DbrIden id, DbrMillis now) noexcept;
 
     DbrBool
-    insert_trade(dbr::Trade trade) noexcept;
+    insert_trade(dbrpp::Trade trade) noexcept;
 
     DbrBool
     archive_trade(DbrIden id, DbrMillis now) noexcept;

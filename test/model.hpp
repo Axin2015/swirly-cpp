@@ -22,7 +22,7 @@
 
 #include <dbr/pool.h>
 
-class Model : public dbr::IModel<Model> {
+class Model : public dbrpp::IModel<Model> {
     DbrPool pool_;
 public:
     explicit

@@ -23,7 +23,7 @@
 #include <cstring>
 #include <stdexcept>
 
-namespace dbr {
+namespace dbrpp {
 
 class DbrException : public std::exception {
     int num_;
@@ -122,6 +122,6 @@ throw_exception()
 {
     throw_exception(dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg());
 }
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_EXCEPT_HPP

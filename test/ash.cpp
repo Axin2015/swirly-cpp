@@ -17,10 +17,9 @@
  */
 #include "test.hpp"
 
-#include <ash/list.h>
-#include <ash/queue.h>
-#include <ash/stack.h>
-#include <ash/slnode.h>
+#include <dbr/list.h>
+#include <dbr/queue.h>
+#include <dbr/stack.h>
 
 struct SlElem {
     int id;
@@ -33,65 +32,65 @@ dbr_elem_from_node(DbrSlNode* node)
     return dbr_implof(SlElem, node, node);
 }
 
-TEST_CASE(ash_list)
+TEST_CASE(list)
 {
-    AshList l = ASH_LIST_INIT(l);
+    DbrList l = DBR_LIST_INIT(l);
 
-    check(ash_list_empty(&l));
-    check(ash_list_first(&l) == ash_list_end(&l));
+    check(dbr_list_empty(&l));
+    check(dbr_list_first(&l) == dbr_list_end(&l));
 }
 
-TEST_CASE(ash_queue)
+TEST_CASE(queue)
 {
-    AshQueue q = ASH_QUEUE_INIT(q);
+    DbrQueue q = DBR_QUEUE_INIT(q);
 
-    check(ash_queue_empty(&q));
-    check(ash_queue_first(&q) == ash_queue_end(&q));
+    check(dbr_queue_empty(&q));
+    check(dbr_queue_first(&q) == dbr_queue_end(&q));
 
     SlElem e1 = { .id = 1, .node = { .next = NULL } };
     SlElem e2 = { .id = 2, .node = { .next = NULL } };
     SlElem e3 = { .id = 3, .node = { .next = NULL } };
 
-    ash_queue_insert_front(&q, &e1.node);
-    ash_queue_insert_front(&q, &e2.node);
-    ash_queue_insert_front(&q, &e3.node);
+    dbr_queue_insert_front(&q, &e1.node);
+    dbr_queue_insert_front(&q, &e2.node);
+    dbr_queue_insert_front(&q, &e3.node);
 
-    check(!ash_queue_empty(&q));
-    check(ash_queue_first(&q) == &e3.node);
-    check(ash_queue_first(&q)->next == &e2.node);
-    check(ash_queue_first(&q)->next->next == &e1.node);
-    check(ash_queue_first(&q)->next->next->next == ash_queue_end(&q));
+    check(!dbr_queue_empty(&q));
+    check(dbr_queue_first(&q) == &e3.node);
+    check(dbr_queue_first(&q)->next == &e2.node);
+    check(dbr_queue_first(&q)->next->next == &e1.node);
+    check(dbr_queue_first(&q)->next->next->next == dbr_queue_end(&q));
 
-    check(ash_queue_remove_first(&q) == &e3.node);
-    check(!ash_queue_empty(&q));
-    check(ash_queue_first(&q) == &e2.node);
-    check(ash_queue_first(&q)->next == &e1.node);
-    check(ash_queue_first(&q)->next->next == ash_queue_end(&q));
+    check(dbr_queue_remove_first(&q) == &e3.node);
+    check(!dbr_queue_empty(&q));
+    check(dbr_queue_first(&q) == &e2.node);
+    check(dbr_queue_first(&q)->next == &e1.node);
+    check(dbr_queue_first(&q)->next->next == dbr_queue_end(&q));
 
-    check(ash_queue_remove_first(&q) == &e2.node);
-    check(!ash_queue_empty(&q));
-    check(ash_queue_first(&q) == &e1.node);
-    check(ash_queue_first(&q)->next == ash_queue_end(&q));
+    check(dbr_queue_remove_first(&q) == &e2.node);
+    check(!dbr_queue_empty(&q));
+    check(dbr_queue_first(&q) == &e1.node);
+    check(dbr_queue_first(&q)->next == dbr_queue_end(&q));
 
-    check(ash_queue_remove_first(&q) == &e1.node);
-    check(ash_queue_empty(&q));
-    check(ash_queue_first(&q) == ash_queue_end(&q));
+    check(dbr_queue_remove_first(&q) == &e1.node);
+    check(dbr_queue_empty(&q));
+    check(dbr_queue_first(&q) == dbr_queue_end(&q));
 
-    ash_queue_insert_front(&q, &e1.node);
-    ash_queue_insert_after(&q, &e1.node, &e2.node);
-    ash_queue_insert_after(&q, &e2.node, &e3.node);
+    dbr_queue_insert_front(&q, &e1.node);
+    dbr_queue_insert_after(&q, &e1.node, &e2.node);
+    dbr_queue_insert_after(&q, &e2.node, &e3.node);
 
-    check(!ash_queue_empty(&q));
-    check(ash_queue_first(&q) == &e1.node);
-    check(ash_queue_first(&q)->next == &e2.node);
-    check(ash_queue_first(&q)->next->next == &e3.node);
-    check(ash_queue_first(&q)->next->next->next == ash_queue_end(&q));
+    check(!dbr_queue_empty(&q));
+    check(dbr_queue_first(&q) == &e1.node);
+    check(dbr_queue_first(&q)->next == &e2.node);
+    check(dbr_queue_first(&q)->next->next == &e3.node);
+    check(dbr_queue_first(&q)->next->next->next == dbr_queue_end(&q));
 }
 
-TEST_CASE(ash_stack)
+TEST_CASE(stack)
 {
-    AshStack s = ASH_STACK_INIT(s);
+    DbrStack s = DBR_STACK_INIT(s);
 
-    check(ash_stack_empty(&s));
-    check(ash_stack_first(&s) == ash_stack_end(&s));
+    check(dbr_stack_empty(&s));
+    check(dbr_stack_first(&s) == dbr_stack_end(&s));
 }

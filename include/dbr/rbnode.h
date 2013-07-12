@@ -15,10 +15,12 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_NODE_H
-#define DBR_NODE_H
+#ifndef DBR_RBNODE_H
+#define DBR_RBNODE_H
 
 #include <dbr/defs.h>
+
+#include <stddef.h>
 
 /**
  * @addtogroup Types
@@ -35,21 +37,6 @@ typedef long DbrKey;
  */
 
 /**
- * @brief Singly-linked node.
- */
-struct DbrSlNode {
-    struct DbrSlNode* next;
-};
-
-/**
- * @brief Doubly-linked node.
- */
-struct DbrDlNode {
-    struct DbrDlNode* prev;
-    struct DbrDlNode* next;
-};
-
-/**
  * @brief Red-black node.
  */
 struct DbrRbNode {
@@ -60,14 +47,15 @@ struct DbrRbNode {
     int color;
 };
 
-/** @} */
+#define DBR_RBNODE_INIT(n, k) { .key = k, .left = NULL, .right = NULL, .parent = NULL, .color = 0 }
 
-#if !defined(DBR_HIDE_API)
-
-/**
- * @addtogroup Node
- * @{
- */
+static inline void
+dbr_rbnode_init(struct DbrRbNode* node, DbrKey key)
+{
+    node->key = key;
+    node->left = node->right = node->parent = NULL;
+    node->color = 0;
+}
 
 /**
  * @brief Next node from current node.
@@ -85,6 +73,4 @@ dbr_rbnode_prev(struct DbrRbNode* node);
 
 /** @} */
 
-#endif // !defined(DBR_HIDE_API)
-
-#endif // DBR_NODE_H
+#endif // DBR_RBNODE_H

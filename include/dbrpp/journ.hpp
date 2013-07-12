@@ -24,7 +24,7 @@
 
 #include <dbr/journ.h>
 
-namespace dbr {
+namespace dbrpp {
 
 template <class DerivedT>
 class IJourn : public DbrIJourn {
@@ -173,6 +173,6 @@ archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
         throw_exception();
 }
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_JOURN_HPP

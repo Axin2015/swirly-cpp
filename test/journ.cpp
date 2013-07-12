@@ -17,7 +17,7 @@
  */
 #include "journ.hpp"
 
-using namespace dbr;
+using namespace dbrpp;
 using namespace std;
 
 DbrIden

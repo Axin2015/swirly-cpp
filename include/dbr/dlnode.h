@@ -15,25 +15,36 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_DLNODE_H
-#define ASH_DLNODE_H
-
-#include <dbr/node.h>
+#ifndef DBR_DLNODE_H
+#define DBR_DLNODE_H
 
 #include <assert.h>
 #include <stddef.h>
 
-#define ASH_DLNODE_INIT(n) { .prev = NULL, .next = NULL }
+/**
+ * @addtogroup Node
+ * @{
+ */
+
+/**
+ * @brief Doubly-linked node.
+ */
+struct DbrDlNode {
+    struct DbrDlNode* prev;
+    struct DbrDlNode* next;
+};
+
+#define DBR_DLNODE_INIT(n) { .prev = NULL, .next = NULL }
 
 static inline void
-ash_dlnode_init(struct DbrDlNode* node)
+dbr_dlnode_init(struct DbrDlNode* node)
 {
     assert(node);
     node->prev = node->next = NULL;
 }
 
 static inline void
-ash_dlnode_insert(struct DbrDlNode* prev, struct DbrDlNode* next, struct DbrDlNode* new_node)
+dbr_dlnode_insert(struct DbrDlNode* prev, struct DbrDlNode* next, struct DbrDlNode* new_node)
 {
     assert(prev);
     assert(next);
@@ -46,21 +57,21 @@ ash_dlnode_insert(struct DbrDlNode* prev, struct DbrDlNode* next, struct DbrDlNo
 }
 
 static inline void
-ash_dlnode_insert_before(struct DbrDlNode* node, struct DbrDlNode* new_node)
+dbr_dlnode_insert_before(struct DbrDlNode* node, struct DbrDlNode* new_node)
 {
     assert(node);
-    ash_dlnode_insert(node->prev, node, new_node);
+    dbr_dlnode_insert(node->prev, node, new_node);
 }
 
 static inline void
-ash_dlnode_insert_after(struct DbrDlNode* node, struct DbrDlNode* new_node)
+dbr_dlnode_insert_after(struct DbrDlNode* node, struct DbrDlNode* new_node)
 {
     assert(node);
-    ash_dlnode_insert(node, node->next, new_node);
+    dbr_dlnode_insert(node, node->next, new_node);
 }
 
 static inline void
-ash_dlnode_remove(struct DbrDlNode* node)
+dbr_dlnode_remove(struct DbrDlNode* node)
 {
     assert(node);
     node->prev->next = node->next;
@@ -68,17 +79,19 @@ ash_dlnode_remove(struct DbrDlNode* node)
 }
 
 static inline struct DbrDlNode*
-ash_dlnode_next(struct DbrDlNode* node)
+dbr_dlnode_next(struct DbrDlNode* node)
 {
     assert(node);
     return node->next;
 }
 
 static inline struct DbrDlNode*
-ash_dlnode_prev(struct DbrDlNode* node)
+dbr_dlnode_prev(struct DbrDlNode* node)
 {
     assert(node);
     return node->prev;
 }
 
-#endif // ASH_DLNODE_H
+/** @} */
+
+#endif // DBR_DLNODE_H

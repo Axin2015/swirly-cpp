@@ -18,10 +18,9 @@
 #ifndef DBR_TYPES_H
 #define DBR_TYPES_H
 
-#include <dbr/bool.h>
-#include <dbr/node.h>
-
-#include <stddef.h>
+#include <dbr/dlnode.h>
+#include <dbr/rbnode.h>
+#include <dbr/slnode.h>
 
 #include <sys/types.h> // ssize_t
 

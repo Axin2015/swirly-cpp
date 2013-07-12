@@ -15,21 +15,41 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_BOOL_H
-#define DBR_BOOL_H
+#ifndef DBRPP_DLNODE_HPP
+#define DBRPP_DLNODE_HPP
 
-/**
- * @addtogroup Types
- * @{
- */
+#include <dbr/dlnode.h>
 
-typedef int DbrBool;
+namespace dbrpp {
 
-enum {
-    DBR_FALSE,
-    DBR_TRUE
+template <typename NodeT>
+struct NodeTraits;
+
+template<>
+struct NodeTraits<DbrDlNode> {
+    typedef DbrDlNode Node;
+    static Node*
+    next(Node* node) noexcept
+    {
+        return node->next;
+    }
+    static const Node*
+    next(const Node* node) noexcept
+    {
+        return node->next;
+    }
+    static Node*
+    prev(Node* node) noexcept
+    {
+        return node->prev;
+    }
+    static const Node*
+    prev(const Node* node) noexcept
+    {
+        return node->prev;
+    }
 };
 
-/** @} */
+} // dbrpp
 
-#endif // DBR_BOOL_H
+#endif // DBRPP_DLNODE_HPP

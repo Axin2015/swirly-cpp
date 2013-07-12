@@ -15,31 +15,28 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_QUEUE_H
-#define ASH_QUEUE_H
+#ifndef DBR_QUEUE_H
+#define DBR_QUEUE_H
 
-#include <dbr/bool.h>
-#include <dbr/node.h>
+#include <dbr/defs.h>
+#include <dbr/slnode.h>
 
-#include <assert.h>
-#include <stddef.h> // NULL
-
-struct AshQueue {
+struct DbrQueue {
     struct DbrSlNode* first;
     struct DbrSlNode** last;
 };
 
-#define ASH_QUEUE_INIT(q) { .first = NULL, .last = &q.first }
+#define DBR_QUEUE_INIT(q) { .first = NULL, .last = &q.first }
 
 static inline void
-ash_queue_init(struct AshQueue* queue)
+dbr_queue_init(struct DbrQueue* queue)
 {
 	queue->first = NULL;
 	queue->last = &queue->first;
 }
 
 static inline void
-ash_queue_insert_after(struct AshQueue* queue, struct DbrSlNode* node, struct DbrSlNode* new_node)
+dbr_queue_insert_after(struct DbrQueue* queue, struct DbrSlNode* node, struct DbrSlNode* new_node)
 {
 	if (!(new_node->next = node->next))
 		queue->last = &new_node->next;
@@ -47,7 +44,7 @@ ash_queue_insert_after(struct AshQueue* queue, struct DbrSlNode* node, struct Db
 }
 
 static inline void
-ash_queue_insert_front(struct AshQueue* queue, struct DbrSlNode* new_node)
+dbr_queue_insert_front(struct DbrQueue* queue, struct DbrSlNode* new_node)
 {
 	if (!(new_node->next = queue->first))
 		queue->last = &new_node->next;
@@ -55,7 +52,7 @@ ash_queue_insert_front(struct AshQueue* queue, struct DbrSlNode* new_node)
 }
 
 static inline void
-ash_queue_insert_back(struct AshQueue* queue, struct DbrSlNode* new_node)
+dbr_queue_insert_back(struct DbrQueue* queue, struct DbrSlNode* new_node)
 {
 	new_node->next = NULL;
 	*queue->last = new_node;
@@ -63,7 +60,7 @@ ash_queue_insert_back(struct AshQueue* queue, struct DbrSlNode* new_node)
 }
 
 static inline struct DbrSlNode*
-ash_queue_remove_first(struct AshQueue* queue)
+dbr_queue_remove_first(struct DbrQueue* queue)
 {
     struct DbrSlNode* first = queue->first;
 	if (!(queue->first = queue->first->next))
@@ -72,33 +69,33 @@ ash_queue_remove_first(struct AshQueue* queue)
 }
 
 static inline void
-ash_queue_push(struct AshQueue* queue, struct DbrSlNode* new_node)
+dbr_queue_push(struct DbrQueue* queue, struct DbrSlNode* new_node)
 {
-    ash_queue_insert_front(queue, new_node);
+    dbr_queue_insert_front(queue, new_node);
 }
 
 static inline struct DbrSlNode*
-ash_queue_pop(struct AshQueue* queue)
+dbr_queue_pop(struct DbrQueue* queue)
 {
-    return ash_queue_remove_first(queue);
+    return dbr_queue_remove_first(queue);
 }
 
 static inline struct DbrSlNode*
-ash_queue_first(const struct AshQueue* queue)
+dbr_queue_first(const struct DbrQueue* queue)
 {
     return queue->first;
 }
 
 static inline struct DbrSlNode*
-ash_queue_end(const struct AshQueue* queue)
+dbr_queue_end(const struct DbrQueue* queue)
 {
     return NULL;
 }
 
 static inline DbrBool
-ash_queue_empty(const struct AshQueue* queue)
+dbr_queue_empty(const struct DbrQueue* queue)
 {
     return queue->first == NULL;
 }
 
-#endif // ASH_QUEUE_H
+#endif // DBR_QUEUE_H

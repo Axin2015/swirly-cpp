@@ -15,10 +15,10 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "rbnode.h"
+#include <dbr/rbnode.h>
 
 DBR_API struct DbrRbNode*
-ash_rbnode_next(struct DbrRbNode* node)
+dbr_rbnode_next(struct DbrRbNode* node)
 {
     if (node->right) {
         node = node->right;
@@ -37,7 +37,7 @@ ash_rbnode_next(struct DbrRbNode* node)
 }
 
 DBR_API struct DbrRbNode*
-ash_rbnode_prev(struct DbrRbNode* node)
+dbr_rbnode_prev(struct DbrRbNode* node)
 {
     if (node->left) {
         node = node->left;

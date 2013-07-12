@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-namespace dbr {
+namespace dbrpp {
 
 class Market {
     DbrMarket impl_;
@@ -72,6 +72,6 @@ operator <<(std::ostream& os, Market market)
     return os << "id=" << market.id();
 }
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_MARKET_HPP

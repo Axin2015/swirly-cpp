@@ -20,11 +20,10 @@
 #include "test.hpp"
 
 #include <dbr/conv.h>
+#include <dbr/err.h>
+#include <dbr/queue.h>
 
-#include <ash/err.h>
-#include <ash/queue.h>
-
-using namespace dbr;
+using namespace dbrpp;
 using namespace std;
 
 namespace {
@@ -58,19 +57,19 @@ read_instr(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
-    AshQueue rq;
-    ash_queue_init(&rq);
+    DbrQueue rq;
+    dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     set_instr(*rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     set_instr(*rec, 2, "GBPUSD.SPOTFWD", "GBPUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "GBP", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     first = rq.first;
@@ -95,17 +94,17 @@ read_market(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
-    AshQueue rq;
-    ash_queue_init(&rq);
+    DbrQueue rq;
+    dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     set_market(*rec, 1, "EURUSD", 1, "SP", 20130417);
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     set_market(*rec, 2, "GBPUSD", 2, "SP", 20130417);
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     first = rq.first;
@@ -129,17 +128,17 @@ read_trader(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
-    AshQueue rq;
-    ash_queue_init(&rq);
+    DbrQueue rq;
+    dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     set_trader(*rec, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     set_trader(*rec, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     first = rq.first;
@@ -163,17 +162,17 @@ read_accnt(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
-    AshQueue rq;
-    ash_queue_init(&rq);
+    DbrQueue rq;
+    dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     set_accnt(*rec, 1, "DBRA", "Account A", "dbra@doobry.org");
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     set_accnt(*rec, 2, "DBRB", "Account B", "dbrb@doobry.org");
-    ash_queue_push(&rq, &rec->model_node_);
+    dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     first = rq.first;
@@ -199,22 +198,22 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
-    AshQueue rq;
-    ash_queue_init(&rq);
+    DbrQueue rq;
+    dbr_queue_init(&rq);
 
     DbrMemb* memb = dbr_pool_alloc_memb(pool, 1);
     set_memb(*memb, 1, 1);
-    ash_queue_push(&rq, &memb->model_node_);
+    dbr_queue_push(&rq, &memb->model_node_);
     ++size;
 
     memb = dbr_pool_alloc_memb(pool, 1);
     set_memb(*memb, 2, 1);
-    ash_queue_push(&rq, &memb->model_node_);
+    dbr_queue_push(&rq, &memb->model_node_);
     ++size;
 
     memb = dbr_pool_alloc_memb(pool, 2);
     set_memb(*memb, 2, 2);
-    ash_queue_push(&rq, &memb->model_node_);
+    dbr_queue_push(&rq, &memb->model_node_);
     ++size;
 
     first = rq.first;
@@ -266,7 +265,7 @@ Model::read_entity(int type, DbrSlNode*& first) noexcept
         ret = read_posn(pool_, first);
         break;
     default:
-        ash_err_set(DBR_EINVAL, "invalid type '%d'", type);
+        dbr_err_set(DBR_EINVAL, "invalid type '%d'", type);
         first = nullptr;
         ret = -1;
     }

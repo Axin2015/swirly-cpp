@@ -20,8 +20,7 @@
 #include "pool.h"
 
 #include <dbr/conv.h>
-
-#include <ash/err.h>
+#include <dbr/err.h>
 
 #include <stdlib.h>
 
@@ -29,7 +28,7 @@ static struct DbrLevel*
 lazy_level(struct ElmSide* side, struct DbrOrder* order)
 {
     const DbrIden key = order->action == DBR_BUY ? -order->ticks : order->ticks;
-	struct DbrRbNode* node = ash_tree_pfind(&side->levels, key);
+	struct DbrRbNode* node = dbr_tree_pfind(&side->levels, key);
 
 	struct DbrLevel* level;
     if (!node || node->key != key) {
@@ -42,7 +41,7 @@ lazy_level(struct ElmSide* side, struct DbrOrder* order)
         level->resd = order->resd;
         DBR_DEBUG2F("insert level: market=%.16s,ticks=%ld", order->market.rec->mnem,
                     order->ticks);
-        ash_tree_pinsert(&side->levels, &level->side_node_, node);
+        dbr_tree_pinsert(&side->levels, &level->side_node_, node);
     } else {
         level = dbr_side_level_entry(node);
         ++level->count;
@@ -75,8 +74,8 @@ DBR_EXTERN void
 elm_side_init(struct ElmSide* side, struct ElmPool* pool)
 {
     side->pool = pool;
-    ash_tree_init(&side->levels);
-    ash_list_init(&side->orders);
+    dbr_tree_init(&side->levels);
+    dbr_list_init(&side->orders);
 
     // Last trade.
     side->last_ticks = 0;
@@ -88,8 +87,8 @@ DBR_EXTERN void
 elm_side_term(struct ElmSide* side)
 {
     assert(side);
-    while (!ash_list_empty(&side->orders)) {
-        struct DbrOrder* order = dbr_side_order_entry(ash_list_remove_first(&side->orders));
+    while (!dbr_list_empty(&side->orders)) {
+        struct DbrOrder* order = dbr_side_order_entry(dbr_list_remove_first(&side->orders));
         // Revision is unchanged by this call.
         elm_side_remove_order(side, order);
     }
@@ -110,13 +109,13 @@ elm_side_insert_order(struct ElmSide* side, struct DbrOrder* order)
     if (!level)
         return false;
 
-    struct DbrRbNode* next_level = ash_rbnode_next(&level->side_node_);
+    struct DbrRbNode* next_level = dbr_rbnode_next(&level->side_node_);
     struct DbrDlNode* end = next_level
         ? &dbr_side_level_entry(next_level)->first_order->side_node_
-        : ash_list_end(&side->orders);
+        : dbr_list_end(&side->orders);
     // Insert order after the level's last order.
     // I.e. insert order before the next level's first order.
-    ash_dlnode_insert_before(end, &order->side_node_);
+    dbr_dlnode_insert_before(end, &order->side_node_);
     return true;
 }
 
@@ -131,18 +130,18 @@ elm_side_remove_order(struct ElmSide* side, struct DbrOrder* order)
         assert(level->resd == 0);
         DBR_DEBUG2F("remove level: market=%.16s,ticks=%ld", order->market.rec->mnem,
                     order->ticks);
-        ash_tree_remove(&side->levels, &level->side_node_);
+        dbr_tree_remove(&side->levels, &level->side_node_);
         elm_pool_free_level(side->pool, level);
     } else if (level->first_order == order) {
         // First order at this level is being removed.
         level->first_order = dbr_side_order_entry(order->side_node_.next);
     }
 
-    ash_dlnode_remove(&order->side_node_);
+    dbr_dlnode_remove(&order->side_node_);
 
     // No longer associated with side.
     order->level = NULL;
-    ash_dlnode_init(&order->side_node_);
+    dbr_dlnode_init(&order->side_node_);
 }
 
 DBR_EXTERN void
@@ -175,7 +174,7 @@ elm_side_revise_order(struct ElmSide* side, struct DbrOrder* order, DbrLots lots
     // 3. greater than original lots.
 
     if (lots < order->exec || lots < order->min || lots > order->lots) {
-        ash_err_set(DBR_EINVAL, "invalid revision lots");
+        dbr_err_set(DBR_EINVAL, "invalid revision lots");
         return false;
     }
 

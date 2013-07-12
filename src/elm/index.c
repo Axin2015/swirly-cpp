@@ -18,8 +18,7 @@
 #include "index.h"
 
 #include <dbr/conv.h>
-
-#include <ash/slnode.h>
+#include <dbr/slnode.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -57,8 +56,8 @@ elm_index_insert(struct ElmIndex* index, struct DbrOrder* order)
 {
     if (order->ref[0] != '\0') {
         const size_t bucket = hash_ref(order->trader.rec->id, order->ref) % ELM_INDEX_BUCKETS;
-        struct AshStack* refs = &index->buckets[bucket].refs;
-        ash_stack_push(refs, &order->ref_node_);
+        struct DbrStack* refs = &index->buckets[bucket].refs;
+        dbr_stack_push(refs, &order->ref_node_);
     }
 }
 
@@ -72,7 +71,7 @@ elm_index_remove(struct ElmIndex* index, DbrIden trid, const char* ref)
         struct DbrOrder* order = order_entry_ref(*node);
         if (equal_ref(order, trid, ref)) {
             *node = (*node)->next;
-            ash_slnode_init(&order->ref_node_);
+            dbr_slnode_init(&order->ref_node_);
             return order;
         }
     }
@@ -84,7 +83,7 @@ elm_index_find(const struct ElmIndex* index, DbrIden trid, const char* ref)
 {
     assert(ref);
     const size_t bucket = hash_ref(trid, ref) % ELM_INDEX_BUCKETS;
-    for (struct DbrSlNode* node = ash_stack_first(&index->buckets[bucket].refs);
+    for (struct DbrSlNode* node = dbr_stack_first(&index->buckets[bucket].refs);
          node; node = node->next) {
         struct DbrOrder* order = order_entry_ref(node);
         if (equal_ref(order, trid, ref))

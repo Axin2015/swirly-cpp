@@ -25,7 +25,7 @@
 #include <dbr/conv.h>
 #include <dbr/trader.h>
 
-using namespace dbr;
+using namespace dbrpp;
 
 TEST_CASE(trader_id)
 {

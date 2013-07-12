@@ -24,7 +24,7 @@
 #include <dbr/conv.h>
 #include <dbr/string.h>
 
-namespace dbr {
+namespace dbrpp {
 
 class RecBase {
 protected:
@@ -305,6 +305,6 @@ operator <<(std::ostream& os, AccntRec arec)
               << ",email=" << arec.email();
 }
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_REC_HPP

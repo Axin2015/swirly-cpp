@@ -19,7 +19,7 @@
 #define DBRPP_TRADER_HPP
 
 #include <dbrpp/iter.hpp>
-#include <dbrpp/node.hpp>
+#include <dbrpp/rbnode.hpp>
 
 #include <dbr/conv.h>
 #include <dbr/trader.h>
@@ -27,7 +27,7 @@
 #include <iostream>
 #include <limits>
 
-namespace dbr {
+namespace dbrpp {
 
 class TraderOrders {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -238,6 +238,6 @@ operator <<(std::ostream& os, Trader trader)
     return os << "id=" << trader.id();
 }
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_TRADER_HPP

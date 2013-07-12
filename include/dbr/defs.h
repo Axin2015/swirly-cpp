@@ -28,6 +28,20 @@
 #define DBR_API DBR_EXTERN __attribute__((visibility ("default")))
 
 /**
+ * @addtogroup Types
+ * @{
+ */
+
+typedef int DbrBool;
+
+enum {
+    DBR_FALSE,
+    DBR_TRUE
+};
+
+/** @} */
+
+/**
  * @addtogroup Util
  * @{
  */

@@ -95,16 +95,16 @@ static inline void
 insert_id(struct ElmCache* cache, struct DbrRec* rec)
 {
     const size_t bucket = hash_id(rec->type, rec->id) % ELM_CACHE_BUCKETS;
-    struct AshStack* ids = &cache->buckets[bucket].ids;
-    ash_stack_push(ids, &rec->id_node_);
+    struct DbrStack* ids = &cache->buckets[bucket].ids;
+    dbr_stack_push(ids, &rec->id_node_);
 }
 
 static inline void
 insert_mnem(struct ElmCache* cache, struct DbrRec* rec)
 {
     const size_t bucket = hash_mnem(rec->type, rec->mnem) % ELM_CACHE_BUCKETS;
-    struct AshStack* mnems = &cache->buckets[bucket].mnems;
-    ash_stack_push(mnems, &rec->mnem_node_);
+    struct DbrStack* mnems = &cache->buckets[bucket].mnems;
+    dbr_stack_push(mnems, &rec->mnem_node_);
 }
 
 static void
@@ -246,7 +246,7 @@ DBR_EXTERN struct DbrSlNode*
 elm_cache_find_rec_id(const struct ElmCache* cache, int type, DbrIden id)
 {
     const size_t bucket = hash_id(type, id) % ELM_CACHE_BUCKETS;
-    for (struct DbrSlNode* node = ash_stack_first(&cache->buckets[bucket].ids);
+    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].ids);
          node; node = node->next) {
         struct DbrRec* rec = rec_entry_id(node);
         if (equal_id(rec, type, id))
@@ -260,7 +260,7 @@ elm_cache_find_rec_mnem(const struct ElmCache* cache, int type, const char* mnem
 {
     assert(mnem);
     const size_t bucket = hash_mnem(type, mnem) % ELM_CACHE_BUCKETS;
-    for (struct DbrSlNode* node = ash_stack_first(&cache->buckets[bucket].mnems);
+    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].mnems);
          node; node = node->next) {
         struct DbrRec* rec = rec_entry_mnem(node);
         if (equal_mnem(rec, type, mnem))

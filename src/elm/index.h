@@ -23,7 +23,7 @@
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
-#include <ash/stack.h>
+#include <dbr/stack.h>
 
 struct ElmIndex;
 
@@ -33,7 +33,7 @@ struct ElmIndex;
 
 struct ElmIndex {
     struct {
-        struct AshStack refs;
+        struct DbrStack refs;
     } buckets[ELM_INDEX_BUCKETS];
 };
 

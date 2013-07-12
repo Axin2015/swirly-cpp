@@ -19,13 +19,13 @@
 #define DBRPP_TRANS_HPP
 
 #include <dbrpp/iter.hpp>
+#include <dbrpp/slnode.hpp>
 #include <dbrpp/match.hpp>
-#include <dbrpp/node.hpp>
 
 #include <dbr/conv.h>
 #include <dbr/ctx.h>
 
-namespace dbr {
+namespace dbrpp {
 
 class TransMatches {
     struct Policy : NodeTraits<DbrSlNode> {
@@ -199,6 +199,6 @@ public:
     }
 };
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_TRANS_HPP

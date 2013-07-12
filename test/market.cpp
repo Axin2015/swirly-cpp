@@ -25,7 +25,7 @@
 #include <dbr/conv.h>
 #include <dbr/market.h>
 
-using namespace dbr;
+using namespace dbrpp;
 
 TEST_CASE(market_id)
 {

@@ -15,4 +15,41 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "dlnode.h"
+#ifndef DBRPP_RBNODE_HPP
+#define DBRPP_RBNODE_HPP
+
+#include <dbr/rbnode.h>
+
+namespace dbrpp {
+
+template <typename NodeT>
+struct NodeTraits;
+
+template<>
+struct NodeTraits<DbrRbNode> {
+    typedef DbrRbNode Node;
+    static Node*
+    next(Node* node) noexcept
+    {
+        return dbr_rbnode_next(node);
+    }
+    static const Node*
+    next(const Node* node) noexcept
+    {
+        return dbr_rbnode_next(const_cast<Node*>(node));
+    }
+    static Node*
+    prev(Node* node) noexcept
+    {
+        return dbr_rbnode_prev(node);
+    }
+    static const Node*
+    prev(const Node* node) noexcept
+    {
+        return dbr_rbnode_prev(const_cast<Node*>(node));
+    }
+};
+
+} // dbrpp
+
+#endif // DBRPP_RBNODE_HPP

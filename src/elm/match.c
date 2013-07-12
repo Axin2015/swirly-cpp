@@ -21,10 +21,9 @@
 #include "market.h"
 #include "pool.h"
 
-#include <ash/queue.h>
-
 #include <dbr/conv.h>
 #include <dbr/journ.h>
+#include <dbr/queue.h>
 
 #include <stdbool.h>
 #include <string.h>
@@ -74,8 +73,8 @@ static DbrBool
 match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, struct DbrOrder* taker,
              const struct ElmSide* side, int direct, struct DbrTrans* trans)
 {
-    struct AshQueue mq;
-    ash_queue_init(&mq);
+    struct DbrQueue mq;
+    dbr_queue_init(&mq);
 
     size_t count = 0;
     DbrLots taken = 0;
@@ -176,7 +175,7 @@ match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, str
         match->taker_trade = taker_trade;
         match->maker_trade = maker_trade;
 
-        ash_queue_push(&mq, &match->trans_node_);
+        dbr_queue_push(&mq, &match->trans_node_);
     }
 
     struct DbrPosn* posn;

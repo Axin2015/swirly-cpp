@@ -21,9 +21,8 @@
 // Record cache.
 
 #include <dbr/defs.h>
+#include <dbr/stack.h>
 #include <dbr/types.h>
-
-#include <ash/stack.h>
 
 #include <assert.h>
 
@@ -46,8 +45,8 @@ struct ElmCache {
     struct DbrSlNode* first_trader;
     size_t trader_size;
     struct {
-        struct AshStack ids;
-        struct AshStack mnems;
+        struct DbrStack ids;
+        struct DbrStack mnems;
     } buckets[ELM_CACHE_BUCKETS];
 };
 

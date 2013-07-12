@@ -18,8 +18,9 @@
 #ifndef DBRPP_SIDE_HPP
 #define DBRPP_SIDE_HPP
 
+#include <dbrpp/dlnode.hpp>
 #include <dbrpp/iter.hpp>
-#include <dbrpp/node.hpp>
+#include <dbrpp/rbnode.hpp>
 
 #include <dbr/conv.h>
 #include <dbr/side.h>
@@ -27,7 +28,7 @@
 #include <iostream>
 #include <limits>
 
-namespace dbr {
+namespace dbrpp {
 
 class SideOrders {
     struct Policy : NodeTraits<DbrDlNode> {
@@ -376,6 +377,6 @@ operator <<(std::ostream& os, Side side)
               << ",last_time=" << side.last_time();
 }
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_SIDE_HPP

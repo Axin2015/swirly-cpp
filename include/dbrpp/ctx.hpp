@@ -25,7 +25,7 @@
 #include <dbrpp/trader.hpp>
 #include <dbrpp/trans.hpp>
 
-namespace dbr {
+namespace dbrpp {
 
 template <int TypeN>
 class Recs {
@@ -322,6 +322,6 @@ public:
     }
 };
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_CTX_HPP

@@ -19,7 +19,7 @@
 #define DBRPP_ACCNT_HPP
 
 #include <dbrpp/iter.hpp>
-#include <dbrpp/node.hpp>
+#include <dbrpp/rbnode.hpp>
 
 #include <dbr/conv.h>
 #include <dbr/accnt.h>
@@ -27,7 +27,7 @@
 #include <iostream>
 #include <limits>
 
-namespace dbr {
+namespace dbrpp {
 
 class AccntTrades {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -387,6 +387,6 @@ operator <<(std::ostream& os, Accnt accnt)
     return os << "id=" << accnt.id();
 }
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_ACCNT_HPP

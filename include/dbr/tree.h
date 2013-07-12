@@ -15,60 +15,58 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_TREE_H
-#define ASH_TREE_H
+#ifndef DBR_TREE_H
+#define DBR_TREE_H
 
-#include <dbr/bool.h>
-#include <dbr/node.h>
+#include <dbr/defs.h>
+#include <dbr/rbnode.h>
 
-#include <stddef.h> // NULL
-
-struct AshTree {
+struct DbrTree {
     struct DbrRbNode* root;
 };
 
-#define ASH_TREE_INIT(s) { .root = NULL }
+#define DBR_TREE_INIT(s) { .root = NULL }
 
 static inline void
-ash_tree_init(struct AshTree* tree)
+dbr_tree_init(struct DbrTree* tree)
 {
     tree->root = NULL;
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_insert(struct AshTree* tree, struct DbrRbNode* node);
+dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node);
 
 DBR_API void
-ash_tree_pinsert(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent);
+dbr_tree_pinsert(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent);
 
 DBR_API struct DbrRbNode*
-ash_tree_remove(struct AshTree* tree, struct DbrRbNode* node);
+dbr_tree_remove(struct DbrTree* tree, struct DbrRbNode* node);
 
 DBR_API struct DbrRbNode*
-ash_tree_find(const struct AshTree* tree, DbrKey key);
+dbr_tree_find(const struct DbrTree* tree, DbrKey key);
 
 DBR_API struct DbrRbNode*
-ash_tree_nfind(const struct AshTree* tree, DbrKey key);
+dbr_tree_nfind(const struct DbrTree* tree, DbrKey key);
 
 DBR_API struct DbrRbNode*
-ash_tree_pfind(const struct AshTree* tree, DbrKey key);
+dbr_tree_pfind(const struct DbrTree* tree, DbrKey key);
 
 DBR_API struct DbrRbNode*
-ash_tree_first(const struct AshTree* tree);
+dbr_tree_first(const struct DbrTree* tree);
 
 DBR_API struct DbrRbNode*
-ash_tree_last(const struct AshTree* tree);
+dbr_tree_last(const struct DbrTree* tree);
 
 static inline struct DbrRbNode*
-ash_tree_end(const struct AshTree* tree)
+dbr_tree_end(const struct DbrTree* tree)
 {
     return NULL;
 }
 
 static inline DbrBool
-ash_tree_empty(const struct AshTree* tree)
+dbr_tree_empty(const struct DbrTree* tree)
 {
     return tree->root == NULL;
 }
 
-#endif // ASH_TREE_H
+#endif // DBR_TREE_H

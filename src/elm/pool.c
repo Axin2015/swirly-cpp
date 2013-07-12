@@ -17,9 +17,8 @@
  */
 #include "pool.h"
 
-#include <ash/err.h>
-
 #include <dbr/conv.h>
+#include <dbr/err.h>
 #include <dbr/pool.h>
 
 #include <assert.h>
@@ -35,7 +34,7 @@ alloc_small_nodes(struct ElmPool* pool)
                                          + pool->small.nodes_per_block
                                          * sizeof(struct ElmSmallNode));
     if (dbr_unlikely(!block)) {
-        ash_err_set(DBR_ENOMEM, "out of memory");
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
 
@@ -73,7 +72,7 @@ alloc_large_nodes(struct ElmPool* pool)
                                          + pool->large.nodes_per_block
                                          * sizeof(struct ElmLargeNode));
     if (dbr_unlikely(!block)) {
-        ash_err_set(DBR_ENOMEM, "out of memory");
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
 
@@ -211,7 +210,7 @@ elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!pool->small.first_node && !alloc_small_nodes(pool))) {
-        ash_err_set(DBR_ENOMEM, "out of memory");
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
     struct ElmSmallNode* node = pool->small.first_node;
@@ -235,7 +234,7 @@ elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!pool->large.first_node && !alloc_large_nodes(pool))) {
-        ash_err_set(DBR_ENOMEM, "out of memory");
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
     struct ElmLargeNode* node = pool->large.first_node;
@@ -344,7 +343,7 @@ dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
 }
 
 DBR_API struct DbrLevel*
-dbr_pool_alloc_level(DbrPool pool, DbrKey key)
+dbr_pool_alloc_level(DbrPool pool, long key)
 {
     return elm_pool_alloc_level(pool, key);
 }
@@ -368,7 +367,7 @@ dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
 }
 
 DBR_API struct DbrOrder*
-dbr_pool_alloc_order(DbrPool pool, DbrKey key)
+dbr_pool_alloc_order(DbrPool pool, long key)
 {
     return elm_pool_alloc_order(pool, key);
 }
@@ -380,7 +379,7 @@ dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
 }
 
 DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool, DbrKey key)
+dbr_pool_alloc_memb(DbrPool pool, long key)
 {
     return elm_pool_alloc_memb(pool, key);
 }
@@ -392,7 +391,7 @@ dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
 }
 
 DBR_API struct DbrTrade*
-dbr_pool_alloc_trade(DbrPool pool, DbrKey key)
+dbr_pool_alloc_trade(DbrPool pool, long key)
 {
     return elm_pool_alloc_trade(pool, key);
 }
@@ -404,7 +403,7 @@ dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade)
 }
 
 DBR_API struct DbrPosn*
-dbr_pool_alloc_posn(DbrPool pool, DbrKey key)
+dbr_pool_alloc_posn(DbrPool pool, long key)
 {
     return elm_pool_alloc_posn(pool, key);
 }
@@ -416,7 +415,7 @@ dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 }
 
 DBR_API struct DbrSub*
-dbr_pool_alloc_sub(DbrPool pool, DbrKey key)
+dbr_pool_alloc_sub(DbrPool pool, long key)
 {
     return elm_pool_alloc_sub(pool, key);
 }

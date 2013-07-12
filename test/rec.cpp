@@ -24,7 +24,7 @@
 
 #include <dbr/conv.h>
 
-using namespace dbr;
+using namespace dbrpp;
 
 template <int TypeN>
 struct TypeTraits;

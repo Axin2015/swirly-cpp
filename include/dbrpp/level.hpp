@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-namespace dbr {
+namespace dbrpp {
 
 class Level {
     DbrLevel impl_;
@@ -62,6 +62,6 @@ operator <<(std::ostream& os, Level level)
               << ",ticks=" << level.ticks()
               << ",resd=" << level.resd();
 }
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_LEVEL_HPP

@@ -20,7 +20,7 @@
 
 #include <dbrpp/rec.hpp>
 
-namespace dbr {
+namespace dbrpp {
 
 class Trade {
     DbrTrade& impl_;
@@ -163,6 +163,6 @@ operator <<(std::ostream& os, Trade trade)
               << ",created=" << trade.created()
               << ",modified=" << trade.modified();
 }
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_TRADE_HPP

@@ -22,7 +22,7 @@
 
 #include <dbr/pool.h>
 
-namespace dbr {
+namespace dbrpp {
 
 class Pool {
     DbrPool impl_;
@@ -91,7 +91,7 @@ public:
         dbr_pool_free_rec(impl_, rec);
     }
     DbrLevel*
-    alloc_level(DbrKey key)
+    alloc_level(long key)
     {
         DbrLevel* const level = dbr_pool_alloc_level(impl_, key);
         if (!level)
@@ -117,7 +117,7 @@ public:
         dbr_pool_free_match(impl_, match);
     }
     DbrOrder*
-    alloc_order(DbrKey key)
+    alloc_order(long key)
     {
         DbrOrder* const order = dbr_pool_alloc_order(impl_, key);
         if (!order)
@@ -130,7 +130,7 @@ public:
         dbr_pool_free_order(impl_, order);
     }
     DbrMemb*
-    alloc_memb(DbrKey key)
+    alloc_memb(long key)
     {
         DbrMemb* const memb = dbr_pool_alloc_memb(impl_, key);
         if (!memb)
@@ -143,7 +143,7 @@ public:
         dbr_pool_free_memb(impl_, memb);
     }
     DbrTrade*
-    alloc_trade(DbrKey key)
+    alloc_trade(long key)
     {
         DbrTrade* const trade = dbr_pool_alloc_trade(impl_, key);
         if (!trade)
@@ -156,7 +156,7 @@ public:
         dbr_pool_free_trade(impl_, trade);
     }
     DbrPosn*
-    alloc_posn(DbrKey key)
+    alloc_posn(long key)
     {
         DbrPosn* const posn = dbr_pool_alloc_posn(impl_, key);
         if (!posn)
@@ -169,7 +169,7 @@ public:
         dbr_pool_free_posn(impl_, posn);
     }
     DbrSub*
-    alloc_sub(DbrKey key)
+    alloc_sub(long key)
     {
         DbrSub* const sub = dbr_pool_alloc_sub(impl_, key);
         if (!sub)
@@ -183,6 +183,6 @@ public:
     }
 };
 
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_POOL_HPP

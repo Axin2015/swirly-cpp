@@ -27,7 +27,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "tree.h"
+#include <dbr/tree.h>
 
 enum { BLACK = 0, RED = 1 };
 
@@ -60,7 +60,7 @@ set_blackred(struct DbrRbNode* black, struct DbrRbNode* red)
 }
 
 static void
-rotate_left(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
+rotate_left(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
 {
     tmp = node->right;
     if ((node->right = tmp->left))
@@ -77,7 +77,7 @@ rotate_left(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
 }
 
 static void
-rotate_right(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
+rotate_right(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
 {
     tmp = node->left;
     if ((node->left = tmp->right))
@@ -94,7 +94,7 @@ rotate_right(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp
 }
 
 static void
-insert_color(struct AshTree* tree, struct DbrRbNode* node)
+insert_color(struct DbrTree* tree, struct DbrRbNode* node)
 {
     struct DbrRbNode* parent, * gparent, * tmp;
     while ((parent = node->parent) && parent->color == RED) {
@@ -137,7 +137,7 @@ insert_color(struct AshTree* tree, struct DbrRbNode* node)
 }
 
 static void
-remove_color(struct AshTree* tree, struct DbrRbNode* parent, struct DbrRbNode* node)
+remove_color(struct DbrTree* tree, struct DbrRbNode* parent, struct DbrRbNode* node)
 {
     struct DbrRbNode* tmp;
     while ((!node || node->color == BLACK) && node != tree->root) {
@@ -206,7 +206,7 @@ remove_color(struct AshTree* tree, struct DbrRbNode* parent, struct DbrRbNode* n
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_insert(struct AshTree* tree, struct DbrRbNode* node)
+dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
 {
     struct DbrRbNode* tmp;
     struct DbrRbNode* parent = NULL;
@@ -235,7 +235,7 @@ ash_tree_insert(struct AshTree* tree, struct DbrRbNode* node)
 }
 
 DBR_API void
-ash_tree_pinsert(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent)
+dbr_tree_pinsert(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent)
 {
     set(node, parent);
     if (parent) {
@@ -250,7 +250,7 @@ ash_tree_pinsert(struct AshTree* tree, struct DbrRbNode* node, struct DbrRbNode*
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_remove(struct AshTree* tree, struct DbrRbNode* node)
+dbr_tree_remove(struct DbrTree* tree, struct DbrRbNode* node)
 {
     struct DbrRbNode* child, * parent, * old = node;
     int color;
@@ -313,7 +313,7 @@ ash_tree_remove(struct AshTree* tree, struct DbrRbNode* node)
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_find(const struct AshTree* tree, DbrKey key)
+dbr_tree_find(const struct DbrTree* tree, DbrKey key)
 {
     struct DbrRbNode* tmp = tree->root;
     int comp;
@@ -330,7 +330,7 @@ ash_tree_find(const struct AshTree* tree, DbrKey key)
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_nfind(const struct AshTree* tree, DbrKey key)
+dbr_tree_nfind(const struct DbrTree* tree, DbrKey key)
 {
     struct DbrRbNode* tmp = tree->root;
     struct DbrRbNode* res = NULL;
@@ -350,7 +350,7 @@ ash_tree_nfind(const struct AshTree* tree, DbrKey key)
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_pfind(const struct AshTree* tree, DbrKey key)
+dbr_tree_pfind(const struct DbrTree* tree, DbrKey key)
 {
     struct DbrRbNode* tmp = tree->root;
     struct DbrRbNode* parent = NULL;
@@ -369,7 +369,7 @@ ash_tree_pfind(const struct AshTree* tree, DbrKey key)
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_first(const struct AshTree* tree)
+dbr_tree_first(const struct DbrTree* tree)
 {
     struct DbrRbNode* tmp = tree->root;
     struct DbrRbNode* parent = NULL;
@@ -381,7 +381,7 @@ ash_tree_first(const struct AshTree* tree)
 }
 
 DBR_API struct DbrRbNode*
-ash_tree_last(const struct AshTree* tree)
+dbr_tree_last(const struct DbrTree* tree)
 {
     struct DbrRbNode* tmp = tree->root;
     struct DbrRbNode* parent = NULL;

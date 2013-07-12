@@ -15,28 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_SLNODE_H
-#define ASH_SLNODE_H
-
-#include <dbr/node.h>
-
-#include <assert.h>
-#include <stddef.h>
-
-#define ASH_SLNODE_INIT(n) { .next = NULL }
-
-static inline void
-ash_slnode_init(struct DbrSlNode* node)
-{
-    assert(node);
-    node->next = NULL;
-}
-
-static inline struct DbrSlNode*
-ash_slnode_next(struct DbrSlNode* node)
-{
-    assert(node);
-    return node->next;
-}
-
-#endif // ASH_SLNODE_H
+#include <dbr/tree.h>

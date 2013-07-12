@@ -22,7 +22,7 @@
 #include <dbrpp/ctx.hpp>
 #include <dbrpp/pool.hpp>
 
-using namespace dbr;
+using namespace dbrpp;
 using namespace std;
 
 TEST_CASE(submit)

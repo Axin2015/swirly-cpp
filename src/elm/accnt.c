@@ -20,9 +20,8 @@
 #include "pool.h"
 
 #include <dbr/conv.h>
+#include <dbr/err.h>
 #include <dbr/sess.h>
-
-#include <ash/err.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -47,7 +46,7 @@ free_membs(struct ElmAccnt* accnt)
     struct DbrRbNode* node;
     while ((node = accnt->membs.root)) {
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
-        ash_tree_remove(&accnt->membs, node);
+        dbr_tree_remove(&accnt->membs, node);
         elm_pool_free_memb(accnt->pool, memb);
     }
 }
@@ -59,7 +58,7 @@ free_trades(struct ElmAccnt* accnt)
     struct DbrRbNode* node;
     while ((node = accnt->trades.root)) {
         struct DbrTrade* trade = dbr_accnt_trade_entry(node);
-        ash_tree_remove(&accnt->trades, node);
+        dbr_tree_remove(&accnt->trades, node);
         elm_pool_free_trade(accnt->pool, trade);
     }
 }
@@ -71,7 +70,7 @@ free_posns(struct ElmAccnt* accnt)
     struct DbrRbNode* node;
     while ((node = accnt->posns.root)) {
         struct DbrPosn* posn = dbr_accnt_posn_entry(node);
-        ash_tree_remove(&accnt->posns, node);
+        dbr_tree_remove(&accnt->posns, node);
         elm_pool_free_posn(accnt->pool, posn);
     }
 }
@@ -85,14 +84,14 @@ elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool)
     if (dbr_unlikely(!accnt)) {
         accnt = malloc(sizeof(struct ElmAccnt));
         if (dbr_unlikely(!accnt)) {
-            ash_err_set(DBR_ENOMEM, "out of memory");
+            dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         accnt->id = arec->id;
         accnt->pool = pool;
-        ash_tree_init(&accnt->membs);
-        ash_tree_init(&accnt->trades);
-        ash_tree_init(&accnt->posns);
+        dbr_tree_init(&accnt->membs);
+        dbr_tree_init(&accnt->trades);
+        dbr_tree_init(&accnt->posns);
         accnt->sess = &sess_noop;
 
         arec->accnt.state = accnt;
@@ -132,7 +131,7 @@ elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
         return NULL;
 
     struct DbrPosn* posn;
-	struct DbrRbNode* node = ash_tree_pfind(&accnt->posns, id);
+	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, id);
     if (!node || node->key != id) {
         if (!(posn = elm_pool_alloc_posn(accnt->pool, id)))
             return NULL;
@@ -150,7 +149,7 @@ elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
                     arec->mnem, irec->mnem, settl_date);
 
         struct DbrRbNode* parent = node;
-        ash_tree_pinsert(&accnt->posns, &posn->accnt_node_, parent);
+        dbr_tree_pinsert(&accnt->posns, &posn->accnt_node_, parent);
     } else
         posn = dbr_accnt_posn_entry(node);
     return posn;

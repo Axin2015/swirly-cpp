@@ -15,43 +15,40 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ASH_STACK_H
-#define ASH_STACK_H
+#ifndef DBR_STACK_H
+#define DBR_STACK_H
 
-#include <dbr/bool.h>
-#include <dbr/node.h>
+#include <dbr/defs.h>
+#include <dbr/slnode.h>
 
-#include <assert.h>
-#include <stddef.h> // NULL
-
-struct AshStack {
+struct DbrStack {
     struct DbrSlNode* first;
 };
 
-#define ASH_STACK_INIT(s) { .first = NULL }
+#define DBR_STACK_INIT(s) { .first = NULL }
 
 static inline void
-ash_stack_init(struct AshStack* stack)
+dbr_stack_init(struct DbrStack* stack)
 {
 	stack->first = NULL;
 }
 
 static inline void
-ash_stack_insert_after(struct AshStack* stack, struct DbrSlNode* node, struct DbrSlNode* new_node)
+dbr_stack_insert_after(struct DbrStack* stack, struct DbrSlNode* node, struct DbrSlNode* new_node)
 {
 	new_node->next = node->next;
 	node->next = new_node;
 }
 
 static inline void
-ash_stack_insert_front(struct AshStack* stack, struct DbrSlNode* new_node)
+dbr_stack_insert_front(struct DbrStack* stack, struct DbrSlNode* new_node)
 {
 	new_node->next = stack->first;
 	stack->first = new_node;
 }
 
 static inline struct DbrSlNode*
-ash_stack_remove_first(struct AshStack* stack)
+dbr_stack_remove_first(struct DbrStack* stack)
 {
     struct DbrSlNode* first = stack->first;
 	stack->first = stack->first->next;
@@ -59,33 +56,33 @@ ash_stack_remove_first(struct AshStack* stack)
 }
 
 static inline struct DbrSlNode*
-ash_stack_pop(struct AshStack* stack)
+dbr_stack_pop(struct DbrStack* stack)
 {
-    return ash_stack_remove_first(stack);
+    return dbr_stack_remove_first(stack);
 }
 
 static inline void
-ash_stack_push(struct AshStack* stack, struct DbrSlNode* new_node)
+dbr_stack_push(struct DbrStack* stack, struct DbrSlNode* new_node)
 {
-    ash_stack_insert_front(stack, new_node);
+    dbr_stack_insert_front(stack, new_node);
 }
 
 static inline struct DbrSlNode*
-ash_stack_first(const struct AshStack* stack)
+dbr_stack_first(const struct DbrStack* stack)
 {
     return stack->first;
 }
 
 static inline struct DbrSlNode*
-ash_stack_end(const struct AshStack* stack)
+dbr_stack_end(const struct DbrStack* stack)
 {
     return NULL;
 }
 
 static inline DbrBool
-ash_stack_empty(const struct AshStack* stack)
+dbr_stack_empty(const struct DbrStack* stack)
 {
     return stack->first == NULL;
 }
 
-#endif // ASH_STACK_H
+#endif // DBR_STACK_H

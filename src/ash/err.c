@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "err.h"
+#include <dbr/err.h>
 
 #include <dbr/types.h>
 
@@ -29,7 +29,7 @@ static __thread struct {
 } err;
 
 DBR_API void
-ash_err_clear(void)
+dbr_err_clear(void)
 {
     err.num = 0;
     err.file = NULL;
@@ -38,13 +38,13 @@ ash_err_clear(void)
 }
 
 DBR_API void
-ash_err_print(FILE* stream, const char* s)
+dbr_err_print(FILE* stream, const char* s)
 {
     fprintf(stream, "%s:%d: %s: %s (%d)\n", err.file, err.line, s, err.msg, err.num);
 }
 
 DBR_API void
-ash_err_vset_(int num, const char* file, int line, const char* format, va_list args)
+dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args)
 {
     err.num = num;
     err.file = file;
@@ -57,34 +57,34 @@ ash_err_vset_(int num, const char* file, int line, const char* format, va_list a
 }
 
 DBR_API void
-ash_err_set_(int num, const char* file, int line, const char* format, ...)
+dbr_err_set_(int num, const char* file, int line, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    ash_err_vset_(num, file, line, format, args);
+    dbr_err_vset_(num, file, line, format, args);
     va_end(args);
 }
 
 DBR_API int
-ash_err_num(void)
+dbr_err_num(void)
 {
     return err.num;
 }
 
 DBR_API const char*
-ash_err_file(void)
+dbr_err_file(void)
 {
     return err.file;
 }
 
 DBR_API int
-ash_err_line(void)
+dbr_err_line(void)
 {
     return err.line;
 }
 
 DBR_API const char*
-ash_err_msg(void)
+dbr_err_msg(void)
 {
     return err.msg;
 }

@@ -15,4 +15,40 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "slnode.h"
+#ifndef DBR_SLNODE_H
+#define DBR_SLNODE_H
+
+#include <assert.h>
+#include <stddef.h>
+
+/**
+ * @addtogroup Node
+ * @{
+ */
+
+/**
+ * @brief Singly-linked node.
+ */
+struct DbrSlNode {
+    struct DbrSlNode* next;
+};
+
+#define DBR_SLNODE_INIT(n) { .next = NULL }
+
+static inline void
+dbr_slnode_init(struct DbrSlNode* node)
+{
+    assert(node);
+    node->next = NULL;
+}
+
+static inline struct DbrSlNode*
+dbr_slnode_next(struct DbrSlNode* node)
+{
+    assert(node);
+    return node->next;
+}
+
+/** @} */
+
+#endif // DBR_SLNODE_H

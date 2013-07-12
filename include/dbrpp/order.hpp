@@ -20,7 +20,7 @@
 
 #include <dbrpp/rec.hpp>
 
-namespace dbr {
+namespace dbrpp {
 
 class Order {
     DbrOrder& impl_;
@@ -156,6 +156,6 @@ operator <<(std::ostream& os, Order order)
               << ",created=" << order.created()
               << ",modified=" << order.modified();
 }
-} // dbr
+} // dbrpp
 
 #endif // DBRPP_ORDER_HPP

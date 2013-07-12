@@ -25,7 +25,7 @@
 #include <dbr/accnt.h>
 #include <dbr/conv.h>
 
-using namespace dbr;
+using namespace dbrpp;
 
 TEST_CASE(accnt_id)
 {

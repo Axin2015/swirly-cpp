@@ -20,9 +20,8 @@
 #include "market.h"
 #include "pool.h"
 
+#include <dbr/err.h>
 #include <dbr/sess.h>
-
-#include <ash/err.h>
 
 #include <stdlib.h>
 
@@ -53,7 +52,7 @@ free_subs(struct ElmTrader* trader)
     while ((node = trader->subs.root)) {
         struct DbrSub* sub = dbr_trader_sub_entry(node);
         elm_market_unsub(sub);
-        ash_tree_remove(&trader->subs, node);
+        dbr_tree_remove(&trader->subs, node);
         elm_pool_free_sub(trader->pool, sub);
     }
 }
@@ -67,14 +66,14 @@ elm_trader_lazy(struct DbrRec* trec, struct ElmPool* pool, struct ElmIndex* inde
     if (dbr_unlikely(!trader)) {
         trader = malloc(sizeof(struct ElmTrader));
         if (dbr_unlikely(!trader)) {
-            ash_err_set(DBR_ENOMEM, "out of memory");
+            dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         trader->id = trec->id;
         trader->pool = pool;
         trader->index = index;
-        ash_tree_init(&trader->orders);
-        ash_tree_init(&trader->subs);
+        dbr_tree_init(&trader->orders);
+        dbr_tree_init(&trader->subs);
         trader->sess = &sess_noop;
 
         trec->trader.state = trader;
@@ -100,9 +99,9 @@ DBR_EXTERN DbrBool
 elm_trader_sub(struct ElmTrader* trader, struct ElmMarket* market)
 {
     struct ElmPool* pool = trader->pool;
-	struct DbrRbNode* node = ash_tree_pfind(&trader->subs, market->id);
+	struct DbrRbNode* node = dbr_tree_pfind(&trader->subs, market->id);
     if (node && node->key == market->id) {
-        ash_err_set(DBR_EINVAL, "subscription already exists");
+        dbr_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
     struct DbrSub* sub = elm_pool_alloc_sub(pool, market->id);
@@ -113,7 +112,7 @@ elm_trader_sub(struct ElmTrader* trader, struct ElmMarket* market)
     sub->trader = trader;
 
     struct DbrRbNode* parent = node;
-    ash_tree_pinsert(&trader->subs, &sub->trader_node_, parent);
+    dbr_tree_pinsert(&trader->subs, &sub->trader_node_, parent);
     elm_market_sub(market, sub);
     return true;
 
@@ -124,11 +123,11 @@ fail1:
 DBR_EXTERN void
 elm_trader_unsub(struct ElmTrader* trader, DbrIden mrid)
 {
-    struct DbrRbNode* node = ash_tree_find(&trader->subs, mrid);
+    struct DbrRbNode* node = dbr_tree_find(&trader->subs, mrid);
     if (node) {
         struct DbrSub* sub = dbr_trader_sub_entry(node);
         elm_market_unsub(sub);
-        ash_tree_remove(&trader->subs, node);
+        dbr_tree_remove(&trader->subs, node);
         elm_pool_free_sub(trader->pool, sub);
     }
 }
