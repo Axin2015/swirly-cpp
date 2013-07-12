@@ -29,8 +29,6 @@
  * @{
  */
 
-typedef long DbrIden;
-
 /**
  * @brief ISO8601 format: "%Y%m%d".
  */

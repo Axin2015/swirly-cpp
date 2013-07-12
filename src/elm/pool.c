@@ -343,7 +343,7 @@ dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
 }
 
 DBR_API struct DbrLevel*
-dbr_pool_alloc_level(DbrPool pool, long key)
+dbr_pool_alloc_level(DbrPool pool, DbrKey key)
 {
     return elm_pool_alloc_level(pool, key);
 }
@@ -367,7 +367,7 @@ dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
 }
 
 DBR_API struct DbrOrder*
-dbr_pool_alloc_order(DbrPool pool, long key)
+dbr_pool_alloc_order(DbrPool pool, DbrKey key)
 {
     return elm_pool_alloc_order(pool, key);
 }
@@ -379,7 +379,7 @@ dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
 }
 
 DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool, long key)
+dbr_pool_alloc_memb(DbrPool pool, DbrKey key)
 {
     return elm_pool_alloc_memb(pool, key);
 }
@@ -391,7 +391,7 @@ dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
 }
 
 DBR_API struct DbrTrade*
-dbr_pool_alloc_trade(DbrPool pool, long key)
+dbr_pool_alloc_trade(DbrPool pool, DbrKey key)
 {
     return elm_pool_alloc_trade(pool, key);
 }
@@ -403,7 +403,7 @@ dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade)
 }
 
 DBR_API struct DbrPosn*
-dbr_pool_alloc_posn(DbrPool pool, long key)
+dbr_pool_alloc_posn(DbrPool pool, DbrKey key)
 {
     return elm_pool_alloc_posn(pool, key);
 }
@@ -415,7 +415,7 @@ dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 }
 
 DBR_API struct DbrSub*
-dbr_pool_alloc_sub(DbrPool pool, long key)
+dbr_pool_alloc_sub(DbrPool pool, DbrKey key)
 {
     return elm_pool_alloc_sub(pool, key);
 }

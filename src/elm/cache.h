@@ -22,7 +22,6 @@
 
 #include <dbr/defs.h>
 #include <dbr/stack.h>
-#include <dbr/types.h>
 
 #include <assert.h>
 

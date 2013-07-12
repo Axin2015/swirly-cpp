@@ -21,9 +21,10 @@
 // Index of trader's orders by reference.
 
 #include <dbr/defs.h>
-#include <dbr/types.h>
 
 #include <dbr/stack.h>
+
+struct DbrOrder;
 
 struct ElmIndex;
 

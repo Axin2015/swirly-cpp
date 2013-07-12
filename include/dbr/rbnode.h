@@ -23,15 +23,6 @@
 #include <stddef.h>
 
 /**
- * @addtogroup Types
- * @{
- */
-
-typedef long DbrKey;
-
-/** @} */
-
-/**
  * @addtogroup Node
  * @{
  */

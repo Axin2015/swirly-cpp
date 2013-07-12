@@ -17,8 +17,6 @@
  */
 #include <dbr/err.h>
 
-#include <dbr/types.h>
-
 #include <string.h> // strcpy()
 
 static __thread struct {
