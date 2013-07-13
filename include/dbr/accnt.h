@@ -18,8 +18,6 @@
 #ifndef DBR_ACCNT_H
 #define DBR_ACCNT_H
 
-#if !defined(DBR_HIDE_API)
-
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
@@ -91,7 +89,5 @@ DBR_API DbrAccntSess
 dbr_accnt_sess(DbrAccnt accnt);
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_ACCNT_H

@@ -65,8 +65,6 @@ enum {
 
 /** @} */
 
-#if !defined(DBR_HIDE_API)
-
 /**
  * @addtogroup Err
  * @{
@@ -103,7 +101,5 @@ dbr_err_msg(void);
     dbr_err_set_(num, __FILE__, __LINE__, __VA_ARGS__)
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_ERR_H

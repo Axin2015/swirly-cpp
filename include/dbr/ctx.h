@@ -18,8 +18,6 @@
 #ifndef DBR_CTX_H
 #define DBR_CTX_H
 
-#if !defined(DBR_HIDE_API)
-
 #include <dbr/model.h>
 #include <dbr/pool.h>
 
@@ -159,7 +157,5 @@ DBR_API void
 dbr_ctx_free_matches(DbrCtx ctx, struct DbrSlNode* first);
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_CTX_H

@@ -20,8 +20,6 @@
 
 #include <dbr/defs.h>
 
-#if !defined(DBR_HIDE_API)
-
 /**
  * @addtogroup Pool
  * @{
@@ -84,7 +82,5 @@ DBR_API void
 dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub);
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_POOL_H

@@ -18,8 +18,6 @@
 #ifndef DBR_TRADER_H
 #define DBR_TRADER_H
 
-#if !defined(DBR_HIDE_API)
-
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
@@ -93,7 +91,5 @@ DBR_API DbrTraderSess
 dbr_trader_sess(DbrTrader trader);
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_TRADER_H

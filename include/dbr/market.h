@@ -18,8 +18,6 @@
 #ifndef DBR_MARKET_H
 #define DBR_MARKET_H
 
-#if !defined(DBR_HIDE_API)
-
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
@@ -43,7 +41,5 @@ DBR_API struct DbrBest*
 dbr_market_best(struct DbrRec* mrec, struct DbrBest* best);
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_MARKET_H

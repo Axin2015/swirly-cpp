@@ -18,8 +18,6 @@
 #ifndef DBR_SIDE_H
 #define DBR_SIDE_H
 
-#if !defined(DBR_HIDE_API)
-
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
@@ -79,7 +77,5 @@ DBR_API DbrMillis
 dbr_side_last_time(DbrSide side);
 
 /** @} */
-
-#endif // !defined(DBR_HIDE_API)
 
 #endif // DBR_SIDE_H
