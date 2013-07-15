@@ -21,6 +21,7 @@
 
 #include <dbr/conv.h>
 #include <dbr/err.h>
+#include <dbr/log.h>
 #include <dbr/sess.h>
 
 #include <assert.h>
@@ -145,8 +146,8 @@ elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
         posn->sell_licks = 0;
         posn->sell_lots = 0;
 
-        DBR_DEBUG1F("insert posn: accnt=%.16s, instr=%.16s, settl_date=%d",
-                    arec->mnem, irec->mnem, settl_date);
+        dbr_log_debug1("insert posn: accnt=%.16s, instr=%.16s, settl_date=%d",
+                       arec->mnem, irec->mnem, settl_date);
 
         struct DbrRbNode* parent = node;
         dbr_tree_pinsert(&accnt->posns, &posn->accnt_node_, parent);

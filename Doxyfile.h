@@ -35,6 +35,10 @@
  */
 
 /**
+ * @defgroup Log Log
+ */
+
+/**
  * @defgroup Node Node
  */
 

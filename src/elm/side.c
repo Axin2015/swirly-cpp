@@ -21,6 +21,7 @@
 
 #include <dbr/conv.h>
 #include <dbr/err.h>
+#include <dbr/log.h>
 
 #include <stdlib.h>
 
@@ -39,8 +40,8 @@ lazy_level(struct ElmSide* side, struct DbrOrder* order)
         level->count = 1;
         level->ticks = order->ticks;
         level->resd = order->resd;
-        DBR_DEBUG2F("insert level: market=%.16s,ticks=%ld", order->market.rec->mnem,
-                    order->ticks);
+        dbr_log_debug2("insert level: market=%.16s,ticks=%ld", order->market.rec->mnem,
+                       order->ticks);
         dbr_tree_pinsert(&side->levels, &level->side_node_, node);
     } else {
         level = dbr_side_level_entry(node);
@@ -128,8 +129,8 @@ elm_side_remove_order(struct ElmSide* side, struct DbrOrder* order)
     if (--level->count <= 0) {
         // Remove level.
         assert(level->resd == 0);
-        DBR_DEBUG2F("remove level: market=%.16s,ticks=%ld", order->market.rec->mnem,
-                    order->ticks);
+        dbr_log_debug2("remove level: market=%.16s,ticks=%ld", order->market.rec->mnem,
+                       order->ticks);
         dbr_tree_remove(&side->levels, &level->side_node_);
         elm_pool_free_level(side->pool, level);
     } else if (level->first_order == order) {

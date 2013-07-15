@@ -18,10 +18,9 @@
 #ifndef ELM_TRADER_H
 #define ELM_TRADER_H
 
-#include <dbr/conv.h>
-
 #include <elm/index.h>
 
+#include <dbr/conv.h>
 #include <dbr/tree.h>
 
 #include <assert.h>

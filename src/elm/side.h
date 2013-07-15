@@ -18,10 +18,9 @@
 #ifndef ELM_SIDE_H
 #define ELM_SIDE_H
 
-#include <dbr/types.h>
-
 #include <dbr/list.h>
 #include <dbr/tree.h>
+#include <dbr/types.h>
 
 #include <assert.h>
 #include <stdbool.h>

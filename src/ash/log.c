@@ -15,38 +15,39 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_INDEX_H
-#define ELM_INDEX_H
+#include <dbr/log.h>
 
-// Index of trader's orders by reference.
+#include <stdio.h>
 
-#include <dbr/defs.h>
-#include <dbr/stack.h>
+static void
+stdlogger(int level, const char* format, va_list args)
+{
+    FILE* stream = level > DBR_WARN ? stdout : stderr;
+    vfprintf(stream, format, args);
+    fputc('\n', stream);
+}
 
-struct DbrOrder;
+static __thread DbrLogger logger = stdlogger;
 
-struct ElmIndex;
+DBR_API DbrLogger
+dbr_log_set(DbrLogger new_logger)
+{
+    DbrLogger old_logger = logger;
+    logger = new_logger ? new_logger : stdlogger;
+    return old_logger;
+}
 
-#ifndef ELM_INDEX_BUCKETS
-#define ELM_INDEX_BUCKETS 257
-#endif // ELM_INDEX_BUCKETS
+DBR_API void
+dbr_log_printf(int level, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    logger(level, format, args);
+    va_end(args);
+}
 
-struct ElmIndex {
-    struct {
-        struct DbrStack refs;
-    } buckets[ELM_INDEX_BUCKETS];
-};
-
-DBR_EXTERN void
-elm_index_init(struct ElmIndex* index);
-
-DBR_EXTERN void
-elm_index_insert(struct ElmIndex* index, struct DbrOrder* order);
-
-DBR_EXTERN struct DbrOrder*
-elm_index_remove(struct ElmIndex* index, DbrIden trid, const char* ref);
-
-DBR_EXTERN struct DbrOrder*
-elm_index_find(const struct ElmIndex* index, DbrIden trid, const char* ref);
-
-#endif // ELM_INDEX_H
+DBR_API void
+dbr_log_vprintf(int level, const char* format, va_list args)
+{
+    logger(level, format, args);
+}

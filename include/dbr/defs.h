@@ -48,42 +48,6 @@ enum {
  * @{
  */
 
-#if DBR_DEBUG_LEVEL >= 1
-#include <stdio.h>
-#define DBR_DEBUG1(fmt)                         \
-    printf(fmt "\n")
-#define DBR_DEBUG1F(fmt, ...)                   \
-    printf(fmt "\n", __VA_ARGS__)
-#define DBR_CHECKPOINT                                      \
-    DBR_DEBUG1F("%s:%d: checkpoint", __FILE__, __LINE__)
-#else  // DBR_DEBUG_LEVEL < 1
-#define DBR_DEBUG1(fmt)
-#define DBR_DEBUG1F(fmt, ...)
-#define DBR_CHECKPOINT
-#endif // DBR_DEBUG_LEVEL < 1
-
-#if DBR_DEBUG_LEVEL >= 2
-#include <stdio.h>
-#define DBR_DEBUG2(fmt)                         \
-    printf(fmt "\n")
-#define DBR_DEBUG2F(fmt, ...)                   \
-    printf(fmt "\n", __VA_ARGS__)
-#else  // DBR_DEBUG_LEVEL < 2
-#define DBR_DEBUG2(fmt)
-#define DBR_DEBUG2F(fmt, ...)
-#endif // DBR_DEBUG_LEVEL < 2
-
-#if DBR_DEBUG_LEVEL >= 3
-#include <stdio.h>
-#define DBR_DEBUG3(fmt)                         \
-    printf(fmt "\n")
-#define DBR_DEBUG3F(fmt, ...)                   \
-    printf(fmt "\n", __VA_ARGS__)
-#else  // DBR_DEBUG_LEVEL < 3
-#define DBR_DEBUG3(fmt)
-#define DBR_DEBUG3F(fmt, ...)
-#endif // DBR_DEBUG_LEVEL < 3
-
 #define dbr_min(a, b) ((a) <= (b) ? (a) : (b))
 #define dbr_max(a, b) ((a) >= (b) ? (a) : (b))
 
