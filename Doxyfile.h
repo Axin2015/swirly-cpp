@@ -43,6 +43,10 @@
  */
 
 /**
+ * @defgroup Pack Pack
+ */
+
+/**
  * @defgroup Pool Pool
  */
 
