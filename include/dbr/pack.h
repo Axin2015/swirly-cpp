@@ -30,9 +30,6 @@
  * @{
  */
 
-DBR_API ssize_t
-dbr_sizeof(const char* format, va_list args);
-
 DBR_API char*
 dbr_pack16(char* buf, uint16_t i);
 
@@ -43,7 +40,10 @@ DBR_API char*
 dbr_pack64(char* buf, uint64_t i);
 
 DBR_API char*
-dbr_pack(char* buf, const char* format, va_list args);
+dbr_packf(char* buf, const char* format, ...);
+
+DBR_API char*
+dbr_vpackf(char* buf, const char* format, va_list args);
 
 DBR_API const char*
 dbr_unpack16(const char* buf, uint16_t* i);
@@ -55,7 +55,16 @@ DBR_API const char*
 dbr_unpack64(const char* buf, uint64_t* i);
 
 DBR_API const char*
-dbr_unpack(const char* buf, const char* format, va_list args);
+dbr_unpackf(const char* buf, const char* format, ...);
+
+DBR_API const char*
+dbr_vunpackf(const char* buf, const char* format, va_list args);
+
+DBR_API ssize_t
+dbr_sizef(const char* format, ...);
+
+DBR_API ssize_t
+dbr_vsizef(const char* format, va_list args);
 
 /** @} */
 

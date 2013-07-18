@@ -23,11 +23,11 @@ TEST_CASE(pack16)
 {
     char buf[sizeof(uint16_t)];
     const char* it = dbr_pack16(buf, (uint16_t)101);
-    check(it == buf + sizeof(uint16_t));
+    check(it == buf + sizeof(buf));
 
     uint16_t i;
     it = dbr_unpack16(buf, &i);
-    check(it == buf + sizeof(uint16_t));
+    check(it == buf + sizeof(buf));
 
     check(i == 101);
 }
@@ -36,11 +36,11 @@ TEST_CASE(pack32)
 {
     char buf[sizeof(uint32_t)];
     const char* it = dbr_pack32(buf, (uint32_t)101);
-    check(it == buf + sizeof(uint32_t));
+    check(it == buf + sizeof(buf));
 
     uint32_t i;
     it = dbr_unpack32(buf, &i);
-    check(it == buf + sizeof(uint32_t));
+    check(it == buf + sizeof(buf));
 
     check(i == 101);
 }
@@ -49,11 +49,25 @@ TEST_CASE(pack64)
 {
     char buf[sizeof(uint64_t)];
     const char* it = dbr_pack64(buf, (uint64_t)101);
-    check(it == buf + sizeof(uint64_t));
+    check(it == buf + sizeof(buf));
 
     uint64_t i;
     it = dbr_unpack64(buf, &i);
-    check(it == buf + sizeof(uint64_t));
+    check(it == buf + sizeof(buf));
 
     check(i == 101);
+}
+
+TEST_CASE(packf_dd)
+{
+    char buf[sizeof(uint32_t) + sizeof(uint32_t)];
+    const char* it = dbr_packf(buf, "dd", (uint32_t)101, (uint32_t)202);
+    check(it == buf + sizeof(buf));
+
+    uint32_t i, j;
+    it = dbr_unpackf(buf, "dd", &i, &j);
+    check(it == buf + sizeof(buf));
+
+    check(i == 101);
+    check(j == 202);
 }

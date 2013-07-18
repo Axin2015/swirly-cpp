@@ -129,7 +129,17 @@ dbr_pack64(char* buf, uint64_t i)
 }
 
 DBR_API char*
-dbr_pack(char* buf, const char* format, va_list args)
+dbr_packf(char* buf, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    buf = dbr_vpackf(buf, format, args);
+    va_end(args);
+    return buf;
+}
+
+DBR_API char*
+dbr_vpackf(char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
         uint32_t i;
@@ -193,7 +203,17 @@ dbr_unpack64(const char* buf, uint64_t* i)
 }
 
 DBR_API const char*
-dbr_unpack(const char* buf, const char* format, va_list args)
+dbr_unpackf(const char* buf, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    buf = dbr_vunpackf(buf, format, args);
+    va_end(args);
+    return buf;
+}
+
+DBR_API const char*
+dbr_vunpackf(const char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
         uint16_t n;
@@ -232,7 +252,18 @@ dbr_unpack(const char* buf, const char* format, va_list args)
 }
 
 DBR_API ssize_t
-dbr_sizeof(const char* format, va_list args)
+dbr_sizef(const char* format, ...)
+{
+    ssize_t size;
+    va_list args;
+    va_start(args, format);
+    size = dbr_vsizef(format, args);
+    va_end(args);
+    return size;
+}
+
+DBR_API ssize_t
+dbr_vsizef(const char* format, va_list args)
 {
     ssize_t size = 0;
     for (const char* cp = format; *cp != '\0'; ++cp) {
