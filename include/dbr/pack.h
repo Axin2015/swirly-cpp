@@ -31,13 +31,28 @@
  */
 
 DBR_API char*
-dbr_pack16(char* buf, uint16_t i);
+dbr_pack_int8(char* buf, int8_t i);
 
 DBR_API char*
-dbr_pack32(char* buf, uint32_t i);
+dbr_pack_uint8(char* buf, uint8_t i);
 
 DBR_API char*
-dbr_pack64(char* buf, uint64_t i);
+dbr_pack_int16(char* buf, int16_t i);
+
+DBR_API char*
+dbr_pack_uint16(char* buf, uint16_t i);
+
+DBR_API char*
+dbr_pack_int32(char* buf, int32_t i);
+
+DBR_API char*
+dbr_pack_uint32(char* buf, uint32_t i);
+
+DBR_API char*
+dbr_pack_int64(char* buf, int64_t i);
+
+DBR_API char*
+dbr_pack_uint64(char* buf, uint64_t i);
 
 DBR_API char*
 dbr_packf(char* buf, const char* format, ...);
@@ -46,25 +61,34 @@ DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args);
 
 DBR_API const char*
-dbr_unpack16(const char* buf, uint16_t* i);
+dbr_unpack_int8(const char* buf, int8_t* i);
 
 DBR_API const char*
-dbr_unpack32(const char* buf, uint32_t* i);
+dbr_unpack_uint8(const char* buf, uint8_t* i);
 
 DBR_API const char*
-dbr_unpack64(const char* buf, uint64_t* i);
+dbr_unpack_int16(const char* buf, int16_t* i);
+
+DBR_API const char*
+dbr_unpack_uint16(const char* buf, uint16_t* i);
+
+DBR_API const char*
+dbr_unpack_int32(const char* buf, int32_t* i);
+
+DBR_API const char*
+dbr_unpack_uint32(const char* buf, uint32_t* i);
+
+DBR_API const char*
+dbr_unpack_int64(const char* buf, int64_t* i);
+
+DBR_API const char*
+dbr_unpack_uint64(const char* buf, uint64_t* i);
 
 DBR_API const char*
 dbr_unpackf(const char* buf, const char* format, ...);
 
 DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args);
-
-DBR_API ssize_t
-dbr_sizef(const char* format, ...);
-
-DBR_API ssize_t
-dbr_vsizef(const char* format, va_list args);
 
 /** @} */
 

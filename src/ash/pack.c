@@ -105,7 +105,21 @@ hton64(uint64_t i)
 #endif // WORDS_BIGENDIAN
 
 DBR_API char*
-dbr_pack16(char* buf, uint16_t i)
+dbr_pack_int8(char* buf, int8_t i)
+{
+    *buf = i;
+    return buf + sizeof(i);
+}
+
+DBR_API char*
+dbr_pack_uint8(char* buf, uint8_t i)
+{
+    *buf = i;
+    return buf + sizeof(i);
+}
+
+DBR_API char*
+dbr_pack_int16(char* buf, int16_t i)
 {
     i = hton16(i);
     __builtin_memcpy(buf, &i, sizeof(i));
@@ -113,7 +127,15 @@ dbr_pack16(char* buf, uint16_t i)
 }
 
 DBR_API char*
-dbr_pack32(char* buf, uint32_t i)
+dbr_pack_uint16(char* buf, uint16_t i)
+{
+    i = hton16(i);
+    __builtin_memcpy(buf, &i, sizeof(i));
+    return buf + sizeof(i);
+}
+
+DBR_API char*
+dbr_pack_int32(char* buf, int32_t i)
 {
     i = hton32(i);
     __builtin_memcpy(buf, &i, sizeof(i));
@@ -121,7 +143,23 @@ dbr_pack32(char* buf, uint32_t i)
 }
 
 DBR_API char*
-dbr_pack64(char* buf, uint64_t i)
+dbr_pack_uint32(char* buf, uint32_t i)
+{
+    i = hton32(i);
+    __builtin_memcpy(buf, &i, sizeof(i));
+    return buf + sizeof(i);
+}
+
+DBR_API char*
+dbr_pack_int64(char* buf, int64_t i)
+{
+    i = hton64(i);
+    __builtin_memcpy(buf, &i, sizeof(i));
+    return buf + sizeof(i);
+}
+
+DBR_API char*
+dbr_pack_uint64(char* buf, uint64_t i)
 {
     i = hton64(i);
     __builtin_memcpy(buf, &i, sizeof(i));
@@ -142,33 +180,35 @@ DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
-        uint32_t i;
-        uint64_t l;
+        uint32_t n;
         const char* s;
         switch (*cp) {
-        case 'd':
         case 'i':
-            i = va_arg(args, uint32_t);
-            buf = dbr_pack32(buf, i);
+            buf = dbr_pack_int32(buf, va_arg(args, int32_t));
+            break;
+        case 'I':
+            buf = dbr_pack_uint32(buf, va_arg(args, uint32_t));
             break;
         case 'l':
-            l = va_arg(args, uint64_t);
-            buf = dbr_pack64(buf, l);
+            buf = dbr_pack_int64(buf, va_arg(args, int64_t));
+            break;
+        case 'L':
+            buf = dbr_pack_uint64(buf, va_arg(args, uint64_t));
             break;
         case 'm':
             s = va_arg(args, const char*);
-            i = strnlen(s, MNEM_MAX);
-            buf = dbr_pack16(buf, i);
-            __builtin_memcpy(buf, s, i);
-            buf += i;
+            n = strnlen(s, MNEM_MAX);
+            buf = dbr_pack_uint16(buf, n);
+            __builtin_memcpy(buf, s, n);
+            buf += n;
             break;
         case 's':
-            i = va_arg(args, uint32_t);
+            n = va_arg(args, uint32_t);
             s = va_arg(args, const char*);
-            i = strnlen(s, i);
-            buf = dbr_pack16(buf, i);
-            __builtin_memcpy(buf, s, i);
-            buf += i;
+            n = strnlen(s, n);
+            buf = dbr_pack_uint16(buf, n);
+            __builtin_memcpy(buf, s, n);
+            buf += n;
             break;
         default:
             dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
@@ -179,7 +219,21 @@ dbr_vpackf(char* buf, const char* format, va_list args)
 }
 
 DBR_API const char*
-dbr_unpack16(const char* buf, uint16_t* i)
+dbr_unpack_int8(const char* buf, int8_t* i)
+{
+    *i = *buf;
+    return buf + sizeof(*i);
+}
+
+DBR_API const char*
+dbr_unpack_uint8(const char* buf, uint8_t* i)
+{
+    *i = *buf;
+    return buf + sizeof(*i);
+}
+
+DBR_API const char*
+dbr_unpack_int16(const char* buf, int16_t* i)
 {
     __builtin_memcpy(i, buf, sizeof(*i));
     *i = ntoh16(*i);
@@ -187,7 +241,15 @@ dbr_unpack16(const char* buf, uint16_t* i)
 }
 
 DBR_API const char*
-dbr_unpack32(const char* buf, uint32_t* i)
+dbr_unpack_uint16(const char* buf, uint16_t* i)
+{
+    __builtin_memcpy(i, buf, sizeof(*i));
+    *i = ntoh16(*i);
+    return buf + sizeof(*i);
+}
+
+DBR_API const char*
+dbr_unpack_int32(const char* buf, int32_t* i)
 {
     __builtin_memcpy(i, buf, sizeof(*i));
     *i = ntoh32(*i);
@@ -195,7 +257,23 @@ dbr_unpack32(const char* buf, uint32_t* i)
 }
 
 DBR_API const char*
-dbr_unpack64(const char* buf, uint64_t* i)
+dbr_unpack_uint32(const char* buf, uint32_t* i)
+{
+    __builtin_memcpy(i, buf, sizeof(*i));
+    *i = ntoh32(*i);
+    return buf + sizeof(*i);
+}
+
+DBR_API const char*
+dbr_unpack_int64(const char* buf, int64_t* i)
+{
+    __builtin_memcpy(i, buf, sizeof(*i));
+    *i = ntoh64(*i);
+    return buf + sizeof(*i);
+}
+
+DBR_API const char*
+dbr_unpack_uint64(const char* buf, uint64_t* i)
 {
     __builtin_memcpy(i, buf, sizeof(*i));
     *i = ntoh64(*i);
@@ -216,32 +294,34 @@ DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
-        uint16_t n;
-        uint32_t* i, j;
-        uint64_t* l;
+        uint32_t n;
+        uint16_t m;
         char* s;
         switch (*cp) {
-        case 'd':
         case 'i':
-            i = va_arg(args, uint32_t*);
-            buf = dbr_unpack32(buf, i);
+            buf = dbr_unpack_int32(buf, va_arg(args, int32_t*));
+            break;
+        case 'I':
+            buf = dbr_unpack_uint32(buf, va_arg(args, uint32_t*));
             break;
         case 'l':
-            l = va_arg(args, uint64_t*);
-            buf = dbr_unpack64(buf, l);
+            buf = dbr_unpack_int64(buf, va_arg(args, int64_t*));
+            break;
+        case 'L':
+            buf = dbr_unpack_uint64(buf, va_arg(args, uint64_t*));
             break;
         case 'm':
             s = va_arg(args, char*);
-            buf = dbr_unpack16(buf, &n);
-            __builtin_memcpy(s, buf, dbr_min(n, MNEM_MAX));
-            buf += n;
+            buf = dbr_unpack_uint16(buf, &m);
+            __builtin_memcpy(s, buf, dbr_min(MNEM_MAX, m));
+            buf += dbr_min(MNEM_MAX, m);
             break;
         case 's':
-            j = va_arg(args, uint32_t);
+            n = va_arg(args, uint32_t);
             s = va_arg(args, char*);
-            buf = dbr_unpack16(buf, &n);
-            __builtin_memcpy(s, buf, dbr_min(n, j));
-            buf += n;
+            buf = dbr_unpack_uint16(buf, &m);
+            __builtin_memcpy(s, buf, dbr_min(n, m));
+            buf += dbr_min(n, m);
             break;
         default:
             dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
@@ -249,51 +329,4 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
         }
     }
     return buf;
-}
-
-DBR_API ssize_t
-dbr_sizef(const char* format, ...)
-{
-    ssize_t size;
-    va_list args;
-    va_start(args, format);
-    size = dbr_vsizef(format, args);
-    va_end(args);
-    return size;
-}
-
-DBR_API ssize_t
-dbr_vsizef(const char* format, va_list args)
-{
-    ssize_t size = 0;
-    for (const char* cp = format; *cp != '\0'; ++cp) {
-        uint32_t i;
-        const char* s;
-        switch (*cp) {
-        case 'd':
-        case 'i':
-            va_arg(args, uint32_t);
-            size += sizeof(uint32_t);
-            break;
-        case 'l':
-            va_arg(args, uint64_t);
-            size += sizeof(uint64_t);
-            break;
-        case 'm':
-            s = va_arg(args, const char*);
-            i = strnlen(s, MNEM_MAX);
-            size += sizeof(uint16_t) + i;
-            break;
-        case 's':
-            i = va_arg(args, uint32_t);
-            s = va_arg(args, const char*);
-            i = strnlen(s, i);
-            size += sizeof(uint16_t) + i;
-            break;
-        default:
-            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
-            return -1;
-        }
-    }
-    return size;
 }
