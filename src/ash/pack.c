@@ -236,6 +236,15 @@ dbr_packl(char* buf, long l)
     return buf;
 }
 
+DBR_API char*
+dbr_packs(char* buf, const char* s, int m)
+{
+    const int n = strnlen(s, m);
+    buf = dbr_packi(buf, n);
+    __builtin_memcpy(buf, s, n);
+    return buf + n;
+}
+
 DBR_API const char*
 dbr_unpacki(const char* buf, int* i)
 {
@@ -298,6 +307,22 @@ dbr_unpackl(const char* buf, long* l)
     return buf;
 }
 
+DBR_API const char*
+dbr_unpacks(const char* buf, char* s, int m)
+{
+    int n;
+    if ((buf = dbr_unpacki(buf, &n))) {
+        const char* next = buf + n;
+        if (n < m) {
+            __builtin_memcpy(s, buf, n);
+            s[n] = '\0';
+        } else
+            __builtin_memcpy(s, buf, m);
+        buf = next;
+    }
+    return buf;
+}
+
 DBR_API char*
 dbr_packf(char* buf, const char* format, ...)
 {
@@ -312,7 +337,7 @@ DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
-        int n;
+        int m;
         const char* s;
         switch (*cp) {
         case 'i':
@@ -323,18 +348,12 @@ dbr_vpackf(char* buf, const char* format, va_list args)
             break;
         case 'm':
             s = va_arg(args, const char*);
-            n = strnlen(s, MNEM_MAX);
-            buf = dbr_packi(buf, n);
-            __builtin_memcpy(buf, s, n);
-            buf += n;
+            buf = dbr_packs(buf, s, MNEM_MAX);
             break;
         case 's':
-            n = va_arg(args, int);
+            m = va_arg(args, int);
             s = va_arg(args, const char*);
-            n = strnlen(s, n);
-            buf = dbr_packi(buf, n);
-            __builtin_memcpy(buf, s, n);
-            buf += n;
+            buf = dbr_packs(buf, s, m);
             break;
         default:
             dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
@@ -358,7 +377,7 @@ DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; buf && *cp != '\0'; ++cp) {
-        int m, n = 0;
+        int m;
         char* s;
         switch (*cp) {
         case 'i':
@@ -369,18 +388,12 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
             break;
         case 'm':
             s = va_arg(args, char*);
-            if ((buf = dbr_unpacki(buf, &n))) {
-                strncpy(s, buf, MNEM_MAX);
-                buf += n;
-            }
+            buf = dbr_unpacks(buf, s, MNEM_MAX);
             break;
         case 's':
             m = va_arg(args, int);
             s = va_arg(args, char*);
-            if ((buf = dbr_unpacki(buf, &n))) {
-                strncpy(s, buf, m);
-                buf += n;
-            }
+            buf = dbr_unpacks(buf, s, m);
             break;
         default:
             dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);

@@ -36,11 +36,17 @@ dbr_packi(char* buf, int i);
 DBR_API char*
 dbr_packl(char* buf, long l);
 
+DBR_API char*
+dbr_packs(char* buf, const char* s, int m);
+
 DBR_API const char*
 dbr_unpacki(const char* buf, int* i);
 
 DBR_API const char*
 dbr_unpackl(const char* buf, long* l);
+
+DBR_API const char*
+dbr_unpacks(const char* buf, char* s, int m);
 
 DBR_API char*
 dbr_packf(char* buf, const char* format, ...);
