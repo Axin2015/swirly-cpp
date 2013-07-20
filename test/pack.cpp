@@ -19,55 +19,28 @@
 
 #include <dbr/pack.h>
 
-TEST_CASE(pack16)
+TEST_CASE(pack_posimm)
 {
-    char buf[sizeof(uint16_t)];
-    const char* it = dbr_pack_uint16(buf, (uint16_t)101);
-    check(it == buf + sizeof(buf));
+    char buf[1];
+    const char* it = dbr_packi(buf, 63);
+    check(it - buf == 1);
 
-    uint16_t i;
-    it = dbr_unpack_uint16(buf, &i);
-    check(it == buf + sizeof(buf));
+    int i;
+    it = dbr_unpacki(buf, &i);
+    check(it - buf == 1);
 
-    check(i == 101);
+    check(i == 63);
 }
 
-TEST_CASE(pack32)
+TEST_CASE(pack_negimm)
 {
-    char buf[sizeof(uint32_t)];
-    const char* it = dbr_pack_uint32(buf, (uint32_t)101);
-    check(it == buf + sizeof(buf));
+    char buf[1];
+    const char* it = dbr_packi(buf, -64);
+    check(it - buf == 1);
 
-    uint32_t i;
-    it = dbr_unpack_uint32(buf, &i);
-    check(it == buf + sizeof(buf));
+    int i;
+    it = dbr_unpacki(buf, &i);
+    check(it - buf == 1);
 
-    check(i == 101);
-}
-
-TEST_CASE(pack64)
-{
-    char buf[sizeof(uint64_t)];
-    const char* it = dbr_pack_uint64(buf, (uint64_t)101);
-    check(it == buf + sizeof(buf));
-
-    uint64_t i;
-    it = dbr_unpack_uint64(buf, &i);
-    check(it == buf + sizeof(buf));
-
-    check(i == 101);
-}
-
-TEST_CASE(packf_II)
-{
-    char buf[sizeof(uint32_t) + sizeof(uint32_t)];
-    const char* it = dbr_packf(buf, "II", (uint32_t)101, (uint32_t)202);
-    check(it == buf + sizeof(buf));
-
-    uint32_t i, j;
-    it = dbr_unpackf(buf, "II", &i, &j);
-    check(it == buf + sizeof(buf));
-
-    check(i == 101);
-    check(j == 202);
+    check(i == -64);
 }

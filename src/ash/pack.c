@@ -20,82 +20,102 @@
 
 #include <dbr/err.h>
 
+#include <limits.h>
 #include <string.h>
+
+// Packed integer spec:
+
+// Immediate can store between -64 and 63:
+// 00 xxxxxx
+// 11 xxxxxx
+
+// Otherwise 10 in high bits signals escape.
+// And lower 6 bits contain integer size in bytes:
+// 10 000001 0x81
+// 10 000010 0x82
+// 10 000100 0x84
+// 10 001000 0x88
+
+// Escape can be tested using the following expresssion:
+// (hdr & '0xc0') == 0x80
+
+// And the following masks-off the lower 6 bits:
+// hdr & 3f
 
 enum { MNEM_MAX = 16 };
 
 #if WORDS_BIGENDIAN == 1
 
-static inline uint16_t
-ntoh16(uint16_t i)
+static inline int16_t
+ntoh16(int16_t i)
 {
     return i;
 }
 
-static inline uint32_t
-ntoh32(uint32_t i)
+static inline int32_t
+ntoh32(int32_t i)
 {
     return i;
 }
 
-static inline uint64_t
-ntoh64(uint64_t i)
+static inline int64_t
+ntoh64(int64_t i)
 {
     return i;
 }
 
-static inline uint16_t
-hton16(uint16_t i)
+static inline int16_t
+hton16(int16_t i)
 {
     return i;
 }
 
-static inline uint32_t
-hton32(uint32_t i)
+static inline int32_t
+hton32(int32_t i)
 {
     return i;
 }
 
-static inline uint64_t
-hton64(uint64_t i)
+static inline int64_t
+hton64(int64_t i)
 {
     return i;
 }
 
 #elif WORDS_BIGENDIAN == 0
 
-static inline uint16_t
-ntoh16(uint16_t i)
+static inline int16_t
+ntoh16(int16_t i)
 {
     return __builtin_bswap16(i);
 }
 
-static inline uint32_t
-ntoh32(uint32_t i)
+static inline int32_t
+ntoh32(int32_t i)
 {
     return __builtin_bswap32(i);
 }
 
-static inline uint64_t
-ntoh64(uint64_t i)
+static inline int64_t
+ntoh64(int64_t i)
 {
     return __builtin_bswap64(i);
 }
 
-static inline uint16_t
-hton16(uint16_t i)
+static inline int16_t
+hton16(int16_t i)
 {
     return __builtin_bswap16(i);
 }
 
-static inline uint32_t
-hton32(uint32_t i)
+static inline int32_t
+hton32(int32_t i)
 {
     return __builtin_bswap32(i);
 }
 
-static inline uint64_t
-hton64(uint64_t i)
+static inline int64_t
+hton64(int64_t i)
 {
     return __builtin_bswap64(i);
 }
@@ -104,66 +124,178 @@ hton64(uint64_t i)
 #error WORDS_BIGENDIAN not defined
 #endif // WORDS_BIGENDIAN
 
-DBR_API char*
-dbr_pack_int8(char* buf, int8_t i)
+static inline void
+pack8(char* buf, int8_t i)
 {
     *buf = i;
-    return buf + sizeof(i);
 }
 
-DBR_API char*
-dbr_pack_uint8(char* buf, uint8_t i)
-{
-    *buf = i;
-    return buf + sizeof(i);
-}
-
-DBR_API char*
-dbr_pack_int16(char* buf, int16_t i)
+static inline void
+pack16(char* buf, int16_t i)
 {
     i = hton16(i);
     __builtin_memcpy(buf, &i, sizeof(i));
-    return buf + sizeof(i);
 }
 
-DBR_API char*
-dbr_pack_uint16(char* buf, uint16_t i)
-{
-    i = hton16(i);
-    __builtin_memcpy(buf, &i, sizeof(i));
-    return buf + sizeof(i);
-}
-
-DBR_API char*
-dbr_pack_int32(char* buf, int32_t i)
+static inline void
+pack32(char* buf, int32_t i)
 {
     i = hton32(i);
     __builtin_memcpy(buf, &i, sizeof(i));
-    return buf + sizeof(i);
 }
 
-DBR_API char*
-dbr_pack_uint32(char* buf, uint32_t i)
-{
-    i = hton32(i);
-    __builtin_memcpy(buf, &i, sizeof(i));
-    return buf + sizeof(i);
-}
-
-DBR_API char*
-dbr_pack_int64(char* buf, int64_t i)
+static inline void
+pack64(char* buf, int64_t i)
 {
     i = hton64(i);
     __builtin_memcpy(buf, &i, sizeof(i));
-    return buf + sizeof(i);
+}
+
+static inline int8_t
+unpack8(const char* buf)
+{
+    return *buf;
+}
+
+static inline int16_t
+unpack16(const char* buf)
+{
+    int16_t i;
+    __builtin_memcpy(&i, buf, sizeof(i));
+    return ntoh16(i);
+}
+
+static inline int32_t
+unpack32(const char* buf)
+{
+    int32_t i;
+    __builtin_memcpy(&i, buf, sizeof(i));
+    return ntoh32(i);
+}
+
+static inline int64_t
+unpack64(const char* buf)
+{
+    int64_t i;
+    __builtin_memcpy(&i, buf, sizeof(i));
+    return ntoh64(i);
 }
 
 DBR_API char*
-dbr_pack_uint64(char* buf, uint64_t i)
+dbr_packi(char* buf, int i)
 {
-    i = hton64(i);
-    __builtin_memcpy(buf, &i, sizeof(i));
-    return buf + sizeof(i);
+    if (-64 <= i && i <= 63) {
+        pack8(buf, i);
+        buf += 1;
+    } else if (SCHAR_MIN <= i && i <= SCHAR_MAX) {
+        pack8(buf, 0x81);
+        buf += 1;
+        pack8(buf, i);
+        buf += 1;
+    } else if (SHRT_MIN <= i && i <= SHRT_MAX) {
+        pack8(buf, 0x82);
+        buf += 1;
+        pack16(buf, i);
+        buf += 2;
+    } else {
+        pack8(buf, 0x84);
+        buf += 1;
+        pack32(buf, i);
+        buf += 4;
+    }
+    return buf;
+}
+
+DBR_API char*
+dbr_packl(char* buf, long l)
+{
+    if (-64 <= l && l <= 63) {
+        pack8(buf, l);
+        buf += 1;
+    } else if (SCHAR_MIN <= l && l <= SCHAR_MAX) {
+        pack8(buf, 0x81);
+        buf += 1;
+        pack8(buf, l);
+        buf += 1;
+    } else if (SHRT_MIN <= l && l <= SHRT_MAX) {
+        pack8(buf, 0x82);
+        buf += 1;
+        pack16(buf, l);
+        buf += 2;
+    } else if (INT_MIN <= l && l <= INT_MAX) {
+        pack8(buf, 0x84);
+        buf += 1;
+        pack32(buf, l);
+        buf += 4;
+    } else {
+        pack8(buf, 0x88);
+        buf += 1;
+        pack64(buf, l);
+        buf += 8;
+    }
+    return buf;
+}
+
+DBR_API const char*
+dbr_unpacki(const char* buf, int* i)
+{
+    int8_t hdr = unpack8(buf);
+    buf += 1;
+    if ((hdr & 0xc0) == 0x80) {
+        switch (hdr & 0x3f) {
+        case 1:
+            *i = unpack8(buf);
+            buf += 1;
+            break;
+        case 2:
+            *i = unpack16(buf);
+            buf += 2;
+            break;
+        case 4:
+            *i = unpack32(buf);
+            buf += 4;
+            break;
+        default:
+            dbr_err_set(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
+            buf = NULL;
+            break;
+        }
+    } else
+        *i = hdr;
+    return buf;
+}
+
+DBR_API const char*
+dbr_unpackl(const char* buf, long* l)
+{
+    int8_t hdr = unpack8(buf);
+    buf += 1;
+    if ((hdr & 0xc0) == 0x80) {
+        switch (hdr & 0x3f) {
+        case 1:
+            *l = unpack8(buf);
+            buf += 1;
+            break;
+        case 2:
+            *l = unpack16(buf);
+            buf += 2;
+            break;
+        case 4:
+            *l = unpack32(buf);
+            buf += 4;
+            break;
+        case 8:
+            *l = unpack64(buf);
+            buf += 8;
+            break;
+        default:
+            dbr_err_set(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
+            buf = NULL;
+            break;
+        }
+    } else
+        *l = hdr;
+    return buf;
 }
 
 DBR_API char*
@@ -180,33 +312,27 @@ DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
-        uint32_t n;
+        int n;
         const char* s;
         switch (*cp) {
         case 'i':
-            buf = dbr_pack_int32(buf, va_arg(args, int32_t));
-            break;
-        case 'I':
-            buf = dbr_pack_uint32(buf, va_arg(args, uint32_t));
+            buf = dbr_packi(buf, va_arg(args, int));
             break;
         case 'l':
-            buf = dbr_pack_int64(buf, va_arg(args, int64_t));
-            break;
-        case 'L':
-            buf = dbr_pack_uint64(buf, va_arg(args, uint64_t));
+            buf = dbr_packl(buf, va_arg(args, long));
             break;
         case 'm':
             s = va_arg(args, const char*);
             n = strnlen(s, MNEM_MAX);
-            buf = dbr_pack_uint16(buf, n);
+            buf = dbr_packi(buf, n);
             __builtin_memcpy(buf, s, n);
             buf += n;
             break;
         case 's':
-            n = va_arg(args, uint32_t);
+            n = va_arg(args, int);
             s = va_arg(args, const char*);
             n = strnlen(s, n);
-            buf = dbr_pack_uint16(buf, n);
+            buf = dbr_packi(buf, n);
             __builtin_memcpy(buf, s, n);
             buf += n;
             break;
@@ -216,68 +342,6 @@ dbr_vpackf(char* buf, const char* format, va_list args)
         }
     }
     return buf;
-}
-
-DBR_API const char*
-dbr_unpack_int8(const char* buf, int8_t* i)
-{
-    *i = *buf;
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_uint8(const char* buf, uint8_t* i)
-{
-    *i = *buf;
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_int16(const char* buf, int16_t* i)
-{
-    __builtin_memcpy(i, buf, sizeof(*i));
-    *i = ntoh16(*i);
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_uint16(const char* buf, uint16_t* i)
-{
-    __builtin_memcpy(i, buf, sizeof(*i));
-    *i = ntoh16(*i);
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_int32(const char* buf, int32_t* i)
-{
-    __builtin_memcpy(i, buf, sizeof(*i));
-    *i = ntoh32(*i);
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_uint32(const char* buf, uint32_t* i)
-{
-    __builtin_memcpy(i, buf, sizeof(*i));
-    *i = ntoh32(*i);
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_int64(const char* buf, int64_t* i)
-{
-    __builtin_memcpy(i, buf, sizeof(*i));
-    *i = ntoh64(*i);
-    return buf + sizeof(*i);
-}
-
-DBR_API const char*
-dbr_unpack_uint64(const char* buf, uint64_t* i)
-{
-    __builtin_memcpy(i, buf, sizeof(*i));
-    *i = ntoh64(*i);
-    return buf + sizeof(*i);
 }
 
 DBR_API const char*
@@ -293,39 +357,35 @@ dbr_unpackf(const char* buf, const char* format, ...)
 DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args)
 {
-    for (const char* cp = format; *cp != '\0'; ++cp) {
-        uint32_t n;
-        uint16_t m;
+    for (const char* cp = format; buf && *cp != '\0'; ++cp) {
+        int m, n = 0;
         char* s;
         switch (*cp) {
         case 'i':
-            buf = dbr_unpack_int32(buf, va_arg(args, int32_t*));
-            break;
-        case 'I':
-            buf = dbr_unpack_uint32(buf, va_arg(args, uint32_t*));
+            buf = dbr_unpacki(buf, va_arg(args, int*));
             break;
         case 'l':
-            buf = dbr_unpack_int64(buf, va_arg(args, int64_t*));
-            break;
-        case 'L':
-            buf = dbr_unpack_uint64(buf, va_arg(args, uint64_t*));
+            buf = dbr_unpackl(buf, va_arg(args, long*));
             break;
         case 'm':
             s = va_arg(args, char*);
-            buf = dbr_unpack_uint16(buf, &m);
-            __builtin_memcpy(s, buf, dbr_min(MNEM_MAX, m));
-            buf += dbr_min(MNEM_MAX, m);
+            if ((buf = dbr_unpacki(buf, &n))) {
+                strncpy(s, buf, MNEM_MAX);
+                buf += n;
+            }
             break;
         case 's':
-            n = va_arg(args, uint32_t);
+            m = va_arg(args, int);
             s = va_arg(args, char*);
-            buf = dbr_unpack_uint16(buf, &m);
-            __builtin_memcpy(s, buf, dbr_min(n, m));
-            buf += dbr_min(n, m);
+            if ((buf = dbr_unpacki(buf, &n))) {
+                strncpy(s, buf, m);
+                buf += n;
+            }
             break;
         default:
             dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
-            return NULL;
+            buf = NULL;
+            break;
         }
     }
     return buf;
