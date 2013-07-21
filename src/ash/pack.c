@@ -311,14 +311,15 @@ DBR_API const char*
 dbr_unpacks(const char* buf, char* s, int m)
 {
     int n;
+    // Unpack string length.
     if ((buf = dbr_unpacki(buf, &n))) {
-        const char* next = buf + n;
         if (n < m) {
+            // Null terminate when less than max.
             __builtin_memcpy(s, buf, n);
             s[n] = '\0';
         } else
             __builtin_memcpy(s, buf, m);
-        buf = next;
+        buf += n;
     }
     return buf;
 }
