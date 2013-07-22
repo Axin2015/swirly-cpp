@@ -39,6 +39,10 @@
  */
 
 /**
+ * @defgroup Msg Msg
+ */
+
+/**
  * @defgroup Node Node
  */
 
