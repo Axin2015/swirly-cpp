@@ -21,6 +21,7 @@
 #include <dbr/err.h>
 
 #include <limits.h>
+#include <stdint.h>
 #include <string.h>
 
 // Packed integer spec:

@@ -21,12 +21,9 @@
 #include <dbr/defs.h>
 
 #include <stdarg.h>
-#include <stdint.h>
-
-#include <sys/types.h> // ssize_t
 
 /**
- * @addtogroup Util
+ * @addtogroup Pack
  * @{
  */
 
