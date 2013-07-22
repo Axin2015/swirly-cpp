@@ -383,6 +383,7 @@ dbr_vpackf(char* buf, const char* format, va_list args)
         int m;
         const char* s;
         switch (*cp) {
+        case 'd':
         case 'i':
             buf = dbr_packi(buf, va_arg(args, int));
             break;
@@ -423,6 +424,7 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
         int m;
         char* s;
         switch (*cp) {
+        case 'd':
         case 'i':
             buf = dbr_unpacki(buf, va_arg(args, int*));
             break;
@@ -466,6 +468,7 @@ dbr_vpacklenf(const char* format, va_list args)
         int m;
         const char* s;
         switch (*cp) {
+        case 'd':
         case 'i':
             n += dbr_packleni(va_arg(args, int));
             break;
