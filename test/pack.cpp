@@ -199,3 +199,32 @@ TEST_CASE(pack_strf)
 
     check(strcmp(s, "test") == 0);
 }
+
+TEST_CASE(packleni)
+{
+    check(dbr_packleni(-64) == 1);
+    check(dbr_packleni(63) == 1);
+    check(dbr_packleni(SCHAR_MIN) == 2);
+    check(dbr_packleni(SCHAR_MAX) == 2);
+    check(dbr_packleni(SHRT_MIN) == 3);
+    check(dbr_packleni(SHRT_MAX) == 3);
+    check(dbr_packleni(INT_MIN) == 5);
+    check(dbr_packleni(INT_MAX) == 5);
+}
+
+TEST_CASE(packlenl)
+{
+    check(dbr_packlenl(LONG_MIN) == 9);
+    check(dbr_packlenl(LONG_MAX) == 9);
+}
+
+TEST_CASE(packlens)
+{
+    check(dbr_packlens("test", 16) == 5);
+    check(dbr_packlens("test", 3) == 4);
+}
+
+TEST_CASE(packlenf)
+{
+    check(dbr_packlenf("iiiilm", 63, SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX, "test") == 25);
+}

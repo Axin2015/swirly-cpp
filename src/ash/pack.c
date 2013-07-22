@@ -324,6 +324,47 @@ dbr_unpacks(const char* buf, char* s, int m)
     return buf;
 }
 
+DBR_API int
+dbr_packleni(int i)
+{
+    int n;
+    if (-64 <= i && i <= 63) {
+        n = 1;
+    } else if (SCHAR_MIN <= i && i <= SCHAR_MAX) {
+        n = 2;
+    } else if (SHRT_MIN <= i && i <= SHRT_MAX) {
+        n = 3;
+    } else {
+        n = 5;
+    }
+    return n;
+}
+
+DBR_API int
+dbr_packlenl(long l)
+{
+    int n;
+    if (-64 <= l && l <= 63) {
+        n = 1;
+    } else if (SCHAR_MIN <= l && l <= SCHAR_MAX) {
+        n = 2;
+    } else if (SHRT_MIN <= l && l <= SHRT_MAX) {
+        n = 3;
+    } else if (INT_MIN <= l && l <= INT_MAX) {
+        n = 5;
+    } else {
+        n = 9;
+    }
+    return n;
+}
+
+DBR_API int
+dbr_packlens(const char* s, int m)
+{
+    const int n = strnlen(s, m);
+    return dbr_packleni(n) + n;
+}
+
 DBR_API char*
 dbr_packf(char* buf, const char* format, ...)
 {
@@ -403,4 +444,46 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
         }
     }
     return buf;
+}
+
+DBR_API int
+dbr_packlenf(const char* format, ...)
+{
+    int n;
+    va_list args;
+    va_start(args, format);
+    n = dbr_vpacklenf(format, args);
+    va_end(args);
+    return n;
+}
+
+DBR_API int
+dbr_vpacklenf(const char* format, va_list args)
+{
+    int n = 0;
+    for (const char* cp = format; *cp != '\0'; ++cp) {
+        int m;
+        const char* s;
+        switch (*cp) {
+        case 'i':
+            n += dbr_packleni(va_arg(args, int));
+            break;
+        case 'l':
+            n += dbr_packlenl(va_arg(args, long));
+            break;
+        case 'm':
+            s = va_arg(args, const char*);
+            n += dbr_packlens(s, MNEM_MAX);
+            break;
+        case 's':
+            m = va_arg(args, int);
+            s = va_arg(args, const char*);
+            n += dbr_packlens(s, m);
+            break;
+        default:
+            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
+            return -1;
+        }
+    }
+    return n;
 }
