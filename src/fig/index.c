@@ -45,27 +45,27 @@ hash_ref(DbrIden trid, const char* ref)
 }
 
 DBR_EXTERN void
-elm_index_init(struct ElmIndex* index)
+fig_index_init(struct FigIndex* index)
 {
     // Zero buckets.
     memset(index->buckets, 0, sizeof(index->buckets));
 }
 
 DBR_EXTERN void
-elm_index_insert(struct ElmIndex* index, struct DbrOrder* order)
+fig_index_insert(struct FigIndex* index, struct DbrOrder* order)
 {
     if (order->ref[0] != '\0') {
-        const size_t bucket = hash_ref(order->trader.rec->id, order->ref) % ELM_INDEX_BUCKETS;
+        const size_t bucket = hash_ref(order->trader.rec->id, order->ref) % FIG_INDEX_BUCKETS;
         struct DbrStack* refs = &index->buckets[bucket].refs;
         dbr_stack_push(refs, &order->ref_node_);
     }
 }
 
 DBR_EXTERN struct DbrOrder*
-elm_index_remove(struct ElmIndex* index, DbrIden trid, const char* ref)
+fig_index_remove(struct FigIndex* index, DbrIden trid, const char* ref)
 {
     assert(ref);
-    const size_t bucket = hash_ref(trid, ref) % ELM_INDEX_BUCKETS;
+    const size_t bucket = hash_ref(trid, ref) % FIG_INDEX_BUCKETS;
     for (struct DbrSlNode** node = &index->buckets[bucket].refs.first;
          *node; node = &(*node)->next) {
         struct DbrOrder* order = order_entry_ref(*node);
@@ -79,10 +79,10 @@ elm_index_remove(struct ElmIndex* index, DbrIden trid, const char* ref)
 }
 
 DBR_EXTERN struct DbrOrder*
-elm_index_find(const struct ElmIndex* index, DbrIden trid, const char* ref)
+fig_index_find(const struct FigIndex* index, DbrIden trid, const char* ref)
 {
     assert(ref);
-    const size_t bucket = hash_ref(trid, ref) % ELM_INDEX_BUCKETS;
+    const size_t bucket = hash_ref(trid, ref) % FIG_INDEX_BUCKETS;
     for (struct DbrSlNode* node = dbr_stack_first(&index->buckets[bucket].refs);
          node; node = node->next) {
         struct DbrOrder* order = order_entry_ref(node);

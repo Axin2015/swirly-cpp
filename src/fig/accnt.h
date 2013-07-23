@@ -15,15 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_ACCNT_H
-#define ELM_ACCNT_H
+#ifndef FIG_ACCNT_H
+#define FIG_ACCNT_H
 
 #include <dbr/conv.h>
 #include <dbr/tree.h>
 
-struct ElmAccnt {
+struct FigAccnt {
     DbrIden id;
-    struct ElmPool* pool;
+    struct FigPool* pool;
     struct DbrTree membs;
     struct DbrTree trades;
     struct DbrTree posns;
@@ -31,16 +31,16 @@ struct ElmAccnt {
     DbrAccntSess sess;
 };
 
-DBR_EXTERN struct ElmAccnt*
-elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool);
+DBR_EXTERN struct FigAccnt*
+fig_accnt_lazy(struct DbrRec* arec, struct FigPool* pool);
 
 // Assumes that arec pointer is not null.
 
 DBR_EXTERN void
-elm_accnt_term(struct DbrRec* arec);
+fig_accnt_term(struct DbrRec* arec);
 
 static inline DbrIden
-elm_accnt_id(const struct ElmAccnt* accnt)
+fig_accnt_id(const struct FigAccnt* accnt)
 {
     return accnt->id;
 }
@@ -48,7 +48,7 @@ elm_accnt_id(const struct ElmAccnt* accnt)
 // Memb.
 
 static inline void
-elm_accnt_emplace_memb(struct ElmAccnt* accnt, struct DbrMemb* memb)
+fig_accnt_emplace_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
 {
     dbr_tree_insert(&accnt->membs, &memb->accnt_node_);
 }
@@ -58,7 +58,7 @@ elm_accnt_emplace_memb(struct ElmAccnt* accnt, struct DbrMemb* memb)
 // Transfer ownership to state.
 
 static inline void
-elm_accnt_emplace_trade(struct ElmAccnt* accnt, struct DbrTrade* trade)
+fig_accnt_emplace_trade(struct FigAccnt* accnt, struct DbrTrade* trade)
 {
     dbr_tree_insert(&accnt->trades, &trade->accnt_node_);
 }
@@ -66,7 +66,7 @@ elm_accnt_emplace_trade(struct ElmAccnt* accnt, struct DbrTrade* trade)
 // Release ownership from state.
 
 static inline void
-elm_accnt_release_trade(struct ElmAccnt* accnt, struct DbrTrade* trade)
+fig_accnt_release_trade(struct FigAccnt* accnt, struct DbrTrade* trade)
 {
     dbr_tree_remove(&accnt->trades, &trade->accnt_node_);
 }
@@ -74,42 +74,42 @@ elm_accnt_release_trade(struct ElmAccnt* accnt, struct DbrTrade* trade)
 // Release ownership from state.
 
 static inline struct DbrTrade*
-elm_accnt_release_trade_id(struct ElmAccnt* accnt, DbrIden id)
+fig_accnt_release_trade_id(struct FigAccnt* accnt, DbrIden id)
 {
     struct DbrRbNode* node = dbr_tree_find(&accnt->trades, id);
     if (!node)
         return NULL;
     struct DbrTrade* trade = dbr_accnt_trade_entry(node);
-    elm_accnt_release_trade(accnt, trade);
+    fig_accnt_release_trade(accnt, trade);
     return trade;
 }
 
 static inline struct DbrRbNode*
-elm_accnt_find_trade_id(const struct ElmAccnt* accnt, DbrIden id)
+fig_accnt_find_trade_id(const struct FigAccnt* accnt, DbrIden id)
 {
     return dbr_tree_find(&accnt->trades, id);
 }
 
 static inline struct DbrRbNode*
-elm_accnt_first_trade(const struct ElmAccnt* accnt)
+fig_accnt_first_trade(const struct FigAccnt* accnt)
 {
     return dbr_tree_first(&accnt->trades);
 }
 
 static inline struct DbrRbNode*
-elm_accnt_last_trade(const struct ElmAccnt* accnt)
+fig_accnt_last_trade(const struct FigAccnt* accnt)
 {
     return dbr_tree_last(&accnt->trades);
 }
 
 static inline struct DbrRbNode*
-elm_accnt_end_trade(const struct ElmAccnt* accnt)
+fig_accnt_end_trade(const struct FigAccnt* accnt)
 {
     return dbr_tree_end(&accnt->trades);
 }
 
 static inline DbrBool
-elm_accnt_empty_trade(const struct ElmAccnt* accnt)
+fig_accnt_empty_trade(const struct FigAccnt* accnt)
 {
     return dbr_tree_empty(&accnt->trades);
 }
@@ -117,40 +117,40 @@ elm_accnt_empty_trade(const struct ElmAccnt* accnt)
 // Posn.
 
 static inline void
-elm_accnt_emplace_posn(struct ElmAccnt* accnt, struct DbrPosn* posn)
+fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
     dbr_tree_insert(&accnt->posns, &posn->accnt_node_);
 }
 
 DBR_EXTERN struct DbrPosn*
-elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct ElmPool* pool);
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct FigPool* pool);
 
 static inline struct DbrRbNode*
-elm_accnt_find_posn_id(const struct ElmAccnt* accnt, DbrIden id)
+fig_accnt_find_posn_id(const struct FigAccnt* accnt, DbrIden id)
 {
     return dbr_tree_find(&accnt->posns, id);
 }
 
 static inline struct DbrRbNode*
-elm_accnt_first_posn(const struct ElmAccnt* accnt)
+fig_accnt_first_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_first(&accnt->posns);
 }
 
 static inline struct DbrRbNode*
-elm_accnt_last_posn(const struct ElmAccnt* accnt)
+fig_accnt_last_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_last(&accnt->posns);
 }
 
 static inline struct DbrRbNode*
-elm_accnt_end_posn(const struct ElmAccnt* accnt)
+fig_accnt_end_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_end(&accnt->posns);
 }
 
 static inline DbrBool
-elm_accnt_empty_posn(const struct ElmAccnt* accnt)
+fig_accnt_empty_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_empty(&accnt->posns);
 }
@@ -158,12 +158,12 @@ elm_accnt_empty_posn(const struct ElmAccnt* accnt)
 // Sess.
 
 DBR_EXTERN void
-elm_accnt_set_sess(struct ElmAccnt* accnt, DbrAccntSess sess);
+fig_accnt_set_sess(struct FigAccnt* accnt, DbrAccntSess sess);
 
 static inline DbrAccntSess
-elm_accnt_sess(const struct ElmAccnt* accnt)
+fig_accnt_sess(const struct FigAccnt* accnt)
 {
     return accnt->sess;
 }
 
-#endif // ELM_ACCNT_H
+#endif // FIG_ACCNT_H

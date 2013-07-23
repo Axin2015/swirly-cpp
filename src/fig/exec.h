@@ -15,49 +15,49 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_EXEC_H
-#define ELM_EXEC_H
+#ifndef FIG_EXEC_H
+#define FIG_EXEC_H
 
 #include <dbr/defs.h>
 #include <dbr/journ.h>
 
-struct ElmExec {
-    struct ElmPool* pool;
+struct FigExec {
+    struct FigPool* pool;
     DbrJourn journ;
-    struct ElmIndex* index;
+    struct FigIndex* index;
 };
 
 DBR_EXTERN void
-elm_exec_init(struct ElmExec* exec, struct ElmPool* pool, DbrJourn journ, struct ElmIndex* index);
+fig_exec_init(struct FigExec* exec, struct FigPool* pool, DbrJourn journ, struct FigIndex* index);
 
 // All members of trans are set to zero on failure.
 
 DBR_EXTERN struct DbrOrder*
-elm_exec_submit(struct ElmExec* exec, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
+fig_exec_submit(struct FigExec* exec, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
                 struct DbrRec* mrec, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                 DbrFlags flags, DbrMillis now, struct DbrTrans* trans);
 
 DBR_EXTERN struct DbrOrder*
-elm_exec_revise_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, DbrLots lots,
+fig_exec_revise_id(struct FigExec* exec, struct FigTrader* trader, DbrIden id, DbrLots lots,
                    DbrMillis now);
 
 DBR_EXTERN struct DbrOrder*
-elm_exec_revise_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* ref, DbrLots lots,
+fig_exec_revise_ref(struct FigExec* exec, struct FigTrader* trader, const char* ref, DbrLots lots,
                     DbrMillis now);
 
 DBR_EXTERN struct DbrOrder*
-elm_exec_cancel_id(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, DbrMillis now);
+fig_exec_cancel_id(struct FigExec* exec, struct FigTrader* trader, DbrIden id, DbrMillis now);
 
 DBR_EXTERN struct DbrOrder*
-elm_exec_cancel_ref(struct ElmExec* exec, struct ElmTrader* trader, const char* ref, DbrMillis now);
+fig_exec_cancel_ref(struct FigExec* exec, struct FigTrader* trader, const char* ref, DbrMillis now);
 
 DBR_EXTERN DbrBool
-elm_exec_archive_order(struct ElmExec* exec, struct ElmTrader* trader, DbrIden id, DbrMillis now);
+fig_exec_archive_order(struct FigExec* exec, struct FigTrader* trader, DbrIden id, DbrMillis now);
 
 DBR_EXTERN DbrBool
-elm_exec_archive_trade(struct ElmExec* exec, struct ElmAccnt* accnt, DbrIden id, DbrMillis now);
+fig_exec_archive_trade(struct FigExec* exec, struct FigAccnt* accnt, DbrIden id, DbrMillis now);
 
 DBR_EXTERN void
-elm_exec_free_matches(struct ElmExec* exec, struct DbrSlNode* first);
+fig_exec_free_matches(struct FigExec* exec, struct DbrSlNode* first);
 
-#endif // ELM_EXEC_H
+#endif // FIG_EXEC_H

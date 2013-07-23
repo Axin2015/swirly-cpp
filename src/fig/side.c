@@ -26,14 +26,14 @@
 #include <stdlib.h>
 
 static struct DbrLevel*
-lazy_level(struct ElmSide* side, struct DbrOrder* order)
+lazy_level(struct FigSide* side, struct DbrOrder* order)
 {
     const DbrIden key = order->action == DBR_BUY ? -order->ticks : order->ticks;
 	struct DbrRbNode* node = dbr_tree_pfind(&side->levels, key);
 
 	struct DbrLevel* level;
     if (!node || node->key != key) {
-        if (!(level = elm_pool_alloc_level(side->pool, key)))
+        if (!(level = fig_pool_alloc_level(side->pool, key)))
             return NULL;
 
         level->first_order = order;
@@ -54,7 +54,7 @@ lazy_level(struct ElmSide* side, struct DbrOrder* order)
 }
 
 static inline void
-reduce(struct ElmSide* side, struct DbrOrder* order, DbrLots delta)
+reduce(struct FigSide* side, struct DbrOrder* order, DbrLots delta)
 {
     assert(order);
     assert(order->level);
@@ -66,13 +66,13 @@ reduce(struct ElmSide* side, struct DbrOrder* order, DbrLots delta)
         order->resd -= delta;
     } else {
         assert(delta == order->resd);
-        elm_side_remove_order(side, order);
+        fig_side_remove_order(side, order);
         order->resd = 0;
     }
 }
 
 DBR_EXTERN void
-elm_side_init(struct ElmSide* side, struct ElmPool* pool)
+fig_side_init(struct FigSide* side, struct FigPool* pool)
 {
     side->pool = pool;
     dbr_tree_init(&side->levels);
@@ -85,18 +85,18 @@ elm_side_init(struct ElmSide* side, struct ElmPool* pool)
 }
 
 DBR_EXTERN void
-elm_side_term(struct ElmSide* side)
+fig_side_term(struct FigSide* side)
 {
     assert(side);
     while (!dbr_list_empty(&side->orders)) {
         struct DbrOrder* order = dbr_side_order_entry(dbr_list_remove_first(&side->orders));
         // Revision is unchanged by this call.
-        elm_side_remove_order(side, order);
+        fig_side_remove_order(side, order);
     }
 }
 
 DBR_EXTERN DbrBool
-elm_side_insert_order(struct ElmSide* side, struct DbrOrder* order)
+fig_side_insert_order(struct FigSide* side, struct DbrOrder* order)
 {
     assert(order);
     assert(!order->level);
@@ -121,7 +121,7 @@ elm_side_insert_order(struct ElmSide* side, struct DbrOrder* order)
 }
 
 DBR_EXTERN void
-elm_side_remove_order(struct ElmSide* side, struct DbrOrder* order)
+fig_side_remove_order(struct FigSide* side, struct DbrOrder* order)
 {
     struct DbrLevel* level = order->level;
     level->resd -= order->resd;
@@ -132,7 +132,7 @@ elm_side_remove_order(struct ElmSide* side, struct DbrOrder* order)
         dbr_log_debug2("remove level: market=%.16s,ticks=%ld", order->market.rec->mnem,
                        order->ticks);
         dbr_tree_remove(&side->levels, &level->side_node_);
-        elm_pool_free_level(side->pool, level);
+        fig_pool_free_level(side->pool, level);
     } else if (level->first_order == order) {
         // First order at this level is being removed.
         level->first_order = dbr_side_order_entry(order->side_node_.next);
@@ -146,7 +146,7 @@ elm_side_remove_order(struct ElmSide* side, struct DbrOrder* order)
 }
 
 DBR_EXTERN void
-elm_side_take_order(struct ElmSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now)
+fig_side_take_order(struct FigSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now)
 {
     reduce(side, order, delta);
 
@@ -162,7 +162,7 @@ elm_side_take_order(struct ElmSide* side, struct DbrOrder* order, DbrLots delta,
 }
 
 DBR_EXTERN DbrBool
-elm_side_revise_order(struct ElmSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now)
+fig_side_revise_order(struct FigSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
     assert(order);
     assert(order->level);
@@ -195,25 +195,25 @@ elm_side_revise_order(struct ElmSide* side, struct DbrOrder* order, DbrLots lots
 DBR_API struct DbrDlNode*
 dbr_side_first_order(DbrSide side)
 {
-    return elm_side_first_order(side);
+    return fig_side_first_order(side);
 }
 
 DBR_API struct DbrDlNode*
 dbr_side_last_order(DbrSide side)
 {
-    return elm_side_last_order(side);
+    return fig_side_last_order(side);
 }
 
 DBR_API struct DbrDlNode*
 dbr_side_end_order(DbrSide side)
 {
-    return elm_side_end_order(side);
+    return fig_side_end_order(side);
 }
 
 DBR_API DbrBool
 dbr_side_empty_order(DbrSide side)
 {
-    return elm_side_empty_order(side);
+    return fig_side_empty_order(side);
 }
 
 // SideLevel
@@ -221,31 +221,31 @@ dbr_side_empty_order(DbrSide side)
 DBR_API struct DbrRbNode*
 dbr_side_find_level(DbrSide side, DbrTicks ticks)
 {
-    return elm_side_find_level(side, ticks);
+    return fig_side_find_level(side, ticks);
 }
 
 DBR_API struct DbrRbNode*
 dbr_side_first_level(DbrSide side)
 {
-    return elm_side_first_level(side);
+    return fig_side_first_level(side);
 }
 
 DBR_API struct DbrRbNode*
 dbr_side_last_level(DbrSide side)
 {
-    return elm_side_last_level(side);
+    return fig_side_last_level(side);
 }
 
 DBR_API struct DbrRbNode*
 dbr_side_end_level(DbrSide side)
 {
-    return elm_side_end_level(side);
+    return fig_side_end_level(side);
 }
 
 DBR_API DbrBool
 dbr_side_empty_level(DbrSide side)
 {
-    return elm_side_empty_level(side);
+    return fig_side_empty_level(side);
 }
 
 // SideLast
@@ -253,17 +253,17 @@ dbr_side_empty_level(DbrSide side)
 DBR_API DbrTicks
 dbr_side_last_ticks(DbrSide side)
 {
-    return elm_side_last_ticks(side);
+    return fig_side_last_ticks(side);
 }
 
 DBR_API DbrLots
 dbr_side_last_lots(DbrSide side)
 {
-    return elm_side_last_lots(side);
+    return fig_side_last_lots(side);
 }
 
 DBR_API DbrMillis
 dbr_side_last_time(DbrSide side)
 {
-    return elm_side_last_time(side);
+    return fig_side_last_time(side);
 }

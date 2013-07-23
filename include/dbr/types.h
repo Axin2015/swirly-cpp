@@ -99,13 +99,13 @@ enum DbrAction {
  * @addtogroup Instr
  */
 
-typedef struct ElmInstr* DbrInstr;
+typedef struct FigInstr* DbrInstr;
 
 /**
  * @addtogroup Market
  */
 
-typedef struct ElmMarket* DbrMarket;
+typedef struct FigMarket* DbrMarket;
 
 struct DbrBest {
     DbrTicks bid_ticks;
@@ -118,19 +118,19 @@ struct DbrBest {
  * @addtogroup Side
  */
 
-typedef struct ElmSide* DbrSide;
+typedef struct FigSide* DbrSide;
 
 /**
  * @addtogroup Trader
  */
 
-typedef struct ElmTrader* DbrTrader;
+typedef struct FigTrader* DbrTrader;
 
 /**
  * @addtogroup Accnt
  */
 
-typedef struct ElmAccnt* DbrAccnt;
+typedef struct FigAccnt* DbrAccnt;
 
 /**
  * @addtogroup Rec

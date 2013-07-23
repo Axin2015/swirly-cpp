@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_CACHE_H
-#define ELM_CACHE_H
+#ifndef FIG_CACHE_H
+#define FIG_CACHE_H
 
 // Record cache.
 
@@ -27,12 +27,12 @@
 
 #include <sys/types.h> // ssize_t
 
-#ifndef ELM_CACHE_BUCKETS
-#define ELM_CACHE_BUCKETS 257
-#endif // ELM_CACHE_BUCKETS
+#ifndef FIG_CACHE_BUCKETS
+#define FIG_CACHE_BUCKETS 257
+#endif // FIG_CACHE_BUCKETS
 
-struct ElmCache {
-    struct ElmPool* pool;
+struct FigCache {
+    struct FigPool* pool;
     // Must be set before first_market.
     struct DbrSlNode* first_instr;
     size_t instr_size;
@@ -46,33 +46,33 @@ struct ElmCache {
     struct {
         struct DbrStack ids;
         struct DbrStack mnems;
-    } buckets[ELM_CACHE_BUCKETS];
+    } buckets[FIG_CACHE_BUCKETS];
 };
 
 DBR_EXTERN void
-elm_cache_init(struct ElmCache* cache, struct ElmPool* pool);
+fig_cache_init(struct FigCache* cache, struct FigPool* pool);
 
 DBR_EXTERN void
-elm_cache_term(struct ElmCache* cache);
+fig_cache_term(struct FigCache* cache);
 
 // Transfer ownership to cache.
 
 DBR_EXTERN void
-elm_cache_emplace_recs(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size);
+fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size);
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_first_rec(struct ElmCache* cache, int type, size_t* size);
+fig_cache_first_rec(struct FigCache* cache, int type, size_t* size);
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_find_rec_id(const struct ElmCache* cache, int type, DbrIden id);
+fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id);
 
 DBR_EXTERN struct DbrSlNode*
-elm_cache_find_rec_mnem(const struct ElmCache* cache, int type, const char* mnem);
+fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem);
 
 static inline struct DbrSlNode*
-elm_cache_end_rec(const struct ElmCache* cache)
+fig_cache_end_rec(const struct FigCache* cache)
 {
     return NULL;
 }
 
-#endif // ELM_CACHE_H
+#endif // FIG_CACHE_H

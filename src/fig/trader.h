@@ -15,35 +15,35 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_TRADER_H
-#define ELM_TRADER_H
+#ifndef FIG_TRADER_H
+#define FIG_TRADER_H
 
-#include <elm/index.h>
+#include <fig/index.h>
 
 #include <dbr/conv.h>
 #include <dbr/tree.h>
 
 #include <assert.h>
 
-struct ElmTrader {
+struct FigTrader {
     DbrIden id;
-    struct ElmPool* pool;
-    struct ElmIndex* index;
+    struct FigPool* pool;
+    struct FigIndex* index;
     struct DbrTree orders;
     struct DbrTree subs;
     DbrTraderSess sess;
 };
 
-DBR_EXTERN struct ElmTrader*
-elm_trader_lazy(struct DbrRec* trec, struct ElmPool* pool, struct ElmIndex* index);
+DBR_EXTERN struct FigTrader*
+fig_trader_lazy(struct DbrRec* trec, struct FigPool* pool, struct FigIndex* index);
 
 // Assumes that trec pointer is not null.
 
 DBR_EXTERN void
-elm_trader_term(struct DbrRec* trec);
+fig_trader_term(struct DbrRec* trec);
 
 static inline DbrIden
-elm_trader_id(struct ElmTrader* trader)
+fig_trader_id(struct FigTrader* trader)
 {
     return trader->id;
 }
@@ -53,50 +53,50 @@ elm_trader_id(struct ElmTrader* trader)
 // Transfer ownership to state.
 
 static inline void
-elm_trader_emplace_order(struct ElmTrader* trader, struct DbrOrder* order)
+fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 {
     dbr_tree_insert(&trader->orders, &order->trader_node_);
     if (order->ref[0] != '\0')
-        elm_index_insert(trader->index, order);
+        fig_index_insert(trader->index, order);
 }
 
 // Release ownership from state.
 
 static inline void
-elm_trader_release_order(struct ElmTrader* trader, struct DbrOrder* order)
+fig_trader_release_order(struct FigTrader* trader, struct DbrOrder* order)
 {
     dbr_tree_remove(&trader->orders, &order->trader_node_);
     if (order->ref[0] != '\0')
-        elm_index_remove(trader->index, trader->id, order->ref);
+        fig_index_remove(trader->index, trader->id, order->ref);
 }
 
 // Release ownership from state.
 
 static inline struct DbrOrder*
-elm_trader_release_order_id(struct ElmTrader* trader, DbrIden id)
+fig_trader_release_order_id(struct FigTrader* trader, DbrIden id)
 {
     struct DbrRbNode* node = dbr_tree_find(&trader->orders, id);
     if (!node)
         return NULL;
     struct DbrOrder* order = dbr_trader_order_entry(node);
-    elm_trader_release_order(trader, order);
+    fig_trader_release_order(trader, order);
     return order;
 }
 
 // Release ownership from state.
 
 static inline struct DbrOrder*
-elm_trader_release_order_ref(struct ElmTrader* trader, const char* ref)
+fig_trader_release_order_ref(struct FigTrader* trader, const char* ref)
 {
     assert(ref);
-    struct DbrOrder* order = elm_index_remove(trader->index, trader->id, ref);
+    struct DbrOrder* order = fig_index_remove(trader->index, trader->id, ref);
     if (order)
         dbr_tree_remove(&trader->orders, &order->trader_node_);
     return order;
 }
 
 static inline struct DbrRbNode*
-elm_trader_find_order_id(const struct ElmTrader* trader, DbrIden id)
+fig_trader_find_order_id(const struct FigTrader* trader, DbrIden id)
 {
     return dbr_tree_find(&trader->orders, id);
 }
@@ -104,32 +104,32 @@ elm_trader_find_order_id(const struct ElmTrader* trader, DbrIden id)
 // Returns order directly because hash lookup is not a node-based container.
 
 static inline struct DbrOrder*
-elm_trader_find_order_ref(const struct ElmTrader* trader, const char* ref)
+fig_trader_find_order_ref(const struct FigTrader* trader, const char* ref)
 {
     assert(ref);
-    return elm_index_find(trader->index, trader->id, ref);
+    return fig_index_find(trader->index, trader->id, ref);
 }
 
 static inline struct DbrRbNode*
-elm_trader_first_order(const struct ElmTrader* trader)
+fig_trader_first_order(const struct FigTrader* trader)
 {
     return dbr_tree_first(&trader->orders);
 }
 
 static inline struct DbrRbNode*
-elm_trader_last_order(const struct ElmTrader* trader)
+fig_trader_last_order(const struct FigTrader* trader)
 {
     return dbr_tree_last(&trader->orders);
 }
 
 static inline struct DbrRbNode*
-elm_trader_end_order(const struct ElmTrader* trader)
+fig_trader_end_order(const struct FigTrader* trader)
 {
     return dbr_tree_end(&trader->orders);
 }
 
 static inline DbrBool
-elm_trader_empty_order(const struct ElmTrader* trader)
+fig_trader_empty_order(const struct FigTrader* trader)
 {
     return dbr_tree_empty(&trader->orders);
 }
@@ -137,18 +137,18 @@ elm_trader_empty_order(const struct ElmTrader* trader)
 // Sub.
 
 DBR_EXTERN DbrBool
-elm_trader_sub(struct ElmTrader* trader, struct ElmMarket* market);
+fig_trader_sub(struct FigTrader* trader, struct FigMarket* market);
 
 DBR_EXTERN void
-elm_trader_unsub(struct ElmTrader* trader, DbrIden mrid);
+fig_trader_unsub(struct FigTrader* trader, DbrIden mrid);
 
 DBR_EXTERN void
-elm_trader_set_sess(struct ElmTrader* trader, DbrTraderSess sess);
+fig_trader_set_sess(struct FigTrader* trader, DbrTraderSess sess);
 
 static inline DbrTraderSess
-elm_trader_sess(struct ElmTrader* trader)
+fig_trader_sess(struct FigTrader* trader)
 {
     return trader->sess;
 }
 
-#endif // ELM_TRADER_H
+#endif // FIG_TRADER_H

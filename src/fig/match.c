@@ -63,15 +63,15 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 }
 
 static inline struct DbrPosn*
-lazy_posn(struct DbrOrder* order, struct ElmPool* pool)
+lazy_posn(struct DbrOrder* order, struct FigPool* pool)
 {
     struct DbrRec* mrec = order->market.rec;
-    return elm_accnt_posn(order->accnt.rec, mrec->market.instr.rec, mrec->market.settl_date, pool);
+    return fig_accnt_posn(order->accnt.rec, mrec->market.instr.rec, mrec->market.settl_date, pool);
 }
 
 static DbrBool
-match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, struct DbrOrder* taker,
-             const struct ElmSide* side, int direct, struct DbrTrans* trans)
+match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market, struct DbrOrder* taker,
+             const struct FigSide* side, int direct, struct DbrTrans* trans)
 {
     struct DbrQueue mq;
     dbr_queue_init(&mq);
@@ -83,8 +83,8 @@ match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, str
     struct DbrRec* irec = mrec->market.instr.rec;
     DbrDate settl_date = mrec->market.settl_date;
 
-    struct DbrDlNode* node = elm_side_first_order(side),
-        * end = elm_side_end_order(side);
+    struct DbrDlNode* node = fig_side_first_order(side),
+        * end = fig_side_end_order(side);
     for (; taken < taker->resd && node != end; node = node->next) {
 
         struct DbrOrder* maker = dbr_side_order_entry(node);
@@ -94,30 +94,30 @@ match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, str
             break;
 
         const DbrIden match_id = dbr_journ_alloc_id(journ);
-        struct DbrMatch* match = elm_pool_alloc_match(pool);
+        struct DbrMatch* match = fig_pool_alloc_match(pool);
         if (!match)
             goto fail1;
 
-        struct DbrPosn* posn = elm_accnt_posn(maker->accnt.rec, irec, settl_date, pool);
+        struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, irec, settl_date, pool);
         if (!posn) {
             // No need to free accnt or posn.
-            elm_pool_free_match(pool, match);
+            fig_pool_free_match(pool, match);
             goto fail1;
         }
 
         const DbrIden taker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* taker_trade = elm_pool_alloc_trade(pool, taker_id);
+        struct DbrTrade* taker_trade = fig_pool_alloc_trade(pool, taker_id);
         if (!taker_trade) {
             // No need to free accnt or posn.
-            elm_pool_free_match(pool, match);
+            fig_pool_free_match(pool, match);
             goto fail1;
         }
 
         const DbrIden maker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* maker_trade = elm_pool_alloc_trade(pool, maker_id);
+        struct DbrTrade* maker_trade = fig_pool_alloc_trade(pool, maker_id);
         if (!maker_trade) {
-            elm_pool_free_trade(pool, taker_trade);
-            elm_pool_free_match(pool, match);
+            fig_pool_free_trade(pool, taker_trade);
+            fig_pool_free_match(pool, match);
             goto fail1;
         }
 
@@ -181,7 +181,7 @@ match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, str
     struct DbrPosn* posn;
     // Avoid allocating position when there are no matches.
     if (count > 0) {
-        if (!(posn = elm_accnt_posn(taker->accnt.rec, irec, settl_date, pool)))
+        if (!(posn = fig_accnt_posn(taker->accnt.rec, irec, settl_date, pool)))
             goto fail1;
     } else
         posn = NULL;
@@ -195,15 +195,15 @@ match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market, str
 
     return true;
  fail1:
-    elm_pool_free_matches(pool, mq.first);
+    fig_pool_free_matches(pool, mq.first);
     return false;
 }
 
 DBR_EXTERN DbrBool
-elm_match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market,
+fig_match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
-    struct ElmSide* side;
+    struct FigSide* side;
     int direct;
 
     if (taker->action == DBR_BUY) {

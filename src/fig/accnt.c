@@ -41,49 +41,49 @@ static struct DbrIAccntSess sess_noop = {
 };
 
 static void
-free_membs(struct ElmAccnt* accnt)
+free_membs(struct FigAccnt* accnt)
 {
     assert(accnt);
     struct DbrRbNode* node;
     while ((node = accnt->membs.root)) {
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
         dbr_tree_remove(&accnt->membs, node);
-        elm_pool_free_memb(accnt->pool, memb);
+        fig_pool_free_memb(accnt->pool, memb);
     }
 }
 
 static void
-free_trades(struct ElmAccnt* accnt)
+free_trades(struct FigAccnt* accnt)
 {
     assert(accnt);
     struct DbrRbNode* node;
     while ((node = accnt->trades.root)) {
         struct DbrTrade* trade = dbr_accnt_trade_entry(node);
         dbr_tree_remove(&accnt->trades, node);
-        elm_pool_free_trade(accnt->pool, trade);
+        fig_pool_free_trade(accnt->pool, trade);
     }
 }
 
 static void
-free_posns(struct ElmAccnt* accnt)
+free_posns(struct FigAccnt* accnt)
 {
     assert(accnt);
     struct DbrRbNode* node;
     while ((node = accnt->posns.root)) {
         struct DbrPosn* posn = dbr_accnt_posn_entry(node);
         dbr_tree_remove(&accnt->posns, node);
-        elm_pool_free_posn(accnt->pool, posn);
+        fig_pool_free_posn(accnt->pool, posn);
     }
 }
 
-DBR_EXTERN struct ElmAccnt*
-elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool)
+DBR_EXTERN struct FigAccnt*
+fig_accnt_lazy(struct DbrRec* arec, struct FigPool* pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
-    struct ElmAccnt* accnt = arec->accnt.state;
+    struct FigAccnt* accnt = arec->accnt.state;
     if (dbr_unlikely(!accnt)) {
-        accnt = malloc(sizeof(struct ElmAccnt));
+        accnt = malloc(sizeof(struct FigAccnt));
         if (dbr_unlikely(!accnt)) {
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
@@ -101,11 +101,11 @@ elm_accnt_lazy(struct DbrRec* arec, struct ElmPool* pool)
 }
 
 DBR_EXTERN void
-elm_accnt_term(struct DbrRec* arec)
+fig_accnt_term(struct DbrRec* arec)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
-    struct ElmAccnt* accnt = arec->accnt.state;
+    struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
         free_posns(accnt);
@@ -116,7 +116,7 @@ elm_accnt_term(struct DbrRec* arec)
 }
 
 DBR_EXTERN struct DbrPosn*
-elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct ElmPool* pool)
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct FigPool* pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
@@ -127,14 +127,14 @@ elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
     // Synthentic id from instrument and settlment date.
     const DbrIden id = irec->id * 100000000L + settl_date;
 
-    struct ElmAccnt* accnt = elm_accnt_lazy(arec, pool);
+    struct FigAccnt* accnt = fig_accnt_lazy(arec, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
 
     struct DbrPosn* posn;
 	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, id);
     if (!node || node->key != id) {
-        if (!(posn = elm_pool_alloc_posn(accnt->pool, id)))
+        if (!(posn = fig_pool_alloc_posn(accnt->pool, id)))
             return NULL;
 
         posn->id = id;
@@ -157,7 +157,7 @@ elm_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
 }
 
 DBR_EXTERN void
-elm_accnt_set_sess(struct ElmAccnt* accnt, DbrAccntSess sess)
+fig_accnt_set_sess(struct FigAccnt* accnt, DbrAccntSess sess)
 {
     accnt->sess = sess ? sess : &sess_noop;
 }
@@ -165,7 +165,7 @@ elm_accnt_set_sess(struct ElmAccnt* accnt, DbrAccntSess sess)
 DBR_API DbrIden
 dbr_accnt_id(DbrAccnt accnt)
 {
-    return elm_accnt_id(accnt);
+    return fig_accnt_id(accnt);
 }
 
 // AccntTrade
@@ -173,31 +173,31 @@ dbr_accnt_id(DbrAccnt accnt)
 DBR_API struct DbrRbNode*
 dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id)
 {
-    return elm_accnt_find_trade_id(accnt, id);
+    return fig_accnt_find_trade_id(accnt, id);
 }
 
 DBR_API struct DbrRbNode*
 dbr_accnt_first_trade(DbrAccnt accnt)
 {
-    return elm_accnt_first_trade(accnt);
+    return fig_accnt_first_trade(accnt);
 }
 
 DBR_API struct DbrRbNode*
 dbr_accnt_last_trade(DbrAccnt accnt)
 {
-    return elm_accnt_last_trade(accnt);
+    return fig_accnt_last_trade(accnt);
 }
 
 DBR_API struct DbrRbNode*
 dbr_accnt_end_trade(DbrAccnt accnt)
 {
-    return elm_accnt_end_trade(accnt);
+    return fig_accnt_end_trade(accnt);
 }
 
 DBR_API DbrBool
 dbr_accnt_empty_trade(DbrAccnt accnt)
 {
-    return elm_accnt_empty_trade(accnt);
+    return fig_accnt_empty_trade(accnt);
 }
 
 // AccntPosn.
@@ -205,41 +205,41 @@ dbr_accnt_empty_trade(DbrAccnt accnt)
 DBR_API struct DbrRbNode*
 dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
 {
-    return elm_accnt_find_posn_id(accnt, id);
+    return fig_accnt_find_posn_id(accnt, id);
 }
 
 DBR_API struct DbrRbNode*
 dbr_accnt_first_posn(DbrAccnt accnt)
 {
-    return elm_accnt_first_posn(accnt);
+    return fig_accnt_first_posn(accnt);
 }
 
 DBR_API struct DbrRbNode*
 dbr_accnt_last_posn(DbrAccnt accnt)
 {
-    return elm_accnt_last_posn(accnt);
+    return fig_accnt_last_posn(accnt);
 }
 
 DBR_API struct DbrRbNode*
 dbr_accnt_end_posn(DbrAccnt accnt)
 {
-    return elm_accnt_end_posn(accnt);
+    return fig_accnt_end_posn(accnt);
 }
 
 DBR_API DbrBool
 dbr_accnt_empty_posn(DbrAccnt accnt)
 {
-    return elm_accnt_empty_posn(accnt);
+    return fig_accnt_empty_posn(accnt);
 }
 
 DBR_API void
 dbr_accnt_set_sess(DbrAccnt accnt, DbrAccntSess sess)
 {
-    elm_accnt_set_sess(accnt, sess);
+    fig_accnt_set_sess(accnt, sess);
 }
 
 DBR_API DbrAccntSess
 dbr_accnt_sess(DbrAccnt accnt)
 {
-    return elm_accnt_sess(accnt);
+    return fig_accnt_sess(accnt);
 }

@@ -24,21 +24,21 @@
 
 #include <stdlib.h>
 
-DBR_EXTERN struct ElmMarket*
-elm_market_lazy(struct DbrRec* mrec, struct ElmPool* pool)
+DBR_EXTERN struct FigMarket*
+fig_market_lazy(struct DbrRec* mrec, struct FigPool* pool)
 {
     assert(mrec);
     assert(mrec->type == DBR_MARKET);
-    struct ElmMarket* market = mrec->market.state;
+    struct FigMarket* market = mrec->market.state;
     if (dbr_unlikely(!market)) {
-        market = malloc(sizeof(struct ElmMarket));
+        market = malloc(sizeof(struct FigMarket));
         if (dbr_unlikely(!market)) {
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
         market->id = mrec->id;
-        elm_side_init(&market->bid_side, pool);
-        elm_side_init(&market->ask_side, pool);
+        fig_side_init(&market->bid_side, pool);
+        fig_side_init(&market->ask_side, pool);
         dbr_list_init(&market->subs);
         mrec->market.state = market;
     }
@@ -46,27 +46,27 @@ elm_market_lazy(struct DbrRec* mrec, struct ElmPool* pool)
 }
 
 DBR_EXTERN void
-elm_market_term(struct DbrRec* mrec)
+fig_market_term(struct DbrRec* mrec)
 {
     assert(mrec);
     assert(mrec->type == DBR_MARKET);
-    struct ElmMarket* market = mrec->market.state;
+    struct FigMarket* market = mrec->market.state;
     if (market) {
         mrec->market.state = NULL;
-        elm_side_term(&market->bid_side);
-        elm_side_term(&market->ask_side);
+        fig_side_term(&market->bid_side);
+        fig_side_term(&market->ask_side);
         free(market);
     }
 }
 
 DBR_EXTERN struct DbrBest*
-elm_market_best(struct DbrRec* mrec, struct DbrBest* best)
+fig_market_best(struct DbrRec* mrec, struct DbrBest* best)
 {
     DbrMarket market = mrec->market.state;
     if (market) {
-        struct ElmSide* side = &market->bid_side;
-        struct DbrRbNode* it = elm_side_first_level(side);
-        struct DbrRbNode* end = elm_side_end_level(side);
+        struct FigSide* side = &market->bid_side;
+        struct DbrRbNode* it = fig_side_first_level(side);
+        struct DbrRbNode* end = fig_side_end_level(side);
         if (it != end) {
             struct DbrLevel* level = dbr_side_level_entry(it);
             best->bid_ticks = level->ticks;
@@ -76,8 +76,8 @@ elm_market_best(struct DbrRec* mrec, struct DbrBest* best)
             best->bid_resd = 0;
         }
         side = &market->ask_side;
-        it = elm_side_first_level(side);
-        end = elm_side_end_level(side);
+        it = fig_side_first_level(side);
+        end = fig_side_end_level(side);
         if (it != end) {
             struct DbrLevel* level = dbr_side_level_entry(it);
             best->ask_ticks = level->ticks;
@@ -98,23 +98,23 @@ elm_market_best(struct DbrRec* mrec, struct DbrBest* best)
 DBR_API DbrIden
 dbr_market_id(DbrMarket market)
 {
-    return elm_market_id(market);
+    return fig_market_id(market);
 }
 
 DBR_API DbrSide
 dbr_market_bid_side(DbrMarket market)
 {
-    return elm_market_bid_side(market);
+    return fig_market_bid_side(market);
 }
 
 DBR_API DbrSide
 dbr_market_ask_side(DbrMarket market)
 {
-    return elm_market_ask_side(market);
+    return fig_market_ask_side(market);
 }
 
 DBR_API struct DbrBest*
 dbr_market_best(struct DbrRec* mrec, struct DbrBest* best)
 {
-    return elm_market_best(mrec, best);
+    return fig_market_best(mrec, best);
 }

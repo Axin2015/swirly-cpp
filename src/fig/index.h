@@ -15,22 +15,38 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef ELM_MATCH_H
-#define ELM_MATCH_H
+#ifndef FIG_INDEX_H
+#define FIG_INDEX_H
+
+// Index of trader's orders by reference.
 
 #include <dbr/defs.h>
-#include <dbr/types.h>
+#include <dbr/stack.h>
 
-struct ElmPool;
-struct ElmIndex;
-struct ElmMarket;
+struct DbrOrder;
 
-// Used by matching engine to build a list of matches.
+struct FigIndex;
 
-// Match taker with list of maker orders.
+#ifndef FIG_INDEX_BUCKETS
+#define FIG_INDEX_BUCKETS 257
+#endif // FIG_INDEX_BUCKETS
 
-DBR_EXTERN DbrBool
-elm_match_orders(struct ElmPool* pool, DbrJourn journ, struct ElmMarket* market,
-                 struct DbrOrder* taker, struct DbrTrans* trans);
+struct FigIndex {
+    struct {
+        struct DbrStack refs;
+    } buckets[FIG_INDEX_BUCKETS];
+};
 
-#endif // ELM_MATCH_H
+DBR_EXTERN void
+fig_index_init(struct FigIndex* index);
+
+DBR_EXTERN void
+fig_index_insert(struct FigIndex* index, struct DbrOrder* order);
+
+DBR_EXTERN struct DbrOrder*
+fig_index_remove(struct FigIndex* index, DbrIden trid, const char* ref);
+
+DBR_EXTERN struct DbrOrder*
+fig_index_find(const struct FigIndex* index, DbrIden trid, const char* ref);
+
+#endif // FIG_INDEX_H
