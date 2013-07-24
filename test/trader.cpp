@@ -30,9 +30,9 @@ using namespace dbrpp;
 TEST_CASE(trader_id)
 {
     Pool pool;
-    Model model(pool);
     Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
+    Model model(pool);
+    Ctx ctx(pool, &journ, &model);
 
     TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
     check(it != ctx.trecs().end());

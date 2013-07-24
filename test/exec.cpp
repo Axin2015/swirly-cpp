@@ -28,9 +28,9 @@ using namespace std;
 TEST_CASE(submit)
 {
     Pool pool;
-    Model model(pool);
     Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
+    Model model(pool);
+    Ctx ctx(pool, &journ, &model);
 
     auto tit = ctx.trecs().find("WRAMIREZ");
     check(tit != ctx.trecs().end());

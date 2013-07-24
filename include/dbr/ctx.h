@@ -33,15 +33,15 @@ typedef struct DbrCtx_* DbrCtx;
  *
  * @param pool Pool.
  *
- * @param model Model.
- *
  * @param journ Journal.
+ *
+ * @param model Model.
  *
  * @return Handle to newly created context or null on failure.
  */
 
 DBR_API DbrCtx
-dbr_ctx_create(DbrPool pool, DbrModel model, DbrJourn journ);
+dbr_ctx_create(DbrPool pool, DbrJourn journ, DbrModel model);
 
 // No-op if ctx is null.
 

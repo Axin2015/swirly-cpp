@@ -30,9 +30,9 @@ using namespace dbrpp;
 TEST_CASE(accnt_id)
 {
     Pool pool;
-    Model model(pool);
     Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
+    Model model(pool);
+    Ctx ctx(pool, &journ, &model);
 
     AccntRecs::Iterator it = ctx.arecs().find("DBRA");
     check(it != ctx.arecs().end());

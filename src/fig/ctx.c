@@ -201,7 +201,7 @@ emplace_posns(DbrCtx ctx)
 }
 
 DBR_API DbrCtx
-dbr_ctx_create(DbrPool pool, DbrModel model, DbrJourn journ)
+dbr_ctx_create(DbrPool pool, DbrJourn journ, DbrModel model)
 {
     DbrCtx ctx = malloc(sizeof(struct DbrCtx_));
     if (dbr_unlikely(!ctx)) {

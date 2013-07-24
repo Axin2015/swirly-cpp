@@ -30,9 +30,9 @@ using namespace dbrpp;
 TEST_CASE(market_id)
 {
     Pool pool;
-    Model model(pool);
     Journ journ(1);
-    Ctx ctx(pool, &model, &journ);
+    Model model(pool);
+    Ctx ctx(pool, &journ, &model);
 
     MarketRecs::Iterator it = ctx.mrecs().find("EURUSD");
     check(it != ctx.mrecs().end());
