@@ -28,7 +28,7 @@
 #define DBR_API DBR_EXTERN __attribute__((visibility ("default")))
 
 /**
- * @addtogroup Types
+ * @addtogroup Cont
  * @{
  */
 

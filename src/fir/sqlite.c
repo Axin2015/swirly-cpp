@@ -1458,7 +1458,7 @@ dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path)
 }
 
 DBR_API void
-dbr_sqllite_destroy(DbrSqlite sqlite)
+dbr_sqlite_destroy(DbrSqlite sqlite)
 {
     if (sqlite) {
         fir_sqlite_term(&sqlite->impl);

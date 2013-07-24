@@ -23,59 +23,94 @@
  */
 
 /**
- * @defgroup Types Types
+ * @defgroup Ash Ash
  */
 
 /**
- * @defgroup Conv Conversion
+ * @defgroup Elm Elm
  */
 
 /**
- * @defgroup Err Error
+ * @defgroup Fig Fig
  */
 
 /**
- * @defgroup Log Log
+ * @defgroup Fir Fir
  */
 
 /**
- * @defgroup Msg Msg
+ * @defgroup Cont Container
+ * @ingroup Ash
  */
 
 /**
  * @defgroup Node Node
+ * @ingroup Cont
  */
 
 /**
- * @defgroup Pack Pack
+ * @defgroup List List
+ * @ingroup Cont
  */
 
 /**
- * @defgroup Pool Pool
+ * @defgroup Queue Queue
+ * @ingroup Cont
  */
 
 /**
- * @defgroup String String
+ * @defgroup Stack Stack
+ * @ingroup Cont
+ */
+
+/**
+ * @defgroup Tree Tree
+ * @ingroup Cont
  */
 
 /**
  * @defgroup Util Utility
+ * @ingroup Ash
  */
 
 /**
- * @defgroup Model Model
+ * @defgroup Err Error
+ * @ingroup Util
  */
 
 /**
- * @defgroup Journ Journal
+ * @defgroup Log Log
+ * @ingroup Util
+ */
+
+/**
+ * @defgroup Pack Pack
+ * @ingroup Util
+ */
+
+/**
+ * @defgroup Types Types
+ * @ingroup Elm
+ */
+
+/**
+ * @defgroup Msg Msg
+ * @ingroup Elm
  */
 
 /**
  * @defgroup Instr Instrument
+ * @ingroup Fig
  */
 
 /**
  * @defgroup Market Market
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup MarketSub Subscription
+ * @ingroup Market
  */
 
 /**
@@ -99,12 +134,8 @@
  */
 
 /**
- * @defgroup MarketSub Subscription
- * @ingroup Market
- */
-
-/**
  * @defgroup Trader Trader
+ * @ingroup Fig
  */
 
 /**
@@ -124,6 +155,7 @@
 
 /**
  * @defgroup Accnt Account
+ * @ingroup Fig
  */
 
 /**
@@ -148,6 +180,7 @@
 
 /**
  * @defgroup Ctx Context
+ * @ingroup Fig
  */
 
 /**
@@ -158,4 +191,34 @@
 /**
  * @defgroup Exec Execution
  * @ingroup Ctx
+ */
+
+/**
+ * @defgroup Conv Conversion
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup Journ Journal
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup Model Model
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup Pool Pool
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup String String
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup Sqlite Sqlite
+ * @ingroup Fir
  */

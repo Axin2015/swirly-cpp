@@ -21,6 +21,11 @@
 #include <dbr/defs.h>
 #include <dbr/dlnode.h>
 
+/**
+ * @addtogroup List
+ * @{
+ */
+
 struct DbrList {
     struct DbrDlNode end;
 };
@@ -97,5 +102,7 @@ dbr_list_empty(const struct DbrList* list)
 {
     return list->end.next == &list->end;
 }
+
+/** @} */
 
 #endif // DBR_LIST_H

@@ -21,6 +21,11 @@
 #include <dbr/defs.h>
 #include <dbr/slnode.h>
 
+/**
+ * @addtogroup Queue
+ * @{
+ */
+
 struct DbrQueue {
     struct DbrSlNode* first;
     struct DbrSlNode** last;
@@ -97,5 +102,7 @@ dbr_queue_empty(const struct DbrQueue* queue)
 {
     return queue->first == NULL;
 }
+
+/** @} */
 
 #endif // DBR_QUEUE_H

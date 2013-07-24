@@ -21,6 +21,11 @@
 #include <dbr/defs.h>
 #include <dbr/rbnode.h>
 
+/**
+ * @addtogroup Tree
+ * @{
+ */
+
 struct DbrTree {
     struct DbrRbNode* root;
 };
@@ -68,5 +73,7 @@ dbr_tree_empty(const struct DbrTree* tree)
 {
     return tree->root == NULL;
 }
+
+/** @} */
 
 #endif // DBR_TREE_H

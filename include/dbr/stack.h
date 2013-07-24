@@ -21,6 +21,11 @@
 #include <dbr/defs.h>
 #include <dbr/slnode.h>
 
+/**
+ * @addtogroup Stack
+ * @{
+ */
+
 struct DbrStack {
     struct DbrSlNode* first;
 };
@@ -84,5 +89,7 @@ dbr_stack_empty(const struct DbrStack* stack)
 {
     return stack->first == NULL;
 }
+
+/** @} */
 
 #endif // DBR_STACK_H

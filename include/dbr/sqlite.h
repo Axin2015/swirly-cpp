@@ -22,7 +22,7 @@
 #include <dbr/types.h>
 
 /**
- * @addtogroup Model
+ * @addtogroup Sqlite
  * @{
  */
 
@@ -44,7 +44,7 @@ DBR_API DbrSqlite
 dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path);
 
 DBR_API void
-dbr_sqllite_destroy(DbrSqlite sqlite);
+dbr_sqlite_destroy(DbrSqlite sqlite);
 
 DBR_API DbrJourn
 dbr_sqlite_journ(DbrSqlite sqlite);

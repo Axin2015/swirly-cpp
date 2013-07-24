@@ -63,13 +63,6 @@ enum {
     DBR_ERROR_MAX = 255
 };
 
-/** @} */
-
-/**
- * @addtogroup Err
- * @{
- */
-
 DBR_API void
 dbr_err_clear(void);
 
