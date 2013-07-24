@@ -22,7 +22,7 @@
 
 #include <dbr/pool.h>
 
-namespace dbrpp {
+namespace dbr {
 
 class Pool {
     DbrPool impl_;
@@ -183,6 +183,6 @@ public:
     }
 };
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_POOL_HPP

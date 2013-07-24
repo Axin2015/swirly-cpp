@@ -25,7 +25,7 @@
 #include <dbr/conv.h>
 #include <dbr/ctx.h>
 
-namespace dbrpp {
+namespace dbr {
 
 class TransMatches {
     struct Policy : NodeTraits<DbrSlNode> {
@@ -199,6 +199,6 @@ public:
     }
 };
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_TRANS_HPP

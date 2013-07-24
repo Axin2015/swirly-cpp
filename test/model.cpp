@@ -23,7 +23,7 @@
 #include <dbr/err.h>
 #include <dbr/queue.h>
 
-using namespace dbrpp;
+using namespace dbr;
 using namespace std;
 
 namespace {

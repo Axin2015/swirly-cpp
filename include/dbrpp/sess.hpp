@@ -22,7 +22,7 @@
 #include <dbrpp/posn.hpp>
 #include <dbrpp/trade.hpp>
 
-namespace dbrpp {
+namespace dbr {
 
 template <class DerivedT>
 class IAccntSess : public DbrIAccntSess {
@@ -45,6 +45,6 @@ public:
     {
     }
 };
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_SESS_HPP

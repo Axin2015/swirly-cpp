@@ -22,7 +22,7 @@
 
 #include <dbr/types.h>
 
-namespace dbrpp {
+namespace dbr {
 
 typedef NString<DBR_DISPLAY_MAX> Display;
 typedef NString<DBR_EMAIL_MAX> Email;
@@ -30,6 +30,6 @@ typedef NString<DBR_MNEM_MAX> Mnem;
 typedef NString<DBR_REF_MAX> Ref;
 typedef NString<DBR_TENOR_MAX> Tenor;
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_TYPES_HPP

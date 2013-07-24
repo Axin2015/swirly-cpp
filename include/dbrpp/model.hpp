@@ -22,7 +22,7 @@
 
 #include <dbr/model.h>
 
-namespace dbrpp {
+namespace dbr {
 
 template <class DerivedT>
 class IModel : public DbrIModel {
@@ -67,6 +67,6 @@ end_entity(DbrModel model) noexcept
     return model->vtbl->end_entity(model);
 }
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_MODEL_HPP

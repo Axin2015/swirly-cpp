@@ -22,7 +22,7 @@
 
 #include <dbr/sqlite.h>
 
-namespace dbrpp {
+namespace dbr {
 
 class Sqlite {
     DbrSqlite impl_;
@@ -89,6 +89,6 @@ public:
     }
 };
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_SQLITE_HPP

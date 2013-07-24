@@ -19,7 +19,7 @@
 
 #include <dbrpp/pool.hpp>
 
-using namespace dbrpp;
+using namespace dbr;
 
 TEST_CASE(create_pool)
 {

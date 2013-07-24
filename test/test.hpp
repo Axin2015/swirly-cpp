@@ -24,7 +24,7 @@
 #include <cstring>  // strcmp()
 
 #define die_(file, line, what)                                          \
-    throw dbrpp::AssrtException(file, line, what)
+    throw dbr::AssrtException(file, line, what)
 
 #define die(what)                               \
     die_(__FILE__, __LINE__, what)

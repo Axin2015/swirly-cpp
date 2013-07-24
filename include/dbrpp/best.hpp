@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-namespace dbrpp {
+namespace dbr {
 
 class Best {
     DbrBest impl_;
@@ -74,6 +74,6 @@ best(DbrRec& mrec)
     dbr_market_best(&mrec, best.c_arg());
     return best;
 }
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_BEST_HPP

@@ -42,7 +42,7 @@ run(const TestCase& tc)
     cout.flush();
     try {
         tc.fn();
-    } catch (const dbrpp::DbrException& e) {
+    } catch (const dbr::DbrException& e) {
         cout << " fail" << endl;
         cerr << e.file() << ':' << e.line() << ": " << e.what() << " (" << e.num() << ')' << endl;
         exit(1);

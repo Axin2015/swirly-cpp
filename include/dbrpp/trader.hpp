@@ -27,7 +27,7 @@
 #include <iostream>
 #include <limits>
 
-namespace dbrpp {
+namespace dbr {
 
 class TraderOrders {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -238,6 +238,6 @@ operator <<(std::ostream& os, Trader trader)
     return os << "id=" << trader.id();
 }
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_TRADER_HPP

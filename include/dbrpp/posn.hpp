@@ -20,7 +20,7 @@
 
 #include <dbrpp/rec.hpp>
 
-namespace dbrpp {
+namespace dbr {
 
 class Posn {
     DbrPosn& impl_;
@@ -103,6 +103,6 @@ operator <<(std::ostream& os, Posn posn)
               << ",sell_licks=" << posn.sell_licks()
               << ",sell_lots=" << posn.sell_lots();
 }
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_POSN_HPP

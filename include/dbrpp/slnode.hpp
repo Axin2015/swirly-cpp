@@ -20,7 +20,7 @@
 
 #include <dbr/slnode.h>
 
-namespace dbrpp {
+namespace dbr {
 
 template <typename NodeT>
 struct NodeTraits;
@@ -40,6 +40,6 @@ struct NodeTraits<DbrSlNode> {
     }
 };
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_SLNODE_HPP

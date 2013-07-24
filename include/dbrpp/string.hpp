@@ -24,7 +24,7 @@
 
 #include <cstring>
 
-namespace dbrpp {
+namespace dbr {
 
 inline std::string
 strncpy(const char* src, size_t n)
@@ -225,6 +225,6 @@ struct NStringHash {
     }
 };
 
-} // dbrpp
+} // dbr
 
 #endif // DBRPP_STRING_HPP
