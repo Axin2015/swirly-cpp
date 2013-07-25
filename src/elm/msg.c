@@ -31,7 +31,7 @@ static const char TRADE_FORMAT[] = "lllillslliillllill";
 static const char POSN_FORMAT[] = "llllllll";
 
 DBR_API char*
-dbr_writeinstr(char* buf, const struct DbrRec* rec)
+dbr_write_instr(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, INSTR_FORMAT,
                      rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
@@ -42,7 +42,7 @@ dbr_writeinstr(char* buf, const struct DbrRec* rec)
 }
 
 DBR_API const char*
-dbr_readinstr(const char* buf, struct DbrRec* rec)
+dbr_read_instr(const char* buf, struct DbrRec* rec)
 {
     return dbr_unpackf(buf, INSTR_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
@@ -53,7 +53,7 @@ dbr_readinstr(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_instrlen(const struct DbrRec* rec)
+dbr_instr_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(INSTR_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
@@ -64,7 +64,7 @@ dbr_instrlen(const struct DbrRec* rec)
 }
 
 DBR_API char*
-dbr_writemarket(char* buf, const struct DbrRec* rec)
+dbr_write_market(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, MARKET_FORMAT,
                      rec->id, rec->mnem, rec->market.instr.id, DBR_TENOR_MAX,
@@ -72,7 +72,7 @@ dbr_writemarket(char* buf, const struct DbrRec* rec)
 }
 
 DBR_API const char*
-dbr_readmarket(const char* buf, struct DbrRec* rec)
+dbr_read_market(const char* buf, struct DbrRec* rec)
 {
     return dbr_unpackf(buf, MARKET_FORMAT,
                        &rec->id, rec->mnem, &rec->market.instr.id, DBR_TENOR_MAX,
@@ -80,7 +80,7 @@ dbr_readmarket(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_marketlen(const struct DbrRec* rec)
+dbr_market_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(MARKET_FORMAT,
                         rec->id, rec->mnem, rec->market.instr.id, DBR_TENOR_MAX,
@@ -88,7 +88,7 @@ dbr_marketlen(const struct DbrRec* rec)
 }
 
 DBR_API char*
-dbr_writetrader(char* buf, const struct DbrRec* rec)
+dbr_write_trader(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, TRADER_FORMAT,
                      rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->trader.display,
@@ -96,7 +96,7 @@ dbr_writetrader(char* buf, const struct DbrRec* rec)
 }
 
 DBR_API const char*
-dbr_readtrader(const char* buf, struct DbrRec* rec)
+dbr_read_trader(const char* buf, struct DbrRec* rec)
 {
     return dbr_unpackf(buf, TRADER_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->trader.display,
@@ -104,7 +104,7 @@ dbr_readtrader(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_traderlen(const struct DbrRec* rec)
+dbr_trader_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(TRADER_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->trader.display,
@@ -112,7 +112,7 @@ dbr_traderlen(const struct DbrRec* rec)
 }
 
 DBR_API char*
-dbr_writeaccnt(char* buf, const struct DbrRec* rec)
+dbr_write_accnt(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, ACCNT_FORMAT,
                      rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->accnt.display,
@@ -120,7 +120,7 @@ dbr_writeaccnt(char* buf, const struct DbrRec* rec)
 }
 
 DBR_API const char*
-dbr_readaccnt(const char* buf, struct DbrRec* rec)
+dbr_read_accnt(const char* buf, struct DbrRec* rec)
 {
     return dbr_unpackf(buf, ACCNT_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->accnt.display,
@@ -128,7 +128,7 @@ dbr_readaccnt(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_accntlen(const struct DbrRec* rec)
+dbr_accnt_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(ACCNT_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->accnt.display,
@@ -136,21 +136,21 @@ dbr_accntlen(const struct DbrRec* rec)
 }
 
 DBR_API char*
-dbr_writerec(char* buf, const struct DbrRec* rec)
+dbr_write_rec(char* buf, const struct DbrRec* rec)
 {
     buf = dbr_packi(buf, rec->type);
     switch (rec->type) {
     case DBR_INSTR:
-        buf = dbr_writeinstr(buf, rec);
+        buf = dbr_write_instr(buf, rec);
         break;
     case DBR_MARKET:
-        buf = dbr_writemarket(buf, rec);
+        buf = dbr_write_market(buf, rec);
         break;
     case DBR_TRADER:
-        buf = dbr_writetrader(buf, rec);
+        buf = dbr_write_trader(buf, rec);
         break;
     case DBR_ACCNT:
-        buf = dbr_writeaccnt(buf, rec);
+        buf = dbr_write_accnt(buf, rec);
         break;
     default:
         dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
@@ -160,22 +160,22 @@ dbr_writerec(char* buf, const struct DbrRec* rec)
 }
 
 DBR_API const char*
-dbr_readrec(const char* buf, struct DbrRec* rec)
+dbr_read_rec(const char* buf, struct DbrRec* rec)
 {
     int type;
     buf = dbr_unpacki(buf, &type);
     switch (type) {
     case DBR_INSTR:
-        buf = dbr_readinstr(buf, rec);
+        buf = dbr_read_instr(buf, rec);
         break;
     case DBR_MARKET:
-        buf = dbr_readmarket(buf, rec);
+        buf = dbr_read_market(buf, rec);
         break;
     case DBR_TRADER:
-        buf = dbr_readtrader(buf, rec);
+        buf = dbr_read_trader(buf, rec);
         break;
     case DBR_ACCNT:
-        buf = dbr_readaccnt(buf, rec);
+        buf = dbr_read_accnt(buf, rec);
         break;
     default:
         dbr_err_set(DBR_EIO, "invalid type %d", type);
@@ -185,21 +185,21 @@ dbr_readrec(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_reclen(const struct DbrRec* rec)
+dbr_rec_len(const struct DbrRec* rec)
 {
     int len = dbr_packleni(rec->type);
     switch (rec->type) {
     case DBR_INSTR:
-        len += dbr_instrlen(rec);
+        len += dbr_instr_len(rec);
         break;
     case DBR_MARKET:
-        len += dbr_marketlen(rec);
+        len += dbr_market_len(rec);
         break;
     case DBR_TRADER:
-        len += dbr_traderlen(rec);
+        len += dbr_trader_len(rec);
         break;
     case DBR_ACCNT:
-        len += dbr_accntlen(rec);
+        len += dbr_accnt_len(rec);
         break;
     default:
         dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
@@ -209,7 +209,7 @@ dbr_reclen(const struct DbrRec* rec)
 }
 
 DBR_API char*
-dbr_writeorder(char* buf, const struct DbrOrder* order)
+dbr_write_order(char* buf, const struct DbrOrder* order)
 {
     return dbr_packf(buf, ORDER_FORMAT,
                      order->id, order->rev, order->status, order->trader.id, order->accnt.id,
@@ -219,7 +219,7 @@ dbr_writeorder(char* buf, const struct DbrOrder* order)
 }
 
 DBR_API const char*
-dbr_readorder(const char* buf, struct DbrOrder* order)
+dbr_read_order(const char* buf, struct DbrOrder* order)
 {
     return dbr_unpackf(buf, ORDER_FORMAT,
                        &order->id, &order->rev, &order->status, &order->trader.id, &order->accnt.id,
@@ -229,7 +229,7 @@ dbr_readorder(const char* buf, struct DbrOrder* order)
 }
 
 DBR_API int
-dbr_orderlen(const struct DbrOrder* order)
+dbr_order_len(const struct DbrOrder* order)
 {
     return dbr_packlenf(ORDER_FORMAT,
                         order->id, order->rev, order->status, order->trader.id, order->accnt.id,
@@ -239,28 +239,28 @@ dbr_orderlen(const struct DbrOrder* order)
 }
 
 DBR_API char*
-dbr_writememb(char* buf, const struct DbrMemb* memb)
+dbr_write_memb(char* buf, const struct DbrMemb* memb)
 {
     return dbr_packf(buf, MEMB_FORMAT,
                      memb->accnt.id, memb->trader.id);
 }
 
 DBR_API const char*
-dbr_readmemb(const char* buf, struct DbrMemb* memb)
+dbr_read_memb(const char* buf, struct DbrMemb* memb)
 {
     return dbr_unpackf(buf, MEMB_FORMAT,
                        &memb->accnt.id, &memb->trader.id);
 }
 
 DBR_API int
-dbr_memblen(const struct DbrMemb* memb)
+dbr_memb_len(const struct DbrMemb* memb)
 {
     return dbr_packlenf(MEMB_FORMAT,
                         memb->accnt.id, memb->trader.id);
 }
 
 DBR_API char*
-dbr_writetrade(char* buf, const struct DbrTrade* trade)
+dbr_write_trade(char* buf, const struct DbrTrade* trade)
 {
     return dbr_packf(buf, TRADE_FORMAT,
                      trade->id, trade->match, trade->order, trade->order_rev,
@@ -271,7 +271,7 @@ dbr_writetrade(char* buf, const struct DbrTrade* trade)
 }
 
 DBR_API const char*
-dbr_readtrade(const char* buf, struct DbrTrade* trade)
+dbr_read_trade(const char* buf, struct DbrTrade* trade)
 {
     return dbr_unpackf(buf, TRADE_FORMAT,
                        &trade->id, &trade->match, &trade->order, &trade->order_rev,
@@ -282,7 +282,7 @@ dbr_readtrade(const char* buf, struct DbrTrade* trade)
 }
 
 DBR_API int
-dbr_tradelen(const struct DbrTrade* trade)
+dbr_trade_len(const struct DbrTrade* trade)
 {
     return dbr_packlenf(TRADE_FORMAT,
                         trade->id, trade->match, trade->order, trade->order_rev,
@@ -293,7 +293,7 @@ dbr_tradelen(const struct DbrTrade* trade)
 }
 
 DBR_API char*
-dbr_writeposn(char* buf, const struct DbrPosn* posn)
+dbr_write_posn(char* buf, const struct DbrPosn* posn)
 {
     return dbr_packf(buf, POSN_FORMAT,
                      posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,
@@ -301,7 +301,7 @@ dbr_writeposn(char* buf, const struct DbrPosn* posn)
 }
 
 DBR_API const char*
-dbr_readposn(const char* buf, struct DbrPosn* posn)
+dbr_read_posn(const char* buf, struct DbrPosn* posn)
 {
     return dbr_unpackf(buf, POSN_FORMAT,
                        &posn->id, &posn->accnt.id, &posn->instr.id, &posn->settl_date,
@@ -309,7 +309,7 @@ dbr_readposn(const char* buf, struct DbrPosn* posn)
 }
 
 DBR_API int
-dbr_posnlen(const char* buf, const struct DbrPosn* posn)
+dbr_posn_len(const char* buf, const struct DbrPosn* posn)
 {
     return dbr_packlenf(buf, POSN_FORMAT,
                         posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,

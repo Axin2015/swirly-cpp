@@ -48,11 +48,11 @@ TEST_CASE(msg_instr)
     struct DbrRec rec;
     set_instr(&rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
-    const int len = dbr_instrlen(&rec);
+    const int len = dbr_instr_len(&rec);
     char buf[len];
-    dbr_writeinstr(buf, &rec);
+    dbr_write_instr(buf, &rec);
     memset(&rec, 0, sizeof(rec));
-    dbr_readinstr(buf, &rec);
+    dbr_read_instr(buf, &rec);
 
     check(rec.id == 1);
     check(sequal(rec.mnem, "EURUSD.SPOTFWD", DBR_MNEM_MAX));

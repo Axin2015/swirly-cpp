@@ -32,85 +32,85 @@ struct DbrPosn;
  */
 
 DBR_API char*
-dbr_writeinstr(char* buf, const struct DbrRec* rec);
+dbr_write_instr(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_readinstr(const char* buf, struct DbrRec* rec);
+dbr_read_instr(const char* buf, struct DbrRec* rec);
 
 DBR_API int
-dbr_instrlen(const struct DbrRec* rec);
+dbr_instr_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_writemarket(char* buf, const struct DbrRec* rec);
+dbr_write_market(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_readmarket(const char* buf, struct DbrRec* rec);
+dbr_read_market(const char* buf, struct DbrRec* rec);
 
 DBR_API int
-dbr_marketlen(const struct DbrRec* rec);
+dbr_market_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_writetrader(char* buf, const struct DbrRec* rec);
+dbr_write_trader(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_readtrader(const char* buf, struct DbrRec* rec);
+dbr_read_trader(const char* buf, struct DbrRec* rec);
 
 DBR_API int
-dbr_traderlen(const struct DbrRec* rec);
+dbr_trader_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_writeaccnt(char* buf, const struct DbrRec* rec);
+dbr_write_accnt(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_readaccnt(const char* buf, struct DbrRec* rec);
+dbr_read_accnt(const char* buf, struct DbrRec* rec);
 
 DBR_API int
-dbr_accntlen(const struct DbrRec* rec);
+dbr_accnt_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_writerec(char* buf, const struct DbrRec* rec);
+dbr_write_rec(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_readrec(const char* buf, struct DbrRec* rec);
+dbr_read_rec(const char* buf, struct DbrRec* rec);
 
 DBR_API int
-dbr_reclen(const struct DbrRec* rec);
+dbr_rec_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_writeorder(char* buf, const struct DbrOrder* order);
+dbr_write_order(char* buf, const struct DbrOrder* order);
 
 DBR_API const char*
-dbr_readorder(const char* buf, struct DbrOrder* order);
+dbr_read_order(const char* buf, struct DbrOrder* order);
 
 DBR_API int
-dbr_orderlen(const struct DbrOrder* order);
+dbr_order_len(const struct DbrOrder* order);
 
 DBR_API char*
-dbr_writememb(char* buf, const struct DbrMemb* memb);
+dbr_write_memb(char* buf, const struct DbrMemb* memb);
 
 DBR_API const char*
-dbr_readmemb(const char* buf, struct DbrMemb* memb);
+dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
 DBR_API int
-dbr_memblen(const struct DbrMemb* memb);
+dbr_memb_len(const struct DbrMemb* memb);
 
 DBR_API char*
-dbr_writetrade(char* buf, const struct DbrTrade* trade);
+dbr_write_trade(char* buf, const struct DbrTrade* trade);
 
 DBR_API const char*
-dbr_readtrade(const char* buf, struct DbrTrade* trade);
+dbr_read_trade(const char* buf, struct DbrTrade* trade);
 
 DBR_API int
-dbr_tradelen(const struct DbrTrade* trade);
+dbr_trade_len(const struct DbrTrade* trade);
 
 DBR_API char*
-dbr_writeposn(char* buf, const struct DbrPosn* posn);
+dbr_write_posn(char* buf, const struct DbrPosn* posn);
 
 DBR_API const char*
-dbr_readposn(const char* buf, struct DbrPosn* posn);
+dbr_read_posn(const char* buf, struct DbrPosn* posn);
 
 DBR_API int
-dbr_posnlen(const char* buf, const struct DbrPosn* posn);
+dbr_posn_len(const char* buf, const struct DbrPosn* posn);
 
 /** @} */
 

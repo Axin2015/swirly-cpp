@@ -22,6 +22,7 @@
 #include <dbrpp/types.hpp>
 
 #include <dbr/conv.h>
+#include <dbr/msg.h>
 #include <dbr/string.h>
 
 namespace dbr {
@@ -215,6 +216,33 @@ operator <<(std::ostream& os, InstrRec irec)
               << ",max_lots=" << irec.max_lots();
 }
 
+inline char*
+write_entity(char* buf, InstrRec irec)
+{
+    buf = dbr_write_instr(buf, irec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, InstrRec irec)
+{
+    buf = dbr_read_instr(buf, irec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(InstrRec irec)
+{
+    const int len = dbr_instr_len(irec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 class MarketRec : public RecBase {
 public:
     explicit
@@ -249,6 +277,33 @@ operator <<(std::ostream& os, MarketRec mrec)
               << ",settl_date=" << mrec.settl_date();
 }
 
+inline char*
+write_entity(char* buf, MarketRec mrec)
+{
+    buf = dbr_write_market(buf, mrec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, MarketRec mrec)
+{
+    buf = dbr_read_market(buf, mrec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(MarketRec mrec)
+{
+    const int len = dbr_market_len(mrec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 class TraderRec : public RecBase {
 public:
     explicit
@@ -277,6 +332,33 @@ operator <<(std::ostream& os, TraderRec trec)
               << ",email=" << trec.email();
 }
 
+inline char*
+write_entity(char* buf, TraderRec trec)
+{
+    buf = dbr_write_trader(buf, trec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, TraderRec trec)
+{
+    buf = dbr_read_trader(buf, trec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(TraderRec trec)
+{
+    const int len = dbr_trader_len(trec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 class AccntRec : public RecBase {
 public:
     explicit
@@ -303,6 +385,33 @@ operator <<(std::ostream& os, AccntRec arec)
               << ",mnem=" << arec.mnem()
               << ",display=" << arec.display()
               << ",email=" << arec.email();
+}
+
+inline char*
+write_entity(char* buf, AccntRec arec)
+{
+    buf = dbr_write_accnt(buf, arec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, AccntRec arec)
+{
+    buf = dbr_read_accnt(buf, arec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(AccntRec arec)
+{
+    const int len = dbr_accnt_len(arec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
 }
 
 } // dbr
