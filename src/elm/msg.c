@@ -17,6 +17,7 @@
  */
 #include <dbr/msg.h>
 
+#include <dbr/err.h>
 #include <dbr/pack.h>
 #include <dbr/types.h>
 
@@ -132,6 +133,79 @@ dbr_accntlen(const struct DbrRec* rec)
     return dbr_packlenf(ACCNT_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->accnt.display,
                         DBR_EMAIL_MAX, rec->accnt.email);
+}
+
+DBR_API char*
+dbr_writerec(char* buf, const struct DbrRec* rec)
+{
+    buf = dbr_packi(buf, rec->type);
+    switch (rec->type) {
+    case DBR_INSTR:
+        buf = dbr_writeinstr(buf, rec);
+        break;
+    case DBR_MARKET:
+        buf = dbr_writemarket(buf, rec);
+        break;
+    case DBR_TRADER:
+        buf = dbr_writetrader(buf, rec);
+        break;
+    case DBR_ACCNT:
+        buf = dbr_writeaccnt(buf, rec);
+        break;
+    default:
+        dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
+        buf = NULL;
+    }
+    return buf;
+}
+
+DBR_API const char*
+dbr_readrec(const char* buf, struct DbrRec* rec)
+{
+    int type;
+    buf = dbr_unpacki(buf, &type);
+    switch (type) {
+    case DBR_INSTR:
+        buf = dbr_readinstr(buf, rec);
+        break;
+    case DBR_MARKET:
+        buf = dbr_readmarket(buf, rec);
+        break;
+    case DBR_TRADER:
+        buf = dbr_readtrader(buf, rec);
+        break;
+    case DBR_ACCNT:
+        buf = dbr_readaccnt(buf, rec);
+        break;
+    default:
+        dbr_err_set(DBR_EIO, "invalid type %d", type);
+        buf = NULL;
+    }
+    return buf;
+}
+
+DBR_API int
+dbr_reclen(const struct DbrRec* rec)
+{
+    int len = dbr_packleni(rec->type);
+    switch (rec->type) {
+    case DBR_INSTR:
+        len += dbr_instrlen(rec);
+        break;
+    case DBR_MARKET:
+        len += dbr_marketlen(rec);
+        break;
+    case DBR_TRADER:
+        len += dbr_traderlen(rec);
+        break;
+    case DBR_ACCNT:
+        len += dbr_accntlen(rec);
+        break;
+    default:
+        dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
+        len = -1;
+    }
+    return len;
 }
 
 DBR_API char*

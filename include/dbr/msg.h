@@ -68,6 +68,15 @@ DBR_API int
 dbr_accntlen(const struct DbrRec* rec);
 
 DBR_API char*
+dbr_writerec(char* buf, const struct DbrRec* rec);
+
+DBR_API const char*
+dbr_readrec(const char* buf, struct DbrRec* rec);
+
+DBR_API int
+dbr_reclen(const struct DbrRec* rec);
+
+DBR_API char*
 dbr_writeorder(char* buf, const struct DbrOrder* order);
 
 DBR_API const char*
