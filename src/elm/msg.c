@@ -309,9 +309,9 @@ dbr_read_posn(const char* buf, struct DbrPosn* posn)
 }
 
 DBR_API int
-dbr_posn_len(const char* buf, const struct DbrPosn* posn)
+dbr_posn_len(const struct DbrPosn* posn)
 {
-    return dbr_packlenf(buf, POSN_FORMAT,
+    return dbr_packlenf(POSN_FORMAT,
                         posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,
                         posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }

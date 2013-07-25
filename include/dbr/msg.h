@@ -73,6 +73,10 @@ dbr_write_rec(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_rec(const char* buf, struct DbrRec* rec);
 
+/**
+ * @brief Returns -1 if type is unrecognised.
+ */
+
 DBR_API int
 dbr_rec_len(const struct DbrRec* rec);
 
@@ -110,7 +114,7 @@ DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
 
 DBR_API int
-dbr_posn_len(const char* buf, const struct DbrPosn* posn);
+dbr_posn_len(const struct DbrPosn* posn);
 
 /** @} */
 

@@ -19,6 +19,7 @@
 #define DBRPP_REC_HPP
 
 #include <dbrpp/best.hpp>
+#include <dbrpp/except.hpp>
 #include <dbrpp/types.hpp>
 
 #include <dbr/conv.h>

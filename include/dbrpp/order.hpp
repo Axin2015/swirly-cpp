@@ -156,6 +156,33 @@ operator <<(std::ostream& os, Order order)
               << ",created=" << order.created()
               << ",modified=" << order.modified();
 }
+
+inline char*
+write_entity(char* buf, Order order)
+{
+    buf = dbr_write_order(buf, order.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, Order order)
+{
+    buf = dbr_read_order(buf, order.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(Order order)
+{
+    const int len = dbr_order_len(order.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
 } // dbr
 
 #endif // DBRPP_ORDER_HPP

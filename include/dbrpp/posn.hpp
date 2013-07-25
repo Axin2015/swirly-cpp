@@ -103,6 +103,33 @@ operator <<(std::ostream& os, Posn posn)
               << ",sell_licks=" << posn.sell_licks()
               << ",sell_lots=" << posn.sell_lots();
 }
+
+inline char*
+write_entity(char* buf, Posn posn)
+{
+    buf = dbr_write_posn(buf, posn.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, Posn posn)
+{
+    buf = dbr_read_posn(buf, posn.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(Posn posn)
+{
+    const int len = dbr_posn_len(posn.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
 } // dbr
 
 #endif // DBRPP_POSN_HPP

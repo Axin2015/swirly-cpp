@@ -163,6 +163,33 @@ operator <<(std::ostream& os, Trade trade)
               << ",created=" << trade.created()
               << ",modified=" << trade.modified();
 }
+
+inline char*
+write_entity(char* buf, Trade trade)
+{
+    buf = dbr_write_trade(buf, trade.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline const char*
+read_entity(const char* buf, Trade trade)
+{
+    buf = dbr_read_trade(buf, trade.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+inline int
+entity_len(Trade trade)
+{
+    const int len = dbr_trade_len(trade.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
 } // dbr
 
 #endif // DBRPP_TRADE_HPP
