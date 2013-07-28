@@ -217,6 +217,15 @@ operator <<(std::ostream& os, InstrRec irec)
               << ",max_lots=" << irec.max_lots();
 }
 
+inline int
+entity_len(InstrRec irec)
+{
+    const int len = dbr_instr_len(irec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 inline char*
 write_entity(char* buf, InstrRec irec)
 {
@@ -233,15 +242,6 @@ read_entity(const char* buf, InstrRec irec)
     if (!buf)
         throw_exception();
     return buf;
-}
-
-inline int
-entity_len(InstrRec irec)
-{
-    const int len = dbr_instr_len(irec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
 }
 
 class MarketRec : public RecBase {
@@ -278,6 +278,15 @@ operator <<(std::ostream& os, MarketRec mrec)
               << ",settl_date=" << mrec.settl_date();
 }
 
+inline int
+entity_len(MarketRec mrec)
+{
+    const int len = dbr_market_len(mrec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 inline char*
 write_entity(char* buf, MarketRec mrec)
 {
@@ -294,15 +303,6 @@ read_entity(const char* buf, MarketRec mrec)
     if (!buf)
         throw_exception();
     return buf;
-}
-
-inline int
-entity_len(MarketRec mrec)
-{
-    const int len = dbr_market_len(mrec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
 }
 
 class TraderRec : public RecBase {
@@ -333,6 +333,15 @@ operator <<(std::ostream& os, TraderRec trec)
               << ",email=" << trec.email();
 }
 
+inline int
+entity_len(TraderRec trec)
+{
+    const int len = dbr_trader_len(trec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 inline char*
 write_entity(char* buf, TraderRec trec)
 {
@@ -349,15 +358,6 @@ read_entity(const char* buf, TraderRec trec)
     if (!buf)
         throw_exception();
     return buf;
-}
-
-inline int
-entity_len(TraderRec trec)
-{
-    const int len = dbr_trader_len(trec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
 }
 
 class AccntRec : public RecBase {
@@ -388,6 +388,15 @@ operator <<(std::ostream& os, AccntRec arec)
               << ",email=" << arec.email();
 }
 
+inline int
+entity_len(AccntRec arec)
+{
+    const int len = dbr_accnt_len(arec.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 inline char*
 write_entity(char* buf, AccntRec arec)
 {
@@ -404,15 +413,6 @@ read_entity(const char* buf, AccntRec arec)
     if (!buf)
         throw_exception();
     return buf;
-}
-
-inline int
-entity_len(AccntRec arec)
-{
-    const int len = dbr_accnt_len(arec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
 }
 
 } // dbr

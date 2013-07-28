@@ -183,6 +183,22 @@ unpack64(const char* buf)
     return ntoh64(i);
 }
 
+DBR_API int
+dbr_packleni(int i)
+{
+    int n;
+    if (-64 <= i && i <= 63) {
+        n = 1;
+    } else if (SCHAR_MIN <= i && i <= SCHAR_MAX) {
+        n = 2;
+    } else if (SHRT_MIN <= i && i <= SHRT_MAX) {
+        n = 3;
+    } else {
+        n = 5;
+    }
+    return n;
+}
+
 DBR_API char*
 dbr_packi(char* buf, int i)
 {
@@ -206,6 +222,53 @@ dbr_packi(char* buf, int i)
         buf += 4;
     }
     return buf;
+}
+
+DBR_API const char*
+dbr_unpacki(const char* buf, int* i)
+{
+    int8_t hdr = unpack8(buf);
+    buf += 1;
+    if ((hdr & 0xc0) == 0x80) {
+        switch (hdr & 0x3f) {
+        case 1:
+            *i = unpack8(buf);
+            buf += 1;
+            break;
+        case 2:
+            *i = unpack16(buf);
+            buf += 2;
+            break;
+        case 4:
+            *i = unpack32(buf);
+            buf += 4;
+            break;
+        default:
+            dbr_err_set(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
+            buf = NULL;
+            break;
+        }
+    } else
+        *i = hdr;
+    return buf;
+}
+
+DBR_API int
+dbr_packlenl(long l)
+{
+    int n;
+    if (-64 <= l && l <= 63) {
+        n = 1;
+    } else if (SCHAR_MIN <= l && l <= SCHAR_MAX) {
+        n = 2;
+    } else if (SHRT_MIN <= l && l <= SHRT_MAX) {
+        n = 3;
+    } else if (INT_MIN <= l && l <= INT_MAX) {
+        n = 5;
+    } else {
+        n = 9;
+    }
+    return n;
 }
 
 DBR_API char*
@@ -235,44 +298,6 @@ dbr_packl(char* buf, long l)
         pack64(buf, l);
         buf += 8;
     }
-    return buf;
-}
-
-DBR_API char*
-dbr_packs(char* buf, const char* s, int m)
-{
-    const int n = strnlen(s, m);
-    buf = dbr_packi(buf, n);
-    __builtin_memcpy(buf, s, n);
-    return buf + n;
-}
-
-DBR_API const char*
-dbr_unpacki(const char* buf, int* i)
-{
-    int8_t hdr = unpack8(buf);
-    buf += 1;
-    if ((hdr & 0xc0) == 0x80) {
-        switch (hdr & 0x3f) {
-        case 1:
-            *i = unpack8(buf);
-            buf += 1;
-            break;
-        case 2:
-            *i = unpack16(buf);
-            buf += 2;
-            break;
-        case 4:
-            *i = unpack32(buf);
-            buf += 4;
-            break;
-        default:
-            dbr_err_set(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
-            buf = NULL;
-            break;
-        }
-    } else
-        *i = hdr;
     return buf;
 }
 
@@ -309,6 +334,22 @@ dbr_unpackl(const char* buf, long* l)
     return buf;
 }
 
+DBR_API int
+dbr_packlens(const char* s, int m)
+{
+    const int n = strnlen(s, m);
+    return dbr_packleni(n) + n;
+}
+
+DBR_API char*
+dbr_packs(char* buf, const char* s, int m)
+{
+    const int n = strnlen(s, m);
+    buf = dbr_packi(buf, n);
+    __builtin_memcpy(buf, s, n);
+    return buf + n;
+}
+
 DBR_API const char*
 dbr_unpacks(const char* buf, char* s, int m)
 {
@@ -327,44 +368,14 @@ dbr_unpacks(const char* buf, char* s, int m)
 }
 
 DBR_API int
-dbr_packleni(int i)
+dbr_packlenf(const char* format, ...)
 {
     int n;
-    if (-64 <= i && i <= 63) {
-        n = 1;
-    } else if (SCHAR_MIN <= i && i <= SCHAR_MAX) {
-        n = 2;
-    } else if (SHRT_MIN <= i && i <= SHRT_MAX) {
-        n = 3;
-    } else {
-        n = 5;
-    }
+    va_list args;
+    va_start(args, format);
+    n = dbr_vpacklenf(format, args);
+    va_end(args);
     return n;
-}
-
-DBR_API int
-dbr_packlenl(long l)
-{
-    int n;
-    if (-64 <= l && l <= 63) {
-        n = 1;
-    } else if (SCHAR_MIN <= l && l <= SCHAR_MAX) {
-        n = 2;
-    } else if (SHRT_MIN <= l && l <= SHRT_MAX) {
-        n = 3;
-    } else if (INT_MIN <= l && l <= INT_MAX) {
-        n = 5;
-    } else {
-        n = 9;
-    }
-    return n;
-}
-
-DBR_API int
-dbr_packlens(const char* s, int m)
-{
-    const int n = strnlen(s, m);
-    return dbr_packleni(n) + n;
 }
 
 DBR_API char*
@@ -375,6 +386,48 @@ dbr_packf(char* buf, const char* format, ...)
     buf = dbr_vpackf(buf, format, args);
     va_end(args);
     return buf;
+}
+
+DBR_API const char*
+dbr_unpackf(const char* buf, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    buf = dbr_vunpackf(buf, format, args);
+    va_end(args);
+    return buf;
+}
+
+DBR_API int
+dbr_vpacklenf(const char* format, va_list args)
+{
+    int n = 0;
+    for (const char* cp = format; *cp != '\0'; ++cp) {
+        int m;
+        const char* s;
+        switch (*cp) {
+        case 'd':
+        case 'i':
+            n += dbr_packleni(va_arg(args, int));
+            break;
+        case 'l':
+            n += dbr_packlenl(va_arg(args, long));
+            break;
+        case 'm':
+            s = va_arg(args, const char*);
+            n += dbr_packlens(s, MNEM_MAX);
+            break;
+        case 's':
+            m = va_arg(args, int);
+            s = va_arg(args, const char*);
+            n += dbr_packlens(s, m);
+            break;
+        default:
+            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
+            return -1;
+        }
+    }
+    return n;
 }
 
 DBR_API char*
@@ -408,16 +461,6 @@ dbr_vpackf(char* buf, const char* format, va_list args)
 }
 
 DBR_API const char*
-dbr_unpackf(const char* buf, const char* format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    buf = dbr_vunpackf(buf, format, args);
-    va_end(args);
-    return buf;
-}
-
-DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; buf && *cp != '\0'; ++cp) {
@@ -445,47 +488,4 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
         }
     }
     return buf;
-}
-
-DBR_API int
-dbr_packlenf(const char* format, ...)
-{
-    int n;
-    va_list args;
-    va_start(args, format);
-    n = dbr_vpacklenf(format, args);
-    va_end(args);
-    return n;
-}
-
-DBR_API int
-dbr_vpacklenf(const char* format, va_list args)
-{
-    int n = 0;
-    for (const char* cp = format; *cp != '\0'; ++cp) {
-        int m;
-        const char* s;
-        switch (*cp) {
-        case 'd':
-        case 'i':
-            n += dbr_packleni(va_arg(args, int));
-            break;
-        case 'l':
-            n += dbr_packlenl(va_arg(args, long));
-            break;
-        case 'm':
-            s = va_arg(args, const char*);
-            n += dbr_packlens(s, MNEM_MAX);
-            break;
-        case 's':
-            m = va_arg(args, int);
-            s = va_arg(args, const char*);
-            n += dbr_packlens(s, m);
-            break;
-        default:
-            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
-            return -1;
-        }
-    }
-    return n;
 }

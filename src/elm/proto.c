@@ -30,6 +30,17 @@ static const char MEMB_FORMAT[] = "ll";
 static const char TRADE_FORMAT[] = "lllillslliillllill";
 static const char POSN_FORMAT[] = "llllllll";
 
+DBR_API int
+dbr_instr_len(const struct DbrRec* rec)
+{
+    return dbr_packlenf(INSTR_FORMAT,
+                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
+                        rec->instr.asset_type, rec->instr.instr_type, rec->instr.asset,
+                        rec->instr.ccy, rec->instr.tick_numer, rec->instr.tick_denom,
+                        rec->instr.lot_numer, rec->instr.lot_denom, rec->instr.pip_dp,
+                        rec->instr.min_lots, rec->instr.max_lots);
+}
+
 DBR_API char*
 dbr_write_instr(char* buf, const struct DbrRec* rec)
 {
@@ -53,14 +64,11 @@ dbr_read_instr(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_instr_len(const struct DbrRec* rec)
+dbr_market_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(INSTR_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
-                        rec->instr.asset_type, rec->instr.instr_type, rec->instr.asset,
-                        rec->instr.ccy, rec->instr.tick_numer, rec->instr.tick_denom,
-                        rec->instr.lot_numer, rec->instr.lot_denom, rec->instr.pip_dp,
-                        rec->instr.min_lots, rec->instr.max_lots);
+    return dbr_packlenf(MARKET_FORMAT,
+                        rec->id, rec->mnem, rec->market.instr.id, DBR_TENOR_MAX,
+                        rec->market.tenor);
 }
 
 DBR_API char*
@@ -80,11 +88,11 @@ dbr_read_market(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_market_len(const struct DbrRec* rec)
+dbr_trader_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(MARKET_FORMAT,
-                        rec->id, rec->mnem, rec->market.instr.id, DBR_TENOR_MAX,
-                        rec->market.tenor);
+    return dbr_packlenf(TRADER_FORMAT,
+                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->trader.display,
+                        DBR_EMAIL_MAX, rec->trader.email);
 }
 
 DBR_API char*
@@ -104,11 +112,11 @@ dbr_read_trader(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_trader_len(const struct DbrRec* rec)
+dbr_accnt_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(TRADER_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->trader.display,
-                        DBR_EMAIL_MAX, rec->trader.email);
+    return dbr_packlenf(ACCNT_FORMAT,
+                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->accnt.display,
+                        DBR_EMAIL_MAX, rec->accnt.email);
 }
 
 DBR_API char*
@@ -128,11 +136,27 @@ dbr_read_accnt(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_accnt_len(const struct DbrRec* rec)
+dbr_rec_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(ACCNT_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->accnt.display,
-                        DBR_EMAIL_MAX, rec->accnt.email);
+    int len = dbr_packleni(rec->type);
+    switch (rec->type) {
+    case DBR_INSTR:
+        len += dbr_instr_len(rec);
+        break;
+    case DBR_MARKET:
+        len += dbr_market_len(rec);
+        break;
+    case DBR_TRADER:
+        len += dbr_trader_len(rec);
+        break;
+    case DBR_ACCNT:
+        len += dbr_accnt_len(rec);
+        break;
+    default:
+        dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
+        len = -1;
+    }
+    return len;
 }
 
 DBR_API char*
@@ -184,27 +208,13 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API int
-dbr_rec_len(const struct DbrRec* rec)
+dbr_order_len(const struct DbrOrder* order)
 {
-    int len = dbr_packleni(rec->type);
-    switch (rec->type) {
-    case DBR_INSTR:
-        len += dbr_instr_len(rec);
-        break;
-    case DBR_MARKET:
-        len += dbr_market_len(rec);
-        break;
-    case DBR_TRADER:
-        len += dbr_trader_len(rec);
-        break;
-    case DBR_ACCNT:
-        len += dbr_accnt_len(rec);
-        break;
-    default:
-        dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
-        len = -1;
-    }
-    return len;
+    return dbr_packlenf(ORDER_FORMAT,
+                        order->id, order->rev, order->status, order->trader.id, order->accnt.id,
+                        DBR_REF_MAX, order->ref, order->market.id, order->action, order->ticks,
+                        order->resd, order->exec, order->lots, order->min, order->flags,
+                        order->created, order->modified);
 }
 
 DBR_API char*
@@ -228,13 +238,10 @@ dbr_read_order(const char* buf, struct DbrOrder* order)
 }
 
 DBR_API int
-dbr_order_len(const struct DbrOrder* order)
+dbr_memb_len(const struct DbrMemb* memb)
 {
-    return dbr_packlenf(ORDER_FORMAT,
-                        order->id, order->rev, order->status, order->trader.id, order->accnt.id,
-                        DBR_REF_MAX, order->ref, order->market.id, order->action, order->ticks,
-                        order->resd, order->exec, order->lots, order->min, order->flags,
-                        order->created, order->modified);
+    return dbr_packlenf(MEMB_FORMAT,
+                        memb->accnt.id, memb->trader.id);
 }
 
 DBR_API char*
@@ -252,10 +259,14 @@ dbr_read_memb(const char* buf, struct DbrMemb* memb)
 }
 
 DBR_API int
-dbr_memb_len(const struct DbrMemb* memb)
+dbr_trade_len(const struct DbrTrade* trade)
 {
-    return dbr_packlenf(MEMB_FORMAT,
-                        memb->accnt.id, memb->trader.id);
+    return dbr_packlenf(TRADE_FORMAT,
+                        trade->id, trade->match, trade->order, trade->order_rev,
+                        trade->trader.id, trade->accnt.id, DBR_REF_MAX, trade->ref,
+                        trade->market.id, trade->cpty.id, trade->role, trade->action,
+                        trade->ticks, trade->resd, trade->exec, trade->lots,
+                        trade->settl_date, trade->created, trade->modified);
 }
 
 DBR_API char*
@@ -281,14 +292,11 @@ dbr_read_trade(const char* buf, struct DbrTrade* trade)
 }
 
 DBR_API int
-dbr_trade_len(const struct DbrTrade* trade)
+dbr_posn_len(const struct DbrPosn* posn)
 {
-    return dbr_packlenf(TRADE_FORMAT,
-                        trade->id, trade->match, trade->order, trade->order_rev,
-                        trade->trader.id, trade->accnt.id, DBR_REF_MAX, trade->ref,
-                        trade->market.id, trade->cpty.id, trade->role, trade->action,
-                        trade->ticks, trade->resd, trade->exec, trade->lots,
-                        trade->settl_date, trade->created, trade->modified);
+    return dbr_packlenf(POSN_FORMAT,
+                        posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,
+                        posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }
 
 DBR_API char*
@@ -305,12 +313,4 @@ dbr_read_posn(const char* buf, struct DbrPosn* posn)
     return dbr_unpackf(buf, POSN_FORMAT,
                        &posn->id, &posn->accnt.id, &posn->instr.id, &posn->settl_date,
                        &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
-}
-
-DBR_API int
-dbr_posn_len(const struct DbrPosn* posn)
-{
-    return dbr_packlenf(POSN_FORMAT,
-                        posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,
-                        posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }

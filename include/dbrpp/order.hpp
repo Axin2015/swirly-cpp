@@ -157,6 +157,15 @@ operator <<(std::ostream& os, Order order)
               << ",modified=" << order.modified();
 }
 
+inline int
+entity_len(Order order)
+{
+    const int len = dbr_order_len(order.c_arg());
+    if (len < 0)
+        throw_exception();
+    return len;
+}
+
 inline char*
 write_entity(char* buf, Order order)
 {
@@ -173,15 +182,6 @@ read_entity(const char* buf, Order order)
     if (!buf)
         throw_exception();
     return buf;
-}
-
-inline int
-entity_len(Order order)
-{
-    const int len = dbr_order_len(order.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
 }
 } // dbr
 

@@ -27,11 +27,34 @@
  * @{
  */
 
+DBR_API int
+dbr_packleni(int i);
+
 DBR_API char*
 dbr_packi(char* buf, int i);
 
+/**
+ * @brief Returns NULL on error.
+ */
+
+DBR_API const char*
+dbr_unpacki(const char* buf, int* i);
+
+DBR_API int
+dbr_packlenl(long l);
+
 DBR_API char*
 dbr_packl(char* buf, long l);
+
+/**
+ * @brief Returns NULL on error.
+ */
+
+DBR_API const char*
+dbr_unpackl(const char* buf, long* l);
+
+DBR_API int
+dbr_packlens(const char* s, int m);
 
 DBR_API char*
 dbr_packs(char* buf, const char* s, int m);
@@ -41,33 +64,23 @@ dbr_packs(char* buf, const char* s, int m);
  */
 
 DBR_API const char*
-dbr_unpacki(const char* buf, int* i);
-
-/**
- * @brief Returns NULL on error.
- */
-
-DBR_API const char*
-dbr_unpackl(const char* buf, long* l);
-
-/**
- * @brief Returns NULL on error.
- */
-
-DBR_API const char*
 dbr_unpacks(const char* buf, char* s, int m);
 
 DBR_API int
-dbr_packleni(int i);
-
-DBR_API int
-dbr_packlenl(long l);
-
-DBR_API int
-dbr_packlens(const char* s, int m);
+dbr_packlenf(const char* format, ...);
 
 DBR_API char*
 dbr_packf(char* buf, const char* format, ...);
+
+/**
+ * @brief Returns NULL on error.
+ */
+
+DBR_API const char*
+dbr_unpackf(const char* buf, const char* format, ...);
+
+DBR_API int
+dbr_vpacklenf(const char* format, va_list args);
 
 DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args);
@@ -77,20 +90,7 @@ dbr_vpackf(char* buf, const char* format, va_list args);
  */
 
 DBR_API const char*
-dbr_unpackf(const char* buf, const char* format, ...);
-
-/**
- * @brief Returns NULL on error.
- */
-
-DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args);
-
-DBR_API int
-dbr_packlenf(const char* format, ...);
-
-DBR_API int
-dbr_vpacklenf(const char* format, va_list args);
 
 /** @} */
 
