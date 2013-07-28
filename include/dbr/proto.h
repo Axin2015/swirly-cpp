@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_MSG_H
-#define DBR_MSG_H
+#ifndef DBR_PROTO_H
+#define DBR_PROTO_H
 
 #include <dbr/defs.h>
 
@@ -27,7 +27,7 @@ struct DbrTrade;
 struct DbrPosn;
 
 /**
- * @addtogroup Msg
+ * @addtogroup Proto
  * @{
  */
 
@@ -118,4 +118,4 @@ dbr_posn_len(const struct DbrPosn* posn);
 
 /** @} */
 
-#endif // DBR_MSG_H
+#endif // DBR_PROTO_H

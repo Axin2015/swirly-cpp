@@ -94,7 +94,7 @@
  */
 
 /**
- * @defgroup Msg Msg
+ * @defgroup Proto Proto
  * @ingroup Elm
  */
 

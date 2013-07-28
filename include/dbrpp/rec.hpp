@@ -23,7 +23,7 @@
 #include <dbrpp/types.hpp>
 
 #include <dbr/conv.h>
-#include <dbr/msg.h>
+#include <dbr/proto.h>
 #include <dbr/string.h>
 
 namespace dbr {

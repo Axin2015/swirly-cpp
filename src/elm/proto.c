@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/msg.h>
+#include <dbr/proto.h>
 
 #include <dbr/err.h>
 #include <dbr/pack.h>
@@ -162,9 +162,8 @@ dbr_write_rec(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_rec(const char* buf, struct DbrRec* rec)
 {
-    int type;
-    buf = dbr_unpacki(buf, &type);
-    switch (type) {
+    buf = dbr_unpacki(buf, &rec->type);
+    switch (rec->type) {
     case DBR_INSTR:
         buf = dbr_read_instr(buf, rec);
         break;
@@ -178,7 +177,7 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
         buf = dbr_read_accnt(buf, rec);
         break;
     default:
-        dbr_err_set(DBR_EIO, "invalid type %d", type);
+        dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
         buf = NULL;
     }
     return buf;

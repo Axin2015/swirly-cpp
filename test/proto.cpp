@@ -17,7 +17,7 @@
  */
 #include "test.hpp"
 
-#include <dbr/msg.h>
+#include <dbr/proto.h>
 #include <dbr/types.h>
 
 static void
@@ -43,7 +43,7 @@ set_instr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
     rec->instr.max_lots = max_lots;
 }
 
-TEST_CASE(msg_instr)
+TEST_CASE(proto_instr)
 {
     struct DbrRec rec;
     set_instr(&rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
