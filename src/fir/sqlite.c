@@ -120,6 +120,17 @@ free_orders(DbrPool pool, struct DbrQueue* oq)
 }
 
 static inline void
+free_membs(DbrPool pool, struct DbrQueue* oq)
+{
+    struct DbrSlNode* node = dbr_queue_first(oq);
+    while (node) {
+        struct DbrMemb* memb = dbr_memb_entry(node);
+        node = node->next;
+        dbr_pool_free_memb(pool, memb);
+    }
+}
+
+static inline void
 free_trades(DbrPool pool, struct DbrQueue* tq)
 {
     struct DbrSlNode* node = dbr_queue_first(tq);
@@ -933,7 +944,7 @@ select_memb(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_orders(sqlite->pool, &mq);
+    free_membs(sqlite->pool, &mq);
     *first = NULL;
  fail1:
     return -1;

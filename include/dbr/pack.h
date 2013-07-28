@@ -36,11 +36,23 @@ dbr_packl(char* buf, long l);
 DBR_API char*
 dbr_packs(char* buf, const char* s, int m);
 
+/**
+ * @brief Returns NULL on error.
+ */
+
 DBR_API const char*
 dbr_unpacki(const char* buf, int* i);
 
+/**
+ * @brief Returns NULL on error.
+ */
+
 DBR_API const char*
 dbr_unpackl(const char* buf, long* l);
+
+/**
+ * @brief Returns NULL on error.
+ */
 
 DBR_API const char*
 dbr_unpacks(const char* buf, char* s, int m);
@@ -60,8 +72,16 @@ dbr_packf(char* buf, const char* format, ...);
 DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args);
 
+/**
+ * @brief Returns NULL on error.
+ */
+
 DBR_API const char*
 dbr_unpackf(const char* buf, const char* format, ...);
+
+/**
+ * @brief Returns NULL on error.
+ */
 
 DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args);

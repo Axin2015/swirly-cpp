@@ -22,6 +22,7 @@
 
 #include <limits.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 // Packed integer spec:
@@ -400,8 +401,7 @@ dbr_vpackf(char* buf, const char* format, va_list args)
             buf = dbr_packs(buf, s, m);
             break;
         default:
-            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
-            return NULL;
+            abort();
         }
     }
     return buf;
@@ -441,9 +441,7 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
             buf = dbr_unpacks(buf, s, m);
             break;
         default:
-            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
-            buf = NULL;
-            break;
+            abort();
         }
     }
     return buf;
