@@ -98,9 +98,8 @@
 // not have been allocated.
 
 static inline void
-free_recs(DbrPool pool, struct DbrQueue* rq)
+free_recs(DbrPool pool, struct DbrSlNode* node)
 {
-    struct DbrSlNode* node = dbr_queue_first(rq);
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
@@ -109,9 +108,8 @@ free_recs(DbrPool pool, struct DbrQueue* rq)
 }
 
 static inline void
-free_orders(DbrPool pool, struct DbrQueue* oq)
+free_orders(DbrPool pool, struct DbrSlNode* node)
 {
-    struct DbrSlNode* node = dbr_queue_first(oq);
     while (node) {
         struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
@@ -120,9 +118,8 @@ free_orders(DbrPool pool, struct DbrQueue* oq)
 }
 
 static inline void
-free_membs(DbrPool pool, struct DbrQueue* oq)
+free_membs(DbrPool pool, struct DbrSlNode* node)
 {
-    struct DbrSlNode* node = dbr_queue_first(oq);
     while (node) {
         struct DbrMemb* memb = dbr_memb_entry(node);
         node = node->next;
@@ -131,9 +128,8 @@ free_membs(DbrPool pool, struct DbrQueue* oq)
 }
 
 static inline void
-free_trades(DbrPool pool, struct DbrQueue* tq)
+free_trades(DbrPool pool, struct DbrSlNode* node)
 {
-    struct DbrSlNode* node = dbr_queue_first(tq);
     while (node) {
         struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
@@ -142,9 +138,8 @@ free_trades(DbrPool pool, struct DbrQueue* tq)
 }
 
 static inline void
-free_posns(DbrPool pool, struct DbrQueue* pq)
+free_posns(DbrPool pool, struct DbrSlNode* node)
 {
-    struct DbrSlNode* node = dbr_queue_first(pq);
     while (node) {
         struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
@@ -587,12 +582,12 @@ select_instr(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = rq.first;
+    *first = dbr_queue_first(&rq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, &rq);
+    free_recs(sqlite->pool, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -656,12 +651,12 @@ select_market(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = rq.first;
+    *first = dbr_queue_first(&rq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, &rq);
+    free_recs(sqlite->pool, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -724,12 +719,12 @@ select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = rq.first;
+    *first = dbr_queue_first(&rq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, &rq);
+    free_recs(sqlite->pool, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -792,12 +787,12 @@ select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = rq.first;
+    *first = dbr_queue_first(&rq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, &rq);
+    free_recs(sqlite->pool, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -885,12 +880,12 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = oq.first;
+    *first = dbr_queue_first(&oq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_orders(sqlite->pool, &oq);
+    free_orders(sqlite->pool, dbr_queue_first(&oq));
     *first = NULL;
  fail1:
     return -1;
@@ -939,12 +934,12 @@ select_memb(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = mq.first;
+    *first = dbr_queue_first(&mq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_membs(sqlite->pool, &mq);
+    free_membs(sqlite->pool, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;
@@ -1036,12 +1031,12 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = tq.first;
+    *first = dbr_queue_first(&tq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_trades(sqlite->pool, &tq);
+    free_trades(sqlite->pool, dbr_queue_first(&tq));
     *first = NULL;
  fail1:
     return -1;
@@ -1130,12 +1125,12 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    *first = pq.first;
+    *first = dbr_queue_first(&pq);
     return size;
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_posns(sqlite->pool, &pq);
+    free_posns(sqlite->pool, dbr_queue_first(&pq));
     *first = NULL;
  fail1:
     return -1;
