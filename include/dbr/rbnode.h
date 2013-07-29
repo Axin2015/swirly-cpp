@@ -20,7 +20,7 @@
 
 #include <dbr/defs.h>
 
-#include <stddef.h>
+#include <stddef.h> // NULL
 
 /**
  * @addtogroup Node

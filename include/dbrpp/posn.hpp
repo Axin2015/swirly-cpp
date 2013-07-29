@@ -104,22 +104,16 @@ operator <<(std::ostream& os, Posn posn)
               << ",sell_lots=" << posn.sell_lots();
 }
 
-inline int
-entity_len(Posn posn)
+inline size_t
+entity_len(Posn posn) noexcept
 {
-    const int len = dbr_posn_len(posn.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_posn_len(posn.c_arg());
 }
 
 inline char*
-write_entity(char* buf, Posn posn)
+write_entity(char* buf, Posn posn) noexcept
 {
-    buf = dbr_write_posn(buf, posn.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_posn(buf, posn.c_arg());
 }
 
 inline const char*

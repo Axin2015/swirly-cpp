@@ -48,8 +48,8 @@ TEST_CASE(proto_instr)
     struct DbrRec rec;
     set_instr(&rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
-    const int len = dbr_instr_len(&rec);
-    char buf[len];
+    const size_t n = dbr_instr_len(&rec);
+    char buf[n];
     dbr_write_instr(buf, &rec);
     memset(&rec, 0, sizeof(rec));
     dbr_read_instr(buf, &rec);

@@ -217,22 +217,16 @@ operator <<(std::ostream& os, InstrRec irec)
               << ",max_lots=" << irec.max_lots();
 }
 
-inline int
-entity_len(InstrRec irec)
+inline size_t
+entity_len(InstrRec irec) noexcept
 {
-    const int len = dbr_instr_len(irec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_instr_len(irec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, InstrRec irec)
+write_entity(char* buf, InstrRec irec) noexcept
 {
-    buf = dbr_write_instr(buf, irec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_instr(buf, irec.c_arg());
 }
 
 inline const char*
@@ -278,22 +272,16 @@ operator <<(std::ostream& os, MarketRec mrec)
               << ",settl_date=" << mrec.settl_date();
 }
 
-inline int
-entity_len(MarketRec mrec)
+inline size_t
+entity_len(MarketRec mrec) noexcept
 {
-    const int len = dbr_market_len(mrec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_market_len(mrec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, MarketRec mrec)
+write_entity(char* buf, MarketRec mrec) noexcept
 {
-    buf = dbr_write_market(buf, mrec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_market(buf, mrec.c_arg());
 }
 
 inline const char*
@@ -333,22 +321,16 @@ operator <<(std::ostream& os, TraderRec trec)
               << ",email=" << trec.email();
 }
 
-inline int
-entity_len(TraderRec trec)
+inline size_t
+entity_len(TraderRec trec) noexcept
 {
-    const int len = dbr_trader_len(trec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_trader_len(trec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, TraderRec trec)
+write_entity(char* buf, TraderRec trec) noexcept
 {
-    buf = dbr_write_trader(buf, trec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_trader(buf, trec.c_arg());
 }
 
 inline const char*
@@ -388,22 +370,16 @@ operator <<(std::ostream& os, AccntRec arec)
               << ",email=" << arec.email();
 }
 
-inline int
-entity_len(AccntRec arec)
+inline size_t
+entity_len(AccntRec arec) noexcept
 {
-    const int len = dbr_accnt_len(arec.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_accnt_len(arec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, AccntRec arec)
+write_entity(char* buf, AccntRec arec) noexcept
 {
-    buf = dbr_write_accnt(buf, arec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_accnt(buf, arec.c_arg());
 }
 
 inline const char*

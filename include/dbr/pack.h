@@ -21,13 +21,14 @@
 #include <dbr/defs.h>
 
 #include <stdarg.h>
+#include <stddef.h> // size_t
 
 /**
  * @addtogroup Pack
  * @{
  */
 
-DBR_API int
+DBR_API size_t
 dbr_packleni(int i);
 
 DBR_API char*
@@ -40,7 +41,7 @@ dbr_packi(char* buf, int i);
 DBR_API const char*
 dbr_unpacki(const char* buf, int* i);
 
-DBR_API int
+DBR_API size_t
 dbr_packlenl(long l);
 
 DBR_API char*
@@ -53,20 +54,45 @@ dbr_packl(char* buf, long l);
 DBR_API const char*
 dbr_unpackl(const char* buf, long* l);
 
-DBR_API int
-dbr_packlens(const char* s, int m);
+static inline size_t
+dbr_packlenz(size_t z)
+{
+    return dbr_packlenl(z);
+}
+
+static inline char*
+dbr_packz(char* buf, size_t z)
+{
+    return dbr_packl(buf, z);
+}
+
+/**
+ * @brief Returns NULL on error.
+ */
+
+static inline const char*
+dbr_unpackz(const char* buf, size_t* z)
+{
+    long n;
+    if ((buf = dbr_unpackl(buf, &n)))
+        *z = n;
+    return buf;
+}
+
+DBR_API size_t
+dbr_packlens(const char* s, size_t m);
 
 DBR_API char*
-dbr_packs(char* buf, const char* s, int m);
+dbr_packs(char* buf, const char* s, size_t m);
 
 /**
  * @brief Returns NULL on error.
  */
 
 DBR_API const char*
-dbr_unpacks(const char* buf, char* s, int m);
+dbr_unpacks(const char* buf, char* s, size_t m);
 
-DBR_API int
+DBR_API size_t
 dbr_packlenf(const char* format, ...);
 
 DBR_API char*
@@ -79,7 +105,7 @@ dbr_packf(char* buf, const char* format, ...);
 DBR_API const char*
 dbr_unpackf(const char* buf, const char* format, ...);
 
-DBR_API int
+DBR_API size_t
 dbr_vpacklenf(const char* format, va_list args);
 
 DBR_API char*

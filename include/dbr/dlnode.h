@@ -19,7 +19,7 @@
 #define DBR_DLNODE_H
 
 #include <assert.h>
-#include <stddef.h>
+#include <stddef.h> // NULL
 
 /**
  * @addtogroup Node

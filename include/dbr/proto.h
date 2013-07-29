@@ -20,6 +20,8 @@
 
 #include <dbr/defs.h>
 
+#include <stddef.h> // size_t
+
 struct DbrRec;
 struct DbrOrder;
 struct DbrMemb;
@@ -31,7 +33,7 @@ struct DbrPosn;
  * @{
  */
 
-DBR_API int
+DBR_API size_t
 dbr_instr_len(const struct DbrRec* rec);
 
 DBR_API char*
@@ -40,7 +42,7 @@ dbr_write_instr(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_instr(const char* buf, struct DbrRec* rec);
 
-DBR_API int
+DBR_API size_t
 dbr_market_len(const struct DbrRec* rec);
 
 DBR_API char*
@@ -49,7 +51,7 @@ dbr_write_market(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_market(const char* buf, struct DbrRec* rec);
 
-DBR_API int
+DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec);
 
 DBR_API char*
@@ -58,7 +60,7 @@ dbr_write_trader(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_trader(const char* buf, struct DbrRec* rec);
 
-DBR_API int
+DBR_API size_t
 dbr_accnt_len(const struct DbrRec* rec);
 
 DBR_API char*
@@ -71,7 +73,7 @@ dbr_read_accnt(const char* buf, struct DbrRec* rec);
  * @brief Returns -1 if type is unrecognised.
  */
 
-DBR_API int
+DBR_API size_t
 dbr_rec_len(const struct DbrRec* rec);
 
 DBR_API char*
@@ -80,7 +82,7 @@ dbr_write_rec(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_rec(const char* buf, struct DbrRec* rec);
 
-DBR_API int
+DBR_API size_t
 dbr_order_len(const struct DbrOrder* order);
 
 DBR_API char*
@@ -89,7 +91,7 @@ dbr_write_order(char* buf, const struct DbrOrder* order);
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order);
 
-DBR_API int
+DBR_API size_t
 dbr_memb_len(const struct DbrMemb* memb);
 
 DBR_API char*
@@ -98,7 +100,7 @@ dbr_write_memb(char* buf, const struct DbrMemb* memb);
 DBR_API const char*
 dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
-DBR_API int
+DBR_API size_t
 dbr_trade_len(const struct DbrTrade* trade);
 
 DBR_API char*
@@ -107,7 +109,7 @@ dbr_write_trade(char* buf, const struct DbrTrade* trade);
 DBR_API const char*
 dbr_read_trade(const char* buf, struct DbrTrade* trade);
 
-DBR_API int
+DBR_API size_t
 dbr_posn_len(const struct DbrPosn* posn);
 
 DBR_API char*

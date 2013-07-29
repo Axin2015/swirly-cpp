@@ -157,22 +157,16 @@ operator <<(std::ostream& os, Order order)
               << ",modified=" << order.modified();
 }
 
-inline int
-entity_len(Order order)
+inline size_t
+entity_len(Order order) noexcept
 {
-    const int len = dbr_order_len(order.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_order_len(order.c_arg());
 }
 
 inline char*
-write_entity(char* buf, Order order)
+write_entity(char* buf, Order order) noexcept
 {
-    buf = dbr_write_order(buf, order.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_order(buf, order.c_arg());
 }
 
 inline const char*

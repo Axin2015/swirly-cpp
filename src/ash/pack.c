@@ -183,10 +183,10 @@ unpack64(const char* buf)
     return ntoh64(i);
 }
 
-DBR_API int
+DBR_API size_t
 dbr_packleni(int i)
 {
-    int n;
+    size_t n;
     if (-64 <= i && i <= 63) {
         n = 1;
     } else if (SCHAR_MIN <= i && i <= SCHAR_MAX) {
@@ -253,10 +253,10 @@ dbr_unpacki(const char* buf, int* i)
     return buf;
 }
 
-DBR_API int
+DBR_API size_t
 dbr_packlenl(long l)
 {
-    int n;
+    size_t n;
     if (-64 <= l && l <= 63) {
         n = 1;
     } else if (SCHAR_MIN <= l && l <= SCHAR_MAX) {
@@ -334,28 +334,28 @@ dbr_unpackl(const char* buf, long* l)
     return buf;
 }
 
-DBR_API int
-dbr_packlens(const char* s, int m)
+DBR_API size_t
+dbr_packlens(const char* s, size_t m)
 {
-    const int n = strnlen(s, m);
-    return dbr_packleni(n) + n;
+    const size_t n = strnlen(s, m);
+    return dbr_packlenz(n) + n;
 }
 
 DBR_API char*
-dbr_packs(char* buf, const char* s, int m)
+dbr_packs(char* buf, const char* s, size_t m)
 {
-    const int n = strnlen(s, m);
-    buf = dbr_packi(buf, n);
+    const size_t n = strnlen(s, m);
+    buf = dbr_packz(buf, n);
     __builtin_memcpy(buf, s, n);
     return buf + n;
 }
 
 DBR_API const char*
-dbr_unpacks(const char* buf, char* s, int m)
+dbr_unpacks(const char* buf, char* s, size_t m)
 {
-    int n;
+    size_t n;
     // Unpack string length.
-    if ((buf = dbr_unpacki(buf, &n))) {
+    if ((buf = dbr_unpackz(buf, &n))) {
         if (n < m) {
             // Null terminate when less than max.
             __builtin_memcpy(s, buf, n);
@@ -367,10 +367,10 @@ dbr_unpacks(const char* buf, char* s, int m)
     return buf;
 }
 
-DBR_API int
+DBR_API size_t
 dbr_packlenf(const char* format, ...)
 {
-    int n;
+    size_t n;
     va_list args;
     va_start(args, format);
     n = dbr_vpacklenf(format, args);
@@ -398,12 +398,12 @@ dbr_unpackf(const char* buf, const char* format, ...)
     return buf;
 }
 
-DBR_API int
+DBR_API size_t
 dbr_vpacklenf(const char* format, va_list args)
 {
-    int n = 0;
+    size_t n = 0;
     for (const char* cp = format; *cp != '\0'; ++cp) {
-        int m;
+        size_t m;
         const char* s;
         switch (*cp) {
         case 'd':
@@ -413,18 +413,20 @@ dbr_vpacklenf(const char* format, va_list args)
         case 'l':
             n += dbr_packlenl(va_arg(args, long));
             break;
+        case 'z':
+            n += dbr_packlenz(va_arg(args, size_t));
+            break;
         case 'm':
             s = va_arg(args, const char*);
             n += dbr_packlens(s, MNEM_MAX);
             break;
         case 's':
-            m = va_arg(args, int);
+            m = va_arg(args, size_t);
             s = va_arg(args, const char*);
             n += dbr_packlens(s, m);
             break;
         default:
-            dbr_err_set(DBR_EINVAL, "invalid format character '%c'", *cp);
-            return -1;
+            abort();
         }
     }
     return n;
@@ -434,7 +436,7 @@ DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; *cp != '\0'; ++cp) {
-        int m;
+        size_t m;
         const char* s;
         switch (*cp) {
         case 'd':
@@ -444,12 +446,15 @@ dbr_vpackf(char* buf, const char* format, va_list args)
         case 'l':
             buf = dbr_packl(buf, va_arg(args, long));
             break;
+        case 'z':
+            buf = dbr_packz(buf, va_arg(args, size_t));
+            break;
         case 'm':
             s = va_arg(args, const char*);
             buf = dbr_packs(buf, s, MNEM_MAX);
             break;
         case 's':
-            m = va_arg(args, int);
+            m = va_arg(args, size_t);
             s = va_arg(args, const char*);
             buf = dbr_packs(buf, s, m);
             break;
@@ -464,7 +469,7 @@ DBR_API const char*
 dbr_vunpackf(const char* buf, const char* format, va_list args)
 {
     for (const char* cp = format; buf && *cp != '\0'; ++cp) {
-        int m;
+        size_t m;
         char* s;
         switch (*cp) {
         case 'd':
@@ -474,12 +479,15 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
         case 'l':
             buf = dbr_unpackl(buf, va_arg(args, long*));
             break;
+        case 'z':
+            buf = dbr_unpackz(buf, va_arg(args, size_t*));
+            break;
         case 'm':
             s = va_arg(args, char*);
             buf = dbr_unpacks(buf, s, MNEM_MAX);
             break;
         case 's':
-            m = va_arg(args, int);
+            m = va_arg(args, size_t);
             s = va_arg(args, char*);
             buf = dbr_unpacks(buf, s, m);
             break;

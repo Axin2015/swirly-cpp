@@ -164,22 +164,16 @@ operator <<(std::ostream& os, Trade trade)
               << ",modified=" << trade.modified();
 }
 
-inline int
-entity_len(Trade trade)
+inline size_t
+entity_len(Trade trade) noexcept
 {
-    const int len = dbr_trade_len(trade.c_arg());
-    if (len < 0)
-        throw_exception();
-    return len;
+    return dbr_trade_len(trade.c_arg());
 }
 
 inline char*
-write_entity(char* buf, Trade trade)
+write_entity(char* buf, Trade trade) noexcept
 {
-    buf = dbr_write_trade(buf, trade.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
+    return dbr_write_trade(buf, trade.c_arg());
 }
 
 inline const char*
