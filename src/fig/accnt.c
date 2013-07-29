@@ -17,8 +17,6 @@
  */
 #include "accnt.h"
 
-#include "pool.h"
-
 #include <dbr/conv.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
@@ -48,7 +46,7 @@ free_membs(struct FigAccnt* accnt)
     while ((node = accnt->membs.root)) {
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
         dbr_tree_remove(&accnt->membs, node);
-        fig_pool_free_memb(accnt->pool, memb);
+        dbr_pool_free_memb(accnt->pool, memb);
     }
 }
 
@@ -60,7 +58,7 @@ free_trades(struct FigAccnt* accnt)
     while ((node = accnt->trades.root)) {
         struct DbrTrade* trade = dbr_accnt_trade_entry(node);
         dbr_tree_remove(&accnt->trades, node);
-        fig_pool_free_trade(accnt->pool, trade);
+        dbr_pool_free_trade(accnt->pool, trade);
     }
 }
 
@@ -72,12 +70,12 @@ free_posns(struct FigAccnt* accnt)
     while ((node = accnt->posns.root)) {
         struct DbrPosn* posn = dbr_accnt_posn_entry(node);
         dbr_tree_remove(&accnt->posns, node);
-        fig_pool_free_posn(accnt->pool, posn);
+        dbr_pool_free_posn(accnt->pool, posn);
     }
 }
 
 DBR_EXTERN struct FigAccnt*
-fig_accnt_lazy(struct DbrRec* arec, struct FigPool* pool)
+fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
@@ -116,7 +114,7 @@ fig_accnt_term(struct DbrRec* arec)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct FigPool* pool)
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
@@ -134,7 +132,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, str
     struct DbrPosn* posn;
 	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, id);
     if (!node || node->key != id) {
-        if (!(posn = fig_pool_alloc_posn(accnt->pool, id)))
+        if (!(posn = dbr_pool_alloc_posn(accnt->pool, id)))
             return NULL;
 
         posn->id = id;

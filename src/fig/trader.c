@@ -18,7 +18,6 @@
 #include "trader.h"
 
 #include "market.h"
-#include "pool.h"
 
 #include <dbr/err.h>
 #include <dbr/sess.h>
@@ -40,7 +39,7 @@ free_orders(struct FigTrader* trader)
     while ((node = trader->orders.root)) {
         struct DbrOrder* order = dbr_trader_order_entry(node);
         fig_trader_release_order(trader, order);
-        fig_pool_free_order(trader->pool, order);
+        dbr_pool_free_order(trader->pool, order);
     }
 }
 
@@ -53,12 +52,12 @@ free_subs(struct FigTrader* trader)
         struct DbrSub* sub = dbr_trader_sub_entry(node);
         fig_market_unsub(sub);
         dbr_tree_remove(&trader->subs, node);
-        fig_pool_free_sub(trader->pool, sub);
+        dbr_pool_free_sub(trader->pool, sub);
     }
 }
 
 DBR_EXTERN struct FigTrader*
-fig_trader_lazy(struct DbrRec* trec, struct FigPool* pool, struct FigIndex* index)
+fig_trader_lazy(struct DbrRec* trec, DbrPool pool, struct FigIndex* index)
 {
     assert(trec);
     assert(trec->type == DBR_TRADER);
@@ -98,13 +97,13 @@ fig_trader_term(struct DbrRec* trec)
 DBR_EXTERN DbrBool
 fig_trader_sub(struct FigTrader* trader, struct FigMarket* market)
 {
-    struct FigPool* pool = trader->pool;
+    DbrPool pool = trader->pool;
 	struct DbrRbNode* node = dbr_tree_pfind(&trader->subs, market->id);
     if (node && node->key == market->id) {
         dbr_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
-    struct DbrSub* sub = fig_pool_alloc_sub(pool, market->id);
+    struct DbrSub* sub = dbr_pool_alloc_sub(pool, market->id);
     if (!sub)
         goto fail1;
 
@@ -128,7 +127,7 @@ fig_trader_unsub(struct FigTrader* trader, DbrIden mrid)
         struct DbrSub* sub = dbr_trader_sub_entry(node);
         fig_market_unsub(sub);
         dbr_tree_remove(&trader->subs, node);
-        fig_pool_free_sub(trader->pool, sub);
+        dbr_pool_free_sub(trader->pool, sub);
     }
 }
 

@@ -19,9 +19,9 @@
 #define FIG_MATCH_H
 
 #include <dbr/defs.h>
+#include <dbr/pool.h>
 #include <dbr/types.h>
 
-struct FigPool;
 struct FigIndex;
 struct FigMarket;
 
@@ -30,7 +30,7 @@ struct FigMarket;
 // Match taker with list of maker orders.
 
 DBR_EXTERN DbrBool
-fig_match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market,
+fig_match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market,
                  struct DbrOrder* taker, struct DbrTrans* trans);
 
 #endif // FIG_MATCH_H

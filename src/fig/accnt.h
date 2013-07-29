@@ -19,11 +19,12 @@
 #define FIG_ACCNT_H
 
 #include <dbr/conv.h>
+#include <dbr/pool.h>
 #include <dbr/tree.h>
 
 struct FigAccnt {
     DbrIden id;
-    struct FigPool* pool;
+    DbrPool pool;
     struct DbrTree membs;
     struct DbrTree trades;
     struct DbrTree posns;
@@ -32,7 +33,7 @@ struct FigAccnt {
 };
 
 DBR_EXTERN struct FigAccnt*
-fig_accnt_lazy(struct DbrRec* arec, struct FigPool* pool);
+fig_accnt_lazy(struct DbrRec* arec, DbrPool pool);
 
 // Assumes that arec pointer is not null.
 
@@ -123,7 +124,7 @@ fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, struct FigPool* pool);
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, DbrPool pool);
 
 static inline struct DbrRbNode*
 fig_accnt_find_posn_id(const struct FigAccnt* accnt, DbrIden id)

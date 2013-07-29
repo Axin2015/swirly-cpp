@@ -21,13 +21,14 @@
 #include <fig/index.h>
 
 #include <dbr/conv.h>
+#include <dbr/pool.h>
 #include <dbr/tree.h>
 
 #include <assert.h>
 
 struct FigTrader {
     DbrIden id;
-    struct FigPool* pool;
+    DbrPool pool;
     struct FigIndex* index;
     struct DbrTree orders;
     struct DbrTree subs;
@@ -35,7 +36,7 @@ struct FigTrader {
 };
 
 DBR_EXTERN struct FigTrader*
-fig_trader_lazy(struct DbrRec* trec, struct FigPool* pool, struct FigIndex* index);
+fig_trader_lazy(struct DbrRec* trec, DbrPool pool, struct FigIndex* index);
 
 // Assumes that trec pointer is not null.
 

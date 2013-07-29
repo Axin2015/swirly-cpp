@@ -17,8 +17,6 @@
  */
 #include "side.h"
 
-#include "pool.h"
-
 #include <dbr/conv.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
@@ -33,7 +31,7 @@ lazy_level(struct FigSide* side, struct DbrOrder* order)
 
 	struct DbrLevel* level;
     if (!node || node->key != key) {
-        if (!(level = fig_pool_alloc_level(side->pool, key)))
+        if (!(level = dbr_pool_alloc_level(side->pool, key)))
             return NULL;
 
         level->first_order = order;
@@ -72,7 +70,7 @@ reduce(struct FigSide* side, struct DbrOrder* order, DbrLots delta)
 }
 
 DBR_EXTERN void
-fig_side_init(struct FigSide* side, struct FigPool* pool)
+fig_side_init(struct FigSide* side, DbrPool pool)
 {
     side->pool = pool;
     dbr_tree_init(&side->levels);
@@ -132,7 +130,7 @@ fig_side_remove_order(struct FigSide* side, struct DbrOrder* order)
         dbr_log_debug2("remove level: market=%.16s,ticks=%ld", order->market.rec->mnem,
                        order->ticks);
         dbr_tree_remove(&side->levels, &level->side_node_);
-        fig_pool_free_level(side->pool, level);
+        dbr_pool_free_level(side->pool, level);
     } else if (level->first_order == order) {
         // First order at this level is being removed.
         level->first_order = dbr_side_order_entry(order->side_node_.next);

@@ -25,7 +25,7 @@
  * @{
  */
 
-typedef struct FigPool* DbrPool;
+typedef struct ElmPool* DbrPool;
 
 DBR_API DbrPool
 dbr_pool_create(void);

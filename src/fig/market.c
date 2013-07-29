@@ -17,15 +17,13 @@
  */
 #include "market.h"
 
-#include "pool.h"
-
 #include <dbr/conv.h>
 #include <dbr/err.h>
 
 #include <stdlib.h>
 
 DBR_EXTERN struct FigMarket*
-fig_market_lazy(struct DbrRec* mrec, struct FigPool* pool)
+fig_market_lazy(struct DbrRec* mrec, DbrPool pool)
 {
     assert(mrec);
     assert(mrec->type == DBR_MARKET);

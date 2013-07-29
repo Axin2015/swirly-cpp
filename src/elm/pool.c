@@ -28,11 +28,11 @@
 #include <unistd.h>
 
 static DbrBool
-alloc_small_nodes(struct FigPool* pool)
+alloc_small_nodes(struct ElmPool* pool)
 {
-    struct FigSmallBlock* block = malloc(sizeof(struct FigSmallBlock)
+    struct ElmSmallBlock* block = malloc(sizeof(struct ElmSmallBlock)
                                          + pool->small.nodes_per_block
-                                         * sizeof(struct FigSmallNode));
+                                         * sizeof(struct ElmSmallNode));
     if (dbr_unlikely(!block)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
@@ -66,11 +66,11 @@ alloc_small_nodes(struct FigPool* pool)
 }
 
 static DbrBool
-alloc_large_nodes(struct FigPool* pool)
+alloc_large_nodes(struct ElmPool* pool)
 {
-    struct FigLargeBlock* block = malloc(sizeof(struct FigLargeBlock)
+    struct ElmLargeBlock* block = malloc(sizeof(struct ElmLargeBlock)
                                          + pool->large.nodes_per_block
-                                         * sizeof(struct FigLargeNode));
+                                         * sizeof(struct ElmLargeNode));
     if (dbr_unlikely(!block)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
@@ -104,7 +104,7 @@ alloc_large_nodes(struct FigPool* pool)
 }
 
 DBR_EXTERN DbrBool
-fig_pool_init(struct FigPool* pool)
+elm_pool_init(struct ElmPool* pool)
 {
     // Slightly less than one page of items.
     // ((page_size - header_size) / item_size) - 1
@@ -112,14 +112,14 @@ fig_pool_init(struct FigPool* pool)
     const long page_size = sysconf(_SC_PAGESIZE);
 
     // Small.
-    pool->small.nodes_per_block = (page_size - sizeof(struct FigSmallBlock))
-        / sizeof(struct FigSmallNode) - 1;
+    pool->small.nodes_per_block = (page_size - sizeof(struct ElmSmallBlock))
+        / sizeof(struct ElmSmallNode) - 1;
     pool->small.first_block = NULL;
     pool->small.first_node = NULL;
 
     // Large.
-    pool->large.nodes_per_block = (page_size - sizeof(struct FigLargeBlock))
-        / sizeof(struct FigLargeNode) - 1;
+    pool->large.nodes_per_block = (page_size - sizeof(struct ElmLargeBlock))
+        / sizeof(struct ElmLargeNode) - 1;
     pool->large.first_block = NULL;
     pool->large.first_node = NULL;
 
@@ -150,7 +150,7 @@ fig_pool_init(struct FigPool* pool)
  fail2:
     // Defensively does not assume single block.
     while (pool->small.first_block) {
-        struct FigSmallBlock* block = pool->small.first_block;
+        struct ElmSmallBlock* block = pool->small.first_block;
         pool->small.first_block = block->next;
         free(block);
     }
@@ -159,13 +159,13 @@ fig_pool_init(struct FigPool* pool)
 }
 
 DBR_EXTERN void
-fig_pool_term(struct FigPool* pool)
+elm_pool_term(struct ElmPool* pool)
 {
     assert(pool);
 
     // Large.
     while (pool->large.first_block) {
-        struct FigLargeBlock* block = pool->large.first_block;
+        struct ElmLargeBlock* block = pool->large.first_block;
 #if defined(DBR_DEBUG_ALLOC)
         for (int i = 0; i < pool->large.nodes_per_block; ++i) {
             if (block->nodes[i].file) {
@@ -181,7 +181,7 @@ fig_pool_term(struct FigPool* pool)
 
     // Small.
     while (pool->small.first_block) {
-        struct FigSmallBlock* block = pool->small.first_block;
+        struct ElmSmallBlock* block = pool->small.first_block;
 #if defined(DBR_DEBUG_ALLOC)
         for (int i = 0; i < pool->small.nodes_per_block; ++i) {
             if (block->nodes[i].file) {
@@ -202,18 +202,18 @@ fig_pool_term(struct FigPool* pool)
 #endif // DBR_DEBUG_ALLOC
 }
 
-DBR_EXTERN struct FigSmallNode*
+DBR_EXTERN struct ElmSmallNode*
 #if !defined(DBR_DEBUG_ALLOC)
-fig_pool_alloc_small(struct FigPool* pool)
+elm_pool_alloc_small(struct ElmPool* pool)
 #else  // DBR_DEBUG_ALLOC
-fig_pool_alloc_small(struct FigPool* pool, const char* file, int line)
+elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!pool->small.first_node && !alloc_small_nodes(pool))) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
-    struct FigSmallNode* node = pool->small.first_node;
+    struct ElmSmallNode* node = pool->small.first_node;
     pool->small.first_node = node->next;
 
 #if defined(DBR_DEBUG_ALLOC)
@@ -226,18 +226,18 @@ fig_pool_alloc_small(struct FigPool* pool, const char* file, int line)
     return node;
 }
 
-DBR_EXTERN struct FigLargeNode*
+DBR_EXTERN struct ElmLargeNode*
 #if !defined(DBR_DEBUG_ALLOC)
-fig_pool_alloc_large(struct FigPool* pool)
+elm_pool_alloc_large(struct ElmPool* pool)
 #else  // DBR_DEBUG_ALLOC
-fig_pool_alloc_large(struct FigPool* pool, const char* file, int line)
+elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
 #endif // DBR_DEBUG_ALLOC
 {
     if (dbr_unlikely(!pool->large.first_node && !alloc_large_nodes(pool))) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return false;
     }
-    struct FigLargeNode* node = pool->large.first_node;
+    struct ElmLargeNode* node = pool->large.first_node;
     pool->large.first_node = node->next;
 
 #if defined(DBR_DEBUG_ALLOC)
@@ -251,7 +251,7 @@ fig_pool_alloc_large(struct FigPool* pool, const char* file, int line)
 }
 
 DBR_EXTERN void
-fig_pool_free_small(struct FigPool* pool, struct FigSmallNode* node)
+elm_pool_free_small(struct ElmPool* pool, struct ElmSmallNode* node)
 {
     if (node) {
 
@@ -271,7 +271,7 @@ fig_pool_free_small(struct FigPool* pool, struct FigSmallNode* node)
 }
 
 DBR_EXTERN void
-fig_pool_free_large(struct FigPool* pool, struct FigLargeNode* node)
+elm_pool_free_large(struct ElmPool* pool, struct ElmLargeNode* node)
 {
     if (node) {
 
@@ -290,28 +290,14 @@ fig_pool_free_large(struct FigPool* pool, struct FigLargeNode* node)
     }
 }
 
-DBR_EXTERN void
-fig_pool_free_matches(struct FigPool* pool, struct DbrSlNode* first)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrMatch* match = dbr_trans_match_entry(node);
-        node = node->next;
-        // Not committed so match object still owns the trades.
-        fig_pool_free_trade(pool, match->taker_trade);
-        fig_pool_free_trade(pool, match->maker_trade);
-        fig_pool_free_match(pool, match);
-    }
-}
-
 DBR_API DbrPool
 dbr_pool_create(void)
 {
-    DbrPool pool = malloc(sizeof(struct FigPool));
+    DbrPool pool = malloc(sizeof(struct ElmPool));
     if (dbr_unlikely(!pool))
         goto fail1;
 
-    if (dbr_unlikely(!fig_pool_init(pool)))
+    if (dbr_unlikely(!elm_pool_init(pool)))
         goto fail2;
 
     return pool;
@@ -325,7 +311,7 @@ DBR_API void
 dbr_pool_destroy(DbrPool pool)
 {
     if (pool) {
-        fig_pool_term(pool);
+        elm_pool_term(pool);
         free(pool);
     }
 }
@@ -333,95 +319,95 @@ dbr_pool_destroy(DbrPool pool)
 DBR_API struct DbrRec*
 dbr_pool_alloc_rec(DbrPool pool)
 {
-    return fig_pool_alloc_rec(pool);
+    return elm_pool_alloc_rec(pool);
 }
 
 DBR_API void
 dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
 {
-    fig_pool_free_rec(pool, rec);
+    elm_pool_free_rec(pool, rec);
 }
 
 DBR_API struct DbrLevel*
 dbr_pool_alloc_level(DbrPool pool, DbrKey key)
 {
-    return fig_pool_alloc_level(pool, key);
+    return elm_pool_alloc_level(pool, key);
 }
 
 DBR_API void
 dbr_pool_free_level(DbrPool pool, struct DbrLevel* level)
 {
-    fig_pool_free_level(pool, level);
+    elm_pool_free_level(pool, level);
 }
 
 DBR_API struct DbrMatch*
 dbr_pool_alloc_match(DbrPool pool)
 {
-    return fig_pool_alloc_match(pool);
+    return elm_pool_alloc_match(pool);
 }
 
 DBR_API void
 dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
 {
-    fig_pool_free_match(pool, match);
+    elm_pool_free_match(pool, match);
 }
 
 DBR_API struct DbrOrder*
 dbr_pool_alloc_order(DbrPool pool, DbrKey key)
 {
-    return fig_pool_alloc_order(pool, key);
+    return elm_pool_alloc_order(pool, key);
 }
 
 DBR_API void
 dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
 {
-    fig_pool_free_order(pool, order);
+    elm_pool_free_order(pool, order);
 }
 
 DBR_API struct DbrMemb*
 dbr_pool_alloc_memb(DbrPool pool, DbrKey key)
 {
-    return fig_pool_alloc_memb(pool, key);
+    return elm_pool_alloc_memb(pool, key);
 }
 
 DBR_API void
 dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
 {
-    fig_pool_free_memb(pool, memb);
+    elm_pool_free_memb(pool, memb);
 }
 
 DBR_API struct DbrTrade*
 dbr_pool_alloc_trade(DbrPool pool, DbrKey key)
 {
-    return fig_pool_alloc_trade(pool, key);
+    return elm_pool_alloc_trade(pool, key);
 }
 
 DBR_API void
 dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade)
 {
-    fig_pool_free_trade(pool, trade);
+    elm_pool_free_trade(pool, trade);
 }
 
 DBR_API struct DbrPosn*
 dbr_pool_alloc_posn(DbrPool pool, DbrKey key)
 {
-    return fig_pool_alloc_posn(pool, key);
+    return elm_pool_alloc_posn(pool, key);
 }
 
 DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 {
-    fig_pool_free_posn(pool, posn);
+    elm_pool_free_posn(pool, posn);
 }
 
 DBR_API struct DbrSub*
 dbr_pool_alloc_sub(DbrPool pool, DbrKey key)
 {
-    return fig_pool_alloc_sub(pool, key);
+    return elm_pool_alloc_sub(pool, key);
 }
 
 DBR_API void
 dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
 {
-    fig_pool_free_sub(pool, sub);
+    elm_pool_free_sub(pool, sub);
 }

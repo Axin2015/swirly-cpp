@@ -98,8 +98,9 @@
 // not have been allocated.
 
 static inline void
-free_recs(DbrPool pool, struct DbrSlNode* node)
+free_recs(DbrPool pool, struct DbrSlNode* first)
 {
+    struct DbrSlNode* node = first;
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
@@ -108,8 +109,9 @@ free_recs(DbrPool pool, struct DbrSlNode* node)
 }
 
 static inline void
-free_orders(DbrPool pool, struct DbrSlNode* node)
+free_orders(DbrPool pool, struct DbrSlNode* first)
 {
+    struct DbrSlNode* node = first;
     while (node) {
         struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
@@ -118,8 +120,9 @@ free_orders(DbrPool pool, struct DbrSlNode* node)
 }
 
 static inline void
-free_membs(DbrPool pool, struct DbrSlNode* node)
+free_membs(DbrPool pool, struct DbrSlNode* first)
 {
+    struct DbrSlNode* node = first;
     while (node) {
         struct DbrMemb* memb = dbr_memb_entry(node);
         node = node->next;
@@ -128,8 +131,9 @@ free_membs(DbrPool pool, struct DbrSlNode* node)
 }
 
 static inline void
-free_trades(DbrPool pool, struct DbrSlNode* node)
+free_trades(DbrPool pool, struct DbrSlNode* first)
 {
+    struct DbrSlNode* node = first;
     while (node) {
         struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
@@ -138,8 +142,9 @@ free_trades(DbrPool pool, struct DbrSlNode* node)
 }
 
 static inline void
-free_posns(DbrPool pool, struct DbrSlNode* node)
+free_posns(DbrPool pool, struct DbrSlNode* first)
 {
+    struct DbrSlNode* node = first;
     while (node) {
         struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
@@ -198,7 +203,7 @@ exec_stmt(sqlite3* db, sqlite3_stmt* stmt)
 static void
 trace_sql(void* unused, const char* sql)
 {
-    DBR_DEBUG1F("%s", sql);
+    dbr_log_debug1("%s", sql);
 }
 #endif // DBR_DEBUG_LEVEL >= 2
 
@@ -1153,7 +1158,7 @@ fir_sqlite_init(struct FirSqlite* sqlite, DbrPool pool, const char* path)
 #endif // DBR_DEBUG_LEVEL >= 2
 
 #if DBR_DEBUG_LEVEL >= 1
-    rc = sqlite3_db_confir(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, NULL);
+    rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, NULL);
     if (dbr_unlikely(rc != SQLITE_OK)) {
         dbr_err_set(DBR_EIO, sqlite3_errmsg(db));
         goto fail1;

@@ -19,7 +19,6 @@
 
 #include "accnt.h"
 #include "market.h"
-#include "pool.h"
 #include "trader.h"
 
 #include <assert.h>
@@ -44,13 +43,13 @@ noterm(struct DbrRec* rec)
 }
 
 static inline void
-free_recs(struct FigPool* pool, struct DbrSlNode* node, void (*term)(struct DbrRec*))
+free_recs(DbrPool pool, struct DbrSlNode* node, void (*term)(struct DbrRec*))
 {
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
         term(rec);
-        fig_pool_free_rec(pool, rec);
+        dbr_pool_free_rec(pool, rec);
     }
 }
 
@@ -161,7 +160,7 @@ emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 }
 
 DBR_EXTERN void
-fig_cache_init(struct FigCache* cache, struct FigPool* pool)
+fig_cache_init(struct FigCache* cache, DbrPool pool)
 {
     cache->pool = pool;
     cache->first_instr = NULL;

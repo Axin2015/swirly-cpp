@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIG_POOL_H
-#define FIG_POOL_H
+#ifndef ELM_POOL_H
+#define ELM_POOL_H
 
 #include <dbr/dlnode.h>
 #include <dbr/log.h>
@@ -24,23 +24,23 @@
 #include <dbr/slnode.h>
 #include <dbr/types.h>
 
-struct FigSmallBlock;
-struct FigLargeBlock;
+struct ElmSmallBlock;
+struct ElmLargeBlock;
 
-struct FigPool {
+struct ElmPool {
     struct {
         size_t nodes_per_block;
         // List of allocated memory blocks.
-        struct FigSmallBlock* first_block;
+        struct ElmSmallBlock* first_block;
         // Free list.
-        struct FigSmallNode* first_node;
+        struct ElmSmallNode* first_node;
     } small;
     struct {
         size_t nodes_per_block;
         // List of allocated memory blocks.
-        struct FigLargeBlock* first_block;
+        struct ElmLargeBlock* first_block;
         // Free list.
-        struct FigLargeNode* first_node;
+        struct ElmLargeNode* first_node;
     } large;
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -52,9 +52,9 @@ struct FigPool {
 #endif // DBR_DEBUG_ALLOC
 };
 
-struct FigSmallNode {
+struct ElmSmallNode {
     union {
-        struct FigSmallNode* next;
+        struct ElmSmallNode* next;
         // Small data structures.
         struct DbrLevel level;
         struct DbrMatch match;
@@ -72,9 +72,9 @@ struct FigSmallNode {
 #endif // DBR_DEBUG_ALLOC
 };
 
-struct FigLargeNode {
+struct ElmLargeNode {
     union {
-        struct FigLargeNode* next;
+        struct ElmLargeNode* next;
         // Large data structures.
         struct DbrRec rec;
         struct DbrOrder order;
@@ -90,44 +90,44 @@ struct FigLargeNode {
 #endif // DBR_DEBUG_ALLOC
 };
 
-struct FigSmallBlock {
-    struct FigSmallBlock* next;
-    struct FigSmallNode nodes[];
+struct ElmSmallBlock {
+    struct ElmSmallBlock* next;
+    struct ElmSmallNode nodes[];
 };
 
-struct FigLargeBlock {
-    struct FigLargeBlock* next;
-    struct FigLargeNode nodes[];
+struct ElmLargeBlock {
+    struct ElmLargeBlock* next;
+    struct ElmLargeNode nodes[];
 };
 
 // Error fields are set on failure.
 
 DBR_EXTERN DbrBool
-fig_pool_init(struct FigPool* pool);
+elm_pool_init(struct ElmPool* pool);
 
 // Assumes that pointer is not null.
 
 DBR_EXTERN void
-fig_pool_term(struct FigPool* pool);
+elm_pool_term(struct ElmPool* pool);
 
 DBR_EXTERN void
-fig_pool_free_small(struct FigPool* pool, struct FigSmallNode* node);
+elm_pool_free_small(struct ElmPool* pool, struct ElmSmallNode* node);
 
 DBR_EXTERN void
-fig_pool_free_large(struct FigPool* pool, struct FigLargeNode* node);
+elm_pool_free_large(struct ElmPool* pool, struct ElmLargeNode* node);
 
 #if !defined(DBR_DEBUG_ALLOC)
 
-DBR_EXTERN struct FigSmallNode*
-fig_pool_alloc_small(struct FigPool* pool);
+DBR_EXTERN struct ElmSmallNode*
+elm_pool_alloc_small(struct ElmPool* pool);
 
-DBR_EXTERN struct FigLargeNode*
-fig_pool_alloc_large(struct FigPool* pool);
+DBR_EXTERN struct ElmLargeNode*
+elm_pool_alloc_large(struct ElmPool* pool);
 
 static inline struct DbrRec*
-fig_pool_alloc_rec(struct FigPool* pool)
+elm_pool_alloc_rec(struct ElmPool* pool)
 {
-    struct FigLargeNode* node = fig_pool_alloc_large(pool);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool);
     if (!node)
         return NULL;
     // Initialise private section.
@@ -139,16 +139,16 @@ fig_pool_alloc_rec(struct FigPool* pool)
 }
 
 static inline void
-fig_pool_free_rec(struct FigPool* pool, struct DbrRec* rec)
+elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
 {
-    struct FigLargeNode* node = (struct FigLargeNode*)rec;
-    fig_pool_free_large(pool, node);
+    struct ElmLargeNode* node = (struct ElmLargeNode*)rec;
+    elm_pool_free_large(pool, node);
 }
 
 static inline struct DbrLevel*
-fig_pool_alloc_level(struct FigPool* pool, DbrKey key)
+elm_pool_alloc_level(struct ElmPool* pool, DbrKey key)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrLevel* level = &node->level;
@@ -157,30 +157,30 @@ fig_pool_alloc_level(struct FigPool* pool, DbrKey key)
 }
 
 static inline void
-fig_pool_free_level(struct FigPool* pool, struct DbrLevel* level)
+elm_pool_free_level(struct ElmPool* pool, struct DbrLevel* level)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)level;
-    fig_pool_free_small(pool, node);
+    struct ElmSmallNode* node = (struct ElmSmallNode*)level;
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrMatch*
-fig_pool_alloc_match(struct FigPool* pool)
+elm_pool_alloc_match(struct ElmPool* pool)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     return node ? &node->match : NULL;
 }
 
 static inline void
-fig_pool_free_match(struct FigPool* pool, struct DbrMatch* match)
+elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)match;
-    fig_pool_free_small(pool, node);
+    struct ElmSmallNode* node = (struct ElmSmallNode*)match;
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrOrder*
-fig_pool_alloc_order(struct FigPool* pool, DbrKey key)
+elm_pool_alloc_order(struct ElmPool* pool, DbrKey key)
 {
-    struct FigLargeNode* node = fig_pool_alloc_large(pool);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool);
     if (!node)
         return NULL;
     struct DbrOrder* order = &node->order;
@@ -192,16 +192,16 @@ fig_pool_alloc_order(struct FigPool* pool, DbrKey key)
 }
 
 static inline void
-fig_pool_free_order(struct FigPool* pool, struct DbrOrder* order)
+elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
 {
-    struct FigLargeNode* node = (struct FigLargeNode*)order;
-    fig_pool_free_large(pool, node);
+    struct ElmLargeNode* node = (struct ElmLargeNode*)order;
+    elm_pool_free_large(pool, node);
 }
 
 static inline struct DbrMemb*
-fig_pool_alloc_memb(struct FigPool* pool, DbrKey key)
+elm_pool_alloc_memb(struct ElmPool* pool, DbrKey key)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrMemb* memb = &node->memb;
@@ -211,16 +211,16 @@ fig_pool_alloc_memb(struct FigPool* pool, DbrKey key)
 }
 
 static inline void
-fig_pool_free_memb(struct FigPool* pool, struct DbrMemb* memb)
+elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)memb;
-    fig_pool_free_small(pool, node);
+    struct ElmSmallNode* node = (struct ElmSmallNode*)memb;
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrTrade*
-fig_pool_alloc_trade(struct FigPool* pool, DbrKey key)
+elm_pool_alloc_trade(struct ElmPool* pool, DbrKey key)
 {
-    struct FigLargeNode* node = fig_pool_alloc_large(pool);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool);
     if (!node)
         return NULL;
     struct DbrTrade* trade = &node->trade;
@@ -230,16 +230,16 @@ fig_pool_alloc_trade(struct FigPool* pool, DbrKey key)
 }
 
 static inline void
-fig_pool_free_trade(struct FigPool* pool, struct DbrTrade* trade)
+elm_pool_free_trade(struct ElmPool* pool, struct DbrTrade* trade)
 {
-    struct FigLargeNode* node = (struct FigLargeNode*)trade;
-    fig_pool_free_large(pool, node);
+    struct ElmLargeNode* node = (struct ElmLargeNode*)trade;
+    elm_pool_free_large(pool, node);
 }
 
 static inline struct DbrPosn*
-fig_pool_alloc_posn(struct FigPool* pool, DbrKey key)
+elm_pool_alloc_posn(struct ElmPool* pool, DbrKey key)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrPosn* posn = &node->posn;
@@ -249,16 +249,16 @@ fig_pool_alloc_posn(struct FigPool* pool, DbrKey key)
 }
 
 static inline void
-fig_pool_free_posn(struct FigPool* pool, struct DbrPosn* posn)
+elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)posn;
-    fig_pool_free_small(pool, node);
+    struct ElmSmallNode* node = (struct ElmSmallNode*)posn;
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrSub*
-fig_pool_alloc_sub(struct FigPool* pool, DbrKey key)
+elm_pool_alloc_sub(struct ElmPool* pool, DbrKey key)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrSub* sub = &node->sub;
@@ -268,24 +268,24 @@ fig_pool_alloc_sub(struct FigPool* pool, DbrKey key)
 }
 
 static inline void
-fig_pool_free_sub(struct FigPool* pool, struct DbrSub* sub)
+elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)sub;
-    fig_pool_free_small(pool, node);
+    struct ElmSmallNode* node = (struct ElmSmallNode*)sub;
+    elm_pool_free_small(pool, node);
 }
 
 #else  // DBR_DEBUG_ALLOC
 
-DBR_EXTERN struct FigSmallNode*
-fig_pool_alloc_small(struct FigPool* pool, const char* file, int line);
+DBR_EXTERN struct ElmSmallNode*
+elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line);
 
-DBR_EXTERN struct FigLargeNode*
-fig_pool_alloc_large(struct FigPool* pool, const char* file, int line);
+DBR_EXTERN struct ElmLargeNode*
+elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line);
 
 static inline struct DbrRec*
-fig_pool_alloc_rec_(struct FigPool* pool, const char* file, int line)
+elm_pool_alloc_rec_(struct ElmPool* pool, const char* file, int line)
 {
-    struct FigLargeNode* node = fig_pool_alloc_large(pool, file, line);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating %p rec in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -298,17 +298,17 @@ fig_pool_alloc_rec_(struct FigPool* pool, const char* file, int line)
 }
 
 static inline void
-fig_pool_free_rec(struct FigPool* pool, struct DbrRec* rec)
+elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
 {
-    struct FigLargeNode* node = (struct FigLargeNode*)rec;
+    struct ElmLargeNode* node = (struct ElmLargeNode*)rec;
     dbr_log_debug3("freeing rec %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_large(pool, node);
+    elm_pool_free_large(pool, node);
 }
 
 static inline struct DbrLevel*
-fig_pool_alloc_level_(struct FigPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_level_(struct ElmPool* pool, DbrKey key, const char* file, int line)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool, file, line);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating level %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -318,33 +318,33 @@ fig_pool_alloc_level_(struct FigPool* pool, DbrKey key, const char* file, int li
 }
 
 static inline void
-fig_pool_free_level(struct FigPool* pool, struct DbrLevel* level)
+elm_pool_free_level(struct ElmPool* pool, struct DbrLevel* level)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)level;
+    struct ElmSmallNode* node = (struct ElmSmallNode*)level;
     dbr_log_debug3("freeing level %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_small(pool, node);
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrMatch*
-fig_pool_alloc_match_(struct FigPool* pool, const char* file, int line)
+elm_pool_alloc_match_(struct ElmPool* pool, const char* file, int line)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool, file, line);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating match %p in %s at %d", node, file, line);
     return node ? &node->match : NULL;
 }
 
 static inline void
-fig_pool_free_match(struct FigPool* pool, struct DbrMatch* match)
+elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)match;
+    struct ElmSmallNode* node = (struct ElmSmallNode*)match;
     dbr_log_debug3("freeing match %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_small(pool, node);
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrOrder*
-fig_pool_alloc_order_(struct FigPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_order_(struct ElmPool* pool, DbrKey key, const char* file, int line)
 {
-    struct FigLargeNode* node = fig_pool_alloc_large(pool, file, line);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating order %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -357,17 +357,17 @@ fig_pool_alloc_order_(struct FigPool* pool, DbrKey key, const char* file, int li
 }
 
 static inline void
-fig_pool_free_order(struct FigPool* pool, struct DbrOrder* order)
+elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
 {
-    struct FigLargeNode* node = (struct FigLargeNode*)order;
+    struct ElmLargeNode* node = (struct ElmLargeNode*)order;
     dbr_log_debug3("freeing order %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_large(pool, node);
+    elm_pool_free_large(pool, node);
 }
 
 static inline struct DbrMemb*
-fig_pool_alloc_memb_(struct FigPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_memb_(struct ElmPool* pool, DbrKey key, const char* file, int line)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool, file, line);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating memb %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -378,17 +378,17 @@ fig_pool_alloc_memb_(struct FigPool* pool, DbrKey key, const char* file, int lin
 }
 
 static inline void
-fig_pool_free_memb(struct FigPool* pool, struct DbrMemb* memb)
+elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)memb;
+    struct ElmSmallNode* node = (struct ElmSmallNode*)memb;
     dbr_log_debug3("freeing memb %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_small(pool, node);
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrTrade*
-fig_pool_alloc_trade_(struct FigPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_trade_(struct ElmPool* pool, DbrKey key, const char* file, int line)
 {
-    struct FigLargeNode* node = fig_pool_alloc_large(pool, file, line);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating trade %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -399,17 +399,17 @@ fig_pool_alloc_trade_(struct FigPool* pool, DbrKey key, const char* file, int li
 }
 
 static inline void
-fig_pool_free_trade(struct FigPool* pool, struct DbrTrade* trade)
+elm_pool_free_trade(struct ElmPool* pool, struct DbrTrade* trade)
 {
-    struct FigLargeNode* node = (struct FigLargeNode*)trade;
+    struct ElmLargeNode* node = (struct ElmLargeNode*)trade;
     dbr_log_debug3("freeing trade %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_large(pool, node);
+    elm_pool_free_large(pool, node);
 }
 
 static inline struct DbrPosn*
-fig_pool_alloc_posn_(struct FigPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_posn_(struct ElmPool* pool, DbrKey key, const char* file, int line)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool, file, line);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating posn %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -420,17 +420,17 @@ fig_pool_alloc_posn_(struct FigPool* pool, DbrKey key, const char* file, int lin
 }
 
 static inline void
-fig_pool_free_posn(struct FigPool* pool, struct DbrPosn* posn)
+elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)posn;
+    struct ElmSmallNode* node = (struct ElmSmallNode*)posn;
     dbr_log_debug3("freeing posn %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_small(pool, node);
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrSub*
-fig_pool_alloc_sub_(struct FigPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_sub_(struct ElmPool* pool, DbrKey key, const char* file, int line)
 {
-    struct FigSmallNode* node = fig_pool_alloc_small(pool, file, line);
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating sub %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
@@ -441,35 +441,30 @@ fig_pool_alloc_sub_(struct FigPool* pool, DbrKey key, const char* file, int line
 }
 
 static inline void
-fig_pool_free_sub(struct FigPool* pool, struct DbrSub* sub)
+elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
 {
-    struct FigSmallNode* node = (struct FigSmallNode*)sub;
+    struct ElmSmallNode* node = (struct ElmSmallNode*)sub;
     dbr_log_debug3("freeing sub %p from %s at %d", node, node->file, node->line);
-    fig_pool_free_small(pool, node);
+    elm_pool_free_small(pool, node);
 }
 
-#define fig_pool_alloc_rec(pool)                            \
-    fig_pool_alloc_rec_(pool, __FILE__, __LINE__)
-#define fig_pool_alloc_level(pool, key)                     \
-    fig_pool_alloc_level_(pool, key, __FILE__, __LINE__)
-#define fig_pool_alloc_match(pool)                          \
-    fig_pool_alloc_match_(pool, __FILE__, __LINE__)
-#define fig_pool_alloc_order(pool, key)                     \
-    fig_pool_alloc_order_(pool, key, __FILE__, __LINE__)
-#define fig_pool_alloc_memb(pool, key)                      \
-    fig_pool_alloc_memb_(pool, key, __FILE__, __LINE__)
-#define fig_pool_alloc_trade(pool, key)                     \
-    fig_pool_alloc_trade_(pool, key, __FILE__, __LINE__)
-#define fig_pool_alloc_posn(pool, key)                      \
-    fig_pool_alloc_posn_(pool, key, __FILE__, __LINE__)
-#define fig_pool_alloc_sub(pool, key)                       \
-    fig_pool_alloc_sub_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_rec(pool)                            \
+    elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_level(pool, key)                     \
+    elm_pool_alloc_level_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_match(pool)                          \
+    elm_pool_alloc_match_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_order(pool, key)                     \
+    elm_pool_alloc_order_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_memb(pool, key)                      \
+    elm_pool_alloc_memb_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_trade(pool, key)                     \
+    elm_pool_alloc_trade_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_posn(pool, key)                      \
+    elm_pool_alloc_posn_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_sub(pool, key)                       \
+    elm_pool_alloc_sub_(pool, key, __FILE__, __LINE__)
 
 #endif // DBR_DEBUG_ALLOC
 
-// Free all matches and trades. Used to unwind match failure. No effect if first argument is null.
-
-DBR_EXTERN void
-fig_pool_free_matches(struct FigPool* pool, struct DbrSlNode* first);
-
-#endif // FIG_POOL_H
+#endif // ELM_POOL_H

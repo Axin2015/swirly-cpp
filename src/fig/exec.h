@@ -20,15 +20,16 @@
 
 #include <dbr/defs.h>
 #include <dbr/journ.h>
+#include <dbr/pool.h>
 
 struct FigExec {
-    struct FigPool* pool;
+    DbrPool pool;
     DbrJourn journ;
     struct FigIndex* index;
 };
 
 DBR_EXTERN void
-fig_exec_init(struct FigExec* exec, struct FigPool* pool, DbrJourn journ, struct FigIndex* index);
+fig_exec_init(struct FigExec* exec, DbrPool pool, DbrJourn journ, struct FigIndex* index);
 
 // All members of trans are set to zero on failure.
 

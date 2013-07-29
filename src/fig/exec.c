@@ -21,14 +21,28 @@
 #include "index.h"
 #include "match.h"
 #include "market.h"
-#include "pool.h"
 #include "trader.h"
 
 #include <dbr/err.h>
+#include <dbr/pool.h>
 #include <dbr/sess.h>
 
 #include <stdbool.h>
 #include <string.h>
+
+static void
+free_matches(DbrPool pool, struct DbrSlNode* first)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrMatch* match = dbr_trans_match_entry(node);
+        node = node->next;
+        // Not committed so match object still owns the trades.
+        dbr_pool_free_trade(pool, match->taker_trade);
+        dbr_pool_free_trade(pool, match->maker_trade);
+        dbr_pool_free_match(pool, match);
+    }
+}
 
 static inline void
 apply_posn(struct DbrPosn* posn, const struct DbrTrade* trade)
@@ -130,7 +144,7 @@ apply_trades(struct FigExec* exec, struct FigMarket* market, const struct DbrTra
 }
 
 DBR_EXTERN void
-fig_exec_init(struct FigExec* exec, struct FigPool* pool, DbrJourn journ, struct FigIndex* index)
+fig_exec_init(struct FigExec* exec, DbrPool pool, DbrJourn journ, struct FigIndex* index)
 {
     exec->pool = pool;
     exec->journ = journ;
@@ -151,7 +165,7 @@ fig_exec_submit(struct FigExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
         goto fail1;
 
     const DbrIden id = dbr_journ_alloc_id(exec->journ);
-    struct DbrOrder* new_order = fig_pool_alloc_order(exec->pool, id);
+    struct DbrOrder* new_order = dbr_pool_alloc_order(exec->pool, id);
     if (!new_order)
         goto fail1;
 
@@ -211,12 +225,12 @@ fig_exec_submit(struct FigExec* exec, struct DbrRec* trec, struct DbrRec* arec, 
     dbr_journ_commit_trans(exec->journ);
     return new_order;
  fail4:
-    fig_pool_free_matches(exec->pool, trans->first_match);
+    free_matches(exec->pool, trans->first_match);
     memset(trans, 0, sizeof(*trans));
  fail3:
     dbr_journ_rollback_trans(exec->journ);
  fail2:
-    fig_pool_free_order(exec->pool, new_order);
+    dbr_pool_free_order(exec->pool, new_order);
  fail1:
     memset(trans, 0, sizeof(*trans));
     return NULL;
@@ -362,7 +376,7 @@ fig_exec_archive_order(struct FigExec* exec, struct FigTrader* trader, DbrIden i
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     fig_trader_release_order(trader, order);
-    fig_pool_free_order(exec->pool, order);
+    dbr_pool_free_order(exec->pool, order);
     return true;
  fail1:
     return false;
@@ -382,7 +396,7 @@ fig_exec_archive_trade(struct FigExec* exec, struct FigAccnt* accnt, DbrIden id,
 
     struct DbrTrade* trade = dbr_accnt_trade_entry(node);
     fig_accnt_release_trade(accnt, trade);
-    fig_pool_free_trade(exec->pool, trade);
+    dbr_pool_free_trade(exec->pool, trade);
     return true;
  fail1:
     return false;
@@ -395,6 +409,6 @@ fig_exec_free_matches(struct FigExec* exec, struct DbrSlNode* first)
     while (node) {
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
-        fig_pool_free_match(exec->pool, match);
+        dbr_pool_free_match(exec->pool, match);
     }
 }

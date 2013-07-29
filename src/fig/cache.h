@@ -21,6 +21,7 @@
 // Record cache.
 
 #include <dbr/defs.h>
+#include <dbr/pool.h>
 #include <dbr/stack.h>
 
 #include <assert.h>
@@ -32,7 +33,7 @@
 #endif // FIG_CACHE_BUCKETS
 
 struct FigCache {
-    struct FigPool* pool;
+    DbrPool pool;
     // Must be set before first_market.
     struct DbrSlNode* first_instr;
     size_t instr_size;
@@ -50,7 +51,7 @@ struct FigCache {
 };
 
 DBR_EXTERN void
-fig_cache_init(struct FigCache* cache, struct FigPool* pool);
+fig_cache_init(struct FigCache* cache, DbrPool pool);
 
 DBR_EXTERN void
 fig_cache_term(struct FigCache* cache);

@@ -94,6 +94,16 @@
  */
 
 /**
+ * @defgroup Conv Conversion
+ * @ingroup Elm
+ */
+
+/**
+ * @defgroup Pool Pool
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup Proto Proto
  * @ingroup Elm
  */
@@ -194,22 +204,12 @@
  */
 
 /**
- * @defgroup Conv Conversion
- * @ingroup Fig
- */
-
-/**
  * @defgroup Journ Journal
  * @ingroup Fig
  */
 
 /**
  * @defgroup Model Model
- * @ingroup Fig
- */
-
-/**
- * @defgroup Pool Pool
  * @ingroup Fig
  */
 

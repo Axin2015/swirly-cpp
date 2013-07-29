@@ -34,7 +34,7 @@ fig_market_side(struct FigMarket* market, int action)
 }
 
 DBR_EXTERN struct FigMarket*
-fig_market_lazy(struct DbrRec* mrec, struct FigPool* pool);
+fig_market_lazy(struct DbrRec* mrec, DbrPool pool);
 
 // Assumes that mrec pointer is not null.
 

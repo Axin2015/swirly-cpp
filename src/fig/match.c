@@ -19,7 +19,6 @@
 
 #include "accnt.h"
 #include "market.h"
-#include "pool.h"
 
 #include <dbr/conv.h>
 #include <dbr/journ.h>
@@ -37,6 +36,20 @@ enum DbrDirect {
     // Aggressor sells.
     DBR_GIVEN = -1
 };
+
+static void
+free_matches(DbrPool pool, struct DbrSlNode* first)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrMatch* match = dbr_trans_match_entry(node);
+        node = node->next;
+        // Not committed so match object still owns the trades.
+        dbr_pool_free_trade(pool, match->taker_trade);
+        dbr_pool_free_trade(pool, match->maker_trade);
+        dbr_pool_free_match(pool, match);
+    }
+}
 
 /*
   Stop Loss orders are stored in this market until the trigger price specified in the order is
@@ -63,14 +76,14 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 }
 
 static inline struct DbrPosn*
-lazy_posn(struct DbrOrder* order, struct FigPool* pool)
+lazy_posn(struct DbrOrder* order, DbrPool pool)
 {
     struct DbrRec* mrec = order->market.rec;
     return fig_accnt_posn(order->accnt.rec, mrec->market.instr.rec, mrec->market.settl_date, pool);
 }
 
 static DbrBool
-match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market, struct DbrOrder* taker,
+match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrOrder* taker,
              const struct FigSide* side, int direct, struct DbrTrans* trans)
 {
     struct DbrQueue mq;
@@ -94,30 +107,30 @@ match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market, str
             break;
 
         const DbrIden match_id = dbr_journ_alloc_id(journ);
-        struct DbrMatch* match = fig_pool_alloc_match(pool);
+        struct DbrMatch* match = dbr_pool_alloc_match(pool);
         if (!match)
             goto fail1;
 
         struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, irec, settl_date, pool);
         if (!posn) {
             // No need to free accnt or posn.
-            fig_pool_free_match(pool, match);
+            dbr_pool_free_match(pool, match);
             goto fail1;
         }
 
         const DbrIden taker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* taker_trade = fig_pool_alloc_trade(pool, taker_id);
+        struct DbrTrade* taker_trade = dbr_pool_alloc_trade(pool, taker_id);
         if (!taker_trade) {
             // No need to free accnt or posn.
-            fig_pool_free_match(pool, match);
+            dbr_pool_free_match(pool, match);
             goto fail1;
         }
 
         const DbrIden maker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* maker_trade = fig_pool_alloc_trade(pool, maker_id);
+        struct DbrTrade* maker_trade = dbr_pool_alloc_trade(pool, maker_id);
         if (!maker_trade) {
-            fig_pool_free_trade(pool, taker_trade);
-            fig_pool_free_match(pool, match);
+            dbr_pool_free_trade(pool, taker_trade);
+            dbr_pool_free_match(pool, match);
             goto fail1;
         }
 
@@ -195,12 +208,12 @@ match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market, str
 
     return true;
  fail1:
-    fig_pool_free_matches(pool, mq.first);
+    free_matches(pool, dbr_queue_first(&mq));
     return false;
 }
 
 DBR_EXTERN DbrBool
-fig_match_orders(struct FigPool* pool, DbrJourn journ, struct FigMarket* market,
+fig_match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
     struct FigSide* side;

@@ -20,7 +20,6 @@
 #include "exec.h"
 #include "index.h"
 #include "market.h"
-#include "pool.h"
 #include "trader.h"
 
 #include <dbr/ctx.h>
@@ -99,7 +98,7 @@ emplace_orders(DbrCtx ctx)
     do {
         struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
-        fig_pool_free_order(ctx->pool, order);
+        dbr_pool_free_order(ctx->pool, order);
     } while (node);
  fail1:
     return false;
@@ -130,7 +129,7 @@ emplace_membs(DbrCtx ctx)
     do {
         struct DbrMemb* memb = dbr_memb_entry(node);
         node = node->next;
-        fig_pool_free_memb(ctx->pool, memb);
+        dbr_pool_free_memb(ctx->pool, memb);
     } while (node);
  fail1:
     return false;
@@ -163,7 +162,7 @@ emplace_trades(DbrCtx ctx)
     do {
         struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
-        fig_pool_free_trade(ctx->pool, trade);
+        dbr_pool_free_trade(ctx->pool, trade);
     } while (node);
  fail1:
     return false;
@@ -194,7 +193,7 @@ emplace_posns(DbrCtx ctx)
     do {
         struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
-        fig_pool_free_posn(ctx->pool, posn);
+        dbr_pool_free_posn(ctx->pool, posn);
     } while (node);
  fail1:
     return false;

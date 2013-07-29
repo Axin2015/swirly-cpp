@@ -19,6 +19,7 @@
 #define FIG_SIDE_H
 
 #include <dbr/list.h>
+#include <dbr/pool.h>
 #include <dbr/tree.h>
 #include <dbr/types.h>
 
@@ -26,7 +27,7 @@
 #include <stdbool.h>
 
 struct FigSide {
-    struct FigPool* pool;
+    DbrPool pool;
     struct DbrTree levels;
     struct DbrList orders;
     // Last trade information.
@@ -36,7 +37,7 @@ struct FigSide {
 };
 
 DBR_EXTERN void
-fig_side_init(struct FigSide* side, struct FigPool* pool);
+fig_side_init(struct FigSide* side, DbrPool pool);
 
 // Levels associated with side are also freed.
 // Assumes that pointer is not null.
