@@ -126,19 +126,18 @@ elm_pool_init(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
     pool->allocs = 0;
     pool->checksum = 0;
-#if DBR_DEBUG_LEVEL >= 1
-    fprintf(stderr, "%zu small nodes per block:\n", pool->small.nodes_per_block);
-    fprintf(stderr, "sizeof DbrLevel=%zu\n", sizeof(struct DbrLevel));
-    fprintf(stderr, "sizeof DbrMatch=%zu\n", sizeof(struct DbrMatch));
-    fprintf(stderr, "sizeof DbrMemb=%zu\n", sizeof(struct DbrMemb));
-    fprintf(stderr, "sizeof DbrPosn=%zu\n", sizeof(struct DbrPosn));
-    fprintf(stderr, "sizeof DbrSub=%zu\n", sizeof(struct DbrSub));
 
-    fprintf(stderr, "%zu large nodes per block:\n", pool->large.nodes_per_block);
-    fprintf(stderr, "sizeof DbrRec=%zu\n", sizeof(struct DbrRec));
-    fprintf(stderr, "sizeof DbrOrder=%zu\n", sizeof(struct DbrOrder));
-    fprintf(stderr, "sizeof DbrTrade=%zu\n", sizeof(struct DbrTrade));
-#endif // DBR_DEBUG_LEVEL >= 1
+    dbr_log_debug1("%zu small nodes per block:\n", pool->small.nodes_per_block);
+    dbr_log_debug1("sizeof DbrLevel=%zu\n", sizeof(struct DbrLevel));
+    dbr_log_debug1("sizeof DbrMatch=%zu\n", sizeof(struct DbrMatch));
+    dbr_log_debug1("sizeof DbrMemb=%zu\n", sizeof(struct DbrMemb));
+    dbr_log_debug1("sizeof DbrPosn=%zu\n", sizeof(struct DbrPosn));
+    dbr_log_debug1("sizeof DbrSub=%zu\n", sizeof(struct DbrSub));
+
+    dbr_log_debug1("%zu large nodes per block:\n", pool->large.nodes_per_block);
+    dbr_log_debug1("sizeof DbrRec=%zu\n", sizeof(struct DbrRec));
+    dbr_log_debug1("sizeof DbrOrder=%zu\n", sizeof(struct DbrOrder));
+    dbr_log_debug1("sizeof DbrTrade=%zu\n", sizeof(struct DbrTrade));
 #endif // DBR_DEBUG_ALLOC
     if (!alloc_small_nodes(pool))
         goto fail1;
@@ -169,8 +168,8 @@ elm_pool_term(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
         for (int i = 0; i < pool->large.nodes_per_block; ++i) {
             if (block->nodes[i].file) {
-                fprintf(stderr, "allocation in %s at %d\n",
-                        block->nodes[i].file, block->nodes[i].line);
+                dbr_log_warn("allocation in %s at %d\n",
+                             block->nodes[i].file, block->nodes[i].line);
             }
         }
 #endif // DBR_DEBUG_ALLOC
@@ -185,8 +184,8 @@ elm_pool_term(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
         for (int i = 0; i < pool->small.nodes_per_block; ++i) {
             if (block->nodes[i].file) {
-                fprintf(stderr, "allocation in %s at %d\n",
-                        block->nodes[i].file, block->nodes[i].line);
+                dbr_log_warn("allocation in %s at %d\n",
+                             block->nodes[i].file, block->nodes[i].line);
             }
         }
 #endif // DBR_DEBUG_ALLOC
@@ -196,8 +195,10 @@ elm_pool_term(struct ElmPool* pool)
     pool->small.first_node = NULL;
 
 #if defined(DBR_DEBUG_ALLOC)
-    fprintf(stderr, "%ld leaks detected\n", pool->allocs);
-    fflush(stderr);
+    if (pool->allocs > 0)
+        dbr_log_warn("%ld leaks detected\n", pool->allocs);
+    else
+        dbr_log_info("no leaks detected\n");
     assert(pool->allocs == 0 && pool->checksum == 0);
 #endif // DBR_DEBUG_ALLOC
 }
