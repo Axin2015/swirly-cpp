@@ -412,3 +412,51 @@ dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
 {
     elm_pool_free_sub(pool, sub);
 }
+
+DBR_API void
+dbr_pool_free_list(DbrPool pool, int type, struct DbrSlNode* first)
+{
+    struct DbrSlNode* node = first;
+    switch (type) {
+    case DBR_INSTR:
+    case DBR_MARKET:
+    case DBR_TRADER:
+    case DBR_ACCNT:
+        while (node) {
+            struct DbrRec* rec = dbr_rec_entry(node);
+            node = node->next;
+            dbr_pool_free_rec(pool, rec);
+        }
+        break;
+    case DBR_ORDER:
+        while (node) {
+            struct DbrOrder* order = dbr_order_entry(node);
+            node = node->next;
+            dbr_pool_free_order(pool, order);
+        }
+        break;
+    case DBR_MEMB:
+        while (node) {
+            struct DbrMemb* memb = dbr_memb_entry(node);
+            node = node->next;
+            dbr_pool_free_memb(pool, memb);
+        }
+        break;
+    case DBR_TRADE:
+        while (node) {
+            struct DbrTrade* trade = dbr_trade_entry(node);
+            node = node->next;
+            dbr_pool_free_trade(pool, trade);
+        }
+        break;
+    case DBR_POSN:
+        while (node) {
+            struct DbrPosn* posn = dbr_posn_entry(node);
+            node = node->next;
+            dbr_pool_free_posn(pool, posn);
+        }
+        break;
+    default:
+        abort();
+    }
+}

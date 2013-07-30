@@ -97,61 +97,6 @@
 // Only called if failure occurs during cache load, so no need to free state members as they will
 // not have been allocated.
 
-static inline void
-free_recs(DbrPool pool, struct DbrSlNode* first)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrRec* rec = dbr_rec_entry(node);
-        node = node->next;
-        dbr_pool_free_rec(pool, rec);
-    }
-}
-
-static inline void
-free_orders(DbrPool pool, struct DbrSlNode* first)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrOrder* order = dbr_order_entry(node);
-        node = node->next;
-        dbr_pool_free_order(pool, order);
-    }
-}
-
-static inline void
-free_membs(DbrPool pool, struct DbrSlNode* first)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrMemb* memb = dbr_memb_entry(node);
-        node = node->next;
-        dbr_pool_free_memb(pool, memb);
-    }
-}
-
-static inline void
-free_trades(DbrPool pool, struct DbrSlNode* first)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrTrade* trade = dbr_trade_entry(node);
-        node = node->next;
-        dbr_pool_free_trade(pool, trade);
-    }
-}
-
-static inline void
-free_posns(DbrPool pool, struct DbrSlNode* first)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrPosn* posn = dbr_posn_entry(node);
-        node = node->next;
-        dbr_pool_free_posn(pool, posn);
-    }
-}
-
 static sqlite3_stmt*
 prepare(sqlite3* db, const char* sql)
 {
@@ -592,7 +537,7 @@ select_instr(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, dbr_queue_first(&rq));
+    dbr_pool_free_list(sqlite->pool, DBR_INSTR, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -661,7 +606,7 @@ select_market(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, dbr_queue_first(&rq));
+    dbr_pool_free_list(sqlite->pool, DBR_MARKET, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -729,7 +674,7 @@ select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, dbr_queue_first(&rq));
+    dbr_pool_free_list(sqlite->pool, DBR_TRADER, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -797,7 +742,7 @@ select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_recs(sqlite->pool, dbr_queue_first(&rq));
+    dbr_pool_free_list(sqlite->pool, DBR_ACCNT, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -890,7 +835,7 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_orders(sqlite->pool, dbr_queue_first(&oq));
+    dbr_pool_free_list(sqlite->pool, DBR_ORDER, dbr_queue_first(&oq));
     *first = NULL;
  fail1:
     return -1;
@@ -944,7 +889,7 @@ select_memb(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_membs(sqlite->pool, dbr_queue_first(&mq));
+    dbr_pool_free_list(sqlite->pool, DBR_MEMB, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;
@@ -1041,7 +986,7 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_trades(sqlite->pool, dbr_queue_first(&tq));
+    dbr_pool_free_list(sqlite->pool, DBR_TRADE, dbr_queue_first(&tq));
     *first = NULL;
  fail1:
     return -1;
@@ -1135,7 +1080,7 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    free_posns(sqlite->pool, dbr_queue_first(&pq));
+    dbr_pool_free_list(sqlite->pool, DBR_POSN, dbr_queue_first(&pq));
     *first = NULL;
  fail1:
     return -1;

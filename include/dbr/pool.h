@@ -20,6 +20,8 @@
 
 #include <dbr/defs.h>
 
+struct DbrSlNode;
+
 /**
  * @addtogroup Pool
  * @{
@@ -82,5 +84,8 @@ DBR_API void
 dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub);
 
 /** @} */
+
+DBR_API void
+dbr_pool_free_list(DbrPool pool, int type, struct DbrSlNode* first);
 
 #endif // DBR_POOL_H
