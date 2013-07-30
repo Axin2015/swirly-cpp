@@ -230,11 +230,14 @@ dbr_write_order(char* buf, const struct DbrOrder* order)
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order)
 {
-    return dbr_unpackf(buf, ORDER_FORMAT,
-                       &order->id, &order->rev, &order->status, &order->trader.id, &order->accnt.id,
-                       DBR_REF_MAX, order->ref, &order->market.id, &order->action, &order->ticks,
-                       &order->resd, &order->exec, &order->lots, &order->min, &order->flags,
-                       &order->created, &order->modified);
+    buf = dbr_unpackf(buf, ORDER_FORMAT,
+                      &order->id, &order->rev, &order->status, &order->trader.id, &order->accnt.id,
+                      DBR_REF_MAX, order->ref, &order->market.id, &order->action, &order->ticks,
+                      &order->resd, &order->exec, &order->lots, &order->min, &order->flags,
+                      &order->created, &order->modified);
+    if (buf)
+        order->trader_node_.key = order->id;
+    return buf;
 }
 
 DBR_API size_t
@@ -254,8 +257,11 @@ dbr_write_memb(char* buf, const struct DbrMemb* memb)
 DBR_API const char*
 dbr_read_memb(const char* buf, struct DbrMemb* memb)
 {
-    return dbr_unpackf(buf, MEMB_FORMAT,
-                       &memb->accnt.id, &memb->trader.id);
+    buf = dbr_unpackf(buf, MEMB_FORMAT,
+                      &memb->accnt.id, &memb->trader.id);
+    if (buf)
+        memb->accnt_node_.key = memb->trader.id;
+    return buf;
 }
 
 DBR_API size_t
@@ -283,12 +289,15 @@ dbr_write_trade(char* buf, const struct DbrTrade* trade)
 DBR_API const char*
 dbr_read_trade(const char* buf, struct DbrTrade* trade)
 {
-    return dbr_unpackf(buf, TRADE_FORMAT,
-                       &trade->id, &trade->match, &trade->order, &trade->order_rev,
-                       &trade->trader.id, &trade->accnt.id, DBR_REF_MAX, trade->ref,
-                       &trade->market.id, &trade->cpty.id, &trade->role, &trade->action,
-                       &trade->ticks, &trade->resd, &trade->exec, &trade->lots,
-                       &trade->settl_date, &trade->created, &trade->modified);
+    buf = dbr_unpackf(buf, TRADE_FORMAT,
+                      &trade->id, &trade->match, &trade->order, &trade->order_rev,
+                      &trade->trader.id, &trade->accnt.id, DBR_REF_MAX, trade->ref,
+                      &trade->market.id, &trade->cpty.id, &trade->role, &trade->action,
+                      &trade->ticks, &trade->resd, &trade->exec, &trade->lots,
+                      &trade->settl_date, &trade->created, &trade->modified);
+    if (buf)
+        trade->accnt_node_.key = trade->id;
+    return buf;
 }
 
 DBR_API size_t
@@ -310,7 +319,10 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn)
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn)
 {
-    return dbr_unpackf(buf, POSN_FORMAT,
-                       &posn->id, &posn->accnt.id, &posn->instr.id, &posn->settl_date,
-                       &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
+    buf = dbr_unpackf(buf, POSN_FORMAT,
+                      &posn->id, &posn->accnt.id, &posn->instr.id, &posn->settl_date,
+                      &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
+    if (buf)
+        posn->accnt_node_.key = posn->id;
+    return buf;
 }
