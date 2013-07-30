@@ -21,7 +21,6 @@
 #include <dbr/defs.h>
 
 #include <stdarg.h> // va_list
-#include <stdio.h>
 
 /**
  * @addtogroup Err
@@ -67,7 +66,7 @@ DBR_API void
 dbr_err_clear(void);
 
 DBR_API void
-dbr_err_print(FILE* stream, const char* s);
+dbr_err_print(const char* s);
 
 DBR_API void
 dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args);

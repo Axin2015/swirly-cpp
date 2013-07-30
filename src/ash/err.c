@@ -17,6 +17,9 @@
  */
 #include <dbr/err.h>
 
+#include <dbr/log.h>
+
+#include <stdio.h>
 #include <string.h> // strcpy()
 
 static __thread struct {
@@ -36,9 +39,9 @@ dbr_err_clear(void)
 }
 
 DBR_API void
-dbr_err_print(FILE* stream, const char* s)
+dbr_err_print(const char* s)
 {
-    fprintf(stream, "%s:%d: %s: %s (%d)\n", err.file, err.line, s, err.msg, err.num);
+    dbr_log_error("%s:%d: %s: %s (%d)", err.file, err.line, s, err.msg, err.num);
 }
 
 DBR_API void
