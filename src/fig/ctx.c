@@ -73,7 +73,7 @@ emplace_orders(DbrCtx ctx)
         struct FigMarket* market;
         if (!dbr_order_done(order)) {
 
-            struct FigMarket* market = fig_market_lazy(order->market.rec, ctx->pool);
+            market = fig_market_lazy(order->market.rec, ctx->pool);
             if (dbr_unlikely(!market))
                 goto fail2;
 
