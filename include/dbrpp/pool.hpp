@@ -33,7 +33,7 @@ public:
             dbr_pool_destroy(impl_);
     }
     constexpr
-    Pool(std::nullptr_t) noexcept
+    Pool(decltype(nullptr)) noexcept
     : impl_(nullptr)
     {
     }

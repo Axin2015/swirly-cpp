@@ -170,7 +170,7 @@ public:
             dbr_ctx_destroy(impl_);
     }
     constexpr
-    Ctx(std::nullptr_t) noexcept
+    Ctx(decltype(nullptr)) noexcept
     : impl_(nullptr)
     {
     }

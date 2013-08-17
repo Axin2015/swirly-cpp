@@ -46,10 +46,10 @@ struct ElmPool {
     // Defensively maintain consistent memory layout.
     long allocs__;
     unsigned long checksum__;
-#else  // DBR_DEBUG_ALLOC
+#else  // defined(DBR_DEBUG_ALLOC)
     long allocs;
     unsigned long checksum;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 };
 
 struct ElmSmallNode {
@@ -66,10 +66,10 @@ struct ElmSmallNode {
     // Defensively maintain consistent memory layout.
     const char* file__;
     int line__;
-#else  // DBR_DEBUG_ALLOC
+#else  // defined(DBR_DEBUG_ALLOC)
     const char* file;
     int line;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 };
 
 struct ElmLargeNode {
@@ -84,10 +84,10 @@ struct ElmLargeNode {
     // Defensively maintain consistent memory layout.
     const char* file__;
     int line__;
-#else  // DBR_DEBUG_ALLOC
+#else  // defined(DBR_DEBUG_ALLOC)
     const char* file;
     int line;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 };
 
 struct ElmSmallBlock {
@@ -274,7 +274,7 @@ elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
     elm_pool_free_small(pool, node);
 }
 
-#else  // DBR_DEBUG_ALLOC
+#else  // defined(DBR_DEBUG_ALLOC)
 
 DBR_EXTERN struct ElmSmallNode*
 elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line);
@@ -465,6 +465,6 @@ elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
 #define elm_pool_alloc_sub(pool, key)                       \
     elm_pool_alloc_sub_(pool, key, __FILE__, __LINE__)
 
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 
 #endif // ELM_POOL_H

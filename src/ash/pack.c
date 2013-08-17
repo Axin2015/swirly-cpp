@@ -25,6 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(__APPLE__)
+#include </usr/include/libkern/OSByteOrder.h>
+#endif // defined(__APPLE__)
+
 // Packed integer spec:
 
 // Immediate can store between -64 and 63:
@@ -89,7 +93,11 @@ hton64(int64_t i)
 static inline int16_t
 ntoh16(int16_t i)
 {
+#if !defined(__APPLE__)
     return __builtin_bswap16(i);
+#else  // defined(__APPLE__)
+    return OSSwapInt16(i);
+#endif // defined(__APPLE__)
 }
 
 static inline int32_t
@@ -107,7 +115,11 @@ ntoh64(int64_t i)
 static inline int16_t
 hton16(int16_t i)
 {
+#if !defined(__APPLE__)
     return __builtin_bswap16(i);
+#else  // defined(__APPLE__)
+    return OSSwapInt16(i);
+#endif // defined(__APPLE__)
 }
 
 static inline int32_t

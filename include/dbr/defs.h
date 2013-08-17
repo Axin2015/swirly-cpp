@@ -20,10 +20,10 @@
 
 #if !defined(__cplusplus)
 # define DBR_EXTERN extern
-#else  // __cplusplus
+#else  // defined(__cplusplus)
 # define restrict __restrict__
 # define DBR_EXTERN extern "C"
-#endif // __cplusplus
+#endif // defined(__cplusplus)
 
 #define DBR_API DBR_EXTERN __attribute__((visibility ("default")))
 
@@ -54,10 +54,10 @@ enum {
 #if !defined(__GNUC__)
 #define dbr_likely(x)   (x)
 #define dbr_unlikely(x) (x)
-#else  // __GNUC__
+#else  // defined(__GNUC__)
 #define dbr_likely(x)   __builtin_expect(!!(x), 1)
 #define dbr_unlikely(x) __builtin_expect(!!(x), 0)
-#endif // __GNUC__
+#endif // defined(__GNUC__)
 
 // http://en.wikipedia.org/wiki/Offsetof
 

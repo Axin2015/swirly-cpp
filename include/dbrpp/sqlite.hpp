@@ -33,7 +33,7 @@ public:
             dbr_sqlite_destroy(impl_);
     }
     constexpr
-    Sqlite(std::nullptr_t) noexcept
+    Sqlite(decltype(nullptr)) noexcept
     : impl_(nullptr)
     {
     }

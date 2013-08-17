@@ -22,6 +22,8 @@
 #include <dbrpp/posn.hpp>
 #include <dbrpp/trade.hpp>
 
+#include <dbr/sess.h>
+
 namespace dbr {
 
 template <class DerivedT>

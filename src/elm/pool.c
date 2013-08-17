@@ -49,7 +49,7 @@ alloc_small_nodes(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
         block->nodes[i].file = NULL;
         block->nodes[i].line = 0;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     }
 
     // Last node links to any existing nodes.
@@ -57,7 +57,7 @@ alloc_small_nodes(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
     block->nodes[last].file = NULL;
     block->nodes[last].line = 0;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 
     // Newly allocated nodes are now at the front.
     pool->small.first_node = &block->nodes[0];
@@ -87,7 +87,7 @@ alloc_large_nodes(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
         block->nodes[i].file = NULL;
         block->nodes[i].line = 0;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     }
 
     // Last node links to any existing nodes.
@@ -95,7 +95,7 @@ alloc_large_nodes(struct ElmPool* pool)
 #if defined(DBR_DEBUG_ALLOC)
     block->nodes[last].file = NULL;
     block->nodes[last].line = 0;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 
     // Newly allocated nodes are now at the front.
     pool->large.first_node = &block->nodes[0];
@@ -138,7 +138,7 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug1("sizeof DbrRec=%zu", sizeof(struct DbrRec));
     dbr_log_debug1("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
     dbr_log_debug1("sizeof DbrTrade=%zu", sizeof(struct DbrTrade));
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
         goto fail1;
 
@@ -172,7 +172,7 @@ elm_pool_term(struct ElmPool* pool)
                              block->nodes[i].file, block->nodes[i].line);
             }
         }
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
         pool->large.first_block = block->next;
         free(block);
     }
@@ -188,7 +188,7 @@ elm_pool_term(struct ElmPool* pool)
                              block->nodes[i].file, block->nodes[i].line);
             }
         }
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
         pool->small.first_block = block->next;
         free(block);
     }
@@ -200,15 +200,15 @@ elm_pool_term(struct ElmPool* pool)
     else
         dbr_log_info("no leaks detected");
     assert(pool->allocs == 0 && pool->checksum == 0);
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 }
 
 DBR_EXTERN struct ElmSmallNode*
 #if !defined(DBR_DEBUG_ALLOC)
 elm_pool_alloc_small(struct ElmPool* pool)
-#else  // DBR_DEBUG_ALLOC
+#else  // defined(DBR_DEBUG_ALLOC)
 elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 {
     if (dbr_unlikely(!pool->small.first_node && !alloc_small_nodes(pool))) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
@@ -223,16 +223,16 @@ elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
 
     ++pool->allocs;
     pool->checksum ^= (unsigned long)node;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     return node;
 }
 
 DBR_EXTERN struct ElmLargeNode*
 #if !defined(DBR_DEBUG_ALLOC)
 elm_pool_alloc_large(struct ElmPool* pool)
-#else  // DBR_DEBUG_ALLOC
+#else  // defined(DBR_DEBUG_ALLOC)
 elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
 {
     if (dbr_unlikely(!pool->large.first_node && !alloc_large_nodes(pool))) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
@@ -247,7 +247,7 @@ elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
 
     ++pool->allocs;
     pool->checksum ^= (unsigned long)node;
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     return node;
 }
 
@@ -267,7 +267,7 @@ elm_pool_free_small(struct ElmPool* pool, struct ElmSmallNode* node)
         pool->checksum ^= (unsigned long)node;
 
         assert(pool->allocs > 0 || (pool->allocs == 0 && pool->checksum == 0));
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     }
 }
 
@@ -287,7 +287,7 @@ elm_pool_free_large(struct ElmPool* pool, struct ElmLargeNode* node)
         pool->checksum ^= (unsigned long)node;
 
         assert(pool->allocs > 0 || (pool->allocs == 0 && pool->checksum == 0));
-#endif // DBR_DEBUG_ALLOC
+#endif // defined(DBR_DEBUG_ALLOC)
     }
 }
 
