@@ -141,12 +141,12 @@ CREATE TABLE market (
 
 CREATE VIEW market_v AS
   SELECT
-  c.id,
-  c.mnem,
-  c.instr,
-  c.tenor,
-  c.settl_date
-  FROM market c
+  m.id,
+  m.mnem,
+  m.instr,
+  m.tenor,
+  m.settl_date
+  FROM market m
 ;
 
 CREATE TABLE trader (
@@ -235,7 +235,7 @@ CREATE VIEW order_v AS
   t.mnem trader,
   a.mnem accnt,
   o.ref,
-  c.mnem market,
+  m.mnem market,
   o.action,
   o.ticks,
   o.resd,
@@ -253,8 +253,8 @@ CREATE VIEW order_v AS
   ON o.trader = t.id
   INNER JOIN accnt a
   ON o.accnt = a.id
-  INNER JOIN market c
-  ON o.market = c.id
+  INNER JOIN market m
+  ON o.market = m.id
 ;
 
 CREATE TABLE history (
