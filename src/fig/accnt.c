@@ -135,7 +135,6 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, Dbr
         if (!(posn = dbr_pool_alloc_posn(accnt->pool, id)))
             return NULL;
 
-        posn->id = id;
         posn->accnt.rec = arec;
         posn->instr.rec = irec;
         posn->settl_date = settl_date;

@@ -109,7 +109,7 @@ TEST_CASE(find_market)
     check(mrec.mnem() == Mnem("EURUSD"));
 
     // Body.
-    check(mrec.tenor() == Tenor("SP"));
+    check(mrec.settl_date() == 20130417);
 }
 
 TEST_CASE(find_trader)

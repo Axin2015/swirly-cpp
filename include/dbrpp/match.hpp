@@ -93,7 +93,6 @@ operator <<(std::ostream& os, Match match)
 {
     return os << "id=" << match.id()
               << ",maker_order=" << match.maker_order().id()
-              << ",maker_posn=" << match.maker_posn().id()
               << ",ticks=" << match.ticks()
               << ",lots=" << match.lots()
               << ",taker_trade=" << match.taker_trade().id()

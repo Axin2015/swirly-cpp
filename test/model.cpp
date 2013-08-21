@@ -77,14 +77,12 @@ read_instr(DbrPool pool, DbrSlNode*& first) noexcept
 }
 
 void
-set_market(DbrRec& rec, DbrIden id, const char* mnem, DbrIden instr, const char* tenor,
-           DbrDate settl_date) noexcept
+set_market(DbrRec& rec, DbrIden id, const char* mnem, DbrIden instr, DbrDate settl_date) noexcept
 {
     rec.type = DBR_MARKET;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
     rec.market.instr.id = instr;
-    strncpy(rec.market.tenor, tenor, DBR_TENOR_MAX);
     rec.market.settl_date = settl_date;
     rec.market.state = nullptr;
 }
@@ -98,12 +96,12 @@ read_market(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
-    set_market(*rec, 1, "EURUSD", 1, "SP", 20130417);
+    set_market(*rec, 1, "EURUSD", 1, 20130417);
     dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
-    set_market(*rec, 2, "GBPUSD", 2, "SP", 20130417);
+    set_market(*rec, 2, "GBPUSD", 2, 20130417);
     dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 

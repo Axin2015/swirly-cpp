@@ -250,11 +250,6 @@ public:
     {
         return InstrRec(*impl_.market.instr.rec);
     }
-    Tenor
-    tenor() const noexcept
-    {
-        return impl_.market.tenor;
-    }
     DbrDate
     settl_date() const noexcept
     {
@@ -268,7 +263,6 @@ operator <<(std::ostream& os, MarketRec mrec)
     return os << "id=" << mrec.id()
               << ",mnem=" << mrec.mnem()
               << ",instr=" << mrec.irec().mnem()
-              << ",tenor=" << mrec.tenor()
               << ",settl_date=" << mrec.settl_date();
 }
 

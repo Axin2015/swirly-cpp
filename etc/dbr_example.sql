@@ -258,134 +258,134 @@ INSERT INTO instr (mnem, display, type, asset, ccy, tick_numer,
         1, 400, 5000, 1, 2, 1, 10)
 ;
 
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURUSD', (SELECT id FROM instr WHERE mnem = 'EURUSD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('GBPUSD', (SELECT id FROM instr WHERE mnem = 'GBPUSD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('AUDUSD', (SELECT id FROM instr WHERE mnem = 'AUDUSD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('NZDUSD', (SELECT id FROM instr WHERE mnem = 'NZDUSD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDCAD', (SELECT id FROM instr WHERE mnem = 'USDCAD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+1 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+1 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDCHF', (SELECT id FROM instr WHERE mnem = 'USDCHF.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDTRY', (SELECT id FROM instr WHERE mnem = 'USDTRY.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+1 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+1 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDSGD', (SELECT id FROM instr WHERE mnem = 'USDSGD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURRON', (SELECT id FROM instr WHERE mnem = 'EURRON.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURPLN', (SELECT id FROM instr WHERE mnem = 'EURPLN.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDILS', (SELECT id FROM instr WHERE mnem = 'USDILS.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURDKK', (SELECT id FROM instr WHERE mnem = 'EURDKK.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDZAR', (SELECT id FROM instr WHERE mnem = 'USDZAR.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURNOK', (SELECT id FROM instr WHERE mnem = 'EURNOK.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURSEK', (SELECT id FROM instr WHERE mnem = 'EURSEK.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDHKD', (SELECT id FROM instr WHERE mnem = 'USDHKD.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDMXN', (SELECT id FROM instr WHERE mnem = 'USDMXN.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURCZK', (SELECT id FROM instr WHERE mnem = 'EURCZK.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDTHB', (SELECT id FROM instr WHERE mnem = 'USDTHB.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('USDJPY', (SELECT id FROM instr WHERE mnem = 'USDJPY.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURHUF', (SELECT id FROM instr WHERE mnem = 'EURHUF.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
 -- Crosses.
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURGBP', (SELECT id FROM instr WHERE mnem = 'EURGBP.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURCHF', (SELECT id FROM instr WHERE mnem = 'EURCHF.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('EURJPY', (SELECT id FROM instr WHERE mnem = 'EURJPY.SPOTFWD'),
-        'SP', STRFTIME('%Y%m%d', DATE('now', '+2 days')))
+        STRFTIME('%Y%m%d', DATE('now', '+2 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZC.MAR', (SELECT id FROM instr WHERE mnem = 'ZC.FUTURE'),
-        'H', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+2 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+2 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZC.JUN', (SELECT id FROM instr WHERE mnem = 'ZC.FUTURE'),
-        'M', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+5 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+5 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZC.SEP', (SELECT id FROM instr WHERE mnem = 'ZC.FUTURE'),
-        'U', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+8 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+8 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZC.DEC', (SELECT id FROM instr WHERE mnem = 'ZC.FUTURE'),
-        'Z', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+11 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+11 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZW.MAR', (SELECT id FROM instr WHERE mnem = 'ZW.FUTURE'),
-        'H', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+2 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+2 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZW.JUN', (SELECT id FROM instr WHERE mnem = 'ZW.FUTURE'),
-        'M', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+5 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+5 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZW.SEP', (SELECT id FROM instr WHERE mnem = 'ZW.FUTURE'),
-        'U', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+8 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+8 months', '+14 days')))
 ;
-INSERT INTO market (mnem, instr, tenor, settl_date)
+INSERT INTO market (mnem, instr, settl_date)
         VALUES ('ZW.DEC', (SELECT id FROM instr WHERE mnem = 'ZW.FUTURE'),
-        'Z', STRFTIME('%Y%m%d', DATE('now', 'start of year', '+11 months', '+14 days')))
+        STRFTIME('%Y%m%d', DATE('now', 'start of year', '+11 months', '+14 days')))
 ;
 
 INSERT INTO trader (mnem, display, email)

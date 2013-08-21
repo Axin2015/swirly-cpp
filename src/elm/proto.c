@@ -24,13 +24,13 @@
 #include <stdlib.h> // abort()
 
 static const char INSTR_FORMAT[] = "lmsmmmmiiiiill";
-static const char MARKET_FORMAT[] = "lmls";
+static const char MARKET_FORMAT[] = "lml";
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
 static const char ORDER_FORMAT[] = "liillslillllllll";
 static const char MEMB_FORMAT[] = "ll";
 static const char TRADE_FORMAT[] = "lllillslliillllill";
-static const char POSN_FORMAT[] = "llllllll";
+static const char POSN_FORMAT[] = "lllllll";
 
 DBR_API size_t
 dbr_instr_len(const struct DbrRec* rec)
@@ -69,24 +69,21 @@ DBR_API size_t
 dbr_market_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(MARKET_FORMAT,
-                        rec->id, rec->mnem, rec->market.instr.id, DBR_TENOR_MAX,
-                        rec->market.tenor);
+                        rec->id, rec->mnem, rec->market.instr.id);
 }
 
 DBR_API char*
 dbr_write_market(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, MARKET_FORMAT,
-                     rec->id, rec->mnem, rec->market.instr.id, DBR_TENOR_MAX,
-                     rec->market.tenor);
+                     rec->id, rec->mnem, rec->market.instr.id);
 }
 
 DBR_API const char*
 dbr_read_market(const char* buf, struct DbrRec* rec)
 {
     return dbr_unpackf(buf, MARKET_FORMAT,
-                       &rec->id, rec->mnem, &rec->market.instr.id, DBR_TENOR_MAX,
-                       rec->market.tenor);
+                       &rec->id, rec->mnem, &rec->market.instr.id);
 }
 
 DBR_API size_t
@@ -304,25 +301,28 @@ DBR_API size_t
 dbr_posn_len(const struct DbrPosn* posn)
 {
     return dbr_packlenf(POSN_FORMAT,
-                        posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,
-                        posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+                        posn->accnt.id, posn->instr.id, posn->settl_date, posn->buy_licks,
+                        posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }
 
 DBR_API char*
 dbr_write_posn(char* buf, const struct DbrPosn* posn)
 {
     return dbr_packf(buf, POSN_FORMAT,
-                     posn->id, posn->accnt.id, posn->instr.id, posn->settl_date,
-                     posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+                     posn->accnt.id, posn->instr.id, posn->settl_date, posn->buy_licks,
+                     posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }
 
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn)
 {
     buf = dbr_unpackf(buf, POSN_FORMAT,
-                      &posn->id, &posn->accnt.id, &posn->instr.id, &posn->settl_date,
-                      &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
-    if (buf)
-        posn->accnt_node_.key = posn->id;
+                      &posn->accnt.id, &posn->instr.id, &posn->settl_date, &posn->buy_licks,
+                      &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
+    if (buf) {
+        // Synthentic id from instrument and settlment date.
+        const DbrIden id = posn->instr.id * 100000000L + posn->settl_date;
+        posn->accnt_node_.key = id;
+    }
     return buf;
 }

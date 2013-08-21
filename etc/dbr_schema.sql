@@ -132,10 +132,9 @@ CREATE TABLE market (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL,
   instr INTEGER NOT NULL REFERENCES instr (id),
-  tenor TEXT NULL,
   settl_date INTEGER NOT NULL,
-  CONSTRAINT market_instr_tenor_uq
-  UNIQUE (instr, tenor)
+  CONSTRAINT market_instr_settl_date_uq
+  UNIQUE (instr, settl_date)
 )
 ;
 
@@ -144,7 +143,6 @@ CREATE VIEW market_v AS
   m.id,
   m.mnem,
   m.instr,
-  m.tenor,
   m.settl_date
   FROM market m
 ;
@@ -347,10 +345,8 @@ CREATE VIEW trade_v AS
   ON t.order_ = o.id
 ;
 
--- Synthentic id from instrument and settlment date.
 CREATE VIEW posn_v AS
   SELECT
-  m.instr * 100000000 + t.settl_date id,
   t.accnt,
   m.instr,
   t.settl_date,
@@ -360,7 +356,7 @@ CREATE VIEW posn_v AS
   FROM trade_v t
   INNER JOIN market m
   ON t.market = m.id
-  GROUP BY t.accnt, id, t.action
+  GROUP BY t.accnt, m.instr, t.settl_date, t.action
 ;
 
 COMMIT TRANSACTION

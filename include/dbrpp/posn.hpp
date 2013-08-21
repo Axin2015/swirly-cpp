@@ -39,21 +39,6 @@ public:
     {
         return &impl_;
     }
-    bool
-    operator ==(Posn rhs) const noexcept
-    {
-        return impl_.id == rhs.impl_.id;
-    }
-    bool
-    operator !=(Posn rhs) const noexcept
-    {
-        return impl_.id != rhs.impl_.id;
-    }
-    DbrIden
-    id() const noexcept
-    {
-        return impl_.id;
-    }
     AccntRec
     arec() const noexcept
     {
@@ -94,8 +79,7 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, Posn posn)
 {
-    return os << "id=" << posn.id()
-              << ",arec=" << posn.arec().mnem()
+    return os << "arec=" << posn.arec().mnem()
               << ",irec=" << posn.irec().mnem()
               << ",settl_date=" << posn.settl_date()
               << ",buy_licks=" << posn.buy_licks()

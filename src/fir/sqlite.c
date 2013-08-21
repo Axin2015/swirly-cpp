@@ -64,7 +64,7 @@
     " FROM instr_v"
 
 #define SELECT_MARKET_SQL                            \
-    "SELECT id, mnem, instr, tenor, settl_date"      \
+    "SELECT id, mnem, instr, settl_date"             \
     " FROM market_v"
 
 #define SELECT_TRADER_SQL                                    \
@@ -91,7 +91,7 @@
     " FROM trade_v WHERE archive = 0 ORDER BY id"
 
 #define SELECT_POSN_SQL                                         \
-    "SELECT id, accnt, instr, settl_date, action, licks, lots"  \
+    "SELECT accnt, instr, settl_date, action, licks, lots"  \
     " FROM posn_v ORDER BY accnt, instr, settl_date, action"
 
 // Only called if failure occurs during cache load, so no need to free state members as they will
@@ -550,7 +550,6 @@ select_market(struct FirSqlite* sqlite, struct DbrSlNode** first)
         ID,
         MNEM,
         INSTR,
-        TENOR,
         SETTL_DATE
     };
 
@@ -580,13 +579,11 @@ select_market(struct FirSqlite* sqlite, struct DbrSlNode** first)
             // Body.
 
             rec->market.instr.id = sqlite3_column_int64(stmt, INSTR);
-            strncpy(rec->market.tenor,
-                    (const char*)sqlite3_column_text(stmt, TENOR), DBR_TENOR_MAX);
             rec->market.settl_date = sqlite3_column_int(stmt, SETTL_DATE);
             rec->market.state = NULL;
 
-            dbr_log_debug3("market: id=%ld,mnem=%.16s,instr=%ld,tenor=%.8s",
-                           rec->id, rec->mnem, rec->market.instr.id, rec->market.tenor);
+            dbr_log_debug3("market: id=%ld,mnem=%.16s,instr=%ld",
+                           rec->id, rec->mnem, rec->market.instr.id);
 
             dbr_queue_push(&rq, &rec->model_node_);
             ++size;
@@ -1019,11 +1016,13 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            const DbrIden id = sqlite3_column_int64(stmt, ID);
             const DbrIden accnt = sqlite3_column_int64(stmt, ACCNT);
+            const DbrIden instr = sqlite3_column_int64(stmt, INSTR);
+            const int settl_date = sqlite3_column_int(stmt, SETTL_DATE);
 
             // Posn is null for first row.
-            if (posn && posn->id == id && posn->accnt.id == accnt) {
+            if (posn && posn->accnt.id == accnt && posn->instr.id == instr
+                && posn->settl_date == settl_date) {
 
                 // Set other side.
 
@@ -1039,14 +1038,15 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
                 continue;
             }
 
+            // Synthentic id from instrument and settlment date.
+            const DbrIden id = instr * 100000000L + settl_date;
             posn = dbr_pool_alloc_posn(sqlite->pool, id);
             if (dbr_unlikely(!posn))
                 goto fail2;
 
-            posn->id = id;
             posn->accnt.id = accnt;
-            posn->instr.id = sqlite3_column_int64(stmt, INSTR);
-            posn->settl_date = sqlite3_column_int(stmt, SETTL_DATE);
+            posn->instr.id = instr;
+            posn->settl_date = settl_date;
 
             const int action = sqlite3_column_int(stmt, ACTION);
             if (action == DBR_BUY) {

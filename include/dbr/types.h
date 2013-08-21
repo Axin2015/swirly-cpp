@@ -63,8 +63,7 @@ enum {
     DBR_DISPLAY_MAX = 64,
     DBR_EMAIL_MAX = 64,
     DBR_MNEM_MAX = 16,
-    DBR_REF_MAX = 64,
-    DBR_TENOR_MAX = 8
+    DBR_REF_MAX = 64
 };
 
 typedef char DbrDisplay[DBR_DISPLAY_MAX];
@@ -86,7 +85,6 @@ typedef char DbrMnem[DBR_MNEM_MAX];
  */
 
 typedef char DbrRef[DBR_REF_MAX];
-typedef char DbrTenor[DBR_TENOR_MAX];
 
 enum DbrAction {
     DBR_BUY = 1,
@@ -175,7 +173,6 @@ struct DbrRec {
         } instr;
         struct {
             union DbrURec instr;
-            DbrTenor tenor;
             DbrDate settl_date;
             DbrMarket state;
         } market;
@@ -309,7 +306,6 @@ struct DbrPosn {
     /**
      * @publicsection
      */
-    DbrIden id;
     union DbrURec accnt;
     union DbrURec instr;
     DbrDate settl_date;
