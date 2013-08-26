@@ -77,92 +77,92 @@ public:
     }
 };
 
-class InstrRec : public RecBase {
+class ContrRec : public RecBase {
 public:
     explicit
-    InstrRec(DbrRec& impl) noexcept
+    ContrRec(DbrRec& impl) noexcept
     : RecBase(impl)
     {
     }
     Display
     display() const noexcept
     {
-        return Display(impl_.instr.display);
+        return Display(impl_.contr.display);
     }
     Mnem
     asset_type() const noexcept
     {
-        return Mnem(impl_.instr.asset_type);
+        return Mnem(impl_.contr.asset_type);
     }
     Mnem
-    instr_type() const noexcept
+    contr_type() const noexcept
     {
-        return Mnem(impl_.instr.instr_type);
+        return Mnem(impl_.contr.contr_type);
     }
     Mnem
     asset() const noexcept
     {
-        return Mnem(impl_.instr.asset);
+        return Mnem(impl_.contr.asset);
     }
     Mnem
     ccy() const noexcept
     {
-        return Mnem(impl_.instr.ccy);
+        return Mnem(impl_.contr.ccy);
     }
     int
     tick_numer() const noexcept
     {
-        return impl_.instr.tick_numer;
+        return impl_.contr.tick_numer;
     }
     int
     tick_denom() const noexcept
     {
-        return impl_.instr.tick_denom;
+        return impl_.contr.tick_denom;
     }
     double
     price_inc() const noexcept
     {
-        return impl_.instr.price_inc;
+        return impl_.contr.price_inc;
     }
     int
     lot_numer() const noexcept
     {
-        return impl_.instr.lot_numer;
+        return impl_.contr.lot_numer;
     }
     int
     lot_denom() const noexcept
     {
-        return impl_.instr.lot_denom;
+        return impl_.contr.lot_denom;
     }
     double
     qty_inc() const noexcept
     {
-        return impl_.instr.qty_inc;
+        return impl_.contr.qty_inc;
     }
     int
     price_dp() const noexcept
     {
-        return impl_.instr.price_dp;
+        return impl_.contr.price_dp;
     }
     int
     pip_dp() const noexcept
     {
-        return impl_.instr.pip_dp;
+        return impl_.contr.pip_dp;
     }
     int
     qty_dp() const noexcept
     {
-        return impl_.instr.qty_dp;
+        return impl_.contr.qty_dp;
     }
     DbrLots
     min_lots() const noexcept
     {
-        return impl_.instr.min_lots;
+        return impl_.contr.min_lots;
     }
     DbrLots
     max_lots() const noexcept
     {
-        return impl_.instr.max_lots;
+        return impl_.contr.max_lots;
     }
     // Conversion functions.
     DbrLots
@@ -195,93 +195,44 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, InstrRec irec)
+operator <<(std::ostream& os, ContrRec crec)
 {
-    return os << "id=" << irec.id()
-              << ",mnem=" << irec.mnem()
-              << ",display=" << irec.display()
-              << ",asset_type=" << irec.asset_type()
-              << ",instr_type=" << irec.instr_type()
-              << ",asset=" << irec.asset()
-              << ",ccy=" << irec.ccy()
-              << ",tick_numer=" << irec.tick_numer()
-              << ",tick_denom=" << irec.tick_denom()
-              << ",price_inc=" << irec.price_inc()
-              << ",lot_numer=" << irec.lot_numer()
-              << ",lot_denom=" << irec.lot_denom()
-              << ",qty_inc=" << irec.qty_inc()
-              << ",price_dp=" << irec.price_dp()
-              << ",pip_dp=" << irec.pip_dp()
-              << ",qty_dp=" << irec.qty_dp()
-              << ",min_lots=" << irec.min_lots()
-              << ",max_lots=" << irec.max_lots();
+    return os << "id=" << crec.id()
+              << ",mnem=" << crec.mnem()
+              << ",display=" << crec.display()
+              << ",asset_type=" << crec.asset_type()
+              << ",contr_type=" << crec.contr_type()
+              << ",asset=" << crec.asset()
+              << ",ccy=" << crec.ccy()
+              << ",tick_numer=" << crec.tick_numer()
+              << ",tick_denom=" << crec.tick_denom()
+              << ",price_inc=" << crec.price_inc()
+              << ",lot_numer=" << crec.lot_numer()
+              << ",lot_denom=" << crec.lot_denom()
+              << ",qty_inc=" << crec.qty_inc()
+              << ",price_dp=" << crec.price_dp()
+              << ",pip_dp=" << crec.pip_dp()
+              << ",qty_dp=" << crec.qty_dp()
+              << ",min_lots=" << crec.min_lots()
+              << ",max_lots=" << crec.max_lots();
 }
 
 inline size_t
-entity_len(InstrRec irec) noexcept
+entity_len(ContrRec crec) noexcept
 {
-    return dbr_instr_len(irec.c_arg());
+    return dbr_contr_len(crec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, InstrRec irec) noexcept
+write_entity(char* buf, ContrRec crec) noexcept
 {
-    return dbr_write_instr(buf, irec.c_arg());
+    return dbr_write_contr(buf, crec.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, InstrRec irec)
+read_entity(const char* buf, ContrRec crec)
 {
-    buf = dbr_read_instr(buf, irec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
-}
-
-class MarketRec : public RecBase {
-public:
-    explicit
-    MarketRec(DbrRec& impl) noexcept
-    : RecBase(impl)
-    {
-    }
-    InstrRec
-    irec() const noexcept
-    {
-        return InstrRec(*impl_.market.instr.rec);
-    }
-    DbrDate
-    settl_date() const noexcept
-    {
-        return impl_.market.settl_date;
-    }
-};
-
-inline std::ostream&
-operator <<(std::ostream& os, MarketRec mrec)
-{
-    return os << "id=" << mrec.id()
-              << ",mnem=" << mrec.mnem()
-              << ",instr=" << mrec.irec().mnem()
-              << ",settl_date=" << mrec.settl_date();
-}
-
-inline size_t
-entity_len(MarketRec mrec) noexcept
-{
-    return dbr_market_len(mrec.c_arg());
-}
-
-inline char*
-write_entity(char* buf, MarketRec mrec) noexcept
-{
-    return dbr_write_market(buf, mrec.c_arg());
-}
-
-inline const char*
-read_entity(const char* buf, MarketRec mrec)
-{
-    buf = dbr_read_market(buf, mrec.c_arg());
+    buf = dbr_read_contr(buf, crec.c_arg());
     if (!buf)
         throw_exception();
     return buf;

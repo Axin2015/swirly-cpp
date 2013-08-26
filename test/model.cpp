@@ -29,31 +29,30 @@ using namespace std;
 namespace {
 
 void
-set_instr(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
-          const char* asset_type, const char* instr_type, const char* asset,
+set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
+          const char* asset_type, const char* contr_type, const char* asset,
           const char* ccy, int tick_numer, int tick_denom, int lot_numer,
           int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots) noexcept
 {
-    rec.type = DBR_INSTR;
+    rec.type = DBR_CONTR;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec.instr.display, display, DBR_DISPLAY_MAX);
-    strncpy(rec.instr.asset_type, asset_type, DBR_MNEM_MAX);
-    strncpy(rec.instr.instr_type, instr_type, DBR_MNEM_MAX);
-    strncpy(rec.instr.asset, asset, DBR_MNEM_MAX);
-    strncpy(rec.instr.ccy, ccy, DBR_MNEM_MAX);
-    rec.instr.price_inc = dbr_fract_to_real(tick_numer, tick_denom);
-    rec.instr.qty_inc = dbr_fract_to_real(lot_numer, lot_denom);
-    rec.instr.price_dp = dbr_real_to_dp(rec.instr.price_inc);
-    rec.instr.pip_dp = pip_dp;
-    rec.instr.qty_dp = dbr_real_to_dp(rec.instr.qty_inc);
-    rec.instr.min_lots = min_lots;
-    rec.instr.max_lots = max_lots;
-    rec.instr.state = nullptr;
+    strncpy(rec.contr.display, display, DBR_DISPLAY_MAX);
+    strncpy(rec.contr.asset_type, asset_type, DBR_MNEM_MAX);
+    strncpy(rec.contr.contr_type, contr_type, DBR_MNEM_MAX);
+    strncpy(rec.contr.asset, asset, DBR_MNEM_MAX);
+    strncpy(rec.contr.ccy, ccy, DBR_MNEM_MAX);
+    rec.contr.price_inc = dbr_fract_to_real(tick_numer, tick_denom);
+    rec.contr.qty_inc = dbr_fract_to_real(lot_numer, lot_denom);
+    rec.contr.price_dp = dbr_real_to_dp(rec.contr.price_inc);
+    rec.contr.pip_dp = pip_dp;
+    rec.contr.qty_dp = dbr_real_to_dp(rec.contr.qty_inc);
+    rec.contr.min_lots = min_lots;
+    rec.contr.max_lots = max_lots;
 }
 
 ssize_t
-read_instr(DbrPool pool, DbrSlNode*& first) noexcept
+read_contr(DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t size = 0;
 
@@ -61,47 +60,14 @@ read_instr(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
-    set_instr(*rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
+    set_contr(*rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
     dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
-    set_instr(*rec, 2, "GBPUSD.SPOTFWD", "GBPUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
+    set_contr(*rec, 2, "GBPUSD.SPOTFWD", "GBPUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "GBP", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
-    dbr_queue_push(&rq, &rec->model_node_);
-    ++size;
-
-    first = rq.first;
-    return size;
-}
-
-void
-set_market(DbrRec& rec, DbrIden id, const char* mnem, DbrIden instr, DbrDate settl_date) noexcept
-{
-    rec.type = DBR_MARKET;
-    rec.id = id;
-    strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
-    rec.market.instr.id = instr;
-    rec.market.settl_date = settl_date;
-    rec.market.state = nullptr;
-}
-
-ssize_t
-read_market(DbrPool pool, DbrSlNode*& first) noexcept
-{
-    ssize_t size = 0;
-
-    DbrQueue rq;
-    dbr_queue_init(&rq);
-
-    DbrRec* rec = dbr_pool_alloc_rec(pool);
-    set_market(*rec, 1, "EURUSD", 1, 20130417);
-    dbr_queue_push(&rq, &rec->model_node_);
-    ++size;
-
-    rec = dbr_pool_alloc_rec(pool);
-    set_market(*rec, 2, "GBPUSD", 2, 20130417);
     dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
@@ -238,11 +204,8 @@ Model::read_entity(int type, DbrSlNode*& first) noexcept
 {
     ssize_t ret;
     switch (type) {
-    case DBR_INSTR:
-        ret = read_instr(pool_, first);
-        break;
-    case DBR_MARKET:
-        ret = read_market(pool_, first);
+    case DBR_CONTR:
+        ret = read_contr(pool_, first);
         break;
     case DBR_TRADER:
         ret = read_trader(pool_, first);

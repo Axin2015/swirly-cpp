@@ -23,67 +23,45 @@
 
 #include <stdlib.h> // abort()
 
-static const char INSTR_FORMAT[] = "lmsmmmmiiiiill";
-static const char MARKET_FORMAT[] = "lml";
+static const char CONTR_FORMAT[] = "lmsmmmmiiiiill";
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
-static const char ORDER_FORMAT[] = "liillslillllllll";
+static const char ORDER_FORMAT[] = "liillllsillllllll";
 static const char MEMB_FORMAT[] = "ll";
-static const char TRADE_FORMAT[] = "lllillslliillllill";
+static const char TRADE_FORMAT[] = "lllilllisliillllll";
 static const char POSN_FORMAT[] = "lllllll";
 
 DBR_API size_t
-dbr_instr_len(const struct DbrRec* rec)
+dbr_contr_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(INSTR_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
-                        rec->instr.asset_type, rec->instr.instr_type, rec->instr.asset,
-                        rec->instr.ccy, rec->instr.tick_numer, rec->instr.tick_denom,
-                        rec->instr.lot_numer, rec->instr.lot_denom, rec->instr.pip_dp,
-                        rec->instr.min_lots, rec->instr.max_lots);
+    return dbr_packlenf(CONTR_FORMAT,
+                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->contr.display,
+                        rec->contr.asset_type, rec->contr.contr_type, rec->contr.asset,
+                        rec->contr.ccy, rec->contr.tick_numer, rec->contr.tick_denom,
+                        rec->contr.lot_numer, rec->contr.lot_denom, rec->contr.pip_dp,
+                        rec->contr.min_lots, rec->contr.max_lots);
 }
 
 DBR_API char*
-dbr_write_instr(char* buf, const struct DbrRec* rec)
+dbr_write_contr(char* buf, const struct DbrRec* rec)
 {
-    return dbr_packf(buf, INSTR_FORMAT,
-                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
-                     rec->instr.asset_type, rec->instr.instr_type, rec->instr.asset,
-                     rec->instr.ccy, rec->instr.tick_numer, rec->instr.tick_denom,
-                     rec->instr.lot_numer, rec->instr.lot_denom, rec->instr.pip_dp,
-                     rec->instr.min_lots, rec->instr.max_lots);
+    return dbr_packf(buf, CONTR_FORMAT,
+                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->contr.display,
+                     rec->contr.asset_type, rec->contr.contr_type, rec->contr.asset,
+                     rec->contr.ccy, rec->contr.tick_numer, rec->contr.tick_denom,
+                     rec->contr.lot_numer, rec->contr.lot_denom, rec->contr.pip_dp,
+                     rec->contr.min_lots, rec->contr.max_lots);
 }
 
 DBR_API const char*
-dbr_read_instr(const char* buf, struct DbrRec* rec)
+dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
-    return dbr_unpackf(buf, INSTR_FORMAT,
-                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->instr.display,
-                       rec->instr.asset_type, rec->instr.instr_type, rec->instr.asset,
-                       rec->instr.ccy, &rec->instr.tick_numer, &rec->instr.tick_denom,
-                       &rec->instr.lot_numer, &rec->instr.lot_denom, &rec->instr.pip_dp,
-                       &rec->instr.min_lots, &rec->instr.max_lots);
-}
-
-DBR_API size_t
-dbr_market_len(const struct DbrRec* rec)
-{
-    return dbr_packlenf(MARKET_FORMAT,
-                        rec->id, rec->mnem, rec->market.instr.id);
-}
-
-DBR_API char*
-dbr_write_market(char* buf, const struct DbrRec* rec)
-{
-    return dbr_packf(buf, MARKET_FORMAT,
-                     rec->id, rec->mnem, rec->market.instr.id);
-}
-
-DBR_API const char*
-dbr_read_market(const char* buf, struct DbrRec* rec)
-{
-    return dbr_unpackf(buf, MARKET_FORMAT,
-                       &rec->id, rec->mnem, &rec->market.instr.id);
+    return dbr_unpackf(buf, CONTR_FORMAT,
+                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->contr.display,
+                       rec->contr.asset_type, rec->contr.contr_type, rec->contr.asset,
+                       rec->contr.ccy, &rec->contr.tick_numer, &rec->contr.tick_denom,
+                       &rec->contr.lot_numer, &rec->contr.lot_denom, &rec->contr.pip_dp,
+                       &rec->contr.min_lots, &rec->contr.max_lots);
 }
 
 DBR_API size_t
@@ -139,11 +117,8 @@ dbr_rec_len(const struct DbrRec* rec)
 {
     size_t n = dbr_packleni(rec->type);
     switch (rec->type) {
-    case DBR_INSTR:
-        n += dbr_instr_len(rec);
-        break;
-    case DBR_MARKET:
-        n += dbr_market_len(rec);
+    case DBR_CONTR:
+        n += dbr_contr_len(rec);
         break;
     case DBR_TRADER:
         n += dbr_trader_len(rec);
@@ -162,11 +137,8 @@ dbr_write_rec(char* buf, const struct DbrRec* rec)
 {
     buf = dbr_packi(buf, rec->type);
     switch (rec->type) {
-    case DBR_INSTR:
-        buf = dbr_write_instr(buf, rec);
-        break;
-    case DBR_MARKET:
-        buf = dbr_write_market(buf, rec);
+    case DBR_CONTR:
+        buf = dbr_write_contr(buf, rec);
         break;
     case DBR_TRADER:
         buf = dbr_write_trader(buf, rec);
@@ -185,11 +157,8 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
 {
     buf = dbr_unpacki(buf, &rec->type);
     switch (rec->type) {
-    case DBR_INSTR:
-        buf = dbr_read_instr(buf, rec);
-        break;
-    case DBR_MARKET:
-        buf = dbr_read_market(buf, rec);
+    case DBR_CONTR:
+        buf = dbr_read_contr(buf, rec);
         break;
     case DBR_TRADER:
         buf = dbr_read_trader(buf, rec);
@@ -209,9 +178,9 @@ dbr_order_len(const struct DbrOrder* order)
 {
     return dbr_packlenf(ORDER_FORMAT,
                         order->id, order->rev, order->status, order->trader.id, order->accnt.id,
-                        DBR_REF_MAX, order->ref, order->market.id, order->action, order->ticks,
-                        order->resd, order->exec, order->lots, order->min, order->flags,
-                        order->created, order->modified);
+                        order->contr.id, order->settl_date, DBR_REF_MAX, order->ref, order->action,
+                        order->ticks, order->resd, order->exec, order->lots, order->min,
+                        order->flags, order->created, order->modified);
 }
 
 DBR_API char*
@@ -219,8 +188,8 @@ dbr_write_order(char* buf, const struct DbrOrder* order)
 {
     return dbr_packf(buf, ORDER_FORMAT,
                      order->id, order->rev, order->status, order->trader.id, order->accnt.id,
-                     DBR_REF_MAX, order->ref, order->market.id, order->action, order->ticks,
-                     order->resd, order->exec, order->lots, order->min, order->flags,
+                     order->contr.id, order->settl_date, DBR_REF_MAX, order->ref, order->action,
+                     order->ticks, order->resd, order->exec, order->lots, order->min, order->flags,
                      order->created, order->modified);
 }
 
@@ -229,9 +198,9 @@ dbr_read_order(const char* buf, struct DbrOrder* order)
 {
     buf = dbr_unpackf(buf, ORDER_FORMAT,
                       &order->id, &order->rev, &order->status, &order->trader.id, &order->accnt.id,
-                      DBR_REF_MAX, order->ref, &order->market.id, &order->action, &order->ticks,
-                      &order->resd, &order->exec, &order->lots, &order->min, &order->flags,
-                      &order->created, &order->modified);
+                      &order->contr.id, &order->settl_date, DBR_REF_MAX, order->ref, &order->action,
+                      &order->ticks, &order->resd, &order->exec, &order->lots, &order->min,
+                      &order->flags, &order->created, &order->modified);
     if (buf)
         order->trader_node_.key = order->id;
     return buf;
@@ -266,10 +235,10 @@ dbr_trade_len(const struct DbrTrade* trade)
 {
     return dbr_packlenf(TRADE_FORMAT,
                         trade->id, trade->match, trade->order, trade->order_rev,
-                        trade->trader.id, trade->accnt.id, DBR_REF_MAX, trade->ref,
-                        trade->market.id, trade->cpty.id, trade->role, trade->action,
-                        trade->ticks, trade->resd, trade->exec, trade->lots,
-                        trade->settl_date, trade->created, trade->modified);
+                        trade->trader.id, trade->accnt.id, trade->contr.id, trade->settl_date,
+                        DBR_REF_MAX, trade->ref, trade->cpty.id, trade->role, trade->action,
+                        trade->ticks, trade->resd, trade->exec, trade->lots, trade->created,
+                        trade->modified);
 }
 
 DBR_API char*
@@ -277,10 +246,10 @@ dbr_write_trade(char* buf, const struct DbrTrade* trade)
 {
     return dbr_packf(buf, TRADE_FORMAT,
                      trade->id, trade->match, trade->order, trade->order_rev,
-                     trade->trader.id, trade->accnt.id, DBR_REF_MAX, trade->ref,
-                     trade->market.id, trade->cpty.id, trade->role, trade->action,
-                     trade->ticks, trade->resd, trade->exec, trade->lots,
-                     trade->settl_date, trade->created, trade->modified);
+                     trade->trader.id, trade->accnt.id, trade->contr.id, trade->settl_date,
+                     DBR_REF_MAX, trade->ref, trade->cpty.id, trade->role, trade->action,
+                     trade->ticks, trade->resd, trade->exec, trade->lots, trade->created,
+                     trade->modified);
 }
 
 DBR_API const char*
@@ -288,10 +257,10 @@ dbr_read_trade(const char* buf, struct DbrTrade* trade)
 {
     buf = dbr_unpackf(buf, TRADE_FORMAT,
                       &trade->id, &trade->match, &trade->order, &trade->order_rev,
-                      &trade->trader.id, &trade->accnt.id, DBR_REF_MAX, trade->ref,
-                      &trade->market.id, &trade->cpty.id, &trade->role, &trade->action,
-                      &trade->ticks, &trade->resd, &trade->exec, &trade->lots,
-                      &trade->settl_date, &trade->created, &trade->modified);
+                      &trade->trader.id, &trade->accnt.id, &trade->contr.id, &trade->settl_date,
+                      DBR_REF_MAX, trade->ref, &trade->cpty.id, &trade->role, &trade->action,
+                      &trade->ticks, &trade->resd, &trade->exec, &trade->lots, &trade->created,
+                      &trade->modified);
     if (buf)
         trade->accnt_node_.key = trade->id;
     return buf;
@@ -301,7 +270,7 @@ DBR_API size_t
 dbr_posn_len(const struct DbrPosn* posn)
 {
     return dbr_packlenf(POSN_FORMAT,
-                        posn->accnt.id, posn->instr.id, posn->settl_date, posn->buy_licks,
+                        posn->accnt.id, posn->contr.id, posn->settl_date, posn->buy_licks,
                         posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }
 
@@ -309,7 +278,7 @@ DBR_API char*
 dbr_write_posn(char* buf, const struct DbrPosn* posn)
 {
     return dbr_packf(buf, POSN_FORMAT,
-                     posn->accnt.id, posn->instr.id, posn->settl_date, posn->buy_licks,
+                     posn->accnt.id, posn->contr.id, posn->settl_date, posn->buy_licks,
                      posn->buy_lots, posn->sell_licks, posn->sell_lots);
 }
 
@@ -317,12 +286,12 @@ DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn)
 {
     buf = dbr_unpackf(buf, POSN_FORMAT,
-                      &posn->accnt.id, &posn->instr.id, &posn->settl_date, &posn->buy_licks,
+                      &posn->accnt.id, &posn->contr.id, &posn->settl_date, &posn->buy_licks,
                       &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
     if (buf) {
-        // Synthentic id from instrument and settlment date.
-        const DbrIden id = posn->instr.id * 100000000L + posn->settl_date;
-        posn->accnt_node_.key = id;
+        // Synthetic key from contract and settlment date.
+        const DbrIden key = posn->contr.id * 100000000L + posn->settl_date;
+        posn->accnt_node_.key = key;
     }
     return buf;
 }

@@ -114,37 +114,37 @@ fig_accnt_term(struct DbrRec* arec)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* irec, DbrDate settl_date, DbrPool pool)
+fig_accnt_posn(struct DbrRec* arec, DbrPool pool, struct DbrRec* crec, DbrDate settl_date)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);
 
-    assert(irec);
-    assert(irec->type == DBR_INSTR);
+    assert(crec);
+    assert(crec->type == DBR_CONTR);
 
-    // Synthentic id from instrument and settlment date.
-    const DbrIden id = irec->id * 100000000L + settl_date;
+    // Synthetic key from contract and settlment date.
+    const DbrIden key = crec->id * 100000000L + settl_date;
 
     struct FigAccnt* accnt = fig_accnt_lazy(arec, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
 
     struct DbrPosn* posn;
-	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, id);
-    if (!node || node->key != id) {
-        if (!(posn = dbr_pool_alloc_posn(accnt->pool, id)))
+	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, key);
+    if (!node || node->key != key) {
+        if (!(posn = dbr_pool_alloc_posn(accnt->pool, key)))
             return NULL;
 
         posn->accnt.rec = arec;
-        posn->instr.rec = irec;
+        posn->contr.rec = crec;
         posn->settl_date = settl_date;
         posn->buy_licks = 0;
         posn->buy_lots = 0;
         posn->sell_licks = 0;
         posn->sell_lots = 0;
 
-        dbr_log_debug1("insert posn: accnt=%.16s, instr=%.16s, settl_date=%d",
-                       arec->mnem, irec->mnem, settl_date);
+        dbr_log_debug1("insert posn: accnt=%.16s, contr=%.16s, settl_date=%d",
+                       arec->mnem, crec->mnem, settl_date);
 
         struct DbrRbNode* parent = node;
         dbr_tree_pinsert(&accnt->posns, &posn->accnt_node_, parent);

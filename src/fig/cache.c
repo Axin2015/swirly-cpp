@@ -18,7 +18,7 @@
 #include "cache.h"
 
 #include "accnt.h"
-#include "market.h"
+#include "book.h"
 #include "trader.h"
 
 #include <assert.h>
@@ -107,27 +107,13 @@ insert_mnem(struct FigCache* cache, struct DbrRec* rec)
 }
 
 static void
-emplace_instr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 {
-    assert(!cache->first_instr);
-    cache->first_instr = first;
-    cache->instr_size = size;
+    assert(!cache->first_contr);
+    cache->first_contr = first;
+    cache->contr_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrRec* rec = dbr_rec_entry(node);
-        insert_id(cache, rec);
-        insert_mnem(cache, rec);
-    }
-}
-
-static void
-emplace_market(struct FigCache* cache, struct DbrSlNode* first, size_t size)
-{
-    assert(!cache->first_market);
-    cache->first_market = first;
-    cache->market_size = size;
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_rec_entry(node);
-        rec->market.instr.rec = get_id(cache, DBR_INSTR, rec->market.instr.id);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
@@ -163,10 +149,10 @@ DBR_EXTERN void
 fig_cache_init(struct FigCache* cache, DbrPool pool)
 {
     cache->pool = pool;
-    cache->first_instr = NULL;
-    cache->instr_size = 0;
-    cache->first_market = NULL;
-    cache->market_size = 0;
+    cache->first_contr = NULL;
+    cache->contr_size = 0;
+    cache->first_book = NULL;
+    cache->book_size = 0;
     cache->first_accnt = NULL;
     cache->accnt_size = 0;
     cache->first_trader = NULL;
@@ -178,22 +164,18 @@ fig_cache_init(struct FigCache* cache, DbrPool pool)
 DBR_EXTERN void
 fig_cache_term(struct FigCache* cache)
 {
-    // Traders must be released before markets, because traders subscribe to markets.
+    // Traders must be released before books, because traders subscribe to books.
     free_recs(cache->pool, cache->first_trader, fig_trader_term);
     free_recs(cache->pool, cache->first_accnt, fig_accnt_term);
-    free_recs(cache->pool, cache->first_market, fig_market_term);
-    free_recs(cache->pool, cache->first_instr, noterm);
+    free_recs(cache->pool, cache->first_contr, noterm);
 }
 
 DBR_EXTERN void
 fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {
-    case DBR_INSTR:
-        emplace_instr(cache, first, size);
-        break;
-    case DBR_MARKET:
-        emplace_market(cache, first, size);
+    case DBR_CONTR:
+        emplace_contr(cache, first, size);
         break;
     case DBR_TRADER:
         emplace_trader(cache, first, size);
@@ -212,15 +194,10 @@ fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
 {
     struct DbrSlNode* first;
     switch (type) {
-    case DBR_INSTR:
-        first = cache->first_instr;
+    case DBR_CONTR:
+        first = cache->first_contr;
         if (size)
-            *size = cache->instr_size;
-        break;
-    case DBR_MARKET:
-        first = cache->first_market;
-        if (size)
-            *size = cache->market_size;
+            *size = cache->contr_size;
         break;
     case DBR_TRADER:
         first = cache->first_trader;

@@ -48,8 +48,7 @@ typedef DbrIncs DbrTicks;
 typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
-    DBR_INSTR = 1,
-    DBR_MARKET,
+    DBR_CONTR = 1,
     DBR_TRADER,
     DBR_ACCNT,
     DBR_DEPTH,
@@ -94,16 +93,16 @@ enum DbrAction {
 /** @} */
 
 /**
- * @addtogroup Instr
+ * @addtogroup Contr
  */
 
-typedef struct FigInstr* DbrInstr;
+typedef struct FigContr* DbrContr;
 
 /**
- * @addtogroup Market
+ * @addtogroup Book
  */
 
-typedef struct FigMarket* DbrMarket;
+typedef struct FigBook* DbrBook;
 
 struct DbrBest {
     DbrTicks bid_ticks;
@@ -155,7 +154,7 @@ struct DbrRec {
         struct {
             DbrDisplay display;
             DbrMnem asset_type;
-            DbrMnem instr_type;
+            DbrMnem contr_type;
             DbrMnem asset;
             DbrMnem ccy;
             int tick_numer;
@@ -169,13 +168,7 @@ struct DbrRec {
             int qty_dp;
             DbrLots min_lots;
             DbrLots max_lots;
-            DbrInstr state;
-        } instr;
-        struct {
-            union DbrURec instr;
-            DbrDate settl_date;
-            DbrMarket state;
-        } market;
+        } contr;
         struct {
             DbrDisplay display;
             DbrEmail email;
@@ -254,12 +247,12 @@ struct DbrSub {
     /**
      * @publicsection
      */
-    DbrMarket market;
+    DbrBook book;
     DbrTrader trader;
     /**
      * @privatesection
      */
-    struct DbrDlNode market_node_;
+    struct DbrDlNode book_node_;
     struct DbrRbNode trader_node_;
 };
 
@@ -307,7 +300,7 @@ struct DbrPosn {
      * @publicsection
      */
     union DbrURec accnt;
-    union DbrURec instr;
+    union DbrURec contr;
     DbrDate settl_date;
     DbrLicks buy_licks;
     DbrLots buy_lots;
@@ -354,7 +347,7 @@ struct DbrOrder {
      */
     // Immutable. Zero is reserved for sentinel nodes only.
     DbrIden id;
-    // Set when order is associated with market.
+    // Set when order is associated with book.
     struct DbrLevel* level;
     // Order revision counter.
     int rev;
@@ -365,9 +358,10 @@ struct DbrOrder {
     // Immutable except for resd.
     union DbrURec trader;
     union DbrURec accnt;
+    union DbrURec contr;
+    DbrDate settl_date;
     // Ref is optional.
     DbrRef ref;
-    union DbrURec market;
     /**
      * @sa enum DbrAction
      */
@@ -412,9 +406,10 @@ struct DbrTrade {
     int order_rev;
     union DbrURec trader;
     union DbrURec accnt;
+    union DbrURec contr;
+    DbrDate settl_date;
     // Ref is optional.
     DbrRef ref;
-    union DbrURec market;
     union DbrURec cpty;
     /**
      * @sa enum DbrRole
@@ -428,7 +423,6 @@ struct DbrTrade {
     DbrLots resd;
     DbrLots exec;
     DbrLots lots;
-    DbrDate settl_date;
     DbrMillis created;
     DbrMillis modified;
     /**

@@ -34,22 +34,13 @@ struct DbrPosn;
  */
 
 DBR_API size_t
-dbr_instr_len(const struct DbrRec* rec);
+dbr_contr_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_write_instr(char* buf, const struct DbrRec* rec);
+dbr_write_contr(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_read_instr(const char* buf, struct DbrRec* rec);
-
-DBR_API size_t
-dbr_market_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_write_market(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_read_market(const char* buf, struct DbrRec* rec);
+dbr_read_contr(const char* buf, struct DbrRec* rec);
 
 DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec);

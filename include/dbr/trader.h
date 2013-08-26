@@ -64,18 +64,18 @@ dbr_trader_empty_order(DbrTrader trader);
  */
 
 /**
- * @brief Subscribe to market.
+ * @brief Subscribe to book.
  */
 
 DBR_API DbrBool
-dbr_trader_sub(DbrTrader trader, DbrMarket market);
+dbr_trader_sub(DbrTrader trader, DbrBook book);
 
 /**
- * @brief Unsubscribe from market.
+ * @brief Unsubscribe from book.
  */
 
 DBR_API void
-dbr_trader_unsub(DbrTrader trader, DbrIden mrid);
+dbr_trader_unsub(DbrTrader trader, DbrBook book);
 
 /** @} */
 

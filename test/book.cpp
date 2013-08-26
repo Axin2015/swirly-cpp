@@ -23,21 +23,22 @@
 #include <dbrpp/pool.hpp>
 
 #include <dbr/conv.h>
-#include <dbr/market.h>
+#include <dbr/book.h>
 
 using namespace dbr;
 
-TEST_CASE(market_id)
+TEST_CASE(book_id)
 {
     Pool pool;
     Journ journ(1);
     Model model(pool);
     Ctx ctx(pool, &journ, &model);
 
-    MarketRecs::Iterator it = ctx.mrecs().find("EURUSD");
-    check(it != ctx.mrecs().end());
+    ContrRecs::Iterator it = ctx.crecs().find("EURUSD.SPOTFWD");
+    check(it != ctx.crecs().end());
 
-    MarketRec mrec(*it);
-    Market market = ctx.market(*it);
-    check(market.id() == mrec.id());
+    ContrRec crec(*it);
+    Book book = ctx.book(*it, 20130824);
+    check(book.crec() == crec);
+    check(book.settl_date() == 20130824);
 }

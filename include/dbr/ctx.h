@@ -81,12 +81,12 @@ dbr_ctx_end_rec(DbrCtx ctx);
 /** @} */
 
 /**
- * @addtogroup Market
+ * @addtogroup Book
  * @{
  */
 
-DBR_API DbrMarket
-dbr_ctx_market(DbrCtx ctx, struct DbrRec* mrec);
+DBR_API DbrBook
+dbr_ctx_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date);
 
 /** @} */
 
@@ -121,8 +121,8 @@ dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec);
  */
 
 DBR_API struct DbrOrder*
-dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, const char* ref,
-               struct DbrRec* mrec, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
+dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, DbrBook book,
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags, struct DbrTrans* trans);
 
 // Assumes that order already belongs to this side.

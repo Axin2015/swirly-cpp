@@ -79,15 +79,20 @@ public:
     {
         return AccntRec(*impl_.accnt.rec);
     }
+    ContrRec
+    crec() const noexcept
+    {
+        return ContrRec(*impl_.contr.rec);
+    }
+    DbrDate
+    settl_date() const noexcept
+    {
+        return impl_.settl_date;
+    }
     Ref
     ref() const noexcept
     {
         return Ref(impl_.ref);
-    }
-    MarketRec
-    mrec() const noexcept
-    {
-        return MarketRec(*impl_.market.rec);
     }
     AccntRec
     cpty() const noexcept
@@ -124,11 +129,6 @@ public:
     {
         return impl_.lots;
     }
-    DbrDate
-    settl_date() const noexcept
-    {
-        return impl_.settl_date;
-    }
     DbrMillis
     created() const noexcept
     {
@@ -150,8 +150,9 @@ operator <<(std::ostream& os, Trade trade)
               << ",order_rev=" << trade.order_rev()
               << ",trec=" << trade.trec().mnem()
               << ",arec=" << trade.arec().mnem()
+              << ",crec=" << trade.crec().mnem()
+              << ",settl_date=" << trade.settl_date()
               << ",ref=" << trade.ref()
-              << ",mrec=" << trade.mrec().mnem()
               << ",cpty=" << trade.cpty().mnem()
               << ",role=" << trade.role()
               << ",action=" << trade.action()
@@ -159,7 +160,6 @@ operator <<(std::ostream& os, Trade trade)
               << ",resd=" << trade.resd()
               << ",exec=" << trade.exec()
               << ",lots=" << trade.lots()
-              << ",settl_date=" << trade.settl_date()
               << ",created=" << trade.created()
               << ",modified=" << trade.modified();
 }

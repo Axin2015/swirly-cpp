@@ -17,7 +17,7 @@
  */
 #include "trader.h"
 
-#include "market.h"
+#include "book.h"
 
 #include <dbr/err.h>
 #include <dbr/sess.h>
@@ -50,7 +50,7 @@ free_subs(struct FigTrader* trader)
     struct DbrRbNode* node;
     while ((node = trader->subs.root)) {
         struct DbrSub* sub = dbr_trader_sub_entry(node);
-        fig_market_unsub(sub);
+        fig_book_unsub(sub);
         dbr_tree_remove(&trader->subs, node);
         dbr_pool_free_sub(trader->pool, sub);
     }
@@ -95,24 +95,24 @@ fig_trader_term(struct DbrRec* trec)
 }
 
 DBR_EXTERN DbrBool
-fig_trader_sub(struct FigTrader* trader, struct FigMarket* market)
+fig_trader_sub(struct FigTrader* trader, struct FigBook* book)
 {
-    DbrPool pool = trader->pool;
-	struct DbrRbNode* node = dbr_tree_pfind(&trader->subs, market->id);
-    if (node && node->key == market->id) {
+    const DbrIden key = fig_book_key(book);
+	struct DbrRbNode* node = dbr_tree_pfind(&trader->subs, key);
+    if (node && node->key == key) {
         dbr_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
-    struct DbrSub* sub = dbr_pool_alloc_sub(pool, market->id);
+    struct DbrSub* sub = dbr_pool_alloc_sub(trader->pool, key);
     if (!sub)
         goto fail1;
 
-    sub->market = market;
+    sub->book = book;
     sub->trader = trader;
 
     struct DbrRbNode* parent = node;
     dbr_tree_pinsert(&trader->subs, &sub->trader_node_, parent);
-    fig_market_sub(market, sub);
+    fig_book_sub(book, sub);
     return true;
 
 fail1:
@@ -120,12 +120,13 @@ fail1:
 }
 
 DBR_EXTERN void
-fig_trader_unsub(struct FigTrader* trader, DbrIden mrid)
+fig_trader_unsub(struct FigTrader* trader, struct FigBook* book)
 {
-    struct DbrRbNode* node = dbr_tree_find(&trader->subs, mrid);
+    const DbrIden key = fig_book_key(book);
+    struct DbrRbNode* node = dbr_tree_find(&trader->subs, key);
     if (node) {
         struct DbrSub* sub = dbr_trader_sub_entry(node);
-        fig_market_unsub(sub);
+        fig_book_unsub(sub);
         dbr_tree_remove(&trader->subs, node);
         dbr_pool_free_sub(trader->pool, sub);
     }
@@ -184,15 +185,15 @@ dbr_trader_empty_order(DbrTrader trader)
 // TraderSub
 
 DBR_API DbrBool
-dbr_trader_sub(DbrTrader trader, DbrMarket market)
+dbr_trader_sub(DbrTrader trader, DbrBook book)
 {
-    return fig_trader_sub(trader, market);
+    return fig_trader_sub(trader, book);
 }
 
 DBR_API void
-dbr_trader_unsub(DbrTrader trader, DbrIden mrid)
+dbr_trader_unsub(DbrTrader trader, DbrBook book)
 {
-    return fig_trader_unsub(trader, mrid);
+    return fig_trader_unsub(trader, book);
 }
 
 // TraderSess

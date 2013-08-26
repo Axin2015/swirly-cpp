@@ -34,7 +34,7 @@
 
 #define INSERT_ORDER_SQL                                                \
     "INSERT INTO order_ (id, rev, status, trader, accnt, ref,"          \
-    " market, action, ticks, resd, exec, lots, min, flags,"             \
+    " book, action, ticks, resd, exec, lots, min, flags,"             \
     " archive, created, modified)"                                      \
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
 
@@ -57,15 +57,11 @@
     "UPDATE trade SET archive = 1, modified = ?"                        \
     " WHERE id = ?"
 
-#define SELECT_INSTR_SQL                                                \
-    "SELECT id, mnem, display, asset_type, instr_type, asset, ccy,"     \
+#define SELECT_CONTR_SQL                                                \
+    "SELECT id, mnem, display, asset_type, contr_type, asset, ccy,"     \
     " tick_numer, tick_denom, lot_numer, lot_denom, pip_dp, min_lots,"  \
     " max_lots"                                                         \
-    " FROM instr_v"
-
-#define SELECT_MARKET_SQL                            \
-    "SELECT id, mnem, instr, settl_date"             \
-    " FROM market_v"
+    " FROM contr_v"
 
 #define SELECT_TRADER_SQL                                    \
     "SELECT id, mnem, display, email"                        \
@@ -76,8 +72,8 @@
     " FROM accnt_v"
 
 #define SELECT_ORDER_SQL                                                \
-    "SELECT id, rev, status, trader, accnt, ref, market, action,"       \
-    " ticks, resd, exec, lots, min, flags, created, modified"           \
+    "SELECT id, rev, status, trader, accnt, contr, settl_date, ref,"    \
+    " action, ticks, resd, exec, lots, min, flags, created, modified"   \
     " FROM order_ WHERE archive = 0 ORDER BY id"
 
 #define SELECT_MEMB_SQL                                    \
@@ -85,14 +81,13 @@
     " FROM memb ORDER BY accnt"
 
 #define SELECT_TRADE_SQL                                                \
-    "SELECT id, match, order_, order_rev, trader, accnt, ref, market,"  \
-    " cpty, role, action, ticks, resd, exec, lots, settl_date,"         \
-    " created, modified"                                                \
+    "SELECT id, match, order_, order_rev, trader, accnt, contr, settl_date," \
+    " ref, cpty, role, action, ticks, resd, exec, lots, created, modified" \
     " FROM trade_v WHERE archive = 0 ORDER BY id"
 
 #define SELECT_POSN_SQL                                         \
-    "SELECT accnt, instr, settl_date, action, licks, lots"  \
-    " FROM posn_v ORDER BY accnt, instr, settl_date, action"
+    "SELECT accnt, contr, settl_date, action, licks, lots"      \
+    " FROM posn_v ORDER BY accnt, contr, settl_date, action"
 
 // Only called if failure occurs during cache load, so no need to free state members as they will
 // not have been allocated.
@@ -167,8 +162,9 @@ bind_insert_order(struct FirSqlite* sqlite, const struct DbrOrder* order)
         STATUS,
         TRADER,
         ACCNT,
+        CONTR,
+        SETTL_DATE,
         REF,
-        MARKET,
         ACTION,
         TICKS,
         RESD,
@@ -200,14 +196,18 @@ bind_insert_order(struct FirSqlite* sqlite, const struct DbrOrder* order)
     if (rc != SQLITE_OK)
         goto fail1;
 
+    rc = sqlite3_bind_int64(stmt, CONTR, order->contr.rec->id);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
+    rc = sqlite3_bind_int(stmt, SETTL_DATE, order->settl_date);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
     if (order->ref[0] != '\0')
         rc = bind_text(stmt, REF, order->ref, DBR_REF_MAX);
     else
         rc = sqlite3_bind_null(stmt, REF);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    rc = sqlite3_bind_int64(stmt, MARKET, order->market.rec->id);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -341,7 +341,6 @@ bind_insert_trade(struct FirSqlite* sqlite, const struct DbrTrade* trade)
         RESD,
         EXEC,
         LOTS,
-        SETTL_DATE,
         CREATED,
         MODIFIED
     };
@@ -390,10 +389,6 @@ bind_insert_trade(struct FirSqlite* sqlite, const struct DbrTrade* trade)
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, SETTL_DATE, trade->settl_date);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
     rc = sqlite3_bind_int64(stmt, CREATED, trade->created);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -433,14 +428,14 @@ bind_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 static ssize_t
-select_instr(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
 {
     enum {
         ID,
         MNEM,
         DISPLAY,
         ASSET_TYPE,
-        INSTR_TYPE,
+        CONTR_TYPE,
         ASSET,
         CCY,
         TICK_NUMER,
@@ -452,7 +447,7 @@ select_instr(struct FirSqlite* sqlite, struct DbrSlNode** first)
         MAX_LOTS
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_INSTR_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_CONTR_SQL);
     if (!stmt)
         goto fail1;
 
@@ -470,54 +465,53 @@ select_instr(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
             // Header.
 
-            rec->type = DBR_INSTR;
+            rec->type = DBR_CONTR;
             rec->id = sqlite3_column_int64(stmt, ID);
             strncpy(rec->mnem,
                     (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
 
             // Body.
 
-            strncpy(rec->instr.display,
+            strncpy(rec->contr.display,
                     (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
-            strncpy(rec->instr.asset_type,
+            strncpy(rec->contr.asset_type,
                     (const char*)sqlite3_column_text(stmt, ASSET_TYPE), DBR_MNEM_MAX);
-            strncpy(rec->instr.instr_type,
-                    (const char*)sqlite3_column_text(stmt, INSTR_TYPE), DBR_MNEM_MAX);
-            strncpy(rec->instr.asset,
+            strncpy(rec->contr.contr_type,
+                    (const char*)sqlite3_column_text(stmt, CONTR_TYPE), DBR_MNEM_MAX);
+            strncpy(rec->contr.asset,
                     (const char*)sqlite3_column_text(stmt, ASSET), DBR_MNEM_MAX);
-            strncpy(rec->instr.ccy,
+            strncpy(rec->contr.ccy,
                     (const char*)sqlite3_column_text(stmt, CCY), DBR_MNEM_MAX);
 
             const int tick_numer = sqlite3_column_int(stmt, TICK_NUMER);
             const int tick_denom = sqlite3_column_int(stmt, TICK_DENOM);
             const double price_inc = dbr_fract_to_real(tick_numer, tick_denom);
-            rec->instr.tick_numer = tick_numer;
-            rec->instr.tick_denom = tick_denom;
-            rec->instr.price_inc = price_inc;
+            rec->contr.tick_numer = tick_numer;
+            rec->contr.tick_denom = tick_denom;
+            rec->contr.price_inc = price_inc;
 
             const int lot_numer = sqlite3_column_int(stmt, LOT_NUMER);
             const int lot_denom = sqlite3_column_int(stmt, LOT_DENOM);
             const double qty_inc = dbr_fract_to_real(lot_numer, lot_denom);
-            rec->instr.lot_numer = lot_numer;
-            rec->instr.lot_denom = lot_denom;
-            rec->instr.qty_inc = qty_inc;
+            rec->contr.lot_numer = lot_numer;
+            rec->contr.lot_denom = lot_denom;
+            rec->contr.qty_inc = qty_inc;
 
-            rec->instr.price_dp = dbr_real_to_dp(price_inc);
-            rec->instr.pip_dp = sqlite3_column_int(stmt, PIP_DP);
-            rec->instr.qty_dp = dbr_real_to_dp(qty_inc);
+            rec->contr.price_dp = dbr_real_to_dp(price_inc);
+            rec->contr.pip_dp = sqlite3_column_int(stmt, PIP_DP);
+            rec->contr.qty_dp = dbr_real_to_dp(qty_inc);
 
-            rec->instr.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
-            rec->instr.max_lots = sqlite3_column_int64(stmt, MAX_LOTS);
-            rec->instr.state = NULL;
+            rec->contr.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
+            rec->contr.max_lots = sqlite3_column_int64(stmt, MAX_LOTS);
 
-            dbr_log_debug3("instr: id=%ld,mnem=%.16s,display=%.64s,asset_type=%.16s,"
-                           "instr_type=%.16s,asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,"
+            dbr_log_debug3("contr: id=%ld,mnem=%.16s,display=%.64s,asset_type=%.16s,"
+                           "contr_type=%.16s,asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,"
                            "price_dp=%d,pip_dp=%d,qty_dp=%d,min_lots=%ld,max_lots=%ld",
-                           rec->id, rec->mnem, rec->instr.display, rec->instr.asset_type,
-                           rec->instr.instr_type, rec->instr.asset, rec->instr.ccy,
-                           rec->instr.price_inc, rec->instr.qty_inc, rec->instr.price_dp,
-                           rec->instr.pip_dp, rec->instr.qty_dp, rec->instr.min_lots,
-                           rec->instr.max_lots);
+                           rec->id, rec->mnem, rec->contr.display, rec->contr.asset_type,
+                           rec->contr.contr_type, rec->contr.asset, rec->contr.ccy,
+                           rec->contr.price_inc, rec->contr.qty_inc, rec->contr.price_dp,
+                           rec->contr.pip_dp, rec->contr.qty_dp, rec->contr.min_lots,
+                           rec->contr.max_lots);
 
             dbr_queue_push(&rq, &rec->model_node_);
             ++size;
@@ -537,73 +531,7 @@ select_instr(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_INSTR, dbr_queue_first(&rq));
-    *first = NULL;
- fail1:
-    return -1;
-}
-
-static ssize_t
-select_market(struct FirSqlite* sqlite, struct DbrSlNode** first)
-{
-    enum {
-        ID,
-        MNEM,
-        INSTR,
-        SETTL_DATE
-    };
-
-    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_MARKET_SQL);
-    if (!stmt)
-        goto fail1;
-
-    struct DbrQueue rq;
-    dbr_queue_init(&rq);
-
-    ssize_t size = 0;
-    for (;;) {
-        int rc = sqlite3_step(stmt);
-        if (rc == SQLITE_ROW) {
-
-            struct DbrRec* rec = dbr_pool_alloc_rec(sqlite->pool);
-            if (!rec)
-                goto fail2;
-
-            // Header.
-
-            rec->type = DBR_MARKET;
-            rec->id = sqlite3_column_int64(stmt, ID);
-            strncpy(rec->mnem,
-                    (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
-
-            // Body.
-
-            rec->market.instr.id = sqlite3_column_int64(stmt, INSTR);
-            rec->market.settl_date = sqlite3_column_int(stmt, SETTL_DATE);
-            rec->market.state = NULL;
-
-            dbr_log_debug3("market: id=%ld,mnem=%.16s,instr=%ld",
-                           rec->id, rec->mnem, rec->market.instr.id);
-
-            dbr_queue_push(&rq, &rec->model_node_);
-            ++size;
-
-        } else if (rc == SQLITE_DONE) {
-            break;
-        } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
-            goto fail2;
-        }
-    }
-
-    sqlite3_clear_bindings(stmt);
-    sqlite3_finalize(stmt);
-    *first = dbr_queue_first(&rq);
-    return size;
- fail2:
-    sqlite3_clear_bindings(stmt);
-    sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_MARKET, dbr_queue_first(&rq));
+    dbr_pool_free_list(sqlite->pool, DBR_CONTR, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -754,8 +682,9 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
         STATUS,
         TRADER,
         ACCNT,
+        CONTR,
+        SETTL_DATE,
         REF,
-        MARKET,
         ACTION,
         TICKS,
         RESD,
@@ -790,12 +719,13 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
             order->status = sqlite3_column_int(stmt, STATUS);
             order->trader.id = sqlite3_column_int64(stmt, TRADER);
             order->accnt.id = sqlite3_column_int64(stmt, ACCNT);
+            order->contr.id = sqlite3_column_int64(stmt, CONTR);
+            order->settl_date = sqlite3_column_int(stmt, SETTL_DATE);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
                 strncpy(order->ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
                 order->ref[0] = '\0';
-            order->market.id = sqlite3_column_int64(stmt, MARKET);
             order->action = sqlite3_column_int(stmt, ACTION);
             order->ticks = sqlite3_column_int64(stmt, TICKS);
             order->resd = sqlite3_column_int64(stmt, RESD);
@@ -806,13 +736,13 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
             order->created = sqlite3_column_int64(stmt, CREATED);
             order->modified = sqlite3_column_int64(stmt, MODIFIED);
 
-            dbr_log_debug3("order: id=%ld,rev=%d,status=%d,trader=%ld,accnt=%ld,ref=%.64s,"
-                           "market=%ld,action=%d,ticks=%ld,resd=%ld,exec=%ld,lots=%ld,"
-                           "min=%ld,flags=%ld,created=%ld,modified=%ld",
+            dbr_log_debug3("order: id=%ld,rev=%d,status=%d,trader=%ld,accnt=%ld,contr=%ld,"
+                           "settl_date=%d,ref=%.64s,action=%d,ticks=%ld,resd=%ld,exec=%ld,"
+                           "lots=%ld,min=%ld,flags=%ld,created=%ld,modified=%ld",
                            order->id, order->rev, order->status, order->trader.id, order->accnt.id,
-                           order->ref, order->market.id, order->action, order->ticks, order->resd,
-                           order->exec, order->lots, order->min, order->flags, order->created,
-                           order->modified);
+                           order->contr.id, order->settl_date, order->ref, order->action,
+                           order->ticks, order->resd, order->exec, order->lots, order->min,
+                           order->flags, order->created, order->modified);
 
             dbr_queue_push(&oq, &order->model_node_);
             ++size;
@@ -902,8 +832,9 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
         ORDER_REV,
         TRADER,
         ACCNT,
+        CONTR,
+        SETTL_DATE,
         REF,
-        MARKET,
         CPTY,
         ROLE,
         ACTION,
@@ -911,7 +842,6 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
         RESD,
         EXEC,
         LOTS,
-        SETTL_DATE,
         CREATED,
         MODIFIED
     };
@@ -939,12 +869,13 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
             trade->order_rev = sqlite3_column_int(stmt, ORDER_REV);
             trade->trader.id = sqlite3_column_int64(stmt, TRADER);
             trade->accnt.id = sqlite3_column_int64(stmt, ACCNT);
+            trade->contr.id = sqlite3_column_int64(stmt, CONTR);
+            trade->settl_date = sqlite3_column_int(stmt, SETTL_DATE);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
                 strncpy(trade->ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
                 trade->ref[0] = '\0';
-            trade->market.id = sqlite3_column_int64(stmt, MARKET);
             trade->cpty.id = sqlite3_column_int64(stmt, CPTY);
             trade->role = sqlite3_column_int(stmt, ROLE);
             trade->action = sqlite3_column_int(stmt, ACTION);
@@ -952,18 +883,18 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
             trade->resd = sqlite3_column_int64(stmt, RESD);
             trade->exec = sqlite3_column_int64(stmt, EXEC);
             trade->lots = sqlite3_column_int64(stmt, LOTS);
-            trade->settl_date = sqlite3_column_int(stmt, SETTL_DATE);
             trade->created = sqlite3_column_int64(stmt, CREATED);
             trade->modified = sqlite3_column_int64(stmt, MODIFIED);
 
             dbr_log_debug3("trade: id=%ld,match=%ld,order=%ld,order_rev=%d,trader=%ld,accnt=%ld,"
-                           "ref=%.64s,market=%ld,cpty=%ld,role=%d,action=%d,ticks=%ld,resd=%ld,"
-                           "exec=%ld,lots=%ld,settl_date=%d,created=%ld, modified=%ld",
+                           "contr=%ld,settl_date=%d,ref=%.64s,cpty=%ld,role=%d,action=%d,"
+                           "ticks=%ld,resd=%ld,exec=%ld,lots=%ld,settl_date=%d,created=%ld,"
+                           "modified=%ld",
                            trade->id, trade->match, trade->order, trade->order_rev,
-                           trade->trader.id, trade->accnt.id, trade->ref, trade->market.id,
-                           trade->cpty.id, trade->role, trade->action, trade->ticks, trade->resd,
-                           trade->exec, trade->lots, trade->settl_date, trade->created,
-                           trade->modified);
+                           trade->trader.id, trade->accnt.id, trade->contr.id, trade->settl_date,
+                           trade->ref, trade->cpty.id, trade->role, trade->action, trade->ticks,
+                           trade->resd, trade->exec, trade->lots, trade->settl_date,
+                           trade->created, trade->modified);
 
             dbr_queue_push(&tq, &trade->model_node_);
             ++size;
@@ -995,7 +926,7 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
     enum {
         ID,
         ACCNT,
-        INSTR,
+        CONTR,
         SETTL_DATE,
         ACTION,
         LICKS,
@@ -1017,11 +948,11 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden accnt = sqlite3_column_int64(stmt, ACCNT);
-            const DbrIden instr = sqlite3_column_int64(stmt, INSTR);
+            const DbrIden contr = sqlite3_column_int64(stmt, CONTR);
             const int settl_date = sqlite3_column_int(stmt, SETTL_DATE);
 
             // Posn is null for first row.
-            if (posn && posn->accnt.id == accnt && posn->instr.id == instr
+            if (posn && posn->accnt.id == accnt && posn->contr.id == contr
                 && posn->settl_date == settl_date) {
 
                 // Set other side.
@@ -1038,14 +969,14 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
                 continue;
             }
 
-            // Synthentic id from instrument and settlment date.
-            const DbrIden id = instr * 100000000L + settl_date;
-            posn = dbr_pool_alloc_posn(sqlite->pool, id);
+            // Synthetic id from contract and settlment date.
+            const DbrIden key = contr * 100000000L + settl_date;
+            posn = dbr_pool_alloc_posn(sqlite->pool, key);
             if (dbr_unlikely(!posn))
                 goto fail2;
 
             posn->accnt.id = accnt;
-            posn->instr.id = instr;
+            posn->contr.id = contr;
             posn->settl_date = settl_date;
 
             const int action = sqlite3_column_int(stmt, ACTION);
@@ -1229,11 +1160,8 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, struct DbrSlNode** 
 {
     ssize_t ret;
     switch (type) {
-    case DBR_INSTR:
-        ret = select_instr(sqlite, first);
-        break;
-    case DBR_MARKET:
-        ret = select_market(sqlite, first);
+    case DBR_CONTR:
+        ret = select_contr(sqlite, first);
         break;
     case DBR_TRADER:
         ret = select_trader(sqlite, first);

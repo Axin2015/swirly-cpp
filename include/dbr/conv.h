@@ -38,18 +38,18 @@ dbr_rec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup MarketSub
+ * @addtogroup BookSub
  * @{
  */
 
 /**
- * @brief Subscription from market node.
+ * @brief Subscription from book node.
  */
 
 static inline struct DbrSub*
-dbr_market_sub_entry(struct DbrDlNode* node)
+dbr_book_sub_entry(struct DbrDlNode* node)
 {
-    return dbr_implof(struct DbrSub, market_node_, node);
+    return dbr_implof(struct DbrSub, book_node_, node);
 }
 
 /** @} */
@@ -243,10 +243,10 @@ dbr_incs_to_real(DbrIncs incs, double inc_size)
  */
 
 static inline DbrLots
-dbr_qty_to_lots(double qty, struct DbrRec* irec)
+dbr_qty_to_lots(double qty, struct DbrRec* crec)
 {
-    assert(irec->type == DBR_INSTR);
-    return dbr_real_to_incs(qty, irec->instr.qty_inc);
+    assert(crec->type == DBR_CONTR);
+    return dbr_real_to_incs(qty, crec->contr.qty_inc);
 }
 
 /**
@@ -254,10 +254,10 @@ dbr_qty_to_lots(double qty, struct DbrRec* irec)
  */
 
 static inline double
-dbr_lots_to_qty(DbrLots lots, struct DbrRec* irec)
+dbr_lots_to_qty(DbrLots lots, struct DbrRec* crec)
 {
-    assert(irec->type == DBR_INSTR);
-    return dbr_incs_to_real(lots, irec->instr.qty_inc);
+    assert(crec->type == DBR_CONTR);
+    return dbr_incs_to_real(lots, crec->contr.qty_inc);
 }
 
 /**
@@ -265,10 +265,10 @@ dbr_lots_to_qty(DbrLots lots, struct DbrRec* irec)
  */
 
 static inline DbrTicks
-dbr_price_to_ticks(double price, struct DbrRec* irec)
+dbr_price_to_ticks(double price, struct DbrRec* crec)
 {
-    assert(irec->type == DBR_INSTR);
-    return dbr_real_to_incs(price, irec->instr.price_inc);
+    assert(crec->type == DBR_CONTR);
+    return dbr_real_to_incs(price, crec->contr.price_inc);
 }
 
 /**
@@ -276,10 +276,10 @@ dbr_price_to_ticks(double price, struct DbrRec* irec)
  */
 
 static inline double
-dbr_ticks_to_price(DbrTicks ticks, struct DbrRec* irec)
+dbr_ticks_to_price(DbrTicks ticks, struct DbrRec* crec)
 {
-    assert(irec->type == DBR_INSTR);
-    return dbr_incs_to_real(ticks, irec->instr.price_inc);
+    assert(crec->type == DBR_CONTR);
+    return dbr_incs_to_real(ticks, crec->contr.price_inc);
 }
 
 /**

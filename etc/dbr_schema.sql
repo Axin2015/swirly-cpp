@@ -78,7 +78,7 @@ CREATE TABLE asset_type (
 )
 ;
 
-CREATE TABLE instr_type (
+CREATE TABLE contr_type (
   mnem TEXT PRIMARY KEY
 )
 ;
@@ -90,11 +90,11 @@ CREATE TABLE asset (
 )
 ;
 
-CREATE TABLE instr (
+CREATE TABLE contr (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL UNIQUE,
   display TEXT NOT NULL UNIQUE,
-  type TEXT NOT NULL REFERENCES instr_type (mnem),
+  type TEXT NOT NULL REFERENCES contr_type (mnem),
   asset TEXT NOT NULL REFERENCES asset (mnem),
   ccy TEXT NOT NULL REFERENCES asset (mnem),
   tick_numer INTEGER NOT NULL,
@@ -107,44 +107,25 @@ CREATE TABLE instr (
 )
 ;
 
-CREATE VIEW instr_v AS
+CREATE VIEW contr_v AS
   SELECT
-  i.id,
-  i.mnem,
-  i.display,
+  c.id,
+  c.mnem,
+  c.display,
   a.type asset_type,
-  i.type instr_type,
-  i.asset,
-  i.ccy,
-  i.tick_numer,
-  i.tick_denom,
-  i.pip_dp,
-  i.lot_numer,
-  i.lot_denom,
-  i.min_lots,
-  i.max_lots
-  FROM instr i
+  c.type contr_type,
+  c.asset,
+  c.ccy,
+  c.tick_numer,
+  c.tick_denom,
+  c.pip_dp,
+  c.lot_numer,
+  c.lot_denom,
+  c.min_lots,
+  c.max_lots
+  FROM contr c
   INNER JOIN asset a
-  ON i.asset = a.mnem
-;
-
-CREATE TABLE market (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  mnem TEXT NOT NULL,
-  instr INTEGER NOT NULL REFERENCES instr (id),
-  settl_date INTEGER NOT NULL,
-  CONSTRAINT market_instr_settl_date_uq
-  UNIQUE (instr, settl_date)
-)
-;
-
-CREATE VIEW market_v AS
-  SELECT
-  m.id,
-  m.mnem,
-  m.instr,
-  m.settl_date
-  FROM market m
+  ON c.asset = a.mnem
 ;
 
 CREATE TABLE trader (
@@ -209,8 +190,9 @@ CREATE TABLE order_ (
   status INTEGER NOT NULL REFERENCES status (id),
   trader INTEGER NOT NULL REFERENCES trader (id),
   accnt INTEGER NOT NULL REFERENCES accnt (id),
+  contr INTEGER NOT NULL REFERENCES contr (id),
+  settl_date INTEGER NOT NULL,
   ref TEXT,
-  market INTEGER NOT NULL REFERENCES market (id),
   action INTEGER NOT NULL REFERENCES action (id),
   ticks INTEGER NOT NULL,
   resd INTEGER NOT NULL,
@@ -232,8 +214,9 @@ CREATE VIEW order_v AS
   s.mnem status,
   t.mnem trader,
   a.mnem accnt,
+  c.mnem contr,
+  o.settl_date,
   o.ref,
-  m.mnem market,
   o.action,
   o.ticks,
   o.resd,
@@ -251,8 +234,8 @@ CREATE VIEW order_v AS
   ON o.trader = t.id
   INNER JOIN accnt a
   ON o.accnt = a.id
-  INNER JOIN market m
-  ON o.market = m.id
+  INNER JOIN contr c
+  ON o.contr = c.id
 ;
 
 CREATE TABLE history (
@@ -310,7 +293,6 @@ CREATE TABLE trade (
   resd INTEGER NOT NULL,
   exec INTEGER NOT NULL,
   lots INTEGER NOT NULL,
-  settl_date INTEGER NOT NULL,
   archive INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL,
@@ -327,8 +309,9 @@ CREATE VIEW trade_v AS
   t.order_rev,
   o.trader,
   o.accnt,
+  o.contr,
+  o.settl_date,
   o.ref,
-  o.market,
   t.cpty,
   t.role,
   t.action,
@@ -336,7 +319,6 @@ CREATE VIEW trade_v AS
   t.resd,
   t.exec,
   t.lots,
-  t.settl_date,
   t.archive,
   t.created,
   t.modified
@@ -348,15 +330,13 @@ CREATE VIEW trade_v AS
 CREATE VIEW posn_v AS
   SELECT
   t.accnt,
-  m.instr,
+  t.contr,
   t.settl_date,
   t.action,
   sum(t.lots * t.ticks) licks,
   sum(t.lots) lots
   FROM trade_v t
-  INNER JOIN market m
-  ON t.market = m.id
-  GROUP BY t.accnt, m.instr, t.settl_date, t.action
+  GROUP BY t.accnt, t.contr, t.settl_date, t.action
 ;
 
 COMMIT TRANSACTION

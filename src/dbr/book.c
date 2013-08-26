@@ -15,31 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_MARKET_H
-#define DBR_MARKET_H
-
-#include <dbr/defs.h>
-#include <dbr/types.h>
-
-/**
- * @addtogroup Market
- * @{
- */
-
-// Returns the market-id for state.
-
-DBR_API DbrIden
-dbr_market_id(DbrMarket market);
-
-DBR_API DbrSide
-dbr_market_bid_side(DbrMarket market);
-
-DBR_API DbrSide
-dbr_market_ask_side(DbrMarket market);
-
-DBR_API struct DbrBest*
-dbr_market_best(struct DbrRec* mrec, struct DbrBest* best);
-
-/** @} */
-
-#endif // DBR_MARKET_H
+#include <dbr/book.h>

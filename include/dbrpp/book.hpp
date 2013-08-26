@@ -15,63 +15,76 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_MARKET_HPP
-#define DBRPP_MARKET_HPP
+#ifndef DBRPP_BOOK_HPP
+#define DBRPP_BOOK_HPP
 
+#include <dbrpp/rec.hpp>
 #include <dbrpp/side.hpp>
 
-#include <dbr/market.h>
+#include <dbr/book.h>
 
 #include <iostream>
 
 namespace dbr {
 
-class Market {
-    DbrMarket impl_;
+class Book {
+    DbrBook impl_;
 public:
     explicit
-    Market(DbrMarket impl) noexcept
+    Book(DbrBook impl) noexcept
         : impl_(impl)
     {
     }
     explicit
-    operator DbrMarket() const noexcept
+    operator DbrBook() const noexcept
     {
         return impl_;
     }
     bool
-    operator ==(Market rhs) const noexcept
+    operator ==(Book rhs) const noexcept
     {
-        return id() == rhs.id();
+        return key() == rhs.key();
     }
     bool
-    operator !=(Market rhs) const noexcept
+    operator !=(Book rhs) const noexcept
     {
-        return id() != rhs.id();
+        return key() != rhs.key();
     }
-    DbrIden
-    id() const noexcept
+    DbrKey
+    key() const noexcept
     {
-        return dbr_market_id(impl_);
+        return dbr_book_key(impl_);
+    }
+    ContrRec
+    crec() const noexcept
+    {
+        return ContrRec(*dbr_book_crec(impl_));
+    }
+    DbrDate
+    settl_date() const noexcept
+    {
+        return dbr_book_settl_date(impl_);
     }
     Side
     bid_side() const noexcept
     {
-        return Side(dbr_market_bid_side(impl_));
+        return Side(dbr_book_bid_side(impl_));
     }
     Side
     ask_side() const noexcept
     {
-        return Side(dbr_market_ask_side(impl_));
+        return Side(dbr_book_ask_side(impl_));
     }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Market market)
+operator <<(std::ostream& os, Book book)
 {
-    return os << "id=" << market.id();
+    return os << "key=" << book.key()
+              << ",crec=" << book.crec().mnem()
+              << ",settl_date" << book.settl_date();
 }
 
 } // dbr
 
-#endif // DBRPP_MARKET_HPP
+#endif // DBRPP_BOOK_HPP

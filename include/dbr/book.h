@@ -15,4 +15,35 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/market.hpp>
+#ifndef DBR_BOOK_H
+#define DBR_BOOK_H
+
+#include <dbr/defs.h>
+#include <dbr/types.h>
+
+/**
+ * @addtogroup Book
+ * @{
+ */
+
+DBR_API DbrKey
+dbr_book_key(DbrBook book);
+
+DBR_API struct DbrRec*
+dbr_book_crec(DbrBook book);
+
+DBR_API DbrDate
+dbr_book_settl_date(DbrBook book);
+
+DBR_API DbrSide
+dbr_book_bid_side(DbrBook book);
+
+DBR_API DbrSide
+dbr_book_ask_side(DbrBook book);
+
+DBR_API struct DbrBest*
+dbr_book_best(struct DbrRec* mrec, struct DbrBest* best);
+
+/** @} */
+
+#endif // DBR_BOOK_H

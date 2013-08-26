@@ -74,15 +74,20 @@ public:
     {
         return AccntRec(*impl_.accnt.rec);
     }
+    ContrRec
+    crec() const noexcept
+    {
+        return ContrRec(*impl_.contr.rec);
+    }
+    DbrDate
+    settl_date() const noexcept
+    {
+        return impl_.settl_date;
+    }
     Ref
     ref() const noexcept
     {
         return Ref(impl_.ref);
-    }
-    MarketRec
-    mrec() const noexcept
-    {
-        return MarketRec(*impl_.market.rec);
     }
     int
     action() const noexcept
@@ -144,8 +149,9 @@ operator <<(std::ostream& os, Order order)
               << ",status=" << order.status()
               << ",trec=" << order.trec().mnem()
               << ",arec=" << order.arec().mnem()
+              << ",crec=" << order.crec().mnem()
+              << ",settl_date=" << order.settl_date()
               << ",ref=" << order.ref()
-              << ",mrec=" << order.mrec().mnem()
               << ",action=" << order.action()
               << ",ticks=" << order.ticks()
               << ",resd=" << order.resd()

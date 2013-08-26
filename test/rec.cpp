@@ -30,13 +30,8 @@ template <int TypeN>
 struct TypeTraits;
 
 template <>
-struct TypeTraits<DBR_INSTR> {
-    typedef InstrRec TypeRec;
-};
-
-template <>
-struct TypeTraits<DBR_MARKET> {
-    typedef MarketRec TypeRec;
+struct TypeTraits<DBR_CONTR> {
+    typedef ContrRec TypeRec;
 };
 
 template <>
@@ -67,49 +62,32 @@ get_rec_mnem(Ctx& ctx, const char* mnem)
     return typename TypeTraits<TypeN>::TypeRec(*it);
 }
 
-TEST_CASE(find_instr)
+TEST_CASE(find_contr)
 {
     Pool pool;
     Journ journ(1);
     Model model(pool);
     Ctx ctx(pool, &journ, &model);
 
-    check(ctx.irecs().find("BAD") == ctx.irecs().end());
+    check(ctx.crecs().find("BAD") == ctx.crecs().end());
 
-    InstrRec irec = get_rec_mnem<DBR_INSTR>(ctx, "EURUSD.SPOTFWD");
-    check(irec == get_rec_id<DBR_INSTR>(ctx, irec.id()));
-    check(irec.mnem() == Mnem("EURUSD.SPOTFWD"));
-
-    // Body.
-    check(irec.display() == Display("EURUSD.SPOTFWD"));
-    check(irec.asset_type() == Mnem("CURRENCY"));
-    check(irec.instr_type() == Mnem("SPOTFWD"));
-    check(irec.asset() == Mnem("EUR"));
-    check(irec.ccy() == Mnem("USD"));
-    check(fequal(irec.price_inc(), 0.0001));
-    check(fequal(irec.qty_inc(), 1e6));
-    check(irec.price_dp() == 4);
-    check(irec.pip_dp() == 4);
-    check(irec.qty_dp() == 0);
-    check(irec.min_lots() == 1);
-    check(irec.max_lots() == 10);
-}
-
-TEST_CASE(find_market)
-{
-    Pool pool;
-    Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
-
-    check(ctx.mrecs().find("BAD") == ctx.mrecs().end());
-
-    MarketRec mrec = get_rec_mnem<DBR_MARKET>(ctx, "EURUSD");
-    check(mrec == get_rec_id<DBR_MARKET>(ctx, mrec.id()));
-    check(mrec.mnem() == Mnem("EURUSD"));
+    ContrRec crec = get_rec_mnem<DBR_CONTR>(ctx, "EURUSD.SPOTFWD");
+    check(crec == get_rec_id<DBR_CONTR>(ctx, crec.id()));
+    check(crec.mnem() == Mnem("EURUSD.SPOTFWD"));
 
     // Body.
-    check(mrec.settl_date() == 20130417);
+    check(crec.display() == Display("EURUSD.SPOTFWD"));
+    check(crec.asset_type() == Mnem("CURRENCY"));
+    check(crec.contr_type() == Mnem("SPOTFWD"));
+    check(crec.asset() == Mnem("EUR"));
+    check(crec.ccy() == Mnem("USD"));
+    check(fequal(crec.price_inc(), 0.0001));
+    check(fequal(crec.qty_inc(), 1e6));
+    check(crec.price_dp() == 4);
+    check(crec.pip_dp() == 4);
+    check(crec.qty_dp() == 0);
+    check(crec.min_lots() == 1);
+    check(crec.max_lots() == 10);
 }
 
 TEST_CASE(find_trader)

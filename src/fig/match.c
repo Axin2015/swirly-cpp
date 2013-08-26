@@ -18,7 +18,7 @@
 #include "match.h"
 
 #include "accnt.h"
-#include "market.h"
+#include "book.h"
 
 #include <dbr/conv.h>
 #include <dbr/journ.h>
@@ -52,17 +52,17 @@ free_matches(DbrPool pool, struct DbrSlNode* first)
 }
 
 /*
-  Stop Loss orders are stored in this market until the trigger price specified in the order is
+  Stop Loss orders are stored in this book until the trigger price specified in the order is
   reached or surpassed. When the trigger price is reached or surpassed, the order is released in the
-  Regular lot market.
+  Regular lot book.
 
   The stop loss condition is met under the following circumstances:
 
-  Sell order - A sell order in the Stop Loss market gets triggered when the last traded price in the
-  normal market reaches or falls below the trigger price of the order.
+  Sell order - A sell order in the Stop Loss book gets triggered when the last traded price in the
+  normal book reaches or falls below the trigger price of the order.
 
-  Buy order - A buy order in the Stop Loss market gets triggered when the last traded price in the
-  normal market reaches or exceeds the trigger price of the order.
+  Buy order - A buy order in the Stop Loss book gets triggered when the last traded price in the
+  normal book reaches or exceeds the trigger price of the order.
 */
 
 static inline DbrTicks
@@ -78,12 +78,11 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 static inline struct DbrPosn*
 lazy_posn(struct DbrOrder* order, DbrPool pool)
 {
-    struct DbrRec* mrec = order->market.rec;
-    return fig_accnt_posn(order->accnt.rec, mrec->market.instr.rec, mrec->market.settl_date, pool);
+    return fig_accnt_posn(order->accnt.rec, pool, order->contr.rec, order->settl_date);
 }
 
 static DbrBool
-match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrOrder* taker,
+match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book, struct DbrOrder* taker,
              const struct FigSide* side, int direct, struct DbrTrans* trans)
 {
     struct DbrQueue mq;
@@ -92,9 +91,8 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrO
     size_t count = 0;
     DbrLots taken = 0;
 
-    struct DbrRec* mrec = taker->market.rec;
-    struct DbrRec* irec = mrec->market.instr.rec;
-    DbrDate settl_date = mrec->market.settl_date;
+    struct DbrRec* crec = book->crec;
+    DbrDate settl_date = book->settl_date;
 
     struct DbrDlNode* node = fig_side_first_order(side),
         * end = fig_side_end_order(side);
@@ -111,7 +109,7 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrO
         if (!match)
             goto fail1;
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, irec, settl_date, pool);
+        struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, pool, crec, settl_date);
         if (!posn) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
@@ -152,8 +150,9 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrO
         taker_trade->order_rev = taker->rev + 1;
         taker_trade->trader.rec = taker->trader.rec;
         taker_trade->accnt.rec = taker->accnt.rec;
+        taker_trade->contr.rec = crec;
+        taker_trade->settl_date = settl_date;
         strncpy(taker_trade->ref, taker->ref, DBR_REF_MAX);
-        taker_trade->market.rec = mrec;
         taker_trade->cpty.rec = maker->accnt.rec;
         taker_trade->role = DBR_TAKER;
         taker_trade->action = taker->action;
@@ -172,8 +171,9 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrO
         maker_trade->order_rev = maker->rev + 1;
         maker_trade->trader.rec = maker->trader.rec;
         maker_trade->accnt.rec = maker->accnt.rec;
+        maker_trade->contr.rec = crec;
+        maker_trade->settl_date = settl_date;
         strncpy(maker_trade->ref, maker->ref, DBR_REF_MAX);
-        maker_trade->market.rec = mrec;
         maker_trade->cpty.rec = taker->accnt.rec;
         maker_trade->role = DBR_MAKER;
         maker_trade->action = maker->action;
@@ -194,7 +194,7 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrO
     struct DbrPosn* posn;
     // Avoid allocating position when there are no matches.
     if (count > 0) {
-        if (!(posn = fig_accnt_posn(taker->accnt.rec, irec, settl_date, pool)))
+        if (!(posn = fig_accnt_posn(taker->accnt.rec, pool, crec, settl_date)))
             goto fail1;
     } else
         posn = NULL;
@@ -213,7 +213,7 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market, struct DbrO
 }
 
 DBR_EXTERN DbrBool
-fig_match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market,
+fig_match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
     struct FigSide* side;
@@ -221,14 +221,14 @@ fig_match_orders(DbrPool pool, DbrJourn journ, struct FigMarket* market,
 
     if (taker->action == DBR_BUY) {
         // Paid when the taker lifts the offer.
-        side = &market->ask_side;
+        side = &book->ask_side;
         direct = DBR_PAID;
     } else {
         assert(taker->action == DBR_SELL);
         // Given when the taker hits the bid.
-        side = &market->bid_side;
+        side = &book->bid_side;
         direct = DBR_GIVEN;
     }
 
-    return match_orders(pool, journ, market, taker, side, direct, trans);
+    return match_orders(pool, journ, book, taker, side, direct, trans);
 }

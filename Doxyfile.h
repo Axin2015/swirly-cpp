@@ -109,23 +109,23 @@
  */
 
 /**
- * @defgroup Instr Instrument
+ * @defgroup Contr Contract
  * @ingroup Fig
  */
 
 /**
- * @defgroup Market Market
+ * @defgroup Book Book
  * @ingroup Fig
  */
 
 /**
- * @defgroup MarketSub Subscription
- * @ingroup Market
+ * @defgroup BookSub Subscription
+ * @ingroup Book
  */
 
 /**
  * @defgroup Side Side
- * @ingroup Market
+ * @ingroup Book
  */
 
 /**

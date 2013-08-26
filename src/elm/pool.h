@@ -262,7 +262,7 @@ elm_pool_alloc_sub(struct ElmPool* pool, DbrKey key)
     if (!node)
         return NULL;
     struct DbrSub* sub = &node->sub;
-    dbr_dlnode_init(&sub->market_node_);
+    dbr_dlnode_init(&sub->book_node_);
     dbr_rbnode_init(&sub->trader_node_, key);
     return sub;
 }
@@ -435,7 +435,7 @@ elm_pool_alloc_sub_(struct ElmPool* pool, DbrKey key, const char* file, int line
     if (!node)
         return NULL;
     struct DbrSub* sub = &node->sub;
-    dbr_dlnode_init(&sub->market_node_);
+    dbr_dlnode_init(&sub->book_node_);
     dbr_rbnode_init(&sub->trader_node_, key);
     return sub;
 }

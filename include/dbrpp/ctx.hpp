@@ -20,7 +20,7 @@
 
 #include <dbrpp/accnt.hpp>
 #include <dbrpp/except.hpp>
-#include <dbrpp/market.hpp>
+#include <dbrpp/book.hpp>
 #include <dbrpp/order.hpp>
 #include <dbrpp/trader.hpp>
 #include <dbrpp/trans.hpp>
@@ -156,8 +156,7 @@ public:
     }
 };
 
-typedef Recs<DBR_INSTR> InstrRecs;
-typedef Recs<DBR_MARKET> MarketRecs;
+typedef Recs<DBR_CONTR> ContrRecs;
 typedef Recs<DBR_TRADER> TraderRecs;
 typedef Recs<DBR_ACCNT> AccntRecs;
 
@@ -221,15 +220,10 @@ public:
     {
         return Recs<TypeN>(impl_);
     }
-    InstrRecs
-    irecs() const noexcept
+    ContrRecs
+    crecs() const noexcept
     {
-        return InstrRecs(impl_);
-    }
-    MarketRecs
-    mrecs() const noexcept
-    {
-        return MarketRecs(impl_);
+        return ContrRecs(impl_);
     }
     TraderRecs
     trecs() const noexcept
@@ -241,13 +235,13 @@ public:
     {
         return AccntRecs(impl_);
     }
-    Market
-    market(DbrRec& mrec) const
+    Book
+    book(DbrRec& crec, DbrDate settl_date) const
     {
-        DbrMarket market = dbr_ctx_market(impl_, &mrec);
-        if (!market)
+        DbrBook book = dbr_ctx_book(impl_, &crec, settl_date);
+        if (!book)
             throw_exception();
-        return Market(market);
+        return Book(book);
     }
     Trader
     trader(DbrRec& trec) const
@@ -266,11 +260,11 @@ public:
         return Accnt(accnt);
     }
     Order
-    submit(DbrRec& trec, DbrRec& arec, const char* ref, DbrRec& mrec, int action,
+    submit(DbrRec& trec, DbrRec& arec, DbrBook book, const char* ref, int action,
            DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
     {
         trans.reset();
-        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, ref, &mrec, action, ticks,
+        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, book, ref, action, ticks,
                                                lots, min, flags, trans.c_arg());
         if (!order)
             throw_exception();

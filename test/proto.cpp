@@ -21,51 +21,51 @@
 #include <dbr/types.h>
 
 static void
-set_instr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
-          const char* asset_type, const char* instr_type, const char* asset, const char* ccy,
+set_contr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
+          const char* asset_type, const char* contr_type, const char* asset, const char* ccy,
           int tick_numer, int tick_denom, int lot_numer, int lot_denom, int pip_dp,
           DbrLots min_lots, DbrLots max_lots)
 {
-    rec->type = DBR_INSTR;
+    rec->type = DBR_CONTR;
     rec->id = id;
     strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec->instr.display, display, DBR_DISPLAY_MAX);
-    strncpy(rec->instr.asset_type, asset_type, DBR_MNEM_MAX);
-    strncpy(rec->instr.instr_type, instr_type, DBR_MNEM_MAX);
-    strncpy(rec->instr.asset, asset, DBR_MNEM_MAX);
-    strncpy(rec->instr.ccy, ccy, DBR_MNEM_MAX);
-    rec->instr.tick_numer = tick_numer;
-    rec->instr.tick_denom = tick_denom;
-    rec->instr.lot_numer = lot_numer;
-    rec->instr.lot_denom = lot_denom;
-    rec->instr.pip_dp = pip_dp;
-    rec->instr.min_lots = min_lots;
-    rec->instr.max_lots = max_lots;
+    strncpy(rec->contr.display, display, DBR_DISPLAY_MAX);
+    strncpy(rec->contr.asset_type, asset_type, DBR_MNEM_MAX);
+    strncpy(rec->contr.contr_type, contr_type, DBR_MNEM_MAX);
+    strncpy(rec->contr.asset, asset, DBR_MNEM_MAX);
+    strncpy(rec->contr.ccy, ccy, DBR_MNEM_MAX);
+    rec->contr.tick_numer = tick_numer;
+    rec->contr.tick_denom = tick_denom;
+    rec->contr.lot_numer = lot_numer;
+    rec->contr.lot_denom = lot_denom;
+    rec->contr.pip_dp = pip_dp;
+    rec->contr.min_lots = min_lots;
+    rec->contr.max_lots = max_lots;
 }
 
-TEST_CASE(proto_instr)
+TEST_CASE(proto_contr)
 {
     struct DbrRec rec;
-    set_instr(&rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
+    set_contr(&rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
               "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
-    const size_t n = dbr_instr_len(&rec);
+    const size_t n = dbr_contr_len(&rec);
     char buf[n];
-    dbr_write_instr(buf, &rec);
+    dbr_write_contr(buf, &rec);
     memset(&rec, 0, sizeof(rec));
-    dbr_read_instr(buf, &rec);
+    dbr_read_contr(buf, &rec);
 
     check(rec.id == 1);
     check(sequal(rec.mnem, "EURUSD.SPOTFWD", DBR_MNEM_MAX));
-    check(sequal(rec.instr.display, "EURUSD.SPOTFWD", DBR_DISPLAY_MAX));
-    check(sequal(rec.instr.asset_type, "CURRENCY", DBR_MNEM_MAX));
-    check(sequal(rec.instr.instr_type, "SPOTFWD", DBR_MNEM_MAX));
-    check(sequal(rec.instr.asset, "EUR", DBR_MNEM_MAX));
-    check(sequal(rec.instr.ccy, "USD", DBR_MNEM_MAX));
-    check(rec.instr.tick_numer == 1);
-    check(rec.instr.tick_denom == 10000);
-    check(rec.instr.lot_numer == 1000000);
-    check(rec.instr.lot_denom == 1);
-    check(rec.instr.pip_dp == 4);
-    check(rec.instr.min_lots == 1);
-    check(rec.instr.max_lots == 10);
+    check(sequal(rec.contr.display, "EURUSD.SPOTFWD", DBR_DISPLAY_MAX));
+    check(sequal(rec.contr.asset_type, "CURRENCY", DBR_MNEM_MAX));
+    check(sequal(rec.contr.contr_type, "SPOTFWD", DBR_MNEM_MAX));
+    check(sequal(rec.contr.asset, "EUR", DBR_MNEM_MAX));
+    check(sequal(rec.contr.ccy, "USD", DBR_MNEM_MAX));
+    check(rec.contr.tick_numer == 1);
+    check(rec.contr.tick_denom == 10000);
+    check(rec.contr.lot_numer == 1000000);
+    check(rec.contr.lot_denom == 1);
+    check(rec.contr.pip_dp == 4);
+    check(rec.contr.min_lots == 1);
+    check(rec.contr.max_lots == 10);
 }

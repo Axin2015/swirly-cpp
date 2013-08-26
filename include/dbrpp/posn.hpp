@@ -44,10 +44,10 @@ public:
     {
         return AccntRec(*impl_.accnt.rec);
     }
-    InstrRec
-    irec() const noexcept
+    ContrRec
+    crec() const noexcept
     {
-        return InstrRec(*impl_.instr.rec);
+        return ContrRec(*impl_.contr.rec);
     }
     DbrDate
     settl_date() const noexcept
@@ -80,7 +80,7 @@ inline std::ostream&
 operator <<(std::ostream& os, Posn posn)
 {
     return os << "arec=" << posn.arec().mnem()
-              << ",irec=" << posn.irec().mnem()
+              << ",crec=" << posn.crec().mnem()
               << ",settl_date=" << posn.settl_date()
               << ",buy_licks=" << posn.buy_licks()
               << ",buy_lots=" << posn.buy_lots()

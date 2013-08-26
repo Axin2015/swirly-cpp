@@ -18,7 +18,7 @@
 #ifndef DBRPP_BEST_HPP
 #define DBRPP_BEST_HPP
 
-#include <dbr/market.h>
+#include <dbr/book.h>
 
 #include <iostream>
 
@@ -71,7 +71,7 @@ inline Best
 best(DbrRec& mrec)
 {
     Best best;
-    dbr_market_best(&mrec, best.c_arg());
+    dbr_book_best(&mrec, best.c_arg());
     return best;
 }
 } // dbr

@@ -418,8 +418,7 @@ dbr_pool_free_list(DbrPool pool, int type, struct DbrSlNode* first)
 {
     struct DbrSlNode* node = first;
     switch (type) {
-    case DBR_INSTR:
-    case DBR_MARKET:
+    case DBR_CONTR:
     case DBR_TRADER:
     case DBR_ACCNT:
         while (node) {
