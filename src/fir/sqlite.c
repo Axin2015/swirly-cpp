@@ -33,10 +33,10 @@
 #include <string.h>
 
 #define INSERT_ORDER_SQL                                                \
-    "INSERT INTO order_ (id, rev, status, trader, accnt, ref,"          \
-    " book, action, ticks, resd, exec, lots, min, flags,"             \
+    "INSERT INTO order_ (id, rev, status, trader, accnt, contr,"        \
+    " settl_date, ref, action, ticks, resd, exec, lots, min, flags,"    \
     " archive, created, modified)"                                      \
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
 
 #define UPDATE_ORDER_SQL                                                \
     "UPDATE order_ SET rev = ?, status = ?, resd = ?, exec = ?,"        \
@@ -49,9 +49,8 @@
 
 #define INSERT_TRADE_SQL                                                \
     "INSERT INTO trade (id, match, order_, order_rev, cpty, role,"      \
-    " action, ticks, resd, exec, lots, settl_date, archive, created,"   \
-    " modified)"                                                        \
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
+    " action, ticks, resd, exec, lots, archive, created, modified)"                                                        \
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
 
 #define ARCHIVE_TRADE_SQL                                               \
     "UPDATE trade SET archive = 1, modified = ?"                        \

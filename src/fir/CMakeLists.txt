@@ -1,7 +1,9 @@
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include")
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 
-FILE(GLOB fir_SOURCES "*.c")
+FILE(GLOB fir_SOURCES
+          sqlite.c
+          sqlite3.c)
 
 ADD_DEFINITIONS(-DSQLITE_THREADSAFE=0)
 
@@ -20,3 +22,8 @@ TARGET_LINK_LIBRARIES(fir_pic fig_pic dl)
 
 INSTALL(TARGETS fir_shared DESTINATION lib)
 INSTALL(TARGETS fir_static DESTINATION lib)
+
+ADD_EXECUTABLE(dbr_dump dump.cpp)
+TARGET_LINK_LIBRARIES(dbr_dump fir_static)
+
+INSTALL(TARGETS dbr_dump DESTINATION bin)
