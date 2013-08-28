@@ -27,8 +27,8 @@ fig_book_init(struct FigBook* book, DbrPool pool, struct DbrRec* crec, DbrDate s
 {
     book->crec = crec;
     book->settl_date = settl_date;
-    fig_side_init(&book->bid_side, pool);
-    fig_side_init(&book->ask_side, pool);
+    dbr_side_init(&book->bid_side, pool);
+    dbr_side_init(&book->ask_side, pool);
     dbr_list_init(&book->subs);
     const DbrKey key = fig_book_key(book);
     dbr_rbnode_init(&book->ctx_node_, key);
@@ -37,17 +37,17 @@ fig_book_init(struct FigBook* book, DbrPool pool, struct DbrRec* crec, DbrDate s
 DBR_EXTERN void
 fig_book_term(struct FigBook* book)
 {
-    fig_side_term(&book->bid_side);
-    fig_side_term(&book->ask_side);
+    dbr_side_term(&book->bid_side);
+    dbr_side_term(&book->ask_side);
     assert(dbr_list_empty(&book->subs));
 }
 
 DBR_EXTERN struct DbrBest*
 fig_book_best(DbrBook book, struct DbrBest* best)
 {
-    struct FigSide* side = &book->bid_side;
-    struct DbrRbNode* it = fig_side_first_level(side);
-    struct DbrRbNode* end = fig_side_end_level(side);
+    struct DbrSide* side = &book->bid_side;
+    struct DbrRbNode* it = dbr_side_first_level(side);
+    struct DbrRbNode* end = dbr_side_end_level(side);
     if (it != end) {
         struct DbrLevel* level = dbr_side_level_entry(it);
         best->bid_ticks = level->ticks;
@@ -58,8 +58,8 @@ fig_book_best(DbrBook book, struct DbrBest* best)
     }
 
     side = &book->ask_side;
-    it = fig_side_first_level(side);
-    end = fig_side_end_level(side);
+    it = dbr_side_first_level(side);
+    end = dbr_side_end_level(side);
     if (it != end) {
         struct DbrLevel* level = dbr_side_level_entry(it);
         best->ask_ticks = level->ticks;
@@ -83,13 +83,13 @@ dbr_book_settl_date(DbrBook book)
     return fig_book_settl_date(book);
 }
 
-DBR_API DbrSide
+DBR_API struct DbrSide*
 dbr_book_bid_side(DbrBook book)
 {
     return fig_book_bid_side(book);
 }
 
-DBR_API DbrSide
+DBR_API struct DbrSide*
 dbr_book_ask_side(DbrBook book)
 {
     return fig_book_ask_side(book);

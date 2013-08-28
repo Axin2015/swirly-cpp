@@ -18,25 +18,101 @@
 #ifndef DBR_SIDE_H
 #define DBR_SIDE_H
 
-#include <dbr/defs.h>
+#include <dbr/list.h>
+#include <dbr/pool.h>
+#include <dbr/tree.h>
 #include <dbr/types.h>
+
+#include <assert.h>
+#include <stdbool.h>
+
+/**
+ * @addtogroup Side
+ * @{
+ */
+
+struct DbrSide {
+    DbrPool pool;
+    struct DbrTree levels;
+    struct DbrList orders;
+    // Last trade information.
+    DbrTicks last_ticks;
+    DbrLots last_lots;
+    DbrMillis last_time;
+};
+
+DBR_API void
+dbr_side_init(struct DbrSide* side, DbrPool pool);
+
+// Levels associated with side are also freed.
+// Assumes that pointer is not null.
+
+DBR_API void
+dbr_side_term(struct DbrSide* side);
+
+/** @} */
 
 /**
  * @addtogroup SideOrder
  * @{
  */
 
-DBR_API struct DbrDlNode*
-dbr_side_first_order(DbrSide side);
-
-DBR_API struct DbrDlNode*
-dbr_side_last_order(DbrSide side);
-
-DBR_API struct DbrDlNode*
-dbr_side_end_order(DbrSide side);
+// Insert order without affecting revision information.
+// Assumes that order does not already belong to a side. I.e. it assumes that level is null.
+// Assumes that order-id and party-ref (if ref is not empty) are unique. The dbr_side_find_ref() can
+// be used to detect duplicate party-refs. Returns false if level allocation fails.
 
 DBR_API DbrBool
-dbr_side_empty_order(DbrSide side);
+dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order);
+
+// Internal housekeeping aside, the state of the order is not affected by this function.
+
+DBR_API void
+dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order);
+
+// Reduce residual lots by delta. If the resulting residual is zero, then the order is removed from
+// the side.
+
+DBR_API void
+dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now);
+
+DBR_API DbrBool
+dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now);
+
+static inline void
+dbr_side_cancel_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
+{
+    dbr_side_remove_order(side, order);
+    ++order->rev;
+    order->status = DBR_CANCELLED;
+    // Note that executed lots is not affected.
+    order->resd = 0;
+    order->modified = now;
+}
+
+static inline struct DbrDlNode*
+dbr_side_first_order(const struct DbrSide* side)
+{
+    return dbr_list_first(&side->orders);
+}
+
+static inline struct DbrDlNode*
+dbr_side_last_order(const struct DbrSide* side)
+{
+    return dbr_list_last(&side->orders);
+}
+
+static inline struct DbrDlNode*
+dbr_side_end_order(const struct DbrSide* side)
+{
+    return dbr_list_end(&side->orders);
+}
+
+static inline DbrBool
+dbr_side_empty_order(const struct DbrSide* side)
+{
+    return dbr_list_empty(&side->orders);
+}
 
 /** @} */
 
@@ -45,20 +121,35 @@ dbr_side_empty_order(DbrSide side);
  * @{
  */
 
-DBR_API struct DbrRbNode*
-dbr_side_find_level(DbrSide side, DbrTicks ticks);
+static inline struct DbrRbNode*
+dbr_side_find_level(const struct DbrSide* side, DbrIden id)
+{
+    return dbr_tree_find(&side->levels, id);
+}
 
-DBR_API struct DbrRbNode*
-dbr_side_first_level(DbrSide side);
+static inline struct DbrRbNode*
+dbr_side_first_level(const struct DbrSide* side)
+{
+    return dbr_tree_first(&side->levels);
+}
 
-DBR_API struct DbrRbNode*
-dbr_side_last_level(DbrSide side);
+static inline struct DbrRbNode*
+dbr_side_last_level(const struct DbrSide* side)
+{
+    return dbr_tree_last(&side->levels);
+}
 
-DBR_API struct DbrRbNode*
-dbr_side_end_level(DbrSide side);
+static inline struct DbrRbNode*
+dbr_side_end_level(const struct DbrSide* side)
+{
+    return dbr_tree_end(&side->levels);
+}
 
-DBR_API DbrBool
-dbr_side_empty_level(DbrSide side);
+static inline DbrBool
+dbr_side_empty_level(const struct DbrSide* side)
+{
+    return dbr_tree_empty(&side->levels);
+}
 
 /** @} */
 
@@ -67,14 +158,23 @@ dbr_side_empty_level(DbrSide side);
  * @{
  */
 
-DBR_API DbrTicks
-dbr_side_last_ticks(DbrSide side);
+static inline DbrTicks
+dbr_side_last_ticks(const struct DbrSide* side)
+{
+    return side->last_ticks;
+}
 
-DBR_API DbrLots
-dbr_side_last_lots(DbrSide side);
+static inline DbrLots
+dbr_side_last_lots(const struct DbrSide* side)
+{
+    return side->last_lots;
+}
 
-DBR_API DbrMillis
-dbr_side_last_time(DbrSide side);
+static inline DbrMillis
+dbr_side_last_time(const struct DbrSide* side)
+{
+    return side->last_time;
+}
 
 /** @} */
 

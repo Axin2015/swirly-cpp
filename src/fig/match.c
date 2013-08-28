@@ -83,7 +83,7 @@ lazy_posn(struct DbrOrder* order, DbrPool pool)
 
 static DbrBool
 match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book, struct DbrOrder* taker,
-             const struct FigSide* side, int direct, struct DbrTrans* trans)
+             const struct DbrSide* side, int direct, struct DbrTrans* trans)
 {
     struct DbrQueue mq;
     dbr_queue_init(&mq);
@@ -94,8 +94,8 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book, struct DbrOrder
     struct DbrRec* crec = book->crec;
     DbrDate settl_date = book->settl_date;
 
-    struct DbrDlNode* node = fig_side_first_order(side),
-        * end = fig_side_end_order(side);
+    struct DbrDlNode* node = dbr_side_first_order(side),
+        * end = dbr_side_end_order(side);
     for (; taken < taker->resd && node != end; node = node->next) {
 
         struct DbrOrder* maker = dbr_side_order_entry(node);
@@ -216,7 +216,7 @@ DBR_EXTERN DbrBool
 fig_match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
-    struct FigSide* side;
+    struct DbrSide* side;
     int direct;
 
     if (taker->action == DBR_BUY) {

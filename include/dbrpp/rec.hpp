@@ -30,30 +30,30 @@ namespace dbr {
 
 class RecBase {
 protected:
-    DbrRec& impl_;
+    DbrRec* impl_;
     // Non-virtual is protected.
     ~RecBase() noexcept
     {
     }
     explicit
     RecBase(DbrRec& impl) noexcept
-        : impl_(impl)
+        : impl_(&impl)
     {
     }
 public:
     operator DbrRec&() const noexcept
     {
-        return impl_;
+        return *impl_;
     }
     DbrRec*
     c_arg() noexcept
     {
-        return &impl_;
+        return impl_;
     }
     bool
     operator ==(const RecBase& rhs) const noexcept
     {
-        return impl_.type == rhs.impl_.type && impl_.id == rhs.impl_.id;
+        return impl_->type == rhs.impl_->type && impl_->id == rhs.impl_->id;
     }
     bool
     operator !=(const RecBase& rhs) const noexcept
@@ -63,17 +63,17 @@ public:
     int
     type() const noexcept
     {
-        return impl_.type;
+        return impl_->type;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_.id;
+        return impl_->id;
     }
     Mnem
     mnem() const noexcept
     {
-        return Mnem(impl_.mnem);
+        return Mnem(impl_->mnem);
     }
 };
 
@@ -87,77 +87,77 @@ public:
     Display
     display() const noexcept
     {
-        return Display(impl_.contr.display);
+        return Display(impl_->contr.display);
     }
     Mnem
     asset_type() const noexcept
     {
-        return Mnem(impl_.contr.asset_type);
+        return Mnem(impl_->contr.asset_type);
     }
     Mnem
     asset() const noexcept
     {
-        return Mnem(impl_.contr.asset);
+        return Mnem(impl_->contr.asset);
     }
     Mnem
     ccy() const noexcept
     {
-        return Mnem(impl_.contr.ccy);
+        return Mnem(impl_->contr.ccy);
     }
     int
     tick_numer() const noexcept
     {
-        return impl_.contr.tick_numer;
+        return impl_->contr.tick_numer;
     }
     int
     tick_denom() const noexcept
     {
-        return impl_.contr.tick_denom;
+        return impl_->contr.tick_denom;
     }
     double
     price_inc() const noexcept
     {
-        return impl_.contr.price_inc;
+        return impl_->contr.price_inc;
     }
     int
     lot_numer() const noexcept
     {
-        return impl_.contr.lot_numer;
+        return impl_->contr.lot_numer;
     }
     int
     lot_denom() const noexcept
     {
-        return impl_.contr.lot_denom;
+        return impl_->contr.lot_denom;
     }
     double
     qty_inc() const noexcept
     {
-        return impl_.contr.qty_inc;
+        return impl_->contr.qty_inc;
     }
     int
     price_dp() const noexcept
     {
-        return impl_.contr.price_dp;
+        return impl_->contr.price_dp;
     }
     int
     pip_dp() const noexcept
     {
-        return impl_.contr.pip_dp;
+        return impl_->contr.pip_dp;
     }
     int
     qty_dp() const noexcept
     {
-        return impl_.contr.qty_dp;
+        return impl_->contr.qty_dp;
     }
     DbrLots
     min_lots() const noexcept
     {
-        return impl_.contr.min_lots;
+        return impl_->contr.min_lots;
     }
     DbrLots
     max_lots() const noexcept
     {
-        return impl_.contr.max_lots;
+        return impl_->contr.max_lots;
     }
     // Conversion functions.
     DbrLots
@@ -242,12 +242,12 @@ public:
     Display
     display() const noexcept
     {
-        return Display(impl_.trader.display);
+        return Display(impl_->trader.display);
     }
     Email
     email() const noexcept
     {
-        return Email(impl_.trader.email);
+        return Email(impl_->trader.email);
     }
 };
 
@@ -291,12 +291,12 @@ public:
     Display
     display() const noexcept
     {
-        return Display(impl_.accnt.display);
+        return Display(impl_->accnt.display);
     }
     Email
     email() const noexcept
     {
-        return Email(impl_.accnt.email);
+        return Email(impl_->accnt.email);
     }
 };
 

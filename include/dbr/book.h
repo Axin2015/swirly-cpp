@@ -35,10 +35,10 @@ dbr_book_crec(DbrBook book);
 DBR_API DbrDate
 dbr_book_settl_date(DbrBook book);
 
-DBR_API DbrSide
+DBR_API struct DbrSide*
 dbr_book_bid_side(DbrBook book);
 
-DBR_API DbrSide
+DBR_API struct DbrSide*
 dbr_book_ask_side(DbrBook book);
 
 DBR_API struct DbrBest*

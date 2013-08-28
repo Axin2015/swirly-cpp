@@ -68,12 +68,12 @@ public:
     Side
     bid_side() const noexcept
     {
-        return Side(dbr_book_bid_side(impl_));
+        return Side(*dbr_book_bid_side(impl_));
     }
     Side
     ask_side() const noexcept
     {
-        return Side(dbr_book_ask_side(impl_));
+        return Side(*dbr_book_ask_side(impl_));
     }
 };
 

@@ -112,12 +112,6 @@ struct DbrBest {
 };
 
 /**
- * @addtogroup Side
- */
-
-typedef struct FigSide* DbrSide;
-
-/**
  * @addtogroup Trader
  */
 

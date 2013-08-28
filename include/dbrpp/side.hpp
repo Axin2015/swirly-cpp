@@ -44,7 +44,7 @@ class SideOrders {
             return dbr_side_order_entry(const_cast<Node*>(node));
         }
     };
-    DbrSide side_;
+    DbrSide* side_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -78,8 +78,8 @@ public:
     typedef SizeType size_type;
 
     explicit
-    SideOrders(DbrSide side) noexcept
-    : side_(side)
+    SideOrders(DbrSide& side) noexcept
+    : side_(&side)
     {
     }
     void
@@ -187,7 +187,7 @@ class SideLevels {
             return dbr_side_level_entry(const_cast<Node*>(node));
         }
     };
-    DbrSide side_;
+    DbrSide* side_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -221,8 +221,8 @@ public:
     typedef SizeType size_type;
 
     explicit
-    SideLevels(DbrSide side) noexcept
-    : side_(side)
+    SideLevels(DbrSide& side) noexcept
+    : side_(&side)
     {
     }
     void
@@ -330,27 +330,31 @@ public:
 };
 
 class Side {
-    DbrSide impl_;
+    DbrSide* impl_;
 public:
     explicit
-    Side(DbrSide impl) noexcept
-        : impl_(impl)
+    Side(DbrSide& impl) noexcept
+        : impl_(&impl)
     {
     }
-    explicit
-    operator DbrSide() const noexcept
+    operator DbrSide&() const noexcept
+    {
+        return *impl_;
+    }
+    DbrSide*
+    c_arg() const noexcept
     {
         return impl_;
     }
     SideOrders
     orders() const noexcept
     {
-        return SideOrders(impl_);
+        return SideOrders(*impl_);
     }
     SideLevels
     levels() const noexcept
     {
-        return SideLevels(impl_);
+        return SideLevels(*impl_);
     }
     DbrTicks
     last_ticks() const noexcept

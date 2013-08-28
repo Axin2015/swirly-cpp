@@ -18,13 +18,13 @@
 #ifndef FIG_BOOK_H
 #define FIG_BOOK_H
 
-#include <fig/side.h>
+#include <dbr/side.h>
 
 struct FigBook {
     struct DbrRec* crec;
     DbrDate settl_date;
-    struct FigSide bid_side;
-    struct FigSide ask_side;
+    struct DbrSide bid_side;
+    struct DbrSide ask_side;
     struct DbrList subs;
     struct DbrRbNode ctx_node_;
 };
@@ -35,7 +35,7 @@ fig_book_init(struct FigBook* book, DbrPool pool, struct DbrRec* crec, DbrDate s
 DBR_EXTERN void
 fig_book_term(struct FigBook* book);
 
-static inline struct FigSide*
+static inline struct DbrSide*
 fig_book_side(struct FigBook* book, int action)
 {
     return action == DBR_BUY ? &book->bid_side : &book->ask_side;
@@ -44,33 +44,33 @@ fig_book_side(struct FigBook* book, int action)
 static inline DbrBool
 fig_book_insert(struct FigBook* book, struct DbrOrder* order)
 {
-    return fig_side_insert_order(fig_book_side(book, order->action), order);
+    return dbr_side_insert_order(fig_book_side(book, order->action), order);
 }
 
 static inline void
 fig_book_remove(struct FigBook* book, struct DbrOrder* order)
 {
     assert(order);
-    fig_side_remove_order(fig_book_side(book, order->action), order);
+    dbr_side_remove_order(fig_book_side(book, order->action), order);
 }
 
 static inline void
 fig_book_take(struct FigBook* book, struct DbrOrder* order, DbrLots delta, DbrMillis now)
 {
-    fig_side_take_order(fig_book_side(book, order->action), order, delta, now);
+    dbr_side_take_order(fig_book_side(book, order->action), order, delta, now);
 }
 
 static inline DbrBool
 fig_book_revise(struct FigBook* book, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
-    return fig_side_revise_order(fig_book_side(book, order->action), order, lots, now);
+    return dbr_side_revise_order(fig_book_side(book, order->action), order, lots, now);
 }
 
 static inline void
 fig_book_cancel(struct FigBook* book, struct DbrOrder* order, DbrMillis now)
 {
     assert(order);
-    fig_side_cancel_order(fig_book_side(book, order->action), order, now);
+    dbr_side_cancel_order(fig_book_side(book, order->action), order, now);
 }
 
 static inline void
@@ -104,13 +104,13 @@ fig_book_settl_date(struct FigBook* book)
     return book->settl_date;
 }
 
-static inline struct FigSide*
+static inline struct DbrSide*
 fig_book_bid_side(struct FigBook* book)
 {
     return &book->bid_side;
 }
 
-static inline struct FigSide*
+static inline struct DbrSide*
 fig_book_ask_side(struct FigBook* book)
 {
     return &book->ask_side;
