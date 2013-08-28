@@ -38,7 +38,7 @@ TEST_CASE(submit)
     auto ait = ctx.arecs().find("DBRA");
     check(ait != ctx.arecs().end());
 
-    auto cit = ctx.crecs().find("EURUSD.SPOTFWD");
+    auto cit = ctx.crecs().find("EURUSD");
     check(cit != ctx.crecs().end());
 
     auto book = ctx.book(ContrRec(*cit), 20130824);

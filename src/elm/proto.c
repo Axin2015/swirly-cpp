@@ -23,7 +23,7 @@
 
 #include <stdlib.h> // abort()
 
-static const char CONTR_FORMAT[] = "lmsmmmmiiiiill";
+static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
 static const char ORDER_FORMAT[] = "liillllsillllllll";
@@ -36,10 +36,10 @@ dbr_contr_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(CONTR_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->contr.display,
-                        rec->contr.asset_type, rec->contr.contr_type, rec->contr.asset,
-                        rec->contr.ccy, rec->contr.tick_numer, rec->contr.tick_denom,
-                        rec->contr.lot_numer, rec->contr.lot_denom, rec->contr.pip_dp,
-                        rec->contr.min_lots, rec->contr.max_lots);
+                        rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
+                        rec->contr.tick_numer, rec->contr.tick_denom, rec->contr.lot_numer,
+                        rec->contr.lot_denom, rec->contr.pip_dp, rec->contr.min_lots,
+                        rec->contr.max_lots);
 }
 
 DBR_API char*
@@ -47,10 +47,10 @@ dbr_write_contr(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, CONTR_FORMAT,
                      rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->contr.display,
-                     rec->contr.asset_type, rec->contr.contr_type, rec->contr.asset,
-                     rec->contr.ccy, rec->contr.tick_numer, rec->contr.tick_denom,
-                     rec->contr.lot_numer, rec->contr.lot_denom, rec->contr.pip_dp,
-                     rec->contr.min_lots, rec->contr.max_lots);
+                     rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
+                     rec->contr.tick_numer, rec->contr.tick_denom, rec->contr.lot_numer,
+                     rec->contr.lot_denom, rec->contr.pip_dp, rec->contr.min_lots,
+                     rec->contr.max_lots);
 }
 
 DBR_API const char*
@@ -58,10 +58,10 @@ dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
     return dbr_unpackf(buf, CONTR_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->contr.display,
-                       rec->contr.asset_type, rec->contr.contr_type, rec->contr.asset,
-                       rec->contr.ccy, &rec->contr.tick_numer, &rec->contr.tick_denom,
-                       &rec->contr.lot_numer, &rec->contr.lot_denom, &rec->contr.pip_dp,
-                       &rec->contr.min_lots, &rec->contr.max_lots);
+                       rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
+                       &rec->contr.tick_numer, &rec->contr.tick_denom, &rec->contr.lot_numer,
+                       &rec->contr.lot_denom, &rec->contr.pip_dp, &rec->contr.min_lots,
+                       &rec->contr.max_lots);
 }
 
 DBR_API size_t

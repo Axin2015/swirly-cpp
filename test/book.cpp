@@ -34,7 +34,7 @@ TEST_CASE(book_id)
     Model model(pool);
     Ctx ctx(pool, &journ, &model);
 
-    ContrRecs::Iterator it = ctx.crecs().find("EURUSD.SPOTFWD");
+    ContrRecs::Iterator it = ctx.crecs().find("EURUSD");
     check(it != ctx.crecs().end());
 
     ContrRec crec(*it);

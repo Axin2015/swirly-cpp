@@ -29,9 +29,8 @@ using namespace std;
 namespace {
 
 void
-set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
-          const char* asset_type, const char* contr_type, const char* asset,
-          const char* ccy, int tick_numer, int tick_denom, int lot_numer,
+set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display, const char* asset_type,
+          const char* asset, const char* ccy, int tick_numer, int tick_denom, int lot_numer,
           int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots) noexcept
 {
     rec.type = DBR_CONTR;
@@ -39,7 +38,6 @@ set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec.contr.display, display, DBR_DISPLAY_MAX);
     strncpy(rec.contr.asset_type, asset_type, DBR_MNEM_MAX);
-    strncpy(rec.contr.contr_type, contr_type, DBR_MNEM_MAX);
     strncpy(rec.contr.asset, asset, DBR_MNEM_MAX);
     strncpy(rec.contr.ccy, ccy, DBR_MNEM_MAX);
     rec.contr.price_inc = dbr_fract_to_real(tick_numer, tick_denom);
@@ -60,14 +58,14 @@ read_contr(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
-    set_contr(*rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
-              "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
+    set_contr(*rec, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
+              1, 10000, 1000000, 1, 4, 1, 10);
     dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
-    set_contr(*rec, 2, "GBPUSD.SPOTFWD", "GBPUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
-              "GBP", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
+    set_contr(*rec, 2, "GBPUSD", "GBPUSD", "CURRENCY", "GBP", "USD",
+              1, 10000, 1000000, 1, 4, 1, 10);
     dbr_queue_push(&rq, &rec->model_node_);
     ++size;
 

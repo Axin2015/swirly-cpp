@@ -22,16 +22,15 @@
 
 static void
 set_contr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
-          const char* asset_type, const char* contr_type, const char* asset, const char* ccy,
-          int tick_numer, int tick_denom, int lot_numer, int lot_denom, int pip_dp,
-          DbrLots min_lots, DbrLots max_lots)
+          const char* asset_type, const char* asset, const char* ccy, int tick_numer,
+          int tick_denom, int lot_numer, int lot_denom, int pip_dp, DbrLots min_lots,
+          DbrLots max_lots)
 {
     rec->type = DBR_CONTR;
     rec->id = id;
     strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec->contr.display, display, DBR_DISPLAY_MAX);
     strncpy(rec->contr.asset_type, asset_type, DBR_MNEM_MAX);
-    strncpy(rec->contr.contr_type, contr_type, DBR_MNEM_MAX);
     strncpy(rec->contr.asset, asset, DBR_MNEM_MAX);
     strncpy(rec->contr.ccy, ccy, DBR_MNEM_MAX);
     rec->contr.tick_numer = tick_numer;
@@ -46,8 +45,8 @@ set_contr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
 TEST_CASE(proto_contr)
 {
     struct DbrRec rec;
-    set_contr(&rec, 1, "EURUSD.SPOTFWD", "EURUSD.SPOTFWD", "CURRENCY", "SPOTFWD",
-              "EUR", "USD", 1, 10000, 1000000, 1, 4, 1, 10);
+    set_contr(&rec, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
+              1, 10000, 1000000, 1, 4, 1, 10);
     const size_t n = dbr_contr_len(&rec);
     char buf[n];
     dbr_write_contr(buf, &rec);
@@ -55,10 +54,9 @@ TEST_CASE(proto_contr)
     dbr_read_contr(buf, &rec);
 
     check(rec.id == 1);
-    check(sequal(rec.mnem, "EURUSD.SPOTFWD", DBR_MNEM_MAX));
-    check(sequal(rec.contr.display, "EURUSD.SPOTFWD", DBR_DISPLAY_MAX));
+    check(sequal(rec.mnem, "EURUSD", DBR_MNEM_MAX));
+    check(sequal(rec.contr.display, "EURUSD", DBR_DISPLAY_MAX));
     check(sequal(rec.contr.asset_type, "CURRENCY", DBR_MNEM_MAX));
-    check(sequal(rec.contr.contr_type, "SPOTFWD", DBR_MNEM_MAX));
     check(sequal(rec.contr.asset, "EUR", DBR_MNEM_MAX));
     check(sequal(rec.contr.ccy, "USD", DBR_MNEM_MAX));
     check(rec.contr.tick_numer == 1);

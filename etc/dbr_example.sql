@@ -34,15 +34,6 @@ INSERT INTO asset_type (mnem) VALUES ('GOVERNMENT')
 INSERT INTO asset_type (mnem) VALUES ('INDEX')
 ;
 
-INSERT INTO contr_type (mnem) VALUES ('SPOTFWD')
-;
-INSERT INTO contr_type (mnem) VALUES ('FUTURE')
-;
-INSERT INTO contr_type (mnem) VALUES ('OPTION')
-;
-INSERT INTO contr_type (mnem) VALUES ('SWAP')
-;
-
 INSERT INTO asset (mnem, display, type)
         VALUES ('EUR', 'Euro Member Countries, Euro', 'CURRENCY')
 ;
@@ -120,142 +111,115 @@ INSERT INTO asset (mnem, display, type)
         VALUES ('ZW', 'Wheat', 'COMMODITY')
 ;
 
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURUSD.SPOTFWD', 'EURUSD.SPOTFWD', 'SPOTFWD', 'EUR', 'USD',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('EURUSD', 'EURUSD', 'EUR', 'USD', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('GBPUSD.SPOTFWD', 'GBPUSD.SPOTFWD', 'SPOTFWD', 'GBP', 'USD',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('GBPUSD', 'GBPUSD', 'GBP', 'USD', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('AUDUSD.SPOTFWD', 'AUDUSD.SPOTFWD', 'SPOTFWD', 'AUD', 'USD',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('AUDUSD', 'AUDUSD', 'AUD', 'USD', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('NZDUSD.SPOTFWD', 'NZDUSD.SPOTFWD', 'SPOTFWD', 'NZD', 'USD',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('NZDUSD', 'NZDUSD', 'NZD', 'USD', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDCAD.SPOTFWD', 'USDCAD.SPOTFWD', 'SPOTFWD', 'USD', 'CAD',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('USDCAD', 'USDCAD', 'USD', 'CAD', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDCHF.SPOTFWD', 'USDCHF.SPOTFWD', 'SPOTFWD', 'USD', 'CHF',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('USDCHF', 'USDCHF', 'USD', 'CHF', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDTRY.SPOTFWD', 'USDTRY.SPOTFWD', 'SPOTFWD', 'USD', 'TRY',
-        1, 1000, 1000000, 1, 4, 1, 10)
+        VALUES ('USDTRY', 'USDTRY', 'USD', 'TRY', 1, 1000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDSGD.SPOTFWD', 'USDSGD.SPOTFWD', 'SPOTFWD', 'USD', 'SGD',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('USDSGD', 'USDSGD', 'USD', 'SGD', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURRON.SPOTFWD', 'EURRON.SPOTFWD', 'SPOTFWD', 'EUR', 'RON',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('EURRON', 'EURRON', 'EUR', 'RON', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURPLN.SPOTFWD', 'EURPLN.SPOTFWD', 'SPOTFWD', 'EUR', 'PLN',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('EURPLN', 'EURPLN', 'EUR', 'PLN', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDILS.SPOTFWD', 'USDILS.SPOTFWD', 'SPOTFWD', 'USD', 'ILS',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('USDILS', 'USDILS', 'USD', 'ILS', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURDKK.SPOTFWD', 'EURDKK.SPOTFWD', 'SPOTFWD', 'EUR', 'DKK',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('EURDKK', 'EURDKK', 'EUR', 'DKK', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDZAR.SPOTFWD', 'USDZAR.SPOTFWD', 'SPOTFWD', 'USD', 'ZAR',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('USDZAR', 'USDZAR', 'USD', 'ZAR', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURNOK.SPOTFWD', 'EURNOK.SPOTFWD', 'SPOTFWD', 'EUR', 'NOK',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('EURNOK', 'EURNOK', 'EUR', 'NOK', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURSEK.SPOTFWD', 'EURSEK.SPOTFWD', 'SPOTFWD', 'EUR', 'SEK',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('EURSEK', 'EURSEK', 'EUR', 'SEK', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDHKD.SPOTFWD', 'USDHKD.SPOTFWD', 'SPOTFWD', 'USD', 'HKD',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('USDHKD', 'USDHKD', 'USD', 'HKD', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDMXN.SPOTFWD', 'USDMXN.SPOTFWD', 'SPOTFWD', 'USD', 'MXN',
-        1, 1000, 1000000, 1, 3, 1, 10)
+        VALUES ('USDMXN', 'USDMXN', 'USD', 'MXN', 1, 1000, 1000000, 1, 3, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURCZK.SPOTFWD', 'EURCZK.SPOTFWD', 'SPOTFWD', 'EUR', 'CZK',
-        1, 100, 1000000, 1, 2, 1, 10)
+        VALUES ('EURCZK', 'EURCZK', 'EUR', 'CZK', 1, 100, 1000000, 1, 2, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDTHB.SPOTFWD', 'USDTHB.SPOTFWD', 'SPOTFWD', 'USD', 'THB',
-        1, 100, 1000000, 1, 2, 1, 10)
+        VALUES ('USDTHB', 'USDTHB', 'USD', 'THB', 1, 100, 1000000, 1, 2, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('USDJPY.SPOTFWD', 'USDJPY.SPOTFWD', 'SPOTFWD', 'USD', 'JPY',
-        1, 100, 1000000, 1, 2, 1, 10)
+        VALUES ('USDJPY', 'USDJPY', 'USD', 'JPY', 1, 100, 1000000, 1, 2, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURHUF.SPOTFWD', 'EURHUF.SPOTFWD', 'SPOTFWD', 'EUR', 'HUF',
-        1, 100, 1000000, 1, 2, 1, 10)
+        VALUES ('EURHUF', 'EURHUF', 'EUR', 'HUF', 1, 100, 1000000, 1, 2, 1, 10)
 ;
 -- Crosses.
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURGBP.SPOTFWD', 'EURGBP.SPOTFWD', 'SPOTFWD', 'EUR', 'GBP',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('EURGBP', 'EURGBP', 'EUR', 'GBP', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURCHF.SPOTFWD', 'EURCHF.SPOTFWD', 'SPOTFWD', 'EUR', 'CHF',
-        1, 10000, 1000000, 1, 4, 1, 10)
+        VALUES ('EURCHF', 'EURCHF', 'EUR', 'CHF', 1, 10000, 1000000, 1, 4, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('EURJPY.SPOTFWD', 'EURJPY.SPOTFWD', 'SPOTFWD', 'EUR', 'JPY',
-        1, 100, 1000000, 1, 2, 1, 10)
+        VALUES ('EURJPY', 'EURJPY', 'EUR', 'JPY', 1, 100, 1000000, 1, 2, 1, 10)
 ;
 
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('ZC.FUTURE', 'ZC.FUTURE', 'FUTURE', 'ZC', 'USD',
-        1, 400, 5000, 1, 2, 1, 10)
+        VALUES ('ZC', 'ZC', 'ZC', 'USD', 1, 400, 5000, 1, 2, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('ZS.FUTURE', 'ZS.FUTURE', 'FUTURE', 'ZS', 'USD',
-        1, 400, 5000, 1, 2, 1, 10)
+        VALUES ('ZS', 'ZS', 'ZS', 'USD', 1, 400, 5000, 1, 2, 1, 10)
 ;
-INSERT INTO contr (mnem, display, type, asset, ccy, tick_numer,
+INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots)
-        VALUES ('ZW.FUTURE', 'ZW.FUTURE', 'FUTURE', 'ZW', 'USD',
-        1, 400, 5000, 1, 2, 1, 10)
+        VALUES ('ZW', 'ZW', 'ZW', 'USD', 1, 400, 5000, 1, 2, 1, 10)
 ;
 
 INSERT INTO trader (mnem, display, email)

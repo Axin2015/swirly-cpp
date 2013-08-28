@@ -71,14 +71,13 @@ TEST_CASE(find_contr)
 
     check(ctx.crecs().find("BAD") == ctx.crecs().end());
 
-    ContrRec crec = get_rec_mnem<DBR_CONTR>(ctx, "EURUSD.SPOTFWD");
+    ContrRec crec = get_rec_mnem<DBR_CONTR>(ctx, "EURUSD");
     check(crec == get_rec_id<DBR_CONTR>(ctx, crec.id()));
-    check(crec.mnem() == Mnem("EURUSD.SPOTFWD"));
+    check(crec.mnem() == Mnem("EURUSD"));
 
     // Body.
-    check(crec.display() == Display("EURUSD.SPOTFWD"));
+    check(crec.display() == Display("EURUSD"));
     check(crec.asset_type() == Mnem("CURRENCY"));
-    check(crec.contr_type() == Mnem("SPOTFWD"));
     check(crec.asset() == Mnem("EUR"));
     check(crec.ccy() == Mnem("USD"));
     check(fequal(crec.price_inc(), 0.0001));

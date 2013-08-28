@@ -154,7 +154,6 @@ struct DbrRec {
         struct {
             DbrDisplay display;
             DbrMnem asset_type;
-            DbrMnem contr_type;
             DbrMnem asset;
             DbrMnem ccy;
             int tick_numer;

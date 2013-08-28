@@ -78,11 +78,6 @@ CREATE TABLE asset_type (
 )
 ;
 
-CREATE TABLE contr_type (
-  mnem TEXT PRIMARY KEY
-)
-;
-
 CREATE TABLE asset (
   mnem TEXT PRIMARY KEY,
   display TEXT NOT NULL UNIQUE,
@@ -94,7 +89,6 @@ CREATE TABLE contr (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL UNIQUE,
   display TEXT NOT NULL UNIQUE,
-  type TEXT NOT NULL REFERENCES contr_type (mnem),
   asset TEXT NOT NULL REFERENCES asset (mnem),
   ccy TEXT NOT NULL REFERENCES asset (mnem),
   tick_numer INTEGER NOT NULL,
@@ -113,7 +107,6 @@ CREATE VIEW contr_v AS
   c.mnem,
   c.display,
   a.type asset_type,
-  c.type contr_type,
   c.asset,
   c.ccy,
   c.tick_numer,

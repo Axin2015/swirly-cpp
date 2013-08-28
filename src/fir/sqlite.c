@@ -57,9 +57,8 @@
     " WHERE id = ?"
 
 #define SELECT_CONTR_SQL                                                \
-    "SELECT id, mnem, display, asset_type, contr_type, asset, ccy,"     \
-    " tick_numer, tick_denom, lot_numer, lot_denom, pip_dp, min_lots,"  \
-    " max_lots"                                                         \
+    "SELECT id, mnem, display, asset_type, asset, ccy, tick_numer,"     \
+    " tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots"     \
     " FROM contr_v"
 
 #define SELECT_TRADER_SQL                                    \
@@ -434,7 +433,6 @@ select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
         MNEM,
         DISPLAY,
         ASSET_TYPE,
-        CONTR_TYPE,
         ASSET,
         CCY,
         TICK_NUMER,
@@ -475,8 +473,6 @@ select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
                     (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
             strncpy(rec->contr.asset_type,
                     (const char*)sqlite3_column_text(stmt, ASSET_TYPE), DBR_MNEM_MAX);
-            strncpy(rec->contr.contr_type,
-                    (const char*)sqlite3_column_text(stmt, CONTR_TYPE), DBR_MNEM_MAX);
             strncpy(rec->contr.asset,
                     (const char*)sqlite3_column_text(stmt, ASSET), DBR_MNEM_MAX);
             strncpy(rec->contr.ccy,
@@ -504,13 +500,12 @@ select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
             rec->contr.max_lots = sqlite3_column_int64(stmt, MAX_LOTS);
 
             dbr_log_debug3("contr: id=%ld,mnem=%.16s,display=%.64s,asset_type=%.16s,"
-                           "contr_type=%.16s,asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,"
-                           "price_dp=%d,pip_dp=%d,qty_dp=%d,min_lots=%ld,max_lots=%ld",
+                           "asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,price_dp=%d,"
+                           "pip_dp=%d,qty_dp=%d,min_lots=%ld,max_lots=%ld",
                            rec->id, rec->mnem, rec->contr.display, rec->contr.asset_type,
-                           rec->contr.contr_type, rec->contr.asset, rec->contr.ccy,
-                           rec->contr.price_inc, rec->contr.qty_inc, rec->contr.price_dp,
-                           rec->contr.pip_dp, rec->contr.qty_dp, rec->contr.min_lots,
-                           rec->contr.max_lots);
+                           rec->contr.asset, rec->contr.ccy, rec->contr.price_inc,
+                           rec->contr.qty_inc, rec->contr.price_dp, rec->contr.pip_dp,
+                           rec->contr.qty_dp, rec->contr.min_lots, rec->contr.max_lots);
 
             dbr_queue_push(&rq, &rec->model_node_);
             ++size;

@@ -95,11 +95,6 @@ public:
         return Mnem(impl_.contr.asset_type);
     }
     Mnem
-    contr_type() const noexcept
-    {
-        return Mnem(impl_.contr.contr_type);
-    }
-    Mnem
     asset() const noexcept
     {
         return Mnem(impl_.contr.asset);
@@ -201,7 +196,6 @@ operator <<(std::ostream& os, ContrRec crec)
               << ",mnem=" << crec.mnem()
               << ",display=" << crec.display()
               << ",asset_type=" << crec.asset_type()
-              << ",contr_type=" << crec.contr_type()
               << ",asset=" << crec.asset()
               << ",ccy=" << crec.ccy()
               << ",tick_numer=" << crec.tick_numer()
