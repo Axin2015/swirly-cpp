@@ -21,10 +21,9 @@
 #include <dbr/types.h>
 
 static void
-set_contr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
-          const char* asset_type, const char* asset, const char* ccy, int tick_numer,
-          int tick_denom, int lot_numer, int lot_denom, int pip_dp, DbrLots min_lots,
-          DbrLots max_lots)
+set_contr(DbrRec* rec, DbrIden id, const char* mnem, const char* display, const char* asset_type,
+          const char* asset, const char* ccy, int tick_numer, int tick_denom, int lot_numer,
+          int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots)
 {
     rec->type = DBR_CONTR;
     rec->id = id;
@@ -44,7 +43,7 @@ set_contr(struct DbrRec* rec, DbrIden id, const char* mnem, const char* display,
 
 TEST_CASE(proto_contr)
 {
-    struct DbrRec rec;
+    DbrRec rec;
     set_contr(&rec, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
               1, 10000, 1000000, 1, 4, 1, 10);
     const size_t n = dbr_contr_len(&rec);

@@ -127,17 +127,17 @@ elm_pool_init(struct ElmPool* pool)
     pool->allocs = 0;
     pool->checksum = 0;
 
-    dbr_log_debug1("%zu small nodes per block:", pool->small.nodes_per_block);
-    dbr_log_debug1("sizeof DbrLevel=%zu", sizeof(struct DbrLevel));
-    dbr_log_debug1("sizeof DbrMatch=%zu", sizeof(struct DbrMatch));
-    dbr_log_debug1("sizeof DbrMemb=%zu", sizeof(struct DbrMemb));
-    dbr_log_debug1("sizeof DbrPosn=%zu", sizeof(struct DbrPosn));
-    dbr_log_debug1("sizeof DbrSub=%zu", sizeof(struct DbrSub));
+    dbr_log_debug2("%zu small nodes per block:", pool->small.nodes_per_block);
+    dbr_log_debug2("sizeof DbrLevel=%zu", sizeof(struct DbrLevel));
+    dbr_log_debug2("sizeof DbrMatch=%zu", sizeof(struct DbrMatch));
+    dbr_log_debug2("sizeof DbrMemb=%zu", sizeof(struct DbrMemb));
+    dbr_log_debug2("sizeof DbrPosn=%zu", sizeof(struct DbrPosn));
+    dbr_log_debug2("sizeof DbrSub=%zu", sizeof(struct DbrSub));
 
-    dbr_log_debug1("%zu large nodes per block:", pool->large.nodes_per_block);
-    dbr_log_debug1("sizeof DbrRec=%zu", sizeof(struct DbrRec));
-    dbr_log_debug1("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
-    dbr_log_debug1("sizeof DbrTrade=%zu", sizeof(struct DbrTrade));
+    dbr_log_debug2("%zu large nodes per block:", pool->large.nodes_per_block);
+    dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
+    dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
+    dbr_log_debug2("sizeof DbrTrade=%zu", sizeof(struct DbrTrade));
 #endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
         goto fail1;

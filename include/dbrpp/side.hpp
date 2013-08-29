@@ -19,6 +19,7 @@
 #define DBRPP_SIDE_HPP
 
 #include <dbrpp/dlnode.hpp>
+#include <dbrpp/except.hpp>
 #include <dbrpp/iter.hpp>
 #include <dbrpp/rbnode.hpp>
 
@@ -326,6 +327,89 @@ public:
     empty() const noexcept
     {
         return dbr_side_empty_level(side_);
+    }
+};
+
+class Side {
+    mutable DbrSide impl_;
+public:
+    ~Side() noexcept
+    {
+        dbr_side_term(&impl_);
+    }
+    explicit
+    Side(DbrPool pool) noexcept
+    {
+        dbr_side_init(&impl_, pool);
+    }
+    operator DbrSide&() noexcept
+    {
+        return impl_;
+    }
+    DbrSide*
+    c_arg() noexcept
+    {
+        return &impl_;
+    }
+
+    // Copy semantics.
+
+    Side(const Side&) = delete;
+
+    Side&
+    operator =(const Side&) = delete;
+
+    void
+    insert_order(DbrOrder& order)
+    {
+        if (!dbr_side_insert_order(&impl_, &order))
+            throw_exception();
+    }
+    void
+    remove_order(DbrOrder& order) noexcept
+    {
+        dbr_side_remove_order(&impl_, &order);
+    }
+    void
+    take_order(DbrOrder& order, DbrLots delta, DbrMillis now) noexcept
+    {
+        dbr_side_take_order(&impl_, &order, delta, now);
+    }
+    void
+    revise_order(DbrOrder& order, DbrLots lots, DbrMillis now)
+    {
+        if (!dbr_side_revise_order(&impl_, &order, lots, now))
+            throw_exception();
+    }
+    void
+    cancel_order(DbrOrder& order, DbrMillis now) noexcept
+    {
+        dbr_side_cancel_order(&impl_, &order, now);
+    }
+    SideOrders
+    orders() const noexcept
+    {
+        return SideOrders(impl_);
+    }
+    SideLevels
+    levels() const noexcept
+    {
+        return SideLevels(impl_);
+    }
+    DbrTicks
+    last_ticks() const noexcept
+    {
+        return dbr_side_last_ticks(&impl_);
+    }
+    DbrLots
+    last_lots() const noexcept
+    {
+        return dbr_side_last_lots(&impl_);
+    }
+    DbrMillis
+    last_time() const noexcept
+    {
+        return dbr_side_last_time(&impl_);
     }
 };
 

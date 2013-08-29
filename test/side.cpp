@@ -17,4 +17,13 @@
  */
 #include "test.hpp"
 
-#include <dbr/ctx.h>
+#include <dbrpp/pool.hpp>
+#include <dbrpp/side.hpp>
+
+using namespace dbr;
+
+TEST_CASE(side_test)
+{
+    Pool pool;
+    Side side(pool);
+}
