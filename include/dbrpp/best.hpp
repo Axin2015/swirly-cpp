@@ -68,10 +68,10 @@ operator <<(std::ostream& os, const Best& best)
 }
 
 inline Best
-best(DbrRec& mrec)
+best(DbrBook& book)
 {
     Best best;
-    dbr_book_best(&mrec, best.c_arg());
+    dbr_book_best(&book, best.c_arg());
     return best;
 }
 } // dbr

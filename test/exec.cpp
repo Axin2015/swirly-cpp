@@ -44,6 +44,6 @@ TEST_CASE(submit)
     auto book = ctx.book(ContrRec(*cit), 20130824);
 
     Trans trans(ctx);
-    ctx.submit(TraderRec(*tit), AccntRec(*ait), static_cast<DbrBook>(book), nullptr,
+    ctx.submit(TraderRec(*tit), AccntRec(*ait), book, nullptr,
                DBR_BUY, 12345, 1, 0, 0, trans);
 }

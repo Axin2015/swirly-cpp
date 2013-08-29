@@ -21,6 +21,7 @@
 #include <dbr/err.h>
 #include <dbr/log.h>
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 static struct DbrLevel*

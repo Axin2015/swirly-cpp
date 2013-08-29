@@ -28,15 +28,19 @@
 namespace dbr {
 
 class Book {
-    DbrBook impl_;
+    DbrBook* impl_;
 public:
     explicit
-    Book(DbrBook impl) noexcept
-        : impl_(impl)
+    Book(DbrBook& impl) noexcept
+        : impl_(&impl)
     {
     }
-    explicit
-    operator DbrBook() const noexcept
+    operator DbrBook&() const noexcept
+    {
+        return *impl_;
+    }
+    DbrBook*
+    c_arg() const noexcept
     {
         return impl_;
     }

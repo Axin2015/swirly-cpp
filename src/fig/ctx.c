@@ -18,10 +18,10 @@
 #include "accnt.h"
 #include "cache.h"
 #include "index.h"
-#include "book.h"
 #include "match.h"
 #include "trader.h"
 
+#include <dbr/book.h>
 #include <dbr/ctx.h>
 #include <dbr/err.h>
 #include <dbr/journ.h>
@@ -41,10 +41,10 @@ struct DbrCtx_ {
     struct FigIndex index;
 };
 
-static inline struct FigBook*
+static inline struct DbrBook*
 ctx_book_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct FigBook, ctx_node_, node);
+    return dbr_implof(struct DbrBook, ctx_node_, node);
 }
 
 static void
@@ -53,9 +53,9 @@ free_books(struct DbrTree* books)
     assert(books);
     struct DbrRbNode* node;
     while ((node = books->root)) {
-        struct FigBook* book = ctx_book_entry(node);
+        struct DbrBook* book = ctx_book_entry(node);
         dbr_tree_remove(books, node);
-        fig_book_term(book);
+        dbr_book_term(book);
         free(book);
     }
 }
@@ -140,7 +140,7 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-apply_trades(DbrCtx ctx, struct FigBook* book, const struct DbrTrans* trans, DbrMillis now)
+apply_trades(DbrCtx ctx, struct DbrBook* book, const struct DbrTrans* trans, DbrMillis now)
 {
     const struct DbrOrder* taker_order = trans->new_order;
     // Must succeed because new_posn exists.
@@ -153,7 +153,7 @@ apply_trades(DbrCtx ctx, struct FigBook* book, const struct DbrTrans* trans, Dbr
         struct DbrOrder* maker_order = match->maker_order;
 
         // Reduce maker. Maker's revision will be incremented by this call.
-        fig_book_take(book, maker_order, match->lots, now);
+        dbr_book_take(book, maker_order, match->lots, now);
 
         // Must succeed because maker_posn exists.
         struct FigAccnt* maker_accnt = fig_accnt_lazy(maker_order->accnt.rec, ctx->pool);
@@ -180,7 +180,7 @@ get_id(DbrCtx ctx, int type, DbrIden id)
     return dbr_rec_entry(node);
 }
 
-static inline DbrBook
+static inline struct DbrBook*
 get_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date)
 {
     assert(crec);
@@ -189,15 +189,15 @@ get_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date)
     // Synthetic key from contract and settlment date.
     const DbrIden key = crec->id * 100000000L + settl_date;
 
-    struct FigBook* book;
+    struct DbrBook* book;
 	struct DbrRbNode* node = dbr_tree_pfind(&ctx->books, key);
     if (!node || node->key != key) {
-        book = malloc(sizeof(struct FigBook));
+        book = malloc(sizeof(struct DbrBook));
         if (dbr_unlikely(!book)) {
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
-        fig_book_init(book, ctx->pool, crec, settl_date);
+        dbr_book_init(book, ctx->pool, crec, settl_date);
         struct DbrRbNode* parent = node;
         dbr_tree_pinsert(&ctx->books, &book->ctx_node_, parent);
     } else
@@ -232,14 +232,14 @@ emplace_orders(DbrCtx ctx)
         order->accnt.rec = get_id(ctx, DBR_ACCNT, order->accnt.id);
         order->contr.rec = get_id(ctx, DBR_CONTR, order->contr.id);
 
-        struct FigBook* book;
+        struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
             book = get_book(ctx, order->contr.rec, order->settl_date);
             if (dbr_unlikely(!book))
                 goto fail2;
 
-            if (dbr_unlikely(!fig_book_insert(book, order)))
+            if (dbr_unlikely(!dbr_book_insert(book, order)))
                 goto fail2;
         } else
             book = NULL;
@@ -247,7 +247,7 @@ emplace_orders(DbrCtx ctx)
         struct FigTrader* trader = fig_trader_lazy(order->trader.rec, ctx->pool, &ctx->index);
         if (dbr_unlikely(!trader)) {
             if (book)
-                fig_book_remove(book, order);
+                dbr_book_remove(book, order);
             goto fail2;
         }
 
@@ -439,7 +439,7 @@ dbr_ctx_end_rec(DbrCtx ctx)
 
 // Pool
 
-DBR_API DbrBook
+DBR_API struct DbrBook*
 dbr_ctx_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date)
 {
     return get_book(ctx, crec, settl_date);
@@ -460,7 +460,7 @@ dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec)
 // Exec
 
 DBR_API struct DbrOrder*
-dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, DbrBook book,
+dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags, struct DbrTrans* trans)
 {
@@ -522,7 +522,7 @@ dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, DbrBook boo
     }
 
     // Place incomplete order in book.
-    if (!dbr_order_done(new_order) && !fig_book_insert(book, new_order))
+    if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order))
         goto fail4;
 
     // Commit phase cannot fail.
@@ -566,10 +566,10 @@ dbr_ctx_revise_id(DbrCtx ctx, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail2;
 
     // Must succeed because order exists.
-    struct FigBook* book = get_book(ctx, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(ctx, order->contr.rec, order->settl_date);
     assert(book);
 
-    if (!fig_book_revise(book, order, lots, now))
+    if (!dbr_book_revise(book, order, lots, now))
         goto fail2;
 
     dbr_journ_commit_trans(ctx->journ);
@@ -602,9 +602,9 @@ dbr_ctx_revise_ref(DbrCtx ctx, DbrTrader trader, const char* ref, DbrLots lots)
                                 order->exec, lots, now))
         goto fail2;
 
-    struct FigBook* book = get_book(ctx, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(ctx, order->contr.rec, order->settl_date);
     assert(book);
-    if (!fig_book_revise(book, order, lots, now))
+    if (!dbr_book_revise(book, order, lots, now))
         goto fail2;
 
     dbr_journ_commit_trans(ctx->journ);
@@ -635,9 +635,9 @@ dbr_ctx_cancel_id(DbrCtx ctx, DbrTrader trader, DbrIden id)
                                 order->exec, order->lots, now))
         goto fail1;
 
-    struct FigBook* book = get_book(ctx, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(ctx, order->contr.rec, order->settl_date);
     assert(book);
-    fig_book_cancel(book, order, now);
+    dbr_book_cancel(book, order, now);
     return order;
  fail1:
     return NULL;
@@ -662,9 +662,9 @@ dbr_ctx_cancel_ref(DbrCtx ctx, DbrTrader trader, const char* ref)
                                 order->exec, order->lots, now))
         goto fail1;
 
-    struct FigBook* book = get_book(ctx, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(ctx, order->contr.rec, order->settl_date);
     assert(book);
-    fig_book_cancel(book, order, now);
+    dbr_book_cancel(book, order, now);
     return order;
  fail1:
     return NULL;

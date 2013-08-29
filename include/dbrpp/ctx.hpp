@@ -238,10 +238,10 @@ public:
     Book
     book(DbrRec& crec, DbrDate settl_date) const
     {
-        DbrBook book = dbr_ctx_book(impl_, &crec, settl_date);
+        DbrBook* book = dbr_ctx_book(impl_, &crec, settl_date);
         if (!book)
             throw_exception();
-        return Book(book);
+        return Book(*book);
     }
     Trader
     trader(DbrRec& trec) const
@@ -260,11 +260,11 @@ public:
         return Accnt(accnt);
     }
     Order
-    submit(DbrRec& trec, DbrRec& arec, DbrBook book, const char* ref, int action,
+    submit(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
            DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
     {
         trans.reset();
-        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, book, ref, action, ticks,
+        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, &book, ref, action, ticks,
                                                lots, min, flags, trans.c_arg());
         if (!order)
             throw_exception();

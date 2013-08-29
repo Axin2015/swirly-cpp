@@ -22,15 +22,12 @@
 #include <dbr/pool.h>
 #include <dbr/types.h>
 
-struct FigIndex;
-struct FigBook;
-
 // Used by matching engine to build a list of matches.
 
 // Match taker with list of maker orders.
 
 DBR_EXTERN DbrBool
-fig_match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book,
+fig_match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book,
                  struct DbrOrder* taker, struct DbrTrans* trans);
 
 #endif // FIG_MATCH_H

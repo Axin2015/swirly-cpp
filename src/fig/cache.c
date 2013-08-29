@@ -18,10 +18,10 @@
 #include "cache.h"
 
 #include "accnt.h"
-#include "book.h"
 #include "trader.h"
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 

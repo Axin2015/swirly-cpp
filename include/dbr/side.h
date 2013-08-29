@@ -23,9 +23,6 @@
 #include <dbr/tree.h>
 #include <dbr/types.h>
 
-#include <assert.h>
-#include <stdbool.h>
-
 /**
  * @addtogroup Side
  * @{

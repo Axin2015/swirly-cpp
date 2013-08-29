@@ -85,7 +85,7 @@ dbr_ctx_end_rec(DbrCtx ctx);
  * @{
  */
 
-DBR_API DbrBook
+DBR_API struct DbrBook*
 dbr_ctx_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date);
 
 /** @} */
@@ -121,7 +121,7 @@ dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec);
  */
 
 DBR_API struct DbrOrder*
-dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, DbrBook book,
+dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags, struct DbrTrans* trans);
 

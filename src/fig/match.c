@@ -18,8 +18,8 @@
 #include "match.h"
 
 #include "accnt.h"
-#include "book.h"
 
+#include <dbr/book.h>
 #include <dbr/conv.h>
 #include <dbr/journ.h>
 #include <dbr/queue.h>
@@ -82,7 +82,7 @@ lazy_posn(struct DbrOrder* order, DbrPool pool)
 }
 
 static DbrBool
-match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book, struct DbrOrder* taker,
+match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
              const struct DbrSide* side, int direct, struct DbrTrans* trans)
 {
     struct DbrQueue mq;
@@ -213,7 +213,7 @@ match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book, struct DbrOrder
 }
 
 DBR_EXTERN DbrBool
-fig_match_orders(DbrPool pool, DbrJourn journ, struct FigBook* book,
+fig_match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book,
                  struct DbrOrder* taker, struct DbrTrans* trans)
 {
     struct DbrSide* side;

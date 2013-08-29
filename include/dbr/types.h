@@ -99,19 +99,6 @@ enum DbrAction {
 typedef struct FigContr* DbrContr;
 
 /**
- * @addtogroup Book
- */
-
-typedef struct FigBook* DbrBook;
-
-struct DbrBest {
-    DbrTicks bid_ticks;
-    DbrLots bid_resd;
-    DbrTicks ask_ticks;
-    DbrLots ask_resd;
-};
-
-/**
  * @addtogroup Trader
  */
 
@@ -240,7 +227,7 @@ struct DbrSub {
     /**
      * @publicsection
      */
-    DbrBook book;
+    struct DbrBook* book;
     DbrTrader trader;
     /**
      * @privatesection

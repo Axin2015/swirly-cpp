@@ -68,14 +68,14 @@ dbr_trader_empty_order(DbrTrader trader);
  */
 
 DBR_API DbrBool
-dbr_trader_sub(DbrTrader trader, DbrBook book);
+dbr_trader_sub(DbrTrader trader, struct DbrBook* book);
 
 /**
  * @brief Unsubscribe from book.
  */
 
 DBR_API void
-dbr_trader_unsub(DbrTrader trader, DbrBook book);
+dbr_trader_unsub(DbrTrader trader, struct DbrBook* book);
 
 /** @} */
 

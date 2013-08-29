@@ -15,35 +15,35 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "book.h"
+#include <dbr/book.h>
 
 #include <dbr/conv.h>
 #include <dbr/err.h>
 
 #include <stdlib.h>
 
-DBR_EXTERN void
-fig_book_init(struct FigBook* book, DbrPool pool, struct DbrRec* crec, DbrDate settl_date)
+DBR_API void
+dbr_book_init(struct DbrBook* book, DbrPool pool, struct DbrRec* crec, DbrDate settl_date)
 {
     book->crec = crec;
     book->settl_date = settl_date;
     dbr_side_init(&book->bid_side, pool);
     dbr_side_init(&book->ask_side, pool);
     dbr_list_init(&book->subs);
-    const DbrKey key = fig_book_key(book);
+    const DbrKey key = dbr_book_key(book);
     dbr_rbnode_init(&book->ctx_node_, key);
 }
 
-DBR_EXTERN void
-fig_book_term(struct FigBook* book)
+DBR_API void
+dbr_book_term(struct DbrBook* book)
 {
     dbr_side_term(&book->bid_side);
     dbr_side_term(&book->ask_side);
     assert(dbr_list_empty(&book->subs));
 }
 
-DBR_EXTERN struct DbrBest*
-fig_book_best(DbrBook book, struct DbrBest* best)
+DBR_API struct DbrBest*
+dbr_book_best(struct DbrBook* book, struct DbrBest* best)
 {
     struct DbrSide* side = &book->bid_side;
     struct DbrRbNode* it = dbr_side_first_level(side);
@@ -69,34 +69,4 @@ fig_book_best(DbrBook book, struct DbrBest* best)
         best->ask_resd = 0;
     }
     return best;
-}
-
-DBR_API struct DbrRec*
-dbr_book_crec(DbrBook book)
-{
-    return fig_book_crec(book);
-}
-
-DBR_API DbrDate
-dbr_book_settl_date(DbrBook book)
-{
-    return fig_book_settl_date(book);
-}
-
-DBR_API struct DbrSide*
-dbr_book_bid_side(DbrBook book)
-{
-    return fig_book_bid_side(book);
-}
-
-DBR_API struct DbrSide*
-dbr_book_ask_side(DbrBook book)
-{
-    return fig_book_ask_side(book);
-}
-
-DBR_API struct DbrBest*
-dbr_book_best(DbrBook book, struct DbrBest* best)
-{
-    return fig_book_best(book, best);
 }

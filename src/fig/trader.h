@@ -138,10 +138,10 @@ fig_trader_empty_order(const struct FigTrader* trader)
 // Sub.
 
 DBR_EXTERN DbrBool
-fig_trader_sub(struct FigTrader* trader, struct FigBook* book);
+fig_trader_sub(struct FigTrader* trader, struct DbrBook* book);
 
 DBR_EXTERN void
-fig_trader_unsub(struct FigTrader* trader, struct FigBook* book);
+fig_trader_unsub(struct FigTrader* trader, struct DbrBook* book);
 
 DBR_EXTERN void
 fig_trader_set_sess(struct FigTrader* trader, DbrTraderSess sess);

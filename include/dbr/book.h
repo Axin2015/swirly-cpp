@@ -18,31 +18,118 @@
 #ifndef DBR_BOOK_H
 #define DBR_BOOK_H
 
-#include <dbr/defs.h>
-#include <dbr/types.h>
+#include <dbr/side.h>
 
 /**
  * @addtogroup Book
  * @{
  */
 
-DBR_API DbrKey
-dbr_book_key(DbrBook book);
+struct DbrBook {
+    struct DbrRec* crec;
+    DbrDate settl_date;
+    struct DbrSide bid_side;
+    struct DbrSide ask_side;
+    struct DbrList subs;
+    struct DbrRbNode ctx_node_;
+};
 
-DBR_API struct DbrRec*
-dbr_book_crec(DbrBook book);
+struct DbrBest {
+    DbrTicks bid_ticks;
+    DbrLots bid_resd;
+    DbrTicks ask_ticks;
+    DbrLots ask_resd;
+};
 
-DBR_API DbrDate
-dbr_book_settl_date(DbrBook book);
+DBR_API void
+dbr_book_init(struct DbrBook* book, DbrPool pool, struct DbrRec* crec, DbrDate settl_date);
 
-DBR_API struct DbrSide*
-dbr_book_bid_side(DbrBook book);
+DBR_API void
+dbr_book_term(struct DbrBook* book);
 
-DBR_API struct DbrSide*
-dbr_book_ask_side(DbrBook book);
+static inline struct DbrSide*
+dbr_book_side(struct DbrBook* book, int action)
+{
+    return action == DBR_BUY ? &book->bid_side : &book->ask_side;
+}
+
+static inline DbrBool
+dbr_book_insert(struct DbrBook* book, struct DbrOrder* order)
+{
+    return dbr_side_insert_order(dbr_book_side(book, order->action), order);
+}
+
+static inline void
+dbr_book_remove(struct DbrBook* book, struct DbrOrder* order)
+{
+    assert(order);
+    dbr_side_remove_order(dbr_book_side(book, order->action), order);
+}
+
+static inline void
+dbr_book_take(struct DbrBook* book, struct DbrOrder* order, DbrLots delta, DbrMillis now)
+{
+    dbr_side_take_order(dbr_book_side(book, order->action), order, delta, now);
+}
+
+static inline DbrBool
+dbr_book_revise(struct DbrBook* book, struct DbrOrder* order, DbrLots lots, DbrMillis now)
+{
+    return dbr_side_revise_order(dbr_book_side(book, order->action), order, lots, now);
+}
+
+static inline void
+dbr_book_cancel(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
+{
+    assert(order);
+    dbr_side_cancel_order(dbr_book_side(book, order->action), order, now);
+}
+
+static inline void
+dbr_book_sub(struct DbrBook* book, struct DbrSub* sub)
+{
+    dbr_list_insert_back(&book->subs, &sub->book_node_);
+}
+
+static inline void
+dbr_book_unsub(struct DbrSub* sub)
+{
+    dbr_dlnode_remove(&sub->book_node_);
+}
+
+static inline DbrKey
+dbr_book_key(struct DbrBook* book)
+{
+    // Synthetic key from contract and settlment date.
+    return book->crec->id * 100000000L + book->settl_date;
+}
+
+static inline struct DbrRec*
+dbr_book_crec(struct DbrBook* book)
+{
+    return book->crec;
+}
+
+static inline DbrDate
+dbr_book_settl_date(struct DbrBook* book)
+{
+    return book->settl_date;
+}
+
+static inline struct DbrSide*
+dbr_book_bid_side(struct DbrBook* book)
+{
+    return &book->bid_side;
+}
+
+static inline struct DbrSide*
+dbr_book_ask_side(struct DbrBook* book)
+{
+    return &book->ask_side;
+}
 
 DBR_API struct DbrBest*
-dbr_book_best(struct DbrRec* mrec, struct DbrBest* best);
+dbr_book_best(struct DbrBook* book, struct DbrBest* best);
 
 /** @} */
 
