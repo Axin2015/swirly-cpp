@@ -235,13 +235,13 @@ public:
     {
         return AccntRecs(impl_);
     }
-    Book
+    BookRef
     book(DbrRec& crec, DbrDate settl_date) const
     {
-        DbrBook* book = dbr_ctx_book(impl_, &crec, settl_date);
+        DbrBook* const book = dbr_ctx_book(impl_, &crec, settl_date);
         if (!book)
             throw_exception();
-        return Book(*book);
+        return BookRef(*book);
     }
     Trader
     trader(DbrRec& trec) const
@@ -259,7 +259,7 @@ public:
             throw_exception();
         return Accnt(accnt);
     }
-    Order
+    OrderRef
     submit(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
            DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
     {
@@ -268,39 +268,39 @@ public:
                                                lots, min, flags, trans.c_arg());
         if (!order)
             throw_exception();
-        return Order(*order);
+        return OrderRef(*order);
     }
-    Order
+    OrderRef
     revise(DbrTrader trader, DbrIden id, DbrLots lots)
     {
         DbrOrder* const order = dbr_ctx_revise_id(impl_, trader, id, lots);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return OrderRef(*order);
     }
-    Order
+    OrderRef
     revise(DbrTrader trader, const char* ref, DbrLots lots)
     {
         DbrOrder* const order = dbr_ctx_revise_ref(impl_, trader, ref, lots);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return OrderRef(*order);
     }
-    Order
+    OrderRef
     cancel(DbrTrader trader, DbrIden id)
     {
         DbrOrder* const order = dbr_ctx_cancel_id(impl_, trader, id);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return OrderRef(*order);
     }
-    Order
+    OrderRef
     cancel(DbrTrader trader, const char* ref)
     {
         DbrOrder* const order = dbr_ctx_cancel_ref(impl_, trader, ref);
         if (!order)
             throw_exception();
-        return Order(*order);
+        return OrderRef(*order);
     }
     void
     archive_order(DbrTrader trader, DbrIden id)

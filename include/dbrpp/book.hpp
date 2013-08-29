@@ -27,11 +27,11 @@
 
 namespace dbr {
 
-class Book {
+class BookRef {
     DbrBook* impl_;
 public:
     explicit
-    Book(DbrBook& impl) noexcept
+    BookRef(DbrBook& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -45,12 +45,12 @@ public:
         return impl_;
     }
     bool
-    operator ==(Book rhs) const noexcept
+    operator ==(BookRef rhs) const noexcept
     {
         return key() == rhs.key();
     }
     bool
-    operator !=(Book rhs) const noexcept
+    operator !=(BookRef rhs) const noexcept
     {
         return key() != rhs.key();
     }
@@ -59,30 +59,30 @@ public:
     {
         return dbr_book_key(impl_);
     }
-    ContrRec
+    ContrRecRef
     crec() const noexcept
     {
-        return ContrRec(*dbr_book_crec(impl_));
+        return ContrRecRef(*dbr_book_crec(impl_));
     }
     DbrDate
     settl_date() const noexcept
     {
         return dbr_book_settl_date(impl_);
     }
-    Side
+    SideRef
     bid_side() const noexcept
     {
-        return Side(*dbr_book_bid_side(impl_));
+        return SideRef(*dbr_book_bid_side(impl_));
     }
-    Side
+    SideRef
     ask_side() const noexcept
     {
-        return Side(*dbr_book_ask_side(impl_));
+        return SideRef(*dbr_book_ask_side(impl_));
     }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Book book)
+operator <<(std::ostream& os, BookRef book)
 {
     return os << "key=" << book.key()
               << ",crec=" << book.crec().mnem()

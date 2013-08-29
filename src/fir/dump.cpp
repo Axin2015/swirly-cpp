@@ -15,32 +15,32 @@ main(int argc, char* argv[])
 
         cout << "contrs:\n";
         for (auto ref : ctx.crecs()) {
-            ContrRec rec(ref);
+            ContrRecRef rec(ref);
             cout << rec << endl;
             ctx.book(rec, 20130827);
         }
 
         cout << "traders:\n";
         for (auto ref : ctx.trecs()) {
-            TraderRec rec(ref);
+            TraderRecRef rec(ref);
             cout << rec << endl;
             cout << rec.mnem() << " orders:" << endl;
             Trader trader = ctx.trader(rec);
             for (auto ref : trader.orders())
-                cout << Order(ref) << endl;
+                cout << OrderRef(ref) << endl;
         }
 
         cout << "accnts:\n";
         for (auto ref : ctx.arecs()) {
-            AccntRec rec(ref);
+            AccntRecRef rec(ref);
             cout << rec << endl;
             cout << rec.mnem() << " trades:" << endl;
             Accnt accnt = ctx.accnt(rec);
             for (auto ref : accnt.trades())
-                cout << Trade(ref) << endl;
+                cout << TradeRef(ref) << endl;
             cout << rec.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
-                cout << Posn(ref) << endl;
+                cout << PosnRef(ref) << endl;
         }
 
         return 0;

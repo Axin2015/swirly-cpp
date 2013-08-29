@@ -22,11 +22,11 @@
 
 namespace dbr {
 
-class Trade {
+class TradeRef {
     DbrTrade* impl_;
 public:
     explicit
-    Trade(DbrTrade& impl) noexcept
+    TradeRef(DbrTrade& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -40,12 +40,12 @@ public:
         return impl_;
     }
     bool
-    operator ==(Trade rhs) const noexcept
+    operator ==(TradeRef rhs) const noexcept
     {
         return impl_->id == rhs.impl_->id;
     }
     bool
-    operator !=(Trade rhs) const noexcept
+    operator !=(TradeRef rhs) const noexcept
     {
         return impl_->id != rhs.impl_->id;
     }
@@ -69,20 +69,20 @@ public:
     {
         return impl_->order_rev;
     }
-    TraderRec
+    TraderRecRef
     trec() const noexcept
     {
-        return TraderRec(*impl_->trader.rec);
+        return TraderRecRef(*impl_->trader.rec);
     }
-    AccntRec
+    AccntRecRef
     arec() const noexcept
     {
-        return AccntRec(*impl_->accnt.rec);
+        return AccntRecRef(*impl_->accnt.rec);
     }
-    ContrRec
+    ContrRecRef
     crec() const noexcept
     {
-        return ContrRec(*impl_->contr.rec);
+        return ContrRecRef(*impl_->contr.rec);
     }
     DbrDate
     settl_date() const noexcept
@@ -94,10 +94,10 @@ public:
     {
         return Ref(impl_->ref);
     }
-    AccntRec
+    AccntRecRef
     cpty() const noexcept
     {
-        return AccntRec(*impl_->cpty.rec);
+        return AccntRecRef(*impl_->cpty.rec);
     }
     int
     role() const noexcept
@@ -142,7 +142,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Trade trade)
+operator <<(std::ostream& os, TradeRef trade)
 {
     return os << "id=" << trade.id()
               << ",match=" << trade.match()
@@ -165,19 +165,19 @@ operator <<(std::ostream& os, Trade trade)
 }
 
 inline size_t
-entity_len(Trade trade) noexcept
+entity_len(TradeRef trade) noexcept
 {
     return dbr_trade_len(trade.c_arg());
 }
 
 inline char*
-write_entity(char* buf, Trade trade) noexcept
+write_entity(char* buf, TradeRef trade) noexcept
 {
     return dbr_write_trade(buf, trade.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, Trade trade)
+read_entity(const char* buf, TradeRef trade)
 {
     buf = dbr_read_trade(buf, trade.c_arg());
     if (!buf)

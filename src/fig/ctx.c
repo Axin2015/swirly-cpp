@@ -568,7 +568,6 @@ dbr_ctx_revise_id(DbrCtx ctx, DbrTrader trader, DbrIden id, DbrLots lots)
     // Must succeed because order exists.
     struct DbrBook* book = get_book(ctx, order->contr.rec, order->settl_date);
     assert(book);
-
     if (!dbr_book_revise(book, order, lots, now))
         goto fail2;
 

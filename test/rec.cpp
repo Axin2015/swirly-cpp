@@ -31,35 +31,35 @@ struct TypeTraits;
 
 template <>
 struct TypeTraits<DBR_CONTR> {
-    typedef ContrRec TypeRec;
+    typedef ContrRecRef TypeRecRef;
 };
 
 template <>
 struct TypeTraits<DBR_TRADER> {
-    typedef TraderRec TypeRec;
+    typedef TraderRecRef TypeRecRef;
 };
 
 template <>
 struct TypeTraits<DBR_ACCNT> {
-    typedef AccntRec TypeRec;
+    typedef AccntRecRef TypeRecRef;
 };
 
 template <int TypeN>
-static typename TypeTraits<TypeN>::TypeRec
+static typename TypeTraits<TypeN>::TypeRecRef
 get_rec_id(Ctx& ctx, DbrIden id)
 {
     auto it = ctx.recs<TypeN>().find(id);
     check(it != ctx.recs<TypeN>().end());
-    return typename TypeTraits<TypeN>::TypeRec(*it);
+    return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
 template <int TypeN>
-static typename TypeTraits<TypeN>::TypeRec
+static typename TypeTraits<TypeN>::TypeRecRef
 get_rec_mnem(Ctx& ctx, const char* mnem)
 {
     auto it = ctx.recs<TypeN>().find(mnem);
     check(it != ctx.recs<TypeN>().end());
-    return typename TypeTraits<TypeN>::TypeRec(*it);
+    return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
 TEST_CASE(find_contr)
@@ -71,7 +71,7 @@ TEST_CASE(find_contr)
 
     check(ctx.crecs().find("BAD") == ctx.crecs().end());
 
-    ContrRec crec = get_rec_mnem<DBR_CONTR>(ctx, "EURUSD");
+    ContrRecRef crec = get_rec_mnem<DBR_CONTR>(ctx, "EURUSD");
     check(crec == get_rec_id<DBR_CONTR>(ctx, crec.id()));
     check(crec.mnem() == Mnem("EURUSD"));
 
@@ -98,7 +98,7 @@ TEST_CASE(find_trader)
 
     check(ctx.trecs().find("BAD") == ctx.trecs().end());
 
-    TraderRec trec = get_rec_mnem<DBR_TRADER>(ctx, "WRAMIREZ");
+    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(ctx, "WRAMIREZ");
     check(trec == get_rec_id<DBR_TRADER>(ctx, trec.id()));
     check(trec.mnem() == Mnem("WRAMIREZ"));
 
@@ -116,7 +116,7 @@ TEST_CASE(find_accnt)
 
     check(ctx.arecs().find("BAD") == ctx.arecs().end());
 
-    AccntRec arec = get_rec_mnem<DBR_ACCNT>(ctx, "DBRA");
+    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(ctx, "DBRA");
     check(arec == get_rec_id<DBR_ACCNT>(ctx, arec.id()));
     check(arec.mnem() == Mnem("DBRA"));
 

@@ -51,7 +51,7 @@ class IJourn : public DbrIJourn {
     static DbrBool
     insert_order(DbrJourn journ, DbrOrder* order) noexcept
     {
-        return static_cast<DerivedT*>(journ)->insert_order(Order(*order));
+        return static_cast<DerivedT*>(journ)->insert_order(OrderRef(*order));
     }
     static DbrBool
     update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
@@ -67,7 +67,7 @@ class IJourn : public DbrIJourn {
     static DbrBool
     insert_trade(DbrJourn journ, DbrTrade* trade) noexcept
     {
-        return static_cast<DerivedT*>(journ)->insert_trade(Trade(*trade));
+        return static_cast<DerivedT*>(journ)->insert_trade(TradeRef(*trade));
     }
     static DbrBool
     archive_trade(DbrJourn journ, DbrIden id, DbrMillis now) noexcept
@@ -138,7 +138,7 @@ rollback_trans(DbrJourn journ)
 }
 
 inline void
-insert_order(DbrJourn journ, Order order)
+insert_order(DbrJourn journ, OrderRef order)
 {
     if (!journ->vtbl->insert_order(journ, order.c_arg()))
         throw_exception();
@@ -160,7 +160,7 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 inline void
-insert_trade(DbrJourn journ, Trade trade)
+insert_trade(DbrJourn journ, TradeRef trade)
 {
     if (!journ->vtbl->insert_trade(journ, trade.c_arg()))
         throw_exception();

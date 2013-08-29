@@ -172,15 +172,15 @@ public:
             impl_.first_match = nullptr;
         }
     }
-    Order
+    OrderRef
     new_order() const noexcept
     {
-        return Order(*impl_.new_order);
+        return OrderRef(*impl_.new_order);
     }
-    Posn
+    PosnRef
     new_posn() const noexcept
     {
-        return Posn(*impl_.new_posn);
+        return PosnRef(*impl_.new_posn);
     }
     TransMatches
     matches() const noexcept

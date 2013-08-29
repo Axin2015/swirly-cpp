@@ -37,7 +37,7 @@ TEST_CASE(trader_id)
     TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
     check(it != ctx.trecs().end());
 
-    TraderRec trec(*it);
+    TraderRecRef trec(*it);
     Trader trader = ctx.trader(*it);
     check(trader.id() == trec.id());
 }

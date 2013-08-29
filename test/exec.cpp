@@ -41,9 +41,9 @@ TEST_CASE(submit)
     auto cit = ctx.crecs().find("EURUSD");
     check(cit != ctx.crecs().end());
 
-    auto book = ctx.book(ContrRec(*cit), 20130824);
+    auto book = ctx.book(ContrRecRef(*cit), 20130824);
 
     Trans trans(ctx);
-    ctx.submit(TraderRec(*tit), AccntRec(*ait), book, nullptr,
+    ctx.submit(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
                DBR_BUY, 12345, 1, 0, 0, trans);
 }

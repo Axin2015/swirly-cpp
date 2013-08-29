@@ -22,11 +22,11 @@
 
 namespace dbr {
 
-class Posn {
+class PosnRef {
     DbrPosn* impl_;
 public:
     explicit
-    Posn(DbrPosn& impl) noexcept
+    PosnRef(DbrPosn& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -39,15 +39,15 @@ public:
     {
         return impl_;
     }
-    AccntRec
+    AccntRecRef
     arec() const noexcept
     {
-        return AccntRec(*impl_->accnt.rec);
+        return AccntRecRef(*impl_->accnt.rec);
     }
-    ContrRec
+    ContrRecRef
     crec() const noexcept
     {
-        return ContrRec(*impl_->contr.rec);
+        return ContrRecRef(*impl_->contr.rec);
     }
     DbrDate
     settl_date() const noexcept
@@ -77,7 +77,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Posn posn)
+operator <<(std::ostream& os, PosnRef posn)
 {
     return os << "arec=" << posn.arec().mnem()
               << ",crec=" << posn.crec().mnem()
@@ -89,19 +89,19 @@ operator <<(std::ostream& os, Posn posn)
 }
 
 inline size_t
-entity_len(Posn posn) noexcept
+entity_len(PosnRef posn) noexcept
 {
     return dbr_posn_len(posn.c_arg());
 }
 
 inline char*
-write_entity(char* buf, Posn posn) noexcept
+write_entity(char* buf, PosnRef posn) noexcept
 {
     return dbr_write_posn(buf, posn.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, Posn posn)
+read_entity(const char* buf, PosnRef posn)
 {
     buf = dbr_read_posn(buf, posn.c_arg());
     if (!buf)

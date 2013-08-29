@@ -37,8 +37,8 @@ TEST_CASE(book_id)
     ContrRecs::Iterator it = ctx.crecs().find("EURUSD");
     check(it != ctx.crecs().end());
 
-    ContrRec crec(*it);
-    Book book = ctx.book(*it, 20130824);
+    ContrRecRef crec(*it);
+    BookRef book = ctx.book(*it, 20130824);
     check(book.crec() == crec);
     check(book.settl_date() == 20130824);
 }

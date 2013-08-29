@@ -45,7 +45,7 @@ Journ::rollback_trans() noexcept
 }
 
 DbrBool
-Journ::insert_order(Order order) noexcept
+Journ::insert_order(OrderRef order) noexcept
 {
     return 1;
 }
@@ -64,7 +64,7 @@ Journ::archive_order(DbrIden id, DbrMillis now) noexcept
 }
 
 DbrBool
-Journ::insert_trade(Trade trade) noexcept
+Journ::insert_trade(TradeRef trade) noexcept
 {
     return 1;
 }

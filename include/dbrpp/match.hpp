@@ -24,11 +24,11 @@
 
 namespace dbr {
 
-class Match {
+class MatchRef {
     DbrMatch* impl_;
 public:
     explicit
-    Match(DbrMatch& impl) noexcept
+    MatchRef(DbrMatch& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -42,12 +42,12 @@ public:
         return impl_;
     }
     bool
-    operator ==(Match rhs) const noexcept
+    operator ==(MatchRef rhs) const noexcept
     {
         return impl_->id == rhs.impl_->id;
     }
     bool
-    operator !=(Match rhs) const noexcept
+    operator !=(MatchRef rhs) const noexcept
     {
         return impl_->id != rhs.impl_->id;
     }
@@ -56,15 +56,15 @@ public:
     {
         return impl_->id;
     }
-    Order
+    OrderRef
     maker_order() const noexcept
     {
-        return Order(*impl_->maker_order);
+        return OrderRef(*impl_->maker_order);
     }
-    Posn
+    PosnRef
     maker_posn() const noexcept
     {
-        return Posn(*impl_->maker_posn);
+        return PosnRef(*impl_->maker_posn);
     }
     DbrTicks
     ticks() const noexcept
@@ -76,20 +76,20 @@ public:
     {
         return impl_->lots;
     }
-    Trade
+    TradeRef
     taker_trade() const noexcept
     {
-        return Trade(*impl_->taker_trade);
+        return TradeRef(*impl_->taker_trade);
     }
-    Trade
+    TradeRef
     maker_trade() const noexcept
     {
-        return Trade(*impl_->maker_trade);
+        return TradeRef(*impl_->maker_trade);
     }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Match match)
+operator <<(std::ostream& os, MatchRef match)
 {
     return os << "id=" << match.id()
               << ",maker_order=" << match.maker_order().id()

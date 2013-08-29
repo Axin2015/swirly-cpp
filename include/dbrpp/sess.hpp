@@ -31,7 +31,7 @@ class IAccntSess : public DbrIAccntSess {
     static void
     trade(DbrAccntSess sess, DbrOrder* order, DbrTrade* trade, DbrPosn* posn) noexcept
     {
-        static_cast<DerivedT*>(sess)->trade(Order(*order), Trade(*trade), Posn(*posn));
+        static_cast<DerivedT*>(sess)->trade(OrderRef(*order), TradeRef(*trade), PosnRef(*posn));
     }
     static const DbrAccntSessVtbl*
     vtbl() noexcept

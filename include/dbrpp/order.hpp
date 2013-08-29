@@ -22,11 +22,11 @@
 
 namespace dbr {
 
-class Order {
+class OrderRef {
     DbrOrder* impl_;
 public:
     explicit
-    Order(DbrOrder& impl) noexcept
+    OrderRef(DbrOrder& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -40,12 +40,12 @@ public:
         return impl_;
     }
     bool
-    operator ==(Order rhs) const noexcept
+    operator ==(OrderRef rhs) const noexcept
     {
         return impl_->id == rhs.impl_->id;
     }
     bool
-    operator !=(Order rhs) const noexcept
+    operator !=(OrderRef rhs) const noexcept
     {
         return impl_->id != rhs.impl_->id;
     }
@@ -64,20 +64,20 @@ public:
     {
         return impl_->status;
     }
-    TraderRec
+    TraderRecRef
     trec() const noexcept
     {
-        return TraderRec(*impl_->trader.rec);
+        return TraderRecRef(*impl_->trader.rec);
     }
-    AccntRec
+    AccntRecRef
     arec() const noexcept
     {
-        return AccntRec(*impl_->accnt.rec);
+        return AccntRecRef(*impl_->accnt.rec);
     }
-    ContrRec
+    ContrRecRef
     crec() const noexcept
     {
-        return ContrRec(*impl_->contr.rec);
+        return ContrRecRef(*impl_->contr.rec);
     }
     DbrDate
     settl_date() const noexcept
@@ -142,7 +142,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Order order)
+operator <<(std::ostream& os, OrderRef order)
 {
     return os << "id=" << order.id()
               << ",rev=" << order.rev()
@@ -164,19 +164,19 @@ operator <<(std::ostream& os, Order order)
 }
 
 inline size_t
-entity_len(Order order) noexcept
+entity_len(OrderRef order) noexcept
 {
     return dbr_order_len(order.c_arg());
 }
 
 inline char*
-write_entity(char* buf, Order order) noexcept
+write_entity(char* buf, OrderRef order) noexcept
 {
     return dbr_write_order(buf, order.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, Order order)
+read_entity(const char* buf, OrderRef order)
 {
     buf = dbr_read_order(buf, order.c_arg());
     if (!buf)

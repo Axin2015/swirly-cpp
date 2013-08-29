@@ -28,15 +28,15 @@
 
 namespace dbr {
 
-class RecBase {
+class RecRefBase {
 protected:
     DbrRec* impl_;
     // Non-virtual is protected.
-    ~RecBase() noexcept
+    ~RecRefBase() noexcept
     {
     }
     explicit
-    RecBase(DbrRec& impl) noexcept
+    RecRefBase(DbrRec& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -51,12 +51,12 @@ public:
         return impl_;
     }
     bool
-    operator ==(const RecBase& rhs) const noexcept
+    operator ==(const RecRefBase& rhs) const noexcept
     {
         return impl_->type == rhs.impl_->type && impl_->id == rhs.impl_->id;
     }
     bool
-    operator !=(const RecBase& rhs) const noexcept
+    operator !=(const RecRefBase& rhs) const noexcept
     {
         return !(*this == rhs);
     }
@@ -77,11 +77,11 @@ public:
     }
 };
 
-class ContrRec : public RecBase {
+class ContrRecRef : public RecRefBase {
 public:
     explicit
-    ContrRec(DbrRec& impl) noexcept
-    : RecBase(impl)
+    ContrRecRef(DbrRec& impl) noexcept
+    : RecRefBase(impl)
     {
     }
     Display
@@ -190,7 +190,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, ContrRec crec)
+operator <<(std::ostream& os, ContrRecRef crec)
 {
     return os << "id=" << crec.id()
               << ",mnem=" << crec.mnem()
@@ -212,19 +212,19 @@ operator <<(std::ostream& os, ContrRec crec)
 }
 
 inline size_t
-entity_len(ContrRec crec) noexcept
+entity_len(ContrRecRef crec) noexcept
 {
     return dbr_contr_len(crec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, ContrRec crec) noexcept
+write_entity(char* buf, ContrRecRef crec) noexcept
 {
     return dbr_write_contr(buf, crec.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, ContrRec crec)
+read_entity(const char* buf, ContrRecRef crec)
 {
     buf = dbr_read_contr(buf, crec.c_arg());
     if (!buf)
@@ -232,11 +232,11 @@ read_entity(const char* buf, ContrRec crec)
     return buf;
 }
 
-class TraderRec : public RecBase {
+class TraderRecRef : public RecRefBase {
 public:
     explicit
-    TraderRec(DbrRec& impl) noexcept
-    : RecBase(impl)
+    TraderRecRef(DbrRec& impl) noexcept
+    : RecRefBase(impl)
     {
     }
     Display
@@ -252,7 +252,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, TraderRec trec)
+operator <<(std::ostream& os, TraderRecRef trec)
 {
     return os << "id=" << trec.id()
               << ",mnem=" << trec.mnem()
@@ -261,19 +261,19 @@ operator <<(std::ostream& os, TraderRec trec)
 }
 
 inline size_t
-entity_len(TraderRec trec) noexcept
+entity_len(TraderRecRef trec) noexcept
 {
     return dbr_trader_len(trec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, TraderRec trec) noexcept
+write_entity(char* buf, TraderRecRef trec) noexcept
 {
     return dbr_write_trader(buf, trec.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, TraderRec trec)
+read_entity(const char* buf, TraderRecRef trec)
 {
     buf = dbr_read_trader(buf, trec.c_arg());
     if (!buf)
@@ -281,11 +281,11 @@ read_entity(const char* buf, TraderRec trec)
     return buf;
 }
 
-class AccntRec : public RecBase {
+class AccntRecRef : public RecRefBase {
 public:
     explicit
-    AccntRec(DbrRec& impl) noexcept
-    : RecBase(impl)
+    AccntRecRef(DbrRec& impl) noexcept
+    : RecRefBase(impl)
     {
     }
     Display
@@ -301,7 +301,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, AccntRec arec)
+operator <<(std::ostream& os, AccntRecRef arec)
 {
     return os << "id=" << arec.id()
               << ",mnem=" << arec.mnem()
@@ -310,19 +310,19 @@ operator <<(std::ostream& os, AccntRec arec)
 }
 
 inline size_t
-entity_len(AccntRec arec) noexcept
+entity_len(AccntRecRef arec) noexcept
 {
     return dbr_accnt_len(arec.c_arg());
 }
 
 inline char*
-write_entity(char* buf, AccntRec arec) noexcept
+write_entity(char* buf, AccntRecRef arec) noexcept
 {
     return dbr_write_accnt(buf, arec.c_arg());
 }
 
 inline const char*
-read_entity(const char* buf, AccntRec arec)
+read_entity(const char* buf, AccntRecRef arec)
 {
     buf = dbr_read_accnt(buf, arec.c_arg());
     if (!buf)

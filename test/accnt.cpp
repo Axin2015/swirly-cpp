@@ -37,7 +37,7 @@ TEST_CASE(accnt_id)
     AccntRecs::Iterator it = ctx.arecs().find("DBRA");
     check(it != ctx.arecs().end());
 
-    AccntRec arec(*it);
+    AccntRecRef arec(*it);
     Accnt accnt = ctx.accnt(*it);
     check(accnt.id() == arec.id());
 }

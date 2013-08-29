@@ -329,11 +329,11 @@ public:
     }
 };
 
-class Side {
+class SideRef {
     DbrSide* impl_;
 public:
     explicit
-    Side(DbrSide& impl) noexcept
+    SideRef(DbrSide& impl) noexcept
         : impl_(&impl)
     {
     }
@@ -374,7 +374,7 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Side side)
+operator <<(std::ostream& os, SideRef side)
 {
     return os << "last_ticks=" << side.last_ticks()
               << ",last_lots=" << side.last_lots()
