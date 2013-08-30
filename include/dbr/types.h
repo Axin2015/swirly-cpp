@@ -48,9 +48,9 @@ typedef DbrIncs DbrTicks;
 typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
-    DBR_CONTR = 1,
-    DBR_TRADER,
+    DBR_TRADER = 1,
     DBR_ACCNT,
+    DBR_CONTR,
     DBR_DEPTH,
     DBR_ORDER,
     DBR_MEMB,
@@ -131,9 +131,17 @@ struct DbrRec {
     int type;
     DbrIden id;
     DbrMnem mnem;
+    DbrDisplay display;
     union {
         struct {
-            DbrDisplay display;
+            DbrEmail email;
+            DbrTrader state;
+        } trader;
+        struct {
+            DbrEmail email;
+            DbrAccnt state;
+        } accnt;
+        struct {
             DbrMnem asset_type;
             DbrMnem asset;
             DbrMnem ccy;
@@ -149,16 +157,6 @@ struct DbrRec {
             DbrLots min_lots;
             DbrLots max_lots;
         } contr;
-        struct {
-            DbrDisplay display;
-            DbrEmail email;
-            DbrTrader state;
-        } trader;
-        struct {
-            DbrDisplay display;
-            DbrEmail email;
-            DbrAccnt state;
-        } accnt;
     };
     /**
      * @privatesection

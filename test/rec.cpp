@@ -30,11 +30,6 @@ template <int TypeN>
 struct TypeTraits;
 
 template <>
-struct TypeTraits<DBR_CONTR> {
-    typedef ContrRecRef TypeRecRef;
-};
-
-template <>
 struct TypeTraits<DBR_TRADER> {
     typedef TraderRecRef TypeRecRef;
 };
@@ -42,6 +37,11 @@ struct TypeTraits<DBR_TRADER> {
 template <>
 struct TypeTraits<DBR_ACCNT> {
     typedef AccntRecRef TypeRecRef;
+};
+
+template <>
+struct TypeTraits<DBR_CONTR> {
+    typedef ContrRecRef TypeRecRef;
 };
 
 template <int TypeN>

@@ -86,7 +86,7 @@ public:
         return rec;
     }
     void
-    free_rec(DbrRec* rec)
+    free_rec(DbrRec* rec) noexcept
     {
         dbr_pool_free_rec(impl_, rec);
     }
@@ -99,7 +99,7 @@ public:
         return level;
     }
     void
-    free_level(DbrLevel* level)
+    free_level(DbrLevel* level) noexcept
     {
         dbr_pool_free_level(impl_, level);
     }
@@ -112,7 +112,7 @@ public:
         return match;
     }
     void
-    free_match(DbrMatch* match)
+    free_match(DbrMatch* match) noexcept
     {
         dbr_pool_free_match(impl_, match);
     }
@@ -125,7 +125,7 @@ public:
         return order;
     }
     void
-    free_order(DbrOrder* order)
+    free_order(DbrOrder* order) noexcept
     {
         dbr_pool_free_order(impl_, order);
     }
@@ -138,7 +138,7 @@ public:
         return memb;
     }
     void
-    free_memb(DbrMemb* memb)
+    free_memb(DbrMemb* memb) noexcept
     {
         dbr_pool_free_memb(impl_, memb);
     }
@@ -151,7 +151,7 @@ public:
         return trade;
     }
     void
-    free_trade(DbrTrade* trade)
+    free_trade(DbrTrade* trade) noexcept
     {
         dbr_pool_free_trade(impl_, trade);
     }
@@ -164,7 +164,7 @@ public:
         return posn;
     }
     void
-    free_posn(DbrPosn* posn)
+    free_posn(DbrPosn* posn) noexcept
     {
         dbr_pool_free_posn(impl_, posn);
     }
@@ -177,7 +177,7 @@ public:
         return sub;
     }
     void
-    free_sub(DbrSub* sub)
+    free_sub(DbrSub* sub) noexcept
     {
         dbr_pool_free_sub(impl_, sub);
     }

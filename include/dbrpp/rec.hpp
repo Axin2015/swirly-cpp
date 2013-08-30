@@ -75,7 +75,100 @@ public:
     {
         return Mnem(impl_->mnem);
     }
+    Display
+    display() const noexcept
+    {
+        return Display(impl_->display);
+    }
 };
+
+class TraderRecRef : public RecRefBase {
+public:
+    explicit
+    TraderRecRef(DbrRec& impl) noexcept
+    : RecRefBase(impl)
+    {
+    }
+    Email
+    email() const noexcept
+    {
+        return Email(impl_->trader.email);
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, TraderRecRef trec)
+{
+    return os << "id=" << trec.id()
+              << ",mnem=" << trec.mnem()
+              << ",display=" << trec.display()
+              << ",email=" << trec.email();
+}
+
+inline size_t
+entity_len(TraderRecRef trec) noexcept
+{
+    return dbr_trader_len(trec.c_arg());
+}
+
+inline char*
+write_entity(char* buf, TraderRecRef trec) noexcept
+{
+    return dbr_write_trader(buf, trec.c_arg());
+}
+
+inline const char*
+read_entity(const char* buf, TraderRecRef trec)
+{
+    buf = dbr_read_trader(buf, trec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+class AccntRecRef : public RecRefBase {
+public:
+    explicit
+    AccntRecRef(DbrRec& impl) noexcept
+    : RecRefBase(impl)
+    {
+    }
+    Email
+    email() const noexcept
+    {
+        return Email(impl_->accnt.email);
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, AccntRecRef arec)
+{
+    return os << "id=" << arec.id()
+              << ",mnem=" << arec.mnem()
+              << ",display=" << arec.display()
+              << ",email=" << arec.email();
+}
+
+inline size_t
+entity_len(AccntRecRef arec) noexcept
+{
+    return dbr_accnt_len(arec.c_arg());
+}
+
+inline char*
+write_entity(char* buf, AccntRecRef arec) noexcept
+{
+    return dbr_write_accnt(buf, arec.c_arg());
+}
+
+inline const char*
+read_entity(const char* buf, AccntRecRef arec)
+{
+    buf = dbr_read_accnt(buf, arec.c_arg());
+    if (!buf)
+        throw_exception();
+    return buf;
+}
 
 class ContrRecRef : public RecRefBase {
 public:
@@ -83,11 +176,6 @@ public:
     ContrRecRef(DbrRec& impl) noexcept
     : RecRefBase(impl)
     {
-    }
-    Display
-    display() const noexcept
-    {
-        return Display(impl_->contr.display);
     }
     Mnem
     asset_type() const noexcept
@@ -227,104 +315,6 @@ inline const char*
 read_entity(const char* buf, ContrRecRef crec)
 {
     buf = dbr_read_contr(buf, crec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
-}
-
-class TraderRecRef : public RecRefBase {
-public:
-    explicit
-    TraderRecRef(DbrRec& impl) noexcept
-    : RecRefBase(impl)
-    {
-    }
-    Display
-    display() const noexcept
-    {
-        return Display(impl_->trader.display);
-    }
-    Email
-    email() const noexcept
-    {
-        return Email(impl_->trader.email);
-    }
-};
-
-inline std::ostream&
-operator <<(std::ostream& os, TraderRecRef trec)
-{
-    return os << "id=" << trec.id()
-              << ",mnem=" << trec.mnem()
-              << ",display=" << trec.display()
-              << ",email=" << trec.email();
-}
-
-inline size_t
-entity_len(TraderRecRef trec) noexcept
-{
-    return dbr_trader_len(trec.c_arg());
-}
-
-inline char*
-write_entity(char* buf, TraderRecRef trec) noexcept
-{
-    return dbr_write_trader(buf, trec.c_arg());
-}
-
-inline const char*
-read_entity(const char* buf, TraderRecRef trec)
-{
-    buf = dbr_read_trader(buf, trec.c_arg());
-    if (!buf)
-        throw_exception();
-    return buf;
-}
-
-class AccntRecRef : public RecRefBase {
-public:
-    explicit
-    AccntRecRef(DbrRec& impl) noexcept
-    : RecRefBase(impl)
-    {
-    }
-    Display
-    display() const noexcept
-    {
-        return Display(impl_->accnt.display);
-    }
-    Email
-    email() const noexcept
-    {
-        return Email(impl_->accnt.email);
-    }
-};
-
-inline std::ostream&
-operator <<(std::ostream& os, AccntRecRef arec)
-{
-    return os << "id=" << arec.id()
-              << ",mnem=" << arec.mnem()
-              << ",display=" << arec.display()
-              << ",email=" << arec.email();
-}
-
-inline size_t
-entity_len(AccntRecRef arec) noexcept
-{
-    return dbr_accnt_len(arec.c_arg());
-}
-
-inline char*
-write_entity(char* buf, AccntRecRef arec) noexcept
-{
-    return dbr_write_accnt(buf, arec.c_arg());
-}
-
-inline const char*
-read_entity(const char* buf, AccntRecRef arec)
-{
-    buf = dbr_read_accnt(buf, arec.c_arg());
     if (!buf)
         throw_exception();
     return buf;

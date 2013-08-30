@@ -56,11 +56,6 @@
     "UPDATE trade SET archive = 1, modified = ?"                        \
     " WHERE id = ?"
 
-#define SELECT_CONTR_SQL                                                \
-    "SELECT id, mnem, display, asset_type, asset, ccy, tick_numer,"     \
-    " tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots"     \
-    " FROM contr_v"
-
 #define SELECT_TRADER_SQL                                    \
     "SELECT id, mnem, display, email"                        \
     " FROM trader_v"
@@ -68,6 +63,11 @@
 #define SELECT_ACCNT_SQL                                      \
     "SELECT id, mnem, display, email"                         \
     " FROM accnt_v"
+
+#define SELECT_CONTR_SQL                                                \
+    "SELECT id, mnem, display, asset_type, asset, ccy, tick_numer,"     \
+    " tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots"     \
+    " FROM contr_v"
 
 #define SELECT_ORDER_SQL                                                \
     "SELECT id, rev, status, trader, accnt, contr, settl_date, ref,"    \
@@ -426,112 +426,6 @@ bind_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 static ssize_t
-select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
-{
-    enum {
-        ID,
-        MNEM,
-        DISPLAY,
-        ASSET_TYPE,
-        ASSET,
-        CCY,
-        TICK_NUMER,
-        TICK_DENOM,
-        LOT_NUMER,
-        LOT_DENOM,
-        PIP_DP,
-        MIN_LOTS,
-        MAX_LOTS
-    };
-
-    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_CONTR_SQL);
-    if (!stmt)
-        goto fail1;
-
-    struct DbrQueue rq;
-    dbr_queue_init(&rq);
-
-    ssize_t size = 0;
-    for (;;) {
-        int rc = sqlite3_step(stmt);
-        if (rc == SQLITE_ROW) {
-
-            struct DbrRec* rec = dbr_pool_alloc_rec(sqlite->pool);
-            if (!rec)
-                goto fail2;
-
-            // Header.
-
-            rec->type = DBR_CONTR;
-            rec->id = sqlite3_column_int64(stmt, ID);
-            strncpy(rec->mnem,
-                    (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
-
-            // Body.
-
-            strncpy(rec->contr.display,
-                    (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
-            strncpy(rec->contr.asset_type,
-                    (const char*)sqlite3_column_text(stmt, ASSET_TYPE), DBR_MNEM_MAX);
-            strncpy(rec->contr.asset,
-                    (const char*)sqlite3_column_text(stmt, ASSET), DBR_MNEM_MAX);
-            strncpy(rec->contr.ccy,
-                    (const char*)sqlite3_column_text(stmt, CCY), DBR_MNEM_MAX);
-
-            const int tick_numer = sqlite3_column_int(stmt, TICK_NUMER);
-            const int tick_denom = sqlite3_column_int(stmt, TICK_DENOM);
-            const double price_inc = dbr_fract_to_real(tick_numer, tick_denom);
-            rec->contr.tick_numer = tick_numer;
-            rec->contr.tick_denom = tick_denom;
-            rec->contr.price_inc = price_inc;
-
-            const int lot_numer = sqlite3_column_int(stmt, LOT_NUMER);
-            const int lot_denom = sqlite3_column_int(stmt, LOT_DENOM);
-            const double qty_inc = dbr_fract_to_real(lot_numer, lot_denom);
-            rec->contr.lot_numer = lot_numer;
-            rec->contr.lot_denom = lot_denom;
-            rec->contr.qty_inc = qty_inc;
-
-            rec->contr.price_dp = dbr_real_to_dp(price_inc);
-            rec->contr.pip_dp = sqlite3_column_int(stmt, PIP_DP);
-            rec->contr.qty_dp = dbr_real_to_dp(qty_inc);
-
-            rec->contr.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
-            rec->contr.max_lots = sqlite3_column_int64(stmt, MAX_LOTS);
-
-            dbr_log_debug3("contr: id=%ld,mnem=%.16s,display=%.64s,asset_type=%.16s,"
-                           "asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,price_dp=%d,"
-                           "pip_dp=%d,qty_dp=%d,min_lots=%ld,max_lots=%ld",
-                           rec->id, rec->mnem, rec->contr.display, rec->contr.asset_type,
-                           rec->contr.asset, rec->contr.ccy, rec->contr.price_inc,
-                           rec->contr.qty_inc, rec->contr.price_dp, rec->contr.pip_dp,
-                           rec->contr.qty_dp, rec->contr.min_lots, rec->contr.max_lots);
-
-            dbr_queue_push(&rq, &rec->model_node_);
-            ++size;
-
-        } else if (rc == SQLITE_DONE) {
-            break;
-        } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
-            goto fail2;
-        }
-    }
-
-    sqlite3_clear_bindings(stmt);
-    sqlite3_finalize(stmt);
-    *first = dbr_queue_first(&rq);
-    return size;
- fail2:
-    sqlite3_clear_bindings(stmt);
-    sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_CONTR, dbr_queue_first(&rq));
-    *first = NULL;
- fail1:
-    return -1;
-}
-
-static ssize_t
 select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
 {
     enum {
@@ -563,11 +457,11 @@ select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
             rec->id = sqlite3_column_int64(stmt, ID);
             strncpy(rec->mnem,
                     (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
+            strncpy(rec->display,
+                    (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
 
             // Body.
 
-            strncpy(rec->trader.display,
-                    (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
             strncpy(rec->trader.email,
                     (const char*)sqlite3_column_text(stmt, EMAIL), DBR_EMAIL_MAX);
             rec->trader.state = NULL;
@@ -631,11 +525,11 @@ select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
             rec->id = sqlite3_column_int64(stmt, ID);
             strncpy(rec->mnem,
                     (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
+            strncpy(rec->display,
+                    (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
 
             // Body.
 
-            strncpy(rec->accnt.display,
-                    (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
             strncpy(rec->accnt.email,
                     (const char*)sqlite3_column_text(stmt, EMAIL), DBR_EMAIL_MAX);
             rec->accnt.state = NULL;
@@ -662,6 +556,112 @@ select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
     dbr_pool_free_list(sqlite->pool, DBR_ACCNT, dbr_queue_first(&rq));
+    *first = NULL;
+ fail1:
+    return -1;
+}
+
+static ssize_t
+select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
+{
+    enum {
+        ID,
+        MNEM,
+        DISPLAY,
+        ASSET_TYPE,
+        ASSET,
+        CCY,
+        TICK_NUMER,
+        TICK_DENOM,
+        LOT_NUMER,
+        LOT_DENOM,
+        PIP_DP,
+        MIN_LOTS,
+        MAX_LOTS
+    };
+
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_CONTR_SQL);
+    if (!stmt)
+        goto fail1;
+
+    struct DbrQueue rq;
+    dbr_queue_init(&rq);
+
+    ssize_t size = 0;
+    for (;;) {
+        int rc = sqlite3_step(stmt);
+        if (rc == SQLITE_ROW) {
+
+            struct DbrRec* rec = dbr_pool_alloc_rec(sqlite->pool);
+            if (!rec)
+                goto fail2;
+
+            // Header.
+
+            rec->type = DBR_CONTR;
+            rec->id = sqlite3_column_int64(stmt, ID);
+            strncpy(rec->mnem,
+                    (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
+            strncpy(rec->display,
+                    (const char*)sqlite3_column_text(stmt, DISPLAY), DBR_DISPLAY_MAX);
+
+            // Body.
+
+            strncpy(rec->contr.asset_type,
+                    (const char*)sqlite3_column_text(stmt, ASSET_TYPE), DBR_MNEM_MAX);
+            strncpy(rec->contr.asset,
+                    (const char*)sqlite3_column_text(stmt, ASSET), DBR_MNEM_MAX);
+            strncpy(rec->contr.ccy,
+                    (const char*)sqlite3_column_text(stmt, CCY), DBR_MNEM_MAX);
+
+            const int tick_numer = sqlite3_column_int(stmt, TICK_NUMER);
+            const int tick_denom = sqlite3_column_int(stmt, TICK_DENOM);
+            const double price_inc = dbr_fract_to_real(tick_numer, tick_denom);
+            rec->contr.tick_numer = tick_numer;
+            rec->contr.tick_denom = tick_denom;
+            rec->contr.price_inc = price_inc;
+
+            const int lot_numer = sqlite3_column_int(stmt, LOT_NUMER);
+            const int lot_denom = sqlite3_column_int(stmt, LOT_DENOM);
+            const double qty_inc = dbr_fract_to_real(lot_numer, lot_denom);
+            rec->contr.lot_numer = lot_numer;
+            rec->contr.lot_denom = lot_denom;
+            rec->contr.qty_inc = qty_inc;
+
+            rec->contr.price_dp = dbr_real_to_dp(price_inc);
+            rec->contr.pip_dp = sqlite3_column_int(stmt, PIP_DP);
+            rec->contr.qty_dp = dbr_real_to_dp(qty_inc);
+
+            rec->contr.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
+            rec->contr.max_lots = sqlite3_column_int64(stmt, MAX_LOTS);
+
+            dbr_log_debug3("contr: id=%ld,mnem=%.16s,display=%.64s,asset_type=%.16s,"
+                           "asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,price_dp=%d,"
+                           "pip_dp=%d,qty_dp=%d,min_lots=%ld,max_lots=%ld",
+                           rec->id, rec->mnem, rec->contr.display, rec->contr.asset_type,
+                           rec->contr.asset, rec->contr.ccy, rec->contr.price_inc,
+                           rec->contr.qty_inc, rec->contr.price_dp, rec->contr.pip_dp,
+                           rec->contr.qty_dp, rec->contr.min_lots, rec->contr.max_lots);
+
+            dbr_queue_push(&rq, &rec->model_node_);
+            ++size;
+
+        } else if (rc == SQLITE_DONE) {
+            break;
+        } else {
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
+            goto fail2;
+        }
+    }
+
+    sqlite3_clear_bindings(stmt);
+    sqlite3_finalize(stmt);
+    *first = dbr_queue_first(&rq);
+    return size;
+ fail2:
+    sqlite3_clear_bindings(stmt);
+    sqlite3_finalize(stmt);
+    dbr_pool_free_list(sqlite->pool, DBR_CONTR, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -1154,14 +1154,14 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, struct DbrSlNode** 
 {
     ssize_t ret;
     switch (type) {
-    case DBR_CONTR:
-        ret = select_contr(sqlite, first);
-        break;
     case DBR_TRADER:
         ret = select_trader(sqlite, first);
         break;
     case DBR_ACCNT:
         ret = select_accnt(sqlite, first);
+        break;
+    case DBR_CONTR:
+        ret = select_contr(sqlite, first);
         break;
     case DBR_ORDER:
         ret = select_order(sqlite, first);

@@ -36,7 +36,7 @@ set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display, const 
     rec.type = DBR_CONTR;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec.contr.display, display, DBR_DISPLAY_MAX);
+    strncpy(rec.display, display, DBR_DISPLAY_MAX);
     strncpy(rec.contr.asset_type, asset_type, DBR_MNEM_MAX);
     strncpy(rec.contr.asset, asset, DBR_MNEM_MAX);
     strncpy(rec.contr.ccy, ccy, DBR_MNEM_MAX);
@@ -80,7 +80,7 @@ set_trader(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
     rec.type = DBR_TRADER;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec.trader.display, display, DBR_DISPLAY_MAX);
+    strncpy(rec.display, display, DBR_DISPLAY_MAX);
     strncpy(rec.trader.email, email, DBR_EMAIL_MAX);
     rec.trader.state = nullptr;
 }
@@ -114,7 +114,7 @@ set_accnt(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
     rec.type = DBR_ACCNT;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec.accnt.display, display, DBR_DISPLAY_MAX);
+    strncpy(rec.display, display, DBR_DISPLAY_MAX);
     strncpy(rec.accnt.email, email, DBR_EMAIL_MAX);
     rec.accnt.state = nullptr;
 }
@@ -202,14 +202,14 @@ Model::read_entity(int type, DbrSlNode*& first) noexcept
 {
     ssize_t ret;
     switch (type) {
-    case DBR_CONTR:
-        ret = read_contr(pool_, first);
-        break;
     case DBR_TRADER:
         ret = read_trader(pool_, first);
         break;
     case DBR_ACCNT:
         ret = read_accnt(pool_, first);
+        break;
+    case DBR_CONTR:
+        ret = read_contr(pool_, first);
         break;
     case DBR_ORDER:
         ret = read_order(pool_, first);

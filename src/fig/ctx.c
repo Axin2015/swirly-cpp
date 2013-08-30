@@ -385,9 +385,9 @@ dbr_ctx_create(DbrPool pool, DbrJourn journ, DbrModel model)
 
     // Data structures are fully initialised at this point.
 
-    if (!emplace_recs(ctx, DBR_CONTR)
-        || !emplace_recs(ctx, DBR_TRADER)
+    if (!emplace_recs(ctx, DBR_TRADER)
         || !emplace_recs(ctx, DBR_ACCNT)
+        || !emplace_recs(ctx, DBR_CONTR)
         || !emplace_orders(ctx)
         || !emplace_membs(ctx)
         || !emplace_trades(ctx)
@@ -479,13 +479,13 @@ dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrB
     new_order->status = DBR_NEW;
     new_order->trader.rec = trec;
     new_order->accnt.rec = arec;
+    new_order->contr.rec = book->crec;
+    new_order->settl_date = book->settl_date;
     if (ref)
         strncpy(new_order->ref, ref, DBR_REF_MAX);
     else
         new_order->ref[0] = '\0';
 
-    new_order->contr.rec = book->crec;
-    new_order->settl_date = book->settl_date;
     new_order->action = action;
     new_order->ticks = ticks;
     new_order->resd = lots;

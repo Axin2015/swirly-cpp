@@ -28,7 +28,7 @@ set_contr(DbrRec* rec, DbrIden id, const char* mnem, const char* display, const 
     rec->type = DBR_CONTR;
     rec->id = id;
     strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec->contr.display, display, DBR_DISPLAY_MAX);
+    strncpy(rec->display, display, DBR_DISPLAY_MAX);
     strncpy(rec->contr.asset_type, asset_type, DBR_MNEM_MAX);
     strncpy(rec->contr.asset, asset, DBR_MNEM_MAX);
     strncpy(rec->contr.ccy, ccy, DBR_MNEM_MAX);
@@ -54,7 +54,7 @@ TEST_CASE(proto_contr)
 
     check(rec.id == 1);
     check(sequal(rec.mnem, "EURUSD", DBR_MNEM_MAX));
-    check(sequal(rec.contr.display, "EURUSD", DBR_DISPLAY_MAX));
+    check(sequal(rec.display, "EURUSD", DBR_DISPLAY_MAX));
     check(sequal(rec.contr.asset_type, "CURRENCY", DBR_MNEM_MAX));
     check(sequal(rec.contr.asset, "EUR", DBR_MNEM_MAX));
     check(sequal(rec.contr.ccy, "USD", DBR_MNEM_MAX));

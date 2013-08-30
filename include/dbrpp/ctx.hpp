@@ -156,9 +156,9 @@ public:
     }
 };
 
-typedef Recs<DBR_CONTR> ContrRecs;
 typedef Recs<DBR_TRADER> TraderRecs;
 typedef Recs<DBR_ACCNT> AccntRecs;
+typedef Recs<DBR_CONTR> ContrRecs;
 
 class Ctx {
     DbrCtx impl_;
