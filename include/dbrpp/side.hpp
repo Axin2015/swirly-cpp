@@ -376,6 +376,12 @@ public:
         dbr_side_take_order(&impl_, &order, delta, now);
     }
     void
+    new_order(DbrOrder& order, DbrMillis now)
+    {
+        if (!dbr_side_new_order(&impl_, &order, now))
+            throw_exception();
+    }
+    void
     revise_order(DbrOrder& order, DbrLots lots, DbrMillis now)
     {
         if (!dbr_side_revise_order(&impl_, &order, lots, now))

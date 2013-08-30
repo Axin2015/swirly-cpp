@@ -73,6 +73,18 @@ dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order);
 DBR_API void
 dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now);
 
+static inline DbrBool
+dbr_side_new_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
+{
+    order->rev = 1;
+    order->status = DBR_NEW;
+    order->resd = order->lots;
+    order->exec = 0;
+    order->created = now;
+    order->modified = now;
+    return dbr_side_insert_order(side, order);
+}
+
 DBR_API DbrBool
 dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now);
 
