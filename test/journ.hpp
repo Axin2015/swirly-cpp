@@ -57,12 +57,6 @@ public:
 
     DbrBool
     archive_trade(DbrIden id, DbrMillis now) noexcept;
-
-    ssize_t
-    read_entity(int type, DbrSlNode*& first) noexcept;
-
-    DbrSlNode*
-    end_entity() noexcept;
 };
 
 #endif // JOURN_HPP

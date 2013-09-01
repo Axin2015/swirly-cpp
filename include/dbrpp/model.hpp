@@ -45,7 +45,6 @@ class ModelRecs {
         }
     };
     DbrSlNode* first_;
-    DbrSlNode* end_;
     size_t size_;
     DbrPool pool_;
 public:
@@ -80,7 +79,7 @@ private:
     destroy()
     {
         DbrSlNode* node = first_;
-        while (node != end_) {
+        while (node) {
             struct DbrRec* rec = dbr_rec_entry(node);
             node = node->next;
             dbr_pool_free_rec(pool_, rec);
@@ -95,14 +94,12 @@ public:
     constexpr
     ModelRecs(decltype(nullptr)) noexcept
     : first_(nullptr),
-      end_(nullptr),
       size_(0),
       pool_(nullptr)
     {
     }
-    ModelRecs(DbrSlNode* first, DbrSlNode* end, size_t size, DbrPool pool) noexcept
+    ModelRecs(DbrSlNode* first, size_t size, DbrPool pool) noexcept
     : first_(first),
-      end_(end),
       size_(size),
       pool_(pool)
     {
@@ -118,7 +115,6 @@ public:
 
     ModelRecs(ModelRecs&& rhs) noexcept
     : first_(nullptr),
-      end_(nullptr),
       size_(0),
       pool_(nullptr)
     {
@@ -130,7 +126,6 @@ public:
         if (pool_) {
             destroy();
             first_ = nullptr;
-            end_ = nullptr;
             size_ = 0;
             pool_ = nullptr;
         }
@@ -141,7 +136,6 @@ public:
     swap(ModelRecs& rhs) noexcept
     {
         std::swap(first_, rhs.first_);
-        std::swap(end_, rhs.end_);
         std::swap(size_, rhs.size_);
         std::swap(pool_, rhs.pool_);
     }
@@ -161,12 +155,12 @@ public:
     Iterator
     end() noexcept
     {
-        return end_;
+        return nullptr;
     }
     ConstIterator
     end() const noexcept
     {
-        return end_;
+        return nullptr;
     }
 
     // Accessor.
@@ -209,17 +203,11 @@ class IModel : public DbrIModel {
     {
         return static_cast<DerivedT*>(model)->read_entity(type, pool, *first);
     }
-    static DbrSlNode*
-    end_entity(DbrModel model) noexcept
-    {
-        return static_cast<DerivedT*>(model)->end_entity();
-    }
     static const DbrModelVtbl*
     vtbl() noexcept
     {
         static const DbrModelVtbl VTBL = {
-            read_entity,
-            end_entity
+            read_entity
         };
         return &VTBL;
     }
@@ -239,19 +227,13 @@ read_entity(DbrModel model, int type, DbrPool pool, DbrSlNode*& first)
     return size;
 }
 
-inline DbrSlNode*
-end_entity(DbrModel model) noexcept
-{
-    return model->vtbl->end_entity(model);
-}
-
 template <int TypeN>
 inline ModelRecs<TypeN>
 read_entity(DbrModel model, DbrPool pool)
 {
-    DbrSlNode* first, * end = end_entity(model);
+    DbrSlNode* first;
     const auto size = read_entity(model, TypeN, pool, first);
-    return ModelRecs<TypeN>(first, end, size, pool);
+    return ModelRecs<TypeN>(first, size, pool);
 }
 
 } // dbr

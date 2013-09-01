@@ -230,9 +230,3 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
     }
     return ret;
 }
-
-DbrSlNode*
-Model::end_entity() noexcept
-{
-    return nullptr;
-}

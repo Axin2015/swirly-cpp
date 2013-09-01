@@ -27,23 +27,19 @@
  */
 
 struct DbrModelVtbl {
+    /**
+     * Read entity list where end is assumed to be null.
+     *
+     * The caller is responsible for freeing the resulting list.
+     */
     ssize_t
     (*read_entity)(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first);
-
-    struct DbrSlNode*
-    (*end_entity)(DbrModel model);
 };
 
 static inline ssize_t
 dbr_model_read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
     return model->vtbl->read_entity(model, type, pool, first);
-}
-
-static inline struct DbrSlNode*
-dbr_model_end_entity(DbrModel model)
-{
-    return model->vtbl->end_entity(model);
 }
 
 /** @} */

@@ -1182,12 +1182,6 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool, struc
     return ret;
 }
 
-DBR_EXTERN struct DbrSlNode*
-fir_sqlite_end_entity(struct FirSqlite* sqlite)
-{
-    return NULL;
-}
-
 struct DbrSqlite_ {
     DbrIden id;
     struct FirSqlite impl;
@@ -1299,17 +1293,8 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
     return fir_sqlite_select_entity(impl, type, pool, first);
 }
 
-static struct DbrSlNode*
-end_entity(DbrModel model)
-{
-    struct DbrSqlite_* sqlite = model_implof(model);
-    struct FirSqlite* impl = &sqlite->impl;
-    return fir_sqlite_end_entity(impl);
-}
-
 static const struct DbrModelVtbl MODEL_VTBL = {
-    .read_entity = read_entity,
-    .end_entity = end_entity
+    .read_entity = read_entity
 };
 
 DBR_API DbrSqlite

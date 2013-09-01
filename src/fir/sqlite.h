@@ -76,7 +76,4 @@ DBR_EXTERN ssize_t
 fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
                          struct DbrSlNode** first);
 
-DBR_EXTERN struct DbrSlNode*
-fir_sqlite_end_entity(struct FirSqlite* sqlite);
-
 #endif // FIR_SQLITE_H

@@ -26,9 +26,6 @@ class Model : public dbr::IModel<Model> {
 public:
     ssize_t
     read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept;
-
-    DbrSlNode*
-    end_entity() noexcept;
 };
 
 #endif // MODEL_HPP
