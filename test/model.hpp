@@ -23,15 +23,9 @@
 #include <dbr/pool.h>
 
 class Model : public dbr::IModel<Model> {
-    DbrPool pool_;
 public:
-    explicit
-    Model(DbrPool pool)
-        : pool_(pool)
-    {
-    }
     ssize_t
-    read_entity(int type, DbrSlNode*& first) noexcept;
+    read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept;
 
     DbrSlNode*
     end_entity() noexcept;

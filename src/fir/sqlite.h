@@ -27,7 +27,6 @@ struct sqlite3;
 struct sqlite3_stmt;
 
 struct FirSqlite {
-    DbrPool pool;
     struct sqlite3* db;
     struct sqlite3_stmt* insert_order;
     struct sqlite3_stmt* update_order;
@@ -38,7 +37,7 @@ struct FirSqlite {
 };
 
 DBR_EXTERN DbrBool
-fir_sqlite_init(struct FirSqlite* sqlite, DbrPool pool, const char* path);
+fir_sqlite_init(struct FirSqlite* sqlite, const char* path);
 
 // Assumes that pointer is not null.
 
@@ -74,7 +73,8 @@ DBR_EXTERN DbrBool
 fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
 
 DBR_EXTERN ssize_t
-fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, struct DbrSlNode** first);
+fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
+                         struct DbrSlNode** first);
 
 DBR_EXTERN struct DbrSlNode*
 fir_sqlite_end_entity(struct FirSqlite* sqlite);

@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 DBR_API void
-dbr_book_init(struct DbrBook* book, DbrPool pool, struct DbrRec* crec, DbrDate settl_date)
+dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, DbrPool pool)
 {
     book->crec = crec;
     book->settl_date = settl_date;

@@ -28,7 +28,7 @@
 namespace dbr {
 
 template <int TypeN>
-class Recs {
+class CtxRecs {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrRec Entry;
         static Entry*
@@ -72,12 +72,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    Recs(DbrCtx ctx) noexcept
+    CtxRecs(DbrCtx ctx) noexcept
     : ctx_(ctx)
     {
     }
     void
-    swap(Recs& rhs) noexcept
+    swap(CtxRecs& rhs) noexcept
     {
         std::swap(ctx_, rhs.ctx_);
     }
@@ -156,9 +156,9 @@ public:
     }
 };
 
-typedef Recs<DBR_TRADER> TraderRecs;
-typedef Recs<DBR_ACCNT> AccntRecs;
-typedef Recs<DBR_CONTR> ContrRecs;
+typedef CtxRecs<DBR_TRADER> CtxTraderRecs;
+typedef CtxRecs<DBR_ACCNT> CtxAccntRecs;
+typedef CtxRecs<DBR_CONTR> CtxContrRecs;
 
 class Ctx {
     DbrCtx impl_;
@@ -173,8 +173,8 @@ public:
     : impl_(nullptr)
     {
     }
-    Ctx(DbrPool pool, DbrJourn journ, DbrModel model)
-        : impl_(dbr_ctx_create(pool, journ, model))
+    Ctx(DbrJourn journ, DbrModel model, DbrPool pool)
+        : impl_(dbr_ctx_create(journ, model, pool))
     {
         if (!impl_)
             throw_exception();
@@ -196,7 +196,7 @@ public:
     Ctx(Ctx&& rhs) noexcept
     : impl_(nullptr)
     {
-        std::swap(impl_, rhs.impl_);
+        swap(rhs);
     }
     Ctx&
     operator =(Ctx&& rhs) noexcept
@@ -205,35 +205,34 @@ public:
             dbr_ctx_destroy(impl_);
             impl_ = nullptr;
         }
-        std::swap(impl_, rhs.impl_);
+        swap(rhs);
         return *this;
     }
-
     void
     swap(Ctx& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
     }
     template <int TypeN>
-    Recs<TypeN>
+    CtxRecs<TypeN>
     recs() const noexcept
     {
-        return Recs<TypeN>(impl_);
+        return CtxRecs<TypeN>(impl_);
     }
-    ContrRecs
+    CtxContrRecs
     crecs() const noexcept
     {
-        return ContrRecs(impl_);
+        return CtxContrRecs(impl_);
     }
-    TraderRecs
+    CtxTraderRecs
     trecs() const noexcept
     {
-        return TraderRecs(impl_);
+        return CtxTraderRecs(impl_);
     }
-    AccntRecs
+    CtxAccntRecs
     arecs() const noexcept
     {
-        return AccntRecs(impl_);
+        return CtxAccntRecs(impl_);
     }
     BookRef
     book(DbrRec& crec, DbrDate settl_date) const

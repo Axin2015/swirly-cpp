@@ -42,7 +42,7 @@ struct DbrBest {
 };
 
 DBR_API void
-dbr_book_init(struct DbrBook* book, DbrPool pool, struct DbrRec* crec, DbrDate settl_date);
+dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, DbrPool pool);
 
 DBR_API void
 dbr_book_term(struct DbrBook* book);

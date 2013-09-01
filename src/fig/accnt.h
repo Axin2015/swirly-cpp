@@ -124,7 +124,7 @@ fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, DbrPool pool, struct DbrRec* crec, DbrDate settl_date);
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, DbrPool pool);
 
 static inline struct DbrRbNode*
 fig_accnt_find_posn_id(const struct FigAccnt* accnt, DbrIden id)

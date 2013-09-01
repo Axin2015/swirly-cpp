@@ -37,8 +37,8 @@ public:
     : impl_(nullptr)
     {
     }
-    Sqlite(DbrPool pool, DbrIden seed, const char* path)
-    : impl_(dbr_sqlite_create(pool, seed, path))
+    Sqlite(DbrIden seed, const char* path)
+    : impl_(dbr_sqlite_create(seed, path))
     {
         if (!impl_)
             throw_exception();
@@ -60,7 +60,7 @@ public:
     Sqlite(Sqlite&& rhs) noexcept
     : impl_(nullptr)
     {
-        std::swap(impl_, rhs.impl_);
+        swap(rhs);
     }
     Sqlite&
     operator =(Sqlite&& rhs) noexcept
@@ -69,7 +69,7 @@ public:
             dbr_sqlite_destroy(impl_);
             impl_ = nullptr;
         }
-        std::swap(impl_, rhs.impl_);
+        swap(rhs);
         return *this;
     }
     void

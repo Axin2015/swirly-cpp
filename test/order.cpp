@@ -15,30 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "factory.hpp"
 #include "test.hpp"
-
-#include <dbrpp/order.hpp>
-#include <dbrpp/pool.hpp>
-#include <dbrpp/side.hpp>
-
-#include <dbr/util.h>
-
-using namespace dbr;
-
-TEST_CASE(order_test)
-{
-    Pool pool;
-    auto trader = create_trader(pool, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
-    auto accnt = create_accnt(pool, 1, "DBRA", "Account A", "dbra@doobry.org");
-    auto contr = create_contr(pool, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
-                              1, 10000, 1000000, 1, 4, 1, 10);
-
-    auto apple = create_order(pool, 1, *trader, *accnt, *contr, 20130827,
-                              "apple", DBR_BUY, 12345, 10, 0, 0);
-    auto orange = create_order(pool, 1, *trader, *accnt, *contr, 20130827,
-                               "orange", DBR_BUY, 12345, 10, 0, 0);
-
-    Side side(pool);
-    side.new_order(*apple, dbr_millis());
-}

@@ -43,7 +43,7 @@ noterm(struct DbrRec* rec)
 }
 
 static inline void
-free_recs(DbrPool pool, struct DbrSlNode* node, void (*term)(struct DbrRec*))
+free_recs(struct DbrSlNode* node, void (*term)(struct DbrRec*), DbrPool pool)
 {
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
@@ -165,9 +165,9 @@ DBR_EXTERN void
 fig_cache_term(struct FigCache* cache)
 {
     // Traders must be released before books, because traders subscribe to books.
-    free_recs(cache->pool, cache->first_trader, fig_trader_term);
-    free_recs(cache->pool, cache->first_accnt, fig_accnt_term);
-    free_recs(cache->pool, cache->first_contr, noterm);
+    free_recs(cache->first_trader, fig_trader_term, cache->pool);
+    free_recs(cache->first_accnt, fig_accnt_term, cache->pool);
+    free_recs(cache->first_contr, noterm, cache->pool);
 }
 
 DBR_EXTERN void

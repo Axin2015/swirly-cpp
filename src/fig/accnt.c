@@ -114,7 +114,7 @@ fig_accnt_term(struct DbrRec* arec)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, DbrPool pool, struct DbrRec* crec, DbrDate settl_date)
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ACCNT);

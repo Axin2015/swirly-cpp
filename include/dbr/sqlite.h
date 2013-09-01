@@ -31,8 +31,6 @@ typedef struct DbrSqlite_* DbrSqlite;
 /**
  * @brief Create SQLite3 model.
  *
- * @param pool Pool.
- *
  * @param seed Seed identifier.
  *
  * @param path Path to the database.
@@ -41,7 +39,7 @@ typedef struct DbrSqlite_* DbrSqlite;
  */
 
 DBR_API DbrSqlite
-dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path);
+dbr_sqlite_create(DbrIden seed, const char* path);
 
 DBR_API void
 dbr_sqlite_destroy(DbrSqlite sqlite);

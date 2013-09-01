@@ -9,9 +9,9 @@ int
 main(int argc, char* argv[])
 {
     try {
+        Sqlite sqlite(1, "doobry.db");
         Pool pool;
-        Sqlite sqlite(pool, 1, "doobry.db");
-        Ctx ctx(pool, sqlite.journ(), sqlite.model());
+        Ctx ctx(sqlite.journ(), sqlite.model(), pool);
 
         cout << "contrs:\n";
         for (auto ref : ctx.crecs()) {

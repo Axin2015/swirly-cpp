@@ -33,9 +33,9 @@
 #include <string.h> // strncpy()
 
 struct DbrCtx_ {
-    DbrPool pool;
     DbrJourn journ;
     DbrModel model;
+    DbrPool pool;
     struct DbrTree books;
     struct FigCache cache;
     struct FigIndex index;
@@ -61,7 +61,7 @@ free_books(struct DbrTree* books)
 }
 
 static void
-free_matches(DbrPool pool, struct DbrSlNode* first)
+free_matches(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
@@ -197,7 +197,7 @@ get_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date)
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
-        dbr_book_init(book, ctx->pool, crec, settl_date);
+        dbr_book_init(book, crec, settl_date, ctx->pool);
         struct DbrRbNode* parent = node;
         dbr_tree_pinsert(&ctx->books, &book->ctx_node_, parent);
     } else
@@ -209,7 +209,7 @@ static DbrBool
 emplace_recs(DbrCtx ctx, int type)
 {
     struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(ctx->model, type, &node);
+    ssize_t size = dbr_model_read_entity(ctx->model, type, ctx->pool, &node);
     if (size == -1)
         return false;
 
@@ -221,7 +221,7 @@ static DbrBool
 emplace_orders(DbrCtx ctx)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(ctx->model, DBR_ORDER, &node) == -1)
+    if (dbr_model_read_entity(ctx->model, DBR_ORDER, ctx->pool, &node) == -1)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -244,7 +244,7 @@ emplace_orders(DbrCtx ctx)
         } else
             book = NULL;
 
-        struct FigTrader* trader = fig_trader_lazy(order->trader.rec, ctx->pool, &ctx->index);
+        struct FigTrader* trader = fig_trader_lazy(order->trader.rec, &ctx->index, ctx->pool);
         if (dbr_unlikely(!trader)) {
             if (book)
                 dbr_book_remove(book, order);
@@ -270,7 +270,7 @@ static DbrBool
 emplace_membs(DbrCtx ctx)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(ctx->model, DBR_MEMB, &node) == -1)
+    if (dbr_model_read_entity(ctx->model, DBR_MEMB, ctx->pool, &node) == -1)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -303,7 +303,7 @@ static DbrBool
 emplace_trades(DbrCtx ctx)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(ctx->model, DBR_TRADE, &node) == -1)
+    if (dbr_model_read_entity(ctx->model, DBR_TRADE, ctx->pool, &node) == -1)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -338,7 +338,7 @@ static DbrBool
 emplace_posns(DbrCtx ctx)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(ctx->model, DBR_POSN, &node) == -1)
+    if (dbr_model_read_entity(ctx->model, DBR_POSN, ctx->pool, &node) == -1)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -368,7 +368,7 @@ emplace_posns(DbrCtx ctx)
 }
 
 DBR_API DbrCtx
-dbr_ctx_create(DbrPool pool, DbrJourn journ, DbrModel model)
+dbr_ctx_create(DbrJourn journ, DbrModel model, DbrPool pool)
 {
     DbrCtx ctx = malloc(sizeof(struct DbrCtx_));
     if (dbr_unlikely(!ctx)) {
@@ -376,9 +376,9 @@ dbr_ctx_create(DbrPool pool, DbrJourn journ, DbrModel model)
         goto fail1;
     }
 
-    ctx->pool = pool;
     ctx->journ = journ;
     ctx->model = model;
+    ctx->pool = pool;
     dbr_tree_init(&ctx->books);
     fig_cache_init(&ctx->cache, pool);
     fig_index_init(&ctx->index);
@@ -448,7 +448,7 @@ dbr_ctx_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date)
 DBR_API DbrTrader
 dbr_ctx_trader(DbrCtx ctx, struct DbrRec* trec)
 {
-    return fig_trader_lazy(trec, ctx->pool, &ctx->index);
+    return fig_trader_lazy(trec, &ctx->index, ctx->pool);
 }
 
 DBR_API DbrAccnt
@@ -464,7 +464,7 @@ dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrB
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags, struct DbrTrans* trans)
 {
-    struct FigTrader* trader = fig_trader_lazy(trec, ctx->pool, &ctx->index);
+    struct FigTrader* trader = fig_trader_lazy(trec, &ctx->index, ctx->pool);
     if (!trader)
         goto fail1;
 
@@ -504,7 +504,7 @@ dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrB
         goto fail2;
 
     if (!dbr_journ_insert_order(ctx->journ, new_order)
-        || !fig_match_orders(ctx->pool, ctx->journ, book, new_order, trans))
+        || !fig_match_orders(ctx->journ, book, new_order, trans, ctx->pool))
         goto fail3;
 
     if (trans->count > 0) {
@@ -531,7 +531,7 @@ dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrB
     dbr_journ_commit_trans(ctx->journ);
     return new_order;
  fail4:
-    free_matches(ctx->pool, trans->first_match);
+    free_matches(trans->first_match, ctx->pool);
     memset(trans, 0, sizeof(*trans));
  fail3:
     dbr_journ_rollback_trans(ctx->journ);

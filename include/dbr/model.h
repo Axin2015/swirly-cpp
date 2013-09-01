@@ -18,6 +18,7 @@
 #ifndef DBR_MODEL_H
 #define DBR_MODEL_H
 
+#include <dbr/pool.h>
 #include <dbr/types.h>
 
 /**
@@ -27,16 +28,16 @@
 
 struct DbrModelVtbl {
     ssize_t
-    (*read_entity)(DbrModel model, int type, struct DbrSlNode** first);
+    (*read_entity)(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first);
 
     struct DbrSlNode*
     (*end_entity)(DbrModel model);
 };
 
 static inline ssize_t
-dbr_model_read_entity(DbrModel model, int type, struct DbrSlNode** first)
+dbr_model_read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    return model->vtbl->read_entity(model, type, first);
+    return model->vtbl->read_entity(model, type, pool, first);
 }
 
 static inline struct DbrSlNode*

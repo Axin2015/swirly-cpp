@@ -57,7 +57,7 @@ free_subs(struct FigTrader* trader)
 }
 
 DBR_EXTERN struct FigTrader*
-fig_trader_lazy(struct DbrRec* trec, DbrPool pool, struct FigIndex* index)
+fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
 {
     assert(trec);
     assert(trec->type == DBR_TRADER);

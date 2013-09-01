@@ -23,18 +23,28 @@
 #include <dbrpp/pool.hpp>
 
 #include <dbr/conv.h>
+#include <dbr/log.h>
 #include <dbr/trader.h>
 
 using namespace dbr;
 
-TEST_CASE(trader_id)
+TEST_CASE(model_trader_id)
 {
+    Model model;
     Pool pool;
-    Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    auto recs = read_entity<DBR_TRADER>(&model, pool);
+    for (auto ref : recs)
+        TraderRecRef(ref).mnem();
+}
 
-    TraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
+TEST_CASE(ctx_trader_id)
+{
+    Journ journ(1);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
+
+    CtxTraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
     check(it != ctx.trecs().end());
 
     TraderRecRef trec(*it);

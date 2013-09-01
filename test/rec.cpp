@@ -64,10 +64,10 @@ get_rec_mnem(Ctx& ctx, const char* mnem)
 
 TEST_CASE(find_contr)
 {
-    Pool pool;
     Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
 
     check(ctx.crecs().find("BAD") == ctx.crecs().end());
 
@@ -91,10 +91,10 @@ TEST_CASE(find_contr)
 
 TEST_CASE(find_trader)
 {
-    Pool pool;
     Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
 
     check(ctx.trecs().find("BAD") == ctx.trecs().end());
 
@@ -109,10 +109,10 @@ TEST_CASE(find_trader)
 
 TEST_CASE(find_accnt)
 {
-    Pool pool;
     Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
 
     check(ctx.arecs().find("BAD") == ctx.arecs().end());
 

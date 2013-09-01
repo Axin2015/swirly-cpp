@@ -19,17 +19,195 @@
 #define DBRPP_MODEL_HPP
 
 #include <dbrpp/except.hpp>
+#include <dbrpp/iter.hpp>
+#include <dbrpp/slnode.hpp>
 
+#include <dbr/conv.h>
 #include <dbr/model.h>
 
+#include <limits> // numeric_limits<>
+
 namespace dbr {
+
+template <int TypeN>
+class ModelRecs {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrRec Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_rec_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_rec_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrSlNode* first_;
+    DbrSlNode* end_;
+    size_t size_;
+    DbrPool pool_;
+public:
+    typedef typename Policy::Entry ValueType;
+    typedef typename Policy::Entry* Pointer;
+    typedef typename Policy::Entry& Reference;
+    typedef const typename Policy::Entry* ConstPointer;
+    typedef const typename Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+private:
+    void
+    destroy()
+    {
+        DbrSlNode* node = first_;
+        while (node != end_) {
+            struct DbrRec* rec = dbr_rec_entry(node);
+            node = node->next;
+            dbr_pool_free_rec(pool_, rec);
+        }
+    }
+public:
+    ~ModelRecs() noexcept
+    {
+        if (pool_)
+            destroy();
+    }
+    constexpr
+    ModelRecs(decltype(nullptr)) noexcept
+    : first_(nullptr),
+      end_(nullptr),
+      size_(0),
+      pool_(nullptr)
+    {
+    }
+    ModelRecs(DbrSlNode* first, DbrSlNode* end, size_t size, DbrPool pool) noexcept
+    : first_(first),
+      end_(end),
+      size_(size),
+      pool_(pool)
+    {
+    }
+    // Copy semantics.
+
+    ModelRecs(const ModelRecs&) = delete;
+
+    ModelRecs&
+    operator =(const ModelRecs&) = delete;
+
+    // Move semantics.
+
+    ModelRecs(ModelRecs&& rhs) noexcept
+    : first_(nullptr),
+      end_(nullptr),
+      size_(0),
+      pool_(nullptr)
+    {
+        swap(rhs);
+    }
+    ModelRecs&
+    operator =(ModelRecs&& rhs) noexcept
+    {
+        if (pool_) {
+            destroy();
+            first_ = nullptr;
+            end_ = nullptr;
+            size_ = 0;
+            pool_ = nullptr;
+        }
+        swap(rhs);
+        return *this;
+    }
+    void
+    swap(ModelRecs& rhs) noexcept
+    {
+        std::swap(first_, rhs.first_);
+        std::swap(end_, rhs.end_);
+        std::swap(size_, rhs.size_);
+        std::swap(pool_, rhs.pool_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return first_;
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return first_;
+    }
+    Iterator
+    end() noexcept
+    {
+        return end_;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return end_;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return size_;
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return size() == 0;
+    }
+};
+
+typedef ModelRecs<DBR_TRADER> ModelTraderRecs;
+typedef ModelRecs<DBR_ACCNT> ModelAccntRecs;
+typedef ModelRecs<DBR_CONTR> ModelContrRecs;
 
 template <class DerivedT>
 class IModel : public DbrIModel {
     static ssize_t
-    read_entity(DbrModel model, int type, DbrSlNode** first) noexcept
+    read_entity(DbrModel model, int type, DbrPool pool, DbrSlNode** first) noexcept
     {
-        return static_cast<DerivedT*>(model)->read_entity(type, *first);
+        return static_cast<DerivedT*>(model)->read_entity(type, pool, *first);
     }
     static DbrSlNode*
     end_entity(DbrModel model) noexcept
@@ -53,9 +231,9 @@ public:
 };
 
 inline size_t
-read_entity(DbrModel model, int type, DbrSlNode*& first)
+read_entity(DbrModel model, int type, DbrPool pool, DbrSlNode*& first)
 {
-    const auto size = model->vtbl->read_entity(model, type, &first);
+    const auto size = model->vtbl->read_entity(model, type, pool, &first);
     if (size < 0)
         throw_exception();
     return size;
@@ -65,6 +243,15 @@ inline DbrSlNode*
 end_entity(DbrModel model) noexcept
 {
     return model->vtbl->end_entity(model);
+}
+
+template <int TypeN>
+inline ModelRecs<TypeN>
+read_entity(DbrModel model, DbrPool pool)
+{
+    DbrSlNode* first, * end = end_entity(model);
+    const auto size = read_entity(model, TypeN, pool, first);
+    return ModelRecs<TypeN>(first, end, size, pool);
 }
 
 } // dbr

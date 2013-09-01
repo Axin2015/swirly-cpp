@@ -426,7 +426,7 @@ bind_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 static ssize_t
-select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_trader(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -447,7 +447,7 @@ select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = dbr_pool_alloc_rec(sqlite->pool);
+            struct DbrRec* rec = dbr_pool_alloc_rec(pool);
             if (!rec)
                 goto fail2;
 
@@ -487,14 +487,14 @@ select_trader(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_TRADER, dbr_queue_first(&rq));
+    dbr_pool_free_list(pool, DBR_TRADER, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 static ssize_t
-select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_accnt(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -515,7 +515,7 @@ select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = dbr_pool_alloc_rec(sqlite->pool);
+            struct DbrRec* rec = dbr_pool_alloc_rec(pool);
             if (!rec)
                 goto fail2;
 
@@ -555,14 +555,14 @@ select_accnt(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_ACCNT, dbr_queue_first(&rq));
+    dbr_pool_free_list(pool, DBR_ACCNT, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 static ssize_t
-select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_contr(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -592,7 +592,7 @@ select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrRec* rec = dbr_pool_alloc_rec(sqlite->pool);
+            struct DbrRec* rec = dbr_pool_alloc_rec(pool);
             if (!rec)
                 goto fail2;
 
@@ -661,14 +661,14 @@ select_contr(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_CONTR, dbr_queue_first(&rq));
+    dbr_pool_free_list(pool, DBR_CONTR, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 static ssize_t
-select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -703,7 +703,7 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden id = sqlite3_column_int64(stmt, ID);
-            struct DbrOrder* order = dbr_pool_alloc_order(sqlite->pool, id);
+            struct DbrOrder* order = dbr_pool_alloc_order(pool, id);
             if (!order)
                 goto fail2;
 
@@ -756,14 +756,14 @@ select_order(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_ORDER, dbr_queue_first(&oq));
+    dbr_pool_free_list(pool, DBR_ORDER, dbr_queue_first(&oq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 static ssize_t
-select_memb(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ACCNT,
@@ -783,7 +783,7 @@ select_memb(struct FirSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden trader = sqlite3_column_int64(stmt, TRADER);
-            struct DbrMemb* memb = dbr_pool_alloc_memb(sqlite->pool, trader);
+            struct DbrMemb* memb = dbr_pool_alloc_memb(pool, trader);
             if (!memb)
                 goto fail2;
 
@@ -810,14 +810,14 @@ select_memb(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_MEMB, dbr_queue_first(&mq));
+    dbr_pool_free_list(pool, DBR_MEMB, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 static ssize_t
-select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -853,7 +853,7 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
         if (rc == SQLITE_ROW) {
 
             const DbrIden id = sqlite3_column_int64(stmt, ID);
-            struct DbrTrade* trade = dbr_pool_alloc_trade(sqlite->pool, id);
+            struct DbrTrade* trade = dbr_pool_alloc_trade(pool, id);
             if (!trade)
                 goto fail2;
 
@@ -908,14 +908,14 @@ select_trade(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_TRADE, dbr_queue_first(&tq));
+    dbr_pool_free_list(pool, DBR_TRADE, dbr_queue_first(&tq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 static ssize_t
-select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
+select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -965,7 +965,7 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
 
             // Synthetic id from contract and settlment date.
             const DbrIden key = contr * 100000000L + settl_date;
-            posn = dbr_pool_alloc_posn(sqlite->pool, key);
+            posn = dbr_pool_alloc_posn(pool, key);
             if (dbr_unlikely(!posn))
                 goto fail2;
 
@@ -1005,14 +1005,14 @@ select_posn(struct FirSqlite* sqlite, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(sqlite->pool, DBR_POSN, dbr_queue_first(&pq));
+    dbr_pool_free_list(pool, DBR_POSN, dbr_queue_first(&pq));
     *first = NULL;
  fail1:
     return -1;
 }
 
 DBR_EXTERN DbrBool
-fir_sqlite_init(struct FirSqlite* sqlite, DbrPool pool, const char* path)
+fir_sqlite_init(struct FirSqlite* sqlite, const char* path)
 {
     sqlite3* db;
     int rc = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE, NULL);
@@ -1061,7 +1061,6 @@ fir_sqlite_init(struct FirSqlite* sqlite, DbrPool pool, const char* path)
     if (!archive_trade)
         goto fail5;
 
-    sqlite->pool = pool;
     sqlite->db = db;
     sqlite->insert_order = insert_order;
     sqlite->update_order = update_order;
@@ -1150,30 +1149,30 @@ fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 DBR_EXTERN ssize_t
-fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, struct DbrSlNode** first)
+fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool, struct DbrSlNode** first)
 {
     ssize_t ret;
     switch (type) {
     case DBR_TRADER:
-        ret = select_trader(sqlite, first);
+        ret = select_trader(sqlite, pool, first);
         break;
     case DBR_ACCNT:
-        ret = select_accnt(sqlite, first);
+        ret = select_accnt(sqlite, pool, first);
         break;
     case DBR_CONTR:
-        ret = select_contr(sqlite, first);
+        ret = select_contr(sqlite, pool, first);
         break;
     case DBR_ORDER:
-        ret = select_order(sqlite, first);
+        ret = select_order(sqlite, pool, first);
         break;
     case DBR_MEMB:
-        ret = select_memb(sqlite, first);
+        ret = select_memb(sqlite, pool, first);
         break;
     case DBR_TRADE:
-        ret = select_trade(sqlite, first);
+        ret = select_trade(sqlite, pool, first);
         break;
     case DBR_POSN:
-        ret = select_posn(sqlite, first);
+        ret = select_posn(sqlite, pool, first);
         break;
     default:
         dbr_err_set(DBR_EINVAL, "invalid type '%d'", type);
@@ -1293,11 +1292,11 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 };
 
 static ssize_t
-read_entity(DbrModel model, int type, struct DbrSlNode** first)
+read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
     struct DbrSqlite_* sqlite = model_implof(model);
     struct FirSqlite* impl = &sqlite->impl;
-    return fir_sqlite_select_entity(impl, type, first);
+    return fir_sqlite_select_entity(impl, type, pool, first);
 }
 
 static struct DbrSlNode*
@@ -1314,7 +1313,7 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 };
 
 DBR_API DbrSqlite
-dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path)
+dbr_sqlite_create(DbrIden seed, const char* path)
 {
     struct DbrSqlite_* sqlite = malloc(sizeof(struct DbrSqlite_));
     if (dbr_unlikely(!sqlite))
@@ -1323,7 +1322,7 @@ dbr_sqlite_create(DbrPool pool, DbrIden seed, const char* path)
     // Seed identity.
     sqlite->id = seed;
 
-    if (!fir_sqlite_init(&sqlite->impl, pool, path))
+    if (!fir_sqlite_init(&sqlite->impl, path))
         goto fail2;
 
     sqlite->journ_.vtbl = &JOURN_VTBL;

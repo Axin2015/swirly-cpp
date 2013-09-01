@@ -38,7 +38,7 @@ enum DbrDirect {
 };
 
 static void
-free_matches(DbrPool pool, struct DbrSlNode* first)
+free_matches(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
@@ -78,12 +78,12 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 static inline struct DbrPosn*
 lazy_posn(struct DbrOrder* order, DbrPool pool)
 {
-    return fig_accnt_posn(order->accnt.rec, pool, order->contr.rec, order->settl_date);
+    return fig_accnt_posn(order->accnt.rec, order->contr.rec, order->settl_date, pool);
 }
 
 static DbrBool
-match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
-             const struct DbrSide* side, int direct, struct DbrTrans* trans)
+match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
+             const struct DbrSide* side, int direct, struct DbrTrans* trans, DbrPool pool)
 {
     struct DbrQueue mq;
     dbr_queue_init(&mq);
@@ -109,7 +109,7 @@ match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book, struct DbrOrder
         if (!match)
             goto fail1;
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, pool, crec, settl_date);
+        struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, crec, settl_date, pool);
         if (!posn) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
@@ -194,7 +194,7 @@ match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book, struct DbrOrder
     struct DbrPosn* posn;
     // Avoid allocating position when there are no matches.
     if (count > 0) {
-        if (!(posn = fig_accnt_posn(taker->accnt.rec, pool, crec, settl_date)))
+        if (!(posn = fig_accnt_posn(taker->accnt.rec, crec, settl_date, pool)))
             goto fail1;
     } else
         posn = NULL;
@@ -208,13 +208,13 @@ match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book, struct DbrOrder
 
     return true;
  fail1:
-    free_matches(pool, dbr_queue_first(&mq));
+    free_matches(dbr_queue_first(&mq), pool);
     return false;
 }
 
 DBR_EXTERN DbrBool
-fig_match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book,
-                 struct DbrOrder* taker, struct DbrTrans* trans)
+fig_match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
+                 struct DbrTrans* trans,  DbrPool pool)
 {
     struct DbrSide* side;
     int direct;
@@ -230,5 +230,5 @@ fig_match_orders(DbrPool pool, DbrJourn journ, struct DbrBook* book,
         direct = DBR_GIVEN;
     }
 
-    return match_orders(pool, journ, book, taker, side, direct, trans);
+    return match_orders(journ, book, taker, side, direct, trans, pool);
 }

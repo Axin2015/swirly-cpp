@@ -60,7 +60,7 @@ public:
     Pool(Pool&& rhs) noexcept
     : impl_(nullptr)
     {
-        std::swap(impl_, rhs.impl_);
+        swap(rhs);
     }
     Pool&
     operator =(Pool&& rhs) noexcept
@@ -69,7 +69,7 @@ public:
             dbr_pool_destroy(impl_);
             impl_ = nullptr;
         }
-        std::swap(impl_, rhs.impl_);
+        swap(rhs);
         return *this;
     }
     void

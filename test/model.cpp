@@ -198,30 +198,30 @@ read_posn(DbrPool pool, DbrSlNode*& first) noexcept
 } // anonymous
 
 ssize_t
-Model::read_entity(int type, DbrSlNode*& first) noexcept
+Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t ret;
     switch (type) {
     case DBR_TRADER:
-        ret = read_trader(pool_, first);
+        ret = read_trader(pool, first);
         break;
     case DBR_ACCNT:
-        ret = read_accnt(pool_, first);
+        ret = read_accnt(pool, first);
         break;
     case DBR_CONTR:
-        ret = read_contr(pool_, first);
+        ret = read_contr(pool, first);
         break;
     case DBR_ORDER:
-        ret = read_order(pool_, first);
+        ret = read_order(pool, first);
         break;
     case DBR_MEMB:
-        ret = read_memb(pool_, first);
+        ret = read_memb(pool, first);
         break;
     case DBR_TRADE:
-        ret = read_trade(pool_, first);
+        ret = read_trade(pool, first);
         break;
     case DBR_POSN:
-        ret = read_posn(pool_, first);
+        ret = read_posn(pool, first);
         break;
     default:
         dbr_err_set(DBR_EINVAL, "invalid type '%d'", type);

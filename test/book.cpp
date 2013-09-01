@@ -29,12 +29,12 @@ using namespace dbr;
 
 TEST_CASE(book_id)
 {
-    Pool pool;
     Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
 
-    ContrRecs::Iterator it = ctx.crecs().find("EURUSD");
+    CtxContrRecs::Iterator it = ctx.crecs().find("EURUSD");
     check(it != ctx.crecs().end());
 
     ContrRecRef crec(*it);

@@ -27,10 +27,10 @@ using namespace std;
 
 TEST_CASE(submit)
 {
-    Pool pool;
     Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
 
     auto tit = ctx.trecs().find("WRAMIREZ");
     check(tit != ctx.trecs().end());

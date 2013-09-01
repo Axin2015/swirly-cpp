@@ -29,12 +29,12 @@ using namespace dbr;
 
 TEST_CASE(accnt_id)
 {
-    Pool pool;
     Journ journ(1);
-    Model model(pool);
-    Ctx ctx(pool, &journ, &model);
+    Model model;
+    Pool pool;
+    Ctx ctx(&journ, &model, pool);
 
-    AccntRecs::Iterator it = ctx.arecs().find("DBRA");
+    CtxAccntRecs::Iterator it = ctx.arecs().find("DBRA");
     check(it != ctx.arecs().end());
 
     AccntRecRef arec(*it);
