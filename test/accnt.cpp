@@ -27,7 +27,18 @@
 
 using namespace dbr;
 
-TEST_CASE(accnt_id)
+TEST_CASE(model_accnt_id)
+{
+    Model model;
+    Pool pool;
+    auto recs = read_entity<DBR_ACCNT>(&model, pool);
+    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
+            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
+        });
+    check(it != recs.end());
+}
+
+TEST_CASE(ctx_accnt_id)
 {
     Journ journ(1);
     Model model;

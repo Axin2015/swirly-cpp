@@ -26,6 +26,8 @@
 #include <dbr/log.h>
 #include <dbr/trader.h>
 
+#include <algorithm>
+
 using namespace dbr;
 
 TEST_CASE(model_trader_id)
@@ -33,8 +35,10 @@ TEST_CASE(model_trader_id)
     Model model;
     Pool pool;
     auto recs = read_entity<DBR_TRADER>(&model, pool);
-    for (auto ref : recs)
-        TraderRecRef(ref).mnem();
+    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
+            return strncmp(rec.mnem, "WRAMIREZ", DBR_MNEM_MAX) == 0;
+        });
+    check(it != recs.end());
 }
 
 TEST_CASE(ctx_trader_id)
