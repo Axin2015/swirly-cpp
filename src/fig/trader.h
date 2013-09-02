@@ -20,8 +20,8 @@
 
 #include <fig/index.h>
 
-#include <dbr/conv.h>
 #include <dbr/pool.h>
+#include <dbr/trader.h>
 #include <dbr/tree.h>
 
 #include <assert.h>

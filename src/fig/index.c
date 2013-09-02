@@ -17,8 +17,8 @@
  */
 #include "index.h"
 
-#include <dbr/conv.h>
 #include <dbr/slnode.h>
+#include <dbr/types.h>
 
 #include <stdbool.h>
 #include <string.h>

@@ -22,7 +22,6 @@
 #include <dbrpp/slnode.hpp>
 #include <dbrpp/match.hpp>
 
-#include <dbr/conv.h>
 #include <dbr/ctx.h>
 
 namespace dbr {

@@ -17,7 +17,6 @@
  */
 #include "accnt.h"
 
-#include <dbr/conv.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
 #include <dbr/sess.h>

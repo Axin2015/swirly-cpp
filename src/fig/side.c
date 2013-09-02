@@ -17,7 +17,6 @@
  */
 #include <dbr/side.h>
 
-#include <dbr/conv.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
 

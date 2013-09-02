@@ -22,7 +22,6 @@
 #include <dbrpp/ctx.hpp>
 #include <dbrpp/pool.hpp>
 
-#include <dbr/conv.h>
 #include <dbr/book.h>
 
 using namespace dbr;

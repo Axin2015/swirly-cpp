@@ -34,9 +34,28 @@ dbr_accnt_id(DbrAccnt accnt);
 /** @} */
 
 /**
+ * @addtogroup AccntMemb
+ * @{
+ */
+
+static inline struct DbrMemb*
+dbr_accnt_memb_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrMemb, accnt_node_, node);
+}
+
+/** @} */
+
+/**
  * @addtogroup AccntTrade
  * @{
  */
+
+static inline struct DbrTrade*
+dbr_accnt_trade_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrTrade, accnt_node_, node);
+}
 
 DBR_API struct DbrRbNode*
 dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id);
@@ -59,6 +78,12 @@ dbr_accnt_empty_trade(DbrAccnt accnt);
  * @addtogroup AccntPosn
  * @{
  */
+
+static inline struct DbrPosn*
+dbr_accnt_posn_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrPosn, accnt_node_, node);
+}
 
 DBR_API struct DbrRbNode*
 dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id);

@@ -54,6 +54,14 @@ dbr_side_term(struct DbrSide* side);
  * @{
  */
 
+static inline struct DbrOrder*
+dbr_side_order_entry(struct DbrDlNode* node)
+{
+    return dbr_implof(struct DbrOrder, side_node_, node);
+}
+
+/** @} */
+
 // Insert order without affecting revision information.
 // Assumes that order does not already belong to a side. I.e. it assumes that level is null.
 // Assumes that order-id and party-ref (if ref is not empty) are unique. The dbr_side_find_ref() can
@@ -129,6 +137,12 @@ dbr_side_empty_order(const struct DbrSide* side)
  * @addtogroup SideLevel
  * @{
  */
+
+static inline struct DbrLevel*
+dbr_side_level_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrLevel, side_node_, node);
+}
 
 static inline struct DbrRbNode*
 dbr_side_find_level(const struct DbrSide* side, DbrIden id)

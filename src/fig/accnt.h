@@ -18,9 +18,10 @@
 #ifndef FIG_ACCNT_H
 #define FIG_ACCNT_H
 
-#include <dbr/conv.h>
+#include <dbr/accnt.h>
 #include <dbr/pool.h>
 #include <dbr/tree.h>
+#include <dbr/types.h>
 
 struct FigAccnt {
     DbrIden id;

@@ -22,7 +22,6 @@
 #include <dbrpp/iter.hpp>
 #include <dbrpp/slnode.hpp>
 
-#include <dbr/conv.h>
 #include <dbr/model.h>
 
 #include <limits> // numeric_limits<>
@@ -36,12 +35,12 @@ class ModelRecs {
         static Entry*
         entry(Node* node)
         {
-            return dbr_rec_entry(node);
+            return dbr_model_rec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_rec_entry(const_cast<Node*>(node));
+            return dbr_model_rec_entry(const_cast<Node*>(node));
         }
     };
     DbrSlNode* first_;
@@ -80,7 +79,7 @@ private:
     {
         DbrSlNode* node = first_;
         while (node) {
-            struct DbrRec* rec = dbr_rec_entry(node);
+            struct DbrRec* rec = dbr_model_rec_entry(node);
             node = node->next;
             dbr_pool_free_rec(pool_, rec);
         }

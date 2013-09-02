@@ -369,6 +369,12 @@ struct DbrOrder {
     struct DbrRbNode trader_node_;
 };
 
+static inline DbrBool
+dbr_order_done(const struct DbrOrder* order)
+{
+    return order->resd == 0;
+}
+
 enum DbrRole {
     DBR_MAKER = 1,
     DBR_TAKER
@@ -448,6 +454,12 @@ struct DbrTrans {
      */
     DbrLots taken;
 };
+
+static inline struct DbrMatch*
+dbr_trans_match_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrMatch, trans_node_, node);
+}
 
 /** @} */
 

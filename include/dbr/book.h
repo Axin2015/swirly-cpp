@@ -91,18 +91,6 @@ dbr_book_cancel(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
     dbr_side_cancel_order(dbr_book_side(book, order->action), order, now);
 }
 
-static inline void
-dbr_book_sub(struct DbrBook* book, struct DbrSub* sub)
-{
-    dbr_list_insert_back(&book->subs, &sub->book_node_);
-}
-
-static inline void
-dbr_book_unsub(struct DbrSub* sub)
-{
-    dbr_dlnode_remove(&sub->book_node_);
-}
-
 static inline DbrKey
 dbr_book_key(struct DbrBook* book)
 {
@@ -136,6 +124,35 @@ dbr_book_ask_side(struct DbrBook* book)
 
 DBR_API struct DbrBest*
 dbr_book_best(struct DbrBook* book, struct DbrBest* best);
+
+/** @} */
+
+/**
+ * @addtogroup BookSub
+ * @{
+ */
+
+/**
+ * @brief Subscription from book node.
+ */
+
+static inline struct DbrSub*
+dbr_book_sub_entry(struct DbrDlNode* node)
+{
+    return dbr_implof(struct DbrSub, book_node_, node);
+}
+
+static inline void
+dbr_book_sub(struct DbrBook* book, struct DbrSub* sub)
+{
+    dbr_list_insert_back(&book->subs, &sub->book_node_);
+}
+
+static inline void
+dbr_book_unsub(struct DbrSub* sub)
+{
+    dbr_dlnode_remove(&sub->book_node_);
+}
 
 /** @} */
 

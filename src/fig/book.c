@@ -17,7 +17,6 @@
  */
 #include <dbr/book.h>
 
-#include <dbr/conv.h>
 #include <dbr/err.h>
 
 #include <stdlib.h>

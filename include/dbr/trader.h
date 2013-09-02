@@ -38,6 +38,12 @@ dbr_trader_id(DbrTrader trader);
  * @{
  */
 
+static inline struct DbrOrder*
+dbr_trader_order_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrOrder, trader_node_, node);
+}
+
 DBR_API struct DbrRbNode*
 dbr_trader_find_order_id(DbrTrader trader, DbrIden id);
 
@@ -62,6 +68,16 @@ dbr_trader_empty_order(DbrTrader trader);
  * @addtogroup TraderSub
  * @{
  */
+
+/**
+ * @brief Subscription from trader node.
+ */
+
+static inline struct DbrSub*
+dbr_trader_sub_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrSub, trader_node_, node);
+}
 
 /**
  * @brief Subscribe to book.

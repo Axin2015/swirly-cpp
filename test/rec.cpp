@@ -22,8 +22,6 @@
 #include <dbrpp/ctx.hpp>
 #include <dbrpp/pool.hpp>
 
-#include <dbr/conv.h>
-
 using namespace dbr;
 
 template <int TypeN>
