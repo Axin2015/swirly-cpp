@@ -95,6 +95,17 @@ TEST_CASE(side_orders)
     check(orange->status == DBR_CANCELLED);
     check(orange->resd == 0);
     check(orange->exec == 0);
+
+    check(side.levels().size() == 1);
+    check(side.orders().size() == 1);
+
+    check(OrderRef(side.orders().front()).ref().str() == "apple");
+    check(OrderRef(side.orders().back()).ref().str() == "apple");
+
+    level = Level(side.levels().front());
+    check(level.count() == 1);
+    check(level.ticks() == 12345);
+    check(level.resd() == 5);
 }
 
 TEST_CASE(side_levels)

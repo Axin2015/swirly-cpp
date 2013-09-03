@@ -124,3 +124,39 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 
     return order;
 }
+
+shared_ptr<DbrOrder>
+create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden& aid, DbrIden& cid,
+             DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+             DbrLots min, DbrFlags flags)
+{
+    auto deleter = [&pool](DbrOrder* order) {
+        pool.free_order(order);
+    };
+    std::shared_ptr<DbrOrder> order(pool.alloc_order(id), deleter);
+
+    order->id = id;
+    order->level = NULL;
+    order->rev = 0;
+    order->status = 0;
+    order->trader.id = tid;
+    order->accnt.id = aid;
+    order->contr.id = cid;
+    order->settl_date = settl_date;
+    if (ref)
+        strncpy(order->ref, ref, DBR_REF_MAX);
+    else
+        order->ref[0] = '\0';
+
+    order->action = action;
+    order->ticks = ticks;
+    order->resd = lots;
+    order->exec = 0;
+    order->lots = lots;
+    order->min = min;
+    order->flags = flags;
+    order->created = 0;
+    order->modified = 0;
+
+    return order;
+}

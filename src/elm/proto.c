@@ -26,7 +26,7 @@
 static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
-static const char ORDER_FORMAT[] = "liillllsillllllll";
+static const char ORDER_FORMAT[] = "liilllisillllllll";
 static const char MEMB_FORMAT[] = "ll";
 static const char TRADE_FORMAT[] = "lllilllisliillllll";
 static const char POSN_FORMAT[] = "lllllll";

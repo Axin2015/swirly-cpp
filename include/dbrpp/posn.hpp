@@ -89,21 +89,21 @@ operator <<(std::ostream& os, PosnRef posn)
 }
 
 inline size_t
-entity_len(PosnRef posn) noexcept
+posn_len(const DbrPosn& posn) noexcept
 {
-    return dbr_posn_len(posn.c_arg());
+    return dbr_posn_len(&posn);
 }
 
 inline char*
-write_entity(char* buf, PosnRef posn) noexcept
+write_posn(char* buf, const DbrPosn& posn) noexcept
 {
-    return dbr_write_posn(buf, posn.c_arg());
+    return dbr_write_posn(buf, &posn);
 }
 
 inline const char*
-read_entity(const char* buf, PosnRef posn)
+read_posn(const char* buf, DbrPosn& posn)
 {
-    buf = dbr_read_posn(buf, posn.c_arg());
+    buf = dbr_read_posn(buf, &posn);
     if (!buf)
         throw_exception();
     return buf;

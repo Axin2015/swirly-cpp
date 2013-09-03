@@ -106,21 +106,21 @@ operator <<(std::ostream& os, TraderRecRef trec)
 }
 
 inline size_t
-entity_len(TraderRecRef trec) noexcept
+trader_len(const DbrRec& trec) noexcept
 {
-    return dbr_trader_len(trec.c_arg());
+    return dbr_trader_len(&trec);
 }
 
 inline char*
-write_entity(char* buf, TraderRecRef trec) noexcept
+write_trader(char* buf, const DbrRec& trec) noexcept
 {
-    return dbr_write_trader(buf, trec.c_arg());
+    return dbr_write_trader(buf, &trec);
 }
 
 inline const char*
-read_entity(const char* buf, TraderRecRef trec)
+read_trader(const char* buf, DbrRec& trec)
 {
-    buf = dbr_read_trader(buf, trec.c_arg());
+    buf = dbr_read_trader(buf, &trec);
     if (!buf)
         throw_exception();
     return buf;
@@ -150,21 +150,21 @@ operator <<(std::ostream& os, AccntRecRef arec)
 }
 
 inline size_t
-entity_len(AccntRecRef arec) noexcept
+accnt_len(const DbrRec& arec) noexcept
 {
-    return dbr_accnt_len(arec.c_arg());
+    return dbr_accnt_len(&arec);
 }
 
 inline char*
-write_entity(char* buf, AccntRecRef arec) noexcept
+write_accnt(char* buf, const DbrRec& arec) noexcept
 {
-    return dbr_write_accnt(buf, arec.c_arg());
+    return dbr_write_accnt(buf, &arec);
 }
 
 inline const char*
-read_entity(const char* buf, AccntRecRef arec)
+read_accnt(const char* buf, DbrRec& arec)
 {
-    buf = dbr_read_accnt(buf, arec.c_arg());
+    buf = dbr_read_accnt(buf, &arec);
     if (!buf)
         throw_exception();
     return buf;
@@ -300,21 +300,21 @@ operator <<(std::ostream& os, ContrRecRef crec)
 }
 
 inline size_t
-entity_len(ContrRecRef crec) noexcept
+contr_len(const DbrRec& crec) noexcept
 {
-    return dbr_contr_len(crec.c_arg());
+    return dbr_contr_len(&crec);
 }
 
 inline char*
-write_entity(char* buf, ContrRecRef crec) noexcept
+write_contr(char* buf, const DbrRec& crec) noexcept
 {
-    return dbr_write_contr(buf, crec.c_arg());
+    return dbr_write_contr(buf, &crec);
 }
 
 inline const char*
-read_entity(const char* buf, ContrRecRef crec)
+read_contr(const char* buf, DbrRec& crec)
 {
-    buf = dbr_read_contr(buf, crec.c_arg());
+    buf = dbr_read_contr(buf, &crec);
     if (!buf)
         throw_exception();
     return buf;

@@ -45,6 +45,11 @@ create_order(dbr::Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec&
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min, DbrFlags flags);
 
+std::shared_ptr<DbrOrder>
+create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden& aid, DbrIden& cid,
+             DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+             DbrLots min, DbrFlags flags);
+
 inline std::shared_ptr<DbrRec>
 create_wramirez(dbr::Pool& pool)
 {
