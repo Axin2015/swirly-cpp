@@ -82,7 +82,7 @@ DBR_API void
 dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now);
 
 static inline DbrBool
-dbr_side_new_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
+dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     order->rev = 1;
     order->status = DBR_NEW;

@@ -375,9 +375,9 @@ public:
         dbr_side_take_order(&impl_, &order, delta, now);
     }
     void
-    new_order(DbrOrder& order, DbrMillis now)
+    place_order(DbrOrder& order, DbrMillis now)
     {
-        if (!dbr_side_new_order(&impl_, &order, now))
+        if (!dbr_side_place_order(&impl_, &order, now))
             throw_exception();
     }
     void
