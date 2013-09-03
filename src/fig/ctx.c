@@ -460,9 +460,9 @@ dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec)
 // Exec
 
 DBR_API struct DbrOrder*
-dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-               DbrFlags flags, struct DbrTrans* trans)
+dbr_ctx_place(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
+              const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
+              DbrFlags flags, struct DbrTrans* trans)
 {
     struct FigTrader* trader = fig_trader_lazy(trec, &ctx->index, ctx->pool);
     if (!trader)
@@ -476,7 +476,7 @@ dbr_ctx_submit(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrB
     new_order->id = id;
     new_order->level = NULL;
     new_order->rev = 1;
-    new_order->status = DBR_NEW;
+    new_order->status = DBR_PLACED;
     new_order->trader.rec = trec;
     new_order->accnt.rec = arec;
     new_order->contr.rec = book->crec;

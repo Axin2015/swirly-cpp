@@ -311,7 +311,7 @@ typedef struct DbrIAccntSess {
  */
 
 enum DbrStatus {
-    DBR_NEW = 1,
+    DBR_PLACED = 1,
     DBR_REVISED,
     DBR_CANCELLED,
     DBR_REJECTED,

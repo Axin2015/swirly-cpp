@@ -259,12 +259,12 @@ public:
         return Accnt(accnt);
     }
     OrderRef
-    submit(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
-           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
+    place(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
+          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
     {
         trans.reset();
-        DbrOrder* const order = dbr_ctx_submit(impl_, &trec, &arec, &book, ref, action, ticks,
-                                               lots, min, flags, trans.c_arg());
+        DbrOrder* const order = dbr_ctx_place(impl_, &trec, &arec, &book, ref, action, ticks,
+                                              lots, min, flags, trans.c_arg());
         if (!order)
             throw_exception();
         return OrderRef(*order);

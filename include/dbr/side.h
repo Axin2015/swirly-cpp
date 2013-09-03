@@ -85,7 +85,7 @@ static inline DbrBool
 dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     order->rev = 1;
-    order->status = DBR_NEW;
+    order->status = DBR_PLACED;
     order->resd = order->lots;
     order->exec = 0;
     order->created = now;

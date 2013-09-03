@@ -44,6 +44,6 @@ TEST_CASE(submit)
     auto book = ctx.book(ContrRecRef(*cit), 20130824);
 
     Trans trans(ctx);
-    ctx.submit(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
-               DBR_BUY, 12345, 1, 0, 0, trans);
+    ctx.place(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
+              DBR_BUY, 12345, 1, 0, 0, trans);
 }

@@ -52,7 +52,7 @@ TEST_CASE(side_orders)
     side.place_order(*orange, dbr_millis());
 
     check(apple->rev == 1);
-    check(apple->status == DBR_NEW);
+    check(apple->status == DBR_PLACED);
     check(apple->resd == 10);
     check(apple->exec == 0);
 
@@ -87,6 +87,14 @@ TEST_CASE(side_orders)
     check(level.count() == 2);
     check(level.ticks() == 12345);
     check(level.resd() == 25);
+
+    // Cancel second order.
+    side.cancel_order(*orange, dbr_millis());
+
+    check(orange->rev == 2);
+    check(orange->status == DBR_CANCELLED);
+    check(orange->resd == 0);
+    check(orange->exec == 0);
 }
 
 TEST_CASE(side_levels)
