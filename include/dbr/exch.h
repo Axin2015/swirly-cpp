@@ -15,21 +15,21 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CTX_H
-#define DBR_CTX_H
+#ifndef DBR_EXCH_H
+#define DBR_EXCH_H
 
 #include <dbr/model.h>
 #include <dbr/pool.h>
 
 /**
- * @addtogroup Ctx
+ * @addtogroup Exch
  * @{
  */
 
-typedef struct DbrCtx_* DbrCtx;
+typedef struct DbrExch_* DbrExch;
 
 /**
- * @brief Create context.
+ * @brief Create Exchange.
  *
  * @param journ Journal.
  *
@@ -37,16 +37,16 @@ typedef struct DbrCtx_* DbrCtx;
  *
  * @param pool Pool.
  *
- * @return Handle to newly created context or null on failure.
+ * @return Handle to newly created Exchange or null on failure.
  */
 
-DBR_API DbrCtx
-dbr_ctx_create(DbrJourn journ, DbrModel model, DbrPool pool);
+DBR_API DbrExch
+dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool);
 
-// No-op if ctx is null.
+// No-op if exch is null.
 
 DBR_API void
-dbr_ctx_destroy(DbrCtx ctx);
+dbr_exch_destroy(DbrExch exch);
 
 /** @} */
 
@@ -62,21 +62,21 @@ dbr_ctx_destroy(DbrCtx ctx);
 // Size is optional.
 
 DBR_API struct DbrSlNode*
-dbr_ctx_first_rec(DbrCtx ctx, int type, size_t* size);
+dbr_exch_first_rec(DbrExch exch, int type, size_t* size);
 
 // Null if record does not exist.
 
 DBR_API struct DbrSlNode*
-dbr_ctx_find_rec_id(DbrCtx ctx, int type, DbrIden id);
+dbr_exch_find_rec_id(DbrExch exch, int type, DbrIden id);
 
 // Null if record does not exist.
 // This function compares DBR_MNEM_MAX characters of mnem at most.
 
 DBR_API struct DbrSlNode*
-dbr_ctx_find_rec_mnem(DbrCtx ctx, int type, const char* mnem);
+dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem);
 
 DBR_API struct DbrSlNode*
-dbr_ctx_end_rec(DbrCtx ctx);
+dbr_exch_end_rec(DbrExch exch);
 
 /** @} */
 
@@ -86,7 +86,7 @@ dbr_ctx_end_rec(DbrCtx ctx);
  */
 
 DBR_API struct DbrBook*
-dbr_ctx_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date);
+dbr_exch_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date);
 
 /** @} */
 
@@ -96,7 +96,7 @@ dbr_ctx_book(DbrCtx ctx, struct DbrRec* crec, DbrDate settl_date);
  */
 
 DBR_API DbrTrader
-dbr_ctx_trader(DbrCtx ctx, struct DbrRec* trec);
+dbr_exch_trader(DbrExch exch, struct DbrRec* trec);
 
 /** @} */
 
@@ -106,7 +106,7 @@ dbr_ctx_trader(DbrCtx ctx, struct DbrRec* trec);
  */
 
 DBR_API DbrAccnt
-dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec);
+dbr_exch_accnt(DbrExch exch, struct DbrRec* arec);
 
 /** @} */
 
@@ -121,9 +121,9 @@ dbr_ctx_accnt(DbrCtx ctx, struct DbrRec* arec);
  */
 
 DBR_API struct DbrOrder*
-dbr_ctx_place(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
-              const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-              DbrFlags flags, struct DbrTrans* trans);
+dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
+               DbrFlags flags, struct DbrTrans* trans);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:
@@ -132,30 +132,30 @@ dbr_ctx_place(DbrCtx ctx, struct DbrRec* trec, struct DbrRec* arec, struct DbrBo
 // 3. greater than original lots.
 
 DBR_API struct DbrOrder*
-dbr_ctx_revise_id(DbrCtx ctx, DbrTrader trader, DbrIden id, DbrLots lots);
+dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_ctx_revise_ref(DbrCtx ctx, DbrTrader trader, const char* ref, DbrLots lots);
+dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_ctx_cancel_id(DbrCtx ctx, DbrTrader trader, DbrIden id);
+dbr_exch_cancel_id(DbrExch exch, DbrTrader trader, DbrIden id);
 
 DBR_API struct DbrOrder*
-dbr_ctx_cancel_ref(DbrCtx ctx, DbrTrader trader, const char* ref);
+dbr_exch_cancel_ref(DbrExch exch, DbrTrader trader, const char* ref);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_ctx_archive_order(DbrCtx ctx, DbrTrader trader, DbrIden id);
+dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_ctx_archive_trade(DbrCtx ctx, DbrAccnt accnt, DbrIden id);
+dbr_exch_archive_trade(DbrExch exch, DbrAccnt accnt, DbrIden id);
 
 DBR_API void
-dbr_ctx_free_matches(DbrCtx ctx, struct DbrSlNode* first);
+dbr_exch_free_matches(DbrExch exch, struct DbrSlNode* first);
 
 /** @} */
 
-#endif // DBR_CTX_H
+#endif // DBR_EXCH_H

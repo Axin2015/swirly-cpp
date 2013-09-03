@@ -19,7 +19,7 @@
 #include "model.hpp"
 #include "test.hpp"
 
-#include <dbrpp/ctx.hpp>
+#include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
 
 #include <dbr/log.h>
@@ -40,17 +40,17 @@ TEST_CASE(model_trader_id)
     check(it != recs.end());
 }
 
-TEST_CASE(ctx_trader_id)
+TEST_CASE(exch_trader_id)
 {
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    CtxTraderRecs::Iterator it = ctx.trecs().find("WRAMIREZ");
-    check(it != ctx.trecs().end());
+    ExchTraderRecs::Iterator it = exch.trecs().find("WRAMIREZ");
+    check(it != exch.trecs().end());
 
     TraderRecRef trec(*it);
-    Trader trader = ctx.trader(*it);
+    Trader trader = exch.trader(*it);
     check(trader.id() == trec.id());
 }

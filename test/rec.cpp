@@ -19,7 +19,7 @@
 #include "model.hpp"
 #include "test.hpp"
 
-#include <dbrpp/ctx.hpp>
+#include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
 
 using namespace dbr;
@@ -44,19 +44,19 @@ struct TypeTraits<DBR_CONTR> {
 
 template <int TypeN>
 static typename TypeTraits<TypeN>::TypeRecRef
-get_rec_id(Ctx& ctx, DbrIden id)
+get_rec_id(Exch& exch, DbrIden id)
 {
-    auto it = ctx.recs<TypeN>().find(id);
-    check(it != ctx.recs<TypeN>().end());
+    auto it = exch.recs<TypeN>().find(id);
+    check(it != exch.recs<TypeN>().end());
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
 template <int TypeN>
 static typename TypeTraits<TypeN>::TypeRecRef
-get_rec_mnem(Ctx& ctx, const char* mnem)
+get_rec_mnem(Exch& exch, const char* mnem)
 {
-    auto it = ctx.recs<TypeN>().find(mnem);
-    check(it != ctx.recs<TypeN>().end());
+    auto it = exch.recs<TypeN>().find(mnem);
+    check(it != exch.recs<TypeN>().end());
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
@@ -65,12 +65,12 @@ TEST_CASE(find_contr)
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    check(ctx.crecs().find("BAD") == ctx.crecs().end());
+    check(exch.crecs().find("BAD") == exch.crecs().end());
 
-    ContrRecRef crec = get_rec_mnem<DBR_CONTR>(ctx, "EURUSD");
-    check(crec == get_rec_id<DBR_CONTR>(ctx, crec.id()));
+    ContrRecRef crec = get_rec_mnem<DBR_CONTR>(exch, "EURUSD");
+    check(crec == get_rec_id<DBR_CONTR>(exch, crec.id()));
     check(crec.mnem() == Mnem("EURUSD"));
 
     // Body.
@@ -92,12 +92,12 @@ TEST_CASE(find_trader)
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    check(ctx.trecs().find("BAD") == ctx.trecs().end());
+    check(exch.trecs().find("BAD") == exch.trecs().end());
 
-    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(ctx, "WRAMIREZ");
-    check(trec == get_rec_id<DBR_TRADER>(ctx, trec.id()));
+    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(exch, "WRAMIREZ");
+    check(trec == get_rec_id<DBR_TRADER>(exch, trec.id()));
     check(trec.mnem() == Mnem("WRAMIREZ"));
 
     // Body.
@@ -110,12 +110,12 @@ TEST_CASE(find_accnt)
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    check(ctx.arecs().find("BAD") == ctx.arecs().end());
+    check(exch.arecs().find("BAD") == exch.arecs().end());
 
-    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(ctx, "DBRA");
-    check(arec == get_rec_id<DBR_ACCNT>(ctx, arec.id()));
+    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(exch, "DBRA");
+    check(arec == get_rec_id<DBR_ACCNT>(exch, arec.id()));
     check(arec.mnem() == Mnem("DBRA"));
 
     // Body.

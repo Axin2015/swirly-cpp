@@ -31,7 +31,7 @@ struct DbrBook {
     struct DbrSide bid_side;
     struct DbrSide ask_side;
     struct DbrList subs;
-    struct DbrRbNode ctx_node_;
+    struct DbrRbNode exch_node_;
 };
 
 struct DbrBest {

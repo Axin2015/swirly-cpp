@@ -19,7 +19,7 @@
 #include "model.hpp"
 #include "test.hpp"
 
-#include <dbrpp/ctx.hpp>
+#include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
 
 using namespace dbr;
@@ -30,20 +30,20 @@ TEST_CASE(submit)
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    auto tit = ctx.trecs().find("WRAMIREZ");
-    check(tit != ctx.trecs().end());
+    auto tit = exch.trecs().find("WRAMIREZ");
+    check(tit != exch.trecs().end());
 
-    auto ait = ctx.arecs().find("DBRA");
-    check(ait != ctx.arecs().end());
+    auto ait = exch.arecs().find("DBRA");
+    check(ait != exch.arecs().end());
 
-    auto cit = ctx.crecs().find("EURUSD");
-    check(cit != ctx.crecs().end());
+    auto cit = exch.crecs().find("EURUSD");
+    check(cit != exch.crecs().end());
 
-    auto book = ctx.book(ContrRecRef(*cit), 20130824);
+    auto book = exch.book(ContrRecRef(*cit), 20130824);
 
-    Trans trans(ctx);
-    ctx.place(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
-              DBR_BUY, 12345, 1, 0, 0, trans);
+    Trans trans(exch);
+    exch.place(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
+               DBR_BUY, 12345, 1, 0, 0, trans);
 }

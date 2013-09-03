@@ -19,7 +19,7 @@
 #include "model.hpp"
 #include "test.hpp"
 
-#include <dbrpp/ctx.hpp>
+#include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
 
 #include <dbr/book.h>
@@ -31,13 +31,13 @@ TEST_CASE(book_id)
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    CtxContrRecs::Iterator it = ctx.crecs().find("EURUSD");
-    check(it != ctx.crecs().end());
+    ExchContrRecs::Iterator it = exch.crecs().find("EURUSD");
+    check(it != exch.crecs().end());
 
     ContrRecRef crec(*it);
-    BookRef book = ctx.book(*it, 20130824);
+    BookRef book = exch.book(*it, 20130824);
     check(book.crec() == crec);
     check(book.settl_date() == 20130824);
 }

@@ -22,7 +22,7 @@
 #include <dbrpp/slnode.hpp>
 #include <dbrpp/match.hpp>
 
-#include <dbr/ctx.h>
+#include <dbr/exch.h>
 
 namespace dbr {
 
@@ -133,7 +133,7 @@ public:
 };
 
 class Trans {
-    DbrCtx ctx_;
+    DbrExch exch_;
     DbrTrans impl_;
 public:
     ~Trans() noexcept
@@ -141,8 +141,8 @@ public:
         reset();
     }
     explicit
-    Trans(DbrCtx ctx) noexcept
-    : ctx_(ctx)
+    Trans(DbrExch exch) noexcept
+    : exch_(exch)
     {
         impl_.first_match = nullptr;
     }
@@ -167,7 +167,7 @@ public:
     reset() noexcept
     {
         if (impl_.first_match) {
-            dbr_ctx_free_matches(ctx_, impl_.first_match);
+            dbr_exch_free_matches(exch_, impl_.first_match);
             impl_.first_match = nullptr;
         }
     }

@@ -19,7 +19,7 @@
 #include "model.hpp"
 #include "test.hpp"
 
-#include <dbrpp/ctx.hpp>
+#include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
 
 #include <dbr/accnt.h>
@@ -37,17 +37,17 @@ TEST_CASE(model_accnt_id)
     check(it != recs.end());
 }
 
-TEST_CASE(ctx_accnt_id)
+TEST_CASE(exch_accnt_id)
 {
     Journ journ(1);
     Model model;
     Pool pool;
-    Ctx ctx(&journ, &model, pool);
+    Exch exch(&journ, &model, pool);
 
-    CtxAccntRecs::Iterator it = ctx.arecs().find("DBRA");
-    check(it != ctx.arecs().end());
+    ExchAccntRecs::Iterator it = exch.arecs().find("DBRA");
+    check(it != exch.arecs().end());
 
     AccntRecRef arec(*it);
-    Accnt accnt = ctx.accnt(*it);
+    Accnt accnt = exch.accnt(*it);
     check(accnt.id() == arec.id());
 }
