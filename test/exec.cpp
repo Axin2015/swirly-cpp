@@ -24,7 +24,23 @@
 using namespace dbr;
 using namespace std;
 
-TEST_CASE(submit)
+TEST_CASE(exec_book)
+{
+    Journ journ(1);
+    Model model;
+    Pool pool;
+    Exch exch(&journ, &model, pool);
+
+    ExchContrRecs::Iterator it = exch.crecs().find("EURUSD");
+    check(it != exch.crecs().end());
+
+    ContrRecRef crec(*it);
+    BookRef book = exch.book(*it, 20130824);
+    check(book.crec() == crec);
+    check(book.settl_date() == 20130824);
+}
+
+TEST_CASE(exec_place)
 {
     Journ journ(1);
     Model model;

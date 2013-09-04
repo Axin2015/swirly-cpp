@@ -19,7 +19,7 @@
 
 #include <dbr/err.h>
 
-TEST_CASE(clear_err)
+TEST_CASE(err_clear)
 {
     dbr_err_clear();
     check(dbr_err_num() == 0);

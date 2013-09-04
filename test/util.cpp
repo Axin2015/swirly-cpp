@@ -21,7 +21,7 @@
 
 #include <limits.h>
 
-TEST_CASE(intlen)
+TEST_CASE(util_intlen)
 {
     check(dbr_intlen(0) == 1);
     check(dbr_intlen(1) == 1);
@@ -41,7 +41,7 @@ TEST_CASE(intlen)
     check(dbr_intlen(INT_MAX) == 10);
 }
 
-TEST_CASE(longlen)
+TEST_CASE(util_longlen)
 {
     check(dbr_longlen(0L) == 1);
     check(dbr_longlen(1L) == 1);

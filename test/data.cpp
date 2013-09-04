@@ -59,7 +59,43 @@ get_rec_mnem(Exch& exch, const char* mnem)
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
-TEST_CASE(find_contr)
+TEST_CASE(data_trader)
+{
+    Journ journ(1);
+    Model model;
+    Pool pool;
+    Exch exch(&journ, &model, pool);
+
+    check(exch.trecs().find("BAD") == exch.trecs().end());
+
+    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(exch, "WRAMIREZ");
+    check(trec == get_rec_id<DBR_TRADER>(exch, trec.id()));
+    check(trec.mnem() == Mnem("WRAMIREZ"));
+
+    // Body.
+    check(trec.display() == Display("Wayne Ramirez"));
+    check(trec.email() == Email("wayne.ramirez@doobry.org"));
+}
+
+TEST_CASE(data_accnt)
+{
+    Journ journ(1);
+    Model model;
+    Pool pool;
+    Exch exch(&journ, &model, pool);
+
+    check(exch.arecs().find("BAD") == exch.arecs().end());
+
+    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(exch, "DBRA");
+    check(arec == get_rec_id<DBR_ACCNT>(exch, arec.id()));
+    check(arec.mnem() == Mnem("DBRA"));
+
+    // Body.
+    check(arec.display() == Display("Account A"));
+    check(arec.email() == Email("dbra@doobry.org"));
+}
+
+TEST_CASE(data_contr)
 {
     Journ journ(1);
     Model model;
@@ -84,40 +120,4 @@ TEST_CASE(find_contr)
     check(crec.qty_dp() == 0);
     check(crec.min_lots() == 1);
     check(crec.max_lots() == 10);
-}
-
-TEST_CASE(find_trader)
-{
-    Journ journ(1);
-    Model model;
-    Pool pool;
-    Exch exch(&journ, &model, pool);
-
-    check(exch.trecs().find("BAD") == exch.trecs().end());
-
-    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(exch, "WRAMIREZ");
-    check(trec == get_rec_id<DBR_TRADER>(exch, trec.id()));
-    check(trec.mnem() == Mnem("WRAMIREZ"));
-
-    // Body.
-    check(trec.display() == Display("Wayne Ramirez"));
-    check(trec.email() == Email("wayne.ramirez@doobry.org"));
-}
-
-TEST_CASE(find_accnt)
-{
-    Journ journ(1);
-    Model model;
-    Pool pool;
-    Exch exch(&journ, &model, pool);
-
-    check(exch.arecs().find("BAD") == exch.arecs().end());
-
-    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(exch, "DBRA");
-    check(arec == get_rec_id<DBR_ACCNT>(exch, arec.id()));
-    check(arec.mnem() == Mnem("DBRA"));
-
-    // Body.
-    check(arec.display() == Display("Account A"));
-    check(arec.email() == Email("dbra@doobry.org"));
 }

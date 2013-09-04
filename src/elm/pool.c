@@ -198,7 +198,7 @@ elm_pool_term(struct ElmPool* pool)
     if (pool->allocs > 0)
         dbr_log_warn("%ld leaks detected", pool->allocs);
     else
-        dbr_log_info("no leaks detected");
+        dbr_log_debug2("no leaks detected");
     assert(pool->allocs == 0 && pool->checksum == 0);
 #endif // defined(DBR_DEBUG_ALLOC)
 }

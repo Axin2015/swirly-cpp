@@ -32,7 +32,7 @@ dbr_elem_from_node(DbrSlNode* node)
     return dbr_implof(SlElem, node, node);
 }
 
-TEST_CASE(list)
+TEST_CASE(slnode_list)
 {
     DbrList l = DBR_LIST_INIT(l);
 
@@ -40,7 +40,7 @@ TEST_CASE(list)
     check(dbr_list_first(&l) == dbr_list_end(&l));
 }
 
-TEST_CASE(queue)
+TEST_CASE(slnode_queue)
 {
     DbrQueue q = DBR_QUEUE_INIT(q);
 
@@ -87,7 +87,7 @@ TEST_CASE(queue)
     check(dbr_queue_first(&q)->next->next->next == dbr_queue_end(&q));
 }
 
-TEST_CASE(stack)
+TEST_CASE(slnode_stack)
 {
     DbrStack s = DBR_STACK_INIT(s);
 

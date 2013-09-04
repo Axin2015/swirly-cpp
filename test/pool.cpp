@@ -21,12 +21,12 @@
 
 using namespace dbr;
 
-TEST_CASE(create_pool)
+TEST_CASE(pool_create)
 {
     Pool pool;
 }
 
-TEST_CASE(destroy_pool)
+TEST_CASE(pool_destroy)
 {
     dbr_pool_destroy(NULL);
 }
