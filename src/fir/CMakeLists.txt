@@ -22,8 +22,3 @@ TARGET_LINK_LIBRARIES(fir_pic fig_pic dl)
 
 INSTALL(TARGETS fir_shared DESTINATION lib)
 INSTALL(TARGETS fir_static DESTINATION lib)
-
-ADD_EXECUTABLE(dbr_dump dump.cpp)
-TARGET_LINK_LIBRARIES(dbr_dump fir_static)
-
-INSTALL(TARGETS dbr_dump DESTINATION bin)
