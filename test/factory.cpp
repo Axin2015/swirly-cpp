@@ -79,7 +79,11 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
     strncpy(rec->contr.asset_type, asset_type, DBR_MNEM_MAX);
     strncpy(rec->contr.asset, asset, DBR_MNEM_MAX);
     strncpy(rec->contr.ccy, ccy, DBR_MNEM_MAX);
+    rec->contr.tick_numer = tick_numer;
+    rec->contr.tick_denom = tick_denom;
     rec->contr.price_inc = dbr_fract_to_real(tick_numer, tick_denom);
+    rec->contr.lot_numer = lot_numer;
+    rec->contr.lot_denom = lot_denom;
     rec->contr.qty_inc = dbr_fract_to_real(lot_numer, lot_denom);
     rec->contr.price_dp = dbr_real_to_dp(rec->contr.price_inc);
     rec->contr.pip_dp = pip_dp;

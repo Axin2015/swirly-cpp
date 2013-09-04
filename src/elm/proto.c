@@ -17,6 +17,7 @@
  */
 #include <dbr/proto.h>
 
+#include <dbr/conv.h>
 #include <dbr/err.h>
 #include <dbr/pack.h>
 #include <dbr/types.h>
@@ -107,12 +108,19 @@ DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
     rec->type = DBR_CONTR;
-    return dbr_unpackf(buf, CONTR_FORMAT,
-                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                       rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
-                       &rec->contr.tick_numer, &rec->contr.tick_denom, &rec->contr.lot_numer,
-                       &rec->contr.lot_denom, &rec->contr.pip_dp, &rec->contr.min_lots,
-                       &rec->contr.max_lots);
+    const char* end = dbr_unpackf(buf, CONTR_FORMAT,
+                                  &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                                  rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
+                                  &rec->contr.tick_numer, &rec->contr.tick_denom,
+                                  &rec->contr.lot_numer, &rec->contr.lot_denom,
+                                  &rec->contr.pip_dp, &rec->contr.min_lots, &rec->contr.max_lots);
+
+    // Derive transient fields.
+    rec->contr.price_inc = dbr_fract_to_real(rec->contr.tick_numer, rec->contr.tick_denom);
+    rec->contr.qty_inc = dbr_fract_to_real(rec->contr.lot_numer, rec->contr.lot_denom);
+    rec->contr.price_dp = dbr_real_to_dp(rec->contr.price_inc);
+    rec->contr.qty_dp = dbr_real_to_dp(rec->contr.qty_inc);
+    return end;
 }
 
 DBR_API size_t

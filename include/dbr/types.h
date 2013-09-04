@@ -141,12 +141,16 @@ struct DbrRec {
             DbrMnem ccy;
             int tick_numer;
             int tick_denom;
+            // Transient.
             double price_inc;
             int lot_numer;
             int lot_denom;
+            // Transient.
             double qty_inc;
+            // Transient.
             int price_dp;
             int pip_dp;
+            // Transient.
             int qty_dp;
             DbrLots min_lots;
             DbrLots max_lots;

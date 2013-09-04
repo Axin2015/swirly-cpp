@@ -25,27 +25,6 @@
 
 using namespace dbr;
 
-static void
-set_contr(DbrRec* rec, DbrIden id, const char* mnem, const char* display, const char* asset_type,
-          const char* asset, const char* ccy, int tick_numer, int tick_denom, int lot_numer,
-          int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots)
-{
-    rec->type = DBR_CONTR;
-    rec->id = id;
-    strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec->display, display, DBR_DISPLAY_MAX);
-    strncpy(rec->contr.asset_type, asset_type, DBR_MNEM_MAX);
-    strncpy(rec->contr.asset, asset, DBR_MNEM_MAX);
-    strncpy(rec->contr.ccy, ccy, DBR_MNEM_MAX);
-    rec->contr.tick_numer = tick_numer;
-    rec->contr.tick_denom = tick_denom;
-    rec->contr.lot_numer = lot_numer;
-    rec->contr.lot_denom = lot_denom;
-    rec->contr.pip_dp = pip_dp;
-    rec->contr.min_lots = min_lots;
-    rec->contr.max_lots = max_lots;
-}
-
 TEST_CASE(proto_trader)
 {
     Pool pool;
@@ -64,32 +43,68 @@ TEST_CASE(proto_trader)
     check(out.id == in->id);
     check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
     check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
+
+    // Body.
+    check(sequal(out.trader.email, in->trader.email, DBR_EMAIL_MAX));
+}
+
+TEST_CASE(proto_accnt)
+{
+    Pool pool;
+    auto in = create_dbra(pool);
+
+    auto len = accnt_len(*in);
+    char buf[len];
+    const char* end = write_accnt(buf, *in);
+    check(buf + len == end);
+
+    DbrRec out;
+    end = read_accnt(buf, out);
+    check(buf + len == end);
+
+    check(out.type == in->type);
+    check(out.id == in->id);
+    check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
+    check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
+
+    // Body.
+    check(sequal(out.accnt.email, in->accnt.email, DBR_EMAIL_MAX));
 }
 
 TEST_CASE(proto_contr)
 {
-    DbrRec rec;
-    set_contr(&rec, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
-              1, 10000, 1000000, 1, 4, 1, 10);
-    const size_t n = dbr_contr_len(&rec);
-    char buf[n];
-    dbr_write_contr(buf, &rec);
-    memset(&rec, 0, sizeof(rec));
-    dbr_read_contr(buf, &rec);
+    Pool pool;
+    auto in = create_eurusd(pool);
 
-    check(rec.id == 1);
-    check(sequal(rec.mnem, "EURUSD", DBR_MNEM_MAX));
-    check(sequal(rec.display, "EURUSD", DBR_DISPLAY_MAX));
-    check(sequal(rec.contr.asset_type, "CURRENCY", DBR_MNEM_MAX));
-    check(sequal(rec.contr.asset, "EUR", DBR_MNEM_MAX));
-    check(sequal(rec.contr.ccy, "USD", DBR_MNEM_MAX));
-    check(rec.contr.tick_numer == 1);
-    check(rec.contr.tick_denom == 10000);
-    check(rec.contr.lot_numer == 1000000);
-    check(rec.contr.lot_denom == 1);
-    check(rec.contr.pip_dp == 4);
-    check(rec.contr.min_lots == 1);
-    check(rec.contr.max_lots == 10);
+    auto len = contr_len(*in);
+    char buf[len];
+    const char* end = write_contr(buf, *in);
+    check(buf + len == end);
+
+    DbrRec out;
+    end = read_contr(buf, out);
+    check(buf + len == end);
+
+    check(out.type == in->type);
+    check(out.id == in->id);
+    check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
+    check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
+
+    // Body.
+    check(sequal(out.contr.asset_type, in->contr.asset_type, DBR_MNEM_MAX));
+    check(sequal(out.contr.asset, in->contr.asset, DBR_MNEM_MAX));
+    check(sequal(out.contr.ccy, in->contr.ccy, DBR_MNEM_MAX));
+    check(out.contr.tick_numer == in->contr.tick_numer);
+    check(out.contr.tick_denom == in->contr.tick_denom);
+    check(fequal(out.contr.price_inc, in->contr.price_inc));
+    check(out.contr.lot_numer == in->contr.lot_numer);
+    check(out.contr.lot_denom == in->contr.lot_denom);
+    check(fequal(out.contr.qty_inc, in->contr.qty_inc));
+    check(fequal(out.contr.price_dp, in->contr.price_dp));
+    check(out.contr.pip_dp == in->contr.pip_dp);
+    check(fequal(out.contr.qty_dp, in->contr.qty_dp));
+    check(out.contr.min_lots == in->contr.min_lots);
+    check(out.contr.max_lots == in->contr.max_lots);
 }
 
 TEST_CASE(proto_order)
