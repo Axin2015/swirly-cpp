@@ -15,20 +15,20 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/string.h>
+#include <dbr/text.h>
 
 #include <math.h>
 
 static const char DIGITS[] = "0123456789";
 
 DBR_API void
-dbr_format_price(double price, int price_dp, int pip_dp, struct DbrPriceString* ps)
+dbr_price_text(double price, int price_dp, int pip_dp, struct DbrPriceText* pt)
 {
     static const char DIGITS[] = "0123456789";
 
     // Digits in price as integer.
     int digits = fabs(price) * pow(10, price_dp) + 0.5;
-    char* cp = ps->buf + sizeof(ps->buf) - 1;
+    char* cp = pt->buf + sizeof(pt->buf) - 1;
 
     *cp-- = '\0';
     while (price_dp > pip_dp) {
@@ -37,7 +37,7 @@ dbr_format_price(double price, int price_dp, int pip_dp, struct DbrPriceString* 
         if (--price_dp == 0)
             *cp-- = '.';
     }
-    ps->small = cp + 1;
+    pt->small = cp + 1;
 
     // Lower-order pip digit.
     *cp-- = '\0';
@@ -50,7 +50,7 @@ dbr_format_price(double price, int price_dp, int pip_dp, struct DbrPriceString* 
     // Higher-order pip digit.
     *cp-- = DIGITS[digits % 10];
     digits /= 10;
-    ps->pips = cp + 1;
+    pt->pips = cp + 1;
 
     *cp-- = '\0';
     while (digits > 0 || price_dp > 0) {
@@ -63,5 +63,5 @@ dbr_format_price(double price, int price_dp, int pip_dp, struct DbrPriceString* 
     if (price < 0)
         *cp-- = '-';
 
-    ps->big = cp + 1;
+    pt->big = cp + 1;
 }

@@ -209,7 +209,7 @@
  */
 
 /**
- * @defgroup String String
+ * @defgroup Text Text
  * @ingroup Fig
  */
 

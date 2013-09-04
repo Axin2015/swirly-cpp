@@ -15,4 +15,27 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/string.h>
+#ifndef DBR_TEXT_H
+#define DBR_TEXT_H
+
+#include <dbr/defs.h>
+
+/**
+ * @addtogroup Text
+ * @{
+ */
+
+struct DbrPriceText {
+    // 10 decimal digits + 3 nulls + dp + sign + pad
+    char buf[16];
+    char* small;
+    char* pips;
+    char* big;
+};
+
+DBR_API void
+dbr_price_text(double price, int price_dp, int pip_dp, struct DbrPriceText* ps);
+
+/** @} */
+
+#endif // DBR_TEXT_H

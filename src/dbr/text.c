@@ -15,27 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_STRING_H
-#define DBR_STRING_H
-
-#include <dbr/defs.h>
-
-/**
- * @addtogroup String
- * @{
- */
-
-struct DbrPriceString {
-    // 10 decimal digits + 3 nulls + dp + sign + pad
-    char buf[16];
-    char* small;
-    char* pips;
-    char* big;
-};
-
-DBR_API void
-dbr_format_price(double price, int price_dp, int pip_dp, struct DbrPriceString* ps);
-
-/** @} */
-
-#endif // DBR_STRING_H
+#include <dbr/text.h>
