@@ -109,11 +109,6 @@
  */
 
 /**
- * @defgroup Contr Contract
- * @ingroup Fig
- */
-
-/**
  * @defgroup Book Book
  * @ingroup Fig
  */
@@ -194,7 +189,7 @@
  */
 
 /**
- * @defgroup Rec Record
+ * @defgroup Data Data
  * @ingroup Exch
  */
 

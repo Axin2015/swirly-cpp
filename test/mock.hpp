@@ -15,10 +15,11 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef JOURN_HPP
-#define JOURN_HPP
+#ifndef MOCK_HPP
+#define MOCK_HPP
 
 #include <dbrpp/journ.hpp>
+#include <dbrpp/model.hpp>
 
 #include <dbr/pool.h>
 
@@ -59,4 +60,10 @@ public:
     archive_trade(DbrIden id, DbrMillis now) noexcept;
 };
 
-#endif // JOURN_HPP
+class Model : public dbr::IModel<Model> {
+public:
+    ssize_t
+    read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept;
+};
+
+#endif // MOCK_HPP

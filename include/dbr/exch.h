@@ -51,7 +51,7 @@ dbr_exch_destroy(DbrExch exch);
 /** @} */
 
 /**
- * @addtogroup Rec
+ * @addtogroup Data
  * @{
  */
 

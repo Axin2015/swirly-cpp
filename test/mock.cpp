@@ -15,11 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "journ.hpp"
-#include "model.hpp"
-#include "test.hpp"
+#include "mock.hpp"
 
-#include <dbr/err.h>
 #include <dbr/queue.h>
 
 using namespace dbr;
@@ -195,6 +192,65 @@ read_posn(DbrPool pool, DbrSlNode*& first) noexcept
     return 0;
 }
 } // anonymous
+
+// Journ.
+
+DbrIden
+Journ::alloc_id() noexcept
+{
+    return id_++;
+}
+
+DbrBool
+Journ::begin_trans() noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::commit_trans() noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::rollback_trans() noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::insert_order(OrderRef order) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
+                    DbrLots lots, DbrMillis now) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::archive_order(DbrIden id, DbrMillis now) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::insert_trade(TradeRef trade) noexcept
+{
+    return 1;
+}
+
+DbrBool
+Journ::archive_trade(DbrIden id, DbrMillis now) noexcept
+{
+    return 1;
+}
+
+// Model.
 
 ssize_t
 Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept

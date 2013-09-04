@@ -93,12 +93,6 @@ enum DbrAction {
 /** @} */
 
 /**
- * @addtogroup Contr
- */
-
-typedef struct FigContr* DbrContr;
-
-/**
  * @addtogroup Trader
  */
 
@@ -111,7 +105,7 @@ typedef struct FigTrader* DbrTrader;
 typedef struct FigAccnt* DbrAccnt;
 
 /**
- * @addtogroup Rec
+ * @addtogroup Data
  * @{
  */
 

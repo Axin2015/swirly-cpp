@@ -23,13 +23,63 @@
 
 #include <stdlib.h> // abort()
 
-static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
+static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
 static const char ORDER_FORMAT[] = "liilllisillllllll";
 static const char MEMB_FORMAT[] = "ll";
 static const char TRADE_FORMAT[] = "lllilllisliillllll";
 static const char POSN_FORMAT[] = "lllllll";
+
+DBR_API size_t
+dbr_trader_len(const struct DbrRec* rec)
+{
+    return dbr_packlenf(TRADER_FORMAT,
+                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                        DBR_EMAIL_MAX, rec->trader.email);
+}
+
+DBR_API char*
+dbr_write_trader(char* buf, const struct DbrRec* rec)
+{
+    return dbr_packf(buf, TRADER_FORMAT,
+                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                     DBR_EMAIL_MAX, rec->trader.email);
+}
+
+DBR_API const char*
+dbr_read_trader(const char* buf, struct DbrRec* rec)
+{
+    rec->type = DBR_TRADER;
+    return dbr_unpackf(buf, TRADER_FORMAT,
+                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                       DBR_EMAIL_MAX, rec->trader.email);
+}
+
+DBR_API size_t
+dbr_accnt_len(const struct DbrRec* rec)
+{
+    return dbr_packlenf(ACCNT_FORMAT,
+                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                        DBR_EMAIL_MAX, rec->accnt.email);
+}
+
+DBR_API char*
+dbr_write_accnt(char* buf, const struct DbrRec* rec)
+{
+    return dbr_packf(buf, ACCNT_FORMAT,
+                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                     DBR_EMAIL_MAX, rec->accnt.email);
+}
+
+DBR_API const char*
+dbr_read_accnt(const char* buf, struct DbrRec* rec)
+{
+    rec->type = DBR_ACCNT;
+    return dbr_unpackf(buf, ACCNT_FORMAT,
+                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                       DBR_EMAIL_MAX, rec->accnt.email);
+}
 
 DBR_API size_t
 dbr_contr_len(const struct DbrRec* rec)
@@ -56,60 +106,13 @@ dbr_write_contr(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
+    rec->type = DBR_CONTR;
     return dbr_unpackf(buf, CONTR_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
                        rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
                        &rec->contr.tick_numer, &rec->contr.tick_denom, &rec->contr.lot_numer,
                        &rec->contr.lot_denom, &rec->contr.pip_dp, &rec->contr.min_lots,
                        &rec->contr.max_lots);
-}
-
-DBR_API size_t
-dbr_trader_len(const struct DbrRec* rec)
-{
-    return dbr_packlenf(TRADER_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                        DBR_EMAIL_MAX, rec->trader.email);
-}
-
-DBR_API char*
-dbr_write_trader(char* buf, const struct DbrRec* rec)
-{
-    return dbr_packf(buf, TRADER_FORMAT,
-                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                     DBR_EMAIL_MAX, rec->trader.email);
-}
-
-DBR_API const char*
-dbr_read_trader(const char* buf, struct DbrRec* rec)
-{
-    return dbr_unpackf(buf, TRADER_FORMAT,
-                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                       DBR_EMAIL_MAX, rec->trader.email);
-}
-
-DBR_API size_t
-dbr_accnt_len(const struct DbrRec* rec)
-{
-    return dbr_packlenf(ACCNT_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                        DBR_EMAIL_MAX, rec->accnt.email);
-}
-
-DBR_API char*
-dbr_write_accnt(char* buf, const struct DbrRec* rec)
-{
-    return dbr_packf(buf, ACCNT_FORMAT,
-                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                     DBR_EMAIL_MAX, rec->accnt.email);
-}
-
-DBR_API const char*
-dbr_read_accnt(const char* buf, struct DbrRec* rec)
-{
-    return dbr_unpackf(buf, ACCNT_FORMAT,
-                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                       DBR_EMAIL_MAX, rec->accnt.email);
 }
 
 DBR_API size_t

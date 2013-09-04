@@ -15,10 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
+#include "factory.hpp"
+#include "mock.hpp"
 #include "test.hpp"
 
+#include <dbrpp/pool.hpp>
+
 #include <dbr/proto.h>
-#include <dbr/types.h>
+
+using namespace dbr;
 
 static void
 set_contr(DbrRec* rec, DbrIden id, const char* mnem, const char* display, const char* asset_type,
@@ -39,6 +44,26 @@ set_contr(DbrRec* rec, DbrIden id, const char* mnem, const char* display, const 
     rec->contr.pip_dp = pip_dp;
     rec->contr.min_lots = min_lots;
     rec->contr.max_lots = max_lots;
+}
+
+TEST_CASE(proto_trader)
+{
+    Pool pool;
+    auto in = create_wramirez(pool);
+
+    auto len = trader_len(*in);
+    char buf[len];
+    const char* end = write_trader(buf, *in);
+    check(buf + len == end);
+
+    DbrRec out;
+    end = read_trader(buf, out);
+    check(buf + len == end);
+
+    check(out.type == in->type);
+    check(out.id == in->id);
+    check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
+    check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
 }
 
 TEST_CASE(proto_contr)
@@ -65,4 +90,42 @@ TEST_CASE(proto_contr)
     check(rec.contr.pip_dp == 4);
     check(rec.contr.min_lots == 1);
     check(rec.contr.max_lots == 10);
+}
+
+TEST_CASE(proto_order)
+{
+    Pool pool;
+    DbrIden trader = 5;
+    DbrIden accnt = 7;
+    DbrIden contr = 11;
+
+    auto in = create_order(pool, 1, trader, accnt, contr, 20130827,
+                           "apple", DBR_BUY, 12345, 10, 0, 0);
+
+    auto len = order_len(*in);
+    char buf[len];
+    const char* end = write_order(buf, *in);
+    check(buf + len == end);
+
+    DbrOrder out;
+    end = read_order(buf, out);
+    check(buf + len == end);
+
+    check(out.id == in->id);
+    check(out.rev == in->rev);
+    check(out.status == in->status);
+    check(out.trader.id == in->trader.id);
+    check(out.accnt.id == in->accnt.id);
+    check(out.contr.id == in->contr.id);
+    check(out.settl_date == in->settl_date);
+    check(sequal(out.ref, in->ref, DBR_REF_MAX));
+    check(out.action == in->action);
+    check(out.ticks == in->ticks);
+    check(out.resd == in->resd);
+    check(out.exec == in->exec);
+    check(out.lots == in->lots);
+    check(out.min == in->min);
+    check(out.flags == in->flags);
+    check(out.created == in->created);
+    check(out.modified == in->modified);
 }
