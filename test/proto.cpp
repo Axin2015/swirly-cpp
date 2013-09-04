@@ -19,6 +19,7 @@
 #include "mock.hpp"
 #include "test.hpp"
 
+#include <dbrpp/memb.hpp>
 #include <dbrpp/pool.hpp>
 
 #include <dbr/proto.h>
@@ -143,4 +144,25 @@ TEST_CASE(proto_order)
     check(out.flags == in->flags);
     check(out.created == in->created);
     check(out.modified == in->modified);
+}
+
+TEST_CASE(proto_memb)
+{
+    Pool pool;
+    DbrIden accnt = 5;
+    DbrIden trader = 7;
+
+    auto in = create_memb(pool, accnt, trader);
+
+    auto len = memb_len(*in);
+    char buf[len];
+    const char* end = write_memb(buf, *in);
+    check(buf + len == end);
+
+    DbrMemb out;
+    end = read_memb(buf, out);
+    check(buf + len == end);
+
+    check(out.accnt.id == in->accnt.id);
+    check(out.trader.id == in->trader.id);
 }

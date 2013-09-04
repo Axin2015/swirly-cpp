@@ -34,15 +34,6 @@ struct DbrPosn;
  */
 
 DBR_API size_t
-dbr_contr_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_write_contr(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_read_contr(const char* buf, struct DbrRec* rec);
-
-DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec);
 
 DBR_API char*
@@ -59,6 +50,15 @@ dbr_write_accnt(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
 dbr_read_accnt(const char* buf, struct DbrRec* rec);
+
+DBR_API size_t
+dbr_contr_len(const struct DbrRec* rec);
+
+DBR_API char*
+dbr_write_contr(char* buf, const struct DbrRec* rec);
+
+DBR_API const char*
+dbr_read_contr(const char* buf, struct DbrRec* rec);
 
 /**
  * @brief Returns -1 if type is unrecognised.
