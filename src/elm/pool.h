@@ -128,14 +128,7 @@ static inline struct DbrRec*
 elm_pool_alloc_rec(struct ElmPool* pool)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool);
-    if (!node)
-        return NULL;
-    // Initialise private section.
-    struct DbrRec* rec = &node->rec;
-    dbr_slnode_init(&rec->model_node_);
-    dbr_slnode_init(&rec->id_node_);
-    dbr_slnode_init(&rec->mnem_node_);
-    return rec;
+    return node ? &node->rec : NULL;
 }
 
 static inline void
@@ -149,11 +142,7 @@ static inline struct DbrLevel*
 elm_pool_alloc_level(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    if (!node)
-        return NULL;
-    struct DbrLevel* level = &node->level;
-    dbr_rbnode_init(&level->side_node_);
-    return level;
+    return node ? &node->level : NULL;
 }
 
 static inline void
@@ -181,14 +170,7 @@ static inline struct DbrOrder*
 elm_pool_alloc_order(struct ElmPool* pool)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool);
-    if (!node)
-        return NULL;
-    struct DbrOrder* order = &node->order;
-    dbr_slnode_init(&order->model_node_);
-    dbr_slnode_init(&order->ref_node_);
-    dbr_dlnode_init(&order->side_node_);
-    dbr_rbnode_init(&order->trader_node_);
-    return order;
+    return node ? &node->order : NULL;
 }
 
 static inline void
@@ -202,12 +184,7 @@ static inline struct DbrMemb*
 elm_pool_alloc_memb(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    if (!node)
-        return NULL;
-    struct DbrMemb* memb = &node->memb;
-    dbr_slnode_init(&memb->model_node_);
-    dbr_rbnode_init(&memb->accnt_node_);
-    return memb;
+    return node ? &node->memb : NULL;
 }
 
 static inline void
@@ -221,12 +198,7 @@ static inline struct DbrTrade*
 elm_pool_alloc_trade(struct ElmPool* pool)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool);
-    if (!node)
-        return NULL;
-    struct DbrTrade* trade = &node->trade;
-    dbr_slnode_init(&trade->model_node_);
-    dbr_rbnode_init(&trade->accnt_node_);
-    return trade;
+    return node ? &node->trade : NULL;
 }
 
 static inline void
@@ -240,12 +212,7 @@ static inline struct DbrPosn*
 elm_pool_alloc_posn(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    if (!node)
-        return NULL;
-    struct DbrPosn* posn = &node->posn;
-    dbr_slnode_init(&posn->model_node_);
-    dbr_rbnode_init(&posn->accnt_node_);
-    return posn;
+    return node ? &node->posn : NULL;
 }
 
 static inline void
@@ -259,12 +226,7 @@ static inline struct DbrSub*
 elm_pool_alloc_sub(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    if (!node)
-        return NULL;
-    struct DbrSub* sub = &node->sub;
-    dbr_dlnode_init(&sub->book_node_);
-    dbr_rbnode_init(&sub->trader_node_);
-    return sub;
+    return node ? &node->sub : NULL;
 }
 
 static inline void
@@ -287,14 +249,7 @@ elm_pool_alloc_rec_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating %p rec in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    // Initialise private section.
-    struct DbrRec* rec = &node->rec;
-    dbr_slnode_init(&rec->model_node_);
-    dbr_slnode_init(&rec->id_node_);
-    dbr_slnode_init(&rec->mnem_node_);
-    return rec;
+    return node ? &node->rec : NULL;
 }
 
 static inline void
@@ -310,11 +265,7 @@ elm_pool_alloc_level_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating level %p in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    struct DbrLevel* level = &node->level;
-    dbr_rbnode_init(&level->side_node_);
-    return level;
+    return node ? &node->level : NULL;
 }
 
 static inline void
@@ -346,14 +297,7 @@ elm_pool_alloc_order_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating order %p in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    struct DbrOrder* order = &node->order;
-    dbr_slnode_init(&order->model_node_);
-    dbr_slnode_init(&order->ref_node_);
-    dbr_dlnode_init(&order->side_node_);
-    dbr_rbnode_init(&order->trader_node_);
-    return order;
+    return node ? &node->order : NULL;
 }
 
 static inline void
@@ -369,12 +313,7 @@ elm_pool_alloc_memb_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating memb %p in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    struct DbrMemb* memb = &node->memb;
-    dbr_slnode_init(&memb->model_node_);
-    dbr_rbnode_init(&memb->accnt_node_);
-    return memb;
+    return node ? &node->memb : NULL;
 }
 
 static inline void
@@ -390,12 +329,7 @@ elm_pool_alloc_trade_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating trade %p in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    struct DbrTrade* trade = &node->trade;
-    dbr_slnode_init(&trade->model_node_);
-    dbr_rbnode_init(&trade->accnt_node_);
-    return trade;
+    return node ? &node->trade : NULL;
 }
 
 static inline void
@@ -411,12 +345,7 @@ elm_pool_alloc_posn_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating posn %p in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    struct DbrPosn* posn = &node->posn;
-    dbr_slnode_init(&posn->model_node_);
-    dbr_rbnode_init(&posn->accnt_node_);
-    return posn;
+    return node ? &node->posn : NULL;
 }
 
 static inline void
@@ -432,12 +361,7 @@ elm_pool_alloc_sub_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating sub %p in %s at %d", node, file, line);
-    if (!node)
-        return NULL;
-    struct DbrSub* sub = &node->sub;
-    dbr_dlnode_init(&sub->book_node_);
-    dbr_rbnode_init(&sub->trader_node_);
-    return sub;
+    return node ? &node->sub : NULL;
 }
 
 static inline void

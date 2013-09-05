@@ -71,6 +71,7 @@ static inline void
 fig_accnt_release_trade(struct FigAccnt* accnt, struct DbrTrade* trade)
 {
     dbr_tree_remove(&accnt->trades, &trade->accnt_node_);
+    dbr_rbnode_init(&trade->accnt_node_);
 }
 
 // Release ownership from state.

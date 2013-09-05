@@ -472,6 +472,7 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
     struct DbrOrder* new_order = dbr_pool_alloc_order(exch->pool);
     if (!new_order)
         goto fail1;
+    dbr_order_init(new_order);
 
     new_order->id = id;
     new_order->level = NULL;

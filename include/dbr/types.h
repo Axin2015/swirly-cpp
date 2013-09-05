@@ -166,6 +166,14 @@ struct DbrRec {
     struct DbrSlNode mnem_node_;
 };
 
+static inline void
+dbr_rec_init(struct DbrRec* rec)
+{
+    dbr_slnode_init(&rec->model_node_);
+    dbr_slnode_init(&rec->id_node_);
+    dbr_slnode_init(&rec->mnem_node_);
+}
+
 /** @} */
 
 /**
@@ -212,6 +220,12 @@ struct DbrLevel {
     struct DbrRbNode side_node_;
 };
 
+static inline void
+dbr_level_init(struct DbrLevel* level)
+{
+    dbr_rbnode_init(&level->side_node_);
+}
+
 /** @} */
 
 /**
@@ -231,6 +245,13 @@ struct DbrSub {
     struct DbrDlNode book_node_;
     struct DbrRbNode trader_node_;
 };
+
+static inline void
+dbr_sub_init(struct DbrSub* sub)
+{
+    dbr_dlnode_init(&sub->book_node_);
+    dbr_rbnode_init(&sub->trader_node_);
+}
 
 /** @} */
 
@@ -264,6 +285,13 @@ struct DbrMemb {
     struct DbrRbNode accnt_node_;
 };
 
+static inline void
+dbr_memb_init(struct DbrMemb* memb)
+{
+    dbr_slnode_init(&memb->model_node_);
+    dbr_rbnode_init(&memb->accnt_node_);
+}
+
 /** @} */
 
 /**
@@ -289,6 +317,13 @@ struct DbrPosn {
     struct DbrSlNode model_node_;
     struct DbrRbNode accnt_node_;
 };
+
+static inline void
+dbr_posn_init(struct DbrPosn* posn)
+{
+    dbr_slnode_init(&posn->model_node_);
+    dbr_rbnode_init(&posn->accnt_node_);
+}
 
 /** @} */
 
@@ -367,6 +402,15 @@ struct DbrOrder {
     struct DbrRbNode trader_node_;
 };
 
+static inline void
+dbr_order_init(struct DbrOrder* order)
+{
+    dbr_slnode_init(&order->model_node_);
+    dbr_slnode_init(&order->ref_node_);
+    dbr_dlnode_init(&order->side_node_);
+    dbr_rbnode_init(&order->trader_node_);
+}
+
 static inline DbrBool
 dbr_order_done(const struct DbrOrder* order)
 {
@@ -415,6 +459,13 @@ struct DbrTrade {
     struct DbrRbNode accnt_node_;
 };
 
+static inline void
+dbr_trade_init(struct DbrTrade* trade)
+{
+    dbr_slnode_init(&trade->model_node_);
+    dbr_rbnode_init(&trade->accnt_node_);
+}
+
 struct DbrMatch {
     /**
      * @publicsection
@@ -436,6 +487,12 @@ struct DbrMatch {
      */
     struct DbrSlNode trans_node_;
 };
+
+static inline void
+dbr_match_init(struct DbrMatch* match)
+{
+    dbr_slnode_init(&match->trans_node_);
+}
 
 struct DbrTrans {
     struct DbrOrder* new_order;

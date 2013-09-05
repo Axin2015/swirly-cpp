@@ -450,6 +450,7 @@ select_trader(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             struct DbrRec* rec = dbr_pool_alloc_rec(pool);
             if (!rec)
                 goto fail2;
+            dbr_rec_init(rec);
 
             // Header.
 
@@ -518,6 +519,7 @@ select_accnt(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             struct DbrRec* rec = dbr_pool_alloc_rec(pool);
             if (!rec)
                 goto fail2;
+            dbr_rec_init(rec);
 
             // Header.
 
@@ -595,6 +597,7 @@ select_contr(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             struct DbrRec* rec = dbr_pool_alloc_rec(pool);
             if (!rec)
                 goto fail2;
+            dbr_rec_init(rec);
 
             // Header.
 
@@ -705,6 +708,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             struct DbrOrder* order = dbr_pool_alloc_order(pool);
             if (!order)
                 goto fail2;
+            dbr_order_init(order);
 
             order->id = sqlite3_column_int64(stmt, ID);
             order->level = NULL;
@@ -784,6 +788,7 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
             if (!memb)
                 goto fail2;
+            dbr_memb_init(memb);
 
             memb->accnt.id = sqlite3_column_int64(stmt, ACCNT);
             memb->trader.id = sqlite3_column_int64(stmt, TRADER);
@@ -853,6 +858,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
             if (!trade)
                 goto fail2;
+            dbr_trade_init(trade);
 
             trade->id = sqlite3_column_int64(stmt, ID);
             trade->match = sqlite3_column_int64(stmt, MATCH);
@@ -963,6 +969,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             posn = dbr_pool_alloc_posn(pool);
             if (dbr_unlikely(!posn))
                 goto fail2;
+            dbr_posn_init(posn);
 
             posn->accnt.id = accnt;
             posn->contr.id = contr;

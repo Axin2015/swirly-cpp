@@ -51,6 +51,7 @@ dbr_write_trader(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_trader(const char* buf, struct DbrRec* rec)
 {
+    dbr_rec_init(rec);
     rec->type = DBR_TRADER;
     return dbr_unpackf(buf, TRADER_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -76,6 +77,7 @@ dbr_write_accnt(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_accnt(const char* buf, struct DbrRec* rec)
 {
+    dbr_rec_init(rec);
     rec->type = DBR_ACCNT;
     return dbr_unpackf(buf, ACCNT_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -107,6 +109,7 @@ dbr_write_contr(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
+    dbr_rec_init(rec);
     rec->type = DBR_CONTR;
     const char* end = dbr_unpackf(buf, CONTR_FORMAT,
                                   &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -207,14 +210,12 @@ dbr_write_order(char* buf, const struct DbrOrder* order)
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order)
 {
-    buf = dbr_unpackf(buf, ORDER_FORMAT,
-                      &order->id, &order->rev, &order->status, &order->trader.id, &order->accnt.id,
-                      &order->contr.id, &order->settl_date, DBR_REF_MAX, order->ref, &order->action,
-                      &order->ticks, &order->resd, &order->exec, &order->lots, &order->min,
-                      &order->flags, &order->created, &order->modified);
-    if (buf)
-        order->trader_node_.key = order->id;
-    return buf;
+    dbr_order_init(order);
+    return dbr_unpackf(buf, ORDER_FORMAT,
+                       &order->id, &order->rev, &order->status, &order->trader.id,
+                       &order->accnt.id, &order->contr.id, &order->settl_date, DBR_REF_MAX,
+                       order->ref, &order->action, &order->ticks, &order->resd, &order->exec,
+                       &order->lots, &order->min, &order->flags, &order->created, &order->modified);
 }
 
 DBR_API size_t
@@ -234,11 +235,8 @@ dbr_write_memb(char* buf, const struct DbrMemb* memb)
 DBR_API const char*
 dbr_read_memb(const char* buf, struct DbrMemb* memb)
 {
-    buf = dbr_unpackf(buf, MEMB_FORMAT,
-                      &memb->accnt.id, &memb->trader.id);
-    if (buf)
-        memb->accnt_node_.key = memb->trader.id;
-    return buf;
+    dbr_memb_init(memb);
+    return dbr_unpackf(buf, MEMB_FORMAT, &memb->accnt.id, &memb->trader.id);
 }
 
 DBR_API size_t
@@ -266,15 +264,13 @@ dbr_write_trade(char* buf, const struct DbrTrade* trade)
 DBR_API const char*
 dbr_read_trade(const char* buf, struct DbrTrade* trade)
 {
-    buf = dbr_unpackf(buf, TRADE_FORMAT,
-                      &trade->id, &trade->match, &trade->order, &trade->order_rev,
-                      &trade->trader.id, &trade->accnt.id, &trade->contr.id, &trade->settl_date,
-                      DBR_REF_MAX, trade->ref, &trade->cpty.id, &trade->role, &trade->action,
-                      &trade->ticks, &trade->resd, &trade->exec, &trade->lots, &trade->created,
-                      &trade->modified);
-    if (buf)
-        trade->accnt_node_.key = trade->id;
-    return buf;
+    dbr_trade_init(trade);
+    return dbr_unpackf(buf, TRADE_FORMAT,
+                       &trade->id, &trade->match, &trade->order, &trade->order_rev,
+                       &trade->trader.id, &trade->accnt.id, &trade->contr.id, &trade->settl_date,
+                       DBR_REF_MAX, trade->ref, &trade->cpty.id, &trade->role, &trade->action,
+                       &trade->ticks, &trade->resd, &trade->exec, &trade->lots, &trade->created,
+                       &trade->modified);
 }
 
 DBR_API size_t
@@ -296,13 +292,8 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn)
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn)
 {
-    buf = dbr_unpackf(buf, POSN_FORMAT,
-                      &posn->accnt.id, &posn->contr.id, &posn->settl_date, &posn->buy_licks,
-                      &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
-    if (buf) {
-        // Synthetic key from contract and settlment date.
-        const DbrIden key = posn->contr.id * 100000000L + posn->settl_date;
-        posn->accnt_node_.key = key;
-    }
-    return buf;
+    dbr_posn_init(posn);
+    return dbr_unpackf(buf, POSN_FORMAT,
+                       &posn->accnt.id, &posn->contr.id, &posn->settl_date, &posn->buy_licks,
+                       &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
 }

@@ -133,6 +133,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
     if (!node || node->key != key) {
         if (!(posn = dbr_pool_alloc_posn(accnt->pool)))
             return NULL;
+        dbr_posn_init(posn);
 
         posn->accnt.rec = arec;
         posn->contr.rec = crec;

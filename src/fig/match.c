@@ -107,6 +107,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
         struct DbrMatch* match = dbr_pool_alloc_match(pool);
         if (!match)
             goto fail1;
+        dbr_match_init(match);
 
         struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, crec, settl_date, pool);
         if (!posn) {
@@ -122,6 +123,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
+        dbr_trade_init(taker_trade);
 
         const DbrIden maker_id = dbr_journ_alloc_id(journ);
         struct DbrTrade* maker_trade = dbr_pool_alloc_trade(pool);
@@ -130,6 +132,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
+        dbr_trade_init(maker_trade);
 
         match->id = match_id;
         match->maker_order = maker;

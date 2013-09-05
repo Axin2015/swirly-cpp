@@ -33,6 +33,7 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
     if (!node || node->key != key) {
         if (!(level = dbr_pool_alloc_level(side->pool)))
             return NULL;
+        dbr_level_init(level);
 
         level->first_order = order;
         level->count = 1;
@@ -137,10 +138,10 @@ dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order)
     }
 
     dbr_dlnode_remove(&order->side_node_);
+    dbr_dlnode_init(&order->side_node_);
 
     // No longer associated with side.
     order->level = NULL;
-    dbr_dlnode_init(&order->side_node_);
 }
 
 DBR_API void

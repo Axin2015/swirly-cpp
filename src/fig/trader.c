@@ -106,6 +106,7 @@ fig_trader_sub(struct FigTrader* trader, struct DbrBook* book)
     struct DbrSub* sub = dbr_pool_alloc_sub(trader->pool);
     if (!sub)
         goto fail1;
+    dbr_sub_init(sub);
 
     sub->book = book;
     sub->trader = trader;

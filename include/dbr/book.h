@@ -152,6 +152,7 @@ static inline void
 dbr_book_unsub(struct DbrSub* sub)
 {
     dbr_dlnode_remove(&sub->book_node_);
+    dbr_dlnode_init(&sub->book_node_);
 }
 
 /** @} */

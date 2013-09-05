@@ -31,6 +31,7 @@ create_trader(Pool& pool, DbrIden id, const char* mnem, const char* display, con
         pool.free_rec(rec);
     };
     std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
+    dbr_rec_init(rec.get());
 
     rec->type = DBR_TRADER;
     rec->id = id;
@@ -49,6 +50,7 @@ create_accnt(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
         pool.free_rec(rec);
     };
     std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
+    dbr_rec_init(rec.get());
 
     rec->type = DBR_ACCNT;
     rec->id = id;
@@ -69,6 +71,7 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
         pool.free_rec(rec);
     };
     std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
+    dbr_rec_init(rec.get());
 
     rec->type = DBR_CONTR;
     rec->id = id;
@@ -102,6 +105,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
         pool.free_order(order);
     };
     std::shared_ptr<DbrOrder> order(pool.alloc_order(), deleter);
+    dbr_order_init(order.get());
 
     order->id = id;
     order->level = NULL;
@@ -138,6 +142,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
         pool.free_order(order);
     };
     std::shared_ptr<DbrOrder> order(pool.alloc_order(), deleter);
+    dbr_order_init(order.get());
 
     order->id = id;
     order->level = NULL;
@@ -172,6 +177,7 @@ create_memb(Pool& pool, DbrIden aid, DbrIden tid)
         pool.free_memb(memb);
     };
     std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
+    dbr_memb_init(memb.get());
 
     memb->accnt.id = aid;
     memb->trader.id = tid;

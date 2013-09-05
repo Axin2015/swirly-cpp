@@ -67,6 +67,7 @@ static inline void
 fig_trader_release_order(struct FigTrader* trader, struct DbrOrder* order)
 {
     dbr_tree_remove(&trader->orders, &order->trader_node_);
+    dbr_rbnode_init(&order->trader_node_);
     if (order->ref[0] != '\0')
         fig_index_remove(trader->index, trader->id, order->ref);
 }
@@ -91,8 +92,10 @@ fig_trader_release_order_ref(struct FigTrader* trader, const char* ref)
 {
     assert(ref);
     struct DbrOrder* order = fig_index_remove(trader->index, trader->id, ref);
-    if (order)
+    if (order) {
         dbr_tree_remove(&trader->orders, &order->trader_node_);
+        dbr_rbnode_init(&order->trader_node_);
+    }
     return order;
 }
 
