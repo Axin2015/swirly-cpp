@@ -56,7 +56,7 @@ fig_trader_id(struct FigTrader* trader)
 static inline void
 fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 {
-    dbr_tree_insert(&trader->orders, &order->trader_node_);
+    dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
     if (order->ref[0] != '\0')
         fig_index_insert(trader->index, order);
 }

@@ -146,13 +146,13 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
 }
 
 static inline struct DbrLevel*
-elm_pool_alloc_level(struct ElmPool* pool, DbrKey key)
+elm_pool_alloc_level(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrLevel* level = &node->level;
-    dbr_rbnode_init(&level->side_node_, key);
+    dbr_rbnode_init(&level->side_node_);
     return level;
 }
 
@@ -178,7 +178,7 @@ elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
 }
 
 static inline struct DbrOrder*
-elm_pool_alloc_order(struct ElmPool* pool, DbrKey key)
+elm_pool_alloc_order(struct ElmPool* pool)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool);
     if (!node)
@@ -187,7 +187,7 @@ elm_pool_alloc_order(struct ElmPool* pool, DbrKey key)
     dbr_slnode_init(&order->model_node_);
     dbr_slnode_init(&order->ref_node_);
     dbr_dlnode_init(&order->side_node_);
-    dbr_rbnode_init(&order->trader_node_, key);
+    dbr_rbnode_init(&order->trader_node_);
     return order;
 }
 
@@ -199,14 +199,14 @@ elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
 }
 
 static inline struct DbrMemb*
-elm_pool_alloc_memb(struct ElmPool* pool, DbrKey key)
+elm_pool_alloc_memb(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrMemb* memb = &node->memb;
     dbr_slnode_init(&memb->model_node_);
-    dbr_rbnode_init(&memb->accnt_node_, key);
+    dbr_rbnode_init(&memb->accnt_node_);
     return memb;
 }
 
@@ -218,14 +218,14 @@ elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
 }
 
 static inline struct DbrTrade*
-elm_pool_alloc_trade(struct ElmPool* pool, DbrKey key)
+elm_pool_alloc_trade(struct ElmPool* pool)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool);
     if (!node)
         return NULL;
     struct DbrTrade* trade = &node->trade;
     dbr_slnode_init(&trade->model_node_);
-    dbr_rbnode_init(&trade->accnt_node_, key);
+    dbr_rbnode_init(&trade->accnt_node_);
     return trade;
 }
 
@@ -237,14 +237,14 @@ elm_pool_free_trade(struct ElmPool* pool, struct DbrTrade* trade)
 }
 
 static inline struct DbrPosn*
-elm_pool_alloc_posn(struct ElmPool* pool, DbrKey key)
+elm_pool_alloc_posn(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrPosn* posn = &node->posn;
     dbr_slnode_init(&posn->model_node_);
-    dbr_rbnode_init(&posn->accnt_node_, key);
+    dbr_rbnode_init(&posn->accnt_node_);
     return posn;
 }
 
@@ -256,14 +256,14 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 }
 
 static inline struct DbrSub*
-elm_pool_alloc_sub(struct ElmPool* pool, DbrKey key)
+elm_pool_alloc_sub(struct ElmPool* pool)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool);
     if (!node)
         return NULL;
     struct DbrSub* sub = &node->sub;
     dbr_dlnode_init(&sub->book_node_);
-    dbr_rbnode_init(&sub->trader_node_, key);
+    dbr_rbnode_init(&sub->trader_node_);
     return sub;
 }
 
@@ -306,14 +306,14 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
 }
 
 static inline struct DbrLevel*
-elm_pool_alloc_level_(struct ElmPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_level_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating level %p in %s at %d", node, file, line);
     if (!node)
         return NULL;
     struct DbrLevel* level = &node->level;
-    dbr_rbnode_init(&level->side_node_, key);
+    dbr_rbnode_init(&level->side_node_);
     return level;
 }
 
@@ -342,7 +342,7 @@ elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
 }
 
 static inline struct DbrOrder*
-elm_pool_alloc_order_(struct ElmPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_order_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating order %p in %s at %d", node, file, line);
@@ -352,7 +352,7 @@ elm_pool_alloc_order_(struct ElmPool* pool, DbrKey key, const char* file, int li
     dbr_slnode_init(&order->model_node_);
     dbr_slnode_init(&order->ref_node_);
     dbr_dlnode_init(&order->side_node_);
-    dbr_rbnode_init(&order->trader_node_, key);
+    dbr_rbnode_init(&order->trader_node_);
     return order;
 }
 
@@ -365,7 +365,7 @@ elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
 }
 
 static inline struct DbrMemb*
-elm_pool_alloc_memb_(struct ElmPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_memb_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating memb %p in %s at %d", node, file, line);
@@ -373,7 +373,7 @@ elm_pool_alloc_memb_(struct ElmPool* pool, DbrKey key, const char* file, int lin
         return NULL;
     struct DbrMemb* memb = &node->memb;
     dbr_slnode_init(&memb->model_node_);
-    dbr_rbnode_init(&memb->accnt_node_, key);
+    dbr_rbnode_init(&memb->accnt_node_);
     return memb;
 }
 
@@ -386,7 +386,7 @@ elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
 }
 
 static inline struct DbrTrade*
-elm_pool_alloc_trade_(struct ElmPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_trade_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating trade %p in %s at %d", node, file, line);
@@ -394,7 +394,7 @@ elm_pool_alloc_trade_(struct ElmPool* pool, DbrKey key, const char* file, int li
         return NULL;
     struct DbrTrade* trade = &node->trade;
     dbr_slnode_init(&trade->model_node_);
-    dbr_rbnode_init(&trade->accnt_node_, key);
+    dbr_rbnode_init(&trade->accnt_node_);
     return trade;
 }
 
@@ -407,7 +407,7 @@ elm_pool_free_trade(struct ElmPool* pool, struct DbrTrade* trade)
 }
 
 static inline struct DbrPosn*
-elm_pool_alloc_posn_(struct ElmPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_posn_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating posn %p in %s at %d", node, file, line);
@@ -415,7 +415,7 @@ elm_pool_alloc_posn_(struct ElmPool* pool, DbrKey key, const char* file, int lin
         return NULL;
     struct DbrPosn* posn = &node->posn;
     dbr_slnode_init(&posn->model_node_);
-    dbr_rbnode_init(&posn->accnt_node_, key);
+    dbr_rbnode_init(&posn->accnt_node_);
     return posn;
 }
 
@@ -428,7 +428,7 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 }
 
 static inline struct DbrSub*
-elm_pool_alloc_sub_(struct ElmPool* pool, DbrKey key, const char* file, int line)
+elm_pool_alloc_sub_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
     dbr_log_debug3("allocating sub %p in %s at %d", node, file, line);
@@ -436,7 +436,7 @@ elm_pool_alloc_sub_(struct ElmPool* pool, DbrKey key, const char* file, int line
         return NULL;
     struct DbrSub* sub = &node->sub;
     dbr_dlnode_init(&sub->book_node_);
-    dbr_rbnode_init(&sub->trader_node_, key);
+    dbr_rbnode_init(&sub->trader_node_);
     return sub;
 }
 
@@ -448,22 +448,22 @@ elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
     elm_pool_free_small(pool, node);
 }
 
-#define elm_pool_alloc_rec(pool)                            \
+#define elm_pool_alloc_rec(pool)                    \
     elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_level(pool, key)                     \
-    elm_pool_alloc_level_(pool, key, __FILE__, __LINE__)
-#define elm_pool_alloc_match(pool)                          \
+#define elm_pool_alloc_level(pool)                  \
+    elm_pool_alloc_level_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_match(pool)                  \
     elm_pool_alloc_match_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_order(pool, key)                     \
-    elm_pool_alloc_order_(pool, key, __FILE__, __LINE__)
-#define elm_pool_alloc_memb(pool, key)                      \
-    elm_pool_alloc_memb_(pool, key, __FILE__, __LINE__)
-#define elm_pool_alloc_trade(pool, key)                     \
-    elm_pool_alloc_trade_(pool, key, __FILE__, __LINE__)
-#define elm_pool_alloc_posn(pool, key)                      \
-    elm_pool_alloc_posn_(pool, key, __FILE__, __LINE__)
-#define elm_pool_alloc_sub(pool, key)                       \
-    elm_pool_alloc_sub_(pool, key, __FILE__, __LINE__)
+#define elm_pool_alloc_order(pool)                  \
+    elm_pool_alloc_order_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_memb(pool)                   \
+    elm_pool_alloc_memb_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_trade(pool)                  \
+    elm_pool_alloc_trade_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_posn(pool)                   \
+    elm_pool_alloc_posn_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_sub(pool)                    \
+    elm_pool_alloc_sub_(pool, __FILE__, __LINE__)
 
 #endif // defined(DBR_DEBUG_ALLOC)
 

@@ -199,7 +199,7 @@ get_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
         }
         dbr_book_init(book, crec, settl_date, exch->pool);
         struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&exch->books, &book->exch_node_, parent);
+        dbr_tree_pinsert(&exch->books, key, &book->exch_node_, parent);
     } else
         book = exch_book_entry(node);
     return book;
@@ -469,7 +469,7 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
         goto fail1;
 
     const DbrIden id = dbr_journ_alloc_id(exch->journ);
-    struct DbrOrder* new_order = dbr_pool_alloc_order(exch->pool, id);
+    struct DbrOrder* new_order = dbr_pool_alloc_order(exch->pool);
     if (!new_order)
         goto fail1;
 

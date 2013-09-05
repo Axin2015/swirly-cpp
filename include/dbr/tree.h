@@ -39,10 +39,11 @@ dbr_tree_init(struct DbrTree* tree)
 }
 
 DBR_API struct DbrRbNode*
-dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node);
+dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node);
 
 DBR_API void
-dbr_tree_pinsert(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent);
+dbr_tree_pinsert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node,
+                 struct DbrRbNode* parent);
 
 DBR_API struct DbrRbNode*
 dbr_tree_remove(struct DbrTree* tree, struct DbrRbNode* node);

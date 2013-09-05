@@ -116,7 +116,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
         }
 
         const DbrIden taker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* taker_trade = dbr_pool_alloc_trade(pool, taker_id);
+        struct DbrTrade* taker_trade = dbr_pool_alloc_trade(pool);
         if (!taker_trade) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
@@ -124,7 +124,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
         }
 
         const DbrIden maker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* maker_trade = dbr_pool_alloc_trade(pool, maker_id);
+        struct DbrTrade* maker_trade = dbr_pool_alloc_trade(pool);
         if (!maker_trade) {
             dbr_pool_free_trade(pool, taker_trade);
             dbr_pool_free_match(pool, match);

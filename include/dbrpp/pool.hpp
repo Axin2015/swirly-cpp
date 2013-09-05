@@ -91,9 +91,9 @@ public:
         dbr_pool_free_rec(impl_, rec);
     }
     DbrLevel*
-    alloc_level(DbrKey key)
+    alloc_level()
     {
-        DbrLevel* const level = dbr_pool_alloc_level(impl_, key);
+        DbrLevel* const level = dbr_pool_alloc_level(impl_);
         if (!level)
             throw_exception();
         return level;
@@ -117,9 +117,9 @@ public:
         dbr_pool_free_match(impl_, match);
     }
     DbrOrder*
-    alloc_order(DbrKey key)
+    alloc_order()
     {
-        DbrOrder* const order = dbr_pool_alloc_order(impl_, key);
+        DbrOrder* const order = dbr_pool_alloc_order(impl_);
         if (!order)
             throw_exception();
         return order;
@@ -130,9 +130,9 @@ public:
         dbr_pool_free_order(impl_, order);
     }
     DbrMemb*
-    alloc_memb(DbrKey key)
+    alloc_memb()
     {
-        DbrMemb* const memb = dbr_pool_alloc_memb(impl_, key);
+        DbrMemb* const memb = dbr_pool_alloc_memb(impl_);
         if (!memb)
             throw_exception();
         return memb;
@@ -143,9 +143,9 @@ public:
         dbr_pool_free_memb(impl_, memb);
     }
     DbrTrade*
-    alloc_trade(DbrKey key)
+    alloc_trade()
     {
-        DbrTrade* const trade = dbr_pool_alloc_trade(impl_, key);
+        DbrTrade* const trade = dbr_pool_alloc_trade(impl_);
         if (!trade)
             throw_exception();
         return trade;
@@ -156,9 +156,9 @@ public:
         dbr_pool_free_trade(impl_, trade);
     }
     DbrPosn*
-    alloc_posn(DbrKey key)
+    alloc_posn()
     {
-        DbrPosn* const posn = dbr_pool_alloc_posn(impl_, key);
+        DbrPosn* const posn = dbr_pool_alloc_posn(impl_);
         if (!posn)
             throw_exception();
         return posn;
@@ -169,9 +169,9 @@ public:
         dbr_pool_free_posn(impl_, posn);
     }
     DbrSub*
-    alloc_sub(DbrKey key)
+    alloc_sub()
     {
-        DbrSub* const sub = dbr_pool_alloc_sub(impl_, key);
+        DbrSub* const sub = dbr_pool_alloc_sub(impl_);
         if (!sub)
             throw_exception();
         return sub;

@@ -31,7 +31,7 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
 
 	struct DbrLevel* level;
     if (!node || node->key != key) {
-        if (!(level = dbr_pool_alloc_level(side->pool, key)))
+        if (!(level = dbr_pool_alloc_level(side->pool)))
             return NULL;
 
         level->first_order = order;
@@ -40,7 +40,7 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
         level->resd = order->resd;
         dbr_log_debug2("insert level: contr=%.16s,ticks=%ld", order->contr.rec->mnem,
                        order->ticks);
-        dbr_tree_pinsert(&side->levels, &level->side_node_, node);
+        dbr_tree_pinsert(&side->levels, key, &level->side_node_, node);
     } else {
         level = dbr_side_level_entry(node);
         ++level->count;

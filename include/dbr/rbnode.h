@@ -27,6 +27,8 @@
  * @{
  */
 
+typedef long DbrKey;
+
 /**
  * @brief Red-black node.
  */
@@ -38,12 +40,12 @@ struct DbrRbNode {
     int color;
 };
 
-#define DBR_RBNODE_INIT(n, k) { .key = k, .left = NULL, .right = NULL, .parent = NULL, .color = 0 }
+#define DBR_RBNODE_INIT(n) { .key = 0, .left = NULL, .right = NULL, .parent = NULL, .color = 0 }
 
 static inline void
-dbr_rbnode_init(struct DbrRbNode* node, DbrKey key)
+dbr_rbnode_init(struct DbrRbNode* node)
 {
-    node->key = key;
+    node->key = 0;
     node->left = node->right = node->parent = NULL;
     node->color = 0;
 }

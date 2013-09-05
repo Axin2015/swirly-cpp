@@ -52,7 +52,7 @@ fig_accnt_id(const struct FigAccnt* accnt)
 static inline void
 fig_accnt_emplace_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
 {
-    dbr_tree_insert(&accnt->membs, &memb->accnt_node_);
+    dbr_tree_insert(&accnt->membs, memb->trader.rec->id, &memb->accnt_node_);
 }
 
 // Trade.
@@ -62,7 +62,7 @@ fig_accnt_emplace_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
 static inline void
 fig_accnt_emplace_trade(struct FigAccnt* accnt, struct DbrTrade* trade)
 {
-    dbr_tree_insert(&accnt->trades, &trade->accnt_node_);
+    dbr_tree_insert(&accnt->trades, trade->id, &trade->accnt_node_);
 }
 
 // Release ownership from state.
@@ -121,7 +121,9 @@ fig_accnt_empty_trade(const struct FigAccnt* accnt)
 static inline void
 fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
-    dbr_tree_insert(&accnt->posns, &posn->accnt_node_);
+    // Synthetic key from contract and settlment date.
+    const DbrIden key = posn->contr.id * 100000000L + posn->settl_date;
+    dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
 }
 
 DBR_EXTERN struct DbrPosn*

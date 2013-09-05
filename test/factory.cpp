@@ -101,7 +101,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
     };
-    std::shared_ptr<DbrOrder> order(pool.alloc_order(id), deleter);
+    std::shared_ptr<DbrOrder> order(pool.alloc_order(), deleter);
 
     order->id = id;
     order->level = NULL;
@@ -137,7 +137,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
     };
-    std::shared_ptr<DbrOrder> order(pool.alloc_order(id), deleter);
+    std::shared_ptr<DbrOrder> order(pool.alloc_order(), deleter);
 
     order->id = id;
     order->level = NULL;
@@ -171,7 +171,7 @@ create_memb(Pool& pool, DbrIden aid, DbrIden tid)
     auto deleter = [&pool](DbrMemb* memb) {
         pool.free_memb(memb);
     };
-    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(aid), deleter);
+    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
 
     memb->accnt.id = aid;
     memb->trader.id = tid;

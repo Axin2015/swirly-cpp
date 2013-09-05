@@ -29,8 +29,7 @@ dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, Dbr
     dbr_side_init(&book->bid_side, pool);
     dbr_side_init(&book->ask_side, pool);
     dbr_list_init(&book->subs);
-    const DbrKey key = dbr_book_key(book);
-    dbr_rbnode_init(&book->exch_node_, key);
+    dbr_rbnode_init(&book->exch_node_);
 }
 
 DBR_API void

@@ -131,7 +131,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
     struct DbrPosn* posn;
 	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, key);
     if (!node || node->key != key) {
-        if (!(posn = dbr_pool_alloc_posn(accnt->pool, key)))
+        if (!(posn = dbr_pool_alloc_posn(accnt->pool)))
             return NULL;
 
         posn->accnt.rec = arec;
@@ -146,7 +146,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
                        arec->mnem, crec->mnem, settl_date);
 
         struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&accnt->posns, &posn->accnt_node_, parent);
+        dbr_tree_pinsert(&accnt->posns, key, &posn->accnt_node_, parent);
     } else
         posn = dbr_accnt_posn_entry(node);
     return posn;

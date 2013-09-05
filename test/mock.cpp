@@ -159,17 +159,17 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
     DbrQueue rq;
     dbr_queue_init(&rq);
 
-    DbrMemb* memb = dbr_pool_alloc_memb(pool, 1);
+    DbrMemb* memb = dbr_pool_alloc_memb(pool);
     set_memb(*memb, 1, 1);
     dbr_queue_push(&rq, &memb->model_node_);
     ++size;
 
-    memb = dbr_pool_alloc_memb(pool, 1);
+    memb = dbr_pool_alloc_memb(pool);
     set_memb(*memb, 2, 1);
     dbr_queue_push(&rq, &memb->model_node_);
     ++size;
 
-    memb = dbr_pool_alloc_memb(pool, 2);
+    memb = dbr_pool_alloc_memb(pool);
     set_memb(*memb, 2, 2);
     dbr_queue_push(&rq, &memb->model_node_);
     ++size;

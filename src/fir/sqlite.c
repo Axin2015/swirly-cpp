@@ -702,12 +702,11 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            const DbrIden id = sqlite3_column_int64(stmt, ID);
-            struct DbrOrder* order = dbr_pool_alloc_order(pool, id);
+            struct DbrOrder* order = dbr_pool_alloc_order(pool);
             if (!order)
                 goto fail2;
 
-            order->id = id;
+            order->id = sqlite3_column_int64(stmt, ID);
             order->level = NULL;
             order->rev = sqlite3_column_int(stmt, REV);
             order->status = sqlite3_column_int(stmt, STATUS);
@@ -782,13 +781,12 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            const DbrIden trader = sqlite3_column_int64(stmt, TRADER);
-            struct DbrMemb* memb = dbr_pool_alloc_memb(pool, trader);
+            struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
             if (!memb)
                 goto fail2;
 
             memb->accnt.id = sqlite3_column_int64(stmt, ACCNT);
-            memb->trader.id = trader;
+            memb->trader.id = sqlite3_column_int64(stmt, TRADER);
 
             dbr_log_debug3("memb: accnt=%ld,trader=%ld", memb->accnt.id, memb->trader.id);
 
@@ -852,12 +850,11 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            const DbrIden id = sqlite3_column_int64(stmt, ID);
-            struct DbrTrade* trade = dbr_pool_alloc_trade(pool, id);
+            struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
             if (!trade)
                 goto fail2;
 
-            trade->id = id;
+            trade->id = sqlite3_column_int64(stmt, ID);
             trade->match = sqlite3_column_int64(stmt, MATCH);
             trade->order = sqlite3_column_int64(stmt, ORDER);
             trade->order_rev = sqlite3_column_int(stmt, ORDER_REV);
@@ -963,9 +960,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 continue;
             }
 
-            // Synthetic id from contract and settlment date.
-            const DbrIden key = contr * 100000000L + settl_date;
-            posn = dbr_pool_alloc_posn(pool, key);
+            posn = dbr_pool_alloc_posn(pool);
             if (dbr_unlikely(!posn))
                 goto fail2;
 

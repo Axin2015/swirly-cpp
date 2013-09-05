@@ -34,7 +34,6 @@
 
 typedef int DbrBool;
 typedef long DbrIden;
-typedef long DbrKey;
 
 enum {
     DBR_FALSE,

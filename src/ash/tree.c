@@ -45,10 +45,11 @@ cmp(DbrKey lhs, DbrKey rhs)
 }
 
 static void
-set(struct DbrRbNode* node, struct DbrRbNode* parent)
+set(DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
 {
-    node->parent = parent;
+    node->key = key;
     node->left = node->right = NULL;
+    node->parent = parent;
     node->color = RED;
 }
 
@@ -206,7 +207,7 @@ remove_color(struct DbrTree* tree, struct DbrRbNode* parent, struct DbrRbNode* n
 }
 
 DBR_API struct DbrRbNode*
-dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
+dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node)
 {
     struct DbrRbNode* tmp;
     struct DbrRbNode* parent = NULL;
@@ -214,7 +215,7 @@ dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
     tmp = tree->root;
     while (tmp) {
         parent = tmp;
-        comp = cmp(node->key, parent->key);
+        comp = cmp(key, parent->key);
         if (comp < 0)
             tmp = tmp->left;
         else if (comp > 0)
@@ -222,7 +223,7 @@ dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
         else
             return tmp;
     }
-    set(node, parent);
+    set(key, node, parent);
     if (parent) {
         if (comp < 0)
             parent->left = node;
@@ -235,11 +236,11 @@ dbr_tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
 }
 
 DBR_API void
-dbr_tree_pinsert(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* parent)
+dbr_tree_pinsert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
 {
-    set(node, parent);
+    set(key, node, parent);
     if (parent) {
-        int comp = cmp(node->key, parent->key);
+        int comp = cmp(key, parent->key);
         if (comp < 0)
             parent->left = node;
         else

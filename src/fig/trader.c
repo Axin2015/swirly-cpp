@@ -103,7 +103,7 @@ fig_trader_sub(struct FigTrader* trader, struct DbrBook* book)
         dbr_err_set(DBR_EINVAL, "subscription already exists");
         goto fail1;
     }
-    struct DbrSub* sub = dbr_pool_alloc_sub(trader->pool, key);
+    struct DbrSub* sub = dbr_pool_alloc_sub(trader->pool);
     if (!sub)
         goto fail1;
 
@@ -111,7 +111,7 @@ fig_trader_sub(struct FigTrader* trader, struct DbrBook* book)
     sub->trader = trader;
 
     struct DbrRbNode* parent = node;
-    dbr_tree_pinsert(&trader->subs, &sub->trader_node_, parent);
+    dbr_tree_pinsert(&trader->subs, key, &sub->trader_node_, parent);
     dbr_book_sub(book, sub);
     return true;
 
