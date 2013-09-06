@@ -8,6 +8,8 @@ using namespace std;
 int
 main(int argc, char* argv[])
 {
+    cout.sync_with_stdio(true);
+    cerr.sync_with_stdio(true);
     try {
         Sqlite sqlite(1, "doobry.db");
         Pool pool;

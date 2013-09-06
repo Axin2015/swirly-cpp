@@ -20,20 +20,20 @@
 #include <stdio.h>
 
 static void
-stdlogger(int level, const char* format, va_list args)
+stdio_logger(int level, const char* format, va_list args)
 {
     FILE* stream = level > DBR_WARN ? stdout : stderr;
     vfprintf(stream, format, args);
     fputc('\n', stream);
 }
 
-static __thread DbrLogger logger = stdlogger;
+static __thread DbrLogger logger = stdio_logger;
 
 DBR_API DbrLogger
 dbr_log_set(DbrLogger new_logger)
 {
     DbrLogger old_logger = logger;
-    logger = new_logger ? new_logger : stdlogger;
+    logger = new_logger ? new_logger : stdio_logger;
     return old_logger;
 }
 

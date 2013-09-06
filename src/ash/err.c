@@ -45,6 +45,15 @@ dbr_err_print(const char* s)
 }
 
 DBR_API void
+dbr_err_set_(int num, const char* file, int line, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    dbr_err_vset_(num, file, line, format, args);
+    va_end(args);
+}
+
+DBR_API void
 dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args)
 {
     err.num = num;
@@ -54,16 +63,7 @@ dbr_err_vset_(int num, const char* file, int line, const char* format, va_list a
     // Null termination is _not_ guaranteed by snprintf().
     err.msg[DBR_ERROR_MAX] = '\0';
     if (ret < 0)
-        strcpy(err.msg, "bad format");
-}
-
-DBR_API void
-dbr_err_set_(int num, const char* file, int line, const char* format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    dbr_err_vset_(num, file, line, format, args);
-    va_end(args);
+        strcpy(err.msg, "bad err format");
 }
 
 DBR_API int
