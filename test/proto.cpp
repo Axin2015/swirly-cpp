@@ -23,6 +23,7 @@
 #include <dbrpp/pool.hpp>
 
 #include <dbr/proto.h>
+#include <dbr/util.h>
 
 using namespace dbr;
 
@@ -114,9 +115,10 @@ TEST_CASE(proto_order)
     DbrIden trader = 5;
     DbrIden accnt = 7;
     DbrIden contr = 11;
+    auto now = dbr_millis();
 
     auto in = create_order(pool, 1, trader, accnt, contr, 20130827,
-                           "apple", DBR_BUY, 12345, 10, 0, 0);
+                           "apple", DBR_BUY, 12345, 10, 0, 0, now, now);
 
     auto len = order_len(*in);
     char buf[len];
@@ -165,4 +167,45 @@ TEST_CASE(proto_memb)
 
     check(out.accnt.id == in->accnt.id);
     check(out.trader.id == in->trader.id);
+}
+
+TEST_CASE(proto_trade)
+{
+    Pool pool;
+    DbrIden trader = 5;
+    DbrIden accnt = 7;
+    DbrIden contr = 11;
+    DbrIden cpty = 13;
+    auto now = dbr_millis();
+
+    auto in = create_trade(pool, 1, 2, 3, 4, trader, accnt, contr, 20130827,
+                           "apple", cpty, DBR_TAKER, DBR_BUY, 12345, 0, 10, 10, now, now);
+
+    auto len = trade_len(*in);
+    char buf[len];
+    const char* end = write_trade(buf, *in);
+    check(buf + len == end);
+
+    DbrTrade out;
+    end = read_trade(buf, out);
+    check(buf + len == end);
+
+    check(out.id == in->id);
+    check(out.match == in->match);
+    check(out.order == in->order);
+    check(out.order_rev == in->order_rev);
+    check(out.trader.id == in->trader.id);
+    check(out.accnt.id == in->accnt.id);
+    check(out.contr.id == in->contr.id);
+    check(out.settl_date == in->settl_date);
+    check(sequal(out.ref, in->ref, DBR_REF_MAX));
+    check(out.cpty.id == in->cpty.id);
+    check(out.role == in->role);
+    check(out.action == in->action);
+    check(out.ticks == in->ticks);
+    check(out.resd == in->resd);
+    check(out.exec == in->exec);
+    check(out.lots == in->lots);
+    check(out.created == in->created);
+    check(out.modified == in->modified);
 }

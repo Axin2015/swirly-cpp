@@ -99,7 +99,7 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& contr,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags)
+             DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified)
 {
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
@@ -127,8 +127,8 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     order->lots = lots;
     order->min = min;
     order->flags = flags;
-    order->created = 0;
-    order->modified = 0;
+    order->created = created;
+    order->modified = modified;
 
     return order;
 }
@@ -136,7 +136,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags)
+             DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified)
 {
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
@@ -164,8 +164,8 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     order->lots = lots;
     order->min = min;
     order->flags = flags;
-    order->created = 0;
-    order->modified = 0;
+    order->created = created;
+    order->modified = modified;
 
     return order;
 }
@@ -183,4 +183,41 @@ create_memb(Pool& pool, DbrIden aid, DbrIden tid)
     memb->trader.id = tid;
 
     return memb;
+}
+
+shared_ptr<DbrTrade>
+create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
+             DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, DbrIden cpty, int role,
+             int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
+             DbrMillis created, DbrMillis modified)
+{
+    auto deleter = [&pool](DbrTrade* trade) {
+        pool.free_trade(trade);
+    };
+    std::shared_ptr<DbrTrade> trade(pool.alloc_trade(), deleter);
+    dbr_trade_init(trade.get());
+
+    trade->id = id;
+    trade->match = match;
+    trade->order = order;
+    trade->order_rev = order_rev;
+    trade->trader.id = tid;
+    trade->accnt.id = aid;
+    trade->contr.id = cid;
+    trade->settl_date = settl_date;
+    if (ref)
+        strncpy(trade->ref, ref, DBR_REF_MAX);
+    else
+        trade->ref[0] = '\0';
+    trade->cpty.id = cpty;
+    trade->role = role;
+    trade->action = action;
+    trade->ticks = ticks;
+    trade->resd = resd;
+    trade->exec = exec;
+    trade->lots = lots;
+    trade->created = created;
+    trade->modified = modified;
+
+    return trade;
 }
