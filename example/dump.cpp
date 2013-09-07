@@ -15,13 +15,6 @@ main(int argc, char* argv[])
         Pool pool;
         Exch exch(sqlite.journ(), sqlite.model(), pool);
 
-        cout << "contrs:\n";
-        for (auto ref : exch.crecs()) {
-            ContrRecRef rec(ref);
-            cout << rec << endl;
-            exch.book(rec, 20130827);
-        }
-
         cout << "traders:\n";
         for (auto ref : exch.trecs()) {
             TraderRecRef rec(ref);
@@ -45,6 +38,12 @@ main(int argc, char* argv[])
                 cout << PosnRef(ref) << endl;
         }
 
+        cout << "contrs:\n";
+        for (auto ref : exch.crecs()) {
+            ContrRecRef rec(ref);
+            cout << rec << endl;
+            exch.book(rec, 20130827);
+        }
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

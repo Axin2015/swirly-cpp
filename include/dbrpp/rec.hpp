@@ -82,6 +82,23 @@ public:
     }
 };
 
+class RecRef : public RecRefBase {
+public:
+    explicit
+    RecRef(DbrRec& impl) noexcept
+    : RecRefBase(impl)
+    {
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, RecRef trec)
+{
+    return os << "id=" << trec.id()
+              << ",mnem=" << trec.mnem()
+              << ",display=" << trec.display();
+}
+
 class TraderRecRef : public RecRefBase {
 public:
     explicit
@@ -288,13 +305,9 @@ operator <<(std::ostream& os, ContrRecRef crec)
               << ",ccy=" << crec.ccy()
               << ",tick_numer=" << crec.tick_numer()
               << ",tick_denom=" << crec.tick_denom()
-              << ",price_inc=" << crec.price_inc()
               << ",lot_numer=" << crec.lot_numer()
               << ",lot_denom=" << crec.lot_denom()
-              << ",qty_inc=" << crec.qty_inc()
-              << ",price_dp=" << crec.price_dp()
               << ",pip_dp=" << crec.pip_dp()
-              << ",qty_dp=" << crec.qty_dp()
               << ",min_lots=" << crec.min_lots()
               << ",max_lots=" << crec.max_lots();
 }

@@ -152,8 +152,10 @@ template <std::size_t MaxN>
 std::ostream&
 operator <<(std::ostream& os, const NString<MaxN>& nstr)
 {
-    os.write(nstr.data(), nstr.size());
-    return os;
+    // FIXME: write() ignores stream formatters.
+    // os.write(nstr.data(), nstr.size());
+    // Work-around:
+    return os << nstr.str();
 }
 
 template <std::size_t MaxN>
