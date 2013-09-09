@@ -32,6 +32,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+// ORDER BY id DESC: so that queue entries are pushed in reverse order.
+
 #define INSERT_ORDER_SQL                                                \
     "INSERT INTO order_ (id, rev, status, trader, accnt, contr,"        \
     " settl_date, ref, action, ticks, resd, exec, lots, min, flags,"    \
@@ -49,7 +51,7 @@
 
 #define INSERT_TRADE_SQL                                                \
     "INSERT INTO trade (id, match, order_, order_rev, cpty, role,"      \
-    " action, ticks, resd, exec, lots, archive, created, modified)"                                                        \
+    " action, ticks, resd, exec, lots, archive, created, modified)"     \
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
 
 #define ARCHIVE_TRADE_SQL                                               \
@@ -58,21 +60,21 @@
 
 #define SELECT_TRADER_SQL                                    \
     "SELECT id, mnem, display, email"                        \
-    " FROM trader_v"
+    " FROM trader_v ORDER BY id DESC"
 
 #define SELECT_ACCNT_SQL                                      \
     "SELECT id, mnem, display, email"                         \
-    " FROM accnt_v"
+    " FROM accnt_v ORDER BY id DESC"
 
 #define SELECT_CONTR_SQL                                                \
     "SELECT id, mnem, display, asset_type, asset, ccy, tick_numer,"     \
     " tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots"     \
-    " FROM contr_v"
+    " FROM contr_v ORDER BY id DESC"
 
 #define SELECT_ORDER_SQL                                                \
     "SELECT id, rev, status, trader, accnt, contr, settl_date, ref,"    \
     " action, ticks, resd, exec, lots, min, flags, created, modified"   \
-    " FROM order_ WHERE archive = 0 ORDER BY id"
+    " FROM order_ WHERE archive = 0 ORDER BY id DESC"
 
 #define SELECT_MEMB_SQL                                    \
     "SELECT accnt, trader"                                 \
@@ -81,7 +83,7 @@
 #define SELECT_TRADE_SQL                                                \
     "SELECT id, match, order_, order_rev, trader, accnt, contr, settl_date," \
     " ref, cpty, role, action, ticks, resd, exec, lots, created, modified" \
-    " FROM trade_v WHERE archive = 0 ORDER BY id"
+    " FROM trade_v WHERE archive = 0 ORDER BY id DESC"
 
 #define SELECT_POSN_SQL                                         \
     "SELECT accnt, contr, settl_date, action, licks, lots"      \
