@@ -348,7 +348,6 @@ public:
         : impl_(impl)
     {
     }
-    explicit
     operator DbrAccnt() const noexcept
     {
         return impl_;

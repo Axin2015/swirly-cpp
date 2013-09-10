@@ -16,33 +16,33 @@ main(int argc, char* argv[])
         Exch exch(sqlite.journ(), sqlite.model(), pool);
 
         cout << "traders:\n";
-        for (auto ref : exch.trecs()) {
-            TraderRecRef rec(ref);
-            cout << rec << endl;
-            cout << rec.mnem() << " orders:" << endl;
-            Trader trader = exch.trader(rec);
+        for (auto rec : exch.trecs()) {
+            TraderRecRef ref(rec);
+            cout << ref << endl;
+            cout << ref.mnem() << " orders:" << endl;
+            Trader trader = exch.trader(ref);
             for (auto ref : trader.orders())
                 cout << OrderRef(ref) << endl;
         }
 
         cout << "accnts:\n";
-        for (auto ref : exch.arecs()) {
-            AccntRecRef rec(ref);
-            cout << rec << endl;
-            cout << rec.mnem() << " trades:" << endl;
-            Accnt accnt = exch.accnt(rec);
+        for (auto rec : exch.arecs()) {
+            AccntRecRef ref(rec);
+            cout << ref << endl;
+            cout << ref.mnem() << " trades:" << endl;
+            Accnt accnt = exch.accnt(ref);
             for (auto ref : accnt.trades())
                 cout << TradeRef(ref) << endl;
-            cout << rec.mnem() << " posns:" << endl;
+            cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
                 cout << PosnRef(ref) << endl;
         }
 
         cout << "contrs:\n";
-        for (auto ref : exch.crecs()) {
-            ContrRecRef rec(ref);
-            cout << rec << endl;
-            exch.book(rec, 20130827);
+        for (auto rec : exch.crecs()) {
+            ContrRecRef ref(rec);
+            cout << ref << endl;
+            exch.book(ref, 20130827);
         }
         return 0;
     } catch (const exception& e) {

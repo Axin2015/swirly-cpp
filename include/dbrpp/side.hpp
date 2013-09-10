@@ -381,10 +381,9 @@ public:
             throw_exception();
     }
     void
-    revise_order(DbrOrder& order, DbrLots lots, DbrMillis now)
+    revise_order(DbrOrder& order, DbrLots lots, DbrMillis now) noexcept
     {
-        if (!dbr_side_revise_order(&impl_, &order, lots, now))
-            throw_exception();
+        dbr_side_revise_order(&impl_, &order, lots, now);
     }
     void
     cancel_order(DbrOrder& order, DbrMillis now) noexcept

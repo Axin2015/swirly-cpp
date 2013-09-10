@@ -78,10 +78,10 @@ dbr_book_place(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
     return dbr_side_place_order(dbr_book_side(book, order->action), order, now);
 }
 
-static inline DbrBool
+static inline void
 dbr_book_revise(struct DbrBook* book, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
-    return dbr_side_revise_order(dbr_book_side(book, order->action), order, lots, now);
+    dbr_side_revise_order(dbr_book_side(book, order->action), order, lots, now);
 }
 
 static inline void

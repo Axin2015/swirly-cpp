@@ -204,7 +204,6 @@ public:
         : impl_(impl)
     {
     }
-    explicit
     operator DbrTrader() const noexcept
     {
         return impl_;

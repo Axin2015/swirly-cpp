@@ -160,23 +160,13 @@ dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta,
     order->modified = now;
 }
 
-DBR_API DbrBool
+DBR_API void
 dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
     assert(order);
     assert(order->level);
     assert(lots >= 0);
-
-    // Assumes that order already belongs to this side.
-    // Reduced lots must not be:
-    // 1. less than executed lots;
-    // 2. less than min lots;
-    // 3. greater than original lots.
-
-    if (lots < order->exec || lots < order->min || lots > order->lots) {
-        dbr_err_set(DBR_EINVAL, "invalid revision lots");
-        return false;
-    }
+    assert(lots < order->exec || lots < order->min || lots > order->lots);
 
     const DbrLots delta = order->lots - lots;
 
@@ -184,9 +174,7 @@ dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots
     reduce(side, order, delta);
 
     ++order->rev;
-    order->status = DBR_REVISED;
+    order->status = order->resd == 0 ? DBR_CANCELLED : DBR_REVISED;
     order->lots = lots;
     order->modified = now;
-
-    return true;
 }

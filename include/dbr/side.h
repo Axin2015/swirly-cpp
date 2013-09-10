@@ -93,7 +93,7 @@ dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now
     return dbr_side_insert_order(side, order);
 }
 
-DBR_API DbrBool
+DBR_API void
 dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now);
 
 static inline void

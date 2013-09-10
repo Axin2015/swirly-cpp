@@ -464,6 +464,11 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
               DbrFlags flags, struct DbrTrans* trans)
 {
+    if (lots == 0 || lots < min) {
+        dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
+        goto fail1;
+    }
+
     struct FigTrader* trader = fig_trader_lazy(trec, &exch->index, exch->pool);
     if (!trader)
         goto fail1;
@@ -558,6 +563,16 @@ dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
     }
 
+    // Revised lots must not be:
+    // 1. less than min lots;
+    // 2. less than executed lots;
+    // 3. greater than original lots.
+
+    if (lots < order->min || lots < order->exec || lots > order->lots) {
+        dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
+        goto fail1;
+    }
+
     if (!dbr_journ_begin_trans(exch->journ))
         goto fail1;
 
@@ -569,9 +584,7 @@ dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
     // Must succeed because order exists.
     struct DbrBook* book = get_book(exch, order->contr.rec, order->settl_date);
     assert(book);
-    if (!dbr_book_revise(book, order, lots, now))
-        goto fail2;
-
+    dbr_book_revise(book, order, lots, now);
     dbr_journ_commit_trans(exch->journ);
     return order;
  fail2:
@@ -594,6 +607,16 @@ dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
     }
 
+    // Revised lots must not be:
+    // 1. less than min lots;
+    // 2. less than executed lots;
+    // 3. greater than original lots.
+
+    if (lots < order->min || lots < order->exec || lots > order->lots) {
+        dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
+        goto fail1;
+    }
+
     if (!dbr_journ_begin_trans(exch->journ))
         goto fail1;
 
@@ -604,9 +627,7 @@ dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lot
 
     struct DbrBook* book = get_book(exch, order->contr.rec, order->settl_date);
     assert(book);
-    if (!dbr_book_revise(book, order, lots, now))
-        goto fail2;
-
+    dbr_book_revise(book, order, lots, now);
     dbr_journ_commit_trans(exch->journ);
     return order;
  fail2:
