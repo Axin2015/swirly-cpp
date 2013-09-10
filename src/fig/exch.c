@@ -695,8 +695,10 @@ DBR_API DbrBool
 dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
-    if (!node)
+    if (!node) {
+        dbr_err_set(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
+    }
 
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_archive_order(exch->journ, node->key, now))
@@ -716,8 +718,10 @@ DBR_API DbrBool
 dbr_exch_archive_trade(DbrExch exch, DbrAccnt accnt, DbrIden id)
 {
     struct DbrRbNode* node = fig_accnt_find_trade_id(accnt, id);
-    if (!node)
+    if (!node) {
+        dbr_err_set(DBR_EINVAL, "no such trade '%ld'", id);
         goto fail1;
+    }
 
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_archive_trade(exch->journ, node->key, now))

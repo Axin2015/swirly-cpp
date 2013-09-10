@@ -166,7 +166,7 @@ dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots
     assert(order);
     assert(order->level);
     assert(lots >= 0);
-    assert(lots < order->exec || lots < order->min || lots > order->lots);
+    assert(lots >= order->exec && lots >= order->min && lots <= order->lots);
 
     const DbrLots delta = order->lots - lots;
 
