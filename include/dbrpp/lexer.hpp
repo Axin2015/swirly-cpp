@@ -15,39 +15,41 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_LEXER_H
-#define DBR_LEXER_H
+#ifndef DBRPP_LEXER_HPP
+#define DBRPP_LEXER_HPP
 
-#include <dbr/defs.h>
+#include <dbrpp/except.hpp>
 
-#include <sys/types.h>
+#include <dbr/lexer.h>
 
-/**
- * @addtogroup Lexer
- * @{
- */
+namespace dbr {
 
-enum {
-    DBR_TOK_MAX = 127,
+template <class DerivedT>
+class LexerBase {
+    DbrLexer lexer_;
+    static void
+    cb(void* ctx, const char* tok, size_t len) noexcept
+    {
+        static_cast<DerivedT*>(ctx)->cb(tok, len);
+    }
+protected:
+    LexerBase() noexcept
+    {
+        dbr_lexer_init(&lexer_, cb, this);
+    }
+public:
+    void
+    reset() noexcept
+    {
+        dbr_lexer_reset(&lexer_);
+    }
+    void
+    exec(const char* buf, size_t size)
+    {
+        if (!dbr_lexer_exec(&lexer_, buf, size))
+            throw_exception();
+    }
 };
+} // dbr
 
-struct DbrLexer {
-    void (*cb)(void* ctx, const char*, size_t);
-    void* ctx;
-    int cs;
-    char tok[DBR_TOK_MAX + 1];
-    size_t len;
-};
-
-DBR_API void
-dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* ctx);
-
-DBR_API void
-dbr_lexer_reset(struct DbrLexer* lexer);
-
-DBR_API DbrBool
-dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size);
-
-/** @} */
-
-#endif // DBR_LEXER_H
+#endif // DBRPP_LEXER_HPP

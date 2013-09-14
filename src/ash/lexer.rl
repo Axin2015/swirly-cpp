@@ -17,7 +17,9 @@
  *  02110-1301 USA.
  */
 #include <dbr/lexer.h>
+#include <dbr/err.h>
 
+#include <stdbool.h>
 #include <stddef.h> // NULL
 
 %%{
@@ -36,7 +38,7 @@
             fbreak;
         }
     }
-    action hold_nl {
+    action hold_char {
         fhold;
     }
     action end_tok {
@@ -46,43 +48,35 @@
     action end_line {
         lexer->cb(lexer->ctx, NULL, 0);
     }
-    btok =
+    tok = (
+        start: (
+            [^\t\n "'\\] @add_char -> bare
+          | '\\' any_except_nl @add_char -> bare
+          | '\\' '\n' -> start
+          | '"' -> dquot
+          | '\'' -> squot
+        ),
         # Starts with characters other than space, newline or quote.
-        start: (
-            [^\t\n "'\\] @add_char -> char
-          | '\\' any_except_nl @add_char -> char
-          | '\\' '\n' -> char
+        bare: (
+            [^\t\n "'\\] @add_char -> bare
+          | '\\' any_except_nl @add_char -> bare
+          | '\\' '\n' -> bare
+          | [\t\n "'] @hold_char -> final
         ),
-        char: (
-            [^\t\n "'\\] @add_char -> char
-          | '\\' any_except_nl @add_char -> char
-          | '\\' '\n' -> char
-          | [ \t] -> final
-          # Hold newline for end-of-line processing.
-          | '\n' @hold_nl -> final
-        );
-    dtok =
-        start: (
-            '"' ->char
-        ),
-        char: (
-            [^"\\] @add_char -> char
-          | '\\' any_except_nl @add_char -> char
-          | '\\' '\n' -> char
+        dquot: (
+            [^"\\] @add_char -> dquot
+          | '\\' any_except_nl @add_char -> dquot
+          | '\\' '\n' -> dquot
           | '"' -> final
-        );
-    stok =
-        start: (
-            '\'' ->char
         ),
-        char: (
-            [^'\\] @add_char -> char
-          | '\\' any_except_nl @add_char -> char
-          | '\\' '\n' -> char
+        squot: (
+            [^'\\] @add_char -> squot
+          | '\\' any_except_nl @add_char -> squot
+          | '\\' '\n' -> squot
           | '\'' -> final
-        );
+        )
+    ) >begin_tok %end_tok;
     white = [ \t];
-    tok = (btok | dtok | stok) >begin_tok %end_tok;
     line = white* (tok white*)* '\n' @end_line;
     main := line*;
 }%%
@@ -108,7 +102,7 @@ dbr_lexer_reset(struct DbrLexer* lexer)
     lexer->cs = cs;
 }
 
-DBR_API int
+DBR_API DbrBool
 dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
 {
 	const char* p = buf;
@@ -118,5 +112,9 @@ dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
 	%% write exec;
     lexer->cs = cs;
 
-	return cs == lexer_error;
+    if (cs == lexer_error) {
+        dbr_err_set(DBR_EINVAL, "lexer error");
+        return false;
+    }
+	return true;
 }
