@@ -79,6 +79,11 @@
  */
 
 /**
+ * @defgroup Lexer Lexer
+ * @ingroup Util
+ */
+
+/**
  * @defgroup Log Log
  * @ingroup Util
  */
