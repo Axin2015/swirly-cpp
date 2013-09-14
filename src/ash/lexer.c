@@ -256,7 +256,8 @@ _again:
     lexer->cs = cs;
 
     if (cs == lexer_error) {
-        dbr_err_set(DBR_EINVAL, "lexer error");
+        dbr_err_set(DBR_EINVAL, "lexical error");
+        dbr_lexer_reset(lexer);
         return false;
     }
 	return true;

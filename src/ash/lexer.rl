@@ -76,8 +76,8 @@
           | '\'' -> final
         )
     ) >begin_tok %end_tok;
-    white = [ \t];
-    line = white* (tok white*)* '\n' @end_line;
+    white = [ \t]*;
+    line = white (tok white)* '\n' @end_line;
     main := line*;
 }%%
 
@@ -113,7 +113,8 @@ dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
     lexer->cs = cs;
 
     if (cs == lexer_error) {
-        dbr_err_set(DBR_EINVAL, "lexer error");
+        dbr_err_set(DBR_EINVAL, "lexical error");
+        dbr_lexer_reset(lexer);
         return false;
     }
 	return true;

@@ -24,20 +24,22 @@
 
 namespace dbr {
 
-template <class DerivedT>
-class LexerBase {
+template <typename FnT>
+class Lexer {
+    FnT fn_;
     DbrLexer lexer_;
     static void
     cb(void* ctx, const char* tok, size_t len) noexcept
     {
-        static_cast<DerivedT*>(ctx)->cb(tok, len);
+        static_cast<Lexer*>(ctx)->fn_(tok, len);
     }
-protected:
-    LexerBase() noexcept
+public:
+    explicit
+    Lexer(FnT fn) noexcept
+    : fn_(fn)
     {
         dbr_lexer_init(&lexer_, cb, this);
     }
-public:
     void
     reset() noexcept
     {
@@ -50,6 +52,13 @@ public:
             throw_exception();
     }
 };
+
+template <typename FnT>
+Lexer<FnT>
+make_lexer(FnT fn)
+{
+    return Lexer<FnT>(fn);
+}
 } // dbr
 
 #endif // DBRPP_LEXER_HPP
