@@ -568,7 +568,7 @@ dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
     // 2. less than executed lots;
     // 3. greater than original lots.
 
-    if (lots < order->min || lots < order->exec || lots > order->lots) {
+    if (lots == 0 || lots < order->min || lots < order->exec || lots > order->lots) {
         dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
@@ -612,7 +612,7 @@ dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lot
     // 2. less than executed lots;
     // 3. greater than original lots.
 
-    if (lots < order->min || lots < order->exec || lots > order->lots) {
+    if (lots == 0 || lots < order->min || lots < order->exec || lots > order->lots) {
         dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }

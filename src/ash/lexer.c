@@ -38,55 +38,58 @@ static const char _lexer_actions[] = {
 };
 
 static const char _lexer_key_offsets[] = {
-	0, 0, 6, 12, 18, 20, 21, 23, 
-	24, 25, 31, 32
+	0, 0, 7, 14, 21, 23, 24, 25, 
+	27, 28, 29, 36, 37
 };
 
 static const char _lexer_trans_keys[] = {
-	32, 34, 39, 92, 9, 10, 9, 10, 
-	32, 34, 39, 92, 9, 10, 32, 34, 
-	39, 92, 34, 92, 10, 39, 92, 10, 
-	10, 32, 34, 39, 92, 9, 10, 10, 
-	9, 10, 32, 34, 39, 92, 0
+	32, 39, 92, 9, 10, 34, 35, 9, 
+	10, 32, 34, 35, 39, 92, 9, 10, 
+	32, 34, 35, 39, 92, 34, 92, 10, 
+	10, 39, 92, 10, 10, 32, 34, 35, 
+	39, 92, 9, 10, 10, 9, 10, 32, 
+	34, 35, 39, 92, 0
 };
 
 static const char _lexer_single_lengths[] = {
-	0, 4, 6, 6, 2, 1, 2, 1, 
-	1, 4, 1, 6
+	0, 3, 7, 7, 2, 1, 1, 2, 
+	1, 1, 5, 1, 7
 };
 
 static const char _lexer_range_lengths[] = {
-	0, 1, 0, 0, 0, 0, 0, 0, 
-	0, 1, 0, 0
+	0, 2, 0, 0, 0, 0, 0, 0, 
+	0, 0, 1, 0, 0
 };
 
 static const char _lexer_index_offsets[] = {
-	0, 0, 6, 13, 20, 23, 25, 28, 
-	30, 32, 38, 40
+	0, 0, 6, 14, 22, 25, 27, 29, 
+	32, 34, 36, 43, 45
 };
 
 static const char _lexer_trans_targs[] = {
-	2, 2, 2, 10, 2, 1, 3, 11, 
-	3, 4, 6, 8, 1, 3, 11, 3, 
-	4, 6, 8, 1, 2, 5, 4, 4, 
-	4, 2, 7, 6, 6, 6, 9, 1, 
-	0, 4, 6, 8, 0, 1, 1, 1, 
-	3, 11, 3, 4, 6, 8, 1, 0
+	2, 2, 11, 2, 2, 1, 3, 12, 
+	3, 4, 6, 7, 9, 1, 3, 12, 
+	3, 4, 6, 7, 9, 1, 2, 5, 
+	4, 4, 4, 12, 6, 2, 8, 7, 
+	7, 7, 10, 1, 0, 4, 0, 7, 
+	9, 0, 1, 1, 1, 3, 12, 3, 
+	4, 6, 7, 9, 1, 0
 };
 
 static const char _lexer_trans_actions[] = {
-	5, 5, 5, 0, 5, 3, 7, 17, 
-	7, 14, 14, 14, 20, 0, 9, 0, 
-	1, 1, 1, 11, 0, 0, 3, 0, 
-	3, 0, 0, 3, 0, 3, 0, 3, 
-	0, 0, 0, 0, 0, 3, 0, 3, 
-	0, 9, 0, 1, 1, 1, 11, 0
+	5, 5, 0, 5, 5, 3, 7, 17, 
+	7, 14, 7, 14, 14, 20, 0, 9, 
+	0, 1, 0, 1, 1, 11, 0, 0, 
+	3, 0, 3, 9, 0, 0, 0, 3, 
+	0, 3, 0, 3, 0, 0, 0, 0, 
+	0, 0, 3, 0, 3, 0, 9, 0, 
+	1, 0, 1, 1, 11, 0
 };
 
-static const int lexer_start = 11;
+static const int lexer_start = 12;
 static const int lexer_error = 0;
 
-static const int lexer_en_main = 11;
+static const int lexer_en_main = 12;
 
 
 #line 85 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
@@ -99,7 +102,7 @@ dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), v
 
     int cs;
     
-#line 103 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 106 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 	{
 	cs = lexer_start;
 	}
@@ -113,7 +116,7 @@ dbr_lexer_reset(struct DbrLexer* lexer)
 {
     int cs;
     
-#line 117 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 120 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 	{
 	cs = lexer_start;
 	}
@@ -130,7 +133,7 @@ dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
 
     int cs = lexer->cs;
 	
-#line 134 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 137 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -239,7 +242,7 @@ _match:
         lexer->cb(lexer->ctx, NULL, 0);
     }
 	break;
-#line 243 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 246 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 		}
 	}
 

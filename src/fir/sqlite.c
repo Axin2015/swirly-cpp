@@ -923,7 +923,6 @@ static ssize_t
 select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
-        ID,
         ACCNT,
         CONTR,
         SETTL_DATE,

@@ -50,18 +50,17 @@
     }
     tok = (
         start: (
-            [^\t\n "'\\] @add_char -> bare
+            [^\t\n "#'\\] @add_char -> bare
           | '\\' any_except_nl @add_char -> bare
           | '\\' '\n' -> start
           | '"' -> dquot
           | '\'' -> squot
         ),
-        # Starts with characters other than space, newline or quote.
         bare: (
-            [^\t\n "'\\] @add_char -> bare
+            [^\t\n "#'\\] @add_char -> bare
           | '\\' any_except_nl @add_char -> bare
           | '\\' '\n' -> bare
-          | [\t\n "'] @hold_char -> final
+          | [\t\n "#'] @hold_char -> final
         ),
         dquot: (
             [^"\\] @add_char -> dquot
@@ -77,7 +76,8 @@
         )
     ) >begin_tok %end_tok;
     white = [ \t]*;
-    line = white (tok white)* '\n' @end_line;
+    comment = '#' . [^\n]*;
+    line = white (tok white)* comment? '\n' @end_line;
     main := line*;
 }%%
 
