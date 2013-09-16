@@ -143,7 +143,7 @@ exec_stmt(sqlite3* db, sqlite3_stmt* stmt)
 static void
 trace_sql(void* unused, const char* sql)
 {
-    dbr_log_debug1("%s", sql);
+    dbr_log_debug2("%s", sql);
 }
 #endif // DBR_DEBUG_LEVEL >= 2
 
@@ -716,9 +716,9 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             order->level = NULL;
             order->rev = sqlite3_column_int(stmt, REV);
             order->status = sqlite3_column_int(stmt, STATUS);
-            order->trader.id = sqlite3_column_int64(stmt, TRADER);
-            order->accnt.id = sqlite3_column_int64(stmt, ACCNT);
-            order->contr.id = sqlite3_column_int64(stmt, CONTR);
+            order->trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            order->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
+            order->contr.id_only = sqlite3_column_int64(stmt, CONTR);
             order->settl_date = sqlite3_column_int(stmt, SETTL_DATE);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
                 strncpy(order->ref,
@@ -792,8 +792,8 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 goto fail2;
             dbr_memb_init(memb);
 
-            memb->accnt.id = sqlite3_column_int64(stmt, ACCNT);
-            memb->trader.id = sqlite3_column_int64(stmt, TRADER);
+            memb->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
+            memb->trader.id_only = sqlite3_column_int64(stmt, TRADER);
 
             dbr_log_debug3("memb: accnt=%ld,trader=%ld", memb->accnt.id, memb->trader.id);
 
@@ -866,16 +866,16 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             trade->match = sqlite3_column_int64(stmt, MATCH);
             trade->order = sqlite3_column_int64(stmt, ORDER);
             trade->order_rev = sqlite3_column_int(stmt, ORDER_REV);
-            trade->trader.id = sqlite3_column_int64(stmt, TRADER);
-            trade->accnt.id = sqlite3_column_int64(stmt, ACCNT);
-            trade->contr.id = sqlite3_column_int64(stmt, CONTR);
+            trade->trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            trade->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
+            trade->contr.id_only = sqlite3_column_int64(stmt, CONTR);
             trade->settl_date = sqlite3_column_int(stmt, SETTL_DATE);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
                 strncpy(trade->ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
                 trade->ref[0] = '\0';
-            trade->cpty.id = sqlite3_column_int64(stmt, CPTY);
+            trade->cpty.id_only = sqlite3_column_int64(stmt, CPTY);
             trade->role = sqlite3_column_int(stmt, ROLE);
             trade->action = sqlite3_column_int(stmt, ACTION);
             trade->ticks = sqlite3_column_int64(stmt, TICKS);
@@ -950,7 +950,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             const int settl_date = sqlite3_column_int(stmt, SETTL_DATE);
 
             // Posn is null for first row.
-            if (posn && posn->accnt.id == accnt && posn->contr.id == contr
+            if (posn && posn->accnt.id_only == accnt && posn->contr.id_only == contr
                 && posn->settl_date == settl_date) {
 
                 // Set other side.
@@ -972,8 +972,8 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 goto fail2;
             dbr_posn_init(posn);
 
-            posn->accnt.id = accnt;
-            posn->contr.id = contr;
+            posn->accnt.id_only = accnt;
+            posn->contr.id_only = contr;
             posn->settl_date = settl_date;
 
             const int action = sqlite3_column_int(stmt, ACTION);

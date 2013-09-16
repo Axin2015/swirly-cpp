@@ -228,9 +228,9 @@ emplace_orders(DbrExch exch)
         struct DbrOrder* order = dbr_model_order_entry(node);
 
         // Enrich.
-        order->trader.rec = get_id(exch, DBR_TRADER, order->trader.id);
-        order->accnt.rec = get_id(exch, DBR_ACCNT, order->accnt.id);
-        order->contr.rec = get_id(exch, DBR_CONTR, order->contr.id);
+        order->trader.rec = get_id(exch, DBR_TRADER, order->trader.id_only);
+        order->accnt.rec = get_id(exch, DBR_ACCNT, order->accnt.id_only);
+        order->contr.rec = get_id(exch, DBR_CONTR, order->contr.id_only);
 
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
@@ -277,8 +277,8 @@ emplace_membs(DbrExch exch)
         struct DbrMemb* memb = dbr_model_memb_entry(node);
 
         // Enrich.
-        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id);
-        memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id);
+        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
+        memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id_only);
 
         struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, exch->pool);
         if (dbr_unlikely(!accnt))
@@ -310,10 +310,10 @@ emplace_trades(DbrExch exch)
         struct DbrTrade* trade = dbr_model_trade_entry(node);
 
         // Enrich.
-        trade->trader.rec = get_id(exch, DBR_TRADER, trade->trader.id);
-        trade->accnt.rec = get_id(exch, DBR_ACCNT, trade->accnt.id);
-        trade->contr.rec = get_id(exch, DBR_CONTR, trade->contr.id);
-        trade->cpty.rec = get_id(exch, DBR_ACCNT, trade->cpty.id);
+        trade->trader.rec = get_id(exch, DBR_TRADER, trade->trader.id_only);
+        trade->accnt.rec = get_id(exch, DBR_ACCNT, trade->accnt.id_only);
+        trade->contr.rec = get_id(exch, DBR_CONTR, trade->contr.id_only);
+        trade->cpty.rec = get_id(exch, DBR_ACCNT, trade->cpty.id_only);
 
         struct FigAccnt* accnt = fig_accnt_lazy(trade->accnt.rec, exch->pool);
         if (dbr_unlikely(!accnt))
@@ -345,8 +345,8 @@ emplace_posns(DbrExch exch)
         struct DbrPosn* posn = dbr_model_posn_entry(node);
 
         // Enrich.
-        posn->accnt.rec = get_id(exch, DBR_ACCNT, posn->accnt.id);
-        posn->contr.rec = get_id(exch, DBR_CONTR, posn->contr.id);
+        posn->accnt.rec = get_id(exch, DBR_ACCNT, posn->accnt.id_only);
+        posn->contr.rec = get_id(exch, DBR_CONTR, posn->contr.id_only);
 
         struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, exch->pool);
         if (dbr_unlikely(!accnt))

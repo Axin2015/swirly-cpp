@@ -143,7 +143,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
         posn->sell_licks = 0;
         posn->sell_lots = 0;
 
-        dbr_log_debug1("insert posn: accnt=%.16s, contr=%.16s, settl_date=%d",
+        dbr_log_debug2("insert posn: accnt=%.16s, contr=%.16s, settl_date=%d",
                        arec->mnem, crec->mnem, settl_date);
 
         struct DbrRbNode* parent = node;

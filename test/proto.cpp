@@ -132,9 +132,9 @@ TEST_CASE(proto_order)
     check(out.id == in->id);
     check(out.rev == in->rev);
     check(out.status == in->status);
-    check(out.trader.id == in->trader.id);
-    check(out.accnt.id == in->accnt.id);
-    check(out.contr.id == in->contr.id);
+    check(out.trader.id_only == in->trader.id_only);
+    check(out.accnt.id_only == in->accnt.id_only);
+    check(out.contr.id_only == in->contr.id_only);
     check(out.settl_date == in->settl_date);
     check(sequal(out.ref, in->ref, DBR_REF_MAX));
     check(out.action == in->action);
@@ -165,8 +165,8 @@ TEST_CASE(proto_memb)
     end = read_memb(buf, out);
     check(buf + len == end);
 
-    check(out.accnt.id == in->accnt.id);
-    check(out.trader.id == in->trader.id);
+    check(out.accnt.id_only == in->accnt.id_only);
+    check(out.trader.id_only == in->trader.id_only);
 }
 
 TEST_CASE(proto_trade)
@@ -194,12 +194,12 @@ TEST_CASE(proto_trade)
     check(out.match == in->match);
     check(out.order == in->order);
     check(out.order_rev == in->order_rev);
-    check(out.trader.id == in->trader.id);
-    check(out.accnt.id == in->accnt.id);
-    check(out.contr.id == in->contr.id);
+    check(out.trader.id_only == in->trader.id_only);
+    check(out.accnt.id_only == in->accnt.id_only);
+    check(out.contr.id_only == in->contr.id_only);
     check(out.settl_date == in->settl_date);
     check(sequal(out.ref, in->ref, DBR_REF_MAX));
-    check(out.cpty.id == in->cpty.id);
+    check(out.cpty.id_only == in->cpty.id_only);
     check(out.role == in->role);
     check(out.action == in->action);
     check(out.ticks == in->ticks);

@@ -148,9 +148,9 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     order->level = NULL;
     order->rev = 0;
     order->status = 0;
-    order->trader.id = tid;
-    order->accnt.id = aid;
-    order->contr.id = cid;
+    order->trader.id_only = tid;
+    order->accnt.id_only = aid;
+    order->contr.id_only = cid;
     order->settl_date = settl_date;
     if (ref)
         strncpy(order->ref, ref, DBR_REF_MAX);
@@ -179,8 +179,8 @@ create_memb(Pool& pool, DbrIden aid, DbrIden tid)
     std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
     dbr_memb_init(memb.get());
 
-    memb->accnt.id = aid;
-    memb->trader.id = tid;
+    memb->accnt.id_only = aid;
+    memb->trader.id_only = tid;
 
     return memb;
 }
@@ -201,15 +201,15 @@ create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev
     trade->match = match;
     trade->order = order;
     trade->order_rev = order_rev;
-    trade->trader.id = tid;
-    trade->accnt.id = aid;
-    trade->contr.id = cid;
+    trade->trader.id_only = tid;
+    trade->accnt.id_only = aid;
+    trade->contr.id_only = cid;
     trade->settl_date = settl_date;
     if (ref)
         strncpy(trade->ref, ref, DBR_REF_MAX);
     else
         trade->ref[0] = '\0';
-    trade->cpty.id = cpty;
+    trade->cpty.id_only = cpty;
     trade->role = role;
     trade->action = action;
     trade->ticks = ticks;

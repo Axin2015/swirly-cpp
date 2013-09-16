@@ -153,8 +153,8 @@ read_order(DbrPool pool, DbrSlNode*& first) noexcept
 void
 set_memb(DbrMemb& memb, DbrIden accnt, DbrIden trader) noexcept
 {
-    memb.accnt.id = accnt;
-    memb.trader.id = trader;
+    memb.accnt.id_only = accnt;
+    memb.trader.id_only = trader;
 }
 
 ssize_t

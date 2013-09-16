@@ -114,7 +114,7 @@ typedef struct FigAccnt* DbrAccnt;
  */
 
 union DbrURec {
-    DbrIden id;
+    DbrIden id_only;
     struct DbrRec* rec;
 };
 

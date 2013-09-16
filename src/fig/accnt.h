@@ -123,7 +123,7 @@ static inline void
 fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
     // Synthetic key from contract and settlment date.
-    const DbrIden key = posn->contr.id * 100000000L + posn->settl_date;
+    const DbrIden key = posn->contr.rec->id * 100000000L + posn->settl_date;
     dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
 }
 
