@@ -44,7 +44,17 @@ typedef unsigned long DbrFlags;
 typedef long DbrMillis;
 
 typedef DbrIncs DbrLots;
+
+/**
+ * @brief Unit representing the minimum price increment.
+ */
+
 typedef DbrIncs DbrTicks;
+
+/**
+ * @brief Sum of lots and ticks.
+ */
+
 typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
@@ -64,6 +74,10 @@ enum {
     DBR_MNEM_MAX = 16,
     DBR_REF_MAX = 64
 };
+
+/**
+ * @brief Description suitable for display on user-interface.
+ */
 
 typedef char DbrDisplay[DBR_DISPLAY_MAX];
 
@@ -485,16 +499,16 @@ struct DbrMatch {
     /**
      * Pointer to next match or null.
      */
-    struct DbrSlNode trans_node_;
+    struct DbrSlNode result_node_;
 };
 
 static inline void
 dbr_match_init(struct DbrMatch* match)
 {
-    dbr_slnode_init(&match->trans_node_);
+    dbr_slnode_init(&match->result_node_);
 }
 
-struct DbrTrans {
+struct DbrResult {
     struct DbrOrder* new_order;
     // Null if no matches.
     struct DbrPosn* new_posn;
@@ -511,9 +525,9 @@ struct DbrTrans {
 };
 
 static inline struct DbrMatch*
-dbr_trans_match_entry(struct DbrSlNode* node)
+dbr_result_match_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrMatch, trans_node_, node);
+    return dbr_implof(struct DbrMatch, result_node_, node);
 }
 
 /** @} */

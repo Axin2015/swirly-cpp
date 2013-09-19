@@ -65,7 +65,7 @@ free_matches(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
-        struct DbrMatch* match = dbr_trans_match_entry(node);
+        struct DbrMatch* match = dbr_result_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
         dbr_pool_free_trade(pool, match->taker_trade);
@@ -96,18 +96,18 @@ update_order(DbrJourn journ, struct DbrOrder* order, DbrMillis now)
 }
 
 static DbrBool
-insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
+insert_result(DbrJourn journ, const struct DbrResult* result, DbrMillis now)
 {
-    struct DbrSlNode* node = trans->first_match;
+    struct DbrSlNode* node = result->first_match;
     assert(node);
 
-    const struct DbrOrder* taker_order = trans->new_order;
+    const struct DbrOrder* taker_order = result->new_order;
     int taker_rev = taker_order->rev;
     DbrLots taker_resd = taker_order->resd;
     DbrLots taker_exec = taker_order->exec;
 
     do {
-        const struct DbrMatch* match = dbr_trans_match_entry(node);
+        const struct DbrMatch* match = dbr_result_match_entry(node);
 
         // Taker revision.
         ++taker_rev;
@@ -140,16 +140,16 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-apply_trades(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, DbrMillis now)
+apply_trades(DbrExch exch, struct DbrBook* book, const struct DbrResult* result, DbrMillis now)
 {
-    const struct DbrOrder* taker_order = trans->new_order;
+    const struct DbrOrder* taker_order = result->new_order;
     // Must succeed because new_posn exists.
     struct FigAccnt* taker_accnt = fig_accnt_lazy(taker_order->accnt.rec, exch->pool);
     assert(taker_accnt);
 
-    for (struct DbrSlNode* node = trans->first_match; node; node = node->next) {
+    for (struct DbrSlNode* node = result->first_match; node; node = node->next) {
 
-        struct DbrMatch* match = dbr_trans_match_entry(node);
+        struct DbrMatch* match = dbr_result_match_entry(node);
         struct DbrOrder* maker_order = match->maker_order;
 
         // Reduce maker. Maker's revision will be incremented by this call.
@@ -161,7 +161,7 @@ apply_trades(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, D
 
         // Update taker.
         fig_accnt_emplace_trade(taker_accnt, match->taker_trade);
-        apply_posn(trans->new_posn, match->taker_trade);
+        apply_posn(result->new_posn, match->taker_trade);
 
         // Update maker.
         fig_accnt_emplace_trade(maker_accnt, match->maker_trade);
@@ -462,7 +462,7 @@ dbr_exch_accnt(DbrExch exch, struct DbrRec* arec)
 DBR_API struct DbrOrder*
 dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-              DbrFlags flags, struct DbrTrans* trans)
+              DbrFlags flags, struct DbrResult* result)
 {
     if (lots == 0 || lots < min) {
         dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
@@ -503,26 +503,26 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
     new_order->created = now;
     new_order->modified = now;
 
-    trans->new_order = new_order;
-    trans->new_posn = NULL;
+    result->new_order = new_order;
+    result->new_posn = NULL;
 
     if (!dbr_journ_begin_trans(exch->journ))
         goto fail2;
 
     if (!dbr_journ_insert_order(exch->journ, new_order)
-        || !fig_match_orders(exch->journ, book, new_order, trans, exch->pool))
+        || !fig_match_orders(exch->journ, book, new_order, result, exch->pool))
         goto fail3;
 
-    if (trans->count > 0) {
+    if (result->count > 0) {
 
         // Orders were matched.
-        if (!insert_trans(exch->journ, trans, now))
+        if (!insert_result(exch->journ, result, now))
             goto fail4;
 
         // Commit taker order.
-        new_order->rev += trans->count;
-        new_order->resd -= trans->taken;
-        new_order->exec += trans->taken;
+        new_order->rev += result->count;
+        new_order->resd -= result->taken;
+        new_order->exec += result->taken;
 
         new_order->status = dbr_order_done(new_order) ? DBR_FILLED : DBR_PARTIAL;
     }
@@ -533,18 +533,18 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
 
     // Commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
-    apply_trades(exch, book, trans, now);
+    apply_trades(exch, book, result, now);
     dbr_journ_commit_trans(exch->journ);
     return new_order;
  fail4:
-    free_matches(trans->first_match, exch->pool);
-    memset(trans, 0, sizeof(*trans));
+    free_matches(result->first_match, exch->pool);
+    memset(result, 0, sizeof(*result));
  fail3:
     dbr_journ_rollback_trans(exch->journ);
  fail2:
     dbr_pool_free_order(exch->pool, new_order);
  fail1:
-    memset(trans, 0, sizeof(*trans));
+    memset(result, 0, sizeof(*result));
     return NULL;
 }
 
@@ -742,7 +742,7 @@ dbr_exch_free_matches(DbrExch exch, struct DbrSlNode* first)
 {
     struct DbrSlNode* node = first;
     while (node) {
-        struct DbrMatch* match = dbr_trans_match_entry(node);
+        struct DbrMatch* match = dbr_result_match_entry(node);
         node = node->next;
         dbr_pool_free_match(exch->pool, match);
     }

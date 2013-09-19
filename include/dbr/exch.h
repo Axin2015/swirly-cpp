@@ -117,13 +117,13 @@ dbr_exch_accnt(DbrExch exch, struct DbrRec* arec);
 
 /**
  * @brief Place order.
- * All members of trans are set to zero on failure.
+ * All members of result are set to zero on failure.
  */
 
 DBR_API struct DbrOrder*
 dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-               DbrFlags flags, struct DbrTrans* trans);
+               DbrFlags flags, struct DbrResult* result);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:

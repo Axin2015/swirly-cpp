@@ -23,7 +23,7 @@
 #include <dbrpp/book.hpp>
 #include <dbrpp/order.hpp>
 #include <dbrpp/trader.hpp>
-#include <dbrpp/trans.hpp>
+#include <dbrpp/result.hpp>
 
 namespace dbr {
 
@@ -260,11 +260,11 @@ public:
     }
     OrderRef
     place(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
-          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Trans& trans)
+          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Result& result)
     {
-        trans.reset();
+        result.reset();
         DbrOrder* const order = dbr_exch_place(impl_, &trec, &arec, &book, ref, action, ticks,
-                                               lots, min, flags, trans.c_arg());
+                                               lots, min, flags, result.c_arg());
         if (!order)
             throw_exception();
         return OrderRef(*order);

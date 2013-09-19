@@ -28,6 +28,6 @@
 
 DBR_EXTERN DbrBool
 fig_match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
-                 struct DbrTrans* trans, DbrPool pool);
+                 struct DbrResult* result, DbrPool pool);
 
 #endif // FIG_MATCH_H

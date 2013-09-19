@@ -17,9 +17,6 @@
  */
 /**
  * @mainpage Doobry
- * @section pretrade PreTradex
- * @section trade Trade
- * @section posttrade PostTrade
  */
 
 /**

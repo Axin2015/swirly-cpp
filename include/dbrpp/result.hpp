@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_TRANS_HPP
-#define DBRPP_TRANS_HPP
+#ifndef DBRPP_RESULT_HPP
+#define DBRPP_RESULT_HPP
 
 #include <dbrpp/iter.hpp>
 #include <dbrpp/slnode.hpp>
@@ -26,21 +26,21 @@
 
 namespace dbr {
 
-class TransMatches {
+class ResultMatches {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrMatch Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_trans_match_entry(node);
+            return dbr_result_match_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_trans_match_entry(const_cast<Node*>(node));
+            return dbr_result_match_entry(const_cast<Node*>(node));
         }
     };
-    DbrTrans trans_;
+    DbrResult result_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -70,14 +70,14 @@ public:
     typedef SizeType size_type;
 
     explicit
-    TransMatches(DbrTrans trans) noexcept
-    : trans_(trans)
+    ResultMatches(DbrResult result) noexcept
+    : result_(result)
     {
     }
     void
-    swap(TransMatches& rhs) noexcept
+    swap(ResultMatches& rhs) noexcept
     {
-        std::swap(trans_, rhs.trans_);
+        std::swap(result_, rhs.result_);
     }
 
     // Iterator.
@@ -85,12 +85,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return trans_.first_match;
+        return result_.first_match;
     }
     ConstIterator
     begin() const noexcept
     {
-        return trans_.first_match;
+        return result_.first_match;
     }
     Iterator
     end() noexcept
@@ -118,7 +118,7 @@ public:
     SizeType
     size() const noexcept
     {
-        return trans_.taken;
+        return result_.taken;
     }
     SizeType
     max_size() const noexcept
@@ -132,25 +132,25 @@ public:
     }
 };
 
-class Trans {
+class Result {
     DbrExch exch_;
-    DbrTrans impl_;
+    DbrResult impl_;
 public:
-    ~Trans() noexcept
+    ~Result() noexcept
     {
         reset();
     }
     explicit
-    Trans(DbrExch exch) noexcept
+    Result(DbrExch exch) noexcept
     : exch_(exch)
     {
         impl_.first_match = nullptr;
     }
-    operator DbrTrans&() noexcept
+    operator DbrResult&() noexcept
     {
         return impl_;
     }
-    DbrTrans*
+    DbrResult*
     c_arg() noexcept
     {
         return &impl_;
@@ -158,10 +158,10 @@ public:
 
     // Copy semantics.
 
-    Trans(const Trans&) = delete;
+    Result(const Result&) = delete;
 
-    Trans&
-    operator =(const Trans&) = delete;
+    Result&
+    operator =(const Result&) = delete;
 
     void
     reset() noexcept
@@ -181,10 +181,10 @@ public:
     {
         return PosnRef(*impl_.new_posn);
     }
-    TransMatches
+    ResultMatches
     matches() const noexcept
     {
-        return TransMatches(impl_);
+        return ResultMatches(impl_);
     }
     size_t
     count() const noexcept
@@ -200,4 +200,4 @@ public:
 
 } // dbr
 
-#endif // DBRPP_TRANS_HPP
+#endif // DBRPP_RESULT_HPP

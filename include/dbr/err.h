@@ -62,8 +62,16 @@ enum {
     DBR_ERROR_MAX = 255
 };
 
+/**
+ * @brief Clear current error message.
+ */
+
 DBR_API void
 dbr_err_clear(void);
+
+/**
+ * @brief Print current error using logger.
+ */
 
 DBR_API void
 dbr_err_print(const char* s);
