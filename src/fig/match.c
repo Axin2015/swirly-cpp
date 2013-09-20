@@ -190,7 +190,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
         match->taker_trade = taker_trade;
         match->maker_trade = maker_trade;
 
-        dbr_queue_push(&mq, &match->result_node_);
+        dbr_queue_insert_back(&mq, &match->result_node_);
     }
 
     struct DbrPosn* posn;

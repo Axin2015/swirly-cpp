@@ -32,8 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ORDER BY id DESC: so that queue entries are pushed in reverse order.
-
 #define INSERT_ORDER_SQL                                                \
     "INSERT INTO order_ (id, rev, status, trader, accnt, contr,"        \
     " settl_date, ref, action, ticks, resd, exec, lots, min, flags,"    \
@@ -60,21 +58,21 @@
 
 #define SELECT_TRADER_SQL                                    \
     "SELECT id, mnem, display, email"                        \
-    " FROM trader_v ORDER BY id DESC"
+    " FROM trader_v ORDER BY id"
 
 #define SELECT_ACCNT_SQL                                      \
     "SELECT id, mnem, display, email"                         \
-    " FROM accnt_v ORDER BY id DESC"
+    " FROM accnt_v ORDER BY id"
 
 #define SELECT_CONTR_SQL                                                \
     "SELECT id, mnem, display, asset_type, asset, ccy, tick_numer,"     \
     " tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots"     \
-    " FROM contr_v ORDER BY id DESC"
+    " FROM contr_v ORDER BY id"
 
 #define SELECT_ORDER_SQL                                                \
     "SELECT id, rev, status, trader, accnt, contr, settl_date, ref,"    \
     " action, ticks, resd, exec, lots, min, flags, created, modified"   \
-    " FROM order_ WHERE archive = 0 ORDER BY id DESC"
+    " FROM order_ WHERE archive = 0 ORDER BY id"
 
 #define SELECT_MEMB_SQL                                    \
     "SELECT accnt, trader"                                 \
@@ -83,7 +81,7 @@
 #define SELECT_TRADE_SQL                                                \
     "SELECT id, match, order_, order_rev, trader, accnt, contr, settl_date," \
     " ref, cpty, role, action, ticks, resd, exec, lots, created, modified" \
-    " FROM trade_v WHERE archive = 0 ORDER BY id DESC"
+    " FROM trade_v WHERE archive = 0 ORDER BY id"
 
 #define SELECT_POSN_SQL                                         \
     "SELECT accnt, contr, settl_date, action, licks, lots"      \
@@ -472,7 +470,7 @@ select_trader(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             dbr_log_debug3("trader: id=%ld,mnem=%.16s,display=%.64s,email=%.64s",
                            rec->id, rec->mnem, rec->trader.display, rec->trader.email);
 
-            dbr_queue_push(&rq, &rec->model_node_);
+            dbr_queue_insert_back(&rq, &rec->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -541,7 +539,7 @@ select_accnt(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             dbr_log_debug3("accnt: id=%ld,mnem=%.16s,display=%.64s,email=%.64s",
                            rec->id, rec->mnem, rec->accnt.display, rec->accnt.email);
 
-            dbr_queue_push(&rq, &rec->model_node_);
+            dbr_queue_insert_back(&rq, &rec->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -648,7 +646,7 @@ select_contr(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                            rec->contr.qty_inc, rec->contr.price_dp, rec->contr.pip_dp,
                            rec->contr.qty_dp, rec->contr.min_lots, rec->contr.max_lots);
 
-            dbr_queue_push(&rq, &rec->model_node_);
+            dbr_queue_insert_back(&rq, &rec->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -743,7 +741,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                            order->ticks, order->resd, order->exec, order->lots, order->min,
                            order->flags, order->created, order->modified);
 
-            dbr_queue_push(&oq, &order->model_node_);
+            dbr_queue_insert_back(&oq, &order->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -797,7 +795,7 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             dbr_log_debug3("memb: accnt=%ld,trader=%ld", memb->accnt.id, memb->trader.id);
 
-            dbr_queue_push(&mq, &memb->model_node_);
+            dbr_queue_insert_back(&mq, &memb->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -895,7 +893,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                            trade->resd, trade->exec, trade->lots, trade->settl_date,
                            trade->created, trade->modified);
 
-            dbr_queue_push(&tq, &trade->model_node_);
+            dbr_queue_insert_back(&tq, &trade->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -990,7 +988,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 posn->sell_lots = sqlite3_column_int64(stmt, LOTS);
             }
 
-            dbr_queue_push(&pq, &posn->model_node_);
+            dbr_queue_insert_back(&pq, &posn->model_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
