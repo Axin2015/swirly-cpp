@@ -1,6 +1,6 @@
 #include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
-#include <dbrpp/sqlite.hpp>
+#include <dbrpp/sqlstore.hpp>
 
 using namespace dbr;
 using namespace std;
@@ -11,9 +11,9 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        Sqlite sqlite(1, "doobry.db");
+        SqlStore sqlstore(1, "doobry.db");
         Pool pool;
-        Exch exch(sqlite.journ(), sqlite.model(), pool);
+        Exch exch(sqlstore.journ(), sqlstore.model(), pool);
 
         cout << "traders:\n";
         for (auto rec : exch.trecs()) {

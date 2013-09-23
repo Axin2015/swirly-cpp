@@ -15,41 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_SQLITE_H
-#define DBR_SQLITE_H
-
-#include <dbr/pool.h>
-#include <dbr/types.h>
-
-/**
- * @addtogroup Sqlite
- * @{
- */
-
-typedef struct DbrSqlite_* DbrSqlite;
-
-/**
- * @brief Create SQLite3 model.
- *
- * @param seed Seed identifier.
- *
- * @param path Path to the database.
- *
- * @return Handle to newly created model or null on failure.
- */
-
-DBR_API DbrSqlite
-dbr_sqlite_create(DbrIden seed, const char* path);
-
-DBR_API void
-dbr_sqlite_destroy(DbrSqlite sqlite);
-
-DBR_API DbrJourn
-dbr_sqlite_journ(DbrSqlite sqlite);
-
-DBR_API DbrModel
-dbr_sqlite_model(DbrSqlite sqlite);
-
-/** @} */
-
-#endif // DBR_SQLITE_H
+#include <dbrpp/zmqstore.hpp>

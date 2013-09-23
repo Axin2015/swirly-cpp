@@ -15,80 +15,80 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_SQLITE_HPP
-#define DBRPP_SQLITE_HPP
+#ifndef DBRPP_ZMQSTORE_HPP
+#define DBRPP_ZMQSTORE_HPP
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/sqlite.h>
+#include <dbr/zmqstore.h>
 
 namespace dbr {
 
-class Sqlite {
-    DbrSqlite impl_;
+class ZmqStore {
+    DbrZmqStore impl_;
 public:
-    ~Sqlite() noexcept
+    ~ZmqStore() noexcept
     {
         if (impl_)
-            dbr_sqlite_destroy(impl_);
+            dbr_zmqstore_destroy(impl_);
     }
     constexpr
-    Sqlite(decltype(nullptr)) noexcept
+    ZmqStore(decltype(nullptr)) noexcept
     : impl_(nullptr)
     {
     }
-    Sqlite(DbrIden seed, const char* path)
-    : impl_(dbr_sqlite_create(seed, path))
+    ZmqStore(DbrIden seed, const char* addr)
+    : impl_(dbr_zmqstore_create(seed, addr))
     {
         if (!impl_)
             throw_exception();
     }
-    operator DbrSqlite() const noexcept
+    operator DbrZmqStore() const noexcept
     {
         return impl_;
     }
 
     // Copy semantics.
 
-    Sqlite(const Sqlite&) = delete;
+    ZmqStore(const ZmqStore&) = delete;
 
-    Sqlite&
-    operator =(const Sqlite&) = delete;
+    ZmqStore&
+    operator =(const ZmqStore&) = delete;
 
     // Move semantics.
 
-    Sqlite(Sqlite&& rhs) noexcept
+    ZmqStore(ZmqStore&& rhs) noexcept
     : impl_(nullptr)
     {
         swap(rhs);
     }
-    Sqlite&
-    operator =(Sqlite&& rhs) noexcept
+    ZmqStore&
+    operator =(ZmqStore&& rhs) noexcept
     {
         if (impl_) {
-            dbr_sqlite_destroy(impl_);
+            dbr_zmqstore_destroy(impl_);
             impl_ = nullptr;
         }
         swap(rhs);
         return *this;
     }
     void
-    swap(Sqlite& rhs) noexcept
+    swap(ZmqStore& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
     }
     DbrJourn
     journ() const noexcept
     {
-        return dbr_sqlite_journ(impl_);
+        return dbr_zmqstore_journ(impl_);
     }
     DbrModel
     model() const noexcept
     {
-        return dbr_sqlite_model(impl_);
+        return dbr_zmqstore_model(impl_);
     }
 };
 
 } // dbr
 
-#endif // DBRPP_SQLITE_HPP
+#endif // DBRPP_ZMQSTORE_HPP

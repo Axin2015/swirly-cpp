@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIR_SQLITE_H
-#define FIR_SQLITE_H
+#ifndef FIR_SQLSTORE_H
+#define FIR_SQLSTORE_H
 
 #include <dbr/pool.h>
 #include <dbr/types.h>
@@ -26,7 +26,7 @@
 struct sqlite3;
 struct sqlite3_stmt;
 
-struct FirSqlite {
+struct FirSqlStore {
     struct sqlite3* db;
     struct sqlite3_stmt* insert_order;
     struct sqlite3_stmt* update_order;
@@ -37,43 +37,43 @@ struct FirSqlite {
 };
 
 DBR_EXTERN DbrBool
-fir_sqlite_init(struct FirSqlite* sqlite, const char* path);
+fir_sqlstore_init(struct FirSqlStore* sqlstore, const char* path);
 
 // Assumes that pointer is not null.
 
 DBR_EXTERN void
-fir_sqlite_term(struct FirSqlite* sqlite);
+fir_sqlstore_term(struct FirSqlStore* sqlstore);
 
 DBR_EXTERN DbrBool
-fir_sqlite_load(struct FirSqlite* sqlite);
+fir_sqlstore_load(struct FirSqlStore* sqlstore);
 
 DBR_EXTERN DbrBool
-fir_sqlite_begin_trans(struct FirSqlite* sqlite);
+fir_sqlstore_begin_trans(struct FirSqlStore* sqlstore);
 
 DBR_EXTERN DbrBool
-fir_sqlite_commit_trans(struct FirSqlite* sqlite);
+fir_sqlstore_commit_trans(struct FirSqlStore* sqlstore);
 
 DBR_EXTERN DbrBool
-fir_sqlite_rollback_trans(struct FirSqlite* sqlite);
+fir_sqlstore_rollback_trans(struct FirSqlStore* sqlstore);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_order(struct FirSqlite* sqlite, const struct DbrOrder* order);
+fir_sqlstore_insert_order(struct FirSqlStore* sqlstore, const struct DbrOrder* order);
 
 DBR_EXTERN DbrBool
-fir_sqlite_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status,
-                        DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
+fir_sqlstore_update_order(struct FirSqlStore* sqlstore, DbrIden id, int rev, int status,
+                          DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
+fir_sqlstore_archive_order(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_trade(struct FirSqlite* sqlite, const struct DbrTrade* trade);
+fir_sqlstore_insert_trade(struct FirSqlStore* sqlstore, const struct DbrTrade* trade);
 
 DBR_EXTERN DbrBool
-fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
+fir_sqlstore_archive_trade(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now);
 
 DBR_EXTERN ssize_t
-fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
-                         struct DbrSlNode** first);
+fir_sqlstore_select_entity(struct FirSqlStore* sqlstore, int type, DbrPool pool,
+                           struct DbrSlNode** first);
 
-#endif // FIR_SQLITE_H
+#endif // FIR_SQLSTORE_H

@@ -28,6 +28,11 @@
  */
 
 /**
+ * @defgroup ZmqStore ZmqStore
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup Fig Fig
  */
 
@@ -216,6 +221,6 @@
  */
 
 /**
- * @defgroup Sqlite Sqlite
+ * @defgroup SqlStore SqlStore
  * @ingroup Fir
  */
