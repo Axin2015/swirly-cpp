@@ -34,11 +34,11 @@ public:
     }
     constexpr
     ZmqStore(decltype(nullptr)) noexcept
-    : impl_(nullptr)
+        : impl_(nullptr)
     {
     }
-    ZmqStore(DbrIden seed, const char* addr)
-    : impl_(dbr_zmqstore_create(seed, addr))
+    ZmqStore(void* ctx, DbrIden seed, const char* addr)
+        : impl_(dbr_zmqstore_create(ctx, seed, addr))
     {
         if (!impl_)
             throw_exception();

@@ -17,14 +17,20 @@
  */
 #include <dbr/zmqstore.h>
 
+#include <dbr/err.h>
 #include <dbr/journ.h>
 #include <dbr/model.h>
+#include <dbr/msg.h>
+
+#include <zmq.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
 
 struct DbrZmqStore_ {
+    void* ctx;
     DbrIden id;
+    void* sock;
     struct DbrIJourn journ_;
     struct DbrIModel model_;
 };
@@ -112,7 +118,17 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    return 0;
+    struct DbrZmqStore_* zmqstore = model_implof(model);
+    struct DbrMsg msg = { .type = DBR_READ_ENTITY_REQ, .read_entity_req.type = type };
+
+    if (!dbr_send_msg(zmqstore->sock, &msg))
+        return -1;
+
+    if (!dbr_recv_msg(zmqstore->sock, pool, &msg))
+        return -1;
+
+    *first = msg.read_entity_rep.first;
+    return msg.read_entity_rep.count;
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {
@@ -120,19 +136,36 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 };
 
 DBR_API DbrZmqStore
-dbr_zmqstore_create(DbrIden seed, const char* path)
+dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr)
 {
     struct DbrZmqStore_* zmqstore = malloc(sizeof(struct DbrZmqStore_));
     if (dbr_unlikely(!zmqstore))
         goto fail1;
 
+    void* sock = zmq_socket(ctx, ZMQ_REQ);
+    if (!sock) {
+        dbr_err_set(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail2;
+    }
+
+    if (zmq_bind(sock, addr) < 0) {
+        dbr_err_set(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+
     // Seed identity.
+    zmqstore->ctx = ctx;
     zmqstore->id = seed;
+    zmqstore->sock = sock;
 
     zmqstore->journ_.vtbl = &JOURN_VTBL;
     zmqstore->model_.vtbl = &MODEL_VTBL;
 
     return zmqstore;
+ fail3:
+    zmq_close(sock);
+ fail2:
+    free(zmqstore);
  fail1:
     return NULL;
 }
@@ -141,6 +174,7 @@ DBR_API void
 dbr_zmqstore_destroy(DbrZmqStore zmqstore)
 {
     if (zmqstore) {
+        zmq_close(zmqstore->sock);
         free(zmqstore);
     }
 }

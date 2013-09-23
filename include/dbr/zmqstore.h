@@ -31,6 +31,8 @@ typedef struct DbrZmqStore_* DbrZmqStore;
 /**
  * @brief Create ZMQite3 model.
  *
+ * @param ctx Zero MQ context.
+ *
  * @param seed Seed identifier.
  *
  * @param addr Address of peer's endpoint.
@@ -39,7 +41,7 @@ typedef struct DbrZmqStore_* DbrZmqStore;
  */
 
 DBR_API DbrZmqStore
-dbr_zmqstore_create(DbrIden seed, const char* addr);
+dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr);
 
 DBR_API void
 dbr_zmqstore_destroy(DbrZmqStore zmqstore);
