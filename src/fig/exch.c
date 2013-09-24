@@ -117,7 +117,24 @@ insert_result(DbrJourn journ, const struct DbrResult* result, DbrMillis now)
         const int taker_status = taker_resd == 0 ? DBR_FILLED : DBR_PARTIAL;
         if (!dbr_journ_update_order(journ, taker_order->id, taker_rev, taker_status,
                                     taker_resd, taker_exec, taker_order->lots, now)
-            || !dbr_journ_insert_trade(journ, match->taker_trade))
+            || !dbr_journ_insert_trade(journ, match->taker_trade->id,
+                                       match->taker_trade->match,
+                                       match->taker_trade->order,
+                                       match->taker_trade->order_rev,
+                                       match->taker_trade->trader.rec->id,
+                                       match->taker_trade->accnt.rec->id,
+                                       match->taker_trade->accnt.rec->id,
+                                       match->taker_trade->settl_date,
+                                       match->taker_trade->ref,
+                                       match->taker_trade->cpty.rec->id,
+                                       match->taker_trade->role,
+                                       match->taker_trade->action,
+                                       match->taker_trade->ticks,
+                                       match->taker_trade->resd,
+                                       match->taker_trade->exec,
+                                       match->taker_trade->lots,
+                                       match->taker_trade->created,
+                                       match->taker_trade->modified))
             goto fail1;
 
         // Maker revision.
@@ -128,7 +145,24 @@ insert_result(DbrJourn journ, const struct DbrResult* result, DbrMillis now)
         const int maker_status = maker_resd == 0 ? DBR_FILLED : DBR_PARTIAL;
         if (!dbr_journ_update_order(journ, maker->id, maker_rev, maker_status, maker_resd,
                                     maker_exec, maker->lots, now)
-            || !dbr_journ_insert_trade(journ, match->maker_trade))
+            || !dbr_journ_insert_trade(journ, match->maker_trade->id,
+                                       match->maker_trade->match,
+                                       match->maker_trade->order,
+                                       match->maker_trade->order_rev,
+                                       match->maker_trade->trader.rec->id,
+                                       match->maker_trade->accnt.rec->id,
+                                       match->maker_trade->accnt.rec->id,
+                                       match->maker_trade->settl_date,
+                                       match->maker_trade->ref,
+                                       match->maker_trade->cpty.rec->id,
+                                       match->maker_trade->role,
+                                       match->maker_trade->action,
+                                       match->maker_trade->ticks,
+                                       match->maker_trade->resd,
+                                       match->maker_trade->exec,
+                                       match->maker_trade->lots,
+                                       match->maker_trade->created,
+                                       match->maker_trade->modified))
             goto fail1;
 
     } while ((node = node->next));
@@ -509,7 +543,13 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
     if (!dbr_journ_begin_trans(exch->journ))
         goto fail2;
 
-    if (!dbr_journ_insert_order(exch->journ, new_order)
+    if (!dbr_journ_insert_order(exch->journ, new_order->id, new_order->rev,
+                                new_order->status, new_order->trader.rec->id,
+                                new_order->accnt.rec->id, new_order->contr.rec->id,
+                                new_order->settl_date, new_order->ref, new_order->action,
+                                new_order->ticks, new_order->resd, new_order->exec,
+                                new_order->lots, new_order->min, new_order->flags,
+                                new_order->created, new_order->modified)
         || !fig_match_orders(exch->journ, book, new_order, result, exch->pool))
         goto fail3;
 

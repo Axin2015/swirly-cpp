@@ -50,8 +50,8 @@ model_implof(DbrModel model)
 static DbrIden
 alloc_id(DbrJourn journ)
 {
-    struct DbrZmqStore_* zmqstore = journ_implof(journ);
-    return zmqstore->id++;
+    struct DbrZmqStore_* store = journ_implof(journ);
+    return store->id++;
 }
 
 static DbrBool
@@ -73,7 +73,10 @@ rollback_trans(DbrJourn journ)
 }
 
 static DbrBool
-insert_order(DbrJourn journ, struct DbrOrder* order)
+insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
+             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
+             DbrMillis created, DbrMillis modified)
 {
     return true;
 }
@@ -92,7 +95,10 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 static DbrBool
-insert_trade(DbrJourn journ, struct DbrTrade* trade)
+insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
+             DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+             DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
+             DbrLots exec, DbrLots lots, DbrMillis created, DbrMillis modified)
 {
     return true;
 }
@@ -118,13 +124,13 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    struct DbrZmqStore_* zmqstore = model_implof(model);
+    struct DbrZmqStore_* store = model_implof(model);
     struct DbrMsg msg = { .type = DBR_READ_ENTITY_REQ, .read_entity_req.type = type };
 
-    if (!dbr_send_msg(zmqstore->sock, &msg))
+    if (!dbr_send_msg(store->sock, &msg))
         return -1;
 
-    if (!dbr_recv_msg(zmqstore->sock, pool, &msg))
+    if (!dbr_recv_msg(store->sock, pool, &msg))
         return -1;
 
     *first = msg.read_entity_rep.first;
@@ -138,8 +144,8 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 DBR_API DbrZmqStore
 dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr)
 {
-    struct DbrZmqStore_* zmqstore = malloc(sizeof(struct DbrZmqStore_));
-    if (dbr_unlikely(!zmqstore))
+    struct DbrZmqStore_* store = malloc(sizeof(struct DbrZmqStore_));
+    if (dbr_unlikely(!store))
         goto fail1;
 
     void* sock = zmq_socket(ctx, ZMQ_REQ);
@@ -154,39 +160,39 @@ dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr)
     }
 
     // Seed identity.
-    zmqstore->ctx = ctx;
-    zmqstore->id = seed;
-    zmqstore->sock = sock;
+    store->ctx = ctx;
+    store->id = seed;
+    store->sock = sock;
 
-    zmqstore->journ_.vtbl = &JOURN_VTBL;
-    zmqstore->model_.vtbl = &MODEL_VTBL;
+    store->journ_.vtbl = &JOURN_VTBL;
+    store->model_.vtbl = &MODEL_VTBL;
 
-    return zmqstore;
+    return store;
  fail3:
     zmq_close(sock);
  fail2:
-    free(zmqstore);
+    free(store);
  fail1:
     return NULL;
 }
 
 DBR_API void
-dbr_zmqstore_destroy(DbrZmqStore zmqstore)
+dbr_zmqstore_destroy(DbrZmqStore store)
 {
-    if (zmqstore) {
-        zmq_close(zmqstore->sock);
-        free(zmqstore);
+    if (store) {
+        zmq_close(store->sock);
+        free(store);
     }
 }
 
 DBR_API DbrJourn
-dbr_zmqstore_journ(DbrZmqStore zmqstore)
+dbr_zmqstore_journ(DbrZmqStore store)
 {
-    return &zmqstore->journ_;
+    return &store->journ_;
 }
 
 DBR_API DbrModel
-dbr_zmqstore_model(DbrZmqStore zmqstore)
+dbr_zmqstore_model(DbrZmqStore store)
 {
-    return &zmqstore->model_;
+    return &store->model_;
 }

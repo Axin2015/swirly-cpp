@@ -37,43 +37,50 @@ struct FirSqlStore {
 };
 
 DBR_EXTERN DbrBool
-fir_sqlstore_init(struct FirSqlStore* sqlstore, const char* path);
+fir_sqlstore_init(struct FirSqlStore* store, const char* path);
 
 // Assumes that pointer is not null.
 
 DBR_EXTERN void
-fir_sqlstore_term(struct FirSqlStore* sqlstore);
+fir_sqlstore_term(struct FirSqlStore* store);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_load(struct FirSqlStore* sqlstore);
+fir_sqlstore_load(struct FirSqlStore* store);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_begin_trans(struct FirSqlStore* sqlstore);
+fir_sqlstore_begin_trans(struct FirSqlStore* store);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_commit_trans(struct FirSqlStore* sqlstore);
+fir_sqlstore_commit_trans(struct FirSqlStore* store);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_rollback_trans(struct FirSqlStore* sqlstore);
+fir_sqlstore_rollback_trans(struct FirSqlStore* store);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_insert_order(struct FirSqlStore* sqlstore, const struct DbrOrder* order);
+fir_sqlstore_insert_order(struct FirSqlStore* store, DbrIden id, int rev, int status, DbrIden tid,
+                          DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+                          int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
+                          DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_update_order(struct FirSqlStore* sqlstore, DbrIden id, int rev, int status,
+fir_sqlstore_update_order(struct FirSqlStore* store, DbrIden id, int rev, int status,
                           DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_archive_order(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now);
+fir_sqlstore_archive_order(struct FirSqlStore* store, DbrIden id, DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_insert_trade(struct FirSqlStore* sqlstore, const struct DbrTrade* trade);
+fir_sqlstore_insert_trade(struct FirSqlStore* store, DbrIden id, DbrIden match, DbrIden order,
+                          int order_rev, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
+                          const char* ref, DbrIden cpty, int role, int action, DbrTicks ticks,
+                          DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis created,
+                          DbrMillis modified);
 
 DBR_EXTERN DbrBool
-fir_sqlstore_archive_trade(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now);
+fir_sqlstore_archive_trade(struct FirSqlStore* store, DbrIden id, DbrMillis now);
 
 DBR_EXTERN ssize_t
-fir_sqlstore_select_entity(struct FirSqlStore* sqlstore, int type, DbrPool pool,
+fir_sqlstore_select_entity(struct FirSqlStore* store, int type, DbrPool pool,
                            struct DbrSlNode** first);
 
 #endif // FIR_SQLSTORE_H

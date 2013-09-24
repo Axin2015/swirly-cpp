@@ -11,9 +11,9 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        SqlStore sqlstore(1, "doobry.db");
+        SqlStore store(1, "doobry.db");
         Pool pool;
-        Exch exch(sqlstore.journ(), sqlstore.model(), pool);
+        Exch exch(store.journ(), store.model(), pool);
 
         cout << "traders:\n";
         for (auto rec : exch.trecs()) {

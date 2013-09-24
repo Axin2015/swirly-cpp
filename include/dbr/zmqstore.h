@@ -44,13 +44,13 @@ DBR_API DbrZmqStore
 dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr);
 
 DBR_API void
-dbr_zmqstore_destroy(DbrZmqStore zmqstore);
+dbr_zmqstore_destroy(DbrZmqStore store);
 
 DBR_API DbrJourn
-dbr_zmqstore_journ(DbrZmqStore zmqstore);
+dbr_zmqstore_journ(DbrZmqStore store);
 
 DBR_API DbrModel
-dbr_zmqstore_model(DbrZmqStore zmqstore);
+dbr_zmqstore_model(DbrZmqStore store);
 
 /** @} */
 

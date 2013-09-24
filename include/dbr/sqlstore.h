@@ -42,13 +42,13 @@ DBR_API DbrSqlStore
 dbr_sqlstore_create(DbrIden seed, const char* path);
 
 DBR_API void
-dbr_sqlstore_destroy(DbrSqlStore sqlstore);
+dbr_sqlstore_destroy(DbrSqlStore store);
 
 DBR_API DbrJourn
-dbr_sqlstore_journ(DbrSqlStore sqlstore);
+dbr_sqlstore_journ(DbrSqlStore store);
 
 DBR_API DbrModel
-dbr_sqlstore_model(DbrSqlStore sqlstore);
+dbr_sqlstore_model(DbrSqlStore store);
 
 /** @} */
 

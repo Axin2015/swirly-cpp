@@ -152,7 +152,10 @@ bind_text(sqlite3_stmt* stmt, int col, const char* text, size_t maxlen)
 }
 
 static DbrBool
-bind_insert_order(struct FirSqlStore* sqlstore, const struct DbrOrder* order)
+bind_insert_order(struct FirSqlStore* store, DbrIden id, int rev, int status, DbrIden tid,
+                  DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
+                  DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min,
+                  DbrFlags flags, DbrMillis created, DbrMillis modified)
 {
     enum {
         ID = 1,
@@ -173,87 +176,87 @@ bind_insert_order(struct FirSqlStore* sqlstore, const struct DbrOrder* order)
         CREATED,
         MODIFIED
     };
-    sqlite3_stmt* stmt = sqlstore->insert_order;
-    int rc = sqlite3_bind_int64(stmt, ID, order->id);
+    sqlite3_stmt* stmt = store->insert_order;
+    int rc = sqlite3_bind_int64(stmt, ID, id);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, REV, order->rev);
+    rc = sqlite3_bind_int(stmt, REV, rev);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, STATUS, order->status);
+    rc = sqlite3_bind_int(stmt, STATUS, status);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TRADER, order->trader.rec->id);
+    rc = sqlite3_bind_int64(stmt, TRADER, tid);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, ACCNT, order->accnt.rec->id);
+    rc = sqlite3_bind_int64(stmt, ACCNT, aid);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CONTR, order->contr.rec->id);
+    rc = sqlite3_bind_int64(stmt, CONTR, cid);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, SETTL_DATE, order->settl_date);
+    rc = sqlite3_bind_int(stmt, SETTL_DATE, settl_date);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    if (order->ref[0] != '\0')
-        rc = bind_text(stmt, REF, order->ref, DBR_REF_MAX);
+    if (ref[0] != '\0')
+        rc = bind_text(stmt, REF, ref, DBR_REF_MAX);
     else
         rc = sqlite3_bind_null(stmt, REF);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ACTION, order->action);
+    rc = sqlite3_bind_int(stmt, ACTION, action);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TICKS, order->ticks);
+    rc = sqlite3_bind_int64(stmt, TICKS, ticks);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, RESD, order->resd);
+    rc = sqlite3_bind_int64(stmt, RESD, resd);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, EXEC, order->exec);
+    rc = sqlite3_bind_int64(stmt, EXEC, exec);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LOTS, order->lots);
+    rc = sqlite3_bind_int64(stmt, LOTS, lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, MIN, order->min);
+    rc = sqlite3_bind_int64(stmt, MIN, min);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, FLAGS, order->flags);
+    rc = sqlite3_bind_int64(stmt, FLAGS, flags);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CREATED, order->created);
+    rc = sqlite3_bind_int64(stmt, CREATED, created);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, MODIFIED, order->modified);
+    rc = sqlite3_bind_int64(stmt, MODIFIED, modified);
     if (rc != SQLITE_OK)
         goto fail1;
 
     return true;
  fail1:
-    dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+    dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
 
 static DbrBool
-bind_update_order(struct FirSqlStore* sqlstore, DbrIden id, int rev, int status,
+bind_update_order(struct FirSqlStore* store, DbrIden id, int rev, int status,
                   DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
 {
     enum {
@@ -265,7 +268,7 @@ bind_update_order(struct FirSqlStore* sqlstore, DbrIden id, int rev, int status,
         MODIFIED,
         ID
     };
-    sqlite3_stmt* stmt = sqlstore->update_order;
+    sqlite3_stmt* stmt = store->update_order;
     int rc = sqlite3_bind_int(stmt, REV, rev);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -296,19 +299,19 @@ bind_update_order(struct FirSqlStore* sqlstore, DbrIden id, int rev, int status,
 
     return true;
  fail1:
-    dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+    dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
 
 static DbrBool
-bind_archive_order(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now)
+bind_archive_order(struct FirSqlStore* store, DbrIden id, DbrMillis now)
 {
     enum {
         MODIFIED = 1,
         ID
     };
-    sqlite3_stmt* stmt = sqlstore->archive_order;
+    sqlite3_stmt* stmt = store->archive_order;
     int rc = sqlite3_bind_int64(stmt, MODIFIED, now);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -319,13 +322,16 @@ bind_archive_order(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now)
 
     return true;
  fail1:
-    dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+    dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
 
 static DbrBool
-bind_insert_trade(struct FirSqlStore* sqlstore, const struct DbrTrade* trade)
+bind_insert_trade(struct FirSqlStore* store, DbrIden id, DbrIden match, DbrIden order,
+                  int order_rev, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
+                  const char* ref, DbrIden cpty, int role, int action, DbrTicks ticks,
+                  DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis created, DbrMillis modified)
 {
     enum {
         ID = 1,
@@ -342,74 +348,74 @@ bind_insert_trade(struct FirSqlStore* sqlstore, const struct DbrTrade* trade)
         CREATED,
         MODIFIED
     };
-    sqlite3_stmt* stmt = sqlstore->insert_trade;
-    int rc = sqlite3_bind_int64(stmt, ID, trade->id);
+    sqlite3_stmt* stmt = store->insert_trade;
+    int rc = sqlite3_bind_int64(stmt, ID, id);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, MATCH, trade->match);
+    rc = sqlite3_bind_int64(stmt, MATCH, match);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, ORDER, trade->order);
+    rc = sqlite3_bind_int64(stmt, ORDER, order);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ORDER_REV, trade->order_rev);
+    rc = sqlite3_bind_int(stmt, ORDER_REV, order_rev);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CPTY, trade->cpty.rec->id);
+    rc = sqlite3_bind_int64(stmt, CPTY, cpty);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ROLE, trade->role);
+    rc = sqlite3_bind_int(stmt, ROLE, role);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ACTION, trade->action);
+    rc = sqlite3_bind_int(stmt, ACTION, action);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TICKS, trade->ticks);
+    rc = sqlite3_bind_int64(stmt, TICKS, ticks);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, RESD, trade->resd);
+    rc = sqlite3_bind_int64(stmt, RESD, resd);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, EXEC, trade->exec);
+    rc = sqlite3_bind_int64(stmt, EXEC, exec);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LOTS, trade->lots);
+    rc = sqlite3_bind_int64(stmt, LOTS, lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CREATED, trade->created);
+    rc = sqlite3_bind_int64(stmt, CREATED, created);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, MODIFIED, trade->modified);
+    rc = sqlite3_bind_int64(stmt, MODIFIED, modified);
     if (rc != SQLITE_OK)
         goto fail1;
 
     return true;
  fail1:
-    dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+    dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
 
 static DbrBool
-bind_archive_trade(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now)
+bind_archive_trade(struct FirSqlStore* store, DbrIden id, DbrMillis now)
 {
     enum {
         MODIFIED = 1,
         ID
     };
-    sqlite3_stmt* stmt = sqlstore->archive_trade;
+    sqlite3_stmt* stmt = store->archive_trade;
     int rc = sqlite3_bind_int64(stmt, MODIFIED, now);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -420,13 +426,13 @@ bind_archive_trade(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now)
 
     return true;
  fail1:
-    dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+    dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
     sqlite3_clear_bindings(stmt);
     return false;
 }
 
 static ssize_t
-select_trader(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_trader(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -435,7 +441,7 @@ select_trader(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** fir
         EMAIL
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_TRADER_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_TRADER_SQL);
     if (!stmt)
         goto fail1;
 
@@ -476,7 +482,7 @@ select_trader(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** fir
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -495,7 +501,7 @@ select_trader(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** fir
 }
 
 static ssize_t
-select_accnt(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_accnt(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -504,7 +510,7 @@ select_accnt(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         EMAIL
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_ACCNT_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_ACCNT_SQL);
     if (!stmt)
         goto fail1;
 
@@ -545,7 +551,7 @@ select_accnt(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -564,7 +570,7 @@ select_accnt(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
 }
 
 static ssize_t
-select_contr(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_contr(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -582,7 +588,7 @@ select_contr(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         MAX_LOTS
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_CONTR_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_CONTR_SQL);
     if (!stmt)
         goto fail1;
 
@@ -652,7 +658,7 @@ select_contr(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -671,7 +677,7 @@ select_contr(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
 }
 
 static ssize_t
-select_order(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_order(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -693,7 +699,7 @@ select_order(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         MODIFIED
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_ORDER_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_ORDER_SQL);
     if (!stmt)
         goto fail1;
 
@@ -747,7 +753,7 @@ select_order(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -766,14 +772,14 @@ select_order(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
 }
 
 static ssize_t
-select_memb(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_memb(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ACCNT,
         TRADER
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_MEMB_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_MEMB_SQL);
     if (!stmt)
         goto fail1;
 
@@ -801,7 +807,7 @@ select_memb(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -820,7 +826,7 @@ select_memb(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first
 }
 
 static ssize_t
-select_trade(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_trade(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
@@ -843,7 +849,7 @@ select_trade(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         MODIFIED
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_TRADE_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_TRADE_SQL);
     if (!stmt)
         goto fail1;
 
@@ -899,7 +905,7 @@ select_trade(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -918,7 +924,7 @@ select_trade(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** firs
 }
 
 static ssize_t
-select_posn(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first)
+select_posn(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ACCNT,
@@ -929,7 +935,7 @@ select_posn(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first
         LOTS
     };
 
-    sqlite3_stmt* stmt = prepare(sqlstore->db, SELECT_POSN_SQL);
+    sqlite3_stmt* stmt = prepare(store->db, SELECT_POSN_SQL);
     if (!stmt)
         goto fail1;
 
@@ -994,7 +1000,7 @@ select_posn(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first
         } else if (rc == SQLITE_DONE) {
             break;
         } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlstore->db));
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(store->db));
             goto fail2;
         }
     }
@@ -1013,7 +1019,7 @@ select_posn(struct FirSqlStore* sqlstore, DbrPool pool, struct DbrSlNode** first
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_init(struct FirSqlStore* sqlstore, const char* path)
+fir_sqlstore_init(struct FirSqlStore* store, const char* path)
 {
     sqlite3* db;
     int rc = sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE, NULL);
@@ -1062,12 +1068,12 @@ fir_sqlstore_init(struct FirSqlStore* sqlstore, const char* path)
     if (!archive_trade)
         goto fail5;
 
-    sqlstore->db = db;
-    sqlstore->insert_order = insert_order;
-    sqlstore->update_order = update_order;
-    sqlstore->archive_order = archive_order;
-    sqlstore->insert_trade = insert_trade;
-    sqlstore->archive_trade = archive_trade;
+    store->db = db;
+    store->insert_order = insert_order;
+    store->update_order = update_order;
+    store->archive_order = archive_order;
+    store->insert_trade = insert_trade;
+    store->archive_trade = archive_trade;
     return true;
 
  fail5:
@@ -1084,97 +1090,106 @@ fir_sqlstore_init(struct FirSqlStore* sqlstore, const char* path)
 }
 
 DBR_EXTERN void
-fir_sqlstore_term(struct FirSqlStore* sqlstore)
+fir_sqlstore_term(struct FirSqlStore* store)
 {
-    assert(sqlstore);
-    sqlite3_finalize(sqlstore->archive_trade);
-    sqlite3_finalize(sqlstore->insert_trade);
-    sqlite3_finalize(sqlstore->archive_order);
-    sqlite3_finalize(sqlstore->update_order);
-    sqlite3_finalize(sqlstore->insert_order);
-    sqlite3_close(sqlstore->db);
+    assert(store);
+    sqlite3_finalize(store->archive_trade);
+    sqlite3_finalize(store->insert_trade);
+    sqlite3_finalize(store->archive_order);
+    sqlite3_finalize(store->update_order);
+    sqlite3_finalize(store->insert_order);
+    sqlite3_close(store->db);
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_begin_trans(struct FirSqlStore* sqlstore)
+fir_sqlstore_begin_trans(struct FirSqlStore* store)
 {
-    return exec_sql(sqlstore->db, "BEGIN TRANSACTION");
+    return exec_sql(store->db, "BEGIN TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_commit_trans(struct FirSqlStore* sqlstore)
+fir_sqlstore_commit_trans(struct FirSqlStore* store)
 {
-    return exec_sql(sqlstore->db, "COMMIT TRANSACTION");
+    return exec_sql(store->db, "COMMIT TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_rollback_trans(struct FirSqlStore* sqlstore)
+fir_sqlstore_rollback_trans(struct FirSqlStore* store)
 {
-    return exec_sql(sqlstore->db, "ROLLBACK TRANSACTION");
+    return exec_sql(store->db, "ROLLBACK TRANSACTION");
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_insert_order(struct FirSqlStore* sqlstore, const struct DbrOrder* order)
+fir_sqlstore_insert_order(struct FirSqlStore* store, DbrIden id, int rev, int status, DbrIden tid,
+                          DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+                          int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
+                          DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified)
 {
-    return bind_insert_order(sqlstore, order)
-        && exec_stmt(sqlstore->db, sqlstore->insert_order);
+    return bind_insert_order(store, id, rev, status, tid, aid, cid, settl_date, ref, action,
+                             ticks, resd, exec, lots, min, flags, created, modified)
+        && exec_stmt(store->db, store->insert_order);
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_update_order(struct FirSqlStore* sqlstore, DbrIden id, int rev, int status,
+fir_sqlstore_update_order(struct FirSqlStore* store, DbrIden id, int rev, int status,
                         DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
 {
-    return bind_update_order(sqlstore, id, rev, status, resd, exec, lots, now)
-        && exec_stmt(sqlstore->db, sqlstore->update_order);
+    return bind_update_order(store, id, rev, status, resd, exec, lots, now)
+        && exec_stmt(store->db, store->update_order);
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_archive_order(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now)
+fir_sqlstore_archive_order(struct FirSqlStore* store, DbrIden id, DbrMillis now)
 {
-    return bind_archive_order(sqlstore, id, now)
-        && exec_stmt(sqlstore->db, sqlstore->archive_order);
+    return bind_archive_order(store, id, now)
+        && exec_stmt(store->db, store->archive_order);
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_insert_trade(struct FirSqlStore* sqlstore, const struct DbrTrade* trade)
+fir_sqlstore_insert_trade(struct FirSqlStore* store, DbrIden id, DbrIden match, DbrIden order,
+                          int order_rev, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
+                          const char* ref, DbrIden cpty, int role, int action, DbrTicks ticks,
+                          DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis created,
+                          DbrMillis modified)
 {
-    return bind_insert_trade(sqlstore, trade)
-        && exec_stmt(sqlstore->db, sqlstore->insert_trade);
+    return bind_insert_trade(store, id, match, order, order_rev, tid, aid, cid, settl_date,
+                             ref, cpty, role, action, ticks, resd, exec, lots, created, modified)
+        && exec_stmt(store->db, store->insert_trade);
 }
 
 DBR_EXTERN DbrBool
-fir_sqlstore_archive_trade(struct FirSqlStore* sqlstore, DbrIden id, DbrMillis now)
+fir_sqlstore_archive_trade(struct FirSqlStore* store, DbrIden id, DbrMillis now)
 {
-    return bind_archive_trade(sqlstore, id, now)
-        && exec_stmt(sqlstore->db, sqlstore->archive_trade);
+    return bind_archive_trade(store, id, now)
+        && exec_stmt(store->db, store->archive_trade);
 }
 
 DBR_EXTERN ssize_t
-fir_sqlstore_select_entity(struct FirSqlStore* sqlstore, int type, DbrPool pool,
+fir_sqlstore_select_entity(struct FirSqlStore* store, int type, DbrPool pool,
                            struct DbrSlNode** first)
 {
     ssize_t ret;
     switch (type) {
     case DBR_TRADER:
-        ret = select_trader(sqlstore, pool, first);
+        ret = select_trader(store, pool, first);
         break;
     case DBR_ACCNT:
-        ret = select_accnt(sqlstore, pool, first);
+        ret = select_accnt(store, pool, first);
         break;
     case DBR_CONTR:
-        ret = select_contr(sqlstore, pool, first);
+        ret = select_contr(store, pool, first);
         break;
     case DBR_ORDER:
-        ret = select_order(sqlstore, pool, first);
+        ret = select_order(store, pool, first);
         break;
     case DBR_MEMB:
-        ret = select_memb(sqlstore, pool, first);
+        ret = select_memb(store, pool, first);
         break;
     case DBR_TRADE:
-        ret = select_trade(sqlstore, pool, first);
+        ret = select_trade(store, pool, first);
         break;
     case DBR_POSN:
-        ret = select_posn(sqlstore, pool, first);
+        ret = select_posn(store, pool, first);
         break;
     default:
         dbr_err_set(DBR_EINVAL, "invalid type '%d'", type);
@@ -1206,72 +1221,82 @@ model_implof(DbrModel model)
 static DbrIden
 alloc_id(DbrJourn journ)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    return sqlstore->id++;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    return store->id++;
 }
 
 static DbrBool
 begin_trans(DbrJourn journ)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_begin_trans(impl);
 }
 
 static DbrBool
 commit_trans(DbrJourn journ)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_commit_trans(impl);
 }
 
 static DbrBool
 rollback_trans(DbrJourn journ)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_rollback_trans(impl);
 }
 
 static DbrBool
-insert_order(DbrJourn journ, struct DbrOrder* order)
+insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
+             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
+             DbrMillis created, DbrMillis modified)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
-    return fir_sqlstore_insert_order(impl, order);
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
+    return fir_sqlstore_insert_order(impl, id, rev, status, tid, aid, cid, settl_date, ref,
+                                     action, ticks, resd, exec, lots, min, flags, created,
+                                     modified);
 }
 
 static DbrBool
 update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
              DbrLots lots, DbrMillis now)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_update_order(impl, id, rev, status, resd, exec, lots, now);
 }
 
 static DbrBool
 archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_archive_order(impl, id, now);
 }
 
 static DbrBool
-insert_trade(DbrJourn journ, struct DbrTrade* trade)
+insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
+             DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+             DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd, DbrLots exec,
+             DbrLots lots, DbrMillis created, DbrMillis modified)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
-    return fir_sqlstore_insert_trade(impl, trade);
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
+    return fir_sqlstore_insert_trade(impl, id, match, order, order_rev, tid, aid, cid,
+                                     settl_date, ref, cpty, role, action, ticks, resd, exec,
+                                     lots, created, modified);
 }
 
 static DbrBool
 archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
-    struct DbrSqlStore_* sqlstore = journ_implof(journ);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = journ_implof(journ);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_archive_trade(impl, id, now);
 }
 
@@ -1290,8 +1315,8 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    struct DbrSqlStore_* sqlstore = model_implof(model);
-    struct FirSqlStore* impl = &sqlstore->impl;
+    struct DbrSqlStore_* store = model_implof(model);
+    struct FirSqlStore* impl = &store->impl;
     return fir_sqlstore_select_entity(impl, type, pool, first);
 }
 
@@ -1302,42 +1327,42 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 DBR_API DbrSqlStore
 dbr_sqlstore_create(DbrIden seed, const char* path)
 {
-    struct DbrSqlStore_* sqlstore = malloc(sizeof(struct DbrSqlStore_));
-    if (dbr_unlikely(!sqlstore))
+    struct DbrSqlStore_* store = malloc(sizeof(struct DbrSqlStore_));
+    if (dbr_unlikely(!store))
         goto fail1;
 
     // Seed identity.
-    sqlstore->id = seed;
+    store->id = seed;
 
-    if (!fir_sqlstore_init(&sqlstore->impl, path))
+    if (!fir_sqlstore_init(&store->impl, path))
         goto fail2;
 
-    sqlstore->journ_.vtbl = &JOURN_VTBL;
-    sqlstore->model_.vtbl = &MODEL_VTBL;
-    return sqlstore;
+    store->journ_.vtbl = &JOURN_VTBL;
+    store->model_.vtbl = &MODEL_VTBL;
+    return store;
  fail2:
-    free(sqlstore);
+    free(store);
  fail1:
     return NULL;
 }
 
 DBR_API void
-dbr_sqlstore_destroy(DbrSqlStore sqlstore)
+dbr_sqlstore_destroy(DbrSqlStore store)
 {
-    if (sqlstore) {
-        fir_sqlstore_term(&sqlstore->impl);
-        free(sqlstore);
+    if (store) {
+        fir_sqlstore_term(&store->impl);
+        free(store);
     }
 }
 
 DBR_API DbrJourn
-dbr_sqlstore_journ(DbrSqlStore sqlstore)
+dbr_sqlstore_journ(DbrSqlStore store)
 {
-    return &sqlstore->journ_;
+    return &store->journ_;
 }
 
 DBR_API DbrModel
-dbr_sqlstore_model(DbrSqlStore sqlstore)
+dbr_sqlstore_model(DbrSqlStore store)
 {
-    return &sqlstore->model_;
+    return &store->model_;
 }

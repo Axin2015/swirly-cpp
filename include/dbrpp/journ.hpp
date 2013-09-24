@@ -49,9 +49,14 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->rollback_trans();
     }
     static DbrBool
-    insert_order(DbrJourn journ, DbrOrder* order) noexcept
+    insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
+                 DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+                 DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
+                 DbrMillis created, DbrMillis modified) noexcept
     {
-        return static_cast<DerivedT*>(journ)->insert_order(OrderRef(*order));
+        return static_cast<DerivedT*>(journ)
+            ->insert_order(id, rev, status, tid, aid, cid, settl_date, ref, action,
+                           ticks, resd, exec, lots, min, flags, created, modified);
     }
     static DbrBool
     update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
@@ -65,9 +70,14 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->archive_order(id, now);
     }
     static DbrBool
-    insert_trade(DbrJourn journ, DbrTrade* trade) noexcept
+    insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
+                 DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+                 DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd, DbrLots exec,
+                 DbrLots lots, DbrMillis created, DbrMillis modified) noexcept
     {
-        return static_cast<DerivedT*>(journ)->insert_trade(TradeRef(*trade));
+        return static_cast<DerivedT*>(journ)
+            ->insert_trade(id, match, order, order_rev, tid, aid, cid, settl_date, ref,
+                           cpty, role, action, ticks, resd, exec, lots, created, modified);
     }
     static DbrBool
     archive_trade(DbrJourn journ, DbrIden id, DbrMillis now) noexcept
@@ -128,9 +138,13 @@ rollback_trans(DbrJourn journ)
 }
 
 inline void
-insert_order(DbrJourn journ, OrderRef order)
+insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
+             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
+             DbrMillis created, DbrMillis modified)
 {
-    if (!journ->vtbl->insert_order(journ, order.c_arg()))
+    if (!journ->vtbl->insert_order(journ, id, rev, status, tid, aid, cid, settl_date, ref, action,
+                                   ticks, resd, exec, lots, min, flags, created, modified))
         throw_exception();
 }
 
@@ -150,9 +164,14 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 inline void
-insert_trade(DbrJourn journ, TradeRef trade)
+insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
+             DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+             DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
+             DbrLots exec, DbrLots lots, DbrMillis created, DbrMillis modified)
 {
-    if (!journ->vtbl->insert_trade(journ, trade.c_arg()))
+    if (!journ->vtbl->insert_trade(journ, id, match, order, order_rev, tid, aid, cid, settl_date,
+                                   ref, cpty, role, action, ticks, resd, exec, lots, created,
+                                   modified))
         throw_exception();
 }
 
