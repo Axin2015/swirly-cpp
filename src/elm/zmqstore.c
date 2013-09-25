@@ -21,19 +21,34 @@
 #include <dbr/journ.h>
 #include <dbr/model.h>
 #include <dbr/msg.h>
+#include <dbr/queue.h>
 
 #include <zmq.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h> // strncpy()
 
 struct DbrZmqStore_ {
     void* ctx;
     DbrIden id;
     void* sock;
+    DbrPool pool;
+    struct DbrQueue queue;
     struct DbrIJourn journ_;
     struct DbrIModel model_;
 };
+
+DBR_API void
+free_stmts(struct DbrSlNode* first, DbrPool pool)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrOrder* order = dbr_model_order_entry(node);
+        node = node->next;
+        dbr_pool_free_order(pool, order);
+    }
+}
 
 static inline struct DbrZmqStore_*
 journ_implof(DbrJourn journ)
@@ -63,12 +78,18 @@ begin_trans(DbrJourn journ)
 static DbrBool
 commit_trans(DbrJourn journ)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    free_stmts(store->queue.first, store->pool);
+    dbr_queue_init(&store->queue);
     return true;
 }
 
 static DbrBool
 rollback_trans(DbrJourn journ)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    free_stmts(store->queue.first, store->pool);
+    dbr_queue_init(&store->queue);
     return true;
 }
 
@@ -76,8 +97,30 @@ static DbrBool
 insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
-             DbrMillis created, DbrMillis modified)
+             DbrMillis now)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
+    if (!stmt)
+        return false;
+    stmt->type = DBR_INSERT_ORDER;
+    stmt->insert_order.id = id;
+    stmt->insert_order.rev = rev;
+    stmt->insert_order.status = status;
+    stmt->insert_order.tid = tid;
+    stmt->insert_order.aid = aid;
+    stmt->insert_order.cid = cid;
+    stmt->insert_order.settl_date = settl_date;
+    strncpy(stmt->insert_order.ref, ref, DBR_REF_MAX);
+    stmt->insert_order.action = action;
+    stmt->insert_order.ticks = ticks;
+    stmt->insert_order.resd = resd;
+    stmt->insert_order.exec = exec;
+    stmt->insert_order.lots = lots;
+    stmt->insert_order.min = min;
+    stmt->insert_order.flags = flags;
+    stmt->insert_order.now = now;
+    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
 
@@ -85,12 +128,33 @@ static DbrBool
 update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
              DbrLots lots, DbrMillis now)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
+    if (!stmt)
+        return false;
+    stmt->type = DBR_UPDATE_ORDER;
+    stmt->update_order.id = id;
+    stmt->update_order.rev = rev;
+    stmt->update_order.status = status;
+    stmt->update_order.resd = resd;
+    stmt->update_order.exec = exec;
+    stmt->update_order.lots = lots;
+    stmt->update_order.now = now;
+    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
 
 static DbrBool
 archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
+    if (!stmt)
+        return false;
+    stmt->type = DBR_ARCHIVE_ORDER;
+    stmt->archive_order.id = id;
+    stmt->archive_order.now = now;
+    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
 
@@ -98,14 +162,45 @@ static DbrBool
 insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
              DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
              DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
-             DbrLots exec, DbrLots lots, DbrMillis created, DbrMillis modified)
+             DbrLots exec, DbrLots lots, DbrMillis now)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
+    if (!stmt)
+        return false;
+    stmt->type = DBR_INSERT_TRADE;
+    stmt->insert_trade.id = id;
+    stmt->insert_trade.match = match;
+    stmt->insert_trade.order = order;
+    stmt->insert_trade.order_rev = order_rev;
+    stmt->insert_trade.tid = tid;
+    stmt->insert_trade.aid = aid;
+    stmt->insert_trade.cid = cid;
+    stmt->insert_trade.settl_date = settl_date;
+    strncpy(stmt->insert_trade.ref, ref, DBR_REF_MAX);
+    stmt->insert_trade.cpty = cpty;
+    stmt->insert_trade.role = role;
+    stmt->insert_trade.action = action;
+    stmt->insert_trade.ticks = ticks;
+    stmt->insert_trade.resd = resd;
+    stmt->insert_trade.exec = exec;
+    stmt->insert_trade.lots = lots;
+    stmt->insert_trade.now = now;
+    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
 
 static DbrBool
 archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
+    if (!stmt)
+        return false;
+    stmt->type = DBR_ARCHIVE_TRADE;
+    stmt->archive_trade.id = id;
+    stmt->archive_trade.now = now;
+    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
 
@@ -142,7 +237,7 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 };
 
 DBR_API DbrZmqStore
-dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr)
+dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
 {
     struct DbrZmqStore_* store = malloc(sizeof(struct DbrZmqStore_));
     if (dbr_unlikely(!store))
@@ -163,6 +258,8 @@ dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr)
     store->ctx = ctx;
     store->id = seed;
     store->sock = sock;
+    store->pool = pool;
+    dbr_queue_init(&store->queue);
 
     store->journ_.vtbl = &JOURN_VTBL;
     store->model_.vtbl = &MODEL_VTBL;
@@ -180,6 +277,8 @@ DBR_API void
 dbr_zmqstore_destroy(DbrZmqStore store)
 {
     if (store) {
+        free_stmts(store->queue.first, store->pool);
+        dbr_queue_init(&store->queue);
         zmq_close(store->sock);
         free(store);
     }

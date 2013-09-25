@@ -116,6 +116,11 @@
  */
 
 /**
+ * @defgroup Msg Msg
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup Book Book
  * @ingroup Fig
  */

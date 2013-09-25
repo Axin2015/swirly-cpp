@@ -83,6 +83,12 @@ dbr_pool_alloc_sub(DbrPool pool);
 DBR_API void
 dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub);
 
+DBR_API struct DbrStmt*
+dbr_pool_alloc_stmt(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_stmt(DbrPool pool, struct DbrStmt* stmt);
+
 /** @} */
 
 DBR_API void

@@ -47,7 +47,7 @@ public:
     insert_order(DbrIden id, int rev, int status, DbrIden tid, DbrIden aid, DbrIden cid,
                  DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
                  DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
-                 DbrMillis created, DbrMillis modified) noexcept;
+                 DbrMillis now) noexcept;
 
     DbrBool
     update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
@@ -60,7 +60,7 @@ public:
     insert_trade(DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
                  DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
                  DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
-                 DbrLots exec, DbrLots lots, DbrMillis created, DbrMillis modified) noexcept;
+                 DbrLots exec, DbrLots lots, DbrMillis now) noexcept;
 
     DbrBool
     archive_trade(DbrIden id, DbrMillis now) noexcept;

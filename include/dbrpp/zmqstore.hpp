@@ -37,8 +37,8 @@ public:
         : impl_(nullptr)
     {
     }
-    ZmqStore(void* ctx, DbrIden seed, const char* addr)
-        : impl_(dbr_zmqstore_create(ctx, seed, addr))
+    ZmqStore(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
+        : impl_(dbr_zmqstore_create(ctx, seed, addr, pool))
     {
         if (!impl_)
             throw_exception();

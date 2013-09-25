@@ -37,11 +37,13 @@ typedef struct DbrZmqStore_* DbrZmqStore;
  *
  * @param addr Address of peer's endpoint.
  *
+ * @param pool Pool.
+ *
  * @return Handle to newly created model or null on failure.
  */
 
 DBR_API DbrZmqStore
-dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr);
+dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool);
 
 DBR_API void
 dbr_zmqstore_destroy(DbrZmqStore store);

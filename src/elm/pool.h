@@ -79,6 +79,7 @@ struct ElmLargeNode {
         struct DbrRec rec;
         struct DbrOrder order;
         struct DbrTrade trade;
+        struct DbrStmt stmt;
     };
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -236,6 +237,20 @@ elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
     elm_pool_free_small(pool, node);
 }
 
+static inline struct DbrStmt*
+elm_pool_alloc_stmt(struct ElmPool* pool)
+{
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool);
+    return node ? &node->stmt : NULL;
+}
+
+static inline void
+elm_pool_free_stmt(struct ElmPool* pool, struct DbrStmt* stmt)
+{
+    struct ElmLargeNode* node = (struct ElmLargeNode*)stmt;
+    elm_pool_free_large(pool, node);
+}
+
 #else  // defined(DBR_DEBUG_ALLOC)
 
 DBR_EXTERN struct ElmSmallNode*
@@ -372,6 +387,22 @@ elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
     elm_pool_free_small(pool, node);
 }
 
+static inline struct DbrStmt*
+elm_pool_alloc_stmt_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
+    dbr_log_debug3("allocating stmt %p in %s at %d", node, file, line);
+    return node ? &node->stmt : NULL;
+}
+
+static inline void
+elm_pool_free_stmt(struct ElmPool* pool, struct DbrStmt* stmt)
+{
+    struct ElmLargeNode* node = (struct ElmLargeNode*)stmt;
+    dbr_log_debug3("freeing stmt %p from %s at %d", node, node->file, node->line);
+    elm_pool_free_large(pool, node);
+}
+
 #define elm_pool_alloc_rec(pool)                    \
     elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_level(pool)                  \
@@ -388,6 +419,8 @@ elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
     elm_pool_alloc_posn_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_sub(pool)                    \
     elm_pool_alloc_sub_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_stmt(pool)                   \
+    elm_pool_alloc_stmt_(pool, __FILE__, __LINE__)
 
 #endif // defined(DBR_DEBUG_ALLOC)
 

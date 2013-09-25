@@ -60,7 +60,7 @@ DBR_EXTERN DbrBool
 fir_sqlstore_insert_order(struct FirSqlStore* store, DbrIden id, int rev, int status, DbrIden tid,
                           DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
                           int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
-                          DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified);
+                          DbrLots min, DbrFlags flags, DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlstore_update_order(struct FirSqlStore* store, DbrIden id, int rev, int status,
@@ -73,8 +73,7 @@ DBR_EXTERN DbrBool
 fir_sqlstore_insert_trade(struct FirSqlStore* store, DbrIden id, DbrIden match, DbrIden order,
                           int order_rev, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
                           const char* ref, DbrIden cpty, int role, int action, DbrTicks ticks,
-                          DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis created,
-                          DbrMillis modified);
+                          DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlstore_archive_trade(struct FirSqlStore* store, DbrIden id, DbrMillis now);

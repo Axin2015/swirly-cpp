@@ -413,6 +413,18 @@ dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
     elm_pool_free_sub(pool, sub);
 }
 
+DBR_API struct DbrStmt*
+dbr_pool_alloc_stmt(DbrPool pool)
+{
+    return elm_pool_alloc_stmt(pool);
+}
+
+DBR_API void
+dbr_pool_free_stmt(DbrPool pool, struct DbrStmt* stmt)
+{
+    elm_pool_free_stmt(pool, stmt);
+}
+
 DBR_API void
 dbr_pool_free_list(DbrPool pool, int type, struct DbrSlNode* first)
 {

@@ -133,8 +133,7 @@ insert_result(DbrJourn journ, const struct DbrResult* result, DbrMillis now)
                                        match->taker_trade->resd,
                                        match->taker_trade->exec,
                                        match->taker_trade->lots,
-                                       match->taker_trade->created,
-                                       match->taker_trade->modified))
+                                       now))
             goto fail1;
 
         // Maker revision.
@@ -161,8 +160,7 @@ insert_result(DbrJourn journ, const struct DbrResult* result, DbrMillis now)
                                        match->maker_trade->resd,
                                        match->maker_trade->exec,
                                        match->maker_trade->lots,
-                                       match->maker_trade->created,
-                                       match->maker_trade->modified))
+                                       now))
             goto fail1;
 
     } while ((node = node->next));
@@ -548,8 +546,7 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
                                 new_order->accnt.rec->id, new_order->contr.rec->id,
                                 new_order->settl_date, new_order->ref, new_order->action,
                                 new_order->ticks, new_order->resd, new_order->exec,
-                                new_order->lots, new_order->min, new_order->flags,
-                                new_order->created, new_order->modified)
+                                new_order->lots, new_order->min, new_order->flags, now)
         || !fig_match_orders(exch->journ, book, new_order, result, exch->pool))
         goto fail3;
 

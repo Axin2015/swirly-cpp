@@ -99,7 +99,7 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& contr,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified)
+             DbrLots min, DbrFlags flags, DbrMillis now)
 {
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
@@ -127,8 +127,8 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     order->lots = lots;
     order->min = min;
     order->flags = flags;
-    order->created = created;
-    order->modified = modified;
+    order->created = now;
+    order->modified = now;
 
     return order;
 }
@@ -136,7 +136,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags, DbrMillis created, DbrMillis modified)
+             DbrLots min, DbrFlags flags, DbrMillis now)
 {
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
@@ -164,8 +164,8 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     order->lots = lots;
     order->min = min;
     order->flags = flags;
-    order->created = created;
-    order->modified = modified;
+    order->created = now;
+    order->modified = now;
 
     return order;
 }
@@ -188,8 +188,7 @@ create_memb(Pool& pool, DbrIden aid, DbrIden tid)
 shared_ptr<DbrTrade>
 create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
              DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, DbrIden cpty, int role,
-             int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
-             DbrMillis created, DbrMillis modified)
+             int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
 {
     auto deleter = [&pool](DbrTrade* trade) {
         pool.free_trade(trade);
@@ -216,8 +215,8 @@ create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev
     trade->resd = resd;
     trade->exec = exec;
     trade->lots = lots;
-    trade->created = created;
-    trade->modified = modified;
+    trade->created = now;
+    trade->modified = now;
 
     return trade;
 }
