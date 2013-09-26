@@ -72,6 +72,11 @@ alloc_id(DbrJourn journ)
 static DbrBool
 begin_trans(DbrJourn journ)
 {
+    struct DbrZmqStore_* store = journ_implof(journ);
+    if (!dbr_queue_empty(&store->queue)) {
+        dbr_err_set(DBR_EIO, "incomplete transaction");
+        return false;
+    }
     return true;
 }
 
@@ -79,9 +84,15 @@ static DbrBool
 commit_trans(DbrJourn journ)
 {
     struct DbrZmqStore_* store = journ_implof(journ);
+    struct DbrMsg msg = { .type = DBR_WRITE_TRANS_REQ,
+                          .write_trans_req = { .count = 0, .first = store->queue.first } };
+    DbrBool ok = dbr_send_msg(store->sock, &msg);
     free_stmts(store->queue.first, store->pool);
     dbr_queue_init(&store->queue);
-    return true;
+    if (!ok)
+        return false;
+    // FIXME: validate return type.
+    return dbr_recv_msg(store->sock, store->pool, &msg);
 }
 
 static DbrBool
