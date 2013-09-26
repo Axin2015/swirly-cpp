@@ -618,6 +618,12 @@ dbr_stmt_init(struct DbrStmt* stmt)
     dbr_slnode_init(&stmt->trans_node_);
 }
 
+static inline struct DbrStmt*
+dbr_trans_stmt_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrStmt, trans_node_, node);
+}
+
 /** @} */
 
 #endif // DBR_TYPES_H

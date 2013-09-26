@@ -27,6 +27,7 @@ struct DbrOrder;
 struct DbrMemb;
 struct DbrTrade;
 struct DbrPosn;
+struct DbrStmt;
 
 /**
  * @addtogroup Proto
@@ -108,6 +109,15 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn);
 
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
+
+DBR_API size_t
+dbr_stmt_len(const struct DbrStmt* stmt);
+
+DBR_API char*
+dbr_write_stmt(char* buf, const struct DbrStmt* stmt);
+
+DBR_API const char*
+dbr_read_stmt(const char* buf, struct DbrStmt* stmt);
 
 /** @} */
 

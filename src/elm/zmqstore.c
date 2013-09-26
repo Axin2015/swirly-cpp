@@ -39,14 +39,14 @@ struct DbrZmqStore_ {
     struct DbrIModel model_;
 };
 
-DBR_API void
+static void
 free_stmts(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
-        struct DbrOrder* order = dbr_model_order_entry(node);
+        struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
         node = node->next;
-        dbr_pool_free_order(pool, order);
+        dbr_pool_free_stmt(pool, stmt);
     }
 }
 

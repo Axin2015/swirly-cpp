@@ -32,6 +32,12 @@ static const char MEMB_FORMAT[] = "ll";
 static const char TRADE_FORMAT[] = "lllilllisliillllll";
 static const char POSN_FORMAT[] = "lllllll";
 
+static const char INSERT_ORDER_FORMAT[] = "liilllisilllllll";
+static const char UPDATE_ORDER_FORMAT[] = "liillll";
+static const char ARCHIVE_ORDER_FORMAT[] = "ll";
+static const char INSERT_TRADE_FORMAT[] = "lllilllisliilllll";
+static const char ARCHIVE_TRADE_FORMAT[] = "ll";
+
 DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec)
 {
@@ -298,4 +304,156 @@ dbr_read_posn(const char* buf, struct DbrPosn* posn)
     return dbr_unpackf(buf, POSN_FORMAT,
                        &posn->accnt.id_only, &posn->contr.id_only, &posn->settl_date,
                        &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
+}
+
+DBR_API size_t
+dbr_stmt_len(const struct DbrStmt* stmt)
+{
+    size_t n = dbr_packleni(stmt->type);
+    switch (stmt->type) {
+    case DBR_INSERT_ORDER:
+        n += dbr_packlenf(INSERT_ORDER_FORMAT,
+                          stmt->insert_order.id, stmt->insert_order.rev,
+                          stmt->insert_order.status, stmt->insert_order.tid,
+                          stmt->insert_order.aid, stmt->insert_order.cid,
+                          stmt->insert_order.settl_date, DBR_REF_MAX,
+                          stmt->insert_order.ref, stmt->insert_order.action,
+                          stmt->insert_order.ticks, stmt->insert_order.resd,
+                          stmt->insert_order.exec, stmt->insert_order.lots,
+                          stmt->insert_order.min, stmt->insert_order.flags,
+                          stmt->insert_order.now);
+        break;
+	case DBR_UPDATE_ORDER:
+        n += dbr_packlenf(UPDATE_ORDER_FORMAT,
+                          stmt->update_order.id, stmt->update_order.rev,
+                          stmt->update_order.status, stmt->update_order.resd,
+                          stmt->update_order.exec, stmt->update_order.lots,
+                          stmt->update_order.now);
+        break;
+	case DBR_ARCHIVE_ORDER:
+        n += dbr_packlenf(ARCHIVE_ORDER_FORMAT,
+                          stmt->archive_order.id, stmt->archive_order.now);
+        break;
+	case DBR_INSERT_TRADE:
+        n += dbr_packlenf(INSERT_TRADE_FORMAT,
+                          stmt->insert_trade.id, stmt->insert_trade.match,
+                          stmt->insert_trade.order, stmt->insert_trade.order_rev,
+                          stmt->insert_trade.tid, stmt->insert_trade.aid,
+                          stmt->insert_trade.cid, stmt->insert_trade.settl_date,
+                          DBR_REF_MAX, stmt->insert_trade.ref,
+                          stmt->insert_trade.cpty, stmt->insert_trade.role,
+                          stmt->insert_trade.action, stmt->insert_trade.ticks,
+                          stmt->insert_trade.resd, stmt->insert_trade.exec,
+                          stmt->insert_trade.lots, stmt->insert_trade.now);
+        break;
+	case DBR_ARCHIVE_TRADE:
+        n += dbr_packlenf(ARCHIVE_TRADE_FORMAT,
+                          stmt->archive_trade.id, stmt->archive_trade.now);
+        break;
+    default:
+        abort();
+    }
+    return 0;
+}
+
+DBR_API char*
+dbr_write_stmt(char* buf, const struct DbrStmt* stmt)
+{
+    buf = dbr_packi(buf, stmt->type);
+    switch (stmt->type) {
+    case DBR_INSERT_ORDER:
+        buf = dbr_packf(buf, INSERT_ORDER_FORMAT,
+                        stmt->insert_order.id, stmt->insert_order.rev,
+                        stmt->insert_order.status, stmt->insert_order.tid,
+                        stmt->insert_order.aid, stmt->insert_order.cid,
+                        stmt->insert_order.settl_date, DBR_REF_MAX,
+                        stmt->insert_order.ref, stmt->insert_order.action,
+                        stmt->insert_order.ticks, stmt->insert_order.resd,
+                        stmt->insert_order.exec, stmt->insert_order.lots,
+                        stmt->insert_order.min, stmt->insert_order.flags,
+                        stmt->insert_order.now);
+        break;
+	case DBR_UPDATE_ORDER:
+        buf = dbr_packf(buf, UPDATE_ORDER_FORMAT,
+                        stmt->update_order.id, stmt->update_order.rev,
+                        stmt->update_order.status, stmt->update_order.resd,
+                        stmt->update_order.exec, stmt->update_order.lots,
+                        stmt->update_order.now);
+        break;
+	case DBR_ARCHIVE_ORDER:
+        buf = dbr_packf(buf, ARCHIVE_ORDER_FORMAT,
+                        stmt->archive_order.id, stmt->archive_order.now);
+        break;
+	case DBR_INSERT_TRADE:
+        buf = dbr_packf(buf, INSERT_TRADE_FORMAT,
+                        stmt->insert_trade.id, stmt->insert_trade.match,
+                        stmt->insert_trade.order, stmt->insert_trade.order_rev,
+                        stmt->insert_trade.tid, stmt->insert_trade.aid,
+                        stmt->insert_trade.cid, stmt->insert_trade.settl_date,
+                        DBR_REF_MAX, stmt->insert_trade.ref,
+                        stmt->insert_trade.cpty, stmt->insert_trade.role,
+                        stmt->insert_trade.action, stmt->insert_trade.ticks,
+                        stmt->insert_trade.resd, stmt->insert_trade.exec,
+                        stmt->insert_trade.lots, stmt->insert_trade.now);
+        break;
+	case DBR_ARCHIVE_TRADE:
+        buf = dbr_packf(buf, ARCHIVE_TRADE_FORMAT,
+                        stmt->archive_trade.id, stmt->archive_trade.now);
+        break;
+    default:
+        abort();
+    }
+    return buf;
+}
+
+DBR_API const char*
+dbr_read_stmt(const char* buf, struct DbrStmt* stmt)
+{
+    dbr_stmt_init(stmt);
+    buf = dbr_unpacki(buf, &stmt->type);
+    switch (stmt->type) {
+    case DBR_INSERT_ORDER:
+        buf = dbr_unpackf(buf, INSERT_ORDER_FORMAT,
+                          &stmt->insert_order.id, &stmt->insert_order.rev,
+                          &stmt->insert_order.status, &stmt->insert_order.tid,
+                          &stmt->insert_order.aid, &stmt->insert_order.cid,
+                          &stmt->insert_order.settl_date, DBR_REF_MAX,
+                          &stmt->insert_order.ref, &stmt->insert_order.action,
+                          &stmt->insert_order.ticks, &stmt->insert_order.resd,
+                          &stmt->insert_order.exec, &stmt->insert_order.lots,
+                          &stmt->insert_order.min, &stmt->insert_order.flags,
+                          &stmt->insert_order.now);
+        break;
+	case DBR_UPDATE_ORDER:
+        buf = dbr_unpackf(buf, UPDATE_ORDER_FORMAT,
+                          &stmt->update_order.id, &stmt->update_order.rev,
+                          &stmt->update_order.status, &stmt->update_order.resd,
+                          &stmt->update_order.exec, &stmt->update_order.lots,
+                          &stmt->update_order.now);
+        break;
+	case DBR_ARCHIVE_ORDER:
+        buf = dbr_unpackf(buf, ARCHIVE_ORDER_FORMAT,
+                          &stmt->archive_order.id, &stmt->archive_order.now);
+        break;
+	case DBR_INSERT_TRADE:
+        buf = dbr_unpackf(buf, INSERT_TRADE_FORMAT,
+                          &stmt->insert_trade.id, &stmt->insert_trade.match,
+                          &stmt->insert_trade.order, &stmt->insert_trade.order_rev,
+                          &stmt->insert_trade.tid, &stmt->insert_trade.aid,
+                          &stmt->insert_trade.cid, &stmt->insert_trade.settl_date,
+                          DBR_REF_MAX, &stmt->insert_trade.ref,
+                          &stmt->insert_trade.cpty, &stmt->insert_trade.role,
+                          &stmt->insert_trade.action, &stmt->insert_trade.ticks,
+                          &stmt->insert_trade.resd, &stmt->insert_trade.exec,
+                          &stmt->insert_trade.lots, &stmt->insert_trade.now);
+        break;
+	case DBR_ARCHIVE_TRADE:
+        buf = dbr_unpackf(buf, ARCHIVE_TRADE_FORMAT,
+                          &stmt->archive_trade.id, &stmt->archive_trade.now);
+        break;
+    default:
+        dbr_err_set(DBR_EIO, "invalid type %d", stmt->type);
+        buf = NULL;
+    }
+    return buf;
 }

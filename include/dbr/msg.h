@@ -29,6 +29,13 @@ struct DbrMsg {
             size_t count;
             struct DbrSlNode* first;
         } read_entity_rep;
+        struct {
+            // Set by dbr_msg_len();
+            size_t count;
+            struct DbrSlNode* first;
+        } write_trans_req;
+        struct {
+        } write_trans_rep;
     };
 };
 

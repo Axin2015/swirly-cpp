@@ -10,6 +10,17 @@
 
 #include <stdlib.h> // abort()
 
+static void
+free_stmts(struct DbrSlNode* first, DbrPool pool)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
+        node = node->next;
+        dbr_pool_free_stmt(pool, stmt);
+    }
+}
+
 static size_t
 dbr_msg_len(struct DbrMsg* msg)
 {
@@ -88,6 +99,17 @@ dbr_msg_len(struct DbrMsg* msg)
             abort();
         }
         break;
+    case DBR_WRITE_TRANS_REQ:
+        msg->write_trans_req.count = 0;
+        for (struct DbrSlNode* node = msg->write_trans_req.first; node; node = node->next) {
+            struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
+            n += dbr_stmt_len(stmt);
+            ++msg->write_trans_req.count;
+        }
+        n += dbr_packlenz(msg->write_trans_req.count);
+        break;
+    case DBR_WRITE_TRANS_REP:
+        break;
     default:
         abort();
     }
@@ -158,6 +180,15 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
             abort();
         }
         break;
+    case DBR_WRITE_TRANS_REQ:
+        buf = dbr_packz(buf, msg->write_trans_req.count);
+        for (struct DbrSlNode* node = msg->write_trans_req.first; node; node = node->next) {
+            struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
+            buf = dbr_write_stmt(buf, stmt);
+        }
+        break;
+    case DBR_WRITE_TRANS_REP:
+        break;
     default:
         abort();
     }
@@ -185,7 +216,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrRec* rec = dbr_pool_alloc_rec(pool);
                 if (!rec) {
                     dbr_pool_free_list(pool, DBR_TRADER, dbr_queue_first(&q));
@@ -204,7 +235,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrRec* rec = dbr_pool_alloc_rec(pool);
                 if (!rec) {
                     dbr_pool_free_list(pool, DBR_ACCNT, dbr_queue_first(&q));
@@ -223,7 +254,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrRec* rec = dbr_pool_alloc_rec(pool);
                 if (!rec) {
                     dbr_pool_free_list(pool, DBR_CONTR, dbr_queue_first(&q));
@@ -242,7 +273,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrOrder* order = dbr_pool_alloc_order(pool);
                 if (!order) {
                     dbr_pool_free_list(pool, DBR_ORDER, dbr_queue_first(&q));
@@ -261,7 +292,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
                 if (!memb) {
                     dbr_pool_free_list(pool, DBR_MEMB, dbr_queue_first(&q));
@@ -280,7 +311,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
                 if (!trade) {
                     dbr_pool_free_list(pool, DBR_TRADE, dbr_queue_first(&q));
@@ -299,7 +330,7 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             if (!(buf = dbr_unpackz(buf, &msg->read_entity_rep.count)))
                 goto fail1;
             dbr_queue_init(&q);
-            for (int i = 0; i < msg->read_entity_rep.count; ++i) {
+            for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
                 struct DbrPosn* posn = dbr_pool_alloc_posn(pool);
                 if (!posn) {
                     dbr_pool_free_list(pool, DBR_POSN, dbr_queue_first(&q));
@@ -318,6 +349,27 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             dbr_err_set(DBR_EIO, "invalid entity-type '%d'", type);
             goto fail1;
         }
+        break;
+    case DBR_WRITE_TRANS_REQ:
+        if (!(buf = dbr_unpackz(buf, &msg->write_trans_req.count)))
+            goto fail1;
+        dbr_queue_init(&q);
+        for (size_t i = 0; i < msg->write_trans_req.count; ++i) {
+            struct DbrStmt* stmt = dbr_pool_alloc_stmt(pool);
+            if (!stmt) {
+                free_stmts(dbr_queue_first(&q), pool);
+                goto fail1;
+            }
+            if (!(buf = dbr_read_stmt(buf, stmt))) {
+                dbr_pool_free_stmt(pool, stmt);
+                free_stmts(dbr_queue_first(&q), pool);
+                goto fail1;
+            }
+            dbr_queue_insert_back(&q, &stmt->trans_node_);
+        }
+        msg->write_trans_req.first = dbr_queue_first(&q);
+        break;
+    case DBR_WRITE_TRANS_REP:
         break;
     default:
         dbr_err_set(DBR_EIO, "invalid msg-type '%d'", type);
