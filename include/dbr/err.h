@@ -29,9 +29,13 @@
 
 enum DbrErrno {
     /**
-     * @brief I/O error.
+     * @brief Interrupted system call.
      */
-    DBR_EIO = 1,
+    DBR_EINTR = 1,
+    /**
+     * @brief Input/output error.
+     */
+    DBR_EIO,
     /**
      * @brief Out of memory.
      */
@@ -44,14 +48,6 @@ enum DbrErrno {
      * @brief Invalid argument.
      */
     DBR_EINVAL,
-    /**
-     * @brief Is null.
-     */
-    DBR_ENULL,
-    /**
-     * @brief Assertion failed.
-     */
-    DBR_EASSRT,
     /**
      * @brief User-defined errors must be >=0x400.
      */

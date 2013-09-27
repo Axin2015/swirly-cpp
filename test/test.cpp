@@ -17,6 +17,8 @@
  */
 #include "test.hpp"
 
+#include <dbrpp/except.hpp>
+
 #include <iostream>
 
 #undef  TEST_CASE
@@ -42,6 +44,10 @@ run(const TestCase& tc)
     cout.flush();
     try {
         tc.fn();
+    } catch (const TestException& e) {
+        cout << " fail" << endl;
+        cerr << e.file() << ':' << e.line() << ": " << e.what() << endl;
+        exit(1);
     } catch (const dbr::DbrException& e) {
         cout << " fail" << endl;
         cerr << e.file() << ':' << e.line() << ": " << e.what() << " (" << e.num() << ')' << endl;

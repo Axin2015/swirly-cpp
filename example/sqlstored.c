@@ -44,6 +44,8 @@ run(void* sock, DbrSqlStore store, DbrPool pool)
     while (!quit) {
         struct DbrMsg msg;
         if (!dbr_recv_msg(sock, pool, &msg)) {
+            if (dbr_err_num() == DBR_EINTR)
+                continue;
             dbr_err_print("dbr_recv_msg() failed");
             goto fail1;
         }

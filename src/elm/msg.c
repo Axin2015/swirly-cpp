@@ -406,7 +406,8 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
         goto fail1;
     }
     if (zmq_msg_recv(&zmsg, sock, 0) < 0) {
-        dbr_err_set(DBR_EIO, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
+        dbr_err_set(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     if (!dbr_read_msg(pool, zmq_msg_data(&zmsg), msg)) {
