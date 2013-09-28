@@ -568,11 +568,17 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
     if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order))
         goto fail4;
 
-    // Commit phase cannot fail.
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(exch->journ))
+        goto fail5;
+
+    // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     apply_trades(exch, book, result, now);
-    dbr_journ_commit_trans(exch->journ);
     return new_order;
+ fail5:
+    if (!dbr_order_done(new_order))
+        dbr_book_remove(book, new_order);
  fail4:
     free_matches(result->first_match, exch->pool);
     memset(result, 0, sizeof(*result));
