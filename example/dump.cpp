@@ -17,6 +17,7 @@
  */
 #include <dbrpp/exch.hpp>
 #include <dbrpp/pool.hpp>
+#include <dbrpp/posn.hpp>
 #include <dbrpp/sqlstore.hpp>
 
 using namespace dbr;

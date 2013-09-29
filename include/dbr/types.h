@@ -413,6 +413,7 @@ struct DbrOrder {
     // Doubly-linked for side.
     struct DbrDlNode side_node_;
     struct DbrRbNode trader_node_;
+    struct DbrSlNode result_node_;
 };
 
 static inline void
@@ -422,6 +423,7 @@ dbr_order_init(struct DbrOrder* order)
     dbr_slnode_init(&order->ref_node_);
     dbr_dlnode_init(&order->side_node_);
     dbr_rbnode_init(&order->trader_node_);
+    dbr_slnode_init(&order->result_node_);
 }
 
 static inline DbrBool
@@ -470,6 +472,7 @@ struct DbrTrade {
     // Singly-linked for data model.
     struct DbrSlNode model_node_;
     struct DbrRbNode accnt_node_;
+    struct DbrSlNode result_node_;
 };
 
 static inline void
@@ -477,6 +480,7 @@ dbr_trade_init(struct DbrTrade* trade)
 {
     dbr_slnode_init(&trade->model_node_);
     dbr_rbnode_init(&trade->accnt_node_);
+    dbr_slnode_init(&trade->result_node_);
 }
 
 struct DbrMatch {
@@ -498,16 +502,16 @@ struct DbrMatch {
     /**
      * Pointer to next match or null.
      */
-    struct DbrSlNode result_node_;
+    struct DbrSlNode trans_node_;
 };
 
 static inline void
 dbr_match_init(struct DbrMatch* match)
 {
-    dbr_slnode_init(&match->result_node_);
+    dbr_slnode_init(&match->trans_node_);
 }
 
-struct DbrResult {
+struct DbrTrans {
     struct DbrOrder* new_order;
     // Null if no matches.
     struct DbrPosn* new_posn;
@@ -524,9 +528,29 @@ struct DbrResult {
 };
 
 static inline struct DbrMatch*
-dbr_result_match_entry(struct DbrSlNode* node)
+dbr_trans_match_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrMatch, result_node_, node);
+    return dbr_implof(struct DbrMatch, trans_node_, node);
+}
+
+struct DbrResult {
+    struct DbrOrder* new_order;
+    // Own maker orders matched.
+    struct DbrSlNode* first_order;
+    // Trades on own orders.
+    struct DbrSlNode* first_trade;
+};
+
+static inline struct DbrOrder*
+dbr_result_order_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrOrder, result_node_, node);
+}
+
+static inline struct DbrTrade*
+dbr_result_trade_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrTrade, result_node_, node);
 }
 
 /** @} */

@@ -19,25 +19,26 @@
 #define DBRPP_RESULT_HPP
 
 #include <dbrpp/iter.hpp>
+#include <dbrpp/order.hpp>
 #include <dbrpp/slnode.hpp>
-#include <dbrpp/match.hpp>
+#include <dbrpp/trade.hpp>
 
-#include <dbr/exch.h>
+#include <limits>
 
 namespace dbr {
 
-class ResultMatches {
+class ResultOrders {
     struct Policy : NodeTraits<DbrSlNode> {
-        typedef DbrMatch Entry;
+        typedef DbrOrder Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_result_match_entry(node);
+            return dbr_result_order_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_result_match_entry(const_cast<Node*>(node));
+            return dbr_result_order_entry(const_cast<Node*>(node));
         }
     };
     DbrResult result_;
@@ -70,12 +71,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ResultMatches(DbrResult result) noexcept
+    ResultOrders(DbrResult result) noexcept
     : result_(result)
     {
     }
     void
-    swap(ResultMatches& rhs) noexcept
+    swap(ResultOrders& rhs) noexcept
     {
         std::swap(result_, rhs.result_);
     }
@@ -85,12 +86,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_.first_match;
+        return result_.first_order;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_.first_match;
+        return result_.first_order;
     }
     Iterator
     end() noexcept
@@ -118,7 +119,7 @@ public:
     SizeType
     size() const noexcept
     {
-        return result_.taken;
+        return std::distance(begin(), end());
     }
     SizeType
     max_size() const noexcept
@@ -128,24 +129,119 @@ public:
     bool
     empty() const noexcept
     {
-        return size() == 0;
+        return result_.first_order == nullptr;
+    }
+};
+
+class ResultTrades {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrOrder Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_result_order_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_result_order_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrResult result_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ResultTrades(DbrResult result) noexcept
+    : result_(result)
+    {
+    }
+    void
+    swap(ResultTrades& rhs) noexcept
+    {
+        std::swap(result_, rhs.result_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return result_.first_order;
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return result_.first_order;
+    }
+    Iterator
+    end() noexcept
+    {
+        return nullptr;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return nullptr;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return result_.first_order == nullptr;
     }
 };
 
 class Result {
-    DbrExch exch_;
     DbrResult impl_;
 public:
-    ~Result() noexcept
-    {
-        reset();
-    }
-    explicit
-    Result(DbrExch exch) noexcept
-    : exch_(exch)
-    {
-        impl_.first_match = nullptr;
-    }
     operator DbrResult&() noexcept
     {
         return impl_;
@@ -155,46 +251,20 @@ public:
     {
         return &impl_;
     }
-
-    // Copy semantics.
-
-    Result(const Result&) = delete;
-
-    Result&
-    operator =(const Result&) = delete;
-
-    void
-    reset() noexcept
-    {
-        if (impl_.first_match) {
-            dbr_exch_free_matches(exch_, impl_.first_match);
-            impl_.first_match = nullptr;
-        }
-    }
     OrderRef
     new_order() const noexcept
     {
         return OrderRef(*impl_.new_order);
     }
-    PosnRef
-    new_posn() const noexcept
+    ResultOrders
+    orders() const noexcept
     {
-        return PosnRef(*impl_.new_posn);
+        return ResultOrders(impl_);
     }
-    ResultMatches
-    matches() const noexcept
+    ResultTrades
+    trades() const noexcept
     {
-        return ResultMatches(impl_);
-    }
-    size_t
-    count() const noexcept
-    {
-        return impl_.count;
-    }
-    DbrLots
-    taken() const noexcept
-    {
-        return impl_.taken;
+        return ResultTrades(impl_);
     }
 };
 

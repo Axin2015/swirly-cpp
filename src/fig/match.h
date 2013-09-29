@@ -27,7 +27,7 @@
 // Match taker with list of maker orders.
 
 DBR_EXTERN DbrBool
-fig_match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
-                 struct DbrResult* result, DbrPool pool);
+fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, DbrJourn journ, DbrPool pool,
+                 struct DbrTrans* trans);
 
 #endif // FIG_MATCH_H

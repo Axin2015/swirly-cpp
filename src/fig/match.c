@@ -41,7 +41,7 @@ free_matches(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
-        struct DbrMatch* match = dbr_result_match_entry(node);
+        struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
         dbr_pool_free_trade(pool, match->taker_trade);
@@ -81,8 +81,8 @@ lazy_posn(struct DbrOrder* order, DbrPool pool)
 }
 
 static DbrBool
-match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
-             const struct DbrSide* side, int direct, struct DbrResult* result, DbrPool pool)
+match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
+             DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
 {
     struct DbrQueue mq;
     dbr_queue_init(&mq);
@@ -190,7 +190,7 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
         match->taker_trade = taker_trade;
         match->maker_trade = maker_trade;
 
-        dbr_queue_insert_back(&mq, &match->result_node_);
+        dbr_queue_insert_back(&mq, &match->trans_node_);
     }
 
     struct DbrPosn* posn;
@@ -201,12 +201,12 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
     } else
         posn = NULL;
 
-    // Commit to result.
-    result->new_order = taker;
-    result->new_posn = posn;
-    result->first_match = mq.first;
-    result->count = count;
-    result->taken = taken;
+    // Commit to trans.
+    trans->new_order = taker;
+    trans->new_posn = posn;
+    trans->first_match = mq.first;
+    trans->count = count;
+    trans->taken = taken;
 
     return true;
  fail1:
@@ -215,8 +215,8 @@ match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
 }
 
 DBR_EXTERN DbrBool
-fig_match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
-                 struct DbrResult* result,  DbrPool pool)
+fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, DbrJourn journ, DbrPool pool,
+                 struct DbrTrans* trans)
 {
     struct DbrSide* side;
     int direct;
@@ -232,5 +232,5 @@ fig_match_orders(DbrJourn journ, struct DbrBook* book, struct DbrOrder* taker,
         direct = DBR_GIVEN;
     }
 
-    return match_orders(journ, book, taker, side, direct, result, pool);
+    return match_orders(book, taker, side, direct, journ, pool, trans);
 }

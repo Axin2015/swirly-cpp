@@ -21,9 +21,10 @@
 #include <dbrpp/accnt.hpp>
 #include <dbrpp/except.hpp>
 #include <dbrpp/book.hpp>
-#include <dbrpp/order.hpp>
 #include <dbrpp/trader.hpp>
 #include <dbrpp/result.hpp>
+
+#include <dbr/exch.h>
 
 namespace dbr {
 
@@ -262,7 +263,6 @@ public:
     place(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Result& result)
     {
-        result.reset();
         DbrOrder* const order = dbr_exch_place(impl_, &trec, &arec, &book, ref, action, ticks,
                                                lots, min, flags, result.c_arg());
         if (!order)

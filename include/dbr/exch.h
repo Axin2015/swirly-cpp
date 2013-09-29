@@ -153,9 +153,6 @@ dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id);
 DBR_API DbrBool
 dbr_exch_archive_trade(DbrExch exch, DbrAccnt accnt, DbrIden id);
 
-DBR_API void
-dbr_exch_free_matches(DbrExch exch, struct DbrSlNode* first);
-
 /** @} */
 
 #endif // DBR_EXCH_H

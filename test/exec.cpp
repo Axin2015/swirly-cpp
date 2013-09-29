@@ -58,7 +58,7 @@ TEST_CASE(exec_place)
 
     auto book = exch.book(ContrRecRef(*cit), 20130824);
 
-    Result result(exch);
+    Result result;
     exch.place(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
                DBR_BUY, 12345, 1, 0, 0, result);
 }

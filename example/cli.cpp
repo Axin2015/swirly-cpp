@@ -1,6 +1,7 @@
 #include <dbrpp/exch.hpp>
 #include <dbrpp/lexer.hpp>
 #include <dbrpp/pool.hpp>
+#include <dbrpp/posn.hpp>
 #include <dbrpp/sqlstore.hpp>
 
 #include <dbr/util.h>
@@ -603,7 +604,7 @@ public:
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        Result result(exch_);
+        Result result;
         exch_.place(*trec_, *arec_, book, nullptr, action, ticks, lots, 0, 0, result);
     }
     void
