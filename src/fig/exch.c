@@ -757,13 +757,18 @@ dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id)
         goto fail1;
     }
 
+    struct DbrOrder* order = dbr_trader_order_entry(node);
+    if (!dbr_order_done(order)) {
+        dbr_err_set(DBR_EINVAL, "order '%ld' not done", id);
+        goto fail1;
+    }
+
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_archive_order(exch->journ, node->key, now))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
 
-    struct DbrOrder* order = dbr_trader_order_entry(node);
     fig_trader_release_order(trader, order);
     dbr_pool_free_order(exch->pool, order);
     return true;

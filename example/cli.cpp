@@ -36,7 +36,7 @@ typedef vector<string>::const_iterator Arg;
 typedef invalid_argument InvalidArgument;
 
 const char*
-action(int action) noexcept
+straction(int action) noexcept
 {
     const char* sym;
     switch (action) {
@@ -53,7 +53,7 @@ action(int action) noexcept
 }
 
 const char*
-role(int role) noexcept
+strrole(int role) noexcept
 {
     const char* sym;
     switch (role) {
@@ -70,7 +70,7 @@ role(int role) noexcept
 }
 
 const char*
-status(int status) noexcept
+strstatus(int status) noexcept
 {
     const char* sym;
     switch (status) {
@@ -573,12 +573,12 @@ public:
             OrderRef ref(order);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << ref.rev()
-                 << '|' << left << setw(10) << status(ref.status())
+                 << '|' << left << setw(10) << strstatus(ref.status())
                  << '|' << left << setw(10) << ref.trec().mnem()
                  << '|' << left << setw(10) << ref.arec().mnem()
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << left << setw(10) << action(ref.action())
+                 << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
                  << '|' << right << setw(10) << ref.resd()
                  << '|' << right << setw(10) << ref.exec()
@@ -606,6 +606,61 @@ public:
 
         Result result;
         exch_.place(*trec_, *arec_, book, nullptr, action, ticks, lots, 0, 0, result);
+
+        if (result.trades().empty())
+            return;
+
+        cout <<
+            "|id        "
+            "|order     "
+            "|trec      "
+            "|arec      "
+            "|crec      "
+            "|settl_date"
+            "|ref       "
+            "|cpty      "
+            "|role      "
+            "|action    "
+            "|ticks     "
+            "|resd      "
+            "|exec      "
+            "|lots      "
+            "|" << endl;
+        cout <<
+            "|----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "|"
+             << endl;
+        for (auto trade : result.trades()) {
+            TradeRef ref(trade);
+            cout << '|' << right << setw(10) << gtol(ref.id())
+                 << '|' << right << setw(10) << gtol(ref.order())
+                 << '|' << left << setw(10) << ref.trec().mnem()
+                 << '|' << left << setw(10) << ref.arec().mnem()
+                 << '|' << left << setw(10) << ref.crec().mnem()
+                 << '|' << left << setw(10) << ref.settl_date()
+                 << '|' << left << setw(10) << ref.ref()
+                 << '|' << left << setw(10) << ref.cpty().mnem()
+                 << '|' << left << setw(10) << strrole(ref.role())
+                 << '|' << left << setw(10) << straction(ref.action())
+                 << '|' << right << setw(10) << ref.ticks()
+                 << '|' << right << setw(10) << ref.resd()
+                 << '|' << right << setw(10) << ref.exec()
+                 << '|' << right << setw(10) << ref.lots()
+                 << '|' << endl;
+        }
     }
     void
     posns(Arg begin, Arg end)
@@ -755,8 +810,8 @@ public:
                  << '|' << left << setw(10) << ref.settl_date()
                  << '|' << left << setw(10) << ref.ref()
                  << '|' << left << setw(10) << ref.cpty().mnem()
-                 << '|' << left << setw(10) << role(ref.role())
-                 << '|' << left << setw(10) << action(ref.action())
+                 << '|' << left << setw(10) << strrole(ref.role())
+                 << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
                  << '|' << right << setw(10) << ref.resd()
                  << '|' << right << setw(10) << ref.exec()
