@@ -95,17 +95,4 @@ dbr_trader_unsub(DbrTrader trader, struct DbrBook* book);
 
 /** @} */
 
-/**
- * @addtogroup TraderSess
- * @{
- */
-
-DBR_API void
-dbr_trader_set_sess(DbrTrader trader, DbrTraderSess sess);
-
-DBR_API DbrTraderSess
-dbr_trader_sess(DbrTrader trader);
-
-/** @} */
-
 #endif // DBR_TRADER_H

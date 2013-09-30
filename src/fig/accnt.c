@@ -19,23 +19,9 @@
 
 #include <dbr/err.h>
 #include <dbr/log.h>
-#include <dbr/sess.h>
 
 #include <assert.h>
 #include <stdlib.h>
-
-static void
-trade(DbrAccntSess sess, struct DbrOrder* order, struct DbrTrade* trade, struct DbrPosn* posn)
-{
-}
-
-static const struct DbrAccntSessVtbl SESS_VTBL = {
-    .trade = trade
-};
-
-static struct DbrIAccntSess sess_noop = {
-    .vtbl = &SESS_VTBL
-};
 
 static void
 free_membs(struct FigAccnt* accnt)
@@ -90,7 +76,6 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
         dbr_tree_init(&accnt->membs);
         dbr_tree_init(&accnt->trades);
         dbr_tree_init(&accnt->posns);
-        accnt->sess = &sess_noop;
 
         arec->accnt.state = accnt;
     }
@@ -151,12 +136,6 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
     } else
         posn = dbr_accnt_posn_entry(node);
     return posn;
-}
-
-DBR_EXTERN void
-fig_accnt_set_sess(struct FigAccnt* accnt, DbrAccntSess sess)
-{
-    accnt->sess = sess ? sess : &sess_noop;
 }
 
 DBR_API DbrIden
@@ -227,16 +206,4 @@ DBR_API DbrBool
 dbr_accnt_empty_posn(DbrAccnt accnt)
 {
     return fig_accnt_empty_posn(accnt);
-}
-
-DBR_API void
-dbr_accnt_set_sess(DbrAccnt accnt, DbrAccntSess sess)
-{
-    fig_accnt_set_sess(accnt, sess);
-}
-
-DBR_API DbrAccntSess
-dbr_accnt_sess(DbrAccnt accnt)
-{
-    return fig_accnt_sess(accnt);
 }

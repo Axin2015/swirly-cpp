@@ -19,17 +19,9 @@
 
 #include <dbr/book.h>
 #include <dbr/err.h>
-#include <dbr/sess.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
-
-static const struct DbrTraderSessVtbl SESS_VTBL = {
-};
-
-static struct DbrITraderSess sess_noop = {
-    .vtbl = &SESS_VTBL
-};
 
 static void
 free_orders(struct FigTrader* trader)
@@ -73,7 +65,6 @@ fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
         trader->index = index;
         dbr_tree_init(&trader->orders);
         dbr_tree_init(&trader->subs);
-        trader->sess = &sess_noop;
 
         trec->trader.state = trader;
     }
@@ -133,12 +124,6 @@ fig_trader_unsub(struct FigTrader* trader, struct DbrBook* book)
     }
 }
 
-DBR_EXTERN void
-fig_trader_set_sess(struct FigTrader* trader, DbrTraderSess sess)
-{
-    trader->sess = sess ? sess : &sess_noop;
-}
-
 DBR_API DbrIden
 dbr_trader_id(DbrTrader trader)
 {
@@ -195,18 +180,4 @@ DBR_API void
 dbr_trader_unsub(DbrTrader trader, struct DbrBook* book)
 {
     return fig_trader_unsub(trader, book);
-}
-
-// TraderSess
-
-DBR_API void
-dbr_trader_set_sess(DbrTrader trader, DbrTraderSess sess)
-{
-    fig_trader_set_sess(trader, sess);
-}
-
-DBR_API DbrTraderSess
-dbr_trader_sess(DbrTrader trader)
-{
-    return fig_trader_sess(trader);
 }

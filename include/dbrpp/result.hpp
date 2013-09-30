@@ -251,11 +251,6 @@ public:
     {
         return &impl_;
     }
-    OrderRef
-    new_order() const noexcept
-    {
-        return OrderRef(*impl_.new_order);
-    }
     ResultOrders
     orders() const noexcept
     {

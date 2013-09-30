@@ -166,11 +166,6 @@
  */
 
 /**
- * @defgroup TraderSess Session
- * @ingroup Trader
- */
-
-/**
  * @defgroup Accnt Account
  * @ingroup Fig
  */
@@ -187,11 +182,6 @@
 
 /**
  * @defgroup AccntPosn Position
- * @ingroup Accnt
- */
-
-/**
- * @defgroup AccntSess Session
  * @ingroup Accnt
  */
 

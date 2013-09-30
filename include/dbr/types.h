@@ -269,17 +269,6 @@ dbr_sub_init(struct DbrSub* sub)
 /** @} */
 
 /**
- * @addtogroup TraderSess
- * @{
- */
-
-typedef struct DbrITraderSess {
-    const struct DbrTraderSessVtbl* vtbl;
-}* DbrTraderSess;
-
-/** @} */
-
-/**
  * @addtogroup AccntMemb
  * @{
  */
@@ -337,17 +326,6 @@ dbr_posn_init(struct DbrPosn* posn)
     dbr_slnode_init(&posn->model_node_);
     dbr_rbnode_init(&posn->accnt_node_);
 }
-
-/** @} */
-
-/**
- * @addtogroup AccntSess
- * @{
- */
-
-typedef struct DbrIAccntSess {
-    const struct DbrAccntSessVtbl* vtbl;
-}* DbrAccntSess;
 
 /** @} */
 
@@ -534,10 +512,10 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 }
 
 struct DbrResult {
-    struct DbrOrder* new_order;
-    // Own maker orders matched.
+    // First order is the new order. Secondary orders are trader's other orders that were matched
+    // against the new order.
     struct DbrSlNode* first_order;
-    // Trades on own orders.
+    // Trades on trader's own orders.
     struct DbrSlNode* first_trade;
 };
 

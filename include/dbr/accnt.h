@@ -102,17 +102,4 @@ dbr_accnt_empty_posn(DbrAccnt accnt);
 
 /** @} */
 
-/**
- * @addtogroup AccntSess
- * @{
- */
-
-DBR_API void
-dbr_accnt_set_sess(DbrAccnt accnt, DbrAccntSess sess);
-
-DBR_API DbrAccntSess
-dbr_accnt_sess(DbrAccnt accnt);
-
-/** @} */
-
 #endif // DBR_ACCNT_H

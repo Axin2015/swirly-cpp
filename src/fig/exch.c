@@ -26,7 +26,6 @@
 #include <dbr/err.h>
 #include <dbr/journ.h>
 #include <dbr/queue.h>
-#include <dbr/sess.h>
 #include <dbr/util.h>
 
 #include <stdbool.h>
@@ -187,6 +186,8 @@ commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, 
     struct FigAccnt* taker_accnt = fig_accnt_lazy(taker_order->accnt.rec, exch->pool);
     assert(taker_accnt);
 
+    dbr_queue_insert_back(&oq, &taker_order->result_node_);
+
     struct DbrSlNode* node = trans->first_match;
     while (node) {
 
@@ -208,10 +209,6 @@ commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, 
         fig_accnt_emplace_trade(maker_accnt, match->maker_trade);
         apply_posn(match->maker_posn, match->maker_trade);
 
-        // Async trader callback.
-        dbr_accnt_sess_trade(fig_accnt_sess(maker_accnt), maker_order, match->maker_trade,
-                             match->maker_posn);
-
         // Copy elements to result.
 
         // Maker order.
@@ -230,7 +227,6 @@ commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, 
         dbr_pool_free_match(exch->pool, match);
     }
 
-    result->new_order = taker_order;
     result->first_order = oq.first;
     result->first_trade = tq.first;
 }

@@ -29,8 +29,6 @@ struct FigAccnt {
     struct DbrTree membs;
     struct DbrTree trades;
     struct DbrTree posns;
-    // Useful for drop-copy sessions.
-    DbrAccntSess sess;
 };
 
 DBR_EXTERN struct FigAccnt*
@@ -158,17 +156,6 @@ static inline DbrBool
 fig_accnt_empty_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_empty(&accnt->posns);
-}
-
-// Sess.
-
-DBR_EXTERN void
-fig_accnt_set_sess(struct FigAccnt* accnt, DbrAccntSess sess);
-
-static inline DbrAccntSess
-fig_accnt_sess(const struct FigAccnt* accnt)
-{
-    return accnt->sess;
 }
 
 #endif // FIG_ACCNT_H

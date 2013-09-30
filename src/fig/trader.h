@@ -32,7 +32,6 @@ struct FigTrader {
     DbrPool pool;
     struct DbrTree orders;
     struct DbrTree subs;
-    DbrTraderSess sess;
 };
 
 DBR_EXTERN struct FigTrader*
@@ -145,14 +144,5 @@ fig_trader_sub(struct FigTrader* trader, struct DbrBook* book);
 
 DBR_EXTERN void
 fig_trader_unsub(struct FigTrader* trader, struct DbrBook* book);
-
-DBR_EXTERN void
-fig_trader_set_sess(struct FigTrader* trader, DbrTraderSess sess);
-
-static inline DbrTraderSess
-fig_trader_sess(struct FigTrader* trader)
-{
-    return trader->sess;
-}
 
 #endif // FIG_TRADER_H
