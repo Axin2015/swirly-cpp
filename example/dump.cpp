@@ -41,16 +41,16 @@ main(int argc, char* argv[])
             Trader trader = exch.trader(ref);
             for (auto ref : trader.orders())
                 cout << OrderRef(ref) << endl;
+            cout << ref.mnem() << " trades:" << endl;
+            for (auto ref : trader.trades())
+                cout << TradeRef(ref) << endl;
         }
 
         cout << "accnts:\n";
         for (auto rec : exch.arecs()) {
             AccntRecRef ref(rec);
             cout << ref << endl;
-            cout << ref.mnem() << " trades:" << endl;
             Accnt accnt = exch.accnt(ref);
-            for (auto ref : accnt.trades())
-                cout << TradeRef(ref) << endl;
             cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
                 cout << PosnRef(ref) << endl;

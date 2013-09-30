@@ -374,12 +374,12 @@ public:
     void
     archive_trades(Arg begin, Arg end)
     {
-        if (!arec_)
-            throw InvalidState("accnt");
-        Accnt accnt = exch_.accnt(*arec_);
+        if (!trec_)
+            throw InvalidState("trader");
+        Trader trader = exch_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            exch_.archive_trade(accnt, id);
+            exch_.archive_trade(trader, id);
         }
     }
     void
@@ -764,9 +764,9 @@ public:
     void
     trades(Arg begin, Arg end)
     {
-        if (!arec_)
-            throw InvalidState("accnt");
-        Accnt accnt = exch_.accnt(*arec_);
+        if (!trec_)
+            throw InvalidState("trader");
+        Trader trader = exch_.trader(*trec_);
         cout <<
             "|id        "
             "|order     "
@@ -800,7 +800,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto trade : accnt.trades()) {
+        for (auto trade : trader.trades()) {
             TradeRef ref(trade);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << gtol(ref.order())

@@ -28,7 +28,6 @@ dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, Dbr
     book->settl_date = settl_date;
     dbr_side_init(&book->bid_side, pool);
     dbr_side_init(&book->ask_side, pool);
-    dbr_list_init(&book->subs);
     dbr_rbnode_init(&book->exch_node_);
 }
 
@@ -37,7 +36,6 @@ dbr_book_term(struct DbrBook* book)
 {
     dbr_side_term(&book->bid_side);
     dbr_side_term(&book->ask_side);
-    assert(dbr_list_empty(&book->subs));
 }
 
 DBR_API struct DbrBest*

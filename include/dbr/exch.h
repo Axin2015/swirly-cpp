@@ -151,7 +151,7 @@ dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id);
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_exch_archive_trade(DbrExch exch, DbrAccnt accnt, DbrIden id);
+dbr_exch_archive_trade(DbrExch exch, DbrTrader trader, DbrIden id);
 
 /** @} */
 

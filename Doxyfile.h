@@ -156,17 +156,17 @@
  */
 
 /**
+ * @defgroup TraderTrade Trade
+ * @ingroup Trader
+ */
+
+/**
  * @defgroup Accnt Account
  * @ingroup Fig
  */
 
 /**
  * @defgroup AccntMemb Member
- * @ingroup Accnt
- */
-
-/**
- * @defgroup AccntTrade Trade
  * @ingroup Accnt
  */
 

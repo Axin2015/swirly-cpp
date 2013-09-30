@@ -31,7 +31,7 @@ struct FigTrader {
     struct FigIndex* index;
     DbrPool pool;
     struct DbrTree orders;
-    struct DbrTree subs;
+    struct DbrTree trades;
 };
 
 DBR_EXTERN struct FigTrader*
@@ -135,6 +135,68 @@ static inline DbrBool
 fig_trader_empty_order(const struct FigTrader* trader)
 {
     return dbr_tree_empty(&trader->orders);
+}
+
+// Trade.
+
+// Transfer ownership to state.
+
+static inline void
+fig_trader_emplace_trade(struct FigTrader* trader, struct DbrTrade* trade)
+{
+    dbr_tree_insert(&trader->trades, trade->id, &trade->trader_node_);
+}
+
+// Release ownership from state.
+
+static inline void
+fig_trader_release_trade(struct FigTrader* trader, struct DbrTrade* trade)
+{
+    dbr_tree_remove(&trader->trades, &trade->trader_node_);
+    dbr_rbnode_init(&trade->trader_node_);
+}
+
+// Release ownership from state.
+
+static inline struct DbrTrade*
+fig_trader_release_trade_id(struct FigTrader* trader, DbrIden id)
+{
+    struct DbrRbNode* node = dbr_tree_find(&trader->trades, id);
+    if (!node)
+        return NULL;
+    struct DbrTrade* trade = dbr_trader_trade_entry(node);
+    fig_trader_release_trade(trader, trade);
+    return trade;
+}
+
+static inline struct DbrRbNode*
+fig_trader_find_trade_id(const struct FigTrader* trader, DbrIden id)
+{
+    return dbr_tree_find(&trader->trades, id);
+}
+
+static inline struct DbrRbNode*
+fig_trader_first_trade(const struct FigTrader* trader)
+{
+    return dbr_tree_first(&trader->trades);
+}
+
+static inline struct DbrRbNode*
+fig_trader_last_trade(const struct FigTrader* trader)
+{
+    return dbr_tree_last(&trader->trades);
+}
+
+static inline struct DbrRbNode*
+fig_trader_end_trade(const struct FigTrader* trader)
+{
+    return dbr_tree_end(&trader->trades);
+}
+
+static inline DbrBool
+fig_trader_empty_trade(const struct FigTrader* trader)
+{
+    return dbr_tree_empty(&trader->trades);
 }
 
 #endif // FIG_TRADER_H

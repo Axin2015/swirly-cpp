@@ -308,9 +308,9 @@ public:
             throw_exception();
     }
     void
-    archive_trade(DbrAccnt accnt, DbrIden id)
+    archive_trade(DbrTrader trader, DbrIden id)
     {
-        if (!dbr_exch_archive_trade(impl_, accnt, id))
+        if (!dbr_exch_archive_trade(impl_, trader, id))
             throw_exception();
     }
 };

@@ -172,18 +172,13 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, DbrMillis now,
-              struct DbrResult* result)
+commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
+              const struct DbrTrans* trans, DbrMillis now, struct DbrResult* result)
 {
     struct DbrQueue tq;
     dbr_queue_init(&tq);
 
     struct DbrOrder* new_order = trans->new_order;
-
-    // Must succeed because new_posn exists.
-    struct FigAccnt* taker_accnt = fig_accnt_lazy(new_order->accnt.rec, exch->pool);
-    assert(taker_accnt);
-
     struct DbrSlNode* node = trans->first_match;
     while (node) {
 
@@ -193,19 +188,20 @@ commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, 
         // Reduce maker. Maker's revision will be incremented by this call.
         dbr_book_take(book, maker_order, match->lots, now);
 
-        // Must succeed because maker_posn exists.
-        struct FigAccnt* maker_accnt = fig_accnt_lazy(maker_order->accnt.rec, exch->pool);
-        assert(maker_accnt);
+        // Must succeed because maker order exists.
+        struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &exch->index,
+                                                  exch->pool);
+        assert(maker);
 
         // TODO: taker or maker trade first?
 
         // Update taker.
-        fig_accnt_emplace_trade(taker_accnt, match->taker_trade);
+        fig_trader_emplace_trade(taker, match->taker_trade);
         apply_posn(trans->new_posn, match->taker_trade);
         dbr_queue_insert_back(&tq, &match->taker_trade->result_node_);
 
         // Update maker.
-        fig_accnt_emplace_trade(maker_accnt, match->maker_trade);
+        fig_trader_emplace_trade(maker, match->maker_trade);
         apply_posn(match->maker_posn, match->maker_trade);
         dbr_queue_insert_back(&tq, &match->maker_trade->result_node_);
 
@@ -361,12 +357,12 @@ emplace_trades(DbrExch exch)
         trade->contr.rec = get_id(exch, DBR_CONTR, trade->contr.id_only);
         trade->cpty.rec = get_id(exch, DBR_ACCNT, trade->cpty.id_only);
 
-        struct FigAccnt* accnt = fig_accnt_lazy(trade->accnt.rec, exch->pool);
-        if (dbr_unlikely(!accnt))
+        struct FigTrader* trader = fig_trader_lazy(trade->trader.rec, &exch->index, exch->pool);
+        if (dbr_unlikely(!trader))
             goto fail2;
 
         // Transfer ownership.
-        fig_accnt_emplace_trade(accnt, trade);
+        fig_trader_emplace_trade(trader, trade);
     }
     return true;
  fail2:
@@ -515,8 +511,8 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
         goto fail1;
     }
 
-    struct FigTrader* trader = fig_trader_lazy(trec, &exch->index, exch->pool);
-    if (!trader)
+    struct FigTrader* taker = fig_trader_lazy(trec, &exch->index, exch->pool);
+    if (!taker)
         goto fail1;
 
     const DbrIden id = dbr_journ_alloc_id(exch->journ);
@@ -586,9 +582,9 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
         goto fail5;
 
     // Final commit phase cannot fail.
-    fig_trader_emplace_order(trader, new_order);
+    fig_trader_emplace_order(taker, new_order);
     // Commit trans to result and free matches.
-    commit_result(exch, book, &trans, now, result);
+    commit_result(exch, taker, book, &trans, now, result);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))
@@ -777,9 +773,9 @@ dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id)
 }
 
 DBR_API DbrBool
-dbr_exch_archive_trade(DbrExch exch, DbrAccnt accnt, DbrIden id)
+dbr_exch_archive_trade(DbrExch exch, DbrTrader trader, DbrIden id)
 {
-    struct DbrRbNode* node = fig_accnt_find_trade_id(accnt, id);
+    struct DbrRbNode* node = fig_trader_find_trade_id(trader, id);
     if (!node) {
         dbr_err_set(DBR_EINVAL, "no such trade '%ld'", id);
         goto fail1;
@@ -791,8 +787,8 @@ dbr_exch_archive_trade(DbrExch exch, DbrAccnt accnt, DbrIden id)
 
     // No need to update timestamps on trade because it is immediately freed.
 
-    struct DbrTrade* trade = dbr_accnt_trade_entry(node);
-    fig_accnt_release_trade(accnt, trade);
+    struct DbrTrade* trade = dbr_trader_trade_entry(node);
+    fig_trader_release_trade(trader, trade);
     dbr_pool_free_trade(exch->pool, trade);
     return true;
  fail1:

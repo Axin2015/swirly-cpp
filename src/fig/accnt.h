@@ -27,7 +27,6 @@ struct FigAccnt {
     DbrIden id;
     DbrPool pool;
     struct DbrTree membs;
-    struct DbrTree trades;
     struct DbrTree posns;
 };
 
@@ -51,68 +50,6 @@ static inline void
 fig_accnt_emplace_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
 {
     dbr_tree_insert(&accnt->membs, memb->trader.rec->id, &memb->accnt_node_);
-}
-
-// Trade.
-
-// Transfer ownership to state.
-
-static inline void
-fig_accnt_emplace_trade(struct FigAccnt* accnt, struct DbrTrade* trade)
-{
-    dbr_tree_insert(&accnt->trades, trade->id, &trade->accnt_node_);
-}
-
-// Release ownership from state.
-
-static inline void
-fig_accnt_release_trade(struct FigAccnt* accnt, struct DbrTrade* trade)
-{
-    dbr_tree_remove(&accnt->trades, &trade->accnt_node_);
-    dbr_rbnode_init(&trade->accnt_node_);
-}
-
-// Release ownership from state.
-
-static inline struct DbrTrade*
-fig_accnt_release_trade_id(struct FigAccnt* accnt, DbrIden id)
-{
-    struct DbrRbNode* node = dbr_tree_find(&accnt->trades, id);
-    if (!node)
-        return NULL;
-    struct DbrTrade* trade = dbr_accnt_trade_entry(node);
-    fig_accnt_release_trade(accnt, trade);
-    return trade;
-}
-
-static inline struct DbrRbNode*
-fig_accnt_find_trade_id(const struct FigAccnt* accnt, DbrIden id)
-{
-    return dbr_tree_find(&accnt->trades, id);
-}
-
-static inline struct DbrRbNode*
-fig_accnt_first_trade(const struct FigAccnt* accnt)
-{
-    return dbr_tree_first(&accnt->trades);
-}
-
-static inline struct DbrRbNode*
-fig_accnt_last_trade(const struct FigAccnt* accnt)
-{
-    return dbr_tree_last(&accnt->trades);
-}
-
-static inline struct DbrRbNode*
-fig_accnt_end_trade(const struct FigAccnt* accnt)
-{
-    return dbr_tree_end(&accnt->trades);
-}
-
-static inline DbrBool
-fig_accnt_empty_trade(const struct FigAccnt* accnt)
-{
-    return dbr_tree_empty(&accnt->trades);
 }
 
 // Posn.

@@ -36,18 +36,6 @@ free_membs(struct FigAccnt* accnt)
 }
 
 static void
-free_trades(struct FigAccnt* accnt)
-{
-    assert(accnt);
-    struct DbrRbNode* node;
-    while ((node = accnt->trades.root)) {
-        struct DbrTrade* trade = dbr_accnt_trade_entry(node);
-        dbr_tree_remove(&accnt->trades, node);
-        dbr_pool_free_trade(accnt->pool, trade);
-    }
-}
-
-static void
 free_posns(struct FigAccnt* accnt)
 {
     assert(accnt);
@@ -74,7 +62,6 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
         accnt->id = arec->id;
         accnt->pool = pool;
         dbr_tree_init(&accnt->membs);
-        dbr_tree_init(&accnt->trades);
         dbr_tree_init(&accnt->posns);
 
         arec->accnt.state = accnt;
@@ -91,7 +78,6 @@ fig_accnt_term(struct DbrRec* arec)
     if (accnt) {
         arec->accnt.state = NULL;
         free_posns(accnt);
-        free_trades(accnt);
         free_membs(accnt);
         free(accnt);
     }
@@ -142,38 +128,6 @@ DBR_API DbrIden
 dbr_accnt_id(DbrAccnt accnt)
 {
     return fig_accnt_id(accnt);
-}
-
-// AccntTrade
-
-DBR_API struct DbrRbNode*
-dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id)
-{
-    return fig_accnt_find_trade_id(accnt, id);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_trade(DbrAccnt accnt)
-{
-    return fig_accnt_first_trade(accnt);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_last_trade(DbrAccnt accnt)
-{
-    return fig_accnt_last_trade(accnt);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_end_trade(DbrAccnt accnt)
-{
-    return fig_accnt_end_trade(accnt);
-}
-
-DBR_API DbrBool
-dbr_accnt_empty_trade(DbrAccnt accnt)
-{
-    return fig_accnt_empty_trade(accnt);
 }
 
 // AccntPosn.

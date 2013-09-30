@@ -420,7 +420,7 @@ struct DbrTrade {
      */
     // Singly-linked for data model.
     struct DbrSlNode model_node_;
-    struct DbrRbNode accnt_node_;
+    struct DbrRbNode trader_node_;
     struct DbrSlNode result_node_;
 };
 
@@ -428,7 +428,7 @@ static inline void
 dbr_trade_init(struct DbrTrade* trade)
 {
     dbr_slnode_init(&trade->model_node_);
-    dbr_rbnode_init(&trade->accnt_node_);
+    dbr_rbnode_init(&trade->trader_node_);
     dbr_slnode_init(&trade->result_node_);
 }
 

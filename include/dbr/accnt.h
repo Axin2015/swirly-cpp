@@ -47,34 +47,6 @@ dbr_accnt_memb_entry(struct DbrRbNode* node)
 /** @} */
 
 /**
- * @addtogroup AccntTrade
- * @{
- */
-
-static inline struct DbrTrade*
-dbr_accnt_trade_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrTrade, accnt_node_, node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id);
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_trade(DbrAccnt accnt);
-
-DBR_API struct DbrRbNode*
-dbr_accnt_last_trade(DbrAccnt accnt);
-
-DBR_API struct DbrRbNode*
-dbr_accnt_end_trade(DbrAccnt accnt);
-
-DBR_API DbrBool
-dbr_accnt_empty_trade(DbrAccnt accnt);
-
-/** @} */
-
-/**
  * @addtogroup AccntPosn
  * @{
  */
