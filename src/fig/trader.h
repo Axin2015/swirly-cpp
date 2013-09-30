@@ -137,12 +137,4 @@ fig_trader_empty_order(const struct FigTrader* trader)
     return dbr_tree_empty(&trader->orders);
 }
 
-// Sub.
-
-DBR_EXTERN DbrBool
-fig_trader_sub(struct FigTrader* trader, struct DbrBook* book);
-
-DBR_EXTERN void
-fig_trader_unsub(struct FigTrader* trader, struct DbrBook* book);
-
 #endif // FIG_TRADER_H

@@ -18,6 +18,7 @@
 #ifndef FIG_MATCH_H
 #define FIG_MATCH_H
 
+#include <dbr/book.h>
 #include <dbr/defs.h>
 #include <dbr/pool.h>
 #include <dbr/types.h>

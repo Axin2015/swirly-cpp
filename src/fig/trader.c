@@ -35,19 +35,6 @@ free_orders(struct FigTrader* trader)
     }
 }
 
-static void
-free_subs(struct FigTrader* trader)
-{
-    assert(trader);
-    struct DbrRbNode* node;
-    while ((node = trader->subs.root)) {
-        struct DbrSub* sub = dbr_trader_sub_entry(node);
-        dbr_book_unsub(sub);
-        dbr_tree_remove(&trader->subs, node);
-        dbr_pool_free_sub(trader->pool, sub);
-    }
-}
-
 DBR_EXTERN struct FigTrader*
 fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
 {
@@ -79,48 +66,8 @@ fig_trader_term(struct DbrRec* trec)
     struct FigTrader* trader = trec->trader.state;
     if (trader) {
         trec->trader.state = NULL;
-        free_subs(trader);
         free_orders(trader);
         free(trader);
-    }
-}
-
-DBR_EXTERN DbrBool
-fig_trader_sub(struct FigTrader* trader, struct DbrBook* book)
-{
-    const DbrIden key = dbr_book_key(book);
-	struct DbrRbNode* node = dbr_tree_pfind(&trader->subs, key);
-    if (node && node->key == key) {
-        dbr_err_set(DBR_EINVAL, "subscription already exists");
-        goto fail1;
-    }
-    struct DbrSub* sub = dbr_pool_alloc_sub(trader->pool);
-    if (!sub)
-        goto fail1;
-    dbr_sub_init(sub);
-
-    sub->book = book;
-    sub->trader = trader;
-
-    struct DbrRbNode* parent = node;
-    dbr_tree_pinsert(&trader->subs, key, &sub->trader_node_, parent);
-    dbr_book_sub(book, sub);
-    return true;
-
-fail1:
-    return false;
-}
-
-DBR_EXTERN void
-fig_trader_unsub(struct FigTrader* trader, struct DbrBook* book)
-{
-    const DbrIden key = dbr_book_key(book);
-    struct DbrRbNode* node = dbr_tree_find(&trader->subs, key);
-    if (node) {
-        struct DbrSub* sub = dbr_trader_sub_entry(node);
-        dbr_book_unsub(sub);
-        dbr_tree_remove(&trader->subs, node);
-        dbr_pool_free_sub(trader->pool, sub);
     }
 }
 
@@ -166,18 +113,4 @@ DBR_API DbrBool
 dbr_trader_empty_order(DbrTrader trader)
 {
     return fig_trader_empty_order(trader);
-}
-
-// TraderSub
-
-DBR_API DbrBool
-dbr_trader_sub(DbrTrader trader, struct DbrBook* book)
-{
-    return fig_trader_sub(trader, book);
-}
-
-DBR_API void
-dbr_trader_unsub(DbrTrader trader, struct DbrBook* book)
-{
-    return fig_trader_unsub(trader, book);
 }

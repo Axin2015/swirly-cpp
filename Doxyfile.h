@@ -126,11 +126,6 @@
  */
 
 /**
- * @defgroup BookSub Subscription
- * @ingroup Book
- */
-
-/**
  * @defgroup Side Side
  * @ingroup Book
  */
@@ -157,11 +152,6 @@
 
 /**
  * @defgroup TraderOrder Order
- * @ingroup Trader
- */
-
-/**
- * @defgroup TraderSub Subscription
  * @ingroup Trader
  */
 

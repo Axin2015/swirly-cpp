@@ -132,12 +132,12 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug2("sizeof DbrMatch=%zu", sizeof(struct DbrMatch));
     dbr_log_debug2("sizeof DbrMemb=%zu", sizeof(struct DbrMemb));
     dbr_log_debug2("sizeof DbrPosn=%zu", sizeof(struct DbrPosn));
-    dbr_log_debug2("sizeof DbrSub=%zu", sizeof(struct DbrSub));
 
     dbr_log_debug2("%zu large nodes per block:", pool->large.nodes_per_block);
     dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
     dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
     dbr_log_debug2("sizeof DbrTrade=%zu", sizeof(struct DbrTrade));
+    dbr_log_debug2("sizeof DbrStmt=%zu", sizeof(struct DbrStmt));
 #endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
         goto fail1;
@@ -399,18 +399,6 @@ DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 {
     elm_pool_free_posn(pool, posn);
-}
-
-DBR_API struct DbrSub*
-dbr_pool_alloc_sub(DbrPool pool)
-{
-    return elm_pool_alloc_sub(pool);
-}
-
-DBR_API void
-dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
-{
-    elm_pool_free_sub(pool, sub);
 }
 
 DBR_API struct DbrStmt*

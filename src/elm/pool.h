@@ -60,7 +60,6 @@ struct ElmSmallNode {
         struct DbrMatch match;
         struct DbrMemb memb;
         struct DbrPosn posn;
-        struct DbrSub sub;
     };
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -223,20 +222,6 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
     elm_pool_free_small(pool, node);
 }
 
-static inline struct DbrSub*
-elm_pool_alloc_sub(struct ElmPool* pool)
-{
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    return node ? &node->sub : NULL;
-}
-
-static inline void
-elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
-{
-    struct ElmSmallNode* node = (struct ElmSmallNode*)sub;
-    elm_pool_free_small(pool, node);
-}
-
 static inline struct DbrStmt*
 elm_pool_alloc_stmt(struct ElmPool* pool)
 {
@@ -371,22 +356,6 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
     elm_pool_free_small(pool, node);
 }
 
-static inline struct DbrSub*
-elm_pool_alloc_sub_(struct ElmPool* pool, const char* file, int line)
-{
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
-    dbr_log_debug3("allocating sub %p in %s at %d", node, file, line);
-    return node ? &node->sub : NULL;
-}
-
-static inline void
-elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
-{
-    struct ElmSmallNode* node = (struct ElmSmallNode*)sub;
-    dbr_log_debug3("freeing sub %p from %s at %d", node, node->file, node->line);
-    elm_pool_free_small(pool, node);
-}
-
 static inline struct DbrStmt*
 elm_pool_alloc_stmt_(struct ElmPool* pool, const char* file, int line)
 {
@@ -417,8 +386,6 @@ elm_pool_free_stmt(struct ElmPool* pool, struct DbrStmt* stmt)
     elm_pool_alloc_trade_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_posn(pool)                   \
     elm_pool_alloc_posn_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_sub(pool)                    \
-    elm_pool_alloc_sub_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_stmt(pool)                   \
     elm_pool_alloc_stmt_(pool, __FILE__, __LINE__)
 

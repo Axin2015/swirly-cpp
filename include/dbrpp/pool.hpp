@@ -168,19 +168,6 @@ public:
     {
         dbr_pool_free_posn(impl_, posn);
     }
-    DbrSub*
-    alloc_sub()
-    {
-        DbrSub* const sub = dbr_pool_alloc_sub(impl_);
-        if (!sub)
-            throw_exception();
-        return sub;
-    }
-    void
-    free_sub(DbrSub* sub) noexcept
-    {
-        dbr_pool_free_sub(impl_, sub);
-    }
 };
 
 } // dbr

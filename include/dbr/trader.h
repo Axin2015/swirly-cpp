@@ -64,35 +64,4 @@ dbr_trader_empty_order(DbrTrader trader);
 
 /** @} */
 
-/**
- * @addtogroup TraderSub
- * @{
- */
-
-/**
- * @brief Subscription from trader node.
- */
-
-static inline struct DbrSub*
-dbr_trader_sub_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrSub, trader_node_, node);
-}
-
-/**
- * @brief Subscribe to book.
- */
-
-DBR_API DbrBool
-dbr_trader_sub(DbrTrader trader, struct DbrBook* book);
-
-/**
- * @brief Unsubscribe from book.
- */
-
-DBR_API void
-dbr_trader_unsub(DbrTrader trader, struct DbrBook* book);
-
-/** @} */
-
 #endif // DBR_TRADER_H

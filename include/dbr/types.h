@@ -242,33 +242,6 @@ dbr_level_init(struct DbrLevel* level)
 /** @} */
 
 /**
- * @addtogroup TraderSub
- * @{
- */
-
-struct DbrSub {
-    /**
-     * @publicsection
-     */
-    struct DbrBook* book;
-    DbrTrader trader;
-    /**
-     * @privatesection
-     */
-    struct DbrDlNode book_node_;
-    struct DbrRbNode trader_node_;
-};
-
-static inline void
-dbr_sub_init(struct DbrSub* sub)
-{
-    dbr_dlnode_init(&sub->book_node_);
-    dbr_rbnode_init(&sub->trader_node_);
-}
-
-/** @} */
-
-/**
  * @addtogroup AccntMemb
  * @{
  */
