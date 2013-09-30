@@ -291,6 +291,7 @@ struct DbrPosn {
     // Singly-linked for data model.
     struct DbrSlNode model_node_;
     struct DbrRbNode accnt_node_;
+    struct DbrSlNode result_node_;
 };
 
 static inline void
@@ -298,6 +299,7 @@ dbr_posn_init(struct DbrPosn* posn)
 {
     dbr_slnode_init(&posn->model_node_);
     dbr_rbnode_init(&posn->accnt_node_);
+    dbr_slnode_init(&posn->result_node_);
 }
 
 /** @} */
@@ -484,8 +486,15 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 
 struct DbrResult {
     struct DbrOrder* new_order;
+    struct DbrSlNode* first_posn;
     struct DbrSlNode* first_trade;
 };
+
+static inline struct DbrPosn*
+dbr_result_posn_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrPosn, result_node_, node);
+}
 
 static inline struct DbrTrade*
 dbr_result_trade_entry(struct DbrSlNode* node)

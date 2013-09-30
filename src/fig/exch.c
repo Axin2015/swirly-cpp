@@ -169,16 +169,32 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
     return false;
 }
 
+static void
+insert_unique_posn(struct DbrQueue* queue, struct DbrPosn* new_posn)
+{
+    for (struct DbrSlNode* node = queue->first; node; node = node->next) {
+        struct DbrPosn* posn = dbr_result_posn_entry(node);
+        if (posn->accnt.rec->id == new_posn->accnt.rec->id
+            && posn->contr.rec->id == new_posn->contr.rec->id
+            && posn->settl_date == new_posn->settl_date)
+            return; // Exists.
+    }
+    dbr_queue_insert_back(queue, &new_posn->result_node_);
+}
+
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
 commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
               const struct DbrTrans* trans, DbrMillis now, struct DbrResult* result)
 {
-    struct DbrQueue tq;
+    struct DbrQueue pq, tq;
+    dbr_queue_init(&pq);
     dbr_queue_init(&tq);
 
-    struct DbrOrder* new_order = trans->new_order;
+    if (trans->new_posn)
+        dbr_queue_insert_back(&pq, &trans->new_posn->result_node_);
+
     struct DbrSlNode* node = trans->first_match;
     while (node) {
 
@@ -187,6 +203,7 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
 
         // Reduce maker. Maker's revision will be incremented by this call.
         dbr_book_take(book, maker_order, match->lots, now);
+        insert_unique_posn(&pq, match->maker_posn);
 
         // Must succeed because maker order exists.
         struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &exch->index,
@@ -210,7 +227,8 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
         dbr_pool_free_match(exch->pool, match);
     }
 
-    result->new_order = new_order;
+    result->new_order = trans->new_order;
+    result->first_posn = pq.first;
     result->first_trade = tq.first;
 }
 

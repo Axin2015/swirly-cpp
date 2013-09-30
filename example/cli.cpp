@@ -611,6 +611,36 @@ public:
             return;
 
         cout <<
+            "|crec      "
+            "|settl_date"
+            "|buy_ticks "
+            "|buy_lots  "
+            "|sell_ticks"
+            "|sell_lots "
+            "|" << endl;
+        cout <<
+            "|----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "|"
+             << endl;
+        for (auto posn : result.posns()) {
+            PosnRef ref(posn);
+            const auto buy_ticks = static_cast<double>(ref.buy_licks()) / ref.buy_lots();
+            const auto sell_ticks = static_cast<double>(ref.sell_licks()) / ref.sell_lots();
+            cout << '|' << left << setw(10) << ref.crec().mnem()
+                 << '|' << left << setw(10) << ref.settl_date()
+                 << '|' << right << setw(10) << buy_ticks
+                 << '|' << right << setw(10) << ref.buy_lots()
+                 << '|' << right << setw(10) << sell_ticks
+                 << '|' << right << setw(10) << ref.sell_lots()
+                 << '|' << endl;
+        }
+
+        cout <<
             "|id        "
             "|order     "
             "|trec      "
