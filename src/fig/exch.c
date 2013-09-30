@@ -175,18 +175,14 @@ static void
 commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, DbrMillis now,
               struct DbrResult* result)
 {
-    struct DbrQueue oq, tq;
-    dbr_queue_init(&oq);
+    struct DbrQueue tq;
     dbr_queue_init(&tq);
 
-    struct DbrOrder* taker_order = trans->new_order;
-    struct DbrRec* trec = taker_order->trader.rec;
+    struct DbrOrder* new_order = trans->new_order;
 
     // Must succeed because new_posn exists.
-    struct FigAccnt* taker_accnt = fig_accnt_lazy(taker_order->accnt.rec, exch->pool);
+    struct FigAccnt* taker_accnt = fig_accnt_lazy(new_order->accnt.rec, exch->pool);
     assert(taker_accnt);
-
-    dbr_queue_insert_back(&oq, &taker_order->result_node_);
 
     struct DbrSlNode* node = trans->first_match;
     while (node) {
@@ -201,33 +197,24 @@ commit_result(DbrExch exch, struct DbrBook* book, const struct DbrTrans* trans, 
         struct FigAccnt* maker_accnt = fig_accnt_lazy(maker_order->accnt.rec, exch->pool);
         assert(maker_accnt);
 
+        // TODO: taker or maker trade first?
+
         // Update taker.
         fig_accnt_emplace_trade(taker_accnt, match->taker_trade);
         apply_posn(trans->new_posn, match->taker_trade);
+        dbr_queue_insert_back(&tq, &match->taker_trade->result_node_);
 
         // Update maker.
         fig_accnt_emplace_trade(maker_accnt, match->maker_trade);
         apply_posn(match->maker_posn, match->maker_trade);
-
-        // Copy elements to result.
-
-        // Maker order.
-        if (maker_order->trader.rec == trec)
-            dbr_queue_insert_back(&oq, &maker_order->result_node_);
-
-        // Taker trade.
-        dbr_queue_insert_back(&tq, &match->taker_trade->result_node_);
-
-        // Maker trade.
-        if (match->maker_trade->trader.rec == trec)
-            dbr_queue_insert_back(&tq, &match->maker_trade->result_node_);
+        dbr_queue_insert_back(&tq, &match->maker_trade->result_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
         dbr_pool_free_match(exch->pool, match);
     }
 
-    result->first_order = oq.first;
+    result->new_order = new_order;
     result->first_trade = tq.first;
 }
 

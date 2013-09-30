@@ -27,124 +27,18 @@
 
 namespace dbr {
 
-class ResultOrders {
-    struct Policy : NodeTraits<DbrSlNode> {
-        typedef DbrOrder Entry;
-        static Entry*
-        entry(Node* node)
-        {
-            return dbr_result_order_entry(node);
-        }
-        static const Entry*
-        entry(const Node* node)
-        {
-            return dbr_result_order_entry(const_cast<Node*>(node));
-        }
-    };
-    DbrResult result_;
-public:
-    typedef Policy::Entry ValueType;
-    typedef Policy::Entry* Pointer;
-    typedef Policy::Entry& Reference;
-    typedef const Policy::Entry* ConstPointer;
-    typedef const Policy::Entry& ConstReference;
-
-    typedef ForwardIterator<Policy> Iterator;
-    typedef ConstForwardIterator<Policy> ConstIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef Pointer pointer;
-    typedef Reference reference;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef Iterator iterator;
-    typedef ConstIterator const_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-
-    explicit
-    ResultOrders(DbrResult result) noexcept
-    : result_(result)
-    {
-    }
-    void
-    swap(ResultOrders& rhs) noexcept
-    {
-        std::swap(result_, rhs.result_);
-    }
-
-    // Iterator.
-
-    Iterator
-    begin() noexcept
-    {
-        return result_.first_order;
-    }
-    ConstIterator
-    begin() const noexcept
-    {
-        return result_.first_order;
-    }
-    Iterator
-    end() noexcept
-    {
-        return nullptr;
-    }
-    ConstIterator
-    end() const noexcept
-    {
-        return nullptr;
-    }
-
-    // Accessor.
-
-    Reference
-    front() noexcept
-    {
-        return *begin();
-    }
-    ConstReference
-    front() const noexcept
-    {
-        return *begin();
-    }
-    SizeType
-    size() const noexcept
-    {
-        return std::distance(begin(), end());
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return std::numeric_limits<SizeType>::max();
-    }
-    bool
-    empty() const noexcept
-    {
-        return result_.first_order == nullptr;
-    }
-};
-
 class ResultTrades {
     struct Policy : NodeTraits<DbrSlNode> {
-        typedef DbrOrder Entry;
+        typedef DbrTrade Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_result_order_entry(node);
+            return dbr_result_trade_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_result_order_entry(const_cast<Node*>(node));
+            return dbr_result_trade_entry(const_cast<Node*>(node));
         }
     };
     DbrResult result_;
@@ -192,12 +86,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_.first_order;
+        return result_.first_trade;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_.first_order;
+        return result_.first_trade;
     }
     Iterator
     end() noexcept
@@ -235,7 +129,7 @@ public:
     bool
     empty() const noexcept
     {
-        return result_.first_order == nullptr;
+        return result_.first_trade == nullptr;
     }
 };
 
@@ -251,10 +145,10 @@ public:
     {
         return &impl_;
     }
-    ResultOrders
-    orders() const noexcept
+    OrderRef
+    new_order() const noexcept
     {
-        return ResultOrders(impl_);
+        return OrderRef(*impl_.new_order);
     }
     ResultTrades
     trades() const noexcept

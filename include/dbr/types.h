@@ -364,7 +364,6 @@ struct DbrOrder {
     // Doubly-linked for side.
     struct DbrDlNode side_node_;
     struct DbrRbNode trader_node_;
-    struct DbrSlNode result_node_;
 };
 
 static inline void
@@ -374,7 +373,6 @@ dbr_order_init(struct DbrOrder* order)
     dbr_slnode_init(&order->ref_node_);
     dbr_dlnode_init(&order->side_node_);
     dbr_rbnode_init(&order->trader_node_);
-    dbr_slnode_init(&order->result_node_);
 }
 
 static inline DbrBool
@@ -485,18 +483,9 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 }
 
 struct DbrResult {
-    // First order is the new order. Secondary orders are trader's other orders that were matched
-    // against the new order.
-    struct DbrSlNode* first_order;
-    // Trades on trader's own orders.
+    struct DbrOrder* new_order;
     struct DbrSlNode* first_trade;
 };
-
-static inline struct DbrOrder*
-dbr_result_order_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrOrder, result_node_, node);
-}
 
 static inline struct DbrTrade*
 dbr_result_trade_entry(struct DbrSlNode* node)
