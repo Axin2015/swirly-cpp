@@ -28,11 +28,6 @@
  */
 
 /**
- * @defgroup ZmqStore ZmqStore
- * @ingroup Elm
- */
-
-/**
  * @defgroup Fig Fig
  */
 
@@ -117,6 +112,11 @@
 
 /**
  * @defgroup Msg Msg
+ * @ingroup Elm
+ */
+
+/**
+ * @defgroup ZmqStore ZmqStore
  * @ingroup Elm
  */
 
