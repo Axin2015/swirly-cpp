@@ -28,7 +28,9 @@
  */
 
 enum {
-    DBR_READ_ENTITY_REQ = 1,
+    DBR_PLACE_ORDER_REQ = 1,
+    DBR_PLACE_ORDER_REP,
+    DBR_READ_ENTITY_REQ,
     DBR_READ_ENTITY_REP,
     DBR_WRITE_TRANS_REQ,
     DBR_WRITE_TRANS_REP
@@ -37,6 +39,16 @@ enum {
 struct DbrMsg {
 	int type;
 	union {
+        struct {
+        } place_order_req;
+        struct {
+            // Set by dbr_msg_len();
+            size_t posn_count;
+            size_t trade_count;
+            struct DbrOrder* new_order;
+            struct DbrSlNode* first_posn;
+            struct DbrSlNode* first_trade;
+        } place_order_rep;
         struct {
             int type;
         } read_entity_req;
@@ -55,6 +67,15 @@ struct DbrMsg {
         } write_trans_rep;
     };
 };
+
+DBR_API size_t
+dbr_msg_len(struct DbrMsg* msg);
+
+DBR_API char*
+dbr_write_msg(char* buf, const struct DbrMsg* msg);
+
+DBR_API const char*
+dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg);
 
 DBR_EXTERN DbrBool
 dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg);

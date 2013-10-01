@@ -28,7 +28,7 @@
 #include <stdlib.h> // abort()
 
 static void
-free_stmts(struct DbrSlNode* first, DbrPool pool)
+free_trans_stmts(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
@@ -38,11 +38,214 @@ free_stmts(struct DbrSlNode* first, DbrPool pool)
     }
 }
 
-static size_t
+static void
+free_result_posns(struct DbrSlNode* first, DbrPool pool)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrPosn* posn = dbr_result_posn_entry(node);
+        node = node->next;
+        dbr_pool_free_posn(pool, posn);
+    }
+}
+
+static void
+free_result_trades(struct DbrSlNode* first, DbrPool pool)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrTrade* trade = dbr_result_trade_entry(node);
+        node = node->next;
+        dbr_pool_free_trade(pool, trade);
+    }
+}
+
+static const char*
+read_model_trader(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
+    if (!rec)
+        goto fail1;
+    if (!(buf = dbr_read_trader(buf, rec))) {
+        dbr_pool_free_rec(pool, rec);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &rec->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_model_accnt(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
+    if (!rec)
+        goto fail1;
+    if (!(buf = dbr_read_accnt(buf, rec))) {
+        dbr_pool_free_rec(pool, rec);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &rec->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_model_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
+    if (!rec)
+        goto fail1;
+    if (!(buf = dbr_read_contr(buf, rec))) {
+        dbr_pool_free_rec(pool, rec);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &rec->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_model_order(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrOrder* order = dbr_pool_alloc_order(pool);
+    if (!order)
+        goto fail1;
+    if (!(buf = dbr_read_order(buf, order))) {
+        dbr_pool_free_order(pool, order);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &order->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_model_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
+    if (!memb)
+        goto fail1;
+    if (!(buf = dbr_read_memb(buf, memb))) {
+        dbr_pool_free_memb(pool, memb);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &memb->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_model_trade(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
+    if (!trade)
+        goto fail1;
+    if (!(buf = dbr_read_trade(buf, trade))) {
+        dbr_pool_free_trade(pool, trade);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &trade->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_model_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrPosn* posn = dbr_pool_alloc_posn(pool);
+    if (!posn)
+        goto fail1;
+    if (!(buf = dbr_read_posn(buf, posn))) {
+        dbr_pool_free_posn(pool, posn);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &posn->model_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_trans_stmt(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrStmt* stmt = dbr_pool_alloc_stmt(pool);
+    if (!stmt)
+        goto fail1;
+    if (!(buf = dbr_read_stmt(buf, stmt))) {
+        dbr_pool_free_stmt(pool, stmt);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &stmt->trans_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_result_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrPosn* posn = dbr_pool_alloc_posn(pool);
+    if (!posn)
+        goto fail1;
+    if (!(buf = dbr_read_posn(buf, posn))) {
+        dbr_pool_free_posn(pool, posn);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &posn->result_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_result_trade(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
+    if (!trade)
+        goto fail1;
+    if (!(buf = dbr_read_trade(buf, trade))) {
+        dbr_pool_free_trade(pool, trade);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &trade->result_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+DBR_API size_t
 dbr_msg_len(struct DbrMsg* msg)
 {
     size_t n = dbr_packleni(msg->type);
     switch (msg->type) {
+    case DBR_PLACE_ORDER_REQ:
+        break;
+    case DBR_PLACE_ORDER_REP:
+        n += dbr_order_len(msg->place_order_rep.new_order);
+        msg->place_order_rep.posn_count = 0;
+        for (struct DbrSlNode* node = msg->place_order_rep.first_posn;
+             node; node = node->next) {
+            struct DbrPosn* posn = dbr_result_posn_entry(node);
+            n += dbr_posn_len(posn);
+            ++msg->place_order_rep.posn_count;
+        }
+        n += dbr_packlenz(msg->place_order_rep.posn_count);
+        msg->place_order_rep.trade_count = 0;
+        for (struct DbrSlNode* node = msg->place_order_rep.first_trade;
+             node; node = node->next) {
+            struct DbrTrade* trade = dbr_result_trade_entry(node);
+            n += dbr_trade_len(trade);
+            ++msg->place_order_rep.trade_count;
+        }
+        n += dbr_packlenz(msg->place_order_rep.trade_count);
+        break;
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(msg->read_entity_req.type);
         break;
@@ -133,11 +336,28 @@ dbr_msg_len(struct DbrMsg* msg)
     return n;
 }
 
-DBR_EXTERN char*
+DBR_API char*
 dbr_write_msg(char* buf, const struct DbrMsg* msg)
 {
     buf = dbr_packi(buf, msg->type);
     switch (msg->type) {
+    case DBR_PLACE_ORDER_REQ:
+        break;
+    case DBR_PLACE_ORDER_REP:
+        buf = dbr_write_order(buf, msg->place_order_rep.new_order);
+        buf = dbr_packz(buf, msg->place_order_rep.posn_count);
+        for (struct DbrSlNode* node = msg->place_order_rep.first_posn;
+             node; node = node->next) {
+            struct DbrPosn* posn = dbr_result_posn_entry(node);
+            buf = dbr_write_posn(buf, posn);
+        }
+        buf = dbr_packz(buf, msg->place_order_rep.trade_count);
+        for (struct DbrSlNode* node = msg->place_order_rep.first_trade;
+             node; node = node->next) {
+            struct DbrTrade* trade = dbr_result_trade_entry(node);
+            buf = dbr_write_trade(buf, trade);
+        }
+        break;
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, msg->read_entity_req.type);
         break;
@@ -212,8 +432,8 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
     return buf;
 }
 
-DBR_EXTERN const char*
-dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
+DBR_API const char*
+dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
 {
     int type;
     if (!(buf = dbr_unpacki(buf, &type)))
@@ -221,6 +441,48 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
     msg->type = type;
     struct DbrQueue q;
     switch (type) {
+    case DBR_PLACE_ORDER_REQ:
+        break;
+    case DBR_PLACE_ORDER_REP:
+        // Order.
+        msg->place_order_rep.new_order = dbr_pool_alloc_order(pool);
+        if (!msg->place_order_rep.new_order)
+            goto fail1;
+        if (!(buf = dbr_read_order(buf, msg->place_order_rep.new_order))) {
+            dbr_pool_free_order(pool, msg->place_order_rep.new_order);
+            goto fail1;
+        }
+        // Posns.
+        if (!(buf = dbr_unpackz(buf, &msg->place_order_rep.posn_count))) {
+            dbr_pool_free_order(pool, msg->place_order_rep.new_order);
+            goto fail1;
+        }
+        dbr_queue_init(&q);
+        for (size_t i = 0; i < msg->place_order_rep.posn_count; ++i) {
+            if (!read_result_posn(buf, pool, &q)) {
+                free_result_posns(msg->place_order_rep.first_posn, pool);
+                dbr_pool_free_order(pool, msg->place_order_rep.new_order);
+                goto fail1;
+            }
+        }
+        msg->place_order_rep.first_posn = dbr_queue_first(&q);
+        // Trades.
+        if (!(buf = dbr_unpackz(buf, &msg->place_order_rep.trade_count))) {
+            free_result_posns(msg->place_order_rep.first_posn, pool);
+            dbr_pool_free_order(pool, msg->place_order_rep.new_order);
+            goto fail1;
+        }
+        dbr_queue_init(&q);
+        for (size_t i = 0; i < msg->place_order_rep.trade_count; ++i) {
+            if (!read_result_trade(buf, pool, &q)) {
+                free_result_trades(msg->place_order_rep.first_trade, pool);
+                free_result_posns(msg->place_order_rep.first_posn, pool);
+                dbr_pool_free_order(pool, msg->place_order_rep.new_order);
+                goto fail1;
+            }
+        }
+        msg->place_order_rep.first_trade = dbr_queue_first(&q);
+        break;
     case DBR_READ_ENTITY_REQ:
         if (!(buf = dbr_unpacki(buf, &msg->read_entity_req.type)))
             goto fail1;
@@ -234,17 +496,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrRec* rec = dbr_pool_alloc_rec(pool);
-                if (!rec) {
+                if (!read_model_trader(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_TRADER, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_trader(buf, rec))) {
-                    dbr_pool_free_rec(pool, rec);
-                    dbr_pool_free_list(pool, DBR_TRADER, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &rec->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -253,17 +508,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrRec* rec = dbr_pool_alloc_rec(pool);
-                if (!rec) {
+                if (!read_model_accnt(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_ACCNT, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_accnt(buf, rec))) {
-                    dbr_pool_free_rec(pool, rec);
-                    dbr_pool_free_list(pool, DBR_ACCNT, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &rec->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -272,17 +520,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrRec* rec = dbr_pool_alloc_rec(pool);
-                if (!rec) {
+                if (!read_model_contr(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_CONTR, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_contr(buf, rec))) {
-                    dbr_pool_free_rec(pool, rec);
-                    dbr_pool_free_list(pool, DBR_CONTR, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &rec->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -291,17 +532,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrOrder* order = dbr_pool_alloc_order(pool);
-                if (!order) {
+                if (!read_model_order(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_ORDER, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_order(buf, order))) {
-                    dbr_pool_free_order(pool, order);
-                    dbr_pool_free_list(pool, DBR_ORDER, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &order->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -310,17 +544,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
-                if (!memb) {
+                if (!read_model_memb(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_MEMB, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_memb(buf, memb))) {
-                    dbr_pool_free_memb(pool, memb);
-                    dbr_pool_free_list(pool, DBR_MEMB, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &memb->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -329,17 +556,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
-                if (!trade) {
+                if (!read_model_trade(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_TRADE, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_trade(buf, trade))) {
-                    dbr_pool_free_trade(pool, trade);
-                    dbr_pool_free_list(pool, DBR_TRADE, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &trade->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -348,17 +568,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
                 goto fail1;
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->read_entity_rep.count; ++i) {
-                struct DbrPosn* posn = dbr_pool_alloc_posn(pool);
-                if (!posn) {
+                if (!read_model_posn(buf, pool, &q)) {
                     dbr_pool_free_list(pool, DBR_POSN, dbr_queue_first(&q));
                     goto fail1;
                 }
-                if (!(buf = dbr_read_posn(buf, posn))) {
-                    dbr_pool_free_posn(pool, posn);
-                    dbr_pool_free_list(pool, DBR_POSN, dbr_queue_first(&q));
-                    goto fail1;
-                }
-                dbr_queue_insert_back(&q, &posn->model_node_);
             }
             msg->read_entity_rep.first = dbr_queue_first(&q);
             break;
@@ -372,17 +585,10 @@ dbr_read_msg(DbrPool pool, const char* buf, struct DbrMsg* msg)
             goto fail1;
         dbr_queue_init(&q);
         for (size_t i = 0; i < msg->write_trans_req.count; ++i) {
-            struct DbrStmt* stmt = dbr_pool_alloc_stmt(pool);
-            if (!stmt) {
-                free_stmts(dbr_queue_first(&q), pool);
+            if (!read_trans_stmt(buf, pool, &q)) {
+                free_trans_stmts(dbr_queue_first(&q), pool);
                 goto fail1;
             }
-            if (!(buf = dbr_read_stmt(buf, stmt))) {
-                dbr_pool_free_stmt(pool, stmt);
-                free_stmts(dbr_queue_first(&q), pool);
-                goto fail1;
-            }
-            dbr_queue_insert_back(&q, &stmt->trans_node_);
         }
         msg->write_trans_req.first = dbr_queue_first(&q);
         break;
@@ -410,7 +616,7 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
         dbr_err_set(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-    if (!dbr_read_msg(pool, zmq_msg_data(&zmsg), msg)) {
+    if (!dbr_read_msg(zmq_msg_data(&zmsg), pool, msg)) {
         dbr_err_set(DBR_EIO, "dbr_read_msg() failed");
         goto fail2;
     }
