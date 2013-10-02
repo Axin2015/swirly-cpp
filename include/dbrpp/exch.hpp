@@ -260,10 +260,10 @@ public:
         return Accnt(accnt);
     }
     OrderRef
-    place(DbrRec& trec, DbrRec& arec, DbrBook& book, const char* ref, int action,
+    place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Result& result)
     {
-        DbrOrder* const order = dbr_exch_place(impl_, &trec, &arec, &book, ref, action, ticks,
+        DbrOrder* const order = dbr_exch_place(impl_, trader, accnt, &book, ref, action, ticks,
                                                lots, min, flags, result.c_arg());
         if (!order)
             throw_exception();

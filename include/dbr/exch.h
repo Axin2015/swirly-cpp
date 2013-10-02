@@ -121,7 +121,7 @@ dbr_exch_accnt(DbrExch exch, struct DbrRec* arec);
  */
 
 DBR_API struct DbrOrder*
-dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
+dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags, struct DbrResult* result);
 

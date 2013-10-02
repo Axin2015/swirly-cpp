@@ -28,8 +28,8 @@
 
 // Returns the trader-id for state.
 
-DBR_API DbrIden
-dbr_trader_id(DbrTrader trader);
+DBR_API struct DbrRec*
+dbr_trader_rec(DbrTrader trader);
 
 /** @} */
 

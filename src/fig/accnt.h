@@ -24,7 +24,7 @@
 #include <dbr/types.h>
 
 struct FigAccnt {
-    DbrIden id;
+    struct DbrRec* rec;
     DbrPool pool;
     struct DbrTree membs;
     struct DbrTree posns;
@@ -38,10 +38,10 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool);
 DBR_EXTERN void
 fig_accnt_term(struct DbrRec* arec);
 
-static inline DbrIden
-fig_accnt_id(const struct FigAccnt* accnt)
+static inline struct DbrRec*
+fig_accnt_rec(const struct FigAccnt* accnt)
 {
-    return accnt->id;
+    return accnt->rec;
 }
 
 // Memb.

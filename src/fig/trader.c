@@ -59,9 +59,9 @@ fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
-        trader->id = trec->id;
-        trader->pool = pool;
+        trader->rec = trec;
         trader->index = index;
+        trader->pool = pool;
         dbr_tree_init(&trader->orders);
         dbr_tree_init(&trader->trades);
 
@@ -84,10 +84,10 @@ fig_trader_term(struct DbrRec* trec)
     }
 }
 
-DBR_API DbrIden
-dbr_trader_id(DbrTrader trader)
+DBR_API struct DbrRec*
+dbr_trader_rec(DbrTrader trader)
 {
-    return fig_trader_id(trader);
+    return fig_trader_rec(trader);
 }
 
 // TraderOrder

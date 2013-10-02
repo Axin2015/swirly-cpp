@@ -20,6 +20,7 @@
 
 #include <dbrpp/iter.hpp>
 #include <dbrpp/rbnode.hpp>
+#include <dbrpp/rec.hpp>
 
 #include <dbr/trader.h>
 
@@ -367,17 +368,17 @@ public:
     bool
     operator ==(Trader rhs) const noexcept
     {
-        return id() == rhs.id();
+        return rec().id() == rhs.rec().id();
     }
     bool
     operator !=(Trader rhs) const noexcept
     {
-        return id() != rhs.id();
+        return rec().id() != rhs.rec().id();
     }
-    DbrIden
-    id() const noexcept
+    TraderRecRef
+    rec() const noexcept
     {
-        return dbr_trader_id(impl_);
+        return TraderRecRef(*dbr_trader_rec(impl_));
     }
     TraderOrders
     orders() const noexcept
@@ -394,7 +395,7 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, Trader trader)
 {
-    return os << "id=" << trader.id();
+    return os << "id=" << trader.rec().id();
 }
 
 } // dbr

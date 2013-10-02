@@ -365,7 +365,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        Trader trader = exch_.trader(*trec_);
+        auto trader = exch_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
             exch_.archive_order(trader, id);
@@ -376,7 +376,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        Trader trader = exch_.trader(*trec_);
+        auto trader = exch_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
             exch_.archive_trade(trader, id);
@@ -389,7 +389,7 @@ public:
             throw InvalidState("contr");
         if (!settl_date_)
             throw InvalidState("settl_date");
-        BookRef book = exch_.book(*crec_, settl_date_);
+        auto book = exch_.book(*crec_, settl_date_);
 
         cout <<
             "|bid_count "
@@ -446,7 +446,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        Trader trader = exch_.trader(*trec_);
+        auto trader = exch_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
             exch_.cancel(trader, id);
@@ -539,7 +539,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        Trader trader = exch_.trader(*trec_);
+        auto trader = exch_.trader(*trec_);
         cout <<
             "|id        "
             "|rev       "
@@ -598,14 +598,16 @@ public:
         if (!settl_date_)
             throw InvalidState("settl_date");
 
-        BookRef book = exch_.book(*crec_, settl_date_);
+        auto trader = exch_.trader(*trec_);
+        auto accnt = exch_.accnt(*arec_);
+        auto book = exch_.book(*crec_, settl_date_);
 
         const auto lots = ston<DbrLots>((*begin++).c_str());
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
         Result result;
-        exch_.place(*trec_, *arec_, book, nullptr, action, ticks, lots, 0, 0, result);
+        exch_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0, result);
 
         if (result.trades().empty())
             return;
@@ -629,8 +631,10 @@ public:
              << endl;
         for (auto posn : result.posns()) {
             PosnRef ref(posn);
-            const auto buy_ticks = static_cast<double>(ref.buy_licks()) / ref.buy_lots();
-            const auto sell_ticks = static_cast<double>(ref.sell_licks()) / ref.sell_lots();
+            const auto buy_ticks = ref.buy_lots() > 0
+                ? static_cast<double>(ref.buy_licks()) / ref.buy_lots() : 0;
+            const auto sell_ticks = ref.sell_lots() > 0
+                ? static_cast<double>(ref.sell_licks()) / ref.sell_lots() : 0;
             cout << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
                  << '|' << right << setw(10) << buy_ticks
@@ -697,7 +701,7 @@ public:
     {
         if (!arec_)
             throw InvalidState("accnt");
-        Accnt accnt = exch_.accnt(*arec_);
+        auto accnt = exch_.accnt(*arec_);
         cout <<
             "|crec      "
             "|settl_date"
@@ -738,7 +742,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        Trader trader = exch_.trader(*trec_);
+        auto trader = exch_.trader(*trec_);
 
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
@@ -796,7 +800,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        Trader trader = exch_.trader(*trec_);
+        auto trader = exch_.trader(*trec_);
         cout <<
             "|id        "
             "|order     "

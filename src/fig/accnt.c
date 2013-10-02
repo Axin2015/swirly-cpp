@@ -59,7 +59,7 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
-        accnt->id = arec->id;
+        accnt->rec = arec;
         accnt->pool = pool;
         dbr_tree_init(&accnt->membs);
         dbr_tree_init(&accnt->posns);
@@ -124,10 +124,10 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
     return posn;
 }
 
-DBR_API DbrIden
-dbr_accnt_id(DbrAccnt accnt)
+DBR_API struct DbrRec*
+dbr_accnt_rec(DbrAccnt accnt)
 {
-    return fig_accnt_id(accnt);
+    return fig_accnt_rec(accnt);
 }
 
 // AccntPosn.

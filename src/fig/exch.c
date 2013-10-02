@@ -520,7 +520,7 @@ dbr_exch_accnt(DbrExch exch, struct DbrRec* arec)
 // Exec
 
 DBR_API struct DbrOrder*
-dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct DbrBook* book,
+dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
               DbrFlags flags, struct DbrResult* result)
 {
@@ -528,10 +528,6 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
         dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
-
-    struct FigTrader* taker = fig_trader_lazy(trec, &exch->index, exch->pool);
-    if (!taker)
-        goto fail1;
 
     const DbrIden id = dbr_journ_alloc_id(exch->journ);
     struct DbrOrder* new_order = dbr_pool_alloc_order(exch->pool);
@@ -543,8 +539,8 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
     new_order->level = NULL;
     new_order->rev = 1;
     new_order->status = DBR_PLACED;
-    new_order->trader.rec = trec;
-    new_order->accnt.rec = arec;
+    new_order->trader.rec = fig_trader_rec(trader);
+    new_order->accnt.rec = fig_accnt_rec(accnt);
     new_order->contr.rec = book->crec;
     new_order->settl_date = book->settl_date;
     if (ref)
@@ -600,9 +596,9 @@ dbr_exch_place(DbrExch exch, struct DbrRec* trec, struct DbrRec* arec, struct Db
         goto fail5;
 
     // Final commit phase cannot fail.
-    fig_trader_emplace_order(taker, new_order);
+    fig_trader_emplace_order(trader, new_order);
     // Commit trans to result and free matches.
-    commit_result(exch, taker, book, &trans, now, result);
+    commit_result(exch, trader, book, &trans, now, result);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))

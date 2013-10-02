@@ -56,9 +56,10 @@ TEST_CASE(exec_place)
     auto cit = exch.crecs().find("EURUSD");
     check(cit != exch.crecs().end());
 
+    auto trader = exch.trader(TraderRecRef(*tit));
+    auto accnt = exch.accnt(AccntRecRef(*ait));
     auto book = exch.book(ContrRecRef(*cit), 20130824);
 
     Result result;
-    exch.place(TraderRecRef(*tit), AccntRecRef(*ait), book, nullptr,
-               DBR_BUY, 12345, 1, 0, 0, result);
+    exch.place(trader, accnt, book, nullptr, DBR_BUY, 12345, 1, 0, 0, result);
 }

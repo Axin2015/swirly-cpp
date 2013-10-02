@@ -26,10 +26,8 @@
  * @{
  */
 
-// Returns the account-id for state.
-
-DBR_API DbrIden
-dbr_accnt_id(DbrAccnt accnt);
+DBR_API struct DbrRec*
+dbr_accnt_rec(DbrAccnt accnt);
 
 /** @} */
 

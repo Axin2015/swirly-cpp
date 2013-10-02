@@ -20,6 +20,7 @@
 
 #include <dbrpp/iter.hpp>
 #include <dbrpp/rbnode.hpp>
+#include <dbrpp/rec.hpp>
 
 #include <dbr/accnt.h>
 
@@ -199,17 +200,17 @@ public:
     bool
     operator ==(Accnt rhs) const noexcept
     {
-        return id() == rhs.id();
+        return rec().id() == rhs.rec().id();
     }
     bool
     operator !=(Accnt rhs) const noexcept
     {
-        return id() != rhs.id();
+        return rec().id() != rhs.rec().id();
     }
-    DbrIden
-    id() const noexcept
+    AccntRecRef
+    rec() const noexcept
     {
-        return dbr_accnt_id(impl_);
+        return AccntRecRef(*dbr_accnt_rec(impl_));
     }
     AccntPosns
     posns() const noexcept
@@ -221,7 +222,7 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, Accnt accnt)
 {
-    return os << "id=" << accnt.id();
+    return os << "id=" << accnt.rec().id();
 }
 
 } // dbr

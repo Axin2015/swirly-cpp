@@ -27,7 +27,7 @@
 #include <assert.h>
 
 struct FigTrader {
-    DbrIden id;
+    struct DbrRec* rec;
     struct FigIndex* index;
     DbrPool pool;
     struct DbrTree orders;
@@ -42,10 +42,10 @@ fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool);
 DBR_EXTERN void
 fig_trader_term(struct DbrRec* trec);
 
-static inline DbrIden
-fig_trader_id(struct FigTrader* trader)
+static inline struct DbrRec*
+fig_trader_rec(struct FigTrader* trader)
 {
-    return trader->id;
+    return trader->rec;
 }
 
 // Order.
@@ -68,7 +68,7 @@ fig_trader_release_order(struct FigTrader* trader, struct DbrOrder* order)
     dbr_tree_remove(&trader->orders, &order->trader_node_);
     dbr_rbnode_init(&order->trader_node_);
     if (order->ref[0] != '\0')
-        fig_index_remove(trader->index, trader->id, order->ref);
+        fig_index_remove(trader->index, trader->rec->id, order->ref);
 }
 
 // Release ownership from state.
@@ -90,7 +90,7 @@ static inline struct DbrOrder*
 fig_trader_release_order_ref(struct FigTrader* trader, const char* ref)
 {
     assert(ref);
-    struct DbrOrder* order = fig_index_remove(trader->index, trader->id, ref);
+    struct DbrOrder* order = fig_index_remove(trader->index, trader->rec->id, ref);
     if (order) {
         dbr_tree_remove(&trader->orders, &order->trader_node_);
         dbr_rbnode_init(&order->trader_node_);
@@ -110,7 +110,7 @@ static inline struct DbrOrder*
 fig_trader_find_order_ref(const struct FigTrader* trader, const char* ref)
 {
     assert(ref);
-    return fig_index_find(trader->index, trader->id, ref);
+    return fig_index_find(trader->index, trader->rec->id, ref);
 }
 
 static inline struct DbrRbNode*
