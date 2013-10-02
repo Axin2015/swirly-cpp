@@ -35,7 +35,7 @@
 
 typedef int DbrDate;
 typedef long DbrIncs;
-typedef unsigned long DbrFlags;
+typedef long DbrFlags;
 
 /**
  * @brief Milliseconds since Unix epoch.

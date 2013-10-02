@@ -27,6 +27,8 @@
 
 #include <stdlib.h> // abort()
 
+static const char PLACE_ORDER_FORMAT[] = "mmmisillll";
+
 static void
 free_trans_stmts(struct DbrSlNode* first, DbrPool pool)
 {
@@ -226,6 +228,17 @@ dbr_msg_len(struct DbrMsg* msg)
     size_t n = dbr_packleni(msg->type);
     switch (msg->type) {
     case DBR_PLACE_ORDER_REQ:
+        n += dbr_packlenf(PLACE_ORDER_FORMAT,
+                          msg->place_order_req.trader,
+                          msg->place_order_req.accnt,
+                          msg->place_order_req.contr,
+                          msg->place_order_req.settl_date,
+                          DBR_REF_MAX, msg->place_order_req.ref,
+                          msg->place_order_req.action,
+                          msg->place_order_req.ticks,
+                          msg->place_order_req.lots,
+                          msg->place_order_req.min,
+                          msg->place_order_req.flags);
         break;
     case DBR_PLACE_ORDER_REP:
         n += dbr_order_len(msg->place_order_rep.new_order);
@@ -342,6 +355,17 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
     buf = dbr_packi(buf, msg->type);
     switch (msg->type) {
     case DBR_PLACE_ORDER_REQ:
+        buf = dbr_packf(buf, PLACE_ORDER_FORMAT,
+                        msg->place_order_req.trader,
+                        msg->place_order_req.accnt,
+                        msg->place_order_req.contr,
+                        msg->place_order_req.settl_date,
+                        DBR_REF_MAX, msg->place_order_req.ref,
+                        msg->place_order_req.action,
+                        msg->place_order_req.ticks,
+                        msg->place_order_req.lots,
+                        msg->place_order_req.min,
+                        msg->place_order_req.flags);
         break;
     case DBR_PLACE_ORDER_REP:
         buf = dbr_write_order(buf, msg->place_order_rep.new_order);
@@ -442,6 +466,17 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
     struct DbrQueue q;
     switch (type) {
     case DBR_PLACE_ORDER_REQ:
+        buf = dbr_unpackf(buf, PLACE_ORDER_FORMAT,
+                          msg->place_order_req.trader,
+                          msg->place_order_req.accnt,
+                          msg->place_order_req.contr,
+                          &msg->place_order_req.settl_date,
+                          DBR_REF_MAX, msg->place_order_req.ref,
+                          &msg->place_order_req.action,
+                          &msg->place_order_req.ticks,
+                          &msg->place_order_req.lots,
+                          &msg->place_order_req.min,
+                          &msg->place_order_req.flags);
         break;
     case DBR_PLACE_ORDER_REP:
         // Order.

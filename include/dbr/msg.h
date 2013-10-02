@@ -19,6 +19,7 @@
 #define DBR_MSG_H
 
 #include <dbr/pool.h>
+#include <dbr/types.h>
 
 #include <stddef.h> // size_t
 
@@ -40,6 +41,16 @@ struct DbrMsg {
 	int type;
 	union {
         struct {
+            DbrMnem trader;
+            DbrMnem accnt;
+            DbrMnem contr;
+            DbrDate settl_date;
+            DbrRef ref;
+            int action;
+            DbrTicks ticks;
+            DbrLots lots;
+            DbrLots min;
+            DbrFlags flags;
         } place_order_req;
         struct {
             // Set by dbr_msg_len();
