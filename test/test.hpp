@@ -27,7 +27,7 @@
 class TestException : public std::exception {
     const char* file_;
     int line_;
-    char msg_[DBR_ERROR_MAX + 1];
+    char msg_[DBR_ERRMSG_MAX + 1];
 public:
     virtual
     ~TestException() noexcept
@@ -37,8 +37,8 @@ public:
     {
         file_ = file;
         line_ = line;
-        strncpy(msg_, msg, DBR_ERROR_MAX);
-        msg_[DBR_ERROR_MAX] = '\0';
+        strncpy(msg_, msg, DBR_ERRMSG_MAX);
+        msg_[DBR_ERRMSG_MAX] = '\0';
     }
     virtual const char*
     what() const noexcept

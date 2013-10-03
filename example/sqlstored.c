@@ -74,7 +74,7 @@ read_entity(const struct DbrMsg* req)
 static DbrBool
 write_trans(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_WRITE_TRANS_REP };
+    struct DbrMsg rep = { .type = DBR_STATUS_OK };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_begin_trans(journ)) {

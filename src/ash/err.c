@@ -26,7 +26,7 @@ static __thread struct {
     int num;
     const char* file;
     int line;
-    char msg[DBR_ERROR_MAX + 1];
+    char msg[DBR_ERRMSG_MAX + 1];
 } err;
 
 DBR_API void
@@ -59,9 +59,9 @@ dbr_err_vset_(int num, const char* file, int line, const char* format, va_list a
     err.num = num;
     err.file = file;
     err.line = line;
-    const int ret = vsnprintf(err.msg, DBR_ERROR_MAX, format, args);
+    const int ret = vsnprintf(err.msg, DBR_ERRMSG_MAX, format, args);
     // Null termination is _not_ guaranteed by snprintf().
-    err.msg[DBR_ERROR_MAX] = '\0';
+    err.msg[DBR_ERRMSG_MAX] = '\0';
     if (ret < 0)
         strcpy(err.msg, "bad err format");
 }

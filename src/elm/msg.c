@@ -27,6 +27,7 @@
 
 #include <stdlib.h> // abort()
 
+static const char STATUS_ERR_FORMAT[] = "is";
 static const char PLACE_ORDER_FORMAT[] = "mmmisillll";
 
 static void
@@ -227,6 +228,13 @@ dbr_msg_len(struct DbrMsg* msg)
 {
     size_t n = dbr_packleni(msg->type);
     switch (msg->type) {
+    case DBR_STATUS_OK:
+        break;
+    case DBR_STATUS_ERR:
+        n += dbr_packlenf(STATUS_ERR_FORMAT,
+                          msg->status_err.num,
+                          DBR_ERRMSG_MAX, msg->status_err.msg);
+        break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_FORMAT,
                           msg->place_order_req.trader,
@@ -341,8 +349,6 @@ dbr_msg_len(struct DbrMsg* msg)
         }
         n += dbr_packlenz(msg->write_trans_req.count);
         break;
-    case DBR_WRITE_TRANS_REP:
-        break;
     default:
         abort();
     }
@@ -354,6 +360,13 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
 {
     buf = dbr_packi(buf, msg->type);
     switch (msg->type) {
+    case DBR_STATUS_OK:
+        break;
+    case DBR_STATUS_ERR:
+        buf = dbr_packf(buf, STATUS_ERR_FORMAT,
+                        msg->status_err.num,
+                        DBR_ERRMSG_MAX, msg->status_err.msg);
+        break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_FORMAT,
                         msg->place_order_req.trader,
@@ -448,10 +461,6 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
             buf = dbr_write_stmt(buf, stmt);
         }
         break;
-    case DBR_WRITE_TRANS_REP:
-        break;
-    default:
-        abort();
     }
     return buf;
 }
@@ -465,6 +474,13 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
     msg->type = type;
     struct DbrQueue q;
     switch (type) {
+    case DBR_STATUS_OK:
+        break;
+    case DBR_STATUS_ERR:
+        buf = dbr_unpackf(buf, STATUS_ERR_FORMAT,
+                          &msg->status_err.num,
+                          DBR_ERRMSG_MAX, msg->status_err.msg);
+        break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_unpackf(buf, PLACE_ORDER_FORMAT,
                           msg->place_order_req.trader,
@@ -626,8 +642,6 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             }
         }
         msg->write_trans_req.first = dbr_queue_first(&q);
-        break;
-    case DBR_WRITE_TRANS_REP:
         break;
     default:
         dbr_err_set(DBR_EIO, "invalid msg-type '%d'", type);

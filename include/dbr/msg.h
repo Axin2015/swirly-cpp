@@ -18,6 +18,7 @@
 #ifndef DBR_MSG_H
 #define DBR_MSG_H
 
+#include <dbr/err.h>
 #include <dbr/pool.h>
 #include <dbr/types.h>
 
@@ -29,17 +30,24 @@
  */
 
 enum {
-    DBR_PLACE_ORDER_REQ = 1,
+    DBR_STATUS_OK = 1,
+    DBR_STATUS_ERR,
+    DBR_PLACE_ORDER_REQ,
     DBR_PLACE_ORDER_REP,
     DBR_READ_ENTITY_REQ,
     DBR_READ_ENTITY_REP,
-    DBR_WRITE_TRANS_REQ,
-    DBR_WRITE_TRANS_REP
+    DBR_WRITE_TRANS_REQ
 };
 
 struct DbrMsg {
 	int type;
 	union {
+        struct {
+        } status_ok;
+        struct {
+            int num;
+            char msg[DBR_ERRMSG_MAX + 1];
+        } status_err;
         struct {
             DbrMnem trader;
             DbrMnem accnt;

@@ -55,7 +55,7 @@ enum DbrErrno {
 };
 
 enum {
-    DBR_ERROR_MAX = 255
+    DBR_ERRMSG_MAX = 255
 };
 
 /**

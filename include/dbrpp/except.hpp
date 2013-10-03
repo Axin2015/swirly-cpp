@@ -29,7 +29,7 @@ class DbrException : public std::exception {
     int num_;
     const char* file_;
     int line_;
-    char msg_[DBR_ERROR_MAX + 1];
+    char msg_[DBR_ERRMSG_MAX + 1];
 public:
     virtual
     ~DbrException() noexcept
@@ -40,8 +40,8 @@ public:
         num_ = num;
         file_ = file;
         line_ = line;
-        strncpy(msg_, msg, DBR_ERROR_MAX);
-        msg_[DBR_ERROR_MAX] = '\0';
+        strncpy(msg_, msg, DBR_ERRMSG_MAX);
+        msg_[DBR_ERRMSG_MAX] = '\0';
     }
     DbrException() noexcept
     : DbrException(dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg())
