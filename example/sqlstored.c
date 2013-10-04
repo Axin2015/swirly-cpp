@@ -29,6 +29,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
@@ -48,6 +49,14 @@ free_stmts(struct DbrSlNode* first, DbrPool pool)
     }
 }
 
+static void
+status_err(struct DbrMsg* rep)
+{
+    rep->type = DBR_STATUS_REP;
+    rep->status_rep.num = dbr_err_num();
+    strncpy(rep->status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
+}
+
 static DbrBool
 read_entity(const struct DbrMsg* req)
 {
@@ -57,16 +66,17 @@ read_entity(const struct DbrMsg* req)
 
     if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {
         dbr_err_print("dbr_model_read_entity() failed");
+        status_err(&rep);
         goto fail1;
     }
     DbrBool ok = dbr_send_msg(sock, &rep);
     dbr_pool_free_list(pool, rep.entity_rep.type, rep.entity_rep.first);
-    if (!ok) {
+    if (!ok)
         dbr_err_print("dbr_send_msg() failed");
-        goto fail1;
-    }
-    return true;
+    return ok;
  fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -78,6 +88,7 @@ write_trans(const struct DbrMsg* req)
 
     if (!dbr_journ_begin_trans(journ)) {
         dbr_err_print("dbr_journ_begin_trans() failed");
+        status_err(&rep);
         goto fail1;
     }
     for (struct DbrSlNode* node = req->write_trans_req.first; node; node = node->next) {
@@ -102,7 +113,8 @@ write_trans(const struct DbrMsg* req)
                                         stmt->insert_order.flags,
                                         stmt->insert_order.now)) {
                 dbr_err_print("dbr_journ_insert_order() failed");
-                goto fail1;
+                status_err(&rep);
+                goto fail2;
             }
             break;
         case DBR_UPDATE_ORDER:
@@ -115,7 +127,8 @@ write_trans(const struct DbrMsg* req)
                                         stmt->update_order.lots,
                                         stmt->update_order.now)) {
                 dbr_err_print("dbr_journ_update_order() failed");
-                goto fail1;
+                status_err(&rep);
+                goto fail2;
             }
             break;
         case DBR_ARCHIVE_ORDER:
@@ -123,7 +136,8 @@ write_trans(const struct DbrMsg* req)
                                          stmt->archive_order.id,
                                          stmt->archive_order.now)) {
                 dbr_err_print("dbr_journ_archive_order() failed");
-                goto fail1;
+                status_err(&rep);
+                goto fail2;
             }
             break;
         case DBR_INSERT_TRADE:
@@ -146,7 +160,8 @@ write_trans(const struct DbrMsg* req)
                                         stmt->insert_trade.lots,
                                         stmt->insert_trade.now)) {
                 dbr_err_print("dbr_journ_insert_trade() failed");
-                goto fail1;
+                status_err(&rep);
+                goto fail2;
             }
             break;
         case DBR_ARCHIVE_TRADE:
@@ -154,22 +169,27 @@ write_trans(const struct DbrMsg* req)
                                          stmt->archive_trade.id,
                                          stmt->archive_trade.now)) {
                 dbr_err_print("dbr_journ_archive_trade() failed");
-                goto fail1;
+                status_err(&rep);
+                goto fail2;
             }
             break;
         }
     }
     if (!dbr_journ_commit_trans(journ)) {
         dbr_err_print("dbr_journ_commit_trans() failed");
-        goto fail1;
+        status_err(&rep);
+        goto fail2;
     }
     DbrBool ok = dbr_send_msg(sock, &rep);
-    if (!dbr_send_msg(sock, &rep))
+    if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
- fail1:
+ fail2:
     if (!dbr_journ_rollback_trans(journ))
         dbr_err_print("dbr_journ_rollback_trans() failed");
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 

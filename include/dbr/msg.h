@@ -49,7 +49,7 @@ struct DbrMsg {
 	union {
         struct {
             int num;
-            char msg[DBR_ERRMSG_MAX + 1];
+            char msg[DBR_ERRMSG_MAX];
         } status_rep;
         struct {
             int type;
