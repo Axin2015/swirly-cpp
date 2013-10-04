@@ -239,8 +239,8 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
     if (!dbr_recv_msg(store->sock, pool, &msg))
         return -1;
 
-    *first = msg.read_entity_rep.first;
-    return msg.read_entity_rep.count;
+    *first = msg.entity_rep.first;
+    return msg.entity_rep.count;
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {

@@ -51,17 +51,16 @@ free_stmts(struct DbrSlNode* first, DbrPool pool)
 static DbrBool
 read_entity(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_READ_ENTITY_REP,
-                          .read_entity_rep = { .type = req->read_entity_req.type } };
+    struct DbrMsg rep = { .type = DBR_ENTITY_REP,
+                          .entity_rep = { .type = req->read_entity_req.type } };
     DbrModel model = dbr_sqlstore_model(store);
 
-    if (dbr_model_read_entity(model, rep.read_entity_rep.type, pool,
-                              &rep.read_entity_rep.first) < 0) {
+    if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {
         dbr_err_print("dbr_model_read_entity() failed");
         goto fail1;
     }
     DbrBool ok = dbr_send_msg(sock, &rep);
-    dbr_pool_free_list(pool, rep.read_entity_rep.type, rep.read_entity_rep.first);
+    dbr_pool_free_list(pool, rep.entity_rep.type, rep.entity_rep.first);
     if (!ok) {
         dbr_err_print("dbr_send_msg() failed");
         goto fail1;
@@ -74,7 +73,7 @@ read_entity(const struct DbrMsg* req)
 static DbrBool
 write_trans(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_OK };
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_begin_trans(journ)) {

@@ -30,12 +30,17 @@
  */
 
 enum {
-    DBR_STATUS_OK = 1,
-    DBR_STATUS_ERR,
-    DBR_PLACE_ORDER_REQ,
-    DBR_PLACE_ORDER_REP,
+    DBR_STATUS_REP = 1,
+    DBR_ENTITY_REP,
+    DBR_RESULT_REP,
     DBR_READ_ENTITY_REQ,
-    DBR_READ_ENTITY_REP,
+    DBR_PLACE_ORDER_REQ,
+    DBR_REVISE_ORDER_ID_REQ,
+    DBR_REVISE_ORDER_REF_REQ,
+    DBR_CANCEL_ORDER_ID_REQ,
+    DBR_CANCEL_ORDER_REF_REQ,
+    DBR_ARCHIVE_ORDER_REQ,
+    DBR_ARCHIVE_TRADE_REQ,
     DBR_WRITE_TRANS_REQ
 };
 
@@ -43,11 +48,26 @@ struct DbrMsg {
 	int type;
 	union {
         struct {
-        } status_ok;
-        struct {
             int num;
             char msg[DBR_ERRMSG_MAX + 1];
-        } status_err;
+        } status_rep;
+        struct {
+            int type;
+            // Set by dbr_msg_len();
+            size_t count;
+            struct DbrSlNode* first;
+        } entity_rep;
+        struct {
+            // Set by dbr_msg_len();
+            size_t posn_count;
+            size_t trade_count;
+            struct DbrOrder* new_order;
+            struct DbrSlNode* first_posn;
+            struct DbrSlNode* first_trade;
+        } result_rep;
+        struct {
+            int type;
+        } read_entity_req;
         struct {
             DbrMnem trader;
             DbrMnem accnt;
@@ -62,28 +82,9 @@ struct DbrMsg {
         } place_order_req;
         struct {
             // Set by dbr_msg_len();
-            size_t posn_count;
-            size_t trade_count;
-            struct DbrOrder* new_order;
-            struct DbrSlNode* first_posn;
-            struct DbrSlNode* first_trade;
-        } place_order_rep;
-        struct {
-            int type;
-        } read_entity_req;
-        struct {
-            int type;
-            // Set by dbr_msg_len();
-            size_t count;
-            struct DbrSlNode* first;
-        } read_entity_rep;
-        struct {
-            // Set by dbr_msg_len();
             size_t count;
             struct DbrSlNode* first;
         } write_trans_req;
-        struct {
-        } write_trans_rep;
     };
 };
 
