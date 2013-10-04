@@ -256,12 +256,12 @@ dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
 
     void* sock = zmq_socket(ctx, ZMQ_REQ);
     if (!sock) {
-        dbr_err_set(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
 
     if (zmq_bind(sock, addr) < 0) {
-        dbr_err_set(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
 

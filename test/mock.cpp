@@ -294,7 +294,7 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
         ret = read_posn(pool, first);
         break;
     default:
-        dbr_err_set(DBR_EINVAL, "invalid type '%d'", type);
+        dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);
         first = nullptr;
         ret = -1;
     }

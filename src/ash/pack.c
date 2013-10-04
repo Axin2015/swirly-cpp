@@ -256,7 +256,7 @@ dbr_unpacki(const char* buf, int* i)
             buf += 4;
             break;
         default:
-            dbr_err_set(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
+            dbr_err_setf(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
             buf = NULL;
             break;
         }
@@ -337,7 +337,7 @@ dbr_unpackl(const char* buf, long* l)
             buf += 8;
             break;
         default:
-            dbr_err_set(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
+            dbr_err_setf(DBR_EIO, "invalid header 0x%x", (unsigned)hdr);
             buf = NULL;
             break;
         }

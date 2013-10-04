@@ -1191,7 +1191,7 @@ fir_sqlstore_select_entity(struct FirSqlStore* store, int type, DbrPool pool,
         ret = select_posn(store, pool, first);
         break;
     default:
-        dbr_err_set(DBR_EINVAL, "invalid type '%d'", type);
+        dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);
         *first = NULL;
         ret = -1;
     }

@@ -187,7 +187,7 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
         buf = dbr_read_contr(buf, rec);
         break;
     default:
-        dbr_err_set(DBR_EIO, "invalid type %d", rec->type);
+        dbr_err_setf(DBR_EIO, "invalid type %d", rec->type);
         buf = NULL;
     }
     return buf;
@@ -452,7 +452,7 @@ dbr_read_stmt(const char* buf, struct DbrStmt* stmt)
                           &stmt->archive_trade.id, &stmt->archive_trade.now);
         break;
     default:
-        dbr_err_set(DBR_EIO, "invalid type %d", stmt->type);
+        dbr_err_setf(DBR_EIO, "invalid type %d", stmt->type);
         buf = NULL;
     }
     return buf;

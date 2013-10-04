@@ -45,16 +45,26 @@ dbr_err_print(const char* s)
 }
 
 DBR_API void
-dbr_err_set_(int num, const char* file, int line, const char* format, ...)
+dbr_err_set_(int num, const char* file, int line, const char* msg)
+{
+    err.num = num;
+    err.file = file;
+    err.line = line;
+    strncpy(err.msg, msg, DBR_ERRMSG_MAX);
+    err.msg[DBR_ERRMSG_MAX] = '\0';
+}
+
+DBR_API void
+dbr_err_setf_(int num, const char* file, int line, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    dbr_err_vset_(num, file, line, format, args);
+    dbr_err_vsetf_(num, file, line, format, args);
     va_end(args);
 }
 
 DBR_API void
-dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args)
+dbr_err_vsetf_(int num, const char* file, int line, const char* format, va_list args)
 {
     err.num = num;
     err.file = file;

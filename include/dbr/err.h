@@ -73,10 +73,13 @@ DBR_API void
 dbr_err_print(const char* s);
 
 DBR_API void
-dbr_err_set_(int num, const char* file, int line, const char* format, ...);
+dbr_err_set_(int num, const char* file, int line, const char* msg);
 
 DBR_API void
-dbr_err_vset_(int num, const char* file, int line, const char* format, va_list args);
+dbr_err_setf_(int num, const char* file, int line, const char* format, ...);
+
+DBR_API void
+dbr_err_vsetf_(int num, const char* file, int line, const char* format, va_list args);
 
 DBR_API int
 dbr_err_num(void);
@@ -90,11 +93,12 @@ dbr_err_line(void);
 DBR_API const char*
 dbr_err_msg(void);
 
-#define dbr_err_set(num, ...)                           \
-    dbr_err_set_(num, __FILE__, __LINE__, __VA_ARGS__)
-
-#define dbr_err_vset(num, format, args)                 \
-    dbr_err_vset_(num, __FILE__, __LINE__, format, args)
+#define dbr_err_set(num, msg)                             \
+    dbr_err_set_(num, __FILE__, __LINE__, msg)
+#define dbr_err_setf(num, ...)                            \
+    dbr_err_setf_(num, __FILE__, __LINE__, __VA_ARGS__)
+#define dbr_err_vsetf(num, format, args)                  \
+    dbr_err_vsetf_(num, __FILE__, __LINE__, format, args)
 
 /** @} */
 

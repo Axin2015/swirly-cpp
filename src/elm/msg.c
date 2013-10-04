@@ -588,7 +588,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             msg->entity_rep.first = dbr_queue_first(&q);
             break;
         default:
-            dbr_err_set(DBR_EIO, "invalid entity-type '%d'", type);
+            dbr_err_setf(DBR_EIO, "invalid entity-type '%d'", type);
             goto fail1;
         }
         break;
@@ -674,7 +674,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         msg->write_trans_req.first = dbr_queue_first(&q);
         break;
     default:
-        dbr_err_set(DBR_EIO, "invalid msg-type '%d'", type);
+        dbr_err_setf(DBR_EIO, "invalid msg-type '%d'", type);
         goto fail1;
     }
     return buf;
@@ -687,12 +687,12 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
 {
     zmq_msg_t zmsg;
     if (zmq_msg_init(&zmsg) < 0) {
-        dbr_err_set(DBR_EIO, "zmq_msg_init() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(DBR_EIO, "zmq_msg_init() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
     if (zmq_msg_recv(&zmsg, sock, 0) < 0) {
         const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
-        dbr_err_set(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     if (!dbr_read_msg(zmq_msg_data(&zmsg), pool, msg)) {
@@ -712,7 +712,7 @@ dbr_send_msg(void* sock, struct DbrMsg* msg)
 {
     zmq_msg_t zmsg;
     if (zmq_msg_init_size(&zmsg, dbr_msg_len(msg)) < 0) {
-        dbr_err_set(DBR_EIO, "zmq_msg_init_size() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(DBR_EIO, "zmq_msg_init_size() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
     if (!dbr_write_msg(zmq_msg_data(&zmsg), msg)) {
@@ -720,7 +720,7 @@ dbr_send_msg(void* sock, struct DbrMsg* msg)
         goto fail2;
     }
     if (zmq_msg_send(&zmsg, sock, 0) < 0) {
-        dbr_err_set(DBR_EIO, "zmq_msg_send() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(DBR_EIO, "zmq_msg_send() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     zmq_msg_close(&zmsg);

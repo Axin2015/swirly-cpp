@@ -525,7 +525,7 @@ dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
               DbrFlags flags, struct DbrResult* result)
 {
     if (lots == 0 || lots < min) {
-        dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
+        dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
 
@@ -620,13 +620,13 @@ dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
-        dbr_err_set(DBR_EINVAL, "no such order '%ld'", id);
+        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     if (dbr_order_done(order)) {
-        dbr_err_set(DBR_EINVAL, "order complete '%ld'", id);
+        dbr_err_setf(DBR_EINVAL, "order complete '%ld'", id);
         goto fail1;
     }
 
@@ -636,7 +636,7 @@ dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
     // 3. greater than original lots.
 
     if (lots == 0 || lots < order->min || lots < order->exec || lots > order->lots) {
-        dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
+        dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
 
@@ -665,12 +665,12 @@ dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lot
 {
     struct DbrOrder* order = fig_trader_find_order_ref(trader, ref);
     if (!order) {
-        dbr_err_set(DBR_EINVAL, "no such order '%.64s'", ref);
+        dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
     }
 
     if (dbr_order_done(order)) {
-        dbr_err_set(DBR_EINVAL, "order complete '%.64s'", ref);
+        dbr_err_setf(DBR_EINVAL, "order complete '%.64s'", ref);
         goto fail1;
     }
 
@@ -680,7 +680,7 @@ dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lot
     // 3. greater than original lots.
 
     if (lots == 0 || lots < order->min || lots < order->exec || lots > order->lots) {
-        dbr_err_set(DBR_EINVAL, "invalid lots '%ld'", lots);
+        dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
 
@@ -708,13 +708,13 @@ dbr_exch_cancel_id(DbrExch exch, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
-        dbr_err_set(DBR_EINVAL, "no such order '%ld'", id);
+        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     if (dbr_order_done(order)) {
-        dbr_err_set(DBR_EINVAL, "order complete '%ld'", id);
+        dbr_err_setf(DBR_EINVAL, "order complete '%ld'", id);
         goto fail1;
     }
 
@@ -736,12 +736,12 @@ dbr_exch_cancel_ref(DbrExch exch, DbrTrader trader, const char* ref)
 {
     struct DbrOrder* order = fig_trader_find_order_ref(trader, ref);
     if (!order) {
-        dbr_err_set(DBR_EINVAL, "no such order '%.64s'", ref);
+        dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
     }
 
     if (dbr_order_done(order)) {
-        dbr_err_set(DBR_EINVAL, "order complete '%.64s'", ref);
+        dbr_err_setf(DBR_EINVAL, "order complete '%.64s'", ref);
         goto fail1;
     }
 
@@ -763,13 +763,13 @@ dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
-        dbr_err_set(DBR_EINVAL, "no such order '%ld'", id);
+        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
     if (!dbr_order_done(order)) {
-        dbr_err_set(DBR_EINVAL, "order '%ld' not done", id);
+        dbr_err_setf(DBR_EINVAL, "order '%ld' not done", id);
         goto fail1;
     }
 
@@ -791,7 +791,7 @@ dbr_exch_archive_trade(DbrExch exch, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_trade_id(trader, id);
     if (!node) {
-        dbr_err_set(DBR_EINVAL, "no such trade '%ld'", id);
+        dbr_err_setf(DBR_EINVAL, "no such trade '%ld'", id);
         goto fail1;
     }
 
