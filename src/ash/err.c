@@ -20,6 +20,7 @@
 #include <dbr/log.h>
 
 #include <stdio.h>
+#include <stdlib.h> // abort()
 #include <string.h> // strcpy()
 
 static __thread struct {
@@ -70,10 +71,10 @@ dbr_err_vsetf_(int num, const char* file, int line, const char* format, va_list 
     err.file = file;
     err.line = line;
     const int ret = vsnprintf(err.msg, DBR_ERRMSG_MAX, format, args);
-    // Null termination is _not_ guaranteed by snprintf().
+    // Defensive. Null termination is _not_ guaranteed by snprintf().
     err.msg[DBR_ERRMSG_MAX] = '\0';
     if (ret < 0)
-        strcpy(err.msg, "bad err format");
+        abort();
 }
 
 DBR_API int

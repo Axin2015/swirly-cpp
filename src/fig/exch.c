@@ -499,12 +499,6 @@ dbr_exch_end_rec(DbrExch exch)
 
 // Pool
 
-DBR_API struct DbrBook*
-dbr_exch_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
-{
-    return get_book(exch, crec, settl_date);
-}
-
 DBR_API DbrTrader
 dbr_exch_trader(DbrExch exch, struct DbrRec* trec)
 {
@@ -515,6 +509,12 @@ DBR_API DbrAccnt
 dbr_exch_accnt(DbrExch exch, struct DbrRec* arec)
 {
     return fig_accnt_lazy(arec, exch->pool);
+}
+
+DBR_API struct DbrBook*
+dbr_exch_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
+{
+    return get_book(exch, crec, settl_date);
 }
 
 // Exec

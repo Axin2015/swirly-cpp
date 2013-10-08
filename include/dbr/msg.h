@@ -53,17 +53,23 @@ struct DbrMsg {
         } status_rep;
         struct {
             int type;
-            // Set by dbr_msg_len();
-            size_t count;
             struct DbrSlNode* first;
+            /**
+             * @privatesection
+             */
+            // Set by dbr_msg_len();
+            size_t count_;
         } entity_rep;
         struct {
-            // Set by dbr_msg_len();
-            size_t posn_count;
-            size_t trade_count;
             struct DbrOrder* new_order;
             struct DbrSlNode* first_posn;
             struct DbrSlNode* first_trade;
+            /**
+             * @privatesection
+             */
+            // Set by dbr_msg_len();
+            size_t posn_count_;
+            size_t trade_count_;
         } result_rep;
         struct {
             int type;
@@ -81,9 +87,12 @@ struct DbrMsg {
             DbrFlags flags;
         } place_order_req;
         struct {
-            // Set by dbr_msg_len();
-            size_t count;
             struct DbrSlNode* first;
+            /**
+             * @privatesection
+             */
+            // Set by dbr_msg_len();
+            size_t count_;
         } write_trans_req;
     };
 };

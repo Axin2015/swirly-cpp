@@ -85,7 +85,7 @@ commit_trans(DbrJourn journ)
 {
     struct DbrZmqStore_* store = journ_implof(journ);
     struct DbrMsg msg = { .type = DBR_WRITE_TRANS_REQ,
-                          .write_trans_req = { .count = 0, .first = store->queue.first } };
+                          .write_trans_req = { .count_ = 0, .first = store->queue.first } };
     DbrBool ok = dbr_send_msg(store->sock, &msg);
     free_stmts(store->queue.first, store->pool);
     dbr_queue_init(&store->queue);
@@ -240,7 +240,7 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
         return -1;
 
     *first = msg.entity_rep.first;
-    return msg.entity_rep.count;
+    return msg.entity_rep.count_;
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {
