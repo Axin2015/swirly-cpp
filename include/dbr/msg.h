@@ -33,6 +33,7 @@ enum {
     DBR_STATUS_REP = 1,
     DBR_ENTITY_REP,
     DBR_RESULT_REP,
+    DBR_ORDER_REP,
     DBR_READ_ENTITY_REQ,
     DBR_PLACE_ORDER_REQ,
     DBR_REVISE_ORDER_ID_REQ,
@@ -71,6 +72,9 @@ struct DbrMsg {
             size_t posn_count_;
             size_t trade_count_;
         } result_rep;
+        struct {
+            struct DbrOrder* order;
+        } order_rep;
         struct {
             int type;
         } read_entity_req;

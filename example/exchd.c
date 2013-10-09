@@ -84,7 +84,7 @@ read_entity(const struct DbrMsg* req)
 static DbrBool
 place_order(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->place_order_req.trader);
     if (!trec) {
@@ -131,6 +131,10 @@ place_order(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_RESULT_REP;
+    rep.result_rep.new_order = result.new_order;
+    rep.result_rep.first_posn = result.first_posn;
+    rep.result_rep.first_trade = result.first_trade;
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -144,7 +148,7 @@ place_order(const struct DbrMsg* req)
 static DbrBool
 revise_order_id(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->revise_order_id_req.trader);
     if (!trec) {
@@ -167,6 +171,8 @@ revise_order_id(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_ORDER_REP;
+    rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -180,7 +186,7 @@ revise_order_id(const struct DbrMsg* req)
 static DbrBool
 revise_order_ref(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->revise_order_ref_req.trader);
     if (!trec) {
@@ -203,6 +209,8 @@ revise_order_ref(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_ORDER_REP;
+    rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -216,7 +224,7 @@ revise_order_ref(const struct DbrMsg* req)
 static DbrBool
 cancel_order_id(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->cancel_order_id_req.trader);
     if (!trec) {
@@ -238,6 +246,8 @@ cancel_order_id(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_ORDER_REP;
+    rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -251,7 +261,7 @@ cancel_order_id(const struct DbrMsg* req)
 static DbrBool
 cancel_order_ref(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->cancel_order_ref_req.trader);
     if (!trec) {
@@ -273,6 +283,8 @@ cancel_order_ref(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_ORDER_REP;
+    rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -286,7 +298,7 @@ cancel_order_ref(const struct DbrMsg* req)
 static DbrBool
 archive_order(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->archive_order_req.trader);
     if (!trec) {
@@ -320,7 +332,7 @@ archive_order(const struct DbrMsg* req)
 static DbrBool
 archive_trade(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep;
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->archive_trade_req.trader);
     if (!trec) {

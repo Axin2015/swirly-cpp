@@ -328,6 +328,9 @@ dbr_msg_len(struct DbrMsg* msg)
         }
         n += dbr_packlenz(msg->result_rep.trade_count_);
         break;
+    case DBR_ORDER_REP:
+        n += dbr_order_len(msg->order_rep.order);
+        break;
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(msg->read_entity_req.type);
         break;
@@ -471,6 +474,9 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
             struct DbrTrade* trade = dbr_result_trade_entry(node);
             buf = dbr_write_trade(buf, trade);
         }
+        break;
+    case DBR_ORDER_REP:
+        buf = dbr_write_order(buf, msg->order_rep.order);
         break;
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, msg->read_entity_req.type);
@@ -677,6 +683,16 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             }
         }
         msg->result_rep.first_trade = dbr_queue_first(&q);
+        break;
+    case DBR_ORDER_REP:
+        // Order.
+        msg->order_rep.order = dbr_pool_alloc_order(pool);
+        if (!msg->order_rep.order)
+            goto fail1;
+        if (!(buf = dbr_read_order(buf, msg->order_rep.order))) {
+            dbr_pool_free_order(pool, msg->order_rep.order);
+            goto fail1;
+        }
         break;
     case DBR_READ_ENTITY_REQ:
         if (!(buf = dbr_unpacki(buf, &msg->read_entity_req.type)))
