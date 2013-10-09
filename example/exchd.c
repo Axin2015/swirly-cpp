@@ -144,37 +144,211 @@ place_order(const struct DbrMsg* req)
 static DbrBool
 revise_order_id(const struct DbrMsg* req)
 {
-    return true;
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->revise_order_id_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->revise_order_id_req.trader);
+        goto fail1;
+    }
+
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrIden id = req->revise_order_id_req.id;
+    const DbrLots lots = req->revise_order_id_req.lots;
+
+    struct DbrOrder* order = dbr_exch_revise_id(exch, trader, id, lots);
+    if (!order) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 revise_order_ref(const struct DbrMsg* req)
 {
-    return true;
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->revise_order_ref_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->revise_order_ref_req.trader);
+        goto fail1;
+    }
+
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const char* ref = req->revise_order_ref_req.ref;
+    const DbrLots lots = req->revise_order_ref_req.lots;
+
+    struct DbrOrder* order = dbr_exch_revise_ref(exch, trader, ref, lots);
+    if (!order) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 cancel_order_id(const struct DbrMsg* req)
 {
-    return true;
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->cancel_order_id_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->cancel_order_id_req.trader);
+        goto fail1;
+    }
+
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrIden id = req->cancel_order_id_req.id;
+
+    struct DbrOrder* order = dbr_exch_cancel_id(exch, trader, id);
+    if (!order) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 cancel_order_ref(const struct DbrMsg* req)
 {
-    return true;
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->cancel_order_ref_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->cancel_order_ref_req.trader);
+        goto fail1;
+    }
+
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const char* ref = req->cancel_order_ref_req.ref;
+
+    struct DbrOrder* order = dbr_exch_cancel_ref(exch, trader, ref);
+    if (!order) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 archive_order(const struct DbrMsg* req)
 {
-    return true;
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->archive_order_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->archive_order_req.trader);
+        goto fail1;
+    }
+
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrIden id = req->archive_order_req.id;
+
+    if (!dbr_exch_archive_order(exch, trader, id)) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 archive_trade(const struct DbrMsg* req)
 {
-    return true;
+    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->archive_trade_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->archive_trade_req.trader);
+        goto fail1;
+    }
+
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrIden id = req->archive_trade_req.id;
+
+    if (!dbr_exch_archive_trade(exch, trader, id)) {
+        status_err(&rep);
+        goto fail1;
+    }
+
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool

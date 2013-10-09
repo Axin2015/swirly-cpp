@@ -29,6 +29,12 @@
 
 static const char STATUS_REP_FORMAT[] = "is";
 static const char PLACE_ORDER_REQ_FORMAT[] = "mmmisillll";
+static const char REVISE_ORDER_ID_REQ_FORMAT[] = "mll";
+static const char REVISE_ORDER_REF_REQ_FORMAT[] = "msl";
+static const char CANCEL_ORDER_ID_REQ_FORMAT[] = "ml";
+static const char CANCEL_ORDER_REF_REQ_FORMAT[] = "ms";
+static const char ARCHIVE_ORDER_REQ_FORMAT[] = "ml";
+static const char ARCHIVE_TRADE_REQ_FORMAT[] = "ml";
 
 static void
 free_result_posns(struct DbrSlNode* first, DbrPool pool)
@@ -339,16 +345,36 @@ dbr_msg_len(struct DbrMsg* msg)
                           msg->place_order_req.flags);
         break;
     case DBR_REVISE_ORDER_ID_REQ:
+        n += dbr_packlenf(REVISE_ORDER_ID_REQ_FORMAT,
+                          msg->revise_order_id_req.trader,
+                          msg->revise_order_id_req.id,
+                          msg->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
+        n += dbr_packlenf(REVISE_ORDER_REF_REQ_FORMAT,
+                          msg->revise_order_ref_req.trader,
+                          DBR_REF_MAX, msg->revise_order_ref_req.ref,
+                          msg->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
+        n += dbr_packlenf(CANCEL_ORDER_ID_REQ_FORMAT,
+                          msg->cancel_order_id_req.trader,
+                          msg->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
+        n += dbr_packlenf(CANCEL_ORDER_REF_REQ_FORMAT,
+                          msg->cancel_order_ref_req.trader,
+                          DBR_REF_MAX, msg->cancel_order_ref_req.ref);
         break;
     case DBR_ARCHIVE_ORDER_REQ:
+        n += dbr_packlenf(ARCHIVE_ORDER_REQ_FORMAT,
+                          msg->archive_order_req.trader,
+                          msg->archive_order_req.id);
         break;
     case DBR_ARCHIVE_TRADE_REQ:
+        n += dbr_packlenf(ARCHIVE_TRADE_REQ_FORMAT,
+                          msg->archive_trade_req.trader,
+                          msg->archive_trade_req.id);
         break;
     case DBR_WRITE_TRANS_REQ:
         msg->write_trans_req.count_ = 0;
@@ -463,16 +489,36 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
                         msg->place_order_req.flags);
         break;
     case DBR_REVISE_ORDER_ID_REQ:
+        buf = dbr_packf(buf, REVISE_ORDER_ID_REQ_FORMAT,
+                        msg->revise_order_id_req.trader,
+                        msg->revise_order_id_req.id,
+                        msg->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
+        buf = dbr_packf(buf, REVISE_ORDER_REF_REQ_FORMAT,
+                        msg->revise_order_ref_req.trader,
+                        DBR_REF_MAX, msg->revise_order_ref_req.ref,
+                        msg->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
+        buf = dbr_packf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
+                        msg->cancel_order_id_req.trader,
+                        msg->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
+        buf = dbr_packf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
+                        msg->cancel_order_ref_req.trader,
+                        DBR_REF_MAX, msg->cancel_order_ref_req.ref);
         break;
     case DBR_ARCHIVE_ORDER_REQ:
+        buf = dbr_packf(buf, ARCHIVE_ORDER_REQ_FORMAT,
+                        msg->archive_order_req.trader,
+                        msg->archive_order_req.id);
         break;
     case DBR_ARCHIVE_TRADE_REQ:
+        buf = dbr_packf(buf, ARCHIVE_TRADE_REQ_FORMAT,
+                        msg->archive_trade_req.trader,
+                        msg->archive_trade_req.id);
         break;
     case DBR_WRITE_TRANS_REQ:
         buf = dbr_packz(buf, msg->write_trans_req.count_);
@@ -650,16 +696,36 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
                           &msg->place_order_req.flags);
         break;
     case DBR_REVISE_ORDER_ID_REQ:
+        buf = dbr_unpackf(buf, REVISE_ORDER_ID_REQ_FORMAT,
+                          msg->revise_order_id_req.trader,
+                          &msg->revise_order_id_req.id,
+                          &msg->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
+        buf = dbr_unpackf(buf, REVISE_ORDER_REF_REQ_FORMAT,
+                          msg->revise_order_ref_req.trader,
+                          DBR_REF_MAX, msg->revise_order_ref_req.ref,
+                          &msg->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
+        buf = dbr_unpackf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
+                          msg->cancel_order_id_req.trader,
+                          &msg->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
+        buf = dbr_unpackf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
+                          msg->cancel_order_ref_req.trader,
+                          DBR_REF_MAX, msg->cancel_order_ref_req.ref);
         break;
     case DBR_ARCHIVE_ORDER_REQ:
+        buf = dbr_unpackf(buf, ARCHIVE_ORDER_REQ_FORMAT,
+                          msg->archive_order_req.trader,
+                          &msg->archive_order_req.id);
         break;
     case DBR_ARCHIVE_TRADE_REQ:
+        buf = dbr_unpackf(buf, ARCHIVE_TRADE_REQ_FORMAT,
+                          msg->archive_trade_req.trader,
+                          &msg->archive_trade_req.id);
         break;
     case DBR_WRITE_TRANS_REQ:
         if (!(buf = dbr_unpackz(buf, &msg->write_trans_req.count_)))

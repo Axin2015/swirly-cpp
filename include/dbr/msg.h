@@ -87,6 +87,32 @@ struct DbrMsg {
             DbrFlags flags;
         } place_order_req;
         struct {
+            DbrMnem trader;
+            DbrIden id;
+            DbrLots lots;
+        } revise_order_id_req;
+        struct {
+            DbrMnem trader;
+            DbrRef ref;
+            DbrLots lots;
+        } revise_order_ref_req;
+        struct {
+            DbrMnem trader;
+            DbrIden id;
+        } cancel_order_id_req;
+        struct {
+            DbrMnem trader;
+            DbrRef ref;
+        } cancel_order_ref_req;
+        struct {
+            DbrMnem trader;
+            DbrIden id;
+        } archive_order_req;
+        struct {
+            DbrMnem trader;
+            DbrIden id;
+        } archive_trade_req;
+        struct {
             struct DbrSlNode* first;
             /**
              * @privatesection
