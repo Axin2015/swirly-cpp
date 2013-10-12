@@ -47,13 +47,13 @@ read_trader(DbrPool pool, DbrSlNode*& first) noexcept
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     dbr_rec_init(rec);
     set_trader(*rec, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
-    dbr_queue_insert_back(&rq, &rec->model_node_);
+    dbr_queue_insert_back(&rq, &rec->entity_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     dbr_rec_init(rec);
     set_trader(*rec, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
-    dbr_queue_insert_back(&rq, &rec->model_node_);
+    dbr_queue_insert_back(&rq, &rec->entity_node_);
     ++size;
 
     first = rq.first;
@@ -83,13 +83,13 @@ read_accnt(DbrPool pool, DbrSlNode*& first) noexcept
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     dbr_rec_init(rec);
     set_accnt(*rec, 1, "DBRA", "Account A", "dbra@doobry.org");
-    dbr_queue_insert_back(&rq, &rec->model_node_);
+    dbr_queue_insert_back(&rq, &rec->entity_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     dbr_rec_init(rec);
     set_accnt(*rec, 2, "DBRB", "Account B", "dbrb@doobry.org");
-    dbr_queue_insert_back(&rq, &rec->model_node_);
+    dbr_queue_insert_back(&rq, &rec->entity_node_);
     ++size;
 
     first = rq.first;
@@ -129,14 +129,14 @@ read_contr(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_rec_init(rec);
     set_contr(*rec, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
               1, 10000, 1000000, 1, 4, 1, 10);
-    dbr_queue_insert_back(&rq, &rec->model_node_);
+    dbr_queue_insert_back(&rq, &rec->entity_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     dbr_rec_init(rec);
     set_contr(*rec, 2, "GBPUSD", "GBPUSD", "CURRENCY", "GBP", "USD",
               1, 10000, 1000000, 1, 4, 1, 10);
-    dbr_queue_insert_back(&rq, &rec->model_node_);
+    dbr_queue_insert_back(&rq, &rec->entity_node_);
     ++size;
 
     first = rq.first;
@@ -168,19 +168,19 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
     DbrMemb* memb = dbr_pool_alloc_memb(pool);
     dbr_memb_init(memb);
     set_memb(*memb, 1, 1);
-    dbr_queue_insert_back(&rq, &memb->model_node_);
+    dbr_queue_insert_back(&rq, &memb->entity_node_);
     ++size;
 
     memb = dbr_pool_alloc_memb(pool);
     dbr_memb_init(memb);
     set_memb(*memb, 2, 1);
-    dbr_queue_insert_back(&rq, &memb->model_node_);
+    dbr_queue_insert_back(&rq, &memb->entity_node_);
     ++size;
 
     memb = dbr_pool_alloc_memb(pool);
     dbr_memb_init(memb);
     set_memb(*memb, 2, 2);
-    dbr_queue_insert_back(&rq, &memb->model_node_);
+    dbr_queue_insert_back(&rq, &memb->entity_node_);
     ++size;
 
     first = rq.first;

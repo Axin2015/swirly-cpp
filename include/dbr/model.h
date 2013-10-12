@@ -43,36 +43,6 @@ dbr_model_read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode**
     return model->vtbl->read_entity(model, type, pool, first);
 }
 
-static inline struct DbrRec*
-dbr_model_rec_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrRec, model_node_, node);
-}
-
-static inline struct DbrOrder*
-dbr_model_order_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrOrder, model_node_, node);
-}
-
-static inline struct DbrMemb*
-dbr_model_memb_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrMemb, model_node_, node);
-}
-
-static inline struct DbrTrade*
-dbr_model_trade_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrTrade, model_node_, node);
-}
-
-static inline struct DbrPosn*
-dbr_model_posn_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrPosn, model_node_, node);
-}
-
 /** @} */
 
 #endif // DBR_MODEL_H

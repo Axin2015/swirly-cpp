@@ -237,7 +237,7 @@ get_id(DbrExch exch, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
     assert(node != fig_cache_end_rec(&exch->cache));
-    return dbr_model_rec_entry(node);
+    return dbr_rec_entry(node);
 }
 
 static inline struct DbrBook*
@@ -285,7 +285,7 @@ emplace_orders(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = dbr_model_order_entry(node);
+        struct DbrOrder* order = dbr_order_entry(node);
 
         // Enrich.
         order->trader.rec = get_id(exch, DBR_TRADER, order->trader.id_only);
@@ -318,7 +318,7 @@ emplace_orders(DbrExch exch)
  fail2:
     // Free tail.
     do {
-        struct DbrOrder* order = dbr_model_order_entry(node);
+        struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
         dbr_pool_free_order(exch->pool, order);
     } while (node);
@@ -334,7 +334,7 @@ emplace_trades(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrTrade* trade = dbr_model_trade_entry(node);
+        struct DbrTrade* trade = dbr_trade_entry(node);
 
         // Enrich.
         trade->trader.rec = get_id(exch, DBR_TRADER, trade->trader.id_only);
@@ -353,7 +353,7 @@ emplace_trades(DbrExch exch)
  fail2:
     // Free tail.
     do {
-        struct DbrTrade* trade = dbr_model_trade_entry(node);
+        struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
         dbr_pool_free_trade(exch->pool, trade);
     } while (node);
@@ -369,7 +369,7 @@ emplace_membs(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = dbr_model_memb_entry(node);
+        struct DbrMemb* memb = dbr_memb_entry(node);
 
         // Enrich.
         memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
@@ -386,7 +386,7 @@ emplace_membs(DbrExch exch)
  fail2:
     // Free tail.
     do {
-        struct DbrMemb* memb = dbr_model_memb_entry(node);
+        struct DbrMemb* memb = dbr_memb_entry(node);
         node = node->next;
         dbr_pool_free_memb(exch->pool, memb);
     } while (node);
@@ -402,7 +402,7 @@ emplace_posns(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = dbr_model_posn_entry(node);
+        struct DbrPosn* posn = dbr_posn_entry(node);
 
         // Enrich.
         posn->accnt.rec = get_id(exch, DBR_ACCNT, posn->accnt.id_only);
@@ -419,7 +419,7 @@ emplace_posns(DbrExch exch)
  fail2:
     // Free tail.
     do {
-        struct DbrPosn* posn = dbr_model_posn_entry(node);
+        struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
         dbr_pool_free_posn(exch->pool, posn);
     } while (node);

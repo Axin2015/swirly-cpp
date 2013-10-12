@@ -173,7 +173,7 @@ struct DbrRec {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode model_node_;
+    struct DbrSlNode entity_node_;
     // Cache nodes.
     struct DbrSlNode id_node_;
     struct DbrSlNode mnem_node_;
@@ -182,9 +182,15 @@ struct DbrRec {
 static inline void
 dbr_rec_init(struct DbrRec* rec)
 {
-    dbr_slnode_init(&rec->model_node_);
+    dbr_slnode_init(&rec->entity_node_);
     dbr_slnode_init(&rec->id_node_);
     dbr_slnode_init(&rec->mnem_node_);
+}
+
+static inline struct DbrRec*
+dbr_rec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrRec, entity_node_, node);
 }
 
 /** @} */
@@ -256,15 +262,21 @@ struct DbrMemb {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode model_node_;
+    struct DbrSlNode entity_node_;
     struct DbrRbNode accnt_node_;
 };
 
 static inline void
 dbr_memb_init(struct DbrMemb* memb)
 {
-    dbr_slnode_init(&memb->model_node_);
+    dbr_slnode_init(&memb->entity_node_);
     dbr_rbnode_init(&memb->accnt_node_);
+}
+
+static inline struct DbrMemb*
+dbr_memb_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrMemb, entity_node_, node);
 }
 
 /** @} */
@@ -289,7 +301,7 @@ struct DbrPosn {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode model_node_;
+    struct DbrSlNode entity_node_;
     struct DbrRbNode accnt_node_;
     struct DbrSlNode result_node_;
 };
@@ -297,9 +309,15 @@ struct DbrPosn {
 static inline void
 dbr_posn_init(struct DbrPosn* posn)
 {
-    dbr_slnode_init(&posn->model_node_);
+    dbr_slnode_init(&posn->entity_node_);
     dbr_rbnode_init(&posn->accnt_node_);
     dbr_slnode_init(&posn->result_node_);
+}
+
+static inline struct DbrPosn*
+dbr_posn_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrPosn, entity_node_, node);
 }
 
 /** @} */
@@ -360,7 +378,7 @@ struct DbrOrder {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode model_node_;
+    struct DbrSlNode entity_node_;
     // Singly-linked for index.
     struct DbrSlNode ref_node_;
     // Doubly-linked for side.
@@ -371,10 +389,16 @@ struct DbrOrder {
 static inline void
 dbr_order_init(struct DbrOrder* order)
 {
-    dbr_slnode_init(&order->model_node_);
+    dbr_slnode_init(&order->entity_node_);
     dbr_slnode_init(&order->ref_node_);
     dbr_dlnode_init(&order->side_node_);
     dbr_rbnode_init(&order->trader_node_);
+}
+
+static inline struct DbrOrder*
+dbr_order_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrOrder, entity_node_, node);
 }
 
 static inline DbrBool
@@ -421,7 +445,7 @@ struct DbrTrade {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode model_node_;
+    struct DbrSlNode entity_node_;
     struct DbrRbNode trader_node_;
     struct DbrSlNode result_node_;
 };
@@ -429,9 +453,15 @@ struct DbrTrade {
 static inline void
 dbr_trade_init(struct DbrTrade* trade)
 {
-    dbr_slnode_init(&trade->model_node_);
+    dbr_slnode_init(&trade->entity_node_);
     dbr_rbnode_init(&trade->trader_node_);
     dbr_slnode_init(&trade->result_node_);
+}
+
+static inline struct DbrTrade*
+dbr_trade_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrTrade, entity_node_, node);
 }
 
 struct DbrMatch {

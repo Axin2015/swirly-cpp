@@ -57,11 +57,11 @@ struct DbrMsg {
         } status_rep;
         struct {
             int type;
-            // dbr_model_rec_entry()
-            // dbr_model_order_entry()
-            // dbr_model_memb_entry()
-            // dbr_model_trade_entry()
-            // dbr_model_posn_entry()
+            // dbr_rec_entry()
+            // dbr_order_entry()
+            // dbr_memb_entry()
+            // dbr_trade_entry()
+            // dbr_posn_entry()
             struct DbrSlNode* first;
             /**
              * @privatesection

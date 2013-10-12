@@ -476,7 +476,7 @@ select_trader(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             dbr_log_debug3("trader: id=%ld,mnem=%.16s,display=%.64s,email=%.64s",
                            rec->id, rec->mnem, rec->trader.display, rec->trader.email);
 
-            dbr_queue_insert_back(&rq, &rec->model_node_);
+            dbr_queue_insert_back(&rq, &rec->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -545,7 +545,7 @@ select_accnt(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             dbr_log_debug3("accnt: id=%ld,mnem=%.16s,display=%.64s,email=%.64s",
                            rec->id, rec->mnem, rec->accnt.display, rec->accnt.email);
 
-            dbr_queue_insert_back(&rq, &rec->model_node_);
+            dbr_queue_insert_back(&rq, &rec->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -652,7 +652,7 @@ select_contr(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
                            rec->contr.qty_inc, rec->contr.price_dp, rec->contr.pip_dp,
                            rec->contr.qty_dp, rec->contr.min_lots, rec->contr.max_lots);
 
-            dbr_queue_insert_back(&rq, &rec->model_node_);
+            dbr_queue_insert_back(&rq, &rec->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -747,7 +747,7 @@ select_order(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
                            order->ticks, order->resd, order->exec, order->lots, order->min,
                            order->flags, order->created, order->modified);
 
-            dbr_queue_insert_back(&oq, &order->model_node_);
+            dbr_queue_insert_back(&oq, &order->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -801,7 +801,7 @@ select_memb(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
 
             dbr_log_debug3("memb: accnt=%ld,trader=%ld", memb->accnt.id, memb->trader.id);
 
-            dbr_queue_insert_back(&mq, &memb->model_node_);
+            dbr_queue_insert_back(&mq, &memb->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -899,7 +899,7 @@ select_trade(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
                            trade->resd, trade->exec, trade->lots, trade->settl_date,
                            trade->created, trade->modified);
 
-            dbr_queue_insert_back(&tq, &trade->model_node_);
+            dbr_queue_insert_back(&tq, &trade->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -994,7 +994,7 @@ select_posn(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
                 posn->sell_lots = sqlite3_column_int64(stmt, LOTS);
             }
 
-            dbr_queue_insert_back(&pq, &posn->model_node_);
+            dbr_queue_insert_back(&pq, &posn->entity_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {

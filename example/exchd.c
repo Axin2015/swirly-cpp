@@ -19,7 +19,6 @@
 #include <dbr/exch.h>
 #include <dbr/journ.h>
 #include <dbr/log.h>
-#include <dbr/model.h>
 #include <dbr/msg.h>
 #include <dbr/sqlstore.h>
 
@@ -64,7 +63,7 @@ DBR_API struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
     struct DbrSlNode* node = dbr_exch_find_rec_mnem(exch, type, mnem);
-    return node != dbr_exch_end_rec(exch) ? dbr_model_rec_entry(node) : NULL;
+    return node != dbr_exch_end_rec(exch) ? dbr_rec_entry(node) : NULL;
 }
 
 static DbrBool

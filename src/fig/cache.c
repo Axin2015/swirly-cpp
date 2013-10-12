@@ -20,8 +20,6 @@
 #include "accnt.h"
 #include "trader.h"
 
-#include <dbr/model.h>
-
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -48,7 +46,7 @@ static inline void
 free_recs(struct DbrSlNode* node, void (*term)(struct DbrRec*), DbrPool pool)
 {
     while (node) {
-        struct DbrRec* rec = dbr_model_rec_entry(node);
+        struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
         term(rec);
         dbr_pool_free_rec(pool, rec);
@@ -89,7 +87,7 @@ get_id(const struct FigCache* cache, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != fig_cache_end_rec(cache));
-    return dbr_model_rec_entry(node);
+    return dbr_rec_entry(node);
 }
 
 static inline void
@@ -115,7 +113,7 @@ emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     cache->first_contr = first;
     cache->contr_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_model_rec_entry(node);
+        struct DbrRec* rec = dbr_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
@@ -128,7 +126,7 @@ emplace_trader(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     cache->first_trader = first;
     cache->trader_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_model_rec_entry(node);
+        struct DbrRec* rec = dbr_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
@@ -141,7 +139,7 @@ emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     cache->first_accnt = first;
     cache->accnt_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_model_rec_entry(node);
+        struct DbrRec* rec = dbr_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
@@ -228,7 +226,7 @@ fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id)
          node; node = node->next) {
         struct DbrRec* rec = rec_entry_id(node);
         if (equal_id(rec, type, id))
-            return &rec->model_node_;
+            return &rec->entity_node_;
     }
     return NULL;
 }
@@ -242,7 +240,7 @@ fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem
          node; node = node->next) {
         struct DbrRec* rec = rec_entry_mnem(node);
         if (equal_mnem(rec, type, mnem))
-            return &rec->model_node_;
+            return &rec->entity_node_;
     }
     return NULL;
 }
