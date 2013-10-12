@@ -70,7 +70,7 @@ read_entity(const struct DbrMsg* req)
         goto fail1;
     }
     const DbrBool ok = dbr_send_msg(sock, &rep);
-    dbr_pool_free_list(pool, rep.entity_rep.type, rep.entity_rep.first);
+    dbr_pool_free_entities(pool, rep.entity_rep.type, rep.entity_rep.first);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;

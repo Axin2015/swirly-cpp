@@ -86,6 +86,6 @@ dbr_pool_free_stmt(DbrPool pool, struct DbrStmt* stmt);
 /** @} */
 
 DBR_API void
-dbr_pool_free_list(DbrPool pool, int type, struct DbrSlNode* first);
+dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first);
 
 #endif // DBR_POOL_H

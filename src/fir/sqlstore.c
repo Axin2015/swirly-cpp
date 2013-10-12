@@ -494,7 +494,7 @@ select_trader(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_TRADER, dbr_queue_first(&rq));
+    dbr_pool_free_entities(pool, DBR_TRADER, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -563,7 +563,7 @@ select_accnt(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_ACCNT, dbr_queue_first(&rq));
+    dbr_pool_free_entities(pool, DBR_ACCNT, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -670,7 +670,7 @@ select_contr(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_CONTR, dbr_queue_first(&rq));
+    dbr_pool_free_entities(pool, DBR_CONTR, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -765,7 +765,7 @@ select_order(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_ORDER, dbr_queue_first(&oq));
+    dbr_pool_free_entities(pool, DBR_ORDER, dbr_queue_first(&oq));
     *first = NULL;
  fail1:
     return -1;
@@ -819,7 +819,7 @@ select_memb(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_MEMB, dbr_queue_first(&mq));
+    dbr_pool_free_entities(pool, DBR_MEMB, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;
@@ -917,7 +917,7 @@ select_trade(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_TRADE, dbr_queue_first(&tq));
+    dbr_pool_free_entities(pool, DBR_TRADE, dbr_queue_first(&tq));
     *first = NULL;
  fail1:
     return -1;
@@ -1012,7 +1012,7 @@ select_posn(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_list(pool, DBR_POSN, dbr_queue_first(&pq));
+    dbr_pool_free_entities(pool, DBR_POSN, dbr_queue_first(&pq));
     *first = NULL;
  fail1:
     return -1;

@@ -334,6 +334,12 @@ dbr_msg_len(struct DbrMsg* msg)
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(msg->read_entity_req.type);
         break;
+    case DBR_READ_TRADER_ORDER_REQ:
+        break;
+    case DBR_READ_TRADER_TRADE_REQ:
+        break;
+    case DBR_READ_ACCNT_POSN_REQ:
+        break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
                           msg->place_order_req.trader,
@@ -481,6 +487,12 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, msg->read_entity_req.type);
         break;
+    case DBR_READ_TRADER_ORDER_REQ:
+        break;
+    case DBR_READ_TRADER_TRADE_REQ:
+        break;
+    case DBR_READ_ACCNT_POSN_REQ:
+        break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
                         msg->place_order_req.trader,
@@ -561,7 +573,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_trader(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_TRADER, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_TRADER, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -573,7 +585,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_accnt(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_ACCNT, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_ACCNT, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -585,7 +597,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_contr(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_CONTR, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_CONTR, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -597,7 +609,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_order(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_ORDER, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_ORDER, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -609,7 +621,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_memb(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_MEMB, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_MEMB, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -621,7 +633,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_trade(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_TRADE, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_TRADE, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -633,7 +645,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             dbr_queue_init(&q);
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
                 if (!read_model_posn(buf, pool, &q)) {
-                    dbr_pool_free_list(pool, DBR_POSN, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_POSN, dbr_queue_first(&q));
                     goto fail1;
                 }
             }
@@ -697,6 +709,12 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
     case DBR_READ_ENTITY_REQ:
         if (!(buf = dbr_unpacki(buf, &msg->read_entity_req.type)))
             goto fail1;
+        break;
+    case DBR_READ_TRADER_ORDER_REQ:
+        break;
+    case DBR_READ_TRADER_TRADE_REQ:
+        break;
+    case DBR_READ_ACCNT_POSN_REQ:
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,

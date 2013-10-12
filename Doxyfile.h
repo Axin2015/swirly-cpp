@@ -121,31 +121,6 @@
  */
 
 /**
- * @defgroup Book Book
- * @ingroup Fig
- */
-
-/**
- * @defgroup Side Side
- * @ingroup Book
- */
-
-/**
- * @defgroup SideOrder Order
- * @ingroup Side
- */
-
-/**
- * @defgroup SideLevel Level
- * @ingroup Side
- */
-
-/**
- * @defgroup SideLast Last
- * @ingroup Side
- */
-
-/**
  * @defgroup Trader Trader
  * @ingroup Fig
  */
@@ -173,6 +148,31 @@
 /**
  * @defgroup AccntPosn Position
  * @ingroup Accnt
+ */
+
+/**
+ * @defgroup Book Book
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup Side Side
+ * @ingroup Book
+ */
+
+/**
+ * @defgroup SideOrder Order
+ * @ingroup Side
+ */
+
+/**
+ * @defgroup SideLevel Level
+ * @ingroup Side
+ */
+
+/**
+ * @defgroup SideLast Last
+ * @ingroup Side
  */
 
 /**

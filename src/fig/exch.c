@@ -327,39 +327,6 @@ emplace_orders(DbrExch exch)
 }
 
 static DbrBool
-emplace_membs(DbrExch exch)
-{
-    struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_MEMB, exch->pool, &node) == -1)
-        goto fail1;
-
-    for (; node; node = node->next) {
-        struct DbrMemb* memb = dbr_model_memb_entry(node);
-
-        // Enrich.
-        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
-        memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id_only);
-
-        struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, exch->pool);
-        if (dbr_unlikely(!accnt))
-            goto fail2;
-
-        // Transfer ownership.
-        fig_accnt_emplace_memb(accnt, memb);
-    }
-    return true;
- fail2:
-    // Free tail.
-    do {
-        struct DbrMemb* memb = dbr_model_memb_entry(node);
-        node = node->next;
-        dbr_pool_free_memb(exch->pool, memb);
-    } while (node);
- fail1:
-    return false;
-}
-
-static DbrBool
 emplace_trades(DbrExch exch)
 {
     struct DbrSlNode* node;
@@ -389,6 +356,39 @@ emplace_trades(DbrExch exch)
         struct DbrTrade* trade = dbr_model_trade_entry(node);
         node = node->next;
         dbr_pool_free_trade(exch->pool, trade);
+    } while (node);
+ fail1:
+    return false;
+}
+
+static DbrBool
+emplace_membs(DbrExch exch)
+{
+    struct DbrSlNode* node;
+    if (dbr_model_read_entity(exch->model, DBR_MEMB, exch->pool, &node) == -1)
+        goto fail1;
+
+    for (; node; node = node->next) {
+        struct DbrMemb* memb = dbr_model_memb_entry(node);
+
+        // Enrich.
+        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
+        memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id_only);
+
+        struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, exch->pool);
+        if (dbr_unlikely(!accnt))
+            goto fail2;
+
+        // Transfer ownership.
+        fig_accnt_emplace_memb(accnt, memb);
+    }
+    return true;
+ fail2:
+    // Free tail.
+    do {
+        struct DbrMemb* memb = dbr_model_memb_entry(node);
+        node = node->next;
+        dbr_pool_free_memb(exch->pool, memb);
     } while (node);
  fail1:
     return false;
@@ -449,8 +449,8 @@ dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
         || !emplace_recs(exch, DBR_ACCNT)
         || !emplace_recs(exch, DBR_CONTR)
         || !emplace_orders(exch)
-        || !emplace_membs(exch)
         || !emplace_trades(exch)
+        || !emplace_membs(exch)
         || !emplace_posns(exch)) {
         dbr_exch_destroy(exch);
         goto fail1;
