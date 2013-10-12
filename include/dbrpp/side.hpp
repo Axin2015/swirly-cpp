@@ -246,12 +246,12 @@ public:
     Iterator
     end() noexcept
     {
-        return dbr_side_end_level(side_);
+        return DBR_SIDE_END_LEVEL;
     }
     ConstIterator
     end() const noexcept
     {
-        return dbr_side_end_level(side_);
+        return DBR_SIDE_END_LEVEL;
     }
 
     // ReverseIterator.
@@ -269,12 +269,12 @@ public:
     ReverseIterator
     rend() noexcept
     {
-        return dbr_side_end_level(side_);
+        return DBR_SIDE_END_LEVEL;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return dbr_side_end_level(side_);
+        return DBR_SIDE_END_LEVEL;
     }
 
     // Find.

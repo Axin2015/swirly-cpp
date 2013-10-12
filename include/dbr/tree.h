@@ -31,6 +31,7 @@ struct DbrTree {
 };
 
 #define DBR_TREE_INIT(s) { .root = NULL }
+#define DBR_TREE_END NULL
 
 static inline void
 dbr_tree_init(struct DbrTree* tree)
@@ -62,12 +63,6 @@ dbr_tree_first(const struct DbrTree* tree);
 
 DBR_API struct DbrRbNode*
 dbr_tree_last(const struct DbrTree* tree);
-
-static inline struct DbrRbNode*
-dbr_tree_end(const struct DbrTree* tree)
-{
-    return NULL;
-}
 
 static inline DbrBool
 dbr_tree_empty(const struct DbrTree* tree)

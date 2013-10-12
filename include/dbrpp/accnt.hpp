@@ -102,12 +102,12 @@ public:
     Iterator
     end() noexcept
     {
-        return dbr_accnt_end_posn(accnt_);
+        return DBR_ACCNT_END_POSN;
     }
     ConstIterator
     end() const noexcept
     {
-        return dbr_accnt_end_posn(accnt_);
+        return DBR_ACCNT_END_POSN;
     }
 
     // ReverseIterator.
@@ -125,12 +125,12 @@ public:
     ReverseIterator
     rend() noexcept
     {
-        return dbr_accnt_end_posn(accnt_);
+        return DBR_ACCNT_END_POSN;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return dbr_accnt_end_posn(accnt_);
+        return DBR_ACCNT_END_POSN;
     }
 
     // Find.

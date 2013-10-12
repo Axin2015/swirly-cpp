@@ -38,6 +38,8 @@ dbr_trader_rec(DbrTrader trader);
  * @{
  */
 
+#define DBR_TRADER_END_ORDER DBR_TREE_END
+
 static inline struct DbrOrder*
 dbr_trader_order_entry(struct DbrRbNode* node)
 {
@@ -56,9 +58,6 @@ dbr_trader_first_order(DbrTrader trader);
 DBR_API struct DbrRbNode*
 dbr_trader_last_order(DbrTrader trader);
 
-DBR_API struct DbrRbNode*
-dbr_trader_end_order(DbrTrader trader);
-
 DBR_API DbrBool
 dbr_trader_empty_order(DbrTrader trader);
 
@@ -68,6 +67,8 @@ dbr_trader_empty_order(DbrTrader trader);
  * @addtogroup TraderTrade
  * @{
  */
+
+#define DBR_TRADER_END_TRADE DBR_TREE_END
 
 static inline struct DbrTrade*
 dbr_trader_trade_entry(struct DbrRbNode* node)
@@ -83,9 +84,6 @@ dbr_trader_first_trade(DbrTrader trader);
 
 DBR_API struct DbrRbNode*
 dbr_trader_last_trade(DbrTrader trader);
-
-DBR_API struct DbrRbNode*
-dbr_trader_end_trade(DbrTrader trader);
 
 DBR_API DbrBool
 dbr_trader_empty_trade(DbrTrader trader);

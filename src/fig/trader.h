@@ -50,6 +50,8 @@ fig_trader_rec(struct FigTrader* trader)
 
 // Order.
 
+#define FIG_TRADER_END_ORDER DBR_TREE_END
+
 // Transfer ownership to state.
 
 static inline void
@@ -125,12 +127,6 @@ fig_trader_last_order(const struct FigTrader* trader)
     return dbr_tree_last(&trader->orders);
 }
 
-static inline struct DbrRbNode*
-fig_trader_end_order(const struct FigTrader* trader)
-{
-    return dbr_tree_end(&trader->orders);
-}
-
 static inline DbrBool
 fig_trader_empty_order(const struct FigTrader* trader)
 {
@@ -138,6 +134,8 @@ fig_trader_empty_order(const struct FigTrader* trader)
 }
 
 // Trade.
+
+#define FIG_TRADER_END_TRADE DBR_TREE_END
 
 // Transfer ownership to state.
 
@@ -185,12 +183,6 @@ static inline struct DbrRbNode*
 fig_trader_last_trade(const struct FigTrader* trader)
 {
     return dbr_tree_last(&trader->trades);
-}
-
-static inline struct DbrRbNode*
-fig_trader_end_trade(const struct FigTrader* trader)
-{
-    return dbr_tree_end(&trader->trades);
 }
 
 static inline DbrBool

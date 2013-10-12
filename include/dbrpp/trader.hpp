@@ -102,12 +102,12 @@ public:
     Iterator
     end() noexcept
     {
-        return dbr_trader_end_order(trader_);
+        return DBR_TRADER_END_ORDER;
     }
     ConstIterator
     end() const noexcept
     {
-        return dbr_trader_end_order(trader_);
+        return DBR_TRADER_END_ORDER;
     }
 
     // ReverseIterator.
@@ -125,12 +125,12 @@ public:
     ReverseIterator
     rend() noexcept
     {
-        return dbr_trader_end_order(trader_);
+        return DBR_TRADER_END_ORDER;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return dbr_trader_end_order(trader_);
+        return DBR_TRADER_END_ORDER;
     }
 
     // Find.
@@ -270,12 +270,12 @@ public:
     Iterator
     end() noexcept
     {
-        return dbr_trader_end_trade(trader_);
+        return DBR_TRADER_END_TRADE;
     }
     ConstIterator
     end() const noexcept
     {
-        return dbr_trader_end_trade(trader_);
+        return DBR_TRADER_END_TRADE;
     }
 
     // ReverseIterator.
@@ -293,12 +293,12 @@ public:
     ReverseIterator
     rend() noexcept
     {
-        return dbr_trader_end_trade(trader_);
+        return DBR_TRADER_END_TRADE;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return dbr_trader_end_trade(trader_);
+        return DBR_TRADER_END_TRADE;
     }
 
     // Find.

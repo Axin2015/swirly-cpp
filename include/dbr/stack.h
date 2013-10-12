@@ -31,6 +31,7 @@ struct DbrStack {
 };
 
 #define DBR_STACK_INIT(s) { .first = NULL }
+#define DBR_STACK_END NULL
 
 static inline void
 dbr_stack_init(struct DbrStack* stack)
@@ -76,12 +77,6 @@ static inline struct DbrSlNode*
 dbr_stack_first(const struct DbrStack* stack)
 {
     return stack->first;
-}
-
-static inline struct DbrSlNode*
-dbr_stack_end(const struct DbrStack* stack)
-{
-    return NULL;
 }
 
 static inline DbrBool

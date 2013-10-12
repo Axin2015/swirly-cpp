@@ -150,12 +150,6 @@ dbr_accnt_last_posn(DbrAccnt accnt)
     return fig_accnt_last_posn(accnt);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_end_posn(DbrAccnt accnt)
-{
-    return fig_accnt_end_posn(accnt);
-}
-
 DBR_API DbrBool
 dbr_accnt_empty_posn(DbrAccnt accnt)
 {

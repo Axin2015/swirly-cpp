@@ -139,6 +139,8 @@ dbr_side_empty_order(const struct DbrSide* side)
  * @{
  */
 
+#define DBR_SIDE_END_LEVEL DBR_TREE_END
+
 static inline struct DbrLevel*
 dbr_side_level_entry(struct DbrRbNode* node)
 {
@@ -161,12 +163,6 @@ static inline struct DbrRbNode*
 dbr_side_last_level(const struct DbrSide* side)
 {
     return dbr_tree_last(&side->levels);
-}
-
-static inline struct DbrRbNode*
-dbr_side_end_level(const struct DbrSide* side)
-{
-    return dbr_tree_end(&side->levels);
 }
 
 static inline DbrBool

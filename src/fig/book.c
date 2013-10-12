@@ -43,8 +43,7 @@ dbr_book_best(struct DbrBook* book, struct DbrBest* best)
 {
     struct DbrSide* side = &book->bid_side;
     struct DbrRbNode* it = dbr_side_first_level(side);
-    struct DbrRbNode* end = dbr_side_end_level(side);
-    if (it != end) {
+    if (it != DBR_SIDE_END_LEVEL) {
         struct DbrLevel* level = dbr_side_level_entry(it);
         best->bid_ticks = level->ticks;
         best->bid_resd = level->resd;
@@ -55,8 +54,7 @@ dbr_book_best(struct DbrBook* book, struct DbrBest* best)
 
     side = &book->ask_side;
     it = dbr_side_first_level(side);
-    end = dbr_side_end_level(side);
-    if (it != end) {
+    if (it != DBR_SIDE_END_LEVEL) {
         struct DbrLevel* level = dbr_side_level_entry(it);
         best->ask_ticks = level->ticks;
         best->ask_resd = level->resd;

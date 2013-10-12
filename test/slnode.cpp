@@ -45,7 +45,7 @@ TEST_CASE(slnode_queue)
     DbrQueue q = DBR_QUEUE_INIT(q);
 
     check(dbr_queue_empty(&q));
-    check(dbr_queue_first(&q) == dbr_queue_end(&q));
+    check(dbr_queue_first(&q) == DBR_QUEUE_END);
 
     SlElem e1 = { .id = 1, .node = { .next = NULL } };
     SlElem e2 = { .id = 2, .node = { .next = NULL } };
@@ -59,22 +59,22 @@ TEST_CASE(slnode_queue)
     check(dbr_queue_first(&q) == &e3.node);
     check(dbr_queue_first(&q)->next == &e2.node);
     check(dbr_queue_first(&q)->next->next == &e1.node);
-    check(dbr_queue_first(&q)->next->next->next == dbr_queue_end(&q));
+    check(dbr_queue_first(&q)->next->next->next == DBR_QUEUE_END);
 
     check(dbr_queue_remove_first(&q) == &e3.node);
     check(!dbr_queue_empty(&q));
     check(dbr_queue_first(&q) == &e2.node);
     check(dbr_queue_first(&q)->next == &e1.node);
-    check(dbr_queue_first(&q)->next->next == dbr_queue_end(&q));
+    check(dbr_queue_first(&q)->next->next == DBR_QUEUE_END);
 
     check(dbr_queue_remove_first(&q) == &e2.node);
     check(!dbr_queue_empty(&q));
     check(dbr_queue_first(&q) == &e1.node);
-    check(dbr_queue_first(&q)->next == dbr_queue_end(&q));
+    check(dbr_queue_first(&q)->next == DBR_QUEUE_END);
 
     check(dbr_queue_remove_first(&q) == &e1.node);
     check(dbr_queue_empty(&q));
-    check(dbr_queue_first(&q) == dbr_queue_end(&q));
+    check(dbr_queue_first(&q) == DBR_QUEUE_END);
 
     dbr_queue_insert_front(&q, &e1.node);
     dbr_queue_insert_after(&q, &e1.node, &e2.node);
@@ -84,7 +84,7 @@ TEST_CASE(slnode_queue)
     check(dbr_queue_first(&q) == &e1.node);
     check(dbr_queue_first(&q)->next == &e2.node);
     check(dbr_queue_first(&q)->next->next == &e3.node);
-    check(dbr_queue_first(&q)->next->next->next == dbr_queue_end(&q));
+    check(dbr_queue_first(&q)->next->next->next == DBR_QUEUE_END);
 }
 
 TEST_CASE(slnode_stack)
@@ -92,5 +92,5 @@ TEST_CASE(slnode_stack)
     DbrStack s = DBR_STACK_INIT(s);
 
     check(dbr_stack_empty(&s));
-    check(dbr_stack_first(&s) == dbr_stack_end(&s));
+    check(dbr_stack_first(&s) == DBR_STACK_END);
 }

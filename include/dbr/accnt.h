@@ -49,6 +49,8 @@ dbr_accnt_memb_entry(struct DbrRbNode* node)
  * @{
  */
 
+#define DBR_ACCNT_END_POSN DBR_TREE_END
+
 static inline struct DbrPosn*
 dbr_accnt_posn_entry(struct DbrRbNode* node)
 {
@@ -63,9 +65,6 @@ dbr_accnt_first_posn(DbrAccnt accnt);
 
 DBR_API struct DbrRbNode*
 dbr_accnt_last_posn(DbrAccnt accnt);
-
-DBR_API struct DbrRbNode*
-dbr_accnt_end_posn(DbrAccnt accnt);
 
 DBR_API DbrBool
 dbr_accnt_empty_posn(DbrAccnt accnt);

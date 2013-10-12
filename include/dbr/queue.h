@@ -32,6 +32,7 @@ struct DbrQueue {
 };
 
 #define DBR_QUEUE_INIT(q) { .first = NULL, .last = &q.first }
+#define DBR_QUEUE_END NULL
 
 static inline void
 dbr_queue_init(struct DbrQueue* queue)
@@ -89,12 +90,6 @@ static inline struct DbrSlNode*
 dbr_queue_first(const struct DbrQueue* queue)
 {
     return queue->first;
-}
-
-static inline struct DbrSlNode*
-dbr_queue_end(const struct DbrQueue* queue)
-{
-    return NULL;
 }
 
 static inline DbrBool

@@ -116,12 +116,6 @@ dbr_trader_last_order(DbrTrader trader)
     return fig_trader_last_order(trader);
 }
 
-DBR_API struct DbrRbNode*
-dbr_trader_end_order(DbrTrader trader)
-{
-    return fig_trader_end_order(trader);
-}
-
 DBR_API DbrBool
 dbr_trader_empty_order(DbrTrader trader)
 {
@@ -146,12 +140,6 @@ DBR_API struct DbrRbNode*
 dbr_trader_last_trade(DbrTrader trader)
 {
     return fig_trader_last_trade(trader);
-}
-
-DBR_API struct DbrRbNode*
-dbr_trader_end_trade(DbrTrader trader)
-{
-    return fig_trader_end_trade(trader);
 }
 
 DBR_API DbrBool

@@ -54,6 +54,8 @@ fig_accnt_emplace_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
 
 // Posn.
 
+#define FIG_ACCNT_END_POSN DBR_TREE_END
+
 static inline void
 fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
@@ -81,12 +83,6 @@ static inline struct DbrRbNode*
 fig_accnt_last_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_last(&accnt->posns);
-}
-
-static inline struct DbrRbNode*
-fig_accnt_end_posn(const struct FigAccnt* accnt)
-{
-    return dbr_tree_end(&accnt->posns);
 }
 
 static inline DbrBool
