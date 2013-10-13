@@ -49,7 +49,7 @@ dbr_accnt_memb_entry(struct DbrRbNode* node)
  * @{
  */
 
-#define DBR_ACCNT_END_POSN DBR_TREE_END
+#define DBR_ACCNT_END_POSN NULL
 
 static inline struct DbrPosn*
 dbr_accnt_posn_entry(struct DbrRbNode* node)

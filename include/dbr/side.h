@@ -139,7 +139,7 @@ dbr_side_empty_order(const struct DbrSide* side)
  * @{
  */
 
-#define DBR_SIDE_END_LEVEL DBR_TREE_END
+#define DBR_SIDE_END_LEVEL NULL
 
 static inline struct DbrLevel*
 dbr_side_level_entry(struct DbrRbNode* node)

@@ -15,12 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
+#include <dbr/accnt.h>
 #include <dbr/err.h>
 #include <dbr/exch.h>
 #include <dbr/journ.h>
 #include <dbr/log.h>
 #include <dbr/msg.h>
+#include <dbr/queue.h>
 #include <dbr/sqlstore.h>
+#include <dbr/trader.h>
 
 #include <zmq.h>
 
@@ -69,11 +72,13 @@ find_rec_mnem(int type, const char* mnem)
 static DbrBool
 read_rec(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_ENTITY_REP,
-                          .entity_rep = { .type = req->read_entity_req.type } };
+    struct DbrMsg rep;
 
-    rep.entity_rep.first = dbr_exch_first_rec(exch, req->read_entity_req.type, NULL);
+    struct DbrSlNode* first = dbr_exch_first_rec(exch, req->read_entity_req.type, NULL);
 
+    rep.type = DBR_ENTITY_REP;
+    rep.entity_rep.type = req->read_entity_req.type;
+    rep.entity_rep.first = first;
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -83,19 +88,106 @@ read_rec(const struct DbrMsg* req)
 static DbrBool
 read_trader_order(const struct DbrMsg* req)
 {
-    return DBR_TRUE;
+    struct DbrMsg rep;
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->read_trader_order_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->read_trader_order_req.trader);
+        goto fail1;
+    }
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    struct DbrRbNode* node = dbr_trader_first_order(trader);
+    while (node != DBR_TRADER_END_ORDER) {
+        struct DbrOrder* order = dbr_trader_order_entry(node);
+        dbr_queue_insert_back(&q, &order->entity_node_);
+    }
+    rep.type = DBR_ENTITY_REP;
+    rep.entity_rep.type = DBR_ORDER;
+    rep.entity_rep.first = q.first;
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 read_trader_trade(const struct DbrMsg* req)
 {
-    return DBR_TRUE;
+    struct DbrMsg rep;
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->read_trader_trade_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->read_trader_trade_req.trader);
+        goto fail1;
+    }
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    struct DbrRbNode* node = dbr_trader_first_trade(trader);
+    while (node != DBR_TRADER_END_TRADE) {
+        struct DbrTrade* trade = dbr_trader_trade_entry(node);
+        dbr_queue_insert_back(&q, &trade->entity_node_);
+    }
+    rep.type = DBR_ENTITY_REP;
+    rep.entity_rep.type = DBR_TRADE;
+    rep.entity_rep.first = q.first;
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool
 read_accnt_posn(const struct DbrMsg* req)
 {
-    return DBR_TRUE;
+    struct DbrMsg rep;
+
+    struct DbrRec* arec = find_rec_mnem(DBR_ACCNT, req->read_accnt_posn_req.accnt);
+    if (!arec) {
+        status_setf(&rep, DBR_EINVAL, "no such accnt '%.16s'", req->read_accnt_posn_req.accnt);
+        goto fail1;
+    }
+    DbrAccnt accnt = dbr_exch_accnt(exch, arec);
+    if (!accnt) {
+        status_err(&rep);
+        goto fail1;
+    }
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    struct DbrRbNode* node = dbr_accnt_first_posn(accnt);
+    while (node != DBR_ACCNT_END_POSN) {
+        struct DbrPosn* posn = dbr_accnt_posn_entry(node);
+        dbr_queue_insert_back(&q, &posn->entity_node_);
+    }
+    rep.type = DBR_ENTITY_REP;
+    rep.entity_rep.type = DBR_POSN;
+    rep.entity_rep.first = q.first;
+    const DbrBool ok = dbr_send_msg(sock, &rep);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
 }
 
 static DbrBool

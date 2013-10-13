@@ -38,7 +38,7 @@ dbr_trader_rec(DbrTrader trader);
  * @{
  */
 
-#define DBR_TRADER_END_ORDER DBR_TREE_END
+#define DBR_TRADER_END_ORDER NULL
 
 static inline struct DbrOrder*
 dbr_trader_order_entry(struct DbrRbNode* node)
@@ -68,7 +68,7 @@ dbr_trader_empty_order(DbrTrader trader);
  * @{
  */
 
-#define DBR_TRADER_END_TRADE DBR_TREE_END
+#define DBR_TRADER_END_TRADE NULL
 
 static inline struct DbrTrade*
 dbr_trader_trade_entry(struct DbrRbNode* node)
