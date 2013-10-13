@@ -86,7 +86,7 @@ static inline struct DbrRec*
 get_id(const struct FigCache* cache, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
-    assert(node != fig_cache_end_rec(cache));
+    assert(node != FIG_CACHE_END_REC);
     return dbr_rec_entry(node);
 }
 

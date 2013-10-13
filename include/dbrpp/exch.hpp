@@ -98,12 +98,12 @@ public:
     Iterator
     end() noexcept
     {
-        return dbr_exch_end_rec(exch_);
+        return DBR_EXCH_END_REC;
     }
     ConstIterator
     end() const noexcept
     {
-        return dbr_exch_end_rec(exch_);
+        return DBR_EXCH_END_REC;
     }
     Iterator
     find(DbrIden id) noexcept

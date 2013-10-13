@@ -50,6 +50,8 @@ struct FigCache {
     } buckets[FIG_CACHE_BUCKETS];
 };
 
+#define FIG_CACHE_END_REC NULL
+
 DBR_EXTERN void
 fig_cache_init(struct FigCache* cache, DbrPool pool);
 
@@ -69,11 +71,5 @@ fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id);
 
 DBR_EXTERN struct DbrSlNode*
 fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem);
-
-static inline struct DbrSlNode*
-fig_cache_end_rec(const struct FigCache* cache)
-{
-    return NULL;
-}
 
 #endif // FIG_CACHE_H

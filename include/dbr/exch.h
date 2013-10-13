@@ -59,6 +59,8 @@ dbr_exch_destroy(DbrExch exch);
  * @brief Returns first record of requested type.
  */
 
+#define DBR_EXCH_END_REC NULL
+
 // Size is optional.
 
 DBR_API struct DbrSlNode*
@@ -74,9 +76,6 @@ dbr_exch_find_rec_id(DbrExch exch, int type, DbrIden id);
 
 DBR_API struct DbrSlNode*
 dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem);
-
-DBR_API struct DbrSlNode*
-dbr_exch_end_rec(DbrExch exch);
 
 /** @} */
 

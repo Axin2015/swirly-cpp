@@ -333,11 +333,17 @@ dbr_msg_len(struct DbrMsg* msg)
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(msg->read_entity_req.type);
         break;
+    case DBR_READ_REC_REQ:
+        n += dbr_packleni(msg->read_rec_req.type);
+        break;
     case DBR_READ_TRADER_ORDER_REQ:
+        n += dbr_packlens(msg->read_trader_order_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_TRADER_TRADE_REQ:
+        n += dbr_packlens(msg->read_trader_trade_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_ACCNT_POSN_REQ:
+        n += dbr_packlens(msg->read_accnt_posn_req.accnt, DBR_MNEM_MAX);
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
@@ -486,11 +492,17 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, msg->read_entity_req.type);
         break;
+    case DBR_READ_REC_REQ:
+        buf = dbr_packi(buf, msg->read_rec_req.type);
+        break;
     case DBR_READ_TRADER_ORDER_REQ:
+        buf = dbr_packs(buf, msg->read_trader_order_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_TRADER_TRADE_REQ:
+        buf = dbr_packs(buf, msg->read_trader_trade_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_ACCNT_POSN_REQ:
+        buf = dbr_packs(buf, msg->read_accnt_posn_req.accnt, DBR_MNEM_MAX);
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
@@ -709,11 +721,18 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         if (!(buf = dbr_unpacki(buf, &msg->read_entity_req.type)))
             goto fail1;
         break;
+    case DBR_READ_REC_REQ:
+        if (!(buf = dbr_unpacki(buf, &msg->read_rec_req.type)))
+            goto fail1;
+        break;
     case DBR_READ_TRADER_ORDER_REQ:
+        buf = dbr_unpacks(buf, msg->read_trader_order_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_TRADER_TRADE_REQ:
+        buf = dbr_unpacks(buf, msg->read_trader_trade_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_ACCNT_POSN_REQ:
+        buf = dbr_unpacks(buf, msg->read_accnt_posn_req.accnt, DBR_MNEM_MAX);
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,

@@ -63,11 +63,11 @@ DBR_API struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
     struct DbrSlNode* node = dbr_exch_find_rec_mnem(exch, type, mnem);
-    return node != dbr_exch_end_rec(exch) ? dbr_rec_entry(node) : NULL;
+    return node != DBR_EXCH_END_REC ? dbr_rec_entry(node) : NULL;
 }
 
 static DbrBool
-read_entity(const struct DbrMsg* req)
+read_rec(const struct DbrMsg* req)
 {
     struct DbrMsg rep = { .type = DBR_ENTITY_REP,
                           .entity_rep = { .type = req->read_entity_req.type } };
@@ -78,6 +78,24 @@ read_entity(const struct DbrMsg* req)
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
+}
+
+static DbrBool
+read_trader_order(const struct DbrMsg* req)
+{
+    return DBR_TRUE;
+}
+
+static DbrBool
+read_trader_trade(const struct DbrMsg* req)
+{
+    return DBR_TRUE;
+}
+
+static DbrBool
+read_accnt_posn(const struct DbrMsg* req)
+{
+    return DBR_TRUE;
 }
 
 static DbrBool
@@ -374,8 +392,17 @@ run(void)
             goto fail1;
         }
         switch (req.type) {
-        case DBR_READ_ENTITY_REQ:
-            read_entity(&req);
+        case DBR_READ_REC_REQ:
+            read_rec(&req);
+            break;
+        case DBR_READ_TRADER_ORDER_REQ:
+            read_trader_order(&req);
+            break;
+        case DBR_READ_TRADER_TRADE_REQ:
+            read_trader_trade(&req);
+            break;
+        case DBR_READ_ACCNT_POSN_REQ:
+            read_accnt_posn(&req);
             break;
         case DBR_PLACE_ORDER_REQ:
             place_order(&req);
@@ -397,6 +424,9 @@ run(void)
             break;
         case DBR_ARCHIVE_TRADE_REQ:
             archive_trade(&req);
+            break;
+        default:
+            // TODO: unsupported type.
             break;
         }
     }

@@ -236,7 +236,7 @@ static inline struct DbrRec*
 get_id(DbrExch exch, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
-    assert(node != fig_cache_end_rec(&exch->cache));
+    assert(node != FIG_CACHE_END_REC);
     return dbr_rec_entry(node);
 }
 
@@ -489,12 +489,6 @@ DBR_API struct DbrSlNode*
 dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem)
 {
     return fig_cache_find_rec_mnem(&exch->cache, type, mnem);
-}
-
-DBR_API struct DbrSlNode*
-dbr_exch_end_rec(DbrExch exch)
-{
-    return fig_cache_end_rec(&exch->cache);
 }
 
 // Pool
