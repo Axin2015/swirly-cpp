@@ -102,14 +102,14 @@ read_trader_order(const struct DbrMsg* req)
     }
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    struct DbrRbNode* node = dbr_trader_first_order(trader);
-    while (node != DBR_TRADER_END_ORDER) {
+    for (struct DbrRbNode* node = dbr_trader_first_order(trader);
+         node != DBR_TRADER_END_ORDER; node = dbr_rbnode_next(node)) {
         struct DbrOrder* order = dbr_trader_order_entry(node);
         dbr_queue_insert_back(&q, &order->entity_node_);
     }
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_ORDER;
-    rep.entity_rep.first = q.first;
+    rep.entity_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -137,14 +137,14 @@ read_trader_trade(const struct DbrMsg* req)
     }
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    struct DbrRbNode* node = dbr_trader_first_trade(trader);
-    while (node != DBR_TRADER_END_TRADE) {
+    for (struct DbrRbNode* node = dbr_trader_first_trade(trader);
+         node != DBR_TRADER_END_TRADE; node = dbr_rbnode_next(node)) {
         struct DbrTrade* trade = dbr_trader_trade_entry(node);
         dbr_queue_insert_back(&q, &trade->entity_node_);
     }
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_TRADE;
-    rep.entity_rep.first = q.first;
+    rep.entity_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -172,14 +172,14 @@ read_accnt_posn(const struct DbrMsg* req)
     }
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    struct DbrRbNode* node = dbr_accnt_first_posn(accnt);
-    while (node != DBR_ACCNT_END_POSN) {
+    for (struct DbrRbNode* node = dbr_accnt_first_posn(accnt);
+         node != DBR_ACCNT_END_POSN; node = dbr_rbnode_next(node)) {
         struct DbrPosn* posn = dbr_accnt_posn_entry(node);
         dbr_queue_insert_back(&q, &posn->entity_node_);
     }
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_POSN;
-    rep.entity_rep.first = q.first;
+    rep.entity_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, &rep);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
