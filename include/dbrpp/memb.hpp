@@ -59,15 +59,15 @@ operator <<(std::ostream& os, MembRef memb)
 }
 
 inline size_t
-memb_len(const DbrMemb& memb) noexcept
+memb_len(const DbrMemb& memb, DbrBool enriched) noexcept
 {
-    return dbr_memb_len(&memb);
+    return dbr_memb_len(&memb, enriched);
 }
 
 inline char*
-write_memb(char* buf, const DbrMemb& memb) noexcept
+write_memb(char* buf, const DbrMemb& memb, DbrBool enriched) noexcept
 {
-    return dbr_write_memb(buf, &memb);
+    return dbr_write_memb(buf, &memb, enriched);
 }
 
 inline const char*

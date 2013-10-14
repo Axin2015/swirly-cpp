@@ -474,7 +474,7 @@ select_trader(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             rec->trader.state = NULL;
 
             dbr_log_debug3("trader: id=%ld,mnem=%.16s,display=%.64s,email=%.64s",
-                           rec->id, rec->mnem, rec->trader.display, rec->trader.email);
+                           rec->id, rec->mnem, rec->display, rec->trader.email);
 
             dbr_queue_insert_back(&rq, &rec->entity_node_);
             ++size;
@@ -543,7 +543,7 @@ select_accnt(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             rec->accnt.state = NULL;
 
             dbr_log_debug3("accnt: id=%ld,mnem=%.16s,display=%.64s,email=%.64s",
-                           rec->id, rec->mnem, rec->accnt.display, rec->accnt.email);
+                           rec->id, rec->mnem, rec->display, rec->accnt.email);
 
             dbr_queue_insert_back(&rq, &rec->entity_node_);
             ++size;
@@ -647,7 +647,7 @@ select_contr(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             dbr_log_debug3("contr: id=%ld,mnem=%.16s,display=%.64s,asset_type=%.16s,"
                            "asset=%.16s,ccy=%.16s,price_inc=%f,qty_inc=%.2f,price_dp=%d,"
                            "pip_dp=%d,qty_dp=%d,min_lots=%ld,max_lots=%ld",
-                           rec->id, rec->mnem, rec->contr.display, rec->contr.asset_type,
+                           rec->id, rec->mnem, rec->display, rec->contr.asset_type,
                            rec->contr.asset, rec->contr.ccy, rec->contr.price_inc,
                            rec->contr.qty_inc, rec->contr.price_dp, rec->contr.pip_dp,
                            rec->contr.qty_dp, rec->contr.min_lots, rec->contr.max_lots);
@@ -742,10 +742,10 @@ select_order(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             dbr_log_debug3("order: id=%ld,rev=%d,status=%d,trader=%ld,accnt=%ld,contr=%ld,"
                            "settl_date=%d,ref=%.64s,action=%d,ticks=%ld,resd=%ld,exec=%ld,"
                            "lots=%ld,min=%ld,flags=%ld,created=%ld,modified=%ld",
-                           order->id, order->rev, order->status, order->trader.id, order->accnt.id,
-                           order->contr.id, order->settl_date, order->ref, order->action,
-                           order->ticks, order->resd, order->exec, order->lots, order->min,
-                           order->flags, order->created, order->modified);
+                           order->id, order->rev, order->status, order->trader.id_only,
+                           order->accnt.id_only, order->contr.id_only, order->settl_date,
+                           order->ref, order->action, order->ticks, order->resd, order->exec,
+                           order->lots, order->min, order->flags, order->created, order->modified);
 
             dbr_queue_insert_back(&oq, &order->entity_node_);
             ++size;
@@ -799,7 +799,7 @@ select_memb(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
             memb->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
             memb->trader.id_only = sqlite3_column_int64(stmt, TRADER);
 
-            dbr_log_debug3("memb: accnt=%ld,trader=%ld", memb->accnt.id, memb->trader.id);
+            dbr_log_debug3("memb: accnt=%ld,trader=%ld", memb->accnt.id_only, memb->trader.id_only);
 
             dbr_queue_insert_back(&mq, &memb->entity_node_);
             ++size;
@@ -894,10 +894,10 @@ select_trade(struct FirSqlStore* store, DbrPool pool, struct DbrSlNode** first)
                            "ticks=%ld,resd=%ld,exec=%ld,lots=%ld,settl_date=%d,created=%ld,"
                            "modified=%ld",
                            trade->id, trade->match, trade->order, trade->order_rev,
-                           trade->trader.id, trade->accnt.id, trade->contr.id, trade->settl_date,
-                           trade->ref, trade->cpty.id, trade->role, trade->action, trade->ticks,
-                           trade->resd, trade->exec, trade->lots, trade->settl_date,
-                           trade->created, trade->modified);
+                           trade->trader.id_only, trade->accnt.id_only, trade->contr.id_only,
+                           trade->settl_date, trade->ref, trade->cpty.id_only, trade->role,
+                           trade->action, trade->ticks, trade->resd, trade->exec, trade->lots,
+                           trade->settl_date, trade->created, trade->modified);
 
             dbr_queue_insert_back(&tq, &trade->entity_node_);
             ++size;

@@ -34,6 +34,8 @@ struct DbrStmt;
  * @{
  */
 
+// Trader.
+
 DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec);
 
@@ -42,6 +44,8 @@ dbr_write_trader(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
 dbr_read_trader(const char* buf, struct DbrRec* rec);
+
+// Accnt.
 
 DBR_API size_t
 dbr_accnt_len(const struct DbrRec* rec);
@@ -52,6 +56,8 @@ dbr_write_accnt(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_accnt(const char* buf, struct DbrRec* rec);
 
+// Contr.
+
 DBR_API size_t
 dbr_contr_len(const struct DbrRec* rec);
 
@@ -60,6 +66,8 @@ dbr_write_contr(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec);
+
+// Rec.
 
 /**
  * @brief Returns -1 if type is unrecognised.
@@ -74,41 +82,51 @@ dbr_write_rec(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_rec(const char* buf, struct DbrRec* rec);
 
+// Order.
+
 DBR_API size_t
-dbr_order_len(const struct DbrOrder* order);
+dbr_order_len(const struct DbrOrder* order, DbrBool enriched);
 
 DBR_API char*
-dbr_write_order(char* buf, const struct DbrOrder* order);
+dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order);
 
+// Memb.
+
 DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb);
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
 
 DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb);
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
+// Trade.
+
 DBR_API size_t
-dbr_trade_len(const struct DbrTrade* trade);
+dbr_trade_len(const struct DbrTrade* trade, DbrBool enriched);
 
 DBR_API char*
-dbr_write_trade(char* buf, const struct DbrTrade* trade);
+dbr_write_trade(char* buf, const struct DbrTrade* trade, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_trade(const char* buf, struct DbrTrade* trade);
 
+// Posn.
+
 DBR_API size_t
-dbr_posn_len(const struct DbrPosn* posn);
+dbr_posn_len(const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API char*
-dbr_write_posn(char* buf, const struct DbrPosn* posn);
+dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
+
+// Stmt.
 
 DBR_API size_t
 dbr_stmt_len(const struct DbrStmt* stmt);

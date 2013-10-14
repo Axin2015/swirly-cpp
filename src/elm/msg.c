@@ -229,7 +229,7 @@ read_result_trade(const char* buf, DbrPool pool, struct DbrQueue* queue)
 }
 
 DBR_API size_t
-dbr_msg_len(struct DbrMsg* msg)
+dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
 {
     size_t n = dbr_packleni(msg->type);
     switch (msg->type) {
@@ -266,28 +266,28 @@ dbr_msg_len(struct DbrMsg* msg)
         case DBR_ORDER:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrOrder* order = dbr_order_entry(node);
-                n += dbr_order_len(order);
+                n += dbr_order_len(order, enriched);
                 ++msg->entity_rep.count_;
             }
             break;
         case DBR_MEMB:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrMemb* memb = dbr_memb_entry(node);
-                n += dbr_memb_len(memb);
+                n += dbr_memb_len(memb, enriched);
                 ++msg->entity_rep.count_;
             }
             break;
         case DBR_TRADE:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrTrade* trade = dbr_trade_entry(node);
-                n += dbr_trade_len(trade);
+                n += dbr_trade_len(trade, enriched);
                 ++msg->entity_rep.count_;
             }
             break;
         case DBR_POSN:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrPosn* posn = dbr_posn_entry(node);
-                n += dbr_posn_len(posn);
+                n += dbr_posn_len(posn, enriched);
                 ++msg->entity_rep.count_;
             }
             break;
@@ -297,12 +297,12 @@ dbr_msg_len(struct DbrMsg* msg)
         n += dbr_packlenz(msg->entity_rep.count_);
         break;
     case DBR_RESULT_REP:
-        n += dbr_order_len(msg->result_rep.new_order);
+        n += dbr_order_len(msg->result_rep.new_order, enriched);
         msg->result_rep.posn_count_ = 0;
         for (struct DbrSlNode* node = msg->result_rep.first_posn;
              node; node = node->next) {
             struct DbrPosn* posn = dbr_result_posn_entry(node);
-            n += dbr_posn_len(posn);
+            n += dbr_posn_len(posn, enriched);
             ++msg->result_rep.posn_count_;
         }
         n += dbr_packlenz(msg->result_rep.posn_count_);
@@ -310,13 +310,13 @@ dbr_msg_len(struct DbrMsg* msg)
         for (struct DbrSlNode* node = msg->result_rep.first_trade;
              node; node = node->next) {
             struct DbrTrade* trade = dbr_result_trade_entry(node);
-            n += dbr_trade_len(trade);
+            n += dbr_trade_len(trade, enriched);
             ++msg->result_rep.trade_count_;
         }
         n += dbr_packlenz(msg->result_rep.trade_count_);
         break;
     case DBR_ORDER_REP:
-        n += dbr_order_len(msg->order_rep.order);
+        n += dbr_order_len(msg->order_rep.order, enriched);
         break;
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(msg->read_entity_req.type);
@@ -394,7 +394,7 @@ dbr_msg_len(struct DbrMsg* msg)
 }
 
 DBR_API char*
-dbr_write_msg(char* buf, const struct DbrMsg* msg)
+dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
 {
     buf = dbr_packi(buf, msg->type);
     switch (msg->type) {
@@ -428,25 +428,25 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
         case DBR_ORDER:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrOrder* order = dbr_order_entry(node);
-                buf = dbr_write_order(buf, order);
+                buf = dbr_write_order(buf, order, enriched);
             }
             break;
         case DBR_MEMB:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrMemb* memb = dbr_memb_entry(node);
-                buf = dbr_write_memb(buf, memb);
+                buf = dbr_write_memb(buf, memb, enriched);
             }
             break;
         case DBR_TRADE:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrTrade* trade = dbr_trade_entry(node);
-                buf = dbr_write_trade(buf, trade);
+                buf = dbr_write_trade(buf, trade, enriched);
             }
             break;
         case DBR_POSN:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
                 struct DbrPosn* posn = dbr_posn_entry(node);
-                buf = dbr_write_posn(buf, posn);
+                buf = dbr_write_posn(buf, posn, enriched);
             }
             break;
         default:
@@ -454,22 +454,22 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg)
         }
         break;
     case DBR_RESULT_REP:
-        buf = dbr_write_order(buf, msg->result_rep.new_order);
+        buf = dbr_write_order(buf, msg->result_rep.new_order, enriched);
         buf = dbr_packz(buf, msg->result_rep.posn_count_);
         for (struct DbrSlNode* node = msg->result_rep.first_posn;
              node; node = node->next) {
             struct DbrPosn* posn = dbr_result_posn_entry(node);
-            buf = dbr_write_posn(buf, posn);
+            buf = dbr_write_posn(buf, posn, enriched);
         }
         buf = dbr_packz(buf, msg->result_rep.trade_count_);
         for (struct DbrSlNode* node = msg->result_rep.first_trade;
              node; node = node->next) {
             struct DbrTrade* trade = dbr_result_trade_entry(node);
-            buf = dbr_write_trade(buf, trade);
+            buf = dbr_write_trade(buf, trade, enriched);
         }
         break;
     case DBR_ORDER_REP:
-        buf = dbr_write_order(buf, msg->order_rep.order);
+        buf = dbr_write_order(buf, msg->order_rep.order, enriched);
         break;
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, msg->read_entity_req.type);
@@ -758,7 +758,31 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
     return NULL;
 }
 
-DBR_EXTERN DbrBool
+DBR_API DbrBool
+dbr_send_msg(void* sock, struct DbrMsg* msg, DbrBool enriched)
+{
+    zmq_msg_t zmsg;
+    if (zmq_msg_init_size(&zmsg, dbr_msg_len(msg, enriched)) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_msg_init_size() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
+    }
+    if (!dbr_write_msg(zmq_msg_data(&zmsg), msg, enriched)) {
+        dbr_err_set(DBR_EIO, "dbr_write_msg() failed");
+        goto fail2;
+    }
+    if (zmq_msg_send(&zmsg, sock, 0) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_msg_send() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail2;
+    }
+    zmq_msg_close(&zmsg);
+    return DBR_TRUE;
+ fail2:
+    zmq_msg_close(&zmsg);
+ fail1:
+    return DBR_FALSE;
+}
+
+DBR_API DbrBool
 dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
 {
     zmq_msg_t zmsg;
@@ -773,30 +797,6 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
     }
     if (!dbr_read_msg(zmq_msg_data(&zmsg), pool, msg)) {
         dbr_err_set(DBR_EIO, "dbr_read_msg() failed");
-        goto fail2;
-    }
-    zmq_msg_close(&zmsg);
-    return DBR_TRUE;
- fail2:
-    zmq_msg_close(&zmsg);
- fail1:
-    return DBR_FALSE;
-}
-
-DBR_EXTERN DbrBool
-dbr_send_msg(void* sock, struct DbrMsg* msg)
-{
-    zmq_msg_t zmsg;
-    if (zmq_msg_init_size(&zmsg, dbr_msg_len(msg)) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_msg_init_size() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail1;
-    }
-    if (!dbr_write_msg(zmq_msg_data(&zmsg), msg)) {
-        dbr_err_set(DBR_EIO, "dbr_write_msg() failed");
-        goto fail2;
-    }
-    if (zmq_msg_send(&zmsg, sock, 0) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_msg_send() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     zmq_msg_close(&zmsg);

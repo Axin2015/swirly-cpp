@@ -151,19 +151,19 @@ struct DbrMsg {
 };
 
 DBR_API size_t
-dbr_msg_len(struct DbrMsg* msg);
+dbr_msg_len(struct DbrMsg* msg, DbrBool enriched);
 
 DBR_API char*
-dbr_write_msg(char* buf, const struct DbrMsg* msg);
+dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg);
 
-DBR_EXTERN DbrBool
-dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg);
+DBR_API DbrBool
+dbr_send_msg(void* sock, struct DbrMsg* msg, DbrBool enriched);
 
-DBR_EXTERN DbrBool
-dbr_send_msg(void* sock, struct DbrMsg* msg);
+DBR_API DbrBool
+dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg);
 
 /** @} */
 

@@ -165,15 +165,15 @@ operator <<(std::ostream& os, TradeRef trade)
 }
 
 inline size_t
-trade_len(const DbrTrade& trade) noexcept
+trade_len(const DbrTrade& trade, DbrBool enriched) noexcept
 {
-    return dbr_trade_len(&trade);
+    return dbr_trade_len(&trade, enriched);
 }
 
 inline char*
-write_trade(char* buf, const DbrTrade& trade) noexcept
+write_trade(char* buf, const DbrTrade& trade, DbrBool enriched) noexcept
 {
-    return dbr_write_trade(buf, &trade);
+    return dbr_write_trade(buf, &trade, enriched);
 }
 
 inline const char*

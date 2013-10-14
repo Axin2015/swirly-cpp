@@ -89,15 +89,15 @@ operator <<(std::ostream& os, PosnRef posn)
 }
 
 inline size_t
-posn_len(const DbrPosn& posn) noexcept
+posn_len(const DbrPosn& posn, DbrBool enriched) noexcept
 {
-    return dbr_posn_len(&posn);
+    return dbr_posn_len(&posn, enriched);
 }
 
 inline char*
-write_posn(char* buf, const DbrPosn& posn) noexcept
+write_posn(char* buf, const DbrPosn& posn, DbrBool enriched) noexcept
 {
-    return dbr_write_posn(buf, &posn);
+    return dbr_write_posn(buf, &posn, enriched);
 }
 
 inline const char*

@@ -69,13 +69,13 @@ read_entity(const struct DbrMsg* req)
         status_err(&rep);
         goto fail1;
     }
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, false);
     dbr_pool_free_entities(pool, rep.entity_rep.type, rep.entity_rep.first);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -180,7 +180,7 @@ write_trans(const struct DbrMsg* req)
         status_err(&rep);
         goto fail2;
     }
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, false);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
@@ -188,7 +188,7 @@ write_trans(const struct DbrMsg* req)
     if (!dbr_journ_rollback_trans(journ))
         dbr_err_print("dbr_journ_rollback_trans() failed");
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }

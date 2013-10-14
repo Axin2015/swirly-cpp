@@ -164,15 +164,15 @@ operator <<(std::ostream& os, OrderRef order)
 }
 
 inline size_t
-order_len(const DbrOrder& order) noexcept
+order_len(const DbrOrder& order, DbrBool enriched) noexcept
 {
-    return dbr_order_len(&order);
+    return dbr_order_len(&order, enriched);
 }
 
 inline char*
-write_order(char* buf, const DbrOrder& order) noexcept
+write_order(char* buf, const DbrOrder& order, DbrBool enriched) noexcept
 {
-    return dbr_write_order(buf, &order);
+    return dbr_write_order(buf, &order, enriched);
 }
 
 inline const char*

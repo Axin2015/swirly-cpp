@@ -120,9 +120,9 @@ TEST_CASE(proto_order)
     auto in = create_order(pool, 1, trader, accnt, contr, 20130827,
                            "apple", DBR_BUY, 12345, 10, 0, 0, now);
 
-    auto len = order_len(*in);
+    auto len = order_len(*in, false);
     char buf[len];
-    const char* end = write_order(buf, *in);
+    const char* end = write_order(buf, *in, false);
     check(buf + len == end);
 
     DbrOrder out;
@@ -156,9 +156,9 @@ TEST_CASE(proto_memb)
 
     auto in = create_memb(pool, accnt, trader);
 
-    auto len = memb_len(*in);
+    auto len = memb_len(*in, false);
     char buf[len];
-    const char* end = write_memb(buf, *in);
+    const char* end = write_memb(buf, *in, false);
     check(buf + len == end);
 
     DbrMemb out;
@@ -181,9 +181,9 @@ TEST_CASE(proto_trade)
     auto in = create_trade(pool, 1, 2, 3, 4, trader, accnt, contr, 20130827,
                            "apple", cpty, DBR_TAKER, DBR_BUY, 12345, 0, 10, 10, now);
 
-    auto len = trade_len(*in);
+    auto len = trade_len(*in, false);
     char buf[len];
-    const char* end = write_trade(buf, *in);
+    const char* end = write_trade(buf, *in, false);
     check(buf + len == end);
 
     DbrTrade out;

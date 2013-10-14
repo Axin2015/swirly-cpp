@@ -79,7 +79,7 @@ read_rec(const struct DbrMsg* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = req->read_entity_req.type;
     rep.entity_rep.first = first;
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
@@ -110,12 +110,12 @@ read_trader_order(const struct DbrMsg* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_ORDER;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -145,12 +145,12 @@ read_trader_trade(const struct DbrMsg* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_TRADE;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -180,12 +180,12 @@ read_accnt_posn(const struct DbrMsg* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_POSN;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -244,12 +244,12 @@ place_order(const struct DbrMsg* req)
     rep.result_rep.new_order = result.new_order;
     rep.result_rep.first_posn = result.first_posn;
     rep.result_rep.first_trade = result.first_trade;
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -282,12 +282,12 @@ revise_order_id(const struct DbrMsg* req)
 
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -320,12 +320,12 @@ revise_order_ref(const struct DbrMsg* req)
 
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -357,12 +357,12 @@ cancel_order_id(const struct DbrMsg* req)
 
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -394,12 +394,12 @@ cancel_order_ref(const struct DbrMsg* req)
 
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -428,12 +428,12 @@ archive_order(const struct DbrMsg* req)
         goto fail1;
     }
 
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -462,12 +462,12 @@ archive_trade(const struct DbrMsg* req)
         goto fail1;
     }
 
-    const DbrBool ok = dbr_send_msg(sock, &rep);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep))
+    if (!dbr_send_msg(sock, &rep, true))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }

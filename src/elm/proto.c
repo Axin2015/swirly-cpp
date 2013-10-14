@@ -194,24 +194,44 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API size_t
-dbr_order_len(const struct DbrOrder* order)
+dbr_order_len(const struct DbrOrder* order, DbrBool enriched)
 {
-    return dbr_packlenf(ORDER_FORMAT,
-                        order->id, order->rev, order->status, order->trader.id_only,
-                        order->accnt.id_only, order->contr.id_only, order->settl_date,
-                        DBR_REF_MAX, order->ref, order->action, order->ticks, order->resd,
-                        order->exec, order->lots, order->min, order->flags, order->created,
-                        order->modified);
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(ORDER_FORMAT,
+                         order->id, order->rev, order->status, order->trader.rec->id,
+                         order->accnt.rec->id, order->contr.rec->id, order->settl_date,
+                         DBR_REF_MAX, order->ref, order->action, order->ticks, order->resd,
+                         order->exec, order->lots, order->min, order->flags, order->created,
+                         order->modified);
+    } else {
+        n = dbr_packlenf(ORDER_FORMAT,
+                         order->id, order->rev, order->status, order->trader.id_only,
+                         order->accnt.id_only, order->contr.id_only, order->settl_date,
+                         DBR_REF_MAX, order->ref, order->action, order->ticks, order->resd,
+                         order->exec, order->lots, order->min, order->flags, order->created,
+                         order->modified);
+    }
+    return n;
 }
 
 DBR_API char*
-dbr_write_order(char* buf, const struct DbrOrder* order)
+dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 {
-    return dbr_packf(buf, ORDER_FORMAT,
-                     order->id, order->rev, order->status, order->trader.id_only,
-                     order->accnt.id_only, order->contr.id_only, order->settl_date, DBR_REF_MAX,
-                     order->ref, order->action, order->ticks, order->resd, order->exec,
-                     order->lots, order->min, order->flags, order->created, order->modified);
+    if (enriched) {
+        buf = dbr_packf(buf, ORDER_FORMAT,
+                        order->id, order->rev, order->status, order->trader.rec->id,
+                        order->accnt.rec->id, order->contr.rec->id, order->settl_date, DBR_REF_MAX,
+                        order->ref, order->action, order->ticks, order->resd, order->exec,
+                        order->lots, order->min, order->flags, order->created, order->modified);
+    } else {
+        buf = dbr_packf(buf, ORDER_FORMAT,
+                        order->id, order->rev, order->status, order->trader.id_only,
+                        order->accnt.id_only, order->contr.id_only, order->settl_date, DBR_REF_MAX,
+                        order->ref, order->action, order->ticks, order->resd, order->exec,
+                        order->lots, order->min, order->flags, order->created, order->modified);
+    }
+    return buf;
 }
 
 DBR_API const char*
@@ -227,17 +247,30 @@ dbr_read_order(const char* buf, struct DbrOrder* order)
 }
 
 DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb)
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched)
 {
-    return dbr_packlenf(MEMB_FORMAT,
-                        memb->accnt.id_only, memb->trader.id_only);
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(MEMB_FORMAT,
+                         memb->accnt.rec->id, memb->trader.rec->id);
+    } else {
+        n = dbr_packlenf(MEMB_FORMAT,
+                         memb->accnt.id_only, memb->trader.id_only);
+    }
+    return n;
 }
 
 DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb)
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 {
-    return dbr_packf(buf, MEMB_FORMAT,
-                     memb->accnt.id_only, memb->trader.id_only);
+    if (enriched) {
+        buf = dbr_packf(buf, MEMB_FORMAT,
+                        memb->accnt.rec->id, memb->trader.rec->id);
+    } else {
+        buf = dbr_packf(buf, MEMB_FORMAT,
+                        memb->accnt.id_only, memb->trader.id_only);
+    }
+    return buf;
 }
 
 DBR_API const char*
@@ -248,25 +281,46 @@ dbr_read_memb(const char* buf, struct DbrMemb* memb)
 }
 
 DBR_API size_t
-dbr_trade_len(const struct DbrTrade* trade)
+dbr_trade_len(const struct DbrTrade* trade, DbrBool enriched)
 {
-    return dbr_packlenf(TRADE_FORMAT,
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(TRADE_FORMAT,
+                         trade->id, trade->match, trade->order, trade->order_rev,
+                         trade->trader.rec->id, trade->accnt.rec->id, trade->contr.rec->id,
+                         trade->settl_date, DBR_REF_MAX, trade->ref, trade->cpty.rec->id,
+                         trade->role, trade->action, trade->ticks, trade->resd, trade->exec,
+                         trade->lots, trade->created, trade->modified);
+    } else {
+        n = dbr_packlenf(TRADE_FORMAT,
+                         trade->id, trade->match, trade->order, trade->order_rev,
+                         trade->trader.id_only, trade->accnt.id_only, trade->contr.id_only,
+                         trade->settl_date, DBR_REF_MAX, trade->ref, trade->cpty.id_only,
+                         trade->role, trade->action, trade->ticks, trade->resd, trade->exec,
+                         trade->lots, trade->created, trade->modified);
+    }
+    return n;
+}
+
+DBR_API char*
+dbr_write_trade(char* buf, const struct DbrTrade* trade, DbrBool enriched)
+{
+    if (enriched) {
+        buf = dbr_packf(buf, TRADE_FORMAT,
+                        trade->id, trade->match, trade->order, trade->order_rev,
+                        trade->trader.rec->id, trade->accnt.rec->id, trade->contr.rec->id,
+                        trade->settl_date, DBR_REF_MAX, trade->ref, trade->cpty.rec->id,
+                        trade->role, trade->action, trade->ticks, trade->resd, trade->exec,
+                        trade->lots, trade->created, trade->modified);
+    } else {
+        buf = dbr_packf(buf, TRADE_FORMAT,
                         trade->id, trade->match, trade->order, trade->order_rev,
                         trade->trader.id_only, trade->accnt.id_only, trade->contr.id_only,
                         trade->settl_date, DBR_REF_MAX, trade->ref, trade->cpty.id_only,
                         trade->role, trade->action, trade->ticks, trade->resd, trade->exec,
                         trade->lots, trade->created, trade->modified);
-}
-
-DBR_API char*
-dbr_write_trade(char* buf, const struct DbrTrade* trade)
-{
-    return dbr_packf(buf, TRADE_FORMAT,
-                     trade->id, trade->match, trade->order, trade->order_rev,
-                     trade->trader.id_only, trade->accnt.id_only, trade->contr.id_only,
-                     trade->settl_date, DBR_REF_MAX, trade->ref, trade->cpty.id_only,
-                     trade->role, trade->action, trade->ticks, trade->resd, trade->exec,
-                     trade->lots, trade->created, trade->modified);
+    }
+    return buf;
 }
 
 DBR_API const char*
@@ -282,19 +336,34 @@ dbr_read_trade(const char* buf, struct DbrTrade* trade)
 }
 
 DBR_API size_t
-dbr_posn_len(const struct DbrPosn* posn)
+dbr_posn_len(const struct DbrPosn* posn, DbrBool enriched)
 {
-    return dbr_packlenf(POSN_FORMAT,
-                        posn->accnt.id_only, posn->contr.id_only, posn->settl_date,
-                        posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(POSN_FORMAT,
+                         posn->accnt.rec->id, posn->contr.rec->id, posn->settl_date,
+                         posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+    } else {
+        n = dbr_packlenf(POSN_FORMAT,
+                         posn->accnt.id_only, posn->contr.id_only, posn->settl_date,
+                         posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+    }
+    return n;
 }
 
 DBR_API char*
-dbr_write_posn(char* buf, const struct DbrPosn* posn)
+dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
 {
-    return dbr_packf(buf, POSN_FORMAT,
-                     posn->accnt.id_only, posn->contr.id_only, posn->settl_date,
-                     posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+    if (enriched) {
+        buf = dbr_packf(buf, POSN_FORMAT,
+                        posn->accnt.rec->id, posn->contr.rec->id, posn->settl_date,
+                        posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+    } else {
+        buf = dbr_packf(buf, POSN_FORMAT,
+                        posn->accnt.id_only, posn->contr.id_only, posn->settl_date,
+                        posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+    }
+    return buf;
 }
 
 DBR_API const char*
@@ -353,7 +422,7 @@ dbr_stmt_len(const struct DbrStmt* stmt)
     default:
         abort();
     }
-    return 0;
+    return n;
 }
 
 DBR_API char*
