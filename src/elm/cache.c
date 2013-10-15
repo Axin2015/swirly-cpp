@@ -17,8 +17,9 @@
  */
 #include "cache.h"
 
-#include "accnt.h"
-#include "trader.h"
+#include <dbr/cache.h>
+#include <dbr/err.h>
+#include <dbr/types.h>
 
 #include <assert.h>
 #include <stdbool.h>
@@ -38,17 +39,17 @@ rec_entry_mnem(struct DbrSlNode* node)
 }
 
 static void
-noterm(struct DbrRec* rec)
+term_state_noop(struct DbrRec* rec)
 {
 }
 
 static inline void
-free_recs(struct DbrSlNode* node, void (*term)(struct DbrRec*), DbrPool pool)
+free_recs(struct DbrSlNode* node, void (*term_state)(struct DbrRec*), DbrPool pool)
 {
     while (node) {
         struct DbrRec* rec = dbr_rec_entry(node);
         node = node->next;
-        term(rec);
+        term_state(rec);
         dbr_pool_free_rec(pool, rec);
     }
 }
@@ -83,31 +84,31 @@ hash_mnem(int type, const char* mnem)
 }
 
 static inline struct DbrRec*
-get_id(const struct FigCache* cache, int type, DbrIden id)
+get_id(const struct ElmCache* cache, int type, DbrIden id)
 {
-    struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
-    assert(node != FIG_CACHE_END_REC);
+    struct DbrSlNode* node = elm_cache_find_rec_id(cache, type, id);
+    assert(node != ELM_CACHE_END_REC);
     return dbr_rec_entry(node);
 }
 
 static inline void
-insert_id(struct FigCache* cache, struct DbrRec* rec)
+insert_id(struct ElmCache* cache, struct DbrRec* rec)
 {
-    const size_t bucket = hash_id(rec->type, rec->id) % FIG_CACHE_BUCKETS;
+    const size_t bucket = hash_id(rec->type, rec->id) % ELM_CACHE_BUCKETS;
     struct DbrStack* ids = &cache->buckets[bucket].ids;
     dbr_stack_push(ids, &rec->id_node_);
 }
 
 static inline void
-insert_mnem(struct FigCache* cache, struct DbrRec* rec)
+insert_mnem(struct ElmCache* cache, struct DbrRec* rec)
 {
-    const size_t bucket = hash_mnem(rec->type, rec->mnem) % FIG_CACHE_BUCKETS;
+    const size_t bucket = hash_mnem(rec->type, rec->mnem) % ELM_CACHE_BUCKETS;
     struct DbrStack* mnems = &cache->buckets[bucket].mnems;
     dbr_stack_push(mnems, &rec->mnem_node_);
 }
 
 static void
-emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+emplace_contr(struct ElmCache* cache, struct DbrSlNode* first, size_t size)
 {
     assert(!cache->first_contr);
     cache->first_contr = first;
@@ -120,7 +121,7 @@ emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 }
 
 static void
-emplace_trader(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+emplace_trader(struct ElmCache* cache, struct DbrSlNode* first, size_t size)
 {
     assert(!cache->first_trader);
     cache->first_trader = first;
@@ -133,7 +134,7 @@ emplace_trader(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 }
 
 static void
-emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+emplace_accnt(struct ElmCache* cache, struct DbrSlNode* first, size_t size)
 {
     assert(!cache->first_accnt);
     cache->first_accnt = first;
@@ -146,8 +147,9 @@ emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 }
 
 DBR_EXTERN void
-fig_cache_init(struct FigCache* cache, DbrPool pool)
+elm_cache_init(struct ElmCache* cache, void (*term_state)(struct DbrRec*), DbrPool pool)
 {
+    cache->term_state = term_state ? term_state : term_state_noop;
     cache->pool = pool;
     cache->first_contr = NULL;
     cache->contr_size = 0;
@@ -162,16 +164,16 @@ fig_cache_init(struct FigCache* cache, DbrPool pool)
 }
 
 DBR_EXTERN void
-fig_cache_term(struct FigCache* cache)
+elm_cache_term(struct ElmCache* cache)
 {
     // Traders must be released before books, because traders subscribe to books.
-    free_recs(cache->first_trader, fig_trader_term, cache->pool);
-    free_recs(cache->first_accnt, fig_accnt_term, cache->pool);
-    free_recs(cache->first_contr, noterm, cache->pool);
+    free_recs(cache->first_trader, cache->term_state, cache->pool);
+    free_recs(cache->first_accnt, cache->term_state, cache->pool);
+    free_recs(cache->first_contr, cache->term_state, cache->pool);
 }
 
 DBR_EXTERN void
-fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
+elm_cache_emplace_recs(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {
     case DBR_TRADER:
@@ -190,7 +192,7 @@ fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first
 }
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
+elm_cache_first_rec(struct ElmCache* cache, int type, size_t* size)
 {
     struct DbrSlNode* first;
     switch (type) {
@@ -219,9 +221,9 @@ fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
 }
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id)
+elm_cache_find_rec_id(const struct ElmCache* cache, int type, DbrIden id)
 {
-    const size_t bucket = hash_id(type, id) % FIG_CACHE_BUCKETS;
+    const size_t bucket = hash_id(type, id) % ELM_CACHE_BUCKETS;
     for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].ids);
          node; node = node->next) {
         struct DbrRec* rec = rec_entry_id(node);
@@ -232,10 +234,10 @@ fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id)
 }
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem)
+elm_cache_find_rec_mnem(const struct ElmCache* cache, int type, const char* mnem)
 {
     assert(mnem);
-    const size_t bucket = hash_mnem(type, mnem) % FIG_CACHE_BUCKETS;
+    const size_t bucket = hash_mnem(type, mnem) % ELM_CACHE_BUCKETS;
     for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].mnems);
          node; node = node->next) {
         struct DbrRec* rec = rec_entry_mnem(node);
@@ -243,4 +245,52 @@ fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem
             return &rec->entity_node_;
     }
     return NULL;
+}
+
+DBR_API DbrCache
+dbr_cache_create(void (*term)(struct DbrRec*), DbrPool pool)
+{
+    DbrCache cache = malloc(sizeof(struct ElmCache));
+    if (dbr_unlikely(!cache)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        goto fail1;
+    }
+
+    elm_cache_init(cache, term, pool);
+    return cache;
+ fail1:
+    return NULL;
+}
+
+DBR_API void
+dbr_cache_destroy(DbrCache cache)
+{
+    if (cache) {
+        elm_cache_term(cache);
+        free(cache);
+    }
+}
+
+DBR_API void
+dbr_cache_emplace_recs(DbrCache cache, int type, struct DbrSlNode* first, size_t size)
+{
+    elm_cache_emplace_recs(cache, type, first, size);
+}
+
+DBR_API struct DbrSlNode*
+dbr_cache_first_rec(DbrCache cache, int type, size_t* size)
+{
+    return elm_cache_first_rec(cache, type, size);
+}
+
+DBR_API struct DbrSlNode*
+dbr_cache_find_rec_id(DbrCache cache, int type, DbrIden id)
+{
+    return elm_cache_find_rec_id(cache, type, id);
+}
+
+DBR_API struct DbrSlNode*
+dbr_cache_find_rec_mnem(DbrCache cache, int type, const char* mnem)
+{
+    return elm_cache_find_rec_mnem(cache, type, mnem);
 }

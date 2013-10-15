@@ -22,6 +22,7 @@
 #include "trader.h"
 
 #include <dbr/book.h>
+#include <dbr/cache.h>
 #include <dbr/exch.h>
 #include <dbr/err.h>
 #include <dbr/journ.h>
@@ -36,8 +37,8 @@ struct DbrExch_ {
     DbrJourn journ;
     DbrModel model;
     DbrPool pool;
+    DbrCache cache;
     struct DbrTree books;
-    struct FigCache cache;
     struct FigIndex index;
 };
 
@@ -45,6 +46,19 @@ static inline struct DbrBook*
 exch_book_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct DbrBook, exch_node_, node);
+}
+
+static void
+term_state(struct DbrRec* rec)
+{
+    switch (rec->type) {
+    case DBR_TRADER:
+        fig_trader_term(rec);
+        break;
+    case DBR_ACCNT:
+        fig_accnt_term(rec);
+        break;
+    }
 }
 
 static void
@@ -235,8 +249,8 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
 static inline struct DbrRec*
 get_id(DbrExch exch, int type, DbrIden id)
 {
-    struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
-    assert(node != FIG_CACHE_END_REC);
+    struct DbrSlNode* node = dbr_cache_find_rec_id(exch->cache, type, id);
+    assert(node != DBR_CACHE_END_REC);
     return dbr_rec_entry(node);
 }
 
@@ -273,7 +287,7 @@ emplace_recs(DbrExch exch, int type)
     if (size == -1)
         return false;
 
-    fig_cache_emplace_recs(&exch->cache, type, node, size);
+    dbr_cache_emplace_recs(exch->cache, type, node, size);
     return true;
 }
 
@@ -436,11 +450,15 @@ dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
         goto fail1;
     }
 
+    DbrCache cache = dbr_cache_create(term_state, pool);
+    if (!cache)
+        goto fail2;
+
     exch->journ = journ;
     exch->model = model;
     exch->pool = pool;
+    exch->cache = cache;
     dbr_tree_init(&exch->books);
-    fig_cache_init(&exch->cache, pool);
     fig_index_init(&exch->index);
 
     // Data structures are fully initialised at this point.
@@ -452,11 +470,14 @@ dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
         || !emplace_trades(exch)
         || !emplace_membs(exch)
         || !emplace_posns(exch)) {
+        // Use destroy since fully initialised.
         dbr_exch_destroy(exch);
         goto fail1;
     }
 
     return exch;
+ fail2:
+    free(exch);
  fail1:
     return NULL;
 }
@@ -465,8 +486,8 @@ DBR_API void
 dbr_exch_destroy(DbrExch exch)
 {
     if (exch) {
-        fig_cache_term(&exch->cache);
         free_books(&exch->books);
+        dbr_cache_destroy(exch->cache);
         free(exch);
     }
 }
@@ -476,19 +497,19 @@ dbr_exch_destroy(DbrExch exch)
 DBR_API struct DbrSlNode*
 dbr_exch_first_rec(DbrExch exch, int type, size_t* size)
 {
-    return fig_cache_first_rec(&exch->cache, type, size);
+    return dbr_cache_first_rec(exch->cache, type, size);
 }
 
 DBR_API struct DbrSlNode*
 dbr_exch_find_rec_id(DbrExch exch, int type, DbrIden id)
 {
-    return fig_cache_find_rec_id(&exch->cache, type, id);
+    return dbr_cache_find_rec_id(exch->cache, type, id);
 }
 
 DBR_API struct DbrSlNode*
 dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem)
 {
-    return fig_cache_find_rec_mnem(&exch->cache, type, mnem);
+    return dbr_cache_find_rec_mnem(exch->cache, type, mnem);
 }
 
 // Pool

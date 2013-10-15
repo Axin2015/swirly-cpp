@@ -59,6 +59,7 @@ dbr_read_trader(const char* buf, struct DbrRec* rec)
 {
     dbr_rec_init(rec);
     rec->type = DBR_TRADER;
+    rec->trader.state = NULL;
     return dbr_unpackf(buf, TRADER_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
                        DBR_EMAIL_MAX, rec->trader.email);
@@ -85,6 +86,7 @@ dbr_read_accnt(const char* buf, struct DbrRec* rec)
 {
     dbr_rec_init(rec);
     rec->type = DBR_ACCNT;
+    rec->accnt.state = NULL;
     return dbr_unpackf(buf, ACCNT_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
                        DBR_EMAIL_MAX, rec->accnt.email);

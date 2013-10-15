@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIG_CACHE_H
-#define FIG_CACHE_H
+#ifndef ELM_CACHE_H
+#define ELM_CACHE_H
 
 // Record cache.
 
@@ -28,11 +28,12 @@
 
 #include <sys/types.h> // ssize_t
 
-#ifndef FIG_CACHE_BUCKETS
-#define FIG_CACHE_BUCKETS 257
-#endif // FIG_CACHE_BUCKETS
+#ifndef ELM_CACHE_BUCKETS
+#define ELM_CACHE_BUCKETS 257
+#endif // ELM_CACHE_BUCKETS
 
-struct FigCache {
+struct ElmCache {
+    void (*term_state)(struct DbrRec*);
     DbrPool pool;
     // Must be set before first_book.
     struct DbrSlNode* first_contr;
@@ -47,29 +48,29 @@ struct FigCache {
     struct {
         struct DbrStack ids;
         struct DbrStack mnems;
-    } buckets[FIG_CACHE_BUCKETS];
+    } buckets[ELM_CACHE_BUCKETS];
 };
 
-#define FIG_CACHE_END_REC NULL
+#define ELM_CACHE_END_REC NULL
 
 DBR_EXTERN void
-fig_cache_init(struct FigCache* cache, DbrPool pool);
+elm_cache_init(struct ElmCache* cache, void (*term_state)(struct DbrRec*), DbrPool pool);
 
 DBR_EXTERN void
-fig_cache_term(struct FigCache* cache);
+elm_cache_term(struct ElmCache* cache);
 
 // Transfer ownership to cache.
 
 DBR_EXTERN void
-fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size);
+elm_cache_emplace_recs(struct ElmCache* cache, int type, struct DbrSlNode* first, size_t size);
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_first_rec(struct FigCache* cache, int type, size_t* size);
+elm_cache_first_rec(struct ElmCache* cache, int type, size_t* size);
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id);
+elm_cache_find_rec_id(const struct ElmCache* cache, int type, DbrIden id);
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem);
+elm_cache_find_rec_mnem(const struct ElmCache* cache, int type, const char* mnem);
 
-#endif // FIG_CACHE_H
+#endif // ELM_CACHE_H

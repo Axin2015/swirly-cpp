@@ -294,8 +294,10 @@ DBR_API DbrPool
 dbr_pool_create(void)
 {
     DbrPool pool = malloc(sizeof(struct ElmPool));
-    if (dbr_unlikely(!pool))
+    if (dbr_unlikely(!pool)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
+    }
 
     if (dbr_unlikely(!elm_pool_init(pool)))
         goto fail2;

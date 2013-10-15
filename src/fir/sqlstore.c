@@ -1326,8 +1326,10 @@ DBR_API DbrSqlStore
 dbr_sqlstore_create(DbrIden seed, const char* path)
 {
     struct DbrSqlStore_* store = malloc(sizeof(struct DbrSqlStore_));
-    if (dbr_unlikely(!store))
+    if (dbr_unlikely(!store)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
+    }
 
     // Seed identity.
     store->id = seed;

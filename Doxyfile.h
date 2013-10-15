@@ -106,6 +106,11 @@
  */
 
 /**
+ * @defgroup Cache Cache
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup Proto Proto
  * @ingroup Elm
  */

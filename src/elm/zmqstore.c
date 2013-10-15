@@ -251,8 +251,10 @@ DBR_API DbrZmqStore
 dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
 {
     struct DbrZmqStore_* store = malloc(sizeof(struct DbrZmqStore_));
-    if (dbr_unlikely(!store))
+    if (dbr_unlikely(!store)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
+    }
 
     void* sock = zmq_socket(ctx, ZMQ_REQ);
     if (!sock) {
