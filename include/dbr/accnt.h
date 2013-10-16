@@ -26,6 +26,8 @@
  * @{
  */
 
+// Returns the associated record.
+
 DBR_API struct DbrRec*
 dbr_accnt_rec(DbrAccnt accnt);
 

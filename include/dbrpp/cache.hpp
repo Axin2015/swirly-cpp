@@ -175,6 +175,13 @@ public:
     : impl_(nullptr)
     {
     }
+    explicit
+    Cache(DbrPool pool)
+        : impl_(dbr_cache_create(nullptr, pool))
+    {
+        if (!impl_)
+            throw_exception();
+    }
     Cache(void (*term_state)(struct DbrRec*), DbrPool pool)
         : impl_(dbr_cache_create(term_state, pool))
     {
@@ -214,6 +221,11 @@ public:
     swap(Cache& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
+    }
+    void
+    emplace_recs(int type, DbrSlNode* first, size_t size)
+    {
+        dbr_cache_emplace_recs(impl_, type, first, size);
     }
     template <int TypeN>
     CacheRecs<TypeN>

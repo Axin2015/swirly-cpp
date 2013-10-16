@@ -26,7 +26,7 @@
  * @{
  */
 
-// Returns the trader-id for state.
+// Returns the associated record.
 
 DBR_API struct DbrRec*
 dbr_trader_rec(DbrTrader trader);

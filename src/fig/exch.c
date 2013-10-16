@@ -23,8 +23,8 @@
 
 #include <dbr/book.h>
 #include <dbr/cache.h>
-#include <dbr/exch.h>
 #include <dbr/err.h>
+#include <dbr/exch.h>
 #include <dbr/journ.h>
 #include <dbr/queue.h>
 #include <dbr/util.h>
