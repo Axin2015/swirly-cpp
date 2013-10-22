@@ -18,12 +18,80 @@
 #include <dbr/clnt.h>
 
 #include <dbr/err.h>
+#include <dbr/model.h>
+#include <dbr/msg.h>
 
+#include <stdbool.h>
 #include <stdlib.h> // malloc()
+#include <string.h> // strncpy()
 
 struct ElmClnt {
-    int i;
+    struct DbrIModel model_;
 };
+
+static inline struct ElmClnt*
+model_implof(DbrModel model)
+{
+    return dbr_implof(struct ElmClnt, model_, model);
+}
+
+static ssize_t
+read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
+{
+    const char* mnem = "x";
+    struct DbrMsg msg;
+
+    struct ElmClnt* clnt = model_implof(model);
+    switch (type) {
+    case DBR_TRADER:
+    case DBR_ACCNT:
+    case DBR_CONTR:
+        msg.type = DBR_READ_REC_REQ;
+        msg.read_rec_req.type = type;
+       break;
+    case DBR_ORDER:
+        msg.type = DBR_READ_TRADER_ORDER_REQ;
+        strncpy(msg.read_trader_order_req.trader, mnem, DBR_MNEM_MAX);
+        break;
+    case DBR_TRADE:
+        msg.type = DBR_READ_TRADER_TRADE_REQ;
+        strncpy(msg.read_trader_trade_req.trader, mnem, DBR_MNEM_MAX);
+        break;
+    case DBR_POSN:
+        msg.type = DBR_READ_ACCNT_POSN_REQ;
+        strncpy(msg.read_accnt_posn_req.accnt, mnem, DBR_MNEM_MAX);
+        break;
+    }
+    return clnt - clnt;
+}
+
+static const struct DbrModelVtbl MODEL_VTBL = {
+    .read_entity = read_entity
+};
+
+static DbrBool
+emplace_recs(DbrClnt clnt, int type)
+{
+    return true;
+}
+
+static DbrBool
+emplace_orders(DbrClnt clnt)
+{
+    return true;
+}
+
+static DbrBool
+emplace_trades(DbrClnt clnt)
+{
+    return true;
+}
+
+static DbrBool
+emplace_posns(DbrClnt clnt)
+{
+    return true;
+}
 
 DBR_API DbrClnt
 dbr_clnt_create(void)
@@ -31,6 +99,20 @@ dbr_clnt_create(void)
     DbrClnt clnt = malloc(sizeof(struct ElmClnt));
     if (dbr_unlikely(!clnt)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
+        goto fail1;
+    }
+    clnt->model_.vtbl = &MODEL_VTBL;
+
+    // Data structures are fully initialised at this point.
+
+    if (!emplace_recs(clnt, DBR_TRADER)
+        || !emplace_recs(clnt, DBR_ACCNT)
+        || !emplace_recs(clnt, DBR_CONTR)
+        || !emplace_orders(clnt)
+        || !emplace_trades(clnt)
+        || !emplace_posns(clnt)) {
+        // Use destroy since fully initialised.
+        dbr_clnt_destroy(clnt);
         goto fail1;
     }
     return clnt;
