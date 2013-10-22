@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h> // strncpy()
 
-struct DbrZmqStore_ {
+struct ElmZmqStore {
     void* ctx;
     DbrIden id;
     void* sock;
@@ -50,29 +50,29 @@ free_stmts(struct DbrSlNode* first, DbrPool pool)
     }
 }
 
-static inline struct DbrZmqStore_*
+static inline struct ElmZmqStore*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct DbrZmqStore_, journ_, journ);
+    return dbr_implof(struct ElmZmqStore, journ_, journ);
 }
 
-static inline struct DbrZmqStore_*
+static inline struct ElmZmqStore*
 model_implof(DbrModel model)
 {
-    return dbr_implof(struct DbrZmqStore_, model_, model);
+    return dbr_implof(struct ElmZmqStore, model_, model);
 }
 
 static DbrIden
 alloc_id(DbrJourn journ)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     return store->id++;
 }
 
 static DbrBool
 begin_trans(DbrJourn journ)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     if (!dbr_queue_empty(&store->queue)) {
         dbr_err_set(DBR_EIO, "incomplete transaction");
         return false;
@@ -83,7 +83,7 @@ begin_trans(DbrJourn journ)
 static DbrBool
 commit_trans(DbrJourn journ)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     struct DbrMsg msg = { .type = DBR_WRITE_TRANS_REQ,
                           .write_trans_req = { .count_ = 0, .first = store->queue.first } };
     DbrBool ok = dbr_send_msg(store->sock, &msg, false);
@@ -98,7 +98,7 @@ commit_trans(DbrJourn journ)
 static DbrBool
 rollback_trans(DbrJourn journ)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     free_stmts(store->queue.first, store->pool);
     dbr_queue_init(&store->queue);
     return true;
@@ -110,7 +110,7 @@ insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrId
              DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
              DbrMillis now)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
@@ -139,7 +139,7 @@ static DbrBool
 update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
              DbrLots lots, DbrMillis now)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
@@ -158,7 +158,7 @@ update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrL
 static DbrBool
 archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
@@ -175,7 +175,7 @@ insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order
              DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
              DbrLots exec, DbrLots lots, DbrMillis now)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
@@ -204,7 +204,7 @@ insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order
 static DbrBool
 archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
-    struct DbrZmqStore_* store = journ_implof(journ);
+    struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
@@ -230,7 +230,7 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    struct DbrZmqStore_* store = model_implof(model);
+    struct ElmZmqStore* store = model_implof(model);
     struct DbrMsg msg = { .type = DBR_READ_ENTITY_REQ, .read_entity_req.type = type };
 
     if (!dbr_send_msg(store->sock, &msg, false))
@@ -250,7 +250,7 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 DBR_API DbrZmqStore
 dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
 {
-    struct DbrZmqStore_* store = malloc(sizeof(struct DbrZmqStore_));
+    struct ElmZmqStore* store = malloc(sizeof(struct ElmZmqStore));
     if (dbr_unlikely(!store)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;

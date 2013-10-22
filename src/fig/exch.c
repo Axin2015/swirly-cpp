@@ -33,7 +33,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-struct DbrExch_ {
+struct FigExch {
     DbrJourn journ;
     DbrModel model;
     DbrPool pool;
@@ -444,7 +444,7 @@ emplace_posns(DbrExch exch)
 DBR_API DbrExch
 dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
 {
-    DbrExch exch = malloc(sizeof(struct DbrExch_));
+    DbrExch exch = malloc(sizeof(struct FigExch));
     if (dbr_unlikely(!exch)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;

@@ -26,7 +26,7 @@
  * @{
  */
 
-typedef struct DbrExch_* DbrExch;
+typedef struct FigExch* DbrExch;
 
 /**
  * @brief Create Exchange.

@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 
 FILE(GLOB fir_SOURCES
           sqlstore.c
+          sqlite.c
           sqlite3.c)
 
 ADD_DEFINITIONS(-DSQLITE_THREADSAFE=0)

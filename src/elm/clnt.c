@@ -15,41 +15,33 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_SQLSTORE_H
-#define DBR_SQLSTORE_H
+#include <dbr/clnt.h>
 
-#include <dbr/pool.h>
-#include <dbr/types.h>
+#include <dbr/err.h>
 
-/**
- * @addtogroup SqlStore
- * @{
- */
+#include <stdlib.h> // malloc()
 
-typedef struct FirSqlStore* DbrSqlStore;
+struct ElmClnt {
+    int i;
+};
 
-/**
- * @brief Create SQLite3 model.
- *
- * @param seed Seed identifier.
- *
- * @param path Path to the database.
- *
- * @return Handle to newly created model or null on failure.
- */
-
-DBR_API DbrSqlStore
-dbr_sqlstore_create(DbrIden seed, const char* path);
+DBR_API DbrClnt
+dbr_clnt_create(void)
+{
+    DbrClnt clnt = malloc(sizeof(struct ElmClnt));
+    if (dbr_unlikely(!clnt)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        goto fail1;
+    }
+    return clnt;
+ fail1:
+    return NULL;
+}
 
 DBR_API void
-dbr_sqlstore_destroy(DbrSqlStore store);
-
-DBR_API DbrJourn
-dbr_sqlstore_journ(DbrSqlStore store);
-
-DBR_API DbrModel
-dbr_sqlstore_model(DbrSqlStore store);
-
-/** @} */
-
-#endif // DBR_SQLSTORE_H
+dbr_clnt_destroy(DbrClnt clnt)
+{
+    if (clnt) {
+        free(clnt);
+    }
+}

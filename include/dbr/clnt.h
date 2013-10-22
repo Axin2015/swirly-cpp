@@ -15,41 +15,26 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_SQLSTORE_H
-#define DBR_SQLSTORE_H
+#ifndef DBR_CLNT_H
+#define DBR_CLNT_H
 
-#include <dbr/pool.h>
-#include <dbr/types.h>
+#include <dbr/defs.h>
 
 /**
- * @addtogroup SqlStore
+ * @addtogroup Clnt
  * @{
  */
 
-typedef struct FirSqlStore* DbrSqlStore;
+typedef struct ElmClnt* DbrClnt;
 
-/**
- * @brief Create SQLite3 model.
- *
- * @param seed Seed identifier.
- *
- * @param path Path to the database.
- *
- * @return Handle to newly created model or null on failure.
- */
+DBR_API DbrClnt
+dbr_clnt_create(void);
 
-DBR_API DbrSqlStore
-dbr_sqlstore_create(DbrIden seed, const char* path);
+// No-op if clnt is null.
 
 DBR_API void
-dbr_sqlstore_destroy(DbrSqlStore store);
-
-DBR_API DbrJourn
-dbr_sqlstore_journ(DbrSqlStore store);
-
-DBR_API DbrModel
-dbr_sqlstore_model(DbrSqlStore store);
+dbr_clnt_destroy(DbrClnt clnt);
 
 /** @} */
 
-#endif // DBR_SQLSTORE_H
+#endif // DBR_CLNT_H

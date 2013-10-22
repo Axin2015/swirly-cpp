@@ -26,7 +26,7 @@
  * @{
  */
 
-typedef struct DbrZmqStore_* DbrZmqStore;
+typedef struct ElmZmqStore* DbrZmqStore;
 
 /**
  * @brief Create ZMQite3 model.
