@@ -171,7 +171,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 }
 
 shared_ptr<DbrMemb>
-create_memb(Pool& pool, DbrIden aid, DbrIden tid)
+create_memb(Pool& pool, DbrIden tid, DbrIden aid)
 {
     auto deleter = [&pool](DbrMemb* memb) {
         pool.free_memb(memb);
@@ -179,8 +179,8 @@ create_memb(Pool& pool, DbrIden aid, DbrIden tid)
     std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
     dbr_memb_init(memb.get());
 
-    memb->accnt.id_only = aid;
     memb->trader.id_only = tid;
+    memb->accnt.id_only = aid;
 
     return memb;
 }

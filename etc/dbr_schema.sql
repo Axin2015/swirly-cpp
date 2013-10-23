@@ -159,9 +159,9 @@ CREATE VIEW accnt_v AS
 ;
 
 CREATE TABLE memb (
-  accnt INTEGER NOT NULL REFERENCES accnt (id),
   trader INTEGER NOT NULL REFERENCES trader (id),
-  PRIMARY KEY (accnt, trader)
+  accnt INTEGER NOT NULL REFERENCES accnt (id),
+  PRIMARY KEY (trader, accnt)
 )
 ;
 
@@ -185,7 +185,7 @@ CREATE TABLE order_ (
   accnt INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
-  ref TEXT,
+  ref TEXT NULL,
   action INTEGER NOT NULL REFERENCES action (id),
   ticks INTEGER NOT NULL,
   resd INTEGER NOT NULL,

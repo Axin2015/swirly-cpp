@@ -62,8 +62,8 @@ enum DbrEntity {
     DBR_ACCNT,
     DBR_CONTR,
     DBR_ORDER,
-    DBR_MEMB,
     DBR_TRADE,
+    DBR_MEMB,
     DBR_POSN
 };
 

@@ -150,11 +150,18 @@ read_order(DbrPool pool, DbrSlNode*& first) noexcept
     return 0;
 }
 
-void
-set_memb(DbrMemb& memb, DbrIden accnt, DbrIden trader) noexcept
+ssize_t
+read_trade(DbrPool pool, DbrSlNode*& first) noexcept
 {
-    memb.accnt.id_only = accnt;
+    first = nullptr;
+    return 0;
+}
+
+void
+set_memb(DbrMemb& memb, DbrIden trader, DbrIden accnt) noexcept
+{
     memb.trader.id_only = trader;
+    memb.accnt.id_only = accnt;
 }
 
 ssize_t
@@ -173,7 +180,7 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
 
     memb = dbr_pool_alloc_memb(pool);
     dbr_memb_init(memb);
-    set_memb(*memb, 2, 1);
+    set_memb(*memb, 1, 2);
     dbr_queue_insert_back(&rq, &memb->entity_node_);
     ++size;
 
@@ -185,13 +192,6 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
 
     first = rq.first;
     return size;
-}
-
-ssize_t
-read_trade(DbrPool pool, DbrSlNode*& first) noexcept
-{
-    first = nullptr;
-    return 0;
 }
 
 ssize_t
@@ -284,11 +284,11 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
     case DBR_ORDER:
         ret = read_order(pool, first);
         break;
-    case DBR_MEMB:
-        ret = read_memb(pool, first);
-        break;
     case DBR_TRADE:
         ret = read_trade(pool, first);
+        break;
+    case DBR_MEMB:
+        ret = read_memb(pool, first);
         break;
     case DBR_POSN:
         ret = read_posn(pool, first);

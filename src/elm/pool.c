@@ -366,18 +366,6 @@ dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
     elm_pool_free_order(pool, order);
 }
 
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool)
-{
-    return elm_pool_alloc_memb(pool);
-}
-
-DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
-{
-    elm_pool_free_memb(pool, memb);
-}
-
 DBR_API struct DbrTrade*
 dbr_pool_alloc_trade(DbrPool pool)
 {
@@ -388,6 +376,18 @@ DBR_API void
 dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade)
 {
     elm_pool_free_trade(pool, trade);
+}
+
+DBR_API struct DbrMemb*
+dbr_pool_alloc_memb(DbrPool pool)
+{
+    return elm_pool_alloc_memb(pool);
+}
+
+DBR_API void
+dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
+{
+    elm_pool_free_memb(pool, memb);
 }
 
 DBR_API struct DbrPosn*
@@ -435,18 +435,18 @@ dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first)
             dbr_pool_free_order(pool, order);
         }
         break;
-    case DBR_MEMB:
-        while (node) {
-            struct DbrMemb* memb = dbr_memb_entry(node);
-            node = node->next;
-            dbr_pool_free_memb(pool, memb);
-        }
-        break;
     case DBR_TRADE:
         while (node) {
             struct DbrTrade* trade = dbr_trade_entry(node);
             node = node->next;
             dbr_pool_free_trade(pool, trade);
+        }
+        break;
+    case DBR_MEMB:
+        while (node) {
+            struct DbrMemb* memb = dbr_memb_entry(node);
+            node = node->next;
+            dbr_pool_free_memb(pool, memb);
         }
         break;
     case DBR_POSN:

@@ -59,17 +59,17 @@ dbr_pool_alloc_order(DbrPool pool);
 DBR_API void
 dbr_pool_free_order(DbrPool pool, struct DbrOrder* order);
 
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool);
-
-DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb);
-
 DBR_API struct DbrTrade*
 dbr_pool_alloc_trade(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade);
+
+DBR_API struct DbrMemb*
+dbr_pool_alloc_memb(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb);
 
 DBR_API struct DbrPosn*
 dbr_pool_alloc_posn(DbrPool pool);

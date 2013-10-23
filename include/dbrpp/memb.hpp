@@ -39,15 +39,15 @@ public:
     {
         return impl_;
     }
-    AccntRecRef
-    arec() const noexcept
-    {
-        return AccntRecRef(*impl_->accnt.rec);
-    }
     TraderRecRef
     trec() const noexcept
     {
         return TraderRecRef(*impl_->trader.rec);
+    }
+    AccntRecRef
+    arec() const noexcept
+    {
+        return AccntRecRef(*impl_->accnt.rec);
     }
 };
 

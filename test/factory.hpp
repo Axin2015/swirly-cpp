@@ -51,7 +51,7 @@ create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
              DbrLots min, DbrFlags flags, DbrMillis now);
 
 std::shared_ptr<DbrMemb>
-create_memb(dbr::Pool& pool, DbrIden aid, DbrIden tid);
+create_memb(dbr::Pool& pool, DbrIden tid, DbrIden aid);
 
 std::shared_ptr<DbrTrade>
 create_trade(dbr::Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,

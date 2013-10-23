@@ -148,27 +148,6 @@ TEST_CASE(proto_order)
     check(out.modified == in->modified);
 }
 
-TEST_CASE(proto_memb)
-{
-    Pool pool;
-    DbrIden accnt = 5;
-    DbrIden trader = 7;
-
-    auto in = create_memb(pool, accnt, trader);
-
-    auto len = memb_len(*in, false);
-    char buf[len];
-    const char* end = write_memb(buf, *in, false);
-    check(buf + len == end);
-
-    DbrMemb out;
-    end = read_memb(buf, out);
-    check(buf + len == end);
-
-    check(out.accnt.id_only == in->accnt.id_only);
-    check(out.trader.id_only == in->trader.id_only);
-}
-
 TEST_CASE(proto_trade)
 {
     Pool pool;
@@ -208,4 +187,25 @@ TEST_CASE(proto_trade)
     check(out.lots == in->lots);
     check(out.created == in->created);
     check(out.modified == in->modified);
+}
+
+TEST_CASE(proto_memb)
+{
+    Pool pool;
+    DbrIden accnt = 5;
+    DbrIden trader = 7;
+
+    auto in = create_memb(pool, trader, accnt);
+
+    auto len = memb_len(*in, false);
+    char buf[len];
+    const char* end = write_memb(buf, *in, false);
+    check(buf + len == end);
+
+    DbrMemb out;
+    end = read_memb(buf, out);
+    check(buf + len == end);
+
+    check(out.accnt.id_only == in->accnt.id_only);
+    check(out.trader.id_only == in->trader.id_only);
 }

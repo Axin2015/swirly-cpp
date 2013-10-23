@@ -386,8 +386,8 @@ emplace_membs(DbrExch exch)
         struct DbrMemb* memb = dbr_memb_entry(node);
 
         // Enrich.
-        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
         memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id_only);
+        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
 
         struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, exch->pool);
         if (dbr_unlikely(!accnt))

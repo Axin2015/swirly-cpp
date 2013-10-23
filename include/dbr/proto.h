@@ -93,17 +93,6 @@ dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order);
 
-// Memb.
-
-DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb);
-
 // Trade.
 
 DBR_API size_t
@@ -114,6 +103,17 @@ dbr_write_trade(char* buf, const struct DbrTrade* trade, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_trade(const char* buf, struct DbrTrade* trade);
+
+// Memb.
+
+DBR_API size_t
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_API char*
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_API const char*
+dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
 // Posn.
 

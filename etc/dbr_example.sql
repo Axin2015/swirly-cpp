@@ -270,59 +270,59 @@ INSERT INTO accnt (mnem, display, email)
         VALUES ('DBRB', 'Account B', 'dbrb@doobry.org')
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRA'),
-        (SELECT id FROM trader WHERE mnem = 'WRAMIREZ'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'WRAMIREZ'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRA'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'WRAMIREZ'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'WRAMIREZ'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'SFLORES'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'SFLORES'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'JWRIGHT'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'JWRIGHT'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'VCAMPBEL'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'VCAMPBEL'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'GWILSON'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'GWILSON'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'BJONES'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'BJONES'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'TLEE'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'TLEE'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'EEDWARDS'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'EEDWARDS'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'RALEXAND'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'RALEXAND'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
-INSERT INTO memb (accnt, trader)
-        VALUES ((SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'JTHOMAS'))
+INSERT INTO memb (trader, accnt)
+        VALUES ((SELECT id FROM trader WHERE mnem = 'JTHOMAS'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB'))
 ;
 
 COMMIT TRANSACTION

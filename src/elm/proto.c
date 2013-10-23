@@ -28,8 +28,8 @@ static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
 static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
 static const char ORDER_FORMAT[] = "liilllisillllllll";
-static const char MEMB_FORMAT[] = "ll";
 static const char TRADE_FORMAT[] = "lllilllisliillllll";
+static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
 
 static const char INSERT_ORDER_FORMAT[] = "liilllisilllllll";
@@ -249,40 +249,6 @@ dbr_read_order(const char* buf, struct DbrOrder* order)
 }
 
 DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched)
-{
-    size_t n;
-    if (enriched) {
-        n = dbr_packlenf(MEMB_FORMAT,
-                         memb->accnt.rec->id, memb->trader.rec->id);
-    } else {
-        n = dbr_packlenf(MEMB_FORMAT,
-                         memb->accnt.id_only, memb->trader.id_only);
-    }
-    return n;
-}
-
-DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
-{
-    if (enriched) {
-        buf = dbr_packf(buf, MEMB_FORMAT,
-                        memb->accnt.rec->id, memb->trader.rec->id);
-    } else {
-        buf = dbr_packf(buf, MEMB_FORMAT,
-                        memb->accnt.id_only, memb->trader.id_only);
-    }
-    return buf;
-}
-
-DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb)
-{
-    dbr_memb_init(memb);
-    return dbr_unpackf(buf, MEMB_FORMAT, &memb->accnt.id_only, &memb->trader.id_only);
-}
-
-DBR_API size_t
 dbr_trade_len(const struct DbrTrade* trade, DbrBool enriched)
 {
     size_t n;
@@ -335,6 +301,40 @@ dbr_read_trade(const char* buf, struct DbrTrade* trade)
                        &trade->settl_date, DBR_REF_MAX, trade->ref, &trade->cpty.id_only,
                        &trade->role, &trade->action, &trade->ticks, &trade->resd, &trade->exec,
                        &trade->lots, &trade->created, &trade->modified);
+}
+
+DBR_API size_t
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched)
+{
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(MEMB_FORMAT,
+                         memb->trader.rec->id, memb->accnt.rec->id);
+    } else {
+        n = dbr_packlenf(MEMB_FORMAT,
+                         memb->trader.id_only, memb->accnt.id_only);
+    }
+    return n;
+}
+
+DBR_API char*
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
+{
+    if (enriched) {
+        buf = dbr_packf(buf, MEMB_FORMAT,
+                        memb->trader.rec->id, memb->accnt.rec->id);
+    } else {
+        buf = dbr_packf(buf, MEMB_FORMAT,
+                        memb->trader.id_only, memb->accnt.id_only);
+    }
+    return buf;
+}
+
+DBR_API const char*
+dbr_read_memb(const char* buf, struct DbrMemb* memb)
+{
+    dbr_memb_init(memb);
+    return dbr_unpackf(buf, MEMB_FORMAT, &memb->trader.id_only, &memb->accnt.id_only);
 }
 
 DBR_API size_t
