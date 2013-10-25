@@ -141,13 +141,13 @@
  */
 
 /**
- * @defgroup Accnt Account
- * @ingroup Fig
+ * @defgroup TraderMemb Member
+ * @ingroup Trader
  */
 
 /**
- * @defgroup AccntMemb Member
- * @ingroup Accnt
+ * @defgroup Accnt Account
+ * @ingroup Fig
  */
 
 /**

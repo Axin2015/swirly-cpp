@@ -47,6 +47,18 @@ free_trades(struct FigTrader* trader)
     }
 }
 
+static void
+free_membs(struct FigTrader* trader)
+{
+    assert(trader);
+    struct DbrRbNode* node;
+    while ((node = trader->membs.root)) {
+        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+        dbr_tree_remove(&trader->membs, node);
+        dbr_pool_free_memb(trader->pool, memb);
+    }
+}
+
 DBR_EXTERN struct FigTrader*
 fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
 {
@@ -64,6 +76,7 @@ fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
         trader->pool = pool;
         dbr_tree_init(&trader->orders);
         dbr_tree_init(&trader->trades);
+        dbr_tree_init(&trader->membs);
 
         trec->trader.state = trader;
     }
@@ -78,8 +91,9 @@ fig_trader_term(struct DbrRec* trec)
     struct FigTrader* trader = trec->trader.state;
     if (trader) {
         trec->trader.state = NULL;
-        free_orders(trader);
+        free_membs(trader);
         free_trades(trader);
+        free_orders(trader);
         free(trader);
     }
 }

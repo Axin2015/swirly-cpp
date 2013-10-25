@@ -90,4 +90,17 @@ dbr_trader_empty_trade(DbrTrader trader);
 
 /** @} */
 
+/**
+ * @addtogroup TraderMemb
+ * @{
+ */
+
+static inline struct DbrMemb*
+dbr_trader_memb_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrMemb, trader_node_, node);
+}
+
+/** @} */
+
 #endif // DBR_TRADER_H

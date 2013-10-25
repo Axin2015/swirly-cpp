@@ -389,12 +389,12 @@ emplace_membs(DbrExch exch)
         memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id_only);
         memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
 
-        struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, exch->pool);
-        if (dbr_unlikely(!accnt))
+        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &exch->index, exch->pool);
+        if (dbr_unlikely(!trader))
             goto fail2;
 
         // Transfer ownership.
-        fig_accnt_emplace_memb(accnt, memb);
+        fig_trader_emplace_memb(trader, memb);
     }
     return true;
  fail2:

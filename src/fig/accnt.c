@@ -24,18 +24,6 @@
 #include <stdlib.h>
 
 static void
-free_membs(struct FigAccnt* accnt)
-{
-    assert(accnt);
-    struct DbrRbNode* node;
-    while ((node = accnt->membs.root)) {
-        struct DbrMemb* memb = dbr_accnt_memb_entry(node);
-        dbr_tree_remove(&accnt->membs, node);
-        dbr_pool_free_memb(accnt->pool, memb);
-    }
-}
-
-static void
 free_posns(struct FigAccnt* accnt)
 {
     assert(accnt);
@@ -61,7 +49,6 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
         }
         accnt->rec = arec;
         accnt->pool = pool;
-        dbr_tree_init(&accnt->membs);
         dbr_tree_init(&accnt->posns);
 
         arec->accnt.state = accnt;
@@ -78,7 +65,6 @@ fig_accnt_term(struct DbrRec* arec)
     if (accnt) {
         arec->accnt.state = NULL;
         free_posns(accnt);
-        free_membs(accnt);
         free(accnt);
     }
 }

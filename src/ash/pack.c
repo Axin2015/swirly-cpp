@@ -26,7 +26,7 @@
 #include <string.h>
 
 #if defined(__APPLE__)
-#include </usr/include/libkern/OSByteOrder.h>
+#include <libkern/OSByteOrder.h>
 #endif // defined(__APPLE__)
 
 // Packed integer spec:

@@ -50,13 +50,13 @@ create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min, DbrFlags flags, DbrMillis now);
 
-std::shared_ptr<DbrMemb>
-create_memb(dbr::Pool& pool, DbrIden tid, DbrIden aid);
-
 std::shared_ptr<DbrTrade>
 create_trade(dbr::Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
              DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, DbrIden cpty, int role,
              int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
+
+std::shared_ptr<DbrMemb>
+create_memb(dbr::Pool& pool, DbrIden tid, DbrIden aid);
 
 inline std::shared_ptr<DbrRec>
 create_wramirez(dbr::Pool& pool)

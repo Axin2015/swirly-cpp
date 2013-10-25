@@ -170,21 +170,6 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     return order;
 }
 
-shared_ptr<DbrMemb>
-create_memb(Pool& pool, DbrIden tid, DbrIden aid)
-{
-    auto deleter = [&pool](DbrMemb* memb) {
-        pool.free_memb(memb);
-    };
-    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
-    dbr_memb_init(memb.get());
-
-    memb->trader.id_only = tid;
-    memb->accnt.id_only = aid;
-
-    return memb;
-}
-
 shared_ptr<DbrTrade>
 create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
              DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, DbrIden cpty, int role,
@@ -219,4 +204,19 @@ create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev
     trade->modified = now;
 
     return trade;
+}
+
+shared_ptr<DbrMemb>
+create_memb(Pool& pool, DbrIden tid, DbrIden aid)
+{
+    auto deleter = [&pool](DbrMemb* memb) {
+        pool.free_memb(memb);
+    };
+    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
+    dbr_memb_init(memb.get());
+
+    memb->trader.id_only = tid;
+    memb->accnt.id_only = aid;
+
+    return memb;
 }

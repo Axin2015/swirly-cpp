@@ -129,19 +129,6 @@ public:
     {
         dbr_pool_free_order(impl_, order);
     }
-    DbrMemb*
-    alloc_memb()
-    {
-        DbrMemb* const memb = dbr_pool_alloc_memb(impl_);
-        if (!memb)
-            throw_exception();
-        return memb;
-    }
-    void
-    free_memb(DbrMemb* memb) noexcept
-    {
-        dbr_pool_free_memb(impl_, memb);
-    }
     DbrTrade*
     alloc_trade()
     {
@@ -154,6 +141,19 @@ public:
     free_trade(DbrTrade* trade) noexcept
     {
         dbr_pool_free_trade(impl_, trade);
+    }
+    DbrMemb*
+    alloc_memb()
+    {
+        DbrMemb* const memb = dbr_pool_alloc_memb(impl_);
+        if (!memb)
+            throw_exception();
+        return memb;
+    }
+    void
+    free_memb(DbrMemb* memb) noexcept
+    {
+        dbr_pool_free_memb(impl_, memb);
     }
     DbrPosn*
     alloc_posn()

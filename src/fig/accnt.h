@@ -26,7 +26,6 @@
 struct FigAccnt {
     struct DbrRec* rec;
     DbrPool pool;
-    struct DbrTree membs;
     struct DbrTree posns;
 };
 
@@ -42,14 +41,6 @@ static inline struct DbrRec*
 fig_accnt_rec(const struct FigAccnt* accnt)
 {
     return accnt->rec;
-}
-
-// Memb.
-
-static inline void
-fig_accnt_emplace_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
-{
-    dbr_tree_insert(&accnt->membs, memb->trader.rec->id, &memb->accnt_node_);
 }
 
 // Posn.

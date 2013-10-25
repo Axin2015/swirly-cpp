@@ -32,6 +32,7 @@ struct FigTrader {
     DbrPool pool;
     struct DbrTree orders;
     struct DbrTree trades;
+    struct DbrTree membs;
 };
 
 DBR_EXTERN struct FigTrader*
@@ -189,6 +190,14 @@ static inline DbrBool
 fig_trader_empty_trade(const struct FigTrader* trader)
 {
     return dbr_tree_empty(&trader->trades);
+}
+
+// Memb.
+
+static inline void
+fig_trader_emplace_memb(struct FigTrader* trader, struct DbrMemb* memb)
+{
+    dbr_tree_insert(&trader->membs, memb->accnt.rec->id, &memb->trader_node_);
 }
 
 #endif // FIG_TRADER_H

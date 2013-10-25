@@ -34,19 +34,6 @@ dbr_accnt_rec(DbrAccnt accnt);
 /** @} */
 
 /**
- * @addtogroup AccntMemb
- * @{
- */
-
-static inline struct DbrMemb*
-dbr_accnt_memb_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrMemb, accnt_node_, node);
-}
-
-/** @} */
-
-/**
  * @addtogroup AccntPosn
  * @{
  */
