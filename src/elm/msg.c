@@ -330,6 +330,9 @@ dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
     case DBR_READ_TRADER_TRADE_REQ:
         n += dbr_packlens(msg->read_trader_trade_req.trader, DBR_MNEM_MAX);
         break;
+    case DBR_READ_TRADER_MEMB_REQ:
+        n += dbr_packlens(msg->read_trader_memb_req.trader, DBR_MNEM_MAX);
+        break;
     case DBR_READ_ACCNT_POSN_REQ:
         n += dbr_packlens(msg->read_accnt_posn_req.accnt, DBR_MNEM_MAX);
         break;
@@ -482,6 +485,9 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
         break;
     case DBR_READ_TRADER_TRADE_REQ:
         buf = dbr_packs(buf, msg->read_trader_trade_req.trader, DBR_MNEM_MAX);
+        break;
+    case DBR_READ_TRADER_MEMB_REQ:
+        buf = dbr_packs(buf, msg->read_trader_memb_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_ACCNT_POSN_REQ:
         buf = dbr_packs(buf, msg->read_accnt_posn_req.accnt, DBR_MNEM_MAX);
@@ -688,6 +694,9 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         break;
     case DBR_READ_TRADER_TRADE_REQ:
         buf = dbr_unpacks(buf, msg->read_trader_trade_req.trader, DBR_MNEM_MAX);
+        break;
+    case DBR_READ_TRADER_MEMB_REQ:
+        buf = dbr_unpacks(buf, msg->read_trader_memb_req.trader, DBR_MNEM_MAX);
         break;
     case DBR_READ_ACCNT_POSN_REQ:
         buf = dbr_unpacks(buf, msg->read_accnt_posn_req.accnt, DBR_MNEM_MAX);

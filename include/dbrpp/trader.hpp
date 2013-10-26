@@ -353,6 +353,162 @@ public:
     }
 };
 
+class TraderMembs {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrMemb Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_trader_memb_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_trader_memb_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrTrader trader_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    TraderMembs(DbrTrader trader) noexcept
+    : trader_(trader)
+    {
+    }
+    void
+    swap(TraderMembs& rhs) noexcept
+    {
+        std::swap(trader_, rhs.trader_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_trader_first_memb(trader_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_trader_first_memb(trader_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_TRADER_END_MEMB;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_TRADER_END_MEMB;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_trader_last_memb(trader_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_trader_last_memb(trader_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_TRADER_END_MEMB;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_TRADER_END_MEMB;
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrTicks ticks) noexcept
+    {
+        return dbr_trader_find_memb_id(trader_, ticks);
+    }
+    ConstIterator
+    find(DbrTicks ticks) const noexcept
+    {
+        return dbr_trader_find_memb_id(trader_, ticks);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_trader_empty_memb(trader_);
+    }
+};
+
 class Trader {
     DbrTrader impl_;
 public:
@@ -389,6 +545,11 @@ public:
     trades() const noexcept
     {
         return TraderTrades(impl_);
+    }
+    TraderMembs
+    membs() const noexcept
+    {
+        return TraderMembs(impl_);
     }
 };
 

@@ -156,6 +156,41 @@ read_trader_trade(const struct DbrMsg* req)
 }
 
 static DbrBool
+read_trader_memb(const struct DbrMsg* req)
+{
+    struct DbrMsg rep;
+
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->read_trader_memb_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->read_trader_memb_req.trader);
+        goto fail1;
+    }
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
+        status_err(&rep);
+        goto fail1;
+    }
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
+         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+        dbr_queue_insert_back(&q, &memb->entity_node_);
+    }
+    rep.type = DBR_ENTITY_REP;
+    rep.entity_rep.type = DBR_MEMB;
+    rep.entity_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(sock, &rep, true);
+    if (!ok)
+        dbr_err_print("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(sock, &rep, true))
+        dbr_err_print("dbr_send_msg() failed");
+    return false;
+}
+
+static DbrBool
 read_accnt_posn(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
@@ -492,6 +527,9 @@ run(void)
             break;
         case DBR_READ_TRADER_TRADE_REQ:
             read_trader_trade(&req);
+            break;
+        case DBR_READ_TRADER_MEMB_REQ:
+            read_trader_memb(&req);
             break;
         case DBR_READ_ACCNT_POSN_REQ:
             read_accnt_posn(&req);

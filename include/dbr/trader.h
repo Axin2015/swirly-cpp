@@ -95,11 +95,25 @@ dbr_trader_empty_trade(DbrTrader trader);
  * @{
  */
 
+#define DBR_TRADER_END_MEMB NULL
+
 static inline struct DbrMemb*
 dbr_trader_memb_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct DbrMemb, trader_node_, node);
 }
+
+DBR_API struct DbrRbNode*
+dbr_trader_find_memb_id(DbrTrader trader, DbrIden id);
+
+DBR_API struct DbrRbNode*
+dbr_trader_first_memb(DbrTrader trader);
+
+DBR_API struct DbrRbNode*
+dbr_trader_last_memb(DbrTrader trader);
+
+DBR_API DbrBool
+dbr_trader_empty_memb(DbrTrader trader);
 
 /** @} */
 

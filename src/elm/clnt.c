@@ -26,6 +26,7 @@
 #include <string.h> // strncpy()
 
 struct ElmClnt {
+    DbrPool pool;
     struct DbrIModel model_;
 };
 
@@ -57,6 +58,10 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
         msg.type = DBR_READ_TRADER_TRADE_REQ;
         strncpy(msg.read_trader_trade_req.trader, mnem, DBR_MNEM_MAX);
         break;
+    case DBR_MEMB:
+        msg.type = DBR_READ_TRADER_MEMB_REQ;
+        strncpy(msg.read_trader_memb_req.trader, mnem, DBR_MNEM_MAX);
+        break;
     case DBR_POSN:
         msg.type = DBR_READ_ACCNT_POSN_REQ;
         strncpy(msg.read_accnt_posn_req.accnt, mnem, DBR_MNEM_MAX);
@@ -72,35 +77,52 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 static DbrBool
 emplace_recs(DbrClnt clnt, int type)
 {
-    return true;
+    struct DbrSlNode* first;
+    ssize_t n = dbr_model_read_entity(&clnt->model_, type, clnt->pool, &first);
+    return n >= 0;
 }
 
 static DbrBool
 emplace_orders(DbrClnt clnt)
 {
-    return true;
+    struct DbrSlNode* first;
+    ssize_t n = dbr_model_read_entity(&clnt->model_, DBR_ORDER, clnt->pool, &first);
+    return n >= 0;
 }
 
 static DbrBool
 emplace_trades(DbrClnt clnt)
 {
-    return true;
+    struct DbrSlNode* first;
+    ssize_t n = dbr_model_read_entity(&clnt->model_, DBR_TRADE, clnt->pool, &first);
+    return n >= 0;
+}
+
+static DbrBool
+emplace_membs(DbrClnt clnt)
+{
+    struct DbrSlNode* first;
+    ssize_t n = dbr_model_read_entity(&clnt->model_, DBR_MEMB, clnt->pool, &first);
+    return n >= 0;
 }
 
 static DbrBool
 emplace_posns(DbrClnt clnt)
 {
-    return true;
+    struct DbrSlNode* first;
+    ssize_t n = dbr_model_read_entity(&clnt->model_, DBR_POSN, clnt->pool, &first);
+    return n >= 0;
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void)
+dbr_clnt_create(DbrPool pool)
 {
     DbrClnt clnt = malloc(sizeof(struct ElmClnt));
     if (dbr_unlikely(!clnt)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
+    clnt->pool = pool;
     clnt->model_.vtbl = &MODEL_VTBL;
 
     // Data structures are fully initialised at this point.
@@ -110,6 +132,7 @@ dbr_clnt_create(void)
         || !emplace_recs(clnt, DBR_CONTR)
         || !emplace_orders(clnt)
         || !emplace_trades(clnt)
+        || !emplace_membs(clnt)
         || !emplace_posns(clnt)) {
         // Use destroy since fully initialised.
         dbr_clnt_destroy(clnt);

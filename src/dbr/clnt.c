@@ -15,28 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_H
-#define DBR_CLNT_H
-
-#include <dbr/defs.h>
-
-typedef struct ElmPool* DbrPool;
-
-/**
- * @addtogroup Clnt
- * @{
- */
-
-typedef struct ElmClnt* DbrClnt;
-
-DBR_API DbrClnt
-dbr_clnt_create(DbrPool pool);
-
-// No-op if clnt is null.
-
-DBR_API void
-dbr_clnt_destroy(DbrClnt clnt);
-
-/** @} */
-
-#endif // DBR_CLNT_H
+#include <dbr/clnt.h>

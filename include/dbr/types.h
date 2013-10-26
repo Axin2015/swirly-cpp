@@ -248,7 +248,7 @@ dbr_level_init(struct DbrLevel* level)
 /** @} */
 
 /**
- * @addtogroup AccntMemb
+ * @addtogroup TraderMemb
  * @{
  */
 

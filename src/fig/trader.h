@@ -194,10 +194,38 @@ fig_trader_empty_trade(const struct FigTrader* trader)
 
 // Memb.
 
+#define FIG_TRADER_END_MEMB DBR_TREE_END
+
+// Transfer ownership to state.
+
 static inline void
 fig_trader_emplace_memb(struct FigTrader* trader, struct DbrMemb* memb)
 {
     dbr_tree_insert(&trader->membs, memb->accnt.rec->id, &memb->trader_node_);
+}
+
+static inline struct DbrRbNode*
+fig_trader_find_memb_id(const struct FigTrader* trader, DbrIden id)
+{
+    return dbr_tree_find(&trader->membs, id);
+}
+
+static inline struct DbrRbNode*
+fig_trader_first_memb(const struct FigTrader* trader)
+{
+    return dbr_tree_first(&trader->membs);
+}
+
+static inline struct DbrRbNode*
+fig_trader_last_memb(const struct FigTrader* trader)
+{
+    return dbr_tree_last(&trader->membs);
+}
+
+static inline DbrBool
+fig_trader_empty_memb(const struct FigTrader* trader)
+{
+    return dbr_tree_empty(&trader->membs);
 }
 
 #endif // FIG_TRADER_H

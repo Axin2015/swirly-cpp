@@ -161,3 +161,29 @@ dbr_trader_empty_trade(DbrTrader trader)
 {
     return fig_trader_empty_trade(trader);
 }
+
+// TraderMemb
+
+DBR_API struct DbrRbNode*
+dbr_trader_find_memb_id(DbrTrader trader, DbrIden id)
+{
+    return fig_trader_find_memb_id(trader, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_trader_first_memb(DbrTrader trader)
+{
+    return fig_trader_first_memb(trader);
+}
+
+DBR_API struct DbrRbNode*
+dbr_trader_last_memb(DbrTrader trader)
+{
+    return fig_trader_last_memb(trader);
+}
+
+DBR_API DbrBool
+dbr_trader_empty_memb(DbrTrader trader)
+{
+    return fig_trader_empty_memb(trader);
+}
