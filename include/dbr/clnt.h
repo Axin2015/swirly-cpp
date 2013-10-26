@@ -27,7 +27,7 @@ typedef struct ElmPool* DbrPool;
  * @{
  */
 
-typedef struct ElmClnt* DbrClnt;
+typedef struct FigClnt* DbrClnt;
 
 DBR_API DbrClnt
 dbr_clnt_create(DbrPool pool);

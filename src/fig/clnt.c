@@ -25,15 +25,15 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-struct ElmClnt {
+struct FigClnt {
     DbrPool pool;
     struct DbrIModel model_;
 };
 
-static inline struct ElmClnt*
+static inline struct FigClnt*
 model_implof(DbrModel model)
 {
-    return dbr_implof(struct ElmClnt, model_, model);
+    return dbr_implof(struct FigClnt, model_, model);
 }
 
 static ssize_t
@@ -42,7 +42,7 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
     const char* mnem = "x";
     struct DbrMsg msg;
 
-    struct ElmClnt* clnt = model_implof(model);
+    struct FigClnt* clnt = model_implof(model);
     switch (type) {
     case DBR_TRADER:
     case DBR_ACCNT:
@@ -117,7 +117,7 @@ emplace_posns(DbrClnt clnt)
 DBR_API DbrClnt
 dbr_clnt_create(DbrPool pool)
 {
-    DbrClnt clnt = malloc(sizeof(struct ElmClnt));
+    DbrClnt clnt = malloc(sizeof(struct FigClnt));
     if (dbr_unlikely(!clnt)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;

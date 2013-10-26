@@ -22,7 +22,6 @@
 #include "trader.h"
 
 #include <dbr/book.h>
-#include <dbr/cache.h>
 #include <dbr/err.h>
 #include <dbr/exch.h>
 #include <dbr/journ.h>
@@ -37,7 +36,7 @@ struct FigExch {
     DbrJourn journ;
     DbrModel model;
     DbrPool pool;
-    DbrCache cache;
+    struct FigCache cache;
     struct DbrTree books;
     struct FigIndex index;
 };
@@ -249,8 +248,8 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
 static inline struct DbrRec*
 get_id(DbrExch exch, int type, DbrIden id)
 {
-    struct DbrSlNode* node = dbr_cache_find_rec_id(exch->cache, type, id);
-    assert(node != DBR_CACHE_END_REC);
+    struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
+    assert(node != FIG_CACHE_END_REC);
     return dbr_rec_entry(node);
 }
 
@@ -287,7 +286,7 @@ emplace_recs(DbrExch exch, int type)
     if (size == -1)
         return false;
 
-    dbr_cache_emplace_recs(exch->cache, type, node, size);
+    fig_cache_emplace_recs(&exch->cache, type, node, size);
     return true;
 }
 
@@ -450,14 +449,10 @@ dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
         goto fail1;
     }
 
-    DbrCache cache = dbr_cache_create(term_state, pool);
-    if (!cache)
-        goto fail2;
-
     exch->journ = journ;
     exch->model = model;
     exch->pool = pool;
-    exch->cache = cache;
+    fig_cache_init(&exch->cache, term_state, pool);
     dbr_tree_init(&exch->books);
     fig_index_init(&exch->index);
 
@@ -476,8 +471,6 @@ dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
     }
 
     return exch;
- fail2:
-    free(exch);
  fail1:
     return NULL;
 }
@@ -487,7 +480,7 @@ dbr_exch_destroy(DbrExch exch)
 {
     if (exch) {
         free_books(&exch->books);
-        dbr_cache_destroy(exch->cache);
+        fig_cache_term(&exch->cache);
         free(exch);
     }
 }
@@ -497,19 +490,19 @@ dbr_exch_destroy(DbrExch exch)
 DBR_API struct DbrSlNode*
 dbr_exch_first_rec(DbrExch exch, int type, size_t* size)
 {
-    return dbr_cache_first_rec(exch->cache, type, size);
+    return fig_cache_first_rec(&exch->cache, type, size);
 }
 
 DBR_API struct DbrSlNode*
 dbr_exch_find_rec_id(DbrExch exch, int type, DbrIden id)
 {
-    return dbr_cache_find_rec_id(exch->cache, type, id);
+    return fig_cache_find_rec_id(&exch->cache, type, id);
 }
 
 DBR_API struct DbrSlNode*
 dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem)
 {
-    return dbr_cache_find_rec_mnem(exch->cache, type, mnem);
+    return fig_cache_find_rec_mnem(&exch->cache, type, mnem);
 }
 
 // Pool
