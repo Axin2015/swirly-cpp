@@ -283,7 +283,7 @@ emplace_recs(DbrExch exch, int type)
 {
     struct DbrSlNode* node;
     ssize_t size = dbr_model_read_entity(exch->model, type, exch->pool, &node);
-    if (size == -1)
+    if (size < 0)
         return false;
 
     fig_cache_emplace_recs(&exch->cache, type, node, size);
@@ -294,7 +294,7 @@ static DbrBool
 emplace_orders(DbrExch exch)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_ORDER, exch->pool, &node) == -1)
+    if (dbr_model_read_entity(exch->model, DBR_ORDER, exch->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -343,7 +343,7 @@ static DbrBool
 emplace_trades(DbrExch exch)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_TRADE, exch->pool, &node) == -1)
+    if (dbr_model_read_entity(exch->model, DBR_TRADE, exch->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -378,7 +378,7 @@ static DbrBool
 emplace_membs(DbrExch exch)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_MEMB, exch->pool, &node) == -1)
+    if (dbr_model_read_entity(exch->model, DBR_MEMB, exch->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -411,7 +411,7 @@ static DbrBool
 emplace_posns(DbrExch exch)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_POSN, exch->pool, &node) == -1)
+    if (dbr_model_read_entity(exch->model, DBR_POSN, exch->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {

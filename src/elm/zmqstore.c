@@ -30,9 +30,8 @@
 #include <string.h> // strncpy()
 
 struct ElmZmqStore {
-    void* ctx;
-    DbrIden id;
     void* sock;
+    DbrIden id;
     DbrPool pool;
     struct DbrQueue queue;
     struct DbrIJourn journ_;
@@ -248,7 +247,7 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 };
 
 DBR_API DbrZmqStore
-dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
+dbr_zmqstore_create(void* ctx, const char* addr, DbrIden seed, DbrPool pool)
 {
     struct ElmZmqStore* store = malloc(sizeof(struct ElmZmqStore));
     if (dbr_unlikely(!store)) {
@@ -262,15 +261,14 @@ dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool)
         goto fail2;
     }
 
-    if (zmq_bind(sock, addr) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+    if (zmq_connect(sock, addr) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
 
     // Seed identity.
-    store->ctx = ctx;
-    store->id = seed;
     store->sock = sock;
+    store->id = seed;
     store->pool = pool;
     dbr_queue_init(&store->queue);
 

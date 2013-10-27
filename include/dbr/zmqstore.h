@@ -33,9 +33,9 @@ typedef struct ElmZmqStore* DbrZmqStore;
  *
  * @param ctx Zero MQ context.
  *
- * @param seed Seed identifier.
- *
  * @param addr Address of peer's endpoint.
+ *
+ * @param seed Seed identifier.
  *
  * @param pool Pool.
  *
@@ -43,7 +43,7 @@ typedef struct ElmZmqStore* DbrZmqStore;
  */
 
 DBR_API DbrZmqStore
-dbr_zmqstore_create(void* ctx, DbrIden seed, const char* addr, DbrPool pool);
+dbr_zmqstore_create(void* ctx, const char* addr, DbrIden seed, DbrPool pool);
 
 DBR_API void
 dbr_zmqstore_destroy(DbrZmqStore store);
