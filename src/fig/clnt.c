@@ -296,3 +296,224 @@ dbr_clnt_destroy(DbrClnt clnt)
         free(clnt);
     }
 }
+
+DBR_API struct DbrSlNode*
+dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size)
+{
+    return fig_cache_first_rec(&clnt->cache, type, size);
+}
+
+DBR_API struct DbrSlNode*
+dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
+{
+    return fig_cache_find_rec_id(&clnt->cache, type, id);
+}
+
+DBR_API struct DbrSlNode*
+dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem)
+{
+    return fig_cache_find_rec_mnem(&clnt->cache, type, mnem);
+}
+
+DBR_API DbrTrader
+dbr_clnt_trader(DbrClnt clnt)
+{
+    return clnt->trader.state;
+}
+
+DBR_API DbrAccnt
+dbr_clnt_accnt(DbrClnt clnt)
+{
+    return clnt->accnt.state;
+}
+
+DBR_API struct DbrOrder*
+dbr_clnt_place(DbrClnt clnt, const char* contr, DbrDate settl_date, const char* ref, int action,
+               DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, struct DbrResult* result)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_PLACE_ORDER_REQ;
+    strncpy(msg.place_order_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    strncpy(msg.place_order_req.accnt, clnt->accnt.state->rec->mnem, DBR_MNEM_MAX);
+    strncpy(msg.place_order_req.contr, contr, DBR_MNEM_MAX);
+    msg.place_order_req.settl_date = settl_date;
+    strncpy(msg.place_order_req.ref, ref, DBR_REF_MAX);
+    msg.place_order_req.action = action;
+    msg.place_order_req.ticks = ticks;
+    msg.place_order_req.lots = lots;
+    msg.place_order_req.min = min;
+    msg.place_order_req.flags = flags;
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    if (msg.type == DBR_STATUS_REP) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+
+    assert(msg.type == DBR_RESULT_REP);
+
+    return result->new_order;
+ fail1:
+    return NULL;
+}
+
+DBR_API struct DbrOrder*
+dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_REVISE_ORDER_ID_REQ;
+    strncpy(msg.revise_order_id_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    msg.revise_order_id_req.id = id;
+    msg.revise_order_id_req.lots = lots;
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    if (msg.type == DBR_STATUS_REP) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+
+    assert(msg.type == DBR_ORDER_REP);
+
+    return msg.order_rep.order;
+ fail1:
+    return NULL;
+}
+
+DBR_API struct DbrOrder*
+dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_REVISE_ORDER_REF_REQ;
+    strncpy(msg.revise_order_ref_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    strncpy(msg.revise_order_ref_req.ref, ref, DBR_REF_MAX);
+    msg.revise_order_ref_req.lots = lots;
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    if (msg.type == DBR_STATUS_REP) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+
+    assert(msg.type == DBR_ORDER_REP);
+
+    return msg.order_rep.order;
+ fail1:
+    return NULL;
+}
+
+DBR_API struct DbrOrder*
+dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_CANCEL_ORDER_ID_REQ;
+    strncpy(msg.cancel_order_id_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    msg.cancel_order_id_req.id = id;
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    if (msg.type == DBR_STATUS_REP) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+
+    assert(msg.type == DBR_ORDER_REP);
+
+    return msg.order_rep.order;
+ fail1:
+    return NULL;
+}
+
+DBR_API struct DbrOrder*
+dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_CANCEL_ORDER_REF_REQ;
+    strncpy(msg.cancel_order_ref_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    strncpy(msg.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    if (msg.type == DBR_STATUS_REP) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+
+    assert(msg.type == DBR_ORDER_REP);
+
+    return msg.order_rep.order;
+ fail1:
+    return NULL;
+}
+
+DBR_API DbrBool
+dbr_clnt_archive_order(DbrClnt clnt, DbrIden id)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_ARCHIVE_ORDER_REQ;
+    strncpy(msg.archive_order_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    msg.archive_order_req.id = id;
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    assert(msg.type == DBR_STATUS_REP);
+
+    if (msg.status_rep.num != 0) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+    return true;
+ fail1:
+    return false;
+}
+
+DBR_API DbrBool
+dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id)
+{
+    struct DbrMsg msg;
+    msg.type = DBR_ARCHIVE_TRADE_REQ;
+    strncpy(msg.archive_trade_req.trader, clnt->trader.state->rec->mnem, DBR_MNEM_MAX);
+    msg.archive_trade_req.id = id;
+
+    if (!dbr_send_msg(clnt->sock, &msg, false))
+        goto fail1;
+
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+        goto fail1;
+
+    assert(msg.type == DBR_STATUS_REP);
+
+    if (msg.status_rep.num != 0) {
+        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+        goto fail1;
+    }
+    return true;
+ fail1:
+    return false;
+}

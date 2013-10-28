@@ -463,6 +463,9 @@ archive_order(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_STATUS_REP;
+    rep.status_rep.num = 0;
+    rep.status_rep.msg[0] = '\0';
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
@@ -497,6 +500,9 @@ archive_trade(const struct DbrMsg* req)
         goto fail1;
     }
 
+    rep.type = DBR_STATUS_REP;
+    rep.status_rep.num = 0;
+    rep.status_rep.msg[0] = '\0';
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");

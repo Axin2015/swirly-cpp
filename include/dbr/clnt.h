@@ -19,6 +19,9 @@
 #define DBR_CLNT_H
 
 #include <dbr/defs.h>
+#include <dbr/types.h>
+
+#include <stddef.h>
 
 typedef struct ElmPool* DbrPool;
 
@@ -37,6 +40,99 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, const char* acc
 
 DBR_API void
 dbr_clnt_destroy(DbrClnt clnt);
+
+/** @} */
+
+/**
+ * @addtogroup Data
+ * @{
+ */
+
+/**
+ * @brief Returns first record of requested type.
+ */
+
+#define DBR_CLNT_END_REC NULL
+
+// Size is optional.
+
+DBR_API struct DbrSlNode*
+dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size);
+
+// Null if record does not exist.
+
+DBR_API struct DbrSlNode*
+dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id);
+
+// Null if record does not exist.
+// This function compares DBR_MNEM_MAX characters of mnem at most.
+
+DBR_API struct DbrSlNode*
+dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem);
+
+/** @} */
+
+/**
+ * @addtogroup Trader
+ * @{
+ */
+
+DBR_API DbrTrader
+dbr_clnt_trader(DbrClnt clnt);
+
+/** @} */
+
+/**
+ * @addtogroup Accnt
+ * @{
+ */
+
+DBR_API DbrAccnt
+dbr_clnt_accnt(DbrClnt clnt);
+
+/** @} */
+
+/**
+ * @addtogroup Exec
+ * @{
+ */
+
+/**
+ * @brief Place order.
+ * All members of result are set to zero on failure.
+ */
+
+DBR_API struct DbrOrder*
+dbr_clnt_place(DbrClnt clnt, const char* contr, DbrDate settl_date, const char* ref, int action,
+               DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, struct DbrResult* result);
+
+// Assumes that order already belongs to this side.
+// Reduced lots must not be:
+// 1. less than executed lots;
+// 2. less than min lots;
+// 3. greater than original lots.
+
+DBR_API struct DbrOrder*
+dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots);
+
+DBR_API struct DbrOrder*
+dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots);
+
+DBR_API struct DbrOrder*
+dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id);
+
+DBR_API struct DbrOrder*
+dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
+
+// Invalidates any pointers to the trade.
+
+DBR_API DbrBool
+dbr_clnt_archive_order(DbrClnt clnt, DbrIden id);
+
+// Invalidates any pointers to the trade.
+
+DBR_API DbrBool
+dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id);
 
 /** @} */
 
