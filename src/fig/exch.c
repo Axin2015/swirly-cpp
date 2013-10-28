@@ -60,6 +60,39 @@ term_state(struct DbrRec* rec)
     }
 }
 
+static inline struct DbrRec*
+get_id(DbrExch exch, int type, DbrIden id)
+{
+    struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
+    assert(node != FIG_CACHE_END_REC);
+    return dbr_rec_entry(node);
+}
+
+static inline struct DbrBook*
+get_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
+{
+    assert(crec);
+    assert(crec->type == DBR_CONTR);
+
+    // Synthetic key from contract and settlment date.
+    const DbrIden key = crec->id * 100000000L + settl_date;
+
+    struct DbrBook* book;
+	struct DbrRbNode* node = dbr_tree_pfind(&exch->books, key);
+    if (!node || node->key != key) {
+        book = malloc(sizeof(struct DbrBook));
+        if (dbr_unlikely(!book)) {
+            dbr_err_set(DBR_ENOMEM, "out of memory");
+            return NULL;
+        }
+        dbr_book_init(book, crec, settl_date, exch->pool);
+        struct DbrRbNode* parent = node;
+        dbr_tree_pinsert(&exch->books, key, &book->exch_node_, parent);
+    } else
+        book = exch_book_entry(node);
+    return book;
+}
+
 static void
 free_books(struct DbrTree* books)
 {
@@ -243,39 +276,6 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
     result->new_order = trans->new_order;
     result->first_posn = pq.first;
     result->first_trade = tq.first;
-}
-
-static inline struct DbrRec*
-get_id(DbrExch exch, int type, DbrIden id)
-{
-    struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
-    assert(node != FIG_CACHE_END_REC);
-    return dbr_rec_entry(node);
-}
-
-static inline struct DbrBook*
-get_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
-{
-    assert(crec);
-    assert(crec->type == DBR_CONTR);
-
-    // Synthetic key from contract and settlment date.
-    const DbrIden key = crec->id * 100000000L + settl_date;
-
-    struct DbrBook* book;
-	struct DbrRbNode* node = dbr_tree_pfind(&exch->books, key);
-    if (!node || node->key != key) {
-        book = malloc(sizeof(struct DbrBook));
-        if (dbr_unlikely(!book)) {
-            dbr_err_set(DBR_ENOMEM, "out of memory");
-            return NULL;
-        }
-        dbr_book_init(book, crec, settl_date, exch->pool);
-        struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&exch->books, key, &book->exch_node_, parent);
-    } else
-        book = exch_book_entry(node);
-    return book;
 }
 
 static DbrBool

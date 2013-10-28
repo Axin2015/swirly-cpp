@@ -66,6 +66,14 @@ term_state(struct DbrRec* rec)
     }
 }
 
+static inline struct DbrRec*
+get_id(DbrClnt clnt, int type, DbrIden id)
+{
+    struct DbrSlNode* node = fig_cache_find_rec_id(&clnt->cache, type, id);
+    assert(node != FIG_CACHE_END_REC);
+    return dbr_rec_entry(node);
+}
+
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
@@ -137,10 +145,20 @@ emplace_orders(DbrClnt clnt)
 
     clnt->trader.state = state;
 
-    ssize_t size = dbr_model_read_entity(&clnt->model_, DBR_ORDER, clnt->pool, &node);
-    if (size < 0)
+    if (dbr_model_read_entity(&clnt->model_, DBR_ORDER, clnt->pool, &node) < 0)
         goto fail1;
 
+    for (; node; node = node->next) {
+        struct DbrOrder* order = dbr_order_entry(node);
+
+        // Enrich.
+        order->trader.rec = get_id(clnt, DBR_TRADER, order->trader.id_only);
+        order->accnt.rec = get_id(clnt, DBR_ACCNT, order->accnt.id_only);
+        order->contr.rec = get_id(clnt, DBR_CONTR, order->contr.id_only);
+
+        // Transfer ownership.
+        fig_trader_emplace_order(clnt->trader.state, order);
+    }
     return true;
  fail1:
     return false;
@@ -150,9 +168,21 @@ static DbrBool
 emplace_trades(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(&clnt->model_, DBR_TRADE, clnt->pool, &node);
-    if (size < 0)
+    if (dbr_model_read_entity(&clnt->model_, DBR_TRADE, clnt->pool, &node) < 0)
         return false;
+
+    for (; node; node = node->next) {
+        struct DbrTrade* trade = dbr_trade_entry(node);
+
+        // Enrich.
+        trade->trader.rec = get_id(clnt, DBR_TRADER, trade->trader.id_only);
+        trade->accnt.rec = get_id(clnt, DBR_ACCNT, trade->accnt.id_only);
+        trade->contr.rec = get_id(clnt, DBR_CONTR, trade->contr.id_only);
+        trade->cpty.rec = get_id(clnt, DBR_ACCNT, trade->cpty.id_only);
+
+        // Transfer ownership.
+        fig_trader_emplace_trade(clnt->trader.state, trade);
+    }
     return true;
 }
 
@@ -160,20 +190,52 @@ static DbrBool
 emplace_membs(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(&clnt->model_, DBR_MEMB, clnt->pool, &node);
-    if (size < 0)
+    if (dbr_model_read_entity(&clnt->model_, DBR_MEMB, clnt->pool, &node) < 0)
         return false;
+
+    for (; node; node = node->next) {
+        struct DbrMemb* memb = dbr_memb_entry(node);
+
+        // Enrich.
+        memb->trader.rec = get_id(clnt, DBR_TRADER, memb->trader.id_only);
+        memb->accnt.rec = get_id(clnt, DBR_ACCNT, memb->accnt.id_only);
+
+        // Transfer ownership.
+        fig_trader_emplace_memb(clnt->trader.state, memb);
+    }
     return true;
 }
 
 static DbrBool
 emplace_posns(DbrClnt clnt)
 {
-    struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(&clnt->model_, DBR_POSN, clnt->pool, &node);
-    if (size < 0)
-        return false;
+    struct DbrSlNode* node = fig_cache_find_rec_mnem(&clnt->cache, DBR_ACCNT, clnt->accnt.mnem);
+    if (node == FIG_CACHE_END_REC)
+        goto fail1;
+
+    struct DbrRec* arec = dbr_rec_entry(node);
+    DbrAccnt state = fig_accnt_lazy(arec, clnt->pool);
+    if (!state)
+        goto fail1;
+
+    clnt->accnt.state = state;
+
+    if (dbr_model_read_entity(&clnt->model_, DBR_POSN, clnt->pool, &node) < 0)
+        goto fail1;
+
+    for (; node; node = node->next) {
+        struct DbrPosn* posn = dbr_posn_entry(node);
+
+        // Enrich.
+        posn->accnt.rec = get_id(clnt, DBR_ACCNT, posn->accnt.id_only);
+        posn->contr.rec = get_id(clnt, DBR_CONTR, posn->contr.id_only);
+
+        // Transfer ownership.
+        fig_accnt_emplace_posn(clnt->accnt.state, posn);
+    }
     return true;
+ fail1:
+    return false;
 }
 
 DBR_API DbrClnt
