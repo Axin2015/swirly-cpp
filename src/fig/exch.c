@@ -284,7 +284,9 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
 
         // Reduce maker. Maker's revision will be incremented by this call.
         dbr_book_take(book, maker_order, match->lots, now);
-        insert_unique_posn(&pq, match->maker_posn);
+        // Insert maker accnt if taker is a member.
+        if (fig_trader_find_memb_id(taker, match->maker_posn->accnt.rec->id) == DBR_TRADER_END_MEMB)
+            insert_unique_posn(&pq, match->maker_posn);
 
         // Must succeed because maker order exists.
         struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &exch->index,
