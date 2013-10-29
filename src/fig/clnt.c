@@ -23,6 +23,7 @@
 #include <dbr/err.h>
 #include <dbr/model.h>
 #include <dbr/msg.h>
+#include <dbr/queue.h>
 
 #include <zmq.h>
 
@@ -67,11 +68,46 @@ term_state(struct DbrRec* rec)
 }
 
 static inline struct DbrRec*
-get_id(DbrClnt clnt, int type, DbrIden id)
+get_id(struct FigCache* cache, int type, DbrIden id)
 {
-    struct DbrSlNode* node = fig_cache_find_rec_id(&clnt->cache, type, id);
+    struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
     return dbr_rec_entry(node);
+}
+
+static inline struct DbrOrder*
+enrich_order(struct FigCache* cache, struct DbrOrder* order)
+{
+    order->trader.rec = get_id(cache, DBR_TRADER, order->trader.id_only);
+    order->accnt.rec = get_id(cache, DBR_ACCNT, order->accnt.id_only);
+    order->contr.rec = get_id(cache, DBR_CONTR, order->contr.id_only);
+    return order;
+}
+
+static inline struct DbrTrade*
+enrich_trade(struct FigCache* cache, struct DbrTrade* trade)
+{
+    trade->trader.rec = get_id(cache, DBR_TRADER, trade->trader.id_only);
+    trade->accnt.rec = get_id(cache, DBR_ACCNT, trade->accnt.id_only);
+    trade->contr.rec = get_id(cache, DBR_CONTR, trade->contr.id_only);
+    trade->cpty.rec = get_id(cache, DBR_ACCNT, trade->cpty.id_only);
+    return trade;
+}
+
+static inline struct DbrMemb*
+enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+{
+    memb->trader.rec = get_id(cache, DBR_TRADER, memb->trader.id_only);
+    memb->accnt.rec = get_id(cache, DBR_ACCNT, memb->accnt.id_only);
+    return memb;
+}
+
+static inline struct DbrPosn*
+enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
+{
+    posn->accnt.rec = get_id(cache, DBR_ACCNT, posn->accnt.id_only);
+    posn->contr.rec = get_id(cache, DBR_CONTR, posn->contr.id_only);
+    return posn;
 }
 
 static ssize_t
@@ -149,13 +185,7 @@ emplace_orders(DbrClnt clnt)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = dbr_order_entry(node);
-
-        // Enrich.
-        order->trader.rec = get_id(clnt, DBR_TRADER, order->trader.id_only);
-        order->accnt.rec = get_id(clnt, DBR_ACCNT, order->accnt.id_only);
-        order->contr.rec = get_id(clnt, DBR_CONTR, order->contr.id_only);
-
+        struct DbrOrder* order = enrich_order(&clnt->cache, dbr_order_entry(node));
         // Transfer ownership.
         fig_trader_emplace_order(clnt->trader.state, order);
     }
@@ -172,14 +202,7 @@ emplace_trades(DbrClnt clnt)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrTrade* trade = dbr_trade_entry(node);
-
-        // Enrich.
-        trade->trader.rec = get_id(clnt, DBR_TRADER, trade->trader.id_only);
-        trade->accnt.rec = get_id(clnt, DBR_ACCNT, trade->accnt.id_only);
-        trade->contr.rec = get_id(clnt, DBR_CONTR, trade->contr.id_only);
-        trade->cpty.rec = get_id(clnt, DBR_ACCNT, trade->cpty.id_only);
-
+        struct DbrTrade* trade = enrich_trade(&clnt->cache, dbr_trade_entry(node));
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader.state, trade);
     }
@@ -194,12 +217,7 @@ emplace_membs(DbrClnt clnt)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = dbr_memb_entry(node);
-
-        // Enrich.
-        memb->trader.rec = get_id(clnt, DBR_TRADER, memb->trader.id_only);
-        memb->accnt.rec = get_id(clnt, DBR_ACCNT, memb->accnt.id_only);
-
+        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_memb_entry(node));
         // Transfer ownership.
         fig_trader_emplace_memb(clnt->trader.state, memb);
     }
@@ -224,12 +242,7 @@ emplace_posns(DbrClnt clnt)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = dbr_posn_entry(node);
-
-        // Enrich.
-        posn->accnt.rec = get_id(clnt, DBR_ACCNT, posn->accnt.id_only);
-        posn->contr.rec = get_id(clnt, DBR_CONTR, posn->contr.id_only);
-
+        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_posn_entry(node));
         // Transfer ownership.
         fig_accnt_emplace_posn(clnt->accnt.state, posn);
     }
@@ -357,6 +370,25 @@ dbr_clnt_place(DbrClnt clnt, const char* contr, DbrDate settl_date, const char* 
 
     assert(msg.type == DBR_RESULT_REP);
 
+    fig_trader_emplace_order(clnt->trader.state, enrich_order(&clnt->cache, result->new_order));
+
+    // Posn list is transformed to include existing positions with updates.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrSlNode* node = result->first_posn; node; ) {
+        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_posn_entry(node));
+        node = node->next;
+        // Transfer ownership or free if update.
+        posn = fig_accnt_update_posn(clnt->accnt.state, posn);
+        dbr_queue_insert_back(&q, &posn->entity_node_);
+    }
+    result->first_posn = q.first;
+
+    for (struct DbrSlNode* node = result->first_trade; node; node = node->next) {
+        struct DbrTrade* trade = enrich_trade(&clnt->cache, dbr_trade_entry(node));
+        // Transfer ownership.
+        fig_trader_emplace_trade(clnt->trader.state, trade);
+    }
+
     return result->new_order;
  fail1:
     return NULL;
@@ -383,8 +415,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     }
 
     assert(msg.type == DBR_ORDER_REP);
-
-    return msg.order_rep.order;
+    return fig_trader_update_order(clnt->trader.state, msg.order_rep.order);
  fail1:
     return NULL;
 }
@@ -410,8 +441,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     }
 
     assert(msg.type == DBR_ORDER_REP);
-
-    return msg.order_rep.order;
+    return fig_trader_update_order(clnt->trader.state, msg.order_rep.order);
  fail1:
     return NULL;
 }
@@ -436,8 +466,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
     }
 
     assert(msg.type == DBR_ORDER_REP);
-
-    return msg.order_rep.order;
+    return fig_trader_update_order(clnt->trader.state, msg.order_rep.order);
  fail1:
     return NULL;
 }
@@ -462,8 +491,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
     }
 
     assert(msg.type == DBR_ORDER_REP);
-
-    return msg.order_rep.order;
+    return fig_trader_update_order(clnt->trader.state, msg.order_rep.order);
  fail1:
     return NULL;
 }

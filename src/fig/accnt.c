@@ -70,6 +70,32 @@ fig_accnt_term(struct DbrRec* arec)
 }
 
 DBR_EXTERN struct DbrPosn*
+fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
+{
+    // Synthetic key from contract and settlment date.
+    const DbrIden key = posn->contr.rec->id * 100000000L + posn->settl_date;
+    struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
+    if (node) {
+        struct DbrPosn* curr = dbr_accnt_posn_entry(node);
+
+        // Update existing position.
+
+        assert(curr->accnt.rec == posn->accnt.rec);
+        assert(curr->contr.rec == posn->contr.rec);
+        assert(curr->settl_date == posn->settl_date);
+
+        curr->buy_licks = posn->buy_licks;
+        curr->buy_lots = posn->buy_lots;
+        curr->sell_licks = posn->sell_licks;
+        curr->sell_lots = posn->sell_lots;
+
+        dbr_pool_free_posn(accnt->pool, posn);
+        posn = curr;
+    }
+    return posn;
+}
+
+DBR_EXTERN struct DbrPosn*
 fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, DbrPool pool)
 {
     assert(arec);

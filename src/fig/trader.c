@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void
 free_orders(struct FigTrader* trader)
@@ -96,6 +97,41 @@ fig_trader_term(struct DbrRec* trec)
         free_orders(trader);
         free(trader);
     }
+}
+
+DBR_EXTERN struct DbrOrder*
+fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
+{
+    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
+    if (node) {
+        struct DbrOrder* curr = dbr_trader_order_entry(node);
+
+        // Update existing order.
+
+        assert(curr->id == order->id);
+        curr->rev = order->rev;
+        curr->status = order->status;
+        assert(curr->trader.rec == order->trader.rec);
+        assert(curr->accnt.rec == order->accnt.rec);
+        assert(curr->contr.rec == order->contr.rec);
+        assert(curr->settl_date == order->settl_date);
+        assert(strncmp(curr->ref, order->ref, DBR_REF_MAX) == 0);
+        assert(curr->action == order->action);
+        assert(curr->ticks == order->ticks);
+        curr->resd = order->resd;
+        curr->exec = order->exec;
+        curr->lots = order->lots;
+        assert(curr->min == order->min);
+        assert(curr->flags == order->flags);
+        assert(curr->created == order->created);
+        curr->modified = order->modified;
+
+        dbr_pool_free_order(trader->pool, order);
+        order = curr;
+    } else if (order->ref[0] != '\0')
+        fig_index_insert(trader->index, order);
+
+    return order;
 }
 
 DBR_API struct DbrRec*

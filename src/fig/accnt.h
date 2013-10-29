@@ -56,6 +56,9 @@ fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 }
 
 DBR_EXTERN struct DbrPosn*
+fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn);
+
+DBR_EXTERN struct DbrPosn*
 fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, DbrPool pool);
 
 static inline struct DbrRbNode*

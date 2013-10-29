@@ -61,11 +61,46 @@ term_state(struct DbrRec* rec)
 }
 
 static inline struct DbrRec*
-get_id(DbrExch exch, int type, DbrIden id)
+get_id(struct FigCache* cache, int type, DbrIden id)
 {
-    struct DbrSlNode* node = fig_cache_find_rec_id(&exch->cache, type, id);
+    struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
     return dbr_rec_entry(node);
+}
+
+static inline struct DbrOrder*
+enrich_order(struct FigCache* cache, struct DbrOrder* order)
+{
+    order->trader.rec = get_id(cache, DBR_TRADER, order->trader.id_only);
+    order->accnt.rec = get_id(cache, DBR_ACCNT, order->accnt.id_only);
+    order->contr.rec = get_id(cache, DBR_CONTR, order->contr.id_only);
+    return order;
+}
+
+static inline struct DbrTrade*
+enrich_trade(struct FigCache* cache, struct DbrTrade* trade)
+{
+    trade->trader.rec = get_id(cache, DBR_TRADER, trade->trader.id_only);
+    trade->accnt.rec = get_id(cache, DBR_ACCNT, trade->accnt.id_only);
+    trade->contr.rec = get_id(cache, DBR_CONTR, trade->contr.id_only);
+    trade->cpty.rec = get_id(cache, DBR_ACCNT, trade->cpty.id_only);
+    return trade;
+}
+
+static inline struct DbrMemb*
+enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+{
+    memb->trader.rec = get_id(cache, DBR_TRADER, memb->trader.id_only);
+    memb->accnt.rec = get_id(cache, DBR_ACCNT, memb->accnt.id_only);
+    return memb;
+}
+
+static inline struct DbrPosn*
+enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
+{
+    posn->accnt.rec = get_id(cache, DBR_ACCNT, posn->accnt.id_only);
+    posn->contr.rec = get_id(cache, DBR_CONTR, posn->contr.id_only);
+    return posn;
 }
 
 static inline struct DbrBook*
@@ -298,13 +333,7 @@ emplace_orders(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = dbr_order_entry(node);
-
-        // Enrich.
-        order->trader.rec = get_id(exch, DBR_TRADER, order->trader.id_only);
-        order->accnt.rec = get_id(exch, DBR_ACCNT, order->accnt.id_only);
-        order->contr.rec = get_id(exch, DBR_CONTR, order->contr.id_only);
-
+        struct DbrOrder* order = enrich_order(&exch->cache, dbr_order_entry(node));
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
@@ -347,14 +376,7 @@ emplace_trades(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrTrade* trade = dbr_trade_entry(node);
-
-        // Enrich.
-        trade->trader.rec = get_id(exch, DBR_TRADER, trade->trader.id_only);
-        trade->accnt.rec = get_id(exch, DBR_ACCNT, trade->accnt.id_only);
-        trade->contr.rec = get_id(exch, DBR_CONTR, trade->contr.id_only);
-        trade->cpty.rec = get_id(exch, DBR_ACCNT, trade->cpty.id_only);
-
+        struct DbrTrade* trade = enrich_trade(&exch->cache, dbr_trade_entry(node));
         struct FigTrader* trader = fig_trader_lazy(trade->trader.rec, &exch->index, exch->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
@@ -382,12 +404,7 @@ emplace_membs(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = dbr_memb_entry(node);
-
-        // Enrich.
-        memb->trader.rec = get_id(exch, DBR_TRADER, memb->trader.id_only);
-        memb->accnt.rec = get_id(exch, DBR_ACCNT, memb->accnt.id_only);
-
+        struct DbrMemb* memb = enrich_memb(&exch->cache, dbr_memb_entry(node));
         struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &exch->index, exch->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
@@ -415,12 +432,7 @@ emplace_posns(DbrExch exch)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = dbr_posn_entry(node);
-
-        // Enrich.
-        posn->accnt.rec = get_id(exch, DBR_ACCNT, posn->accnt.id_only);
-        posn->contr.rec = get_id(exch, DBR_CONTR, posn->contr.id_only);
-
+        struct DbrPosn* posn = enrich_posn(&exch->cache, dbr_posn_entry(node));
         struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, exch->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;

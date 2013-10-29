@@ -63,6 +63,9 @@ fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
         fig_index_insert(trader->index, order);
 }
 
+DBR_EXTERN struct DbrOrder*
+fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order);
+
 // Release ownership from state.
 
 static inline void
