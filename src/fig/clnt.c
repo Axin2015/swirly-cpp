@@ -230,7 +230,7 @@ emplace_posns(DbrClnt clnt)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* addr, const char* trader, const char* accnt, DbrPool pool)
+dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrPool pool)
 {
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
     if (dbr_unlikely(!clnt)) {

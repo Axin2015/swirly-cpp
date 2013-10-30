@@ -33,8 +33,7 @@ typedef struct ElmPool* DbrPool;
 typedef struct FigClnt* DbrClnt;
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* addr, const char* trader, const char* accnt,
-                const DbrPool pool);
+dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrPool pool);
 
 // No-op if clnt is null.
 
