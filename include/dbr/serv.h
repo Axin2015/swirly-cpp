@@ -15,21 +15,21 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_EXCH_H
-#define DBR_EXCH_H
+#ifndef DBR_SERV_H
+#define DBR_SERV_H
 
 #include <dbr/model.h>
 #include <dbr/pool.h>
 
 /**
- * @addtogroup Exch
+ * @addtogroup Serv
  * @{
  */
 
-typedef struct FigExch* DbrExch;
+typedef struct FigServ* DbrServ;
 
 /**
- * @brief Create Exchange.
+ * @brief Create Servange.
  *
  * @param journ Journal.
  *
@@ -37,82 +37,47 @@ typedef struct FigExch* DbrExch;
  *
  * @param pool Pool.
  *
- * @return Handle to newly created Exchange or null on failure.
+ * @return Handle to newly created Servange or null on failure.
  */
 
-DBR_API DbrExch
-dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool);
+DBR_API DbrServ
+dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool);
 
-// No-op if exch is null.
+// No-op if serv is null.
 
 DBR_API void
-dbr_exch_destroy(DbrExch exch);
-
-/** @} */
-
-/**
- * @addtogroup Data
- * @{
- */
+dbr_serv_destroy(DbrServ serv);
 
 /**
  * @brief Returns first record of requested type.
  */
 
-#define DBR_EXCH_END_REC NULL
+#define DBR_SERV_END_REC NULL
 
 // Size is optional.
 
 DBR_API struct DbrSlNode*
-dbr_exch_first_rec(DbrExch exch, int type, size_t* size);
+dbr_serv_first_rec(DbrServ serv, int type, size_t* size);
 
 // Null if record does not exist.
 
 DBR_API struct DbrSlNode*
-dbr_exch_find_rec_id(DbrExch exch, int type, DbrIden id);
+dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id);
 
 // Null if record does not exist.
 // This function compares DBR_MNEM_MAX characters of mnem at most.
 
 DBR_API struct DbrSlNode*
-dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem);
-
-/** @} */
-
-/**
- * @addtogroup Trader
- * @{
- */
+dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem);
 
 DBR_API DbrTrader
-dbr_exch_trader(DbrExch exch, struct DbrRec* trec);
-
-/** @} */
-
-/**
- * @addtogroup Accnt
- * @{
- */
+dbr_serv_trader(DbrServ serv, struct DbrRec* trec);
 
 DBR_API DbrAccnt
-dbr_exch_accnt(DbrExch exch, struct DbrRec* arec);
-
-/** @} */
-
-/**
- * @addtogroup Book
- * @{
- */
+dbr_serv_accnt(DbrServ serv, struct DbrRec* arec);
 
 DBR_API struct DbrBook*
-dbr_exch_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date);
-
-/** @} */
-
-/**
- * @addtogroup Exec
- * @{
- */
+dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date);
 
 /**
  * @brief Place order.
@@ -120,7 +85,7 @@ dbr_exch_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date);
  */
 
 DBR_API struct DbrOrder*
-dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
+dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags, struct DbrResult* result);
 
@@ -131,27 +96,27 @@ dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 // 3. greater than original lots.
 
 DBR_API struct DbrOrder*
-dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots);
+dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lots);
+dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_exch_cancel_id(DbrExch exch, DbrTrader trader, DbrIden id);
+dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id);
 
 DBR_API struct DbrOrder*
-dbr_exch_cancel_ref(DbrExch exch, DbrTrader trader, const char* ref);
+dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id);
+dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_exch_archive_trade(DbrExch exch, DbrTrader trader, DbrIden id);
+dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id);
 
 /** @} */
 
-#endif // DBR_EXCH_H
+#endif // DBR_SERV_H

@@ -18,7 +18,7 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/exch.hpp>
+#include <dbrpp/serv.hpp>
 #include <dbrpp/pool.hpp>
 
 using namespace dbr;
@@ -43,19 +43,19 @@ struct TypeTraits<DBR_CONTR> {
 
 template <int TypeN>
 static typename TypeTraits<TypeN>::TypeRecRef
-get_rec_id(Exch& exch, DbrIden id)
+get_rec_id(Serv& serv, DbrIden id)
 {
-    auto it = exch.recs<TypeN>().find(id);
-    check(it != exch.recs<TypeN>().end());
+    auto it = serv.recs<TypeN>().find(id);
+    check(it != serv.recs<TypeN>().end());
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
 template <int TypeN>
 static typename TypeTraits<TypeN>::TypeRecRef
-get_rec_mnem(Exch& exch, const char* mnem)
+get_rec_mnem(Serv& serv, const char* mnem)
 {
-    auto it = exch.recs<TypeN>().find(mnem);
-    check(it != exch.recs<TypeN>().end());
+    auto it = serv.recs<TypeN>().find(mnem);
+    check(it != serv.recs<TypeN>().end());
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
@@ -64,12 +64,12 @@ TEST_CASE(data_trader)
     Journ journ(1);
     Model model;
     Pool pool;
-    Exch exch(&journ, &model, pool);
+    Serv serv(&journ, &model, pool);
 
-    check(exch.trecs().find("BAD") == exch.trecs().end());
+    check(serv.trecs().find("BAD") == serv.trecs().end());
 
-    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(exch, "WRAMIREZ");
-    check(trec == get_rec_id<DBR_TRADER>(exch, trec.id()));
+    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(serv, "WRAMIREZ");
+    check(trec == get_rec_id<DBR_TRADER>(serv, trec.id()));
     check(trec.mnem() == Mnem("WRAMIREZ"));
 
     // Body.
@@ -82,12 +82,12 @@ TEST_CASE(data_accnt)
     Journ journ(1);
     Model model;
     Pool pool;
-    Exch exch(&journ, &model, pool);
+    Serv serv(&journ, &model, pool);
 
-    check(exch.arecs().find("BAD") == exch.arecs().end());
+    check(serv.arecs().find("BAD") == serv.arecs().end());
 
-    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(exch, "DBRA");
-    check(arec == get_rec_id<DBR_ACCNT>(exch, arec.id()));
+    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(serv, "DBRA");
+    check(arec == get_rec_id<DBR_ACCNT>(serv, arec.id()));
     check(arec.mnem() == Mnem("DBRA"));
 
     // Body.
@@ -100,12 +100,12 @@ TEST_CASE(data_contr)
     Journ journ(1);
     Model model;
     Pool pool;
-    Exch exch(&journ, &model, pool);
+    Serv serv(&journ, &model, pool);
 
-    check(exch.crecs().find("BAD") == exch.crecs().end());
+    check(serv.crecs().find("BAD") == serv.crecs().end());
 
-    ContrRecRef crec = get_rec_mnem<DBR_CONTR>(exch, "EURUSD");
-    check(crec == get_rec_id<DBR_CONTR>(exch, crec.id()));
+    ContrRecRef crec = get_rec_mnem<DBR_CONTR>(serv, "EURUSD");
+    check(crec == get_rec_id<DBR_CONTR>(serv, crec.id()));
     check(crec.mnem() == Mnem("EURUSD"));
 
     // Body.

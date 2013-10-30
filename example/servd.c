@@ -17,7 +17,7 @@
  */
 #include <dbr/accnt.h>
 #include <dbr/err.h>
-#include <dbr/exch.h>
+#include <dbr/serv.h>
 #include <dbr/journ.h>
 #include <dbr/log.h>
 #include <dbr/msg.h>
@@ -36,7 +36,7 @@
 
 static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
-static DbrExch exch = NULL;
+static DbrServ serv = NULL;
 static void* ctx = NULL;
 static void* sock = NULL;
 
@@ -65,8 +65,8 @@ status_setf(struct DbrMsg* rep, int num, const char* format, ...)
 DBR_API struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
-    struct DbrSlNode* node = dbr_exch_find_rec_mnem(exch, type, mnem);
-    return node != DBR_EXCH_END_REC ? dbr_rec_entry(node) : NULL;
+    struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
+    return node != DBR_SERV_END_REC ? dbr_rec_entry(node) : NULL;
 }
 
 static DbrBool
@@ -74,7 +74,7 @@ sess_rec(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
-    struct DbrSlNode* first = dbr_exch_first_rec(exch, req->read_entity_req.type, NULL);
+    struct DbrSlNode* first = dbr_serv_first_rec(serv, req->read_entity_req.type, NULL);
 
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = req->read_entity_req.type;
@@ -95,7 +95,7 @@ sess_order(const struct DbrMsg* req)
         status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -130,7 +130,7 @@ sess_trade(const struct DbrMsg* req)
         status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -165,7 +165,7 @@ sess_memb(const struct DbrMsg* req)
         status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -200,7 +200,7 @@ sess_posn(const struct DbrMsg* req)
         status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -211,7 +211,7 @@ sess_posn(const struct DbrMsg* req)
          mnode != DBR_TRADER_END_MEMB; mnode = dbr_rbnode_next(mnode)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(mnode);
         struct DbrRec* arec = memb->accnt.rec;
-        DbrAccnt accnt = dbr_exch_accnt(exch, arec);
+        DbrAccnt accnt = dbr_serv_accnt(serv, arec);
         if (!accnt) {
             status_err(&rep);
             goto fail1;
@@ -257,17 +257,17 @@ place_order(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
     }
-    DbrAccnt accnt = dbr_exch_accnt(exch, arec);
+    DbrAccnt accnt = dbr_serv_accnt(serv, arec);
     if (!accnt) {
         status_err(&rep);
         goto fail1;
     }
-    struct DbrBook* book = dbr_exch_book(exch, crec, req->place_order_req.settl_date);
+    struct DbrBook* book = dbr_serv_book(serv, crec, req->place_order_req.settl_date);
     if (!book) {
         status_err(&rep);
         goto fail1;
@@ -281,7 +281,7 @@ place_order(const struct DbrMsg* req)
     const DbrFlags flags = req->place_order_req.flags;
 
     struct DbrResult result;
-    if (!dbr_exch_place(exch, trader, accnt, book, ref, action, ticks, lots, min, flags, &result)) {
+    if (!dbr_serv_place(serv, trader, accnt, book, ref, action, ticks, lots, min, flags, &result)) {
         status_err(&rep);
         goto fail1;
     }
@@ -311,7 +311,7 @@ revise_order_id(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -320,7 +320,7 @@ revise_order_id(const struct DbrMsg* req)
     const DbrIden id = req->revise_order_id_req.id;
     const DbrLots lots = req->revise_order_id_req.lots;
 
-    struct DbrOrder* order = dbr_exch_revise_id(exch, trader, id, lots);
+    struct DbrOrder* order = dbr_serv_revise_id(serv, trader, id, lots);
     if (!order) {
         status_err(&rep);
         goto fail1;
@@ -349,7 +349,7 @@ revise_order_ref(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -358,7 +358,7 @@ revise_order_ref(const struct DbrMsg* req)
     const char* ref = req->revise_order_ref_req.ref;
     const DbrLots lots = req->revise_order_ref_req.lots;
 
-    struct DbrOrder* order = dbr_exch_revise_ref(exch, trader, ref, lots);
+    struct DbrOrder* order = dbr_serv_revise_ref(serv, trader, ref, lots);
     if (!order) {
         status_err(&rep);
         goto fail1;
@@ -387,7 +387,7 @@ cancel_order_id(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -395,7 +395,7 @@ cancel_order_id(const struct DbrMsg* req)
 
     const DbrIden id = req->cancel_order_id_req.id;
 
-    struct DbrOrder* order = dbr_exch_cancel_id(exch, trader, id);
+    struct DbrOrder* order = dbr_serv_cancel_id(serv, trader, id);
     if (!order) {
         status_err(&rep);
         goto fail1;
@@ -424,7 +424,7 @@ cancel_order_ref(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -432,7 +432,7 @@ cancel_order_ref(const struct DbrMsg* req)
 
     const char* ref = req->cancel_order_ref_req.ref;
 
-    struct DbrOrder* order = dbr_exch_cancel_ref(exch, trader, ref);
+    struct DbrOrder* order = dbr_serv_cancel_ref(serv, trader, ref);
     if (!order) {
         status_err(&rep);
         goto fail1;
@@ -461,7 +461,7 @@ archive_order(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -469,7 +469,7 @@ archive_order(const struct DbrMsg* req)
 
     const DbrIden id = req->archive_order_req.id;
 
-    if (!dbr_exch_archive_order(exch, trader, id)) {
+    if (!dbr_serv_archive_order(serv, trader, id)) {
         status_err(&rep);
         goto fail1;
     }
@@ -498,7 +498,7 @@ archive_trade(const struct DbrMsg* req)
         goto fail1;
     }
 
-    DbrTrader trader = dbr_exch_trader(exch, trec);
+    DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
         status_err(&rep);
         goto fail1;
@@ -506,7 +506,7 @@ archive_trade(const struct DbrMsg* req)
 
     const DbrIden id = req->archive_trade_req.id;
 
-    if (!dbr_exch_archive_trade(exch, trader, id)) {
+    if (!dbr_serv_archive_trade(serv, trader, id)) {
         status_err(&rep);
         goto fail1;
     }
@@ -614,9 +614,9 @@ main(int argc, char* argv[])
     DbrJourn journ = dbr_sqlstore_journ(store);
     DbrModel model = dbr_sqlstore_model(store);
 
-    exch = dbr_exch_create(journ, model, pool);
-    if (!exch) {
-        dbr_err_print("dbr_exch_create() failed");
+    serv = dbr_serv_create(journ, model, pool);
+    if (!serv) {
+        dbr_err_print("dbr_serv_create() failed");
         goto exit3;
     }
 
@@ -648,7 +648,7 @@ main(int argc, char* argv[])
  exit5:
     zmq_ctx_destroy(ctx);
  exit4:
-    dbr_exch_destroy(exch);
+    dbr_serv_destroy(serv);
  exit3:
     dbr_sqlstore_destroy(store);
  exit2:

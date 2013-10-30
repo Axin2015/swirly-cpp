@@ -30,7 +30,7 @@ struct DbrBook {
     DbrDate settl_date;
     struct DbrSide bid_side;
     struct DbrSide ask_side;
-    struct DbrRbNode exch_node_;
+    struct DbrRbNode serv_node_;
 };
 
 struct DbrBest {

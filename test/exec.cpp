@@ -18,7 +18,7 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/exch.hpp>
+#include <dbrpp/serv.hpp>
 #include <dbrpp/pool.hpp>
 
 using namespace dbr;
@@ -29,13 +29,13 @@ TEST_CASE(exec_book)
     Journ journ(1);
     Model model;
     Pool pool;
-    Exch exch(&journ, &model, pool);
+    Serv serv(&journ, &model, pool);
 
-    ExchContrRecs::Iterator it = exch.crecs().find("EURUSD");
-    check(it != exch.crecs().end());
+    ServContrRecs::Iterator it = serv.crecs().find("EURUSD");
+    check(it != serv.crecs().end());
 
     ContrRecRef crec(*it);
-    BookRef book = exch.book(*it, 20130824);
+    BookRef book = serv.book(*it, 20130824);
     check(book.crec() == crec);
     check(book.settl_date() == 20130824);
 }
@@ -45,21 +45,21 @@ TEST_CASE(exec_place)
     Journ journ(1);
     Model model;
     Pool pool;
-    Exch exch(&journ, &model, pool);
+    Serv serv(&journ, &model, pool);
 
-    auto tit = exch.trecs().find("WRAMIREZ");
-    check(tit != exch.trecs().end());
+    auto tit = serv.trecs().find("WRAMIREZ");
+    check(tit != serv.trecs().end());
 
-    auto ait = exch.arecs().find("DBRA");
-    check(ait != exch.arecs().end());
+    auto ait = serv.arecs().find("DBRA");
+    check(ait != serv.arecs().end());
 
-    auto cit = exch.crecs().find("EURUSD");
-    check(cit != exch.crecs().end());
+    auto cit = serv.crecs().find("EURUSD");
+    check(cit != serv.crecs().end());
 
-    auto trader = exch.trader(TraderRecRef(*tit));
-    auto accnt = exch.accnt(AccntRecRef(*ait));
-    auto book = exch.book(ContrRecRef(*cit), 20130824);
+    auto trader = serv.trader(TraderRecRef(*tit));
+    auto accnt = serv.accnt(AccntRecRef(*ait));
+    auto book = serv.book(ContrRecRef(*cit), 20130824);
 
     Result result;
-    exch.place(trader, accnt, book, nullptr, DBR_BUY, 12345, 1, 0, 0, result);
+    serv.place(trader, accnt, book, nullptr, DBR_BUY, 12345, 1, 0, 0, result);
 }

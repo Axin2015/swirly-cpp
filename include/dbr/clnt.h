@@ -40,13 +40,6 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrPool pool);
 DBR_API void
 dbr_clnt_destroy(DbrClnt clnt);
 
-/** @} */
-
-/**
- * @addtogroup Data
- * @{
- */
-
 /**
  * @brief Returns first record of requested type.
  */
@@ -69,32 +62,11 @@ dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id);
 DBR_API struct DbrSlNode*
 dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem);
 
-/** @} */
-
-/**
- * @addtogroup Trader
- * @{
- */
-
 DBR_API DbrTrader
 dbr_clnt_trader(DbrClnt clnt);
 
-/** @} */
-
-/**
- * @addtogroup Accnt
- * @{
- */
-
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
-
-/** @} */
-
-/**
- * @addtogroup Exec
- * @{
- */
 
 /**
  * @brief Place order.

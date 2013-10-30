@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/exch.hpp>
+#include <dbrpp/serv.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
 #include <dbrpp/sqlstore.hpp>
@@ -31,14 +31,14 @@ main(int argc, char* argv[])
     try {
         SqlStore store(1, "doobry.db");
         Pool pool;
-        Exch exch(store.journ(), store.model(), pool);
+        Serv serv(store.journ(), store.model(), pool);
 
         cout << "traders:\n";
-        for (auto rec : exch.trecs()) {
+        for (auto rec : serv.trecs()) {
             TraderRecRef ref(rec);
             cout << ref << endl;
             cout << ref.mnem() << " orders:" << endl;
-            Trader trader = exch.trader(ref);
+            Trader trader = serv.trader(ref);
             for (auto ref : trader.orders())
                 cout << OrderRef(ref) << endl;
             cout << ref.mnem() << " trades:" << endl;
@@ -47,20 +47,20 @@ main(int argc, char* argv[])
         }
 
         cout << "accnts:\n";
-        for (auto rec : exch.arecs()) {
+        for (auto rec : serv.arecs()) {
             AccntRecRef ref(rec);
             cout << ref << endl;
-            Accnt accnt = exch.accnt(ref);
+            Accnt accnt = serv.accnt(ref);
             cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
                 cout << PosnRef(ref) << endl;
         }
 
         cout << "contrs:\n";
-        for (auto rec : exch.crecs()) {
+        for (auto rec : serv.crecs()) {
             ContrRecRef ref(rec);
             cout << ref << endl;
-            exch.book(ref, 20130827);
+            serv.book(ref, 20130827);
         }
         return 0;
     } catch (const exception& e) {

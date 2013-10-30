@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_EXCH_HPP
-#define DBRPP_EXCH_HPP
+#ifndef DBRPP_SERV_HPP
+#define DBRPP_SERV_HPP
 
 #include <dbrpp/accnt.hpp>
 #include <dbrpp/except.hpp>
@@ -24,12 +24,12 @@
 #include <dbrpp/trader.hpp>
 #include <dbrpp/result.hpp>
 
-#include <dbr/exch.h>
+#include <dbr/serv.h>
 
 namespace dbr {
 
 template <int TypeN>
-class ExchRecs {
+class ServRecs {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrRec Entry;
         static Entry*
@@ -43,7 +43,7 @@ class ExchRecs {
             return dbr_rec_entry(const_cast<Node*>(node));
         }
     };
-    DbrExch exch_;
+    DbrServ serv_;
 public:
     typedef typename Policy::Entry ValueType;
     typedef typename Policy::Entry* Pointer;
@@ -73,14 +73,14 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ExchRecs(DbrExch exch) noexcept
-    : exch_(exch)
+    ServRecs(DbrServ serv) noexcept
+    : serv_(serv)
     {
     }
     void
-    swap(ExchRecs& rhs) noexcept
+    swap(ServRecs& rhs) noexcept
     {
-        std::swap(exch_, rhs.exch_);
+        std::swap(serv_, rhs.serv_);
     }
 
     // Iterator.
@@ -88,42 +88,42 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_exch_first_rec(exch_, TypeN, nullptr);
+        return dbr_serv_first_rec(serv_, TypeN, nullptr);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_exch_first_rec(exch_, TypeN, nullptr);
+        return dbr_serv_first_rec(serv_, TypeN, nullptr);
     }
     Iterator
     end() noexcept
     {
-        return DBR_EXCH_END_REC;
+        return DBR_SERV_END_REC;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_EXCH_END_REC;
+        return DBR_SERV_END_REC;
     }
     Iterator
     find(DbrIden id) noexcept
     {
-        return dbr_exch_find_rec_id(exch_, TypeN, id);
+        return dbr_serv_find_rec_id(serv_, TypeN, id);
     }
     ConstIterator
     find(DbrIden id) const noexcept
     {
-        return dbr_exch_find_rec_id(exch_, TypeN, id);
+        return dbr_serv_find_rec_id(serv_, TypeN, id);
     }
     Iterator
     find(const char* mnem) noexcept
     {
-        return dbr_exch_find_rec_mnem(exch_, TypeN, mnem);
+        return dbr_serv_find_rec_mnem(serv_, TypeN, mnem);
     }
     ConstIterator
     find(const char* mnem) const noexcept
     {
-        return dbr_exch_find_rec_mnem(exch_, TypeN, mnem);
+        return dbr_serv_find_rec_mnem(serv_, TypeN, mnem);
     }
 
     // Accessor.
@@ -142,7 +142,7 @@ public:
     size() const noexcept
     {
         size_t size;
-        dbr_exch_first_rec(exch_, TypeN, &size);
+        dbr_serv_first_rec(serv_, TypeN, &size);
         return size;
     }
     SizeType
@@ -157,88 +157,88 @@ public:
     }
 };
 
-typedef ExchRecs<DBR_TRADER> ExchTraderRecs;
-typedef ExchRecs<DBR_ACCNT> ExchAccntRecs;
-typedef ExchRecs<DBR_CONTR> ExchContrRecs;
+typedef ServRecs<DBR_TRADER> ServTraderRecs;
+typedef ServRecs<DBR_ACCNT> ServAccntRecs;
+typedef ServRecs<DBR_CONTR> ServContrRecs;
 
-class Exch {
-    DbrExch impl_;
+class Serv {
+    DbrServ impl_;
 public:
-    ~Exch() noexcept
+    ~Serv() noexcept
     {
         if (impl_)
-            dbr_exch_destroy(impl_);
+            dbr_serv_destroy(impl_);
     }
     constexpr
-    Exch(decltype(nullptr)) noexcept
+    Serv(decltype(nullptr)) noexcept
     : impl_(nullptr)
     {
     }
-    Exch(DbrJourn journ, DbrModel model, DbrPool pool)
-        : impl_(dbr_exch_create(journ, model, pool))
+    Serv(DbrJourn journ, DbrModel model, DbrPool pool)
+        : impl_(dbr_serv_create(journ, model, pool))
     {
         if (!impl_)
             throw_exception();
     }
-    operator DbrExch() const noexcept
+    operator DbrServ() const noexcept
     {
         return impl_;
     }
 
     // Copy semantics.
 
-    Exch(const Exch&) = delete;
+    Serv(const Serv&) = delete;
 
-    Exch&
-    operator =(const Exch&) = delete;
+    Serv&
+    operator =(const Serv&) = delete;
 
     // Move semantics.
 
-    Exch(Exch&& rhs) noexcept
+    Serv(Serv&& rhs) noexcept
     : impl_(nullptr)
     {
         swap(rhs);
     }
-    Exch&
-    operator =(Exch&& rhs) noexcept
+    Serv&
+    operator =(Serv&& rhs) noexcept
     {
         if (impl_) {
-            dbr_exch_destroy(impl_);
+            dbr_serv_destroy(impl_);
             impl_ = nullptr;
         }
         swap(rhs);
         return *this;
     }
     void
-    swap(Exch& rhs) noexcept
+    swap(Serv& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
     }
     template <int TypeN>
-    ExchRecs<TypeN>
+    ServRecs<TypeN>
     recs() const noexcept
     {
-        return ExchRecs<TypeN>(impl_);
+        return ServRecs<TypeN>(impl_);
     }
-    ExchContrRecs
+    ServContrRecs
     crecs() const noexcept
     {
-        return ExchContrRecs(impl_);
+        return ServContrRecs(impl_);
     }
-    ExchTraderRecs
+    ServTraderRecs
     trecs() const noexcept
     {
-        return ExchTraderRecs(impl_);
+        return ServTraderRecs(impl_);
     }
-    ExchAccntRecs
+    ServAccntRecs
     arecs() const noexcept
     {
-        return ExchAccntRecs(impl_);
+        return ServAccntRecs(impl_);
     }
     BookRef
     book(DbrRec& crec, DbrDate settl_date) const
     {
-        DbrBook* const book = dbr_exch_book(impl_, &crec, settl_date);
+        DbrBook* const book = dbr_serv_book(impl_, &crec, settl_date);
         if (!book)
             throw_exception();
         return BookRef(*book);
@@ -246,7 +246,7 @@ public:
     Trader
     trader(DbrRec& trec) const
     {
-        DbrTrader trader = dbr_exch_trader(impl_, &trec);
+        DbrTrader trader = dbr_serv_trader(impl_, &trec);
         if (!trader)
             throw_exception();
         return Trader(trader);
@@ -254,7 +254,7 @@ public:
     Accnt
     accnt(DbrRec& arec) const
     {
-        DbrAccnt accnt = dbr_exch_accnt(impl_, &arec);
+        DbrAccnt accnt = dbr_serv_accnt(impl_, &arec);
         if (!accnt)
             throw_exception();
         return Accnt(accnt);
@@ -263,7 +263,7 @@ public:
     place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Result& result)
     {
-        DbrOrder* const order = dbr_exch_place(impl_, trader, accnt, &book, ref, action, ticks,
+        DbrOrder* const order = dbr_serv_place(impl_, trader, accnt, &book, ref, action, ticks,
                                                lots, min, flags, result.c_arg());
         if (!order)
             throw_exception();
@@ -272,7 +272,7 @@ public:
     OrderRef
     revise(DbrTrader trader, DbrIden id, DbrLots lots)
     {
-        DbrOrder* const order = dbr_exch_revise_id(impl_, trader, id, lots);
+        DbrOrder* const order = dbr_serv_revise_id(impl_, trader, id, lots);
         if (!order)
             throw_exception();
         return OrderRef(*order);
@@ -280,7 +280,7 @@ public:
     OrderRef
     revise(DbrTrader trader, const char* ref, DbrLots lots)
     {
-        DbrOrder* const order = dbr_exch_revise_ref(impl_, trader, ref, lots);
+        DbrOrder* const order = dbr_serv_revise_ref(impl_, trader, ref, lots);
         if (!order)
             throw_exception();
         return OrderRef(*order);
@@ -288,7 +288,7 @@ public:
     OrderRef
     cancel(DbrTrader trader, DbrIden id)
     {
-        DbrOrder* const order = dbr_exch_cancel_id(impl_, trader, id);
+        DbrOrder* const order = dbr_serv_cancel_id(impl_, trader, id);
         if (!order)
             throw_exception();
         return OrderRef(*order);
@@ -296,7 +296,7 @@ public:
     OrderRef
     cancel(DbrTrader trader, const char* ref)
     {
-        DbrOrder* const order = dbr_exch_cancel_ref(impl_, trader, ref);
+        DbrOrder* const order = dbr_serv_cancel_ref(impl_, trader, ref);
         if (!order)
             throw_exception();
         return OrderRef(*order);
@@ -304,17 +304,17 @@ public:
     void
     archive_order(DbrTrader trader, DbrIden id)
     {
-        if (!dbr_exch_archive_order(impl_, trader, id))
+        if (!dbr_serv_archive_order(impl_, trader, id))
             throw_exception();
     }
     void
     archive_trade(DbrTrader trader, DbrIden id)
     {
-        if (!dbr_exch_archive_trade(impl_, trader, id))
+        if (!dbr_serv_archive_trade(impl_, trader, id))
             throw_exception();
     }
 };
 
 } // dbr
 
-#endif // DBRPP_EXCH_HPP
+#endif // DBRPP_SERV_HPP

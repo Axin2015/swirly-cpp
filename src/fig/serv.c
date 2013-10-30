@@ -23,7 +23,7 @@
 
 #include <dbr/book.h>
 #include <dbr/err.h>
-#include <dbr/exch.h>
+#include <dbr/serv.h>
 #include <dbr/journ.h>
 #include <dbr/queue.h>
 #include <dbr/util.h>
@@ -32,7 +32,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-struct FigExch {
+struct FigServ {
     DbrJourn journ;
     DbrModel model;
     DbrPool pool;
@@ -42,9 +42,9 @@ struct FigExch {
 };
 
 static inline struct DbrBook*
-exch_book_entry(struct DbrRbNode* node)
+serv_book_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrBook, exch_node_, node);
+    return dbr_implof(struct DbrBook, serv_node_, node);
 }
 
 static void
@@ -104,7 +104,7 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 }
 
 static inline struct DbrBook*
-get_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
+get_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
     assert(crec);
     assert(crec->type == DBR_CONTR);
@@ -113,18 +113,18 @@ get_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
     const DbrIden key = crec->id * 100000000L + settl_date;
 
     struct DbrBook* book;
-	struct DbrRbNode* node = dbr_tree_pfind(&exch->books, key);
+	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);
     if (!node || node->key != key) {
         book = malloc(sizeof(struct DbrBook));
         if (dbr_unlikely(!book)) {
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
-        dbr_book_init(book, crec, settl_date, exch->pool);
+        dbr_book_init(book, crec, settl_date, serv->pool);
         struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&exch->books, key, &book->exch_node_, parent);
+        dbr_tree_pinsert(&serv->books, key, &book->serv_node_, parent);
     } else
-        book = exch_book_entry(node);
+        book = serv_book_entry(node);
     return book;
 }
 
@@ -134,7 +134,7 @@ free_books(struct DbrTree* books)
     assert(books);
     struct DbrRbNode* node;
     while ((node = books->root)) {
-        struct DbrBook* book = exch_book_entry(node);
+        struct DbrBook* book = serv_book_entry(node);
         dbr_tree_remove(books, node);
         dbr_book_term(book);
         free(book);
@@ -266,7 +266,7 @@ insert_unique_posn(struct DbrQueue* queue, struct DbrPosn* new_posn)
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
+commit_result(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
               const struct DbrTrans* trans, DbrMillis now, struct DbrResult* result)
 {
     struct DbrQueue pq, tq;
@@ -289,8 +289,8 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
             insert_unique_posn(&pq, match->maker_posn);
 
         // Must succeed because maker order exists.
-        struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &exch->index,
-                                                  exch->pool);
+        struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &serv->index,
+                                                  serv->pool);
         assert(maker);
 
         // TODO: taker or maker trade first?
@@ -307,7 +307,7 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
 
         // Advance node to next before current node is freed.
         node = node->next;
-        dbr_pool_free_match(exch->pool, match);
+        dbr_pool_free_match(serv->pool, match);
     }
 
     result->new_order = trans->new_order;
@@ -316,30 +316,30 @@ commit_result(DbrExch exch, struct FigTrader* taker, struct DbrBook* book,
 }
 
 static DbrBool
-emplace_recs(DbrExch exch, int type)
+emplace_recs(DbrServ serv, int type)
 {
     struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(exch->model, type, exch->pool, &node);
+    ssize_t size = dbr_model_read_entity(serv->model, type, serv->pool, &node);
     if (size < 0)
         return false;
 
-    fig_cache_emplace_recs(&exch->cache, type, node, size);
+    fig_cache_emplace_recs(&serv->cache, type, node, size);
     return true;
 }
 
 static DbrBool
-emplace_orders(DbrExch exch)
+emplace_orders(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_ORDER, exch->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_ORDER, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = enrich_order(&exch->cache, dbr_order_entry(node));
+        struct DbrOrder* order = enrich_order(&serv->cache, dbr_order_entry(node));
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
-            book = get_book(exch, order->contr.rec, order->settl_date);
+            book = get_book(serv, order->contr.rec, order->settl_date);
             if (dbr_unlikely(!book))
                 goto fail2;
 
@@ -348,7 +348,7 @@ emplace_orders(DbrExch exch)
         } else
             book = NULL;
 
-        struct FigTrader* trader = fig_trader_lazy(order->trader.rec, &exch->index, exch->pool);
+        struct FigTrader* trader = fig_trader_lazy(order->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader)) {
             if (book)
                 dbr_book_remove(book, order);
@@ -364,22 +364,22 @@ emplace_orders(DbrExch exch)
     do {
         struct DbrOrder* order = dbr_order_entry(node);
         node = node->next;
-        dbr_pool_free_order(exch->pool, order);
+        dbr_pool_free_order(serv->pool, order);
     } while (node);
  fail1:
     return false;
 }
 
 static DbrBool
-emplace_trades(DbrExch exch)
+emplace_trades(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_TRADE, exch->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_TRADE, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrTrade* trade = enrich_trade(&exch->cache, dbr_trade_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(trade->trader.rec, &exch->index, exch->pool);
+        struct DbrTrade* trade = enrich_trade(&serv->cache, dbr_trade_entry(node));
+        struct FigTrader* trader = fig_trader_lazy(trade->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
@@ -392,22 +392,22 @@ emplace_trades(DbrExch exch)
     do {
         struct DbrTrade* trade = dbr_trade_entry(node);
         node = node->next;
-        dbr_pool_free_trade(exch->pool, trade);
+        dbr_pool_free_trade(serv->pool, trade);
     } while (node);
  fail1:
     return false;
 }
 
 static DbrBool
-emplace_membs(DbrExch exch)
+emplace_membs(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_MEMB, exch->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_MEMB, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&exch->cache, dbr_memb_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &exch->index, exch->pool);
+        struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_memb_entry(node));
+        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
@@ -420,22 +420,22 @@ emplace_membs(DbrExch exch)
     do {
         struct DbrMemb* memb = dbr_memb_entry(node);
         node = node->next;
-        dbr_pool_free_memb(exch->pool, memb);
+        dbr_pool_free_memb(serv->pool, memb);
     } while (node);
  fail1:
     return false;
 }
 
 static DbrBool
-emplace_posns(DbrExch exch)
+emplace_posns(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(exch->model, DBR_POSN, exch->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_POSN, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = enrich_posn(&exch->cache, dbr_posn_entry(node));
-        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, exch->pool);
+        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_posn_entry(node));
+        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -448,101 +448,101 @@ emplace_posns(DbrExch exch)
     do {
         struct DbrPosn* posn = dbr_posn_entry(node);
         node = node->next;
-        dbr_pool_free_posn(exch->pool, posn);
+        dbr_pool_free_posn(serv->pool, posn);
     } while (node);
  fail1:
     return false;
 }
 
-DBR_API DbrExch
-dbr_exch_create(DbrJourn journ, DbrModel model, DbrPool pool)
+DBR_API DbrServ
+dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
 {
-    DbrExch exch = malloc(sizeof(struct FigExch));
-    if (dbr_unlikely(!exch)) {
+    DbrServ serv = malloc(sizeof(struct FigServ));
+    if (dbr_unlikely(!serv)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
 
-    exch->journ = journ;
-    exch->model = model;
-    exch->pool = pool;
-    fig_cache_init(&exch->cache, term_state, pool);
-    dbr_tree_init(&exch->books);
-    fig_index_init(&exch->index);
+    serv->journ = journ;
+    serv->model = model;
+    serv->pool = pool;
+    fig_cache_init(&serv->cache, term_state, pool);
+    dbr_tree_init(&serv->books);
+    fig_index_init(&serv->index);
 
     // Data structures are fully initialised at this point.
 
-    if (!emplace_recs(exch, DBR_TRADER)
-        || !emplace_recs(exch, DBR_ACCNT)
-        || !emplace_recs(exch, DBR_CONTR)
-        || !emplace_orders(exch)
-        || !emplace_trades(exch)
-        || !emplace_membs(exch)
-        || !emplace_posns(exch)) {
+    if (!emplace_recs(serv, DBR_TRADER)
+        || !emplace_recs(serv, DBR_ACCNT)
+        || !emplace_recs(serv, DBR_CONTR)
+        || !emplace_orders(serv)
+        || !emplace_trades(serv)
+        || !emplace_membs(serv)
+        || !emplace_posns(serv)) {
         // Use destroy since fully initialised.
-        dbr_exch_destroy(exch);
+        dbr_serv_destroy(serv);
         goto fail1;
     }
 
-    return exch;
+    return serv;
  fail1:
     return NULL;
 }
 
 DBR_API void
-dbr_exch_destroy(DbrExch exch)
+dbr_serv_destroy(DbrServ serv)
 {
-    if (exch) {
-        free_books(&exch->books);
-        fig_cache_term(&exch->cache);
-        free(exch);
+    if (serv) {
+        free_books(&serv->books);
+        fig_cache_term(&serv->cache);
+        free(serv);
     }
 }
 
 // Cache
 
 DBR_API struct DbrSlNode*
-dbr_exch_first_rec(DbrExch exch, int type, size_t* size)
+dbr_serv_first_rec(DbrServ serv, int type, size_t* size)
 {
-    return fig_cache_first_rec(&exch->cache, type, size);
+    return fig_cache_first_rec(&serv->cache, type, size);
 }
 
 DBR_API struct DbrSlNode*
-dbr_exch_find_rec_id(DbrExch exch, int type, DbrIden id)
+dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id)
 {
-    return fig_cache_find_rec_id(&exch->cache, type, id);
+    return fig_cache_find_rec_id(&serv->cache, type, id);
 }
 
 DBR_API struct DbrSlNode*
-dbr_exch_find_rec_mnem(DbrExch exch, int type, const char* mnem)
+dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem)
 {
-    return fig_cache_find_rec_mnem(&exch->cache, type, mnem);
+    return fig_cache_find_rec_mnem(&serv->cache, type, mnem);
 }
 
 // Pool
 
 DBR_API DbrTrader
-dbr_exch_trader(DbrExch exch, struct DbrRec* trec)
+dbr_serv_trader(DbrServ serv, struct DbrRec* trec)
 {
-    return fig_trader_lazy(trec, &exch->index, exch->pool);
+    return fig_trader_lazy(trec, &serv->index, serv->pool);
 }
 
 DBR_API DbrAccnt
-dbr_exch_accnt(DbrExch exch, struct DbrRec* arec)
+dbr_serv_accnt(DbrServ serv, struct DbrRec* arec)
 {
-    return fig_accnt_lazy(arec, exch->pool);
+    return fig_accnt_lazy(arec, serv->pool);
 }
 
 DBR_API struct DbrBook*
-dbr_exch_book(DbrExch exch, struct DbrRec* crec, DbrDate settl_date)
+dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
-    return get_book(exch, crec, settl_date);
+    return get_book(serv, crec, settl_date);
 }
 
 // Exec
 
 DBR_API struct DbrOrder*
-dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
+dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
               DbrFlags flags, struct DbrResult* result)
 {
@@ -551,8 +551,8 @@ dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
         goto fail1;
     }
 
-    const DbrIden id = dbr_journ_alloc_id(exch->journ);
-    struct DbrOrder* new_order = dbr_pool_alloc_order(exch->pool);
+    const DbrIden id = dbr_journ_alloc_id(serv->journ);
+    struct DbrOrder* new_order = dbr_pool_alloc_order(serv->pool);
     if (!new_order)
         goto fail1;
     dbr_order_init(new_order);
@@ -583,22 +583,22 @@ dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 
     struct DbrTrans trans = { .new_order = new_order, .new_posn = NULL };
 
-    if (!dbr_journ_begin_trans(exch->journ))
+    if (!dbr_journ_begin_trans(serv->journ))
         goto fail2;
 
-    if (!dbr_journ_insert_order(exch->journ, new_order->id, new_order->rev,
+    if (!dbr_journ_insert_order(serv->journ, new_order->id, new_order->rev,
                                 new_order->status, new_order->trader.rec->id,
                                 new_order->accnt.rec->id, new_order->contr.rec->id,
                                 new_order->settl_date, new_order->ref, new_order->action,
                                 new_order->ticks, new_order->resd, new_order->exec,
                                 new_order->lots, new_order->min, new_order->flags, now)
-        || !fig_match_orders(book, new_order, exch->journ, exch->pool, &trans))
+        || !fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
         goto fail3;
 
     if (trans.count > 0) {
 
         // Orders were matched.
-        if (!insert_trans(exch->journ, &trans, now))
+        if (!insert_trans(serv->journ, &trans, now))
             goto fail4;
 
         // Commit taker order.
@@ -614,31 +614,31 @@ dbr_exch_place(DbrExch exch, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
         goto fail4;
 
     // Journal commit can still fail.
-    if (!dbr_journ_commit_trans(exch->journ))
+    if (!dbr_journ_commit_trans(serv->journ))
         goto fail5;
 
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to result and free matches.
-    commit_result(exch, trader, book, &trans, now, result);
+    commit_result(serv, trader, book, &trans, now, result);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))
         dbr_book_remove(book, new_order);
  fail4:
-    free_matches(trans.first_match, exch->pool);
+    free_matches(trans.first_match, serv->pool);
     memset(&trans, 0, sizeof(trans));
  fail3:
-    dbr_journ_rollback_trans(exch->journ);
+    dbr_journ_rollback_trans(serv->journ);
  fail2:
-    dbr_pool_free_order(exch->pool, new_order);
+    dbr_pool_free_order(serv->pool, new_order);
  fail1:
     memset(&trans, 0, sizeof(trans));
     return NULL;
 }
 
 DBR_API struct DbrOrder*
-dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
+dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
@@ -662,28 +662,28 @@ dbr_exch_revise_id(DbrExch exch, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
     }
 
-    if (!dbr_journ_begin_trans(exch->journ))
+    if (!dbr_journ_begin_trans(serv->journ))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(exch->journ, id, order->rev + 1, DBR_REVISED, order->resd,
+    if (!dbr_journ_update_order(serv->journ, id, order->rev + 1, DBR_REVISED, order->resd,
                                 order->exec, lots, now))
         goto fail2;
 
     // Must succeed because order exists.
-    struct DbrBook* book = get_book(exch, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_journ_commit_trans(exch->journ);
+    dbr_journ_commit_trans(serv->journ);
     return order;
  fail2:
-    dbr_journ_rollback_trans(exch->journ);
+    dbr_journ_rollback_trans(serv->journ);
  fail1:
     return NULL;
 }
 
 DBR_API struct DbrOrder*
-dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lots)
+dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lots)
 {
     struct DbrOrder* order = fig_trader_find_order_ref(trader, ref);
     if (!order) {
@@ -706,27 +706,27 @@ dbr_exch_revise_ref(DbrExch exch, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
     }
 
-    if (!dbr_journ_begin_trans(exch->journ))
+    if (!dbr_journ_begin_trans(serv->journ))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(exch->journ, order->id, order->rev + 1, DBR_REVISED, order->resd,
+    if (!dbr_journ_update_order(serv->journ, order->id, order->rev + 1, DBR_REVISED, order->resd,
                                 order->exec, lots, now))
         goto fail2;
 
-    struct DbrBook* book = get_book(exch, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_journ_commit_trans(exch->journ);
+    dbr_journ_commit_trans(serv->journ);
     return order;
  fail2:
-    dbr_journ_rollback_trans(exch->journ);
+    dbr_journ_rollback_trans(serv->journ);
  fail1:
     return NULL;
 }
 
 DBR_API struct DbrOrder*
-dbr_exch_cancel_id(DbrExch exch, DbrTrader trader, DbrIden id)
+dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
@@ -741,11 +741,11 @@ dbr_exch_cancel_id(DbrExch exch, DbrTrader trader, DbrIden id)
     }
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(exch->journ, id, order->rev + 1, DBR_CANCELLED, 0,
+    if (!dbr_journ_update_order(serv->journ, id, order->rev + 1, DBR_CANCELLED, 0,
                                 order->exec, order->lots, now))
         goto fail1;
 
-    struct DbrBook* book = get_book(exch, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
     return order;
@@ -754,7 +754,7 @@ dbr_exch_cancel_id(DbrExch exch, DbrTrader trader, DbrIden id)
 }
 
 DBR_API struct DbrOrder*
-dbr_exch_cancel_ref(DbrExch exch, DbrTrader trader, const char* ref)
+dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 {
     struct DbrOrder* order = fig_trader_find_order_ref(trader, ref);
     if (!order) {
@@ -768,11 +768,11 @@ dbr_exch_cancel_ref(DbrExch exch, DbrTrader trader, const char* ref)
     }
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(exch->journ, order->id, order->rev + 1, DBR_CANCELLED, 0,
+    if (!dbr_journ_update_order(serv->journ, order->id, order->rev + 1, DBR_CANCELLED, 0,
                                 order->exec, order->lots, now))
         goto fail1;
 
-    struct DbrBook* book = get_book(exch, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
     return order;
@@ -781,7 +781,7 @@ dbr_exch_cancel_ref(DbrExch exch, DbrTrader trader, const char* ref)
 }
 
 DBR_API DbrBool
-dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id)
+dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
@@ -796,20 +796,20 @@ dbr_exch_archive_order(DbrExch exch, DbrTrader trader, DbrIden id)
     }
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_archive_order(exch->journ, node->key, now))
+    if (!dbr_journ_archive_order(serv->journ, node->key, now))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
 
     fig_trader_release_order(trader, order);
-    dbr_pool_free_order(exch->pool, order);
+    dbr_pool_free_order(serv->pool, order);
     return true;
  fail1:
     return false;
 }
 
 DBR_API DbrBool
-dbr_exch_archive_trade(DbrExch exch, DbrTrader trader, DbrIden id)
+dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_trade_id(trader, id);
     if (!node) {
@@ -818,14 +818,14 @@ dbr_exch_archive_trade(DbrExch exch, DbrTrader trader, DbrIden id)
     }
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_archive_trade(exch->journ, node->key, now))
+    if (!dbr_journ_archive_trade(serv->journ, node->key, now))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
 
     struct DbrTrade* trade = dbr_trader_trade_entry(node);
     fig_trader_release_trade(trader, trade);
-    dbr_pool_free_trade(exch->pool, trade);
+    dbr_pool_free_trade(serv->pool, trade);
     return true;
  fail1:
     return false;

@@ -1,4 +1,4 @@
-#include <dbrpp/exch.hpp>
+#include <dbrpp/serv.hpp>
 #include <dbrpp/lexer.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
@@ -301,7 +301,7 @@ argc(Arg begin, Arg end)
 class Test {
     SqlStore store_;
     Pool pool_;
-    Exch exch_;
+    Serv serv_;
     DbrRec* trec_;
     DbrRec* arec_;
     DbrRec* crec_;
@@ -331,7 +331,7 @@ class Test {
 public:
     Test(DbrIden seed, const char* path)
         : store_(seed, path),
-          exch_(store_.journ(), store_.model(), pool_),
+          serv_(store_.journ(), store_.model(), pool_),
           trec_(nullptr),
           arec_(nullptr),
           crec_(nullptr),
@@ -352,7 +352,7 @@ public:
             "+------------------------------"
             "+------------------------------"
             "|" << endl;
-        for (auto rec : exch_.arecs()) {
+        for (auto rec : serv_.arecs()) {
             AccntRecRef ref(rec);
             cout << '|' << left << setw(10) << ref.mnem()
                  << '|' << left << setw(30) << ref.display()
@@ -365,10 +365,10 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = exch_.trader(*trec_);
+        auto trader = serv_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            exch_.archive_order(trader, id);
+            serv_.archive_order(trader, id);
         }
     }
     void
@@ -376,10 +376,10 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = exch_.trader(*trec_);
+        auto trader = serv_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            exch_.archive_trade(trader, id);
+            serv_.archive_trade(trader, id);
         }
     }
     void
@@ -389,7 +389,7 @@ public:
             throw InvalidState("contr");
         if (!settl_date_)
             throw InvalidState("settl_date");
-        auto book = exch_.book(*crec_, settl_date_);
+        auto book = serv_.book(*crec_, settl_date_);
 
         cout <<
             "|bid_count "
@@ -446,10 +446,10 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = exch_.trader(*trec_);
+        auto trader = serv_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            exch_.cancel(trader, id);
+            serv_.cancel(trader, id);
         }
     }
     void
@@ -483,7 +483,7 @@ public:
             "+----------"
             "+----------"
             "|" << endl;
-        for (auto rec : exch_.crecs()) {
+        for (auto rec : serv_.crecs()) {
             ContrRecRef ref(rec);
             cout << '|' << left << setw(10) << ref.mnem()
                  << '|' << left << setw(10) << ref.display()
@@ -539,7 +539,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = exch_.trader(*trec_);
+        auto trader = serv_.trader(*trec_);
         cout <<
             "|id        "
             "|rev       "
@@ -598,16 +598,16 @@ public:
         if (!settl_date_)
             throw InvalidState("settl_date");
 
-        auto trader = exch_.trader(*trec_);
-        auto accnt = exch_.accnt(*arec_);
-        auto book = exch_.book(*crec_, settl_date_);
+        auto trader = serv_.trader(*trec_);
+        auto accnt = serv_.accnt(*arec_);
+        auto book = serv_.book(*crec_, settl_date_);
 
         const auto lots = ston<DbrLots>((*begin++).c_str());
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
         Result result;
-        exch_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0, result);
+        serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0, result);
 
         if (result.trades().empty())
             return;
@@ -701,7 +701,7 @@ public:
     {
         if (!arec_)
             throw InvalidState("accnt");
-        auto accnt = exch_.accnt(*arec_);
+        auto accnt = serv_.accnt(*arec_);
         cout <<
             "|crec      "
             "|settl_date"
@@ -742,12 +742,12 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = exch_.trader(*trec_);
+        auto trader = serv_.trader(*trec_);
 
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        exch_.revise(trader, id, lots);
+        serv_.revise(trader, id, lots);
     }
     void
     set(Arg begin, Arg end)
@@ -755,18 +755,18 @@ public:
         const string& name = *begin++;
         const string& value = *begin++;
         if (name == "trader") {
-            auto it = exch_.trecs().find(value.c_str());
-            if (it == exch_.trecs().end())
+            auto it = serv_.trecs().find(value.c_str());
+            if (it == serv_.trecs().end())
                 throw InvalidArgument(value);
             trec_ = &*it;
         } else if (name == "accnt") {
-            auto it = exch_.arecs().find(value.c_str());
-            if (it == exch_.arecs().end())
+            auto it = serv_.arecs().find(value.c_str());
+            if (it == serv_.arecs().end())
                 throw InvalidArgument(value);
             arec_ = &*it;
         } else if (name == "contr") {
-            auto it = exch_.crecs().find(value.c_str());
-            if (it == exch_.crecs().end())
+            auto it = serv_.crecs().find(value.c_str());
+            if (it == serv_.crecs().end())
                 throw InvalidArgument(value);
             crec_ = &*it;
         } else if (name == "settl_date") {
@@ -787,7 +787,7 @@ public:
             "+------------------------------"
             "+------------------------------"
             "|" << endl;
-        for (auto rec : exch_.trecs()) {
+        for (auto rec : serv_.trecs()) {
             TraderRecRef ref(rec);
             cout << '|' << left << setw(10) << ref.mnem()
                  << '|' << left << setw(30) << ref.display()
@@ -800,7 +800,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = exch_.trader(*trec_);
+        auto trader = serv_.trader(*trec_);
         cout <<
             "|id        "
             "|order     "

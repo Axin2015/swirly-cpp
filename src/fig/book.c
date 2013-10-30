@@ -28,7 +28,7 @@ dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, Dbr
     book->settl_date = settl_date;
     dbr_side_init(&book->bid_side, pool);
     dbr_side_init(&book->ask_side, pool);
-    dbr_rbnode_init(&book->exch_node_);
+    dbr_rbnode_init(&book->serv_node_);
 }
 
 DBR_API void
