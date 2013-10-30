@@ -88,7 +88,7 @@ dbr_clnt_trader(DbrClnt clnt);
  */
 
 DBR_API DbrAccnt
-dbr_clnt_accnt(DbrClnt clnt);
+dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
 /** @} */
 
@@ -103,8 +103,9 @@ dbr_clnt_accnt(DbrClnt clnt);
  */
 
 DBR_API struct DbrOrder*
-dbr_clnt_place(DbrClnt clnt, const char* contr, DbrDate settl_date, const char* ref, int action,
-               DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, struct DbrResult* result);
+dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
+               DbrFlags flags, struct DbrResult* result);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:

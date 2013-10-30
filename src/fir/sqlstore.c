@@ -29,20 +29,20 @@
 struct FirSqlStore {
     DbrIden id;
     struct FirSqlite impl;
-    struct DbrIJourn journ_;
-    struct DbrIModel model_;
+    struct DbrIJourn journ;
+    struct DbrIModel model;
 };
 
 static inline struct FirSqlStore*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct FirSqlStore, journ_, journ);
+    return dbr_implof(struct FirSqlStore, journ, journ);
 }
 
 static inline struct FirSqlStore*
 model_implof(DbrModel model)
 {
-    return dbr_implof(struct FirSqlStore, model_, model);
+    return dbr_implof(struct FirSqlStore, model, model);
 }
 
 static DbrIden
@@ -165,8 +165,8 @@ dbr_sqlstore_create(DbrIden seed, const char* path)
     if (!fir_sqlite_init(&store->impl, path))
         goto fail2;
 
-    store->journ_.vtbl = &JOURN_VTBL;
-    store->model_.vtbl = &MODEL_VTBL;
+    store->journ.vtbl = &JOURN_VTBL;
+    store->model.vtbl = &MODEL_VTBL;
     return store;
  fail2:
     free(store);
@@ -186,11 +186,11 @@ dbr_sqlstore_destroy(DbrSqlStore store)
 DBR_API DbrJourn
 dbr_sqlstore_journ(DbrSqlStore store)
 {
-    return &store->journ_;
+    return &store->journ;
 }
 
 DBR_API DbrModel
 dbr_sqlstore_model(DbrSqlStore store)
 {
-    return &store->model_;
+    return &store->model;
 }

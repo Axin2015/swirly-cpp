@@ -70,7 +70,7 @@ find_rec_mnem(int type, const char* mnem)
 }
 
 static DbrBool
-read_rec(const struct DbrMsg* req)
+sess_rec(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
@@ -86,13 +86,13 @@ read_rec(const struct DbrMsg* req)
 }
 
 static DbrBool
-read_trader_order(const struct DbrMsg* req)
+sess_order(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
-    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->read_trader_order_req.trader);
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->read_trader_order_req.trader);
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_exch_trader(exch, trec);
@@ -121,13 +121,13 @@ read_trader_order(const struct DbrMsg* req)
 }
 
 static DbrBool
-read_trader_trade(const struct DbrMsg* req)
+sess_trade(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
-    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->read_trader_trade_req.trader);
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->read_trader_trade_req.trader);
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_exch_trader(exch, trec);
@@ -156,13 +156,13 @@ read_trader_trade(const struct DbrMsg* req)
 }
 
 static DbrBool
-read_trader_memb(const struct DbrMsg* req)
+sess_memb(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
-    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->read_trader_memb_req.trader);
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->read_trader_memb_req.trader);
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_exch_trader(exch, trec);
@@ -191,26 +191,37 @@ read_trader_memb(const struct DbrMsg* req)
 }
 
 static DbrBool
-read_accnt_posn(const struct DbrMsg* req)
+sess_posn(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
-    struct DbrRec* arec = find_rec_mnem(DBR_ACCNT, req->read_accnt_posn_req.accnt);
-    if (!arec) {
-        status_setf(&rep, DBR_EINVAL, "no such accnt '%.16s'", req->read_accnt_posn_req.accnt);
+    struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
+    if (!trec) {
+        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
         goto fail1;
     }
-    DbrAccnt accnt = dbr_exch_accnt(exch, arec);
-    if (!accnt) {
+    DbrTrader trader = dbr_exch_trader(exch, trec);
+    if (!trader) {
         status_err(&rep);
         goto fail1;
     }
-    // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_posn(accnt);
-         node != DBR_ACCNT_END_POSN; node = dbr_rbnode_next(node)) {
-        struct DbrPosn* posn = dbr_accnt_posn_entry(node);
-        dbr_queue_insert_back(&q, &posn->entity_node_);
+    // For each account.
+    for (struct DbrRbNode* mnode = dbr_trader_first_memb(trader);
+         mnode != DBR_TRADER_END_MEMB; mnode = dbr_rbnode_next(mnode)) {
+        struct DbrMemb* memb = dbr_trader_memb_entry(mnode);
+        struct DbrRec* arec = memb->accnt.rec;
+        DbrAccnt accnt = dbr_exch_accnt(exch, arec);
+        if (!accnt) {
+            status_err(&rep);
+            goto fail1;
+        }
+        // Copy each posn to entity node.
+        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(accnt);
+             pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {
+            struct DbrPosn* posn = dbr_accnt_posn_entry(pnode);
+            dbr_queue_insert_back(&q, &posn->entity_node_);
+        }
     }
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_POSN;
@@ -525,20 +536,26 @@ run(void)
             goto fail1;
         }
         switch (req.type) {
-        case DBR_READ_REC_REQ:
-            read_rec(&req);
-            break;
-        case DBR_READ_TRADER_ORDER_REQ:
-            read_trader_order(&req);
-            break;
-        case DBR_READ_TRADER_TRADE_REQ:
-            read_trader_trade(&req);
-            break;
-        case DBR_READ_TRADER_MEMB_REQ:
-            read_trader_memb(&req);
-            break;
-        case DBR_READ_ACCNT_POSN_REQ:
-            read_accnt_posn(&req);
+        case DBR_SESS_ENTITY_REQ:
+            switch (req.sess_entity_req.type) {
+            case DBR_TRADER:
+            case DBR_ACCNT:
+            case DBR_CONTR:
+                sess_rec(&req);
+                break;
+            case DBR_ORDER:
+                sess_order(&req);
+                break;
+            case DBR_TRADE:
+                sess_trade(&req);
+                break;
+            case DBR_MEMB:
+                sess_memb(&req);
+                break;
+            case DBR_POSN:
+                sess_posn(&req);
+                break;
+            };
             break;
         case DBR_PLACE_ORDER_REQ:
             place_order(&req);

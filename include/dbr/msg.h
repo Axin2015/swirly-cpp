@@ -35,11 +35,7 @@ enum {
     DBR_RESULT_REP,
     DBR_ORDER_REP,
     DBR_READ_ENTITY_REQ,
-    DBR_READ_REC_REQ,
-    DBR_READ_TRADER_ORDER_REQ,
-    DBR_READ_TRADER_TRADE_REQ,
-    DBR_READ_TRADER_MEMB_REQ,
-    DBR_READ_ACCNT_POSN_REQ,
+    DBR_SESS_ENTITY_REQ,
     DBR_PLACE_ORDER_REQ,
     DBR_REVISE_ORDER_ID_REQ,
     DBR_REVISE_ORDER_REF_REQ,
@@ -91,20 +87,9 @@ struct DbrMsg {
             int type;
         } read_entity_req;
         struct {
+            DbrMnem trader;
             int type;
-        } read_rec_req;
-        struct {
-            DbrMnem trader;
-        } read_trader_order_req;
-        struct {
-            DbrMnem trader;
-        } read_trader_trade_req;
-        struct {
-            DbrMnem trader;
-        } read_trader_memb_req;
-        struct {
-            DbrMnem accnt;
-        } read_accnt_posn_req;
+        } sess_entity_req;
         struct {
             DbrMnem trader;
             DbrMnem accnt;
