@@ -36,7 +36,7 @@ class Lexer {
 public:
     explicit
     Lexer(FnT fn) noexcept
-    : fn_(fn)
+        : fn_{fn}
     {
         dbr_lexer_init(&lexer_, cb, this);
     }
@@ -57,7 +57,7 @@ template <typename FnT>
 Lexer<FnT>
 make_lexer(FnT fn)
 {
-    return Lexer<FnT>(fn);
+    return Lexer<FnT>{fn};
 }
 } // dbr
 

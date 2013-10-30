@@ -79,7 +79,7 @@ public:
 
     explicit
     SideOrders(DbrSide& side) noexcept
-    : side_(&side)
+        : side_{&side}
     {
     }
     void
@@ -222,7 +222,7 @@ public:
 
     explicit
     SideLevels(DbrSide& side) noexcept
-    : side_(&side)
+        : side_{&side}
     {
     }
     void
@@ -393,12 +393,12 @@ public:
     SideOrders
     orders() const noexcept
     {
-        return SideOrders(impl_);
+        return SideOrders{impl_};
     }
     SideLevels
     levels() const noexcept
     {
-        return SideLevels(impl_);
+        return SideLevels{impl_};
     }
     DbrTicks
     last_ticks() const noexcept
@@ -422,7 +422,7 @@ class SideRef {
 public:
     explicit
     SideRef(DbrSide& impl) noexcept
-        : impl_(&impl)
+        : impl_{&impl}
     {
     }
     operator DbrSide&() const noexcept
@@ -437,12 +437,12 @@ public:
     SideOrders
     orders() const noexcept
     {
-        return SideOrders(*impl_);
+        return SideOrders{*impl_};
     }
     SideLevels
     levels() const noexcept
     {
-        return SideLevels(*impl_);
+        return SideLevels{*impl_};
     }
     DbrTicks
     last_ticks() const noexcept

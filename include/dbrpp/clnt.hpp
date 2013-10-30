@@ -73,7 +73,7 @@ public:
 
     explicit
     ClntRecs(DbrClnt clnt) noexcept
-    : clnt_(clnt)
+        : clnt_{clnt}
     {
     }
     void
@@ -170,11 +170,11 @@ public:
     }
     constexpr
     Clnt(decltype(nullptr)) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
     }
     Clnt(void* ctx, const char* addr, const char* trader, DbrPool pool)
-        : impl_(dbr_clnt_create(ctx, addr, trader, pool))
+        : impl_{dbr_clnt_create(ctx, addr, trader, pool)}
     {
         if (!impl_)
             throw_exception();
@@ -194,7 +194,7 @@ public:
     // Move semantics.
 
     Clnt(Clnt&& rhs) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
         swap(rhs);
     }
@@ -217,27 +217,27 @@ public:
     ClntRecs<TypeN>
     recs() const noexcept
     {
-        return ClntRecs<TypeN>(impl_);
+        return ClntRecs<TypeN>{impl_};
     }
     ClntContrRecs
     crecs() const noexcept
     {
-        return ClntContrRecs(impl_);
+        return ClntContrRecs{impl_};
     }
     ClntTraderRecs
     trecs() const noexcept
     {
-        return ClntTraderRecs(impl_);
+        return ClntTraderRecs{impl_};
     }
     ClntAccntRecs
     arecs() const noexcept
     {
-        return ClntAccntRecs(impl_);
+        return ClntAccntRecs{impl_};
     }
     Trader
     trader() const noexcept
     {
-        return Trader(dbr_clnt_trader(impl_));
+        return Trader{dbr_clnt_trader(impl_)};
     }
     Accnt
     accnt(DbrRec& arec) const
@@ -245,7 +245,7 @@ public:
         DbrAccnt accnt = dbr_clnt_accnt(impl_, &arec);
         if (!accnt)
             throw_exception();
-        return Accnt(accnt);
+        return Accnt{accnt};
     }
     OrderRef
     place(const char* accnt, const char* contr, DbrDate settl_date, const char* ref, int action,
@@ -255,7 +255,7 @@ public:
                                                ticks, lots, min, flags, result.c_arg());
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     revise(DbrIden id, DbrLots lots)
@@ -263,7 +263,7 @@ public:
         DbrOrder* const order = dbr_clnt_revise_id(impl_, id, lots);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     revise(const char* ref, DbrLots lots)
@@ -271,7 +271,7 @@ public:
         DbrOrder* const order = dbr_clnt_revise_ref(impl_, ref, lots);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     cancel(DbrIden id)
@@ -279,7 +279,7 @@ public:
         DbrOrder* const order = dbr_clnt_cancel_id(impl_, id);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     cancel(const char* ref)
@@ -287,7 +287,7 @@ public:
         DbrOrder* const order = dbr_clnt_cancel_ref(impl_, ref);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     void
     archive_order(DbrIden id)

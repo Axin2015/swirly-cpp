@@ -92,15 +92,15 @@ public:
     }
     constexpr
     ModelRecs(decltype(nullptr)) noexcept
-    : first_(nullptr),
-      size_(0),
-      pool_(nullptr)
+        : first_{nullptr},
+          size_{0},
+          pool_{nullptr}
     {
     }
     ModelRecs(DbrSlNode* first, size_t size, DbrPool pool) noexcept
-    : first_(first),
-      size_(size),
-      pool_(pool)
+        : first_{first},
+          size_{size},
+          pool_{pool}
     {
     }
     // Copy semantics.
@@ -113,9 +113,9 @@ public:
     // Move semantics.
 
     ModelRecs(ModelRecs&& rhs) noexcept
-    : first_(nullptr),
-      size_(0),
-      pool_(nullptr)
+        : first_{nullptr},
+          size_{0},
+          pool_{nullptr}
     {
         swap(rhs);
     }
@@ -212,7 +212,7 @@ class IModel : public DbrIModel {
     }
 public:
     IModel()
-        : DbrIModel{ vtbl() }
+        : DbrIModel{vtbl()}
     {
     }
 };
@@ -232,7 +232,7 @@ read_entity(DbrModel model, DbrPool pool)
 {
     DbrSlNode* first;
     const auto size = read_entity(model, TypeN, pool, first);
-    return ModelRecs<TypeN>(first, size, pool);
+    return ModelRecs<TypeN>{first, size, pool};
 }
 
 } // dbr

@@ -74,7 +74,7 @@ public:
 
     explicit
     ServRecs(DbrServ serv) noexcept
-    : serv_(serv)
+        : serv_{serv}
     {
     }
     void
@@ -171,11 +171,11 @@ public:
     }
     constexpr
     Serv(decltype(nullptr)) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
     }
     Serv(DbrJourn journ, DbrModel model, DbrPool pool)
-        : impl_(dbr_serv_create(journ, model, pool))
+        : impl_{dbr_serv_create(journ, model, pool)}
     {
         if (!impl_)
             throw_exception();
@@ -195,7 +195,7 @@ public:
     // Move semantics.
 
     Serv(Serv&& rhs) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
         swap(rhs);
     }
@@ -218,22 +218,22 @@ public:
     ServRecs<TypeN>
     recs() const noexcept
     {
-        return ServRecs<TypeN>(impl_);
+        return ServRecs<TypeN>{impl_};
     }
     ServContrRecs
     crecs() const noexcept
     {
-        return ServContrRecs(impl_);
+        return ServContrRecs{impl_};
     }
     ServTraderRecs
     trecs() const noexcept
     {
-        return ServTraderRecs(impl_);
+        return ServTraderRecs{impl_};
     }
     ServAccntRecs
     arecs() const noexcept
     {
-        return ServAccntRecs(impl_);
+        return ServAccntRecs{impl_};
     }
     BookRef
     book(DbrRec& crec, DbrDate settl_date) const
@@ -241,7 +241,7 @@ public:
         DbrBook* const book = dbr_serv_book(impl_, &crec, settl_date);
         if (!book)
             throw_exception();
-        return BookRef(*book);
+        return BookRef{*book};
     }
     Trader
     trader(DbrRec& trec) const
@@ -249,7 +249,7 @@ public:
         DbrTrader trader = dbr_serv_trader(impl_, &trec);
         if (!trader)
             throw_exception();
-        return Trader(trader);
+        return Trader{trader};
     }
     Accnt
     accnt(DbrRec& arec) const
@@ -257,7 +257,7 @@ public:
         DbrAccnt accnt = dbr_serv_accnt(impl_, &arec);
         if (!accnt)
             throw_exception();
-        return Accnt(accnt);
+        return Accnt{accnt};
     }
     OrderRef
     place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
@@ -267,7 +267,7 @@ public:
                                                lots, min, flags, result.c_arg());
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     revise(DbrTrader trader, DbrIden id, DbrLots lots)
@@ -275,7 +275,7 @@ public:
         DbrOrder* const order = dbr_serv_revise_id(impl_, trader, id, lots);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     revise(DbrTrader trader, const char* ref, DbrLots lots)
@@ -283,7 +283,7 @@ public:
         DbrOrder* const order = dbr_serv_revise_ref(impl_, trader, ref, lots);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     cancel(DbrTrader trader, DbrIden id)
@@ -291,7 +291,7 @@ public:
         DbrOrder* const order = dbr_serv_cancel_id(impl_, trader, id);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     OrderRef
     cancel(DbrTrader trader, const char* ref)
@@ -299,7 +299,7 @@ public:
         DbrOrder* const order = dbr_serv_cancel_ref(impl_, trader, ref);
         if (!order)
             throw_exception();
-        return OrderRef(*order);
+        return OrderRef{*order};
     }
     void
     archive_order(DbrTrader trader, DbrIden id)

@@ -33,7 +33,7 @@ class BookRef {
 public:
     explicit
     BookRef(DbrBook& impl) noexcept
-        : impl_(&impl)
+        : impl_{&impl}
     {
     }
     operator DbrBook&() const noexcept
@@ -63,7 +63,7 @@ public:
     ContrRecRef
     crec() const noexcept
     {
-        return ContrRecRef(*dbr_book_crec(impl_));
+        return ContrRecRef{*dbr_book_crec(impl_)};
     }
     DbrDate
     settl_date() const noexcept
@@ -73,12 +73,12 @@ public:
     SideRef
     bid_side() const noexcept
     {
-        return SideRef(*dbr_book_bid_side(impl_));
+        return SideRef{*dbr_book_bid_side(impl_)};
     }
     SideRef
     ask_side() const noexcept
     {
-        return SideRef(*dbr_book_ask_side(impl_));
+        return SideRef{*dbr_book_ask_side(impl_)};
     }
 };
 

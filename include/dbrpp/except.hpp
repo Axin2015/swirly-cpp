@@ -44,7 +44,7 @@ public:
         msg_[DBR_ERRMSG_MAX] = '\0';
     }
     DbrException() noexcept
-    : DbrException(dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg())
+        : DbrException{dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg()}
     {
     }
     virtual const char*
@@ -77,7 +77,7 @@ public:
     {
     }
     BasicException(const char* file, int line, const char* msg) noexcept
-    : DbrException(Num, file, line, msg)
+        : DbrException{Num, file, line, msg}
     {
     }
 };
@@ -93,22 +93,22 @@ throw_exception(int num, const char* file, int line, const char* msg)
 {
     switch (num) {
     case DBR_EINTR:
-        throw IntrException(file, line, msg);
+        throw IntrException{file, line, msg};
         break;
     case DBR_EIO:
-        throw IoException(file, line, msg);
+        throw IoException{file, line, msg};
         break;
     case DBR_ENOMEM:
-        throw NoMemException(file, line, msg);
+        throw NoMemException{file, line, msg};
         break;
     case DBR_EACCES:
-        throw AccesException(file, line, msg);
+        throw AccesException{file, line, msg};
         break;
     case DBR_EINVAL:
-        throw InvalException(file, line, msg);
+        throw InvalException{file, line, msg};
         break;
     default:
-        throw DbrException(num, file, line, msg);
+        throw DbrException{num, file, line, msg};
         break;
     }
 }

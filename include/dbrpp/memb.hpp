@@ -27,7 +27,7 @@ class MembRef {
 public:
     explicit
     MembRef(DbrMemb& impl) noexcept
-        : impl_(&impl)
+        : impl_{&impl}
     {
     }
     operator DbrMemb&() const noexcept
@@ -42,12 +42,12 @@ public:
     TraderRecRef
     trec() const noexcept
     {
-        return TraderRecRef(*impl_->trader.rec);
+        return TraderRecRef{*impl_->trader.rec};
     }
     AccntRecRef
     arec() const noexcept
     {
-        return AccntRecRef(*impl_->accnt.rec);
+        return AccntRecRef{*impl_->accnt.rec};
     }
 };
 

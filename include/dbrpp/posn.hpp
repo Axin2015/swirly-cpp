@@ -27,7 +27,7 @@ class PosnRef {
 public:
     explicit
     PosnRef(DbrPosn& impl) noexcept
-        : impl_(&impl)
+        : impl_{&impl}
     {
     }
     operator DbrPosn&() const noexcept
@@ -42,12 +42,12 @@ public:
     AccntRecRef
     arec() const noexcept
     {
-        return AccntRecRef(*impl_->accnt.rec);
+        return AccntRecRef{*impl_->accnt.rec};
     }
     ContrRecRef
     crec() const noexcept
     {
-        return ContrRecRef(*impl_->contr.rec);
+        return ContrRecRef{*impl_->contr.rec};
     }
     DbrDate
     settl_date() const noexcept

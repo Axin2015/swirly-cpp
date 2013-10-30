@@ -78,7 +78,7 @@ public:
 
     explicit
     TraderOrders(DbrTrader trader) noexcept
-    : trader_(trader)
+        : trader_{trader}
     {
     }
     void
@@ -246,7 +246,7 @@ public:
 
     explicit
     TraderTrades(DbrTrader trader) noexcept
-    : trader_(trader)
+        : trader_{trader}
     {
     }
     void
@@ -402,7 +402,7 @@ public:
 
     explicit
     TraderMembs(DbrTrader trader) noexcept
-    : trader_(trader)
+        : trader_{trader}
     {
     }
     void
@@ -514,7 +514,7 @@ class Trader {
 public:
     explicit
     Trader(DbrTrader impl) noexcept
-        : impl_(impl)
+        : impl_{impl}
     {
     }
     operator DbrTrader() const noexcept
@@ -534,22 +534,22 @@ public:
     TraderRecRef
     rec() const noexcept
     {
-        return TraderRecRef(*dbr_trader_rec(impl_));
+        return TraderRecRef{*dbr_trader_rec(impl_)};
     }
     TraderOrders
     orders() const noexcept
     {
-        return TraderOrders(impl_);
+        return TraderOrders{impl_};
     }
     TraderTrades
     trades() const noexcept
     {
-        return TraderTrades(impl_);
+        return TraderTrades{impl_};
     }
     TraderMembs
     membs() const noexcept
     {
-        return TraderMembs(impl_);
+        return TraderMembs{impl_};
     }
 };
 

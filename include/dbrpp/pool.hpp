@@ -34,11 +34,11 @@ public:
     }
     constexpr
     Pool(decltype(nullptr)) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
     }
     Pool()
-    : impl_(dbr_pool_create())
+        : impl_{dbr_pool_create()}
     {
         if (!impl_)
             throw_exception();
@@ -58,7 +58,7 @@ public:
     // Move semantics.
 
     Pool(Pool&& rhs) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
         swap(rhs);
     }

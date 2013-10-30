@@ -27,7 +27,7 @@ class TradeRef {
 public:
     explicit
     TradeRef(DbrTrade& impl) noexcept
-        : impl_(&impl)
+        : impl_{&impl}
     {
     }
     operator DbrTrade&() const noexcept
@@ -72,17 +72,17 @@ public:
     TraderRecRef
     trec() const noexcept
     {
-        return TraderRecRef(*impl_->trader.rec);
+        return TraderRecRef{*impl_->trader.rec};
     }
     AccntRecRef
     arec() const noexcept
     {
-        return AccntRecRef(*impl_->accnt.rec);
+        return AccntRecRef{*impl_->accnt.rec};
     }
     ContrRecRef
     crec() const noexcept
     {
-        return ContrRecRef(*impl_->contr.rec);
+        return ContrRecRef{*impl_->contr.rec};
     }
     DbrDate
     settl_date() const noexcept
@@ -92,12 +92,12 @@ public:
     Ref
     ref() const noexcept
     {
-        return Ref(impl_->ref);
+        return Ref{impl_->ref};
     }
     AccntRecRef
     cpty() const noexcept
     {
-        return AccntRecRef(*impl_->cpty.rec);
+        return AccntRecRef{*impl_->cpty.rec};
     }
     int
     role() const noexcept

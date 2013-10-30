@@ -37,7 +37,7 @@ protected:
     }
     explicit
     RecRefBase(DbrRec& impl) noexcept
-        : impl_(&impl)
+        : impl_{&impl}
     {
     }
 public:
@@ -73,12 +73,12 @@ public:
     Mnem
     mnem() const noexcept
     {
-        return Mnem(impl_->mnem);
+        return Mnem{impl_->mnem};
     }
     Display
     display() const noexcept
     {
-        return Display(impl_->display);
+        return Display{impl_->display};
     }
 };
 
@@ -86,7 +86,7 @@ class RecRef : public RecRefBase {
 public:
     explicit
     RecRef(DbrRec& impl) noexcept
-    : RecRefBase(impl)
+        : RecRefBase{impl}
     {
     }
 };
@@ -103,13 +103,13 @@ class TraderRecRef : public RecRefBase {
 public:
     explicit
     TraderRecRef(DbrRec& impl) noexcept
-    : RecRefBase(impl)
+        : RecRefBase{impl}
     {
     }
     Email
     email() const noexcept
     {
-        return Email(impl_->trader.email);
+        return Email{impl_->trader.email};
     }
 };
 
@@ -147,13 +147,13 @@ class AccntRecRef : public RecRefBase {
 public:
     explicit
     AccntRecRef(DbrRec& impl) noexcept
-    : RecRefBase(impl)
+        : RecRefBase{impl}
     {
     }
     Email
     email() const noexcept
     {
-        return Email(impl_->accnt.email);
+        return Email{impl_->accnt.email};
     }
 };
 
@@ -191,23 +191,23 @@ class ContrRecRef : public RecRefBase {
 public:
     explicit
     ContrRecRef(DbrRec& impl) noexcept
-    : RecRefBase(impl)
+        : RecRefBase{impl}
     {
     }
     Mnem
     asset_type() const noexcept
     {
-        return Mnem(impl_->contr.asset_type);
+        return Mnem{impl_->contr.asset_type};
     }
     Mnem
     asset() const noexcept
     {
-        return Mnem(impl_->contr.asset);
+        return Mnem{impl_->contr.asset};
     }
     Mnem
     ccy() const noexcept
     {
-        return Mnem(impl_->contr.ccy);
+        return Mnem{impl_->contr.ccy};
     }
     int
     tick_numer() const noexcept
@@ -288,7 +288,7 @@ public:
     DbrPriceText
     price_text(double price) const noexcept
     {
-        DbrPriceText pt;;
+        DbrPriceText pt;
         dbr_price_text(price, price_dp(), pip_dp(), &pt);
         return pt;
     }

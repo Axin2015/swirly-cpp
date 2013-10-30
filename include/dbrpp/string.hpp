@@ -67,8 +67,8 @@ public:
     typedef SizeType size_type;
 public:
     NString(const char* begin, size_t size = std::numeric_limits<SizeType>::max()) noexcept
-    : begin_(begin),
-        size_(size)
+        : begin_{begin},
+          size_{size}
     {
     }
 
@@ -87,24 +87,24 @@ public:
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return ConstReverseIterator(end());
+        return ConstReverseIterator{end()};
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return ConstReverseIterator(begin());
+        return ConstReverseIterator{begin()};
     }
     ConstIterator
     find(char ch) const noexcept
     {
-        const char* match(strchr(begin(), ch));
-        return match ? ConstIterator(match) : end();
+        const char* match{strchr(begin(), ch)};
+        return match ? ConstIterator{match} : end();
     }
     ConstIterator
     find(const char* str) const noexcept
     {
-        const char* match(strstr(begin(), str));
-        return match ? ConstIterator(match) : end();
+        const char* match{strstr(begin(), str)};
+        return match ? ConstIterator{match} : end();
     }
 
     // Accessor.

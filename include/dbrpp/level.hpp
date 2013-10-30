@@ -29,7 +29,7 @@ class Level {
 public:
     explicit
     Level(DbrLevel impl) noexcept
-        : impl_(impl)
+        : impl_{impl}
     {
     }
     explicit

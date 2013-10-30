@@ -78,7 +78,7 @@ public:
 
     explicit
     AccntPosns(DbrAccnt accnt) noexcept
-    : accnt_(accnt)
+    : accnt_{accnt}
     {
     }
     void
@@ -190,7 +190,7 @@ class Accnt {
 public:
     explicit
     Accnt(DbrAccnt impl) noexcept
-        : impl_(impl)
+        : impl_{impl}
     {
     }
     operator DbrAccnt() const noexcept
@@ -210,12 +210,12 @@ public:
     AccntRecRef
     rec() const noexcept
     {
-        return AccntRecRef(*dbr_accnt_rec(impl_));
+        return AccntRecRef{*dbr_accnt_rec(impl_)};
     }
     AccntPosns
     posns() const noexcept
     {
-        return AccntPosns(impl_);
+        return AccntPosns{impl_};
     }
 };
 

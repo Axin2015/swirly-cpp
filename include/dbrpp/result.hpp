@@ -72,7 +72,7 @@ public:
 
     explicit
     ResultPosns(DbrResult result) noexcept
-    : result_(result)
+        : result_{result}
     {
     }
     void
@@ -178,7 +178,7 @@ public:
 
     explicit
     ResultTrades(DbrResult result) noexcept
-    : result_(result)
+        : result_{result}
     {
     }
     void
@@ -254,17 +254,17 @@ public:
     OrderRef
     new_order() const noexcept
     {
-        return OrderRef(*impl_.new_order);
+        return OrderRef{*impl_.new_order};
     }
     ResultPosns
     posns() const noexcept
     {
-        return ResultPosns(impl_);
+        return ResultPosns{impl_};
     }
     ResultTrades
     trades() const noexcept
     {
-        return ResultTrades(impl_);
+        return ResultTrades{impl_};
     }
 };
 

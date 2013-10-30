@@ -102,7 +102,7 @@ class IJourn : public DbrIJourn {
     }
 public:
     IJourn()
-        : DbrIJourn{ vtbl() }
+        : DbrIJourn{vtbl()}
     {
     }
 };

@@ -49,7 +49,7 @@ public:
     typedef Reference reference;
 
     BiDirectionalIterator(Node* node = nullptr) noexcept
-    : node_(node)
+        : node_{node}
     {
     }
     Reference
@@ -71,7 +71,7 @@ public:
     BiDirectionalIterator
     operator ++(int) noexcept
     {
-        BiDirectionalIterator tmp(*this);
+        BiDirectionalIterator tmp{*this};
         node_ = PolicyT::next(node_);
         return tmp;
     }
@@ -84,7 +84,7 @@ public:
     BiDirectionalIterator
     operator --(int) noexcept
     {
-        BiDirectionalIterator tmp(*this);
+        BiDirectionalIterator tmp{*this};
         node_ = PolicyT::prev(node_);
         return tmp;
     }
@@ -123,11 +123,11 @@ public:
     typedef Reference reference;
 
     ConstBiDirectionalIterator(/*const*/ Node* node = nullptr) noexcept
-    : node_(node)
+        : node_{node}
     {
     }
     ConstBiDirectionalIterator(BiDirectionalIterator<PolicyT> it) noexcept
-    : node_(it.node_)
+        : node_{it.node_}
     {
     }
     Reference
@@ -149,7 +149,7 @@ public:
     ConstBiDirectionalIterator
     operator ++(int) noexcept
     {
-        ConstBiDirectionalIterator tmp(*this);
+        ConstBiDirectionalIterator tmp{*this};
         node_ = PolicyT::next(node_);
         return tmp;
     }
@@ -170,7 +170,7 @@ bool
 operator ==(BiDirectionalIterator<PolicyT> lhs,
             ConstBiDirectionalIterator<PolicyT> rhs) noexcept
 {
-    return ConstBiDirectionalIterator<PolicyT>(lhs) == rhs;
+    return ConstBiDirectionalIterator<PolicyT>{lhs} == rhs;
 }
 
 template <typename PolicyT>
@@ -178,7 +178,7 @@ bool
 operator ==(ConstBiDirectionalIterator<PolicyT> lhs,
             BiDirectionalIterator<PolicyT> rhs) noexcept
 {
-    return lhs == ConstBiDirectionalIterator<PolicyT>(rhs);
+    return lhs == ConstBiDirectionalIterator<PolicyT>{rhs};
 }
 
 template <typename PolicyT>
@@ -186,7 +186,7 @@ bool
 operator !=(BiDirectionalIterator<PolicyT> lhs,
             ConstBiDirectionalIterator<PolicyT> rhs) noexcept
 {
-    return ConstBiDirectionalIterator<PolicyT>(lhs) != rhs;
+    return ConstBiDirectionalIterator<PolicyT>{lhs} != rhs;
 }
 
 template <typename PolicyT>
@@ -194,7 +194,7 @@ bool
 operator !=(ConstBiDirectionalIterator<PolicyT> lhs,
             BiDirectionalIterator<PolicyT> rhs) noexcept
 {
-    return lhs != ConstBiDirectionalIterator<PolicyT>(rhs);
+    return lhs != ConstBiDirectionalIterator<PolicyT>{rhs};
 }
 
 template <typename PolicyT>
@@ -267,7 +267,7 @@ public:
     typedef Reference reference;
 
     ForwardIterator(Node* node = nullptr) noexcept
-    : node_(node)
+        : node_{node}
     {
     }
     Reference
@@ -289,7 +289,7 @@ public:
     ForwardIterator
     operator ++(int) noexcept
     {
-        ForwardIterator tmp(*this);
+        ForwardIterator tmp{*this};
         node_ = PolicyT::next(node_);
         return tmp;
     }
@@ -328,11 +328,11 @@ public:
     typedef Reference reference;
 
     ConstForwardIterator(/*const*/ Node* node = nullptr) noexcept
-    : node_(node)
+        : node_{node}
     {
     }
     ConstForwardIterator(ForwardIterator<PolicyT> it) noexcept
-    : node_(it.node_)
+        : node_{it.node_}
     {
     }
     Reference
@@ -354,7 +354,7 @@ public:
     ConstForwardIterator
     operator ++(int) noexcept
     {
-        ConstForwardIterator tmp(*this);
+        ConstForwardIterator tmp{*this};
         node_ = PolicyT::next(node_);
         return tmp;
     }
@@ -374,28 +374,28 @@ template <typename PolicyT>
 bool
 operator ==(ForwardIterator<PolicyT> lhs, ConstForwardIterator<PolicyT> rhs) noexcept
 {
-    return ConstForwardIterator<PolicyT>(lhs) == rhs;
+    return ConstForwardIterator<PolicyT>{lhs} == rhs;
 }
 
 template <typename PolicyT>
 bool
 operator ==(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noexcept
 {
-    return lhs == ConstForwardIterator<PolicyT>(rhs);
+    return lhs == ConstForwardIterator<PolicyT>{rhs};
 }
 
 template <typename PolicyT>
 bool
 operator !=(ForwardIterator<PolicyT> lhs, ConstForwardIterator<PolicyT> rhs) noexcept
 {
-    return ConstForwardIterator<PolicyT>(lhs) != rhs;
+    return ConstForwardIterator<PolicyT>{lhs} != rhs;
 }
 
 template <typename PolicyT>
 bool
 operator !=(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noexcept
 {
-    return lhs != ConstForwardIterator<PolicyT>(rhs);
+    return lhs != ConstForwardIterator<PolicyT>{rhs};
 }
 } // dbr
 

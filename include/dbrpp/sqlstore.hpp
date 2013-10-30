@@ -34,11 +34,11 @@ public:
     }
     constexpr
     SqlStore(decltype(nullptr)) noexcept
-        : impl_(nullptr)
+        : impl_{nullptr}
     {
     }
     SqlStore(DbrIden seed, const char* path)
-        : impl_(dbr_sqlstore_create(seed, path))
+        : impl_{dbr_sqlstore_create(seed, path)}
     {
         if (!impl_)
             throw_exception();
@@ -58,7 +58,7 @@ public:
     // Move semantics.
 
     SqlStore(SqlStore&& rhs) noexcept
-    : impl_(nullptr)
+        : impl_{nullptr}
     {
         swap(rhs);
     }
