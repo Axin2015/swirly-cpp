@@ -63,7 +63,7 @@ TEST_CASE(side_orders)
     check(OrderRef(side.orders().front()).ref().str() == "apple");
     check(OrderRef(side.orders().back()).ref().str() == "orange");
 
-    auto level = Level(side.levels().front());
+    auto level = LevelRef(side.levels().front());
     // Two orders at this price level.
     check(level.count() == 2);
     check(level.ticks() == 12345);
@@ -84,7 +84,7 @@ TEST_CASE(side_orders)
     check(OrderRef(side.orders().front()).ref().str() == "apple");
     check(OrderRef(side.orders().back()).ref().str() == "orange");
 
-    level = Level(side.levels().front());
+    level = LevelRef(side.levels().front());
     check(level.count() == 2);
     check(level.ticks() == 12345);
     check(level.resd() == 25);
@@ -103,7 +103,7 @@ TEST_CASE(side_orders)
     check(OrderRef(side.orders().front()).ref().str() == "apple");
     check(OrderRef(side.orders().back()).ref().str() == "apple");
 
-    level = Level(side.levels().front());
+    level = LevelRef(side.levels().front());
     check(level.count() == 1);
     check(level.ticks() == 12345);
     check(level.resd() == 5);
@@ -138,14 +138,14 @@ TEST_CASE(side_levels)
 
     // Level 1.
 
-    auto level = Level(side.levels().front());
+    auto level = LevelRef(side.levels().front());
     check(level.count() == 1);
     check(level.ticks() == 12346);
     check(level.resd() == 30);
 
     // Level 2.
 
-    level = Level(side.levels().back());
+    level = LevelRef(side.levels().back());
     check(level.count() == 2);
     check(level.ticks() == 12345);
     check(level.resd() == 30);

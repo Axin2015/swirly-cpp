@@ -24,39 +24,43 @@
 
 namespace dbr {
 
-class Level {
-    DbrLevel impl_;
+class LevelRef {
+    DbrLevel* impl_;
 public:
     explicit
-    Level(DbrLevel impl) noexcept
-        : impl_{impl}
+    LevelRef(DbrLevel& impl) noexcept
+        : impl_{&impl}
     {
     }
-    explicit
-    operator DbrLevel() const noexcept
+    operator DbrLevel&() const noexcept
+    {
+        return *impl_;
+    }
+    DbrLevel*
+    c_arg() const noexcept
     {
         return impl_;
     }
     size_t
     count() const noexcept
     {
-        return impl_.count;
+        return impl_->count;
     }
     DbrTicks
     ticks() const noexcept
     {
-        return impl_.ticks;
+        return impl_->ticks;
     }
     // Must be greater than zero.
     DbrLots
     resd() const noexcept
     {
-        return impl_.resd;
+        return impl_->resd;
     }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, Level level)
+operator <<(std::ostream& os, LevelRef level)
 {
     return os << "count=" << level.count()
               << ",ticks=" << level.ticks()

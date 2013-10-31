@@ -41,7 +41,7 @@ class ResultPosns {
             return dbr_result_posn_entry(const_cast<Node*>(node));
         }
     };
-    DbrResult result_;
+    const DbrResult* result_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -71,8 +71,8 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ResultPosns(DbrResult result) noexcept
-        : result_{result}
+    ResultPosns(const DbrResult& result) noexcept
+        : result_{&result}
     {
     }
     void
@@ -86,12 +86,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_.first_posn;
+        return result_->first_posn;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_.first_posn;
+        return result_->first_posn;
     }
     Iterator
     end() noexcept
@@ -129,7 +129,7 @@ public:
     bool
     empty() const noexcept
     {
-        return result_.first_posn == nullptr;
+        return result_->first_posn == nullptr;
     }
 };
 
@@ -147,7 +147,7 @@ class ResultTrades {
             return dbr_result_trade_entry(const_cast<Node*>(node));
         }
     };
-    DbrResult result_;
+    const DbrResult* result_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -177,8 +177,8 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ResultTrades(DbrResult result) noexcept
-        : result_{result}
+    ResultTrades(const DbrResult& result) noexcept
+        : result_{&result}
     {
     }
     void
@@ -192,12 +192,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_.first_trade;
+        return result_->first_trade;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_.first_trade;
+        return result_->first_trade;
     }
     Iterator
     end() noexcept
@@ -235,7 +235,7 @@ public:
     bool
     empty() const noexcept
     {
-        return result_.first_trade == nullptr;
+        return result_->first_trade == nullptr;
     }
 };
 
