@@ -250,7 +250,7 @@ main(int argc, char* argv[])
     if (!sock)
         goto exit4;
 
-    if (zmq_bind(sock, "tcp://*:5555") < 0)
+    if (zmq_bind(sock, "tcp://*:3271") < 0)
         goto exit5;
 
     struct sigaction action;

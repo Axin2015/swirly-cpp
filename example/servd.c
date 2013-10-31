@@ -74,10 +74,10 @@ sess_rec(const struct DbrMsg* req)
 {
     struct DbrMsg rep;
 
-    struct DbrSlNode* first = dbr_serv_first_rec(serv, req->read_entity_req.type, NULL);
+    struct DbrSlNode* first = dbr_serv_first_rec(serv, req->sess_entity_req.type, NULL);
 
     rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = req->read_entity_req.type;
+    rep.entity_rep.type = req->sess_entity_req.type;
     rep.entity_rep.first = first;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
@@ -628,7 +628,7 @@ main(int argc, char* argv[])
     if (!sock)
         goto exit5;
 
-    if (zmq_bind(sock, "tcp://*:5555") < 0)
+    if (zmq_bind(sock, "tcp://*:3272") < 0)
         goto exit6;
 
     struct sigaction action;

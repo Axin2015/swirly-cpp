@@ -21,7 +21,6 @@
 
 #include <dbr/clnt.h>
 #include <dbr/err.h>
-#include <dbr/model.h>
 #include <dbr/msg.h>
 #include <dbr/queue.h>
 
@@ -39,14 +38,7 @@ struct FigClnt {
     DbrPool pool;
     struct FigCache cache;
     struct FigIndex index;
-    struct DbrIModel model;
 };
-
-static inline struct FigClnt*
-model_implof(DbrModel model)
-{
-    return dbr_implof(struct FigClnt, model, model);
-}
 
 static void
 term_state(struct DbrRec* rec)
@@ -105,35 +97,28 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 }
 
 static ssize_t
-read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
+read_entity(DbrClnt clnt, const char* mnem, int type, struct DbrSlNode** first)
 {
-    struct FigClnt* clnt = model_implof(model);
-    assert(clnt->pool == pool);
-
     struct DbrMsg msg;
     msg.type = DBR_SESS_ENTITY_REQ;
     msg.sess_entity_req.type = type;
-    strncpy(msg.sess_entity_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
+    strncpy(msg.sess_entity_req.trader, mnem, DBR_MNEM_MAX);
 
     if (!dbr_send_msg(clnt->sock, &msg, false))
         return -1;
 
-    if (!dbr_recv_msg(clnt->sock, pool, &msg))
+    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
         return -1;
 
     *first = msg.entity_rep.first;
     return msg.entity_rep.count_;
 }
 
-static const struct DbrModelVtbl MODEL_VTBL = {
-    .read_entity = read_entity
-};
-
 static DbrBool
-emplace_recs(DbrClnt clnt, int type)
+emplace_recs(DbrClnt clnt, const char* mnem, int type)
 {
     struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(&clnt->model, type, clnt->pool, &node);
+    ssize_t size = read_entity(clnt, mnem, type, &node);
     if (size < 0)
         return false;
 
@@ -169,10 +154,10 @@ set_trader(DbrClnt clnt, const char* mnem)
 }
 
 static DbrBool
-emplace_orders(DbrClnt clnt)
+emplace_orders(DbrClnt clnt, const char* mnem)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(&clnt->model, DBR_ORDER, clnt->pool, &node) < 0)
+    if (read_entity(clnt, mnem, DBR_ORDER, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -184,10 +169,10 @@ emplace_orders(DbrClnt clnt)
 }
 
 static DbrBool
-emplace_trades(DbrClnt clnt)
+emplace_trades(DbrClnt clnt, const char* mnem)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(&clnt->model, DBR_TRADE, clnt->pool, &node) < 0)
+    if (read_entity(clnt, mnem, DBR_TRADE, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -199,10 +184,10 @@ emplace_trades(DbrClnt clnt)
 }
 
 static DbrBool
-emplace_membs(DbrClnt clnt)
+emplace_membs(DbrClnt clnt, const char* mnem)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(&clnt->model, DBR_MEMB, clnt->pool, &node) < 0)
+    if (read_entity(clnt, mnem, DBR_MEMB, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -214,10 +199,10 @@ emplace_membs(DbrClnt clnt)
 }
 
 static DbrBool
-emplace_posns(DbrClnt clnt)
+emplace_posns(DbrClnt clnt, const char* mnem)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(&clnt->model, DBR_POSN, clnt->pool, &node) < 0)
+    if (read_entity(clnt, mnem, DBR_POSN, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -254,18 +239,17 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrPool pool)
     clnt->pool = pool;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
-    clnt->model.vtbl = &MODEL_VTBL;
 
     // Data structures are fully initialised at this point.
 
-    if (!emplace_recs(clnt, DBR_TRADER)
-        || !emplace_recs(clnt, DBR_ACCNT)
-        || !emplace_recs(clnt, DBR_CONTR)
+    if (!emplace_recs(clnt, trader, DBR_TRADER)
+        || !emplace_recs(clnt, trader, DBR_ACCNT)
+        || !emplace_recs(clnt, trader, DBR_CONTR)
         || !set_trader(clnt, trader)
-        || !emplace_orders(clnt)
-        || !emplace_trades(clnt)
-        || !emplace_membs(clnt)
-        || !emplace_posns(clnt)) {
+        || !emplace_orders(clnt, trader)
+        || !emplace_trades(clnt, trader)
+        || !emplace_membs(clnt, trader)
+        || !emplace_posns(clnt, trader)) {
         // Use destroy since fully initialised.
         dbr_clnt_destroy(clnt);
         goto fail1;
