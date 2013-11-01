@@ -893,7 +893,8 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             memb->trader.id_only = sqlite3_column_int64(stmt, TRADER);
             memb->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
 
-            dbr_log_debug3("memb: trader=%ld,accnt=%ld", memb->trader.id_only, memb->accnt.id_only);
+            dbr_log_debug3("memb: trader=%ld,accnt=%ld",
+                           memb->trader.id_only, memb->accnt.id_only);
 
             dbr_queue_insert_back(&mq, &memb->entity_node_);
             ++size;
@@ -989,6 +990,11 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 posn->sell_licks = sqlite3_column_int64(stmt, LICKS);
                 posn->sell_lots = sqlite3_column_int64(stmt, LOTS);
             }
+
+            dbr_log_debug3("posn: accnt=%ld,contr=%ld,settl_date=%d,buy_licks=%ld,buy_lots=%ld,"
+                           "sell_licks=%ld,sell_lots=%ld",
+                           posn->accnt.id_only, posn->contr.id_only, posn->settl_date,
+                           posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
 
             dbr_queue_insert_back(&pq, &posn->entity_node_);
             ++size;

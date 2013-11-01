@@ -54,8 +54,8 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, MembRef memb)
 {
-    return os << "arec=" << memb.arec().mnem()
-              << ",trec=" << memb.trec().mnem();
+    return os << "trec=" << memb.trec().mnem()
+              << ",arec=" << memb.arec().mnem();
 }
 
 inline size_t

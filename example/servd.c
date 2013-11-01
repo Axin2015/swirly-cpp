@@ -115,7 +115,7 @@ sess_order(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -150,7 +150,7 @@ sess_trade(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -185,7 +185,7 @@ sess_memb(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -231,7 +231,7 @@ sess_posn(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -295,7 +295,7 @@ place_order(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -333,7 +333,7 @@ revise_order_id(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -371,7 +371,7 @@ revise_order_ref(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -408,7 +408,7 @@ cancel_order_id(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -445,7 +445,7 @@ cancel_order_ref(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -482,7 +482,7 @@ archive_order(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }
@@ -519,7 +519,7 @@ archive_trade(const struct DbrMsg* req)
         dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, true))
+    if (!dbr_send_msg(sock, &rep, false))
         dbr_err_print("dbr_send_msg() failed");
     return false;
 }

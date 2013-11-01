@@ -58,7 +58,11 @@ fig_trader_rec(struct FigTrader* trader)
 static inline void
 fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 {
-    dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
+    assert(!node);
+#pragma GCC diagnostic pop
     if (order->ref[0] != '\0')
         fig_index_insert(trader->index, order);
 }
@@ -146,7 +150,11 @@ fig_trader_empty_order(const struct FigTrader* trader)
 static inline void
 fig_trader_emplace_trade(struct FigTrader* trader, struct DbrTrade* trade)
 {
-    dbr_tree_insert(&trader->trades, trade->id, &trade->trader_node_);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+    struct DbrRbNode* node = dbr_tree_insert(&trader->trades, trade->id, &trade->trader_node_);
+    assert(!node);
+#pragma GCC diagnostic pop
 }
 
 // Release ownership from state.
@@ -204,7 +212,12 @@ fig_trader_empty_trade(const struct FigTrader* trader)
 static inline void
 fig_trader_emplace_memb(struct FigTrader* trader, struct DbrMemb* memb)
 {
-    dbr_tree_insert(&trader->membs, memb->accnt.rec->id, &memb->trader_node_);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+    struct DbrRbNode* node = dbr_tree_insert(&trader->membs, memb->accnt.rec->id,
+                                             &memb->trader_node_);
+    assert(!node);
+#pragma GCC diagnostic pop
 }
 
 static inline struct DbrRbNode*

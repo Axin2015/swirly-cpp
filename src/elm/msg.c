@@ -552,7 +552,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         switch (msg->entity_rep.type) {
         case DBR_TRADER:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_trader(buf, pool, &q)) {
+                if (!(buf = read_entity_trader(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_TRADER, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -560,7 +560,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             break;
         case DBR_ACCNT:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_accnt(buf, pool, &q)) {
+                if (!(buf = read_entity_accnt(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_ACCNT, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -568,7 +568,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             break;
         case DBR_CONTR:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_contr(buf, pool, &q)) {
+                if (!(buf = read_entity_contr(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_CONTR, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -576,7 +576,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             break;
         case DBR_ORDER:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_order(buf, pool, &q)) {
+                if (!(buf = read_entity_order(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_ORDER, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -584,7 +584,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             break;
         case DBR_TRADE:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_trade(buf, pool, &q)) {
+                if (!(buf = read_entity_trade(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_TRADE, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -592,7 +592,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             break;
         case DBR_MEMB:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_memb(buf, pool, &q)) {
+                if (!(buf = read_entity_memb(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_MEMB, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -600,7 +600,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             break;
         case DBR_POSN:
             for (size_t i = 0; i < msg->entity_rep.count_; ++i) {
-                if (!read_entity_posn(buf, pool, &q)) {
+                if (!(buf = read_entity_posn(buf, pool, &q))) {
                     dbr_pool_free_entities(pool, DBR_POSN, dbr_queue_first(&q));
                     goto fail1;
                 }
@@ -628,7 +628,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         }
         dbr_queue_init(&q);
         for (size_t i = 0; i < msg->result_rep.posn_count_; ++i) {
-            if (!read_result_posn(buf, pool, &q)) {
+            if (!(buf = read_result_posn(buf, pool, &q))) {
                 free_result_posns(msg->result_rep.first_posn, pool);
                 dbr_pool_free_order(pool, msg->result_rep.new_order);
                 goto fail1;
@@ -643,7 +643,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         }
         dbr_queue_init(&q);
         for (size_t i = 0; i < msg->result_rep.trade_count_; ++i) {
-            if (!read_result_trade(buf, pool, &q)) {
+            if (!(buf = read_result_trade(buf, pool, &q))) {
                 free_result_trades(msg->result_rep.first_trade, pool);
                 free_result_posns(msg->result_rep.first_posn, pool);
                 dbr_pool_free_order(pool, msg->result_rep.new_order);
@@ -721,7 +721,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
             goto fail1;
         dbr_queue_init(&q);
         for (size_t i = 0; i < msg->write_trans_req.count_; ++i) {
-            if (!read_trans_stmt(buf, pool, &q)) {
+            if (!(buf = read_trans_stmt(buf, pool, &q))) {
                 free_trans_stmts(dbr_queue_first(&q), pool);
                 goto fail1;
             }

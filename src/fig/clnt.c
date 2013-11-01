@@ -268,6 +268,7 @@ dbr_clnt_destroy(DbrClnt clnt)
 {
     if (clnt) {
         fig_cache_term(&clnt->cache);
+        zmq_close(clnt->sock);
         free(clnt);
     }
 }
