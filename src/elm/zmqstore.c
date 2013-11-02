@@ -83,7 +83,7 @@ static DbrBool
 commit_trans(DbrJourn journ)
 {
     struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrMsg msg = { .type = DBR_WRITE_TRANS_REQ,
+    struct DbrMsg msg = { .req_id = store->id++, .type = DBR_WRITE_TRANS_REQ,
                           .write_trans_req = { .count_ = 0, .first = store->queue.first } };
     DbrBool ok = dbr_send_msg(store->sock, &msg, false);
     free_stmts(store->queue.first, store->pool);
@@ -230,7 +230,8 @@ static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
     struct ElmZmqStore* store = model_implof(model);
-    struct DbrMsg msg = { .type = DBR_READ_ENTITY_REQ, .read_entity_req.type = type };
+    struct DbrMsg msg = { .req_id = store->id++, .type = DBR_READ_ENTITY_REQ,
+                          .read_entity_req.type = type };
 
     if (!dbr_send_msg(store->sock, &msg, false))
         return -1;

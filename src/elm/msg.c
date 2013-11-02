@@ -232,7 +232,8 @@ read_result_trade(const char* buf, DbrPool pool, struct DbrQueue* queue)
 DBR_API size_t
 dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
 {
-    size_t n = dbr_packleni(msg->type);
+    size_t n = dbr_packlenl(msg->req_id);
+    n += dbr_packleni(msg->type);
     switch (msg->type) {
     case DBR_STATUS_REP:
         n += dbr_packlenf(STATUS_REP_FORMAT,
@@ -390,6 +391,7 @@ dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
 DBR_API char*
 dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
 {
+    buf = dbr_packl(buf, msg->req_id);
     buf = dbr_packi(buf, msg->type);
     switch (msg->type) {
     case DBR_STATUS_REP:
@@ -532,9 +534,13 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
 DBR_API const char*
 dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
 {
+    DbrIden req_id;
+    if (!(buf = dbr_unpackl(buf, &req_id)))
+        goto fail1;
     int type;
     if (!(buf = dbr_unpacki(buf, &type)))
         goto fail1;
+    msg->req_id = req_id;
     msg->type = type;
     struct DbrQueue q;
     switch (type) {

@@ -17,7 +17,7 @@ main(int argc, char* argv[])
     try {
         ZmqCtx ctx;
         Pool pool;
-        Clnt clnt(ctx.c_arg(), "tcp://localhost:3272", "WRAMIREZ", pool);
+        Clnt clnt(ctx.c_arg(), "tcp://localhost:3272", "WRAMIREZ", 1, pool);
 
         cout << "traders:\n";
         for (auto rec : clnt.trecs()) {

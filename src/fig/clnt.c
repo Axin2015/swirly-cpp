@@ -35,6 +35,7 @@ struct FigClnt {
     void* sock;
     // See set_trader().
     DbrTrader trader;
+    DbrIden id;
     DbrPool pool;
     struct FigCache cache;
     struct FigIndex index;
@@ -100,6 +101,7 @@ static ssize_t
 read_entity(DbrClnt clnt, const char* mnem, int type, struct DbrSlNode** first)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_SESS_ENTITY_REQ;
     msg.sess_entity_req.type = type;
     strncpy(msg.sess_entity_req.trader, mnem, DBR_MNEM_MAX);
@@ -215,7 +217,7 @@ emplace_posns(DbrClnt clnt, const char* mnem)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrPool pool)
+dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, DbrPool pool)
 {
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
     if (dbr_unlikely(!clnt)) {
@@ -236,6 +238,7 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrPool pool)
 
     clnt->sock = sock;
     clnt->trader = NULL;
+    clnt->id = seed;
     clnt->pool = pool;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
@@ -309,6 +312,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
                DbrFlags flags)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_PLACE_ORDER_REQ;
     strncpy(msg.place_order_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     strncpy(msg.place_order_req.accnt, accnt, DBR_MNEM_MAX);
@@ -362,6 +366,7 @@ DBR_API struct DbrOrder*
 dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_REVISE_ORDER_ID_REQ;
     strncpy(msg.revise_order_id_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     msg.revise_order_id_req.id = id;
@@ -388,6 +393,7 @@ DBR_API struct DbrOrder*
 dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_REVISE_ORDER_REF_REQ;
     strncpy(msg.revise_order_ref_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     strncpy(msg.revise_order_ref_req.ref, ref, DBR_REF_MAX);
@@ -414,6 +420,7 @@ DBR_API struct DbrOrder*
 dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_CANCEL_ORDER_ID_REQ;
     strncpy(msg.cancel_order_id_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     msg.cancel_order_id_req.id = id;
@@ -439,6 +446,7 @@ DBR_API struct DbrOrder*
 dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_CANCEL_ORDER_REF_REQ;
     strncpy(msg.cancel_order_ref_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     strncpy(msg.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
@@ -464,6 +472,7 @@ DBR_API DbrBool
 dbr_clnt_archive_order(DbrClnt clnt, DbrIden id)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_ARCHIVE_ORDER_REQ;
     strncpy(msg.archive_order_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     msg.archive_order_req.id = id;
@@ -489,6 +498,7 @@ DBR_API DbrBool
 dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id)
 {
     struct DbrMsg msg;
+    msg.req_id = clnt->id++;
     msg.type = DBR_ARCHIVE_TRADE_REQ;
     strncpy(msg.archive_trade_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
     msg.archive_trade_req.id = id;

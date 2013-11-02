@@ -50,8 +50,9 @@ free_stmts(struct DbrSlNode* first, DbrPool pool)
 }
 
 static void
-status_err(struct DbrMsg* rep)
+status_err(struct DbrMsg* rep, DbrIden req_id)
 {
+    rep->req_id = req_id;
     rep->type = DBR_STATUS_REP;
     rep->status_rep.num = dbr_err_num();
     strncpy(rep->status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
@@ -60,13 +61,13 @@ status_err(struct DbrMsg* rep)
 static DbrBool
 read_entity(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_ENTITY_REP,
+    struct DbrMsg rep = { .req_id = req->req_id, .type = DBR_ENTITY_REP,
                           .entity_rep = { .type = req->read_entity_req.type } };
     DbrModel model = dbr_sqlstore_model(store);
 
     if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {
         dbr_err_print("dbr_model_read_entity() failed");
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_msg(sock, &rep, false);
@@ -83,12 +84,13 @@ read_entity(const struct DbrMsg* req)
 static DbrBool
 write_trans(const struct DbrMsg* req)
 {
-    struct DbrMsg rep = { .type = DBR_STATUS_REP, .status_rep = { .num = 0, .msg = "" } };
+    struct DbrMsg rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
+                          .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_begin_trans(journ)) {
         dbr_err_print("dbr_journ_begin_trans() failed");
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     for (struct DbrSlNode* node = req->write_trans_req.first; node; node = node->next) {
@@ -113,7 +115,7 @@ write_trans(const struct DbrMsg* req)
                                         stmt->insert_order.flags,
                                         stmt->insert_order.now)) {
                 dbr_err_print("dbr_journ_insert_order() failed");
-                status_err(&rep);
+                status_err(&rep, req->req_id);
                 goto fail2;
             }
             break;
@@ -127,7 +129,7 @@ write_trans(const struct DbrMsg* req)
                                         stmt->update_order.lots,
                                         stmt->update_order.now)) {
                 dbr_err_print("dbr_journ_update_order() failed");
-                status_err(&rep);
+                status_err(&rep, req->req_id);
                 goto fail2;
             }
             break;
@@ -136,7 +138,7 @@ write_trans(const struct DbrMsg* req)
                                          stmt->archive_order.id,
                                          stmt->archive_order.now)) {
                 dbr_err_print("dbr_journ_archive_order() failed");
-                status_err(&rep);
+                status_err(&rep, req->req_id);
                 goto fail2;
             }
             break;
@@ -160,7 +162,7 @@ write_trans(const struct DbrMsg* req)
                                         stmt->insert_trade.lots,
                                         stmt->insert_trade.now)) {
                 dbr_err_print("dbr_journ_insert_trade() failed");
-                status_err(&rep);
+                status_err(&rep, req->req_id);
                 goto fail2;
             }
             break;
@@ -169,7 +171,7 @@ write_trans(const struct DbrMsg* req)
                                          stmt->archive_trade.id,
                                          stmt->archive_trade.now)) {
                 dbr_err_print("dbr_journ_archive_trade() failed");
-                status_err(&rep);
+                status_err(&rep, req->req_id);
                 goto fail2;
             }
             break;
@@ -177,7 +179,7 @@ write_trans(const struct DbrMsg* req)
     }
     if (!dbr_journ_commit_trans(journ)) {
         dbr_err_print("dbr_journ_commit_trans() failed");
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail2;
     }
     const DbrBool ok = dbr_send_msg(sock, &rep, false);

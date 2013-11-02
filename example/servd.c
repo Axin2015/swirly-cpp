@@ -43,16 +43,18 @@ static void* sock = NULL;
 static volatile sig_atomic_t quit = false;
 
 static void
-status_err(struct DbrMsg* rep)
+status_err(struct DbrMsg* rep, DbrIden req_id)
 {
+    rep->req_id = req_id;
     rep->type = DBR_STATUS_REP;
     rep->status_rep.num = dbr_err_num();
     strncpy(rep->status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
 }
 
 static void
-status_setf(struct DbrMsg* rep, int num, const char* format, ...)
+status_setf(struct DbrMsg* rep, DbrIden req_id, int num, const char* format, ...)
 {
+    rep->req_id = req_id;
     rep->type = DBR_STATUS_REP;
     rep->status_rep.num = num;
 
@@ -76,6 +78,7 @@ sess_rec(const struct DbrMsg* req)
 
     struct DbrSlNode* first = dbr_serv_first_rec(serv, req->sess_entity_req.type, NULL);
 
+    rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = req->sess_entity_req.type;
     rep.entity_rep.first = first;
@@ -92,12 +95,13 @@ sess_order(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     // Copy to entity node.
@@ -107,6 +111,7 @@ sess_order(const struct DbrMsg* req)
         struct DbrOrder* order = dbr_trader_order_entry(node);
         dbr_queue_insert_back(&q, &order->entity_node_);
     }
+    rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_ORDER;
     rep.entity_rep.first = dbr_queue_first(&q);
@@ -127,12 +132,13 @@ sess_trade(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     // Copy to entity node.
@@ -142,6 +148,7 @@ sess_trade(const struct DbrMsg* req)
         struct DbrTrade* trade = dbr_trader_trade_entry(node);
         dbr_queue_insert_back(&q, &trade->entity_node_);
     }
+    rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_TRADE;
     rep.entity_rep.first = dbr_queue_first(&q);
@@ -162,12 +169,13 @@ sess_memb(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     // Copy to entity node.
@@ -177,6 +185,7 @@ sess_memb(const struct DbrMsg* req)
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
         dbr_queue_insert_back(&q, &memb->entity_node_);
     }
+    rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_MEMB;
     rep.entity_rep.first = dbr_queue_first(&q);
@@ -197,12 +206,13 @@ sess_posn(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->sess_entity_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->sess_entity_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->sess_entity_req.trader);
         goto fail1;
     }
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     struct DbrQueue q = DBR_QUEUE_INIT(q);
@@ -213,7 +223,7 @@ sess_posn(const struct DbrMsg* req)
         struct DbrRec* arec = memb->accnt.rec;
         DbrAccnt accnt = dbr_serv_accnt(serv, arec);
         if (!accnt) {
-            status_err(&rep);
+            status_err(&rep, req->req_id);
             goto fail1;
         }
         // Copy each posn to entity node.
@@ -223,6 +233,7 @@ sess_posn(const struct DbrMsg* req)
             dbr_queue_insert_back(&q, &posn->entity_node_);
         }
     }
+    rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_POSN;
     rep.entity_rep.first = dbr_queue_first(&q);
@@ -243,33 +254,36 @@ place_order(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->place_order_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->place_order_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->place_order_req.trader);
         goto fail1;
     }
     struct DbrRec* arec = find_rec_mnem(DBR_ACCNT, req->place_order_req.accnt);
     if (!arec) {
-        status_setf(&rep, DBR_EINVAL, "no such accnt '%.16s'", req->place_order_req.accnt);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such accnt '%.16s'",
+                    req->place_order_req.accnt);
         goto fail1;
     }
     struct DbrRec* crec = find_rec_mnem(DBR_CONTR, req->place_order_req.contr);
     if (!crec) {
-        status_setf(&rep, DBR_EINVAL, "no such contr '%.16s'", req->place_order_req.contr);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such contr '%.16s'",
+                    req->place_order_req.contr);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     DbrAccnt accnt = dbr_serv_accnt(serv, arec);
     if (!accnt) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
     struct DbrBook* book = dbr_serv_book(serv, crec, req->place_order_req.settl_date);
     if (!book) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
@@ -282,10 +296,11 @@ place_order(const struct DbrMsg* req)
 
     struct DbrResult result;
     if (!dbr_serv_place(serv, trader, accnt, book, ref, action, ticks, lots, min, flags, &result)) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_RESULT_REP;
     rep.result_rep.new_order = result.new_order;
     rep.result_rep.first_posn = result.first_posn;
@@ -307,13 +322,14 @@ revise_order_id(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->revise_order_id_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->revise_order_id_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->revise_order_id_req.trader);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
@@ -322,10 +338,11 @@ revise_order_id(const struct DbrMsg* req)
 
     struct DbrOrder* order = dbr_serv_revise_id(serv, trader, id, lots);
     if (!order) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
@@ -345,13 +362,14 @@ revise_order_ref(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->revise_order_ref_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->revise_order_ref_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->revise_order_ref_req.trader);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
@@ -360,10 +378,11 @@ revise_order_ref(const struct DbrMsg* req)
 
     struct DbrOrder* order = dbr_serv_revise_ref(serv, trader, ref, lots);
     if (!order) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
@@ -383,13 +402,14 @@ cancel_order_id(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->cancel_order_id_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->cancel_order_id_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->cancel_order_id_req.trader);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
@@ -397,10 +417,11 @@ cancel_order_id(const struct DbrMsg* req)
 
     struct DbrOrder* order = dbr_serv_cancel_id(serv, trader, id);
     if (!order) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
@@ -420,13 +441,14 @@ cancel_order_ref(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->cancel_order_ref_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->cancel_order_ref_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->cancel_order_ref_req.trader);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
@@ -434,10 +456,11 @@ cancel_order_ref(const struct DbrMsg* req)
 
     struct DbrOrder* order = dbr_serv_cancel_ref(serv, trader, ref);
     if (!order) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
@@ -457,23 +480,25 @@ archive_order(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->archive_order_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->archive_order_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->archive_order_req.trader);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
     const DbrIden id = req->archive_order_req.id;
 
     if (!dbr_serv_archive_order(serv, trader, id)) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';
@@ -494,23 +519,25 @@ archive_trade(const struct DbrMsg* req)
 
     struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req->archive_trade_req.trader);
     if (!trec) {
-        status_setf(&rep, DBR_EINVAL, "no such trader '%.16s'", req->archive_trade_req.trader);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such trader '%.16s'",
+                    req->archive_trade_req.trader);
         goto fail1;
     }
 
     DbrTrader trader = dbr_serv_trader(serv, trec);
     if (!trader) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
     const DbrIden id = req->archive_trade_req.id;
 
     if (!dbr_serv_archive_trade(serv, trader, id)) {
-        status_err(&rep);
+        status_err(&rep, req->req_id);
         goto fail1;
     }
 
+    rep.req_id = req->req_id;
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';

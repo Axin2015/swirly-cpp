@@ -47,6 +47,7 @@ enum {
 };
 
 struct DbrMsg {
+    DbrIden req_id;
 	int type;
 	union {
         // Reply.
