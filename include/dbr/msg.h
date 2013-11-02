@@ -49,6 +49,7 @@ enum {
 struct DbrMsg {
 	int type;
 	union {
+        // Reply.
         struct {
             int num;
             char msg[DBR_ERRMSG_MAX];
@@ -83,6 +84,7 @@ struct DbrMsg {
         struct {
             struct DbrOrder* order;
         } order_rep;
+        // Request.
         struct {
             int type;
         } read_entity_req;

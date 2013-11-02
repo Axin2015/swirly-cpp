@@ -249,10 +249,10 @@ public:
     }
     OrderRef
     place(const char* accnt, const char* contr, DbrDate settl_date, const char* ref, int action,
-          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Result& result)
+          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags)
     {
         DbrOrder* const order = dbr_clnt_place(impl_, accnt, contr, settl_date, ref, action,
-                                               ticks, lots, min, flags, result.c_arg());
+                                               ticks, lots, min, flags);
         if (!order)
             throw_exception();
         return OrderRef{*order};

@@ -76,7 +76,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 DBR_API struct DbrOrder*
 dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-               DbrFlags flags, struct DbrResult* result);
+               DbrFlags flags);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:
