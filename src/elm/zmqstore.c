@@ -227,11 +227,11 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 };
 
 static ssize_t
-read_entity(DbrModel model, int which, DbrPool pool, struct DbrSlNode** first)
+read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
     struct ElmZmqStore* store = model_implof(model);
     struct DbrMsg msg = { .req_id = store->id++, .type = DBR_READ_ENTITY_REQ,
-                          .read_entity_req.which = which };
+                          .read_entity_req.type = type };
 
     if (!dbr_send_msg(store->sock, &msg, false))
         return -1;
