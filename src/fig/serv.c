@@ -293,17 +293,17 @@ commit_result(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
                                                   serv->pool);
         assert(maker);
 
-        // TODO: taker or maker trade first?
-
-        // Update taker.
-        fig_trader_emplace_trade(taker, match->taker_trade);
-        apply_posn(trans->new_posn, match->taker_trade);
-        dbr_queue_insert_back(&tq, &match->taker_trade->result_node_);
+        // Maker updated first because this is consistent with last-look semantics.
 
         // Update maker.
         fig_trader_emplace_trade(maker, match->maker_trade);
         apply_posn(match->maker_posn, match->maker_trade);
         dbr_queue_insert_back(&tq, &match->maker_trade->result_node_);
+
+        // Update taker.
+        fig_trader_emplace_trade(taker, match->taker_trade);
+        apply_posn(trans->new_posn, match->taker_trade);
+        dbr_queue_insert_back(&tq, &match->taker_trade->result_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;

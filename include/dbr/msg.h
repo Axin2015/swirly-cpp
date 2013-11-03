@@ -87,7 +87,8 @@ struct DbrMsg {
         } order_rep;
         // Request.
         struct {
-            int type;
+            // Bit set of entity-types.
+            int which;
         } read_entity_req;
         struct {
             DbrMnem trader;

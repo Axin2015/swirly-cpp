@@ -321,7 +321,7 @@ dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
         n += dbr_order_len(msg->order_rep.order, enriched);
         break;
     case DBR_READ_ENTITY_REQ:
-        n += dbr_packleni(msg->read_entity_req.type);
+        n += dbr_packleni(msg->read_entity_req.which);
         break;
     case DBR_SESS_ENTITY_REQ:
         n += dbr_packlenf(SESS_ENTITY_REQ_FORMAT,
@@ -468,7 +468,7 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
         buf = dbr_write_order(buf, msg->order_rep.order, enriched);
         break;
     case DBR_READ_ENTITY_REQ:
-        buf = dbr_packi(buf, msg->read_entity_req.type);
+        buf = dbr_packi(buf, msg->read_entity_req.which);
         break;
     case DBR_SESS_ENTITY_REQ:
         buf = dbr_packf(buf, SESS_ENTITY_REQ_FORMAT,
@@ -669,7 +669,7 @@ dbr_read_msg(const char* buf, DbrPool pool, struct DbrMsg* msg)
         }
         break;
     case DBR_READ_ENTITY_REQ:
-        if (!(buf = dbr_unpacki(buf, &msg->read_entity_req.type)))
+        if (!(buf = dbr_unpacki(buf, &msg->read_entity_req.which)))
             goto fail1;
         break;
     case DBR_SESS_ENTITY_REQ:

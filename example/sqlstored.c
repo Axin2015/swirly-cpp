@@ -62,7 +62,7 @@ static DbrBool
 read_entity(const struct DbrMsg* req)
 {
     struct DbrMsg rep = { .req_id = req->req_id, .type = DBR_ENTITY_REP,
-                          .entity_rep = { .type = req->read_entity_req.type } };
+                          .entity_rep = { .type = req->read_entity_req.which } };
     DbrModel model = dbr_sqlstore_model(store);
 
     if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {

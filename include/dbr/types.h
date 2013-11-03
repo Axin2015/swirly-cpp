@@ -58,13 +58,13 @@ typedef DbrIncs DbrTicks;
 typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
-    DBR_TRADER = 1,
-    DBR_ACCNT,
-    DBR_CONTR,
-    DBR_ORDER,
-    DBR_TRADE,
-    DBR_MEMB,
-    DBR_POSN
+    DBR_TRADER = 0x01,
+    DBR_ACCNT  = 0x02,
+    DBR_CONTR  = 0x04,
+    DBR_ORDER  = 0x08,
+    DBR_TRADE  = 0x10,
+    DBR_MEMB   = 0x20,
+    DBR_POSN   = 0x40
 };
 
 enum {
