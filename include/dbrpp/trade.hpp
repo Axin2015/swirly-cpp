@@ -55,19 +55,14 @@ public:
         return impl_->id;
     }
     DbrIden
-    match() const noexcept
-    {
-        return impl_->match;
-    }
-    DbrIden
     order() const noexcept
     {
         return impl_->order;
     }
     int
-    order_rev() const noexcept
+    rev() const noexcept
     {
-        return impl_->order_rev;
+        return impl_->rev;
     }
     TraderRecRef
     trec() const noexcept
@@ -94,16 +89,6 @@ public:
     {
         return Ref{impl_->ref};
     }
-    AccntRecRef
-    cpty() const noexcept
-    {
-        return AccntRecRef{*impl_->cpty.rec};
-    }
-    int
-    role() const noexcept
-    {
-        return impl_->role;
-    }
     int
     action() const noexcept
     {
@@ -129,6 +114,21 @@ public:
     {
         return impl_->lots;
     }
+    DbrIden
+    match() const noexcept
+    {
+        return impl_->match;
+    }
+    AccntRecRef
+    cpty() const noexcept
+    {
+        return AccntRecRef{*impl_->cpty.rec};
+    }
+    int
+    role() const noexcept
+    {
+        return impl_->role;
+    }
     DbrMillis
     created() const noexcept
     {
@@ -145,21 +145,21 @@ inline std::ostream&
 operator <<(std::ostream& os, TradeRef trade)
 {
     return os << "id=" << trade.id()
-              << ",match=" << trade.match()
               << ",order=" << trade.order()
-              << ",order_rev=" << trade.order_rev()
+              << ",rev=" << trade.rev()
               << ",trec=" << trade.trec().mnem()
               << ",arec=" << trade.arec().mnem()
               << ",crec=" << trade.crec().mnem()
               << ",settl_date=" << trade.settl_date()
               << ",ref=" << trade.ref()
-              << ",cpty=" << trade.cpty().mnem()
-              << ",role=" << trade.role()
               << ",action=" << trade.action()
               << ",ticks=" << trade.ticks()
               << ",resd=" << trade.resd()
               << ",exec=" << trade.exec()
               << ",lots=" << trade.lots()
+              << ",match=" << trade.match()
+              << ",cpty=" << trade.cpty().mnem()
+              << ",role=" << trade.role()
               << ",created=" << trade.created()
               << ",modified=" << trade.modified();
 }

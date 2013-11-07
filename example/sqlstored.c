@@ -145,21 +145,21 @@ write_trans(const struct DbrMsg* req)
         case DBR_INSERT_TRADE:
             if (!dbr_journ_insert_trade(journ,
                                         stmt->insert_trade.id,
-                                        stmt->insert_trade.match,
                                         stmt->insert_trade.order,
-                                        stmt->insert_trade.order_rev,
+                                        stmt->insert_trade.rev,
                                         stmt->insert_trade.tid,
                                         stmt->insert_trade.aid,
                                         stmt->insert_trade.cid,
                                         stmt->insert_trade.settl_date,
                                         stmt->insert_trade.ref,
-                                        stmt->insert_trade.cpty,
-                                        stmt->insert_trade.role,
                                         stmt->insert_trade.action,
                                         stmt->insert_trade.ticks,
                                         stmt->insert_trade.resd,
                                         stmt->insert_trade.exec,
                                         stmt->insert_trade.lots,
+                                        stmt->insert_trade.match,
+                                        stmt->insert_trade.cpty,
+                                        stmt->insert_trade.role,
                                         stmt->insert_trade.now)) {
                 dbr_err_print("dbr_journ_insert_trade() failed");
                 status_err(&rep, req->req_id);

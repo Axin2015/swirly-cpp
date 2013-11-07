@@ -417,20 +417,14 @@ struct DbrTrade {
      * @publicsection
      */
     DbrIden id;
-    DbrIden match;
     DbrIden order;
-    int order_rev;
+    int rev;
     union DbrURec trader;
     union DbrURec accnt;
     union DbrURec contr;
     DbrDate settl_date;
     // Ref is optional.
     DbrRef ref;
-    union DbrURec cpty;
-    /**
-     * @sa enum DbrRole
-     */
-    int role;
     /**
      * @sa enum DbrAction
      */
@@ -439,6 +433,12 @@ struct DbrTrade {
     DbrLots resd;
     DbrLots exec;
     DbrLots lots;
+    DbrIden match;
+    union DbrURec cpty;
+    /**
+     * @sa enum DbrRole
+     */
+    int role;
     DbrMillis created;
     DbrMillis modified;
     /**
@@ -586,21 +586,21 @@ struct DbrStmt {
         } archive_order;
         struct {
             DbrIden id;
-            DbrIden match;
             DbrIden order;
-            int order_rev;
+            int rev;
             DbrIden tid;
             DbrIden aid;
             DbrIden cid;
             DbrDate settl_date;
             DbrRef ref;
-            DbrIden cpty;
-            int role;
             int action;
             DbrTicks ticks;
             DbrLots resd;
             DbrLots exec;
             DbrLots lots;
+            DbrIden match;
+            DbrIden cpty;
+            int role;
             DbrMillis now;
         } insert_trade;
         struct {

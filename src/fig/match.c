@@ -147,43 +147,41 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
         // Taker trade.
         taker_trade->id = taker_id;
-        taker_trade->match = match->id;
         taker_trade->order = taker->id;
-        taker_trade->order_rev = taker->rev + 1;
+        taker_trade->rev = taker->rev + 1;
         taker_trade->trader.rec = taker->trader.rec;
         taker_trade->accnt.rec = taker->accnt.rec;
         taker_trade->contr.rec = crec;
         taker_trade->settl_date = settl_date;
         strncpy(taker_trade->ref, taker->ref, DBR_REF_MAX);
-        taker_trade->cpty.rec = maker->accnt.rec;
-        taker_trade->role = DBR_TAKER;
         taker_trade->action = taker->action;
         taker_trade->ticks = match->ticks;
         taker_trade->resd = taker->resd - taken;
         taker_trade->exec = taker->exec + taken;
         taker_trade->lots = match->lots;
-        taker_trade->settl_date = settl_date;
+        taker_trade->match = match->id;
+        taker_trade->cpty.rec = maker->accnt.rec;
+        taker_trade->role = DBR_TAKER;
         taker_trade->created = now;
         taker_trade->modified = now;
 
         // Maker trade.
         maker_trade->id = maker_id;
-        maker_trade->match = match->id;
         maker_trade->order = maker->id;
-        maker_trade->order_rev = maker->rev + 1;
+        maker_trade->rev = maker->rev + 1;
         maker_trade->trader.rec = maker->trader.rec;
         maker_trade->accnt.rec = maker->accnt.rec;
         maker_trade->contr.rec = crec;
         maker_trade->settl_date = settl_date;
         strncpy(maker_trade->ref, maker->ref, DBR_REF_MAX);
-        maker_trade->cpty.rec = taker->accnt.rec;
-        maker_trade->role = DBR_MAKER;
         maker_trade->action = maker->action;
         maker_trade->ticks = match->ticks;
         maker_trade->resd = maker->resd - match->lots;
         maker_trade->exec = maker->exec + match->lots;
         maker_trade->lots = match->lots;
-        maker_trade->settl_date = settl_date;
+        maker_trade->match = match->id;
+        maker_trade->cpty.rec = taker->accnt.rec;
+        maker_trade->role = DBR_MAKER;
         maker_trade->created = now;
         maker_trade->modified = now;
 

@@ -70,10 +70,10 @@ DBR_EXTERN DbrBool
 fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden match, DbrIden order,
-                        int order_rev, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
-                        const char* ref, DbrIden cpty, int role, int action, DbrTicks ticks,
-                        DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
+fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev, DbrIden tid,
+                        DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
+                        DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match,
+                        DbrIden cpty, int role, DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);

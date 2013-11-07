@@ -70,14 +70,14 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->archive_order(id, now);
     }
     static DbrBool
-    insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
-                 DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-                 DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd, DbrLots exec,
-                 DbrLots lots, DbrMillis now) noexcept
+    insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid,
+                 DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
+                 DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match,
+                 DbrIden cpty, int role, DbrMillis now) noexcept
     {
         return static_cast<DerivedT*>(journ)
-            ->insert_trade(id, match, order, order_rev, tid, aid, cid, settl_date, ref,
-                           cpty, role, action, ticks, resd, exec, lots, now);
+            ->insert_trade(id, order, rev, tid, aid, cid, settl_date, ref, action,
+                           ticks, resd, exec, lots, match, cpty, role, now);
     }
     static DbrBool
     archive_trade(DbrJourn journ, DbrIden id, DbrMillis now) noexcept
@@ -164,13 +164,13 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 inline void
-insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
-             DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-             DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
-             DbrLots exec, DbrLots lots, DbrMillis now)
+insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
+             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
+             DbrMillis now)
 {
-    if (!journ->vtbl->insert_trade(journ, id, match, order, order_rev, tid, aid, cid, settl_date,
-                                   ref, cpty, role, action, ticks, resd, exec, lots, now))
+    if (!journ->vtbl->insert_trade(journ, id, order, rev, tid, aid, cid, settl_date, ref,
+                                   action, ticks, resd, exec, lots, match, cpty, role, now))
         throw_exception();
 }
 

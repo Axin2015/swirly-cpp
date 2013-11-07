@@ -106,16 +106,15 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 static DbrBool
-insert_trade(DbrJourn journ, DbrIden id, DbrIden match, DbrIden order, int order_rev,
-             DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-             DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd, DbrLots exec,
-             DbrLots lots, DbrMillis now)
+insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
+             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
+             DbrMillis now)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_insert_trade(impl, id, match, order, order_rev, tid, aid, cid,
-                                     settl_date, ref, cpty, role, action, ticks, resd, exec,
-                                     lots, now);
+    return fir_sqlite_insert_trade(impl, id, order, rev, tid, aid, cid, settl_date, ref,
+                                   ticks, resd, exec, lots, match, cpty, role, action, now);
 }
 
 static DbrBool

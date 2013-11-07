@@ -199,21 +199,21 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         if (!dbr_journ_update_order(journ, taker_order->id, taker_rev, taker_status,
                                     taker_resd, taker_exec, taker_order->lots, now)
             || !dbr_journ_insert_trade(journ, match->taker_trade->id,
-                                       match->taker_trade->match,
                                        match->taker_trade->order,
-                                       match->taker_trade->order_rev,
+                                       match->taker_trade->rev,
                                        match->taker_trade->trader.rec->id,
                                        match->taker_trade->accnt.rec->id,
                                        match->taker_trade->accnt.rec->id,
                                        match->taker_trade->settl_date,
                                        match->taker_trade->ref,
-                                       match->taker_trade->cpty.rec->id,
-                                       match->taker_trade->role,
                                        match->taker_trade->action,
                                        match->taker_trade->ticks,
                                        match->taker_trade->resd,
                                        match->taker_trade->exec,
                                        match->taker_trade->lots,
+                                       match->taker_trade->match,
+                                       match->taker_trade->cpty.rec->id,
+                                       match->taker_trade->role,
                                        now))
             goto fail1;
 
@@ -226,21 +226,21 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         if (!dbr_journ_update_order(journ, maker->id, maker_rev, maker_status, maker_resd,
                                     maker_exec, maker->lots, now)
             || !dbr_journ_insert_trade(journ, match->maker_trade->id,
-                                       match->maker_trade->match,
                                        match->maker_trade->order,
-                                       match->maker_trade->order_rev,
+                                       match->maker_trade->rev,
                                        match->maker_trade->trader.rec->id,
                                        match->maker_trade->accnt.rec->id,
                                        match->maker_trade->accnt.rec->id,
                                        match->maker_trade->settl_date,
                                        match->maker_trade->ref,
-                                       match->maker_trade->cpty.rec->id,
-                                       match->maker_trade->role,
                                        match->maker_trade->action,
                                        match->maker_trade->ticks,
                                        match->maker_trade->resd,
                                        match->maker_trade->exec,
                                        match->maker_trade->lots,
+                                       match->maker_trade->match,
+                                       match->maker_trade->cpty.rec->id,
+                                       match->maker_trade->role,
                                        now))
             goto fail1;
 

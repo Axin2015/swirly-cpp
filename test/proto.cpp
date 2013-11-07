@@ -157,8 +157,8 @@ TEST_CASE(proto_trade)
     DbrIden cpty = 13;
     auto now = dbr_millis();
 
-    auto in = create_trade(pool, 1, 2, 3, 4, trader, accnt, contr, 20130827,
-                           "apple", cpty, DBR_TAKER, DBR_BUY, 12345, 0, 10, 10, now);
+    auto in = create_trade(pool, 1, 2, 3, trader, accnt, contr, 20130827, "apple",
+                           DBR_BUY, 12345, 0, 10, 10, 4, cpty, DBR_TAKER, now);
 
     auto len = trade_len(*in, false);
     char buf[len];
@@ -170,21 +170,21 @@ TEST_CASE(proto_trade)
     check(buf + len == end);
 
     check(out.id == in->id);
-    check(out.match == in->match);
     check(out.order == in->order);
-    check(out.order_rev == in->order_rev);
+    check(out.rev == in->rev);
     check(out.trader.id_only == in->trader.id_only);
     check(out.accnt.id_only == in->accnt.id_only);
     check(out.contr.id_only == in->contr.id_only);
     check(out.settl_date == in->settl_date);
     check(sequal(out.ref, in->ref, DBR_REF_MAX));
-    check(out.cpty.id_only == in->cpty.id_only);
-    check(out.role == in->role);
     check(out.action == in->action);
     check(out.ticks == in->ticks);
     check(out.resd == in->resd);
     check(out.exec == in->exec);
     check(out.lots == in->lots);
+    check(out.match == in->match);
+    check(out.cpty.id_only == in->cpty.id_only);
+    check(out.role == in->role);
     check(out.created == in->created);
     check(out.modified == in->modified);
 }

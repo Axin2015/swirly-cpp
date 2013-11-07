@@ -251,10 +251,10 @@ Journ::archive_order(DbrIden id, DbrMillis now) noexcept
 }
 
 DbrBool
-Journ::insert_trade(DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
-                    DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-                    DbrIden cpty, int role, int action, DbrTicks ticks, DbrLots resd,
-                    DbrLots exec, DbrLots lots, DbrMillis now) noexcept
+Journ::insert_trade(DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid, DbrIden cid,
+                    DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots resd,
+                    DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
+                    DbrMillis now) noexcept
 {
     return DBR_TRUE;
 }

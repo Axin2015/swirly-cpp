@@ -171,9 +171,10 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 }
 
 shared_ptr<DbrTrade>
-create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev, DbrIden tid,
-             DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, DbrIden cpty, int role,
-             int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
+create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
+             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
+             DbrMillis now)
 {
     auto deleter = [&pool](DbrTrade* trade) {
         pool.free_trade(trade);
@@ -182,9 +183,8 @@ create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev
     dbr_trade_init(trade.get());
 
     trade->id = id;
-    trade->match = match;
     trade->order = order;
-    trade->order_rev = order_rev;
+    trade->rev = rev;
     trade->trader.id_only = tid;
     trade->accnt.id_only = aid;
     trade->contr.id_only = cid;
@@ -193,13 +193,14 @@ create_trade(Pool& pool, DbrIden id, DbrIden match, DbrIden order, int order_rev
         strncpy(trade->ref, ref, DBR_REF_MAX);
     else
         trade->ref[0] = '\0';
-    trade->cpty.id_only = cpty;
-    trade->role = role;
     trade->action = action;
     trade->ticks = ticks;
     trade->resd = resd;
     trade->exec = exec;
     trade->lots = lots;
+    trade->match = match;
+    trade->cpty.id_only = cpty;
+    trade->role = role;
     trade->created = now;
     trade->modified = now;
 
