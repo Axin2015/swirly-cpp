@@ -18,10 +18,10 @@
 #ifndef DBRPP_RESULT_HPP
 #define DBRPP_RESULT_HPP
 
+#include <dbrpp/exec.hpp>
 #include <dbrpp/iter.hpp>
 #include <dbrpp/order.hpp>
 #include <dbrpp/slnode.hpp>
-#include <dbrpp/trade.hpp>
 
 #include <limits>
 

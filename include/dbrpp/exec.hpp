@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_TRADE_HPP
-#define DBRPP_TRADE_HPP
+#ifndef DBRPP_EXEC_HPP
+#define DBRPP_EXEC_HPP
 
 #include <dbrpp/rec.hpp>
 
@@ -186,4 +186,4 @@ read_trade(const char* buf, DbrTrade& trade)
 }
 } // dbr
 
-#endif // DBRPP_TRADE_HPP
+#endif // DBRPP_EXEC_HPP

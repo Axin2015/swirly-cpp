@@ -19,8 +19,8 @@
 #define DBRPP_JOURN_HPP
 
 #include <dbrpp/except.hpp>
+#include <dbrpp/exec.hpp>
 #include <dbrpp/order.hpp>
-#include <dbrpp/trade.hpp>
 
 #include <dbr/journ.h>
 
