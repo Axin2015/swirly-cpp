@@ -195,8 +195,7 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         taker_resd -= match->lots;
         taker_exec += match->lots;
 
-        const int taker_status = taker_resd == 0 ? DBR_FILLED : DBR_PARTIAL;
-        if (!dbr_journ_update_order(journ, taker_order->id, taker_rev, taker_status,
+        if (!dbr_journ_update_order(journ, taker_order->id, taker_rev, DBR_TRADED,
                                     taker_resd, taker_exec, taker_order->lots, now)
             || !dbr_journ_insert_trade(journ, match->taker_trade->id,
                                        match->taker_trade->order,
@@ -222,8 +221,7 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         const int maker_rev = maker->rev + 1;
         const DbrLots maker_resd = maker->resd - match->lots;
         const DbrLots maker_exec = maker->exec + match->lots;
-        const int maker_status = maker_resd == 0 ? DBR_FILLED : DBR_PARTIAL;
-        if (!dbr_journ_update_order(journ, maker->id, maker_rev, maker_status, maker_resd,
+        if (!dbr_journ_update_order(journ, maker->id, maker_rev, DBR_TRADED, maker_resd,
                                     maker_exec, maker->lots, now)
             || !dbr_journ_insert_trade(journ, match->maker_trade->id,
                                        match->maker_trade->order,
@@ -560,7 +558,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     new_order->id = id;
     new_order->level = NULL;
     new_order->rev = 1;
-    new_order->status = DBR_PLACED;
+    new_order->status = DBR_NEW;
     new_order->trader.rec = fig_trader_rec(trader);
     new_order->accnt.rec = fig_accnt_rec(accnt);
     new_order->contr.rec = book->crec;
@@ -603,10 +601,9 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 
         // Commit taker order.
         new_order->rev += trans.count;
+        new_order->status = DBR_TRADED;
         new_order->resd -= trans.taken;
         new_order->exec += trans.taken;
-
-        new_order->status = dbr_order_done(new_order) ? DBR_FILLED : DBR_PARTIAL;
     }
 
     // Place incomplete order in book.

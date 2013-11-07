@@ -53,7 +53,7 @@ TEST_CASE(side_orders)
     side.place_order(*orange, dbr_millis());
 
     check(apple->rev == 1);
-    check(apple->status == DBR_PLACED);
+    check(apple->status == DBR_NEW);
     check(apple->resd == 10);
     check(apple->exec == 0);
 

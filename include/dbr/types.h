@@ -328,12 +328,11 @@ dbr_posn_entry(struct DbrSlNode* node)
  */
 
 enum DbrStatus {
-    DBR_PLACED = 1,
+    DBR_NEW = 1,
     DBR_REVISED,
     DBR_CANCELLED,
     DBR_REJECTED,
-    DBR_PARTIAL,
-    DBR_FILLED
+    DBR_TRADED
 };
 
 struct DbrOrder {

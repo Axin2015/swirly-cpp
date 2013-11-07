@@ -74,8 +74,8 @@ strstatus(int status) noexcept
 {
     const char* sym;
     switch (status) {
-    case DBR_PLACED:
-        sym = "PLACED";
+    case DBR_NEW:
+        sym = "NEW";
         break;
     case DBR_REVISED:
         sym = "REVISED";
@@ -86,11 +86,8 @@ strstatus(int status) noexcept
     case DBR_REJECTED:
         sym = "REJECTED";
         break;
-    case DBR_PARTIAL:
-        sym = "PARTIAL";
-        break;
-    case DBR_FILLED:
-        sym = "FILLED";
+    case DBR_TRADED:
+        sym = "TRADED";
         break;
     default:
         throw InvalidArgument("status");

@@ -35,9 +35,7 @@ INSERT INTO status (id, mnem) VALUES (3, 'CANCELLED')
 ;
 INSERT INTO status (id, mnem) VALUES (4, 'REJECTED')
 ;
-INSERT INTO status (id, mnem) VALUES (5, 'PARTIAL')
-;
-INSERT INTO status (id, mnem) VALUES (6, 'FILLED')
+INSERT INTO status (id, mnem) VALUES (5, 'TRADED')
 ;
 
 CREATE TABLE action (

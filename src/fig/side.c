@@ -155,7 +155,7 @@ dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta,
     side->last_time = now;
 
     ++order->rev;
-    order->status = order->resd == 0 ? DBR_FILLED : DBR_PARTIAL;
+    order->status = DBR_TRADED;
     order->exec += delta;
     order->modified = now;
 }

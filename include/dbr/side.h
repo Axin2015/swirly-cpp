@@ -86,7 +86,7 @@ dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now
 {
     assert(order->lots > 0 && order->lots >= order->min);
     order->rev = 1;
-    order->status = DBR_PLACED;
+    order->status = DBR_NEW;
     order->resd = order->lots;
     order->exec = 0;
     order->created = now;
