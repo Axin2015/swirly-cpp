@@ -199,7 +199,7 @@ public:
 
 class TraderTrades {
     struct Policy : NodeTraits<DbrRbNode> {
-        typedef DbrTrade Entry;
+        typedef DbrExec Entry;
         static Entry*
         entry(Node* node)
         {

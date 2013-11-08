@@ -43,7 +43,7 @@ main(int argc, char* argv[])
                 cout << OrderRef(ref) << endl;
             cout << ref.mnem() << " trades:" << endl;
             for (auto ref : trader.trades())
-                cout << TradeRef(ref) << endl;
+                cout << ExecRef(ref) << endl;
         }
 
         cout << "accnts:\n";

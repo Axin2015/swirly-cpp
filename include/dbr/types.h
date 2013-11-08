@@ -411,7 +411,7 @@ enum DbrRole {
     DBR_TAKER
 };
 
-struct DbrTrade {
+struct DbrExec {
     /**
      * @publicsection
      */
@@ -450,17 +450,17 @@ struct DbrTrade {
 };
 
 static inline void
-dbr_trade_init(struct DbrTrade* trade)
+dbr_exec_init(struct DbrExec* exec)
 {
-    dbr_slnode_init(&trade->entity_node_);
-    dbr_rbnode_init(&trade->trader_node_);
-    dbr_slnode_init(&trade->result_node_);
+    dbr_slnode_init(&exec->entity_node_);
+    dbr_rbnode_init(&exec->trader_node_);
+    dbr_slnode_init(&exec->result_node_);
 }
 
-static inline struct DbrTrade*
-dbr_trade_entry(struct DbrSlNode* node)
+static inline struct DbrExec*
+dbr_exec_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrTrade, entity_node_, node);
+    return dbr_implof(struct DbrExec, entity_node_, node);
 }
 
 struct DbrMatch {
@@ -474,8 +474,8 @@ struct DbrMatch {
     DbrTicks ticks;
     // Must be greater than zero.
     DbrLots lots;
-    struct DbrTrade* taker_trade;
-    struct DbrTrade* maker_trade;
+    struct DbrExec* taker_exec;
+    struct DbrExec* maker_exec;
     /**
      * @privatesection
      */
@@ -525,10 +525,10 @@ dbr_result_posn_entry(struct DbrSlNode* node)
     return dbr_implof(struct DbrPosn, result_node_, node);
 }
 
-static inline struct DbrTrade*
+static inline struct DbrExec*
 dbr_result_trade_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrTrade, result_node_, node);
+    return dbr_implof(struct DbrExec, result_node_, node);
 }
 
 /** @} */

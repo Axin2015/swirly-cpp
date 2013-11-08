@@ -71,14 +71,14 @@ enrich_order(struct FigCache* cache, struct DbrOrder* order)
     return order;
 }
 
-static inline struct DbrTrade*
-enrich_trade(struct FigCache* cache, struct DbrTrade* trade)
+static inline struct DbrExec*
+enrich_trade(struct FigCache* cache, struct DbrExec* exec)
 {
-    trade->trader.rec = get_id(cache, DBR_TRADER, trade->trader.id_only);
-    trade->accnt.rec = get_id(cache, DBR_ACCNT, trade->accnt.id_only);
-    trade->contr.rec = get_id(cache, DBR_CONTR, trade->contr.id_only);
-    trade->cpty.rec = get_id(cache, DBR_ACCNT, trade->cpty.id_only);
-    return trade;
+    exec->trader.rec = get_id(cache, DBR_TRADER, exec->trader.id_only);
+    exec->accnt.rec = get_id(cache, DBR_ACCNT, exec->accnt.id_only);
+    exec->contr.rec = get_id(cache, DBR_CONTR, exec->contr.id_only);
+    exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
+    return exec;
 }
 
 static inline struct DbrMemb*
@@ -178,9 +178,9 @@ emplace_trades(DbrClnt clnt, const char* mnem)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrTrade* trade = enrich_trade(&clnt->cache, dbr_trade_entry(node));
+        struct DbrExec* exec = enrich_trade(&clnt->cache, dbr_exec_entry(node));
         // Transfer ownership.
-        fig_trader_emplace_trade(clnt->trader, trade);
+        fig_trader_emplace_trade(clnt->trader, exec);
     }
     return true;
 }
@@ -352,9 +352,9 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     msg.result_rep.first_posn = q.first;
 
     for (struct DbrSlNode* node = msg.result_rep.first_trade; node; node = node->next) {
-        struct DbrTrade* trade = enrich_trade(&clnt->cache, dbr_trade_entry(node));
+        struct DbrExec* exec = enrich_trade(&clnt->cache, dbr_exec_entry(node));
         // Transfer ownership.
-        fig_trader_emplace_trade(clnt->trader, trade);
+        fig_trader_emplace_trade(clnt->trader, exec);
     }
 
     return msg.result_rep.new_order;

@@ -60,7 +60,7 @@ struct DbrMsg {
             // dbr_rec_entry()
             // dbr_order_entry()
             // dbr_memb_entry()
-            // dbr_trade_entry()
+            // dbr_exec_entry()
             // dbr_posn_entry()
             struct DbrSlNode* first;
             /**

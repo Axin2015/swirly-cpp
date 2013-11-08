@@ -135,7 +135,7 @@ public:
 
 class ResultTrades {
     struct Policy : NodeTraits<DbrSlNode> {
-        typedef DbrTrade Entry;
+        typedef DbrExec Entry;
         static Entry*
         entry(Node* node)
         {

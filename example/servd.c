@@ -145,8 +145,8 @@ sess_trade(const struct DbrMsg* req)
     struct DbrQueue q = DBR_QUEUE_INIT(q);
     for (struct DbrRbNode* node = dbr_trader_first_trade(trader);
          node != DBR_TRADER_END_TRADE; node = dbr_rbnode_next(node)) {
-        struct DbrTrade* trade = dbr_trader_trade_entry(node);
-        dbr_queue_insert_back(&q, &trade->entity_node_);
+        struct DbrExec* exec = dbr_trader_trade_entry(node);
+        dbr_queue_insert_back(&q, &exec->entity_node_);
     }
     rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;

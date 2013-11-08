@@ -37,14 +37,14 @@ free_orders(struct FigTrader* trader)
 }
 
 static void
-free_trades(struct FigTrader* trader)
+free_execs(struct FigTrader* trader)
 {
     assert(trader);
     struct DbrRbNode* node;
     while ((node = trader->trades.root)) {
-        struct DbrTrade* trade = dbr_trader_trade_entry(node);
+        struct DbrExec* exec = dbr_trader_trade_entry(node);
         dbr_tree_remove(&trader->trades, node);
-        dbr_pool_free_trade(trader->pool, trade);
+        dbr_pool_free_exec(trader->pool, exec);
     }
 }
 
@@ -93,7 +93,7 @@ fig_trader_term(struct DbrRec* trec)
     if (trader) {
         trec->trader.state = NULL;
         free_membs(trader);
-        free_trades(trader);
+        free_execs(trader);
         free_orders(trader);
         free(trader);
     }

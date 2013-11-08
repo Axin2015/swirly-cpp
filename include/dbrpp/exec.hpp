@@ -22,30 +22,30 @@
 
 namespace dbr {
 
-class TradeRef {
-    DbrTrade* impl_;
+class ExecRef {
+    DbrExec* impl_;
 public:
     explicit
-    TradeRef(DbrTrade& impl) noexcept
+    ExecRef(DbrExec& impl) noexcept
         : impl_{&impl}
     {
     }
-    operator DbrTrade&() const noexcept
+    operator DbrExec&() const noexcept
     {
         return *impl_;
     }
-    DbrTrade*
+    DbrExec*
     c_arg() const noexcept
     {
         return impl_;
     }
     bool
-    operator ==(TradeRef rhs) const noexcept
+    operator ==(ExecRef rhs) const noexcept
     {
         return impl_->id == rhs.impl_->id;
     }
     bool
-    operator !=(TradeRef rhs) const noexcept
+    operator !=(ExecRef rhs) const noexcept
     {
         return impl_->id != rhs.impl_->id;
     }
@@ -142,44 +142,44 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, TradeRef trade)
+operator <<(std::ostream& os, ExecRef exec)
 {
-    return os << "id=" << trade.id()
-              << ",order=" << trade.order()
-              << ",rev=" << trade.rev()
-              << ",trec=" << trade.trec().mnem()
-              << ",arec=" << trade.arec().mnem()
-              << ",crec=" << trade.crec().mnem()
-              << ",settl_date=" << trade.settl_date()
-              << ",ref=" << trade.ref()
-              << ",action=" << trade.action()
-              << ",ticks=" << trade.ticks()
-              << ",resd=" << trade.resd()
-              << ",exec=" << trade.exec()
-              << ",lots=" << trade.lots()
-              << ",match=" << trade.match()
-              << ",cpty=" << trade.cpty().mnem()
-              << ",role=" << trade.role()
-              << ",created=" << trade.created()
-              << ",modified=" << trade.modified();
+    return os << "id=" << exec.id()
+              << ",order=" << exec.order()
+              << ",rev=" << exec.rev()
+              << ",trec=" << exec.trec().mnem()
+              << ",arec=" << exec.arec().mnem()
+              << ",crec=" << exec.crec().mnem()
+              << ",settl_date=" << exec.settl_date()
+              << ",ref=" << exec.ref()
+              << ",action=" << exec.action()
+              << ",ticks=" << exec.ticks()
+              << ",resd=" << exec.resd()
+              << ",exec=" << exec.exec()
+              << ",lots=" << exec.lots()
+              << ",match=" << exec.match()
+              << ",cpty=" << exec.cpty().mnem()
+              << ",role=" << exec.role()
+              << ",created=" << exec.created()
+              << ",modified=" << exec.modified();
 }
 
 inline size_t
-trade_len(const DbrTrade& trade, DbrBool enriched) noexcept
+exec_len(const DbrExec& exec, DbrBool enriched) noexcept
 {
-    return dbr_trade_len(&trade, enriched);
+    return dbr_exec_len(&exec, enriched);
 }
 
 inline char*
-write_trade(char* buf, const DbrTrade& trade, DbrBool enriched) noexcept
+write_exec(char* buf, const DbrExec& exec, DbrBool enriched) noexcept
 {
-    return dbr_write_trade(buf, &trade, enriched);
+    return dbr_write_exec(buf, &exec, enriched);
 }
 
 inline const char*
-read_trade(const char* buf, DbrTrade& trade)
+read_exec(const char* buf, DbrExec& exec)
 {
-    buf = dbr_read_trade(buf, &trade);
+    buf = dbr_read_exec(buf, &exec);
     if (!buf)
         throw_exception();
     return buf;

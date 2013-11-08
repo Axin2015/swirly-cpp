@@ -135,7 +135,7 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug2("%zu large nodes per block:", pool->large.nodes_per_block);
     dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
     dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
-    dbr_log_debug2("sizeof DbrTrade=%zu", sizeof(struct DbrTrade));
+    dbr_log_debug2("sizeof DbrExec=%zu", sizeof(struct DbrExec));
     dbr_log_debug2("sizeof DbrStmt=%zu", sizeof(struct DbrStmt));
 #endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
@@ -366,16 +366,16 @@ dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
     elm_pool_free_order(pool, order);
 }
 
-DBR_API struct DbrTrade*
-dbr_pool_alloc_trade(DbrPool pool)
+DBR_API struct DbrExec*
+dbr_pool_alloc_exec(DbrPool pool)
 {
-    return elm_pool_alloc_trade(pool);
+    return elm_pool_alloc_exec(pool);
 }
 
 DBR_API void
-dbr_pool_free_trade(DbrPool pool, struct DbrTrade* trade)
+dbr_pool_free_exec(DbrPool pool, struct DbrExec* exec)
 {
-    elm_pool_free_trade(pool, trade);
+    elm_pool_free_exec(pool, exec);
 }
 
 DBR_API struct DbrMemb*
@@ -437,9 +437,9 @@ dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first)
         break;
     case DBR_TRADE:
         while (node) {
-            struct DbrTrade* trade = dbr_trade_entry(node);
+            struct DbrExec* exec = dbr_exec_entry(node);
             node = node->next;
-            dbr_pool_free_trade(pool, trade);
+            dbr_pool_free_exec(pool, exec);
         }
         break;
     case DBR_MEMB:

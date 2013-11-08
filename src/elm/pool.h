@@ -77,7 +77,7 @@ struct ElmLargeNode {
         // Large data structures.
         struct DbrRec rec;
         struct DbrOrder order;
-        struct DbrTrade trade;
+        struct DbrExec exec;
         struct DbrStmt stmt;
     };
 #if !defined(DBR_DEBUG_ALLOC)
@@ -180,17 +180,17 @@ elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
     elm_pool_free_large(pool, node);
 }
 
-static inline struct DbrTrade*
-elm_pool_alloc_trade(struct ElmPool* pool)
+static inline struct DbrExec*
+elm_pool_alloc_exec(struct ElmPool* pool)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool);
-    return node ? &node->trade : NULL;
+    return node ? &node->exec : NULL;
 }
 
 static inline void
-elm_pool_free_trade(struct ElmPool* pool, struct DbrTrade* trade)
+elm_pool_free_exec(struct ElmPool* pool, struct DbrExec* exec)
 {
-    struct ElmLargeNode* node = (struct ElmLargeNode*)trade;
+    struct ElmLargeNode* node = (struct ElmLargeNode*)exec;
     elm_pool_free_large(pool, node);
 }
 
@@ -308,19 +308,19 @@ elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
     elm_pool_free_large(pool, node);
 }
 
-static inline struct DbrTrade*
-elm_pool_alloc_trade_(struct ElmPool* pool, const char* file, int line)
+static inline struct DbrExec*
+elm_pool_alloc_exec_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
-    dbr_log_debug3("allocating trade %p in %s at %d", node, file, line);
-    return node ? &node->trade : NULL;
+    dbr_log_debug3("allocating exec %p in %s at %d", node, file, line);
+    return node ? &node->exec : NULL;
 }
 
 static inline void
-elm_pool_free_trade(struct ElmPool* pool, struct DbrTrade* trade)
+elm_pool_free_exec(struct ElmPool* pool, struct DbrExec* exec)
 {
-    struct ElmLargeNode* node = (struct ElmLargeNode*)trade;
-    dbr_log_debug3("freeing trade %p from %s at %d", node, node->file, node->line);
+    struct ElmLargeNode* node = (struct ElmLargeNode*)exec;
+    dbr_log_debug3("freeing exec %p from %s at %d", node, node->file, node->line);
     elm_pool_free_large(pool, node);
 }
 
@@ -380,8 +380,8 @@ elm_pool_free_stmt(struct ElmPool* pool, struct DbrStmt* stmt)
     elm_pool_alloc_match_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_order(pool)                  \
     elm_pool_alloc_order_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_trade(pool)                  \
-    elm_pool_alloc_trade_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_exec(pool)                   \
+    elm_pool_alloc_exec_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_memb(pool)                   \
     elm_pool_alloc_memb_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_posn(pool)                   \

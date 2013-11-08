@@ -77,14 +77,14 @@ enrich_order(struct FigCache* cache, struct DbrOrder* order)
     return order;
 }
 
-static inline struct DbrTrade*
-enrich_trade(struct FigCache* cache, struct DbrTrade* trade)
+static inline struct DbrExec*
+enrich_trade(struct FigCache* cache, struct DbrExec* exec)
 {
-    trade->trader.rec = get_id(cache, DBR_TRADER, trade->trader.id_only);
-    trade->accnt.rec = get_id(cache, DBR_ACCNT, trade->accnt.id_only);
-    trade->contr.rec = get_id(cache, DBR_CONTR, trade->contr.id_only);
-    trade->cpty.rec = get_id(cache, DBR_ACCNT, trade->cpty.id_only);
-    return trade;
+    exec->trader.rec = get_id(cache, DBR_TRADER, exec->trader.id_only);
+    exec->accnt.rec = get_id(cache, DBR_ACCNT, exec->accnt.id_only);
+    exec->contr.rec = get_id(cache, DBR_CONTR, exec->contr.id_only);
+    exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
+    return exec;
 }
 
 static inline struct DbrMemb*
@@ -149,23 +149,23 @@ free_matches(struct DbrSlNode* first, DbrPool pool)
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
-        dbr_pool_free_trade(pool, match->taker_trade);
-        dbr_pool_free_trade(pool, match->maker_trade);
+        dbr_pool_free_exec(pool, match->taker_exec);
+        dbr_pool_free_exec(pool, match->maker_exec);
         dbr_pool_free_match(pool, match);
     }
 }
 
 static inline void
-apply_posn(struct DbrPosn* posn, const struct DbrTrade* trade)
+apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
 {
-    const double licks = trade->lots * trade->ticks;
-    if (trade->action == DBR_BUY) {
+    const double licks = exec->lots * exec->ticks;
+    if (exec->action == DBR_BUY) {
         posn->buy_licks += licks;
-        posn->buy_lots += trade->lots;
+        posn->buy_lots += exec->lots;
     } else {
-        assert(trade->action == DBR_SELL);
+        assert(exec->action == DBR_SELL);
         posn->sell_licks += licks;
-        posn->sell_lots += trade->lots;
+        posn->sell_lots += exec->lots;
     }
 }
 
@@ -197,22 +197,22 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
 
         if (!dbr_journ_update_order(journ, taker_order->id, taker_rev, DBR_TRADED,
                                     taker_resd, taker_exec, taker_order->lots, now)
-            || !dbr_journ_insert_trade(journ, match->taker_trade->id,
-                                       match->taker_trade->order,
-                                       match->taker_trade->rev,
-                                       match->taker_trade->trader.rec->id,
-                                       match->taker_trade->accnt.rec->id,
-                                       match->taker_trade->accnt.rec->id,
-                                       match->taker_trade->settl_date,
-                                       match->taker_trade->ref,
-                                       match->taker_trade->action,
-                                       match->taker_trade->ticks,
-                                       match->taker_trade->resd,
-                                       match->taker_trade->exec,
-                                       match->taker_trade->lots,
-                                       match->taker_trade->match,
-                                       match->taker_trade->cpty.rec->id,
-                                       match->taker_trade->role,
+            || !dbr_journ_insert_trade(journ, match->taker_exec->id,
+                                       match->taker_exec->order,
+                                       match->taker_exec->rev,
+                                       match->taker_exec->trader.rec->id,
+                                       match->taker_exec->accnt.rec->id,
+                                       match->taker_exec->accnt.rec->id,
+                                       match->taker_exec->settl_date,
+                                       match->taker_exec->ref,
+                                       match->taker_exec->action,
+                                       match->taker_exec->ticks,
+                                       match->taker_exec->resd,
+                                       match->taker_exec->exec,
+                                       match->taker_exec->lots,
+                                       match->taker_exec->match,
+                                       match->taker_exec->cpty.rec->id,
+                                       match->taker_exec->role,
                                        now))
             goto fail1;
 
@@ -223,22 +223,22 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         const DbrLots maker_exec = maker->exec + match->lots;
         if (!dbr_journ_update_order(journ, maker->id, maker_rev, DBR_TRADED, maker_resd,
                                     maker_exec, maker->lots, now)
-            || !dbr_journ_insert_trade(journ, match->maker_trade->id,
-                                       match->maker_trade->order,
-                                       match->maker_trade->rev,
-                                       match->maker_trade->trader.rec->id,
-                                       match->maker_trade->accnt.rec->id,
-                                       match->maker_trade->accnt.rec->id,
-                                       match->maker_trade->settl_date,
-                                       match->maker_trade->ref,
-                                       match->maker_trade->action,
-                                       match->maker_trade->ticks,
-                                       match->maker_trade->resd,
-                                       match->maker_trade->exec,
-                                       match->maker_trade->lots,
-                                       match->maker_trade->match,
-                                       match->maker_trade->cpty.rec->id,
-                                       match->maker_trade->role,
+            || !dbr_journ_insert_trade(journ, match->maker_exec->id,
+                                       match->maker_exec->order,
+                                       match->maker_exec->rev,
+                                       match->maker_exec->trader.rec->id,
+                                       match->maker_exec->accnt.rec->id,
+                                       match->maker_exec->accnt.rec->id,
+                                       match->maker_exec->settl_date,
+                                       match->maker_exec->ref,
+                                       match->maker_exec->action,
+                                       match->maker_exec->ticks,
+                                       match->maker_exec->resd,
+                                       match->maker_exec->exec,
+                                       match->maker_exec->lots,
+                                       match->maker_exec->match,
+                                       match->maker_exec->cpty.rec->id,
+                                       match->maker_exec->role,
                                        now))
             goto fail1;
 
@@ -294,14 +294,14 @@ commit_result(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Maker updated first because this is consistent with last-look semantics.
 
         // Update maker.
-        fig_trader_emplace_trade(maker, match->maker_trade);
-        apply_posn(match->maker_posn, match->maker_trade);
-        dbr_queue_insert_back(&tq, &match->maker_trade->result_node_);
+        fig_trader_emplace_trade(maker, match->maker_exec);
+        apply_posn(match->maker_posn, match->maker_exec);
+        dbr_queue_insert_back(&tq, &match->maker_exec->result_node_);
 
         // Update taker.
-        fig_trader_emplace_trade(taker, match->taker_trade);
-        apply_posn(trans->new_posn, match->taker_trade);
-        dbr_queue_insert_back(&tq, &match->taker_trade->result_node_);
+        fig_trader_emplace_trade(taker, match->taker_exec);
+        apply_posn(trans->new_posn, match->taker_exec);
+        dbr_queue_insert_back(&tq, &match->taker_exec->result_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
@@ -376,21 +376,21 @@ emplace_trades(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrTrade* trade = enrich_trade(&serv->cache, dbr_trade_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(trade->trader.rec, &serv->index, serv->pool);
+        struct DbrExec* exec = enrich_trade(&serv->cache, dbr_exec_entry(node));
+        struct FigTrader* trader = fig_trader_lazy(exec->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
         // Transfer ownership.
-        fig_trader_emplace_trade(trader, trade);
+        fig_trader_emplace_trade(trader, exec);
     }
     return true;
  fail2:
     // Free tail.
     do {
-        struct DbrTrade* trade = dbr_trade_entry(node);
+        struct DbrExec* exec = dbr_exec_entry(node);
         node = node->next;
-        dbr_pool_free_trade(serv->pool, trade);
+        dbr_pool_free_exec(serv->pool, exec);
     } while (node);
  fail1:
     return false;
@@ -820,9 +820,9 @@ dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 
     // No need to update timestamps on trade because it is immediately freed.
 
-    struct DbrTrade* trade = dbr_trader_trade_entry(node);
-    fig_trader_release_trade(trader, trade);
-    dbr_pool_free_trade(serv->pool, trade);
+    struct DbrExec* exec = dbr_trader_trade_entry(node);
+    fig_trader_release_trade(trader, exec);
+    dbr_pool_free_exec(serv->pool, exec);
     return true;
  fail1:
     return false;

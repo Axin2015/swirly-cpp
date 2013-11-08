@@ -160,13 +160,13 @@ TEST_CASE(proto_trade)
     auto in = create_trade(pool, 1, 2, 3, trader, accnt, contr, 20130827, "apple",
                            DBR_BUY, 12345, 0, 10, 10, 4, cpty, DBR_TAKER, now);
 
-    auto len = trade_len(*in, false);
+    auto len = exec_len(*in, false);
     char buf[len];
-    const char* end = write_trade(buf, *in, false);
+    const char* end = write_exec(buf, *in, false);
     check(buf + len == end);
 
-    DbrTrade out;
-    end = read_trade(buf, out);
+    DbrExec out;
+    end = read_exec(buf, out);
     check(buf + len == end);
 
     check(out.id == in->id);

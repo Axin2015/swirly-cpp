@@ -70,10 +70,10 @@ dbr_trader_empty_order(DbrTrader trader);
 
 #define DBR_TRADER_END_TRADE NULL
 
-static inline struct DbrTrade*
+static inline struct DbrExec*
 dbr_trader_trade_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrTrade, trader_node_, node);
+    return dbr_implof(struct DbrExec, trader_node_, node);
 }
 
 DBR_API struct DbrRbNode*

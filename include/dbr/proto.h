@@ -25,7 +25,7 @@
 struct DbrRec;
 struct DbrOrder;
 struct DbrMemb;
-struct DbrTrade;
+struct DbrExec;
 struct DbrPosn;
 struct DbrStmt;
 
@@ -93,16 +93,16 @@ dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order);
 
-// Trade.
+// Exec.
 
 DBR_API size_t
-dbr_trade_len(const struct DbrTrade* trade, DbrBool enriched);
+dbr_exec_len(const struct DbrExec* exec, DbrBool enriched);
 
 DBR_API char*
-dbr_write_trade(char* buf, const struct DbrTrade* trade, DbrBool enriched);
+dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
 
 DBR_API const char*
-dbr_read_trade(const char* buf, struct DbrTrade* trade);
+dbr_read_exec(const char* buf, struct DbrExec* exec);
 
 // Memb.
 

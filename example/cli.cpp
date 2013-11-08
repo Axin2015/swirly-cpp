@@ -674,8 +674,8 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto trade : result.trades()) {
-            TradeRef ref(trade);
+        for (auto exec : result.trades()) {
+            ExecRef ref(exec);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << gtol(ref.order())
                  << '|' << left << setw(10) << ref.trec().mnem()
@@ -831,8 +831,8 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto trade : trader.trades()) {
-            TradeRef ref(trade);
+        for (auto exec : trader.trades()) {
+            ExecRef ref(exec);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << gtol(ref.order())
                  << '|' << left << setw(10) << ref.trec().mnem()

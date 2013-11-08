@@ -129,18 +129,18 @@ public:
     {
         dbr_pool_free_order(impl_, order);
     }
-    DbrTrade*
-    alloc_trade()
+    DbrExec*
+    alloc_exec()
     {
-        DbrTrade* const trade = dbr_pool_alloc_trade(impl_);
-        if (!trade)
+        DbrExec* const exec = dbr_pool_alloc_exec(impl_);
+        if (!exec)
             throw_exception();
-        return trade;
+        return exec;
     }
     void
-    free_trade(DbrTrade* trade) noexcept
+    free_exec(DbrExec* exec) noexcept
     {
-        dbr_pool_free_trade(impl_, trade);
+        dbr_pool_free_exec(impl_, exec);
     }
     DbrMemb*
     alloc_memb()

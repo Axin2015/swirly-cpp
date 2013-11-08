@@ -52,9 +52,9 @@ free_result_trades(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
-        struct DbrTrade* trade = dbr_result_trade_entry(node);
+        struct DbrExec* exec = dbr_result_trade_entry(node);
         node = node->next;
-        dbr_pool_free_trade(pool, trade);
+        dbr_pool_free_exec(pool, exec);
     }
 }
 
@@ -136,14 +136,14 @@ read_entity_order(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_entity_trade(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
-    if (!trade)
+    struct DbrExec* exec = dbr_pool_alloc_exec(pool);
+    if (!exec)
         goto fail1;
-    if (!(buf = dbr_read_trade(buf, trade))) {
-        dbr_pool_free_trade(pool, trade);
+    if (!(buf = dbr_read_exec(buf, exec))) {
+        dbr_pool_free_exec(pool, exec);
         goto fail1;
     }
-    dbr_queue_insert_back(queue, &trade->entity_node_);
+    dbr_queue_insert_back(queue, &exec->entity_node_);
     return buf;
  fail1:
     return NULL;
@@ -216,14 +216,14 @@ read_result_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_result_trade(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrTrade* trade = dbr_pool_alloc_trade(pool);
-    if (!trade)
+    struct DbrExec* exec = dbr_pool_alloc_exec(pool);
+    if (!exec)
         goto fail1;
-    if (!(buf = dbr_read_trade(buf, trade))) {
-        dbr_pool_free_trade(pool, trade);
+    if (!(buf = dbr_read_exec(buf, exec))) {
+        dbr_pool_free_exec(pool, exec);
         goto fail1;
     }
-    dbr_queue_insert_back(queue, &trade->result_node_);
+    dbr_queue_insert_back(queue, &exec->result_node_);
     return buf;
  fail1:
     return NULL;
@@ -274,8 +274,8 @@ dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
             break;
         case DBR_TRADE:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
-                struct DbrTrade* trade = dbr_trade_entry(node);
-                n += dbr_trade_len(trade, enriched);
+                struct DbrExec* exec = dbr_exec_entry(node);
+                n += dbr_exec_len(exec, enriched);
                 ++msg->entity_rep.count_;
             }
             break;
@@ -311,8 +311,8 @@ dbr_msg_len(struct DbrMsg* msg, DbrBool enriched)
         msg->result_rep.trade_count_ = 0;
         for (struct DbrSlNode* node = msg->result_rep.first_trade;
              node; node = node->next) {
-            struct DbrTrade* trade = dbr_result_trade_entry(node);
-            n += dbr_trade_len(trade, enriched);
+            struct DbrExec* exec = dbr_result_trade_entry(node);
+            n += dbr_exec_len(exec, enriched);
             ++msg->result_rep.trade_count_;
         }
         n += dbr_packlenz(msg->result_rep.trade_count_);
@@ -429,8 +429,8 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
             break;
         case DBR_TRADE:
             for (struct DbrSlNode* node = msg->entity_rep.first; node; node = node->next) {
-                struct DbrTrade* trade = dbr_trade_entry(node);
-                buf = dbr_write_trade(buf, trade, enriched);
+                struct DbrExec* exec = dbr_exec_entry(node);
+                buf = dbr_write_exec(buf, exec, enriched);
             }
             break;
         case DBR_MEMB:
@@ -460,8 +460,8 @@ dbr_write_msg(char* buf, const struct DbrMsg* msg, DbrBool enriched)
         buf = dbr_packz(buf, msg->result_rep.trade_count_);
         for (struct DbrSlNode* node = msg->result_rep.first_trade;
              node; node = node->next) {
-            struct DbrTrade* trade = dbr_result_trade_entry(node);
-            buf = dbr_write_trade(buf, trade, enriched);
+            struct DbrExec* exec = dbr_result_trade_entry(node);
+            buf = dbr_write_exec(buf, exec, enriched);
         }
         break;
     case DBR_ORDER_REP:

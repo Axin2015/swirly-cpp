@@ -170,41 +170,41 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     return order;
 }
 
-shared_ptr<DbrTrade>
+shared_ptr<DbrExec>
 create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
              DbrMillis now)
 {
-    auto deleter = [&pool](DbrTrade* trade) {
-        pool.free_trade(trade);
+    auto deleter = [&pool](DbrExec* exec) {
+        pool.free_exec(exec);
     };
-    std::shared_ptr<DbrTrade> trade(pool.alloc_trade(), deleter);
-    dbr_trade_init(trade.get());
+    std::shared_ptr<DbrExec> ptr(pool.alloc_exec(), deleter);
+    dbr_exec_init(ptr.get());
 
-    trade->id = id;
-    trade->order = order;
-    trade->rev = rev;
-    trade->trader.id_only = tid;
-    trade->accnt.id_only = aid;
-    trade->contr.id_only = cid;
-    trade->settl_date = settl_date;
+    ptr->id = id;
+    ptr->order = order;
+    ptr->rev = rev;
+    ptr->trader.id_only = tid;
+    ptr->accnt.id_only = aid;
+    ptr->contr.id_only = cid;
+    ptr->settl_date = settl_date;
     if (ref)
-        strncpy(trade->ref, ref, DBR_REF_MAX);
+        strncpy(ptr->ref, ref, DBR_REF_MAX);
     else
-        trade->ref[0] = '\0';
-    trade->action = action;
-    trade->ticks = ticks;
-    trade->resd = resd;
-    trade->exec = exec;
-    trade->lots = lots;
-    trade->match = match;
-    trade->cpty.id_only = cpty;
-    trade->role = role;
-    trade->created = now;
-    trade->modified = now;
+        ptr->ref[0] = '\0';
+    ptr->action = action;
+    ptr->ticks = ticks;
+    ptr->resd = resd;
+    ptr->exec = exec;
+    ptr->lots = lots;
+    ptr->match = match;
+    ptr->cpty.id_only = cpty;
+    ptr->role = role;
+    ptr->created = now;
+    ptr->modified = now;
 
-    return trade;
+    return ptr;
 }
 
 shared_ptr<DbrMemb>

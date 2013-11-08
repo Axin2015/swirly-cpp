@@ -44,8 +44,8 @@ free_matches(struct DbrSlNode* first, DbrPool pool)
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
-        dbr_pool_free_trade(pool, match->taker_trade);
-        dbr_pool_free_trade(pool, match->maker_trade);
+        dbr_pool_free_exec(pool, match->taker_exec);
+        dbr_pool_free_exec(pool, match->maker_exec);
         dbr_pool_free_match(pool, match);
     }
 }
@@ -117,22 +117,22 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         }
 
         const DbrIden taker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* taker_trade = dbr_pool_alloc_trade(pool);
-        if (!taker_trade) {
+        struct DbrExec* taker_exec = dbr_pool_alloc_exec(pool);
+        if (!taker_exec) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
-        dbr_trade_init(taker_trade);
+        dbr_exec_init(taker_exec);
 
         const DbrIden maker_id = dbr_journ_alloc_id(journ);
-        struct DbrTrade* maker_trade = dbr_pool_alloc_trade(pool);
-        if (!maker_trade) {
-            dbr_pool_free_trade(pool, taker_trade);
+        struct DbrExec* maker_exec = dbr_pool_alloc_exec(pool);
+        if (!maker_exec) {
+            dbr_pool_free_exec(pool, taker_exec);
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
-        dbr_trade_init(maker_trade);
+        dbr_exec_init(maker_exec);
 
         match->id = match_id;
         match->maker_order = maker;
@@ -146,47 +146,47 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         const DbrMillis now = taker->created;
 
         // Taker trade.
-        taker_trade->id = taker_id;
-        taker_trade->order = taker->id;
-        taker_trade->rev = taker->rev + 1;
-        taker_trade->trader.rec = taker->trader.rec;
-        taker_trade->accnt.rec = taker->accnt.rec;
-        taker_trade->contr.rec = crec;
-        taker_trade->settl_date = settl_date;
-        strncpy(taker_trade->ref, taker->ref, DBR_REF_MAX);
-        taker_trade->action = taker->action;
-        taker_trade->ticks = match->ticks;
-        taker_trade->resd = taker->resd - taken;
-        taker_trade->exec = taker->exec + taken;
-        taker_trade->lots = match->lots;
-        taker_trade->match = match->id;
-        taker_trade->cpty.rec = maker->accnt.rec;
-        taker_trade->role = DBR_TAKER;
-        taker_trade->created = now;
-        taker_trade->modified = now;
+        taker_exec->id = taker_id;
+        taker_exec->order = taker->id;
+        taker_exec->rev = taker->rev + 1;
+        taker_exec->trader.rec = taker->trader.rec;
+        taker_exec->accnt.rec = taker->accnt.rec;
+        taker_exec->contr.rec = crec;
+        taker_exec->settl_date = settl_date;
+        strncpy(taker_exec->ref, taker->ref, DBR_REF_MAX);
+        taker_exec->action = taker->action;
+        taker_exec->ticks = match->ticks;
+        taker_exec->resd = taker->resd - taken;
+        taker_exec->exec = taker->exec + taken;
+        taker_exec->lots = match->lots;
+        taker_exec->match = match->id;
+        taker_exec->cpty.rec = maker->accnt.rec;
+        taker_exec->role = DBR_TAKER;
+        taker_exec->created = now;
+        taker_exec->modified = now;
 
         // Maker trade.
-        maker_trade->id = maker_id;
-        maker_trade->order = maker->id;
-        maker_trade->rev = maker->rev + 1;
-        maker_trade->trader.rec = maker->trader.rec;
-        maker_trade->accnt.rec = maker->accnt.rec;
-        maker_trade->contr.rec = crec;
-        maker_trade->settl_date = settl_date;
-        strncpy(maker_trade->ref, maker->ref, DBR_REF_MAX);
-        maker_trade->action = maker->action;
-        maker_trade->ticks = match->ticks;
-        maker_trade->resd = maker->resd - match->lots;
-        maker_trade->exec = maker->exec + match->lots;
-        maker_trade->lots = match->lots;
-        maker_trade->match = match->id;
-        maker_trade->cpty.rec = taker->accnt.rec;
-        maker_trade->role = DBR_MAKER;
-        maker_trade->created = now;
-        maker_trade->modified = now;
+        maker_exec->id = maker_id;
+        maker_exec->order = maker->id;
+        maker_exec->rev = maker->rev + 1;
+        maker_exec->trader.rec = maker->trader.rec;
+        maker_exec->accnt.rec = maker->accnt.rec;
+        maker_exec->contr.rec = crec;
+        maker_exec->settl_date = settl_date;
+        strncpy(maker_exec->ref, maker->ref, DBR_REF_MAX);
+        maker_exec->action = maker->action;
+        maker_exec->ticks = match->ticks;
+        maker_exec->resd = maker->resd - match->lots;
+        maker_exec->exec = maker->exec + match->lots;
+        maker_exec->lots = match->lots;
+        maker_exec->match = match->id;
+        maker_exec->cpty.rec = taker->accnt.rec;
+        maker_exec->role = DBR_MAKER;
+        maker_exec->created = now;
+        maker_exec->modified = now;
 
-        match->taker_trade = taker_trade;
-        match->maker_trade = maker_trade;
+        match->taker_exec = taker_exec;
+        match->maker_exec = maker_exec;
 
         dbr_queue_insert_back(&mq, &match->trans_node_);
     }
