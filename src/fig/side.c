@@ -53,18 +53,18 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
 }
 
 static inline void
-reduce(struct DbrSide* side, struct DbrOrder* order, DbrLots delta)
+reduce(struct DbrSide* side, struct DbrOrder* order, DbrLots lots)
 {
     assert(order);
     assert(order->level);
-    assert(delta >= 0 && delta <= order->resd);
+    assert(lots >= 0 && lots <= order->resd);
 
-    if (delta < order->resd) {
-        // Reduce level and order by delta.
-        order->level->resd -= delta;
-        order->resd -= delta;
+    if (lots < order->resd) {
+        // Reduce level and order by lots.
+        order->level->resd -= lots;
+        order->resd -= lots;
     } else {
-        assert(delta == order->resd);
+        assert(lots == order->resd);
         dbr_side_remove_order(side, order);
         order->resd = 0;
     }
@@ -145,18 +145,20 @@ dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order)
 }
 
 DBR_API void
-dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now)
+dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
-    reduce(side, order, delta);
+    reduce(side, order, lots);
 
     // Last trade.
     side->last_ticks = order->ticks;
-    side->last_lots = delta;
+    side->last_lots = lots;
     side->last_time = now;
 
-    ++order->rev;
+    ++order->rev_;
     order->status = DBR_TRADED;
-    order->exec += delta;
+    order->exec += lots;
+    order->last_ticks = order->ticks;
+    order->last_lots = lots;
     order->modified = now;
 }
 
@@ -173,7 +175,7 @@ dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots
     // This will increase order revision.
     reduce(side, order, delta);
 
-    ++order->rev;
+    ++order->rev_;
     order->status = DBR_REVISED;
     order->lots = lots;
     order->modified = now;

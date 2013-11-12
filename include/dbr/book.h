@@ -66,15 +66,9 @@ dbr_book_remove(struct DbrBook* book, struct DbrOrder* order)
 }
 
 static inline void
-dbr_book_take(struct DbrBook* book, struct DbrOrder* order, DbrLots delta, DbrMillis now)
+dbr_book_take(struct DbrBook* book, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
-    dbr_side_take_order(dbr_book_side(book, order->action), order, delta, now);
-}
-
-static inline DbrBool
-dbr_book_place(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
-{
-    return dbr_side_place_order(dbr_book_side(book, order->action), order, now);
+    dbr_side_take_order(dbr_book_side(book, order->action), order, lots, now);
 }
 
 static inline void

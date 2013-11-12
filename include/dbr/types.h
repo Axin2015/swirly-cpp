@@ -339,12 +339,12 @@ struct DbrOrder {
     /**
      * @publicsection
      */
-    // Immutable. Zero is reserved for sentinel nodes only.
-    DbrIden id;
     // Set when order is associated with book.
     struct DbrLevel* level;
+    // Immutable. Zero is reserved for sentinel nodes only.
+    DbrIden id;
     // Order revision counter.
-    int rev;
+    int rev_;
     /**
      * @sa enum DbrStatus
      */
@@ -362,11 +362,13 @@ struct DbrOrder {
     int action;
     DbrTicks ticks;
     // Must be greater than zero.
+    DbrLots lots;
+    // Must be greater than zero.
     DbrLots resd;
     // Must not be greater that lots.
     DbrLots exec;
-    // Must be greater than zero.
-    DbrLots lots;
+    DbrTicks last_ticks;
+    DbrLots last_lots;
     // Minimum to be filled by this order.
     DbrLots min;
     // Flags.
@@ -417,7 +419,11 @@ struct DbrExec {
      */
     DbrIden id;
     DbrIden order;
-    int rev;
+    int rev_;
+    /**
+     * @sa enum DbrStatus
+     */
+    int status;
     union DbrURec trader;
     union DbrURec accnt;
     union DbrURec contr;
@@ -429,15 +435,17 @@ struct DbrExec {
      */
     int action;
     DbrTicks ticks;
+    DbrLots lots;
     DbrLots resd;
     DbrLots exec;
-    DbrLots lots;
+    DbrTicks last_ticks;
+    DbrLots last_lots;
     DbrIden match;
-    union DbrURec cpty;
     /**
      * @sa enum DbrRole
      */
     int role;
+    union DbrURec cpty;
     DbrMillis created;
     DbrMillis modified;
     /**
@@ -504,8 +512,22 @@ struct DbrTrans {
     /**
      * Total quantity taken.
      */
-    DbrLots taken;
+    DbrLots taken_;
+    DbrTicks last_ticks;
+    DbrLots last_lots;
 };
+
+static inline void
+dbr_trans_init(struct DbrTrans* trans)
+{
+    trans->new_order = NULL;
+    trans->new_posn = NULL;
+    trans->first_match = NULL;
+    trans->count = 0;
+    trans->taken_ = 0;
+    trans->last_ticks = 0;
+    trans->last_lots = 0;
+}
 
 static inline struct DbrMatch*
 dbr_trans_match_entry(struct DbrSlNode* node)
@@ -554,7 +576,7 @@ struct DbrStmt {
     union {
         struct {
             DbrIden id;
-            int rev;
+            int rev_;
             int status;
             DbrIden tid;
             DbrIden aid;
@@ -563,20 +585,24 @@ struct DbrStmt {
             DbrRef ref;
             int action;
             DbrTicks ticks;
+            DbrLots lots;
             DbrLots resd;
             DbrLots exec;
-            DbrLots lots;
+            DbrTicks last_ticks;
+            DbrLots last_lots;
             DbrLots min;
             DbrFlags flags;
             DbrMillis now;
         } insert_order;
         struct {
             DbrIden id;
-            int rev;
+            int rev_;
             int status;
+            DbrLots lots;
             DbrLots resd;
             DbrLots exec;
-            DbrLots lots;
+            DbrTicks last_ticks;
+            DbrLots last_lots;
             DbrMillis now;
         } update_order;
         struct {
@@ -586,20 +612,10 @@ struct DbrStmt {
         struct {
             DbrIden id;
             DbrIden order;
-            int rev;
-            DbrIden tid;
-            DbrIden aid;
-            DbrIden cid;
-            DbrDate settl_date;
-            DbrRef ref;
-            int action;
-            DbrTicks ticks;
-            DbrLots resd;
-            DbrLots exec;
-            DbrLots lots;
+            int rev_;
             DbrIden match;
-            DbrIden cpty;
             int role;
+            DbrIden cpty;
             DbrMillis now;
         } insert_trade;
         struct {

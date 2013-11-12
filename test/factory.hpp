@@ -53,8 +53,8 @@ create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 std::shared_ptr<DbrExec>
 create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-             DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
-             DbrMillis now);
+             DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
+             DbrIden match, int role, DbrIden cpty, DbrMillis now);
 
 std::shared_ptr<DbrMemb>
 create_memb(dbr::Pool& pool, DbrIden tid, DbrIden aid);

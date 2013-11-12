@@ -41,21 +41,19 @@ struct DbrJournVtbl {
     DbrBool
     (*insert_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
                     DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-                    DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
-                    DbrMillis now);
+                    DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
+                    DbrLots last_lots, DbrLots min, DbrFlags flags, DbrMillis now);
 
     DbrBool
-    (*update_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
-                    DbrLots lots, DbrMillis now);
+    (*update_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
+                    DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrMillis now);
 
     DbrBool
     (*archive_order)(DbrJourn journ, DbrIden id, DbrMillis now);
 
     DbrBool
-    (*insert_trade)(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
-                    DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-                    DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty,
-                    int role, DbrMillis now);
+    (*insert_trade)(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match,
+                    int role, DbrIden cpty, DbrMillis now);
 
     DbrBool
     (*archive_trade)(DbrJourn journ, DbrIden id, DbrMillis now);
@@ -87,19 +85,22 @@ dbr_journ_rollback_trans(DbrJourn journ)
 
 static inline DbrBool
 dbr_journ_insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
-                       DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-                       DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
+                       DbrIden cid, DbrDate settl_date, const char* ref, int action,
+                       DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
+                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min, DbrFlags flags,
                        DbrMillis now)
 {
     return journ->vtbl->insert_order(journ, id, rev, status, tid, aid, cid, settl_date, ref,
-                                     action, ticks, resd, exec, lots, min, flags, now);
+                                     action, ticks, lots, resd, exec, last_ticks, last_lots,
+                                     min, flags, now);
 }
 
 static inline DbrBool
-dbr_journ_update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
-                       DbrLots lots, DbrMillis now)
+dbr_journ_update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
+                       DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrMillis now)
 {
-    return journ->vtbl->update_order(journ, id, rev, status, resd, exec, lots, now);
+    return journ->vtbl->update_order(journ, id, rev, status, lots, resd, exec, last_ticks,
+                                     last_lots, now);
 }
 
 static inline DbrBool
@@ -109,13 +110,10 @@ dbr_journ_archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 static inline DbrBool
-dbr_journ_insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid,
-                       DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
-                       DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match,
-                       DbrIden cpty, int role, DbrMillis now)
+dbr_journ_insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match,
+                       int role, DbrIden cpty, DbrMillis now)
 {
-    return journ->vtbl->insert_trade(journ, id, order, rev, tid, aid, cid, settl_date, ref,
-                                     action, ticks, resd, exec, lots, match, cpty, role, now);
+    return journ->vtbl->insert_trade(journ, id, order, rev, match, role, cpty, now);
 }
 
 static inline DbrBool

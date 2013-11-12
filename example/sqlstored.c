@@ -99,7 +99,7 @@ write_trans(const struct DbrMsg* req)
         case DBR_INSERT_ORDER:
             if (!dbr_journ_insert_order(journ,
                                         stmt->insert_order.id,
-                                        stmt->insert_order.rev,
+                                        stmt->insert_order.rev_,
                                         stmt->insert_order.status,
                                         stmt->insert_order.tid,
                                         stmt->insert_order.aid,
@@ -108,9 +108,11 @@ write_trans(const struct DbrMsg* req)
                                         stmt->insert_order.ref,
                                         stmt->insert_order.action,
                                         stmt->insert_order.ticks,
+                                        stmt->insert_order.lots,
                                         stmt->insert_order.resd,
                                         stmt->insert_order.exec,
-                                        stmt->insert_order.lots,
+                                        stmt->insert_order.last_ticks,
+                                        stmt->insert_order.last_lots,
                                         stmt->insert_order.min,
                                         stmt->insert_order.flags,
                                         stmt->insert_order.now)) {
@@ -122,11 +124,13 @@ write_trans(const struct DbrMsg* req)
         case DBR_UPDATE_ORDER:
             if (!dbr_journ_update_order(journ,
                                         stmt->update_order.id,
-                                        stmt->update_order.rev,
+                                        stmt->update_order.rev_,
                                         stmt->update_order.status,
+                                        stmt->update_order.lots,
                                         stmt->update_order.resd,
                                         stmt->update_order.exec,
-                                        stmt->update_order.lots,
+                                        stmt->update_order.last_ticks,
+                                        stmt->update_order.last_lots,
                                         stmt->update_order.now)) {
                 dbr_err_print("dbr_journ_update_order() failed");
                 status_err(&rep, req->req_id);
@@ -146,20 +150,10 @@ write_trans(const struct DbrMsg* req)
             if (!dbr_journ_insert_trade(journ,
                                         stmt->insert_trade.id,
                                         stmt->insert_trade.order,
-                                        stmt->insert_trade.rev,
-                                        stmt->insert_trade.tid,
-                                        stmt->insert_trade.aid,
-                                        stmt->insert_trade.cid,
-                                        stmt->insert_trade.settl_date,
-                                        stmt->insert_trade.ref,
-                                        stmt->insert_trade.action,
-                                        stmt->insert_trade.ticks,
-                                        stmt->insert_trade.resd,
-                                        stmt->insert_trade.exec,
-                                        stmt->insert_trade.lots,
+                                        stmt->insert_trade.rev_,
                                         stmt->insert_trade.match,
-                                        stmt->insert_trade.cpty,
                                         stmt->insert_trade.role,
+                                        stmt->insert_trade.cpty,
                                         stmt->insert_trade.now)) {
                 dbr_err_print("dbr_journ_insert_trade() failed");
                 status_err(&rep, req->req_id);

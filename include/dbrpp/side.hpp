@@ -370,9 +370,9 @@ public:
         dbr_side_remove_order(&impl_, &order);
     }
     void
-    take_order(DbrOrder& order, DbrLots delta, DbrMillis now) noexcept
+    take_order(DbrOrder& order, DbrLots lots, DbrMillis now) noexcept
     {
-        dbr_side_take_order(&impl_, &order, delta, now);
+        dbr_side_take_order(&impl_, &order, lots, now);
     }
     void
     place_order(DbrOrder& order, DbrMillis now)

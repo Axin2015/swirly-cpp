@@ -45,21 +45,19 @@ public:
 
     DbrBool
     insert_order(DbrIden id, int rev, int status, DbrIden tid, DbrIden aid, DbrIden cid,
-                 DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-                 DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
-                 DbrMillis now) noexcept;
+                 DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+                 DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrLots min,
+                 DbrFlags flags, DbrMillis now) noexcept;
 
     DbrBool
-    update_order(DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
-                 DbrLots lots, DbrMillis now) noexcept;
+    update_order(DbrIden id, int rev, int status, DbrLots lots, DbrLots resd, DbrLots exec,
+                 DbrTicks last_tics, DbrLots last_lots, DbrMillis now) noexcept;
 
     DbrBool
     archive_order(DbrIden id, DbrMillis now) noexcept;
 
     DbrBool
-    insert_trade(DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid, DbrIden cid,
-                 DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots resd,
-                 DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
+    insert_trade(DbrIden id, DbrIden order, int rev, DbrIden match, int role, DbrIden cpty,
                  DbrMillis now) noexcept;
 
     DbrBool

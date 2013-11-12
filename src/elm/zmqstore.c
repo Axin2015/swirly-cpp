@@ -106,8 +106,8 @@ rollback_trans(DbrJourn journ)
 static DbrBool
 insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-             DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min, DbrFlags flags,
-             DbrMillis now)
+             DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
+             DbrLots min, DbrFlags flags, DbrMillis now)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
@@ -115,7 +115,7 @@ insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrId
         return false;
     stmt->type = DBR_INSERT_ORDER;
     stmt->insert_order.id = id;
-    stmt->insert_order.rev = rev;
+    stmt->insert_order.rev_ = rev;
     stmt->insert_order.status = status;
     stmt->insert_order.tid = tid;
     stmt->insert_order.aid = aid;
@@ -124,9 +124,11 @@ insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrId
     strncpy(stmt->insert_order.ref, ref, DBR_REF_MAX);
     stmt->insert_order.action = action;
     stmt->insert_order.ticks = ticks;
+    stmt->insert_order.lots = lots;
     stmt->insert_order.resd = resd;
     stmt->insert_order.exec = exec;
-    stmt->insert_order.lots = lots;
+    stmt->insert_order.last_ticks = last_ticks;
+    stmt->insert_order.last_lots = last_lots;
     stmt->insert_order.min = min;
     stmt->insert_order.flags = flags;
     stmt->insert_order.now = now;
@@ -135,8 +137,8 @@ insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrId
 }
 
 static DbrBool
-update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrLots exec,
-             DbrLots lots, DbrMillis now)
+update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
+             DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrMillis now)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
@@ -144,11 +146,13 @@ update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots resd, DbrL
         return false;
     stmt->type = DBR_UPDATE_ORDER;
     stmt->update_order.id = id;
-    stmt->update_order.rev = rev;
+    stmt->update_order.rev_ = rev;
     stmt->update_order.status = status;
+    stmt->update_order.lots = lots;
     stmt->update_order.resd = resd;
     stmt->update_order.exec = exec;
-    stmt->update_order.lots = lots;
+    stmt->update_order.last_ticks = last_ticks;
+    stmt->update_order.last_lots = last_lots;
     stmt->update_order.now = now;
     dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
@@ -169,10 +173,8 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 }
 
 static DbrBool
-insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
-             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-             DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match, DbrIden cpty, int role,
-             DbrMillis now)
+insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match, int role,
+             DbrIden cpty, DbrMillis now)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
@@ -181,20 +183,10 @@ insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden tid, Db
     stmt->type = DBR_INSERT_TRADE;
     stmt->insert_trade.id = id;
     stmt->insert_trade.order = order;
-    stmt->insert_trade.rev = rev;
-    stmt->insert_trade.tid = tid;
-    stmt->insert_trade.aid = aid;
-    stmt->insert_trade.cid = cid;
-    stmt->insert_trade.settl_date = settl_date;
-    strncpy(stmt->insert_trade.ref, ref, DBR_REF_MAX);
-    stmt->insert_trade.action = action;
-    stmt->insert_trade.ticks = ticks;
-    stmt->insert_trade.resd = resd;
-    stmt->insert_trade.exec = exec;
-    stmt->insert_trade.lots = lots;
+    stmt->insert_trade.rev_ = rev;
     stmt->insert_trade.match = match;
-    stmt->insert_trade.cpty = cpty;
     stmt->insert_trade.role = role;
+    stmt->insert_trade.cpty = cpty;
     stmt->insert_trade.now = now;
     dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;

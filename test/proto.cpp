@@ -130,7 +130,7 @@ TEST_CASE(proto_order)
     check(buf + len == end);
 
     check(out.id == in->id);
-    check(out.rev == in->rev);
+    check(out.rev_ == in->rev_);
     check(out.status == in->status);
     check(out.trader.id_only == in->trader.id_only);
     check(out.accnt.id_only == in->accnt.id_only);
@@ -139,9 +139,11 @@ TEST_CASE(proto_order)
     check(sequal(out.ref, in->ref, DBR_REF_MAX));
     check(out.action == in->action);
     check(out.ticks == in->ticks);
+    check(out.lots == in->lots);
     check(out.resd == in->resd);
     check(out.exec == in->exec);
-    check(out.lots == in->lots);
+    check(out.last_ticks == in->last_ticks);
+    check(out.last_lots == in->last_lots);
     check(out.min == in->min);
     check(out.flags == in->flags);
     check(out.created == in->created);
@@ -158,7 +160,7 @@ TEST_CASE(proto_trade)
     auto now = dbr_millis();
 
     auto in = create_trade(pool, 1, 2, 3, trader, accnt, contr, 20130827, "apple",
-                           DBR_BUY, 12345, 0, 10, 10, 4, cpty, DBR_TAKER, now);
+                           DBR_BUY, 12345, 10, 0, 10, 12345, 10, 4, DBR_TAKER, cpty, now);
 
     auto len = exec_len(*in, false);
     char buf[len];
@@ -171,7 +173,7 @@ TEST_CASE(proto_trade)
 
     check(out.id == in->id);
     check(out.order == in->order);
-    check(out.rev == in->rev);
+    check(out.rev_ == in->rev_);
     check(out.trader.id_only == in->trader.id_only);
     check(out.accnt.id_only == in->accnt.id_only);
     check(out.contr.id_only == in->contr.id_only);
@@ -179,12 +181,14 @@ TEST_CASE(proto_trade)
     check(sequal(out.ref, in->ref, DBR_REF_MAX));
     check(out.action == in->action);
     check(out.ticks == in->ticks);
+    check(out.lots == in->lots);
     check(out.resd == in->resd);
     check(out.exec == in->exec);
-    check(out.lots == in->lots);
+    check(out.last_ticks == in->last_ticks);
+    check(out.last_lots == in->last_lots);
     check(out.match == in->match);
-    check(out.cpty.id_only == in->cpty.id_only);
     check(out.role == in->role);
+    check(out.cpty.id_only == in->cpty.id_only);
     check(out.created == in->created);
     check(out.modified == in->modified);
 }

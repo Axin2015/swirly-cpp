@@ -75,17 +75,17 @@ dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order);
 DBR_API void
 dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order);
 
-// Reduce residual lots by delta. If the resulting residual is zero, then the order is removed from
+// Reduce residual lots by lots. If the resulting residual is zero, then the order is removed from
 // the side.
 
 DBR_API void
-dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots delta, DbrMillis now);
+dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now);
 
 static inline DbrBool
 dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     assert(order->lots > 0 && order->lots >= order->min);
-    order->rev = 1;
+    order->rev_ = 1;
     order->status = DBR_NEW;
     order->resd = order->lots;
     order->exec = 0;
@@ -101,7 +101,7 @@ static inline void
 dbr_side_cancel_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     dbr_side_remove_order(side, order);
-    ++order->rev;
+    ++order->rev_;
     order->status = DBR_CANCELLED;
     // Note that executed lots is not affected.
     order->resd = 0;

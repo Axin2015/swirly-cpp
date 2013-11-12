@@ -59,21 +59,21 @@ fir_sqlite_rollback_trans(struct FirSqlite* sqlite);
 DBR_EXTERN DbrBool
 fir_sqlite_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, DbrIden tid,
                         DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-                        int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
-                        DbrLots min, DbrFlags flags, DbrMillis now);
+                        int action, DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
+                        DbrTicks last_ticks, DbrLots last_lots, DbrLots min, DbrFlags flags,
+                        DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlite_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status,
-                        DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now);
+fir_sqlite_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, DbrLots lots,
+                        DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
+                        DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev, DbrIden tid,
-                        DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
-                        DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match,
-                        DbrIden cpty, int role, DbrMillis now);
+fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev,
+                        DbrIden match, int role, DbrIden cpty, DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);

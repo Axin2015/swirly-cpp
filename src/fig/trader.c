@@ -109,7 +109,7 @@ fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
         // Update existing order.
 
         assert(curr->id == order->id);
-        curr->rev = order->rev;
+        curr->rev_ = order->rev_;
         curr->status = order->status;
         assert(curr->trader.rec == order->trader.rec);
         assert(curr->accnt.rec == order->accnt.rec);
@@ -118,9 +118,11 @@ fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
         assert(strncmp(curr->ref, order->ref, DBR_REF_MAX) == 0);
         assert(curr->action == order->action);
         assert(curr->ticks == order->ticks);
+        curr->lots = order->lots;
         curr->resd = order->resd;
         curr->exec = order->exec;
-        curr->lots = order->lots;
+        curr->last_lots = order->last_lots;
+        curr->last_ticks = order->last_ticks;
         assert(curr->min == order->min);
         assert(curr->flags == order->flags);
         assert(curr->created == order->created);

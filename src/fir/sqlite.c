@@ -30,13 +30,13 @@
 
 #define INSERT_ORDER_SQL                                                \
     "INSERT INTO order_ (id, rev, status, trader, accnt, contr,"        \
-    " settl_date, ref, action, ticks, resd, exec, lots, min, flags,"    \
+    " settl_date, ref, action, ticks, lots, resd, exec, min, flags,"    \
     " archive, created, modified)"                                      \
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
 
 #define UPDATE_ORDER_SQL                                                \
-    "UPDATE order_ SET rev = ?, status = ?, resd = ?, exec = ?,"        \
-    " lots = ?,  modified = ?"                                          \
+    "UPDATE order_ SET rev = ?, status = ?, lots = ?, resd = ?,"        \
+    " exec = ?, last_ticks = ?, last_lots = ?, modified = ?"            \
     " WHERE id = ?"
 
 #define ARCHIVE_ORDER_SQL                                             \
@@ -44,9 +44,9 @@
     " WHERE id = ?"
 
 #define INSERT_TRADE_SQL                                                \
-    "INSERT INTO trade (id, order_, rev, action, ticks, resd, exec,"    \
-    " lots, match, cpty, role, archive, created, modified)"             \
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)"
+    "INSERT INTO trade (id, order_, rev, match, role, cpty, archive,"   \
+    " created, modified)"                                               \
+    " VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)"
 
 #define ARCHIVE_TRADE_SQL                                               \
     "UPDATE trade SET archive = 1, modified = ?"                        \
@@ -67,13 +67,13 @@
 
 #define SELECT_ORDER_SQL                                                \
     "SELECT id, rev, status, trader, accnt, contr, settl_date, ref,"    \
-    " action, ticks, resd, exec, lots, min, flags, created, modified"   \
+    " action, ticks, lots, resd, exec, min, flags, created, modified"   \
     " FROM order_ WHERE archive = 0 ORDER BY id"
 
 #define SELECT_TRADE_SQL                                                \
     "SELECT id, order_, rev, trader, accnt, contr, settl_date, ref,"    \
-    " action, ticks, resd, exec, lots, match, cpty, role, created,"     \
-    " modified"                                                         \
+    " action, ticks, lots, resd, exec, last_ticks, last_lots, match,"   \
+    " role, cpty, created, modified"                                    \
     " FROM trade_v WHERE archive = 0 ORDER BY id"
 
 #define SELECT_MEMB_SQL                                    \
@@ -151,8 +151,8 @@ bind_text(sqlite3_stmt* stmt, int col, const char* text, size_t maxlen)
 static DbrBool
 bind_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, DbrIden tid,
                   DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
-                  DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrLots min,
-                  DbrFlags flags, DbrMillis now)
+                  DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
+                  DbrLots last_lots, DbrLots min, DbrFlags flags, DbrMillis now)
 {
     enum {
         ID = 1,
@@ -165,9 +165,11 @@ bind_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, Dbr
         REF,
         ACTION,
         TICKS,
+        LOTS,
         RESD,
         EXEC,
-        LOTS,
+        LAST_TICKS,
+        LAST_LOTS,
         MIN,
         FLAGS,
         CREATED,
@@ -217,6 +219,10 @@ bind_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, Dbr
     if (rc != SQLITE_OK)
         goto fail1;
 
+    rc = sqlite3_bind_int64(stmt, LOTS, lots);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
     rc = sqlite3_bind_int64(stmt, RESD, resd);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -225,7 +231,11 @@ bind_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, Dbr
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LOTS, lots);
+    rc = sqlite3_bind_int64(stmt, LAST_TICKS, last_ticks);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
+    rc = sqlite3_bind_int64(stmt, LAST_LOTS, last_lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -254,14 +264,17 @@ bind_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, Dbr
 
 static DbrBool
 bind_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status,
-                  DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
+                  DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
+                  DbrLots last_lots, DbrMillis now)
 {
     enum {
         REV = 1,
         STATUS,
+        LOTS,
         RESD,
         EXEC,
-        LOTS,
+        LAST_TICKS,
+        LAST_LOTS,
         MODIFIED,
         ID
     };
@@ -274,6 +287,10 @@ bind_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status,
     if (rc != SQLITE_OK)
         goto fail1;
 
+    rc = sqlite3_bind_int64(stmt, LOTS, lots);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
     rc = sqlite3_bind_int64(stmt, RESD, resd);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -282,7 +299,11 @@ bind_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status,
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LOTS, lots);
+    rc = sqlite3_bind_int64(stmt, LAST_TICKS, last_ticks);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
+    rc = sqlite3_bind_int64(stmt, LAST_LOTS, last_lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -325,23 +346,16 @@ bind_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 static DbrBool
-bind_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev, DbrIden tid,
-                  DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
-                  DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match,
-                  DbrIden cpty, int role, DbrMillis now)
+bind_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev, DbrIden match,
+                  int role, DbrIden cpty, DbrMillis now)
 {
     enum {
         ID = 1,
         ORDER,
         REV,
-        ACTION,
-        TICKS,
-        RESD,
-        EXEC,
-        LOTS,
         MATCH,
-        CPTY,
         ROLE,
+        CPTY,
         CREATED,
         MODIFIED
     };
@@ -358,35 +372,15 @@ bind_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev, 
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ACTION, action);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    rc = sqlite3_bind_int64(stmt, TICKS, ticks);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    rc = sqlite3_bind_int64(stmt, RESD, resd);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    rc = sqlite3_bind_int64(stmt, EXEC, exec);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    rc = sqlite3_bind_int64(stmt, LOTS, lots);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
     rc = sqlite3_bind_int64(stmt, MATCH, match);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CPTY, cpty);
+    rc = sqlite3_bind_int(stmt, ROLE, role);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ROLE, role);
+    rc = sqlite3_bind_int64(stmt, CPTY, cpty);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -687,9 +681,11 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         REF,
         ACTION,
         TICKS,
+        LOTS,
         RESD,
         EXEC,
-        LOTS,
+        LAST_TICKS,
+        LAST_LOTS,
         MIN,
         FLAGS,
         CREATED,
@@ -715,7 +711,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             order->id = sqlite3_column_int64(stmt, ID);
             order->level = NULL;
-            order->rev = sqlite3_column_int(stmt, REV);
+            order->rev_ = sqlite3_column_int(stmt, REV);
             order->status = sqlite3_column_int(stmt, STATUS);
             order->trader.id_only = sqlite3_column_int64(stmt, TRADER);
             order->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
@@ -728,21 +724,25 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 order->ref[0] = '\0';
             order->action = sqlite3_column_int(stmt, ACTION);
             order->ticks = sqlite3_column_int64(stmt, TICKS);
+            order->lots = sqlite3_column_int64(stmt, LOTS);
             order->resd = sqlite3_column_int64(stmt, RESD);
             order->exec = sqlite3_column_int64(stmt, EXEC);
-            order->lots = sqlite3_column_int64(stmt, LOTS);
+            order->last_ticks = sqlite3_column_int64(stmt, LAST_TICKS);
+            order->last_lots = sqlite3_column_int64(stmt, LAST_LOTS);
             order->min = sqlite3_column_int64(stmt, MIN);
             order->flags = sqlite3_column_int64(stmt, FLAGS);
             order->created = sqlite3_column_int64(stmt, CREATED);
             order->modified = sqlite3_column_int64(stmt, MODIFIED);
 
             dbr_log_debug3("order: id=%ld,rev=%d,status=%d,trader=%ld,accnt=%ld,contr=%ld,"
-                           "settl_date=%d,ref=%.64s,action=%d,ticks=%ld,resd=%ld,exec=%ld,"
-                           "lots=%ld,min=%ld,flags=%ld,created=%ld,modified=%ld",
+                           "settl_date=%d,ref=%.64s,action=%d,ticks=%ld,lots=%ld,resd=%ld,"
+                           "exec=%ld,last_ticks=%ld,last_lots=%ld,min=%ld,flags=%ld,"
+                           "created=%ld,modified=%ld",
                            order->id, order->rev, order->status, order->trader.id_only,
                            order->accnt.id_only, order->contr.id_only, order->settl_date,
-                           order->ref, order->action, order->ticks, order->resd, order->exec,
-                           order->lots, order->min, order->flags, order->created, order->modified);
+                           order->ref, order->action, order->ticks, order->lots, order->resd,
+                           order->exec, order->last_ticks, order->last_lots, order->min,
+                           order->flags, order->created, order->modified);
 
             dbr_queue_insert_back(&oq, &order->entity_node_);
             ++size;
@@ -782,12 +782,14 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         REF,
         ACTION,
         TICKS,
+        LOTS,
         RESD,
         EXEC,
-        LOTS,
+        LAST_TICKS,
+        LAST_LOTS,
         MATCH,
-        CPTY,
         ROLE,
+        CPTY,
         CREATED,
         MODIFIED
     };
@@ -811,7 +813,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             exec->id = sqlite3_column_int64(stmt, ID);
             exec->order = sqlite3_column_int64(stmt, ORDER);
-            exec->rev = sqlite3_column_int(stmt, REV);
+            exec->rev_ = sqlite3_column_int(stmt, REV);
             exec->trader.id_only = sqlite3_column_int64(stmt, TRADER);
             exec->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
             exec->contr.id_only = sqlite3_column_int64(stmt, CONTR);
@@ -823,23 +825,26 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 exec->ref[0] = '\0';
             exec->action = sqlite3_column_int(stmt, ACTION);
             exec->ticks = sqlite3_column_int64(stmt, TICKS);
+            exec->lots = sqlite3_column_int64(stmt, LOTS);
             exec->resd = sqlite3_column_int64(stmt, RESD);
             exec->exec = sqlite3_column_int64(stmt, EXEC);
-            exec->lots = sqlite3_column_int64(stmt, LOTS);
+            exec->last_ticks = sqlite3_column_int64(stmt, LAST_TICKS);
+            exec->last_lots = sqlite3_column_int64(stmt, LAST_LOTS);
             exec->match = sqlite3_column_int64(stmt, MATCH);
-            exec->cpty.id_only = sqlite3_column_int64(stmt, CPTY);
             exec->role = sqlite3_column_int(stmt, ROLE);
+            exec->cpty.id_only = sqlite3_column_int64(stmt, CPTY);
             exec->created = sqlite3_column_int64(stmt, CREATED);
             exec->modified = sqlite3_column_int64(stmt, MODIFIED);
 
             dbr_log_debug3("exec: id=%ld,order=%ld,rev=%d,trader=%ld,accnt=%ld,contr=%ld,"
-                           "settl_date=%d,ref=%.64s,action=%d,ticks=%ld,resd=%ld,exec=%ld,"
-                           "lots=%ld,match=%ld,cpty=%ld,role=%d,created=%ld,modified=%ld",
+                           "settl_date=%d,ref=%.64s,action=%d,ticks=%ld,lots=%ld,resd=%ld,exec=%ld,"
+                           "last_ticks=%ld,last_lots=%ld,match=%ld,role=%d,cpty=%ld,created=%ld,"
+                           "modified=%ld",
                            exec->id, exec->order, exec->rev, exec->trader.id_only,
-                           exec->accnt.id_only, exec->contr.id_only, exec->settl_date,
-                           exec->ref, exec->action, exec->ticks, exec->resd, exec->exec,
-                           exec->lots, exec->match, exec->cpty.id_only, exec->role,
-                           exec->created, exec->modified);
+                           exec->accnt.id_only, exec->contr.id_only, exec->settl_date, exec->ref,
+                           exec->action, exec->ticks, exec->lots, exec->resd, exec->exec,
+                           exec->last_ticks, exec->last_lots, exec->match, exec->role,
+                           exec->cpty.id_only, exec->created, exec->modified);
 
             dbr_queue_insert_back(&tq, &exec->entity_node_);
             ++size;
@@ -1124,19 +1129,21 @@ fir_sqlite_rollback_trans(struct FirSqlite* sqlite)
 DBR_EXTERN DbrBool
 fir_sqlite_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, DbrIden tid,
                         DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-                        int action, DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots,
-                        DbrLots min, DbrFlags flags, DbrMillis now)
+                        int action, DbrLots lots, DbrTicks ticks, DbrLots resd, DbrLots exec,
+                        DbrTicks last_ticks, DbrLots last_lots, DbrLots min, DbrFlags flags,
+                        DbrMillis now)
 {
     return bind_insert_order(sqlite, id, rev, status, tid, aid, cid, settl_date, ref, action,
-                             ticks, resd, exec, lots, min, flags, now)
+                             ticks, lots, resd, exec, last_ticks, last_lots, min, flags, now)
         && exec_stmt(sqlite->db, sqlite->insert_order);
 }
 
 DBR_EXTERN DbrBool
 fir_sqlite_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status,
-                        DbrLots resd, DbrLots exec, DbrLots lots, DbrMillis now)
+                        DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
+                        DbrLots last_lots, DbrMillis now)
 {
-    return bind_update_order(sqlite, id, rev, status, resd, exec, lots, now)
+    return bind_update_order(sqlite, id, rev, status, lots, resd, exec, last_ticks, last_lots, now)
         && exec_stmt(sqlite->db, sqlite->update_order);
 }
 
@@ -1148,13 +1155,10 @@ fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 }
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev, DbrIden tid,
-                        DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
-                        DbrTicks ticks, DbrLots resd, DbrLots exec, DbrLots lots, DbrIden match,
-                        DbrIden cpty, int role, DbrMillis now)
+fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev,
+                        DbrIden match, int role, DbrIden cpty, DbrMillis now)
 {
-    return bind_insert_trade(sqlite, id, order, rev, tid, aid, cid, settl_date, ref,
-                             action, ticks, resd, exec, lots, match, cpty, role, now)
+    return bind_insert_trade(sqlite, id, order, rev, match, role, cpty, now)
         && exec_stmt(sqlite->db, sqlite->insert_trade);
 }
 

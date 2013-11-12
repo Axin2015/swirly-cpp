@@ -148,40 +148,46 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         // Taker trade.
         taker_exec->id = taker_id;
         taker_exec->order = taker->id;
-        taker_exec->rev = taker->rev + 1;
+        taker_exec->rev_ = taker->rev_ + 1;
+        taker_exec->status = DBR_TRADED;
         taker_exec->trader.rec = taker->trader.rec;
         taker_exec->accnt.rec = taker->accnt.rec;
         taker_exec->contr.rec = crec;
         taker_exec->settl_date = settl_date;
         strncpy(taker_exec->ref, taker->ref, DBR_REF_MAX);
         taker_exec->action = taker->action;
-        taker_exec->ticks = match->ticks;
+        taker_exec->ticks = taker->ticks;
+        taker_exec->lots = taker->lots;
         taker_exec->resd = taker->resd - taken;
         taker_exec->exec = taker->exec + taken;
-        taker_exec->lots = match->lots;
+        taker_exec->last_ticks = match->ticks;
+        taker_exec->last_lots = match->lots;
         taker_exec->match = match->id;
-        taker_exec->cpty.rec = maker->accnt.rec;
         taker_exec->role = DBR_TAKER;
+        taker_exec->cpty.rec = maker->accnt.rec;
         taker_exec->created = now;
         taker_exec->modified = now;
 
         // Maker trade.
         maker_exec->id = maker_id;
         maker_exec->order = maker->id;
-        maker_exec->rev = maker->rev + 1;
+        maker_exec->rev_ = maker->rev_ + 1;
+        maker_exec->status = DBR_TRADED;
         maker_exec->trader.rec = maker->trader.rec;
         maker_exec->accnt.rec = maker->accnt.rec;
         maker_exec->contr.rec = crec;
         maker_exec->settl_date = settl_date;
         strncpy(maker_exec->ref, maker->ref, DBR_REF_MAX);
         maker_exec->action = maker->action;
-        maker_exec->ticks = match->ticks;
+        maker_exec->ticks = maker->ticks;
+        maker_exec->lots = maker->lots;
         maker_exec->resd = maker->resd - match->lots;
         maker_exec->exec = maker->exec + match->lots;
-        maker_exec->lots = match->lots;
+        maker_exec->last_ticks = match->ticks;
+        maker_exec->last_lots = match->lots;
         maker_exec->match = match->id;
-        maker_exec->cpty.rec = taker->accnt.rec;
         maker_exec->role = DBR_MAKER;
+        maker_exec->cpty.rec = taker->accnt.rec;
         maker_exec->created = now;
         maker_exec->modified = now;
 
@@ -204,7 +210,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     trans->new_posn = posn;
     trans->first_match = mq.first;
     trans->count = count;
-    trans->taken = taken;
+    trans->taken_ = taken;
 
     return true;
  fail1:
