@@ -99,7 +99,7 @@ write_trans(const struct DbrMsg* req)
         case DBR_INSERT_ORDER:
             if (!dbr_journ_insert_order(journ,
                                         stmt->insert_order.id,
-                                        stmt->insert_order.rev_,
+                                        stmt->insert_order.rev,
                                         stmt->insert_order.status,
                                         stmt->insert_order.tid,
                                         stmt->insert_order.aid,
@@ -124,7 +124,7 @@ write_trans(const struct DbrMsg* req)
         case DBR_UPDATE_ORDER:
             if (!dbr_journ_update_order(journ,
                                         stmt->update_order.id,
-                                        stmt->update_order.rev_,
+                                        stmt->update_order.rev,
                                         stmt->update_order.status,
                                         stmt->update_order.lots,
                                         stmt->update_order.resd,
@@ -150,7 +150,7 @@ write_trans(const struct DbrMsg* req)
             if (!dbr_journ_insert_trade(journ,
                                         stmt->insert_trade.id,
                                         stmt->insert_trade.order,
-                                        stmt->insert_trade.rev_,
+                                        stmt->insert_trade.rev,
                                         stmt->insert_trade.match,
                                         stmt->insert_trade.role,
                                         stmt->insert_trade.cpty,

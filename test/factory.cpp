@@ -109,7 +109,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 
     order->level = NULL;
     order->id = id;
-    order->rev_ = 0;
+    order->rev = 0;
     order->status = 0;
     order->trader.rec = &trader;
     order->accnt.rec = &accnt;
@@ -148,7 +148,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 
     order->level = NULL;
     order->id = id;
-    order->rev_ = 0;
+    order->rev = 0;
     order->status = 0;
     order->trader.id_only = tid;
     order->accnt.id_only = aid;
@@ -188,7 +188,7 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIde
 
     ptr->id = id;
     ptr->order = order;
-    ptr->rev_ = rev;
+    ptr->rev = rev;
     ptr->trader.id_only = tid;
     ptr->accnt.id_only = aid;
     ptr->contr.id_only = cid;

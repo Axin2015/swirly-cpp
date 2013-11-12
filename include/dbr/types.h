@@ -344,7 +344,7 @@ struct DbrOrder {
     // Immutable. Zero is reserved for sentinel nodes only.
     DbrIden id;
     // Order revision counter.
-    int rev_;
+    int rev;
     /**
      * @sa enum DbrStatus
      */
@@ -419,7 +419,7 @@ struct DbrExec {
      */
     DbrIden id;
     DbrIden order;
-    int rev_;
+    int rev;
     /**
      * @sa enum DbrStatus
      */
@@ -512,7 +512,7 @@ struct DbrTrans {
     /**
      * Total quantity taken.
      */
-    DbrLots taken_;
+    DbrLots taken;
     DbrTicks last_ticks;
     DbrLots last_lots;
 };
@@ -524,7 +524,7 @@ dbr_trans_init(struct DbrTrans* trans)
     trans->new_posn = NULL;
     trans->first_match = NULL;
     trans->count = 0;
-    trans->taken_ = 0;
+    trans->taken = 0;
     trans->last_ticks = 0;
     trans->last_lots = 0;
 }
@@ -576,7 +576,7 @@ struct DbrStmt {
     union {
         struct {
             DbrIden id;
-            int rev_;
+            int rev;
             int status;
             DbrIden tid;
             DbrIden aid;
@@ -596,7 +596,7 @@ struct DbrStmt {
         } insert_order;
         struct {
             DbrIden id;
-            int rev_;
+            int rev;
             int status;
             DbrLots lots;
             DbrLots resd;
@@ -612,7 +612,7 @@ struct DbrStmt {
         struct {
             DbrIden id;
             DbrIden order;
-            int rev_;
+            int rev;
             DbrIden match;
             int role;
             DbrIden cpty;

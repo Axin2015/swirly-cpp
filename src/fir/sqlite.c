@@ -711,7 +711,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             order->id = sqlite3_column_int64(stmt, ID);
             order->level = NULL;
-            order->rev_ = sqlite3_column_int(stmt, REV);
+            order->rev = sqlite3_column_int(stmt, REV);
             order->status = sqlite3_column_int(stmt, STATUS);
             order->trader.id_only = sqlite3_column_int64(stmt, TRADER);
             order->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
@@ -813,7 +813,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             exec->id = sqlite3_column_int64(stmt, ID);
             exec->order = sqlite3_column_int64(stmt, ORDER);
-            exec->rev_ = sqlite3_column_int(stmt, REV);
+            exec->rev = sqlite3_column_int(stmt, REV);
             exec->trader.id_only = sqlite3_column_int64(stmt, TRADER);
             exec->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
             exec->contr.id_only = sqlite3_column_int64(stmt, CONTR);

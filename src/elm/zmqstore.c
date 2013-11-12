@@ -115,7 +115,7 @@ insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrId
         return false;
     stmt->type = DBR_INSERT_ORDER;
     stmt->insert_order.id = id;
-    stmt->insert_order.rev_ = rev;
+    stmt->insert_order.rev = rev;
     stmt->insert_order.status = status;
     stmt->insert_order.tid = tid;
     stmt->insert_order.aid = aid;
@@ -146,7 +146,7 @@ update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrL
         return false;
     stmt->type = DBR_UPDATE_ORDER;
     stmt->update_order.id = id;
-    stmt->update_order.rev_ = rev;
+    stmt->update_order.rev = rev;
     stmt->update_order.status = status;
     stmt->update_order.lots = lots;
     stmt->update_order.resd = resd;
@@ -183,7 +183,7 @@ insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match, 
     stmt->type = DBR_INSERT_TRADE;
     stmt->insert_trade.id = id;
     stmt->insert_trade.order = order;
-    stmt->insert_trade.rev_ = rev;
+    stmt->insert_trade.rev = rev;
     stmt->insert_trade.match = match;
     stmt->insert_trade.role = role;
     stmt->insert_trade.cpty = cpty;

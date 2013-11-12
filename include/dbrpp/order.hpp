@@ -57,7 +57,7 @@ public:
     int
     rev() const noexcept
     {
-        return impl_->rev_;
+        return impl_->rev;
     }
     int
     status() const noexcept

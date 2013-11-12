@@ -130,7 +130,7 @@ TEST_CASE(proto_order)
     check(buf + len == end);
 
     check(out.id == in->id);
-    check(out.rev_ == in->rev_);
+    check(out.rev == in->rev);
     check(out.status == in->status);
     check(out.trader.id_only == in->trader.id_only);
     check(out.accnt.id_only == in->accnt.id_only);
@@ -173,7 +173,7 @@ TEST_CASE(proto_trade)
 
     check(out.id == in->id);
     check(out.order == in->order);
-    check(out.rev_ == in->rev_);
+    check(out.rev == in->rev);
     check(out.trader.id_only == in->trader.id_only);
     check(out.accnt.id_only == in->accnt.id_only);
     check(out.contr.id_only == in->contr.id_only);

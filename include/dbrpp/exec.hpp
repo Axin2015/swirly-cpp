@@ -62,7 +62,7 @@ public:
     int
     rev() const noexcept
     {
-        return impl_->rev_;
+        return impl_->rev;
     }
     TraderRecRef
     trec() const noexcept

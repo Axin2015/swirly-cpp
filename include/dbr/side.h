@@ -85,7 +85,7 @@ static inline DbrBool
 dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     assert(order->lots > 0 && order->lots >= order->min);
-    order->rev_ = 1;
+    order->rev = 1;
     order->status = DBR_NEW;
     order->resd = order->lots;
     order->exec = 0;
@@ -101,7 +101,7 @@ static inline void
 dbr_side_cancel_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     dbr_side_remove_order(side, order);
-    ++order->rev_;
+    ++order->rev;
     order->status = DBR_CANCELLED;
     // Note that executed lots is not affected.
     order->resd = 0;

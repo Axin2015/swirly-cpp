@@ -148,7 +148,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         // Taker trade.
         taker_exec->id = taker_id;
         taker_exec->order = taker->id;
-        taker_exec->rev_ = taker->rev_ + 1;
+        taker_exec->rev = taker->rev + 1;
         taker_exec->status = DBR_TRADED;
         taker_exec->trader.rec = taker->trader.rec;
         taker_exec->accnt.rec = taker->accnt.rec;
@@ -171,7 +171,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         // Maker trade.
         maker_exec->id = maker_id;
         maker_exec->order = maker->id;
-        maker_exec->rev_ = maker->rev_ + 1;
+        maker_exec->rev = maker->rev + 1;
         maker_exec->status = DBR_TRADED;
         maker_exec->trader.rec = maker->trader.rec;
         maker_exec->accnt.rec = maker->accnt.rec;
@@ -210,7 +210,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     trans->new_posn = posn;
     trans->first_match = mq.first;
     trans->count = count;
-    trans->taken_ = taken;
+    trans->taken = taken;
 
     return true;
  fail1:
