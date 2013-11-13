@@ -304,7 +304,7 @@ place_order(const struct DbrMsg* req)
     rep.type = DBR_RESULT_REP;
     rep.result_rep.new_order = result.new_order;
     rep.result_rep.first_posn = result.first_posn;
-    rep.result_rep.first_trade = result.first_trade;
+    rep.result_rep.first_trade = result.first_exec;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");

@@ -606,7 +606,7 @@ public:
         Result result;
         serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0, result);
 
-        if (result.trades().empty())
+        if (result.execs().empty())
             return;
 
         cout <<
@@ -674,7 +674,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto exec : result.trades()) {
+        for (auto exec : result.execs()) {
             ExecRef ref(exec);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << gtol(ref.order())

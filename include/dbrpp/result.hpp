@@ -133,7 +133,7 @@ public:
     }
 };
 
-class ResultTrades {
+class ResultExecs {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrExec Entry;
         static Entry*
@@ -177,12 +177,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ResultTrades(const DbrResult& result) noexcept
+    ResultExecs(const DbrResult& result) noexcept
         : result_{&result}
     {
     }
     void
-    swap(ResultTrades& rhs) noexcept
+    swap(ResultExecs& rhs) noexcept
     {
         std::swap(result_, rhs.result_);
     }
@@ -192,12 +192,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_->first_trade;
+        return result_->first_exec;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_->first_trade;
+        return result_->first_exec;
     }
     Iterator
     end() noexcept
@@ -235,7 +235,7 @@ public:
     bool
     empty() const noexcept
     {
-        return result_->first_trade == nullptr;
+        return result_->first_exec == nullptr;
     }
 };
 
@@ -261,10 +261,10 @@ public:
     {
         return ResultPosns{impl_};
     }
-    ResultTrades
-    trades() const noexcept
+    ResultExecs
+    execs() const noexcept
     {
-        return ResultTrades{impl_};
+        return ResultExecs{impl_};
     }
 };
 

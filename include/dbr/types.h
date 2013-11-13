@@ -538,7 +538,7 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 struct DbrResult {
     struct DbrOrder* new_order;
     struct DbrSlNode* first_posn;
-    struct DbrSlNode* first_trade;
+    struct DbrSlNode* first_exec;
 };
 
 static inline struct DbrPosn*

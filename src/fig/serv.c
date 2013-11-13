@@ -293,7 +293,7 @@ commit_result(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
     result->new_order = trans->new_order;
     result->first_posn = pq.first;
-    result->first_trade = tq.first;
+    result->first_exec = tq.first;
 }
 
 static DbrBool
