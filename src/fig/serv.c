@@ -39,6 +39,7 @@ struct FigServ {
     struct FigCache cache;
     struct DbrTree books;
     struct FigIndex index;
+    struct DbrCycle cycle;
 };
 
 static inline struct DbrBook*
@@ -235,27 +236,27 @@ static void
 insert_unique_posn(struct DbrQueue* queue, struct DbrPosn* new_posn)
 {
     for (struct DbrSlNode* node = queue->first; node; node = node->next) {
-        struct DbrPosn* posn = dbr_result_posn_entry(node);
+        struct DbrPosn* posn = dbr_cycle_posn_entry(node);
         if (posn->accnt.rec->id == new_posn->accnt.rec->id
             && posn->contr.rec->id == new_posn->contr.rec->id
             && posn->settl_date == new_posn->settl_date)
             return; // Exists.
     }
-    dbr_queue_insert_back(queue, &new_posn->result_node_);
+    dbr_queue_insert_back(queue, &new_posn->cycle_node_);
 }
 
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-commit_result(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
-              const struct DbrTrans* trans, DbrMillis now, struct DbrResult* result)
+commit_cycle(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
+              const struct DbrTrans* trans, DbrMillis now)
 {
     struct DbrQueue pq, tq;
     dbr_queue_init(&pq);
     dbr_queue_init(&tq);
 
     if (trans->new_posn)
-        dbr_queue_insert_back(&pq, &trans->new_posn->result_node_);
+        dbr_queue_insert_back(&pq, &trans->new_posn->cycle_node_);
 
     struct DbrSlNode* node = trans->first_match;
     while (node) {
@@ -279,21 +280,22 @@ commit_result(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Update maker.
         fig_trader_emplace_trade(maker, match->maker_exec);
         apply_posn(match->maker_posn, match->maker_exec);
-        dbr_queue_insert_back(&tq, &match->maker_exec->result_node_);
+        dbr_queue_insert_back(&tq, &match->maker_exec->cycle_node_);
 
         // Update taker.
         fig_trader_emplace_trade(taker, match->taker_exec);
         apply_posn(trans->new_posn, match->taker_exec);
-        dbr_queue_insert_back(&tq, &match->taker_exec->result_node_);
+        dbr_queue_insert_back(&tq, &match->taker_exec->cycle_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
         dbr_pool_free_match(serv->pool, match);
     }
 
-    result->new_order = trans->new_order;
-    result->first_posn = pq.first;
-    result->first_exec = tq.first;
+    dbr_cycle_init(&serv->cycle);
+    serv->cycle.new_order = trans->new_order;
+    serv->cycle.first_posn = pq.first;
+    serv->cycle.first_exec = tq.first;
 }
 
 static DbrBool
@@ -450,6 +452,7 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     fig_cache_init(&serv->cache, term_state, pool);
     dbr_tree_init(&serv->books);
     fig_index_init(&serv->index);
+    dbr_cycle_init(&serv->cycle);
 
     // Data structures are fully initialised at this point.
 
@@ -525,7 +528,7 @@ dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-              DbrFlags flags, struct DbrResult* result)
+              DbrFlags flags)
 {
     if (lots == 0 || lots < min) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
@@ -609,8 +612,8 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
-    // Commit trans to result and free matches.
-    commit_result(serv, trader, book, &trans, now, result);
+    // Commit trans to cycle and free matches.
+    commit_cycle(serv, trader, book, &trans, now);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))
@@ -823,4 +826,16 @@ dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
     return true;
  fail1:
     return false;
+}
+
+DBR_API struct DbrSlNode*
+dbr_serv_first_exec(DbrServ serv)
+{
+    return serv->cycle.first_exec;
+}
+
+DBR_API DbrBool
+dbr_serv_empty_exec(DbrServ serv)
+{
+    return serv->cycle.first_exec == NULL;
 }

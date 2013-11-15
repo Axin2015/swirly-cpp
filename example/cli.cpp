@@ -603,43 +603,10 @@ public:
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        Result result;
-        serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0, result);
+        serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0);
 
-        if (result.execs().empty())
+        if (serv_.execs().empty())
             return;
-
-        cout <<
-            "|crec      "
-            "|settl_date"
-            "|buy_ticks "
-            "|buy_lots  "
-            "|sell_ticks"
-            "|sell_lots "
-            "|" << endl;
-        cout <<
-            "|----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "|"
-             << endl;
-        for (auto posn : result.posns()) {
-            PosnRef ref(posn);
-            const auto buy_ticks = ref.buy_lots() > 0
-                ? static_cast<double>(ref.buy_licks()) / ref.buy_lots() : 0;
-            const auto sell_ticks = ref.sell_lots() > 0
-                ? static_cast<double>(ref.sell_licks()) / ref.sell_lots() : 0;
-            cout << '|' << left << setw(10) << ref.crec().mnem()
-                 << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << right << setw(10) << buy_ticks
-                 << '|' << right << setw(10) << ref.buy_lots()
-                 << '|' << right << setw(10) << sell_ticks
-                 << '|' << right << setw(10) << ref.sell_lots()
-                 << '|' << endl;
-        }
 
         cout <<
             "|id        "
@@ -674,7 +641,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto exec : result.execs()) {
+        for (auto exec : serv_.execs()) {
             ExecRef ref(exec);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << gtol(ref.order())

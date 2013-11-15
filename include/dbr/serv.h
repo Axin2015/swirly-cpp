@@ -87,7 +87,7 @@ dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date);
 DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-               DbrFlags flags, struct DbrResult* result);
+               DbrFlags flags);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:
@@ -116,6 +116,20 @@ dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id);
 
 DBR_API DbrBool
 dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id);
+
+#define DBR_SERV_END_EXEC NULL
+
+static inline struct DbrExec*
+dbr_serv_exec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrExec, cycle_node_, node);
+}
+
+DBR_API struct DbrSlNode*
+dbr_serv_first_exec(DbrServ serv);
+
+DBR_API DbrBool
+dbr_serv_empty_exec(DbrServ serv);
 
 /** @} */
 

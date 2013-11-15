@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_RESULT_HPP
-#define DBRPP_RESULT_HPP
+#ifndef DBRPP_CYCLE_HPP
+#define DBRPP_CYCLE_HPP
 
 #include <dbrpp/exec.hpp>
 #include <dbrpp/iter.hpp>
@@ -27,21 +27,21 @@
 
 namespace dbr {
 
-class ResultPosns {
+class CyclePosns {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrPosn Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_result_posn_entry(node);
+            return dbr_cycle_posn_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_result_posn_entry(const_cast<Node*>(node));
+            return dbr_cycle_posn_entry(const_cast<Node*>(node));
         }
     };
-    const DbrResult* result_;
+    const DbrCycle* cycle_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -71,14 +71,14 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ResultPosns(const DbrResult& result) noexcept
-        : result_{&result}
+    CyclePosns(const DbrCycle& cycle) noexcept
+        : cycle_{&cycle}
     {
     }
     void
-    swap(ResultPosns& rhs) noexcept
+    swap(CyclePosns& rhs) noexcept
     {
-        std::swap(result_, rhs.result_);
+        std::swap(cycle_, rhs.cycle_);
     }
 
     // Iterator.
@@ -86,12 +86,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_->first_posn;
+        return cycle_->first_posn;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_->first_posn;
+        return cycle_->first_posn;
     }
     Iterator
     end() noexcept
@@ -129,25 +129,25 @@ public:
     bool
     empty() const noexcept
     {
-        return result_->first_posn == nullptr;
+        return cycle_->first_posn == nullptr;
     }
 };
 
-class ResultExecs {
+class CycleExecs {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrExec Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_result_trade_entry(node);
+            return dbr_cycle_exec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_result_trade_entry(const_cast<Node*>(node));
+            return dbr_cycle_exec_entry(const_cast<Node*>(node));
         }
     };
-    const DbrResult* result_;
+    const DbrCycle* cycle_;
 public:
     typedef Policy::Entry ValueType;
     typedef Policy::Entry* Pointer;
@@ -177,14 +177,14 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ResultExecs(const DbrResult& result) noexcept
-        : result_{&result}
+    CycleExecs(const DbrCycle& cycle) noexcept
+        : cycle_{&cycle}
     {
     }
     void
-    swap(ResultExecs& rhs) noexcept
+    swap(CycleExecs& rhs) noexcept
     {
-        std::swap(result_, rhs.result_);
+        std::swap(cycle_, rhs.cycle_);
     }
 
     // Iterator.
@@ -192,12 +192,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return result_->first_exec;
+        return cycle_->first_exec;
     }
     ConstIterator
     begin() const noexcept
     {
-        return result_->first_exec;
+        return cycle_->first_exec;
     }
     Iterator
     end() noexcept
@@ -235,18 +235,18 @@ public:
     bool
     empty() const noexcept
     {
-        return result_->first_exec == nullptr;
+        return cycle_->first_exec == nullptr;
     }
 };
 
-class Result {
-    DbrResult impl_;
+class Cycle {
+    DbrCycle impl_;
 public:
-    operator DbrResult&() noexcept
+    operator DbrCycle&() noexcept
     {
         return impl_;
     }
-    DbrResult*
+    DbrCycle*
     c_arg() noexcept
     {
         return &impl_;
@@ -256,18 +256,18 @@ public:
     {
         return OrderRef{*impl_.new_order};
     }
-    ResultPosns
+    CyclePosns
     posns() const noexcept
     {
-        return ResultPosns{impl_};
+        return CyclePosns{impl_};
     }
-    ResultExecs
+    CycleExecs
     execs() const noexcept
     {
-        return ResultExecs{impl_};
+        return CycleExecs{impl_};
     }
 };
 
 } // dbr
 
-#endif // DBRPP_RESULT_HPP
+#endif // DBRPP_CYCLE_HPP

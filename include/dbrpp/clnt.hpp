@@ -19,9 +19,9 @@
 #define DBRPP_CLNT_HPP
 
 #include <dbrpp/accnt.hpp>
+#include <dbrpp/cycle.hpp>
 #include <dbrpp/except.hpp>
 #include <dbrpp/trader.hpp>
-#include <dbrpp/result.hpp>
 
 #include <dbr/clnt.h>
 

@@ -336,28 +336,28 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
         goto fail1;
     }
 
-    assert(msg.type == DBR_RESULT_REP);
+    assert(msg.type == DBR_CYCLE_REP);
 
-    fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, msg.result_rep.new_order));
+    fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, msg.cycle_rep.new_order));
 
     // Posn list is transformed to include existing positions with updates.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrSlNode* node = msg.result_rep.first_posn; node; ) {
+    for (struct DbrSlNode* node = msg.cycle_rep.first_posn; node; ) {
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_posn_entry(node));
         node = node->next;
         // Transfer ownership or free if update.
         posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
         dbr_queue_insert_back(&q, &posn->entity_node_);
     }
-    msg.result_rep.first_posn = q.first;
+    msg.cycle_rep.first_posn = q.first;
 
-    for (struct DbrSlNode* node = msg.result_rep.first_trade; node; node = node->next) {
+    for (struct DbrSlNode* node = msg.cycle_rep.first_trade; node; node = node->next) {
         struct DbrExec* exec = enrich_trade(&clnt->cache, dbr_exec_entry(node));
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader, exec);
     }
 
-    return msg.result_rep.new_order;
+    return msg.cycle_rep.new_order;
  fail1:
     return NULL;
 }

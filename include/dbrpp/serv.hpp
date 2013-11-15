@@ -19,10 +19,10 @@
 #define DBRPP_SERV_HPP
 
 #include <dbrpp/accnt.hpp>
+#include <dbrpp/cycle.hpp>
 #include <dbrpp/except.hpp>
 #include <dbrpp/book.hpp>
 #include <dbrpp/trader.hpp>
-#include <dbrpp/result.hpp>
 
 #include <dbr/serv.h>
 
@@ -161,6 +161,112 @@ typedef ServRecs<DBR_TRADER> ServTraderRecs;
 typedef ServRecs<DBR_ACCNT> ServAccntRecs;
 typedef ServRecs<DBR_CONTR> ServContrRecs;
 
+class ServExecs {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrExec Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_cycle_exec_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_cycle_exec_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrServ serv_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ServExecs(DbrServ serv) noexcept
+        : serv_{serv}
+    {
+    }
+    void
+    swap(ServExecs& rhs) noexcept
+    {
+        std::swap(serv_, rhs.serv_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_serv_first_exec(serv_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_serv_first_exec(serv_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return nullptr;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return nullptr;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_serv_empty_exec(serv_);
+    }
+};
+
 class Serv {
     DbrServ impl_;
 public:
@@ -261,10 +367,10 @@ public:
     }
     OrderRef
     place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
-          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags, Result& result)
+          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags)
     {
         DbrOrder* const order = dbr_serv_place(impl_, trader, accnt, &book, ref, action, ticks,
-                                               lots, min, flags, result.c_arg());
+                                               lots, min, flags);
         if (!order)
             throw_exception();
         return OrderRef{*order};
@@ -312,6 +418,11 @@ public:
     {
         if (!dbr_serv_archive_trade(impl_, trader, id))
             throw_exception();
+    }
+    ServExecs
+    execs() const noexcept
+    {
+        return ServExecs{impl_};
     }
 };
 

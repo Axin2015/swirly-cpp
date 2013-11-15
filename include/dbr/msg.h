@@ -32,7 +32,7 @@
 enum {
     DBR_STATUS_REP = 1,
     DBR_ENTITY_REP,
-    DBR_RESULT_REP,
+    DBR_CYCLE_REP,
     DBR_ORDER_REP,
     DBR_READ_ENTITY_REQ,
     DBR_SESS_ENTITY_REQ,
@@ -71,9 +71,9 @@ struct DbrMsg {
         } entity_rep;
         struct {
             struct DbrOrder* new_order;
-            // dbr_result_posn_entry()
+            // dbr_cycle_posn_entry()
             struct DbrSlNode* first_posn;
-            // dbr_result_trade_entry()
+            // dbr_cycle_exec_entry()
             struct DbrSlNode* first_trade;
             /**
              * @privatesection
@@ -81,7 +81,7 @@ struct DbrMsg {
             // Set by dbr_msg_len();
             size_t posn_count_;
             size_t trade_count_;
-        } result_rep;
+        } cycle_rep;
         struct {
             struct DbrOrder* order;
         } order_rep;

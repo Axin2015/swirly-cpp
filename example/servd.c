@@ -294,17 +294,18 @@ place_order(const struct DbrMsg* req)
     const DbrLots min = req->place_order_req.min;
     const DbrFlags flags = req->place_order_req.flags;
 
-    struct DbrResult result;
-    if (!dbr_serv_place(serv, trader, accnt, book, ref, action, ticks, lots, min, flags, &result)) {
+    struct DbrOrder* order = dbr_serv_place(serv, trader, accnt, book, ref, action, ticks,
+                                            lots, min, flags);
+    if (!order) {
         status_err(&rep, req->req_id);
         goto fail1;
     }
 
     rep.req_id = req->req_id;
-    rep.type = DBR_RESULT_REP;
-    rep.result_rep.new_order = result.new_order;
-    rep.result_rep.first_posn = result.first_posn;
-    rep.result_rep.first_trade = result.first_exec;
+    rep.type = DBR_CYCLE_REP;
+    rep.cycle_rep.new_order = order;
+    rep.cycle_rep.first_posn = NULL;
+    rep.cycle_rep.first_trade = dbr_serv_first_exec(serv);
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
