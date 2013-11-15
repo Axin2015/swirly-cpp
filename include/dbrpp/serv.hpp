@@ -19,9 +19,10 @@
 #define DBRPP_SERV_HPP
 
 #include <dbrpp/accnt.hpp>
-#include <dbrpp/cycle.hpp>
-#include <dbrpp/except.hpp>
 #include <dbrpp/book.hpp>
+#include <dbrpp/except.hpp>
+#include <dbrpp/order.hpp>
+#include <dbrpp/slnode.hpp>
 #include <dbrpp/trader.hpp>
 
 #include <dbr/serv.h>
@@ -35,12 +36,12 @@ class ServRecs {
         static Entry*
         entry(Node* node)
         {
-            return dbr_rec_entry(node);
+            return dbr_entity_rec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_rec_entry(const_cast<Node*>(node));
+            return dbr_entity_rec_entry(const_cast<Node*>(node));
         }
     };
     DbrServ serv_;
@@ -167,12 +168,12 @@ class ServExecs {
         static Entry*
         entry(Node* node)
         {
-            return dbr_cycle_exec_entry(node);
+            return dbr_serv_exec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_cycle_exec_entry(const_cast<Node*>(node));
+            return dbr_serv_exec_entry(const_cast<Node*>(node));
         }
     };
     DbrServ serv_;
@@ -264,6 +265,112 @@ public:
     empty() const noexcept
     {
         return dbr_serv_empty_exec(serv_);
+    }
+};
+
+class ServPosns {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrPosn Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_serv_posn_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_serv_posn_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrServ serv_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ServPosns(DbrServ serv) noexcept
+        : serv_{serv}
+    {
+    }
+    void
+    swap(ServPosns& rhs) noexcept
+    {
+        std::swap(serv_, rhs.serv_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_serv_first_posn(serv_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_serv_first_posn(serv_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return nullptr;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return nullptr;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_serv_empty_posn(serv_);
     }
 };
 
@@ -423,6 +530,11 @@ public:
     execs() const noexcept
     {
         return ServExecs{impl_};
+    }
+    ServPosns
+    posns() const noexcept
+    {
+        return ServPosns{impl_};
     }
 };
 

@@ -68,7 +68,7 @@ DBR_API struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
     struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
-    return node != DBR_SERV_END_REC ? dbr_rec_entry(node) : NULL;
+    return node != DBR_SERV_END_REC ? dbr_entity_rec_entry(node) : NULL;
 }
 
 static DbrBool
@@ -304,8 +304,8 @@ place_order(const struct DbrMsg* req)
     rep.req_id = req->req_id;
     rep.type = DBR_CYCLE_REP;
     rep.cycle_rep.new_order = order;
-    rep.cycle_rep.first_posn = NULL;
-    rep.cycle_rep.first_trade = dbr_serv_first_exec(serv);
+    rep.cycle_rep.first_posn = dbr_serv_first_posn(serv);
+    rep.cycle_rep.first_exec = dbr_serv_first_exec(serv);
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");

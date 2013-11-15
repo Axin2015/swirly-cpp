@@ -44,7 +44,7 @@ static inline void
 free_recs(struct DbrSlNode* node, void (*term_state)(struct DbrRec*), DbrPool pool)
 {
     while (node) {
-        struct DbrRec* rec = dbr_rec_entry(node);
+        struct DbrRec* rec = dbr_entity_rec_entry(node);
         node = node->next;
         term_state(rec);
         dbr_pool_free_rec(pool, rec);
@@ -85,7 +85,7 @@ get_id(const struct FigCache* cache, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
-    return dbr_rec_entry(node);
+    return dbr_entity_rec_entry(node);
 }
 
 static inline void
@@ -111,7 +111,7 @@ emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     cache->first_contr = first;
     cache->contr_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_rec_entry(node);
+        struct DbrRec* rec = dbr_entity_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
@@ -124,7 +124,7 @@ emplace_trader(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     cache->first_trader = first;
     cache->trader_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_rec_entry(node);
+        struct DbrRec* rec = dbr_entity_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
@@ -137,7 +137,7 @@ emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     cache->first_accnt = first;
     cache->accnt_size = size;
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_rec_entry(node);
+        struct DbrRec* rec = dbr_entity_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }

@@ -188,7 +188,7 @@ dbr_rec_init(struct DbrRec* rec)
 }
 
 static inline struct DbrRec*
-dbr_rec_entry(struct DbrSlNode* node)
+dbr_entity_rec_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrRec, entity_node_, node);
 }
@@ -274,7 +274,7 @@ dbr_memb_init(struct DbrMemb* memb)
 }
 
 static inline struct DbrMemb*
-dbr_memb_entry(struct DbrSlNode* node)
+dbr_entity_memb_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrMemb, entity_node_, node);
 }
@@ -301,21 +301,27 @@ struct DbrPosn {
      * @privatesection
      */
     // Singly-linked for data model.
+    struct DbrSlNode cycle_node_;
     struct DbrSlNode entity_node_;
     struct DbrRbNode accnt_node_;
-    struct DbrSlNode cycle_node_;
 };
 
 static inline void
 dbr_posn_init(struct DbrPosn* posn)
 {
+    dbr_slnode_init(&posn->cycle_node_);
     dbr_slnode_init(&posn->entity_node_);
     dbr_rbnode_init(&posn->accnt_node_);
-    dbr_slnode_init(&posn->cycle_node_);
 }
 
 static inline struct DbrPosn*
-dbr_posn_entry(struct DbrSlNode* node)
+dbr_cycle_posn_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrPosn, cycle_node_, node);
+}
+
+static inline struct DbrPosn*
+dbr_entity_posn_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrPosn, entity_node_, node);
 }
@@ -396,16 +402,16 @@ dbr_order_init(struct DbrOrder* order)
     dbr_rbnode_init(&order->trader_node_);
 }
 
-static inline struct DbrOrder*
-dbr_order_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrOrder, entity_node_, node);
-}
-
 static inline DbrBool
 dbr_order_done(const struct DbrOrder* order)
 {
     return order->resd == 0;
+}
+
+static inline struct DbrOrder*
+dbr_entity_order_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrOrder, entity_node_, node);
 }
 
 enum DbrRole {
@@ -452,21 +458,27 @@ struct DbrExec {
      * @privatesection
      */
     // Singly-linked for data model.
+    struct DbrSlNode cycle_node_;
     struct DbrSlNode entity_node_;
     struct DbrRbNode trader_node_;
-    struct DbrSlNode cycle_node_;
 };
 
 static inline void
 dbr_exec_init(struct DbrExec* exec)
 {
+    dbr_slnode_init(&exec->cycle_node_);
     dbr_slnode_init(&exec->entity_node_);
     dbr_rbnode_init(&exec->trader_node_);
-    dbr_slnode_init(&exec->cycle_node_);
 }
 
 static inline struct DbrExec*
-dbr_exec_entry(struct DbrSlNode* node)
+dbr_cycle_exec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrExec, cycle_node_, node);
+}
+
+static inline struct DbrExec*
+dbr_entity_exec_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrExec, entity_node_, node);
 }
@@ -547,18 +559,6 @@ dbr_cycle_init(struct DbrCycle* cycle)
     cycle->new_order = NULL;
     cycle->first_posn = NULL;
     cycle->first_exec = NULL;
-}
-
-static inline struct DbrPosn*
-dbr_cycle_posn_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrPosn, cycle_node_, node);
-}
-
-static inline struct DbrExec*
-dbr_cycle_exec_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrExec, cycle_node_, node);
 }
 
 /** @} */

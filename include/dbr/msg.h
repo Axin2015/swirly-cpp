@@ -57,11 +57,11 @@ struct DbrMsg {
         } status_rep;
         struct {
             int type;
-            // dbr_rec_entry()
-            // dbr_order_entry()
-            // dbr_memb_entry()
-            // dbr_exec_entry()
-            // dbr_posn_entry()
+            // dbr_entity_rec_entry()
+            // dbr_entity_order_entry()
+            // dbr_entity_memb_entry()
+            // dbr_entity_exec_entry()
+            // dbr_entity_posn_entry()
             struct DbrSlNode* first;
             /**
              * @privatesection
@@ -74,13 +74,13 @@ struct DbrMsg {
             // dbr_cycle_posn_entry()
             struct DbrSlNode* first_posn;
             // dbr_cycle_exec_entry()
-            struct DbrSlNode* first_trade;
+            struct DbrSlNode* first_exec;
             /**
              * @privatesection
              */
             // Set by dbr_msg_len();
             size_t posn_count_;
-            size_t trade_count_;
+            size_t exec_count_;
         } cycle_rep;
         struct {
             struct DbrOrder* order;

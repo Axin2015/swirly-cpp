@@ -15,9 +15,10 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/serv.hpp>
+#include <dbrpp/exec.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
+#include <dbrpp/serv.hpp>
 #include <dbrpp/sqlstore.hpp>
 
 using namespace dbr;

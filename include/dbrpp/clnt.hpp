@@ -19,8 +19,9 @@
 #define DBRPP_CLNT_HPP
 
 #include <dbrpp/accnt.hpp>
-#include <dbrpp/cycle.hpp>
 #include <dbrpp/except.hpp>
+#include <dbrpp/order.hpp>
+#include <dbrpp/slnode.hpp>
 #include <dbrpp/trader.hpp>
 
 #include <dbr/clnt.h>
@@ -34,12 +35,12 @@ class ClntRecs {
         static Entry*
         entry(Node* node)
         {
-            return dbr_rec_entry(node);
+            return dbr_entity_rec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_rec_entry(const_cast<Node*>(node));
+            return dbr_entity_rec_entry(const_cast<Node*>(node));
         }
     };
     DbrClnt clnt_;

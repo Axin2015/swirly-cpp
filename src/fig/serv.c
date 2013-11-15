@@ -66,7 +66,7 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
-    return dbr_rec_entry(node);
+    return dbr_entity_rec_entry(node);
 }
 
 static inline struct DbrOrder*
@@ -318,7 +318,7 @@ emplace_orders(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = enrich_order(&serv->cache, dbr_order_entry(node));
+        struct DbrOrder* order = enrich_order(&serv->cache, dbr_entity_order_entry(node));
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
@@ -345,7 +345,7 @@ emplace_orders(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrOrder* order = dbr_order_entry(node);
+        struct DbrOrder* order = dbr_entity_order_entry(node);
         node = node->next;
         dbr_pool_free_order(serv->pool, order);
     } while (node);
@@ -361,7 +361,7 @@ emplace_trades(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrExec* exec = enrich_trade(&serv->cache, dbr_exec_entry(node));
+        struct DbrExec* exec = enrich_trade(&serv->cache, dbr_entity_exec_entry(node));
         struct FigTrader* trader = fig_trader_lazy(exec->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
@@ -373,7 +373,7 @@ emplace_trades(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrExec* exec = dbr_exec_entry(node);
+        struct DbrExec* exec = dbr_entity_exec_entry(node);
         node = node->next;
         dbr_pool_free_exec(serv->pool, exec);
     } while (node);
@@ -389,7 +389,7 @@ emplace_membs(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_memb_entry(node));
+        struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_entity_memb_entry(node));
         struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
@@ -401,7 +401,7 @@ emplace_membs(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrMemb* memb = dbr_memb_entry(node);
+        struct DbrMemb* memb = dbr_entity_memb_entry(node);
         node = node->next;
         dbr_pool_free_memb(serv->pool, memb);
     } while (node);
@@ -417,7 +417,7 @@ emplace_posns(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_posn_entry(node));
+        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_entity_posn_entry(node));
         struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
@@ -429,7 +429,7 @@ emplace_posns(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrPosn* posn = dbr_posn_entry(node);
+        struct DbrPosn* posn = dbr_entity_posn_entry(node);
         node = node->next;
         dbr_pool_free_posn(serv->pool, posn);
     } while (node);
@@ -838,4 +838,16 @@ DBR_API DbrBool
 dbr_serv_empty_exec(DbrServ serv)
 {
     return serv->cycle.first_exec == NULL;
+}
+
+DBR_API struct DbrSlNode*
+dbr_serv_first_posn(DbrServ serv)
+{
+    return serv->cycle.first_posn;
+}
+
+DBR_API DbrBool
+dbr_serv_empty_posn(DbrServ serv)
+{
+    return serv->cycle.first_posn == NULL;
 }
