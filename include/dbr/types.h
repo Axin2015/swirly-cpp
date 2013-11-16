@@ -547,20 +547,6 @@ dbr_trans_match_entry(struct DbrSlNode* node)
     return dbr_implof(struct DbrMatch, trans_node_, node);
 }
 
-struct DbrCycle {
-    struct DbrOrder* new_order;
-    struct DbrSlNode* first_posn;
-    struct DbrSlNode* first_exec;
-};
-
-static inline void
-dbr_cycle_init(struct DbrCycle* cycle)
-{
-    cycle->new_order = NULL;
-    cycle->first_posn = NULL;
-    cycle->first_exec = NULL;
-}
-
 /** @} */
 
 /**

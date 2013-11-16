@@ -117,6 +117,9 @@ dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id);
 DBR_API DbrBool
 dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id);
 
+DBR_API void
+dbr_serv_clear(DbrServ serv);
+
 #define DBR_SERV_END_EXEC NULL
 
 static inline struct DbrExec*

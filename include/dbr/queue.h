@@ -98,6 +98,18 @@ dbr_queue_empty(const struct DbrQueue* queue)
     return queue->first == NULL;
 }
 
+static inline void
+dbr_queue_join(struct DbrQueue* lhs, struct DbrQueue* rhs)
+{
+    if (rhs->first) {
+        if (lhs->first)
+            *lhs->last = rhs->first;
+        else
+            lhs->first = rhs->first;
+        lhs->last = rhs->last;
+    }
+}
+
 /** @} */
 
 #endif // DBR_QUEUE_H

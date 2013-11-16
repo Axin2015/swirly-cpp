@@ -526,6 +526,11 @@ public:
         if (!dbr_serv_archive_trade(impl_, trader, id))
             throw_exception();
     }
+    void
+    clear()
+    {
+        dbr_serv_clear(impl_);
+    }
     ServExecs
     execs() const noexcept
     {
