@@ -378,8 +378,13 @@ emplace_membs(DbrServ serv)
         if (dbr_unlikely(!trader))
             goto fail2;
 
+        struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, serv->pool);
+        if (dbr_unlikely(!accnt))
+            goto fail2;
+
         // Transfer ownership.
         fig_trader_emplace_memb(trader, memb);
+        fig_accnt_insert_memb(accnt, memb);
     }
     return true;
  fail2:

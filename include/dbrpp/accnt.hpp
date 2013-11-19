@@ -185,6 +185,162 @@ public:
     }
 };
 
+class AccntMembs {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrMemb Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_accnt_memb_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_accnt_memb_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrAccnt accnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    AccntMembs(DbrAccnt accnt) noexcept
+        : accnt_{accnt}
+    {
+    }
+    void
+    swap(AccntMembs& rhs) noexcept
+    {
+        std::swap(accnt_, rhs.accnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_accnt_first_memb(accnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_accnt_first_memb(accnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_ACCNT_END_MEMB;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_ACCNT_END_MEMB;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_accnt_last_memb(accnt_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_accnt_last_memb(accnt_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_ACCNT_END_MEMB;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_ACCNT_END_MEMB;
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrTicks ticks) noexcept
+    {
+        return dbr_accnt_find_memb_id(accnt_, ticks);
+    }
+    ConstIterator
+    find(DbrTicks ticks) const noexcept
+    {
+        return dbr_accnt_find_memb_id(accnt_, ticks);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_accnt_empty_memb(accnt_);
+    }
+};
+
 class Accnt {
     DbrAccnt impl_;
 public:
@@ -216,6 +372,11 @@ public:
     posns() const noexcept
     {
         return AccntPosns{impl_};
+    }
+    AccntMembs
+    membs() const noexcept
+    {
+        return AccntMembs{impl_};
     }
 };
 

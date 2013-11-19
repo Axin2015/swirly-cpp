@@ -176,6 +176,11 @@
  */
 
 /**
+ * @defgroup AccntMemb Member
+ * @ingroup Accnt
+ */
+
+/**
  * @defgroup Book Book
  * @ingroup Fig
  */

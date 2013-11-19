@@ -27,6 +27,7 @@ struct FigAccnt {
     struct DbrRec* rec;
     DbrPool pool;
     struct DbrTree posns;
+    struct DbrTree membs;
 };
 
 DBR_EXTERN struct FigAccnt*
@@ -87,6 +88,47 @@ static inline DbrBool
 fig_accnt_empty_posn(const struct FigAccnt* accnt)
 {
     return dbr_tree_empty(&accnt->posns);
+}
+
+// Memb.
+
+#define FIG_ACCNT_END_MEMB DBR_TREE_END
+
+// This does not transfer ownership.
+
+static inline void
+fig_accnt_insert_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+    struct DbrRbNode* node = dbr_tree_insert(&accnt->membs, memb->trader.rec->id,
+                                             &memb->accnt_node_);
+    assert(!node);
+#pragma GCC diagnostic pop
+}
+
+static inline struct DbrRbNode*
+fig_accnt_find_memb_id(const struct FigAccnt* accnt, DbrIden id)
+{
+    return dbr_tree_find(&accnt->membs, id);
+}
+
+static inline struct DbrRbNode*
+fig_accnt_first_memb(const struct FigAccnt* accnt)
+{
+    return dbr_tree_first(&accnt->membs);
+}
+
+static inline struct DbrRbNode*
+fig_accnt_last_memb(const struct FigAccnt* accnt)
+{
+    return dbr_tree_last(&accnt->membs);
+}
+
+static inline DbrBool
+fig_accnt_empty_memb(const struct FigAccnt* accnt)
+{
+    return dbr_tree_empty(&accnt->membs);
 }
 
 #endif // FIG_ACCNT_H

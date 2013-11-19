@@ -264,6 +264,7 @@ struct DbrMemb {
     // Singly-linked for data model.
     struct DbrSlNode entity_node_;
     struct DbrRbNode trader_node_;
+    struct DbrRbNode accnt_node_;
 };
 
 static inline void

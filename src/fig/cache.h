@@ -35,16 +35,12 @@
 struct FigCache {
     void (*term_state)(struct DbrRec*);
     DbrPool pool;
-    // Must be set before first_book.
-    struct DbrSlNode* first_contr;
-    size_t contr_size;
-    struct DbrSlNode* first_book;
-    size_t book_size;
-    // Must be set before first_trader.
-    struct DbrSlNode* first_accnt;
-    size_t accnt_size;
     struct DbrSlNode* first_trader;
     size_t trader_size;
+    struct DbrSlNode* first_accnt;
+    size_t accnt_size;
+    struct DbrSlNode* first_contr;
+    size_t contr_size;
     struct {
         struct DbrStack ids;
         struct DbrStack mnems;

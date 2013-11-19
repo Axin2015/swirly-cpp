@@ -105,19 +105,6 @@ insert_mnem(struct FigCache* cache, struct DbrRec* rec)
 }
 
 static void
-emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
-{
-    assert(!cache->first_contr);
-    cache->first_contr = first;
-    cache->contr_size = size;
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_entity_rec_entry(node);
-        insert_id(cache, rec);
-        insert_mnem(cache, rec);
-    }
-}
-
-static void
 emplace_trader(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 {
     assert(!cache->first_trader);
@@ -143,19 +130,30 @@ emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
     }
 }
 
+static void
+emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+{
+    assert(!cache->first_contr);
+    cache->first_contr = first;
+    cache->contr_size = size;
+    for (struct DbrSlNode* node = first; node; node = node->next) {
+        struct DbrRec* rec = dbr_entity_rec_entry(node);
+        insert_id(cache, rec);
+        insert_mnem(cache, rec);
+    }
+}
+
 DBR_EXTERN void
 fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPool pool)
 {
     cache->term_state = term_state ? term_state : term_state_noop;
     cache->pool = pool;
-    cache->first_contr = NULL;
-    cache->contr_size = 0;
-    cache->first_book = NULL;
-    cache->book_size = 0;
-    cache->first_accnt = NULL;
-    cache->accnt_size = 0;
     cache->first_trader = NULL;
     cache->trader_size = 0;
+    cache->first_accnt = NULL;
+    cache->accnt_size = 0;
+    cache->first_contr = NULL;
+    cache->contr_size = 0;
     // Zero buckets.
     memset(cache->buckets, 0, sizeof(cache->buckets));
 }
@@ -163,10 +161,9 @@ fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPo
 DBR_EXTERN void
 fig_cache_term(struct FigCache* cache)
 {
-    // Traders must be released before books, because traders subscribe to books.
-    free_recs(cache->first_trader, cache->term_state, cache->pool);
-    free_recs(cache->first_accnt, cache->term_state, cache->pool);
     free_recs(cache->first_contr, cache->term_state, cache->pool);
+    free_recs(cache->first_accnt, cache->term_state, cache->pool);
+    free_recs(cache->first_trader, cache->term_state, cache->pool);
 }
 
 DBR_EXTERN void

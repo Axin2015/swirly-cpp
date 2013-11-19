@@ -50,6 +50,7 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
         accnt->rec = arec;
         accnt->pool = pool;
         dbr_tree_init(&accnt->posns);
+        dbr_tree_init(&accnt->membs);
 
         arec->accnt.state = accnt;
     }
@@ -64,6 +65,7 @@ fig_accnt_term(struct DbrRec* arec)
     struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
+        // Do not free members because these are owned by the trader.
         free_posns(accnt);
         free(accnt);
     }
@@ -166,4 +168,30 @@ DBR_API DbrBool
 dbr_accnt_empty_posn(DbrAccnt accnt)
 {
     return fig_accnt_empty_posn(accnt);
+}
+
+// AccntMemb
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_memb_id(accnt, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_memb(DbrAccnt accnt)
+{
+    return fig_accnt_first_memb(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_memb(DbrAccnt accnt)
+{
+    return fig_accnt_last_memb(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_memb(DbrAccnt accnt)
+{
+    return fig_accnt_empty_memb(accnt);
 }
