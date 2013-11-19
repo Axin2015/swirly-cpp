@@ -301,23 +301,17 @@ struct DbrPosn {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode cycle_node_;
     struct DbrSlNode entity_node_;
     struct DbrRbNode accnt_node_;
+    struct DbrRbNode serv_node_;
 };
 
 static inline void
 dbr_posn_init(struct DbrPosn* posn)
 {
-    dbr_slnode_init(&posn->cycle_node_);
     dbr_slnode_init(&posn->entity_node_);
     dbr_rbnode_init(&posn->accnt_node_);
-}
-
-static inline struct DbrPosn*
-dbr_cycle_posn_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrPosn, cycle_node_, node);
+    dbr_rbnode_init(&posn->serv_node_);
 }
 
 static inline struct DbrPosn*
@@ -458,23 +452,17 @@ struct DbrExec {
      * @privatesection
      */
     // Singly-linked for data model.
-    struct DbrSlNode cycle_node_;
     struct DbrSlNode entity_node_;
     struct DbrRbNode trader_node_;
+    struct DbrSlNode serv_node_;
 };
 
 static inline void
 dbr_exec_init(struct DbrExec* exec)
 {
-    dbr_slnode_init(&exec->cycle_node_);
     dbr_slnode_init(&exec->entity_node_);
     dbr_rbnode_init(&exec->trader_node_);
-}
-
-static inline struct DbrExec*
-dbr_cycle_exec_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrExec, cycle_node_, node);
+    dbr_slnode_init(&exec->serv_node_);
 }
 
 static inline struct DbrExec*

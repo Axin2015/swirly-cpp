@@ -269,7 +269,7 @@ public:
 };
 
 class ServPosns {
-    struct Policy : NodeTraits<DbrSlNode> {
+    struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrPosn Entry;
         static Entry*
         entry(Node* node)

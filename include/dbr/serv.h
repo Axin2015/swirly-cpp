@@ -125,7 +125,7 @@ dbr_serv_clear(DbrServ serv);
 static inline struct DbrExec*
 dbr_serv_exec_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrExec, cycle_node_, node);
+    return dbr_implof(struct DbrExec, serv_node_, node);
 }
 
 DBR_API struct DbrSlNode*
@@ -137,12 +137,12 @@ dbr_serv_empty_exec(DbrServ serv);
 #define DBR_SERV_END_POSN NULL
 
 static inline struct DbrPosn*
-dbr_serv_posn_entry(struct DbrSlNode* node)
+dbr_serv_posn_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrPosn, cycle_node_, node);
+    return dbr_implof(struct DbrPosn, serv_node_, node);
 }
 
-DBR_API struct DbrSlNode*
+DBR_API struct DbrRbNode*
 dbr_serv_first_posn(DbrServ serv);
 
 DBR_API DbrBool

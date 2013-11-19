@@ -71,10 +71,10 @@ struct DbrMsg {
         } entity_rep;
         struct {
             struct DbrOrder* new_order;
-            // dbr_cycle_posn_entry()
-            struct DbrSlNode* first_posn;
-            // dbr_cycle_exec_entry()
+            // dbr_entity_exec_entry()
             struct DbrSlNode* first_exec;
+            // dbr_entity_posn_entry()
+            struct DbrSlNode* first_posn;
             /**
              * @privatesection
              */

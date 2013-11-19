@@ -24,6 +24,7 @@
 #include <dbr/queue.h>
 #include <dbr/sqlstore.h>
 #include <dbr/trader.h>
+#include <dbr/tree.h>
 
 #include <zmq.h>
 
@@ -301,11 +302,19 @@ place_order(const struct DbrMsg* req)
         goto fail1;
     }
 
+    struct DbrQueue posns;
+    dbr_queue_init(&posns);
+    for (struct DbrRbNode* node = dbr_serv_first_posn(serv);
+         node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
+        struct DbrPosn* posn = dbr_serv_posn_entry(node);
+        dbr_queue_insert_back(&posns, &posn->entity_node_);
+    }
+
     rep.req_id = req->req_id;
     rep.type = DBR_CYCLE_REP;
     rep.cycle_rep.new_order = order;
-    rep.cycle_rep.first_posn = dbr_serv_first_posn(serv);
     rep.cycle_rep.first_exec = dbr_serv_first_exec(serv);
+    rep.cycle_rep.first_posn = posns.first;
     const DbrBool ok = dbr_send_msg(sock, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");
