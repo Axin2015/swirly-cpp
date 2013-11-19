@@ -245,13 +245,8 @@ static void
 commit_cycle(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
               const struct DbrTrans* trans, DbrMillis now)
 {
-    struct DbrQueue execs;
-    struct DbrTree posns;
-    dbr_queue_init(&execs);
-    dbr_tree_init(&posns);
-
     if (trans->new_posn)
-        tree_insert(&posns, &trans->new_posn->serv_node_);
+        tree_insert(&serv->posns, &trans->new_posn->serv_node_);
 
     struct DbrSlNode* node = trans->first_match;
     while (node) {
@@ -262,7 +257,7 @@ commit_cycle(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Reduce maker. Maker's revision will be incremented by this call.
         dbr_book_take(book, maker_order, match->lots, now);
         // Insert maker accnt if taker is a member.
-        tree_insert(&posns, &match->maker_posn->serv_node_);
+        tree_insert(&serv->posns, &match->maker_posn->serv_node_);
 
         // Must succeed because maker order exists.
         struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &serv->index,
@@ -274,24 +269,16 @@ commit_cycle(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Update maker.
         fig_trader_emplace_trade(maker, match->maker_exec);
         apply_posn(match->maker_posn, match->maker_exec);
-        dbr_queue_insert_back(&execs, &match->maker_exec->serv_node_);
+        dbr_queue_insert_back(&serv->execs, &match->maker_exec->serv_node_);
 
         // Update taker.
         fig_trader_emplace_trade(taker, match->taker_exec);
         apply_posn(trans->new_posn, match->taker_exec);
-        dbr_queue_insert_back(&execs, &match->taker_exec->serv_node_);
+        dbr_queue_insert_back(&serv->execs, &match->taker_exec->serv_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
         dbr_pool_free_match(serv->pool, match);
-    }
-
-    dbr_queue_join(&serv->execs, &execs);
-
-    struct DbrRbNode* pnode;
-    while ((pnode = posns.root)) {
-        dbr_tree_remove(&posns, pnode);
-        tree_insert(&serv->posns, pnode);
     }
 }
 
