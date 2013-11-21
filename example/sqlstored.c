@@ -50,7 +50,7 @@ free_stmts(struct DbrSlNode* first, DbrPool pool)
 }
 
 static void
-status_err(struct DbrMsg* rep, DbrIden req_id)
+status_err(struct DbrBody* rep, DbrIden req_id)
 {
     rep->req_id = req_id;
     rep->type = DBR_STATUS_REP;
@@ -59,10 +59,10 @@ status_err(struct DbrMsg* rep, DbrIden req_id)
 }
 
 static DbrBool
-read_entity(const struct DbrMsg* req)
+read_entity(const struct DbrBody* req)
 {
-    struct DbrMsg rep = { .req_id = req->req_id, .type = DBR_ENTITY_REP,
-                          .entity_rep = { .type = req->read_entity_req.type } };
+    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_ENTITY_REP,
+                           .entity_rep = { .type = req->read_entity_req.type } };
     DbrModel model = dbr_sqlstore_model(store);
 
     if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {
@@ -70,22 +70,22 @@ read_entity(const struct DbrMsg* req)
         status_err(&rep, req->req_id);
         goto fail1;
     }
-    const DbrBool ok = dbr_send_msg(sock, &rep, false);
+    const DbrBool ok = dbr_send_body(sock, &rep, false);
     dbr_pool_free_entities(pool, rep.entity_rep.type, rep.entity_rep.first);
     if (!ok)
-        dbr_err_print("dbr_send_msg() failed");
+        dbr_err_print("dbr_send_body() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(sock, &rep, false))
-        dbr_err_print("dbr_send_msg() failed");
+    if (!dbr_send_body(sock, &rep, false))
+        dbr_err_print("dbr_send_body() failed");
     return false;
 }
 
 static DbrBool
-write_trans(const struct DbrMsg* req)
+write_trans(const struct DbrBody* req)
 {
-    struct DbrMsg rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
-                          .status_rep = { .num = 0, .msg = "" } };
+    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
+                           .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_begin_trans(journ)) {
@@ -176,16 +176,16 @@ write_trans(const struct DbrMsg* req)
         status_err(&rep, req->req_id);
         goto fail2;
     }
-    const DbrBool ok = dbr_send_msg(sock, &rep, false);
+    const DbrBool ok = dbr_send_body(sock, &rep, false);
     if (!ok)
-        dbr_err_print("dbr_send_msg() failed");
+        dbr_err_print("dbr_send_body() failed");
     return ok;
  fail2:
     if (!dbr_journ_rollback_trans(journ))
         dbr_err_print("dbr_journ_rollback_trans() failed");
  fail1:
-    if (!dbr_send_msg(sock, &rep, false))
-        dbr_err_print("dbr_send_msg() failed");
+    if (!dbr_send_body(sock, &rep, false))
+        dbr_err_print("dbr_send_body() failed");
     return false;
 }
 
@@ -193,8 +193,8 @@ static DbrBool
 run(void)
 {
     while (!quit) {
-        struct DbrMsg req;
-        if (!dbr_recv_msg(sock, pool, &req)) {
+        struct DbrBody req;
+        if (!dbr_recv_body(sock, pool, &req)) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
             dbr_err_print("dbr_recv_msg() failed");

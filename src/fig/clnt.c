@@ -24,7 +24,7 @@
 #include <dbr/msg.h>
 #include <dbr/queue.h>
 
-#include <zmq.h>
+#include <czmq.h>
 
 #include <stdbool.h>
 #include <stdlib.h> // malloc()
@@ -98,29 +98,28 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 }
 
 static ssize_t
-read_entity(DbrClnt clnt, const char* mnem, int type, struct DbrSlNode** first)
+read_entity(DbrClnt clnt, int type, struct DbrSlNode** first)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_SESS_ENTITY_REQ;
-    msg.sess_entity_req.type = type;
-    strncpy(msg.sess_entity_req.trader, mnem, DBR_MNEM_MAX);
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_SESS_ENTITY_REQ;
+    body.sess_entity_req.type = type;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         return -1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         return -1;
 
-    *first = msg.entity_rep.first;
-    return msg.entity_rep.count_;
+    *first = body.entity_rep.first;
+    return body.entity_rep.count_;
 }
 
 static DbrBool
-emplace_recs(DbrClnt clnt, const char* mnem, int type)
+emplace_recs(DbrClnt clnt, int type)
 {
     struct DbrSlNode* node;
-    ssize_t size = read_entity(clnt, mnem, type, &node);
+    ssize_t size = read_entity(clnt, type, &node);
     if (size < 0)
         return false;
 
@@ -156,10 +155,10 @@ set_trader(DbrClnt clnt, const char* mnem)
 }
 
 static DbrBool
-emplace_orders(DbrClnt clnt, const char* mnem)
+emplace_orders(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    if (read_entity(clnt, mnem, DBR_ORDER, &node) < 0)
+    if (read_entity(clnt, DBR_ORDER, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -171,10 +170,10 @@ emplace_orders(DbrClnt clnt, const char* mnem)
 }
 
 static DbrBool
-emplace_trades(DbrClnt clnt, const char* mnem)
+emplace_trades(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    if (read_entity(clnt, mnem, DBR_TRADE, &node) < 0)
+    if (read_entity(clnt, DBR_TRADE, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -186,10 +185,10 @@ emplace_trades(DbrClnt clnt, const char* mnem)
 }
 
 static DbrBool
-emplace_membs(DbrClnt clnt, const char* mnem)
+emplace_membs(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    if (read_entity(clnt, mnem, DBR_MEMB, &node) < 0)
+    if (read_entity(clnt, DBR_MEMB, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -201,10 +200,10 @@ emplace_membs(DbrClnt clnt, const char* mnem)
 }
 
 static DbrBool
-emplace_posns(DbrClnt clnt, const char* mnem)
+emplace_posns(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    if (read_entity(clnt, mnem, DBR_POSN, &node) < 0)
+    if (read_entity(clnt, DBR_POSN, &node) < 0)
         return false;
 
     for (; node; node = node->next) {
@@ -225,11 +224,16 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
         goto fail1;
     }
 
-    void* sock = zmq_socket(ctx, ZMQ_REQ);
+    void* sock = zmq_socket(ctx, ZMQ_DEALER);
     if (!sock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
+
+    // Null-terminate trader mnemonic and set identity.
+    char identity[DBR_MNEM_MAX + 1];
+    sprintf(identity, "%.16s", trader);
+    zsocket_set_identity(sock, identity);
 
     if (zmq_connect(sock, addr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
@@ -245,14 +249,14 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
 
     // Data structures are fully initialised at this point.
 
-    if (!emplace_recs(clnt, trader, DBR_TRADER)
-        || !emplace_recs(clnt, trader, DBR_ACCNT)
-        || !emplace_recs(clnt, trader, DBR_CONTR)
+    if (!emplace_recs(clnt, DBR_TRADER)
+        || !emplace_recs(clnt, DBR_ACCNT)
+        || !emplace_recs(clnt, DBR_CONTR)
         || !set_trader(clnt, trader)
-        || !emplace_orders(clnt, trader)
-        || !emplace_trades(clnt, trader)
-        || !emplace_membs(clnt, trader)
-        || !emplace_posns(clnt, trader)) {
+        || !emplace_orders(clnt)
+        || !emplace_trades(clnt)
+        || !emplace_membs(clnt)
+        || !emplace_posns(clnt)) {
         // Use destroy since fully initialised.
         dbr_clnt_destroy(clnt);
         goto fail1;
@@ -311,53 +315,52 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
                DbrFlags flags)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_PLACE_ORDER_REQ;
-    strncpy(msg.place_order_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    strncpy(msg.place_order_req.accnt, accnt, DBR_MNEM_MAX);
-    strncpy(msg.place_order_req.contr, contr, DBR_MNEM_MAX);
-    msg.place_order_req.settl_date = settl_date;
-    strncpy(msg.place_order_req.ref, ref, DBR_REF_MAX);
-    msg.place_order_req.action = action;
-    msg.place_order_req.ticks = ticks;
-    msg.place_order_req.lots = lots;
-    msg.place_order_req.min = min;
-    msg.place_order_req.flags = flags;
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_PLACE_ORDER_REQ;
+    strncpy(body.place_order_req.accnt, accnt, DBR_MNEM_MAX);
+    strncpy(body.place_order_req.contr, contr, DBR_MNEM_MAX);
+    body.place_order_req.settl_date = settl_date;
+    strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);
+    body.place_order_req.action = action;
+    body.place_order_req.ticks = ticks;
+    body.place_order_req.lots = lots;
+    body.place_order_req.min = min;
+    body.place_order_req.flags = flags;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    if (msg.type == DBR_STATUS_REP) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.type == DBR_STATUS_REP) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
 
-    assert(msg.type == DBR_CYCLE_REP);
+    assert(body.type == DBR_CYCLE_REP);
 
-    fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, msg.cycle_rep.new_order));
+    fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, body.cycle_rep.new_order));
 
     // Posn list is transformed to include existing positions with updates.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrSlNode* node = msg.cycle_rep.first_posn; node; ) {
+    for (struct DbrSlNode* node = body.cycle_rep.first_posn; node; ) {
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_entity_posn_entry(node));
         node = node->next;
         // Transfer ownership or free if update.
         posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
         dbr_queue_insert_back(&q, &posn->entity_node_);
     }
-    msg.cycle_rep.first_posn = q.first;
+    body.cycle_rep.first_posn = q.first;
 
-    for (struct DbrSlNode* node = msg.cycle_rep.first_exec; node; node = node->next) {
+    for (struct DbrSlNode* node = body.cycle_rep.first_exec; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_entity_exec_entry(node));
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader, exec);
     }
 
-    return msg.cycle_rep.new_order;
+    return body.cycle_rep.new_order;
  fail1:
     return NULL;
 }
@@ -365,26 +368,25 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 DBR_API struct DbrOrder*
 dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_REVISE_ORDER_ID_REQ;
-    strncpy(msg.revise_order_id_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    msg.revise_order_id_req.id = id;
-    msg.revise_order_id_req.lots = lots;
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_REVISE_ORDER_ID_REQ;
+    body.revise_order_id_req.id = id;
+    body.revise_order_id_req.lots = lots;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    if (msg.type == DBR_STATUS_REP) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.type == DBR_STATUS_REP) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
 
-    assert(msg.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, msg.order_rep.order);
+    assert(body.type == DBR_ORDER_REP);
+    return fig_trader_update_order(clnt->trader, body.order_rep.order);
  fail1:
     return NULL;
 }
@@ -392,26 +394,25 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
 DBR_API struct DbrOrder*
 dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_REVISE_ORDER_REF_REQ;
-    strncpy(msg.revise_order_ref_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    strncpy(msg.revise_order_ref_req.ref, ref, DBR_REF_MAX);
-    msg.revise_order_ref_req.lots = lots;
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_REVISE_ORDER_REF_REQ;
+    strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
+    body.revise_order_ref_req.lots = lots;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    if (msg.type == DBR_STATUS_REP) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.type == DBR_STATUS_REP) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
 
-    assert(msg.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, msg.order_rep.order);
+    assert(body.type == DBR_ORDER_REP);
+    return fig_trader_update_order(clnt->trader, body.order_rep.order);
  fail1:
     return NULL;
 }
@@ -419,25 +420,24 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
 DBR_API struct DbrOrder*
 dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_CANCEL_ORDER_ID_REQ;
-    strncpy(msg.cancel_order_id_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    msg.cancel_order_id_req.id = id;
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_CANCEL_ORDER_ID_REQ;
+    body.cancel_order_id_req.id = id;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    if (msg.type == DBR_STATUS_REP) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.type == DBR_STATUS_REP) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
 
-    assert(msg.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, msg.order_rep.order);
+    assert(body.type == DBR_ORDER_REP);
+    return fig_trader_update_order(clnt->trader, body.order_rep.order);
  fail1:
     return NULL;
 }
@@ -445,25 +445,24 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
 DBR_API struct DbrOrder*
 dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_CANCEL_ORDER_REF_REQ;
-    strncpy(msg.cancel_order_ref_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    strncpy(msg.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_CANCEL_ORDER_REF_REQ;
+    strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    if (msg.type == DBR_STATUS_REP) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.type == DBR_STATUS_REP) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
 
-    assert(msg.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, msg.order_rep.order);
+    assert(body.type == DBR_ORDER_REP);
+    return fig_trader_update_order(clnt->trader, body.order_rep.order);
  fail1:
     return NULL;
 }
@@ -471,22 +470,21 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 DBR_API DbrBool
 dbr_clnt_archive_order(DbrClnt clnt, DbrIden id)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_ARCHIVE_ORDER_REQ;
-    strncpy(msg.archive_order_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    msg.archive_order_req.id = id;
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_ARCHIVE_ORDER_REQ;
+    body.archive_order_req.id = id;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    assert(msg.type == DBR_STATUS_REP);
+    assert(body.type == DBR_STATUS_REP);
 
-    if (msg.status_rep.num != 0) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.status_rep.num != 0) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
     return true;
@@ -497,22 +495,21 @@ dbr_clnt_archive_order(DbrClnt clnt, DbrIden id)
 DBR_API DbrBool
 dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id)
 {
-    struct DbrMsg msg;
-    msg.req_id = clnt->id++;
-    msg.type = DBR_ARCHIVE_TRADE_REQ;
-    strncpy(msg.archive_trade_req.trader, clnt->trader->rec->mnem, DBR_MNEM_MAX);
-    msg.archive_trade_req.id = id;
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_ARCHIVE_TRADE_REQ;
+    body.archive_trade_req.id = id;
 
-    if (!dbr_send_msg(clnt->sock, &msg, false))
+    if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_msg(clnt->sock, clnt->pool, &msg))
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
-    assert(msg.type == DBR_STATUS_REP);
+    assert(body.type == DBR_STATUS_REP);
 
-    if (msg.status_rep.num != 0) {
-        dbr_err_set(msg.status_rep.num, msg.status_rep.msg);
+    if (body.status_rep.num != 0) {
+        dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
     }
     return true;
