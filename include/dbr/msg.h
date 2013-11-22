@@ -50,7 +50,7 @@ enum {
 };
 
 struct DbrHead {
-    DbrTrader trader;
+    DbrMnem trader;
 };
 
 struct DbrBody {
@@ -143,6 +143,11 @@ struct DbrBody {
     };
 };
 
+struct DbrMsg {
+    struct DbrHead head;
+    struct DbrBody body;
+};
+
 DBR_API size_t
 dbr_body_len(struct DbrBody* body, DbrBool enriched);
 
@@ -157,6 +162,12 @@ dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched);
 
 DBR_API DbrBool
 dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body);
+
+DBR_API DbrBool
+dbr_send_msg(void* sock, const char* trader, struct DbrBody* body, DbrBool enriched);
+
+DBR_API DbrBool
+dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg);
 
 /** @} */
 

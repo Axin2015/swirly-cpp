@@ -83,9 +83,9 @@ sess_rec(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = req->sess_entity_req.type;
     rep.entity_rep.first = first;
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
 }
 
@@ -105,9 +105,9 @@ sess_order(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_ORDER;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  }
 
@@ -127,9 +127,9 @@ sess_trade(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_TRADE;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
 }
 
@@ -149,9 +149,9 @@ sess_memb(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_MEMB;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
 }
 
@@ -182,13 +182,13 @@ sess_posn(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_ENTITY_REP;
     rep.entity_rep.type = DBR_POSN;
     rep.entity_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -247,13 +247,13 @@ place_order(DbrTrader trader, const struct DbrBody* req)
     rep.cycle_rep.new_order = order;
     rep.cycle_rep.first_exec = dbr_serv_first_exec(serv);
     rep.cycle_rep.first_posn = posns.first;
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -274,13 +274,13 @@ revise_order_id(DbrTrader trader, const struct DbrBody* req)
     rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -301,13 +301,13 @@ revise_order_ref(DbrTrader trader, const struct DbrBody* req)
     rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -327,13 +327,13 @@ cancel_order_id(DbrTrader trader, const struct DbrBody* req)
     rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -353,13 +353,13 @@ cancel_order_ref(DbrTrader trader, const struct DbrBody* req)
     rep.req_id = req->req_id;
     rep.type = DBR_ORDER_REP;
     rep.order_rep.order = order;
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -379,13 +379,13 @@ archive_order(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -405,13 +405,13 @@ archive_trade(DbrTrader trader, const struct DbrBody* req)
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';
-    const DbrBool ok = dbr_send_body(sock, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_print("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+        dbr_err_print("dbr_send_msg() failed");
     return false;
 }
 
@@ -419,70 +419,71 @@ static DbrBool
 run(void)
 {
     while (!quit) {
-        struct DbrBody req, rep;
-        if (!dbr_recv_body(sock, pool, &req)) {
+        struct DbrMsg req;
+        if (!dbr_recv_msg(sock, pool, &req)) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
             dbr_err_print("dbr_recv_msg() failed");
             goto fail1;
         }
-        static const char TRADER[] = "WRAMIREZ";
-        struct DbrRec* trec = find_rec_mnem(DBR_TRADER, TRADER);
+        struct DbrBody rep;
+        struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req.head.trader);
         if (!trec) {
-            status_setf(&rep, req.req_id, DBR_EINVAL, "no such trader '%.16s'", TRADER);
-            if (!dbr_send_body(sock, &rep, false))
-                dbr_err_print("dbr_send_body() failed");
+            status_setf(&rep, req.body.req_id, DBR_EINVAL, "no such trader '%.16s'",
+                        req.head.trader);
+            if (!dbr_send_msg(sock, req.head.trader, &rep, false))
+                dbr_err_print("dbr_send_msg() failed");
             continue;
         }
         DbrTrader trader = dbr_serv_trader(serv, trec);
         if (!trader) {
-            status_err(&rep, req.req_id);
-            if (!dbr_send_body(sock, &rep, false))
-                dbr_err_print("dbr_send_body() failed");
+            status_err(&rep, req.body.req_id);
+            if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
+                dbr_err_print("dbr_send_msg() failed");
             continue;
         }
-        switch (req.type) {
+        switch (req.body.type) {
         case DBR_SESS_ENTITY_REQ:
-            switch (req.sess_entity_req.type) {
+            switch (req.body.sess_entity_req.type) {
             case DBR_TRADER:
             case DBR_ACCNT:
             case DBR_CONTR:
-                sess_rec(trader, &req);
+                sess_rec(trader, &req.body);
                 break;
             case DBR_ORDER:
-                sess_order(trader, &req);
+                sess_order(trader, &req.body);
                 break;
             case DBR_TRADE:
-                sess_trade(trader, &req);
+                sess_trade(trader, &req.body);
                 break;
             case DBR_MEMB:
-                sess_memb(trader, &req);
+                sess_memb(trader, &req.body);
                 break;
             case DBR_POSN:
-                sess_posn(trader, &req);
+                sess_posn(trader, &req.body);
                 break;
             };
             break;
         case DBR_PLACE_ORDER_REQ:
-            place_order(trader, &req);
+            place_order(trader, &req.body);
             break;
         case DBR_REVISE_ORDER_ID_REQ:
-            revise_order_id(trader, &req);
+            revise_order_id(trader, &req.body);
             break;
         case DBR_REVISE_ORDER_REF_REQ:
-            revise_order_ref(trader, &req);
+            revise_order_ref(trader, &req.body);
             break;
         case DBR_CANCEL_ORDER_ID_REQ:
-            cancel_order_id(trader, &req);
+            cancel_order_id(trader, &req.body);
             break;
         case DBR_CANCEL_ORDER_REF_REQ:
-            cancel_order_ref(trader, &req);
+            cancel_order_ref(trader, &req.body);
             break;
         case DBR_ARCHIVE_ORDER_REQ:
-            archive_order(trader, &req);
+            archive_order(trader, &req.body);
             break;
         case DBR_ARCHIVE_TRADE_REQ:
-            archive_trade(trader, &req);
+            archive_trade(trader, &req.body);
             break;
         default:
             // TODO: unsupported type.

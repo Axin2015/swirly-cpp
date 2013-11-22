@@ -738,3 +738,15 @@ dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body)
  fail1:
     return DBR_FALSE;
 }
+
+DBR_API DbrBool
+dbr_send_msg(void* sock, const char* trader, struct DbrBody* body, DbrBool enriched)
+{
+    return dbr_send_body(sock, body, enriched);
+}
+
+DBR_API DbrBool
+dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
+{
+    return dbr_recv_body(sock, pool, &msg->body);
+}
