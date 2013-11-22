@@ -15,6 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
+#define _XOPEN_SOURCE 700 // strnlen()
 #include <dbr/msg.h>
 
 #include <dbr/err.h>
@@ -25,6 +26,7 @@
 #include <zmq.h>
 
 #include <stdlib.h> // abort()
+#include <string.h>
 
 static const char STATUS_REP_FORMAT[] = "is";
 static const char PLACE_ORDER_REQ_FORMAT[] = "mmisillll";
@@ -693,23 +695,30 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
 DBR_API DbrBool
 dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 {
-    zmq_msg_t zmsg;
-    if (zmq_msg_init_size(&zmsg, dbr_body_len(body, enriched)) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_msg_init_size() failed: %s", zmq_strerror(zmq_errno()));
+    const size_t len = dbr_body_len(body, enriched);
+    char buf[len];
+
+    if (!dbr_write_body(buf, body, enriched)) {
+        dbr_err_set(DBR_EIO, "dbr_write_body() failed");
         goto fail1;
     }
-    if (!dbr_write_body(zmq_msg_data(&zmsg), body, enriched)) {
-        dbr_err_set(DBR_EIO, "dbr_write_body() failed");
-        goto fail2;
+    if (zmq_send(sock, buf, len, 0) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
     }
-    if (zmq_msg_send(&zmsg, sock, 0) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_msg_send() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail2;
-    }
-    zmq_msg_close(&zmsg);
     return DBR_TRUE;
- fail2:
-    zmq_msg_close(&zmsg);
+ fail1:
+    return DBR_FALSE;
+}
+
+DBR_API DbrBool
+dbr_send_msg(void* sock, const char* trader, struct DbrBody* body, DbrBool enriched)
+{
+    if (zmq_send(sock, trader, strnlen(trader, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
+    }
+    return dbr_send_body(sock, body, enriched);
  fail1:
     return DBR_FALSE;
 }
@@ -740,13 +749,28 @@ dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body)
 }
 
 DBR_API DbrBool
-dbr_send_msg(void* sock, const char* trader, struct DbrBody* body, DbrBool enriched)
-{
-    return dbr_send_body(sock, body, enriched);
-}
-
-DBR_API DbrBool
 dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
 {
+    zmq_msg_t zmsg;
+    if (zmq_msg_init(&zmsg) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_msg_init() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
+    }
+    if (zmq_msg_recv(&zmsg, sock, 0) < 0) {
+        const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
+        dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail2;
+    }
+    const size_t size = zmq_msg_size(&zmsg);
+    if (size < DBR_MNEM_MAX) {
+        __builtin_memcpy(msg->head.trader, zmq_msg_data(&zmsg), size);
+        msg->head.trader[size] = '\0';
+    } else
+        __builtin_memcpy(msg->head.trader, zmq_msg_data(&zmsg), DBR_MNEM_MAX);
+    zmq_msg_close(&zmsg);
     return dbr_recv_body(sock, pool, &msg->body);
+ fail2:
+    zmq_msg_close(&zmsg);
+ fail1:
+    return DBR_FALSE;
 }

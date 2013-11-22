@@ -24,7 +24,7 @@
 #include <dbr/msg.h>
 #include <dbr/queue.h>
 
-#include <czmq.h>
+#include <zmq.h>
 
 #include <stdbool.h>
 #include <stdlib.h> // malloc()
@@ -229,11 +229,7 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-
-    // Null-terminate trader mnemonic and set identity.
-    char identity[DBR_MNEM_MAX + 1];
-    sprintf(identity, "%.16s", trader);
-    zsocket_set_identity(sock, identity);
+    zmq_setsockopt(sock, ZMQ_IDENTITY, trader, strnlen(trader, DBR_MNEM_MAX));
 
     if (zmq_connect(sock, addr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
