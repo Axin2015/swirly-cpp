@@ -102,27 +102,27 @@ fig_trader_term(struct DbrRec* trec)
 DBR_EXTERN struct DbrOrder*
 fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
 {
-    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
+    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->c.id, &order->trader_node_);
     if (node) {
         struct DbrOrder* curr = dbr_trader_order_entry(node);
 
         // Update existing order.
 
-        assert(curr->id == order->id);
-        curr->rev = order->rev;
-        curr->status = order->status;
-        assert(curr->trader.rec == order->trader.rec);
-        assert(curr->accnt.rec == order->accnt.rec);
-        assert(curr->contr.rec == order->contr.rec);
-        assert(curr->settl_date == order->settl_date);
-        assert(strncmp(curr->ref, order->ref, DBR_REF_MAX) == 0);
-        assert(curr->action == order->action);
-        assert(curr->ticks == order->ticks);
-        curr->lots = order->lots;
-        curr->resd = order->resd;
-        curr->exec = order->exec;
-        curr->last_lots = order->last_lots;
-        curr->last_ticks = order->last_ticks;
+        assert(curr->c.id == order->c.id);
+        curr->c.rev = order->c.rev;
+        curr->c.status = order->c.status;
+        assert(curr->c.trader.rec == order->c.trader.rec);
+        assert(curr->c.accnt.rec == order->c.accnt.rec);
+        assert(curr->c.contr.rec == order->c.contr.rec);
+        assert(curr->c.settl_date == order->c.settl_date);
+        assert(strncmp(curr->c.ref, order->c.ref, DBR_REF_MAX) == 0);
+        assert(curr->c.action == order->c.action);
+        assert(curr->c.ticks == order->c.ticks);
+        curr->c.lots = order->c.lots;
+        curr->c.resd = order->c.resd;
+        curr->c.exec = order->c.exec;
+        curr->c.last_lots = order->c.last_lots;
+        curr->c.last_ticks = order->c.last_ticks;
         assert(curr->min == order->min);
         assert(curr->flags == order->flags);
         assert(curr->created == order->created);
@@ -130,7 +130,7 @@ fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
 
         dbr_pool_free_order(trader->pool, order);
         order = curr;
-    } else if (order->ref[0] != '\0')
+    } else if (order->c.ref[0] != '\0')
         fig_index_insert(trader->index, order);
 
     return order;

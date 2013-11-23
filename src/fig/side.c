@@ -26,7 +26,7 @@
 static struct DbrLevel*
 lazy_level(struct DbrSide* side, struct DbrOrder* order)
 {
-    const DbrIden key = order->action == DBR_BUY ? -order->ticks : order->ticks;
+    const DbrIden key = order->c.action == DBR_BUY ? -order->c.ticks : order->c.ticks;
 	struct DbrRbNode* node = dbr_tree_pfind(&side->levels, key);
 
 	struct DbrLevel* level;
@@ -37,15 +37,15 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
 
         level->first_order = order;
         level->count = 1;
-        level->ticks = order->ticks;
-        level->resd = order->resd;
+        level->ticks = order->c.ticks;
+        level->resd = order->c.resd;
         dbr_log_debug2("insert level: contr=%.16s,ticks=%ld", order->contr.rec->mnem,
                        order->ticks);
         dbr_tree_pinsert(&side->levels, key, &level->side_node_, node);
     } else {
         level = dbr_side_level_entry(node);
         ++level->count;
-        level->resd += order->resd;
+        level->resd += order->c.resd;
     }
 
     order->level = level;
@@ -57,16 +57,16 @@ reduce(struct DbrSide* side, struct DbrOrder* order, DbrLots lots)
 {
     assert(order);
     assert(order->level);
-    assert(lots >= 0 && lots <= order->resd);
+    assert(lots >= 0 && lots <= order->c.resd);
 
-    if (lots < order->resd) {
+    if (lots < order->c.resd) {
         // Reduce level and order by lots.
         order->level->resd -= lots;
-        order->resd -= lots;
+        order->c.resd -= lots;
     } else {
-        assert(lots == order->resd);
+        assert(lots == order->c.resd);
         dbr_side_remove_order(side, order);
-        order->resd = 0;
+        order->c.resd = 0;
     }
 }
 
@@ -99,10 +99,10 @@ dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order)
 {
     assert(order);
     assert(!order->level);
-    assert(order->ticks != 0);
-    assert(order->resd > 0);
-    assert(order->exec <= order->lots);
-    assert(order->lots > 0);
+    assert(order->c.ticks != 0);
+    assert(order->c.resd > 0);
+    assert(order->c.exec <= order->c.lots);
+    assert(order->c.lots > 0);
     assert(order->min >= 0);
 
 	struct DbrLevel* level = lazy_level(side, order);
@@ -123,7 +123,7 @@ DBR_API void
 dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order)
 {
     struct DbrLevel* level = order->level;
-    level->resd -= order->resd;
+    level->resd -= order->c.resd;
 
     if (--level->count <= 0) {
         // Remove level.
@@ -150,15 +150,15 @@ dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, 
     reduce(side, order, lots);
 
     // Last trade.
-    side->last_ticks = order->ticks;
+    side->last_ticks = order->c.ticks;
     side->last_lots = lots;
     side->last_time = now;
 
-    ++order->rev;
-    order->status = DBR_TRADED;
-    order->exec += lots;
-    order->last_ticks = order->ticks;
-    order->last_lots = lots;
+    ++order->c.rev;
+    order->c.status = DBR_TRADED;
+    order->c.exec += lots;
+    order->c.last_ticks = order->c.ticks;
+    order->c.last_lots = lots;
     order->modified = now;
 }
 
@@ -168,15 +168,15 @@ dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots
     assert(order);
     assert(order->level);
     assert(lots > 0);
-    assert(lots >= order->exec && lots >= order->min && lots <= order->lots);
+    assert(lots >= order->c.exec && lots >= order->min && lots <= order->c.lots);
 
-    const DbrLots delta = order->lots - lots;
+    const DbrLots delta = order->c.lots - lots;
 
     // This will increase order revision.
     reduce(side, order, delta);
 
-    ++order->rev;
-    order->status = DBR_REVISED;
-    order->lots = lots;
+    ++order->c.rev;
+    order->c.status = DBR_REVISED;
+    order->c.lots = lots;
     order->modified = now;
 }

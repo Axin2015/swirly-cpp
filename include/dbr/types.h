@@ -336,13 +336,7 @@ enum DbrStatus {
     DBR_TRADED
 };
 
-struct DbrOrder {
-    /**
-     * @publicsection
-     */
-    // Set when order is associated with book.
-    struct DbrLevel* level;
-    // Immutable. Zero is reserved for sentinel nodes only.
+struct DbrCommon {
     DbrIden id;
     // Order revision counter.
     int rev;
@@ -370,6 +364,15 @@ struct DbrOrder {
     DbrLots exec;
     DbrTicks last_ticks;
     DbrLots last_lots;
+};
+
+struct DbrOrder {
+    /**
+     * @publicsection
+     */
+    // Set when order is associated with book.
+    struct DbrLevel* level;
+    struct DbrCommon c;
     // Minimum to be filled by this order.
     DbrLots min;
     // Flags.
@@ -400,7 +403,7 @@ dbr_order_init(struct DbrOrder* order)
 static inline DbrBool
 dbr_order_done(const struct DbrOrder* order)
 {
-    return order->resd == 0;
+    return order->c.resd == 0;
 }
 
 static inline struct DbrOrder*
@@ -419,28 +422,7 @@ struct DbrExec {
      * @publicsection
      */
     DbrIden id;
-    DbrIden order;
-    int rev;
-    /**
-     * @sa enum DbrStatus
-     */
-    int status;
-    union DbrURec trader;
-    union DbrURec accnt;
-    union DbrURec contr;
-    DbrDate settl_date;
-    // Ref is optional.
-    DbrRef ref;
-    /**
-     * @sa enum DbrAction
-     */
-    int action;
-    DbrTicks ticks;
-    DbrLots lots;
-    DbrLots resd;
-    DbrLots exec;
-    DbrTicks last_ticks;
-    DbrLots last_lots;
+    struct DbrCommon c;
     DbrIden match;
     /**
      * @sa enum DbrRole

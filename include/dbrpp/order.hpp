@@ -42,77 +42,77 @@ public:
     bool
     operator ==(OrderRef rhs) const noexcept
     {
-        return impl_->id == rhs.impl_->id;
+        return impl_->c.id == rhs.impl_->c.id;
     }
     bool
     operator !=(OrderRef rhs) const noexcept
     {
-        return impl_->id != rhs.impl_->id;
+        return impl_->c.id != rhs.impl_->c.id;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_->id;
+        return impl_->c.id;
     }
     int
     rev() const noexcept
     {
-        return impl_->rev;
+        return impl_->c.rev;
     }
     int
     status() const noexcept
     {
-        return impl_->status;
+        return impl_->c.status;
     }
     TraderRecRef
     trec() const noexcept
     {
-        return TraderRecRef{*impl_->trader.rec};
+        return TraderRecRef{*impl_->c.trader.rec};
     }
     AccntRecRef
     arec() const noexcept
     {
-        return AccntRecRef{*impl_->accnt.rec};
+        return AccntRecRef{*impl_->c.accnt.rec};
     }
     ContrRecRef
     crec() const noexcept
     {
-        return ContrRecRef{*impl_->contr.rec};
+        return ContrRecRef{*impl_->c.contr.rec};
     }
     DbrDate
     settl_date() const noexcept
     {
-        return impl_->settl_date;
+        return impl_->c.settl_date;
     }
     Ref
     ref() const noexcept
     {
-        return Ref{impl_->ref};
+        return Ref{impl_->c.ref};
     }
     int
     action() const noexcept
     {
-        return impl_->action;
+        return impl_->c.action;
     }
     DbrTicks
     ticks() const noexcept
     {
-        return impl_->ticks;
+        return impl_->c.ticks;
     }
     DbrLots
     resd() const noexcept
     {
-        return impl_->resd;
+        return impl_->c.resd;
     }
     DbrLots
     exec() const noexcept
     {
-        return impl_->exec;
+        return impl_->c.exec;
     }
     DbrLots
     lots() const noexcept
     {
-        return impl_->lots;
+        return impl_->c.lots;
     }
     DbrLots
     min() const noexcept
@@ -137,7 +137,7 @@ public:
     bool
     done() const noexcept
     {
-        return impl_->resd == 0;
+        return impl_->c.resd == 0;
     }
 };
 

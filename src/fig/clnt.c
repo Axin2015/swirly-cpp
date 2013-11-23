@@ -65,18 +65,18 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->trader.rec = get_id(cache, DBR_TRADER, order->trader.id_only);
-    order->accnt.rec = get_id(cache, DBR_ACCNT, order->accnt.id_only);
-    order->contr.rec = get_id(cache, DBR_CONTR, order->contr.id_only);
+    order->c.trader.rec = get_id(cache, DBR_TRADER, order->c.trader.id_only);
+    order->c.accnt.rec = get_id(cache, DBR_ACCNT, order->c.accnt.id_only);
+    order->c.contr.rec = get_id(cache, DBR_CONTR, order->c.contr.id_only);
     return order;
 }
 
 static inline struct DbrExec*
 enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->trader.rec = get_id(cache, DBR_TRADER, exec->trader.id_only);
-    exec->accnt.rec = get_id(cache, DBR_ACCNT, exec->accnt.id_only);
-    exec->contr.rec = get_id(cache, DBR_CONTR, exec->contr.id_only);
+    exec->c.trader.rec = get_id(cache, DBR_TRADER, exec->c.trader.id_only);
+    exec->c.accnt.rec = get_id(cache, DBR_ACCNT, exec->c.accnt.id_only);
+    exec->c.contr.rec = get_id(cache, DBR_CONTR, exec->c.contr.id_only);
     exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
     return exec;
 }
@@ -339,6 +339,12 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 
     fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, body.cycle_rep.new_order));
 
+    for (struct DbrSlNode* node = body.cycle_rep.first_exec; node; node = node->next) {
+        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_entity_exec_entry(node));
+        // Transfer ownership.
+        fig_trader_emplace_trade(clnt->trader, exec);
+    }
+
     // Posn list is transformed to include existing positions with updates.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
     for (struct DbrSlNode* node = body.cycle_rep.first_posn; node; ) {
@@ -349,13 +355,6 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
         dbr_queue_insert_back(&q, &posn->entity_node_);
     }
     body.cycle_rep.first_posn = q.first;
-
-    for (struct DbrSlNode* node = body.cycle_rep.first_exec; node; node = node->next) {
-        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_entity_exec_entry(node));
-        // Transfer ownership.
-        fig_trader_emplace_trade(clnt->trader, exec);
-    }
-
     return body.cycle_rep.new_order;
  fail1:
     return NULL;

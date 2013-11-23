@@ -43,30 +43,30 @@ TEST_CASE(side_orders)
 
     Side side(pool);
 
-    apple->rev = -1;
-    apple->status = -1;
-    apple->resd = -1;
-    apple->exec = -1;
-    apple->last_ticks = -1;
-    apple->last_lots = -1;
+    apple->c.rev = -1;
+    apple->c.status = -1;
+    apple->c.resd = -1;
+    apple->c.exec = -1;
+    apple->c.last_ticks = -1;
+    apple->c.last_lots = -1;
 
-    orange->rev = -1;
-    orange->status = -1;
-    orange->resd = -1;
-    orange->exec = -1;
-    orange->last_ticks = -1;
-    orange->last_lots = -1;
+    orange->c.rev = -1;
+    orange->c.status = -1;
+    orange->c.resd = -1;
+    orange->c.exec = -1;
+    orange->c.last_ticks = -1;
+    orange->c.last_lots = -1;
 
     // Place orders.
     side.place_order(*apple, dbr_millis());
     side.place_order(*orange, dbr_millis());
 
-    check(apple->rev == 1);
-    check(apple->status == DBR_NEW);
-    check(apple->resd == 10);
-    check(apple->exec == 0);
-    check(apple->last_ticks == -1);
-    check(apple->last_lots == -1);
+    check(apple->c.rev == 1);
+    check(apple->c.status == DBR_NEW);
+    check(apple->c.resd == 10);
+    check(apple->c.exec == 0);
+    check(apple->c.last_ticks == -1);
+    check(apple->c.last_lots == -1);
 
     check(side.levels().size() == 1);
     check(side.orders().size() == 2);
@@ -84,12 +84,12 @@ TEST_CASE(side_orders)
     // Revise first order.
     side.revise_order(*apple, 5, dbr_millis());
 
-    check(apple->rev == 2);
-    check(apple->status == DBR_REVISED);
-    check(apple->resd == 5);
-    check(apple->exec == 0);
-    check(apple->last_ticks == -1);
-    check(apple->last_lots == -1);
+    check(apple->c.rev == 2);
+    check(apple->c.status == DBR_REVISED);
+    check(apple->c.resd == 5);
+    check(apple->c.exec == 0);
+    check(apple->c.last_ticks == -1);
+    check(apple->c.last_lots == -1);
 
     check(side.levels().size() == 1);
     check(side.orders().size() == 2);
@@ -105,12 +105,12 @@ TEST_CASE(side_orders)
     // Cancel second order.
     side.cancel_order(*orange, dbr_millis());
 
-    check(orange->rev == 2);
-    check(orange->status == DBR_CANCELLED);
-    check(orange->resd == 0);
-    check(orange->exec == 0);
-    check(orange->last_ticks == -1);
-    check(orange->last_lots == -1);
+    check(orange->c.rev == 2);
+    check(orange->c.status == DBR_CANCELLED);
+    check(orange->c.resd == 0);
+    check(orange->c.exec == 0);
+    check(orange->c.last_ticks == -1);
+    check(orange->c.last_lots == -1);
 
     check(side.levels().size() == 1);
     check(side.orders().size() == 1);

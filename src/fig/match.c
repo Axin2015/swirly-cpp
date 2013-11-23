@@ -69,15 +69,15 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 {
     return direct == DBR_PAID
         // Paid when the taker lifts the offer.
-        ? maker->ticks - taker->ticks
+        ? maker->c.ticks - taker->c.ticks
         // Given when the taker hits the bid.
-        : taker->ticks - maker->ticks;
+        : taker->c.ticks - maker->c.ticks;
 }
 
 static inline struct DbrPosn*
 lazy_posn(struct DbrOrder* order, DbrPool pool)
 {
-    return fig_accnt_posn(order->accnt.rec, order->contr.rec, order->settl_date, pool);
+    return fig_accnt_posn(order->c.accnt.rec, order->c.contr.rec, order->c.settl_date, pool);
 }
 
 static DbrBool
@@ -95,7 +95,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
     struct DbrDlNode* node = dbr_side_first_order(side),
         * end = dbr_side_end_order(side);
-    for (; taken < taker->resd && node != end; node = node->next) {
+    for (; taken < taker->c.resd && node != end; node = node->next) {
 
         struct DbrOrder* maker = dbr_side_order_entry(node);
 
@@ -109,7 +109,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         dbr_match_init(match);
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->accnt.rec, crec, settl_date, pool);
+        struct DbrPosn* posn = fig_accnt_posn(maker->c.accnt.rec, crec, settl_date, pool);
         if (!posn) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
@@ -137,8 +137,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         match->id = match_id;
         match->maker_order = maker;
         match->maker_posn = posn;
-        match->ticks = maker->ticks;
-        match->lots = dbr_min(taker->resd - taken, maker->resd);
+        match->ticks = maker->c.ticks;
+        match->lots = dbr_min(taker->c.resd - taken, maker->c.resd);
 
         ++count;
         taken += match->lots;
@@ -147,47 +147,47 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
         // Taker trade.
         taker_exec->id = taker_id;
-        taker_exec->order = taker->id;
-        taker_exec->rev = taker->rev + 1;
-        taker_exec->status = DBR_TRADED;
-        taker_exec->trader.rec = taker->trader.rec;
-        taker_exec->accnt.rec = taker->accnt.rec;
-        taker_exec->contr.rec = crec;
-        taker_exec->settl_date = settl_date;
-        strncpy(taker_exec->ref, taker->ref, DBR_REF_MAX);
-        taker_exec->action = taker->action;
-        taker_exec->ticks = taker->ticks;
-        taker_exec->lots = taker->lots;
-        taker_exec->resd = taker->resd - taken;
-        taker_exec->exec = taker->exec + taken;
-        taker_exec->last_ticks = match->ticks;
-        taker_exec->last_lots = match->lots;
+        taker_exec->c.id = taker->c.id;
+        taker_exec->c.rev = taker->c.rev + 1;
+        taker_exec->c.status = DBR_TRADED;
+        taker_exec->c.trader.rec = taker->c.trader.rec;
+        taker_exec->c.accnt.rec = taker->c.accnt.rec;
+        taker_exec->c.contr.rec = crec;
+        taker_exec->c.settl_date = settl_date;
+        strncpy(taker_exec->c.ref, taker->c.ref, DBR_REF_MAX);
+        taker_exec->c.action = taker->c.action;
+        taker_exec->c.ticks = taker->c.ticks;
+        taker_exec->c.lots = taker->c.lots;
+        taker_exec->c.resd = taker->c.resd - taken;
+        taker_exec->c.exec = taker->c.exec + taken;
+        taker_exec->c.last_ticks = match->ticks;
+        taker_exec->c.last_lots = match->lots;
         taker_exec->match = match->id;
         taker_exec->role = DBR_TAKER;
-        taker_exec->cpty.rec = maker->accnt.rec;
+        taker_exec->cpty.rec = maker->c.accnt.rec;
         taker_exec->created = now;
         taker_exec->modified = now;
 
         // Maker trade.
         maker_exec->id = maker_id;
-        maker_exec->order = maker->id;
-        maker_exec->rev = maker->rev + 1;
-        maker_exec->status = DBR_TRADED;
-        maker_exec->trader.rec = maker->trader.rec;
-        maker_exec->accnt.rec = maker->accnt.rec;
-        maker_exec->contr.rec = crec;
-        maker_exec->settl_date = settl_date;
-        strncpy(maker_exec->ref, maker->ref, DBR_REF_MAX);
-        maker_exec->action = maker->action;
-        maker_exec->ticks = maker->ticks;
-        maker_exec->lots = maker->lots;
-        maker_exec->resd = maker->resd - match->lots;
-        maker_exec->exec = maker->exec + match->lots;
-        maker_exec->last_ticks = match->ticks;
-        maker_exec->last_lots = match->lots;
+        maker_exec->c.id = maker->c.id;
+        maker_exec->c.rev = maker->c.rev + 1;
+        maker_exec->c.status = DBR_TRADED;
+        maker_exec->c.trader.rec = maker->c.trader.rec;
+        maker_exec->c.accnt.rec = maker->c.accnt.rec;
+        maker_exec->c.contr.rec = crec;
+        maker_exec->c.settl_date = settl_date;
+        strncpy(maker_exec->c.ref, maker->c.ref, DBR_REF_MAX);
+        maker_exec->c.action = maker->c.action;
+        maker_exec->c.ticks = maker->c.ticks;
+        maker_exec->c.lots = maker->c.lots;
+        maker_exec->c.resd = maker->c.resd - match->lots;
+        maker_exec->c.exec = maker->c.exec + match->lots;
+        maker_exec->c.last_ticks = match->ticks;
+        maker_exec->c.last_lots = match->lots;
         maker_exec->match = match->id;
         maker_exec->role = DBR_MAKER;
-        maker_exec->cpty.rec = taker->accnt.rec;
+        maker_exec->cpty.rec = taker->c.accnt.rec;
         maker_exec->created = now;
         maker_exec->modified = now;
 
@@ -200,7 +200,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     struct DbrPosn* posn;
     // Avoid allocating position when there are no matches.
     if (count > 0) {
-        if (!(posn = fig_accnt_posn(taker->accnt.rec, crec, settl_date, pool)))
+        if (!(posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date, pool)))
             goto fail1;
     } else
         posn = NULL;
@@ -225,12 +225,12 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, DbrJourn journ, D
     struct DbrSide* side;
     int direct;
 
-    if (taker->action == DBR_BUY) {
+    if (taker->c.action == DBR_BUY) {
         // Paid when the taker lifts the offer.
         side = &book->ask_side;
         direct = DBR_PAID;
     } else {
-        assert(taker->action == DBR_SELL);
+        assert(taker->c.action == DBR_SELL);
         // Given when the taker hits the bid.
         side = &book->bid_side;
         direct = DBR_GIVEN;

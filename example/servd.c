@@ -243,10 +243,8 @@ place_order(DbrTrader trader, const struct DbrBody* req)
     }
 
     rep.req_id = req->req_id;
-    rep.type = DBR_CYCLE_REP;
-    rep.cycle_rep.new_order = order;
-    rep.cycle_rep.first_exec = dbr_serv_first_exec(serv);
-    rep.cycle_rep.first_posn = posns.first;
+    rep.type = DBR_ORDER_REP;
+    rep.order_rep.order = order;
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_print("dbr_send_msg() failed");

@@ -57,62 +57,62 @@ public:
     DbrIden
     order() const noexcept
     {
-        return impl_->order;
+        return impl_->c.id;
     }
     int
     rev() const noexcept
     {
-        return impl_->rev;
+        return impl_->c.rev;
     }
     TraderRecRef
     trec() const noexcept
     {
-        return TraderRecRef{*impl_->trader.rec};
+        return TraderRecRef{*impl_->c.trader.rec};
     }
     AccntRecRef
     arec() const noexcept
     {
-        return AccntRecRef{*impl_->accnt.rec};
+        return AccntRecRef{*impl_->c.accnt.rec};
     }
     ContrRecRef
     crec() const noexcept
     {
-        return ContrRecRef{*impl_->contr.rec};
+        return ContrRecRef{*impl_->c.contr.rec};
     }
     DbrDate
     settl_date() const noexcept
     {
-        return impl_->settl_date;
+        return impl_->c.settl_date;
     }
     Ref
     ref() const noexcept
     {
-        return Ref{impl_->ref};
+        return Ref{impl_->c.ref};
     }
     int
     action() const noexcept
     {
-        return impl_->action;
+        return impl_->c.action;
     }
     DbrTicks
     ticks() const noexcept
     {
-        return impl_->ticks;
+        return impl_->c.ticks;
     }
     DbrLots
     resd() const noexcept
     {
-        return impl_->resd;
+        return impl_->c.resd;
     }
     DbrLots
     exec() const noexcept
     {
-        return impl_->exec;
+        return impl_->c.exec;
     }
     DbrLots
     lots() const noexcept
     {
-        return impl_->lots;
+        return impl_->c.lots;
     }
     DbrIden
     match() const noexcept

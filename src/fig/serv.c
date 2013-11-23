@@ -73,18 +73,18 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->trader.rec = get_id(cache, DBR_TRADER, order->trader.id_only);
-    order->accnt.rec = get_id(cache, DBR_ACCNT, order->accnt.id_only);
-    order->contr.rec = get_id(cache, DBR_CONTR, order->contr.id_only);
+    order->c.trader.rec = get_id(cache, DBR_TRADER, order->c.trader.id_only);
+    order->c.accnt.rec = get_id(cache, DBR_ACCNT, order->c.accnt.id_only);
+    order->c.contr.rec = get_id(cache, DBR_CONTR, order->c.contr.id_only);
     return order;
 }
 
 static inline struct DbrExec*
 enrich_trade(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->trader.rec = get_id(cache, DBR_TRADER, exec->trader.id_only);
-    exec->accnt.rec = get_id(cache, DBR_ACCNT, exec->accnt.id_only);
-    exec->contr.rec = get_id(cache, DBR_CONTR, exec->contr.id_only);
+    exec->c.trader.rec = get_id(cache, DBR_TRADER, exec->c.trader.id_only);
+    exec->c.accnt.rec = get_id(cache, DBR_ACCNT, exec->c.accnt.id_only);
+    exec->c.contr.rec = get_id(cache, DBR_CONTR, exec->c.contr.id_only);
     exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
     return exec;
 }
@@ -160,23 +160,23 @@ free_matches(struct DbrSlNode* first, DbrPool pool)
 static inline void
 apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
 {
-    const double licks = exec->lots * exec->ticks;
-    if (exec->action == DBR_BUY) {
+    const double licks = exec->c.lots * exec->c.ticks;
+    if (exec->c.action == DBR_BUY) {
         posn->buy_licks += licks;
-        posn->buy_lots += exec->lots;
+        posn->buy_lots += exec->c.lots;
     } else {
-        assert(exec->action == DBR_SELL);
+        assert(exec->c.action == DBR_SELL);
         posn->sell_licks += licks;
-        posn->sell_lots += exec->lots;
+        posn->sell_lots += exec->c.lots;
     }
 }
 
 static inline DbrBool
 update_order(DbrJourn journ, struct DbrOrder* order, DbrMillis now)
 {
-    return dbr_journ_update_order(journ, order->id, order->rev, order->status, order->lots,
-                                  order->resd, order->exec, order->last_ticks, order->last_lots,
-                                  now);
+    return dbr_journ_update_order(journ, order->c.id, order->c.rev, order->c.status, order->c.lots,
+                                  order->c.resd, order->c.exec, order->c.last_ticks,
+                                  order->c.last_lots, now);
 }
 
 static DbrBool
@@ -186,9 +186,9 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
     assert(node);
 
     const struct DbrOrder* taker_order = trans->new_order;
-    int taker_rev = taker_order->rev;
-    DbrLots taker_resd = taker_order->resd;
-    DbrLots taker_exec = taker_order->exec;
+    int taker_rev = taker_order->c.rev;
+    DbrLots taker_resd = taker_order->c.resd;
+    DbrLots taker_exec = taker_order->c.exec;
 
     do {
         const struct DbrMatch* match = dbr_trans_match_entry(node);
@@ -198,12 +198,12 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         taker_resd -= match->lots;
         taker_exec += match->lots;
 
-        if (!dbr_journ_update_order(journ, taker_order->id, taker_rev, DBR_TRADED,
-                                    taker_order->lots, taker_resd, taker_exec,
+        if (!dbr_journ_update_order(journ, taker_order->c.id, taker_rev, DBR_TRADED,
+                                    taker_order->c.lots, taker_resd, taker_exec,
                                     match->ticks, match->lots, now)
-            || !dbr_journ_insert_trade(journ, match->taker_exec->id,
-                                       match->taker_exec->order,
-                                       match->taker_exec->rev,
+            || !dbr_journ_insert_trade(journ, match->taker_exec->c.id,
+                                       match->taker_exec->c.id,
+                                       match->taker_exec->c.rev,
                                        match->taker_exec->match,
                                        match->taker_exec->role,
                                        match->taker_exec->cpty.rec->id,
@@ -212,15 +212,15 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
 
         // Maker revision.
         const struct DbrOrder* maker = match->maker_order;
-        const int maker_rev = maker->rev + 1;
-        const DbrLots maker_resd = maker->resd - match->lots;
-        const DbrLots maker_exec = maker->exec + match->lots;
-        if (!dbr_journ_update_order(journ, maker->id, maker_rev, DBR_TRADED,
-                                    maker->lots, maker_resd, maker_exec,
+        const int maker_rev = maker->c.rev + 1;
+        const DbrLots maker_resd = maker->c.resd - match->lots;
+        const DbrLots maker_exec = maker->c.exec + match->lots;
+        if (!dbr_journ_update_order(journ, maker->c.id, maker_rev, DBR_TRADED,
+                                    maker->c.lots, maker_resd, maker_exec,
                                     match->ticks, match->lots, now)
             || !dbr_journ_insert_trade(journ, match->maker_exec->id,
-                                       match->maker_exec->order,
-                                       match->maker_exec->rev,
+                                       match->maker_exec->c.id,
+                                       match->maker_exec->c.rev,
                                        match->maker_exec->match,
                                        match->maker_exec->role,
                                        match->maker_exec->cpty.rec->id,
@@ -260,7 +260,7 @@ commit_cycle(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         tree_insert(&serv->posns, &match->maker_posn->serv_node_);
 
         // Must succeed because maker order exists.
-        struct FigTrader* maker = fig_trader_lazy(maker_order->trader.rec, &serv->index,
+        struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
                                                   serv->pool);
         assert(maker);
 
@@ -306,7 +306,7 @@ emplace_orders(DbrServ serv)
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
-            book = get_book(serv, order->contr.rec, order->settl_date);
+            book = get_book(serv, order->c.contr.rec, order->c.settl_date);
             if (dbr_unlikely(!book))
                 goto fail2;
 
@@ -315,7 +315,7 @@ emplace_orders(DbrServ serv)
         } else
             book = NULL;
 
-        struct FigTrader* trader = fig_trader_lazy(order->trader.rec, &serv->index, serv->pool);
+        struct FigTrader* trader = fig_trader_lazy(order->c.trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader)) {
             if (book)
                 dbr_book_remove(book, order);
@@ -346,7 +346,7 @@ emplace_trades(DbrServ serv)
 
     for (; node; node = node->next) {
         struct DbrExec* exec = enrich_trade(&serv->cache, dbr_entity_exec_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(exec->trader.rec, &serv->index, serv->pool);
+        struct FigTrader* trader = fig_trader_lazy(exec->c.trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
@@ -532,25 +532,25 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     dbr_order_init(new_order);
 
     new_order->level = NULL;
-    new_order->id = id;
-    new_order->rev = 1;
-    new_order->status = DBR_NEW;
-    new_order->trader.rec = fig_trader_rec(trader);
-    new_order->accnt.rec = fig_accnt_rec(accnt);
-    new_order->contr.rec = book->crec;
-    new_order->settl_date = book->settl_date;
+    new_order->c.id = id;
+    new_order->c.rev = 1;
+    new_order->c.status = DBR_NEW;
+    new_order->c.trader.rec = fig_trader_rec(trader);
+    new_order->c.accnt.rec = fig_accnt_rec(accnt);
+    new_order->c.contr.rec = book->crec;
+    new_order->c.settl_date = book->settl_date;
     if (ref)
-        strncpy(new_order->ref, ref, DBR_REF_MAX);
+        strncpy(new_order->c.ref, ref, DBR_REF_MAX);
     else
-        new_order->ref[0] = '\0';
+        new_order->c.ref[0] = '\0';
 
-    new_order->action = action;
-    new_order->ticks = ticks;
-    new_order->lots = lots;
-    new_order->resd = lots;
-    new_order->exec = 0;
-    new_order->last_ticks = 0;
-    new_order->last_lots = 0;
+    new_order->c.action = action;
+    new_order->c.ticks = ticks;
+    new_order->c.lots = lots;
+    new_order->c.resd = lots;
+    new_order->c.exec = 0;
+    new_order->c.last_ticks = 0;
+    new_order->c.last_lots = 0;
     new_order->min = min;
     new_order->flags = flags;
     const DbrMillis now = dbr_millis();
@@ -564,12 +564,12 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     if (!dbr_journ_begin_trans(serv->journ))
         goto fail2;
 
-    if (!dbr_journ_insert_order(serv->journ, new_order->id, new_order->rev,
-                                new_order->status, new_order->trader.rec->id,
-                                new_order->accnt.rec->id, new_order->contr.rec->id,
-                                new_order->settl_date, new_order->ref, new_order->action,
-                                new_order->ticks, new_order->lots, new_order->resd,
-                                new_order->exec, new_order->last_ticks, new_order->last_lots,
+    if (!dbr_journ_insert_order(serv->journ, new_order->c.id, new_order->c.rev,
+                                new_order->c.status, new_order->c.trader.rec->id,
+                                new_order->c.accnt.rec->id, new_order->c.contr.rec->id,
+                                new_order->c.settl_date, new_order->c.ref, new_order->c.action,
+                                new_order->c.ticks, new_order->c.lots, new_order->c.resd,
+                                new_order->c.exec, new_order->c.last_ticks, new_order->c.last_lots,
                                 new_order->min, new_order->flags, now)
         || !fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
         goto fail3;
@@ -584,12 +584,12 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
         // any unfilled quantity.
 
         // Commit taker order.
-        new_order->rev += trans.count;
-        new_order->status = DBR_TRADED;
-        new_order->resd -= trans.taken;
-        new_order->exec += trans.taken;
-        new_order->last_ticks = trans.last_ticks;
-        new_order->last_lots = trans.last_lots;
+        new_order->c.rev += trans.count;
+        new_order->c.status = DBR_TRADED;
+        new_order->c.resd -= trans.taken;
+        new_order->c.exec += trans.taken;
+        new_order->c.last_ticks = trans.last_ticks;
+        new_order->c.last_lots = trans.last_lots;
     }
 
     // Place incomplete order in book.
@@ -640,7 +640,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     // 2. less than executed lots;
     // 3. greater than original lots.
 
-    if (lots == 0 || lots < order->min || lots < order->exec || lots > order->lots) {
+    if (lots == 0 || lots < order->min || lots < order->c.exec || lots > order->c.lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
@@ -649,13 +649,13 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, id, order->rev + 1, DBR_REVISED,
-                                lots, order->resd, order->exec, order->last_ticks,
-                                order->last_lots, now))
+    if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_REVISED,
+                                lots, order->c.resd, order->c.exec, order->c.last_ticks,
+                                order->c.last_lots, now))
         goto fail2;
 
     // Must succeed because order exists.
-    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
     dbr_journ_commit_trans(serv->journ);
@@ -685,7 +685,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     // 2. less than executed lots;
     // 3. greater than original lots.
 
-    if (lots == 0 || lots < order->min || lots < order->exec || lots > order->lots) {
+    if (lots == 0 || lots < order->min || lots < order->c.exec || lots > order->c.lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
@@ -694,12 +694,12 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, order->id, order->rev + 1, DBR_REVISED,
-                                lots, order->resd, order->exec, order->last_ticks,
-                                order->last_lots, now))
+    if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_REVISED,
+                                lots, order->c.resd, order->c.exec, order->c.last_ticks,
+                                order->c.last_lots, now))
         goto fail2;
 
-    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
     dbr_journ_commit_trans(serv->journ);
@@ -726,12 +726,12 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     }
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, id, order->rev + 1, DBR_CANCELLED,
-                                order->lots, 0, order->exec, order->last_ticks,
-                                order->last_lots, now))
+    if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_CANCELLED,
+                                order->c.lots, 0, order->c.exec, order->c.last_ticks,
+                                order->c.last_lots, now))
         goto fail1;
 
-    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
     return order;
@@ -754,12 +754,12 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     }
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, order->id, order->rev + 1, DBR_CANCELLED,
-                                order->lots, 0, order->exec, order->last_ticks,
-                                order->last_lots, now))
+    if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_CANCELLED,
+                                order->c.lots, 0, order->c.exec, order->c.last_ticks,
+                                order->c.last_lots, now))
         goto fail1;
 
-    struct DbrBook* book = get_book(serv, order->contr.rec, order->settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
     return order;

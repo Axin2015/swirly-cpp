@@ -86,8 +86,8 @@ struct DbrBody {
              * @privatesection
              */
             // Set by dbr_body_len();
-            size_t posn_count_;
             size_t exec_count_;
+            size_t posn_count_;
         } cycle_rep;
         struct {
             struct DbrOrder* order;
