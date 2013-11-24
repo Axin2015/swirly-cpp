@@ -571,14 +571,18 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
                                 new_order->c.ticks, new_order->c.lots, new_order->c.resd,
                                 new_order->c.exec, new_order->c.last_ticks, new_order->c.last_lots,
                                 new_order->min, new_order->flags, now)
-        || !fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
-        goto fail3;
+        || !fig_match_orders(book, new_order, serv->journ, serv->pool, &trans)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail2;
+    }
 
     if (trans.count > 0) {
 
         // Orders were matched.
-        if (!insert_trans(serv->journ, &trans, now))
-            goto fail4;
+        if (!insert_trans(serv->journ, &trans, now)) {
+            dbr_journ_rollback_trans(serv->journ);
+            goto fail3;
+        }
 
         // TODO: IOC orders would need an additional revision for the unsolicited cancellation of
         // any unfilled quantity.
@@ -593,30 +597,28 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     }
 
     // Place incomplete order in book.
-    if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order))
-        goto fail4;
+    if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail3;
+    }
 
     // Journal commit can still fail.
     if (!dbr_journ_commit_trans(serv->journ))
-        goto fail5;
+        goto fail4;
 
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to cycle and free matches.
     commit_cycle(serv, trader, book, &trans, now);
     return new_order;
- fail5:
+ fail4:
     if (!dbr_order_done(new_order))
         dbr_book_remove(book, new_order);
- fail4:
-    free_matches(trans.first_match, serv->pool);
-    memset(&trans, 0, sizeof(trans));
  fail3:
-    dbr_journ_rollback_trans(serv->journ);
+    free_matches(trans.first_match, serv->pool);
  fail2:
     dbr_pool_free_order(serv->pool, new_order);
  fail1:
-    memset(&trans, 0, sizeof(trans));
     return NULL;
 }
 
@@ -645,23 +647,29 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
     }
 
+    //const DbrIden exec_id = dbr_journ_alloc_id(serv->journ);
+    //struct DbrExec* exec = dbr_pool_alloc_exec(serv->pool);
+
     if (!dbr_journ_begin_trans(serv->journ))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_REVISED,
                                 lots, order->c.resd, order->c.exec, order->c.last_ticks,
-                                order->c.last_lots, now))
-        goto fail2;
+                                order->c.last_lots, now)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail1;
+    }
+
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(serv->journ))
+        goto fail1;
 
     // Must succeed because order exists.
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_journ_commit_trans(serv->journ);
     return order;
- fail2:
-    dbr_journ_rollback_trans(serv->journ);
  fail1:
     return NULL;
 }
@@ -696,16 +704,19 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_REVISED,
                                 lots, order->c.resd, order->c.exec, order->c.last_ticks,
-                                order->c.last_lots, now))
-        goto fail2;
+                                order->c.last_lots, now)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail1;
+    }
+
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(serv->journ))
+        goto fail1;
 
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_journ_commit_trans(serv->journ);
     return order;
- fail2:
-    dbr_journ_rollback_trans(serv->journ);
  fail1:
     return NULL;
 }
@@ -725,10 +736,19 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail1;
     }
 
+    if (!dbr_journ_begin_trans(serv->journ))
+        goto fail1;
+
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_CANCELLED,
                                 order->c.lots, 0, order->c.exec, order->c.last_ticks,
-                                order->c.last_lots, now))
+                                order->c.last_lots, now)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail1;
+    }
+
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(serv->journ))
         goto fail1;
 
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
@@ -753,10 +773,19 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
         goto fail1;
     }
 
+    if (!dbr_journ_begin_trans(serv->journ))
+        goto fail1;
+
     const DbrMillis now = dbr_millis();
     if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_CANCELLED,
                                 order->c.lots, 0, order->c.exec, order->c.last_ticks,
-                                order->c.last_lots, now))
+                                order->c.last_lots, now)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail1;
+    }
+
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(serv->journ))
         goto fail1;
 
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
@@ -782,8 +811,17 @@ dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail1;
     }
 
+    if (!dbr_journ_begin_trans(serv->journ))
+        goto fail1;
+
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_archive_order(serv->journ, node->key, now))
+    if (!dbr_journ_archive_order(serv->journ, node->key, now)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail1;
+    }
+
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(serv->journ))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
@@ -804,8 +842,17 @@ dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail1;
     }
 
+    if (!dbr_journ_begin_trans(serv->journ))
+        goto fail1;
+
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_archive_trade(serv->journ, node->key, now))
+    if (!dbr_journ_archive_trade(serv->journ, node->key, now)) {
+        dbr_journ_rollback_trans(serv->journ);
+        goto fail1;
+    }
+
+    // Journal commit can still fail.
+    if (!dbr_journ_commit_trans(serv->journ))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
