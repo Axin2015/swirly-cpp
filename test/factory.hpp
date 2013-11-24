@@ -43,12 +43,12 @@ create_contr(dbr::Pool& pool, DbrIden id, const char* mnem, const char* display,
 std::shared_ptr<DbrOrder>
 create_order(dbr::Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& contr,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags, DbrMillis now);
+             DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrOrder>
 create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags, DbrMillis now);
+             DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrExec>
 create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,

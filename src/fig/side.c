@@ -103,7 +103,7 @@ dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order)
     assert(order->c.resd > 0);
     assert(order->c.exec <= order->c.lots);
     assert(order->c.lots > 0);
-    assert(order->min >= 0);
+    assert(order->c.min_lots >= 0);
 
 	struct DbrLevel* level = lazy_level(side, order);
     if (!level)
@@ -168,7 +168,7 @@ dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots
     assert(order);
     assert(order->level);
     assert(lots > 0);
-    assert(lots >= order->c.exec && lots >= order->min && lots <= order->c.lots);
+    assert(lots >= order->c.exec && lots >= order->c.min_lots && lots <= order->c.lots);
 
     const DbrLots delta = order->c.lots - lots;
 

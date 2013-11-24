@@ -86,8 +86,7 @@ dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date);
 
 DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-               DbrFlags flags);
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:

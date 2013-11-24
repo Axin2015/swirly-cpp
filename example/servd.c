@@ -224,11 +224,10 @@ place_order(DbrTrader trader, const struct DbrBody* req)
     const int action = req->place_order_req.action;
     const DbrTicks ticks = req->place_order_req.ticks;
     const DbrLots lots = req->place_order_req.lots;
-    const DbrLots min = req->place_order_req.min;
-    const DbrFlags flags = req->place_order_req.flags;
+    const DbrLots min_lots = req->place_order_req.min_lots;
 
     struct DbrOrder* order = dbr_serv_place(serv, trader, accnt, book, ref, action, ticks,
-                                            lots, min, flags);
+                                            lots, min_lots);
     if (!order) {
         status_err(&rep, req->req_id);
         goto fail1;

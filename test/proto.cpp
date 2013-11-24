@@ -118,7 +118,7 @@ TEST_CASE(proto_order)
     auto now = dbr_millis();
 
     auto in = create_order(pool, 1, trader, accnt, contr, 20130827,
-                           "apple", DBR_BUY, 12345, 10, 0, 0, now);
+                           "apple", DBR_BUY, 12345, 10, 0, now);
 
     auto len = order_len(*in, false);
     char buf[len];
@@ -144,8 +144,7 @@ TEST_CASE(proto_order)
     check(out.c.exec == in->c.exec);
     check(out.c.last_ticks == in->c.last_ticks);
     check(out.c.last_lots == in->c.last_lots);
-    check(out.min == in->min);
-    check(out.flags == in->flags);
+    check(out.c.min_lots == in->c.min_lots);
     check(out.created == in->created);
     check(out.modified == in->modified);
 }

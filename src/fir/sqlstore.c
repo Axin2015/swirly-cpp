@@ -80,12 +80,12 @@ static DbrBool
 insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-             DbrLots min, DbrFlags flags, DbrMillis now)
+             DbrLots min_lots, DbrMillis now)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
     return fir_sqlite_insert_order(impl, id, rev, status, tid, aid, cid, settl_date, ref, action,
-                                   lots, ticks, resd, exec, last_ticks, last_lots, min, flags, now);
+                                   lots, ticks, resd, exec, last_ticks, last_lots, min_lots, now);
 }
 
 static DbrBool

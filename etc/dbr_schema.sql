@@ -346,5 +346,31 @@ CREATE VIEW posn_v AS
   GROUP BY o.accnt, o.contr, o.settl_date, o.action
 ;
 
+CREATE TABLE exec (
+  id INTEGER PRIMARY KEY,
+  rev INTEGER NOT NULL,
+  status INTEGER NOT NULL REFERENCES status (id),
+  trader INTEGER NOT NULL REFERENCES trader (id),
+  accnt INTEGER NOT NULL REFERENCES accnt (id),
+  contr INTEGER NOT NULL REFERENCES contr (id),
+  settl_date INTEGER NOT NULL,
+  ref TEXT NULL,
+  action INTEGER NOT NULL REFERENCES action (id),
+  ticks INTEGER NOT NULL,
+  lots INTEGER NOT NULL,
+  resd INTEGER NOT NULL,
+  exec INTEGER NOT NULL,
+  last_ticks INTEGER NOT NULL,
+  last_lots INTEGER NOT NULL,
+  min_lots INTEGER NOT NULL,
+  match INTEGER NOT NULL,
+  role INTEGER NOT NULL REFERENCES role (id),
+  cpty INTEGER NOT NULL REFERENCES accnt (id),
+  archive INTEGER NOT NULL,
+  created INTEGER NOT NULL,
+  modified INTEGER NOT NULL
+)
+;
+
 COMMIT TRANSACTION
 ;

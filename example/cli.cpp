@@ -604,7 +604,7 @@ public:
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0, 0);
+        serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0);
 
         if (serv_.execs().empty())
             return;

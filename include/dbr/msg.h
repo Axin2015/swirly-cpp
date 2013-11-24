@@ -109,8 +109,7 @@ struct DbrBody {
             int action;
             DbrTicks ticks;
             DbrLots lots;
-            DbrLots min;
-            DbrFlags flags;
+            DbrLots min_lots;
         } place_order_req;
         struct {
             DbrIden id;

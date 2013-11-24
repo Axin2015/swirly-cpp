@@ -474,10 +474,10 @@ public:
     }
     OrderRef
     place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
-          DbrTicks ticks, DbrLots lots, DbrLots min, DbrFlags flags)
+          DbrTicks ticks, DbrLots lots, DbrLots min_lots)
     {
         DbrOrder* const order = dbr_serv_place(impl_, trader, accnt, &book, ref, action, ticks,
-                                               lots, min, flags);
+                                               lots, min_lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};

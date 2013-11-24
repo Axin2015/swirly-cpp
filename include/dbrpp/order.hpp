@@ -115,14 +115,9 @@ public:
         return impl_->c.lots;
     }
     DbrLots
-    min() const noexcept
+    min_lots() const noexcept
     {
-        return impl_->min;
-    }
-    DbrFlags
-    flags() const noexcept
-    {
-        return impl_->flags;
+        return impl_->c.min_lots;
     }
     DbrMillis
     created() const noexcept
@@ -157,8 +152,7 @@ operator <<(std::ostream& os, OrderRef order)
               << ",resd=" << order.resd()
               << ",exec=" << order.exec()
               << ",lots=" << order.lots()
-              << ",min=" << order.min()
-              << ",flags=" << order.flags()
+              << ",min_lots=" << order.min_lots()
               << ",created=" << order.created()
               << ",modified=" << order.modified();
 }

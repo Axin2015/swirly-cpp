@@ -517,10 +517,9 @@ dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 
 DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
-              const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-              DbrFlags flags)
+              const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
-    if (lots == 0 || lots < min) {
+    if (lots == 0 || lots < min_lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
@@ -551,8 +550,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     new_order->c.exec = 0;
     new_order->c.last_ticks = 0;
     new_order->c.last_lots = 0;
-    new_order->min = min;
-    new_order->flags = flags;
+    new_order->c.min_lots = min_lots;
     const DbrMillis now = dbr_millis();
     new_order->created = now;
     new_order->modified = now;
@@ -570,7 +568,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
                                 new_order->c.settl_date, new_order->c.ref, new_order->c.action,
                                 new_order->c.ticks, new_order->c.lots, new_order->c.resd,
                                 new_order->c.exec, new_order->c.last_ticks, new_order->c.last_lots,
-                                new_order->min, new_order->flags, now)
+                                new_order->c.min_lots, now)
         || !fig_match_orders(book, new_order, serv->journ, serv->pool, &trans)) {
         dbr_journ_rollback_trans(serv->journ);
         goto fail2;
@@ -642,7 +640,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     // 2. less than executed lots;
     // 3. greater than original lots.
 
-    if (lots == 0 || lots < order->min || lots < order->c.exec || lots > order->c.lots) {
+    if (lots == 0 || lots < order->c.min_lots || lots < order->c.exec || lots > order->c.lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
@@ -693,7 +691,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     // 2. less than executed lots;
     // 3. greater than original lots.
 
-    if (lots == 0 || lots < order->min || lots < order->c.exec || lots > order->c.lots) {
+    if (lots == 0 || lots < order->c.min_lots || lots < order->c.exec || lots > order->c.lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }

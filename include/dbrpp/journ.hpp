@@ -52,11 +52,11 @@ class IJourn : public DbrIJourn {
     insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
                  DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
                  DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-                 DbrLots min, DbrFlags flags, DbrMillis now) noexcept
+                 DbrLots min_lots, DbrMillis now) noexcept
     {
         return static_cast<DerivedT*>(journ)
             ->insert_order(id, rev, status, tid, aid, cid, settl_date, ref, action, ticks,
-                           lots, resd, exec, last_ticks, last_lots, min, flags, now);
+                           lots, resd, exec, last_ticks, last_lots, min_lots, now);
     }
     static DbrBool
     update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
@@ -139,10 +139,10 @@ inline void
 insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrLots lots,
              DbrTicks ticks, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-             DbrLots min, DbrFlags flags, DbrMillis now)
+             DbrLots min_lots, DbrMillis now)
 {
     if (!journ->vtbl->insert_order(journ, id, rev, status, tid, aid, cid, settl_date, ref, action,
-                                   ticks, lots, resd, exec, last_ticks, last_lots, min, flags, now))
+                                   ticks, lots, resd, exec, last_ticks, last_lots, min_lots, now))
         throw_exception();
 }
 

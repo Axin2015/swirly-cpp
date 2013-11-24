@@ -107,7 +107,7 @@ static DbrBool
 insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-             DbrLots min, DbrFlags flags, DbrMillis now)
+             DbrLots min_lots, DbrMillis now)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
@@ -129,8 +129,7 @@ insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrId
     stmt->insert_order.exec = exec;
     stmt->insert_order.last_ticks = last_ticks;
     stmt->insert_order.last_lots = last_lots;
-    stmt->insert_order.min = min;
-    stmt->insert_order.flags = flags;
+    stmt->insert_order.min_lots = min_lots;
     stmt->insert_order.now = now;
     dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;

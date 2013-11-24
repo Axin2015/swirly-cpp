@@ -99,7 +99,7 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& contr,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags, DbrMillis now)
+             DbrLots min_lots, DbrMillis now)
 {
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
@@ -127,8 +127,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     order->c.exec = 0;
     order->c.last_ticks = 0;
     order->c.last_lots = 0;
-    order->min = min;
-    order->flags = flags;
+    order->c.min_lots = min_lots;
     order->created = now;
     order->modified = now;
 
@@ -138,7 +137,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-             DbrLots min, DbrFlags flags, DbrMillis now)
+             DbrLots min_lots, DbrMillis now)
 {
     auto deleter = [&pool](DbrOrder* order) {
         pool.free_order(order);
@@ -166,8 +165,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     order->c.exec = 0;
     order->c.last_ticks = 0;
     order->c.last_lots = 0;
-    order->min = min;
-    order->flags = flags;
+    order->c.min_lots = min_lots;
     order->created = now;
     order->modified = now;
 

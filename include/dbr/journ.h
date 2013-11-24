@@ -42,7 +42,7 @@ struct DbrJournVtbl {
     (*insert_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
                     DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
                     DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
-                    DbrLots last_lots, DbrLots min, DbrFlags flags, DbrMillis now);
+                    DbrLots last_lots, DbrLots min_lots, DbrMillis now);
 
     DbrBool
     (*update_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
@@ -87,12 +87,11 @@ static inline DbrBool
 dbr_journ_insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
                        DbrIden cid, DbrDate settl_date, const char* ref, int action,
                        DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
-                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min, DbrFlags flags,
-                       DbrMillis now)
+                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots, DbrMillis now)
 {
     return journ->vtbl->insert_order(journ, id, rev, status, tid, aid, cid, settl_date, ref,
                                      action, ticks, lots, resd, exec, last_ticks, last_lots,
-                                     min, flags, now);
+                                     min_lots, now);
 }
 
 static inline DbrBool

@@ -113,8 +113,7 @@ write_trans(const struct DbrBody* req)
                                         stmt->insert_order.exec,
                                         stmt->insert_order.last_ticks,
                                         stmt->insert_order.last_lots,
-                                        stmt->insert_order.min,
-                                        stmt->insert_order.flags,
+                                        stmt->insert_order.min_lots,
                                         stmt->insert_order.now)) {
                 dbr_err_print("dbr_journ_insert_order() failed");
                 status_err(&rep, req->req_id);

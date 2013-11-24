@@ -35,7 +35,6 @@
 
 typedef int DbrDate;
 typedef long DbrIncs;
-typedef long DbrFlags;
 
 /**
  * @brief Milliseconds since Unix epoch.
@@ -364,6 +363,8 @@ struct DbrCommon {
     DbrLots exec;
     DbrTicks last_ticks;
     DbrLots last_lots;
+    // Minimum to be filled by this order.
+    DbrLots min_lots;
 };
 
 struct DbrOrder {
@@ -373,10 +374,6 @@ struct DbrOrder {
     // Set when order is associated with book.
     struct DbrLevel* level;
     struct DbrCommon c;
-    // Minimum to be filled by this order.
-    DbrLots min;
-    // Flags.
-    DbrFlags flags;
     DbrMillis created;
     DbrMillis modified;
     /**
@@ -555,8 +552,7 @@ struct DbrStmt {
             DbrLots exec;
             DbrTicks last_ticks;
             DbrLots last_lots;
-            DbrLots min;
-            DbrFlags flags;
+            DbrLots min_lots;
             DbrMillis now;
         } insert_order;
         struct {

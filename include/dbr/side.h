@@ -84,7 +84,7 @@ dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, 
 static inline DbrBool
 dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
-    assert(order->c.lots > 0 && order->c.lots >= order->min);
+    assert(order->c.lots > 0 && order->c.lots >= order->c.min_lots);
     order->c.rev = 1;
     order->c.status = DBR_NEW;
     order->c.resd = order->c.lots;

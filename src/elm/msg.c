@@ -305,8 +305,7 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
                           body->place_order_req.action,
                           body->place_order_req.ticks,
                           body->place_order_req.lots,
-                          body->place_order_req.min,
-                          body->place_order_req.flags);
+                          body->place_order_req.min_lots);
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         n += dbr_packlenf(REVISE_ORDER_ID_REQ_FORMAT,
@@ -444,8 +443,7 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
                         body->place_order_req.action,
                         body->place_order_req.ticks,
                         body->place_order_req.lots,
-                        body->place_order_req.min,
-                        body->place_order_req.flags);
+                        body->place_order_req.min_lots);
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_ID_REQ_FORMAT,
@@ -639,8 +637,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
                                 &body->place_order_req.action,
                                 &body->place_order_req.ticks,
                                 &body->place_order_req.lots,
-                                &body->place_order_req.min,
-                                &body->place_order_req.flags)))
+                                &body->place_order_req.min_lots)))
             goto fail1;
         break;
     case DBR_REVISE_ORDER_ID_REQ:

@@ -123,8 +123,7 @@ fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
         curr->c.exec = order->c.exec;
         curr->c.last_lots = order->c.last_lots;
         curr->c.last_ticks = order->c.last_ticks;
-        assert(curr->min == order->min);
-        assert(curr->flags == order->flags);
+        assert(curr->c.min_lots == order->c.min_lots);
         assert(curr->created == order->created);
         curr->modified = order->modified;
 

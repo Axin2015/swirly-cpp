@@ -27,12 +27,12 @@
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
 static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
-static const char ORDER_FORMAT[] = "liilllisillllllllll";
+static const char ORDER_FORMAT[] = "liilllisilllllllll";
 static const char EXEC_FORMAT[] = "lliilllisilllllllilll";
 static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
 
-static const char INSERT_ORDER_FORMAT[] = "liilllisilllllllll";
+static const char INSERT_ORDER_FORMAT[] = "liilllisillllllll";
 static const char UPDATE_ORDER_FORMAT[] = "liillllll";
 static const char ARCHIVE_ORDER_FORMAT[] = "ll";
 static const char INSERT_TRADE_FORMAT[] = "llilill";
@@ -205,14 +205,14 @@ dbr_order_len(const struct DbrOrder* order, DbrBool enriched)
                          order->c.accnt.rec->id, order->c.contr.rec->id, order->c.settl_date,
                          DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                         order->min, order->flags, order->created, order->modified);
+                         order->c.min_lots, order->created, order->modified);
     } else {
         n = dbr_packlenf(ORDER_FORMAT,
                          order->c.id, order->c.rev, order->c.status, order->c.trader.id_only,
                          order->c.accnt.id_only, order->c.contr.id_only, order->c.settl_date,
                          DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                         order->min, order->flags, order->created, order->modified);
+                         order->c.min_lots, order->created, order->modified);
     }
     return n;
 }
@@ -226,14 +226,14 @@ dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
                         order->c.accnt.rec->id, order->c.contr.rec->id, order->c.settl_date,
                         DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                        order->min, order->flags, order->created, order->modified);
+                        order->c.min_lots, order->created, order->modified);
     } else {
         buf = dbr_packf(buf, ORDER_FORMAT,
                         order->c.id, order->c.rev, order->c.status, order->c.trader.id_only,
                         order->c.accnt.id_only, order->c.contr.id_only, order->c.settl_date,
                         DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                        order->min, order->flags, order->created, order->modified);
+                        order->c.min_lots, order->created, order->modified);
     }
     return buf;
 }
@@ -247,7 +247,7 @@ dbr_read_order(const char* buf, struct DbrOrder* order)
                        &order->c.accnt.id_only, &order->c.contr.id_only, &order->c.settl_date,
                        DBR_REF_MAX, order->c.ref, &order->c.action, &order->c.ticks, &order->c.lots,
                        &order->c.resd, &order->c.exec, &order->c.last_ticks, &order->c.last_lots,
-                       &order->min, &order->flags, &order->created, &order->modified);
+                       &order->c.min_lots, &order->created, &order->modified);
 }
 
 DBR_API size_t
@@ -397,8 +397,7 @@ dbr_stmt_len(const struct DbrStmt* stmt)
                           stmt->insert_order.ticks, stmt->insert_order.lots,
                           stmt->insert_order.resd, stmt->insert_order.exec,
                           stmt->insert_order.last_ticks, stmt->insert_order.last_lots,
-                          stmt->insert_order.min, stmt->insert_order.flags,
-                          stmt->insert_order.now);
+                          stmt->insert_order.min_lots, stmt->insert_order.now);
         break;
 	case DBR_UPDATE_ORDER:
         n += dbr_packlenf(UPDATE_ORDER_FORMAT,
@@ -444,8 +443,7 @@ dbr_write_stmt(char* buf, const struct DbrStmt* stmt)
                         stmt->insert_order.ticks, stmt->insert_order.lots,
                         stmt->insert_order.resd, stmt->insert_order.exec,
                         stmt->insert_order.last_ticks, stmt->insert_order.last_lots,
-                        stmt->insert_order.min, stmt->insert_order.flags,
-                        stmt->insert_order.now);
+                        stmt->insert_order.min_lots, stmt->insert_order.now);
         break;
 	case DBR_UPDATE_ORDER:
         buf = dbr_packf(buf, UPDATE_ORDER_FORMAT,
@@ -492,8 +490,7 @@ dbr_read_stmt(const char* buf, struct DbrStmt* stmt)
                           &stmt->insert_order.ticks, &stmt->insert_order.lots,
                           &stmt->insert_order.resd, &stmt->insert_order.exec,
                           &stmt->insert_order.last_ticks, &stmt->insert_order.last_lots,
-                          &stmt->insert_order.min, &stmt->insert_order.flags,
-                          &stmt->insert_order.now);
+                          &stmt->insert_order.min_lots, &stmt->insert_order.now);
         break;
 	case DBR_UPDATE_ORDER:
         buf = dbr_unpackf(buf, UPDATE_ORDER_FORMAT,

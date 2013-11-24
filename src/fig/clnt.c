@@ -308,8 +308,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 
 DBR_API struct DbrOrder*
 dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min,
-               DbrFlags flags)
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
@@ -321,8 +320,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     body.place_order_req.action = action;
     body.place_order_req.ticks = ticks;
     body.place_order_req.lots = lots;
-    body.place_order_req.min = min;
-    body.place_order_req.flags = flags;
+    body.place_order_req.min_lots = min_lots;
 
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
