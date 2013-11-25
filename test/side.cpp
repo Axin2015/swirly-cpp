@@ -85,7 +85,7 @@ TEST_CASE(side_orders)
     side.revise_order(*apple, 5, dbr_millis());
 
     check(apple->c.rev == 2);
-    check(apple->c.status == DBR_REVISED);
+    check(apple->c.status == DBR_REVISE);
     check(apple->c.resd == 5);
     check(apple->c.exec == 0);
     check(apple->c.last_ticks == -1);
@@ -106,7 +106,7 @@ TEST_CASE(side_orders)
     side.cancel_order(*orange, dbr_millis());
 
     check(orange->c.rev == 2);
-    check(orange->c.status == DBR_CANCELLED);
+    check(orange->c.status == DBR_CANCEL);
     check(orange->c.resd == 0);
     check(orange->c.exec == 0);
     check(orange->c.last_ticks == -1);

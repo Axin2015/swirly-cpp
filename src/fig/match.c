@@ -149,7 +149,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         taker_exec->id = taker_id;
         taker_exec->c.id = taker->c.id;
         taker_exec->c.rev = taker->c.rev + 1;
-        taker_exec->c.status = DBR_TRADED;
+        taker_exec->c.status = DBR_TRADE;
         taker_exec->c.trader.rec = taker->c.trader.rec;
         taker_exec->c.accnt.rec = taker->c.accnt.rec;
         taker_exec->c.contr.rec = crec;
@@ -172,7 +172,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         maker_exec->id = maker_id;
         maker_exec->c.id = maker->c.id;
         maker_exec->c.rev = maker->c.rev + 1;
-        maker_exec->c.status = DBR_TRADED;
+        maker_exec->c.status = DBR_TRADE;
         maker_exec->c.trader.rec = maker->c.trader.rec;
         maker_exec->c.accnt.rec = maker->c.accnt.rec;
         maker_exec->c.contr.rec = crec;

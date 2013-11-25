@@ -198,7 +198,7 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         taker_resd -= match->lots;
         taker_exec += match->lots;
 
-        if (!dbr_journ_update_order(journ, taker_order->c.id, taker_rev, DBR_TRADED,
+        if (!dbr_journ_update_order(journ, taker_order->c.id, taker_rev, DBR_TRADE,
                                     taker_order->c.lots, taker_resd, taker_exec,
                                     match->ticks, match->lots, now)
             || !dbr_journ_insert_trade(journ, match->taker_exec->c.id,
@@ -215,7 +215,7 @@ insert_trans(DbrJourn journ, const struct DbrTrans* trans, DbrMillis now)
         const int maker_rev = maker->c.rev + 1;
         const DbrLots maker_resd = maker->c.resd - match->lots;
         const DbrLots maker_exec = maker->c.exec + match->lots;
-        if (!dbr_journ_update_order(journ, maker->c.id, maker_rev, DBR_TRADED,
+        if (!dbr_journ_update_order(journ, maker->c.id, maker_rev, DBR_TRADE,
                                     maker->c.lots, maker_resd, maker_exec,
                                     match->ticks, match->lots, now)
             || !dbr_journ_insert_trade(journ, match->maker_exec->id,
@@ -587,7 +587,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 
         // Commit taker order.
         new_order->c.rev += trans.count;
-        new_order->c.status = DBR_TRADED;
+        new_order->c.status = DBR_TRADE;
         new_order->c.resd -= trans.taken;
         new_order->c.exec += trans.taken;
         new_order->c.last_ticks = trans.last_ticks;
@@ -652,7 +652,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_REVISED,
+    if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_REVISE,
                                 lots, order->c.resd, order->c.exec, order->c.last_ticks,
                                 order->c.last_lots, now)) {
         dbr_journ_rollback_trans(serv->journ);
@@ -700,7 +700,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_REVISED,
+    if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_REVISE,
                                 lots, order->c.resd, order->c.exec, order->c.last_ticks,
                                 order->c.last_lots, now)) {
         dbr_journ_rollback_trans(serv->journ);
@@ -738,7 +738,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_CANCELLED,
+    if (!dbr_journ_update_order(serv->journ, id, order->c.rev + 1, DBR_CANCEL,
                                 order->c.lots, 0, order->c.exec, order->c.last_ticks,
                                 order->c.last_lots, now)) {
         dbr_journ_rollback_trans(serv->journ);
@@ -775,7 +775,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_CANCELLED,
+    if (!dbr_journ_update_order(serv->journ, order->c.id, order->c.rev + 1, DBR_CANCEL,
                                 order->c.lots, 0, order->c.exec, order->c.last_ticks,
                                 order->c.last_lots, now)) {
         dbr_journ_rollback_trans(serv->journ);

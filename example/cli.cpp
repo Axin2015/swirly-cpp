@@ -78,17 +78,17 @@ strstatus(int status) noexcept
     case DBR_NEW:
         sym = "NEW";
         break;
-    case DBR_REVISED:
-        sym = "REVISED";
+    case DBR_REVISE:
+        sym = "REVISE";
         break;
-    case DBR_CANCELLED:
-        sym = "CANCELLED";
+    case DBR_CANCEL:
+        sym = "CANCEL";
         break;
-    case DBR_REJECTED:
-        sym = "REJECTED";
+    case DBR_REJECT:
+        sym = "REJECT";
         break;
-    case DBR_TRADED:
-        sym = "TRADED";
+    case DBR_TRADE:
+        sym = "TRADE";
         break;
     default:
         throw InvalidArgument("status");

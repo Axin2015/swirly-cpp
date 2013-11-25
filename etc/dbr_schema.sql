@@ -29,13 +29,13 @@ CREATE TABLE status (
 
 INSERT INTO status (id, mnem) VALUES (1, 'NEW')
 ;
-INSERT INTO status (id, mnem) VALUES (2, 'REVISED')
+INSERT INTO status (id, mnem) VALUES (2, 'REVISE')
 ;
-INSERT INTO status (id, mnem) VALUES (3, 'CANCELLED')
+INSERT INTO status (id, mnem) VALUES (3, 'CANCEL')
 ;
-INSERT INTO status (id, mnem) VALUES (4, 'REJECTED')
+INSERT INTO status (id, mnem) VALUES (4, 'REJECT')
 ;
-INSERT INTO status (id, mnem) VALUES (5, 'TRADED')
+INSERT INTO status (id, mnem) VALUES (5, 'TRADE')
 ;
 
 CREATE TABLE action (

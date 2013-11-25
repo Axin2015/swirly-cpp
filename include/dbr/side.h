@@ -102,7 +102,7 @@ dbr_side_cancel_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis no
 {
     dbr_side_remove_order(side, order);
     ++order->c.rev;
-    order->c.status = DBR_CANCELLED;
+    order->c.status = DBR_CANCEL;
     // Note that executed lots is not affected.
     order->c.resd = 0;
     order->modified = now;

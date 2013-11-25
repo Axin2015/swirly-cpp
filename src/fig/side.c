@@ -155,7 +155,7 @@ dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, 
     side->last_time = now;
 
     ++order->c.rev;
-    order->c.status = DBR_TRADED;
+    order->c.status = DBR_TRADE;
     order->c.exec += lots;
     order->c.last_ticks = order->c.ticks;
     order->c.last_lots = lots;
@@ -176,7 +176,7 @@ dbr_side_revise_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots
     reduce(side, order, delta);
 
     ++order->c.rev;
-    order->c.status = DBR_REVISED;
+    order->c.status = DBR_REVISE;
     order->c.lots = lots;
     order->modified = now;
 }

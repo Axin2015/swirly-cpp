@@ -329,10 +329,10 @@ dbr_entity_posn_entry(struct DbrSlNode* node)
 
 enum DbrStatus {
     DBR_NEW = 1,
-    DBR_REVISED,
-    DBR_CANCELLED,
-    DBR_REJECTED,
-    DBR_TRADED
+    DBR_REVISE,
+    DBR_CANCEL,
+    DBR_REJECT,
+    DBR_TRADE
 };
 
 struct DbrCommon {
