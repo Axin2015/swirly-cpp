@@ -435,7 +435,7 @@ dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first)
             dbr_pool_free_order(pool, order);
         }
         break;
-    case DBR_TRADE:
+    case DBR_EXEC:
         while (node) {
             struct DbrExec* exec = dbr_entity_exec_entry(node);
             node = node->next;

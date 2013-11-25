@@ -239,7 +239,7 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
                 ++body->entity_rep.count_;
             }
             break;
-        case DBR_TRADE:
+        case DBR_EXEC:
             for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
                 struct DbrExec* exec = dbr_entity_exec_entry(node);
                 n += dbr_exec_len(exec, enriched);
@@ -385,7 +385,7 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
                 buf = dbr_write_order(buf, order, enriched);
             }
             break;
-        case DBR_TRADE:
+        case DBR_EXEC:
             for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
                 struct DbrExec* exec = dbr_entity_exec_entry(node);
                 buf = dbr_write_exec(buf, exec, enriched);
@@ -537,10 +537,10 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
                 }
             }
             break;
-        case DBR_TRADE:
+        case DBR_EXEC:
             for (size_t i = 0; i < body->entity_rep.count_; ++i) {
                 if (!(buf = read_entity_exec(buf, pool, &q))) {
-                    dbr_pool_free_entities(pool, DBR_TRADE, dbr_queue_first(&q));
+                    dbr_pool_free_entities(pool, DBR_EXEC, dbr_queue_first(&q));
                     goto fail1;
                 }
             }

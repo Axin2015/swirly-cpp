@@ -348,7 +348,7 @@ CREATE VIEW posn_v AS
 
 CREATE TABLE exec (
   id INTEGER PRIMARY KEY,
-  rev INTEGER NOT NULL,
+  order_ INTEGER NOT NULL REFERENCES order_ (id),
   status INTEGER NOT NULL REFERENCES status (id),
   trader INTEGER NOT NULL REFERENCES trader (id),
   accnt INTEGER NOT NULL REFERENCES accnt (id),

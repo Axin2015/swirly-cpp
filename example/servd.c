@@ -125,7 +125,7 @@ sess_trade(DbrTrader trader, const struct DbrBody* req)
     }
     rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_TRADE;
+    rep.entity_rep.type = DBR_EXEC;
     rep.entity_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
@@ -450,7 +450,7 @@ run(void)
             case DBR_ORDER:
                 sess_order(trader, &req.body);
                 break;
-            case DBR_TRADE:
+            case DBR_EXEC:
                 sess_trade(trader, &req.body);
                 break;
             case DBR_MEMB:

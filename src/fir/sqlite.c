@@ -857,7 +857,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entities(pool, DBR_TRADE, dbr_queue_first(&tq));
+    dbr_pool_free_entities(pool, DBR_EXEC, dbr_queue_first(&tq));
     *first = NULL;
  fail1:
     return -1;
@@ -1179,7 +1179,7 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
     case DBR_ORDER:
         ret = select_order(sqlite, pool, first);
         break;
-    case DBR_TRADE:
+    case DBR_EXEC:
         ret = select_trade(sqlite, pool, first);
         break;
     case DBR_MEMB:

@@ -282,7 +282,7 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
     case DBR_ORDER:
         ret = read_order(pool, first);
         break;
-    case DBR_TRADE:
+    case DBR_EXEC:
         ret = read_trade(pool, first);
         break;
     case DBR_MEMB:

@@ -173,7 +173,7 @@ static DbrBool
 emplace_trades(DbrClnt clnt)
 {
     struct DbrSlNode* node;
-    if (read_entity(clnt, DBR_TRADE, &node) < 0)
+    if (read_entity(clnt, DBR_EXEC, &node) < 0)
         return false;
 
     for (; node; node = node->next) {

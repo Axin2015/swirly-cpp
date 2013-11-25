@@ -341,7 +341,7 @@ static DbrBool
 emplace_trades(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_TRADE, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_EXEC, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
