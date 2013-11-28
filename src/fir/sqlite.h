@@ -28,10 +28,8 @@ struct sqlite3_stmt;
 
 struct FirSqlite {
     struct sqlite3* db;
-    struct sqlite3_stmt* insert_order;
-    struct sqlite3_stmt* update_order;
+    struct sqlite3_stmt* insert_exec;
     struct sqlite3_stmt* archive_order;
-    struct sqlite3_stmt* insert_trade;
     struct sqlite3_stmt* archive_trade;
     const struct DbrModel* model_;
 };
@@ -57,22 +55,14 @@ DBR_EXTERN DbrBool
 fir_sqlite_rollback_trans(struct FirSqlite* sqlite);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, DbrIden tid,
-                        DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-                        int action, DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
-                        DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots, DbrMillis now);
-
-DBR_EXTERN DbrBool
-fir_sqlite_update_order(struct FirSqlite* sqlite, DbrIden id, int rev, int status, DbrLots lots,
-                        DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-                        DbrMillis now);
+fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden tid,
+                       DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int status,
+                       int action, DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
+                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots,
+                       DbrIden match, int role, DbrIden cpty, DbrMillis created);
 
 DBR_EXTERN DbrBool
 fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
-
-DBR_EXTERN DbrBool
-fir_sqlite_insert_trade(struct FirSqlite* sqlite, DbrIden id, DbrIden order, int rev,
-                        DbrIden match, int role, DbrIden cpty, DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);

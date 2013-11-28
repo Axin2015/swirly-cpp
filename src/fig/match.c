@@ -87,8 +87,9 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     struct DbrQueue mq;
     dbr_queue_init(&mq);
 
-    size_t count = 0;
     DbrLots taken = 0;
+    DbrTicks last_ticks = 0;
+    DbrLots last_lots = 0;
 
     struct DbrRec* crec = book->crec;
     DbrDate settl_date = book->settl_date;
@@ -132,29 +133,29 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
-        dbr_exec_init(maker_exec);
 
+        dbr_exec_init(maker_exec);
         match->id = match_id;
         match->maker_order = maker;
         match->maker_posn = posn;
         match->ticks = maker->c.ticks;
         match->lots = dbr_min(taker->c.resd - taken, maker->c.resd);
 
-        ++count;
         taken += match->lots;
+        last_ticks = match->ticks;
+        last_lots = match->lots;
 
         const DbrMillis now = taker->created;
 
         // Taker trade.
         taker_exec->id = taker_id;
-        taker_exec->c.id = taker->c.id;
-        taker_exec->c.rev = taker->c.rev + 1;
-        taker_exec->c.status = DBR_TRADE;
+        taker_exec->order = taker->id;
         taker_exec->c.trader.rec = taker->c.trader.rec;
         taker_exec->c.accnt.rec = taker->c.accnt.rec;
         taker_exec->c.contr.rec = crec;
         taker_exec->c.settl_date = settl_date;
         strncpy(taker_exec->c.ref, taker->c.ref, DBR_REF_MAX);
+        taker_exec->c.status = DBR_TRADE;
         taker_exec->c.action = taker->c.action;
         taker_exec->c.ticks = taker->c.ticks;
         taker_exec->c.lots = taker->c.lots;
@@ -162,22 +163,21 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         taker_exec->c.exec = taker->c.exec + taken;
         taker_exec->c.last_ticks = match->ticks;
         taker_exec->c.last_lots = match->lots;
+        taker_exec->c.min_lots = taker->c.min_lots;
         taker_exec->match = match->id;
         taker_exec->role = DBR_TAKER;
         taker_exec->cpty.rec = maker->c.accnt.rec;
         taker_exec->created = now;
-        taker_exec->modified = now;
 
         // Maker trade.
         maker_exec->id = maker_id;
-        maker_exec->c.id = maker->c.id;
-        maker_exec->c.rev = maker->c.rev + 1;
-        maker_exec->c.status = DBR_TRADE;
+        maker_exec->order = maker->id;
         maker_exec->c.trader.rec = maker->c.trader.rec;
         maker_exec->c.accnt.rec = maker->c.accnt.rec;
         maker_exec->c.contr.rec = crec;
         maker_exec->c.settl_date = settl_date;
         strncpy(maker_exec->c.ref, maker->c.ref, DBR_REF_MAX);
+        maker_exec->c.status = DBR_TRADE;
         maker_exec->c.action = maker->c.action;
         maker_exec->c.ticks = maker->c.ticks;
         maker_exec->c.lots = maker->c.lots;
@@ -185,11 +185,11 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         maker_exec->c.exec = maker->c.exec + match->lots;
         maker_exec->c.last_ticks = match->ticks;
         maker_exec->c.last_lots = match->lots;
+        maker_exec->c.min_lots = maker->c.min_lots;
         maker_exec->match = match->id;
         maker_exec->role = DBR_MAKER;
         maker_exec->cpty.rec = taker->c.accnt.rec;
         maker_exec->created = now;
-        maker_exec->modified = now;
 
         match->taker_exec = taker_exec;
         match->maker_exec = maker_exec;
@@ -199,18 +199,18 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
     struct DbrPosn* posn;
     // Avoid allocating position when there are no matches.
-    if (count > 0) {
+    if (!dbr_queue_empty(&mq)) {
         if (!(posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date, pool)))
             goto fail1;
     } else
         posn = NULL;
 
     // Commit to trans.
-    trans->new_order = taker;
-    trans->new_posn = posn;
+    trans->taker_posn = posn;
     trans->first_match = mq.first;
-    trans->count = count;
     trans->taken = taken;
+    trans->last_ticks = last_ticks;
+    trans->last_lots = last_lots;
 
     return true;
  fail1:

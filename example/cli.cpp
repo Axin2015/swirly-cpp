@@ -540,17 +540,16 @@ public:
         auto trader = serv_.trader(*trec_);
         cout <<
             "|id        "
-            "|rev       "
-            "|status    "
             "|trec      "
             "|arec      "
             "|crec      "
             "|settl_date"
+            "|status    "
             "|action    "
             "|ticks     "
+            "|lots      "
             "|resd      "
             "|exec      "
-            "|lots      "
             "|" << endl;
         cout <<
             "|----------"
@@ -570,17 +569,16 @@ public:
         for (auto order : trader.orders()) {
             OrderRef ref(order);
             cout << '|' << right << setw(10) << gtol(ref.id())
-                 << '|' << right << setw(10) << ref.rev()
-                 << '|' << left << setw(10) << strstatus(ref.status())
                  << '|' << left << setw(10) << ref.trec().mnem()
                  << '|' << left << setw(10) << ref.arec().mnem()
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
+                 << '|' << left << setw(10) << strstatus(ref.status())
                  << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
+                 << '|' << right << setw(10) << ref.lots()
                  << '|' << right << setw(10) << ref.resd()
                  << '|' << right << setw(10) << ref.exec()
-                 << '|' << right << setw(10) << ref.lots()
                  << '|' << endl;
         }
     }
@@ -617,13 +615,13 @@ public:
             "|crec      "
             "|settl_date"
             "|ref       "
-            "|cpty      "
-            "|role      "
             "|action    "
             "|ticks     "
+            "|lots      "
             "|resd      "
             "|exec      "
-            "|lots      "
+            "|role      "
+            "|cpty      "
             "|" << endl;
         cout <<
             "|----------"
@@ -651,13 +649,13 @@ public:
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
                  << '|' << left << setw(10) << ref.ref()
-                 << '|' << left << setw(10) << ref.cpty().mnem()
-                 << '|' << left << setw(10) << strrole(ref.role())
                  << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
+                 << '|' << right << setw(10) << ref.lots()
                  << '|' << right << setw(10) << ref.resd()
                  << '|' << right << setw(10) << ref.exec()
-                 << '|' << right << setw(10) << ref.lots()
+                 << '|' << left << setw(10) << strrole(ref.role())
+                 << '|' << left << setw(10) << ref.cpty().mnem()
                  << '|' << endl;
         }
     }

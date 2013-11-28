@@ -102,20 +102,19 @@ fig_trader_term(struct DbrRec* trec)
 DBR_EXTERN struct DbrOrder*
 fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
 {
-    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->c.id, &order->trader_node_);
+    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
     if (node) {
         struct DbrOrder* curr = dbr_trader_order_entry(node);
 
         // Update existing order.
 
-        assert(curr->c.id == order->c.id);
-        curr->c.rev = order->c.rev;
-        curr->c.status = order->c.status;
+        assert(curr->id == order->id);
         assert(curr->c.trader.rec == order->c.trader.rec);
         assert(curr->c.accnt.rec == order->c.accnt.rec);
         assert(curr->c.contr.rec == order->c.contr.rec);
         assert(curr->c.settl_date == order->c.settl_date);
         assert(strncmp(curr->c.ref, order->c.ref, DBR_REF_MAX) == 0);
+        curr->c.status = order->c.status;
         assert(curr->c.action == order->c.action);
         assert(curr->c.ticks == order->c.ticks);
         curr->c.lots = order->c.lots;

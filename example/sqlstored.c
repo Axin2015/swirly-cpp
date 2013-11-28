@@ -95,79 +95,10 @@ write_trans(const struct DbrBody* req)
     }
     for (struct DbrSlNode* node = req->write_trans_req.first; node; node = node->next) {
         struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-        switch (stmt->type) {
-        case DBR_INSERT_ORDER:
-            if (!dbr_journ_insert_order(journ,
-                                        stmt->insert_order.id,
-                                        stmt->insert_order.rev,
-                                        stmt->insert_order.status,
-                                        stmt->insert_order.tid,
-                                        stmt->insert_order.aid,
-                                        stmt->insert_order.cid,
-                                        stmt->insert_order.settl_date,
-                                        stmt->insert_order.ref,
-                                        stmt->insert_order.action,
-                                        stmt->insert_order.ticks,
-                                        stmt->insert_order.lots,
-                                        stmt->insert_order.resd,
-                                        stmt->insert_order.exec,
-                                        stmt->insert_order.last_ticks,
-                                        stmt->insert_order.last_lots,
-                                        stmt->insert_order.min_lots,
-                                        stmt->insert_order.now)) {
-                dbr_err_print("dbr_journ_insert_order() failed");
-                status_err(&rep, req->req_id);
-                goto fail2;
-            }
-            break;
-        case DBR_UPDATE_ORDER:
-            if (!dbr_journ_update_order(journ,
-                                        stmt->update_order.id,
-                                        stmt->update_order.rev,
-                                        stmt->update_order.status,
-                                        stmt->update_order.lots,
-                                        stmt->update_order.resd,
-                                        stmt->update_order.exec,
-                                        stmt->update_order.last_ticks,
-                                        stmt->update_order.last_lots,
-                                        stmt->update_order.now)) {
-                dbr_err_print("dbr_journ_update_order() failed");
-                status_err(&rep, req->req_id);
-                goto fail2;
-            }
-            break;
-        case DBR_ARCHIVE_ORDER:
-            if (!dbr_journ_archive_order(journ,
-                                         stmt->archive_order.id,
-                                         stmt->archive_order.now)) {
-                dbr_err_print("dbr_journ_archive_order() failed");
-                status_err(&rep, req->req_id);
-                goto fail2;
-            }
-            break;
-        case DBR_INSERT_TRADE:
-            if (!dbr_journ_insert_trade(journ,
-                                        stmt->insert_trade.id,
-                                        stmt->insert_trade.order,
-                                        stmt->insert_trade.rev,
-                                        stmt->insert_trade.match,
-                                        stmt->insert_trade.role,
-                                        stmt->insert_trade.cpty,
-                                        stmt->insert_trade.now)) {
-                dbr_err_print("dbr_journ_insert_trade() failed");
-                status_err(&rep, req->req_id);
-                goto fail2;
-            }
-            break;
-        case DBR_ARCHIVE_TRADE:
-            if (!dbr_journ_archive_trade(journ,
-                                         stmt->archive_trade.id,
-                                         stmt->archive_trade.now)) {
-                dbr_err_print("dbr_journ_archive_trade() failed");
-                status_err(&rep, req->req_id);
-                goto fail2;
-            }
-            break;
+        if (!dbr_journ_insert_stmt(journ, stmt)) {
+            dbr_err_print("dbr_journ_insert_stmt() failed");
+            status_err(&rep, req->req_id);
+            goto fail2;
         }
     }
     if (!dbr_journ_commit_trans(journ)) {

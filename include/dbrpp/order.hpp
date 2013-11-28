@@ -42,27 +42,17 @@ public:
     bool
     operator ==(OrderRef rhs) const noexcept
     {
-        return impl_->c.id == rhs.impl_->c.id;
+        return impl_->id == rhs.impl_->id;
     }
     bool
     operator !=(OrderRef rhs) const noexcept
     {
-        return impl_->c.id != rhs.impl_->c.id;
+        return impl_->id != rhs.impl_->id;
     }
     DbrIden
     id() const noexcept
     {
-        return impl_->c.id;
-    }
-    int
-    rev() const noexcept
-    {
-        return impl_->c.rev;
-    }
-    int
-    status() const noexcept
-    {
-        return impl_->c.status;
+        return impl_->id;
     }
     TraderRecRef
     trec() const noexcept
@@ -90,6 +80,11 @@ public:
         return Ref{impl_->c.ref};
     }
     int
+    status() const noexcept
+    {
+        return impl_->c.status;
+    }
+    int
     action() const noexcept
     {
         return impl_->c.action;
@@ -98,6 +93,11 @@ public:
     ticks() const noexcept
     {
         return impl_->c.ticks;
+    }
+    DbrLots
+    lots() const noexcept
+    {
+        return impl_->c.lots;
     }
     DbrLots
     resd() const noexcept
@@ -109,10 +109,15 @@ public:
     {
         return impl_->c.exec;
     }
-    DbrLots
-    lots() const noexcept
+    DbrTicks
+    last_ticks() const noexcept
     {
-        return impl_->c.lots;
+        return impl_->c.last_ticks;
+    }
+    DbrLots
+    last_lots() const noexcept
+    {
+        return impl_->c.last_lots;
     }
     DbrLots
     min_lots() const noexcept
@@ -140,18 +145,19 @@ inline std::ostream&
 operator <<(std::ostream& os, OrderRef order)
 {
     return os << "id=" << order.id()
-              << ",rev=" << order.rev()
-              << ",status=" << order.status()
               << ",trec=" << order.trec().mnem()
               << ",arec=" << order.arec().mnem()
               << ",crec=" << order.crec().mnem()
               << ",settl_date=" << order.settl_date()
               << ",ref=" << order.ref()
+              << ",status=" << order.status()
               << ",action=" << order.action()
               << ",ticks=" << order.ticks()
+              << ",lots=" << order.lots()
               << ",resd=" << order.resd()
               << ",exec=" << order.exec()
-              << ",lots=" << order.lots()
+              << ",last_ticks=" << order.last_ticks()
+              << ",last_lots=" << order.last_lots()
               << ",min_lots=" << order.min_lots()
               << ",created=" << order.created()
               << ",modified=" << order.modified();

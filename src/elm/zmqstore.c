@@ -104,56 +104,33 @@ rollback_trans(DbrJourn journ)
 }
 
 static DbrBool
-insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
-             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-             DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-             DbrLots min_lots, DbrMillis now)
+insert_exec(DbrJourn journ, const struct DbrExec* exec)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
-    stmt->type = DBR_INSERT_ORDER;
-    stmt->insert_order.id = id;
-    stmt->insert_order.rev = rev;
-    stmt->insert_order.status = status;
-    stmt->insert_order.tid = tid;
-    stmt->insert_order.aid = aid;
-    stmt->insert_order.cid = cid;
-    stmt->insert_order.settl_date = settl_date;
-    strncpy(stmt->insert_order.ref, ref, DBR_REF_MAX);
-    stmt->insert_order.action = action;
-    stmt->insert_order.ticks = ticks;
-    stmt->insert_order.lots = lots;
-    stmt->insert_order.resd = resd;
-    stmt->insert_order.exec = exec;
-    stmt->insert_order.last_ticks = last_ticks;
-    stmt->insert_order.last_lots = last_lots;
-    stmt->insert_order.min_lots = min_lots;
-    stmt->insert_order.now = now;
+    stmt->type = DBR_INSERT_EXEC;
+    stmt->insert_exec.id = exec->id;
+    stmt->insert_exec.order = exec->order;
+    __builtin_memcpy(&stmt->insert_exec.c, &exec->c, sizeof(struct DbrCommon));
+    stmt->insert_exec.match = exec->match;
+    stmt->insert_exec.role = exec->role;
+    stmt->insert_exec.cpty.id_only = exec->cpty.id_only;
+    stmt->insert_exec.created = exec->created;
     dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
 
 static DbrBool
-update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
-             DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrMillis now)
+insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
 {
     struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
-    if (!stmt)
+    struct DbrStmt* copy = dbr_pool_alloc_stmt(store->pool);
+    if (!copy)
         return false;
-    stmt->type = DBR_UPDATE_ORDER;
-    stmt->update_order.id = id;
-    stmt->update_order.rev = rev;
-    stmt->update_order.status = status;
-    stmt->update_order.lots = lots;
-    stmt->update_order.resd = resd;
-    stmt->update_order.exec = exec;
-    stmt->update_order.last_ticks = last_ticks;
-    stmt->update_order.last_lots = last_lots;
-    stmt->update_order.now = now;
-    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
+    __builtin_memcpy(&copy, stmt, sizeof(struct DbrStmt));
+    dbr_queue_insert_back(&store->queue, &copy->trans_node_);
     return true;
 }
 
@@ -167,26 +144,6 @@ archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
     stmt->type = DBR_ARCHIVE_ORDER;
     stmt->archive_order.id = id;
     stmt->archive_order.now = now;
-    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
-    return true;
-}
-
-static DbrBool
-insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match, int role,
-             DbrIden cpty, DbrMillis now)
-{
-    struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
-    if (!stmt)
-        return false;
-    stmt->type = DBR_INSERT_TRADE;
-    stmt->insert_trade.id = id;
-    stmt->insert_trade.order = order;
-    stmt->insert_trade.rev = rev;
-    stmt->insert_trade.match = match;
-    stmt->insert_trade.role = role;
-    stmt->insert_trade.cpty = cpty;
-    stmt->insert_trade.now = now;
     dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
@@ -210,10 +167,9 @@ static const struct DbrJournVtbl JOURN_VTBL = {
     .begin_trans = begin_trans,
     .commit_trans = commit_trans,
     .rollback_trans = rollback_trans,
-    .insert_order = insert_order,
-    .update_order = update_order,
+    .insert_exec = insert_exec,
+    .insert_stmt = insert_stmt,
     .archive_order = archive_order,
-    .insert_trade = insert_trade,
     .archive_trade = archive_trade
 };
 

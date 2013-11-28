@@ -27,15 +27,13 @@
 static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
 static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
-static const char ORDER_FORMAT[] = "liilllisilllllllll";
-static const char EXEC_FORMAT[] = "lliilllisilllllllilll";
+static const char ORDER_FORMAT[] = "llllisiilllllllll";
+static const char EXEC_FORMAT[] = "lllllisiillllllllill";
 static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
 
-static const char INSERT_ORDER_FORMAT[] = "liilllisillllllll";
-static const char UPDATE_ORDER_FORMAT[] = "liillllll";
+static const char INSERT_EXEC_FORMAT[] = "lllllisiillllllllill";
 static const char ARCHIVE_ORDER_FORMAT[] = "ll";
-static const char INSERT_TRADE_FORMAT[] = "llilill";
 static const char ARCHIVE_TRADE_FORMAT[] = "ll";
 
 DBR_API size_t
@@ -201,16 +199,16 @@ dbr_order_len(const struct DbrOrder* order, DbrBool enriched)
     size_t n;
     if (enriched) {
         n = dbr_packlenf(ORDER_FORMAT,
-                         order->c.id, order->c.rev, order->c.status, order->c.trader.rec->id,
-                         order->c.accnt.rec->id, order->c.contr.rec->id, order->c.settl_date,
-                         DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
+                         order->id, order->c.trader.rec->id, order->c.accnt.rec->id,
+                         order->c.contr.rec->id, order->c.settl_date, DBR_REF_MAX, order->c.ref,
+                         order->c.status, order->c.action, order->c.ticks, order->c.lots,
                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
                          order->c.min_lots, order->created, order->modified);
     } else {
         n = dbr_packlenf(ORDER_FORMAT,
-                         order->c.id, order->c.rev, order->c.status, order->c.trader.id_only,
-                         order->c.accnt.id_only, order->c.contr.id_only, order->c.settl_date,
-                         DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
+                         order->id, order->c.trader.id_only, order->c.accnt.id_only,
+                         order->c.contr.id_only, order->c.settl_date, DBR_REF_MAX, order->c.ref,
+                         order->c.status, order->c.action, order->c.ticks, order->c.lots,
                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
                          order->c.min_lots, order->created, order->modified);
     }
@@ -222,18 +220,18 @@ dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, ORDER_FORMAT,
-                        order->c.id, order->c.rev, order->c.status, order->c.trader.rec->id,
-                        order->c.accnt.rec->id, order->c.contr.rec->id, order->c.settl_date,
-                        DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
-                        order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                        order->c.min_lots, order->created, order->modified);
+                        order->id, order->c.trader.rec->id, order->c.accnt.rec->id,
+                        order->c.contr.rec->id, order->c.settl_date, DBR_REF_MAX,
+                        order->c.ref, order->c.status, order->c.action, order->c.ticks,
+                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
+                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
     } else {
         buf = dbr_packf(buf, ORDER_FORMAT,
-                        order->c.id, order->c.rev, order->c.status, order->c.trader.id_only,
-                        order->c.accnt.id_only, order->c.contr.id_only, order->c.settl_date,
-                        DBR_REF_MAX, order->c.ref, order->c.action, order->c.ticks, order->c.lots,
-                        order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                        order->c.min_lots, order->created, order->modified);
+                        order->id, order->c.trader.id_only, order->c.accnt.id_only,
+                        order->c.contr.id_only, order->c.settl_date, DBR_REF_MAX,
+                        order->c.ref, order->c.status, order->c.action, order->c.ticks,
+                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
+                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
     }
     return buf;
 }
@@ -243,11 +241,11 @@ dbr_read_order(const char* buf, struct DbrOrder* order)
 {
     dbr_order_init(order);
     return dbr_unpackf(buf, ORDER_FORMAT,
-                       &order->c.id, &order->c.rev, &order->c.status, &order->c.trader.id_only,
-                       &order->c.accnt.id_only, &order->c.contr.id_only, &order->c.settl_date,
-                       DBR_REF_MAX, order->c.ref, &order->c.action, &order->c.ticks, &order->c.lots,
-                       &order->c.resd, &order->c.exec, &order->c.last_ticks, &order->c.last_lots,
-                       &order->c.min_lots, &order->created, &order->modified);
+                       &order->id, &order->c.trader.id_only, &order->c.accnt.id_only,
+                       &order->c.contr.id_only, &order->c.settl_date, DBR_REF_MAX,
+                       order->c.ref, &order->c.status, &order->c.action, &order->c.ticks,
+                       &order->c.lots, &order->c.resd, &order->c.exec, &order->c.last_ticks,
+                       &order->c.last_lots, &order->c.min_lots, &order->created, &order->modified);
 }
 
 DBR_API size_t
@@ -256,20 +254,18 @@ dbr_exec_len(const struct DbrExec* exec, DbrBool enriched)
     size_t n;
     if (enriched) {
         n = dbr_packlenf(EXEC_FORMAT,
-                         exec->id, exec->c.id, exec->c.rev, exec->c.status, exec->c.trader.rec->id,
-                         exec->c.accnt.rec->id, exec->c.contr.rec->id, exec->c.settl_date,
-                         DBR_REF_MAX, exec->c.ref, exec->c.action, exec->c.ticks, exec->c.lots,
+                         exec->id, exec->order, exec->c.trader.rec->id, exec->c.accnt.rec->id,
+                         exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                         exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->match, exec->role, exec->cpty.rec->id, exec->created,
-                         exec->modified);
+                         exec->match, exec->role, exec->cpty.rec->id, exec->created);
     } else {
         n = dbr_packlenf(EXEC_FORMAT,
-                         exec->id, exec->c.id, exec->c.rev, exec->c.status, exec->c.trader.id_only,
-                         exec->c.accnt.id_only, exec->c.contr.id_only, exec->c.settl_date,
-                         DBR_REF_MAX, exec->c.ref, exec->c.action, exec->c.ticks, exec->c.lots,
+                         exec->id, exec->order, exec->c.trader.id_only, exec->c.accnt.id_only,
+                         exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                         exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->match, exec->role, exec->cpty.id_only, exec->created,
-                         exec->modified);
+                         exec->match, exec->role, exec->cpty.id_only, exec->created);
     }
     return n;
 }
@@ -279,18 +275,18 @@ dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, EXEC_FORMAT,
-                        exec->id, exec->c.id, exec->c.rev, exec->c.status, exec->c.trader.rec->id,
-                        exec->c.accnt.rec->id, exec->c.contr.rec->id, exec->c.settl_date,
-                        DBR_REF_MAX, exec->c.ref, exec->c.action, exec->c.ticks, exec->c.lots,
+                        exec->id, exec->order, exec->c.trader.rec->id, exec->c.accnt.rec->id,
+                        exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                        exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->match, exec->role, exec->cpty.rec->id, exec->created, exec->modified);
+                        exec->match, exec->role, exec->cpty.rec->id, exec->created);
     } else {
         buf = dbr_packf(buf, EXEC_FORMAT,
-                        exec->id, exec->c.id, exec->c.rev, exec->c.status, exec->c.trader.id_only,
-                        exec->c.accnt.id_only, exec->c.contr.id_only, exec->c.settl_date,
-                        DBR_REF_MAX, exec->c.ref, exec->c.action, exec->c.ticks, exec->c.lots,
+                        exec->id, exec->order, exec->c.trader.id_only, exec->c.accnt.id_only,
+                        exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                        exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->match, exec->role, exec->cpty.id_only, exec->created, exec->modified);
+                        exec->match, exec->role, exec->cpty.id_only, exec->created);
     }
     return buf;
 }
@@ -300,12 +296,11 @@ dbr_read_exec(const char* buf, struct DbrExec* exec)
 {
     dbr_exec_init(exec);
     return dbr_unpackf(buf, EXEC_FORMAT,
-                       &exec->id, &exec->c.id, &exec->c.rev, &exec->c.status,
-                       &exec->c.trader.id_only, &exec->c.accnt.id_only, &exec->c.contr.id_only,
-                       &exec->c.settl_date, DBR_REF_MAX, exec->c.ref, &exec->c.action,
-                       &exec->c.ticks, &exec->c.lots, &exec->c.resd, &exec->c.exec,
-                       &exec->c.last_ticks, &exec->c.last_lots, &exec->match, &exec->role,
-                       &exec->cpty.id_only, &exec->created, &exec->modified);
+                       &exec->id, &exec->order, &exec->c.trader.id_only, &exec->c.accnt.id_only,
+                       &exec->c.contr.id_only, &exec->c.settl_date, DBR_REF_MAX, &exec->c.status,
+                       exec->c.ref, &exec->c.action, &exec->c.ticks, &exec->c.lots, &exec->c.resd,
+                       &exec->c.exec, &exec->c.last_ticks, &exec->c.last_lots, &exec->match,
+                       &exec->role, &exec->cpty.id_only, &exec->created);
 }
 
 DBR_API size_t
@@ -387,36 +382,22 @@ dbr_stmt_len(const struct DbrStmt* stmt)
 {
     size_t n = dbr_packleni(stmt->type);
     switch (stmt->type) {
-    case DBR_INSERT_ORDER:
-        n += dbr_packlenf(INSERT_ORDER_FORMAT,
-                          stmt->insert_order.id, stmt->insert_order.rev,
-                          stmt->insert_order.status, stmt->insert_order.tid,
-                          stmt->insert_order.aid, stmt->insert_order.cid,
-                          stmt->insert_order.settl_date, DBR_REF_MAX,
-                          stmt->insert_order.ref, stmt->insert_order.action,
-                          stmt->insert_order.ticks, stmt->insert_order.lots,
-                          stmt->insert_order.resd, stmt->insert_order.exec,
-                          stmt->insert_order.last_ticks, stmt->insert_order.last_lots,
-                          stmt->insert_order.min_lots, stmt->insert_order.now);
-        break;
-	case DBR_UPDATE_ORDER:
-        n += dbr_packlenf(UPDATE_ORDER_FORMAT,
-                          stmt->update_order.id, stmt->update_order.rev,
-                          stmt->update_order.status, stmt->update_order.lots,
-                          stmt->update_order.resd, stmt->update_order.exec,
-                          stmt->update_order.last_ticks, stmt->update_order.last_lots,
-                          stmt->update_order.now);
+    case DBR_INSERT_EXEC:
+        n += dbr_packlenf(INSERT_EXEC_FORMAT,
+                          stmt->insert_exec.id, stmt->insert_exec.order,
+                          stmt->insert_exec.c.trader.id_only, stmt->insert_exec.c.accnt.id_only,
+                          stmt->insert_exec.c.contr.id_only, stmt->insert_exec.c.settl_date,
+                          DBR_REF_MAX, stmt->insert_exec.c.ref, stmt->insert_exec.c.status,
+                          stmt->insert_exec.c.action, stmt->insert_exec.c.ticks,
+                          stmt->insert_exec.c.lots, stmt->insert_exec.c.resd,
+                          stmt->insert_exec.c.exec, stmt->insert_exec.c.last_ticks,
+                          stmt->insert_exec.c.last_lots, stmt->insert_exec.c.min_lots,
+                          stmt->insert_exec.match, stmt->insert_exec.role,
+                          stmt->insert_exec.cpty.id_only, stmt->insert_exec.created);
         break;
 	case DBR_ARCHIVE_ORDER:
         n += dbr_packlenf(ARCHIVE_ORDER_FORMAT,
                           stmt->archive_order.id, stmt->archive_order.now);
-        break;
-	case DBR_INSERT_TRADE:
-        n += dbr_packlenf(INSERT_TRADE_FORMAT,
-                          stmt->insert_trade.id, stmt->insert_trade.order,
-                          stmt->insert_trade.rev, stmt->insert_trade.match,
-                          stmt->insert_trade.role, stmt->insert_trade.cpty,
-                          stmt->insert_trade.now);
         break;
 	case DBR_ARCHIVE_TRADE:
         n += dbr_packlenf(ARCHIVE_TRADE_FORMAT,
@@ -433,36 +414,22 @@ dbr_write_stmt(char* buf, const struct DbrStmt* stmt)
 {
     buf = dbr_packi(buf, stmt->type);
     switch (stmt->type) {
-    case DBR_INSERT_ORDER:
-        buf = dbr_packf(buf, INSERT_ORDER_FORMAT,
-                        stmt->insert_order.id, stmt->insert_order.rev,
-                        stmt->insert_order.status, stmt->insert_order.tid,
-                        stmt->insert_order.aid, stmt->insert_order.cid,
-                        stmt->insert_order.settl_date, DBR_REF_MAX,
-                        stmt->insert_order.ref, stmt->insert_order.action,
-                        stmt->insert_order.ticks, stmt->insert_order.lots,
-                        stmt->insert_order.resd, stmt->insert_order.exec,
-                        stmt->insert_order.last_ticks, stmt->insert_order.last_lots,
-                        stmt->insert_order.min_lots, stmt->insert_order.now);
-        break;
-	case DBR_UPDATE_ORDER:
-        buf = dbr_packf(buf, UPDATE_ORDER_FORMAT,
-                        stmt->update_order.id, stmt->update_order.rev,
-                        stmt->update_order.status, stmt->update_order.lots,
-                        stmt->update_order.resd, stmt->update_order.exec,
-                        stmt->update_order.last_ticks, stmt->update_order.last_lots,
-                        stmt->update_order.now);
+    case DBR_INSERT_EXEC:
+        buf = dbr_packf(buf, INSERT_EXEC_FORMAT,
+                        stmt->insert_exec.id, stmt->insert_exec.order,
+                        stmt->insert_exec.c.trader.id_only, stmt->insert_exec.c.accnt.id_only,
+                        stmt->insert_exec.c.contr.id_only, stmt->insert_exec.c.settl_date,
+                        DBR_REF_MAX, stmt->insert_exec.c.ref, stmt->insert_exec.c.status,
+                        stmt->insert_exec.c.action, stmt->insert_exec.c.ticks,
+                        stmt->insert_exec.c.lots, stmt->insert_exec.c.resd,
+                        stmt->insert_exec.c.exec, stmt->insert_exec.c.last_ticks,
+                        stmt->insert_exec.c.last_lots, stmt->insert_exec.c.min_lots,
+                        stmt->insert_exec.match, stmt->insert_exec.role,
+                        stmt->insert_exec.cpty.id_only, stmt->insert_exec.created);
         break;
 	case DBR_ARCHIVE_ORDER:
         buf = dbr_packf(buf, ARCHIVE_ORDER_FORMAT,
                         stmt->archive_order.id, stmt->archive_order.now);
-        break;
-	case DBR_INSERT_TRADE:
-        buf = dbr_packf(buf, INSERT_TRADE_FORMAT,
-                        stmt->insert_trade.id, stmt->insert_trade.order,
-                        stmt->insert_trade.rev, stmt->insert_trade.match,
-                        stmt->insert_trade.role, stmt->insert_trade.cpty,
-                        stmt->insert_trade.now);
         break;
 	case DBR_ARCHIVE_TRADE:
         buf = dbr_packf(buf, ARCHIVE_TRADE_FORMAT,
@@ -480,36 +447,22 @@ dbr_read_stmt(const char* buf, struct DbrStmt* stmt)
     dbr_stmt_init(stmt);
     buf = dbr_unpacki(buf, &stmt->type);
     switch (stmt->type) {
-    case DBR_INSERT_ORDER:
-        buf = dbr_unpackf(buf, INSERT_ORDER_FORMAT,
-                          &stmt->insert_order.id, &stmt->insert_order.rev,
-                          &stmt->insert_order.status, &stmt->insert_order.tid,
-                          &stmt->insert_order.aid, &stmt->insert_order.cid,
-                          &stmt->insert_order.settl_date, DBR_REF_MAX,
-                          &stmt->insert_order.ref, &stmt->insert_order.action,
-                          &stmt->insert_order.ticks, &stmt->insert_order.lots,
-                          &stmt->insert_order.resd, &stmt->insert_order.exec,
-                          &stmt->insert_order.last_ticks, &stmt->insert_order.last_lots,
-                          &stmt->insert_order.min_lots, &stmt->insert_order.now);
-        break;
-	case DBR_UPDATE_ORDER:
-        buf = dbr_unpackf(buf, UPDATE_ORDER_FORMAT,
-                          &stmt->update_order.id, &stmt->update_order.rev,
-                          &stmt->update_order.status, &stmt->update_order.lots,
-                          &stmt->update_order.resd, &stmt->update_order.exec,
-                          &stmt->update_order.last_ticks, &stmt->update_order.last_lots,
-                          &stmt->update_order.now);
+    case DBR_INSERT_EXEC:
+        buf = dbr_unpackf(buf, INSERT_EXEC_FORMAT,
+                          &stmt->insert_exec.id, &stmt->insert_exec.order,
+                          &stmt->insert_exec.c.trader.id_only, &stmt->insert_exec.c.accnt.id_only,
+                          &stmt->insert_exec.c.contr.id_only, &stmt->insert_exec.c.settl_date,
+                          DBR_REF_MAX, stmt->insert_exec.c.ref, &stmt->insert_exec.c.status,
+                          &stmt->insert_exec.c.action, &stmt->insert_exec.c.ticks,
+                          &stmt->insert_exec.c.lots, &stmt->insert_exec.c.resd,
+                          &stmt->insert_exec.c.exec, &stmt->insert_exec.c.last_ticks,
+                          &stmt->insert_exec.c.last_lots, &stmt->insert_exec.c.min_lots,
+                          &stmt->insert_exec.match, &stmt->insert_exec.role,
+                          &stmt->insert_exec.cpty.id_only, &stmt->insert_exec.created);
         break;
 	case DBR_ARCHIVE_ORDER:
         buf = dbr_unpackf(buf, ARCHIVE_ORDER_FORMAT,
                           &stmt->archive_order.id, &stmt->archive_order.now);
-        break;
-	case DBR_INSERT_TRADE:
-        buf = dbr_unpackf(buf, INSERT_TRADE_FORMAT,
-                          &stmt->insert_trade.id, &stmt->insert_trade.order,
-                          &stmt->insert_trade.rev, &stmt->insert_trade.match,
-                          &stmt->insert_trade.role, &stmt->insert_trade.cpty,
-                          &stmt->insert_trade.now);
         break;
 	case DBR_ARCHIVE_TRADE:
         buf = dbr_unpackf(buf, ARCHIVE_TRADE_FORMAT,

@@ -336,20 +336,16 @@ enum DbrStatus {
 };
 
 struct DbrCommon {
-    DbrIden id;
-    // Order revision counter.
-    int rev;
-    /**
-     * @sa enum DbrStatus
-     */
-    int status;
-    // Immutable except for resd.
     union DbrURec trader;
     union DbrURec accnt;
     union DbrURec contr;
     DbrDate settl_date;
     // Ref is optional.
     DbrRef ref;
+    /**
+     * @sa enum DbrStatus
+     */
+    int status;
     /**
      * @sa enum DbrAction
      */
@@ -373,6 +369,7 @@ struct DbrOrder {
      */
     // Set when order is associated with book.
     struct DbrLevel* level;
+    DbrIden id;
     struct DbrCommon c;
     DbrMillis created;
     DbrMillis modified;
@@ -419,6 +416,7 @@ struct DbrExec {
      * @publicsection
      */
     DbrIden id;
+    DbrIden order;
     struct DbrCommon c;
     DbrIden match;
     /**
@@ -427,7 +425,6 @@ struct DbrExec {
     int role;
     union DbrURec cpty;
     DbrMillis created;
-    DbrMillis modified;
     /**
      * @privatesection
      */
@@ -456,14 +453,12 @@ struct DbrMatch {
      * @publicsection
      */
     DbrIden id;
-    struct DbrOrder* maker_order;
-    struct DbrPosn* maker_posn;
-    // Must be greater than zero.
     DbrTicks ticks;
-    // Must be greater than zero.
     DbrLots lots;
     struct DbrExec* taker_exec;
+    struct DbrOrder* maker_order;
     struct DbrExec* maker_exec;
+    struct DbrPosn* maker_posn;
     /**
      * @privatesection
      */
@@ -480,15 +475,10 @@ dbr_match_init(struct DbrMatch* match)
 }
 
 struct DbrTrans {
-    struct DbrOrder* new_order;
-    // Null if no matches.
-    struct DbrPosn* new_posn;
+    struct DbrExec* new_exec;
+    struct DbrPosn* taker_posn;
     // Null if no matches.
     struct DbrSlNode* first_match;
-    /**
-     * Number of matches.
-     */
-    size_t count;
     /**
      * Total quantity taken.
      */
@@ -500,10 +490,9 @@ struct DbrTrans {
 static inline void
 dbr_trans_init(struct DbrTrans* trans)
 {
-    trans->new_order = NULL;
-    trans->new_posn = NULL;
+    trans->new_exec = NULL;
+    trans->taker_posn = NULL;
     trans->first_match = NULL;
-    trans->count = 0;
     trans->taken = 0;
     trans->last_ticks = 0;
     trans->last_lots = 0;
@@ -523,10 +512,8 @@ dbr_trans_match_entry(struct DbrSlNode* node)
  */
 
 enum {
-	DBR_INSERT_ORDER = 1,
-	DBR_UPDATE_ORDER,
+	DBR_INSERT_EXEC = 1,
 	DBR_ARCHIVE_ORDER,
-	DBR_INSERT_TRADE,
 	DBR_ARCHIVE_TRADE
 };
 
@@ -538,47 +525,19 @@ struct DbrStmt {
     union {
         struct {
             DbrIden id;
-            int rev;
-            int status;
-            DbrIden tid;
-            DbrIden aid;
-            DbrIden cid;
-            DbrDate settl_date;
-            DbrRef ref;
-            int action;
-            DbrTicks ticks;
-            DbrLots lots;
-            DbrLots resd;
-            DbrLots exec;
-            DbrTicks last_ticks;
-            DbrLots last_lots;
-            DbrLots min_lots;
-            DbrMillis now;
-        } insert_order;
-        struct {
-            DbrIden id;
-            int rev;
-            int status;
-            DbrLots lots;
-            DbrLots resd;
-            DbrLots exec;
-            DbrTicks last_ticks;
-            DbrLots last_lots;
-            DbrMillis now;
-        } update_order;
+            DbrIden order;
+            // id_only.
+            struct DbrCommon c;
+            DbrIden match;
+            int role;
+            // id_only.
+            union DbrURec cpty;
+            DbrMillis created;
+        } insert_exec;
         struct {
             DbrIden id;
             DbrMillis now;
         } archive_order;
-        struct {
-            DbrIden id;
-            DbrIden order;
-            int rev;
-            DbrIden match;
-            int role;
-            DbrIden cpty;
-            DbrMillis now;
-        } insert_trade;
         struct {
             DbrIden id;
             DbrMillis now;

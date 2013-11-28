@@ -57,12 +57,7 @@ public:
     DbrIden
     order() const noexcept
     {
-        return impl_->c.id;
-    }
-    int
-    rev() const noexcept
-    {
-        return impl_->c.rev;
+        return impl_->order;
     }
     TraderRecRef
     trec() const noexcept
@@ -90,6 +85,11 @@ public:
         return Ref{impl_->c.ref};
     }
     int
+    status() const noexcept
+    {
+        return impl_->c.status;
+    }
+    int
     action() const noexcept
     {
         return impl_->c.action;
@@ -98,6 +98,11 @@ public:
     ticks() const noexcept
     {
         return impl_->c.ticks;
+    }
+    DbrLots
+    lots() const noexcept
+    {
+        return impl_->c.lots;
     }
     DbrLots
     resd() const noexcept
@@ -109,10 +114,20 @@ public:
     {
         return impl_->c.exec;
     }
-    DbrLots
-    lots() const noexcept
+    DbrTicks
+    last_ticks() const noexcept
     {
-        return impl_->c.lots;
+        return impl_->c.last_ticks;
+    }
+    DbrLots
+    last_lots() const noexcept
+    {
+        return impl_->c.last_lots;
+    }
+    DbrLots
+    min_lots() const noexcept
+    {
+        return impl_->c.min_lots;
     }
     DbrIden
     match() const noexcept
@@ -134,11 +149,6 @@ public:
     {
         return impl_->created;
     }
-    DbrMillis
-    modified() const noexcept
-    {
-        return impl_->modified;
-    }
 };
 
 inline std::ostream&
@@ -146,22 +156,24 @@ operator <<(std::ostream& os, ExecRef exec)
 {
     return os << "id=" << exec.id()
               << ",order=" << exec.order()
-              << ",rev=" << exec.rev()
               << ",trec=" << exec.trec().mnem()
               << ",arec=" << exec.arec().mnem()
               << ",crec=" << exec.crec().mnem()
               << ",settl_date=" << exec.settl_date()
               << ",ref=" << exec.ref()
+              << ",status=" << exec.status()
               << ",action=" << exec.action()
               << ",ticks=" << exec.ticks()
+              << ",lots=" << exec.lots()
               << ",resd=" << exec.resd()
               << ",exec=" << exec.exec()
-              << ",lots=" << exec.lots()
+              << ",last_ticks=" << exec.last_ticks()
+              << ",last_lots=" << exec.last_lots()
+              << ",min_lots=" << exec.min_lots()
               << ",match=" << exec.match()
               << ",cpty=" << exec.cpty().mnem()
               << ",role=" << exec.role()
-              << ",created=" << exec.created()
-              << ",modified=" << exec.modified();
+              << ",created=" << exec.created();
 }
 
 inline size_t

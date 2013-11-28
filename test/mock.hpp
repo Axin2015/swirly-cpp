@@ -44,21 +44,13 @@ public:
     rollback_trans() noexcept;
 
     DbrBool
-    insert_order(DbrIden id, int rev, int status, DbrIden tid, DbrIden aid, DbrIden cid,
-                 DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-                 DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
-                 DbrLots min_lots , DbrMillis now) noexcept;
+    insert_exec(const DbrExec& exec) noexcept;
 
     DbrBool
-    update_order(DbrIden id, int rev, int status, DbrLots lots, DbrLots resd, DbrLots exec,
-                 DbrTicks last_tics, DbrLots last_lots, DbrMillis now) noexcept;
+    insert_stmt(const DbrStmt& stmt) noexcept;
 
     DbrBool
     archive_order(DbrIden id, DbrMillis now) noexcept;
-
-    DbrBool
-    insert_trade(DbrIden id, DbrIden order, int rev, DbrIden match, int role, DbrIden cpty,
-                 DbrMillis now) noexcept;
 
     DbrBool
     archive_trade(DbrIden id, DbrMillis now) noexcept;

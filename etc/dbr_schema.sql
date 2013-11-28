@@ -177,13 +177,12 @@ CREATE VIEW memb_v AS
 
 CREATE TABLE order_ (
   id INTEGER PRIMARY KEY,
-  rev INTEGER NOT NULL,
-  status INTEGER NOT NULL REFERENCES status (id),
   trader INTEGER NOT NULL REFERENCES trader (id),
   accnt INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
   ref TEXT NULL,
+  status INTEGER NOT NULL REFERENCES status (id),
   action INTEGER NOT NULL REFERENCES action (id),
   ticks INTEGER NOT NULL,
   lots INTEGER NOT NULL,
@@ -191,8 +190,7 @@ CREATE TABLE order_ (
   exec INTEGER NOT NULL,
   last_ticks INTEGER NOT NULL,
   last_lots INTEGER NOT NULL,
-  min INTEGER NOT NULL,
-  flags INTEGER NOT NULL,
+  min_lots INTEGER NOT NULL,
   archive INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL,
@@ -203,13 +201,12 @@ CREATE TABLE order_ (
 CREATE VIEW order_v AS
   SELECT
   o.id,
-  o.rev,
-  s.mnem status,
   t.mnem trader,
   a.mnem accnt,
   c.mnem contr,
   o.settl_date,
   o.ref,
+  s.mnem status,
   o.action,
   o.ticks,
   o.lots,
@@ -217,8 +214,7 @@ CREATE VIEW order_v AS
   o.exec,
   o.last_ticks,
   o.last_lots,
-  o.min,
-  o.flags,
+  o.min_lots,
   o.archive,
   o.created,
   o.modified
@@ -233,128 +229,15 @@ CREATE VIEW order_v AS
   ON o.contr = c.id
 ;
 
-CREATE TABLE history (
-  id INTEGER NOT NULL REFERENCES order_ (id),
-  rev INTEGER NOT NULL,
-  status INTEGER NOT NULL,
-  lots INTEGER NOT NULL,
-  resd INTEGER NOT NULL,
-  exec INTEGER NOT NULL,
-  last_ticks INTEGER NOT NULL,
-  last_lots INTEGER NOT NULL,
-  modified INTEGER NOT NULL,
-  PRIMARY KEY (id, rev)
-)
-;
-
-CREATE VIEW history_v AS
-  SELECT
-  o.id,
-  o.rev,
-  s.mnem status,
-  o.lots,
-  o.resd,
-  o.exec,
-  o.last_ticks,
-  o.last_lots,
-  o.modified
-  FROM history o
-  INNER JOIN status s
-  ON o.status = s.id
-;
-
-CREATE TRIGGER after_insert_on_order
-  AFTER INSERT ON order_
-BEGIN
-  INSERT INTO history (id, rev, status, lots, resd, exec, last_ticks, last_lots, modified)
-  VALUES (new.id, new.rev, new.status, new.lots, new.resd, new.exec, new.last_ticks,
-          new.last_lots, new.modified);
-END
-;
-
-CREATE TRIGGER after_update_on_order
-  AFTER UPDATE ON order_
-  WHEN new.archive = 0
-BEGIN
-  INSERT INTO history (id, rev, status, lots, resd, exec, last_ticks, last_lots, modified)
-  VALUES (new.id, new.rev, new.status, new.lots, new.resd, new.exec, new.last_ticks,
-          new.last_lots, new.modified);
-END
-;
-
-CREATE TABLE trade (
-  id INTEGER PRIMARY KEY,
-  order_ INTEGER NOT NULL REFERENCES order_ (id),
-  rev INTEGER NOT NULL,
-  match INTEGER NOT NULL,
-  role INTEGER NOT NULL REFERENCES role (id),
-  cpty INTEGER NOT NULL REFERENCES accnt (id),
-  archive INTEGER NOT NULL,
-  created INTEGER NOT NULL,
-  modified INTEGER NOT NULL,
-  CONSTRAINT trade_match_role_uq
-  UNIQUE (match, role)
-)
-;
-
-CREATE VIEW trade_v AS
-  SELECT
-  t.id,
-  t.order_,
-  t.rev,
-  h.status,
-  o.trader,
-  o.accnt,
-  o.contr,
-  o.settl_date,
-  o.ref,
-  o.action,
-  o.ticks,
-  h.lots,
-  h.resd,
-  h.exec,
-  h.last_ticks,
-  h.last_lots,
-  t.match,
-  t.role,
-  t.cpty,
-  t.archive,
-  t.created,
-  t.modified
-  FROM trade t
-  INNER JOIN order_ o
-  ON t.order_ = h.id
-  INNER JOIN history h
-  ON t.order_ = h.id
-  AND t.rev = h.rev
-;
-
-CREATE VIEW posn_v AS
-  SELECT
-  o.accnt,
-  o.contr,
-  o.settl_date,
-  o.action,
-  SUM(h.last_lots * h.last_ticks) licks,
-  SUM(h.last_lots) lots
-  FROM trade t
-  INNER JOIN order_ o
-  ON t.order_ = h.id
-  INNER JOIN history h
-  ON t.order_ = h.id
-  AND t.rev = h.rev
-  GROUP BY o.accnt, o.contr, o.settl_date, o.action
-;
-
 CREATE TABLE exec (
   id INTEGER PRIMARY KEY,
   order_ INTEGER NOT NULL REFERENCES order_ (id),
-  status INTEGER NOT NULL REFERENCES status (id),
   trader INTEGER NOT NULL REFERENCES trader (id),
   accnt INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
   ref TEXT NULL,
+  status INTEGER NOT NULL REFERENCES status (id),
   action INTEGER NOT NULL REFERENCES action (id),
   ticks INTEGER NOT NULL,
   lots INTEGER NOT NULL,
@@ -363,13 +246,165 @@ CREATE TABLE exec (
   last_ticks INTEGER NOT NULL,
   last_lots INTEGER NOT NULL,
   min_lots INTEGER NOT NULL,
-  match INTEGER NOT NULL,
-  role INTEGER NOT NULL REFERENCES role (id),
-  cpty INTEGER NOT NULL REFERENCES accnt (id),
+  match INTEGER NULL,
+  role INTEGER NULL REFERENCES role (id),
+  cpty INTEGER NULL REFERENCES accnt (id),
   archive INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL
 )
+;
+
+CREATE TRIGGER before_insert_on_exec
+  BEFORE INSERT ON exec
+  WHEN new.status IN (1, 4)
+BEGIN
+  INSERT INTO order_ (
+    id,
+    trader,
+    accnt,
+    contr,
+    settl_date,
+    ref,
+    status,
+    action,
+    ticks,
+    lots,
+    resd,
+    exec,
+    last_ticks,
+    last_lots,
+    min_lots,
+    archive,
+    created,
+    modified
+  ) VALUES (
+    new.order_,
+    new.trader,
+    new.accnt,
+    new.contr,
+    new.settl_date,
+    new.ref,
+    new.status,
+    new.action,
+    new.ticks,
+    new.lots,
+    new.resd,
+    new.exec,
+    new.last_ticks,
+    new.last_lots,
+    new.min_lots,
+    0,
+    new.created,
+    new.modified
+  );
+END
+;
+
+CREATE TRIGGER before_update_on_exec
+  BEFORE INSERT ON exec
+  WHEN NOT new.status IN (1, 4)
+BEGIN
+  UPDATE order_
+  SET
+    status = new.status,
+    lots = new.lots,
+    resd = new.resd,
+    exec = new.exec,
+    last_ticks = new.last_ticks,
+    last_lots = new.last_lots,
+    modified = new.modified
+  WHERE id = new.order_;
+END
+;
+
+CREATE VIEW exec_v AS
+  SELECT
+  e.id,
+  e.order_,
+  t.mnem trader,
+  a.mnem accnt,
+  c.mnem contr,
+  e.settl_date,
+  e.ref,
+  s.mnem status,
+  e.action,
+  e.ticks,
+  e.lots,
+  e.resd,
+  e.exec,
+  e.last_ticks,
+  e.last_lots,
+  e.min_lots,
+  e.match,
+  r.mnem role,
+  p.mnem cpty,
+  e.archive,
+  e.created,
+  e.modified
+  FROM exec e
+  INNER JOIN status s
+  ON e.status = s.id
+  INNER JOIN trader t
+  ON e.trader = t.id
+  INNER JOIN accnt a
+  ON e.accnt = a.id
+  INNER JOIN contr c
+  ON e.contr = c.id
+  INNER JOIN role r
+  ON e.role = r.id
+  INNER JOIN accnt p
+  ON e.cpty = p.id
+;
+
+CREATE VIEW trade_v AS
+  SELECT
+  e.id,
+  e.order_,
+  t.mnem trader,
+  a.mnem accnt,
+  c.mnem contr,
+  e.settl_date,
+  e.ref,
+  e.action,
+  e.ticks,
+  e.lots,
+  e.resd,
+  e.exec,
+  e.last_ticks,
+  e.last_lots,
+  e.min_lots,
+  e.match,
+  r.mnem role,
+  p.mnem cpty,
+  e.archive,
+  e.created,
+  e.modified
+  FROM exec e
+  INNER JOIN trader t
+  ON e.trader = t.id
+  INNER JOIN accnt a
+  ON e.accnt = a.id
+  INNER JOIN contr c
+  ON e.contr = c.id
+  INNER JOIN role r
+  ON e.role = r.id
+  INNER JOIN accnt p
+  ON e.cpty = p.id
+  WHERE e.status = 5
+;
+
+CREATE VIEW posn_v AS
+  SELECT
+  e.accnt,
+  e.contr,
+  e.settl_date,
+  e.action,
+  SUM(e.last_lots * e.last_ticks) licks,
+  SUM(e.last_lots) lots
+  FROM exec e
+  WHERE e.status = 5
+  GROUP BY e.accnt, e.contr, e.settl_date, e.action
 ;
 
 COMMIT TRANSACTION

@@ -60,7 +60,7 @@ fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->c.id, &order->trader_node_);
+    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
     assert(!node);
 #pragma GCC diagnostic pop
     if (order->c.ref[0] != '\0')

@@ -229,36 +229,25 @@ Journ::rollback_trans() noexcept
 }
 
 DbrBool
-Journ::insert_order(DbrIden id, int rev, int status, DbrIden tid, DbrIden aid, DbrIden cid,
-                    DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-                    DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
-                    DbrLots last_lots, DbrLots min_lots, DbrMillis now) noexcept
+Journ::insert_exec(DbrIden id, const DbrExec& exec) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::update_order(DbrIden id, int rev, int status, DbrLots lots, DbrLots resd, DbrLots exec,
-                    DbrTicks last_ticks, DbrLots last_lots, DbrMillis now) noexcept
+Journ::insert_stmt(DbrIden id, const DbrStmt& stmt) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::archive_order(DbrIden id, DbrMillis now) noexcept
+Journ::archive_order(DbrMillis now) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::insert_trade(DbrIden id, DbrIden order, int rev, DbrIden match, int role, DbrIden cpty,
-                    DbrMillis now) noexcept
-{
-    return DBR_TRUE;
-}
-
-DbrBool
-Journ::archive_trade(DbrIden id, DbrMillis now) noexcept
+Journ::archive_trade(DbrMillis now) noexcept
 {
     return DBR_TRUE;
 }

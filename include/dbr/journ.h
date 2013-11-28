@@ -39,21 +39,13 @@ struct DbrJournVtbl {
     (*rollback_trans)(DbrJourn journ);
 
     DbrBool
-    (*insert_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
-                    DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-                    DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks,
-                    DbrLots last_lots, DbrLots min_lots, DbrMillis now);
+    (*insert_exec)(DbrJourn journ, const struct DbrExec* exec);
 
     DbrBool
-    (*update_order)(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
-                    DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrMillis now);
+    (*insert_stmt)(DbrJourn journ, const struct DbrStmt* stmt);
 
     DbrBool
     (*archive_order)(DbrJourn journ, DbrIden id, DbrMillis now);
-
-    DbrBool
-    (*insert_trade)(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match,
-                    int role, DbrIden cpty, DbrMillis now);
 
     DbrBool
     (*archive_trade)(DbrJourn journ, DbrIden id, DbrMillis now);
@@ -84,35 +76,21 @@ dbr_journ_rollback_trans(DbrJourn journ)
 }
 
 static inline DbrBool
-dbr_journ_insert_order(DbrJourn journ, DbrIden id, int rev, int status, DbrIden tid, DbrIden aid,
-                       DbrIden cid, DbrDate settl_date, const char* ref, int action,
-                       DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
-                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots, DbrMillis now)
+dbr_journ_insert_exec(DbrJourn journ, const struct DbrExec* exec)
 {
-    return journ->vtbl->insert_order(journ, id, rev, status, tid, aid, cid, settl_date, ref,
-                                     action, ticks, lots, resd, exec, last_ticks, last_lots,
-                                     min_lots, now);
+    return journ->vtbl->insert_exec(journ, exec);
 }
 
 static inline DbrBool
-dbr_journ_update_order(DbrJourn journ, DbrIden id, int rev, int status, DbrLots lots, DbrLots resd,
-                       DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrMillis now)
+dbr_journ_insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
 {
-    return journ->vtbl->update_order(journ, id, rev, status, lots, resd, exec, last_ticks,
-                                     last_lots, now);
+    return journ->vtbl->insert_stmt(journ, stmt);
 }
 
 static inline DbrBool
 dbr_journ_archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
 {
     return journ->vtbl->archive_order(journ, id, now);
-}
-
-static inline DbrBool
-dbr_journ_insert_trade(DbrJourn journ, DbrIden id, DbrIden order, int rev, DbrIden match,
-                       int role, DbrIden cpty, DbrMillis now)
-{
-    return journ->vtbl->insert_trade(journ, id, order, rev, match, role, cpty, now);
 }
 
 static inline DbrBool
