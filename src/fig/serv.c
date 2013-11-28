@@ -144,9 +144,9 @@ free_books(struct DbrTree* books)
 }
 
 static void
-free_trans(struct DbrTrans* trans, DbrPool pool)
+free_matches(struct DbrSlNode* first, DbrPool pool)
 {
-    struct DbrSlNode* node = trans->first_match;
+    struct DbrSlNode* node = first;
     while (node) {
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
@@ -155,11 +155,10 @@ free_trans(struct DbrTrans* trans, DbrPool pool)
         dbr_pool_free_exec(pool, match->maker_exec);
         dbr_pool_free_match(pool, match);
     }
-    dbr_pool_free_exec(pool, trans->new_exec);
 }
 
 static struct DbrExec*
-new_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
+create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
 {
     struct DbrExec* exec = dbr_pool_alloc_exec(serv->pool);
     if (!exec)
@@ -219,10 +218,9 @@ tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-commit_cycle(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
-              const struct DbrTrans* trans, DbrMillis now)
+commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
+             const struct DbrTrans* trans, DbrMillis now)
 {
-    dbr_queue_insert_back(&serv->execs, &trans->new_exec->serv_node_);
     if (trans->taker_posn)
         tree_insert(&serv->posns, &trans->taker_posn->serv_node_);
 
@@ -533,19 +531,19 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     struct DbrTrans trans;
     dbr_trans_init(&trans);
 
-    trans.new_exec = new_exec(serv, new_order, now);
-    if (!trans.new_exec)
+    struct DbrExec* new_exec = create_exec(serv, new_order, now);
+    if (!new_exec)
         goto fail2;
 
     if (!fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
         goto fail3;
 
     if (!dbr_journ_begin_trans(serv->journ))
-        goto fail3;
+        goto fail4;
 
-    if (!dbr_journ_insert_exec(serv->journ, trans.new_exec)) {
+    if (!dbr_journ_insert_exec(serv->journ, new_exec)) {
         dbr_journ_rollback_trans(serv->journ);
-        goto fail3;
+        goto fail4;
     }
 
     if (trans.first_match) {
@@ -553,7 +551,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
         // Orders were matched.
         if (!insert_matches(serv->journ, trans.first_match)) {
             dbr_journ_rollback_trans(serv->journ);
-            goto fail3;
+            goto fail4;
         }
 
         // TODO: IOC orders would need an additional revision for the unsolicited cancellation of
@@ -570,25 +568,28 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // Place incomplete order in book.
     if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order)) {
         dbr_journ_rollback_trans(serv->journ);
-        goto fail3;
+        goto fail4;
     }
 
     // Journal commit can still fail.
     if (!dbr_journ_commit_trans(serv->journ))
-        goto fail4;
+        goto fail5;
 
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to cycle and free matches.
-    commit_cycle(serv, trader, book, &trans, now);
+    dbr_queue_insert_back(&serv->execs, &new_exec->serv_node_);
+    commit_trans(serv, trader, book, &trans, now);
     // FIXME
-    dbr_pool_free_exec(serv->pool, trans.new_exec);
+    dbr_pool_free_exec(serv->pool, new_exec);
     return new_order;
- fail4:
+ fail5:
     if (!dbr_order_done(new_order))
         dbr_book_remove(book, new_order);
+ fail4:
+    free_matches(trans.first_match, serv->pool);
  fail3:
-    free_trans(&trans, serv->pool);
+    dbr_pool_free_exec(serv->pool, new_exec);
  fail2:
     dbr_pool_free_order(serv->pool, new_order);
  fail1:
@@ -621,7 +622,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     }
 
     const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = new_exec(serv, order, now);
+    struct DbrExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
@@ -679,7 +680,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     }
 
     const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = new_exec(serv, order, now);
+    struct DbrExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
@@ -727,7 +728,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     }
 
     const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = new_exec(serv, order, now);
+    struct DbrExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
@@ -774,7 +775,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     }
 
     const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = new_exec(serv, order, now);
+    struct DbrExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 

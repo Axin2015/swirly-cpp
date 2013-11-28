@@ -475,7 +475,6 @@ dbr_match_init(struct DbrMatch* match)
 }
 
 struct DbrTrans {
-    struct DbrExec* new_exec;
     struct DbrPosn* taker_posn;
     // Null if no matches.
     struct DbrSlNode* first_match;
@@ -490,7 +489,6 @@ struct DbrTrans {
 static inline void
 dbr_trans_init(struct DbrTrans* trans)
 {
-    trans->new_exec = NULL;
     trans->taker_posn = NULL;
     trans->first_match = NULL;
     trans->taken = 0;
