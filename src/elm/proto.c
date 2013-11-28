@@ -258,14 +258,16 @@ dbr_exec_len(const struct DbrExec* exec, DbrBool enriched)
                          exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
                          exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->match, exec->role, exec->cpty.rec->id, exec->created);
+                         exec->c.min_lots, exec->match, exec->role, exec->cpty.rec->id,
+                         exec->created);
     } else {
         n = dbr_packlenf(EXEC_FORMAT,
                          exec->id, exec->order, exec->c.trader.id_only, exec->c.accnt.id_only,
                          exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
                          exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->match, exec->role, exec->cpty.id_only, exec->created);
+                         exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                         exec->created);
     }
     return n;
 }
@@ -279,14 +281,16 @@ dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
                         exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
                         exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->match, exec->role, exec->cpty.rec->id, exec->created);
+                        exec->c.min_lots, exec->match, exec->role, exec->cpty.rec->id,
+                        exec->created);
     } else {
         buf = dbr_packf(buf, EXEC_FORMAT,
                         exec->id, exec->order, exec->c.trader.id_only, exec->c.accnt.id_only,
                         exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
                         exec->c.status, exec->c.action, exec->c.ticks, exec->c.lots,
                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->match, exec->role, exec->cpty.id_only, exec->created);
+                        exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                        exec->created);
     }
     return buf;
 }
@@ -297,10 +301,11 @@ dbr_read_exec(const char* buf, struct DbrExec* exec)
     dbr_exec_init(exec);
     return dbr_unpackf(buf, EXEC_FORMAT,
                        &exec->id, &exec->order, &exec->c.trader.id_only, &exec->c.accnt.id_only,
-                       &exec->c.contr.id_only, &exec->c.settl_date, DBR_REF_MAX, &exec->c.status,
-                       exec->c.ref, &exec->c.action, &exec->c.ticks, &exec->c.lots, &exec->c.resd,
-                       &exec->c.exec, &exec->c.last_ticks, &exec->c.last_lots, &exec->match,
-                       &exec->role, &exec->cpty.id_only, &exec->created);
+                       &exec->c.contr.id_only, &exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                       &exec->c.status, &exec->c.action, &exec->c.ticks, &exec->c.lots,
+                       &exec->c.resd, &exec->c.exec, &exec->c.last_ticks, &exec->c.last_lots,
+                       &exec->c.min_lots, &exec->match, &exec->role, &exec->cpty.id_only,
+                       &exec->created);
 }
 
 DBR_API size_t

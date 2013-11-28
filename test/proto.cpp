@@ -129,14 +129,13 @@ TEST_CASE(proto_order)
     end = read_order(buf, out);
     check(buf + len == end);
 
-    check(out.c.id == in->c.id);
-    check(out.c.rev == in->c.rev);
-    check(out.c.status == in->c.status);
+    check(out.id == in->id);
     check(out.c.trader.id_only == in->c.trader.id_only);
     check(out.c.accnt.id_only == in->c.accnt.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_date == in->c.settl_date);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
+    check(out.c.status == in->c.status);
     check(out.c.action == in->c.action);
     check(out.c.ticks == in->c.ticks);
     check(out.c.lots == in->c.lots);
@@ -158,8 +157,8 @@ TEST_CASE(proto_trade)
     DbrIden cpty = 13;
     auto now = dbr_millis();
 
-    auto in = create_trade(pool, 1, 2, 3, trader, accnt, contr, 20130827, "apple",
-                           DBR_BUY, 12345, 10, 0, 10, 12345, 10, 4, DBR_TAKER, cpty, now);
+    auto in = create_trade(pool, 1, 2, trader, accnt, contr, 20130827, "apple",
+                           DBR_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_TAKER, cpty, now);
 
     auto len = exec_len(*in, false);
     char buf[len];
@@ -171,13 +170,13 @@ TEST_CASE(proto_trade)
     check(buf + len == end);
 
     check(out.id == in->id);
-    check(out.c.id == in->c.id);
-    check(out.c.rev == in->c.rev);
+    check(out.order == in->order);
     check(out.c.trader.id_only == in->c.trader.id_only);
     check(out.c.accnt.id_only == in->c.accnt.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_date == in->c.settl_date);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
+    check(out.c.status == in->c.status);
     check(out.c.action == in->c.action);
     check(out.c.ticks == in->c.ticks);
     check(out.c.lots == in->c.lots);
@@ -185,11 +184,11 @@ TEST_CASE(proto_trade)
     check(out.c.exec == in->c.exec);
     check(out.c.last_ticks == in->c.last_ticks);
     check(out.c.last_lots == in->c.last_lots);
+    check(out.c.min_lots == in->c.min_lots);
     check(out.match == in->match);
     check(out.role == in->role);
     check(out.cpty.id_only == in->cpty.id_only);
     check(out.created == in->created);
-    check(out.modified == in->modified);
 }
 
 TEST_CASE(proto_memb)

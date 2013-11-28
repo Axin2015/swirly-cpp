@@ -581,6 +581,8 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to cycle and free matches.
     commit_cycle(serv, trader, book, &trans, now);
+    // FIXME
+    dbr_pool_free_exec(serv->pool, trans.new_exec);
     return new_order;
  fail4:
     if (!dbr_order_done(new_order))
@@ -643,6 +645,8 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
+    // FIXME
+    dbr_pool_free_exec(serv->pool, exec);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -698,6 +702,8 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
+    // FIXME
+    dbr_pool_free_exec(serv->pool, exec);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -744,6 +750,8 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
+    // FIXME
+    dbr_pool_free_exec(serv->pool, exec);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -789,6 +797,8 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
+    // FIXME
+    dbr_pool_free_exec(serv->pool, exec);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);

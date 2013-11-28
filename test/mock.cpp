@@ -229,25 +229,25 @@ Journ::rollback_trans() noexcept
 }
 
 DbrBool
-Journ::insert_exec(DbrIden id, const DbrExec& exec) noexcept
+Journ::insert_exec(const DbrExec& exec) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::insert_stmt(DbrIden id, const DbrStmt& stmt) noexcept
+Journ::insert_stmt(const DbrStmt& stmt) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::archive_order(DbrMillis now) noexcept
+Journ::archive_order(DbrIden id, DbrMillis now) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::archive_trade(DbrMillis now) noexcept
+Journ::archive_trade(DbrIden id, DbrMillis now) noexcept
 {
     return DBR_TRUE;
 }

@@ -108,9 +108,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     dbr_order_init(order.get());
 
     order->level = NULL;
-    order->c.id = id;
-    order->c.rev = 0;
-    order->c.status = 0;
+    order->id = id;
     order->c.trader.rec = &trader;
     order->c.accnt.rec = &accnt;
     order->c.contr.rec = &contr;
@@ -120,6 +118,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     else
         order->c.ref[0] = '\0';
 
+    order->c.status = 0;
     order->c.action = action;
     order->c.ticks = ticks;
     order->c.lots = lots;
@@ -146,9 +145,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     dbr_order_init(order.get());
 
     order->level = NULL;
-    order->c.id = id;
-    order->c.rev = 0;
-    order->c.status = 0;
+    order->id = id;
     order->c.trader.id_only = tid;
     order->c.accnt.id_only = aid;
     order->c.contr.id_only = cid;
@@ -158,6 +155,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     else
         order->c.ref[0] = '\0';
 
+    order->c.status = 0;
     order->c.action = action;
     order->c.ticks = ticks;
     order->c.lots = lots;
@@ -173,7 +171,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 }
 
 shared_ptr<DbrExec>
-create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIden aid,
+create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden aid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now)
@@ -185,8 +183,7 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIde
     dbr_exec_init(ptr.get());
 
     ptr->id = id;
-    ptr->c.id = order;
-    ptr->c.rev = rev;
+    ptr->order = order;
     ptr->c.trader.id_only = tid;
     ptr->c.accnt.id_only = aid;
     ptr->c.contr.id_only = cid;
@@ -195,6 +192,7 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIde
         strncpy(ptr->c.ref, ref, DBR_REF_MAX);
     else
         ptr->c.ref[0] = '\0';
+    ptr->c.status = 0;
     ptr->c.action = action;
     ptr->c.ticks = ticks;
     ptr->c.lots = lots;
@@ -202,11 +200,11 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, int rev, DbrIden tid, DbrIde
     ptr->c.exec = exec;
     ptr->c.last_ticks = last_ticks;
     ptr->c.last_lots = last_lots;
+    ptr->c.min_lots = 0;
     ptr->match = match;
     ptr->role = role;
     ptr->cpty.id_only = cpty;
     ptr->created = now;
-    ptr->modified = now;
 
     return ptr;
 }

@@ -43,14 +43,12 @@ TEST_CASE(side_orders)
 
     Side side(pool);
 
-    apple->c.rev = -1;
     apple->c.status = -1;
     apple->c.resd = -1;
     apple->c.exec = -1;
     apple->c.last_ticks = -1;
     apple->c.last_lots = -1;
 
-    orange->c.rev = -1;
     orange->c.status = -1;
     orange->c.resd = -1;
     orange->c.exec = -1;
@@ -61,7 +59,6 @@ TEST_CASE(side_orders)
     side.place_order(*apple, dbr_millis());
     side.place_order(*orange, dbr_millis());
 
-    check(apple->c.rev == 1);
     check(apple->c.status == DBR_NEW);
     check(apple->c.resd == 10);
     check(apple->c.exec == 0);
@@ -84,7 +81,6 @@ TEST_CASE(side_orders)
     // Revise first order.
     side.revise_order(*apple, 5, dbr_millis());
 
-    check(apple->c.rev == 2);
     check(apple->c.status == DBR_REVISE);
     check(apple->c.resd == 5);
     check(apple->c.exec == 0);
@@ -105,7 +101,6 @@ TEST_CASE(side_orders)
     // Cancel second order.
     side.cancel_order(*orange, dbr_millis());
 
-    check(orange->c.rev == 2);
     check(orange->c.status == DBR_CANCEL);
     check(orange->c.resd == 0);
     check(orange->c.exec == 0);
