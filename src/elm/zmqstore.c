@@ -135,15 +135,15 @@ insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
 }
 
 static DbrBool
-archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
+ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
     if (!stmt)
         return false;
-    stmt->type = DBR_ARCHIVE_TRADE;
-    stmt->archive_trade.id = id;
-    stmt->archive_trade.now = now;
+    stmt->type = DBR_ACK_TRADE;
+    stmt->ack_trade.id = id;
+    stmt->ack_trade.now = now;
     dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
     return true;
 }
@@ -155,7 +155,7 @@ static const struct DbrJournVtbl JOURN_VTBL = {
     .rollback_trans = rollback_trans,
     .insert_exec = insert_exec,
     .insert_stmt = insert_stmt,
-    .archive_trade = archive_trade
+    .ack_trade = ack_trade
 };
 
 static ssize_t

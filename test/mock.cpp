@@ -241,7 +241,7 @@ Journ::insert_stmt(const DbrStmt& stmt) noexcept
 }
 
 DbrBool
-Journ::archive_trade(DbrIden id, DbrMillis now) noexcept
+Journ::ack_trade(DbrIden id, DbrMillis now) noexcept
 {
     return DBR_TRUE;
 }

@@ -511,7 +511,7 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 
 enum {
 	DBR_INSERT_EXEC = 1,
-	DBR_ARCHIVE_TRADE
+	DBR_ACK_TRADE
 };
 
 struct DbrStmt {
@@ -534,7 +534,7 @@ struct DbrStmt {
         struct {
             DbrIden id;
             DbrMillis now;
-        } archive_trade;
+        } ack_trade;
     };
     /**
      * @privatesection

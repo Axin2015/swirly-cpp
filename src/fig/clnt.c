@@ -461,12 +461,12 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 }
 
 DBR_API DbrBool
-dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id)
+dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
-    body.type = DBR_ARCHIVE_TRADE_REQ;
-    body.archive_trade_req.id = id;
+    body.type = DBR_ACK_TRADE_REQ;
+    body.ack_trade_req.id = id;
 
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;

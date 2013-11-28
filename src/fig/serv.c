@@ -804,7 +804,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 }
 
 DBR_API DbrBool
-dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
+dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_trade_id(trader, id);
     if (!node) {
@@ -816,7 +816,7 @@ dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
     if (!dbr_journ_begin_trans(serv->journ))
         goto fail1;
 
-    if (!dbr_journ_archive_trade(serv->journ, node->key, now)) {
+    if (!dbr_journ_ack_trade(serv->journ, node->key, now)) {
         dbr_journ_rollback_trans(serv->journ);
         goto fail1;
     }

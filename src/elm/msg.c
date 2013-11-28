@@ -323,8 +323,8 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_CANCEL_ORDER_REF_REQ:
         n += dbr_packlens(body->cancel_order_ref_req.ref, DBR_REF_MAX);
         break;
-    case DBR_ARCHIVE_TRADE_REQ:
-        n += dbr_packlenl(body->archive_trade_req.id);
+    case DBR_ACK_TRADE_REQ:
+        n += dbr_packlenl(body->ack_trade_req.id);
         break;
     case DBR_WRITE_TRANS_REQ:
         body->write_trans_req.count_ = 0;
@@ -458,8 +458,8 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     case DBR_CANCEL_ORDER_REF_REQ:
         buf = dbr_packs(buf, body->cancel_order_ref_req.ref, DBR_REF_MAX);
         break;
-    case DBR_ARCHIVE_TRADE_REQ:
-        buf = dbr_packl(buf, body->archive_trade_req.id);
+    case DBR_ACK_TRADE_REQ:
+        buf = dbr_packl(buf, body->ack_trade_req.id);
         break;
     case DBR_WRITE_TRANS_REQ:
         buf = dbr_packz(buf, body->write_trans_req.count_);
@@ -654,8 +654,8 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         if (!(buf = dbr_unpacks(buf, body->cancel_order_ref_req.ref, DBR_REF_MAX)))
             goto fail1;
         break;
-    case DBR_ARCHIVE_TRADE_REQ:
-        if (!(buf = dbr_unpackl(buf, &body->archive_trade_req.id)))
+    case DBR_ACK_TRADE_REQ:
+        if (!(buf = dbr_unpackl(buf, &body->ack_trade_req.id)))
             goto fail1;
         break;
     case DBR_WRITE_TRANS_REQ:

@@ -515,9 +515,9 @@ public:
         return OrderRef{*order};
     }
     void
-    archive_trade(DbrTrader trader, DbrIden id)
+    ack_trade(DbrTrader trader, DbrIden id)
     {
-        if (!dbr_serv_archive_trade(impl_, trader, id))
+        if (!dbr_serv_ack_trade(impl_, trader, id))
             throw_exception();
     }
     void

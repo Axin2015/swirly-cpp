@@ -29,7 +29,7 @@ struct sqlite3_stmt;
 struct FirSqlite {
     struct sqlite3* db;
     struct sqlite3_stmt* insert_exec;
-    struct sqlite3_stmt* archive_trade;
+    struct sqlite3_stmt* ack_trade;
     const struct DbrModel* model_;
 };
 
@@ -61,7 +61,7 @@ fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrI
                        DbrIden match, int role, DbrIden cpty, DbrMillis created);
 
 DBR_EXTERN DbrBool
-fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
+fir_sqlite_ack_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
 
 DBR_EXTERN ssize_t
 fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,

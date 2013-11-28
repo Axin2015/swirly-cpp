@@ -361,13 +361,13 @@ cancel_order_ref(DbrTrader trader, const struct DbrBody* req)
 }
 
 static DbrBool
-archive_trade(DbrTrader trader, const struct DbrBody* req)
+ack_trade(DbrTrader trader, const struct DbrBody* req)
 {
     struct DbrBody rep;
 
-    const DbrIden id = req->archive_trade_req.id;
+    const DbrIden id = req->ack_trade_req.id;
 
-    if (!dbr_serv_archive_trade(serv, trader, id)) {
+    if (!dbr_serv_ack_trade(serv, trader, id)) {
         status_err(&rep, req->req_id);
         goto fail1;
     }
@@ -450,8 +450,8 @@ run(void)
         case DBR_CANCEL_ORDER_REF_REQ:
             cancel_order_ref(trader, &req.body);
             break;
-        case DBR_ARCHIVE_TRADE_REQ:
-            archive_trade(trader, &req.body);
+        case DBR_ACK_TRADE_REQ:
+            ack_trade(trader, &req.body);
             break;
         default:
             // TODO: unsupported type.

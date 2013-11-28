@@ -117,21 +117,21 @@ insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
                                       stmt->insert_exec.role,
                                       stmt->insert_exec.cpty.rec->id,
                                       stmt->insert_exec.created);
-    case DBR_ARCHIVE_TRADE:
-        return fir_sqlite_archive_trade(impl,
-                                        stmt->archive_trade.id,
-                                        stmt->archive_trade.now);
+    case DBR_ACK_TRADE:
+        return fir_sqlite_ack_trade(impl,
+                                    stmt->ack_trade.id,
+                                    stmt->ack_trade.now);
     default:
         abort();
     }
 }
 
 static DbrBool
-archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
+ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_archive_trade(impl, id, now);
+    return fir_sqlite_ack_trade(impl, id, now);
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
@@ -141,7 +141,7 @@ static const struct DbrJournVtbl JOURN_VTBL = {
     .rollback_trans = rollback_trans,
     .insert_exec = insert_exec,
     .insert_stmt = insert_stmt,
-    .archive_trade = archive_trade
+    .ack_trade = ack_trade
 };
 
 static ssize_t

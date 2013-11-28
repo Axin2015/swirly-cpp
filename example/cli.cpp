@@ -359,14 +359,14 @@ public:
         }
     }
     void
-    archive_trades(Arg begin, Arg end)
+    ack_trades(Arg begin, Arg end)
     {
         if (!trec_)
             throw InvalidState("trader");
         auto trader = serv_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            serv_.archive_trade(trader, id);
+            serv_.ack_trade(trader, id);
         }
     }
     void
@@ -833,7 +833,7 @@ main(int argc, char* argv[])
         Repl repl;
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));
-        repl.cmd("archive_trades", -1, bind(&Test::archive_trades, ref(test), _1, _2));
+        repl.cmd("ack_trades", -1, bind(&Test::ack_trades, ref(test), _1, _2));
         repl.cmd("book", 0, bind(&Test::book, ref(test), _1, _2));
         repl.cmd("buy", 2, bind(&Test::place, ref(test), DBR_BUY, _1, _2));
         repl.cmd("cancel", -1, bind(&Test::cancel, ref(test), _1, _2));

@@ -36,7 +36,7 @@
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"    \
     " ?, 0, ?, ?)"
 
-#define ARCHIVE_TRADE_SQL                                               \
+#define ACK_TRADE_SQL                                               \
     "UPDATE exec SET acked = 1, modified = ?"                        \
     " WHERE id = ?"
 
@@ -258,13 +258,13 @@ bind_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden ti
 }
 
 static DbrBool
-bind_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
+bind_ack_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 {
     enum {
         MODIFIED = 1,
         ID
     };
-    sqlite3_stmt* stmt = sqlite->archive_trade;
+    sqlite3_stmt* stmt = sqlite->ack_trade;
     int rc = sqlite3_bind_int64(stmt, MODIFIED, now);
     if (rc != SQLITE_OK)
         goto fail1;
@@ -914,13 +914,13 @@ fir_sqlite_init(struct FirSqlite* sqlite, const char* path)
     if (!insert_exec)
         goto fail1;
 
-    sqlite3_stmt* archive_trade = prepare(db, ARCHIVE_TRADE_SQL);
-    if (!archive_trade)
+    sqlite3_stmt* ack_trade = prepare(db, ACK_TRADE_SQL);
+    if (!ack_trade)
         goto fail2;
 
     sqlite->db = db;
     sqlite->insert_exec = insert_exec;
-    sqlite->archive_trade = archive_trade;
+    sqlite->ack_trade = ack_trade;
     return true;
  fail2:
     sqlite3_finalize(insert_exec);
@@ -933,7 +933,7 @@ DBR_EXTERN void
 fir_sqlite_term(struct FirSqlite* sqlite)
 {
     assert(sqlite);
-    sqlite3_finalize(sqlite->archive_trade);
+    sqlite3_finalize(sqlite->ack_trade);
     sqlite3_finalize(sqlite->insert_exec);
     sqlite3_close(sqlite->db);
 }
@@ -970,10 +970,10 @@ fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrI
 }
 
 DBR_EXTERN DbrBool
-fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
+fir_sqlite_ack_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
 {
-    return bind_archive_trade(sqlite, id, now)
-        && exec_stmt(sqlite->db, sqlite->archive_trade);
+    return bind_ack_trade(sqlite, id, now)
+        && exec_stmt(sqlite->db, sqlite->ack_trade);
 }
 
 DBR_EXTERN ssize_t

@@ -45,7 +45,7 @@ struct DbrJournVtbl {
     (*insert_stmt)(DbrJourn journ, const struct DbrStmt* stmt);
 
     DbrBool
-    (*archive_trade)(DbrJourn journ, DbrIden id, DbrMillis now);
+    (*ack_trade)(DbrJourn journ, DbrIden id, DbrMillis now);
 };
 
 static inline DbrIden
@@ -85,9 +85,9 @@ dbr_journ_insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
 }
 
 static inline DbrBool
-dbr_journ_archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
+dbr_journ_ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
-    return journ->vtbl->archive_trade(journ, id, now);
+    return journ->vtbl->ack_trade(journ, id, now);
 }
 
 /** @} */

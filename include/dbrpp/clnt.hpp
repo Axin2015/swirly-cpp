@@ -291,9 +291,9 @@ public:
         return OrderRef{*order};
     }
     void
-    archive_trade(DbrIden id)
+    ack_trade(DbrIden id)
     {
-        if (!dbr_clnt_archive_trade(impl_, id))
+        if (!dbr_clnt_ack_trade(impl_, id))
             throw_exception();
     }
 };

@@ -109,7 +109,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref);
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id);
+dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id);
 
 DBR_API void
 dbr_serv_clear(DbrServ serv);

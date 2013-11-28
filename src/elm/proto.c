@@ -33,7 +33,7 @@ static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
 
 static const char INSERT_EXEC_FORMAT[] = "lllllisiillllllllill";
-static const char ARCHIVE_TRADE_FORMAT[] = "ll";
+static const char ACK_TRADE_FORMAT[] = "ll";
 
 DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec)
@@ -399,9 +399,9 @@ dbr_stmt_len(const struct DbrStmt* stmt)
                           stmt->insert_exec.match, stmt->insert_exec.role,
                           stmt->insert_exec.cpty.id_only, stmt->insert_exec.created);
         break;
-	case DBR_ARCHIVE_TRADE:
-        n += dbr_packlenf(ARCHIVE_TRADE_FORMAT,
-                          stmt->archive_trade.id, stmt->archive_trade.now);
+	case DBR_ACK_TRADE:
+        n += dbr_packlenf(ACK_TRADE_FORMAT,
+                          stmt->ack_trade.id, stmt->ack_trade.now);
         break;
     default:
         abort();
@@ -427,9 +427,9 @@ dbr_write_stmt(char* buf, const struct DbrStmt* stmt)
                         stmt->insert_exec.match, stmt->insert_exec.role,
                         stmt->insert_exec.cpty.id_only, stmt->insert_exec.created);
         break;
-	case DBR_ARCHIVE_TRADE:
-        buf = dbr_packf(buf, ARCHIVE_TRADE_FORMAT,
-                        stmt->archive_trade.id, stmt->archive_trade.now);
+	case DBR_ACK_TRADE:
+        buf = dbr_packf(buf, ACK_TRADE_FORMAT,
+                        stmt->ack_trade.id, stmt->ack_trade.now);
         break;
     default:
         abort();
@@ -456,9 +456,9 @@ dbr_read_stmt(const char* buf, struct DbrStmt* stmt)
                           &stmt->insert_exec.match, &stmt->insert_exec.role,
                           &stmt->insert_exec.cpty.id_only, &stmt->insert_exec.created);
         break;
-	case DBR_ARCHIVE_TRADE:
-        buf = dbr_unpackf(buf, ARCHIVE_TRADE_FORMAT,
-                          &stmt->archive_trade.id, &stmt->archive_trade.now);
+	case DBR_ACK_TRADE:
+        buf = dbr_unpackf(buf, ACK_TRADE_FORMAT,
+                          &stmt->ack_trade.id, &stmt->ack_trade.now);
         break;
     default:
         dbr_err_setf(DBR_EIO, "invalid type %d", stmt->type);

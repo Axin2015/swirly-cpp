@@ -44,7 +44,7 @@ enum {
     DBR_REVISE_ORDER_REF_REQ,
     DBR_CANCEL_ORDER_ID_REQ,
     DBR_CANCEL_ORDER_REF_REQ,
-    DBR_ARCHIVE_TRADE_REQ,
+    DBR_ACK_TRADE_REQ,
     DBR_WRITE_TRANS_REQ
 };
 
@@ -126,7 +126,7 @@ struct DbrBody {
         } cancel_order_ref_req;
         struct {
             DbrIden id;
-        } archive_trade_req;
+        } ack_trade_req;
         struct {
             struct DbrSlNode* first;
             /**

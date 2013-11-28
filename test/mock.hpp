@@ -50,7 +50,7 @@ public:
     insert_stmt(const DbrStmt& stmt) noexcept;
 
     DbrBool
-    archive_trade(DbrIden id, DbrMillis now) noexcept;
+    ack_trade(DbrIden id, DbrMillis now) noexcept;
 };
 
 class Model : public dbr::IModel<Model> {
