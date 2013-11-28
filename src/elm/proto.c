@@ -33,7 +33,6 @@ static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
 
 static const char INSERT_EXEC_FORMAT[] = "lllllisiillllllllill";
-static const char ARCHIVE_ORDER_FORMAT[] = "ll";
 static const char ARCHIVE_TRADE_FORMAT[] = "ll";
 
 DBR_API size_t
@@ -400,10 +399,6 @@ dbr_stmt_len(const struct DbrStmt* stmt)
                           stmt->insert_exec.match, stmt->insert_exec.role,
                           stmt->insert_exec.cpty.id_only, stmt->insert_exec.created);
         break;
-	case DBR_ARCHIVE_ORDER:
-        n += dbr_packlenf(ARCHIVE_ORDER_FORMAT,
-                          stmt->archive_order.id, stmt->archive_order.now);
-        break;
 	case DBR_ARCHIVE_TRADE:
         n += dbr_packlenf(ARCHIVE_TRADE_FORMAT,
                           stmt->archive_trade.id, stmt->archive_trade.now);
@@ -431,10 +426,6 @@ dbr_write_stmt(char* buf, const struct DbrStmt* stmt)
                         stmt->insert_exec.c.last_lots, stmt->insert_exec.c.min_lots,
                         stmt->insert_exec.match, stmt->insert_exec.role,
                         stmt->insert_exec.cpty.id_only, stmt->insert_exec.created);
-        break;
-	case DBR_ARCHIVE_ORDER:
-        buf = dbr_packf(buf, ARCHIVE_ORDER_FORMAT,
-                        stmt->archive_order.id, stmt->archive_order.now);
         break;
 	case DBR_ARCHIVE_TRADE:
         buf = dbr_packf(buf, ARCHIVE_TRADE_FORMAT,
@@ -464,10 +455,6 @@ dbr_read_stmt(const char* buf, struct DbrStmt* stmt)
                           &stmt->insert_exec.c.last_lots, &stmt->insert_exec.c.min_lots,
                           &stmt->insert_exec.match, &stmt->insert_exec.role,
                           &stmt->insert_exec.cpty.id_only, &stmt->insert_exec.created);
-        break;
-	case DBR_ARCHIVE_ORDER:
-        buf = dbr_unpackf(buf, ARCHIVE_ORDER_FORMAT,
-                          &stmt->archive_order.id, &stmt->archive_order.now);
         break;
 	case DBR_ARCHIVE_TRADE:
         buf = dbr_unpackf(buf, ARCHIVE_TRADE_FORMAT,

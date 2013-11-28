@@ -98,11 +98,6 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_clnt_archive_order(DbrClnt clnt, DbrIden id);
-
-// Invalidates any pointers to the trade.
-
-DBR_API DbrBool
 dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id);
 
 /** @} */

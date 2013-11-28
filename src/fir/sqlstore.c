@@ -117,10 +117,6 @@ insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
                                       stmt->insert_exec.role,
                                       stmt->insert_exec.cpty.rec->id,
                                       stmt->insert_exec.created);
-    case DBR_ARCHIVE_ORDER:
-        return fir_sqlite_archive_trade(impl,
-                                        stmt->archive_order.id,
-                                        stmt->archive_order.now);
     case DBR_ARCHIVE_TRADE:
         return fir_sqlite_archive_trade(impl,
                                         stmt->archive_trade.id,
@@ -128,14 +124,6 @@ insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
     default:
         abort();
     }
-}
-
-static DbrBool
-archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    struct FirSqlStore* store = journ_implof(journ);
-    struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_archive_order(impl, id, now);
 }
 
 static DbrBool
@@ -153,7 +141,6 @@ static const struct DbrJournVtbl JOURN_VTBL = {
     .rollback_trans = rollback_trans,
     .insert_exec = insert_exec,
     .insert_stmt = insert_stmt,
-    .archive_order = archive_order,
     .archive_trade = archive_trade
 };
 

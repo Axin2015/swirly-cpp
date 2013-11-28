@@ -45,9 +45,6 @@ struct DbrJournVtbl {
     (*insert_stmt)(DbrJourn journ, const struct DbrStmt* stmt);
 
     DbrBool
-    (*archive_order)(DbrJourn journ, DbrIden id, DbrMillis now);
-
-    DbrBool
     (*archive_trade)(DbrJourn journ, DbrIden id, DbrMillis now);
 };
 
@@ -85,12 +82,6 @@ static inline DbrBool
 dbr_journ_insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
 {
     return journ->vtbl->insert_stmt(journ, stmt);
-}
-
-static inline DbrBool
-dbr_journ_archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    return journ->vtbl->archive_order(journ, id, now);
 }
 
 static inline DbrBool

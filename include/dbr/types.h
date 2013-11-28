@@ -511,7 +511,6 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 
 enum {
 	DBR_INSERT_EXEC = 1,
-	DBR_ARCHIVE_ORDER,
 	DBR_ARCHIVE_TRADE
 };
 
@@ -532,10 +531,6 @@ struct DbrStmt {
             union DbrURec cpty;
             DbrMillis created;
         } insert_exec;
-        struct {
-            DbrIden id;
-            DbrMillis now;
-        } archive_order;
         struct {
             DbrIden id;
             DbrMillis now;

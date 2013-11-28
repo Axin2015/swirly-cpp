@@ -804,43 +804,6 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 }
 
 DBR_API DbrBool
-dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id)
-{
-    struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
-    if (!node) {
-        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
-        goto fail1;
-    }
-
-    struct DbrOrder* order = dbr_trader_order_entry(node);
-    if (!dbr_order_done(order)) {
-        dbr_err_setf(DBR_EINVAL, "order '%ld' not done", id);
-        goto fail1;
-    }
-
-    const DbrMillis now = dbr_millis();
-    if (!dbr_journ_begin_trans(serv->journ))
-        goto fail1;
-
-    if (!dbr_journ_archive_order(serv->journ, node->key, now)) {
-        dbr_journ_rollback_trans(serv->journ);
-        goto fail1;
-    }
-
-    // Journal commit can still fail.
-    if (!dbr_journ_commit_trans(serv->journ))
-        goto fail1;
-
-    // No need to update timestamps on trade because it is immediately freed.
-
-    fig_trader_release_order(trader, order);
-    dbr_pool_free_order(serv->pool, order);
-    return true;
- fail1:
-    return false;
-}
-
-DBR_API DbrBool
 dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 {
     struct DbrRbNode* node = fig_trader_find_trade_id(trader, id);

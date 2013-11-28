@@ -135,20 +135,6 @@ insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
 }
 
 static DbrBool
-archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
-    if (!stmt)
-        return false;
-    stmt->type = DBR_ARCHIVE_ORDER;
-    stmt->archive_order.id = id;
-    stmt->archive_order.now = now;
-    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
-    return true;
-}
-
-static DbrBool
 archive_trade(DbrJourn journ, DbrIden id, DbrMillis now)
 {
     struct ElmZmqStore* store = journ_implof(journ);
@@ -169,7 +155,6 @@ static const struct DbrJournVtbl JOURN_VTBL = {
     .rollback_trans = rollback_trans,
     .insert_exec = insert_exec,
     .insert_stmt = insert_stmt,
-    .archive_order = archive_order,
     .archive_trade = archive_trade
 };
 

@@ -461,31 +461,6 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 }
 
 DBR_API DbrBool
-dbr_clnt_archive_order(DbrClnt clnt, DbrIden id)
-{
-    struct DbrBody body;
-    body.req_id = clnt->id++;
-    body.type = DBR_ARCHIVE_ORDER_REQ;
-    body.archive_order_req.id = id;
-
-    if (!dbr_send_body(clnt->sock, &body, false))
-        goto fail1;
-
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
-    assert(body.type == DBR_STATUS_REP);
-
-    if (body.status_rep.num != 0) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-    return true;
- fail1:
-    return false;
-}
-
-DBR_API DbrBool
 dbr_clnt_archive_trade(DbrClnt clnt, DbrIden id)
 {
     struct DbrBody body;

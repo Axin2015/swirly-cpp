@@ -109,11 +109,6 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref);
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_serv_archive_order(DbrServ serv, DbrTrader trader, DbrIden id);
-
-// Invalidates any pointers to the trade.
-
-DBR_API DbrBool
 dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id);
 
 DBR_API void

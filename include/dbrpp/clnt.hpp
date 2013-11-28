@@ -291,12 +291,6 @@ public:
         return OrderRef{*order};
     }
     void
-    archive_order(DbrIden id)
-    {
-        if (!dbr_clnt_archive_order(impl_, id))
-            throw_exception();
-    }
-    void
     archive_trade(DbrIden id)
     {
         if (!dbr_clnt_archive_trade(impl_, id))

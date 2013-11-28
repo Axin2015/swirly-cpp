@@ -191,7 +191,6 @@ CREATE TABLE order_ (
   last_ticks INTEGER NOT NULL,
   last_lots INTEGER NOT NULL,
   min_lots INTEGER NOT NULL,
-  archive INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL,
   CONSTRAINT order_trader_ref_uq UNIQUE (trader, ref)
@@ -215,7 +214,6 @@ CREATE VIEW order_v AS
   o.last_ticks,
   o.last_lots,
   o.min_lots,
-  o.archive,
   o.created,
   o.modified
   FROM order_ o
@@ -249,7 +247,7 @@ CREATE TABLE exec (
   match INTEGER NULL,
   role INTEGER NULL REFERENCES role (id),
   cpty INTEGER NULL REFERENCES accnt (id),
-  archive INTEGER NOT NULL,
+  acked INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL
 )
@@ -275,7 +273,6 @@ BEGIN
     last_ticks,
     last_lots,
     min_lots,
-    archive,
     created,
     modified
   ) VALUES (
@@ -294,7 +291,6 @@ BEGIN
     new.last_ticks,
     new.last_lots,
     new.min_lots,
-    0,
     new.created,
     new.modified
   );
@@ -339,7 +335,7 @@ CREATE VIEW exec_v AS
   e.match,
   r.mnem role,
   p.mnem cpty,
-  e.archive,
+  e.acked,
   e.created,
   e.modified
   FROM exec e
@@ -377,7 +373,7 @@ CREATE VIEW trade_v AS
   e.match,
   r.mnem role,
   p.mnem cpty,
-  e.archive,
+  e.acked,
   e.created,
   e.modified
   FROM exec e

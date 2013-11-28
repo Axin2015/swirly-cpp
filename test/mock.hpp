@@ -50,9 +50,6 @@ public:
     insert_stmt(const DbrStmt& stmt) noexcept;
 
     DbrBool
-    archive_order(DbrIden id, DbrMillis now) noexcept;
-
-    DbrBool
     archive_trade(DbrIden id, DbrMillis now) noexcept;
 };
 

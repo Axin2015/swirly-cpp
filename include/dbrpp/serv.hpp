@@ -515,12 +515,6 @@ public:
         return OrderRef{*order};
     }
     void
-    archive_order(DbrTrader trader, DbrIden id)
-    {
-        if (!dbr_serv_archive_order(impl_, trader, id))
-            throw_exception();
-    }
-    void
     archive_trade(DbrTrader trader, DbrIden id)
     {
         if (!dbr_serv_archive_trade(impl_, trader, id))

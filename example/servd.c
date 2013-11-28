@@ -361,32 +361,6 @@ cancel_order_ref(DbrTrader trader, const struct DbrBody* req)
 }
 
 static DbrBool
-archive_order(DbrTrader trader, const struct DbrBody* req)
-{
-    struct DbrBody rep;
-
-    const DbrIden id = req->archive_order_req.id;
-
-    if (!dbr_serv_archive_order(serv, trader, id)) {
-        status_err(&rep, req->req_id);
-        goto fail1;
-    }
-
-    rep.req_id = req->req_id;
-    rep.type = DBR_STATUS_REP;
-    rep.status_rep.num = 0;
-    rep.status_rep.msg[0] = '\0';
-    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
-    if (!ok)
-        dbr_err_print("dbr_send_msg() failed");
-    return ok;
- fail1:
-    if (!dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false))
-        dbr_err_print("dbr_send_msg() failed");
-    return false;
-}
-
-static DbrBool
 archive_trade(DbrTrader trader, const struct DbrBody* req)
 {
     struct DbrBody rep;
@@ -475,9 +449,6 @@ run(void)
             break;
         case DBR_CANCEL_ORDER_REF_REQ:
             cancel_order_ref(trader, &req.body);
-            break;
-        case DBR_ARCHIVE_ORDER_REQ:
-            archive_order(trader, &req.body);
             break;
         case DBR_ARCHIVE_TRADE_REQ:
             archive_trade(trader, &req.body);

@@ -59,11 +59,6 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->insert_stmt(*stmt);
     }
     static DbrBool
-    archive_order(DbrJourn journ, DbrIden id, DbrMillis now) noexcept
-    {
-        return static_cast<DerivedT*>(journ)->archive_order(id, now);
-    }
-    static DbrBool
     archive_trade(DbrJourn journ, DbrIden id, DbrMillis now) noexcept
     {
         return static_cast<DerivedT*>(journ)->archive_trade(id, now);
@@ -78,7 +73,6 @@ class IJourn : public DbrIJourn {
             rollback_trans,
             insert_exec,
             insert_stmt,
-            archive_order,
             archive_trade
         };
         return &VTBL;
@@ -131,13 +125,6 @@ inline void
 insert_stmt(DbrJourn journ, const DbrStmt& stmt)
 {
     if (!journ->vtbl->insert_stmt(journ, &stmt))
-        throw_exception();
-}
-
-inline void
-archive_order(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    if (!journ->vtbl->archive_order(journ, id, now))
         throw_exception();
 }
 

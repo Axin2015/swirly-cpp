@@ -29,7 +29,6 @@ struct sqlite3_stmt;
 struct FirSqlite {
     struct sqlite3* db;
     struct sqlite3_stmt* insert_exec;
-    struct sqlite3_stmt* archive_order;
     struct sqlite3_stmt* archive_trade;
     const struct DbrModel* model_;
 };
@@ -60,9 +59,6 @@ fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrI
                        int action, DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
                        DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots,
                        DbrIden match, int role, DbrIden cpty, DbrMillis created);
-
-DBR_EXTERN DbrBool
-fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
 
 DBR_EXTERN DbrBool
 fir_sqlite_archive_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);

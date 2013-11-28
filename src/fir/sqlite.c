@@ -31,17 +31,13 @@
 #define INSERT_EXEC_SQL                                                 \
     "INSERT INTO exec (id, order_, trader, accnt, contr, settl_date,"   \
     " ref, status, action, ticks, lots, resd, exec, last_ticks,"        \
-    " last_lots, min_lots, match, role, cpty, archive, created,"        \
+    " last_lots, min_lots, match, role, cpty, acked, created,"        \
     " modified)"                                                        \
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"    \
     " ?, 0, ?, ?)"
 
-#define ARCHIVE_ORDER_SQL                                             \
-    "UPDATE order_ SET archive = 1, modified = ?"                     \
-    " WHERE id = ?"
-
 #define ARCHIVE_TRADE_SQL                                               \
-    "UPDATE trade SET archive = 1, modified = ?"                        \
+    "UPDATE exec SET acked = 1, modified = ?"                        \
     " WHERE id = ?"
 
 #define SELECT_TRADER_SQL                                    \
@@ -61,13 +57,13 @@
     "SELECT id, trader, accnt, contr, settl_date, ref, status,"         \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, created, modified"                                      \
-    " FROM order_ WHERE archive = 0 ORDER BY id"
+    " FROM order_ WHERE resd > 0 ORDER BY id"
 
 #define SELECT_TRADE_SQL                                                \
     "SELECT id, order_, trader, accnt, contr, settl_date, ref,"         \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, match, role, cpty, created"                             \
-    " FROM trade_v WHERE archive = 0 ORDER BY id"
+    " FROM trade_v WHERE acked = 0 ORDER BY id"
 
 #define SELECT_MEMB_SQL                                    \
     "SELECT trader, accnt"                                 \
@@ -251,29 +247,6 @@ bind_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden ti
         goto fail1;
 
     rc = sqlite3_bind_int64(stmt, CREATED, created);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    return true;
- fail1:
-    dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
-    sqlite3_clear_bindings(stmt);
-    return false;
-}
-
-static DbrBool
-bind_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
-{
-    enum {
-        MODIFIED = 1,
-        ID
-    };
-    sqlite3_stmt* stmt = sqlite->archive_order;
-    int rc = sqlite3_bind_int64(stmt, MODIFIED, now);
-    if (rc != SQLITE_OK)
-        goto fail1;
-
-    rc = sqlite3_bind_int64(stmt, ID, id);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -941,21 +914,14 @@ fir_sqlite_init(struct FirSqlite* sqlite, const char* path)
     if (!insert_exec)
         goto fail1;
 
-    sqlite3_stmt* archive_order = prepare(db, ARCHIVE_ORDER_SQL);
-    if (!archive_order)
-        goto fail2;
-
     sqlite3_stmt* archive_trade = prepare(db, ARCHIVE_TRADE_SQL);
     if (!archive_trade)
-        goto fail3;
+        goto fail2;
 
     sqlite->db = db;
     sqlite->insert_exec = insert_exec;
-    sqlite->archive_order = archive_order;
     sqlite->archive_trade = archive_trade;
     return true;
- fail3:
-    sqlite3_finalize(archive_order);
  fail2:
     sqlite3_finalize(insert_exec);
  fail1:
@@ -968,7 +934,6 @@ fir_sqlite_term(struct FirSqlite* sqlite)
 {
     assert(sqlite);
     sqlite3_finalize(sqlite->archive_trade);
-    sqlite3_finalize(sqlite->archive_order);
     sqlite3_finalize(sqlite->insert_exec);
     sqlite3_close(sqlite->db);
 }
@@ -1002,13 +967,6 @@ fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrI
                             ticks, lots, resd, exec, last_ticks, last_lots, min_lots, match,
                             role, cpty, created)
         && exec_stmt(sqlite->db, sqlite->insert_exec);
-}
-
-DBR_EXTERN DbrBool
-fir_sqlite_archive_order(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
-{
-    return bind_archive_order(sqlite, id, now)
-        && exec_stmt(sqlite->db, sqlite->archive_order);
 }
 
 DBR_EXTERN DbrBool

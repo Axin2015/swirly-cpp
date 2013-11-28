@@ -359,17 +359,6 @@ public:
         }
     }
     void
-    archive_orders(Arg begin, Arg end)
-    {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = serv_.trader(*trec_);
-        while (begin != end) {
-            const auto id = ltog(ston<int>((*begin++).c_str()));
-            serv_.archive_order(trader, id);
-        }
-    }
-    void
     archive_trades(Arg begin, Arg end)
     {
         if (!trec_)
@@ -844,7 +833,6 @@ main(int argc, char* argv[])
         Repl repl;
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));
-        repl.cmd("archive_orders", -1, bind(&Test::archive_orders, ref(test), _1, _2));
         repl.cmd("archive_trades", -1, bind(&Test::archive_trades, ref(test), _1, _2));
         repl.cmd("book", 0, bind(&Test::book, ref(test), _1, _2));
         repl.cmd("buy", 2, bind(&Test::place, ref(test), DBR_BUY, _1, _2));
