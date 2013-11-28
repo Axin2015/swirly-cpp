@@ -443,6 +443,8 @@ DBR_API void
 dbr_serv_destroy(DbrServ serv)
 {
     if (serv) {
+        // Ensure that executions are freed.
+        dbr_serv_clear(serv);
         free_books(&serv->books);
         fig_cache_term(&serv->cache);
         free(serv);
@@ -580,8 +582,6 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // Commit trans to cycle and free matches.
     dbr_queue_insert_back(&serv->execs, &new_exec->serv_node_);
     commit_trans(serv, trader, book, &trans, now);
-    // FIXME
-    dbr_pool_free_exec(serv->pool, new_exec);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))
@@ -646,8 +646,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    // FIXME
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -703,8 +702,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    // FIXME
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -751,8 +749,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    // FIXME
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -798,8 +795,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    // FIXME
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -879,7 +875,12 @@ dbr_serv_archive_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 DBR_API void
 dbr_serv_clear(DbrServ serv)
 {
-    dbr_queue_init(&serv->execs);
+    while (!dbr_queue_empty(&serv->execs)) {
+        struct DbrExec* exec = dbr_serv_exec_entry(dbr_queue_pop(&serv->execs));
+        // Trades are owned by trader.
+        if (exec->c.status != DBR_TRADE)
+            dbr_pool_free_exec(serv->pool, exec);
+    }
     dbr_tree_init(&serv->posns);
 }
 
