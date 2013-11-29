@@ -34,28 +34,6 @@ static const char REVISE_ORDER_ID_REQ_FORMAT[] = "ll";
 static const char REVISE_ORDER_REF_REQ_FORMAT[] = "sl";
 
 static void
-free_entity_posns(struct DbrSlNode* first, DbrPool pool)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrPosn* posn = dbr_entity_posn_entry(node);
-        node = node->next;
-        dbr_pool_free_posn(pool, posn);
-    }
-}
-
-static void
-free_entity_execs(struct DbrSlNode* first, DbrPool pool)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrExec* exec = dbr_entity_exec_entry(node);
-        node = node->next;
-        dbr_pool_free_exec(pool, exec);
-    }
-}
-
-static void
 free_trans_stmts(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
@@ -572,15 +550,13 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         }
         // Execs.
         if (!(buf = dbr_unpackz(buf, &body->cycle_rep.exec_count_))) {
-            free_entity_posns(body->cycle_rep.first_posn, pool);
             dbr_pool_free_order(pool, body->cycle_rep.new_order);
             goto fail1;
         }
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->cycle_rep.exec_count_; ++i) {
             if (!(buf = read_entity_exec(buf, pool, &q))) {
-                free_entity_execs(body->cycle_rep.first_exec, pool);
-                free_entity_posns(body->cycle_rep.first_posn, pool);
+                dbr_pool_free_entities(pool, DBR_EXEC, dbr_queue_first(&q));
                 dbr_pool_free_order(pool, body->cycle_rep.new_order);
                 goto fail1;
             }
@@ -588,13 +564,15 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         body->cycle_rep.first_exec = dbr_queue_first(&q);
         // Posns.
         if (!(buf = dbr_unpackz(buf, &body->cycle_rep.posn_count_))) {
+            dbr_pool_free_entities(pool, DBR_EXEC, body->cycle_rep.first_exec);
             dbr_pool_free_order(pool, body->cycle_rep.new_order);
             goto fail1;
         }
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->cycle_rep.posn_count_; ++i) {
             if (!(buf = read_entity_posn(buf, pool, &q))) {
-                free_entity_posns(body->cycle_rep.first_posn, pool);
+                dbr_pool_free_entities(pool, DBR_POSN, dbr_queue_first(&q));
+                dbr_pool_free_entities(pool, DBR_EXEC, body->cycle_rep.first_exec);
                 dbr_pool_free_order(pool, body->cycle_rep.new_order);
                 goto fail1;
             }
