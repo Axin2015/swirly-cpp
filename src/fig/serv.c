@@ -67,7 +67,7 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
-    return dbr_entity_rec_entry(node);
+    return dbr_shared_rec_entry(node);
 }
 
 static inline struct DbrOrder*
@@ -245,12 +245,12 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Update maker.
         fig_trader_emplace_trade(maker, match->maker_exec);
         apply_posn(match->maker_posn, match->maker_exec);
-        dbr_queue_insert_back(&serv->execs, &match->maker_exec->entity_node_);
+        dbr_queue_insert_back(&serv->execs, &match->maker_exec->shared_node_);
 
         // Update taker.
         fig_trader_emplace_trade(taker, match->taker_exec);
         apply_posn(trans->taker_posn, match->taker_exec);
-        dbr_queue_insert_back(&serv->execs, &match->taker_exec->entity_node_);
+        dbr_queue_insert_back(&serv->execs, &match->taker_exec->shared_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
@@ -278,7 +278,7 @@ emplace_orders(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = enrich_order(&serv->cache, dbr_entity_order_entry(node));
+        struct DbrOrder* order = enrich_order(&serv->cache, dbr_shared_order_entry(node));
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
@@ -305,7 +305,7 @@ emplace_orders(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrOrder* order = dbr_entity_order_entry(node);
+        struct DbrOrder* order = dbr_shared_order_entry(node);
         node = node->next;
         dbr_pool_free_order(serv->pool, order);
     } while (node);
@@ -321,7 +321,7 @@ emplace_trades(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrExec* exec = enrich_trade(&serv->cache, dbr_entity_exec_entry(node));
+        struct DbrExec* exec = enrich_trade(&serv->cache, dbr_shared_exec_entry(node));
         struct FigTrader* trader = fig_trader_lazy(exec->c.trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
@@ -333,7 +333,7 @@ emplace_trades(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrExec* exec = dbr_entity_exec_entry(node);
+        struct DbrExec* exec = dbr_shared_exec_entry(node);
         node = node->next;
         dbr_pool_free_exec(serv->pool, exec);
     } while (node);
@@ -349,7 +349,7 @@ emplace_membs(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_entity_memb_entry(node));
+        struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
         struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->index, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
@@ -366,7 +366,7 @@ emplace_membs(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrMemb* memb = dbr_entity_memb_entry(node);
+        struct DbrMemb* memb = dbr_shared_memb_entry(node);
         node = node->next;
         dbr_pool_free_memb(serv->pool, memb);
     } while (node);
@@ -382,7 +382,7 @@ emplace_posns(DbrServ serv)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_entity_posn_entry(node));
+        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_shared_posn_entry(node));
         struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
@@ -394,7 +394,7 @@ emplace_posns(DbrServ serv)
  fail2:
     // Free tail.
     do {
-        struct DbrPosn* posn = dbr_entity_posn_entry(node);
+        struct DbrPosn* posn = dbr_shared_posn_entry(node);
         node = node->next;
         dbr_pool_free_posn(serv->pool, posn);
     } while (node);
@@ -580,7 +580,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to cycle and free matches.
-    dbr_queue_insert_back(&serv->execs, &new_exec->entity_node_);
+    dbr_queue_insert_back(&serv->execs, &new_exec->shared_node_);
     commit_trans(serv, trader, book, &trans, now);
     return new_order;
  fail5:
@@ -646,7 +646,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -702,7 +702,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -749,7 +749,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -795,7 +795,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);

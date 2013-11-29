@@ -116,13 +116,6 @@ dbr_serv_clear(DbrServ serv);
 
 #define DBR_SERV_END_EXEC NULL
 
-static inline struct DbrExec*
-dbr_serv_exec_entry(struct DbrSlNode* node)
-{
-    // Reuse entity_node for this purpose.
-    return dbr_implof(struct DbrExec, entity_node_, node);
-}
-
 DBR_API struct DbrSlNode*
 dbr_serv_first_exec(DbrServ serv);
 
@@ -131,17 +124,29 @@ dbr_serv_empty_exec(DbrServ serv);
 
 #define DBR_SERV_END_POSN NULL
 
-static inline struct DbrPosn*
-dbr_serv_posn_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrPosn, serv_node_, node);
-}
-
 DBR_API struct DbrRbNode*
 dbr_serv_first_posn(DbrServ serv);
 
 DBR_API DbrBool
 dbr_serv_empty_posn(DbrServ serv);
+
+static inline struct DbrRec*
+dbr_serv_rec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrRec, shared_node_, node);
+}
+
+static inline struct DbrExec*
+dbr_serv_exec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrExec, shared_node_, node);
+}
+
+static inline struct DbrPosn*
+dbr_serv_posn_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrPosn, serv_node_, node);
+}
 
 /** @} */
 

@@ -59,7 +59,7 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 {
     struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
-    return dbr_entity_rec_entry(node);
+    return dbr_shared_rec_entry(node);
 }
 
 static inline struct DbrOrder*
@@ -134,7 +134,7 @@ set_trader(DbrClnt clnt, const char* mnem)
     if (node == FIG_CACHE_END_REC)
         goto fail1;
 
-    struct DbrRec* trec = dbr_entity_rec_entry(node);
+    struct DbrRec* trec = dbr_shared_rec_entry(node);
     DbrTrader trader = fig_trader_lazy(trec, &clnt->index, clnt->pool);
     if (!trader)
         goto fail1;
@@ -162,7 +162,7 @@ emplace_orders(DbrClnt clnt)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = enrich_order(&clnt->cache, dbr_entity_order_entry(node));
+        struct DbrOrder* order = enrich_order(&clnt->cache, dbr_shared_order_entry(node));
         // Transfer ownership.
         fig_trader_emplace_order(clnt->trader, order);
     }
@@ -177,7 +177,7 @@ emplace_trades(DbrClnt clnt)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_entity_exec_entry(node));
+        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader, exec);
     }
@@ -192,7 +192,7 @@ emplace_membs(DbrClnt clnt)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_entity_memb_entry(node));
+        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
         // Transfer ownership.
         fig_trader_emplace_memb(clnt->trader, memb);
     }
@@ -207,7 +207,7 @@ emplace_posns(DbrClnt clnt)
         return false;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_entity_posn_entry(node));
+        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
         // Transfer ownership.
         // All accnts that trader is member of are created in set_trader().
         fig_accnt_emplace_posn(posn->accnt.rec->accnt.state, posn);
@@ -338,7 +338,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, body.cycle_rep.new_order));
 
     for (struct DbrSlNode* node = body.cycle_rep.first_exec; node; node = node->next) {
-        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_entity_exec_entry(node));
+        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader, exec);
     }
@@ -346,11 +346,11 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     // Posn list is transformed to include existing positions with updates.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
     for (struct DbrSlNode* node = body.cycle_rep.first_posn; node; ) {
-        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_entity_posn_entry(node));
+        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
         node = node->next;
         // Transfer ownership or free if update.
         posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
-        dbr_queue_insert_back(&q, &posn->entity_node_);
+        dbr_queue_insert_back(&q, &posn->shared_node_);
     }
     body.cycle_rep.first_posn = q.first;
     return body.cycle_rep.new_order;

@@ -100,6 +100,24 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
 DBR_API DbrBool
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
 
+static inline struct DbrRec*
+dbr_clnt_rec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrRec, shared_node_, node);
+}
+
+static inline struct DbrExec*
+dbr_clnt_exec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrExec, shared_node_, node);
+}
+
+static inline struct DbrPosn*
+dbr_clnt_posn_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrPosn, shared_node_, node);
+}
+
 /** @} */
 
 #endif // DBR_CLNT_H

@@ -69,7 +69,7 @@ DBR_API struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
     struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
-    return node != DBR_SERV_END_REC ? dbr_entity_rec_entry(node) : NULL;
+    return node != DBR_SERV_END_REC ? dbr_serv_rec_entry(node) : NULL;
 }
 
 static DbrBool
@@ -99,7 +99,7 @@ sess_order(DbrTrader trader, const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_trader_first_order(trader);
          node != DBR_TRADER_END_ORDER; node = dbr_rbnode_next(node)) {
         struct DbrOrder* order = dbr_trader_order_entry(node);
-        dbr_queue_insert_back(&q, &order->entity_node_);
+        dbr_queue_insert_back(&q, &order->shared_node_);
     }
     rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
@@ -121,7 +121,7 @@ sess_trade(DbrTrader trader, const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_trader_first_trade(trader);
          node != DBR_TRADER_END_TRADE; node = dbr_rbnode_next(node)) {
         struct DbrExec* exec = dbr_trader_trade_entry(node);
-        dbr_queue_insert_back(&q, &exec->entity_node_);
+        dbr_queue_insert_back(&q, &exec->shared_node_);
     }
     rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
@@ -143,7 +143,7 @@ sess_memb(DbrTrader trader, const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
          node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        dbr_queue_insert_back(&q, &memb->entity_node_);
+        dbr_queue_insert_back(&q, &memb->shared_node_);
     }
     rep.req_id = req->req_id;
     rep.type = DBR_ENTITY_REP;
@@ -175,7 +175,7 @@ sess_posn(DbrTrader trader, const struct DbrBody* req)
         for (struct DbrRbNode* pnode = dbr_accnt_first_posn(accnt);
              pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {
             struct DbrPosn* posn = dbr_accnt_posn_entry(pnode);
-            dbr_queue_insert_back(&q, &posn->entity_node_);
+            dbr_queue_insert_back(&q, &posn->shared_node_);
         }
     }
     rep.req_id = req->req_id;
@@ -238,7 +238,7 @@ place_order(DbrTrader trader, const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_serv_first_posn(serv);
          node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
         struct DbrPosn* posn = dbr_serv_posn_entry(node);
-        dbr_queue_insert_back(&posns, &posn->entity_node_);
+        dbr_queue_insert_back(&posns, &posn->shared_node_);
     }
 
     rep.req_id = req->req_id;

@@ -36,12 +36,12 @@ class ServRecs {
         static Entry*
         entry(Node* node)
         {
-            return dbr_entity_rec_entry(node);
+            return dbr_serv_rec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_entity_rec_entry(const_cast<Node*>(node));
+            return dbr_serv_rec_entry(const_cast<Node*>(node));
         }
     };
     DbrServ serv_;

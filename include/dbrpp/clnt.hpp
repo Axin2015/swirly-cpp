@@ -35,12 +35,12 @@ class ClntRecs {
         static Entry*
         entry(Node* node)
         {
-            return dbr_entity_rec_entry(node);
+            return dbr_clnt_rec_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_entity_rec_entry(const_cast<Node*>(node));
+            return dbr_clnt_rec_entry(const_cast<Node*>(node));
         }
     };
     DbrClnt clnt_;
