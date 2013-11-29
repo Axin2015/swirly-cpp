@@ -530,47 +530,32 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     new_order->created = now;
     new_order->modified = now;
 
-    struct DbrTrans trans;
-    dbr_trans_init(&trans);
-
     struct DbrExec* new_exec = create_exec(serv, new_order, now);
     if (!new_exec)
         goto fail2;
 
+    struct DbrTrans trans;
+    dbr_trans_init(&trans);
+
+    // Order fields are updated on match.
     if (!fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
         goto fail3;
 
-    if (!dbr_journ_begin_trans(serv->journ))
+    // Place incomplete order in book.
+    if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order))
         goto fail4;
+
+    if (!dbr_journ_begin_trans(serv->journ))
+        goto fail5;
 
     if (!dbr_journ_insert_exec(serv->journ, new_exec)) {
         dbr_journ_rollback_trans(serv->journ);
-        goto fail4;
+        goto fail5;
     }
 
-    if (trans.first_match) {
-
-        // Orders were matched.
-        if (!insert_matches(serv->journ, trans.first_match)) {
-            dbr_journ_rollback_trans(serv->journ);
-            goto fail4;
-        }
-
-        // TODO: IOC orders would need an additional revision for the unsolicited cancellation of
-        // any unfilled quantity.
-
-        // Commit taker order.
-        new_order->c.status = DBR_TRADE;
-        new_order->c.resd -= trans.taken;
-        new_order->c.exec += trans.taken;
-        new_order->c.last_ticks = trans.last_ticks;
-        new_order->c.last_lots = trans.last_lots;
-    }
-
-    // Place incomplete order in book.
-    if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order)) {
+    if (trans.first_match && !insert_matches(serv->journ, trans.first_match)) {
         dbr_journ_rollback_trans(serv->journ);
-        goto fail4;
+        goto fail5;
     }
 
     // Journal commit can still fail.
@@ -582,6 +567,8 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // Commit trans to cycle and free matches.
     dbr_queue_insert_back(&serv->execs, &new_exec->shared_node_);
     commit_trans(serv, trader, book, &trans, now);
+    // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
+    // unfilled quantity.
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))

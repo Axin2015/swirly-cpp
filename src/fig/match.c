@@ -198,20 +198,25 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     }
 
     struct DbrPosn* posn;
-    // Avoid allocating position when there are no matches.
     if (!dbr_queue_empty(&mq)) {
+
+        // Avoid allocating position when there are no matches.
         if (!(posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date, pool)))
             goto fail1;
+
+        // Commit taker order.
+        taker->c.status = DBR_TRADE;
+        taker->c.resd -= taken;
+        taker->c.exec += taken;
+        taker->c.last_ticks = last_ticks;
+        taker->c.last_lots = last_lots;
+
     } else
         posn = NULL;
 
     // Commit to trans.
     trans->taker_posn = posn;
     trans->first_match = mq.first;
-    trans->taken = taken;
-    trans->last_ticks = last_ticks;
-    trans->last_lots = last_lots;
-
     return true;
  fail1:
     free_matches(dbr_queue_first(&mq), pool);

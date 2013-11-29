@@ -476,12 +476,6 @@ struct DbrTrans {
     struct DbrPosn* taker_posn;
     // Null if no matches.
     struct DbrSlNode* first_match;
-    /**
-     * Total quantity taken.
-     */
-    DbrLots taken;
-    DbrTicks last_ticks;
-    DbrLots last_lots;
 };
 
 static inline void
@@ -489,9 +483,6 @@ dbr_trans_init(struct DbrTrans* trans)
 {
     trans->taker_posn = NULL;
     trans->first_match = NULL;
-    trans->taken = 0;
-    trans->last_ticks = 0;
-    trans->last_lots = 0;
 }
 
 static inline struct DbrMatch*
