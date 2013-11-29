@@ -245,12 +245,12 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Update maker.
         fig_trader_emplace_trade(maker, match->maker_exec);
         apply_posn(match->maker_posn, match->maker_exec);
-        dbr_queue_insert_back(&serv->execs, &match->maker_exec->serv_node_);
+        dbr_queue_insert_back(&serv->execs, &match->maker_exec->entity_node_);
 
         // Update taker.
         fig_trader_emplace_trade(taker, match->taker_exec);
         apply_posn(trans->taker_posn, match->taker_exec);
-        dbr_queue_insert_back(&serv->execs, &match->taker_exec->serv_node_);
+        dbr_queue_insert_back(&serv->execs, &match->taker_exec->entity_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
@@ -495,7 +495,7 @@ dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 
 DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
-              const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
     if (lots == 0 || lots < min_lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
@@ -580,7 +580,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to cycle and free matches.
-    dbr_queue_insert_back(&serv->execs, &new_exec->serv_node_);
+    dbr_queue_insert_back(&serv->execs, &new_exec->entity_node_);
     commit_trans(serv, trader, book, &trans, now);
     return new_order;
  fail5:
@@ -646,7 +646,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -702,7 +702,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -749,7 +749,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);
@@ -795,7 +795,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    dbr_queue_insert_back(&serv->execs, &exec->serv_node_);
+    dbr_queue_insert_back(&serv->execs, &exec->entity_node_);
     return order;
  fail2:
     dbr_pool_free_exec(serv->pool, exec);

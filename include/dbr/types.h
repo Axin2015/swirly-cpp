@@ -431,7 +431,6 @@ struct DbrExec {
     // Singly-linked for data model.
     struct DbrSlNode entity_node_;
     struct DbrRbNode trader_node_;
-    struct DbrSlNode serv_node_;
 };
 
 static inline void
@@ -439,7 +438,6 @@ dbr_exec_init(struct DbrExec* exec)
 {
     dbr_slnode_init(&exec->entity_node_);
     dbr_rbnode_init(&exec->trader_node_);
-    dbr_slnode_init(&exec->serv_node_);
 }
 
 static inline struct DbrExec*

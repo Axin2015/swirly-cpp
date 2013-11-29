@@ -119,7 +119,8 @@ dbr_serv_clear(DbrServ serv);
 static inline struct DbrExec*
 dbr_serv_exec_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrExec, serv_node_, node);
+    // Reuse entity_node for this purpose.
+    return dbr_implof(struct DbrExec, entity_node_, node);
 }
 
 DBR_API struct DbrSlNode*
