@@ -437,6 +437,7 @@ run(void)
             break;
         case DBR_PLACE_ORDER_REQ:
             place_order(trader, &req.body);
+            dbr_serv_clear(serv);
             break;
         case DBR_REVISE_ORDER_ID_REQ:
             revise_order_id(trader, &req.body);

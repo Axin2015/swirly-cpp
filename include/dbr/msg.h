@@ -35,6 +35,8 @@ enum {
     DBR_ENTITY_REP,
     DBR_CYCLE_REP,
     DBR_ORDER_REP,
+    DBR_EXEC_REP,
+    DBR_POSN_REP,
     DBR_LOGON_REQ,
     DBR_LOGOFF_REQ,
     DBR_READ_ENTITY_REQ,
@@ -93,6 +95,12 @@ struct DbrBody {
         struct {
             struct DbrOrder* order;
         } order_rep;
+        struct {
+            struct DbrExec* exec;
+        } exec_rep;
+        struct {
+            struct DbrPosn* posn;
+        } posn_rep;
 
         // Request.
         struct {
