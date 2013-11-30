@@ -199,20 +199,16 @@ tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
 
 static void
 commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
-             const struct DbrTrans* trans, DbrMillis now)
+             struct DbrTrans* trans, DbrMillis now)
 {
-    if (trans->taker_posn)
-        tree_insert(&serv->posns, &trans->taker_posn->serv_node_);
+    while (!dbr_queue_empty(&trans->matches)) {
 
-    struct DbrSlNode* node = trans->first_match;
-    while (node) {
-
+        struct DbrSlNode* node = dbr_queue_pop(&trans->matches);
         struct DbrMatch* match = dbr_trans_match_entry(node);
         struct DbrOrder* maker_order = match->maker_order;
 
-        // Reduce maker. Maker's revision will be incremented by this call.
+        // Reduce maker.
         dbr_book_take(book, maker_order, match->lots, now);
-        // Insert maker accnt if taker is a member.
         tree_insert(&serv->posns, &match->maker_posn->serv_node_);
 
         // Must succeed because maker order exists.
@@ -225,17 +221,19 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Update maker.
         fig_trader_emplace_trade(maker, match->maker_exec);
         apply_posn(match->maker_posn, match->maker_exec);
-        dbr_queue_insert_back(&serv->execs, &match->maker_exec->shared_node_);
 
         // Update taker.
         fig_trader_emplace_trade(taker, match->taker_exec);
         apply_posn(trans->taker_posn, match->taker_exec);
-        dbr_queue_insert_back(&serv->execs, &match->taker_exec->shared_node_);
 
         // Advance node to next before current node is freed.
         node = node->next;
         dbr_pool_free_match(serv->pool, match);
     }
+
+    dbr_queue_join(&serv->execs, &trans->execs);
+    if (trans->taker_posn)
+        tree_insert(&serv->posns, &trans->taker_posn->serv_node_);
 }
 
 static DbrBool
@@ -517,6 +515,8 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     struct DbrTrans trans;
     dbr_trans_init(&trans);
 
+    dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
+
     // Order fields are updated on match.
     if (!fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
         goto fail3;
@@ -528,26 +528,19 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
     // unfilled quantity.
 
-    if (!trans.execs.first) {
-        if (!dbr_journ_insert_exec(serv->journ, new_exec))
-            goto fail5;
-    } else {
-        dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
-        if (!dbr_journ_insert_execs(serv->journ, trans.execs.first))
-            goto fail5;
-    }
+    if (!dbr_journ_insert_execs(serv->journ, trans.execs.first))
+        goto fail5;
 
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
     // Commit trans to cycle and free matches.
-    dbr_queue_insert_back(&serv->execs, &new_exec->shared_node_);
     commit_trans(serv, trader, book, &trans, now);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))
         dbr_book_remove(book, new_order);
  fail4:
-    free_matches(trans.first_match, serv->pool);
+    free_matches(dbr_queue_first(&trans.matches), serv->pool);
  fail3:
     dbr_pool_free_exec(serv->pool, new_exec);
  fail2:

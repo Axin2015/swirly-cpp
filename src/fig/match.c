@@ -84,9 +84,6 @@ static DbrBool
 match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
              DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
 {
-    struct DbrQueue mq;
-    dbr_queue_init(&mq);
-
     DbrLots taken = 0;
     DbrTicks last_ticks = 0;
     DbrLots last_lots = 0;
@@ -194,14 +191,17 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         match->taker_exec = taker_exec;
         match->maker_exec = maker_exec;
 
-        dbr_queue_insert_back(&mq, &match->trans_node_);
+        dbr_queue_insert_back(&trans->matches, &match->trans_node_);
+
+        // Maker updated first because this is consistent with last-look semantics.
+        dbr_queue_insert_back(&trans->execs, &maker_exec->shared_node_);
+        dbr_queue_insert_back(&trans->execs, &taker_exec->shared_node_);
     }
 
-    struct DbrPosn* posn;
-    if (!dbr_queue_empty(&mq)) {
+    if (!dbr_queue_empty(&trans->matches)) {
 
         // Avoid allocating position when there are no matches.
-        if (!(posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date, pool)))
+        if (!(trans->taker_posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date, pool)))
             goto fail1;
 
         // Commit taker order.
@@ -212,14 +212,11 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         taker->c.last_lots = last_lots;
 
     } else
-        posn = NULL;
+        trans->taker_posn = NULL;
 
-    // Commit to trans.
-    trans->taker_posn = posn;
-    trans->first_match = mq.first;
     return true;
  fail1:
-    free_matches(dbr_queue_first(&mq), pool);
+    free_matches(dbr_queue_first(&trans->matches), pool);
     return false;
 }
 

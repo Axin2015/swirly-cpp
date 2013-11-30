@@ -474,18 +474,17 @@ dbr_match_init(struct DbrMatch* match)
 }
 
 struct DbrTrans {
+    struct DbrQueue matches;
     struct DbrQueue execs;
     struct DbrPosn* taker_posn;
-    // Null if no matches.
-    struct DbrSlNode* first_match;
 };
 
 static inline void
 dbr_trans_init(struct DbrTrans* trans)
 {
+    dbr_queue_init(&trans->matches);
     dbr_queue_init(&trans->execs);
     trans->taker_posn = NULL;
-    trans->first_match = NULL;
 }
 
 static inline struct DbrMatch*
