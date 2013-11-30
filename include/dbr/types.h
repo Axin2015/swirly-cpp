@@ -19,6 +19,7 @@
 #define DBR_TYPES_H
 
 #include <dbr/dlnode.h>
+#include <dbr/queue.h>
 #include <dbr/rbnode.h>
 #include <dbr/slnode.h>
 
@@ -473,6 +474,7 @@ dbr_match_init(struct DbrMatch* match)
 }
 
 struct DbrTrans {
+    struct DbrQueue execs;
     struct DbrPosn* taker_posn;
     // Null if no matches.
     struct DbrSlNode* first_match;
@@ -481,6 +483,7 @@ struct DbrTrans {
 static inline void
 dbr_trans_init(struct DbrTrans* trans)
 {
+    dbr_queue_init(&trans->execs);
     trans->taker_posn = NULL;
     trans->first_match = NULL;
 }
@@ -489,59 +492,6 @@ static inline struct DbrMatch*
 dbr_trans_match_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrMatch, trans_node_, node);
-}
-
-/** @} */
-
-/**
- * @addtogroup Msg
- * @{
- */
-
-enum {
-	DBR_INSERT_EXEC = 1,
-	DBR_ACK_TRADE
-};
-
-struct DbrStmt {
-    /**
-     * @publicsection
-     */
-    int type;
-    union {
-        struct {
-            DbrIden id;
-            DbrIden order;
-            // id_only.
-            struct DbrCommon c;
-            DbrIden match;
-            int role;
-            // id_only.
-            union DbrURec cpty;
-            DbrMillis created;
-        } insert_exec;
-        struct {
-            DbrIden id;
-            DbrMillis now;
-        } ack_trade;
-    };
-    /**
-     * @privatesection
-     */
-    // Singly-linked for transaction.
-    struct DbrSlNode trans_node_;
-};
-
-static inline void
-dbr_stmt_init(struct DbrStmt* stmt)
-{
-    dbr_slnode_init(&stmt->trans_node_);
-}
-
-static inline struct DbrStmt*
-dbr_trans_stmt_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrStmt, trans_node_, node);
 }
 
 /** @} */

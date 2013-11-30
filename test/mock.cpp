@@ -211,37 +211,19 @@ Journ::alloc_id() noexcept
 }
 
 DbrBool
-Journ::begin_trans() noexcept
+Journ::insert_execs(DbrSlNode* first) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::commit_trans() noexcept
+Journ::insert_exec(DbrExec& exec) noexcept
 {
     return DBR_TRUE;
 }
 
 DbrBool
-Journ::rollback_trans() noexcept
-{
-    return DBR_TRUE;
-}
-
-DbrBool
-Journ::insert_exec(const DbrExec& exec) noexcept
-{
-    return DBR_TRUE;
-}
-
-DbrBool
-Journ::insert_stmt(const DbrStmt& stmt) noexcept
-{
-    return DBR_TRUE;
-}
-
-DbrBool
-Journ::ack_trade(DbrIden id, DbrMillis now) noexcept
+Journ::update_exec(DbrIden id, DbrMillis modified) noexcept
 {
     return DBR_TRUE;
 }

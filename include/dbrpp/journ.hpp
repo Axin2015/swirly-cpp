@@ -34,46 +34,28 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->alloc_id();
     }
     static DbrBool
-    begin_trans(DbrJourn journ) noexcept
+    insert_execs(DbrJourn journ, DbrSlNode* first) noexcept
     {
-        return static_cast<DerivedT*>(journ)->begin_trans();
+        return static_cast<DerivedT*>(journ)->insert_execs(first);
     }
     static DbrBool
-    commit_trans(DbrJourn journ) noexcept
-    {
-        return static_cast<DerivedT*>(journ)->commit_trans();
-    }
-    static DbrBool
-    rollback_trans(DbrJourn journ) noexcept
-    {
-        return static_cast<DerivedT*>(journ)->rollback_trans();
-    }
-    static DbrBool
-    insert_exec(DbrJourn journ, const DbrExec* exec) noexcept
+    insert_exec(DbrJourn journ, struct DbrExec* exec) noexcept
     {
         return static_cast<DerivedT*>(journ)->insert_exec(*exec);
     }
     static DbrBool
-    insert_stmt(DbrJourn journ, const DbrStmt* stmt) noexcept
+    update_exec(DbrJourn journ, DbrIden id, DbrMillis modified) noexcept
     {
-        return static_cast<DerivedT*>(journ)->insert_stmt(*stmt);
-    }
-    static DbrBool
-    ack_trade(DbrJourn journ, DbrIden id, DbrMillis now) noexcept
-    {
-        return static_cast<DerivedT*>(journ)->ack_trade(id, now);
+        return static_cast<DerivedT*>(journ)->update_exec(id, modified);
     }
     static const DbrJournVtbl*
     vtbl() noexcept
     {
         static const DbrJournVtbl VTBL = {
             alloc_id,
-            begin_trans,
-            commit_trans,
-            rollback_trans,
+            insert_execs,
             insert_exec,
-            insert_stmt,
-            ack_trade
+            update_exec
         };
         return &VTBL;
     }
@@ -94,44 +76,23 @@ alloc_id(DbrJourn journ)
 }
 
 inline void
-begin_trans(DbrJourn journ)
+insert_execs(DbrJourn journ, DbrSlNode* first)
 {
-    if (!journ->vtbl->begin_trans(journ))
+    if (!journ->vtbl->insert_execs(journ, first))
         throw_exception();
 }
 
 inline void
-commit_trans(DbrJourn journ)
-{
-    if (!journ->vtbl->commit_trans(journ))
-        throw_exception();
-}
-
-inline void
-rollback_trans(DbrJourn journ)
-{
-    if (!journ->vtbl->rollback_trans(journ))
-        throw_exception();
-}
-
-inline void
-insert_exec(DbrJourn journ, const DbrExec& exec)
+insert_exec(DbrJourn journ, DbrExec& exec)
 {
     if (!journ->vtbl->insert_exec(journ, &exec))
         throw_exception();
 }
 
 inline void
-insert_stmt(DbrJourn journ, const DbrStmt& stmt)
+update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
-    if (!journ->vtbl->insert_stmt(journ, &stmt))
-        throw_exception();
-}
-
-inline void
-ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    if (!journ->vtbl->ack_trade(journ, id, now))
+    if (!journ->vtbl->update_exec(journ, id, modified))
         throw_exception();
 }
 

@@ -36,7 +36,7 @@
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"    \
     " ?, 0, ?, ?)"
 
-#define ACK_TRADE_SQL                                               \
+#define UPDATE_EXEC_SQL                                               \
     "UPDATE exec SET acked = 1, modified = ?"                        \
     " WHERE id = ?"
 
@@ -138,11 +138,7 @@ bind_text(sqlite3_stmt* stmt, int col, const char* text, size_t maxlen)
 }
 
 static DbrBool
-bind_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden tid,
-                 DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-                 int status, int action, DbrTicks ticks, DbrLots lots, DbrLots resd,
-                 DbrLots exec, DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots,
-                 DbrIden match, int role, DbrIden cpty, DbrMillis created)
+bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
 {
     enum {
         ID = 1,
@@ -167,86 +163,89 @@ bind_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden ti
         CREATED
     };
     sqlite3_stmt* stmt = sqlite->insert_exec;
-    int rc = sqlite3_bind_int64(stmt, ID, id);
+    int rc = sqlite3_bind_int64(stmt, ID, exec->id);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, ORDER, order);
+    rc = sqlite3_bind_int64(stmt, ORDER, exec->order);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TRADER, tid);
+    rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.id_only);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, ACCNT, aid);
+    rc = sqlite3_bind_int64(stmt, ACCNT, exec->c.accnt.id_only);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CONTR, cid);
+    rc = sqlite3_bind_int64(stmt, CONTR, exec->c.contr.id_only);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, SETTL_DATE, settl_date);
+    rc = sqlite3_bind_int(stmt, SETTL_DATE, exec->c.settl_date);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    if (ref[0] != '\0')
-        rc = bind_text(stmt, REF, ref, DBR_REF_MAX);
+    if (exec->c.ref[0] != '\0')
+        rc = bind_text(stmt, REF, exec->c.ref, DBR_REF_MAX);
     else
         rc = sqlite3_bind_null(stmt, REF);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, STATUS, status);
+    rc = sqlite3_bind_int(stmt, STATUS, exec->c.status);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ACTION, action);
+    rc = sqlite3_bind_int(stmt, ACTION, exec->c.action);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TICKS, ticks);
+    rc = sqlite3_bind_int64(stmt, TICKS, exec->c.ticks);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LOTS, lots);
+    rc = sqlite3_bind_int64(stmt, LOTS, exec->c.lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, RESD, resd);
+    rc = sqlite3_bind_int64(stmt, RESD, exec->c.resd);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, EXEC, exec);
+    rc = sqlite3_bind_int64(stmt, EXEC, exec->c.exec);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LAST_TICKS, last_ticks);
+    rc = sqlite3_bind_int64(stmt, LAST_TICKS, exec->c.last_ticks);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LAST_LOTS, last_lots);
+    rc = sqlite3_bind_int64(stmt, LAST_LOTS, exec->c.last_lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, MIN_LOTS, min_lots);
+    rc = sqlite3_bind_int64(stmt, MIN_LOTS, exec->c.min_lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
+    const DbrIden match = exec->match;
     rc = match != 0 ? sqlite3_bind_int64(stmt, MATCH, match) : sqlite3_bind_null(stmt, REF);
     if (rc != SQLITE_OK)
         goto fail1;
 
+    const int role = exec->role;
     rc = role != 0 ? sqlite3_bind_int(stmt, ROLE, role) : sqlite3_bind_null(stmt, REF);
     if (rc != SQLITE_OK)
         goto fail1;
 
+    const DbrIden cpty = exec->cpty.id_only;
     rc = cpty != 0 ? sqlite3_bind_int64(stmt, CPTY, cpty) : sqlite3_bind_null(stmt, REF);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CREATED, created);
+    rc = sqlite3_bind_int64(stmt, CREATED, exec->created);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -258,14 +257,14 @@ bind_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden ti
 }
 
 static DbrBool
-bind_ack_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
+bind_update_exec(struct FirSqlite* sqlite, DbrIden id, DbrMillis modified)
 {
     enum {
         MODIFIED = 1,
         ID
     };
-    sqlite3_stmt* stmt = sqlite->ack_trade;
-    int rc = sqlite3_bind_int64(stmt, MODIFIED, now);
+    sqlite3_stmt* stmt = sqlite->update_exec;
+    int rc = sqlite3_bind_int64(stmt, MODIFIED, modified);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -914,13 +913,13 @@ fir_sqlite_init(struct FirSqlite* sqlite, const char* path)
     if (!insert_exec)
         goto fail1;
 
-    sqlite3_stmt* ack_trade = prepare(db, ACK_TRADE_SQL);
-    if (!ack_trade)
+    sqlite3_stmt* update_exec = prepare(db, UPDATE_EXEC_SQL);
+    if (!update_exec)
         goto fail2;
 
     sqlite->db = db;
     sqlite->insert_exec = insert_exec;
-    sqlite->ack_trade = ack_trade;
+    sqlite->update_exec = update_exec;
     return true;
  fail2:
     sqlite3_finalize(insert_exec);
@@ -933,7 +932,7 @@ DBR_EXTERN void
 fir_sqlite_term(struct FirSqlite* sqlite)
 {
     assert(sqlite);
-    sqlite3_finalize(sqlite->ack_trade);
+    sqlite3_finalize(sqlite->update_exec);
     sqlite3_finalize(sqlite->insert_exec);
     sqlite3_close(sqlite->db);
 }
@@ -957,23 +956,17 @@ fir_sqlite_rollback_trans(struct FirSqlite* sqlite)
 }
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden tid,
-                       DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int status,
-                       int action, DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
-                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots,
-                       DbrIden match, int role, DbrIden cpty, DbrMillis created)
+fir_sqlite_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
 {
-    return bind_insert_exec(sqlite, id, order, tid, aid, cid, settl_date, ref, status, action,
-                            ticks, lots, resd, exec, last_ticks, last_lots, min_lots, match,
-                            role, cpty, created)
+    return bind_insert_exec(sqlite, exec)
         && exec_stmt(sqlite->db, sqlite->insert_exec);
 }
 
 DBR_EXTERN DbrBool
-fir_sqlite_ack_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now)
+fir_sqlite_update_exec(struct FirSqlite* sqlite, DbrIden id, DbrMillis modified)
 {
-    return bind_ack_trade(sqlite, id, now)
-        && exec_stmt(sqlite->db, sqlite->ack_trade);
+    return bind_update_exec(sqlite, id, modified)
+        && exec_stmt(sqlite->db, sqlite->update_exec);
 }
 
 DBR_EXTERN ssize_t

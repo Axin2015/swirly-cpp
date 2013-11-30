@@ -32,17 +32,7 @@ static const char STATUS_REP_FORMAT[] = "is";
 static const char PLACE_ORDER_REQ_FORMAT[] = "mmisillll";
 static const char REVISE_ORDER_ID_REQ_FORMAT[] = "ll";
 static const char REVISE_ORDER_REF_REQ_FORMAT[] = "sl";
-
-static void
-free_trans_stmts(struct DbrSlNode* first, DbrPool pool)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-        node = node->next;
-        dbr_pool_free_stmt(pool, stmt);
-    }
-}
+static const char UPDATE_EXEC_REQ_FORMAT[] = "li";
 
 static const char*
 read_entity_trader(const char* buf, DbrPool pool, struct DbrQueue* queue)
@@ -151,22 +141,6 @@ read_entity_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     }
     dbr_queue_insert_back(queue, &posn->shared_node_);
-    return buf;
- fail1:
-    return NULL;
-}
-
-static const char*
-read_trans_stmt(const char* buf, DbrPool pool, struct DbrQueue* queue)
-{
-    struct DbrStmt* stmt = dbr_pool_alloc_stmt(pool);
-    if (!stmt)
-        goto fail1;
-    if (!(buf = dbr_read_stmt(buf, stmt))) {
-        dbr_pool_free_stmt(pool, stmt);
-        goto fail1;
-    }
-    dbr_queue_insert_back(queue, &stmt->trans_node_);
     return buf;
  fail1:
     return NULL;
@@ -304,14 +278,22 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_ACK_TRADE_REQ:
         n += dbr_packlenl(body->ack_trade_req.id);
         break;
-    case DBR_WRITE_TRANS_REQ:
-        body->write_trans_req.count_ = 0;
-        for (struct DbrSlNode* node = body->write_trans_req.first; node; node = node->next) {
-            struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-            n += dbr_stmt_len(stmt);
-            ++body->write_trans_req.count_;
+    case DBR_INSERT_EXECS_REQ:
+        body->insert_execs_req.count_ = 0;
+        for (struct DbrSlNode* node = body->insert_execs_req.first; node; node = node->next) {
+            struct DbrExec* exec = dbr_shared_exec_entry(node);
+            n += dbr_exec_len(exec, enriched);
+            ++body->insert_execs_req.count_;
         }
-        n += dbr_packlenz(body->write_trans_req.count_);
+        n += dbr_packlenz(body->insert_execs_req.count_);
+        break;
+    case DBR_INSERT_EXEC_REQ:
+        n += dbr_exec_len(body->insert_exec_req.exec, enriched);
+        break;
+    case DBR_UPDATE_EXEC_REQ:
+        n += dbr_packlenf(UPDATE_EXEC_REQ_FORMAT,
+                          body->update_exec_req.id,
+                          body->update_exec_req.modified);
         break;
     default:
         abort();
@@ -439,12 +421,20 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     case DBR_ACK_TRADE_REQ:
         buf = dbr_packl(buf, body->ack_trade_req.id);
         break;
-    case DBR_WRITE_TRANS_REQ:
-        buf = dbr_packz(buf, body->write_trans_req.count_);
-        for (struct DbrSlNode* node = body->write_trans_req.first; node; node = node->next) {
-            struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-            buf = dbr_write_stmt(buf, stmt);
+    case DBR_INSERT_EXECS_REQ:
+        buf = dbr_packz(buf, body->insert_execs_req.count_);
+        for (struct DbrSlNode* node = body->insert_execs_req.first; node; node = node->next) {
+            struct DbrExec* exec = dbr_shared_exec_entry(node);
+            buf = dbr_write_exec(buf, exec, enriched);
         }
+        break;
+    case DBR_INSERT_EXEC_REQ:
+        buf = dbr_write_exec(buf, body->insert_exec_req.exec, enriched);
+        break;
+    case DBR_UPDATE_EXEC_REQ:
+        buf = dbr_packf(buf, UPDATE_EXEC_REQ_FORMAT,
+                        body->update_exec_req.id,
+                        body->update_exec_req.modified);
         break;
     }
     return buf;
@@ -636,17 +626,32 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         if (!(buf = dbr_unpackl(buf, &body->ack_trade_req.id)))
             goto fail1;
         break;
-    case DBR_WRITE_TRANS_REQ:
-        if (!(buf = dbr_unpackz(buf, &body->write_trans_req.count_)))
+    case DBR_INSERT_EXECS_REQ:
+        if (!(buf = dbr_unpackz(buf, &body->insert_execs_req.count_)))
             goto fail1;
         dbr_queue_init(&q);
-        for (size_t i = 0; i < body->write_trans_req.count_; ++i) {
-            if (!(buf = read_trans_stmt(buf, pool, &q))) {
-                free_trans_stmts(dbr_queue_first(&q), pool);
+        for (size_t i = 0; i < body->insert_execs_req.count_; ++i) {
+            if (!(buf = read_entity_exec(buf, pool, &q))) {
+                dbr_pool_free_entities(pool, DBR_EXEC, dbr_queue_first(&q));
                 goto fail1;
             }
         }
-        body->write_trans_req.first = dbr_queue_first(&q);
+        body->insert_execs_req.first = dbr_queue_first(&q);
+        break;
+    case DBR_INSERT_EXEC_REQ:
+        body->insert_exec_req.exec = dbr_pool_alloc_exec(pool);
+        if (!body->insert_exec_req.exec)
+            goto fail1;
+        if (!(buf = dbr_read_exec(buf, body->insert_exec_req.exec))) {
+            dbr_pool_free_exec(pool, body->insert_exec_req.exec);
+            goto fail1;
+        }
+        break;
+    case DBR_UPDATE_EXEC_REQ:
+        if (!(buf = dbr_unpackf(buf, UPDATE_EXEC_REQ_FORMAT,
+                                &body->update_exec_req.id,
+                                &body->update_exec_req.modified)))
+            goto fail1;
         break;
     default:
         dbr_err_setf(DBR_EIO, "invalid body-type '%d'", type);

@@ -35,22 +35,13 @@ public:
     alloc_id() noexcept;
 
     DbrBool
-    begin_trans() noexcept;
+    insert_execs(DbrSlNode* first) noexcept;
 
     DbrBool
-    commit_trans() noexcept;
+    insert_exec(DbrExec& exec) noexcept;
 
     DbrBool
-    rollback_trans() noexcept;
-
-    DbrBool
-    insert_exec(const DbrExec& exec) noexcept;
-
-    DbrBool
-    insert_stmt(const DbrStmt& stmt) noexcept;
-
-    DbrBool
-    ack_trade(DbrIden id, DbrMillis now) noexcept;
+    update_exec(DbrIden id, DbrMillis modified) noexcept;
 };
 
 class Model : public dbr::IModel<Model> {

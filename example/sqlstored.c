@@ -39,17 +39,6 @@ static void* sock = NULL;
 static volatile sig_atomic_t quit = false;
 
 static void
-free_stmts(struct DbrSlNode* first, DbrPool pool)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-        node = node->next;
-        dbr_pool_free_stmt(pool, stmt);
-    }
-}
-
-static void
 status_err(struct DbrBody* rep, DbrIden req_id)
 {
     rep->req_id = req_id;
@@ -82,37 +71,65 @@ read_entity(const struct DbrBody* req)
 }
 
 static DbrBool
-write_trans(const struct DbrBody* req)
+insert_execs(struct DbrBody* req)
 {
     struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
                            .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
-    if (!dbr_journ_begin_trans(journ)) {
-        dbr_err_print("dbr_journ_begin_trans() failed");
+    if (!dbr_journ_insert_execs(journ, req->insert_execs_req.first)) {
+        dbr_err_print("dbr_journ_insert_execs() failed");
         status_err(&rep, req->req_id);
         goto fail1;
-    }
-    for (struct DbrSlNode* node = req->write_trans_req.first; node; node = node->next) {
-        struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-        if (!dbr_journ_insert_stmt(journ, stmt)) {
-            dbr_err_print("dbr_journ_insert_stmt() failed");
-            status_err(&rep, req->req_id);
-            goto fail2;
-        }
-    }
-    if (!dbr_journ_commit_trans(journ)) {
-        dbr_err_print("dbr_journ_commit_trans() failed");
-        status_err(&rep, req->req_id);
-        goto fail2;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
     if (!ok)
         dbr_err_print("dbr_send_body() failed");
     return ok;
- fail2:
-    if (!dbr_journ_rollback_trans(journ))
-        dbr_err_print("dbr_journ_rollback_trans() failed");
+ fail1:
+    if (!dbr_send_body(sock, &rep, false))
+        dbr_err_print("dbr_send_body() failed");
+    return false;
+}
+
+static DbrBool
+insert_exec(struct DbrBody* req)
+{
+    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
+                           .status_rep = { .num = 0, .msg = "" } };
+    DbrJourn journ = dbr_sqlstore_journ(store);
+
+    if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec)) {
+        dbr_err_print("dbr_journ_insert_exec() failed");
+        status_err(&rep, req->req_id);
+        goto fail1;
+    }
+    const DbrBool ok = dbr_send_body(sock, &rep, false);
+    if (!ok)
+        dbr_err_print("dbr_send_body() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_body(sock, &rep, false))
+        dbr_err_print("dbr_send_body() failed");
+    return false;
+}
+
+static DbrBool
+update_exec(struct DbrBody* req)
+{
+    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
+                           .status_rep = { .num = 0, .msg = "" } };
+    DbrJourn journ = dbr_sqlstore_journ(store);
+
+    if (!dbr_journ_update_exec(journ, req->update_exec_req.id, req->update_exec_req.modified)) {
+        dbr_err_print("dbr_journ_update_exec() failed");
+        status_err(&rep, req->req_id);
+        goto fail1;
+    }
+    const DbrBool ok = dbr_send_body(sock, &rep, false);
+    if (!ok)
+        dbr_err_print("dbr_send_body() failed");
+    return ok;
  fail1:
     if (!dbr_send_body(sock, &rep, false))
         dbr_err_print("dbr_send_body() failed");
@@ -134,9 +151,16 @@ run(void)
         case DBR_READ_ENTITY_REQ:
             read_entity(&req);
             break;
-        case DBR_WRITE_TRANS_REQ:
-            write_trans(&req);
-            free_stmts(req.write_trans_req.first, pool);
+        case DBR_INSERT_EXECS_REQ:
+            insert_execs(&req);
+            dbr_pool_free_entities(pool, DBR_EXEC, req.insert_execs_req.first);
+            break;
+        case DBR_INSERT_EXEC_REQ:
+            insert_exec(&req);
+            dbr_pool_free_exec(pool, req.insert_exec_req.exec);
+            break;
+        case DBR_UPDATE_EXEC_REQ:
+            update_exec(&req);
             break;
         }
     }

@@ -45,7 +45,9 @@ enum {
     DBR_CANCEL_ORDER_ID_REQ,
     DBR_CANCEL_ORDER_REF_REQ,
     DBR_ACK_TRADE_REQ,
-    DBR_WRITE_TRANS_REQ
+    DBR_INSERT_EXECS_REQ,
+    DBR_INSERT_EXEC_REQ,
+    DBR_UPDATE_EXEC_REQ
 };
 
 struct DbrHead {
@@ -63,11 +65,11 @@ struct DbrBody {
         } status_rep;
         struct {
             int type;
-            // dbr_entity_rec_entry()
-            // dbr_entity_order_entry()
-            // dbr_entity_memb_entry()
-            // dbr_entity_exec_entry()
-            // dbr_entity_posn_entry()
+            // dbr_shared_rec_entry()
+            // dbr_shared_order_entry()
+            // dbr_shared_memb_entry()
+            // dbr_shared_exec_entry()
+            // dbr_shared_posn_entry()
             struct DbrSlNode* first;
             /**
              * @privatesection
@@ -77,9 +79,9 @@ struct DbrBody {
         } entity_rep;
         struct {
             struct DbrOrder* new_order;
-            // dbr_entity_exec_entry()
+            // dbr_shared_exec_entry()
             struct DbrSlNode* first_exec;
-            // dbr_entity_posn_entry()
+            // dbr_shared_posn_entry()
             struct DbrSlNode* first_posn;
             /**
              * @privatesection
@@ -134,7 +136,14 @@ struct DbrBody {
              */
             // Set by dbr_body_len();
             size_t count_;
-        } write_trans_req;
+        } insert_execs_req;
+        struct {
+            struct DbrExec* exec;
+        } insert_exec_req;
+        struct {
+            DbrIden id;
+            DbrMillis modified;
+        } update_exec_req;
     };
 };
 

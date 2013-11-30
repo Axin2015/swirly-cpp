@@ -33,21 +33,9 @@ struct ElmZmqStore {
     void* sock;
     DbrIden id;
     DbrPool pool;
-    struct DbrQueue queue;
     struct DbrIJourn journ;
     struct DbrIModel model;
 };
-
-static void
-free_stmts(struct DbrSlNode* first, DbrPool pool)
-{
-    struct DbrSlNode* node = first;
-    while (node) {
-        struct DbrStmt* stmt = dbr_trans_stmt_entry(node);
-        node = node->next;
-        dbr_pool_free_stmt(pool, stmt);
-    }
-}
 
 static inline struct ElmZmqStore*
 journ_implof(DbrJourn journ)
@@ -69,93 +57,31 @@ alloc_id(DbrJourn journ)
 }
 
 static DbrBool
-begin_trans(DbrJourn journ)
+insert_execs(DbrJourn journ, struct DbrSlNode* first)
 {
     struct ElmZmqStore* store = journ_implof(journ);
-    if (!dbr_queue_empty(&store->queue)) {
-        dbr_err_set(DBR_EIO, "incomplete transaction");
+    struct DbrBody body = { .req_id = store->id++, .type = DBR_INSERT_EXECS_REQ,
+                            .insert_execs_req = { .first = first, .count_ = 0 } };
+    if (!(dbr_send_body(store->sock, &body, false)))
         return false;
-    }
-    return true;
-}
-
-static DbrBool
-commit_trans(DbrJourn journ)
-{
-    struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrBody body = { .req_id = store->id++, .type = DBR_WRITE_TRANS_REQ,
-                            .write_trans_req = { .count_ = 0, .first = store->queue.first } };
-    DbrBool ok = dbr_send_body(store->sock, &body, false);
-    free_stmts(store->queue.first, store->pool);
-    dbr_queue_init(&store->queue);
-    if (!ok)
-        return false;
-    // FIXME: validate return type.
     return dbr_recv_body(store->sock, store->pool, &body);
 }
 
 static DbrBool
-rollback_trans(DbrJourn journ)
+update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
     struct ElmZmqStore* store = journ_implof(journ);
-    free_stmts(store->queue.first, store->pool);
-    dbr_queue_init(&store->queue);
-    return true;
-}
-
-static DbrBool
-insert_exec(DbrJourn journ, const struct DbrExec* exec)
-{
-    struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
-    if (!stmt)
+    struct DbrBody body = { .req_id = store->id++, .type = DBR_UPDATE_EXEC_REQ,
+                            .update_exec_req = { .id = id, .modified = modified } };
+    if (!(dbr_send_body(store->sock, &body, false)))
         return false;
-    stmt->type = DBR_INSERT_EXEC;
-    stmt->insert_exec.id = exec->id;
-    stmt->insert_exec.order = exec->order;
-    __builtin_memcpy(&stmt->insert_exec.c, &exec->c, sizeof(struct DbrCommon));
-    stmt->insert_exec.match = exec->match;
-    stmt->insert_exec.role = exec->role;
-    stmt->insert_exec.cpty.id_only = exec->cpty.id_only;
-    stmt->insert_exec.created = exec->created;
-    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
-    return true;
-}
-
-static DbrBool
-insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
-{
-    struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrStmt* copy = dbr_pool_alloc_stmt(store->pool);
-    if (!copy)
-        return false;
-    __builtin_memcpy(&copy, stmt, sizeof(struct DbrStmt));
-    dbr_queue_insert_back(&store->queue, &copy->trans_node_);
-    return true;
-}
-
-static DbrBool
-ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrStmt* stmt = dbr_pool_alloc_stmt(store->pool);
-    if (!stmt)
-        return false;
-    stmt->type = DBR_ACK_TRADE;
-    stmt->ack_trade.id = id;
-    stmt->ack_trade.now = now;
-    dbr_queue_insert_back(&store->queue, &stmt->trans_node_);
-    return true;
+    return dbr_recv_body(store->sock, store->pool, &body);
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
     .alloc_id = alloc_id,
-    .begin_trans = begin_trans,
-    .commit_trans = commit_trans,
-    .rollback_trans = rollback_trans,
-    .insert_exec = insert_exec,
-    .insert_stmt = insert_stmt,
-    .ack_trade = ack_trade
+    .insert_execs = insert_execs,
+    .update_exec = update_exec
 };
 
 static ssize_t
@@ -203,7 +129,6 @@ dbr_zmqstore_create(void* ctx, const char* addr, DbrIden seed, DbrPool pool)
     store->sock = sock;
     store->id = seed;
     store->pool = pool;
-    dbr_queue_init(&store->queue);
 
     store->journ.vtbl = &JOURN_VTBL;
     store->model.vtbl = &MODEL_VTBL;
@@ -221,8 +146,6 @@ DBR_API void
 dbr_zmqstore_destroy(DbrZmqStore store)
 {
     if (store) {
-        free_stmts(store->queue.first, store->pool);
-        dbr_queue_init(&store->queue);
         zmq_close(store->sock);
         free(store);
     }

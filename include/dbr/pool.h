@@ -77,12 +77,6 @@ dbr_pool_alloc_posn(DbrPool pool);
 DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn);
 
-DBR_API struct DbrStmt*
-dbr_pool_alloc_stmt(DbrPool pool);
-
-DBR_API void
-dbr_pool_free_stmt(DbrPool pool, struct DbrStmt* stmt);
-
 DBR_API void
 dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first);
 

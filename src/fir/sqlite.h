@@ -29,7 +29,7 @@ struct sqlite3_stmt;
 struct FirSqlite {
     struct sqlite3* db;
     struct sqlite3_stmt* insert_exec;
-    struct sqlite3_stmt* ack_trade;
+    struct sqlite3_stmt* update_exec;
     const struct DbrModel* model_;
 };
 
@@ -54,14 +54,10 @@ DBR_EXTERN DbrBool
 fir_sqlite_rollback_trans(struct FirSqlite* sqlite);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_exec(struct FirSqlite* sqlite, DbrIden id, DbrIden order, DbrIden tid,
-                       DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int status,
-                       int action, DbrTicks ticks, DbrLots lots, DbrLots resd, DbrLots exec,
-                       DbrTicks last_ticks, DbrLots last_lots, DbrLots min_lots,
-                       DbrIden match, int role, DbrIden cpty, DbrMillis created);
+fir_sqlite_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec);
 
 DBR_EXTERN DbrBool
-fir_sqlite_ack_trade(struct FirSqlite* sqlite, DbrIden id, DbrMillis now);
+fir_sqlite_update_exec(struct FirSqlite* sqlite, DbrIden id, DbrMillis modified);
 
 DBR_EXTERN ssize_t
 fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,

@@ -53,95 +53,50 @@ alloc_id(DbrJourn journ)
 }
 
 static DbrBool
-begin_trans(DbrJourn journ)
+insert_execs(DbrJourn journ, struct DbrSlNode* first)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_begin_trans(impl);
-}
 
-static DbrBool
-commit_trans(DbrJourn journ)
-{
-    struct FirSqlStore* store = journ_implof(journ);
-    struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_commit_trans(impl);
-}
+    if (!fir_sqlite_begin_trans(impl))
+        goto fail1;
 
-static DbrBool
-rollback_trans(DbrJourn journ)
-{
-    struct FirSqlStore* store = journ_implof(journ);
-    struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_rollback_trans(impl);
-}
-
-static DbrBool
-insert_exec(DbrJourn journ, const struct DbrExec* exec)
-{
-    struct FirSqlStore* store = journ_implof(journ);
-    struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_insert_exec(impl, exec->id, exec->order, exec->c.trader.rec->id,
-                                  exec->c.accnt.rec->id, exec->c.contr.rec->id,
-                                  exec->c.settl_date, exec->c.ref, exec->c.status, exec->c.action,
-                                  exec->c.ticks, exec->c.lots, exec->c.resd, exec->c.exec,
-                                  exec->c.last_ticks, exec->c.last_lots, exec->c.min_lots,
-                                  exec->match, exec->role, exec->cpty.rec->id, exec->created);
-}
-
-static DbrBool
-insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
-{
-    struct FirSqlStore* store = journ_implof(journ);
-    struct FirSqlite* impl = &store->impl;
-    switch (stmt->type) {
-    case DBR_INSERT_EXEC:
-        return fir_sqlite_insert_exec(impl,
-                                      stmt->insert_exec.id,
-                                      stmt->insert_exec.order,
-                                      stmt->insert_exec.c.trader.rec->id,
-                                      stmt->insert_exec.c.accnt.rec->id,
-                                      stmt->insert_exec.c.contr.rec->id,
-                                      stmt->insert_exec.c.settl_date,
-                                      stmt->insert_exec.c.ref,
-                                      stmt->insert_exec.c.status,
-                                      stmt->insert_exec.c.action,
-                                      stmt->insert_exec.c.ticks,
-                                      stmt->insert_exec.c.lots,
-                                      stmt->insert_exec.c.resd,
-                                      stmt->insert_exec.c.exec,
-                                      stmt->insert_exec.c.last_ticks,
-                                      stmt->insert_exec.c.last_lots,
-                                      stmt->insert_exec.c.min_lots,
-                                      stmt->insert_exec.match,
-                                      stmt->insert_exec.role,
-                                      stmt->insert_exec.cpty.rec->id,
-                                      stmt->insert_exec.created);
-    case DBR_ACK_TRADE:
-        return fir_sqlite_ack_trade(impl,
-                                    stmt->ack_trade.id,
-                                    stmt->ack_trade.now);
-    default:
-        abort();
+    for (struct DbrSlNode* node = first; node; node = node->next) {
+        struct DbrExec* exec = dbr_shared_exec_entry(node);
+        if (!fir_sqlite_insert_exec(impl, exec)) {
+            fir_sqlite_rollback_trans(impl);
+            goto fail1;
+        }
     }
+    if (!fir_sqlite_commit_trans(impl))
+        goto fail1;
+
+    return DBR_TRUE;
+ fail1:
+    return DBR_FALSE;
 }
 
 static DbrBool
-ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
+insert_exec(DbrJourn journ, struct DbrExec* exec)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_ack_trade(impl, id, now);
+    return fir_sqlite_insert_exec(impl, exec);
+}
+
+static DbrBool
+update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
+{
+    struct FirSqlStore* store = journ_implof(journ);
+    struct FirSqlite* impl = &store->impl;
+    return fir_sqlite_update_exec(impl, id, modified);
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
     .alloc_id = alloc_id,
-    .begin_trans = begin_trans,
-    .commit_trans = commit_trans,
-    .rollback_trans = rollback_trans,
+    .insert_execs = insert_execs,
     .insert_exec = insert_exec,
-    .insert_stmt = insert_stmt,
-    .ack_trade = ack_trade
+    .update_exec = update_exec
 };
 
 static ssize_t

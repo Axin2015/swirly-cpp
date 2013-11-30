@@ -30,22 +30,13 @@ struct DbrJournVtbl {
     (*alloc_id)(DbrJourn journ);
 
     DbrBool
-    (*begin_trans)(DbrJourn journ);
+    (*insert_execs)(DbrJourn journ, struct DbrSlNode* first);
 
     DbrBool
-    (*commit_trans)(DbrJourn journ);
+    (*insert_exec)(DbrJourn journ, struct DbrExec* exec);
 
     DbrBool
-    (*rollback_trans)(DbrJourn journ);
-
-    DbrBool
-    (*insert_exec)(DbrJourn journ, const struct DbrExec* exec);
-
-    DbrBool
-    (*insert_stmt)(DbrJourn journ, const struct DbrStmt* stmt);
-
-    DbrBool
-    (*ack_trade)(DbrJourn journ, DbrIden id, DbrMillis now);
+    (*update_exec)(DbrJourn journ, DbrIden id, DbrMillis modified);
 };
 
 static inline DbrIden
@@ -55,39 +46,21 @@ dbr_journ_alloc_id(DbrJourn journ)
 }
 
 static inline DbrBool
-dbr_journ_begin_trans(DbrJourn journ)
+dbr_journ_insert_execs(DbrJourn journ, struct DbrSlNode* first)
 {
-    return journ->vtbl->begin_trans(journ);
+    return journ->vtbl->insert_execs(journ, first);
 }
 
 static inline DbrBool
-dbr_journ_commit_trans(DbrJourn journ)
-{
-    return journ->vtbl->commit_trans(journ);
-}
-
-static inline DbrBool
-dbr_journ_rollback_trans(DbrJourn journ)
-{
-    return journ->vtbl->rollback_trans(journ);
-}
-
-static inline DbrBool
-dbr_journ_insert_exec(DbrJourn journ, const struct DbrExec* exec)
+dbr_journ_insert_exec(DbrJourn journ, struct DbrExec* exec)
 {
     return journ->vtbl->insert_exec(journ, exec);
 }
 
 static inline DbrBool
-dbr_journ_insert_stmt(DbrJourn journ, const struct DbrStmt* stmt)
+dbr_journ_update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
-    return journ->vtbl->insert_stmt(journ, stmt);
-}
-
-static inline DbrBool
-dbr_journ_ack_trade(DbrJourn journ, DbrIden id, DbrMillis now)
-{
-    return journ->vtbl->ack_trade(journ, id, now);
+    return journ->vtbl->update_exec(journ, id, modified);
 }
 
 /** @} */

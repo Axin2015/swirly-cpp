@@ -136,7 +136,6 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
     dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
     dbr_log_debug2("sizeof DbrExec=%zu", sizeof(struct DbrExec));
-    dbr_log_debug2("sizeof DbrStmt=%zu", sizeof(struct DbrStmt));
 #endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
         goto fail1;
@@ -400,18 +399,6 @@ DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 {
     elm_pool_free_posn(pool, posn);
-}
-
-DBR_API struct DbrStmt*
-dbr_pool_alloc_stmt(DbrPool pool)
-{
-    return elm_pool_alloc_stmt(pool);
-}
-
-DBR_API void
-dbr_pool_free_stmt(DbrPool pool, struct DbrStmt* stmt)
-{
-    elm_pool_free_stmt(pool, stmt);
 }
 
 DBR_API void
