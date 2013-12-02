@@ -332,7 +332,6 @@ enum DbrStatus {
     DBR_NEW = 1,
     DBR_REVISE,
     DBR_CANCEL,
-    DBR_REJECT,
     DBR_TRADE
 };
 

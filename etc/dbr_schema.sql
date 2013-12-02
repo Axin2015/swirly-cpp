@@ -33,9 +33,7 @@ INSERT INTO status (id, mnem) VALUES (2, 'REVISE')
 ;
 INSERT INTO status (id, mnem) VALUES (3, 'CANCEL')
 ;
-INSERT INTO status (id, mnem) VALUES (4, 'REJECT')
-;
-INSERT INTO status (id, mnem) VALUES (5, 'TRADE')
+INSERT INTO status (id, mnem) VALUES (4, 'TRADE')
 ;
 
 CREATE TABLE action (
@@ -387,7 +385,7 @@ CREATE VIEW trade_v AS
   ON e.role = r.id
   INNER JOIN accnt p
   ON e.cpty = p.id
-  WHERE e.status = 5
+  WHERE e.status = 4
 ;
 
 CREATE VIEW posn_v AS
@@ -399,7 +397,7 @@ CREATE VIEW posn_v AS
   SUM(e.last_lots * e.last_ticks) licks,
   SUM(e.last_lots) lots
   FROM exec e
-  WHERE e.status = 5
+  WHERE e.status = 4
   GROUP BY e.accnt, e.contr, e.settl_date, e.action
 ;
 

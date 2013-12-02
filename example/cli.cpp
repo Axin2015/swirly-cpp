@@ -84,9 +84,6 @@ strstatus(int status) noexcept
     case DBR_CANCEL:
         sym = "CANCEL";
         break;
-    case DBR_REJECT:
-        sym = "REJECT";
-        break;
     case DBR_TRADE:
         sym = "TRADE";
         break;
