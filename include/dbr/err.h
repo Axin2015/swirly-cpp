@@ -70,7 +70,14 @@ dbr_err_clear(void);
  */
 
 DBR_API void
-dbr_err_print(const char* s);
+dbr_err_print(void);
+
+/**
+ * @brief Print current error with string prefix using logger.
+ */
+
+DBR_API void
+dbr_err_prints(const char* s);
 
 DBR_API void
 dbr_err_set_(int num, const char* file, int line, const char* msg);

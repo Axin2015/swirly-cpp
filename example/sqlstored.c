@@ -55,18 +55,18 @@ read_entity(const struct DbrBody* req)
     DbrModel model = dbr_sqlstore_model(store);
 
     if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {
-        dbr_err_print("dbr_model_read_entity() failed");
+        dbr_err_prints("dbr_model_read_entity() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
     dbr_pool_free_entities(pool, rep.entity_rep.type, rep.entity_rep.first);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
     if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return false;
 }
 
@@ -78,17 +78,17 @@ insert_execs(struct DbrBody* req)
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_insert_execs(journ, req->insert_execs_req.first)) {
-        dbr_err_print("dbr_journ_insert_execs() failed");
+        dbr_err_prints("dbr_journ_insert_execs() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
     if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return false;
 }
 
@@ -100,17 +100,17 @@ insert_exec(struct DbrBody* req)
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec)) {
-        dbr_err_print("dbr_journ_insert_exec() failed");
+        dbr_err_prints("dbr_journ_insert_exec() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
     if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return false;
 }
 
@@ -122,17 +122,17 @@ update_exec(struct DbrBody* req)
     DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_update_exec(journ, req->update_exec_req.id, req->update_exec_req.modified)) {
-        dbr_err_print("dbr_journ_update_exec() failed");
+        dbr_err_prints("dbr_journ_update_exec() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
     if (!ok)
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
     if (!dbr_send_body(sock, &rep, false))
-        dbr_err_print("dbr_send_body() failed");
+        dbr_err_prints("dbr_send_body() failed");
     return false;
 }
 
@@ -144,7 +144,7 @@ run(void)
         if (!dbr_recv_body(sock, pool, &req)) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
-            dbr_err_print("dbr_recv_msg() failed");
+            dbr_err_prints("dbr_recv_msg() failed");
             goto fail1;
         }
         switch (req.type) {
@@ -182,13 +182,13 @@ main(int argc, char* argv[])
 
     pool = dbr_pool_create();
     if (!pool) {
-        dbr_err_print("dbr_pool_create() failed");
+        dbr_err_prints("dbr_pool_create() failed");
         goto exit1;
     }
 
     store = dbr_sqlstore_create(1, "doobry.db");
     if (!store) {
-        dbr_err_print("dbr_sqlstore_create() failed");
+        dbr_err_prints("dbr_sqlstore_create() failed");
         goto exit2;
     }
 

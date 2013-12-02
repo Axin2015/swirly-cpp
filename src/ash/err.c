@@ -40,7 +40,13 @@ dbr_err_clear(void)
 }
 
 DBR_API void
-dbr_err_print(const char* s)
+dbr_err_print(void)
+{
+    dbr_log_error("%s:%d: %s (%d)", err.file, err.line, err.msg, err.num);
+}
+
+DBR_API void
+dbr_err_prints(const char* s)
 {
     dbr_log_error("%s:%d: %s: %s (%d)", err.file, err.line, s, err.msg, err.num);
 }
