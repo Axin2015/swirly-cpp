@@ -63,6 +63,8 @@ run(const TestCase& tc)
 int
 main(int argc, char* argv[])
 {
+    srand(time(NULL));
+
     if (argc > 1) {
         // Run specific test-cases according to arguments.
         int n = 0;
