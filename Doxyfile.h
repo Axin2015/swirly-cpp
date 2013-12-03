@@ -71,6 +71,11 @@
  */
 
 /**
+ * @defgroup Prioq Prioq
+ * @ingroup Cont
+ */
+
+/**
  * @defgroup Queue Queue
  * @ingroup Cont
  */

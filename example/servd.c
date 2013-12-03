@@ -90,9 +90,17 @@ send_posn(DbrIden req_id, struct DbrPosn* posn)
     DbrAccnt accnt = dbr_serv_accnt(serv, posn->accnt.rec);
     for (struct DbrRbNode* node = dbr_accnt_first_memb(accnt);
          node != DBR_ACCNT_END_MEMB; node = dbr_rbnode_next(node)) {
+
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
+        const char* trader = memb->trader.rec->mnem;
+        if (zmq_send(sock, trader, strnlen(trader, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+            dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+            dbr_err_print();
+            goto fail1;
+        }
+
         // FIXME: pack message once for all traders.
-        if (!dbr_send_msg(sock, memb->trader.rec->mnem, &rep, true)) {
+        if (!dbr_send_body(sock, &rep, true)) {
             dbr_err_prints("dbr_send_msg() failed");
             goto fail1;
         }
