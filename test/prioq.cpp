@@ -26,7 +26,7 @@ TEST_CASE(prioq_rand)
     struct DbrPrioq pq;
     dbr_prioq_init(&pq);
 
-    for (int i = 0; i < 128; ++i)
+    for (int i = 0; i < 1024; ++i)
         dbr_prioq_push(&pq, rand() % 1000, 0);
 
     long prev = 0;
