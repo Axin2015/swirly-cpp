@@ -44,16 +44,23 @@ dbr_prioq_term(struct DbrPrioq* pq);
 DBR_API DbrBool
 dbr_prioq_init(struct DbrPrioq* pq);
 
-DBR_API DbrBool
-dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id);
-
-DBR_API DbrBool
-dbr_prioq_pop(struct DbrPrioq* pq, struct DbrPair* elem);
-
 // Clear existing id.
 
 DBR_API DbrBool
 dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id);
+
+DBR_API DbrBool
+dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id);
+
+DBR_API void
+dbr_prioq_pop(struct DbrPrioq* pq);
+
+static inline const struct DbrPair*
+dbr_prioq_top(struct DbrPrioq* pq)
+{
+    // Root has lowest value.
+    return pq->size > 0 ? &pq->elems[1] : NULL;
+}
 
 /** @} */
 

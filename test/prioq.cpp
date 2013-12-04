@@ -26,14 +26,16 @@ TEST_CASE(prioq_rand)
     struct DbrPrioq pq;
     dbr_prioq_init(&pq);
 
-    for (int i = 0; i < 1024; ++i)
-        dbr_prioq_push(&pq, rand() % 1000, 0);
+    for (int i = 1; i <= 1024; ++i)
+        dbr_prioq_push(&pq, rand() % 1000, i);
 
     long prev = 0;
-    struct DbrPair elem;
-    while (dbr_prioq_pop(&pq, &elem)) {
-        check(elem.key >= prev);
-        prev = elem.key;
+
+    const struct DbrPair* elem;
+    while ((elem = dbr_prioq_top(&pq))) {
+        check(elem->key >= prev);
+        prev = elem->key;
+        dbr_prioq_pop(&pq);
     }
     dbr_prioq_term(&pq);
 }

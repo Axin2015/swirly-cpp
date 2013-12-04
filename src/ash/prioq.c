@@ -17,6 +17,7 @@
  */
 #include <dbr/prioq.h>
 
+#include <assert.h>
 #include <stdlib.h> // malloc()
 
 /*
@@ -100,6 +101,23 @@ sift_down(struct DbrPrioq* pq)
     // heap(1, n)
 }
 
+static void
+flush(struct DbrPrioq* pq)
+{
+    // While not empty.
+    while (pq->size > 0) {
+        // Done if top has valid id.
+        if (pq->elems[1].id != 0)
+            break;
+        // Fill gap with last.
+        pq->elems[1] = pq->elems[pq->size--];
+        // Restore invariant.
+        // heap(2, n)
+        sift_down(pq);
+        // heap(1, n)
+    }
+}
+
 static DbrBool
 grow(struct DbrPrioq* pq)
 {
@@ -113,6 +131,19 @@ grow(struct DbrPrioq* pq)
     pq->capacity = capacity;
     pq->elems = elems;
     return DBR_TRUE;
+}
+
+static void
+pop(struct DbrPrioq* pq)
+{
+    assert(pq->size > 0);
+    // Fill gap with last.
+    pq->elems[1] = pq->elems[pq->size--];
+    // Restore invariant.
+    // heap(2, n)
+    sift_down(pq);
+    // heap(1, n)
+    flush(pq);
 }
 
 DBR_API void
@@ -133,8 +164,30 @@ dbr_prioq_init(struct DbrPrioq* pq)
 }
 
 DBR_API DbrBool
+dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
+{
+    assert(id != 0);
+    if (pq->size > 0) {
+        // If top element matches then pop and flush.
+        if (pq->elems[1].id == id) {
+            pop(pq);
+            return DBR_TRUE;
+        }
+        // Linear search on remaining.
+        for (size_t i = 2; i <= pq->size; ++i)
+            if (pq->elems[i].id == id) {
+                // Some element other than top.
+                pq->elems[i].id = 0;
+                return DBR_TRUE;
+            }
+    }
+    return DBR_FALSE;
+}
+
+DBR_API DbrBool
 dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
 {
+    assert(id != 0);
     if (pq->capacity <= pq->size && !grow(pq))
         return DBR_FALSE;
     // Push back.
@@ -147,29 +200,8 @@ dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
     return DBR_TRUE;
 }
 
-DBR_API DbrBool
-dbr_prioq_pop(struct DbrPrioq* pq, struct DbrPair* elem)
+DBR_API void
+dbr_prioq_pop(struct DbrPrioq* pq)
 {
-    if (pq->size < 1)
-        return DBR_FALSE;
-    // Root has lowest value.
-    *elem = pq->elems[1];
-    // Fill gap with last.
-    pq->elems[1] = pq->elems[pq->size--];
-    // Restore invariant.
-    // heap(2, n)
-    sift_down(pq);
-    // heap(1, n)
-    return DBR_TRUE;
-}
-
-DBR_API DbrBool
-dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
-{
-    for (size_t i = 1; i <= pq->size; ++i)
-        if (pq->elems[i].id == id) {
-            pq->elems[i].id = 0;
-            return DBR_TRUE;
-        }
-    return DBR_FALSE;
+    pop(pq);
 }
