@@ -17,6 +17,8 @@
  */
 #include <dbr/prioq.h>
 
+#include <dbr/err.h>
+
 #include <assert.h>
 #include <stdlib.h> // malloc()
 
@@ -124,8 +126,10 @@ grow(struct DbrPrioq* pq)
     const size_t capacity = pq->capacity * 2;
     // One-based index.
     struct DbrPair* elems = realloc(pq->elems, sizeof(struct DbrPair) * (1 + capacity));
-    if (!elems)
+    if (!elems) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         return DBR_FALSE;
+    }
 
     // Commit.
     pq->capacity = capacity;
@@ -160,7 +164,11 @@ dbr_prioq_init(struct DbrPrioq* pq)
     pq->capacity = 64;
     // One-based index.
     pq->elems = malloc(sizeof(struct DbrPair) * (1 + pq->capacity));
-    return pq->elems != NULL;
+    if (!pq->elems) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
 }
 
 DBR_API DbrBool
