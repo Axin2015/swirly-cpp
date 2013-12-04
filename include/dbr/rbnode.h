@@ -27,8 +27,6 @@
  * @{
  */
 
-typedef long DbrKey;
-
 /**
  * @brief Red-black node.
  */

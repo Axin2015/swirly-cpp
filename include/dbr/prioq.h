@@ -28,8 +28,8 @@
  */
 
 struct DbrPair {
-    long key;
-    long val;
+    DbrKey key;
+    DbrIden id;
 };
 
 struct DbrPrioq {
@@ -45,10 +45,15 @@ DBR_API DbrBool
 dbr_prioq_init(struct DbrPrioq* pq);
 
 DBR_API DbrBool
-dbr_prioq_push(struct DbrPrioq* pq, long key, long val);
+dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id);
 
 DBR_API DbrBool
 dbr_prioq_pop(struct DbrPrioq* pq, struct DbrPair* elem);
+
+// Clear existing id.
+
+DBR_API DbrBool
+dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id);
 
 /** @} */
 

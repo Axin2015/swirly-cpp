@@ -33,6 +33,7 @@
  */
 
 typedef int DbrBool;
+typedef long DbrKey;
 typedef long DbrIden;
 
 enum {

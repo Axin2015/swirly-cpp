@@ -36,28 +36,28 @@
 
  */
 
-static inline int
-invariant(struct DbrPrioq* pq, int c, int p)
+static inline DbrBool
+invariant(struct DbrPrioq* pq, size_t c, size_t p)
 {
     return pq->elems[p].key <= pq->elems[c].key;
 }
 
-static inline int
-left_child(int i)
+static inline size_t
+left_child(size_t i)
 {
     // i * 2
     return i << 1;
 }
 
-static inline int
-parent(int i)
+static inline size_t
+parent(size_t i)
 {
     // i / 2
     return i >> 1;
 }
 
 static inline void
-swap(struct DbrPrioq* pq, int i, int j)
+swap(struct DbrPrioq* pq, size_t i, size_t j)
 {
     struct DbrPair tmp = pq->elems[i];
     pq->elems[i] = pq->elems[j];
@@ -68,7 +68,7 @@ static void
 sift_up(struct DbrPrioq* pq)
 {
     // heap(1, n - 1)
-    int c, p;
+    size_t c, p;
     // While child is not root.
     for (c = pq->size; c != 1; c = p) {
         p = parent(c);
@@ -84,12 +84,12 @@ static void
 sift_down(struct DbrPrioq* pq)
 {
     // heap(2, n)
-    const int n = pq->size;
-    int c, p;
+    const size_t n = pq->size;
+    size_t c, p;
     // While parent has child.
     for (p = 1; (c = left_child(p)) && c <= n; p = c) {
         // Use child with lower value.
-        const int r = c + 1;
+        const size_t r = c + 1;
         if (r <= n && pq->elems[r].key < pq->elems[c].key)
             c = r;
         if (invariant(pq, c, p))
@@ -133,13 +133,13 @@ dbr_prioq_init(struct DbrPrioq* pq)
 }
 
 DBR_API DbrBool
-dbr_prioq_push(struct DbrPrioq* pq, long key, long val)
+dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
 {
     if (pq->capacity <= pq->size && !grow(pq))
         return DBR_FALSE;
     // Push back.
     pq->elems[++pq->size].key = key;
-    pq->elems[pq->size].val = val;
+    pq->elems[pq->size].id = id;
     // Restore invariant.
     // heap(1, n - 1)
     sift_up(pq);
@@ -161,4 +161,15 @@ dbr_prioq_pop(struct DbrPrioq* pq, struct DbrPair* elem)
     sift_down(pq);
     // heap(1, n)
     return DBR_TRUE;
+}
+
+DBR_API DbrBool
+dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
+{
+    for (size_t i = 1; i <= pq->size; ++i)
+        if (pq->elems[i].id == id) {
+            pq->elems[i].id = 0;
+            return DBR_TRUE;
+        }
+    return DBR_FALSE;
 }
