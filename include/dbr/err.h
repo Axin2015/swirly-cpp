@@ -49,6 +49,10 @@ enum DbrErrno {
      */
     DBR_EINVAL,
     /**
+     * @brief Timeout.
+     */
+    DBR_ETIMEOUT,
+    /**
      * @brief User-defined errors must be >=0x400.
      */
     DBR_EUSER = 0x400
