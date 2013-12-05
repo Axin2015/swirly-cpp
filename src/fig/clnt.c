@@ -22,6 +22,7 @@
 #include <dbr/clnt.h>
 #include <dbr/err.h>
 #include <dbr/msg.h>
+#include <dbr/prioq.h>
 #include <dbr/queue.h>
 
 #include <zmq.h>
@@ -37,6 +38,7 @@ struct FigClnt {
     DbrTrader trader;
     DbrIden id;
     DbrPool pool;
+    struct DbrPrioq prioq;
     struct FigCache cache;
     struct FigIndex index;
 };
@@ -240,6 +242,8 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     clnt->trader = NULL;
     clnt->id = seed;
     clnt->pool = pool;
+    if (!dbr_prioq_init(&clnt->prioq))
+        goto fail3;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
 
@@ -271,6 +275,7 @@ dbr_clnt_destroy(DbrClnt clnt)
 {
     if (clnt) {
         fig_cache_term(&clnt->cache);
+        dbr_prioq_term(&clnt->prioq);
         zmq_close(clnt->sock);
         free(clnt);
     }
