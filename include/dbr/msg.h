@@ -33,7 +33,6 @@ enum {
     DBR_SESS_HB = 1,
     DBR_STATUS_REP,
     DBR_ENTITY_REP,
-    DBR_CYCLE_REP,
     DBR_ORDER_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
@@ -79,19 +78,6 @@ struct DbrBody {
             // Set by dbr_body_len();
             size_t count_;
         } entity_rep;
-        struct {
-            struct DbrOrder* new_order;
-            // dbr_shared_exec_entry()
-            struct DbrSlNode* first_exec;
-            // dbr_shared_posn_entry()
-            struct DbrSlNode* first_posn;
-            /**
-             * @privatesection
-             */
-            // Set by dbr_body_len();
-            size_t exec_count_;
-            size_t posn_count_;
-        } cycle_rep;
         struct {
             struct DbrOrder* order;
         } order_rep;

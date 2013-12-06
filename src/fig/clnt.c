@@ -24,12 +24,15 @@
 #include <dbr/msg.h>
 #include <dbr/prioq.h>
 #include <dbr/queue.h>
+#include <dbr/util.h>
 
 #include <zmq.h>
 
 #include <stdbool.h>
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
+
+enum { TIMEOUT = 5000 };
 
 struct FigClnt {
     void* ctx;
@@ -335,8 +338,11 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     body.place_order_req.lots = lots;
     body.place_order_req.min_lots = min_lots;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
+
+    if (!dbr_send_body(clnt->sock, &body, false))
+        goto fail2;
 
     return body.req_id;
 #if 0
@@ -367,6 +373,8 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     body.cycle_rep.first_posn = q.first;
     return body.cycle_rep.new_order;
 #endif
+ fail2:
+    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -380,8 +388,11 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
+
+    if (!dbr_send_body(clnt->sock, &body, false))
+        goto fail2;
 
     return body.req_id;
 #if 0
@@ -393,6 +404,8 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
 #endif
+ fail2:
+    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -406,8 +419,11 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
+
+    if (!dbr_send_body(clnt->sock, &body, false))
+        goto fail2;
 
     return body.req_id;
 #if 0
@@ -419,6 +435,8 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
 #endif
+ fail2:
+    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -431,8 +449,11 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
     body.type = DBR_CANCEL_ORDER_ID_REQ;
     body.cancel_order_id_req.id = id;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
+
+    if (!dbr_send_body(clnt->sock, &body, false))
+        goto fail2;
 
     return body.req_id;
 #if 0
@@ -444,6 +465,8 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
 #endif
+ fail2:
+    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -456,8 +479,11 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
     body.type = DBR_CANCEL_ORDER_REF_REQ;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
+
+    if (!dbr_send_body(clnt->sock, &body, false))
+        goto fail2;
 
     return body.req_id;
 #if 0
@@ -469,6 +495,8 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
 #endif
+ fail2:
+    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -481,8 +509,11 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     body.type = DBR_ACK_TRADE_REQ;
     body.ack_trade_req.id = id;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
+
+    if (!dbr_send_body(clnt->sock, &body, false))
+        goto fail2;
 
     return body.req_id;
 #if 0
@@ -494,6 +525,8 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     }
     return true;
 #endif
+ fail2:
+    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -518,13 +551,29 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms)
         dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
-    const int num = items[0].revents & ZMQ_POLLIN ? 1 : 0;
-    if (num > 0) {
-        struct DbrBody body;
-        if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-            goto fail1;
+    if (!(items[0].revents & ZMQ_POLLIN))
+        return 0;
+
+    struct DbrBody body;
+    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
+        goto fail1;
+
+    switch (body.type) {
+    case DBR_STATUS_REP:
+        break;
+    case DBR_ENTITY_REP:
+        break;
+    case DBR_ORDER_REP:
+        break;
+    case DBR_EXEC_REP:
+        break;
+    case DBR_POSN_REP:
+        break;
+    default:
+        dbr_err_setf(DBR_EIO, "unknown msg-type '%d'", body.type);
+        goto fail1;
     }
-    return num;
+    return body.type;
  fail1:
     return -1;
 }
