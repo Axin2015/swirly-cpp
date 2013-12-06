@@ -38,9 +38,11 @@ struct FigClnt {
     DbrTrader trader;
     DbrIden id;
     DbrPool pool;
-    struct DbrPrioq prioq;
     struct FigCache cache;
     struct FigIndex index;
+    struct DbrQueue execs;
+    struct DbrTree posns;
+    struct DbrPrioq prioq;
 };
 
 static void
@@ -242,10 +244,12 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     clnt->trader = NULL;
     clnt->id = seed;
     clnt->pool = pool;
-    if (!dbr_prioq_init(&clnt->prioq))
-        goto fail3;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
+    dbr_queue_init(&clnt->execs);
+    dbr_tree_init(&clnt->posns);
+    if (!dbr_prioq_init(&clnt->prioq))
+        goto fail4;
 
     // Data structures are fully initialised at this point.
 
@@ -262,6 +266,8 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
         goto fail1;
     }
     return clnt;
+ fail4:
+    fig_cache_term(&clnt->cache);
  fail3:
     zmq_close(sock);
  fail2:
@@ -274,8 +280,10 @@ DBR_API void
 dbr_clnt_destroy(DbrClnt clnt)
 {
     if (clnt) {
-        fig_cache_term(&clnt->cache);
+        // Ensure that executions are freed.
+        dbr_clnt_clear(clnt);
         dbr_prioq_term(&clnt->prioq);
+        fig_cache_term(&clnt->cache);
         zmq_close(clnt->sock);
         free(clnt);
     }
@@ -311,7 +319,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
     return fig_accnt_lazy(arec, clnt->pool);
 }
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
@@ -330,9 +338,8 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
+    return body.req_id;
+#if 0
     if (body.type == DBR_STATUS_REP) {
         dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
@@ -359,11 +366,12 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     }
     body.cycle_rep.first_posn = q.first;
     return body.cycle_rep.new_order;
+#endif
  fail1:
-    return NULL;
+    return -1;
 }
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
 {
     struct DbrBody body;
@@ -375,9 +383,8 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
+    return body.req_id;
+#if 0
     if (body.type == DBR_STATUS_REP) {
         dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
@@ -385,11 +392,12 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
 
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
+#endif
  fail1:
-    return NULL;
+    return -1;
 }
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
 {
     struct DbrBody body;
@@ -401,9 +409,8 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
+    return body.req_id;
+#if 0
     if (body.type == DBR_STATUS_REP) {
         dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
@@ -411,11 +418,12 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
 
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
+#endif
  fail1:
-    return NULL;
+    return -1;
 }
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
 {
     struct DbrBody body;
@@ -426,9 +434,8 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
+    return body.req_id;
+#if 0
     if (body.type == DBR_STATUS_REP) {
         dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
@@ -436,11 +443,12 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
 
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
+#endif
  fail1:
-    return NULL;
+    return -1;
 }
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 {
     struct DbrBody body;
@@ -451,9 +459,8 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
+    return body.req_id;
+#if 0
     if (body.type == DBR_STATUS_REP) {
         dbr_err_set(body.status_rep.num, body.status_rep.msg);
         goto fail1;
@@ -461,11 +468,12 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 
     assert(body.type == DBR_ORDER_REP);
     return fig_trader_update_order(clnt->trader, body.order_rep.order);
+#endif
  fail1:
-    return NULL;
+    return -1;
 }
 
-DBR_API DbrBool
+DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
 {
     struct DbrBody body;
@@ -476,9 +484,8 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail1;
 
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        goto fail1;
-
+    return body.req_id;
+#if 0
     assert(body.type == DBR_STATUS_REP);
 
     if (body.status_rep.num != 0) {
@@ -486,6 +493,38 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
         goto fail1;
     }
     return true;
+#endif
  fail1:
-    return false;
+    return -1;
+}
+
+DBR_API void
+dbr_clnt_clear(DbrClnt clnt)
+{
+    while (!dbr_queue_empty(&clnt->execs)) {
+        struct DbrExec* exec = dbr_clnt_exec_entry(dbr_queue_pop(&clnt->execs));
+        // Trades are owned by trader.
+        if (exec->c.status != DBR_TRADE)
+            dbr_pool_free_exec(clnt->pool, exec);
+    }
+    dbr_tree_init(&clnt->posns);
+}
+
+DBR_API int
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms)
+{
+    zmq_pollitem_t items[] = { { clnt->sock, 0, ZMQ_POLLIN, 0 } };
+    if (zmq_poll(items, 1, ms) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
+    }
+    const int num = items[0].revents & ZMQ_POLLIN ? 1 : 0;
+    if (num > 0) {
+        struct DbrBody body;
+        if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
+            goto fail1;
+    }
+    return num;
+ fail1:
+    return -1;
 }

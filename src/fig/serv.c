@@ -37,10 +37,10 @@ struct FigServ {
     DbrModel model;
     DbrPool pool;
     struct FigCache cache;
-    struct DbrTree books;
     struct FigIndex index;
     struct DbrQueue execs;
     struct DbrTree posns;
+    struct DbrTree books;
 };
 
 static inline struct DbrBook*
@@ -393,10 +393,10 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     serv->model = model;
     serv->pool = pool;
     fig_cache_init(&serv->cache, term_state, pool);
-    dbr_tree_init(&serv->books);
     fig_index_init(&serv->index);
     dbr_queue_init(&serv->execs);
     dbr_tree_init(&serv->posns);
+    dbr_tree_init(&serv->books);
 
     // Data structures are fully initialised at this point.
 

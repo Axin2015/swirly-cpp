@@ -22,6 +22,8 @@
 #include <assert.h>
 #include <stdlib.h> // malloc()
 
+enum { INVAL = -1 };
+
 /*
     Heap invariant:
 
@@ -109,7 +111,7 @@ flush(struct DbrPrioq* pq)
     // While not empty.
     while (pq->size > 0) {
         // Done if top has valid id.
-        if (pq->elems[1].id != 0)
+        if (pq->elems[1].id != INVAL)
             break;
         // Fill gap with last.
         pq->elems[1] = pq->elems[pq->size--];
@@ -130,7 +132,6 @@ grow(struct DbrPrioq* pq)
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return DBR_FALSE;
     }
-
     // Commit.
     pq->capacity = capacity;
     pq->elems = elems;
@@ -174,7 +175,7 @@ dbr_prioq_init(struct DbrPrioq* pq)
 DBR_API DbrBool
 dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
 {
-    assert(id != 0);
+    assert(id != INVAL);
     if (pq->size > 0) {
         // If top element matches then pop and flush.
         if (pq->elems[1].id == id) {
@@ -184,8 +185,8 @@ dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
         // Linear search on remaining.
         for (size_t i = 2; i <= pq->size; ++i)
             if (pq->elems[i].id == id) {
-                // Some element other than top.
-                pq->elems[i].id = 0;
+                // Clear some element other than top.
+                pq->elems[i].id = INVAL;
                 return DBR_TRUE;
             }
     }
@@ -195,7 +196,7 @@ dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
 DBR_API DbrBool
 dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
 {
-    assert(id != 0);
+    assert(id != INVAL);
     if (pq->capacity <= pq->size && !grow(pq))
         return DBR_FALSE;
     // Push back.

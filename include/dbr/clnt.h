@@ -73,7 +73,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
  * All members of result are set to zero on failure.
  */
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots);
 
@@ -83,22 +83,28 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 // 2. less than min lots;
 // 3. greater than original lots.
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots);
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots);
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id);
 
-DBR_API struct DbrOrder*
+DBR_API DbrIden
 dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
 
 // Invalidates any pointers to the trade.
 
-DBR_API DbrBool
+DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
+
+DBR_API void
+dbr_clnt_clear(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms);
 
 static inline struct DbrRec*
 dbr_clnt_rec_entry(struct DbrSlNode* node)

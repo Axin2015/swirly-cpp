@@ -248,53 +248,55 @@ public:
             throw_exception();
         return Accnt{accnt};
     }
-    OrderRef
+    DbrIden
     place(const char* accnt, const char* contr, DbrDate settl_date, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min_lots)
     {
-        DbrOrder* const order = dbr_clnt_place(impl_, accnt, contr, settl_date, ref, action,
-                                               ticks, lots, min_lots);
-        if (!order)
+        DbrIden req_id = dbr_clnt_place(impl_, accnt, contr, settl_date, ref, action, ticks,
+                                        lots, min_lots);
+        if (req_id < 0)
             throw_exception();
-        return OrderRef{*order};
+        return req_id;
     }
-    OrderRef
+    DbrIden
     revise(DbrIden id, DbrLots lots)
     {
-        DbrOrder* const order = dbr_clnt_revise_id(impl_, id, lots);
-        if (!order)
+        DbrIden req_id = dbr_clnt_revise_id(impl_, id, lots);
+        if (req_id < 0)
             throw_exception();
-        return OrderRef{*order};
+        return req_id;
     }
-    OrderRef
+    DbrIden
     revise(const char* ref, DbrLots lots)
     {
-        DbrOrder* const order = dbr_clnt_revise_ref(impl_, ref, lots);
-        if (!order)
+        DbrIden req_id = dbr_clnt_revise_ref(impl_, ref, lots);
+        if (req_id < 0)
             throw_exception();
-        return OrderRef{*order};
+        return req_id;
     }
-    OrderRef
+    DbrIden
     cancel(DbrIden id)
     {
-        DbrOrder* const order = dbr_clnt_cancel_id(impl_, id);
-        if (!order)
+        DbrIden req_id = dbr_clnt_cancel_id(impl_, id);
+        if (req_id < 0)
             throw_exception();
-        return OrderRef{*order};
+        return req_id;
     }
-    OrderRef
+    DbrIden
     cancel(const char* ref)
     {
-        DbrOrder* const order = dbr_clnt_cancel_ref(impl_, ref);
-        if (!order)
+        DbrIden req_id = dbr_clnt_cancel_ref(impl_, ref);
+        if (req_id < 0)
             throw_exception();
-        return OrderRef{*order};
+        return req_id;
     }
-    void
+    DbrIden
     ack_trade(DbrIden id)
     {
-        if (!dbr_clnt_ack_trade(impl_, id))
+        DbrIden req_id = dbr_clnt_ack_trade(impl_, id);
+        if (req_id < 0)
             throw_exception();
+        return req_id;
     }
 };
 

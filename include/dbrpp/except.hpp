@@ -108,7 +108,7 @@ throw_exception(int num, const char* file, int line, const char* msg)
     case DBR_EINVAL:
         throw InvalException{file, line, msg};
         break;
-    case DBR_TIMEOUT:
+    case DBR_ETIMEOUT:
         throw TimeoutException{file, line, msg};
         break;
     default:
