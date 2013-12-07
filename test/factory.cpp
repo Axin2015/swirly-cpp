@@ -118,7 +118,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
     else
         order->c.ref[0] = '\0';
 
-    order->c.status = 0;
+    order->c.state = 0;
     order->c.action = action;
     order->c.ticks = ticks;
     order->c.lots = lots;
@@ -155,7 +155,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
     else
         order->c.ref[0] = '\0';
 
-    order->c.status = 0;
+    order->c.state = 0;
     order->c.action = action;
     order->c.ticks = ticks;
     order->c.lots = lots;
@@ -192,7 +192,7 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden aid,
         strncpy(ptr->c.ref, ref, DBR_REF_MAX);
     else
         ptr->c.ref[0] = '\0';
-    ptr->c.status = 0;
+    ptr->c.state = 0;
     ptr->c.action = action;
     ptr->c.ticks = ticks;
     ptr->c.lots = lots;

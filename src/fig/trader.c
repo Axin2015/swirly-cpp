@@ -114,7 +114,7 @@ fig_trader_update_order(struct FigTrader* trader, struct DbrOrder* order)
         assert(curr->c.contr.rec == order->c.contr.rec);
         assert(curr->c.settl_date == order->c.settl_date);
         assert(strncmp(curr->c.ref, order->c.ref, DBR_REF_MAX) == 0);
-        curr->c.status = order->c.status;
+        curr->c.state = order->c.state;
         assert(curr->c.action == order->c.action);
         assert(curr->c.ticks == order->c.ticks);
         curr->c.lots = order->c.lots;

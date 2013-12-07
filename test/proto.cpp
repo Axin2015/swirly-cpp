@@ -135,7 +135,7 @@ TEST_CASE(proto_order)
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_date == in->c.settl_date);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
-    check(out.c.status == in->c.status);
+    check(out.c.state == in->c.state);
     check(out.c.action == in->c.action);
     check(out.c.ticks == in->c.ticks);
     check(out.c.lots == in->c.lots);
@@ -176,7 +176,7 @@ TEST_CASE(proto_trade)
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_date == in->c.settl_date);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
-    check(out.c.status == in->c.status);
+    check(out.c.state == in->c.state);
     check(out.c.action == in->c.action);
     check(out.c.ticks == in->c.ticks);
     check(out.c.lots == in->c.lots);

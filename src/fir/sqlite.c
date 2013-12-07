@@ -30,22 +30,22 @@
 
 #define INSERT_EXEC_SQL                                                 \
     "INSERT INTO exec (id, order_, trader, accnt, contr, settl_date,"   \
-    " ref, status, action, ticks, lots, resd, exec, last_ticks,"        \
-    " last_lots, min_lots, match, role, cpty, acked, created,"        \
+    " ref, state, action, ticks, lots, resd, exec, last_ticks,"         \
+    " last_lots, min_lots, match, role, cpty, acked, created,"          \
     " modified)"                                                        \
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"    \
     " ?, 0, ?, ?)"
 
-#define UPDATE_EXEC_SQL                                               \
-    "UPDATE exec SET acked = 1, modified = ?"                        \
+#define UPDATE_EXEC_SQL                                                 \
+    "UPDATE exec SET acked = 1, modified = ?"                           \
     " WHERE id = ?"
 
-#define SELECT_TRADER_SQL                                    \
-    "SELECT id, mnem, display, email"                        \
+#define SELECT_TRADER_SQL                                               \
+    "SELECT id, mnem, display, email"                                   \
     " FROM trader_v ORDER BY id"
 
-#define SELECT_ACCNT_SQL                                      \
-    "SELECT id, mnem, display, email"                         \
+#define SELECT_ACCNT_SQL                                                \
+    "SELECT id, mnem, display, email"                                   \
     " FROM accnt_v ORDER BY id"
 
 #define SELECT_CONTR_SQL                                                \
@@ -54,7 +54,7 @@
     " FROM contr_v ORDER BY id"
 
 #define SELECT_ORDER_SQL                                                \
-    "SELECT id, trader, accnt, contr, settl_date, ref, status,"         \
+    "SELECT id, trader, accnt, contr, settl_date, ref, state,"          \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, created, modified"                                      \
     " FROM order_ WHERE resd > 0 ORDER BY id"
@@ -65,12 +65,12 @@
     " min_lots, match, role, cpty, created"                             \
     " FROM trade_v WHERE acked = 0 ORDER BY id"
 
-#define SELECT_MEMB_SQL                                    \
-    "SELECT trader, accnt"                                 \
+#define SELECT_MEMB_SQL                                                 \
+    "SELECT trader, accnt"                                              \
     " FROM memb ORDER BY trader"
 
-#define SELECT_POSN_SQL                                         \
-    "SELECT accnt, contr, settl_date, action, licks, lots"      \
+#define SELECT_POSN_SQL                                                 \
+    "SELECT accnt, contr, settl_date, action, licks, lots"              \
     " FROM posn_v ORDER BY accnt, contr, settl_date, action"
 
 // Only called if failure occurs during cache load, so no need to free state members as they will
@@ -148,7 +148,7 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
         CONTR,
         SETTL_DATE,
         REF,
-        STATUS,
+        STATE,
         ACTION,
         TICKS,
         LOTS,
@@ -194,7 +194,7 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, STATUS, exec->c.status);
+    rc = sqlite3_bind_int(stmt, STATE, exec->c.state);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -534,7 +534,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         CONTR,
         SETTL_DATE,
         REF,
-        STATUS,
+        STATE,
         ACTION,
         TICKS,
         LOTS,
@@ -575,7 +575,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
                 order->c.ref[0] = '\0';
-            order->c.status = sqlite3_column_int(stmt, STATUS);
+            order->c.state = sqlite3_column_int(stmt, STATE);
             order->c.action = sqlite3_column_int(stmt, ACTION);
             order->c.ticks = sqlite3_column_int64(stmt, TICKS);
             order->c.lots = sqlite3_column_int64(stmt, LOTS);
@@ -588,12 +588,12 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             order->modified = sqlite3_column_int64(stmt, MODIFIED);
 
             dbr_log_debug3("order: id=%ld,trader=%ld,accnt=%ld,contr=%ld,settl_date=%d,"
-                           "ref=%.64s,status=%d,action=%d,ticks=%ld,lots=%ld,resd=%ld,"
+                           "ref=%.64s,state=%d,action=%d,ticks=%ld,lots=%ld,resd=%ld,"
                            "exec=%ld,last_ticks=%ld,last_lots=%ld,min_lots=%ld,"
                            "created=%ld,modified=%ld",
                            order->id, order->c.trader.id_only, order->c.accnt.id_only,
                            order->c.contr.id_only, order->c.settl_date, order->c.ref,
-                           order->c.status, order->c.action, order->c.ticks, order->c.lots,
+                           order->c.state, order->c.action, order->c.ticks, order->c.lots,
                            order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
                            order->c.min_lots, order->created, order->modified);
 

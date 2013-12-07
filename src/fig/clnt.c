@@ -537,7 +537,7 @@ dbr_clnt_clear(DbrClnt clnt)
     while (!dbr_queue_empty(&clnt->execs)) {
         struct DbrExec* exec = dbr_clnt_exec_entry(dbr_queue_pop(&clnt->execs));
         // Trades are owned by trader.
-        if (exec->c.status != DBR_TRADE)
+        if (exec->c.state != DBR_TRADE)
             dbr_pool_free_exec(clnt->pool, exec);
     }
     dbr_tree_init(&clnt->posns);

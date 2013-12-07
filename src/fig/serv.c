@@ -496,7 +496,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
         strncpy(new_order->c.ref, ref, DBR_REF_MAX);
     else
         new_order->c.ref[0] = '\0';
-    new_order->c.status = DBR_NEW;
+    new_order->c.state = DBR_NEW;
     new_order->c.action = action;
     new_order->c.ticks = ticks;
     new_order->c.lots = lots;
@@ -580,7 +580,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
 
     // Revise.
-    exec->c.status = DBR_REVISE;
+    exec->c.state = DBR_REVISE;
     exec->c.lots = lots;
 
     if (!dbr_journ_insert_exec(serv->journ, exec))
@@ -628,7 +628,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
 
     // Revise.
-    exec->c.status = DBR_REVISE;
+    exec->c.state = DBR_REVISE;
     exec->c.lots = lots;
 
     if (!dbr_journ_insert_exec(serv->journ, exec))
@@ -666,7 +666,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail1;
 
     // Cancel.
-    exec->c.status = DBR_CANCEL;
+    exec->c.state = DBR_CANCEL;
     exec->c.resd = 0;
 
     if (!dbr_journ_insert_exec(serv->journ, exec))
@@ -703,7 +703,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
         goto fail1;
 
     // Cancel.
-    exec->c.status = DBR_CANCEL;
+    exec->c.state = DBR_CANCEL;
     exec->c.resd = 0;
 
     if (!dbr_journ_insert_exec(serv->journ, exec))
@@ -749,7 +749,7 @@ dbr_serv_clear(DbrServ serv)
     while (!dbr_queue_empty(&serv->execs)) {
         struct DbrExec* exec = dbr_serv_exec_entry(dbr_queue_pop(&serv->execs));
         // Trades are owned by trader.
-        if (exec->c.status != DBR_TRADE)
+        if (exec->c.state != DBR_TRADE)
             dbr_pool_free_exec(serv->pool, exec);
     }
     dbr_tree_init(&serv->posns);

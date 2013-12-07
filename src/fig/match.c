@@ -152,7 +152,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         taker_exec->c.contr.rec = crec;
         taker_exec->c.settl_date = settl_date;
         strncpy(taker_exec->c.ref, taker->c.ref, DBR_REF_MAX);
-        taker_exec->c.status = DBR_TRADE;
+        taker_exec->c.state = DBR_TRADE;
         taker_exec->c.action = taker->c.action;
         taker_exec->c.ticks = taker->c.ticks;
         taker_exec->c.lots = taker->c.lots;
@@ -174,7 +174,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         maker_exec->c.contr.rec = crec;
         maker_exec->c.settl_date = settl_date;
         strncpy(maker_exec->c.ref, maker->c.ref, DBR_REF_MAX);
-        maker_exec->c.status = DBR_TRADE;
+        maker_exec->c.state = DBR_TRADE;
         maker_exec->c.action = maker->c.action;
         maker_exec->c.ticks = maker->c.ticks;
         maker_exec->c.lots = maker->c.lots;
@@ -205,7 +205,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
 
         // Commit taker order.
-        taker->c.status = DBR_TRADE;
+        taker->c.state = DBR_TRADE;
         taker->c.resd -= taken;
         taker->c.exec += taken;
         taker->c.last_ticks = last_ticks;

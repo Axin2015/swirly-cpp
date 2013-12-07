@@ -328,7 +328,7 @@ dbr_shared_posn_entry(struct DbrSlNode* node)
  * @{
  */
 
-enum DbrStatus {
+enum DbrState {
     DBR_NEW = 1,
     DBR_REVISE,
     DBR_CANCEL,
@@ -343,9 +343,9 @@ struct DbrCommon {
     // Ref is optional.
     DbrRef ref;
     /**
-     * @sa enum DbrStatus
+     * @sa enum DbrState
      */
-    int status;
+    int state;
     /**
      * @sa enum DbrAction
      */

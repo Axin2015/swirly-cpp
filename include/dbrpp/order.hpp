@@ -80,9 +80,9 @@ public:
         return Ref{impl_->c.ref};
     }
     int
-    status() const noexcept
+    state() const noexcept
     {
-        return impl_->c.status;
+        return impl_->c.state;
     }
     int
     action() const noexcept
@@ -150,7 +150,7 @@ operator <<(std::ostream& os, OrderRef order)
               << ",crec=" << order.crec().mnem()
               << ",settl_date=" << order.settl_date()
               << ",ref=" << order.ref()
-              << ",status=" << order.status()
+              << ",state=" << order.state()
               << ",action=" << order.action()
               << ",ticks=" << order.ticks()
               << ",lots=" << order.lots()

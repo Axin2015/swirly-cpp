@@ -21,19 +21,19 @@ PRAGMA foreign_keys = ON
 BEGIN TRANSACTION
 ;
 
-CREATE TABLE status (
+CREATE TABLE state (
   id INTEGER PRIMARY KEY,
   mnem TEXT NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO status (id, mnem) VALUES (1, 'NEW')
+INSERT INTO state (id, mnem) VALUES (1, 'NEW')
 ;
-INSERT INTO status (id, mnem) VALUES (2, 'REVISE')
+INSERT INTO state (id, mnem) VALUES (2, 'REVISE')
 ;
-INSERT INTO status (id, mnem) VALUES (3, 'CANCEL')
+INSERT INTO state (id, mnem) VALUES (3, 'CANCEL')
 ;
-INSERT INTO status (id, mnem) VALUES (4, 'TRADE')
+INSERT INTO state (id, mnem) VALUES (4, 'TRADE')
 ;
 
 CREATE TABLE action (
@@ -180,7 +180,7 @@ CREATE TABLE order_ (
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
   ref TEXT NULL,
-  status INTEGER NOT NULL REFERENCES status (id),
+  state INTEGER NOT NULL REFERENCES state (id),
   action INTEGER NOT NULL REFERENCES action (id),
   ticks INTEGER NOT NULL,
   lots INTEGER NOT NULL,
@@ -203,7 +203,7 @@ CREATE VIEW order_v AS
   c.mnem contr,
   o.settl_date,
   o.ref,
-  s.mnem status,
+  s.mnem state,
   o.action,
   o.ticks,
   o.lots,
@@ -215,8 +215,8 @@ CREATE VIEW order_v AS
   o.created,
   o.modified
   FROM order_ o
-  INNER JOIN status s
-  ON o.status = s.id
+  INNER JOIN state s
+  ON o.state = s.id
   INNER JOIN trader t
   ON o.trader = t.id
   INNER JOIN accnt a
@@ -233,7 +233,7 @@ CREATE TABLE exec (
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
   ref TEXT NULL,
-  status INTEGER NOT NULL REFERENCES status (id),
+  state INTEGER NOT NULL REFERENCES state (id),
   action INTEGER NOT NULL REFERENCES action (id),
   ticks INTEGER NOT NULL,
   lots INTEGER NOT NULL,
@@ -253,7 +253,7 @@ CREATE TABLE exec (
 
 CREATE TRIGGER before_insert_on_exec
   BEFORE INSERT ON exec
-  WHEN new.status IN (1, 4)
+  WHEN new.state IN (1, 4)
 BEGIN
   INSERT INTO order_ (
     id,
@@ -262,7 +262,7 @@ BEGIN
     contr,
     settl_date,
     ref,
-    status,
+    state,
     action,
     ticks,
     lots,
@@ -280,7 +280,7 @@ BEGIN
     new.contr,
     new.settl_date,
     new.ref,
-    new.status,
+    new.state,
     new.action,
     new.ticks,
     new.lots,
@@ -297,11 +297,11 @@ END
 
 CREATE TRIGGER before_update_on_exec
   BEFORE INSERT ON exec
-  WHEN NOT new.status IN (1, 4)
+  WHEN NOT new.state IN (1, 4)
 BEGIN
   UPDATE order_
   SET
-    status = new.status,
+    state = new.state,
     lots = new.lots,
     resd = new.resd,
     exec = new.exec,
@@ -321,7 +321,7 @@ CREATE VIEW exec_v AS
   c.mnem contr,
   e.settl_date,
   e.ref,
-  s.mnem status,
+  s.mnem state,
   e.action,
   e.ticks,
   e.lots,
@@ -337,8 +337,8 @@ CREATE VIEW exec_v AS
   e.created,
   e.modified
   FROM exec e
-  INNER JOIN status s
-  ON e.status = s.id
+  INNER JOIN state s
+  ON e.state = s.id
   INNER JOIN trader t
   ON e.trader = t.id
   INNER JOIN accnt a
@@ -385,7 +385,7 @@ CREATE VIEW trade_v AS
   ON e.role = r.id
   INNER JOIN accnt p
   ON e.cpty = p.id
-  WHERE e.status = 4
+  WHERE e.state = 4
 ;
 
 CREATE VIEW posn_v AS
@@ -397,7 +397,7 @@ CREATE VIEW posn_v AS
   SUM(e.last_lots * e.last_ticks) licks,
   SUM(e.last_lots) lots
   FROM exec e
-  WHERE e.status = 4
+  WHERE e.state = 4
   GROUP BY e.accnt, e.contr, e.settl_date, e.action
 ;
 

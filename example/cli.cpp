@@ -71,10 +71,10 @@ strrole(int role) noexcept
 }
 
 const char*
-strstatus(int status) noexcept
+strstate(int state) noexcept
 {
     const char* sym;
-    switch (status) {
+    switch (state) {
     case DBR_NEW:
         sym = "NEW";
         break;
@@ -88,7 +88,7 @@ strstatus(int status) noexcept
         sym = "TRADE";
         break;
     default:
-        throw InvalidArgument("status");
+        throw InvalidArgument("state");
     }
     return sym;
 }
@@ -530,7 +530,7 @@ public:
             "|arec      "
             "|crec      "
             "|settl_date"
-            "|status    "
+            "|state    "
             "|action    "
             "|ticks     "
             "|lots      "
@@ -559,7 +559,7 @@ public:
                  << '|' << left << setw(10) << ref.arec().mnem()
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << left << setw(10) << strstatus(ref.status())
+                 << '|' << left << setw(10) << strstate(ref.state())
                  << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
                  << '|' << right << setw(10) << ref.lots()

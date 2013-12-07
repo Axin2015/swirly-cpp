@@ -85,9 +85,9 @@ public:
         return Ref{impl_->c.ref};
     }
     int
-    status() const noexcept
+    state() const noexcept
     {
-        return impl_->c.status;
+        return impl_->c.state;
     }
     int
     action() const noexcept
@@ -161,7 +161,7 @@ operator <<(std::ostream& os, ExecRef exec)
               << ",crec=" << exec.crec().mnem()
               << ",settl_date=" << exec.settl_date()
               << ",ref=" << exec.ref()
-              << ",status=" << exec.status()
+              << ",state=" << exec.state()
               << ",action=" << exec.action()
               << ",ticks=" << exec.ticks()
               << ",lots=" << exec.lots()
