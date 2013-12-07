@@ -143,6 +143,24 @@ flush(const struct DbrBody* req)
 }
 
 static DbrBool
+sess_logon(const struct DbrBody* req, DbrTrader trader)
+{
+    return true;
+}
+
+static DbrBool
+sess_logoff(const struct DbrBody* req, DbrTrader trader)
+{
+    return true;
+}
+
+static DbrBool
+sess_heartbt(const struct DbrBody* req, DbrTrader trader)
+{
+    return true;
+}
+
+static DbrBool
 sess_rec(const struct DbrBody* req, DbrTrader trader)
 {
     struct DbrBody rep;
@@ -441,6 +459,15 @@ run(void)
             continue;
         }
         switch (req.body.type) {
+        case DBR_SESS_LOGON:
+            sess_logon(&req.body, trader);
+            break;
+        case DBR_SESS_LOGOFF:
+            sess_logoff(&req.body, trader);
+            break;
+        case DBR_SESS_HEARTBT:
+            sess_heartbt(&req.body, trader);
+            break;
         case DBR_SESS_ENTITY_REQ:
             switch (req.body.sess_entity_req.type) {
             case DBR_TRADER:

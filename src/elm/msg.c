@@ -152,7 +152,9 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     size_t n = dbr_packlenl(body->req_id);
     n += dbr_packleni(body->type);
     switch (body->type) {
-    case DBR_SESS_HB:
+    case DBR_SESS_LOGON:
+    case DBR_SESS_LOGOFF:
+    case DBR_SESS_HEARTBT:
         break;
     case DBR_STATUS_REP:
         n += dbr_packlenf(STATUS_REP_FORMAT,
@@ -223,9 +225,6 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_POSN_REP:
         n += dbr_posn_len(body->posn_rep.posn, enriched);
         break;
-    case DBR_LOGON_REQ:
-    case DBR_LOGOFF_REQ:
-        break;
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(body->read_entity_req.type);
         break;
@@ -291,7 +290,9 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     buf = dbr_packl(buf, body->req_id);
     buf = dbr_packi(buf, body->type);
     switch (body->type) {
-    case DBR_SESS_HB:
+    case DBR_SESS_LOGON:
+    case DBR_SESS_LOGOFF:
+    case DBR_SESS_HEARTBT:
         break;
     case DBR_STATUS_REP:
         buf = dbr_packf(buf, STATUS_REP_FORMAT,
@@ -353,9 +354,6 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_POSN_REP:
         buf = dbr_write_posn(buf, body->posn_rep.posn, enriched);
-        break;
-    case DBR_LOGON_REQ:
-    case DBR_LOGOFF_REQ:
         break;
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, body->read_entity_req.type);
@@ -425,7 +423,9 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     body->type = type;
     struct DbrQueue q;
     switch (type) {
-    case DBR_SESS_HB:
+    case DBR_SESS_LOGON:
+    case DBR_SESS_LOGOFF:
+    case DBR_SESS_HEARTBT:
         break;
     case DBR_STATUS_REP:
         buf = dbr_unpackf(buf, STATUS_REP_FORMAT,
@@ -520,9 +520,6 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             dbr_pool_free_posn(pool, body->posn_rep.posn);
             goto fail1;
         }
-        break;
-    case DBR_LOGON_REQ:
-    case DBR_LOGOFF_REQ:
         break;
     case DBR_READ_ENTITY_REQ:
         if (!(buf = dbr_unpacki(buf, &body->read_entity_req.type)))

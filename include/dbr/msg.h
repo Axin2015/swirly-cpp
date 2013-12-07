@@ -29,15 +29,17 @@
  */
 
 enum {
-    DBR_SESS_HB = 1,
+    DBR_SESS_LOGON = 1,
+    DBR_SESS_LOGOFF,
+    DBR_SESS_HEARTBT,
+
     DBR_STATUS_REP,
     DBR_ENTITY_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
-    DBR_LOGON_REQ,
-    DBR_LOGOFF_REQ,
-    DBR_READ_ENTITY_REQ,
+
     DBR_SESS_ENTITY_REQ,
+    DBR_READ_ENTITY_REQ,
     DBR_PLACE_ORDER_REQ,
     DBR_REVISE_ORDER_ID_REQ,
     DBR_REVISE_ORDER_REF_REQ,
@@ -85,12 +87,12 @@ struct DbrBody {
 
         // Request.
         struct {
+            int type;
+        } sess_entity_req;
+        struct {
             // Bit set of entity-types.
             int type;
         } read_entity_req;
-        struct {
-            int type;
-        } sess_entity_req;
         struct {
             DbrMnem accnt;
             DbrMnem contr;
