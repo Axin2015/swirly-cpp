@@ -56,6 +56,11 @@
  */
 
 /**
+ * @defgroup Defs Defs
+ * @ingroup Ash
+ */
+
+/**
  * @defgroup Cont Container
  * @ingroup Ash
  */

@@ -28,7 +28,7 @@
 #define DBR_API DBR_EXTERN __attribute__((visibility ("default")))
 
 /**
- * @addtogroup Cont
+ * @addtogroup Defs
  * @{
  */
 
@@ -41,12 +41,9 @@ enum {
     DBR_TRUE
 };
 
-/** @} */
-
-/**
- * @addtogroup Util
- * @{
- */
+enum {
+    DBR_ERRMSG_MAX = 128
+};
 
 #define dbr_min(a, b) ((a) <= (b) ? (a) : (b))
 #define dbr_max(a, b) ((a) >= (b) ? (a) : (b))

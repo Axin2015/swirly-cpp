@@ -516,15 +516,6 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
         goto fail2;
 
     return body.req_id;
-#if 0
-    assert(body.type == DBR_STATUS_REP);
-
-    if (body.status_rep.num != 0) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-    return true;
-#endif
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -544,7 +535,7 @@ dbr_clnt_clear(DbrClnt clnt)
 }
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms)
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
 {
     zmq_pollitem_t items[] = { { clnt->sock, 0, ZMQ_POLLIN, 0 } };
     if (zmq_poll(items, 1, ms) < 0) {
@@ -558,8 +549,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms)
     if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
         goto fail1;
 
+    status->req_id = body.req_id;
+    status->num = 0;
+    status->msg[0] = '\0';
     switch (body.type) {
     case DBR_STATUS_REP:
+        status->num = 0;
+        strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
         break;
     case DBR_ENTITY_REP:
         break;

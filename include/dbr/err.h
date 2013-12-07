@@ -58,10 +58,6 @@ enum DbrErrno {
     DBR_EUSER = 0x400
 };
 
-enum {
-    DBR_ERRMSG_MAX = 255
-};
-
 /**
  * @brief Clear current error message.
  */

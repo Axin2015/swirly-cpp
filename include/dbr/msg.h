@@ -18,7 +18,6 @@
 #ifndef DBR_MSG_H
 #define DBR_MSG_H
 
-#include <dbr/err.h>
 #include <dbr/pool.h>
 #include <dbr/types.h>
 

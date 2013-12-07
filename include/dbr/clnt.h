@@ -32,6 +32,12 @@ typedef struct ElmPool* DbrPool;
 
 typedef struct FigClnt* DbrClnt;
 
+struct DbrStatus {
+    DbrIden req_id;
+    int num;
+    char msg[DBR_ERRMSG_MAX];
+};
+
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, DbrPool pool);
 
@@ -103,8 +109,8 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);
 
-DBR_API DbrBool
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms);
+DBR_API int
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);
 
 static inline struct DbrRec*
 dbr_clnt_rec_entry(struct DbrSlNode* node)
