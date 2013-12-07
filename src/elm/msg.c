@@ -217,9 +217,6 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         }
         n += dbr_packlenz(body->entity_rep.count_);
         break;
-    case DBR_ORDER_REP:
-        n += dbr_order_len(body->order_rep.order, enriched);
-        break;
     case DBR_EXEC_REP:
         n += dbr_exec_len(body->exec_rep.exec, enriched);
         break;
@@ -350,9 +347,6 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         default:
             abort();
         }
-        break;
-    case DBR_ORDER_REP:
-        buf = dbr_write_order(buf, body->order_rep.order, enriched);
         break;
     case DBR_EXEC_REP:
         buf = dbr_write_exec(buf, body->exec_rep.exec, enriched);
@@ -506,16 +500,6 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         }
         body->entity_rep.first = dbr_queue_first(&q);
-        break;
-    case DBR_ORDER_REP:
-        // Order.
-        body->order_rep.order = dbr_pool_alloc_order(pool);
-        if (!body->order_rep.order)
-            goto fail1;
-        if (!(buf = dbr_read_order(buf, body->order_rep.order))) {
-            dbr_pool_free_order(pool, body->order_rep.order);
-            goto fail1;
-        }
         break;
     case DBR_EXEC_REP:
         // Exec.

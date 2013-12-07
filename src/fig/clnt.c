@@ -563,8 +563,6 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms)
         break;
     case DBR_ENTITY_REP:
         break;
-    case DBR_ORDER_REP:
-        break;
     case DBR_EXEC_REP:
         break;
     case DBR_POSN_REP:
@@ -573,7 +571,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms)
         dbr_err_setf(DBR_EIO, "unknown msg-type '%d'", body.type);
         goto fail1;
     }
-    return body.type;
+    return 1;
  fail1:
     return -1;
 }

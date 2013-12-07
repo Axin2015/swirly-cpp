@@ -33,7 +33,6 @@ enum {
     DBR_SESS_HB = 1,
     DBR_STATUS_REP,
     DBR_ENTITY_REP,
-    DBR_ORDER_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
     DBR_LOGON_REQ,
@@ -78,9 +77,6 @@ struct DbrBody {
             // Set by dbr_body_len();
             size_t count_;
         } entity_rep;
-        struct {
-            struct DbrOrder* order;
-        } order_rep;
         struct {
             struct DbrExec* exec;
         } exec_rep;
