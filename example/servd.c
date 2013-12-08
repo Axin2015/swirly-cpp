@@ -143,24 +143,6 @@ flush(const struct DbrBody* req)
 }
 
 static DbrBool
-sess_logon(DbrIden req_id, DbrTrader trader)
-{
-    return true;
-}
-
-static DbrBool
-sess_logoff(DbrIden req_id, DbrTrader trader)
-{
-    return true;
-}
-
-static DbrBool
-sess_heartbt(DbrIden req_id, DbrTrader trader)
-{
-    return true;
-}
-
-static DbrBool
 sess_trader(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
@@ -315,6 +297,33 @@ sess_posn(DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
+sess_logon(DbrIden req_id, DbrTrader trader)
+{
+    struct DbrBody rep = { .req_id = req_id, .type = DBR_STATUS_REP,
+                           .status_rep = { .num = 0, .msg = "" } };
+    return dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false)
+        && sess_trader(0, trader)
+        && sess_accnt(0, trader)
+        && sess_contr(0, trader)
+        && sess_order(0, trader)
+        && sess_trade(0, trader)
+        && sess_memb(0, trader)
+        && sess_posn(0, trader);
+}
+
+static DbrBool
+sess_logoff(DbrIden req_id, DbrTrader trader)
+{
+    return true;
+}
+
+static DbrBool
+sess_heartbt(DbrIden req_id, DbrTrader trader)
+{
+    return true;
+}
+
+static DbrBool
 place_order(const struct DbrBody* req, DbrTrader trader)
 {
     struct DbrBody rep;
@@ -455,7 +464,7 @@ ack_trade(const struct DbrBody* req, DbrTrader trader)
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';
-    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, false);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -501,31 +510,6 @@ run(void)
             break;
         case DBR_SESS_HEARTBT:
             sess_heartbt(req.body.req_id, trader);
-            break;
-        case DBR_SESS_ENTITY_REQ:
-            switch (req.body.sess_entity_req.type) {
-            case DBR_TRADER:
-                sess_trader(req.body.req_id, trader);
-                break;
-            case DBR_ACCNT:
-                sess_accnt(req.body.req_id, trader);
-                break;
-            case DBR_CONTR:
-                sess_contr(req.body.req_id, trader);
-                break;
-            case DBR_ORDER:
-                sess_order(req.body.req_id, trader);
-                break;
-            case DBR_EXEC:
-                sess_trade(req.body.req_id, trader);
-                break;
-            case DBR_MEMB:
-                sess_memb(req.body.req_id, trader);
-                break;
-            case DBR_POSN:
-                sess_posn(req.body.req_id, trader);
-                break;
-            };
             break;
         case DBR_PLACE_ORDER_REQ:
             place_order(&req.body, trader);

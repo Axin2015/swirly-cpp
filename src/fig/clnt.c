@@ -38,9 +38,13 @@ struct FigClnt {
     void* ctx;
     void* sock;
     // See set_trader().
-    DbrTrader trader;
+    union {
+        DbrMnem mnem;
+        DbrTrader trader;
+    };
     DbrIden id;
     DbrPool pool;
+    int pending;
     struct FigCache cache;
     struct FigIndex index;
     struct DbrQueue execs;
@@ -104,40 +108,19 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
     return posn;
 }
 
-static ssize_t
-read_entity(DbrClnt clnt, int type, struct DbrSlNode** first)
+static DbrIden
+logon(DbrClnt clnt)
 {
-    struct DbrBody body;
-    body.req_id = clnt->id++;
-    body.type = DBR_SESS_ENTITY_REQ;
-    body.sess_entity_req.type = type;
-
+    struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_LOGON };
     if (!dbr_send_body(clnt->sock, &body, false))
         return -1;
-
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
-        return -1;
-
-    *first = body.entity_rep.first;
-    return body.entity_rep.count_;
+    return body.req_id;
 }
 
-static DbrBool
-emplace_recs(DbrClnt clnt, int type)
+static inline DbrBool
+set_trader(DbrClnt clnt)
 {
-    struct DbrSlNode* node;
-    ssize_t size = read_entity(clnt, type, &node);
-    if (size < 0)
-        return false;
-
-    fig_cache_emplace_recs(&clnt->cache, type, node, size);
-    return true;
-}
-
-static DbrBool
-set_trader(DbrClnt clnt, const char* mnem)
-{
-    struct DbrSlNode* node = fig_cache_find_rec_mnem(&clnt->cache, DBR_TRADER, mnem);
+    struct DbrSlNode* node = fig_cache_find_rec_mnem(&clnt->cache, DBR_TRADER, clnt->mnem);
     if (node == FIG_CACHE_END_REC)
         goto fail1;
 
@@ -161,65 +144,58 @@ set_trader(DbrClnt clnt, const char* mnem)
     return false;
 }
 
-static DbrBool
-emplace_orders(DbrClnt clnt)
+static void
+emplace_recs(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
 {
-    struct DbrSlNode* node;
-    if (read_entity(clnt, DBR_ORDER, &node) < 0)
-        return false;
+    fig_cache_emplace_recs(&clnt->cache, type, first, count);
+    clnt->pending &= ~type;
+    if ((clnt->pending & (DBR_TRADER | DBR_ACCNT | DBR_CONTR)) == 0)
+        set_trader(clnt);
+}
 
-    for (; node; node = node->next) {
+static void
+emplace_orders(DbrClnt clnt, struct DbrSlNode* first)
+{
+    for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrOrder* order = enrich_order(&clnt->cache, dbr_shared_order_entry(node));
         // Transfer ownership.
         fig_trader_emplace_order(clnt->trader, order);
     }
-    return true;
+    clnt->pending &= ~DBR_ORDER;
 }
 
-static DbrBool
-emplace_trades(DbrClnt clnt)
+static void
+emplace_trades(DbrClnt clnt, struct DbrSlNode* first)
 {
-    struct DbrSlNode* node;
-    if (read_entity(clnt, DBR_EXEC, &node) < 0)
-        return false;
-
-    for (; node; node = node->next) {
+    for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader, exec);
     }
-    return true;
+    clnt->pending &= ~DBR_TRADE;
 }
 
-static DbrBool
-emplace_membs(DbrClnt clnt)
+static void
+emplace_membs(DbrClnt clnt, struct DbrSlNode* first)
 {
-    struct DbrSlNode* node;
-    if (read_entity(clnt, DBR_MEMB, &node) < 0)
-        return false;
-
-    for (; node; node = node->next) {
+    for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
         // Transfer ownership.
         fig_trader_emplace_memb(clnt->trader, memb);
     }
-    return true;
+    clnt->pending &= ~DBR_MEMB;
 }
 
-static DbrBool
-emplace_posns(DbrClnt clnt)
+static void
+emplace_posns(DbrClnt clnt, struct DbrSlNode* first)
 {
-    struct DbrSlNode* node;
-    if (read_entity(clnt, DBR_POSN, &node) < 0)
-        return false;
-
-    for (; node; node = node->next) {
+    for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
         // Transfer ownership.
         // All accnts that trader is member of are created in set_trader().
         fig_accnt_emplace_posn(posn->accnt.rec->accnt.state, posn);
     }
-    return true;
+    clnt->pending &= ~DBR_POSN;
 }
 
 DBR_API DbrClnt
@@ -244,31 +220,21 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     }
 
     clnt->sock = sock;
-    clnt->trader = NULL;
+    strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
     clnt->pool = pool;
+    clnt->pending = DBR_TRADER | DBR_ACCNT | DBR_CONTR | DBR_ORDER | DBR_EXEC | DBR_MEMB | DBR_POSN;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
     dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->posns);
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail4;
-
-    // Data structures are fully initialised at this point.
-
-    if (!emplace_recs(clnt, DBR_TRADER)
-        || !emplace_recs(clnt, DBR_ACCNT)
-        || !emplace_recs(clnt, DBR_CONTR)
-        || !set_trader(clnt, trader)
-        || !emplace_orders(clnt)
-        || !emplace_trades(clnt)
-        || !emplace_membs(clnt)
-        || !emplace_posns(clnt)) {
-        // Use destroy since fully initialised.
-        dbr_clnt_destroy(clnt);
-        goto fail1;
-    }
+    if (!logon(clnt))
+        goto fail5;
     return clnt;
+ fail5:
+    dbr_prioq_term(&clnt->prioq);
  fail4:
     fig_cache_term(&clnt->cache);
  fail3:
@@ -558,6 +524,25 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
         break;
     case DBR_ENTITY_REP:
+        switch (body.entity_rep.type) {
+        case DBR_TRADER:
+        case DBR_ACCNT:
+        case DBR_CONTR:
+            emplace_recs(clnt, body.entity_rep.type, body.entity_rep.first, body.entity_rep.count_);
+            break;
+        case DBR_ORDER:
+            emplace_orders(clnt, body.entity_rep.first);
+            break;
+        case DBR_EXEC:
+            emplace_trades(clnt, body.entity_rep.first);
+            break;
+        case DBR_MEMB:
+            emplace_membs(clnt, body.entity_rep.first);
+            break;
+        case DBR_POSN:
+            emplace_posns(clnt, body.entity_rep.first);
+            break;
+        };
         break;
     case DBR_EXEC_REP:
         break;

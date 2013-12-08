@@ -225,12 +225,6 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_POSN_REP:
         n += dbr_posn_len(body->posn_rep.posn, enriched);
         break;
-    case DBR_READ_ENTITY_REQ:
-        n += dbr_packleni(body->read_entity_req.type);
-        break;
-    case DBR_SESS_ENTITY_REQ:
-        n += dbr_packleni(body->sess_entity_req.type);
-        break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
                           body->place_order_req.accnt,
@@ -260,6 +254,9 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_ACK_TRADE_REQ:
         n += dbr_packlenl(body->ack_trade_req.id);
+        break;
+    case DBR_READ_ENTITY_REQ:
+        n += dbr_packleni(body->read_entity_req.type);
         break;
     case DBR_INSERT_EXECS_REQ:
         body->insert_execs_req.count_ = 0;
@@ -355,12 +352,6 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     case DBR_POSN_REP:
         buf = dbr_write_posn(buf, body->posn_rep.posn, enriched);
         break;
-    case DBR_READ_ENTITY_REQ:
-        buf = dbr_packi(buf, body->read_entity_req.type);
-        break;
-    case DBR_SESS_ENTITY_REQ:
-        buf = dbr_packi(buf, body->sess_entity_req.type);
-        break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
                         body->place_order_req.accnt,
@@ -390,6 +381,9 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_ACK_TRADE_REQ:
         buf = dbr_packl(buf, body->ack_trade_req.id);
+        break;
+    case DBR_READ_ENTITY_REQ:
+        buf = dbr_packi(buf, body->read_entity_req.type);
         break;
     case DBR_INSERT_EXECS_REQ:
         buf = dbr_packz(buf, body->insert_execs_req.count_);
@@ -521,14 +515,6 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         }
         break;
-    case DBR_READ_ENTITY_REQ:
-        if (!(buf = dbr_unpacki(buf, &body->read_entity_req.type)))
-            goto fail1;
-        break;
-    case DBR_SESS_ENTITY_REQ:
-        if (!(buf = dbr_unpacki(buf, &body->sess_entity_req.type)))
-            goto fail1;
-        break;
     case DBR_PLACE_ORDER_REQ:
         if (!(buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,
                                 body->place_order_req.accnt,
@@ -563,6 +549,10 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_ACK_TRADE_REQ:
         if (!(buf = dbr_unpackl(buf, &body->ack_trade_req.id)))
+            goto fail1;
+        break;
+    case DBR_READ_ENTITY_REQ:
+        if (!(buf = dbr_unpacki(buf, &body->read_entity_req.type)))
             goto fail1;
         break;
     case DBR_INSERT_EXECS_REQ:

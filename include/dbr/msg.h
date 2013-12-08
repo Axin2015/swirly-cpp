@@ -38,14 +38,14 @@ enum {
     DBR_EXEC_REP,
     DBR_POSN_REP,
 
-    DBR_SESS_ENTITY_REQ,
-    DBR_READ_ENTITY_REQ,
     DBR_PLACE_ORDER_REQ,
     DBR_REVISE_ORDER_ID_REQ,
     DBR_REVISE_ORDER_REF_REQ,
     DBR_CANCEL_ORDER_ID_REQ,
     DBR_CANCEL_ORDER_REF_REQ,
     DBR_ACK_TRADE_REQ,
+
+    DBR_READ_ENTITY_REQ,
     DBR_INSERT_EXECS_REQ,
     DBR_INSERT_EXEC_REQ,
     DBR_UPDATE_EXEC_REQ
@@ -90,10 +90,6 @@ struct DbrBody {
             int type;
         } sess_entity_req;
         struct {
-            // Bit set of entity-types.
-            int type;
-        } read_entity_req;
-        struct {
             DbrMnem accnt;
             DbrMnem contr;
             DbrDate settl_date;
@@ -120,6 +116,10 @@ struct DbrBody {
         struct {
             DbrIden id;
         } ack_trade_req;
+        struct {
+            // Bit set of entity-types.
+            int type;
+        } read_entity_req;
         struct {
             struct DbrSlNode* first;
             /**
