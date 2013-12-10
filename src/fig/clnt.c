@@ -517,6 +517,10 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     if (!dbr_send_body(clnt->sock, &body, false))
         goto fail2;
 
+    struct DbrExec* exec = fig_trader_release_trade_id(clnt->trader, id);
+    if (exec)
+        dbr_pool_free_exec(clnt->pool, exec);
+
     return body.req_id;
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
