@@ -198,6 +198,93 @@ emplace_posns(DbrClnt clnt, struct DbrSlNode* first)
     clnt->pending &= ~DBR_POSN;
 }
 
+static struct DbrOrder*
+create_order(DbrClnt clnt, struct DbrExec* exec)
+{
+    struct DbrOrder* order = dbr_pool_alloc_order(clnt->pool);
+    if (!order)
+        return NULL;
+
+    dbr_order_init(order);
+    order->level = NULL;
+    order->id = exec->order;
+    __builtin_memcpy(&exec->c, &exec->c, sizeof(struct DbrCommon));
+    order->created = exec->created;
+    order->modified = exec->created;
+    return order;
+}
+
+static inline struct DbrRbNode*
+tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
+{
+    return dbr_tree_insert(tree, (DbrKey)node, node);
+}
+
+static DbrBool
+apply_new(DbrClnt clnt, struct DbrExec* exec)
+{
+    struct DbrOrder* order = create_order(clnt, exec);
+    if (!order) {
+        dbr_pool_free_exec(clnt->pool, exec);
+        return false;
+    }
+    // Transfer ownership.
+    fig_trader_emplace_order(clnt->trader, order);
+    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
+    return true;
+}
+
+static DbrBool
+apply_revise(DbrClnt clnt, struct DbrExec* exec)
+{
+    struct DbrRbNode* node = fig_trader_find_order_id(clnt->trader, exec->order);
+    if (!node) {
+        dbr_pool_free_exec(clnt->pool, exec);
+        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", exec->order);
+        return false;
+    }
+
+    struct DbrOrder* order = dbr_trader_order_entry(node);
+    order->c.state = exec->c.state;
+    order->c.lots = exec->c.lots;
+    order->c.resd = exec->c.resd;
+    order->modified = exec->created;
+
+    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
+    return true;
+}
+
+static DbrBool
+apply_cancel(DbrClnt clnt, struct DbrExec* exec)
+{
+    struct DbrOrder* order = fig_trader_release_order_id(clnt->trader, exec->order);
+    if (!order) {
+        dbr_pool_free_exec(clnt->pool, exec);
+        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", exec->order);
+        return false;
+    }
+    dbr_pool_free_order(clnt->pool, order);
+    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
+    return true;
+}
+
+static DbrBool
+apply_trade(DbrClnt clnt, struct DbrExec* exec)
+{
+    // Transfer ownership.
+    fig_trader_emplace_trade(clnt->trader, exec);
+    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
+    return true;
+}
+
+static DbrBool
+apply_posn(DbrClnt clnt, struct DbrPosn* posn)
+{
+    posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
+    tree_insert(&clnt->posns, &posn->cycle_node_);
+    return true;
+}
+
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, DbrPool pool)
 {
@@ -312,21 +399,6 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 
     return body.req_id;
 #if 0
-    if (body.type == DBR_STATUS_REP) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-
-    assert(body.type == DBR_CYCLE_REP);
-
-    fig_trader_emplace_order(clnt->trader, enrich_order(&clnt->cache, body.cycle_rep.new_order));
-
-    for (struct DbrSlNode* node = body.cycle_rep.first_exec; node; node = node->next) {
-        struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
-        // Transfer ownership.
-        fig_trader_emplace_trade(clnt->trader, exec);
-    }
-
     // Posn list is transformed to include existing positions with updates.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
     for (struct DbrSlNode* node = body.cycle_rep.first_posn; node; ) {
@@ -361,15 +433,6 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
         goto fail2;
 
     return body.req_id;
-#if 0
-    if (body.type == DBR_STATUS_REP) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-
-    assert(body.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, body.order_rep.order);
-#endif
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -392,15 +455,6 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
         goto fail2;
 
     return body.req_id;
-#if 0
-    if (body.type == DBR_STATUS_REP) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-
-    assert(body.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, body.order_rep.order);
-#endif
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -422,15 +476,6 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
         goto fail2;
 
     return body.req_id;
-#if 0
-    if (body.type == DBR_STATUS_REP) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-
-    assert(body.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, body.order_rep.order);
-#endif
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -452,15 +497,6 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
         goto fail2;
 
     return body.req_id;
-#if 0
-    if (body.type == DBR_STATUS_REP) {
-        dbr_err_set(body.status_rep.num, body.status_rep.msg);
-        goto fail1;
-    }
-
-    assert(body.type == DBR_ORDER_REP);
-    return fig_trader_update_order(clnt->trader, body.order_rep.order);
-#endif
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -488,22 +524,13 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     return -1;
 }
 
-DBR_API void
-dbr_clnt_clear(DbrClnt clnt)
-{
-    while (!dbr_queue_empty(&clnt->execs)) {
-        struct DbrExec* exec = dbr_clnt_exec_entry(dbr_queue_pop(&clnt->execs));
-        // Trades are owned by trader.
-        if (exec->c.state != DBR_TRADE)
-            dbr_pool_free_exec(clnt->pool, exec);
-    }
-    dbr_tree_init(&clnt->posns);
-}
-
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
 {
     zmq_pollitem_t items[] = { { clnt->sock, 0, ZMQ_POLLIN, 0 } };
+
+    // TODO: min of ms and timer.
+
     if (zmq_poll(items, 1, ms) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
@@ -518,9 +545,10 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
     status->req_id = body.req_id;
     status->num = 0;
     status->msg[0] = '\0';
+
     switch (body.type) {
     case DBR_STATUS_REP:
-        status->num = 0;
+        status->num = body.status_rep.num;
         strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
         break;
     case DBR_ENTITY_REP:
@@ -545,8 +573,25 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         };
         break;
     case DBR_EXEC_REP:
+        enrich_exec(&clnt->cache, body.exec_rep.exec);
+        switch (body.exec_rep.exec->c.state) {
+        case DBR_NEW:
+            apply_new(clnt, body.exec_rep.exec);
+            break;
+        case DBR_REVISE:
+            apply_revise(clnt, body.exec_rep.exec);
+            break;
+        case DBR_CANCEL:
+            apply_cancel(clnt, body.exec_rep.exec);
+            break;
+        case DBR_TRADE:
+            apply_trade(clnt, body.exec_rep.exec);
+            break;
+        }
         break;
     case DBR_POSN_REP:
+        enrich_posn(&clnt->cache, body.posn_rep.posn);
+        apply_posn(clnt, body.posn_rep.posn);
         break;
     default:
         dbr_err_setf(DBR_EIO, "unknown msg-type '%d'", body.type);
@@ -555,4 +600,40 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
     return 1;
  fail1:
     return -1;
+}
+
+DBR_API void
+dbr_clnt_clear(DbrClnt clnt)
+{
+    while (!dbr_queue_empty(&clnt->execs)) {
+        struct DbrExec* exec = dbr_clnt_exec_entry(dbr_queue_pop(&clnt->execs));
+        // Trades are owned by trader.
+        if (exec->c.state != DBR_TRADE)
+            dbr_pool_free_exec(clnt->pool, exec);
+    }
+    dbr_tree_init(&clnt->posns);
+}
+
+DBR_API struct DbrSlNode*
+dbr_clnt_first_exec(DbrClnt clnt)
+{
+    return dbr_queue_first(&clnt->execs);
+}
+
+DBR_API DbrBool
+dbr_clnt_empty_exec(DbrClnt clnt)
+{
+    return dbr_queue_empty(&clnt->execs);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_posn(DbrClnt clnt)
+{
+    return dbr_tree_first(&clnt->posns);
+}
+
+DBR_API DbrBool
+dbr_clnt_empty_posn(DbrClnt clnt)
+{
+    return dbr_tree_empty(&clnt->posns);
 }

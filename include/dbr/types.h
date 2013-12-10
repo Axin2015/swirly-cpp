@@ -304,7 +304,7 @@ struct DbrPosn {
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
     struct DbrRbNode accnt_node_;
-    struct DbrRbNode serv_node_;
+    struct DbrRbNode cycle_node_;
 };
 
 static inline void
@@ -312,7 +312,7 @@ dbr_posn_init(struct DbrPosn* posn)
 {
     dbr_slnode_init(&posn->shared_node_);
     dbr_rbnode_init(&posn->accnt_node_);
-    dbr_rbnode_init(&posn->serv_node_);
+    dbr_rbnode_init(&posn->cycle_node_);
 }
 
 static inline struct DbrPosn*

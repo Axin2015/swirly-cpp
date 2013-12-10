@@ -106,11 +106,27 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
 
+DBR_API int
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);
+
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);
 
-DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);
+#define DBR_CLNT_END_EXEC NULL
+
+DBR_API struct DbrSlNode*
+dbr_clnt_first_exec(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_empty_exec(DbrClnt clnt);
+
+#define DBR_CLNT_END_POSN NULL
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_posn(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_empty_posn(DbrClnt clnt);
 
 static inline struct DbrRec*
 dbr_clnt_rec_entry(struct DbrSlNode* node)
@@ -125,9 +141,9 @@ dbr_clnt_exec_entry(struct DbrSlNode* node)
 }
 
 static inline struct DbrPosn*
-dbr_clnt_posn_entry(struct DbrSlNode* node)
+dbr_clnt_posn_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrPosn, shared_node_, node);
+    return dbr_implof(struct DbrPosn, cycle_node_, node);
 }
 
 /** @} */

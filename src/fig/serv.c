@@ -157,85 +157,6 @@ free_matches(struct DbrSlNode* first, DbrPool pool)
     }
 }
 
-static struct DbrExec*
-create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
-{
-    struct DbrExec* exec = dbr_pool_alloc_exec(serv->pool);
-    if (!exec)
-        return NULL;
-
-    dbr_exec_init(exec);
-    exec->id = dbr_journ_alloc_id(serv->journ);
-    exec->order = order->id;
-    __builtin_memcpy(&exec->c, &order->c, sizeof(struct DbrCommon));
-    exec->match = 0;
-    exec->role = 0;
-    exec->cpty.id_only = 0;
-    exec->created = now;
-    return exec;
-}
-
-static inline void
-apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
-{
-    const double licks = exec->c.lots * exec->c.ticks;
-    if (exec->c.action == DBR_BUY) {
-        posn->buy_licks += licks;
-        posn->buy_lots += exec->c.lots;
-    } else {
-        assert(exec->c.action == DBR_SELL);
-        posn->sell_licks += licks;
-        posn->sell_lots += exec->c.lots;
-    }
-}
-
-static inline struct DbrRbNode*
-tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
-{
-    return dbr_tree_insert(tree, (DbrKey)node, node);
-}
-
-// Assumes that maker lots have not been reduced since matching took place.
-
-static void
-commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
-             struct DbrTrans* trans, DbrMillis now)
-{
-    while (!dbr_queue_empty(&trans->matches)) {
-
-        struct DbrSlNode* node = dbr_queue_pop(&trans->matches);
-        struct DbrMatch* match = dbr_trans_match_entry(node);
-        struct DbrOrder* maker_order = match->maker_order;
-
-        // Reduce maker.
-        dbr_book_take(book, maker_order, match->lots, now);
-        tree_insert(&serv->posns, &match->maker_posn->serv_node_);
-
-        // Must succeed because maker order exists.
-        struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
-                                                  serv->pool);
-        assert(maker);
-
-        // Maker updated first because this is consistent with last-look semantics.
-
-        // Update maker.
-        fig_trader_emplace_trade(maker, match->maker_exec);
-        apply_posn(match->maker_posn, match->maker_exec);
-
-        // Update taker.
-        fig_trader_emplace_trade(taker, match->taker_exec);
-        apply_posn(trans->taker_posn, match->taker_exec);
-
-        // Advance node to next before current node is freed.
-        node = node->next;
-        dbr_pool_free_match(serv->pool, match);
-    }
-
-    dbr_queue_join(&serv->execs, &trans->execs);
-    if (trans->taker_posn)
-        tree_insert(&serv->posns, &trans->taker_posn->serv_node_);
-}
-
 static DbrBool
 emplace_recs(DbrServ serv, int type)
 {
@@ -378,6 +299,85 @@ emplace_posns(DbrServ serv)
     } while (node);
  fail1:
     return false;
+}
+
+static struct DbrExec*
+create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
+{
+    struct DbrExec* exec = dbr_pool_alloc_exec(serv->pool);
+    if (!exec)
+        return NULL;
+
+    dbr_exec_init(exec);
+    exec->id = dbr_journ_alloc_id(serv->journ);
+    exec->order = order->id;
+    __builtin_memcpy(&exec->c, &order->c, sizeof(struct DbrCommon));
+    exec->match = 0;
+    exec->role = 0;
+    exec->cpty.id_only = 0;
+    exec->created = now;
+    return exec;
+}
+
+static inline struct DbrRbNode*
+tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
+{
+    return dbr_tree_insert(tree, (DbrKey)node, node);
+}
+
+static inline void
+apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
+{
+    const double licks = exec->c.lots * exec->c.ticks;
+    if (exec->c.action == DBR_BUY) {
+        posn->buy_licks += licks;
+        posn->buy_lots += exec->c.lots;
+    } else {
+        assert(exec->c.action == DBR_SELL);
+        posn->sell_licks += licks;
+        posn->sell_lots += exec->c.lots;
+    }
+}
+
+// Assumes that maker lots have not been reduced since matching took place.
+
+static void
+commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
+             struct DbrTrans* trans, DbrMillis now)
+{
+    while (!dbr_queue_empty(&trans->matches)) {
+
+        struct DbrSlNode* node = dbr_queue_pop(&trans->matches);
+        struct DbrMatch* match = dbr_trans_match_entry(node);
+        struct DbrOrder* maker_order = match->maker_order;
+
+        // Reduce maker.
+        dbr_book_take(book, maker_order, match->lots, now);
+        tree_insert(&serv->posns, &match->maker_posn->cycle_node_);
+
+        // Must succeed because maker order exists.
+        struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
+                                                  serv->pool);
+        assert(maker);
+
+        // Maker updated first because this is consistent with last-look semantics.
+
+        // Update maker.
+        fig_trader_emplace_trade(maker, match->maker_exec);
+        apply_posn(match->maker_posn, match->maker_exec);
+
+        // Update taker.
+        fig_trader_emplace_trade(taker, match->taker_exec);
+        apply_posn(trans->taker_posn, match->taker_exec);
+
+        // Advance node to next before current node is freed.
+        node = node->next;
+        dbr_pool_free_match(serv->pool, match);
+    }
+
+    dbr_queue_join(&serv->execs, &trans->execs);
+    if (trans->taker_posn)
+        tree_insert(&serv->posns, &trans->taker_posn->cycle_node_);
 }
 
 DBR_API DbrServ
