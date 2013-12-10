@@ -440,6 +440,12 @@ dbr_exec_init(struct DbrExec* exec)
     dbr_rbnode_init(&exec->trader_node_);
 }
 
+static inline DbrBool
+dbr_exec_done(const struct DbrExec* exec)
+{
+    return exec->c.resd == 0;
+}
+
 static inline struct DbrExec*
 dbr_shared_exec_entry(struct DbrSlNode* node)
 {

@@ -605,12 +605,23 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt)
 {
-    while (!dbr_queue_empty(&clnt->execs)) {
-        struct DbrExec* exec = dbr_clnt_exec_entry(dbr_queue_pop(&clnt->execs));
+    struct DbrSlNode* node = clnt->execs.first;
+    while (node) {
+        struct DbrExec* exec = dbr_clnt_exec_entry(node);
+        node = node->next;
+        // Free completed orders.
+        if (dbr_exec_done(exec)) {
+            DbrTrader trader = exec->c.trader.rec->trader.state;
+            assert(trader);
+            struct DbrOrder* order = fig_trader_release_order_id(trader, exec->order);
+            if (order)
+                dbr_pool_free_order(clnt->pool, order);
+        }
         // Trades are owned by trader.
         if (exec->c.state != DBR_TRADE)
             dbr_pool_free_exec(clnt->pool, exec);
     }
+    dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->posns);
 }
 

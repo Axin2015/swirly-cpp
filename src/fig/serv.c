@@ -746,12 +746,23 @@ dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 DBR_API void
 dbr_serv_clear(DbrServ serv)
 {
-    while (!dbr_queue_empty(&serv->execs)) {
-        struct DbrExec* exec = dbr_serv_exec_entry(dbr_queue_pop(&serv->execs));
+    struct DbrSlNode* node = serv->execs.first;
+    while (node) {
+        struct DbrExec* exec = dbr_serv_exec_entry(node);
+        node = node->next;
+        // Free completed orders.
+        if (dbr_exec_done(exec)) {
+            DbrTrader trader = exec->c.trader.rec->trader.state;
+            assert(trader);
+            struct DbrOrder* order = fig_trader_release_order_id(trader, exec->order);
+            if (order)
+                dbr_pool_free_order(serv->pool, order);
+        }
         // Trades are owned by trader.
         if (exec->c.state != DBR_TRADE)
             dbr_pool_free_exec(serv->pool, exec);
     }
+    dbr_queue_init(&serv->execs);
     dbr_tree_init(&serv->posns);
 }
 
