@@ -20,7 +20,7 @@ main(int argc, char* argv[])
         Clnt clnt(ctx.c_arg(), "tcp://localhost:3272", "WRAMIREZ", 1, pool);
 
         // TODO: more robust logic.
-        struct DbrStatus status;
+        DbrStatus status;
         while (clnt.poll(100, status))
             ;
 

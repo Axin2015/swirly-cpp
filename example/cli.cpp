@@ -1,9 +1,9 @@
+#include <dbrpp/clnt.hpp>
 #include <dbrpp/exec.hpp>
 #include <dbrpp/lexer.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
-#include <dbrpp/serv.hpp>
-#include <dbrpp/sqlstore.hpp>
+#include <dbrpp/zmqctx.hpp>
 
 #include <dbr/util.h>
 
@@ -294,10 +294,9 @@ argc(Arg begin, Arg end)
 }
 
 class Test {
-    SqlStore store_;
+    ZmqCtx ctx_;
     Pool pool_;
-    Serv serv_;
-    DbrRec* trec_;
+    Clnt clnt_;
     DbrRec* arec_;
     DbrRec* crec_;
     DbrDate settl_date_;
@@ -324,15 +323,17 @@ class Test {
         return it->second;
     }
 public:
-    Test(DbrIden seed, const char* path)
-        : store_(seed, path),
-          serv_(store_.journ(), store_.model(), pool_),
-          trec_(nullptr),
+    Test(const char* addr, const char* trader, DbrIden seed)
+        : clnt_(ctx_.c_arg(), addr, trader, seed, pool_),
           arec_(nullptr),
           crec_(nullptr),
           settl_date_(0),
           id_(1)
     {
+        // TODO: more robust logic.
+        DbrStatus status;
+        while (clnt_.poll(100, status))
+            ;
     }
     void
     accnts(Arg begin, Arg end)
@@ -347,7 +348,7 @@ public:
             "+------------------------------"
             "+------------------------------"
             "|" << endl;
-        for (auto rec : serv_.arecs()) {
+        for (auto rec : clnt_.arecs()) {
             AccntRecRef ref(rec);
             cout << '|' << left << setw(10) << ref.mnem()
                  << '|' << left << setw(30) << ref.display()
@@ -358,12 +359,9 @@ public:
     void
     ack_trades(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = serv_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            serv_.ack_trade(trader, id);
+            clnt_.ack_trade(id);
         }
     }
     void
@@ -373,7 +371,8 @@ public:
             throw InvalidState("contr");
         if (!settl_date_)
             throw InvalidState("settl_date");
-        auto book = serv_.book(*crec_, settl_date_);
+#if 0
+        auto book = clnt_.book(*crec_, settl_date_);
 
         cout <<
             "|bid_count "
@@ -424,16 +423,14 @@ public:
             }
             cout << '|' << endl;
         }
+#endif
     }
     void
     cancel(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = serv_.trader(*trec_);
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            serv_.cancel(trader, id);
+            clnt_.cancel(id);
         }
     }
     void
@@ -467,7 +464,7 @@ public:
             "+----------"
             "+----------"
             "|" << endl;
-        for (auto rec : serv_.crecs()) {
+        for (auto rec : clnt_.crecs()) {
             ContrRecRef ref(rec);
             cout << '|' << left << setw(10) << ref.mnem()
                  << '|' << left << setw(10) << ref.display()
@@ -501,10 +498,6 @@ public:
                 "|--------------------"
                 "+--------------------"
                 "|" << endl;
-            if (trec_)
-                cout << '|' << left << setw(20) << "trader"
-                     << '|' << left << setw(20) << TraderRecRef(*trec_).mnem()
-                     << '|' << endl;
             if (arec_)
                 cout << '|' << left << setw(20) << "accnt"
                      << '|' << left << setw(20) << AccntRecRef(*arec_).mnem()
@@ -521,9 +514,7 @@ public:
     void
     orders(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = serv_.trader(*trec_);
+        auto trader = clnt_.trader();
         cout <<
             "|id        "
             "|trec      "
@@ -571,8 +562,6 @@ public:
     void
     place(int action, Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
         if (!arec_)
             throw InvalidState("accnt");
         if (!crec_)
@@ -580,17 +569,13 @@ public:
         if (!settl_date_)
             throw InvalidState("settl_date");
 
-        auto trader = serv_.trader(*trec_);
-        auto accnt = serv_.accnt(*arec_);
-        auto book = serv_.book(*crec_, settl_date_);
-
         const auto lots = ston<DbrLots>((*begin++).c_str());
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        serv_.place(trader, accnt, book, nullptr, action, ticks, lots, 0);
+        clnt_.place(arec_->mnem, crec_->mnem, settl_date_, nullptr, action, ticks, lots, 0);
 
-        if (serv_.execs().empty())
+        if (clnt_.execs().empty())
             return;
 
         cout <<
@@ -626,7 +611,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto exec : serv_.execs()) {
+        for (auto exec : clnt_.execs()) {
             ExecRef ref(exec);
             cout << '|' << right << setw(10) << gtol(ref.id())
                  << '|' << right << setw(10) << gtol(ref.order())
@@ -650,7 +635,7 @@ public:
     {
         if (!arec_)
             throw InvalidState("accnt");
-        auto accnt = serv_.accnt(*arec_);
+        auto accnt = clnt_.accnt(*arec_);
         cout <<
             "|crec      "
             "|settl_date"
@@ -689,33 +674,24 @@ public:
     void
     revise(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = serv_.trader(*trec_);
-
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        serv_.revise(trader, id, lots);
+        clnt_.revise(id, lots);
     }
     void
     set(Arg begin, Arg end)
     {
         const string& name = *begin++;
         const string& value = *begin++;
-        if (name == "trader") {
-            auto it = serv_.trecs().find(value.c_str());
-            if (it == serv_.trecs().end())
-                throw InvalidArgument(value);
-            trec_ = &*it;
-        } else if (name == "accnt") {
-            auto it = serv_.arecs().find(value.c_str());
-            if (it == serv_.arecs().end())
+        if (name == "accnt") {
+            auto it = clnt_.arecs().find(value.c_str());
+            if (it == clnt_.arecs().end())
                 throw InvalidArgument(value);
             arec_ = &*it;
         } else if (name == "contr") {
-            auto it = serv_.crecs().find(value.c_str());
-            if (it == serv_.crecs().end())
+            auto it = clnt_.crecs().find(value.c_str());
+            if (it == clnt_.crecs().end())
                 throw InvalidArgument(value);
             crec_ = &*it;
         } else if (name == "settl_date") {
@@ -736,7 +712,7 @@ public:
             "+------------------------------"
             "+------------------------------"
             "|" << endl;
-        for (auto rec : serv_.trecs()) {
+        for (auto rec : clnt_.trecs()) {
             TraderRecRef ref(rec);
             cout << '|' << left << setw(10) << ref.mnem()
                  << '|' << left << setw(30) << ref.display()
@@ -747,9 +723,7 @@ public:
     void
     trades(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = serv_.trader(*trec_);
+        auto trader = clnt_.trader();
         cout <<
             "|id        "
             "|order     "
@@ -806,9 +780,7 @@ public:
     unset(Arg begin, Arg end)
     {
         const string& name = *begin++;
-        if (name == "trader") {
-            trec_ = nullptr;
-        } else if (name == "accnt") {
+        if (name == "accnt") {
             arec_ = nullptr;
         } else if (name == "contr") {
             crec_ = nullptr;
@@ -826,7 +798,7 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        Test test(dbr_millis(), "doobry.db");
+        Test test("tcp://localhost:3272", "WRAMIREZ", dbr_millis());
         Repl repl;
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));
