@@ -344,6 +344,60 @@ public:
     {
         DbrStatus status;
         clnt_.poll(100, status);
+        if (clnt_.execs().empty())
+            return;
+
+        cout <<
+            "|id        "
+            "|order     "
+            "|trec      "
+            "|arec      "
+            "|crec      "
+            "|settl_date"
+            "|ref       "
+            "|action    "
+            "|ticks     "
+            "|lots      "
+            "|resd      "
+            "|exec      "
+            "|role      "
+            "|cpty      "
+            "|" << endl;
+        cout <<
+            "|----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "|"
+             << endl;
+        for (auto exec : clnt_.execs()) {
+            ExecRef ref(exec);
+            cout << '|' << right << setw(10) << gtol(ref.id())
+                 << '|' << right << setw(10) << gtol(ref.order())
+                 << '|' << left << setw(10) << ref.trec().mnem()
+                 << '|' << left << setw(10) << ref.arec().mnem()
+                 << '|' << left << setw(10) << ref.crec().mnem()
+                 << '|' << left << setw(10) << ref.settl_date()
+                 << '|' << left << setw(10) << ref.ref()
+                 << '|' << left << setw(10) << straction(ref.action())
+                 << '|' << right << setw(10) << ref.ticks()
+                 << '|' << right << setw(10) << ref.lots()
+                 << '|' << right << setw(10) << ref.resd()
+                 << '|' << right << setw(10) << ref.exec()
+                 << '|' << left << setw(10) << strrole(ref.role())
+                 << '|' << left << setw(10) << ref.cpty().mnem()
+                 << '|' << endl;
+        }
+        clnt_.clear();
     }
     void
     accnts(Arg begin, Arg end)
@@ -531,7 +585,7 @@ public:
             "|arec      "
             "|crec      "
             "|settl_date"
-            "|state    "
+            "|state     "
             "|action    "
             "|ticks     "
             "|lots      "
@@ -540,7 +594,6 @@ public:
             "|" << endl;
         cout <<
             "|----------"
-            "+----------"
             "+----------"
             "+----------"
             "+----------"
@@ -584,61 +637,6 @@ public:
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
         clnt_.place(arec_->mnem, crec_->mnem, settl_date_, nullptr, action, ticks, lots, 0);
-
-        if (clnt_.execs().empty())
-            return;
-
-        cout <<
-            "|id        "
-            "|order     "
-            "|trec      "
-            "|arec      "
-            "|crec      "
-            "|settl_date"
-            "|ref       "
-            "|action    "
-            "|ticks     "
-            "|lots      "
-            "|resd      "
-            "|exec      "
-            "|role      "
-            "|cpty      "
-            "|" << endl;
-        cout <<
-            "|----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "|"
-             << endl;
-        for (auto exec : clnt_.execs()) {
-            ExecRef ref(exec);
-            cout << '|' << right << setw(10) << gtol(ref.id())
-                 << '|' << right << setw(10) << gtol(ref.order())
-                 << '|' << left << setw(10) << ref.trec().mnem()
-                 << '|' << left << setw(10) << ref.arec().mnem()
-                 << '|' << left << setw(10) << ref.crec().mnem()
-                 << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << left << setw(10) << ref.ref()
-                 << '|' << left << setw(10) << straction(ref.action())
-                 << '|' << right << setw(10) << ref.ticks()
-                 << '|' << right << setw(10) << ref.lots()
-                 << '|' << right << setw(10) << ref.resd()
-                 << '|' << right << setw(10) << ref.exec()
-                 << '|' << left << setw(10) << strrole(ref.role())
-                 << '|' << left << setw(10) << ref.cpty().mnem()
-                 << '|' << endl;
-        }
     }
     void
     posns(Arg begin, Arg end)
@@ -805,10 +803,16 @@ public:
 int
 main(int argc, char* argv[])
 {
+    if (argc != 2) {
+        cerr << "usage: dbr_cli <trader>\n";
+        return 1;
+    }
+    const char* const trader = argv[1];
+
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        Test test("tcp://localhost:3272", "WRAMIREZ", dbr_millis());
+        Test test("tcp://localhost:3272", trader, dbr_millis());
         Repl repl(bind(&Test::idle, ref(test)));
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));

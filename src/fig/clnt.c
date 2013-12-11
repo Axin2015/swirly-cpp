@@ -369,7 +369,10 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     strncpy(body.place_order_req.accnt, accnt, DBR_MNEM_MAX);
     strncpy(body.place_order_req.contr, contr, DBR_MNEM_MAX);
     body.place_order_req.settl_date = settl_date;
-    strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);
+    if (ref)
+        strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);
+    else
+        body.place_order_req.ref[0] = '\0';
     body.place_order_req.action = action;
     body.place_order_req.ticks = ticks;
     body.place_order_req.lots = lots;
