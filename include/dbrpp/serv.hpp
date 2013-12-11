@@ -521,7 +521,7 @@ public:
             throw_exception();
     }
     void
-    clear()
+    clear() noexcept
     {
         dbr_serv_clear(impl_);
     }
