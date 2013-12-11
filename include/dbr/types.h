@@ -419,6 +419,7 @@ struct DbrExec {
     DbrIden order;
     struct DbrCommon c;
     DbrIden match;
+    int locks_;
     /**
      * @sa enum DbrRole
      */
@@ -436,6 +437,7 @@ struct DbrExec {
 static inline void
 dbr_exec_init(struct DbrExec* exec)
 {
+    exec->locks_ = 0;
     dbr_slnode_init(&exec->shared_node_);
     dbr_rbnode_init(&exec->trader_node_);
 }

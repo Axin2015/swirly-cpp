@@ -235,7 +235,7 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
 }
 
 static DbrBool
-apply_revise(DbrClnt clnt, struct DbrExec* exec)
+apply_update(DbrClnt clnt, struct DbrExec* exec)
 {
     struct DbrRbNode* node = fig_trader_find_order_id(clnt->trader, exec->order);
     if (!node) {
@@ -248,31 +248,15 @@ apply_revise(DbrClnt clnt, struct DbrExec* exec)
     order->c.state = exec->c.state;
     order->c.lots = exec->c.lots;
     order->c.resd = exec->c.resd;
+    order->c.exec = exec->c.exec;
+    order->c.last_ticks = exec->c.last_ticks;
+    order->c.last_lots = exec->c.last_lots;
     order->modified = exec->created;
 
-    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
-    return true;
-}
-
-static DbrBool
-apply_cancel(DbrClnt clnt, struct DbrExec* exec)
-{
-    struct DbrOrder* order = fig_trader_release_order_id(clnt->trader, exec->order);
-    if (!order) {
-        dbr_pool_free_exec(clnt->pool, exec);
-        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", exec->order);
-        return false;
+    if (exec->c.state == DBR_TRADE) {
+        // Transfer ownership.
+        fig_trader_emplace_trade(clnt->trader, exec);
     }
-    dbr_pool_free_order(clnt->pool, order);
-    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
-    return true;
-}
-
-static DbrBool
-apply_trade(DbrClnt clnt, struct DbrExec* exec)
-{
-    // Transfer ownership.
-    fig_trader_emplace_trade(clnt->trader, exec);
     dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
     return true;
 }
@@ -398,19 +382,6 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
         goto fail2;
 
     return body.req_id;
-#if 0
-    // Posn list is transformed to include existing positions with updates.
-    struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrSlNode* node = body.cycle_rep.first_posn; node; ) {
-        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
-        node = node->next;
-        // Transfer ownership or free if update.
-        posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
-        dbr_queue_insert_back(&q, &posn->shared_node_);
-    }
-    body.cycle_rep.first_posn = q.first;
-    return body.cycle_rep.new_order;
-#endif
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -518,6 +489,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
         goto fail2;
 
     struct DbrExec* exec = fig_trader_release_trade_id(clnt->trader, id);
+    // FIXME: reference-counted release.
     if (exec)
         dbr_pool_free_exec(clnt->pool, exec);
 
@@ -583,13 +555,9 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
             apply_new(clnt, body.exec_rep.exec);
             break;
         case DBR_REVISE:
-            apply_revise(clnt, body.exec_rep.exec);
-            break;
         case DBR_CANCEL:
-            apply_cancel(clnt, body.exec_rep.exec);
-            break;
         case DBR_TRADE:
-            apply_trade(clnt, body.exec_rep.exec);
+            apply_update(clnt, body.exec_rep.exec);
             break;
         }
         break;

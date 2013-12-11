@@ -31,10 +31,10 @@
 #define INSERT_EXEC_SQL                                                 \
     "INSERT INTO exec (id, order_, trader, accnt, contr, settl_date,"   \
     " ref, state, action, ticks, lots, resd, exec, last_ticks,"         \
-    " last_lots, min_lots, match, role, cpty, acked, created,"          \
+    " last_lots, min_lots, match, acked, role, cpty, created,"          \
     " modified)"                                                        \
-    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"    \
-    " ?, 0, ?, ?)"
+    " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0,"    \
+    " ?, ?, ?, ?)"
 
 #define UPDATE_EXEC_SQL                                                 \
     "UPDATE exec SET acked = 1, modified = ?"                           \

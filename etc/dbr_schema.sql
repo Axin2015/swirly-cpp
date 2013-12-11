@@ -243,9 +243,9 @@ CREATE TABLE exec (
   last_lots INTEGER NOT NULL,
   min_lots INTEGER NOT NULL,
   match INTEGER NULL,
+  acked INTEGER NOT NULL,
   role INTEGER NULL REFERENCES role (id),
   cpty INTEGER NULL REFERENCES accnt (id),
-  acked INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL
 )
