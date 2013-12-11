@@ -214,11 +214,14 @@ split(const string& s, vector<string>& v)
 class Repl {
     typedef pair<Arity, function<void (Arg, Arg)> > Cmd;
     typedef map<string, Cmd> Cmds;
+    function<void ()> idle_;
     Cmds cmds_;
     bool quit_;
 public:
-    Repl() noexcept
-    : quit_(false)
+    explicit
+    Repl(const function<void ()>& idle) noexcept
+    :   idle_(idle),
+        quit_(false)
     {
     }
     void
@@ -257,7 +260,8 @@ public:
             Arg begin = toks.begin();
             const string& name = *begin++;
             eval(name, begin, toks.end());
-        }
+        } else
+            idle_();
     }
     void
     read(istream& is, const char* prompt = nullptr)
@@ -334,6 +338,12 @@ public:
         DbrStatus status;
         while (clnt_.poll(100, status))
             ;
+    }
+    void
+    idle()
+    {
+        DbrStatus status;
+        clnt_.poll(100, status);
     }
     void
     accnts(Arg begin, Arg end)
@@ -799,7 +809,7 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         Test test("tcp://localhost:3272", "WRAMIREZ", dbr_millis());
-        Repl repl;
+        Repl repl(bind(&Test::idle, ref(test)));
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));
         repl.cmd("ack_trades", -1, bind(&Test::ack_trades, ref(test), _1, _2));
