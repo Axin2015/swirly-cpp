@@ -19,6 +19,11 @@ main(int argc, char* argv[])
         Pool pool;
         Clnt clnt(ctx.c_arg(), "tcp://localhost:3272", "WRAMIREZ", 1, pool);
 
+        // TODO: more robust logic.
+        struct DbrStatus status;
+        while (clnt.poll(100, status))
+            ;
+
         cout << "traders:\n";
         for (auto rec : clnt.trecs()) {
             TraderRecRef ref(rec);
