@@ -370,8 +370,6 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         fig_trader_emplace_trade(taker, match->taker_exec);
         apply_posn(trans->taker_posn, match->taker_exec);
 
-        // Advance node to next before current node is freed.
-        node = node->next;
         dbr_pool_free_match(serv->pool, match);
     }
 

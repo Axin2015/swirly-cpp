@@ -29,7 +29,7 @@
 #include <string.h>
 
 static const char STATUS_REP_FORMAT[] = "is";
-static const char PLACE_ORDER_REQ_FORMAT[] = "mmisillll";
+static const char PLACE_ORDER_REQ_FORMAT[] = "mmisilll";
 static const char REVISE_ORDER_ID_REQ_FORMAT[] = "ll";
 static const char REVISE_ORDER_REF_REQ_FORMAT[] = "sl";
 static const char UPDATE_EXEC_REQ_FORMAT[] = "li";
@@ -664,8 +664,10 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
     if (size < DBR_MNEM_MAX) {
         __builtin_memcpy(msg->head.trader, zmq_msg_data(&zmsg), size);
         msg->head.trader[size] = '\0';
-    } else
+    } else {
+        assert(size == DBR_MNEM_MAX);
         __builtin_memcpy(msg->head.trader, zmq_msg_data(&zmsg), DBR_MNEM_MAX);
+    }
     zmq_msg_close(&zmsg);
     return dbr_recv_body(sock, pool, &msg->body);
  fail2:

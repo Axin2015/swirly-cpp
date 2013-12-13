@@ -37,14 +37,11 @@ enum { TIMEOUT = 5000 };
 struct FigClnt {
     void* ctx;
     void* sock;
-    // See set_trader().
-    union {
-        DbrMnem mnem;
-        DbrTrader trader;
-    };
+    DbrMnem mnem;
     DbrIden id;
     DbrPool pool;
     int pending;
+    DbrTrader trader;
     struct FigCache cache;
     struct FigIndex index;
     struct DbrQueue execs;
@@ -295,6 +292,7 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     clnt->id = seed;
     clnt->pool = pool;
     clnt->pending = DBR_TRADER | DBR_ACCNT | DBR_CONTR | DBR_ORDER | DBR_EXEC | DBR_MEMB | DBR_POSN;
+    clnt->trader = NULL;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
     dbr_queue_init(&clnt->execs);
@@ -569,7 +567,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         apply_posn(clnt, body.posn_rep.posn);
         break;
     default:
-        dbr_err_setf(DBR_EIO, "unknown msg-type '%d'", body.type);
+        dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
         goto fail1;
     }
     return 1;

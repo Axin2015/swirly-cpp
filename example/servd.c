@@ -57,6 +57,7 @@ status_err(struct DbrBody* body, DbrIden req_id)
     body->type = DBR_STATUS_REP;
     body->status_rep.num = dbr_err_num();
     strncpy(body->status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
+    dbr_log_error("error: %.128s", body->status_rep.msg);
 }
 
 static void
@@ -70,6 +71,7 @@ status_setf(struct DbrBody* body, DbrIden req_id, int num, const char* format, .
     va_start(args, format);
     vsnprintf(body->status_rep.msg, DBR_ERRMSG_MAX, format, args);
     va_end(args);
+    dbr_log_error("error: %.128s", body->status_rep.msg);
 }
 
 static DbrBool
@@ -485,6 +487,7 @@ run(void)
             dbr_err_prints("dbr_recv_msg() failed");
             goto fail1;
         }
+        dbr_log_info("received '%d' from '%.16s'", req.body.type, req.head.trader);
         struct DbrBody rep;
         struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req.head.trader);
         if (!trec) {
@@ -530,7 +533,7 @@ run(void)
             ack_trade(&req.body, trader);
             break;
         default:
-            // TODO: unsupported type.
+            dbr_log_error("invalid body-type '%d'", req.body.type);
             break;
         }
     }
