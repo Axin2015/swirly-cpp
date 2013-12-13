@@ -35,10 +35,10 @@ public:
     alloc_id() noexcept;
 
     DbrBool
-    insert_execs(DbrSlNode* first) noexcept;
+    insert_execs(DbrSlNode* first, DbrBool enriched) noexcept;
 
     DbrBool
-    insert_exec(DbrExec& exec) noexcept;
+    insert_exec(DbrExec& exec, DbrBool enriched) noexcept;
 
     DbrBool
     update_exec(DbrIden id, DbrMillis modified) noexcept;

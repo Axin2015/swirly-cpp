@@ -77,7 +77,7 @@ insert_execs(struct DbrBody* req)
                            .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
-    if (!dbr_journ_insert_execs(journ, req->insert_execs_req.first)) {
+    if (!dbr_journ_insert_execs(journ, req->insert_execs_req.first, false)) {
         dbr_err_prints("dbr_journ_insert_execs() failed");
         status_err(&rep, req->req_id);
         goto fail1;
@@ -99,7 +99,7 @@ insert_exec(struct DbrBody* req)
                            .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
-    if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec)) {
+    if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec, false)) {
         dbr_err_prints("dbr_journ_insert_exec() failed");
         status_err(&rep, req->req_id);
         goto fail1;

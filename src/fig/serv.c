@@ -526,7 +526,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
     // unfilled quantity.
 
-    if (!dbr_journ_insert_execs(serv->journ, trans.execs.first))
+    if (!dbr_journ_insert_execs(serv->journ, trans.execs.first, true))
         goto fail5;
 
     // Final commit phase cannot fail.
@@ -581,7 +581,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     exec->c.state = DBR_REVISE;
     exec->c.lots = lots;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec))
+    if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
     // Must succeed because order exists.
@@ -629,7 +629,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     exec->c.state = DBR_REVISE;
     exec->c.lots = lots;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec))
+    if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
@@ -667,7 +667,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     exec->c.state = DBR_CANCEL;
     exec->c.resd = 0;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec))
+    if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
@@ -704,7 +704,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     exec->c.state = DBR_CANCEL;
     exec->c.resd = 0;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec))
+    if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);

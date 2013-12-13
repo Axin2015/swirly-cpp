@@ -57,7 +57,7 @@ alloc_id(DbrJourn journ)
 }
 
 static DbrBool
-insert_execs(DbrJourn journ, struct DbrSlNode* first)
+insert_execs(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrBody body = { .req_id = store->id++, .type = DBR_INSERT_EXECS_REQ,

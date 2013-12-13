@@ -53,7 +53,7 @@ alloc_id(DbrJourn journ)
 }
 
 static DbrBool
-insert_execs(DbrJourn journ, struct DbrSlNode* first)
+insert_execs(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
@@ -63,7 +63,7 @@ insert_execs(DbrJourn journ, struct DbrSlNode* first)
 
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = dbr_shared_exec_entry(node);
-        if (!fir_sqlite_insert_exec(impl, exec)) {
+        if (!fir_sqlite_insert_exec(impl, exec, enriched)) {
             fir_sqlite_rollback_trans(impl);
             goto fail1;
         }
@@ -77,11 +77,11 @@ insert_execs(DbrJourn journ, struct DbrSlNode* first)
 }
 
 static DbrBool
-insert_exec(DbrJourn journ, struct DbrExec* exec)
+insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
-    return fir_sqlite_insert_exec(impl, exec);
+    return fir_sqlite_insert_exec(impl, exec, enriched);
 }
 
 static DbrBool

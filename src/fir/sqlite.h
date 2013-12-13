@@ -54,7 +54,7 @@ DBR_EXTERN DbrBool
 fir_sqlite_rollback_trans(struct FirSqlite* sqlite);
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec);
+fir_sqlite_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool enriched);
 
 DBR_EXTERN DbrBool
 fir_sqlite_update_exec(struct FirSqlite* sqlite, DbrIden id, DbrMillis modified);

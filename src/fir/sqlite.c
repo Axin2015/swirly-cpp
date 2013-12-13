@@ -138,7 +138,7 @@ bind_text(sqlite3_stmt* stmt, int col, const char* text, size_t maxlen)
 }
 
 static DbrBool
-bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
+bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool enriched)
 {
     enum {
         ID = 1,
@@ -160,7 +160,8 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
         MATCH,
         ROLE,
         CPTY,
-        CREATED
+        CREATED,
+        MODIFIED
     };
     sqlite3_stmt* stmt = sqlite->insert_exec;
     int rc = sqlite3_bind_int64(stmt, ID, exec->id);
@@ -246,6 +247,10 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
         goto fail1;
 
     rc = sqlite3_bind_int64(stmt, CREATED, exec->created);
+    if (rc != SQLITE_OK)
+        goto fail1;
+
+    rc = sqlite3_bind_int64(stmt, MODIFIED, exec->created);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -956,9 +961,9 @@ fir_sqlite_rollback_trans(struct FirSqlite* sqlite)
 }
 
 DBR_EXTERN DbrBool
-fir_sqlite_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec)
+fir_sqlite_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool enriched)
 {
-    return bind_insert_exec(sqlite, exec)
+    return bind_insert_exec(sqlite, exec, enriched)
         && exec_stmt(sqlite->db, sqlite->insert_exec);
 }
 
