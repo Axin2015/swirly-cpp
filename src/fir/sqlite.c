@@ -172,17 +172,34 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.id_only);
-    if (rc != SQLITE_OK)
-        goto fail1;
+    if (enriched) {
 
-    rc = sqlite3_bind_int64(stmt, ACCNT, exec->c.accnt.id_only);
-    if (rc != SQLITE_OK)
-        goto fail1;
+        rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.rec->id);
+        if (rc != SQLITE_OK)
+            goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, CONTR, exec->c.contr.id_only);
-    if (rc != SQLITE_OK)
-        goto fail1;
+        rc = sqlite3_bind_int64(stmt, ACCNT, exec->c.accnt.rec->id);
+        if (rc != SQLITE_OK)
+            goto fail1;
+
+        rc = sqlite3_bind_int64(stmt, CONTR, exec->c.contr.rec->id);
+        if (rc != SQLITE_OK)
+            goto fail1;
+
+    } else {
+
+        rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.id_only);
+        if (rc != SQLITE_OK)
+            goto fail1;
+
+        rc = sqlite3_bind_int64(stmt, ACCNT, exec->c.accnt.id_only);
+        if (rc != SQLITE_OK)
+            goto fail1;
+
+        rc = sqlite3_bind_int64(stmt, CONTR, exec->c.contr.id_only);
+        if (rc != SQLITE_OK)
+            goto fail1;
+    }
 
     rc = sqlite3_bind_int(stmt, SETTL_DATE, exec->c.settl_date);
     if (rc != SQLITE_OK)
@@ -232,17 +249,24 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
         goto fail1;
 
     const DbrIden match = exec->match;
-    rc = match != 0 ? sqlite3_bind_int64(stmt, MATCH, match) : sqlite3_bind_null(stmt, REF);
+    rc = match != 0 ? sqlite3_bind_int64(stmt, MATCH, match) : sqlite3_bind_null(stmt, MATCH);
     if (rc != SQLITE_OK)
         goto fail1;
 
     const int role = exec->role;
-    rc = role != 0 ? sqlite3_bind_int(stmt, ROLE, role) : sqlite3_bind_null(stmt, REF);
+    rc = role != 0 ? sqlite3_bind_int(stmt, ROLE, role) : sqlite3_bind_null(stmt, ROLE);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    const DbrIden cpty = exec->cpty.id_only;
-    rc = cpty != 0 ? sqlite3_bind_int64(stmt, CPTY, cpty) : sqlite3_bind_null(stmt, REF);
+    if (enriched) {
+        if (exec->cpty.rec)
+            rc = sqlite3_bind_int64(stmt, CPTY, exec->cpty.rec->id);
+        else
+            rc = sqlite3_bind_null(stmt, CPTY);
+    } else {
+        const DbrIden cpty = exec->cpty.id_only;
+        rc = cpty != 0 ? sqlite3_bind_int64(stmt, CPTY, cpty) : sqlite3_bind_null(stmt, CPTY);
+    }
     if (rc != SQLITE_OK)
         goto fail1;
 
