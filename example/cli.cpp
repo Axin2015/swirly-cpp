@@ -377,6 +377,7 @@ public:
             "+----------"
             "+----------"
             "+----------"
+            "+----------"
             "|"
              << endl;
         for (auto exec : clnt_.execs()) {
@@ -392,10 +393,14 @@ public:
                  << '|' << right << setw(10) << ref.ticks()
                  << '|' << right << setw(10) << ref.lots()
                  << '|' << right << setw(10) << ref.resd()
-                 << '|' << right << setw(10) << ref.exec()
-                 << '|' << left << setw(10) << strrole(ref.role())
-                 << '|' << left << setw(10) << ref.cpty().mnem()
-                 << '|' << endl;
+                 << '|' << right << setw(10) << ref.exec();
+            if (ref.state() == DBR_TRADE)
+                cout << '|' << left << setw(10) << strrole(ref.role())
+                     << '|' << left << setw(10) << ref.cpty().mnem();
+            else
+                cout << '|' << left << setw(10) << "N/A"
+                     << '|' << left << setw(10) << "N/A";
+            cout << '|' << endl;
         }
         clnt_.clear();
     }

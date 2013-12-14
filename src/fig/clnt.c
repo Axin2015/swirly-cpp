@@ -85,7 +85,10 @@ enrich_exec(struct FigCache* cache, struct DbrExec* exec)
     exec->c.trader.rec = get_id(cache, DBR_TRADER, exec->c.trader.id_only);
     exec->c.accnt.rec = get_id(cache, DBR_ACCNT, exec->c.accnt.id_only);
     exec->c.contr.rec = get_id(cache, DBR_CONTR, exec->c.contr.id_only);
-    exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
+    if (exec->cpty.id_only)
+        exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
+    else
+        exec->cpty.rec = NULL;
     return exec;
 }
 
@@ -205,7 +208,7 @@ create_order(DbrClnt clnt, struct DbrExec* exec)
     dbr_order_init(order);
     order->level = NULL;
     order->id = exec->order;
-    __builtin_memcpy(&exec->c, &exec->c, sizeof(struct DbrCommon));
+    __builtin_memcpy(&order->c, &exec->c, sizeof(struct DbrCommon));
     order->created = exec->created;
     order->modified = exec->created;
     return order;
