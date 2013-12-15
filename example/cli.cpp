@@ -21,7 +21,12 @@
 #include <stdexcept>
 #include <vector>
 
-#include <sys/syslimits.h>
+// PATH_MAX
+#if !defined(__APPLE__)
+# include <linux/limits.h>
+#else  // defined(__APPLE__)
+# include <sys/syslimits.h>
+#endif // defined(__APPLE__)
 
 #pragma GCC diagnostic ignored "-Wunused-function"
 
