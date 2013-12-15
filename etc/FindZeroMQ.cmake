@@ -66,13 +66,13 @@
 
 # Look for the header file.
 FIND_PATH(ZEROMQ_INCLUDE_DIR NAMES zmq.h
-  HINTS "$ENV{DOOBRY_HOME}/include")
+  HINTS "$ENV{ZEROMQ_HOME}/include")
 
 # Look for the libraries.
 FIND_LIBRARY(CZEROMQ_LIBRARY NAMES czmq
-  HINTS "$ENV{DOOBRY_HOME}/lib")
+  HINTS "$ENV{ZEROMQ_HOME}/lib")
 FIND_LIBRARY(ZEROMQ_LIBRARY NAMES zmq
-  HINTS "$ENV{DOOBRY_HOME}/lib")
+  HINTS "$ENV{ZEROMQ_HOME}/lib")
 
 # handle the QUIETLY and REQUIRED arguments and set ZEROMQ_FOUND to TRUE if 
 # all listed variables are TRUE
