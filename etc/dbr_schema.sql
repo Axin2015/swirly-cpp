@@ -253,7 +253,7 @@ CREATE TABLE exec (
 
 CREATE TRIGGER before_insert_on_exec
   BEFORE INSERT ON exec
-  WHEN new.state IN (1, 4)
+  WHEN new.state = 1
 BEGIN
   INSERT INTO order_ (
     id,
@@ -297,7 +297,7 @@ END
 
 CREATE TRIGGER before_update_on_exec
   BEFORE INSERT ON exec
-  WHEN NOT new.state IN (1, 4)
+  WHEN new.state != 1
 BEGIN
   UPDATE order_
   SET
