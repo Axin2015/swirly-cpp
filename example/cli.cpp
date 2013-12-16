@@ -353,23 +353,25 @@ public:
             return;
 
         cout <<
-            "|id        "
-            "|order     "
-            "|trec      "
+            "|id   "
+            "|order"
             "|arec      "
             "|crec      "
             "|settl_date"
-            "|ref       "
+            "|state     "
             "|action    "
             "|ticks     "
             "|lots      "
             "|resd      "
             "|exec      "
+            "|last_ticks"
+            "|last_lots "
             "|role      "
             "|cpty      "
             "|" << endl;
         cout <<
-            "|----------"
+            "|-----"
+            "+-----"
             "+----------"
             "+----------"
             "+----------"
@@ -387,18 +389,19 @@ public:
              << endl;
         for (auto exec : clnt_.execs()) {
             ExecRef ref(exec);
-            cout << '|' << right << setw(10) << gtol(ref.id())
-                 << '|' << right << setw(10) << gtol(ref.order())
-                 << '|' << left << setw(10) << ref.trec().mnem()
+            cout << '|' << right << setw(5) << gtol(ref.id())
+                 << '|' << right << setw(5) << gtol(ref.order())
                  << '|' << left << setw(10) << ref.arec().mnem()
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << left << setw(10) << ref.ref()
+                 << '|' << left << setw(10) << strstate(ref.state())
                  << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
                  << '|' << right << setw(10) << ref.lots()
                  << '|' << right << setw(10) << ref.resd()
-                 << '|' << right << setw(10) << ref.exec();
+                 << '|' << right << setw(10) << ref.exec()
+                 << '|' << right << setw(10) << ref.last_ticks()
+                 << '|' << right << setw(10) << ref.last_lots();
             if (ref.state() == DBR_TRADE)
                 cout << '|' << left << setw(10) << strrole(ref.role())
                      << '|' << left << setw(10) << ref.cpty().mnem();
@@ -590,8 +593,7 @@ public:
     {
         auto trader = clnt_.trader();
         cout <<
-            "|id        "
-            "|trec      "
+            "|id   "
             "|arec      "
             "|crec      "
             "|settl_date"
@@ -601,9 +603,12 @@ public:
             "|lots      "
             "|resd      "
             "|exec      "
+            "|last_ticks"
+            "|last_lots "
             "|" << endl;
         cout <<
-            "|----------"
+            "|-----"
+            "+----------"
             "+----------"
             "+----------"
             "+----------"
@@ -618,8 +623,7 @@ public:
              << endl;
         for (auto order : trader.orders()) {
             OrderRef ref(order);
-            cout << '|' << right << setw(10) << gtol(ref.id())
-                 << '|' << left << setw(10) << ref.trec().mnem()
+            cout << '|' << right << setw(5) << gtol(ref.id())
                  << '|' << left << setw(10) << ref.arec().mnem()
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
@@ -629,6 +633,8 @@ public:
                  << '|' << right << setw(10) << ref.lots()
                  << '|' << right << setw(10) << ref.resd()
                  << '|' << right << setw(10) << ref.exec()
+                 << '|' << right << setw(10) << ref.last_ticks()
+                 << '|' << right << setw(10) << ref.last_lots()
                  << '|' << endl;
         }
     }
@@ -743,24 +749,24 @@ public:
     {
         auto trader = clnt_.trader();
         cout <<
-            "|id        "
-            "|order     "
-            "|trec      "
+            "|id   "
+            "|order"
             "|arec      "
             "|crec      "
             "|settl_date"
-            "|ref       "
-            "|cpty      "
-            "|role      "
             "|action    "
             "|ticks     "
+            "|lots      "
             "|resd      "
             "|exec      "
-            "|lots      "
+            "|last_ticks"
+            "|last_lots "
+            "|role      "
+            "|cpty      "
             "|" << endl;
         cout <<
-            "|----------"
-            "+----------"
+            "|-----"
+            "+-----"
             "+----------"
             "+----------"
             "+----------"
@@ -777,20 +783,20 @@ public:
              << endl;
         for (auto exec : trader.trades()) {
             ExecRef ref(exec);
-            cout << '|' << right << setw(10) << gtol(ref.id())
-                 << '|' << right << setw(10) << gtol(ref.order())
-                 << '|' << left << setw(10) << ref.trec().mnem()
+            cout << '|' << right << setw(5) << gtol(ref.id())
+                 << '|' << right << setw(5) << gtol(ref.order())
                  << '|' << left << setw(10) << ref.arec().mnem()
                  << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << left << setw(10) << ref.ref()
-                 << '|' << left << setw(10) << ref.cpty().mnem()
-                 << '|' << left << setw(10) << strrole(ref.role())
                  << '|' << left << setw(10) << straction(ref.action())
                  << '|' << right << setw(10) << ref.ticks()
+                 << '|' << right << setw(10) << ref.lots()
                  << '|' << right << setw(10) << ref.resd()
                  << '|' << right << setw(10) << ref.exec()
-                 << '|' << right << setw(10) << ref.lots()
+                 << '|' << right << setw(10) << ref.last_ticks()
+                 << '|' << right << setw(10) << ref.last_lots()
+                 << '|' << left << setw(10) << strrole(ref.role())
+                 << '|' << left << setw(10) << ref.cpty().mnem()
                  << '|' << endl;
         }
     }
