@@ -16,8 +16,6 @@
  *  02110-1301 USA.
  */
 #define _XOPEN_SOURCE 700 // strnlen()
-#undef DBR_DEBUG_LEVEL
-#define DBR_DEBUG_LEVEL 3
 #include "sqlite.h"
 
 #include "sqlite3.h"
