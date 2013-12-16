@@ -204,7 +204,7 @@ CREATE VIEW order_v AS
   o.settl_date,
   o.ref,
   s.mnem state,
-  o.action,
+  n.mnem action,
   o.ticks,
   o.lots,
   o.resd,
@@ -215,14 +215,16 @@ CREATE VIEW order_v AS
   o.created,
   o.modified
   FROM order_ o
-  INNER JOIN state s
-  ON o.state = s.id
   INNER JOIN trader t
   ON o.trader = t.id
   INNER JOIN accnt a
   ON o.accnt = a.id
   INNER JOIN contr c
   ON o.contr = c.id
+  INNER JOIN state s
+  ON o.state = s.id
+  INNER JOIN action n
+  ON o.action = n.id
 ;
 
 CREATE TABLE exec (
@@ -322,7 +324,7 @@ CREATE VIEW exec_v AS
   e.settl_date,
   e.ref,
   s.mnem state,
-  e.action,
+  n.mnem action,
   e.ticks,
   e.lots,
   e.resd,
@@ -337,14 +339,16 @@ CREATE VIEW exec_v AS
   e.created,
   e.modified
   FROM exec e
-  INNER JOIN state s
-  ON e.state = s.id
   INNER JOIN trader t
   ON e.trader = t.id
   INNER JOIN accnt a
   ON e.accnt = a.id
   INNER JOIN contr c
   ON e.contr = c.id
+  INNER JOIN state s
+  ON e.state = s.id
+  INNER JOIN action n
+  ON e.action = n.id
   INNER JOIN role r
   ON e.role = r.id
   INNER JOIN accnt p
