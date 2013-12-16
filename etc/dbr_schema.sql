@@ -331,9 +331,9 @@ CREATE VIEW exec_v AS
   e.last_lots,
   e.min_lots,
   e.match,
+  e.acked,
   r.mnem role,
   p.mnem cpty,
-  e.acked,
   e.created,
   e.modified
   FROM exec e
@@ -355,9 +355,9 @@ CREATE VIEW trade_v AS
   SELECT
   e.id,
   e.order_,
-  t.mnem trader,
-  a.mnem accnt,
-  c.mnem contr,
+  e.trader,
+  e.accnt,
+  e.contr,
   e.settl_date,
   e.ref,
   e.action,
@@ -369,22 +369,12 @@ CREATE VIEW trade_v AS
   e.last_lots,
   e.min_lots,
   e.match,
-  r.mnem role,
-  p.mnem cpty,
   e.acked,
+  e.role,
+  e.cpty,
   e.created,
   e.modified
   FROM exec e
-  INNER JOIN trader t
-  ON e.trader = t.id
-  INNER JOIN accnt a
-  ON e.accnt = a.id
-  INNER JOIN contr c
-  ON e.contr = c.id
-  INNER JOIN role r
-  ON e.role = r.id
-  INNER JOIN accnt p
-  ON e.cpty = p.id
   WHERE e.state = 4
 ;
 

@@ -30,7 +30,7 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        SqlStore store(1, "doobry.db");
+        SqlStore store("doobry.db", 1);
         Pool pool;
         Serv serv(store.journ(), store.model(), pool);
 

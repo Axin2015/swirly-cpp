@@ -37,8 +37,8 @@ public:
         : impl_{nullptr}
     {
     }
-    SqlStore(DbrIden seed, const char* path)
-        : impl_{dbr_sqlstore_create(seed, path)}
+    SqlStore(const char* path, DbrIden seed)
+        : impl_{dbr_sqlstore_create(path, seed)}
     {
         if (!impl_)
             throw_exception();

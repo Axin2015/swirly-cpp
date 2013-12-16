@@ -27,6 +27,7 @@
 #include <dbr/sqlstore.h>
 #include <dbr/trader.h>
 #include <dbr/tree.h>
+#include <dbr/util.h>
 
 #include <zmq.h>
 
@@ -561,7 +562,7 @@ main(int argc, char* argv[])
         goto exit1;
     }
 
-    store = dbr_sqlstore_create(1, "doobry.db");
+    store = dbr_sqlstore_create("doobry.db", dbr_millis());
     if (!store) {
         dbr_err_prints("dbr_sqlstore_create() failed");
         goto exit2;

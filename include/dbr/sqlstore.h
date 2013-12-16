@@ -31,15 +31,15 @@ typedef struct FirSqlStore* DbrSqlStore;
 /**
  * @brief Create SQLite3 model.
  *
- * @param seed Seed identifier.
- *
  * @param path Path to the database.
+ *
+ * @param seed Seed identifier.
  *
  * @return Handle to newly created model or null on failure.
  */
 
 DBR_API DbrSqlStore
-dbr_sqlstore_create(DbrIden seed, const char* path);
+dbr_sqlstore_create(const char* path, DbrIden seed);
 
 DBR_API void
 dbr_sqlstore_destroy(DbrSqlStore store);

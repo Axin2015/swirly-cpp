@@ -27,8 +27,8 @@
 #include <stdlib.h>
 
 struct FirSqlStore {
-    DbrIden id;
     struct FirSqlite impl;
+    DbrIden id;
     struct DbrIJourn journ;
     struct DbrIModel model;
 };
@@ -112,7 +112,7 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 };
 
 DBR_API DbrSqlStore
-dbr_sqlstore_create(DbrIden seed, const char* path)
+dbr_sqlstore_create(const char* path, DbrIden seed)
 {
     struct FirSqlStore* store = malloc(sizeof(struct FirSqlStore));
     if (dbr_unlikely(!store)) {
@@ -120,12 +120,11 @@ dbr_sqlstore_create(DbrIden seed, const char* path)
         goto fail1;
     }
 
-    // Seed identity.
-    store->id = seed;
-
     if (!fir_sqlite_init(&store->impl, path))
         goto fail2;
 
+    // Seed identity.
+    store->id = seed;
     store->journ.vtbl = &JOURN_VTBL;
     store->model.vtbl = &MODEL_VTBL;
     return store;
