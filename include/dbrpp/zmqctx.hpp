@@ -31,8 +31,11 @@ public:
     ~ZmqCtx() noexcept
     {
         if (impl_) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
             const int rc{zmq_ctx_destroy(impl_)};
             assert(rc == 0);
+#pragma GCC diagnostic pop
         }
     }
     constexpr
@@ -72,8 +75,11 @@ public:
     operator =(ZmqCtx&& rhs) noexcept
     {
         if (impl_) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
             const int rc{zmq_ctx_destroy(impl_)};
             assert(rc == 0);
+#pragma GCC diagnostic pop
             impl_ = nullptr;
         }
         swap(rhs);
