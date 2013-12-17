@@ -55,8 +55,10 @@ fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
     const DbrIden key = posn->contr.rec->id * 100000000L + posn->settl_date;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-    struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
-    assert(!node);
+    {
+        struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
+        assert(!node);
+    }
 #pragma GCC diagnostic pop
 }
 
@@ -101,9 +103,11 @@ fig_accnt_insert_memb(struct FigAccnt* accnt, struct DbrMemb* memb)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-    struct DbrRbNode* node = dbr_tree_insert(&accnt->membs, memb->trader.rec->id,
-                                             &memb->accnt_node_);
-    assert(!node);
+    {
+        struct DbrRbNode* node = dbr_tree_insert(&accnt->membs, memb->trader.rec->id,
+                                                 &memb->accnt_node_);
+        assert(!node);
+    }
 #pragma GCC diagnostic pop
 }
 

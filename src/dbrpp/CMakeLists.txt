@@ -4,5 +4,5 @@ INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIRS}")
 
 FILE(GLOB dbrpp_SOURCES "*.cpp")
 
-ADD_LIBRARY(dbrpp_static STATIC ${dbrpp_SOURCES})
-SET_TARGET_PROPERTIES(dbrpp_static PROPERTIES OUTPUT_NAME dbrpp)
+# TODO: exclude from install target.
+ADD_EXECUTABLE(dbrpp_stub ${dbrpp_SOURCES})

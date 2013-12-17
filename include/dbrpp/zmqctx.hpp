@@ -33,8 +33,10 @@ public:
         if (impl_) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-            const int rc{zmq_ctx_destroy(impl_)};
-            assert(rc == 0);
+            {
+                const int rc{zmq_ctx_destroy(impl_)};
+                assert(rc == 0);
+            }
 #pragma GCC diagnostic pop
         }
     }
@@ -77,8 +79,10 @@ public:
         if (impl_) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-            const int rc{zmq_ctx_destroy(impl_)};
-            assert(rc == 0);
+            {
+                const int rc{zmq_ctx_destroy(impl_)};
+                assert(rc == 0);
+            }
 #pragma GCC diagnostic pop
             impl_ = nullptr;
         }

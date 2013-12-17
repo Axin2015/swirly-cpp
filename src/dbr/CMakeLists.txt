@@ -3,5 +3,5 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 
 FILE(GLOB dbr_SOURCES "*.c")
 
-ADD_LIBRARY(dbr_static STATIC ${dbr_SOURCES})
-SET_TARGET_PROPERTIES(dbr_static PROPERTIES OUTPUT_NAME dbr)
+# TODO: exclude from install target.
+ADD_EXECUTABLE(dbr_stub ${dbr_SOURCES})

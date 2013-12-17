@@ -60,8 +60,10 @@ fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-    struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
-    assert(!node);
+    {
+        struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
+        assert(!node);
+    }
 #pragma GCC diagnostic pop
     if (order->c.ref[0] != '\0')
         fig_index_insert(trader->index, order);
@@ -149,8 +151,10 @@ fig_trader_emplace_trade(struct FigTrader* trader, struct DbrExec* exec)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-    struct DbrRbNode* node = dbr_tree_insert(&trader->trades, exec->id, &exec->trader_node_);
-    assert(!node);
+    {
+        struct DbrRbNode* node = dbr_tree_insert(&trader->trades, exec->id, &exec->trader_node_);
+        assert(!node);
+    }
 #pragma GCC diagnostic pop
 }
 
@@ -211,9 +215,11 @@ fig_trader_emplace_memb(struct FigTrader* trader, struct DbrMemb* memb)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
-    struct DbrRbNode* node = dbr_tree_insert(&trader->membs, memb->accnt.rec->id,
-                                             &memb->trader_node_);
-    assert(!node);
+    {
+        struct DbrRbNode* node = dbr_tree_insert(&trader->membs, memb->accnt.rec->id,
+                                                 &memb->trader_node_);
+        assert(!node);
+    }
 #pragma GCC diagnostic pop
 }
 
