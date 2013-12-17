@@ -433,7 +433,7 @@ dbr_vpacklenf(const char* format, va_list args)
             n += dbr_packlens(s, MNEM_MAX);
             break;
         case 's':
-            m = va_arg(args, size_t);
+            m = va_arg(args, int);
             s = va_arg(args, const char*);
             n += dbr_packlens(s, m);
             break;
@@ -466,7 +466,7 @@ dbr_vpackf(char* buf, const char* format, va_list args)
             buf = dbr_packs(buf, s, MNEM_MAX);
             break;
         case 's':
-            m = va_arg(args, size_t);
+            m = va_arg(args, int);
             s = va_arg(args, const char*);
             buf = dbr_packs(buf, s, m);
             break;
@@ -499,7 +499,7 @@ dbr_vunpackf(const char* buf, const char* format, va_list args)
             buf = dbr_unpacks(buf, s, MNEM_MAX);
             break;
         case 's':
-            m = va_arg(args, size_t);
+            m = va_arg(args, int);
             s = va_arg(args, char*);
             buf = dbr_unpacks(buf, s, m);
             break;
