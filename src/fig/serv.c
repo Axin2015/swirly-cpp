@@ -328,14 +328,14 @@ tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
 static inline void
 apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
 {
-    const double licks = exec->c.lots * exec->c.ticks;
+    const double licks = exec->c.last_lots * exec->c.last_ticks;
     if (exec->c.action == DBR_BUY) {
         posn->buy_licks += licks;
-        posn->buy_lots += exec->c.lots;
+        posn->buy_lots += exec->c.last_lots;
     } else {
         assert(exec->c.action == DBR_SELL);
         posn->sell_licks += licks;
-        posn->sell_lots += exec->c.lots;
+        posn->sell_lots += exec->c.last_lots;
     }
 }
 

@@ -132,15 +132,6 @@ set_trader(DbrClnt clnt)
         goto fail1;
 
     clnt->trader = trader;
-
-    // Force instantiation of all accounts now.
-    for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
-         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
-        if (!accnt)
-            goto fail1;
-    }
     return true;
  fail1:
     return false;
@@ -151,8 +142,10 @@ emplace_recs(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
 {
     fig_cache_emplace_recs(&clnt->cache, type, first, count);
     clnt->pending &= ~type;
-    if ((clnt->pending & (DBR_TRADER | DBR_ACCNT | DBR_CONTR)) == 0)
-        set_trader(clnt);
+    if ((clnt->pending & (DBR_TRADER | DBR_ACCNT | DBR_CONTR)) == 0) {
+        if (!set_trader(clnt))
+            abort();
+    }
 }
 
 static void
@@ -184,6 +177,9 @@ emplace_membs(DbrClnt clnt, struct DbrSlNode* first)
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
         // Transfer ownership.
         fig_trader_emplace_memb(clnt->trader, memb);
+        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
+        if (!accnt)
+            abort();
     }
     clnt->pending &= ~DBR_MEMB;
 }
@@ -194,8 +190,10 @@ emplace_posns(DbrClnt clnt, struct DbrSlNode* first)
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
         // Transfer ownership.
-        // All accnts that trader is member of are created in set_trader().
-        fig_accnt_emplace_posn(posn->accnt.rec->accnt.state, posn);
+        // All accnts that trader is member of are created in emplace_membs().
+        DbrAccnt accnt = posn->accnt.rec->accnt.state;
+        assert(accnt);
+        fig_accnt_emplace_posn(accnt, posn);
     }
     clnt->pending &= ~DBR_POSN;
 }
