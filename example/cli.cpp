@@ -365,7 +365,12 @@ public:
     idle()
     {
         DbrStatus status;
-        clnt_.poll(100, status);
+        if (!clnt_.poll(100, status))
+            return;
+
+        if (status.num != 0)
+            cerr << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
+
         if (clnt_.execs().empty())
             return;
 

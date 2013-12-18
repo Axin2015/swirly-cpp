@@ -510,13 +510,13 @@ public:
             throw_exception();
         return req_id;
     }
-    int
+    bool
     poll(DbrMillis ms, DbrStatus& status)
     {
         int n = dbr_clnt_poll(impl_, ms, &status);
         if (n < 0)
             throw_exception();
-        return n;
+        return n == 1;
     }
     void
     clear() noexcept
