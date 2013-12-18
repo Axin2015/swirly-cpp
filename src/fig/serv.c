@@ -579,12 +579,15 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
 
     // Revise.
     exec->c.state = DBR_REVISE;
+    const DbrLots delta = exec->c.lots - lots;
+    assert(delta >= 0);
     exec->c.lots = lots;
+    exec->c.resd -= delta;
 
     if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
-    // Must succeed because order exists.
+    // Final commit phase cannot fail.
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
@@ -627,11 +630,15 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
 
     // Revise.
     exec->c.state = DBR_REVISE;
+    const DbrLots delta = exec->c.lots - lots;
+    assert(delta >= 0);
     exec->c.lots = lots;
+    exec->c.resd -= delta;
 
     if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
+    // Final commit phase cannot fail.
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
@@ -670,6 +677,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
+    // Final commit phase cannot fail.
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
@@ -707,6 +715,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     if (!dbr_journ_insert_exec(serv->journ, exec, true))
         goto fail2;
 
+    // Final commit phase cannot fail.
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);

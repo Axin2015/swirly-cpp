@@ -53,18 +53,18 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
 }
 
 static inline void
-reduce(struct DbrSide* side, struct DbrOrder* order, DbrLots lots)
+reduce(struct DbrSide* side, struct DbrOrder* order, DbrLots delta)
 {
     assert(order);
     assert(order->level);
-    assert(lots >= 0 && lots <= order->c.resd);
+    assert(delta >= 0 && delta <= order->c.resd);
 
-    if (lots < order->c.resd) {
+    if (delta < order->c.resd) {
         // Reduce level and order by lots.
-        order->level->resd -= lots;
-        order->c.resd -= lots;
+        order->level->resd -= delta;
+        order->c.resd -= delta;
     } else {
-        assert(lots == order->c.resd);
+        assert(delta == order->c.resd);
         dbr_side_remove_order(side, order);
         order->c.resd = 0;
     }
