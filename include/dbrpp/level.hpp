@@ -41,11 +41,6 @@ public:
     {
         return impl_;
     }
-    size_t
-    count() const noexcept
-    {
-        return impl_->count;
-    }
     DbrTicks
     ticks() const noexcept
     {
@@ -53,18 +48,23 @@ public:
     }
     // Must be greater than zero.
     DbrLots
-    resd() const noexcept
+    lots() const noexcept
     {
-        return impl_->resd;
+        return impl_->lots;
+    }
+    size_t
+    count() const noexcept
+    {
+        return impl_->count;
     }
 };
 
 inline std::ostream&
 operator <<(std::ostream& os, LevelRef level)
 {
-    return os << "count=" << level.count()
-              << ",ticks=" << level.ticks()
-              << ",resd=" << level.resd();
+    return os << "ticks=" << level.ticks()
+              << ",lots=" << level.lots()
+              << ",count=" << level.count();
 }
 } // dbr
 

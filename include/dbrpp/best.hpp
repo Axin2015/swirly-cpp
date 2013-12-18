@@ -42,9 +42,14 @@ public:
         return impl_.bid_ticks;
     }
     DbrLots
-    bid_resd() const noexcept
+    bid_lots() const noexcept
     {
-        return impl_.bid_resd;
+        return impl_.bid_lots;
+    }
+    size_t
+    bid_count() const noexcept
+    {
+        return impl_.bid_count;
     }
     DbrTicks
     ask_ticks() const noexcept
@@ -52,9 +57,14 @@ public:
         return impl_.ask_ticks;
     }
     DbrLots
-    ask_resd() const noexcept
+    ask_lots() const noexcept
     {
-        return impl_.ask_resd;
+        return impl_.ask_lots;
+    }
+    size_t
+    ask_count() const noexcept
+    {
+        return impl_.ask_count;
     }
 };
 
@@ -62,9 +72,11 @@ inline std::ostream&
 operator <<(std::ostream& os, const Best& best)
 {
     return os << "bid_ticks=" << best.bid_ticks()
-              << ",bid_resd=" << best.bid_resd()
+              << ",bid_lots=" << best.bid_lots()
+              << ",bid_count=" << best.bid_count()
               << ",ask_ticks=" << best.ask_ticks()
-              << ",ask_resd=" << best.ask_resd();
+              << ",ask_lots=" << best.ask_lots()
+              << ",ask_count=" << best.ask_count();
 }
 
 inline Best

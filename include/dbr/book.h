@@ -35,9 +35,11 @@ struct DbrBook {
 
 struct DbrBest {
     DbrTicks bid_ticks;
-    DbrLots bid_resd;
+    DbrLots bid_lots;
+    size_t bid_count;
     DbrTicks ask_ticks;
-    DbrLots ask_resd;
+    DbrLots ask_lots;
+    size_t ask_count;
 };
 
 DBR_API void

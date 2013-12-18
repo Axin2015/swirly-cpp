@@ -227,12 +227,11 @@ struct DbrLevel {
      * @publicsection
      */
     struct DbrOrder* first_order;
-    // Must be greater than zero.
-    size_t count;
-    // Signed where negative means buy.
     DbrTicks ticks;
     // Must be greater than zero.
-    DbrLots resd;
+    DbrLots lots;
+    // Must be greater than zero.
+    size_t count;
     /**
      * @privatesection
      */
