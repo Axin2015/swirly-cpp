@@ -41,6 +41,9 @@ dbr_book_term(struct DbrBook* book)
 DBR_API struct DbrView*
 dbr_book_view(struct DbrBook* book, struct DbrView* view)
 {
+    view->contr.rec = book->crec;
+    view->settl_date = book->settl_date;
+
     struct DbrSide* side = &book->bid_side;
     struct DbrRbNode* it = dbr_side_first_level(side);
     if (it != DBR_SIDE_END_LEVEL) {

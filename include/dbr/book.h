@@ -34,6 +34,8 @@ struct DbrBook {
 };
 
 struct DbrView {
+    union DbrURec contr;
+    DbrDate settl_date;
     DbrTicks bid_ticks;
     DbrLots bid_lots;
     size_t bid_count;
