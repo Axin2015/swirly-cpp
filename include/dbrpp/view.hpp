@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_BEST_HPP
-#define DBRPP_BEST_HPP
+#ifndef DBRPP_VIEW_HPP
+#define DBRPP_VIEW_HPP
 
 #include <dbr/book.h>
 
@@ -24,14 +24,14 @@
 
 namespace dbr {
 
-class Best {
-    DbrBest impl_;
+class View {
+    DbrView impl_;
 public:
-    operator DbrBest&() noexcept
+    operator DbrView&() noexcept
     {
         return impl_;
     }
-    DbrBest*
+    DbrView*
     c_arg() noexcept
     {
         return &impl_;
@@ -69,23 +69,23 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, const Best& best)
+operator <<(std::ostream& os, const View& view)
 {
-    return os << "bid_ticks=" << best.bid_ticks()
-              << ",bid_lots=" << best.bid_lots()
-              << ",bid_count=" << best.bid_count()
-              << ",ask_ticks=" << best.ask_ticks()
-              << ",ask_lots=" << best.ask_lots()
-              << ",ask_count=" << best.ask_count();
+    return os << "bid_ticks=" << view.bid_ticks()
+              << ",bid_lots=" << view.bid_lots()
+              << ",bid_count=" << view.bid_count()
+              << ",ask_ticks=" << view.ask_ticks()
+              << ",ask_lots=" << view.ask_lots()
+              << ",ask_count=" << view.ask_count();
 }
 
-inline Best
-best(DbrBook& book)
+inline View
+view(DbrBook& book)
 {
-    Best best;
-    dbr_book_best(&book, best.c_arg());
-    return best;
+    View view;
+    dbr_book_view(&book, view.c_arg());
+    return view;
 }
 } // dbr
 
-#endif // DBRPP_BEST_HPP
+#endif // DBRPP_VIEW_HPP

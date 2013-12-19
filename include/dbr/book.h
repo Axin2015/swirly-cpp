@@ -33,7 +33,7 @@ struct DbrBook {
     struct DbrRbNode serv_node_;
 };
 
-struct DbrBest {
+struct DbrView {
     DbrTicks bid_ticks;
     DbrLots bid_lots;
     size_t bid_count;
@@ -117,8 +117,8 @@ dbr_book_ask_side(struct DbrBook* book)
     return &book->ask_side;
 }
 
-DBR_API struct DbrBest*
-dbr_book_best(struct DbrBook* book, struct DbrBest* best);
+DBR_API struct DbrView*
+dbr_book_view(struct DbrBook* book, struct DbrView* view);
 
 /** @} */
 

@@ -38,33 +38,33 @@ dbr_book_term(struct DbrBook* book)
     dbr_side_term(&book->ask_side);
 }
 
-DBR_API struct DbrBest*
-dbr_book_best(struct DbrBook* book, struct DbrBest* best)
+DBR_API struct DbrView*
+dbr_book_view(struct DbrBook* book, struct DbrView* view)
 {
     struct DbrSide* side = &book->bid_side;
     struct DbrRbNode* it = dbr_side_first_level(side);
     if (it != DBR_SIDE_END_LEVEL) {
         struct DbrLevel* level = dbr_side_level_entry(it);
-        best->bid_ticks = level->ticks;
-        best->bid_lots = level->lots;
-        best->bid_count = level->count;
+        view->bid_ticks = level->ticks;
+        view->bid_lots = level->lots;
+        view->bid_count = level->count;
     } else {
-        best->bid_ticks = 0;
-        best->bid_lots = 0;
-        best->bid_count = 0;
+        view->bid_ticks = 0;
+        view->bid_lots = 0;
+        view->bid_count = 0;
     }
 
     side = &book->ask_side;
     it = dbr_side_first_level(side);
     if (it != DBR_SIDE_END_LEVEL) {
         struct DbrLevel* level = dbr_side_level_entry(it);
-        best->ask_ticks = level->ticks;
-        best->ask_lots = level->lots;
-        best->ask_count = level->count;
+        view->ask_ticks = level->ticks;
+        view->ask_lots = level->lots;
+        view->ask_count = level->count;
     } else {
-        best->ask_ticks = 0;
-        best->ask_lots = 0;
-        best->ask_count = 0;
+        view->ask_ticks = 0;
+        view->ask_lots = 0;
+        view->ask_count = 0;
     }
-    return best;
+    return view;
 }
