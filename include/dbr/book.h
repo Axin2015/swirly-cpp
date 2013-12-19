@@ -30,7 +30,11 @@ struct DbrBook {
     DbrDate settl_date;
     struct DbrSide bid_side;
     struct DbrSide ask_side;
+    /**
+     * @privatesection
+     */
     struct DbrRbNode serv_node_;
+    struct DbrRbNode cycle_node_;
 };
 
 struct DbrView {
@@ -42,6 +46,9 @@ struct DbrView {
     DbrTicks ask_ticks;
     DbrLots ask_lots;
     size_t ask_count;
+    /**
+     * @privatesection
+     */
 };
 
 DBR_API void
