@@ -21,7 +21,6 @@
 #include "match.h"
 #include "trader.h"
 
-#include <dbr/book.h>
 #include <dbr/err.h>
 #include <dbr/serv.h>
 #include <dbr/journ.h>
@@ -38,9 +37,11 @@ struct FigServ {
     DbrPool pool;
     struct FigCache cache;
     struct FigIndex index;
-    struct DbrQueue execs;
-    struct DbrTree posns;
     struct DbrTree books;
+
+    struct DbrQueue execs;
+    struct DbrTree posnups;
+    struct DbrTree bookups;
 };
 
 static inline struct DbrBook*
@@ -353,7 +354,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
         // Reduce maker.
         dbr_book_take(book, maker_order, match->lots, now);
-        tree_insert(&serv->posns, &match->maker_posn->cycle_node_);
+        tree_insert(&serv->posnups, &match->maker_posn->cycle_node_);
 
         // Must succeed because maker order exists.
         struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
@@ -375,7 +376,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
     dbr_queue_join(&serv->execs, &trans->execs);
     if (trans->taker_posn)
-        tree_insert(&serv->posns, &trans->taker_posn->cycle_node_);
+        tree_insert(&serv->posnups, &trans->taker_posn->cycle_node_);
 }
 
 DBR_API DbrServ
@@ -392,9 +393,11 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     serv->pool = pool;
     fig_cache_init(&serv->cache, term_state, pool);
     fig_index_init(&serv->index);
-    dbr_queue_init(&serv->execs);
-    dbr_tree_init(&serv->posns);
     dbr_tree_init(&serv->books);
+
+    dbr_queue_init(&serv->execs);
+    dbr_tree_init(&serv->posnups);
+    dbr_tree_init(&serv->bookups);
 
     // Data structures are fully initialised at this point.
 
@@ -770,7 +773,8 @@ dbr_serv_clear(DbrServ serv)
             dbr_pool_free_exec(serv->pool, exec);
     }
     dbr_queue_init(&serv->execs);
-    dbr_tree_init(&serv->posns);
+    dbr_tree_init(&serv->posnups);
+    dbr_tree_init(&serv->bookups);
 }
 
 DBR_API struct DbrSlNode*
@@ -786,13 +790,25 @@ dbr_serv_empty_exec(DbrServ serv)
 }
 
 DBR_API struct DbrRbNode*
-dbr_serv_first_posn(DbrServ serv)
+dbr_serv_first_posnup(DbrServ serv)
 {
-    return dbr_tree_first(&serv->posns);
+    return dbr_tree_first(&serv->posnups);
 }
 
 DBR_API DbrBool
-dbr_serv_empty_posn(DbrServ serv)
+dbr_serv_empty_posnup(DbrServ serv)
 {
-    return dbr_tree_empty(&serv->posns);
+    return dbr_tree_empty(&serv->posnups);
+}
+
+DBR_API struct DbrRbNode*
+dbr_serv_first_bookup(DbrServ serv)
+{
+    return dbr_tree_first(&serv->bookups);
+}
+
+DBR_API DbrBool
+dbr_serv_empty_bookup(DbrServ serv)
+{
+    return dbr_tree_empty(&serv->bookups);
 }

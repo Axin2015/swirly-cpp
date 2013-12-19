@@ -134,9 +134,9 @@ flush(const struct DbrBody* req)
         }
     }
 
-    for (struct DbrRbNode* node = dbr_serv_first_posn(serv);
-         node != DBR_SERV_END_POSN; node = dbr_rbnode_next(node)) {
-        struct DbrPosn* posn = dbr_serv_posn_entry(node);
+    for (struct DbrRbNode* node = dbr_serv_first_posnup(serv);
+         node != DBR_SERV_END_POSNUP; node = dbr_rbnode_next(node)) {
+        struct DbrPosn* posn = dbr_serv_posnup_entry(node);
         if (!send_posn(0, posn))
             goto fail1;
     }

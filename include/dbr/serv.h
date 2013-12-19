@@ -18,6 +18,7 @@
 #ifndef DBR_SERV_H
 #define DBR_SERV_H
 
+#include <dbr/book.h>
 #include <dbr/model.h>
 #include <dbr/pool.h>
 
@@ -122,13 +123,21 @@ dbr_serv_first_exec(DbrServ serv);
 DBR_API DbrBool
 dbr_serv_empty_exec(DbrServ serv);
 
-#define DBR_SERV_END_POSN NULL
+#define DBR_SERV_END_POSNUP NULL
 
 DBR_API struct DbrRbNode*
-dbr_serv_first_posn(DbrServ serv);
+dbr_serv_first_posnup(DbrServ serv);
 
 DBR_API DbrBool
-dbr_serv_empty_posn(DbrServ serv);
+dbr_serv_empty_posnup(DbrServ serv);
+
+#define DBR_SERV_END_BOOKUP NULL
+
+DBR_API struct DbrRbNode*
+dbr_serv_first_bookup(DbrServ serv);
+
+DBR_API DbrBool
+dbr_serv_empty_bookup(DbrServ serv);
 
 static inline struct DbrRec*
 dbr_serv_rec_entry(struct DbrSlNode* node)
@@ -143,9 +152,15 @@ dbr_serv_exec_entry(struct DbrSlNode* node)
 }
 
 static inline struct DbrPosn*
-dbr_serv_posn_entry(struct DbrRbNode* node)
+dbr_serv_posnup_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct DbrPosn, cycle_node_, node);
+}
+
+static inline struct DbrBook*
+dbr_serv_bookup_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrBook, cycle_node_, node);
 }
 
 /** @} */
