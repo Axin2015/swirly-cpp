@@ -37,20 +37,6 @@ struct DbrBook {
     struct DbrRbNode update_node_;
 };
 
-struct DbrView {
-    union DbrURec contr;
-    DbrDate settl_date;
-    DbrTicks bid_ticks;
-    DbrLots bid_lots;
-    size_t bid_count;
-    DbrTicks ask_ticks;
-    DbrLots ask_lots;
-    size_t ask_count;
-    /**
-     * @privatesection
-     */
-};
-
 DBR_API void
 dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, DbrPool pool);
 
