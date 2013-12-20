@@ -354,7 +354,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
         // Reduce maker.
         dbr_book_take(book, maker_order, match->lots, now);
-        tree_insert(&serv->posnups, &match->maker_posn->cycle_node_);
+        tree_insert(&serv->posnups, &match->maker_posn->update_node_);
 
         // Must succeed because maker order exists.
         struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
@@ -376,7 +376,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
     dbr_queue_join(&serv->execs, &trans->execs);
     if (trans->taker_posn)
-        tree_insert(&serv->posnups, &trans->taker_posn->cycle_node_);
+        tree_insert(&serv->posnups, &trans->taker_posn->update_node_);
 }
 
 DBR_API DbrServ

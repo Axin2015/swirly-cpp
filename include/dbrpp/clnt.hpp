@@ -267,18 +267,18 @@ public:
     }
 };
 
-class ClntPosns {
+class ClntPosnups {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrPosn Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_clnt_posn_entry(node);
+            return dbr_clnt_posnup_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_clnt_posn_entry(const_cast<Node*>(node));
+            return dbr_clnt_posnup_entry(const_cast<Node*>(node));
         }
     };
     DbrClnt clnt_;
@@ -311,12 +311,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    ClntPosns(DbrClnt clnt) noexcept
+    ClntPosnups(DbrClnt clnt) noexcept
         : clnt_{clnt}
     {
     }
     void
-    swap(ClntPosns& rhs) noexcept
+    swap(ClntPosnups& rhs) noexcept
     {
         std::swap(clnt_, rhs.clnt_);
     }
@@ -326,12 +326,12 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_clnt_first_posn(clnt_);
+        return dbr_clnt_first_posnup(clnt_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_clnt_first_posn(clnt_);
+        return dbr_clnt_first_posnup(clnt_);
     }
     Iterator
     end() noexcept
@@ -369,7 +369,7 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_clnt_empty_posn(clnt_);
+        return dbr_clnt_empty_posnup(clnt_);
     }
 };
 
@@ -528,10 +528,10 @@ public:
     {
         return ClntExecs{impl_};
     }
-    ClntPosns
-    posns() const noexcept
+    ClntPosnups
+    posnups() const noexcept
     {
-        return ClntPosns{impl_};
+        return ClntPosnups{impl_};
     }
 };
 

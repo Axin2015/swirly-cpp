@@ -34,7 +34,7 @@ struct DbrBook {
      * @privatesection
      */
     struct DbrRbNode serv_node_;
-    struct DbrRbNode cycle_node_;
+    struct DbrRbNode update_node_;
 };
 
 struct DbrView {

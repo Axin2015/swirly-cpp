@@ -120,13 +120,13 @@ dbr_clnt_first_exec(DbrClnt clnt);
 DBR_API DbrBool
 dbr_clnt_empty_exec(DbrClnt clnt);
 
-#define DBR_CLNT_END_POSN NULL
+#define DBR_CLNT_END_POSNUP NULL
 
 DBR_API struct DbrRbNode*
-dbr_clnt_first_posn(DbrClnt clnt);
+dbr_clnt_first_posnup(DbrClnt clnt);
 
 DBR_API DbrBool
-dbr_clnt_empty_posn(DbrClnt clnt);
+dbr_clnt_empty_posnup(DbrClnt clnt);
 
 static inline struct DbrRec*
 dbr_clnt_rec_entry(struct DbrSlNode* node)
@@ -141,9 +141,9 @@ dbr_clnt_exec_entry(struct DbrSlNode* node)
 }
 
 static inline struct DbrPosn*
-dbr_clnt_posn_entry(struct DbrRbNode* node)
+dbr_clnt_posnup_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrPosn, cycle_node_, node);
+    return dbr_implof(struct DbrPosn, update_node_, node);
 }
 
 /** @} */

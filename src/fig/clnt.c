@@ -47,7 +47,7 @@ struct FigClnt {
     struct FigCache cache;
     struct FigIndex index;
     struct DbrQueue execs;
-    struct DbrTree posns;
+    struct DbrTree posnups;
     struct DbrPrioq prioq;
 };
 
@@ -265,7 +265,7 @@ static DbrBool
 apply_posn(DbrClnt clnt, struct DbrPosn* posn)
 {
     posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
-    tree_insert(&clnt->posns, &posn->cycle_node_);
+    tree_insert(&clnt->posnups, &posn->update_node_);
     return true;
 }
 
@@ -299,7 +299,7 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
     dbr_queue_init(&clnt->execs);
-    dbr_tree_init(&clnt->posns);
+    dbr_tree_init(&clnt->posnups);
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail4;
     if (!logon(clnt))
@@ -598,7 +598,7 @@ dbr_clnt_clear(DbrClnt clnt)
             dbr_pool_free_exec(clnt->pool, exec);
     }
     dbr_queue_init(&clnt->execs);
-    dbr_tree_init(&clnt->posns);
+    dbr_tree_init(&clnt->posnups);
 }
 
 DBR_API struct DbrSlNode*
@@ -614,13 +614,13 @@ dbr_clnt_empty_exec(DbrClnt clnt)
 }
 
 DBR_API struct DbrRbNode*
-dbr_clnt_first_posn(DbrClnt clnt)
+dbr_clnt_first_posnup(DbrClnt clnt)
 {
-    return dbr_tree_first(&clnt->posns);
+    return dbr_tree_first(&clnt->posnups);
 }
 
 DBR_API DbrBool
-dbr_clnt_empty_posn(DbrClnt clnt)
+dbr_clnt_empty_posnup(DbrClnt clnt)
 {
-    return dbr_tree_empty(&clnt->posns);
+    return dbr_tree_empty(&clnt->posnups);
 }

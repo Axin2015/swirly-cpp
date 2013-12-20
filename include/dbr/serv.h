@@ -154,13 +154,13 @@ dbr_serv_exec_entry(struct DbrSlNode* node)
 static inline struct DbrPosn*
 dbr_serv_posnup_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrPosn, cycle_node_, node);
+    return dbr_implof(struct DbrPosn, update_node_, node);
 }
 
 static inline struct DbrBook*
 dbr_serv_bookup_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrBook, cycle_node_, node);
+    return dbr_implof(struct DbrBook, update_node_, node);
 }
 
 /** @} */
