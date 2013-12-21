@@ -41,7 +41,7 @@ term_state_noop(struct DbrRec* rec)
 }
 
 static inline void
-free_recs(struct DbrSlNode* node, void (*term_state)(struct DbrRec*), DbrPool pool)
+free_rec_list(struct DbrSlNode* node, void (*term_state)(struct DbrRec*), DbrPool pool)
 {
     while (node) {
         struct DbrRec* rec = dbr_shared_rec_entry(node);
@@ -161,9 +161,9 @@ fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPo
 DBR_EXTERN void
 fig_cache_term(struct FigCache* cache)
 {
-    free_recs(cache->first_contr, cache->term_state, cache->pool);
-    free_recs(cache->first_accnt, cache->term_state, cache->pool);
-    free_recs(cache->first_trader, cache->term_state, cache->pool);
+    free_rec_list(cache->first_contr, cache->term_state, cache->pool);
+    free_rec_list(cache->first_accnt, cache->term_state, cache->pool);
+    free_rec_list(cache->first_trader, cache->term_state, cache->pool);
 }
 
 DBR_EXTERN void

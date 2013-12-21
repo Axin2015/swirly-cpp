@@ -63,7 +63,7 @@ read_entity(const struct DbrBody* req)
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
-    dbr_pool_free_entities(pool, rep.entity_rep.type, rep.entity_rep.first);
+    dbr_pool_free_entity_list(pool, rep.entity_rep.type, rep.entity_rep.first);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;
@@ -156,7 +156,7 @@ run(void)
             break;
         case DBR_INSERT_EXECS_REQ:
             insert_execs(&req);
-            dbr_pool_free_entities(pool, DBR_EXEC, req.insert_execs_req.first);
+            dbr_pool_free_entity_list(pool, DBR_EXEC, req.insert_execs_req.first);
             break;
         case DBR_INSERT_EXEC_REQ:
             insert_exec(&req);

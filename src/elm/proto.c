@@ -31,9 +31,7 @@ static const char ORDER_FORMAT[] = "llllisiilllllllll";
 static const char EXEC_FORMAT[] = "lllllisiillllllllill";
 static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
-
-static const char INSERT_EXEC_FORMAT[] = "lllllisiillllllllill";
-static const char ACK_TRADE_FORMAT[] = "ll";
+static const char VIEW_FORMAT[] = "lillzllz";
 
 DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec)
@@ -379,4 +377,39 @@ dbr_read_posn(const char* buf, struct DbrPosn* posn)
     return dbr_unpackf(buf, POSN_FORMAT,
                        &posn->accnt.id_only, &posn->contr.id_only, &posn->settl_date,
                        &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
+}
+
+DBR_API size_t
+dbr_view_len(const struct DbrView* view, DbrBool enriched)
+{
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(VIEW_FORMAT,
+                         view->contr.rec->id, view->settl_date);
+    } else {
+        n = dbr_packlenf(VIEW_FORMAT,
+                         view->contr.id_only, view->settl_date);
+    }
+    return n;
+}
+
+DBR_API char*
+dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
+{
+    if (enriched) {
+        buf = dbr_packf(buf, VIEW_FORMAT,
+                        view->contr.rec->id, view->settl_date);
+    } else {
+        buf = dbr_packf(buf, VIEW_FORMAT,
+                        view->contr.id_only, view->settl_date);
+    }
+    return buf;
+}
+
+DBR_API const char*
+dbr_read_view(const char* buf, struct DbrView* view)
+{
+    dbr_view_init(view);
+    return dbr_unpackf(buf, VIEW_FORMAT,
+                       &view->contr.id_only, &view->settl_date);
 }

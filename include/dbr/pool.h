@@ -77,8 +77,14 @@ dbr_pool_alloc_posn(DbrPool pool);
 DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn);
 
+DBR_API struct DbrView*
+dbr_pool_alloc_view(DbrPool pool);
+
 DBR_API void
-dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first);
+dbr_pool_free_view(DbrPool pool, struct DbrView* view);
+
+DBR_API void
+dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first);
 
 /** @} */
 

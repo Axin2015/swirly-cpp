@@ -37,6 +37,7 @@ enum {
     DBR_ENTITY_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
+    DBR_VIEW_REP,
 
     DBR_PLACE_ORDER_REQ,
     DBR_REVISE_ORDER_ID_REQ,
@@ -84,7 +85,14 @@ struct DbrBody {
         struct {
             struct DbrPosn* posn;
         } posn_rep;
-
+        struct {
+            struct DbrSlNode* first;
+            /**
+             * @privatesection
+             */
+            // Set by dbr_body_len();
+            size_t count_;
+        } view_rep;
         // Request.
         struct {
             int type;

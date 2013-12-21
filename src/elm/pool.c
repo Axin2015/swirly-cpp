@@ -401,8 +401,20 @@ dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
     elm_pool_free_posn(pool, posn);
 }
 
+DBR_API struct DbrView*
+dbr_pool_alloc_view(DbrPool pool)
+{
+    return elm_pool_alloc_view(pool);
+}
+
 DBR_API void
-dbr_pool_free_entities(DbrPool pool, int type, struct DbrSlNode* first)
+dbr_pool_free_view(DbrPool pool, struct DbrView* view)
+{
+    elm_pool_free_view(pool, view);
+}
+
+DBR_API void
+dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first)
 {
     struct DbrSlNode* node = first;
     switch (type) {

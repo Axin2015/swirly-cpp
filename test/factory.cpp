@@ -49,7 +49,7 @@ create_accnt(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
     auto deleter = [&pool](DbrRec* rec) {
         pool.free_rec(rec);
     };
-    std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
+    shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
     dbr_rec_init(rec.get());
 
     rec->type = DBR_ACCNT;

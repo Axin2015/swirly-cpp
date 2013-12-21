@@ -569,6 +569,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         enrich_posn(&clnt->cache, body.posn_rep.posn);
         apply_posn(clnt, body.posn_rep.posn);
         break;
+    case DBR_VIEW_REP:
+        break;
     default:
         dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
         goto fail1;

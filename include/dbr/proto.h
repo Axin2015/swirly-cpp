@@ -27,6 +27,7 @@ struct DbrOrder;
 struct DbrMemb;
 struct DbrExec;
 struct DbrPosn;
+struct DbrView;
 
 /**
  * @addtogroup Proto
@@ -124,6 +125,17 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
+
+// View.
+
+DBR_API size_t
+dbr_view_len(const struct DbrView* view, DbrBool enriched);
+
+DBR_API char*
+dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched);
+
+DBR_API const char*
+dbr_read_view(const char* buf, struct DbrView* view);
 
 /** @} */
 

@@ -37,7 +37,7 @@ enum DbrDirect {
 };
 
 static void
-free_matches(struct DbrSlNode* first, DbrPool pool)
+free_match_list(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
@@ -216,7 +216,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
     return true;
  fail1:
-    free_matches(dbr_queue_first(&trans->matches), pool);
+    free_match_list(dbr_queue_first(&trans->matches), pool);
     return false;
 }
 

@@ -145,7 +145,7 @@ free_books(struct DbrTree* books)
 }
 
 static void
-free_matches(struct DbrSlNode* first, DbrPool pool)
+free_match_list(struct DbrSlNode* first, DbrPool pool)
 {
     struct DbrSlNode* node = first;
     while (node) {
@@ -542,7 +542,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     if (!dbr_order_done(new_order))
         dbr_book_remove(book, new_order);
  fail4:
-    free_matches(dbr_queue_first(&trans.matches), serv->pool);
+    free_match_list(dbr_queue_first(&trans.matches), serv->pool);
  fail3:
     dbr_pool_free_exec(serv->pool, new_exec);
  fail2:

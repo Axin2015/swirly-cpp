@@ -193,34 +193,6 @@ dbr_shared_rec_entry(struct DbrSlNode* node)
     return dbr_implof(struct DbrRec, shared_node_, node);
 }
 
-struct DbrView {
-    union DbrURec contr;
-    DbrDate settl_date;
-    DbrTicks bid_ticks;
-    DbrLots bid_lots;
-    size_t bid_count;
-    DbrTicks ask_ticks;
-    DbrLots ask_lots;
-    size_t ask_count;
-    /**
-     * @privatesection
-     */
-    // Singly-linked for data model.
-    struct DbrSlNode shared_node_;
-};
-
-static inline void
-dbr_view_init(struct DbrView* view)
-{
-    dbr_slnode_init(&view->shared_node_);
-}
-
-static inline struct DbrView*
-dbr_shared_view_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrView, shared_node_, node);
-}
-
 /** @} */
 
 /**
@@ -525,6 +497,41 @@ static inline struct DbrMatch*
 dbr_trans_match_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrMatch, trans_node_, node);
+}
+
+/** @} */
+
+/**
+ * @addtogroup Data
+ * @{
+ */
+
+struct DbrView {
+    union DbrURec contr;
+    DbrDate settl_date;
+    DbrTicks bid_ticks;
+    DbrLots bid_lots;
+    size_t bid_count;
+    DbrTicks ask_ticks;
+    DbrLots ask_lots;
+    size_t ask_count;
+    /**
+     * @privatesection
+     */
+    // Singly-linked for data model.
+    struct DbrSlNode shared_node_;
+};
+
+static inline void
+dbr_view_init(struct DbrView* view)
+{
+    dbr_slnode_init(&view->shared_node_);
+}
+
+static inline struct DbrView*
+dbr_shared_view_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrView, shared_node_, node);
 }
 
 /** @} */
