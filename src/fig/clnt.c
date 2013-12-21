@@ -48,6 +48,7 @@ struct FigClnt {
     struct FigIndex index;
     struct DbrQueue execs;
     struct DbrTree posnups;
+    struct DbrTree viewups;
     struct DbrPrioq prioq;
 };
 
@@ -300,6 +301,7 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     fig_index_init(&clnt->index);
     dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->posnups);
+    dbr_tree_init(&clnt->viewups);
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail4;
     if (!logon(clnt))
@@ -601,6 +603,7 @@ dbr_clnt_clear(DbrClnt clnt)
     }
     dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->posnups);
+    dbr_tree_init(&clnt->viewups);
 }
 
 DBR_API struct DbrSlNode*
@@ -625,4 +628,16 @@ DBR_API DbrBool
 dbr_clnt_empty_posnup(DbrClnt clnt)
 {
     return dbr_tree_empty(&clnt->posnups);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_viewup(DbrClnt clnt)
+{
+    return dbr_tree_first(&clnt->viewups);
+}
+
+DBR_API DbrBool
+dbr_clnt_empty_viewup(DbrClnt clnt)
+{
+    return dbr_tree_empty(&clnt->viewups);
 }

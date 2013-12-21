@@ -373,6 +373,112 @@ public:
     }
 };
 
+class ClntViewups {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrView Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_clnt_viewup_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_clnt_viewup_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrClnt clnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ClntViewups(DbrClnt clnt) noexcept
+        : clnt_{clnt}
+    {
+    }
+    void
+    swap(ClntViewups& rhs) noexcept
+    {
+        std::swap(clnt_, rhs.clnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_clnt_first_viewup(clnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_clnt_first_viewup(clnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return nullptr;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return nullptr;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_clnt_empty_viewup(clnt_);
+    }
+};
+
 class Clnt {
     DbrClnt impl_;
 public:
@@ -532,6 +638,11 @@ public:
     posnups() const noexcept
     {
         return ClntPosnups{impl_};
+    }
+    ClntViewups
+    viewups() const noexcept
+    {
+        return ClntViewups{impl_};
     }
 };
 

@@ -128,6 +128,14 @@ dbr_clnt_first_posnup(DbrClnt clnt);
 DBR_API DbrBool
 dbr_clnt_empty_posnup(DbrClnt clnt);
 
+#define DBR_CLNT_END_VIEWUP NULL
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_viewup(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_empty_viewup(DbrClnt clnt);
+
 static inline struct DbrRec*
 dbr_clnt_rec_entry(struct DbrSlNode* node)
 {
@@ -144,6 +152,12 @@ static inline struct DbrPosn*
 dbr_clnt_posnup_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct DbrPosn, update_node_, node);
+}
+
+static inline struct DbrView*
+dbr_clnt_viewup_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrView, update_node_, node);
 }
 
 /** @} */

@@ -520,12 +520,14 @@ struct DbrView {
      */
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
+    struct DbrRbNode update_node_;
 };
 
 static inline void
 dbr_view_init(struct DbrView* view)
 {
     dbr_slnode_init(&view->shared_node_);
+    dbr_rbnode_init(&view->update_node_);
 }
 
 static inline struct DbrView*
