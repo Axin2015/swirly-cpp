@@ -167,7 +167,7 @@ fig_cache_term(struct FigCache* cache)
 }
 
 DBR_EXTERN void
-fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
+fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {
     case DBR_TRADER:

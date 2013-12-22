@@ -34,10 +34,10 @@ enum {
     DBR_SESS_HEARTBT,
 
     DBR_STATUS_REP,
-    DBR_ENTITY_REP,
+    DBR_ENTITY_LIST_REP,
+    DBR_VIEW_LIST_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
-    DBR_VIEW_REP,
 
     DBR_PLACE_ORDER_REQ,
     DBR_REVISE_ORDER_ID_REQ,
@@ -47,7 +47,7 @@ enum {
     DBR_ACK_TRADE_REQ,
 
     DBR_READ_ENTITY_REQ,
-    DBR_INSERT_EXECS_REQ,
+    DBR_INSERT_EXEC_LIST_REQ,
     DBR_INSERT_EXEC_REQ,
     DBR_UPDATE_EXEC_REQ
 };
@@ -78,21 +78,22 @@ struct DbrBody {
              */
             // Set by dbr_body_len();
             size_t count_;
-        } entity_rep;
+        } entity_list_rep;
         struct {
-            struct DbrExec* exec;
-        } exec_rep;
-        struct {
-            struct DbrPosn* posn;
-        } posn_rep;
-        struct {
+            // dbr_shared_view_entry()
             struct DbrSlNode* first;
             /**
              * @privatesection
              */
             // Set by dbr_body_len();
             size_t count_;
-        } view_rep;
+        } view_list_rep;
+        struct {
+            struct DbrExec* exec;
+        } exec_rep;
+        struct {
+            struct DbrPosn* posn;
+        } posn_rep;
         // Request.
         struct {
             int type;
@@ -135,7 +136,7 @@ struct DbrBody {
              */
             // Set by dbr_body_len();
             size_t count_;
-        } insert_execs_req;
+        } insert_exec_list_req;
         struct {
             struct DbrExec* exec;
         } insert_exec_req;

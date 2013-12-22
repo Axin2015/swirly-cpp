@@ -53,7 +53,7 @@ alloc_id(DbrJourn journ)
 }
 
 static DbrBool
-insert_execs(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
+insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
     struct FirSqlStore* store = journ_implof(journ);
     struct FirSqlite* impl = &store->impl;
@@ -94,7 +94,7 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 
 static const struct DbrJournVtbl JOURN_VTBL = {
     .alloc_id = alloc_id,
-    .insert_execs = insert_execs,
+    .insert_exec_list = insert_exec_list,
     .insert_exec = insert_exec,
     .update_exec = update_exec
 };

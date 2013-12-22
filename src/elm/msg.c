@@ -188,76 +188,76 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
                           body->status_rep.num,
                           DBR_ERRMSG_MAX, body->status_rep.msg);
         break;
-    case DBR_ENTITY_REP:
-        n += dbr_packleni(body->entity_rep.type);
-        body->entity_rep.count_ = 0;
-        switch (body->entity_rep.type) {
+    case DBR_ENTITY_LIST_REP:
+        n += dbr_packleni(body->entity_list_rep.type);
+        body->entity_list_rep.count_ = 0;
+        switch (body->entity_list_rep.type) {
         case DBR_TRADER:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrRec* rec = dbr_shared_rec_entry(node);
                 n += dbr_trader_len(rec);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         case DBR_ACCNT:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrRec* rec = dbr_shared_rec_entry(node);
                 n += dbr_accnt_len(rec);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         case DBR_CONTR:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrRec* rec = dbr_shared_rec_entry(node);
                 n += dbr_contr_len(rec);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         case DBR_ORDER:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrOrder* order = dbr_shared_order_entry(node);
                 n += dbr_order_len(order, enriched);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         case DBR_EXEC:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrExec* exec = dbr_shared_exec_entry(node);
                 n += dbr_exec_len(exec, enriched);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         case DBR_MEMB:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrMemb* memb = dbr_shared_memb_entry(node);
                 n += dbr_memb_len(memb, enriched);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         case DBR_POSN:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrPosn* posn = dbr_shared_posn_entry(node);
                 n += dbr_posn_len(posn, enriched);
-                ++body->entity_rep.count_;
+                ++body->entity_list_rep.count_;
             }
             break;
         default:
             abort();
         }
-        n += dbr_packlenz(body->entity_rep.count_);
+        n += dbr_packlenz(body->entity_list_rep.count_);
+        break;
+    case DBR_VIEW_LIST_REP:
+        for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
+            struct DbrView* view = dbr_shared_view_entry(node);
+            n += dbr_view_len(view, enriched);
+            ++body->view_list_rep.count_;
+        }
         break;
     case DBR_EXEC_REP:
         n += dbr_exec_len(body->exec_rep.exec, enriched);
         break;
     case DBR_POSN_REP:
         n += dbr_posn_len(body->posn_rep.posn, enriched);
-        break;
-    case DBR_VIEW_REP:
-        for (struct DbrSlNode* node = body->view_rep.first; node; node = node->next) {
-            struct DbrView* view = dbr_shared_view_entry(node);
-            n += dbr_view_len(view, enriched);
-            ++body->view_rep.count_;
-        }
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
@@ -292,14 +292,14 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(body->read_entity_req.type);
         break;
-    case DBR_INSERT_EXECS_REQ:
-        body->insert_execs_req.count_ = 0;
-        for (struct DbrSlNode* node = body->insert_execs_req.first; node; node = node->next) {
+    case DBR_INSERT_EXEC_LIST_REQ:
+        body->insert_exec_list_req.count_ = 0;
+        for (struct DbrSlNode* node = body->insert_exec_list_req.first; node; node = node->next) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
             n += dbr_exec_len(exec, enriched);
-            ++body->insert_execs_req.count_;
+            ++body->insert_exec_list_req.count_;
         }
-        n += dbr_packlenz(body->insert_execs_req.count_);
+        n += dbr_packlenz(body->insert_exec_list_req.count_);
         break;
     case DBR_INSERT_EXEC_REQ:
         n += dbr_exec_len(body->insert_exec_req.exec, enriched);
@@ -330,48 +330,48 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
                         body->status_rep.num,
                         DBR_ERRMSG_MAX, body->status_rep.msg);
         break;
-    case DBR_ENTITY_REP:
-        buf = dbr_packi(buf, body->entity_rep.type);
-        buf = dbr_packz(buf, body->entity_rep.count_);
-        switch (body->entity_rep.type) {
+    case DBR_ENTITY_LIST_REP:
+        buf = dbr_packi(buf, body->entity_list_rep.type);
+        buf = dbr_packz(buf, body->entity_list_rep.count_);
+        switch (body->entity_list_rep.type) {
         case DBR_TRADER:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrRec* rec = dbr_shared_rec_entry(node);
                 buf = dbr_write_trader(buf, rec);
             }
             break;
         case DBR_ACCNT:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrRec* rec = dbr_shared_rec_entry(node);
                 buf = dbr_write_accnt(buf, rec);
             }
             break;
         case DBR_CONTR:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrRec* rec = dbr_shared_rec_entry(node);
                 buf = dbr_write_contr(buf, rec);
             }
             break;
         case DBR_ORDER:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrOrder* order = dbr_shared_order_entry(node);
                 buf = dbr_write_order(buf, order, enriched);
             }
             break;
         case DBR_EXEC:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrExec* exec = dbr_shared_exec_entry(node);
                 buf = dbr_write_exec(buf, exec, enriched);
             }
             break;
         case DBR_MEMB:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrMemb* memb = dbr_shared_memb_entry(node);
                 buf = dbr_write_memb(buf, memb, enriched);
             }
             break;
         case DBR_POSN:
-            for (struct DbrSlNode* node = body->entity_rep.first; node; node = node->next) {
+            for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
                 struct DbrPosn* posn = dbr_shared_posn_entry(node);
                 buf = dbr_write_posn(buf, posn, enriched);
             }
@@ -380,17 +380,17 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
             abort();
         }
         break;
+    case DBR_VIEW_LIST_REP:
+        for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
+            struct DbrView* view = dbr_shared_view_entry(node);
+            buf = dbr_write_view(buf, view, enriched);
+        }
+        break;
     case DBR_EXEC_REP:
         buf = dbr_write_exec(buf, body->exec_rep.exec, enriched);
         break;
     case DBR_POSN_REP:
         buf = dbr_write_posn(buf, body->posn_rep.posn, enriched);
-        break;
-    case DBR_VIEW_REP:
-        for (struct DbrSlNode* node = body->view_rep.first; node; node = node->next) {
-            struct DbrView* view = dbr_shared_view_entry(node);
-            buf = dbr_write_view(buf, view, enriched);
-        }
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
@@ -425,9 +425,9 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, body->read_entity_req.type);
         break;
-    case DBR_INSERT_EXECS_REQ:
-        buf = dbr_packz(buf, body->insert_execs_req.count_);
-        for (struct DbrSlNode* node = body->insert_execs_req.first; node; node = node->next) {
+    case DBR_INSERT_EXEC_LIST_REQ:
+        buf = dbr_packz(buf, body->insert_exec_list_req.count_);
+        for (struct DbrSlNode* node = body->insert_exec_list_req.first; node; node = node->next) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
             buf = dbr_write_exec(buf, exec, enriched);
         }
@@ -466,15 +466,15 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
                           &body->status_rep.num,
                           DBR_ERRMSG_MAX, body->status_rep.msg);
         break;
-    case DBR_ENTITY_REP:
-        if (!(buf = dbr_unpacki(buf, &body->entity_rep.type)))
+    case DBR_ENTITY_LIST_REP:
+        if (!(buf = dbr_unpacki(buf, &body->entity_list_rep.type)))
             goto fail1;
-        if (!(buf = dbr_unpackz(buf, &body->entity_rep.count_)))
+        if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
             goto fail1;
         dbr_queue_init(&q);
-        switch (body->entity_rep.type) {
+        switch (body->entity_list_rep.type) {
         case DBR_TRADER:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_trader(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_TRADER, dbr_queue_first(&q));
                     goto fail1;
@@ -482,7 +482,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
             break;
         case DBR_ACCNT:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_accnt(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_ACCNT, dbr_queue_first(&q));
                     goto fail1;
@@ -490,7 +490,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
             break;
         case DBR_CONTR:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_contr(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_CONTR, dbr_queue_first(&q));
                     goto fail1;
@@ -498,7 +498,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
             break;
         case DBR_ORDER:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_order(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_ORDER, dbr_queue_first(&q));
                     goto fail1;
@@ -506,7 +506,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
             break;
         case DBR_EXEC:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_exec(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_EXEC, dbr_queue_first(&q));
                     goto fail1;
@@ -514,7 +514,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
             break;
         case DBR_MEMB:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_memb(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_MEMB, dbr_queue_first(&q));
                     goto fail1;
@@ -522,7 +522,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
             break;
         case DBR_POSN:
-            for (size_t i = 0; i < body->entity_rep.count_; ++i) {
+            for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
                 if (!(buf = read_posn(buf, pool, &q))) {
                     dbr_pool_free_entity_list(pool, DBR_POSN, dbr_queue_first(&q));
                     goto fail1;
@@ -533,7 +533,19 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             dbr_err_setf(DBR_EIO, "invalid entity-type '%d'", type);
             goto fail1;
         }
-        body->entity_rep.first = dbr_queue_first(&q);
+        body->entity_list_rep.first = dbr_queue_first(&q);
+        break;
+    case DBR_VIEW_LIST_REP:
+        if (!(buf = dbr_unpackz(buf, &body->view_list_rep.count_)))
+            goto fail1;
+        dbr_queue_init(&q);
+        for (size_t i = 0; i < body->view_list_rep.count_; ++i) {
+            if (!(buf = read_view(buf, pool, &q))) {
+                free_view_list(dbr_queue_first(&q), pool);
+                goto fail1;
+            }
+        }
+        body->view_list_rep.first = dbr_queue_first(&q);
         break;
     case DBR_EXEC_REP:
         // Exec.
@@ -554,18 +566,6 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             dbr_pool_free_posn(pool, body->posn_rep.posn);
             goto fail1;
         }
-        break;
-    case DBR_VIEW_REP:
-        if (!(buf = dbr_unpackz(buf, &body->view_rep.count_)))
-            goto fail1;
-        dbr_queue_init(&q);
-        for (size_t i = 0; i < body->view_rep.count_; ++i) {
-            if (!(buf = read_view(buf, pool, &q))) {
-                free_view_list(dbr_queue_first(&q), pool);
-                goto fail1;
-            }
-        }
-        body->view_rep.first = dbr_queue_first(&q);
         break;
     case DBR_PLACE_ORDER_REQ:
         if (!(buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,
@@ -607,17 +607,17 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         if (!(buf = dbr_unpacki(buf, &body->read_entity_req.type)))
             goto fail1;
         break;
-    case DBR_INSERT_EXECS_REQ:
-        if (!(buf = dbr_unpackz(buf, &body->insert_execs_req.count_)))
+    case DBR_INSERT_EXEC_LIST_REQ:
+        if (!(buf = dbr_unpackz(buf, &body->insert_exec_list_req.count_)))
             goto fail1;
         dbr_queue_init(&q);
-        for (size_t i = 0; i < body->insert_execs_req.count_; ++i) {
+        for (size_t i = 0; i < body->insert_exec_list_req.count_; ++i) {
             if (!(buf = read_exec(buf, pool, &q))) {
                 dbr_pool_free_entity_list(pool, DBR_EXEC, dbr_queue_first(&q));
                 goto fail1;
             }
         }
-        body->insert_execs_req.first = dbr_queue_first(&q);
+        body->insert_exec_list_req.first = dbr_queue_first(&q);
         break;
     case DBR_INSERT_EXEC_REQ:
         body->insert_exec_req.exec = dbr_pool_alloc_exec(pool);

@@ -68,6 +68,10 @@ enum DbrEntity {
 };
 
 enum {
+    DBR_VIEW   = 0x80
+};
+
+enum {
     DBR_DISPLAY_MAX = 64,
     DBR_EMAIL_MAX = 64,
     DBR_MNEM_MAX = 16,
@@ -520,6 +524,7 @@ struct DbrView {
      */
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
+    struct DbrRbNode clnt_node_;
     struct DbrRbNode update_node_;
 };
 
@@ -527,6 +532,7 @@ static inline void
 dbr_view_init(struct DbrView* view)
 {
     dbr_slnode_init(&view->shared_node_);
+    dbr_rbnode_init(&view->clnt_node_);
     dbr_rbnode_init(&view->update_node_);
 }
 

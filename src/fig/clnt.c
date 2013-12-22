@@ -111,6 +111,13 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
     return posn;
 }
 
+static inline struct DbrView*
+enrich_view(struct FigCache* cache, struct DbrView* view)
+{
+    view->contr.rec = get_id(cache, DBR_CONTR, view->contr.id_only);
+    return view;
+}
+
 static DbrIden
 logon(DbrClnt clnt)
 {
@@ -139,9 +146,9 @@ set_trader(DbrClnt clnt)
 }
 
 static void
-emplace_recs(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
+emplace_rec_list(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
 {
-    fig_cache_emplace_recs(&clnt->cache, type, first, count);
+    fig_cache_emplace_rec_list(&clnt->cache, type, first, count);
     clnt->pending &= ~type;
     if ((clnt->pending & (DBR_TRADER | DBR_ACCNT | DBR_CONTR)) == 0) {
         if (!set_trader(clnt))
@@ -150,7 +157,7 @@ emplace_recs(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
 }
 
 static void
-emplace_orders(DbrClnt clnt, struct DbrSlNode* first)
+emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrOrder* order = enrich_order(&clnt->cache, dbr_shared_order_entry(node));
@@ -161,7 +168,7 @@ emplace_orders(DbrClnt clnt, struct DbrSlNode* first)
 }
 
 static void
-emplace_trades(DbrClnt clnt, struct DbrSlNode* first)
+emplace_trade_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
@@ -172,7 +179,7 @@ emplace_trades(DbrClnt clnt, struct DbrSlNode* first)
 }
 
 static void
-emplace_membs(DbrClnt clnt, struct DbrSlNode* first)
+emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
@@ -186,7 +193,7 @@ emplace_membs(DbrClnt clnt, struct DbrSlNode* first)
 }
 
 static void
-emplace_posns(DbrClnt clnt, struct DbrSlNode* first)
+emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
@@ -267,6 +274,13 @@ apply_posn(DbrClnt clnt, struct DbrPosn* posn)
 {
     posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
     tree_insert(&clnt->posnups, &posn->update_node_);
+    return true;
+}
+
+static DbrBool
+apply_view(DbrClnt clnt, struct DbrView* view)
+{
+    // TODO: implement apply view.
     return true;
 }
 
@@ -533,26 +547,34 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         status->num = body.status_rep.num;
         strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
         break;
-    case DBR_ENTITY_REP:
-        switch (body.entity_rep.type) {
+    case DBR_ENTITY_LIST_REP:
+        switch (body.entity_list_rep.type) {
         case DBR_TRADER:
         case DBR_ACCNT:
         case DBR_CONTR:
-            emplace_recs(clnt, body.entity_rep.type, body.entity_rep.first, body.entity_rep.count_);
+            emplace_rec_list(clnt, body.entity_list_rep.type, body.entity_list_rep.first,
+                             body.entity_list_rep.count_);
             break;
         case DBR_ORDER:
-            emplace_orders(clnt, body.entity_rep.first);
+            emplace_order_list(clnt, body.entity_list_rep.first);
             break;
         case DBR_EXEC:
-            emplace_trades(clnt, body.entity_rep.first);
+            emplace_trade_list(clnt, body.entity_list_rep.first);
             break;
         case DBR_MEMB:
-            emplace_membs(clnt, body.entity_rep.first);
+            emplace_memb_list(clnt, body.entity_list_rep.first);
             break;
         case DBR_POSN:
-            emplace_posns(clnt, body.entity_rep.first);
+            emplace_posn_list(clnt, body.entity_list_rep.first);
             break;
         };
+        break;
+    case DBR_VIEW_LIST_REP:
+        for (struct DbrSlNode* node = body.view_list_rep.first; node; node = node->next) {
+            struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
+            // Transfer ownership.
+            apply_view(clnt, view);
+        }
         break;
     case DBR_EXEC_REP:
         enrich_exec(&clnt->cache, body.exec_rep.exec);
@@ -570,8 +592,6 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
     case DBR_POSN_REP:
         enrich_posn(&clnt->cache, body.posn_rep.posn);
         apply_posn(clnt, body.posn_rep.posn);
-        break;
-    case DBR_VIEW_REP:
         break;
     default:
         dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);

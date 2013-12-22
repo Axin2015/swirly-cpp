@@ -58,7 +58,7 @@ fig_cache_term(struct FigCache* cache);
 // Transfer ownership to cache.
 
 DBR_EXTERN void
-fig_cache_emplace_recs(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size);
+fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size);
 
 DBR_EXTERN struct DbrSlNode*
 fig_cache_first_rec(struct FigCache* cache, int type, size_t* size);

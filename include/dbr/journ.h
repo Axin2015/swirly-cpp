@@ -30,7 +30,7 @@ struct DbrJournVtbl {
     (*alloc_id)(DbrJourn journ);
 
     DbrBool
-    (*insert_execs)(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched);
+    (*insert_exec_list)(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched);
 
     DbrBool
     (*insert_exec)(DbrJourn journ, struct DbrExec* exec, DbrBool enriched);
@@ -46,9 +46,9 @@ dbr_journ_alloc_id(DbrJourn journ)
 }
 
 static inline DbrBool
-dbr_journ_insert_execs(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
+dbr_journ_insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
-    return journ->vtbl->insert_execs(journ, first, enriched);
+    return journ->vtbl->insert_exec_list(journ, first, enriched);
 }
 
 static inline DbrBool

@@ -34,9 +34,9 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->alloc_id();
     }
     static DbrBool
-    insert_execs(DbrJourn journ, DbrSlNode* first, DbrBool enriched) noexcept
+    insert_exec_list(DbrJourn journ, DbrSlNode* first, DbrBool enriched) noexcept
     {
-        return static_cast<DerivedT*>(journ)->insert_execs(first, enriched);
+        return static_cast<DerivedT*>(journ)->insert_exec_list(first, enriched);
     }
     static DbrBool
     insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched) noexcept
@@ -53,7 +53,7 @@ class IJourn : public DbrIJourn {
     {
         static const DbrJournVtbl VTBL = {
             alloc_id,
-            insert_execs,
+            insert_exec_list,
             insert_exec,
             update_exec
         };
@@ -76,9 +76,9 @@ alloc_id(DbrJourn journ)
 }
 
 inline void
-insert_execs(DbrJourn journ, DbrSlNode* first, DbrBool enriched)
+insert_exec_list(DbrJourn journ, DbrSlNode* first, DbrBool enriched)
 {
-    if (!journ->vtbl->insert_execs(journ, first, enriched))
+    if (!journ->vtbl->insert_exec_list(journ, first, enriched))
         throw_exception();
 }
 

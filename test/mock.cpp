@@ -211,7 +211,7 @@ Journ::alloc_id() noexcept
 }
 
 DbrBool
-Journ::insert_execs(DbrSlNode* first, DbrBool enriched) noexcept
+Journ::insert_exec_list(DbrSlNode* first, DbrBool enriched) noexcept
 {
     return DBR_TRUE;
 }

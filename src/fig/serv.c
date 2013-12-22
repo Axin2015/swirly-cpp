@@ -159,14 +159,14 @@ free_match_list(struct DbrSlNode* first, DbrPool pool)
 }
 
 static DbrBool
-emplace_recs(DbrServ serv, int type)
+emplace_rec_list(DbrServ serv, int type)
 {
     struct DbrSlNode* node;
     ssize_t size = dbr_model_read_entity(serv->model, type, serv->pool, &node);
     if (size < 0)
         return false;
 
-    fig_cache_emplace_recs(&serv->cache, type, node, size);
+    fig_cache_emplace_rec_list(&serv->cache, type, node, size);
     return true;
 }
 
@@ -401,9 +401,9 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
 
     // Data structures are fully initialised at this point.
 
-    if (!emplace_recs(serv, DBR_TRADER)
-        || !emplace_recs(serv, DBR_ACCNT)
-        || !emplace_recs(serv, DBR_CONTR)
+    if (!emplace_rec_list(serv, DBR_TRADER)
+        || !emplace_rec_list(serv, DBR_ACCNT)
+        || !emplace_rec_list(serv, DBR_CONTR)
         || !emplace_orders(serv)
         || !emplace_trades(serv)
         || !emplace_membs(serv)
@@ -529,7 +529,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
     // unfilled quantity.
 
-    if (!dbr_journ_insert_execs(serv->journ, trans.execs.first, true))
+    if (!dbr_journ_insert_exec_list(serv->journ, trans.execs.first, true))
         goto fail5;
 
     // Final commit phase cannot fail.

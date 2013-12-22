@@ -57,11 +57,11 @@ alloc_id(DbrJourn journ)
 }
 
 static DbrBool
-insert_execs(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
+insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
     struct ElmZmqStore* store = journ_implof(journ);
-    struct DbrBody body = { .req_id = store->id++, .type = DBR_INSERT_EXECS_REQ,
-                            .insert_execs_req = { .first = first, .count_ = 0 } };
+    struct DbrBody body = { .req_id = store->id++, .type = DBR_INSERT_EXEC_LIST_REQ,
+                            .insert_exec_list_req = { .first = first, .count_ = 0 } };
     if (!(dbr_send_body(store->sock, &body, false)))
         return false;
     return dbr_recv_body(store->sock, store->pool, &body);
@@ -80,7 +80,7 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 
 static const struct DbrJournVtbl JOURN_VTBL = {
     .alloc_id = alloc_id,
-    .insert_execs = insert_execs,
+    .insert_exec_list = insert_exec_list,
     .update_exec = update_exec
 };
 
@@ -97,8 +97,8 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
     if (!dbr_recv_body(store->sock, pool, &body))
         return -1;
 
-    *first = body.entity_rep.first;
-    return body.entity_rep.count_;
+    *first = body.entity_list_rep.first;
+    return body.entity_list_rep.count_;
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {

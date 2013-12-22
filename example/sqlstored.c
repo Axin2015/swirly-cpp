@@ -53,17 +53,17 @@ status_err(struct DbrBody* rep, DbrIden req_id)
 static DbrBool
 read_entity(const struct DbrBody* req)
 {
-    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_ENTITY_REP,
-                           .entity_rep = { .type = req->read_entity_req.type } };
+    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_ENTITY_LIST_REP,
+                           .entity_list_rep = { .type = req->read_entity_req.type } };
     DbrModel model = dbr_sqlstore_model(store);
 
-    if (dbr_model_read_entity(model, rep.entity_rep.type, pool, &rep.entity_rep.first) < 0) {
+    if (dbr_model_read_entity(model, rep.entity_list_rep.type, pool, &rep.entity_list_rep.first) < 0) {
         dbr_err_prints("dbr_model_read_entity() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
-    dbr_pool_free_entity_list(pool, rep.entity_rep.type, rep.entity_rep.first);
+    dbr_pool_free_entity_list(pool, rep.entity_list_rep.type, rep.entity_list_rep.first);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;
@@ -74,14 +74,14 @@ read_entity(const struct DbrBody* req)
 }
 
 static DbrBool
-insert_execs(struct DbrBody* req)
+insert_exec_list(struct DbrBody* req)
 {
     struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
                            .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
-    if (!dbr_journ_insert_execs(journ, req->insert_execs_req.first, false)) {
-        dbr_err_prints("dbr_journ_insert_execs() failed");
+    if (!dbr_journ_insert_exec_list(journ, req->insert_exec_list_req.first, false)) {
+        dbr_err_prints("dbr_journ_insert_exec_list() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
@@ -154,9 +154,9 @@ run(void)
         case DBR_READ_ENTITY_REQ:
             read_entity(&req);
             break;
-        case DBR_INSERT_EXECS_REQ:
-            insert_execs(&req);
-            dbr_pool_free_entity_list(pool, DBR_EXEC, req.insert_execs_req.first);
+        case DBR_INSERT_EXEC_LIST_REQ:
+            insert_exec_list(&req);
+            dbr_pool_free_entity_list(pool, DBR_EXEC, req.insert_exec_list_req.first);
             break;
         case DBR_INSERT_EXEC_REQ:
             insert_exec(&req);

@@ -155,9 +155,9 @@ sess_trader(DbrIden req_id, DbrTrader trader)
     struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_TRADER, NULL);
 
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_TRADER;
-    rep.entity_rep.first = first;
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_TRADER;
+    rep.entity_list_rep.first = first;
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -172,9 +172,9 @@ sess_accnt(DbrIden req_id, DbrTrader trader)
     struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_ACCNT, NULL);
 
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_ACCNT;
-    rep.entity_rep.first = first;
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_ACCNT;
+    rep.entity_list_rep.first = first;
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -189,9 +189,9 @@ sess_contr(DbrIden req_id, DbrTrader trader)
     struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_CONTR, NULL);
 
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_CONTR;
-    rep.entity_rep.first = first;
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_CONTR;
+    rep.entity_list_rep.first = first;
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -211,9 +211,9 @@ sess_order(DbrIden req_id, DbrTrader trader)
         dbr_queue_insert_back(&q, &order->shared_node_);
     }
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_ORDER;
-    rep.entity_rep.first = dbr_queue_first(&q);
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_ORDER;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -233,9 +233,9 @@ sess_trade(DbrIden req_id, DbrTrader trader)
         dbr_queue_insert_back(&q, &exec->shared_node_);
     }
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_EXEC;
-    rep.entity_rep.first = dbr_queue_first(&q);
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_EXEC;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -255,9 +255,9 @@ sess_memb(DbrIden req_id, DbrTrader trader)
         dbr_queue_insert_back(&q, &memb->shared_node_);
     }
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_MEMB;
-    rep.entity_rep.first = dbr_queue_first(&q);
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_MEMB;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -288,9 +288,9 @@ sess_posn(DbrIden req_id, DbrTrader trader)
         }
     }
     rep.req_id = req_id;
-    rep.type = DBR_ENTITY_REP;
-    rep.entity_rep.type = DBR_POSN;
-    rep.entity_rep.first = dbr_queue_first(&q);
+    rep.type = DBR_ENTITY_LIST_REP;
+    rep.entity_list_rep.type = DBR_POSN;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
