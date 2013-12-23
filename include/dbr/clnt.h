@@ -148,6 +148,12 @@ dbr_clnt_exec_entry(struct DbrSlNode* node)
     return dbr_implof(struct DbrExec, shared_node_, node);
 }
 
+static inline struct DbrView*
+dbr_clnt_view_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrView, clnt_node_, node);
+}
+
 static inline struct DbrPosn*
 dbr_clnt_posnup_entry(struct DbrRbNode* node)
 {

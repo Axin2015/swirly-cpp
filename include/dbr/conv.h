@@ -119,6 +119,16 @@ dbr_dp_to_real(int dp)
     return pow(10, -dp);
 }
 
+/**
+ * @brief Synthetic market key from contract and settlment date.
+ */
+
+static inline DbrKey
+dbr_market_key(DbrIden contr, int settl_date)
+{
+    return contr * 100000000L + settl_date;
+}
+
 /** @} */
 
 #endif // DBR_CONV_H

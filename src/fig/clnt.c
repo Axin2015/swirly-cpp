@@ -22,6 +22,7 @@
 #include "trader.h"
 
 #include <dbr/clnt.h>
+#include <dbr/conv.h> // dbr_market_key()
 #include <dbr/err.h>
 #include <dbr/msg.h>
 #include <dbr/prioq.h>
@@ -47,6 +48,7 @@ struct FigClnt {
     struct FigCache cache;
     struct FigIndex index;
     struct DbrQueue execs;
+    struct DbrTree views;
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
@@ -116,6 +118,18 @@ enrich_view(struct FigCache* cache, struct DbrView* view)
 {
     view->contr.rec = get_id(cache, DBR_CONTR, view->contr.id_only);
     return view;
+}
+
+static void
+free_views(struct DbrTree* views, DbrPool pool)
+{
+    assert(views);
+    struct DbrRbNode* node;
+    while ((node = views->root)) {
+        struct DbrView* view = dbr_clnt_view_entry(node);
+        dbr_tree_remove(views, node);
+        dbr_pool_free_view(pool, view);
+    }
 }
 
 static DbrIden
@@ -204,6 +218,17 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         fig_accnt_emplace_posn(accnt, posn);
     }
     clnt->pending &= ~DBR_POSN;
+}
+
+static void
+emplace_view_list(DbrClnt clnt, struct DbrSlNode* first)
+{
+    for (struct DbrSlNode* node = first; node; node = node->next) {
+        struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
+        dbr_tree_insert(&clnt->views, dbr_market_key(view->contr.rec->id, view->settl_date),
+                        &view->clnt_node_);
+    }
+    clnt->pending &= ~DBR_VIEW;
 }
 
 static struct DbrOrder*
@@ -309,11 +334,13 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->pending = DBR_TRADER | DBR_ACCNT | DBR_CONTR | DBR_ORDER | DBR_EXEC | DBR_MEMB | DBR_POSN;
+    clnt->pending = DBR_TRADER | DBR_ACCNT | DBR_CONTR | DBR_ORDER | DBR_EXEC | DBR_MEMB
+        | DBR_POSN | DBR_VIEW;
     clnt->trader = NULL;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
     dbr_queue_init(&clnt->execs);
+    dbr_tree_init(&clnt->views);
     dbr_tree_init(&clnt->posnups);
     dbr_tree_init(&clnt->viewups);
     if (!dbr_prioq_init(&clnt->prioq))
@@ -339,6 +366,7 @@ dbr_clnt_destroy(DbrClnt clnt)
     if (clnt) {
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
+        free_views(&clnt->views, clnt->pool);
         dbr_prioq_term(&clnt->prioq);
         fig_cache_term(&clnt->cache);
         zmq_close(clnt->sock);
@@ -569,11 +597,14 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         emplace_posn_list(clnt, body.entity_list_rep.first);
         break;
     case DBR_VIEW_LIST_REP:
-        for (struct DbrSlNode* node = body.view_list_rep.first; node; node = node->next) {
-            struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
-            // Transfer ownership.
-            apply_view(clnt, view);
-        }
+        if ((clnt->pending & DBR_VIEW))
+            emplace_view_list(clnt, body.view_list_rep.first);
+        else
+            for (struct DbrSlNode* node = body.view_list_rep.first; node; node = node->next) {
+                struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
+                // Transfer ownership.
+                apply_view(clnt, view);
+            }
         break;
     case DBR_EXEC_REP:
         enrich_exec(&clnt->cache, body.exec_rep.exec);

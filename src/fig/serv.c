@@ -112,8 +112,7 @@ get_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
     assert(crec);
     assert(crec->type == DBR_CONTR);
 
-    // Synthetic key from contract and settlment date.
-    const DbrIden key = crec->id * 100000000L + settl_date;
+    const DbrIden key = dbr_market_key(crec->id, settl_date);
 
     struct DbrBook* book;
 	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);

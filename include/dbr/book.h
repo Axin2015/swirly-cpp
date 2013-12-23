@@ -18,6 +18,7 @@
 #ifndef DBR_BOOK_H
 #define DBR_BOOK_H
 
+#include <dbr/conv.h> // dbr_market_key()
 #include <dbr/side.h>
 
 /**
@@ -84,8 +85,7 @@ dbr_book_cancel(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
 static inline DbrKey
 dbr_book_key(struct DbrBook* book)
 {
-    // Synthetic key from contract and settlment date.
-    return book->crec->id * 100000000L + book->settl_date;
+    return dbr_market_key(book->crec->id, book->settl_date);
 }
 
 static inline struct DbrRec*
