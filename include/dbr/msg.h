@@ -34,7 +34,13 @@ enum {
     DBR_SESS_HEARTBT,
 
     DBR_STATUS_REP,
-    DBR_ENTITY_LIST_REP,
+    DBR_TRADER_LIST_REP,
+    DBR_ACCNT_LIST_REP,
+    DBR_CONTR_LIST_REP,
+    DBR_ORDER_LIST_REP,
+    DBR_EXEC_LIST_REP,
+    DBR_MEMB_LIST_REP,
+    DBR_POSN_LIST_REP,
     DBR_VIEW_LIST_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
@@ -66,7 +72,6 @@ struct DbrBody {
             char msg[DBR_ERRMSG_MAX];
         } status_rep;
         struct {
-            int type;
             // dbr_shared_rec_entry()
             // dbr_shared_order_entry()
             // dbr_shared_memb_entry()

@@ -53,17 +53,41 @@ status_err(struct DbrBody* rep, DbrIden req_id)
 static DbrBool
 read_entity(const struct DbrBody* req)
 {
-    struct DbrBody rep = { .req_id = req->req_id, .type = DBR_ENTITY_LIST_REP,
-                           .entity_list_rep = { .type = req->read_entity_req.type } };
+    struct DbrBody rep = { .req_id = req->req_id };
+    switch (req->type) {
+    case DBR_TRADER:
+        rep.type = DBR_TRADER_LIST_REP;
+        break;
+    case DBR_ACCNT:
+        rep.type = DBR_ACCNT_LIST_REP;
+        break;
+    case DBR_CONTR:
+        rep.type = DBR_CONTR_LIST_REP;
+        break;
+    case DBR_ORDER:
+        rep.type = DBR_ORDER_LIST_REP;
+        break;
+    case DBR_EXEC:
+        rep.type = DBR_EXEC_LIST_REP;
+        break;
+    case DBR_MEMB:
+        rep.type = DBR_MEMB_LIST_REP;
+        break;
+    case DBR_POSN:
+        rep.type = DBR_POSN_LIST_REP;
+        break;
+    }
     DbrModel model = dbr_sqlstore_model(store);
-
-    if (dbr_model_read_entity(model, rep.entity_list_rep.type, pool, &rep.entity_list_rep.first) < 0) {
+    const int type = req->read_entity_req.type;
+    const ssize_t size = dbr_model_read_entity(model, type, pool, &rep.entity_list_rep.first);
+    if (size < 0) {
         dbr_err_prints("dbr_model_read_entity() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
     const DbrBool ok = dbr_send_body(sock, &rep, false);
-    dbr_pool_free_entity_list(pool, rep.entity_list_rep.type, rep.entity_list_rep.first);
+    assert(rep.entity_list_rep.count_ == size);
+    dbr_pool_free_entity_list(pool, type, rep.entity_list_rep.first);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;

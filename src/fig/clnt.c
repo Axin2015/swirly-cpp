@@ -547,27 +547,26 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         status->num = body.status_rep.num;
         strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
         break;
-    case DBR_ENTITY_LIST_REP:
-        switch (body.entity_list_rep.type) {
-        case DBR_TRADER:
-        case DBR_ACCNT:
-        case DBR_CONTR:
-            emplace_rec_list(clnt, body.entity_list_rep.type, body.entity_list_rep.first,
-                             body.entity_list_rep.count_);
-            break;
-        case DBR_ORDER:
-            emplace_order_list(clnt, body.entity_list_rep.first);
-            break;
-        case DBR_EXEC:
-            emplace_trade_list(clnt, body.entity_list_rep.first);
-            break;
-        case DBR_MEMB:
-            emplace_memb_list(clnt, body.entity_list_rep.first);
-            break;
-        case DBR_POSN:
-            emplace_posn_list(clnt, body.entity_list_rep.first);
-            break;
-        };
+    case DBR_TRADER_LIST_REP:
+        emplace_rec_list(clnt, DBR_TRADER, body.entity_list_rep.first, body.entity_list_rep.count_);
+        break;
+    case DBR_ACCNT_LIST_REP:
+        emplace_rec_list(clnt, DBR_ACCNT, body.entity_list_rep.first, body.entity_list_rep.count_);
+        break;
+    case DBR_CONTR_LIST_REP:
+        emplace_rec_list(clnt, DBR_CONTR, body.entity_list_rep.first, body.entity_list_rep.count_);
+        break;
+    case DBR_ORDER_LIST_REP:
+        emplace_order_list(clnt, body.entity_list_rep.first);
+        break;
+    case DBR_EXEC_LIST_REP:
+        emplace_trade_list(clnt, body.entity_list_rep.first);
+        break;
+    case DBR_MEMB_LIST_REP:
+        emplace_memb_list(clnt, body.entity_list_rep.first);
+        break;
+    case DBR_POSN_LIST_REP:
+        emplace_posn_list(clnt, body.entity_list_rep.first);
         break;
     case DBR_VIEW_LIST_REP:
         for (struct DbrSlNode* node = body.view_list_rep.first; node; node = node->next) {
