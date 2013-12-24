@@ -132,10 +132,16 @@ free_views(struct DbrTree* views, DbrPool pool)
     }
 }
 
-static inline struct DbrRbNode*
-insert_posnup(struct DbrTree* tree, struct DbrRbNode* node)
+static inline void
+insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
 {
-    return dbr_tree_insert(tree, (DbrKey)node, node);
+    dbr_tree_insert(posnups, (DbrKey)posn, &posn->update_node_);
+}
+
+static inline void
+insert_viewup(struct DbrTree* viewups, struct DbrView* view)
+{
+    dbr_tree_insert(viewups, (DbrKey)view, &view->update_node_);
 }
 
 static DbrIden
@@ -301,7 +307,7 @@ apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
     enrich_posn(&clnt->cache, posn);
     posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
-    insert_posnup(&clnt->posnups, &posn->update_node_);
+    insert_posnup(&clnt->posnups, posn);
 }
 
 static void
@@ -310,7 +316,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
     enrich_view(&clnt->cache, view);
     const DbrIden key = dbr_market_key(view->contr.rec->id, view->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
-    if (node) {
+    if (node != &view->clnt_node_) {
         struct DbrView* curr = dbr_clnt_view_entry(node);
 
         // Update existing position.
@@ -328,8 +334,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
         dbr_pool_free_view(clnt->pool, view);
         view = curr;
     }
-    dbr_tree_insert(&clnt->viewups, dbr_market_key(view->contr.rec->id, view->settl_date),
-                    &view->update_node_);
+    insert_viewup(&clnt->viewups, view);
 }
 
 DBR_API DbrClnt

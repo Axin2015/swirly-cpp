@@ -78,7 +78,7 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
     // Synthetic key from contract and settlment date.
     const DbrIden key = dbr_market_key(posn->contr.rec->id, posn->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
-    if (node) {
+    if (node != &posn->accnt_node_) {
         struct DbrPosn* curr = dbr_accnt_posn_entry(node);
 
         // Update existing position.

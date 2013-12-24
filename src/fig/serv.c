@@ -106,6 +106,18 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
     return posn;
 }
 
+static inline void
+insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
+{
+    dbr_tree_insert(posnups, (DbrKey)posn, &posn->update_node_);
+}
+
+static inline void
+insert_bookup(struct DbrTree* bookups, struct DbrBook* book)
+{
+    dbr_tree_insert(bookups, (DbrKey)book, &book->update_node_);
+}
+
 static inline struct DbrBook*
 get_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
@@ -319,12 +331,6 @@ create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
     return exec;
 }
 
-static inline struct DbrRbNode*
-tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
-{
-    return dbr_tree_insert(tree, (DbrKey)node, node);
-}
-
 static inline void
 apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
 {
@@ -353,7 +359,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
         // Reduce maker.
         dbr_book_take(book, maker_order, match->lots, now);
-        tree_insert(&serv->posnups, &match->maker_posn->update_node_);
+        insert_posnup(&serv->posnups, match->maker_posn);
 
         // Must succeed because maker order exists.
         struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
@@ -375,7 +381,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 
     dbr_queue_join(&serv->execs, &trans->execs);
     if (trans->taker_posn)
-        tree_insert(&serv->posnups, &trans->taker_posn->update_node_);
+        insert_posnup(&serv->posnups, trans->taker_posn);
 }
 
 DBR_API DbrServ
@@ -533,7 +539,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 
     // Final commit phase cannot fail.
     fig_trader_emplace_order(trader, new_order);
-    dbr_tree_insert(&serv->bookups, dbr_book_key(book), &book->update_node_);
+    insert_bookup(&serv->bookups, book);
     // Commit trans to cycle and free matches.
     commit_trans(serv, trader, book, &trans, now);
     return new_order;
@@ -594,7 +600,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_tree_insert(&serv->bookups, dbr_book_key(book), &book->update_node_);
+    insert_bookup(&serv->bookups, book);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
@@ -646,7 +652,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    dbr_tree_insert(&serv->bookups, dbr_book_key(book), &book->update_node_);
+    insert_bookup(&serv->bookups, book);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
@@ -686,7 +692,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    dbr_tree_insert(&serv->bookups, dbr_book_key(book), &book->update_node_);
+    insert_bookup(&serv->bookups, book);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
@@ -725,7 +731,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
-    dbr_tree_insert(&serv->bookups, dbr_book_key(book), &book->update_node_);
+    insert_bookup(&serv->bookups, book);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:

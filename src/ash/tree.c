@@ -232,7 +232,7 @@ dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node)
     } else
         tree->root = node;
     insert_color(tree, node);
-    return NULL;
+    return node;
 }
 
 DBR_API void
