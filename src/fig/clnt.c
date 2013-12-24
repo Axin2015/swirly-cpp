@@ -132,6 +132,12 @@ free_views(struct DbrTree* views, DbrPool pool)
     }
 }
 
+static inline struct DbrRbNode*
+insert_posnup(struct DbrTree* tree, struct DbrRbNode* node)
+{
+    return dbr_tree_insert(tree, (DbrKey)node, node);
+}
+
 static DbrIden
 logon(DbrClnt clnt)
 {
@@ -247,15 +253,10 @@ create_order(DbrClnt clnt, struct DbrExec* exec)
     return order;
 }
 
-static inline struct DbrRbNode*
-tree_insert(struct DbrTree* tree, struct DbrRbNode* node)
-{
-    return dbr_tree_insert(tree, (DbrKey)node, node);
-}
-
 static DbrBool
 apply_new(DbrClnt clnt, struct DbrExec* exec)
 {
+    enrich_exec(&clnt->cache, exec);
     struct DbrOrder* order = create_order(clnt, exec);
     if (!order) {
         dbr_pool_free_exec(clnt->pool, exec);
@@ -270,6 +271,7 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
 static DbrBool
 apply_update(DbrClnt clnt, struct DbrExec* exec)
 {
+    enrich_exec(&clnt->cache, exec);
     struct DbrRbNode* node = fig_trader_find_order_id(clnt->trader, exec->order);
     if (!node) {
         dbr_pool_free_exec(clnt->pool, exec);
@@ -294,19 +296,40 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
     return true;
 }
 
-static DbrBool
-apply_posn(DbrClnt clnt, struct DbrPosn* posn)
+static void
+apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
+    enrich_posn(&clnt->cache, posn);
     posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
-    tree_insert(&clnt->posnups, &posn->update_node_);
-    return true;
+    insert_posnup(&clnt->posnups, &posn->update_node_);
 }
 
-static DbrBool
-apply_view(DbrClnt clnt, struct DbrView* view)
+static void
+apply_viewup(DbrClnt clnt, struct DbrView* view)
 {
-    // TODO: implement apply view.
-    return true;
+    enrich_view(&clnt->cache, view);
+    const DbrIden key = dbr_market_key(view->contr.rec->id, view->settl_date);
+    struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
+    if (node) {
+        struct DbrView* curr = dbr_clnt_view_entry(node);
+
+        // Update existing position.
+
+        assert(curr->contr.rec == view->contr.rec);
+        assert(curr->settl_date == view->settl_date);
+
+        curr->bid_ticks = view->bid_ticks;
+        curr->bid_lots = view->bid_lots;
+        curr->bid_count = view->bid_count;
+        curr->ask_ticks = view->ask_ticks;
+        curr->ask_lots = view->ask_lots;
+        curr->ask_count = view->ask_count;
+
+        dbr_pool_free_view(clnt->pool, view);
+        view = curr;
+    }
+    dbr_tree_insert(&clnt->viewups, dbr_market_key(view->contr.rec->id, view->settl_date),
+                    &view->update_node_);
 }
 
 DBR_API DbrClnt
@@ -601,13 +624,11 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
             emplace_view_list(clnt, body.view_list_rep.first);
         else
             for (struct DbrSlNode* node = body.view_list_rep.first; node; node = node->next) {
-                struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
                 // Transfer ownership.
-                apply_view(clnt, view);
+                apply_viewup(clnt, dbr_shared_view_entry(node));
             }
         break;
     case DBR_EXEC_REP:
-        enrich_exec(&clnt->cache, body.exec_rep.exec);
         switch (body.exec_rep.exec->c.state) {
         case DBR_NEW:
             apply_new(clnt, body.exec_rep.exec);
@@ -620,8 +641,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         }
         break;
     case DBR_POSN_REP:
-        enrich_posn(&clnt->cache, body.posn_rep.posn);
-        apply_posn(clnt, body.posn_rep.posn);
+        apply_posnup(clnt, body.posn_rep.posn);
         break;
     default:
         dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);

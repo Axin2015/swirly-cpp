@@ -17,6 +17,7 @@
  */
 #include "accnt.h"
 
+#include <dbr/conv.h> // dbr_market_key()
 #include <dbr/err.h>
 #include <dbr/log.h>
 
@@ -75,7 +76,7 @@ DBR_EXTERN struct DbrPosn*
 fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
     // Synthetic key from contract and settlment date.
-    const DbrIden key = posn->contr.rec->id * 100000000L + posn->settl_date;
+    const DbrIden key = dbr_market_key(posn->contr.rec->id, posn->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
     if (node) {
         struct DbrPosn* curr = dbr_accnt_posn_entry(node);
