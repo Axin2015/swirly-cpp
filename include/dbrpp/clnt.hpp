@@ -161,6 +161,162 @@ typedef ClntRecs<DBR_TRADER> ClntTraderRecs;
 typedef ClntRecs<DBR_ACCNT> ClntAccntRecs;
 typedef ClntRecs<DBR_CONTR> ClntContrRecs;
 
+class ClntViews {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrView Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_clnt_view_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_clnt_view_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrClnt clnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ClntViews(DbrClnt clnt) noexcept
+    : clnt_{clnt}
+    {
+    }
+    void
+    swap(ClntViews& rhs) noexcept
+    {
+        std::swap(clnt_, rhs.clnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_clnt_first_view(clnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_clnt_first_view(clnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_CLNT_END_VIEW;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_CLNT_END_VIEW;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_clnt_last_view(clnt_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_clnt_last_view(clnt_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_CLNT_END_VIEW;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_CLNT_END_VIEW;
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrIden cid, DbrDate settl_date) noexcept
+    {
+        return dbr_clnt_find_view(clnt_, cid, settl_date);
+    }
+    ConstIterator
+    find(DbrIden cid, DbrDate settl_date) const noexcept
+    {
+        return dbr_clnt_find_view(clnt_, cid, settl_date);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_clnt_empty_view(clnt_);
+    }
+};
+
 class ClntExecs {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrExec Entry;
@@ -552,6 +708,11 @@ public:
     arecs() const noexcept
     {
         return ClntAccntRecs{impl_};
+    }
+    ClntViews
+    views() const noexcept
+    {
+        return ClntViews{impl_};
     }
     Trader
     trader() const noexcept
