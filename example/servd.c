@@ -295,6 +295,12 @@ sess_posn(DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
+sess_view(DbrIden req_id, DbrTrader trader)
+{
+    return true;
+}
+
+static DbrBool
 sess_logon(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep = { .req_id = req_id, .type = DBR_STATUS_REP,
@@ -306,7 +312,8 @@ sess_logon(DbrIden req_id, DbrTrader trader)
         && sess_order(0, trader)
         && sess_trade(0, trader)
         && sess_memb(0, trader)
-        && sess_posn(0, trader);
+        && sess_posn(0, trader)
+        && sess_view(0, trader);
 }
 
 static DbrBool

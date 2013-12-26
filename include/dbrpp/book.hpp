@@ -58,7 +58,7 @@ public:
     DbrKey
     key() const noexcept
     {
-        return dbr_book_key(impl_);
+        return dbr_book_key(impl_->crec->id, impl_->settl_date);
     }
     ContrRecRef
     crec() const noexcept

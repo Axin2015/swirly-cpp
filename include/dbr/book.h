@@ -18,7 +18,7 @@
 #ifndef DBR_BOOK_H
 #define DBR_BOOK_H
 
-#include <dbr/conv.h> // dbr_market_key()
+#include <dbr/conv.h> // dbr_book_key()
 #include <dbr/side.h>
 
 /**
@@ -80,12 +80,6 @@ dbr_book_cancel(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
 {
     assert(order);
     dbr_side_cancel_order(dbr_book_side(book, order->c.action), order, now);
-}
-
-static inline DbrKey
-dbr_book_key(struct DbrBook* book)
-{
-    return dbr_market_key(book->crec->id, book->settl_date);
 }
 
 static inline struct DbrRec*

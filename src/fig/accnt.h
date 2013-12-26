@@ -19,6 +19,7 @@
 #define FIG_ACCNT_H
 
 #include <dbr/accnt.h>
+#include <dbr/conv.h> // dbr_book_key()
 #include <dbr/pool.h>
 #include <dbr/tree.h>
 #include <dbr/types.h>
@@ -52,7 +53,7 @@ static inline void
 fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
     // Synthetic key from contract and settlment date.
-    const DbrIden key = posn->contr.rec->id * 100000000L + posn->settl_date;
+    const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_date);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {

@@ -119,13 +119,20 @@ insert_bookup(struct DbrTree* bookups, struct DbrBook* book)
 }
 
 static inline struct DbrBook*
-get_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
+get_book(DbrServ serv, DbrIden cid, DbrDate settl_date)
+{
+    const DbrIden key = dbr_book_key(cid, settl_date);
+	struct DbrRbNode* node = dbr_tree_find(&serv->books, key);
+    return node ? serv_book_entry(node) : NULL;
+}
+
+static struct DbrBook*
+lazy_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
     assert(crec);
     assert(crec->type == DBR_CONTR);
 
-    const DbrIden key = dbr_market_key(crec->id, settl_date);
-
+    const DbrIden key = dbr_book_key(crec->id, settl_date);
     struct DbrBook* book;
 	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);
     if (!node || node->key != key) {
@@ -193,7 +200,7 @@ emplace_orders(DbrServ serv)
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
-            book = get_book(serv, order->c.contr.rec, order->c.settl_date);
+            book = lazy_book(serv, order->c.contr.rec, order->c.settl_date);
             if (dbr_unlikely(!book))
                 goto fail2;
 
@@ -472,7 +479,7 @@ dbr_serv_accnt(DbrServ serv, struct DbrRec* arec)
 DBR_API struct DbrBook*
 dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
-    return get_book(serv, crec, settl_date);
+    return lazy_book(serv, crec, settl_date);
 }
 
 // Exec
@@ -597,7 +604,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
     insert_bookup(&serv->bookups, book);
@@ -649,7 +656,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
     assert(book);
     dbr_book_revise(book, order, lots, now);
     insert_bookup(&serv->bookups, book);
@@ -689,7 +696,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
     insert_bookup(&serv->bookups, book);
@@ -728,7 +735,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
     assert(book);
     dbr_book_cancel(book, order, now);
     insert_bookup(&serv->bookups, book);

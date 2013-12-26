@@ -22,7 +22,7 @@
 #include "trader.h"
 
 #include <dbr/clnt.h>
-#include <dbr/conv.h> // dbr_market_key()
+#include <dbr/conv.h> // dbr_book_key()
 #include <dbr/err.h>
 #include <dbr/msg.h>
 #include <dbr/prioq.h>
@@ -237,7 +237,7 @@ emplace_view_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
-        dbr_tree_insert(&clnt->views, dbr_market_key(view->contr.rec->id, view->settl_date),
+        dbr_tree_insert(&clnt->views, dbr_book_key(view->contr.rec->id, view->settl_date),
                         &view->clnt_node_);
     }
     clnt->pending &= ~DBR_VIEW;
@@ -314,7 +314,7 @@ static void
 apply_viewup(DbrClnt clnt, struct DbrView* view)
 {
     enrich_view(&clnt->cache, view);
-    const DbrIden key = dbr_market_key(view->contr.rec->id, view->settl_date);
+    const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
     if (node != &view->clnt_node_) {
         struct DbrView* curr = dbr_clnt_view_entry(node);

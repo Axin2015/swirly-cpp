@@ -120,13 +120,13 @@ dbr_dp_to_real(int dp)
 }
 
 /**
- * @brief Synthetic market key from contract and settlment date.
+ * @brief Synthetic book key from contract and settlment date.
  */
 
 static inline DbrKey
-dbr_market_key(DbrIden contr, int settl_date)
+dbr_book_key(DbrIden cid, int settl_date)
 {
-    return contr * 100000000L + settl_date;
+    return cid * 100000000L + settl_date;
 }
 
 /** @} */
