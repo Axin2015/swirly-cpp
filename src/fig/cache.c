@@ -21,6 +21,7 @@
 #include <dbr/types.h>
 
 #include <stdbool.h>
+#include <stdlib.h> // abort()
 #include <string.h>
 
 static inline struct DbrRec*
@@ -206,12 +207,29 @@ fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
             *size = cache->contr_size;
         break;
     default:
-        assert(false);
-        first = NULL;
-        if (size)
-            *size = 0;
+        abort();
     }
     return first;
+}
+
+DBR_EXTERN DbrBool
+fig_cache_empty_rec(struct FigCache* cache, int type)
+{
+    struct DbrSlNode* first;
+    switch (type) {
+    case DBR_TRADER:
+        first = cache->first_trader;
+        break;
+    case DBR_ACCNT:
+        first = cache->first_accnt;
+        break;
+    case DBR_CONTR:
+        first = cache->first_contr;
+        break;
+    default:
+        abort();
+    }
+    return first == FIG_CACHE_END_REC;
 }
 
 DBR_EXTERN struct DbrSlNode*

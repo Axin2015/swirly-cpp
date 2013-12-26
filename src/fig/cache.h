@@ -63,6 +63,9 @@ fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* f
 DBR_EXTERN struct DbrSlNode*
 fig_cache_first_rec(struct FigCache* cache, int type, size_t* size);
 
+DBR_EXTERN DbrBool
+fig_cache_empty_rec(struct FigCache* cache, int type);
+
 DBR_EXTERN struct DbrSlNode*
 fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id);
 

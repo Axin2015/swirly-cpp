@@ -836,7 +836,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             const DbrIden accnt = sqlite3_column_int64(stmt, ACCNT);
             const DbrIden contr = sqlite3_column_int64(stmt, CONTR);
-            const int settl_date = sqlite3_column_int(stmt, SETTL_DATE);
+            const DbrDate settl_date = sqlite3_column_int(stmt, SETTL_DATE);
 
             // Posn is null for first row.
             if (posn && posn->accnt.id_only == accnt && posn->contr.id_only == contr

@@ -124,7 +124,7 @@ dbr_dp_to_real(int dp)
  */
 
 static inline DbrKey
-dbr_book_key(DbrIden cid, int settl_date)
+dbr_book_key(DbrIden cid, DbrDate settl_date)
 {
     return cid * 100000000L + settl_date;
 }

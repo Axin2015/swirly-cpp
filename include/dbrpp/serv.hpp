@@ -154,7 +154,7 @@ public:
     bool
     empty() const noexcept
     {
-        return size() == 0;
+        return dbr_serv_empty_rec(serv_, TypeN) == DBR_TRUE;
     }
 };
 

@@ -46,16 +46,13 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
 DBR_API void
 dbr_clnt_destroy(DbrClnt clnt);
 
-/**
- * @brief Returns first record of requested type.
- */
-
 #define DBR_CLNT_END_REC NULL
 
-// Size is optional.
-
-DBR_API struct DbrSlNode*
-dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size);
+static inline struct DbrRec*
+dbr_clnt_rec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrRec, shared_node_, node);
+}
 
 // Null if record does not exist.
 
@@ -67,6 +64,38 @@ dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id);
 
 DBR_API struct DbrSlNode*
 dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem);
+
+/**
+ * @brief Returns first record of requested type.
+ */
+
+// Size is optional.
+
+DBR_API struct DbrSlNode*
+dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size);
+
+DBR_API DbrBool
+dbr_clnt_empty_rec(DbrClnt clnt, int type);
+
+#define DBR_CLNT_END_VIEW NULL
+
+static inline struct DbrView*
+dbr_clnt_view_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrView, clnt_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date);
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_view(DbrClnt clnt);
+
+DBR_API struct DbrRbNode*
+dbr_clnt_last_view(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_empty_view(DbrClnt clnt);
 
 DBR_API DbrTrader
 dbr_clnt_trader(DbrClnt clnt);
@@ -114,6 +143,12 @@ dbr_clnt_clear(DbrClnt clnt);
 
 #define DBR_CLNT_END_EXEC NULL
 
+static inline struct DbrExec*
+dbr_clnt_exec_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrExec, shared_node_, node);
+}
+
 DBR_API struct DbrSlNode*
 dbr_clnt_first_exec(DbrClnt clnt);
 
@@ -121,6 +156,12 @@ DBR_API DbrBool
 dbr_clnt_empty_exec(DbrClnt clnt);
 
 #define DBR_CLNT_END_POSNUP NULL
+
+static inline struct DbrPosn*
+dbr_clnt_posnup_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrPosn, update_node_, node);
+}
 
 DBR_API struct DbrRbNode*
 dbr_clnt_first_posnup(DbrClnt clnt);
@@ -130,41 +171,17 @@ dbr_clnt_empty_posnup(DbrClnt clnt);
 
 #define DBR_CLNT_END_VIEWUP NULL
 
-DBR_API struct DbrRbNode*
-dbr_clnt_first_viewup(DbrClnt clnt);
-
-DBR_API DbrBool
-dbr_clnt_empty_viewup(DbrClnt clnt);
-
-static inline struct DbrRec*
-dbr_clnt_rec_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrRec, shared_node_, node);
-}
-
-static inline struct DbrExec*
-dbr_clnt_exec_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrExec, shared_node_, node);
-}
-
-static inline struct DbrView*
-dbr_clnt_view_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrView, clnt_node_, node);
-}
-
-static inline struct DbrPosn*
-dbr_clnt_posnup_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrPosn, update_node_, node);
-}
-
 static inline struct DbrView*
 dbr_clnt_viewup_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct DbrView, update_node_, node);
 }
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_viewup(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_empty_viewup(DbrClnt clnt);
 
 /** @} */
 

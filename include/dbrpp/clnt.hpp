@@ -153,7 +153,7 @@ public:
     bool
     empty() const noexcept
     {
-        return size() == 0;
+        return dbr_clnt_empty_rec(clnt_, TypeN) == DBR_TRUE;
     }
 };
 

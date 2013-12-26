@@ -445,12 +445,6 @@ dbr_serv_destroy(DbrServ serv)
 // Cache
 
 DBR_API struct DbrSlNode*
-dbr_serv_first_rec(DbrServ serv, int type, size_t* size)
-{
-    return fig_cache_first_rec(&serv->cache, type, size);
-}
-
-DBR_API struct DbrSlNode*
 dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id)
 {
     return fig_cache_find_rec_id(&serv->cache, type, id);
@@ -460,6 +454,45 @@ DBR_API struct DbrSlNode*
 dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem)
 {
     return fig_cache_find_rec_mnem(&serv->cache, type, mnem);
+}
+
+DBR_API struct DbrSlNode*
+dbr_serv_first_rec(DbrServ serv, int type, size_t* size)
+{
+    return fig_cache_first_rec(&serv->cache, type, size);
+}
+
+DBR_API DbrBool
+dbr_serv_empty_rec(DbrServ serv, int type)
+{
+    return fig_cache_empty_rec(&serv->cache, type);
+}
+
+// Book
+
+DBR_API struct DbrRbNode*
+dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrDate settl_date)
+{
+    const DbrIden key = dbr_book_key(cid, settl_date);
+	return dbr_tree_find(&serv->books, key);
+}
+
+DBR_API struct DbrRbNode*
+dbr_serv_first_book(DbrServ serv)
+{
+    return dbr_tree_first(&serv->books);
+}
+
+DBR_API struct DbrRbNode*
+dbr_serv_last_book(DbrServ serv)
+{
+    return dbr_tree_last(&serv->books);
+}
+
+DBR_API DbrBool
+dbr_serv_empty_book(DbrServ serv)
+{
+    return dbr_tree_empty(&serv->books);
 }
 
 // Pool
