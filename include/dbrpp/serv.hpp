@@ -446,8 +446,10 @@ public:
     typedef const Policy::Entry* ConstPointer;
     typedef const Policy::Entry& ConstReference;
 
-    typedef ForwardIterator<Policy> Iterator;
-    typedef ConstForwardIterator<Policy> ConstIterator;
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
 
     typedef std::ptrdiff_t DifferenceType;
     typedef size_t SizeType;
@@ -462,6 +464,8 @@ public:
 
     typedef Iterator iterator;
     typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
 
     typedef DifferenceType difference_type;
     typedef DifferenceType distance_type;
@@ -469,7 +473,7 @@ public:
 
     explicit
     ServPosnups(DbrServ serv) noexcept
-        : serv_{serv}
+    : serv_{serv}
     {
     }
     void
@@ -493,12 +497,35 @@ public:
     Iterator
     end() noexcept
     {
-        return nullptr;
+        return DBR_SERV_END_POSNUP;
     }
     ConstIterator
     end() const noexcept
     {
-        return nullptr;
+        return DBR_SERV_END_POSNUP;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_serv_last_posnup(serv_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_serv_last_posnup(serv_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_SERV_END_POSNUP;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_SERV_END_POSNUP;
     }
 
     // Accessor.
@@ -512,6 +539,16 @@ public:
     front() const noexcept
     {
         return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
     }
     SizeType
     size() const noexcept
@@ -552,8 +589,10 @@ public:
     typedef const Policy::Entry* ConstPointer;
     typedef const Policy::Entry& ConstReference;
 
-    typedef ForwardIterator<Policy> Iterator;
-    typedef ConstForwardIterator<Policy> ConstIterator;
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
 
     typedef std::ptrdiff_t DifferenceType;
     typedef size_t SizeType;
@@ -568,6 +607,8 @@ public:
 
     typedef Iterator iterator;
     typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
 
     typedef DifferenceType difference_type;
     typedef DifferenceType distance_type;
@@ -575,7 +616,7 @@ public:
 
     explicit
     ServBookups(DbrServ serv) noexcept
-        : serv_{serv}
+    : serv_{serv}
     {
     }
     void
@@ -599,12 +640,35 @@ public:
     Iterator
     end() noexcept
     {
-        return nullptr;
+        return DBR_SERV_END_BOOKUP;
     }
     ConstIterator
     end() const noexcept
     {
-        return nullptr;
+        return DBR_SERV_END_BOOKUP;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_serv_last_bookup(serv_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_serv_last_bookup(serv_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_SERV_END_BOOKUP;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_SERV_END_BOOKUP;
     }
 
     // Accessor.
@@ -618,6 +682,16 @@ public:
     front() const noexcept
     {
         return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
     }
     SizeType
     size() const noexcept

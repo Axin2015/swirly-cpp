@@ -169,6 +169,9 @@ dbr_serv_posnup_entry(struct DbrRbNode* node)
 DBR_API struct DbrRbNode*
 dbr_serv_first_posnup(DbrServ serv);
 
+DBR_API struct DbrRbNode*
+dbr_serv_last_posnup(DbrServ serv);
+
 DBR_API DbrBool
 dbr_serv_empty_posnup(DbrServ serv);
 
@@ -182,6 +185,9 @@ dbr_serv_bookup_entry(struct DbrRbNode* node)
 
 DBR_API struct DbrRbNode*
 dbr_serv_first_bookup(DbrServ serv);
+
+DBR_API struct DbrRbNode*
+dbr_serv_last_bookup(DbrServ serv);
 
 DBR_API DbrBool
 dbr_serv_empty_bookup(DbrServ serv);

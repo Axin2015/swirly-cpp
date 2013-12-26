@@ -845,6 +845,12 @@ dbr_serv_first_posnup(DbrServ serv)
     return dbr_tree_first(&serv->posnups);
 }
 
+DBR_API struct DbrRbNode*
+dbr_serv_last_posnup(DbrServ serv)
+{
+    return dbr_tree_last(&serv->posnups);
+}
+
 DBR_API DbrBool
 dbr_serv_empty_posnup(DbrServ serv)
 {
@@ -855,6 +861,12 @@ DBR_API struct DbrRbNode*
 dbr_serv_first_bookup(DbrServ serv)
 {
     return dbr_tree_first(&serv->bookups);
+}
+
+DBR_API struct DbrRbNode*
+dbr_serv_last_bookup(DbrServ serv)
+{
+    return dbr_tree_last(&serv->bookups);
 }
 
 DBR_API DbrBool

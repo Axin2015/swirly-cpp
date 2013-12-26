@@ -166,6 +166,9 @@ dbr_clnt_posnup_entry(struct DbrRbNode* node)
 DBR_API struct DbrRbNode*
 dbr_clnt_first_posnup(DbrClnt clnt);
 
+DBR_API struct DbrRbNode*
+dbr_clnt_last_posnup(DbrClnt clnt);
+
 DBR_API DbrBool
 dbr_clnt_empty_posnup(DbrClnt clnt);
 
@@ -179,6 +182,9 @@ dbr_clnt_viewup_entry(struct DbrRbNode* node)
 
 DBR_API struct DbrRbNode*
 dbr_clnt_first_viewup(DbrClnt clnt);
+
+DBR_API struct DbrRbNode*
+dbr_clnt_last_viewup(DbrClnt clnt);
 
 DBR_API DbrBool
 dbr_clnt_empty_viewup(DbrClnt clnt);

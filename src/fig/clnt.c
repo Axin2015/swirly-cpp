@@ -730,6 +730,12 @@ dbr_clnt_first_posnup(DbrClnt clnt)
     return dbr_tree_first(&clnt->posnups);
 }
 
+DBR_API struct DbrRbNode*
+dbr_clnt_last_posnup(DbrClnt clnt)
+{
+    return dbr_tree_last(&clnt->posnups);
+}
+
 DBR_API DbrBool
 dbr_clnt_empty_posnup(DbrClnt clnt)
 {
@@ -740,6 +746,12 @@ DBR_API struct DbrRbNode*
 dbr_clnt_first_viewup(DbrClnt clnt)
 {
     return dbr_tree_first(&clnt->viewups);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_last_viewup(DbrClnt clnt)
+{
+    return dbr_tree_last(&clnt->viewups);
 }
 
 DBR_API DbrBool
