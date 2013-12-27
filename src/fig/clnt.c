@@ -354,6 +354,7 @@ dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const 
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, "", 0);
 
     if (zmq_connect(sub, sub_addr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
@@ -634,80 +635,104 @@ dbr_clnt_ready(DbrClnt clnt)
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
 {
-    zmq_pollitem_t items[] = { { clnt->dealer, 0, ZMQ_POLLIN, 0 } };
+    zmq_pollitem_t items[] = {
+        { clnt->sub,    0, ZMQ_POLLIN, 0 },
+        { clnt->dealer, 0, ZMQ_POLLIN, 0 }
+    };
 
     // TODO: min of ms and timer.
 
-    if (zmq_poll(items, 1, ms) < 0) {
+    const int nevents = zmq_poll(items, 2, ms);
+    if (nevents < 0) {
         dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
-    if (!(items[0].revents & ZMQ_POLLIN))
-        return 0;
 
-    struct DbrBody body;
-    if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
-        goto fail1;
-
-    status->req_id = body.req_id;
+    status->req_id = 0;
     status->num = 0;
     status->msg[0] = '\0';
 
-    switch (body.type) {
-    case DBR_STATUS_REP:
-        status->num = body.status_rep.num;
-        strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
-        break;
-    case DBR_TRADER_LIST_REP:
-        emplace_rec_list(clnt, DBR_TRADER, body.entity_list_rep.first, body.entity_list_rep.count_);
-        break;
-    case DBR_ACCNT_LIST_REP:
-        emplace_rec_list(clnt, DBR_ACCNT, body.entity_list_rep.first, body.entity_list_rep.count_);
-        break;
-    case DBR_CONTR_LIST_REP:
-        emplace_rec_list(clnt, DBR_CONTR, body.entity_list_rep.first, body.entity_list_rep.count_);
-        break;
-    case DBR_ORDER_LIST_REP:
-        emplace_order_list(clnt, body.entity_list_rep.first);
-        break;
-    case DBR_EXEC_LIST_REP:
-        emplace_exec_list(clnt, body.entity_list_rep.first);
-        break;
-    case DBR_MEMB_LIST_REP:
-        emplace_memb_list(clnt, body.entity_list_rep.first);
-        break;
-    case DBR_POSN_LIST_REP:
-        emplace_posn_list(clnt, body.entity_list_rep.first);
-        break;
-    case DBR_VIEW_LIST_REP:
-        if ((clnt->pending & DBR_VIEW))
-            emplace_view_list(clnt, body.view_list_rep.first);
-        else
-            for (struct DbrSlNode* node = body.view_list_rep.first; node; node = node->next) {
+    if ((items[0].revents & ZMQ_POLLIN)) {
+
+        struct DbrBody body;
+        if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
+            goto fail1;
+
+        switch (body.type) {
+        case DBR_VIEW_LIST_REP:
+            for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
+                struct DbrView* view = dbr_shared_view_entry(node);
+                node = node->next;
                 // Transfer ownership.
-                apply_viewup(clnt, dbr_shared_view_entry(node));
+                apply_viewup(clnt, view);
             }
-        break;
-    case DBR_EXEC_REP:
-        switch (body.exec_rep.exec->c.state) {
-        case DBR_NEW:
-            apply_new(clnt, body.exec_rep.exec);
             break;
-        case DBR_REVISE:
-        case DBR_CANCEL:
-        case DBR_TRADE:
-            apply_update(clnt, body.exec_rep.exec);
-            break;
+        default:
+            dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
+            goto fail1;
         }
-        break;
-    case DBR_POSN_REP:
-        apply_posnup(clnt, body.posn_rep.posn);
-        break;
-    default:
-        dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
-        goto fail1;
     }
-    return 1;
+    if ((items[1].revents & ZMQ_POLLIN)) {
+
+        struct DbrBody body;
+        if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
+            goto fail1;
+
+        status->req_id = body.req_id;
+
+        switch (body.type) {
+        case DBR_STATUS_REP:
+            status->num = body.status_rep.num;
+            strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
+            break;
+        case DBR_TRADER_LIST_REP:
+            emplace_rec_list(clnt, DBR_TRADER, body.entity_list_rep.first,
+                             body.entity_list_rep.count_);
+            break;
+        case DBR_ACCNT_LIST_REP:
+            emplace_rec_list(clnt, DBR_ACCNT, body.entity_list_rep.first,
+                             body.entity_list_rep.count_);
+            break;
+        case DBR_CONTR_LIST_REP:
+            emplace_rec_list(clnt, DBR_CONTR, body.entity_list_rep.first,
+                             body.entity_list_rep.count_);
+            break;
+        case DBR_ORDER_LIST_REP:
+            emplace_order_list(clnt, body.entity_list_rep.first);
+            break;
+        case DBR_EXEC_LIST_REP:
+            emplace_exec_list(clnt, body.entity_list_rep.first);
+            break;
+        case DBR_MEMB_LIST_REP:
+            emplace_memb_list(clnt, body.entity_list_rep.first);
+            break;
+        case DBR_POSN_LIST_REP:
+            emplace_posn_list(clnt, body.entity_list_rep.first);
+            break;
+        case DBR_VIEW_LIST_REP:
+            emplace_view_list(clnt, body.view_list_rep.first);
+            break;
+        case DBR_EXEC_REP:
+            switch (body.exec_rep.exec->c.state) {
+            case DBR_NEW:
+                apply_new(clnt, body.exec_rep.exec);
+                break;
+            case DBR_REVISE:
+            case DBR_CANCEL:
+            case DBR_TRADE:
+                apply_update(clnt, body.exec_rep.exec);
+                break;
+            }
+            break;
+        case DBR_POSN_REP:
+            apply_posnup(clnt, body.posn_rep.posn);
+            break;
+        default:
+            dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
+            goto fail1;
+        }
+    }
+    return nevents;
  fail1:
     return -1;
 }

@@ -128,6 +128,34 @@ send_posnup(DbrIden req_id, struct DbrPosn* posn)
 }
 
 static DbrBool
+send_bookup(DbrIden req_id)
+{
+    struct DbrBody rep;
+
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_serv_first_bookup(serv);
+         node != DBR_SERV_END_BOOKUP; node = dbr_rbnode_next(node)) {
+        struct DbrBook* book = dbr_serv_bookup_entry(node);
+        struct DbrView* view = dbr_pool_alloc_view(pool);
+        if (!view)
+            goto fail1;
+        dbr_book_view(book, view);
+        dbr_queue_insert_back(&q, &view->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_VIEW_LIST_REP;
+    rep.view_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_body(pub, &rep, true);
+    free_view_list(q.first);
+    if (!ok)
+        dbr_err_prints("dbr_send_body() failed");
+    return ok;
+ fail1:
+    free_view_list(q.first);
+    return false;
+}
+
+static DbrBool
 flush(const struct DbrBody* req)
 {
     {
@@ -152,6 +180,10 @@ flush(const struct DbrBody* req)
         if (!send_posnup(0, posn))
             goto fail1;
     }
+
+    if (!send_bookup(0))
+        goto fail1;
+
     dbr_serv_clear(serv);
     return true;
  fail1:
@@ -307,7 +339,7 @@ sess_posn(DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
-sess_view(DbrIden req_id, DbrTrader trader)
+sess_book(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
 
@@ -347,7 +379,7 @@ sess_logon(DbrIden req_id, DbrTrader trader)
         && sess_exec(0, trader)
         && sess_memb(0, trader)
         && sess_posn(0, trader)
-        && sess_view(0, trader);
+        && sess_book(0, trader);
 }
 
 static DbrBool

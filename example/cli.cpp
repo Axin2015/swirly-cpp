@@ -359,10 +359,11 @@ public:
     {
         // TODO: more robust logic.
         do {
-            cout << "polling until ready\n";
+            cout << '.';
             DbrStatus status;
             clnt_.poll(250, status);
         } while (!clnt_.ready());
+        cout << endl;
     }
     void
     idle(DbrMillis ms)
