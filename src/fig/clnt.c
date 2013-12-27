@@ -39,7 +39,7 @@ enum { TIMEOUT = 5000 };
 
 struct FigClnt {
     void* ctx;
-    void* sock;
+    void* dealer;
     DbrMnem mnem;
     DbrIden id;
     DbrPool pool;
@@ -148,7 +148,7 @@ static DbrIden
 logon(DbrClnt clnt)
 {
     struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_LOGON };
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         return -1;
     return body.req_id;
 }
@@ -346,19 +346,19 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
         goto fail1;
     }
 
-    void* sock = zmq_socket(ctx, ZMQ_DEALER);
-    if (!sock) {
+    void* dealer = zmq_socket(ctx, ZMQ_DEALER);
+    if (!dealer) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-    zmq_setsockopt(sock, ZMQ_IDENTITY, trader, strnlen(trader, DBR_MNEM_MAX));
+    zmq_setsockopt(dealer, ZMQ_IDENTITY, trader, strnlen(trader, DBR_MNEM_MAX));
 
-    if (zmq_connect(sock, addr) < 0) {
+    if (zmq_connect(dealer, addr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
 
-    clnt->sock = sock;
+    clnt->dealer = dealer;
     strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
     clnt->pool = pool;
@@ -381,7 +381,7 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
  fail4:
     fig_cache_term(&clnt->cache);
  fail3:
-    zmq_close(sock);
+    zmq_close(dealer);
  fail2:
     free(clnt);
  fail1:
@@ -397,7 +397,7 @@ dbr_clnt_destroy(DbrClnt clnt)
         free_views(&clnt->views, clnt->pool);
         dbr_prioq_term(&clnt->prioq);
         fig_cache_term(&clnt->cache);
-        zmq_close(clnt->sock);
+        zmq_close(clnt->dealer);
         free(clnt);
     }
 }
@@ -485,7 +485,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         goto fail2;
 
     return body.req_id;
@@ -507,7 +507,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         goto fail2;
 
     return body.req_id;
@@ -529,7 +529,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         goto fail2;
 
     return body.req_id;
@@ -550,7 +550,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         goto fail2;
 
     return body.req_id;
@@ -571,7 +571,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         goto fail2;
 
     return body.req_id;
@@ -592,7 +592,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, false))
         goto fail2;
 
     struct DbrExec* exec = fig_trader_release_trade_id(clnt->trader, id);
@@ -610,7 +610,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
 {
-    zmq_pollitem_t items[] = { { clnt->sock, 0, ZMQ_POLLIN, 0 } };
+    zmq_pollitem_t items[] = { { clnt->dealer, 0, ZMQ_POLLIN, 0 } };
 
     // TODO: min of ms and timer.
 
@@ -622,7 +622,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         return 0;
 
     struct DbrBody body;
-    if (!dbr_recv_body(clnt->sock, clnt->pool, &body))
+    if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
         goto fail1;
 
     status->req_id = body.req_id;
