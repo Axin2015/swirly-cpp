@@ -46,6 +46,17 @@ static void* sock = NULL;
 
 static volatile sig_atomic_t quit = false;
 
+static void
+free_view_list(struct DbrSlNode* first)
+{
+    struct DbrSlNode* node = first;
+    while (node) {
+        struct DbrView* view = dbr_shared_view_entry(node);
+        node = node->next;
+        dbr_pool_free_view(pool, view);
+    }
+}
+
 static inline struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
@@ -88,7 +99,7 @@ send_exec(DbrIden req_id, struct DbrExec* exec)
 }
 
 static DbrBool
-send_posn(DbrIden req_id, struct DbrPosn* posn)
+send_posnup(DbrIden req_id, struct DbrPosn* posn)
 {
     struct DbrBody rep = { .req_id = req_id, .type = DBR_POSN_REP, .posn_rep.posn = posn };
 
@@ -137,7 +148,7 @@ flush(const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_serv_first_posnup(serv);
          node != DBR_SERV_END_POSNUP; node = dbr_rbnode_next(node)) {
         struct DbrPosn* posn = dbr_serv_posnup_entry(node);
-        if (!send_posn(0, posn))
+        if (!send_posnup(0, posn))
             goto fail1;
     }
     dbr_serv_clear(serv);
@@ -297,7 +308,29 @@ sess_posn(DbrIden req_id, DbrTrader trader)
 static DbrBool
 sess_view(DbrIden req_id, DbrTrader trader)
 {
-    return true;
+    struct DbrBody rep;
+
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_serv_first_book(serv);
+         node != DBR_SERV_END_BOOK; node = dbr_rbnode_next(node)) {
+        struct DbrBook* book = dbr_serv_book_entry(node);
+        struct DbrView* view = dbr_pool_alloc_view(pool);
+        if (!view)
+            goto fail1;
+        dbr_book_view(book, view);
+        dbr_queue_insert_back(&q, &view->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_VIEW_LIST_REP;
+    rep.view_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(sock, dbr_trader_rec(trader)->mnem, &rep, true);
+    free_view_list(q.first);
+    if (!ok)
+        dbr_err_prints("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    free_view_list(q.first);
+    return false;
 }
 
 static DbrBool

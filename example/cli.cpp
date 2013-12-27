@@ -465,21 +465,19 @@ public:
         }
     }
     void
-    book(Arg begin, Arg end)
+    view(Arg begin, Arg end)
     {
         if (!crec_)
             throw InvalidState("contr");
         if (!settl_date_)
             throw InvalidState("settl_date");
-#if 0
-        auto book = clnt_.book(*crec_, settl_date_);
 
         cout <<
             "|bid_count "
-            "|bid_resd  "
+            "|bid_lots  "
             "|bid_ticks "
             "|ask_ticks "
-            "|ask_resd  "
+            "|ask_lots  "
             "|ask_count "
             "|" << endl;
         cout <<
@@ -491,39 +489,29 @@ public:
             "+----------"
             "|" << endl;
 
-        auto bid_levels = book.bid_side().levels();
-        auto bid_it = bid_levels.begin();
-        auto bid_end = bid_levels.end();
+        auto it = clnt_.views().find(crec_->id, settl_date_);
+        if (it == clnt_.views().end())
+            return;
 
-        auto ask_levels = book.ask_side().levels();
-        auto ask_it = ask_levels.begin();
-        auto ask_end = ask_levels.end();
-
-        while (bid_it != bid_end || ask_it != ask_end) {
-
-            if (bid_it != bid_end) {
-                cout << '|' << right << setw(10) << bid_it->count
-                     << '|' << right << setw(10) << bid_it->resd
-                     << '|' << right << setw(10) << bid_it->ticks;
-                ++bid_it;
-            } else {
-                cout << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- ";
-            }
-            if (ask_it != ask_end) {
-                cout << '|' << right << setw(10) << ask_it->ticks
-                     << '|' << right << setw(10) << ask_it->resd
-                     << '|' << right << setw(10) << ask_it->count;
-                ++ask_it;
-            } else {
-                cout << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- ";
-            }
-            cout << '|' << endl;
+        if (it->bid_count > 0) {
+            cout << '|' << right << setw(10) << it->bid_count
+                 << '|' << right << setw(10) << it->bid_lots
+                 << '|' << right << setw(10) << it->bid_ticks;
+        } else {
+            cout << '|' << right << setw(10) << "- "
+                 << '|' << right << setw(10) << "- "
+                 << '|' << right << setw(10) << "- ";
         }
-#endif
+        if (it->ask_count > 0) {
+            cout << '|' << right << setw(10) << it->ask_ticks
+                 << '|' << right << setw(10) << it->ask_lots
+                 << '|' << right << setw(10) << it->ask_count;
+        } else {
+            cout << '|' << right << setw(10) << "- "
+                 << '|' << right << setw(10) << "- "
+                 << '|' << right << setw(10) << "- ";
+        }
+        cout << '|' << endl;
     }
     void
     cancel(Arg begin, Arg end)
@@ -856,7 +844,6 @@ main(int argc, char* argv[])
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));
         repl.cmd("ack_trades", -1, bind(&Test::ack_trades, ref(test), _1, _2));
-        repl.cmd("book", 0, bind(&Test::book, ref(test), _1, _2));
         repl.cmd("buy", 2, bind(&Test::place, ref(test), DBR_BUY, _1, _2));
         repl.cmd("cancel", -1, bind(&Test::cancel, ref(test), _1, _2));
         repl.cmd("contrs", 0, bind(&Test::contrs, ref(test), _1, _2));
@@ -871,6 +858,7 @@ main(int argc, char* argv[])
         repl.cmd("traders", 0, bind(&Test::traders, ref(test), _1, _2));
         repl.cmd("trades", 0, bind(&Test::trades, ref(test), _1, _2));
         repl.cmd("unset", 1, bind(&Test::unset, ref(test), _1, _2));
+        repl.cmd("view", 0, bind(&Test::view, ref(test), _1, _2));
 
         char path[PATH_MAX];
         sprintf(path, "%s/.dbr_clirc", getenv("HOME"));

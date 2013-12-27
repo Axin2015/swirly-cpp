@@ -385,10 +385,14 @@ dbr_view_len(const struct DbrView* view, DbrBool enriched)
     size_t n;
     if (enriched) {
         n = dbr_packlenf(VIEW_FORMAT,
-                         view->contr.rec->id, view->settl_date);
+                         view->contr.rec->id, view->settl_date,
+                         view->bid_ticks, view->bid_lots, view->bid_count,
+                         view->ask_ticks, view->ask_lots, view->ask_count);
     } else {
         n = dbr_packlenf(VIEW_FORMAT,
-                         view->contr.id_only, view->settl_date);
+                         view->contr.id_only, view->settl_date,
+                         view->bid_ticks, view->bid_lots, view->bid_count,
+                         view->ask_ticks, view->ask_lots, view->ask_count);
     }
     return n;
 }
@@ -398,10 +402,15 @@ dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, VIEW_FORMAT,
-                        view->contr.rec->id, view->settl_date);
+                        view->contr.rec->id, view->settl_date,
+                        view->bid_ticks, view->bid_lots, view->bid_count,
+                        view->ask_ticks, view->ask_lots, view->ask_count);
+
     } else {
         buf = dbr_packf(buf, VIEW_FORMAT,
-                        view->contr.id_only, view->settl_date);
+                        view->contr.id_only, view->settl_date,
+                        view->bid_ticks, view->bid_lots, view->bid_count,
+                        view->ask_ticks, view->ask_lots, view->ask_count);
     }
     return buf;
 }
@@ -411,5 +420,7 @@ dbr_read_view(const char* buf, struct DbrView* view)
 {
     dbr_view_init(view);
     return dbr_unpackf(buf, VIEW_FORMAT,
-                       &view->contr.id_only, &view->settl_date);
+                       &view->contr.id_only, &view->settl_date,
+                       &view->bid_ticks, &view->bid_lots, &view->bid_count,
+                       &view->ask_ticks, &view->ask_lots, &view->ask_count);
 }

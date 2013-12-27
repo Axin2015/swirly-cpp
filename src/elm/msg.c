@@ -252,7 +252,6 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         n += dbr_packlenz(body->entity_list_rep.count_);
         break;
     case DBR_VIEW_LIST_REP:
-        break;
         body->view_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
             struct DbrView* view = dbr_shared_view_entry(node);
