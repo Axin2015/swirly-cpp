@@ -39,6 +39,7 @@ enum { TIMEOUT = 5000 };
 
 struct FigClnt {
     void* ctx;
+    void* sub;
     void* dealer;
     DbrMnem mnem;
     DbrIden id;
@@ -194,14 +195,15 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
 }
 
 static void
-emplace_trade_list(DbrClnt clnt, struct DbrSlNode* first)
+emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
+        assert(exec->c.state == DBR_TRADE);
         // Transfer ownership.
         fig_trader_emplace_trade(clnt->trader, exec);
     }
-    clnt->pending &= ~DBR_TRADE;
+    clnt->pending &= ~DBR_EXEC;
 }
 
 static void
@@ -338,7 +340,8 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, DbrPool pool)
+dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const char* trader,
+                DbrIden seed, DbrPool pool)
 {
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
     if (dbr_unlikely(!clnt)) {
@@ -346,18 +349,30 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
         goto fail1;
     }
 
-    void* dealer = zmq_socket(ctx, ZMQ_DEALER);
-    if (!dealer) {
+    void* sub = zmq_socket(ctx, ZMQ_SUB);
+    if (!sub) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-    zmq_setsockopt(dealer, ZMQ_IDENTITY, trader, strnlen(trader, DBR_MNEM_MAX));
 
-    if (zmq_connect(dealer, addr) < 0) {
+    if (zmq_connect(sub, sub_addr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
 
+    void* dealer = zmq_socket(ctx, ZMQ_DEALER);
+    if (!dealer) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+    zmq_setsockopt(dealer, ZMQ_IDENTITY, trader, strnlen(trader, DBR_MNEM_MAX));
+
+    if (zmq_connect(dealer, dealer_addr) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail4;
+    }
+
+    clnt->sub = sub;
     clnt->dealer = dealer;
     strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
@@ -372,16 +387,18 @@ dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, D
     dbr_tree_init(&clnt->posnups);
     dbr_tree_init(&clnt->viewups);
     if (!dbr_prioq_init(&clnt->prioq))
-        goto fail4;
-    if (!logon(clnt))
         goto fail5;
+    if (!logon(clnt))
+        goto fail6;
     return clnt;
- fail5:
+ fail6:
     dbr_prioq_term(&clnt->prioq);
- fail4:
+ fail5:
     fig_cache_term(&clnt->cache);
- fail3:
+ fail4:
     zmq_close(dealer);
+ fail3:
+    zmq_close(sub);
  fail2:
     free(clnt);
  fail1:
@@ -398,6 +415,7 @@ dbr_clnt_destroy(DbrClnt clnt)
         dbr_prioq_term(&clnt->prioq);
         fig_cache_term(&clnt->cache);
         zmq_close(clnt->dealer);
+        zmq_close(clnt->sub);
         free(clnt);
     }
 }
@@ -607,6 +625,12 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     return -1;
 }
 
+DBR_API DbrBool
+dbr_clnt_ready(DbrClnt clnt)
+{
+    return clnt->pending == 0;
+}
+
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
 {
@@ -647,7 +671,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
         emplace_order_list(clnt, body.entity_list_rep.first);
         break;
     case DBR_EXEC_LIST_REP:
-        emplace_trade_list(clnt, body.entity_list_rep.first);
+        emplace_exec_list(clnt, body.entity_list_rep.first);
         break;
     case DBR_MEMB_LIST_REP:
         emplace_memb_list(clnt, body.entity_list_rep.first);

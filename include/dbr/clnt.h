@@ -39,7 +39,8 @@ struct DbrStatus {
 };
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* addr, const char* trader, DbrIden seed, DbrPool pool);
+dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const char* trader,
+                DbrIden seed, DbrPool pool);
 
 // No-op if clnt is null.
 
@@ -134,6 +135,9 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
 
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
+
+DBR_API DbrBool
+dbr_clnt_ready(DbrClnt clnt);
 
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);

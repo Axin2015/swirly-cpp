@@ -703,6 +703,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
                 exec->c.ref[0] = '\0';
+            exec->c.state = DBR_TRADE;
             exec->c.action = sqlite3_column_int(stmt, ACTION);
             exec->c.ticks = sqlite3_column_int64(stmt, TICKS);
             exec->c.lots = sqlite3_column_int64(stmt, LOTS);

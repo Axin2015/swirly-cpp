@@ -722,8 +722,9 @@ public:
         : impl_{nullptr}
     {
     }
-    Clnt(void* ctx, const char* addr, const char* trader, DbrIden seed, DbrPool pool)
-        : impl_{dbr_clnt_create(ctx, addr, trader, seed, pool)}
+    Clnt(void* ctx, const char* sub_addr, const char* dealer_addr, const char* trader,
+         DbrIden seed, DbrPool pool)
+        : impl_{dbr_clnt_create(ctx, sub_addr, dealer_addr, trader, seed, pool)}
     {
         if (!impl_)
             throw_exception();
@@ -850,6 +851,11 @@ public:
         if (req_id < 0)
             throw_exception();
         return req_id;
+    }
+    bool
+    ready() const noexcept
+    {
+        return dbr_clnt_ready(impl_) == DBR_TRUE;
     }
     bool
     poll(DbrMillis ms, DbrStatus& status)

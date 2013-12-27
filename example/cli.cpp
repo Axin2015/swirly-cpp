@@ -282,7 +282,7 @@ public:
             Arg begin = toks.begin();
             const string& name = *begin++;
             eval(name, begin, toks.end());
-            idle_(300);
+            idle_(250);
         } else
             idle_(100);
     }
@@ -350,17 +350,19 @@ class Test {
         return it->second;
     }
 public:
-    Test(const char* addr, const char* trader, DbrIden seed)
-        : clnt_(ctx_.c_arg(), addr, trader, seed, pool_),
+    Test(const char* sub_addr, const char* dealer_addr, const char* trader, DbrIden seed)
+        : clnt_(ctx_.c_arg(), sub_addr, dealer_addr, trader, seed, pool_),
           arec_(nullptr),
           crec_(nullptr),
           settl_date_(0),
           id_(1)
     {
         // TODO: more robust logic.
-        DbrStatus status;
-        while (clnt_.poll(100, status))
-            ;
+        do {
+            cout << "polling until ready\n";
+            DbrStatus status;
+            clnt_.poll(250, status);
+        } while (!clnt_.ready());
     }
     void
     idle(DbrMillis ms)
@@ -839,7 +841,8 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        Test test("tcp://localhost:3272", trader, dbr_millis());
+        // epgm://239.192.1.1:3270
+        Test test("tcp://localhost:3270", "tcp://localhost:3271", trader, dbr_millis());
         Repl repl(bind(&Test::idle, ref(test), _1));
 
         repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));

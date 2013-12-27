@@ -42,6 +42,7 @@ static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
 static DbrServ serv = NULL;
 static void* ctx = NULL;
+static void* pub = NULL;
 static void* router = NULL;
 
 static volatile sig_atomic_t quit = false;
@@ -228,7 +229,7 @@ sess_order(DbrIden req_id, DbrTrader trader)
  }
 
 static DbrBool
-sess_trade(DbrIden req_id, DbrTrader trader)
+sess_exec(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
 
@@ -343,7 +344,7 @@ sess_logon(DbrIden req_id, DbrTrader trader)
         && sess_accnt(0, trader)
         && sess_contr(0, trader)
         && sess_order(0, trader)
-        && sess_trade(0, trader)
+        && sess_exec(0, trader)
         && sess_memb(0, trader)
         && sess_posn(0, trader)
         && sess_view(0, trader);
@@ -517,6 +518,7 @@ run(void)
 {
     while (!quit) {
         struct DbrMsg req;
+        dbr_log_info("receiving...");
         if (!dbr_recv_msg(router, pool, &req)) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
@@ -611,15 +613,37 @@ main(int argc, char* argv[])
     }
 
     ctx = zmq_ctx_new();
-    if (!ctx)
+    if (!ctx) {
+        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_print();
         goto exit4;
+    }
+
+    pub = zmq_socket(ctx, ZMQ_PUB);
+    if (!pub) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_print();
+        goto exit5;
+    }
+
+    if (zmq_bind(pub, "tcp://*:3270") < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_print();
+        goto exit6;
+    }
 
     router = zmq_socket(ctx, ZMQ_ROUTER);
-    if (!router)
-        goto exit5;
-
-    if (zmq_bind(router, "tcp://*:3272") < 0)
+    if (!router) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_print();
         goto exit6;
+    }
+
+    if (zmq_bind(router, "tcp://*:3271") < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_print();
+        goto exit7;
+    }
 
     struct sigaction action;
     action.sa_handler = sighandler;
@@ -629,12 +653,14 @@ main(int argc, char* argv[])
     sigaction(SIGTERM, &action, NULL);
 
     if (!run())
-        goto exit6;
+        goto exit7;
 
     dbr_log_info("exiting...");
     status = 0;
- exit6:
+ exit7:
     zmq_close(router);
+ exit6:
+    zmq_close(pub);
  exit5:
     zmq_ctx_destroy(ctx);
  exit4:
