@@ -857,13 +857,13 @@ public:
     {
         return dbr_clnt_ready(impl_) == DBR_TRUE;
     }
-    bool
+    int
     poll(DbrMillis ms, DbrStatus& status)
     {
-        int n = dbr_clnt_poll(impl_, ms, &status);
-        if (n < 0)
+        const int nevents = dbr_clnt_poll(impl_, ms, &status);
+        if (nevents < 0)
             throw_exception();
-        return n == 1;
+        return nevents;
     }
     void
     clear() noexcept

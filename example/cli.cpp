@@ -369,72 +369,153 @@ public:
     idle(DbrMillis ms)
     {
         DbrStatus status;
-        if (!clnt_.poll(ms, status))
+        const int nevents{clnt_.poll(ms, status)};
+        cout << "nevents: " << nevents << endl;
+        cout << "execs:   " << clnt_.execs().size() << endl;
+        cout << "posnups: " << clnt_.posnups().size() << endl;
+        cout << "viewups: " << clnt_.viewups().size() << endl;
+
+        if (nevents == 0)
             return;
 
-        if (status.num != 0)
-            cerr << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
-
-        if (clnt_.execs().empty())
-            return;
-
-        cout <<
-            "|id   "
-            "|order"
-            "|arec      "
-            "|crec      "
-            "|settl_date"
-            "|state     "
-            "|action    "
-            "|ticks     "
-            "|lots      "
-            "|resd      "
-            "|exec      "
-            "|last_ticks"
-            "|last_lots "
-            "|role      "
-            "|cpty      "
-            "|" << endl;
-        cout <<
-            "|-----"
-            "+-----"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "|"
-             << endl;
-        for (auto exec : clnt_.execs()) {
-            ExecRef ref(exec);
-            cout << '|' << right << setw(5) << gtol(ref.id())
-                 << '|' << right << setw(5) << gtol(ref.order())
-                 << '|' << left << setw(10) << ref.arec().mnem()
-                 << '|' << left << setw(10) << ref.crec().mnem()
-                 << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << left << setw(10) << strstate(ref.state())
-                 << '|' << left << setw(10) << straction(ref.action())
-                 << '|' << right << setw(10) << ref.ticks()
-                 << '|' << right << setw(10) << ref.lots()
-                 << '|' << right << setw(10) << ref.resd()
-                 << '|' << right << setw(10) << ref.exec()
-                 << '|' << right << setw(10) << ref.last_ticks()
-                 << '|' << right << setw(10) << ref.last_lots();
-            if (ref.state() == DBR_TRADE)
-                cout << '|' << left << setw(10) << strrole(ref.role())
-                     << '|' << left << setw(10) << ref.cpty().mnem();
+        if (status.req_id != 0) {
+            cout << "status: ";
+            if (status.num == 0)
+                cout << "ok\n";
             else
-                cout << '|' << left << setw(10) << "N/A"
-                     << '|' << left << setw(10) << "N/A";
-            cout << '|' << endl;
+                cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
+        }
+
+        if (!clnt_.execs().empty()) {
+            cout <<
+                "|id   "
+                "|order"
+                "|arec      "
+                "|crec      "
+                "|settl_date"
+                "|state     "
+                "|action    "
+                "|ticks     "
+                "|lots      "
+                "|resd      "
+                "|exec      "
+                "|last_ticks"
+                "|last_lots "
+                "|role      "
+                "|cpty      "
+                "|" << endl;
+            cout <<
+                "|-----"
+                "+-----"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "|"
+                 << endl;
+            for (auto exec : clnt_.execs()) {
+                ExecRef ref(exec);
+                cout << '|' << right << setw(5) << gtol(ref.id())
+                     << '|' << right << setw(5) << gtol(ref.order())
+                     << '|' << left << setw(10) << ref.arec().mnem()
+                     << '|' << left << setw(10) << ref.crec().mnem()
+                     << '|' << left << setw(10) << ref.settl_date()
+                     << '|' << left << setw(10) << strstate(ref.state())
+                     << '|' << left << setw(10) << straction(ref.action())
+                     << '|' << right << setw(10) << ref.ticks()
+                     << '|' << right << setw(10) << ref.lots()
+                     << '|' << right << setw(10) << ref.resd()
+                     << '|' << right << setw(10) << ref.exec()
+                     << '|' << right << setw(10) << ref.last_ticks()
+                     << '|' << right << setw(10) << ref.last_lots();
+                if (ref.state() == DBR_TRADE)
+                    cout << '|' << left << setw(10) << strrole(ref.role())
+                         << '|' << left << setw(10) << ref.cpty().mnem();
+                else
+                    cout << '|' << left << setw(10) << "N/A"
+                         << '|' << left << setw(10) << "N/A";
+                cout << '|' << endl;
+            }
+        }
+        if (!clnt_.posnups().empty()) {
+            cout <<
+                "|crec      "
+                "|settl_date"
+                "|buy_ticks "
+                "|buy_lots  "
+                "|sell_ticks"
+                "|sell_lots "
+                "|" << endl;
+            cout <<
+                "|----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "|"
+                 << endl;
+            for (auto posn : clnt_.posnups()) {
+                PosnRef ref(posn);
+                const auto buy_ticks = static_cast<double>(ref.buy_licks()) / ref.buy_lots();
+                const auto sell_ticks = static_cast<double>(ref.sell_licks()) / ref.sell_lots();
+                cout << '|' << left << setw(10) << ref.crec().mnem()
+                     << '|' << left << setw(10) << ref.settl_date()
+                     << '|' << right << setw(10) << static_cast<DbrTicks>(buy_ticks + 0.5)
+                     << '|' << right << setw(10) << ref.buy_lots()
+                     << '|' << right << setw(10) << static_cast<DbrTicks>(sell_ticks + 0.5)
+                     << '|' << right << setw(10) << ref.sell_lots()
+                     << '|' << endl;
+            }
+        }
+        if (!clnt_.viewups().empty()) {
+            cout <<
+                "|bid_count "
+                "|bid_lots  "
+                "|bid_ticks "
+                "|ask_ticks "
+                "|ask_lots  "
+                "|ask_count "
+                "|" << endl;
+            cout <<
+                "|----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
+                "|" << endl;
+            for (auto view : clnt_.viewups()) {
+                ViewRef ref(view);
+                if (ref.bid_count() > 0) {
+                    cout << '|' << right << setw(10) << ref.bid_count()
+                         << '|' << right << setw(10) << ref.bid_lots()
+                         << '|' << right << setw(10) << ref.bid_ticks();
+                } else {
+                    cout << '|' << right << setw(10) << "- "
+                         << '|' << right << setw(10) << "- "
+                         << '|' << right << setw(10) << "- ";
+                }
+                if (ref.ask_count() > 0) {
+                    cout << '|' << right << setw(10) << ref.ask_ticks()
+                         << '|' << right << setw(10) << ref.ask_lots()
+                         << '|' << right << setw(10) << ref.ask_count();
+                } else {
+                    cout << '|' << right << setw(10) << "- "
+                         << '|' << right << setw(10) << "- "
+                         << '|' << right << setw(10) << "- ";
+                }
+                cout << '|' << endl;
+            }
         }
         clnt_.clear();
     }
@@ -496,19 +577,20 @@ public:
         if (it == clnt_.views().end())
             return;
 
-        if (it->bid_count > 0) {
-            cout << '|' << right << setw(10) << it->bid_count
-                 << '|' << right << setw(10) << it->bid_lots
-                 << '|' << right << setw(10) << it->bid_ticks;
+        ViewRef ref(*it);
+        if (ref.bid_count() > 0) {
+            cout << '|' << right << setw(10) << ref.bid_count()
+                 << '|' << right << setw(10) << ref.bid_lots()
+                 << '|' << right << setw(10) << ref.bid_ticks();
         } else {
             cout << '|' << right << setw(10) << "- "
                  << '|' << right << setw(10) << "- "
                  << '|' << right << setw(10) << "- ";
         }
-        if (it->ask_count > 0) {
-            cout << '|' << right << setw(10) << it->ask_ticks
-                 << '|' << right << setw(10) << it->ask_lots
-                 << '|' << right << setw(10) << it->ask_count;
+        if (ref.ask_count() > 0) {
+            cout << '|' << right << setw(10) << ref.ask_ticks()
+                 << '|' << right << setw(10) << ref.ask_lots()
+                 << '|' << right << setw(10) << ref.ask_count();
         } else {
             cout << '|' << right << setw(10) << "- "
                  << '|' << right << setw(10) << "- "
@@ -581,26 +663,26 @@ public:
     void
     env(Arg begin, Arg end)
     {
-            cout <<
-                "|name                "
-                "|value               "
-                "|" << endl;
-            cout <<
-                "|--------------------"
-                "+--------------------"
-                "|" << endl;
-            if (arec_)
-                cout << '|' << left << setw(20) << "accnt"
-                     << '|' << left << setw(20) << AccntRecRef(*arec_).mnem()
-                     << '|' << endl;
-            if (crec_)
-                cout << '|' << left << setw(20) << "contr"
-                     << '|' << left << setw(20) << ContrRecRef(*crec_).mnem()
-                     << '|' << endl;
-            if (settl_date_)
-                cout << '|' << left << setw(20) << "settl_date"
-                     << '|' << left << setw(20) << settl_date_
-                     << '|' << endl;
+        cout <<
+            "|name                "
+            "|value               "
+            "|" << endl;
+        cout <<
+            "|--------------------"
+            "+--------------------"
+            "|" << endl;
+        if (arec_)
+            cout << '|' << left << setw(20) << "accnt"
+                 << '|' << left << setw(20) << AccntRecRef(*arec_).mnem()
+                 << '|' << endl;
+        if (crec_)
+            cout << '|' << left << setw(20) << "contr"
+                 << '|' << left << setw(20) << ContrRecRef(*crec_).mnem()
+                 << '|' << endl;
+        if (settl_date_)
+            cout << '|' << left << setw(20) << "settl_date"
+                 << '|' << left << setw(20) << settl_date_
+                 << '|' << endl;
     }
     void
     orders(Arg begin, Arg end)
@@ -697,9 +779,9 @@ public:
             const auto sell_ticks = static_cast<double>(ref.sell_licks()) / ref.sell_lots();
             cout << '|' << left << setw(10) << ref.crec().mnem()
                  << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << right << setw(10) << buy_ticks
+                 << '|' << right << setw(10) << static_cast<DbrTicks>(buy_ticks + 0.5)
                  << '|' << right << setw(10) << ref.buy_lots()
-                 << '|' << right << setw(10) << sell_ticks
+                 << '|' << right << setw(10) << static_cast<DbrTicks>(sell_ticks + 0.5)
                  << '|' << right << setw(10) << ref.sell_lots()
                  << '|' << endl;
         }

@@ -24,52 +24,57 @@
 
 namespace dbr {
 
-class View {
-    DbrView impl_;
+class ViewRef {
+    DbrView* impl_;
 public:
-    operator DbrView&() noexcept
+    explicit
+    ViewRef(DbrView& impl) noexcept
+        : impl_{&impl}
     {
-        return impl_;
+    }
+    operator DbrView&() const noexcept
+    {
+        return *impl_;
     }
     DbrView*
-    c_arg() noexcept
+    c_arg() const noexcept
     {
-        return &impl_;
+        return impl_;
     }
     DbrTicks
     bid_ticks() const noexcept
     {
-        return impl_.bid_ticks;
+        return impl_->bid_ticks;
     }
     DbrLots
     bid_lots() const noexcept
     {
-        return impl_.bid_lots;
+        return impl_->bid_lots;
     }
     size_t
     bid_count() const noexcept
     {
-        return impl_.bid_count;
+        return impl_->bid_count;
     }
     DbrTicks
     ask_ticks() const noexcept
     {
-        return impl_.ask_ticks;
+        return impl_->ask_ticks;
     }
     DbrLots
     ask_lots() const noexcept
     {
-        return impl_.ask_lots;
+        return impl_->ask_lots;
     }
     size_t
     ask_count() const noexcept
     {
-        return impl_.ask_count;
+        return impl_->ask_count;
     }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, const View& view)
+operator <<(std::ostream& os, ViewRef view)
 {
     return os << "bid_ticks=" << view.bid_ticks()
               << ",bid_lots=" << view.bid_lots()
@@ -77,14 +82,6 @@ operator <<(std::ostream& os, const View& view)
               << ",ask_ticks=" << view.ask_ticks()
               << ",ask_lots=" << view.ask_lots()
               << ",ask_count=" << view.ask_count();
-}
-
-inline View
-view(DbrBook& book)
-{
-    View view;
-    dbr_book_view(&book, view.c_arg());
-    return view;
 }
 } // dbr
 
