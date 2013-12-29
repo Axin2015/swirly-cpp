@@ -27,7 +27,7 @@
  */
 
 /**
- * @brief Doubly-linked node.
+ * Doubly-linked node.
  */
 struct DbrDlNode {
     struct DbrDlNode* prev;

@@ -28,7 +28,7 @@
  */
 
 /**
- * @brief Red-black node.
+ * Red-black node.
  */
 struct DbrRbNode {
     DbrKey key;
@@ -49,14 +49,14 @@ dbr_rbnode_init(struct DbrRbNode* node)
 }
 
 /**
- * @brief Next node from current node.
+ * Next node from current node.
  */
 
 DBR_API struct DbrRbNode*
 dbr_rbnode_next(struct DbrRbNode* node);
 
 /**
- * @brief Previous node from current node.
+ * Previous node from current node.
  */
 
 DBR_API struct DbrRbNode*

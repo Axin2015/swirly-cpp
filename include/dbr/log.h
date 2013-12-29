@@ -31,35 +31,35 @@ typedef void (*DbrLogger)(int, const char*, va_list);
 
 enum DbrLogLevel {
     /**
-     * @brief Critical.
+     * Critical.
      */
     DBR_CRIT,
     /**
-     * @brief Error.
+     * Error.
      */
     DBR_ERROR,
     /**
-     * @brief Warning.
+     * Warning.
      */
     DBR_WARN,
     /**
-     * @brief Notice.
+     * Notice.
      */
     DBR_NOTICE,
     /**
-     * @brief Information.
+     * Information.
      */
     DBR_INFO,
     /**
-     * @brief Debug level 1.
+     * Debug level 1.
      */
     DBR_DEBUG1,
     /**
-     * @brief Debug level 2.
+     * Debug level 2.
      */
     DBR_DEBUG2,
     /**
-     * @brief Debug level 3.
+     * Debug level 3.
      */
     DBR_DEBUG3
 };

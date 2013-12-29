@@ -30,7 +30,7 @@
 typedef struct FigServ* DbrServ;
 
 /**
- * @brief Create Servange.
+ * Create Servange.
  *
  * @param journ Journal.
  *
@@ -58,7 +58,7 @@ dbr_serv_rec_entry(struct DbrSlNode* node)
 }
 
 /**
- * @brief Returns first record of requested type.
+ * Returns first record of requested type.
  */
 
 // Size is optional.
@@ -110,7 +110,7 @@ DBR_API struct DbrBook*
 dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date);
 
 /**
- * @brief Place order.
+ * Place order.
  * All members of result are set to zero on failure.
  */
 

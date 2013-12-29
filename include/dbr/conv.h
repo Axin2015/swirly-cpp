@@ -48,7 +48,7 @@ dbr_incs_to_real(DbrIncs incs, double inc_size)
 }
 
 /**
- * @brief Convert quantity to lots.
+ * Convert quantity to lots.
  */
 
 static inline DbrLots
@@ -59,7 +59,7 @@ dbr_qty_to_lots(double qty, struct DbrRec* crec)
 }
 
 /**
- * @brief Convert lots to quantity.
+ * Convert lots to quantity.
  */
 
 static inline double
@@ -70,7 +70,7 @@ dbr_lots_to_qty(DbrLots lots, struct DbrRec* crec)
 }
 
 /**
- * @brief Convert price to ticks.
+ * Convert price to ticks.
  */
 
 static inline DbrTicks
@@ -81,7 +81,7 @@ dbr_price_to_ticks(double price, struct DbrRec* crec)
 }
 
 /**
- * @brief Convert ticks to price.
+ * Convert ticks to price.
  */
 
 static inline double
@@ -92,7 +92,7 @@ dbr_ticks_to_price(DbrTicks ticks, struct DbrRec* crec)
 }
 
 /**
- * @brief Number of decimal places in real.
+ * Number of decimal places in real.
  */
 
 static inline int
@@ -110,7 +110,7 @@ dbr_real_to_dp(double d)
 }
 
 /**
- * @brief Decimal places as real.
+ * Decimal places as real.
  */
 
 static inline double
@@ -120,7 +120,7 @@ dbr_dp_to_real(int dp)
 }
 
 /**
- * @brief Synthetic book key from contract and settlment date.
+ * Synthetic book key from contract and settlment date.
  */
 
 static inline DbrKey

@@ -29,51 +29,51 @@
 
 enum DbrErrno {
     /**
-     * @brief Interrupted system call.
+     * Interrupted system call.
      */
     DBR_EINTR = 1,
     /**
-     * @brief Input/output error.
+     * Input/output error.
      */
     DBR_EIO,
     /**
-     * @brief Out of memory.
+     * Out of memory.
      */
     DBR_ENOMEM,
     /**
-     * @brief Access denied.
+     * Access denied.
      */
     DBR_EACCES,
     /**
-     * @brief Invalid argument.
+     * Invalid argument.
      */
     DBR_EINVAL,
     /**
-     * @brief Timeout.
+     * Timeout.
      */
     DBR_ETIMEOUT,
     /**
-     * @brief User-defined errors must be >=0x400.
+     * User-defined errors must be >=0x400.
      */
     DBR_EUSER = 0x400
 };
 
 /**
- * @brief Clear current error message.
+ * Clear current error message.
  */
 
 DBR_API void
 dbr_err_clear(void);
 
 /**
- * @brief Print current error using logger.
+ * Print current error using logger.
  */
 
 DBR_API void
 dbr_err_print(void);
 
 /**
- * @brief Print current error with string prefix using logger.
+ * Print current error with string prefix using logger.
  */
 
 DBR_API void

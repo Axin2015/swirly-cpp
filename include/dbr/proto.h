@@ -70,7 +70,7 @@ dbr_read_contr(const char* buf, struct DbrRec* rec);
 // Rec.
 
 /**
- * @brief Returns -1 if type is unrecognised.
+ * Returns -1 if type is unrecognised.
  */
 
 DBR_API size_t

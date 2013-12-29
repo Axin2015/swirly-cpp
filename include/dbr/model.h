@@ -32,7 +32,7 @@ struct DbrModelVtbl {
 };
 
 /**
- * @brief Read entity list for type.
+ * Read entity list for type.
  * The caller is responsible for freeing the resulting list.
  */
 

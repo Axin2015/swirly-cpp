@@ -33,8 +33,17 @@ typedef struct ElmPool* DbrPool;
 typedef struct FigClnt* DbrClnt;
 
 enum DbrEvent {
+    /**
+     * Data may be read without blocking.
+     */
     DBR_POLLIN = 0x1,
+    /**
+     * Data may be written without blocking.
+     */
     DBR_POLLOUT = 0x2,
+    /**
+     * An exceptional condition has occurred on the device or socket.
+     */
     DBR_POLLERR = 0x4
 };
 
@@ -114,7 +123,7 @@ DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
 /**
- * @brief Place order.
+ * Place order.
  * All members of result are set to zero on failure.
  */
 

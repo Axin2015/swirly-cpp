@@ -29,7 +29,7 @@
 typedef struct ElmZmqStore* DbrZmqStore;
 
 /**
- * @brief Create ZMQite3 model.
+ * Create ZMQite3 model.
  *
  * @param ctx Zero MQ context.
  *

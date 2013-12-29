@@ -27,7 +27,7 @@
  */
 
 /**
- * @brief Singly-linked node.
+ * Singly-linked node.
  */
 struct DbrSlNode {
     struct DbrSlNode* next;

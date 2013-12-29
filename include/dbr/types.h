@@ -31,14 +31,14 @@
  */
 
 /**
- * @brief ISO8601 format: "%Y%m%d".
+ * ISO8601 format: "%Y%m%d".
  */
 
 typedef int DbrDate;
 typedef long DbrIncs;
 
 /**
- * @brief Milliseconds since Unix epoch.
+ * Milliseconds since Unix epoch.
  */
 
 typedef long DbrMillis;
@@ -46,13 +46,13 @@ typedef long DbrMillis;
 typedef DbrIncs DbrLots;
 
 /**
- * @brief Unit representing the minimum price increment.
+ * Unit representing the minimum price increment.
  */
 
 typedef DbrIncs DbrTicks;
 
 /**
- * @brief Sum of lots and ticks.
+ * Sum of lots and ticks.
  */
 
 typedef DbrIncs DbrLicks;
@@ -79,25 +79,25 @@ enum {
 };
 
 /**
- * @brief Description suitable for display on user-interface.
+ * Description suitable for display on user-interface.
  */
 
 typedef char DbrDisplay[DBR_DISPLAY_MAX];
 
 /**
- * @brief Email address.
+ * Email address.
  */
 
 typedef char DbrEmail[DBR_EMAIL_MAX];
 
 /**
- * @brief Memorable identifier.
+ * Memorable identifier.
  */
 
 typedef char DbrMnem[DBR_MNEM_MAX];
 
 /**
- * @brief Reference.
+ * Reference.
  */
 
 typedef char DbrRef[DBR_REF_MAX];
@@ -127,7 +127,7 @@ typedef struct FigAccnt* DbrAccnt;
  */
 
 /**
- * @brief Union used for record enrichment.
+ * Union used for record enrichment.
  */
 
 union DbrURec {

@@ -46,7 +46,7 @@ dbr_longlen(long l)
 }
 
 /**
- * @brief Milliseconds since Unix epoch.
+ * Milliseconds since Unix epoch.
  */
 
 DBR_API long

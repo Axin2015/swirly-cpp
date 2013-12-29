@@ -29,7 +29,7 @@
 typedef struct FirSqlStore* DbrSqlStore;
 
 /**
- * @brief Create SQLite3 model.
+ * Create SQLite3 model.
  *
  * @param path Path to the database.
  *
