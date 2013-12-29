@@ -39,7 +39,7 @@ main(int argc, char* argv[])
 
         // TODO: more robust logic.
         DbrStatus status;
-        while (clnt.poll(100, status))
+        while (clnt.poll(0, 0, 100, status))
             ;
 
         cout << "traders:\n";

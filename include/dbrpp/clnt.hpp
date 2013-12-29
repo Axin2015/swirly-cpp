@@ -858,9 +858,9 @@ public:
         return dbr_clnt_ready(impl_) == DBR_TRUE;
     }
     int
-    poll(DbrMillis ms, DbrStatus& status)
+    poll(int fd, int events, DbrMillis ms, DbrStatus& status)
     {
-        const int nevents = dbr_clnt_poll(impl_, ms, &status);
+        const int nevents = dbr_clnt_poll(impl_, fd, events, ms, &status);
         if (nevents < 0)
             throw_exception();
         return nevents;

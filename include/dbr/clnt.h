@@ -32,8 +32,17 @@ typedef struct ElmPool* DbrPool;
 
 typedef struct FigClnt* DbrClnt;
 
+enum DbrEvent {
+    DBR_POLLIN = 0x1,
+    DBR_POLLOUT = 0x2,
+    DBR_POLLERR = 0x4
+};
+
 struct DbrStatus {
     DbrIden req_id;
+    //int local;
+    //int sub;
+    //int dealer;
     int num;
     char msg[DBR_ERRMSG_MAX];
 };
@@ -67,7 +76,7 @@ DBR_API struct DbrSlNode*
 dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem);
 
 /**
- * @brief Returns first record of requested type.
+ * Returns first record of requested type.
  */
 
 // Size is optional.
@@ -140,7 +149,7 @@ DBR_API DbrBool
 dbr_clnt_ready(DbrClnt clnt);
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);
+dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* status);
 
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);

@@ -38,6 +38,9 @@
 #include <stdexcept>
 #include <vector>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 // PATH_MAX
 #if !defined(__APPLE__)
 # include <linux/limits.h>
@@ -124,6 +127,19 @@ public:
     explicit
     InvalidState(const string& arg)
         : logic_error(arg)
+    {
+    }
+};
+
+class PosixError : public runtime_error {
+public:
+	virtual
+    ~PosixError() noexcept
+    {
+    }
+    explicit
+    PosixError()
+        : runtime_error(strerror(errno))
     {
     }
 };
@@ -287,7 +303,7 @@ public:
             idle_(100);
     }
     void
-    read(istream& is, const char* prompt = nullptr)
+    read(istream& is)
     {
         vector<string> toks;
         auto lexer = make_lexer([this, &toks](const char* tok, size_t len) {
@@ -298,8 +314,6 @@ public:
                     toks.clear();
                 }
             });
-        if (prompt)
-            cout << prompt;
         string line;
         while (!quit_ && getline(is, line)) {
             line += '\n';
@@ -308,8 +322,37 @@ public:
             } catch (const exception& e) {
                 cerr << e.what() << endl;
             }
-            if (prompt)
-                cout << prompt;
+        }
+    }
+    void
+    read(int fd, const char* prompt)
+    {
+        vector<string> toks;
+        auto lexer = make_lexer([this, &toks](const char* tok, size_t len) {
+                if (tok)
+                    toks.push_back(tok);
+                else {
+                    eval(toks);
+                    toks.clear();
+                }
+            });
+        char buf[LINE_MAX];
+        while (!quit_) {
+            cout << prompt;
+            cout.flush();
+            const ssize_t n{::read(fd, buf, sizeof(buf))};
+            if (n < 0)
+                throw PosixError();
+            if (n == 0) {
+                // End-of file.
+                quit_ = true;
+                break;
+            }
+            try {
+                lexer.exec(buf, n);
+            } catch (const exception& e) {
+                cerr << e.what() << endl;
+            }
         }
     }
 };
@@ -361,7 +404,7 @@ public:
         do {
             cout << '.';
             DbrStatus status;
-            clnt_.poll(250, status);
+            clnt_.poll(0, 0, 250, status);
         } while (!clnt_.ready());
         cout << endl;
     }
@@ -369,7 +412,7 @@ public:
     idle(DbrMillis ms)
     {
         DbrStatus status;
-        const int nevents{clnt_.poll(ms, status)};
+        const int nevents{clnt_.poll(0, 0, ms, status)};
         cout << "nevents: " << nevents << endl;
         cout << "execs:   " << clnt_.execs().size() << endl;
         cout << "posnups: " << clnt_.posnups().size() << endl;
@@ -951,7 +994,7 @@ main(int argc, char* argv[])
         ifstream cfg(path);
         if (cfg.is_open())
             repl.read(cfg);
-        repl.read(cin, "> ");
+        repl.read(0, "> ");
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

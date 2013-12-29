@@ -633,7 +633,7 @@ dbr_clnt_ready(DbrClnt clnt)
 }
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
+dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* status)
 {
     zmq_pollitem_t items[] = {
         { clnt->sub,    0, ZMQ_POLLIN, 0 },
