@@ -56,6 +56,8 @@ using namespace std::placeholders;
 
 namespace {
 
+enum { BUF_MAX = 128 };
+
 typedef int Arity;
 typedef vector<string>::const_iterator Arg;
 
@@ -336,7 +338,7 @@ public:
                     toks.clear();
                 }
             });
-        char buf[LINE_MAX];
+        char buf[BUF_MAX];
         while (!quit_) {
             cout << prompt;
             cout.flush();
