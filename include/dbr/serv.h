@@ -49,6 +49,11 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool);
 DBR_API void
 dbr_serv_destroy(DbrServ serv);
 
+/**
+ * @addtogroup ServRec
+ * @{
+ */
+
 #define DBR_SERV_END_REC NULL
 
 static inline struct DbrRec*
@@ -56,6 +61,17 @@ dbr_serv_rec_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrRec, shared_node_, node);
 }
+
+// Null if record does not exist.
+
+DBR_API struct DbrSlNode*
+dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id);
+
+// Null if record does not exist.
+// This function compares DBR_MNEM_MAX characters of mnem at most.
+
+DBR_API struct DbrSlNode*
+dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem);
 
 /**
  * Returns first record of requested type.
@@ -69,36 +85,7 @@ dbr_serv_first_rec(DbrServ serv, int type, size_t* size);
 DBR_API DbrBool
 dbr_serv_empty_rec(DbrServ serv, int type);
 
-// Null if record does not exist.
-
-DBR_API struct DbrSlNode*
-dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id);
-
-// Null if record does not exist.
-// This function compares DBR_MNEM_MAX characters of mnem at most.
-
-DBR_API struct DbrSlNode*
-dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem);
-
-#define DBR_SERV_END_BOOK NULL
-
-static inline struct DbrBook*
-dbr_serv_book_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrBook, serv_node_, node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrDate settl_date);
-
-DBR_API struct DbrRbNode*
-dbr_serv_first_book(DbrServ serv);
-
-DBR_API struct DbrRbNode*
-dbr_serv_last_book(DbrServ serv);
-
-DBR_API DbrBool
-dbr_serv_empty_book(DbrServ serv);
+/** @} */
 
 DBR_API DbrTrader
 dbr_serv_trader(DbrServ serv, struct DbrRec* trec);
@@ -144,6 +131,11 @@ dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id);
 DBR_API void
 dbr_serv_clear(DbrServ serv);
 
+/**
+ * @addtogroup ServExec
+ * @{
+ */
+
 #define DBR_SERV_END_EXEC NULL
 
 static inline struct DbrExec*
@@ -157,6 +149,13 @@ dbr_serv_first_exec(DbrServ serv);
 
 DBR_API DbrBool
 dbr_serv_empty_exec(DbrServ serv);
+
+/** @} */
+
+/**
+ * @addtogroup ServPosn
+ * @{
+ */
 
 #define DBR_SERV_END_POSNUP NULL
 
@@ -175,6 +174,33 @@ dbr_serv_last_posnup(DbrServ serv);
 DBR_API DbrBool
 dbr_serv_empty_posnup(DbrServ serv);
 
+/** @} */
+
+/**
+ * @addtogroup ServBook
+ * @{
+ */
+
+#define DBR_SERV_END_BOOK NULL
+
+static inline struct DbrBook*
+dbr_serv_book_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrBook, serv_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrDate settl_date);
+
+DBR_API struct DbrRbNode*
+dbr_serv_first_book(DbrServ serv);
+
+DBR_API struct DbrRbNode*
+dbr_serv_last_book(DbrServ serv);
+
+DBR_API DbrBool
+dbr_serv_empty_book(DbrServ serv);
+
 #define DBR_SERV_END_BOOKUP NULL
 
 static inline struct DbrBook*
@@ -191,6 +217,8 @@ dbr_serv_last_bookup(DbrServ serv);
 
 DBR_API DbrBool
 dbr_serv_empty_bookup(DbrServ serv);
+
+/** @} */
 
 /** @} */
 

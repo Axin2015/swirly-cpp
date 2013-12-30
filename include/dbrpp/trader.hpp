@@ -29,6 +29,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup TraderOrder
+ * @{
+ */
+
 class TraderOrders {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrOrder Entry;
@@ -197,6 +202,13 @@ public:
     }
 };
 
+/** @} */
+
+/**
+ * @addtogroup TraderTrade
+ * @{
+ */
+
 class TraderTrades {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrExec Entry;
@@ -352,6 +364,13 @@ public:
         return dbr_trader_empty_trade(trader_);
     }
 };
+
+/** @} */
+
+/**
+ * @addtogroup TraderMemb
+ * @{
+ */
 
 class TraderMembs {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -509,6 +528,8 @@ public:
     }
 };
 
+/** @} */
+
 /**
  * @addtogroup Trader
  * @{
@@ -541,21 +562,36 @@ public:
     {
         return TraderRecRef{*dbr_trader_rec(impl_)};
     }
+    /**
+     * @addtogroup TraderOrder
+     * @{
+     */
     TraderOrders
     orders() const noexcept
     {
         return TraderOrders{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup TraderTrade
+     * @{
+     */
     TraderTrades
     trades() const noexcept
     {
         return TraderTrades{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup TraderMemb
+     * @{
+     */
     TraderMembs
     membs() const noexcept
     {
         return TraderMembs{impl_};
     }
+    /** @} */
 };
 
 inline std::ostream&

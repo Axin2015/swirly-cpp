@@ -29,7 +29,7 @@
 namespace dbr {
 
 /**
- * @addtogroup ClntRecData
+ * @addtogroup ClntRec
  * @{
  */
 
@@ -169,7 +169,270 @@ typedef ClntRecs<DBR_CONTR> ClntContrRecs;
 /** @} */
 
 /**
- * @addtogroup ClntMktData
+ * @addtogroup ClntExec
+ * @{
+ */
+
+class ClntExecs {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrExec Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_clnt_exec_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_clnt_exec_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrClnt clnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ClntExecs(DbrClnt clnt) noexcept
+        : clnt_{clnt}
+    {
+    }
+    void
+    swap(ClntExecs& rhs) noexcept
+    {
+        std::swap(clnt_, rhs.clnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_clnt_first_exec(clnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_clnt_first_exec(clnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return nullptr;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return nullptr;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_clnt_empty_exec(clnt_);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup ClntPosn
+ * @{
+ */
+
+class ClntPosnups {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrPosn Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_clnt_posnup_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_clnt_posnup_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrClnt clnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ClntPosnups(DbrClnt clnt) noexcept
+    : clnt_{clnt}
+    {
+    }
+    void
+    swap(ClntPosnups& rhs) noexcept
+    {
+        std::swap(clnt_, rhs.clnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_clnt_first_posnup(clnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_clnt_first_posnup(clnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_CLNT_END_POSNUP;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_CLNT_END_POSNUP;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_clnt_last_posnup(clnt_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_clnt_last_posnup(clnt_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_CLNT_END_POSNUP;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_CLNT_END_POSNUP;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_clnt_empty_posnup(clnt_);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup ClntView
  * @{
  */
 
@@ -328,269 +591,6 @@ public:
         return dbr_clnt_empty_view(clnt_);
     }
 };
-
-/** @} */
-
-/**
- * @addtogroup ClntExec
- * @{
- */
-
-class ClntExecs {
-    struct Policy : NodeTraits<DbrSlNode> {
-        typedef DbrExec Entry;
-        static Entry*
-        entry(Node* node)
-        {
-            return dbr_clnt_exec_entry(node);
-        }
-        static const Entry*
-        entry(const Node* node)
-        {
-            return dbr_clnt_exec_entry(const_cast<Node*>(node));
-        }
-    };
-    DbrClnt clnt_;
-public:
-    typedef Policy::Entry ValueType;
-    typedef Policy::Entry* Pointer;
-    typedef Policy::Entry& Reference;
-    typedef const Policy::Entry* ConstPointer;
-    typedef const Policy::Entry& ConstReference;
-
-    typedef ForwardIterator<Policy> Iterator;
-    typedef ConstForwardIterator<Policy> ConstIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef Pointer pointer;
-    typedef Reference reference;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef Iterator iterator;
-    typedef ConstIterator const_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-
-    explicit
-    ClntExecs(DbrClnt clnt) noexcept
-        : clnt_{clnt}
-    {
-    }
-    void
-    swap(ClntExecs& rhs) noexcept
-    {
-        std::swap(clnt_, rhs.clnt_);
-    }
-
-    // Iterator.
-
-    Iterator
-    begin() noexcept
-    {
-        return dbr_clnt_first_exec(clnt_);
-    }
-    ConstIterator
-    begin() const noexcept
-    {
-        return dbr_clnt_first_exec(clnt_);
-    }
-    Iterator
-    end() noexcept
-    {
-        return nullptr;
-    }
-    ConstIterator
-    end() const noexcept
-    {
-        return nullptr;
-    }
-
-    // Accessor.
-
-    Reference
-    front() noexcept
-    {
-        return *begin();
-    }
-    ConstReference
-    front() const noexcept
-    {
-        return *begin();
-    }
-    SizeType
-    size() const noexcept
-    {
-        return std::distance(begin(), end());
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return std::numeric_limits<SizeType>::max();
-    }
-    bool
-    empty() const noexcept
-    {
-        return dbr_clnt_empty_exec(clnt_);
-    }
-};
-
-class ClntPosnups {
-    struct Policy : NodeTraits<DbrRbNode> {
-        typedef DbrPosn Entry;
-        static Entry*
-        entry(Node* node)
-        {
-            return dbr_clnt_posnup_entry(node);
-        }
-        static const Entry*
-        entry(const Node* node)
-        {
-            return dbr_clnt_posnup_entry(const_cast<Node*>(node));
-        }
-    };
-    DbrClnt clnt_;
-public:
-    typedef Policy::Entry ValueType;
-    typedef Policy::Entry* Pointer;
-    typedef Policy::Entry& Reference;
-    typedef const Policy::Entry* ConstPointer;
-    typedef const Policy::Entry& ConstReference;
-
-    typedef BiDirectionalIterator<Policy> Iterator;
-    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
-    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
-    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef Pointer pointer;
-    typedef Reference reference;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef Iterator iterator;
-    typedef ConstIterator const_iterator;
-    typedef ReverseIterator reverse_iterator;
-    typedef ConstReverseIterator const_reverse_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-
-    explicit
-    ClntPosnups(DbrClnt clnt) noexcept
-    : clnt_{clnt}
-    {
-    }
-    void
-    swap(ClntPosnups& rhs) noexcept
-    {
-        std::swap(clnt_, rhs.clnt_);
-    }
-
-    // Iterator.
-
-    Iterator
-    begin() noexcept
-    {
-        return dbr_clnt_first_posnup(clnt_);
-    }
-    ConstIterator
-    begin() const noexcept
-    {
-        return dbr_clnt_first_posnup(clnt_);
-    }
-    Iterator
-    end() noexcept
-    {
-        return DBR_CLNT_END_POSNUP;
-    }
-    ConstIterator
-    end() const noexcept
-    {
-        return DBR_CLNT_END_POSNUP;
-    }
-
-    // ReverseIterator.
-
-    ReverseIterator
-    rbegin() noexcept
-    {
-        return dbr_clnt_last_posnup(clnt_);
-    }
-    ConstReverseIterator
-    rbegin() const noexcept
-    {
-        return dbr_clnt_last_posnup(clnt_);
-    }
-    ReverseIterator
-    rend() noexcept
-    {
-        return DBR_CLNT_END_POSNUP;
-    }
-    ConstReverseIterator
-    rend() const noexcept
-    {
-        return DBR_CLNT_END_POSNUP;
-    }
-
-    // Accessor.
-
-    Reference
-    front() noexcept
-    {
-        return *begin();
-    }
-    ConstReference
-    front() const noexcept
-    {
-        return *begin();
-    }
-    Reference
-    back() noexcept
-    {
-        return *rbegin();
-    }
-    ConstReference
-    back() const noexcept
-    {
-        return *rbegin();
-    }
-    SizeType
-    size() const noexcept
-    {
-        return std::distance(begin(), end());
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return std::numeric_limits<SizeType>::max();
-    }
-    bool
-    empty() const noexcept
-    {
-        return dbr_clnt_empty_posnup(clnt_);
-    }
-};
-
-/** @} */
-
-/**
- * @addtogroup ClntMktData
- * @{
- */
 
 class ClntViewups {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -796,16 +796,15 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    /**
+     * @addtogroup ClntRec
+     * @{
+     */
     template <int TypeN>
     ClntRecs<TypeN>
     recs() const noexcept
     {
         return ClntRecs<TypeN>{impl_};
-    }
-    ClntContrRecs
-    crecs() const noexcept
-    {
-        return ClntContrRecs{impl_};
     }
     ClntTraderRecs
     trecs() const noexcept
@@ -817,11 +816,12 @@ public:
     {
         return ClntAccntRecs{impl_};
     }
-    ClntViews
-    views() const noexcept
+    ClntContrRecs
+    crecs() const noexcept
     {
-        return ClntViews{impl_};
+        return ClntContrRecs{impl_};
     }
+    /** @} */
     Trader
     trader() const noexcept
     {
@@ -903,21 +903,41 @@ public:
     {
         dbr_clnt_clear(impl_);
     }
+    /**
+     * @addtogroup ClntExec
+     * @{
+     */
     ClntExecs
     execs() const noexcept
     {
         return ClntExecs{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup ClntPosn
+     * @{
+     */
     ClntPosnups
     posnups() const noexcept
     {
         return ClntPosnups{impl_};
+    }
+    /** @} */
+    /**
+     * @addtogroup ClntView
+     * @{
+     */
+    ClntViews
+    views() const noexcept
+    {
+        return ClntViews{impl_};
     }
     ClntViewups
     viewups() const noexcept
     {
         return ClntViewups{impl_};
     }
+    /** @} */
 };
 
 /** @} */

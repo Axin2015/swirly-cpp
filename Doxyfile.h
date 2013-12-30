@@ -376,7 +376,7 @@
  */
 
 /**
- * @defgroup ClntRecData RecData
+ * @defgroup ClntRec Record
  * @ingroup Clnt
  */
 
@@ -386,7 +386,12 @@
  */
 
 /**
- * @defgroup ClntMktData MktData
+ * @defgroup ClntPosn Position
+ * @ingroup Clnt
+ */
+
+/**
+ * @defgroup ClntView View
  * @ingroup Clnt
  */
 
@@ -397,7 +402,7 @@
  */
 
 /**
- * @defgroup ServRecData RecData
+ * @defgroup ServRec Record
  * @ingroup Serv
  */
 
@@ -407,7 +412,12 @@
  */
 
 /**
- * @defgroup ServMktData MktData
+ * @defgroup ServPosn Position
+ * @ingroup Serv
+ */
+
+/**
+ * @defgroup ServBook Book
  * @ingroup Serv
  */
 

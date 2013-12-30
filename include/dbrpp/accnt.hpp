@@ -29,6 +29,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup AccntPosn
+ * @{
+ */
+
 class AccntPosns {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrPosn Entry;
@@ -184,6 +189,13 @@ public:
         return dbr_accnt_empty_posn(accnt_);
     }
 };
+
+/** @} */
+
+/**
+ * @addtogroup AccntMemb
+ * @{
+ */
 
 class AccntMembs {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -341,6 +353,8 @@ public:
     }
 };
 
+/** @} */
+
 /**
  * @addtogroup Accnt
  * @{
@@ -373,16 +387,26 @@ public:
     {
         return AccntRecRef{*dbr_accnt_rec(impl_)};
     }
+    /**
+     * @addtogroup AccntPosn
+     * @{
+     */
     AccntPosns
     posns() const noexcept
     {
         return AccntPosns{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup AccntMemb
+     * @{
+     */
     AccntMembs
     membs() const noexcept
     {
         return AccntMembs{impl_};
     }
+    /** @} */
 };
 
 inline std::ostream&

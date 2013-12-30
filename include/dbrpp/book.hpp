@@ -28,6 +28,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Book
+ * @{
+ */
+
 class BookRef {
     DbrBook* impl_;
 public:
@@ -89,6 +94,8 @@ operator <<(std::ostream& os, BookRef book)
               << ",crec=" << book.crec().mnem()
               << ",settl_date" << book.settl_date();
 }
+
+/** @} */
 
 } // dbr
 

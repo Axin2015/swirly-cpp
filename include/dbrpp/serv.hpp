@@ -29,6 +29,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup ServRec
+ * @{
+ */
+
 template <int TypeN>
 class ServRecs {
     struct Policy : NodeTraits<DbrSlNode> {
@@ -161,6 +166,276 @@ public:
 typedef ServRecs<DBR_TRADER> ServTraderRecs;
 typedef ServRecs<DBR_ACCNT> ServAccntRecs;
 typedef ServRecs<DBR_CONTR> ServContrRecs;
+
+/** @} */
+
+/**
+ * @addtogroup ServExec
+ * @{
+ */
+
+class ServExecs {
+    struct Policy : NodeTraits<DbrSlNode> {
+        typedef DbrExec Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_serv_exec_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_serv_exec_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrServ serv_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef ForwardIterator<Policy> Iterator;
+    typedef ConstForwardIterator<Policy> ConstIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ServExecs(DbrServ serv) noexcept
+        : serv_{serv}
+    {
+    }
+    void
+    swap(ServExecs& rhs) noexcept
+    {
+        std::swap(serv_, rhs.serv_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_serv_first_exec(serv_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_serv_first_exec(serv_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return nullptr;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return nullptr;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_serv_empty_exec(serv_);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup ServPosn
+ * @{
+ */
+
+class ServPosnups {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrPosn Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_serv_posnup_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_serv_posnup_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrServ serv_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    ServPosnups(DbrServ serv) noexcept
+    : serv_{serv}
+    {
+    }
+    void
+    swap(ServPosnups& rhs) noexcept
+    {
+        std::swap(serv_, rhs.serv_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_serv_first_posnup(serv_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_serv_first_posnup(serv_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_SERV_END_POSNUP;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_SERV_END_POSNUP;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_serv_last_posnup(serv_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_serv_last_posnup(serv_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_SERV_END_POSNUP;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_SERV_END_POSNUP;
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_serv_empty_posnup(serv_);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup ServBook
+ * @{
+ */
 
 class ServBooks {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -318,255 +593,6 @@ public:
     }
 };
 
-class ServExecs {
-    struct Policy : NodeTraits<DbrSlNode> {
-        typedef DbrExec Entry;
-        static Entry*
-        entry(Node* node)
-        {
-            return dbr_serv_exec_entry(node);
-        }
-        static const Entry*
-        entry(const Node* node)
-        {
-            return dbr_serv_exec_entry(const_cast<Node*>(node));
-        }
-    };
-    DbrServ serv_;
-public:
-    typedef Policy::Entry ValueType;
-    typedef Policy::Entry* Pointer;
-    typedef Policy::Entry& Reference;
-    typedef const Policy::Entry* ConstPointer;
-    typedef const Policy::Entry& ConstReference;
-
-    typedef ForwardIterator<Policy> Iterator;
-    typedef ConstForwardIterator<Policy> ConstIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef Pointer pointer;
-    typedef Reference reference;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef Iterator iterator;
-    typedef ConstIterator const_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-
-    explicit
-    ServExecs(DbrServ serv) noexcept
-        : serv_{serv}
-    {
-    }
-    void
-    swap(ServExecs& rhs) noexcept
-    {
-        std::swap(serv_, rhs.serv_);
-    }
-
-    // Iterator.
-
-    Iterator
-    begin() noexcept
-    {
-        return dbr_serv_first_exec(serv_);
-    }
-    ConstIterator
-    begin() const noexcept
-    {
-        return dbr_serv_first_exec(serv_);
-    }
-    Iterator
-    end() noexcept
-    {
-        return nullptr;
-    }
-    ConstIterator
-    end() const noexcept
-    {
-        return nullptr;
-    }
-
-    // Accessor.
-
-    Reference
-    front() noexcept
-    {
-        return *begin();
-    }
-    ConstReference
-    front() const noexcept
-    {
-        return *begin();
-    }
-    SizeType
-    size() const noexcept
-    {
-        return std::distance(begin(), end());
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return std::numeric_limits<SizeType>::max();
-    }
-    bool
-    empty() const noexcept
-    {
-        return dbr_serv_empty_exec(serv_);
-    }
-};
-
-class ServPosnups {
-    struct Policy : NodeTraits<DbrRbNode> {
-        typedef DbrPosn Entry;
-        static Entry*
-        entry(Node* node)
-        {
-            return dbr_serv_posnup_entry(node);
-        }
-        static const Entry*
-        entry(const Node* node)
-        {
-            return dbr_serv_posnup_entry(const_cast<Node*>(node));
-        }
-    };
-    DbrServ serv_;
-public:
-    typedef Policy::Entry ValueType;
-    typedef Policy::Entry* Pointer;
-    typedef Policy::Entry& Reference;
-    typedef const Policy::Entry* ConstPointer;
-    typedef const Policy::Entry& ConstReference;
-
-    typedef BiDirectionalIterator<Policy> Iterator;
-    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
-    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
-    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef Pointer pointer;
-    typedef Reference reference;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef Iterator iterator;
-    typedef ConstIterator const_iterator;
-    typedef ReverseIterator reverse_iterator;
-    typedef ConstReverseIterator const_reverse_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-
-    explicit
-    ServPosnups(DbrServ serv) noexcept
-    : serv_{serv}
-    {
-    }
-    void
-    swap(ServPosnups& rhs) noexcept
-    {
-        std::swap(serv_, rhs.serv_);
-    }
-
-    // Iterator.
-
-    Iterator
-    begin() noexcept
-    {
-        return dbr_serv_first_posnup(serv_);
-    }
-    ConstIterator
-    begin() const noexcept
-    {
-        return dbr_serv_first_posnup(serv_);
-    }
-    Iterator
-    end() noexcept
-    {
-        return DBR_SERV_END_POSNUP;
-    }
-    ConstIterator
-    end() const noexcept
-    {
-        return DBR_SERV_END_POSNUP;
-    }
-
-    // ReverseIterator.
-
-    ReverseIterator
-    rbegin() noexcept
-    {
-        return dbr_serv_last_posnup(serv_);
-    }
-    ConstReverseIterator
-    rbegin() const noexcept
-    {
-        return dbr_serv_last_posnup(serv_);
-    }
-    ReverseIterator
-    rend() noexcept
-    {
-        return DBR_SERV_END_POSNUP;
-    }
-    ConstReverseIterator
-    rend() const noexcept
-    {
-        return DBR_SERV_END_POSNUP;
-    }
-
-    // Accessor.
-
-    Reference
-    front() noexcept
-    {
-        return *begin();
-    }
-    ConstReference
-    front() const noexcept
-    {
-        return *begin();
-    }
-    Reference
-    back() noexcept
-    {
-        return *rbegin();
-    }
-    ConstReference
-    back() const noexcept
-    {
-        return *rbegin();
-    }
-    SizeType
-    size() const noexcept
-    {
-        return std::distance(begin(), end());
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return std::numeric_limits<SizeType>::max();
-    }
-    bool
-    empty() const noexcept
-    {
-        return dbr_serv_empty_posnup(serv_);
-    }
-};
-
 class ServBookups {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrBook Entry;
@@ -710,6 +736,13 @@ public:
     }
 };
 
+/** @} */
+
+/**
+ * @addtogroup Serv
+ * @{
+ */
+
 class Serv {
     DbrServ impl_;
 public:
@@ -763,16 +796,15 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    /**
+     * @addtogroup ServRec
+     * @{
+     */
     template <int TypeN>
     ServRecs<TypeN>
     recs() const noexcept
     {
         return ServRecs<TypeN>{impl_};
-    }
-    ServContrRecs
-    crecs() const noexcept
-    {
-        return ServContrRecs{impl_};
     }
     ServTraderRecs
     trecs() const noexcept
@@ -784,19 +816,12 @@ public:
     {
         return ServAccntRecs{impl_};
     }
-    ServBooks
-    books() const noexcept
+    ServContrRecs
+    crecs() const noexcept
     {
-        return ServBooks{impl_};
+        return ServContrRecs{impl_};
     }
-    BookRef
-    book(DbrRec& crec, DbrDate settl_date) const
-    {
-        DbrBook* const book = dbr_serv_book(impl_, &crec, settl_date);
-        if (!book)
-            throw_exception();
-        return BookRef{*book};
-    }
+    /** @} */
     Trader
     trader(DbrRec& trec) const
     {
@@ -812,6 +837,14 @@ public:
         if (!accnt)
             throw_exception();
         return Accnt{accnt};
+    }
+    BookRef
+    book(DbrRec& crec, DbrDate settl_date) const
+    {
+        DbrBook* const book = dbr_serv_book(impl_, &crec, settl_date);
+        if (!book)
+            throw_exception();
+        return BookRef{*book};
     }
     OrderRef
     place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
@@ -866,22 +899,44 @@ public:
     {
         dbr_serv_clear(impl_);
     }
+    /**
+     * @addtogroup ServExec
+     * @{
+     */
     ServExecs
     execs() const noexcept
     {
         return ServExecs{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup ServPosn
+     * @{
+     */
     ServPosnups
     posnups() const noexcept
     {
         return ServPosnups{impl_};
+    }
+    /** @} */
+    /**
+     * @addtogroup ServBook
+     * @{
+     */
+    ServBooks
+    books() const noexcept
+    {
+        return ServBooks{impl_};
     }
     ServBookups
     bookups() const noexcept
     {
         return ServBookups{impl_};
     }
+    /** @} */
 };
+
+/** @} */
 
 } // dbr
 

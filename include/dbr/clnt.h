@@ -69,6 +69,11 @@ dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const 
 DBR_API void
 dbr_clnt_destroy(DbrClnt clnt);
 
+/**
+ * @addtogroup ClntRec
+ * @{
+ */
+
 #define DBR_CLNT_END_REC NULL
 
 static inline struct DbrRec*
@@ -100,25 +105,7 @@ dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size);
 DBR_API DbrBool
 dbr_clnt_empty_rec(DbrClnt clnt, int type);
 
-#define DBR_CLNT_END_VIEW NULL
-
-static inline struct DbrView*
-dbr_clnt_view_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrView, clnt_node_, node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date);
-
-DBR_API struct DbrRbNode*
-dbr_clnt_first_view(DbrClnt clnt);
-
-DBR_API struct DbrRbNode*
-dbr_clnt_last_view(DbrClnt clnt);
-
-DBR_API DbrBool
-dbr_clnt_empty_view(DbrClnt clnt);
+/** @} */
 
 DBR_API DbrTrader
 dbr_clnt_trader(DbrClnt clnt);
@@ -167,6 +154,11 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);
 
+/**
+ * @addtogroup ClntExec
+ * @{
+ */
+
 #define DBR_CLNT_END_EXEC NULL
 
 static inline struct DbrExec*
@@ -180,6 +172,13 @@ dbr_clnt_first_exec(DbrClnt clnt);
 
 DBR_API DbrBool
 dbr_clnt_empty_exec(DbrClnt clnt);
+
+/** @} */
+
+/**
+ * @addtogroup ClntPosn
+ * @{
+ */
 
 #define DBR_CLNT_END_POSNUP NULL
 
@@ -198,6 +197,33 @@ dbr_clnt_last_posnup(DbrClnt clnt);
 DBR_API DbrBool
 dbr_clnt_empty_posnup(DbrClnt clnt);
 
+/** @} */
+
+/**
+ * @addtogroup ClntView
+ * @{
+ */
+
+#define DBR_CLNT_END_VIEW NULL
+
+static inline struct DbrView*
+dbr_clnt_view_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrView, clnt_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date);
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_view(DbrClnt clnt);
+
+DBR_API struct DbrRbNode*
+dbr_clnt_last_view(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_empty_view(DbrClnt clnt);
+
 #define DBR_CLNT_END_VIEWUP NULL
 
 static inline struct DbrView*
@@ -214,6 +240,8 @@ dbr_clnt_last_viewup(DbrClnt clnt);
 
 DBR_API DbrBool
 dbr_clnt_empty_viewup(DbrClnt clnt);
+
+/** @} */
 
 /** @} */
 

@@ -445,31 +445,6 @@ dbr_clnt_empty_rec(DbrClnt clnt, int type)
     return fig_cache_empty_rec(&clnt->cache, type);
 }
 
-DBR_API struct DbrRbNode*
-dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date)
-{
-    const DbrIden key = dbr_book_key(cid, settl_date);
-	return dbr_tree_find(&clnt->views, key);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_first_view(DbrClnt clnt)
-{
-    return dbr_tree_first(&clnt->views);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_last_view(DbrClnt clnt)
-{
-    return dbr_tree_last(&clnt->views);
-}
-
-DBR_API DbrBool
-dbr_clnt_empty_view(DbrClnt clnt)
-{
-    return dbr_tree_empty(&clnt->views);
-}
-
 DBR_API DbrTrader
 dbr_clnt_trader(DbrClnt clnt)
 {
@@ -789,6 +764,31 @@ DBR_API DbrBool
 dbr_clnt_empty_posnup(DbrClnt clnt)
 {
     return dbr_tree_empty(&clnt->posnups);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date)
+{
+    const DbrIden key = dbr_book_key(cid, settl_date);
+	return dbr_tree_find(&clnt->views, key);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_first_view(DbrClnt clnt)
+{
+    return dbr_tree_first(&clnt->views);
+}
+
+DBR_API struct DbrRbNode*
+dbr_clnt_last_view(DbrClnt clnt)
+{
+    return dbr_tree_last(&clnt->views);
+}
+
+DBR_API DbrBool
+dbr_clnt_empty_view(DbrClnt clnt)
+{
+    return dbr_tree_empty(&clnt->views);
 }
 
 DBR_API struct DbrRbNode*

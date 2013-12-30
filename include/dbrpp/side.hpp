@@ -31,7 +31,7 @@
 namespace dbr {
 
 /**
- * @addtogroup Side
+ * @addtogroup SideOrder
  * @{
  */
 
@@ -177,6 +177,13 @@ public:
         return begin() == end();
     }
 };
+
+/** @} */
+
+/**
+ * @addtogroup SideLevel
+ * @{
+ */
 
 class SideLevels {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -334,6 +341,13 @@ public:
     }
 };
 
+/** @} */
+
+/**
+ * @addtogroup Side
+ * @{
+ */
+
 class Side {
     mutable DbrSide impl_;
 public:
@@ -395,16 +409,30 @@ public:
     {
         dbr_side_cancel_order(&impl_, &order, now);
     }
+    /**
+     * @addtogroup SideOrder
+     * @{
+     */
     SideOrders
     orders() const noexcept
     {
         return SideOrders{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup SideLevel
+     * @{
+     */
     SideLevels
     levels() const noexcept
     {
         return SideLevels{impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup SideLast
+     * @{
+     */
     DbrTicks
     last_ticks() const noexcept
     {
@@ -420,6 +448,7 @@ public:
     {
         return dbr_side_last_time(&impl_);
     }
+    /** @} **/
 };
 
 class SideRef {
@@ -439,16 +468,30 @@ public:
     {
         return impl_;
     }
+    /**
+     * @addtogroup SideOrder
+     * @{
+     */
     SideOrders
     orders() const noexcept
     {
         return SideOrders{*impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup SideLevel
+     * @{
+     */
     SideLevels
     levels() const noexcept
     {
         return SideLevels{*impl_};
     }
+    /** @} */
+    /**
+     * @addtogroup SideLast
+     * @{
+     */
     DbrTicks
     last_ticks() const noexcept
     {
@@ -464,6 +507,7 @@ public:
     {
         return dbr_side_last_time(impl_);
     }
+    /** @} */
 };
 
 inline std::ostream&
