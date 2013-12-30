@@ -22,7 +22,7 @@
 #include <dbr/types.h>
 
 /**
- * @addtogroup ZmqStore
+ * @addtogroup Zmq
  * @{
  */
 
@@ -31,7 +31,7 @@ typedef struct ElmZmqStore* DbrZmqStore;
 /**
  * Create ZMQite3 model.
  *
- * @param ctx Zero MQ context.
+ * @param ctx ZeroMQ context.
  *
  * @param addr Address of peer's endpoint.
  *

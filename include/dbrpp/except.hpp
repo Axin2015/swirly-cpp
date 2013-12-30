@@ -25,6 +25,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Err
+ * @{
+ */
+
 class DbrException : public std::exception {
     int num_;
     const char* file_;
@@ -122,6 +127,9 @@ throw_exception()
 {
     throw_exception(dbr_err_num(), dbr_err_file(), dbr_err_line(), dbr_err_msg());
 }
+
+/** @} */
+
 } // dbr
 
 #endif // DBRPP_EXCEPT_HPP

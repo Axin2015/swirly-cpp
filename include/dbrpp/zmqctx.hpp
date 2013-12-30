@@ -25,6 +25,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Zmq
+ * @{
+ */
+
 class ZmqCtx {
     void* impl_;
 public:
@@ -95,6 +100,8 @@ public:
         std::swap(impl_, rhs.impl_);
     }
 };
+
+/** @} */
 
 } // dbr
 

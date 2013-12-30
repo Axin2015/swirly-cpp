@@ -301,7 +301,7 @@
  */
 
 /**
- * @defgroup ZmqStore ZmqStore
+ * @defgroup Zmq ZeroMQ
  * @ingroup Elm
  */
 

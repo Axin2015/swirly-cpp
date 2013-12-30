@@ -18,6 +18,11 @@
 #ifndef DBR_DEFS_H
 #define DBR_DEFS_H
 
+/**
+ * @addtogroup Defs
+ * @{
+ */
+
 #if !defined(__cplusplus)
 # define DBR_EXTERN extern
 #else  // defined(__cplusplus)
@@ -27,37 +32,59 @@
 
 #define DBR_API DBR_EXTERN __attribute__((visibility ("default")))
 
-/**
- * @addtogroup Defs
- * @{
- */
+enum {
+    /**
+     * Boolean logical false.
+     */
+    DBR_FALSE,
+    /**
+     * Boolean logical true.
+     */
+    DBR_TRUE
+};
 
+/**
+ * Boolean logic type.
+ */
 typedef int DbrBool;
 typedef long DbrKey;
 typedef long DbrIden;
 
 enum {
-    DBR_FALSE,
-    DBR_TRUE
-};
-
-enum {
     DBR_ERRMSG_MAX = 128
 };
 
+/**
+ * Returns the smallest of a and b. If both are equivalent, a is returned.
+ */
 #define dbr_min(a, b) ((a) <= (b) ? (a) : (b))
+
+/**
+ * Returns the largest of a and b. If both are equivalent, a is returned.
+ */
 #define dbr_max(a, b) ((a) >= (b) ? (a) : (b))
 
+/**
+ * Expected branch.
+ */
 #if !defined(__GNUC__)
 #define dbr_likely(x)   (x)
-#define dbr_unlikely(x) (x)
 #else  // defined(__GNUC__)
 #define dbr_likely(x)   __builtin_expect(!!(x), 1)
+#endif // defined(__GNUC__)
+
+/**
+ * Unexpected branch.
+ */
+#if !defined(__GNUC__)
+#define dbr_unlikely(x) (x)
+#else  // defined(__GNUC__)
 #define dbr_unlikely(x) __builtin_expect(!!(x), 0)
 #endif // defined(__GNUC__)
 
-// http://en.wikipedia.org/wiki/Offsetof
-
+/**
+ * http://en.wikipedia.org/wiki/Offsetof
+ */
 #define dbr_offsetof(st, m) __builtin_offsetof(st, m)
 #define dbr_implof(s, m, p) (s*)((char*)(p) - dbr_offsetof(s, m))
 

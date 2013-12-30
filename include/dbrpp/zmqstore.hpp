@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup ZmqStore
+ * @addtogroup Zmq
  * @{
  */
 

@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Cont
+ * @{
+ */
+
 template <class PolicyT>
 class ConstBiDirectionalIterator;
 
@@ -397,6 +402,9 @@ operator !=(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noe
 {
     return lhs != ConstForwardIterator<PolicyT>{rhs};
 }
+
+/** @} */
+
 } // dbr
 
 #endif // DBRPP_ITER_HPP
