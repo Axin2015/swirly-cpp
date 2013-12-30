@@ -19,11 +19,10 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/memb.hpp>
 #include <dbrpp/pool.hpp>
+#include <dbrpp/proto.hpp>
 
-#include <dbr/proto.h>
-#include <dbr/util.h>
+#include <dbr/util.h> // dbr_millis()
 
 using namespace dbr;
 

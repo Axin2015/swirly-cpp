@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup AccntPosn
+ * @{
+ */
+
 class PosnRef {
     DbrPosn* impl_;
 public:
@@ -88,26 +93,8 @@ operator <<(std::ostream& os, PosnRef posn)
               << ",sell_lots=" << posn.sell_lots();
 }
 
-inline size_t
-posn_len(const DbrPosn& posn, DbrBool enriched) noexcept
-{
-    return dbr_posn_len(&posn, enriched);
-}
+/** @} */
 
-inline char*
-write_posn(char* buf, const DbrPosn& posn, DbrBool enriched) noexcept
-{
-    return dbr_write_posn(buf, &posn, enriched);
-}
-
-inline const char*
-read_posn(const char* buf, DbrPosn& posn)
-{
-    buf = dbr_read_posn(buf, &posn);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
 } // dbr
 
 #endif // DBRPP_POSN_HPP

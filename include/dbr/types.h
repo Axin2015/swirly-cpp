@@ -67,9 +67,24 @@ enum DbrEntity {
     DBR_POSN   = 0x40
 };
 
-enum {
-    DBR_VIEW   = 0x80
-};
+/** @} */
+
+/**
+ * @addtogroup Trader
+ */
+
+typedef struct FigTrader* DbrTrader;
+
+/**
+ * @addtogroup Accnt
+ */
+
+typedef struct FigAccnt* DbrAccnt;
+
+/**
+ * @addtogroup TypesRec
+ * @{
+ */
 
 enum {
     DBR_DISPLAY_MAX = 64,
@@ -101,30 +116,6 @@ typedef char DbrMnem[DBR_MNEM_MAX];
  */
 
 typedef char DbrRef[DBR_REF_MAX];
-
-enum DbrAction {
-    DBR_BUY = 1,
-    DBR_SELL = -1
-};
-
-/** @} */
-
-/**
- * @addtogroup Trader
- */
-
-typedef struct FigTrader* DbrTrader;
-
-/**
- * @addtogroup Accnt
- */
-
-typedef struct FigAccnt* DbrAccnt;
-
-/**
- * @addtogroup Data
- * @{
- */
 
 /**
  * Union used for record enrichment.
@@ -211,123 +202,7 @@ typedef struct DbrIModel {
 /** @} */
 
 /**
- * @addtogroup Journ
- * @{
- */
-
-typedef struct DbrIJourn {
-    const struct DbrJournVtbl* vtbl;
-}* DbrJourn;
-
-/** @} */
-
-/**
- * @addtogroup SideLevel
- * @{
- */
-
-struct DbrLevel {
-    /**
-     * @publicsection
-     */
-    struct DbrOrder* first_order;
-    DbrTicks ticks;
-    // Must be greater than zero.
-    DbrLots lots;
-    // Must be greater than zero.
-    size_t count;
-    /**
-     * @privatesection
-     */
-    struct DbrRbNode side_node_;
-};
-
-static inline void
-dbr_level_init(struct DbrLevel* level)
-{
-    dbr_rbnode_init(&level->side_node_);
-}
-
-/** @} */
-
-/**
- * @addtogroup TraderMemb
- * @{
- */
-
-struct DbrMemb {
-    /**
-     * @publicsection
-     */
-    union DbrURec trader;
-    union DbrURec accnt;
-    /**
-     * @privatesection
-     */
-    // Singly-linked for data model.
-    struct DbrSlNode shared_node_;
-    struct DbrRbNode trader_node_;
-    struct DbrRbNode accnt_node_;
-};
-
-static inline void
-dbr_memb_init(struct DbrMemb* memb)
-{
-    dbr_slnode_init(&memb->shared_node_);
-    dbr_rbnode_init(&memb->trader_node_);
-}
-
-static inline struct DbrMemb*
-dbr_shared_memb_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrMemb, shared_node_, node);
-}
-
-/** @} */
-
-/**
- * @addtogroup AccntPosn
- * @{
- */
-
-struct DbrPosn {
-    /**
-     * @publicsection
-     */
-    union DbrURec accnt;
-    union DbrURec contr;
-    DbrDate settl_date;
-    DbrLicks buy_licks;
-    DbrLots buy_lots;
-    DbrLicks sell_licks;
-    DbrLots sell_lots;
-    /**
-     * @privatesection
-     */
-    // Singly-linked for data model.
-    struct DbrSlNode shared_node_;
-    struct DbrRbNode accnt_node_;
-    struct DbrRbNode update_node_;
-};
-
-static inline void
-dbr_posn_init(struct DbrPosn* posn)
-{
-    dbr_slnode_init(&posn->shared_node_);
-    dbr_rbnode_init(&posn->accnt_node_);
-    dbr_rbnode_init(&posn->update_node_);
-}
-
-static inline struct DbrPosn*
-dbr_shared_posn_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrPosn, shared_node_, node);
-}
-
-/** @} */
-
-/**
- * @addtogroup Exec
+ * @addtogroup Types
  * @{
  */
 
@@ -336,6 +211,11 @@ enum DbrState {
     DBR_REVISE,
     DBR_CANCEL,
     DBR_TRADE
+};
+
+enum DbrAction {
+    DBR_BUY = 1,
+    DBR_SELL = -1
 };
 
 struct DbrCommon {
@@ -365,6 +245,13 @@ struct DbrCommon {
     // Minimum to be filled by this order.
     DbrLots min_lots;
 };
+
+/** @} */
+
+/**
+ * @addtogroup TypesOrder
+ * @{
+ */
 
 struct DbrOrder {
     /**
@@ -408,6 +295,42 @@ dbr_shared_order_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrOrder, shared_node_, node);
 }
+
+/** @} */
+
+/**
+ * @addtogroup TypesLevel
+ * @{
+ */
+
+struct DbrLevel {
+    /**
+     * @publicsection
+     */
+    struct DbrOrder* first_order;
+    DbrTicks ticks;
+    // Must be greater than zero.
+    DbrLots lots;
+    // Must be greater than zero.
+    size_t count;
+    /**
+     * @privatesection
+     */
+    struct DbrRbNode side_node_;
+};
+
+static inline void
+dbr_level_init(struct DbrLevel* level)
+{
+    dbr_rbnode_init(&level->side_node_);
+}
+
+/** @} */
+
+/**
+ * @addtogroup TypesExec
+ * @{
+ */
 
 enum DbrRole {
     DBR_MAKER = 1,
@@ -456,6 +379,13 @@ dbr_shared_exec_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrExec, shared_node_, node);
 }
+
+/** @} */
+
+/**
+ * @addtogroup TypesTrans
+ * @{
+ */
 
 struct DbrMatch {
     /**
@@ -506,9 +436,100 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup Data
+ * @addtogroup Journ
  * @{
  */
+
+typedef struct DbrIJourn {
+    const struct DbrJournVtbl* vtbl;
+}* DbrJourn;
+
+/** @} */
+
+/**
+ * @addtogroup TypesMemb
+ * @{
+ */
+
+struct DbrMemb {
+    /**
+     * @publicsection
+     */
+    union DbrURec trader;
+    union DbrURec accnt;
+    /**
+     * @privatesection
+     */
+    // Singly-linked for data model.
+    struct DbrSlNode shared_node_;
+    struct DbrRbNode trader_node_;
+    struct DbrRbNode accnt_node_;
+};
+
+static inline void
+dbr_memb_init(struct DbrMemb* memb)
+{
+    dbr_slnode_init(&memb->shared_node_);
+    dbr_rbnode_init(&memb->trader_node_);
+}
+
+static inline struct DbrMemb*
+dbr_shared_memb_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrMemb, shared_node_, node);
+}
+
+/** @} */
+
+/**
+ * @addtogroup TypesPosn
+ * @{
+ */
+
+struct DbrPosn {
+    /**
+     * @publicsection
+     */
+    union DbrURec accnt;
+    union DbrURec contr;
+    DbrDate settl_date;
+    DbrLicks buy_licks;
+    DbrLots buy_lots;
+    DbrLicks sell_licks;
+    DbrLots sell_lots;
+    /**
+     * @privatesection
+     */
+    // Singly-linked for data model.
+    struct DbrSlNode shared_node_;
+    struct DbrRbNode accnt_node_;
+    struct DbrRbNode update_node_;
+};
+
+static inline void
+dbr_posn_init(struct DbrPosn* posn)
+{
+    dbr_slnode_init(&posn->shared_node_);
+    dbr_rbnode_init(&posn->accnt_node_);
+    dbr_rbnode_init(&posn->update_node_);
+}
+
+static inline struct DbrPosn*
+dbr_shared_posn_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrPosn, shared_node_, node);
+}
+
+/** @} */
+
+/**
+ * @addtogroup TypesView
+ * @{
+ */
+
+enum {
+    DBR_VIEW   = 0x80
+};
 
 struct DbrView {
     union DbrURec contr;

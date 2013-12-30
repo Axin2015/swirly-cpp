@@ -30,7 +30,7 @@
 typedef struct FigServ* DbrServ;
 
 /**
- * Create Servange.
+ * Create Server.
  *
  * @param journ Journal.
  *

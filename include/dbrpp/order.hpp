@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup TypesExec
+ * @{
+ */
+
 class OrderRef {
     DbrOrder* impl_;
 public:
@@ -163,26 +168,8 @@ operator <<(std::ostream& os, OrderRef order)
               << ",modified=" << order.modified();
 }
 
-inline size_t
-order_len(const DbrOrder& order, DbrBool enriched) noexcept
-{
-    return dbr_order_len(&order, enriched);
-}
+/** @} */
 
-inline char*
-write_order(char* buf, const DbrOrder& order, DbrBool enriched) noexcept
-{
-    return dbr_write_order(buf, &order, enriched);
-}
-
-inline const char*
-read_order(const char* buf, DbrOrder& order)
-{
-    buf = dbr_read_order(buf, &order);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
 } // dbr
 
 #endif // DBRPP_ORDER_HPP

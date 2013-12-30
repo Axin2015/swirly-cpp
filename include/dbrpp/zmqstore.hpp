@@ -24,6 +24,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup ZmqStore
+ * @{
+ */
+
 class ZmqStore {
     DbrZmqStore impl_;
 public:
@@ -88,6 +93,8 @@ public:
         return dbr_zmqstore_model(impl_);
     }
 };
+
+/** @} */
 
 } // dbr
 

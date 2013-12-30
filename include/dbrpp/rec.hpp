@@ -18,15 +18,17 @@
 #ifndef DBRPP_REC_HPP
 #define DBRPP_REC_HPP
 
-#include <dbrpp/view.hpp>
-#include <dbrpp/except.hpp>
 #include <dbrpp/types.hpp>
 
 #include <dbr/conv.h>
-#include <dbr/proto.h>
 #include <dbr/text.h>
 
 namespace dbr {
+
+/**
+ * @addtogroup TypesRecData
+ * @{
+ */
 
 class RecRefBase {
 protected:
@@ -122,27 +124,6 @@ operator <<(std::ostream& os, TraderRecRef trec)
               << ",email=" << trec.email();
 }
 
-inline size_t
-trader_len(const DbrRec& trec) noexcept
-{
-    return dbr_trader_len(&trec);
-}
-
-inline char*
-write_trader(char* buf, const DbrRec& trec) noexcept
-{
-    return dbr_write_trader(buf, &trec);
-}
-
-inline const char*
-read_trader(const char* buf, DbrRec& trec)
-{
-    buf = dbr_read_trader(buf, &trec);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
-
 class AccntRecRef : public RecRefBase {
 public:
     explicit
@@ -164,27 +145,6 @@ operator <<(std::ostream& os, AccntRecRef arec)
               << ",mnem=" << arec.mnem()
               << ",display=" << arec.display()
               << ",email=" << arec.email();
-}
-
-inline size_t
-accnt_len(const DbrRec& arec) noexcept
-{
-    return dbr_accnt_len(&arec);
-}
-
-inline char*
-write_accnt(char* buf, const DbrRec& arec) noexcept
-{
-    return dbr_write_accnt(buf, &arec);
-}
-
-inline const char*
-read_accnt(const char* buf, DbrRec& arec)
-{
-    buf = dbr_read_accnt(buf, &arec);
-    if (!buf)
-        throw_exception();
-    return buf;
 }
 
 class ContrRecRef : public RecRefBase {
@@ -312,26 +272,7 @@ operator <<(std::ostream& os, ContrRecRef crec)
               << ",max_lots=" << crec.max_lots();
 }
 
-inline size_t
-contr_len(const DbrRec& crec) noexcept
-{
-    return dbr_contr_len(&crec);
-}
-
-inline char*
-write_contr(char* buf, const DbrRec& crec) noexcept
-{
-    return dbr_write_contr(buf, &crec);
-}
-
-inline const char*
-read_contr(const char* buf, DbrRec& crec)
-{
-    buf = dbr_read_contr(buf, &crec);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
+/** @} */
 
 } // dbr
 

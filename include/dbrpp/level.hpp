@@ -24,6 +24,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup SideLevel
+ * @{
+ */
+
 class LevelRef {
     DbrLevel* impl_;
 public:
@@ -66,6 +71,9 @@ operator <<(std::ostream& os, LevelRef level)
               << ",lots=" << level.lots()
               << ",count=" << level.count();
 }
+
+/** @} */
+
 } // dbr
 
 #endif // DBRPP_LEVEL_HPP

@@ -18,7 +18,7 @@
 #ifndef DBRPP_VIEW_HPP
 #define DBRPP_VIEW_HPP
 
-#include <dbr/book.h>
+#include <dbrpp/types.hpp>
 
 #include <iostream>
 
@@ -83,6 +83,7 @@ operator <<(std::ostream& os, ViewRef view)
               << ",ask_lots=" << view.ask_lots()
               << ",ask_count=" << view.ask_count();
 }
+
 } // dbr
 
 #endif // DBRPP_VIEW_HPP

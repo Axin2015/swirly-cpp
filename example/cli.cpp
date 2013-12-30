@@ -20,6 +20,7 @@
 #include <dbrpp/lexer.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
+#include <dbrpp/view.hpp>
 #include <dbrpp/zmqctx.hpp>
 
 #include <dbr/util.h>

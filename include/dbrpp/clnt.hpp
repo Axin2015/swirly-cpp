@@ -28,6 +28,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup ClntRecData
+ * @{
+ */
+
 template <int TypeN>
 class ClntRecs {
     struct Policy : NodeTraits<DbrSlNode> {
@@ -160,6 +165,13 @@ public:
 typedef ClntRecs<DBR_TRADER> ClntTraderRecs;
 typedef ClntRecs<DBR_ACCNT> ClntAccntRecs;
 typedef ClntRecs<DBR_CONTR> ClntContrRecs;
+
+/** @} */
+
+/**
+ * @addtogroup ClntMktData
+ * @{
+ */
 
 class ClntViews {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -316,6 +328,13 @@ public:
         return dbr_clnt_empty_view(clnt_);
     }
 };
+
+/** @} */
+
+/**
+ * @addtogroup ClntExec
+ * @{
+ */
 
 class ClntExecs {
     struct Policy : NodeTraits<DbrSlNode> {
@@ -566,6 +585,13 @@ public:
     }
 };
 
+/** @} */
+
+/**
+ * @addtogroup ClntMktData
+ * @{
+ */
+
 class ClntViewups {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrView Entry;
@@ -708,6 +734,13 @@ public:
         return dbr_clnt_empty_viewup(clnt_);
     }
 };
+
+/** @} */
+
+/**
+ * @addtogroup Clnt
+ * @{
+ */
 
 class Clnt {
     DbrClnt impl_;
@@ -886,6 +919,8 @@ public:
         return ClntViewups{impl_};
     }
 };
+
+/** @} */
 
 } // dbr
 

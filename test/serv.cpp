@@ -59,7 +59,7 @@ get_rec_mnem(Serv& serv, const char* mnem)
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
 }
 
-TEST_CASE(data_trader)
+TEST_CASE(serv_trader)
 {
     Journ journ(1);
     Model model;
@@ -77,7 +77,7 @@ TEST_CASE(data_trader)
     check(trec.email() == Email("wayne.ramirez@doobry.org"));
 }
 
-TEST_CASE(data_accnt)
+TEST_CASE(serv_accnt)
 {
     Journ journ(1);
     Model model;
@@ -95,7 +95,7 @@ TEST_CASE(data_accnt)
     check(arec.email() == Email("dbra@doobry.org"));
 }
 
-TEST_CASE(data_contr)
+TEST_CASE(serv_contr)
 {
     Journ journ(1);
     Model model;
@@ -120,4 +120,43 @@ TEST_CASE(data_contr)
     check(crec.qty_dp() == 0);
     check(crec.min_lots() == 1);
     check(crec.max_lots() == 10);
+}
+
+TEST_CASE(serv_book)
+{
+    Journ journ(1);
+    Model model;
+    Pool pool;
+    Serv serv(&journ, &model, pool);
+
+    ServContrRecs::Iterator it = serv.crecs().find("EURUSD");
+    check(it != serv.crecs().end());
+
+    ContrRecRef crec(*it);
+    BookRef book = serv.book(*it, 20130824);
+    check(book.crec() == crec);
+    check(book.settl_date() == 20130824);
+}
+
+TEST_CASE(serv_place)
+{
+    Journ journ(1);
+    Model model;
+    Pool pool;
+    Serv serv(&journ, &model, pool);
+
+    auto tit = serv.trecs().find("WRAMIREZ");
+    check(tit != serv.trecs().end());
+
+    auto ait = serv.arecs().find("DBRA");
+    check(ait != serv.arecs().end());
+
+    auto cit = serv.crecs().find("EURUSD");
+    check(cit != serv.crecs().end());
+
+    auto trader = serv.trader(TraderRecRef(*tit));
+    auto accnt = serv.accnt(AccntRecRef(*ait));
+    auto book = serv.book(ContrRecRef(*cit), 20130824);
+
+    serv.place(trader, accnt, book, nullptr, DBR_BUY, 12345, 1, 0);
 }

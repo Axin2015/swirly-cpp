@@ -24,6 +24,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Lexer
+ * @{
+ */
+
 template <typename FnT>
 class Lexer {
     FnT fn_;
@@ -59,6 +64,9 @@ make_lexer(FnT fn)
 {
     return Lexer<FnT>{fn};
 }
+
+/** @} */
+
 } // dbr
 
 #endif // DBRPP_LEXER_HPP

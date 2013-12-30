@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup TraderMemb
+ * @{
+ */
+
 class MembRef {
     DbrMemb* impl_;
 public:
@@ -58,26 +63,8 @@ operator <<(std::ostream& os, MembRef memb)
               << ",arec=" << memb.arec().mnem();
 }
 
-inline size_t
-memb_len(const DbrMemb& memb, DbrBool enriched) noexcept
-{
-    return dbr_memb_len(&memb, enriched);
-}
+/** @} */
 
-inline char*
-write_memb(char* buf, const DbrMemb& memb, DbrBool enriched) noexcept
-{
-    return dbr_write_memb(buf, &memb, enriched);
-}
-
-inline const char*
-read_memb(const char* buf, DbrMemb& memb)
-{
-    buf = dbr_read_memb(buf, &memb);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
 } // dbr
 
 #endif // DBRPP_MEMB_HPP

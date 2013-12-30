@@ -44,18 +44,6 @@
  */
 
 /**
- * @defgroup Elm Elm
- */
-
-/**
- * @defgroup Fig Fig
- */
-
-/**
- * @defgroup Fir Fir
- */
-
-/**
  * @defgroup Defs Defs
  * @ingroup Ash
  */
@@ -68,6 +56,7 @@
 /**
  * @defgroup Node Node
  * @ingroup Cont
+ * @example slnode.cpp
  */
 
 /**
@@ -78,6 +67,7 @@
 /**
  * @defgroup Prioq Prioq
  * @ingroup Cont
+ * @example prioq.cpp
  */
 
 /**
@@ -98,11 +88,13 @@
 /**
  * @defgroup Util Utility
  * @ingroup Ash
+ * @example util.cpp
  */
 
 /**
  * @defgroup Err Error
  * @ingroup Util
+ * @example err.cpp
  */
 
 /**
@@ -118,11 +110,61 @@
 /**
  * @defgroup Pack Pack
  * @ingroup Util
+ * @example pack.cpp
+ */
+
+/**
+ * @defgroup String String
+ * @ingroup Util
+ */
+
+/**
+ * @defgroup Elm Elm
  */
 
 /**
  * @defgroup Types Types
  * @ingroup Elm
+ */
+
+/**
+ * @defgroup TypesRec Record
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesOrder Order
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesLevel Level
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesExec Execution
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesTrans Transaction
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesMemb Member
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesPosn Position
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup TypesView View
+ * @ingroup Types
  */
 
 /**
@@ -133,16 +175,53 @@
 /**
  * @defgroup Pool Pool
  * @ingroup Elm
- */
-
-/**
- * @defgroup Cache Cache
- * @ingroup Elm
+ * @example pool.cpp
  */
 
 /**
  * @defgroup Proto Proto
  * @ingroup Elm
+ * @example proto.cpp
+ */
+
+/**
+ * @defgroup ProtoTrader Trader
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoAccnt Account
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoContr Contract
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoOrder Order
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoExec Execution
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoMemb Member
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoPosn Position
+ * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoView View
+ * @ingroup Proto
  */
 
 /**
@@ -151,8 +230,23 @@
  */
 
 /**
+ * @defgroup Model Model
+ * @ingroup Elm
+ * @example model.cpp
+ */
+
+/**
+ * @defgroup Journ Journal
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup ZmqStore ZmqStore
  * @ingroup Elm
+ */
+
+/**
+ * @defgroup Fig Fig
  */
 
 /**
@@ -198,6 +292,7 @@
 /**
  * @defgroup Side Side
  * @ingroup Book
+ * @example side.cpp
  */
 
 /**
@@ -216,13 +311,44 @@
  */
 
 /**
- * @defgroup Journ Journal
+ * @defgroup Clnt Client
  * @ingroup Fig
  */
 
 /**
- * @defgroup Model Model
+ * @defgroup ClntRecData RecData
+ * @ingroup Clnt
+ */
+
+/**
+ * @defgroup ClntExec Execution
+ * @ingroup Clnt
+ */
+
+/**
+ * @defgroup ClntMktData MktData
+ * @ingroup Clnt
+ */
+
+/**
+ * @defgroup Serv Server
  * @ingroup Fig
+ * @example serv.cpp
+ */
+
+/**
+ * @defgroup ServRecData RecData
+ * @ingroup Serv
+ */
+
+/**
+ * @defgroup ServExec Execution
+ * @ingroup Serv
+ */
+
+/**
+ * @defgroup ServMktData MktData
+ * @ingroup Serv
  */
 
 /**
@@ -231,13 +357,7 @@
  */
 
 /**
- * @defgroup Clnt Client
- * @ingroup Fig
- */
-
-/**
- * @defgroup Serv Server
- * @ingroup Fig
+ * @defgroup Fir Fir
  */
 
 /**

@@ -49,7 +49,11 @@ enum DbrEvent {
 
 struct DbrStatus {
     DbrIden req_id;
-    //int local;
+    /**
+     * Events signalled on fd parameter passed to dbr_clnt_poll().
+     * @sa enum DbrEvent
+     */
+    int revents;
     //int sub;
     //int dealer;
     int num;

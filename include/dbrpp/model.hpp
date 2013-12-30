@@ -28,6 +28,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Model
+ * @{
+ */
+
 template <int TypeN>
 class ModelRecs {
     struct Policy : NodeTraits<DbrSlNode> {
@@ -234,6 +239,8 @@ read_entity(DbrModel model, DbrPool pool)
     const auto size = read_entity(model, TypeN, pool, first);
     return ModelRecs<TypeN>{first, size, pool};
 }
+
+/** @} */
 
 } // dbr
 

@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup TypesExec
+ * @{
+ */
+
 class ExecRef {
     DbrExec* impl_;
 public:
@@ -176,26 +181,8 @@ operator <<(std::ostream& os, ExecRef exec)
               << ",created=" << exec.created();
 }
 
-inline size_t
-exec_len(const DbrExec& exec, DbrBool enriched) noexcept
-{
-    return dbr_exec_len(&exec, enriched);
-}
+/** @} */
 
-inline char*
-write_exec(char* buf, const DbrExec& exec, DbrBool enriched) noexcept
-{
-    return dbr_write_exec(buf, &exec, enriched);
-}
-
-inline const char*
-read_exec(const char* buf, DbrExec& exec)
-{
-    buf = dbr_read_exec(buf, &exec);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
 } // dbr
 
 #endif // DBRPP_EXEC_HPP

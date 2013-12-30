@@ -26,6 +26,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Journ
+ * @{
+ */
+
 template <class DerivedT>
 class IJourn : public DbrIJourn {
     static DbrIden
@@ -95,6 +100,8 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
     if (!journ->vtbl->update_exec(journ, id, modified))
         throw_exception();
 }
+
+/** @} */
 
 } // dbr
 

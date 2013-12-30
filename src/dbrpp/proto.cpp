@@ -15,38 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_SLNODE_HPP
-#define DBRPP_SLNODE_HPP
-
-#include <dbr/slnode.h>
-
-namespace dbr {
-
-/**
- * @addtogroup Node
- * @{
- */
-
-template <typename NodeT>
-struct NodeTraits;
-
-template<>
-struct NodeTraits<DbrSlNode> {
-    typedef DbrSlNode Node;
-    static Node*
-    next(Node* node) noexcept
-    {
-        return node->next;
-    }
-    static const Node*
-    next(const Node* node) noexcept
-    {
-        return node->next;
-    }
-};
-
-/** @} */
-
-} // dbr
-
-#endif // DBRPP_SLNODE_HPP
+#include <dbrpp/proto.hpp>

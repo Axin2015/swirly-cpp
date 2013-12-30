@@ -24,6 +24,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup SqlStore
+ * @{
+ */
+
 class SqlStore {
     DbrSqlStore impl_;
 public:
@@ -88,6 +93,8 @@ public:
         return dbr_sqlstore_model(impl_);
     }
 };
+
+/** @} */
 
 } // dbr
 

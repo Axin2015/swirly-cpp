@@ -30,6 +30,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Side
+ * @{
+ */
+
 class SideOrders {
     struct Policy : NodeTraits<DbrDlNode> {
         typedef DbrOrder Entry;
@@ -468,6 +473,8 @@ operator <<(std::ostream& os, SideRef side)
               << ",last_lots=" << side.last_lots()
               << ",last_time=" << side.last_time();
 }
+
+/** @} */
 
 } // dbr
 

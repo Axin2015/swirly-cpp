@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Node
+ * @{
+ */
+
 template <typename NodeT>
 struct NodeTraits;
 
@@ -49,6 +54,8 @@ struct NodeTraits<DbrRbNode> {
         return dbr_rbnode_prev(const_cast<Node*>(node));
     }
 };
+
+/** @} */
 
 } // dbr
 

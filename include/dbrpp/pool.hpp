@@ -24,6 +24,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Pool
+ * @{
+ */
+
 class Pool {
     DbrPool impl_;
 public:
@@ -169,6 +174,8 @@ public:
         dbr_pool_free_posn(impl_, posn);
     }
 };
+
+/** @} */
 
 } // dbr
 

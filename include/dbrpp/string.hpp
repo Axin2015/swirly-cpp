@@ -26,6 +26,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup String
+ * @{
+ */
+
 inline std::string
 strncpy(const char* src, size_t n)
 {
@@ -226,6 +231,8 @@ struct NStringHash {
         return strnhash(nstr.data(), MaxN);
     }
 };
+
+/** @} */
 
 } // dbr
 
