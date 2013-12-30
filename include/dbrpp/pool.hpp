@@ -82,6 +82,10 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    /**
+     * @addtogroup PoolRec
+     * @{
+     */
     DbrRec*
     alloc_rec()
     {
@@ -95,32 +99,11 @@ public:
     {
         dbr_pool_free_rec(impl_, rec);
     }
-    DbrLevel*
-    alloc_level()
-    {
-        DbrLevel* const level = dbr_pool_alloc_level(impl_);
-        if (!level)
-            throw_exception();
-        return level;
-    }
-    void
-    free_level(DbrLevel* level) noexcept
-    {
-        dbr_pool_free_level(impl_, level);
-    }
-    DbrMatch*
-    alloc_match()
-    {
-        DbrMatch* const match = dbr_pool_alloc_match(impl_);
-        if (!match)
-            throw_exception();
-        return match;
-    }
-    void
-    free_match(DbrMatch* match) noexcept
-    {
-        dbr_pool_free_match(impl_, match);
-    }
+    /** @} */
+    /**
+     * @addtogroup PoolOrder
+     * @{
+     */
     DbrOrder*
     alloc_order()
     {
@@ -134,6 +117,29 @@ public:
     {
         dbr_pool_free_order(impl_, order);
     }
+    /** @} */
+    /**
+     * @addtogroup PoolLevel
+     * @{
+     */
+    DbrLevel*
+    alloc_level()
+    {
+        DbrLevel* const level = dbr_pool_alloc_level(impl_);
+        if (!level)
+            throw_exception();
+        return level;
+    }
+    void
+    free_level(DbrLevel* level) noexcept
+    {
+        dbr_pool_free_level(impl_, level);
+    }
+    /** @} */
+    /**
+     * @addtogroup PoolExec
+     * @{
+     */
     DbrExec*
     alloc_exec()
     {
@@ -147,6 +153,29 @@ public:
     {
         dbr_pool_free_exec(impl_, exec);
     }
+    /** @} */
+    /**
+     * @addtogroup PoolMatch
+     * @{
+     */
+    DbrMatch*
+    alloc_match()
+    {
+        DbrMatch* const match = dbr_pool_alloc_match(impl_);
+        if (!match)
+            throw_exception();
+        return match;
+    }
+    void
+    free_match(DbrMatch* match) noexcept
+    {
+        dbr_pool_free_match(impl_, match);
+    }
+    /** @} */
+    /**
+     * @addtogroup PoolMemb
+     * @{
+     */
     DbrMemb*
     alloc_memb()
     {
@@ -160,6 +189,11 @@ public:
     {
         dbr_pool_free_memb(impl_, memb);
     }
+    /** @} */
+    /**
+     * @addtogroup PoolPosn
+     * @{
+     */
     DbrPosn*
     alloc_posn()
     {
@@ -173,6 +207,25 @@ public:
     {
         dbr_pool_free_posn(impl_, posn);
     }
+    /** @} */
+    /**
+     * @addtogroup PoolView
+     * @{
+     */
+    DbrView*
+    alloc_view()
+    {
+        DbrView* const view = dbr_pool_alloc_view(impl_);
+        if (!view)
+            throw_exception();
+        return view;
+    }
+    void
+    free_view(DbrView* view) noexcept
+    {
+        dbr_pool_free_view(impl_, view);
+    }
+    /** @} */
 };
 
 /** @} */

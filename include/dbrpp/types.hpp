@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup TypesRecData
+ * @addtogroup TypesRec
  * @{
  */
 

@@ -341,6 +341,11 @@ public:
     }
 };
 
+/**
+ * @addtogroup Accnt
+ * @{
+ */
+
 class Accnt {
     DbrAccnt impl_;
 public:
@@ -385,6 +390,8 @@ operator <<(std::ostream& os, Accnt accnt)
 {
     return os << "id=" << accnt.rec().id();
 }
+
+/** @} */
 
 } // dbr
 

@@ -138,34 +138,6 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
     elm_pool_free_large(pool, node);
 }
 
-static inline struct DbrLevel*
-elm_pool_alloc_level(struct ElmPool* pool)
-{
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    return node ? &node->level : NULL;
-}
-
-static inline void
-elm_pool_free_level(struct ElmPool* pool, struct DbrLevel* level)
-{
-    struct ElmSmallNode* node = (struct ElmSmallNode*)level;
-    elm_pool_free_small(pool, node);
-}
-
-static inline struct DbrMatch*
-elm_pool_alloc_match(struct ElmPool* pool)
-{
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
-    return node ? &node->match : NULL;
-}
-
-static inline void
-elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
-{
-    struct ElmSmallNode* node = (struct ElmSmallNode*)match;
-    elm_pool_free_small(pool, node);
-}
-
 static inline struct DbrOrder*
 elm_pool_alloc_order(struct ElmPool* pool)
 {
@@ -180,6 +152,20 @@ elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
     elm_pool_free_large(pool, node);
 }
 
+static inline struct DbrLevel*
+elm_pool_alloc_level(struct ElmPool* pool)
+{
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
+    return node ? &node->level : NULL;
+}
+
+static inline void
+elm_pool_free_level(struct ElmPool* pool, struct DbrLevel* level)
+{
+    struct ElmSmallNode* node = (struct ElmSmallNode*)level;
+    elm_pool_free_small(pool, node);
+}
+
 static inline struct DbrExec*
 elm_pool_alloc_exec(struct ElmPool* pool)
 {
@@ -192,6 +178,20 @@ elm_pool_free_exec(struct ElmPool* pool, struct DbrExec* exec)
 {
     struct ElmLargeNode* node = (struct ElmLargeNode*)exec;
     elm_pool_free_large(pool, node);
+}
+
+static inline struct DbrMatch*
+elm_pool_alloc_match(struct ElmPool* pool)
+{
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
+    return node ? &node->match : NULL;
+}
+
+static inline void
+elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
+{
+    struct ElmSmallNode* node = (struct ElmSmallNode*)match;
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrMemb*
@@ -260,38 +260,6 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
     elm_pool_free_large(pool, node);
 }
 
-static inline struct DbrLevel*
-elm_pool_alloc_level_(struct ElmPool* pool, const char* file, int line)
-{
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
-    dbr_log_debug3("allocating level %p in %s at %d", node, file, line);
-    return node ? &node->level : NULL;
-}
-
-static inline void
-elm_pool_free_level(struct ElmPool* pool, struct DbrLevel* level)
-{
-    struct ElmSmallNode* node = (struct ElmSmallNode*)level;
-    dbr_log_debug3("freeing level %p from %s at %d", node, node->file, node->line);
-    elm_pool_free_small(pool, node);
-}
-
-static inline struct DbrMatch*
-elm_pool_alloc_match_(struct ElmPool* pool, const char* file, int line)
-{
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
-    dbr_log_debug3("allocating match %p in %s at %d", node, file, line);
-    return node ? &node->match : NULL;
-}
-
-static inline void
-elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
-{
-    struct ElmSmallNode* node = (struct ElmSmallNode*)match;
-    dbr_log_debug3("freeing match %p from %s at %d", node, node->file, node->line);
-    elm_pool_free_small(pool, node);
-}
-
 static inline struct DbrOrder*
 elm_pool_alloc_order_(struct ElmPool* pool, const char* file, int line)
 {
@@ -308,6 +276,22 @@ elm_pool_free_order(struct ElmPool* pool, struct DbrOrder* order)
     elm_pool_free_large(pool, node);
 }
 
+static inline struct DbrLevel*
+elm_pool_alloc_level_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
+    dbr_log_debug3("allocating level %p in %s at %d", node, file, line);
+    return node ? &node->level : NULL;
+}
+
+static inline void
+elm_pool_free_level(struct ElmPool* pool, struct DbrLevel* level)
+{
+    struct ElmSmallNode* node = (struct ElmSmallNode*)level;
+    dbr_log_debug3("freeing level %p from %s at %d", node, node->file, node->line);
+    elm_pool_free_small(pool, node);
+}
+
 static inline struct DbrExec*
 elm_pool_alloc_exec_(struct ElmPool* pool, const char* file, int line)
 {
@@ -322,6 +306,22 @@ elm_pool_free_exec(struct ElmPool* pool, struct DbrExec* exec)
     struct ElmLargeNode* node = (struct ElmLargeNode*)exec;
     dbr_log_debug3("freeing exec %p from %s at %d", node, node->file, node->line);
     elm_pool_free_large(pool, node);
+}
+
+static inline struct DbrMatch*
+elm_pool_alloc_match_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
+    dbr_log_debug3("allocating match %p in %s at %d", node, file, line);
+    return node ? &node->match : NULL;
+}
+
+static inline void
+elm_pool_free_match(struct ElmPool* pool, struct DbrMatch* match)
+{
+    struct ElmSmallNode* node = (struct ElmSmallNode*)match;
+    dbr_log_debug3("freeing match %p from %s at %d", node, node->file, node->line);
+    elm_pool_free_small(pool, node);
 }
 
 static inline struct DbrMemb*
@@ -374,14 +374,14 @@ elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
 
 #define elm_pool_alloc_rec(pool)                    \
     elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_level(pool)                  \
-    elm_pool_alloc_level_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_match(pool)                  \
-    elm_pool_alloc_match_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_order(pool)                  \
     elm_pool_alloc_order_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_level(pool)                  \
+    elm_pool_alloc_level_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_exec(pool)                   \
     elm_pool_alloc_exec_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_match(pool)                  \
+    elm_pool_alloc_match_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_memb(pool)                   \
     elm_pool_alloc_memb_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_posn(pool)                   \

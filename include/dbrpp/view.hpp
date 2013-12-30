@@ -24,6 +24,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup TypesView
+ * @{
+ */
+
 class ViewRef {
     DbrView* impl_;
 public:
@@ -83,6 +88,8 @@ operator <<(std::ostream& os, ViewRef view)
               << ",ask_lots=" << view.ask_lots()
               << ",ask_count=" << view.ask_count();
 }
+
+/** @} */
 
 } // dbr
 

@@ -509,6 +509,11 @@ public:
     }
 };
 
+/**
+ * @addtogroup Trader
+ * @{
+ */
+
 class Trader {
     DbrTrader impl_;
 public:
@@ -558,6 +563,8 @@ operator <<(std::ostream& os, Trader trader)
 {
     return os << "id=" << trader.rec().id();
 }
+
+/** @} */
 
 } // dbr
 

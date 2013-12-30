@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup ProtoRecData
+ * @addtogroup ProtoTrader
  * @{
  */
 
@@ -50,6 +50,13 @@ read_trader(const char* buf, DbrRec& trec)
     return buf;
 }
 
+/** @} */
+
+/**
+ * @addtogroup ProtoAccnt
+ * @{
+ */
+
 inline size_t
 accnt_len(const DbrRec& arec) noexcept
 {
@@ -70,6 +77,13 @@ read_accnt(const char* buf, DbrRec& arec)
         throw_exception();
     return buf;
 }
+
+/** @} */
+
+/**
+ * @addtogroup ProtoContr
+ * @{
+ */
 
 inline size_t
 contr_len(const DbrRec& crec) noexcept
@@ -95,7 +109,7 @@ read_contr(const char* buf, DbrRec& crec)
 /** @} */
 
 /**
- * @addtogroup ProtoExec
+ * @addtogroup ProtoOrder
  * @{
  */
 
@@ -120,6 +134,13 @@ read_order(const char* buf, DbrOrder& order)
     return buf;
 }
 
+/** @} */
+
+/**
+ * @addtogroup ProtoExec
+ * @{
+ */
+
 inline size_t
 exec_len(const DbrExec& exec, DbrBool enriched) noexcept
 {
@@ -141,6 +162,13 @@ read_exec(const char* buf, DbrExec& exec)
     return buf;
 }
 
+/** @} */
+
+/**
+ * @addtogroup ProtoMemb
+ * @{
+ */
+
 inline size_t
 memb_len(const DbrMemb& memb, DbrBool enriched) noexcept
 {
@@ -161,6 +189,13 @@ read_memb(const char* buf, DbrMemb& memb)
         throw_exception();
     return buf;
 }
+
+/** @} */
+
+/**
+ * @addtogroup ProtoPosn
+ * @{
+ */
 
 inline size_t
 posn_len(const DbrPosn& posn, DbrBool enriched) noexcept
@@ -186,7 +221,7 @@ read_posn(const char* buf, DbrPosn& posn)
 /** @} */
 
 /**
- * @addtogroup ProtoMktData
+ * @addtogroup ProtoView
  * @{
  */
 

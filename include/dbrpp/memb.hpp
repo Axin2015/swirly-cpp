@@ -23,7 +23,7 @@
 namespace dbr {
 
 /**
- * @addtogroup TraderMemb
+ * @addtogroup TypesMemb
  * @{
  */
 

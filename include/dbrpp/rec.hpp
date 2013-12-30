@@ -26,7 +26,7 @@
 namespace dbr {
 
 /**
- * @addtogroup TypesRecData
+ * @addtogroup TypesRec
  * @{
  */
 
@@ -101,6 +101,13 @@ operator <<(std::ostream& os, RecRef trec)
               << ",display=" << trec.display();
 }
 
+/** @} */
+
+/**
+ * @addtogroup TypesTrader
+ * @{
+ */
+
 class TraderRecRef : public RecRefBase {
 public:
     explicit
@@ -124,6 +131,13 @@ operator <<(std::ostream& os, TraderRecRef trec)
               << ",email=" << trec.email();
 }
 
+/** @} */
+
+/**
+ * @addtogroup TypesAccnt
+ * @{
+ */
+
 class AccntRecRef : public RecRefBase {
 public:
     explicit
@@ -146,6 +160,13 @@ operator <<(std::ostream& os, AccntRecRef arec)
               << ",display=" << arec.display()
               << ",email=" << arec.email();
 }
+
+/** @} */
+
+/**
+ * @addtogroup TypesContr
+ * @{
+ */
 
 class ContrRecRef : public RecRefBase {
 public:

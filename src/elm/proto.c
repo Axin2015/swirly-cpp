@@ -34,6 +34,67 @@ static const char POSN_FORMAT[] = "lllllll";
 static const char VIEW_FORMAT[] = "lillzllz";
 
 DBR_API size_t
+dbr_rec_len(const struct DbrRec* rec)
+{
+    size_t n = dbr_packleni(rec->type);
+    switch (rec->type) {
+    case DBR_TRADER:
+        n += dbr_trader_len(rec);
+        break;
+    case DBR_ACCNT:
+        n += dbr_accnt_len(rec);
+        break;
+    case DBR_CONTR:
+        n += dbr_contr_len(rec);
+        break;
+    default:
+        abort();
+    }
+    return n;
+}
+
+DBR_API char*
+dbr_write_rec(char* buf, const struct DbrRec* rec)
+{
+    buf = dbr_packi(buf, rec->type);
+    switch (rec->type) {
+    case DBR_TRADER:
+        buf = dbr_write_trader(buf, rec);
+        break;
+    case DBR_ACCNT:
+        buf = dbr_write_accnt(buf, rec);
+        break;
+    case DBR_CONTR:
+        buf = dbr_write_contr(buf, rec);
+        break;
+    default:
+        abort();
+    }
+    return buf;
+}
+
+DBR_API const char*
+dbr_read_rec(const char* buf, struct DbrRec* rec)
+{
+    buf = dbr_unpacki(buf, &rec->type);
+    switch (rec->type) {
+    case DBR_TRADER:
+        buf = dbr_read_trader(buf, rec);
+        break;
+    case DBR_ACCNT:
+        buf = dbr_read_accnt(buf, rec);
+        break;
+    case DBR_CONTR:
+        buf = dbr_read_contr(buf, rec);
+        break;
+    default:
+        dbr_err_setf(DBR_EIO, "invalid type %d", rec->type);
+        buf = NULL;
+    }
+    return buf;
+}
+
+DBR_API size_t
 dbr_trader_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(TRADER_FORMAT,
@@ -127,67 +188,6 @@ dbr_read_contr(const char* buf, struct DbrRec* rec)
     rec->contr.price_dp = dbr_real_to_dp(rec->contr.price_inc);
     rec->contr.qty_dp = dbr_real_to_dp(rec->contr.qty_inc);
     return end;
-}
-
-DBR_API size_t
-dbr_rec_len(const struct DbrRec* rec)
-{
-    size_t n = dbr_packleni(rec->type);
-    switch (rec->type) {
-    case DBR_TRADER:
-        n += dbr_trader_len(rec);
-        break;
-    case DBR_ACCNT:
-        n += dbr_accnt_len(rec);
-        break;
-    case DBR_CONTR:
-        n += dbr_contr_len(rec);
-        break;
-    default:
-        abort();
-    }
-    return n;
-}
-
-DBR_API char*
-dbr_write_rec(char* buf, const struct DbrRec* rec)
-{
-    buf = dbr_packi(buf, rec->type);
-    switch (rec->type) {
-    case DBR_TRADER:
-        buf = dbr_write_trader(buf, rec);
-        break;
-    case DBR_ACCNT:
-        buf = dbr_write_accnt(buf, rec);
-        break;
-    case DBR_CONTR:
-        buf = dbr_write_contr(buf, rec);
-        break;
-    default:
-        abort();
-    }
-    return buf;
-}
-
-DBR_API const char*
-dbr_read_rec(const char* buf, struct DbrRec* rec)
-{
-    buf = dbr_unpacki(buf, &rec->type);
-    switch (rec->type) {
-    case DBR_TRADER:
-        buf = dbr_read_trader(buf, rec);
-        break;
-    case DBR_ACCNT:
-        buf = dbr_read_accnt(buf, rec);
-        break;
-    case DBR_CONTR:
-        buf = dbr_read_contr(buf, rec);
-        break;
-    default:
-        dbr_err_setf(DBR_EIO, "invalid type %d", rec->type);
-        buf = NULL;
-    }
-    return buf;
 }
 
 DBR_API size_t

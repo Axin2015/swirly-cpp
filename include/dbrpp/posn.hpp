@@ -23,7 +23,7 @@
 namespace dbr {
 
 /**
- * @addtogroup AccntPosn
+ * @addtogroup TypesPosn
  * @{
  */
 

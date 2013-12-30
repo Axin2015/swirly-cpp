@@ -383,7 +383,7 @@ dbr_shared_exec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesTrans
+ * @addtogroup TypesMatch
  * @{
  */
 

@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup SideLevel
+ * @addtogroup TypesLevel
  * @{
  */
 

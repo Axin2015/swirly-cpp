@@ -30,44 +30,9 @@ struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup Proto
+ * @addtogroup ProtoRec
  * @{
  */
-
-// Trader.
-
-DBR_API size_t
-dbr_trader_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_write_trader(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_read_trader(const char* buf, struct DbrRec* rec);
-
-// Accnt.
-
-DBR_API size_t
-dbr_accnt_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_write_accnt(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_read_accnt(const char* buf, struct DbrRec* rec);
-
-// Contr.
-
-DBR_API size_t
-dbr_contr_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_write_contr(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_read_contr(const char* buf, struct DbrRec* rec);
-
-// Rec.
 
 /**
  * Returns -1 if type is unrecognised.
@@ -82,7 +47,60 @@ dbr_write_rec(char* buf, const struct DbrRec* rec);
 DBR_API const char*
 dbr_read_rec(const char* buf, struct DbrRec* rec);
 
-// Order.
+/** @} */
+
+/**
+ * @addtogroup ProtoTrader
+ * @{
+ */
+
+DBR_API size_t
+dbr_trader_len(const struct DbrRec* rec);
+
+DBR_API char*
+dbr_write_trader(char* buf, const struct DbrRec* rec);
+
+DBR_API const char*
+dbr_read_trader(const char* buf, struct DbrRec* rec);
+
+/** @} */
+
+/**
+ * @addtogroup ProtoAccnt
+ * @{
+ */
+
+DBR_API size_t
+dbr_accnt_len(const struct DbrRec* rec);
+
+DBR_API char*
+dbr_write_accnt(char* buf, const struct DbrRec* rec);
+
+DBR_API const char*
+dbr_read_accnt(const char* buf, struct DbrRec* rec);
+
+/** @} */
+
+/**
+ * @addtogroup ProtoContr
+ * @{
+ */
+
+DBR_API size_t
+dbr_contr_len(const struct DbrRec* rec);
+
+DBR_API char*
+dbr_write_contr(char* buf, const struct DbrRec* rec);
+
+DBR_API const char*
+dbr_read_contr(const char* buf, struct DbrRec* rec);
+
+/** @} */
+
+/**
+ * @addtogroup ProtoOrder
+ * @{
+ */
 
 DBR_API size_t
 dbr_order_len(const struct DbrOrder* order, DbrBool enriched);
@@ -93,7 +111,12 @@ dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order);
 
-// Exec.
+/** @} */
+
+/**
+ * @addtogroup ProtoExec
+ * @{
+ */
 
 DBR_API size_t
 dbr_exec_len(const struct DbrExec* exec, DbrBool enriched);
@@ -104,7 +127,12 @@ dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
 DBR_API const char*
 dbr_read_exec(const char* buf, struct DbrExec* exec);
 
-// Memb.
+/** @} */
+
+/**
+ * @addtogroup ProtoMemb
+ * @{
+ */
 
 DBR_API size_t
 dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
@@ -115,7 +143,12 @@ dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
 DBR_API const char*
 dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
-// Posn.
+/** @} */
+
+/**
+ * @addtogroup ProtoPosn
+ * @{
+ */
 
 DBR_API size_t
 dbr_posn_len(const struct DbrPosn* posn, DbrBool enriched);
@@ -126,7 +159,12 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
 
-// View.
+/** @} */
+
+/**
+ * @addtogroup ProtoView
+ * @{
+ */
 
 DBR_API size_t
 dbr_view_len(const struct DbrView* view, DbrBool enriched);

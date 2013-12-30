@@ -329,30 +329,6 @@ dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
     elm_pool_free_rec(pool, rec);
 }
 
-DBR_API struct DbrLevel*
-dbr_pool_alloc_level(DbrPool pool)
-{
-    return elm_pool_alloc_level(pool);
-}
-
-DBR_API void
-dbr_pool_free_level(DbrPool pool, struct DbrLevel* level)
-{
-    elm_pool_free_level(pool, level);
-}
-
-DBR_API struct DbrMatch*
-dbr_pool_alloc_match(DbrPool pool)
-{
-    return elm_pool_alloc_match(pool);
-}
-
-DBR_API void
-dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
-{
-    elm_pool_free_match(pool, match);
-}
-
 DBR_API struct DbrOrder*
 dbr_pool_alloc_order(DbrPool pool)
 {
@@ -365,6 +341,18 @@ dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
     elm_pool_free_order(pool, order);
 }
 
+DBR_API struct DbrLevel*
+dbr_pool_alloc_level(DbrPool pool)
+{
+    return elm_pool_alloc_level(pool);
+}
+
+DBR_API void
+dbr_pool_free_level(DbrPool pool, struct DbrLevel* level)
+{
+    elm_pool_free_level(pool, level);
+}
+
 DBR_API struct DbrExec*
 dbr_pool_alloc_exec(DbrPool pool)
 {
@@ -375,6 +363,18 @@ DBR_API void
 dbr_pool_free_exec(DbrPool pool, struct DbrExec* exec)
 {
     elm_pool_free_exec(pool, exec);
+}
+
+DBR_API struct DbrMatch*
+dbr_pool_alloc_match(DbrPool pool)
+{
+    return elm_pool_alloc_match(pool);
+}
+
+DBR_API void
+dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
+{
+    elm_pool_free_match(pool, match);
 }
 
 DBR_API struct DbrMemb*

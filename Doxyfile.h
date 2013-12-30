@@ -133,6 +133,21 @@
  */
 
 /**
+ * @defgroup TypesTrader Trader
+ * @ingroup TypesRec
+ */
+
+/**
+ * @defgroup TypesAccnt Account
+ * @ingroup TypesRec
+ */
+
+/**
+ * @defgroup TypesContr Contract
+ * @ingroup TypesRec
+ */
+
+/**
  * @defgroup TypesOrder Order
  * @ingroup Types
  */
@@ -148,7 +163,7 @@
  */
 
 /**
- * @defgroup TypesTrans Transaction
+ * @defgroup TypesMatch Match
  * @ingroup Types
  */
 
@@ -179,24 +194,69 @@
  */
 
 /**
+ * @defgroup PoolRec Record
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolOrder Order
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolLevel Level
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolExec Execution
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolMatch Match
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolMemb Member
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolPosn Position
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolView View
+ * @ingroup Pool
+ */
+
+/**
  * @defgroup Proto Proto
  * @ingroup Elm
  * @example proto.cpp
  */
 
 /**
- * @defgroup ProtoTrader Trader
+ * @defgroup ProtoRec Record
  * @ingroup Proto
+ */
+
+/**
+ * @defgroup ProtoTrader Trader
+ * @ingroup ProtoRec
  */
 
 /**
  * @defgroup ProtoAccnt Account
- * @ingroup Proto
+ * @ingroup ProtoRec
  */
 
 /**
  * @defgroup ProtoContr Contract
- * @ingroup Proto
+ * @ingroup ProtoRec
  */
 
 /**

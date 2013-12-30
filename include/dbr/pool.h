@@ -35,23 +35,25 @@ dbr_pool_create(void);
 DBR_API void
 dbr_pool_destroy(DbrPool pool);
 
+/** @} */
+
+/**
+ * @addtogroup PoolRec
+ * @{
+ */
+
 DBR_API struct DbrRec*
 dbr_pool_alloc_rec(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec);
 
-DBR_API struct DbrLevel*
-dbr_pool_alloc_level(DbrPool pool);
+/** @} */
 
-DBR_API void
-dbr_pool_free_level(DbrPool pool, struct DbrLevel* level);
-
-DBR_API struct DbrMatch*
-dbr_pool_alloc_match(DbrPool pool);
-
-DBR_API void
-dbr_pool_free_match(DbrPool pool, struct DbrMatch* match);
+/**
+ * @addtogroup PoolOrder
+ * @{
+ */
 
 DBR_API struct DbrOrder*
 dbr_pool_alloc_order(DbrPool pool);
@@ -59,11 +61,51 @@ dbr_pool_alloc_order(DbrPool pool);
 DBR_API void
 dbr_pool_free_order(DbrPool pool, struct DbrOrder* order);
 
+/** @} */
+
+/**
+ * @addtogroup PoolLevel
+ * @{
+ */
+
+DBR_API struct DbrLevel*
+dbr_pool_alloc_level(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_level(DbrPool pool, struct DbrLevel* level);
+
+/** @} */
+
+/**
+ * @addtogroup PoolExec
+ * @{
+ */
+
 DBR_API struct DbrExec*
 dbr_pool_alloc_exec(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_exec(DbrPool pool, struct DbrExec* exec);
+
+/** @} */
+
+/**
+ * @addtogroup PoolMatch
+ * @{
+ */
+
+DBR_API struct DbrMatch*
+dbr_pool_alloc_match(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_match(DbrPool pool, struct DbrMatch* match);
+
+/** @} */
+
+/**
+ * @addtogroup PoolMemb
+ * @{
+ */
 
 DBR_API struct DbrMemb*
 dbr_pool_alloc_memb(DbrPool pool);
@@ -71,17 +113,38 @@ dbr_pool_alloc_memb(DbrPool pool);
 DBR_API void
 dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb);
 
+/** @} */
+
+/**
+ * @addtogroup PoolPosn
+ * @{
+ */
+
 DBR_API struct DbrPosn*
 dbr_pool_alloc_posn(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn);
 
+/** @} */
+
+/**
+ * @addtogroup PoolView
+ * @{
+ */
+
 DBR_API struct DbrView*
 dbr_pool_alloc_view(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_view(DbrPool pool, struct DbrView* view);
+
+/** @} */
+
+/**
+ * @addtogroup Pool
+ * @{
+ */
 
 DBR_API void
 dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first);
