@@ -23,7 +23,7 @@
 #include <stddef.h> // NULL
 
 /**
- * @addtogroup Node
+ * @addtogroup RbNode
  * @{
  */
 

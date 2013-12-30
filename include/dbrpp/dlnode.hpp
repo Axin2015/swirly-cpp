@@ -30,6 +30,13 @@ namespace dbr {
 template <typename NodeT>
 struct NodeTraits;
 
+/** @} */
+
+/**
+ * @addtogroup DlNode
+ * @{
+ */
+
 template<>
 struct NodeTraits<DbrDlNode> {
     typedef DbrDlNode Node;

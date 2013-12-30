@@ -22,7 +22,7 @@
 #include <stddef.h> // NULL
 
 /**
- * @addtogroup Node
+ * @addtogroup SlNode
  * @{
  */
 

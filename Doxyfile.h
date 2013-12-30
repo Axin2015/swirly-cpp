@@ -60,6 +60,21 @@
  */
 
 /**
+ * @defgroup DlNode DlNode
+ * @ingroup Node
+ */
+
+/**
+ * @defgroup RbNode RbNode
+ * @ingroup Node
+ */
+
+/**
+ * @defgroup SlNode SlNode
+ * @ingroup Node
+ */
+
+/**
  * @defgroup List List
  * @ingroup Cont
  */
