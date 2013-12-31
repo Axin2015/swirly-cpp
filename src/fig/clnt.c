@@ -636,7 +636,7 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
         if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
             goto fail1;
 
-        switch (body.type) {
+        switch ((status->sub = body.type)) {
         case DBR_VIEW_LIST_REP:
             for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
                 struct DbrView* view = dbr_shared_view_entry(node);
@@ -659,7 +659,7 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
         if ((status->req_id = body.req_id) > 0)
             dbr_prioq_clear(&clnt->prioq, body.req_id);
 
-        switch (body.type) {
+        switch ((status->dealer = body.type)) {
         case DBR_STATUS_REP:
             status->num = body.status_rep.num;
             strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);

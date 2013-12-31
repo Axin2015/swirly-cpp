@@ -256,14 +256,11 @@ split(const string& s, vector<string>& v)
 class Repl {
     typedef pair<Arity, function<void (Arg, Arg)> > Cmd;
     typedef map<string, Cmd> Cmds;
-    function<void (DbrMillis)> idle_;
     Cmds cmds_;
     bool quit_;
 public:
-    explicit
-    Repl(const function<void (DbrMillis)>& idle) noexcept
-    :   idle_(idle),
-        quit_(false)
+    Repl() noexcept
+    :   quit_(false)
     {
     }
     void
@@ -302,9 +299,7 @@ public:
             Arg begin = toks.begin();
             const string& name = *begin++;
             eval(name, begin, toks.end());
-            idle_(250);
-        } else
-            idle_(100);
+        }
     }
     void
     read(istream& is)
@@ -394,6 +389,7 @@ public:
     flush()
     {
         if (!clnt_.execs().empty()) {
+            cout << endl;
             cout <<
                 "|id   "
                 "|order"
@@ -454,6 +450,7 @@ public:
             }
         }
         if (!clnt_.posnups().empty()) {
+            cout << endl;
             cout <<
                 "|crec      "
                 "|settl_date"
@@ -485,6 +482,7 @@ public:
             }
         }
         if (!clnt_.viewups().empty()) {
+            cout << endl;
             cout <<
                 "|bid_count "
                 "|bid_lots  "
@@ -524,30 +522,6 @@ public:
                 cout << '|' << endl;
             }
         }
-        clnt_.clear();
-    }
-    void
-    idle(DbrMillis ms)
-    {
-        DbrStatus status;
-        const int nevents{clnt_.poll(0, 0, ms, status)};
-        cout << "nevents: " << nevents << endl;
-        cout << "execs:   " << clnt_.execs().size() << endl;
-        cout << "posnups: " << clnt_.posnups().size() << endl;
-        cout << "viewups: " << clnt_.viewups().size() << endl;
-
-        if (nevents == 0)
-            return;
-
-        if (status.dealer == DBR_STATUS_REP) {
-            cout << "status: ";
-            if (status.num == 0)
-                cout << "ok\n";
-            else
-                cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
-        }
-
-        flush();
     }
     void
     accnts(Arg begin, Arg end)
@@ -960,7 +934,7 @@ main(int argc, char* argv[])
         Clnt clnt(ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271", trader,
                   dbr_millis(), pool);
         Sess sess(clnt);
-        Repl repl(bind(&Sess::idle, ref(sess), _1));
+        Repl repl;
 
         repl.cmd("accnts", 0, bind(&Sess::accnts, ref(sess), _1, _2));
         repl.cmd("ack_trades", -1, bind(&Sess::ack_trades, ref(sess), _1, _2));
@@ -993,27 +967,48 @@ main(int argc, char* argv[])
                 else {
                     repl.eval(toks);
                     toks.clear();
-                    cout << "> ";
-                    cout.flush();
                 }
             });
         cout << "> ";
         cout.flush();
         char buf[BUF_MAX];
         while (!repl.quit()) {
-            const ssize_t n{::read(0, buf, sizeof(buf))};
-            if (n < 0)
-                throw PosixError();
-            if (n == 0) {
-                // End-of file.
-                repl.set_quit();
-                break;
+
+            DbrStatus status;
+            const int nevents{clnt.poll(0, DBR_POLLIN, 30000, status)};
+            if (nevents == 0)
+                continue;
+
+            if (status.dealer == DBR_STATUS_REP) {
+                cout << endl;
+                cout << "status: ";
+                if (status.num == 0)
+                    cout << "ok\n";
+                else
+                    cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
             }
-            try {
-                lexer.exec(buf, n);
-            } catch (const exception& e) {
-                cerr << e.what() << endl;
+
+            if ((status.revents & DBR_POLLIN)) {
+
+                const ssize_t n{::read(0, buf, sizeof(buf))};
+                if (n < 0)
+                    throw PosixError();
+                if (n == 0) {
+                    // End-of file.
+                    repl.set_quit();
+                    break;
+                }
+                try {
+                    lexer.exec(buf, n);
+                } catch (const exception& e) {
+                    cerr << e.what() << endl;
+                }
             }
+
+            sess.flush();
+            clnt.clear();
+            cout << "> ";
+            cout.flush();
         }
         return 0;
     } catch (const exception& e) {
