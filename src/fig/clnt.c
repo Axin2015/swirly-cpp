@@ -611,23 +611,24 @@ DBR_API int
 dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* status)
 {
     zmq_pollitem_t items[] = {
-        { clnt->sub,    0, ZMQ_POLLIN, 0 },
-        { clnt->dealer, 0, ZMQ_POLLIN, 0 }
+        { NULL,         fd, events,     0 },
+        { clnt->sub,    0,  ZMQ_POLLIN, 0 },
+        { clnt->dealer, 0,  ZMQ_POLLIN, 0 }
     };
+    enum { LOCAL_FD, SUB_SOCK, DEALER_SOCK };
 
     // TODO: min of ms and timer.
 
-    const int nevents = zmq_poll(items, 2, ms);
+    const int nevents = zmq_poll(items, 3, ms);
     if (nevents < 0) {
         dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
 
-    status->req_id = 0;
-    status->num = 0;
-    status->msg[0] = '\0';
+    __builtin_bzero(status, sizeof(*status));
+    status->revents = items[LOCAL_FD].revents;
 
-    if ((items[0].revents & ZMQ_POLLIN)) {
+    if ((items[SUB_SOCK].revents & ZMQ_POLLIN)) {
 
         struct DbrBody body;
         if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
@@ -647,7 +648,7 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
             goto fail1;
         }
     }
-    if ((items[1].revents & ZMQ_POLLIN)) {
+    if ((items[DEALER_SOCK].revents & ZMQ_POLLIN)) {
 
         struct DbrBody body;
         if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))

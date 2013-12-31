@@ -54,9 +54,22 @@ struct DbrStatus {
      * @sa enum DbrEvent
      */
     int revents;
-    //int sub;
-    //int dealer;
+    /**
+     * Message type received on subscription socket.
+     * Valid values are either zero (none) or #DBR_VIEW_LIST_REP.
+     */
+    int sub;
+    /**
+     * Message type received on dealer socket.
+     */
+    int dealer;
+    /**
+     * If DbrStatus::dealer is #DBR_STATUS_REP, then this is set to the status number.
+     */
     int num;
+    /**
+     * If DbrStatus::dealer is #DBR_STATUS_REP, then this is set to the status message.
+     */
     char msg[DBR_ERRMSG_MAX];
 };
 

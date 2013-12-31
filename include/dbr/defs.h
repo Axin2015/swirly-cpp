@@ -47,10 +47,20 @@ enum {
  * Boolean logic type.
  */
 typedef int DbrBool;
-typedef long DbrKey;
+/**
+ * Identifier type.
+ */
 typedef long DbrIden;
+/**
+ * Key type used by associative containers.
+ * @sa struct RbNode
+ */
+typedef long DbrKey;
 
 enum {
+    /**
+     * Maximum length of error messages.
+     */
     DBR_ERRMSG_MAX = 128
 };
 
