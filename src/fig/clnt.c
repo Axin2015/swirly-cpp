@@ -625,8 +625,10 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
         goto fail1;
     }
 
-    __builtin_bzero(status, sizeof(*status));
+    status->req_id = 0;
     status->revents = items[LOCAL_FD].revents;
+    status->sub = status->dealer = status->num = 0;
+    status->msg[0] = '\0';
 
     if ((items[SUB_SOCK].revents & ZMQ_POLLIN)) {
 
@@ -654,7 +656,8 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
         if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
             goto fail1;
 
-        status->req_id = body.req_id;
+        if ((status->req_id = body.req_id) > 0)
+            dbr_prioq_clear(&clnt->prioq, body.req_id);
 
         switch (body.type) {
         case DBR_STATUS_REP:

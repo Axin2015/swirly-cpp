@@ -23,6 +23,7 @@
 #include <dbrpp/view.hpp>
 #include <dbrpp/zmqctx.hpp>
 
+#include <dbr/msg.h>
 #include <dbr/util.h>
 
 #include <algorithm>
@@ -328,35 +329,14 @@ public:
         }
     }
     void
-    read(int fd, const char* prompt)
+    set_quit(bool quit = true) noexcept
     {
-        vector<string> toks;
-        auto lexer = make_lexer([this, &toks](const char* tok, size_t len) {
-                if (tok)
-                    toks.push_back(tok);
-                else {
-                    eval(toks);
-                    toks.clear();
-                }
-            });
-        char buf[BUF_MAX];
-        while (!quit_) {
-            cout << prompt;
-            cout.flush();
-            const ssize_t n{::read(fd, buf, sizeof(buf))};
-            if (n < 0)
-                throw PosixError();
-            if (n == 0) {
-                // End-of file.
-                quit_ = true;
-                break;
-            }
-            try {
-                lexer.exec(buf, n);
-            } catch (const exception& e) {
-                cerr << e.what() << endl;
-            }
-        }
+        quit_ = quit;
+    }
+    bool
+    quit() const noexcept
+    {
+        return quit_;
     }
 };
 
@@ -366,10 +346,8 @@ argc(Arg begin, Arg end)
     return distance(begin, end);
 }
 
-class Test {
-    ZmqCtx ctx_;
-    Pool pool_;
-    Clnt clnt_;
+class Sess {
+    Clnt& clnt_;
     DbrRec* arec_;
     DbrRec* crec_;
     DbrDate settl_date_;
@@ -396,8 +374,9 @@ class Test {
         return it->second;
     }
 public:
-    Test(const char* sub_addr, const char* dealer_addr, const char* trader, DbrIden seed)
-        : clnt_(ctx_.c_arg(), sub_addr, dealer_addr, trader, seed, pool_),
+    explicit
+    Sess(Clnt& clnt)
+        : clnt_(clnt),
           arec_(nullptr),
           crec_(nullptr),
           settl_date_(0),
@@ -412,26 +391,8 @@ public:
         cout << endl;
     }
     void
-    idle(DbrMillis ms)
+    flush()
     {
-        DbrStatus status;
-        const int nevents{clnt_.poll(0, 0, ms, status)};
-        cout << "nevents: " << nevents << endl;
-        cout << "execs:   " << clnt_.execs().size() << endl;
-        cout << "posnups: " << clnt_.posnups().size() << endl;
-        cout << "viewups: " << clnt_.viewups().size() << endl;
-
-        if (nevents == 0)
-            return;
-
-        if (status.req_id != 0) {
-            cout << "status: ";
-            if (status.num == 0)
-                cout << "ok\n";
-            else
-                cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
-        }
-
         if (!clnt_.execs().empty()) {
             cout <<
                 "|id   "
@@ -564,6 +525,29 @@ public:
             }
         }
         clnt_.clear();
+    }
+    void
+    idle(DbrMillis ms)
+    {
+        DbrStatus status;
+        const int nevents{clnt_.poll(0, 0, ms, status)};
+        cout << "nevents: " << nevents << endl;
+        cout << "execs:   " << clnt_.execs().size() << endl;
+        cout << "posnups: " << clnt_.posnups().size() << endl;
+        cout << "viewups: " << clnt_.viewups().size() << endl;
+
+        if (nevents == 0)
+            return;
+
+        if (status.dealer == DBR_STATUS_REP) {
+            cout << "status: ";
+            if (status.num == 0)
+                cout << "ok\n";
+            else
+                cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
+        }
+
+        flush();
     }
     void
     accnts(Arg begin, Arg end)
@@ -970,34 +954,67 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
+        ZmqCtx ctx;
+        Pool pool;
         // epgm://239.192.1.1:3270
-        Test test("tcp://localhost:3270", "tcp://localhost:3271", trader, dbr_millis());
-        Repl repl(bind(&Test::idle, ref(test), _1));
+        Clnt clnt(ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271", trader,
+                  dbr_millis(), pool);
+        Sess sess(clnt);
+        Repl repl(bind(&Sess::idle, ref(sess), _1));
 
-        repl.cmd("accnts", 0, bind(&Test::accnts, ref(test), _1, _2));
-        repl.cmd("ack_trades", -1, bind(&Test::ack_trades, ref(test), _1, _2));
-        repl.cmd("buy", 2, bind(&Test::place, ref(test), DBR_BUY, _1, _2));
-        repl.cmd("cancel", -1, bind(&Test::cancel, ref(test), _1, _2));
-        repl.cmd("contrs", 0, bind(&Test::contrs, ref(test), _1, _2));
-        repl.cmd("echo", -1, bind(&Test::echo, ref(test), _1, _2));
-        repl.cmd("env", 0, bind(&Test::env, ref(test), _1, _2));
-        repl.cmd("orders", 0, bind(&Test::orders, ref(test), _1, _2));
-        repl.cmd("posns", 0, bind(&Test::posns, ref(test), _1, _2));
-        repl.cmd("quit", 0, bind(&Test::quit, ref(test), _1, _2));
-        repl.cmd("revise", 2, bind(&Test::revise, ref(test), _1, _2));
-        repl.cmd("sell", 2, bind(&Test::place, ref(test), DBR_SELL, _1, _2));
-        repl.cmd("set", 2, bind(&Test::set, ref(test), _1, _2));
-        repl.cmd("traders", 0, bind(&Test::traders, ref(test), _1, _2));
-        repl.cmd("trades", 0, bind(&Test::trades, ref(test), _1, _2));
-        repl.cmd("unset", 1, bind(&Test::unset, ref(test), _1, _2));
-        repl.cmd("view", 0, bind(&Test::view, ref(test), _1, _2));
+        repl.cmd("accnts", 0, bind(&Sess::accnts, ref(sess), _1, _2));
+        repl.cmd("ack_trades", -1, bind(&Sess::ack_trades, ref(sess), _1, _2));
+        repl.cmd("buy", 2, bind(&Sess::place, ref(sess), DBR_BUY, _1, _2));
+        repl.cmd("cancel", -1, bind(&Sess::cancel, ref(sess), _1, _2));
+        repl.cmd("contrs", 0, bind(&Sess::contrs, ref(sess), _1, _2));
+        repl.cmd("echo", -1, bind(&Sess::echo, ref(sess), _1, _2));
+        repl.cmd("env", 0, bind(&Sess::env, ref(sess), _1, _2));
+        repl.cmd("orders", 0, bind(&Sess::orders, ref(sess), _1, _2));
+        repl.cmd("posns", 0, bind(&Sess::posns, ref(sess), _1, _2));
+        repl.cmd("quit", 0, bind(&Sess::quit, ref(sess), _1, _2));
+        repl.cmd("revise", 2, bind(&Sess::revise, ref(sess), _1, _2));
+        repl.cmd("sell", 2, bind(&Sess::place, ref(sess), DBR_SELL, _1, _2));
+        repl.cmd("set", 2, bind(&Sess::set, ref(sess), _1, _2));
+        repl.cmd("traders", 0, bind(&Sess::traders, ref(sess), _1, _2));
+        repl.cmd("trades", 0, bind(&Sess::trades, ref(sess), _1, _2));
+        repl.cmd("unset", 1, bind(&Sess::unset, ref(sess), _1, _2));
+        repl.cmd("view", 0, bind(&Sess::view, ref(sess), _1, _2));
 
         char path[PATH_MAX];
         sprintf(path, "%s/.dbr_clirc", getenv("HOME"));
         ifstream cfg(path);
         if (cfg.is_open())
             repl.read(cfg);
-        repl.read(0, "> ");
+
+        vector<string> toks;
+        auto lexer = make_lexer([&repl, &toks](const char* tok, size_t len) {
+                if (tok)
+                    toks.push_back(tok);
+                else {
+                    repl.eval(toks);
+                    toks.clear();
+                    cout << "> ";
+                    cout.flush();
+                }
+            });
+        cout << "> ";
+        cout.flush();
+        char buf[BUF_MAX];
+        while (!repl.quit()) {
+            const ssize_t n{::read(0, buf, sizeof(buf))};
+            if (n < 0)
+                throw PosixError();
+            if (n == 0) {
+                // End-of file.
+                repl.set_quit();
+                break;
+            }
+            try {
+                lexer.exec(buf, n);
+            } catch (const exception& e) {
+                cerr << e.what() << endl;
+            }
+        }
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

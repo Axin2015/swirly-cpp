@@ -22,7 +22,7 @@
 #include <assert.h>
 #include <stdlib.h> // malloc()
 
-enum { INVAL = -1 };
+enum { INVAL = 0 };
 
 /*
     Heap invariant:
