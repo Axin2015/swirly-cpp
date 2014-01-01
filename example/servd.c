@@ -139,6 +139,7 @@ send_bookup(DbrIden req_id)
         struct DbrView* view = dbr_pool_alloc_view(pool);
         if (!view)
             goto fail1;
+        dbr_view_init(view);
         dbr_book_view(book, view);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }
@@ -350,6 +351,7 @@ sess_book(DbrIden req_id, DbrTrader trader)
         struct DbrView* view = dbr_pool_alloc_view(pool);
         if (!view)
             goto fail1;
+        dbr_view_init(view);
         dbr_book_view(book, view);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }

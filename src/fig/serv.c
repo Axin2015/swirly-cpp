@@ -326,8 +326,8 @@ create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
     struct DbrExec* exec = dbr_pool_alloc_exec(serv->pool);
     if (!exec)
         return NULL;
-
     dbr_exec_init(exec);
+
     exec->id = dbr_journ_alloc_id(serv->journ);
     exec->order = order->id;
     __builtin_memcpy(&exec->c, &order->c, sizeof(struct DbrCommon));

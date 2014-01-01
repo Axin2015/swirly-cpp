@@ -251,8 +251,8 @@ create_order(DbrClnt clnt, struct DbrExec* exec)
     struct DbrOrder* order = dbr_pool_alloc_order(clnt->pool);
     if (!order)
         return NULL;
-
     dbr_order_init(order);
+
     order->level = NULL;
     order->id = exec->order;
     __builtin_memcpy(&order->c, &exec->c, sizeof(struct DbrCommon));

@@ -130,8 +130,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
-
         dbr_exec_init(maker_exec);
+
         match->id = match_id;
         match->maker_order = maker;
         match->maker_posn = posn;

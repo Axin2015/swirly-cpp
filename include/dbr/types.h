@@ -344,8 +344,20 @@ struct DbrExec {
     DbrIden id;
     DbrIden order;
     struct DbrCommon c;
+    /**
+     * @sa struct DbrMatch
+     */
     DbrIden match;
-    int locks_;
+    /**
+     * @privatesection
+     */
+    /**
+     * Reference count. Exec lifetime is managed by a shared reference count.
+     */
+    int refs_;
+    /**
+     * @publicsection
+     */
     /**
      * @sa enum DbrRole
      */
@@ -363,7 +375,7 @@ struct DbrExec {
 static inline void
 dbr_exec_init(struct DbrExec* exec)
 {
-    exec->locks_ = 0;
+    exec->refs_ = 1;
     dbr_slnode_init(&exec->shared_node_);
     dbr_rbnode_init(&exec->trader_node_);
 }
@@ -385,6 +397,10 @@ dbr_shared_exec_entry(struct DbrSlNode* node)
 /**
  * @addtogroup TypesMatch
  * @{
+ */
+
+/**
+ * A Match represents two orders from opposing sides of the market that may trade.
  */
 
 struct DbrMatch {

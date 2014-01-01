@@ -979,7 +979,7 @@ main(int argc, char* argv[])
             if (nevents == 0)
                 continue;
 
-            if (status.dealer == DBR_STATUS_REP) {
+            if (status.req_id > 0) {
                 cout << endl;
                 cout << "status: ";
                 if (status.num == 0)
