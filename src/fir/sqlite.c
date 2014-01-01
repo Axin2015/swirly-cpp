@@ -25,7 +25,6 @@
 #include <dbr/log.h>
 #include <dbr/queue.h>
 
-#include <stdbool.h>
 #include <string.h>
 
 #define INSERT_EXEC_SQL                                                 \
@@ -105,9 +104,9 @@ exec_sql(sqlite3* db, const char* sql)
     }
 
     sqlite3_finalize(stmt);
-    return true;
+    return DBR_TRUE;
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -118,9 +117,9 @@ exec_stmt(sqlite3* db, sqlite3_stmt* stmt)
     sqlite3_reset(stmt);
     if (dbr_unlikely(rc != SQLITE_DONE)) {
         dbr_err_set(DBR_EIO, sqlite3_errmsg(db));
-        return false;
+        return DBR_FALSE;
     }
-    return true;
+    return DBR_TRUE;
 }
 
 #if DBR_DEBUG_LEVEL >= 2
@@ -278,11 +277,11 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
     if (rc != SQLITE_OK)
         goto fail1;
 
-    return true;
+    return DBR_TRUE;
  fail1:
     dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -301,11 +300,11 @@ bind_update_exec(struct FirSqlite* sqlite, DbrIden id, DbrMillis modified)
     if (rc != SQLITE_OK)
         goto fail1;
 
-    return true;
+    return DBR_TRUE;
  fail1:
     dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
     sqlite3_clear_bindings(stmt);
-    return false;
+    return DBR_FALSE;
 }
 
 static ssize_t
@@ -950,12 +949,12 @@ fir_sqlite_init(struct FirSqlite* sqlite, const char* path)
     sqlite->db = db;
     sqlite->insert_exec = insert_exec;
     sqlite->update_exec = update_exec;
-    return true;
+    return DBR_TRUE;
  fail2:
     sqlite3_finalize(insert_exec);
  fail1:
     sqlite3_close(db);
-    return false;
+    return DBR_FALSE;
 }
 
 DBR_EXTERN void

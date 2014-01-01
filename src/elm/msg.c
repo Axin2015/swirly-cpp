@@ -119,6 +119,7 @@ read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
         dbr_pool_free_exec(pool, exec);
         goto fail1;
     }
+    // Transfer ownership to queue. (Reference count remains 1.)
     dbr_queue_insert_back(queue, &exec->shared_node_);
     return buf;
  fail1:

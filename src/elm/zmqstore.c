@@ -25,7 +25,6 @@
 
 #include <zmq.h>
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h> // strncpy()
 
@@ -62,8 +61,8 @@ insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrBody body = { .req_id = store->id++, .type = DBR_INSERT_EXEC_LIST_REQ,
                             .insert_exec_list_req = { .first = first, .count_ = 0 } };
-    if (!(dbr_send_body(store->sock, &body, false)))
-        return false;
+    if (!(dbr_send_body(store->sock, &body, DBR_FALSE)))
+        return DBR_FALSE;
     return dbr_recv_body(store->sock, store->pool, &body);
 }
 
@@ -73,8 +72,8 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
     struct ElmZmqStore* store = journ_implof(journ);
     struct DbrBody body = { .req_id = store->id++, .type = DBR_UPDATE_EXEC_REQ,
                             .update_exec_req = { .id = id, .modified = modified } };
-    if (!(dbr_send_body(store->sock, &body, false)))
-        return false;
+    if (!(dbr_send_body(store->sock, &body, DBR_FALSE)))
+        return DBR_FALSE;
     return dbr_recv_body(store->sock, store->pool, &body);
 }
 
@@ -91,7 +90,7 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
     struct DbrBody body = { .req_id = store->id++, .type = DBR_READ_ENTITY_REQ,
                             .read_entity_req.type = type };
 
-    if (!dbr_send_body(store->sock, &body, false))
+    if (!dbr_send_body(store->sock, &body, DBR_FALSE))
         return -1;
 
     if (!dbr_recv_body(store->sock, pool, &body))

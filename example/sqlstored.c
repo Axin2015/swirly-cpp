@@ -22,6 +22,7 @@
 #include <dbr/log.h>
 #include <dbr/model.h>
 #include <dbr/msg.h>
+#include <dbr/refcount.h>
 #include <dbr/sqlstore.h>
 #include <dbr/util.h>
 
@@ -29,7 +30,6 @@
 
 #include <assert.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,7 +39,7 @@ static DbrSqlStore store = NULL;
 static void* ctx = NULL;
 static void* sock = NULL;
 
-static volatile sig_atomic_t quit = false;
+static volatile sig_atomic_t quit = DBR_FALSE;
 
 static void
 status_err(struct DbrBody* rep, DbrIden req_id)
@@ -85,16 +85,16 @@ read_entity(const struct DbrBody* req)
         status_err(&rep, req->req_id);
         goto fail1;
     }
-    const DbrBool ok = dbr_send_body(sock, &rep, false);
+    const DbrBool ok = dbr_send_body(sock, &rep, DBR_FALSE);
     assert(rep.entity_list_rep.count_ == size);
     dbr_pool_free_entity_list(pool, type, rep.entity_list_rep.first);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
+    if (!dbr_send_body(sock, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_body() failed");
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -104,19 +104,19 @@ insert_exec_list(struct DbrBody* req)
                            .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
-    if (!dbr_journ_insert_exec_list(journ, req->insert_exec_list_req.first, false)) {
+    if (!dbr_journ_insert_exec_list(journ, req->insert_exec_list_req.first, DBR_FALSE)) {
         dbr_err_prints("dbr_journ_insert_exec_list() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
-    const DbrBool ok = dbr_send_body(sock, &rep, false);
+    const DbrBool ok = dbr_send_body(sock, &rep, DBR_FALSE);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
+    if (!dbr_send_body(sock, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_body() failed");
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -126,19 +126,19 @@ insert_exec(struct DbrBody* req)
                            .status_rep = { .num = 0, .msg = "" } };
     DbrJourn journ = dbr_sqlstore_journ(store);
 
-    if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec, false)) {
+    if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec, DBR_FALSE)) {
         dbr_err_prints("dbr_journ_insert_exec() failed");
         status_err(&rep, req->req_id);
         goto fail1;
     }
-    const DbrBool ok = dbr_send_body(sock, &rep, false);
+    const DbrBool ok = dbr_send_body(sock, &rep, DBR_FALSE);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
+    if (!dbr_send_body(sock, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_body() failed");
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -153,14 +153,14 @@ update_exec(struct DbrBody* req)
         status_err(&rep, req->req_id);
         goto fail1;
     }
-    const DbrBool ok = dbr_send_body(sock, &rep, false);
+    const DbrBool ok = dbr_send_body(sock, &rep, DBR_FALSE);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
     return ok;
  fail1:
-    if (!dbr_send_body(sock, &rep, false))
+    if (!dbr_send_body(sock, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_body() failed");
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -184,22 +184,22 @@ run(void)
             break;
         case DBR_INSERT_EXEC_REQ:
             insert_exec(&req);
-            dbr_pool_free_exec(pool, req.insert_exec_req.exec);
+            dbr_exec_decref(req.insert_exec_req.exec, pool);
             break;
         case DBR_UPDATE_EXEC_REQ:
             update_exec(&req);
             break;
         }
     }
-    return true;
+    return DBR_TRUE;
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static void
 sighandler(int signum)
 {
-    quit = true;
+    quit = DBR_TRUE;
 }
 
 int

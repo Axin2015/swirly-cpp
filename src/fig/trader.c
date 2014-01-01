@@ -20,7 +20,6 @@
 #include <dbr/book.h>
 #include <dbr/err.h>
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,7 +43,7 @@ free_execs(struct FigTrader* trader)
     while ((node = trader->trades.root)) {
         struct DbrExec* exec = dbr_trader_trade_entry(node);
         dbr_tree_remove(&trader->trades, node);
-        dbr_pool_free_exec(trader->pool, exec);
+        dbr_exec_decref(exec, trader->pool);
     }
 }
 

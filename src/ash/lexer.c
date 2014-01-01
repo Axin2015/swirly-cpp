@@ -21,7 +21,6 @@
 #include <dbr/lexer.h>
 #include <dbr/err.h>
 
-#include <stdbool.h>
 #include <stddef.h> // NULL
 
 
@@ -261,7 +260,7 @@ _again:
     if (cs == lexer_error) {
         dbr_err_set(DBR_EINVAL, "lexical error");
         dbr_lexer_reset(lexer);
-        return false;
+        return DBR_FALSE;
     }
-	return true;
+	return DBR_TRUE;
 }

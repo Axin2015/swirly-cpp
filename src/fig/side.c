@@ -20,7 +20,6 @@
 #include <dbr/err.h>
 #include <dbr/log.h>
 
-#include <stdbool.h>
 #include <stdlib.h>
 
 static struct DbrLevel*
@@ -107,7 +106,7 @@ dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order)
 
 	struct DbrLevel* level = lazy_level(side, order);
     if (!level)
-        return false;
+        return DBR_FALSE;
 
     struct DbrRbNode* next_level = dbr_rbnode_next(&level->side_node_);
     struct DbrDlNode* end = next_level
@@ -116,7 +115,7 @@ dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order)
     // Insert order after the level's last order.
     // I.e. insert order before the next level's first order.
     dbr_dlnode_insert_before(end, &order->side_node_);
-    return true;
+    return DBR_TRUE;
 }
 
 DBR_API void

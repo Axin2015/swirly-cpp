@@ -20,7 +20,6 @@
 #include <dbr/slnode.h>
 #include <dbr/types.h>
 
-#include <stdbool.h>
 #include <string.h>
 
 static inline struct DbrOrder*

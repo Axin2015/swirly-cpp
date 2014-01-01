@@ -21,6 +21,7 @@
 #include <fig/index.h>
 
 #include <dbr/pool.h>
+#include <dbr/refcount.h>
 #include <dbr/trader.h>
 #include <dbr/tree.h>
 
@@ -147,8 +148,9 @@ fig_trader_empty_order(const struct FigTrader* trader)
 // Transfer ownership to state.
 
 static inline void
-fig_trader_emplace_trade(struct FigTrader* trader, struct DbrExec* exec)
+fig_trader_insert_trade(struct FigTrader* trader, struct DbrExec* exec)
 {
+    dbr_exec_incref(exec);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
@@ -161,7 +163,7 @@ fig_trader_emplace_trade(struct FigTrader* trader, struct DbrExec* exec)
 // Release ownership from state.
 
 static inline void
-fig_trader_release_trade(struct FigTrader* trader, struct DbrExec* exec)
+fig_trader_remove_trade(struct FigTrader* trader, struct DbrExec* exec)
 {
     dbr_tree_remove(&trader->trades, &exec->trader_node_);
     dbr_rbnode_init(&exec->trader_node_);
@@ -169,15 +171,16 @@ fig_trader_release_trade(struct FigTrader* trader, struct DbrExec* exec)
 
 // Release ownership from state.
 
-static inline struct DbrExec*
-fig_trader_release_trade_id(struct FigTrader* trader, DbrIden id)
+static inline DbrBool
+fig_trader_remove_trade_id(struct FigTrader* trader, DbrIden id)
 {
     struct DbrRbNode* node = dbr_tree_find(&trader->trades, id);
     if (!node)
-        return NULL;
+        return DBR_FALSE;
+
     struct DbrExec* exec = dbr_trader_trade_entry(node);
-    fig_trader_release_trade(trader, exec);
-    return exec;
+    fig_trader_remove_trade(trader, exec);
+    return DBR_TRUE;
 }
 
 static inline struct DbrRbNode*

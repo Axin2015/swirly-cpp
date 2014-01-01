@@ -34,7 +34,7 @@
 
 enum {
     /**
-     * Boolean logical false.
+     * Boolean logical DBR_FALSE.
      */
     DBR_FALSE,
     /**

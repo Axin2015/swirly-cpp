@@ -20,7 +20,6 @@
 #include <dbr/err.h>
 #include <dbr/types.h>
 
-#include <stdbool.h>
 #include <stdlib.h> // abort()
 #include <string.h>
 
@@ -181,7 +180,7 @@ fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* f
         emplace_contr(cache, first, size);
         break;
     default:
-        assert(false);
+        assert(DBR_FALSE);
         break;
     }
 }

@@ -27,11 +27,11 @@
 #include <dbr/msg.h>
 #include <dbr/prioq.h>
 #include <dbr/queue.h>
+#include <dbr/refcount.h>
 #include <dbr/util.h>
 
 #include <zmq.h>
 
-#include <stdbool.h>
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
@@ -149,7 +149,7 @@ static DbrIden
 logon(DbrClnt clnt)
 {
     struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_LOGON };
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
 }
@@ -167,9 +167,9 @@ set_trader(DbrClnt clnt)
         goto fail1;
 
     clnt->trader = trader;
-    return true;
+    return DBR_TRUE;
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static void
@@ -201,7 +201,8 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
         assert(exec->c.state == DBR_TRADE);
         // Transfer ownership.
-        fig_trader_emplace_trade(clnt->trader, exec);
+        fig_trader_insert_trade(clnt->trader, exec);
+        dbr_exec_decref(exec, clnt->pool);
     }
     clnt->pending &= ~DBR_EXEC;
 }
@@ -264,27 +265,23 @@ create_order(DbrClnt clnt, struct DbrExec* exec)
 static DbrBool
 apply_new(DbrClnt clnt, struct DbrExec* exec)
 {
-    enrich_exec(&clnt->cache, exec);
     struct DbrOrder* order = create_order(clnt, exec);
-    if (!order) {
-        dbr_pool_free_exec(clnt->pool, exec);
-        return false;
-    }
+    if (!order)
+        return DBR_FALSE;
     // Transfer ownership.
     fig_trader_emplace_order(clnt->trader, order);
+    dbr_exec_incref(exec);
     dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
-    return true;
+    return DBR_TRUE;
 }
 
 static DbrBool
 apply_update(DbrClnt clnt, struct DbrExec* exec)
 {
-    enrich_exec(&clnt->cache, exec);
     struct DbrRbNode* node = fig_trader_find_order_id(clnt->trader, exec->order);
     if (!node) {
-        dbr_pool_free_exec(clnt->pool, exec);
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", exec->order);
-        return false;
+        return DBR_FALSE;
     }
 
     struct DbrOrder* order = dbr_trader_order_entry(node);
@@ -298,16 +295,16 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
 
     if (exec->c.state == DBR_TRADE) {
         // Transfer ownership.
-        fig_trader_emplace_trade(clnt->trader, exec);
+        fig_trader_insert_trade(clnt->trader, exec);
     }
+    dbr_exec_incref(exec);
     dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
-    return true;
+    return DBR_TRUE;
 }
 
 static void
 apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
-    enrich_posn(&clnt->cache, posn);
     posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
     insert_posnup(&clnt->posnups, posn);
 }
@@ -315,7 +312,6 @@ apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 static void
 apply_viewup(DbrClnt clnt, struct DbrView* view)
 {
-    enrich_view(&clnt->cache, view);
     const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
     if (node != &view->clnt_node_) {
@@ -479,7 +475,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail2;
 
     return body.req_id;
@@ -501,7 +497,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail2;
 
     return body.req_id;
@@ -523,7 +519,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail2;
 
     return body.req_id;
@@ -544,7 +540,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail2;
 
     return body.req_id;
@@ -565,7 +561,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail2;
 
     return body.req_id;
@@ -586,14 +582,10 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, false))
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail2;
 
-    struct DbrExec* exec = fig_trader_release_trade_id(clnt->trader, id);
-    // FIXME: reference-counted release.
-    if (exec)
-        dbr_pool_free_exec(clnt->pool, exec);
-
+    fig_trader_remove_trade_id(clnt->trader, id);
     return body.req_id;
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
@@ -642,6 +634,7 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
                 struct DbrView* view = dbr_shared_view_entry(node);
                 node = node->next;
                 // Transfer ownership.
+                enrich_view(&clnt->cache, view);
                 apply_viewup(clnt, view);
             }
             break;
@@ -692,6 +685,7 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
             emplace_view_list(clnt, body.view_list_rep.first);
             break;
         case DBR_EXEC_REP:
+            enrich_exec(&clnt->cache, body.exec_rep.exec);
             switch (body.exec_rep.exec->c.state) {
             case DBR_NEW:
                 apply_new(clnt, body.exec_rep.exec);
@@ -702,8 +696,10 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
                 apply_update(clnt, body.exec_rep.exec);
                 break;
             }
+            dbr_exec_decref(body.exec_rep.exec, clnt->pool);
             break;
         case DBR_POSN_REP:
+            enrich_posn(&clnt->cache, body.posn_rep.posn);
             apply_posnup(clnt, body.posn_rep.posn);
             break;
         default:
@@ -731,9 +727,7 @@ dbr_clnt_clear(DbrClnt clnt)
             if (order)
                 dbr_pool_free_order(clnt->pool, order);
         }
-        // Trades are owned by trader.
-        if (exec->c.state != DBR_TRADE)
-            dbr_pool_free_exec(clnt->pool, exec);
+        dbr_exec_decref(exec, clnt->pool);
     }
     dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->posnups);

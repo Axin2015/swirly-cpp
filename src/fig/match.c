@@ -22,8 +22,8 @@
 #include <dbr/book.h>
 #include <dbr/journ.h>
 #include <dbr/queue.h>
+#include <dbr/refcount.h>
 
-#include <stdbool.h>
 #include <string.h>
 
 // Trades are considered positive or negative depending on whether the aggressor is buying or
@@ -44,8 +44,8 @@ free_match_list(struct DbrSlNode* first, DbrPool pool)
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
-        dbr_pool_free_exec(pool, match->taker_exec);
-        dbr_pool_free_exec(pool, match->maker_exec);
+        dbr_exec_decref(match->taker_exec, pool);
+        dbr_exec_decref(match->maker_exec, pool);
         dbr_pool_free_match(pool, match);
     }
 }
@@ -126,7 +126,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         const DbrIden maker_id = dbr_journ_alloc_id(journ);
         struct DbrExec* maker_exec = dbr_pool_alloc_exec(pool);
         if (!maker_exec) {
-            dbr_pool_free_exec(pool, taker_exec);
+            dbr_exec_decref(taker_exec, pool);
             dbr_pool_free_match(pool, match);
             goto fail1;
         }
@@ -214,10 +214,10 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     } else
         trans->taker_posn = NULL;
 
-    return true;
+    return DBR_TRUE;
  fail1:
     free_match_list(dbr_queue_first(&trans->matches), pool);
-    return false;
+    return DBR_FALSE;
 }
 
 DBR_EXTERN DbrBool

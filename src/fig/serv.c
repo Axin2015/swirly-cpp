@@ -27,7 +27,6 @@
 #include <dbr/queue.h>
 #include <dbr/util.h>
 
-#include <stdbool.h>
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
@@ -170,8 +169,8 @@ free_match_list(struct DbrSlNode* first, DbrPool pool)
         struct DbrMatch* match = dbr_trans_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
-        dbr_pool_free_exec(pool, match->taker_exec);
-        dbr_pool_free_exec(pool, match->maker_exec);
+        dbr_exec_decref(match->taker_exec, pool);
+        dbr_exec_decref(match->maker_exec, pool);
         dbr_pool_free_match(pool, match);
     }
 }
@@ -182,10 +181,10 @@ emplace_rec_list(DbrServ serv, int type)
     struct DbrSlNode* node;
     ssize_t size = dbr_model_read_entity(serv->model, type, serv->pool, &node);
     if (size < 0)
-        return false;
+        return DBR_FALSE;
 
     fig_cache_emplace_rec_list(&serv->cache, type, node, size);
-    return true;
+    return DBR_TRUE;
 }
 
 static DbrBool
@@ -219,7 +218,7 @@ emplace_orders(DbrServ serv)
         // Transfer ownership.
         fig_trader_emplace_order(trader, order);
     }
-    return true;
+    return DBR_TRUE;
  fail2:
     // Free tail.
     do {
@@ -228,7 +227,7 @@ emplace_orders(DbrServ serv)
         dbr_pool_free_order(serv->pool, order);
     } while (node);
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -245,18 +244,19 @@ emplace_trades(DbrServ serv)
             goto fail2;
 
         // Transfer ownership.
-        fig_trader_emplace_trade(trader, exec);
+        fig_trader_insert_trade(trader, exec);
+        dbr_exec_decref(exec, serv->pool);
     }
-    return true;
+    return DBR_TRUE;
  fail2:
     // Free tail.
     do {
         struct DbrExec* exec = dbr_shared_exec_entry(node);
         node = node->next;
-        dbr_pool_free_exec(serv->pool, exec);
+        dbr_exec_decref(exec, serv->pool);
     } while (node);
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -280,7 +280,7 @@ emplace_membs(DbrServ serv)
         fig_trader_emplace_memb(trader, memb);
         fig_accnt_insert_memb(accnt, memb);
     }
-    return true;
+    return DBR_TRUE;
  fail2:
     // Free tail.
     do {
@@ -289,7 +289,7 @@ emplace_membs(DbrServ serv)
         dbr_pool_free_memb(serv->pool, memb);
     } while (node);
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static DbrBool
@@ -308,7 +308,7 @@ emplace_posns(DbrServ serv)
         // Transfer ownership.
         fig_accnt_emplace_posn(accnt, posn);
     }
-    return true;
+    return DBR_TRUE;
  fail2:
     // Free tail.
     do {
@@ -317,7 +317,7 @@ emplace_posns(DbrServ serv)
         dbr_pool_free_posn(serv->pool, posn);
     } while (node);
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 static struct DbrExec*
@@ -376,13 +376,15 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         // Maker updated first because this is consistent with last-look semantics.
 
         // Update maker.
-        fig_trader_emplace_trade(maker, match->maker_exec);
+        fig_trader_insert_trade(maker, match->maker_exec);
         apply_posn(match->maker_posn, match->maker_exec);
 
         // Update taker.
-        fig_trader_emplace_trade(taker, match->taker_exec);
+        fig_trader_insert_trade(taker, match->taker_exec);
         apply_posn(trans->taker_posn, match->taker_exec);
 
+        dbr_exec_decref(match->maker_exec, serv->pool);
+        dbr_exec_decref(match->taker_exec, serv->pool);
         dbr_pool_free_match(serv->pool, match);
     }
 
@@ -547,7 +549,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
     // unfilled quantity.
 
-    if (!dbr_journ_insert_exec_list(serv->journ, trans.execs.first, true))
+    if (!dbr_journ_insert_exec_list(serv->journ, trans.execs.first, DBR_TRUE))
         goto fail5;
 
     // Final commit phase cannot fail.
@@ -562,7 +564,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
  fail4:
     free_match_list(dbr_queue_first(&trans.matches), serv->pool);
  fail3:
-    dbr_pool_free_exec(serv->pool, new_exec);
+    dbr_exec_decref(new_exec, serv->pool);
  fail2:
     dbr_pool_free_order(serv->pool, new_order);
  fail1:
@@ -606,7 +608,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     exec->c.lots = lots;
     exec->c.resd -= delta;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, true))
+    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
@@ -617,7 +619,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
@@ -658,7 +660,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     exec->c.lots = lots;
     exec->c.resd -= delta;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, true))
+    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
@@ -669,7 +671,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
@@ -698,7 +700,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     exec->c.state = DBR_CANCEL;
     exec->c.resd = 0;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, true))
+    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
@@ -709,7 +711,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
@@ -737,7 +739,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     exec->c.state = DBR_CANCEL;
     exec->c.resd = 0;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, true))
+    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
@@ -748,7 +750,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_pool_free_exec(serv->pool, exec);
+    dbr_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
@@ -769,11 +771,10 @@ dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
     // No need to update timestamps on trade because it is immediately freed.
 
     struct DbrExec* exec = dbr_trader_trade_entry(node);
-    fig_trader_release_trade(trader, exec);
-    dbr_pool_free_exec(serv->pool, exec);
-    return true;
+    fig_trader_remove_trade(trader, exec);
+    return DBR_TRUE;
  fail1:
-    return false;
+    return DBR_FALSE;
 }
 
 DBR_API void
@@ -791,9 +792,7 @@ dbr_serv_clear(DbrServ serv)
             if (order)
                 dbr_pool_free_order(serv->pool, order);
         }
-        // Trades are owned by trader.
-        if (exec->c.state != DBR_TRADE)
-            dbr_pool_free_exec(serv->pool, exec);
+        dbr_exec_decref(exec, serv->pool);
     }
     dbr_queue_init(&serv->execs);
     dbr_tree_init(&serv->posnups);
