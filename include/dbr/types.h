@@ -429,8 +429,14 @@ dbr_match_init(struct DbrMatch* match)
     dbr_slnode_init(&match->trans_node_);
 }
 
+/**
+ * A single Transaction comprises many Matches.
+ */
 struct DbrTrans {
     struct DbrQueue matches;
+    /**
+     * All executions referenced in DbrTrans::matches.
+     */
     struct DbrQueue execs;
     struct DbrPosn* taker_posn;
 };

@@ -194,6 +194,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         dbr_queue_insert_back(&trans->matches, &match->trans_node_);
 
         // Maker updated first because this is consistent with last-look semantics.
+        // N.B. the reference count is not incremented here.
         dbr_queue_insert_back(&trans->execs, &maker_exec->shared_node_);
         dbr_queue_insert_back(&trans->execs, &taker_exec->shared_node_);
     }

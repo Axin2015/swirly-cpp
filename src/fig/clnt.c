@@ -768,7 +768,7 @@ DBR_API struct DbrRbNode*
 dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date)
 {
     const DbrIden key = dbr_book_key(cid, settl_date);
-	return dbr_tree_find(&clnt->views, key);
+    return dbr_tree_find(&clnt->views, key);
 }
 
 DBR_API struct DbrRbNode*

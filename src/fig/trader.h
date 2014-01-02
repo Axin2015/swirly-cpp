@@ -145,8 +145,6 @@ fig_trader_empty_order(const struct FigTrader* trader)
 
 #define FIG_TRADER_END_TRADE DBR_TREE_END
 
-// Transfer ownership to state.
-
 static inline void
 fig_trader_insert_trade(struct FigTrader* trader, struct DbrExec* exec)
 {
@@ -160,13 +158,12 @@ fig_trader_insert_trade(struct FigTrader* trader, struct DbrExec* exec)
 #pragma GCC diagnostic pop
 }
 
-// Release ownership from state.
-
 static inline void
 fig_trader_remove_trade(struct FigTrader* trader, struct DbrExec* exec)
 {
     dbr_tree_remove(&trader->trades, &exec->trader_node_);
     dbr_rbnode_init(&exec->trader_node_);
+    dbr_exec_decref(exec, trader->pool);
 }
 
 // Release ownership from state.

@@ -383,8 +383,8 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         fig_trader_insert_trade(taker, match->taker_exec);
         apply_posn(trans->taker_posn, match->taker_exec);
 
-        dbr_exec_decref(match->maker_exec, serv->pool);
-        dbr_exec_decref(match->taker_exec, serv->pool);
+        // Exec ownership is effectively transferred to serv->execs outside of loop, so no need to
+        // decrement Exec reference count here.
         dbr_pool_free_match(serv->pool, match);
     }
 

@@ -22,6 +22,7 @@
 #include <dbr/pack.h>
 #include <dbr/proto.h>
 #include <dbr/queue.h>
+#include <dbr/refcount.h>
 
 #include <zmq.h>
 
@@ -126,7 +127,7 @@ read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
     dbr_exec_init(exec);
 
     if (!(buf = dbr_read_exec(buf, exec))) {
-        dbr_pool_free_exec(pool, exec);
+        dbr_exec_decref(exec, pool);
         goto fail1;
     }
     // Transfer ownership to queue. (Reference count remains 1.)
@@ -594,7 +595,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_exec_init(body->exec_rep.exec);
 
         if (!(buf = dbr_read_exec(buf, body->exec_rep.exec))) {
-            dbr_pool_free_exec(pool, body->exec_rep.exec);
+            dbr_exec_decref(body->exec_rep.exec, pool);
             goto fail1;
         }
         break;
@@ -669,7 +670,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_exec_init(body->exec_rep.exec);
 
         if (!(buf = dbr_read_exec(buf, body->insert_exec_req.exec))) {
-            dbr_pool_free_exec(pool, body->insert_exec_req.exec);
+            dbr_exec_decref(body->insert_exec_req.exec, pool);
             goto fail1;
         }
         break;

@@ -437,6 +437,7 @@ dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first)
         while (node) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
             node = node->next;
+            // Inline version of dbr_exec_decref() to avoid cycle.
             assert(exec->refs_ >= 1);
             if (--exec->refs_ == 0)
                 dbr_pool_free_exec(pool, exec);
