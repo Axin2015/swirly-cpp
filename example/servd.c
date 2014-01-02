@@ -41,8 +41,8 @@ static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
 static DbrServ serv = NULL;
 static void* ctx = NULL;
-static void* pub = NULL;
 static void* router = NULL;
+static void* pub = NULL;
 
 static volatile sig_atomic_t quit = DBR_FALSE;
 
@@ -656,27 +656,27 @@ main(int argc, char* argv[])
         goto exit4;
     }
 
-    pub = zmq_socket(ctx, ZMQ_PUB);
-    if (!pub) {
+    router = zmq_socket(ctx, ZMQ_ROUTER);
+    if (!router) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit5;
     }
 
-    if (zmq_bind(pub, "tcp://*:3270") < 0) {
+    if (zmq_bind(router, "tcp://*:3270") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit6;
     }
 
-    router = zmq_socket(ctx, ZMQ_ROUTER);
-    if (!router) {
+    pub = zmq_socket(ctx, ZMQ_PUB);
+    if (!pub) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit6;
     }
 
-    if (zmq_bind(router, "tcp://*:3271") < 0) {
+    if (zmq_bind(pub, "tcp://*:3271") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit7;
@@ -695,9 +695,9 @@ main(int argc, char* argv[])
     dbr_log_info("exiting...");
     status = 0;
  exit7:
-    zmq_close(router);
- exit6:
     zmq_close(pub);
+ exit6:
+    zmq_close(router);
  exit5:
     zmq_ctx_destroy(ctx);
  exit4:

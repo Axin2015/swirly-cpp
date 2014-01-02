@@ -755,9 +755,9 @@ public:
         : impl_{nullptr}
     {
     }
-    Clnt(void* ctx, const char* sub_addr, const char* dealer_addr, const char* trader,
+    Clnt(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
          DbrIden seed, DbrPool pool)
-        : impl_{dbr_clnt_create(ctx, sub_addr, dealer_addr, trader, seed, pool)}
+        : impl_{dbr_clnt_create(ctx, dealer_addr, sub_addr, trader, seed, pool)}
     {
         if (!impl_)
             throw_exception();

@@ -39,8 +39,8 @@ enum { TIMEOUT = 5000 };
 
 struct FigClnt {
     void* ctx;
-    void* sub;
     void* dealer;
+    void* sub;
     DbrMnem mnem;
     DbrIden id;
     DbrPool pool;
@@ -336,7 +336,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const char* trader,
+dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
                 DbrIden seed, DbrPool pool)
 {
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
@@ -345,32 +345,32 @@ dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const 
         goto fail1;
     }
 
-    void* sub = zmq_socket(ctx, ZMQ_SUB);
-    if (!sub) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail2;
-    }
-    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, "", 0);
-
-    if (zmq_connect(sub, sub_addr) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail3;
-    }
-
     void* dealer = zmq_socket(ctx, ZMQ_DEALER);
     if (!dealer) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail3;
+        goto fail2;
     }
     zmq_setsockopt(dealer, ZMQ_IDENTITY, trader, strnlen(trader, DBR_MNEM_MAX));
 
     if (zmq_connect(dealer, dealer_addr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+
+    void* sub = zmq_socket(ctx, ZMQ_SUB);
+    if (!sub) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+    zmq_setsockopt(sub, ZMQ_SUBSCRIBE, "", 0);
+
+    if (zmq_connect(sub, sub_addr) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;
     }
 
-    clnt->sub = sub;
     clnt->dealer = dealer;
+    clnt->sub = sub;
     strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
     clnt->pool = pool;
@@ -393,9 +393,9 @@ dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const 
  fail5:
     fig_cache_term(&clnt->cache);
  fail4:
-    zmq_close(dealer);
- fail3:
     zmq_close(sub);
+ fail3:
+    zmq_close(dealer);
  fail2:
     free(clnt);
  fail1:
@@ -411,8 +411,8 @@ dbr_clnt_destroy(DbrClnt clnt)
         free_views(&clnt->views, clnt->pool);
         dbr_prioq_term(&clnt->prioq);
         fig_cache_term(&clnt->cache);
-        zmq_close(clnt->dealer);
         zmq_close(clnt->sub);
+        zmq_close(clnt->dealer);
         free(clnt);
     }
 }
@@ -604,10 +604,10 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
 {
     zmq_pollitem_t items[] = {
         { NULL,         fd, events,     0 },
-        { clnt->sub,    0,  ZMQ_POLLIN, 0 },
-        { clnt->dealer, 0,  ZMQ_POLLIN, 0 }
+        { clnt->dealer, 0,  ZMQ_POLLIN, 0 },
+        { clnt->sub,    0,  ZMQ_POLLIN, 0 }
     };
-    enum { LOCAL_FD, SUB_SOCK, DEALER_SOCK };
+    enum { LOCAL_FD, DEALER_SOCK, SUB_SOCK };
 
     // TODO: min of ms and timer.
 
@@ -622,27 +622,6 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
     status->sub = status->dealer = status->num = 0;
     status->msg[0] = '\0';
 
-    if ((items[SUB_SOCK].revents & ZMQ_POLLIN)) {
-
-        struct DbrBody body;
-        if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
-            goto fail1;
-
-        switch ((status->sub = body.type)) {
-        case DBR_VIEW_LIST_REP:
-            for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
-                struct DbrView* view = dbr_shared_view_entry(node);
-                node = node->next;
-                // Transfer ownership.
-                enrich_view(&clnt->cache, view);
-                apply_viewup(clnt, view);
-            }
-            break;
-        default:
-            dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
-            goto fail1;
-        }
-    }
     if ((items[DEALER_SOCK].revents & ZMQ_POLLIN)) {
 
         struct DbrBody body;
@@ -701,6 +680,27 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
         case DBR_POSN_REP:
             enrich_posn(&clnt->cache, body.posn_rep.posn);
             apply_posnup(clnt, body.posn_rep.posn);
+            break;
+        default:
+            dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
+            goto fail1;
+        }
+    }
+    if ((items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+
+        struct DbrBody body;
+        if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
+            goto fail1;
+
+        switch ((status->sub = body.type)) {
+        case DBR_VIEW_LIST_REP:
+            for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
+                struct DbrView* view = dbr_shared_view_entry(node);
+                node = node->next;
+                // Transfer ownership.
+                enrich_view(&clnt->cache, view);
+                apply_viewup(clnt, view);
+            }
             break;
         default:
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);

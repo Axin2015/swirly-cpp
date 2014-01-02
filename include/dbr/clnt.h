@@ -74,7 +74,7 @@ struct DbrStatus {
 };
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* sub_addr, const char* dealer_addr, const char* trader,
+dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
                 DbrIden seed, DbrPool pool);
 
 // No-op if clnt is null.
