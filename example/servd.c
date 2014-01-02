@@ -135,10 +135,12 @@ send_bookup(DbrIden req_id)
     for (struct DbrRbNode* node = dbr_serv_first_bookup(serv);
          node != DBR_SERV_END_BOOKUP; node = dbr_rbnode_next(node)) {
         struct DbrBook* book = dbr_serv_bookup_entry(node);
+
         struct DbrView* view = dbr_pool_alloc_view(pool);
         if (!view)
             goto fail1;
         dbr_view_init(view);
+
         dbr_book_view(book, view);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }
@@ -347,10 +349,12 @@ sess_book(DbrIden req_id, DbrTrader trader)
     for (struct DbrRbNode* node = dbr_serv_first_book(serv);
          node != DBR_SERV_END_BOOK; node = dbr_rbnode_next(node)) {
         struct DbrBook* book = dbr_serv_book_entry(node);
+
         struct DbrView* view = dbr_pool_alloc_view(pool);
         if (!view)
             goto fail1;
         dbr_view_init(view);
+
         dbr_book_view(book, view);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }

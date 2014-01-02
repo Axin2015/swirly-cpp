@@ -51,6 +51,8 @@ read_trader(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     if (!rec)
         goto fail1;
+    dbr_rec_init(rec);
+
     if (!(buf = dbr_read_trader(buf, rec))) {
         dbr_pool_free_rec(pool, rec);
         goto fail1;
@@ -67,6 +69,8 @@ read_accnt(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     if (!rec)
         goto fail1;
+    dbr_rec_init(rec);
+
     if (!(buf = dbr_read_accnt(buf, rec))) {
         dbr_pool_free_rec(pool, rec);
         goto fail1;
@@ -83,6 +87,8 @@ read_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrRec* rec = dbr_pool_alloc_rec(pool);
     if (!rec)
         goto fail1;
+    dbr_rec_init(rec);
+
     if (!(buf = dbr_read_contr(buf, rec))) {
         dbr_pool_free_rec(pool, rec);
         goto fail1;
@@ -99,6 +105,8 @@ read_order(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrOrder* order = dbr_pool_alloc_order(pool);
     if (!order)
         goto fail1;
+    dbr_order_init(order);
+
     if (!(buf = dbr_read_order(buf, order))) {
         dbr_pool_free_order(pool, order);
         goto fail1;
@@ -115,6 +123,8 @@ read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrExec* exec = dbr_pool_alloc_exec(pool);
     if (!exec)
         goto fail1;
+    dbr_exec_init(exec);
+
     if (!(buf = dbr_read_exec(buf, exec))) {
         dbr_pool_free_exec(pool, exec);
         goto fail1;
@@ -132,6 +142,8 @@ read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
     if (!memb)
         goto fail1;
+    dbr_memb_init(memb);
+
     if (!(buf = dbr_read_memb(buf, memb))) {
         dbr_pool_free_memb(pool, memb);
         goto fail1;
@@ -148,6 +160,8 @@ read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrPosn* posn = dbr_pool_alloc_posn(pool);
     if (!posn)
         goto fail1;
+    dbr_posn_init(posn);
+
     if (!(buf = dbr_read_posn(buf, posn))) {
         dbr_pool_free_posn(pool, posn);
         goto fail1;
@@ -164,6 +178,8 @@ read_view(const char* buf, DbrPool pool, struct DbrQueue* queue)
     struct DbrView* view = dbr_pool_alloc_view(pool);
     if (!view)
         goto fail1;
+    dbr_view_init(view);
+
     if (!(buf = dbr_read_view(buf, view))) {
         dbr_pool_free_view(pool, view);
         goto fail1;
@@ -575,6 +591,8 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         body->exec_rep.exec = dbr_pool_alloc_exec(pool);
         if (!body->exec_rep.exec)
             goto fail1;
+        dbr_exec_init(body->exec_rep.exec);
+
         if (!(buf = dbr_read_exec(buf, body->exec_rep.exec))) {
             dbr_pool_free_exec(pool, body->exec_rep.exec);
             goto fail1;
@@ -585,6 +603,8 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         body->posn_rep.posn = dbr_pool_alloc_posn(pool);
         if (!body->posn_rep.posn)
             goto fail1;
+        dbr_posn_init(body->posn_rep.posn);
+
         if (!(buf = dbr_read_posn(buf, body->posn_rep.posn))) {
             dbr_pool_free_posn(pool, body->posn_rep.posn);
             goto fail1;
@@ -646,6 +666,8 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         body->insert_exec_req.exec = dbr_pool_alloc_exec(pool);
         if (!body->insert_exec_req.exec)
             goto fail1;
+        dbr_exec_init(body->exec_rep.exec);
+
         if (!(buf = dbr_read_exec(buf, body->insert_exec_req.exec))) {
             dbr_pool_free_exec(pool, body->insert_exec_req.exec);
             goto fail1;

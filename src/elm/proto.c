@@ -113,7 +113,6 @@ dbr_write_trader(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_trader(const char* buf, struct DbrRec* rec)
 {
-    dbr_rec_init(rec);
     rec->type = DBR_TRADER;
     rec->trader.state = NULL;
     return dbr_unpackf(buf, TRADER_FORMAT,
@@ -140,7 +139,6 @@ dbr_write_accnt(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_accnt(const char* buf, struct DbrRec* rec)
 {
-    dbr_rec_init(rec);
     rec->type = DBR_ACCNT;
     rec->accnt.state = NULL;
     return dbr_unpackf(buf, ACCNT_FORMAT,
@@ -173,7 +171,6 @@ dbr_write_contr(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
-    dbr_rec_init(rec);
     rec->type = DBR_CONTR;
     const char* end = dbr_unpackf(buf, CONTR_FORMAT,
                                   &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -236,7 +233,6 @@ dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 DBR_API const char*
 dbr_read_order(const char* buf, struct DbrOrder* order)
 {
-    dbr_order_init(order);
     return dbr_unpackf(buf, ORDER_FORMAT,
                        &order->id, &order->c.trader.id_only, &order->c.accnt.id_only,
                        &order->c.contr.id_only, &order->c.settl_date, DBR_REF_MAX,
@@ -295,7 +291,6 @@ dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
 DBR_API const char*
 dbr_read_exec(const char* buf, struct DbrExec* exec)
 {
-    dbr_exec_init(exec);
     return dbr_unpackf(buf, EXEC_FORMAT,
                        &exec->id, &exec->order, &exec->c.trader.id_only, &exec->c.accnt.id_only,
                        &exec->c.contr.id_only, &exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
@@ -335,7 +330,6 @@ dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 DBR_API const char*
 dbr_read_memb(const char* buf, struct DbrMemb* memb)
 {
-    dbr_memb_init(memb);
     return dbr_unpackf(buf, MEMB_FORMAT, &memb->trader.id_only, &memb->accnt.id_only);
 }
 
@@ -373,7 +367,6 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn)
 {
-    dbr_posn_init(posn);
     return dbr_unpackf(buf, POSN_FORMAT,
                        &posn->accnt.id_only, &posn->contr.id_only, &posn->settl_date,
                        &posn->buy_licks, &posn->buy_lots, &posn->sell_licks, &posn->sell_lots);
@@ -418,7 +411,6 @@ dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
 DBR_API const char*
 dbr_read_view(const char* buf, struct DbrView* view)
 {
-    dbr_view_init(view);
     return dbr_unpackf(buf, VIEW_FORMAT,
                        &view->contr.id_only, &view->settl_date,
                        &view->bid_ticks, &view->bid_lots, &view->bid_count,
