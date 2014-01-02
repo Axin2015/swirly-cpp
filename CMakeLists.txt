@@ -10,6 +10,8 @@ IF(NOT CMAKE_BUILD_TYPE)
   #SET(CMAKE_BUILD_TYPE MINSIZEREL)
 ENDIF()
 
+STRING(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
+
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -fstrict-aliasing -fvisibility=hidden")
   SET(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Werror -fstrict-aliasing -fvisibility=hidden")

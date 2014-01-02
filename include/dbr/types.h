@@ -218,6 +218,10 @@ enum DbrAction {
     DBR_SELL = -1
 };
 
+/**
+ * Fields common to both DbrOrder and DbrExec.
+ */
+
 struct DbrCommon {
     union DbrURec trader;
     union DbrURec accnt;
