@@ -380,8 +380,8 @@ public:
         // TODO: more robust logic.
         do {
             cout << '.';
-            DbrStatus status;
-            clnt_.poll(250, status);
+            DbrEvent event;
+            clnt_.poll(250, event);
         } while (!clnt_.ready());
         cout << endl;
     }
@@ -979,16 +979,18 @@ main(int argc, char* argv[])
         char buf[BUF_MAX];
         while (!repl.quit()) {
 
-            DbrStatus status;
-            clnt.poll(30000, status);
+            DbrEvent event;
+            clnt.poll(30000, event);
 
-            if (status.req_id > 0) {
-                cout << endl;
-                cout << "status: ";
-                if (status.num == 0)
+            cout << endl;
+            if (event.type == DBR_STATUS_REP) {
+                if (event.status_rep.num == 0)
                     cout << "ok\n";
                 else
-                    cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
+                    cout << dbr::strncpy(event.status_rep.msg, DBR_ERRMSG_MAX)
+                         << " (" << event.status_rep.num << ")\n";
+            } else if (event.type == DBR_EXEC_REP) {
+                cout << "exec: " << event.exec_rep.exec->id << endl;
             }
 
             if ((items[0].revents & ZMQ_POLLIN)) {

@@ -40,8 +40,8 @@ main(int argc, char* argv[])
         // TODO: more robust logic.
         do {
             cout << '.';
-            DbrStatus status;
-            clnt.poll(250, status);
+            DbrEvent event;
+            clnt.poll(250, event);
         } while (!clnt.ready());
         cout << endl;
 

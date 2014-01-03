@@ -34,25 +34,32 @@ typedef struct ElmPool* DbrPool;
 
 typedef struct FigClnt* DbrClnt;
 
-struct DbrStatus {
+struct DbrEvent {
     DbrIden req_id;
     /**
-     * Message type received on subscription socket.
-     * Valid values are either zero (none) or #DBR_VIEW_LIST_REP.
+     * Message type received.
      */
-    int sub;
-    /**
-     * Message type received on dealer socket.
-     */
-    int dealer;
-    /**
-     * If DbrStatus::dealer is #DBR_STATUS_REP, then this is set to the status number.
-     */
-    int num;
-    /**
-     * If DbrStatus::dealer is #DBR_STATUS_REP, then this is set to the status message.
-     */
-    char msg[DBR_ERRMSG_MAX];
+    int type;
+    union {
+        struct {
+            /**
+             * If DbrEvent::type is #DBR_STATUS_REP, then this is set to the status number.
+             */
+            int num;
+            /**
+             * If DbrEvent::type is #DBR_STATUS_REP, then this is set to the status message.
+             */
+            char msg[DBR_ERRMSG_MAX];
+        } status_rep;
+        struct {
+            /**
+             * If DbrEvent::type is #DBR_EXEC_REP, then this is set to the execution. The
+             * execution's reference count is not incremented, so dbr_exec_incref() must be used to
+             * extend the lifetime beyond the next call to dbr_clnt_clear().
+             */
+            struct DbrExec* exec;
+        } exec_rep;
+    };
 };
 
 DBR_API DbrClnt
@@ -147,7 +154,7 @@ DBR_API zmq_pollitem_t*
 dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems);
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event);
 
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);

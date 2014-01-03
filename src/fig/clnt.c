@@ -622,6 +622,7 @@ dbr_clnt_ready(DbrClnt clnt)
 DBR_API zmq_pollitem_t*
 dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 {
+    // The first two items are reserved for the dealer and sub sockets.
     zmq_pollitem_t* new_items = realloc(clnt->items, (2 + nitems) * sizeof(zmq_pollitem_t));
     if (!new_items) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
@@ -631,47 +632,66 @@ dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
     __builtin_memcpy(&new_items[2], items, nitems * sizeof(zmq_pollitem_t));
     clnt->items = new_items;
     clnt->nitems = 2 + nitems;
+    // Return pointer to third item, reserving the first two for internal use.
     return &new_items[2];
 }
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
 {
+    event->req_id = 0;
+    event->type = 0;
+
     // TODO: min of ms and timer.
 
-    // From the zmq_poll() man page:
+    // Implementation notes: events on the dealer socket take precedence over those on the sub
+    // socket. If events are triggered on both, then the event on the sub socket will be processed
+    // on the next call to dbr_clnt_poll(). Once an event has been processed, the revents member of
+    // zmq_pollitem_t is cleared. If revents is still set on entry to this function, then an event
+    // is assumed to be pending from a previous call.
 
-    // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
-    // indicate any requested events that have occurred by setting the bit corresponding to the
-    // event condition in the revents member.
+    int nevents;
+    if (!(clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
 
-    int nevents = zmq_poll(clnt->items, clnt->nitems, ms);
-    if (nevents < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail1;
+        // From the zmq_poll() man page:
+
+        // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
+        // indicate any requested events that have occurred by setting the bit corresponding to the
+        // event condition in the revents member.
+
+        nevents = zmq_poll(clnt->items, clnt->nitems, ms);
+        if (nevents < 0) {
+            dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
+            goto fail1;
+        }
+
+        if (nevents == 0)
+            return 0; // Timeout.
+
+    } else {
+
+        // Consume pending input event on the sub socket from previous call.
+
+        nevents = 1;
     }
 
-    status->req_id = 0;
-    status->sub = status->dealer = status->num = 0;
-    status->msg[0] = '\0';
-
-    if (nevents == 0)
-        return 0; // Timeout.
-
+    struct DbrBody body;
     if ((clnt->items[DEALER_SOCK].revents & ZMQ_POLLIN)) {
-        --nevents;
 
-        struct DbrBody body;
+        nevents -= (clnt->items[SUB_SOCK].revents & ZMQ_POLLIN) ? 2 : 1;
+        // Clear event once consumed.
+        clnt->items[DEALER_SOCK].revents &= ~ZMQ_POLLIN;
+
         if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
             goto fail1;
 
-        if ((status->req_id = body.req_id) > 0)
+        if ((event->req_id = body.req_id) > 0)
             dbr_prioq_clear(&clnt->prioq, body.req_id);
 
-        switch ((status->dealer = body.type)) {
+        switch ((event->type = body.type)) {
         case DBR_STATUS_REP:
-            status->num = body.status_rep.num;
-            strncpy(status->msg, body.status_rep.msg, DBR_ERRMSG_MAX);
+            event->status_rep.num = body.status_rep.num;
+            strncpy(event->status_rep.msg, body.status_rep.msg, DBR_ERRMSG_MAX);
             break;
         case DBR_TRADER_LIST_REP:
             emplace_rec_list(clnt, DBR_TRADER, body.entity_list_rep.first,
@@ -712,6 +732,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
                 apply_update(clnt, body.exec_rep.exec);
                 break;
             }
+            event->exec_rep.exec = body.exec_rep.exec;
             dbr_exec_decref(body.exec_rep.exec, clnt->pool);
             break;
         case DBR_POSN_REP:
@@ -722,15 +743,17 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
             goto fail1;
         }
-    }
-    if ((clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
-        --nevents;
 
-        struct DbrBody body;
+    } else if ((clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+
+        --nevents;
+        // Clear event once consumed.
+        clnt->items[SUB_SOCK].revents &= ~ZMQ_POLLIN;
+
         if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
             goto fail1;
 
-        switch ((status->sub = body.type)) {
+        switch ((event->type = body.type)) {
         case DBR_VIEW_LIST_REP:
             for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
                 struct DbrView* view = dbr_shared_view_entry(node);
