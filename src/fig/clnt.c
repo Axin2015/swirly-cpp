@@ -30,12 +30,10 @@
 #include <dbr/refcount.h>
 #include <dbr/util.h>
 
-#include <zmq.h>
-
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { TIMEOUT = 5000 };
+enum { DEALER_SOCK, SUB_SOCK, TIMEOUT = 5000 };
 
 struct FigClnt {
     void* ctx;
@@ -53,6 +51,8 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
+    zmq_pollitem_t* items;
+    int nitems;
 };
 
 static void
@@ -385,9 +385,28 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     dbr_tree_init(&clnt->viewups);
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
-    if (!logon(clnt))
+
+    clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
+    if (!clnt->items)
         goto fail6;
+
+    clnt->items[DEALER_SOCK].socket = dealer;
+    clnt->items[DEALER_SOCK].fd = 0;
+    clnt->items[DEALER_SOCK].events = ZMQ_POLLIN;
+    clnt->items[DEALER_SOCK].revents = 0;
+
+    clnt->items[SUB_SOCK].socket = sub;
+    clnt->items[SUB_SOCK].fd = 0;
+    clnt->items[SUB_SOCK].events = ZMQ_POLLIN;
+    clnt->items[SUB_SOCK].revents = 0;
+
+    clnt->nitems = 2;
+
+    if (!logon(clnt))
+        goto fail7;
     return clnt;
+ fail7:
+    free(clnt->items);
  fail6:
     dbr_prioq_term(&clnt->prioq);
  fail5:
@@ -409,6 +428,7 @@ dbr_clnt_destroy(DbrClnt clnt)
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
         free_views(&clnt->views, clnt->pool);
+        free(clnt->items);
         dbr_prioq_term(&clnt->prioq);
         fig_cache_term(&clnt->cache);
         zmq_close(clnt->sub);
@@ -599,30 +619,47 @@ dbr_clnt_ready(DbrClnt clnt)
     return clnt->pending == 0;
 }
 
-DBR_API int
-dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* status)
+DBR_API zmq_pollitem_t*
+dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 {
-    zmq_pollitem_t items[] = {
-        { NULL,         fd, events,     0 },
-        { clnt->dealer, 0,  ZMQ_POLLIN, 0 },
-        { clnt->sub,    0,  ZMQ_POLLIN, 0 }
-    };
-    enum { LOCAL_FD, DEALER_SOCK, SUB_SOCK };
+    zmq_pollitem_t* new_items = realloc(clnt->items, (2 + nitems) * sizeof(zmq_pollitem_t));
+    if (!new_items) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return NULL;
+    }
+    // Copy new items to tail.
+    __builtin_memcpy(&new_items[2], items, nitems * sizeof(zmq_pollitem_t));
+    clnt->items = new_items;
+    clnt->nitems = 2 + nitems;
+    return &new_items[2];
+}
 
+DBR_API int
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status)
+{
     // TODO: min of ms and timer.
 
-    const int nevents = zmq_poll(items, 3, ms);
+    // From the zmq_poll() man page:
+
+    // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
+    // indicate any requested events that have occurred by setting the bit corresponding to the
+    // event condition in the revents member.
+
+    int nevents = zmq_poll(clnt->items, clnt->nitems, ms);
     if (nevents < 0) {
         dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
 
     status->req_id = 0;
-    status->revents = items[LOCAL_FD].revents;
     status->sub = status->dealer = status->num = 0;
     status->msg[0] = '\0';
 
-    if ((items[DEALER_SOCK].revents & ZMQ_POLLIN)) {
+    if (nevents == 0)
+        return 0; // Timeout.
+
+    if ((clnt->items[DEALER_SOCK].revents & ZMQ_POLLIN)) {
+        --nevents;
 
         struct DbrBody body;
         if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
@@ -686,7 +723,8 @@ dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* 
             goto fail1;
         }
     }
-    if ((items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+    if ((clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+        --nevents;
 
         struct DbrBody body;
         if (!dbr_recv_body(clnt->sub, clnt->pool, &body))

@@ -21,6 +21,8 @@
 #include <dbr/defs.h>
 #include <dbr/types.h>
 
+#include <zmq.h>
+
 #include <stddef.h>
 
 typedef struct ElmPool* DbrPool;
@@ -32,28 +34,8 @@ typedef struct ElmPool* DbrPool;
 
 typedef struct FigClnt* DbrClnt;
 
-enum DbrEvent {
-    /**
-     * Data may be read without blocking.
-     */
-    DBR_POLLIN = 0x1,
-    /**
-     * Data may be written without blocking.
-     */
-    DBR_POLLOUT = 0x2,
-    /**
-     * An exceptional condition has occurred on the device or socket.
-     */
-    DBR_POLLERR = 0x4
-};
-
 struct DbrStatus {
     DbrIden req_id;
-    /**
-     * Events signalled on fd parameter passed to dbr_clnt_poll().
-     * @sa enum DbrEvent
-     */
-    int revents;
     /**
      * Message type received on subscription socket.
      * Valid values are either zero (none) or #DBR_VIEW_LIST_REP.
@@ -161,8 +143,11 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
 DBR_API DbrBool
 dbr_clnt_ready(DbrClnt clnt);
 
+DBR_API zmq_pollitem_t*
+dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems);
+
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, int fd, int events, DbrMillis ms, struct DbrStatus* status);
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrStatus* status);
 
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);

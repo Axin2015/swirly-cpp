@@ -38,9 +38,12 @@ main(int argc, char* argv[])
                   "WRAMIREZ", 1, pool);
 
         // TODO: more robust logic.
-        DbrStatus status;
-        while (clnt.poll(0, 0, 100, status))
-            ;
+        do {
+            cout << '.';
+            DbrStatus status;
+            clnt.poll(250, status);
+        } while (!clnt.ready());
+        cout << endl;
 
         cout << "traders:\n";
         for (auto rec : clnt.trecs()) {

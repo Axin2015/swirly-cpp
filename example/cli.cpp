@@ -381,7 +381,7 @@ public:
         do {
             cout << '.';
             DbrStatus status;
-            clnt_.poll(0, 0, 250, status);
+            clnt_.poll(250, status);
         } while (!clnt_.ready());
         cout << endl;
     }
@@ -969,15 +969,18 @@ main(int argc, char* argv[])
                     toks.clear();
                 }
             });
+
+        // Add stdin to descriptor set.
+        zmq_pollitem_t templ{ NULL, 0, ZMQ_POLLIN, 0 };
+        zmq_pollitem_t* items = clnt.setitems(&templ, 1);
+
         cout << "> ";
         cout.flush();
         char buf[BUF_MAX];
         while (!repl.quit()) {
 
             DbrStatus status;
-            const int nevents{clnt.poll(0, DBR_POLLIN, 30000, status)};
-            if (nevents == 0)
-                continue;
+            clnt.poll(30000, status);
 
             if (status.req_id > 0) {
                 cout << endl;
@@ -988,7 +991,7 @@ main(int argc, char* argv[])
                     cout << dbr::strncpy(status.msg, DBR_ERRMSG_MAX) << " (" << status.num << ")\n";
             }
 
-            if ((status.revents & DBR_POLLIN)) {
+            if ((items[0].revents & ZMQ_POLLIN)) {
 
                 const ssize_t n{::read(0, buf, sizeof(buf))};
                 if (n < 0)

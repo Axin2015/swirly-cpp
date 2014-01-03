@@ -890,10 +890,18 @@ public:
     {
         return dbr_clnt_ready(impl_) == DBR_TRUE;
     }
-    int
-    poll(int fd, int events, DbrMillis ms, DbrStatus& status)
+    zmq_pollitem_t*
+    setitems(zmq_pollitem_t* items, int nitems)
     {
-        const int nevents = dbr_clnt_poll(impl_, fd, events, ms, &status);
+        items = dbr_clnt_setitems(impl_, items, nitems);
+        if (!items)
+            throw_exception();
+        return items;
+    }
+    int
+    poll(DbrMillis ms, DbrStatus& status)
+    {
+        const int nevents = dbr_clnt_poll(impl_, ms, &status);
         if (nevents < 0)
             throw_exception();
         return nevents;
