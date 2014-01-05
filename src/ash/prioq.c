@@ -22,8 +22,6 @@
 #include <assert.h>
 #include <stdlib.h> // malloc()
 
-enum { INVAL = 0 };
-
 /*
     Heap invariant:
 
@@ -111,7 +109,7 @@ flush(struct DbrPrioq* pq)
     // While not empty.
     while (pq->size > 0) {
         // Done if top has valid id.
-        if (pq->elems[1].id != INVAL)
+        if (pq->elems[1].id > 0)
             break;
         // Fill gap with last.
         pq->elems[1] = pq->elems[pq->size--];
@@ -175,7 +173,7 @@ dbr_prioq_init(struct DbrPrioq* pq)
 DBR_API DbrBool
 dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
 {
-    assert(id != INVAL);
+    assert(id > 0);
     if (pq->size > 0) {
         // If top element matches then pop and flush.
         if (pq->elems[1].id == id) {
@@ -186,7 +184,7 @@ dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
         for (size_t i = 2; i <= pq->size; ++i)
             if (pq->elems[i].id == id) {
                 // Clear some element other than top.
-                pq->elems[i].id = INVAL;
+                pq->elems[i].id = 0;
                 return DBR_TRUE;
             }
     }
@@ -196,7 +194,7 @@ dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
 DBR_API DbrBool
 dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
 {
-    assert(id != INVAL);
+    assert(id > 0);
     if (pq->capacity <= pq->size && !grow(pq))
         return DBR_FALSE;
     // Push back.

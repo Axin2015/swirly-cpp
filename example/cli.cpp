@@ -385,10 +385,12 @@ public:
         } while (!clnt_.ready());
         cout << endl;
     }
-    void
+    bool
     flush()
     {
+        bool prompt{false};
         if (!clnt_.execs().empty()) {
+            prompt = true;
             cout << endl;
             cout <<
                 "|id   "
@@ -450,6 +452,7 @@ public:
             }
         }
         if (!clnt_.posnups().empty()) {
+            prompt = true;
             cout << endl;
             cout <<
                 "|crec      "
@@ -482,6 +485,7 @@ public:
             }
         }
         if (!clnt_.viewups().empty()) {
+            prompt = true;
             cout << endl;
             cout <<
                 "|bid_count "
@@ -522,6 +526,7 @@ public:
                 cout << '|' << endl;
             }
         }
+        return prompt;
     }
     void
     accnts(Arg begin, Arg end)
@@ -982,15 +987,25 @@ main(int argc, char* argv[])
             DbrEvent event;
             clnt.poll(30000, event);
 
-            cout << endl;
-            if (event.type == DBR_STATUS_REP) {
-                if (event.status_rep.num == 0)
-                    cout << "ok\n";
-                else
-                    cout << dbr::strncpy(event.status_rep.msg, DBR_ERRMSG_MAX)
-                         << " (" << event.status_rep.num << ")\n";
-            } else if (event.type == DBR_EXEC_REP) {
-                cout << "exec: " << event.exec_rep.exec->id << endl;
+            bool prompt{false};
+            if (event.type) {
+
+                if (event.type == DBR_STATUS_REP) {
+                    prompt = true;
+                    cout << endl;
+                    if (event.status_rep.num == 0)
+                        cout << "ok\n";
+                    else
+                        cout << dbr::strncpy(event.status_rep.msg, DBR_ERRMSG_MAX)
+                             << " (" << event.status_rep.num << ")\n";
+                } else if (event.type == DBR_EXEC_REP) {
+                    prompt = true;
+                    cout << endl;
+                    cout << "exec: " << event.exec_rep.exec->id << endl;
+                }
+                if (sess.flush())
+                    prompt = true;
+                clnt.clear();
             }
 
             if ((items[0].revents & ZMQ_POLLIN)) {
@@ -1004,16 +1019,17 @@ main(int argc, char* argv[])
                     break;
                 }
                 try {
+                    prompt = true;
                     lexer.exec(buf, n);
                 } catch (const exception& e) {
                     cerr << e.what() << endl;
                 }
             }
 
-            sess.flush();
-            clnt.clear();
-            cout << "> ";
-            cout.flush();
+            if (prompt) {
+                cout << "> ";
+                cout.flush();
+            }
         }
         return 0;
     } catch (const exception& e) {

@@ -33,7 +33,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK, TIMEOUT = 5000 };
+enum { DEALER_SOCK, SUB_SOCK, TIMEOUT = 1 };
 
 struct FigClnt {
     void* ctx;
@@ -652,6 +652,19 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
 
     int nevents;
     if (!(clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+
+        const DbrMillis now = dbr_millis();
+        const struct DbrPair* elem = dbr_prioq_top(&clnt->prioq);
+        if (elem) {
+            if (elem->key <= now) {
+                event->req_id = elem->id;
+                event->type = DBR_STATUS_REP;
+                event->status_rep.num = DBR_ETIMEOUT;
+                strncpy(event->status_rep.msg, "request timeout", DBR_ERRMSG_MAX);
+                dbr_prioq_pop(&clnt->prioq);
+                return 0;
+            }
+        }
 
         // From the zmq_poll() man page:
 
