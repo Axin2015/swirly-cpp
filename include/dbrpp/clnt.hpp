@@ -837,50 +837,50 @@ public:
     }
     DbrIden
     place(const char* accnt, const char* contr, DbrDate settl_date, const char* ref, int action,
-          DbrTicks ticks, DbrLots lots, DbrLots min_lots)
+          DbrTicks ticks, DbrLots lots, DbrLots min_lots, DbrMillis ms)
     {
         DbrIden req_id = dbr_clnt_place(impl_, accnt, contr, settl_date, ref, action, ticks,
-                                        lots, min_lots);
+                                        lots, min_lots, ms);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    revise(DbrIden id, DbrLots lots)
+    revise(DbrIden id, DbrLots lots, DbrMillis ms)
     {
-        DbrIden req_id = dbr_clnt_revise_id(impl_, id, lots);
+        DbrIden req_id = dbr_clnt_revise_id(impl_, id, lots, ms);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    revise(const char* ref, DbrLots lots)
+    revise(const char* ref, DbrLots lots, DbrMillis ms)
     {
-        DbrIden req_id = dbr_clnt_revise_ref(impl_, ref, lots);
+        DbrIden req_id = dbr_clnt_revise_ref(impl_, ref, lots, ms);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    cancel(DbrIden id)
+    cancel(DbrIden id, DbrMillis ms)
     {
-        DbrIden req_id = dbr_clnt_cancel_id(impl_, id);
+        DbrIden req_id = dbr_clnt_cancel_id(impl_, id, ms);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    cancel(const char* ref)
+    cancel(const char* ref, DbrMillis ms)
     {
-        DbrIden req_id = dbr_clnt_cancel_ref(impl_, ref);
+        DbrIden req_id = dbr_clnt_cancel_ref(impl_, ref, ms);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    ack_trade(DbrIden id)
+    ack_trade(DbrIden id, DbrMillis ms)
     {
-        DbrIden req_id = dbr_clnt_ack_trade(impl_, id);
+        DbrIden req_id = dbr_clnt_ack_trade(impl_, id, ms);
         if (req_id < 0)
             throw_exception();
         return req_id;

@@ -33,7 +33,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK, TIMEOUT = 1 };
+enum { DEALER_SOCK, SUB_SOCK };
 
 struct FigClnt {
     void* ctx;
@@ -335,6 +335,15 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
     insert_viewup(&clnt->viewups, view);
 }
 
+static void
+set_timeout(DbrIden req_id, struct DbrEvent* event)
+{
+    event->req_id = req_id;
+    event->type = DBR_STATUS_REP;
+    event->status_rep.num = DBR_ETIMEOUT;
+    strncpy(event->status_rep.msg, "request timeout", DBR_ERRMSG_MAX);
+}
+
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
                 DbrIden seed, DbrPool pool)
@@ -475,7 +484,8 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 
 DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
+               DbrMillis ms)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
@@ -492,7 +502,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     body.place_order_req.lots = lots;
     body.place_order_req.min_lots = min_lots;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
@@ -506,7 +516,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
+dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
@@ -514,7 +524,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
@@ -528,7 +538,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots)
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
+dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
@@ -536,7 +546,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
@@ -550,14 +560,14 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
+dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
     body.cancel_order_id_req.id = id;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
@@ -571,14 +581,14 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
+dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
@@ -592,14 +602,14 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref)
 }
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id)
+dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 {
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_ACK_TRADE_REQ;
     body.ack_trade_req.id = id;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + TIMEOUT, body.req_id))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
@@ -657,13 +667,11 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         const struct DbrPair* elem = dbr_prioq_top(&clnt->prioq);
         if (elem) {
             if (elem->key <= now) {
-                event->req_id = elem->id;
-                event->type = DBR_STATUS_REP;
-                event->status_rep.num = DBR_ETIMEOUT;
-                strncpy(event->status_rep.msg, "request timeout", DBR_ERRMSG_MAX);
+                set_timeout(elem->id, event);
                 dbr_prioq_pop(&clnt->prioq);
                 return 0;
             }
+            ms = dbr_min(ms, elem->key - now);
         }
 
         // From the zmq_poll() man page:
@@ -678,8 +686,16 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             goto fail1;
         }
 
-        if (nevents == 0)
-            return 0; // Timeout.
+        if (nevents == 0) {
+
+            // Timeout.
+
+            if (elem && elem->key <= dbr_millis()) {
+                set_timeout(elem->id, event);
+                dbr_prioq_pop(&clnt->prioq);
+            }
+            return 0;
+        }
 
     } else {
 

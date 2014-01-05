@@ -122,7 +122,8 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
 DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots);
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
+               DbrMillis ms);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:
@@ -131,21 +132,21 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 // 3. greater than original lots.
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots);
+dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots);
+dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id);
+dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref);
+dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id);
+dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms);
 
 DBR_API DbrBool
 dbr_clnt_ready(DbrClnt clnt);

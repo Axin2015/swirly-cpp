@@ -58,7 +58,7 @@ using namespace std::placeholders;
 
 namespace {
 
-enum { BUF_MAX = 128 };
+enum { BUF_MAX = 128, TIMEOUT = 5 };
 
 typedef int Arity;
 typedef vector<string>::const_iterator Arg;
@@ -554,7 +554,7 @@ public:
     {
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.ack_trade(id);
+            clnt_.ack_trade(id, TIMEOUT);
         }
     }
     void
@@ -612,7 +612,7 @@ public:
     {
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(id);
+            clnt_.cancel(id, TIMEOUT);
         }
     }
     void
@@ -757,7 +757,8 @@ public:
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        clnt_.place(arec_->mnem, crec_->mnem, settl_date_, nullptr, action, ticks, lots, 0);
+        clnt_.place(arec_->mnem, crec_->mnem, settl_date_, nullptr, action, ticks, lots, 0,
+                    TIMEOUT);
     }
     void
     posns(Arg begin, Arg end)
@@ -806,7 +807,7 @@ public:
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        clnt_.revise(id, lots);
+        clnt_.revise(id, lots, TIMEOUT);
     }
     void
     set(Arg begin, Arg end)
