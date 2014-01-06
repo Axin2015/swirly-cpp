@@ -24,6 +24,7 @@
 #include <dbr/clnt.h>
 #include <dbr/conv.h> // dbr_book_key()
 #include <dbr/err.h>
+#include <dbr/log.h>
 #include <dbr/msg.h>
 #include <dbr/prioq.h>
 #include <dbr/queue.h>
@@ -33,7 +34,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK };
+enum { DEALER_SOCK, SUB_SOCK, HBINT = 5000 };
 
 struct FigClnt {
     void* ctx;
@@ -51,6 +52,7 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
+    DbrIden hbid;
     zmq_pollitem_t* items;
     int nitems;
 };
@@ -395,6 +397,11 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
+    // Schedule initial heartbeat timer.
+    clnt->hbid = clnt->id++;
+    if (!dbr_prioq_push(&clnt->prioq, HBINT + dbr_millis(), clnt->hbid))
+        goto fail6;
+
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
         goto fail6;
@@ -629,6 +636,21 @@ dbr_clnt_ready(DbrClnt clnt)
     return clnt->pending == 0;
 }
 
+DBR_API DbrIden
+dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
+{
+    DbrIden id = clnt->id++;
+    if (!dbr_prioq_push(&clnt->prioq, absms, clnt->id++))
+        id = -1;
+    return id;
+}
+
+DBR_API void
+dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id)
+{
+    dbr_prioq_clear(&clnt->prioq, id);
+}
+
 DBR_API zmq_pollitem_t*
 dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 {
@@ -664,14 +686,28 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
     if (!(clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
 
         const DbrMillis now = dbr_millis();
-        const struct DbrPair* elem = dbr_prioq_top(&clnt->prioq);
-        if (elem) {
-            if (elem->key <= now) {
-                set_timeout(elem->id, event);
-                dbr_prioq_pop(&clnt->prioq);
+
+        const struct DbrPair* elem;
+        while ((elem = dbr_prioq_top(&clnt->prioq))) {
+            if (elem->key > now) {
+                // Millis until next timeout.
+                ms = dbr_min(ms, elem->key - now);
+                break;
+            }
+            // Timeout.
+            const DbrKey key = elem->key;
+            const DbrIden id = elem->id;
+            dbr_prioq_pop(&clnt->prioq);
+
+            if (id == clnt->hbid) {
+                if (!dbr_prioq_push(&clnt->prioq, key + HBINT, id))
+                    goto fail1;
+                dbr_log_info("heartbeat timeout");
+                // Next heartbeat may have already expired.
+            } else {
+                set_timeout(id, event);
                 return 0;
             }
-            ms = dbr_min(ms, elem->key - now);
         }
 
         // From the zmq_poll() man page:
@@ -690,9 +726,21 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
 
             // Timeout.
 
-            if (elem && elem->key <= dbr_millis()) {
-                set_timeout(elem->id, event);
+            while (elem && elem->key <= dbr_millis()) {
+                const DbrKey key = elem->key;
+                const DbrIden id = elem->id;
                 dbr_prioq_pop(&clnt->prioq);
+
+                if (id == clnt->hbid) {
+                    if (!dbr_prioq_push(&clnt->prioq, key + HBINT, id))
+                        goto fail1;
+                    dbr_log_info("heartbeat timeout");
+                    // Next heartbeat may have already expired.
+                    elem = dbr_prioq_top(&clnt->prioq);
+                } else {
+                    set_timeout(id, event);
+                    break;
+                }
             }
             return 0;
         }

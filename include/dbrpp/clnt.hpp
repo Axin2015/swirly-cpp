@@ -890,6 +890,19 @@ public:
     {
         return dbr_clnt_ready(impl_) == DBR_TRUE;
     }
+    DbrIden
+    settimer(DbrMillis absms)
+    {
+        const DbrIden id = dbr_clnt_settimer(impl_, absms);
+        if (id < 0)
+            throw_exception();
+        return id;
+    }
+    void
+    canceltimer(DbrIden id)
+    {
+        dbr_clnt_canceltimer(impl_, id);
+    }
     zmq_pollitem_t*
     setitems(zmq_pollitem_t* items, int nitems)
     {
