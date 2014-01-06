@@ -34,7 +34,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK, HBINT = 5000 };
+enum { DEALER_SOCK, SUB_SOCK, HBINT = 2000 };
 
 struct FigClnt {
     void* ctx;
@@ -151,6 +151,15 @@ static DbrIden
 logon(DbrClnt clnt)
 {
     struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_LOGON };
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
+        return -1;
+    return body.req_id;
+}
+
+static DbrIden
+heartbt(DbrClnt clnt)
+{
+    struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_HEARTBT };
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
@@ -702,7 +711,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             if (id == clnt->hbid) {
                 if (!dbr_prioq_push(&clnt->prioq, key + HBINT, id))
                     goto fail1;
-                dbr_log_info("heartbeat timeout");
+                if (!heartbt(clnt))
+                    goto fail1;
                 // Next heartbeat may have already expired.
             } else {
                 set_timeout(id, event);
@@ -734,7 +744,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 if (id == clnt->hbid) {
                     if (!dbr_prioq_push(&clnt->prioq, key + HBINT, id))
                         goto fail1;
-                    dbr_log_info("heartbeat timeout");
+                    if (!heartbt(clnt))
+                        goto fail1;
                     // Next heartbeat may have already expired.
                     elem = dbr_prioq_top(&clnt->prioq);
                 } else {
