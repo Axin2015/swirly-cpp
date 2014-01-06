@@ -374,8 +374,7 @@ sess_book(DbrIden req_id, DbrTrader trader)
 static DbrBool
 sess_logon(DbrIden req_id, DbrTrader trader)
 {
-    struct DbrBody rep = { .req_id = req_id, .type = DBR_STATUS_REP,
-                           .status_rep = { .num = 0, .msg = "" } };
+    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_LOGON };
     return dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_FALSE)
         && sess_trader(0, trader)
         && sess_accnt(0, trader)

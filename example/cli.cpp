@@ -58,7 +58,7 @@ using namespace std::placeholders;
 
 namespace {
 
-enum { BUF_MAX = 128, TIMEOUT = 5 };
+enum { BUF_MAX = 128, TIMEOUT = 5000 };
 
 typedef int Arity;
 typedef vector<string>::const_iterator Arg;

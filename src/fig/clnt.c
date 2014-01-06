@@ -150,7 +150,7 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
 static DbrIden
 logon(DbrClnt clnt)
 {
-    struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_LOGON };
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_LOGON };
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
@@ -159,7 +159,7 @@ logon(DbrClnt clnt)
 static DbrIden
 heartbt(DbrClnt clnt)
 {
-    struct DbrBody body = { .req_id = clnt->id++, body.type = DBR_SESS_HEARTBT };
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_HEARTBT };
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
@@ -777,6 +777,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             dbr_prioq_clear(&clnt->prioq, body.req_id);
 
         switch ((event->type = body.type)) {
+        case DBR_SESS_LOGON:
+            break;
         case DBR_STATUS_REP:
             event->status_rep.num = body.status_rep.num;
             strncpy(event->status_rep.msg, body.status_rep.msg, DBR_ERRMSG_MAX);
