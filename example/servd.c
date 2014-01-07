@@ -37,6 +37,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+enum { HBINT_IN = 2000 };
+
 static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
 static DbrServ serv = NULL;
@@ -374,7 +376,8 @@ sess_book(DbrIden req_id, DbrTrader trader)
 static DbrBool
 sess_logon(DbrIden req_id, DbrTrader trader)
 {
-    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_LOGON };
+    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_LOGON,
+                           .sess_logon = { .hbint = HBINT_IN } };
     return dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_FALSE)
         && sess_trader(0, trader)
         && sess_accnt(0, trader)

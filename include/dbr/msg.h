@@ -66,6 +66,10 @@ struct DbrBody {
     DbrIden req_id;
 	int type;
 	union {
+        // Session.
+        struct {
+            int hbint;
+        } sess_logon;
         // Reply.
         struct {
             int num;

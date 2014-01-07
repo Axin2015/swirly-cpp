@@ -34,7 +34,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK, HBINT = 2000 };
+enum { DEALER_SOCK, SUB_SOCK, HBINT_IN = 30000 };
 
 struct FigClnt {
     void* ctx;
@@ -52,6 +52,7 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
+    DbrMillis hbint_out;
     DbrIden hbid;
     zmq_pollitem_t* items;
     int nitems;
@@ -150,7 +151,8 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
 static DbrIden
 logon(DbrClnt clnt)
 {
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_LOGON };
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_LOGON,
+                            .sess_logon = { .hbint = HBINT_IN } };
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
@@ -408,10 +410,9 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
-    // Schedule initial heartbeat timer.
+    // The heartbeat is actually scheduled once we receive the logon response.
+    clnt->hbint_out = 0;
     clnt->hbid = clnt->id++;
-    if (!dbr_prioq_push(&clnt->prioq, HBINT + dbr_millis(), clnt->hbid))
-        goto fail6;
 
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
@@ -711,7 +712,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             dbr_prioq_pop(&clnt->prioq);
 
             if (id == clnt->hbid) {
-                if (!dbr_prioq_push(&clnt->prioq, key + HBINT, id))
+                if (!dbr_prioq_push(&clnt->prioq, key + clnt->hbint_out, id))
                     goto fail1;
                 if (!heartbt(clnt))
                     goto fail1;
@@ -744,7 +745,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 dbr_prioq_pop(&clnt->prioq);
 
                 if (id == clnt->hbid) {
-                    if (!dbr_prioq_push(&clnt->prioq, key + HBINT, id))
+                    if (!dbr_prioq_push(&clnt->prioq, key + clnt->hbint_out, id))
                         goto fail1;
                     if (!heartbt(clnt))
                         goto fail1;
@@ -780,6 +781,10 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
 
         switch ((event->type = body.type)) {
         case DBR_SESS_LOGON:
+            dbr_log_info("hbint: %d", body.sess_logon.hbint);
+            clnt->hbint_out = body.sess_logon.hbint;
+            if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + clnt->hbint_out, clnt->hbid))
+                goto fail1;
             break;
         case DBR_STATUS_REP:
             event->status_rep.num = body.status_rep.num;
