@@ -18,9 +18,7 @@
 #ifndef DBRPP_VIEW_HPP
 #define DBRPP_VIEW_HPP
 
-#include <dbrpp/types.hpp>
-
-#include <iostream>
+#include <dbrpp/rec.hpp>
 
 namespace dbr {
 
@@ -46,47 +44,59 @@ public:
     {
         return impl_;
     }
-    DbrTicks
-    bid_ticks() const noexcept
+    ContrRecRef
+    crec() const noexcept
     {
-        return impl_->bid_ticks;
+        return ContrRecRef{*impl_->contr.rec};
     }
-    DbrLots
-    bid_lots() const noexcept
+    DbrDate
+    settl_date() const noexcept
     {
-        return impl_->bid_lots;
-    }
-    size_t
-    bid_count() const noexcept
-    {
-        return impl_->bid_count;
+        return impl_->settl_date;
     }
     DbrTicks
-    ask_ticks() const noexcept
+    bid_ticks(size_t level) const noexcept
     {
-        return impl_->ask_ticks;
+        return impl_->bid_ticks[level];
     }
     DbrLots
-    ask_lots() const noexcept
+    bid_lots(size_t level) const noexcept
     {
-        return impl_->ask_lots;
+        return impl_->bid_lots[level];
     }
     size_t
-    ask_count() const noexcept
+    bid_count(size_t level) const noexcept
     {
-        return impl_->ask_count;
+        return impl_->bid_count[level];
+    }
+    DbrTicks
+    ask_ticks(size_t level) const noexcept
+    {
+        return impl_->ask_ticks[level];
+    }
+    DbrLots
+    ask_lots(size_t level) const noexcept
+    {
+        return impl_->ask_lots[level];
+    }
+    size_t
+    ask_count(size_t level) const noexcept
+    {
+        return impl_->ask_count[level];
     }
 };
 
 inline std::ostream&
 operator <<(std::ostream& os, ViewRef view)
 {
-    return os << "bid_ticks=" << view.bid_ticks()
-              << ",bid_lots=" << view.bid_lots()
-              << ",bid_count=" << view.bid_count()
-              << ",ask_ticks=" << view.ask_ticks()
-              << ",ask_lots=" << view.ask_lots()
-              << ",ask_count=" << view.ask_count();
+    return os << "crec=" << view.crec().mnem()
+              << ",settl_date=" << view.settl_date()
+              << ",bid_ticks=" << view.bid_ticks(0)
+              << ",bid_lots=" << view.bid_lots(0)
+              << ",bid_count=" << view.bid_count(0)
+              << ",ask_ticks=" << view.ask_ticks(0)
+              << ",ask_lots=" << view.ask_lots(0)
+              << ",ask_count=" << view.ask_count(0);
 }
 
 /** @} */

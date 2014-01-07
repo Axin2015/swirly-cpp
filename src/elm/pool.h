@@ -60,7 +60,6 @@ struct ElmSmallNode {
         struct DbrMatch match;
         struct DbrMemb memb;
         struct DbrPosn posn;
-        struct DbrView view;
     };
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -79,6 +78,7 @@ struct ElmLargeNode {
         struct DbrRec rec;
         struct DbrOrder order;
         struct DbrExec exec;
+        struct DbrView view;
     };
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -225,15 +225,15 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 static inline struct DbrView*
 elm_pool_alloc_view(struct ElmPool* pool)
 {
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool);
     return node ? &node->view : NULL;
 }
 
 static inline void
 elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
 {
-    struct ElmSmallNode* node = (struct ElmSmallNode*)view;
-    elm_pool_free_small(pool, node);
+    struct ElmLargeNode* node = (struct ElmLargeNode*)view;
+    elm_pool_free_large(pool, node);
 }
 
 #else  // defined(DBR_DEBUG_ALLOC)
@@ -359,7 +359,7 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 static inline struct DbrView*
 elm_pool_alloc_view_(struct ElmPool* pool, const char* file, int line)
 {
-    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating view %p in %s at %d", node, file, line);
     return node ? &node->view : NULL;
 }
@@ -367,9 +367,9 @@ elm_pool_alloc_view_(struct ElmPool* pool, const char* file, int line)
 static inline void
 elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
 {
-    struct ElmSmallNode* node = (struct ElmSmallNode*)view;
+    struct ElmLargeNode* node = (struct ElmLargeNode*)view;
     dbr_log_debug3("freeing view %p from %s at %d", node, node->file, node->line);
-    elm_pool_free_small(pool, node);
+    elm_pool_free_large(pool, node);
 }
 
 #define elm_pool_alloc_rec(pool)                    \

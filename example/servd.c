@@ -260,7 +260,7 @@ sess_order(DbrIden req_id, DbrTrader trader)
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
- }
+}
 
 static DbrBool
 sess_exec(DbrIden req_id, DbrTrader trader)

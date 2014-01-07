@@ -554,18 +554,19 @@ dbr_shared_posn_entry(struct DbrSlNode* node)
  */
 
 enum {
+    DBR_LEVEL_MAX = 3,
     DBR_VIEW   = 0x80
 };
 
 struct DbrView {
     union DbrURec contr;
     DbrDate settl_date;
-    DbrTicks bid_ticks;
-    DbrLots bid_lots;
-    size_t bid_count;
-    DbrTicks ask_ticks;
-    DbrLots ask_lots;
-    size_t ask_count;
+    DbrTicks bid_ticks[DBR_LEVEL_MAX];
+    DbrLots bid_lots[DBR_LEVEL_MAX];
+    size_t bid_count[DBR_LEVEL_MAX];
+    DbrTicks ask_ticks[DBR_LEVEL_MAX];
+    DbrLots ask_lots[DBR_LEVEL_MAX];
+    size_t ask_count[DBR_LEVEL_MAX];
     /**
      * @privatesection
      */

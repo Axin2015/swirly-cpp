@@ -333,12 +333,14 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
         assert(curr->contr.rec == view->contr.rec);
         assert(curr->settl_date == view->settl_date);
 
-        curr->bid_ticks = view->bid_ticks;
-        curr->bid_lots = view->bid_lots;
-        curr->bid_count = view->bid_count;
-        curr->ask_ticks = view->ask_ticks;
-        curr->ask_lots = view->ask_lots;
-        curr->ask_count = view->ask_count;
+        for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
+            curr->bid_ticks[i] = view->bid_ticks[i];
+            curr->bid_lots[i] = view->bid_lots[i];
+            curr->bid_count[i] = view->bid_count[i];
+            curr->ask_ticks[i] = view->ask_ticks[i];
+            curr->ask_lots[i] = view->ask_lots[i];
+            curr->ask_count[i] = view->ask_count[i];
+        }
 
         dbr_pool_free_view(clnt->pool, view);
         view = curr;

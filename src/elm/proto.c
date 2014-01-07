@@ -31,7 +31,7 @@ static const char ORDER_FORMAT[] = "llllisiilllllllll";
 static const char EXEC_FORMAT[] = "lllllisiillllllllill";
 static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
-static const char VIEW_FORMAT[] = "lillzllz";
+static const char VIEW_FORMAT[] = "lillzllzllzllzllzllz";
 
 DBR_API size_t
 dbr_rec_len(const struct DbrRec* rec)
@@ -379,13 +379,21 @@ dbr_view_len(const struct DbrView* view, DbrBool enriched)
     if (enriched) {
         n = dbr_packlenf(VIEW_FORMAT,
                          view->contr.rec->id, view->settl_date,
-                         view->bid_ticks, view->bid_lots, view->bid_count,
-                         view->ask_ticks, view->ask_lots, view->ask_count);
+                         view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
+                         view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
+                         view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
+                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
     } else {
         n = dbr_packlenf(VIEW_FORMAT,
                          view->contr.id_only, view->settl_date,
-                         view->bid_ticks, view->bid_lots, view->bid_count,
-                         view->ask_ticks, view->ask_lots, view->ask_count);
+                         view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
+                         view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
+                         view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
+                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
     }
     return n;
 }
@@ -396,14 +404,22 @@ dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
     if (enriched) {
         buf = dbr_packf(buf, VIEW_FORMAT,
                         view->contr.rec->id, view->settl_date,
-                        view->bid_ticks, view->bid_lots, view->bid_count,
-                        view->ask_ticks, view->ask_lots, view->ask_count);
+                        view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
+                        view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                        view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
+                        view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                        view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
+                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
 
     } else {
         buf = dbr_packf(buf, VIEW_FORMAT,
                         view->contr.id_only, view->settl_date,
-                        view->bid_ticks, view->bid_lots, view->bid_count,
-                        view->ask_ticks, view->ask_lots, view->ask_count);
+                        view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
+                        view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                        view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
+                        view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                        view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
+                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
     }
     return buf;
 }
@@ -413,6 +429,10 @@ dbr_read_view(const char* buf, struct DbrView* view)
 {
     return dbr_unpackf(buf, VIEW_FORMAT,
                        &view->contr.id_only, &view->settl_date,
-                       &view->bid_ticks, &view->bid_lots, &view->bid_count,
-                       &view->ask_ticks, &view->ask_lots, &view->ask_count);
+                       &view->bid_ticks[0], &view->bid_lots[0], &view->bid_count[0],
+                       &view->ask_ticks[0], &view->ask_lots[0], &view->ask_count[0],
+                       &view->bid_ticks[1], &view->bid_lots[1], &view->bid_count[1],
+                       &view->ask_ticks[1], &view->ask_lots[1], &view->ask_count[1],
+                       &view->bid_ticks[2], &view->bid_lots[2], &view->bid_count[2],
+                       &view->ask_ticks[2], &view->ask_lots[2], &view->ask_count[2]);
 }

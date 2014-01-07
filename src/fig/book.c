@@ -45,30 +45,36 @@ dbr_book_view(struct DbrBook* book, struct DbrView* view)
     view->contr.rec = book->crec;
     view->settl_date = book->settl_date;
 
-    struct DbrSide* side = &book->bid_side;
-    struct DbrRbNode* it = dbr_side_first_level(side);
-    if (it != DBR_SIDE_END_LEVEL) {
-        struct DbrLevel* level = dbr_side_level_entry(it);
-        view->bid_ticks = level->ticks;
-        view->bid_lots = level->lots;
-        view->bid_count = level->count;
-    } else {
-        view->bid_ticks = 0;
-        view->bid_lots = 0;
-        view->bid_count = 0;
+    struct DbrSide* bid_side = &book->bid_side;
+    struct DbrSide* ask_side = &book->ask_side;
+
+    struct DbrRbNode* bid_it = dbr_side_first_level(bid_side);
+    struct DbrRbNode* ask_it = dbr_side_first_level(ask_side);
+
+    for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
+        if (bid_it != DBR_SIDE_END_LEVEL) {
+            struct DbrLevel* level = dbr_side_level_entry(bid_it);
+            view->bid_ticks[i] = level->ticks;
+            view->bid_lots[i] = level->lots;
+            view->bid_count[i] = level->count;
+            bid_it = dbr_rbnode_next(bid_it);
+        } else {
+            view->bid_ticks[i] = 0;
+            view->bid_lots[i] = 0;
+            view->bid_count[i] = 0;
+        }
+        if (ask_it != DBR_SIDE_END_LEVEL) {
+            struct DbrLevel* level = dbr_side_level_entry(ask_it);
+            view->ask_ticks[i] = level->ticks;
+            view->ask_lots[i] = level->lots;
+            view->ask_count[i] = level->count;
+            ask_it = dbr_rbnode_next(ask_it);
+        } else {
+            view->ask_ticks[i] = 0;
+            view->ask_lots[i] = 0;
+            view->ask_count[i] = 0;
+        }
     }
 
-    side = &book->ask_side;
-    it = dbr_side_first_level(side);
-    if (it != DBR_SIDE_END_LEVEL) {
-        struct DbrLevel* level = dbr_side_level_entry(it);
-        view->ask_ticks = level->ticks;
-        view->ask_lots = level->lots;
-        view->ask_count = level->count;
-    } else {
-        view->ask_ticks = 0;
-        view->ask_lots = 0;
-        view->ask_count = 0;
-    }
     return view;
 }

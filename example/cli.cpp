@@ -488,6 +488,9 @@ public:
             prompt = true;
             cout << endl;
             cout <<
+                "|crec      "
+                "|settl_date"
+                "|level     "
                 "|bid_count "
                 "|bid_lots  "
                 "|bid_ticks "
@@ -502,28 +505,36 @@ public:
                 "+----------"
                 "+----------"
                 "+----------"
+                "+----------"
+                "+----------"
+                "+----------"
                 "|" << endl;
             for (auto view : clnt_.viewups()) {
                 ViewRef ref(view);
-                if (ref.bid_count() > 0) {
-                    cout << '|' << right << setw(10) << ref.bid_count()
-                         << '|' << right << setw(10) << ref.bid_lots()
-                         << '|' << right << setw(10) << ref.bid_ticks();
-                } else {
-                    cout << '|' << right << setw(10) << "- "
-                         << '|' << right << setw(10) << "- "
-                         << '|' << right << setw(10) << "- ";
+                for (size_t i{0}; i < DBR_LEVEL_MAX; ++i) {
+                    cout << '|' << left << setw(10) << ref.crec().mnem()
+                         << '|' << left << setw(10) << ref.settl_date()
+                         << '|' << right << setw(10) << (i + 1);
+                    if (ref.bid_count(i) > 0) {
+                        cout << '|' << right << setw(10) << ref.bid_count(i)
+                             << '|' << right << setw(10) << ref.bid_lots(i)
+                             << '|' << right << setw(10) << ref.bid_ticks(i);
+                    } else {
+                        cout << '|' << right << setw(10) << "- "
+                             << '|' << right << setw(10) << "- "
+                             << '|' << right << setw(10) << "- ";
+                    }
+                    if (ref.ask_count(i) > 0) {
+                        cout << '|' << right << setw(10) << ref.ask_ticks(i)
+                             << '|' << right << setw(10) << ref.ask_lots(i)
+                             << '|' << right << setw(10) << ref.ask_count(i);
+                    } else {
+                        cout << '|' << right << setw(10) << "- "
+                             << '|' << right << setw(10) << "- "
+                             << '|' << right << setw(10) << "- ";
+                    }
+                    cout << '|' << endl;
                 }
-                if (ref.ask_count() > 0) {
-                    cout << '|' << right << setw(10) << ref.ask_ticks()
-                         << '|' << right << setw(10) << ref.ask_lots()
-                         << '|' << right << setw(10) << ref.ask_count();
-                } else {
-                    cout << '|' << right << setw(10) << "- "
-                         << '|' << right << setw(10) << "- "
-                         << '|' << right << setw(10) << "- ";
-                }
-                cout << '|' << endl;
             }
         }
         return prompt;
@@ -566,6 +577,9 @@ public:
             throw InvalidState("settl_date");
 
         cout <<
+            "|crec      "
+            "|settl_date"
+            "|level     "
             "|bid_count "
             "|bid_lots  "
             "|bid_ticks "
@@ -580,6 +594,9 @@ public:
             "+----------"
             "+----------"
             "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
             "|" << endl;
 
         auto it = clnt_.views().find(crec_->id, settl_date_);
@@ -587,25 +604,30 @@ public:
             return;
 
         ViewRef ref(*it);
-        if (ref.bid_count() > 0) {
-            cout << '|' << right << setw(10) << ref.bid_count()
-                 << '|' << right << setw(10) << ref.bid_lots()
-                 << '|' << right << setw(10) << ref.bid_ticks();
-        } else {
-            cout << '|' << right << setw(10) << "- "
-                 << '|' << right << setw(10) << "- "
-                 << '|' << right << setw(10) << "- ";
+        for (size_t i{0}; i < DBR_LEVEL_MAX; ++i) {
+            cout << '|' << left << setw(10) << ref.crec().mnem()
+                 << '|' << left << setw(10) << ref.settl_date()
+                 << '|' << right << setw(10) << (i + 1);
+            if (ref.bid_count(i) > 0) {
+                cout << '|' << right << setw(10) << ref.bid_count(i)
+                     << '|' << right << setw(10) << ref.bid_lots(i)
+                     << '|' << right << setw(10) << ref.bid_ticks(i);
+            } else {
+                cout << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- ";
+            }
+            if (ref.ask_count(i) > 0) {
+                cout << '|' << right << setw(10) << ref.ask_ticks(i)
+                     << '|' << right << setw(10) << ref.ask_lots(i)
+                     << '|' << right << setw(10) << ref.ask_count(i);
+            } else {
+                cout << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- ";
+            }
+            cout << '|' << endl;
         }
-        if (ref.ask_count() > 0) {
-            cout << '|' << right << setw(10) << ref.ask_ticks()
-                 << '|' << right << setw(10) << ref.ask_lots()
-                 << '|' << right << setw(10) << ref.ask_count();
-        } else {
-            cout << '|' << right << setw(10) << "- "
-                 << '|' << right << setw(10) << "- "
-                 << '|' << right << setw(10) << "- ";
-        }
-        cout << '|' << endl;
     }
     void
     cancel(Arg begin, Arg end)
@@ -1002,7 +1024,7 @@ main(int argc, char* argv[])
                 } else if (event.type == DBR_EXEC_REP) {
                     prompt = true;
                     cout << endl;
-                    cout << "exec: " << event.exec_rep.exec->id << endl;
+                    cout << "ok\n";
                 }
                 if (sess.flush())
                     prompt = true;

@@ -135,6 +135,7 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
     dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
     dbr_log_debug2("sizeof DbrExec=%zu", sizeof(struct DbrExec));
+    dbr_log_debug2("sizeof DbrView=%zu", sizeof(struct DbrView));
 #endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
         goto fail1;
