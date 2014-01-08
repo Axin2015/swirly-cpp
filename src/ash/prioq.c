@@ -62,7 +62,7 @@ parent(size_t i)
 static inline void
 swap(struct DbrPrioq* pq, size_t i, size_t j)
 {
-    struct DbrPair tmp = pq->elems[i];
+    struct DbrElem tmp = pq->elems[i];
     pq->elems[i] = pq->elems[j];
     pq->elems[j] = tmp;
 }
@@ -125,7 +125,7 @@ grow(struct DbrPrioq* pq)
 {
     const size_t capacity = pq->capacity * 2;
     // One-based index.
-    struct DbrPair* elems = realloc(pq->elems, sizeof(struct DbrPair) * (1 + capacity));
+    struct DbrElem* elems = realloc(pq->elems, sizeof(struct DbrElem) * (1 + capacity));
     if (!elems) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return DBR_FALSE;
@@ -162,7 +162,7 @@ dbr_prioq_init(struct DbrPrioq* pq)
     // Initial capacity.
     pq->capacity = 64;
     // One-based index.
-    pq->elems = malloc(sizeof(struct DbrPair) * (1 + pq->capacity));
+    pq->elems = malloc(sizeof(struct DbrElem) * (1 + pq->capacity));
     if (!pq->elems) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return DBR_FALSE;

@@ -91,6 +91,7 @@ typedef BasicException<DBR_EINTR>    IntrException;
 typedef BasicException<DBR_EIO>      IoException;
 typedef BasicException<DBR_ENOMEM>   NoMemException;
 typedef BasicException<DBR_EACCES>   AccesException;
+typedef BasicException<DBR_EBUSY>    BusyException;
 typedef BasicException<DBR_EINVAL>   InvalException;
 typedef BasicException<DBR_ETIMEOUT> TimeoutException;
 
@@ -109,6 +110,9 @@ throw_exception(int num, const char* file, int line, const char* msg)
         break;
     case DBR_EACCES:
         throw AccesException{file, line, msg};
+        break;
+    case DBR_EBUSY:
+        throw BusyException{file, line, msg};
         break;
     case DBR_EINVAL:
         throw InvalException{file, line, msg};

@@ -27,11 +27,11 @@ TEST_CASE(prioq_rand)
     dbr_prioq_init(&pq);
 
     for (int i = 1; i <= 1024; ++i)
-        dbr_prioq_push(&pq, rand() % 1000, i);
+        check(dbr_prioq_push(&pq, rand() % 1000, i));
 
     long prev = 0;
 
-    const struct DbrPair* elem;
+    const struct DbrElem* elem;
     while ((elem = dbr_prioq_top(&pq))) {
         check(elem->key >= prev);
         prev = elem->key;

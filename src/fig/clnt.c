@@ -52,8 +52,9 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
-    DbrMillis hbint_out;
     DbrIden hbid;
+    DbrMillis hbint_out;
+    DbrMillis hbnext;
     zmq_pollitem_t* items;
     int nitems;
 };
@@ -350,8 +351,15 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
     insert_viewup(&clnt->viewups, view);
 }
 
+static inline DbrBool
+resethb(DbrClnt clnt)
+{
+    dbr_prioq_clear(&clnt->prioq, clnt->hbid);
+    return dbr_prioq_push(&clnt->prioq, clnt->hbnext, clnt->hbid);
+}
+
 static void
-set_timeout(DbrIden req_id, struct DbrEvent* event)
+settimeout(DbrIden req_id, struct DbrEvent* event)
 {
     event->req_id = req_id;
     event->type = DBR_STATUS_REP;
@@ -411,8 +419,9 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
         goto fail5;
 
     // The heartbeat is actually scheduled once we receive the logon response.
+    clnt->hbid = 0;
     clnt->hbint_out = 0;
-    clnt->hbid = clnt->id++;
+    clnt->hbnext = 0;
 
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
@@ -506,6 +515,10 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
                DbrMillis ms)
 {
+    if (clnt->pending != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_PLACE_ORDER_REQ;
@@ -524,10 +537,19 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
         goto fail1;
 
-    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
+    const DbrMillis hbsave = clnt->hbnext;
+    clnt->hbnext = dbr_millis() + clnt->hbint_out;
+    if (!resethb(clnt))
         goto fail2;
 
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
+        goto fail3;
+
     return body.req_id;
+ fail3:
+    clnt->hbnext = hbsave;
+    if (!resethb(clnt))
+        dbr_log_error("failed to restore heartbeat");
  fail2:
     dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
@@ -537,6 +559,10 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 DBR_API DbrIden
 dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
 {
+    if (clnt->pending != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_ID_REQ;
@@ -559,6 +585,10 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
 {
+    if (clnt->pending != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_REF_REQ;
@@ -581,6 +611,10 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
 {
+    if (clnt->pending != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
@@ -602,6 +636,10 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
 {
+    if (clnt->pending != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
@@ -623,6 +661,10 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 {
+    if (clnt->pending != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_ACK_TRADE_REQ;
@@ -652,7 +694,7 @@ DBR_API DbrIden
 dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
 {
     DbrIden id = clnt->id++;
-    if (!dbr_prioq_push(&clnt->prioq, absms, clnt->id++))
+    if (!dbr_prioq_push(&clnt->prioq, absms, id))
         id = -1;
     return id;
 }
@@ -699,7 +741,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
 
         const DbrMillis now = dbr_millis();
 
-        const struct DbrPair* elem;
+        const struct DbrElem* elem;
         while ((elem = dbr_prioq_top(&clnt->prioq))) {
             if (elem->key > now) {
                 // Millis until next timeout.
@@ -718,7 +760,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else {
-                set_timeout(id, event);
+                settimeout(id, event);
                 return 0;
             }
         }
@@ -752,7 +794,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                     // Next heartbeat may have already expired.
                     elem = dbr_prioq_top(&clnt->prioq);
                 } else {
-                    set_timeout(id, event);
+                    settimeout(id, event);
                     break;
                 }
             }
@@ -782,6 +824,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         switch ((event->type = body.type)) {
         case DBR_SESS_LOGON:
             dbr_log_info("hbint: %d", body.sess_logon.hbint);
+            clnt->hbid = clnt->id++;
             clnt->hbint_out = body.sess_logon.hbint;
             if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + clnt->hbint_out, clnt->hbid))
                 goto fail1;

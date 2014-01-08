@@ -37,7 +37,7 @@ enum DbrErrno {
      */
     DBR_EIO,
     /**
-     * Out of memory.
+     * Cannot allocate memory.
      */
     DBR_ENOMEM,
     /**
@@ -45,11 +45,15 @@ enum DbrErrno {
      */
     DBR_EACCES,
     /**
+     * Device/resource busy.
+     */
+    DBR_EBUSY,
+    /**
      * Invalid argument.
      */
     DBR_EINVAL,
     /**
-     * Timeout.
+     * Operation timed-out.
      */
     DBR_ETIMEOUT,
     /**

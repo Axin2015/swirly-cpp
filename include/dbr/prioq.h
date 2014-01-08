@@ -27,7 +27,7 @@
  * @{
  */
 
-struct DbrPair {
+struct DbrElem {
     DbrKey key;
     DbrIden id;
 };
@@ -35,7 +35,7 @@ struct DbrPair {
 struct DbrPrioq {
     size_t size;
     size_t capacity;
-    struct DbrPair* elems;
+    struct DbrElem* elems;
 };
 
 DBR_API void
@@ -49,13 +49,17 @@ dbr_prioq_init(struct DbrPrioq* pq);
 DBR_API DbrBool
 dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id);
 
+/**
+ * Push new element and return pointer to it.
+ */
+
 DBR_API DbrBool
 dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id);
 
 DBR_API void
 dbr_prioq_pop(struct DbrPrioq* pq);
 
-static inline const struct DbrPair*
+static inline const struct DbrElem*
 dbr_prioq_top(struct DbrPrioq* pq)
 {
     // Root has lowest value.
