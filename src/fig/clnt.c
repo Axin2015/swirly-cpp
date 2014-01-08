@@ -351,10 +351,12 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 }
 
 static inline void
-resethb(DbrClnt clnt, DbrMillis absms)
+resethb(DbrClnt clnt, DbrMillis ms, DbrIden req_id)
 {
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, req_id);
     dbr_prioq_clear(&clnt->prioq, clnt->hbid);
-    dbr_prioq_push(&clnt->prioq, absms, clnt->hbid);
+    dbr_prioq_push(&clnt->prioq, now + clnt->hbint_out, clnt->hbid);
 }
 
 static void
@@ -539,9 +541,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
-    resethb(clnt, now + clnt->hbint_out);
+    resethb(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -567,9 +567,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
-    resethb(clnt, now + clnt->hbint_out);
+    resethb(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -595,9 +593,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
-    resethb(clnt, now + clnt->hbint_out);
+    resethb(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -622,9 +618,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
-    resethb(clnt, now + clnt->hbint_out);
+    resethb(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -649,9 +643,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
-    resethb(clnt, now + clnt->hbint_out);
+    resethb(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -678,9 +670,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 
     fig_trader_remove_trade_id(clnt->trader, id);
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
-    resethb(clnt, now + clnt->hbint_out);
+    resethb(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;

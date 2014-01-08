@@ -139,9 +139,9 @@ static inline DbrBool
 reserve(struct DbrPrioq* pq, size_t capacity)
 {
     // If desired capacity is less than or equal to the current capacity, the return true, otherwise
-    // grow.
+    // grow by 50%.
     return capacity <= pq->capacity ? DBR_TRUE
-        : grow(pq, dbr_max(capacity, pq->capacity * 2));
+        : grow(pq, dbr_max(capacity, (pq->capacity * 3) / 2));
 }
 
 static void
