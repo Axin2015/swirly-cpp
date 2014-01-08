@@ -54,7 +54,6 @@ struct FigClnt {
     struct DbrPrioq prioq;
     DbrIden hbid;
     DbrMillis hbint_out;
-    DbrMillis hbnext;
     zmq_pollitem_t* items;
     int nitems;
 };
@@ -351,11 +350,11 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
     insert_viewup(&clnt->viewups, view);
 }
 
-static inline DbrBool
-resethb(DbrClnt clnt)
+static inline void
+resethb(DbrClnt clnt, DbrMillis absms)
 {
     dbr_prioq_clear(&clnt->prioq, clnt->hbid);
-    return dbr_prioq_push(&clnt->prioq, clnt->hbnext, clnt->hbid);
+    dbr_prioq_push(&clnt->prioq, absms, clnt->hbid);
 }
 
 static void
@@ -421,7 +420,6 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     // The heartbeat is actually scheduled once we receive the logon response.
     clnt->hbid = 0;
     clnt->hbint_out = 0;
-    clnt->hbnext = 0;
 
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
@@ -534,24 +532,17 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     body.place_order_req.lots = lots;
     body.place_order_req.min_lots = min_lots;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail1;
 
-    const DbrMillis hbsave = clnt->hbnext;
-    clnt->hbnext = dbr_millis() + clnt->hbint_out;
-    if (!resethb(clnt))
-        goto fail2;
-
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
-        goto fail3;
+        goto fail1;
 
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
+    resethb(clnt, now + clnt->hbint_out);
     return body.req_id;
- fail3:
-    clnt->hbnext = hbsave;
-    if (!resethb(clnt))
-        dbr_log_error("failed to restore heartbeat");
- fail2:
-    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -569,15 +560,17 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
-        goto fail2;
+        goto fail1;
 
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
+    resethb(clnt, now + clnt->hbint_out);
     return body.req_id;
- fail2:
-    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -595,15 +588,17 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
-        goto fail2;
+        goto fail1;
 
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
+    resethb(clnt, now + clnt->hbint_out);
     return body.req_id;
- fail2:
-    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -620,15 +615,17 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
     body.type = DBR_CANCEL_ORDER_ID_REQ;
     body.cancel_order_id_req.id = id;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
-        goto fail2;
+        goto fail1;
 
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
+    resethb(clnt, now + clnt->hbint_out);
     return body.req_id;
- fail2:
-    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -645,15 +642,17 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
     body.type = DBR_CANCEL_ORDER_REF_REQ;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
-        goto fail2;
+        goto fail1;
 
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
+    resethb(clnt, now + clnt->hbint_out);
     return body.req_id;
- fail2:
-    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }
@@ -670,16 +669,19 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
     body.type = DBR_ACK_TRADE_REQ;
     body.ack_trade_req.id = id;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + ms, body.req_id))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail1;
 
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
-        goto fail2;
+        goto fail1;
 
     fig_trader_remove_trade_id(clnt->trader, id);
+
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, now + ms, body.req_id);
+    resethb(clnt, now + clnt->hbint_out);
     return body.req_id;
- fail2:
-    dbr_prioq_clear(&clnt->prioq, body.req_id);
  fail1:
     return -1;
 }

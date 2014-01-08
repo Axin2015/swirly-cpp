@@ -49,6 +49,9 @@ dbr_prioq_init(struct DbrPrioq* pq);
 DBR_API DbrBool
 dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id);
 
+DBR_API DbrBool
+dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity);
+
 /**
  * Push new element and return pointer to it.
  */
@@ -64,6 +67,18 @@ dbr_prioq_top(struct DbrPrioq* pq)
 {
     // Root has lowest value.
     return pq->size > 0 ? &pq->elems[1] : NULL;
+}
+
+static inline size_t
+dbr_prioq_size(struct DbrPrioq* pq)
+{
+    return pq->size;
+}
+
+static inline size_t
+dbr_prioq_capacity(struct DbrPrioq* pq)
+{
+    return pq->capacity;
 }
 
 /** @} */

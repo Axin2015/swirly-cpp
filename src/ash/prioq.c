@@ -121,9 +121,8 @@ flush(struct DbrPrioq* pq)
 }
 
 static DbrBool
-grow(struct DbrPrioq* pq)
+grow(struct DbrPrioq* pq, size_t capacity)
 {
-    const size_t capacity = pq->capacity * 2;
     // One-based index.
     struct DbrElem* elems = realloc(pq->elems, sizeof(struct DbrElem) * (1 + capacity));
     if (!elems) {
@@ -134,6 +133,15 @@ grow(struct DbrPrioq* pq)
     pq->capacity = capacity;
     pq->elems = elems;
     return DBR_TRUE;
+}
+
+static inline DbrBool
+reserve(struct DbrPrioq* pq, size_t capacity)
+{
+    // If desired capacity is less than or equal to the current capacity, the return true, otherwise
+    // grow.
+    return capacity <= pq->capacity ? DBR_TRUE
+        : grow(pq, dbr_max(capacity, pq->capacity * 2));
 }
 
 static void
@@ -192,10 +200,16 @@ dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
 }
 
 DBR_API DbrBool
+dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity)
+{
+    return reserve(pq, capacity);
+}
+
+DBR_API DbrBool
 dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
 {
     assert(id > 0);
-    if (pq->capacity <= pq->size && !grow(pq))
+    if (!reserve(pq, pq->size + 1))
         return DBR_FALSE;
     // Push back.
     pq->elems[++pq->size].key = key;
