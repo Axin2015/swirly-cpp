@@ -44,11 +44,6 @@ dbr_prioq_term(struct DbrPrioq* pq);
 DBR_API DbrBool
 dbr_prioq_init(struct DbrPrioq* pq);
 
-// Clear existing id.
-
-DBR_API DbrBool
-dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id);
-
 DBR_API DbrBool
 dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity);
 
@@ -61,6 +56,9 @@ dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id);
 
 DBR_API void
 dbr_prioq_pop(struct DbrPrioq* pq);
+
+DBR_API DbrBool
+dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id);
 
 static inline const struct DbrElem*
 dbr_prioq_top(struct DbrPrioq* pq)

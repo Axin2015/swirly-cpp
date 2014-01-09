@@ -67,26 +67,24 @@ swap(struct DbrPrioq* pq, size_t i, size_t j)
     pq->elems[j] = tmp;
 }
 
-static void
-sift_up(struct DbrPrioq* pq)
+static size_t
+sift_up(struct DbrPrioq* pq, size_t c)
 {
-    // heap(1, n - 1)
-    size_t c, p;
+    size_t p;
     // While child is not root.
-    for (c = pq->size; c != 1; c = p) {
+    for (; c != 1; c = p) {
         p = parent(c);
         if (invariant(pq, c, p))
             break;
         // Restore invariant.
         swap(pq, c, p);
     }
-    // heap(1, n)
+    return c;
 }
 
-static void
+static size_t
 sift_down(struct DbrPrioq* pq, size_t p)
 {
-    // heap(p + 1, n)
     const size_t n = pq->size;
     size_t c;
     // While parent has child.
@@ -100,24 +98,7 @@ sift_down(struct DbrPrioq* pq, size_t p)
         // Restore invariant.
         swap(pq, c, p);
     }
-    // heap(p, n)
-}
-
-static void
-flush(struct DbrPrioq* pq)
-{
-    // While not empty.
-    while (pq->size > 0) {
-        // Done if top has valid id.
-        if (pq->elems[1].id > 0)
-            break;
-        // Fill gap with last.
-        pq->elems[1] = pq->elems[pq->size--];
-        // Restore invariant.
-        // heap(p + 1, n)
-        sift_down(pq, 1);
-        // heap(p, n)
-    }
+    return p;
 }
 
 static DbrBool
@@ -144,19 +125,6 @@ reserve(struct DbrPrioq* pq, size_t capacity)
         : grow(pq, dbr_max(capacity, (pq->capacity * 3) / 2));
 }
 
-static void
-remove(struct DbrPrioq* pq, size_t i)
-{
-    assert(pq->size > 0);
-    // Fill gap with last.
-    pq->elems[i] = pq->elems[pq->size--];
-    // Restore invariant.
-    // heap(p + 1, n)
-    sift_down(pq, i);
-    // heap(p, n)
-    flush(pq);
-}
-
 DBR_API void
 dbr_prioq_term(struct DbrPrioq* pq)
 {
@@ -179,27 +147,6 @@ dbr_prioq_init(struct DbrPrioq* pq)
 }
 
 DBR_API DbrBool
-dbr_prioq_clear(struct DbrPrioq* pq, DbrIden id)
-{
-    assert(id > 0);
-    if (pq->size > 0) {
-        // If top element matches then pop and flush.
-        if (pq->elems[1].id == id) {
-            pop(pq);
-            return DBR_TRUE;
-        }
-        // Linear search on remaining.
-        for (size_t i = 2; i <= pq->size; ++i)
-            if (pq->elems[i].id == id) {
-                // Clear some element other than top.
-                pq->elems[i].id = 0;
-                return DBR_TRUE;
-            }
-    }
-    return DBR_FALSE;
-}
-
-DBR_API DbrBool
 dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity)
 {
     return reserve(pq, capacity);
@@ -208,21 +155,39 @@ dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity)
 DBR_API DbrBool
 dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
 {
-    assert(id > 0);
     if (!reserve(pq, pq->size + 1))
         return DBR_FALSE;
     // Push back.
     pq->elems[++pq->size].key = key;
     pq->elems[pq->size].id = id;
     // Restore invariant.
-    // heap(1, n - 1)
-    sift_up(pq);
-    // heap(1, n)
+    sift_up(pq, pq->size);
     return DBR_TRUE;
 }
 
 DBR_API void
 dbr_prioq_pop(struct DbrPrioq* pq)
 {
-    pop(pq);
+    assert(pq->size > 0);
+    // Fill gap with last.
+    pq->elems[1] = pq->elems[pq->size--];
+    // Restore invariant.
+    sift_down(pq, 1);
+}
+
+DBR_API DbrBool
+dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
+{
+    // Linear search.
+    for (size_t i = 1; i <= pq->size; ++i)
+        if (pq->elems[i].id == id) {
+            // Fill gap with last.
+            pq->elems[i] = pq->elems[pq->size--];
+            // Restore invariant.
+            // Shift down if not shifted up.
+            if (sift_up(pq, i) == i)
+                sift_down(pq, i);
+            return DBR_TRUE;
+        }
+    return DBR_FALSE;
 }
