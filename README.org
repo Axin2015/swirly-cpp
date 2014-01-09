@@ -11,11 +11,11 @@
   facilitate trading between desks and reduce the cost of trading on external venues.
 
   Matching engines tend to follow a pre-defined set of rules and present mostly technical
-  challenges. Open-sourcing the technical parts of a trading platform allows businesses to focus on
-  their IP-sensitive pricing and trading algorithms.
+  challenges. Open-sourcing the mechanical parts of a trading platform allows the business to focus
+  on IP-sensitive pricing and trading algorithms.
 
   The goal of this project is to eventually host an educational trading platform that will allow
-  market-participants to experiment and compete in a risk-free environment.
+  market-participants to experiment and compete in an environment free of financial risk.
 
   The core libraries are written in C11, which are supplemented with C++11 wrappers for convenience.
 

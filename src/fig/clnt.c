@@ -34,7 +34,7 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK, HBINT_IN = 30000 };
+enum { DEALER_SOCK, SUB_SOCK, HBINT_IN = 2000, HBTIMEOUT_IN = (HBINT_IN * 3) / 2 };
 
 struct FigClnt {
     void* ctx;
@@ -52,7 +52,9 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
-    DbrIden hbid;
+    DbrIden hbid_in;
+    DbrIden hbid_out;
+    // The heartbeat interval requested by the server.
     DbrMillis hbint_out;
     zmq_pollitem_t* items;
     int nitems;
@@ -351,12 +353,20 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 }
 
 static inline void
-resethb(DbrClnt clnt, DbrMillis ms, DbrIden req_id)
+resethb_in(DbrClnt clnt)
+{
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_clear(&clnt->prioq, clnt->hbid_in);
+    dbr_prioq_push(&clnt->prioq, now + HBTIMEOUT_IN, clnt->hbid_in);
+}
+
+static inline void
+resethb_out(DbrClnt clnt, DbrMillis ms, DbrIden req_id)
 {
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, now + ms, req_id);
-    dbr_prioq_clear(&clnt->prioq, clnt->hbid);
-    dbr_prioq_push(&clnt->prioq, now + clnt->hbint_out, clnt->hbid);
+    dbr_prioq_clear(&clnt->prioq, clnt->hbid_out);
+    dbr_prioq_push(&clnt->prioq, now + clnt->hbint_out, clnt->hbid_out);
 }
 
 static void
@@ -419,9 +429,12 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
-    // The heartbeat is actually scheduled once we receive the logon response.
-    clnt->hbid = 0;
-    clnt->hbint_out = 0;
+    // The inbound heartbeat timeout timer is scheduled prior to sending our logon request.
+    clnt->hbid_in = clnt->id++;
+
+    // The outbound heartbeat timer is actually scheduled once the logon response has been received.
+    clnt->hbid_out = clnt->id++;
+    clnt->hbint_out = 0; // Pending hbint from server's logon message.
 
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
@@ -439,9 +452,14 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
 
     clnt->nitems = 2;
 
-    if (!logon(clnt))
+    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + HBTIMEOUT_IN, clnt->hbid_in))
         goto fail7;
+
+    if (!logon(clnt))
+        goto fail8;
     return clnt;
+ fail8:
+    dbr_prioq_clear(&clnt->prioq, clnt->hbid_in);
  fail7:
     free(clnt->items);
  fail6:
@@ -541,7 +559,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb(clnt, ms, body.req_id);
+    resethb_out(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -567,7 +585,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb(clnt, ms, body.req_id);
+    resethb_out(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -593,7 +611,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb(clnt, ms, body.req_id);
+    resethb_out(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -618,7 +636,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb(clnt, ms, body.req_id);
+    resethb_out(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -643,7 +661,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb(clnt, ms, body.req_id);
+    resethb_out(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -670,7 +688,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 
     fig_trader_remove_trade_id(clnt->trader, id);
 
-    resethb(clnt, ms, body.req_id);
+    resethb_out(clnt, ms, body.req_id);
     return body.req_id;
  fail1:
     return -1;
@@ -745,7 +763,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
 
-            if (id == clnt->hbid) {
+            if (id == clnt->hbid_out) {
                 if (!dbr_prioq_push(&clnt->prioq, key + clnt->hbint_out, id))
                     goto fail1;
                 if (!heartbt(clnt))
@@ -778,7 +796,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 const DbrIden id = elem->id;
                 dbr_prioq_pop(&clnt->prioq);
 
-                if (id == clnt->hbid) {
+                if (id == clnt->hbid_out) {
                     if (!dbr_prioq_push(&clnt->prioq, key + clnt->hbint_out, id))
                         goto fail1;
                     if (!heartbt(clnt))
@@ -816,9 +834,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         switch ((event->type = body.type)) {
         case DBR_SESS_LOGON:
             dbr_log_info("hbint: %d", body.sess_logon.hbint);
-            clnt->hbid = clnt->id++;
             clnt->hbint_out = body.sess_logon.hbint;
-            if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + clnt->hbint_out, clnt->hbid))
+            if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + clnt->hbint_out, clnt->hbid_out))
                 goto fail1;
             break;
         case DBR_STATUS_REP:

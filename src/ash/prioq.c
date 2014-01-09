@@ -84,13 +84,13 @@ sift_up(struct DbrPrioq* pq)
 }
 
 static void
-sift_down(struct DbrPrioq* pq)
+sift_down(struct DbrPrioq* pq, size_t p)
 {
-    // heap(2, n)
+    // heap(p + 1, n)
     const size_t n = pq->size;
-    size_t c, p;
+    size_t c;
     // While parent has child.
-    for (p = 1; (c = left_child(p)) && c <= n; p = c) {
+    for (; (c = left_child(p)) && c <= n; p = c) {
         // Use child with lower value.
         const size_t r = c + 1;
         if (r <= n && pq->elems[r].key < pq->elems[c].key)
@@ -100,7 +100,7 @@ sift_down(struct DbrPrioq* pq)
         // Restore invariant.
         swap(pq, c, p);
     }
-    // heap(1, n)
+    // heap(p, n)
 }
 
 static void
@@ -114,9 +114,9 @@ flush(struct DbrPrioq* pq)
         // Fill gap with last.
         pq->elems[1] = pq->elems[pq->size--];
         // Restore invariant.
-        // heap(2, n)
-        sift_down(pq);
-        // heap(1, n)
+        // heap(p + 1, n)
+        sift_down(pq, 1);
+        // heap(p, n)
     }
 }
 
@@ -145,15 +145,15 @@ reserve(struct DbrPrioq* pq, size_t capacity)
 }
 
 static void
-pop(struct DbrPrioq* pq)
+remove(struct DbrPrioq* pq, size_t i)
 {
     assert(pq->size > 0);
     // Fill gap with last.
-    pq->elems[1] = pq->elems[pq->size--];
+    pq->elems[i] = pq->elems[pq->size--];
     // Restore invariant.
-    // heap(2, n)
-    sift_down(pq);
-    // heap(1, n)
+    // heap(p + 1, n)
+    sift_down(pq, i);
+    // heap(p, n)
     flush(pq);
 }
 
