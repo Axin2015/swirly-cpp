@@ -37,6 +37,72 @@
      / \   / \
     7   4 6   5
 
+    Complete Example:
+
+    push 6:
+
+         6
+        / \
+      X     X
+     / \   / \
+    X   X X   X
+
+    push 4:
+
+         4
+        / \
+      6     X
+     / \   / \
+    X   X X   X
+
+    push 3:
+
+         3
+        / \
+      6     4
+     / \   / \
+    X   X X   X
+
+    push 5:
+
+         3
+        / \
+      5     4
+     / \   / \
+    6   X X   X
+
+    push 7:
+
+         3
+        / \
+      5     4
+     / \   / \
+    6   7 X   X
+
+    replace 5 with 8:
+
+         3
+        / \
+      6     4
+     / \   / \
+    8   7 X   X
+
+    replace 6 with 2:
+
+         2
+        / \
+      3     4
+     / \   / \
+    8   7 X   X
+
+    pop:
+
+         3
+        / \
+      7     4
+     / \   / \
+    8   X X   X
+
  */
 
 static inline DbrBool
@@ -178,8 +244,11 @@ dbr_prioq_pop(struct DbrPrioq* pq)
 DBR_API DbrBool
 dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
 {
-    // Linear search.
-    for (size_t i = 1; i <= pq->size; ++i)
+    if (pq->size == 0)
+        return DBR_FALSE;
+    // Linear search all except last.
+    size_t i;
+    for (i = 1; i < pq->size; ++i)
         if (pq->elems[i].id == id) {
             // Fill gap with last.
             pq->elems[i] = pq->elems[pq->size--];
@@ -189,6 +258,11 @@ dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
                 sift_down(pq, i);
             return DBR_TRUE;
         }
+    // Gap fill is not required when last is removed.
+    if (pq->elems[i].id == id) {
+        pq->size--;
+        return DBR_TRUE;
+    }
     return DBR_FALSE;
 }
 
