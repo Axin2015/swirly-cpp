@@ -158,8 +158,8 @@ dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
     if (!reserve(pq, pq->size + 1))
         return DBR_FALSE;
     // Push back.
-    pq->elems[++pq->size].key = key;
-    pq->elems[pq->size].id = id;
+    pq->elems[++pq->size].id = id;
+    pq->elems[pq->size].key = key;
     // Restore invariant.
     sift_up(pq, pq->size);
     return DBR_TRUE;

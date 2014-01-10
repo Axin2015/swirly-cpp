@@ -355,18 +355,15 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 static inline void
 resethb_in(DbrClnt clnt)
 {
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_remove(&clnt->prioq, clnt->hbid_in);
-    dbr_prioq_push(&clnt->prioq, now + HBTIMEOUT_IN, clnt->hbid_in);
+    dbr_prioq_replace(&clnt->prioq, clnt->hbid_in, dbr_millis() + HBTIMEOUT_IN);
 }
 
 static inline void
-resethb_out(DbrClnt clnt, DbrMillis ms, DbrIden req_id)
+resethb_out(DbrClnt clnt, DbrIden req_id, DbrMillis ms)
 {
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, now + ms, req_id);
-    dbr_prioq_remove(&clnt->prioq, clnt->hbid_out);
-    dbr_prioq_push(&clnt->prioq, now + clnt->hbint_out, clnt->hbid_out);
+    dbr_prioq_push(&clnt->prioq, req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, clnt->hbid_out, now + clnt->hbint_out);
 }
 
 static void
@@ -452,7 +449,7 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
 
     clnt->nitems = 2;
 
-    if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + HBTIMEOUT_IN, clnt->hbid_in))
+    if (!dbr_prioq_push(&clnt->prioq, clnt->hbid_in, dbr_millis() + HBTIMEOUT_IN))
         goto fail7;
 
     if (!logon(clnt))
@@ -559,7 +556,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb_out(clnt, ms, body.req_id);
+    resethb_out(clnt, body.req_id, ms);
     return body.req_id;
  fail1:
     return -1;
@@ -585,7 +582,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb_out(clnt, ms, body.req_id);
+    resethb_out(clnt, body.req_id, ms);
     return body.req_id;
  fail1:
     return -1;
@@ -611,7 +608,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb_out(clnt, ms, body.req_id);
+    resethb_out(clnt, body.req_id, ms);
     return body.req_id;
  fail1:
     return -1;
@@ -636,7 +633,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb_out(clnt, ms, body.req_id);
+    resethb_out(clnt, body.req_id, ms);
     return body.req_id;
  fail1:
     return -1;
@@ -661,7 +658,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resethb_out(clnt, ms, body.req_id);
+    resethb_out(clnt, body.req_id, ms);
     return body.req_id;
  fail1:
     return -1;
@@ -688,7 +685,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 
     fig_trader_remove_trade_id(clnt->trader, id);
 
-    resethb_out(clnt, ms, body.req_id);
+    resethb_out(clnt, body.req_id, ms);
     return body.req_id;
  fail1:
     return -1;
@@ -704,7 +701,7 @@ DBR_API DbrIden
 dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
 {
     DbrIden id = clnt->id++;
-    if (!dbr_prioq_push(&clnt->prioq, absms, id))
+    if (!dbr_prioq_push(&clnt->prioq, id, absms))
         id = -1;
     return id;
 }
@@ -764,7 +761,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             dbr_prioq_pop(&clnt->prioq);
 
             if (id == clnt->hbid_out) {
-                if (!dbr_prioq_push(&clnt->prioq, key + clnt->hbint_out, id))
+                if (!dbr_prioq_push(&clnt->prioq, id, key + clnt->hbint_out))
                     goto fail1;
                 if (!heartbt(clnt))
                     goto fail1;
@@ -797,7 +794,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 dbr_prioq_pop(&clnt->prioq);
 
                 if (id == clnt->hbid_out) {
-                    if (!dbr_prioq_push(&clnt->prioq, key + clnt->hbint_out, id))
+                    if (!dbr_prioq_push(&clnt->prioq, id, key + clnt->hbint_out))
                         goto fail1;
                     if (!heartbt(clnt))
                         goto fail1;
@@ -835,7 +832,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         case DBR_SESS_LOGON:
             dbr_log_info("hbint: %d", body.sess_logon.hbint);
             clnt->hbint_out = body.sess_logon.hbint;
-            if (!dbr_prioq_push(&clnt->prioq, dbr_millis() + clnt->hbint_out, clnt->hbid_out))
+            if (!dbr_prioq_push(&clnt->prioq, clnt->hbid_out, dbr_millis() + clnt->hbint_out))
                 goto fail1;
             break;
         case DBR_STATUS_REP:

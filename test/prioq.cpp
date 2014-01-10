@@ -27,7 +27,7 @@ TEST_CASE(prioq_push)
     dbr_prioq_init(&pq);
 
     for (int i = 1; i <= 4096; ++i)
-        check(dbr_prioq_push(&pq, rand() % 2048, i));
+        check(dbr_prioq_push(&pq, i, rand() % 2048));
 
     long prev = 0;
 
@@ -46,7 +46,7 @@ TEST_CASE(prioq_remove)
     dbr_prioq_init(&pq);
 
     for (int i = 1; i <= 4096; ++i)
-        check(dbr_prioq_push(&pq, rand() % 2048, i));
+        check(dbr_prioq_push(&pq, i, rand() % 2048));
 
     for (int i = 1; i <= 1024; ++i)
         dbr_prioq_remove(&pq, rand() % 2048);
@@ -68,10 +68,10 @@ TEST_CASE(prioq_replace)
     dbr_prioq_init(&pq);
 
     for (int i = 1; i <= 4096; ++i)
-        check(dbr_prioq_push(&pq, rand() % 2048, i));
+        check(dbr_prioq_push(&pq, i, rand() % 2048));
 
     for (int i = 1; i <= 1024; ++i)
-        dbr_prioq_replace(&pq, rand() % 2048, i);
+        dbr_prioq_replace(&pq, i, rand() % 2048);
 
     long prev = 0;
 
