@@ -60,6 +60,9 @@ dbr_prioq_pop(struct DbrPrioq* pq);
 DBR_API DbrBool
 dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id);
 
+DBR_API DbrBool
+dbr_prioq_replace(struct DbrPrioq* pq, DbrKey key, DbrIden id);
+
 static inline const struct DbrElem*
 dbr_prioq_top(struct DbrPrioq* pq)
 {

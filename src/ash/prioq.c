@@ -191,3 +191,20 @@ dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
         }
     return DBR_FALSE;
 }
+
+DBR_API DbrBool
+dbr_prioq_replace(struct DbrPrioq* pq, DbrKey key, DbrIden id)
+{
+    // Linear search.
+    for (size_t i = 1; i <= pq->size; ++i)
+        if (pq->elems[i].id == id) {
+            // Update key.
+            pq->elems[i].key = key;
+            // Restore invariant.
+            // Shift down if not shifted up.
+            if (sift_up(pq, i) == i)
+                sift_down(pq, i);
+            return DBR_TRUE;
+        }
+    return DBR_FALSE;
+}
