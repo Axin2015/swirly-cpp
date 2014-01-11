@@ -43,8 +43,9 @@ enum {
     // Negative timer ids are reserved for internal use.  The outbound heartbeat timer is actually
     // scheduled once the logon response has been received.
     CLNTID = -1,
-    // The inbound heartbeat timeout timer is scheduled prior to sending our logon request.
+    // The inbound heartbeat timeout timers are scheduled prior to sending the logon request.
     DEALERID = -2,
+    SUBID = -3,
 
     HBINT = 2000,
     HBTIMEOUT = (HBINT * 3) / 2
@@ -364,20 +365,6 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
     insert_viewup(&clnt->viewups, view);
 }
 
-static inline void
-resetdealer(DbrClnt clnt)
-{
-    dbr_prioq_replace(&clnt->prioq, DEALERID, dbr_millis() + HBTIMEOUT);
-}
-
-static inline void
-resetclnt(DbrClnt clnt, DbrIden req_id, DbrMillis ms)
-{
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
-}
-
 static void
 settimeout(DbrIden req_id, struct DbrEvent* event)
 {
@@ -456,14 +443,17 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
 
     clnt->nitems = 2;
 
-    if (!dbr_prioq_push(&clnt->prioq, DEALERID, dbr_millis() + HBTIMEOUT))
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail7;
 
     if (!logon(clnt))
-        goto fail8;
+        goto fail7;
+
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, DEALERID, now + HBTIMEOUT);
+    dbr_prioq_push(&clnt->prioq, SUBID, now + HBTIMEOUT);
     return clnt;
- fail8:
-    dbr_prioq_remove(&clnt->prioq, DEALERID);
  fail7:
     free(clnt->items);
  fail6:
@@ -563,7 +553,9 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resetclnt(clnt, body.req_id, ms);
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
     return body.req_id;
  fail1:
     return -1;
@@ -589,7 +581,9 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resetclnt(clnt, body.req_id, ms);
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
     return body.req_id;
  fail1:
     return -1;
@@ -615,7 +609,9 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resetclnt(clnt, body.req_id, ms);
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
     return body.req_id;
  fail1:
     return -1;
@@ -640,7 +636,9 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resetclnt(clnt, body.req_id, ms);
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
     return body.req_id;
  fail1:
     return -1;
@@ -665,7 +663,9 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    resetclnt(clnt, body.req_id, ms);
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
     return body.req_id;
  fail1:
     return -1;
@@ -692,7 +692,9 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 
     fig_trader_remove_trade_id(clnt->trader, id);
 
-    resetclnt(clnt, body.req_id, ms);
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
     return body.req_id;
  fail1:
     return -1;
@@ -767,16 +769,20 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
 
-            if (id == DEALERID) {
-                if (!dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT))
-                    goto fail1;
-                dbr_log_info("dealer timeout");
-            } else if (id == CLNTID) {
+            if (id == CLNTID) {
                 if (!dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint))
                     goto fail1;
                 if (!heartbt(clnt))
                     goto fail1;
                 // Next heartbeat may have already expired.
+            } else if (id == DEALERID) {
+                if (!dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT))
+                    goto fail1;
+                // TODO: dealer timeout.
+            } else if (id == SUBID) {
+                if (!dbr_prioq_push(&clnt->prioq, SUBID, key + HBTIMEOUT))
+                    goto fail1;
+                // TODO: sub timeout.
             } else {
                 settimeout(id, event);
                 return 0;
@@ -804,15 +810,19 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 const DbrIden id = elem->id;
                 dbr_prioq_pop(&clnt->prioq);
 
-                if (id == DEALERID) {
-                    if (!dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT))
-                        goto fail1;
-                    dbr_log_info("dealer timeout");
-                } else if (id == CLNTID) {
+                if (id == CLNTID) {
                     if (!dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint))
                         goto fail1;
                     if (!heartbt(clnt))
                         goto fail1;
+                } else if (id == DEALERID) {
+                    if (!dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT))
+                        goto fail1;
+                    dbr_log_info("dealer timeout");
+                } else if (id == SUBID) {
+                    if (!dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT))
+                        goto fail1;
+                    dbr_log_info("sub timeout");
                 } else {
                     settimeout(id, event);
                     break;
@@ -843,7 +853,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         if ((event->req_id = body.req_id) > 0)
             dbr_prioq_remove(&clnt->prioq, body.req_id);
 
-        resetdealer(clnt);
+        dbr_prioq_replace(&clnt->prioq, DEALERID, dbr_millis() + HBTIMEOUT);
         switch ((event->type = body.type)) {
         case DBR_SESS_LOGON:
             clnt->clntint = body.sess_logon.hbint;
