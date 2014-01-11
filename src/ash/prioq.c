@@ -219,7 +219,7 @@ dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity)
 }
 
 DBR_API DbrBool
-dbr_prioq_push(struct DbrPrioq* pq, DbrKey key, DbrIden id)
+dbr_prioq_push(struct DbrPrioq* pq, DbrIden id, DbrKey key)
 {
     if (!reserve(pq, pq->size + 1))
         return DBR_FALSE;
@@ -267,7 +267,7 @@ dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
 }
 
 DBR_API DbrBool
-dbr_prioq_replace(struct DbrPrioq* pq, DbrKey key, DbrIden id)
+dbr_prioq_replace(struct DbrPrioq* pq, DbrIden id, DbrKey key)
 {
     // Linear search.
     for (size_t i = 1; i <= pq->size; ++i)

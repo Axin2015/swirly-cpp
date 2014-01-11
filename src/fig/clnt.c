@@ -34,7 +34,21 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-enum { DEALER_SOCK, SUB_SOCK, HBINT = 2000, HBTIMEOUT = (HBINT * 3) / 2 };
+enum {
+    DEALER_SOCK,
+    SUB_SOCK
+};
+
+enum {
+    // Negative timer ids are reserved for internal use.  The outbound heartbeat timer is actually
+    // scheduled once the logon response has been received.
+    CLNTID = -1,
+    // The inbound heartbeat timeout timer is scheduled prior to sending our logon request.
+    DEALERID = -2,
+
+    HBINT = 2000,
+    HBTIMEOUT = (HBINT * 3) / 2
+};
 
 struct FigClnt {
     void* ctx;
@@ -52,8 +66,6 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
-    DbrIden dealerid;
-    DbrIden clntid;
     // The heartbeat interval requested by the server.
     DbrMillis clntint;
     zmq_pollitem_t* items;
@@ -355,7 +367,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 static inline void
 resetdealer(DbrClnt clnt)
 {
-    dbr_prioq_replace(&clnt->prioq, clnt->dealerid, dbr_millis() + HBTIMEOUT);
+    dbr_prioq_replace(&clnt->prioq, DEALERID, dbr_millis() + HBTIMEOUT);
 }
 
 static inline void
@@ -363,7 +375,7 @@ resetclnt(DbrClnt clnt, DbrIden req_id, DbrMillis ms)
 {
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, clnt->clntid, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
 }
 
 static void
@@ -426,11 +438,6 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
-    // The inbound heartbeat timeout timer is scheduled prior to sending our logon request.
-    clnt->dealerid = clnt->id++;
-
-    // The outbound heartbeat timer is actually scheduled once the logon response has been received.
-    clnt->clntid = clnt->id++;
     clnt->clntint = 0; // Pending hbint from server's logon message.
 
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
@@ -449,14 +456,14 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
 
     clnt->nitems = 2;
 
-    if (!dbr_prioq_push(&clnt->prioq, clnt->dealerid, dbr_millis() + HBTIMEOUT))
+    if (!dbr_prioq_push(&clnt->prioq, DEALERID, dbr_millis() + HBTIMEOUT))
         goto fail7;
 
     if (!logon(clnt))
         goto fail8;
     return clnt;
  fail8:
-    dbr_prioq_remove(&clnt->prioq, clnt->dealerid);
+    dbr_prioq_remove(&clnt->prioq, DEALERID);
  fail7:
     free(clnt->items);
  fail6:
@@ -760,7 +767,11 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
 
-            if (id == clnt->clntid) {
+            if (id == DEALERID) {
+                if (!dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT))
+                    goto fail1;
+                dbr_log_info("dealer timeout");
+            } else if (id == CLNTID) {
                 if (!dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint))
                     goto fail1;
                 if (!heartbt(clnt))
@@ -793,17 +804,21 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 const DbrIden id = elem->id;
                 dbr_prioq_pop(&clnt->prioq);
 
-                if (id == clnt->clntid) {
+                if (id == DEALERID) {
+                    if (!dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT))
+                        goto fail1;
+                    dbr_log_info("dealer timeout");
+                } else if (id == CLNTID) {
                     if (!dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint))
                         goto fail1;
                     if (!heartbt(clnt))
                         goto fail1;
-                    // Next heartbeat may have already expired.
-                    elem = dbr_prioq_top(&clnt->prioq);
                 } else {
                     settimeout(id, event);
                     break;
                 }
+                // Next heartbeat may have already expired.
+                elem = dbr_prioq_top(&clnt->prioq);
             }
             return 0;
         }
@@ -831,9 +846,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         resetdealer(clnt);
         switch ((event->type = body.type)) {
         case DBR_SESS_LOGON:
-            dbr_log_info("clntint: %d", body.sess_logon.hbint);
             clnt->clntint = body.sess_logon.hbint;
-            if (!dbr_prioq_push(&clnt->prioq, clnt->clntid, dbr_millis() + clnt->clntint))
+            if (!dbr_prioq_push(&clnt->prioq, CLNTID, dbr_millis() + clnt->clntint))
                 goto fail1;
             break;
         case DBR_STATUS_REP:
