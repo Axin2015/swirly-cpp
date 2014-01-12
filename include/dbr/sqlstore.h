@@ -33,7 +33,7 @@ typedef struct FirSqlStore* DbrSqlStore;
  *
  * @param path Path to the database.
  *
- * @param seed Seed identifier.
+ * @param seed Seed identifier. Must be positive.
  *
  * @return Handle to newly created model or null on failure.
  */

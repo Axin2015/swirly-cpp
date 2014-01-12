@@ -35,7 +35,7 @@ typedef struct ElmZmqStore* DbrZmqStore;
  *
  * @param addr Address of peer's endpoint.
  *
- * @param seed Seed identifier.
+ * @param seed Seed identifier. Must be positive.
  *
  * @param pool Pool.
  *

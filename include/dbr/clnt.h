@@ -62,6 +62,22 @@ struct DbrEvent {
     };
 };
 
+/**
+ * Create ZMQite3 model.
+ *
+ * @param ctx ZeroMQ context.
+ *
+ * @param dealer_addr Address of dealer endpoint.
+ *
+ * @param sub_addr Address of subscriber endpoint.
+ *
+ * @param trader Trader mnemonic.
+ *
+ * @param seed Seed identifier. Must be positive.
+ *
+ * @param pool Pool.
+ */
+
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
                 DbrIden seed, DbrPool pool);
