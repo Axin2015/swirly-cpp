@@ -18,8 +18,6 @@
 #include <dbr/zmqstore.h>
 
 #include <dbr/err.h>
-#include <dbr/journ.h>
-#include <dbr/model.h>
 #include <dbr/msg.h>
 #include <dbr/queue.h>
 

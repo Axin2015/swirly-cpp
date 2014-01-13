@@ -26,6 +26,10 @@
  * @{
  */
 
+typedef struct DbrIModel {
+    const struct DbrModelVtbl* vtbl;
+}* DbrModel;
+
 struct DbrModelVtbl {
     ssize_t
     (*read_entity)(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first);

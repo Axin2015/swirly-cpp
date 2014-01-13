@@ -18,6 +18,8 @@
 #ifndef DBR_ZMQSTORE_H
 #define DBR_ZMQSTORE_H
 
+#include <dbr/journ.h>
+#include <dbr/model.h>
 #include <dbr/pool.h>
 #include <dbr/types.h>
 

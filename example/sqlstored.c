@@ -18,9 +18,7 @@
 #define _XOPEN_SOURCE 700 // strnlen()
 
 #include <dbr/err.h>
-#include <dbr/journ.h>
 #include <dbr/log.h>
-#include <dbr/model.h>
 #include <dbr/msg.h>
 #include <dbr/refcount.h>
 #include <dbr/sqlstore.h>

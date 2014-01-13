@@ -20,7 +20,6 @@
 #include "accnt.h"
 
 #include <dbr/book.h>
-#include <dbr/journ.h>
 #include <dbr/queue.h>
 #include <dbr/refcount.h>
 

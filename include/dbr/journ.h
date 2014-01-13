@@ -25,6 +25,10 @@
  * @{
  */
 
+typedef struct DbrIJourn {
+    const struct DbrJournVtbl* vtbl;
+}* DbrJourn;
+
 struct DbrJournVtbl {
     DbrIden
     (*alloc_id)(DbrJourn journ);

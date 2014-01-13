@@ -18,6 +18,8 @@
 #ifndef DBR_SQLSTORE_H
 #define DBR_SQLSTORE_H
 
+#include <dbr/journ.h>
+#include <dbr/model.h>
 #include <dbr/pool.h>
 #include <dbr/types.h>
 

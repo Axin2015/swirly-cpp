@@ -19,6 +19,7 @@
 #define DBR_SERV_H
 
 #include <dbr/book.h>
+#include <dbr/journ.h>
 #include <dbr/model.h>
 #include <dbr/pool.h>
 

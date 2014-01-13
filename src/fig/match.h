@@ -20,6 +20,7 @@
 
 #include <dbr/book.h>
 #include <dbr/defs.h>
+#include <dbr/journ.h>
 #include <dbr/pool.h>
 #include <dbr/types.h>
 

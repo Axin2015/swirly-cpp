@@ -21,8 +21,6 @@
 #include "sqlite.h"
 
 #include <dbr/err.h>
-#include <dbr/journ.h>
-#include <dbr/model.h>
 
 #include <stdlib.h>
 

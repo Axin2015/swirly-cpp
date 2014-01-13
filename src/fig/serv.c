@@ -23,7 +23,6 @@
 
 #include <dbr/err.h>
 #include <dbr/serv.h>
-#include <dbr/journ.h>
 #include <dbr/queue.h>
 #include <dbr/util.h>
 

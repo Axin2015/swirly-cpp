@@ -191,17 +191,6 @@ dbr_shared_rec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup Model
- * @{
- */
-
-typedef struct DbrIModel {
-    const struct DbrModelVtbl* vtbl;
-}* DbrModel;
-
-/** @} */
-
-/**
  * @addtogroup Types
  * @{
  */
@@ -458,17 +447,6 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrMatch, trans_node_, node);
 }
-
-/** @} */
-
-/**
- * @addtogroup Journ
- * @{
- */
-
-typedef struct DbrIJourn {
-    const struct DbrJournVtbl* vtbl;
-}* DbrJourn;
 
 /** @} */
 

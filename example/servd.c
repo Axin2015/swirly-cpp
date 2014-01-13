@@ -20,7 +20,6 @@
 #include <dbr/accnt.h>
 #include <dbr/err.h>
 #include <dbr/serv.h>
-#include <dbr/journ.h>
 #include <dbr/log.h>
 #include <dbr/msg.h>
 #include <dbr/queue.h>
