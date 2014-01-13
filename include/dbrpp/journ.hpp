@@ -44,7 +44,7 @@ class IJourn : public DbrIJourn {
         return static_cast<DerivedT*>(journ)->insert_exec_list(first, enriched);
     }
     static DbrBool
-    insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched) noexcept
+    insert_exec(DbrJourn journ, DbrExec* exec, DbrBool enriched) noexcept
     {
         return static_cast<DerivedT*>(journ)->insert_exec(*exec, enriched);
     }

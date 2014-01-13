@@ -84,7 +84,7 @@ private:
     {
         DbrSlNode* node = first_;
         while (node) {
-            struct DbrRec* rec = dbr_shared_rec_entry(node);
+            DbrRec* rec = dbr_shared_rec_entry(node);
             node = node->next;
             dbr_pool_free_rec(pool_, rec);
         }
