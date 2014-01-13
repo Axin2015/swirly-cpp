@@ -25,21 +25,27 @@ namespace dbr {
 template <class DerivedT>
 class ISess : public DbrISess {
     static void
-    status_rep(DbrSess sess, DbrIden req_id, int num, const char* msg) noexcept
+    status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg) noexcept
     {
-        static_cast<DerivedT*>(sess)->status_rep(req_id, num, msg);
+        static_cast<DerivedT*>(sess)->status_handler(req_id, num, msg);
     }
     static void
-    exec_rep(DbrSess sess, DbrIden req_id, DbrExec* exec) noexcept
+    exec_handler(DbrSess sess, DbrIden req_id, DbrExec* exec) noexcept
     {
-        static_cast<DerivedT*>(sess)->exec_rep(req_id, *exec);
+        static_cast<DerivedT*>(sess)->exec_handler(req_id, *exec);
+    }
+    static void
+    timeout_handler(DbrSess sess, DbrIden req_id) noexcept
+    {
+        static_cast<DerivedT*>(sess)->timeout_handler(req_id);
     }
     static const DbrSessVtbl*
     vtbl() noexcept
     {
         static const DbrSessVtbl VTBL = {
-            status_rep,
-            exec_rep
+            status_handler,
+            exec_handler,
+            timeout_handler
         };
         return &VTBL;
     }
@@ -51,15 +57,21 @@ public:
 };
 
 inline void
-status_rep(DbrSess sess, DbrIden req_id, int num, const char* msg)
+status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg)
 {
-    sess->vtbl->status_rep(sess, req_id, num, msg);
+    sess->vtbl->status_handler(sess, req_id, num, msg);
 }
 
 inline void
-exec_rep(DbrSess sess, DbrIden req_id, DbrExec& exec)
+exec_handler(DbrSess sess, DbrIden req_id, DbrExec& exec)
 {
-    sess->vtbl->exec_rep(sess, req_id, &exec);
+    sess->vtbl->exec_handler(sess, req_id, &exec);
+}
+
+inline void
+timeout_handler(DbrSess sess, DbrIden req_id)
+{
+    sess->vtbl->timeout_handler(sess, req_id);
 }
 
 /** @} */

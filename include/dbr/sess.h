@@ -34,22 +34,36 @@ typedef struct DbrISess {
 struct DbrSessVtbl {
 
     void
-    (*status_rep)(DbrSess sess, DbrIden req_id, int num, const char* msg);
+    (*status_handler)(DbrSess sess, DbrIden req_id, int num, const char* msg);
 
     void
-    (*exec_rep)(DbrSess sess, DbrIden req_id, struct DbrExec* exec);
+    (*exec_handler)(DbrSess sess, DbrIden req_id, struct DbrExec* exec);
+
+    void
+    (*timeout_handler)(DbrSess sess, DbrIden req_id);
 };
 
 static inline void
-dbr_sess_status_rep(DbrSess sess, DbrIden req_id, int num, const char* msg)
+dbr_sess_status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg)
 {
-    sess->vtbl->status_rep(sess, req_id, num, msg);
+    sess->vtbl->status_handler(sess, req_id, num, msg);
+}
+
+/**
+ * The dbr_exec_incref() function can be used to extend the lifetime beyond the scope of the
+ * callback.
+ */
+
+static inline void
+dbr_sess_exec_handler(DbrSess sess, DbrIden req_id, struct DbrExec* exec)
+{
+    sess->vtbl->exec_handler(sess, req_id, exec);
 }
 
 static inline void
-dbr_sess_exec_rep(DbrSess sess, DbrIden req_id, struct DbrExec* exec)
+dbr_sess_timeout_handler(DbrSess sess, DbrIden req_id)
 {
-    sess->vtbl->exec_rep(sess, req_id, exec);
+    sess->vtbl->timeout_handler(sess, req_id);
 }
 
 /** @} */

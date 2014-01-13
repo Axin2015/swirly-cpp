@@ -17,6 +17,7 @@
  */
 #include <dbrpp/clnt.hpp>
 #include <dbrpp/pool.hpp>
+#include <dbrpp/sess.hpp>
 #include <dbrpp/zmqctx.hpp>
 
 #include <zmq.h>
@@ -25,6 +26,22 @@
 
 using namespace dbr;
 using namespace std;
+
+class Sess : public dbr::ISess<Sess> {
+public:
+    void
+    status_handler(DbrIden req_id, int num, const char* msg) noexcept
+    {
+    }
+    void
+    exec_handler(DbrIden req_id, DbrExec& exec) noexcept
+    {
+    }
+    void
+    timeout_handler(DbrIden req_id) noexcept
+    {
+    }
+};
 
 int
 main(int argc, char* argv[])
@@ -38,10 +55,10 @@ main(int argc, char* argv[])
                   "WRAMIREZ", 1, pool);
 
         // TODO: more robust logic.
+        Sess sess;
         do {
             cout << '.';
-            DbrEvent event;
-            clnt.poll(250, event);
+            clnt.poll(250, &sess);
         } while (!clnt.ready());
         cout << endl;
 

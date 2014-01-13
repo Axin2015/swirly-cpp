@@ -20,6 +20,7 @@
 #include <dbrpp/lexer.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
+#include <dbrpp/sess.hpp>
 #include <dbrpp/view.hpp>
 #include <dbrpp/zmqctx.hpp>
 
@@ -341,7 +342,7 @@ argc(Arg begin, Arg end)
     return distance(begin, end);
 }
 
-class Sess {
+class Sess : public ISess<Sess> {
     Clnt& clnt_;
     DbrRec* arec_;
     DbrRec* crec_;
@@ -349,6 +350,7 @@ class Sess {
     map<DbrIden, int> gtol_;
     map<int, DbrIden> ltog_;
     int id_;
+    bool prompt_;
     int
     gtol(DbrIden gid)
     {
@@ -375,22 +377,42 @@ public:
           arec_(nullptr),
           crec_(nullptr),
           settl_date_(0),
-          id_(1)
+          id_(1),
+          prompt_(false)
     {
         // TODO: more robust logic.
         do {
             cout << '.';
-            DbrEvent event;
-            clnt_.poll(250, event);
+            clnt_.poll(250, this);
         } while (!clnt_.ready());
         cout << endl;
     }
-    bool
+    void
+    status_handler(DbrIden req_id, int num, const char* msg) noexcept
+    {
+        prompt_ = true;
+        cout << endl;
+        if (num == 0)
+            cout << "ok\n";
+        else
+            cout << dbr::strncpy(msg, DBR_ERRMSG_MAX) << " (" << num << ")\n";
+    }
+    void
+    exec_handler(DbrIden req_id, DbrExec& exec) noexcept
+    {
+        prompt_ = true;
+        cout << endl;
+        cout << "ok\n";
+    }
+    void
+    timeout_handler(DbrIden req_id) noexcept
+    {
+    }
+    void
     flush()
     {
-        bool prompt{false};
         if (!clnt_.execs().empty()) {
-            prompt = true;
+            prompt_ = true;
             cout << endl;
             cout <<
                 "|id   "
@@ -452,7 +474,7 @@ public:
             }
         }
         if (!clnt_.posnups().empty()) {
-            prompt = true;
+            prompt_ = true;
             cout << endl;
             cout <<
                 "|crec      "
@@ -485,7 +507,7 @@ public:
             }
         }
         if (!clnt_.viewups().empty()) {
-            prompt = true;
+            prompt_ = true;
             cout << endl;
             cout <<
                 "|crec      "
@@ -537,7 +559,12 @@ public:
                 }
             }
         }
-        return prompt;
+        clnt_.clear();
+        if (prompt_) {
+            prompt_ = false;
+            cout << "> ";
+            cout.flush();
+        }
     }
     void
     accnts(Arg begin, Arg end)
@@ -941,6 +968,16 @@ public:
         } else
             throw InvalidArgument(name);
     }
+    void
+    set_prompt(bool prompt = true) noexcept
+    {
+        prompt_ = prompt;
+    }
+    bool
+    prompt() const noexcept
+    {
+        return prompt_;
+    }
 };
 }
 
@@ -1007,30 +1044,7 @@ main(int argc, char* argv[])
         char buf[BUF_MAX];
         while (!repl.quit()) {
 
-            DbrEvent event;
-            clnt.poll(30000, event);
-
-            bool prompt{false};
-            if (event.type) {
-
-                if (event.type == DBR_STATUS_REP) {
-                    prompt = true;
-                    cout << endl;
-                    if (event.status_rep.num == 0)
-                        cout << "ok\n";
-                    else
-                        cout << dbr::strncpy(event.status_rep.msg, DBR_ERRMSG_MAX)
-                             << " (" << event.status_rep.num << ")\n";
-                } else if (event.type == DBR_EXEC_REP) {
-                    prompt = true;
-                    cout << endl;
-                    cout << "ok\n";
-                }
-                if (sess.flush())
-                    prompt = true;
-                clnt.clear();
-            }
-
+            clnt.poll(30000, &sess);
             if ((items[0].revents & ZMQ_POLLIN)) {
 
                 const ssize_t n{::read(0, buf, sizeof(buf))};
@@ -1042,17 +1056,13 @@ main(int argc, char* argv[])
                     break;
                 }
                 try {
-                    prompt = true;
+                    sess.set_prompt(true);
                     lexer.exec(buf, n);
                 } catch (const exception& e) {
                     cerr << e.what() << endl;
                 }
             }
-
-            if (prompt) {
-                cout << "> ";
-                cout.flush();
-            }
+            sess.flush();
         }
         return 0;
     } catch (const exception& e) {

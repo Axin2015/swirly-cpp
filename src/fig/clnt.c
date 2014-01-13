@@ -367,15 +367,6 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
     insert_viewup(&clnt->viewups, view);
 }
 
-static void
-settimeout(DbrIden req_id, struct DbrEvent* event)
-{
-    event->req_id = req_id;
-    event->type = DBR_STATUS_REP;
-    event->status_rep.num = DBR_ETIMEOUT;
-    strncpy(event->status_rep.msg, "request timeout", DBR_ERRMSG_MAX);
-}
-
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
                 DbrIden seed, DbrPool pool)
@@ -741,11 +732,8 @@ dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 }
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
 {
-    event->req_id = 0;
-    event->type = 0;
-
     // TODO: min of ms and timer.
 
     // Implementation notes: events on the dealer socket take precedence over those on the sub
@@ -786,7 +774,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 dbr_prioq_push(&clnt->prioq, SUBID, key + HBTIMEOUT);
                 // TODO: sub timeout.
             } else {
-                settimeout(id, event);
+                dbr_sess_timeout_handler(sess, id);
                 return 0;
             }
         }
@@ -827,7 +815,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                     dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
                     dbr_log_info("sub timeout");
                 } else {
-                    settimeout(id, event);
+                    dbr_sess_timeout_handler(sess, id);
                     break;
                 }
                 // Next heartbeat may have already expired.
@@ -853,19 +841,18 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
         if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
             goto fail1;
 
-        if ((event->req_id = body.req_id) > 0)
+        if (body.req_id > 0)
             dbr_prioq_remove(&clnt->prioq, body.req_id);
 
         dbr_prioq_replace(&clnt->prioq, DEALERID, now + HBTIMEOUT);
-        switch ((event->type = body.type)) {
+        switch (body.type) {
         case DBR_SESS_LOGON:
             clnt->clntint = body.sess_logon.hbint;
             if (!dbr_prioq_push(&clnt->prioq, CLNTID, now + clnt->clntint))
                 goto fail1;
             break;
         case DBR_STATUS_REP:
-            event->status_rep.num = body.status_rep.num;
-            strncpy(event->status_rep.msg, body.status_rep.msg, DBR_ERRMSG_MAX);
+            dbr_sess_status_handler(sess, body.req_id, body.status_rep.num, body.status_rep.msg);
             break;
         case DBR_TRADER_LIST_REP:
             emplace_rec_list(clnt, DBR_TRADER, body.entity_list_rep.first,
@@ -906,8 +893,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
                 apply_update(clnt, body.exec_rep.exec);
                 break;
             }
-            event->exec_rep.exec = body.exec_rep.exec;
             dbr_exec_decref(body.exec_rep.exec, clnt->pool);
+            dbr_sess_exec_handler(sess, body.req_id, body.exec_rep.exec);
             break;
         case DBR_POSN_REP:
             enrich_posn(&clnt->cache, body.posn_rep.posn);
@@ -928,7 +915,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, struct DbrEvent* event)
             goto fail1;
 
         dbr_prioq_replace(&clnt->prioq, SUBID, now + HBTIMEOUT);
-        switch ((event->type = body.type)) {
+        switch (body.type) {
         case DBR_VIEW_LIST_REP:
             for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
                 struct DbrView* view = dbr_shared_view_entry(node);
