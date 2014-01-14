@@ -44,13 +44,25 @@ enum {
 enum {
     // Non-negative timer ids are reserved for internal use.  The outbound heartbeat timer is
     // scheduled once the logon response has been received along with the heartbeat interval.
-    CLNTID = 0,
+    CLNTID = -1,
     // The inbound heartbeat timeout timers are scheduled prior when the logon request is sent
     // during initialisation.
-    DEALERID = -DBR_CONN_EXEC,
-    SUBID = -DBR_CONN_MD,
-    HBINT = 2000,
-    HBTIMEOUT = (HBINT * 3) / 2
+    DEALERID = -2,
+    SUBID = -3,
+
+    HBINT = 10000,
+    HBTIMEOUT = (HBINT * 3) / 2,
+
+    TRADER_PENDING    = 0x001,
+    ACCNT_PENDING     = 0x002,
+    CONTR_PENDING     = 0x004,
+    ORDER_PENDING     = 0x008,
+    EXEC_PENDING      = 0x010,
+    MEMB_PENDING      = 0x020,
+    POSN_PENDING      = 0x040,
+    VIEW_PENDING      = 0x080,
+    EXEC_DOWN         = 0x100,
+    MD_DOWN           = 0x200
 };
 
 struct FigClnt {
@@ -60,7 +72,7 @@ struct FigClnt {
     DbrMnem mnem;
     DbrIden id;
     DbrPool pool;
-    int pending;
+    unsigned flags;
     DbrTrader trader;
     struct FigCache cache;
     struct FigIndex index;
@@ -203,11 +215,11 @@ set_trader(DbrClnt clnt)
 }
 
 static void
-emplace_rec_list(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
+emplace_rec_list(DbrClnt clnt, int type, unsigned flag, struct DbrSlNode* first, size_t count)
 {
     fig_cache_emplace_rec_list(&clnt->cache, type, first, count);
-    clnt->pending &= ~type;
-    if ((clnt->pending & (DBR_ENTITY_TRADER | DBR_ENTITY_ACCNT | DBR_ENTITY_CONTR)) == 0) {
+    clnt->flags &= ~flag;
+    if ((clnt->flags & (TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING)) == 0) {
         if (!set_trader(clnt))
             abort();
     }
@@ -221,7 +233,7 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
         // Transfer ownership.
         fig_trader_emplace_order(clnt->trader, order);
     }
-    clnt->pending &= ~DBR_ENTITY_ORDER;
+    clnt->flags &= ~ORDER_PENDING;
 }
 
 static void
@@ -234,7 +246,7 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
         fig_trader_insert_trade(clnt->trader, exec);
         dbr_exec_decref(exec, clnt->pool);
     }
-    clnt->pending &= ~DBR_ENTITY_EXEC;
+    clnt->flags &= ~EXEC_PENDING;
 }
 
 static void
@@ -248,7 +260,7 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         if (!accnt)
             abort();
     }
-    clnt->pending &= ~DBR_ENTITY_MEMB;
+    clnt->flags &= ~MEMB_PENDING;
 }
 
 static void
@@ -262,7 +274,7 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         assert(accnt);
         fig_accnt_emplace_posn(accnt, posn);
     }
-    clnt->pending &= ~DBR_ENTITY_POSN;
+    clnt->flags &= ~POSN_PENDING;
 }
 
 static void
@@ -273,7 +285,7 @@ emplace_view_list(DbrClnt clnt, struct DbrSlNode* first)
         dbr_tree_insert(&clnt->views, dbr_book_key(view->contr.rec->id, view->settl_date),
                         &view->clnt_node_);
     }
-    clnt->pending &= ~DBR_VIEW;
+    clnt->flags &= ~VIEW_PENDING;
 }
 
 static struct DbrOrder*
@@ -406,8 +418,8 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->pending = DBR_ENTITY_TRADER | DBR_ENTITY_ACCNT | DBR_ENTITY_CONTR | DBR_ENTITY_ORDER
-        | DBR_ENTITY_EXEC | DBR_ENTITY_MEMB | DBR_ENTITY_POSN | DBR_VIEW;
+    clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING | ORDER_PENDING
+        | EXEC_PENDING | MEMB_PENDING | POSN_PENDING | VIEW_PENDING | EXEC_DOWN /*| MD_DOWN*/;
     clnt->trader = NULL;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
@@ -520,7 +532,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
                DbrMillis ms)
 {
-    if (clnt->pending != 0) {
+    if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -557,7 +569,7 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
 DBR_API DbrIden
 dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
 {
-    if (clnt->pending != 0) {
+    if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -585,7 +597,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
 {
-    if (clnt->pending != 0) {
+    if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -613,7 +625,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
 {
-    if (clnt->pending != 0) {
+    if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -640,7 +652,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
 {
-    if (clnt->pending != 0) {
+    if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -667,7 +679,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 {
-    if (clnt->pending != 0) {
+    if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -696,7 +708,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
 DBR_API DbrBool
 dbr_clnt_ready(DbrClnt clnt)
 {
-    return clnt->pending == 0;
+    return clnt->flags == 0;
 }
 
 DBR_API DbrIden
@@ -757,11 +769,17 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
         } else if (id == DEALERID) {
             // Cannot fail due to pop.
             dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT);
-            dbr_sess_down_handler(sess, DBR_CONN_EXEC);
+            if (!(clnt->flags & EXEC_DOWN)) {
+                clnt->flags |= EXEC_DOWN;
+                dbr_sess_down_handler(sess, DBR_CONN_EXEC);
+            }
         } else if (id == SUBID) {
             // Cannot fail due to pop.
             dbr_prioq_push(&clnt->prioq, SUBID, key + HBTIMEOUT);
-            dbr_sess_down_handler(sess, DBR_CONN_MD);
+            if (!(clnt->flags & MD_DOWN)) {
+                clnt->flags |= MD_DOWN;
+                dbr_sess_down_handler(sess, DBR_CONN_MD);
+            }
         } else {
             // Assumed that these "top-half" handlers do not block.
             dbr_sess_timeout_handler(sess, id);
@@ -797,11 +815,17 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             } else if (id == DEALERID) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
-                dbr_sess_down_handler(sess, DBR_CONN_EXEC);
+                if (!(clnt->flags & EXEC_DOWN)) {
+                    clnt->flags |= EXEC_DOWN;
+                    dbr_sess_down_handler(sess, DBR_CONN_EXEC);
+                }
             } else if (id == SUBID) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
-                dbr_sess_down_handler(sess, DBR_CONN_MD);
+                if (!(clnt->flags & MD_DOWN)) {
+                    clnt->flags |= MD_DOWN;
+                    dbr_sess_down_handler(sess, DBR_CONN_MD);
+                }
             } else {
                 dbr_sess_timeout_handler(sess, id);
                 break;
@@ -823,6 +847,11 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             dbr_prioq_remove(&clnt->prioq, body.req_id);
 
         dbr_prioq_replace(&clnt->prioq, DEALERID, now + HBTIMEOUT);
+
+        if ((clnt->flags & EXEC_DOWN)) {
+            clnt->flags &= ~EXEC_DOWN;
+            dbr_sess_up_handler(sess, DBR_CONN_EXEC);
+        }
         switch (body.type) {
         case DBR_SESS_LOGON:
             clnt->clntint = body.sess_logon.hbint;
@@ -833,16 +862,16 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             dbr_sess_status_handler(sess, body.req_id, body.status_rep.num, body.status_rep.msg);
             break;
         case DBR_TRADER_LIST_REP:
-            emplace_rec_list(clnt, DBR_ENTITY_TRADER, body.entity_list_rep.first,
-                             body.entity_list_rep.count_);
+            emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_PENDING,
+                             body.entity_list_rep.first, body.entity_list_rep.count_);
             break;
         case DBR_ACCNT_LIST_REP:
-            emplace_rec_list(clnt, DBR_ENTITY_ACCNT, body.entity_list_rep.first,
-                             body.entity_list_rep.count_);
+            emplace_rec_list(clnt, DBR_ENTITY_ACCNT, ACCNT_PENDING,
+                             body.entity_list_rep.first, body.entity_list_rep.count_);
             break;
         case DBR_CONTR_LIST_REP:
-            emplace_rec_list(clnt, DBR_ENTITY_CONTR, body.entity_list_rep.first,
-                             body.entity_list_rep.count_);
+            emplace_rec_list(clnt, DBR_ENTITY_CONTR, CONTR_PENDING,
+                             body.entity_list_rep.first, body.entity_list_rep.count_);
             break;
         case DBR_ORDER_LIST_REP:
             emplace_order_list(clnt, body.entity_list_rep.first);
@@ -891,6 +920,11 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             goto fail1;
 
         dbr_prioq_replace(&clnt->prioq, SUBID, now + HBTIMEOUT);
+
+        if ((clnt->flags & MD_DOWN)) {
+            clnt->flags &= ~MD_DOWN;
+            dbr_sess_up_handler(sess, DBR_CONN_MD);
+        }
         switch (body.type) {
         case DBR_VIEW_LIST_REP:
             for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {

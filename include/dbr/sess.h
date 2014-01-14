@@ -28,8 +28,8 @@ struct DbrExec;
  */
 
 enum DbrConn {
-    DBR_CONN_EXEC = 0x01,
-    DBR_CONN_MD   = 0x02
+    DBR_CONN_EXEC = 1,
+    DBR_CONN_MD
 };
 
 typedef struct DbrISess {

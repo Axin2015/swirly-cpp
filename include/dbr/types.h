@@ -58,13 +58,13 @@ typedef DbrIncs DbrTicks;
 typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
-    DBR_ENTITY_TRADER = 0x01,
-    DBR_ENTITY_ACCNT  = 0x02,
-    DBR_ENTITY_CONTR  = 0x04,
-    DBR_ENTITY_ORDER  = 0x08,
-    DBR_ENTITY_EXEC   = 0x10,
-    DBR_ENTITY_MEMB   = 0x20,
-    DBR_ENTITY_POSN   = 0x40
+    DBR_ENTITY_TRADER = 1,
+    DBR_ENTITY_ACCNT,
+    DBR_ENTITY_CONTR,
+    DBR_ENTITY_ORDER,
+    DBR_ENTITY_EXEC,
+    DBR_ENTITY_MEMB,
+    DBR_ENTITY_POSN
 };
 
 /** @} */
@@ -532,8 +532,7 @@ dbr_shared_posn_entry(struct DbrSlNode* node)
  */
 
 enum {
-    DBR_LEVEL_MAX = 3,
-    DBR_VIEW   = 0x80
+    DBR_LEVEL_MAX = 3
 };
 
 struct DbrView {
