@@ -29,39 +29,39 @@
 
 typedef void (*DbrLogger)(int, const char*, va_list);
 
-enum DbrLogLevel {
+enum DbrLog {
     /**
      * Critical.
      */
-    DBR_CRIT,
+    DBR_LOG_CRIT,
     /**
      * Error.
      */
-    DBR_ERROR,
+    DBR_LOG_ERROR,
     /**
      * Warning.
      */
-    DBR_WARN,
+    DBR_LOG_WARN,
     /**
      * Notice.
      */
-    DBR_NOTICE,
+    DBR_LOG_NOTICE,
     /**
      * Information.
      */
-    DBR_INFO,
+    DBR_LOG_INFO,
     /**
      * Debug level 1.
      */
-    DBR_DEBUG1,
+    DBR_LOG_DEBUG1,
     /**
      * Debug level 2.
      */
-    DBR_DEBUG2,
+    DBR_LOG_DEBUG2,
     /**
      * Debug level 3.
      */
-    DBR_DEBUG3
+    DBR_LOG_DEBUG3
 };
 
 DBR_API DbrLogger
@@ -74,33 +74,33 @@ DBR_API void
 dbr_log_vprintf(int level, const char* format, va_list args);
 
 #define dbr_log_crit(format, ...)                       \
-    dbr_log_printf(DBR_CRIT, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_CRIT, format, ##__VA_ARGS__)
 #define dbr_log_error(format, ...)                      \
-    dbr_log_printf(DBR_ERROR, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_ERROR, format, ##__VA_ARGS__)
 #define dbr_log_warn(format, ...)                       \
-    dbr_log_printf(DBR_WARN, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_WARN, format, ##__VA_ARGS__)
 #define dbr_log_notice(format, ...)                     \
-    dbr_log_printf(DBR_NOTICE, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_NOTICE, format, ##__VA_ARGS__)
 #define dbr_log_info(format, ...)                       \
-    dbr_log_printf(DBR_INFO, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_INFO, format, ##__VA_ARGS__)
 
 #if DBR_DEBUG_LEVEL >= 1
 #define dbr_log_debug1(format, ...)                     \
-    dbr_log_printf(DBR_DEBUG1, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_DEBUG1, format, ##__VA_ARGS__)
 #else  // DBR_DEBUG_LEVEL < 1
 #define dbr_log_debug1(format, ...)
 #endif // DBR_DEBUG_LEVEL < 1
 
 #if DBR_DEBUG_LEVEL >= 2
 #define dbr_log_debug2(format, ...)                     \
-    dbr_log_printf(DBR_DEBUG2, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_DEBUG2, format, ##__VA_ARGS__)
 #else  // DBR_DEBUG_LEVEL < 2
 #define dbr_log_debug2(format, ...)
 #endif // DBR_DEBUG_LEVEL < 2
 
 #if DBR_DEBUG_LEVEL >= 3
 #define dbr_log_debug3(format, ...)                     \
-    dbr_log_printf(DBR_DEBUG3, format, ##__VA_ARGS__)
+    dbr_log_printf(DBR_LOG_DEBUG3, format, ##__VA_ARGS__)
 #else  // DBR_DEBUG_LEVEL < 3
 #define dbr_log_debug3(format, ...)
 #endif // DBR_DEBUG_LEVEL < 3
