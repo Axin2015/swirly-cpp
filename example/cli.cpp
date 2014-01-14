@@ -388,6 +388,20 @@ public:
         cout << endl;
     }
     void
+    up_handler(int conn) noexcept
+    {
+        prompt_ = true;
+        cout << endl;
+        cout << "conn up: " << conn << endl;
+    }
+    void
+    down_handler(int conn) noexcept
+    {
+        prompt_ = true;
+        cout << endl;
+        cout << "conn down: " << conn << endl;
+    }
+    void
     status_handler(DbrIden req_id, int num, const char* msg) noexcept
     {
         prompt_ = true;

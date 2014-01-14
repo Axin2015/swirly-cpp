@@ -44,11 +44,11 @@ enum {
 enum {
     // Non-negative timer ids are reserved for internal use.  The outbound heartbeat timer is
     // scheduled once the logon response has been received along with the heartbeat interval.
-    CLNTID = -1,
+    CLNTID = 0,
     // The inbound heartbeat timeout timers are scheduled prior when the logon request is sent
     // during initialisation.
-    DEALERID = -2,
-    SUBID = -3,
+    DEALERID = -DBR_CONN_EXEC,
+    SUBID = -DBR_CONN_MD,
     HBINT = 2000,
     HBTIMEOUT = (HBINT * 3) / 2
 };
@@ -734,27 +734,57 @@ dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
 {
-    // TODO: min of ms and timer.
-
-    // Implementation notes: events on the dealer socket take precedence over those on the sub
-    // socket. If events are triggered on both, then the event on the sub socket will be processed
-    // on the next call to dbr_clnt_poll(). Once an event has been processed, the revents member of
-    // zmq_pollitem_t is cleared. If revents is still set on entry to this function, then an event
-    // is assumed to be pending from a previous call.
-
-    int nevents;
     DbrMillis now = dbr_millis();
 
-    if (!(clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+    const struct DbrElem* elem;
+    while ((elem = dbr_prioq_top(&clnt->prioq))) {
+        if (elem->key > now) {
+            // Millis until next timeout.
+            ms = dbr_min(ms, elem->key - now);
+            break;
+        }
+        // Timeout.
+        const DbrKey key = elem->key;
+        const DbrIden id = elem->id;
+        dbr_prioq_pop(&clnt->prioq);
 
-        const struct DbrElem* elem;
-        while ((elem = dbr_prioq_top(&clnt->prioq))) {
-            if (elem->key > now) {
-                // Millis until next timeout.
-                ms = dbr_min(ms, elem->key - now);
-                break;
-            }
-            // Timeout.
+        if (id == CLNTID) {
+            // Cannot fail due to pop.
+            dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint);
+            if (!heartbt(clnt))
+                goto fail1;
+            // Next heartbeat may have already expired.
+        } else if (id == DEALERID) {
+            // Cannot fail due to pop.
+            dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT);
+            dbr_sess_down_handler(sess, DBR_CONN_EXEC);
+        } else if (id == SUBID) {
+            // Cannot fail due to pop.
+            dbr_prioq_push(&clnt->prioq, SUBID, key + HBTIMEOUT);
+            dbr_sess_down_handler(sess, DBR_CONN_MD);
+        } else {
+            // Assumed that these "top-half" handlers do not block.
+            dbr_sess_timeout_handler(sess, id);
+        }
+    }
+
+    // From the zmq_poll() man page:
+
+    // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
+    // indicate any requested events that have occurred by setting the bit corresponding to the
+    // event condition in the revents member.
+
+    int nevents = zmq_poll(clnt->items, clnt->nitems, ms);
+    if (nevents < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
+    }
+
+    now = dbr_millis();
+    if (nevents == 0) {
+
+        // Timeout.
+        while (elem && elem->key <= now) {
             const DbrKey key = elem->key;
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
@@ -764,80 +794,28 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
                 dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint);
                 if (!heartbt(clnt))
                     goto fail1;
-                // Next heartbeat may have already expired.
             } else if (id == DEALERID) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT);
-                // TODO: dealer timeout.
+                dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
+                dbr_sess_down_handler(sess, DBR_CONN_EXEC);
             } else if (id == SUBID) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, SUBID, key + HBTIMEOUT);
-                // TODO: sub timeout.
+                dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
+                dbr_sess_down_handler(sess, DBR_CONN_MD);
             } else {
                 dbr_sess_timeout_handler(sess, id);
-                return 0;
+                break;
             }
+            // Next heartbeat may have already expired.
+            elem = dbr_prioq_top(&clnt->prioq);
         }
-
-        // From the zmq_poll() man page:
-
-        // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
-        // indicate any requested events that have occurred by setting the bit corresponding to the
-        // event condition in the revents member.
-
-        nevents = zmq_poll(clnt->items, clnt->nitems, ms);
-        if (nevents < 0) {
-            dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
-            goto fail1;
-        }
-
-        now = dbr_millis();
-        if (nevents == 0) {
-
-            // Timeout.
-
-            while (elem && elem->key <= now) {
-                const DbrKey key = elem->key;
-                const DbrIden id = elem->id;
-                dbr_prioq_pop(&clnt->prioq);
-
-                if (id == CLNTID) {
-                    // Cannot fail due to pop.
-                    dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint);
-                    if (!heartbt(clnt))
-                        goto fail1;
-                } else if (id == DEALERID) {
-                    // Cannot fail due to pop.
-                    dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
-                    dbr_log_info("dealer timeout");
-                } else if (id == SUBID) {
-                    // Cannot fail due to pop.
-                    dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
-                    dbr_log_info("sub timeout");
-                } else {
-                    dbr_sess_timeout_handler(sess, id);
-                    break;
-                }
-                // Next heartbeat may have already expired.
-                elem = dbr_prioq_top(&clnt->prioq);
-            }
-            return 0;
-        }
-
-    } else {
-
-        // Consume pending input event on the sub socket from previous call.
-
-        nevents = 1;
+        return 0;
     }
 
     struct DbrBody body;
     if ((clnt->items[DEALER_SOCK].revents & ZMQ_POLLIN)) {
 
-        nevents -= (clnt->items[SUB_SOCK].revents & ZMQ_POLLIN) ? 2 : 1;
-        // Clear event once consumed.
-        clnt->items[DEALER_SOCK].revents &= ~ZMQ_POLLIN;
-
+        --nevents;
         if (!dbr_recv_body(clnt->dealer, clnt->pool, &body))
             goto fail1;
 
@@ -904,13 +882,11 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
             goto fail1;
         }
+    }
 
-    } else if ((clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
+    if ((clnt->items[SUB_SOCK].revents & ZMQ_POLLIN)) {
 
         --nevents;
-        // Clear event once consumed.
-        clnt->items[SUB_SOCK].revents &= ~ZMQ_POLLIN;
-
         if (!dbr_recv_body(clnt->sub, clnt->pool, &body))
             goto fail1;
 

@@ -25,6 +25,16 @@ namespace dbr {
 template <class DerivedT>
 class ISess : public DbrISess {
     static void
+    up_handler(DbrSess sess, int conn) noexcept
+    {
+        static_cast<DerivedT*>(sess)->up_handler(conn);
+    }
+    static void
+    down_handler(DbrSess sess, int conn) noexcept
+    {
+        static_cast<DerivedT*>(sess)->down_handler(conn);
+    }
+    static void
     status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg) noexcept
     {
         static_cast<DerivedT*>(sess)->status_handler(req_id, num, msg);
@@ -43,6 +53,8 @@ class ISess : public DbrISess {
     vtbl() noexcept
     {
         static const DbrSessVtbl VTBL = {
+            up_handler,
+            down_handler,
             status_handler,
             exec_handler,
             timeout_handler
@@ -55,6 +67,18 @@ public:
     {
     }
 };
+
+inline void
+up_handler(DbrSess sess, int conn)
+{
+    sess->vtbl->up_handler(sess, conn);
+}
+
+inline void
+down_handler(DbrSess sess, int conn)
+{
+    sess->vtbl->down_handler(sess, conn);
+}
 
 inline void
 status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg)

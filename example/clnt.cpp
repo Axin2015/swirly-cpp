@@ -30,6 +30,14 @@ using namespace std;
 class Sess : public dbr::ISess<Sess> {
 public:
     void
+    up_handler(int conn) noexcept
+    {
+    }
+    void
+    down_handler(int conn) noexcept
+    {
+    }
+    void
     status_handler(DbrIden req_id, int num, const char* msg) noexcept
     {
     }

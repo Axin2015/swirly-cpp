@@ -27,11 +27,22 @@ struct DbrExec;
  * @{
  */
 
+enum DbrConn {
+    DBR_CONN_EXEC = 0x01,
+    DBR_CONN_MD   = 0x02
+};
+
 typedef struct DbrISess {
     const struct DbrSessVtbl* vtbl;
 }* DbrSess;
 
 struct DbrSessVtbl {
+
+    void
+    (*up_handler)(DbrSess sess, int conn);
+
+    void
+    (*down_handler)(DbrSess sess, int conn);
 
     void
     (*status_handler)(DbrSess sess, DbrIden req_id, int num, const char* msg);
@@ -42,6 +53,18 @@ struct DbrSessVtbl {
     void
     (*timeout_handler)(DbrSess sess, DbrIden req_id);
 };
+
+static inline void
+dbr_sess_up_handler(DbrSess sess, int conn)
+{
+    sess->vtbl->up_handler(sess, conn);
+}
+
+static inline void
+dbr_sess_down_handler(DbrSess sess, int conn)
+{
+    sess->vtbl->down_handler(sess, conn);
+}
 
 static inline void
 dbr_sess_status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg)
@@ -68,4 +91,4 @@ dbr_sess_timeout_handler(DbrSess sess, DbrIden req_id)
 
 /** @} */
 
-#endif // DBR_MODEL_H
+#endif // DBR_SESS_H
