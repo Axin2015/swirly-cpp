@@ -40,7 +40,7 @@ DBR_EXTERN struct FigAccnt*
 fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
 {
     assert(arec);
-    assert(arec->type == DBR_ACCNT);
+    assert(arec->type == DBR_ENTITY_ACCNT);
     struct FigAccnt* accnt = arec->accnt.state;
     if (dbr_unlikely(!accnt)) {
         accnt = malloc(sizeof(struct FigAccnt));
@@ -62,7 +62,7 @@ DBR_EXTERN void
 fig_accnt_term(struct DbrRec* arec)
 {
     assert(arec);
-    assert(arec->type == DBR_ACCNT);
+    assert(arec->type == DBR_ENTITY_ACCNT);
     struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
@@ -102,10 +102,10 @@ DBR_EXTERN struct DbrPosn*
 fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, DbrPool pool)
 {
     assert(arec);
-    assert(arec->type == DBR_ACCNT);
+    assert(arec->type == DBR_ENTITY_ACCNT);
 
     assert(crec);
-    assert(crec->type == DBR_CONTR);
+    assert(crec->type == DBR_ENTITY_CONTR);
 
     const DbrIden key = dbr_book_key(crec->id, settl_date);
     struct FigAccnt* accnt = fig_accnt_lazy(arec, pool);

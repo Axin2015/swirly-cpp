@@ -52,10 +52,10 @@ static void
 term_state(struct DbrRec* rec)
 {
     switch (rec->type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         fig_trader_term(rec);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         fig_accnt_term(rec);
         break;
     }
@@ -72,35 +72,35 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->c.trader.rec = get_id(cache, DBR_TRADER, order->c.trader.id_only);
-    order->c.accnt.rec = get_id(cache, DBR_ACCNT, order->c.accnt.id_only);
-    order->c.contr.rec = get_id(cache, DBR_CONTR, order->c.contr.id_only);
+    order->c.trader.rec = get_id(cache, DBR_ENTITY_TRADER, order->c.trader.id_only);
+    order->c.accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.accnt.id_only);
+    order->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->c.contr.id_only);
     return order;
 }
 
 static inline struct DbrExec*
 enrich_trade(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->c.trader.rec = get_id(cache, DBR_TRADER, exec->c.trader.id_only);
-    exec->c.accnt.rec = get_id(cache, DBR_ACCNT, exec->c.accnt.id_only);
-    exec->c.contr.rec = get_id(cache, DBR_CONTR, exec->c.contr.id_only);
-    exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
+    exec->c.trader.rec = get_id(cache, DBR_ENTITY_TRADER, exec->c.trader.id_only);
+    exec->c.accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.accnt.id_only);
+    exec->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->c.contr.id_only);
+    exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
     return exec;
 }
 
 static inline struct DbrMemb*
 enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
 {
-    memb->trader.rec = get_id(cache, DBR_TRADER, memb->trader.id_only);
-    memb->accnt.rec = get_id(cache, DBR_ACCNT, memb->accnt.id_only);
+    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
+    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
     return memb;
 }
 
 static inline struct DbrPosn*
 enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 {
-    posn->accnt.rec = get_id(cache, DBR_ACCNT, posn->accnt.id_only);
-    posn->contr.rec = get_id(cache, DBR_CONTR, posn->contr.id_only);
+    posn->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, posn->accnt.id_only);
+    posn->contr.rec = get_id(cache, DBR_ENTITY_CONTR, posn->contr.id_only);
     return posn;
 }
 
@@ -128,7 +128,7 @@ static struct DbrBook*
 lazy_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
     assert(crec);
-    assert(crec->type == DBR_CONTR);
+    assert(crec->type == DBR_ENTITY_CONTR);
 
     const DbrIden key = dbr_book_key(crec->id, settl_date);
     struct DbrBook* book;
@@ -190,7 +190,7 @@ static DbrBool
 emplace_orders(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_ORDER, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_ENTITY_ORDER, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -233,7 +233,7 @@ static DbrBool
 emplace_trades(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_EXEC, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_ENTITY_EXEC, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -262,7 +262,7 @@ static DbrBool
 emplace_membs(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_MEMB, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_ENTITY_MEMB, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -295,7 +295,7 @@ static DbrBool
 emplace_posns(DbrServ serv)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_POSN, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(serv->model, DBR_ENTITY_POSN, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -414,9 +414,9 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
 
     // Data structures are fully initialised at this point.
 
-    if (!emplace_rec_list(serv, DBR_TRADER)
-        || !emplace_rec_list(serv, DBR_ACCNT)
-        || !emplace_rec_list(serv, DBR_CONTR)
+    if (!emplace_rec_list(serv, DBR_ENTITY_TRADER)
+        || !emplace_rec_list(serv, DBR_ENTITY_ACCNT)
+        || !emplace_rec_list(serv, DBR_ENTITY_CONTR)
         || !emplace_orders(serv)
         || !emplace_trades(serv)
         || !emplace_membs(serv)

@@ -196,9 +196,9 @@ public:
     }
 };
 
-typedef ModelRecs<DBR_TRADER> ModelTraderRecs;
-typedef ModelRecs<DBR_ACCNT> ModelAccntRecs;
-typedef ModelRecs<DBR_CONTR> ModelContrRecs;
+typedef ModelRecs<DBR_ENTITY_TRADER> ModelTraderRecs;
+typedef ModelRecs<DBR_ENTITY_ACCNT> ModelAccntRecs;
+typedef ModelRecs<DBR_ENTITY_CONTR> ModelContrRecs;
 
 template <class DerivedT>
 class IModel : public DbrIModel {

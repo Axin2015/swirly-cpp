@@ -199,7 +199,7 @@ sess_trader(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
 
-    struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_TRADER, NULL);
+    struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_ENTITY_TRADER, NULL);
 
     rep.req_id = req_id;
     rep.type = DBR_TRADER_LIST_REP;
@@ -215,7 +215,7 @@ sess_accnt(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
 
-    struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_ACCNT, NULL);
+    struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_ENTITY_ACCNT, NULL);
 
     rep.req_id = req_id;
     rep.type = DBR_ACCNT_LIST_REP;
@@ -231,7 +231,7 @@ sess_contr(DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
 
-    struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_CONTR, NULL);
+    struct DbrSlNode* first = dbr_serv_first_rec(serv, DBR_ENTITY_CONTR, NULL);
 
     rep.req_id = req_id;
     rep.type = DBR_CONTR_LIST_REP;
@@ -405,13 +405,13 @@ place_order(const struct DbrBody* req, DbrTrader trader)
 {
     struct DbrBody rep;
 
-    struct DbrRec* arec = find_rec_mnem(DBR_ACCNT, req->place_order_req.accnt);
+    struct DbrRec* arec = find_rec_mnem(DBR_ENTITY_ACCNT, req->place_order_req.accnt);
     if (!arec) {
         status_setf(&rep, req->req_id, DBR_EINVAL, "no such accnt '%.16s'",
                     req->place_order_req.accnt);
         goto fail1;
     }
-    struct DbrRec* crec = find_rec_mnem(DBR_CONTR, req->place_order_req.contr);
+    struct DbrRec* crec = find_rec_mnem(DBR_ENTITY_CONTR, req->place_order_req.contr);
     if (!crec) {
         status_setf(&rep, req->req_id, DBR_EINVAL, "no such contr '%.16s'",
                     req->place_order_req.contr);
@@ -565,7 +565,7 @@ run(void)
         }
         dbr_log_info("received '%d' from '%.16s'", req.body.type, req.head.trader);
         struct DbrBody rep;
-        struct DbrRec* trec = find_rec_mnem(DBR_TRADER, req.head.trader);
+        struct DbrRec* trec = find_rec_mnem(DBR_ENTITY_TRADER, req.head.trader);
         if (!trec) {
             status_setf(&rep, req.body.req_id, DBR_EINVAL, "no such trader '%.16s'",
                         req.head.trader);

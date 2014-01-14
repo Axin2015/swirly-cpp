@@ -162,9 +162,9 @@ public:
     }
 };
 
-typedef ClntRecs<DBR_TRADER> ClntTraderRecs;
-typedef ClntRecs<DBR_ACCNT> ClntAccntRecs;
-typedef ClntRecs<DBR_CONTR> ClntContrRecs;
+typedef ClntRecs<DBR_ENTITY_TRADER> ClntTraderRecs;
+typedef ClntRecs<DBR_ENTITY_ACCNT> ClntAccntRecs;
+typedef ClntRecs<DBR_ENTITY_CONTR> ClntContrRecs;
 
 /** @} */
 

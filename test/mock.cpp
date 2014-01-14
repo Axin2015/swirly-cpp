@@ -28,7 +28,7 @@ void
 set_trader(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
            const char* email) noexcept
 {
-    rec.type = DBR_TRADER;
+    rec.type = DBR_ENTITY_TRADER;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec.display, display, DBR_DISPLAY_MAX);
@@ -64,7 +64,7 @@ void
 set_accnt(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
           const char* email) noexcept
 {
-    rec.type = DBR_ACCNT;
+    rec.type = DBR_ENTITY_ACCNT;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec.display, display, DBR_DISPLAY_MAX);
@@ -101,7 +101,7 @@ set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display, const 
           const char* asset, const char* ccy, int tick_numer, int tick_denom, int lot_numer,
           int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots) noexcept
 {
-    rec.type = DBR_CONTR;
+    rec.type = DBR_ENTITY_CONTR;
     rec.id = id;
     strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec.display, display, DBR_DISPLAY_MAX);
@@ -235,25 +235,25 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
 {
     ssize_t ret;
     switch (type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         ret = read_trader(pool, first);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         ret = read_accnt(pool, first);
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         ret = read_contr(pool, first);
         break;
-    case DBR_ORDER:
+    case DBR_ENTITY_ORDER:
         ret = read_order(pool, first);
         break;
-    case DBR_EXEC:
+    case DBR_ENTITY_EXEC:
         ret = read_trade(pool, first);
         break;
-    case DBR_MEMB:
+    case DBR_ENTITY_MEMB:
         ret = read_memb(pool, first);
         break;
-    case DBR_POSN:
+    case DBR_ENTITY_POSN:
         ret = read_posn(pool, first);
         break;
     default:

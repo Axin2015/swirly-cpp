@@ -170,13 +170,13 @@ DBR_EXTERN void
 fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         emplace_trader(cache, first, size);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         emplace_accnt(cache, first, size);
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         emplace_contr(cache, first, size);
         break;
     default:
@@ -190,17 +190,17 @@ fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
 {
     struct DbrSlNode* first;
     switch (type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         first = cache->first_trader;
         if (size)
             *size = cache->trader_size;
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         first = cache->first_accnt;
         if (size)
             *size = cache->accnt_size;
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         first = cache->first_contr;
         if (size)
             *size = cache->contr_size;
@@ -216,13 +216,13 @@ fig_cache_empty_rec(struct FigCache* cache, int type)
 {
     struct DbrSlNode* first;
     switch (type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         first = cache->first_trader;
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         first = cache->first_accnt;
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         first = cache->first_contr;
         break;
     default:

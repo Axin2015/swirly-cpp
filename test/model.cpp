@@ -30,7 +30,7 @@ TEST_CASE(model_trader)
 {
     Model model;
     Pool pool;
-    auto recs = read_entity<DBR_TRADER>(&model, pool);
+    auto recs = read_entity<DBR_ENTITY_TRADER>(&model, pool);
     auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
             return strncmp(rec.mnem, "WRAMIREZ", DBR_MNEM_MAX) == 0;
         });
@@ -41,7 +41,7 @@ TEST_CASE(model_accnt)
 {
     Model model;
     Pool pool;
-    auto recs = read_entity<DBR_ACCNT>(&model, pool);
+    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
     auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
             return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
         });

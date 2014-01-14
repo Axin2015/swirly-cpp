@@ -54,7 +54,7 @@ dbr_incs_to_real(DbrIncs incs, double inc_size)
 static inline DbrLots
 dbr_qty_to_lots(double qty, struct DbrRec* crec)
 {
-    assert(crec->type == DBR_CONTR);
+    assert(crec->type == DBR_ENTITY_CONTR);
     return dbr_real_to_incs(qty, crec->contr.qty_inc);
 }
 
@@ -65,7 +65,7 @@ dbr_qty_to_lots(double qty, struct DbrRec* crec)
 static inline double
 dbr_lots_to_qty(DbrLots lots, struct DbrRec* crec)
 {
-    assert(crec->type == DBR_CONTR);
+    assert(crec->type == DBR_ENTITY_CONTR);
     return dbr_incs_to_real(lots, crec->contr.qty_inc);
 }
 
@@ -76,7 +76,7 @@ dbr_lots_to_qty(DbrLots lots, struct DbrRec* crec)
 static inline DbrTicks
 dbr_price_to_ticks(double price, struct DbrRec* crec)
 {
-    assert(crec->type == DBR_CONTR);
+    assert(crec->type == DBR_ENTITY_CONTR);
     return dbr_real_to_incs(price, crec->contr.price_inc);
 }
 
@@ -87,7 +87,7 @@ dbr_price_to_ticks(double price, struct DbrRec* crec)
 static inline double
 dbr_ticks_to_price(DbrTicks ticks, struct DbrRec* crec)
 {
-    assert(crec->type == DBR_CONTR);
+    assert(crec->type == DBR_ENTITY_CONTR);
     return dbr_incs_to_real(ticks, crec->contr.price_inc);
 }
 

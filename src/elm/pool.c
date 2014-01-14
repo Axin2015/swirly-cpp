@@ -418,23 +418,23 @@ dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first)
 {
     struct DbrSlNode* node = first;
     switch (type) {
-    case DBR_TRADER:
-    case DBR_ACCNT:
-    case DBR_CONTR:
+    case DBR_ENTITY_TRADER:
+    case DBR_ENTITY_ACCNT:
+    case DBR_ENTITY_CONTR:
         while (node) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
             node = node->next;
             dbr_pool_free_rec(pool, rec);
         }
         break;
-    case DBR_ORDER:
+    case DBR_ENTITY_ORDER:
         while (node) {
             struct DbrOrder* order = dbr_shared_order_entry(node);
             node = node->next;
             dbr_pool_free_order(pool, order);
         }
         break;
-    case DBR_EXEC:
+    case DBR_ENTITY_EXEC:
         while (node) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
             node = node->next;
@@ -444,14 +444,14 @@ dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first)
                 dbr_pool_free_exec(pool, exec);
         }
         break;
-    case DBR_MEMB:
+    case DBR_ENTITY_MEMB:
         while (node) {
             struct DbrMemb* memb = dbr_shared_memb_entry(node);
             node = node->next;
             dbr_pool_free_memb(pool, memb);
         }
         break;
-    case DBR_POSN:
+    case DBR_ENTITY_POSN:
         while (node) {
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
             node = node->next;

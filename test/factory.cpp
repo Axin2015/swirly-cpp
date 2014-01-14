@@ -33,7 +33,7 @@ create_trader(Pool& pool, DbrIden id, const char* mnem, const char* display, con
     std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
     dbr_rec_init(rec.get());
 
-    rec->type = DBR_TRADER;
+    rec->type = DBR_ENTITY_TRADER;
     rec->id = id;
     strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec->display, display, DBR_DISPLAY_MAX);
@@ -52,7 +52,7 @@ create_accnt(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
     shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
     dbr_rec_init(rec.get());
 
-    rec->type = DBR_ACCNT;
+    rec->type = DBR_ENTITY_ACCNT;
     rec->id = id;
     strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec->display, display, DBR_DISPLAY_MAX);
@@ -73,7 +73,7 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
     std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
     dbr_rec_init(rec.get());
 
-    rec->type = DBR_CONTR;
+    rec->type = DBR_ENTITY_CONTR;
     rec->id = id;
     strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
     strncpy(rec->display, display, DBR_DISPLAY_MAX);

@@ -336,7 +336,7 @@ select_trader(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             // Header.
 
-            rec->type = DBR_TRADER;
+            rec->type = DBR_ENTITY_TRADER;
             rec->id = sqlite3_column_int64(stmt, ID);
             strncpy(rec->mnem,
                     (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
@@ -370,7 +370,7 @@ select_trader(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_TRADER, dbr_queue_first(&rq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_TRADER, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -405,7 +405,7 @@ select_accnt(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             // Header.
 
-            rec->type = DBR_ACCNT;
+            rec->type = DBR_ENTITY_ACCNT;
             rec->id = sqlite3_column_int64(stmt, ID);
             strncpy(rec->mnem,
                     (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
@@ -439,7 +439,7 @@ select_accnt(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_ACCNT, dbr_queue_first(&rq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_ACCNT, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -483,7 +483,7 @@ select_contr(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             // Header.
 
-            rec->type = DBR_CONTR;
+            rec->type = DBR_ENTITY_CONTR;
             rec->id = sqlite3_column_int64(stmt, ID);
             strncpy(rec->mnem,
                     (const char*)sqlite3_column_text(stmt, MNEM), DBR_MNEM_MAX);
@@ -546,7 +546,7 @@ select_contr(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_CONTR, dbr_queue_first(&rq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_CONTR, dbr_queue_first(&rq));
     *first = NULL;
  fail1:
     return -1;
@@ -643,7 +643,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_ORDER, dbr_queue_first(&oq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_ORDER, dbr_queue_first(&oq));
     *first = NULL;
  fail1:
     return -1;
@@ -747,7 +747,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_EXEC, dbr_queue_first(&tq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&tq));
     *first = NULL;
  fail1:
     return -1;
@@ -802,7 +802,7 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_MEMB, dbr_queue_first(&mq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;
@@ -902,7 +902,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_POSN, dbr_queue_first(&pq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&pq));
     *first = NULL;
  fail1:
     return -1;
@@ -1004,25 +1004,25 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
 {
     ssize_t ret;
     switch (type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         ret = select_trader(sqlite, pool, first);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         ret = select_accnt(sqlite, pool, first);
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         ret = select_contr(sqlite, pool, first);
         break;
-    case DBR_ORDER:
+    case DBR_ENTITY_ORDER:
         ret = select_order(sqlite, pool, first);
         break;
-    case DBR_EXEC:
+    case DBR_ENTITY_EXEC:
         ret = select_trade(sqlite, pool, first);
         break;
-    case DBR_MEMB:
+    case DBR_ENTITY_MEMB:
         ret = select_memb(sqlite, pool, first);
         break;
-    case DBR_POSN:
+    case DBR_ENTITY_POSN:
         ret = select_posn(sqlite, pool, first);
         break;
     default:

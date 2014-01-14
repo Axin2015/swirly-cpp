@@ -38,13 +38,13 @@ dbr_rec_len(const struct DbrRec* rec)
 {
     size_t n = dbr_packleni(rec->type);
     switch (rec->type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         n += dbr_trader_len(rec);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         n += dbr_accnt_len(rec);
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         n += dbr_contr_len(rec);
         break;
     default:
@@ -58,13 +58,13 @@ dbr_write_rec(char* buf, const struct DbrRec* rec)
 {
     buf = dbr_packi(buf, rec->type);
     switch (rec->type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         buf = dbr_write_trader(buf, rec);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         buf = dbr_write_accnt(buf, rec);
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         buf = dbr_write_contr(buf, rec);
         break;
     default:
@@ -78,13 +78,13 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
 {
     buf = dbr_unpacki(buf, &rec->type);
     switch (rec->type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         buf = dbr_read_trader(buf, rec);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         buf = dbr_read_accnt(buf, rec);
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         buf = dbr_read_contr(buf, rec);
         break;
     default:
@@ -113,7 +113,7 @@ dbr_write_trader(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_trader(const char* buf, struct DbrRec* rec)
 {
-    rec->type = DBR_TRADER;
+    rec->type = DBR_ENTITY_TRADER;
     rec->trader.state = NULL;
     return dbr_unpackf(buf, TRADER_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -139,7 +139,7 @@ dbr_write_accnt(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_accnt(const char* buf, struct DbrRec* rec)
 {
-    rec->type = DBR_ACCNT;
+    rec->type = DBR_ENTITY_ACCNT;
     rec->accnt.state = NULL;
     return dbr_unpackf(buf, ACCNT_FORMAT,
                        &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -171,7 +171,7 @@ dbr_write_contr(char* buf, const struct DbrRec* rec)
 DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec)
 {
-    rec->type = DBR_CONTR;
+    rec->type = DBR_ENTITY_CONTR;
     const char* end = dbr_unpackf(buf, CONTR_FORMAT,
                                   &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
                                   rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,

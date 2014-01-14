@@ -163,9 +163,9 @@ public:
     }
 };
 
-typedef ServRecs<DBR_TRADER> ServTraderRecs;
-typedef ServRecs<DBR_ACCNT> ServAccntRecs;
-typedef ServRecs<DBR_CONTR> ServContrRecs;
+typedef ServRecs<DBR_ENTITY_TRADER> ServTraderRecs;
+typedef ServRecs<DBR_ENTITY_ACCNT> ServAccntRecs;
+typedef ServRecs<DBR_ENTITY_CONTR> ServContrRecs;
 
 /** @} */
 

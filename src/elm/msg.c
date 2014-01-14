@@ -504,7 +504,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_trader(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_TRADER, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_TRADER, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -516,7 +516,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_accnt(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ACCNT, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_ACCNT, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -528,7 +528,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_contr(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_CONTR, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_CONTR, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -540,7 +540,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_order(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ORDER, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_ORDER, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -552,7 +552,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_exec(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_EXEC, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -564,7 +564,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_memb(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_MEMB, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -576,7 +576,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_posn(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_POSN, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -664,7 +664,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->insert_exec_list_req.count_; ++i) {
             if (!(buf = read_exec(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_EXEC, dbr_queue_first(&q));
+                dbr_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&q));
                 goto fail1;
             }
         }

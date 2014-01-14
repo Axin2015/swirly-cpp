@@ -53,25 +53,25 @@ read_entity(const struct DbrBody* req)
 {
     struct DbrBody rep = { .req_id = req->req_id };
     switch (req->type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         rep.type = DBR_TRADER_LIST_REP;
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         rep.type = DBR_ACCNT_LIST_REP;
         break;
-    case DBR_CONTR:
+    case DBR_ENTITY_CONTR:
         rep.type = DBR_CONTR_LIST_REP;
         break;
-    case DBR_ORDER:
+    case DBR_ENTITY_ORDER:
         rep.type = DBR_ORDER_LIST_REP;
         break;
-    case DBR_EXEC:
+    case DBR_ENTITY_EXEC:
         rep.type = DBR_EXEC_LIST_REP;
         break;
-    case DBR_MEMB:
+    case DBR_ENTITY_MEMB:
         rep.type = DBR_MEMB_LIST_REP;
         break;
-    case DBR_POSN:
+    case DBR_ENTITY_POSN:
         rep.type = DBR_POSN_LIST_REP;
         break;
     }
@@ -178,7 +178,7 @@ run(void)
             break;
         case DBR_INSERT_EXEC_LIST_REQ:
             insert_exec_list(&req);
-            dbr_pool_free_entity_list(pool, DBR_EXEC, req.insert_exec_list_req.first);
+            dbr_pool_free_entity_list(pool, DBR_ENTITY_EXEC, req.insert_exec_list_req.first);
             break;
         case DBR_INSERT_EXEC_REQ:
             insert_exec(&req);

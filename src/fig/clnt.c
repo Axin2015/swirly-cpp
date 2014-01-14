@@ -79,10 +79,10 @@ static void
 term_state(struct DbrRec* rec)
 {
     switch (rec->type) {
-    case DBR_TRADER:
+    case DBR_ENTITY_TRADER:
         fig_trader_term(rec);
         break;
-    case DBR_ACCNT:
+    case DBR_ENTITY_ACCNT:
         fig_accnt_term(rec);
         break;
     }
@@ -99,20 +99,20 @@ get_id(struct FigCache* cache, int type, DbrIden id)
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->c.trader.rec = get_id(cache, DBR_TRADER, order->c.trader.id_only);
-    order->c.accnt.rec = get_id(cache, DBR_ACCNT, order->c.accnt.id_only);
-    order->c.contr.rec = get_id(cache, DBR_CONTR, order->c.contr.id_only);
+    order->c.trader.rec = get_id(cache, DBR_ENTITY_TRADER, order->c.trader.id_only);
+    order->c.accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.accnt.id_only);
+    order->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->c.contr.id_only);
     return order;
 }
 
 static inline struct DbrExec*
 enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->c.trader.rec = get_id(cache, DBR_TRADER, exec->c.trader.id_only);
-    exec->c.accnt.rec = get_id(cache, DBR_ACCNT, exec->c.accnt.id_only);
-    exec->c.contr.rec = get_id(cache, DBR_CONTR, exec->c.contr.id_only);
+    exec->c.trader.rec = get_id(cache, DBR_ENTITY_TRADER, exec->c.trader.id_only);
+    exec->c.accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.accnt.id_only);
+    exec->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->c.contr.id_only);
     if (exec->cpty.id_only)
-        exec->cpty.rec = get_id(cache, DBR_ACCNT, exec->cpty.id_only);
+        exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
     else
         exec->cpty.rec = NULL;
     return exec;
@@ -121,23 +121,23 @@ enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 static inline struct DbrMemb*
 enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
 {
-    memb->trader.rec = get_id(cache, DBR_TRADER, memb->trader.id_only);
-    memb->accnt.rec = get_id(cache, DBR_ACCNT, memb->accnt.id_only);
+    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
+    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
     return memb;
 }
 
 static inline struct DbrPosn*
 enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 {
-    posn->accnt.rec = get_id(cache, DBR_ACCNT, posn->accnt.id_only);
-    posn->contr.rec = get_id(cache, DBR_CONTR, posn->contr.id_only);
+    posn->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, posn->accnt.id_only);
+    posn->contr.rec = get_id(cache, DBR_ENTITY_CONTR, posn->contr.id_only);
     return posn;
 }
 
 static inline struct DbrView*
 enrich_view(struct FigCache* cache, struct DbrView* view)
 {
-    view->contr.rec = get_id(cache, DBR_CONTR, view->contr.id_only);
+    view->contr.rec = get_id(cache, DBR_ENTITY_CONTR, view->contr.id_only);
     return view;
 }
 
@@ -187,7 +187,7 @@ heartbt(DbrClnt clnt)
 static inline DbrBool
 set_trader(DbrClnt clnt)
 {
-    struct DbrSlNode* node = fig_cache_find_rec_mnem(&clnt->cache, DBR_TRADER, clnt->mnem);
+    struct DbrSlNode* node = fig_cache_find_rec_mnem(&clnt->cache, DBR_ENTITY_TRADER, clnt->mnem);
     if (node == FIG_CACHE_END_REC)
         goto fail1;
 
@@ -207,7 +207,7 @@ emplace_rec_list(DbrClnt clnt, int type, struct DbrSlNode* first, size_t count)
 {
     fig_cache_emplace_rec_list(&clnt->cache, type, first, count);
     clnt->pending &= ~type;
-    if ((clnt->pending & (DBR_TRADER | DBR_ACCNT | DBR_CONTR)) == 0) {
+    if ((clnt->pending & (DBR_ENTITY_TRADER | DBR_ENTITY_ACCNT | DBR_ENTITY_CONTR)) == 0) {
         if (!set_trader(clnt))
             abort();
     }
@@ -221,7 +221,7 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
         // Transfer ownership.
         fig_trader_emplace_order(clnt->trader, order);
     }
-    clnt->pending &= ~DBR_ORDER;
+    clnt->pending &= ~DBR_ENTITY_ORDER;
 }
 
 static void
@@ -234,7 +234,7 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
         fig_trader_insert_trade(clnt->trader, exec);
         dbr_exec_decref(exec, clnt->pool);
     }
-    clnt->pending &= ~DBR_EXEC;
+    clnt->pending &= ~DBR_ENTITY_EXEC;
 }
 
 static void
@@ -248,7 +248,7 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         if (!accnt)
             abort();
     }
-    clnt->pending &= ~DBR_MEMB;
+    clnt->pending &= ~DBR_ENTITY_MEMB;
 }
 
 static void
@@ -262,7 +262,7 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         assert(accnt);
         fig_accnt_emplace_posn(accnt, posn);
     }
-    clnt->pending &= ~DBR_POSN;
+    clnt->pending &= ~DBR_ENTITY_POSN;
 }
 
 static void
@@ -406,8 +406,8 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     strncpy(clnt->mnem, trader, DBR_MNEM_MAX);
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->pending = DBR_TRADER | DBR_ACCNT | DBR_CONTR | DBR_ORDER | DBR_EXEC | DBR_MEMB
-        | DBR_POSN | DBR_VIEW;
+    clnt->pending = DBR_ENTITY_TRADER | DBR_ENTITY_ACCNT | DBR_ENTITY_CONTR | DBR_ENTITY_ORDER
+        | DBR_ENTITY_EXEC | DBR_ENTITY_MEMB | DBR_ENTITY_POSN | DBR_VIEW;
     clnt->trader = NULL;
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_index_init(&clnt->index);
@@ -833,15 +833,15 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             dbr_sess_status_handler(sess, body.req_id, body.status_rep.num, body.status_rep.msg);
             break;
         case DBR_TRADER_LIST_REP:
-            emplace_rec_list(clnt, DBR_TRADER, body.entity_list_rep.first,
+            emplace_rec_list(clnt, DBR_ENTITY_TRADER, body.entity_list_rep.first,
                              body.entity_list_rep.count_);
             break;
         case DBR_ACCNT_LIST_REP:
-            emplace_rec_list(clnt, DBR_ACCNT, body.entity_list_rep.first,
+            emplace_rec_list(clnt, DBR_ENTITY_ACCNT, body.entity_list_rep.first,
                              body.entity_list_rep.count_);
             break;
         case DBR_CONTR_LIST_REP:
-            emplace_rec_list(clnt, DBR_CONTR, body.entity_list_rep.first,
+            emplace_rec_list(clnt, DBR_ENTITY_CONTR, body.entity_list_rep.first,
                              body.entity_list_rep.count_);
             break;
         case DBR_ORDER_LIST_REP:

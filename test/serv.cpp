@@ -27,17 +27,17 @@ template <int TypeN>
 struct TypeTraits;
 
 template <>
-struct TypeTraits<DBR_TRADER> {
+struct TypeTraits<DBR_ENTITY_TRADER> {
     typedef TraderRecRef TypeRecRef;
 };
 
 template <>
-struct TypeTraits<DBR_ACCNT> {
+struct TypeTraits<DBR_ENTITY_ACCNT> {
     typedef AccntRecRef TypeRecRef;
 };
 
 template <>
-struct TypeTraits<DBR_CONTR> {
+struct TypeTraits<DBR_ENTITY_CONTR> {
     typedef ContrRecRef TypeRecRef;
 };
 
@@ -68,8 +68,8 @@ TEST_CASE(serv_trader)
 
     check(serv.trecs().find("BAD") == serv.trecs().end());
 
-    TraderRecRef trec = get_rec_mnem<DBR_TRADER>(serv, "WRAMIREZ");
-    check(trec == get_rec_id<DBR_TRADER>(serv, trec.id()));
+    TraderRecRef trec = get_rec_mnem<DBR_ENTITY_TRADER>(serv, "WRAMIREZ");
+    check(trec == get_rec_id<DBR_ENTITY_TRADER>(serv, trec.id()));
     check(trec.mnem() == Mnem("WRAMIREZ"));
 
     // Body.
@@ -86,8 +86,8 @@ TEST_CASE(serv_accnt)
 
     check(serv.arecs().find("BAD") == serv.arecs().end());
 
-    AccntRecRef arec = get_rec_mnem<DBR_ACCNT>(serv, "DBRA");
-    check(arec == get_rec_id<DBR_ACCNT>(serv, arec.id()));
+    AccntRecRef arec = get_rec_mnem<DBR_ENTITY_ACCNT>(serv, "DBRA");
+    check(arec == get_rec_id<DBR_ENTITY_ACCNT>(serv, arec.id()));
     check(arec.mnem() == Mnem("DBRA"));
 
     // Body.
@@ -104,8 +104,8 @@ TEST_CASE(serv_contr)
 
     check(serv.crecs().find("BAD") == serv.crecs().end());
 
-    ContrRecRef crec = get_rec_mnem<DBR_CONTR>(serv, "EURUSD");
-    check(crec == get_rec_id<DBR_CONTR>(serv, crec.id()));
+    ContrRecRef crec = get_rec_mnem<DBR_ENTITY_CONTR>(serv, "EURUSD");
+    check(crec == get_rec_id<DBR_ENTITY_CONTR>(serv, crec.id()));
     check(crec.mnem() == Mnem("EURUSD"));
 
     // Body.

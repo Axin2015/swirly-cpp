@@ -63,7 +63,7 @@ DBR_EXTERN struct FigTrader*
 fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
 {
     assert(trec);
-    assert(trec->type == DBR_TRADER);
+    assert(trec->type == DBR_ENTITY_TRADER);
     struct FigTrader* trader = trec->trader.state;
     if (dbr_unlikely(!trader)) {
         trader = malloc(sizeof(struct FigTrader));
@@ -87,7 +87,7 @@ DBR_EXTERN void
 fig_trader_term(struct DbrRec* trec)
 {
     assert(trec);
-    assert(trec->type == DBR_TRADER);
+    assert(trec->type == DBR_ENTITY_TRADER);
     struct FigTrader* trader = trec->trader.state;
     if (trader) {
         trec->trader.state = NULL;
