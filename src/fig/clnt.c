@@ -229,7 +229,7 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
-        assert(exec->c.state == DBR_TRADE);
+        assert(exec->c.state == DBR_STATE_TRADE);
         // Transfer ownership.
         fig_trader_insert_trade(clnt->trader, exec);
         dbr_exec_decref(exec, clnt->pool);
@@ -323,7 +323,7 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
     order->c.last_lots = exec->c.last_lots;
     order->modified = exec->created;
 
-    if (exec->c.state == DBR_TRADE) {
+    if (exec->c.state == DBR_STATE_TRADE) {
         // Transfer ownership.
         fig_trader_insert_trade(clnt->trader, exec);
     }
@@ -862,12 +862,12 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
         case DBR_EXEC_REP:
             enrich_exec(&clnt->cache, body.exec_rep.exec);
             switch (body.exec_rep.exec->c.state) {
-            case DBR_NEW:
+            case DBR_STATE_NEW:
                 apply_new(clnt, body.exec_rep.exec);
                 break;
-            case DBR_REVISE:
-            case DBR_CANCEL:
-            case DBR_TRADE:
+            case DBR_STATE_REVISE:
+            case DBR_STATE_CANCEL:
+            case DBR_STATE_TRADE:
                 apply_update(clnt, body.exec_rep.exec);
                 break;
             }

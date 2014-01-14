@@ -158,5 +158,5 @@ TEST_CASE(serv_place)
     auto accnt = serv.accnt(AccntRecRef(*ait));
     auto book = serv.book(ContrRecRef(*cit), 20130824);
 
-    serv.place(trader, accnt, book, nullptr, DBR_BUY, 12345, 1, 0);
+    serv.place(trader, accnt, book, nullptr, DBR_ACTION_BUY, 12345, 1, 0);
 }

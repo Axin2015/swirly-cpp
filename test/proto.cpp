@@ -117,7 +117,7 @@ TEST_CASE(proto_order)
     auto now = dbr_millis();
 
     auto in = create_order(pool, 1, trader, accnt, contr, 20130827,
-                           "apple", DBR_BUY, 12345, 10, 0, now);
+                           "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
 
     auto len = order_len(*in, false);
     char buf[len];
@@ -156,8 +156,8 @@ TEST_CASE(proto_trade)
     DbrIden cpty = 13;
     auto now = dbr_millis();
 
-    auto in = create_trade(pool, 1, 2, trader, accnt, contr, 20130827, "apple",
-                           DBR_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_TAKER, cpty, now);
+    auto in = create_trade(pool, 1, 2, trader, accnt, contr, 20130827, "apple", DBR_ACTION_BUY,
+                           12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER, cpty, now);
 
     auto len = exec_len(*in, false);
     char buf[len];

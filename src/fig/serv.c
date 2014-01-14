@@ -341,11 +341,11 @@ static inline void
 apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
 {
     const double licks = exec->c.last_lots * exec->c.last_ticks;
-    if (exec->c.action == DBR_BUY) {
+    if (exec->c.action == DBR_ACTION_BUY) {
         posn->buy_licks += licks;
         posn->buy_lots += exec->c.last_lots;
     } else {
-        assert(exec->c.action == DBR_SELL);
+        assert(exec->c.action == DBR_ACTION_SELL);
         posn->sell_licks += licks;
         posn->sell_lots += exec->c.last_lots;
     }
@@ -516,7 +516,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
         strncpy(new_order->c.ref, ref, DBR_REF_MAX);
     else
         new_order->c.ref[0] = '\0';
-    new_order->c.state = DBR_NEW;
+    new_order->c.state = DBR_STATE_NEW;
     new_order->c.action = action;
     new_order->c.ticks = ticks;
     new_order->c.lots = lots;
@@ -601,7 +601,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
         goto fail1;
 
     // Revise.
-    exec->c.state = DBR_REVISE;
+    exec->c.state = DBR_STATE_REVISE;
     const DbrLots delta = exec->c.lots - lots;
     assert(delta >= 0);
     exec->c.lots = lots;
@@ -653,7 +653,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
 
     // Revise.
-    exec->c.state = DBR_REVISE;
+    exec->c.state = DBR_STATE_REVISE;
     const DbrLots delta = exec->c.lots - lots;
     assert(delta >= 0);
     exec->c.lots = lots;
@@ -696,7 +696,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
         goto fail1;
 
     // Cancel.
-    exec->c.state = DBR_CANCEL;
+    exec->c.state = DBR_STATE_CANCEL;
     exec->c.resd = 0;
 
     if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
@@ -735,7 +735,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
         goto fail1;
 
     // Cancel.
-    exec->c.state = DBR_CANCEL;
+    exec->c.state = DBR_STATE_CANCEL;
     exec->c.resd = 0;
 
     if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))

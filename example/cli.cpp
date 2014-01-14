@@ -71,10 +71,10 @@ straction(int action) noexcept
 {
     const char* sym;
     switch (action) {
-    case DBR_BUY:
+    case DBR_ACTION_BUY:
         sym = "BUY";
         break;
-    case DBR_SELL:
+    case DBR_ACTION_SELL:
         sym = "SELL";
         break;
     default:
@@ -88,10 +88,10 @@ strrole(int role) noexcept
 {
     const char* sym;
     switch (role) {
-    case DBR_MAKER:
+    case DBR_ROLE_MAKER:
         sym = "MAKER";
         break;
-    case DBR_TAKER:
+    case DBR_ROLE_TAKER:
         sym = "TAKER";
         break;
     default:
@@ -105,16 +105,16 @@ strstate(int state) noexcept
 {
     const char* sym;
     switch (state) {
-    case DBR_NEW:
+    case DBR_STATE_NEW:
         sym = "NEW";
         break;
-    case DBR_REVISE:
+    case DBR_STATE_REVISE:
         sym = "REVISE";
         break;
-    case DBR_CANCEL:
+    case DBR_STATE_CANCEL:
         sym = "CANCEL";
         break;
-    case DBR_TRADE:
+    case DBR_STATE_TRADE:
         sym = "TRADE";
         break;
     default:
@@ -478,7 +478,7 @@ public:
                      << '|' << right << setw(10) << ref.exec()
                      << '|' << right << setw(10) << ref.last_ticks()
                      << '|' << right << setw(10) << ref.last_lots();
-                if (ref.state() == DBR_TRADE)
+                if (ref.state() == DBR_STATE_TRADE)
                     cout << '|' << left << setw(10) << strrole(ref.role())
                          << '|' << left << setw(10) << ref.cpty().mnem();
                 else
@@ -1017,7 +1017,7 @@ main(int argc, char* argv[])
 
         repl.cmd("accnts", 0, bind(&Sess::accnts, ref(sess), _1, _2));
         repl.cmd("ack_trades", -1, bind(&Sess::ack_trades, ref(sess), _1, _2));
-        repl.cmd("buy", 2, bind(&Sess::place, ref(sess), DBR_BUY, _1, _2));
+        repl.cmd("buy", 2, bind(&Sess::place, ref(sess), DBR_ACTION_BUY, _1, _2));
         repl.cmd("cancel", -1, bind(&Sess::cancel, ref(sess), _1, _2));
         repl.cmd("contrs", 0, bind(&Sess::contrs, ref(sess), _1, _2));
         repl.cmd("echo", -1, bind(&Sess::echo, ref(sess), _1, _2));
@@ -1026,7 +1026,7 @@ main(int argc, char* argv[])
         repl.cmd("posns", 0, bind(&Sess::posns, ref(sess), _1, _2));
         repl.cmd("quit", 0, bind(&Sess::quit, ref(sess), _1, _2));
         repl.cmd("revise", 2, bind(&Sess::revise, ref(sess), _1, _2));
-        repl.cmd("sell", 2, bind(&Sess::place, ref(sess), DBR_SELL, _1, _2));
+        repl.cmd("sell", 2, bind(&Sess::place, ref(sess), DBR_ACTION_SELL, _1, _2));
         repl.cmd("set", 2, bind(&Sess::set, ref(sess), _1, _2));
         repl.cmd("traders", 0, bind(&Sess::traders, ref(sess), _1, _2));
         repl.cmd("trades", 0, bind(&Sess::trades, ref(sess), _1, _2));

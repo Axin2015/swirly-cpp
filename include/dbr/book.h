@@ -47,7 +47,7 @@ dbr_book_term(struct DbrBook* book);
 static inline struct DbrSide*
 dbr_book_side(struct DbrBook* book, int action)
 {
-    return action == DBR_BUY ? &book->bid_side : &book->ask_side;
+    return action == DBR_ACTION_BUY ? &book->bid_side : &book->ask_side;
 }
 
 static inline DbrBool

@@ -37,9 +37,9 @@ TEST_CASE(side_orders)
 
     // Two orders at the same price level.
     auto apple = create_order(pool, 1, *trader, *accnt, *contr, 20130827,
-                              "apple", DBR_BUY, 12345, 10, 0, now);
+                              "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
     auto orange = create_order(pool, 2, *trader, *accnt, *contr, 20130827,
-                               "orange", DBR_BUY, 12345, 20, 0, now);
+                               "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
 
     Side side(pool);
 
@@ -59,7 +59,7 @@ TEST_CASE(side_orders)
     side.place_order(*apple, dbr_millis());
     side.place_order(*orange, dbr_millis());
 
-    check(apple->c.state == DBR_NEW);
+    check(apple->c.state == DBR_STATE_NEW);
     check(apple->c.resd == 10);
     check(apple->c.exec == 0);
     check(apple->c.last_ticks == -1);
@@ -81,7 +81,7 @@ TEST_CASE(side_orders)
     // Revise first order.
     side.revise_order(*apple, 5, dbr_millis());
 
-    check(apple->c.state == DBR_REVISE);
+    check(apple->c.state == DBR_STATE_REVISE);
     check(apple->c.resd == 5);
     check(apple->c.exec == 0);
     check(apple->c.last_ticks == -1);
@@ -101,7 +101,7 @@ TEST_CASE(side_orders)
     // Cancel second order.
     side.cancel_order(*orange, dbr_millis());
 
-    check(orange->c.state == DBR_CANCEL);
+    check(orange->c.state == DBR_STATE_CANCEL);
     check(orange->c.resd == 0);
     check(orange->c.exec == 0);
     check(orange->c.last_ticks == -1);
@@ -128,12 +128,12 @@ TEST_CASE(side_levels)
     auto now = dbr_millis();
 
     auto apple = create_order(pool, 1, *trader, *accnt, *contr, 20130827,
-                              "apple", DBR_BUY, 12345, 10, 0, now);
+                              "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
     auto orange = create_order(pool, 2, *trader, *accnt, *contr, 20130827,
-                               "orange", DBR_BUY, 12345, 20, 0, now);
+                               "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
     // Best inserted last.
     auto pear = create_order(pool, 3, *trader, *accnt, *contr, 20130827,
-                             "pear", DBR_BUY, 12346, 30, 0, now);
+                             "pear", DBR_ACTION_BUY, 12346, 30, 0, now);
 
     Side side(pool);
     side.place_order(*apple, dbr_millis());

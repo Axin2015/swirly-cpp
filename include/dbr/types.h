@@ -196,15 +196,15 @@ dbr_shared_rec_entry(struct DbrSlNode* node)
  */
 
 enum DbrState {
-    DBR_NEW = 1,
-    DBR_REVISE,
-    DBR_CANCEL,
-    DBR_TRADE
+    DBR_STATE_NEW = 1,
+    DBR_STATE_REVISE,
+    DBR_STATE_CANCEL,
+    DBR_STATE_TRADE
 };
 
 enum DbrAction {
-    DBR_BUY = 1,
-    DBR_SELL = -1
+    DBR_ACTION_BUY = 1,
+    DBR_ACTION_SELL = -1
 };
 
 /**
@@ -326,8 +326,8 @@ dbr_level_init(struct DbrLevel* level)
  */
 
 enum DbrRole {
-    DBR_MAKER = 1,
-    DBR_TAKER
+    DBR_ROLE_MAKER = 1,
+    DBR_ROLE_TAKER
 };
 
 struct DbrExec {

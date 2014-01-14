@@ -702,7 +702,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
                 exec->c.ref[0] = '\0';
-            exec->c.state = DBR_TRADE;
+            exec->c.state = DBR_STATE_TRADE;
             exec->c.action = sqlite3_column_int(stmt, ACTION);
             exec->c.ticks = sqlite3_column_int64(stmt, TICKS);
             exec->c.lots = sqlite3_column_int64(stmt, LOTS);
@@ -845,11 +845,11 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 // Set other side.
 
                 const int action = sqlite3_column_int(stmt, ACTION);
-                if (action == DBR_BUY) {
+                if (action == DBR_ACTION_BUY) {
                     posn->buy_licks = sqlite3_column_int64(stmt, LICKS);
                     posn->buy_lots = sqlite3_column_int64(stmt, LOTS);
                 } else {
-                    assert(action == DBR_SELL);
+                    assert(action == DBR_ACTION_SELL);
                     posn->sell_licks = sqlite3_column_int64(stmt, LICKS);
                     posn->sell_lots = sqlite3_column_int64(stmt, LOTS);
                 }
@@ -866,13 +866,13 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             posn->settl_date = settl_date;
 
             const int action = sqlite3_column_int(stmt, ACTION);
-            if (action == DBR_BUY) {
+            if (action == DBR_ACTION_BUY) {
                 posn->buy_licks = sqlite3_column_int64(stmt, LICKS);
                 posn->buy_lots = sqlite3_column_int64(stmt, LOTS);
                 posn->sell_licks = 0;
                 posn->sell_lots = 0;
             } else {
-                assert(action == DBR_SELL);
+                assert(action == DBR_ACTION_SELL);
                 posn->buy_licks = 0;
                 posn->buy_lots = 0;
                 posn->sell_licks = sqlite3_column_int64(stmt, LICKS);
