@@ -73,8 +73,12 @@ class ISess : public DbrISess {
         };
         return &VTBL;
     }
+protected:
+    ~ISess() noexcept
+    {
+    }
 public:
-    ISess()
+    ISess() noexcept
         : DbrISess{vtbl()}
     {
     }

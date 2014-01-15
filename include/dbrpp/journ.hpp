@@ -64,8 +64,12 @@ class IJourn : public DbrIJourn {
         };
         return &VTBL;
     }
+protected:
+    ~IJourn() noexcept
+    {
+    }
 public:
-    IJourn()
+    IJourn() noexcept
         : DbrIJourn{vtbl()}
     {
     }

@@ -215,8 +215,12 @@ class IModel : public DbrIModel {
         };
         return &VTBL;
     }
+protected:
+    ~IModel() noexcept
+    {
+    }
 public:
-    IModel()
+    IModel() noexcept
         : DbrIModel{vtbl()}
     {
     }
