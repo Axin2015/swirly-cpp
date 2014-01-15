@@ -397,7 +397,9 @@ sess_logoff(DbrIden req_id, DbrTrader trader)
 static DbrBool
 sess_heartbt(DbrIden req_id, DbrTrader trader)
 {
-    return DBR_TRUE;
+    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_HEARTBT };
+    dbr_send_body(pub, &rep, DBR_FALSE);
+    return dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_FALSE);
 }
 
 static DbrBool

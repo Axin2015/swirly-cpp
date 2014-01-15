@@ -50,7 +50,7 @@ enum {
     DEALERID = -2,
     SUBID = -3,
 
-    HBINT = 10000,
+    HBINT = 2000,
     HBTIMEOUT = (HBINT * 3) / 2,
 
     TRADER_PENDING    = 0x001,
@@ -858,6 +858,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             if (!dbr_prioq_push(&clnt->prioq, CLNTID, now + clnt->clntint))
                 goto fail1;
             break;
+        case DBR_SESS_HEARTBT:
+            break;
         case DBR_STATUS_REP:
             dbr_sess_status_handler(sess, body.req_id, body.status_rep.num, body.status_rep.msg);
             break;
@@ -927,6 +929,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
             dbr_sess_up_handler(sess, DBR_CONN_MD);
         }
         switch (body.type) {
+        case DBR_SESS_HEARTBT:
+            break;
         case DBR_VIEW_LIST_REP:
             for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
                 struct DbrView* view = dbr_shared_view_entry(node);
