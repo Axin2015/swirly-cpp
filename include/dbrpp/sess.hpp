@@ -35,6 +35,11 @@ class ISess : public DbrISess {
         static_cast<DerivedT*>(sess)->down_handler(conn);
     }
     static void
+    timeout_handler(DbrSess sess, DbrIden req_id) noexcept
+    {
+        static_cast<DerivedT*>(sess)->timeout_handler(req_id);
+    }
+    static void
     status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg) noexcept
     {
         static_cast<DerivedT*>(sess)->status_handler(req_id, num, msg);
@@ -45,9 +50,14 @@ class ISess : public DbrISess {
         static_cast<DerivedT*>(sess)->exec_handler(req_id, *exec);
     }
     static void
-    timeout_handler(DbrSess sess, DbrIden req_id) noexcept
+    posn_handler(DbrSess sess, DbrPosn* posn) noexcept
     {
-        static_cast<DerivedT*>(sess)->timeout_handler(req_id);
+        static_cast<DerivedT*>(sess)->posn_handler(*posn);
+    }
+    static void
+    view_handler(DbrSess sess, DbrView* view) noexcept
+    {
+        static_cast<DerivedT*>(sess)->view_handler(*view);
     }
     static const DbrSessVtbl*
     vtbl() noexcept
@@ -55,9 +65,11 @@ class ISess : public DbrISess {
         static const DbrSessVtbl VTBL = {
             up_handler,
             down_handler,
+            timeout_handler,
             status_handler,
             exec_handler,
-            timeout_handler
+            posn_handler,
+            view_handler
         };
         return &VTBL;
     }
@@ -81,6 +93,12 @@ down_handler(DbrSess sess, int conn)
 }
 
 inline void
+timeout_handler(DbrSess sess, DbrIden req_id)
+{
+    sess->vtbl->timeout_handler(sess, req_id);
+}
+
+inline void
 status_handler(DbrSess sess, DbrIden req_id, int num, const char* msg)
 {
     sess->vtbl->status_handler(sess, req_id, num, msg);
@@ -93,9 +111,15 @@ exec_handler(DbrSess sess, DbrIden req_id, DbrExec& exec)
 }
 
 inline void
-timeout_handler(DbrSess sess, DbrIden req_id)
+posn_handler(DbrSess sess, DbrPosn& posn)
 {
-    sess->vtbl->timeout_handler(sess, req_id);
+    sess->vtbl->posn_handler(sess, &posn);
+}
+
+inline void
+view_handler(DbrSess sess, DbrView& view)
+{
+    sess->vtbl->view_handler(sess, &view);
 }
 
 /** @} */

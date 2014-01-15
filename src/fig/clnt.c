@@ -900,12 +900,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
                 apply_update(clnt, body.exec_rep.exec);
                 break;
             }
-            dbr_exec_decref(body.exec_rep.exec, clnt->pool);
             dbr_sess_exec_handler(sess, body.req_id, body.exec_rep.exec);
+            dbr_exec_decref(body.exec_rep.exec, clnt->pool);
             break;
         case DBR_POSN_REP:
             enrich_posn(&clnt->cache, body.posn_rep.posn);
             apply_posnup(clnt, body.posn_rep.posn);
+            dbr_sess_posn_handler(sess, body.posn_rep.posn);
             break;
         default:
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
@@ -933,6 +934,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
                 // Transfer ownership.
                 enrich_view(&clnt->cache, view);
                 apply_viewup(clnt, view);
+                dbr_sess_view_handler(sess, view);
             }
             break;
         default:

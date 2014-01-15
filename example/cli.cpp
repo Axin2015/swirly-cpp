@@ -402,6 +402,13 @@ public:
         cout << "conn down: " << conn << endl;
     }
     void
+    timeout_handler(DbrIden req_id) noexcept
+    {
+        prompt_ = true;
+        cout << endl;
+        cout << "timeout: " << req_id << endl;
+    }
+    void
     status_handler(DbrIden req_id, int num, const char* msg) noexcept
     {
         prompt_ = true;
@@ -419,7 +426,11 @@ public:
         cout << "ok\n";
     }
     void
-    timeout_handler(DbrIden req_id) noexcept
+    posn_handler(DbrPosn& posn) noexcept
+    {
+    }
+    void
+    view_handler(DbrView& view) noexcept
     {
     }
     void

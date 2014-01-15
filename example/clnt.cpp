@@ -38,6 +38,10 @@ public:
     {
     }
     void
+    timeout_handler(DbrIden req_id) noexcept
+    {
+    }
+    void
     status_handler(DbrIden req_id, int num, const char* msg) noexcept
     {
     }
@@ -46,7 +50,11 @@ public:
     {
     }
     void
-    timeout_handler(DbrIden req_id) noexcept
+    posn_handler(DbrPosn& posn) noexcept
+    {
+    }
+    void
+    view_handler(DbrView& view) noexcept
     {
     }
 };

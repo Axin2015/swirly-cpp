@@ -21,6 +21,8 @@
 #include <dbr/defs.h>
 
 struct DbrExec;
+struct DbrPosn;
+struct DbrView;
 
 /**
  * @addtogroup Sess
@@ -45,13 +47,19 @@ struct DbrSessVtbl {
     (*down_handler)(DbrSess sess, int conn);
 
     void
+    (*timeout_handler)(DbrSess sess, DbrIden req_id);
+
+    void
     (*status_handler)(DbrSess sess, DbrIden req_id, int num, const char* msg);
 
     void
     (*exec_handler)(DbrSess sess, DbrIden req_id, struct DbrExec* exec);
 
     void
-    (*timeout_handler)(DbrSess sess, DbrIden req_id);
+    (*posn_handler)(DbrSess sess, struct DbrPosn* posn);
+
+    void
+    (*view_handler)(DbrSess sess, struct DbrView* view);
 };
 
 static inline void
@@ -64,6 +72,12 @@ static inline void
 dbr_sess_down_handler(DbrSess sess, int conn)
 {
     sess->vtbl->down_handler(sess, conn);
+}
+
+static inline void
+dbr_sess_timeout_handler(DbrSess sess, DbrIden req_id)
+{
+    sess->vtbl->timeout_handler(sess, req_id);
 }
 
 static inline void
@@ -84,9 +98,15 @@ dbr_sess_exec_handler(DbrSess sess, DbrIden req_id, struct DbrExec* exec)
 }
 
 static inline void
-dbr_sess_timeout_handler(DbrSess sess, DbrIden req_id)
+dbr_sess_posn_handler(DbrSess sess, struct DbrPosn* posn)
 {
-    sess->vtbl->timeout_handler(sess, req_id);
+    sess->vtbl->posn_handler(sess, posn);
+}
+
+static inline void
+dbr_sess_view_handler(DbrSess sess, struct DbrView* view)
+{
+    sess->vtbl->view_handler(sess, view);
 }
 
 /** @} */
