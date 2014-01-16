@@ -434,6 +434,10 @@ public:
     {
     }
     void
+    flush_handler() noexcept
+    {
+    }
+    void
     flush()
     {
         if (!clnt_.execs().empty()) {

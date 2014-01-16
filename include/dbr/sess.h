@@ -60,6 +60,9 @@ struct DbrSessVtbl {
 
     void
     (*view_handler)(DbrSess sess, struct DbrView* view);
+
+    void
+    (*flush_handler)(DbrSess sess);
 };
 
 static inline void
@@ -107,6 +110,12 @@ static inline void
 dbr_sess_view_handler(DbrSess sess, struct DbrView* view)
 {
     sess->vtbl->view_handler(sess, view);
+}
+
+static inline void
+dbr_sess_flush_handler(DbrSess sess)
+{
+    sess->vtbl->flush_handler(sess);
 }
 
 /** @} */

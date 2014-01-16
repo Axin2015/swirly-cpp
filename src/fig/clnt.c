@@ -940,6 +940,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess)
                 apply_viewup(clnt, view);
                 dbr_sess_view_handler(sess, view);
             }
+            dbr_sess_flush_handler(sess);
             break;
         default:
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);

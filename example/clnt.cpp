@@ -57,6 +57,10 @@ public:
     view_handler(DbrView& view) noexcept
     {
     }
+    void
+    flush_handler() noexcept
+    {
+    }
 };
 
 int

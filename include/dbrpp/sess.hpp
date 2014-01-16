@@ -59,6 +59,11 @@ class ISess : public DbrISess {
     {
         static_cast<DerivedT*>(sess)->view_handler(*view);
     }
+    static void
+    flush_handler(DbrSess sess) noexcept
+    {
+        static_cast<DerivedT*>(sess)->flush_handler();
+    }
     static const DbrSessVtbl*
     vtbl() noexcept
     {
@@ -69,7 +74,8 @@ class ISess : public DbrISess {
             status_handler,
             exec_handler,
             posn_handler,
-            view_handler
+            view_handler,
+            flush_handler
         };
         return &VTBL;
     }
@@ -124,6 +130,12 @@ inline void
 view_handler(DbrSess sess, DbrView& view)
 {
     sess->vtbl->view_handler(sess, &view);
+}
+
+inline void
+flush_handler(DbrSess sess)
+{
+    sess->vtbl->flush_handler(sess);
 }
 
 /** @} */
