@@ -391,6 +391,11 @@
  */
 
 /**
+ * @defgroup Handler Handler
+ * @ingroup Clnt
+ */
+
+/**
  * @defgroup ClntRec Record
  * @ingroup Clnt
  */

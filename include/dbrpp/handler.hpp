@@ -22,6 +22,11 @@
 
 namespace dbr {
 
+/**
+ * @addtogroup Handler
+ * @{
+ */
+
 template <class DerivedT>
 class IHandler : public DbrIHandler {
     static void
