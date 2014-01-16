@@ -15,36 +15,35 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIG_ORDIDX_H
-#define FIG_ORDIDX_H
+#ifndef FIG_SESSIDX_H
+#define FIG_SESSIDX_H
 
-// Index of orders by reference.
+// Index of sessions by reference.
 
 #include <dbr/defs.h>
+#include <dbr/pool.h>
 #include <dbr/stack.h>
 
-struct DbrOrder;
+struct DbrSess;
 
-#ifndef FIG_ORDIDX_BUCKETS
-#define FIG_ORDIDX_BUCKETS 257
-#endif // FIG_ORDIDX_BUCKETS
+#ifndef FIG_SESSIDX_BUCKETS
+#define FIG_SESSIDX_BUCKETS 257
+#endif // FIG_SESSIDX_BUCKETS
 
-struct FigOrdIdx {
+struct FigSessIdx {
+    DbrPool pool;
     struct {
-        struct DbrStack refs;
-    } buckets[FIG_ORDIDX_BUCKETS];
+        struct DbrStack mnems;
+    } buckets[FIG_SESSIDX_BUCKETS];
 };
 
 DBR_EXTERN void
-fig_ordidx_init(struct FigOrdIdx* ordidx);
+fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool);
 
 DBR_EXTERN void
-fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order);
+fig_sessidx_term(struct FigSessIdx* sessidx);
 
-DBR_EXTERN struct DbrOrder*
-fig_ordidx_remove(struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
+DBR_EXTERN struct DbrSess*
+fig_sessidx_lazy(const struct FigSessIdx* sessidx, const char* mnem);
 
-DBR_EXTERN struct DbrOrder*
-fig_ordidx_find(const struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
-
-#endif // FIG_ORDIDX_H
+#endif // FIG_SESSIDX_H

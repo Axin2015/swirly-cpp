@@ -575,13 +575,18 @@ dbr_shared_view_entry(struct DbrSlNode* node)
  */
 
 struct DbrSess {
+    DbrMnem mnem;
     struct DbrTree traders;
+    /**
+     * @privatesection
+     */
+    struct DbrSlNode mnem_node_;
 };
 
 static inline void
 dbr_sess_init(struct DbrSess* sess)
 {
-    dbr_tree_init(&sess->traders);
+    dbr_slnode_init(&sess->mnem_node_);
 }
 
 /** @} */
