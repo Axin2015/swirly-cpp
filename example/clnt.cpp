@@ -17,7 +17,7 @@
  */
 #include <dbrpp/clnt.hpp>
 #include <dbrpp/pool.hpp>
-#include <dbrpp/sess.hpp>
+#include <dbrpp/handler.hpp>
 #include <dbrpp/zmqctx.hpp>
 
 #include <zmq.h>
@@ -27,38 +27,38 @@
 using namespace dbr;
 using namespace std;
 
-class Sess : public dbr::ISess<Sess> {
+class Handler : public dbr::IHandler<Handler> {
 public:
     void
-    up_handler(int conn) noexcept
+    up(int conn) noexcept
     {
     }
     void
-    down_handler(int conn) noexcept
+    down(int conn) noexcept
     {
     }
     void
-    timeout_handler(DbrIden req_id) noexcept
+    timeout(DbrIden req_id) noexcept
     {
     }
     void
-    status_handler(DbrIden req_id, int num, const char* msg) noexcept
+    status(DbrIden req_id, int num, const char* msg) noexcept
     {
     }
     void
-    exec_handler(DbrIden req_id, DbrExec& exec) noexcept
+    exec(DbrIden req_id, DbrExec& exec) noexcept
     {
     }
     void
-    posn_handler(DbrPosn& posn) noexcept
+    posn(DbrPosn& posn) noexcept
     {
     }
     void
-    view_handler(DbrView& view) noexcept
+    view(DbrView& view) noexcept
     {
     }
     void
-    flush_handler() noexcept
+    flush() noexcept
     {
     }
 };
@@ -75,10 +75,10 @@ main(int argc, char* argv[])
                   "WRAMIREZ", 1, pool);
 
         // TODO: more robust logic.
-        Sess sess;
+        Handler handler;
         do {
             cout << '.';
-            clnt.poll(250, &sess);
+            clnt.poll(250, &handler);
         } while (!clnt.ready());
         cout << endl;
 

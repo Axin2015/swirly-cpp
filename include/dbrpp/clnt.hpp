@@ -912,9 +912,9 @@ public:
         return items;
     }
     int
-    poll(DbrMillis ms, DbrSess sess)
+    poll(DbrMillis ms, DbrHandler handler)
     {
-        const int nevents = dbr_clnt_poll(impl_, ms, sess);
+        const int nevents = dbr_clnt_poll(impl_, ms, handler);
         if (nevents < 0)
             throw_exception();
         return nevents;

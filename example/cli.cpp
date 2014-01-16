@@ -20,7 +20,7 @@
 #include <dbrpp/lexer.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
-#include <dbrpp/sess.hpp>
+#include <dbrpp/handler.hpp>
 #include <dbrpp/view.hpp>
 #include <dbrpp/zmqctx.hpp>
 
@@ -342,7 +342,7 @@ argc(Arg begin, Arg end)
     return distance(begin, end);
 }
 
-class Sess : public ISess<Sess> {
+class Handler : public IHandler<Handler> {
     Clnt& clnt_;
     DbrRec* arec_;
     DbrRec* crec_;
@@ -372,7 +372,7 @@ class Sess : public ISess<Sess> {
     }
 public:
     explicit
-    Sess(Clnt& clnt)
+    Handler(Clnt& clnt)
         : clnt_(clnt),
           arec_(nullptr),
           crec_(nullptr),
@@ -388,28 +388,28 @@ public:
         cout << endl;
     }
     void
-    up_handler(int conn) noexcept
+    up(int conn) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "conn up: " << conn << endl;
     }
     void
-    down_handler(int conn) noexcept
+    down(int conn) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "conn down: " << conn << endl;
     }
     void
-    timeout_handler(DbrIden req_id) noexcept
+    timeout(DbrIden req_id) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "timeout: " << req_id << endl;
     }
     void
-    status_handler(DbrIden req_id, int num, const char* msg) noexcept
+    status(DbrIden req_id, int num, const char* msg) noexcept
     {
         prompt_ = true;
         cout << endl;
@@ -419,26 +419,26 @@ public:
             cout << dbr::strncpy(msg, DBR_ERRMSG_MAX) << " (" << num << ")\n";
     }
     void
-    exec_handler(DbrIden req_id, DbrExec& exec) noexcept
+    exec(DbrIden req_id, DbrExec& exec) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "ok\n";
     }
     void
-    posn_handler(DbrPosn& posn) noexcept
+    posn(DbrPosn& posn) noexcept
     {
     }
     void
-    view_handler(DbrView& view) noexcept
+    view(DbrView& view) noexcept
     {
     }
     void
-    flush_handler() noexcept
+    flush() noexcept
     {
     }
     void
-    flush()
+    clear()
     {
         if (!clnt_.execs().empty()) {
             prompt_ = true;
@@ -625,7 +625,63 @@ public:
         }
     }
     void
-    view(Arg begin, Arg end)
+    cancel(Arg begin, Arg end)
+    {
+        while (begin != end) {
+            const auto id = ltog(ston<int>((*begin++).c_str()));
+            clnt_.cancel(id, TIMEOUT);
+        }
+    }
+    void
+    contrs(Arg begin, Arg end)
+    {
+        cout <<
+            "|mnem      "
+            "|display   "
+            "|asset_type"
+            "|asset     "
+            "|ccy       "
+            "|tick_numer"
+            "|tick_denom"
+            "|lot_numer "
+            "|lot_denom "
+            "|pip_dp    "
+            "|min_lots  "
+            "|max_lots  "
+            "|" << endl;
+        cout <<
+            "|----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "|" << endl;
+        for (auto rec : clnt_.crecs()) {
+            ContrRecRef ref(rec);
+            cout << '|' << left << setw(10) << ref.mnem()
+                 << '|' << left << setw(10) << ref.display()
+                 << '|' << left << setw(10) << ref.asset_type()
+                 << '|' << left << setw(10) << ref.asset()
+                 << '|' << left << setw(10) << ref.ccy()
+                 << '|' << right << setw(10) << ref.tick_numer()
+                 << '|' << right << setw(10) << ref.tick_denom()
+                 << '|' << right << setw(10) << ref.lot_numer()
+                 << '|' << right << setw(10) << ref.lot_denom()
+                 << '|' << right << setw(10) << ref.pip_dp()
+                 << '|' << right << setw(10) << ref.min_lots()
+                 << '|' << right << setw(10) << ref.max_lots()
+                 << '|' << endl;
+        }
+    }
+    void
+    depth(Arg begin, Arg end)
     {
         if (!crec_)
             throw InvalidState("contr");
@@ -686,68 +742,6 @@ public:
         }
     }
     void
-    cancel(Arg begin, Arg end)
-    {
-        while (begin != end) {
-            const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(id, TIMEOUT);
-        }
-    }
-    void
-    contrs(Arg begin, Arg end)
-    {
-        cout <<
-            "|mnem      "
-            "|display   "
-            "|asset_type"
-            "|asset     "
-            "|ccy       "
-            "|tick_numer"
-            "|tick_denom"
-            "|lot_numer "
-            "|lot_denom "
-            "|pip_dp    "
-            "|min_lots  "
-            "|max_lots  "
-            "|" << endl;
-        cout <<
-            "|----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "|" << endl;
-        for (auto rec : clnt_.crecs()) {
-            ContrRecRef ref(rec);
-            cout << '|' << left << setw(10) << ref.mnem()
-                 << '|' << left << setw(10) << ref.display()
-                 << '|' << left << setw(10) << ref.asset_type()
-                 << '|' << left << setw(10) << ref.asset()
-                 << '|' << left << setw(10) << ref.ccy()
-                 << '|' << right << setw(10) << ref.tick_numer()
-                 << '|' << right << setw(10) << ref.tick_denom()
-                 << '|' << right << setw(10) << ref.lot_numer()
-                 << '|' << right << setw(10) << ref.lot_denom()
-                 << '|' << right << setw(10) << ref.pip_dp()
-                 << '|' << right << setw(10) << ref.min_lots()
-                 << '|' << right << setw(10) << ref.max_lots()
-                 << '|' << endl;
-        }
-    }
-    void
-    echo(Arg begin, Arg end)
-    {
-        for (; begin != end; ++begin)
-            cout << *begin << endl;
-    }
-    void
     env(Arg begin, Arg end)
     {
         cout <<
@@ -770,6 +764,12 @@ public:
             cout << '|' << left << setw(20) << "settl_date"
                  << '|' << left << setw(20) << settl_date_
                  << '|' << endl;
+    }
+    void
+    echo(Arg begin, Arg end)
+    {
+        for (; begin != end; ++begin)
+            cout << *begin << endl;
     }
     void
     orders(Arg begin, Arg end)
@@ -1027,26 +1027,26 @@ main(int argc, char* argv[])
         // epgm://239.192.1.1:3270
         Clnt clnt(ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271", trader,
                   dbr_millis(), pool);
-        Sess sess(clnt);
+        Handler handler(clnt);
         Repl repl;
 
-        repl.cmd("accnts", 0, bind(&Sess::accnts, ref(sess), _1, _2));
-        repl.cmd("ack_trades", -1, bind(&Sess::ack_trades, ref(sess), _1, _2));
-        repl.cmd("buy", 2, bind(&Sess::place, ref(sess), DBR_ACTION_BUY, _1, _2));
-        repl.cmd("cancel", -1, bind(&Sess::cancel, ref(sess), _1, _2));
-        repl.cmd("contrs", 0, bind(&Sess::contrs, ref(sess), _1, _2));
-        repl.cmd("echo", -1, bind(&Sess::echo, ref(sess), _1, _2));
-        repl.cmd("env", 0, bind(&Sess::env, ref(sess), _1, _2));
-        repl.cmd("orders", 0, bind(&Sess::orders, ref(sess), _1, _2));
-        repl.cmd("posns", 0, bind(&Sess::posns, ref(sess), _1, _2));
-        repl.cmd("quit", 0, bind(&Sess::quit, ref(sess), _1, _2));
-        repl.cmd("revise", 2, bind(&Sess::revise, ref(sess), _1, _2));
-        repl.cmd("sell", 2, bind(&Sess::place, ref(sess), DBR_ACTION_SELL, _1, _2));
-        repl.cmd("set", 2, bind(&Sess::set, ref(sess), _1, _2));
-        repl.cmd("traders", 0, bind(&Sess::traders, ref(sess), _1, _2));
-        repl.cmd("trades", 0, bind(&Sess::trades, ref(sess), _1, _2));
-        repl.cmd("unset", 1, bind(&Sess::unset, ref(sess), _1, _2));
-        repl.cmd("view", 0, bind(&Sess::view, ref(sess), _1, _2));
+        repl.cmd("accnts", 0, bind(&Handler::accnts, ref(handler), _1, _2));
+        repl.cmd("ack_trades", -1, bind(&Handler::ack_trades, ref(handler), _1, _2));
+        repl.cmd("buy", 2, bind(&Handler::place, ref(handler), DBR_ACTION_BUY, _1, _2));
+        repl.cmd("cancel", -1, bind(&Handler::cancel, ref(handler), _1, _2));
+        repl.cmd("contrs", 0, bind(&Handler::contrs, ref(handler), _1, _2));
+        repl.cmd("depth", 0, bind(&Handler::depth, ref(handler), _1, _2));
+        repl.cmd("echo", -1, bind(&Handler::echo, ref(handler), _1, _2));
+        repl.cmd("env", 0, bind(&Handler::env, ref(handler), _1, _2));
+        repl.cmd("orders", 0, bind(&Handler::orders, ref(handler), _1, _2));
+        repl.cmd("posns", 0, bind(&Handler::posns, ref(handler), _1, _2));
+        repl.cmd("quit", 0, bind(&Handler::quit, ref(handler), _1, _2));
+        repl.cmd("revise", 2, bind(&Handler::revise, ref(handler), _1, _2));
+        repl.cmd("sell", 2, bind(&Handler::place, ref(handler), DBR_ACTION_SELL, _1, _2));
+        repl.cmd("set", 2, bind(&Handler::set, ref(handler), _1, _2));
+        repl.cmd("traders", 0, bind(&Handler::traders, ref(handler), _1, _2));
+        repl.cmd("trades", 0, bind(&Handler::trades, ref(handler), _1, _2));
+        repl.cmd("unset", 1, bind(&Handler::unset, ref(handler), _1, _2));
 
         char path[PATH_MAX];
         sprintf(path, "%s/.dbr_clirc", getenv("HOME"));
@@ -1073,7 +1073,7 @@ main(int argc, char* argv[])
         char buf[BUF_MAX];
         while (!repl.quit()) {
 
-            clnt.poll(30000, &sess);
+            clnt.poll(30000, &handler);
             if ((items[0].revents & ZMQ_POLLIN)) {
 
                 const ssize_t n{::read(0, buf, sizeof(buf))};
@@ -1085,13 +1085,13 @@ main(int argc, char* argv[])
                     break;
                 }
                 try {
-                    sess.set_prompt(true);
+                    handler.set_prompt(true);
                     lexer.exec(buf, n);
                 } catch (const exception& e) {
                     cerr << e.what() << endl;
                 }
             }
-            sess.flush();
+            handler.clear();
         }
         return 0;
     } catch (const exception& e) {

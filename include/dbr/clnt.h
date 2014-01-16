@@ -18,7 +18,7 @@
 #ifndef DBR_CLNT_H
 #define DBR_CLNT_H
 
-#include <dbr/sess.h>
+#include <dbr/handler.h>
 #include <dbr/types.h>
 
 #include <zmq.h>
@@ -149,7 +149,7 @@ DBR_API zmq_pollitem_t*
 dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems);
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrSess sess);
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 DBR_API void
 dbr_clnt_clear(DbrClnt clnt);
