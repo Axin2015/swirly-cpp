@@ -75,7 +75,7 @@ struct FigClnt {
     unsigned flags;
     DbrTrader trader;
     struct FigCache cache;
-    struct FigIndex index;
+    struct FigOrdIdx ordidx;
     struct DbrQueue execs;
     struct DbrTree views;
     struct DbrTree posnups;
@@ -204,7 +204,7 @@ set_trader(DbrClnt clnt)
         goto fail1;
 
     struct DbrRec* trec = dbr_shared_rec_entry(node);
-    DbrTrader trader = fig_trader_lazy(trec, &clnt->index, clnt->pool);
+    DbrTrader trader = fig_trader_lazy(trec, &clnt->ordidx, clnt->pool);
     if (!trader)
         goto fail1;
 
@@ -422,7 +422,7 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
         | EXEC_PENDING | MEMB_PENDING | POSN_PENDING | VIEW_PENDING | EXEC_DOWN /*| MD_DOWN*/;
     clnt->trader = NULL;
     fig_cache_init(&clnt->cache, term_state, pool);
-    fig_index_init(&clnt->index);
+    fig_ordidx_init(&clnt->ordidx);
     dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->views);
     dbr_tree_init(&clnt->posnups);

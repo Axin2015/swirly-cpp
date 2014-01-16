@@ -198,6 +198,11 @@
  */
 
 /**
+ * @defgroup TypesSess Sess
+ * @ingroup Types
+ */
+
+/**
  * @defgroup Conv Conversion
  * @ingroup Elm
  */

@@ -18,7 +18,7 @@
 #ifndef FIG_TRADER_H
 #define FIG_TRADER_H
 
-#include <fig/index.h>
+#include <fig/ordidx.h>
 
 #include <dbr/pool.h>
 #include <dbr/refcount.h>
@@ -29,7 +29,7 @@
 
 struct FigTrader {
     struct DbrRec* rec;
-    struct FigIndex* index;
+    struct FigOrdIdx* ordidx;
     DbrPool pool;
     struct DbrTree orders;
     struct DbrTree trades;
@@ -37,7 +37,7 @@ struct FigTrader {
 };
 
 DBR_EXTERN struct FigTrader*
-fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool);
+fig_trader_lazy(struct DbrRec* trec, struct FigOrdIdx* ordidx, DbrPool pool);
 
 // Assumes that trec pointer is not null.
 
@@ -67,7 +67,7 @@ fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
     }
 #pragma GCC diagnostic pop
     if (order->c.ref[0] != '\0')
-        fig_index_insert(trader->index, order);
+        fig_ordidx_insert(trader->ordidx, order);
 }
 
 // Release ownership from state.
@@ -78,7 +78,7 @@ fig_trader_release_order(struct FigTrader* trader, struct DbrOrder* order)
     dbr_tree_remove(&trader->orders, &order->trader_node_);
     dbr_rbnode_init(&order->trader_node_);
     if (order->c.ref[0] != '\0')
-        fig_index_remove(trader->index, trader->rec->id, order->c.ref);
+        fig_ordidx_remove(trader->ordidx, trader->rec->id, order->c.ref);
 }
 
 // Release ownership from state.
@@ -100,7 +100,7 @@ static inline struct DbrOrder*
 fig_trader_release_order_ref(struct FigTrader* trader, const char* ref)
 {
     assert(ref);
-    struct DbrOrder* order = fig_index_remove(trader->index, trader->rec->id, ref);
+    struct DbrOrder* order = fig_ordidx_remove(trader->ordidx, trader->rec->id, ref);
     if (order) {
         dbr_tree_remove(&trader->orders, &order->trader_node_);
         dbr_rbnode_init(&order->trader_node_);
@@ -120,7 +120,7 @@ static inline struct DbrOrder*
 fig_trader_find_order_ref(const struct FigTrader* trader, const char* ref)
 {
     assert(ref);
-    return fig_index_find(trader->index, trader->rec->id, ref);
+    return fig_ordidx_find(trader->ordidx, trader->rec->id, ref);
 }
 
 static inline struct DbrRbNode*

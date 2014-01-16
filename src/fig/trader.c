@@ -60,7 +60,7 @@ free_membs(struct FigTrader* trader)
 }
 
 DBR_EXTERN struct FigTrader*
-fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
+fig_trader_lazy(struct DbrRec* trec, struct FigOrdIdx* ordidx, DbrPool pool)
 {
     assert(trec);
     assert(trec->type == DBR_ENTITY_TRADER);
@@ -72,7 +72,7 @@ fig_trader_lazy(struct DbrRec* trec, struct FigIndex* index, DbrPool pool)
             return NULL;
         }
         trader->rec = trec;
-        trader->index = index;
+        trader->ordidx = ordidx;
         trader->pool = pool;
         dbr_tree_init(&trader->orders);
         dbr_tree_init(&trader->trades);

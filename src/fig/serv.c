@@ -17,7 +17,7 @@
  */
 #include "accnt.h"
 #include "cache.h"
-#include "index.h"
+#include "ordidx.h"
 #include "match.h"
 #include "trader.h"
 
@@ -34,7 +34,7 @@ struct FigServ {
     DbrModel model;
     DbrPool pool;
     struct FigCache cache;
-    struct FigIndex index;
+    struct FigOrdIdx ordidx;
     struct DbrTree books;
 
     struct DbrQueue execs;
@@ -207,7 +207,7 @@ emplace_orders(DbrServ serv)
         } else
             book = NULL;
 
-        struct FigTrader* trader = fig_trader_lazy(order->c.trader.rec, &serv->index, serv->pool);
+        struct FigTrader* trader = fig_trader_lazy(order->c.trader.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader)) {
             if (book)
                 dbr_book_remove(book, order);
@@ -238,7 +238,7 @@ emplace_trades(DbrServ serv)
 
     for (; node; node = node->next) {
         struct DbrExec* exec = enrich_trade(&serv->cache, dbr_shared_exec_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(exec->c.trader.rec, &serv->index, serv->pool);
+        struct FigTrader* trader = fig_trader_lazy(exec->c.trader.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
@@ -267,7 +267,7 @@ emplace_membs(DbrServ serv)
 
     for (; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->index, serv->pool);
+        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
@@ -368,7 +368,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
         insert_posnup(&serv->posnups, match->maker_posn);
 
         // Must succeed because maker order exists.
-        struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->index,
+        struct FigTrader* maker = fig_trader_lazy(maker_order->c.trader.rec, &serv->ordidx,
                                                   serv->pool);
         assert(maker);
 
@@ -405,7 +405,7 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     serv->model = model;
     serv->pool = pool;
     fig_cache_init(&serv->cache, term_state, pool);
-    fig_index_init(&serv->index);
+    fig_ordidx_init(&serv->ordidx);
     dbr_tree_init(&serv->books);
 
     dbr_queue_init(&serv->execs);
@@ -474,7 +474,7 @@ dbr_serv_empty_rec(DbrServ serv, int type)
 DBR_API DbrTrader
 dbr_serv_trader(DbrServ serv, struct DbrRec* trec)
 {
-    return fig_trader_lazy(trec, &serv->index, serv->pool);
+    return fig_trader_lazy(trec, &serv->ordidx, serv->pool);
 }
 
 DBR_API DbrAccnt

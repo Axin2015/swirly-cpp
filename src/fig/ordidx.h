@@ -15,38 +15,38 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIG_INDEX_H
-#define FIG_INDEX_H
+#ifndef FIG_ORDIDX_H
+#define FIG_ORDIDX_H
 
-// Index of trader's orders by reference.
+// OrdIdx of trader's orders by reference.
 
 #include <dbr/defs.h>
 #include <dbr/stack.h>
 
 struct DbrOrder;
 
-struct FigIndex;
+struct FigOrdIdx;
 
-#ifndef FIG_INDEX_BUCKETS
-#define FIG_INDEX_BUCKETS 257
-#endif // FIG_INDEX_BUCKETS
+#ifndef FIG_ORDIDX_BUCKETS
+#define FIG_ORDIDX_BUCKETS 257
+#endif // FIG_ORDIDX_BUCKETS
 
-struct FigIndex {
+struct FigOrdIdx {
     struct {
         struct DbrStack refs;
-    } buckets[FIG_INDEX_BUCKETS];
+    } buckets[FIG_ORDIDX_BUCKETS];
 };
 
 DBR_EXTERN void
-fig_index_init(struct FigIndex* index);
+fig_ordidx_init(struct FigOrdIdx* ordidx);
 
 DBR_EXTERN void
-fig_index_insert(struct FigIndex* index, struct DbrOrder* order);
+fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order);
 
 DBR_EXTERN struct DbrOrder*
-fig_index_remove(struct FigIndex* index, DbrIden trid, const char* ref);
+fig_ordidx_remove(struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
 
 DBR_EXTERN struct DbrOrder*
-fig_index_find(const struct FigIndex* index, DbrIden trid, const char* ref);
+fig_ordidx_find(const struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
 
-#endif // FIG_INDEX_H
+#endif // FIG_ORDIDX_H
