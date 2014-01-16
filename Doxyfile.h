@@ -254,6 +254,11 @@
  */
 
 /**
+ * @defgroup PoolSess Sess
+ * @ingroup Pool
+ */
+
+/**
  * @defgroup Proto Proto
  * @ingroup Elm
  * @example proto.cpp

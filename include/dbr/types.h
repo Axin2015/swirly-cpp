@@ -20,8 +20,8 @@
 
 #include <dbr/dlnode.h>
 #include <dbr/queue.h>
-#include <dbr/rbnode.h>
 #include <dbr/slnode.h>
+#include <dbr/tree.h>
 
 #include <sys/types.h> // ssize_t
 
@@ -565,6 +565,23 @@ static inline struct DbrView*
 dbr_shared_view_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrView, shared_node_, node);
+}
+
+/** @} */
+
+/**
+ * @addtogroup TypesSess
+ * @{
+ */
+
+struct DbrSess {
+    struct DbrTree traders;
+};
+
+static inline void
+dbr_sess_init(struct DbrSess* sess)
+{
+    dbr_tree_init(&sess->traders);
 }
 
 /** @} */

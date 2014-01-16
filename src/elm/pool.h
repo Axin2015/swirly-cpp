@@ -60,6 +60,7 @@ struct ElmSmallNode {
         struct DbrMatch match;
         struct DbrMemb memb;
         struct DbrPosn posn;
+        struct DbrSess sess;
     };
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -236,6 +237,20 @@ elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
     elm_pool_free_large(pool, node);
 }
 
+static inline struct DbrSess*
+elm_pool_alloc_sess(struct ElmPool* pool)
+{
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool);
+    return node ? &node->sess : NULL;
+}
+
+static inline void
+elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
+{
+    struct ElmSmallNode* node = (struct ElmSmallNode*)sess;
+    elm_pool_free_small(pool, node);
+}
+
 #else  // defined(DBR_DEBUG_ALLOC)
 
 DBR_EXTERN struct ElmSmallNode*
@@ -372,6 +387,22 @@ elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
     elm_pool_free_large(pool, node);
 }
 
+static inline struct DbrSess*
+elm_pool_alloc_sess_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmSmallNode* node = elm_pool_alloc_small(pool, file, line);
+    dbr_log_debug3("allocating sess %p in %s at %d", node, file, line);
+    return node ? &node->sess : NULL;
+}
+
+static inline void
+elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
+{
+    struct ElmSmallNode* node = (struct ElmSmallNode*)sess;
+    dbr_log_debug3("freeing sess %p from %s at %d", node, node->file, node->line);
+    elm_pool_free_small(pool, node);
+}
+
 #define elm_pool_alloc_rec(pool)                    \
     elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_order(pool)                  \
@@ -388,6 +419,8 @@ elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
     elm_pool_alloc_posn_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_view(pool)                   \
     elm_pool_alloc_view_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_sess(pool)                   \
+    elm_pool_alloc_sess_(pool, __FILE__, __LINE__)
 
 #endif // defined(DBR_DEBUG_ALLOC)
 

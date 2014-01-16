@@ -24,11 +24,11 @@
 #include <stddef.h> // NULL
 
 
-#line 82 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 81 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 
 
 
-#line 33 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 32 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 static const char _lexer_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 2, 0, 1, 2, 3, 
@@ -91,7 +91,7 @@ static const int lexer_error = 0;
 static const int lexer_en_main = 12;
 
 
-#line 85 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 84 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 
 DBR_API void
 dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* ctx)
@@ -101,12 +101,12 @@ dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), v
 
     int cs;
     
-#line 106 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 105 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 	{
 	cs = lexer_start;
 	}
 
-#line 94 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 93 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
     lexer->cs = cs;
 }
 
@@ -115,12 +115,12 @@ dbr_lexer_reset(struct DbrLexer* lexer)
 {
     int cs;
     
-#line 120 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 119 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 	{
 	cs = lexer_start;
 	}
 
-#line 102 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 101 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
     lexer->cs = cs;
 }
 
@@ -132,7 +132,7 @@ dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
 
     int cs = lexer->cs;
 	
-#line 137 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 136 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -206,13 +206,13 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 30 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 29 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 	{
         lexer->len = 0;
     }
 	break;
 	case 1:
-#line 33 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 32 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 	{
         if (lexer->len < DBR_TOK_MAX)
             lexer->tok[lexer->len++] = (*p);
@@ -223,25 +223,25 @@ _match:
     }
 	break;
 	case 2:
-#line 41 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 40 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 	{
         p--;
     }
 	break;
 	case 3:
-#line 44 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 43 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 	{
         lexer->tok[lexer->len] = '\0';
         lexer->cb(lexer->ctx, lexer->tok, lexer->len);
     }
 	break;
 	case 4:
-#line 48 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 47 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
 	{
         lexer->cb(lexer->ctx, NULL, 0);
     }
 	break;
-#line 246 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 245 "/Users/marayl/repo/doobry/src/ash/lexer.c"
 		}
 	}
 
@@ -254,7 +254,7 @@ _again:
 	_out: {}
 	}
 
-#line 113 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 112 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
     lexer->cs = cs;
 
     if (cs == lexer_error) {

@@ -142,6 +142,19 @@ dbr_pool_free_view(DbrPool pool, struct DbrView* view);
 /** @} */
 
 /**
+ * @addtogroup PoolSess
+ * @{
+ */
+
+DBR_API struct DbrSess*
+dbr_pool_alloc_sess(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_sess(DbrPool pool, struct DbrSess* sess);
+
+/** @} */
+
+/**
  * @addtogroup Pool
  * @{
  */

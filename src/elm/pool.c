@@ -130,6 +130,7 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug2("sizeof DbrMatch=%zu", sizeof(struct DbrMatch));
     dbr_log_debug2("sizeof DbrMemb=%zu", sizeof(struct DbrMemb));
     dbr_log_debug2("sizeof DbrPosn=%zu", sizeof(struct DbrPosn));
+    dbr_log_debug2("sizeof DbrSess=%zu", sizeof(struct DbrSess));
 
     dbr_log_debug2("%zu large nodes per block:", pool->large.nodes_per_block);
     dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
@@ -411,6 +412,18 @@ DBR_API void
 dbr_pool_free_view(DbrPool pool, struct DbrView* view)
 {
     elm_pool_free_view(pool, view);
+}
+
+DBR_API struct DbrSess*
+dbr_pool_alloc_sess(DbrPool pool)
+{
+    return elm_pool_alloc_sess(pool);
+}
+
+DBR_API void
+dbr_pool_free_sess(DbrPool pool, struct DbrSess* sess)
+{
+    elm_pool_free_sess(pool, sess);
 }
 
 DBR_API void
