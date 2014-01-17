@@ -32,9 +32,9 @@ static inline void
 free_sess_list(struct DbrSlNode* node, DbrPool pool)
 {
     while (node) {
-        struct DbrRec* rec = dbr_shared_rec_entry(node);
+        struct DbrSess* sess = sess_entry_mnem(node);
         node = node->next;
-        dbr_pool_free_rec(pool, rec);
+        dbr_pool_free_sess(pool, sess);
     }
 }
 
@@ -63,7 +63,9 @@ fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool)
 DBR_EXTERN void
 fig_sessidx_term(struct FigSessIdx* sessidx)
 {
-    free_sess_list(sessidx->buckets[0].mnems.first, sessidx->pool);
+    // Free each bucket.
+    for (size_t i = 0; i < FIG_SESSIDX_BUCKETS; ++i)
+        free_sess_list(sessidx->buckets[i].mnems.first, sessidx->pool);
 }
 
 DBR_EXTERN struct DbrSess*
