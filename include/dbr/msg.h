@@ -110,8 +110,8 @@ struct DbrBody {
             int type;
         } sess_entity_req;
         struct {
-            DbrMnem accnt;
-            DbrMnem contr;
+            DbrIden aid;
+            DbrIden cid;
             DbrDate settl_date;
             DbrRef ref;
             int action;

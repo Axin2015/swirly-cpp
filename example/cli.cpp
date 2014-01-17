@@ -835,7 +835,7 @@ public:
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        clnt_.place(arec_->mnem, crec_->mnem, settl_date_, nullptr, action, ticks, lots, 0,
+        clnt_.place(arec_->id, crec_->id, settl_date_, nullptr, action, ticks, lots, 0,
                     TIMEOUT);
     }
     void

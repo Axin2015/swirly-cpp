@@ -836,10 +836,10 @@ public:
         return Accnt{accnt};
     }
     DbrIden
-    place(const char* accnt, const char* contr, DbrDate settl_date, const char* ref, int action,
+    place(DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min_lots, DbrMillis ms)
     {
-        DbrIden req_id = dbr_clnt_place(impl_, accnt, contr, settl_date, ref, action, ticks,
+        DbrIden req_id = dbr_clnt_place(impl_, aid, cid, settl_date, ref, action, ticks,
                                         lots, min_lots, ms);
         if (req_id < 0)
             throw_exception();

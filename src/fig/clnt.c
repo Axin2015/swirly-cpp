@@ -528,9 +528,8 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 }
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
-               DbrMillis ms)
+dbr_clnt_place(DbrClnt clnt, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+               int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -539,8 +538,8 @@ dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_PLACE_ORDER_REQ;
-    strncpy(body.place_order_req.accnt, accnt, DBR_MNEM_MAX);
-    strncpy(body.place_order_req.contr, contr, DBR_MNEM_MAX);
+    body.place_order_req.aid = aid;
+    body.place_order_req.cid = cid;
     body.place_order_req.settl_date = settl_date;
     if (ref)
         strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);

@@ -109,9 +109,8 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
  */
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, const char* accnt, const char* contr, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
-               DbrMillis ms);
+dbr_clnt_place(DbrClnt clnt, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
+               int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots, DbrMillis ms);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:

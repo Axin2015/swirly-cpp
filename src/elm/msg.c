@@ -30,7 +30,7 @@
 #include <string.h>
 
 static const char STATUS_REP_FORMAT[] = "is";
-static const char PLACE_ORDER_REQ_FORMAT[] = "mmisilll";
+static const char PLACE_ORDER_REQ_FORMAT[] = "llisilll";
 static const char REVISE_ORDER_ID_REQ_FORMAT[] = "ll";
 static const char REVISE_ORDER_REF_REQ_FORMAT[] = "sl";
 static const char UPDATE_EXEC_REQ_FORMAT[] = "li";
@@ -290,8 +290,8 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
-                          body->place_order_req.accnt,
-                          body->place_order_req.contr,
+                          body->place_order_req.aid,
+                          body->place_order_req.cid,
                           body->place_order_req.settl_date,
                           DBR_REF_MAX, body->place_order_req.ref,
                           body->place_order_req.action,
@@ -427,8 +427,8 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
-                        body->place_order_req.accnt,
-                        body->place_order_req.contr,
+                        body->place_order_req.aid,
+                        body->place_order_req.cid,
                         body->place_order_req.settl_date,
                         DBR_REF_MAX, body->place_order_req.ref,
                         body->place_order_req.action,
@@ -626,8 +626,8 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_PLACE_ORDER_REQ:
         if (!(buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,
-                                body->place_order_req.accnt,
-                                body->place_order_req.contr,
+                                &body->place_order_req.aid,
+                                &body->place_order_req.cid,
                                 &body->place_order_req.settl_date,
                                 DBR_REF_MAX, body->place_order_req.ref,
                                 &body->place_order_req.action,

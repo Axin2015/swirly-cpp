@@ -59,6 +59,13 @@ free_view_list(struct DbrSlNode* first)
 }
 
 static inline struct DbrRec*
+find_rec_id(int type, DbrIden id)
+{
+    struct DbrSlNode* node = dbr_serv_find_rec_id(serv, type, id);
+    return node != DBR_SERV_END_REC ? dbr_serv_rec_entry(node) : NULL;
+}
+
+static inline struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
 {
     struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
@@ -419,16 +426,16 @@ place_order(const struct DbrBody* req, DbrTrader trader)
 {
     struct DbrBody rep;
 
-    struct DbrRec* arec = find_rec_mnem(DBR_ENTITY_ACCNT, req->place_order_req.accnt);
+    struct DbrRec* arec = find_rec_id(DBR_ENTITY_ACCNT, req->place_order_req.aid);
     if (!arec) {
-        status_setf(&rep, req->req_id, DBR_EINVAL, "no such accnt '%.16s'",
-                    req->place_order_req.accnt);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such accnt '%ld'",
+                    req->place_order_req.aid);
         goto fail1;
     }
-    struct DbrRec* crec = find_rec_mnem(DBR_ENTITY_CONTR, req->place_order_req.contr);
+    struct DbrRec* crec = find_rec_id(DBR_ENTITY_CONTR, req->place_order_req.cid);
     if (!crec) {
-        status_setf(&rep, req->req_id, DBR_EINVAL, "no such contr '%.16s'",
-                    req->place_order_req.contr);
+        status_setf(&rep, req->req_id, DBR_EINVAL, "no such contr '%ld'",
+                    req->place_order_req.cid);
         goto fail1;
     }
     DbrAccnt accnt = dbr_serv_accnt(serv, arec);
