@@ -29,7 +29,9 @@
  */
 
 enum {
-    DBR_SESS_LOGON = 1,
+    DBR_SESS_INIT = 1,
+    DBR_SESS_TERM,
+    DBR_SESS_LOGON,
     DBR_SESS_LOGOFF,
     DBR_SESS_HEARTBT,
 
@@ -69,7 +71,7 @@ struct DbrBody {
         // Session.
         struct {
             int hbint;
-        } sess_logon;
+        } sess_init;
         // Reply.
         struct {
             int num;

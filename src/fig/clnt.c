@@ -178,10 +178,10 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
 }
 
 static DbrIden
-logon(DbrClnt clnt)
+init(DbrClnt clnt)
 {
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_LOGON,
-                            .sess_logon = { .hbint = HBINT } };
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_INIT,
+                            .sess_init = { .hbint = HBINT } };
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
@@ -452,7 +452,7 @@ dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const 
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail7;
 
-    if (!logon(clnt))
+    if (!init(clnt))
         goto fail7;
 
     const DbrMillis now = dbr_millis();
@@ -853,11 +853,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             dbr_handler_up(handler, DBR_CONN_EXEC);
         }
         switch (body.type) {
-        case DBR_SESS_LOGON:
-            clnt->clntint = body.sess_logon.hbint;
+        case DBR_SESS_INIT:
+            clnt->clntint = body.sess_init.hbint;
             if (!dbr_prioq_push(&clnt->prioq, CLNTID, now + clnt->clntint))
                 goto fail1;
             break;
+        case DBR_SESS_TERM:
+        case DBR_SESS_LOGON:
         case DBR_SESS_HEARTBT:
             break;
         case DBR_STATUS_REP:

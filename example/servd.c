@@ -373,10 +373,10 @@ sess_book(DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
-sess_logon(DbrIden req_id, DbrTrader trader)
+sess_init(DbrIden req_id, DbrTrader trader)
 {
-    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_LOGON,
-                           .sess_logon = { .hbint = HBINT_IN } };
+    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_INIT,
+                           .sess_init = { .hbint = HBINT_IN } };
     return dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_FALSE)
         && sess_trader(0, trader)
         && sess_accnt(0, trader)
@@ -386,6 +386,18 @@ sess_logon(DbrIden req_id, DbrTrader trader)
         && sess_memb(0, trader)
         && sess_posn(0, trader)
         && sess_book(0, trader);
+}
+
+static DbrBool
+sess_term(DbrIden req_id, DbrTrader trader)
+{
+    return DBR_TRUE;
+}
+
+static DbrBool
+sess_logon(DbrIden req_id, DbrTrader trader)
+{
+    return DBR_TRUE;
 }
 
 static DbrBool
@@ -583,6 +595,12 @@ run(void)
             continue;
         }
         switch (req.body.type) {
+        case DBR_SESS_INIT:
+            sess_init(req.body.req_id, trader);
+            break;
+        case DBR_SESS_TERM:
+            sess_term(req.body.req_id, trader);
+            break;
         case DBR_SESS_LOGON:
             sess_logon(req.body.req_id, trader);
             break;

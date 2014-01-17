@@ -197,9 +197,11 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     size_t n = dbr_packlenl(body->req_id);
     n += dbr_packleni(body->type);
     switch (body->type) {
-    case DBR_SESS_LOGON:
-        n += dbr_packleni(body->sess_logon.hbint);
+    case DBR_SESS_INIT:
+        n += dbr_packleni(body->sess_init.hbint);
         break;
+    case DBR_SESS_TERM:
+    case DBR_SESS_LOGON:
     case DBR_SESS_LOGOFF:
     case DBR_SESS_HEARTBT:
         break;
@@ -348,9 +350,11 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     buf = dbr_packl(buf, body->req_id);
     buf = dbr_packi(buf, body->type);
     switch (body->type) {
-    case DBR_SESS_LOGON:
-        buf = dbr_packi(buf, body->sess_logon.hbint);
+    case DBR_SESS_INIT:
+        buf = dbr_packi(buf, body->sess_init.hbint);
         break;
+    case DBR_SESS_TERM:
+    case DBR_SESS_LOGON:
     case DBR_SESS_LOGOFF:
     case DBR_SESS_HEARTBT:
         break;
@@ -486,10 +490,12 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     body->type = type;
     struct DbrQueue q;
     switch (type) {
-    case DBR_SESS_LOGON:
-        if (!(buf = dbr_unpacki(buf, &body->sess_logon.hbint)))
+    case DBR_SESS_INIT:
+        if (!(buf = dbr_unpacki(buf, &body->sess_init.hbint)))
             goto fail1;
         break;
+    case DBR_SESS_TERM:
+    case DBR_SESS_LOGON:
     case DBR_SESS_LOGOFF:
     case DBR_SESS_HEARTBT:
         break;
