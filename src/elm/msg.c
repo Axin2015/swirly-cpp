@@ -30,9 +30,11 @@
 #include <string.h>
 
 static const char STATUS_REP_FORMAT[] = "is";
-static const char PLACE_ORDER_REQ_FORMAT[] = "llisilll";
-static const char REVISE_ORDER_ID_REQ_FORMAT[] = "ll";
-static const char REVISE_ORDER_REF_REQ_FORMAT[] = "sl";
+static const char PLACE_ORDER_REQ_FORMAT[] = "lllisilll";
+static const char CANCEL_ORDER_ID_REQ_FORMAT[] = "ll";
+static const char CANCEL_ORDER_REF_REQ_FORMAT[] = "ls";
+static const char REVISE_ORDER_ID_REQ_FORMAT[] = "lll";
+static const char REVISE_ORDER_REF_REQ_FORMAT[] = "lsl";
 static const char UPDATE_EXEC_REQ_FORMAT[] = "li";
 
 static void
@@ -290,6 +292,7 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
+                          body->place_order_req.tid,
                           body->place_order_req.aid,
                           body->place_order_req.cid,
                           body->place_order_req.settl_date,
@@ -301,19 +304,25 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         n += dbr_packlenf(REVISE_ORDER_ID_REQ_FORMAT,
+                          body->revise_order_id_req.tid,
                           body->revise_order_id_req.id,
                           body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         n += dbr_packlenf(REVISE_ORDER_REF_REQ_FORMAT,
+                          body->revise_order_ref_req.tid,
                           DBR_REF_MAX, body->revise_order_ref_req.ref,
                           body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
-        n += dbr_packlenl(body->cancel_order_id_req.id);
+        n += dbr_packlenf(CANCEL_ORDER_ID_REQ_FORMAT,
+                          body->cancel_order_id_req.tid,
+                          body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
-        n += dbr_packlens(body->cancel_order_ref_req.ref, DBR_REF_MAX);
+        n += dbr_packlenf(CANCEL_ORDER_REF_REQ_FORMAT,
+                          body->cancel_order_ref_req.tid,
+                          DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
         n += dbr_packlenl(body->ack_trade_req.id);
@@ -427,6 +436,7 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
+                        body->place_order_req.tid,
                         body->place_order_req.aid,
                         body->place_order_req.cid,
                         body->place_order_req.settl_date,
@@ -438,19 +448,25 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_ID_REQ_FORMAT,
+                        body->revise_order_id_req.tid,
                         body->revise_order_id_req.id,
                         body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_REF_REQ_FORMAT,
+                        body->revise_order_ref_req.tid,
                         DBR_REF_MAX, body->revise_order_ref_req.ref,
                         body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
-        buf = dbr_packl(buf, body->cancel_order_id_req.id);
+        buf = dbr_packf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
+                        body->cancel_order_ref_req.tid,
+                        body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
-        buf = dbr_packs(buf, body->cancel_order_ref_req.ref, DBR_REF_MAX);
+        buf = dbr_packf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
+                        body->cancel_order_ref_req.tid,
+                        DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
         buf = dbr_packl(buf, body->ack_trade_req.id);
@@ -626,6 +642,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_PLACE_ORDER_REQ:
         if (!(buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,
+                                &body->place_order_req.tid,
                                 &body->place_order_req.aid,
                                 &body->place_order_req.cid,
                                 &body->place_order_req.settl_date,
@@ -638,22 +655,28 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         if (!(buf = dbr_unpackf(buf, REVISE_ORDER_ID_REQ_FORMAT,
+                                &body->revise_order_id_req.tid,
                                 &body->revise_order_id_req.id,
                                 &body->revise_order_id_req.lots)))
             goto fail1;
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         if (!(buf = dbr_unpackf(buf, REVISE_ORDER_REF_REQ_FORMAT,
+                                &body->revise_order_ref_req.tid,
                                 DBR_REF_MAX, body->revise_order_ref_req.ref,
                                 &body->revise_order_ref_req.lots)))
             goto fail1;
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
-        if (!(buf = dbr_unpackl(buf, &body->cancel_order_id_req.id)))
+        if (!(buf = dbr_unpackf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
+                                &body->cancel_order_id_req.tid,
+                                &body->cancel_order_id_req.id)))
             goto fail1;
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
-        if (!(buf = dbr_unpacks(buf, body->cancel_order_ref_req.ref, DBR_REF_MAX)))
+        if (!(buf = dbr_unpackf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
+                                &body->cancel_order_ref_req.tid,
+                                DBR_REF_MAX, body->cancel_order_ref_req.ref)))
             goto fail1;
         break;
     case DBR_ACK_TRADE_REQ:

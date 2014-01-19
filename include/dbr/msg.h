@@ -110,6 +110,7 @@ struct DbrBody {
             int type;
         } sess_entity_req;
         struct {
+            DbrIden tid;
             DbrIden aid;
             DbrIden cid;
             DbrDate settl_date;
@@ -120,20 +121,25 @@ struct DbrBody {
             DbrLots min_lots;
         } place_order_req;
         struct {
+            DbrIden tid;
             DbrIden id;
             DbrLots lots;
         } revise_order_id_req;
         struct {
+            DbrIden tid;
             DbrRef ref;
             DbrLots lots;
         } revise_order_ref_req;
         struct {
+            DbrIden tid;
             DbrIden id;
         } cancel_order_id_req;
         struct {
+            DbrIden tid;
             DbrRef ref;
         } cancel_order_ref_req;
         struct {
+            DbrIden tid;
             DbrIden id;
         } ack_trade_req;
         struct {

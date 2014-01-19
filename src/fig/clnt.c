@@ -538,6 +538,7 @@ dbr_clnt_place(DbrClnt clnt, DbrIden aid, DbrIden cid, DbrDate settl_date, const
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_PLACE_ORDER_REQ;
+    body.place_order_req.tid = clnt->trader->rec->id;
     body.place_order_req.aid = aid;
     body.place_order_req.cid = cid;
     body.place_order_req.settl_date = settl_date;
@@ -575,6 +576,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_ID_REQ;
+    body.revise_order_id_req.tid = clnt->trader->rec->id;
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
@@ -603,6 +605,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_REF_REQ;
+    body.revise_order_ref_req.tid = clnt->trader->rec->id;
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
@@ -631,6 +634,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
+    body.cancel_order_id_req.tid = clnt->trader->rec->id;
     body.cancel_order_id_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -658,6 +662,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
+    body.cancel_order_ref_req.tid = clnt->trader->rec->id;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
     // Reserve so that push cannot fail after send.
@@ -685,6 +690,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_ACK_TRADE_REQ;
+    body.ack_trade_req.tid = clnt->trader->rec->id;
     body.ack_trade_req.id = id;
 
     // Reserve so that push cannot fail after send.
