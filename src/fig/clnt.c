@@ -370,12 +370,14 @@ DBR_API DbrClnt
 dbr_clnt_create(const char* sess, void* ctx, const char* dealer_addr, const char* sub_addr,
                 DbrIden seed, DbrPool pool)
 {
+    // 1.
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
     if (dbr_unlikely(!clnt)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
 
+    // 2.
     void* dealer = zmq_socket(ctx, ZMQ_DEALER);
     if (!dealer) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
@@ -388,6 +390,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* dealer_addr, const char
         goto fail3;
     }
 
+    // 3.
     void* sub = zmq_socket(ctx, ZMQ_SUB);
     if (!sub) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
@@ -406,17 +409,21 @@ dbr_clnt_create(const char* sess, void* ctx, const char* dealer_addr, const char
     clnt->pool = pool;
     clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING | ORDER_PENDING
         | EXEC_PENDING | MEMB_PENDING | POSN_PENDING | VIEW_PENDING | EXEC_DOWN /*| MD_DOWN*/;
+    // 4.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
     dbr_queue_init(&clnt->execs);
+    // 5.
     dbr_tree_init(&clnt->views);
     dbr_tree_init(&clnt->posnups);
     dbr_tree_init(&clnt->viewups);
+    // 6.
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
     clnt->clntint = 0; // Pending hbint from server's logon message.
 
+    // 7.
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
         goto fail6;
@@ -448,6 +455,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* dealer_addr, const char
     free(clnt->items);
  fail6:
     dbr_prioq_term(&clnt->prioq);
+    free_views(&clnt->views, pool);
  fail5:
     fig_cache_term(&clnt->cache);
  fail4:
@@ -466,12 +474,19 @@ dbr_clnt_destroy(DbrClnt clnt)
     if (clnt) {
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
-        free_views(&clnt->views, clnt->pool);
+        // 7.
         free(clnt->items);
+        // 6.
         dbr_prioq_term(&clnt->prioq);
+        // 5.
+        free_views(&clnt->views, clnt->pool);
+        // 4.
         fig_cache_term(&clnt->cache);
+        // 3.
         zmq_close(clnt->sub);
+        // 2.
         zmq_close(clnt->dealer);
+        // 1.
         free(clnt);
     }
 }

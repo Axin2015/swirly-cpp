@@ -19,6 +19,7 @@
 #include "cache.h"
 #include "ordidx.h"
 #include "match.h"
+#include "sessidx.h"
 #include "trader.h"
 
 #include <dbr/err.h>
@@ -35,6 +36,7 @@ struct FigServ {
     DbrPool pool;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
+    struct FigSessIdx sessidx;
     struct DbrTree books;
 
     struct DbrQueue execs;
@@ -395,6 +397,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 DBR_API DbrServ
 dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
 {
+    // 1.
     DbrServ serv = malloc(sizeof(struct FigServ));
     if (dbr_unlikely(!serv)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
@@ -404,8 +407,12 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     serv->journ = journ;
     serv->model = model;
     serv->pool = pool;
+    // 2.
     fig_cache_init(&serv->cache, term_state, pool);
     fig_ordidx_init(&serv->ordidx);
+    // 3.
+    fig_sessidx_init(&serv->sessidx, pool);
+    // 4.
     dbr_tree_init(&serv->books);
 
     dbr_queue_init(&serv->execs);
@@ -437,8 +444,13 @@ dbr_serv_destroy(DbrServ serv)
     if (serv) {
         // Ensure that executions are freed.
         dbr_serv_clear(serv);
+        // 4.
         free_books(&serv->books);
+        // 3.
+        fig_sessidx_term(&serv->sessidx);
+        // 2.
         fig_cache_term(&serv->cache);
+        // 1.
         free(serv);
     }
 }
