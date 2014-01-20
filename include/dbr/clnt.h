@@ -35,7 +35,9 @@ typedef struct ElmPool* DbrPool;
 typedef struct FigClnt* DbrClnt;
 
 /**
- * Create ZMQite3 model.
+ * Create client.
+ *
+ * @param sess Session mnemonic.
  *
  * @param ctx ZeroMQ context.
  *
@@ -43,15 +45,13 @@ typedef struct FigClnt* DbrClnt;
  *
  * @param sub_addr Address of subscriber endpoint.
  *
- * @param trader Trader mnemonic.
- *
  * @param seed Seed identifier. Must be positive.
  *
  * @param pool Pool.
  */
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* dealer_addr, const char* sub_addr, const char* trader,
+dbr_clnt_create(const char* sess, void* ctx, const char* dealer_addr, const char* sub_addr,
                 DbrIden seed, DbrPool pool);
 
 // No-op if clnt is null.
@@ -98,7 +98,7 @@ dbr_clnt_empty_rec(DbrClnt clnt, int type);
 /** @} */
 
 DBR_API DbrTrader
-dbr_clnt_trader(DbrClnt clnt);
+dbr_clnt_trader(DbrClnt clnt, struct DbrRec* trec);
 
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
@@ -109,8 +109,9 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
  */
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
-               int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots, DbrMillis ms);
+dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
+               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
+               DbrMillis ms);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:
@@ -119,21 +120,21 @@ dbr_clnt_place(DbrClnt clnt, DbrIden aid, DbrIden cid, DbrDate settl_date, const
 // 3. greater than original lots.
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrIden id, DbrLots lots, DbrMillis ms);
+dbr_clnt_revise_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrLots lots, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, const char* ref, DbrLots lots, DbrMillis ms);
+dbr_clnt_revise_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrLots lots, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrIden id, DbrMillis ms);
+dbr_clnt_cancel_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, const char* ref, DbrMillis ms);
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrMillis ms);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrIden id, DbrMillis ms);
+dbr_clnt_ack_trade(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms);
 
 DBR_API DbrBool
 dbr_clnt_ready(DbrClnt clnt);

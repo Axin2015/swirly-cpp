@@ -344,6 +344,7 @@ argc(Arg begin, Arg end)
 
 class Handler : public IHandler<Handler> {
     Clnt& clnt_;
+    DbrRec* trec_;
     DbrRec* arec_;
     DbrRec* crec_;
     DbrDate settl_date_;
@@ -374,6 +375,7 @@ public:
     explicit
     Handler(Clnt& clnt)
         : clnt_(clnt),
+          trec_(nullptr),
           arec_(nullptr),
           crec_(nullptr),
           settl_date_(0),
@@ -619,17 +621,23 @@ public:
     void
     ack_trades(Arg begin, Arg end)
     {
+        if (!trec_)
+            throw InvalidState("trader");
+
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.ack_trade(id, TIMEOUT);
+            clnt_.ack_trade(id, trec_->id, TIMEOUT);
         }
     }
     void
     cancel(Arg begin, Arg end)
     {
+        if (!trec_)
+            throw InvalidState("trader");
+
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(id, TIMEOUT);
+            clnt_.cancel(id, trec_->id, TIMEOUT);
         }
     }
     void
@@ -752,6 +760,10 @@ public:
             "|--------------------"
             "+--------------------"
             "|" << endl;
+        if (trec_)
+            cout << '|' << left << setw(20) << "trader"
+                 << '|' << left << setw(20) << TraderRecRef(*trec_).mnem()
+                 << '|' << endl;
         if (arec_)
             cout << '|' << left << setw(20) << "accnt"
                  << '|' << left << setw(20) << AccntRecRef(*arec_).mnem()
@@ -774,7 +786,9 @@ public:
     void
     orders(Arg begin, Arg end)
     {
-        auto trader = clnt_.trader();
+        if (!trec_)
+            throw InvalidState("trader");
+        auto trader = clnt_.trader(*trec_);
         cout <<
             "|id   "
             "|arec      "
@@ -824,6 +838,8 @@ public:
     void
     place(int action, Arg begin, Arg end)
     {
+        if (!trec_)
+            throw InvalidState("trader");
         if (!arec_)
             throw InvalidState("accnt");
         if (!crec_)
@@ -835,8 +851,8 @@ public:
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        clnt_.place(arec_->id, crec_->id, settl_date_, nullptr, action, ticks, lots, 0,
-                    TIMEOUT);
+        clnt_.place(trec_->id, arec_->id, crec_->id, settl_date_,
+                    nullptr, action, ticks, lots, 0, TIMEOUT);
     }
     void
     posns(Arg begin, Arg end)
@@ -882,17 +898,25 @@ public:
     void
     revise(Arg begin, Arg end)
     {
+        if (!trec_)
+            throw InvalidState("trader");
+
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        clnt_.revise(id, lots, TIMEOUT);
+        clnt_.revise(trec_->id, id, lots, TIMEOUT);
     }
     void
     set(Arg begin, Arg end)
     {
         const string& name = *begin++;
         const string& value = *begin++;
-        if (name == "accnt") {
+        if (name == "trader") {
+            auto it = clnt_.trecs().find(value.c_str());
+            if (it == clnt_.trecs().end())
+                throw InvalidArgument(value);
+            trec_ = &*it;
+        } else if (name == "accnt") {
             auto it = clnt_.arecs().find(value.c_str());
             if (it == clnt_.arecs().end())
                 throw InvalidArgument(value);
@@ -931,7 +955,10 @@ public:
     void
     trades(Arg begin, Arg end)
     {
-        auto trader = clnt_.trader();
+        if (!trec_)
+            throw InvalidState("trader");
+        auto trader = clnt_.trader(*trec_
+);
         cout <<
             "|id   "
             "|order"
@@ -1013,19 +1040,13 @@ public:
 int
 main(int argc, char* argv[])
 {
-    if (argc != 2) {
-        cerr << "usage: dbr_cli <trader>\n";
-        return 1;
-    }
-    const char* const trader = argv[1];
-
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
         ZmqCtx ctx;
         Pool pool;
         // epgm://239.192.1.1:3270
-        Clnt clnt(ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271", trader,
+        Clnt clnt("TEST", ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271",
                   dbr_millis(), pool);
         Handler handler(clnt);
         Repl repl;

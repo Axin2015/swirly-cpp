@@ -71,8 +71,7 @@ main(int argc, char* argv[])
     try {
         ZmqCtx ctx;
         Pool pool;
-        Clnt clnt(ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271",
-                  "WRAMIREZ", 1, pool);
+        Clnt clnt("TEST", ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271", 1, pool);
 
         // TODO: more robust logic.
         Handler handler;
