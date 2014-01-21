@@ -30,57 +30,57 @@ namespace dbr {
 template <class DerivedT>
 class IHandler : public DbrIHandler {
     static void
-    up(DbrHandler handler, int conn) noexcept
+    on_up(DbrHandler handler, int conn) noexcept
     {
-        static_cast<DerivedT*>(handler)->up(conn);
+        static_cast<DerivedT*>(handler)->on_up(conn);
     }
     static void
-    down(DbrHandler handler, int conn) noexcept
+    on_down(DbrHandler handler, int conn) noexcept
     {
-        static_cast<DerivedT*>(handler)->down(conn);
+        static_cast<DerivedT*>(handler)->on_down(conn);
     }
     static void
-    timeout(DbrHandler handler, DbrIden req_id) noexcept
+    on_timeout(DbrHandler handler, DbrIden req_id) noexcept
     {
-        static_cast<DerivedT*>(handler)->timeout(req_id);
+        static_cast<DerivedT*>(handler)->on_timeout(req_id);
     }
     static void
-    status(DbrHandler handler, DbrIden req_id, int num, const char* msg) noexcept
+    on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) noexcept
     {
-        static_cast<DerivedT*>(handler)->status(req_id, num, msg);
+        static_cast<DerivedT*>(handler)->on_status(req_id, num, msg);
     }
     static void
-    exec(DbrHandler handler, DbrIden req_id, DbrExec* exec) noexcept
+    on_exec(DbrHandler handler, DbrIden req_id, DbrExec* exec) noexcept
     {
-        static_cast<DerivedT*>(handler)->exec(req_id, *exec);
+        static_cast<DerivedT*>(handler)->on_exec(req_id, *exec);
     }
     static void
-    posn(DbrHandler handler, DbrPosn* posn) noexcept
+    on_posn(DbrHandler handler, DbrPosn* posn) noexcept
     {
-        static_cast<DerivedT*>(handler)->posn(*posn);
+        static_cast<DerivedT*>(handler)->on_posn(*posn);
     }
     static void
-    view(DbrHandler handler, DbrView* view) noexcept
+    on_view(DbrHandler handler, DbrView* view) noexcept
     {
-        static_cast<DerivedT*>(handler)->view(*view);
+        static_cast<DerivedT*>(handler)->on_view(*view);
     }
     static void
-    flush(DbrHandler handler) noexcept
+    on_flush(DbrHandler handler) noexcept
     {
-        static_cast<DerivedT*>(handler)->flush();
+        static_cast<DerivedT*>(handler)->on_flush();
     }
     static const DbrHandlerVtbl*
     vtbl() noexcept
     {
         static const DbrHandlerVtbl VTBL = {
-            up,
-            down,
-            timeout,
-            status,
-            exec,
-            posn,
-            view,
-            flush
+            on_up,
+            on_down,
+            on_timeout,
+            on_status,
+            on_exec,
+            on_posn,
+            on_view,
+            on_flush
         };
         return &VTBL;
     }
@@ -96,51 +96,51 @@ public:
 };
 
 inline void
-up(DbrHandler handler, int conn)
+on_up(DbrHandler handler, int conn) noexcept
 {
-    handler->vtbl->up(handler, conn);
+    handler->vtbl->on_up(handler, conn);
 }
 
 inline void
-down(DbrHandler handler, int conn)
+on_down(DbrHandler handler, int conn) noexcept
 {
-    handler->vtbl->down(handler, conn);
+    handler->vtbl->on_down(handler, conn);
 }
 
 inline void
-timeout(DbrHandler handler, DbrIden req_id)
+on_timeout(DbrHandler handler, DbrIden req_id) noexcept
 {
-    handler->vtbl->timeout(handler, req_id);
+    handler->vtbl->on_timeout(handler, req_id);
 }
 
 inline void
-status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
+on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) noexcept
 {
-    handler->vtbl->status(handler, req_id, num, msg);
+    handler->vtbl->on_status(handler, req_id, num, msg);
 }
 
 inline void
-exec(DbrHandler handler, DbrIden req_id, DbrExec& exec)
+on_exec(DbrHandler handler, DbrIden req_id, DbrExec& exec) noexcept
 {
-    handler->vtbl->exec(handler, req_id, &exec);
+    handler->vtbl->on_exec(handler, req_id, &exec);
 }
 
 inline void
-posn(DbrHandler handler, DbrPosn& posn)
+on_posn(DbrHandler handler, DbrPosn& posn) noexcept
 {
-    handler->vtbl->posn(handler, &posn);
+    handler->vtbl->on_posn(handler, &posn);
 }
 
 inline void
-view(DbrHandler handler, DbrView& view)
+on_view(DbrHandler handler, DbrView& view) noexcept
 {
-    handler->vtbl->view(handler, &view);
+    handler->vtbl->on_view(handler, &view);
 }
 
 inline void
-flush(DbrHandler handler)
+on_flush(DbrHandler handler) noexcept
 {
-    handler->vtbl->flush(handler);
+    handler->vtbl->on_flush(handler);
 }
 
 /** @} */

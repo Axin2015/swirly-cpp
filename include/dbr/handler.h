@@ -41,52 +41,52 @@ typedef struct DbrIHandler {
 struct DbrHandlerVtbl {
 
     void
-    (*up)(DbrHandler handler, int conn);
+    (*on_up)(DbrHandler handler, int conn);
 
     void
-    (*down)(DbrHandler handler, int conn);
+    (*on_down)(DbrHandler handler, int conn);
 
     void
-    (*timeout)(DbrHandler handler, DbrIden req_id);
+    (*on_timeout)(DbrHandler handler, DbrIden req_id);
 
     void
-    (*status)(DbrHandler handler, DbrIden req_id, int num, const char* msg);
+    (*on_status)(DbrHandler handler, DbrIden req_id, int num, const char* msg);
 
     void
-    (*exec)(DbrHandler handler, DbrIden req_id, struct DbrExec* exec);
+    (*on_exec)(DbrHandler handler, DbrIden req_id, struct DbrExec* exec);
 
     void
-    (*posn)(DbrHandler handler, struct DbrPosn* posn);
+    (*on_posn)(DbrHandler handler, struct DbrPosn* posn);
 
     void
-    (*view)(DbrHandler handler, struct DbrView* view);
+    (*on_view)(DbrHandler handler, struct DbrView* view);
 
     void
-    (*flush)(DbrHandler handler);
+    (*on_flush)(DbrHandler handler);
 };
 
 static inline void
-dbr_handler_up(DbrHandler handler, int conn)
+dbr_handler_on_up(DbrHandler handler, int conn)
 {
-    handler->vtbl->up(handler, conn);
+    handler->vtbl->on_up(handler, conn);
 }
 
 static inline void
-dbr_handler_down(DbrHandler handler, int conn)
+dbr_handler_on_down(DbrHandler handler, int conn)
 {
-    handler->vtbl->down(handler, conn);
+    handler->vtbl->on_down(handler, conn);
 }
 
 static inline void
-dbr_handler_timeout(DbrHandler handler, DbrIden req_id)
+dbr_handler_on_timeout(DbrHandler handler, DbrIden req_id)
 {
-    handler->vtbl->timeout(handler, req_id);
+    handler->vtbl->on_timeout(handler, req_id);
 }
 
 static inline void
-dbr_handler_status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
+dbr_handler_on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
 {
-    handler->vtbl->status(handler, req_id, num, msg);
+    handler->vtbl->on_status(handler, req_id, num, msg);
 }
 
 /**
@@ -95,27 +95,27 @@ dbr_handler_status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
  */
 
 static inline void
-dbr_handler_exec(DbrHandler handler, DbrIden req_id, struct DbrExec* exec)
+dbr_handler_on_exec(DbrHandler handler, DbrIden req_id, struct DbrExec* exec)
 {
-    handler->vtbl->exec(handler, req_id, exec);
+    handler->vtbl->on_exec(handler, req_id, exec);
 }
 
 static inline void
-dbr_handler_posn(DbrHandler handler, struct DbrPosn* posn)
+dbr_handler_on_posn(DbrHandler handler, struct DbrPosn* posn)
 {
-    handler->vtbl->posn(handler, posn);
+    handler->vtbl->on_posn(handler, posn);
 }
 
 static inline void
-dbr_handler_view(DbrHandler handler, struct DbrView* view)
+dbr_handler_on_view(DbrHandler handler, struct DbrView* view)
 {
-    handler->vtbl->view(handler, view);
+    handler->vtbl->on_view(handler, view);
 }
 
 static inline void
-dbr_handler_flush(DbrHandler handler)
+dbr_handler_on_flush(DbrHandler handler)
 {
-    handler->vtbl->flush(handler);
+    handler->vtbl->on_flush(handler);
 }
 
 /** @} */

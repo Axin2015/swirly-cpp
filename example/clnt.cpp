@@ -30,35 +30,35 @@ using namespace std;
 class Handler : public dbr::IHandler<Handler> {
 public:
     void
-    up(int conn) noexcept
+    on_up(int conn) noexcept
     {
     }
     void
-    down(int conn) noexcept
+    on_down(int conn) noexcept
     {
     }
     void
-    timeout(DbrIden req_id) noexcept
+    on_timeout(DbrIden req_id) noexcept
     {
     }
     void
-    status(DbrIden req_id, int num, const char* msg) noexcept
+    on_status(DbrIden req_id, int num, const char* msg) noexcept
     {
     }
     void
-    exec(DbrIden req_id, DbrExec& exec) noexcept
+    on_exec(DbrIden req_id, DbrExec& exec) noexcept
     {
     }
     void
-    posn(DbrPosn& posn) noexcept
+    on_posn(DbrPosn& posn) noexcept
     {
     }
     void
-    view(DbrView& view) noexcept
+    on_view(DbrView& view) noexcept
     {
     }
     void
-    flush() noexcept
+    on_flush() noexcept
     {
     }
 };

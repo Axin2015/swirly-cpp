@@ -390,28 +390,28 @@ public:
         cout << endl;
     }
     void
-    up(int conn) noexcept
+    on_up(int conn) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "conn up: " << conn << endl;
     }
     void
-    down(int conn) noexcept
+    on_down(int conn) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "conn down: " << conn << endl;
     }
     void
-    timeout(DbrIden req_id) noexcept
+    on_timeout(DbrIden req_id) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "timeout: " << req_id << endl;
     }
     void
-    status(DbrIden req_id, int num, const char* msg) noexcept
+    on_status(DbrIden req_id, int num, const char* msg) noexcept
     {
         prompt_ = true;
         cout << endl;
@@ -421,22 +421,22 @@ public:
             cout << dbr::strncpy(msg, DBR_ERRMSG_MAX) << " (" << num << ")\n";
     }
     void
-    exec(DbrIden req_id, DbrExec& exec) noexcept
+    on_exec(DbrIden req_id, DbrExec& exec) noexcept
     {
         prompt_ = true;
         cout << endl;
         cout << "ok\n";
     }
     void
-    posn(DbrPosn& posn) noexcept
+    on_posn(DbrPosn& posn) noexcept
     {
     }
     void
-    view(DbrView& view) noexcept
+    on_view(DbrView& view) noexcept
     {
     }
     void
-    flush() noexcept
+    on_flush() noexcept
     {
     }
     void
@@ -686,67 +686,6 @@ public:
                  << '|' << right << setw(10) << ref.min_lots()
                  << '|' << right << setw(10) << ref.max_lots()
                  << '|' << endl;
-        }
-    }
-    void
-    depth(Arg begin, Arg end)
-    {
-        if (!crec_)
-            throw InvalidState("contr");
-        if (!settl_date_)
-            throw InvalidState("settl_date");
-
-        cout <<
-            "|crec      "
-            "|settl_date"
-            "|level     "
-            "|bid_count "
-            "|bid_lots  "
-            "|bid_ticks "
-            "|ask_ticks "
-            "|ask_lots  "
-            "|ask_count "
-            "|" << endl;
-        cout <<
-            "|----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "+----------"
-            "|" << endl;
-
-        auto it = clnt_.views().find(crec_->id, settl_date_);
-        if (it == clnt_.views().end())
-            return;
-
-        ViewRef ref(*it);
-        for (size_t i{0}; i < DBR_LEVEL_MAX; ++i) {
-            cout << '|' << left << setw(10) << ref.crec().mnem()
-                 << '|' << left << setw(10) << ref.settl_date()
-                 << '|' << right << setw(10) << (i + 1);
-            if (ref.bid_count(i) > 0) {
-                cout << '|' << right << setw(10) << ref.bid_count(i)
-                     << '|' << right << setw(10) << ref.bid_lots(i)
-                     << '|' << right << setw(10) << ref.bid_ticks(i);
-            } else {
-                cout << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- ";
-            }
-            if (ref.ask_count(i) > 0) {
-                cout << '|' << right << setw(10) << ref.ask_ticks(i)
-                     << '|' << right << setw(10) << ref.ask_lots(i)
-                     << '|' << right << setw(10) << ref.ask_count(i);
-            } else {
-                cout << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- "
-                     << '|' << right << setw(10) << "- ";
-            }
-            cout << '|' << endl;
         }
     }
     void
@@ -1033,6 +972,67 @@ public:
             throw InvalidArgument(name);
     }
     void
+    view(Arg begin, Arg end)
+    {
+        if (!crec_)
+            throw InvalidState("contr");
+        if (!settl_date_)
+            throw InvalidState("settl_date");
+
+        cout <<
+            "|crec      "
+            "|settl_date"
+            "|level     "
+            "|bid_count "
+            "|bid_lots  "
+            "|bid_ticks "
+            "|ask_ticks "
+            "|ask_lots  "
+            "|ask_count "
+            "|" << endl;
+        cout <<
+            "|----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "+----------"
+            "|" << endl;
+
+        auto it = clnt_.views().find(crec_->id, settl_date_);
+        if (it == clnt_.views().end())
+            return;
+
+        ViewRef ref(*it);
+        for (size_t i{0}; i < DBR_LEVEL_MAX; ++i) {
+            cout << '|' << left << setw(10) << ref.crec().mnem()
+                 << '|' << left << setw(10) << ref.settl_date()
+                 << '|' << right << setw(10) << (i + 1);
+            if (ref.bid_count(i) > 0) {
+                cout << '|' << right << setw(10) << ref.bid_count(i)
+                     << '|' << right << setw(10) << ref.bid_lots(i)
+                     << '|' << right << setw(10) << ref.bid_ticks(i);
+            } else {
+                cout << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- ";
+            }
+            if (ref.ask_count(i) > 0) {
+                cout << '|' << right << setw(10) << ref.ask_ticks(i)
+                     << '|' << right << setw(10) << ref.ask_lots(i)
+                     << '|' << right << setw(10) << ref.ask_count(i);
+            } else {
+                cout << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- "
+                     << '|' << right << setw(10) << "- ";
+            }
+            cout << '|' << endl;
+        }
+    }
+    void
     set_prompt(bool prompt = true) noexcept
     {
         prompt_ = prompt;
@@ -1064,7 +1064,6 @@ main(int argc, char* argv[])
         repl.cmd("buy", 2, bind(&Handler::place, ref(handler), DBR_ACTION_BUY, _1, _2));
         repl.cmd("cancel", -1, bind(&Handler::cancel, ref(handler), _1, _2));
         repl.cmd("contrs", 0, bind(&Handler::contrs, ref(handler), _1, _2));
-        repl.cmd("depth", 0, bind(&Handler::depth, ref(handler), _1, _2));
         repl.cmd("echo", -1, bind(&Handler::echo, ref(handler), _1, _2));
         repl.cmd("env", 0, bind(&Handler::env, ref(handler), _1, _2));
         repl.cmd("logon", 1, bind(&Handler::logon, ref(handler), _1, _2));
@@ -1078,6 +1077,7 @@ main(int argc, char* argv[])
         repl.cmd("traders", 0, bind(&Handler::traders, ref(handler), _1, _2));
         repl.cmd("trades", 0, bind(&Handler::trades, ref(handler), _1, _2));
         repl.cmd("unset", 1, bind(&Handler::unset, ref(handler), _1, _2));
+        repl.cmd("view", 0, bind(&Handler::view, ref(handler), _1, _2));
 
         char path[PATH_MAX];
         sprintf(path, "%s/.dbr_clirc", getenv("HOME"));

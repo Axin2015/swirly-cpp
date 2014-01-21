@@ -834,18 +834,18 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             dbr_prioq_push(&clnt->prioq, DEALERID, key + HBTIMEOUT);
             if (!(clnt->flags & EXEC_DOWN)) {
                 clnt->flags |= EXEC_DOWN;
-                dbr_handler_down(handler, DBR_CONN_EXEC);
+                dbr_handler_on_down(handler, DBR_CONN_EXEC);
             }
         } else if (id == SUBID) {
             // Cannot fail due to pop.
             dbr_prioq_push(&clnt->prioq, SUBID, key + HBTIMEOUT);
             if (!(clnt->flags & MD_DOWN)) {
                 clnt->flags |= MD_DOWN;
-                dbr_handler_down(handler, DBR_CONN_MD);
+                dbr_handler_on_down(handler, DBR_CONN_MD);
             }
         } else {
             // Assumed that these "top-half" handlers do not block.
-            dbr_handler_timeout(handler, id);
+            dbr_handler_on_timeout(handler, id);
         }
     }
 
@@ -880,17 +880,17 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
                 if (!(clnt->flags & EXEC_DOWN)) {
                     clnt->flags |= EXEC_DOWN;
-                    dbr_handler_down(handler, DBR_CONN_EXEC);
+                    dbr_handler_on_down(handler, DBR_CONN_EXEC);
                 }
             } else if (id == SUBID) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
                 if (!(clnt->flags & MD_DOWN)) {
                     clnt->flags |= MD_DOWN;
-                    dbr_handler_down(handler, DBR_CONN_MD);
+                    dbr_handler_on_down(handler, DBR_CONN_MD);
                 }
             } else {
-                dbr_handler_timeout(handler, id);
+                dbr_handler_on_timeout(handler, id);
                 break;
             }
             // Next heartbeat may have already expired.
@@ -913,7 +913,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         if ((clnt->flags & EXEC_DOWN)) {
             clnt->flags &= ~EXEC_DOWN;
-            dbr_handler_up(handler, DBR_CONN_EXEC);
+            dbr_handler_on_up(handler, DBR_CONN_EXEC);
         }
         switch (body.type) {
         case DBR_SESS_INIT:
@@ -926,7 +926,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         case DBR_SESS_HEARTBT:
             break;
         case DBR_STATUS_REP:
-            dbr_handler_status(handler, body.req_id, body.status_rep.num, body.status_rep.msg);
+            dbr_handler_on_status(handler, body.req_id, body.status_rep.num, body.status_rep.msg);
             break;
         case DBR_TRADER_LIST_REP:
             emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_PENDING,
@@ -967,13 +967,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 apply_update(clnt, body.exec_rep.exec);
                 break;
             }
-            dbr_handler_exec(handler, body.req_id, body.exec_rep.exec);
+            dbr_handler_on_exec(handler, body.req_id, body.exec_rep.exec);
             dbr_exec_decref(body.exec_rep.exec, clnt->pool);
             break;
         case DBR_POSN_REP:
             enrich_posn(&clnt->cache, body.posn_rep.posn);
             apply_posnup(clnt, body.posn_rep.posn);
-            dbr_handler_posn(handler, body.posn_rep.posn);
+            dbr_handler_on_posn(handler, body.posn_rep.posn);
             break;
         default:
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
@@ -991,7 +991,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         if ((clnt->flags & MD_DOWN)) {
             clnt->flags &= ~MD_DOWN;
-            dbr_handler_up(handler, DBR_CONN_MD);
+            dbr_handler_on_up(handler, DBR_CONN_MD);
         }
         switch (body.type) {
         case DBR_SESS_HEARTBT:
@@ -1003,9 +1003,9 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 // Transfer ownership.
                 enrich_view(&clnt->cache, view);
                 apply_viewup(clnt, view);
-                dbr_handler_view(handler, view);
+                dbr_handler_on_view(handler, view);
             }
-            dbr_handler_flush(handler);
+            dbr_handler_on_flush(handler);
             break;
         default:
             dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
