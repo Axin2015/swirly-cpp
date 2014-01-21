@@ -203,8 +203,13 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
         n += dbr_packleni(body->sess_init.hbint);
         break;
     case DBR_SESS_TERM:
+        break;
     case DBR_SESS_LOGON:
+        n += dbr_packlenl(body->sess_logon.tid);
+        break;
     case DBR_SESS_LOGOFF:
+        n += dbr_packlenl(body->sess_logoff.tid);
+        break;
     case DBR_SESS_HEARTBT:
         break;
     case DBR_STATUS_REP:
@@ -363,8 +368,13 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         buf = dbr_packi(buf, body->sess_init.hbint);
         break;
     case DBR_SESS_TERM:
+        break;
     case DBR_SESS_LOGON:
+        buf = dbr_packl(buf, body->sess_logon.tid);
+        break;
     case DBR_SESS_LOGOFF:
+        buf = dbr_packl(buf, body->sess_logoff.tid);
+        break;
     case DBR_SESS_HEARTBT:
         break;
     case DBR_STATUS_REP:
@@ -511,8 +521,15 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         break;
     case DBR_SESS_TERM:
+        break;
     case DBR_SESS_LOGON:
+        if (!(buf = dbr_unpackl(buf, &body->sess_logon.tid)))
+            goto fail1;
+        break;
     case DBR_SESS_LOGOFF:
+        if (!(buf = dbr_unpackl(buf, &body->sess_logoff.tid)))
+            goto fail1;
+        break;
     case DBR_SESS_HEARTBT:
         break;
     case DBR_STATUS_REP:

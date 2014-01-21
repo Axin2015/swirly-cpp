@@ -626,7 +626,7 @@ public:
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.ack_trade(id, trec_->id, TIMEOUT);
+            clnt_.ack_trade(trec_->id, id, TIMEOUT);
         }
     }
     void
@@ -637,7 +637,7 @@ public:
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(id, trec_->id, TIMEOUT);
+            clnt_.cancel(trec_->id, id, TIMEOUT);
         }
     }
     void
@@ -760,10 +760,6 @@ public:
             "|--------------------"
             "+--------------------"
             "|" << endl;
-        if (trec_)
-            cout << '|' << left << setw(20) << "trader"
-                 << '|' << left << setw(20) << TraderRecRef(*trec_).mnem()
-                 << '|' << endl;
         if (arec_)
             cout << '|' << left << setw(20) << "accnt"
                  << '|' << left << setw(20) << AccntRecRef(*arec_).mnem()
@@ -782,6 +778,24 @@ public:
     {
         for (; begin != end; ++begin)
             cout << *begin << endl;
+    }
+    void
+    logon(Arg begin, Arg end)
+    {
+        const string& mnem = *begin++;
+        auto it = clnt_.trecs().find(mnem.c_str());
+        if (it == clnt_.trecs().end())
+            throw InvalidArgument(mnem);
+        trec_ = &*it;
+
+        clnt_.logon(trec_->id, TIMEOUT);
+    }
+    void
+    logoff(Arg begin, Arg end)
+    {
+        if (!trec_)
+            throw InvalidState("trader");
+        clnt_.logoff(trec_->id, TIMEOUT);
     }
     void
     orders(Arg begin, Arg end)
@@ -911,12 +925,7 @@ public:
     {
         const string& name = *begin++;
         const string& value = *begin++;
-        if (name == "trader") {
-            auto it = clnt_.trecs().find(value.c_str());
-            if (it == clnt_.trecs().end())
-                throw InvalidArgument(value);
-            trec_ = &*it;
-        } else if (name == "accnt") {
+        if (name == "accnt") {
             auto it = clnt_.arecs().find(value.c_str());
             if (it == clnt_.arecs().end())
                 throw InvalidArgument(value);
@@ -957,8 +966,7 @@ public:
     {
         if (!trec_)
             throw InvalidState("trader");
-        auto trader = clnt_.trader(*trec_
-);
+        auto trader = clnt_.trader(*trec_);
         cout <<
             "|id   "
             "|order"
@@ -1059,6 +1067,8 @@ main(int argc, char* argv[])
         repl.cmd("depth", 0, bind(&Handler::depth, ref(handler), _1, _2));
         repl.cmd("echo", -1, bind(&Handler::echo, ref(handler), _1, _2));
         repl.cmd("env", 0, bind(&Handler::env, ref(handler), _1, _2));
+        repl.cmd("logon", 1, bind(&Handler::logon, ref(handler), _1, _2));
+        repl.cmd("logoff", 0, bind(&Handler::logoff, ref(handler), _1, _2));
         repl.cmd("orders", 0, bind(&Handler::orders, ref(handler), _1, _2));
         repl.cmd("posns", 0, bind(&Handler::posns, ref(handler), _1, _2));
         repl.cmd("quit", 0, bind(&Handler::quit, ref(handler), _1, _2));

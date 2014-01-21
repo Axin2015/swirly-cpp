@@ -72,6 +72,12 @@ struct DbrBody {
         struct {
             int hbint;
         } sess_init;
+        struct {
+            DbrIden tid;
+        } sess_logon;
+        struct {
+            DbrIden tid;
+        } sess_logoff;
         // Reply.
         struct {
             int num;

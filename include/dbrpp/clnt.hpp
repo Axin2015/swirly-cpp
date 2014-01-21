@@ -836,6 +836,22 @@ public:
         return Accnt{accnt};
     }
     DbrIden
+    logon(DbrIden tid, DbrMillis ms)
+    {
+        DbrIden req_id = dbr_clnt_logon(impl_, tid, ms);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    logoff(DbrIden tid, DbrMillis ms)
+    {
+        DbrIden req_id = dbr_clnt_logoff(impl_, tid, ms);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
     place(DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date, const char* ref,
           int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots, DbrMillis ms)
     {

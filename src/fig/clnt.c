@@ -528,6 +528,60 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 }
 
 DBR_API DbrIden
+dbr_clnt_logon(DbrClnt clnt, DbrIden tid, DbrMillis ms)
+{
+    if (clnt->flags != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_SESS_LOGON;
+    body.sess_logon.tid = tid;
+
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+        goto fail1;
+
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
+        goto fail1;
+
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
+    return body.req_id;
+ fail1:
+    return -1;
+}
+
+DBR_API DbrIden
+dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms)
+{
+    if (clnt->flags != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
+    struct DbrBody body;
+    body.req_id = clnt->id++;
+    body.type = DBR_SESS_LOGOFF;
+    body.sess_logoff.tid = tid;
+
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+        goto fail1;
+
+    if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
+        goto fail1;
+
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, CLNTID, now + clnt->clntint);
+    return body.req_id;
+ fail1:
+    return -1;
+}
+
+DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
                DbrMillis ms)

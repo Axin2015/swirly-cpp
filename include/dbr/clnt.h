@@ -103,6 +103,12 @@ dbr_clnt_trader(DbrClnt clnt, struct DbrRec* trec);
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
+DBR_API DbrIden
+dbr_clnt_logon(DbrClnt clnt, DbrIden tid, DbrMillis ms);
+
+DBR_API DbrIden
+dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms);
+
 /**
  * Place order.
  * All members of result are set to zero on failure.
