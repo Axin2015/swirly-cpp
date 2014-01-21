@@ -40,6 +40,16 @@ class IHandler : public DbrIHandler {
         static_cast<DerivedT*>(handler)->on_down(conn);
     }
     static void
+    on_logon(DbrHandler handler, DbrIden tid) noexcept
+    {
+        static_cast<DerivedT*>(handler)->on_logon(tid);
+    }
+    static void
+    on_logoff(DbrHandler handler, DbrIden tid) noexcept
+    {
+        static_cast<DerivedT*>(handler)->on_logoff(tid);
+    }
+    static void
     on_timeout(DbrHandler handler, DbrIden req_id) noexcept
     {
         static_cast<DerivedT*>(handler)->on_timeout(req_id);
@@ -75,6 +85,8 @@ class IHandler : public DbrIHandler {
         static const DbrHandlerVtbl VTBL = {
             on_up,
             on_down,
+            on_logon,
+            on_logoff,
             on_timeout,
             on_status,
             on_exec,
@@ -105,6 +117,18 @@ inline void
 on_down(DbrHandler handler, int conn) noexcept
 {
     handler->vtbl->on_down(handler, conn);
+}
+
+inline void
+on_logon(DbrHandler handler, DbrIden tid) noexcept
+{
+    handler->vtbl->on_logon(handler, tid);
+}
+
+inline void
+on_logoff(DbrHandler handler, DbrIden tid) noexcept
+{
+    handler->vtbl->on_logoff(handler, tid);
 }
 
 inline void

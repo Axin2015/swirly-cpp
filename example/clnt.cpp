@@ -38,6 +38,14 @@ public:
     {
     }
     void
+    on_logon(DbrIden tid) noexcept
+    {
+    }
+    void
+    on_logoff(DbrIden tid) noexcept
+    {
+    }
+    void
     on_timeout(DbrIden req_id) noexcept
     {
     }

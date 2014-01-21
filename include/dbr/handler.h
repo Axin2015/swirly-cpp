@@ -47,6 +47,12 @@ struct DbrHandlerVtbl {
     (*on_down)(DbrHandler handler, int conn);
 
     void
+    (*on_logon)(DbrHandler handler, DbrIden tid);
+
+    void
+    (*on_logoff)(DbrHandler handler, DbrIden tid);
+
+    void
     (*on_timeout)(DbrHandler handler, DbrIden req_id);
 
     void
@@ -75,6 +81,18 @@ static inline void
 dbr_handler_on_down(DbrHandler handler, int conn)
 {
     handler->vtbl->on_down(handler, conn);
+}
+
+static inline void
+dbr_handler_on_logon(DbrHandler handler, DbrIden tid)
+{
+    handler->vtbl->on_logon(handler, tid);
+}
+
+static inline void
+dbr_handler_on_logoff(DbrHandler handler, DbrIden tid)
+{
+    handler->vtbl->on_logoff(handler, tid);
 }
 
 static inline void

@@ -404,6 +404,14 @@ public:
         cout << "conn down: " << conn << endl;
     }
     void
+    on_logon(DbrIden tid) noexcept
+    {
+    }
+    void
+    on_logoff(DbrIden tid) noexcept
+    {
+    }
+    void
     on_timeout(DbrIden req_id) noexcept
     {
         prompt_ = true;
