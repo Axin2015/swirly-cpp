@@ -34,6 +34,9 @@ struct FigTrader {
     struct DbrTree orders;
     struct DbrTree trades;
     struct DbrTree membs;
+    struct DbrSess* sess;
+    // Private section.
+    struct DbrRbNode sess_node_;
 };
 
 DBR_EXTERN struct FigTrader*
@@ -245,6 +248,12 @@ static inline DbrBool
 fig_trader_empty_memb(const struct FigTrader* trader)
 {
     return dbr_tree_empty(&trader->membs);
+}
+
+static inline DbrBool
+fig_trader_logged_on(const struct FigTrader* trader)
+{
+    return trader->sess != NULL;
 }
 
 #endif // FIG_TRADER_H

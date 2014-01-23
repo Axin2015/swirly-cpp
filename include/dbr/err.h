@@ -49,6 +49,10 @@ enum DbrErrno {
      */
     DBR_EBUSY,
     /**
+     * Already exists.
+     */
+    DBR_EEXIST,
+    /**
      * Invalid argument.
      */
     DBR_EINVAL,

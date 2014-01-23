@@ -77,6 +77,8 @@ fig_trader_lazy(struct DbrRec* trec, struct FigOrdIdx* ordidx, DbrPool pool)
         dbr_tree_init(&trader->orders);
         dbr_tree_init(&trader->trades);
         dbr_tree_init(&trader->membs);
+        trader->sess = NULL;
+        dbr_rbnode_init(&trader->sess_node_);
 
         trec->trader.state = trader;
     }

@@ -29,8 +29,8 @@
  */
 
 enum {
-    DBR_SESS_INIT = 1,
-    DBR_SESS_TERM,
+    DBR_SESS_OPEN = 1,
+    DBR_SESS_CLOSE,
     DBR_SESS_LOGON,
     DBR_SESS_LOGOFF,
     DBR_SESS_HEARTBT,
@@ -61,7 +61,7 @@ enum {
 };
 
 struct DbrHead {
-    DbrMnem trader;
+    DbrMnem sess;
 };
 
 struct DbrBody {
@@ -71,7 +71,7 @@ struct DbrBody {
         // Session.
         struct {
             int hbint;
-        } sess_init;
+        } sess_open;
         struct {
             DbrIden tid;
         } sess_logon;
@@ -188,7 +188,7 @@ DBR_API DbrBool
 dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched);
 
 DBR_API DbrBool
-dbr_send_msg(void* sock, const char* trader, struct DbrBody* body, DbrBool enriched);
+dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched);
 
 DBR_API DbrBool
 dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body);

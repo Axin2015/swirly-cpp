@@ -179,8 +179,8 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
 static DbrIden
 init(DbrClnt clnt)
 {
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_INIT,
-                            .sess_init = { .hbint = HBINT } };
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_OPEN,
+                            .sess_open = { .hbint = HBINT } };
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         return -1;
     return body.req_id;
@@ -916,12 +916,12 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             dbr_handler_on_up(handler, DBR_CONN_EXEC);
         }
         switch (body.type) {
-        case DBR_SESS_INIT:
-            clnt->clntint = body.sess_init.hbint;
+        case DBR_SESS_OPEN:
+            clnt->clntint = body.sess_open.hbint;
             if (!dbr_prioq_push(&clnt->prioq, CLNTID, now + clnt->clntint))
                 goto fail1;
             break;
-        case DBR_SESS_TERM:
+        case DBR_SESS_CLOSE:
         case DBR_SESS_LOGON:
         case DBR_SESS_HEARTBT:
             break;

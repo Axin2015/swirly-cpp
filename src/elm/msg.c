@@ -199,10 +199,10 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     size_t n = dbr_packlenl(body->req_id);
     n += dbr_packleni(body->type);
     switch (body->type) {
-    case DBR_SESS_INIT:
-        n += dbr_packleni(body->sess_init.hbint);
+    case DBR_SESS_OPEN:
+        n += dbr_packleni(body->sess_open.hbint);
         break;
-    case DBR_SESS_TERM:
+    case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
         n += dbr_packlenl(body->sess_logon.tid);
@@ -364,10 +364,10 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     buf = dbr_packl(buf, body->req_id);
     buf = dbr_packi(buf, body->type);
     switch (body->type) {
-    case DBR_SESS_INIT:
-        buf = dbr_packi(buf, body->sess_init.hbint);
+    case DBR_SESS_OPEN:
+        buf = dbr_packi(buf, body->sess_open.hbint);
         break;
-    case DBR_SESS_TERM:
+    case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
         buf = dbr_packl(buf, body->sess_logon.tid);
@@ -516,11 +516,11 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     body->type = type;
     struct DbrQueue q;
     switch (type) {
-    case DBR_SESS_INIT:
-        if (!(buf = dbr_unpacki(buf, &body->sess_init.hbint)))
+    case DBR_SESS_OPEN:
+        if (!(buf = dbr_unpacki(buf, &body->sess_open.hbint)))
             goto fail1;
         break;
-    case DBR_SESS_TERM:
+    case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
         if (!(buf = dbr_unpackl(buf, &body->sess_logon.tid)))
@@ -762,9 +762,9 @@ dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 }
 
 DBR_API DbrBool
-dbr_send_msg(void* sock, const char* trader, struct DbrBody* body, DbrBool enriched)
+dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
 {
-    if (zmq_send(sock, trader, strnlen(trader, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+    if (zmq_send(sock, sess, strnlen(sess, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
@@ -813,11 +813,11 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
     }
     const size_t size = zmq_msg_size(&zmsg);
     if (size < DBR_MNEM_MAX) {
-        __builtin_memcpy(msg->head.trader, zmq_msg_data(&zmsg), size);
-        msg->head.trader[size] = '\0';
+        __builtin_memcpy(msg->head.sess, zmq_msg_data(&zmsg), size);
+        msg->head.sess[size] = '\0';
     } else {
         assert(size == DBR_MNEM_MAX);
-        __builtin_memcpy(msg->head.trader, zmq_msg_data(&zmsg), DBR_MNEM_MAX);
+        __builtin_memcpy(msg->head.sess, zmq_msg_data(&zmsg), DBR_MNEM_MAX);
     }
     zmq_msg_close(&zmsg);
     return dbr_recv_body(sock, pool, &msg->body);

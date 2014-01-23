@@ -406,10 +406,13 @@ public:
     void
     on_logon(DbrIden tid) noexcept
     {
+        auto it = clnt_.trecs().find(tid);
+        trec_ = &*it;
     }
     void
     on_logoff(DbrIden tid) noexcept
     {
+        trec_ = nullptr;
     }
     void
     on_timeout(DbrIden req_id) noexcept
@@ -733,9 +736,7 @@ public:
         auto it = clnt_.trecs().find(mnem.c_str());
         if (it == clnt_.trecs().end())
             throw InvalidArgument(mnem);
-        trec_ = &*it;
-
-        clnt_.logon(trec_->id, TIMEOUT);
+        clnt_.logon(it->id, TIMEOUT);
     }
     void
     logoff(Arg begin, Arg end)

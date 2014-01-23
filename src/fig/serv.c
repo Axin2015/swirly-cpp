@@ -19,7 +19,6 @@
 #include "cache.h"
 #include "ordidx.h"
 #include "match.h"
-#include "sessidx.h"
 #include "trader.h"
 
 #include <dbr/err.h>
@@ -36,7 +35,6 @@ struct FigServ {
     DbrPool pool;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
-    struct FigSessIdx sessidx;
     struct DbrTree books;
 
     struct DbrQueue execs;
@@ -411,8 +409,6 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     fig_cache_init(&serv->cache, term_state, pool);
     fig_ordidx_init(&serv->ordidx);
     // 3.
-    fig_sessidx_init(&serv->sessidx, pool);
-    // 4.
     dbr_tree_init(&serv->books);
 
     dbr_queue_init(&serv->execs);
@@ -444,10 +440,8 @@ dbr_serv_destroy(DbrServ serv)
     if (serv) {
         // Ensure that executions are freed.
         dbr_serv_clear(serv);
-        // 4.
-        free_books(&serv->books);
         // 3.
-        fig_sessidx_term(&serv->sessidx);
+        free_books(&serv->books);
         // 2.
         fig_cache_term(&serv->cache);
         // 1.
@@ -507,6 +501,11 @@ DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
+    if (fig_trader_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        goto fail1;
+    }
+
     if (lots == 0 || lots < min_lots) {
         dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
@@ -585,6 +584,11 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 DBR_API struct DbrOrder*
 dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
 {
+    if (fig_trader_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        goto fail1;
+    }
+
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
@@ -638,6 +642,11 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
 DBR_API struct DbrOrder*
 dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lots)
 {
+    if (fig_trader_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        goto fail1;
+    }
+
     struct DbrOrder* order = fig_trader_find_order_ref(trader, ref);
     if (!order) {
         dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
@@ -690,6 +699,11 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
 DBR_API struct DbrOrder*
 dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
 {
+    if (fig_trader_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        goto fail1;
+    }
+
     struct DbrRbNode* node = fig_trader_find_order_id(trader, id);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
@@ -730,6 +744,11 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
 DBR_API struct DbrOrder*
 dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 {
+    if (fig_trader_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        goto fail1;
+    }
+
     struct DbrOrder* order = fig_trader_find_order_ref(trader, ref);
     if (!order) {
         dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
@@ -769,6 +788,11 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 DBR_API DbrBool
 dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 {
+    if (fig_trader_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        goto fail1;
+    }
+
     struct DbrRbNode* node = fig_trader_find_trade_id(trader, id);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such trade '%ld'", id);
