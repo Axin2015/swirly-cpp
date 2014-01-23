@@ -18,7 +18,7 @@
 #ifndef DBR_SESSIDX_H
 #define DBR_SESSIDX_H
 
-#include <dbr/pool.h>
+#include <dbr/types.h>
 
 /**
  * @addtogroup SessIdx

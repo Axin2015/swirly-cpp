@@ -18,7 +18,6 @@
 #ifndef DBR_MSG_H
 #define DBR_MSG_H
 
-#include <dbr/pool.h>
 #include <dbr/types.h>
 
 #include <stddef.h> // size_t

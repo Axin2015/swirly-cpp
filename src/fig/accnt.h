@@ -20,8 +20,6 @@
 
 #include <dbr/accnt.h>
 #include <dbr/conv.h> // dbr_book_key()
-#include <dbr/pool.h>
-#include <dbr/tree.h>
 #include <dbr/types.h>
 
 struct FigAccnt {

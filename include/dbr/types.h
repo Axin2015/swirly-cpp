@@ -18,7 +18,7 @@
 #ifndef DBR_TYPES_H
 #define DBR_TYPES_H
 
-#include <dbr/dlnode.h>
+#include <dbr/list.h>
 #include <dbr/queue.h>
 #include <dbr/slnode.h>
 #include <dbr/tree.h>
@@ -68,6 +68,12 @@ enum DbrEntity {
 };
 
 /** @} */
+
+/**
+ * @addtogroup Pool
+ */
+
+typedef struct ElmPool* DbrPool;
 
 /**
  * @addtogroup Trader
@@ -566,6 +572,42 @@ dbr_shared_view_entry(struct DbrSlNode* node)
 {
     return dbr_implof(struct DbrView, shared_node_, node);
 }
+
+/** @} */
+
+/**
+ * @addtogroup TypesSide
+ * @{
+ */
+
+struct DbrSide {
+    DbrPool pool;
+    struct DbrTree levels;
+    struct DbrList orders;
+    // Last trade information.
+    DbrTicks last_ticks;
+    DbrLots last_lots;
+    DbrMillis last_time;
+};
+
+/** @} */
+
+/**
+ * @addtogroup TypesBook
+ * @{
+ */
+
+struct DbrBook {
+    struct DbrRec* crec;
+    DbrDate settl_date;
+    struct DbrSide bid_side;
+    struct DbrSide ask_side;
+    /**
+     * @privatesection
+     */
+    struct DbrRbNode serv_node_;
+    struct DbrRbNode update_node_;
+};
 
 /** @} */
 

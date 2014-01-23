@@ -20,7 +20,6 @@
 
 #include <fig/ordidx.h>
 
-#include <dbr/pool.h>
 #include <dbr/refcount.h>
 #include <dbr/trader.h>
 #include <dbr/tree.h>

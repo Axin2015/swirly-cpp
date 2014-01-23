@@ -18,10 +18,12 @@
 #define _XOPEN_SOURCE 700 // strnlen()
 
 #include <dbr/accnt.h>
+#include <dbr/book.h>
 #include <dbr/err.h>
 #include <dbr/serv.h>
 #include <dbr/log.h>
 #include <dbr/msg.h>
+#include <dbr/pool.h>
 #include <dbr/queue.h>
 #include <dbr/sqlstore.h>
 #include <dbr/trader.h>

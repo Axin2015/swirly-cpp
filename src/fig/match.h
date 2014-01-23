@@ -18,10 +18,7 @@
 #ifndef FIG_MATCH_H
 #define FIG_MATCH_H
 
-#include <dbr/book.h>
-#include <dbr/defs.h>
 #include <dbr/journ.h>
-#include <dbr/pool.h>
 #include <dbr/types.h>
 
 // Used by matching engine to build a list of matches.

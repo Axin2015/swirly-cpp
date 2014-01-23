@@ -21,8 +21,6 @@
 #include <dbrpp/journ.hpp>
 #include <dbrpp/model.hpp>
 
-#include <dbr/pool.h>
-
 class Journ : public dbr::IJourn<Journ> {
     DbrIden id_;
 public:

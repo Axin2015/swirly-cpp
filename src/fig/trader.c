@@ -17,7 +17,6 @@
  */
 #include "trader.h"
 
-#include <dbr/book.h>
 #include <dbr/err.h>
 
 #include <stdlib.h>

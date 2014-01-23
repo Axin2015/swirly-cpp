@@ -26,18 +26,6 @@
  * @{
  */
 
-struct DbrBook {
-    struct DbrRec* crec;
-    DbrDate settl_date;
-    struct DbrSide bid_side;
-    struct DbrSide ask_side;
-    /**
-     * @privatesection
-     */
-    struct DbrRbNode serv_node_;
-    struct DbrRbNode update_node_;
-};
-
 DBR_API void
 dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, DbrPool pool);
 

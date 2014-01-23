@@ -137,6 +137,7 @@ elm_pool_init(struct ElmPool* pool)
     dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
     dbr_log_debug2("sizeof DbrExec=%zu", sizeof(struct DbrExec));
     dbr_log_debug2("sizeof DbrView=%zu", sizeof(struct DbrView));
+    dbr_log_debug2("sizeof DbrBook=%zu", sizeof(struct DbrBook));
 #endif // defined(DBR_DEBUG_ALLOC)
     if (!alloc_small_nodes(pool))
         goto fail1;
@@ -412,6 +413,18 @@ DBR_API void
 dbr_pool_free_view(DbrPool pool, struct DbrView* view)
 {
     elm_pool_free_view(pool, view);
+}
+
+DBR_API struct DbrBook*
+dbr_pool_alloc_book(DbrPool pool)
+{
+    return elm_pool_alloc_book(pool);
+}
+
+DBR_API void
+dbr_pool_free_book(DbrPool pool, struct DbrBook* book)
+{
+    elm_pool_free_book(pool, book);
 }
 
 DBR_API struct DbrSess*

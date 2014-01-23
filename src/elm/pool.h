@@ -18,9 +18,7 @@
 #ifndef ELM_POOL_H
 #define ELM_POOL_H
 
-#include <dbr/dlnode.h>
 #include <dbr/log.h>
-#include <dbr/rbnode.h>
 #include <dbr/slnode.h>
 #include <dbr/types.h>
 
@@ -80,6 +78,7 @@ struct ElmLargeNode {
         struct DbrOrder order;
         struct DbrExec exec;
         struct DbrView view;
+        struct DbrBook book;
     };
 #if !defined(DBR_DEBUG_ALLOC)
     // Defensively maintain consistent memory layout.
@@ -237,6 +236,20 @@ elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
     elm_pool_free_large(pool, node);
 }
 
+static inline struct DbrBook*
+elm_pool_alloc_book(struct ElmPool* pool)
+{
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool);
+    return node ? &node->book : NULL;
+}
+
+static inline void
+elm_pool_free_book(struct ElmPool* pool, struct DbrBook* book)
+{
+    struct ElmLargeNode* node = (struct ElmLargeNode*)book;
+    elm_pool_free_large(pool, node);
+}
+
 static inline struct DbrSess*
 elm_pool_alloc_sess(struct ElmPool* pool)
 {
@@ -387,6 +400,22 @@ elm_pool_free_view(struct ElmPool* pool, struct DbrView* view)
     elm_pool_free_large(pool, node);
 }
 
+static inline struct DbrBook*
+elm_pool_alloc_book_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmLargeNode* node = elm_pool_alloc_large(pool, file, line);
+    dbr_log_debug3("allocating book %p in %s at %d", node, file, line);
+    return node ? &node->book : NULL;
+}
+
+static inline void
+elm_pool_free_book(struct ElmPool* pool, struct DbrBook* book)
+{
+    struct ElmLargeNode* node = (struct ElmLargeNode*)book;
+    dbr_log_debug3("freeing book %p from %s at %d", node, node->file, node->line);
+    elm_pool_free_large(pool, node);
+}
+
 static inline struct DbrSess*
 elm_pool_alloc_sess_(struct ElmPool* pool, const char* file, int line)
 {
@@ -419,6 +448,8 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
     elm_pool_alloc_posn_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_view(pool)                   \
     elm_pool_alloc_view_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_book(pool)                   \
+    elm_pool_alloc_book_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_sess(pool)                   \
     elm_pool_alloc_sess_(pool, __FILE__, __LINE__)
 

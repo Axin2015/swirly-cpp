@@ -19,6 +19,7 @@
 
 #include <dbr/err.h>
 #include <dbr/log.h>
+#include <dbr/pool.h>
 
 #include <stdlib.h>
 

@@ -21,6 +21,7 @@
 #include "match.h"
 #include "trader.h"
 
+#include <dbr/book.h>
 #include <dbr/err.h>
 #include <dbr/serv.h>
 #include <dbr/queue.h>

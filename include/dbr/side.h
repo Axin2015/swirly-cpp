@@ -19,25 +19,12 @@
 #ifndef DBR_SIDE_H
 #define DBR_SIDE_H
 
-#include <dbr/list.h>
-#include <dbr/pool.h>
-#include <dbr/tree.h>
 #include <dbr/types.h>
 
 /**
  * @addtogroup Side
  * @{
  */
-
-struct DbrSide {
-    DbrPool pool;
-    struct DbrTree levels;
-    struct DbrList orders;
-    // Last trade information.
-    DbrTicks last_ticks;
-    DbrLots last_lots;
-    DbrMillis last_time;
-};
 
 DBR_API void
 dbr_side_init(struct DbrSide* side, DbrPool pool);

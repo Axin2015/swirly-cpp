@@ -18,7 +18,6 @@
 #ifndef DBR_CONV_H
 #define DBR_CONV_H
 
-#include <dbr/defs.h>
 #include <dbr/types.h>
 
 #include <assert.h>

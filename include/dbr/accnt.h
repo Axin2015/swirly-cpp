@@ -18,7 +18,6 @@
 #ifndef DBR_ACCNT_H
 #define DBR_ACCNT_H
 
-#include <dbr/defs.h>
 #include <dbr/types.h>
 
 /**

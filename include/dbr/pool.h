@@ -18,7 +18,7 @@
 #ifndef DBR_POOL_H
 #define DBR_POOL_H
 
-#include <dbr/defs.h>
+#include <dbr/types.h>
 
 struct DbrSlNode;
 
@@ -26,8 +26,6 @@ struct DbrSlNode;
  * @addtogroup Pool
  * @{
  */
-
-typedef struct ElmPool* DbrPool;
 
 DBR_API DbrPool
 dbr_pool_create(void);
@@ -138,6 +136,19 @@ dbr_pool_alloc_view(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_view(DbrPool pool, struct DbrView* view);
+
+/** @} */
+
+/**
+ * @addtogroup PoolBook
+ * @{
+ */
+
+DBR_API struct DbrBook*
+dbr_pool_alloc_book(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_book(DbrPool pool, struct DbrBook* book);
 
 /** @} */
 

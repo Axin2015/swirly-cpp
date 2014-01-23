@@ -20,7 +20,6 @@
 
 #include <dbr/journ.h>
 #include <dbr/model.h>
-#include <dbr/pool.h>
 #include <dbr/types.h>
 
 /**

@@ -18,7 +18,6 @@
 #ifndef DBR_TRADER_H
 #define DBR_TRADER_H
 
-#include <dbr/defs.h>
 #include <dbr/types.h>
 
 /**

@@ -19,7 +19,6 @@
 #define DBR_REFCOUNT_H
 
 #include <dbr/pool.h>
-#include <dbr/types.h>
 
 /**
  * @addtogroup TypesExec

@@ -17,6 +17,7 @@
  */
 #include "mock.hpp"
 
+#include <dbr/pool.h>
 #include <dbr/queue.h>
 
 using namespace dbr;

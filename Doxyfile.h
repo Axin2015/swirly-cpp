@@ -198,6 +198,11 @@
  */
 
 /**
+ * @defgroup TypesBook Book
+ * @ingroup Types
+ */
+
+/**
  * @defgroup TypesSess Sess
  * @ingroup Types
  */
@@ -250,6 +255,11 @@
 
 /**
  * @defgroup PoolView View
+ * @ingroup Pool
+ */
+
+/**
+ * @defgroup PoolBook Book
  * @ingroup Pool
  */
 
@@ -370,13 +380,8 @@
  */
 
 /**
- * @defgroup Book Book
- * @ingroup Fig
- */
-
-/**
  * @defgroup Side Side
- * @ingroup Book
+ * @ingroup Fig
  * @example side.cpp
  */
 
@@ -393,6 +398,11 @@
 /**
  * @defgroup SideLast Last
  * @ingroup Side
+ */
+
+/**
+ * @defgroup Book Book
+ * @ingroup Fig
  */
 
 /**

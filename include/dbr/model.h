@@ -18,7 +18,6 @@
 #ifndef DBR_MODEL_H
 #define DBR_MODEL_H
 
-#include <dbr/pool.h>
 #include <dbr/types.h>
 
 /**

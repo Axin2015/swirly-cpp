@@ -23,6 +23,7 @@
 #include <dbr/conv.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
+#include <dbr/pool.h>
 #include <dbr/queue.h>
 
 #include <string.h>
