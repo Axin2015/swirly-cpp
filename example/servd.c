@@ -750,7 +750,7 @@ main(int argc, char* argv[])
 {
     int status = 1;
 
-    pool = dbr_pool_create();
+    pool = dbr_pool_create(8 * 1024 * 1024);
     if (!pool) {
         dbr_err_prints("dbr_pool_create() failed");
         goto exit1;

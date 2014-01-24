@@ -63,7 +63,7 @@ TEST_CASE(serv_trader)
 {
     Journ journ(1);
     Model model;
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     Serv serv(&journ, &model, pool);
 
     check(serv.trecs().find("BAD") == serv.trecs().end());
@@ -81,7 +81,7 @@ TEST_CASE(serv_accnt)
 {
     Journ journ(1);
     Model model;
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     Serv serv(&journ, &model, pool);
 
     check(serv.arecs().find("BAD") == serv.arecs().end());
@@ -99,7 +99,7 @@ TEST_CASE(serv_contr)
 {
     Journ journ(1);
     Model model;
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     Serv serv(&journ, &model, pool);
 
     check(serv.crecs().find("BAD") == serv.crecs().end());
@@ -126,7 +126,7 @@ TEST_CASE(serv_book)
 {
     Journ journ(1);
     Model model;
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     Serv serv(&journ, &model, pool);
 
     ServContrRecs::Iterator it = serv.crecs().find("EURUSD");
@@ -142,7 +142,7 @@ TEST_CASE(serv_place)
 {
     Journ journ(1);
     Model model;
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     Serv serv(&journ, &model, pool);
 
     auto tit = serv.trecs().find("WRAMIREZ");

@@ -29,7 +29,7 @@ using namespace dbr;
 
 TEST_CASE(side_orders)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     auto trader = create_wramirez(pool);
     auto accnt = create_dbra(pool);
     auto contr = create_eurusd(pool);
@@ -121,7 +121,7 @@ TEST_CASE(side_orders)
 
 TEST_CASE(side_levels)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     auto trader = create_wramirez(pool);
     auto accnt = create_dbra(pool);
     auto contr = create_eurusd(pool);

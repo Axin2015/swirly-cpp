@@ -28,7 +28,7 @@ struct DbrSlNode;
  */
 
 DBR_API DbrPool
-dbr_pool_create(void);
+dbr_pool_create(size_t capacity);
 
 DBR_API void
 dbr_pool_destroy(DbrPool pool);

@@ -28,7 +28,7 @@ using namespace dbr;
 
 TEST_CASE(proto_trader)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     auto in = create_wramirez(pool);
 
     auto len = trader_len(*in);
@@ -51,7 +51,7 @@ TEST_CASE(proto_trader)
 
 TEST_CASE(proto_accnt)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     auto in = create_dbra(pool);
 
     auto len = accnt_len(*in);
@@ -74,7 +74,7 @@ TEST_CASE(proto_accnt)
 
 TEST_CASE(proto_contr)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     auto in = create_eurusd(pool);
 
     auto len = contr_len(*in);
@@ -110,7 +110,7 @@ TEST_CASE(proto_contr)
 
 TEST_CASE(proto_order)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     DbrIden trader = 5;
     DbrIden accnt = 7;
     DbrIden contr = 11;
@@ -149,7 +149,7 @@ TEST_CASE(proto_order)
 
 TEST_CASE(proto_trade)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     DbrIden trader = 5;
     DbrIden accnt = 7;
     DbrIden contr = 11;
@@ -192,7 +192,7 @@ TEST_CASE(proto_trade)
 
 TEST_CASE(proto_memb)
 {
-    Pool pool;
+    Pool pool(8 * 1024 * 1024);
     DbrIden accnt = 5;
     DbrIden trader = 7;
 

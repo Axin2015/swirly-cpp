@@ -16,6 +16,7 @@
  *  02110-1301 USA.
  */
 #include "mock.hpp"
+#include "test.hpp"
 
 #include <dbr/pool.h>
 #include <dbr/queue.h>
@@ -27,7 +28,7 @@ namespace {
 
 void
 set_trader(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
-           const char* email) noexcept
+           const char* email)
 {
     rec.type = DBR_ENTITY_TRADER;
     rec.id = id;
@@ -38,7 +39,7 @@ set_trader(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
 }
 
 ssize_t
-read_trader(DbrPool pool, DbrSlNode*& first) noexcept
+read_trader(DbrPool pool, DbrSlNode*& first)
 {
     ssize_t size = 0;
 
@@ -46,12 +47,14 @@ read_trader(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
+    check(rec);
     dbr_rec_init(rec);
     set_trader(*rec, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
     dbr_queue_insert_back(&rq, &rec->shared_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
+    check(rec);
     dbr_rec_init(rec);
     set_trader(*rec, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
     dbr_queue_insert_back(&rq, &rec->shared_node_);
@@ -63,7 +66,7 @@ read_trader(DbrPool pool, DbrSlNode*& first) noexcept
 
 void
 set_accnt(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
-          const char* email) noexcept
+          const char* email)
 {
     rec.type = DBR_ENTITY_ACCNT;
     rec.id = id;
@@ -74,7 +77,7 @@ set_accnt(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
 }
 
 ssize_t
-read_accnt(DbrPool pool, DbrSlNode*& first) noexcept
+read_accnt(DbrPool pool, DbrSlNode*& first)
 {
     ssize_t size = 0;
 
@@ -82,12 +85,14 @@ read_accnt(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
+    check(rec);
     dbr_rec_init(rec);
     set_accnt(*rec, 1, "DBRA", "Account A", "dbra@doobry.org");
     dbr_queue_insert_back(&rq, &rec->shared_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
+    check(rec);
     dbr_rec_init(rec);
     set_accnt(*rec, 2, "DBRB", "Account B", "dbrb@doobry.org");
     dbr_queue_insert_back(&rq, &rec->shared_node_);
@@ -100,7 +105,7 @@ read_accnt(DbrPool pool, DbrSlNode*& first) noexcept
 void
 set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display, const char* asset_type,
           const char* asset, const char* ccy, int tick_numer, int tick_denom, int lot_numer,
-          int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots) noexcept
+          int lot_denom, int pip_dp, DbrLots min_lots, DbrLots max_lots)
 {
     rec.type = DBR_ENTITY_CONTR;
     rec.id = id;
@@ -119,7 +124,7 @@ set_contr(DbrRec& rec, DbrIden id, const char* mnem, const char* display, const 
 }
 
 ssize_t
-read_contr(DbrPool pool, DbrSlNode*& first) noexcept
+read_contr(DbrPool pool, DbrSlNode*& first)
 {
     ssize_t size = 0;
 
@@ -127,6 +132,7 @@ read_contr(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrRec* rec = dbr_pool_alloc_rec(pool);
+    check(rec);
     dbr_rec_init(rec);
     set_contr(*rec, 1, "EURUSD", "EURUSD", "CURRENCY", "EUR", "USD",
               1, 10000, 1000000, 1, 4, 1, 10);
@@ -134,6 +140,7 @@ read_contr(DbrPool pool, DbrSlNode*& first) noexcept
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
+    check(rec);
     dbr_rec_init(rec);
     set_contr(*rec, 2, "GBPUSD", "GBPUSD", "CURRENCY", "GBP", "USD",
               1, 10000, 1000000, 1, 4, 1, 10);
@@ -145,28 +152,28 @@ read_contr(DbrPool pool, DbrSlNode*& first) noexcept
 }
 
 ssize_t
-read_order(DbrPool pool, DbrSlNode*& first) noexcept
+read_order(DbrPool pool, DbrSlNode*& first)
 {
     first = nullptr;
     return 0;
 }
 
 ssize_t
-read_trade(DbrPool pool, DbrSlNode*& first) noexcept
+read_trade(DbrPool pool, DbrSlNode*& first)
 {
     first = nullptr;
     return 0;
 }
 
 void
-set_memb(DbrMemb& memb, DbrIden trader, DbrIden accnt) noexcept
+set_memb(DbrMemb& memb, DbrIden trader, DbrIden accnt)
 {
     memb.trader.id_only = trader;
     memb.accnt.id_only = accnt;
 }
 
 ssize_t
-read_memb(DbrPool pool, DbrSlNode*& first) noexcept
+read_memb(DbrPool pool, DbrSlNode*& first)
 {
     ssize_t size = 0;
 
@@ -174,18 +181,21 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
     dbr_queue_init(&rq);
 
     DbrMemb* memb = dbr_pool_alloc_memb(pool);
+    check(memb);
     dbr_memb_init(memb);
     set_memb(*memb, 1, 1);
     dbr_queue_insert_back(&rq, &memb->shared_node_);
     ++size;
 
     memb = dbr_pool_alloc_memb(pool);
+    check(memb);
     dbr_memb_init(memb);
     set_memb(*memb, 1, 2);
     dbr_queue_insert_back(&rq, &memb->shared_node_);
     ++size;
 
     memb = dbr_pool_alloc_memb(pool);
+    check(memb);
     dbr_memb_init(memb);
     set_memb(*memb, 2, 2);
     dbr_queue_insert_back(&rq, &memb->shared_node_);
@@ -196,7 +206,7 @@ read_memb(DbrPool pool, DbrSlNode*& first) noexcept
 }
 
 ssize_t
-read_posn(DbrPool pool, DbrSlNode*& first) noexcept
+read_posn(DbrPool pool, DbrSlNode*& first)
 {
     first = nullptr;
     return 0;
@@ -234,33 +244,46 @@ Journ::update_exec(DbrIden id, DbrMillis modified) noexcept
 ssize_t
 Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
 {
-    ssize_t ret;
-    switch (type) {
-    case DBR_ENTITY_TRADER:
-        ret = read_trader(pool, first);
-        break;
-    case DBR_ENTITY_ACCNT:
-        ret = read_accnt(pool, first);
-        break;
-    case DBR_ENTITY_CONTR:
-        ret = read_contr(pool, first);
-        break;
-    case DBR_ENTITY_ORDER:
-        ret = read_order(pool, first);
-        break;
-    case DBR_ENTITY_EXEC:
-        ret = read_trade(pool, first);
-        break;
-    case DBR_ENTITY_MEMB:
-        ret = read_memb(pool, first);
-        break;
-    case DBR_ENTITY_POSN:
-        ret = read_posn(pool, first);
-        break;
-    default:
-        dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);
-        first = nullptr;
-        ret = -1;
+    ssize_t ret = -1;
+    try {
+        switch (type) {
+        case DBR_ENTITY_TRADER:
+            ret = read_trader(pool, first);
+            break;
+        case DBR_ENTITY_ACCNT:
+            ret = read_accnt(pool, first);
+            break;
+        case DBR_ENTITY_CONTR:
+            ret = read_contr(pool, first);
+            break;
+        case DBR_ENTITY_ORDER:
+            ret = read_order(pool, first);
+            break;
+        case DBR_ENTITY_EXEC:
+            ret = read_trade(pool, first);
+            break;
+        case DBR_ENTITY_MEMB:
+            ret = read_memb(pool, first);
+            break;
+        case DBR_ENTITY_POSN:
+            ret = read_posn(pool, first);
+            break;
+        default:
+            dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);
+            first = nullptr;
+        }
+    } catch (const TestException& e) {
+        cout << " fail" << endl;
+        cerr << e.file() << ':' << e.line() << ": " << e.what() << endl;
+        exit(1);
+    } catch (const dbr::DbrException& e) {
+        cout << " fail" << endl;
+        cerr << e.file() << ':' << e.line() << ": " << e.what() << " (" << e.num() << ')' << endl;
+        exit(1);
+    } catch (const exception& e) {
+        cout << " fail" << endl;
+        cerr << "exception: " << e.what() << endl;
+        exit(1);
     }
     return ret;
 }

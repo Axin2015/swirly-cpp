@@ -1061,7 +1061,7 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         ZmqCtx ctx;
-        Pool pool;
+        Pool pool(8 * 1024 * 1024);
         // epgm://239.192.1.1:3270
         Clnt clnt("TEST", ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271",
                   dbr_millis(), pool);

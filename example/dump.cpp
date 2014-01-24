@@ -31,7 +31,7 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         SqlStore store("doobry.db", 1);
-        Pool pool;
+        Pool pool(8 * 1024 * 1024);
         Serv serv(store.journ(), store.model(), pool);
 
         cout << "traders:\n";

@@ -42,8 +42,9 @@ public:
         : impl_{nullptr}
     {
     }
-    Pool()
-        : impl_{dbr_pool_create()}
+    explicit
+    Pool(size_t capacity)
+        : impl_{dbr_pool_create(capacity)}
     {
         if (!impl_)
             throw_exception();
