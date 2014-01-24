@@ -198,12 +198,17 @@
  */
 
 /**
+ * @defgroup TypesSide Side
+ * @ingroup Types
+ */
+
+/**
  * @defgroup TypesBook Book
  * @ingroup Types
  */
 
 /**
- * @defgroup TypesSess Sess
+ * @defgroup TypesSess Session
  * @ingroup Types
  */
 
@@ -259,12 +264,17 @@
  */
 
 /**
+ * @defgroup PoolSide Side
+ * @ingroup Pool
+ */
+
+/**
  * @defgroup PoolBook Book
  * @ingroup Pool
  */
 
 /**
- * @defgroup PoolSess Sess
+ * @defgroup PoolSess Session
  * @ingroup Pool
  */
 
@@ -403,6 +413,16 @@
 /**
  * @defgroup Book Book
  * @ingroup Fig
+ */
+
+/**
+ * @defgroup Sess Session
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup SessTrader Trader
+ * @ingroup Sess
  */
 
 /**

@@ -16,3 +16,11 @@
  *  02110-1301 USA.
  */
 #include <dbr/sess.h>
+
+#include "trader.h"
+
+DBR_API DbrTrader
+dbr_sess_trader_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct FigTrader, sess_node_, node);
+}

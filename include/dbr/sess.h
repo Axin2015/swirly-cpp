@@ -33,4 +33,40 @@ dbr_sess_init(struct DbrSess* sess)
 
 /** @} */
 
+/**
+ * @addtogroup SessTrader
+ * @{
+ */
+
+#define DBR_SESS_END_TRADER NULL
+
+DBR_API DbrTrader
+dbr_sess_trader_entry(struct DbrRbNode* node);
+
+static inline struct DbrRbNode*
+dbr_sess_find_trader(const struct DbrSess* sess, DbrIden id)
+{
+    return dbr_tree_find(&sess->traders, id);
+}
+
+static inline struct DbrRbNode*
+dbr_sess_first_trader(const struct DbrSess* sess)
+{
+    return dbr_tree_first(&sess->traders);
+}
+
+static inline struct DbrRbNode*
+dbr_sess_last_trader(const struct DbrSess* sess)
+{
+    return dbr_tree_last(&sess->traders);
+}
+
+static inline DbrBool
+dbr_sess_empty_trader(const struct DbrSess* sess)
+{
+    return dbr_tree_empty(&sess->traders);
+}
+
+/** @} */
+
 #endif // DBR_SESS_H

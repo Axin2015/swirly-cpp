@@ -625,12 +625,6 @@ struct DbrSess {
     struct DbrSlNode mnem_node_;
 };
 
-static inline void
-dbr_sess_init(struct DbrSess* sess)
-{
-    dbr_slnode_init(&sess->mnem_node_);
-}
-
 /** @} */
 
 #endif // DBR_TYPES_H

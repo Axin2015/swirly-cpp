@@ -135,7 +135,7 @@ lazy_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
     struct DbrBook* book;
 	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);
     if (!node || node->key != key) {
-        book = malloc(sizeof(struct DbrBook));
+        book = dbr_pool_alloc_book(serv->pool);
         if (dbr_unlikely(!book)) {
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
@@ -149,7 +149,7 @@ lazy_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 }
 
 static void
-free_books(struct DbrTree* books)
+free_books(struct DbrTree* books, DbrPool pool)
 {
     assert(books);
     struct DbrRbNode* node;
@@ -157,7 +157,7 @@ free_books(struct DbrTree* books)
         struct DbrBook* book = serv_book_entry(node);
         dbr_tree_remove(books, node);
         dbr_book_term(book);
-        free(book);
+        dbr_pool_free_book(pool, book);
     }
 }
 
@@ -442,7 +442,7 @@ dbr_serv_destroy(DbrServ serv)
         // Ensure that executions are freed.
         dbr_serv_clear(serv);
         // 3.
-        free_books(&serv->books);
+        free_books(&serv->books, serv->pool);
         // 2.
         fig_cache_term(&serv->cache);
         // 1.
