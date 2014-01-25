@@ -36,6 +36,7 @@ free_sess_list(struct DbrSlNode* node, DbrPool pool)
     while (node) {
         struct DbrSess* sess = sess_entry_mnem(node);
         node = node->next;
+        dbr_sess_term(sess);
         dbr_pool_free_sess(pool, sess);
     }
 }

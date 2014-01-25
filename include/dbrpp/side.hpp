@@ -451,6 +451,14 @@ public:
     /** @} **/
 };
 
+inline std::ostream&
+operator <<(std::ostream& os, const Side& side)
+{
+    return os << "last_ticks=" << side.last_ticks()
+              << ",last_lots=" << side.last_lots()
+              << ",last_time=" << side.last_time();
+}
+
 class SideRef {
     DbrSide* impl_;
 public:

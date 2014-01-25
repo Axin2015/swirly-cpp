@@ -33,6 +33,80 @@ namespace dbr {
  * @{
  */
 
+class Book {
+    mutable DbrBook impl_;
+public:
+    ~Book() noexcept
+    {
+        dbr_book_term(&impl_);
+    }
+    explicit
+    Book(DbrRec& crec, DbrDate settl_date, DbrPool pool) noexcept
+    {
+        dbr_book_init(&impl_, &crec, settl_date, pool);
+    }
+    operator DbrBook&() noexcept
+    {
+        return impl_;
+    }
+    DbrBook*
+    c_arg() noexcept
+    {
+        return &impl_;
+    }
+
+    // Copy semantics.
+
+    Book(const Book&) = delete;
+
+    Book&
+    operator =(const Book&) = delete;
+
+    bool
+    operator ==(const Book& rhs) const noexcept
+    {
+        return key() == rhs.key();
+    }
+    bool
+    operator !=(const Book& rhs) const noexcept
+    {
+        return key() != rhs.key();
+    }
+    DbrKey
+    key() const noexcept
+    {
+        return dbr_book_key(impl_.crec->id, impl_.settl_date);
+    }
+    ContrRecRef
+    crec() const noexcept
+    {
+        return ContrRecRef{*dbr_book_crec(&impl_)};
+    }
+    DbrDate
+    settl_date() const noexcept
+    {
+        return dbr_book_settl_date(&impl_);
+    }
+    SideRef
+    bid_side() const noexcept
+    {
+        return SideRef{*dbr_book_bid_side(&impl_)};
+    }
+    SideRef
+    ask_side() const noexcept
+    {
+        return SideRef{*dbr_book_ask_side(&impl_)};
+    }
+};
+
+inline std::ostream&
+operator <<(std::ostream& os, const Book& book)
+{
+    return os << "key=" << book.key()
+              << ",crec=" << book.crec().mnem()
+              << ",settl_date" << book.settl_date();
+}
+
 class BookRef {
     DbrBook* impl_;
 public:
