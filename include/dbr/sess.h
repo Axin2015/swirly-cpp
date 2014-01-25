@@ -36,6 +36,12 @@ dbr_sess_term(struct DbrSess* sess)
 {
 }
 
+DBR_API DbrBool
+dbr_sess_logon(struct DbrSess* sess, DbrTrader trader);
+
+DBR_API void
+dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader);
+
 /** @} */
 
 /**

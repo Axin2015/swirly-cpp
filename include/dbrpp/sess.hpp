@@ -267,6 +267,16 @@ public:
     {
         return impl_;
     }
+    DbrBool
+    logon(DbrTrader trader)
+    {
+        return dbr_sess_logon(impl_, trader);
+    }
+    void
+    logoff(DbrTrader trader)
+    {
+        return dbr_sess_logoff(impl_, trader);
+    }
     Mnem
     mnem() const noexcept
     {

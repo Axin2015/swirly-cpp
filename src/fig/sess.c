@@ -19,8 +19,29 @@
 
 #include "trader.h"
 
+#include <dbr/err.h>
+
 DBR_API DbrTrader
 dbr_sess_trader_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct FigTrader, sess_node_, node);
+}
+
+DBR_API DbrBool
+dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
+{
+    if (trader->sess) {
+        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", trader->rec->mnem);
+        return DBR_FALSE;
+    }
+    trader->sess = sess;
+    dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
+    return DBR_TRUE;
+}
+
+DBR_API void
+dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader)
+{
+    dbr_tree_remove(&sess->traders, &trader->sess_node_);
+    trader->sess = NULL;
 }
