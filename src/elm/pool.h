@@ -29,6 +29,7 @@ struct ElmPool {
     void* addr;
     size_t used;
     size_t capacity;
+    size_t pagesize;
     // Free lists.
     struct ElmSmallNode* first_small;
     struct ElmLargeNode* first_large;

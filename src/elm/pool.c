@@ -24,8 +24,29 @@
 #include <string.h> // strerror()
 #include <stdlib.h> // malloc()
 
+#include <unistd.h> // sysconf()
+
 #include <sys/types.h>
 #include <sys/mman.h>
+
+static void*
+alloc_mem(struct ElmPool* pool, size_t size)
+{
+    const size_t new_used = pool->used + size;
+    if (new_used > pool->capacity) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return NULL;
+    }
+#if DBR_DEBUG_LEVEL >= 1
+    const size_t page = new_used / pool->pagesize;
+    if (pool->used == 0 || page > pool->used / pool->pagesize)
+        dbr_log_info("allocating page %zu", page + 1);
+#endif // DBR_DEBUG_LEVEL >= 1
+    // Allocate node from virtual memory.
+    void* addr = pool->addr + pool->used;
+    pool->used = new_used;
+    return addr;
+}
 
 DBR_EXTERN DbrBool
 elm_pool_init(struct ElmPool* pool, size_t capacity)
@@ -39,24 +60,26 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     pool->addr = addr;
     pool->used = 0;
     pool->capacity = capacity;
+    //pool->pagesize = sysconf(_SC_PAGESIZE);
+    pool->pagesize = 1024;
     pool->first_small = NULL;
     pool->first_large = NULL;
     pool->allocs = 0;
     pool->checksum = 0;
 
-    dbr_log_debug2("%zu small nodes per block:", pool->small.nodes_per_block);
-    dbr_log_debug2("sizeof DbrLevel=%zu", sizeof(struct DbrLevel));
-    dbr_log_debug2("sizeof DbrMatch=%zu", sizeof(struct DbrMatch));
-    dbr_log_debug2("sizeof DbrMemb=%zu", sizeof(struct DbrMemb));
-    dbr_log_debug2("sizeof DbrPosn=%zu", sizeof(struct DbrPosn));
-    dbr_log_debug2("sizeof DbrSess=%zu", sizeof(struct DbrSess));
+    // Small nodes.
+    dbr_log_debug1("sizeof DbrLevel: %zu", sizeof(struct DbrLevel));
+    dbr_log_debug1("sizeof DbrMatch: %zu", sizeof(struct DbrMatch));
+    dbr_log_debug1("sizeof DbrMemb: %zu", sizeof(struct DbrMemb));
+    dbr_log_debug1("sizeof DbrPosn: %zu", sizeof(struct DbrPosn));
+    dbr_log_debug1("sizeof DbrSess: %zu", sizeof(struct DbrSess));
 
-    dbr_log_debug2("%zu large nodes per block:", pool->large.nodes_per_block);
-    dbr_log_debug2("sizeof DbrRec=%zu", sizeof(struct DbrRec));
-    dbr_log_debug2("sizeof DbrOrder=%zu", sizeof(struct DbrOrder));
-    dbr_log_debug2("sizeof DbrExec=%zu", sizeof(struct DbrExec));
-    dbr_log_debug2("sizeof DbrView=%zu", sizeof(struct DbrView));
-    dbr_log_debug2("sizeof DbrBook=%zu", sizeof(struct DbrBook));
+    // Large nodes.
+    dbr_log_debug1("sizeof DbrRec: %zu", sizeof(struct DbrRec));
+    dbr_log_debug1("sizeof DbrOrder: %zu", sizeof(struct DbrOrder));
+    dbr_log_debug1("sizeof DbrExec: %zu", sizeof(struct DbrExec));
+    dbr_log_debug1("sizeof DbrView: %zu", sizeof(struct DbrView));
+    dbr_log_debug1("sizeof DbrBook: %zu", sizeof(struct DbrBook));
 
     return DBR_TRUE;
 }
@@ -81,16 +104,8 @@ elm_pool_alloc_small(struct ElmPool* pool)
         // Pop from free-list.
         node = pool->first_small;
         pool->first_small = node->next;
-    } else {
-        const size_t new_used = pool->used + sizeof(struct ElmSmallNode);
-        if (new_used > pool->capacity) {
-            dbr_err_set(DBR_ENOMEM, "out of memory");
-            return NULL;
-        }
-        // Allocate node from virtual memory.
-        node = pool->addr + pool->used;
-        pool->used = new_used;
-    }
+    } else if (!(node = alloc_mem(pool, sizeof(struct ElmSmallNode))))
+        return NULL;
     ++pool->allocs;
     pool->checksum ^= (unsigned long)node;
     return node;
@@ -104,16 +119,8 @@ elm_pool_alloc_large(struct ElmPool* pool)
         // Pop from free-list.
         node = pool->first_large;
         pool->first_large = node->next;
-    } else {
-        const size_t new_used = pool->used + sizeof(struct ElmLargeNode);
-        if (new_used > pool->capacity) {
-            dbr_err_set(DBR_ENOMEM, "out of memory");
-            return NULL;
-        }
-        // Allocate node from virtual memory.
-        node = pool->addr + pool->used;
-        pool->used = new_used;
-    }
+    } else if (!(node = alloc_mem(pool, sizeof(struct ElmLargeNode))))
+        return NULL;
     ++pool->allocs;
     pool->checksum ^= (unsigned long)node;
     return node;
