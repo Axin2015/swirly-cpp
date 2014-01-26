@@ -592,6 +592,11 @@ public:
         return TraderMembs{impl_};
     }
     /** @} */
+    DbrBool
+    logged_on() const
+    {
+        return dbr_trader_logged_on(impl_);
+    }
 };
 
 inline std::ostream&

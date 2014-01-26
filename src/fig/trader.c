@@ -188,3 +188,9 @@ dbr_trader_empty_memb(DbrTrader trader)
 {
     return fig_trader_empty_memb(trader);
 }
+
+DBR_API DbrBool
+dbr_trader_logged_on(DbrTrader trader)
+{
+    return fig_trader_logged_on(trader);
+}

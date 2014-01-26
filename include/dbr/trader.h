@@ -116,4 +116,14 @@ dbr_trader_empty_memb(DbrTrader trader);
 
 /** @} */
 
+/**
+ * @addtogroup Trader
+ * @{
+ */
+
+DBR_API DbrBool
+dbr_trader_logged_on(DbrTrader trader);
+
+/** @} */
+
 #endif // DBR_TRADER_H
