@@ -85,53 +85,17 @@ fig_sessidx_term(struct FigSessIdx* sessidx)
         free_sess_list(sessidx->buckets[i].mnems.first, sessidx->pool);
 }
 
-DBR_EXTERN DbrBool
-fig_sessidx_open(const struct FigSessIdx* sessidx, const char* mnem)
+DBR_EXTERN struct DbrSess*
+fig_sessidx_lazy(const struct FigSessIdx* sessidx, const char* mnem)
 {
     assert(mnem);
     struct DbrSess* sess = find_sess(sessidx, mnem);
-    if (!sess) {
+    if (dbr_unlikely(!sess)) {
         if (!(sess = dbr_pool_alloc_sess(sessidx->pool)))
             return DBR_FALSE;
         dbr_sess_init(sess);
         strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
         dbr_tree_init(&sess->traders);
-    } else {
-        // Close session if already open.
-        fig_sessidx_close(sessidx, mnem);
     }
-    return DBR_TRUE;
-}
-
-DBR_EXTERN void
-fig_sessidx_close(const struct FigSessIdx* sessidx, const char* mnem)
-{
-}
-
-DBR_EXTERN DbrBool
-fig_sessidx_logon(const struct FigSessIdx* sessidx, const char* mnem, DbrTrader trader)
-{
-    assert(sessidx);
-    assert(mnem);
-    assert(trader);
-
-    if (trader->sess) {
-        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", trader->rec->mnem);
-        goto fail1;
-    }
-    struct DbrSess* sess = find_sess(sessidx, mnem);
-    if (!sess) {
-        dbr_err_setf(DBR_EINVAL, "no such session '%.16s'", mnem);
-        goto fail1;
-    }
-    trader->sess = sess;
-    dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
-    return DBR_TRUE;
- fail1:
-    return DBR_FALSE;
-}
-
-DBR_EXTERN void
-fig_sessidx_logoff(const struct FigSessIdx* sessidx, const char* mnem, DbrTrader trader)
-{
+    return sess;
 }

@@ -41,16 +41,7 @@ fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool);
 DBR_EXTERN void
 fig_sessidx_term(struct FigSessIdx* sessidx);
 
-DBR_EXTERN DbrBool
-fig_sessidx_open(const struct FigSessIdx* sessidx, const char* mnem);
-
-DBR_EXTERN void
-fig_sessidx_close(const struct FigSessIdx* sessidx, const char* mnem);
-
-DBR_EXTERN DbrBool
-fig_sessidx_logon(const struct FigSessIdx* sessidx, const char* mnem, DbrTrader trader);
-
-DBR_EXTERN void
-fig_sessidx_logoff(const struct FigSessIdx* sessidx, const char* mnem, DbrTrader trader);
+DBR_EXTERN struct DbrSess*
+fig_sessidx_lazy(const struct FigSessIdx* sessidx, const char* mnem);
 
 #endif // FIG_SESSIDX_H

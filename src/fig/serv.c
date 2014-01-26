@@ -17,8 +17,9 @@
  */
 #include "accnt.h"
 #include "cache.h"
-#include "ordidx.h"
 #include "match.h"
+#include "ordidx.h"
+#include "sessidx.h"
 #include "trader.h"
 
 #include <dbr/book.h>
@@ -36,6 +37,7 @@ struct FigServ {
     DbrPool pool;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
+    struct FigSessIdx sessidx;
     struct DbrTree books;
 
     struct DbrQueue execs;
@@ -410,6 +412,8 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     fig_cache_init(&serv->cache, term_state, pool);
     fig_ordidx_init(&serv->ordidx);
     // 3.
+    fig_sessidx_init(&serv->sessidx, pool);
+    // 4.
     dbr_tree_init(&serv->books);
 
     dbr_queue_init(&serv->execs);
@@ -441,8 +445,10 @@ dbr_serv_destroy(DbrServ serv)
     if (serv) {
         // Ensure that executions are freed.
         dbr_serv_clear(serv);
-        // 3.
+        // 4.
         free_books(&serv->books, serv->pool);
+        // 3.
+        fig_sessidx_term(&serv->sessidx);
         // 2.
         fig_cache_term(&serv->cache);
         // 1.
@@ -494,6 +500,12 @@ DBR_API struct DbrBook*
 dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
 {
     return lazy_book(serv, crec, settl_date);
+}
+
+DBR_API struct DbrSess*
+dbr_serv_sess(DbrServ serv, const char* mnem)
+{
+    return fig_sessidx_lazy(&serv->sessidx, mnem);
 }
 
 // Exec

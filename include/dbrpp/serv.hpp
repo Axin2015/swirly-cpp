@@ -22,6 +22,7 @@
 #include <dbrpp/book.hpp>
 #include <dbrpp/except.hpp>
 #include <dbrpp/order.hpp>
+#include <dbrpp/sess.hpp>
 #include <dbrpp/slnode.hpp>
 #include <dbrpp/trader.hpp>
 
@@ -845,6 +846,14 @@ public:
         if (!book)
             throw_exception();
         return BookRef{*book};
+    }
+    SessRef
+    sess(const char* mnem) const
+    {
+        DbrSess* const sess = dbr_serv_sess(impl_, mnem);
+        if (!sess)
+            throw_exception();
+        return SessRef{*sess};
     }
     OrderRef
     place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
