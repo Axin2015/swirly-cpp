@@ -130,9 +130,12 @@ send_posnup(struct DbrSess* sess, DbrIden req_id, struct DbrPosn* posn)
          node != DBR_ACCNT_END_MEMB; node = dbr_rbnode_next(node)) {
 
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
-        const char* trader = memb->trader.rec->mnem;
-        // TODO.
-        if (zmq_send(router, trader, strnlen(trader, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+        DbrTrader trader = memb->trader.rec->trader.state;
+        struct DbrSess* other = dbr_trader_sess(trader);
+        if (!other)
+            continue;
+
+        if (zmq_send(router, trader, strnlen(other->mnem, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
             dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
             dbr_err_print();
             goto fail1;
@@ -195,7 +198,9 @@ flush(struct DbrSess* sess, const struct DbrBody* req)
         for (node = dbr_slnode_next(node);
              node != DBR_SERV_END_EXEC; node = dbr_slnode_next(node)) {
             struct DbrExec* exec = dbr_serv_exec_entry(node);
+            // Send execution on associated trader's session.
             DbrTrader trader = exec->c.trader.rec->trader.state;
+            // Null if trader is not logged-on.
             struct DbrSess* other = dbr_trader_sess(trader);
             if (other && !send_exec(other, 0, exec))
                 goto fail1;

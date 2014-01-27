@@ -73,6 +73,7 @@ find_sess(const struct FigSessIdx* sessidx, const char* mnem)
 DBR_EXTERN void
 fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool)
 {
+    sessidx->pool = pool;
     // Zero buckets.
     memset(sessidx->buckets, 0, sizeof(sessidx->buckets));
 }
