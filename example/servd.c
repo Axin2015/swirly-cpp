@@ -121,9 +121,12 @@ send_exec(struct DbrSess* sess, DbrIden req_id, struct DbrExec* exec)
 }
 
 static DbrBool
-send_posnup(struct DbrSess* sess, DbrIden req_id, struct DbrPosn* posn)
+flush_posnup(struct DbrPosn* posn)
 {
-    struct DbrBody rep = { .req_id = req_id, .type = DBR_POSN_REP, .posn_rep.posn = posn };
+    static long marker = 0;
+    ++marker;
+
+    struct DbrBody rep = { .req_id = 0, .type = DBR_POSN_REP, .posn_rep.posn = posn };
 
     DbrAccnt accnt = dbr_serv_accnt(serv, posn->accnt.rec);
     for (struct DbrRbNode* node = dbr_accnt_first_memb(accnt);
@@ -132,8 +135,12 @@ send_posnup(struct DbrSess* sess, DbrIden req_id, struct DbrPosn* posn)
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
         DbrTrader trader = memb->trader.rec->trader.state;
         struct DbrSess* other = dbr_trader_sess(trader);
-        if (!other)
+        // Next if trader not logged-on or the position has already been sent.
+        if (!other || other->marker_ == marker)
             continue;
+
+        // Set marker to record that position update has been sent on this session.
+        other->marker_ = marker;
 
         if (zmq_send(router, trader, strnlen(other->mnem, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
             dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
@@ -153,7 +160,7 @@ send_posnup(struct DbrSess* sess, DbrIden req_id, struct DbrPosn* posn)
 }
 
 static DbrBool
-send_bookup(DbrIden req_id)
+flush_bookup(void)
 {
     struct DbrBody rep;
 
@@ -170,9 +177,11 @@ send_bookup(DbrIden req_id)
         dbr_book_view(book, view);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }
-    rep.req_id = req_id;
+
+    rep.req_id = 0;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
+
     const DbrBool ok = dbr_send_body(pub, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
@@ -210,11 +219,11 @@ flush(struct DbrSess* sess, const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_serv_first_posnup(serv);
          node != DBR_SERV_END_POSNUP; node = dbr_rbnode_next(node)) {
         struct DbrPosn* posn = dbr_serv_posnup_entry(node);
-        if (!send_posnup(sess, 0, posn))
+        if (!flush_posnup(posn))
             goto fail1;
     }
 
-    if (!send_bookup(0))
+    if (!flush_bookup())
         goto fail1;
 
     dbr_serv_clear(serv);

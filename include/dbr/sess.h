@@ -28,6 +28,7 @@
 static inline void
 dbr_sess_init(struct DbrSess* sess)
 {
+    sess->marker_ = 0;
     dbr_slnode_init(&sess->mnem_node_);
 }
 

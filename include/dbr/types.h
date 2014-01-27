@@ -622,6 +622,7 @@ struct DbrSess {
     /**
      * @privatesection
      */
+    long marker_;
     struct DbrSlNode mnem_node_;
 };
 
