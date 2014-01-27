@@ -121,6 +121,9 @@ dbr_trader_empty_memb(DbrTrader trader);
  * @{
  */
 
+DBR_API struct DbrSess*
+dbr_trader_sess(DbrTrader trader);
+
 DBR_API DbrBool
 dbr_trader_logged_on(DbrTrader trader);
 

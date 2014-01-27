@@ -189,6 +189,12 @@ dbr_trader_empty_memb(DbrTrader trader)
     return fig_trader_empty_memb(trader);
 }
 
+DBR_API struct DbrSess*
+dbr_trader_sess(DbrTrader trader)
+{
+    return fig_trader_sess(trader);
+}
+
 DBR_API DbrBool
 dbr_trader_logged_on(DbrTrader trader)
 {

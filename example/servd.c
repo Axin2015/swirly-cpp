@@ -111,17 +111,17 @@ status_setf(struct DbrBody* body, DbrIden req_id, int num, const char* format, .
 }
 
 static DbrBool
-send_exec(DbrIden req_id, struct DbrExec* exec)
+send_exec(struct DbrSess* sess, DbrIden req_id, struct DbrExec* exec)
 {
     struct DbrBody rep = { .req_id = req_id, .type = DBR_EXEC_REP, .exec_rep.exec = exec };
-    const DbrBool ok = dbr_send_msg(router, exec->c.trader.rec->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
 }
 
 static DbrBool
-send_posnup(DbrIden req_id, struct DbrPosn* posn)
+send_posnup(struct DbrSess* sess, DbrIden req_id, struct DbrPosn* posn)
 {
     struct DbrBody rep = { .req_id = req_id, .type = DBR_POSN_REP, .posn_rep.posn = posn };
 
@@ -131,6 +131,7 @@ send_posnup(DbrIden req_id, struct DbrPosn* posn)
 
         struct DbrMemb* memb = dbr_accnt_memb_entry(node);
         const char* trader = memb->trader.rec->mnem;
+        // TODO.
         if (zmq_send(router, trader, strnlen(trader, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
             dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
             dbr_err_print();
@@ -180,7 +181,7 @@ send_bookup(DbrIden req_id)
 }
 
 static DbrBool
-flush(const struct DbrBody* req)
+flush(struct DbrSess* sess, const struct DbrBody* req)
 {
     const DbrIden req_id = req->req_id;
     {
@@ -188,13 +189,15 @@ flush(const struct DbrBody* req)
         assert(node != DBR_SERV_END_EXEC);
 
         struct DbrExec* exec = dbr_serv_exec_entry(node);
-        if (!send_exec(req_id, exec))
+        if (!send_exec(sess, req_id, exec))
             goto fail1;
 
         for (node = dbr_slnode_next(node);
              node != DBR_SERV_END_EXEC; node = dbr_slnode_next(node)) {
             struct DbrExec* exec = dbr_serv_exec_entry(node);
-            if (!send_exec(0, exec))
+            DbrTrader trader = exec->c.trader.rec->trader.state;
+            struct DbrSess* other = dbr_trader_sess(trader);
+            if (other && !send_exec(other, 0, exec))
                 goto fail1;
         }
     }
@@ -202,7 +205,7 @@ flush(const struct DbrBody* req)
     for (struct DbrRbNode* node = dbr_serv_first_posnup(serv);
          node != DBR_SERV_END_POSNUP; node = dbr_rbnode_next(node)) {
         struct DbrPosn* posn = dbr_serv_posnup_entry(node);
-        if (!send_posnup(0, posn))
+        if (!send_posnup(sess, 0, posn))
             goto fail1;
     }
 
@@ -352,7 +355,7 @@ sess_memb(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_MEMB_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -384,12 +387,12 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_POSN_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(router, dbr_trader_rec(trader)->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -482,9 +485,9 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden tid = req->place_order_req.tid;
-    struct DbrRec* trec = find_rec_id(DBR_ENTITY_TRADER, tid);
-    if (!trec) {
-        status_setf(&rep, req_id, DBR_EINVAL, "no such trader '%ld'", tid);
+    DbrTrader trader = get_trader(tid);
+    if (!trader) {
+        status_err(&rep, req_id);
         goto fail1;
     }
     struct DbrRec* arec = find_rec_id(DBR_ENTITY_ACCNT, req->place_order_req.aid);
@@ -516,14 +519,13 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
     const DbrLots lots = req->place_order_req.lots;
     const DbrLots min_lots = req->place_order_req.min_lots;
 
-    DbrTrader trader = NULL; // TODO
     struct DbrOrder* order = dbr_serv_place(serv, trader, accnt, book, ref, action, ticks,
                                             lots, min_lots);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(req);
+    return flush(sess, req);
  fail1:
     if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -536,22 +538,21 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    struct DbrRec* trec = find_rec_id(DBR_ENTITY_TRADER, req->revise_order_id_req.tid);
-    if (!trec) {
-        status_setf(&rep, req_id, DBR_EINVAL, "no such trader '%ld'",
-                    req->revise_order_id_req.tid);
+    const DbrIden tid = req->revise_order_id_req.tid;
+    DbrTrader trader = get_trader(tid);
+    if (!trader) {
+        status_err(&rep, req_id);
         goto fail1;
     }
     const DbrIden id = req->revise_order_id_req.id;
     const DbrLots lots = req->revise_order_id_req.lots;
 
-    DbrTrader trader = NULL; // TODO
     struct DbrOrder* order = dbr_serv_revise_id(serv, trader, id, lots);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(req);
+    return flush(sess, req);
  fail1:
     if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -564,22 +565,21 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    struct DbrRec* trec = find_rec_id(DBR_ENTITY_TRADER, req->revise_order_ref_req.tid);
-    if (!trec) {
-        status_setf(&rep, req_id, DBR_EINVAL, "no such trader '%ld'",
-                    req->revise_order_ref_req.tid);
+    const DbrIden tid = req->revise_order_ref_req.tid;
+    DbrTrader trader = get_trader(tid);
+    if (!trader) {
+        status_err(&rep, req_id);
         goto fail1;
     }
     const char* ref = req->revise_order_ref_req.ref;
     const DbrLots lots = req->revise_order_ref_req.lots;
 
-    DbrTrader trader = NULL; // TODO
     struct DbrOrder* order = dbr_serv_revise_ref(serv, trader, ref, lots);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(req);
+    return flush(sess, req);
  fail1:
     if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -592,21 +592,20 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    struct DbrRec* trec = find_rec_id(DBR_ENTITY_TRADER, req->cancel_order_id_req.tid);
-    if (!trec) {
-        status_setf(&rep, req_id, DBR_EINVAL, "no such trader '%ld'",
-                    req->cancel_order_id_req.tid);
+    const DbrIden tid = req->cancel_order_id_req.tid;
+    DbrTrader trader = get_trader(tid);
+    if (!trader) {
+        status_err(&rep, req_id);
         goto fail1;
     }
     const DbrIden id = req->cancel_order_id_req.id;
 
-    DbrTrader trader = NULL; // TODO
     struct DbrOrder* order = dbr_serv_cancel_id(serv, trader, id);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(req);
+    return flush(sess, req);
  fail1:
     if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -619,21 +618,20 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    struct DbrRec* trec = find_rec_id(DBR_ENTITY_TRADER, req->cancel_order_ref_req.tid);
-    if (!trec) {
-        status_setf(&rep, req_id, DBR_EINVAL, "no such trader '%ld'",
-                    req->cancel_order_ref_req.tid);
+    const DbrIden tid = req->cancel_order_ref_req.tid;
+    DbrTrader trader = get_trader(tid);
+    if (!trader) {
+        status_err(&rep, req_id);
         goto fail1;
     }
     const char* ref = req->cancel_order_ref_req.ref;
 
-    DbrTrader trader = NULL; // TODO
     struct DbrOrder* order = dbr_serv_cancel_ref(serv, trader, ref);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(req);
+    return flush(sess, req);
  fail1:
     if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -646,15 +644,14 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    struct DbrRec* trec = find_rec_id(DBR_ENTITY_TRADER, req->ack_trade_req.id);
-    if (!trec) {
-        status_setf(&rep, req_id, DBR_EINVAL, "no such trader '%ld'",
-                    req->ack_trade_req.id);
+    const DbrIden tid = req->ack_trade_req.tid;
+    DbrTrader trader = get_trader(tid);
+    if (!trader) {
+        status_err(&rep, req_id);
         goto fail1;
     }
     const DbrIden id = req->ack_trade_req.id;
 
-    DbrTrader trader = NULL; // TODO
     if (!dbr_serv_ack_trade(serv, trader, id)) {
         status_err(&rep, req_id);
         goto fail1;
