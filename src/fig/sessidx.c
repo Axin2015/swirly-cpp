@@ -56,20 +56,6 @@ hash_mnem(const char* mnem)
     return h;
 }
 
-static struct DbrSess*
-find_sess(const struct FigSessIdx* sessidx, const char* mnem)
-{
-    assert(mnem);
-    const size_t bucket = hash_mnem(mnem) % FIG_SESSIDX_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&sessidx->buckets[bucket].mnems);
-         node; node = node->next) {
-        struct DbrSess* sess = sess_entry_mnem(node);
-        if (equal_mnem(sess, mnem))
-            return sess;
-    }
-    return NULL;
-}
-
 DBR_EXTERN void
 fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool)
 {
@@ -87,16 +73,27 @@ fig_sessidx_term(struct FigSessIdx* sessidx)
 }
 
 DBR_EXTERN struct DbrSess*
-fig_sessidx_lazy(const struct FigSessIdx* sessidx, const char* mnem)
+fig_sessidx_lazy(struct FigSessIdx* sessidx, const char* mnem)
 {
     assert(mnem);
-    struct DbrSess* sess = find_sess(sessidx, mnem);
-    if (dbr_unlikely(!sess)) {
-        if (!(sess = dbr_pool_alloc_sess(sessidx->pool)))
-            return DBR_FALSE;
-        dbr_sess_init(sess);
-        strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
-        dbr_tree_init(&sess->traders);
+
+    struct DbrSess* sess;
+
+    const size_t bucket = hash_mnem(mnem) % FIG_SESSIDX_BUCKETS;
+    for (struct DbrSlNode* node = dbr_stack_first(&sessidx->buckets[bucket].mnems);
+         node; node = node->next) {
+        sess = sess_entry_mnem(node);
+        if (equal_mnem(sess, mnem))
+            goto done;
     }
+    if (!(sess = dbr_pool_alloc_sess(sessidx->pool)))
+        goto done;
+
+    dbr_sess_init(sess);
+    strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
+    dbr_tree_init(&sess->traders);
+
+    dbr_stack_push(&sessidx->buckets[bucket].mnems, &sess->mnem_node_);
+ done:
     return sess;
 }
