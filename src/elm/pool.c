@@ -29,6 +29,20 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
+#if defined(DBR_DEBUG_ALLOC)
+static inline struct ElmSmallEntry*
+small_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct ElmSmallEntry, pool_node_, node);
+}
+
+static inline struct ElmLargeEntry*
+large_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct ElmLargeEntry, pool_node_, node);
+}
+#endif // defined(DBR_DEBUG_ALLOC)
+
 static void*
 alloc_mem(struct ElmPool* pool, size_t size)
 {
@@ -42,7 +56,7 @@ alloc_mem(struct ElmPool* pool, size_t size)
     if (pool->used == 0 || page > pool->used / pool->pagesize)
         dbr_log_info("allocating page %zu", page + 1);
 #endif // DBR_DEBUG_LEVEL >= 1
-    // Allocate node from virtual memory.
+    // Allocate entry from virtual memory.
     void* addr = pool->addr + pool->used;
     pool->used = new_used;
     return addr;
@@ -64,17 +78,20 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     pool->pagesize = 1024;
     pool->first_small = NULL;
     pool->first_large = NULL;
-    pool->allocs = 0;
-    pool->checksum = 0;
 
-    // Small nodes.
+#if defined(DBR_DEBUG_ALLOC)
+    dbr_tree_init(&pool->allocs_small);
+    dbr_tree_init(&pool->allocs_large);
+#endif // defined(DBR_DEBUG_ALLOC)
+
+    // Small entrys.
     dbr_log_debug1("sizeof DbrLevel: %zu", sizeof(struct DbrLevel));
     dbr_log_debug1("sizeof DbrMatch: %zu", sizeof(struct DbrMatch));
     dbr_log_debug1("sizeof DbrMemb: %zu", sizeof(struct DbrMemb));
     dbr_log_debug1("sizeof DbrPosn: %zu", sizeof(struct DbrPosn));
     dbr_log_debug1("sizeof DbrSess: %zu", sizeof(struct DbrSess));
 
-    // Large nodes.
+    // Large entrys.
     dbr_log_debug1("sizeof DbrRec: %zu", sizeof(struct DbrRec));
     dbr_log_debug1("sizeof DbrOrder: %zu", sizeof(struct DbrOrder));
     dbr_log_debug1("sizeof DbrExec: %zu", sizeof(struct DbrExec));
@@ -88,71 +105,80 @@ DBR_EXTERN void
 elm_pool_term(struct ElmPool* pool)
 {
     assert(pool);
-    if (pool->allocs > 0)
-        dbr_log_warn("%ld leaks detected", pool->allocs);
-    else
-        dbr_log_debug2("no leaks detected");
-    assert(pool->allocs == 0 && pool->checksum == 0);
     munmap(pool->addr, pool->capacity);
 }
 
-DBR_EXTERN struct ElmSmallNode*
+DBR_EXTERN struct ElmSmallEntry*
+#if !defined(DBR_DEBUG_ALLOC)
 elm_pool_alloc_small(struct ElmPool* pool)
+#else  // defined(DBR_DEBUG_ALLOC)
+elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
+#endif // defined(DBR_DEBUG_ALLOC)
 {
-    struct ElmSmallNode* node;
+    struct ElmSmallEntry* entry;
     if (pool->first_small) {
         // Pop from free-list.
-        node = pool->first_small;
-        pool->first_small = node->next;
-    } else if (!(node = alloc_mem(pool, sizeof(struct ElmSmallNode))))
+        entry = pool->first_small;
+        pool->first_small = entry->next;
+    } else if (!(entry = alloc_mem(pool, sizeof(struct ElmSmallEntry))))
         return NULL;
-    ++pool->allocs;
-    pool->checksum ^= (unsigned long)node;
-    return node;
+
+#if defined(DBR_DEBUG_ALLOC)
+    entry->file = file;
+    entry->line = line;
+    dbr_tree_insert(&pool->allocs_small, (DbrKey)entry, &entry->pool_node_);
+#endif // defined(DBR_DEBUG_ALLOC)
+
+    return entry;
 }
 
-DBR_EXTERN struct ElmLargeNode*
+DBR_EXTERN struct ElmLargeEntry*
+#if !defined(DBR_DEBUG_ALLOC)
 elm_pool_alloc_large(struct ElmPool* pool)
+#else  // defined(DBR_DEBUG_ALLOC)
+elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
+#endif // defined(DBR_DEBUG_ALLOC)
 {
-    struct ElmLargeNode* node;
+    struct ElmLargeEntry* entry;
     if (pool->first_large) {
         // Pop from free-list.
-        node = pool->first_large;
-        pool->first_large = node->next;
-    } else if (!(node = alloc_mem(pool, sizeof(struct ElmLargeNode))))
+        entry = pool->first_large;
+        pool->first_large = entry->next;
+    } else if (!(entry = alloc_mem(pool, sizeof(struct ElmLargeEntry))))
         return NULL;
-    ++pool->allocs;
-    pool->checksum ^= (unsigned long)node;
-    return node;
+
+#if defined(DBR_DEBUG_ALLOC)
+    entry->file = file;
+    entry->line = line;
+    dbr_tree_insert(&pool->allocs_large, (DbrKey)entry, &entry->pool_node_);
+#endif // defined(DBR_DEBUG_ALLOC)
+
+    return entry;
 }
 
 DBR_EXTERN void
-elm_pool_free_small(struct ElmPool* pool, struct ElmSmallNode* node)
+elm_pool_free_small(struct ElmPool* pool, struct ElmSmallEntry* entry)
 {
-    if (node) {
-
+    if (entry) {
+#if defined(DBR_DEBUG_ALLOC)
+        dbr_tree_remove(&pool->allocs_small, &entry->pool_node_);
+#endif // defined(DBR_DEBUG_ALLOC)
         // Push onto free-list.
-        node->next = pool->first_small;
-        pool->first_small = node;
-
-        --pool->allocs;
-        pool->checksum ^= (unsigned long)node;
-        assert(pool->allocs > 0 || (pool->allocs == 0 && pool->checksum == 0));
+        entry->next = pool->first_small;
+        pool->first_small = entry;
     }
 }
 
 DBR_EXTERN void
-elm_pool_free_large(struct ElmPool* pool, struct ElmLargeNode* node)
+elm_pool_free_large(struct ElmPool* pool, struct ElmLargeEntry* entry)
 {
-    if (node) {
-
+    if (entry) {
+#if defined(DBR_DEBUG_ALLOC)
+        dbr_tree_remove(&pool->allocs_large, &entry->pool_node_);
+#endif // defined(DBR_DEBUG_ALLOC)
         // Push onto free-list.
-        node->next = pool->first_large;
-        pool->first_large = node;
-
-        --pool->allocs;
-        pool->checksum ^= (unsigned long)node;
-        assert(pool->allocs > 0 || (pool->allocs == 0 && pool->checksum == 0));
+        entry->next = pool->first_large;
+        pool->first_large = entry;
     }
 }
 
@@ -179,6 +205,18 @@ DBR_API void
 dbr_pool_destroy(DbrPool pool)
 {
     if (pool) {
+#if defined(DBR_DEBUG_ALLOC)
+        for (struct DbrRbNode* node = dbr_tree_first(&pool->allocs_small);
+             node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
+            struct ElmSmallEntry* small = small_entry(node);
+            dbr_log_warn("memory leak in %s at %d", small->file, small->line);
+        }
+        for (struct DbrRbNode* node = dbr_tree_first(&pool->allocs_large);
+             node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
+            struct ElmLargeEntry* large = large_entry(node);
+            dbr_log_warn("memory leak in %s at %d", large->file, large->line);
+        }
+#endif // defined(DBR_DEBUG_ALLOC)
         elm_pool_term(pool);
         free(pool);
     }

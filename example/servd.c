@@ -446,7 +446,6 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGON;
     rep.sess_logon.tid = tid;
-
     return dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE)
         && sess_order(sess, 0, trader)
         && sess_exec(sess, 0, trader)
@@ -475,7 +474,6 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGOFF;
     rep.sess_logoff.tid = tid;
-
     return dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE);
  fail1:
     if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
@@ -700,7 +698,7 @@ run(void)
         dbr_log_info("received '%d' from '%.16s'", req.body.type, req.head.sess);
         struct DbrBody rep;
         struct DbrSess* sess = dbr_serv_sess(serv, req.head.sess);
-        if (sess) {
+        if (!sess) {
             status_err(&rep, req.body.req_id);
             if (!dbr_send_msg(router, req.head.sess, &rep, DBR_FALSE))
                 dbr_err_prints("dbr_send_msg() failed");

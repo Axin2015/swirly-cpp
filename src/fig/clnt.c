@@ -53,16 +53,12 @@ enum {
     HBINT = 2000,
     HBTIMEOUT = (HBINT * 3) / 2,
 
-    TRADER_PENDING    = 0x001,
-    ACCNT_PENDING     = 0x002,
-    CONTR_PENDING     = 0x004,
-    ORDER_PENDING     = 0x008,
-    EXEC_PENDING      = 0x010,
-    MEMB_PENDING      = 0x020,
-    POSN_PENDING      = 0x040,
-    VIEW_PENDING      = 0x080,
-    EXEC_DOWN         = 0x100,
-    MD_DOWN           = 0x200
+    TRADER_PENDING = 0x01,
+    ACCNT_PENDING  = 0x02,
+    CONTR_PENDING  = 0x04,
+    VIEW_PENDING   = 0x08,
+    EXEC_DOWN      = 0x10,
+    MD_DOWN        = 0x20
 };
 
 struct FigClnt {
@@ -212,7 +208,6 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
         // Transfer ownership.
         fig_trader_emplace_order(trader, order);
     }
-    clnt->flags &= ~ORDER_PENDING;
 }
 
 static void
@@ -227,7 +222,6 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
         fig_trader_insert_trade(trader, exec);
         dbr_exec_decref(exec, clnt->pool);
     }
-    clnt->flags &= ~EXEC_PENDING;
 }
 
 static void
@@ -243,7 +237,6 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         if (!accnt)
             abort();
     }
-    clnt->flags &= ~MEMB_PENDING;
 }
 
 static void
@@ -257,7 +250,6 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         assert(accnt);
         fig_accnt_emplace_posn(accnt, posn);
     }
-    clnt->flags &= ~POSN_PENDING;
 }
 
 static void
@@ -407,8 +399,8 @@ dbr_clnt_create(const char* sess, void* ctx, const char* dealer_addr, const char
     clnt->sub = sub;
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING | ORDER_PENDING
-        | EXEC_PENDING | MEMB_PENDING | POSN_PENDING | VIEW_PENDING | EXEC_DOWN /*| MD_DOWN*/;
+    clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
+        | VIEW_PENDING | EXEC_DOWN /*| MD_DOWN*/;
     // 4.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
