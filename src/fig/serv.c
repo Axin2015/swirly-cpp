@@ -514,7 +514,7 @@ DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
-    if (fig_trader_logged_on(trader)) {
+    if (!fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
@@ -597,7 +597,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 DBR_API struct DbrOrder*
 dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
 {
-    if (fig_trader_logged_on(trader)) {
+    if (!fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
@@ -655,7 +655,7 @@ dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots)
 DBR_API struct DbrOrder*
 dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lots)
 {
-    if (fig_trader_logged_on(trader)) {
+    if (!fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
@@ -712,7 +712,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lot
 DBR_API struct DbrOrder*
 dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
 {
-    if (fig_trader_logged_on(trader)) {
+    if (!fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
@@ -757,7 +757,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id)
 DBR_API struct DbrOrder*
 dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 {
-    if (fig_trader_logged_on(trader)) {
+    if (!fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
@@ -801,7 +801,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 DBR_API DbrBool
 dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 {
-    if (fig_trader_logged_on(trader)) {
+    if (!fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
