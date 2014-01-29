@@ -406,11 +406,13 @@ public:
     void
     on_logon(DbrIden tid) noexcept
     {
+        cout << "logon\n";
         trader_ = clnt_.trader(*clnt_.trecs().find(tid));
     }
     void
     on_logoff(DbrIden tid) noexcept
     {
+        cout << "logoff\n";
         trader_ = nullptr;
     }
     void

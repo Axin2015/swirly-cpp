@@ -900,7 +900,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         dbr_prioq_replace(&clnt->prioq, DEALERID, now + HBTIMEOUT);
 
-        if ((clnt->flags & EXEC_DOWN)) {
+        if ((clnt->flags & EXEC_DOWN) && body.type != DBR_SESS_CLOSE) {
             clnt->flags &= ~EXEC_DOWN;
             dbr_handler_on_up(handler, DBR_CONN_EXEC);
         }
@@ -911,7 +911,15 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto fail1;
             break;
         case DBR_SESS_CLOSE:
+            clnt->flags |= EXEC_DOWN;
+            dbr_handler_on_down(handler, DBR_CONN_EXEC);
+            break;
         case DBR_SESS_LOGON:
+            dbr_handler_on_logon(handler, body.sess_logon.tid);
+            break;
+        case DBR_SESS_LOGOFF:
+            dbr_handler_on_logoff(handler, body.sess_logoff.tid);
+            break;
         case DBR_SESS_HEARTBT:
             break;
         case DBR_STATUS_REP:
