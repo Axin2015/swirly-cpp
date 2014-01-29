@@ -104,10 +104,10 @@ DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrIden tid, DbrMillis ms);
+dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms);
+dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms);
 
 /**
  * Place order.
@@ -115,9 +115,9 @@ dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms);
  */
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
-               DbrMillis ms);
+dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* crec,
+               DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+               DbrLots min_lots, DbrMillis ms);
 
 // Assumes that order already belongs to this side.
 // Reduced lots must not be:
@@ -126,21 +126,21 @@ dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate sett
 // 3. greater than original lots.
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrLots lots, DbrMillis ms);
+dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrLots lots, DbrMillis ms);
+dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms);
+dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms);
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrMillis ms);
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms);
+dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms);
 
 DBR_API DbrBool
 dbr_clnt_ready(DbrClnt clnt);

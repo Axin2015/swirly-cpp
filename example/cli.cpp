@@ -344,8 +344,8 @@ argc(Arg begin, Arg end)
 
 class Handler : public IHandler<Handler> {
     Clnt& clnt_;
-    DbrRec* trec_;
-    DbrRec* arec_;
+    DbrTrader trader_;
+    DbrAccnt accnt_;
     DbrRec* crec_;
     DbrDate settl_date_;
     map<DbrIden, int> gtol_;
@@ -375,8 +375,8 @@ public:
     explicit
     Handler(Clnt& clnt)
         : clnt_(clnt),
-          trec_(nullptr),
-          arec_(nullptr),
+          trader_(nullptr),
+          accnt_(nullptr),
           crec_(nullptr),
           settl_date_(0),
           id_(1),
@@ -406,13 +406,12 @@ public:
     void
     on_logon(DbrIden tid) noexcept
     {
-        auto it = clnt_.trecs().find(tid);
-        trec_ = &*it;
+        trader_ = clnt_.trader(*clnt_.trecs().find(tid));
     }
     void
     on_logoff(DbrIden tid) noexcept
     {
-        trec_ = nullptr;
+        trader_ = nullptr;
     }
     void
     on_timeout(DbrIden req_id) noexcept
@@ -632,23 +631,23 @@ public:
     void
     ack_trades(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
+        if (!trader_)
+            throw InvalidState("not logged-on");
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.ack_trade(trec_->id, id, TIMEOUT);
+            clnt_.ack_trade(trader_, id, TIMEOUT);
         }
     }
     void
     cancel(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
+        if (!trader_)
+            throw InvalidState("not logged-on");
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(trec_->id, id, TIMEOUT);
+            clnt_.cancel(trader_, id, TIMEOUT);
         }
     }
     void
@@ -710,9 +709,9 @@ public:
             "|--------------------"
             "+--------------------"
             "|" << endl;
-        if (arec_)
+        if (accnt_)
             cout << '|' << left << setw(20) << "accnt"
-                 << '|' << left << setw(20) << AccntRecRef(*arec_).mnem()
+                 << '|' << left << setw(20) << Accnt(accnt_).rec().mnem()
                  << '|' << endl;
         if (crec_)
             cout << '|' << left << setw(20) << "contr"
@@ -736,21 +735,20 @@ public:
         auto it = clnt_.trecs().find(mnem.c_str());
         if (it == clnt_.trecs().end())
             throw InvalidArgument(mnem);
-        clnt_.logon(it->id, TIMEOUT);
+        clnt_.logon(clnt_.trader(*it), TIMEOUT);
     }
     void
     logoff(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        clnt_.logoff(trec_->id, TIMEOUT);
+        if (!trader_)
+            throw InvalidState("not logged-on");
+        clnt_.logoff(trader_, TIMEOUT);
     }
     void
     orders(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = clnt_.trader(*trec_);
+        if (!trader_)
+            throw InvalidState("not logged-on");
         cout <<
             "|id   "
             "|arec      "
@@ -780,7 +778,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto order : trader.orders()) {
+        for (auto order : Trader(trader_).orders()) {
             OrderRef ref(order);
             cout << '|' << right << setw(5) << gtol(ref.id())
                  << '|' << left << setw(10) << ref.arec().mnem()
@@ -800,28 +798,27 @@ public:
     void
     place(int action, Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        if (!arec_)
-            throw InvalidState("accnt");
+        if (!trader_)
+            throw InvalidState("not logged-on");
+        if (!accnt_)
+            throw InvalidState("account not set");
         if (!crec_)
-            throw InvalidState("contr");
+            throw InvalidState("contract not set");
         if (!settl_date_)
-            throw InvalidState("settl_date");
+            throw InvalidState("settlement date not set");
 
         const auto lots = ston<DbrLots>((*begin++).c_str());
         const auto price = ston<double>((*begin++).c_str());
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
-        clnt_.place(trec_->id, arec_->id, crec_->id, settl_date_,
+        clnt_.place(trader_, accnt_, *crec_, settl_date_,
                     nullptr, action, ticks, lots, 0, TIMEOUT);
     }
     void
     posns(Arg begin, Arg end)
     {
-        if (!arec_)
-            throw InvalidState("accnt");
-        auto accnt = clnt_.accnt(*arec_);
+        if (!accnt_)
+            throw InvalidState("account not set");
         cout <<
             "|crec      "
             "|settl_date"
@@ -839,7 +836,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto posn : accnt.posns()) {
+        for (auto posn : Accnt(accnt_).posns()) {
             PosnRef ref(posn);
             const auto buy_ticks = static_cast<double>(ref.buy_licks()) / ref.buy_lots();
             const auto sell_ticks = static_cast<double>(ref.sell_licks()) / ref.sell_lots();
@@ -860,13 +857,13 @@ public:
     void
     revise(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
+        if (!trader_)
+            throw InvalidState("not logged-on");
 
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        clnt_.revise(trec_->id, id, lots, TIMEOUT);
+        clnt_.revise(trader_, id, lots, TIMEOUT);
     }
     void
     set(Arg begin, Arg end)
@@ -877,7 +874,7 @@ public:
             auto it = clnt_.arecs().find(value.c_str());
             if (it == clnt_.arecs().end())
                 throw InvalidArgument(value);
-            arec_ = &*it;
+            accnt_ = clnt_.accnt(*it);
         } else if (name == "contr") {
             auto it = clnt_.crecs().find(value.c_str());
             if (it == clnt_.crecs().end())
@@ -912,9 +909,8 @@ public:
     void
     trades(Arg begin, Arg end)
     {
-        if (!trec_)
-            throw InvalidState("trader");
-        auto trader = clnt_.trader(*trec_);
+        if (!trader_)
+            throw InvalidState("not logged-on");
         cout <<
             "|id   "
             "|order"
@@ -948,7 +944,7 @@ public:
             "+----------"
             "|"
              << endl;
-        for (auto exec : trader.trades()) {
+        for (auto exec : Trader(trader_).trades()) {
             ExecRef ref(exec);
             cout << '|' << right << setw(5) << gtol(ref.id())
                  << '|' << right << setw(5) << gtol(ref.order())
@@ -972,7 +968,7 @@ public:
     {
         const string& name = *begin++;
         if (name == "accnt") {
-            arec_ = nullptr;
+            accnt_ = nullptr;
         } else if (name == "contr") {
             crec_ = nullptr;
         } else if (name == "settl_date") {
@@ -984,9 +980,9 @@ public:
     view(Arg begin, Arg end)
     {
         if (!crec_)
-            throw InvalidState("contr");
+            throw InvalidState("contract not set");
         if (!settl_date_)
-            throw InvalidState("settl_date");
+            throw InvalidState("settlement date not set");
 
         cout <<
             "|crec      "

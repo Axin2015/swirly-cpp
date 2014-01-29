@@ -520,7 +520,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 }
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrIden tid, DbrMillis ms)
+dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -529,7 +529,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrIden tid, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGON;
-    body.sess_logon.tid = tid;
+    body.sess_logon.tid = trader->rec->id;
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -547,7 +547,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrIden tid, DbrMillis ms)
 }
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms)
+dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -556,7 +556,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGOFF;
-    body.sess_logoff.tid = tid;
+    body.sess_logoff.tid = trader->rec->id;
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -574,9 +574,9 @@ dbr_clnt_logoff(DbrClnt clnt, DbrIden tid, DbrMillis ms)
 }
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate settl_date,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots,
-               DbrMillis ms)
+dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* crec,
+               DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+               DbrLots min_lots, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -585,9 +585,9 @@ dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate sett
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_PLACE_ORDER_REQ;
-    body.place_order_req.tid = tid;
-    body.place_order_req.aid = aid;
-    body.place_order_req.cid = cid;
+    body.place_order_req.tid = trader->rec->id;
+    body.place_order_req.aid = accnt->rec->id;
+    body.place_order_req.cid = crec->id;
     body.place_order_req.settl_date = settl_date;
     if (ref)
         strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);
@@ -614,7 +614,7 @@ dbr_clnt_place(DbrClnt clnt, DbrIden tid, DbrIden aid, DbrIden cid, DbrDate sett
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrLots lots, DbrMillis ms)
+dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -623,7 +623,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrLots lots, DbrMilli
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_ID_REQ;
-    body.revise_order_id_req.tid = tid;
+    body.revise_order_id_req.tid = trader->rec->id;
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
@@ -643,7 +643,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrLots lots, DbrMilli
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrLots lots, DbrMillis ms)
+dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -652,7 +652,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrLots lots, Db
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_REF_REQ;
-    body.revise_order_ref_req.tid = tid;
+    body.revise_order_ref_req.tid = trader->rec->id;
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
@@ -672,7 +672,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrLots lots, Db
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms)
+dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -681,7 +681,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
-    body.cancel_order_id_req.tid = tid;
+    body.cancel_order_id_req.tid = trader->rec->id;
     body.cancel_order_id_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -700,7 +700,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrMillis ms)
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -709,7 +709,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
-    body.cancel_order_ref_req.tid = tid;
+    body.cancel_order_ref_req.tid = trader->rec->id;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
     // Reserve so that push cannot fail after send.
@@ -728,7 +728,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrIden tid, const char* ref, DbrMillis ms)
 }
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms)
+dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -737,7 +737,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_ACK_TRADE_REQ;
-    body.ack_trade_req.tid = tid;
+    body.ack_trade_req.tid = trader->rec->id;
     body.ack_trade_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -747,9 +747,6 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrIden tid, DbrIden id, DbrMillis ms)
     if (!dbr_send_body(clnt->dealer, &body, DBR_FALSE))
         goto fail1;
 
-    struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
-    DbrTrader trader = trec->trader.state;
-    assert(trader);
     fig_trader_remove_trade_id(trader, id);
 
     const DbrMillis now = dbr_millis();
