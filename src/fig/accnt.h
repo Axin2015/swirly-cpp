@@ -37,6 +37,9 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool);
 DBR_EXTERN void
 fig_accnt_term(struct DbrRec* arec);
 
+DBR_EXTERN void
+fig_accnt_clear(struct FigAccnt* accnt);
+
 static inline struct DbrRec*
 fig_accnt_rec(const struct FigAccnt* accnt)
 {

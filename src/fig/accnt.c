@@ -73,6 +73,12 @@ fig_accnt_term(struct DbrRec* arec)
     }
 }
 
+DBR_EXTERN void
+fig_accnt_clear(struct FigAccnt* accnt)
+{
+    free_posns(accnt);
+}
+
 DBR_EXTERN struct DbrPosn*
 fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {

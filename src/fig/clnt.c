@@ -256,6 +256,8 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         // All accnts that trader is member of are created in emplace_membs().
         DbrAccnt accnt = posn->accnt.rec->accnt.state;
         assert(accnt);
+        // Traders may share accounts, so clear before emplacing new positions.
+        fig_accnt_clear(accnt);
         fig_accnt_emplace_posn(accnt, posn);
     }
 }
