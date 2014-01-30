@@ -99,6 +99,14 @@ fig_trader_term(struct DbrRec* trec)
     }
 }
 
+DBR_EXTERN void
+fig_trader_clear(struct FigTrader* trader)
+{
+    free_membs(trader);
+    free_execs(trader);
+    free_orders(trader);
+}
+
 DBR_API struct DbrRec*
 dbr_trader_rec(DbrTrader trader)
 {

@@ -51,7 +51,7 @@ enum {
     MDTMR = -3,
 
     HBINT = 2000,
-    HBTIMEOUT = (HBINT * 3) / 2,
+    HBTMOUT = (HBINT * 3) / 2,
 
     TRADER_PENDING = 0x01,
     ACCNT_PENDING  = 0x02,
@@ -189,6 +189,14 @@ heartbt(DbrClnt clnt)
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         return -1;
     return body.req_id;
+}
+
+static void
+clear_trader(DbrClnt clnt, DbrIden tid)
+{
+    struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
+    assert(trec->trader.state);
+    fig_trader_clear(trec->trader.state);
 }
 
 static void
@@ -440,8 +448,8 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
         goto fail7;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, TRTMR, now + HBTIMEOUT);
-    dbr_prioq_push(&clnt->prioq, MDTMR, now + HBTIMEOUT);
+    dbr_prioq_push(&clnt->prioq, TRTMR, now + HBTMOUT);
+    dbr_prioq_push(&clnt->prioq, MDTMR, now + HBTMOUT);
     return clnt;
  fail7:
     free(clnt->items);
@@ -820,14 +828,14 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             // Next heartbeat may have already expired.
         } else if (id == TRTMR) {
             // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, TRTMR, key + HBTIMEOUT);
+            dbr_prioq_push(&clnt->prioq, TRTMR, key + HBTMOUT);
             if (!(clnt->flags & TR_DOWN)) {
                 clnt->flags |= TR_DOWN;
                 dbr_handler_on_down(handler, DBR_CONN_TR);
             }
         } else if (id == MDTMR) {
             // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, MDTMR, key + HBTIMEOUT);
+            dbr_prioq_push(&clnt->prioq, MDTMR, key + HBTMOUT);
             if (!(clnt->flags & MD_DOWN)) {
                 clnt->flags |= MD_DOWN;
                 dbr_handler_on_down(handler, DBR_CONN_MD);
@@ -866,14 +874,14 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
             } else if (id == TRTMR) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
+                dbr_prioq_push(&clnt->prioq, id, key + HBTMOUT);
                 if (!(clnt->flags & TR_DOWN)) {
                     clnt->flags |= TR_DOWN;
                     dbr_handler_on_down(handler, DBR_CONN_TR);
                 }
             } else if (id == MDTMR) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
+                dbr_prioq_push(&clnt->prioq, id, key + HBTMOUT);
                 if (!(clnt->flags & MD_DOWN)) {
                     clnt->flags |= MD_DOWN;
                     dbr_handler_on_down(handler, DBR_CONN_MD);
@@ -898,7 +906,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         if (body.req_id > 0)
             dbr_prioq_remove(&clnt->prioq, body.req_id);
 
-        dbr_prioq_replace(&clnt->prioq, TRTMR, now + HBTIMEOUT);
+        dbr_prioq_replace(&clnt->prioq, TRTMR, now + HBTMOUT);
 
         if ((clnt->flags & TR_DOWN) && body.type != DBR_SESS_CLOSE) {
             clnt->flags &= ~TR_DOWN;
@@ -919,6 +927,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             break;
         case DBR_SESS_LOGOFF:
             dbr_handler_on_logoff(handler, body.sess_logoff.tid);
+            clear_trader(clnt, body.sess_logoff.tid);
             break;
         case DBR_SESS_HEARTBT:
             break;
@@ -984,7 +993,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         if (!dbr_recv_body(clnt->mdsock, clnt->pool, &body))
             goto fail1;
 
-        dbr_prioq_replace(&clnt->prioq, MDTMR, now + HBTIMEOUT);
+        dbr_prioq_replace(&clnt->prioq, MDTMR, now + HBTMOUT);
 
         if ((clnt->flags & MD_DOWN)) {
             clnt->flags &= ~MD_DOWN;

@@ -46,6 +46,9 @@ fig_trader_lazy(struct DbrRec* trec, struct FigOrdIdx* ordidx, DbrPool pool);
 DBR_EXTERN void
 fig_trader_term(struct DbrRec* trec);
 
+DBR_EXTERN void
+fig_trader_clear(struct FigTrader* trader);
+
 static inline struct DbrRec*
 fig_trader_rec(struct FigTrader* trader)
 {
