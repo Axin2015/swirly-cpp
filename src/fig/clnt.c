@@ -59,7 +59,7 @@ enum {
     ACCNT_PENDING  = 0x02,
     CONTR_PENDING  = 0x04,
     VIEW_PENDING   = 0x08,
-    EXEC_DOWN      = 0x10,
+    TR_DOWN        = 0x10,
     MD_DOWN        = 0x20
 };
 
@@ -402,7 +402,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* addr_tr, const char* ad
     clnt->id = seed;
     clnt->pool = pool;
     clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
-        | VIEW_PENDING | EXEC_DOWN /*| MD_DOWN*/;
+        | VIEW_PENDING | TR_DOWN /*| MD_DOWN*/;
     // 4.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
@@ -823,8 +823,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         } else if (id == TIMER_TR) {
             // Cannot fail due to pop.
             dbr_prioq_push(&clnt->prioq, TIMER_TR, key + HBTIMEOUT);
-            if (!(clnt->flags & EXEC_DOWN)) {
-                clnt->flags |= EXEC_DOWN;
+            if (!(clnt->flags & TR_DOWN)) {
+                clnt->flags |= TR_DOWN;
                 dbr_handler_on_down(handler, DBR_CONN_TR);
             }
         } else if (id == TIMER_MD) {
@@ -869,8 +869,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             } else if (id == TIMER_TR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
-                if (!(clnt->flags & EXEC_DOWN)) {
-                    clnt->flags |= EXEC_DOWN;
+                if (!(clnt->flags & TR_DOWN)) {
+                    clnt->flags |= TR_DOWN;
                     dbr_handler_on_down(handler, DBR_CONN_TR);
                 }
             } else if (id == TIMER_MD) {
@@ -902,8 +902,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         dbr_prioq_replace(&clnt->prioq, TIMER_TR, now + HBTIMEOUT);
 
-        if ((clnt->flags & EXEC_DOWN) && body.type != DBR_SESS_CLOSE) {
-            clnt->flags &= ~EXEC_DOWN;
+        if ((clnt->flags & TR_DOWN) && body.type != DBR_SESS_CLOSE) {
+            clnt->flags &= ~TR_DOWN;
             dbr_handler_on_up(handler, DBR_CONN_TR);
         }
         switch (body.type) {
@@ -913,7 +913,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto fail1;
             break;
         case DBR_SESS_CLOSE:
-            clnt->flags |= EXEC_DOWN;
+            clnt->flags |= TR_DOWN;
             dbr_handler_on_down(handler, DBR_CONN_TR);
             break;
         case DBR_SESS_LOGON:
