@@ -755,9 +755,9 @@ public:
         : impl_{nullptr}
     {
     }
-    Clnt(const char* sess, void* ctx, const char* addr_tr, const char* addr_md,
+    Clnt(const char* sess, void* ctx, const char* traddr, const char* mdaddr,
          DbrIden seed, DbrPool pool)
-        : impl_{dbr_clnt_create(sess, ctx, addr_tr, addr_md, seed, pool)}
+        : impl_{dbr_clnt_create(sess, ctx, traddr, mdaddr, seed, pool)}
     {
         if (!impl_)
             throw_exception();

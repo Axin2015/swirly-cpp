@@ -35,8 +35,8 @@
 #include <string.h> // strncpy()
 
 enum {
-    SOCK_TR,
-    SOCK_MD
+    TRSOCK,
+    MDSOCK
 };
 
 // Other constants.
@@ -44,14 +44,12 @@ enum {
 enum {
     // Non-negative timer ids are reserved for internal use.  The outbound heartbeat timer is
     // scheduled once the logon response has been received along with the heartbeat interval.
-    TIMER_CLNT = -1,
+    CLTMR = -1,
     // The inbound heartbeat timeout timers are scheduled prior when the logon request is sent
     // during initialisation.
-    TIMER_TR = -2,
-    TIMER_MD = -3
-};
+    TRTMR = -2,
+    MDTMR = -3,
 
-enum {
     HBINT = 2000,
     HBTIMEOUT = (HBINT * 3) / 2,
 
@@ -65,8 +63,8 @@ enum {
 
 struct FigClnt {
     void* ctx;
-    void* sock_tr;
-    void* sock_md;
+    void* trsock;
+    void* mdsock;
     DbrMnem mnem;
     DbrIden id;
     DbrPool pool;
@@ -79,7 +77,7 @@ struct FigClnt {
     struct DbrTree viewups;
     struct DbrPrioq prioq;
     // The heartbeat interval requested by the server.
-    DbrMillis clntint;
+    DbrMillis clint;
     zmq_pollitem_t* items;
     int nitems;
 };
@@ -179,7 +177,7 @@ init(DbrClnt clnt)
 {
     struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_OPEN,
                             .sess_open = { .hbint = HBINT } };
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         return -1;
     return body.req_id;
 }
@@ -188,7 +186,7 @@ static DbrIden
 heartbt(DbrClnt clnt)
 {
     struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_HEARTBT };
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         return -1;
     return body.req_id;
 }
@@ -361,7 +359,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(const char* sess, void* ctx, const char* addr_tr, const char* addr_md,
+dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mdaddr,
                 DbrIden seed, DbrPool pool)
 {
     // 1.
@@ -372,33 +370,33 @@ dbr_clnt_create(const char* sess, void* ctx, const char* addr_tr, const char* ad
     }
 
     // 2.
-    void* sock_tr = zmq_socket(ctx, ZMQ_DEALER);
-    if (!sock_tr) {
+    void* trsock = zmq_socket(ctx, ZMQ_DEALER);
+    if (!trsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-    zmq_setsockopt(sock_tr, ZMQ_IDENTITY, sess, strnlen(sess, DBR_MNEM_MAX));
+    zmq_setsockopt(trsock, ZMQ_IDENTITY, sess, strnlen(sess, DBR_MNEM_MAX));
 
-    if (zmq_connect(sock_tr, addr_tr) < 0) {
+    if (zmq_connect(trsock, traddr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
 
     // 3.
-    void* sock_md = zmq_socket(ctx, ZMQ_SUB);
-    if (!sock_md) {
+    void* mdsock = zmq_socket(ctx, ZMQ_SUB);
+    if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
-    zmq_setsockopt(sock_md, ZMQ_SUBSCRIBE, "", 0);
+    zmq_setsockopt(mdsock, ZMQ_SUBSCRIBE, "", 0);
 
-    if (zmq_connect(sock_md, addr_md) < 0) {
+    if (zmq_connect(mdsock, mdaddr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;
     }
 
-    clnt->sock_tr = sock_tr;
-    clnt->sock_md = sock_md;
+    clnt->trsock = trsock;
+    clnt->mdsock = mdsock;
     clnt->id = seed;
     clnt->pool = pool;
     clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
@@ -415,22 +413,22 @@ dbr_clnt_create(const char* sess, void* ctx, const char* addr_tr, const char* ad
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
-    clnt->clntint = 0; // Pending hbint from server's logon message.
+    clnt->clint = 0; // Pending hbint from server's logon message.
 
     // 7.
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
         goto fail6;
 
-    clnt->items[SOCK_TR].socket = sock_tr;
-    clnt->items[SOCK_TR].fd = 0;
-    clnt->items[SOCK_TR].events = ZMQ_POLLIN;
-    clnt->items[SOCK_TR].revents = 0;
+    clnt->items[TRSOCK].socket = trsock;
+    clnt->items[TRSOCK].fd = 0;
+    clnt->items[TRSOCK].events = ZMQ_POLLIN;
+    clnt->items[TRSOCK].revents = 0;
 
-    clnt->items[SOCK_MD].socket = sock_md;
-    clnt->items[SOCK_MD].fd = 0;
-    clnt->items[SOCK_MD].events = ZMQ_POLLIN;
-    clnt->items[SOCK_MD].revents = 0;
+    clnt->items[MDSOCK].socket = mdsock;
+    clnt->items[MDSOCK].fd = 0;
+    clnt->items[MDSOCK].events = ZMQ_POLLIN;
+    clnt->items[MDSOCK].revents = 0;
 
     clnt->nitems = 2;
 
@@ -442,8 +440,8 @@ dbr_clnt_create(const char* sess, void* ctx, const char* addr_tr, const char* ad
         goto fail7;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, TIMER_TR, now + HBTIMEOUT);
-    dbr_prioq_push(&clnt->prioq, TIMER_MD, now + HBTIMEOUT);
+    dbr_prioq_push(&clnt->prioq, TRTMR, now + HBTIMEOUT);
+    dbr_prioq_push(&clnt->prioq, MDTMR, now + HBTIMEOUT);
     return clnt;
  fail7:
     free(clnt->items);
@@ -453,9 +451,9 @@ dbr_clnt_create(const char* sess, void* ctx, const char* addr_tr, const char* ad
  fail5:
     fig_cache_term(&clnt->cache);
  fail4:
-    zmq_close(sock_md);
+    zmq_close(mdsock);
  fail3:
-    zmq_close(sock_tr);
+    zmq_close(trsock);
  fail2:
     free(clnt);
  fail1:
@@ -477,9 +475,9 @@ dbr_clnt_destroy(DbrClnt clnt)
         // 4.
         fig_cache_term(&clnt->cache);
         // 3.
-        zmq_close(clnt->sock_md);
+        zmq_close(clnt->mdsock);
         // 2.
-        zmq_close(clnt->sock_tr);
+        zmq_close(clnt->trsock);
         // 1.
         free(clnt);
     }
@@ -537,12 +535,12 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -564,12 +562,12 @@ dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -604,12 +602,12 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -633,12 +631,12 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, Dbr
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -662,12 +660,12 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -690,12 +688,12 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -718,12 +716,12 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis m
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -746,14 +744,14 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->sock_tr, &body, DBR_FALSE))
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
     fig_trader_remove_trade_id(trader, id);
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, TIMER_CLNT, now + clnt->clntint);
+    dbr_prioq_replace(&clnt->prioq, CLTMR, now + clnt->clint);
     return body.req_id;
  fail1:
     return -1;
@@ -814,22 +812,22 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         const DbrIden id = elem->id;
         dbr_prioq_pop(&clnt->prioq);
 
-        if (id == TIMER_CLNT) {
+        if (id == CLTMR) {
             // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint);
+            dbr_prioq_push(&clnt->prioq, id, key + clnt->clint);
             if (!heartbt(clnt))
                 goto fail1;
             // Next heartbeat may have already expired.
-        } else if (id == TIMER_TR) {
+        } else if (id == TRTMR) {
             // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, TIMER_TR, key + HBTIMEOUT);
+            dbr_prioq_push(&clnt->prioq, TRTMR, key + HBTIMEOUT);
             if (!(clnt->flags & TR_DOWN)) {
                 clnt->flags |= TR_DOWN;
                 dbr_handler_on_down(handler, DBR_CONN_TR);
             }
-        } else if (id == TIMER_MD) {
+        } else if (id == MDTMR) {
             // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, TIMER_MD, key + HBTIMEOUT);
+            dbr_prioq_push(&clnt->prioq, MDTMR, key + HBTIMEOUT);
             if (!(clnt->flags & MD_DOWN)) {
                 clnt->flags |= MD_DOWN;
                 dbr_handler_on_down(handler, DBR_CONN_MD);
@@ -861,19 +859,19 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
 
-            if (id == TIMER_CLNT) {
+            if (id == CLTMR) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, id, key + clnt->clntint);
+                dbr_prioq_push(&clnt->prioq, id, key + clnt->clint);
                 if (!heartbt(clnt))
                     goto fail1;
-            } else if (id == TIMER_TR) {
+            } else if (id == TRTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
                 if (!(clnt->flags & TR_DOWN)) {
                     clnt->flags |= TR_DOWN;
                     dbr_handler_on_down(handler, DBR_CONN_TR);
                 }
-            } else if (id == TIMER_MD) {
+            } else if (id == MDTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTIMEOUT);
                 if (!(clnt->flags & MD_DOWN)) {
@@ -891,16 +889,16 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
     }
 
     struct DbrBody body;
-    if ((clnt->items[SOCK_TR].revents & ZMQ_POLLIN)) {
+    if ((clnt->items[TRSOCK].revents & ZMQ_POLLIN)) {
 
         --nevents;
-        if (!dbr_recv_body(clnt->sock_tr, clnt->pool, &body))
+        if (!dbr_recv_body(clnt->trsock, clnt->pool, &body))
             goto fail1;
 
         if (body.req_id > 0)
             dbr_prioq_remove(&clnt->prioq, body.req_id);
 
-        dbr_prioq_replace(&clnt->prioq, TIMER_TR, now + HBTIMEOUT);
+        dbr_prioq_replace(&clnt->prioq, TRTMR, now + HBTIMEOUT);
 
         if ((clnt->flags & TR_DOWN) && body.type != DBR_SESS_CLOSE) {
             clnt->flags &= ~TR_DOWN;
@@ -908,8 +906,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         }
         switch (body.type) {
         case DBR_SESS_OPEN:
-            clnt->clntint = body.sess_open.hbint;
-            if (!dbr_prioq_push(&clnt->prioq, TIMER_CLNT, now + clnt->clntint))
+            clnt->clint = body.sess_open.hbint;
+            if (!dbr_prioq_push(&clnt->prioq, CLTMR, now + clnt->clint))
                 goto fail1;
             break;
         case DBR_SESS_CLOSE:
@@ -980,13 +978,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         }
     }
 
-    if ((clnt->items[SOCK_MD].revents & ZMQ_POLLIN)) {
+    if ((clnt->items[MDSOCK].revents & ZMQ_POLLIN)) {
 
         --nevents;
-        if (!dbr_recv_body(clnt->sock_md, clnt->pool, &body))
+        if (!dbr_recv_body(clnt->mdsock, clnt->pool, &body))
             goto fail1;
 
-        dbr_prioq_replace(&clnt->prioq, TIMER_MD, now + HBTIMEOUT);
+        dbr_prioq_replace(&clnt->prioq, MDTMR, now + HBTIMEOUT);
 
         if ((clnt->flags & MD_DOWN)) {
             clnt->flags &= ~MD_DOWN;
