@@ -30,7 +30,13 @@ struct DbrView;
  */
 
 enum DbrConn {
-    DBR_CONN_EXEC = 1,
+    /**
+     * Trading connection.
+     */
+    DBR_CONN_TR = 1,
+    /**
+     * Market-data connection.
+     */
     DBR_CONN_MD
 };
 

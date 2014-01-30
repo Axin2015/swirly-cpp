@@ -801,7 +801,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref)
 DBR_API DbrBool
 dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 {
-    if (!fig_trader_logged_on(trader)) {
+    if (fig_trader_logged_on(trader)) {
         dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }

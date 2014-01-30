@@ -45,8 +45,8 @@ static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
 static DbrServ serv = NULL;
 static void* ctx = NULL;
-static void* router = NULL;
-static void* pub = NULL;
+static void* sock_tr = NULL;
+static void* sock_md = NULL;
 
 static volatile sig_atomic_t quit = DBR_FALSE;
 
@@ -114,7 +114,7 @@ static DbrBool
 send_exec(struct DbrSess* sess, DbrIden req_id, struct DbrExec* exec)
 {
     struct DbrBody rep = { .req_id = req_id, .type = DBR_EXEC_REP, .exec_rep.exec = exec };
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -142,14 +142,14 @@ flush_posnup(struct DbrPosn* posn)
         // Set marker to record that position update has been sent on this session.
         other->marker_ = marker;
 
-        if (zmq_send(router, trader, strnlen(other->mnem, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+        if (zmq_send(sock_tr, trader, strnlen(other->mnem, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
             dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
             dbr_err_print();
             goto fail1;
         }
 
         // FIXME: pack message once for all traders.
-        if (!dbr_send_body(router, &rep, DBR_TRUE)) {
+        if (!dbr_send_body(sock_tr, &rep, DBR_TRUE)) {
             dbr_err_prints("dbr_send_msg() failed");
             goto fail1;
         }
@@ -182,7 +182,7 @@ flush_bookup(void)
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
 
-    const DbrBool ok = dbr_send_body(pub, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_body(sock_md, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
@@ -243,7 +243,7 @@ sess_trader(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_TRADER_LIST_REP;
     rep.entity_list_rep.first = first;
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -259,7 +259,7 @@ sess_accnt(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_ACCNT_LIST_REP;
     rep.entity_list_rep.first = first;
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -275,7 +275,7 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_CONTR_LIST_REP;
     rep.entity_list_rep.first = first;
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -302,7 +302,7 @@ sess_book(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
@@ -327,7 +327,7 @@ sess_order(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_ORDER_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -348,7 +348,7 @@ sess_exec(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_EXEC_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -369,7 +369,7 @@ sess_memb(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_MEMB_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
@@ -401,12 +401,12 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_POSN_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -417,7 +417,7 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req)
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_OPEN,
                            .sess_open = { .hbint = HBINT_IN } };
-    return dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE)
+    return dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE)
         && sess_trader(sess, 0)
         && sess_accnt(sess, 0)
         && sess_contr(sess, 0)
@@ -446,13 +446,13 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGON;
     rep.sess_logon.tid = tid;
-    return dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE)
+    return dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE)
         && sess_order(sess, 0, trader)
         && sess_exec(sess, 0, trader)
         && sess_memb(sess, 0, trader)
         && sess_posn(sess, 0, trader);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -474,9 +474,9 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGOFF;
     rep.sess_logoff.tid = tid;
-    return dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE);
+    return dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -486,8 +486,8 @@ sess_heartbt(struct DbrSess* sess, const struct DbrBody* req)
 {
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_HEARTBT };
-    dbr_send_body(pub, &rep, DBR_FALSE);
-    return dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE);
+    dbr_send_body(sock_md, &rep, DBR_FALSE);
+    return dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE);
 }
 
 static DbrBool
@@ -539,7 +539,7 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
     }
     return flush(sess, req);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -566,7 +566,7 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
     }
     return flush(sess, req);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -593,7 +593,7 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     }
     return flush(sess, req);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -619,7 +619,7 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
     }
     return flush(sess, req);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -645,7 +645,7 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     }
     return flush(sess, req);
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -673,12 +673,12 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';
-    const DbrBool ok = dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE);
+    const DbrBool ok = dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE);
     if (!ok)
         dbr_err_prints("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(router, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(sock_tr, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -689,7 +689,7 @@ run(void)
     while (!quit) {
         struct DbrMsg req;
         dbr_log_info("receiving...");
-        if (!dbr_recv_msg(router, pool, &req)) {
+        if (!dbr_recv_msg(sock_tr, pool, &req)) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
             dbr_err_prints("dbr_recv_msg() failed");
@@ -700,7 +700,7 @@ run(void)
         struct DbrSess* sess = dbr_serv_sess(serv, req.head.sess);
         if (!sess) {
             status_err(&rep, req.body.req_id);
-            if (!dbr_send_msg(router, req.head.sess, &rep, DBR_FALSE))
+            if (!dbr_send_msg(sock_tr, req.head.sess, &rep, DBR_FALSE))
                 dbr_err_prints("dbr_send_msg() failed");
             continue;
         }
@@ -787,27 +787,27 @@ main(int argc, char* argv[])
         goto exit4;
     }
 
-    router = zmq_socket(ctx, ZMQ_ROUTER);
-    if (!router) {
+    sock_tr = zmq_socket(ctx, ZMQ_ROUTER);
+    if (!sock_tr) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit5;
     }
 
-    if (zmq_bind(router, "tcp://*:3270") < 0) {
+    if (zmq_bind(sock_tr, "tcp://*:3270") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit6;
     }
 
-    pub = zmq_socket(ctx, ZMQ_PUB);
-    if (!pub) {
+    sock_md = zmq_socket(ctx, ZMQ_PUB);
+    if (!sock_md) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit6;
     }
 
-    if (zmq_bind(pub, "tcp://*:3271") < 0) {
+    if (zmq_bind(sock_md, "tcp://*:3271") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit7;
@@ -826,9 +826,9 @@ main(int argc, char* argv[])
     dbr_log_info("exiting...");
     status = 0;
  exit7:
-    zmq_close(pub);
+    zmq_close(sock_md);
  exit6:
-    zmq_close(router);
+    zmq_close(sock_tr);
  exit5:
     zmq_ctx_destroy(ctx);
  exit4:
