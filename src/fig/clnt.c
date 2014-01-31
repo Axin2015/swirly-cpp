@@ -383,7 +383,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     dbr_sess_init(&clnt->sess);
     strncpy(clnt->sess.mnem, sess, DBR_MNEM_MAX);
     dbr_tree_init(&clnt->sess.traders);
-    dbr_tree_init(&clnt->sess.accnts);
+    dbr_tree_init(&clnt->sess.subs);
 
     // 3.
     void* trsock = zmq_socket(ctx, ZMQ_DEALER);

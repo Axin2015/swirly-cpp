@@ -89,6 +89,7 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     dbr_log_debug1("sizeof DbrLevel:  %zu", sizeof(struct DbrLevel));
     dbr_log_debug1("sizeof DbrMatch:  %zu", sizeof(struct DbrMatch));
     dbr_log_debug1("sizeof DbrMemb:   %zu", sizeof(struct DbrMemb));
+    dbr_log_debug1("sizeof DbrSub:    %zu", sizeof(struct DbrSub));
     dbr_log_debug1("sizeof DbrSess:   %zu", sizeof(struct DbrSess));
 
     // Large entrys.
@@ -329,6 +330,18 @@ DBR_API void
 dbr_pool_free_book(DbrPool pool, struct DbrBook* book)
 {
     elm_pool_free_book(pool, book);
+}
+
+DBR_API struct DbrSub*
+dbr_pool_alloc_sub(DbrPool pool)
+{
+    return elm_pool_alloc_sub(pool);
+}
+
+DBR_API void
+dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
+{
+    elm_pool_free_sub(pool, sub);
 }
 
 DBR_API struct DbrSess*

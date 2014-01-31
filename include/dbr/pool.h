@@ -157,6 +157,12 @@ dbr_pool_free_book(DbrPool pool, struct DbrBook* book);
  * @{
  */
 
+DBR_API struct DbrSub*
+dbr_pool_alloc_sub(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub);
+
 DBR_API struct DbrSess*
 dbr_pool_alloc_sess(DbrPool pool);
 

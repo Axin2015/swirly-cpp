@@ -47,6 +47,7 @@ struct ElmSmallEntry {
         struct DbrLevel level;
         struct DbrMatch match;
         struct DbrMemb memb;
+        struct DbrSub sub;
         struct DbrSess sess;
     };
 #if defined(DBR_DEBUG_ALLOC)
@@ -238,6 +239,20 @@ elm_pool_free_book(struct ElmPool* pool, struct DbrBook* book)
     elm_pool_free_large(pool, entry);
 }
 
+static inline struct DbrSub*
+elm_pool_alloc_sub(struct ElmPool* pool)
+{
+    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool);
+    return entry ? &entry->sub : NULL;
+}
+
+static inline void
+elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
+{
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)sub;
+    elm_pool_free_small(pool, entry);
+}
+
 static inline struct DbrSess*
 elm_pool_alloc_sess(struct ElmPool* pool)
 {
@@ -420,6 +435,22 @@ elm_pool_free_book(struct ElmPool* pool, struct DbrBook* book)
     elm_pool_free_large(pool, entry);
 }
 
+static inline struct DbrSub*
+elm_pool_alloc_sub_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool, file, line);
+    dbr_log_debug3("allocating sub %p in %s at %d", entry, file, line);
+    return entry ? &entry->sub : NULL;
+}
+
+static inline void
+elm_pool_free_sub(struct ElmPool* pool, struct DbrSub* sub)
+{
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)sub;
+    dbr_log_debug3("freeing sub %p from %s at %d", entry, entry->file, entry->line);
+    elm_pool_free_small(pool, entry);
+}
+
 static inline struct DbrSess*
 elm_pool_alloc_sess_(struct ElmPool* pool, const char* file, int line)
 {
@@ -454,6 +485,8 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
     elm_pool_alloc_view_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_book(pool)                   \
     elm_pool_alloc_book_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_sub(pool)                   \
+    elm_pool_alloc_sub_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_sess(pool)                   \
     elm_pool_alloc_sess_(pool, __FILE__, __LINE__)
 

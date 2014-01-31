@@ -616,13 +616,31 @@ struct DbrBook {
  * @{
  */
 
+struct DbrSub {
+    /**
+     * @privatesection
+     */
+    int refs_;
+    struct DbrRbNode sess_node_;
+};
+
+static inline void
+dbr_sub_init(struct DbrSub* sub)
+{
+    sub->refs_ = 1;
+    dbr_rbnode_init(&sub->sess_node_);
+}
+
+static inline struct DbrSub*
+dbr_sess_sub_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrSub, sess_node_, node);
+}
+
 struct DbrSess {
     DbrMnem mnem;
     struct DbrTree traders;
-    /**
-     * This is a tree of rbnodes only.
-     */
-    struct DbrTree accnts;
+    struct DbrTree subs;
     /**
      * @privatesection
      */

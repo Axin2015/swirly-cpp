@@ -227,6 +227,55 @@ public:
         dbr_pool_free_view(impl_, view);
     }
     /** @} */
+    /**
+     * @addtogroup PoolBook
+     * @{
+     */
+    DbrBook*
+    alloc_book()
+    {
+        DbrBook* const book = dbr_pool_alloc_book(impl_);
+        if (!book)
+            throw_exception();
+        return book;
+    }
+    void
+    free_book(DbrBook* book) noexcept
+    {
+        dbr_pool_free_book(impl_, book);
+    }
+    /** @} */
+    /**
+     * @addtogroup PoolSess
+     * @{
+     */
+    DbrSub*
+    alloc_sub()
+    {
+        DbrSub* const sub = dbr_pool_alloc_sub(impl_);
+        if (!sub)
+            throw_exception();
+        return sub;
+    }
+    void
+    free_sub(DbrSub* sub) noexcept
+    {
+        dbr_pool_free_sub(impl_, sub);
+    }
+    DbrSess*
+    alloc_sess()
+    {
+        DbrSess* const sess = dbr_pool_alloc_sess(impl_);
+        if (!sess)
+            throw_exception();
+        return sess;
+    }
+    void
+    free_sess(DbrSess* sess) noexcept
+    {
+        dbr_pool_free_sess(impl_, sess);
+    }
+    /** @} */
 };
 
 /** @} */
