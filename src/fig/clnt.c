@@ -29,6 +29,7 @@
 #include <dbr/prioq.h>
 #include <dbr/queue.h>
 #include <dbr/refcount.h>
+#include <dbr/sess.h>
 #include <dbr/util.h>
 
 #include <stdlib.h> // malloc()
@@ -171,6 +172,14 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
     dbr_tree_insert(viewups, (DbrKey)view, &view->update_node_);
 }
 
+static DbrTrader
+get_trader(DbrClnt clnt, DbrIden tid)
+{
+    struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
+    assert(trec->trader.state);
+    return trec->trader.state;
+}
+
 static DbrIden
 init(DbrClnt clnt)
 {
@@ -188,14 +197,6 @@ heartbt(DbrClnt clnt)
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         return -1;
     return body.req_id;
-}
-
-static void
-clear_trader(DbrClnt clnt, DbrIden tid)
-{
-    struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
-    assert(trec->trader.state);
-    fig_trader_clear(trec->trader.state);
 }
 
 static void
@@ -941,11 +942,16 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             dbr_handler_on_down(handler, DBR_CONN_TR);
             break;
         case DBR_SESS_LOGON:
+            dbr_sess_logon(&clnt->sess, get_trader(clnt, body.sess_logon.tid));
             dbr_handler_on_logon(handler, body.sess_logon.tid);
             break;
         case DBR_SESS_LOGOFF:
             dbr_handler_on_logoff(handler, body.sess_logoff.tid);
-            clear_trader(clnt, body.sess_logoff.tid);
+            {
+                DbrTrader trader = get_trader(clnt, body.sess_logoff.tid);
+                dbr_sess_logoff(&clnt->sess, trader);
+                fig_trader_clear(trader);
+            }
             break;
         case DBR_SESS_HEARTBT:
             break;
