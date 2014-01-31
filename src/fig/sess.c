@@ -17,6 +17,7 @@
  */
 #include <dbr/sess.h>
 
+#include "accnt.h"
 #include "trader.h"
 
 #include <dbr/err.h>
@@ -32,16 +33,43 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
 {
     if (trader->sess) {
         dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", trader->rec->mnem);
-        return DBR_FALSE;
+        goto fail1;
     }
+
+    struct DbrRbNode* node = dbr_trader_first_memb(trader);
+    for (; node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, trader->pool);
+        if (!accnt)
+            goto fail2;
+        ++accnt->usage;
+    }
+
     trader->sess = sess;
     dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
     return DBR_TRUE;
-}
+ fail2:
+    // Rollback usage.
+    for (node = dbr_rbnode_prev(node);
+         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_prev(node)) {
+        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, trader->pool);
+        --accnt->usage;
+    }
+ fail1:
+    return DBR_FALSE;
+ }
 
 DBR_API void
 dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader)
 {
     dbr_tree_remove(&sess->traders, &trader->sess_node_);
     trader->sess = NULL;
+
+    for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
+         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, trader->pool);
+        --accnt->usage;
+    }
 }
