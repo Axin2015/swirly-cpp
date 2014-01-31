@@ -62,10 +62,9 @@ enum {
 };
 
 struct FigClnt {
-    void* ctx;
+    struct DbrSess sess;
     void* trsock;
     void* mdsock;
-    DbrMnem mnem;
     DbrIden id;
     DbrPool pool;
     unsigned flags;
@@ -380,6 +379,12 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     }
 
     // 2.
+    dbr_sess_init(&clnt->sess);
+    strncpy(clnt->sess.mnem, sess, DBR_MNEM_MAX);
+    dbr_tree_init(&clnt->sess.traders);
+    dbr_tree_init(&clnt->sess.accnts);
+
+    // 3.
     void* trsock = zmq_socket(ctx, ZMQ_DEALER);
     if (!trsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
@@ -392,7 +397,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
         goto fail3;
     }
 
-    // 3.
+    // 4.
     void* mdsock = zmq_socket(ctx, ZMQ_SUB);
     if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
@@ -411,21 +416,21 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     clnt->pool = pool;
     clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
         | VIEW_PENDING | TR_DOWN /*| MD_DOWN*/;
-    // 4.
+    // 5.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
     dbr_queue_init(&clnt->execs);
-    // 5.
+    // 6.
     dbr_tree_init(&clnt->views);
     dbr_tree_init(&clnt->posnups);
     dbr_tree_init(&clnt->viewups);
-    // 6.
+    // 7.
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
     clnt->clint = 0; // Pending hbint from server's logon message.
 
-    // 7.
+    // 8.
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
     if (!clnt->items)
         goto fail6;
@@ -454,17 +459,26 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     dbr_prioq_push(&clnt->prioq, MDTMR, now + HBTMOUT);
     return clnt;
  fail7:
+    // 8.
     free(clnt->items);
  fail6:
+    // 7.
     dbr_prioq_term(&clnt->prioq);
-    free_views(&clnt->views, pool);
  fail5:
+    // 6.
+    free_views(&clnt->views, pool);
+    // 5.
     fig_cache_term(&clnt->cache);
  fail4:
+    // 4.
     zmq_close(mdsock);
  fail3:
+    // 3.
     zmq_close(trsock);
  fail2:
+    // 2.
+    dbr_sess_term(&clnt->sess);
+    // 1.
     free(clnt);
  fail1:
     return NULL;
@@ -476,18 +490,20 @@ dbr_clnt_destroy(DbrClnt clnt)
     if (clnt) {
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
-        // 7.
+        // 8.
         free(clnt->items);
-        // 6.
+        // 7.
         dbr_prioq_term(&clnt->prioq);
-        // 5.
+        // 6.
         free_views(&clnt->views, clnt->pool);
-        // 4.
+        // 5.
         fig_cache_term(&clnt->cache);
-        // 3.
+        // 4.
         zmq_close(clnt->mdsock);
-        // 2.
+        // 3.
         zmq_close(clnt->trsock);
+        // 2.
+        dbr_sess_term(&clnt->sess);
         // 1.
         free(clnt);
     }
