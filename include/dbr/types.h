@@ -620,9 +620,14 @@ struct DbrSess {
     DbrMnem mnem;
     struct DbrTree traders;
     /**
+     * This is a tree of rbnodes only.
+     */
+    struct DbrTree accnts;
+    /**
      * @privatesection
      */
     long marker_;
+    // FigSessIdx bucket list.
     struct DbrSlNode mnem_node_;
 };
 

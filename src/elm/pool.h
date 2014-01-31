@@ -43,10 +43,10 @@ struct ElmSmallEntry {
     union {
         struct ElmSmallEntry* next;
         // Small data structures.
+        struct DbrRbNode rbnode;
         struct DbrLevel level;
         struct DbrMatch match;
         struct DbrMemb memb;
-        struct DbrPosn posn;
         struct DbrSess sess;
     };
 #if defined(DBR_DEBUG_ALLOC)
@@ -63,6 +63,7 @@ struct ElmLargeEntry {
         struct DbrRec rec;
         struct DbrOrder order;
         struct DbrExec exec;
+        struct DbrPosn posn;
         struct DbrView view;
         struct DbrBook book;
     };
@@ -96,6 +97,20 @@ elm_pool_alloc_small(struct ElmPool* pool);
 
 DBR_EXTERN struct ElmLargeEntry*
 elm_pool_alloc_large(struct ElmPool* pool);
+
+static inline struct DbrRbNode*
+elm_pool_alloc_rbnode(struct ElmPool* pool)
+{
+    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool);
+    return entry ? &entry->rbnode : NULL;
+}
+
+static inline void
+elm_pool_free_rbnode(struct ElmPool* pool, struct DbrRbNode* rbnode)
+{
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)rbnode;
+    elm_pool_free_small(pool, entry);
+}
 
 static inline struct DbrRec*
 elm_pool_alloc_rec(struct ElmPool* pool)
@@ -184,15 +199,15 @@ elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
 static inline struct DbrPosn*
 elm_pool_alloc_posn(struct ElmPool* pool)
 {
-    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool);
+    struct ElmLargeEntry* entry = elm_pool_alloc_large(pool);
     return entry ? &entry->posn : NULL;
 }
 
 static inline void
 elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 {
-    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)posn;
-    elm_pool_free_small(pool, entry);
+    struct ElmLargeEntry* entry = (struct ElmLargeEntry*)posn;
+    elm_pool_free_large(pool, entry);
 }
 
 static inline struct DbrView*
@@ -244,6 +259,22 @@ elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line);
 
 DBR_EXTERN struct ElmLargeEntry*
 elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line);
+
+static inline struct DbrRbNode*
+elm_pool_alloc_rbnode_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool, file, line);
+    dbr_log_debug3("allocating rbnode %p in %s at %d", entry, file, line);
+    return entry ? &entry->rbnode : NULL;
+}
+
+static inline void
+elm_pool_free_rbnode(struct ElmPool* pool, struct DbrRbNode* rbnode)
+{
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)rbnode;
+    dbr_log_debug3("freeing rbnode %p from %s at %d", entry, entry->file, entry->line);
+    elm_pool_free_small(pool, entry);
+}
 
 static inline struct DbrRec*
 elm_pool_alloc_rec_(struct ElmPool* pool, const char* file, int line)
@@ -344,7 +375,7 @@ elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
 static inline struct DbrPosn*
 elm_pool_alloc_posn_(struct ElmPool* pool, const char* file, int line)
 {
-    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool, file, line);
+    struct ElmLargeEntry* entry = elm_pool_alloc_large(pool, file, line);
     dbr_log_debug3("allocating posn %p in %s at %d", entry, file, line);
     return entry ? &entry->posn : NULL;
 }
@@ -352,9 +383,9 @@ elm_pool_alloc_posn_(struct ElmPool* pool, const char* file, int line)
 static inline void
 elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 {
-    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)posn;
+    struct ElmLargeEntry* entry = (struct ElmLargeEntry*)posn;
     dbr_log_debug3("freeing posn %p from %s at %d", entry, entry->file, entry->line);
-    elm_pool_free_small(pool, entry);
+    elm_pool_free_large(pool, entry);
 }
 
 static inline struct DbrView*
