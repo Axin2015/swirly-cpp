@@ -84,6 +84,9 @@ dbr_accnt_last_memb(DbrAccnt accnt);
 DBR_API DbrBool
 dbr_accnt_empty_memb(DbrAccnt accnt);
 
+DBR_API int
+dbr_accnt_usage(DbrAccnt accnt);
+
 /** @} */
 
 #endif // DBR_ACCNT_H

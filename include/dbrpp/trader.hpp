@@ -21,6 +21,7 @@
 #include <dbrpp/iter.hpp>
 #include <dbrpp/rbnode.hpp>
 #include <dbrpp/rec.hpp>
+#include <dbrpp/sess.hpp>
 
 #include <dbr/trader.h>
 
@@ -593,9 +594,14 @@ public:
     }
     /** @} */
     DbrBool
-    logged_on() const
+    logged_on() const noexcept
     {
         return dbr_trader_logged_on(impl_);
+    }
+    SessRef
+    sess() const noexcept
+    {
+        return SessRef(*dbr_trader_sess(impl_));
     }
 };
 

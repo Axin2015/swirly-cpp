@@ -252,16 +252,16 @@ fig_trader_empty_memb(const struct FigTrader* trader)
     return dbr_tree_empty(&trader->membs);
 }
 
-static inline struct DbrSess*
-fig_trader_sess(const struct FigTrader* trader)
-{
-    return trader->sess;
-}
-
 static inline DbrBool
 fig_trader_logged_on(const struct FigTrader* trader)
 {
     return trader->sess != NULL;
+}
+
+static inline struct DbrSess*
+fig_trader_sess(const struct FigTrader* trader)
+{
+    return trader->sess;
 }
 
 #endif // FIG_TRADER_H

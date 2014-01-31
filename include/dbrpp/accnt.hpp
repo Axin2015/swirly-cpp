@@ -407,6 +407,11 @@ public:
         return AccntMembs{impl_};
     }
     /** @} */
+    int
+    usage() const noexcept
+    {
+        return dbr_accnt_usage(impl_);
+    }
 };
 
 inline std::ostream&
