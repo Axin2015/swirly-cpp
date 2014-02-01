@@ -91,6 +91,7 @@ fig_sessidx_lazy(struct FigSessIdx* sessidx, const char* mnem)
 
     dbr_sess_init(sess);
     strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
+    sess->pool = sessidx->pool;
     dbr_tree_init(&sess->subs);
     dbr_tree_init(&sess->traders);
 

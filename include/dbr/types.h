@@ -639,6 +639,7 @@ dbr_sess_sub_entry(struct DbrRbNode* node)
 
 struct DbrSess {
     DbrMnem mnem;
+    DbrPool pool;
     struct DbrTree subs;
     struct DbrTree traders;
     /**

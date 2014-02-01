@@ -32,10 +32,8 @@ dbr_sess_init(struct DbrSess* sess)
     dbr_slnode_init(&sess->mnem_node_);
 }
 
-static inline void
-dbr_sess_term(struct DbrSess* sess)
-{
-}
+DBR_API void
+dbr_sess_term(struct DbrSess* sess);
 
 DBR_API DbrBool
 dbr_sess_logon(struct DbrSess* sess, DbrTrader trader);
