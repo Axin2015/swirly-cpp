@@ -632,15 +632,15 @@ dbr_sub_init(struct DbrSub* sub)
 }
 
 static inline struct DbrSub*
-dbr_sess_sub_entry(struct DbrSlNode* node)
+dbr_sess_sub_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct DbrSub, sess_node_, node);
 }
 
 struct DbrSess {
     DbrMnem mnem;
-    struct DbrTree traders;
     struct DbrTree subs;
+    struct DbrTree traders;
     /**
      * @privatesection
      */

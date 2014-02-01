@@ -267,6 +267,11 @@ public:
     {
         return impl_;
     }
+    Mnem
+    mnem() const noexcept
+    {
+        return Mnem{impl_->mnem};
+    }
     DbrBool
     logon(DbrTrader trader)
     {
@@ -277,10 +282,10 @@ public:
     {
         return dbr_sess_logoff(impl_, trader);
     }
-    Mnem
-    mnem() const noexcept
+    int
+    subs(DbrAccnt accnt) const noexcept
     {
-        return Mnem{impl_->mnem};
+        return dbr_sess_subs(impl_, accnt);
     }
     /**
      * @addtogroup SessTrader

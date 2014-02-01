@@ -391,6 +391,12 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
             status_err(&rep, req_id);
             goto fail1;
         }
+        const int subs = dbr_sess_subs(sess, accnt);
+        if (subs > 1)
+            continue;
+        // This logon represents the first subscription to this account, so the initial positions
+        // for this account must be sent.
+        assert(subs == 1);
         // Copy each posn to entity node.
         for (struct DbrRbNode* pnode = dbr_accnt_first_posn(accnt);
              pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {

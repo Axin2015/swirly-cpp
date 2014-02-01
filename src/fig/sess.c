@@ -22,6 +22,38 @@
 
 #include <dbr/err.h>
 
+static DbrBool
+incref(struct DbrSess* sess, DbrKey key, DbrPool pool)
+{
+    struct DbrSub* sub;
+    struct DbrRbNode* node = dbr_tree_pfind(&sess->subs, key);
+    if (!node || node->key != key) {
+        if (!(sub = dbr_pool_alloc_sub(pool)))
+            return DBR_FALSE;
+        dbr_sub_init(sub);
+
+        struct DbrRbNode* parent = node;
+        dbr_tree_pinsert(&sess->subs, key, &sub->sess_node_, parent);
+    } else {
+        sub = dbr_sess_sub_entry(node);
+        ++sub->refs_;
+    }
+    return DBR_TRUE;
+}
+
+static void
+decref(struct DbrSess* sess, DbrKey key, DbrPool pool)
+{
+    struct DbrRbNode* node = dbr_tree_find(&sess->subs, key);
+    if (node) {
+        struct DbrSub* sub = dbr_sess_sub_entry(node);
+        if (--sub->refs_ == 0) {
+            dbr_tree_remove(&sess->subs, node);
+            dbr_pool_free_sub(pool, sub);
+        }
+    }
+}
+
 DBR_API DbrTrader
 dbr_sess_trader_entry(struct DbrRbNode* node)
 {
@@ -39,26 +71,23 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
     struct DbrRbNode* node = dbr_trader_first_memb(trader);
     for (; node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, trader->pool);
-        if (!accnt)
+        if (!incref(sess, memb->accnt.rec->id, trader->pool))
             goto fail2;
-        ++accnt->usage;
     }
 
     trader->sess = sess;
     dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
     return DBR_TRUE;
  fail2:
-    // Rollback usage.
+    // Rollback subs.
     for (node = dbr_rbnode_prev(node);
          node != DBR_TRADER_END_MEMB; node = dbr_rbnode_prev(node)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, trader->pool);
-        --accnt->usage;
+        decref(sess, memb->accnt.rec->id, trader->pool);
     }
  fail1:
     return DBR_FALSE;
- }
+}
 
 DBR_API void
 dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader)
@@ -69,7 +98,19 @@ dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader)
     for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
          node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, trader->pool);
-        --accnt->usage;
+        decref(sess, memb->accnt.rec->id, trader->pool);
     }
+}
+
+DBR_API int
+dbr_sess_subs(struct DbrSess* sess, DbrAccnt accnt)
+{
+    int refs;
+    struct DbrRbNode* node = dbr_tree_find(&sess->subs, accnt->rec->id);
+    if (node) {
+        struct DbrSub* sub = dbr_sess_sub_entry(node);
+        refs = sub->refs_;
+    } else
+        refs = 0;
+    return refs;
 }

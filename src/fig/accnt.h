@@ -27,8 +27,6 @@ struct FigAccnt {
     DbrPool pool;
     struct DbrTree posns;
     struct DbrTree membs;
-    // The number of traders currently using this account.
-    int usage;
 };
 
 DBR_EXTERN struct FigAccnt*
@@ -137,12 +135,6 @@ static inline DbrBool
 fig_accnt_empty_memb(const struct FigAccnt* accnt)
 {
     return dbr_tree_empty(&accnt->membs);
-}
-
-static inline int
-fig_accnt_usage(const struct FigAccnt* accnt)
-{
-    return accnt->usage;
 }
 
 #endif // FIG_ACCNT_H

@@ -53,7 +53,6 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
         accnt->pool = pool;
         dbr_tree_init(&accnt->posns);
         dbr_tree_init(&accnt->membs);
-        accnt->usage = 0;
 
         arec->accnt.state = accnt;
     }
@@ -201,10 +200,4 @@ DBR_API DbrBool
 dbr_accnt_empty_memb(DbrAccnt accnt)
 {
     return fig_accnt_empty_memb(accnt);
-}
-
-DBR_API int
-dbr_accnt_usage(DbrAccnt accnt)
-{
-    return fig_accnt_usage(accnt);
 }
