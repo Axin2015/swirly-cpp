@@ -232,7 +232,7 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
     }
 }
 
-static void
+static DbrBool
 emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
@@ -241,11 +241,12 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         assert(trader);
         DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
         if (!accnt)
-            abort();
+            return DBR_FALSE;
         // Transfer ownership.
         fig_trader_emplace_memb(trader, memb);
         fig_accnt_insert_memb(accnt, memb);
     }
+    return DBR_TRUE;
 }
 
 static void
@@ -871,6 +872,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
     // indicate any requested events that have occurred by setting the bit corresponding to the
     // event condition in the revents member.
 
+    // Note also that zmq_poll() is level-triggered.
+
     int nevents = zmq_poll(clnt->items, clnt->nitems, ms);
     if (nevents < 0) {
         dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
@@ -977,7 +980,9 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             emplace_exec_list(clnt, body.entity_list_rep.first);
             break;
         case DBR_MEMB_LIST_REP:
-            emplace_memb_list(clnt, body.entity_list_rep.first);
+            // This function can fail when out of memory.
+            if (emplace_memb_list(clnt, body.entity_list_rep.first))
+                goto fail1;
             break;
         case DBR_POSN_LIST_REP:
             emplace_posn_list(clnt, body.entity_list_rep.first);
