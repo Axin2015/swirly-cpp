@@ -475,7 +475,7 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    dbr_sess_logoff(sess, trader);
+    dbr_sess_logoff(sess, trader, DBR_FALSE);
 
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGOFF;

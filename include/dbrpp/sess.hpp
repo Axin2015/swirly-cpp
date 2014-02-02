@@ -278,9 +278,9 @@ public:
         return dbr_sess_logon(impl_, trader);
     }
     void
-    logoff(DbrTrader trader)
+    logoff(DbrTrader trader, DbrBool clear)
     {
-        return dbr_sess_logoff(impl_, trader);
+        return dbr_sess_logoff(impl_, trader, clear);
     }
     int
     subs(DbrAccnt accnt) const noexcept

@@ -22,14 +22,14 @@
 
 #include <dbr/err.h>
 
-static DbrBool
+static int
 incref(struct DbrSess* sess, DbrKey key)
 {
     struct DbrSub* sub;
     struct DbrRbNode* node = dbr_tree_pfind(&sess->subs, key);
     if (!node || node->key != key) {
         if (!(sub = dbr_pool_alloc_sub(sess->pool)))
-            return DBR_FALSE;
+            return 0;
         dbr_sub_init(sub);
 
         struct DbrRbNode* parent = node;
@@ -38,20 +38,24 @@ incref(struct DbrSess* sess, DbrKey key)
         sub = dbr_sess_sub_entry(node);
         ++sub->refs_;
     }
-    return DBR_TRUE;
+    return sub->refs_;
 }
 
-static void
+static int
 decref(struct DbrSess* sess, DbrKey key)
 {
+    int refs;
     struct DbrRbNode* node = dbr_tree_find(&sess->subs, key);
     if (node) {
         struct DbrSub* sub = dbr_sess_sub_entry(node);
-        if (--sub->refs_ == 0) {
+        refs = --sub->refs_;
+        if (refs == 0) {
             dbr_tree_remove(&sess->subs, node);
             dbr_pool_free_sub(sess->pool, sub);
         }
-    }
+    } else
+        refs = 0;
+    return refs;
 }
 
 DBR_API DbrTrader
@@ -82,7 +86,7 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
     struct DbrRbNode* node = dbr_trader_first_memb(trader);
     for (; node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        if (!incref(sess, memb->accnt.rec->id))
+        if (incref(sess, memb->accnt.rec->id) == 0)
             goto fail2;
     }
 
@@ -101,7 +105,7 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
 }
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader)
+dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader, DbrBool clear)
 {
     dbr_tree_remove(&sess->traders, &trader->sess_node_);
     trader->sess = NULL;
@@ -109,7 +113,11 @@ dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader)
     for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
          node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_trader_memb_entry(node);
-        decref(sess, memb->accnt.rec->id);
+        if (decref(sess, memb->accnt.rec->id) == 0 && clear) {
+            DbrAccnt accnt = memb->accnt.rec->accnt.state;
+            if (accnt)
+                fig_accnt_clear(accnt);
+        }
     }
 }
 

@@ -239,11 +239,12 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
         DbrTrader trader = memb->trader.rec->trader.state;
         assert(trader);
-        // Transfer ownership.
-        fig_trader_emplace_memb(trader, memb);
         DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
         if (!accnt)
             abort();
+        // Transfer ownership.
+        fig_trader_emplace_memb(trader, memb);
+        fig_accnt_insert_memb(accnt, memb);
     }
 }
 
@@ -256,8 +257,6 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         // All accnts that trader is member of are created in emplace_membs().
         DbrAccnt accnt = posn->accnt.rec->accnt.state;
         assert(accnt);
-        // Traders may share accounts, so clear before emplacing new positions.
-        fig_accnt_clear(accnt);
         fig_accnt_emplace_posn(accnt, posn);
     }
 }
@@ -553,6 +552,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
+
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGON;
@@ -949,7 +949,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             dbr_handler_on_logoff(handler, body.sess_logoff.tid);
             {
                 DbrTrader trader = get_trader(clnt, body.sess_logoff.tid);
-                dbr_sess_logoff(&clnt->sess, trader);
+                dbr_sess_logoff(&clnt->sess, trader, DBR_TRUE);
                 fig_trader_clear(trader);
             }
             break;
