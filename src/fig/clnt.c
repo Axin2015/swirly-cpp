@@ -854,65 +854,23 @@ dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
+    int nevents;
     DbrMillis now = dbr_millis();
-
-    const struct DbrElem* elem;
-    while ((elem = dbr_prioq_top(&clnt->prioq))) {
-        if (elem->key > now) {
-            // Millis until next timeout.
-            ms = dbr_min(ms, elem->key - now);
+    const DbrMillis absms = now + ms;
+    do {
+        if (absms <= now) {
+            // User timeout.
+            nevents = 0;
             break;
         }
-        // Timeout.
-        const DbrKey key = elem->key;
-        const DbrIden id = elem->id;
-        dbr_prioq_pop(&clnt->prioq);
-
-        if (id == CLTMR) {
-            // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, id, key + clnt->clint);
-            if (!heartbt(clnt))
-                goto fail1;
-            // Next heartbeat may have already expired.
-        } else if (id == TRTMR) {
-            // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, TRTMR, key + HBTMOUT);
-            if (!(clnt->flags & TR_DOWN)) {
-                clnt->flags |= TR_DOWN;
-                dbr_handler_on_down(handler, DBR_CONN_TR);
+        const struct DbrElem* elem;
+        while ((elem = dbr_prioq_top(&clnt->prioq))) {
+            if (elem->key > now) {
+                // Millis until next timeout.
+                ms = dbr_min(absms, elem->key) - now;
+                break;
             }
-        } else if (id == MDTMR) {
-            // Cannot fail due to pop.
-            dbr_prioq_push(&clnt->prioq, MDTMR, key + HBTMOUT);
-            if (!(clnt->flags & MD_DOWN)) {
-                clnt->flags |= MD_DOWN;
-                dbr_handler_on_down(handler, DBR_CONN_MD);
-            }
-        } else {
-            // Assumed that these "top-half" handlers do not block.
-            dbr_handler_on_timeout(handler, id);
-        }
-    }
-
-    // From the zmq_poll() man page:
-
-    // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
-    // indicate any requested events that have occurred by setting the bit corresponding to the
-    // event condition in the revents member.
-
-    // Note also that zmq_poll() is level-triggered.
-
-    int nevents = zmq_poll(clnt->items, clnt->nitems, ms);
-    if (nevents < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail1;
-    }
-
-    now = dbr_millis();
-    if (nevents == 0) {
-
-        // Timeout.
-        while (elem && elem->key <= now) {
+            // Intrenal timeout.
             const DbrKey key = elem->key;
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
@@ -922,6 +880,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_prioq_push(&clnt->prioq, id, key + clnt->clint);
                 if (!heartbt(clnt))
                     goto fail1;
+                // Next heartbeat may have already expired.
             } else if (id == TRTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + HBTMOUT);
@@ -931,154 +890,172 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 }
             } else if (id == MDTMR) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, id, key + HBTMOUT);
+                dbr_prioq_push(&clnt->prioq, MDTMR, key + HBTMOUT);
                 if (!(clnt->flags & MD_DOWN)) {
                     clnt->flags |= MD_DOWN;
                     dbr_handler_on_down(handler, DBR_CONN_MD);
                 }
             } else {
+                // Assumed that these "top-half" handlers do not block.
                 dbr_handler_on_timeout(handler, id);
+            }
+        }
+
+        // From the zmq_poll() man page:
+
+        // For each zmq_pollitem_t item, zmq_poll() shall first clear the revents member, and then
+        // indicate any requested events that have occurred by setting the bit corresponding to the
+        // event condition in the revents member.
+
+        // Note also that zmq_poll() is level-triggered.
+
+        nevents = zmq_poll(clnt->items, clnt->nitems, ms);
+        if (nevents < 0) {
+            dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
+            goto fail1;
+        }
+        // Time after slow operation.
+        now = dbr_millis();
+
+        struct DbrBody body;
+        if ((clnt->items[TRSOCK].revents & ZMQ_POLLIN)) {
+
+            --nevents;
+            if (!dbr_recv_body(clnt->trsock, clnt->pool, &body))
+                goto fail1;
+
+            if (body.req_id > 0)
+                dbr_prioq_remove(&clnt->prioq, body.req_id);
+
+            dbr_prioq_replace(&clnt->prioq, TRTMR, now + HBTMOUT);
+
+            if ((clnt->flags & TR_DOWN) && body.type != DBR_SESS_CLOSE) {
+                clnt->flags &= ~TR_DOWN;
+                dbr_handler_on_up(handler, DBR_CONN_TR);
+            }
+            switch (body.type) {
+            case DBR_SESS_OPEN:
+                clnt->clint = body.sess_open.hbint;
+                if (!dbr_prioq_push(&clnt->prioq, CLTMR, now + clnt->clint))
+                    goto fail1;
                 break;
-            }
-            // Next heartbeat may have already expired.
-            elem = dbr_prioq_top(&clnt->prioq);
-        }
-        return 0;
-    }
-
-    struct DbrBody body;
-    if ((clnt->items[TRSOCK].revents & ZMQ_POLLIN)) {
-
-        --nevents;
-        if (!dbr_recv_body(clnt->trsock, clnt->pool, &body))
-            goto fail1;
-
-        if (body.req_id > 0)
-            dbr_prioq_remove(&clnt->prioq, body.req_id);
-
-        dbr_prioq_replace(&clnt->prioq, TRTMR, now + HBTMOUT);
-
-        if ((clnt->flags & TR_DOWN) && body.type != DBR_SESS_CLOSE) {
-            clnt->flags &= ~TR_DOWN;
-            dbr_handler_on_up(handler, DBR_CONN_TR);
-        }
-        switch (body.type) {
-        case DBR_SESS_OPEN:
-            clnt->clint = body.sess_open.hbint;
-            if (!dbr_prioq_push(&clnt->prioq, CLTMR, now + clnt->clint))
-                goto fail1;
-            break;
-        case DBR_SESS_CLOSE:
-            clnt->flags |= TR_DOWN;
-            dbr_handler_on_down(handler, DBR_CONN_TR);
-            break;
-        case DBR_SESS_LOGON:
-            dbr_sess_logon(&clnt->sess, get_trader(clnt, body.sess_logon.tid));
-            dbr_handler_on_logon(handler, body.sess_logon.tid);
-            break;
-        case DBR_SESS_LOGOFF:
-            dbr_handler_on_logoff(handler, body.sess_logoff.tid);
-            {
-                DbrTrader trader = get_trader(clnt, body.sess_logoff.tid);
-                dbr_sess_logoff(&clnt->sess, trader, DBR_TRUE);
-                fig_trader_clear(trader);
-            }
-            break;
-        case DBR_SESS_HEARTBT:
-            break;
-        case DBR_STATUS_REP:
-            dbr_handler_on_status(handler, body.req_id, body.status_rep.num, body.status_rep.msg);
-            break;
-        case DBR_TRADER_LIST_REP:
-            emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_PENDING,
-                             body.entity_list_rep.first, body.entity_list_rep.count_);
-            break;
-        case DBR_ACCNT_LIST_REP:
-            emplace_rec_list(clnt, DBR_ENTITY_ACCNT, ACCNT_PENDING,
-                             body.entity_list_rep.first, body.entity_list_rep.count_);
-            break;
-        case DBR_CONTR_LIST_REP:
-            emplace_rec_list(clnt, DBR_ENTITY_CONTR, CONTR_PENDING,
-                             body.entity_list_rep.first, body.entity_list_rep.count_);
-            break;
-        case DBR_ORDER_LIST_REP:
-            emplace_order_list(clnt, body.entity_list_rep.first);
-            break;
-        case DBR_EXEC_LIST_REP:
-            emplace_exec_list(clnt, body.entity_list_rep.first);
-            break;
-        case DBR_MEMB_LIST_REP:
-            // This function can fail is there is no memory available for a lazily created account.
-            if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first)))
-                goto fail1;
-            break;
-        case DBR_POSN_LIST_REP:
-            // This function can fail is there is no memory available for a lazily created account.
-            if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first)))
-                goto fail1;
-            break;
-        case DBR_VIEW_LIST_REP:
-            emplace_view_list(clnt, body.view_list_rep.first);
-            break;
-        case DBR_EXEC_REP:
-            enrich_exec(&clnt->cache, body.exec_rep.exec);
-            switch (body.exec_rep.exec->c.state) {
-            case DBR_STATE_NEW:
-                apply_new(clnt, body.exec_rep.exec);
+            case DBR_SESS_CLOSE:
+                clnt->flags |= TR_DOWN;
+                dbr_handler_on_down(handler, DBR_CONN_TR);
                 break;
-            case DBR_STATE_REVISE:
-            case DBR_STATE_CANCEL:
-            case DBR_STATE_TRADE:
-                apply_update(clnt, body.exec_rep.exec);
+            case DBR_SESS_LOGON:
+                dbr_sess_logon(&clnt->sess, get_trader(clnt, body.sess_logon.tid));
+                dbr_handler_on_logon(handler, body.sess_logon.tid);
                 break;
-            }
-            dbr_handler_on_exec(handler, body.req_id, body.exec_rep.exec);
-            dbr_exec_decref(body.exec_rep.exec, clnt->pool);
-            break;
-        case DBR_POSN_REP:
-            enrich_posn(&clnt->cache, body.posn_rep.posn);
-            // This function can fail is there is no memory available for a lazily created account.
-            if (dbr_unlikely(!apply_posnup(clnt, body.posn_rep.posn)))
+            case DBR_SESS_LOGOFF:
+                dbr_handler_on_logoff(handler, body.sess_logoff.tid);
+                {
+                    DbrTrader trader = get_trader(clnt, body.sess_logoff.tid);
+                    dbr_sess_logoff(&clnt->sess, trader, DBR_TRUE);
+                    fig_trader_clear(trader);
+                }
+                break;
+            case DBR_SESS_HEARTBT:
+                break;
+            case DBR_STATUS_REP:
+                dbr_handler_on_status(handler, body.req_id, body.status_rep.num,
+                                      body.status_rep.msg);
+                break;
+            case DBR_TRADER_LIST_REP:
+                emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_PENDING,
+                                 body.entity_list_rep.first, body.entity_list_rep.count_);
+                break;
+            case DBR_ACCNT_LIST_REP:
+                emplace_rec_list(clnt, DBR_ENTITY_ACCNT, ACCNT_PENDING,
+                                 body.entity_list_rep.first, body.entity_list_rep.count_);
+                break;
+            case DBR_CONTR_LIST_REP:
+                emplace_rec_list(clnt, DBR_ENTITY_CONTR, CONTR_PENDING,
+                                 body.entity_list_rep.first, body.entity_list_rep.count_);
+                break;
+            case DBR_ORDER_LIST_REP:
+                emplace_order_list(clnt, body.entity_list_rep.first);
+                break;
+            case DBR_EXEC_LIST_REP:
+                emplace_exec_list(clnt, body.entity_list_rep.first);
+                break;
+            case DBR_MEMB_LIST_REP:
+                // This function can fail is there is no memory available for a lazily created
+                // account.
+                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first)))
+                    goto fail1;
+                break;
+            case DBR_POSN_LIST_REP:
+                // This function can fail is there is no memory available for a lazily created
+                // account.
+                if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first)))
+                    goto fail1;
+                break;
+            case DBR_VIEW_LIST_REP:
+                emplace_view_list(clnt, body.view_list_rep.first);
+                break;
+            case DBR_EXEC_REP:
+                enrich_exec(&clnt->cache, body.exec_rep.exec);
+                switch (body.exec_rep.exec->c.state) {
+                case DBR_STATE_NEW:
+                    apply_new(clnt, body.exec_rep.exec);
+                    break;
+                case DBR_STATE_REVISE:
+                case DBR_STATE_CANCEL:
+                case DBR_STATE_TRADE:
+                    apply_update(clnt, body.exec_rep.exec);
+                    break;
+                }
+                dbr_handler_on_exec(handler, body.req_id, body.exec_rep.exec);
+                dbr_exec_decref(body.exec_rep.exec, clnt->pool);
+                break;
+            case DBR_POSN_REP:
+                enrich_posn(&clnt->cache, body.posn_rep.posn);
+                // This function can fail is there is no memory available for a lazily created
+                // account.
+                if (dbr_unlikely(!apply_posnup(clnt, body.posn_rep.posn)))
+                    goto fail1;
+                dbr_handler_on_posn(handler, body.posn_rep.posn);
+                break;
+            default:
+                dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
                 goto fail1;
-            dbr_handler_on_posn(handler, body.posn_rep.posn);
-            break;
-        default:
-            dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
-            goto fail1;
-        }
-    }
-
-    if ((clnt->items[MDSOCK].revents & ZMQ_POLLIN)) {
-
-        --nevents;
-        if (!dbr_recv_body(clnt->mdsock, clnt->pool, &body))
-            goto fail1;
-
-        dbr_prioq_replace(&clnt->prioq, MDTMR, now + HBTMOUT);
-
-        if ((clnt->flags & MD_DOWN)) {
-            clnt->flags &= ~MD_DOWN;
-            dbr_handler_on_up(handler, DBR_CONN_MD);
-        }
-        switch (body.type) {
-        case DBR_SESS_HEARTBT:
-            break;
-        case DBR_VIEW_LIST_REP:
-            for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
-                struct DbrView* view = dbr_shared_view_entry(node);
-                node = node->next;
-                // Transfer ownership.
-                enrich_view(&clnt->cache, view);
-                apply_viewup(clnt, view);
-                dbr_handler_on_view(handler, view);
             }
-            dbr_handler_on_flush(handler);
-            break;
-        default:
-            dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
-            goto fail1;
         }
-    }
+
+        if ((clnt->items[MDSOCK].revents & ZMQ_POLLIN)) {
+
+            --nevents;
+            if (!dbr_recv_body(clnt->mdsock, clnt->pool, &body))
+                goto fail1;
+
+            dbr_prioq_replace(&clnt->prioq, MDTMR, now + HBTMOUT);
+
+            if ((clnt->flags & MD_DOWN)) {
+                clnt->flags &= ~MD_DOWN;
+                dbr_handler_on_up(handler, DBR_CONN_MD);
+            }
+            switch (body.type) {
+            case DBR_SESS_HEARTBT:
+                break;
+            case DBR_VIEW_LIST_REP:
+                for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
+                    struct DbrView* view = dbr_shared_view_entry(node);
+                    node = node->next;
+                    // Transfer ownership.
+                    enrich_view(&clnt->cache, view);
+                    apply_viewup(clnt, view);
+                    dbr_handler_on_view(handler, view);
+                }
+                dbr_handler_on_flush(handler);
+                break;
+            default:
+                dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
+                goto fail1;
+            }
+        }
+        // Repeat while no external events.
+    } while (nevents == 0);
     return nevents;
  fail1:
     return -1;
