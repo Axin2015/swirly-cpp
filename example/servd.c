@@ -39,6 +39,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+enum {
+    TRSOCK,
+    MDSOCK
+};
+
 enum { HBINT_IN = 2000 };
 
 static DbrPool pool = NULL;
@@ -692,61 +697,71 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
 static DbrBool
 run(void)
 {
+    zmq_pollitem_t items[] = {
+        { .socket = trsock, .events = ZMQ_POLLIN }
+    };
     while (!quit) {
         struct DbrMsg req;
         dbr_log_info("receiving...");
-        if (!dbr_recv_msg(trsock, pool, &req)) {
-            if (dbr_err_num() == DBR_EINTR)
-                continue;
-            dbr_err_prints("dbr_recv_msg() failed");
+        const int nevents = zmq_poll(items, 1, -1);
+        if (nevents < 0) {
+            dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
-        dbr_log_info("received '%d' from '%.16s'", req.body.type, req.head.sess);
-        struct DbrBody rep;
-        struct DbrSess* sess = dbr_serv_sess(serv, req.head.sess);
-        if (!sess) {
-            status_err(&rep, req.body.req_id);
-            if (!dbr_send_msg(trsock, req.head.sess, &rep, DBR_FALSE))
-                dbr_err_prints("dbr_send_msg() failed");
-            continue;
-        }
-        switch (req.body.type) {
-        case DBR_SESS_OPEN:
-            sess_open(sess, &req.body);
-            break;
-        case DBR_SESS_CLOSE:
-            sess_close(sess, &req.body);
-            break;
-        case DBR_SESS_LOGON:
-            sess_logon(sess, &req.body);
-            break;
-        case DBR_SESS_LOGOFF:
-            sess_logoff(sess, &req.body);
-            break;
-        case DBR_SESS_HEARTBT:
-            sess_heartbt(sess, &req.body);
-            break;
-        case DBR_PLACE_ORDER_REQ:
-            place_order(sess, &req.body);
-            break;
-        case DBR_REVISE_ORDER_ID_REQ:
-            revise_order_id(sess, &req.body);
-            break;
-        case DBR_REVISE_ORDER_REF_REQ:
-            revise_order_ref(sess, &req.body);
-            break;
-        case DBR_CANCEL_ORDER_ID_REQ:
-            cancel_order_id(sess, &req.body);
-            break;
-        case DBR_CANCEL_ORDER_REF_REQ:
-            cancel_order_ref(sess, &req.body);
-            break;
-        case DBR_ACK_TRADE_REQ:
-            ack_trade(sess, &req.body);
-            break;
-        default:
-            dbr_log_error("invalid body-type '%d'", req.body.type);
-            break;
+        if ((items[TRSOCK].revents & ZMQ_POLLIN)) {
+            if (!dbr_recv_msg(trsock, pool, &req)) {
+                if (dbr_err_num() == DBR_EINTR)
+                    continue;
+                dbr_err_prints("dbr_recv_msg() failed");
+                goto fail1;
+            }
+            dbr_log_info("received '%d' from '%.16s'", req.body.type, req.head.sess);
+            struct DbrBody rep;
+            struct DbrSess* sess = dbr_serv_sess(serv, req.head.sess);
+            if (!sess) {
+                status_err(&rep, req.body.req_id);
+                if (!dbr_send_msg(trsock, req.head.sess, &rep, DBR_FALSE))
+                    dbr_err_prints("dbr_send_msg() failed");
+                continue;
+            }
+            switch (req.body.type) {
+            case DBR_SESS_OPEN:
+                sess_open(sess, &req.body);
+                break;
+            case DBR_SESS_CLOSE:
+                sess_close(sess, &req.body);
+                break;
+            case DBR_SESS_LOGON:
+                sess_logon(sess, &req.body);
+                break;
+            case DBR_SESS_LOGOFF:
+                sess_logoff(sess, &req.body);
+                break;
+            case DBR_SESS_HEARTBT:
+                sess_heartbt(sess, &req.body);
+                break;
+            case DBR_PLACE_ORDER_REQ:
+                place_order(sess, &req.body);
+                break;
+            case DBR_REVISE_ORDER_ID_REQ:
+                revise_order_id(sess, &req.body);
+                break;
+            case DBR_REVISE_ORDER_REF_REQ:
+                revise_order_ref(sess, &req.body);
+                break;
+            case DBR_CANCEL_ORDER_ID_REQ:
+                cancel_order_id(sess, &req.body);
+                break;
+            case DBR_CANCEL_ORDER_REF_REQ:
+                cancel_order_ref(sess, &req.body);
+                break;
+            case DBR_ACK_TRADE_REQ:
+                ack_trade(sess, &req.body);
+                break;
+            default:
+                dbr_log_error("invalid body-type '%d'", req.body.type);
+                break;
+            }
         }
     }
     return DBR_TRUE;

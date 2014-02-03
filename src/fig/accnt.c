@@ -51,8 +51,8 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
         }
         accnt->rec = arec;
         accnt->pool = pool;
-        dbr_tree_init(&accnt->posns);
         dbr_tree_init(&accnt->membs);
+        dbr_tree_init(&accnt->posns);
 
         arec->accnt.state = accnt;
     }
@@ -77,6 +77,7 @@ DBR_EXTERN void
 fig_accnt_clear(struct FigAccnt* accnt)
 {
     free_posns(accnt);
+    dbr_tree_init(&accnt->membs);
 }
 
 DBR_EXTERN struct DbrPosn*
@@ -150,32 +151,6 @@ dbr_accnt_rec(DbrAccnt accnt)
     return fig_accnt_rec(accnt);
 }
 
-// AccntPosn.
-
-DBR_API struct DbrRbNode*
-dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
-{
-    return fig_accnt_find_posn_id(accnt, id);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_posn(DbrAccnt accnt)
-{
-    return fig_accnt_first_posn(accnt);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_last_posn(DbrAccnt accnt)
-{
-    return fig_accnt_last_posn(accnt);
-}
-
-DBR_API DbrBool
-dbr_accnt_empty_posn(DbrAccnt accnt)
-{
-    return fig_accnt_empty_posn(accnt);
-}
-
 // AccntMemb
 
 DBR_API struct DbrRbNode*
@@ -200,4 +175,30 @@ DBR_API DbrBool
 dbr_accnt_empty_memb(DbrAccnt accnt)
 {
     return fig_accnt_empty_memb(accnt);
+}
+
+// AccntPosn.
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_posn_id(accnt, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_posn(DbrAccnt accnt)
+{
+    return fig_accnt_first_posn(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_posn(DbrAccnt accnt)
+{
+    return fig_accnt_last_posn(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_posn(DbrAccnt accnt)
+{
+    return fig_accnt_empty_posn(accnt);
 }

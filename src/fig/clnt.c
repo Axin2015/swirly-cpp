@@ -235,31 +235,52 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
 static DbrBool
 emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
 {
+    DbrBool nomem = DBR_FALSE;
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
+
         DbrTrader trader = memb->trader.rec->trader.state;
         assert(trader);
-        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
-        if (!accnt)
-            return DBR_FALSE;
         // Transfer ownership.
         fig_trader_emplace_memb(trader, memb);
-        fig_accnt_insert_memb(accnt, memb);
+
+        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
+        if (dbr_likely(accnt)) {
+            fig_accnt_insert_memb(accnt, memb);
+        } else {
+            // Member is owned by trader so no need to free here.
+            nomem = DBR_TRUE;
+        }
+    }
+    if (dbr_unlikely(nomem)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return DBR_FALSE;
     }
     return DBR_TRUE;
 }
 
-static void
+static DbrBool
 emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
 {
-    for (struct DbrSlNode* node = first; node; node = node->next) {
+    DbrBool nomem = DBR_FALSE;
+    for (struct DbrSlNode* node = first; node; ) {
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
+        node = node->next;
         // Transfer ownership.
         // All accnts that trader is member of are created in emplace_membs().
-        DbrAccnt accnt = posn->accnt.rec->accnt.state;
-        assert(accnt);
-        fig_accnt_emplace_posn(accnt, posn);
+        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
+        if (dbr_likely(accnt)) {
+            fig_accnt_emplace_posn(accnt, posn);
+        } else {
+            dbr_pool_free_posn(clnt->pool, posn);
+            nomem = DBR_TRUE;
+        }
     }
+    if (dbr_unlikely(nomem)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
 }
 
 static void
@@ -333,11 +354,18 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
     return DBR_TRUE;
 }
 
-static void
+static DbrBool
 apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
-    posn = fig_accnt_update_posn(posn->accnt.rec->accnt.state, posn);
+    DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
+    if (dbr_unlikely(!accnt)) {
+        dbr_pool_free_posn(accnt->pool, posn);
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return DBR_FALSE;
+    }
+    posn = fig_accnt_update_posn(accnt, posn);
     insert_posnup(&clnt->posnups, posn);
+    return DBR_TRUE;
 }
 
 static void
@@ -980,12 +1008,14 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             emplace_exec_list(clnt, body.entity_list_rep.first);
             break;
         case DBR_MEMB_LIST_REP:
-            // This function can fail when out of memory.
-            if (emplace_memb_list(clnt, body.entity_list_rep.first))
+            // This function can fail is there is no memory available for a lazily created account.
+            if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first)))
                 goto fail1;
             break;
         case DBR_POSN_LIST_REP:
-            emplace_posn_list(clnt, body.entity_list_rep.first);
+            // This function can fail is there is no memory available for a lazily created account.
+            if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first)))
+                goto fail1;
             break;
         case DBR_VIEW_LIST_REP:
             emplace_view_list(clnt, body.view_list_rep.first);
@@ -1007,7 +1037,9 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             break;
         case DBR_POSN_REP:
             enrich_posn(&clnt->cache, body.posn_rep.posn);
-            apply_posnup(clnt, body.posn_rep.posn);
+            // This function can fail is there is no memory available for a lazily created account.
+            if (dbr_unlikely(!apply_posnup(clnt, body.posn_rep.posn)))
+                goto fail1;
             dbr_handler_on_posn(handler, body.posn_rep.posn);
             break;
         default:

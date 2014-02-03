@@ -380,12 +380,12 @@
  */
 
 /**
- * @defgroup AccntPosn Position
+ * @defgroup AccntMemb Member
  * @ingroup Accnt
  */
 
 /**
- * @defgroup AccntMemb Member
+ * @defgroup AccntPosn Position
  * @ingroup Accnt
  */
 
