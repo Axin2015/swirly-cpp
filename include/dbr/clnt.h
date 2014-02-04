@@ -41,9 +41,9 @@ typedef struct FigClnt* DbrClnt;
  *
  * @param ctx ZeroMQ context.
  *
- * @param traddr Address of trading endpoint.
- *
  * @param mdaddr Address of market-data endpoint.
+ *
+ * @param traddr Address of trading endpoint.
  *
  * @param seed Seed identifier. Must be positive.
  *
@@ -51,7 +51,7 @@ typedef struct FigClnt* DbrClnt;
  */
 
 DBR_API DbrClnt
-dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mdaddr,
+dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrPool pool);
 
 // No-op if clnt is null.

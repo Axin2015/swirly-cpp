@@ -41,8 +41,8 @@
 #include <string.h>
 
 enum {
-    TRSOCK,
-    MDSOCK
+    MDSOCK,
+    TRSOCK
 };
 
 // Other constants.
@@ -50,21 +50,21 @@ enum {
 enum {
     // Non-negative timer ids are reserved for internal use.
 
-    TRTMR = -2,
-    TRINT = 2000,
-    TRTMOUT = (TRINT * 3) / 2,
-
-    MDTMR = -3,
+    MDTMR = -2,
     MDINT = 2000,
-    MDTMOUT = (MDINT * 3) / 2
+    MDTMOUT = (MDINT * 3) / 2,
+
+    TRTMR = -3,
+    TRINT = 2000,
+    TRTMOUT = (TRINT * 3) / 2
 };
 
 static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
 static DbrServ serv = NULL;
 static void* ctx = NULL;
-static void* trsock = NULL;
 static void* mdsock = NULL;
+static void* trsock = NULL;
 static struct DbrPrioq prioq = { 0 };
 
 static volatile sig_atomic_t quit = DBR_FALSE;
@@ -850,27 +850,27 @@ main(int argc, char* argv[])
         goto exit4;
     }
 
-    trsock = zmq_socket(ctx, ZMQ_ROUTER);
-    if (!trsock) {
+    mdsock = zmq_socket(ctx, ZMQ_PUB);
+    if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit5;
     }
 
-    if (zmq_bind(trsock, "tcp://*:3270") < 0) {
+    if (zmq_bind(mdsock, "tcp://*:3270") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit6;
     }
 
-    mdsock = zmq_socket(ctx, ZMQ_PUB);
-    if (!mdsock) {
+    trsock = zmq_socket(ctx, ZMQ_ROUTER);
+    if (!trsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit6;
     }
 
-    if (zmq_bind(mdsock, "tcp://*:3271") < 0) {
+    if (zmq_bind(trsock, "tcp://*:3271") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit7;
@@ -894,9 +894,9 @@ main(int argc, char* argv[])
  exit8:
     dbr_prioq_term(&prioq);
  exit7:
-    zmq_close(mdsock);
- exit6:
     zmq_close(trsock);
+ exit6:
+    zmq_close(mdsock);
  exit5:
     zmq_ctx_destroy(ctx);
  exit4:

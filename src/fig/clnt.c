@@ -36,8 +36,8 @@
 #include <string.h> // strncpy()
 
 enum {
-    TRSOCK,
-    MDSOCK
+    MDSOCK,
+    TRSOCK
 };
 
 // Other constants.
@@ -49,15 +49,15 @@ enum {
     // with the heartbeat interval.
     HBTMR = -1,
 
+    MDTMR = -2,
+    MDINT = 2000,
+    MDTMOUT = (MDINT * 3) / 2,
+
     // The transaction heartbeat timer is scheduled when the logon request is sent during
     // initialisation.
     TRTMR = -2,
     TRINT = 2000,
     TRTMOUT = (TRINT * 3) / 2,
-
-    MDTMR = -3,
-    MDINT = 2000,
-    MDTMOUT = (MDINT * 3) / 2,
 
     TRADER_PENDING = 0x01,
     ACCNT_PENDING  = 0x02,
@@ -69,8 +69,8 @@ enum {
 
 struct FigClnt {
     struct DbrSess sess;
-    void* trsock;
     void* mdsock;
+    void* trsock;
     DbrIden id;
     DbrPool pool;
     unsigned flags;
@@ -402,7 +402,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mdaddr,
+dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrPool pool)
 {
     // 1.
@@ -419,33 +419,33 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     dbr_tree_init(&clnt->sess.subs);
 
     // 3.
-    void* trsock = zmq_socket(ctx, ZMQ_DEALER);
-    if (!trsock) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail2;
-    }
-    zmq_setsockopt(trsock, ZMQ_IDENTITY, sess, strnlen(sess, DBR_MNEM_MAX));
-
-    if (zmq_connect(trsock, traddr) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail3;
-    }
-
-    // 4.
     void* mdsock = zmq_socket(ctx, ZMQ_SUB);
     if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail3;
+        goto fail2;
     }
     zmq_setsockopt(mdsock, ZMQ_SUBSCRIBE, "", 0);
 
     if (zmq_connect(mdsock, mdaddr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+
+    // 4.
+    void* trsock = zmq_socket(ctx, ZMQ_DEALER);
+    if (!trsock) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+    zmq_setsockopt(trsock, ZMQ_IDENTITY, sess, strnlen(sess, DBR_MNEM_MAX));
+
+    if (zmq_connect(trsock, traddr) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;
     }
 
-    clnt->trsock = trsock;
     clnt->mdsock = mdsock;
+    clnt->trsock = trsock;
     clnt->id = seed;
     clnt->pool = pool;
     clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
@@ -469,15 +469,15 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     if (!clnt->items)
         goto fail6;
 
-    clnt->items[TRSOCK].socket = trsock;
-    clnt->items[TRSOCK].fd = 0;
-    clnt->items[TRSOCK].events = ZMQ_POLLIN;
-    clnt->items[TRSOCK].revents = 0;
-
     clnt->items[MDSOCK].socket = mdsock;
     clnt->items[MDSOCK].fd = 0;
     clnt->items[MDSOCK].events = ZMQ_POLLIN;
     clnt->items[MDSOCK].revents = 0;
+
+    clnt->items[TRSOCK].socket = trsock;
+    clnt->items[TRSOCK].fd = 0;
+    clnt->items[TRSOCK].events = ZMQ_POLLIN;
+    clnt->items[TRSOCK].revents = 0;
 
     clnt->nitems = 2;
 
@@ -505,10 +505,10 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     fig_cache_term(&clnt->cache);
  fail4:
     // 4.
-    zmq_close(mdsock);
+    zmq_close(trsock);
  fail3:
     // 3.
-    zmq_close(trsock);
+    zmq_close(mdsock);
  fail2:
     // 2.
     dbr_sess_term(&clnt->sess);
@@ -533,9 +533,9 @@ dbr_clnt_destroy(DbrClnt clnt)
         // 5.
         fig_cache_term(&clnt->cache);
         // 4.
-        zmq_close(clnt->mdsock);
-        // 3.
         zmq_close(clnt->trsock);
+        // 3.
+        zmq_close(clnt->mdsock);
         // 2.
         dbr_sess_term(&clnt->sess);
         // 1.
