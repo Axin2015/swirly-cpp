@@ -55,7 +55,7 @@ enum {
 
     // The transaction heartbeat timer is scheduled when the logon request is sent during
     // initialisation.
-    TRTMR = -2,
+    TRTMR = -3,
     TRINT = 2000,
     TRTMOUT = (TRINT * 3) / 2,
 
@@ -489,8 +489,8 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
         goto fail7;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT);
     dbr_prioq_push(&clnt->prioq, MDTMR, now + MDTMOUT);
+    dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT);
     return clnt;
  fail7:
     // 8.
@@ -886,19 +886,19 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 if (heartbt(clnt) < 0)
                     goto fail1;
                 // Next heartbeat may have already expired.
-            } else if (id == TRTMR) {
-                // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
-                if (!(clnt->flags & TR_DOWN)) {
-                    clnt->flags |= TR_DOWN;
-                    dbr_handler_on_down(handler, DBR_CONN_TR);
-                }
             } else if (id == MDTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, MDTMR, key + MDTMOUT);
                 if (!(clnt->flags & MD_DOWN)) {
                     clnt->flags |= MD_DOWN;
                     dbr_handler_on_down(handler, DBR_CONN_MD);
+                }
+            } else if (id == TRTMR) {
+                // Cannot fail due to pop.
+                dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
+                if (!(clnt->flags & TR_DOWN)) {
+                    clnt->flags |= TR_DOWN;
+                    dbr_handler_on_down(handler, DBR_CONN_TR);
                 }
             } else {
                 // Assumed that these "top-half" handlers do not block.

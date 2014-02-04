@@ -41,7 +41,6 @@
 #include <string.h>
 
 enum {
-    MDSOCK,
     TRSOCK
 };
 
