@@ -449,7 +449,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     clnt->id = seed;
     clnt->pool = pool;
     clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
-        | VIEW_PENDING | TR_DOWN /*| MD_DOWN*/;
+        | VIEW_PENDING | TR_DOWN | MD_DOWN;
     // 5.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
