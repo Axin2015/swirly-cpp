@@ -715,15 +715,40 @@ run(void)
         { .socket = trsock, .events = ZMQ_POLLIN }
     };
 
-    dbr_prioq_push(&prioq, MDTMR, MDINT * ((dbr_millis() / MDINT) + 1));
+    DbrMillis now = dbr_millis();
+    dbr_prioq_push(&prioq, MDTMR, MDINT * ((now / MDINT) + 1));
 
     while (!quit) {
-        dbr_log_info("receiving...");
-        const int nevents = zmq_poll(items, 1, -1);
+        DbrMillis ms = -1;
+        const struct DbrElem* elem;
+        while ((elem = dbr_prioq_top(&prioq))) {
+            if (elem->key > now) {
+                // Millis until next timeout.
+                ms = elem->key - now;
+                break;
+            }
+            const DbrKey key = elem->key;
+            const DbrIden id = elem->id;
+            dbr_prioq_pop(&prioq);
+
+            if (id == MDTMR) {
+                // Cannot fail due to pop.
+                dbr_prioq_push(&prioq, id, key + MDINT);
+                struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
+                if (!dbr_send_body(mdsock, &body, DBR_FALSE))
+                    goto fail1;
+                // Next heartbeat may have already expired.
+            }
+        }
+
+        const int nevents = zmq_poll(items, 1, ms);
         if (nevents < 0) {
             dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
+        // Current time after slow operation.
+        now = dbr_millis();
+
         if ((items[TRSOCK].revents & ZMQ_POLLIN)) {
             struct DbrMsg req;
             if (!dbr_recv_msg(trsock, pool, &req)) {

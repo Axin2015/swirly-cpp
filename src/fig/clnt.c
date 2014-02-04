@@ -485,7 +485,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* traddr, const char* mda
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
         goto fail7;
 
-    if (!init(clnt))
+    if (init(clnt) < 0)
         goto fail7;
 
     const DbrMillis now = dbr_millis();
@@ -875,7 +875,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 ms = dbr_min(absms, elem->key) - now;
                 break;
             }
-            // Intrenal timeout.
+            // Internal timeout.
             const DbrKey key = elem->key;
             const DbrIden id = elem->id;
             dbr_prioq_pop(&clnt->prioq);
@@ -883,7 +883,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (id == HBTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + clnt->hbint);
-                if (!heartbt(clnt))
+                if (heartbt(clnt) < 0)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (id == TRTMR) {
@@ -919,7 +919,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
-        // Time after slow operation.
+        // Current time after slow operation.
         now = dbr_millis();
 
         struct DbrBody body;
