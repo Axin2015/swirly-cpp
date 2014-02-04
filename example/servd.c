@@ -24,6 +24,7 @@
 #include <dbr/log.h>
 #include <dbr/msg.h>
 #include <dbr/pool.h>
+#include <dbr/prioq.h>
 #include <dbr/queue.h>
 #include <dbr/sess.h>
 #include <dbr/sqlstore.h>
@@ -44,7 +45,19 @@ enum {
     MDSOCK
 };
 
-enum { HBINT_IN = 2000 };
+// Other constants.
+
+enum {
+    // Non-negative timer ids are reserved for internal use.
+
+    TRTMR = -2,
+    TRINT = 2000,
+    TRTMOUT = (TRINT * 3) / 2,
+
+    MDTMR = -3,
+    MDINT = 2000,
+    MDTMOUT = (MDINT * 3) / 2
+};
 
 static DbrPool pool = NULL;
 static DbrSqlStore store = NULL;
@@ -52,6 +65,7 @@ static DbrServ serv = NULL;
 static void* ctx = NULL;
 static void* trsock = NULL;
 static void* mdsock = NULL;
+static struct DbrPrioq prioq = { 0 };
 
 static volatile sig_atomic_t quit = DBR_FALSE;
 
@@ -427,7 +441,7 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req)
 {
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_OPEN,
-                           .sess_open = { .hbint = HBINT_IN } };
+                           .sess_open = { .hbint = TRINT } };
     return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE)
         && sess_trader(sess, 0)
         && sess_accnt(sess, 0)
@@ -700,8 +714,10 @@ run(void)
     zmq_pollitem_t items[] = {
         { .socket = trsock, .events = ZMQ_POLLIN }
     };
+
+    dbr_prioq_push(&prioq, MDTMR, MDINT * ((dbr_millis() / MDINT) + 1));
+
     while (!quit) {
-        struct DbrMsg req;
         dbr_log_info("receiving...");
         const int nevents = zmq_poll(items, 1, -1);
         if (nevents < 0) {
@@ -709,6 +725,7 @@ run(void)
             goto fail1;
         }
         if ((items[TRSOCK].revents & ZMQ_POLLIN)) {
+            struct DbrMsg req;
             if (!dbr_recv_msg(trsock, pool, &req)) {
                 if (dbr_err_num() == DBR_EINTR)
                     continue;
@@ -834,6 +851,9 @@ main(int argc, char* argv[])
         goto exit7;
     }
 
+    if (!dbr_prioq_init(&prioq))
+        goto exit7;
+
     struct sigaction action;
     action.sa_handler = sighandler;
     action.sa_flags = 0;
@@ -842,10 +862,12 @@ main(int argc, char* argv[])
     sigaction(SIGTERM, &action, NULL);
 
     if (!run())
-        goto exit7;
+        goto exit8;
 
     dbr_log_info("exiting...");
     status = 0;
+ exit8:
+    dbr_prioq_term(&prioq);
  exit7:
     zmq_close(mdsock);
  exit6:

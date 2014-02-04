@@ -44,6 +44,11 @@ typedef struct DbrIHandler {
     const struct DbrHandlerVtbl* vtbl;
 }* DbrHandler;
 
+/**
+ * Handler implementations should comprise non-blocking operations to avoid starving the main IO
+ * dispatch loop.
+ */
+
 struct DbrHandlerVtbl {
 
     void
