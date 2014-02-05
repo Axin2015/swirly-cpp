@@ -50,13 +50,13 @@ enum {
     HBTMR = -1,
 
     MDTMR = -2,
-    MDINT = 2000,
+    MDINT = 10000,
     MDTMOUT = (MDINT * 3) / 2,
 
     // The transaction heartbeat timer is scheduled when the logon request is sent during
     // initialisation.
     TRTMR = -3,
-    TRINT = 2000,
+    TRINT = 10000,
     TRTMOUT = (TRINT * 3) / 2,
 
     TRADER_PENDING = 0x01,
