@@ -50,7 +50,7 @@ enum {
     HBTMR = -1,
 
     MDTMR = -2,
-    MDINT = 10000,
+    MDINT = 1000,
     MDTMOUT = (MDINT * 3) / 2,
 
     // The transaction heartbeat timer is scheduled when the logon request is sent during
@@ -84,6 +84,7 @@ struct FigClnt {
     struct DbrPrioq prioq;
     // The heartbeat interval requested by the server.
     DbrMillis hbint;
+    DbrMillis mdlast;
     zmq_pollitem_t* items;
     int nitems;
 };
@@ -407,8 +408,10 @@ apply_viewup(DbrClnt clnt, struct DbrView* view, DbrBool overwrite)
 }
 
 static void
-apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrHandler handler, DbrBool overwrite)
+apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrMillis created, DbrHandler handler)
 {
+    const DbrBool overwrite = clnt->mdlast < created;
+    clnt->mdlast = created;
     for (struct DbrSlNode* node = first; node; ) {
         struct DbrView* view = dbr_shared_view_entry(node);
         node = node->next;
@@ -482,6 +485,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
         goto fail5;
 
     clnt->hbint = 0; // Pending hbint from server's logon message.
+    clnt->mdlast = 0;
 
     // 8.
     clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
@@ -1009,7 +1013,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_VIEW_LIST_REP:
-                apply_views(clnt, body.view_list_rep.first, handler, DBR_TRUE);
+                apply_views(clnt, body.view_list_rep.first, body.view_list_rep.created,
+                            handler);
                 clnt->flags &= ~VIEW_PENDING;
                 break;
             case DBR_EXEC_REP:
@@ -1060,7 +1065,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                         goto fail1;
                     clnt->flags &= ~INIT_PENDING;
                 } else
-                    apply_views(clnt, body.view_list_rep.first, handler, DBR_TRUE);
+                    apply_views(clnt, body.view_list_rep.first, body.view_list_rep.created,
+                                handler);
                 break;
             default:
                 dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
