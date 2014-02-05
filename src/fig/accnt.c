@@ -87,21 +87,21 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
     const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
     if (node != &posn->accnt_node_) {
-        struct DbrPosn* curr = dbr_accnt_posn_entry(node);
+        struct DbrPosn* exist = dbr_accnt_posn_entry(node);
 
         // Update existing position.
 
-        assert(curr->accnt.rec == posn->accnt.rec);
-        assert(curr->contr.rec == posn->contr.rec);
-        assert(curr->settl_date == posn->settl_date);
+        assert(exist->accnt.rec == posn->accnt.rec);
+        assert(exist->contr.rec == posn->contr.rec);
+        assert(exist->settl_date == posn->settl_date);
 
-        curr->buy_licks = posn->buy_licks;
-        curr->buy_lots = posn->buy_lots;
-        curr->sell_licks = posn->sell_licks;
-        curr->sell_lots = posn->sell_lots;
+        exist->buy_licks = posn->buy_licks;
+        exist->buy_lots = posn->buy_lots;
+        exist->sell_licks = posn->sell_licks;
+        exist->sell_lots = posn->sell_lots;
 
         dbr_pool_free_posn(accnt->pool, posn);
-        posn = curr;
+        posn = exist;
     }
     return posn;
 }

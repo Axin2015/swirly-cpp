@@ -178,7 +178,7 @@ flush_posnup(struct DbrPosn* posn)
 }
 
 static DbrBool
-flush_bookup(void)
+mdflush(void)
 {
     struct DbrBody rep;
 
@@ -204,14 +204,16 @@ flush_bookup(void)
     free_view_list(q.first);
     if (!ok)
         dbr_err_prints("dbr_send_body() failed");
+    dbr_serv_mdclear(serv);
     return ok;
  fail1:
     free_view_list(q.first);
+    dbr_serv_mdclear(serv);
     return DBR_FALSE;
 }
 
 static DbrBool
-flush(struct DbrSess* sess, const struct DbrBody* req)
+trflush(struct DbrSess* sess, const struct DbrBody* req)
 {
     const DbrIden req_id = req->req_id;
     {
@@ -241,13 +243,10 @@ flush(struct DbrSess* sess, const struct DbrBody* req)
             goto fail1;
     }
 
-    if (!flush_bookup())
-        goto fail1;
-
-    dbr_serv_clear(serv);
+    dbr_serv_trclear(serv);
     return DBR_TRUE;
  fail1:
-    dbr_serv_clear(serv);
+    dbr_serv_trclear(serv);
     return DBR_FALSE;
 }
 
@@ -510,7 +509,6 @@ sess_heartbt(struct DbrSess* sess, const struct DbrBody* req)
 {
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_HEARTBT };
-    dbr_send_body(mdsock, &rep, DBR_FALSE);
     return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
 }
 
@@ -561,7 +559,7 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(sess, req);
+    return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -588,7 +586,7 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(sess, req);
+    return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -615,7 +613,7 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(sess, req);
+    return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -641,7 +639,7 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(sess, req);
+    return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -667,7 +665,7 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    return flush(sess, req);
+    return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
@@ -733,8 +731,7 @@ run(void)
             if (id == MDTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&prioq, id, key + MDINT);
-                struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
-                if (!dbr_send_body(mdsock, &body, DBR_FALSE))
+                if (!mdflush())
                     goto fail1;
                 // Next heartbeat may have already expired.
             }

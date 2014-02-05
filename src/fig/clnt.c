@@ -59,12 +59,13 @@ enum {
     TRINT = 10000,
     TRTMOUT = (TRINT * 3) / 2,
 
-    TRADER_PENDING = 0x01,
-    ACCNT_PENDING  = 0x02,
-    CONTR_PENDING  = 0x04,
-    VIEW_PENDING   = 0x08,
-    TR_DOWN        = 0x10,
-    MD_DOWN        = 0x20
+    INIT_PENDING   = 0x01,
+    TRADER_PENDING = 0x02,
+    ACCNT_PENDING  = 0x04,
+    CONTR_PENDING  = 0x08,
+    VIEW_PENDING   = 0x10,
+    TR_DOWN        = 0x20,
+    MD_DOWN        = 0x40
 };
 
 struct FigClnt {
@@ -186,13 +187,21 @@ get_trader(DbrClnt clnt, DbrIden tid)
 }
 
 static DbrIden
-init(DbrClnt clnt)
+init(DbrClnt clnt, DbrMillis now)
 {
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+        goto fail1;
+
     struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_OPEN,
                             .sess_open = { .hbint = TRINT } };
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
-        return -1;
+        goto fail1;
+
+    dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT);
     return body.req_id;
+ fail1:
+    return -1;
 }
 
 static DbrIden
@@ -288,17 +297,6 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
     return DBR_TRUE;
 }
 
-static void
-emplace_view_list(DbrClnt clnt, struct DbrSlNode* first)
-{
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrView* view = enrich_view(&clnt->cache, dbr_shared_view_entry(node));
-        dbr_tree_insert(&clnt->views, dbr_book_key(view->contr.rec->id, view->settl_date),
-                        &view->clnt_node_);
-    }
-    clnt->flags &= ~VIEW_PENDING;
-}
-
 static struct DbrOrder*
 create_order(DbrClnt clnt, struct DbrExec* exec)
 {
@@ -374,31 +372,52 @@ apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 }
 
 static void
-apply_viewup(DbrClnt clnt, struct DbrView* view)
+apply_viewup(DbrClnt clnt, struct DbrView* view, DbrBool overwrite)
 {
     const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
     if (node != &view->clnt_node_) {
-        struct DbrView* curr = dbr_clnt_view_entry(node);
+
+        // Drop if node already exists and overwrite is not set.
+        if (dbr_unlikely(!overwrite)) {
+            dbr_pool_free_view(clnt->pool, view);
+            return;
+        }
+
+        struct DbrView* exist = dbr_clnt_view_entry(node);
 
         // Update existing position.
 
-        assert(curr->contr.rec == view->contr.rec);
-        assert(curr->settl_date == view->settl_date);
+        assert(exist->contr.rec == view->contr.rec);
+        assert(exist->settl_date == view->settl_date);
 
         for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
-            curr->bid_ticks[i] = view->bid_ticks[i];
-            curr->bid_lots[i] = view->bid_lots[i];
-            curr->bid_count[i] = view->bid_count[i];
-            curr->ask_ticks[i] = view->ask_ticks[i];
-            curr->ask_lots[i] = view->ask_lots[i];
-            curr->ask_count[i] = view->ask_count[i];
+            exist->bid_ticks[i] = view->bid_ticks[i];
+            exist->bid_lots[i] = view->bid_lots[i];
+            exist->bid_count[i] = view->bid_count[i];
+            exist->ask_ticks[i] = view->ask_ticks[i];
+            exist->ask_lots[i] = view->ask_lots[i];
+            exist->ask_count[i] = view->ask_count[i];
         }
 
         dbr_pool_free_view(clnt->pool, view);
-        view = curr;
+        view = exist;
     }
     insert_viewup(&clnt->viewups, view);
+}
+
+static void
+apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrHandler handler, DbrBool overwrite)
+{
+    for (struct DbrSlNode* node = first; node; ) {
+        struct DbrView* view = dbr_shared_view_entry(node);
+        node = node->next;
+        // Transfer ownership or free.
+        enrich_view(&clnt->cache, view);
+        apply_viewup(clnt, view, overwrite);
+        dbr_handler_on_view(handler, view);
+    }
+    dbr_handler_on_flush(handler);
 }
 
 DBR_API DbrClnt
@@ -448,7 +467,7 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
     clnt->trsock = trsock;
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->flags = TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
+    clnt->flags = INIT_PENDING | TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
         | VIEW_PENDING | TR_DOWN | MD_DOWN;
     // 5.
     fig_cache_init(&clnt->cache, term_state, pool);
@@ -481,16 +500,9 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
 
     clnt->nitems = 2;
 
-    // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 2))
+    if (!dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT))
         goto fail7;
 
-    if (init(clnt) < 0)
-        goto fail7;
-
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, MDTMR, now + MDTMOUT);
-    dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT);
     return clnt;
  fail7:
     // 8.
@@ -997,7 +1009,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_VIEW_LIST_REP:
-                emplace_view_list(clnt, body.view_list_rep.first);
+                apply_views(clnt, body.view_list_rep.first, handler, DBR_TRUE);
+                clnt->flags &= ~VIEW_PENDING;
                 break;
             case DBR_EXEC_REP:
                 enrich_exec(&clnt->cache, body.exec_rep.exec);
@@ -1041,18 +1054,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_handler_on_up(handler, DBR_CONN_MD);
             }
             switch (body.type) {
-            case DBR_SESS_HEARTBT:
-                break;
             case DBR_VIEW_LIST_REP:
-                for (struct DbrSlNode* node = body.view_list_rep.first; node; ) {
-                    struct DbrView* view = dbr_shared_view_entry(node);
-                    node = node->next;
-                    // Transfer ownership.
-                    enrich_view(&clnt->cache, view);
-                    apply_viewup(clnt, view);
-                    dbr_handler_on_view(handler, view);
-                }
-                dbr_handler_on_flush(handler);
+                if (dbr_unlikely(clnt->flags & INIT_PENDING)) {
+                    if (init(clnt, now) < 0)
+                        goto fail1;
+                    clnt->flags &= ~INIT_PENDING;
+                } else
+                    apply_views(clnt, body.view_list_rep.first, handler, DBR_TRUE);
                 break;
             default:
                 dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
