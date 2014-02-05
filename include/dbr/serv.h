@@ -131,7 +131,17 @@ DBR_API DbrBool
 dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id);
 
 DBR_API void
-dbr_serv_clear(DbrServ serv);
+dbr_serv_mdclear(DbrServ serv);
+
+DBR_API void
+dbr_serv_trclear(DbrServ serv);
+
+static inline void
+dbr_serv_clear(DbrServ serv)
+{
+    dbr_serv_mdclear(serv);
+    dbr_serv_trclear(serv);
+}
 
 /**
  * @addtogroup ServExec

@@ -826,7 +826,13 @@ dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id)
 }
 
 DBR_API void
-dbr_serv_clear(DbrServ serv)
+dbr_serv_mdclear(DbrServ serv)
+{
+    dbr_tree_init(&serv->bookups);
+}
+
+DBR_API void
+dbr_serv_trclear(DbrServ serv)
 {
     struct DbrSlNode* node = serv->execs.first;
     while (node) {
@@ -844,7 +850,6 @@ dbr_serv_clear(DbrServ serv)
     }
     dbr_queue_init(&serv->execs);
     dbr_tree_init(&serv->posnups);
-    dbr_tree_init(&serv->bookups);
 }
 
 DBR_API struct DbrSlNode*

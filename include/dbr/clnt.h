@@ -158,7 +158,17 @@ DBR_API int
 dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 DBR_API void
-dbr_clnt_clear(DbrClnt clnt);
+dbr_clnt_mdclear(DbrClnt clnt);
+
+DBR_API void
+dbr_clnt_trclear(DbrClnt clnt);
+
+static inline void
+dbr_clnt_clear(DbrClnt clnt)
+{
+    dbr_clnt_mdclear(clnt);
+    dbr_clnt_trclear(clnt);
+}
 
 /**
  * @addtogroup ClntExec

@@ -1067,7 +1067,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 }
 
 DBR_API void
-dbr_clnt_clear(DbrClnt clnt)
+dbr_clnt_mdclear(DbrClnt clnt)
+{
+    dbr_tree_init(&clnt->viewups);
+}
+
+DBR_API void
+dbr_clnt_trclear(DbrClnt clnt)
 {
     struct DbrSlNode* node = clnt->execs.first;
     while (node) {
@@ -1085,7 +1091,6 @@ dbr_clnt_clear(DbrClnt clnt)
     }
     dbr_queue_init(&clnt->execs);
     dbr_tree_init(&clnt->posnups);
-    dbr_tree_init(&clnt->viewups);
 }
 
 DBR_API struct DbrSlNode*
