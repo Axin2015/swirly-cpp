@@ -288,6 +288,7 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
             ++body->view_list_rep.count_;
         }
         n += dbr_packlenz(body->view_list_rep.count_);
+        n += dbr_packlenl(body->view_list_rep.created);
         break;
     case DBR_EXEC_REP:
         n += dbr_exec_len(body->exec_rep.exec, enriched);
@@ -437,6 +438,7 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
             struct DbrView* view = dbr_shared_view_entry(node);
             buf = dbr_write_view(buf, view, enriched);
         }
+        buf = dbr_packl(buf, body->view_list_rep.created);
         break;
     case DBR_EXEC_REP:
         buf = dbr_write_exec(buf, body->exec_rep.exec, enriched);
@@ -632,6 +634,10 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             }
         }
         body->view_list_rep.first = dbr_queue_first(&q);
+        if (!(buf = dbr_unpackl(buf, &body->view_list_rep.created))) {
+            free_view_list(body->view_list_rep.first, pool);
+            goto fail1;
+        }
         break;
     case DBR_EXEC_REP:
         // Exec.

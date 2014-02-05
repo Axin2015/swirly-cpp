@@ -178,7 +178,7 @@ flush_posnup(struct DbrPosn* posn)
 }
 
 static DbrBool
-mdflush(void)
+mdflush(DbrMillis now)
 {
     struct DbrBody rep;
 
@@ -199,6 +199,7 @@ mdflush(void)
     rep.req_id = 0;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
+    rep.view_list_rep.created = now;
 
     const DbrBool ok = dbr_send_body(mdsock, &rep, DBR_TRUE);
     free_view_list(q.first);
@@ -299,7 +300,7 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
 }
 
 static DbrBool
-sess_book(struct DbrSess* sess, DbrIden req_id)
+sess_book(struct DbrSess* sess, DbrIden req_id, DbrMillis now)
 {
     struct DbrBody rep;
 
@@ -319,6 +320,7 @@ sess_book(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
+    rep.view_list_rep.created = now;
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
@@ -435,7 +437,7 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
-sess_open(struct DbrSess* sess, const struct DbrBody* req)
+sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
 {
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_OPEN,
@@ -444,7 +446,7 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req)
         && sess_trader(sess, 0)
         && sess_accnt(sess, 0)
         && sess_contr(sess, 0)
-        && sess_book(sess, 0);
+        && sess_book(sess, 0, now);
 }
 
 static DbrBool
@@ -731,7 +733,7 @@ run(void)
             if (id == MDTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&prioq, id, key + MDINT);
-                if (!mdflush())
+                if (!mdflush(key))
                     goto fail1;
                 // Next heartbeat may have already expired.
             }
@@ -764,7 +766,7 @@ run(void)
             switch (req.body.type) {
             case DBR_SESS_OPEN:
                 dbr_log_info("session open from '%.16s'", req.head.sess);
-                sess_open(sess, &req.body);
+                sess_open(sess, &req.body, now);
                 break;
             case DBR_SESS_CLOSE:
                 dbr_log_info("session close from '%.16s'", req.head.sess);
