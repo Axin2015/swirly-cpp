@@ -640,6 +640,10 @@ dbr_sess_sub_entry(struct DbrRbNode* node)
 struct DbrSess {
     DbrMnem mnem;
     DbrPool pool;
+    /**
+     * The heartbeat interval requested by remote side.
+     */
+    DbrMillis hbint;
     struct DbrTree subs;
     struct DbrTree traders;
     /**

@@ -49,13 +49,12 @@ enum {
 enum {
     // Non-negative timer ids are reserved for internal use.
 
-    MDTMR = -2,
+    MDTMR = -1,
     MDINT = 1000,
     MDTMOUT = (MDINT * 3) / 2,
 
-    TRTMR = -3,
     TRINT = 10000,
-    TRTMOUT = (TRINT * 3) / 2
+    TRTMOUT = (MDINT * 3) / 2
 };
 
 static DbrPool pool = NULL;
@@ -67,6 +66,37 @@ static void* trsock = NULL;
 static struct DbrPrioq prioq = { 0 };
 
 static volatile sig_atomic_t quit = DBR_FALSE;
+
+static inline DbrBool
+is_hbtmr(DbrKey tmr)
+{
+    // Heartbeat timers are even numbered.
+    return (tmr & 0x1) == 0;
+}
+
+static inline DbrKey
+sess_to_hbtmr(struct DbrSess* sess)
+{
+    return (DbrKey)sess;
+}
+
+static inline struct DbrSess*
+hbtmr_to_sess(DbrKey hbtmr)
+{
+    return (struct DbrSess*)hbtmr;
+}
+
+static inline DbrKey
+sess_to_trtmr(struct DbrSess* sess)
+{
+    return ((DbrKey)sess) + 1;
+}
+
+static inline struct DbrSess*
+trtmr_to_sess(DbrKey trtmr)
+{
+    return (struct DbrSess*)(trtmr - 1);
+}
 
 static void
 free_view_list(struct DbrSlNode* first)
@@ -736,6 +766,9 @@ run(void)
                 if (!mdflush(key))
                     goto fail1;
                 // Next heartbeat may have already expired.
+            } else if (is_hbtmr(id)) {
+            } else {
+                assert(id & 0x1);
             }
         }
 

@@ -82,8 +82,6 @@ struct FigClnt {
     struct DbrTree posnups;
     struct DbrTree viewups;
     struct DbrPrioq prioq;
-    // The heartbeat interval requested by the server.
-    DbrMillis hbint;
     DbrMillis mdlast;
     zmq_pollitem_t* items;
     int nitems;
@@ -412,6 +410,8 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrMillis created, DbrHandler
 {
     const DbrBool overwrite = clnt->mdlast < created;
     clnt->mdlast = created;
+    if (dbr_unlikely(!overwrite))
+        dbr_log_warn("received stale market-data");
     for (struct DbrSlNode* node = first; node; ) {
         struct DbrView* view = dbr_shared_view_entry(node);
         node = node->next;
@@ -437,6 +437,8 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
     // 2.
     dbr_sess_init(&clnt->sess);
     strncpy(clnt->sess.mnem, sess, DBR_MNEM_MAX);
+    clnt->sess.pool = pool;
+    clnt->sess.hbint = 0;
     dbr_tree_init(&clnt->sess.traders);
     dbr_tree_init(&clnt->sess.subs);
 
@@ -484,7 +486,6 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail5;
 
-    clnt->hbint = 0; // Pending hbint from server's logon message.
     clnt->mdlast = 0;
 
     // 8.
@@ -617,7 +618,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -644,7 +645,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -684,7 +685,7 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -713,7 +714,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, Dbr
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -742,7 +743,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -770,7 +771,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -798,7 +799,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis m
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -828,7 +829,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->hbint);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
@@ -898,7 +899,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
             if (id == HBTMR) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, id, key + clnt->hbint);
+                dbr_prioq_push(&clnt->prioq, id, key + clnt->sess.hbint);
                 if (heartbt(clnt) < 0)
                     goto fail1;
                 // Next heartbeat may have already expired.
@@ -956,8 +957,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             }
             switch (body.type) {
             case DBR_SESS_OPEN:
-                clnt->hbint = body.sess_open.hbint;
-                if (!dbr_prioq_push(&clnt->prioq, HBTMR, now + clnt->hbint))
+                clnt->sess.hbint = body.sess_open.hbint;
+                if (!dbr_prioq_push(&clnt->prioq, HBTMR, now + clnt->sess.hbint))
                     goto fail1;
                 break;
             case DBR_SESS_CLOSE:
