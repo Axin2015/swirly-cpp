@@ -54,7 +54,7 @@ enum {
     MDTMOUT = (MDINT * 3) / 2,
 
     TRINT = 5000,
-    TRTMOUT = (MDINT * 3) / 2
+    TRTMOUT = (TRINT * 3) / 2
 };
 
 static DbrPool pool = NULL;
@@ -470,7 +470,7 @@ static DbrBool
 sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
 {
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&prioq, dbr_prioq_size(&prioq) + 1))
+    if (!dbr_prioq_reserve(&prioq, dbr_prioq_size(&prioq) + 2))
         goto fail1;
 
     sess->hbint = req->sess_open.hbint;
@@ -483,15 +483,17 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
         && sess_accnt(sess, 0)
         && sess_contr(sess, 0)
         && sess_book(sess, 0, now)
-        && dbr_prioq_push(&prioq, sess_to_hbtmr(sess), now + sess->hbint);
+        && dbr_prioq_push(&prioq, sess_to_hbtmr(sess), now + sess->hbint)
+        && dbr_prioq_push(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
  fail1:
     return DBR_FALSE;
 }
 
 static DbrBool
-sess_close(struct DbrSess* sess, const struct DbrBody* req)
+sess_close(struct DbrSess* sess)
 {
     dbr_prioq_remove(&prioq, sess_to_hbtmr(sess));
+    dbr_prioq_remove(&prioq, sess_to_trtmr(sess));
     return DBR_TRUE;
 }
 
@@ -785,6 +787,9 @@ run(void)
                     goto fail1;
             } else {
                 assert(id & 0x1);
+                struct DbrSess* sess = trtmr_to_sess(id);
+                dbr_log_info("session timeout on '%.16s'", sess->mnem);
+                sess_close(sess);
             }
         }
 
@@ -819,43 +824,52 @@ run(void)
                 break;
             case DBR_SESS_CLOSE:
                 dbr_log_info("session close from '%.16s'", req.head.sess);
-                sess_close(sess, &req.body);
+                sess_close(sess);
                 break;
             case DBR_SESS_LOGON:
                 dbr_log_info("session logon from '%.16s'", req.head.sess);
                 sess_logon(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_SESS_LOGOFF:
                 dbr_log_info("session logoff '%.16s'", req.head.sess);
                 sess_logoff(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_SESS_HEARTBT:
                 dbr_log_info("session heartbeat from '%.16s'", req.head.sess);
                 sess_heartbt(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_PLACE_ORDER_REQ:
                 dbr_log_info("place order request from '%.16s'", req.head.sess);
                 place_order(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_REVISE_ORDER_ID_REQ:
                 dbr_log_info("revise order by id request from '%.16s'", req.head.sess);
                 revise_order_id(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_REVISE_ORDER_REF_REQ:
                 dbr_log_info("revise order by ref request from '%.16s'", req.head.sess);
                 revise_order_ref(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_CANCEL_ORDER_ID_REQ:
                 dbr_log_info("cancel order by id request from '%.16s'", req.head.sess);
                 cancel_order_id(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_CANCEL_ORDER_REF_REQ:
                 dbr_log_info("cancel order by ref request from '%.16s'", req.head.sess);
                 cancel_order_ref(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_ACK_TRADE_REQ:
                 dbr_log_info("acknowledge trade request from '%.16s'", req.head.sess);
                 ack_trade(sess, &req.body);
+                dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             default:
                 dbr_log_error("invalid body-type '%d'", req.body.type);
