@@ -56,7 +56,7 @@ enum {
     // The transaction heartbeat timer is scheduled when the logon request is sent during
     // initialisation.
     TRTMR = -3,
-    TRINT = 10000,
+    TRINT = 5000,
     TRTMOUT = (TRINT * 3) / 2,
 
     INIT_PENDING   = 0x01,
@@ -201,15 +201,6 @@ init(DbrClnt clnt, DbrMillis now)
     return body.req_id;
  fail1:
     return -1;
-}
-
-static DbrIden
-heartbt(DbrClnt clnt)
-{
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_HEARTBT };
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
-        return -1;
-    return body.req_id;
 }
 
 static void
@@ -900,7 +891,8 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (id == HBTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + clnt->sess.hbint);
-                if (heartbt(clnt) < 0)
+                struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
+                if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (id == MDTMR) {

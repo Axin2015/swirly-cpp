@@ -53,7 +53,7 @@ enum {
     MDINT = 1000,
     MDTMOUT = (MDINT * 3) / 2,
 
-    TRINT = 10000,
+    TRINT = 5000,
     TRTMOUT = (MDINT * 3) / 2
 };
 
@@ -469,6 +469,12 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
 static DbrBool
 sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
 {
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&prioq, dbr_prioq_size(&prioq) + 1))
+        goto fail1;
+
+    sess->hbint = req->sess_open.hbint;
+
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_OPEN,
                            .sess_open = { .hbint = TRINT } };
@@ -476,12 +482,16 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
         && sess_trader(sess, 0)
         && sess_accnt(sess, 0)
         && sess_contr(sess, 0)
-        && sess_book(sess, 0, now);
+        && sess_book(sess, 0, now)
+        && dbr_prioq_push(&prioq, sess_to_hbtmr(sess), now + sess->hbint);
+ fail1:
+    return DBR_FALSE;
 }
 
 static DbrBool
 sess_close(struct DbrSess* sess, const struct DbrBody* req)
 {
+    dbr_prioq_remove(&prioq, sess_to_hbtmr(sess));
     return DBR_TRUE;
 }
 
@@ -767,6 +777,12 @@ run(void)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (is_hbtmr(id)) {
+                struct DbrSess* sess = hbtmr_to_sess(id);
+                dbr_log_info("session heartbeat to '%.16s'", sess->mnem);
+                dbr_prioq_push(&prioq, id, key + sess->hbint);
+                struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
+                if (!dbr_send_body(trsock, &body, DBR_FALSE))
+                    goto fail1;
             } else {
                 assert(id & 0x1);
             }
