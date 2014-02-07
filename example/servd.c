@@ -490,11 +490,12 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
 }
 
 static DbrBool
-sess_close(struct DbrSess* sess)
+sess_close(struct DbrSess* sess, DbrIden req_id)
 {
     dbr_prioq_remove(&prioq, sess_to_hbtmr(sess));
     dbr_prioq_remove(&prioq, sess_to_trtmr(sess));
-    return DBR_TRUE;
+    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_CLOSE };
+    return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
 }
 
 static DbrBool
@@ -546,14 +547,6 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
         dbr_err_prints("dbr_send_msg() failed");
     return DBR_FALSE;
-}
-
-static DbrBool
-sess_heartbt(struct DbrSess* sess, const struct DbrBody* req)
-{
-    const DbrIden req_id = req->req_id;
-    struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_HEARTBT };
-    return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
 }
 
 static DbrBool
@@ -783,13 +776,13 @@ run(void)
                 dbr_log_info("session heartbeat to '%.16s'", sess->mnem);
                 dbr_prioq_push(&prioq, id, key + sess->hbint);
                 struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
-                if (!dbr_send_body(trsock, &body, DBR_FALSE))
+                if (!dbr_send_msg(trsock, sess->mnem, &body, DBR_FALSE))
                     goto fail1;
             } else {
                 assert(id & 0x1);
                 struct DbrSess* sess = trtmr_to_sess(id);
                 dbr_log_info("session timeout on '%.16s'", sess->mnem);
-                sess_close(sess);
+                sess_close(sess, 0);
             }
         }
 
@@ -824,7 +817,7 @@ run(void)
                 break;
             case DBR_SESS_CLOSE:
                 dbr_log_info("session close from '%.16s'", req.head.sess);
-                sess_close(sess);
+                sess_close(sess, req.body.req_id);
                 break;
             case DBR_SESS_LOGON:
                 dbr_log_info("session logon from '%.16s'", req.head.sess);
@@ -838,7 +831,6 @@ run(void)
                 break;
             case DBR_SESS_HEARTBT:
                 dbr_log_info("session heartbeat from '%.16s'", req.head.sess);
-                sess_heartbt(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_PLACE_ORDER_REQ:
