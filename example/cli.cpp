@@ -59,7 +59,7 @@ using namespace std::placeholders;
 
 namespace {
 
-enum { BUF_MAX = 128, TIMEOUT = 5000 };
+enum { BUF_MAX = 128, TMOUT = 5000 };
 
 typedef int Arity;
 typedef vector<string>::const_iterator Arg;
@@ -638,7 +638,7 @@ public:
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.ack_trade(trader_, id, TIMEOUT);
+            clnt_.ack_trade(trader_, id, TMOUT);
         }
     }
     void
@@ -649,7 +649,7 @@ public:
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(trader_, id, TIMEOUT);
+            clnt_.cancel(trader_, id, TMOUT);
         }
     }
     void
@@ -737,14 +737,14 @@ public:
         auto it = clnt_.trecs().find(mnem.c_str());
         if (it == clnt_.trecs().end())
             throw InvalidArgument(mnem);
-        clnt_.logon(clnt_.trader(*it), TIMEOUT);
+        clnt_.logon(clnt_.trader(*it), TMOUT);
     }
     void
     logoff(Arg begin, Arg end)
     {
         if (!trader_)
             throw InvalidState("not logged-on");
-        clnt_.logoff(trader_, TIMEOUT);
+        clnt_.logoff(trader_, TMOUT);
     }
     void
     orders(Arg begin, Arg end)
@@ -814,7 +814,7 @@ public:
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
         clnt_.place(trader_, accnt_, *crec_, settl_date_,
-                    nullptr, action, ticks, lots, 0, TIMEOUT);
+                    nullptr, action, ticks, lots, 0, TMOUT);
     }
     void
     posns(Arg begin, Arg end)
@@ -854,6 +854,7 @@ public:
     void
     quit(Arg begin, Arg end)
     {
+        clnt_.close(TMOUT);
         throw Quit();
     }
     void
@@ -865,7 +866,7 @@ public:
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        clnt_.revise(trader_, id, lots, TIMEOUT);
+        clnt_.revise(trader_, id, lots, TMOUT);
     }
     void
     set(Arg begin, Arg end)

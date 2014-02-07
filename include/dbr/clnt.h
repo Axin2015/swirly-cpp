@@ -59,6 +59,9 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
 DBR_API void
 dbr_clnt_destroy(DbrClnt clnt);
 
+DBR_API DbrIden
+dbr_clnt_close(DbrClnt clnt, DbrMillis ms);
+
 /**
  * @addtogroup ClntRec
  * @{

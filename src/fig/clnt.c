@@ -551,6 +551,31 @@ dbr_clnt_destroy(DbrClnt clnt)
     }
 }
 
+DBR_API DbrIden
+dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
+{
+    if (clnt->flags != 0) {
+        dbr_err_set(DBR_EBUSY, "client not ready");
+        goto fail1;
+    }
+
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_CLOSE };
+
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+        goto fail1;
+
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+        goto fail1;
+
+    const DbrMillis now = dbr_millis();
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
+    return body.req_id;
+ fail1:
+    return -1;
+}
+
 DBR_API struct DbrSlNode*
 dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
 {

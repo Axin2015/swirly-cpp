@@ -796,6 +796,14 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    DbrIden
+    close(DbrMillis ms)
+    {
+        DbrIden req_id = dbr_clnt_close(impl_, ms);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
     /**
      * @addtogroup ClntRec
      * @{
