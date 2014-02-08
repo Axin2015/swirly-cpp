@@ -64,8 +64,9 @@ enum {
     ACCNT_PENDING  = 0x04,
     CONTR_PENDING  = 0x08,
     VIEW_PENDING   = 0x10,
-    TR_DOWN        = 0x20,
-    MD_DOWN        = 0x40
+    TR_CLOSED      = 0x20,
+    TR_DOWN        = 0x40,
+    MD_DOWN        = 0x80
 };
 
 struct FigClnt {
@@ -852,7 +853,13 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
 }
 
 DBR_API DbrBool
-dbr_clnt_ready(DbrClnt clnt)
+dbr_clnt_is_open(DbrClnt clnt)
+{
+    return (clnt->flags & TR_CLOSED) == 0;
+}
+
+DBR_API DbrBool
+dbr_clnt_is_ready(DbrClnt clnt)
 {
     return clnt->flags == 0;
 }
@@ -968,7 +975,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
             dbr_prioq_replace(&clnt->prioq, TRTMR, now + TRTMOUT);
 
-            if ((clnt->flags & TR_DOWN) && body.type != DBR_SESS_CLOSE) {
+            if (body.type != DBR_SESS_CLOSE && (clnt->flags & (TR_CLOSED | TR_DOWN)) == TR_DOWN) {
                 clnt->flags &= ~TR_DOWN;
                 dbr_handler_on_up(handler, DBR_CONN_TR);
             }
@@ -979,7 +986,7 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_SESS_CLOSE:
-                clnt->flags |= TR_DOWN;
+                clnt->flags |= (TR_CLOSED | TR_DOWN);
                 dbr_handler_on_down(handler, DBR_CONN_TR);
                 break;
             case DBR_SESS_LOGON:

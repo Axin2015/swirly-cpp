@@ -910,9 +910,14 @@ public:
         return req_id;
     }
     bool
-    ready() const noexcept
+    is_open() const noexcept
     {
-        return dbr_clnt_ready(impl_) == DBR_TRUE;
+        return dbr_clnt_is_open(impl_) == DBR_TRUE;
+    }
+    bool
+    is_ready() const noexcept
+    {
+        return dbr_clnt_is_ready(impl_) == DBR_TRUE;
     }
     DbrIden
     settimer(DbrMillis absms)

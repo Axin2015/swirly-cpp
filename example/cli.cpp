@@ -149,8 +149,6 @@ public:
     }
 };
 
-struct Quit { };
-
 template <typename T>
 class JoinIterator : public iterator<output_iterator_tag, void, void, void, void> {
     ostream* os_;
@@ -258,10 +256,8 @@ class Repl {
     typedef pair<Arity, function<void (Arg, Arg)> > Cmd;
     typedef map<string, Cmd> Cmds;
     Cmds cmds_;
-    bool quit_;
 public:
     Repl() noexcept
-    :   quit_(false)
     {
     }
     void
@@ -285,8 +281,6 @@ public:
                     cerr << "invalid argument: " << e.what() << endl;
                 } catch (const InvalidState& e) {
                     cerr << "invalid state: " << e.what() << endl;
-                } catch (const Quit&) {
-                    quit_ = true;
                 }
             } else
                 cerr << "invalid argument(s): " << join(begin, end) << endl;
@@ -315,7 +309,7 @@ public:
                 }
             });
         string line;
-        while (!quit_ && getline(is, line)) {
+        while (getline(is, line)) {
             line += '\n';
             try {
                 lexer.exec(line.data(), line.size());
@@ -323,16 +317,6 @@ public:
                 cerr << e.what() << endl;
             }
         }
-    }
-    void
-    set_quit(bool quit = true) noexcept
-    {
-        quit_ = quit;
-    }
-    bool
-    quit() const noexcept
-    {
-        return quit_;
     }
 };
 
@@ -386,7 +370,7 @@ public:
         do {
             cout << '.';
             clnt_.poll(250, this);
-        } while (!clnt_.ready());
+        } while (!clnt_.is_ready());
         cout << endl;
     }
     void
@@ -855,7 +839,6 @@ public:
     quit(Arg begin, Arg end)
     {
         clnt_.close(TMOUT);
-        throw Quit();
     }
     void
     revise(Arg begin, Arg end)
@@ -1110,7 +1093,7 @@ main(int argc, char* argv[])
         cout << "> ";
         cout.flush();
         char buf[BUF_MAX];
-        while (!repl.quit()) {
+        do {
 
             clnt.poll(30000, &handler);
             if ((items[0].revents & ZMQ_POLLIN)) {
@@ -1120,7 +1103,7 @@ main(int argc, char* argv[])
                     throw PosixError();
                 if (n == 0) {
                     // End-of file.
-                    repl.set_quit();
+                    clnt.close(TMOUT);
                     break;
                 }
                 try {
@@ -1131,7 +1114,7 @@ main(int argc, char* argv[])
                 }
             }
             handler.clear();
-        }
+        } while (clnt.is_open());
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

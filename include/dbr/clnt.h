@@ -146,7 +146,10 @@ DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms);
 
 DBR_API DbrBool
-dbr_clnt_ready(DbrClnt clnt);
+dbr_clnt_is_open(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_is_ready(DbrClnt clnt);
 
 DBR_API DbrIden
 dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms);

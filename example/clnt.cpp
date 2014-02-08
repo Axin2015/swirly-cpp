@@ -86,7 +86,7 @@ main(int argc, char* argv[])
         do {
             cout << '.';
             clnt.poll(250, &handler);
-        } while (!clnt.ready());
+        } while (!clnt.is_ready());
         cout << endl;
 
         cout << "traders:\n";
