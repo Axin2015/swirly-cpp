@@ -19,13 +19,14 @@
 
 #include <dbr/log.h>
 
+#include <limits.h> // PATH_MAX
 #include <stdio.h>
 #include <stdlib.h> // abort()
 #include <string.h> // strcpy()
 
 static __thread struct {
     int num;
-    const char* file;
+    char file[PATH_MAX + 1];
     int line;
     char msg[DBR_ERRMSG_MAX + 1];
 } err;
@@ -34,7 +35,7 @@ DBR_API void
 dbr_err_clear(void)
 {
     err.num = 0;
-    err.file = NULL;
+    err.file[0] = '\0';
     err.line = 0;
     err.msg[0] = '\0';
 }
@@ -55,7 +56,8 @@ DBR_API void
 dbr_err_set_(int num, const char* file, int line, const char* msg)
 {
     err.num = num;
-    err.file = file;
+    strncpy(err.file, file, PATH_MAX);
+    err.file[PATH_MAX] = '\0';
     err.line = line;
     strncpy(err.msg, msg, DBR_ERRMSG_MAX);
     err.msg[DBR_ERRMSG_MAX] = '\0';
@@ -74,7 +76,8 @@ DBR_API void
 dbr_err_vsetf_(int num, const char* file, int line, const char* format, va_list args)
 {
     err.num = num;
-    err.file = file;
+    strncpy(err.file, file, PATH_MAX);
+    err.file[PATH_MAX] = '\0';
     err.line = line;
     const int ret = vsnprintf(err.msg, DBR_ERRMSG_MAX, format, args);
     // Defensive. Null termination is _not_ guaranteed by snprintf().
