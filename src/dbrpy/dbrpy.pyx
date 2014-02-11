@@ -2,6 +2,16 @@ cimport cdbrpy
 
 from inspect import currentframe, getframeinfo
 
+EINTR = cdbrpy.DBR_EINTR
+EIO = cdbrpy.DBR_EIO
+ENOMEM = cdbrpy.DBR_ENOMEM
+EACCES = cdbrpy.DBR_EACCES
+EBUSY = cdbrpy.DBR_EBUSY
+EEXIST = cdbrpy.DBR_EEXIST
+EINVAL = cdbrpy.DBR_EINVAL
+ETIMEOUT = cdbrpy.DBR_ETIMEOUT
+EUSER = cdbrpy.DBR_EUSER
+
 def err_set(num, msg):
     fi = getframeinfo(currentframe())
     cdbrpy.dbr_err_set_(num, fi.filename, fi.lineno, msg)
@@ -21,11 +31,11 @@ def err_msg():
 class Error(Exception):
     def __init__(self):
         self.num = err_num()
-        self.fname = err_file()
+        self.file = err_file()
         self.line = err_line()
         self.msg = err_msg()
     def __str__(self):
-        return repr("%s:%d: %s (%d)" % (self.fname, self.line, self.msg, self.num))
+        return repr("{1}:{2}: {3} ({0})".format(self.num, self.file, self.line, self.msg))
 
 cdef class Pool:
     cdef cdbrpy.DbrPool _c_pool

@@ -1,6 +1,17 @@
 cdef extern from "dbr/err.h":
 
-    void dbr_err_set_(int num, const char* fname, int line, const char* msg)
+    cdef enum DbrErrno:
+        DBR_EINTR
+        DBR_EIO
+        DBR_ENOMEM
+        DBR_EACCES
+        DBR_EBUSY
+        DBR_EEXIST
+        DBR_EINVAL
+        DBR_ETIMEOUT
+        DBR_EUSER
+
+    void dbr_err_set_(int num, const char* file, int line, const char* msg)
 
     int dbr_err_num()
 
