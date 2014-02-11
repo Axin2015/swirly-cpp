@@ -13,6 +13,8 @@ cdef extern from "dbr/err.h":
 
     void dbr_err_set_(int num, const char* file, int line, const char* msg)
 
+    void dbr_err_setf_(int num, const char* file, int line, const char* format, ...)
+
     int dbr_err_num()
 
     const char* dbr_err_file()
