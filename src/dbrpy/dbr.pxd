@@ -4,9 +4,9 @@ cdef extern from "dbr/defs.h":
         DBR_FALSE
         DBR_TRUE
 
-    ctypedef DbrBool
-    ctypedef DbrIden
-    ctypedef DbrKey
+    ctypedef int DbrBool
+    ctypedef long DbrIden
+    ctypedef long DbrKey
 
 cdef extern from "dbr/err.h":
 

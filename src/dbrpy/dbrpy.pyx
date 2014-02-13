@@ -104,8 +104,8 @@ cdef class Clnt:
         if dbr.dbr_clnt_close(self.impl_, ms) == -1:
             raise Error()
 
-    # def is_open(self):
-    #     return dbr.dbr_clnt_is_open(self.impl_)
+    def is_open(self):
+        return <bint>dbr.dbr_clnt_is_open(self.impl_)
 
-    # def is_ready(self):
-    #     return dbr.dbr_clnt_is_ready(self.impl_)
+    def is_ready(self):
+        return <bint>dbr.dbr_clnt_is_ready(self.impl_)
