@@ -10,18 +10,19 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include")
 INCLUDE_DIRECTORIES("${PYTHON_INCLUDE_DIRS}")
 INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIRS}")
 
-INCLUDE(AddFileDependencies)
-
-ADD_FILE_DEPENDENCIES(${CMAKE_CURRENT_SOURCE_DIR}/dbrpy.pyx
-        ${CMAKE_CURRENT_SOURCE_DIR}/dbr.pxd)
-ADD_FILE_DEPENDENCIES(${CMAKE_CURRENT_SOURCE_DIR}/dbrpy.pyx
-        ${CMAKE_CURRENT_SOURCE_DIR}/zmq.pxd)
-
 FIND_PROGRAM(CYTHON cython)
 ADD_CUSTOM_COMMAND(
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/dbrpy.pyx
-  COMMAND ${CYTHON} ${CMAKE_CURRENT_SOURCE_DIR}/dbrpy.pyx
-    -o ${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c
+          ${CMAKE_CURRENT_SOURCE_DIR}/dbr.pxd
+          ${CMAKE_CURRENT_SOURCE_DIR}/zmq.pxd
+  COMMAND ${CYTHON} -Wextra ${CMAKE_CURRENT_SOURCE_DIR}/dbrpy.pyx
+          -o ${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c
+  # Hack to work-around missing struct tags.
+  COMMAND sed -e 's/DbrIHandler handler\;/struct DbrIHandler handler\;/'
+          -e 's/DbrHandlerVtbl vtbl_\;/struct DbrHandlerVtbl vtbl_\;/'
+          <${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c
+          >${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c.tmp
+  COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c.tmp ${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/dbrpy.c
   )
 

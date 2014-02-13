@@ -52,6 +52,18 @@ cdef extern from "dbr/pool.h":
 
     void dbr_pool_destroy(DbrPool pool)
 
+cdef extern from "dbr/handler.h":
+
+    ctypedef struct DbrHandlerVtbl
+
+    ctypedef struct DbrIHandler:
+        const DbrHandlerVtbl* vtbl
+
+    ctypedef DbrIHandler* DbrHandler
+
+    ctypedef struct DbrHandlerVtbl:
+        void on_up(DbrHandler handler, int conn)
+
 cdef extern from "dbr/clnt.h":
 
     ctypedef struct FigClnt:
@@ -65,3 +77,7 @@ cdef extern from "dbr/clnt.h":
     void dbr_clnt_destroy(DbrClnt clnt)
 
     int dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
+
+    DbrBool dbr_clnt_is_open(DbrClnt clnt)
+
+    DbrBool dbr_clnt_is_ready(DbrClnt clnt)

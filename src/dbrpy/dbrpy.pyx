@@ -68,6 +68,25 @@ cdef class Pool:
         if self.impl_ is not NULL:
             dbr.dbr_pool_destroy(self.impl_)
 
+cdef struct HandlerImpl:
+    void* target
+    dbr.DbrIHandler handler
+
+#define dbr_implof(s, m, p) (s*)((char*)(p) - dbr_offsetof(s, m))
+cdef void on_up(dbr.DbrHandler handler, int conn):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_up(conn)
+
+cdef class Handler:
+    cdef dbr.DbrHandlerVtbl vtbl_
+    cdef HandlerImpl impl_
+
+    def __init__(self):
+        self.vtbl_.on_up = on_up
+        self.impl_.target = <void*>self
+        self.impl_.handler.vtbl = &self.vtbl_
+
 cdef class Clnt:
     cdef dbr.DbrClnt impl_
 
@@ -84,3 +103,9 @@ cdef class Clnt:
     def close(self, dbr.DbrMillis ms):
         if dbr.dbr_clnt_close(self.impl_, ms) == -1:
             raise Error()
+
+    # def is_open(self):
+    #     return dbr.dbr_clnt_is_open(self.impl_)
+
+    # def is_ready(self):
+    #     return dbr.dbr_clnt_is_ready(self.impl_)
