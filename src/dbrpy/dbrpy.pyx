@@ -1,6 +1,11 @@
 cimport dbr
 cimport zmq
 
+cdef extern from "dbrpy/dbrpy.h":
+
+    ctypedef dbr.DbrHandlerVtbl DbrpyHandlerVtbl
+    ctypedef dbr.DbrIHandler DbrpyIHandler
+
 from inspect import currentframe, getframeinfo
 
 EINTR = dbr.DBR_EINTR
@@ -70,16 +75,15 @@ cdef class Pool:
 
 cdef struct HandlerImpl:
     void* target
-    dbr.DbrIHandler handler
+    DbrpyIHandler handler
 
-#define dbr_implof(s, m, p) (s*)((char*)(p) - dbr_offsetof(s, m))
 cdef void on_up(dbr.DbrHandler handler, int conn):
     cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
     cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
     (<object>impl.target).on_up(conn)
 
 cdef class Handler:
-    cdef dbr.DbrHandlerVtbl vtbl_
+    cdef DbrpyHandlerVtbl vtbl_
     cdef HandlerImpl impl_
 
     def __init__(self):
