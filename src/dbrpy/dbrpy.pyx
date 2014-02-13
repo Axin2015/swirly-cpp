@@ -3,6 +3,10 @@ cimport zmq
 
 cdef extern from "dbrpy/dbrpy.h":
 
+    ctypedef dbr.DbrExec DbrpyExec
+    ctypedef dbr.DbrPosn DbrpyPosn
+    ctypedef dbr.DbrView DbrpyView
+
     ctypedef dbr.DbrHandlerVtbl DbrpyHandlerVtbl
     ctypedef dbr.DbrIHandler DbrpyIHandler
 
@@ -77,10 +81,60 @@ cdef struct HandlerImpl:
     void* target
     DbrpyIHandler handler
 
+cdef inline object handler_target(dbr.DbrHandler handler):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    return <object>impl.target
+
 cdef void on_up(dbr.DbrHandler handler, int conn):
     cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
     cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
     (<object>impl.target).on_up(conn)
+
+cdef void on_down(dbr.DbrHandler handler, int conn):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_down()
+
+cdef void on_logon(dbr.DbrHandler handler, dbr.DbrIden tid):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_logon()
+
+cdef void on_logoff(dbr.DbrHandler handler, dbr.DbrIden tid):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_logoff()
+
+cdef void on_timeout(dbr.DbrHandler handler, dbr.DbrIden req_id):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_timeout()
+
+cdef void on_status(dbr.DbrHandler handler, dbr.DbrIden req_id, int num, const char* msg):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_status()
+
+cdef void on_exec(dbr.DbrHandler handler, dbr.DbrIden req_id, DbrpyExec* exc):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_exec()
+
+cdef void on_posn(dbr.DbrHandler handler, DbrpyPosn* posn):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_posn()
+
+cdef void on_view(dbr.DbrHandler handler, DbrpyView* view):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_view()
+
+cdef void on_flush(dbr.DbrHandler handler):
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    (<object>impl.target).on_flush()
 
 cdef class Handler:
     cdef DbrpyHandlerVtbl vtbl_
@@ -88,6 +142,15 @@ cdef class Handler:
 
     def __init__(self):
         self.vtbl_.on_up = on_up
+        self.vtbl_.on_down = on_down
+        self.vtbl_.on_logon = on_logon
+        self.vtbl_.on_logoff = on_logoff
+        self.vtbl_.on_timeout = on_timeout
+        self.vtbl_.on_status = on_status
+        self.vtbl_.on_exec = on_exec
+        self.vtbl_.on_posn = on_posn
+        self.vtbl_.on_view = on_view
+        self.vtbl_.on_flush = on_flush
         self.impl_.target = <void*>self
         self.impl_.handler.vtbl = &self.vtbl_
 
@@ -113,3 +176,6 @@ cdef class Clnt:
 
     def is_ready(self):
         return <bint>dbr.dbr_clnt_is_ready(self.impl_)
+
+    def poll(self, dbr.DbrMillis ms, Handler handler):
+        return dbr.dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)

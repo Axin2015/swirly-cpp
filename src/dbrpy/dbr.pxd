@@ -41,6 +41,15 @@ cdef extern from "dbr/types.h":
 
     ctypedef DbrMillis
 
+    ctypedef struct DbrExec:
+        pass
+
+    ctypedef struct DbrPosn:
+        pass
+
+    ctypedef struct DbrView:
+        pass
+
 cdef extern from "dbr/pool.h":
 
     ctypedef struct ElmPool:
@@ -62,7 +71,26 @@ cdef extern from "dbr/handler.h":
     ctypedef DbrIHandler* DbrHandler
 
     ctypedef struct DbrHandlerVtbl:
+
         void on_up(DbrHandler handler, int conn)
+
+        void on_down(DbrHandler handler, int conn)
+
+        void on_logon(DbrHandler handler, DbrIden tid)
+
+        void on_logoff(DbrHandler handler, DbrIden tid)
+
+        void on_timeout(DbrHandler handler, DbrIden req_id)
+
+        void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
+
+        void on_exec(DbrHandler handler, DbrIden req_id, DbrExec* exc)
+
+        void on_posn(DbrHandler handler, DbrPosn* posn)
+
+        void on_view(DbrHandler handler, DbrView* view)
+
+        void on_flush(DbrHandler handler)
 
 cdef extern from "dbr/clnt.h":
 
@@ -81,3 +109,5 @@ cdef extern from "dbr/clnt.h":
     DbrBool dbr_clnt_is_open(DbrClnt clnt)
 
     DbrBool dbr_clnt_is_ready(DbrClnt clnt)
+
+    int dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
