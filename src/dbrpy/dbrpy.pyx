@@ -81,60 +81,40 @@ cdef struct HandlerImpl:
     void* target
     DbrpyIHandler handler
 
-cdef inline object handler_target(dbr.DbrHandler handler):
+cdef inline void* handler_target(dbr.DbrHandler handler):
     cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
     cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    return <object>impl.target
+    return impl.target
 
 cdef void on_up(dbr.DbrHandler handler, int conn):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_up(conn)
+    (<object>handler_target(handler)).on_up(conn)
 
 cdef void on_down(dbr.DbrHandler handler, int conn):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_down()
+    (<object>handler_target(handler)).on_down()
 
 cdef void on_logon(dbr.DbrHandler handler, dbr.DbrIden tid):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_logon()
+    (<object>handler_target(handler)).on_logon()
 
 cdef void on_logoff(dbr.DbrHandler handler, dbr.DbrIden tid):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_logoff()
+    (<object>handler_target(handler)).on_logoff()
 
 cdef void on_timeout(dbr.DbrHandler handler, dbr.DbrIden req_id):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_timeout()
+    (<object>handler_target(handler)).on_timeout()
 
 cdef void on_status(dbr.DbrHandler handler, dbr.DbrIden req_id, int num, const char* msg):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_status()
+    (<object>handler_target(handler)).on_status()
 
 cdef void on_exec(dbr.DbrHandler handler, dbr.DbrIden req_id, DbrpyExec* exc):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_exec()
+    (<object>handler_target(handler)).on_exec()
 
 cdef void on_posn(dbr.DbrHandler handler, DbrpyPosn* posn):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_posn()
+    (<object>handler_target(handler)).on_posn()
 
 cdef void on_view(dbr.DbrHandler handler, DbrpyView* view):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_view()
+    (<object>handler_target(handler)).on_view()
 
 cdef void on_flush(dbr.DbrHandler handler):
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    (<object>impl.target).on_flush()
+    (<object>handler_target(handler)).on_flush()
 
 cdef class Handler:
     cdef DbrpyHandlerVtbl vtbl_
