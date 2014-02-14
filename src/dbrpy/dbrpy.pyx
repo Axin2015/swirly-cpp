@@ -1,8 +1,14 @@
 cimport dbr
 cimport zmq
+cimport string
+
+from cpython.ref cimport PyObject
 
 cdef extern from "dbrpy/dbrpy.h":
 
+    ctypedef dbr.DbrSlNode DbrpySlNode
+
+    ctypedef dbr.DbrRec  DbrpyRec
     ctypedef dbr.DbrExec DbrpyExec
     ctypedef dbr.DbrPosn DbrpyPosn
     ctypedef dbr.DbrView DbrpyView
@@ -50,7 +56,7 @@ class Error(Exception):
 def millis():
     return dbr.dbr_millis()
 
-cdef class ZmqCtx:
+cdef class ZmqCtx(object):
     cdef void* impl_
 
     def __cinit__(self):
@@ -65,7 +71,68 @@ cdef class ZmqCtx:
         if self.impl_ is not NULL:
             zmq.zmq_ctx_destroy(self.impl_)
 
-cdef class Pool:
+ENTITY_TRADER = dbr.DBR_ENTITY_TRADER
+ENTITY_ACCNT = dbr.DBR_ENTITY_ACCNT
+ENTITY_CONTR = dbr.DBR_ENTITY_CONTR
+ENTITY_ORDER = dbr.DBR_ENTITY_ORDER
+ENTITY_EXEC = dbr.DBR_ENTITY_EXEC
+ENTITY_MEMB = dbr.DBR_ENTITY_MEMB
+ENTITY_POSN = dbr.DBR_ENTITY_POSN
+
+class Rec(object):
+    def __init__(self):
+        raise TypeError("init called on Rec")
+
+class TraderRec(Rec):
+    def __init__(self):
+        raise TypeError("init called on TraderRec")
+
+class AccntRec(Rec):
+    def __init__(self):
+        raise TypeError("init called on AccntRec")
+
+class ContrRec(Rec):
+    def __init__(self):
+        raise TypeError("init called on ContrRec")
+
+cdef make_rec(DbrpyRec* ref):
+    inst = None
+    if ref.type == dbr.DBR_ENTITY_TRADER:
+        inst = TraderRec.__new__(TraderRec)
+    elif ref.type == dbr.DBR_ENTITY_ACCNT:
+        inst = AccntRec.__new__(AccntRec)
+    elif ref.type == dbr.DBR_ENTITY_CONTR:
+        inst = ContrRec.__new__(ContrRec)
+    return inst
+
+class Exec(object):
+    def __init__(self):
+        raise TypeError("init called on Exec")
+
+cdef make_exec(DbrpyExec* exc):
+    inst = Exec.__new__(Exec)
+    inst.id = exc.id
+    inst.ref = exc.c.ref[:string.strnlen(exc.c.ref, dbr.DBR_REF_MAX)]
+    return inst
+
+class Posn(object):
+    def __init__(self):
+        raise TypeError("init called on Posn")
+
+cdef make_posn(DbrpyPosn* posn):
+    inst = Posn.__new__(Posn)
+    return inst
+
+class View(object):
+    def __init__(self):
+        raise TypeError("init called on View")
+
+cdef make_view(DbrpyView* view):
+    inst = View.__new__(View)
+    #intst.cid = view.contr.rec.id
+    return inst
+
+cdef class Pool(object):
     cdef dbr.DbrPool impl_
 
     def __cinit__(self, capacity):
@@ -78,7 +145,7 @@ cdef class Pool:
             dbr.dbr_pool_destroy(self.impl_)
 
 cdef struct HandlerImpl:
-    void* target
+    PyObject* target
     DbrpyIHandler handler
 
 cdef inline void* handler_target(dbr.DbrHandler handler):
@@ -90,33 +157,33 @@ cdef void on_up(dbr.DbrHandler handler, int conn):
     (<object>handler_target(handler)).on_up(conn)
 
 cdef void on_down(dbr.DbrHandler handler, int conn):
-    (<object>handler_target(handler)).on_down()
+    (<object>handler_target(handler)).on_down(conn)
 
 cdef void on_logon(dbr.DbrHandler handler, dbr.DbrIden tid):
-    (<object>handler_target(handler)).on_logon()
+    (<object>handler_target(handler)).on_logon(tid)
 
 cdef void on_logoff(dbr.DbrHandler handler, dbr.DbrIden tid):
-    (<object>handler_target(handler)).on_logoff()
+    (<object>handler_target(handler)).on_logoff(tid)
 
 cdef void on_timeout(dbr.DbrHandler handler, dbr.DbrIden req_id):
-    (<object>handler_target(handler)).on_timeout()
+    (<object>handler_target(handler)).on_timeout(req_id)
 
 cdef void on_status(dbr.DbrHandler handler, dbr.DbrIden req_id, int num, const char* msg):
-    (<object>handler_target(handler)).on_status()
+    (<object>handler_target(handler)).on_status(req_id, num, msg)
 
 cdef void on_exec(dbr.DbrHandler handler, dbr.DbrIden req_id, DbrpyExec* exc):
-    (<object>handler_target(handler)).on_exec()
+    (<object>handler_target(handler)).on_exec(req_id, req_id, make_exec(exc))
 
 cdef void on_posn(dbr.DbrHandler handler, DbrpyPosn* posn):
-    (<object>handler_target(handler)).on_posn()
+    (<object>handler_target(handler)).on_posn(make_posn(posn))
 
 cdef void on_view(dbr.DbrHandler handler, DbrpyView* view):
-    (<object>handler_target(handler)).on_view()
+    (<object>handler_target(handler)).on_view(make_view(view))
 
 cdef void on_flush(dbr.DbrHandler handler):
     (<object>handler_target(handler)).on_flush()
 
-cdef class Handler:
+cdef class Handler(object):
     cdef DbrpyHandlerVtbl vtbl_
     cdef HandlerImpl impl_
 
@@ -131,10 +198,40 @@ cdef class Handler:
         self.vtbl_.on_posn = on_posn
         self.vtbl_.on_view = on_view
         self.vtbl_.on_flush = on_flush
-        self.impl_.target = <void*>self
+        self.impl_.target = <PyObject*>self
         self.impl_.handler.vtbl = &self.vtbl_
 
-cdef class Clnt:
+    def on_up(self, conn):
+        pass
+
+    def on_down(self, conn):
+        pass
+
+    def on_logon(self, tid):
+        pass
+
+    def on_logoff(self, tid):
+        pass
+
+    def on_timeout(self, req_id):
+        pass
+
+    def on_status(self, req_id, num, msg):
+        pass
+
+    def on_exec(self, req_id, exc):
+        pass
+
+    def on_posn(self, posn):
+        pass
+
+    def on_view(self, view):
+        pass
+
+    def on_flush(self):
+        pass
+
+cdef class Clnt(object):
     cdef dbr.DbrClnt impl_
 
     def __cinit__(self, const char* sess, ZmqCtx ctx, const char* mdaddr,
@@ -150,6 +247,10 @@ cdef class Clnt:
     def close(self, dbr.DbrMillis ms):
         if dbr.dbr_clnt_close(self.impl_, ms) == -1:
             raise Error()
+
+    def find_rec_id(self, int type, dbr.DbrIden id):
+        cdef DbrpySlNode* node = dbr.dbr_clnt_find_rec_id(self.impl_, type, id)
+        return make_rec(dbr.dbr_shared_rec_entry(node)) if not NULL else None
 
     def is_open(self):
         return <bint>dbr.dbr_clnt_is_open(self.impl_)
