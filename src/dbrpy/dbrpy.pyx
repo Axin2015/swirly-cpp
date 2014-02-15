@@ -51,7 +51,7 @@ class Error(Exception):
         self.line = err_line()
         self.msg = err_msg()
     def __str__(self):
-        return repr("{1}:{2}: {3} ({0})".format(self.num, self.file, self.line, self.msg))
+        return "{1}:{2}: {3} ({0})".format(self.num, self.file, self.line, self.msg)
 
 def millis():
     return dbr.dbr_millis()
@@ -79,58 +79,77 @@ ENTITY_EXEC = dbr.DBR_ENTITY_EXEC
 ENTITY_MEMB = dbr.DBR_ENTITY_MEMB
 ENTITY_POSN = dbr.DBR_ENTITY_POSN
 
-class Rec(object):
-    def __init__(self):
-        raise TypeError("init called on Rec")
+cdef class RecBase(object):
 
-class TraderRec(Rec):
+    cdef public int type
+    cdef public dbr.DbrIden id
+    cdef public bytes mnem
+    cdef public bytes display
+
+    def __init__(self):
+        raise TypeError("init called on RecBase")
+
+cdef class TraderRec(RecBase):
     def __init__(self):
         raise TypeError("init called on TraderRec")
+    def __repr__(self):
+        return 'TraderRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
-class AccntRec(Rec):
+cdef class AccntRec(RecBase):
     def __init__(self):
         raise TypeError("init called on AccntRec")
+    def __repr__(self):
+        return 'AccntRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
-class ContrRec(Rec):
+cdef class ContrRec(RecBase):
     def __init__(self):
         raise TypeError("init called on ContrRec")
+    def __repr__(self):
+        return 'ContrRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
-cdef make_rec(DbrpyRec* ref):
-    inst = None
-    if ref.type == dbr.DBR_ENTITY_TRADER:
-        inst = TraderRec.__new__(TraderRec)
-    elif ref.type == dbr.DBR_ENTITY_ACCNT:
-        inst = AccntRec.__new__(AccntRec)
-    elif ref.type == dbr.DBR_ENTITY_CONTR:
-        inst = ContrRec.__new__(ContrRec)
-    return inst
+cdef inline void set_rec(RecBase obj, DbrpyRec* rec):
+    obj.type = rec.type
+    obj.id = rec.id
+    obj.mnem = rec.mnem[:string.strnlen(rec.mnem, dbr.DBR_MNEM_MAX)]
+    obj.display = rec.display[:string.strnlen(rec.display, dbr.DBR_DISPLAY_MAX)]
 
-class Exec(object):
+cdef RecBase make_rec(DbrpyRec* rec):
+    cdef RecBase obj = None
+    if rec.type == dbr.DBR_ENTITY_TRADER:
+        obj = TraderRec.__new__(TraderRec)
+    elif rec.type == dbr.DBR_ENTITY_ACCNT:
+        obj = AccntRec.__new__(AccntRec)
+    elif rec.type == dbr.DBR_ENTITY_CONTR:
+        obj = ContrRec.__new__(ContrRec)
+    set_rec(obj, rec)
+    return obj
+
+cdef class Exec(object):
     def __init__(self):
         raise TypeError("init called on Exec")
 
-cdef make_exec(DbrpyExec* exc):
-    inst = Exec.__new__(Exec)
-    inst.id = exc.id
-    inst.ref = exc.c.ref[:string.strnlen(exc.c.ref, dbr.DBR_REF_MAX)]
-    return inst
+cdef Exec make_exec(DbrpyExec* exc):
+    cdef obj = Exec.__new__(Exec)
+    obj.id = exc.id
+    obj.ref = exc.c.ref[:string.strnlen(exc.c.ref, dbr.DBR_REF_MAX)]
+    return obj
 
-class Posn(object):
+cdef class Posn(object):
     def __init__(self):
         raise TypeError("init called on Posn")
 
-cdef make_posn(DbrpyPosn* posn):
-    inst = Posn.__new__(Posn)
-    return inst
+cdef Posn make_posn(DbrpyPosn* posn):
+    cdef obj = Posn.__new__(Posn)
+    return obj
 
-class View(object):
+cdef class View(object):
     def __init__(self):
         raise TypeError("init called on View")
 
-cdef make_view(DbrpyView* view):
-    inst = View.__new__(View)
+cdef View make_view(DbrpyView* view):
+    cdef obj = View.__new__(View)
     #intst.cid = view.contr.rec.id
-    return inst
+    return obj
 
 cdef class Pool(object):
     cdef dbr.DbrPool impl_
