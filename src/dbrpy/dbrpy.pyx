@@ -80,48 +80,92 @@ ENTITY_MEMB = dbr.DBR_ENTITY_MEMB
 ENTITY_POSN = dbr.DBR_ENTITY_POSN
 
 cdef class RecBase(object):
-
     cdef public int type
     cdef public dbr.DbrIden id
     cdef public bytes mnem
     cdef public bytes display
-
     def __init__(self):
         raise TypeError("init called on RecBase")
 
 cdef class TraderRec(RecBase):
+    cdef public bytes email
     def __init__(self):
         raise TypeError("init called on TraderRec")
     def __repr__(self):
         return 'TraderRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
 cdef class AccntRec(RecBase):
+    cdef public bytes email
     def __init__(self):
         raise TypeError("init called on AccntRec")
     def __repr__(self):
         return 'AccntRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
 cdef class ContrRec(RecBase):
+    cdef public bytes asset_type
+    cdef public bytes asset
+    cdef public bytes ccy
+    cdef public int tick_numer
+    cdef public int tick_denom
+    cdef public double price_inc
+    cdef public int lot_numer
+    cdef public int lot_denom
+    cdef public double qty_inc
+    cdef public int price_dp
+    cdef public int pip_dp
+    cdef public int qty_dp
+    cdef public dbr.DbrLots min_lots
+    cdef public dbr.DbrLots max_lots
     def __init__(self):
         raise TypeError("init called on ContrRec")
     def __repr__(self):
         return 'ContrRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
-cdef inline void set_rec(RecBase obj, DbrpyRec* rec):
+cdef inline void set_rec_base(RecBase obj, DbrpyRec* rec):
     obj.type = rec.type
     obj.id = rec.id
     obj.mnem = rec.mnem[:string.strnlen(rec.mnem, dbr.DBR_MNEM_MAX)]
     obj.display = rec.display[:string.strnlen(rec.display, dbr.DBR_DISPLAY_MAX)]
 
+cdef TraderRec make_trader_rec(DbrpyRec* rec):
+    cdef obj = TraderRec.__new__(TraderRec)
+    set_rec_base(obj, rec)
+    obj.email = rec.trader.email[:string.strnlen(rec.trader.email, dbr.DBR_EMAIL_MAX)]
+    return obj
+
+cdef AccntRec make_accnt_rec(DbrpyRec* rec):
+    cdef obj = AccntRec.__new__(AccntRec)
+    set_rec_base(obj, rec)
+    obj.email = rec.accnt.email[:string.strnlen(rec.accnt.email, dbr.DBR_EMAIL_MAX)]
+    return obj
+
+cdef ContrRec make_contr_rec(DbrpyRec* rec):
+    cdef obj = ContrRec.__new__(ContrRec)
+    set_rec_base(obj, rec)
+    obj.asset_type = rec.contr.asset_type[:string.strnlen(rec.contr.asset_type, dbr.DBR_MNEM_MAX)]
+    obj.asset = rec.contr.asset[:string.strnlen(rec.contr.asset, dbr.DBR_MNEM_MAX)]
+    obj.ccy = rec.contr.ccy[:string.strnlen(rec.contr.ccy, dbr.DBR_MNEM_MAX)]
+    obj.tick_numer = rec.contr.tick_numer
+    obj.tick_denom = rec.contr.tick_denom
+    obj.price_inc = rec.contr.price_inc
+    obj.lot_numer = rec.contr.lot_numer
+    obj.lot_denom = rec.contr.lot_denom
+    obj.qty_inc = rec.contr.qty_inc
+    obj.price_dp = rec.contr.price_dp
+    obj.pip_dp = rec.contr.pip_dp
+    obj.qty_dp = rec.contr.qty_dp
+    obj.min_lots = rec.contr.min_lots
+    obj.max_lots = rec.contr.max_lots
+    return obj
+
 cdef RecBase make_rec(DbrpyRec* rec):
     cdef RecBase obj = None
     if rec.type == dbr.DBR_ENTITY_TRADER:
-        obj = TraderRec.__new__(TraderRec)
+        obj = make_trader_rec(rec)
     elif rec.type == dbr.DBR_ENTITY_ACCNT:
-        obj = AccntRec.__new__(AccntRec)
+        obj = make_accnt_rec(rec)
     elif rec.type == dbr.DBR_ENTITY_CONTR:
-        obj = ContrRec.__new__(ContrRec)
-    set_rec(obj, rec)
+        obj = make_contr_rec(rec)
     return obj
 
 cdef class Exec(object):
