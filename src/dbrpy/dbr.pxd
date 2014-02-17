@@ -5,6 +5,8 @@ cdef extern from "dbr/slnode.h":
     ctypedef struct DbrSlNode:
         DbrSlNode* next
 
+    DbrSlNode* dbr_slnode_next(DbrSlNode* node)
+
 cdef extern from "dbr/defs.h":
 
     cdef enum:
@@ -195,6 +197,18 @@ cdef extern from "dbr/clnt.h":
     int dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
 
     DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
+
+    DbrSlNode* dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem)
+
+    DbrSlNode* dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size)
+
+    DbrTrader dbr_clnt_trader(DbrClnt clnt, DbrRec* trec)
+
+    DbrAccnt dbr_clnt_accnt(DbrClnt clnt, DbrRec* arec)
+
+    DbrIden dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
+
+    DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 
     DbrBool dbr_clnt_is_open(DbrClnt clnt)
 

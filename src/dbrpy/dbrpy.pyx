@@ -1,4 +1,4 @@
-cimport dbr
+from dbr cimport *
 cimport zmq
 cimport string
 
@@ -6,43 +6,43 @@ from cpython.ref cimport PyObject
 
 cdef extern from "dbrpy/dbrpy.h":
 
-    ctypedef dbr.DbrSlNode DbrpySlNode
+    ctypedef DbrSlNode DbrpySlNode
 
-    ctypedef dbr.DbrRec  DbrpyRec
-    ctypedef dbr.DbrExec DbrpyExec
-    ctypedef dbr.DbrPosn DbrpyPosn
-    ctypedef dbr.DbrView DbrpyView
+    ctypedef DbrRec  DbrpyRec
+    ctypedef DbrExec DbrpyExec
+    ctypedef DbrPosn DbrpyPosn
+    ctypedef DbrView DbrpyView
 
-    ctypedef dbr.DbrHandlerVtbl DbrpyHandlerVtbl
-    ctypedef dbr.DbrIHandler DbrpyIHandler
+    ctypedef DbrHandlerVtbl DbrpyHandlerVtbl
+    ctypedef DbrIHandler DbrpyIHandler
 
 from inspect import currentframe, getframeinfo
 
-EINTR = dbr.DBR_EINTR
-EIO = dbr.DBR_EIO
-ENOMEM = dbr.DBR_ENOMEM
-EACCES = dbr.DBR_EACCES
-EBUSY = dbr.DBR_EBUSY
-EEXIST = dbr.DBR_EEXIST
-EINVAL = dbr.DBR_EINVAL
-ETIMEOUT = dbr.DBR_ETIMEOUT
-EUSER = dbr.DBR_EUSER
+EINTR = DBR_EINTR
+EIO = DBR_EIO
+ENOMEM = DBR_ENOMEM
+EACCES = DBR_EACCES
+EBUSY = DBR_EBUSY
+EEXIST = DBR_EEXIST
+EINVAL = DBR_EINVAL
+ETIMEOUT = DBR_ETIMEOUT
+EUSER = DBR_EUSER
 
 def err_set(int num, const char* msg):
     fi = getframeinfo(currentframe())
-    dbr.dbr_err_set_(num, fi.filename, fi.lineno, msg)
+    dbr_err_set_(num, fi.filename, fi.lineno, msg)
 
 def err_num():
-    return dbr.dbr_err_num()
+    return dbr_err_num()
 
 def err_file():
-    return dbr.dbr_err_file()
+    return dbr_err_file()
 
 def err_line():
-    return dbr.dbr_err_line()
+    return dbr_err_line()
 
 def err_msg():
-    return dbr.dbr_err_msg()
+    return dbr_err_msg()
 
 class Error(Exception):
     def __init__(self):
@@ -50,11 +50,13 @@ class Error(Exception):
         self.file = err_file()
         self.line = err_line()
         self.msg = err_msg()
+    def __repr__(self):
+        return 'Error({0.num!r}, {0.file!r}, {0.line!r}, {0.msg!r})'.format(self)
     def __str__(self):
         return "{1}:{2}: {3} ({0})".format(self.num, self.file, self.line, self.msg)
 
 def millis():
-    return dbr.dbr_millis()
+    return dbr_millis()
 
 cdef class ZmqCtx(object):
     cdef void* impl_
@@ -63,7 +65,7 @@ cdef class ZmqCtx(object):
         self.impl_ = zmq.zmq_ctx_new()
         if self.impl_ is NULL:
             fi = getframeinfo(currentframe())
-            dbr.dbr_err_setf_(dbr.DBR_EIO, fi.filename, fi.lineno,
+            dbr_err_setf_(DBR_EIO, fi.filename, fi.lineno,
                               "zmq_ctx_new() failed: %s", zmq.zmq_strerror(zmq.zmq_errno()))
             raise Error()
 
@@ -71,17 +73,19 @@ cdef class ZmqCtx(object):
         if self.impl_ is not NULL:
             zmq.zmq_ctx_destroy(self.impl_)
 
-ENTITY_TRADER = dbr.DBR_ENTITY_TRADER
-ENTITY_ACCNT = dbr.DBR_ENTITY_ACCNT
-ENTITY_CONTR = dbr.DBR_ENTITY_CONTR
-ENTITY_ORDER = dbr.DBR_ENTITY_ORDER
-ENTITY_EXEC = dbr.DBR_ENTITY_EXEC
-ENTITY_MEMB = dbr.DBR_ENTITY_MEMB
-ENTITY_POSN = dbr.DBR_ENTITY_POSN
+ENTITY_TRADER = DBR_ENTITY_TRADER
+ENTITY_ACCNT = DBR_ENTITY_ACCNT
+ENTITY_CONTR = DBR_ENTITY_CONTR
+ENTITY_ORDER = DBR_ENTITY_ORDER
+ENTITY_EXEC = DBR_ENTITY_EXEC
+ENTITY_MEMB = DBR_ENTITY_MEMB
+ENTITY_POSN = DBR_ENTITY_POSN
 
 cdef class RecBase(object):
+    # Only accesed from clnt thread.
+    cdef DbrpyRec* impl_
     cdef public int type
-    cdef public dbr.DbrIden id
+    cdef public DbrIden id
     cdef public bytes mnem
     cdef public bytes display
     def __init__(self):
@@ -114,37 +118,38 @@ cdef class ContrRec(RecBase):
     cdef public int price_dp
     cdef public int pip_dp
     cdef public int qty_dp
-    cdef public dbr.DbrLots min_lots
-    cdef public dbr.DbrLots max_lots
+    cdef public DbrLots min_lots
+    cdef public DbrLots max_lots
     def __init__(self):
         raise TypeError("init called on ContrRec")
     def __repr__(self):
         return 'ContrRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
 cdef inline void set_rec_base(RecBase obj, DbrpyRec* rec):
+    obj.impl_ = rec
     obj.type = rec.type
     obj.id = rec.id
-    obj.mnem = rec.mnem[:string.strnlen(rec.mnem, dbr.DBR_MNEM_MAX)]
-    obj.display = rec.display[:string.strnlen(rec.display, dbr.DBR_DISPLAY_MAX)]
+    obj.mnem = rec.mnem[:string.strnlen(rec.mnem, DBR_MNEM_MAX)]
+    obj.display = rec.display[:string.strnlen(rec.display, DBR_DISPLAY_MAX)]
 
 cdef TraderRec make_trader_rec(DbrpyRec* rec):
     cdef obj = TraderRec.__new__(TraderRec)
     set_rec_base(obj, rec)
-    obj.email = rec.trader.email[:string.strnlen(rec.trader.email, dbr.DBR_EMAIL_MAX)]
+    obj.email = rec.trader.email[:string.strnlen(rec.trader.email, DBR_EMAIL_MAX)]
     return obj
 
 cdef AccntRec make_accnt_rec(DbrpyRec* rec):
     cdef obj = AccntRec.__new__(AccntRec)
     set_rec_base(obj, rec)
-    obj.email = rec.accnt.email[:string.strnlen(rec.accnt.email, dbr.DBR_EMAIL_MAX)]
+    obj.email = rec.accnt.email[:string.strnlen(rec.accnt.email, DBR_EMAIL_MAX)]
     return obj
 
 cdef ContrRec make_contr_rec(DbrpyRec* rec):
     cdef obj = ContrRec.__new__(ContrRec)
     set_rec_base(obj, rec)
-    obj.asset_type = rec.contr.asset_type[:string.strnlen(rec.contr.asset_type, dbr.DBR_MNEM_MAX)]
-    obj.asset = rec.contr.asset[:string.strnlen(rec.contr.asset, dbr.DBR_MNEM_MAX)]
-    obj.ccy = rec.contr.ccy[:string.strnlen(rec.contr.ccy, dbr.DBR_MNEM_MAX)]
+    obj.asset_type = rec.contr.asset_type[:string.strnlen(rec.contr.asset_type, DBR_MNEM_MAX)]
+    obj.asset = rec.contr.asset[:string.strnlen(rec.contr.asset, DBR_MNEM_MAX)]
+    obj.ccy = rec.contr.ccy[:string.strnlen(rec.contr.ccy, DBR_MNEM_MAX)]
     obj.tick_numer = rec.contr.tick_numer
     obj.tick_denom = rec.contr.tick_denom
     obj.price_inc = rec.contr.price_inc
@@ -160,11 +165,11 @@ cdef ContrRec make_contr_rec(DbrpyRec* rec):
 
 cdef RecBase make_rec(DbrpyRec* rec):
     cdef RecBase obj = None
-    if rec.type == dbr.DBR_ENTITY_TRADER:
+    if rec.type == DBR_ENTITY_TRADER:
         obj = make_trader_rec(rec)
-    elif rec.type == dbr.DBR_ENTITY_ACCNT:
+    elif rec.type == DBR_ENTITY_ACCNT:
         obj = make_accnt_rec(rec)
-    elif rec.type == dbr.DBR_ENTITY_CONTR:
+    elif rec.type == DBR_ENTITY_CONTR:
         obj = make_contr_rec(rec)
     return obj
 
@@ -175,7 +180,7 @@ cdef class Exec(object):
 cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
     obj.id = exc.id
-    obj.ref = exc.c.ref[:string.strnlen(exc.c.ref, dbr.DBR_REF_MAX)]
+    obj.ref = exc.c.ref[:string.strnlen(exc.c.ref, DBR_REF_MAX)]
     return obj
 
 cdef class Posn(object):
@@ -196,54 +201,54 @@ cdef View make_view(DbrpyView* view):
     return obj
 
 cdef class Pool(object):
-    cdef dbr.DbrPool impl_
+    cdef DbrPool impl_
 
     def __cinit__(self, capacity):
-        self.impl_ = dbr.dbr_pool_create(capacity)
+        self.impl_ = dbr_pool_create(capacity)
         if self.impl_ is NULL:
             raise Error()
 
     def __dealloc__(self):
         if self.impl_ is not NULL:
-            dbr.dbr_pool_destroy(self.impl_)
+            dbr_pool_destroy(self.impl_)
 
 cdef struct HandlerImpl:
     PyObject* target
     DbrpyIHandler handler
 
-cdef inline void* handler_target(dbr.DbrHandler handler):
+cdef inline void* handler_target(DbrHandler handler):
     cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
     cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
     return impl.target
 
-cdef void on_up(dbr.DbrHandler handler, int conn):
+cdef void on_up(DbrHandler handler, int conn):
     (<object>handler_target(handler)).on_up(conn)
 
-cdef void on_down(dbr.DbrHandler handler, int conn):
+cdef void on_down(DbrHandler handler, int conn):
     (<object>handler_target(handler)).on_down(conn)
 
-cdef void on_logon(dbr.DbrHandler handler, dbr.DbrIden tid):
+cdef void on_logon(DbrHandler handler, DbrIden tid):
     (<object>handler_target(handler)).on_logon(tid)
 
-cdef void on_logoff(dbr.DbrHandler handler, dbr.DbrIden tid):
+cdef void on_logoff(DbrHandler handler, DbrIden tid):
     (<object>handler_target(handler)).on_logoff(tid)
 
-cdef void on_timeout(dbr.DbrHandler handler, dbr.DbrIden req_id):
+cdef void on_timeout(DbrHandler handler, DbrIden req_id):
     (<object>handler_target(handler)).on_timeout(req_id)
 
-cdef void on_status(dbr.DbrHandler handler, dbr.DbrIden req_id, int num, const char* msg):
+cdef void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg):
     (<object>handler_target(handler)).on_status(req_id, num, msg)
 
-cdef void on_exec(dbr.DbrHandler handler, dbr.DbrIden req_id, DbrpyExec* exc):
+cdef void on_exec(DbrHandler handler, DbrIden req_id, DbrpyExec* exc):
     (<object>handler_target(handler)).on_exec(req_id, req_id, make_exec(exc))
 
-cdef void on_posn(dbr.DbrHandler handler, DbrpyPosn* posn):
+cdef void on_posn(DbrHandler handler, DbrpyPosn* posn):
     (<object>handler_target(handler)).on_posn(make_posn(posn))
 
-cdef void on_view(dbr.DbrHandler handler, DbrpyView* view):
+cdef void on_view(DbrHandler handler, DbrpyView* view):
     (<object>handler_target(handler)).on_view(make_view(view))
 
-cdef void on_flush(dbr.DbrHandler handler):
+cdef void on_flush(DbrHandler handler):
     (<object>handler_target(handler)).on_flush()
 
 cdef class Handler(object):
@@ -295,31 +300,56 @@ cdef class Handler(object):
         pass
 
 cdef class Clnt(object):
-    cdef dbr.DbrClnt impl_
+    cdef DbrClnt impl_
 
     def __cinit__(self, const char* sess, ZmqCtx ctx, const char* mdaddr,
-                  const char* traddr, dbr.DbrIden seed, Pool pool):
-        self.impl_ = dbr.dbr_clnt_create(sess, ctx.impl_, mdaddr, traddr, seed, pool.impl_)
+                  const char* traddr, DbrIden seed, Pool pool):
+        self.impl_ = dbr_clnt_create(sess, ctx.impl_, mdaddr, traddr, seed, pool.impl_)
         if self.impl_ is NULL:
             raise Error()
 
     def __dealloc__(self):
         if self.impl_ is not NULL:
-            dbr.dbr_clnt_destroy(self.impl_)
+            dbr_clnt_destroy(self.impl_)
 
-    def close(self, dbr.DbrMillis ms):
-        if dbr.dbr_clnt_close(self.impl_, ms) == -1:
+    def close(self, DbrMillis ms):
+        if dbr_clnt_close(self.impl_, ms) == -1:
             raise Error()
 
-    def find_rec_id(self, int type, dbr.DbrIden id):
-        cdef DbrpySlNode* node = dbr.dbr_clnt_find_rec_id(self.impl_, type, id)
-        return make_rec(dbr.dbr_shared_rec_entry(node)) if not NULL else None
+    def find_rec_id(self, int type, DbrIden id):
+        cdef DbrpySlNode* node = dbr_clnt_find_rec_id(self.impl_, type, id)
+        return make_rec(dbr_shared_rec_entry(node)) if node is not NULL else None
+
+    def find_rec_mnem(self, int type, const char* mnem):
+        cdef DbrpySlNode* node = dbr_clnt_find_rec_mnem(self.impl_, type, mnem)
+        return make_rec(dbr_shared_rec_entry(node)) if node is not NULL else None
+
+    def recs(self, int type):
+        cdef size_t size = 0
+        cdef DbrpySlNode* node = dbr_clnt_first_rec(self.impl_, type, &size)
+        ls = []
+        while node is not NULL:
+            ls.append(make_rec(dbr_shared_rec_entry(node)))
+            node = dbr_slnode_next(node)
+        return ls
+
+    def logon(self, TraderRec trec, DbrMillis ms):
+        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
+        if trader is NULL:
+            raise Error()
+        return dbr_clnt_logon(self.impl_, trader, ms)
+
+    def logoff(self, TraderRec trec, DbrMillis ms):
+        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
+        if trader is NULL:
+            raise Error()
+        return dbr_clnt_logoff(self.impl_, trader, ms)
 
     def is_open(self):
-        return <bint>dbr.dbr_clnt_is_open(self.impl_)
+        return <bint>dbr_clnt_is_open(self.impl_)
 
     def is_ready(self):
-        return <bint>dbr.dbr_clnt_is_ready(self.impl_)
+        return <bint>dbr_clnt_is_ready(self.impl_)
 
-    def poll(self, dbr.DbrMillis ms, Handler handler):
-        return dbr.dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
+    def poll(self, DbrMillis ms, Handler handler):
+        return dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
