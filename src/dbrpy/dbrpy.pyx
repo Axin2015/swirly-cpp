@@ -125,6 +125,18 @@ cdef class ContrRec(RecBase):
     def __repr__(self):
         return 'ContrRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
+    def qty_to_lots(self, double qty):
+        return dbr_real_to_incs(qty, self.qty_inc)
+
+    def lots_to_qty(self, DbrLots lots):
+        return dbr_incs_to_real(lots, self.qty_inc)
+
+    def price_to_ticks(self, double price):
+        return dbr_real_to_incs(price, self.price_inc)
+
+    def ticks_to_price(self, DbrTicks ticks):
+        return dbr_incs_to_real(ticks, self.price_inc)
+
 cdef inline void set_rec_base(RecBase obj, DbrpyRec* rec):
     obj.impl_ = rec
     obj.type = rec.type
@@ -173,6 +185,9 @@ cdef RecBase make_rec(DbrpyRec* rec):
         obj = make_contr_rec(rec)
     return obj
 
+ACTION_BUY = DBR_ACTION_BUY
+ACTION_SELL = DBR_ACTION_SELL
+
 cdef class Exec(object):
     def __init__(self):
         raise TypeError("init called on Exec")
@@ -212,6 +227,33 @@ cdef class Pool(object):
         if self.impl_ is not NULL:
             dbr_pool_destroy(self.impl_)
 
+def fract_to_real(int numer, int denom):
+    return dbr_fract_to_real(numer, denom)
+
+def real_to_incs(double real, double inc_size):
+    return dbr_real_to_incs(real, inc_size)
+
+def incs_to_real(DbrIncs incs, double inc_size):
+    return dbr_incs_to_real(incs, inc_size)
+
+def qty_to_lots(double qty, ContrRec crec):
+    return dbr_qty_to_lots(qty, crec.impl_)
+
+def lots_to_qty(DbrLots lots, ContrRec crec):
+    return dbr_lots_to_qty(lots, crec.impl_)
+
+def price_to_ticks(double price, ContrRec crec):
+    return dbr_price_to_ticks(price, crec.impl_)
+
+def ticks_to_price(DbrTicks ticks, ContrRec crec):
+    return dbr_ticks_to_price(ticks, crec.impl_)
+
+def real_to_dp(double d):
+    return dbr_real_to_dp(d)
+
+def dp_to_real(int dp):
+    return dbr_dp_to_real(dp)
+
 cdef struct HandlerImpl:
     PyObject* target
     DbrpyIHandler handler
@@ -240,7 +282,7 @@ cdef void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg
     (<object>handler_target(handler)).on_status(req_id, num, msg)
 
 cdef void on_exec(DbrHandler handler, DbrIden req_id, DbrpyExec* exc):
-    (<object>handler_target(handler)).on_exec(req_id, req_id, make_exec(exc))
+    (<object>handler_target(handler)).on_exec(req_id, make_exec(exc))
 
 cdef void on_posn(DbrHandler handler, DbrpyPosn* posn):
     (<object>handler_target(handler)).on_posn(make_posn(posn))
@@ -313,8 +355,10 @@ cdef class Clnt(object):
             dbr_clnt_destroy(self.impl_)
 
     def close(self, DbrMillis ms):
-        if dbr_clnt_close(self.impl_, ms) == -1:
+        cdef DbrIden id = dbr_clnt_close(self.impl_, ms)
+        if id < 0:
             raise Error()
+        return id
 
     def find_rec_id(self, int type, DbrIden id):
         cdef DbrpySlNode* node = dbr_clnt_find_rec_id(self.impl_, type, id)
@@ -337,13 +381,35 @@ cdef class Clnt(object):
         cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
         if trader is NULL:
             raise Error()
-        return dbr_clnt_logon(self.impl_, trader, ms)
+        cdef DbrIden id = dbr_clnt_logon(self.impl_, trader, ms)
+        if id < 0:
+            raise Error()
+        return id
 
     def logoff(self, TraderRec trec, DbrMillis ms):
         cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
         if trader is NULL:
             raise Error()
-        return dbr_clnt_logoff(self.impl_, trader, ms)
+        cdef DbrIden id = dbr_clnt_logoff(self.impl_, trader, ms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def place(self, TraderRec trec, AccntRec arec, ContrRec crec,
+              DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+              DbrLots lots, DbrLots min_lots, DbrMillis ms):
+        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
+        if trader is NULL:
+            raise Error()
+        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
+        if accnt is NULL:
+            raise Error()
+        cdef DbrIden id = dbr_clnt_place(self.impl_, trader, accnt, crec.impl_,
+                                         settl_date, ref, action, ticks, lots,
+                                         min_lots, ms)
+        if id < 0:
+            raise Error()
+        return id
 
     def is_open(self):
         return <bint>dbr_clnt_is_open(self.impl_)

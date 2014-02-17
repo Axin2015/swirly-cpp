@@ -126,6 +126,10 @@ cdef extern from "dbr/types.h":
 
     DbrRec* dbr_shared_rec_entry(DbrSlNode* node)
 
+    cdef enum DbrAction:
+        DBR_ACTION_BUY
+        DBR_ACTION_SELL
+
     ctypedef struct DbrCommon:
         DbrRef ref
 
@@ -150,6 +154,26 @@ cdef extern from "dbr/pool.h":
     DbrPool dbr_pool_create(size_t capacity)
 
     void dbr_pool_destroy(DbrPool pool)
+
+cdef extern from "dbr/conv.h":
+
+    double dbr_fract_to_real(int numer, int denom)
+
+    DbrIncs dbr_real_to_incs(double real, double inc_size)
+
+    double dbr_incs_to_real(DbrIncs incs, double inc_size)
+
+    DbrLots dbr_qty_to_lots(double qty, DbrRec* crec)
+
+    double dbr_lots_to_qty(DbrLots lots, DbrRec* crec)
+
+    DbrTicks dbr_price_to_ticks(double price, DbrRec* crec)
+
+    double dbr_ticks_to_price(DbrTicks ticks, DbrRec* crec)
+
+    int dbr_real_to_dp(double d)
+
+    double dbr_dp_to_real(int dp)
 
 cdef extern from "dbr/handler.h":
 
@@ -194,7 +218,7 @@ cdef extern from "dbr/clnt.h":
 
     void dbr_clnt_destroy(DbrClnt clnt)
 
-    int dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
+    DbrIden dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
 
     DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
 
@@ -209,6 +233,11 @@ cdef extern from "dbr/clnt.h":
     DbrIden dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 
     DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
+
+    DbrIden dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt,
+                           DbrRec* crec, DbrDate settl_date, const char* ref,
+                           int action, DbrTicks ticks, DbrLots lots,
+                           DbrLots min_lots, DbrMillis ms)
 
     DbrBool dbr_clnt_is_open(DbrClnt clnt)
 
