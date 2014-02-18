@@ -90,19 +90,19 @@ cdef class RecBase(object):
     cdef public bytes mnem
     cdef public bytes display
     def __init__(self):
-        raise TypeError("init called on RecBase")
+        raise TypeError("init called")
 
 cdef class TraderRec(RecBase):
     cdef public bytes email
     def __init__(self):
-        raise TypeError("init called on TraderRec")
+        raise TypeError("init called")
     def __repr__(self):
         return 'TraderRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
 cdef class AccntRec(RecBase):
     cdef public bytes email
     def __init__(self):
-        raise TypeError("init called on AccntRec")
+        raise TypeError("init called")
     def __repr__(self):
         return 'AccntRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
@@ -122,7 +122,7 @@ cdef class ContrRec(RecBase):
     cdef public DbrLots min_lots
     cdef public DbrLots max_lots
     def __init__(self):
-        raise TypeError("init called on ContrRec")
+        raise TypeError("init called")
     def __repr__(self):
         return 'ContrRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
@@ -213,7 +213,7 @@ cdef class Order(object):
     cdef public DbrMillis created
     cdef public DbrMillis modified
     def __init__(self):
-        raise TypeError("init called on Order")
+        raise TypeError("init called")
 
 ROLE_MAKER = DBR_ROLE_MAKER
 ROLE_TAKER = DBR_ROLE_TAKER
@@ -240,7 +240,7 @@ cdef class Exec(object):
     cdef public DbrIden cpty
     cdef public DbrMillis created
     def __init__(self):
-        raise TypeError("init called on Exec")
+        raise TypeError("init called")
 
 cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
@@ -268,7 +268,7 @@ cdef Exec make_exec(DbrpyExec* exc):
 
 cdef class Posn(object):
     def __init__(self):
-        raise TypeError("init called on Posn")
+        raise TypeError("init called")
 
 cdef Posn make_posn(DbrpyPosn* posn):
     cdef obj = Posn.__new__(Posn)
@@ -276,7 +276,7 @@ cdef Posn make_posn(DbrpyPosn* posn):
 
 cdef class View(object):
     def __init__(self):
-        raise TypeError("init called on View")
+        raise TypeError("init called")
 
 cdef View make_view(DbrpyView* view):
     cdef obj = View.__new__(View)
@@ -409,6 +409,30 @@ cdef class Handler(object):
     def on_flush(self):
         pass
 
+cdef class Trader(object):
+    cdef DbrTrader impl_
+    cdef public TraderRec rec
+    def __init__(self):
+        raise TypeError("init called")
+
+cdef Trader make_trader(DbrTrader trader, TraderRec rec):
+    cdef Trader obj = Trader.__new__(Trader)
+    obj.impl_ = trader
+    obj.rec = rec
+    return obj
+
+cdef class Accnt(object):
+    cdef DbrAccnt impl_
+    cdef public AccntRec rec
+    def __init__(self):
+        raise TypeError("init called")
+
+cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
+    cdef Accnt obj = Accnt.__new__(Accnt)
+    obj.impl_ = accnt
+    obj.rec = rec
+    return obj
+
 cdef class Clnt(object):
     cdef DbrClnt impl_
 
@@ -445,6 +469,18 @@ cdef class Clnt(object):
             node = dbr_slnode_next(node)
         return ls
 
+    def trader(self, TraderRec trec):
+        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
+        if trader is NULL:
+            raise Error()
+        return make_trader(trader, trec)
+
+    def accnt(self, AccntRec arec):
+        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
+        if accnt is NULL:
+            raise Error()
+        return make_accnt(accnt, arec)
+
     def logon(self, TraderRec trec, DbrMillis ms):
         cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
         if trader is NULL:
@@ -463,18 +499,12 @@ cdef class Clnt(object):
             raise Error()
         return id
 
-    def place(self, TraderRec trec, AccntRec arec, ContrRec crec,
-              DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
-              DbrLots lots, DbrLots min_lots, DbrMillis ms):
-        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
-        if trader is NULL:
-            raise Error()
-        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
-        if accnt is NULL:
-            raise Error()
-        cdef DbrIden id = dbr_clnt_place(self.impl_, trader, accnt, crec.impl_,
-                                         settl_date, ref, action, ticks, lots,
-                                         min_lots, ms)
+    def place(self, Trader trader, Accnt accnt, ContrRec crec, DbrDate settl_date,
+              const char* ref, int action, DbrTicks ticks, DbrLots lots,
+              DbrLots min_lots, DbrMillis ms):
+        cdef DbrIden id = dbr_clnt_place(self.impl_, trader.impl_, accnt.impl_,
+                                         crec.impl_, settl_date, ref, action,
+                                         ticks, lots, min_lots, ms)
         if id < 0:
             raise Error()
         return id
