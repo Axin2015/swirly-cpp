@@ -8,7 +8,8 @@ cdef extern from "dbrpy/dbrpy.h":
 
     ctypedef DbrSlNode DbrpySlNode
 
-    ctypedef DbrRec  DbrpyRec
+    ctypedef DbrRec DbrpyRec
+    ctypedef DbrOrder DbrpyOrder
     ctypedef DbrExec DbrpyExec
     ctypedef DbrPosn DbrpyPosn
     ctypedef DbrView DbrpyView
@@ -185,17 +186,84 @@ cdef RecBase make_rec(DbrpyRec* rec):
         obj = make_contr_rec(rec)
     return obj
 
+STATE_NEW = DBR_STATE_NEW
+STATE_REVISE = DBR_STATE_REVISE
+STATE_CANCEL = DBR_STATE_CANCEL
+STATE_TRADE = DBR_STATE_TRADE
+
 ACTION_BUY = DBR_ACTION_BUY
 ACTION_SELL = DBR_ACTION_SELL
 
+cdef class Order(object):
+    cdef public DbrIden id
+    cdef public DbrIden trader
+    cdef public DbrIden accnt
+    cdef public DbrIden contr
+    cdef public DbrDate settl_date
+    cdef public bytes ref
+    cdef public int state
+    cdef public int action
+    cdef public DbrTicks ticks
+    cdef public DbrLots lots
+    cdef public DbrLots resd
+    cdef public DbrLots exc
+    cdef public DbrTicks last_ticks
+    cdef public DbrLots last_lots
+    cdef public DbrLots min_lots
+    cdef public DbrMillis created
+    cdef public DbrMillis modified
+    def __init__(self):
+        raise TypeError("init called on Order")
+
+ROLE_MAKER = DBR_ROLE_MAKER
+ROLE_TAKER = DBR_ROLE_TAKER
+
 cdef class Exec(object):
+    cdef public DbrIden id
+    cdef public DbrIden order
+    cdef public DbrIden tid
+    cdef public DbrIden aid
+    cdef public DbrIden cid
+    cdef public DbrDate settl_date
+    cdef public bytes ref
+    cdef public int state
+    cdef public int action
+    cdef public DbrTicks ticks
+    cdef public DbrLots lots
+    cdef public DbrLots resd
+    cdef public DbrLots exc
+    cdef public DbrTicks last_ticks
+    cdef public DbrLots last_lots
+    cdef public DbrLots min_lots
+    cdef public DbrIden match
+    cdef public int role
+    cdef public DbrIden cpty
+    cdef public DbrMillis created
     def __init__(self):
         raise TypeError("init called on Exec")
 
 cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
     obj.id = exc.id
+    obj.order = exc.order
+    obj.tid = exc.c.trader.rec.id
+    obj.aid = exc.c.accnt.rec.id
+    obj.cid = exc.c.contr.rec.id
+    obj.settl_date = exc.c.settl_date
     obj.ref = exc.c.ref[:string.strnlen(exc.c.ref, DBR_REF_MAX)]
+    obj.state = exc.c.state
+    obj.action = exc.c.action
+    obj.ticks = exc.c.ticks
+    obj.lots = exc.c.lots
+    obj.resd = exc.c.resd
+    obj.exc = exc.c.exc
+    obj.last_ticks = exc.c.last_ticks
+    obj.last_lots = exc.c.last_lots
+    obj.min_lots = exc.c.min_lots
+    obj.match = exc.match
+    obj.role = exc.role
+    obj.cpty = exc.cpty.rec.id if exc.cpty.rec is not NULL else 0
+    obj.created = exc.created
     return obj
 
 cdef class Posn(object):

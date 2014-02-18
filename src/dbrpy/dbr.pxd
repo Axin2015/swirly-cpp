@@ -126,17 +126,50 @@ cdef extern from "dbr/types.h":
 
     DbrRec* dbr_shared_rec_entry(DbrSlNode* node)
 
+    cdef enum DbrState:
+        DBR_STATE_NEW
+        DBR_STATE_REVISE
+        DBR_STATE_CANCEL
+        DBR_STATE_TRADE
+
     cdef enum DbrAction:
         DBR_ACTION_BUY
         DBR_ACTION_SELL
 
     ctypedef struct DbrCommon:
+        DbrURec trader
+        DbrURec accnt
+        DbrURec contr
+        DbrDate settl_date
         DbrRef ref
+        int state
+        int action
+        DbrTicks ticks
+        DbrLots lots
+        DbrLots resd
+        DbrLots exc "exec"
+        DbrTicks last_ticks
+        DbrLots last_lots
+        DbrLots min_lots
+
+    ctypedef struct DbrOrder:
+        DbrIden id
+        DbrCommon c
+        DbrMillis created
+        DbrMillis modified
+
+    cdef enum DbrRole:
+        DBR_ROLE_MAKER
+        DBR_ROLE_TAKER
 
     ctypedef struct DbrExec:
         DbrIden id
         DbrIden order
         DbrCommon c
+        DbrIden match
+        int role
+        DbrURec cpty
+        DbrMillis created
 
     ctypedef struct DbrPosn:
         pass
