@@ -1,3 +1,11 @@
+cdef extern from "dbr/rbnode.h":
+
+    ctypedef struct DbrRbNode
+
+    DbrRbNode* dbr_rbnode_next(DbrRbNode* node)
+
+    DbrRbNode* dbr_rbnode_prev(DbrRbNode* node)
+
 cdef extern from "dbr/slnode.h":
 
     ctypedef struct DbrSlNode
@@ -208,6 +216,14 @@ cdef extern from "dbr/conv.h":
 
     double dbr_dp_to_real(int dp)
 
+cdef extern from "dbr/trader.h":
+
+    DbrOrder* dbr_trader_order_entry(DbrRbNode* node)
+
+    DbrRbNode* dbr_trader_find_order_id(DbrTrader trader, DbrIden id)
+
+    DbrOrder* dbr_trader_find_order_ref(DbrTrader trader, const char* ref)
+
 cdef extern from "dbr/handler.h":
 
     ctypedef struct DbrHandlerVtbl
@@ -258,6 +274,8 @@ cdef extern from "dbr/clnt.h":
     DbrSlNode* dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem)
 
     DbrSlNode* dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size)
+
+    DbrBool dbr_clnt_empty_rec(DbrClnt clnt, int type)
 
     DbrTrader dbr_clnt_trader(DbrClnt clnt, DbrRec* trec)
 

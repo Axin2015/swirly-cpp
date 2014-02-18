@@ -6,6 +6,7 @@ from cpython.ref cimport PyObject
 
 cdef extern from "dbrpy/dbrpy.h":
 
+    ctypedef DbrRbNode DbrpyRbNode
     ctypedef DbrSlNode DbrpySlNode
 
     ctypedef DbrRec DbrpyRec
@@ -215,6 +216,27 @@ cdef class Order(object):
     def __init__(self):
         raise TypeError("init called")
 
+cdef Order make_order(DbrpyOrder* order):
+    cdef obj = Order.__new__(Order)
+    obj.id = order.id
+    obj.tid = order.c.trader.rec.id
+    obj.aid = order.c.accnt.rec.id
+    obj.cid = order.c.contr.rec.id
+    obj.settl_date = order.c.settl_date
+    obj.ref = order.c.ref[:string.strnlen(order.c.ref, DBR_REF_MAX)]
+    obj.state = order.c.state
+    obj.action = order.c.action
+    obj.ticks = order.c.ticks
+    obj.lots = order.c.lots
+    obj.resd = order.c.resd
+    obj.exc = order.c.exc
+    obj.last_ticks = order.c.last_ticks
+    obj.last_lots = order.c.last_lots
+    obj.min_lots = order.c.min_lots
+    obj.created = order.created
+    obj.modified = order.modified
+    return obj
+
 ROLE_MAKER = DBR_ROLE_MAKER
 ROLE_TAKER = DBR_ROLE_TAKER
 
@@ -322,6 +344,33 @@ def real_to_dp(double d):
 def dp_to_real(int dp):
     return dbr_dp_to_real(dp)
 
+cdef class Trader(object):
+    cdef DbrTrader impl_
+    cdef public TraderRec rec
+    def __init__(self):
+        raise TypeError("init called")
+    def find_order_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_trader_find_order_id(self.impl_, id)
+        return make_order(dbr_trader_order_entry(node)) if node is not NULL else None
+
+cdef Trader make_trader(DbrTrader trader, TraderRec rec):
+    cdef Trader obj = Trader.__new__(Trader)
+    obj.impl_ = trader
+    obj.rec = rec
+    return obj
+
+cdef class Accnt(object):
+    cdef DbrAccnt impl_
+    cdef public AccntRec rec
+    def __init__(self):
+        raise TypeError("init called")
+
+cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
+    cdef Accnt obj = Accnt.__new__(Accnt)
+    obj.impl_ = accnt
+    obj.rec = rec
+    return obj
+
 cdef struct HandlerImpl:
     PyObject* target
     DbrpyIHandler handler
@@ -409,30 +458,6 @@ cdef class Handler(object):
     def on_flush(self):
         pass
 
-cdef class Trader(object):
-    cdef DbrTrader impl_
-    cdef public TraderRec rec
-    def __init__(self):
-        raise TypeError("init called")
-
-cdef Trader make_trader(DbrTrader trader, TraderRec rec):
-    cdef Trader obj = Trader.__new__(Trader)
-    obj.impl_ = trader
-    obj.rec = rec
-    return obj
-
-cdef class Accnt(object):
-    cdef DbrAccnt impl_
-    cdef public AccntRec rec
-    def __init__(self):
-        raise TypeError("init called")
-
-cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
-    cdef Accnt obj = Accnt.__new__(Accnt)
-    obj.impl_ = accnt
-    obj.rec = rec
-    return obj
-
 cdef class Clnt(object):
     cdef DbrClnt impl_
 
@@ -468,6 +493,9 @@ cdef class Clnt(object):
             ls.append(make_rec(dbr_shared_rec_entry(node)))
             node = dbr_slnode_next(node)
         return ls
+
+    def empty_rec(self, int type):
+        return <bint>dbr_clnt_empty_rec(self.impl_, type)
 
     def trader(self, TraderRec trec):
         cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
