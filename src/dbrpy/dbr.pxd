@@ -180,7 +180,13 @@ cdef extern from "dbr/types.h":
         DbrMillis created
 
     ctypedef struct DbrPosn:
-        pass
+        DbrURec accnt
+        DbrURec contr
+        DbrDate settl_date
+        DbrLicks buy_licks
+        DbrLots buy_lots
+        DbrLicks sell_licks
+        DbrLots sell_lots
 
     ctypedef struct DbrView:
         pass
@@ -223,6 +229,12 @@ cdef extern from "dbr/trader.h":
     DbrRbNode* dbr_trader_find_order_id(DbrTrader trader, DbrIden id)
 
     DbrOrder* dbr_trader_find_order_ref(DbrTrader trader, const char* ref)
+
+cdef extern from "dbr/accnt.h":
+
+    DbrPosn* dbr_accnt_posn_entry(DbrRbNode* node)
+
+    DbrRbNode* dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
 
 cdef extern from "dbr/handler.h":
 

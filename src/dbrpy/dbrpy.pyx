@@ -289,11 +289,25 @@ cdef Exec make_exec(DbrpyExec* exc):
     return obj
 
 cdef class Posn(object):
+    cdef public DbrIden aid
+    cdef public DbrIden cid
+    cdef public DbrDate settl_date
+    cdef public DbrLicks buy_licks
+    cdef public DbrLots buy_lots
+    cdef public DbrLicks sell_licks
+    cdef public DbrLots sell_lots
     def __init__(self):
         raise TypeError("init called")
 
 cdef Posn make_posn(DbrpyPosn* posn):
     cdef obj = Posn.__new__(Posn)
+    obj.aid = posn.accnt.rec.id
+    obj.cid = posn.contr.rec.id
+    obj.settl_date = posn.settl_date
+    obj.buy_licks = posn.buy_licks
+    obj.buy_lots = posn.buy_lots
+    obj.sell_licks = posn.sell_licks
+    obj.sell_lots = posn.sell_lots
     return obj
 
 cdef class View(object):
@@ -352,6 +366,9 @@ cdef class Trader(object):
     def find_order_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_trader_find_order_id(self.impl_, id)
         return make_order(dbr_trader_order_entry(node)) if node is not NULL else None
+    def find_order_ref(self, const char* ref):
+        cdef DbrpyOrder* order = dbr_trader_find_order_ref(self.impl_, ref)
+        return make_order(order) if order is not NULL else None
 
 cdef Trader make_trader(DbrTrader trader, TraderRec rec):
     cdef Trader obj = Trader.__new__(Trader)
@@ -364,6 +381,9 @@ cdef class Accnt(object):
     cdef public AccntRec rec
     def __init__(self):
         raise TypeError("init called")
+    def find_posn_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_posn_id(self.impl_, id)
+        return make_posn(dbr_accnt_posn_entry(node)) if node is not NULL else None
 
 cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     cdef Accnt obj = Accnt.__new__(Accnt)
