@@ -240,6 +240,17 @@ cdef Order make_order(DbrpyOrder* order):
     obj.modified = order.modified
     return obj
 
+cdef class Level(object):
+    cdef public DbrTicks ticks
+    cdef public DbrLots lots
+    cdef public size_t count
+    def __cinit__(self, DbrTicks ticks, DbrLots lots, size_t count):
+        self.ticks = ticks
+        self.lots = lots
+        self.count = count
+    def __repr__(self):
+        return 'Level({0.ticks!r}, {0.lots!r}, {0.count!r})'.format(self)
+
 ROLE_MAKER = DBR_ROLE_MAKER
 ROLE_TAKER = DBR_ROLE_TAKER
 
@@ -331,19 +342,35 @@ cdef Posn make_posn(DbrpyPosn* posn):
     obj.sell_lots = posn.sell_lots
     return obj
 
+LEVEL_MAX = DBR_LEVEL_MAX
+
 cdef class View(object):
+    cdef public DbrIden cid
+    cdef public DbrDate settl_date
+    cdef public list list_bid
+    cdef public list list_ask
     def __init__(self):
         raise TypeError("init called")
+    def __repr__(self):
+        return 'View({0.cid!r}, {0.settl_date!r}, {0.list_bid[0]!r}, {0.list_ask[0]!r})'.format(self)
 
 cdef View make_view(DbrpyView* view):
     cdef obj = View.__new__(View)
-    #intst.cid = view.contr.rec.id
+    obj.cid = view.contr.rec.id
+    obj.settl_date = view.settl_date
+    obj.list_bid = []
+    obj.list_ask = []
+    cdef size_t i
+    for i in range(LEVEL_MAX):
+        obj.list_bid.append(Level(view.bid_ticks[i], view.bid_lots[i], view.bid_count[i]))
+    for i in range(LEVEL_MAX):
+        obj.list_ask.append(Level(view.ask_ticks[i], view.ask_lots[i], view.ask_count[i]))
     return obj
 
 cdef class Pool(object):
     cdef DbrPool impl_
 
-    def __cinit__(self, capacity):
+    def __cinit__(self, size_t capacity):
         self.impl_ = dbr_pool_create(capacity)
         if self.impl_ is NULL:
             raise Error()
@@ -645,3 +672,16 @@ cdef class Clnt(object):
 
     def poll(self, DbrMillis ms, Handler handler):
         return dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
+
+    def find_view(self, DbrIden cid, DbrDate settl_date):
+        cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_date)
+        return make_view(dbr_clnt_view_entry(node)) if node is not NULL else None
+    def list_view(self):
+        views = []
+        cdef DbrpyRbNode* node = dbr_clnt_first_view(self.impl_)
+        while node is not NULL:
+            views.append(make_view(dbr_clnt_view_entry(node)))
+            node = dbr_rbnode_next(node)
+        return views
+    def empty_view(self):
+        return <bint>dbr_clnt_empty_view(self.impl_)

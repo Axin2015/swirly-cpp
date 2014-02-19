@@ -363,3 +363,13 @@ cdef extern from "dbr/clnt.h":
     DbrBool dbr_clnt_is_ready(DbrClnt clnt)
 
     int dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
+
+    DbrView* dbr_clnt_view_entry(DbrRbNode* node)
+
+    DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date)
+
+    DbrRbNode* dbr_clnt_first_view(DbrClnt clnt)
+
+    DbrRbNode* dbr_clnt_last_view(DbrClnt clnt)
+
+    DbrBool dbr_clnt_empty_view(DbrClnt clnt)
