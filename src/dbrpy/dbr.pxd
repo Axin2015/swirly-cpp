@@ -179,6 +179,10 @@ cdef extern from "dbr/types.h":
         DbrURec cpty
         DbrMillis created
 
+    ctypedef struct DbrMemb:
+        DbrURec trader
+        DbrURec accnt
+
     ctypedef struct DbrPosn:
         DbrURec accnt
         DbrURec contr
@@ -188,8 +192,18 @@ cdef extern from "dbr/types.h":
         DbrLicks sell_licks
         DbrLots sell_lots
 
+    cdef enum:
+        DBR_LEVEL_MAX
+
     ctypedef struct DbrView:
-        pass
+        DbrURec contr
+        DbrDate settl_date
+        DbrTicks bid_ticks[DBR_LEVEL_MAX]
+        DbrLots bid_lots[DBR_LEVEL_MAX]
+        size_t bid_count[DBR_LEVEL_MAX]
+        DbrTicks ask_ticks[DBR_LEVEL_MAX]
+        DbrLots ask_lots[DBR_LEVEL_MAX]
+        size_t ask_count[DBR_LEVEL_MAX]
 
 cdef extern from "dbr/pool.h":
 
@@ -230,11 +244,53 @@ cdef extern from "dbr/trader.h":
 
     DbrOrder* dbr_trader_find_order_ref(DbrTrader trader, const char* ref)
 
+    DbrRbNode* dbr_trader_first_order(DbrTrader trader)
+
+    DbrRbNode* dbr_trader_last_order(DbrTrader trader)
+
+    DbrBool dbr_trader_empty_order(DbrTrader trader)
+
+    DbrExec* dbr_trader_trade_entry(DbrRbNode* node)
+
+    DbrRbNode* dbr_trader_find_trade_id(DbrTrader trader, DbrIden id)
+
+    DbrRbNode* dbr_trader_first_trade(DbrTrader trader)
+
+    DbrRbNode* dbr_trader_last_trade(DbrTrader trader)
+
+    DbrBool dbr_trader_empty_trade(DbrTrader trader)
+
+    DbrMemb* dbr_trader_memb_entry(DbrRbNode* node)
+
+    DbrRbNode* dbr_trader_find_memb_id(DbrTrader trader, DbrIden id)
+
+    DbrRbNode* dbr_trader_first_memb(DbrTrader trader)
+
+    DbrRbNode* dbr_trader_last_memb(DbrTrader trader)
+
+    DbrBool dbr_trader_empty_memb(DbrTrader trader)
+
 cdef extern from "dbr/accnt.h":
+
+    DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node)
+
+    DbrRbNode* dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id)
+
+    DbrRbNode* dbr_accnt_first_memb(DbrAccnt accnt)
+
+    DbrRbNode* dbr_accnt_last_memb(DbrAccnt accnt)
+
+    DbrBool dbr_accnt_empty_memb(DbrAccnt accnt)
 
     DbrPosn* dbr_accnt_posn_entry(DbrRbNode* node)
 
     DbrRbNode* dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
+
+    DbrRbNode* dbr_accnt_first_posn(DbrAccnt accnt)
+
+    DbrRbNode* dbr_accnt_last_posn(DbrAccnt accnt)
+
+    DbrBool dbr_accnt_empty_posn(DbrAccnt accnt)
 
 cdef extern from "dbr/handler.h":
 

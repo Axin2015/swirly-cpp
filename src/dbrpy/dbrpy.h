@@ -26,6 +26,7 @@ typedef struct DbrSlNode DbrpySlNode;
 typedef struct DbrRec DbrpyRec;
 typedef struct DbrOrder DbrpyOrder;
 typedef struct DbrExec DbrpyExec;
+typedef struct DbrMemb DbrpyMemb;
 typedef struct DbrPosn DbrpyPosn;
 typedef struct DbrView DbrpyView;
 

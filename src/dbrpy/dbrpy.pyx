@@ -12,6 +12,7 @@ cdef extern from "dbrpy/dbrpy.h":
     ctypedef DbrRec DbrpyRec
     ctypedef DbrOrder DbrpyOrder
     ctypedef DbrExec DbrpyExec
+    ctypedef DbrMemb DbrpyMemb
     ctypedef DbrPosn DbrpyPosn
     ctypedef DbrView DbrpyView
 
@@ -197,9 +198,9 @@ ACTION_SELL = DBR_ACTION_SELL
 
 cdef class Order(object):
     cdef public DbrIden id
-    cdef public DbrIden trader
-    cdef public DbrIden accnt
-    cdef public DbrIden contr
+    cdef public DbrIden tid
+    cdef public DbrIden aid
+    cdef public DbrIden cid
     cdef public DbrDate settl_date
     cdef public bytes ref
     cdef public int state
@@ -215,6 +216,8 @@ cdef class Order(object):
     cdef public DbrMillis modified
     def __init__(self):
         raise TypeError("init called")
+    def __repr__(self):
+        return 'Order({0.id!r})'.format(self)
 
 cdef Order make_order(DbrpyOrder* order):
     cdef obj = Order.__new__(Order)
@@ -263,6 +266,8 @@ cdef class Exec(object):
     cdef public DbrMillis created
     def __init__(self):
         raise TypeError("init called")
+    def __repr__(self):
+        return 'Exec({0.id!r})'.format(self)
 
 cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
@@ -288,6 +293,20 @@ cdef Exec make_exec(DbrpyExec* exc):
     obj.created = exc.created
     return obj
 
+cdef class Memb(object):
+    cdef public DbrIden tid
+    cdef public DbrIden aid
+    def __init__(self):
+        raise TypeError("init called")
+    def __repr__(self):
+        return 'Memb({0.tid!r}, {0.aid!r})'.format(self)
+
+cdef Memb make_memb(DbrpyMemb* memb):
+    cdef obj = Memb.__new__(Memb)
+    obj.tid = memb.trader.rec.id
+    obj.aid = memb.accnt.rec.id
+    return obj
+
 cdef class Posn(object):
     cdef public DbrIden aid
     cdef public DbrIden cid
@@ -298,6 +317,8 @@ cdef class Posn(object):
     cdef public DbrLots sell_lots
     def __init__(self):
         raise TypeError("init called")
+    def __repr__(self):
+        return 'Posn({0.aid!r}, {0.cid!r}, {0.settl_date!r})'.format(self)
 
 cdef Posn make_posn(DbrpyPosn* posn):
     cdef obj = Posn.__new__(Posn)
@@ -363,12 +384,48 @@ cdef class Trader(object):
     cdef public TraderRec rec
     def __init__(self):
         raise TypeError("init called")
+    # TraderOrder
     def find_order_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_trader_find_order_id(self.impl_, id)
         return make_order(dbr_trader_order_entry(node)) if node is not NULL else None
     def find_order_ref(self, const char* ref):
         cdef DbrpyOrder* order = dbr_trader_find_order_ref(self.impl_, ref)
         return make_order(order) if order is not NULL else None
+    def list_order(self):
+        orders = []
+        cdef DbrpyRbNode* node = dbr_trader_first_order(self.impl_)
+        while node is not NULL:
+            orders.append(make_order(dbr_trader_order_entry(node)))
+            node = dbr_rbnode_next(node)
+        return orders
+    def empty_order(self):
+        return <bint>dbr_trader_empty_order(self.impl_)
+    # TraderTrade
+    def find_trade_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_trader_find_trade_id(self.impl_, id)
+        return make_exec(dbr_trader_trade_entry(node)) if node is not NULL else None
+    def list_trade(self):
+        trades = []
+        cdef DbrpyRbNode* node = dbr_trader_first_trade(self.impl_)
+        while node is not NULL:
+            trades.append(make_exec(dbr_trader_trade_entry(node)))
+            node = dbr_rbnode_next(node)
+        return trades
+    def empty_trade(self):
+        return <bint>dbr_trader_empty_trade(self.impl_)
+    # TraderMemb
+    def find_memb_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_trader_find_memb_id(self.impl_, id)
+        return make_memb(dbr_trader_memb_entry(node)) if node is not NULL else None
+    def list_memb(self):
+        membs = []
+        cdef DbrpyRbNode* node = dbr_trader_first_memb(self.impl_)
+        while node is not NULL:
+            membs.append(make_memb(dbr_trader_memb_entry(node)))
+            node = dbr_rbnode_next(node)
+        return membs
+    def empty_memb(self):
+        return <bint>dbr_trader_empty_memb(self.impl_)
 
 cdef Trader make_trader(DbrTrader trader, TraderRec rec):
     cdef Trader obj = Trader.__new__(Trader)
@@ -381,9 +438,32 @@ cdef class Accnt(object):
     cdef public AccntRec rec
     def __init__(self):
         raise TypeError("init called")
+    # AccntMemb
+    def find_memb_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_memb_id(self.impl_, id)
+        return make_memb(dbr_accnt_memb_entry(node)) if node is not NULL else None
+    def list_memb(self):
+        membs = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_memb(self.impl_)
+        while node is not NULL:
+            membs.append(make_memb(dbr_accnt_memb_entry(node)))
+            node = dbr_rbnode_next(node)
+        return membs
+    def empty_memb(self):
+        return <bint>dbr_accnt_empty_memb(self.impl_)
+    # AccntPosn
     def find_posn_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_accnt_find_posn_id(self.impl_, id)
         return make_posn(dbr_accnt_posn_entry(node)) if node is not NULL else None
+    def list_posn(self):
+        posns = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_posn(self.impl_)
+        while node is not NULL:
+            posns.append(make_posn(dbr_accnt_posn_entry(node)))
+            node = dbr_rbnode_next(node)
+        return posns
+    def empty_posn(self):
+        return <bint>dbr_accnt_empty_posn(self.impl_)
 
 cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     cdef Accnt obj = Accnt.__new__(Accnt)
@@ -505,14 +585,14 @@ cdef class Clnt(object):
         cdef DbrpySlNode* node = dbr_clnt_find_rec_mnem(self.impl_, type, mnem)
         return make_rec(dbr_shared_rec_entry(node)) if node is not NULL else None
 
-    def recs(self, int type):
+    def list_rec(self, int type):
+        recs = []
         cdef size_t size = 0
         cdef DbrpySlNode* node = dbr_clnt_first_rec(self.impl_, type, &size)
-        ls = []
         while node is not NULL:
-            ls.append(make_rec(dbr_shared_rec_entry(node)))
+            recs.append(make_rec(dbr_shared_rec_entry(node)))
             node = dbr_slnode_next(node)
-        return ls
+        return recs
 
     def empty_rec(self, int type):
         return <bint>dbr_clnt_empty_rec(self.impl_, type)

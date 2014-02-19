@@ -33,33 +33,6 @@ dbr_accnt_rec(DbrAccnt accnt);
 /** @} */
 
 /**
- * @addtogroup AccntPosn
- * @{
- */
-
-#define DBR_ACCNT_END_POSN NULL
-
-static inline struct DbrPosn*
-dbr_accnt_posn_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrPosn, accnt_node_, node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id);
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_posn(DbrAccnt accnt);
-
-DBR_API struct DbrRbNode*
-dbr_accnt_last_posn(DbrAccnt accnt);
-
-DBR_API DbrBool
-dbr_accnt_empty_posn(DbrAccnt accnt);
-
-/** @} */
-
-/**
  * @addtogroup AccntMemb
  * @{
  */
@@ -83,6 +56,33 @@ dbr_accnt_last_memb(DbrAccnt accnt);
 
 DBR_API DbrBool
 dbr_accnt_empty_memb(DbrAccnt accnt);
+
+/** @} */
+
+/**
+ * @addtogroup AccntPosn
+ * @{
+ */
+
+#define DBR_ACCNT_END_POSN NULL
+
+static inline struct DbrPosn*
+dbr_accnt_posn_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrPosn, accnt_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_posn(DbrAccnt accnt);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_posn(DbrAccnt accnt);
+
+DBR_API DbrBool
+dbr_accnt_empty_posn(DbrAccnt accnt);
 
 /** @} */
 
