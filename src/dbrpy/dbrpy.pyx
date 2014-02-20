@@ -21,6 +21,12 @@ cdef extern from "dbrpy/dbrpy.h":
 
 from inspect import currentframe, getframeinfo
 
+# Defs
+
+ERRMSG_MAX = DBR_ERRMSG_MAX
+
+# Err
+
 EINTR = DBR_EINTR
 EIO = DBR_EIO
 ENOMEM = DBR_ENOMEM
@@ -30,6 +36,15 @@ EEXIST = DBR_EEXIST
 EINVAL = DBR_EINVAL
 ETIMEOUT = DBR_ETIMEOUT
 EUSER = DBR_EUSER
+
+def err_clear():
+    dbr_err_clear()
+
+def err_print():
+    dbr_err_print()
+
+def err_prints(const char* s):
+    dbr_err_prints(s)
 
 def err_set(int num, const char* msg):
     fi = getframeinfo(currentframe())
@@ -58,23 +73,24 @@ class Error(Exception):
     def __str__(self):
         return "{1}:{2}: {3} ({0})".format(self.num, self.file, self.line, self.msg)
 
+# Util
+
 def millis():
     return dbr_millis()
 
-cdef class ZmqCtx(object):
-    cdef void* impl_
+def intdig(int i):
+    return dbr_intdig(i)
 
-    def __cinit__(self):
-        self.impl_ = zmq.zmq_ctx_new()
-        if self.impl_ is NULL:
-            fi = getframeinfo(currentframe())
-            dbr_err_setf_(DBR_EIO, fi.filename, fi.lineno,
-                              "zmq_ctx_new() failed: %s", zmq.zmq_strerror(zmq.zmq_errno()))
-            raise Error()
+def longdig(long l):
+    return dbr_longdig(l)
 
-    def __dealloc__(self):
-        if self.impl_ is not NULL:
-            zmq.zmq_ctx_destroy(self.impl_)
+def intlen(int i):
+    return dbr_intlen(i)
+
+def longlen(long l):
+    return dbr_longlen(l)
+
+# Types
 
 ENTITY_TRADER = DBR_ENTITY_TRADER
 ENTITY_ACCNT = DBR_ENTITY_ACCNT
@@ -83,6 +99,11 @@ ENTITY_ORDER = DBR_ENTITY_ORDER
 ENTITY_EXEC = DBR_ENTITY_EXEC
 ENTITY_MEMB = DBR_ENTITY_MEMB
 ENTITY_POSN = DBR_ENTITY_POSN
+
+DISPLAY_MAX = DBR_DISPLAY_MAX
+EMAIL_MAX = DBR_EMAIL_MAX
+MNEM_MAX = DBR_MNEM_MAX
+REF_MAX = DBR_REF_MAX
 
 cdef class RecBase(object):
     # Only accesed from clnt thread.
@@ -240,6 +261,9 @@ cdef Order make_order(DbrpyOrder* order):
     obj.modified = order.modified
     return obj
 
+def order_done(Order order):
+    return order.resd == 0
+
 cdef class Level(object):
     cdef public DbrTicks ticks
     cdef public DbrLots lots
@@ -304,6 +328,9 @@ cdef Exec make_exec(DbrpyExec* exc):
     obj.created = exc.created
     return obj
 
+def exec_done(Exec exc):
+    return exc.resd == 0
+
 cdef class Memb(object):
     cdef public DbrIden tid
     cdef public DbrIden aid
@@ -367,6 +394,8 @@ cdef View make_view(DbrpyView* view):
         obj.list_ask.append(Level(view.ask_ticks[i], view.ask_lots[i], view.ask_count[i]))
     return obj
 
+# Pool
+
 cdef class Pool(object):
     cdef DbrPool impl_
 
@@ -378,6 +407,8 @@ cdef class Pool(object):
     def __dealloc__(self):
         if self.impl_ is not NULL:
             dbr_pool_destroy(self.impl_)
+
+# Conv
 
 def fract_to_real(int numer, int denom):
     return dbr_fract_to_real(numer, denom)
@@ -406,11 +437,15 @@ def real_to_dp(double d):
 def dp_to_real(int dp):
     return dbr_dp_to_real(dp)
 
+# Trader
+
 cdef class Trader(object):
     cdef DbrTrader impl_
     cdef public TraderRec rec
+
     def __init__(self):
         raise TypeError("init called")
+
     # TraderOrder
     def find_order_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_trader_find_order_id(self.impl_, id)
@@ -427,6 +462,7 @@ cdef class Trader(object):
         return orders
     def empty_order(self):
         return <bint>dbr_trader_empty_order(self.impl_)
+
     # TraderTrade
     def find_trade_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_trader_find_trade_id(self.impl_, id)
@@ -440,6 +476,7 @@ cdef class Trader(object):
         return trades
     def empty_trade(self):
         return <bint>dbr_trader_empty_trade(self.impl_)
+
     # TraderMemb
     def find_memb_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_trader_find_memb_id(self.impl_, id)
@@ -453,6 +490,8 @@ cdef class Trader(object):
         return membs
     def empty_memb(self):
         return <bint>dbr_trader_empty_memb(self.impl_)
+    def logged_on(self):
+        return <bint>dbr_trader_logged_on(self.impl_)
 
 cdef Trader make_trader(DbrTrader trader, TraderRec rec):
     cdef Trader obj = Trader.__new__(Trader)
@@ -460,11 +499,15 @@ cdef Trader make_trader(DbrTrader trader, TraderRec rec):
     obj.rec = rec
     return obj
 
+# Accnt
+
 cdef class Accnt(object):
     cdef DbrAccnt impl_
     cdef public AccntRec rec
+
     def __init__(self):
         raise TypeError("init called")
+
     # AccntMemb
     def find_memb_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_accnt_find_memb_id(self.impl_, id)
@@ -478,6 +521,7 @@ cdef class Accnt(object):
         return membs
     def empty_memb(self):
         return <bint>dbr_accnt_empty_memb(self.impl_)
+
     # AccntPosn
     def find_posn_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_accnt_find_posn_id(self.impl_, id)
@@ -497,6 +541,8 @@ cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     obj.impl_ = accnt
     obj.rec = rec
     return obj
+
+# Handler
 
 cdef struct HandlerImpl:
     PyObject* target
@@ -585,6 +631,25 @@ cdef class Handler(object):
     def on_flush(self):
         pass
 
+# Zmq
+
+cdef class ZmqCtx(object):
+    cdef void* impl_
+
+    def __cinit__(self):
+        self.impl_ = zmq.zmq_ctx_new()
+        if self.impl_ is NULL:
+            fi = getframeinfo(currentframe())
+            dbr_err_setf_(DBR_EIO, fi.filename, fi.lineno,
+                              "zmq_ctx_new() failed: %s", zmq.zmq_strerror(zmq.zmq_errno()))
+            raise Error()
+
+    def __dealloc__(self):
+        if self.impl_ is not NULL:
+            zmq.zmq_ctx_destroy(self.impl_)
+
+# Clnt
+
 cdef class Clnt(object):
     cdef DbrClnt impl_
 
@@ -664,14 +729,62 @@ cdef class Clnt(object):
             raise Error()
         return id
 
+    def revise_id(self, Trader trader, DbrIden id, DbrLots lots, DbrMillis ms):
+        id = dbr_clnt_revise_id(self.impl_, trader.impl_, id, lots, ms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def revise_ref(self, Trader trader, const char* ref, DbrLots lots, DbrMillis ms):
+        cdef DbrIden id = dbr_clnt_revise_ref(self.impl_, trader.impl_, ref, lots, ms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def cancel_id(self, Trader trader, DbrIden id, DbrMillis ms):
+        id = dbr_clnt_cancel_id(self.impl_, trader.impl_, id, ms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def cancel_ref(self, Trader trader, const char* ref, DbrMillis ms):
+        cdef DbrIden id = dbr_clnt_cancel_ref(self.impl_, trader.impl_, ref, ms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def ack_trade(self, Trader trader, DbrIden id, DbrMillis ms):
+        id = dbr_clnt_ack_trade(self.impl_, trader.impl_, id, ms)
+        if id < 0:
+            raise Error()
+        return id
+
     def is_open(self):
         return <bint>dbr_clnt_is_open(self.impl_)
 
     def is_ready(self):
         return <bint>dbr_clnt_is_ready(self.impl_)
 
+    def settimer(self, DbrMillis absms):
+        cdef DbrIden id = dbr_clnt_settimer(self.impl_, absms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def canceltimer(self, DbrIden id):
+        dbr_clnt_canceltimer(self.impl_, id)
+
     def poll(self, DbrMillis ms, Handler handler):
         return dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
+
+    def mdclear(self):
+        dbr_clnt_mdclear(self.impl_)
+
+    def trclear(self):
+        dbr_clnt_trclear(self.impl_)
+
+    def clear(self):
+        dbr_clnt_clear(self.impl_)
 
     def find_view(self, DbrIden cid, DbrDate settl_date):
         cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_date)

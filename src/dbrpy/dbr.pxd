@@ -1,3 +1,16 @@
+cdef extern from "dbr/defs.h":
+
+    cdef enum:
+        DBR_FALSE
+        DBR_TRUE
+
+    ctypedef int DbrBool
+    ctypedef long DbrIden
+    ctypedef long DbrKey
+
+    cdef enum:
+        DBR_ERRMSG_MAX
+
 cdef extern from "dbr/rbnode.h":
 
     ctypedef struct DbrRbNode
@@ -15,16 +28,6 @@ cdef extern from "dbr/slnode.h":
 
     DbrSlNode* dbr_slnode_next(DbrSlNode* node)
 
-cdef extern from "dbr/defs.h":
-
-    cdef enum:
-        DBR_FALSE
-        DBR_TRUE
-
-    ctypedef int DbrBool
-    ctypedef long DbrIden
-    ctypedef long DbrKey
-
 cdef extern from "dbr/err.h":
 
     cdef enum DbrErrno:
@@ -37,6 +40,12 @@ cdef extern from "dbr/err.h":
         DBR_EINVAL
         DBR_ETIMEOUT
         DBR_EUSER
+
+    void dbr_err_clear()
+
+    void dbr_err_print()
+
+    void dbr_err_prints(const char* s)
 
     void dbr_err_set_(int num, const char* file, int line, const char* msg)
 
@@ -51,6 +60,14 @@ cdef extern from "dbr/err.h":
     const char* dbr_err_msg()
 
 cdef extern from "dbr/util.h":
+
+    int dbr_intdig(int i)
+
+    int dbr_longdig(long l)
+
+    size_t dbr_intlen(int i)
+
+    size_t dbr_longlen(long l)
 
     long dbr_millis()
 
@@ -166,6 +183,11 @@ cdef extern from "dbr/types.h":
         DbrMillis created
         DbrMillis modified
 
+    DbrBool dbr_order_done(const DbrOrder* order)
+
+    ctypedef struct DbrLevel:
+        pass
+
     cdef enum DbrRole:
         DBR_ROLE_MAKER
         DBR_ROLE_TAKER
@@ -178,6 +200,14 @@ cdef extern from "dbr/types.h":
         int role
         DbrURec cpty
         DbrMillis created
+
+    DbrBool dbr_exec_done(const DbrExec* exc)
+
+    ctypedef struct DbrMatch:
+        pass
+
+    ctypedef struct DbrTrans:
+        pass
 
     ctypedef struct DbrMemb:
         DbrURec trader
@@ -204,6 +234,9 @@ cdef extern from "dbr/types.h":
         DbrTicks ask_ticks[DBR_LEVEL_MAX]
         DbrLots ask_lots[DBR_LEVEL_MAX]
         size_t ask_count[DBR_LEVEL_MAX]
+
+    ctypedef struct DbrSide:
+        pass
 
 cdef extern from "dbr/pool.h":
 
@@ -238,6 +271,8 @@ cdef extern from "dbr/conv.h":
 
 cdef extern from "dbr/trader.h":
 
+    DbrRec* dbr_trader_rec(DbrTrader trader)
+
     DbrOrder* dbr_trader_order_entry(DbrRbNode* node)
 
     DbrRbNode* dbr_trader_find_order_id(DbrTrader trader, DbrIden id)
@@ -270,7 +305,11 @@ cdef extern from "dbr/trader.h":
 
     DbrBool dbr_trader_empty_memb(DbrTrader trader)
 
+    DbrBool dbr_trader_logged_on(DbrTrader trader)
+
 cdef extern from "dbr/accnt.h":
+
+    DbrRec* dbr_accnt_rec(DbrAccnt accnt)
 
     DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node)
 
@@ -293,6 +332,10 @@ cdef extern from "dbr/accnt.h":
     DbrBool dbr_accnt_empty_posn(DbrAccnt accnt)
 
 cdef extern from "dbr/handler.h":
+
+    cdef enum DbrConn:
+        DBR_CONN_TR
+        DBR_CONN_MD
 
     ctypedef struct DbrHandlerVtbl
 
@@ -335,6 +378,8 @@ cdef extern from "dbr/clnt.h":
 
     void dbr_clnt_destroy(DbrClnt clnt)
 
+    DbrRec* dbr_clnt_rec_entry(DbrSlNode* node)
+
     DbrIden dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
 
     DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
@@ -358,11 +403,31 @@ cdef extern from "dbr/clnt.h":
                            int action, DbrTicks ticks, DbrLots lots,
                            DbrLots min_lots, DbrMillis ms)
 
+    DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms)
+
+    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms)
+
+    DbrIden dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
+
+    DbrIden dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms)
+
+    DbrIden dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
+
     DbrBool dbr_clnt_is_open(DbrClnt clnt)
 
     DbrBool dbr_clnt_is_ready(DbrClnt clnt)
 
+    DbrIden dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
+
+    void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id)
+
     int dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
+
+    void dbr_clnt_mdclear(DbrClnt clnt)
+
+    void dbr_clnt_trclear(DbrClnt clnt)
+
+    void dbr_clnt_clear(DbrClnt clnt)
 
     DbrView* dbr_clnt_view_entry(DbrRbNode* node)
 
