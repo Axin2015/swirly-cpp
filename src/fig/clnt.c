@@ -35,10 +35,6 @@
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
-#if DBR_THREADSAFE
-#include <pthread.h>
-#endif // DBR_THREADSAFE
-
 enum {
     MDSOCK,
     TRSOCK
@@ -90,9 +86,6 @@ struct FigClnt {
     DbrMillis mdlast;
     zmq_pollitem_t* items;
     int nitems;
-#if DBR_THREADSAFE
-    pthread_mutex_t mutex;
-#endif // DBR_THREADSAFE
 };
 
 static void
@@ -507,13 +500,6 @@ dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* tra
     if (!dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT))
         goto fail7;
 
-#if DBR_THREADSAFE
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&clnt->mutex, &attr);
-    pthread_mutexattr_destroy(&attr);
-#endif // DBR_THREADSAFE
     return clnt;
  fail7:
     // 8.
@@ -545,9 +531,6 @@ DBR_API void
 dbr_clnt_destroy(DbrClnt clnt)
 {
     if (clnt) {
-#if DBR_THREADSAFE
-        pthread_mutex_destroy(&clnt->mutex);
-#endif // DBR_THREADSAFE
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
         // 8.
