@@ -29,7 +29,7 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
 static inline struct ElmSmallEntry*
 small_entry(struct DbrRbNode* node)
 {
@@ -41,7 +41,7 @@ large_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct ElmLargeEntry, pool_node_, node);
 }
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 
 static void*
 alloc_mem(struct ElmPool* pool, size_t size)
@@ -79,10 +79,10 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     pool->first_small = NULL;
     pool->first_large = NULL;
 
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
     dbr_tree_init(&pool->allocs_small);
     dbr_tree_init(&pool->allocs_large);
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 
     // Small entrys.
     dbr_log_debug1("sizeof DbrRbNode: %zu", sizeof(struct DbrRbNode));
@@ -111,11 +111,11 @@ elm_pool_term(struct ElmPool* pool)
 }
 
 DBR_EXTERN struct ElmSmallEntry*
-#if !defined(DBR_DEBUG_ALLOC)
+#if !DBR_DEBUG_ALLOC
 elm_pool_alloc_small(struct ElmPool* pool)
-#else  // defined(DBR_DEBUG_ALLOC)
+#else  // DBR_DEBUG_ALLOC
 elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 {
     struct ElmSmallEntry* entry;
     if (pool->first_small) {
@@ -125,21 +125,21 @@ elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
     } else if (!(entry = alloc_mem(pool, sizeof(struct ElmSmallEntry))))
         return NULL;
 
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
     entry->file = file;
     entry->line = line;
     dbr_tree_insert(&pool->allocs_small, (DbrKey)entry, &entry->pool_node_);
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 
     return entry;
 }
 
 DBR_EXTERN struct ElmLargeEntry*
-#if !defined(DBR_DEBUG_ALLOC)
+#if !DBR_DEBUG_ALLOC
 elm_pool_alloc_large(struct ElmPool* pool)
-#else  // defined(DBR_DEBUG_ALLOC)
+#else  // DBR_DEBUG_ALLOC
 elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 {
     struct ElmLargeEntry* entry;
     if (pool->first_large) {
@@ -149,11 +149,11 @@ elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
     } else if (!(entry = alloc_mem(pool, sizeof(struct ElmLargeEntry))))
         return NULL;
 
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
     entry->file = file;
     entry->line = line;
     dbr_tree_insert(&pool->allocs_large, (DbrKey)entry, &entry->pool_node_);
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 
     return entry;
 }
@@ -162,9 +162,9 @@ DBR_EXTERN void
 elm_pool_free_small(struct ElmPool* pool, struct ElmSmallEntry* entry)
 {
     if (entry) {
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
         dbr_tree_remove(&pool->allocs_small, &entry->pool_node_);
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
         // Push onto free-list.
         entry->next = pool->first_small;
         pool->first_small = entry;
@@ -175,9 +175,9 @@ DBR_EXTERN void
 elm_pool_free_large(struct ElmPool* pool, struct ElmLargeEntry* entry)
 {
     if (entry) {
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
         dbr_tree_remove(&pool->allocs_large, &entry->pool_node_);
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
         // Push onto free-list.
         entry->next = pool->first_large;
         pool->first_large = entry;
@@ -207,7 +207,7 @@ DBR_API void
 dbr_pool_destroy(DbrPool pool)
 {
     if (pool) {
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
         for (struct DbrRbNode* node = dbr_tree_first(&pool->allocs_small);
              node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
             struct ElmSmallEntry* small = small_entry(node);
@@ -218,7 +218,7 @@ dbr_pool_destroy(DbrPool pool)
             struct ElmLargeEntry* large = large_entry(node);
             dbr_log_warn("memory leak in %s at %d", large->file, large->line);
         }
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
         elm_pool_term(pool);
         free(pool);
     }

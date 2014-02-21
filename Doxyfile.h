@@ -107,6 +107,7 @@
  */
 
 /**
+ * Each thread has its own error information.
  * @defgroup Err Error
  * @ingroup Util
  * @example err.cpp
@@ -118,6 +119,7 @@
  */
 
 /**
+ * Each thread has its own logger.
  * @defgroup Log Log
  * @ingroup Util
  */

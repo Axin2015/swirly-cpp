@@ -33,10 +33,10 @@ struct ElmPool {
     // Free lists.
     struct ElmSmallEntry* first_small;
     struct ElmLargeEntry* first_large;
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
     struct DbrTree allocs_small;
     struct DbrTree allocs_large;
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 };
 
 struct ElmSmallEntry {
@@ -50,11 +50,11 @@ struct ElmSmallEntry {
         struct DbrSub sub;
         struct DbrSess sess;
     };
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
     const char* file;
     int line;
     struct DbrRbNode pool_node_;
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 };
 
 struct ElmLargeEntry {
@@ -68,11 +68,11 @@ struct ElmLargeEntry {
         struct DbrView view;
         struct DbrBook book;
     };
-#if defined(DBR_DEBUG_ALLOC)
+#if DBR_DEBUG_ALLOC
     const char* file;
     int line;
     struct DbrRbNode pool_node_;
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 };
 
 // Error fields are set on failure.
@@ -91,7 +91,7 @@ elm_pool_free_small(struct ElmPool* pool, struct ElmSmallEntry* entry);
 DBR_EXTERN void
 elm_pool_free_large(struct ElmPool* pool, struct ElmLargeEntry* entry);
 
-#if !defined(DBR_DEBUG_ALLOC)
+#if !DBR_DEBUG_ALLOC
 
 DBR_EXTERN struct ElmSmallEntry*
 elm_pool_alloc_small(struct ElmPool* pool);
@@ -267,7 +267,7 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
     elm_pool_free_small(pool, entry);
 }
 
-#else  // defined(DBR_DEBUG_ALLOC)
+#else  // DBR_DEBUG_ALLOC
 
 DBR_EXTERN struct ElmSmallEntry*
 elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line);
@@ -490,6 +490,6 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
 #define elm_pool_alloc_sess(pool)                   \
     elm_pool_alloc_sess_(pool, __FILE__, __LINE__)
 
-#endif // defined(DBR_DEBUG_ALLOC)
+#endif // DBR_DEBUG_ALLOC
 
 #endif // ELM_POOL_H
