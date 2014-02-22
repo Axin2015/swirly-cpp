@@ -416,7 +416,7 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrMillis created, DbrHandler
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* traddr,
+dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrPool pool)
 {
     // 1.

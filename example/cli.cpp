@@ -1045,7 +1045,7 @@ main(int argc, char* argv[])
         ZmqCtx ctx;
         Pool pool(8 * 1024 * 1024);
         // epgm://239.192.1.1:3270
-        Clnt clnt("TEST", ctx.c_arg(), "tcp://localhost:3270", "tcp://localhost:3271",
+        Clnt clnt(ctx.c_arg(), "test", "tcp://localhost:3270", "tcp://localhost:3271",
                   dbr_millis(), pool);
         Handler handler(clnt);
         Repl repl;

@@ -653,9 +653,9 @@ cdef class ZmqCtx(object):
 cdef class Clnt(object):
     cdef DbrClnt impl_
 
-    def __cinit__(self, const char* sess, ZmqCtx ctx, const char* mdaddr,
+    def __cinit__(self, ZmqCtx ctx, const char* sess, const char* mdaddr,
                   const char* traddr, DbrIden seed, Pool pool):
-        self.impl_ = dbr_clnt_create(sess, ctx.impl_, mdaddr, traddr, seed, pool.impl_)
+        self.impl_ = dbr_clnt_create(ctx.impl_, sess, mdaddr, traddr, seed, pool.impl_)
         if self.impl_ is NULL:
             raise Error()
 

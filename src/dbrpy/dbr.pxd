@@ -373,7 +373,7 @@ cdef extern from "dbr/clnt.h":
 
     ctypedef FigClnt* DbrClnt
 
-    DbrClnt dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr,
+    DbrClnt dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr,
                             const char* traddr, DbrIden seed, DbrPool pool)
 
     void dbr_clnt_destroy(DbrClnt clnt)

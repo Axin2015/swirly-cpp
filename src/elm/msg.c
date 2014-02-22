@@ -758,7 +758,7 @@ dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
         dbr_err_set(DBR_EIO, "dbr_write_body() failed");
         goto fail1;
     }
-    if (zmq_send(sock, buf, len, 0) < 0) {
+    if (zmq_send(sock, buf, len, 0) != len) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
@@ -770,7 +770,8 @@ dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 DBR_API DbrBool
 dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
 {
-    if (zmq_send(sock, sess, strnlen(sess, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+    const size_t len = strnlen(sess, DBR_MNEM_MAX);
+    if (zmq_send(sock, sess, len, ZMQ_SNDMORE) != len) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }

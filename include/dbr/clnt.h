@@ -37,9 +37,9 @@ typedef struct FigClnt* DbrClnt;
 /**
  * Create client.
  *
- * @param sess Session mnemonic.
- *
  * @param ctx ZeroMQ context.
+ *
+ * @param sess Session mnemonic.
  *
  * @param mdaddr Address of market-data endpoint.
  *
@@ -51,7 +51,7 @@ typedef struct FigClnt* DbrClnt;
  */
 
 DBR_API DbrClnt
-dbr_clnt_create(const char* sess, void* ctx, const char* mdaddr, const char* traddr,
+dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrPool pool);
 
 // No-op if clnt is null.
