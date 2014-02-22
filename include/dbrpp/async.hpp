@@ -82,6 +82,20 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    void
+    send(DbrAsync async, void* ptr)
+    {
+        if (!dbr_async_send(async, ptr))
+            throw_exception();
+    }
+    void*
+    recv(DbrAsync async)
+    {
+        void* ptr;
+        if (!dbr_async_send(async, &ptr))
+            throw_exception();
+        return ptr;
+    }
 };
 
 /** @} */

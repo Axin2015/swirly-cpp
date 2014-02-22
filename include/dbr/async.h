@@ -33,6 +33,12 @@ dbr_async_create(void* ctx, const char* sess);
 DBR_API void
 dbr_async_destroy(DbrAsync async);
 
+DBR_API DbrBool
+dbr_async_send(DbrAsync async, void* ptr);
+
+DBR_API DbrBool
+dbr_async_recv(DbrAsync async, void** ptr);
+
 /** @} */
 
 #endif // DBR_ASYNC_H

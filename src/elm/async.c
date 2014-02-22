@@ -18,6 +18,9 @@
 #include <dbr/async.h>
 
 #include <dbr/err.h>
+#include <dbr/types.h>
+
+#include <zmq.h>
 
 #include <stdlib.h> // malloc()
 
@@ -33,7 +36,24 @@ dbr_async_create(void* ctx, const char* sess)
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
+    void* sock = zmq_socket(ctx, ZMQ_REQ);
+    if (!sock) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail2;
+    }
+    // Sizeof string literal includes null terminator.
+    char addr[sizeof("inproc://") + DBR_MNEM_MAX];
+    sprintf(addr, "inproc://%.16s", sess);
+    if (zmq_connect(sock, addr) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail3;
+    }
+    async->sock = sock;
     return async;
+ fail3:
+    zmq_close(sock);
+ fail2:
+    free(async);
  fail1:
     return NULL;
 }
@@ -42,6 +62,28 @@ DBR_API void
 dbr_async_destroy(DbrAsync async)
 {
     if (async) {
+        zmq_close(async->sock);
         free(async);
     }
+}
+
+DBR_API DbrBool
+dbr_async_send(DbrAsync async, void* ptr)
+{
+    if (zmq_send(async->sock, &ptr, sizeof(void*), 0) != sizeof(void*)) {
+        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
+}
+
+DBR_API DbrBool
+dbr_async_recv(DbrAsync async, void** ptr)
+{
+    if (zmq_recv(async->sock, ptr, sizeof(void*), 0) != sizeof(void*)) {
+        const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
+        dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
 }
