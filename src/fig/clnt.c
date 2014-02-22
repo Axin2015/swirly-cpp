@@ -37,7 +37,9 @@
 
 enum {
     MDSOCK,
-    TRSOCK
+    TRSOCK,
+    ASOCK,
+    NSOCK
 };
 
 // Other constants.
@@ -73,6 +75,7 @@ struct FigClnt {
     struct DbrSess sess;
     void* mdsock;
     void* trsock;
+    void* asock;
     DbrIden id;
     DbrPool pool;
     unsigned flags;
@@ -415,6 +418,27 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrMillis created, DbrHandler
     dbr_handler_on_flush(handler);
 }
 
+static DbrBool
+async_send(void* sock, void* arg)
+{
+    if (zmq_send(sock, &arg, sizeof(void*), 0) != sizeof(void*)) {
+        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
+}
+
+static DbrBool
+async_recv(void* sock, void** arg)
+{
+    if (zmq_recv(sock, arg, sizeof(void*), 0) != sizeof(void*)) {
+        const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
+        dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
+}
+
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrPool pool)
@@ -460,30 +484,45 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         goto fail4;
     }
 
+    // 5.
+    void* asock = zmq_socket(ctx, ZMQ_REP);
+    if (!asock) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail4;
+    }
+
+    char aaddr[sizeof("inproc://") + DBR_MNEM_MAX];
+    sprintf(aaddr, "inproc://%.16s", sess);
+    if (zmq_bind(asock, aaddr) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail5;
+    }
+
     clnt->mdsock = mdsock;
     clnt->trsock = trsock;
+    clnt->asock = asock;
     clnt->id = seed;
     clnt->pool = pool;
     clnt->flags = INIT_PENDING | TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
         | VIEW_PENDING | TR_DOWN | MD_DOWN;
-    // 5.
+    // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
     dbr_queue_init(&clnt->execs);
-    // 6.
+    // 7.
     dbr_tree_init(&clnt->views);
     dbr_tree_init(&clnt->posnups);
     dbr_tree_init(&clnt->viewups);
-    // 7.
+    // 8.
     if (!dbr_prioq_init(&clnt->prioq))
-        goto fail5;
+        goto fail6;
 
     clnt->mdlast = 0;
 
-    // 8.
-    clnt->items = malloc(2 * sizeof(zmq_pollitem_t));
+    // 9.
+    clnt->items = malloc(NSOCK * sizeof(zmq_pollitem_t));
     if (!clnt->items)
-        goto fail6;
+        goto fail7;
 
     clnt->items[MDSOCK].socket = mdsock;
     clnt->items[MDSOCK].fd = 0;
@@ -495,23 +534,31 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     clnt->items[TRSOCK].events = ZMQ_POLLIN;
     clnt->items[TRSOCK].revents = 0;
 
-    clnt->nitems = 2;
+    clnt->items[ASOCK].socket = asock;
+    clnt->items[ASOCK].fd = 0;
+    clnt->items[ASOCK].events = ZMQ_POLLIN;
+    clnt->items[ASOCK].revents = 0;
+
+    clnt->nitems = NSOCK;
 
     if (!dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT))
-        goto fail7;
+        goto fail8;
 
     return clnt;
+ fail8:
+    // 9.
+    free(clnt->items);
  fail7:
     // 8.
-    free(clnt->items);
+    dbr_prioq_term(&clnt->prioq);
  fail6:
     // 7.
-    dbr_prioq_term(&clnt->prioq);
- fail5:
-    // 6.
     free_views(&clnt->views, pool);
-    // 5.
+    // 6.
     fig_cache_term(&clnt->cache);
+ fail5:
+    // 5.
+    zmq_close(asock);
  fail4:
     // 4.
     zmq_close(trsock);
@@ -533,14 +580,16 @@ dbr_clnt_destroy(DbrClnt clnt)
     if (clnt) {
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
-        // 8.
+        // 9.
         free(clnt->items);
-        // 7.
+        // 8.
         dbr_prioq_term(&clnt->prioq);
-        // 6.
+        // 7.
         free_views(&clnt->views, clnt->pool);
-        // 5.
+        // 6.
         fig_cache_term(&clnt->cache);
+        // 5.
+        zmq_close(clnt->asock);
         // 4.
         zmq_close(clnt->trsock);
         // 3.
@@ -883,17 +932,17 @@ DBR_API zmq_pollitem_t*
 dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 {
     // The first two items are reserved for the tr and md sockets.
-    zmq_pollitem_t* new_items = realloc(clnt->items, (2 + nitems) * sizeof(zmq_pollitem_t));
+    zmq_pollitem_t* new_items = realloc(clnt->items, (NSOCK + nitems) * sizeof(zmq_pollitem_t));
     if (!new_items) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         return NULL;
     }
     // Copy new items to tail.
-    __builtin_memcpy(&new_items[2], items, nitems * sizeof(zmq_pollitem_t));
+    __builtin_memcpy(&new_items[NSOCK], items, nitems * sizeof(zmq_pollitem_t));
     clnt->items = new_items;
-    clnt->nitems = 2 + nitems;
+    clnt->nitems = NSOCK + nitems;
     // Return pointer to third item, reserving the first two for internal use.
-    return &new_items[2];
+    return &new_items[NSOCK];
 }
 
 DBR_API int
@@ -1097,6 +1146,19 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);
                 goto fail1;
             }
+        }
+
+        if ((clnt->items[ASOCK].revents & ZMQ_POLLIN)) {
+
+            --nevents;
+            void* arg;
+            if (!async_recv(clnt->asock, &arg))
+                goto fail1;
+
+            arg = dbr_handler_on_async(handler, arg);
+
+            if (!async_send(clnt->asock, arg))
+                goto fail1;
         }
         // Repeat while no external events.
     } while (nevents == 0);

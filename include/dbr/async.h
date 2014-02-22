@@ -34,10 +34,10 @@ DBR_API void
 dbr_async_destroy(DbrAsync async);
 
 DBR_API DbrBool
-dbr_async_send(DbrAsync async, void* ptr);
+dbr_async_send(DbrAsync async, void* arg);
 
 DBR_API DbrBool
-dbr_async_recv(DbrAsync async, void** ptr);
+dbr_async_recv(DbrAsync async, void** arg);
 
 /** @} */
 

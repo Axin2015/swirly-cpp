@@ -583,6 +583,10 @@ cdef void on_view(DbrHandler handler, DbrpyView* view):
 cdef void on_flush(DbrHandler handler):
     (<object>handler_target(handler)).on_flush()
 
+cdef void* on_async(DbrHandler handler, void* arg):
+    (<object>handler_target(handler)).on_async(<object>arg)
+    return arg
+
 cdef class Handler(object):
     cdef DbrpyHandlerVtbl vtbl_
     cdef HandlerImpl impl_
@@ -598,6 +602,7 @@ cdef class Handler(object):
         self.vtbl_.on_posn = on_posn
         self.vtbl_.on_view = on_view
         self.vtbl_.on_flush = on_flush
+        self.vtbl_.on_async = on_async
         self.impl_.target = <PyObject*>self
         self.impl_.handler.vtbl = &self.vtbl_
 
@@ -630,6 +635,9 @@ cdef class Handler(object):
 
     def on_flush(self):
         pass
+
+    def on_async(self, arg):
+        return arg
 
 # Zmq
 

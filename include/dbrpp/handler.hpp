@@ -79,6 +79,11 @@ class IHandler : public DbrIHandler {
     {
         static_cast<DerivedT*>(handler)->on_flush();
     }
+    static void*
+    on_async(DbrHandler handler, void* arg) noexcept
+    {
+        return static_cast<DerivedT*>(handler)->on_async(arg);
+    }
     static const DbrHandlerVtbl*
     vtbl() noexcept
     {
@@ -92,7 +97,8 @@ class IHandler : public DbrIHandler {
             on_exec,
             on_posn,
             on_view,
-            on_flush
+            on_flush,
+            on_async
         };
         return &VTBL;
     }
@@ -165,6 +171,12 @@ inline void
 on_flush(DbrHandler handler) noexcept
 {
     handler->vtbl->on_flush(handler);
+}
+
+inline void*
+on_async(DbrHandler handler, void* arg) noexcept
+{
+    return handler->vtbl->on_async(handler, arg);
 }
 
 /** @} */

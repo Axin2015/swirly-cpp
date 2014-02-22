@@ -80,6 +80,9 @@ struct DbrHandlerVtbl {
 
     void
     (*on_flush)(DbrHandler handler);
+
+    void*
+    (*on_async)(DbrHandler handler, void* arg);
 };
 
 static inline void
@@ -145,6 +148,12 @@ static inline void
 dbr_handler_on_flush(DbrHandler handler)
 {
     handler->vtbl->on_flush(handler);
+}
+
+static inline void*
+dbr_handler_on_async(DbrHandler handler, void* arg)
+{
+    return handler->vtbl->on_async(handler, arg);
 }
 
 /** @} */

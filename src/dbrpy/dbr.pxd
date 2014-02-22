@@ -366,6 +366,8 @@ cdef extern from "dbr/handler.h":
 
         void on_flush(DbrHandler handler)
 
+        void* on_async(DbrHandler handler, void* arg)
+
 cdef extern from "dbr/clnt.h":
 
     ctypedef struct FigClnt:

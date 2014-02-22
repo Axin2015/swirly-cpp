@@ -435,6 +435,11 @@ public:
     on_flush() noexcept
     {
     }
+    void*
+    on_async(void* arg) noexcept
+    {
+        return arg;
+    }
     void
     clear()
     {
