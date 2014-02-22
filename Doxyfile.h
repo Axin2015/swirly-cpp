@@ -348,6 +348,11 @@
  */
 
 /**
+ * @defgroup Async Async
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup Zmq ZeroMQ
  * @ingroup Elm
  */
