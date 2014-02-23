@@ -437,6 +437,26 @@ def real_to_dp(double d):
 def dp_to_real(int dp):
     return dbr_dp_to_real(dp)
 
+# Async
+
+cdef class Async(object):
+    cdef DbrAsync impl_
+
+    def __cinit__(self, ZmqCtx ctx, const char* sess):
+        self.impl_ = dbr_async_create(ctx.impl_, sess)
+        if self.impl_ is NULL:
+            raise Error()
+
+    def __dealloc__(self):
+        if self.impl_ is not NULL:
+            dbr_async_destroy(self.impl_)
+
+    def send(self, object arg):
+        pass
+
+    def recv(self):
+        return None
+
 # Trader
 
 cdef class Trader(object):

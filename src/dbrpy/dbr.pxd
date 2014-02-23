@@ -269,6 +269,21 @@ cdef extern from "dbr/conv.h":
 
     double dbr_dp_to_real(int dp)
 
+cdef extern from "dbr/async.h":
+
+    ctypedef struct ElmAsync:
+        pass
+
+    ctypedef ElmAsync* DbrAsync
+
+    DbrAsync dbr_async_create(void* ctx, const char* sess)
+
+    void dbr_async_destroy(DbrAsync async)
+
+    DbrBool dbr_async_send(DbrAsync async, void* arg)
+
+    DbrBool dbr_async_recv(DbrAsync async, void** arg)
+
 cdef extern from "dbr/trader.h":
 
     DbrRec* dbr_trader_rec(DbrTrader trader)
