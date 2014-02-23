@@ -1,7 +1,8 @@
+# Strict aliasing removed.
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -fstrict-aliasing")
+  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror")
 ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -fstrict-aliasing")
+  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror")
 ENDIF()
 
 FIND_PACKAGE(PythonLibs REQUIRED)

@@ -15,7 +15,6 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#define _XOPEN_SOURCE 700 // strnlen()
 #include "sqlite.h"
 
 #include "sqlite3.h"

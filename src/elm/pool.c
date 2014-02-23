@@ -65,7 +65,7 @@ alloc_mem(struct ElmPool* pool, size_t size)
 DBR_EXTERN DbrBool
 elm_pool_init(struct ElmPool* pool, size_t capacity)
 {
-    void* addr = mmap(NULL, capacity, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+    void* addr = mmap(NULL, capacity, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
     if (addr == MAP_FAILED) {
         dbr_err_setf(DBR_ENOMEM, "mmap() failed: %s", strerror(errno));
         return DBR_FALSE;

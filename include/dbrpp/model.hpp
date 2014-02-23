@@ -23,6 +23,7 @@
 #include <dbrpp/slnode.hpp>
 
 #include <dbr/model.h>
+#include <dbr/pool.h>
 
 #include <limits> // numeric_limits<>
 
