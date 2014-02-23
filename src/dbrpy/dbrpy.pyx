@@ -1,7 +1,9 @@
 from dbr cimport *
+
 cimport zmq
 cimport string
 
+from cpython cimport Py_DECREF, Py_INCREF
 from cpython.ref cimport PyObject
 
 cdef extern from "dbrpy/dbrpy.h":
@@ -439,6 +441,12 @@ def dp_to_real(int dp):
 
 # Async
 
+cdef object async_recv(DbrAsync async):
+    cdef void* arg = NULL
+    if dbr_async_recv(async, &arg) == DBR_FALSE:
+        raise Error()
+    return <object>arg
+
 cdef class Async(object):
     cdef DbrAsync impl_
 
@@ -452,10 +460,15 @@ cdef class Async(object):
             dbr_async_destroy(self.impl_)
 
     def send(self, object arg):
-        pass
+        Py_INCREF(arg)
+        if dbr_async_send(self.impl_, <PyObject*>arg) == DBR_FALSE:
+            Py_DECREF(arg)
+            raise Error()
 
     def recv(self):
-        return None
+        cdef object arg = async_recv(self.impl_)
+        Py_DECREF(arg)
+        return arg
 
 # Trader
 
@@ -604,8 +617,10 @@ cdef void on_flush(DbrHandler handler):
     (<object>handler_target(handler)).on_flush()
 
 cdef void* on_async(DbrHandler handler, void* arg):
-    (<object>handler_target(handler)).on_async(<object>arg)
-    return arg
+    cdef object ret = (<object>handler_target(handler)).on_async(<object>arg)
+    Py_INCREF(ret)
+    Py_DECREF(<object>arg)
+    return <void*>ret
 
 cdef class Handler(object):
     cdef DbrpyHandlerVtbl vtbl_
