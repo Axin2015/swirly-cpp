@@ -15,9 +15,9 @@ cdef extern from "dbr/rbnode.h":
 
     ctypedef struct DbrRbNode
 
-    DbrRbNode* dbr_rbnode_next(DbrRbNode* node)
+    DbrRbNode* dbr_rbnode_next(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_rbnode_prev(DbrRbNode* node)
+    DbrRbNode* dbr_rbnode_prev(DbrRbNode* node) nogil
 
 cdef extern from "dbr/slnode.h":
 
@@ -26,7 +26,7 @@ cdef extern from "dbr/slnode.h":
     ctypedef struct DbrSlNode:
         DbrSlNode* next
 
-    DbrSlNode* dbr_slnode_next(DbrSlNode* node)
+    DbrSlNode* dbr_slnode_next(DbrSlNode* node) nogil
 
 cdef extern from "dbr/err.h":
 
@@ -41,35 +41,35 @@ cdef extern from "dbr/err.h":
         DBR_ETIMEOUT
         DBR_EUSER
 
-    void dbr_err_clear()
+    void dbr_err_clear() nogil
 
-    void dbr_err_print()
+    void dbr_err_print() nogil
 
-    void dbr_err_prints(const char* s)
+    void dbr_err_prints(const char* s) nogil
 
-    void dbr_err_set_(int num, const char* file, int line, const char* msg)
+    void dbr_err_set_(int num, const char* file, int line, const char* msg) nogil
 
-    void dbr_err_setf_(int num, const char* file, int line, const char* format, ...)
+    void dbr_err_setf_(int num, const char* file, int line, const char* format, ...) nogil
 
-    int dbr_err_num()
+    int dbr_err_num() nogil
 
-    const char* dbr_err_file()
+    const char* dbr_err_file() nogil
 
-    int dbr_err_line()
+    int dbr_err_line() nogil
 
-    const char* dbr_err_msg()
+    const char* dbr_err_msg() nogil
 
 cdef extern from "dbr/util.h":
 
-    int dbr_intdig(int i)
+    int dbr_intdig(int i) nogil
 
-    int dbr_longdig(long l)
+    int dbr_longdig(long l) nogil
 
-    size_t dbr_intlen(int i)
+    size_t dbr_intlen(int i) nogil
 
-    size_t dbr_longlen(long l)
+    size_t dbr_longlen(long l) nogil
 
-    long dbr_millis()
+    long dbr_millis() nogil
 
 cdef extern from "dbr/types.h":
 
@@ -149,7 +149,7 @@ cdef extern from "dbr/types.h":
         DbrAccntAnon accnt
         DbrContrAnon contr
 
-    DbrRec* dbr_shared_rec_entry(DbrSlNode* node)
+    DbrRec* dbr_shared_rec_entry(DbrSlNode* node) nogil
 
     cdef enum DbrState:
         DBR_STATE_NEW
@@ -183,7 +183,7 @@ cdef extern from "dbr/types.h":
         DbrMillis created
         DbrMillis modified
 
-    DbrBool dbr_order_done(const DbrOrder* order)
+    DbrBool dbr_order_done(const DbrOrder* order) nogil
 
     ctypedef struct DbrLevel:
         pass
@@ -201,7 +201,7 @@ cdef extern from "dbr/types.h":
         DbrURec cpty
         DbrMillis created
 
-    DbrBool dbr_exec_done(const DbrExec* exc)
+    DbrBool dbr_exec_done(const DbrExec* exc) nogil
 
     ctypedef struct DbrMatch:
         pass
@@ -245,29 +245,29 @@ cdef extern from "dbr/pool.h":
 
     ctypedef ElmPool* DbrPool
 
-    DbrPool dbr_pool_create(size_t capacity)
+    DbrPool dbr_pool_create(size_t capacity) nogil
 
-    void dbr_pool_destroy(DbrPool pool)
+    void dbr_pool_destroy(DbrPool pool) nogil
 
 cdef extern from "dbr/conv.h":
 
-    double dbr_fract_to_real(int numer, int denom)
+    double dbr_fract_to_real(int numer, int denom) nogil
 
-    DbrIncs dbr_real_to_incs(double real, double inc_size)
+    DbrIncs dbr_real_to_incs(double real, double inc_size) nogil
 
-    double dbr_incs_to_real(DbrIncs incs, double inc_size)
+    double dbr_incs_to_real(DbrIncs incs, double inc_size) nogil
 
-    DbrLots dbr_qty_to_lots(double qty, DbrRec* crec)
+    DbrLots dbr_qty_to_lots(double qty, DbrRec* crec) nogil
 
-    double dbr_lots_to_qty(DbrLots lots, DbrRec* crec)
+    double dbr_lots_to_qty(DbrLots lots, DbrRec* crec) nogil
 
-    DbrTicks dbr_price_to_ticks(double price, DbrRec* crec)
+    DbrTicks dbr_price_to_ticks(double price, DbrRec* crec) nogil
 
-    double dbr_ticks_to_price(DbrTicks ticks, DbrRec* crec)
+    double dbr_ticks_to_price(DbrTicks ticks, DbrRec* crec) nogil
 
-    int dbr_real_to_dp(double d)
+    int dbr_real_to_dp(double d) nogil
 
-    double dbr_dp_to_real(int dp)
+    double dbr_dp_to_real(int dp) nogil
 
 cdef extern from "dbr/async.h":
 
@@ -276,75 +276,75 @@ cdef extern from "dbr/async.h":
 
     ctypedef ElmAsync* DbrAsync
 
-    DbrAsync dbr_async_create(void* ctx, const char* sess)
+    DbrAsync dbr_async_create(void* ctx, const char* sess) nogil
 
-    void dbr_async_destroy(DbrAsync async)
+    void dbr_async_destroy(DbrAsync async) nogil
 
-    DbrBool dbr_async_send(DbrAsync async, void* arg)
+    DbrBool dbr_async_send(DbrAsync async, void* val) nogil
 
-    DbrBool dbr_async_recv(DbrAsync async, void** arg)
+    DbrBool dbr_async_recv(DbrAsync async, void** val) nogil
 
 cdef extern from "dbr/trader.h":
 
-    DbrRec* dbr_trader_rec(DbrTrader trader)
+    DbrRec* dbr_trader_rec(DbrTrader trader) nogil
 
-    DbrOrder* dbr_trader_order_entry(DbrRbNode* node)
+    DbrOrder* dbr_trader_order_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_trader_find_order_id(DbrTrader trader, DbrIden id)
+    DbrRbNode* dbr_trader_find_order_id(DbrTrader trader, DbrIden id) nogil
 
-    DbrOrder* dbr_trader_find_order_ref(DbrTrader trader, const char* ref)
+    DbrOrder* dbr_trader_find_order_ref(DbrTrader trader, const char* ref) nogil
 
-    DbrRbNode* dbr_trader_first_order(DbrTrader trader)
+    DbrRbNode* dbr_trader_first_order(DbrTrader trader) nogil
 
-    DbrRbNode* dbr_trader_last_order(DbrTrader trader)
+    DbrRbNode* dbr_trader_last_order(DbrTrader trader) nogil
 
-    DbrBool dbr_trader_empty_order(DbrTrader trader)
+    DbrBool dbr_trader_empty_order(DbrTrader trader) nogil
 
-    DbrExec* dbr_trader_trade_entry(DbrRbNode* node)
+    DbrExec* dbr_trader_trade_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_trader_find_trade_id(DbrTrader trader, DbrIden id)
+    DbrRbNode* dbr_trader_find_trade_id(DbrTrader trader, DbrIden id) nogil
 
-    DbrRbNode* dbr_trader_first_trade(DbrTrader trader)
+    DbrRbNode* dbr_trader_first_trade(DbrTrader trader) nogil
 
-    DbrRbNode* dbr_trader_last_trade(DbrTrader trader)
+    DbrRbNode* dbr_trader_last_trade(DbrTrader trader) nogil
 
-    DbrBool dbr_trader_empty_trade(DbrTrader trader)
+    DbrBool dbr_trader_empty_trade(DbrTrader trader) nogil
 
-    DbrMemb* dbr_trader_memb_entry(DbrRbNode* node)
+    DbrMemb* dbr_trader_memb_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_trader_find_memb_id(DbrTrader trader, DbrIden id)
+    DbrRbNode* dbr_trader_find_memb_id(DbrTrader trader, DbrIden id) nogil
 
-    DbrRbNode* dbr_trader_first_memb(DbrTrader trader)
+    DbrRbNode* dbr_trader_first_memb(DbrTrader trader) nogil
 
-    DbrRbNode* dbr_trader_last_memb(DbrTrader trader)
+    DbrRbNode* dbr_trader_last_memb(DbrTrader trader) nogil
 
-    DbrBool dbr_trader_empty_memb(DbrTrader trader)
+    DbrBool dbr_trader_empty_memb(DbrTrader trader) nogil
 
-    DbrBool dbr_trader_logged_on(DbrTrader trader)
+    DbrBool dbr_trader_logged_on(DbrTrader trader) nogil
 
 cdef extern from "dbr/accnt.h":
 
-    DbrRec* dbr_accnt_rec(DbrAccnt accnt)
+    DbrRec* dbr_accnt_rec(DbrAccnt accnt) nogil
 
-    DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node)
+    DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id)
+    DbrRbNode* dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id) nogil
 
-    DbrRbNode* dbr_accnt_first_memb(DbrAccnt accnt)
+    DbrRbNode* dbr_accnt_first_memb(DbrAccnt accnt) nogil
 
-    DbrRbNode* dbr_accnt_last_memb(DbrAccnt accnt)
+    DbrRbNode* dbr_accnt_last_memb(DbrAccnt accnt) nogil
 
-    DbrBool dbr_accnt_empty_memb(DbrAccnt accnt)
+    DbrBool dbr_accnt_empty_memb(DbrAccnt accnt) nogil
 
-    DbrPosn* dbr_accnt_posn_entry(DbrRbNode* node)
+    DbrPosn* dbr_accnt_posn_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
+    DbrRbNode* dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id) nogil
 
-    DbrRbNode* dbr_accnt_first_posn(DbrAccnt accnt)
+    DbrRbNode* dbr_accnt_first_posn(DbrAccnt accnt) nogil
 
-    DbrRbNode* dbr_accnt_last_posn(DbrAccnt accnt)
+    DbrRbNode* dbr_accnt_last_posn(DbrAccnt accnt) nogil
 
-    DbrBool dbr_accnt_empty_posn(DbrAccnt accnt)
+    DbrBool dbr_accnt_empty_posn(DbrAccnt accnt) nogil
 
 cdef extern from "dbr/handler.h":
 
@@ -361,27 +361,27 @@ cdef extern from "dbr/handler.h":
 
     ctypedef struct DbrHandlerVtbl:
 
-        void on_up(DbrHandler handler, int conn)
+        void on_up(DbrHandler handler, int conn) nogil
 
-        void on_down(DbrHandler handler, int conn)
+        void on_down(DbrHandler handler, int conn) nogil
 
-        void on_logon(DbrHandler handler, DbrIden tid)
+        void on_logon(DbrHandler handler, DbrIden tid) nogil
 
-        void on_logoff(DbrHandler handler, DbrIden tid)
+        void on_logoff(DbrHandler handler, DbrIden tid) nogil
 
-        void on_timeout(DbrHandler handler, DbrIden req_id)
+        void on_timeout(DbrHandler handler, DbrIden req_id) nogil
 
-        void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
+        void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) nogil
 
-        void on_exec(DbrHandler handler, DbrIden req_id, DbrExec* exc)
+        void on_exec(DbrHandler handler, DbrIden req_id, DbrExec* exc) nogil
 
-        void on_posn(DbrHandler handler, DbrPosn* posn)
+        void on_posn(DbrHandler handler, DbrPosn* posn) nogil
 
-        void on_view(DbrHandler handler, DbrView* view)
+        void on_view(DbrHandler handler, DbrView* view) nogil
 
-        void on_flush(DbrHandler handler)
+        void on_flush(DbrHandler handler) nogil
 
-        void* on_async(DbrHandler handler, void* arg)
+        void* on_async(DbrHandler handler, void* val) nogil
 
 cdef extern from "dbr/clnt.h":
 
@@ -391,67 +391,67 @@ cdef extern from "dbr/clnt.h":
     ctypedef FigClnt* DbrClnt
 
     DbrClnt dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr,
-                            const char* traddr, DbrIden seed, DbrPool pool)
+                            const char* traddr, DbrIden seed, DbrPool pool) nogil
 
-    void dbr_clnt_destroy(DbrClnt clnt)
+    void dbr_clnt_destroy(DbrClnt clnt) nogil
 
-    DbrRec* dbr_clnt_rec_entry(DbrSlNode* node)
+    DbrRec* dbr_clnt_rec_entry(DbrSlNode* node) nogil
 
-    DbrIden dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
+    DbrIden dbr_clnt_close(DbrClnt clnt, DbrMillis ms) nogil
 
-    DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
+    DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id) nogil
 
-    DbrSlNode* dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem)
+    DbrSlNode* dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem) nogil
 
-    DbrSlNode* dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size)
+    DbrSlNode* dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size) nogil
 
-    DbrBool dbr_clnt_empty_rec(DbrClnt clnt, int type)
+    DbrBool dbr_clnt_empty_rec(DbrClnt clnt, int type) nogil
 
-    DbrTrader dbr_clnt_trader(DbrClnt clnt, DbrRec* trec)
+    DbrTrader dbr_clnt_trader(DbrClnt clnt, DbrRec* trec) nogil
 
-    DbrAccnt dbr_clnt_accnt(DbrClnt clnt, DbrRec* arec)
+    DbrAccnt dbr_clnt_accnt(DbrClnt clnt, DbrRec* arec) nogil
 
-    DbrIden dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
+    DbrIden dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms) nogil
 
-    DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
+    DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms) nogil
 
     DbrIden dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt,
                            DbrRec* crec, DbrDate settl_date, const char* ref,
                            int action, DbrTicks ticks, DbrLots lots,
-                           DbrLots min_lots, DbrMillis ms)
+                           DbrLots min_lots, DbrMillis ms) nogil
 
-    DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms)
+    DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms) nogil
 
-    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms)
+    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms) nogil
 
-    DbrIden dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
+    DbrIden dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms) nogil
 
-    DbrIden dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms)
+    DbrIden dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms) nogil
 
-    DbrIden dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
+    DbrIden dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms) nogil
 
-    DbrBool dbr_clnt_is_open(DbrClnt clnt)
+    DbrBool dbr_clnt_is_open(DbrClnt clnt) nogil
 
-    DbrBool dbr_clnt_is_ready(DbrClnt clnt)
+    DbrBool dbr_clnt_is_ready(DbrClnt clnt) nogil
 
-    DbrIden dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
+    DbrIden dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms) nogil
 
-    void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id)
+    void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id) nogil
 
-    int dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
+    int dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
 
-    void dbr_clnt_mdclear(DbrClnt clnt)
+    void dbr_clnt_mdclear(DbrClnt clnt) nogil
 
-    void dbr_clnt_trclear(DbrClnt clnt)
+    void dbr_clnt_trclear(DbrClnt clnt) nogil
 
-    void dbr_clnt_clear(DbrClnt clnt)
+    void dbr_clnt_clear(DbrClnt clnt) nogil
 
-    DbrView* dbr_clnt_view_entry(DbrRbNode* node)
+    DbrView* dbr_clnt_view_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date)
+    DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date) nogil
 
-    DbrRbNode* dbr_clnt_first_view(DbrClnt clnt)
+    DbrRbNode* dbr_clnt_first_view(DbrClnt clnt) nogil
 
-    DbrRbNode* dbr_clnt_last_view(DbrClnt clnt)
+    DbrRbNode* dbr_clnt_last_view(DbrClnt clnt) nogil
 
-    DbrBool dbr_clnt_empty_view(DbrClnt clnt)
+    DbrBool dbr_clnt_empty_view(DbrClnt clnt) nogil

@@ -418,9 +418,9 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrMillis created, DbrHandler
 }
 
 static DbrBool
-async_send(void* sock, void* arg)
+async_send(void* sock, void* val)
 {
-    if (zmq_send(sock, &arg, sizeof(void*), 0) != sizeof(void*)) {
+    if (zmq_send(sock, &val, sizeof(void*), 0) != sizeof(void*)) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
@@ -428,9 +428,9 @@ async_send(void* sock, void* arg)
 }
 
 static DbrBool
-async_recv(void* sock, void** arg)
+async_recv(void* sock, void** val)
 {
-    if (zmq_recv(sock, arg, sizeof(void*), 0) != sizeof(void*)) {
+    if (zmq_recv(sock, val, sizeof(void*), 0) != sizeof(void*)) {
         const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
         dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
@@ -1150,13 +1150,13 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         if ((clnt->items[ASOCK].revents & ZMQ_POLLIN)) {
 
             --nevents;
-            void* arg;
-            if (!async_recv(clnt->asock, &arg))
+            void* val;
+            if (!async_recv(clnt->asock, &val))
                 goto fail1;
 
-            arg = dbr_handler_on_async(handler, arg);
+            val = dbr_handler_on_async(handler, val);
 
-            if (!async_send(clnt->asock, arg))
+            if (!async_send(clnt->asock, val))
                 goto fail1;
         }
         // Repeat while no external events.

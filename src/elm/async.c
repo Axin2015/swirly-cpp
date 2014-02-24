@@ -68,9 +68,9 @@ dbr_async_destroy(DbrAsync async)
 }
 
 DBR_API DbrBool
-dbr_async_send(DbrAsync async, void* arg)
+dbr_async_send(DbrAsync async, void* val)
 {
-    if (zmq_send(async->sock, &arg, sizeof(void*), 0) != sizeof(void*)) {
+    if (zmq_send(async->sock, &val, sizeof(void*), 0) != sizeof(void*)) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
@@ -78,9 +78,9 @@ dbr_async_send(DbrAsync async, void* arg)
 }
 
 DBR_API DbrBool
-dbr_async_recv(DbrAsync async, void** arg)
+dbr_async_recv(DbrAsync async, void** val)
 {
-    if (zmq_recv(async->sock, arg, sizeof(void*), 0) != sizeof(void*)) {
+    if (zmq_recv(async->sock, val, sizeof(void*), 0) != sizeof(void*)) {
         const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
         dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;

@@ -70,9 +70,9 @@ public:
     {
     }
     void*
-    on_async(void* arg) noexcept
+    on_async(void* val) noexcept
     {
-        return arg;
+        return val;
     }
 };
 

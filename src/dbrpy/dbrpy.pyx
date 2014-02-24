@@ -443,7 +443,10 @@ def dp_to_real(int dp):
 
 cdef object async_recv(DbrAsync async):
     cdef void* arg = NULL
-    if dbr_async_recv(async, &arg) == DBR_FALSE:
+    cdef DbrBool ret
+    with nogil:
+        ret = dbr_async_recv(async, &arg)
+    if ret == DBR_FALSE:
         raise Error()
     return <object>arg
 
@@ -461,7 +464,10 @@ cdef class Async(object):
 
     def send(self, object arg):
         Py_INCREF(arg)
-        if dbr_async_send(self.impl_, <PyObject*>arg) == DBR_FALSE:
+        cdef DbrBool ret
+        with nogil:
+            ret = dbr_async_send(self.impl_, <PyObject*>arg)
+        if ret == DBR_FALSE:
             Py_DECREF(arg)
             raise Error()
 
@@ -581,42 +587,43 @@ cdef struct HandlerImpl:
     PyObject* target
     DbrpyIHandler handler
 
-cdef inline void* handler_target(DbrHandler handler):
+cdef inline void* handler_target(DbrHandler handler) nogil:
     cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
     cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
     return impl.target
 
-cdef void on_up(DbrHandler handler, int conn):
+cdef void on_up(DbrHandler handler, int conn) with gil:
     (<object>handler_target(handler)).on_up(conn)
 
-cdef void on_down(DbrHandler handler, int conn):
+cdef void on_down(DbrHandler handler, int conn) with gil:
     (<object>handler_target(handler)).on_down(conn)
 
-cdef void on_logon(DbrHandler handler, DbrIden tid):
+cdef void on_logon(DbrHandler handler, DbrIden tid) with gil:
     (<object>handler_target(handler)).on_logon(tid)
 
-cdef void on_logoff(DbrHandler handler, DbrIden tid):
+cdef void on_logoff(DbrHandler handler, DbrIden tid) with gil:
     (<object>handler_target(handler)).on_logoff(tid)
 
-cdef void on_timeout(DbrHandler handler, DbrIden req_id):
+cdef void on_timeout(DbrHandler handler, DbrIden req_id) with gil:
     (<object>handler_target(handler)).on_timeout(req_id)
 
-cdef void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg):
+cdef void on_status(DbrHandler handler, DbrIden req_id, int num,
+                    const char* msg) with gil:
     (<object>handler_target(handler)).on_status(req_id, num, msg)
 
-cdef void on_exec(DbrHandler handler, DbrIden req_id, DbrpyExec* exc):
+cdef void on_exec(DbrHandler handler, DbrIden req_id, DbrpyExec* exc) with gil:
     (<object>handler_target(handler)).on_exec(req_id, make_exec(exc))
 
-cdef void on_posn(DbrHandler handler, DbrpyPosn* posn):
+cdef void on_posn(DbrHandler handler, DbrpyPosn* posn) with gil:
     (<object>handler_target(handler)).on_posn(make_posn(posn))
 
-cdef void on_view(DbrHandler handler, DbrpyView* view):
+cdef void on_view(DbrHandler handler, DbrpyView* view) with gil:
     (<object>handler_target(handler)).on_view(make_view(view))
 
-cdef void on_flush(DbrHandler handler):
+cdef void on_flush(DbrHandler handler) with gil:
     (<object>handler_target(handler)).on_flush()
 
-cdef void* on_async(DbrHandler handler, void* arg):
+cdef void* on_async(DbrHandler handler, void* arg) with gil:
     cdef object ret = (<object>handler_target(handler)).on_async(<object>arg)
     Py_INCREF(ret)
     Py_DECREF(<object>arg)
@@ -748,7 +755,9 @@ cdef class Clnt(object):
         cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
         if trader is NULL:
             raise Error()
-        cdef DbrIden id = dbr_clnt_logon(self.impl_, trader, ms)
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_logon(self.impl_, trader, ms)
         if id < 0:
             raise Error()
         return id
@@ -757,7 +766,9 @@ cdef class Clnt(object):
         cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
         if trader is NULL:
             raise Error()
-        cdef DbrIden id = dbr_clnt_logoff(self.impl_, trader, ms)
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_logoff(self.impl_, trader, ms)
         if id < 0:
             raise Error()
         return id
@@ -765,39 +776,47 @@ cdef class Clnt(object):
     def place(self, Trader trader, Accnt accnt, ContrRec crec, DbrDate settl_date,
               const char* ref, int action, DbrTicks ticks, DbrLots lots,
               DbrLots min_lots, DbrMillis ms):
-        cdef DbrIden id = dbr_clnt_place(self.impl_, trader.impl_, accnt.impl_,
-                                         crec.impl_, settl_date, ref, action,
-                                         ticks, lots, min_lots, ms)
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_place(self.impl_, trader.impl_, accnt.impl_, crec.impl_,
+                                settl_date, ref, action, ticks, lots, min_lots, ms)
         if id < 0:
             raise Error()
         return id
 
     def revise_id(self, Trader trader, DbrIden id, DbrLots lots, DbrMillis ms):
-        id = dbr_clnt_revise_id(self.impl_, trader.impl_, id, lots, ms)
+        with nogil:
+            id = dbr_clnt_revise_id(self.impl_, trader.impl_, id, lots, ms)
         if id < 0:
             raise Error()
         return id
 
     def revise_ref(self, Trader trader, const char* ref, DbrLots lots, DbrMillis ms):
-        cdef DbrIden id = dbr_clnt_revise_ref(self.impl_, trader.impl_, ref, lots, ms)
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_revise_ref(self.impl_, trader.impl_, ref, lots, ms)
         if id < 0:
             raise Error()
         return id
 
     def cancel_id(self, Trader trader, DbrIden id, DbrMillis ms):
-        id = dbr_clnt_cancel_id(self.impl_, trader.impl_, id, ms)
+        with nogil:
+            id = dbr_clnt_cancel_id(self.impl_, trader.impl_, id, ms)
         if id < 0:
             raise Error()
         return id
 
     def cancel_ref(self, Trader trader, const char* ref, DbrMillis ms):
-        cdef DbrIden id = dbr_clnt_cancel_ref(self.impl_, trader.impl_, ref, ms)
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_cancel_ref(self.impl_, trader.impl_, ref, ms)
         if id < 0:
             raise Error()
         return id
 
     def ack_trade(self, Trader trader, DbrIden id, DbrMillis ms):
-        id = dbr_clnt_ack_trade(self.impl_, trader.impl_, id, ms)
+        with nogil:
+            id = dbr_clnt_ack_trade(self.impl_, trader.impl_, id, ms)
         if id < 0:
             raise Error()
         return id
@@ -818,7 +837,12 @@ cdef class Clnt(object):
         dbr_clnt_canceltimer(self.impl_, id)
 
     def poll(self, DbrMillis ms, Handler handler):
-        return dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
+        cdef int nevents
+        with nogil:
+            nevents = dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
+        if nevents < 0:
+            raise Error()
+        return nevents
 
     def mdclear(self):
         dbr_clnt_mdclear(self.impl_)
