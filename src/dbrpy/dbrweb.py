@@ -89,18 +89,43 @@ class ContrRequest(object):
         contrs = []
         if self.mnems:
             for mnem in self.mnems:
-                arec = clnt.find_rec_mnem(ENTITY_CONTR, mnem)
-                if arec:
-                    contrs.append(ContrRequest.contrDict(arec))
+                crec = clnt.find_rec_mnem(ENTITY_CONTR, mnem)
+                if crec:
+                    contrs.append(ContrRequest.contrDict(crec))
         else:
-            contrs = [ContrRequest.contrDict(arec)
-                      for arec in clnt.list_rec(ENTITY_CONTR)]
+            contrs = [ContrRequest.contrDict(crec)
+                      for crec in clnt.list_rec(ENTITY_CONTR)]
         return contrs
 
+class ViewRequest(object):
+    @staticmethod
+    def viewDict(view):
+        return {
+            'cid': view.cid,
+            'settl_date': view.settl_date
+        }
+    def __init__(self, mnem, settl_dates):
+        self.mnem = mnem
+        self.settl_dates = settl_dates
+    def __call__(self, clnt):
+        views = []
+        crec = clnt.find_rec_mnem(ENTITY_CONTR, self.mnem)
+        if crec:
+            if self.settl_dates:
+                for settl_date in self.settl_dates:
+                    view = clnt.find_view(crec.id, int(settl_date))
+                    if view:
+                        views.append(ViewRequest.viewDict(view))
+            else:
+                views = [ViewRequest.viewDict(view)
+                         for view in clnt.list_view() if view.cid == crec.id]
+        return views
+
 urls = (
-    '/api/trader', 'TraderHandler',
-    '/api/accnt',  'AccntHandler',
-    '/api/contr',  'ContrHandler'
+    '/api/trader',    'TraderHandler',
+    '/api/accnt',     'AccntHandler',
+    '/api/contr',     'ContrHandler',
+    '/api/view/(.*)', 'ViewHandler'
 )
 
 class TraderHandler:
@@ -121,6 +146,13 @@ class ContrHandler:
     def GET(self):
         async = web.ctx.async
         async.send(ContrRequest(web.input(mnem = []).mnem))
+        web.header('Content-Type', 'application/json')
+        return json.dumps(async.recv())
+
+class ViewHandler:
+    def GET(self, mnem):
+        async = web.ctx.async
+        async.send(ViewRequest(mnem, web.input(settl_date = []).settl_date))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
