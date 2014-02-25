@@ -111,10 +111,19 @@ class ContrRequest(object):
 
 class ViewRequest(object):
     @staticmethod
+    def levelDict(level):
+        return {
+            'ticks': level.ticks,
+            'lots': level.lots,
+            'count': level.count
+        }
+    @staticmethod
     def viewDict(view):
         return {
             'cid': view.cid,
-            'settl_date': view.settl_date
+            'settl_date': view.settl_date,
+            'list_bid': [ViewRequest.levelDict(level) for level in view.list_bid],
+            'list_ask': [ViewRequest.levelDict(level) for level in view.list_ask]
         }
     def __init__(self, mnems, settl_dates):
         self.mnems = set(mnems)
