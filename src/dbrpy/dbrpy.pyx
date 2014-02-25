@@ -451,9 +451,11 @@ cdef object async_recv(DbrAsync async):
     return <object>arg
 
 cdef class Async(object):
+    cdef ZmqCtx ctx_
     cdef DbrAsync impl_
 
     def __cinit__(self, ZmqCtx ctx, const char* sess):
+        self.ctx_ = ctx # Incref.
         self.impl_ = dbr_async_create(ctx.impl_, sess)
         if self.impl_ is NULL:
             raise Error()
@@ -701,10 +703,14 @@ cdef class ZmqCtx(object):
 # Clnt
 
 cdef class Clnt(object):
+    cdef ZmqCtx ctx_
+    cdef Pool pool_
     cdef DbrClnt impl_
 
     def __cinit__(self, ZmqCtx ctx, const char* sess, const char* mdaddr,
                   const char* traddr, DbrIden seed, Pool pool):
+        self.ctx_ = ctx   # Incref.
+        self.pool_ = pool # Incref.
         self.impl_ = dbr_clnt_create(ctx.impl_, sess, mdaddr, traddr, seed, pool.impl_)
         if self.impl_ is NULL:
             raise Error()
