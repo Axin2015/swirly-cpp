@@ -39,7 +39,7 @@ class TraderRequest(object):
             'email': trec.email
         }
     def __init__(self, mnems):
-        self.mnems = mnems
+        self.mnems = set(mnems)
     def __call__(self, clnt):
         traders = []
         if self.mnems:
@@ -62,7 +62,7 @@ class AccntRequest(object):
             'email': arec.email
         }
     def __init__(self, mnems):
-        self.mnems = mnems
+        self.mnems = set(mnems)
     def __call__(self, clnt):
         accnts = []
         if self.mnems:
@@ -77,14 +77,26 @@ class AccntRequest(object):
 
 class ContrRequest(object):
     @staticmethod
-    def contrDict(arec):
+    def contrDict(crec):
         return {
-            'id': arec.id,
-            'mnem': arec.mnem,
-            'display': arec.display
+            'id': crec.id,
+            'mnem': crec.mnem,
+            'display': crec.display,
+            'asset_type': crec.asset_type,
+            'asset': crec.asset,
+            'ccy': crec.ccy,
+            'tick_numer': crec.tick_numer,
+            'tick_denom': crec.tick_denom,
+            'lot_numer': crec.lot_numer,
+            'lot_denom': crec.lot_denom,
+            'price_dp': crec.price_dp,
+            'pip_dp': crec.pip_dp,
+            'qty_dp': crec.qty_dp,
+            'min_lots': crec.min_lots,
+            'max_lots': crec.max_lots
         }
     def __init__(self, mnems):
-        self.mnems = mnems
+        self.mnems = set(mnems)
     def __call__(self, clnt):
         contrs = []
         if self.mnems:
@@ -104,28 +116,43 @@ class ViewRequest(object):
             'cid': view.cid,
             'settl_date': view.settl_date
         }
-    def __init__(self, mnem, settl_dates):
-        self.mnem = mnem
-        self.settl_dates = settl_dates
+    def __init__(self, mnems, settl_dates):
+        self.mnems = set(mnems)
+        self.settl_dates = {int(x) for x in settl_dates}
     def __call__(self, clnt):
+        cids = set()
+        for mnem in self.mnems:
+            crec = clnt.find_rec_mnem(ENTITY_CONTR, mnem)
+            if crec:
+                cids.add(crec.id)
         views = []
-        crec = clnt.find_rec_mnem(ENTITY_CONTR, self.mnem)
-        if crec:
+        if cids:
             if self.settl_dates:
-                for settl_date in self.settl_dates:
-                    view = clnt.find_view(crec.id, int(settl_date))
-                    if view:
-                        views.append(ViewRequest.viewDict(view))
+                # Cids and settl_dates.
+                for cid in cids:
+                    for settl_date in self.settl_dates:
+                        view = clnt.find_view(crec.id, settl_date)
+                        if view:
+                            views.append(ViewRequest.viewDict(view))
             else:
-                views = [ViewRequest.viewDict(view)
-                         for view in clnt.list_view() if view.cid == crec.id]
+                # Cids only.
+                views = [ViewRequest.viewDict(view) for view in clnt.list_view()
+                         if view.cid in cids]
+        else:
+            if self.settl_dates:
+                # Settl_dates only.
+                views = [ViewRequest.viewDict(view) for view in clnt.list_view()
+                         if view.settl_date in self.settl_dates]
+            else:
+                # Neither cids nor settl_dates.
+                views = [ViewRequest.viewDict(view) for view in clnt.list_view()]
         return views
 
 urls = (
-    '/api/trader',    'TraderHandler',
-    '/api/accnt',     'AccntHandler',
-    '/api/contr',     'ContrHandler',
-    '/api/view/(.*)', 'ViewHandler'
+    '/api/trader', 'TraderHandler',
+    '/api/accnt',  'AccntHandler',
+    '/api/contr',  'ContrHandler',
+    '/api/view',   'ViewHandler'
 )
 
 class TraderHandler:
@@ -150,9 +177,10 @@ class ContrHandler:
         return json.dumps(async.recv())
 
 class ViewHandler:
-    def GET(self, mnem):
+    def GET(self):
         async = web.ctx.async
-        async.send(ViewRequest(mnem, web.input(settl_date = []).settl_date))
+        params = web.input(mnem = [], settl_date = [])
+        async.send(ViewRequest(params.mnem, params.settl_date))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
