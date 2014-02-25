@@ -442,13 +442,13 @@ def dp_to_real(int dp):
 # Async
 
 cdef object async_recv(DbrAsync async):
-    cdef void* arg = NULL
+    cdef void* val = NULL
     cdef DbrBool ret
     with nogil:
-        ret = dbr_async_recv(async, &arg)
+        ret = dbr_async_recv(async, &val)
     if ret == DBR_FALSE:
         raise Error()
-    return <object>arg
+    return <object>val
 
 cdef class Async(object):
     cdef ZmqCtx ctx_
@@ -464,19 +464,19 @@ cdef class Async(object):
         if self.impl_ is not NULL:
             dbr_async_destroy(self.impl_)
 
-    def send(self, object arg):
-        Py_INCREF(arg)
+    def send(self, object val):
+        Py_INCREF(val)
         cdef DbrBool ret
         with nogil:
-            ret = dbr_async_send(self.impl_, <PyObject*>arg)
+            ret = dbr_async_send(self.impl_, <PyObject*>val)
         if ret == DBR_FALSE:
-            Py_DECREF(arg)
+            Py_DECREF(val)
             raise Error()
 
     def recv(self):
-        cdef object arg = async_recv(self.impl_)
-        Py_DECREF(arg)
-        return arg
+        cdef object val = async_recv(self.impl_)
+        Py_DECREF(val)
+        return val
 
 # Trader
 
