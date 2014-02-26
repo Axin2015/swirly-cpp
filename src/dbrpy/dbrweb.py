@@ -22,6 +22,11 @@ def worker(ctx):
     clnt = Clnt(ctx, SESS, 'tcp://localhost:3270', 'tcp://localhost:3271',
                 millis(), pool)
     handler = WorkerHandler(clnt)
+    while not clnt.is_ready():
+        clnt.poll(TMOUT, handler)
+    # Temporary hack for test purposes.
+    trec = clnt.find_rec_mnem(ENTITY_TRADER, 'WRAMIREZ')
+    clnt.logon(trec, TMOUT)
     while clnt.is_open():
         clnt.poll(TMOUT, handler)
 
@@ -31,7 +36,7 @@ class CloseRequest(object):
 
 class TraderRequest(object):
     @staticmethod
-    def traderDict(trec):
+    def toDict(trec):
         return {
             'id': trec.id,
             'mnem': trec.mnem,
@@ -46,15 +51,15 @@ class TraderRequest(object):
             for mnem in self.mnems:
                 trec = clnt.find_rec_mnem(ENTITY_TRADER, mnem)
                 if trec:
-                    traders.append(TraderRequest.traderDict(trec))
+                    traders.append(TraderRequest.toDict(trec))
         else:
-            traders = [TraderRequest.traderDict(trec)
+            traders = [TraderRequest.toDict(trec)
                        for trec in clnt.list_rec(ENTITY_TRADER)]
         return traders
 
 class AccntRequest(object):
     @staticmethod
-    def accntDict(arec):
+    def toDict(arec):
         return {
             'id': arec.id,
             'mnem': arec.mnem,
@@ -69,15 +74,15 @@ class AccntRequest(object):
             for mnem in self.mnems:
                 arec = clnt.find_rec_mnem(ENTITY_ACCNT, mnem)
                 if arec:
-                    accnts.append(AccntRequest.accntDict(arec))
+                    accnts.append(AccntRequest.toDict(arec))
         else:
-            accnts = [AccntRequest.accntDict(arec)
+            accnts = [AccntRequest.toDict(arec)
                       for arec in clnt.list_rec(ENTITY_ACCNT)]
         return accnts
 
 class ContrRequest(object):
     @staticmethod
-    def contrDict(crec):
+    def toDict(crec):
         return {
             'id': crec.id,
             'mnem': crec.mnem,
@@ -103,11 +108,60 @@ class ContrRequest(object):
             for mnem in self.mnems:
                 crec = clnt.find_rec_mnem(ENTITY_CONTR, mnem)
                 if crec:
-                    contrs.append(ContrRequest.contrDict(crec))
+                    contrs.append(ContrRequest.toDict(crec))
         else:
-            contrs = [ContrRequest.contrDict(crec)
+            contrs = [ContrRequest.toDict(crec)
                       for crec in clnt.list_rec(ENTITY_CONTR)]
         return contrs
+
+class LogonRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        return clnt.logon(trec, TMOUT) if trec else -1
+
+class LogoffRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        return clnt.logoff(trec, TMOUT) if trec else -1
+
+class OrderRequest(object):
+    @staticmethod
+    def toDict(order):
+        return {
+            'id': order.id
+        }
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        orders = []
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        if trec:
+            trader = clnt.trader(trec)
+            orders = [OrderRequest.toDict(order)
+                      for order in trader.list_order()]
+        return orders
+
+class ExecRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        return []
+
+class MembRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        return []
+
+class PosnRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        return []
 
 class ViewRequest(object):
     @staticmethod
@@ -118,7 +172,7 @@ class ViewRequest(object):
             'count': level.count
         }
     @staticmethod
-    def viewDict(view):
+    def toDict(view):
         return {
             'cid': view.cid,
             'settl_date': view.settl_date,
@@ -142,26 +196,30 @@ class ViewRequest(object):
                     for settl_date in self.settl_dates:
                         view = clnt.find_view(crec.id, settl_date)
                         if view:
-                            views.append(ViewRequest.viewDict(view))
+                            views.append(ViewRequest.toDict(view))
             else:
                 # Cids only.
-                views = [ViewRequest.viewDict(view) for view in clnt.list_view()
+                views = [ViewRequest.toDict(view) for view in clnt.list_view()
                          if view.cid in cids]
         else:
             if self.settl_dates:
                 # Settl_dates only.
-                views = [ViewRequest.viewDict(view) for view in clnt.list_view()
+                views = [ViewRequest.toDict(view) for view in clnt.list_view()
                          if view.settl_date in self.settl_dates]
             else:
                 # Neither cids nor settl_dates.
-                views = [ViewRequest.viewDict(view) for view in clnt.list_view()]
+                views = [ViewRequest.toDict(view) for view in clnt.list_view()]
         return views
 
 urls = (
-    '/api/trader', 'TraderHandler',
-    '/api/accnt',  'AccntHandler',
-    '/api/contr',  'ContrHandler',
-    '/api/view',   'ViewHandler'
+    '/api/trader',     'TraderHandler',
+    '/api/accnt',      'AccntHandler',
+    '/api/contr',      'ContrHandler',
+    '/api/order/(.+)', 'OrderHandler',
+    '/api/exec/(.+)',  'ExecHandler',
+    '/api/memb/(.+)',  'MembHandler',
+    '/api/posn/(.+)',  'PosnHandler',
+    '/api/view',       'ViewHandler'
 )
 
 class TraderHandler:
@@ -182,6 +240,34 @@ class ContrHandler:
     def GET(self):
         async = web.ctx.async
         async.send(ContrRequest(web.input(mnem = []).mnem))
+        web.header('Content-Type', 'application/json')
+        return json.dumps(async.recv())
+
+class OrderHandler:
+    def GET(self, mnem):
+        async = web.ctx.async
+        async.send(OrderRequest(mnem))
+        web.header('Content-Type', 'application/json')
+        return json.dumps(async.recv())
+
+class ExecHandler:
+    def GET(self, mnem):
+        async = web.ctx.async
+        async.send(ExecRequest(mnem))
+        web.header('Content-Type', 'application/json')
+        return json.dumps(async.recv())
+
+class MembHandler:
+    def GET(self, mnem):
+        async = web.ctx.async
+        async.send(MembRequest(mnem))
+        web.header('Content-Type', 'application/json')
+        return json.dumps(async.recv())
+
+class PosnHandler:
+    def GET(self, mnem):
+        async = web.ctx.async
+        async.send(PosnRequest(mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
