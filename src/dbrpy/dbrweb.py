@@ -23,12 +23,12 @@ def worker(ctx):
                 millis(), pool)
     handler = WorkerHandler(clnt)
     while not clnt.is_ready():
-        clnt.poll(TMOUT, handler)
+        clnt.dispatch(TMOUT, handler)
     # Temporary hack for test purposes.
     trec = clnt.find_rec_mnem(ENTITY_TRADER, 'WRAMIREZ')
     clnt.logon(trec, TMOUT)
     while clnt.is_open():
-        clnt.poll(TMOUT, handler)
+        clnt.dispatch(TMOUT, handler)
 
 class CloseRequest(object):
     def __call__(self, clnt):

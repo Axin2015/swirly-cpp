@@ -369,7 +369,7 @@ public:
         // TODO: more robust logic.
         do {
             cout << '.';
-            clnt_.poll(250, this);
+            clnt_.dispatch(250, this);
         } while (!clnt_.is_ready());
         cout << endl;
     }
@@ -1091,16 +1091,20 @@ main(int argc, char* argv[])
                 }
             });
 
+        // FIXME: migrate to async model.
+        assert(0);
+        zmq_pollitem_t* items = nullptr;
+#if 0
         // Add stdin to descriptor set.
         zmq_pollitem_t templ{ NULL, 0, ZMQ_POLLIN, 0 };
         zmq_pollitem_t* items = clnt.setitems(&templ, 1);
-
+#endif
         cout << "> ";
         cout.flush();
         char buf[BUF_MAX];
         do {
 
-            clnt.poll(30000, &handler);
+            clnt.dispatch(30000, &handler);
             if ((items[0].revents & ZMQ_POLLIN)) {
 
                 const ssize_t n{::read(0, buf, sizeof(buf))};

@@ -21,8 +21,6 @@
 #include <dbr/handler.h>
 #include <dbr/types.h>
 
-#include <zmq.h>
-
 #include <stddef.h>
 
 typedef struct ElmPool* DbrPool;
@@ -157,11 +155,8 @@ dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms);
 DBR_API void
 dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id);
 
-DBR_API zmq_pollitem_t*
-dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems);
-
-DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
+DBR_API DbrBool
+dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 DBR_API void
 dbr_clnt_mdclear(DbrClnt clnt);

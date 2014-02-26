@@ -438,7 +438,7 @@ cdef extern from "dbr/clnt.h":
 
     void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id) nogil
 
-    int dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
+    DbrBool dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
 
     void dbr_clnt_mdclear(DbrClnt clnt) nogil
 

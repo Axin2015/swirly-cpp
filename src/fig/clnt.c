@@ -31,6 +31,8 @@
 #include <dbr/sess.h>
 #include <dbr/util.h>
 
+#include <zmq.h>
+
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
@@ -86,8 +88,7 @@ struct FigClnt {
     struct DbrTree viewups;
     struct DbrPrioq prioq;
     DbrMillis mdlast;
-    zmq_pollitem_t* items;
-    int nitems;
+    zmq_pollitem_t items[NSOCK];
 };
 
 static void
@@ -518,11 +519,6 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
 
     clnt->mdlast = 0;
 
-    // 9.
-    clnt->items = malloc(NSOCK * sizeof(zmq_pollitem_t));
-    if (!clnt->items)
-        goto fail7;
-
     clnt->items[MDSOCK].socket = mdsock;
     clnt->items[MDSOCK].fd = 0;
     clnt->items[MDSOCK].events = ZMQ_POLLIN;
@@ -538,15 +534,10 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     clnt->items[ASOCK].events = ZMQ_POLLIN;
     clnt->items[ASOCK].revents = 0;
 
-    clnt->nitems = NSOCK;
-
     if (!dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT))
-        goto fail8;
+        goto fail7;
 
     return clnt;
- fail8:
-    // 9.
-    free(clnt->items);
  fail7:
     // 8.
     dbr_prioq_term(&clnt->prioq);
@@ -579,8 +570,6 @@ dbr_clnt_destroy(DbrClnt clnt)
     if (clnt) {
         // Ensure that executions are freed.
         dbr_clnt_clear(clnt);
-        // 9.
-        free(clnt->items);
         // 8.
         dbr_prioq_term(&clnt->prioq);
         // 7.
@@ -927,35 +916,14 @@ dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id)
     dbr_prioq_remove(&clnt->prioq, id);
 }
 
-DBR_API zmq_pollitem_t*
-dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
+DBR_API DbrBool
+dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
-    // The first two items are reserved for the tr and md sockets.
-    zmq_pollitem_t* new_items = realloc(clnt->items, (NSOCK + nitems) * sizeof(zmq_pollitem_t));
-    if (!new_items) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        return NULL;
-    }
-    // Copy new items to tail.
-    __builtin_memcpy(&new_items[NSOCK], items, nitems * sizeof(zmq_pollitem_t));
-    clnt->items = new_items;
-    clnt->nitems = NSOCK + nitems;
-    // Return pointer to third item, reserving the first two for internal use.
-    return &new_items[NSOCK];
-}
-
-DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
-{
-    int nevents;
+    assert(ms >= 0);
     DbrMillis now = dbr_millis();
     const DbrMillis absms = now + ms;
+    // At least one iteration.
     do {
-        if (absms <= now) {
-            // User timeout.
-            nevents = 0;
-            break;
-        }
         const struct DbrElem* elem;
         while ((elem = dbr_prioq_top(&clnt->prioq))) {
             if (elem->key > now) {
@@ -1003,18 +971,19 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         // Note also that zmq_poll() is level-triggered.
 
-        nevents = zmq_poll(clnt->items, clnt->nitems, ms);
+        const int nevents = zmq_poll(clnt->items, NSOCK, ms);
         if (nevents < 0) {
             dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
         // Current time after slow operation.
         now = dbr_millis();
+        if (nevents == 0)
+            continue;
 
         struct DbrBody body;
         if ((clnt->items[TRSOCK].revents & ZMQ_POLLIN)) {
 
-            --nevents;
             if (!dbr_recv_body(clnt->trsock, clnt->pool, &body))
                 goto fail1;
 
@@ -1121,7 +1090,6 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         if ((clnt->items[MDSOCK].revents & ZMQ_POLLIN)) {
 
-            --nevents;
             if (!dbr_recv_body(clnt->mdsock, clnt->pool, &body))
                 goto fail1;
 
@@ -1149,7 +1117,6 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
         if ((clnt->items[ASOCK].revents & ZMQ_POLLIN)) {
 
-            --nevents;
             void* val;
             if (!async_recv(clnt->asock, &val))
                 goto fail1;
@@ -1159,11 +1126,10 @@ dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (!async_send(clnt->asock, val))
                 goto fail1;
         }
-        // Repeat while no external events.
-    } while (nevents == 0);
-    return nevents;
+    } while (now < absms);
+    return DBR_TRUE;
  fail1:
-    return -1;
+    return DBR_FALSE;
 }
 
 DBR_API void

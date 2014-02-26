@@ -932,21 +932,11 @@ public:
     {
         dbr_clnt_canceltimer(impl_, id);
     }
-    zmq_pollitem_t*
-    setitems(zmq_pollitem_t* items, int nitems)
+    void
+    dispatch(DbrMillis ms, DbrHandler handler)
     {
-        items = dbr_clnt_setitems(impl_, items, nitems);
-        if (!items)
+        if (!dbr_clnt_dispatch(impl_, ms, handler))
             throw_exception();
-        return items;
-    }
-    int
-    poll(DbrMillis ms, DbrHandler handler)
-    {
-        const int nevents = dbr_clnt_poll(impl_, ms, handler);
-        if (nevents < 0)
-            throw_exception();
-        return nevents;
     }
     void
     clear() noexcept

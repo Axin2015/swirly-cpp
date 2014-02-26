@@ -842,13 +842,12 @@ cdef class Clnt(object):
     def canceltimer(self, DbrIden id):
         dbr_clnt_canceltimer(self.impl_, id)
 
-    def poll(self, DbrMillis ms, Handler handler):
-        cdef int nevents
+    def dispatch(self, DbrMillis ms, Handler handler):
+        cdef DbrBool ret
         with nogil:
-            nevents = dbr_clnt_poll(self.impl_, ms, &handler.impl_.handler)
-        if nevents < 0:
+            ret = dbr_clnt_dispatch(self.impl_, ms, &handler.impl_.handler)
+        if ret == DBR_FALSE:
             raise Error()
-        return nevents
 
     def mdclear(self):
         dbr_clnt_mdclear(self.impl_)
