@@ -90,7 +90,7 @@ main(int argc, char* argv[])
         Handler handler;
         do {
             cout << '.';
-            clnt.poll(250, &handler);
+            clnt.poll(&handler, 250);
         } while (!clnt.is_ready());
         cout << endl;
 

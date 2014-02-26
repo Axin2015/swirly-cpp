@@ -945,7 +945,7 @@ dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems)
 }
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
+dbr_clnt_poll(DbrClnt clnt, DbrHandler handler, DbrMillis ms)
 {
     int nevents;
     DbrMillis now = dbr_millis();

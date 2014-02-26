@@ -369,7 +369,7 @@ public:
         // TODO: more robust logic.
         do {
             cout << '.';
-            clnt_.poll(250, this);
+            clnt_.poll(this, 250);
         } while (!clnt_.is_ready());
         cout << endl;
     }
@@ -1100,7 +1100,7 @@ main(int argc, char* argv[])
         char buf[BUF_MAX];
         do {
 
-            clnt.poll(30000, &handler);
+            clnt.poll(&handler, 30000);
             if ((items[0].revents & ZMQ_POLLIN)) {
 
                 const ssize_t n{::read(0, buf, sizeof(buf))};
