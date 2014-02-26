@@ -161,7 +161,7 @@ DBR_API zmq_pollitem_t*
 dbr_clnt_setitems(DbrClnt clnt, zmq_pollitem_t* items, int nitems);
 
 DBR_API int
-dbr_clnt_poll(DbrClnt clnt, DbrHandler handler, DbrMillis ms);
+dbr_clnt_poll(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 DBR_API void
 dbr_clnt_mdclear(DbrClnt clnt);

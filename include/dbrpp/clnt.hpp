@@ -941,9 +941,9 @@ public:
         return items;
     }
     int
-    poll(DbrHandler handler, DbrMillis ms)
+    poll(DbrMillis ms, DbrHandler handler)
     {
-        const int nevents = dbr_clnt_poll(impl_, handler, ms);
+        const int nevents = dbr_clnt_poll(impl_, ms, handler);
         if (nevents < 0)
             throw_exception();
         return nevents;
