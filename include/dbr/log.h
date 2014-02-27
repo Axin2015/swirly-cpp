@@ -67,11 +67,11 @@ enum DbrLog {
 DBR_API DbrLogger
 dbr_log_setlogger(DbrLogger new_logger);
 
-DBR_API DbrLogger
-dbr_log_stdio();
+DBR_API void
+dbr_log_stdio(int level, const char* format, va_list args);
 
-DBR_API DbrLogger
-dbr_log_syslog();
+DBR_API void
+dbr_log_syslog(int level, const char* format, va_list args);
 
 DBR_API void
 dbr_log_printf(int level, const char* format, ...);

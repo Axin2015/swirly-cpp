@@ -21,8 +21,19 @@
 #include <stdio.h>
 #include <syslog.h>
 
-static void
-stdio_logger(int level, const char* format, va_list args)
+static __thread DbrLogger logger = dbr_log_stdio;
+
+DBR_API DbrLogger
+dbr_log_setlogger(DbrLogger new_logger)
+{
+    assert(new_logger);
+    DbrLogger prev = logger;
+    logger = new_logger;
+    return prev;
+}
+
+DBR_API void
+dbr_log_stdio(int level, const char* format, va_list args)
 {
     FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
     flockfile(stream);
@@ -31,8 +42,8 @@ stdio_logger(int level, const char* format, va_list args)
     funlockfile(stream);
 }
 
-static void
-syslog_logger(int level, const char* format, va_list args)
+DBR_API void
+dbr_log_syslog(int level, const char* format, va_list args)
 {
     int priority;
     switch (level) {
@@ -55,29 +66,6 @@ syslog_logger(int level, const char* format, va_list args)
         priority = LOG_DEBUG;
     }
     vsyslog(priority, format, args);
-}
-
-static __thread DbrLogger logger = stdio_logger;
-
-DBR_API DbrLogger
-dbr_log_setlogger(DbrLogger new_logger)
-{
-    assert(new_logger);
-    DbrLogger prev = logger;
-    logger = new_logger;
-    return prev;
-}
-
-DBR_API DbrLogger
-dbr_log_stdio()
-{
-    return stdio_logger;
-}
-
-DBR_API DbrLogger
-dbr_log_syslog()
-{
-    return syslog_logger;
 }
 
 DBR_API void
