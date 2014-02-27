@@ -23,8 +23,11 @@ static void
 stdio_logger(int level, const char* format, va_list args)
 {
     FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
+
+    flockfile(stream);
     vfprintf(stream, format, args);
     fputc('\n', stream);
+    funlockfile(stream);
 }
 
 static __thread DbrLogger logger = stdio_logger;
