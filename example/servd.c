@@ -491,6 +491,13 @@ sess_close(struct DbrSess* sess, DbrIden req_id)
 {
     dbr_prioq_remove(&prioq, sess_to_hbtmr(sess));
     dbr_prioq_remove(&prioq, sess_to_trtmr(sess));
+
+    for (struct DbrRbNode* node = dbr_sess_first_trader(sess);
+         node != DBR_SESS_END_TRADER; node = dbr_rbnode_next(node)) {
+        DbrTrader trader = dbr_sess_trader_entry(node);
+        dbr_sess_logoff(sess, trader, DBR_FALSE);
+        // TODO: implicit logoff?
+    }
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_CLOSE };
     return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
 }
