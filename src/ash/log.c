@@ -17,27 +17,67 @@
  */
 #include <dbr/log.h>
 
+#include <assert.h>
 #include <stdio.h>
+#include <syslog.h>
 
 static void
 stdio_logger(int level, const char* format, va_list args)
 {
     FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
-
     flockfile(stream);
     vfprintf(stream, format, args);
     fputc('\n', stream);
     funlockfile(stream);
 }
 
+static void
+syslog_logger(int level, const char* format, va_list args)
+{
+    int priority;
+    switch (level) {
+    case DBR_LOG_CRIT:
+        priority = LOG_CRIT;
+        break;
+    case DBR_LOG_ERROR:
+        priority = LOG_ERR;
+        break;
+    case DBR_LOG_WARN:
+        priority = LOG_WARNING;
+        break;
+    case DBR_LOG_NOTICE:
+        priority = LOG_NOTICE;
+        break;
+    case DBR_LOG_INFO:
+        priority = LOG_INFO;
+        break;
+    default:
+        priority = LOG_DEBUG;
+    }
+    vsyslog(priority, format, args);
+}
+
 static __thread DbrLogger logger = stdio_logger;
 
 DBR_API DbrLogger
-dbr_log_set(DbrLogger new_logger)
+dbr_log_setlogger(DbrLogger new_logger)
 {
-    DbrLogger old_logger = logger;
-    logger = new_logger ? new_logger : stdio_logger;
-    return old_logger;
+    assert(new_logger);
+    DbrLogger prev = logger;
+    logger = new_logger;
+    return prev;
+}
+
+DBR_API DbrLogger
+dbr_log_stdio()
+{
+    return stdio_logger;
+}
+
+DBR_API DbrLogger
+dbr_log_syslog()
+{
+    return syslog_logger;
 }
 
 DBR_API void
