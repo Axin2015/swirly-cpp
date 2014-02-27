@@ -351,34 +351,35 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
     return DBR_TRUE;
 }
 
-static DbrBool
+static struct DbrPosn*
 apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
     DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
     if (dbr_unlikely(!accnt)) {
         dbr_pool_free_posn(accnt->pool, posn);
         dbr_err_set(DBR_ENOMEM, "out of memory");
-        return DBR_FALSE;
+        return NULL;
     }
     posn = fig_accnt_update_posn(accnt, posn);
     insert_posnup(&clnt->posnups, posn);
-    return DBR_TRUE;
+    return posn;
 }
 
-static void
-apply_viewup(DbrClnt clnt, struct DbrView* view, DbrBool overwrite)
+static struct DbrView*
+apply_viewup(DbrClnt clnt, struct DbrView* view)
 {
     const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_date);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
     if (node != &view->clnt_node_) {
 
-        // Drop if node already exists and overwrite is not set.
-        if (dbr_unlikely(!overwrite)) {
-            dbr_pool_free_view(clnt->pool, view);
-            return;
-        }
-
         struct DbrView* exist = dbr_clnt_view_entry(node);
+
+        // Drop if node already exists and overwrite is not set.
+        if (dbr_unlikely(view->created < exist->created)) {
+            dbr_log_warn("dropped stale view");
+            dbr_pool_free_view(clnt->pool, view);
+            return NULL;
+        }
 
         // Update existing position.
 
@@ -392,28 +393,32 @@ apply_viewup(DbrClnt clnt, struct DbrView* view, DbrBool overwrite)
             exist->ask_ticks[i] = view->ask_ticks[i];
             exist->ask_lots[i] = view->ask_lots[i];
             exist->ask_count[i] = view->ask_count[i];
+            exist->created = view->created;
         }
 
         dbr_pool_free_view(clnt->pool, view);
         view = exist;
     }
     insert_viewup(&clnt->viewups, view);
+    return view;
 }
 
 static void
-apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrMillis created, DbrHandler handler)
+apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrHandler handler)
 {
-    const DbrBool overwrite = clnt->mdlast < created;
-    clnt->mdlast = created;
-    if (dbr_unlikely(!overwrite))
-        dbr_log_warn("received stale market-data");
+    // In the following example, the snapshot should overwrite the T+0 delta, but not the T+2 delta:
+    // T+0: EURUSD delta
+    // T+2: USDJPY delta
+    // T+1: snapshot
+
     for (struct DbrSlNode* node = first; node; ) {
         struct DbrView* view = dbr_shared_view_entry(node);
         node = node->next;
         // Transfer ownership or free.
         enrich_view(&clnt->cache, view);
-        apply_viewup(clnt, view, overwrite);
-        dbr_handler_on_view(handler, view);
+        view = apply_viewup(clnt, view);
+        if (dbr_unlikely(!view))
+            dbr_handler_on_view(handler, view);
     }
     dbr_handler_on_flush(handler);
 }
@@ -1055,8 +1060,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_VIEW_LIST_REP:
-                apply_views(clnt, body.view_list_rep.first, body.view_list_rep.created,
-                            handler);
+                apply_views(clnt, body.view_list_rep.first, handler);
                 clnt->flags &= ~VIEW_PENDING;
                 break;
             case DBR_EXEC_REP:
@@ -1078,7 +1082,8 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 enrich_posn(&clnt->cache, body.posn_rep.posn);
                 // This function can fail is there is no memory available for a lazily created
                 // account.
-                if (dbr_unlikely(!apply_posnup(clnt, body.posn_rep.posn)))
+                body.posn_rep.posn = apply_posnup(clnt, body.posn_rep.posn);
+                if (dbr_unlikely(!body.posn_rep.posn))
                     goto fail1;
                 dbr_handler_on_posn(handler, body.posn_rep.posn);
                 break;
@@ -1106,8 +1111,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                         goto fail1;
                     clnt->flags &= ~INIT_PENDING;
                 } else
-                    apply_views(clnt, body.view_list_rep.first, body.view_list_rep.created,
-                                handler);
+                    apply_views(clnt, body.view_list_rep.first, handler);
                 break;
             default:
                 dbr_err_setf(DBR_EIO, "unknown body-type '%d'", body.type);

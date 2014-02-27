@@ -40,7 +40,7 @@ dbr_book_term(struct DbrBook* book)
 }
 
 DBR_API struct DbrView*
-dbr_book_view(struct DbrBook* book, struct DbrView* view)
+dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now)
 {
     view->contr.rec = book->crec;
     view->settl_date = book->settl_date;
@@ -76,5 +76,6 @@ dbr_book_view(struct DbrBook* book, struct DbrView* view)
         }
     }
 
+    view->settl_date = now;
     return view;
 }

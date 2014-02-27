@@ -31,7 +31,7 @@ static const char ORDER_FORMAT[] = "llllisiilllllllll";
 static const char EXEC_FORMAT[] = "lllllisiillllllllill";
 static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
-static const char VIEW_FORMAT[] = "lillzllzllzllzllzllz";
+static const char VIEW_FORMAT[] = "lillzllzllzllzllzllzl";
 
 DBR_API size_t
 dbr_rec_len(const struct DbrRec* rec)
@@ -384,7 +384,8 @@ dbr_view_len(const struct DbrView* view, DbrBool enriched)
                          view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
                          view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
                          view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
+                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                         view->created);
     } else {
         n = dbr_packlenf(VIEW_FORMAT,
                          view->contr.id_only, view->settl_date,
@@ -393,7 +394,8 @@ dbr_view_len(const struct DbrView* view, DbrBool enriched)
                          view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
                          view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
                          view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
+                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                         view->created);
     }
     return n;
 }
@@ -409,7 +411,8 @@ dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
                         view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
+                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                        view->created);
 
     } else {
         buf = dbr_packf(buf, VIEW_FORMAT,
@@ -419,7 +422,8 @@ dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
                         view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2]);
+                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                        view->created);
     }
     return buf;
 }
@@ -434,5 +438,6 @@ dbr_read_view(const char* buf, struct DbrView* view)
                        &view->bid_ticks[1], &view->bid_lots[1], &view->bid_count[1],
                        &view->ask_ticks[1], &view->ask_lots[1], &view->ask_count[1],
                        &view->bid_ticks[2], &view->bid_lots[2], &view->bid_count[2],
-                       &view->ask_ticks[2], &view->ask_lots[2], &view->ask_count[2]);
+                       &view->ask_ticks[2], &view->ask_lots[2], &view->ask_count[2],
+                       &view->created);
 }

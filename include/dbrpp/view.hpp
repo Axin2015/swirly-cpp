@@ -84,6 +84,11 @@ public:
     {
         return impl_->ask_count[level];
     }
+    DbrMillis
+    created() const noexcept
+    {
+        return impl_->created;
+    }
 };
 
 inline std::ostream&
@@ -96,7 +101,8 @@ operator <<(std::ostream& os, ViewRef view)
               << ",bid_count=" << view.bid_count(0)
               << ",ask_ticks=" << view.ask_ticks(0)
               << ",ask_lots=" << view.ask_lots(0)
-              << ",ask_count=" << view.ask_count(0);
+              << ",ask_count=" << view.ask_count(0)
+              << ",created=" << view.created();
 }
 
 /** @} */

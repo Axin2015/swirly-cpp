@@ -221,14 +221,13 @@ mdflush(DbrMillis now)
             goto fail1;
         dbr_view_init(view);
 
-        dbr_book_view(book, view);
+        dbr_book_view(book, view, now);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }
 
     rep.req_id = 0;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
-    rep.view_list_rep.created = now;
 
     const DbrBool ok = dbr_send_body(mdsock, &rep, DBR_TRUE);
     free_view_list(q.first);
@@ -343,13 +342,12 @@ sess_book(struct DbrSess* sess, DbrIden req_id, DbrMillis now)
             goto fail1;
         dbr_view_init(view);
 
-        dbr_book_view(book, view);
+        dbr_book_view(book, view, now);
         dbr_queue_insert_back(&q, &view->shared_node_);
     }
     rep.req_id = req_id;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
-    rep.view_list_rep.created = now;
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)

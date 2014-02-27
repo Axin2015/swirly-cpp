@@ -550,6 +550,7 @@ struct DbrView {
     DbrTicks ask_ticks[DBR_LEVEL_MAX];
     DbrLots ask_lots[DBR_LEVEL_MAX];
     size_t ask_count[DBR_LEVEL_MAX];
+    DbrMillis created;
     /**
      * @privatesection
      */

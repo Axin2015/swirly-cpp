@@ -95,7 +95,7 @@ dbr_book_ask_side(struct DbrBook* book)
 }
 
 DBR_API struct DbrView*
-dbr_book_view(struct DbrBook* book, struct DbrView* view);
+dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now);
 
 /** @} */
 

@@ -98,7 +98,6 @@ struct DbrBody {
         struct {
             // dbr_shared_view_entry()
             struct DbrSlNode* first;
-            DbrMillis created;
             /**
              * @privatesection
              */
