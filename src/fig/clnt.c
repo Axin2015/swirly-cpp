@@ -69,7 +69,10 @@ enum {
     VIEW_PENDING   = 0x10,
     TR_CLOSED      = 0x20,
     TR_DOWN        = 0x40,
-    MD_DOWN        = 0x80
+    MD_DOWN        = 0x80,
+
+    ALL_PENDING    = INIT_PENDING | TRADER_PENDING | ACCNT_PENDING
+                   | CONTR_PENDING| VIEW_PENDING
 };
 
 struct FigClnt {
@@ -212,6 +215,9 @@ emplace_rec_list(DbrClnt clnt, int type, unsigned flag, struct DbrSlNode* first,
 {
     fig_cache_emplace_rec_list(&clnt->cache, type, first, count);
     clnt->flags &= ~flag;
+    // Accept async requests once initialised.
+    if ((clnt->flags & ALL_PENDING) == 0)
+        clnt->items[ASOCK].events = ZMQ_POLLIN;
 }
 
 static void
@@ -536,7 +542,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
 
     clnt->items[ASOCK].socket = asock;
     clnt->items[ASOCK].fd = 0;
-    clnt->items[ASOCK].events = ZMQ_POLLIN;
+    clnt->items[ASOCK].events = 0;
     clnt->items[ASOCK].revents = 0;
 
     if (!dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT))
@@ -1062,6 +1068,9 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_VIEW_LIST_REP:
                 apply_views(clnt, body.view_list_rep.first, handler);
                 clnt->flags &= ~VIEW_PENDING;
+                // Accept async requests once initialised.
+                if ((clnt->flags & ALL_PENDING) == 0)
+                    clnt->items[ASOCK].events = ZMQ_POLLIN;
                 break;
             case DBR_EXEC_REP:
                 enrich_exec(&clnt->cache, body.exec_rep.exec);
