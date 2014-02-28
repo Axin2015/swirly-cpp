@@ -215,6 +215,7 @@ class ViewRequest(object):
 
 urls = (
     '/',               'IndexHandler',
+    '/logon',          'LogonHandler',
     '/api/trader',     'TraderHandler',
     '/api/accnt',      'AccntHandler',
     '/api/contr',      'ContrHandler',
@@ -244,20 +245,27 @@ def auth():
         auth = re.sub('^Basic ', '', auth)
         user, passwd = base64.decodestring(auth).split(':')
         if (user, passwd) in allowed:
+            print('user: %s' % user)
             return user
-    web.header('WWW-Authenticate', 'Basic realm="Doobry"')
-    web.ctx.status = '401 Unauthorized'
     return None
 
-class Index:
+class IndexHandler:
     def GET(self):
         return 'Doobry Index Page'
 
+class LogonHandler:
+    def GET(self):
+        user = auth()
+        if user is not None:
+            raise web.seeother('/')
+        web.header('WWW-Authenticate', 'Basic realm="Doobry"')
+        web.ctx.status = '401 Unauthorized'
+
 class TraderHandler:
     def GET(self):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(TraderRequest(web.input(mnem = []).mnem))
         web.header('Content-Type', 'application/json')
@@ -265,9 +273,9 @@ class TraderHandler:
 
 class AccntHandler:
     def GET(self):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(AccntRequest(web.input(mnem = []).mnem))
         web.header('Content-Type', 'application/json')
@@ -275,9 +283,9 @@ class AccntHandler:
 
 class ContrHandler:
     def GET(self):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(ContrRequest(web.input(mnem = []).mnem))
         web.header('Content-Type', 'application/json')
@@ -285,9 +293,9 @@ class ContrHandler:
 
 class OrderHandler:
     def GET(self, mnem):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(OrderRequest(mnem))
         web.header('Content-Type', 'application/json')
@@ -295,9 +303,9 @@ class OrderHandler:
 
 class ExecHandler:
     def GET(self, mnem):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(ExecRequest(mnem))
         web.header('Content-Type', 'application/json')
@@ -305,9 +313,9 @@ class ExecHandler:
 
 class MembHandler:
     def GET(self, mnem):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(MembRequest(mnem))
         web.header('Content-Type', 'application/json')
@@ -315,9 +323,9 @@ class MembHandler:
 
 class PosnHandler:
     def GET(self, mnem):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         async.send(PosnRequest(mnem))
         web.header('Content-Type', 'application/json')
@@ -325,9 +333,9 @@ class PosnHandler:
 
 class ViewHandler:
     def GET(self):
-        username = auth()
-        if username is None:
-            return
+        user = auth()
+        if user is None:
+            raise web.seeother('/logon')
         async = web.ctx.async
         params = web.input(mnem = [], settl_date = [])
         async.send(ViewRequest(params.mnem, params.settl_date))
