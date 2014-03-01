@@ -26,15 +26,26 @@ def worker(ctx):
     handler = WorkerHandler(clnt)
     while not clnt.is_ready():
         clnt.dispatch(TMOUT, handler)
-    # Temporary hack for test purposes.
-    trec = clnt.find_rec_mnem(ENTITY_TRADER, 'WRAMIREZ')
-    clnt.logon(trec, TMOUT)
     while clnt.is_open():
         clnt.dispatch(TMOUT, handler)
 
 class CloseRequest(object):
     def __call__(self, clnt):
         return clnt.close(TMOUT)
+
+class LogonRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        return clnt.logon(trec, TMOUT) if trec else -1
+
+class LogoffRequest(object):
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        return clnt.logoff(trec, TMOUT) if trec else -1
 
 class TraderRequest(object):
     @staticmethod
@@ -115,20 +126,6 @@ class ContrRequest(object):
             contrs = [ContrRequest.toDict(crec)
                       for crec in clnt.list_rec(ENTITY_CONTR)]
         return contrs
-
-class LogonRequest(object):
-    def __init__(self, mnem):
-        self.mnem = mnem
-    def __call__(self, clnt):
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        return clnt.logon(trec, TMOUT) if trec else -1
-
-class LogoffRequest(object):
-    def __init__(self, mnem):
-        self.mnem = mnem
-    def __call__(self, clnt):
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        return clnt.logoff(trec, TMOUT) if trec else -1
 
 class OrderRequest(object):
     @staticmethod
@@ -216,6 +213,7 @@ class ViewRequest(object):
 urls = (
     '/',               'IndexHandler',
     '/logon',          'LogonHandler',
+    '/logoff',         'LogoffHandler',
     '/api/trader',     'TraderHandler',
     '/api/accnt',      'AccntHandler',
     '/api/contr',      'ContrHandler',
@@ -239,104 +237,116 @@ allowed = (
     ('JTHOMAS', 'test')
 )
 
-def auth():
-    auth = web.ctx.env.get('HTTP_AUTHORIZATION')
-    if auth is not None:
-        auth = re.sub('^Basic ', '', auth)
-        user, passwd = base64.decodestring(auth).split(':')
-        if (user, passwd) in allowed:
-            print('user: %s' % user)
-            return user
-    return None
+#web.config.debug = False
+if web.config.get('async') is None:
+    async = None
+    session = None
+else:
+    async = web.config.async
+    session = web.config.session
 
 class IndexHandler:
     def GET(self):
-        return 'Doobry Index Page'
+        return '''
+        <html><head><title>Doobry</title></head>
+        <body>
+        <p>config: %s</p>
+        <p>session: %s</p>
+        </body>
+        </html>
+        ''' % (web.htmlquote(str(web.config)), session.session_id)
 
 class LogonHandler:
     def GET(self):
-        user = auth()
-        if user is not None:
-            raise web.seeother('/')
+        auth = web.ctx.env.get('HTTP_AUTHORIZATION')
+        if auth is not None:
+            auth = re.sub('^Basic ', '', auth)
+            user, passwd = base64.decodestring(auth).split(':')
+            if (user, passwd) in allowed:
+                session.user = user
+                async.send(LogonRequest(user))
+                async.recv()
+                raise web.seeother('/')
         web.header('WWW-Authenticate', 'Basic realm="Doobry"')
         web.ctx.status = '401 Unauthorized'
 
+class LogoffHandler:
+    def GET(self):
+        user = session.user
+        if user is not None:
+            session.kill()
+            async.send(LogoffRequest(user))
+            async.recv()
+        raise web.seeother('/')
+
 class TraderHandler:
     def GET(self):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(TraderRequest(web.input(mnem = []).mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class AccntHandler:
     def GET(self):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(AccntRequest(web.input(mnem = []).mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class ContrHandler:
     def GET(self):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(ContrRequest(web.input(mnem = []).mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class OrderHandler:
     def GET(self, mnem):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(OrderRequest(mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class ExecHandler:
     def GET(self, mnem):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(ExecRequest(mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class MembHandler:
     def GET(self, mnem):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(MembRequest(mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class PosnHandler:
     def GET(self, mnem):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         async.send(PosnRequest(mnem))
         web.header('Content-Type', 'application/json')
         return json.dumps(async.recv())
 
 class ViewHandler:
     def GET(self):
-        user = auth()
+        user = session.user
         if user is None:
             raise web.seeother('/logon')
-        async = web.ctx.async
         params = web.input(mnem = [], settl_date = [])
         async.send(ViewRequest(params.mnem, params.settl_date))
         web.header('Content-Type', 'application/json')
@@ -346,11 +356,12 @@ def run():
     ctx = ZmqCtx()
     thread = Thread(target = worker, args = (ctx,))
     thread.start()
-    async = Async(ctx, SESS)
     app = web.application(urls, globals())
-    def loadhook():
-        web.ctx.async = async
-    app.add_processor(web.loadhook(loadhook))
+    async = Async(ctx, SESS)
+    session = web.session.Session(app, web.session.DiskStore('sessions'),
+                                  initializer = {'user': None})
+    web.config.async = async
+    web.config.session = session
     app.run()
     print('shutdown')
     async.send(CloseRequest())
