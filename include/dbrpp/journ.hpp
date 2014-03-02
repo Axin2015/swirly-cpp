@@ -33,6 +33,11 @@ namespace dbr {
 
 template <class DerivedT>
 class IJourn : public DbrIJourn {
+    static void
+    destroy(DbrJourn journ) noexcept
+    {
+        return static_cast<DerivedT*>(journ)->destroy();
+    }
     static DbrIden
     alloc_id(DbrJourn journ) noexcept
     {
@@ -57,6 +62,7 @@ class IJourn : public DbrIJourn {
     vtbl() noexcept
     {
         static const DbrJournVtbl VTBL = {
+            destroy,
             alloc_id,
             insert_exec_list,
             insert_exec,
@@ -74,6 +80,12 @@ public:
     {
     }
 };
+
+inline void
+destroy(DbrJourn journ)
+{
+    journ->vtbl->destroy(journ);
+}
 
 inline DbrIden
 alloc_id(DbrJourn journ)

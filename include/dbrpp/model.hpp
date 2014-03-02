@@ -203,6 +203,11 @@ typedef ModelRecs<DBR_ENTITY_CONTR> ModelContrRecs;
 
 template <class DerivedT>
 class IModel : public DbrIModel {
+    static void
+    destroy(DbrModel model) noexcept
+    {
+        return static_cast<DerivedT*>(model)->destroy();
+    }
     static ssize_t
     read_entity(DbrModel model, int type, DbrPool pool, DbrSlNode** first) noexcept
     {
@@ -212,6 +217,7 @@ class IModel : public DbrIModel {
     vtbl() noexcept
     {
         static const DbrModelVtbl VTBL = {
+            destroy,
             read_entity
         };
         return &VTBL;
@@ -226,6 +232,12 @@ public:
     {
     }
 };
+
+inline void
+destroy(DbrModel model)
+{
+    model->vtbl->destroy(model);
+}
 
 inline size_t
 read_entity(DbrModel model, int type, DbrPool pool, DbrSlNode*& first)

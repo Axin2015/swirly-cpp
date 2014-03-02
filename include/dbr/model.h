@@ -30,9 +30,18 @@ typedef struct DbrIModel {
 }* DbrModel;
 
 struct DbrModelVtbl {
+    void
+    (*destroy)(DbrModel model);
+
     ssize_t
     (*read_entity)(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first);
 };
+
+static inline void
+dbr_model_destroy(DbrModel model)
+{
+    model->vtbl->destroy(model);
+}
 
 /**
  * Read entity list for type.

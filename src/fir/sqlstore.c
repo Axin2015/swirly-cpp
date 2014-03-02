@@ -42,6 +42,11 @@ model_implof(DbrModel model)
     return dbr_implof(struct FirSqlStore, model, model);
 }
 
+static void
+journ_destroy(DbrJourn journ)
+{
+}
+
 static DbrIden
 alloc_id(DbrJourn journ)
 {
@@ -90,11 +95,17 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
+    .destroy = journ_destroy,
     .alloc_id = alloc_id,
     .insert_exec_list = insert_exec_list,
     .insert_exec = insert_exec,
     .update_exec = update_exec
 };
+
+static void
+model_destroy(DbrModel model)
+{
+}
 
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
@@ -105,6 +116,7 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {
+    .destroy = model_destroy,
     .read_entity = read_entity
 };
 

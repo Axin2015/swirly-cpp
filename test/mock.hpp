@@ -29,6 +29,9 @@ public:
         : id_(seed)
     {
     }
+    void
+    destroy() noexcept;
+
     DbrIden
     alloc_id() noexcept;
 
@@ -44,6 +47,9 @@ public:
 
 class Model : public dbr::IModel<Model> {
 public:
+    void
+    destroy() noexcept;
+
     ssize_t
     read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept;
 };

@@ -215,6 +215,11 @@ read_posn(DbrPool pool, DbrSlNode*& first)
 
 // Journ.
 
+void
+Journ::destroy() noexcept
+{
+}
+
 DbrIden
 Journ::alloc_id() noexcept
 {
@@ -240,6 +245,11 @@ Journ::update_exec(DbrIden id, DbrMillis modified) noexcept
 }
 
 // Model.
+
+void
+Model::destroy() noexcept
+{
+}
 
 ssize_t
 Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept

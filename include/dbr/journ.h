@@ -30,6 +30,9 @@ typedef struct DbrIJourn {
 }* DbrJourn;
 
 struct DbrJournVtbl {
+    void
+    (*destroy)(DbrJourn journ);
+
     DbrIden
     (*alloc_id)(DbrJourn journ);
 
@@ -42,6 +45,12 @@ struct DbrJournVtbl {
     DbrBool
     (*update_exec)(DbrJourn journ, DbrIden id, DbrMillis modified);
 };
+
+static inline void
+dbr_journ_destroy(DbrJourn journ)
+{
+    journ->vtbl->destroy(journ);
+}
 
 static inline DbrIden
 dbr_journ_alloc_id(DbrJourn journ)
