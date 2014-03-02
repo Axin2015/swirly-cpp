@@ -32,7 +32,8 @@ main(int argc, char* argv[])
     try {
         SqlStore store("doobry.db", 1);
         Pool pool(8 * 1024 * 1024);
-        Serv serv(store.journ(), store.model(), pool);
+        Serv serv(store.journ(), pool);
+        serv.load(store.model());
 
         cout << "traders:\n";
         for (auto rec : serv.trecs()) {

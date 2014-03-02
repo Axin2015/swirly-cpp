@@ -904,10 +904,15 @@ main(int argc, char* argv[])
     DbrJourn journ = dbr_sqlstore_journ(store);
     DbrModel model = dbr_sqlstore_model(store);
 
-    serv = dbr_serv_create(journ, model, pool);
+    serv = dbr_serv_create(journ, pool);
     if (!serv) {
         dbr_err_prints("dbr_serv_create() failed");
         goto exit3;
+    }
+
+    if (!dbr_serv_load(serv, model)) {
+        dbr_err_prints("dbr_serv_load() failed");
+        goto exit4;
     }
 
     ctx = zmq_ctx_new();

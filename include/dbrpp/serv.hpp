@@ -757,8 +757,8 @@ public:
         : impl_{nullptr}
     {
     }
-    Serv(DbrJourn journ, DbrModel model, DbrPool pool)
-        : impl_{dbr_serv_create(journ, model, pool)}
+    Serv(DbrJourn journ, DbrPool pool)
+        : impl_{dbr_serv_create(journ, pool)}
     {
         if (!impl_)
             throw_exception();
@@ -801,6 +801,12 @@ public:
      * @addtogroup ServRec
      * @{
      */
+    void
+    load(DbrModel model)
+    {
+        if (!dbr_serv_load(impl_, model))
+            throw_exception();
+    }
     template <int TypeN>
     ServRecs<TypeN>
     recs() const noexcept

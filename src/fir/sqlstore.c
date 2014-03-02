@@ -163,3 +163,15 @@ dbr_sqlstore_model(DbrSqlStore store)
 {
     return &store->model;
 }
+
+DBR_API DbrJourn
+dbr_sqljourn_create(const char* path)
+{
+    return NULL;
+}
+
+DBR_API DbrModel
+dbr_sqlmodel_create(const char* path)
+{
+    return NULL;
+}

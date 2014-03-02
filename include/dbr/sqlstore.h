@@ -51,6 +51,12 @@ dbr_sqlstore_journ(DbrSqlStore store);
 DBR_API DbrModel
 dbr_sqlstore_model(DbrSqlStore store);
 
+DBR_API DbrJourn
+dbr_sqljourn_create(const char* path);
+
+DBR_API DbrModel
+dbr_sqlmodel_create(const char* path);
+
 /** @} */
 
 #endif // DBR_SQLSTORE_H

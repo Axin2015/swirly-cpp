@@ -33,7 +33,6 @@
 
 struct FigServ {
     DbrJourn journ;
-    DbrModel model;
     DbrPool pool;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
@@ -178,10 +177,10 @@ free_match_list(struct DbrSlNode* first, DbrPool pool)
 }
 
 static DbrBool
-emplace_rec_list(DbrServ serv, int type)
+emplace_rec_list(DbrServ serv, DbrModel model, int type)
 {
     struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(serv->model, type, serv->pool, &node);
+    ssize_t size = dbr_model_read_entity(model, type, serv->pool, &node);
     if (size < 0)
         return DBR_FALSE;
 
@@ -190,10 +189,10 @@ emplace_rec_list(DbrServ serv, int type)
 }
 
 static DbrBool
-emplace_orders(DbrServ serv)
+emplace_orders(DbrServ serv, DbrModel model)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_ENTITY_ORDER, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(model, DBR_ENTITY_ORDER, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -233,10 +232,10 @@ emplace_orders(DbrServ serv)
 }
 
 static DbrBool
-emplace_trades(DbrServ serv)
+emplace_trades(DbrServ serv, DbrModel model)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_ENTITY_EXEC, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(model, DBR_ENTITY_EXEC, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -262,10 +261,10 @@ emplace_trades(DbrServ serv)
 }
 
 static DbrBool
-emplace_membs(DbrServ serv)
+emplace_membs(DbrServ serv, DbrModel model)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_ENTITY_MEMB, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(model, DBR_ENTITY_MEMB, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -295,10 +294,10 @@ emplace_membs(DbrServ serv)
 }
 
 static DbrBool
-emplace_posns(DbrServ serv)
+emplace_posns(DbrServ serv, DbrModel model)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(serv->model, DBR_ENTITY_POSN, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(model, DBR_ENTITY_POSN, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
@@ -396,7 +395,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 }
 
 DBR_API DbrServ
-dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
+dbr_serv_create(DbrJourn journ, DbrPool pool)
 {
     // 1.
     DbrServ serv = malloc(sizeof(struct FigServ));
@@ -406,7 +405,6 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     }
 
     serv->journ = journ;
-    serv->model = model;
     serv->pool = pool;
     // 2.
     fig_cache_init(&serv->cache, term_state, pool);
@@ -419,20 +417,6 @@ dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool)
     dbr_queue_init(&serv->execs);
     dbr_tree_init(&serv->posnups);
     dbr_tree_init(&serv->bookups);
-
-    // Data structures are fully initialised at this point.
-
-    if (!emplace_rec_list(serv, DBR_ENTITY_TRADER)
-        || !emplace_rec_list(serv, DBR_ENTITY_ACCNT)
-        || !emplace_rec_list(serv, DBR_ENTITY_CONTR)
-        || !emplace_orders(serv)
-        || !emplace_trades(serv)
-        || !emplace_membs(serv)
-        || !emplace_posns(serv)) {
-        // Use destroy since fully initialised.
-        dbr_serv_destroy(serv);
-        goto fail1;
-    }
 
     return serv;
  fail1:
@@ -457,6 +441,18 @@ dbr_serv_destroy(DbrServ serv)
 }
 
 // Cache
+
+DBR_API DbrBool
+dbr_serv_load(DbrServ serv, DbrModel model)
+{
+    return emplace_rec_list(serv, model, DBR_ENTITY_TRADER)
+        && emplace_rec_list(serv, model, DBR_ENTITY_ACCNT)
+        && emplace_rec_list(serv, model, DBR_ENTITY_CONTR)
+        && emplace_orders(serv, model)
+        && emplace_trades(serv, model)
+        && emplace_membs(serv, model)
+        && emplace_posns(serv, model);
+}
 
 DBR_API struct DbrSlNode*
 dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id)

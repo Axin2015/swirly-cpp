@@ -33,15 +33,13 @@ typedef struct FigServ* DbrServ;
  *
  * @param journ Journal.
  *
- * @param model Model.
- *
  * @param pool Pool.
  *
  * @return Handle to newly created Servange or null on failure.
  */
 
 DBR_API DbrServ
-dbr_serv_create(DbrJourn journ, DbrModel model, DbrPool pool);
+dbr_serv_create(DbrJourn journ, DbrPool pool);
 
 // No-op if serv is null.
 
@@ -52,6 +50,9 @@ dbr_serv_destroy(DbrServ serv);
  * @addtogroup ServRec
  * @{
  */
+
+DBR_API DbrBool
+dbr_serv_load(DbrServ serv, DbrModel model);
 
 #define DBR_SERV_END_REC NULL
 
