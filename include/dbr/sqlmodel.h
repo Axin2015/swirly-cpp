@@ -15,4 +15,19 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/sqlstore.hpp>
+#ifndef DBR_SQLMODEL_H
+#define DBR_SQLMODEL_H
+
+#include <dbr/model.h>
+
+/**
+ * @addtogroup SqlModel
+ * @{
+ */
+
+DBR_API DbrModel
+dbr_sqlmodel_create(const char* path);
+
+/** @} */
+
+#endif // DBR_SQLMODEL_H

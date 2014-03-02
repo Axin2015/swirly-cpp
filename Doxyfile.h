@@ -337,14 +337,14 @@
  */
 
 /**
- * @defgroup Model Model
+ * @defgroup Journ Journal
  * @ingroup Elm
- * @example model.cpp
  */
 
 /**
- * @defgroup Journ Journal
+ * @defgroup Model Model
  * @ingroup Elm
+ * @example model.cpp
  */
 
 /**
@@ -499,5 +499,15 @@
 
 /**
  * @defgroup SqlStore SqlStore
+ * @ingroup Fir
+ */
+
+/**
+ * @defgroup SqlJourn SqlJourn
+ * @ingroup Fir
+ */
+
+/**
+ * @defgroup SqlModel SqlModel
  * @ingroup Fir
  */

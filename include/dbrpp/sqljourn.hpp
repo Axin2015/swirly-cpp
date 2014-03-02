@@ -15,4 +15,22 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/sqlstore.hpp>
+#ifndef DBRPP_SQLJOURN_HPP
+#define DBRPP_SQLJOURN_HPP
+
+#include <dbrpp/except.hpp>
+
+#include <dbr/sqljourn.h>
+
+namespace dbr {
+
+/**
+ * @addtogroup SqlJourn
+ * @{
+ */
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_SQLJOURN_HPP
