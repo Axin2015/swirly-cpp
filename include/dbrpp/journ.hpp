@@ -24,12 +24,24 @@
 
 #include <dbr/journ.h>
 
+#include <memory> // unique_ptr<>
+
 namespace dbr {
 
 /**
  * @addtogroup Journ
  * @{
  */
+
+struct JournDelete {
+    void
+    operator()(DbrJourn journ) const noexcept
+    {
+        dbr_journ_destroy(journ);
+    }
+};
+
+typedef std::unique_ptr<DbrIJourn, JournDelete> JournPtr;
 
 template <class DerivedT>
 class IJourn : public DbrIJourn {

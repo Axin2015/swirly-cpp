@@ -18,7 +18,7 @@
 #ifndef DBRPP_SQLJOURN_HPP
 #define DBRPP_SQLJOURN_HPP
 
-#include <dbrpp/except.hpp>
+#include <dbrpp/journ.hpp>
 
 #include <dbr/sqljourn.h>
 
@@ -28,6 +28,15 @@ namespace dbr {
  * @addtogroup SqlJourn
  * @{
  */
+
+inline JournPtr
+sqljourn_create(const char* path)
+{
+    JournPtr ptr{dbr_sqljourn_create(path)};
+    if (!ptr)
+        throw_exception();
+    return ptr;
+}
 
 /** @} */
 

@@ -18,7 +18,7 @@
 #ifndef DBRPP_SQLMODEL_HPP
 #define DBRPP_SQLMODEL_HPP
 
-#include <dbrpp/except.hpp>
+#include <dbrpp/model.hpp>
 
 #include <dbr/sqlmodel.h>
 
@@ -28,6 +28,15 @@ namespace dbr {
  * @addtogroup SqlModel
  * @{
  */
+
+inline ModelPtr
+sqlmodel_create(const char* path)
+{
+    ModelPtr ptr{dbr_sqlmodel_create(path)};
+    if (!ptr)
+        throw_exception();
+    return ptr;
+}
 
 /** @} */
 

@@ -26,6 +26,7 @@
 #include <dbr/pool.h>
 
 #include <limits> // numeric_limits<>
+#include <memory> // unique_ptr<>
 
 namespace dbr {
 
@@ -33,6 +34,16 @@ namespace dbr {
  * @addtogroup Model
  * @{
  */
+
+struct ModelDelete {
+    void
+    operator()(DbrModel model) const noexcept
+    {
+        dbr_model_destroy(model);
+    }
+};
+
+typedef std::unique_ptr<DbrIModel, ModelDelete> ModelPtr;
 
 template <int TypeN>
 class ModelRecs {
