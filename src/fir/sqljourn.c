@@ -17,8 +17,105 @@
  */
 #include <dbr/sqljourn.h>
 
-DBR_API DbrJourn
-dbr_sqljourn_create(const char* path)
+#include "sqlite.h"
+
+#include <dbr/err.h>
+
+#include <stdlib.h>
+
+struct FirSqlJourn {
+    struct FirSqlite impl;
+    DbrIden id;
+    struct DbrIJourn journ;
+};
+
+static inline struct FirSqlJourn*
+journ_implof(DbrJourn journ)
 {
+    return dbr_implof(struct FirSqlJourn, journ, journ);
+}
+
+static void
+destroy(DbrJourn journ)
+{
+    struct FirSqlJourn* journ = journ_implof(journ);
+    fir_sqlite_term(&journ->impl);
+    free(journ);
+}
+
+static DbrIden
+alloc_id(DbrJourn journ)
+{
+    struct FirSqlJourn* journ = journ_implof(journ);
+    return journ->id++;
+}
+
+static DbrBool
+insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
+{
+    struct FirSqlJourn* journ = journ_implof(journ);
+    struct FirSqlite* impl = &journ->impl;
+
+    if (!fir_sqlite_begin_trans(impl))
+        goto fail1;
+
+    for (struct DbrSlNode* node = first; node; node = node->next) {
+        struct DbrExec* exec = dbr_shared_exec_entry(node);
+        if (!fir_sqlite_insert_exec(impl, exec, enriched)) {
+            fir_sqlite_rollback_trans(impl);
+            goto fail1;
+        }
+    }
+    if (!fir_sqlite_commit_trans(impl))
+        goto fail1;
+
+    return DBR_TRUE;
+ fail1:
+    return DBR_FALSE;
+}
+
+static DbrBool
+insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
+{
+    struct FirSqlJourn* journ = journ_implof(journ);
+    struct FirSqlite* impl = &journ->impl;
+    return fir_sqlite_insert_exec(impl, exec, enriched);
+}
+
+static DbrBool
+update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
+{
+    struct FirSqlJourn* journ = journ_implof(journ);
+    struct FirSqlite* impl = &journ->impl;
+    return fir_sqlite_update_exec(impl, id, modified);
+}
+
+static const struct DbrJournVtbl JOURN_VTBL = {
+    .destroy = journ_destroy,
+    .alloc_id = alloc_id,
+    .insert_exec_list = insert_exec_list,
+    .insert_exec = insert_exec,
+    .update_exec = update_exec
+};
+
+DBR_API DbrJourn
+dbr_sqljourn_create(const char* path, DbrIden seed)
+{
+    struct FirSqlJourn* journ = malloc(sizeof(struct FirSqlJourn));
+    if (dbr_unlikely(!journ)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        goto fail1;
+    }
+
+    if (!fir_sqlite_init(&journ->impl, path))
+        goto fail2;
+
+    // Seed identity.
+    journ->id = seed;
+    journ->journ.vtbl = &JOURN_VTBL;
+    return &journ->journ;
+ fail2:
+    free(journ);
+ fail1:
     return NULL;
 }

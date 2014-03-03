@@ -26,7 +26,7 @@
  */
 
 DBR_API DbrJourn
-dbr_sqljourn_create(const char* path);
+dbr_sqljourn_create(const char* path, DbrIden seed);
 
 /** @} */
 
