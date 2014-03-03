@@ -329,7 +329,7 @@ create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
         return NULL;
     dbr_exec_init(exec);
 
-    exec->id = dbr_journ_alloc_id(serv->journ);
+    exec->id = dbr_pool_alloc_id(serv->pool);
     exec->order = order->id;
     __builtin_memcpy(&exec->c, &order->c, sizeof(struct DbrCommon));
     exec->match = 0;
@@ -527,7 +527,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     dbr_order_init(new_order);
 
     new_order->level = NULL;
-    new_order->id = dbr_journ_alloc_id(serv->journ);
+    new_order->id = dbr_pool_alloc_id(serv->pool);
     new_order->c.trader.rec = fig_trader_rec(trader);
     new_order->c.accnt.rec = fig_accnt_rec(accnt);
     new_order->c.contr.rec = book->crec;

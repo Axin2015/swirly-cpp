@@ -47,13 +47,6 @@ journ_destroy(DbrJourn journ)
 {
 }
 
-static DbrIden
-alloc_id(DbrJourn journ)
-{
-    struct FirSqlStore* store = journ_implof(journ);
-    return store->id++;
-}
-
 static DbrBool
 insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
@@ -96,7 +89,6 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 
 static const struct DbrJournVtbl JOURN_VTBL = {
     .destroy = journ_destroy,
-    .alloc_id = alloc_id,
     .insert_exec_list = insert_exec_list,
     .insert_exec = insert_exec,
     .update_exec = update_exec

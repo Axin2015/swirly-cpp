@@ -100,7 +100,6 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         if (spread(taker, maker, direct) > 0)
             break;
 
-        const DbrIden match_id = dbr_journ_alloc_id(journ);
         struct DbrMatch* match = dbr_pool_alloc_match(pool);
         if (!match)
             goto fail1;
@@ -113,7 +112,6 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         }
 
-        const DbrIden taker_id = dbr_journ_alloc_id(journ);
         struct DbrExec* taker_exec = dbr_pool_alloc_exec(pool);
         if (!taker_exec) {
             // No need to free accnt or posn.
@@ -122,7 +120,6 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         }
         dbr_exec_init(taker_exec);
 
-        const DbrIden maker_id = dbr_journ_alloc_id(journ);
         struct DbrExec* maker_exec = dbr_pool_alloc_exec(pool);
         if (!maker_exec) {
             dbr_exec_decref(taker_exec, pool);
@@ -130,6 +127,10 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         }
         dbr_exec_init(maker_exec);
+
+        const DbrIden match_id = dbr_pool_alloc_id(pool);
+        const DbrIden taker_id = dbr_pool_alloc_id(pool);
+        const DbrIden maker_id = dbr_pool_alloc_id(pool);
 
         match->id = match_id;
         match->maker_order = maker;

@@ -46,11 +46,9 @@ model_implof(DbrModel model)
     return dbr_implof(struct ElmZmqStore, model, model);
 }
 
-static DbrIden
-alloc_id(DbrJourn journ)
+static void
+journ_destroy(DbrJourn journ)
 {
-    struct ElmZmqStore* store = journ_implof(journ);
-    return store->id++;
 }
 
 static DbrBool
@@ -76,10 +74,15 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
-    .alloc_id = alloc_id,
+    .destroy = journ_destroy,
     .insert_exec_list = insert_exec_list,
     .update_exec = update_exec
 };
+
+static void
+model_destroy(DbrModel model)
+{
+}
 
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
@@ -99,6 +102,7 @@ read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {
+    .destroy = model_destroy,
     .read_entity = read_entity
 };
 

@@ -220,12 +220,6 @@ Journ::destroy() noexcept
 {
 }
 
-DbrIden
-Journ::alloc_id() noexcept
-{
-    return id_++;
-}
-
 DbrBool
 Journ::insert_exec_list(DbrSlNode* first, DbrBool enriched) noexcept
 {

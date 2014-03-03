@@ -61,7 +61,7 @@ get_rec_mnem(Serv& serv, const char* mnem)
 
 TEST_CASE(serv_trader)
 {
-    Journ journ(1);
+    Journ journ;
     Model model;
     Pool pool(0, 8 * 1024 * 1024);
     Serv serv(&journ, pool);
@@ -80,7 +80,7 @@ TEST_CASE(serv_trader)
 
 TEST_CASE(serv_accnt)
 {
-    Journ journ(1);
+    Journ journ;
     Model model;
     Pool pool(0, 8 * 1024 * 1024);
     Serv serv(&journ, pool);
@@ -99,7 +99,7 @@ TEST_CASE(serv_accnt)
 
 TEST_CASE(serv_contr)
 {
-    Journ journ(1);
+    Journ journ;
     Model model;
     Pool pool(0, 8 * 1024 * 1024);
     Serv serv(&journ, pool);
@@ -127,7 +127,7 @@ TEST_CASE(serv_contr)
 
 TEST_CASE(serv_book)
 {
-    Journ journ(1);
+    Journ journ;
     Model model;
     Pool pool(0, 8 * 1024 * 1024);
     Serv serv(&journ, pool);
@@ -144,7 +144,7 @@ TEST_CASE(serv_book)
 
 TEST_CASE(serv_place)
 {
-    Journ journ(1);
+    Journ journ;
     Model model;
     Pool pool(0, 8 * 1024 * 1024);
     Serv serv(&journ, pool);

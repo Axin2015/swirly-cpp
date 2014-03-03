@@ -22,18 +22,9 @@
 #include <dbrpp/model.hpp>
 
 class Journ : public dbr::IJourn<Journ> {
-    DbrIden id_;
 public:
-    explicit
-    Journ(DbrIden seed)
-        : id_(seed)
-    {
-    }
     void
     destroy() noexcept;
-
-    DbrIden
-    alloc_id() noexcept;
 
     DbrBool
     insert_exec_list(DbrSlNode* first, DbrBool enriched) noexcept;

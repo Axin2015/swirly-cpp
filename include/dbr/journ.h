@@ -33,9 +33,6 @@ struct DbrJournVtbl {
     void
     (*destroy)(DbrJourn journ);
 
-    DbrIden
-    (*alloc_id)(DbrJourn journ);
-
     DbrBool
     (*insert_exec_list)(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched);
 
@@ -50,12 +47,6 @@ static inline void
 dbr_journ_destroy(DbrJourn journ)
 {
     journ->vtbl->destroy(journ);
-}
-
-static inline DbrIden
-dbr_journ_alloc_id(DbrJourn journ)
-{
-    return journ->vtbl->alloc_id(journ);
 }
 
 static inline DbrBool

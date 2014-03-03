@@ -38,11 +38,6 @@ class IJourn : public DbrIJourn {
     {
         return static_cast<DerivedT*>(journ)->destroy();
     }
-    static DbrIden
-    alloc_id(DbrJourn journ) noexcept
-    {
-        return static_cast<DerivedT*>(journ)->alloc_id();
-    }
     static DbrBool
     insert_exec_list(DbrJourn journ, DbrSlNode* first, DbrBool enriched) noexcept
     {
@@ -63,7 +58,6 @@ class IJourn : public DbrIJourn {
     {
         static const DbrJournVtbl VTBL = {
             destroy,
-            alloc_id,
             insert_exec_list,
             insert_exec,
             update_exec
@@ -85,15 +79,6 @@ inline void
 destroy(DbrJourn journ)
 {
     journ->vtbl->destroy(journ);
-}
-
-inline DbrIden
-alloc_id(DbrJourn journ)
-{
-    const auto id = journ->vtbl->alloc_id(journ);
-    if (id < 0)
-        throw_exception();
-    return id;
 }
 
 inline void

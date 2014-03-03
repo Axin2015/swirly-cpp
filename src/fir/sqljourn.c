@@ -25,7 +25,6 @@
 
 struct FirSqlJourn {
     struct FirSqlite impl;
-    DbrIden id;
     struct DbrIJourn journ;
 };
 
@@ -41,13 +40,6 @@ destroy(DbrJourn journ)
     struct FirSqlJourn* journ = journ_implof(journ);
     fir_sqlite_term(&journ->impl);
     free(journ);
-}
-
-static DbrIden
-alloc_id(DbrJourn journ)
-{
-    struct FirSqlJourn* journ = journ_implof(journ);
-    return journ->id++;
 }
 
 static DbrBool
@@ -92,14 +84,13 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 
 static const struct DbrJournVtbl JOURN_VTBL = {
     .destroy = journ_destroy,
-    .alloc_id = alloc_id,
     .insert_exec_list = insert_exec_list,
     .insert_exec = insert_exec,
     .update_exec = update_exec
 };
 
 DBR_API DbrJourn
-dbr_sqljourn_create(const char* path, DbrIden seed)
+dbr_sqljourn_create(const char* path)
 {
     struct FirSqlJourn* journ = malloc(sizeof(struct FirSqlJourn));
     if (dbr_unlikely(!journ)) {
