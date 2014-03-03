@@ -26,7 +26,8 @@
 #include <dbr/prioq.h>
 #include <dbr/queue.h>
 #include <dbr/sess.h>
-#include <dbr/sqlstore.h>
+#include <dbr/sqljourn.h>
+#include <dbr/sqlmodel.h>
 #include <dbr/trader.h>
 #include <dbr/tree.h>
 #include <dbr/util.h>
@@ -57,7 +58,8 @@ enum {
 };
 
 static DbrPool pool = NULL;
-static DbrSqlStore store = NULL;
+static DbrJourn journ = NULL;
+static DbrModel model = NULL;
 static DbrServ serv = NULL;
 static void* ctx = NULL;
 static void* mdsock = NULL;
@@ -895,61 +897,64 @@ main(int argc, char* argv[])
         goto exit1;
     }
 
-    store = dbr_sqlstore_create("doobry.db", dbr_millis());
-    if (!store) {
-        dbr_err_prints("dbr_sqlstore_create() failed");
+    journ = dbr_sqljourn_create("doobry.db");
+    if (!journ) {
+        dbr_err_prints("dbr_sqljourn_create() failed");
         goto exit2;
     }
 
-    DbrJourn journ = dbr_sqlstore_journ(store);
-    DbrModel model = dbr_sqlstore_model(store);
+    model = dbr_sqlmodel_create("doobry.db");
+    if (!model) {
+        dbr_err_prints("dbr_sqlmodel_create() failed");
+        goto exit3;
+    }
 
     serv = dbr_serv_create(journ, pool);
     if (!serv) {
         dbr_err_prints("dbr_serv_create() failed");
-        goto exit3;
+        goto exit4;
     }
 
     if (!dbr_serv_load(serv, model)) {
         dbr_err_prints("dbr_serv_load() failed");
-        goto exit4;
+        goto exit5;
     }
 
     ctx = zmq_ctx_new();
     if (!ctx) {
         dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit4;
+        goto exit5;
     }
 
     mdsock = zmq_socket(ctx, ZMQ_PUB);
     if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit5;
+        goto exit6;
     }
 
     if (zmq_bind(mdsock, "tcp://*:3270") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit6;
+        goto exit7;
     }
 
     trsock = zmq_socket(ctx, ZMQ_ROUTER);
     if (!trsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit6;
+        goto exit7;
     }
 
     if (zmq_bind(trsock, "tcp://*:3271") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit7;
+        goto exit8;
     }
 
     if (!dbr_prioq_init(&prioq))
-        goto exit7;
+        goto exit8;
 
     struct sigaction action;
     action.sa_handler = sighandler;
@@ -959,22 +964,24 @@ main(int argc, char* argv[])
     sigaction(SIGTERM, &action, NULL);
 
     if (!run())
-        goto exit8;
+        goto exit9;
 
     dbr_log_info("exiting...");
     status = 0;
- exit8:
+ exit9:
     dbr_prioq_term(&prioq);
- exit7:
+ exit8:
     zmq_close(trsock);
- exit6:
+ exit7:
     zmq_close(mdsock);
- exit5:
+ exit6:
     zmq_ctx_destroy(ctx);
- exit4:
+ exit5:
     dbr_serv_destroy(serv);
+ exit4:
+    dbr_model_destroy(model);
  exit3:
-    dbr_sqlstore_destroy(store);
+    dbr_journ_destroy(journ);
  exit2:
     dbr_pool_destroy(pool);
  exit1:

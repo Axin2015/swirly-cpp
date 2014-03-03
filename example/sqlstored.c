@@ -20,7 +20,8 @@
 #include <dbr/log.h>
 #include <dbr/msg.h>
 #include <dbr/refcount.h>
-#include <dbr/sqlstore.h>
+#include <dbr/sqljourn.h>
+#include <dbr/sqlmodel.h>
 #include <dbr/util.h>
 
 #include <zmq.h>
@@ -32,7 +33,8 @@
 #include <string.h>
 
 static DbrPool pool = NULL;
-static DbrSqlStore store = NULL;
+static DbrJourn journ = NULL;
+static DbrModel model = NULL;
 static void* ctx = NULL;
 static void* sock = NULL;
 
@@ -74,7 +76,6 @@ read_entity(const struct DbrBody* req)
         rep.type = DBR_POSN_LIST_REP;
         break;
     }
-    DbrModel model = dbr_sqlstore_model(store);
     const int type = req->read_entity_req.type;
     const ssize_t size = dbr_model_read_entity(model, type, pool, &rep.entity_list_rep.first);
     if (size < 0) {
@@ -99,7 +100,6 @@ insert_exec_list(struct DbrBody* req)
 {
     struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
                            .status_rep = { .num = 0, .msg = "" } };
-    DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_insert_exec_list(journ, req->insert_exec_list_req.first, DBR_FALSE)) {
         dbr_err_prints("dbr_journ_insert_exec_list() failed");
@@ -121,7 +121,6 @@ insert_exec(struct DbrBody* req)
 {
     struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
                            .status_rep = { .num = 0, .msg = "" } };
-    DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_insert_exec(journ, req->insert_exec_req.exec, DBR_FALSE)) {
         dbr_err_prints("dbr_journ_insert_exec() failed");
@@ -143,7 +142,6 @@ update_exec(struct DbrBody* req)
 {
     struct DbrBody rep = { .req_id = req->req_id, .type = DBR_STATUS_REP,
                            .status_rep = { .num = 0, .msg = "" } };
-    DbrJourn journ = dbr_sqlstore_journ(store);
 
     if (!dbr_journ_update_exec(journ, req->update_exec_req.id, req->update_exec_req.modified)) {
         dbr_err_prints("dbr_journ_update_exec() failed");
@@ -210,22 +208,28 @@ main(int argc, char* argv[])
         goto exit1;
     }
 
-    store = dbr_sqlstore_create("doobry.db", dbr_millis());
-    if (!store) {
-        dbr_err_prints("dbr_sqlstore_create() failed");
+    journ = dbr_sqljourn_create("doobry.db");
+    if (!journ) {
+        dbr_err_prints("dbr_sqljourn_create() failed");
         goto exit2;
+    }
+
+    model = dbr_sqlmodel_create("doobry.db");
+    if (!model) {
+        dbr_err_prints("dbr_sqlmodel_create() failed");
+        goto exit3;
     }
 
     ctx = zmq_ctx_new();
     if (!ctx)
-        goto exit3;
+        goto exit4;
 
     sock = zmq_socket(ctx, ZMQ_REP);
     if (!sock)
-        goto exit4;
+        goto exit5;
 
     if (zmq_bind(sock, "tcp://*:3272") < 0)
-        goto exit5;
+        goto exit6;
 
     struct sigaction action;
     action.sa_handler = sighandler;
@@ -235,16 +239,18 @@ main(int argc, char* argv[])
     sigaction(SIGTERM, &action, NULL);
 
     if (!run())
-        goto exit5;
+        goto exit6;
 
     dbr_log_info("exiting...");
     status = 0;
- exit5:
+ exit6:
     zmq_close(sock);
- exit4:
+ exit5:
     zmq_ctx_destroy(ctx);
+ exit4:
+    dbr_model_destroy(model);
  exit3:
-    dbr_sqlstore_destroy(store);
+    dbr_journ_destroy(journ);
  exit2:
     dbr_pool_destroy(pool);
  exit1:

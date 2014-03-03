@@ -2,7 +2,8 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include")
 INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 
 FILE(GLOB fir_SOURCES
-          sqlstore.c
+          sqljourn.c
+          sqlmodel.c
           sqlite.c
           sqlite3.c)
 

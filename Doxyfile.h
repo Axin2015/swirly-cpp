@@ -498,11 +498,6 @@
  */
 
 /**
- * @defgroup SqlStore SqlStore
- * @ingroup Fir
- */
-
-/**
  * @defgroup SqlJourn SqlJourn
  * @ingroup Fir
  */

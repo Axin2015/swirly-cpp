@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 struct FirSqlModel {
-    struct FirSqlite impl;
+    struct FirSqlite sqlite;
     struct DbrIModel model;
 };
 
@@ -37,17 +37,17 @@ model_implof(DbrModel model)
 static void
 destroy(DbrModel model)
 {
-    struct FirSqlModel* model = model_implof(model);
-    fir_sqlite_term(&model->impl);
-    free(model);
+    struct FirSqlModel* impl = model_implof(model);
+    fir_sqlite_term(&impl->sqlite);
+    free(impl);
 }
 
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    struct FirSqlModel* model = model_implof(model);
-    struct FirSqlite* impl = &model->impl;
-    return fir_sqlite_select_entity(impl, type, pool, first);
+    struct FirSqlModel* impl = model_implof(model);
+    struct FirSqlite* sqlite = &impl->sqlite;
+    return fir_sqlite_select_entity(sqlite, type, pool, first);
 }
 
 static const struct DbrModelVtbl MODEL_VTBL = {
@@ -58,19 +58,19 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 DBR_API DbrModel
 dbr_sqlmodel_create(const char* path)
 {
-    struct FirSqlModel* model = malloc(sizeof(struct FirSqlModel));
-    if (dbr_unlikely(!model)) {
+    struct FirSqlModel* impl = malloc(sizeof(struct FirSqlModel));
+    if (dbr_unlikely(!impl)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
 
-    if (!fir_sqlite_init(&model->model, path))
+    if (!fir_sqlite_init(&impl->sqlite, path))
         goto fail2;
 
-    model->model.vtbl = &MODEL_VTBL;
-    return &model->model;
+    impl->model.vtbl = &MODEL_VTBL;
+    return &impl->model;
  fail2:
-    free(model);
+    free(impl);
  fail1:
     return NULL;
 }

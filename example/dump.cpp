@@ -19,7 +19,9 @@
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
 #include <dbrpp/serv.hpp>
-#include <dbrpp/sqlstore.hpp>
+
+#include <dbrpp/sqljourn.hpp>
+#include <dbrpp/sqlmodel.hpp>
 
 using namespace dbr;
 using namespace std;
@@ -30,10 +32,11 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        SqlStore store("doobry.db", 1);
         Pool pool(0, 8 * 1024 * 1024);
-        Serv serv(store.journ(), pool);
-        serv.load(store.model());
+        auto journ = sqljourn_create("doobry.db");
+        auto model = sqlmodel_create("doobry.db");
+        Serv serv(journ.get(), pool);
+        serv.load(model.get());
 
         cout << "traders:\n";
         for (auto rec : serv.trecs()) {
