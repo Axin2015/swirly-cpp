@@ -42,9 +42,8 @@ public:
         : impl_{nullptr}
     {
     }
-    explicit
-    Pool(size_t capacity)
-        : impl_{dbr_pool_create(capacity)}
+    Pool(DbrIden seed, size_t capacity)
+        : impl_{dbr_pool_create(seed, capacity)}
     {
         if (!impl_)
             throw_exception();
@@ -82,6 +81,11 @@ public:
     swap(Pool& rhs) noexcept
     {
         std::swap(impl_, rhs.impl_);
+    }
+    DbrIden
+    alloc_id(DbrPool pool) noexcept
+    {
+        return dbr_pool_alloc_id(impl_);
     }
     /**
      * @addtogroup PoolRec

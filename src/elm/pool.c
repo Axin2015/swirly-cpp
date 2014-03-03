@@ -63,7 +63,7 @@ alloc_mem(struct ElmPool* pool, size_t size)
 }
 
 DBR_EXTERN DbrBool
-elm_pool_init(struct ElmPool* pool, size_t capacity)
+elm_pool_init(struct ElmPool* pool, DbrIden seed, size_t capacity)
 {
     void* addr = mmap(NULL, capacity, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
     if (addr == MAP_FAILED) {
@@ -71,6 +71,7 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
         return DBR_FALSE;
     }
 
+    pool->id = seed;
     pool->addr = addr;
     pool->used = 0;
     pool->capacity = capacity;
@@ -185,7 +186,7 @@ elm_pool_free_large(struct ElmPool* pool, struct ElmLargeEntry* entry)
 }
 
 DBR_API DbrPool
-dbr_pool_create(size_t capacity)
+dbr_pool_create(DbrIden seed, size_t capacity)
 {
     DbrPool pool = malloc(sizeof(struct ElmPool));
     if (dbr_unlikely(!pool)) {
@@ -193,7 +194,7 @@ dbr_pool_create(size_t capacity)
         goto fail1;
     }
 
-    if (dbr_unlikely(!elm_pool_init(pool, capacity)))
+    if (dbr_unlikely(!elm_pool_init(pool, seed, capacity)))
         goto fail2;
 
     return pool;
@@ -222,6 +223,12 @@ dbr_pool_destroy(DbrPool pool)
         elm_pool_term(pool);
         free(pool);
     }
+}
+
+DBR_API DbrIden
+dbr_pool_alloc_id(DbrPool pool)
+{
+    return elm_pool_alloc_id(pool);
 }
 
 DBR_API struct DbrRec*

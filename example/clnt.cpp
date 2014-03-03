@@ -83,7 +83,7 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         ZmqCtx ctx;
-        Pool pool(8 * 1024 * 1024);
+        Pool pool(0, 8 * 1024 * 1024);
         Clnt clnt(ctx.c_arg(), "test", "tcp://localhost:3270", "tcp://localhost:3271", 1, pool);
 
         // TODO: more robust logic.

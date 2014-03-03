@@ -31,7 +31,7 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         SqlStore store("doobry.db", 1);
-        Pool pool(8 * 1024 * 1024);
+        Pool pool(0, 8 * 1024 * 1024);
         Serv serv(store.journ(), pool);
         serv.load(store.model());
 
