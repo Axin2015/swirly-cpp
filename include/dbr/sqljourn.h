@@ -21,7 +21,7 @@
 #include <dbr/journ.h>
 
 /**
- * @addtogroup SqlJourn
+ * @addtogroup Sql
  * @{
  */
 

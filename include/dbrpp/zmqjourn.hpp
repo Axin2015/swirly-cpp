@@ -15,24 +15,24 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_SQLJOURN_HPP
-#define DBRPP_SQLJOURN_HPP
+#ifndef DBRPP_ZMQJOURN_HPP
+#define DBRPP_ZMQJOURN_HPP
 
 #include <dbrpp/journ.hpp>
 
-#include <dbr/sqljourn.h>
+#include <dbr/zmqjourn.h>
 
 namespace dbr {
 
 /**
- * @addtogroup Sql
+ * @addtogroup Zmq
  * @{
  */
 
 inline JournPtr
-sqljourn_create(const char* path)
+zmqjourn_create(DbrJourn (*factory)(void*), void* arg)
 {
-    JournPtr ptr{dbr_sqljourn_create(path)};
+    JournPtr ptr{dbr_zmqjourn_create(factory, arg)};
     if (!ptr)
         throw_exception();
     return ptr;
@@ -42,4 +42,4 @@ sqljourn_create(const char* path)
 
 } // dbr
 
-#endif // DBRPP_SQLJOURN_HPP
+#endif // DBRPP_ZMQJOURN_HPP
