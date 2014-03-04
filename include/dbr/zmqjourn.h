@@ -26,7 +26,7 @@
  */
 
 DBR_API DbrJourn
-dbr_zmqjourn_create(DbrJourn (*factory)(void*), void* arg);
+dbr_zmqjourn_create(void* ctx, DbrJourn (*factory)(void*), void* arg);
 
 /** @} */
 

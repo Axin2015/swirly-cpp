@@ -444,7 +444,7 @@ async_recv(void* sock, void** val)
 {
     if (zmq_recv(sock, val, sizeof(void*), 0) != sizeof(void*)) {
         const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
-        dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(num, "zmq_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
     return DBR_TRUE;

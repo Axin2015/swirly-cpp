@@ -37,14 +37,14 @@ dbr_async_create(void* ctx, const char* sess)
         goto fail1;
     }
     void* sock = zmq_socket(ctx, ZMQ_REQ);
-    if (!sock) {
+    if (dbr_unlikely(!sock)) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     // Sizeof string literal includes null terminator.
     char addr[sizeof("inproc://") + DBR_MNEM_MAX];
     sprintf(addr, "inproc://%.16s", sess);
-    if (zmq_connect(sock, addr) < 0) {
+    if (dbr_unlikely(zmq_connect(sock, addr) < 0)) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
@@ -70,7 +70,7 @@ dbr_async_destroy(DbrAsync async)
 DBR_API DbrBool
 dbr_async_send(DbrAsync async, void* val)
 {
-    if (zmq_send(async->sock, &val, sizeof(void*), 0) != sizeof(void*)) {
+    if (dbr_unlikely(zmq_send(async->sock, &val, sizeof(void*), 0) != sizeof(void*))) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
@@ -80,9 +80,9 @@ dbr_async_send(DbrAsync async, void* val)
 DBR_API DbrBool
 dbr_async_recv(DbrAsync async, void** val)
 {
-    if (zmq_recv(async->sock, val, sizeof(void*), 0) != sizeof(void*)) {
+    if (dbr_unlikely(zmq_recv(async->sock, val, sizeof(void*), 0) != sizeof(void*))) {
         const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
-        dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_setf(num, "zmq_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
     return DBR_TRUE;
