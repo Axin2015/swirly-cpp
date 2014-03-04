@@ -25,13 +25,13 @@
 
 struct FirSqlModel {
     struct FirSqlite sqlite;
-    struct DbrIModel model;
+    struct DbrIModel i_model;
 };
 
 static inline struct FirSqlModel*
 model_implof(DbrModel model)
 {
-    return dbr_implof(struct FirSqlModel, model, model);
+    return dbr_implof(struct FirSqlModel, i_model, model);
 }
 
 static void
@@ -67,8 +67,8 @@ dbr_sqlmodel_create(const char* path)
     if (!fir_sqlite_init(&impl->sqlite, path))
         goto fail2;
 
-    impl->model.vtbl = &MODEL_VTBL;
-    return &impl->model;
+    impl->i_model.vtbl = &MODEL_VTBL;
+    return &impl->i_model;
  fail2:
     free(impl);
  fail1:

@@ -22,13 +22,13 @@
 #include <stdlib.h>
 
 struct FirZmqJourn {
-    struct DbrIJourn journ;
+    struct DbrIJourn i_journ;
 };
 
 static inline struct FirZmqJourn*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct FirZmqJourn, journ, journ);
+    return dbr_implof(struct FirZmqJourn, i_journ, journ);
 }
 
 static void
@@ -73,8 +73,8 @@ dbr_zmqjourn_create(DbrJourn (*factory)(void*), void* arg)
     }
 
     // Seed identity.
-    impl->journ.vtbl = &JOURN_VTBL;
-    return &impl->journ;
+    impl->i_journ.vtbl = &JOURN_VTBL;
+    return &impl->i_journ;
  fail1:
     return NULL;
 }

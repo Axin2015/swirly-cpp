@@ -25,13 +25,13 @@
 
 struct FirSqlJourn {
     struct FirSqlite sqlite;
-    struct DbrIJourn journ;
+    struct DbrIJourn i_journ;
 };
 
 static inline struct FirSqlJourn*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct FirSqlJourn, journ, journ);
+    return dbr_implof(struct FirSqlJourn, i_journ, journ);
 }
 
 static void
@@ -102,8 +102,8 @@ dbr_sqljourn_create(const char* path)
         goto fail2;
 
     // Seed identity.
-    impl->journ.vtbl = &JOURN_VTBL;
-    return &impl->journ;
+    impl->i_journ.vtbl = &JOURN_VTBL;
+    return &impl->i_journ;
  fail2:
     free(impl);
  fail1:

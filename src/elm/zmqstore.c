@@ -30,20 +30,20 @@ struct ElmZmqStore {
     void* sock;
     DbrIden id;
     DbrPool pool;
-    struct DbrIJourn journ;
-    struct DbrIModel model;
+    struct DbrIJourn i_journ;
+    struct DbrIModel i_model;
 };
 
 static inline struct ElmZmqStore*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct ElmZmqStore, journ, journ);
+    return dbr_implof(struct ElmZmqStore, i_journ, journ);
 }
 
 static inline struct ElmZmqStore*
 model_implof(DbrModel model)
 {
-    return dbr_implof(struct ElmZmqStore, model, model);
+    return dbr_implof(struct ElmZmqStore, i_model, model);
 }
 
 static void
@@ -131,8 +131,8 @@ dbr_zmqstore_create(void* ctx, const char* addr, DbrIden seed, DbrPool pool)
     store->id = seed;
     store->pool = pool;
 
-    store->journ.vtbl = &JOURN_VTBL;
-    store->model.vtbl = &MODEL_VTBL;
+    store->i_journ.vtbl = &JOURN_VTBL;
+    store->i_model.vtbl = &MODEL_VTBL;
 
     return store;
  fail3:
@@ -155,11 +155,11 @@ dbr_zmqstore_destroy(DbrZmqStore store)
 DBR_API DbrJourn
 dbr_zmqstore_journ(DbrZmqStore store)
 {
-    return &store->journ;
+    return &store->i_journ;
 }
 
 DBR_API DbrModel
 dbr_zmqstore_model(DbrZmqStore store)
 {
-    return &store->model;
+    return &store->i_model;
 }
