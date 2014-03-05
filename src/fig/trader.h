@@ -18,10 +18,11 @@
 #ifndef FIG_TRADER_H
 #define FIG_TRADER_H
 
-#include <fig/ordidx.h>
+#include <dbr/trader.h>
+
+#include "ordidx.h"
 
 #include <dbr/refcount.h>
-#include <dbr/trader.h>
 #include <dbr/tree.h>
 
 #include <assert.h>

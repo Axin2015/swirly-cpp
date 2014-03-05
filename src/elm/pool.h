@@ -18,6 +18,8 @@
 #ifndef ELM_POOL_H
 #define ELM_POOL_H
 
+#include <dbr/pool.h>
+
 #include <dbr/log.h>
 #include <dbr/slnode.h>
 #include <dbr/types.h>
@@ -75,8 +77,6 @@ struct ElmLargeEntry {
     struct DbrRbNode pool_node_;
 #endif // DBR_DEBUG_ALLOC
 };
-
-// Error fields are set on failure.
 
 DBR_EXTERN DbrBool
 elm_pool_init(struct ElmPool* pool, DbrIden seed, size_t capacity);
@@ -498,5 +498,8 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
     elm_pool_alloc_sess_(pool, __FILE__, __LINE__)
 
 #endif // DBR_DEBUG_ALLOC
+
+DBR_EXTERN void
+elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* first);
 
 #endif // ELM_POOL_H

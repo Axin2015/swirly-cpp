@@ -18,7 +18,6 @@
 #include "pool.h"
 
 #include <dbr/err.h>
-#include <dbr/pool.h>
 
 #include <errno.h>
 #include <string.h> // strerror()
@@ -182,6 +181,56 @@ elm_pool_free_large(struct ElmPool* pool, struct ElmLargeEntry* entry)
         // Push onto free-list.
         entry->next = pool->first_large;
         pool->first_large = entry;
+    }
+}
+
+DBR_EXTERN void
+elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* first)
+{
+    struct DbrSlNode* node = first;
+    switch (type) {
+    case DBR_ENTITY_TRADER:
+    case DBR_ENTITY_ACCNT:
+    case DBR_ENTITY_CONTR:
+        while (node) {
+            struct DbrRec* rec = dbr_shared_rec_entry(node);
+            node = node->next;
+            dbr_pool_free_rec(pool, rec);
+        }
+        break;
+    case DBR_ENTITY_ORDER:
+        while (node) {
+            struct DbrOrder* order = dbr_shared_order_entry(node);
+            node = node->next;
+            dbr_pool_free_order(pool, order);
+        }
+        break;
+    case DBR_ENTITY_EXEC:
+        while (node) {
+            struct DbrExec* exec = dbr_shared_exec_entry(node);
+            node = node->next;
+            // Inline version of dbr_exec_decref() to avoid cycle.
+            assert(exec->refs_ >= 1);
+            if (--exec->refs_ == 0)
+                dbr_pool_free_exec(pool, exec);
+        }
+        break;
+    case DBR_ENTITY_MEMB:
+        while (node) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            node = node->next;
+            dbr_pool_free_memb(pool, memb);
+        }
+        break;
+    case DBR_ENTITY_POSN:
+        while (node) {
+            struct DbrPosn* posn = dbr_shared_posn_entry(node);
+            node = node->next;
+            dbr_pool_free_posn(pool, posn);
+        }
+        break;
+    default:
+        abort();
     }
 }
 
@@ -366,49 +415,5 @@ dbr_pool_free_sess(DbrPool pool, struct DbrSess* sess)
 DBR_API void
 dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first)
 {
-    struct DbrSlNode* node = first;
-    switch (type) {
-    case DBR_ENTITY_TRADER:
-    case DBR_ENTITY_ACCNT:
-    case DBR_ENTITY_CONTR:
-        while (node) {
-            struct DbrRec* rec = dbr_shared_rec_entry(node);
-            node = node->next;
-            dbr_pool_free_rec(pool, rec);
-        }
-        break;
-    case DBR_ENTITY_ORDER:
-        while (node) {
-            struct DbrOrder* order = dbr_shared_order_entry(node);
-            node = node->next;
-            dbr_pool_free_order(pool, order);
-        }
-        break;
-    case DBR_ENTITY_EXEC:
-        while (node) {
-            struct DbrExec* exec = dbr_shared_exec_entry(node);
-            node = node->next;
-            // Inline version of dbr_exec_decref() to avoid cycle.
-            assert(exec->refs_ >= 1);
-            if (--exec->refs_ == 0)
-                dbr_pool_free_exec(pool, exec);
-        }
-        break;
-    case DBR_ENTITY_MEMB:
-        while (node) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            node = node->next;
-            dbr_pool_free_memb(pool, memb);
-        }
-        break;
-    case DBR_ENTITY_POSN:
-        while (node) {
-            struct DbrPosn* posn = dbr_shared_posn_entry(node);
-            node = node->next;
-            dbr_pool_free_posn(pool, posn);
-        }
-        break;
-    default:
-        abort();
-    }
+    elm_pool_free_entity_list(pool, type, first);
 }

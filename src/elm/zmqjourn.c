@@ -17,6 +17,8 @@
  */
 #include <dbr/zmqjourn.h>
 
+#include "pool.h"
+
 #include <dbr/err.h>
 #include <dbr/msg.h>
 
@@ -68,19 +70,28 @@ destroy(DbrJourn journ)
 static DbrBool
 insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
-    return DBR_TRUE;
+    struct FirZmqJourn* impl = journ_implof(journ);
+    struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
+                            .insert_exec_list_req = { .first = first, .count_ = 0 } };
+    return dbr_send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static DbrBool
 insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 {
-    return DBR_TRUE;
+    struct FirZmqJourn* impl = journ_implof(journ);
+    struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_REQ,
+                            .insert_exec_req = { .exec = exec } };
+    return dbr_send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static DbrBool
 update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
-    return DBR_TRUE;
+    struct FirZmqJourn* impl = journ_implof(journ);
+    struct DbrBody body = { .req_id = 0, .type = DBR_UPDATE_EXEC_REQ,
+                            .update_exec_req = { .id = id, .modified = modified } };
+    return dbr_send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
@@ -92,6 +103,7 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 
 struct State {
     void* ctx;
+    size_t capacity;
     // Sizeof string literal includes null terminator.
     char addr[sizeof("inproc://0x0123456789ABCDEF")];
 };
@@ -101,6 +113,10 @@ start_routine(void* arg)
 {
     struct State* state = arg;
 
+    struct ElmPool pool;
+    if (!elm_pool_init(&pool, 0, 8 * 1024 * 1024))
+        goto exit1;
+
     // The socket cannot be created in the parent. The zguide says:
     // Remember: Do not use or close sockets except in the thread that created them.
 
@@ -108,51 +124,52 @@ start_routine(void* arg)
     if (dbr_unlikely(!sock)) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit1;
+        goto exit2;
     }
 
     if (dbr_unlikely(zmq_connect(sock, state->addr) < 0)) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit2;
+        goto exit3;
     }
 
     struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
     if (dbr_unlikely(!dbr_send_body(sock, &body, DBR_FALSE))) {
         dbr_err_print();
-        goto exit2;
+        goto exit3;
     }
 
     for (;;) {
-        DbrPool pool = NULL;
-        if (dbr_unlikely(!dbr_recv_body(sock, pool, &body))) {
+        if (dbr_unlikely(!dbr_recv_body(sock, &pool, &body))) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
-            dbr_err_prints("dbr_recv_msg() failed");
-            goto exit2;
+            dbr_err_prints("dbr_recv_body() failed");
+            goto exit3;
         }
         switch (body.type) {
         case DBR_SESS_NOOP:
-            goto exit2;
-        case DBR_READ_ENTITY_REQ:
-            break;
+            goto exit3;
         case DBR_INSERT_EXEC_LIST_REQ:
+            elm_pool_free_entity_list(&pool, DBR_ENTITY_EXEC, body.insert_exec_list_req.first);
             break;
         case DBR_INSERT_EXEC_REQ:
+            elm_pool_free_exec(&pool, body.insert_exec_req.exec);
             break;
         case DBR_UPDATE_EXEC_REQ:
             break;
         }
     }
- exit2:
+ exit3:
     zmq_close(sock);
+ exit2:
+    elm_pool_term(&pool);
  exit1:
     free(state);
     return NULL;
 }
 
 DBR_API DbrJourn
-dbr_zmqjourn_create(void* ctx, DbrJourn (*factory)(void*), void* arg)
+dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void* arg)
 {
     struct FirZmqJourn* impl = malloc(sizeof(struct FirZmqJourn));
     if (dbr_unlikely(!impl)) {
@@ -167,6 +184,7 @@ dbr_zmqjourn_create(void* ctx, DbrJourn (*factory)(void*), void* arg)
     }
 
     state->ctx = ctx;
+    state->capacity = capacity;
     // Socket address is uniquely constructed from memory address.
     sprintf(state->addr, "inproc://%p", impl);
 
@@ -189,6 +207,7 @@ dbr_zmqjourn_create(void* ctx, DbrJourn (*factory)(void*), void* arg)
     }
 
     for (;;) {
+        // Noop does not allocate memory.
         DbrPool pool = NULL;
         struct DbrBody body;
         if (dbr_likely(dbr_recv_body(sock, pool, &body))) {

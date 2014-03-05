@@ -30,9 +30,9 @@ namespace dbr {
  */
 
 inline JournPtr
-zmqjourn_create(void* ctx, DbrJourn (*factory)(void*), void* arg)
+zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void* arg)
 {
-    JournPtr ptr{dbr_zmqjourn_create(ctx, factory, arg)};
+    JournPtr ptr{dbr_zmqjourn_create(ctx, capacity, factory, arg)};
     if (!ptr)
         throw_exception();
     return ptr;

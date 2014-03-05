@@ -15,6 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
+#include <dbr/serv.h>
+
 #include "accnt.h"
 #include "cache.h"
 #include "match.h"
@@ -24,7 +26,6 @@
 
 #include <dbr/book.h>
 #include <dbr/err.h>
-#include <dbr/serv.h>
 #include <dbr/queue.h>
 #include <dbr/util.h>
 

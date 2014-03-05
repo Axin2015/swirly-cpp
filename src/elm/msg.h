@@ -15,19 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_ZMQJOURN_H
-#define DBR_ZMQJOURN_H
+#ifndef ELM_MSG_H
+#define ELM_MSG_H
 
-#include <dbr/journ.h>
+#include <dbr/msg.h>
 
-/**
- * @addtogroup Zmq
- * @{
- */
-
-DBR_API DbrJourn
-dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void* arg);
-
-/** @} */
-
-#endif // DBR_ZMQJOURN_H
+#endif // ELM_MSG_H

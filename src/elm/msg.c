@@ -15,7 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/msg.h>
+#include "msg.h"
+#include "pool.h"
 
 #include <dbr/err.h>
 #include <dbr/pack.h>
@@ -43,20 +44,20 @@ free_view_list(struct DbrSlNode* first, DbrPool pool)
     while (node) {
         struct DbrView* view = dbr_shared_view_entry(node);
         node = node->next;
-        dbr_pool_free_view(pool, view);
+        elm_pool_free_view(pool, view);
     }
 }
 
 static const char*
 read_trader(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
+    struct DbrRec* rec = elm_pool_alloc_rec(pool);
     if (!rec)
         goto fail1;
     dbr_rec_init(rec);
 
     if (!(buf = dbr_read_trader(buf, rec))) {
-        dbr_pool_free_rec(pool, rec);
+        elm_pool_free_rec(pool, rec);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &rec->shared_node_);
@@ -68,13 +69,13 @@ read_trader(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_accnt(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
+    struct DbrRec* rec = elm_pool_alloc_rec(pool);
     if (!rec)
         goto fail1;
     dbr_rec_init(rec);
 
     if (!(buf = dbr_read_accnt(buf, rec))) {
-        dbr_pool_free_rec(pool, rec);
+        elm_pool_free_rec(pool, rec);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &rec->shared_node_);
@@ -86,13 +87,13 @@ read_accnt(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrRec* rec = dbr_pool_alloc_rec(pool);
+    struct DbrRec* rec = elm_pool_alloc_rec(pool);
     if (!rec)
         goto fail1;
     dbr_rec_init(rec);
 
     if (!(buf = dbr_read_contr(buf, rec))) {
-        dbr_pool_free_rec(pool, rec);
+        elm_pool_free_rec(pool, rec);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &rec->shared_node_);
@@ -104,13 +105,13 @@ read_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_order(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrOrder* order = dbr_pool_alloc_order(pool);
+    struct DbrOrder* order = elm_pool_alloc_order(pool);
     if (!order)
         goto fail1;
     dbr_order_init(order);
 
     if (!(buf = dbr_read_order(buf, order))) {
-        dbr_pool_free_order(pool, order);
+        elm_pool_free_order(pool, order);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &order->shared_node_);
@@ -122,7 +123,7 @@ read_order(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrExec* exec = dbr_pool_alloc_exec(pool);
+    struct DbrExec* exec = elm_pool_alloc_exec(pool);
     if (!exec)
         goto fail1;
     dbr_exec_init(exec);
@@ -141,13 +142,13 @@ read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
+    struct DbrMemb* memb = elm_pool_alloc_memb(pool);
     if (!memb)
         goto fail1;
     dbr_memb_init(memb);
 
     if (!(buf = dbr_read_memb(buf, memb))) {
-        dbr_pool_free_memb(pool, memb);
+        elm_pool_free_memb(pool, memb);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &memb->shared_node_);
@@ -159,13 +160,13 @@ read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrPosn* posn = dbr_pool_alloc_posn(pool);
+    struct DbrPosn* posn = elm_pool_alloc_posn(pool);
     if (!posn)
         goto fail1;
     dbr_posn_init(posn);
 
     if (!(buf = dbr_read_posn(buf, posn))) {
-        dbr_pool_free_posn(pool, posn);
+        elm_pool_free_posn(pool, posn);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &posn->shared_node_);
@@ -177,13 +178,13 @@ read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
 static const char*
 read_view(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrView* view = dbr_pool_alloc_view(pool);
+    struct DbrView* view = elm_pool_alloc_view(pool);
     if (!view)
         goto fail1;
     dbr_view_init(view);
 
     if (!(buf = dbr_read_view(buf, view))) {
-        dbr_pool_free_view(pool, view);
+        elm_pool_free_view(pool, view);
         goto fail1;
     }
     dbr_queue_insert_back(queue, &view->shared_node_);
@@ -542,7 +543,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_trader(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_TRADER, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_TRADER, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -554,7 +555,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_accnt(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_ACCNT, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_ACCNT, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -566,7 +567,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_contr(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_CONTR, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_CONTR, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -578,7 +579,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_order(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_ORDER, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_ORDER, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -590,7 +591,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_exec(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -602,7 +603,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_memb(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -614,7 +615,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_posn(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -634,7 +635,7 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_EXEC_REP:
         // Exec.
-        body->exec_rep.exec = dbr_pool_alloc_exec(pool);
+        body->exec_rep.exec = elm_pool_alloc_exec(pool);
         if (!body->exec_rep.exec)
             goto fail1;
         dbr_exec_init(body->exec_rep.exec);
@@ -646,13 +647,13 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_POSN_REP:
         // Posn.
-        body->posn_rep.posn = dbr_pool_alloc_posn(pool);
+        body->posn_rep.posn = elm_pool_alloc_posn(pool);
         if (!body->posn_rep.posn)
             goto fail1;
         dbr_posn_init(body->posn_rep.posn);
 
         if (!(buf = dbr_read_posn(buf, body->posn_rep.posn))) {
-            dbr_pool_free_posn(pool, body->posn_rep.posn);
+            elm_pool_free_posn(pool, body->posn_rep.posn);
             goto fail1;
         }
         break;
@@ -709,14 +710,14 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->insert_exec_list_req.count_; ++i) {
             if (!(buf = read_exec(buf, pool, &q))) {
-                dbr_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&q));
+                elm_pool_free_entity_list(pool, DBR_ENTITY_EXEC, dbr_queue_first(&q));
                 goto fail1;
             }
         }
         body->insert_exec_list_req.first = dbr_queue_first(&q);
         break;
     case DBR_INSERT_EXEC_REQ:
-        body->insert_exec_req.exec = dbr_pool_alloc_exec(pool);
+        body->insert_exec_req.exec = elm_pool_alloc_exec(pool);
         if (!body->insert_exec_req.exec)
             goto fail1;
         dbr_exec_init(body->exec_rep.exec);

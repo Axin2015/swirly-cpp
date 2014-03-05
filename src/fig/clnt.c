@@ -15,12 +15,12 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
+#include <dbr/clnt.h>
 
 #include "accnt.h"
 #include "cache.h"
 #include "trader.h"
 
-#include <dbr/clnt.h>
 #include <dbr/conv.h> // dbr_book_key()
 #include <dbr/err.h>
 #include <dbr/log.h>

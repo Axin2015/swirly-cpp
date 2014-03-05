@@ -19,6 +19,7 @@
 #define FIG_ACCNT_H
 
 #include <dbr/accnt.h>
+
 #include <dbr/conv.h> // dbr_book_key()
 #include <dbr/types.h>
 
