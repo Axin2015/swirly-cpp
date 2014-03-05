@@ -19,3 +19,6 @@ TARGET_LINK_LIBRARIES(elm_pic ash_pic ${ZEROMQ_LIBRARIES} m)
 
 INSTALL(TARGETS elm_shared DESTINATION lib)
 INSTALL(TARGETS elm_static DESTINATION lib)
+
+ADD_EXECUTABLE(dbr_scratch scratch.c)
+TARGET_LINK_LIBRARIES(dbr_scratch elm_static)

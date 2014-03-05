@@ -18,6 +18,7 @@
 #include <dbr/zmqjourn.h>
 
 #include <dbr/err.h>
+#include <dbr/msg.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,6 +44,16 @@ destroy(DbrJourn journ)
 {
     struct FirZmqJourn* impl = journ_implof(journ);
 
+    for (;;) {
+        struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
+        if (dbr_likely(dbr_send_body(impl->sock, &body, DBR_FALSE)))
+            break;
+        if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
+            dbr_err_print();
+            break;
+        }
+        // DBR_EINTR
+    }
     zmq_close(impl->sock);
 
     void* retval;
@@ -106,17 +117,37 @@ start_routine(void* arg)
         goto exit2;
     }
 
-    if (dbr_unlikely(zmq_send(sock, "", 1, 0) != 1)) {
-        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+    struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
+    if (dbr_unlikely(!dbr_send_body(sock, &body, DBR_FALSE))) {
         dbr_err_print();
         goto exit2;
     }
 
-    // State is now a dangling pointer.
-
+    for (;;) {
+        DbrPool pool = NULL;
+        if (dbr_unlikely(!dbr_recv_body(sock, pool, &body))) {
+            if (dbr_err_num() == DBR_EINTR)
+                continue;
+            dbr_err_prints("dbr_recv_msg() failed");
+            goto exit2;
+        }
+        switch (body.type) {
+        case DBR_SESS_NOOP:
+            goto exit2;
+        case DBR_READ_ENTITY_REQ:
+            break;
+        case DBR_INSERT_EXEC_LIST_REQ:
+            break;
+        case DBR_INSERT_EXEC_REQ:
+            break;
+        case DBR_UPDATE_EXEC_REQ:
+            break;
+        }
+    }
  exit2:
     zmq_close(sock);
  exit1:
+    free(state);
     return NULL;
 }
 
@@ -129,43 +160,56 @@ dbr_zmqjourn_create(void* ctx, DbrJourn (*factory)(void*), void* arg)
         goto fail1;
     }
 
-    void* sock = zmq_socket(ctx, ZMQ_PAIR);
-    if (dbr_unlikely(!sock)) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+    struct State* state = malloc(sizeof(struct State));
+    if (dbr_unlikely(!state)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail2;
     }
 
-    struct State state;
-    state.ctx = ctx;
-    sprintf(state.addr, "inproc://%p", impl);
+    state->ctx = ctx;
+    // Socket address is uniquely constructed from memory address.
+    sprintf(state->addr, "inproc://%p", impl);
 
-    if (dbr_unlikely(zmq_bind(sock, state.addr) < 0)) {
-        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+    void* sock = zmq_socket(ctx, ZMQ_PAIR);
+    if (dbr_unlikely(!sock)) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
+    }
+
+    if (dbr_unlikely(zmq_bind(sock, state->addr) < 0)) {
+        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail4;
     }
 
     pthread_t thread;
-    const int err = pthread_create(&thread, NULL, start_routine, &state);
+    const int err = pthread_create(&thread, NULL, start_routine, state);
     if (dbr_unlikely(err)) {
         dbr_err_setf(DBR_EIO, "pthread_create() failed: %s", strerror(err));
-        goto fail3;
+        goto fail4;
     }
 
     for (;;) {
-        char buf[1];
-        if (dbr_likely(zmq_recv(sock, buf, 1, 0) == 1))
+        DbrPool pool = NULL;
+        struct DbrBody body;
+        if (dbr_likely(dbr_recv_body(sock, pool, &body))) {
+            assert(body.type == DBR_SESS_NOOP);
             break;
-        if (zmq_errno() == EINTR)
-            continue;
-        abort();
+        }
+        if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
+            // This unlikely failure scenario is not easily dealt with, so we simply abort.
+            abort();
+        }
+        // DBR_EINTR
     }
 
     impl->sock = sock;
     impl->thread = thread;
     impl->i_journ.vtbl = &JOURN_VTBL;
     return &impl->i_journ;
- fail3:
+ fail4:
     zmq_close(sock);
+ fail3:
+    free(state);
  fail2:
     free(impl);
  fail1:

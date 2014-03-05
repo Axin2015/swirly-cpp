@@ -28,11 +28,11 @@
  */
 
 enum {
-    DBR_SESS_OPEN = 1,
+    DBR_SESS_NOOP,
+    DBR_SESS_OPEN,
     DBR_SESS_CLOSE,
     DBR_SESS_LOGON,
     DBR_SESS_LOGOFF,
-    DBR_SESS_HEARTBT,
 
     DBR_STATUS_REP,
     DBR_TRADER_LIST_REP,
@@ -57,6 +57,11 @@ enum {
     DBR_INSERT_EXEC_LIST_REQ,
     DBR_INSERT_EXEC_REQ,
     DBR_UPDATE_EXEC_REQ
+};
+
+enum {
+    // No-op is used for heartbeating.
+    DBR_SESS_HEARTBT = DBR_SESS_NOOP
 };
 
 struct DbrHead {
