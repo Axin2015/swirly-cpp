@@ -17,10 +17,10 @@
  */
 #include <dbr/zmqjourn.h>
 
+#include "msg.h"
 #include "pool.h"
 
 #include <dbr/err.h>
-#include <dbr/msg.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +48,7 @@ destroy(DbrJourn journ)
 
     for (;;) {
         struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
-        if (dbr_likely(dbr_send_body(impl->sock, &body, DBR_FALSE)))
+        if (dbr_likely(elm_send_body(impl->sock, &body, DBR_FALSE)))
             break;
         if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
             dbr_err_print();
@@ -73,7 +73,7 @@ insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
                             .insert_exec_list_req = { .first = first, .count_ = 0 } };
-    return dbr_send_body(impl->sock, &body, DBR_FALSE);
+    return elm_send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static DbrBool
@@ -82,7 +82,7 @@ insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_REQ,
                             .insert_exec_req = { .exec = exec } };
-    return dbr_send_body(impl->sock, &body, DBR_FALSE);
+    return elm_send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static DbrBool
@@ -91,7 +91,7 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_UPDATE_EXEC_REQ,
                             .update_exec_req = { .id = id, .modified = modified } };
-    return dbr_send_body(impl->sock, &body, DBR_FALSE);
+    return elm_send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
@@ -134,13 +134,13 @@ start_routine(void* arg)
     }
 
     struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
-    if (dbr_unlikely(!dbr_send_body(sock, &body, DBR_FALSE))) {
+    if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE))) {
         dbr_err_print();
         goto exit3;
     }
 
     for (;;) {
-        if (dbr_unlikely(!dbr_recv_body(sock, &pool, &body))) {
+        if (dbr_unlikely(!elm_recv_body(sock, &pool, &body))) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
             dbr_err_prints("dbr_recv_body() failed");
@@ -210,7 +210,7 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
         // Noop does not allocate memory.
         DbrPool pool = NULL;
         struct DbrBody body;
-        if (dbr_likely(dbr_recv_body(sock, pool, &body))) {
+        if (dbr_likely(elm_recv_body(sock, pool, &body))) {
             assert(body.type == DBR_SESS_NOOP);
             break;
         }

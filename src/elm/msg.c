@@ -193,8 +193,8 @@ read_view(const char* buf, DbrPool pool, struct DbrQueue* queue)
     return NULL;
 }
 
-DBR_API size_t
-dbr_body_len(struct DbrBody* body, DbrBool enriched)
+DBR_EXTERN size_t
+elm_body_len(struct DbrBody* body, DbrBool enriched)
 {
     size_t n = dbr_packlenl(body->req_id);
     n += dbr_packleni(body->type);
@@ -358,8 +358,8 @@ dbr_body_len(struct DbrBody* body, DbrBool enriched)
     return n;
 }
 
-DBR_API char*
-dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
+DBR_EXTERN char*
+elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
 {
     buf = dbr_packl(buf, body->req_id);
     buf = dbr_packi(buf, body->type);
@@ -503,8 +503,8 @@ dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     return buf;
 }
 
-DBR_API const char*
-dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
+DBR_EXTERN const char*
+elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
 {
     DbrIden req_id;
     if (!(buf = dbr_unpackl(buf, &req_id)))
@@ -742,8 +742,8 @@ dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     return NULL;
 }
 
-DBR_API DbrBool
-dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
+DBR_EXTERN DbrBool
+elm_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 {
     const size_t len = dbr_body_len(body, enriched);
     char buf[len];
@@ -761,8 +761,8 @@ dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
     return DBR_FALSE;
 }
 
-DBR_API DbrBool
-dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
+DBR_EXTERN DbrBool
+elm_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
 {
     const size_t len = strnlen(sess, DBR_MNEM_MAX);
     if (zmq_send(sock, sess, len, ZMQ_SNDMORE) != len) {
@@ -774,8 +774,8 @@ dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriche
     return DBR_FALSE;
 }
 
-DBR_API DbrBool
-dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body)
+DBR_EXTERN DbrBool
+elm_recv_body(void* sock, DbrPool pool, struct DbrBody* body)
 {
     zmq_msg_t zmsg;
     if (zmq_msg_init(&zmsg) < 0) {
@@ -799,8 +799,8 @@ dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body)
     return DBR_FALSE;
 }
 
-DBR_API DbrBool
-dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
+DBR_EXTERN DbrBool
+elm_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
 {
     zmq_msg_t zmsg;
     if (zmq_msg_init(&zmsg) < 0) {
@@ -826,4 +826,46 @@ dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
     zmq_msg_close(&zmsg);
  fail1:
     return DBR_FALSE;
+}
+
+DBR_API size_t
+dbr_body_len(struct DbrBody* body, DbrBool enriched)
+{
+    return elm_body_len(body, enriched);
+}
+
+DBR_API char*
+dbr_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
+{
+    return elm_write_body(buf, body, enriched);
+}
+
+DBR_API const char*
+dbr_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
+{
+    return elm_read_body(buf, pool, body);
+}
+
+DBR_API DbrBool
+dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
+{
+    return elm_send_body(sock, body, enriched);
+}
+
+DBR_API DbrBool
+dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
+{
+    return elm_send_msg(sock, sess, body, enriched);
+}
+
+DBR_API DbrBool
+dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body)
+{
+    return elm_recv_body(sock, pool, body);
+}
+
+DBR_API DbrBool
+dbr_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
+{
+    return elm_recv_msg(sock, pool, msg);
 }
