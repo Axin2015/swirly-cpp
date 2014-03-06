@@ -24,6 +24,12 @@
 static __thread DbrLogger logger = dbr_log_stdio;
 
 DBR_API DbrLogger
+dbr_log_logger(void)
+{
+    return logger;
+}
+
+DBR_API DbrLogger
 dbr_log_setlogger(DbrLogger new_logger)
 {
     assert(new_logger);

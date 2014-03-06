@@ -65,6 +65,9 @@ enum DbrLog {
 };
 
 DBR_API DbrLogger
+dbr_log_logger(void);
+
+DBR_API DbrLogger
 dbr_log_setlogger(DbrLogger new_logger);
 
 DBR_API void

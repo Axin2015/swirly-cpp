@@ -47,6 +47,7 @@ destroy(DbrJourn journ)
     struct FirZmqJourn* impl = journ_implof(journ);
 
     for (;;) {
+        // Send poison pill.
         struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
         if (dbr_likely(elm_send_body(impl->sock, &body, DBR_FALSE)))
             break;
@@ -104,6 +105,9 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 struct State {
     void* ctx;
     size_t capacity;
+    DbrJourn (*factory)(void*);
+    void* arg;
+    DbrLogger logger;
     // Sizeof string literal includes null terminator.
     char addr[sizeof("inproc://0x0123456789ABCDEF")];
 };
@@ -112,6 +116,9 @@ static void*
 start_routine(void* arg)
 {
     struct State* state = arg;
+
+    // Inherit parent's logger.
+    dbr_log_setlogger(state->logger);
 
     struct ElmPool pool;
     if (!elm_pool_init(&pool, 0, 8 * 1024 * 1024))
@@ -133,10 +140,25 @@ start_routine(void* arg)
         goto exit3;
     }
 
-    struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
+    struct DbrBody body = { .req_id = 0, .type = DBR_STATUS_REP,
+                            .status_rep = { .num = 0, .msg = "" } };
+    DbrJourn journ = state->factory(state->arg);
+    // Nullify parent pointer as precaution after use.
+    state->arg = NULL;
+
+    if (dbr_unlikely(!journ)) {
+        dbr_err_prints("state->factory() failed");
+        // Reply to parent with error status.
+        body.status_rep.num = dbr_err_num();
+        strncpy(body.status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
+        if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE)))
+            dbr_err_print();
+        goto exit3;
+    }
+
     if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE))) {
         dbr_err_print();
-        goto exit3;
+        goto exit4;
     }
 
     for (;;) {
@@ -144,21 +166,31 @@ start_routine(void* arg)
             if (dbr_err_num() == DBR_EINTR)
                 continue;
             dbr_err_prints("elm_recv_body() failed");
-            goto exit3;
+            goto exit4;
         }
         switch (body.type) {
         case DBR_SESS_NOOP:
-            goto exit3;
+            // Poison pill.
+            goto exit4;
         case DBR_INSERT_EXEC_LIST_REQ:
+            if (!dbr_journ_insert_exec_list(journ, body.insert_exec_list_req.first, DBR_FALSE))
+                dbr_err_print();
             elm_pool_free_entity_list(&pool, DBR_ENTITY_EXEC, body.insert_exec_list_req.first);
             break;
         case DBR_INSERT_EXEC_REQ:
+            if (!dbr_journ_insert_exec(journ, body.insert_exec_req.exec, DBR_FALSE))
+                dbr_err_print();
             elm_pool_free_exec(&pool, body.insert_exec_req.exec);
             break;
         case DBR_UPDATE_EXEC_REQ:
+            if (!dbr_journ_update_exec(journ, body.update_exec_req.id,
+                                       body.update_exec_req.modified))
+                dbr_err_print();
             break;
         }
     }
+ exit4:
+    dbr_journ_destroy(journ);
  exit3:
     zmq_close(sock);
  exit2:
@@ -185,6 +217,9 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
 
     state->ctx = ctx;
     state->capacity = capacity;
+    state->factory = factory;
+    state->arg = arg;
+    state->logger = dbr_log_logger();
     // Socket address is uniquely constructed from memory address.
     sprintf(state->addr, "inproc://%p", impl);
 
@@ -206,12 +241,22 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
         goto fail4;
     }
 
+    // Thread now owns state.
+    state = NULL;
+
     for (;;) {
         // Noop does not allocate memory.
         DbrPool pool = NULL;
         struct DbrBody body;
         if (dbr_likely(elm_recv_body(sock, pool, &body))) {
-            assert(body.type == DBR_SESS_NOOP);
+            assert(body.type == DBR_STATUS_REP);
+            // The factory function called by the thread may have failed.
+            if (dbr_unlikely(body.status_rep.num != 0)) {
+                dbr_err_set(body.status_rep.num, body.status_rep.msg);
+                void* retval;
+                pthread_join(thread, &retval);
+                goto fail4;
+            }
             break;
         }
         if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
