@@ -199,7 +199,7 @@ flush_posnup(struct DbrPosn* posn)
 
         // FIXME: pack message once for all traders.
         if (!dbr_send_body(trsock, &rep, DBR_TRUE)) {
-            dbr_err_prints("dbr_send_msg() failed");
+            dbr_err_prints("dbr_send_body() failed");
             goto fail1;
         }
     }

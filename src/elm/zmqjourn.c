@@ -143,7 +143,7 @@ start_routine(void* arg)
         if (dbr_unlikely(!elm_recv_body(sock, &pool, &body))) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
-            dbr_err_prints("dbr_recv_body() failed");
+            dbr_err_prints("elm_recv_body() failed");
             goto exit3;
         }
         switch (body.type) {
