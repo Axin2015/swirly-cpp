@@ -12,7 +12,4 @@ ADD_EXECUTABLE(dbr_dump dump.cpp)
 TARGET_LINK_LIBRARIES(dbr_dump fir_static)
 
 ADD_EXECUTABLE(dbr_servd servd.c)
-TARGET_LINK_LIBRARIES(dbr_servd fir_static ${ZEROMQ_LIBRARIES})
-
-ADD_EXECUTABLE(dbr_sqlstored sqlstored.c)
-TARGET_LINK_LIBRARIES(dbr_sqlstored fir_static ${ZEROMQ_LIBRARIES})
+TARGET_LINK_LIBRARIES(dbr_servd fir_static)
