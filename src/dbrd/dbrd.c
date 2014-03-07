@@ -31,6 +31,7 @@
 #include <dbr/trader.h>
 #include <dbr/tree.h>
 #include <dbr/util.h>
+#include <dbr/zmqjourn.h>
 
 #include <zmq.h>
 
@@ -57,11 +58,10 @@ enum {
     TRTMOUT = (TRINT * 3) / 2
 };
 
-static DbrPool pool = NULL;
-static DbrJourn journ = NULL;
-static DbrModel model = NULL;
-static DbrServ serv = NULL;
 static void* ctx = NULL;
+static DbrJourn journ = NULL;
+static DbrPool pool = NULL;
+static DbrServ serv = NULL;
 static void* mdsock = NULL;
 static void* trsock = NULL;
 static struct DbrPrioq prioq = { 0 };
@@ -880,6 +880,27 @@ run(void)
     return DBR_FALSE;
 }
 
+static DbrJourn
+factory(void* arg)
+{
+    return dbr_sqljourn_create((const char*)arg);
+}
+
+static DbrBool
+load(DbrServ serv, const char* path)
+{
+    DbrBool ret;
+
+    DbrModel model = dbr_sqlmodel_create("doobry.db");
+    if (dbr_likely(model)) {
+        ret = dbr_serv_load(serv, model);
+        dbr_model_destroy(model);
+    } else
+        ret = DBR_FALSE;
+
+    return ret;
+}
+
 static void
 sighandler(int signum)
 {
@@ -891,21 +912,22 @@ main(int argc, char* argv[])
 {
     int status = 1;
 
-    pool = dbr_pool_create(dbr_millis(), 8 * 1024 * 1024);
-    if (!pool) {
-        dbr_err_prints("dbr_pool_create() failed");
+    ctx = zmq_ctx_new();
+    if (!ctx) {
+        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
+        dbr_err_print();
         goto exit1;
     }
 
-    journ = dbr_sqljourn_create("doobry.db");
+    journ = dbr_zmqjourn_create(ctx, 1 * 1024 * 1024, factory, "doobry.db");
     if (!journ) {
         dbr_err_prints("dbr_sqljourn_create() failed");
         goto exit2;
     }
 
-    model = dbr_sqlmodel_create("doobry.db");
-    if (!model) {
-        dbr_err_prints("dbr_sqlmodel_create() failed");
+    pool = dbr_pool_create(dbr_millis(), 8 * 1024 * 1024);
+    if (!pool) {
+        dbr_err_prints("dbr_pool_create() failed");
         goto exit3;
     }
 
@@ -915,15 +937,8 @@ main(int argc, char* argv[])
         goto exit4;
     }
 
-    if (!dbr_serv_load(serv, model)) {
-        dbr_err_prints("dbr_serv_load() failed");
-        goto exit5;
-    }
-
-    ctx = zmq_ctx_new();
-    if (!ctx) {
-        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+    if (!load(serv, "doobry.db")) {
+        dbr_err_prints("load() failed");
         goto exit5;
     }
 
@@ -931,30 +946,30 @@ main(int argc, char* argv[])
     if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit6;
+        goto exit5;
     }
 
     if (zmq_bind(mdsock, "tcp://*:3270") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit7;
+        goto exit6;
     }
 
     trsock = zmq_socket(ctx, ZMQ_ROUTER);
     if (!trsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit7;
+        goto exit6;
     }
 
     if (zmq_bind(trsock, "tcp://*:3271") < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
-        goto exit8;
+        goto exit7;
     }
 
     if (!dbr_prioq_init(&prioq))
-        goto exit8;
+        goto exit7;
 
     struct sigaction action;
     action.sa_handler = sighandler;
@@ -964,26 +979,24 @@ main(int argc, char* argv[])
     sigaction(SIGTERM, &action, NULL);
 
     if (!run())
-        goto exit9;
+        goto exit8;
 
     dbr_log_info("exiting...");
     status = 0;
- exit9:
-    dbr_prioq_term(&prioq);
  exit8:
-    zmq_close(trsock);
+    dbr_prioq_term(&prioq);
  exit7:
-    zmq_close(mdsock);
+    zmq_close(trsock);
  exit6:
-    zmq_ctx_destroy(ctx);
+    zmq_close(mdsock);
  exit5:
     dbr_serv_destroy(serv);
  exit4:
-    dbr_model_destroy(model);
+    dbr_pool_destroy(pool);
  exit3:
     dbr_journ_destroy(journ);
  exit2:
-    dbr_pool_destroy(pool);
+    zmq_ctx_destroy(ctx);
  exit1:
     return status;
 }

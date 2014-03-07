@@ -59,8 +59,8 @@ destroy(DbrJourn journ)
     }
     zmq_close(impl->sock);
 
-    void* retval;
-    const int err = pthread_join(impl->thread, &retval);
+    void* ret;
+    const int err = pthread_join(impl->thread, &ret);
     if (dbr_unlikely(err)) {
         dbr_err_setf(DBR_EIO, "pthread_create() failed: %s", strerror(err));
         dbr_err_print();
@@ -197,6 +197,7 @@ start_routine(void* arg)
     elm_pool_term(&pool);
  exit1:
     free(state);
+    dbr_log_info("exiting thread");
     return NULL;
 }
 
@@ -253,8 +254,8 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
             // The factory function called by the thread may have failed.
             if (dbr_unlikely(body.status_rep.num != 0)) {
                 dbr_err_set(body.status_rep.num, body.status_rep.msg);
-                void* retval;
-                pthread_join(thread, &retval);
+                void* ret;
+                pthread_join(thread, &ret);
                 goto fail4;
             }
             break;
