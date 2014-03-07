@@ -19,6 +19,7 @@
 #include <dbr/err.h>
 #include <dbr/pool.h>
 #include <dbr/serv.h>
+#include <dbr/sess.h>
 #include <dbr/sqljourn.h>
 #include <dbr/sqlmodel.h>
 #include <dbr/util.h>
@@ -32,6 +33,17 @@ static void* ctx = NULL;
 static DbrJourn journ = NULL;
 static DbrPool pool = NULL;
 static DbrServ serv = NULL;
+
+static struct DbrRec*
+find_rec_mnem(int type, const char* mnem)
+{
+    struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
+    if (dbr_unlikely(!node)) {
+        dbr_err_setf(DBR_EINVAL, "no such record '%.16s'", mnem);
+        return NULL;
+    }
+    return dbr_serv_rec_entry(node);
+}
 
 static DbrJourn
 factory(void* arg)
@@ -57,7 +69,58 @@ load(DbrServ serv, const char* path)
 static DbrBool
 run(void)
 {
+    const DbrDate settl_date = 20140307;
+
+    struct DbrRec* trec = find_rec_mnem(DBR_ENTITY_TRADER, "WRAMIREZ");
+    if (dbr_unlikely(!trec))
+        goto fail1;
+
+    struct DbrRec* arec = find_rec_mnem(DBR_ENTITY_ACCNT, "DBRA");
+    if (dbr_unlikely(!arec))
+        goto fail1;
+
+    struct DbrRec* crec = find_rec_mnem(DBR_ENTITY_CONTR, "EURUSD");
+    if (dbr_unlikely(!crec))
+        goto fail1;
+
+    DbrTrader trader = dbr_serv_trader(serv, trec);
+    if (dbr_unlikely(!trader))
+        goto fail1;
+
+    DbrAccnt accnt = dbr_serv_accnt(serv, arec);
+    if (dbr_unlikely(!accnt))
+        goto fail1;
+
+    struct DbrBook* book = dbr_serv_book(serv, crec, settl_date);
+    if (dbr_unlikely(!book))
+        goto fail1;
+
+    struct DbrSess* sess = dbr_serv_sess(serv, "TEST");
+    if (dbr_unlikely(!sess))
+        goto fail1;
+
+    if (dbr_unlikely(!dbr_sess_logon(sess, trader)))
+        goto fail1;
+
+    for (int i = 0; i < 1000; ++i) {
+
+        if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
+                                         DBR_ACTION_BUY, 12345, 1, 0)))
+            goto fail2;
+
+        if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
+                                         DBR_ACTION_SELL, 12345, 1, 0)))
+            goto fail2;
+
+        dbr_serv_clear(serv);
+    }
+
+    dbr_sess_logoff(sess, trader, DBR_FALSE);
     return DBR_TRUE;
+ fail2:
+    dbr_sess_logoff(sess, trader, DBR_FALSE);
+ fail1:
+    return DBR_FALSE;
 }
 
 int
@@ -95,8 +158,10 @@ main(int argc, char* argv[])
         goto exit5;
     }
 
-    if (!run())
+    if (!run()) {
+        dbr_err_prints("run() failed");
         goto exit5;
+    }
 
     status = EXIT_SUCCESS;
  exit5:

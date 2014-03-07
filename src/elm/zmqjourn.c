@@ -74,7 +74,7 @@ insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
                             .insert_exec_list_req = { .first = first, .count_ = 0 } };
-    return elm_send_body(impl->sock, &body, DBR_FALSE);
+    return elm_send_body(impl->sock, &body, enriched);
 }
 
 static DbrBool
@@ -83,7 +83,7 @@ insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_REQ,
                             .insert_exec_req = { .exec = exec } };
-    return elm_send_body(impl->sock, &body, DBR_FALSE);
+    return elm_send_body(impl->sock, &body, enriched);
 }
 
 static DbrBool
