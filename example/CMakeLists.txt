@@ -10,3 +10,6 @@ TARGET_LINK_LIBRARIES(dbr_cli fir_static)
 
 ADD_EXECUTABLE(dbr_dump dump.cpp)
 TARGET_LINK_LIBRARIES(dbr_dump fir_static)
+
+ADD_EXECUTABLE(dbr_perf perf.c)
+TARGET_LINK_LIBRARIES(dbr_perf fir_static)

@@ -910,7 +910,7 @@ sighandler(int signum)
 int
 main(int argc, char* argv[])
 {
-    int status = 1;
+    int status = EXIT_FAILURE;
 
     ctx = zmq_ctx_new();
     if (!ctx) {
@@ -981,8 +981,7 @@ main(int argc, char* argv[])
     if (!run())
         goto exit8;
 
-    dbr_log_info("exiting...");
-    status = 0;
+    status = EXIT_SUCCESS;
  exit8:
     dbr_prioq_term(&prioq);
  exit7:
