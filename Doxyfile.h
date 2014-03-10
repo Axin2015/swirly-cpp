@@ -101,6 +101,11 @@
  */
 
 /**
+ * @defgroup Store Store
+ * @ingroup Ash
+ */
+
+/**
  * @defgroup Util Utility
  * @ingroup Ash
  * @example util.cpp
