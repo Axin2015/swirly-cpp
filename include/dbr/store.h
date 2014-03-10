@@ -20,12 +20,24 @@
 
 #include <dbr/defs.h>
 
-#include <stddef.h> // NULL
+#include <stddef.h> // size_t
 
 /**
  * @addtogroup Store
  * @{
  */
+
+struct DbrStore {
+    int fd;
+    size_t len;
+    long* arr;
+};
+
+DBR_API void
+dbr_store_term(struct DbrStore* store);
+
+DBR_API DbrBool
+dbr_store_init(struct DbrStore* store, const char* path, size_t len);
 
 /** @} */
 
