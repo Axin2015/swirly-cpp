@@ -18,6 +18,8 @@
 #ifndef DBRPP_STORE_HPP
 #define DBRPP_STORE_HPP
 
+#include <dbrpp/except.hpp>
+
 #include <dbr/store.h>
 
 namespace dbr {
@@ -26,6 +28,42 @@ namespace dbr {
  * @addtogroup Store
  * @{
  */
+
+class Store {
+    DbrStore impl_;
+public:
+    ~Store() noexcept
+    {
+        dbr_store_term(&impl_);
+    }
+    Store(const char* path, size_t len)
+    {
+        if (!dbr_store_init(&impl_, path, len))
+            throw_exception();
+    }
+    operator DbrStore&() noexcept
+    {
+        return impl_;
+    }
+    DbrStore*
+    c_arg() noexcept
+    {
+        return &impl_;
+    }
+
+    // Copy semantics.
+
+    Store(const Store&) = delete;
+
+    Store&
+    operator =(const Store&) = delete;
+
+    long
+    next(size_t idx) noexcept
+    {
+        return dbr_store_next(&impl_, idx);
+    }
+};
 
 /** @} */
 

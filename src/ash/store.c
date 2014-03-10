@@ -33,20 +33,20 @@ DBR_API void
 dbr_store_term(struct DbrStore* store)
 {
     if (store->fd >= 0) {
-        if (munmap(store->arr, store->len * sizeof(long)) < 0) {
+        if (munmap((void*)store->arr, store->len * sizeof(long)) < 0) {
             dbr_err_setf(DBR_EIO, "munmap() failed: %s", strerror(errno));
             dbr_err_print();
         }
         close(store->fd);
     } else
-        free(store->arr);
+        free((void*)store->arr);
 }
 
 DBR_API DbrBool
 dbr_store_init(struct DbrStore* store, const char* path, size_t len)
 {
     int fd;
-    void* arr;
+    volatile long* arr;
     if (path != NULL) {
         fd = open(path, O_RDWR | O_CREAT, (mode_t)0600);
         if (fd < 0) {

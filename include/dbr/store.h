@@ -30,7 +30,7 @@
 struct DbrStore {
     int fd;
     size_t len;
-    long* arr;
+    volatile long* arr;
 };
 
 DBR_API void
@@ -38,6 +38,13 @@ dbr_store_term(struct DbrStore* store);
 
 DBR_API DbrBool
 dbr_store_init(struct DbrStore* store, const char* path, size_t len);
+
+static inline long
+dbr_store_next(struct DbrStore* store, size_t idx)
+{
+    volatile long* ptr = store->arr + idx;
+	return __sync_add_and_fetch(ptr, 1L);
+}
 
 /** @} */
 
