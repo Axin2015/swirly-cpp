@@ -17,11 +17,13 @@
  */
 
 #include <dbr/err.h>
+#include <dbr/log.h>
 #include <dbr/pool.h>
 #include <dbr/serv.h>
 #include <dbr/sess.h>
 #include <dbr/sqljourn.h>
 #include <dbr/sqlmodel.h>
+#include <dbr/trader.h>
 #include <dbr/util.h>
 #include <dbr/zmqjourn.h>
 
@@ -33,6 +35,19 @@ static void* ctx = NULL;
 static DbrJourn journ = NULL;
 static DbrPool pool = NULL;
 static DbrServ serv = NULL;
+
+// Time Stamp Counter.
+
+typedef unsigned long long tsc_t;
+
+static inline tsc_t
+tsc(void)
+{
+    unsigned high; // edx (=d)
+    unsigned low;  // eax (=a)
+    __asm__ __volatile__ ("rdtsc" : "=d"(high), "=a"(low));
+    return (((tsc_t)high) << 32) | ((tsc_t)low);
+}
 
 static struct DbrRec*
 find_rec_mnem(int type, const char* mnem)
@@ -102,18 +117,38 @@ run(void)
     if (dbr_unlikely(!dbr_sess_logon(sess, trader)))
         goto fail1;
 
-    for (int i = 0; i < 1000; ++i) {
+    enum { ITERS = 500 };
+    tsc_t total = 0;
+    for (int i = 0; i < ITERS; ++i) {
+
+        const tsc_t start = tsc();
+        if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
+                                         DBR_ACTION_BUY, 12345, 1, 0))) {
+            dbr_err_print();
+            goto fail2;
+        }
 
         if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
-                                         DBR_ACTION_BUY, 12345, 1, 0)))
+                                         DBR_ACTION_SELL, 12345, 1, 0))) {
+            dbr_err_print();
             goto fail2;
-
-        if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
-                                         DBR_ACTION_SELL, 12345, 1, 0)))
-            goto fail2;
+        }
+        const tsc_t finish = tsc();
+        total += finish - start;
 
         dbr_serv_clear(serv);
+
+        struct DbrRbNode* node;
+        while ((node = dbr_trader_first_trade(trader)) != DBR_TRADER_END_TRADE) {
+            struct DbrExec* trade = dbr_trader_trade_entry(node);
+            if (!dbr_serv_ack_trade(serv, trader, trade->id)) {
+                dbr_err_print();
+                goto fail2;
+            }
+        }
     }
+    const double ms = total / 1e6;
+    dbr_log_info("total=%.3f ms, per_order=%.3f ms", ms, ms / (ITERS * 2));
 
     dbr_sess_logoff(sess, trader, DBR_FALSE);
     return DBR_TRUE;

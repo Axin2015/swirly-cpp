@@ -29,11 +29,32 @@
 #include <pthread.h>
 #include <zmq.h>
 
+enum { HWM = 0 };
+
 struct FirZmqJourn {
     void* sock;
     pthread_t thread;
     struct DbrIJourn i_journ;
 };
+
+DBR_EXTERN DbrBool
+send_body(void* sock, struct DbrBody* body, DbrBool enriched)
+{
+    const size_t len = dbr_body_len(body, enriched);
+    char buf[len];
+
+    if (!elm_write_body(buf, body, enriched)) {
+        dbr_err_set(DBR_EIO, "elm_write_body() failed");
+        goto fail1;
+    }
+    if (zmq_send(sock, buf, len, ZMQ_DONTWAIT) != len) {
+        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail1;
+    }
+    return DBR_TRUE;
+ fail1:
+    return DBR_FALSE;
+}
 
 static inline struct FirZmqJourn*
 journ_implof(DbrJourn journ)
@@ -74,7 +95,7 @@ insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
                             .insert_exec_list_req = { .first = first, .count_ = 0 } };
-    return elm_send_body(impl->sock, &body, enriched);
+    return send_body(impl->sock, &body, enriched);
 }
 
 static DbrBool
@@ -83,7 +104,7 @@ insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_REQ,
                             .insert_exec_req = { .exec = exec } };
-    return elm_send_body(impl->sock, &body, enriched);
+    return send_body(impl->sock, &body, enriched);
 }
 
 static DbrBool
@@ -92,7 +113,7 @@ update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
     struct FirZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_UPDATE_EXEC_REQ,
                             .update_exec_req = { .id = id, .modified = modified } };
-    return elm_send_body(impl->sock, &body, DBR_FALSE);
+    return send_body(impl->sock, &body, DBR_FALSE);
 }
 
 static const struct DbrJournVtbl JOURN_VTBL = {
@@ -132,6 +153,12 @@ start_routine(void* arg)
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         dbr_err_print();
         goto exit2;
+    }
+
+    const int hwm = HWM;
+    if (dbr_unlikely(zmq_setsockopt(sock, ZMQ_SNDHWM, &hwm, sizeof(int))) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_setsockopt() failed: %s", zmq_strerror(zmq_errno()));
+        goto exit3;
     }
 
     if (dbr_unlikely(zmq_connect(sock, state->addr) < 0)) {
@@ -228,6 +255,12 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
     if (dbr_unlikely(!sock)) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
+    }
+
+    const int hwm = HWM;
+    if (dbr_unlikely(zmq_setsockopt(sock, ZMQ_RCVHWM, &hwm, sizeof(int))) < 0) {
+        dbr_err_setf(DBR_EIO, "zmq_setsockopt() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail4;
     }
 
     if (dbr_unlikely(zmq_bind(sock, state->addr) < 0)) {
