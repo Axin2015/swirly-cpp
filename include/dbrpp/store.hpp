@@ -59,8 +59,19 @@ public:
     operator =(const Store&) = delete;
 
     long
+    get(size_t idx) const noexcept
+    {
+        return dbr_store_get(&impl_, idx);
+    }
+    void
+    set(size_t idx, long val) noexcept
+    {
+        dbr_store_set(&impl_, idx, val);
+    }
+    long
     next(size_t idx) noexcept
     {
+        // Add and fetch.
         return dbr_store_next(&impl_, idx);
     }
 };

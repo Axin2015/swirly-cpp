@@ -182,7 +182,7 @@ main(int argc, char* argv[])
         goto exit3;
     }
 
-    serv = dbr_serv_create(journ, pool);
+    serv = dbr_serv_create("doobry.bin", journ, pool);
     if (!serv) {
         dbr_err_prints("dbr_serv_create() failed");
         goto exit4;

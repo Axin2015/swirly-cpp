@@ -35,7 +35,7 @@ main(int argc, char* argv[])
         Pool pool(0, 8 * 1024 * 1024);
         auto journ = sqljourn_create("doobry.db");
         auto model = sqlmodel_create("doobry.db");
-        Serv serv(journ.get(), pool);
+        Serv serv("doobry.bin", journ.get(), pool);
         serv.load(model.get());
 
         cout << "traders:\n";

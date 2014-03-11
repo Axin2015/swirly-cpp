@@ -27,12 +27,14 @@
 #include <dbr/book.h>
 #include <dbr/err.h>
 #include <dbr/queue.h>
+#include <dbr/store.h>
 #include <dbr/util.h>
 
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
 struct FigServ {
+    struct DbrStore store;
     DbrJourn journ;
     DbrPool pool;
     struct FigCache cache;
@@ -396,7 +398,7 @@ commit_trans(DbrServ serv, struct FigTrader* taker, struct DbrBook* book,
 }
 
 DBR_API DbrServ
-dbr_serv_create(DbrJourn journ, DbrPool pool)
+dbr_serv_create(const char* store, DbrJourn journ, DbrPool pool)
 {
     // 1.
     DbrServ serv = malloc(sizeof(struct FigServ));
@@ -405,14 +407,18 @@ dbr_serv_create(DbrJourn journ, DbrPool pool)
         goto fail1;
     }
 
+    // 2.
+    if (!dbr_store_init(&serv->store, store, 1))
+        goto fail2;
+
     serv->journ = journ;
     serv->pool = pool;
-    // 2.
+    // 3.
     fig_cache_init(&serv->cache, term_state, pool);
     fig_ordidx_init(&serv->ordidx);
-    // 3.
-    fig_sessidx_init(&serv->sessidx, pool);
     // 4.
+    fig_sessidx_init(&serv->sessidx, pool);
+    // 5.
     dbr_tree_init(&serv->books);
 
     dbr_queue_init(&serv->execs);
@@ -420,6 +426,8 @@ dbr_serv_create(DbrJourn journ, DbrPool pool)
     dbr_tree_init(&serv->bookups);
 
     return serv;
+ fail2:
+    free(serv);
  fail1:
     return NULL;
 }
@@ -430,12 +438,14 @@ dbr_serv_destroy(DbrServ serv)
     if (serv) {
         // Ensure that executions are freed.
         dbr_serv_clear(serv);
-        // 4.
+        // 5.
         free_books(&serv->books, serv->pool);
-        // 3.
+        // 4.
         fig_sessidx_term(&serv->sessidx);
-        // 2.
+        // 3.
         fig_cache_term(&serv->cache);
+        // 2.
+        dbr_store_term(&serv->store);
         // 1.
         free(serv);
     }
