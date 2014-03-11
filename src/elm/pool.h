@@ -28,7 +28,6 @@ struct ElmSmallBlock;
 struct ElmLargeBlock;
 
 struct ElmPool {
-    DbrIden id;
     void* addr;
     size_t used;
     size_t capacity;
@@ -79,18 +78,12 @@ struct ElmLargeEntry {
 };
 
 DBR_EXTERN DbrBool
-elm_pool_init(struct ElmPool* pool, DbrIden seed, size_t capacity);
+elm_pool_init(struct ElmPool* pool, size_t capacity);
 
 // Assumes that pointer is not null.
 
 DBR_EXTERN void
 elm_pool_term(struct ElmPool* pool);
-
-static inline DbrIden
-elm_pool_alloc_id(DbrPool pool)
-{
-    return ++pool->id;
-}
 
 DBR_EXTERN void
 elm_pool_free_small(struct ElmPool* pool, struct ElmSmallEntry* entry);

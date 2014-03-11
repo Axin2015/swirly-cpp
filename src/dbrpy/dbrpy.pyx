@@ -401,8 +401,8 @@ cdef View make_view(DbrpyView* view):
 cdef class Pool(object):
     cdef DbrPool impl_
 
-    def __cinit__(self, DbrIden seed, size_t capacity):
-        self.impl_ = dbr_pool_create(seed, capacity)
+    def __cinit__(self, size_t capacity):
+        self.impl_ = dbr_pool_create(capacity)
         if self.impl_ is NULL:
             raise Error()
 

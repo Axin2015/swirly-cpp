@@ -142,7 +142,7 @@ start_routine(void* arg)
     dbr_log_setlogger(state->logger);
 
     struct ElmPool pool;
-    if (!elm_pool_init(&pool, 0, 8 * 1024 * 1024))
+    if (!elm_pool_init(&pool, 8 * 1024 * 1024))
         goto exit1;
 
     // The socket cannot be created in the parent. The zguide says:

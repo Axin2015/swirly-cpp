@@ -925,7 +925,7 @@ main(int argc, char* argv[])
         goto exit2;
     }
 
-    pool = dbr_pool_create(dbr_millis(), 8 * 1024 * 1024);
+    pool = dbr_pool_create(8 * 1024 * 1024);
     if (!pool) {
         dbr_err_prints("dbr_pool_create() failed");
         goto exit3;

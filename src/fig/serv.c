@@ -332,7 +332,7 @@ create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
         return NULL;
     dbr_exec_init(exec);
 
-    exec->id = dbr_pool_alloc_id(serv->pool);
+    exec->id = dbr_store_next(&serv->store, 0);
     exec->order = order->id;
     __builtin_memcpy(&exec->c, &order->c, sizeof(struct DbrCommon));
     exec->match = 0;
@@ -538,7 +538,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     dbr_order_init(new_order);
 
     new_order->level = NULL;
-    new_order->id = dbr_pool_alloc_id(serv->pool);
+    new_order->id = dbr_store_next(&serv->store, 0);
     new_order->c.trader.rec = fig_trader_rec(trader);
     new_order->c.accnt.rec = fig_accnt_rec(accnt);
     new_order->c.contr.rec = book->crec;
@@ -569,7 +569,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
 
     // Order fields are updated on match.
-    if (!fig_match_orders(book, new_order, serv->journ, serv->pool, &trans))
+    if (!fig_match_orders(book, new_order, &serv->store, serv->journ, serv->pool, &trans))
         goto fail3;
 
     // Place incomplete order in book.

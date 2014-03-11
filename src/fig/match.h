@@ -21,12 +21,14 @@
 #include <dbr/journ.h>
 #include <dbr/types.h>
 
+struct DbrStore;
+
 // Used by matching engine to build a list of matches.
 
 // Match taker with list of maker orders.
 
 DBR_EXTERN DbrBool
-fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, DbrJourn journ, DbrPool pool,
-                 struct DbrTrans* trans);
+fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrStore* store,
+                 DbrJourn journ, DbrPool pool, struct DbrTrans* trans);
 
 #endif // FIG_MATCH_H

@@ -245,7 +245,7 @@ cdef extern from "dbr/pool.h":
 
     ctypedef ElmPool* DbrPool
 
-    DbrPool dbr_pool_create(DbrIden seed, size_t capacity) nogil
+    DbrPool dbr_pool_create(size_t capacity) nogil
 
     void dbr_pool_destroy(DbrPool pool) nogil
 

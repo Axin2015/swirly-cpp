@@ -23,7 +23,7 @@ using namespace dbr;
 
 TEST_CASE(pool_create)
 {
-    Pool pool(0, 8 * 1024 * 1024);
+    Pool pool(8 * 1024 * 1024);
 }
 
 TEST_CASE(pool_destroy)

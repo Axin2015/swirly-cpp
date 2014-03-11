@@ -32,7 +32,7 @@ main(int argc, char* argv[])
     cout.sync_with_stdio(true);
     cerr.sync_with_stdio(true);
     try {
-        Pool pool(0, 8 * 1024 * 1024);
+        Pool pool(8 * 1024 * 1024);
         auto journ = sqljourn_create("doobry.db");
         auto model = sqlmodel_create("doobry.db");
         Serv serv("doobry.bin", journ.get(), pool);

@@ -22,6 +22,7 @@
 #include <dbr/queue.h>
 #include <dbr/refcount.h>
 #include <dbr/side.h>
+#include <dbr/store.h>
 
 #include <string.h>
 
@@ -81,7 +82,7 @@ lazy_posn(struct DbrOrder* order, DbrPool pool)
 
 static DbrBool
 match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
-             DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
+             struct DbrStore* store, DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
 {
     DbrLots taken = 0;
     DbrTicks last_ticks = 0;
@@ -128,9 +129,9 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         }
         dbr_exec_init(maker_exec);
 
-        const DbrIden match_id = dbr_pool_alloc_id(pool);
-        const DbrIden taker_id = dbr_pool_alloc_id(pool);
-        const DbrIden maker_id = dbr_pool_alloc_id(pool);
+        const DbrIden match_id = dbr_store_next(store, 0);
+        const DbrIden taker_id = dbr_store_next(store, 0);
+        const DbrIden maker_id = dbr_store_next(store, 0);
 
         match->id = match_id;
         match->maker_order = maker;
@@ -222,8 +223,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 }
 
 DBR_EXTERN DbrBool
-fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, DbrJourn journ, DbrPool pool,
-                 struct DbrTrans* trans)
+fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrStore* store,
+                 DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
 {
     struct DbrSide* side;
     int direct;
@@ -239,5 +240,5 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, DbrJourn journ, D
         direct = DBR_GIVEN;
     }
 
-    return match_orders(book, taker, side, direct, journ, pool, trans);
+    return match_orders(book, taker, side, direct, store, journ, pool, trans);
 }

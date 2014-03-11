@@ -101,7 +101,6 @@ dbr_sqljourn_create(const char* path)
     if (!fir_sqlite_init(&impl->sqlite, path))
         goto fail2;
 
-    // Seed identity.
     impl->i_journ.vtbl = &JOURN_VTBL;
     return &impl->i_journ;
  fail2:
