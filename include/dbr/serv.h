@@ -31,7 +31,7 @@ typedef struct FigServ* DbrServ;
 /**
  * Create Server.
  *
- * @param store Store.
+ * @param bank Bank.
  *
  * @param journ Journal.
  *
@@ -41,7 +41,7 @@ typedef struct FigServ* DbrServ;
  */
 
 DBR_API DbrServ
-dbr_serv_create(const char* store, DbrJourn journ, DbrPool pool);
+dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool);
 
 // No-op if serv is null.
 

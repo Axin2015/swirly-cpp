@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/store.h>
+#include <dbr/bank.h>
 
 #include <dbr/err.h>
 
@@ -30,20 +30,20 @@
 #include <unistd.h> // close()
 
 DBR_API void
-dbr_store_term(struct DbrStore* store)
+dbr_bank_term(struct DbrBank* bank)
 {
-    if (store->fd >= 0) {
-        if (munmap(store->arr, store->len * sizeof(long)) < 0) {
+    if (bank->fd >= 0) {
+        if (munmap(bank->arr, bank->len * sizeof(long)) < 0) {
             dbr_err_setf(DBR_EIO, "munmap() failed: %s", strerror(errno));
             dbr_err_print();
         }
-        close(store->fd);
+        close(bank->fd);
     } else
-        free(store->arr);
+        free(bank->arr);
 }
 
 DBR_API DbrBool
-dbr_store_init(struct DbrStore* store, const char* path, size_t len)
+dbr_bank_init(struct DbrBank* bank, const char* path, size_t len)
 {
     int fd;
     long* arr;
@@ -72,9 +72,9 @@ dbr_store_init(struct DbrStore* store, const char* path, size_t len)
             goto fail1;
         }
     }
-    store->fd = fd;
-    store->len = len;
-    store->arr = arr;
+    bank->fd = fd;
+    bank->len = len;
+    bank->arr = arr;
     return DBR_TRUE;
  fail1:
     return DBR_FALSE;

@@ -15,37 +15,37 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_STORE_HPP
-#define DBRPP_STORE_HPP
+#ifndef DBRPP_BANK_HPP
+#define DBRPP_BANK_HPP
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/store.h>
+#include <dbr/bank.h>
 
 namespace dbr {
 
 /**
- * @addtogroup Store
+ * @addtogroup Bank
  * @{
  */
 
-class Store {
-    DbrStore impl_;
+class Bank {
+    DbrBank impl_;
 public:
-    ~Store() noexcept
+    ~Bank() noexcept
     {
-        dbr_store_term(&impl_);
+        dbr_bank_term(&impl_);
     }
-    Store(const char* path, size_t len)
+    Bank(const char* path, size_t len)
     {
-        if (!dbr_store_init(&impl_, path, len))
+        if (!dbr_bank_init(&impl_, path, len))
             throw_exception();
     }
-    operator DbrStore&() noexcept
+    operator DbrBank&() noexcept
     {
         return impl_;
     }
-    DbrStore*
+    DbrBank*
     c_arg() noexcept
     {
         return &impl_;
@@ -53,26 +53,25 @@ public:
 
     // Copy semantics.
 
-    Store(const Store&) = delete;
+    Bank(const Bank&) = delete;
 
-    Store&
-    operator =(const Store&) = delete;
+    Bank&
+    operator =(const Bank&) = delete;
 
     long
-    get(size_t idx) const noexcept
+    load(size_t reg) const noexcept
     {
-        return dbr_store_get(&impl_, idx);
+        return dbr_bank_load(&impl_, reg);
     }
     void
-    set(size_t idx, long val) noexcept
+    store(size_t reg, long val) noexcept
     {
-        dbr_store_set(&impl_, idx, val);
+        dbr_bank_store(&impl_, reg, val);
     }
     long
-    next(size_t idx) noexcept
+    add_fetch(size_t reg) noexcept
     {
-        // Add and fetch.
-        return dbr_store_next(&impl_, idx);
+        return dbr_bank_add_fetch(&impl_, reg);
     }
 };
 
@@ -80,4 +79,4 @@ public:
 
 } // dbr
 
-#endif // DBRPP_STORE_HPP
+#endif // DBRPP_BANK_HPP

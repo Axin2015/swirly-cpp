@@ -757,8 +757,8 @@ public:
         : impl_{nullptr}
     {
     }
-    Serv(const char* store, DbrJourn journ, DbrPool pool)
-        : impl_{dbr_serv_create(store, journ, pool)}
+    Serv(const char* bank, DbrJourn journ, DbrPool pool)
+        : impl_{dbr_serv_create(bank, journ, pool)}
     {
         if (!impl_)
             throw_exception();

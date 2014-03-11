@@ -101,7 +101,7 @@
  */
 
 /**
- * @defgroup Store Store
+ * @defgroup Bank Bank
  * @ingroup Ash
  */
 

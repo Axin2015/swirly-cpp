@@ -15,48 +15,4 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_STORE_H
-#define DBR_STORE_H
-
-#include <dbr/defs.h>
-
-#include <stddef.h> // size_t
-
-/**
- * @addtogroup Store
- * @{
- */
-
-struct DbrStore {
-    int fd;
-    size_t len;
-    long* arr;
-};
-
-DBR_API void
-dbr_store_term(struct DbrStore* store);
-
-DBR_API DbrBool
-dbr_store_init(struct DbrStore* store, const char* path, size_t len);
-
-static inline long
-dbr_store_get(const struct DbrStore* store, size_t idx)
-{
-    return __atomic_load_n(store->arr + idx, __ATOMIC_SEQ_CST);
-}
-
-static inline void
-dbr_store_set(struct DbrStore* store, size_t idx, long val)
-{
-    __atomic_store_n(store->arr + idx, val, __ATOMIC_SEQ_CST);
-}
-
-static inline long
-dbr_store_next(struct DbrStore* store, size_t idx)
-{
-    return __atomic_add_fetch(store->arr + idx, 1L, __ATOMIC_SEQ_CST);
-}
-
-/** @} */
-
-#endif // DBR_STORE_H
+#include <dbr/bank.h>

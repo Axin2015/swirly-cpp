@@ -15,20 +15,50 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIG_MATCH_H
-#define FIG_MATCH_H
+#ifndef DBR_BANK_H
+#define DBR_BANK_H
 
-#include <dbr/journ.h>
-#include <dbr/types.h>
+#include <dbr/defs.h>
 
-struct DbrBank;
+#include <stddef.h> // size_t
 
-// Used by matching engine to build a list of matches.
+/**
+ * A bank of registers (not a financial institution.)
+ *
+ * @addtogroup Bank
+ * @{
+ */
 
-// Match taker with list of maker orders.
+struct DbrBank {
+    int fd;
+    size_t len;
+    long* arr;
+};
 
-DBR_EXTERN DbrBool
-fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 DbrJourn journ, DbrPool pool, struct DbrTrans* trans);
+DBR_API void
+dbr_bank_term(struct DbrBank* bank);
 
-#endif // FIG_MATCH_H
+DBR_API DbrBool
+dbr_bank_init(struct DbrBank* bank, const char* path, size_t len);
+
+static inline long
+dbr_bank_load(const struct DbrBank* bank, size_t reg)
+{
+    return __atomic_load_n(bank->arr + reg, __ATOMIC_SEQ_CST);
+}
+
+static inline void
+dbr_bank_store(struct DbrBank* bank, size_t reg, long val)
+{
+    __atomic_store_n(bank->arr + reg, val, __ATOMIC_SEQ_CST);
+}
+
+static inline long
+dbr_bank_add_fetch(struct DbrBank* bank, size_t reg)
+{
+    return __atomic_add_fetch(bank->arr + reg, 1L, __ATOMIC_SEQ_CST);
+}
+
+/** @} */
+
+#endif // DBR_BANK_H
