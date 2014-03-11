@@ -129,9 +129,9 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         }
         dbr_exec_init(maker_exec);
 
-        const DbrIden match_id = dbr_bank_add_fetch(bank, 0);
-        const DbrIden taker_id = dbr_bank_add_fetch(bank, 0);
-        const DbrIden maker_id = dbr_bank_add_fetch(bank, 0);
+        const DbrIden taker_id = dbr_bank_add_fetch(bank, DBR_REG_EXEC, 1L);
+        const DbrIden maker_id = dbr_bank_add_fetch(bank, DBR_REG_EXEC, 1L);
+        const DbrIden match_id = dbr_bank_add_fetch(bank, DBR_REG_MATCH, 1L);
 
         match->id = match_id;
         match->maker_order = maker;

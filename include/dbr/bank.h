@@ -54,9 +54,9 @@ dbr_bank_store(struct DbrBank* bank, size_t reg, long val)
 }
 
 static inline long
-dbr_bank_add_fetch(struct DbrBank* bank, size_t reg)
+dbr_bank_add_fetch(struct DbrBank* bank, size_t reg, long val)
 {
-    return __atomic_add_fetch(bank->arr + reg, 1L, __ATOMIC_SEQ_CST);
+    return __atomic_add_fetch(bank->arr + reg, val, __ATOMIC_SEQ_CST);
 }
 
 /** @} */

@@ -69,9 +69,9 @@ public:
         dbr_bank_store(&impl_, reg, val);
     }
     long
-    add_fetch(size_t reg) noexcept
+    add_fetch(size_t reg, long val) noexcept
     {
-        return dbr_bank_add_fetch(&impl_, reg);
+        return dbr_bank_add_fetch(&impl_, reg, val);
     }
 };
 

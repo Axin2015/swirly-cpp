@@ -332,7 +332,7 @@ create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
         return NULL;
     dbr_exec_init(exec);
 
-    exec->id = dbr_bank_add_fetch(&serv->bank, 0);
+    exec->id = dbr_bank_add_fetch(&serv->bank, DBR_REG_EXEC, 1L);
     exec->order = order->id;
     __builtin_memcpy(&exec->c, &order->c, sizeof(struct DbrCommon));
     exec->match = 0;
@@ -408,7 +408,7 @@ dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool)
     }
 
     // 2.
-    if (!dbr_bank_init(&serv->bank, bank, 1))
+    if (!dbr_bank_init(&serv->bank, bank, DBR_REG_LEN))
         goto fail2;
 
     serv->journ = journ;
@@ -538,7 +538,7 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     dbr_order_init(new_order);
 
     new_order->level = NULL;
-    new_order->id = dbr_bank_add_fetch(&serv->bank, 0);
+    new_order->id = dbr_bank_add_fetch(&serv->bank, DBR_REG_ORDER, 1L);
     new_order->c.trader.rec = fig_trader_rec(trader);
     new_order->c.accnt.rec = fig_accnt_rec(accnt);
     new_order->c.contr.rec = book->crec;

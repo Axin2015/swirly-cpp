@@ -67,6 +67,13 @@ enum DbrEntity {
     DBR_ENTITY_POSN
 };
 
+enum DbrReg {
+    DBR_REG_ORDER = 0,
+    DBR_REG_EXEC,
+    DBR_REG_MATCH,
+    DBR_REG_LEN
+};
+
 /** @} */
 
 /**
