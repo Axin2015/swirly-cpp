@@ -148,7 +148,8 @@ run(void)
         }
     }
     const double ms = total / 1e6;
-    dbr_log_info("total=%.3f ms, per_order=%.3f ms", ms, ms / (ITERS * 2));
+    const int orders = ITERS * 2;
+    dbr_log_info("orders=%d, total=%.3f ms, per_order=%.3f ms", orders, ms, ms / orders);
 
     dbr_sess_logoff(sess, trader, DBR_FALSE);
     return DBR_TRUE;
