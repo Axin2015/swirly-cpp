@@ -71,7 +71,7 @@ dbr_log_stdio(int level, const char* format, va_list args)
 
     FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
     flockfile(stream);
-    fprintf(stream, "%s.%03d %s [%d]: ", buf, (int)(ms % 1000), dbr_log_label(level),
+    fprintf(stream, "%s.%03d %-6s [%d]: ", buf, (int)(ms % 1000), dbr_log_label(level),
             (int)getpid());
     vfprintf(stream, format, args);
     fputc('\n', stream);
