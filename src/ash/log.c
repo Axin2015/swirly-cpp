@@ -17,11 +17,30 @@
  */
 #include <dbr/log.h>
 
+#include <dbr/util.h>
+
 #include <assert.h>
 #include <stdio.h>
 #include <syslog.h>
+#include <time.h>
+#include <unistd.h> // getpid()
+
+static const char* LABELS[] = {
+    "CRIT",
+    "ERROR",
+    "WARN",
+    "NOTICE",
+    "INFO",
+    "DEBUG"
+};
 
 static __thread DbrLogger logger = dbr_log_stdio;
+
+DBR_API const char*
+dbr_log_label(int level)
+{
+    return LABELS[level < DBR_LOG_DEBUG1 ? level : DBR_LOG_DEBUG1];
+}
 
 DBR_API DbrLogger
 dbr_log_logger(void)
@@ -41,8 +60,19 @@ dbr_log_setlogger(DbrLogger new_logger)
 DBR_API void
 dbr_log_stdio(int level, const char* format, va_list args)
 {
+    const long ms = dbr_millis();
+    const time_t now = ms / 1000;
+
+    struct tm tm;
+    localtime_r(&now, &tm);
+
+    char buf[sizeof("Mar 12 06:26:39")];
+    strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &tm);
+
     FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
     flockfile(stream);
+    fprintf(stream, "%s.%03d %s [%d]: ", buf, (int)(ms % 1000), dbr_log_label(level),
+            (int)getpid());
     vfprintf(stream, format, args);
     fputc('\n', stream);
     funlockfile(stream);

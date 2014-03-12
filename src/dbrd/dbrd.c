@@ -910,6 +910,7 @@ sighandler(int signum)
 int
 main(int argc, char* argv[])
 {
+    dbr_log_notice("server started");
     int status = EXIT_FAILURE;
 
     ctx = zmq_ctx_new();

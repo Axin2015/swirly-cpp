@@ -64,6 +64,9 @@ enum DbrLog {
     DBR_LOG_DEBUG3
 };
 
+DBR_API const char*
+dbr_log_label(int level);
+
 DBR_API DbrLogger
 dbr_log_logger(void);
 
