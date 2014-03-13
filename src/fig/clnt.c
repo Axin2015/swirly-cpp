@@ -62,6 +62,9 @@ enum {
     TRINT = 5000,
     TRTMOUT = (TRINT * 3) / 2,
 
+    // The init() function is called when the first view list is received on the md socket. The
+    // init() function is responsible for sending a sesion-open to the server. The is expected to
+    // respond by returning the session-open and reference data.
     INIT_PENDING   = 0x01,
     TRADER_PENDING = 0x02,
     ACCNT_PENDING  = 0x04,
@@ -603,12 +606,19 @@ dbr_clnt_destroy(DbrClnt clnt)
 DBR_API DbrIden
 dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
 {
+    const DbrIden req_id = clnt->id++;
+    if ((clnt->flags & TR_DOWN)) {
+        clnt->flags |= TR_CLOSED;
+        clnt->flags &= ~ALL_PENDING;
+        goto done;
+    }
+
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
 
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_CLOSE };
+    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_CLOSE };
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -618,9 +628,10 @@ dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, req_id, now + ms);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
-    return body.req_id;
+ done:
+    return req_id;
  fail1:
     return -1;
 }
@@ -1015,6 +1026,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_SESS_CLOSE:
                 clnt->flags |= (TR_CLOSED | TR_DOWN);
+                clnt->flags &= ~ALL_PENDING;
                 dbr_handler_on_down(handler, DBR_CONN_TR);
                 break;
             case DBR_SESS_LOGON:
