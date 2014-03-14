@@ -16,6 +16,8 @@
  *  02110-1301 USA.
  */
 
+#include "config.h"
+
 #include <dbr/accnt.h>
 #include <dbr/book.h>
 #include <dbr/err.h>
@@ -40,6 +42,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> // getopt()
 
 enum {
     TRSOCK
@@ -910,8 +913,24 @@ sighandler(int signum)
 int
 main(int argc, char* argv[])
 {
-    dbr_log_notice("server started");
+    struct Config config = { 0 };
     int status = EXIT_FAILURE;
+
+    char c;
+    while ((c = getopt(argc, argv, "f:")) != -1) {
+        switch (c) {
+        case 'f':
+            if (!parse_file(optarg, &config)) {
+                dbr_err_prints("parse_file() failed");
+                goto exit1;
+            }
+            break;
+        }
+    }
+    argc -= optind;
+    argv += optind;
+
+    dbr_log_notice("server started");
 
     ctx = zmq_ctx_new();
     if (!ctx) {

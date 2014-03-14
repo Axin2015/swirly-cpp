@@ -20,6 +20,7 @@
 #include <dbr/err.h>
 #include <dbr/util.h>
 
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -64,7 +65,7 @@ parse_line(char* begin, char* end, int line, struct Config* config)
 }
 
 DBR_EXTERN DbrBool
-parse_file(FILE* stream, struct Config* config)
+parse_stream(FILE* stream, struct Config* config)
 {
     char* buf = NULL;
     size_t capacity = 0;
@@ -81,4 +82,19 @@ parse_file(FILE* stream, struct Config* config)
  fail1:
     free(buf);
     return DBR_FALSE;
+}
+
+DBR_EXTERN DbrBool
+parse_file(const char* path, struct Config* config)
+{
+    DbrBool ret;
+    FILE* file = fopen(path, "r");
+    if (file) {
+        ret = parse_stream(file, config);
+        fclose(file);
+    } else {
+        dbr_err_setf(DBR_EIO, "fopen() failed: %s", strerror(errno));
+        ret = DBR_FALSE;
+    }
+    return ret;
 }

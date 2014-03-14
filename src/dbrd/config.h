@@ -30,6 +30,9 @@ DBR_EXTERN DbrBool
 parse_line(char* begin, char* end, int line, struct Config* config);
 
 DBR_EXTERN DbrBool
-parse_file(FILE* stream, struct Config* config);
+parse_stream(FILE* stream, struct Config* config);
+
+DBR_EXTERN DbrBool
+parse_file(const char* path, struct Config* config);
 
 #endif // CONFIG_H
