@@ -61,6 +61,10 @@ enum DbrErrno {
      */
     DBR_ETIMEOUT,
     /**
+     * Operating-system error.
+     */
+    DBR_ESYSTEM,
+    /**
      * User-defined errors must be >=0x400.
      */
     DBR_EUSER = 0x400

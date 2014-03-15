@@ -95,6 +95,7 @@ typedef BasicException<DBR_EBUSY>    BusyException;
 typedef BasicException<DBR_EEXIST>   ExistException;
 typedef BasicException<DBR_EINVAL>   InvalException;
 typedef BasicException<DBR_ETIMEOUT> TimeoutException;
+typedef BasicException<DBR_ESYSTEM>  SystemException;
 
 inline void
 throw_exception(int num, const char* file, int line, const char* msg)
@@ -123,6 +124,9 @@ throw_exception(int num, const char* file, int line, const char* msg)
         break;
     case DBR_ETIMEOUT:
         throw TimeoutException{file, line, msg};
+        break;
+    case DBR_ESYSTEM:
+        throw SystemException{file, line, msg};
         break;
     default:
         throw DbrException{num, file, line, msg};

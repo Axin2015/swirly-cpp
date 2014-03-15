@@ -34,7 +34,7 @@ dbr_bank_term(struct DbrBank* bank)
 {
     if (bank->fd >= 0) {
         if (munmap(bank->arr, bank->len * sizeof(long)) < 0)
-            dbr_err_printf(DBR_EIO, "munmap() failed: %s", strerror(errno));
+            dbr_err_printf(DBR_ESYSTEM, "munmap() failed: %s", strerror(errno));
         close(bank->fd);
     } else
         free(bank->arr);

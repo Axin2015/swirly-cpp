@@ -909,7 +909,7 @@ open_logfile(const char* path)
 {
     int fd = open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
     if (fd < 0) {
-        dbr_err_setf(DBR_EIO, "daemon() failed: %s", strerror(errno));
+        dbr_err_setf(DBR_EIO, "open() failed: %s", strerror(errno));
         return DBR_FALSE;
     }
     dup2(fd, STDOUT_FILENO);
@@ -952,7 +952,7 @@ main(int argc, char* argv[])
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     if (config.daemon && daemon(0, 0) < 0) {
 #pragma GCC diagnostic pop
-        dbr_err_printf(DBR_EIO, "daemon() failed: %s", strerror(errno));
+        dbr_err_printf(DBR_ESYSTEM, "daemon() failed: %s", strerror(errno));
         goto exit1;
     }
 

@@ -39,6 +39,7 @@ cdef extern from "dbr/err.h":
         DBR_EEXIST
         DBR_EINVAL
         DBR_ETIMEOUT
+        DBR_ESYSTEM
         DBR_EUSER
 
     void dbr_err_clear() nogil

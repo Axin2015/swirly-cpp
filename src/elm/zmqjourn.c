@@ -83,7 +83,7 @@ destroy(DbrJourn journ)
     void* ret;
     const int err = pthread_join(impl->thread, &ret);
     if (dbr_unlikely(err)) {
-        dbr_err_printf(DBR_EIO, "pthread_create() failed: %s", strerror(err));
+        dbr_err_printf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
     }
     free(impl);
 }
@@ -268,7 +268,7 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
     pthread_t thread;
     const int err = pthread_create(&thread, NULL, start_routine, state);
     if (dbr_unlikely(err)) {
-        dbr_err_setf(DBR_EIO, "pthread_create() failed: %s", strerror(err));
+        dbr_err_setf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
         goto fail4;
     }
 
