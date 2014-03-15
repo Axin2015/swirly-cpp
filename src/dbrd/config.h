@@ -25,6 +25,7 @@
 
 struct Config {
     DbrBool daemon;
+    char prefix[PATH_MAX + 1];
     char logfile[PATH_MAX + 1];
 };
 

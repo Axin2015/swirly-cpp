@@ -944,20 +944,20 @@ main(int argc, char* argv[])
     argc -= optind;
     argv += optind;
 
+    if (config.logfile[0] != '\0' && !open_logfile(config.logfile)) {
+        dbr_err_perror("open_logfile() failed");
+        goto exit1;
+    }
+
     dbr_log_notice("server started");
     dbr_log_info("daemon:  %s", config.daemon ? "yes" : "no");
     dbr_log_info("logfile: %s", config.logfile);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    if (config.daemon && daemon(0, 0) < 0) {
+    if (config.daemon && daemon(0, 1) < 0) {
 #pragma GCC diagnostic pop
         dbr_err_printf(DBR_ESYSTEM, "daemon() failed: %s", strerror(errno));
-        goto exit1;
-    }
-
-    if (config.logfile[0] != '\0' && !open_logfile(config.logfile)) {
-        dbr_err_perror("open_logfile() failed");
         goto exit1;
     }
 

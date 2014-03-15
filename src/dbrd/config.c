@@ -23,11 +23,22 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> // getcwd()
 
 struct Tok {
     char* begin;
     char* end;
 };
+
+static void
+copy_path(const char* prefix, const char* path, char* buf)
+{
+    if (*path == '/') {
+        strncpy(buf, path, PATH_MAX);
+        buf[PATH_MAX] = '\0';
+    } else
+        snprintf(buf, PATH_MAX + 1, "%s/%s", prefix, path);
+}
 
 static int
 parse_bool(const char* begin, const char* end, int line)
@@ -76,7 +87,7 @@ parse_bool(const char* begin, const char* end, int line)
     }
     return ret;
  fail1:
-    dbr_err_setf(DBR_EINVAL, "invalid boolean value '%s' at line %d", begin, line);
+    dbr_err_setf(DBR_EINVAL, "invalid boolean '%s' at line %d", begin, line);
     return -1;
 }
 
@@ -112,8 +123,7 @@ parse_line(char* begin, char* end, int line, struct Config* config)
             goto fail1;
         config->daemon = ret;
     } else if (strcmp(key.begin, "logfile") == 0) {
-        strncpy(config->logfile, val.begin, PATH_MAX);
-        config->logfile[PATH_MAX] = '\0';
+        copy_path(config->prefix, val.begin, config->logfile);
     } else {
         dbr_err_setf(DBR_EINVAL, "invalid key '%s' at line %d", key.begin, line);
         goto fail1;
@@ -126,6 +136,10 @@ parse_line(char* begin, char* end, int line, struct Config* config)
 DBR_EXTERN DbrBool
 parse_stream(FILE* stream, struct Config* config)
 {
+    if (!getcwd(config->prefix, sizeof(config->prefix))) {
+        dbr_err_printf(DBR_EIO, "getcwd() failed: %s", strerror(errno));
+        goto fail1;
+    }
     char* buf = NULL;
     size_t capacity = 0;
     int line = 0;
@@ -134,12 +148,13 @@ parse_stream(FILE* stream, struct Config* config)
         if (len == -1)
             break;
         if (!parse_line(buf, buf + len, ++line, config))
-            goto fail1;
+            goto fail2;
     }
     free(buf);
     return DBR_TRUE;
- fail1:
+ fail2:
     free(buf);
+ fail1:
     return DBR_FALSE;
 }
 
