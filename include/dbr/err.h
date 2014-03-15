@@ -74,18 +74,11 @@ DBR_API void
 dbr_err_clear(void);
 
 /**
- * Print current error using logger.
- */
-
-DBR_API void
-dbr_err_print(void);
-
-/**
  * Print current error with string prefix using logger.
  */
 
 DBR_API void
-dbr_err_prints(const char* s);
+dbr_err_perror(const char* s);
 
 DBR_API void
 dbr_err_set_(int num, const char* file, int line, const char* msg);
@@ -95,6 +88,15 @@ dbr_err_setf_(int num, const char* file, int line, const char* format, ...);
 
 DBR_API void
 dbr_err_vsetf_(int num, const char* file, int line, const char* format, va_list args);
+
+DBR_API void
+dbr_err_print_(int num, const char* file, int line, const char* msg);
+
+DBR_API void
+dbr_err_printf_(int num, const char* file, int line, const char* format, ...);
+
+DBR_API void
+dbr_err_vprintf_(int num, const char* file, int line, const char* format, va_list args);
 
 DBR_API int
 dbr_err_num(void);
@@ -108,12 +110,18 @@ dbr_err_line(void);
 DBR_API const char*
 dbr_err_msg(void);
 
-#define dbr_err_set(num, msg)                             \
+#define dbr_err_set(num, msg)                               \
     dbr_err_set_(num, __FILE__, __LINE__, msg)
-#define dbr_err_setf(num, ...)                            \
+#define dbr_err_setf(num, ...)                              \
     dbr_err_setf_(num, __FILE__, __LINE__, __VA_ARGS__)
-#define dbr_err_vsetf(num, format, args)                  \
+#define dbr_err_vsetf(num, format, args)                    \
     dbr_err_vsetf_(num, __FILE__, __LINE__, format, args)
+#define dbr_err_print(num, msg)                             \
+    dbr_err_print_(num, __FILE__, __LINE__, msg)
+#define dbr_err_printf(num, ...)                            \
+    dbr_err_printf_(num, __FILE__, __LINE__, __VA_ARGS__)
+#define dbr_err_vprintf(num, format, args)                  \
+    dbr_err_vprintf_(num, __FILE__, __LINE__, format, args)
 
 /** @} */
 

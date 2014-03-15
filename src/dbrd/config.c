@@ -111,6 +111,9 @@ parse_line(char* begin, char* end, int line, struct Config* config)
         if (ret < 0)
             goto fail1;
         config->daemon = ret;
+    } else if (strcmp(key.begin, "logfile") == 0) {
+        strncpy(config->logfile, val.begin, PATH_MAX);
+        config->logfile[PATH_MAX] = '\0';
     } else {
         dbr_err_setf(DBR_EINVAL, "invalid key '%s' at line %d", key.begin, line);
         goto fail1;

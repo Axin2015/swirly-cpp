@@ -41,13 +41,7 @@ dbr_err_clear(void)
 }
 
 DBR_API void
-dbr_err_print(void)
-{
-    dbr_log_error("%s:%d: %s (%d)", err.file, err.line, err.msg, err.num);
-}
-
-DBR_API void
-dbr_err_prints(const char* s)
+dbr_err_perror(const char* s)
 {
     dbr_log_error("%s:%d: %s: %s (%d)", err.file, err.line, s, err.msg, err.num);
 }
@@ -84,6 +78,30 @@ dbr_err_vsetf_(int num, const char* file, int line, const char* format, va_list 
     err.msg[DBR_ERRMSG_MAX] = '\0';
     if (ret < 0)
         abort();
+}
+
+DBR_API void
+dbr_err_print_(int num, const char* file, int line, const char* msg)
+{
+    dbr_err_set_(num, file, line, msg);
+    dbr_log_error("%s:%d: %s (%d)", err.file, err.line, err.msg, err.num);
+}
+
+DBR_API void
+dbr_err_printf_(int num, const char* file, int line, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    dbr_err_vsetf_(num, file, line, format, args);
+    va_end(args);
+    dbr_log_error("%s:%d: %s (%d)", err.file, err.line, err.msg, err.num);
+}
+
+DBR_API void
+dbr_err_vprintf_(int num, const char* file, int line, const char* format, va_list args)
+{
+    dbr_err_vsetf_(num, file, line, format, args);
+    dbr_log_error("%s:%d: %s (%d)", err.file, err.line, err.msg, err.num);
 }
 
 DBR_API int

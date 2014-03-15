@@ -38,6 +38,7 @@
 #include <zmq.h>
 
 #include <assert.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -168,7 +169,7 @@ send_exec(struct DbrSess* sess, DbrIden req_id, struct DbrExec* exec)
     struct DbrBody rep = { .req_id = req_id, .type = DBR_EXEC_REP, .exec_rep.exec = exec };
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -195,14 +196,13 @@ flush_posnup(struct DbrPosn* posn)
         other->marker_ = marker;
 
         if (zmq_send(trsock, trader, strnlen(other->mnem, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
-            dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
-            dbr_err_print();
+            dbr_err_printf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
 
         // FIXME: pack message once for all traders.
         if (!dbr_send_body(trsock, &rep, DBR_TRUE)) {
-            dbr_err_prints("dbr_send_body() failed");
+            dbr_err_perror("dbr_send_body() failed");
             goto fail1;
         }
     }
@@ -237,7 +237,7 @@ mdflush(DbrMillis now)
     const DbrBool ok = dbr_send_body(mdsock, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
-        dbr_err_prints("dbr_send_body() failed");
+        dbr_err_perror("dbr_send_body() failed");
     dbr_serv_mdclear(serv);
     return ok;
  fail1:
@@ -296,7 +296,7 @@ sess_trader(struct DbrSess* sess, DbrIden req_id)
     rep.entity_list_rep.first = first;
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -312,7 +312,7 @@ sess_accnt(struct DbrSess* sess, DbrIden req_id)
     rep.entity_list_rep.first = first;
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -328,7 +328,7 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
     rep.entity_list_rep.first = first;
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -356,7 +356,7 @@ sess_book(struct DbrSess* sess, DbrIden req_id, DbrMillis now)
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
  fail1:
     free_view_list(q.first);
@@ -380,7 +380,7 @@ sess_order(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -401,7 +401,7 @@ sess_exec(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -422,7 +422,7 @@ sess_memb(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
 }
 
@@ -460,11 +460,11 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -530,7 +530,7 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
         && sess_posn(sess, 0, trader);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -554,7 +554,7 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
     return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -608,7 +608,7 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
     return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -635,7 +635,7 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
     return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -662,7 +662,7 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -688,7 +688,7 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
     return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -714,7 +714,7 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     return trflush(sess, req);
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
@@ -743,16 +743,16 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
     rep.status_rep.msg[0] = '\0';
     const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
     if (!ok)
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return ok;
  fail1:
     if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
-        dbr_err_prints("dbr_send_msg() failed");
+        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
 static DbrBool
-run(void)
+run(struct Config* config)
 {
     zmq_pollitem_t items[] = {
         { .socket = trsock, .events = ZMQ_POLLIN }
@@ -808,7 +808,7 @@ run(void)
             if (!dbr_recv_msg(trsock, pool, &req)) {
                 if (dbr_err_num() == DBR_EINTR)
                     continue;
-                dbr_err_prints("dbr_recv_msg() failed");
+                dbr_err_perror("dbr_recv_msg() failed");
                 goto fail1;
             }
             struct DbrBody rep;
@@ -816,7 +816,7 @@ run(void)
             if (!sess) {
                 status_err(&rep, req.body.req_id);
                 if (!dbr_send_msg(trsock, req.head.sess, &rep, DBR_FALSE))
-                    dbr_err_prints("dbr_send_msg() failed");
+                    dbr_err_perror("dbr_send_msg() failed");
                 continue;
             }
             switch (req.body.type) {
@@ -904,6 +904,20 @@ load(DbrServ serv, const char* path)
     return ret;
 }
 
+static DbrBool
+open_logfile(const char* path)
+{
+    int fd = open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
+    if (fd < 0) {
+        dbr_err_setf(DBR_EIO, "daemon() failed: %s", strerror(errno));
+        return DBR_FALSE;
+    }
+    dup2(fd, STDOUT_FILENO);
+    dup2(fd, STDERR_FILENO);
+    close(fd);
+    return DBR_TRUE;
+}
+
 static void
 sighandler(int signum)
 {
@@ -921,7 +935,7 @@ main(int argc, char* argv[])
         switch (c) {
         case 'f':
             if (!parse_file(optarg, &config)) {
-                dbr_err_prints("parse_file() failed");
+                dbr_err_perror("parse_file() failed");
                 goto exit1;
             }
             break;
@@ -931,61 +945,70 @@ main(int argc, char* argv[])
     argv += optind;
 
     dbr_log_notice("server started");
-    dbr_log_info("daemon: %s", config.daemon ? "yes" : "no");
+    dbr_log_info("daemon:  %s", config.daemon ? "yes" : "no");
+    dbr_log_info("logfile: %s", config.logfile);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    if (config.daemon && daemon(0, 0) < 0) {
+#pragma GCC diagnostic pop
+        dbr_err_printf(DBR_EIO, "daemon() failed: %s", strerror(errno));
+        goto exit1;
+    }
+
+    if (config.logfile[0] != '\0' && !open_logfile(config.logfile)) {
+        dbr_err_perror("open_logfile() failed");
+        goto exit1;
+    }
 
     ctx = zmq_ctx_new();
     if (!ctx) {
-        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
         goto exit1;
     }
 
     journ = dbr_zmqjourn_create(ctx, 1 * 1024 * 1024, factory, "doobry.db");
     if (!journ) {
-        dbr_err_prints("dbr_sqljourn_create() failed");
+        dbr_err_perror("dbr_sqljourn_create() failed");
         goto exit2;
     }
 
     pool = dbr_pool_create(8 * 1024 * 1024);
     if (!pool) {
-        dbr_err_prints("dbr_pool_create() failed");
+        dbr_err_perror("dbr_pool_create() failed");
         goto exit3;
     }
 
     serv = dbr_serv_create("doobry.bin", journ, pool);
     if (!serv) {
-        dbr_err_prints("dbr_serv_create() failed");
+        dbr_err_perror("dbr_serv_create() failed");
         goto exit4;
     }
 
     if (!load(serv, "doobry.db")) {
-        dbr_err_prints("load() failed");
+        dbr_err_perror("load() failed");
         goto exit5;
     }
 
     mdsock = zmq_socket(ctx, ZMQ_PUB);
     if (!mdsock) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit5;
     }
 
     if (zmq_bind(mdsock, "tcp://*:3270") < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         goto exit6;
     }
 
     trsock = zmq_socket(ctx, ZMQ_ROUTER);
     if (!trsock) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit6;
     }
 
     if (zmq_bind(trsock, "tcp://*:3271") < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         goto exit7;
     }
 
@@ -999,7 +1022,7 @@ main(int argc, char* argv[])
     sigaction(SIGINT, &action, NULL);
     sigaction(SIGTERM, &action, NULL);
 
-    if (!run())
+    if (!run(&config))
         goto exit8;
 
     status = EXIT_SUCCESS;

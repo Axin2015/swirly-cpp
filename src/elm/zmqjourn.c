@@ -73,7 +73,7 @@ destroy(DbrJourn journ)
         if (dbr_likely(elm_send_body(impl->sock, &body, DBR_FALSE)))
             break;
         if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
-            dbr_err_print();
+            dbr_err_perror("elm_send_body() failed");
             break;
         }
         // DBR_EINTR
@@ -83,8 +83,7 @@ destroy(DbrJourn journ)
     void* ret;
     const int err = pthread_join(impl->thread, &ret);
     if (dbr_unlikely(err)) {
-        dbr_err_setf(DBR_EIO, "pthread_create() failed: %s", strerror(err));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "pthread_create() failed: %s", strerror(err));
     }
     free(impl);
 }
@@ -150,8 +149,7 @@ start_routine(void* arg)
 
     void* sock = zmq_socket(state->ctx, ZMQ_PAIR);
     if (dbr_unlikely(!sock)) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit2;
     }
 
@@ -162,8 +160,7 @@ start_routine(void* arg)
     }
 
     if (dbr_unlikely(zmq_connect(sock, state->addr) < 0)) {
-        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto exit3;
     }
 
@@ -174,17 +171,17 @@ start_routine(void* arg)
     state->arg = NULL;
 
     if (dbr_unlikely(!journ)) {
-        dbr_err_prints("state->factory() failed");
+        dbr_err_perror("state->factory() failed");
         // Reply to parent with error status.
         body.status_rep.num = dbr_err_num();
         strncpy(body.status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
         if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE)))
-            dbr_err_print();
+            dbr_err_perror("elm_send_body() failed");
         goto exit3;
     }
 
     if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE))) {
-        dbr_err_print();
+        dbr_err_perror("elm_send_body() failed");
         goto exit4;
     }
 
@@ -192,7 +189,7 @@ start_routine(void* arg)
         if (dbr_unlikely(!elm_recv_body(sock, &pool, &body))) {
             if (dbr_err_num() == DBR_EINTR)
                 continue;
-            dbr_err_prints("elm_recv_body() failed");
+            dbr_err_perror("elm_recv_body() failed");
             goto exit4;
         }
         switch (body.type) {
@@ -201,18 +198,18 @@ start_routine(void* arg)
             goto exit4;
         case DBR_INSERT_EXEC_LIST_REQ:
             if (!dbr_journ_insert_exec_list(journ, body.insert_exec_list_req.first, DBR_FALSE))
-                dbr_err_print();
+                dbr_err_perror("dbr_journ_insert_exec_list() failed");
             elm_pool_free_entity_list(&pool, DBR_ENTITY_EXEC, body.insert_exec_list_req.first);
             break;
         case DBR_INSERT_EXEC_REQ:
             if (!dbr_journ_insert_exec(journ, body.insert_exec_req.exec, DBR_FALSE))
-                dbr_err_print();
+                dbr_err_perror("dbr_journ_insert_exec() failed");
             elm_pool_free_exec(&pool, body.insert_exec_req.exec);
             break;
         case DBR_UPDATE_EXEC_REQ:
             if (!dbr_journ_update_exec(journ, body.update_exec_req.id,
                                        body.update_exec_req.modified))
-                dbr_err_print();
+                dbr_err_perror("dbr_journ_update_exec() failed");
             break;
         }
     }

@@ -43,13 +43,15 @@ cdef extern from "dbr/err.h":
 
     void dbr_err_clear() nogil
 
-    void dbr_err_print() nogil
-
-    void dbr_err_prints(const char* s) nogil
+    void dbr_err_perror(const char* s) nogil
 
     void dbr_err_set_(int num, const char* file, int line, const char* msg) nogil
 
     void dbr_err_setf_(int num, const char* file, int line, const char* format, ...) nogil
+
+    void dbr_err_print_(int num, const char* file, int line, const char* msg) nogil
+
+    void dbr_err_printf_(int num, const char* file, int line, const char* format, ...) nogil
 
     int dbr_err_num() nogil
 

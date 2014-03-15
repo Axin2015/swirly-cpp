@@ -20,10 +20,12 @@
 
 #include <dbr/defs.h>
 
+#include <limits.h> // PATH_MAX
 #include <stdio.h>
 
 struct Config {
     DbrBool daemon;
+    char logfile[PATH_MAX + 1];
 };
 
 DBR_EXTERN DbrBool

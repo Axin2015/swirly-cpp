@@ -124,13 +124,13 @@ run(void)
         const tsc_t start = tsc();
         if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
                                          DBR_ACTION_BUY, 12345, 1, 0))) {
-            dbr_err_print();
+            dbr_err_perror("dbr_serv_place() failed");
             goto fail2;
         }
 
         if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
                                          DBR_ACTION_SELL, 12345, 1, 0))) {
-            dbr_err_print();
+            dbr_err_perror("dbr_serv_place() failed");
             goto fail2;
         }
         const tsc_t finish = tsc();
@@ -142,7 +142,7 @@ run(void)
         while ((node = dbr_trader_first_trade(trader)) != DBR_TRADER_END_TRADE) {
             struct DbrExec* trade = dbr_trader_trade_entry(node);
             if (!dbr_serv_ack_trade(serv, trader, trade->id)) {
-                dbr_err_print();
+                dbr_err_perror("dbr_serv_ack_trade() failed");
                 goto fail2;
             }
         }
@@ -166,36 +166,35 @@ main(int argc, char* argv[])
 
     ctx = zmq_ctx_new();
     if (!ctx) {
-        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
-        dbr_err_print();
+        dbr_err_printf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
         goto exit1;
     }
 
     journ = dbr_zmqjourn_create(ctx, 1 * 1024 * 1024, factory, "doobry.db");
     if (!journ) {
-        dbr_err_prints("dbr_sqljourn_create() failed");
+        dbr_err_perror("dbr_sqljourn_create() failed");
         goto exit2;
     }
 
     pool = dbr_pool_create(8 * 1024 * 1024);
     if (!pool) {
-        dbr_err_prints("dbr_pool_create() failed");
+        dbr_err_perror("dbr_pool_create() failed");
         goto exit3;
     }
 
     serv = dbr_serv_create("doobry.bin", journ, pool);
     if (!serv) {
-        dbr_err_prints("dbr_serv_create() failed");
+        dbr_err_perror("dbr_serv_create() failed");
         goto exit4;
     }
 
     if (!load(serv, "doobry.db")) {
-        dbr_err_prints("load() failed");
+        dbr_err_perror("load() failed");
         goto exit5;
     }
 
     if (!run()) {
-        dbr_err_prints("run() failed");
+        dbr_err_perror("run() failed");
         goto exit5;
     }
 

@@ -42,15 +42,16 @@ EUSER = DBR_EUSER
 def err_clear():
     dbr_err_clear()
 
-def err_print():
-    dbr_err_print()
-
-def err_prints(const char* s):
-    dbr_err_prints(s)
+def err_perror(const char* s):
+    dbr_err_perror(s)
 
 def err_set(int num, const char* msg):
     fi = getframeinfo(currentframe())
     dbr_err_set_(num, fi.filename, fi.lineno, msg)
+
+def err_print(int num, const char* msg):
+    fi = getframeinfo(currentframe())
+    dbr_err_print_(num, fi.filename, fi.lineno, msg)
 
 def err_num():
     return dbr_err_num()
