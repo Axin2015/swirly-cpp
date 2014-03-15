@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 struct Config {
-    int x;
+    DbrBool daemon;
 };
 
 DBR_EXTERN DbrBool

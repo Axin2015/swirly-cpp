@@ -29,6 +29,57 @@ struct Tok {
     char* end;
 };
 
+static int
+parse_bool(const char* begin, const char* end, int line)
+{
+    int ret;
+    switch (end - begin) {
+    case 1:
+        // 0 or 1.
+        switch (*begin) {
+        case '0':
+            ret = DBR_FALSE;
+            break;
+        case '1':
+            ret = DBR_TRUE;
+            break;
+        default:
+            goto fail1;
+        }
+        break;
+    case 2:
+        // no.
+        if (strcmp(begin, "no") != 0)
+            goto fail1;
+        ret = DBR_FALSE;
+        break;
+    case 3:
+        // yes.
+        if (strcmp(begin, "yes") != 0)
+            goto fail1;
+        ret = DBR_TRUE;
+        break;
+    case 4:
+        // true.
+        if (strcmp(begin, "true") != 0)
+            goto fail1;
+        ret = DBR_TRUE;
+        break;
+    case 5:
+        // false.
+        if (strcmp(begin, "false") != 0)
+            goto fail1;
+        ret = DBR_FALSE;
+        break;
+    default:
+        goto fail1;
+    }
+    return ret;
+ fail1:
+    dbr_err_setf(DBR_EINVAL, "invalid boolean value '%s' at line %d", begin, line);
+    return -1;
+}
+
 DBR_EXTERN DbrBool
 parse_line(char* begin, char* end, int line, struct Config* config)
 {
@@ -40,7 +91,7 @@ parse_line(char* begin, char* end, int line, struct Config* config)
     char* sep = strchr(begin, '=');
     if (!sep) {
         dbr_err_setf(DBR_EINVAL, "missing separator at line %d", line);
-        return DBR_FALSE;
+        goto fail1;
     }
 
     struct Tok key = { .begin = begin, .end = sep };
@@ -55,13 +106,18 @@ parse_line(char* begin, char* end, int line, struct Config* config)
     *key.end = '\0';
     *val.end = '\0';
 
-    if (strcmp(key.begin, "x") == 0) {
-        config->x = atoi(val.begin);
+    if (strcmp(key.begin, "daemon") == 0) {
+        const int ret = parse_bool(val.begin, val.end, line);
+        if (ret < 0)
+            goto fail1;
+        config->daemon = ret;
     } else {
         dbr_err_setf(DBR_EINVAL, "invalid key '%s' at line %d", key.begin, line);
-        return DBR_FALSE;
+        goto fail1;
     }
     return DBR_TRUE;
+ fail1:
+    return DBR_FALSE;
 }
 
 DBR_EXTERN DbrBool
@@ -71,7 +127,7 @@ parse_stream(FILE* stream, struct Config* config)
     size_t capacity = 0;
     int line = 0;
     for (;;) {
-        const ssize_t len = getline(&buf, &capacity, stdin);
+        const ssize_t len = getline(&buf, &capacity, stream);
         if (len == -1)
             break;
         if (!parse_line(buf, buf + len, ++line, config))

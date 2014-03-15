@@ -931,6 +931,7 @@ main(int argc, char* argv[])
     argv += optind;
 
     dbr_log_notice("server started");
+    dbr_log_info("daemon: %s", config.daemon ? "yes" : "no");
 
     ctx = zmq_ctx_new();
     if (!ctx) {
