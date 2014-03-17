@@ -26,12 +26,6 @@ struct SlElem {
     DbrSlNode node;
 };
 
-static inline SlElem*
-dbr_elem_from_node(DbrSlNode* node)
-{
-    return dbr_implof(SlElem, node, node);
-}
-
 TEST_CASE(slnode_list)
 {
     DbrList l = DBR_LIST_INIT(l);

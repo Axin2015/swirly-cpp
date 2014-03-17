@@ -74,12 +74,6 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
         : taker->c.ticks - maker->c.ticks;
 }
 
-static inline struct DbrPosn*
-lazy_posn(struct DbrOrder* order, DbrPool pool)
-{
-    return fig_accnt_posn(order->c.accnt.rec, order->c.contr.rec, order->c.settl_date, pool);
-}
-
 static DbrBool
 match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
              struct DbrBank* bank, DbrJourn journ, DbrPool pool, struct DbrTrans* trans)

@@ -4,6 +4,8 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 # Remove -Werror due to error: array subscript is above array bounds [-Werror=array-bounds].
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -Wno-array-bounds -fstrict-aliasing -fvisibility=hidden")
+ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -Wno-unused-const-variable  -fstrict-aliasing -fvisibility=hidden")
 ENDIF()
 
 FILE(GLOB fir_SOURCES

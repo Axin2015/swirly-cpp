@@ -80,14 +80,6 @@ hash_mnem(int type, const char* mnem)
     return h;
 }
 
-static inline struct DbrRec*
-get_id(const struct FigCache* cache, int type, DbrIden id)
-{
-    struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
-    assert(node != FIG_CACHE_END_REC);
-    return dbr_shared_rec_entry(node);
-}
-
 static inline void
 insert_id(struct FigCache* cache, struct DbrRec* rec)
 {

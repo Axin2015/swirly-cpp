@@ -121,13 +121,6 @@ find_rec_id(int type, DbrIden id)
     return node != DBR_SERV_END_REC ? dbr_serv_rec_entry(node) : NULL;
 }
 
-static inline struct DbrRec*
-find_rec_mnem(int type, const char* mnem)
-{
-    struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
-    return node != DBR_SERV_END_REC ? dbr_serv_rec_entry(node) : NULL;
-}
-
 static DbrTrader
 get_trader(DbrIden tid)
 {

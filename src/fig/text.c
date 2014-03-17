@@ -19,8 +19,6 @@
 
 #include <math.h>
 
-static const char DIGITS[] = "0123456789";
-
 DBR_API void
 dbr_price_text(double price, int price_dp, int pip_dp, struct DbrPriceText* pt)
 {
