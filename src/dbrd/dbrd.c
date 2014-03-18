@@ -887,7 +887,7 @@ load(DbrServ serv, const char* path)
 {
     DbrBool ret;
 
-    DbrModel model = dbr_sqlmodel_create("doobry.db");
+    DbrModel model = dbr_sqlmodel_create(path);
     if (dbr_likely(model)) {
         ret = dbr_serv_load(serv, model);
         dbr_model_destroy(model);
