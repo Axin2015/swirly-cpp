@@ -122,8 +122,16 @@ parse_line(char* begin, char* end, int line, struct Config* config)
         if (ret < 0)
             goto fail1;
         config->daemon = ret;
+    } else if (strcmp(key.begin, "bankfile") == 0) {
+        copy_path(config->prefix, val.begin, config->bankfile);
+    } else if (strcmp(key.begin, "dbfile") == 0) {
+        copy_path(config->prefix, val.begin, config->dbfile);
     } else if (strcmp(key.begin, "logfile") == 0) {
         copy_path(config->prefix, val.begin, config->logfile);
+    } else if (strcmp(key.begin, "journsize") == 0) {
+        config->journsize = atoi(val.begin);
+    } else if (strcmp(key.begin, "poolsize") == 0) {
+        config->poolsize = atoi(val.begin);
     } else {
         dbr_err_setf(DBR_EINVAL, "invalid key '%s' at line %d", key.begin, line);
         goto fail1;

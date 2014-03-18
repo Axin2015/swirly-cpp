@@ -920,7 +920,17 @@ sighandler(int signum)
 int
 main(int argc, char* argv[])
 {
-    struct Config config = { 0 };
+    // Reasonable config defaults.
+    struct Config config = {
+        .daemon = DBR_FALSE,
+        .prefix = "",
+        .bankfile = "doobry.bin",
+        .dbfile = "doobry.db",
+        .logfile = "",
+        .journsize = 1 * 1024 * 1024,
+        .poolsize = 1 * 1024 * 1024
+    };
+
     int status = EXIT_FAILURE;
 
     char c;
@@ -943,8 +953,12 @@ main(int argc, char* argv[])
     }
 
     dbr_log_notice("server started");
-    dbr_log_info("daemon:  %s", config.daemon ? "yes" : "no");
-    dbr_log_info("logfile: %s", config.logfile);
+    dbr_log_info("daemon:    %s", config.daemon ? "yes" : "no");
+    dbr_log_info("bankfile:  %s", config.bankfile);
+    dbr_log_info("dbfile:    %s", config.dbfile);
+    dbr_log_info("logfile:   %s", config.logfile);
+    dbr_log_info("journsize: %d", config.journsize);
+    dbr_log_info("poolsize:  %d", config.poolsize);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -960,25 +974,25 @@ main(int argc, char* argv[])
         goto exit1;
     }
 
-    journ = dbr_zmqjourn_create(ctx, 1 * 1024 * 1024, factory, "doobry.db");
+    journ = dbr_zmqjourn_create(ctx, config.journsize, factory, config.dbfile);
     if (!journ) {
         dbr_err_perror("dbr_sqljourn_create() failed");
         goto exit2;
     }
 
-    pool = dbr_pool_create(8 * 1024 * 1024);
+    pool = dbr_pool_create(config.poolsize);
     if (!pool) {
         dbr_err_perror("dbr_pool_create() failed");
         goto exit3;
     }
 
-    serv = dbr_serv_create("doobry.bin", journ, pool);
+    serv = dbr_serv_create(config.bankfile, journ, pool);
     if (!serv) {
         dbr_err_perror("dbr_serv_create() failed");
         goto exit4;
     }
 
-    if (!load(serv, "doobry.db")) {
+    if (!load(serv, config.dbfile)) {
         dbr_err_perror("load() failed");
         goto exit5;
     }
