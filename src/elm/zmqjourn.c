@@ -187,8 +187,10 @@ start_routine(void* arg)
 
     for (;;) {
         if (dbr_unlikely(!elm_recv_body(sock, &pool, &body))) {
-            if (dbr_err_num() == DBR_EINTR)
+            if (dbr_err_num() == DBR_EINTR) {
+                dbr_log_warn("thread interrupted");
                 continue;
+            }
             dbr_err_perror("elm_recv_body() failed");
             goto exit4;
         }

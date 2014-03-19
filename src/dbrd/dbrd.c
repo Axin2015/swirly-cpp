@@ -70,8 +70,6 @@ static void* mdsock = NULL;
 static void* trsock = NULL;
 static struct DbrPrioq prioq = { 0 };
 
-static volatile sig_atomic_t quit = DBR_FALSE;
-
 static inline DbrBool
 is_hbtmr(DbrKey tmr)
 {
@@ -744,6 +742,63 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
     return DBR_FALSE;
 }
 
+enum {
+    NONE,
+    QUIT,
+    RELOAD
+};
+
+static volatile sig_atomic_t action = NONE;
+
+static DbrJourn
+factory(void* arg)
+{
+    return dbr_sqljourn_create((const char*)arg);
+}
+
+static DbrBool
+load(DbrServ serv, const char* path)
+{
+    DbrBool ret;
+
+    DbrModel model = dbr_sqlmodel_create(path);
+    if (dbr_likely(model)) {
+        ret = dbr_serv_load(serv, model);
+        dbr_model_destroy(model);
+    } else
+        ret = DBR_FALSE;
+
+    return ret;
+}
+
+static DbrBool
+open_logfile(const char* path)
+{
+    int fd = open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
+    if (fd < 0) {
+        dbr_err_setf(DBR_EIO, "open() failed: %s", strerror(errno));
+        return DBR_FALSE;
+    }
+    dup2(fd, STDOUT_FILENO);
+    dup2(fd, STDERR_FILENO);
+    close(fd);
+    return DBR_TRUE;
+}
+
+static void
+sighandler(int signum)
+{
+    switch (signum) {
+    case SIGHUP:
+        action = RELOAD;
+        break;
+    case SIGINT:
+    case SIGTERM:
+        action = QUIT;
+        break;
+    };
+}
+
 static DbrBool
 run(struct Config* config)
 {
@@ -754,7 +809,20 @@ run(struct Config* config)
     DbrMillis now = dbr_millis();
     dbr_prioq_push(&prioq, MDTMR, MDINT * ((now / MDINT) + 1));
 
-    while (!quit) {
+    while (action != QUIT) {
+
+        if (action == RELOAD) {
+            action = NONE;
+            if (config->logfile[0] != '\0') {
+                dbr_log_info("reloading configuration");
+                fflush(stdout);
+                if (!open_logfile(config->logfile)) {
+                    dbr_err_perror("open_logfile() failed");
+                    goto fail1;
+                }
+            }
+        }
+
         DbrMillis ms = -1;
         const struct DbrElem* elem;
         while ((elem = dbr_prioq_top(&prioq))) {
@@ -790,6 +858,8 @@ run(struct Config* config)
 
         const int nevents = zmq_poll(items, 1, ms);
         if (nevents < 0) {
+            if (zmq_errno() == EINTR)
+                continue;
             dbr_err_setf(DBR_EIO, "zmq_poll() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
@@ -874,47 +944,6 @@ run(struct Config* config)
     return DBR_TRUE;
  fail1:
     return DBR_FALSE;
-}
-
-static DbrJourn
-factory(void* arg)
-{
-    return dbr_sqljourn_create((const char*)arg);
-}
-
-static DbrBool
-load(DbrServ serv, const char* path)
-{
-    DbrBool ret;
-
-    DbrModel model = dbr_sqlmodel_create(path);
-    if (dbr_likely(model)) {
-        ret = dbr_serv_load(serv, model);
-        dbr_model_destroy(model);
-    } else
-        ret = DBR_FALSE;
-
-    return ret;
-}
-
-static DbrBool
-open_logfile(const char* path)
-{
-    int fd = open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP);
-    if (fd < 0) {
-        dbr_err_setf(DBR_EIO, "open() failed: %s", strerror(errno));
-        return DBR_FALSE;
-    }
-    dup2(fd, STDOUT_FILENO);
-    dup2(fd, STDERR_FILENO);
-    close(fd);
-    return DBR_TRUE;
-}
-
-static void
-sighandler(int signum)
-{
-    quit = DBR_TRUE;
 }
 
 int
@@ -1026,11 +1055,14 @@ main(int argc, char* argv[])
     action.sa_handler = sighandler;
     action.sa_flags = 0;
     sigemptyset(&action.sa_mask);
+    sigaction(SIGHUP, &action, NULL);
     sigaction(SIGINT, &action, NULL);
     sigaction(SIGTERM, &action, NULL);
 
-    if (!run(&config))
+    if (!run(&config)) {
+        dbr_err_perror("run() failed");
         goto exit8;
+    }
 
     status = EXIT_SUCCESS;
  exit8:
