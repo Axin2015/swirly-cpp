@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <syslog.h>
 #include <unistd.h> // getopt()
 
 enum {
@@ -985,12 +986,20 @@ main(int argc, char* argv[])
             dbr_err_perror("dbr_daemon() failed");
             goto exit1;
         }
-        const char* logfile = config.logfile;
-        if (*logfile == '\0')
-            logfile = "/dev/null";
-        if (!open_logfile(logfile)) {
-            dbr_err_perror("open_logfile() failed");
-            goto exit1;
+        if (config.logfile[0] != '\0') {
+            if (!open_logfile(config.logfile)) {
+                dbr_err_perror("open_logfile() failed");
+                goto exit1;
+            }
+        } else {
+            // Daemon uses syslog by default.
+            openlog("dbrd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+#if DBR_DEBUG_LEVEL >= 1
+            setlogmask(LOG_UPTO(LOG_DEBUG));
+#else  // DBR_DEBUG_LEVEL < 1
+            setlogmask(LOG_UPTO(LOG_INFO));
+#endif // DBR_DEBUG_LEVEL < 1
+            dbr_log_setlogger(dbr_log_syslog);
         }
     }
 
