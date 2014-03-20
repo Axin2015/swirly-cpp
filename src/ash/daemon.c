@@ -21,7 +21,6 @@
 
 #include <errno.h>
 #include <fcntl.h>    // open()
-#include <signal.h>
 #include <string.h>   // strerror()
 #include <unistd.h>   // fork()
 
@@ -48,7 +47,6 @@ dbr_daemon(const char* wd, mode_t mask)
 
     // Forking again ensures that the daemon process is not a session leader, and therefore cannot
     // regain access to a controlling terminal.
-    signal(SIGHUP, SIG_IGN);
     pid = fork();
     if (pid < 0) {
         dbr_err_setf(DBR_ESYSTEM, "fork() failed: %s", strerror(errno));
@@ -66,19 +64,19 @@ dbr_daemon(const char* wd, mode_t mask)
     // Restrict file creation mode. This function is always successful.
     umask(mask);
 
-    // Close all open file handles.
-    const int fds = getdtablesize();
-    for (int fd = 0; fd < fds; ++fd)
-        close(fd);
-
-    // Re-open standard file handles.
-    if (open("/dev/null", O_RDONLY) < 0       // STDIN_FILENO
-        || open("/dev/null", O_WRONLY) < 0    // STDOUT_FILENO
-        || open("/dev/null", O_WRONLY) < 0) { // STDERR_FILENO
+    // Re-open standard input.
+    close(STDIN_FILENO);
+    if (open("/dev/null", O_RDONLY) < 0) {
         dbr_err_setf(DBR_EIO, "open() failed: %s", strerror(errno));
         goto fail1;
     }
 
+    // Close all non-standard file handles.
+    const int fds = getdtablesize();
+    for (int fd = STDERR_FILENO + 1; fd < fds; ++fd)
+        close(fd);
+
+    // Note that the standard output handles are unchanged.
     return DBR_TRUE;
  fail1:
     return DBR_FALSE;

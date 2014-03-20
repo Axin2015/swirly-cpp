@@ -20,6 +20,7 @@
 
 #include <dbr/accnt.h>
 #include <dbr/book.h>
+#include <dbr/daemon.h>
 #include <dbr/err.h>
 #include <dbr/serv.h>
 #include <dbr/log.h>
@@ -744,8 +745,8 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
 
 enum {
     NONE,
+    HANGUP,
     QUIT,
-    RELOAD
 };
 
 static volatile sig_atomic_t action = NONE;
@@ -790,7 +791,7 @@ sighandler(int signum)
 {
     switch (signum) {
     case SIGHUP:
-        action = RELOAD;
+        action = HANGUP;
         break;
     case SIGINT:
     case SIGTERM:
@@ -811,10 +812,13 @@ run(struct Config* config)
 
     while (action != QUIT) {
 
-        if (action == RELOAD) {
+        if (action == HANGUP) {
             action = NONE;
+            // Exit when hang-up is received on non-daemon process.
+            if (!config->daemon)
+                break;
             if (config->logfile[0] != '\0') {
-                dbr_log_info("reloading configuration");
+                dbr_log_info("reopening logfile on hangup");
                 fflush(stdout);
                 if (!open_logfile(config->logfile)) {
                     dbr_err_perror("open_logfile() failed");
@@ -976,17 +980,18 @@ main(int argc, char* argv[])
     argc -= optind;
     argv += optind;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    if (config.daemon && daemon(0, 1) < 0) {
-#pragma GCC diagnostic pop
-        dbr_err_printf(DBR_ESYSTEM, "daemon() failed: %s", strerror(errno));
-        goto exit1;
-    }
-
-    if (config.logfile[0] != '\0' && !open_logfile(config.logfile)) {
-        dbr_err_perror("open_logfile() failed");
-        goto exit1;
+    if (config.daemon) {
+        if (dbr_daemon("/", 0027) < 0) {
+            dbr_err_perror("dbr_daemon() failed");
+            goto exit1;
+        }
+        const char* logfile = config.logfile;
+        if (*logfile == '\0')
+            logfile = "/dev/null";
+        if (!open_logfile(logfile)) {
+            dbr_err_perror("open_logfile() failed");
+            goto exit1;
+        }
     }
 
     dbr_log_notice("server started");
