@@ -106,6 +106,11 @@
  */
 
 /**
+ * @defgroup Daemon Daemon
+ * @ingroup Ash
+ */
+
+/**
  * @defgroup Util Utility
  * @ingroup Ash
  * @example util.cpp

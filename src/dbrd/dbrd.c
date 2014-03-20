@@ -976,6 +976,14 @@ main(int argc, char* argv[])
     argc -= optind;
     argv += optind;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    if (config.daemon && daemon(0, 1) < 0) {
+#pragma GCC diagnostic pop
+        dbr_err_printf(DBR_ESYSTEM, "daemon() failed: %s", strerror(errno));
+        goto exit1;
+    }
+
     if (config.logfile[0] != '\0' && !open_logfile(config.logfile)) {
         dbr_err_perror("open_logfile() failed");
         goto exit1;
@@ -988,14 +996,6 @@ main(int argc, char* argv[])
     dbr_log_info("logfile:   %s", config.logfile);
     dbr_log_info("journsize: %d", config.journsize);
     dbr_log_info("poolsize:  %d", config.poolsize);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    if (config.daemon && daemon(0, 1) < 0) {
-#pragma GCC diagnostic pop
-        dbr_err_printf(DBR_ESYSTEM, "daemon() failed: %s", strerror(errno));
-        goto exit1;
-    }
 
     ctx = zmq_ctx_new();
     if (!ctx) {
