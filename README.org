@@ -1,5 +1,4 @@
-#+TITLE: Doobry Home
 #+AUTHOR: Mark Aylett
 #+EMAIL: mark.aylett@gmail.com
 Doobry is an open-source matching engine written in C11. The target platform is GNU/Linux. Please
-see [[www.doobry.org][The Doobry Guide]] for more information.
+see [[http://www.doobry.org][The Doobry Guide]] for more information.
