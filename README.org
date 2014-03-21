@@ -1,32 +1,5 @@
 #+TITLE: Doobry Home
 #+AUTHOR: Mark Aylett
 #+EMAIL: mark.aylett@gmail.com
-* Introduction
-  This project provides the core components for an open-source matching engine.
-
-  Matching engines are used in financial trading systems to match buyers and sellers in a
-  market-place.
-
-  Investment banks and other financial organisations often build in-house matching engines to
-  facilitate trading between desks and reduce the cost of trading on external venues.
-
-  Matching engines tend to follow a pre-defined set of rules and present mostly technical
-  challenges. Open-sourcing the mechanical parts of a trading platform allows the business to focus
-  on IP-sensitive pricing and trading algorithms.
-
-  The goal of this project is to eventually host an educational trading platform that will allow
-  market-participants to experiment and compete in an environment free of financial risk.
-
-  The core libraries are written in C11, which are supplemented with C++11 wrappers for convenience.
-
-  The matching engine currently favours performance over a rich feature set.
-* Build
-  Example =cmake= command:
-  #+BEGIN_SRC sh
-  $ cmake $HOME/src/doobry -G "Unix Makefiles" \
-                           -DCMAKE_BUILD_TYPE=Debug \
-                           -DCMAKE_C_COMPILER=/opt/local/bin/gcc-mp-4.8 \
-                           -DCMAKE_CXX_COMPILER=/opt/local/bin/g++-mp-4.8 \
-                           -DCMAKE_C_FLAGS_DEBUG="-g3 -gdwarf-2" \
-                           -DCMAKE_CXX_FLAGS_DEBUG="-g3 -gdwarf-2"
-  #+END_SRC sh
+Doobry is an open-source matching engine written in C11. The target platform is GNU/Linux. Please
+see [[www.doobry.org][The Doobry Guide]] for more information.
