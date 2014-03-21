@@ -1,5 +1,5 @@
-The Doobry Guide {#mainpage}
-================
+Overview
+========
 
 Matching engines are used in financial trading systems to match buyers and sellers in a
 market-place.
