@@ -16,12 +16,6 @@
  *  02110-1301 USA.
  */
 /**
- * @mainpage Doobry
- *
- * Doobry is an open-source matching engine written in C11. The target platform is GNU/Linux.
- */
-
-/**
  * @defgroup Ash Ash
  */
 
@@ -114,6 +108,11 @@
  * @defgroup Pack Pack
  * @ingroup Ash
  * @example pack.cpp
+ */
+
+/**
+ * @defgroup String String
+ * @ingroup Ash
  */
 
 /**
