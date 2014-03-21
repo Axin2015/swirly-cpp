@@ -18,25 +18,7 @@
 /**
  * @mainpage Doobry
  *
- * This project provides the core components for an open-source matching engine.
- *
- * Matching engines are used in financial trading systems to match buyers and sellers in a
- * market-place.
- *
- * Investment banks and other financial organisations often build in-house matching engines to
- * facilitate trading between desks and reduce the cost of trading on external venues.
- *
- * Matching engines tend to follow a pre-defined set of rules and present mostly technical
- * challenges. Open-sourcing the technical parts of a trading platform allows businesses to focus on
- * their IP-sensitive pricing and trading algorithms.
- *
- * The goal of this project is to eventually host an educational trading platform that will allow
- * market-participants to experiment and compete in a risk-free environment.
- *
- * The core libraries are written in C11, which are supplemented with C++11 wrappers for
- * convenience.
- *
- * The matching engine currently favours performance over a rich feature set.
+ * Doobry is an open-source matching engine written in C11. The target platform is GNU/Linux.
  */
 
 /**
@@ -111,38 +93,33 @@
  */
 
 /**
- * @defgroup Util Utility
- * @ingroup Ash
- * @example util.cpp
- */
-
-/**
  * Each thread has its own error information.
  * @defgroup Err Error
- * @ingroup Util
+ * @ingroup Ash
  * @example err.cpp
  */
 
 /**
  * @defgroup Lexer Lexer
- * @ingroup Util
+ * @ingroup Ash
  */
 
 /**
  * Each thread has its own logger.
  * @defgroup Log Log
- * @ingroup Util
+ * @ingroup Ash
  */
 
 /**
  * @defgroup Pack Pack
- * @ingroup Util
+ * @ingroup Ash
  * @example pack.cpp
  */
 
 /**
- * @defgroup String String
- * @ingroup Util
+ * @defgroup Util Utility
+ * @ingroup Ash
+ * @example util.cpp
  */
 
 /**
@@ -342,7 +319,7 @@
  */
 
 /**
- * @defgroup Msg Msg
+ * @defgroup Async Async
  * @ingroup Elm
  */
 
@@ -358,7 +335,7 @@
  */
 
 /**
- * @defgroup Async Async
+ * @defgroup Msg Msg
  * @ingroup Elm
  */
 
@@ -433,6 +410,11 @@
  */
 
 /**
+ * @defgroup Handler Handler
+ * @ingroup Fig
+ */
+
+/**
  * @defgroup Sess Session
  * @ingroup Fig
  */
@@ -445,11 +427,6 @@
 /**
  * @defgroup Clnt Client
  * @ingroup Fig
- */
-
-/**
- * @defgroup Handler Handler
- * @ingroup Clnt
  */
 
 /**
