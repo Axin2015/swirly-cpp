@@ -4,7 +4,7 @@ Admin Guide
 Configuration
 -------------
 
-### Synopsis
+### Synopsis ###
 
 | option    | description                         |
 |-----------|-------------------------------------|
@@ -15,11 +15,11 @@ Configuration
 | journsize | size of journal mempool in bytes    |
 | poolsize  | size of main mempool in bytes       |
 
-### Bank
+### Bank ###
 
-### Database
+### Database ###
 
-### Logger
+### Logger ###
 
 The `logfile` option is ignored unless `daemon=yes`:
 
@@ -28,9 +28,9 @@ The `logfile` option is ignored unless `daemon=yes`:
 | logfile=<path> | <path> | stdout/err |
 | logfile=       | syslog | stdout/err |
 
-### Memory Pool
+### Memory Pool ###
 
-### Example
+### Example ###
 
     daemon = yes
 
@@ -44,10 +44,10 @@ The `logfile` option is ignored unless `daemon=yes`:
 Operations
 ----------
 
-### Starting
+### Starting ###
 
 The `dbrd` server is typically started as follows:
 
     $ dbrd -f doobry.conf
 
-### Log Rotation
+### Log Rotation ###

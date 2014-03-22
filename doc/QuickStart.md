@@ -35,7 +35,7 @@ Installing
 The following sections assume that `DOOBRY_SOURCE` is equal to `SOURCE_DIR/doobry`, and that
 `DOOBRY_BUILD` is equal to `BUILD_DIR/doobry`.
 
-### Download
+### Download ###
 
 Download the source from [GitHub](http://github.com/doobry-org):
 
@@ -44,7 +44,7 @@ Download the source from [GitHub](http://github.com/doobry-org):
 
 The `SOURCE_DIR/doobry` directory should now contain the source.
 
-### Configuration
+### Configuration ###
 
 Configure using `cmake` as follows from the build directory:
 
@@ -55,7 +55,7 @@ Configure using `cmake` as follows from the build directory:
 
 This step will produce Unix Makefiles by default.
 
-### Build
+### Build ###
 
 Assuming that you have write access to the default installation path:
 
@@ -73,4 +73,4 @@ See CMake Options for more information.
 [SQLite]: http://sqlite.org/
 [ZeroMQ]: http://zeromq.org/
 
-### Tutorial
+### Tutorial ###

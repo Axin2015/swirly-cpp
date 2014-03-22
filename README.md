@@ -2,14 +2,9 @@ Overview
 ========
 
 Matching engines are used in financial trading systems to match buyers and sellers in a
-market-place.
-
-Investment banks and other financial organisations often build in-house matching engines to
-facilitate trading between desks and reduce the cost of trading on external venues.
-
-Matching engines tend to follow a pre-defined set of rules and present mostly technical
-challenges. Open-sourcing the mechanical parts of a trading platform allows the business to focus on
-IP-sensitive pricing and trading algorithms.
+market-place. Traders place bids and offers into an order-book. These orders can be revised and
+cancelled. A trade happens when a bid and offer match on price. Market participants can see the
+liquidity currently available in the order-book.
 
 Doobry is an open-source matching engine written in C11. The target platform is GNU/Linux. The
 source-code is [freely available on GitHub](http://github.com/doobry-org).
