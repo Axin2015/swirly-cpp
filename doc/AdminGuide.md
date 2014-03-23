@@ -19,6 +19,11 @@ Configuration
 
 ### Database ###
 
+The example database can be created as follows:
+
+    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_schema.sql 
+    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_example.sql 
+
 ### Logger ###
 
 The `logfile` option is ignored unless `daemon=yes`:
@@ -51,3 +56,10 @@ The `dbrd` server is typically started as follows:
     $ dbrd -f doobry.conf
 
 ### Log Rotation ###
+
+If the `daemon` and `logfile` options are set, then the daemon process will respond to a `SIGHUP` by
+re-opening the logfile. This behaviour can be use to rotate the log, as the following example
+demonstrates:
+
+    $ mv doobry.log doobry.log.1
+    $ killall -HUP dbrd
