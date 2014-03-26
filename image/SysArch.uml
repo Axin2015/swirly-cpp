@@ -1,0 +1,21 @@
+@startuml
+
+interface "ZeroMQ" as ZMQ
+
+package Daemon {
+  [dbr_serv] <<library>>
+  database SQLite
+}
+dbr_serv - ZMQ
+
+package GUI {
+  [dbr_clnt] <<library>>
+}
+ZMQ <.. [dbr_clnt]
+
+package Script {
+  [dbrpy] <<module>>
+}
+ZMQ <.. [dbrpy]
+
+@enduml
