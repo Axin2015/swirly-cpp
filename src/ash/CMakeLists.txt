@@ -9,7 +9,6 @@ IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -Wno-unused-const-variable  -fstrict-aliasing -fvisibility=hidden")
 ENDIF()
 
-FIND_PROGRAM(RAGEL ragel)
 IF(RAGEL)
   ADD_CUSTOM_COMMAND(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}

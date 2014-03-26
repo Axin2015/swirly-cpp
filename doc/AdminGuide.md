@@ -28,10 +28,10 @@ The example database can be created as follows:
 
 The `logfile` option is ignored unless `daemon=yes`:
 
-| option         | daemon | foreground |
-|----------------|--------|------------|
-| logfile=<path> | <path> | stdout/err |
-| logfile=       | syslog | stdout/err |
+| option           | daemon   | foreground |
+|------------------+----------+------------|
+| logfile=\<path\> | \<path\> | stdout/err |
+| logfile=         | syslog   | stdout/err |
 
 ### Memory Pool ###
 
