@@ -7,7 +7,8 @@ cancelled. A trade happens when a bid and offer match on price. Market participa
 liquidity currently available in the order-book.
 
 Doobry is an open-source matching engine written in C11. The target platform is GNU/Linux. The
-source-code is [freely available on GitHub](http://github.com/doobry-org).
+source-code is [freely available on GitHub](http://github.com/doobry-org). See
+[related pages](http://www.doobry.org/pages.html) for more information.
 
 License
 -------
