@@ -65,17 +65,17 @@ enum {
     // The init() function is called when the first view list is received on the md socket. The
     // init() function is responsible for sending a sesion-open to the server. The is expected to
     // respond by returning the session-open and reference data.
-    INIT_PENDING   = 0x01,
+    DELTA_PENDING   = 0x01,
     TRADER_PENDING = 0x02,
     ACCNT_PENDING  = 0x04,
     CONTR_PENDING  = 0x08,
-    VIEW_PENDING   = 0x10,
+    SNAP_PENDING   = 0x10,
     TR_CLOSED      = 0x20,
     TR_DOWN        = 0x40,
     MD_DOWN        = 0x80,
 
-    ALL_PENDING    = INIT_PENDING | TRADER_PENDING | ACCNT_PENDING
-                   | CONTR_PENDING| VIEW_PENDING
+    ALL_PENDING    = DELTA_PENDING | TRADER_PENDING | ACCNT_PENDING
+                   | CONTR_PENDING| SNAP_PENDING
 };
 
 struct FigClnt {
@@ -517,8 +517,8 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     clnt->asock = asock;
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->flags = INIT_PENDING | TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
-        | VIEW_PENDING | TR_DOWN | MD_DOWN;
+    clnt->flags = DELTA_PENDING | TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
+        | SNAP_PENDING | TR_DOWN | MD_DOWN;
     // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
@@ -1079,7 +1079,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_VIEW_LIST_REP:
                 apply_views(clnt, body.view_list_rep.first, handler);
-                clnt->flags &= ~VIEW_PENDING;
+                clnt->flags &= ~SNAP_PENDING;
                 // Accept async requests once initialised.
                 if ((clnt->flags & ALL_PENDING) == 0)
                     clnt->items[ASOCK].events = ZMQ_POLLIN;
@@ -1127,10 +1127,10 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             }
             switch (body.type) {
             case DBR_VIEW_LIST_REP:
-                if (dbr_unlikely(clnt->flags & INIT_PENDING)) {
+                if (dbr_unlikely(clnt->flags & DELTA_PENDING)) {
                     if (init(clnt, now) < 0)
                         goto fail1;
-                    clnt->flags &= ~INIT_PENDING;
+                    clnt->flags &= ~DELTA_PENDING;
                 } else
                     apply_views(clnt, body.view_list_rep.first, handler);
                 break;

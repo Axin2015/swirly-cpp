@@ -1,8 +1,21 @@
 @startuml
 
-[*] --> INIT
-INIT -> OPEN
-OPEN -> CLOSE
-CLOSE --> [*]
+SYNCING -> OPEN : open()
+SYNCING -> CLOSING : close()
+OPEN -> CLOSING : close()
+
+state SYNCING {
+  [*] --> DELTA_WAIT
+}
+
+state OPEN {
+  OPEN_WAIT --> REC_WAIT
+  REC_WAIT --> SNAP_WAIT
+  SNAP_WAIT --> READY
+}
+
+state CLOSING {
+  CLOSE_WAIT --> [*]
+}
 
 @enduml

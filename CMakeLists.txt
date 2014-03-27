@@ -57,6 +57,8 @@ IF(DOXYGEN_FOUND)
     SOURCES ${PROJECT_BINARY_DIR}/Doxyfile)
 
   ADD_CUSTOM_COMMAND(TARGET doc POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/CNAME
+            ${PROJECT_BINARY_DIR}/share/doc/html/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/image/favicon.ico
             ${PROJECT_BINARY_DIR}/share/doc/html/)
   ADD_DEPENDENCIES(doc image)
