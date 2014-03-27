@@ -58,24 +58,25 @@ enum {
 
     // The transaction heartbeat timer is scheduled when the logon request is sent during
     // initialisation.
-    TRTMR = -3,
-    TRINT = 5000,
-    TRTMOUT = (TRINT * 3) / 2,
+    TRTMR       = -3,
+    TRINT       = 5000,
+    TRTMOUT     = (TRINT * 3) / 2,
 
     // The init() function is called when the first view list is received on the md socket. The
     // init() function is responsible for sending a sesion-open to the server. The is expected to
     // respond by returning the session-open and reference data.
-    DELTA_PENDING   = 0x01,
-    TRADER_PENDING = 0x02,
-    ACCNT_PENDING  = 0x04,
-    CONTR_PENDING  = 0x08,
-    SNAP_PENDING   = 0x10,
-    TR_CLOSED      = 0x20,
-    TR_DOWN        = 0x40,
-    MD_DOWN        = 0x80,
 
-    ALL_PENDING    = DELTA_PENDING | TRADER_PENDING | ACCNT_PENDING
-                   | CONTR_PENDING| SNAP_PENDING
+    DELTA_WAIT  = 0x01,
+    TRADER_WAIT = 0x02,
+    ACCNT_WAIT  = 0x04,
+    CONTR_WAIT  = 0x08,
+    SNAP_WAIT   = 0x10,
+    TR_CLOSED   = 0x20,
+    TR_DOWN     = 0x40,
+    MD_DOWN     = 0x80,
+
+    REC_WAIT    = TRADER_WAIT | ACCNT_WAIT | CONTR_WAIT,
+    ALL_WAIT    = DELTA_WAIT  | REC_WAIT   | SNAP_WAIT
 };
 
 struct FigClnt {
@@ -219,7 +220,7 @@ emplace_rec_list(DbrClnt clnt, int type, unsigned flag, struct DbrSlNode* first,
     fig_cache_emplace_rec_list(&clnt->cache, type, first, count);
     clnt->flags &= ~flag;
     // Accept async requests once initialised.
-    if ((clnt->flags & ALL_PENDING) == 0)
+    if ((clnt->flags & ALL_WAIT) == 0)
         clnt->items[ASOCK].events = ZMQ_POLLIN;
 }
 
@@ -517,8 +518,8 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     clnt->asock = asock;
     clnt->id = seed;
     clnt->pool = pool;
-    clnt->flags = DELTA_PENDING | TRADER_PENDING | ACCNT_PENDING | CONTR_PENDING
-        | SNAP_PENDING | TR_DOWN | MD_DOWN;
+    clnt->flags = DELTA_WAIT | TRADER_WAIT | ACCNT_WAIT | CONTR_WAIT
+        | SNAP_WAIT | TR_DOWN | MD_DOWN;
     // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
@@ -609,7 +610,7 @@ dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
     const DbrIden req_id = clnt->id++;
     if ((clnt->flags & TR_DOWN)) {
         clnt->flags |= TR_CLOSED;
-        clnt->flags &= ~ALL_PENDING;
+        clnt->flags &= ~ALL_WAIT;
         goto done;
     }
 
@@ -1026,7 +1027,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_SESS_CLOSE:
                 clnt->flags |= (TR_CLOSED | TR_DOWN);
-                clnt->flags &= ~ALL_PENDING;
+                clnt->flags &= ~ALL_WAIT;
                 dbr_handler_on_down(handler, DBR_CONN_TR);
                 break;
             case DBR_SESS_LOGON:
@@ -1048,15 +1049,15 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                                       body.status_rep.msg);
                 break;
             case DBR_TRADER_LIST_REP:
-                emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_PENDING,
+                emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_WAIT,
                                  body.entity_list_rep.first, body.entity_list_rep.count_);
                 break;
             case DBR_ACCNT_LIST_REP:
-                emplace_rec_list(clnt, DBR_ENTITY_ACCNT, ACCNT_PENDING,
+                emplace_rec_list(clnt, DBR_ENTITY_ACCNT, ACCNT_WAIT,
                                  body.entity_list_rep.first, body.entity_list_rep.count_);
                 break;
             case DBR_CONTR_LIST_REP:
-                emplace_rec_list(clnt, DBR_ENTITY_CONTR, CONTR_PENDING,
+                emplace_rec_list(clnt, DBR_ENTITY_CONTR, CONTR_WAIT,
                                  body.entity_list_rep.first, body.entity_list_rep.count_);
                 break;
             case DBR_ORDER_LIST_REP:
@@ -1079,9 +1080,9 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_VIEW_LIST_REP:
                 apply_views(clnt, body.view_list_rep.first, handler);
-                clnt->flags &= ~SNAP_PENDING;
+                clnt->flags &= ~SNAP_WAIT;
                 // Accept async requests once initialised.
-                if ((clnt->flags & ALL_PENDING) == 0)
+                if ((clnt->flags & ALL_WAIT) == 0)
                     clnt->items[ASOCK].events = ZMQ_POLLIN;
                 break;
             case DBR_EXEC_REP:
@@ -1127,10 +1128,10 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             }
             switch (body.type) {
             case DBR_VIEW_LIST_REP:
-                if (dbr_unlikely(clnt->flags & DELTA_PENDING)) {
+                if (dbr_unlikely(clnt->flags & DELTA_WAIT)) {
                     if (init(clnt, now) < 0)
                         goto fail1;
-                    clnt->flags &= ~DELTA_PENDING;
+                    clnt->flags &= ~DELTA_WAIT;
                 } else
                     apply_views(clnt, body.view_list_rep.first, handler);
                 break;

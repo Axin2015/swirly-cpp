@@ -1,10 +1,10 @@
 @startuml
 
-SYNCING -> OPEN : open()
-SYNCING -> CLOSING : close()
-OPEN -> CLOSING : close()
+SYNC -> OPEN : open()
+SYNC -> CLOSE : close()
+OPEN -> CLOSE : close()
 
-state SYNCING {
+state SYNC {
   [*] --> DELTA_WAIT
 }
 
@@ -14,7 +14,7 @@ state OPEN {
   SNAP_WAIT --> READY
 }
 
-state CLOSING {
+state CLOSE {
   CLOSE_WAIT --> [*]
 }
 
