@@ -1,21 +1,29 @@
 @startuml
 
 interface "ZeroMQ" as ZMQ
+interface HTTP
 
-package Daemon {
+package "Doobry Daemon" {
   [dbr_serv] <<library>>
   database SQLite
 }
 dbr_serv - ZMQ
 
-package GUI {
+package "Desktop Client" {
   [dbr_clnt] <<library>>
 }
 ZMQ <.. [dbr_clnt]
 
-package Script {
+package "Web Server" {
   [dbrpy] <<module>>
 }
 ZMQ <.. [dbrpy]
+
+dbrpy - HTTP
+
+cloud Internet {
+  [Web 2.0 Client]
+}
+HTTP <.. Internet
 
 @enduml
