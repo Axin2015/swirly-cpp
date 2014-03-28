@@ -627,7 +627,7 @@ public:
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.ack_trade(trader_, id, TMOUT);
+            clnt_.ack_trade(trader_, id);
         }
     }
     void
@@ -638,7 +638,7 @@ public:
 
         while (begin != end) {
             const auto id = ltog(ston<int>((*begin++).c_str()));
-            clnt_.cancel(trader_, id, TMOUT);
+            clnt_.cancel(trader_, id);
         }
     }
     void
@@ -726,14 +726,14 @@ public:
         auto it = clnt_.trecs().find(mnem.c_str());
         if (it == clnt_.trecs().end())
             throw InvalidArgument(mnem);
-        clnt_.logon(clnt_.trader(*it), TMOUT);
+        clnt_.logon(clnt_.trader(*it));
     }
     void
     logoff(Arg begin, Arg end)
     {
         if (!trader_)
             throw InvalidState("not logged-on");
-        clnt_.logoff(trader_, TMOUT);
+        clnt_.logoff(trader_);
     }
     void
     orders(Arg begin, Arg end)
@@ -803,7 +803,7 @@ public:
         const auto ticks = ContrRecRef(*crec_).price_to_ticks(price);
 
         clnt_.place(trader_, accnt_, *crec_, settl_date_,
-                    nullptr, action, ticks, lots, 0, TMOUT);
+                    nullptr, action, ticks, lots, 0);
     }
     void
     posns(Arg begin, Arg end)
@@ -843,7 +843,7 @@ public:
     void
     quit(Arg begin, Arg end)
     {
-        clnt_.close(TMOUT);
+        clnt_.close();
     }
     void
     revise(Arg begin, Arg end)
@@ -854,7 +854,7 @@ public:
         const auto id = ltog(ston<int>((*begin++).c_str()));
         const auto lots = ston<DbrLots>((*begin++).c_str());
 
-        clnt_.revise(trader_, id, lots, TMOUT);
+        clnt_.revise(trader_, id, lots);
     }
     void
     set(Arg begin, Arg end)
@@ -1051,7 +1051,7 @@ main(int argc, char* argv[])
         Pool pool(8 * 1024 * 1024);
         // epgm://239.192.1.1:3270
         Clnt clnt(ctx.c_arg(), "test", "tcp://localhost:3270", "tcp://localhost:3271",
-                  dbr_millis(), pool);
+                  dbr_millis(), TMOUT, pool);
         Handler handler(clnt);
         Repl repl;
 
@@ -1112,7 +1112,7 @@ main(int argc, char* argv[])
                     throw PosixError();
                 if (n == 0) {
                     // End-of file.
-                    clnt.close(TMOUT);
+                    clnt.close();
                     break;
                 }
                 try {

@@ -84,7 +84,8 @@ main(int argc, char* argv[])
     try {
         ZmqCtx ctx;
         Pool pool(8 * 1024 * 1024);
-        Clnt clnt(ctx.c_arg(), "test", "tcp://localhost:3270", "tcp://localhost:3271", 1, pool);
+        Clnt clnt(ctx.c_arg(), "test", "tcp://localhost:3270", "tcp://localhost:3271",
+                  1, 5000, pool);
 
         // TODO: more robust logic.
         Handler handler;

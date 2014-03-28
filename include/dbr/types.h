@@ -58,19 +58,58 @@ typedef DbrIncs DbrTicks;
 typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
+    /**
+     * Trader.
+     */
     DBR_ENTITY_TRADER = 1,
+    /**
+     * Account.
+     */
     DBR_ENTITY_ACCNT,
+    /**
+     * Contract.
+     */
     DBR_ENTITY_CONTR,
+    /**
+     * Order.
+     */
     DBR_ENTITY_ORDER,
+    /**
+     * Execution.
+     */
     DBR_ENTITY_EXEC,
+    /**
+     * Membership.
+     */
     DBR_ENTITY_MEMB,
+    /**
+     * Position.
+     */
     DBR_ENTITY_POSN
 };
 
+/** @} */
+
+/**
+ * @addtogroup Bank
+ */
+
 enum DbrReg {
+    /**
+     * Order identifier register index.
+     */
     DBR_REG_ORDER = 0,
+    /**
+     * Execution identifier register index.
+     */
     DBR_REG_EXEC,
+    /**
+     * Match identifier register index.
+     */
     DBR_REG_MATCH,
+    /**
+     * Number of registers in @ref DbrBank file.
+     */
     DBR_REG_LEN
 };
 

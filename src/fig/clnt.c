@@ -85,6 +85,7 @@ struct FigClnt {
     void* trsock;
     void* asock;
     DbrIden id;
+    DbrMillis tmout;
     DbrPool pool;
     unsigned flags;
     struct FigCache cache;
@@ -95,6 +96,8 @@ struct FigClnt {
     struct DbrTree viewups;
     struct DbrPrioq prioq;
     DbrMillis mdlast;
+    // Internal request-id for open or close.
+    DbrIden req_id;
     zmq_pollitem_t items[NSOCK];
 };
 
@@ -194,24 +197,6 @@ get_trader(DbrClnt clnt, DbrIden tid)
     struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
     assert(trec->trader.state);
     return trec->trader.state;
-}
-
-static DbrIden
-init(DbrClnt clnt, DbrMillis now)
-{
-    // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
-        goto fail1;
-
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_OPEN,
-                            .sess_open = { .hbint = TRINT } };
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
-        goto fail1;
-
-    dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT);
-    return body.req_id;
- fail1:
-    return -1;
 }
 
 static void
@@ -454,9 +439,50 @@ async_recv(void* sock, void** val)
     return DBR_TRUE;
 }
 
+static DbrIden
+sess_open(DbrClnt clnt, DbrMillis now)
+{
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+        goto fail1;
+
+    const DbrIden req_id = clnt->id++;
+    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_OPEN,
+                            .sess_open = { .hbint = TRINT } };
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+        goto fail1;
+
+    dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
+    return req_id;
+ fail1:
+    return -1;
+}
+
+static DbrIden
+sess_close(DbrClnt clnt, DbrMillis now)
+{
+    // Reserve so that push cannot fail after send.
+    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+        goto fail1;
+
+    const DbrIden req_id = clnt->id++;
+    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_CLOSE };
+
+    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+        goto fail1;
+
+    dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
+    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
+    return req_id;
+ fail1:
+    return -1;
+}
+
+
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
-                DbrIden seed, DbrPool pool)
+                DbrIden seed, DbrMillis tmout, DbrPool pool)
 {
     // 1.
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
@@ -517,6 +543,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     clnt->trsock = trsock;
     clnt->asock = asock;
     clnt->id = seed;
+    clnt->tmout = tmout;
     clnt->pool = pool;
     clnt->flags = DELTA_WAIT | TRADER_WAIT | ACCNT_WAIT | CONTR_WAIT
         | SNAP_WAIT | TR_DOWN | MD_DOWN;
@@ -533,6 +560,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         goto fail6;
 
     clnt->mdlast = 0;
+    clnt->req_id = 0;
 
     clnt->items[MDSOCK].socket = mdsock;
     clnt->items[MDSOCK].fd = 0;
@@ -605,33 +633,17 @@ dbr_clnt_destroy(DbrClnt clnt)
 }
 
 DBR_API DbrIden
-dbr_clnt_close(DbrClnt clnt, DbrMillis ms)
+dbr_clnt_close(DbrClnt clnt)
 {
-    const DbrIden req_id = clnt->id++;
-    if ((clnt->flags & TR_DOWN)) {
-        clnt->flags |= TR_CLOSED;
-        clnt->flags &= ~ALL_WAIT;
-        goto done;
-    }
-
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
 
-    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_CLOSE };
-
-    // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
-        goto fail1;
-
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
-        goto fail1;
-
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, req_id, now + ms);
-    dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
- done:
+    const DbrIden req_id = sess_close(clnt, now);
+    if (req_id < 0)
+        goto fail1;
     return req_id;
  fail1:
     return -1;
@@ -674,7 +686,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 }
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
+dbr_clnt_logon(DbrClnt clnt, DbrTrader trader)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -694,7 +706,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -702,7 +714,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 }
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
+dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -721,7 +733,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -731,7 +743,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms)
 DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* crec,
                DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-               DbrLots min_lots, DbrMillis ms)
+               DbrLots min_lots)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -761,7 +773,7 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -769,7 +781,7 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms)
+dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -790,7 +802,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, Dbr
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -798,7 +810,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, Dbr
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms)
+dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -819,7 +831,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -827,7 +839,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
+dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -847,7 +859,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -855,7 +867,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms)
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -875,7 +887,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis m
         goto fail1;
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -883,7 +895,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis m
 }
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
+dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id)
 {
     if (clnt->flags != 0) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -905,7 +917,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms)
     fig_trader_remove_trade_id(trader, id);
 
     const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + ms);
+    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
@@ -1022,7 +1034,8 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             switch (body.type) {
             case DBR_SESS_OPEN:
                 clnt->sess.hbint = body.sess_open.hbint;
-                if (!dbr_prioq_push(&clnt->prioq, HBTMR, now + clnt->sess.hbint))
+                if (!dbr_prioq_push(&clnt->prioq, HBTMR, now + clnt->sess.hbint)
+                    || !dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT))
                     goto fail1;
                 break;
             case DBR_SESS_CLOSE:
@@ -1129,7 +1142,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             switch (body.type) {
             case DBR_VIEW_LIST_REP:
                 if (dbr_unlikely(clnt->flags & DELTA_WAIT)) {
-                    if (init(clnt, now) < 0)
+                    if (sess_open(clnt, now) < 0)
                         goto fail1;
                     clnt->flags &= ~DELTA_WAIT;
                 } else
