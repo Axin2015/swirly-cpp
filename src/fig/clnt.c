@@ -66,17 +66,18 @@ enum {
     // init() function is responsible for sending a sesion-open to the server. The is expected to
     // respond by returning the session-open and reference data.
 
+    READY       = 0x00,
     DELTA_WAIT  = 0x01,
-    TRADER_WAIT = 0x02,
-    ACCNT_WAIT  = 0x04,
-    CONTR_WAIT  = 0x08,
-    SNAP_WAIT   = 0x10,
-    TR_CLOSED   = 0x20,
-    TR_DOWN     = 0x40,
-    MD_DOWN     = 0x80,
+    OPEN_WAIT   = 0x02,
+    TRADER_WAIT = 0x04,
+    ACCNT_WAIT  = 0x08,
+    CONTR_WAIT  = 0x10,
+    SNAP_WAIT   = 0x20,
+    CLOSE_WAIT  = 0x40,
+    CLOSED      = 0x80,
 
     REC_WAIT    = TRADER_WAIT | ACCNT_WAIT | CONTR_WAIT,
-    ALL_WAIT    = DELTA_WAIT  | REC_WAIT   | SNAP_WAIT
+    ALL_WAIT    = DELTA_WAIT | OPEN_WAIT | REC_WAIT | SNAP_WAIT
 };
 
 struct FigClnt {
@@ -87,7 +88,7 @@ struct FigClnt {
     DbrIden id;
     DbrMillis tmout;
     DbrPool pool;
-    unsigned flags;
+    unsigned state;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
     struct DbrQueue execs;
@@ -197,16 +198,6 @@ get_trader(DbrClnt clnt, DbrIden tid)
     struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
     assert(trec->trader.state);
     return trec->trader.state;
-}
-
-static void
-emplace_rec_list(DbrClnt clnt, int type, unsigned flag, struct DbrSlNode* first, size_t count)
-{
-    fig_cache_emplace_rec_list(&clnt->cache, type, first, count);
-    clnt->flags &= ~flag;
-    // Accept async requests once initialised.
-    if ((clnt->flags & ALL_WAIT) == 0)
-        clnt->items[ASOCK].events = ZMQ_POLLIN;
 }
 
 static void
@@ -479,7 +470,6 @@ sess_close(DbrClnt clnt, DbrMillis now)
     return -1;
 }
 
-
 DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrMillis tmout, DbrPool pool)
@@ -545,8 +535,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     clnt->id = seed;
     clnt->tmout = tmout;
     clnt->pool = pool;
-    clnt->flags = DELTA_WAIT | TRADER_WAIT | ACCNT_WAIT | CONTR_WAIT
-        | SNAP_WAIT | TR_DOWN | MD_DOWN;
+    clnt->state = DELTA_WAIT;
     // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
@@ -635,11 +624,6 @@ dbr_clnt_destroy(DbrClnt clnt)
 DBR_API DbrIden
 dbr_clnt_close(DbrClnt clnt)
 {
-    if (clnt->flags != 0) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
-        goto fail1;
-    }
-
     const DbrMillis now = dbr_millis();
     const DbrIden req_id = sess_close(clnt, now);
     if (req_id < 0)
@@ -688,7 +672,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 DBR_API DbrIden
 dbr_clnt_logon(DbrClnt clnt, DbrTrader trader)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -716,7 +700,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader)
 DBR_API DbrIden
 dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -745,7 +729,7 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
                DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -783,7 +767,7 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
 DBR_API DbrIden
 dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -812,7 +796,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots)
 DBR_API DbrIden
 dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -841,7 +825,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
 DBR_API DbrIden
 dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -869,7 +853,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id)
 DBR_API DbrIden
 dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -897,7 +881,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref)
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id)
 {
-    if (clnt->flags != 0) {
+    if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
         goto fail1;
     }
@@ -925,15 +909,9 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id)
 }
 
 DBR_API DbrBool
-dbr_clnt_is_open(DbrClnt clnt)
-{
-    return (clnt->flags & TR_CLOSED) == 0;
-}
-
-DBR_API DbrBool
 dbr_clnt_is_ready(DbrClnt clnt)
 {
-    return clnt->flags == 0;
+    return clnt->state == READY;
 }
 
 DBR_API DbrIden
@@ -981,17 +959,11 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             } else if (id == MDTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, MDTMR, key + MDTMOUT);
-                if (!(clnt->flags & MD_DOWN)) {
-                    clnt->flags |= MD_DOWN;
-                    dbr_handler_on_down(handler, DBR_CONN_MD);
-                }
+                // TODO: close
             } else if (id == TRTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
-                if (!(clnt->flags & TR_DOWN)) {
-                    clnt->flags |= TR_DOWN;
-                    dbr_handler_on_down(handler, DBR_CONN_TR);
-                }
+                // TODO: close
             } else {
                 // Assumed that these "top-half" handlers do not block.
                 dbr_handler_on_timeout(handler, id);
@@ -1027,21 +999,18 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
             dbr_prioq_replace(&clnt->prioq, TRTMR, now + TRTMOUT);
 
-            if (body.type != DBR_SESS_CLOSE && (clnt->flags & (TR_CLOSED | TR_DOWN)) == TR_DOWN) {
-                clnt->flags &= ~TR_DOWN;
-                dbr_handler_on_up(handler, DBR_CONN_TR);
-            }
             switch (body.type) {
             case DBR_SESS_OPEN:
                 clnt->sess.hbint = body.sess_open.hbint;
+                clnt->state &= ~OPEN_WAIT;
+                clnt->state |= (REC_WAIT | SNAP_WAIT);
                 if (!dbr_prioq_push(&clnt->prioq, HBTMR, now + clnt->sess.hbint)
                     || !dbr_prioq_push(&clnt->prioq, TRTMR, now + TRTMOUT))
                     goto fail1;
                 break;
             case DBR_SESS_CLOSE:
-                clnt->flags |= (TR_CLOSED | TR_DOWN);
-                clnt->flags &= ~ALL_WAIT;
-                dbr_handler_on_down(handler, DBR_CONN_TR);
+                clnt->state = CLOSED;
+                dbr_handler_on_close(handler);
                 break;
             case DBR_SESS_LOGON:
                 dbr_sess_logon(&clnt->sess, get_trader(clnt, body.sess_logon.tid));
@@ -1062,16 +1031,34 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                                       body.status_rep.msg);
                 break;
             case DBR_TRADER_LIST_REP:
-                emplace_rec_list(clnt, DBR_ENTITY_TRADER, TRADER_WAIT,
-                                 body.entity_list_rep.first, body.entity_list_rep.count_);
+                clnt->state &= ~TRADER_WAIT;
+                fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_TRADER,
+                                           body.entity_list_rep.first, body.entity_list_rep.count_);
+                if (!(clnt->state & ALL_WAIT)) {
+                    // Accept async requests once initialised.
+                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                    dbr_handler_on_ready(handler);
+                }
                 break;
             case DBR_ACCNT_LIST_REP:
-                emplace_rec_list(clnt, DBR_ENTITY_ACCNT, ACCNT_WAIT,
-                                 body.entity_list_rep.first, body.entity_list_rep.count_);
+                clnt->state &= ~ACCNT_WAIT;
+                fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_ACCNT,
+                                           body.entity_list_rep.first, body.entity_list_rep.count_);
+                if (!(clnt->state & ALL_WAIT)) {
+                    // Accept async requests once initialised.
+                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                    dbr_handler_on_ready(handler);
+                }
                 break;
             case DBR_CONTR_LIST_REP:
-                emplace_rec_list(clnt, DBR_ENTITY_CONTR, CONTR_WAIT,
-                                 body.entity_list_rep.first, body.entity_list_rep.count_);
+                clnt->state &= ~CONTR_WAIT;
+                fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_CONTR,
+                                           body.entity_list_rep.first, body.entity_list_rep.count_);
+                if (!(clnt->state & ALL_WAIT)) {
+                    // Accept async requests once initialised.
+                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                    dbr_handler_on_ready(handler);
+                }
                 break;
             case DBR_ORDER_LIST_REP:
                 emplace_order_list(clnt, body.entity_list_rep.first);
@@ -1092,11 +1079,13 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_VIEW_LIST_REP:
+                clnt->state &= ~SNAP_WAIT;
                 apply_views(clnt, body.view_list_rep.first, handler);
-                clnt->flags &= ~SNAP_WAIT;
-                // Accept async requests once initialised.
-                if ((clnt->flags & ALL_WAIT) == 0)
+                if (!(clnt->state & ALL_WAIT)) {
+                    // Accept async requests once initialised.
                     clnt->items[ASOCK].events = ZMQ_POLLIN;
+                    dbr_handler_on_ready(handler);
+                }
                 break;
             case DBR_EXEC_REP:
                 enrich_exec(&clnt->cache, body.exec_rep.exec);
@@ -1135,16 +1124,13 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
             dbr_prioq_replace(&clnt->prioq, MDTMR, now + MDTMOUT);
 
-            if ((clnt->flags & MD_DOWN)) {
-                clnt->flags &= ~MD_DOWN;
-                dbr_handler_on_up(handler, DBR_CONN_MD);
-            }
             switch (body.type) {
             case DBR_VIEW_LIST_REP:
-                if (dbr_unlikely(clnt->flags & DELTA_WAIT)) {
+                if (dbr_unlikely(clnt->state & DELTA_WAIT)) {
                     if (sess_open(clnt, now) < 0)
                         goto fail1;
-                    clnt->flags &= ~DELTA_WAIT;
+                    clnt->state &= ~DELTA_WAIT;
+                    clnt->state |= OPEN_WAIT;
                 } else
                     apply_views(clnt, body.view_list_rep.first, handler);
                 break;

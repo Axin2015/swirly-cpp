@@ -30,14 +30,14 @@ namespace dbr {
 template <class DerivedT>
 class IHandler : public DbrIHandler {
     static void
-    on_up(DbrHandler handler, int conn) noexcept
+    on_close(DbrHandler handler) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_up(conn);
+        static_cast<DerivedT*>(handler)->on_close();
     }
     static void
-    on_down(DbrHandler handler, int conn) noexcept
+    on_ready(DbrHandler handler) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_down(conn);
+        static_cast<DerivedT*>(handler)->on_ready();
     }
     static void
     on_logon(DbrHandler handler, DbrIden tid) noexcept
@@ -88,8 +88,8 @@ class IHandler : public DbrIHandler {
     vtbl() noexcept
     {
         static const DbrHandlerVtbl VTBL = {
-            on_up,
-            on_down,
+            on_close,
+            on_ready,
             on_logon,
             on_logoff,
             on_timeout,
@@ -114,15 +114,15 @@ public:
 };
 
 inline void
-on_up(DbrHandler handler, int conn) noexcept
+on_close(DbrHandler handler) noexcept
 {
-    handler->vtbl->on_up(handler, conn);
+    handler->vtbl->on_close(handler);
 }
 
 inline void
-on_down(DbrHandler handler, int conn) noexcept
+on_ready(DbrHandler handler) noexcept
 {
-    handler->vtbl->on_down(handler, conn);
+    handler->vtbl->on_ready(handler);
 }
 
 inline void

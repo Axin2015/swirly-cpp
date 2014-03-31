@@ -351,10 +351,6 @@ cdef extern from "dbr/accnt.h":
 
 cdef extern from "dbr/handler.h":
 
-    cdef enum DbrConn:
-        DBR_CONN_TR
-        DBR_CONN_MD
-
     ctypedef struct DbrHandlerVtbl
 
     ctypedef struct DbrIHandler:
@@ -364,9 +360,9 @@ cdef extern from "dbr/handler.h":
 
     ctypedef struct DbrHandlerVtbl:
 
-        void on_up(DbrHandler handler, int conn) nogil
+        void on_close(DbrHandler handler) nogil
 
-        void on_down(DbrHandler handler, int conn) nogil
+        void on_ready(DbrHandler handler) nogil
 
         void on_logon(DbrHandler handler, DbrIden tid) nogil
 
@@ -393,14 +389,14 @@ cdef extern from "dbr/clnt.h":
 
     ctypedef FigClnt* DbrClnt
 
-    DbrClnt dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr,
-                            const char* traddr, DbrIden seed, DbrPool pool) nogil
+    DbrClnt dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
+                            DbrIden seed, DbrMillis tmout, DbrPool pool) nogil
 
     void dbr_clnt_destroy(DbrClnt clnt) nogil
 
     DbrRec* dbr_clnt_rec_entry(DbrSlNode* node) nogil
 
-    DbrIden dbr_clnt_close(DbrClnt clnt, DbrMillis ms) nogil
+    DbrIden dbr_clnt_close(DbrClnt clnt) nogil
 
     DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id) nogil
 
@@ -414,26 +410,23 @@ cdef extern from "dbr/clnt.h":
 
     DbrAccnt dbr_clnt_accnt(DbrClnt clnt, DbrRec* arec) nogil
 
-    DbrIden dbr_clnt_logon(DbrClnt clnt, DbrTrader trader, DbrMillis ms) nogil
+    DbrIden dbr_clnt_logon(DbrClnt clnt, DbrTrader trader) nogil
 
-    DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader, DbrMillis ms) nogil
+    DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader) nogil
 
-    DbrIden dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt,
-                           DbrRec* crec, DbrDate settl_date, const char* ref,
-                           int action, DbrTicks ticks, DbrLots lots,
-                           DbrLots min_lots, DbrMillis ms) nogil
+    DbrIden dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, DbrRec* crec,
+                           DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+                           DbrLots lots, DbrLots min_lots) nogil
 
-    DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots, DbrMillis ms) nogil
+    DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots) nogil
 
-    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots, DbrMillis ms) nogil
+    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots) nogil
 
-    DbrIden dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms) nogil
+    DbrIden dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id) nogil
 
-    DbrIden dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrMillis ms) nogil
+    DbrIden dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref) nogil
 
-    DbrIden dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrMillis ms) nogil
-
-    DbrBool dbr_clnt_is_open(DbrClnt clnt) nogil
+    DbrIden dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id) nogil
 
     DbrBool dbr_clnt_is_ready(DbrClnt clnt) nogil
 

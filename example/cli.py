@@ -28,11 +28,11 @@ class RequestHandler(Handler):
         super(RequestHandler, self).__init__()
         self.clnt = clnt
 
-    def on_up(self, conn):
-        print('on_up: {0}'.format(conn))
+    def on_close(self):
+        print('on_close')
 
-    def on_down(self, conn):
-        print('on_down: {0}'.format(conn))
+    def on_ready(self):
+        print('on_ready')
 
     def on_logon(self, tid):
         print('on_logon: {0}'.format(tid))

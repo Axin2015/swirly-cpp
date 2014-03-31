@@ -374,18 +374,18 @@ public:
         cout << endl;
     }
     void
-    on_up(int conn) noexcept
+    on_close() noexcept
     {
         prompt_ = true;
         cout << endl;
-        cout << "conn up: " << conn << endl;
+        cout << "close\n";
     }
     void
-    on_down(int conn) noexcept
+    on_ready() noexcept
     {
         prompt_ = true;
         cout << endl;
-        cout << "conn down: " << conn << endl;
+        cout << "ready\n";
     }
     void
     on_logon(DbrIden tid) noexcept
@@ -1123,7 +1123,7 @@ main(int argc, char* argv[])
                 }
             }
             handler.clear();
-        } while (clnt.is_open());
+        } while (clnt.is_ready());
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

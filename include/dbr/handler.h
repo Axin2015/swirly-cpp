@@ -29,17 +29,6 @@ struct DbrView;
  * @{
  */
 
-enum DbrConn {
-    /**
-     * Trading connection.
-     */
-    DBR_CONN_TR = 1,
-    /**
-     * Market-data connection.
-     */
-    DBR_CONN_MD
-};
-
 typedef struct DbrIHandler {
     const struct DbrHandlerVtbl* vtbl;
 }* DbrHandler;
@@ -52,10 +41,10 @@ typedef struct DbrIHandler {
 struct DbrHandlerVtbl {
 
     void
-    (*on_up)(DbrHandler handler, int conn);
+    (*on_close)(DbrHandler handler);
 
     void
-    (*on_down)(DbrHandler handler, int conn);
+    (*on_ready)(DbrHandler handler);
 
     void
     (*on_logon)(DbrHandler handler, DbrIden tid);
@@ -86,15 +75,15 @@ struct DbrHandlerVtbl {
 };
 
 static inline void
-dbr_handler_on_up(DbrHandler handler, int conn)
+dbr_handler_on_close(DbrHandler handler)
 {
-    handler->vtbl->on_up(handler, conn);
+    handler->vtbl->on_close(handler);
 }
 
 static inline void
-dbr_handler_on_down(DbrHandler handler, int conn)
+dbr_handler_on_ready(DbrHandler handler)
 {
-    handler->vtbl->on_down(handler, conn);
+    handler->vtbl->on_ready(handler);
 }
 
 static inline void

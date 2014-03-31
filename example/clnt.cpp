@@ -30,11 +30,11 @@ using namespace std;
 class Handler : public dbr::IHandler<Handler> {
 public:
     void
-    on_up(int conn) noexcept
+    on_close() noexcept
     {
     }
     void
-    on_down(int conn) noexcept
+    on_ready() noexcept
     {
     }
     void
