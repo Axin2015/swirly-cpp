@@ -29,52 +29,54 @@ class RequestHandler(Handler):
         self.clnt = clnt
 
     def on_close(self):
-        print('on_close')
+        log_info('on_close')
 
     def on_ready(self):
-        print('on_ready')
+        log_info('on_ready')
 
     def on_logon(self, tid):
-        print('on_logon: {0}'.format(tid))
+        log_info('on_logon: {0}'.format(tid))
 
     def on_logoff(self, tid):
-        print('on_logoff: {0}'.format(tid))
+        log_info('on_logoff: {0}'.format(tid))
 
     def on_timeout(self, req_id):
-        print('on_timeout: {0}'.format(req_id))
+        log_info('on_timeout: {0}'.format(req_id))
 
     def on_status(self, req_id, num, msg):
-        print('on_status: {0}: {2} ({1})'.format(req_id, num, msg))
+        log_info('on_status: {0}: {2} ({1})'.format(req_id, num, msg))
 
     def on_exec(self, req_id, exc):
-        print('on_exec: {0}: {1}'.format(req_id, exc))
+        log_info('on_exec: {0}: {1}'.format(req_id, exc))
 
     def on_posn(self, posn):
-        print('on_posn: {0}'.format(posn))
+        log_info('on_posn: {0}'.format(posn))
 
     def on_view(self, view):
-        print('on_view: {0}'.format(view))
+        log_info('on_view: {0}'.format(view))
 
     def on_flush(self):
-        print('on_flush')
+        log_info('on_flush')
 
     def on_async(self, fn):
         ret = None
         try:
             ret = fn(self.clnt)
         except Error as e:
-            print 'error: ' + str(e)
+            log_error('error: ' + str(e))
         return ret
 
 def worker(ctx):
     pool = Pool(8 * 1024 * 1024)
     clnt = Clnt(ctx, SESS, 'tcp://localhost:3270', 'tcp://localhost:3271',
-                millis(), pool)
+                millis(), 1000, pool)
     handler = RequestHandler(clnt)
-    while not clnt.is_ready():
-        clnt.dispatch(TMOUT, handler)
-    while clnt.is_open():
-        clnt.dispatch(TMOUT, handler)
+    while True:
+        try:
+            if not clnt.dispatch(TMOUT, handler):
+                break
+        except Error as e:
+            log_error('error: ' + str(e))
 
 class CloseRequest(object):
     def __call__(self, clnt):
@@ -267,65 +269,65 @@ class AsyncClnt(object):
     def close(self):
         self.async.send(CloseRequest())
         self.async.recv()
-        print('joining')
+        log_info('joining')
         self.thread.join()
 
     def accnts(self):
-        print('accnts')
+        log_info('accnts')
 
     def ack_trades(self, *args):
-        print('ack_trades: ' + ','.join(args))
+        log_info('ack_trades: ' + ','.join(args))
 
     def buy(self, lots, price):
-        print('buy: {0},{1}'.format(lots, price))
+        log_info('buy: {0},{1}'.format(lots, price))
 
     def cancel(self, *args):
-        print('cancel: ' + ','.join(args))
+        log_info('cancel: ' + ','.join(args))
 
     def contrs(self):
-        print('contrs')
+        log_info('contrs')
 
     def echo(self, *args):
-        print('echo: ' + ','.join(args))
+        log_info('echo: ' + ','.join(args))
 
     def env(self):
-        print('env')
+        log_info('env')
 
     def logon(self, tid):
-        print('logon: {0}'.format(tid))
+        log_info('logon: {0}'.format(tid))
 
     def logoff(self):
-        print('logoff')
+        log_info('logoff')
 
     def orders(self):
-        print('orders')
+        log_info('orders')
 
     def posns(self):
-        print('posns')
+        log_info('posns')
 
     def quit(self):
-        print('quit')
+        log_info('quit')
 
     def revise(self, id, lots):
-        print('revise: {0},{1}'.format(id, lots))
+        log_info('revise: {0},{1}'.format(id, lots))
 
     def sell(self, lots, price):
-        print('sell: {0},{1}'.format(lots, price))
+        log_info('sell: {0},{1}'.format(lots, price))
 
     def set(self, name, value):
-        print('set: {0},{1}'.format(name, value))
+        log_info('set: {0},{1}'.format(name, value))
 
     def traders(self):
-        print('traders')
+        log_info('traders')
 
     def trades(self):
-        print('trades')
+        log_info('trades')
 
     def unset(self, name):
-        print('unset: {0}'.format(name))
+        log_info('unset: {0}'.format(name))
 
     def view(self):
-        print('view')
+        log_info('view')
 
 @contextmanager
 def async_clnt():
@@ -333,7 +335,7 @@ def async_clnt():
     try:
         yield ac
     finally:
-        print('closing')
+        log_info('closing')
         ac.close()
 
 if __name__ == '__main__':
@@ -346,6 +348,6 @@ if __name__ == '__main__':
         with async_clnt() as ac:
             parse(lex, ac)
     except KeyboardInterrupt as e:
-        print 'interrupted'
+        log_warn('interrupted')
     except Error as e:
-        print 'error: ' + str(e)
+        log_error('error: ' + str(e))

@@ -929,7 +929,7 @@ dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id)
     dbr_prioq_remove(&clnt->prioq, id);
 }
 
-DBR_API DbrBool
+DBR_API int
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
     assert(ms >= 0);
@@ -958,12 +958,14 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 // Next heartbeat may have already expired.
             } else if (id == MDTMR) {
                 // Cannot fail due to pop.
-                dbr_prioq_push(&clnt->prioq, MDTMR, key + MDTMOUT);
-                // TODO: close
+                dbr_prioq_push(&clnt->prioq, id, key + MDTMOUT);
+                dbr_err_setf(DBR_ETIMEOUT, "market-data socket timeout");
+                goto fail1;
             } else if (id == TRTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
-                // TODO: close
+                dbr_err_setf(DBR_ETIMEOUT, "transaction socket timeout");
+                goto fail1;
             } else {
                 // Assumed that these "top-half" handlers do not block.
                 dbr_handler_on_timeout(handler, id);
@@ -1152,9 +1154,9 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto fail1;
         }
     } while (now < absms);
-    return DBR_TRUE;
+    return !(clnt->state & CLOSED) ? DBR_TRUE : DBR_FALSE;
  fail1:
-    return DBR_FALSE;
+    return -1;
 }
 
 DBR_API void

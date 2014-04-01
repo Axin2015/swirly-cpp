@@ -62,6 +62,36 @@ cdef extern from "dbr/err.h":
 
     const char* dbr_err_msg() nogil
 
+cdef extern from "dbr/log.h":
+
+    cdef enum DbrLog:
+        DBR_LOG_CRIT
+        DBR_LOG_ERROR
+        DBR_LOG_WARN
+        DBR_LOG_NOTICE
+        DBR_LOG_INFO
+        DBR_LOG_DEBUG1
+        DBR_LOG_DEBUG2
+        DBR_LOG_DEBUG3
+
+    void dbr_log_printf(int level, const char* format, ...) nogil
+
+    void dbr_log_crit(const char* format, ...) nogil
+
+    void dbr_log_error(const char* format, ...) nogil
+
+    void dbr_log_warn(const char* format, ...) nogil
+
+    void dbr_log_notice(const char* format, ...) nogil
+
+    void dbr_log_info(const char* format, ...) nogil
+
+    void dbr_log_debug1(const char* format, ...) nogil
+
+    void dbr_log_debug2(const char* format, ...) nogil
+
+    void dbr_log_debug3(const char* format, ...) nogil
+
 cdef extern from "dbr/util.h":
 
     int dbr_intdig(int i) nogil
@@ -434,7 +464,7 @@ cdef extern from "dbr/clnt.h":
 
     void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id) nogil
 
-    DbrBool dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
+    int dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
 
     void dbr_clnt_mdclear(DbrClnt clnt) nogil
 

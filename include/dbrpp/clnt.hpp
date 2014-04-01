@@ -927,11 +927,13 @@ public:
     {
         dbr_clnt_canceltimer(impl_, id);
     }
-    void
+    bool
     dispatch(DbrMillis ms, DbrHandler handler)
     {
-        if (!dbr_clnt_dispatch(impl_, ms, handler))
+        const int ret = dbr_clnt_dispatch(impl_, ms, handler);
+        if (ret < 0)
             throw_exception();
+        return ret == DBR_TRUE;
     }
     void
     clear() noexcept

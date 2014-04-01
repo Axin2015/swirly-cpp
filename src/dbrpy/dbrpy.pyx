@@ -77,6 +77,44 @@ class Error(Exception):
     def __str__(self):
         return "{1}:{2}: {3} ({0})".format(self.num, self.file, self.line, self.msg)
 
+# Log
+
+LOG_CRIT = DBR_LOG_CRIT
+LOG_ERROR = DBR_LOG_ERROR
+LOG_WARN = DBR_LOG_WARN
+LOG_NOTICE = DBR_LOG_NOTICE
+LOG_INFO = DBR_LOG_INFO
+LOG_DEBUG1 = DBR_LOG_DEBUG1
+LOG_DEBUG2 = DBR_LOG_DEBUG2
+LOG_DEBUG3 = DBR_LOG_DEBUG3
+
+def log_printf(int level, const char* msg):
+    dbr_log_printf(level, msg)
+
+def log_crit(const char* msg):
+    dbr_log_crit(msg)
+
+def log_error(const char* msg):
+    dbr_log_error(msg)
+
+def log_warn(const char* msg):
+    dbr_log_warn(msg)
+
+def log_notice(const char* msg):
+    dbr_log_notice(msg)
+
+def log_info(const char* msg):
+    dbr_log_info(msg)
+
+def log_debug1(const char* msg):
+    dbr_log_debug1(msg)
+
+def log_debug2(const char* msg):
+    dbr_log_debug2(msg)
+
+def log_debug3(const char* msg):
+    dbr_log_debug3(msg)
+
 # Util
 
 def millis():
@@ -844,8 +882,9 @@ cdef class Clnt(object):
         cdef DbrBool ret
         with nogil:
             ret = dbr_clnt_dispatch(self.impl_, ms, &handler.impl_.handler)
-        if ret == DBR_FALSE:
+        if ret < 0:
             raise Error()
+        return <bint>ret;
 
     def mdclear(self):
         dbr_clnt_mdclear(self.impl_)

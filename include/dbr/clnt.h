@@ -154,7 +154,7 @@ dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms);
 DBR_API void
 dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id);
 
-DBR_API DbrBool
+DBR_API int
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 DBR_API void
