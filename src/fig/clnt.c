@@ -496,6 +496,8 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
+    const int opt = 0;
+    zmq_setsockopt(mdsock, ZMQ_LINGER, &opt, sizeof(opt));
     zmq_setsockopt(mdsock, ZMQ_SUBSCRIBE, "", 0);
 
     if (zmq_connect(mdsock, mdaddr) < 0) {
@@ -509,6 +511,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
+    zmq_setsockopt(trsock, ZMQ_LINGER, &opt, sizeof(opt));
     zmq_setsockopt(trsock, ZMQ_IDENTITY, sess, strnlen(sess, DBR_MNEM_MAX));
 
     if (zmq_connect(trsock, traddr) < 0) {
@@ -522,6 +525,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;
     }
+    zmq_setsockopt(asock, ZMQ_LINGER, &opt, sizeof(opt));
 
     char aaddr[sizeof("inproc://") + DBR_MNEM_MAX];
     sprintf(aaddr, "inproc://%.16s", sess);

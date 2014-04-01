@@ -41,6 +41,8 @@ dbr_async_create(void* ctx, const char* sess)
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
+    const int opt = 0;
+    zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
 
     // Sizeof string literal includes null terminator.
     char addr[sizeof("inproc://") + DBR_MNEM_MAX];

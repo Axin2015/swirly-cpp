@@ -502,6 +502,7 @@ cdef class Async(object):
 
     def __dealloc__(self):
         if self.impl_ is not NULL:
+            dbr_log_info('destroying async')
             dbr_async_destroy(self.impl_)
 
     def send(self, object val):
@@ -738,6 +739,7 @@ cdef class ZmqCtx(object):
 
     def __dealloc__(self):
         if self.impl_ is not NULL:
+            dbr_log_info('destroying ctx')
             zmq.zmq_ctx_destroy(self.impl_)
 
 # Clnt
@@ -757,6 +759,7 @@ cdef class Clnt(object):
 
     def __dealloc__(self):
         if self.impl_ is not NULL:
+            dbr_log_info('destroying clnt')
             dbr_clnt_destroy(self.impl_)
 
     def close(self):

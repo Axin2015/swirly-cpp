@@ -152,6 +152,8 @@ start_routine(void* arg)
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit2;
     }
+    const int opt = 0;
+    zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
 
     const int hwm = HWM;
     if (dbr_unlikely(zmq_setsockopt(sock, ZMQ_SNDHWM, &hwm, sizeof(int))) < 0) {
@@ -255,6 +257,8 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
+    const int opt = 0;
+    zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
 
     const int hwm = HWM;
     if (dbr_unlikely(zmq_setsockopt(sock, ZMQ_RCVHWM, &hwm, sizeof(int))) < 0) {

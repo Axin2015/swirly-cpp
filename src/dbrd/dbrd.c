@@ -1045,6 +1045,8 @@ main(int argc, char* argv[])
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit5;
     }
+    const int opt = 0;
+    zmq_setsockopt(mdsock, ZMQ_LINGER, &opt, sizeof(opt));
 
     if (zmq_bind(mdsock, "tcp://*:3270") < 0) {
         dbr_err_printf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
@@ -1056,6 +1058,7 @@ main(int argc, char* argv[])
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit6;
     }
+    zmq_setsockopt(trsock, ZMQ_LINGER, &opt, sizeof(opt));
 
     if (zmq_bind(trsock, "tcp://*:3271") < 0) {
         dbr_err_printf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
