@@ -53,7 +53,7 @@ enum {
     HBTMR = -1,
 
     MDTMR = -2,
-    MDINT = 1000,
+    MDINT = 2000,
     MDTMOUT = (MDINT * 3) / 2,
 
     // The transaction heartbeat timer is scheduled when the logon request is sent during
@@ -98,7 +98,8 @@ struct FigClnt {
     struct DbrPrioq prioq;
     DbrMillis mdlast;
     // Internal request-id for open or close.
-    DbrIden req_id;
+    DbrIden close_id;
+    DbrIden open_id;
     zmq_pollitem_t items[NSOCK];
 };
 
@@ -431,15 +432,15 @@ async_recv(void* sock, void** val)
 }
 
 static DbrIden
-sess_open(DbrClnt clnt, DbrMillis now)
+sess_close(DbrClnt clnt, DbrMillis now)
 {
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    const DbrIden req_id = clnt->id++;
-    struct DbrBody body = { .req_id = clnt->id++, .type = DBR_SESS_OPEN,
-                            .sess_open = { .hbint = TRINT } };
+    const DbrIden req_id = clnt->close_id;
+    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_CLOSE };
+
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
@@ -451,15 +452,15 @@ sess_open(DbrClnt clnt, DbrMillis now)
 }
 
 static DbrIden
-sess_close(DbrClnt clnt, DbrMillis now)
+sess_open(DbrClnt clnt, DbrMillis now)
 {
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    const DbrIden req_id = clnt->id++;
-    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_CLOSE };
-
+    const DbrIden req_id = clnt->open_id;
+    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_OPEN,
+                            .sess_open = { .hbint = TRINT } };
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
@@ -549,7 +550,8 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         goto fail6;
 
     clnt->mdlast = 0;
-    clnt->req_id = 0;
+    clnt->close_id = clnt->id++;
+    clnt->open_id = clnt->id++;
 
     clnt->items[MDSOCK].socket = mdsock;
     clnt->items[MDSOCK].fd = 0;
@@ -563,7 +565,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
 
     clnt->items[ASOCK].socket = asock;
     clnt->items[ASOCK].fd = 0;
-    clnt->items[ASOCK].events = 0;
+    clnt->items[ASOCK].events = ZMQ_POLLIN;
     clnt->items[ASOCK].revents = 0;
 
     if (!dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT))
@@ -966,6 +968,10 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
                 dbr_err_setf(DBR_ETIMEOUT, "transaction socket timeout");
                 goto fail1;
+            } else if (id == clnt->close_id) {
+                clnt->state = CLOSED;
+                dbr_handler_on_close(handler);
+                return DBR_FALSE;
             } else {
                 // Assumed that these "top-half" handlers do not block.
                 dbr_handler_on_timeout(handler, id);
@@ -1036,31 +1042,22 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 clnt->state &= ~TRADER_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_TRADER,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
-                if (!(clnt->state & ALL_WAIT)) {
-                    // Accept async requests once initialised.
-                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
-                }
                 break;
             case DBR_ACCNT_LIST_REP:
                 clnt->state &= ~ACCNT_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_ACCNT,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
-                if (!(clnt->state & ALL_WAIT)) {
-                    // Accept async requests once initialised.
-                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
-                }
                 break;
             case DBR_CONTR_LIST_REP:
                 clnt->state &= ~CONTR_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_CONTR,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
-                if (!(clnt->state & ALL_WAIT)) {
-                    // Accept async requests once initialised.
-                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
-                }
                 break;
             case DBR_ORDER_LIST_REP:
                 emplace_order_list(clnt, body.entity_list_rep.first);
@@ -1083,11 +1080,8 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_VIEW_LIST_REP:
                 clnt->state &= ~SNAP_WAIT;
                 apply_views(clnt, body.view_list_rep.first, handler);
-                if (!(clnt->state & ALL_WAIT)) {
-                    // Accept async requests once initialised.
-                    clnt->items[ASOCK].events = ZMQ_POLLIN;
+                if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
-                }
                 break;
             case DBR_EXEC_REP:
                 enrich_exec(&clnt->cache, body.exec_rep.exec);

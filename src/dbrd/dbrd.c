@@ -57,7 +57,7 @@ enum {
     // Non-negative timer ids are reserved for internal use.
 
     MDTMR = -1,
-    MDINT = 1000,
+    MDINT = 2000,
     MDTMOUT = (MDINT * 3) / 2,
 
     TRINT = 5000,

@@ -14,6 +14,7 @@ def parse(lex, obj):
     while True:
         tok = lex.get_token()
         if tok == lex.eof:
+            log_info('end-of-file')
             break
         if tok == ';':
             if len(toks) > 0:
@@ -69,7 +70,7 @@ class RequestHandler(Handler):
 def worker(ctx):
     pool = Pool(8 * 1024 * 1024)
     clnt = Clnt(ctx, SESS, 'tcp://localhost:3270', 'tcp://localhost:3271',
-                millis(), 1000, pool)
+                millis(), TMOUT, pool)
     handler = RequestHandler(clnt)
     while True:
         try:
@@ -80,21 +81,21 @@ def worker(ctx):
 
 class CloseRequest(object):
     def __call__(self, clnt):
-        return clnt.close(TMOUT)
+        return clnt.close()
 
 class LogonRequest(object):
     def __init__(self, mnem):
         self.mnem = mnem
     def __call__(self, clnt):
         trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        return clnt.logon(trec, TMOUT) if trec else -1
+        return clnt.logon(trec) if trec else -1
 
 class LogoffRequest(object):
     def __init__(self, mnem):
         self.mnem = mnem
     def __call__(self, clnt):
         trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        return clnt.logoff(trec, TMOUT) if trec else -1
+        return clnt.logoff(trec) if trec else -1
 
 class TraderRequest(object):
     @staticmethod
@@ -347,6 +348,7 @@ if __name__ == '__main__':
             lex.push_source(open(rcfile, 'r'), rcfile)
         with async_clnt() as ac:
             parse(lex, ac)
+        log_info('exiting')
     except KeyboardInterrupt as e:
         log_warn('interrupted')
     except Error as e:
