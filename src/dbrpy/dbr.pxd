@@ -426,9 +426,11 @@ cdef extern from "dbr/clnt.h":
 
     void dbr_clnt_destroy(DbrClnt clnt) nogil
 
-    DbrRec* dbr_clnt_rec_entry(DbrSlNode* node) nogil
+    void dbr_clnt_reset(DbrClnt clnt) nogil
 
     DbrIden dbr_clnt_close(DbrClnt clnt) nogil
+
+    DbrRec* dbr_clnt_rec_entry(DbrSlNode* node) nogil
 
     DbrSlNode* dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id) nogil
 

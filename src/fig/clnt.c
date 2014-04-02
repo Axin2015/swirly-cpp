@@ -598,16 +598,6 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
 }
 
 DBR_API void
-dbr_clnt_reset(DbrClnt clnt)
-{
-    dbr_clnt_clear(clnt);
-    dbr_prioq_reset(&clnt->prioq);
-    free_views(&clnt->views, clnt->pool);
-    fig_cache_reset(&clnt->cache);
-    dbr_sess_reset(&clnt->sess);
-}
-
-DBR_API void
 dbr_clnt_destroy(DbrClnt clnt)
 {
     if (clnt) {
@@ -630,6 +620,21 @@ dbr_clnt_destroy(DbrClnt clnt)
         // 1.
         free(clnt);
     }
+}
+
+DBR_API void
+dbr_clnt_reset(DbrClnt clnt)
+{
+    dbr_sess_reset(&clnt->sess);
+    clnt->state = DELTA_WAIT;
+    fig_cache_reset(&clnt->cache);
+    fig_ordidx_init(&clnt->ordidx);
+    free_views(&clnt->views, clnt->pool);
+    dbr_clnt_clear(clnt); // viewups, execs and posnups.
+    dbr_prioq_reset(&clnt->prioq);
+    clnt->mdlast = 0;
+    dbr_clnt_clear(clnt);
+    dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT);
 }
 
 DBR_API DbrIden

@@ -769,6 +769,9 @@ cdef class Clnt(object):
             dbr_log_info('destroying clnt')
             dbr_clnt_destroy(self.impl_)
 
+    def reset(self):
+        dbr_clnt_reset(self.impl_)
+
     def close(self):
         cdef DbrIden id = dbr_clnt_close(self.impl_)
         if id < 0:

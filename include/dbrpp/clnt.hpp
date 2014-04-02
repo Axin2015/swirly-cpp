@@ -796,6 +796,11 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
+    void
+    reset() noexcept
+    {
+        dbr_clnt_reset(impl_);
+    }
     DbrIden
     close()
     {
