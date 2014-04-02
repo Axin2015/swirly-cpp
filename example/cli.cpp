@@ -400,6 +400,13 @@ public:
         trader_ = nullptr;
     }
     void
+    on_reset() noexcept
+    {
+        prompt_ = true;
+        cout << endl;
+        cout << "reset\n";
+    }
+    void
     on_timeout(DbrIden req_id) noexcept
     {
         prompt_ = true;

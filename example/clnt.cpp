@@ -46,6 +46,10 @@ public:
     {
     }
     void
+    on_reset() noexcept
+    {
+    }
+    void
     on_timeout(DbrIden req_id) noexcept
     {
     }

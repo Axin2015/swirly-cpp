@@ -647,6 +647,9 @@ cdef void on_logon(DbrHandler handler, DbrIden tid) with gil:
 cdef void on_logoff(DbrHandler handler, DbrIden tid) with gil:
     (<object>handler_target(handler)).on_logoff(tid)
 
+cdef void on_reset(DbrHandler handler) with gil:
+    (<object>handler_target(handler)).on_reset()
+
 cdef void on_timeout(DbrHandler handler, DbrIden req_id) with gil:
     (<object>handler_target(handler)).on_timeout(req_id)
 
@@ -681,6 +684,7 @@ cdef class Handler(object):
         self.vtbl_.on_ready = on_ready
         self.vtbl_.on_logon = on_logon
         self.vtbl_.on_logoff = on_logoff
+        self.vtbl_.on_reset = on_reset
         self.vtbl_.on_timeout = on_timeout
         self.vtbl_.on_status = on_status
         self.vtbl_.on_exec = on_exec
@@ -701,6 +705,9 @@ cdef class Handler(object):
         pass
 
     def on_logoff(self, tid):
+        pass
+
+    def on_reset(self):
         pass
 
     def on_timeout(self, req_id):

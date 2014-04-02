@@ -1,8 +1,9 @@
 @startuml
 
-SYNC -> OPEN : open()
-SYNC -> CLOSE : close()
-OPEN -> CLOSE : close()
+SYNC -> OPEN : open
+SYNC -> CLOSE : close
+OPEN -> SYNC : reset
+OPEN -> CLOSE : close
 
 state SYNC {
   [*] --> DELTA_WAIT

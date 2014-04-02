@@ -41,6 +41,9 @@ class RequestHandler(Handler):
     def on_logoff(self, tid):
         log_info('on_logoff: {0}'.format(tid))
 
+    def on_reset(self):
+        log_info('on_reset')
+
     def on_timeout(self, req_id):
         log_info('on_timeout: {0}'.format(req_id))
 

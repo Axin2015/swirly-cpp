@@ -398,6 +398,8 @@ cdef extern from "dbr/handler.h":
 
         void on_logoff(DbrHandler handler, DbrIden tid) nogil
 
+        void on_reset(DbrHandler handler) nogil
+
         void on_timeout(DbrHandler handler, DbrIden req_id) nogil
 
         void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) nogil
