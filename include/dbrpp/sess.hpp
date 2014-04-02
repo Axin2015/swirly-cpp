@@ -205,10 +205,9 @@ public:
     {
         dbr_sess_term(&impl_);
     }
-    explicit
-    Sess(DbrPool pool) noexcept
+    Sess(const char* mnem, DbrPool pool) noexcept
     {
-        dbr_sess_init(&impl_);
+        dbr_sess_init(&impl_, mnem, pool);
     }
     operator DbrSess&() noexcept
     {

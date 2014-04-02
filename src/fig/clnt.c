@@ -483,12 +483,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     }
 
     // 2.
-    dbr_sess_init(&clnt->sess);
-    strncpy(clnt->sess.mnem, sess, DBR_MNEM_MAX);
-    clnt->sess.pool = pool;
-    clnt->sess.hbint = 0;
-    dbr_tree_init(&clnt->sess.traders);
-    dbr_tree_init(&clnt->sess.subs);
+    dbr_sess_init(&clnt->sess, sess, pool);
 
     // 3.
     void* mdsock = zmq_socket(ctx, ZMQ_SUB);
@@ -600,6 +595,16 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     free(clnt);
  fail1:
     return NULL;
+}
+
+DBR_API void
+dbr_clnt_reset(DbrClnt clnt)
+{
+    dbr_clnt_clear(clnt);
+    dbr_prioq_reset(&clnt->prioq);
+    free_views(&clnt->views, clnt->pool);
+    fig_cache_reset(&clnt->cache);
+    dbr_sess_reset(&clnt->sess);
 }
 
 DBR_API void
@@ -963,11 +968,15 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (id == MDTMR) {
+                if (clnt->state != DELTA_WAIT)
+                    dbr_handler_on_reset(handler);
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + MDTMOUT);
                 dbr_err_setf(DBR_ETIMEOUT, "market-data socket timeout");
                 goto fail1;
             } else if (id == TRTMR) {
+                if (clnt->state != DELTA_WAIT)
+                    dbr_handler_on_reset(handler);
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
                 dbr_err_setf(DBR_ETIMEOUT, "transaction socket timeout");

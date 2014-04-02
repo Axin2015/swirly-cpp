@@ -38,6 +38,12 @@ struct FigOrdIdx {
 DBR_EXTERN void
 fig_ordidx_init(struct FigOrdIdx* ordidx);
 
+static inline void
+fig_ordidx_reset(struct FigOrdIdx* ordidx)
+{
+    fig_ordidx_init(ordidx);
+}
+
 DBR_EXTERN void
 fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order);
 

@@ -159,6 +159,15 @@ fig_cache_term(struct FigCache* cache)
 }
 
 DBR_EXTERN void
+fig_cache_reset(struct FigCache* cache)
+{
+    void (*term_state)(struct DbrRec*) = cache->term_state;
+    DbrPool pool = cache->pool;
+    fig_cache_term(cache);
+    fig_cache_init(cache, term_state, pool);
+}
+
+DBR_EXTERN void
 fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {

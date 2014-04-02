@@ -89,13 +89,7 @@ fig_sessidx_lazy(struct FigSessIdx* sessidx, const char* mnem)
     if (!(sess = dbr_pool_alloc_sess(sessidx->pool)))
         goto done;
 
-    dbr_sess_init(sess);
-    strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
-    sess->pool = sessidx->pool;
-    sess->hbint = 0;
-    dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->traders);
-
+    dbr_sess_init(sess, mnem, sessidx->pool);
     dbr_stack_push(&sessidx->buckets[bucket].mnems, &sess->mnem_node_);
  done:
     return sess;

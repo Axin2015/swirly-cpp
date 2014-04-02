@@ -22,6 +22,8 @@
 
 #include <dbr/err.h>
 
+#include <string.h> // strncpy()
+
 static int
 incref(struct DbrSess* sess, DbrKey key)
 {
@@ -65,6 +67,18 @@ dbr_sess_trader_entry(struct DbrRbNode* node)
 }
 
 DBR_API void
+dbr_sess_init(struct DbrSess* sess, const char* mnem, DbrPool pool)
+{
+    strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
+    sess->pool = pool;
+    sess->hbint = 0;
+    dbr_tree_init(&sess->subs);
+    dbr_tree_init(&sess->traders);
+    sess->marker_ = 0;
+    dbr_slnode_init(&sess->mnem_node_);
+}
+
+DBR_API void
 dbr_sess_term(struct DbrSess* sess)
 {
     struct DbrRbNode* node;
@@ -73,6 +87,19 @@ dbr_sess_term(struct DbrSess* sess)
         dbr_tree_remove(&sess->subs, node);
         dbr_pool_free_sub(sess->pool, sub);
     }
+}
+
+DBR_API void
+dbr_sess_reset(struct DbrSess* sess)
+{
+    DbrMnem mnem;
+    DbrPool pool;
+
+    strncpy(mnem, sess->mnem, DBR_MNEM_MAX);
+    pool = sess->pool;
+
+    dbr_sess_term(sess);
+    dbr_sess_init(sess, mnem, pool);
 }
 
 DBR_API DbrBool

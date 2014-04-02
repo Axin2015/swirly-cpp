@@ -54,6 +54,9 @@ fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPo
 DBR_EXTERN void
 fig_cache_term(struct FigCache* cache);
 
+DBR_EXTERN void
+fig_cache_reset(struct FigCache* cache);
+
 // Transfer ownership to cache.
 
 DBR_EXTERN void

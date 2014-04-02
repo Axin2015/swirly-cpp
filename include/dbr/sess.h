@@ -25,15 +25,14 @@
  * @{
  */
 
-static inline void
-dbr_sess_init(struct DbrSess* sess)
-{
-    sess->marker_ = 0;
-    dbr_slnode_init(&sess->mnem_node_);
-}
+DBR_API void
+dbr_sess_init(struct DbrSess* sess, const char* mnem, DbrPool pool);
 
 DBR_API void
 dbr_sess_term(struct DbrSess* sess);
+
+DBR_API void
+dbr_sess_reset(struct DbrSess* sess);
 
 DBR_API DbrBool
 dbr_sess_logon(struct DbrSess* sess, DbrTrader trader);

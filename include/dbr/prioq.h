@@ -44,6 +44,12 @@ dbr_prioq_term(struct DbrPrioq* pq);
 DBR_API DbrBool
 dbr_prioq_init(struct DbrPrioq* pq);
 
+static inline void
+dbr_prioq_reset(struct DbrPrioq* pq)
+{
+    pq->size = 0;
+}
+
 DBR_API DbrBool
 dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity);
 
