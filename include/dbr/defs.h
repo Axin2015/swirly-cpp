@@ -43,6 +43,14 @@ enum {
     DBR_TRUE
 };
 
+enum {
+    /**
+     * Maximum length of error messages.
+     */
+    DBR_ERRMSG_MAX = 128,
+    DBR_UUID_MAX_ = 36,
+};
+
 /**
  * Boolean logic type.
  */
@@ -56,13 +64,10 @@ typedef long DbrIden;
  * @sa struct RbNode
  */
 typedef long DbrKey;
-
-enum {
-    /**
-     * Maximum length of error messages.
-     */
-    DBR_ERRMSG_MAX = 128
-};
+/**
+ * Universally unique identifier.
+ */
+typedef unsigned char DbrUuid[16];
 
 /**
  * Returns the smallest of a and b. If both are equivalent, a is returned.

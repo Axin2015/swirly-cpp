@@ -26,7 +26,7 @@
  */
 
 DBR_API void
-dbr_sess_init(struct DbrSess* sess, const char* mnem, DbrPool pool);
+dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool);
 
 DBR_API void
 dbr_sess_term(struct DbrSess* sess);

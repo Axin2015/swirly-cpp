@@ -31,10 +31,11 @@
 #include <dbr/sess.h>
 #include <dbr/util.h>
 
-#include <zmq.h>
-
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
+
+#include <uuid/uuid.h>
+#include <zmq.h>
 
 enum {
     MDSOCK,
@@ -431,6 +432,22 @@ async_recv(void* sock, void** val)
     return DBR_TRUE;
 }
 
+static void
+sess_reset(DbrClnt clnt)
+{
+    // This function does not schedule any new timers.
+
+    dbr_sess_reset(&clnt->sess);
+    clnt->state = DELTA_WAIT;
+    fig_cache_reset(&clnt->cache);
+    fig_ordidx_init(&clnt->ordidx);
+    free_views(&clnt->views, clnt->pool);
+    dbr_clnt_clear(clnt); // viewups, execs and posnups.
+    dbr_prioq_reset(&clnt->prioq);
+    clnt->mdlast = 0;
+    dbr_clnt_clear(clnt);
+}
+
 static DbrIden
 sess_close(DbrClnt clnt, DbrMillis now)
 {
@@ -472,7 +489,7 @@ sess_open(DbrClnt clnt, DbrMillis now)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
+dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrMillis tmout, DbrPool pool)
 {
     // 1.
@@ -483,7 +500,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     }
 
     // 2.
-    dbr_sess_init(&clnt->sess, sess, pool);
+    dbr_sess_init(&clnt->sess, uuid, pool);
 
     // 3.
     void* mdsock = zmq_socket(ctx, ZMQ_SUB);
@@ -507,7 +524,7 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
         goto fail3;
     }
     zmq_setsockopt(trsock, ZMQ_LINGER, &opt, sizeof(opt));
-    zmq_setsockopt(trsock, ZMQ_IDENTITY, sess, strnlen(sess, DBR_MNEM_MAX));
+    zmq_setsockopt(trsock, ZMQ_IDENTITY, clnt->sess.uuid, 16);
 
     if (zmq_connect(trsock, traddr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
@@ -522,8 +539,11 @@ dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* tra
     }
     zmq_setsockopt(asock, ZMQ_LINGER, &opt, sizeof(opt));
 
-    char aaddr[sizeof("inproc://") + DBR_MNEM_MAX];
-    sprintf(aaddr, "inproc://%.16s", sess);
+    enum { INPROC_LEN = sizeof("inproc://") - 1 };
+    char aaddr[INPROC_LEN + DBR_UUID_MAX_ + 1];
+    __builtin_memcpy(aaddr, "inproc://", INPROC_LEN);
+    uuid_unparse_lower(clnt->sess.uuid, aaddr + INPROC_LEN);
+
     if (zmq_bind(asock, aaddr) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         goto fail5;
@@ -625,15 +645,8 @@ dbr_clnt_destroy(DbrClnt clnt)
 DBR_API void
 dbr_clnt_reset(DbrClnt clnt)
 {
-    dbr_sess_reset(&clnt->sess);
-    clnt->state = DELTA_WAIT;
-    fig_cache_reset(&clnt->cache);
-    fig_ordidx_init(&clnt->ordidx);
-    free_views(&clnt->views, clnt->pool);
-    dbr_clnt_clear(clnt); // viewups, execs and posnups.
-    dbr_prioq_reset(&clnt->prioq);
-    clnt->mdlast = 0;
-    dbr_clnt_clear(clnt);
+    sess_reset(clnt);
+    // Cannot fail due to prioq reset.
     dbr_prioq_push(&clnt->prioq, MDTMR, dbr_millis() + MDTMOUT);
 }
 
@@ -973,15 +986,19 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (id == MDTMR) {
-                if (clnt->state != DELTA_WAIT)
+                if (clnt->state != DELTA_WAIT) {
+                    sess_reset(clnt);
                     dbr_handler_on_reset(handler);
+                }
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + MDTMOUT);
                 dbr_err_setf(DBR_ETIMEOUT, "market-data socket timeout");
                 goto fail1;
             } else if (id == TRTMR) {
-                if (clnt->state != DELTA_WAIT)
+                if (clnt->state != DELTA_WAIT) {
+                    sess_reset(clnt);
                     dbr_handler_on_reset(handler);
+                }
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + TRTMOUT);
                 dbr_err_setf(DBR_ETIMEOUT, "transaction socket timeout");
@@ -1027,6 +1044,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
             switch (body.type) {
             case DBR_SESS_OPEN:
+                dbr_log_info("open message");
                 clnt->sess.hbint = body.sess_open.hbint;
                 clnt->state &= ~OPEN_WAIT;
                 clnt->state |= (REC_WAIT | SNAP_WAIT);
@@ -1035,14 +1053,17 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_SESS_CLOSE:
+                dbr_log_info("close message");
                 clnt->state = CLOSED;
                 dbr_handler_on_close(handler);
                 break;
             case DBR_SESS_LOGON:
+                dbr_log_info("logon message");
                 dbr_sess_logon(&clnt->sess, get_trader(clnt, body.sess_logon.tid));
                 dbr_handler_on_logon(handler, body.sess_logon.tid);
                 break;
             case DBR_SESS_LOGOFF:
+                dbr_log_info("logoff message");
                 dbr_handler_on_logoff(handler, body.sess_logoff.tid);
                 {
                     DbrTrader trader = get_trader(clnt, body.sess_logoff.tid);
@@ -1053,10 +1074,12 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_SESS_HEARTBT:
                 break;
             case DBR_STATUS_REP:
+                dbr_log_info("status message");
                 dbr_handler_on_status(handler, body.req_id, body.status_rep.num,
                                       body.status_rep.msg);
                 break;
             case DBR_TRADER_LIST_REP:
+                dbr_log_info("trader-list message");
                 clnt->state &= ~TRADER_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_TRADER,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
@@ -1064,6 +1087,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     dbr_handler_on_ready(handler);
                 break;
             case DBR_ACCNT_LIST_REP:
+                dbr_log_info("accnt-list message");
                 clnt->state &= ~ACCNT_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_ACCNT,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
@@ -1071,6 +1095,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     dbr_handler_on_ready(handler);
                 break;
             case DBR_CONTR_LIST_REP:
+                dbr_log_info("contr-list message");
                 clnt->state &= ~CONTR_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_CONTR,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
@@ -1078,30 +1103,40 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     dbr_handler_on_ready(handler);
                 break;
             case DBR_ORDER_LIST_REP:
+                dbr_log_info("order-list message");
                 emplace_order_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_EXEC_LIST_REP:
+                dbr_log_info("exec-list message");
                 emplace_exec_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_MEMB_LIST_REP:
+                dbr_log_info("memb-list message");
                 // This function can fail is there is no memory available for a lazily created
                 // account.
-                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first)))
+                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first))) {
+                    sess_reset(clnt);
                     goto fail1;
+                }
                 break;
             case DBR_POSN_LIST_REP:
+                dbr_log_info("posn-list message");
                 // This function can fail is there is no memory available for a lazily created
                 // account.
-                if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first)))
+                if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first))) {
+                    sess_reset(clnt);
                     goto fail1;
+                }
                 break;
             case DBR_VIEW_LIST_REP:
+                dbr_log_info("view-list message");
                 clnt->state &= ~SNAP_WAIT;
                 apply_views(clnt, body.view_list_rep.first, handler);
                 if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
                 break;
             case DBR_EXEC_REP:
+                dbr_log_info("exec message");
                 enrich_exec(&clnt->cache, body.exec_rep.exec);
                 switch (body.exec_rep.exec->c.state) {
                 case DBR_STATE_NEW:
@@ -1117,6 +1152,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_exec_decref(body.exec_rep.exec, clnt->pool);
                 break;
             case DBR_POSN_REP:
+                dbr_log_info("posn message");
                 enrich_posn(&clnt->cache, body.posn_rep.posn);
                 // This function can fail is there is no memory available for a lazily created
                 // account.
@@ -1269,4 +1305,10 @@ DBR_API DbrBool
 dbr_clnt_empty_viewup(DbrClnt clnt)
 {
     return dbr_tree_empty(&clnt->viewups);
+}
+
+DBR_API const unsigned char*
+dbr_clnt_uuid(DbrClnt clnt)
+{
+    return clnt->sess.uuid;
 }

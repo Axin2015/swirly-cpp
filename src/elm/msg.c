@@ -25,10 +25,10 @@
 #include <dbr/queue.h>
 #include <dbr/refcount.h>
 
-#include <zmq.h>
-
 #include <stdlib.h> // abort()
 #include <string.h>
+
+#include <zmq.h>
 
 static const char STATUS_REP_FORMAT[] = "is";
 static const char PLACE_ORDER_REQ_FORMAT[] = "lllisilll";
@@ -763,10 +763,9 @@ elm_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 }
 
 DBR_EXTERN DbrBool
-elm_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
+elm_send_msg(void* sock, const DbrUuid uuid, struct DbrBody* body, DbrBool enriched)
 {
-    const size_t len = strnlen(sess, DBR_MNEM_MAX);
-    if (zmq_send(sock, sess, len, ZMQ_SNDMORE) != len) {
+    if (zmq_send(sock, uuid, 16, ZMQ_SNDMORE) != 16) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         goto fail1;
     }
@@ -813,14 +812,8 @@ elm_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg)
         dbr_err_setf(num, "zmq_msg_recv() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-    const size_t size = zmq_msg_size(&zmsg);
-    if (size < DBR_MNEM_MAX) {
-        __builtin_memcpy(msg->head.sess, zmq_msg_data(&zmsg), size);
-        msg->head.sess[size] = '\0';
-    } else {
-        assert(size == DBR_MNEM_MAX);
-        __builtin_memcpy(msg->head.sess, zmq_msg_data(&zmsg), DBR_MNEM_MAX);
-    }
+    assert(zmq_msg_size(&zmsg) == 16);
+    __builtin_memcpy(msg->uuid, zmq_msg_data(&zmsg), 16);
     zmq_msg_close(&zmsg);
     return elm_recv_body(sock, pool, &msg->body);
  fail2:
@@ -854,9 +847,9 @@ dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 }
 
 DBR_API DbrBool
-dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched)
+dbr_send_msg(void* sock, const DbrUuid uuid, struct DbrBody* body, DbrBool enriched)
 {
-    return elm_send_msg(sock, sess, body, enriched);
+    return elm_send_msg(sock, uuid, body, enriched);
 }
 
 DBR_API DbrBool

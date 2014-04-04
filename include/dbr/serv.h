@@ -99,7 +99,7 @@ DBR_API struct DbrBook*
 dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date);
 
 DBR_API struct DbrSess*
-dbr_serv_sess(DbrServ serv, const char* mnem);
+dbr_serv_sess(DbrServ serv, const DbrUuid uuid);
 
 /**
  * Place order.

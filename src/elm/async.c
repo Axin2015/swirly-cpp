@@ -20,16 +20,17 @@
 #include <dbr/err.h>
 #include <dbr/types.h>
 
-#include <zmq.h>
-
 #include <stdlib.h> // malloc()
+
+#include <uuid/uuid.h>
+#include <zmq.h>
 
 struct ElmAsync {
     void* sock;
 };
 
 DBR_API DbrAsync
-dbr_async_create(void* ctx, const char* sess)
+dbr_async_create(void* ctx, const DbrUuid uuid)
 {
     DbrAsync async = malloc(sizeof(struct ElmAsync));
     if (dbr_unlikely(!async)) {
@@ -44,9 +45,11 @@ dbr_async_create(void* ctx, const char* sess)
     const int opt = 0;
     zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
 
-    // Sizeof string literal includes null terminator.
-    char addr[sizeof("inproc://") + DBR_MNEM_MAX];
-    sprintf(addr, "inproc://%.16s", sess);
+    enum { INPROC_LEN = sizeof("inproc://") - 1 };
+    char addr[INPROC_LEN + DBR_UUID_MAX_ + 1];
+    __builtin_memcpy(addr, "inproc://", INPROC_LEN);
+    uuid_unparse_lower(uuid, addr + INPROC_LEN);
+
     if (dbr_unlikely(zmq_connect(sock, addr) < 0)) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;

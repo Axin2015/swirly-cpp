@@ -64,10 +64,6 @@ enum {
     DBR_SESS_HEARTBT = DBR_SESS_NOOP
 };
 
-struct DbrHead {
-    DbrMnem sess;
-};
-
 struct DbrBody {
     DbrIden req_id;
 	int type;
@@ -175,7 +171,7 @@ struct DbrBody {
 };
 
 struct DbrMsg {
-    struct DbrHead head;
+    DbrUuid uuid;
     struct DbrBody body;
 };
 
@@ -192,7 +188,7 @@ DBR_API DbrBool
 dbr_send_body(void* sock, struct DbrBody* body, DbrBool enriched);
 
 DBR_API DbrBool
-dbr_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched);
+dbr_send_msg(void* sock, const DbrUuid uuid, struct DbrBody* body, DbrBool enriched);
 
 DBR_API DbrBool
 dbr_recv_body(void* sock, DbrPool pool, struct DbrBody* body);

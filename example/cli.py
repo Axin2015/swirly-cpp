@@ -3,10 +3,10 @@
 from contextlib import contextmanager
 from dbrpy import *
 from threading import Thread
+from uuid import *
 
 import os, shlex, sys
 
-SESS = 'TEST'
 TMOUT = 5000
 
 def parse(lex, obj):
@@ -70,9 +70,9 @@ class RequestHandler(Handler):
             log_error('error: ' + str(e))
         return ret
 
-def worker(ctx):
+def worker(ctx, uuid):
     pool = Pool(8 * 1024 * 1024)
-    clnt = Clnt(ctx, SESS, 'tcp://localhost:3270', 'tcp://localhost:3271',
+    clnt = Clnt(ctx, uuid, 'tcp://localhost:3270', 'tcp://localhost:3271',
                 millis(), TMOUT, pool)
     handler = RequestHandler(clnt)
     while True:
@@ -265,10 +265,12 @@ class ViewRequest(object):
 
 class AsyncClnt(object):
     def __init__(self):
+        uuid = uuid1()
+        log_info('uuid: {0}'.format(uuid))
         self.ctx = ZmqCtx()
-        self.thread = Thread(target = worker, args = (self.ctx,))
+        self.thread = Thread(target = worker, args = (self.ctx, uuid))
         self.thread.start()
-        self.async = Async(self.ctx, SESS)
+        self.async = Async(self.ctx, uuid)
 
     def close(self):
         self.async.send(CloseRequest())

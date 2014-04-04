@@ -36,8 +36,6 @@
 #include <dbr/util.h>
 #include <dbr/zmqjourn.h>
 
-#include <zmq.h>
-
 #include <assert.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -46,6 +44,9 @@
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h> // getopt()
+
+#include <uuid/uuid.h>
+#include <zmq.h>
 
 enum {
     TRSOCK
@@ -160,7 +161,7 @@ static DbrBool
 send_exec(struct DbrSess* sess, DbrIden req_id, struct DbrExec* exec)
 {
     struct DbrBody rep = { .req_id = req_id, .type = DBR_EXEC_REP, .exec_rep.exec = exec };
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -188,7 +189,7 @@ flush_posnup(struct DbrPosn* posn)
         // Set marker to record that position update has been sent on this session.
         other->marker_ = marker;
 
-        if (zmq_send(trsock, trader, strnlen(other->mnem, DBR_MNEM_MAX), ZMQ_SNDMORE) < 0) {
+        if (zmq_send(trsock, other->uuid, 16, ZMQ_SNDMORE) < 0) {
             dbr_err_printf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
             goto fail1;
         }
@@ -287,7 +288,7 @@ sess_trader(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_TRADER_LIST_REP;
     rep.entity_list_rep.first = first;
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -303,7 +304,7 @@ sess_accnt(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_ACCNT_LIST_REP;
     rep.entity_list_rep.first = first;
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -319,7 +320,7 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
     rep.req_id = req_id;
     rep.type = DBR_CONTR_LIST_REP;
     rep.entity_list_rep.first = first;
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -346,7 +347,7 @@ sess_book(struct DbrSess* sess, DbrIden req_id, DbrMillis now)
     rep.req_id = req_id;
     rep.type = DBR_VIEW_LIST_REP;
     rep.view_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     free_view_list(q.first);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
@@ -371,7 +372,7 @@ sess_order(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_ORDER_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -392,7 +393,7 @@ sess_exec(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_EXEC_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -413,7 +414,7 @@ sess_memb(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_MEMB_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
@@ -451,12 +452,12 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     rep.req_id = req_id;
     rep.type = DBR_POSN_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_TRUE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -473,7 +474,7 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
     const DbrIden req_id = req->req_id;
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_OPEN,
                            .sess_open = { .hbint = TRINT } };
-    return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE)
+    return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
         && sess_trader(sess, 0)
         && sess_accnt(sess, 0)
         && sess_contr(sess, 0)
@@ -497,7 +498,7 @@ sess_close(struct DbrSess* sess, DbrIden req_id)
         // TODO: implicit logoff?
     }
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_CLOSE };
-    return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
+    return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE);
 }
 
 static DbrBool
@@ -516,13 +517,13 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGON;
     rep.sess_logon.tid = tid;
-    return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE)
+    return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
         && sess_order(sess, 0, trader)
         && sess_exec(sess, 0, trader)
         && sess_memb(sess, 0, trader)
         && sess_posn(sess, 0, trader);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -544,9 +545,9 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGOFF;
     rep.sess_logoff.tid = tid;
-    return dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
+    return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -600,7 +601,7 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
     }
     return trflush(sess, req);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -627,7 +628,7 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
     }
     return trflush(sess, req);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -654,7 +655,7 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     }
     return trflush(sess, req);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -680,7 +681,7 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
     }
     return trflush(sess, req);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -706,7 +707,7 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     }
     return trflush(sess, req);
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -734,12 +735,12 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
     rep.type = DBR_STATUS_REP;
     rep.status_rep.num = 0;
     rep.status_rep.msg[0] = '\0';
-    const DbrBool ok = dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE);
     if (!ok)
         dbr_err_perror("dbr_send_msg() failed");
     return ok;
  fail1:
-    if (!dbr_send_msg(trsock, sess->mnem, &rep, DBR_FALSE))
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
@@ -828,6 +829,7 @@ run(struct Config* config)
             }
         }
 
+        char buf[DBR_UUID_MAX_ + 1];
         DbrMillis ms = -1;
         const struct DbrElem* elem;
         while ((elem = dbr_prioq_top(&prioq))) {
@@ -848,15 +850,17 @@ run(struct Config* config)
                 // Next heartbeat may have already expired.
             } else if (is_hbtmr(id)) {
                 struct DbrSess* sess = hbtmr_to_sess(id);
-                dbr_log_info("session heartbeat to '%.16s'", sess->mnem);
+                uuid_unparse_lower(sess->uuid, buf);
+                dbr_log_info("session heartbeat to '%.36s'", buf);
                 dbr_prioq_push(&prioq, id, key + sess->hbint);
                 struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
-                if (!dbr_send_msg(trsock, sess->mnem, &body, DBR_FALSE))
+                if (!dbr_send_msg(trsock, sess->uuid, &body, DBR_FALSE))
                     goto fail1;
             } else {
                 assert(id & 0x1);
                 struct DbrSess* sess = trtmr_to_sess(id);
-                dbr_log_info("session timeout on '%.16s'", sess->mnem);
+                uuid_unparse_lower(sess->uuid, buf);
+                dbr_log_info("session timeout on '%.36s'", buf);
                 sess_close(sess, 0);
             }
         }
@@ -880,63 +884,65 @@ run(struct Config* config)
                 goto fail1;
             }
             struct DbrBody rep;
-            struct DbrSess* sess = dbr_serv_sess(serv, req.head.sess);
+            struct DbrSess* sess = dbr_serv_sess(serv, req.uuid);
             if (!sess) {
                 status_err(&rep, req.body.req_id);
-                if (!dbr_send_msg(trsock, req.head.sess, &rep, DBR_FALSE))
+                if (!dbr_send_msg(trsock, req.uuid, &rep, DBR_FALSE))
                     dbr_err_perror("dbr_send_msg() failed");
                 continue;
             }
+            uuid_unparse_lower(req.uuid, buf);
             switch (req.body.type) {
             case DBR_SESS_OPEN:
-                dbr_log_info("session open from '%.16s'", req.head.sess);
+                dbr_log_info("session open from '%.36s'", buf);
                 sess_open(sess, &req.body, now);
                 break;
             case DBR_SESS_CLOSE:
-                dbr_log_info("session close from '%.16s'", req.head.sess);
+                uuid_unparse_lower(sess->uuid, buf);
+                dbr_log_info("session close from '%.36s'", buf);
                 sess_close(sess, req.body.req_id);
                 break;
             case DBR_SESS_LOGON:
-                dbr_log_info("session logon from '%.16s'", req.head.sess);
+                dbr_log_info("session logon from '%.36s'", buf);
                 sess_logon(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_SESS_LOGOFF:
-                dbr_log_info("session logoff '%.16s'", req.head.sess);
+                dbr_log_info("session logoff '%.36s'", buf);
                 sess_logoff(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_SESS_HEARTBT:
-                dbr_log_info("session heartbeat from '%.16s'", req.head.sess);
+                dbr_log_info("session heartbeat from '%.36s'", buf);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_PLACE_ORDER_REQ:
-                dbr_log_info("place order request from '%.16s'", req.head.sess);
+                dbr_log_info("place order request from '%.36s'", buf);
                 place_order(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_REVISE_ORDER_ID_REQ:
-                dbr_log_info("revise order by id request from '%.16s'", req.head.sess);
+                dbr_log_info("revise order by id request from '%.36s'", buf);
                 revise_order_id(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_REVISE_ORDER_REF_REQ:
-                dbr_log_info("revise order by ref request from '%.16s'", req.head.sess);
+                dbr_log_info("revise order by ref request from '%.36s'", buf);
                 revise_order_ref(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_CANCEL_ORDER_ID_REQ:
-                dbr_log_info("cancel order by id request from '%.16s'", req.head.sess);
+                dbr_log_info("cancel order by id request from '%.36s'", buf);
                 cancel_order_id(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_CANCEL_ORDER_REF_REQ:
-                dbr_log_info("cancel order by ref request from '%.16s'", req.head.sess);
+                dbr_log_info("cancel order by ref request from '%.36s'", buf);
                 cancel_order_ref(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_ACK_TRADE_REQ:
-                dbr_log_info("acknowledge trade request from '%.16s'", req.head.sess);
+                dbr_log_info("acknowledge trade request from '%.36s'", buf);
                 ack_trade(sess, &req.body);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;

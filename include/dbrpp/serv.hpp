@@ -854,9 +854,9 @@ public:
         return BookRef{*book};
     }
     SessRef
-    sess(const char* mnem) const
+    sess(const DbrUuid uuid) const
     {
-        DbrSess* const sess = dbr_serv_sess(impl_, mnem);
+        DbrSess* const sess = dbr_serv_sess(impl_, uuid);
         if (!sess)
             throw_exception();
         return SessRef{*sess};

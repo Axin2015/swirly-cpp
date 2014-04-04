@@ -4,12 +4,13 @@ cdef extern from "dbr/defs.h":
         DBR_FALSE
         DBR_TRUE
 
+    cdef enum:
+        DBR_ERRMSG_MAX
+
     ctypedef int DbrBool
     ctypedef long DbrIden
     ctypedef long DbrKey
-
-    cdef enum:
-        DBR_ERRMSG_MAX
+    ctypedef unsigned char DbrUuid[16]
 
 cdef extern from "dbr/rbnode.h":
 
@@ -309,7 +310,7 @@ cdef extern from "dbr/async.h":
 
     ctypedef ElmAsync* DbrAsync
 
-    DbrAsync dbr_async_create(void* ctx, const char* sess) nogil
+    DbrAsync dbr_async_create(void* ctx, const DbrUuid uuid) nogil
 
     void dbr_async_destroy(DbrAsync async) nogil
 
@@ -421,8 +422,9 @@ cdef extern from "dbr/clnt.h":
 
     ctypedef FigClnt* DbrClnt
 
-    DbrClnt dbr_clnt_create(void* ctx, const char* sess, const char* mdaddr, const char* traddr,
-                            DbrIden seed, DbrMillis tmout, DbrPool pool) nogil
+    DbrClnt dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr,
+                            const char* traddr, DbrIden seed, DbrMillis tmout,
+                            DbrPool pool) nogil
 
     void dbr_clnt_destroy(DbrClnt clnt) nogil
 
@@ -485,3 +487,5 @@ cdef extern from "dbr/clnt.h":
     DbrRbNode* dbr_clnt_last_view(DbrClnt clnt) nogil
 
     DbrBool dbr_clnt_empty_view(DbrClnt clnt) nogil
+
+    const unsigned char* dbr_clnt_uuid(DbrClnt clnt) nogil

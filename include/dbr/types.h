@@ -685,7 +685,7 @@ dbr_sess_sub_entry(struct DbrRbNode* node)
 }
 
 struct DbrSess {
-    DbrMnem mnem;
+    DbrUuid uuid;
     DbrPool pool;
     /**
      * The heartbeat interval requested by remote side.
@@ -698,7 +698,7 @@ struct DbrSess {
      */
     long marker_;
     // FigSessIdx bucket list.
-    struct DbrSlNode mnem_node_;
+    struct DbrSlNode uuid_node_;
 };
 
 /** @} */

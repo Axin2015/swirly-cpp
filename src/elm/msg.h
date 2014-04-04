@@ -33,7 +33,7 @@ DBR_EXTERN DbrBool
 elm_send_body(void* sock, struct DbrBody* body, DbrBool enriched);
 
 DBR_EXTERN DbrBool
-elm_send_msg(void* sock, const char* sess, struct DbrBody* body, DbrBool enriched);
+elm_send_msg(void* sock, const DbrUuid uuid, struct DbrBody* body, DbrBool enriched);
 
 DBR_EXTERN DbrBool
 elm_recv_body(void* sock, DbrPool pool, struct DbrBody* body);

@@ -31,7 +31,7 @@ struct DbrSess;
 struct FigSessIdx {
     DbrPool pool;
     struct {
-        struct DbrStack mnems;
+        struct DbrStack uuids;
     } buckets[FIG_SESSIDX_BUCKETS];
 };
 
@@ -42,6 +42,6 @@ DBR_EXTERN void
 fig_sessidx_term(struct FigSessIdx* sessidx);
 
 DBR_EXTERN struct DbrSess*
-fig_sessidx_lazy(struct FigSessIdx* sessidx, const char* mnem);
+fig_sessidx_lazy(struct FigSessIdx* sessidx, const DbrUuid uuid);
 
 #endif // FIG_SESSIDX_H

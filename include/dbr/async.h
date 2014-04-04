@@ -28,7 +28,7 @@
 typedef struct ElmAsync* DbrAsync;
 
 DBR_API DbrAsync
-dbr_async_create(void* ctx, const char* sess);
+dbr_async_create(void* ctx, const DbrUuid uuid);
 
 DBR_API void
 dbr_async_destroy(DbrAsync async);

@@ -21,6 +21,7 @@
 #include <dbrpp/except.hpp>
 
 #include <assert.h>
+
 #include <zmq.h>
 
 namespace dbr {

@@ -28,6 +28,8 @@
 #include <iostream>
 #include <limits>
 
+#include <uuid/uuid.h>
+
 namespace dbr {
 
 /**
@@ -205,9 +207,9 @@ public:
     {
         dbr_sess_term(&impl_);
     }
-    Sess(const char* mnem, DbrPool pool) noexcept
+    Sess(const DbrUuid uuid, DbrPool pool) noexcept
     {
-        dbr_sess_init(&impl_, mnem, pool);
+        dbr_sess_init(&impl_, uuid, pool);
     }
     operator DbrSess&() noexcept
     {
@@ -226,10 +228,10 @@ public:
     Sess&
     operator =(const Sess&) = delete;
 
-    Mnem
-    mnem() const noexcept
+    const unsigned char*
+    uuid() const noexcept
     {
-        return Mnem{impl_.mnem};
+        return impl_.uuid;
     }
     /**
      * @addtogroup SessTrader
@@ -246,7 +248,7 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, const Sess& sess)
 {
-    return os << "mnem=" << sess.mnem();
+    return os << "uuid=" << sess.uuid();
 }
 
 class SessRef {
@@ -266,10 +268,10 @@ public:
     {
         return impl_;
     }
-    Mnem
-    mnem() const noexcept
+    const unsigned char*
+    uuid() const noexcept
     {
-        return Mnem{impl_->mnem};
+        return impl_->uuid;
     }
     DbrBool
     logon(DbrTrader trader)
@@ -301,7 +303,9 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, SessRef sess)
 {
-    return os << "mnem=" << sess.mnem();
+    char buf[DBR_UUID_MAX_ + 1];
+    uuid_unparse_lower(sess.uuid(), buf);
+    return os << "uuid=" << buf;
 }
 
 /** @} */

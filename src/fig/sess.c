@@ -24,6 +24,8 @@
 
 #include <string.h> // strncpy()
 
+#include <uuid/uuid.h>
+
 static int
 incref(struct DbrSess* sess, DbrKey key)
 {
@@ -67,15 +69,18 @@ dbr_sess_trader_entry(struct DbrRbNode* node)
 }
 
 DBR_API void
-dbr_sess_init(struct DbrSess* sess, const char* mnem, DbrPool pool)
+dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
 {
-    strncpy(sess->mnem, mnem, DBR_MNEM_MAX);
+    if (uuid)
+        uuid_copy(sess->uuid, uuid);
+    else
+        uuid_generate(sess->uuid);
     sess->pool = pool;
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
     dbr_tree_init(&sess->traders);
     sess->marker_ = 0;
-    dbr_slnode_init(&sess->mnem_node_);
+    dbr_slnode_init(&sess->uuid_node_);
 }
 
 DBR_API void
@@ -92,14 +97,11 @@ dbr_sess_term(struct DbrSess* sess)
 DBR_API void
 dbr_sess_reset(struct DbrSess* sess)
 {
-    DbrMnem mnem;
-    DbrPool pool;
-
-    strncpy(mnem, sess->mnem, DBR_MNEM_MAX);
-    pool = sess->pool;
-
-    dbr_sess_term(sess);
-    dbr_sess_init(sess, mnem, pool);
+    sess->hbint = 0;
+    dbr_tree_init(&sess->subs);
+    dbr_tree_init(&sess->traders);
+    sess->marker_ = 0;
+    dbr_slnode_init(&sess->uuid_node_);
 }
 
 DBR_API DbrBool

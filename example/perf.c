@@ -27,9 +27,10 @@
 #include <dbr/util.h>
 #include <dbr/zmqjourn.h>
 
-#include <zmq.h>
-
 #include <stdlib.h>
+
+#include <uuid/uuid.h>
+#include <zmq.h>
 
 static void* ctx = NULL;
 static DbrJourn journ = NULL;
@@ -110,7 +111,9 @@ run(void)
     if (dbr_unlikely(!book))
         goto fail1;
 
-    struct DbrSess* sess = dbr_serv_sess(serv, "TEST");
+    DbrUuid uuid;
+    uuid_generate(uuid);
+    struct DbrSess* sess = dbr_serv_sess(serv, uuid);
     if (dbr_unlikely(!sess))
         goto fail1;
 
