@@ -66,6 +66,8 @@ Assuming that you have write access to the default installation path:
 
 See CMake Options for more information.
 
+### Tutorial ###
+
 [GCC]: http://gcc.gnu.org/
 [Clang]: http://clang.llvm.org/
 [CMake]: http://www.cmake.org/
@@ -74,5 +76,3 @@ See CMake Options for more information.
 [Ragel]: http://www.complang.org/ragel/
 [SQLite]: http://sqlite.org/
 [ZeroMQ]: http://zeromq.org/
-
-### Tutorial ###
