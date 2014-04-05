@@ -25,6 +25,7 @@ To build Doobry from source, you will need:
 - [GCC] or [Clang] - with support for C11;
 - [CMake] - for Makefile generation;
 - [Cython] - for generating the [Python] module;
+- [LibUuid] - for session identifiers;
 - [Ragel] - if you intend to change `ragel.rl`;
 - [SQLite] - for database management;
 - [ZeroMQ] - for messaging.
