@@ -46,7 +46,7 @@ dbr_async_create(void* ctx, const DbrUuid uuid)
     zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
 
     enum { INPROC_LEN = sizeof("inproc://") - 1 };
-    char addr[INPROC_LEN + DBR_UUID_MAX_ + 1];
+    char addr[INPROC_LEN + DBR_UUID_MAX + 1];
     __builtin_memcpy(addr, "inproc://", INPROC_LEN);
     uuid_unparse_lower(uuid, addr + INPROC_LEN);
 

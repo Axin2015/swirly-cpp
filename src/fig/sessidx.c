@@ -44,14 +44,14 @@ free_sess_list(struct DbrSlNode* node, DbrPool pool)
 static inline DbrBool
 equal_uuid(const struct DbrSess* sess, const DbrUuid uuid)
 {
-    return memcmp(sess->uuid, uuid, DBR_UUID_MAX_) == 0;
+    return __builtin_memcmp(sess->uuid, uuid, 16) == 0;
 }
 
 static inline size_t
 hash_uuid(const DbrUuid uuid)
 {
     size_t h = 0;
-    for (int i = 0; i < DBR_UUID_MAX_; ++uuid, ++i)
+    for (int i = 0; i < 16; ++uuid, ++i)
         h = 31 * h + *uuid;
     return h;
 }

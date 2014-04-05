@@ -540,7 +540,7 @@ dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* t
     zmq_setsockopt(asock, ZMQ_LINGER, &opt, sizeof(opt));
 
     enum { INPROC_LEN = sizeof("inproc://") - 1 };
-    char aaddr[INPROC_LEN + DBR_UUID_MAX_ + 1];
+    char aaddr[INPROC_LEN + DBR_UUID_MAX + 1];
     __builtin_memcpy(aaddr, "inproc://", INPROC_LEN);
     uuid_unparse_lower(clnt->sess.uuid, aaddr + INPROC_LEN);
 

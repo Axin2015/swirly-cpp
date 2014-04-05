@@ -829,7 +829,7 @@ run(struct Config* config)
             }
         }
 
-        char buf[DBR_UUID_MAX_ + 1];
+        char buf[DBR_UUID_MAX + 1];
         DbrMillis ms = -1;
         const struct DbrElem* elem;
         while ((elem = dbr_prioq_top(&prioq))) {

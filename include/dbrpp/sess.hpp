@@ -303,7 +303,7 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, SessRef sess)
 {
-    char buf[DBR_UUID_MAX_ + 1];
+    char buf[DBR_UUID_MAX + 1];
     uuid_unparse_lower(sess.uuid(), buf);
     return os << "uuid=" << buf;
 }
