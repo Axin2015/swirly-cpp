@@ -70,6 +70,7 @@ See CMake Options for more information.
 [Clang]: http://clang.llvm.org/
 [CMake]: http://www.cmake.org/
 [Cython]: http://cython.org/
+[LibUuid]: http://linux.die.net/man/3/libuuid
 [Ragel]: http://www.complang.org/ragel/
 [SQLite]: http://sqlite.org/
 [ZeroMQ]: http://zeromq.org/
