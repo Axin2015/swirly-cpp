@@ -48,6 +48,10 @@ enum {
      * Maximum length of error messages.
      */
     DBR_ERRMSG_MAX = 128,
+    /**
+     * Maximum length of log messages.
+     */
+    DBR_LOGMSG_MAX = 512,
     DBR_UUID_MAX = 36,
 };
 

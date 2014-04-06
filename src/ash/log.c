@@ -58,7 +58,7 @@ dbr_log_setlogger(DbrLogger new_logger)
 }
 
 DBR_API void
-dbr_log_stdio(int level, const char* format, va_list args)
+dbr_log_stdio(int level, const char* msg)
 {
     const long ms = dbr_millis();
     const time_t now = ms / 1000;
@@ -70,16 +70,12 @@ dbr_log_stdio(int level, const char* format, va_list args)
     strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &tm);
 
     FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
-    flockfile(stream);
-    fprintf(stream, "%s.%03d %-6s [%d]: ", buf, (int)(ms % 1000), dbr_log_label(level),
-            (int)getpid());
-    vfprintf(stream, format, args);
-    fputc('\n', stream);
-    funlockfile(stream);
+    fprintf(stream, "%s.%03d %-6s [%d]: %s\n", buf, (int)(ms % 1000), dbr_log_label(level),
+            (int)getpid(), msg);
 }
 
 DBR_API void
-dbr_log_syslog(int level, const char* format, va_list args)
+dbr_log_syslog(int level, const char* msg)
 {
     int priority;
     switch (level) {
@@ -101,7 +97,7 @@ dbr_log_syslog(int level, const char* format, va_list args)
     default:
         priority = LOG_DEBUG;
     }
-    vsyslog(priority, format, args);
+    syslog(priority, "%s", msg);
 }
 
 DBR_API void
@@ -109,12 +105,16 @@ dbr_log_printf(int level, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    logger(level, format, args);
+    char msg[DBR_LOGMSG_MAX + 1];
+    vsnprintf(msg, sizeof(msg), format, args);
+    logger(level, msg);
     va_end(args);
 }
 
 DBR_API void
 dbr_log_vprintf(int level, const char* format, va_list args)
 {
-    logger(level, format, args);
+    char msg[DBR_LOGMSG_MAX + 1];
+    vsnprintf(msg, sizeof(msg), format, args);
+    logger(level, msg);
 }
