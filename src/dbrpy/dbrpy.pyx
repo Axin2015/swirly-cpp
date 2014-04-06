@@ -519,7 +519,14 @@ cdef class Async(object):
     def recv(self):
         cdef object val = async_recv(self.impl_)
         Py_DECREF(val)
+        # Re-raise exceptions on asynchronous thread.
+        if isinstance(val, Exception):
+            raise val
         return val
+
+    def sendAndRecv(self, object val):
+        self.send(val)
+        return self.recv()
 
 # Trader
 
