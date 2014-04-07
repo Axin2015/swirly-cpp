@@ -215,17 +215,44 @@ class OrderRequest(object):
                   for order in trader.list_order()]
         return orders
 
-class ExecRequest(object):
+class TradeRequest(object):
+    @staticmethod
+    def to_dict(exc):
+        return {
+            'id': exc.id
+        }
     def __init__(self, mnem):
         self.mnem = mnem
     def __call__(self, clnt):
-        return []
+        trades = []
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        if not trec:
+            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
+            raise Error()
+        trader = clnt.trader(trec)
+        trades = [ExecRequest.to_dict(exc)
+                  for exc in trader.list_trade()]
+        return trades
 
 class MembRequest(object):
+    @staticmethod
+    def to_dict(memb):
+        return {
+            'tid': memb.tid,
+            'aid': memb.aid
+        }
     def __init__(self, mnem):
         self.mnem = mnem
     def __call__(self, clnt):
-        return []
+        membs = []
+        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
+        if not trec:
+            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
+            raise Error()
+        trader = clnt.trader(trec)
+        membs = [MembRequest.to_dict(memb)
+                 for memb in trader.list_memb()]
+        return membs
 
 class PosnRequest(object):
     def __init__(self, mnem):
@@ -307,17 +334,41 @@ class AsyncClnt(object):
     def contrs(self, *mnems):
         print(self.async.sendAndRecv(ContrRequest(*mnems)))
 
+    def logon(self, mnem):
+        self.async.sendAndRecv(LogonRequest(mnem))
+
+    def logoff(self, mnem):
+        self.async.sendAndRecv(LogoffRequest(mnem))
+
     def orders(self, mnem):
         print(self.async.sendAndRecv(OrderRequest(mnem)))
 
-    def ack_trades(self, *args):
-        log_info('ack_trades: ' + ','.join(args))
+    def trades(self, mnem):
+        print(self.async.sendAndRecv(TradeRequest(mnem)))
+
+    def membs(self, mnem):
+        print(self.async.sendAndRecv(MembRequest(mnem)))
+
+    def posns(self):
+        log_info('posns')
+
+    def view(self):
+        log_info('view')
 
     def buy(self, lots, price):
         log_info('buy: {0},{1}'.format(lots, price))
 
+    def sell(self, lots, price):
+        log_info('sell: {0},{1}'.format(lots, price))
+
+    def revise(self, id, lots):
+        log_info('revise: {0},{1}'.format(id, lots))
+
     def cancel(self, *args):
         log_info('cancel: ' + ','.join(args))
+
+    def ack_trades(self, *args):
+        log_info('ack_trades: ' + ','.join(args))
 
     def echo(self, *args):
         log_info('echo: ' + ','.join(args))
@@ -325,35 +376,14 @@ class AsyncClnt(object):
     def env(self):
         log_info('env')
 
-    def logon(self, mnem):
-        self.async.sendAndRecv(LogonRequest(mnem))
-
-    def logoff(self, mnem):
-        self.async.sendAndRecv(LogoffRequest(mnem))
-
-    def posns(self):
-        log_info('posns')
-
-    def quit(self):
-        self.close()
-
-    def revise(self, id, lots):
-        log_info('revise: {0},{1}'.format(id, lots))
-
-    def sell(self, lots, price):
-        log_info('sell: {0},{1}'.format(lots, price))
-
     def set(self, name, value):
         log_info('set: {0},{1}'.format(name, value))
-
-    def trades(self):
-        log_info('trades')
 
     def unset(self, name):
         log_info('unset: {0}'.format(name))
 
-    def view(self):
-        log_info('view')
+    def quit(self):
+        self.close()
 
 @contextmanager
 def async_clnt():

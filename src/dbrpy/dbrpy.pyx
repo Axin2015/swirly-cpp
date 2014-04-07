@@ -587,6 +587,7 @@ cdef class Trader(object):
         return membs
     def empty_memb(self):
         return <bint>dbr_trader_empty_memb(self.impl_)
+
     def logged_on(self):
         return <bint>dbr_trader_logged_on(self.impl_)
 
