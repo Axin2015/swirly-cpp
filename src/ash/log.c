@@ -34,7 +34,17 @@ static const char* LABELS[] = {
     "DEBUG"
 };
 
-static __thread DbrLogger logger = dbr_log_stdio;
+static __thread struct {
+    int level;
+    DbrLogger logger;
+} log = {
+#if DBR_DEBUG_LEVEL >= 1
+    .level = DBR_LOG_DEBUG1,
+#else  // DBR_DEBUG_LEVEL < 1
+    .level = DBR_LOG_INFO,
+#endif // DBR_DEBUG_LEVEL < 1
+    .logger = dbr_log_clnt
+};
 
 DBR_API const char*
 dbr_log_label(int level)
@@ -42,23 +52,45 @@ dbr_log_label(int level)
     return LABELS[level < DBR_LOG_DEBUG1 ? level : DBR_LOG_DEBUG1];
 }
 
-DBR_API DbrLogger
-dbr_log_logger(void)
+DBR_API int
+dbr_log_level(void)
 {
-    return logger;
+    return log.level;
 }
 
 DBR_API DbrLogger
-dbr_log_setlogger(DbrLogger new_logger)
+dbr_log_logger(void)
 {
-    assert(new_logger);
-    DbrLogger prev = logger;
-    logger = new_logger;
+    return log.logger;
+}
+
+DBR_API int
+dbr_log_setlevel(int level)
+{
+    assert(level >= 0);
+    int prev = log.level;
+    log.level = level;
+    return prev;
+}
+
+DBR_API DbrLogger
+dbr_log_setlogger(DbrLogger logger)
+{
+    assert(logger);
+    DbrLogger prev = log.logger;
+    log.logger = logger;
     return prev;
 }
 
 DBR_API void
-dbr_log_stdio(int level, const char* msg)
+dbr_log_clnt(int level, const char* msg)
+{
+    FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
+    fprintf(stream, "%s\n", msg);
+}
+
+DBR_API void
+dbr_log_serv(int level, const char* msg)
 {
     const long ms = dbr_millis();
     const time_t now = ms / 1000;
@@ -103,18 +135,24 @@ dbr_log_syslog(int level, const char* msg)
 DBR_API void
 dbr_log_printf(int level, const char* format, ...)
 {
+    if (level > log.level)
+        return;
+
     va_list args;
     va_start(args, format);
     char msg[DBR_LOGMSG_MAX + 1];
     vsnprintf(msg, sizeof(msg), format, args);
-    logger(level, msg);
+    log.logger(level, msg);
     va_end(args);
 }
 
 DBR_API void
 dbr_log_vprintf(int level, const char* format, va_list args)
 {
+    if (level > log.level)
+        return;
+
     char msg[DBR_LOGMSG_MAX + 1];
     vsnprintf(msg, sizeof(msg), format, args);
-    logger(level, msg);
+    log.logger(level, msg);
 }

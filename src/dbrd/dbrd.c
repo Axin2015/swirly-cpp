@@ -987,6 +987,8 @@ main(int argc, char* argv[])
     argc -= optind;
     argv += optind;
 
+    dbr_log_setlogger(dbr_log_serv);
+
     if (config.daemon) {
         if (dbr_daemon("/", 0027) < 0) {
             dbr_err_perror("dbr_daemon() failed");

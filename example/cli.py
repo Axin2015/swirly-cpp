@@ -74,6 +74,7 @@ class RequestHandler(Handler):
         return ret
 
 def worker(ctx, uuid):
+    log_setlevel(3)
     pool = Pool(8 * 1024 * 1024)
     clnt = Clnt(ctx, uuid, 'tcp://localhost:3270', 'tcp://localhost:3271',
                 millis(), TMOUT, pool)

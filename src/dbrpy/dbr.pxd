@@ -75,6 +75,11 @@ cdef extern from "dbr/log.h":
         DBR_LOG_DEBUG2
         DBR_LOG_DEBUG3
 
+
+    int dbr_log_level() nogil
+
+    int dbr_log_setlevel(int level) nogil
+
     void dbr_log_printf(int level, const char* format, ...) nogil
 
     void dbr_log_crit(const char* format, ...) nogil

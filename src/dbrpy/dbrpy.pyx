@@ -90,6 +90,12 @@ LOG_DEBUG1 = DBR_LOG_DEBUG1
 LOG_DEBUG2 = DBR_LOG_DEBUG2
 LOG_DEBUG3 = DBR_LOG_DEBUG3
 
+def log_level():
+    return dbr_log_level()
+
+def log_setlevel(int level):
+    return dbr_log_setlevel(level)
+
 def log_printf(int level, const char* msg):
     dbr_log_printf(level, msg)
 

@@ -127,6 +127,7 @@ struct State {
     size_t capacity;
     DbrJourn (*factory)(void*);
     void* arg;
+    int level;
     DbrLogger logger;
     // Sizeof string literal includes null terminator.
     char addr[sizeof("inproc://0x0123456789ABCDEF")];
@@ -137,7 +138,8 @@ start_routine(void* arg)
 {
     struct State* state = arg;
 
-    // Inherit parent's logger.
+    // Inherit parent's level and logger.
+    dbr_log_setlevel(state->level);
     dbr_log_setlogger(state->logger);
 
     struct ElmPool pool;
@@ -248,6 +250,7 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
     state->capacity = capacity;
     state->factory = factory;
     state->arg = arg;
+    state->level = dbr_log_level();
     state->logger = dbr_log_logger();
     // Socket address is uniquely constructed from memory address.
     sprintf(state->addr, "inproc://%p", impl);

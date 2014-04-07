@@ -84,6 +84,7 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
 #endif // DBR_DEBUG_ALLOC
 
     // Small entrys.
+    dbr_log_debug1("small entries:");
     dbr_log_debug1("sizeof DbrRbNode: %zu", sizeof(struct DbrRbNode));
     dbr_log_debug1("sizeof DbrLevel:  %zu", sizeof(struct DbrLevel));
     dbr_log_debug1("sizeof DbrMatch:  %zu", sizeof(struct DbrMatch));
@@ -92,6 +93,7 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     dbr_log_debug1("sizeof DbrSess:   %zu", sizeof(struct DbrSess));
 
     // Large entrys.
+    dbr_log_debug1("large entries:");
     dbr_log_debug1("sizeof DbrRec:    %zu", sizeof(struct DbrRec));
     dbr_log_debug1("sizeof DbrOrder:  %zu", sizeof(struct DbrOrder));
     dbr_log_debug1("sizeof DbrExec:   %zu", sizeof(struct DbrExec));
