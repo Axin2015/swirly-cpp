@@ -125,8 +125,8 @@ cdef extern from "dbr/types.h":
         DBR_ENTITY_CONTR
         DBR_ENTITY_ORDER
         DBR_ENTITY_EXEC
-        DBR_ENTITY_MEMB
         DBR_ENTITY_POSN
+        DBR_ENTITY_MEMB
 
     ctypedef struct FigTrader:
         pass

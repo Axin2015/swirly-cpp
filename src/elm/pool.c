@@ -216,18 +216,18 @@ elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* firs
                 dbr_pool_free_exec(pool, exec);
         }
         break;
-    case DBR_ENTITY_MEMB:
-        while (node) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            node = node->next;
-            dbr_pool_free_memb(pool, memb);
-        }
-        break;
     case DBR_ENTITY_POSN:
         while (node) {
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
             node = node->next;
             dbr_pool_free_posn(pool, posn);
+        }
+        break;
+    case DBR_ENTITY_MEMB:
+        while (node) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            node = node->next;
+            dbr_pool_free_memb(pool, memb);
         }
         break;
     default:

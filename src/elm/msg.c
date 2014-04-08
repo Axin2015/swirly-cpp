@@ -263,20 +263,20 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
         break;
-    case DBR_MEMB_LIST_REP:
-        body->entity_list_rep.count_ = 0;
-        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            n += elm_memb_len(memb, enriched);
-            ++body->entity_list_rep.count_;
-        }
-        n += dbr_packlenz(body->entity_list_rep.count_);
-        break;
     case DBR_POSN_LIST_REP:
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
             n += elm_posn_len(posn, enriched);
+            ++body->entity_list_rep.count_;
+        }
+        n += dbr_packlenz(body->entity_list_rep.count_);
+        break;
+    case DBR_MEMB_LIST_REP:
+        body->entity_list_rep.count_ = 0;
+        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            n += elm_memb_len(memb, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -418,18 +418,18 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
             buf = elm_write_exec(buf, exec, enriched);
         }
         break;
-    case DBR_MEMB_LIST_REP:
-        buf = dbr_packz(buf, body->entity_list_rep.count_);
-        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            buf = elm_write_memb(buf, memb, enriched);
-        }
-        break;
     case DBR_POSN_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
             buf = elm_write_posn(buf, posn, enriched);
+        }
+        break;
+    case DBR_MEMB_LIST_REP:
+        buf = dbr_packz(buf, body->entity_list_rep.count_);
+        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            buf = elm_write_memb(buf, memb, enriched);
         }
         break;
     case DBR_VIEW_LIST_REP:
@@ -598,18 +598,6 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         }
         body->entity_list_rep.first = dbr_queue_first(&q);
         break;
-    case DBR_MEMB_LIST_REP:
-        if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
-            goto fail1;
-        dbr_queue_init(&q);
-        for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
-            if (!(buf = read_memb(buf, pool, &q))) {
-                elm_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
-                goto fail1;
-            }
-        }
-        body->entity_list_rep.first = dbr_queue_first(&q);
-        break;
     case DBR_POSN_LIST_REP:
         if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
             goto fail1;
@@ -617,6 +605,18 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_posn(buf, pool, &q))) {
                 elm_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&q));
+                goto fail1;
+            }
+        }
+        body->entity_list_rep.first = dbr_queue_first(&q);
+        break;
+    case DBR_MEMB_LIST_REP:
+        if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
+            goto fail1;
+        dbr_queue_init(&q);
+        for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
+            if (!(buf = read_memb(buf, pool, &q))) {
+                elm_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
                 goto fail1;
             }
         }

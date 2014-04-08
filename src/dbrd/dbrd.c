@@ -402,27 +402,6 @@ sess_exec(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
-sess_perm(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
-{
-    struct DbrBody rep;
-
-    // Copy to entity node.
-    struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_trader_first_perm(trader);
-         node != DBR_TRADER_END_PERM; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_perm_entry(node);
-        dbr_queue_insert_back(&q, &memb->shared_node_);
-    }
-    rep.req_id = req_id;
-    rep.type = DBR_MEMB_LIST_REP;
-    rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
-    if (!ok)
-        dbr_err_perror("dbr_send_msg() failed");
-    return ok;
-}
-
-static DbrBool
 sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
@@ -465,6 +444,27 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
+}
+
+static DbrBool
+sess_perm(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
+{
+    struct DbrBody rep;
+
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_trader_first_perm(trader);
+         node != DBR_TRADER_END_PERM; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_perm_entry(node);
+        dbr_queue_insert_back(&q, &memb->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_MEMB_LIST_REP;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
+    if (!ok)
+        dbr_err_perror("dbr_send_msg() failed");
+    return ok;
 }
 
 static DbrBool

@@ -266,11 +266,11 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
         case DBR_ENTITY_EXEC:
             ret = read_trade(pool, first);
             break;
-        case DBR_ENTITY_MEMB:
-            ret = read_memb(pool, first);
-            break;
         case DBR_ENTITY_POSN:
             ret = read_posn(pool, first);
+            break;
+        case DBR_ENTITY_MEMB:
+            ret = read_memb(pool, first);
             break;
         default:
             dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);

@@ -264,6 +264,34 @@ emplace_trades(DbrServ serv, DbrModel model)
 }
 
 static DbrBool
+emplace_posns(DbrServ serv, DbrModel model)
+{
+    struct DbrSlNode* node;
+    if (dbr_model_read_entity(model, DBR_ENTITY_POSN, serv->pool, &node) < 0)
+        goto fail1;
+
+    for (; node; node = node->next) {
+        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_shared_posn_entry(node));
+        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, serv->pool);
+        if (dbr_unlikely(!accnt))
+            goto fail2;
+
+        // Transfer ownership.
+        fig_accnt_emplace_posn(accnt, posn);
+    }
+    return DBR_TRUE;
+ fail2:
+    // Free tail.
+    do {
+        struct DbrPosn* posn = dbr_shared_posn_entry(node);
+        node = node->next;
+        dbr_pool_free_posn(serv->pool, posn);
+    } while (node);
+ fail1:
+    return DBR_FALSE;
+}
+
+static DbrBool
 emplace_membs(DbrServ serv, DbrModel model)
 {
     struct DbrSlNode* node;
@@ -292,34 +320,6 @@ emplace_membs(DbrServ serv, DbrModel model)
         struct DbrMemb* memb = dbr_shared_memb_entry(node);
         node = node->next;
         dbr_pool_free_memb(serv->pool, memb);
-    } while (node);
- fail1:
-    return DBR_FALSE;
-}
-
-static DbrBool
-emplace_posns(DbrServ serv, DbrModel model)
-{
-    struct DbrSlNode* node;
-    if (dbr_model_read_entity(model, DBR_ENTITY_POSN, serv->pool, &node) < 0)
-        goto fail1;
-
-    for (; node; node = node->next) {
-        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_shared_posn_entry(node));
-        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, serv->pool);
-        if (dbr_unlikely(!accnt))
-            goto fail2;
-
-        // Transfer ownership.
-        fig_accnt_emplace_posn(accnt, posn);
-    }
-    return DBR_TRUE;
- fail2:
-    // Free tail.
-    do {
-        struct DbrPosn* posn = dbr_shared_posn_entry(node);
-        node = node->next;
-        dbr_pool_free_posn(serv->pool, posn);
     } while (node);
  fail1:
     return DBR_FALSE;

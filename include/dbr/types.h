@@ -79,13 +79,13 @@ enum DbrEntity {
      */
     DBR_ENTITY_EXEC,
     /**
-     * Membership.
-     */
-    DBR_ENTITY_MEMB,
-    /**
      * Position.
      */
-    DBR_ENTITY_POSN
+    DBR_ENTITY_POSN,
+    /**
+     * Membership.
+     */
+    DBR_ENTITY_MEMB
 };
 
 /** @} */

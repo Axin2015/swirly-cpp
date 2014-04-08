@@ -1019,11 +1019,11 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
     case DBR_ENTITY_EXEC:
         ret = select_trade(sqlite, pool, first);
         break;
-    case DBR_ENTITY_MEMB:
-        ret = select_memb(sqlite, pool, first);
-        break;
     case DBR_ENTITY_POSN:
         ret = select_posn(sqlite, pool, first);
+        break;
+    case DBR_ENTITY_MEMB:
+        ret = select_memb(sqlite, pool, first);
         break;
     default:
         dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);

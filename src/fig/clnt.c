@@ -1110,20 +1110,20 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_log_info("exec-list message");
                 emplace_exec_list(clnt, body.entity_list_rep.first);
                 break;
-            case DBR_MEMB_LIST_REP:
-                dbr_log_info("memb-list message");
-                // This function can fail is there is no memory available for a lazily created
-                // account.
-                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first))) {
-                    sess_reset(clnt);
-                    goto fail1;
-                }
-                break;
             case DBR_POSN_LIST_REP:
                 dbr_log_info("posn-list message");
                 // This function can fail is there is no memory available for a lazily created
                 // account.
                 if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first))) {
+                    sess_reset(clnt);
+                    goto fail1;
+                }
+                break;
+            case DBR_MEMB_LIST_REP:
+                dbr_log_info("memb-list message");
+                // This function can fail is there is no memory available for a lazily created
+                // account.
+                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first))) {
                     sess_reset(clnt);
                     goto fail1;
                 }
