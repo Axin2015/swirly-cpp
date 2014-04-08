@@ -165,6 +165,13 @@ read_trade(DbrPool pool, DbrSlNode*& first)
     return 0;
 }
 
+ssize_t
+read_posn(DbrPool pool, DbrSlNode*& first)
+{
+    first = nullptr;
+    return 0;
+}
+
 void
 set_memb(DbrMemb& memb, DbrIden accnt, DbrIden trader)
 {
@@ -203,13 +210,6 @@ read_memb(DbrPool pool, DbrSlNode*& first)
 
     first = rq.first;
     return size;
-}
-
-ssize_t
-read_posn(DbrPool pool, DbrSlNode*& first)
-{
-    first = nullptr;
-    return 0;
 }
 } // anonymous
 

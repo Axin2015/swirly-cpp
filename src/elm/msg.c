@@ -141,24 +141,6 @@ read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
 }
 
 static const char*
-read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
-{
-    struct DbrMemb* memb = elm_pool_alloc_memb(pool);
-    if (!memb)
-        goto fail1;
-    dbr_memb_init(memb);
-
-    if (!(buf = elm_read_memb(buf, memb))) {
-        elm_pool_free_memb(pool, memb);
-        goto fail1;
-    }
-    dbr_queue_insert_back(queue, &memb->shared_node_);
-    return buf;
- fail1:
-    return NULL;
-}
-
-static const char*
 read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
     struct DbrPosn* posn = elm_pool_alloc_posn(pool);
@@ -171,6 +153,24 @@ read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     }
     dbr_queue_insert_back(queue, &posn->shared_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrMemb* memb = elm_pool_alloc_memb(pool);
+    if (!memb)
+        goto fail1;
+    dbr_memb_init(memb);
+
+    if (!(buf = elm_read_memb(buf, memb))) {
+        elm_pool_free_memb(pool, memb);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &memb->shared_node_);
     return buf;
  fail1:
     return NULL;

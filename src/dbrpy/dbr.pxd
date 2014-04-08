@@ -365,16 +365,6 @@ cdef extern from "dbr/accnt.h":
 
     DbrRec* dbr_accnt_rec(DbrAccnt accnt) nogil
 
-    DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node) nogil
-
-    DbrRbNode* dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id) nogil
-
-    DbrRbNode* dbr_accnt_first_memb(DbrAccnt accnt) nogil
-
-    DbrRbNode* dbr_accnt_last_memb(DbrAccnt accnt) nogil
-
-    DbrBool dbr_accnt_empty_memb(DbrAccnt accnt) nogil
-
     DbrPosn* dbr_accnt_posn_entry(DbrRbNode* node) nogil
 
     DbrRbNode* dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id) nogil
@@ -384,6 +374,16 @@ cdef extern from "dbr/accnt.h":
     DbrRbNode* dbr_accnt_last_posn(DbrAccnt accnt) nogil
 
     DbrBool dbr_accnt_empty_posn(DbrAccnt accnt) nogil
+
+    DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node) nogil
+
+    DbrRbNode* dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id) nogil
+
+    DbrRbNode* dbr_accnt_first_memb(DbrAccnt accnt) nogil
+
+    DbrRbNode* dbr_accnt_last_memb(DbrAccnt accnt) nogil
+
+    DbrBool dbr_accnt_empty_memb(DbrAccnt accnt) nogil
 
 cdef extern from "dbr/handler.h":
 

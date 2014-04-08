@@ -147,20 +147,20 @@ enrich_exec(struct FigCache* cache, struct DbrExec* exec)
     return exec;
 }
 
-static inline struct DbrMemb*
-enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
-{
-    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
-    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
-    return memb;
-}
-
 static inline struct DbrPosn*
 enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 {
     posn->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, posn->accnt.id_only);
     posn->contr.rec = get_id(cache, DBR_ENTITY_CONTR, posn->contr.id_only);
     return posn;
+}
+
+static inline struct DbrMemb*
+enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+{
+    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
+    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
+    return memb;
 }
 
 static inline struct DbrView*
@@ -229,6 +229,30 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
 }
 
 static DbrBool
+emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
+{
+    DbrBool nomem = DBR_FALSE;
+    for (struct DbrSlNode* node = first; node; ) {
+        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
+        node = node->next;
+        // Transfer ownership.
+        // All accnts that trader is member of are created in emplace_membs().
+        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
+        if (dbr_likely(accnt)) {
+            fig_accnt_emplace_posn(accnt, posn);
+        } else {
+            dbr_pool_free_posn(clnt->pool, posn);
+            nomem = DBR_TRUE;
+        }
+    }
+    if (dbr_unlikely(nomem)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
+}
+
+static DbrBool
 emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     DbrBool nomem = DBR_FALSE;
@@ -245,30 +269,6 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
             fig_accnt_insert_memb(accnt, memb);
         } else {
             // Member is owned by trader so no need to free here.
-            nomem = DBR_TRUE;
-        }
-    }
-    if (dbr_unlikely(nomem)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        return DBR_FALSE;
-    }
-    return DBR_TRUE;
-}
-
-static DbrBool
-emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
-{
-    DbrBool nomem = DBR_FALSE;
-    for (struct DbrSlNode* node = first; node; ) {
-        struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
-        node = node->next;
-        // Transfer ownership.
-        // All accnts that trader is member of are created in emplace_membs().
-        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
-        if (dbr_likely(accnt)) {
-            fig_accnt_emplace_posn(accnt, posn);
-        } else {
-            dbr_pool_free_posn(clnt->pool, posn);
             nomem = DBR_TRUE;
         }
     }

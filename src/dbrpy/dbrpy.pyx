@@ -606,20 +606,6 @@ cdef class Accnt(object):
     def __init__(self):
         raise TypeError("init called")
 
-    # AccntMemb
-    def find_memb_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_accnt_find_memb_id(self.impl_, id)
-        return make_memb(dbr_accnt_memb_entry(node)) if node is not NULL else None
-    def list_memb(self):
-        membs = []
-        cdef DbrpyRbNode* node = dbr_accnt_first_memb(self.impl_)
-        while node is not NULL:
-            membs.append(make_memb(dbr_accnt_memb_entry(node)))
-            node = dbr_rbnode_next(node)
-        return membs
-    def empty_memb(self):
-        return <bint>dbr_accnt_empty_memb(self.impl_)
-
     # AccntPosn
     def find_posn_id(self, DbrIden id):
         cdef DbrpyRbNode* node = dbr_accnt_find_posn_id(self.impl_, id)
@@ -633,6 +619,20 @@ cdef class Accnt(object):
         return posns
     def empty_posn(self):
         return <bint>dbr_accnt_empty_posn(self.impl_)
+
+    # AccntMemb
+    def find_memb_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_memb_id(self.impl_, id)
+        return make_memb(dbr_accnt_memb_entry(node)) if node is not NULL else None
+    def list_memb(self):
+        membs = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_memb(self.impl_)
+        while node is not NULL:
+            membs.append(make_memb(dbr_accnt_memb_entry(node)))
+            node = dbr_rbnode_next(node)
+        return membs
+    def empty_memb(self):
+        return <bint>dbr_accnt_empty_memb(self.impl_)
 
 cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     cdef Accnt obj = Accnt.__new__(Accnt)

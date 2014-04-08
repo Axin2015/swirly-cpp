@@ -64,13 +64,13 @@
     " min_lots, match, role, cpty, created"                             \
     " FROM trade_v WHERE acked = 0 ORDER BY id"
 
-#define SELECT_MEMB_SQL                                                 \
-    "SELECT accnt, trader"                                              \
-    " FROM memb ORDER BY accnt"
-
 #define SELECT_POSN_SQL                                                 \
     "SELECT accnt, contr, settl_date, action, licks, lots"              \
     " FROM posn_v ORDER BY accnt, contr, settl_date, action"
+
+#define SELECT_MEMB_SQL                                                 \
+    "SELECT accnt, trader"                                              \
+    " FROM memb ORDER BY accnt"
 
 // Only called if failure occurs during cache load, so no need to free state members as they will
 // not have been allocated.
@@ -754,61 +754,6 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 }
 
 static ssize_t
-select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
-{
-    enum {
-        ACCNT,
-        TRADER
-    };
-
-    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_MEMB_SQL);
-    if (!stmt)
-        goto fail1;
-
-    struct DbrQueue mq;
-    dbr_queue_init(&mq);
-
-    ssize_t size = 0;
-    for (;;) {
-        int rc = sqlite3_step(stmt);
-        if (rc == SQLITE_ROW) {
-
-            struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
-            if (!memb)
-                goto fail2;
-            dbr_memb_init(memb);
-
-            memb->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
-            memb->trader.id_only = sqlite3_column_int64(stmt, TRADER);
-
-            dbr_log_debug3("memb: accnt=%ld,trader=%ld",
-                           memb->accnt.id_only, memb->trader.id_only);
-
-            dbr_queue_insert_back(&mq, &memb->shared_node_);
-            ++size;
-
-        } else if (rc == SQLITE_DONE) {
-            break;
-        } else {
-            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
-            goto fail2;
-        }
-    }
-
-    sqlite3_clear_bindings(stmt);
-    sqlite3_finalize(stmt);
-    *first = dbr_queue_first(&mq);
-    return size;
- fail2:
-    sqlite3_clear_bindings(stmt);
-    sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&mq));
-    *first = NULL;
- fail1:
-    return -1;
-}
-
-static ssize_t
 select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
@@ -903,6 +848,61 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
     dbr_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&pq));
+    *first = NULL;
+ fail1:
+    return -1;
+}
+
+static ssize_t
+select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
+{
+    enum {
+        ACCNT,
+        TRADER
+    };
+
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_MEMB_SQL);
+    if (!stmt)
+        goto fail1;
+
+    struct DbrQueue mq;
+    dbr_queue_init(&mq);
+
+    ssize_t size = 0;
+    for (;;) {
+        int rc = sqlite3_step(stmt);
+        if (rc == SQLITE_ROW) {
+
+            struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
+            if (!memb)
+                goto fail2;
+            dbr_memb_init(memb);
+
+            memb->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
+            memb->trader.id_only = sqlite3_column_int64(stmt, TRADER);
+
+            dbr_log_debug3("memb: accnt=%ld,trader=%ld",
+                           memb->accnt.id_only, memb->trader.id_only);
+
+            dbr_queue_insert_back(&mq, &memb->shared_node_);
+            ++size;
+
+        } else if (rc == SQLITE_DONE) {
+            break;
+        } else {
+            dbr_err_set(DBR_EIO, sqlite3_errmsg(sqlite->db));
+            goto fail2;
+        }
+    }
+
+    sqlite3_clear_bindings(stmt);
+    sqlite3_finalize(stmt);
+    *first = dbr_queue_first(&mq);
+    return size;
+ fail2:
+    sqlite3_clear_bindings(stmt);
+    sqlite3_finalize(stmt);
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;

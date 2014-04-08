@@ -174,24 +174,6 @@ public:
     }
     /** @} */
     /**
-     * @addtogroup PoolMemb
-     * @{
-     */
-    DbrMemb*
-    alloc_memb()
-    {
-        DbrMemb* const memb = dbr_pool_alloc_memb(impl_);
-        if (!memb)
-            throw_exception();
-        return memb;
-    }
-    void
-    free_memb(DbrMemb* memb) noexcept
-    {
-        dbr_pool_free_memb(impl_, memb);
-    }
-    /** @} */
-    /**
      * @addtogroup PoolPosn
      * @{
      */
@@ -207,6 +189,24 @@ public:
     free_posn(DbrPosn* posn) noexcept
     {
         dbr_pool_free_posn(impl_, posn);
+    }
+    /** @} */
+    /**
+     * @addtogroup PoolMemb
+     * @{
+     */
+    DbrMemb*
+    alloc_memb()
+    {
+        DbrMemb* const memb = dbr_pool_alloc_memb(impl_);
+        if (!memb)
+            throw_exception();
+        return memb;
+    }
+    void
+    free_memb(DbrMemb* memb) noexcept
+    {
+        dbr_pool_free_memb(impl_, memb);
     }
     /** @} */
     /**

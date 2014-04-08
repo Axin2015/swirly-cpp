@@ -101,19 +101,6 @@ dbr_pool_free_match(DbrPool pool, struct DbrMatch* match);
 /** @} */
 
 /**
- * @addtogroup PoolMemb
- * @{
- */
-
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool);
-
-DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb);
-
-/** @} */
-
-/**
  * @addtogroup PoolPosn
  * @{
  */
@@ -123,6 +110,19 @@ dbr_pool_alloc_posn(DbrPool pool);
 
 DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn);
+
+/** @} */
+
+/**
+ * @addtogroup PoolMemb
+ * @{
+ */
+
+DBR_API struct DbrMemb*
+dbr_pool_alloc_memb(DbrPool pool);
+
+DBR_API void
+dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb);
 
 /** @} */
 

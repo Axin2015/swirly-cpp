@@ -86,9 +86,9 @@ struct DbrBody {
         struct {
             // dbr_shared_rec_entry()
             // dbr_shared_order_entry()
-            // dbr_shared_memb_entry()
             // dbr_shared_exec_entry()
             // dbr_shared_posn_entry()
+            // dbr_shared_memb_entry()
             struct DbrSlNode* first;
             /**
              * @privatesection

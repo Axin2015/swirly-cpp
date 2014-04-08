@@ -24,9 +24,9 @@
 
 struct DbrRec;
 struct DbrOrder;
-struct DbrMemb;
 struct DbrExec;
 struct DbrPosn;
+struct DbrMemb;
 struct DbrView;
 
 /**
@@ -130,22 +130,6 @@ dbr_read_exec(const char* buf, struct DbrExec* exec);
 /** @} */
 
 /**
- * @addtogroup ProtoMemb
- * @{
- */
-
-DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb);
-
-/** @} */
-
-/**
  * @addtogroup ProtoPosn
  * @{
  */
@@ -158,6 +142,22 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
+
+/** @} */
+
+/**
+ * @addtogroup ProtoMemb
+ * @{
+ */
+
+DBR_API size_t
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_API char*
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_API const char*
+dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
 /** @} */
 

@@ -335,18 +335,6 @@ dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
     elm_pool_free_match(pool, match);
 }
 
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool)
-{
-    return elm_pool_alloc_memb(pool);
-}
-
-DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
-{
-    elm_pool_free_memb(pool, memb);
-}
-
 DBR_API struct DbrPosn*
 dbr_pool_alloc_posn(DbrPool pool)
 {
@@ -357,6 +345,18 @@ DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 {
     elm_pool_free_posn(pool, posn);
+}
+
+DBR_API struct DbrMemb*
+dbr_pool_alloc_memb(DbrPool pool)
+{
+    return elm_pool_alloc_memb(pool);
+}
+
+DBR_API void
+dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
+{
+    elm_pool_free_memb(pool, memb);
 }
 
 DBR_API struct DbrView*

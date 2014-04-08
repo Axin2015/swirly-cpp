@@ -237,12 +237,12 @@
  */
 
 /**
- * @defgroup PoolMemb Member
+ * @defgroup PoolPosn Position
  * @ingroup Pool
  */
 
 /**
- * @defgroup PoolPosn Position
+ * @defgroup PoolMemb Member
  * @ingroup Pool
  */
 
@@ -373,12 +373,12 @@
  */
 
 /**
- * @defgroup AccntMemb Member
+ * @defgroup AccntPosn Position
  * @ingroup Accnt
  */
 
 /**
- * @defgroup AccntPosn Position
+ * @defgroup AccntMemb Member
  * @ingroup Accnt
  */
 

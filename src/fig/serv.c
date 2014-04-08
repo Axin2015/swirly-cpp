@@ -93,14 +93,6 @@ enrich_trade(struct FigCache* cache, struct DbrExec* exec)
     return exec;
 }
 
-static inline struct DbrMemb*
-enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
-{
-    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
-    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
-    return memb;
-}
-
 static inline struct DbrPosn*
 enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 {
@@ -113,6 +105,14 @@ static inline void
 insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
 {
     dbr_tree_insert(posnups, (DbrKey)posn, &posn->update_node_);
+}
+
+static inline struct DbrMemb*
+enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+{
+    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
+    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
+    return memb;
 }
 
 static inline void
