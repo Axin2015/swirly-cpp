@@ -283,7 +283,7 @@ emplace_membs(DbrServ serv, DbrModel model)
 
         // Transfer ownership.
         fig_accnt_insert_memb(accnt, memb);
-        fig_trader_emplace_memb(trader, memb);
+        fig_trader_emplace_perm(trader, memb);
     }
     return DBR_TRUE;
  fail2:

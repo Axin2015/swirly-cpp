@@ -574,19 +574,19 @@ cdef class Trader(object):
     def empty_trade(self):
         return <bint>dbr_trader_empty_trade(self.impl_)
 
-    # TraderMemb
-    def find_memb_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_trader_find_memb_id(self.impl_, id)
-        return make_memb(dbr_trader_memb_entry(node)) if node is not NULL else None
-    def list_memb(self):
-        membs = []
-        cdef DbrpyRbNode* node = dbr_trader_first_memb(self.impl_)
+    # TraderPerm
+    def find_perm_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_trader_find_perm_id(self.impl_, id)
+        return make_memb(dbr_trader_perm_entry(node)) if node is not NULL else None
+    def list_perm(self):
+        perms = []
+        cdef DbrpyRbNode* node = dbr_trader_first_perm(self.impl_)
         while node is not NULL:
-            membs.append(make_memb(dbr_trader_memb_entry(node)))
+            perms.append(make_memb(dbr_trader_perm_entry(node)))
             node = dbr_rbnode_next(node)
-        return membs
-    def empty_memb(self):
-        return <bint>dbr_trader_empty_memb(self.impl_)
+        return perms
+    def empty_perm(self):
+        return <bint>dbr_trader_empty_perm(self.impl_)
 
     def logged_on(self):
         return <bint>dbr_trader_logged_on(self.impl_)

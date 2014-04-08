@@ -238,7 +238,7 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         DbrTrader trader = memb->trader.rec->trader.state;
         assert(trader);
         // Transfer ownership.
-        fig_trader_emplace_memb(trader, memb);
+        fig_trader_emplace_perm(trader, memb);
 
         DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
         if (dbr_likely(accnt)) {

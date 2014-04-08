@@ -402,15 +402,15 @@ sess_exec(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
 }
 
 static DbrBool
-sess_memb(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
+sess_perm(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
 {
     struct DbrBody rep;
 
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
-         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+    for (struct DbrRbNode* node = dbr_trader_first_perm(trader);
+         node != DBR_TRADER_END_PERM; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_perm_entry(node);
         dbr_queue_insert_back(&q, &memb->shared_node_);
     }
     rep.req_id = req_id;
@@ -432,9 +432,9 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     // Send positions for each account that the trader is a member of.
 
     // For each account.
-    for (struct DbrRbNode* mnode = dbr_trader_first_memb(trader);
-         mnode != DBR_TRADER_END_MEMB; mnode = dbr_rbnode_next(mnode)) {
-        struct DbrMemb* memb = dbr_trader_memb_entry(mnode);
+    for (struct DbrRbNode* mnode = dbr_trader_first_perm(trader);
+         mnode != DBR_TRADER_END_PERM; mnode = dbr_rbnode_next(mnode)) {
+        struct DbrMemb* memb = dbr_trader_perm_entry(mnode);
         struct DbrRec* arec = memb->accnt.rec;
         DbrAccnt accnt = dbr_serv_accnt(serv, arec);
         if (!accnt) {
@@ -525,7 +525,7 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
         && sess_order(sess, 0, trader)
         && sess_exec(sess, 0, trader)
-        && sess_memb(sess, 0, trader)
+        && sess_perm(sess, 0, trader)
         && sess_posn(sess, 0, trader);
  fail1:
     if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))

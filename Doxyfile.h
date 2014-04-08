@@ -363,7 +363,7 @@
  */
 
 /**
- * @defgroup TraderMemb Member
+ * @defgroup TraderPerm Permission
  * @ingroup Trader
  */
 

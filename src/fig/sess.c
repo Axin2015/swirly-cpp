@@ -112,9 +112,9 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
         goto fail1;
     }
 
-    struct DbrRbNode* node = dbr_trader_first_memb(trader);
-    for (; node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+    struct DbrRbNode* node = dbr_trader_first_perm(trader);
+    for (; node != DBR_TRADER_END_PERM; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_perm_entry(node);
         if (incref(sess, memb->accnt.rec->id) == 0)
             goto fail2;
     }
@@ -125,8 +125,8 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
  fail2:
     // Rollback subs.
     for (node = dbr_rbnode_prev(node);
-         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_prev(node)) {
-        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+         node != DBR_TRADER_END_PERM; node = dbr_rbnode_prev(node)) {
+        struct DbrMemb* memb = dbr_trader_perm_entry(node);
         decref(sess, memb->accnt.rec->id);
     }
  fail1:
@@ -139,9 +139,9 @@ dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader, DbrBool clear)
     dbr_tree_remove(&sess->traders, &trader->sess_node_);
     trader->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_trader_first_memb(trader);
-         node != DBR_TRADER_END_MEMB; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_memb_entry(node);
+    for (struct DbrRbNode* node = dbr_trader_first_perm(trader);
+         node != DBR_TRADER_END_PERM; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_trader_perm_entry(node);
         if (decref(sess, memb->accnt.rec->id) == 0 && clear) {
             DbrAccnt accnt = memb->accnt.rec->accnt.state;
             if (accnt)

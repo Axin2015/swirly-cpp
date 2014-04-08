@@ -349,15 +349,15 @@ cdef extern from "dbr/trader.h":
 
     DbrBool dbr_trader_empty_trade(DbrTrader trader) nogil
 
-    DbrMemb* dbr_trader_memb_entry(DbrRbNode* node) nogil
+    DbrMemb* dbr_trader_perm_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_trader_find_memb_id(DbrTrader trader, DbrIden id) nogil
+    DbrRbNode* dbr_trader_find_perm_id(DbrTrader trader, DbrIden id) nogil
 
-    DbrRbNode* dbr_trader_first_memb(DbrTrader trader) nogil
+    DbrRbNode* dbr_trader_first_perm(DbrTrader trader) nogil
 
-    DbrRbNode* dbr_trader_last_memb(DbrTrader trader) nogil
+    DbrRbNode* dbr_trader_last_perm(DbrTrader trader) nogil
 
-    DbrBool dbr_trader_empty_memb(DbrTrader trader) nogil
+    DbrBool dbr_trader_empty_perm(DbrTrader trader) nogil
 
     DbrBool dbr_trader_logged_on(DbrTrader trader) nogil
 

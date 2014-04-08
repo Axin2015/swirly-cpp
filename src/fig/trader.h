@@ -33,7 +33,7 @@ struct FigTrader {
     DbrPool pool;
     struct DbrTree orders;
     struct DbrTree trades;
-    struct DbrTree membs;
+    struct DbrTree perms;
     struct DbrSess* sess;
     // Private section.
     struct DbrRbNode sess_node_;
@@ -210,19 +210,19 @@ fig_trader_empty_trade(const struct FigTrader* trader)
     return dbr_tree_empty(&trader->trades);
 }
 
-// Memb.
+// Perm.
 
-#define FIG_TRADER_END_MEMB DBR_TREE_END
+#define FIG_TRADER_END_PERM DBR_TREE_END
 
 // Transfer ownership to state.
 
 static inline void
-fig_trader_emplace_memb(struct FigTrader* trader, struct DbrMemb* memb)
+fig_trader_emplace_perm(struct FigTrader* trader, struct DbrMemb* memb)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-        struct DbrRbNode* node = dbr_tree_insert(&trader->membs, memb->accnt.rec->id,
+        struct DbrRbNode* node = dbr_tree_insert(&trader->perms, memb->accnt.rec->id,
                                                  &memb->trader_node_);
         assert(node == &memb->trader_node_);
     }
@@ -230,27 +230,27 @@ fig_trader_emplace_memb(struct FigTrader* trader, struct DbrMemb* memb)
 }
 
 static inline struct DbrRbNode*
-fig_trader_find_memb_id(const struct FigTrader* trader, DbrIden id)
+fig_trader_find_perm_id(const struct FigTrader* trader, DbrIden id)
 {
-    return dbr_tree_find(&trader->membs, id);
+    return dbr_tree_find(&trader->perms, id);
 }
 
 static inline struct DbrRbNode*
-fig_trader_first_memb(const struct FigTrader* trader)
+fig_trader_first_perm(const struct FigTrader* trader)
 {
-    return dbr_tree_first(&trader->membs);
+    return dbr_tree_first(&trader->perms);
 }
 
 static inline struct DbrRbNode*
-fig_trader_last_memb(const struct FigTrader* trader)
+fig_trader_last_perm(const struct FigTrader* trader)
 {
-    return dbr_tree_last(&trader->membs);
+    return dbr_tree_last(&trader->perms);
 }
 
 static inline DbrBool
-fig_trader_empty_memb(const struct FigTrader* trader)
+fig_trader_empty_perm(const struct FigTrader* trader)
 {
-    return dbr_tree_empty(&trader->membs);
+    return dbr_tree_empty(&trader->perms);
 }
 
 static inline DbrBool
