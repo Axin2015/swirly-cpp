@@ -511,15 +511,15 @@ struct DbrMemb {
     /**
      * @publicsection
      */
-    union DbrURec trader;
     union DbrURec accnt;
+    union DbrURec trader;
     /**
      * @privatesection
      */
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
-    struct DbrRbNode trader_node_;
     struct DbrRbNode accnt_node_;
+    struct DbrRbNode trader_node_;
 };
 
 static inline void

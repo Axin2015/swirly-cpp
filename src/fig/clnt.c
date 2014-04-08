@@ -150,8 +150,8 @@ enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 static inline struct DbrMemb*
 enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
 {
-    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
     memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
+    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
     return memb;
 }
 

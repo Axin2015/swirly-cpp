@@ -382,17 +382,17 @@ def exec_done(Exec exc):
     return exc.resd == 0
 
 cdef class Memb(object):
-    cdef public DbrIden tid
     cdef public DbrIden aid
+    cdef public DbrIden tid
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Memb({0.tid!r}, {0.aid!r})'.format(self)
+        return 'Memb({0.aid!r}, {0.tid!r})'.format(self)
 
 cdef Memb make_memb(DbrpyMemb* memb):
     cdef obj = Memb.__new__(Memb)
-    obj.tid = memb.trader.rec.id
     obj.aid = memb.accnt.rec.id
+    obj.tid = memb.trader.rec.id
     return obj
 
 cdef class Posn(object):

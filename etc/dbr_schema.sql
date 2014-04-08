@@ -121,10 +121,7 @@ CREATE TABLE trader (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL UNIQUE,
   display TEXT NOT NULL UNIQUE,
-  email TEXT NOT NULL UNIQUE,
-  title TEXT NULL,
-  given TEXT NULL,
-  family TEXT NULL
+  email TEXT NOT NULL UNIQUE
 )
 ;
 
@@ -155,9 +152,9 @@ CREATE VIEW accnt_v AS
 ;
 
 CREATE TABLE memb (
-  trader INTEGER NOT NULL REFERENCES trader (id),
   accnt INTEGER NOT NULL REFERENCES accnt (id),
-  PRIMARY KEY (trader, accnt)
+  trader INTEGER NOT NULL REFERENCES trader (id),
+  PRIMARY KEY (accnt, trader)
 )
 ;
 

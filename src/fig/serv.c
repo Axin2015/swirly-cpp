@@ -96,8 +96,8 @@ enrich_trade(struct FigCache* cache, struct DbrExec* exec)
 static inline struct DbrMemb*
 enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
 {
-    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
     memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
+    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
     return memb;
 }
 
@@ -272,17 +272,18 @@ emplace_membs(DbrServ serv, DbrModel model)
 
     for (; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
-        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!trader))
-            goto fail2;
 
         struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
+        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!trader))
+            goto fail2;
+
         // Transfer ownership.
-        fig_trader_emplace_memb(trader, memb);
         fig_accnt_insert_memb(accnt, memb);
+        fig_trader_emplace_memb(trader, memb);
     }
     return DBR_TRUE;
  fail2:

@@ -166,10 +166,10 @@ read_trade(DbrPool pool, DbrSlNode*& first)
 }
 
 void
-set_memb(DbrMemb& memb, DbrIden trader, DbrIden accnt)
+set_memb(DbrMemb& memb, DbrIden accnt, DbrIden trader)
 {
-    memb.trader.id_only = trader;
     memb.accnt.id_only = accnt;
+    memb.trader.id_only = trader;
 }
 
 ssize_t
@@ -190,7 +190,7 @@ read_memb(DbrPool pool, DbrSlNode*& first)
     memb = dbr_pool_alloc_memb(pool);
     check(memb);
     dbr_memb_init(memb);
-    set_memb(*memb, 1, 2);
+    set_memb(*memb, 2, 1);
     dbr_queue_insert_back(&rq, &memb->shared_node_);
     ++size;
 

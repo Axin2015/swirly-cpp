@@ -238,8 +238,8 @@ class MembRequest(object):
     @staticmethod
     def to_dict(memb):
         return {
-            'tid': memb.tid,
-            'aid': memb.aid
+            'aid': memb.aid,
+            'tid': memb.tid
         }
     def __init__(self, mnem):
         self.mnem = mnem

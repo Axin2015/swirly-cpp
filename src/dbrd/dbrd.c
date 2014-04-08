@@ -175,6 +175,8 @@ flush_posnup(struct DbrPosn* posn)
 
     struct DbrBody rep = { .req_id = 0, .type = DBR_POSN_REP, .posn_rep.posn = posn };
 
+    // Send position update to each trader that is a member of this account.
+
     DbrAccnt accnt = dbr_serv_accnt(serv, posn->accnt.rec);
     for (struct DbrRbNode* node = dbr_accnt_first_memb(accnt);
          node != DBR_ACCNT_END_MEMB; node = dbr_rbnode_next(node)) {
@@ -426,6 +428,9 @@ sess_posn(struct DbrSess* sess, DbrIden req_id, DbrTrader trader)
     struct DbrBody rep;
 
     struct DbrQueue q = DBR_QUEUE_INIT(q);
+
+    // Send positions for each account that the trader is a member of.
+
     // For each account.
     for (struct DbrRbNode* mnode = dbr_trader_first_memb(trader);
          mnode != DBR_TRADER_END_MEMB; mnode = dbr_rbnode_next(mnode)) {

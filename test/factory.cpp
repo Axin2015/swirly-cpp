@@ -218,8 +218,8 @@ create_memb(Pool& pool, DbrIden tid, DbrIden aid)
     std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
     dbr_memb_init(memb.get());
 
-    memb->trader.id_only = tid;
     memb->accnt.id_only = aid;
+    memb->trader.id_only = tid;
 
     return memb;
 }
