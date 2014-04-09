@@ -193,22 +193,22 @@ public:
 /** @} */
 
 /**
- * @addtogroup AccntMemb
+ * @addtogroup AccntUser
  * @{
  */
 
-class AccntMembs {
+class AccntUsers {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrMemb Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_accnt_memb_entry(node);
+            return dbr_accnt_user_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_accnt_memb_entry(const_cast<Node*>(node));
+            return dbr_accnt_user_entry(const_cast<Node*>(node));
         }
     };
     DbrAccnt accnt_;
@@ -245,12 +245,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    AccntMembs(DbrAccnt accnt) noexcept
+    AccntUsers(DbrAccnt accnt) noexcept
         : accnt_{accnt}
     {
     }
     void
-    swap(AccntMembs& rhs) noexcept
+    swap(AccntUsers& rhs) noexcept
     {
         std::swap(accnt_, rhs.accnt_);
     }
@@ -260,22 +260,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_accnt_first_memb(accnt_);
+        return dbr_accnt_first_user(accnt_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_accnt_first_memb(accnt_);
+        return dbr_accnt_first_user(accnt_);
     }
     Iterator
     end() noexcept
     {
-        return DBR_ACCNT_END_MEMB;
+        return DBR_ACCNT_END_USER;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_ACCNT_END_MEMB;
+        return DBR_ACCNT_END_USER;
     }
 
     // ReverseIterator.
@@ -283,22 +283,22 @@ public:
     ReverseIterator
     rbegin() noexcept
     {
-        return dbr_accnt_last_memb(accnt_);
+        return dbr_accnt_last_user(accnt_);
     }
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return dbr_accnt_last_memb(accnt_);
+        return dbr_accnt_last_user(accnt_);
     }
     ReverseIterator
     rend() noexcept
     {
-        return DBR_ACCNT_END_MEMB;
+        return DBR_ACCNT_END_USER;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return DBR_ACCNT_END_MEMB;
+        return DBR_ACCNT_END_USER;
     }
 
     // Find.
@@ -306,12 +306,12 @@ public:
     Iterator
     find(DbrTicks ticks) noexcept
     {
-        return dbr_accnt_find_memb_id(accnt_, ticks);
+        return dbr_accnt_find_user_id(accnt_, ticks);
     }
     ConstIterator
     find(DbrTicks ticks) const noexcept
     {
-        return dbr_accnt_find_memb_id(accnt_, ticks);
+        return dbr_accnt_find_user_id(accnt_, ticks);
     }
 
     // Accessor.
@@ -349,7 +349,7 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_accnt_empty_memb(accnt_);
+        return dbr_accnt_empty_user(accnt_);
     }
 };
 
@@ -398,13 +398,13 @@ public:
     }
     /** @} */
     /**
-     * @addtogroup AccntMemb
+     * @addtogroup AccntUser
      * @{
      */
-    AccntMembs
-    membs() const noexcept
+    AccntUsers
+    users() const noexcept
     {
-        return AccntMembs{impl_};
+        return AccntUsers{impl_};
     }
     /** @} */
 };

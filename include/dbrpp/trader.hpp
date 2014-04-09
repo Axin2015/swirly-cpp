@@ -369,22 +369,22 @@ public:
 /** @} */
 
 /**
- * @addtogroup TraderPerm
+ * @addtogroup TraderGroup
  * @{
  */
 
-class TraderPerms {
+class TraderGroups {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrMemb Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_trader_perm_entry(node);
+            return dbr_trader_group_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_trader_perm_entry(const_cast<Node*>(node));
+            return dbr_trader_group_entry(const_cast<Node*>(node));
         }
     };
     DbrTrader trader_;
@@ -421,12 +421,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    TraderPerms(DbrTrader trader) noexcept
+    TraderGroups(DbrTrader trader) noexcept
         : trader_{trader}
     {
     }
     void
-    swap(TraderPerms& rhs) noexcept
+    swap(TraderGroups& rhs) noexcept
     {
         std::swap(trader_, rhs.trader_);
     }
@@ -436,22 +436,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_trader_first_perm(trader_);
+        return dbr_trader_first_group(trader_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_trader_first_perm(trader_);
+        return dbr_trader_first_group(trader_);
     }
     Iterator
     end() noexcept
     {
-        return DBR_TRADER_END_PERM;
+        return DBR_TRADER_END_GROUP;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_TRADER_END_PERM;
+        return DBR_TRADER_END_GROUP;
     }
 
     // ReverseIterator.
@@ -459,22 +459,22 @@ public:
     ReverseIterator
     rbegin() noexcept
     {
-        return dbr_trader_last_perm(trader_);
+        return dbr_trader_last_group(trader_);
     }
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return dbr_trader_last_perm(trader_);
+        return dbr_trader_last_group(trader_);
     }
     ReverseIterator
     rend() noexcept
     {
-        return DBR_TRADER_END_PERM;
+        return DBR_TRADER_END_GROUP;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return DBR_TRADER_END_PERM;
+        return DBR_TRADER_END_GROUP;
     }
 
     // Find.
@@ -482,12 +482,12 @@ public:
     Iterator
     find(DbrTicks ticks) noexcept
     {
-        return dbr_trader_find_perm_id(trader_, ticks);
+        return dbr_trader_find_group_id(trader_, ticks);
     }
     ConstIterator
     find(DbrTicks ticks) const noexcept
     {
-        return dbr_trader_find_perm_id(trader_, ticks);
+        return dbr_trader_find_group_id(trader_, ticks);
     }
 
     // Accessor.
@@ -525,7 +525,7 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_trader_empty_perm(trader_);
+        return dbr_trader_empty_group(trader_);
     }
 };
 
@@ -584,13 +584,13 @@ public:
     }
     /** @} */
     /**
-     * @addtogroup TraderPerm
+     * @addtogroup TraderGroup
      * @{
      */
-    TraderPerms
-    perms() const noexcept
+    TraderGroups
+    groups() const noexcept
     {
-        return TraderPerms{impl_};
+        return TraderGroups{impl_};
     }
     /** @} */
     DbrBool

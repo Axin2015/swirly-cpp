@@ -64,25 +64,25 @@ dbr_accnt_empty_posn(DbrAccnt accnt);
  * @{
  */
 
-#define DBR_ACCNT_END_MEMB NULL
+#define DBR_ACCNT_END_USER NULL
 
 static inline struct DbrMemb*
-dbr_accnt_memb_entry(struct DbrRbNode* node)
+dbr_accnt_user_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrMemb, accnt_node_, node);
+    return dbr_implof(struct DbrMemb, group_node_, node);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id);
+dbr_accnt_find_user_id(DbrAccnt accnt, DbrIden id);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_first_memb(DbrAccnt accnt);
+dbr_accnt_first_user(DbrAccnt accnt);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_last_memb(DbrAccnt accnt);
+dbr_accnt_last_user(DbrAccnt accnt);
 
 DBR_API DbrBool
-dbr_accnt_empty_memb(DbrAccnt accnt);
+dbr_accnt_empty_user(DbrAccnt accnt);
 
 /** @} */
 

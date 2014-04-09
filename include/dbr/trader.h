@@ -90,29 +90,29 @@ dbr_trader_empty_trade(DbrTrader trader);
 /** @} */
 
 /**
- * @addtogroup TraderPerm
+ * @addtogroup TraderGroup
  * @{
  */
 
-#define DBR_TRADER_END_PERM NULL
+#define DBR_TRADER_END_GROUP NULL
 
 static inline struct DbrMemb*
-dbr_trader_perm_entry(struct DbrRbNode* node)
+dbr_trader_group_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrMemb, trader_node_, node);
+    return dbr_implof(struct DbrMemb, user_node_, node);
 }
 
 DBR_API struct DbrRbNode*
-dbr_trader_find_perm_id(DbrTrader trader, DbrIden id);
+dbr_trader_find_group_id(DbrTrader trader, DbrIden id);
 
 DBR_API struct DbrRbNode*
-dbr_trader_first_perm(DbrTrader trader);
+dbr_trader_first_group(DbrTrader trader);
 
 DBR_API struct DbrRbNode*
-dbr_trader_last_perm(DbrTrader trader);
+dbr_trader_last_group(DbrTrader trader);
 
 DBR_API DbrBool
-dbr_trader_empty_perm(DbrTrader trader);
+dbr_trader_empty_group(DbrTrader trader);
 
 /** @} */
 

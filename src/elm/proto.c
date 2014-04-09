@@ -306,10 +306,10 @@ elm_memb_len(const struct DbrMemb* memb, DbrBool enriched)
     size_t n;
     if (enriched) {
         n = dbr_packlenf(MEMB_FORMAT,
-                         memb->accnt.rec->id, memb->trader.rec->id);
+                         memb->group.rec->id, memb->user.rec->id);
     } else {
         n = dbr_packlenf(MEMB_FORMAT,
-                         memb->accnt.id_only, memb->trader.id_only);
+                         memb->group.id_only, memb->user.id_only);
     }
     return n;
 }
@@ -319,10 +319,10 @@ elm_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, MEMB_FORMAT,
-                        memb->accnt.rec->id, memb->trader.rec->id);
+                        memb->group.rec->id, memb->user.rec->id);
     } else {
         buf = dbr_packf(buf, MEMB_FORMAT,
-                        memb->accnt.id_only, memb->trader.id_only);
+                        memb->group.id_only, memb->user.id_only);
     }
     return buf;
 }
@@ -330,7 +330,7 @@ elm_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 DBR_EXTERN const char*
 elm_read_memb(const char* buf, struct DbrMemb* memb)
 {
-    return dbr_unpackf(buf, MEMB_FORMAT, &memb->accnt.id_only, &memb->trader.id_only);
+    return dbr_unpackf(buf, MEMB_FORMAT, &memb->group.id_only, &memb->user.id_only);
 }
 
 DBR_EXTERN size_t

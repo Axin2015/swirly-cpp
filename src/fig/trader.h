@@ -33,7 +33,7 @@ struct FigTrader {
     DbrPool pool;
     struct DbrTree orders;
     struct DbrTree trades;
-    struct DbrTree perms;
+    struct DbrTree groups;
     struct DbrSess* sess;
     // Private section.
     struct DbrRbNode sess_node_;
@@ -210,47 +210,47 @@ fig_trader_empty_trade(const struct FigTrader* trader)
     return dbr_tree_empty(&trader->trades);
 }
 
-// Perm.
+// Group.
 
-#define FIG_TRADER_END_PERM DBR_TREE_END
+#define FIG_TRADER_END_GROUP DBR_TREE_END
 
 // Transfer ownership to state.
 
 static inline void
-fig_trader_emplace_perm(struct FigTrader* trader, struct DbrMemb* memb)
+fig_trader_emplace_group(struct FigTrader* trader, struct DbrMemb* memb)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-        struct DbrRbNode* node = dbr_tree_insert(&trader->perms, memb->accnt.rec->id,
-                                                 &memb->trader_node_);
-        assert(node == &memb->trader_node_);
+        struct DbrRbNode* node = dbr_tree_insert(&trader->groups, memb->group.rec->id,
+                                                 &memb->user_node_);
+        assert(node == &memb->user_node_);
     }
 #pragma GCC diagnostic pop
 }
 
 static inline struct DbrRbNode*
-fig_trader_find_perm_id(const struct FigTrader* trader, DbrIden id)
+fig_trader_find_group_id(const struct FigTrader* trader, DbrIden id)
 {
-    return dbr_tree_find(&trader->perms, id);
+    return dbr_tree_find(&trader->groups, id);
 }
 
 static inline struct DbrRbNode*
-fig_trader_first_perm(const struct FigTrader* trader)
+fig_trader_first_group(const struct FigTrader* trader)
 {
-    return dbr_tree_first(&trader->perms);
+    return dbr_tree_first(&trader->groups);
 }
 
 static inline struct DbrRbNode*
-fig_trader_last_perm(const struct FigTrader* trader)
+fig_trader_last_group(const struct FigTrader* trader)
 {
-    return dbr_tree_last(&trader->perms);
+    return dbr_tree_last(&trader->groups);
 }
 
 static inline DbrBool
-fig_trader_empty_perm(const struct FigTrader* trader)
+fig_trader_empty_group(const struct FigTrader* trader)
 {
-    return dbr_tree_empty(&trader->perms);
+    return dbr_tree_empty(&trader->groups);
 }
 
 static inline DbrBool

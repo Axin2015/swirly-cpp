@@ -110,8 +110,8 @@ insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
 static inline struct DbrMemb*
 enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
 {
-    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
-    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
+    memb->group.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->group.id_only);
+    memb->user.rec = get_id(cache, DBR_ENTITY_TRADER, memb->user.id_only);
     return memb;
 }
 
@@ -301,17 +301,17 @@ emplace_membs(DbrServ serv, DbrModel model)
     for (; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
 
-        struct FigAccnt* accnt = fig_accnt_lazy(memb->accnt.rec, serv->pool);
+        struct FigAccnt* accnt = fig_accnt_lazy(memb->group.rec, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
-        struct FigTrader* trader = fig_trader_lazy(memb->trader.rec, &serv->ordidx, serv->pool);
+        struct FigTrader* trader = fig_trader_lazy(memb->user.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
         // Transfer ownership.
-        fig_accnt_insert_memb(accnt, memb);
-        fig_trader_emplace_perm(trader, memb);
+        fig_accnt_insert_user(accnt, memb);
+        fig_trader_emplace_group(trader, memb);
     }
     return DBR_TRUE;
  fail2:

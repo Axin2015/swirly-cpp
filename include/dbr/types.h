@@ -511,22 +511,23 @@ struct DbrMemb {
     /**
      * @publicsection
      */
-    union DbrURec accnt;
-    union DbrURec trader;
+    union DbrURec group;
+    union DbrURec user;
     /**
      * @privatesection
      */
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
-    struct DbrRbNode accnt_node_;
-    struct DbrRbNode trader_node_;
+    struct DbrRbNode group_node_;
+    struct DbrRbNode user_node_;
 };
 
 static inline void
 dbr_memb_init(struct DbrMemb* memb)
 {
     dbr_slnode_init(&memb->shared_node_);
-    dbr_rbnode_init(&memb->trader_node_);
+    dbr_rbnode_init(&memb->group_node_);
+    dbr_rbnode_init(&memb->user_node_);
 }
 
 static inline struct DbrMemb*

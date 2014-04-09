@@ -207,6 +207,6 @@ TEST_CASE(proto_memb)
     end = read_memb(buf, out);
     check(buf + len == end);
 
-    check(out.accnt.id_only == in->accnt.id_only);
-    check(out.trader.id_only == in->trader.id_only);
+    check(out.group.id_only == in->group.id_only);
+    check(out.user.id_only == in->user.id_only);
 }

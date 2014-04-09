@@ -173,10 +173,10 @@ read_posn(DbrPool pool, DbrSlNode*& first)
 }
 
 void
-set_memb(DbrMemb& memb, DbrIden accnt, DbrIden trader)
+set_memb(DbrMemb& memb, DbrIden gid, DbrIden uid)
 {
-    memb.accnt.id_only = accnt;
-    memb.trader.id_only = trader;
+    memb.group.id_only = gid;
+    memb.user.id_only = uid;
 }
 
 ssize_t

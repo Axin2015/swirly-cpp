@@ -249,8 +249,8 @@ cdef extern from "dbr/types.h":
         pass
 
     ctypedef struct DbrMemb:
-        DbrURec trader
-        DbrURec accnt
+        DbrURec group
+        DbrURec user
 
     ctypedef struct DbrPosn:
         DbrURec accnt
@@ -349,15 +349,15 @@ cdef extern from "dbr/trader.h":
 
     DbrBool dbr_trader_empty_trade(DbrTrader trader) nogil
 
-    DbrMemb* dbr_trader_perm_entry(DbrRbNode* node) nogil
+    DbrMemb* dbr_trader_group_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_trader_find_perm_id(DbrTrader trader, DbrIden id) nogil
+    DbrRbNode* dbr_trader_find_group_id(DbrTrader trader, DbrIden id) nogil
 
-    DbrRbNode* dbr_trader_first_perm(DbrTrader trader) nogil
+    DbrRbNode* dbr_trader_first_group(DbrTrader trader) nogil
 
-    DbrRbNode* dbr_trader_last_perm(DbrTrader trader) nogil
+    DbrRbNode* dbr_trader_last_group(DbrTrader trader) nogil
 
-    DbrBool dbr_trader_empty_perm(DbrTrader trader) nogil
+    DbrBool dbr_trader_empty_group(DbrTrader trader) nogil
 
     DbrBool dbr_trader_logged_on(DbrTrader trader) nogil
 
@@ -375,15 +375,15 @@ cdef extern from "dbr/accnt.h":
 
     DbrBool dbr_accnt_empty_posn(DbrAccnt accnt) nogil
 
-    DbrMemb* dbr_accnt_memb_entry(DbrRbNode* node) nogil
+    DbrMemb* dbr_accnt_user_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_accnt_find_memb_id(DbrAccnt accnt, DbrIden id) nogil
+    DbrRbNode* dbr_accnt_find_user_id(DbrAccnt accnt, DbrIden id) nogil
 
-    DbrRbNode* dbr_accnt_first_memb(DbrAccnt accnt) nogil
+    DbrRbNode* dbr_accnt_first_user(DbrAccnt accnt) nogil
 
-    DbrRbNode* dbr_accnt_last_memb(DbrAccnt accnt) nogil
+    DbrRbNode* dbr_accnt_last_user(DbrAccnt accnt) nogil
 
-    DbrBool dbr_accnt_empty_memb(DbrAccnt accnt) nogil
+    DbrBool dbr_accnt_empty_user(DbrAccnt accnt) nogil
 
 cdef extern from "dbr/handler.h":
 

@@ -382,17 +382,17 @@ def exec_done(Exec exc):
     return exc.resd == 0
 
 cdef class Memb(object):
-    cdef public DbrIden aid
-    cdef public DbrIden tid
+    cdef public DbrIden gid
+    cdef public DbrIden uid
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Memb({0.aid!r}, {0.tid!r})'.format(self)
+        return 'Memb({0.gid!r}, {0.uid!r})'.format(self)
 
 cdef Memb make_memb(DbrpyMemb* memb):
     cdef obj = Memb.__new__(Memb)
-    obj.aid = memb.accnt.rec.id
-    obj.tid = memb.trader.rec.id
+    obj.gid = memb.group.rec.id
+    obj.uid = memb.user.rec.id
     return obj
 
 cdef class Posn(object):
@@ -574,19 +574,19 @@ cdef class Trader(object):
     def empty_trade(self):
         return <bint>dbr_trader_empty_trade(self.impl_)
 
-    # TraderPerm
-    def find_perm_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_trader_find_perm_id(self.impl_, id)
-        return make_memb(dbr_trader_perm_entry(node)) if node is not NULL else None
-    def list_perm(self):
-        perms = []
-        cdef DbrpyRbNode* node = dbr_trader_first_perm(self.impl_)
+    # TraderGroup
+    def find_group_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_trader_find_group_id(self.impl_, id)
+        return make_memb(dbr_trader_group_entry(node)) if node is not NULL else None
+    def list_group(self):
+        groups = []
+        cdef DbrpyRbNode* node = dbr_trader_first_group(self.impl_)
         while node is not NULL:
-            perms.append(make_memb(dbr_trader_perm_entry(node)))
+            groups.append(make_memb(dbr_trader_group_entry(node)))
             node = dbr_rbnode_next(node)
-        return perms
-    def empty_perm(self):
-        return <bint>dbr_trader_empty_perm(self.impl_)
+        return groups
+    def empty_group(self):
+        return <bint>dbr_trader_empty_group(self.impl_)
 
     def logged_on(self):
         return <bint>dbr_trader_logged_on(self.impl_)
@@ -622,17 +622,17 @@ cdef class Accnt(object):
 
     # AccntMemb
     def find_memb_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_accnt_find_memb_id(self.impl_, id)
-        return make_memb(dbr_accnt_memb_entry(node)) if node is not NULL else None
+        cdef DbrpyRbNode* node = dbr_accnt_find_user_id(self.impl_, id)
+        return make_memb(dbr_accnt_user_entry(node)) if node is not NULL else None
     def list_memb(self):
         membs = []
-        cdef DbrpyRbNode* node = dbr_accnt_first_memb(self.impl_)
+        cdef DbrpyRbNode* node = dbr_accnt_first_user(self.impl_)
         while node is not NULL:
-            membs.append(make_memb(dbr_accnt_memb_entry(node)))
+            membs.append(make_memb(dbr_accnt_user_entry(node)))
             node = dbr_rbnode_next(node)
         return membs
     def empty_memb(self):
-        return <bint>dbr_accnt_empty_memb(self.impl_)
+        return <bint>dbr_accnt_empty_user(self.impl_)
 
 cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     cdef Accnt obj = Accnt.__new__(Accnt)

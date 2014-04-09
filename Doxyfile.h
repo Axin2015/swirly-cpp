@@ -363,7 +363,7 @@
  */
 
 /**
- * @defgroup TraderPerm Permission
+ * @defgroup TraderGroup Group
  * @ingroup Trader
  */
 
@@ -378,7 +378,7 @@
  */
 
 /**
- * @defgroup AccntMemb Member
+ * @defgroup AccntUser User
  * @ingroup Accnt
  */
 

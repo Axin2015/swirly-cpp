@@ -251,7 +251,7 @@ class MembRequest(object):
             raise Error()
         trader = clnt.trader(trec)
         membs = [MembRequest.to_dict(memb)
-                 for memb in trader.list_memb()]
+                 for memb in trader.list_group()]
         return membs
 
 class PosnRequest(object):

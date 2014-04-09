@@ -51,9 +51,9 @@ free_membs(struct FigTrader* trader)
 {
     assert(trader);
     struct DbrRbNode* node;
-    while ((node = trader->perms.root)) {
-        struct DbrMemb* memb = dbr_trader_perm_entry(node);
-        dbr_tree_remove(&trader->perms, node);
+    while ((node = trader->groups.root)) {
+        struct DbrMemb* memb = dbr_trader_group_entry(node);
+        dbr_tree_remove(&trader->groups, node);
         dbr_pool_free_memb(trader->pool, memb);
     }
 }
@@ -75,7 +75,7 @@ fig_trader_lazy(struct DbrRec* trec, struct FigOrdIdx* ordidx, DbrPool pool)
         trader->pool = pool;
         dbr_tree_init(&trader->orders);
         dbr_tree_init(&trader->trades);
-        dbr_tree_init(&trader->perms);
+        dbr_tree_init(&trader->groups);
         trader->sess = NULL;
         dbr_rbnode_init(&trader->sess_node_);
 
@@ -171,30 +171,30 @@ dbr_trader_empty_trade(DbrTrader trader)
     return fig_trader_empty_trade(trader);
 }
 
-// TraderPerm
+// TraderGroup
 
 DBR_API struct DbrRbNode*
-dbr_trader_find_perm_id(DbrTrader trader, DbrIden id)
+dbr_trader_find_group_id(DbrTrader trader, DbrIden id)
 {
-    return fig_trader_find_perm_id(trader, id);
+    return fig_trader_find_group_id(trader, id);
 }
 
 DBR_API struct DbrRbNode*
-dbr_trader_first_perm(DbrTrader trader)
+dbr_trader_first_group(DbrTrader trader)
 {
-    return fig_trader_first_perm(trader);
+    return fig_trader_first_group(trader);
 }
 
 DBR_API struct DbrRbNode*
-dbr_trader_last_perm(DbrTrader trader)
+dbr_trader_last_group(DbrTrader trader)
 {
-    return fig_trader_last_perm(trader);
+    return fig_trader_last_group(trader);
 }
 
 DBR_API DbrBool
-dbr_trader_empty_perm(DbrTrader trader)
+dbr_trader_empty_group(DbrTrader trader)
 {
-    return fig_trader_empty_perm(trader);
+    return fig_trader_empty_group(trader);
 }
 
 DBR_API DbrBool

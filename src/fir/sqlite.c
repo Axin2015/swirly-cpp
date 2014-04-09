@@ -878,11 +878,11 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 goto fail2;
             dbr_memb_init(memb);
 
-            memb->accnt.id_only = sqlite3_column_int64(stmt, ACCNT);
-            memb->trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            memb->group.id_only = sqlite3_column_int64(stmt, ACCNT);
+            memb->user.id_only = sqlite3_column_int64(stmt, TRADER);
 
             dbr_log_debug3("memb: accnt=%ld,trader=%ld",
-                           memb->accnt.id_only, memb->trader.id_only);
+                           memb->group.id_only, memb->user.id_only);
 
             dbr_queue_insert_back(&mq, &memb->shared_node_);
             ++size;

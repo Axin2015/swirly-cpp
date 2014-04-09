@@ -158,8 +158,8 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 static inline struct DbrMemb*
 enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
 {
-    memb->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->accnt.id_only);
-    memb->trader.rec = get_id(cache, DBR_ENTITY_TRADER, memb->trader.id_only);
+    memb->group.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->group.id_only);
+    memb->user.rec = get_id(cache, DBR_ENTITY_TRADER, memb->user.id_only);
     return memb;
 }
 
@@ -259,14 +259,14 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
 
-        DbrTrader trader = memb->trader.rec->trader.state;
+        DbrTrader trader = memb->user.rec->trader.state;
         assert(trader);
         // Transfer ownership.
-        fig_trader_emplace_perm(trader, memb);
+        fig_trader_emplace_group(trader, memb);
 
-        DbrAccnt accnt = fig_accnt_lazy(memb->accnt.rec, clnt->pool);
+        DbrAccnt accnt = fig_accnt_lazy(memb->group.rec, clnt->pool);
         if (dbr_likely(accnt)) {
-            fig_accnt_insert_memb(accnt, memb);
+            fig_accnt_insert_user(accnt, memb);
         } else {
             // Member is owned by trader so no need to free here.
             nomem = DBR_TRUE;
