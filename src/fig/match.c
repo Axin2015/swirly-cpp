@@ -76,7 +76,8 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 
 static DbrBool
 match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
-             struct DbrBank* bank, DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
+             struct DbrBank* bank, DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool,
+             struct DbrTrans* trans)
 {
     DbrLots taken = 0;
     DbrTicks last_ticks = 0;
@@ -100,7 +101,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         dbr_match_init(match);
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->c.accnt.rec, crec, settl_date, pool);
+        struct DbrPosn* posn = fig_accnt_posn(maker->c.accnt.rec, crec, settl_date,
+                                              ordidx, pool);
         if (!posn) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
@@ -197,7 +199,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     if (!dbr_queue_empty(&trans->matches)) {
 
         // Avoid allocating position when there are no matches.
-        if (!(trans->taker_posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date, pool)))
+        if (!(trans->taker_posn = fig_accnt_posn(taker->c.accnt.rec, crec, settl_date,
+                                                 ordidx, pool)))
             goto fail1;
 
         // Commit taker order.
@@ -218,7 +221,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
 DBR_EXTERN DbrBool
 fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 DbrJourn journ, DbrPool pool, struct DbrTrans* trans)
+                 DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans)
 {
     struct DbrSide* side;
     int direct;
@@ -234,5 +237,5 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* b
         direct = DBR_GIVEN;
     }
 
-    return match_orders(book, taker, side, direct, bank, journ, pool, trans);
+    return match_orders(book, taker, side, direct, bank, journ, ordidx, pool, trans);
 }

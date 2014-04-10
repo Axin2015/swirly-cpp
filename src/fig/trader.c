@@ -47,7 +47,7 @@ free_execs(struct FigTrader* trader)
 }
 
 static void
-free_membs(struct FigTrader* trader)
+free_groups(struct FigTrader* trader)
 {
     assert(trader);
     struct DbrRbNode* node;
@@ -92,7 +92,7 @@ fig_trader_term(struct DbrRec* trec)
     struct FigTrader* trader = trec->trader.state;
     if (trader) {
         trec->trader.state = NULL;
-        free_membs(trader);
+        free_groups(trader);
         free_execs(trader);
         free_orders(trader);
         free(trader);
@@ -102,7 +102,7 @@ fig_trader_term(struct DbrRec* trec)
 DBR_EXTERN void
 fig_trader_clear(struct FigTrader* trader)
 {
-    free_membs(trader);
+    free_groups(trader);
     free_execs(trader);
     free_orders(trader);
 }

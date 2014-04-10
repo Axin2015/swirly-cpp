@@ -21,6 +21,7 @@
 #include <dbrpp/iter.hpp>
 #include <dbrpp/rbnode.hpp>
 #include <dbrpp/rec.hpp>
+#include <dbrpp/sess.hpp>
 
 #include <dbr/accnt.h>
 
@@ -30,22 +31,22 @@
 namespace dbr {
 
 /**
- * @addtogroup AccntPosn
+ * @addtogroup AccntGroup
  * @{
  */
 
-class AccntPosns {
+class AccntGroups {
     struct Policy : NodeTraits<DbrRbNode> {
-        typedef DbrPosn Entry;
+        typedef DbrMemb Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_accnt_posn_entry(node);
+            return dbr_accnt_group_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_accnt_posn_entry(const_cast<Node*>(node));
+            return dbr_accnt_group_entry(const_cast<Node*>(node));
         }
     };
     DbrAccnt accnt_;
@@ -82,12 +83,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    AccntPosns(DbrAccnt accnt) noexcept
-    : accnt_{accnt}
+    AccntGroups(DbrAccnt accnt) noexcept
+        : accnt_{accnt}
     {
     }
     void
-    swap(AccntPosns& rhs) noexcept
+    swap(AccntGroups& rhs) noexcept
     {
         std::swap(accnt_, rhs.accnt_);
     }
@@ -97,22 +98,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_accnt_first_posn(accnt_);
+        return dbr_accnt_first_group(accnt_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_accnt_first_posn(accnt_);
+        return dbr_accnt_first_group(accnt_);
     }
     Iterator
     end() noexcept
     {
-        return DBR_ACCNT_END_POSN;
+        return DBR_ACCNT_END_GROUP;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_ACCNT_END_POSN;
+        return DBR_ACCNT_END_GROUP;
     }
 
     // ReverseIterator.
@@ -120,35 +121,35 @@ public:
     ReverseIterator
     rbegin() noexcept
     {
-        return dbr_accnt_last_posn(accnt_);
+        return dbr_accnt_last_group(accnt_);
     }
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return dbr_accnt_last_posn(accnt_);
+        return dbr_accnt_last_group(accnt_);
     }
     ReverseIterator
     rend() noexcept
     {
-        return DBR_ACCNT_END_POSN;
+        return DBR_ACCNT_END_GROUP;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return DBR_ACCNT_END_POSN;
+        return DBR_ACCNT_END_GROUP;
     }
 
     // Find.
 
     Iterator
-    find(DbrIden id) noexcept
+    find(DbrTicks ticks) noexcept
     {
-        return dbr_accnt_find_posn_id(accnt_, id);
+        return dbr_accnt_find_group_id(accnt_, ticks);
     }
     ConstIterator
-    find(DbrIden id) const noexcept
+    find(DbrTicks ticks) const noexcept
     {
-        return dbr_accnt_find_posn_id(accnt_, id);
+        return dbr_accnt_find_group_id(accnt_, ticks);
     }
 
     // Accessor.
@@ -186,7 +187,7 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_accnt_empty_posn(accnt_);
+        return dbr_accnt_empty_group(accnt_);
     }
 };
 
@@ -356,6 +357,507 @@ public:
 /** @} */
 
 /**
+ * @addtogroup AccntOrder
+ * @{
+ */
+
+class AccntOrders {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrOrder Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_accnt_order_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_accnt_order_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrAccnt accnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    AccntOrders(DbrAccnt accnt) noexcept
+        : accnt_{accnt}
+    {
+    }
+    void
+    swap(AccntOrders& rhs) noexcept
+    {
+        std::swap(accnt_, rhs.accnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_accnt_first_order(accnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_accnt_first_order(accnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_ACCNT_END_ORDER;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_ACCNT_END_ORDER;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_accnt_last_order(accnt_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_accnt_last_order(accnt_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_ACCNT_END_ORDER;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_ACCNT_END_ORDER;
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrTicks ticks) noexcept
+    {
+        return dbr_accnt_find_order_id(accnt_, ticks);
+    }
+    ConstIterator
+    find(DbrTicks ticks) const noexcept
+    {
+        return dbr_accnt_find_order_id(accnt_, ticks);
+    }
+    Iterator
+    find(const char* ref) noexcept
+    {
+        DbrOrder* const order = dbr_accnt_find_order_ref(accnt_, ref);
+        return order ? &order->trader_node_ : end();
+    }
+    ConstIterator
+    find(const char* ref) const noexcept
+    {
+        DbrOrder* const order = dbr_accnt_find_order_ref(accnt_, ref);
+        return order ? &order->trader_node_ : end();
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_accnt_empty_order(accnt_);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup AccntTrade
+ * @{
+ */
+
+class AccntTrades {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrExec Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_accnt_trade_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_accnt_trade_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrAccnt accnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    AccntTrades(DbrAccnt accnt) noexcept
+        : accnt_{accnt}
+    {
+    }
+    void
+    swap(AccntTrades& rhs) noexcept
+    {
+        std::swap(accnt_, rhs.accnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_accnt_first_trade(accnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_accnt_first_trade(accnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_ACCNT_END_TRADE;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_ACCNT_END_TRADE;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_accnt_last_trade(accnt_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_accnt_last_trade(accnt_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_ACCNT_END_TRADE;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_ACCNT_END_TRADE;
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrTicks ticks) noexcept
+    {
+        return dbr_accnt_find_trade_id(accnt_, ticks);
+    }
+    ConstIterator
+    find(DbrTicks ticks) const noexcept
+    {
+        return dbr_accnt_find_trade_id(accnt_, ticks);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_accnt_empty_trade(accnt_);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup AccntPosn
+ * @{
+ */
+
+class AccntPosns {
+    struct Policy : NodeTraits<DbrRbNode> {
+        typedef DbrPosn Entry;
+        static Entry*
+        entry(Node* node)
+        {
+            return dbr_accnt_posn_entry(node);
+        }
+        static const Entry*
+        entry(const Node* node)
+        {
+            return dbr_accnt_posn_entry(const_cast<Node*>(node));
+        }
+    };
+    DbrAccnt accnt_;
+public:
+    typedef Policy::Entry ValueType;
+    typedef Policy::Entry* Pointer;
+    typedef Policy::Entry& Reference;
+    typedef const Policy::Entry* ConstPointer;
+    typedef const Policy::Entry& ConstReference;
+
+    typedef BiDirectionalIterator<Policy> Iterator;
+    typedef ConstBiDirectionalIterator<Policy> ConstIterator;
+    typedef ReverseBiDirectionalIterator<Policy> ReverseIterator;
+    typedef ConstReverseBiDirectionalIterator<Policy> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef Iterator iterator;
+    typedef ConstIterator const_iterator;
+    typedef ReverseIterator reverse_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+
+    explicit
+    AccntPosns(DbrAccnt accnt) noexcept
+    : accnt_{accnt}
+    {
+    }
+    void
+    swap(AccntPosns& rhs) noexcept
+    {
+        std::swap(accnt_, rhs.accnt_);
+    }
+
+    // Iterator.
+
+    Iterator
+    begin() noexcept
+    {
+        return dbr_accnt_first_posn(accnt_);
+    }
+    ConstIterator
+    begin() const noexcept
+    {
+        return dbr_accnt_first_posn(accnt_);
+    }
+    Iterator
+    end() noexcept
+    {
+        return DBR_ACCNT_END_POSN;
+    }
+    ConstIterator
+    end() const noexcept
+    {
+        return DBR_ACCNT_END_POSN;
+    }
+
+    // ReverseIterator.
+
+    ReverseIterator
+    rbegin() noexcept
+    {
+        return dbr_accnt_last_posn(accnt_);
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return dbr_accnt_last_posn(accnt_);
+    }
+    ReverseIterator
+    rend() noexcept
+    {
+        return DBR_ACCNT_END_POSN;
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return DBR_ACCNT_END_POSN;
+    }
+
+    // Find.
+
+    Iterator
+    find(DbrIden id) noexcept
+    {
+        return dbr_accnt_find_posn_id(accnt_, id);
+    }
+    ConstIterator
+    find(DbrIden id) const noexcept
+    {
+        return dbr_accnt_find_posn_id(accnt_, id);
+    }
+
+    // Accessor.
+
+    Reference
+    front() noexcept
+    {
+        return *begin();
+    }
+    ConstReference
+    front() const noexcept
+    {
+        return *begin();
+    }
+    Reference
+    back() noexcept
+    {
+        return *rbegin();
+    }
+    ConstReference
+    back() const noexcept
+    {
+        return *rbegin();
+    }
+    SizeType
+    size() const noexcept
+    {
+        return std::distance(begin(), end());
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return std::numeric_limits<SizeType>::max();
+    }
+    bool
+    empty() const noexcept
+    {
+        return dbr_accnt_empty_posn(accnt_);
+    }
+};
+
+/** @} */
+
+/**
  * @addtogroup Accnt
  * @{
  */
@@ -388,13 +890,13 @@ public:
         return AccntRecRef{*dbr_accnt_rec(impl_)};
     }
     /**
-     * @addtogroup AccntPosn
+     * @addtogroup AccntGroup
      * @{
      */
-    AccntPosns
-    posns() const noexcept
+    AccntGroups
+    groups() const noexcept
     {
-        return AccntPosns{impl_};
+        return AccntGroups{impl_};
     }
     /** @} */
     /**
@@ -407,6 +909,46 @@ public:
         return AccntUsers{impl_};
     }
     /** @} */
+    /**
+     * @addtogroup AccntOrder
+     * @{
+     */
+    AccntOrders
+    orders() const noexcept
+    {
+        return AccntOrders{impl_};
+    }
+    /** @} */
+    /**
+     * @addtogroup AccntTrade
+     * @{
+     */
+    AccntTrades
+    trades() const noexcept
+    {
+        return AccntTrades{impl_};
+    }
+    /** @} */
+    /**
+     * @addtogroup AccntPosn
+     * @{
+     */
+    AccntPosns
+    posns() const noexcept
+    {
+        return AccntPosns{impl_};
+    }
+    /** @} */
+    DbrBool
+    logged_on() const noexcept
+    {
+        return dbr_accnt_logged_on(impl_);
+    }
+    SessRef
+    sess() const noexcept
+    {
+        return SessRef(*dbr_accnt_sess(impl_));
+    }
 };
 
 inline std::ostream&

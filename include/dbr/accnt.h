@@ -33,29 +33,29 @@ dbr_accnt_rec(DbrAccnt accnt);
 /** @} */
 
 /**
- * @addtogroup AccntPosn
+ * @addtogroup AccntGroup
  * @{
  */
 
-#define DBR_ACCNT_END_POSN NULL
+#define DBR_ACCNT_END_GROUP NULL
 
-static inline struct DbrPosn*
-dbr_accnt_posn_entry(struct DbrRbNode* node)
+static inline struct DbrMemb*
+dbr_accnt_group_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrPosn, accnt_node_, node);
+    return dbr_implof(struct DbrMemb, user_node_, node);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id);
+dbr_accnt_find_group_id(DbrAccnt accnt, DbrIden id);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_first_posn(DbrAccnt accnt);
+dbr_accnt_first_group(DbrAccnt accnt);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_last_posn(DbrAccnt accnt);
+dbr_accnt_last_group(DbrAccnt accnt);
 
 DBR_API DbrBool
-dbr_accnt_empty_posn(DbrAccnt accnt);
+dbr_accnt_empty_group(DbrAccnt accnt);
 
 /** @} */
 
@@ -83,6 +83,103 @@ dbr_accnt_last_user(DbrAccnt accnt);
 
 DBR_API DbrBool
 dbr_accnt_empty_user(DbrAccnt accnt);
+
+/** @} */
+
+/**
+ * @addtogroup AccntOrder
+ * @{
+ */
+
+#define DBR_ACCNT_END_ORDER NULL
+
+static inline struct DbrOrder*
+dbr_accnt_order_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrOrder, trader_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_order_id(DbrAccnt accnt, DbrIden id);
+
+DBR_API struct DbrOrder*
+dbr_accnt_find_order_ref(DbrAccnt accnt, const char* ref);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_order(DbrAccnt accnt);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_order(DbrAccnt accnt);
+
+DBR_API DbrBool
+dbr_accnt_empty_order(DbrAccnt accnt);
+
+/** @} */
+
+/**
+ * @addtogroup AccntTrade
+ * @{
+ */
+
+#define DBR_ACCNT_END_TRADE NULL
+
+static inline struct DbrExec*
+dbr_accnt_trade_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrExec, trader_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_trade(DbrAccnt accnt);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_trade(DbrAccnt accnt);
+
+DBR_API DbrBool
+dbr_accnt_empty_trade(DbrAccnt accnt);
+
+/** @} */
+
+/**
+ * @addtogroup AccntPosn
+ * @{
+ */
+
+#define DBR_ACCNT_END_POSN NULL
+
+static inline struct DbrPosn*
+dbr_accnt_posn_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrPosn, accnt_node_, node);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_posn(DbrAccnt accnt);
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_posn(DbrAccnt accnt);
+
+DBR_API DbrBool
+dbr_accnt_empty_posn(DbrAccnt accnt);
+
+/** @} */
+
+/**
+ * @addtogroup Accnt
+ * @{
+ */
+
+DBR_API DbrBool
+dbr_accnt_logged_on(DbrAccnt accnt);
+
+DBR_API struct DbrSess*
+dbr_accnt_sess(DbrAccnt accnt);
 
 /** @} */
 

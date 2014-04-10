@@ -237,7 +237,7 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         node = node->next;
         // Transfer ownership.
         // All accnts that trader is member of are created in emplace_membs().
-        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
+        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->ordidx, clnt->pool);
         if (dbr_likely(accnt)) {
             fig_accnt_emplace_posn(accnt, posn);
         } else {
@@ -264,7 +264,7 @@ emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
         // Transfer ownership.
         fig_trader_emplace_group(trader, memb);
 
-        DbrAccnt accnt = fig_accnt_lazy(memb->group.rec, clnt->pool);
+        DbrAccnt accnt = fig_accnt_lazy(memb->group.rec, &clnt->ordidx, clnt->pool);
         if (dbr_likely(accnt)) {
             fig_accnt_insert_user(accnt, memb);
         } else {
@@ -342,7 +342,7 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
 static struct DbrPosn*
 apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
-    DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, clnt->pool);
+    DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->ordidx, clnt->pool);
     if (dbr_unlikely(!accnt)) {
         dbr_pool_free_posn(accnt->pool, posn);
         dbr_err_set(DBR_ENOMEM, "out of memory");
@@ -695,7 +695,7 @@ dbr_clnt_trader(DbrClnt clnt, struct DbrRec* trec)
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 {
-    return fig_accnt_lazy(arec, clnt->pool);
+    return fig_accnt_lazy(arec, &clnt->ordidx, clnt->pool);
 }
 
 DBR_API DbrIden

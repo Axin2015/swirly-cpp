@@ -22,6 +22,7 @@
 #include <dbr/types.h>
 
 struct DbrBank;
+struct FigOrdIdx;
 
 // Used by matching engine to build a list of matches.
 
@@ -29,6 +30,6 @@ struct DbrBank;
 
 DBR_EXTERN DbrBool
 fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 DbrJourn journ, DbrPool pool, struct DbrTrans* trans);
+                 DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans);
 
 #endif // FIG_MATCH_H

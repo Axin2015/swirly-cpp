@@ -26,6 +26,42 @@
 #include <stdlib.h>
 
 static void
+free_groups(struct FigAccnt* accnt)
+{
+    assert(accnt);
+    struct DbrRbNode* node;
+    while ((node = accnt->groups.root)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(node);
+        dbr_tree_remove(&accnt->groups, node);
+        dbr_pool_free_memb(accnt->pool, memb);
+    }
+}
+
+static void
+free_orders(struct FigAccnt* accnt)
+{
+    assert(accnt);
+    struct DbrRbNode* node;
+    while ((node = accnt->orders.root)) {
+        struct DbrOrder* order = dbr_accnt_order_entry(node);
+        fig_accnt_release_order(accnt, order);
+        dbr_pool_free_order(accnt->pool, order);
+    }
+}
+
+static void
+free_execs(struct FigAccnt* accnt)
+{
+    assert(accnt);
+    struct DbrRbNode* node;
+    while ((node = accnt->trades.root)) {
+        struct DbrExec* exec = dbr_accnt_trade_entry(node);
+        dbr_tree_remove(&accnt->trades, node);
+        dbr_exec_decref(exec, accnt->pool);
+    }
+}
+
+static void
 free_posns(struct FigAccnt* accnt)
 {
     assert(accnt);
@@ -38,7 +74,7 @@ free_posns(struct FigAccnt* accnt)
 }
 
 DBR_EXTERN struct FigAccnt*
-fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
+fig_accnt_lazy(struct DbrRec* arec, struct FigOrdIdx* ordidx, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ENTITY_ACCNT);
@@ -50,9 +86,15 @@ fig_accnt_lazy(struct DbrRec* arec, DbrPool pool)
             return NULL;
         }
         accnt->rec = arec;
+        accnt->ordidx = ordidx;
         accnt->pool = pool;
+        dbr_tree_init(&accnt->groups);
+        dbr_tree_init(&accnt->users);
+        dbr_tree_init(&accnt->orders);
+        dbr_tree_init(&accnt->trades);
         dbr_tree_init(&accnt->posns);
-        dbr_tree_init(&accnt->membs);
+        accnt->sess = NULL;
+        dbr_rbnode_init(&accnt->sess_node_);
 
         arec->accnt.state = accnt;
     }
@@ -67,8 +109,7 @@ fig_accnt_term(struct DbrRec* arec)
     struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
-        // Do not free members because these are owned by the trader.
-        free_posns(accnt);
+        fig_accnt_clear(accnt);
         free(accnt);
     }
 }
@@ -77,7 +118,10 @@ DBR_EXTERN void
 fig_accnt_clear(struct FigAccnt* accnt)
 {
     free_posns(accnt);
-    dbr_tree_init(&accnt->membs);
+    free_execs(accnt);
+    free_orders(accnt);
+    dbr_tree_init(&accnt->users);
+    free_groups(accnt);
 }
 
 DBR_EXTERN struct DbrPosn*
@@ -107,7 +151,8 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, DbrPool pool)
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date,
+               struct FigOrdIdx* ordidx, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ENTITY_ACCNT);
@@ -116,7 +161,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date, Dbr
     assert(crec->type == DBR_ENTITY_CONTR);
 
     const DbrIden key = dbr_book_key(crec->id, settl_date);
-    struct FigAccnt* accnt = fig_accnt_lazy(arec, pool);
+    struct FigAccnt* accnt = fig_accnt_lazy(arec, ordidx, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
 
@@ -151,6 +196,116 @@ dbr_accnt_rec(DbrAccnt accnt)
     return fig_accnt_rec(accnt);
 }
 
+// AccntGroup
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_group_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_group_id(accnt, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_group(DbrAccnt accnt)
+{
+    return fig_accnt_first_group(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_group(DbrAccnt accnt)
+{
+    return fig_accnt_last_group(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_group(DbrAccnt accnt)
+{
+    return fig_accnt_empty_group(accnt);
+}
+
+// AccntUser
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_user_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_user_id(accnt, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_user(DbrAccnt accnt)
+{
+    return fig_accnt_first_user(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_user(DbrAccnt accnt)
+{
+    return fig_accnt_last_user(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_user(DbrAccnt accnt)
+{
+    return fig_accnt_empty_user(accnt);
+}
+
+// AccntOrder
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_order_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_order_id(accnt, id);
+}
+
+DBR_API struct DbrOrder*
+dbr_accnt_find_order_ref(DbrAccnt accnt, const char* ref)
+{
+    return fig_accnt_find_order_ref(accnt, ref);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_order(DbrAccnt accnt)
+{
+    return fig_accnt_first_order(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_order(DbrAccnt accnt)
+{
+    return fig_accnt_last_order(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_order(DbrAccnt accnt)
+{
+    return fig_accnt_empty_order(accnt);
+}
+
+// AccntTrade
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_trade_id(accnt, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_trade(DbrAccnt accnt)
+{
+    return fig_accnt_first_trade(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_trade(DbrAccnt accnt)
+{
+    return fig_accnt_last_trade(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_trade(DbrAccnt accnt)
+{
+    return fig_accnt_empty_trade(accnt);
+}
+
 // AccntPosn.
 
 DBR_API struct DbrRbNode*
@@ -177,28 +332,16 @@ dbr_accnt_empty_posn(DbrAccnt accnt)
     return fig_accnt_empty_posn(accnt);
 }
 
-// AccntMemb
-
-DBR_API struct DbrRbNode*
-dbr_accnt_find_user_id(DbrAccnt accnt, DbrIden id)
-{
-    return fig_accnt_find_user_id(accnt, id);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_user(DbrAccnt accnt)
-{
-    return fig_accnt_first_user(accnt);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_last_user(DbrAccnt accnt)
-{
-    return fig_accnt_last_user(accnt);
-}
+// Accnt
 
 DBR_API DbrBool
-dbr_accnt_empty_user(DbrAccnt accnt)
+dbr_accnt_logged_on(DbrAccnt accnt)
 {
-    return fig_accnt_empty_user(accnt);
+    return fig_accnt_logged_on(accnt);
+}
+
+DBR_API struct DbrSess*
+dbr_accnt_sess(DbrAccnt accnt)
+{
+    return fig_accnt_sess(accnt);
 }

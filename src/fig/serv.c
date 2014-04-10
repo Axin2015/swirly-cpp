@@ -272,7 +272,7 @@ emplace_posns(DbrServ serv, DbrModel model)
 
     for (; node; node = node->next) {
         struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_shared_posn_entry(node));
-        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, serv->pool);
+        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -301,7 +301,7 @@ emplace_membs(DbrServ serv, DbrModel model)
     for (; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
 
-        struct FigAccnt* accnt = fig_accnt_lazy(memb->group.rec, serv->pool);
+        struct FigAccnt* accnt = fig_accnt_lazy(memb->group.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -501,7 +501,7 @@ dbr_serv_trader(DbrServ serv, struct DbrRec* trec)
 DBR_API DbrAccnt
 dbr_serv_accnt(DbrServ serv, struct DbrRec* arec)
 {
-    return fig_accnt_lazy(arec, serv->pool);
+    return fig_accnt_lazy(arec, &serv->ordidx, serv->pool);
 }
 
 DBR_API struct DbrBook*
@@ -570,7 +570,8 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
     dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
 
     // Order fields are updated on match.
-    if (!fig_match_orders(book, new_order, &serv->bank, serv->journ, serv->pool, &trans))
+    if (!fig_match_orders(book, new_order, &serv->bank, serv->journ, &serv->ordidx,
+                          serv->pool, &trans))
         goto fail3;
 
     // Place incomplete order in book.
