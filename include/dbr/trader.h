@@ -42,7 +42,7 @@ dbr_trader_rec(DbrTrader trader);
 static inline struct DbrOrder*
 dbr_trader_order_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrOrder, trader_node_, node);
+    return dbr_implof(struct DbrOrder, accnt_node_, node);
 }
 
 DBR_API struct DbrRbNode*
@@ -72,7 +72,7 @@ dbr_trader_empty_order(DbrTrader trader);
 static inline struct DbrExec*
 dbr_trader_trade_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrExec, trader_node_, node);
+    return dbr_implof(struct DbrExec, accnt_node_, node);
 }
 
 DBR_API struct DbrRbNode*

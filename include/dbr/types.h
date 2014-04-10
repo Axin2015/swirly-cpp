@@ -317,7 +317,7 @@ struct DbrOrder {
     struct DbrSlNode ref_node_;
     // Doubly-linked for side.
     struct DbrDlNode side_node_;
-    struct DbrRbNode trader_node_;
+    struct DbrRbNode accnt_node_;
 };
 
 static inline void
@@ -326,7 +326,7 @@ dbr_order_init(struct DbrOrder* order)
     dbr_slnode_init(&order->shared_node_);
     dbr_slnode_init(&order->ref_node_);
     dbr_dlnode_init(&order->side_node_);
-    dbr_rbnode_init(&order->trader_node_);
+    dbr_rbnode_init(&order->accnt_node_);
 }
 
 static inline DbrBool
@@ -414,7 +414,7 @@ struct DbrExec {
      */
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
-    struct DbrRbNode trader_node_;
+    struct DbrRbNode accnt_node_;
 };
 
 static inline void
@@ -422,7 +422,7 @@ dbr_exec_init(struct DbrExec* exec)
 {
     exec->refs_ = 1;
     dbr_slnode_init(&exec->shared_node_);
-    dbr_rbnode_init(&exec->trader_node_);
+    dbr_rbnode_init(&exec->accnt_node_);
 }
 
 static inline DbrBool

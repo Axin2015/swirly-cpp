@@ -156,8 +156,8 @@ fig_accnt_emplace_order(struct FigAccnt* accnt, struct DbrOrder* order)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-        struct DbrRbNode* node = dbr_tree_insert(&accnt->orders, order->id, &order->trader_node_);
-        assert(node == &order->trader_node_);
+        struct DbrRbNode* node = dbr_tree_insert(&accnt->orders, order->id, &order->accnt_node_);
+        assert(node == &order->accnt_node_);
     }
 #pragma GCC diagnostic pop
     if (order->c.ref[0] != '\0')
@@ -169,8 +169,8 @@ fig_accnt_emplace_order(struct FigAccnt* accnt, struct DbrOrder* order)
 static inline void
 fig_accnt_release_order(struct FigAccnt* accnt, struct DbrOrder* order)
 {
-    dbr_tree_remove(&accnt->orders, &order->trader_node_);
-    dbr_rbnode_init(&order->trader_node_);
+    dbr_tree_remove(&accnt->orders, &order->accnt_node_);
+    dbr_rbnode_init(&order->accnt_node_);
     if (order->c.ref[0] != '\0')
         fig_ordidx_remove(accnt->ordidx, accnt->rec->id, order->c.ref);
 }
@@ -196,8 +196,8 @@ fig_accnt_release_order_ref(struct FigAccnt* accnt, const char* ref)
     assert(ref);
     struct DbrOrder* order = fig_ordidx_remove(accnt->ordidx, accnt->rec->id, ref);
     if (order) {
-        dbr_tree_remove(&accnt->orders, &order->trader_node_);
-        dbr_rbnode_init(&order->trader_node_);
+        dbr_tree_remove(&accnt->orders, &order->accnt_node_);
+        dbr_rbnode_init(&order->accnt_node_);
     }
     return order;
 }
@@ -246,8 +246,8 @@ fig_accnt_insert_trade(struct FigAccnt* accnt, struct DbrExec* exec)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-        struct DbrRbNode* node = dbr_tree_insert(&accnt->trades, exec->id, &exec->trader_node_);
-        assert(node == &exec->trader_node_);
+        struct DbrRbNode* node = dbr_tree_insert(&accnt->trades, exec->id, &exec->accnt_node_);
+        assert(node == &exec->accnt_node_);
     }
 #pragma GCC diagnostic pop
 }
@@ -255,8 +255,8 @@ fig_accnt_insert_trade(struct FigAccnt* accnt, struct DbrExec* exec)
 static inline void
 fig_accnt_remove_trade(struct FigAccnt* accnt, struct DbrExec* exec)
 {
-    dbr_tree_remove(&accnt->trades, &exec->trader_node_);
-    dbr_rbnode_init(&exec->trader_node_);
+    dbr_tree_remove(&accnt->trades, &exec->accnt_node_);
+    dbr_rbnode_init(&exec->accnt_node_);
     dbr_exec_decref(exec, accnt->pool);
 }
 

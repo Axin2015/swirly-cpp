@@ -96,7 +96,7 @@ dbr_accnt_empty_user(DbrAccnt accnt);
 static inline struct DbrOrder*
 dbr_accnt_order_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrOrder, trader_node_, node);
+    return dbr_implof(struct DbrOrder, accnt_node_, node);
 }
 
 DBR_API struct DbrRbNode*
@@ -126,7 +126,7 @@ dbr_accnt_empty_order(DbrAccnt accnt);
 static inline struct DbrExec*
 dbr_accnt_trade_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrExec, trader_node_, node);
+    return dbr_implof(struct DbrExec, accnt_node_, node);
 }
 
 DBR_API struct DbrRbNode*

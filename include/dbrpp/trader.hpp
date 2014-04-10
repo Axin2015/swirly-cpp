@@ -155,13 +155,13 @@ public:
     find(const char* ref) noexcept
     {
         DbrOrder* const order = dbr_trader_find_order_ref(trader_, ref);
-        return order ? &order->trader_node_ : end();
+        return order ? &order->accnt_node_ : end();
     }
     ConstIterator
     find(const char* ref) const noexcept
     {
         DbrOrder* const order = dbr_trader_find_order_ref(trader_, ref);
-        return order ? &order->trader_node_ : end();
+        return order ? &order->accnt_node_ : end();
     }
 
     // Accessor.

@@ -68,8 +68,8 @@ fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-        struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->trader_node_);
-        assert(node == &order->trader_node_);
+        struct DbrRbNode* node = dbr_tree_insert(&trader->orders, order->id, &order->accnt_node_);
+        assert(node == &order->accnt_node_);
     }
 #pragma GCC diagnostic pop
     if (order->c.ref[0] != '\0')
@@ -81,8 +81,8 @@ fig_trader_emplace_order(struct FigTrader* trader, struct DbrOrder* order)
 static inline void
 fig_trader_release_order(struct FigTrader* trader, struct DbrOrder* order)
 {
-    dbr_tree_remove(&trader->orders, &order->trader_node_);
-    dbr_rbnode_init(&order->trader_node_);
+    dbr_tree_remove(&trader->orders, &order->accnt_node_);
+    dbr_rbnode_init(&order->accnt_node_);
     if (order->c.ref[0] != '\0')
         fig_ordidx_remove(trader->ordidx, trader->rec->id, order->c.ref);
 }
@@ -108,8 +108,8 @@ fig_trader_release_order_ref(struct FigTrader* trader, const char* ref)
     assert(ref);
     struct DbrOrder* order = fig_ordidx_remove(trader->ordidx, trader->rec->id, ref);
     if (order) {
-        dbr_tree_remove(&trader->orders, &order->trader_node_);
-        dbr_rbnode_init(&order->trader_node_);
+        dbr_tree_remove(&trader->orders, &order->accnt_node_);
+        dbr_rbnode_init(&order->accnt_node_);
     }
     return order;
 }
@@ -158,8 +158,8 @@ fig_trader_insert_trade(struct FigTrader* trader, struct DbrExec* exec)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
-        struct DbrRbNode* node = dbr_tree_insert(&trader->trades, exec->id, &exec->trader_node_);
-        assert(node == &exec->trader_node_);
+        struct DbrRbNode* node = dbr_tree_insert(&trader->trades, exec->id, &exec->accnt_node_);
+        assert(node == &exec->accnt_node_);
     }
 #pragma GCC diagnostic pop
 }
@@ -167,8 +167,8 @@ fig_trader_insert_trade(struct FigTrader* trader, struct DbrExec* exec)
 static inline void
 fig_trader_remove_trade(struct FigTrader* trader, struct DbrExec* exec)
 {
-    dbr_tree_remove(&trader->trades, &exec->trader_node_);
-    dbr_rbnode_init(&exec->trader_node_);
+    dbr_tree_remove(&trader->trades, &exec->accnt_node_);
+    dbr_rbnode_init(&exec->accnt_node_);
     dbr_exec_decref(exec, trader->pool);
 }
 
