@@ -31,7 +31,7 @@ order_entry_ref(struct DbrSlNode* node)
 static inline DbrBool
 equal_ref(const struct DbrOrder* order, DbrIden trid, const char* ref)
 {
-    return order->c.trader.rec->id == trid && strncmp(order->c.ref, ref, DBR_REF_MAX) == 0;
+    return order->c.user.rec->id == trid && strncmp(order->c.ref, ref, DBR_REF_MAX) == 0;
 }
 
 static inline size_t
@@ -54,7 +54,7 @@ DBR_EXTERN void
 fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order)
 {
     if (order->c.ref[0] != '\0') {
-        const size_t bucket = hash_ref(order->c.trader.rec->id, order->c.ref) % FIG_ORDIDX_BUCKETS;
+        const size_t bucket = hash_ref(order->c.user.rec->id, order->c.ref) % FIG_ORDIDX_BUCKETS;
         struct DbrStack* refs = &ordidx->buckets[bucket].refs;
         dbr_stack_push(refs, &order->ref_node_);
     }

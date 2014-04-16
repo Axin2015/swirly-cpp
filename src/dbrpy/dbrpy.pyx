@@ -14,9 +14,9 @@ cdef extern from "dbrpy/dbrpy.h":
     ctypedef DbrSlNode DbrpySlNode
 
     ctypedef DbrRec DbrpyRec
+    ctypedef DbrMemb DbrpyMemb
     ctypedef DbrOrder DbrpyOrder
     ctypedef DbrExec DbrpyExec
-    ctypedef DbrMemb DbrpyMemb
     ctypedef DbrPosn DbrpyPosn
     ctypedef DbrView DbrpyView
 
@@ -142,13 +142,12 @@ def longlen(long l):
 
 # Types
 
-ENTITY_TRADER = DBR_ENTITY_TRADER
 ENTITY_ACCNT = DBR_ENTITY_ACCNT
 ENTITY_CONTR = DBR_ENTITY_CONTR
+ENTITY_MEMB = DBR_ENTITY_MEMB
 ENTITY_ORDER = DBR_ENTITY_ORDER
 ENTITY_EXEC = DBR_ENTITY_EXEC
 ENTITY_POSN = DBR_ENTITY_POSN
-ENTITY_MEMB = DBR_ENTITY_MEMB
 
 DISPLAY_MAX = DBR_DISPLAY_MAX
 EMAIL_MAX = DBR_EMAIL_MAX
@@ -164,13 +163,6 @@ cdef class RecBase(object):
     cdef public bytes display
     def __init__(self):
         raise TypeError("init called")
-
-cdef class TraderRec(RecBase):
-    cdef public bytes email
-    def __init__(self):
-        raise TypeError("init called")
-    def __repr__(self):
-        return 'TraderRec({0.type!r}, {0.id!r}, {0.mnem!r}, {0.display!r})'.format(self)
 
 cdef class AccntRec(RecBase):
     cdef public bytes email
@@ -218,12 +210,6 @@ cdef inline void set_rec_base(RecBase obj, DbrpyRec* rec):
     obj.mnem = rec.mnem[:string.strnlen(rec.mnem, DBR_MNEM_MAX)]
     obj.display = rec.display[:string.strnlen(rec.display, DBR_DISPLAY_MAX)]
 
-cdef TraderRec make_trader_rec(DbrpyRec* rec):
-    cdef obj = TraderRec.__new__(TraderRec)
-    set_rec_base(obj, rec)
-    obj.email = rec.trader.email[:string.strnlen(rec.trader.email, DBR_EMAIL_MAX)]
-    return obj
-
 cdef AccntRec make_accnt_rec(DbrpyRec* rec):
     cdef obj = AccntRec.__new__(AccntRec)
     set_rec_base(obj, rec)
@@ -251,12 +237,24 @@ cdef ContrRec make_contr_rec(DbrpyRec* rec):
 
 cdef RecBase make_rec(DbrpyRec* rec):
     cdef RecBase obj = None
-    if rec.type == DBR_ENTITY_TRADER:
-        obj = make_trader_rec(rec)
-    elif rec.type == DBR_ENTITY_ACCNT:
+    if rec.type == DBR_ENTITY_ACCNT:
         obj = make_accnt_rec(rec)
     elif rec.type == DBR_ENTITY_CONTR:
         obj = make_contr_rec(rec)
+    return obj
+
+cdef class Memb(object):
+    cdef public DbrIden gid
+    cdef public DbrIden uid
+    def __init__(self):
+        raise TypeError("init called")
+    def __repr__(self):
+        return 'Memb({0.gid!r}, {0.uid!r})'.format(self)
+
+cdef Memb make_memb(DbrpyMemb* memb):
+    cdef obj = Memb.__new__(Memb)
+    obj.uid = memb.user.rec.id
+    obj.gid = memb.group.rec.id
     return obj
 
 STATE_NEW = DBR_STATE_NEW
@@ -269,8 +267,8 @@ ACTION_SELL = DBR_ACTION_SELL
 
 cdef class Order(object):
     cdef public DbrIden id
-    cdef public DbrIden tid
-    cdef public DbrIden aid
+    cdef public DbrIden uid
+    cdef public DbrIden gid
     cdef public DbrIden cid
     cdef public DbrDate settl_date
     cdef public bytes ref
@@ -293,8 +291,8 @@ cdef class Order(object):
 cdef Order make_order(DbrpyOrder* order):
     cdef obj = Order.__new__(Order)
     obj.id = order.id
-    obj.tid = order.c.trader.rec.id
-    obj.aid = order.c.accnt.rec.id
+    obj.uid = order.c.user.rec.id
+    obj.gid = order.c.group.rec.id
     obj.cid = order.c.contr.rec.id
     obj.settl_date = order.c.settl_date
     obj.ref = order.c.ref[:string.strnlen(order.c.ref, DBR_REF_MAX)]
@@ -331,8 +329,8 @@ ROLE_TAKER = DBR_ROLE_TAKER
 cdef class Exec(object):
     cdef public DbrIden id
     cdef public DbrIden order
-    cdef public DbrIden tid
-    cdef public DbrIden aid
+    cdef public DbrIden uid
+    cdef public DbrIden gid
     cdef public DbrIden cid
     cdef public DbrDate settl_date
     cdef public bytes ref
@@ -358,8 +356,8 @@ cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
     obj.id = exc.id
     obj.order = exc.order
-    obj.tid = exc.c.trader.rec.id
-    obj.aid = exc.c.accnt.rec.id
+    obj.uid = exc.c.user.rec.id
+    obj.gid = exc.c.group.rec.id
     obj.cid = exc.c.contr.rec.id
     obj.settl_date = exc.c.settl_date
     obj.ref = exc.c.ref[:string.strnlen(exc.c.ref, DBR_REF_MAX)]
@@ -381,22 +379,8 @@ cdef Exec make_exec(DbrpyExec* exc):
 def exec_done(Exec exc):
     return exc.resd == 0
 
-cdef class Memb(object):
-    cdef public DbrIden gid
-    cdef public DbrIden uid
-    def __init__(self):
-        raise TypeError("init called")
-    def __repr__(self):
-        return 'Memb({0.gid!r}, {0.uid!r})'.format(self)
-
-cdef Memb make_memb(DbrpyMemb* memb):
-    cdef obj = Memb.__new__(Memb)
-    obj.gid = memb.group.rec.id
-    obj.uid = memb.user.rec.id
-    return obj
-
 cdef class Posn(object):
-    cdef public DbrIden aid
+    cdef public DbrIden gid
     cdef public DbrIden cid
     cdef public DbrDate settl_date
     cdef public DbrLicks buy_licks
@@ -406,11 +390,11 @@ cdef class Posn(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Posn({0.aid!r}, {0.cid!r}, {0.settl_date!r})'.format(self)
+        return 'Posn({0.gid!r}, {0.cid!r}, {0.settl_date!r})'.format(self)
 
 cdef Posn make_posn(DbrpyPosn* posn):
     cdef obj = Posn.__new__(Posn)
-    obj.aid = posn.accnt.rec.id
+    obj.gid = posn.accnt.rec.id
     obj.cid = posn.contr.rec.id
     obj.settl_date = posn.settl_date
     obj.buy_licks = posn.buy_licks
@@ -534,69 +518,6 @@ cdef class Async(object):
         self.send(val)
         return self.recv()
 
-# Trader
-
-cdef class Trader(object):
-    cdef DbrTrader impl_
-    cdef public TraderRec rec
-
-    def __init__(self):
-        raise TypeError("init called")
-
-    # TraderOrder
-    def find_order_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_trader_find_order_id(self.impl_, id)
-        return make_order(dbr_trader_order_entry(node)) if node is not NULL else None
-    def find_order_ref(self, const char* ref):
-        cdef DbrpyOrder* order = dbr_trader_find_order_ref(self.impl_, ref)
-        return make_order(order) if order is not NULL else None
-    def list_order(self):
-        orders = []
-        cdef DbrpyRbNode* node = dbr_trader_first_order(self.impl_)
-        while node is not NULL:
-            orders.append(make_order(dbr_trader_order_entry(node)))
-            node = dbr_rbnode_next(node)
-        return orders
-    def empty_order(self):
-        return <bint>dbr_trader_empty_order(self.impl_)
-
-    # TraderTrade
-    def find_trade_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_trader_find_trade_id(self.impl_, id)
-        return make_exec(dbr_trader_trade_entry(node)) if node is not NULL else None
-    def list_trade(self):
-        trades = []
-        cdef DbrpyRbNode* node = dbr_trader_first_trade(self.impl_)
-        while node is not NULL:
-            trades.append(make_exec(dbr_trader_trade_entry(node)))
-            node = dbr_rbnode_next(node)
-        return trades
-    def empty_trade(self):
-        return <bint>dbr_trader_empty_trade(self.impl_)
-
-    # TraderGroup
-    def find_group_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_trader_find_group_id(self.impl_, id)
-        return make_memb(dbr_trader_group_entry(node)) if node is not NULL else None
-    def list_group(self):
-        groups = []
-        cdef DbrpyRbNode* node = dbr_trader_first_group(self.impl_)
-        while node is not NULL:
-            groups.append(make_memb(dbr_trader_group_entry(node)))
-            node = dbr_rbnode_next(node)
-        return groups
-    def empty_group(self):
-        return <bint>dbr_trader_empty_group(self.impl_)
-
-    def logged_on(self):
-        return <bint>dbr_trader_logged_on(self.impl_)
-
-cdef Trader make_trader(DbrTrader trader, TraderRec rec):
-    cdef Trader obj = Trader.__new__(Trader)
-    obj.impl_ = trader
-    obj.rec = rec
-    return obj
-
 # Accnt
 
 cdef class Accnt(object):
@@ -605,6 +526,65 @@ cdef class Accnt(object):
 
     def __init__(self):
         raise TypeError("init called")
+
+    # AccntUser
+    def find_user_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_user_id(self.impl_, id)
+        return make_memb(dbr_accnt_user_entry(node)) if node is not NULL else None
+    def list_user(self):
+        users = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_user(self.impl_)
+        while node is not NULL:
+            users.append(make_memb(dbr_accnt_user_entry(node)))
+            node = dbr_rbnode_next(node)
+        return users
+    def empty_user(self):
+        return <bint>dbr_accnt_empty_user(self.impl_)
+
+    # AccntGroup
+    def find_group_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_group_id(self.impl_, id)
+        return make_memb(dbr_accnt_group_entry(node)) if node is not NULL else None
+    def list_group(self):
+        groups = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_group(self.impl_)
+        while node is not NULL:
+            groups.append(make_memb(dbr_accnt_group_entry(node)))
+            node = dbr_rbnode_next(node)
+        return groups
+    def empty_group(self):
+        return <bint>dbr_accnt_empty_group(self.impl_)
+
+    # AccntOrder
+    def find_order_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_order_id(self.impl_, id)
+        return make_order(dbr_accnt_order_entry(node)) if node is not NULL else None
+    def find_order_ref(self, const char* ref):
+        cdef DbrpyOrder* order = dbr_accnt_find_order_ref(self.impl_, ref)
+        return make_order(order) if order is not NULL else None
+    def list_order(self):
+        orders = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_order(self.impl_)
+        while node is not NULL:
+            orders.append(make_order(dbr_accnt_order_entry(node)))
+            node = dbr_rbnode_next(node)
+        return orders
+    def empty_order(self):
+        return <bint>dbr_accnt_empty_order(self.impl_)
+
+    # AccntTrade
+    def find_trade_id(self, DbrIden id):
+        cdef DbrpyRbNode* node = dbr_accnt_find_trade_id(self.impl_, id)
+        return make_exec(dbr_accnt_trade_entry(node)) if node is not NULL else None
+    def list_trade(self):
+        trades = []
+        cdef DbrpyRbNode* node = dbr_accnt_first_trade(self.impl_)
+        while node is not NULL:
+            trades.append(make_exec(dbr_accnt_trade_entry(node)))
+            node = dbr_rbnode_next(node)
+        return trades
+    def empty_trade(self):
+        return <bint>dbr_accnt_empty_trade(self.impl_)
 
     # AccntPosn
     def find_posn_id(self, DbrIden id):
@@ -620,19 +600,8 @@ cdef class Accnt(object):
     def empty_posn(self):
         return <bint>dbr_accnt_empty_posn(self.impl_)
 
-    # AccntMemb
-    def find_memb_id(self, DbrIden id):
-        cdef DbrpyRbNode* node = dbr_accnt_find_user_id(self.impl_, id)
-        return make_memb(dbr_accnt_user_entry(node)) if node is not NULL else None
-    def list_memb(self):
-        membs = []
-        cdef DbrpyRbNode* node = dbr_accnt_first_user(self.impl_)
-        while node is not NULL:
-            membs.append(make_memb(dbr_accnt_user_entry(node)))
-            node = dbr_rbnode_next(node)
-        return membs
-    def empty_memb(self):
-        return <bint>dbr_accnt_empty_user(self.impl_)
+    def logged_on(self):
+        return <bint>dbr_accnt_logged_on(self.impl_)
 
 cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     cdef Accnt obj = Accnt.__new__(Accnt)
@@ -657,11 +626,11 @@ cdef void on_close(DbrHandler handler) with gil:
 cdef void on_ready(DbrHandler handler) with gil:
     (<object>handler_target(handler)).on_ready()
 
-cdef void on_logon(DbrHandler handler, DbrIden tid) with gil:
-    (<object>handler_target(handler)).on_logon(tid)
+cdef void on_logon(DbrHandler handler, DbrIden uid) with gil:
+    (<object>handler_target(handler)).on_logon(uid)
 
-cdef void on_logoff(DbrHandler handler, DbrIden tid) with gil:
-    (<object>handler_target(handler)).on_logoff(tid)
+cdef void on_logoff(DbrHandler handler, DbrIden uid) with gil:
+    (<object>handler_target(handler)).on_logoff(uid)
 
 cdef void on_reset(DbrHandler handler) with gil:
     (<object>handler_target(handler)).on_reset()
@@ -717,10 +686,10 @@ cdef class Handler(object):
     def on_ready(self):
         pass
 
-    def on_logon(self, tid):
+    def on_logon(self, uid):
         pass
 
-    def on_logoff(self, tid):
+    def on_logoff(self, uid):
         pass
 
     def on_reset(self):
@@ -814,83 +783,77 @@ cdef class Clnt(object):
     def empty_rec(self, int type):
         return <bint>dbr_clnt_empty_rec(self.impl_, type)
 
-    def trader(self, TraderRec trec):
-        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
-        if trader is NULL:
-            raise Error()
-        return make_trader(trader, trec)
-
     def accnt(self, AccntRec arec):
         cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
         if accnt is NULL:
             raise Error()
         return make_accnt(accnt, arec)
 
-    def logon(self, TraderRec trec):
-        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
-        if trader is NULL:
+    def logon(self, AccntRec arec):
+        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
+        if accnt is NULL:
             raise Error()
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_logon(self.impl_, trader)
+            id = dbr_clnt_logon(self.impl_, accnt)
         if id < 0:
             raise Error()
         return id
 
-    def logoff(self, TraderRec trec):
-        cdef DbrTrader trader = dbr_clnt_trader(self.impl_, trec.impl_)
-        if trader is NULL:
+    def logoff(self, AccntRec arec):
+        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
+        if accnt is NULL:
             raise Error()
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_logoff(self.impl_, trader)
+            id = dbr_clnt_logoff(self.impl_, accnt)
         if id < 0:
             raise Error()
         return id
 
-    def place(self, Trader trader, Accnt accnt, ContrRec crec, DbrDate settl_date,
+    def place(self, Accnt user, Accnt group, ContrRec crec, DbrDate settl_date,
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots):
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_place(self.impl_, trader.impl_, accnt.impl_, crec.impl_,
+            id = dbr_clnt_place(self.impl_, user.impl_, group.impl_, crec.impl_,
                                 settl_date, ref, action, ticks, lots, min_lots)
         if id < 0:
             raise Error()
         return id
 
-    def revise_id(self, Trader trader, DbrIden id, DbrLots lots):
+    def revise_id(self, Accnt user, DbrIden id, DbrLots lots):
         with nogil:
-            id = dbr_clnt_revise_id(self.impl_, trader.impl_, id, lots)
+            id = dbr_clnt_revise_id(self.impl_, user.impl_, id, lots)
         if id < 0:
             raise Error()
         return id
 
-    def revise_ref(self, Trader trader, const char* ref, DbrLots lots):
+    def revise_ref(self, Accnt user, const char* ref, DbrLots lots):
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_revise_ref(self.impl_, trader.impl_, ref, lots)
+            id = dbr_clnt_revise_ref(self.impl_, user.impl_, ref, lots)
         if id < 0:
             raise Error()
         return id
 
-    def cancel_id(self, Trader trader, DbrIden id):
+    def cancel_id(self, Accnt user, DbrIden id):
         with nogil:
-            id = dbr_clnt_cancel_id(self.impl_, trader.impl_, id)
+            id = dbr_clnt_cancel_id(self.impl_, user.impl_, id)
         if id < 0:
             raise Error()
         return id
 
-    def cancel_ref(self, Trader trader, const char* ref):
+    def cancel_ref(self, Accnt user, const char* ref):
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_cancel_ref(self.impl_, trader.impl_, ref)
+            id = dbr_clnt_cancel_ref(self.impl_, user.impl_, ref)
         if id < 0:
             raise Error()
         return id
 
-    def ack_trade(self, Trader trader, DbrIden id):
+    def ack_trade(self, Accnt user, DbrIden id):
         with nogil:
-            id = dbr_clnt_ack_trade(self.impl_, trader.impl_, id)
+            id = dbr_clnt_ack_trade(self.impl_, user.impl_, id)
         if id < 0:
             raise Error()
         return id

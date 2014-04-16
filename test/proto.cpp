@@ -26,29 +26,6 @@
 
 using namespace dbr;
 
-TEST_CASE(proto_trader)
-{
-    Pool pool(8 * 1024 * 1024);
-    auto in = create_wramirez(pool);
-
-    auto len = trader_len(*in);
-    char buf[len];
-    const char* end = write_trader(buf, *in);
-    check(buf + len == end);
-
-    DbrRec out;
-    end = read_trader(buf, out);
-    check(buf + len == end);
-
-    check(out.type == in->type);
-    check(out.id == in->id);
-    check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
-    check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
-
-    // Body.
-    check(sequal(out.trader.email, in->trader.email, DBR_EMAIL_MAX));
-}
-
 TEST_CASE(proto_accnt)
 {
     Pool pool(8 * 1024 * 1024);
@@ -108,15 +85,36 @@ TEST_CASE(proto_contr)
     check(out.contr.max_lots == in->contr.max_lots);
 }
 
+TEST_CASE(proto_memb)
+{
+    Pool pool(8 * 1024 * 1024);
+    DbrIden user = 5;
+    DbrIden group = 7;
+
+    auto in = create_memb(pool, user, group);
+
+    auto len = memb_len(*in, false);
+    char buf[len];
+    const char* end = write_memb(buf, *in, false);
+    check(buf + len == end);
+
+    DbrMemb out;
+    end = read_memb(buf, out);
+    check(buf + len == end);
+
+    check(out.user.id_only == in->user.id_only);
+    check(out.group.id_only == in->group.id_only);
+}
+
 TEST_CASE(proto_order)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden trader = 5;
-    DbrIden accnt = 7;
+    DbrIden user = 5;
+    DbrIden group = 7;
     DbrIden contr = 11;
     auto now = dbr_millis();
 
-    auto in = create_order(pool, 1, trader, accnt, contr, 20130827,
+    auto in = create_order(pool, 1, user, group, contr, 20130827,
                            "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
 
     auto len = order_len(*in, false);
@@ -129,8 +127,8 @@ TEST_CASE(proto_order)
     check(buf + len == end);
 
     check(out.id == in->id);
-    check(out.c.trader.id_only == in->c.trader.id_only);
-    check(out.c.accnt.id_only == in->c.accnt.id_only);
+    check(out.c.user.id_only == in->c.user.id_only);
+    check(out.c.group.id_only == in->c.group.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_date == in->c.settl_date);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
@@ -150,13 +148,13 @@ TEST_CASE(proto_order)
 TEST_CASE(proto_trade)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden trader = 5;
-    DbrIden accnt = 7;
+    DbrIden user = 5;
+    DbrIden group = 7;
     DbrIden contr = 11;
     DbrIden cpty = 13;
     auto now = dbr_millis();
 
-    auto in = create_trade(pool, 1, 2, trader, accnt, contr, 20130827, "apple", DBR_ACTION_BUY,
+    auto in = create_trade(pool, 1, 2, user, group, contr, 20130827, "apple", DBR_ACTION_BUY,
                            12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER, cpty, now);
 
     auto len = exec_len(*in, false);
@@ -170,8 +168,8 @@ TEST_CASE(proto_trade)
 
     check(out.id == in->id);
     check(out.order == in->order);
-    check(out.c.trader.id_only == in->c.trader.id_only);
-    check(out.c.accnt.id_only == in->c.accnt.id_only);
+    check(out.c.user.id_only == in->c.user.id_only);
+    check(out.c.group.id_only == in->c.group.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_date == in->c.settl_date);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
@@ -188,25 +186,4 @@ TEST_CASE(proto_trade)
     check(out.role == in->role);
     check(out.cpty.id_only == in->cpty.id_only);
     check(out.created == in->created);
-}
-
-TEST_CASE(proto_memb)
-{
-    Pool pool(8 * 1024 * 1024);
-    DbrIden accnt = 5;
-    DbrIden trader = 7;
-
-    auto in = create_memb(pool, trader, accnt);
-
-    auto len = memb_len(*in, false);
-    char buf[len];
-    const char* end = write_memb(buf, *in, false);
-    check(buf + len == end);
-
-    DbrMemb out;
-    end = read_memb(buf, out);
-    check(buf + len == end);
-
-    check(out.group.id_only == in->group.id_only);
-    check(out.user.id_only == in->user.id_only);
 }

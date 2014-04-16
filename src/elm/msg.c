@@ -50,24 +50,6 @@ free_view_list(struct DbrSlNode* first, DbrPool pool)
 }
 
 static const char*
-read_trader(const char* buf, DbrPool pool, struct DbrQueue* queue)
-{
-    struct DbrRec* rec = elm_pool_alloc_rec(pool);
-    if (!rec)
-        goto fail1;
-    dbr_rec_init(rec);
-
-    if (!(buf = elm_read_trader(buf, rec))) {
-        elm_pool_free_rec(pool, rec);
-        goto fail1;
-    }
-    dbr_queue_insert_back(queue, &rec->shared_node_);
-    return buf;
- fail1:
-    return NULL;
-}
-
-static const char*
 read_accnt(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
     struct DbrRec* rec = elm_pool_alloc_rec(pool);
@@ -98,6 +80,24 @@ read_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     }
     dbr_queue_insert_back(queue, &rec->shared_node_);
+    return buf;
+ fail1:
+    return NULL;
+}
+
+static const char*
+read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
+{
+    struct DbrMemb* memb = elm_pool_alloc_memb(pool);
+    if (!memb)
+        goto fail1;
+    dbr_memb_init(memb);
+
+    if (!(buf = elm_read_memb(buf, memb))) {
+        elm_pool_free_memb(pool, memb);
+        goto fail1;
+    }
+    dbr_queue_insert_back(queue, &memb->shared_node_);
     return buf;
  fail1:
     return NULL;
@@ -159,24 +159,6 @@ read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
 }
 
 static const char*
-read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
-{
-    struct DbrMemb* memb = elm_pool_alloc_memb(pool);
-    if (!memb)
-        goto fail1;
-    dbr_memb_init(memb);
-
-    if (!(buf = elm_read_memb(buf, memb))) {
-        elm_pool_free_memb(pool, memb);
-        goto fail1;
-    }
-    dbr_queue_insert_back(queue, &memb->shared_node_);
-    return buf;
- fail1:
-    return NULL;
-}
-
-static const char*
 read_view(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
     struct DbrView* view = elm_pool_alloc_view(pool);
@@ -208,24 +190,15 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        n += dbr_packlenl(body->sess_logon.tid);
+        n += dbr_packlenl(body->sess_logon.uid);
         break;
     case DBR_SESS_LOGOFF:
-        n += dbr_packlenl(body->sess_logoff.tid);
+        n += dbr_packlenl(body->sess_logoff.uid);
         break;
     case DBR_STATUS_REP:
         n += dbr_packlenf(STATUS_REP_FORMAT,
                           body->status_rep.num,
                           DBR_ERRMSG_MAX, body->status_rep.msg);
-        break;
-    case DBR_TRADER_LIST_REP:
-        body->entity_list_rep.count_ = 0;
-        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrRec* rec = dbr_shared_rec_entry(node);
-            n += elm_trader_len(rec);
-            ++body->entity_list_rep.count_;
-        }
-        n += dbr_packlenz(body->entity_list_rep.count_);
         break;
     case DBR_ACCNT_LIST_REP:
         body->entity_list_rep.count_ = 0;
@@ -241,6 +214,15 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
             n += elm_contr_len(rec);
+            ++body->entity_list_rep.count_;
+        }
+        n += dbr_packlenz(body->entity_list_rep.count_);
+        break;
+    case DBR_MEMB_LIST_REP:
+        body->entity_list_rep.count_ = 0;
+        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            n += elm_memb_len(memb, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -272,15 +254,6 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
         break;
-    case DBR_MEMB_LIST_REP:
-        body->entity_list_rep.count_ = 0;
-        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            n += elm_memb_len(memb, enriched);
-            ++body->entity_list_rep.count_;
-        }
-        n += dbr_packlenz(body->entity_list_rep.count_);
-        break;
     case DBR_VIEW_LIST_REP:
         body->view_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
@@ -298,8 +271,8 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
-                          body->place_order_req.tid,
-                          body->place_order_req.aid,
+                          body->place_order_req.uid,
+                          body->place_order_req.gid,
                           body->place_order_req.cid,
                           body->place_order_req.settl_date,
                           DBR_REF_MAX, body->place_order_req.ref,
@@ -310,24 +283,24 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         n += dbr_packlenf(REVISE_ORDER_ID_REQ_FORMAT,
-                          body->revise_order_id_req.tid,
+                          body->revise_order_id_req.uid,
                           body->revise_order_id_req.id,
                           body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         n += dbr_packlenf(REVISE_ORDER_REF_REQ_FORMAT,
-                          body->revise_order_ref_req.tid,
+                          body->revise_order_ref_req.uid,
                           DBR_REF_MAX, body->revise_order_ref_req.ref,
                           body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         n += dbr_packlenf(CANCEL_ORDER_ID_REQ_FORMAT,
-                          body->cancel_order_id_req.tid,
+                          body->cancel_order_id_req.uid,
                           body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
         n += dbr_packlenf(CANCEL_ORDER_REF_REQ_FORMAT,
-                          body->cancel_order_ref_req.tid,
+                          body->cancel_order_ref_req.uid,
                           DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
@@ -373,22 +346,15 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        buf = dbr_packl(buf, body->sess_logon.tid);
+        buf = dbr_packl(buf, body->sess_logon.uid);
         break;
     case DBR_SESS_LOGOFF:
-        buf = dbr_packl(buf, body->sess_logoff.tid);
+        buf = dbr_packl(buf, body->sess_logoff.uid);
         break;
     case DBR_STATUS_REP:
         buf = dbr_packf(buf, STATUS_REP_FORMAT,
                         body->status_rep.num,
                         DBR_ERRMSG_MAX, body->status_rep.msg);
-        break;
-    case DBR_TRADER_LIST_REP:
-        buf = dbr_packz(buf, body->entity_list_rep.count_);
-        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrRec* rec = dbr_shared_rec_entry(node);
-            buf = elm_write_trader(buf, rec);
-        }
         break;
     case DBR_ACCNT_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
@@ -402,6 +368,13 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
             buf = elm_write_contr(buf, rec);
+        }
+        break;
+    case DBR_MEMB_LIST_REP:
+        buf = dbr_packz(buf, body->entity_list_rep.count_);
+        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            buf = elm_write_memb(buf, memb, enriched);
         }
         break;
     case DBR_ORDER_LIST_REP:
@@ -425,13 +398,6 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
             buf = elm_write_posn(buf, posn, enriched);
         }
         break;
-    case DBR_MEMB_LIST_REP:
-        buf = dbr_packz(buf, body->entity_list_rep.count_);
-        for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            buf = elm_write_memb(buf, memb, enriched);
-        }
-        break;
     case DBR_VIEW_LIST_REP:
         buf = dbr_packz(buf, body->view_list_rep.count_);
         for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
@@ -447,8 +413,8 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
-                        body->place_order_req.tid,
-                        body->place_order_req.aid,
+                        body->place_order_req.uid,
+                        body->place_order_req.gid,
                         body->place_order_req.cid,
                         body->place_order_req.settl_date,
                         DBR_REF_MAX, body->place_order_req.ref,
@@ -459,24 +425,24 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_ID_REQ_FORMAT,
-                        body->revise_order_id_req.tid,
+                        body->revise_order_id_req.uid,
                         body->revise_order_id_req.id,
                         body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_REF_REQ_FORMAT,
-                        body->revise_order_ref_req.tid,
+                        body->revise_order_ref_req.uid,
                         DBR_REF_MAX, body->revise_order_ref_req.ref,
                         body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         buf = dbr_packf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
-                        body->cancel_order_ref_req.tid,
+                        body->cancel_order_ref_req.uid,
                         body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
         buf = dbr_packf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
-                        body->cancel_order_ref_req.tid,
+                        body->cancel_order_ref_req.uid,
                         DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
@@ -526,29 +492,17 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        if (!(buf = dbr_unpackl(buf, &body->sess_logon.tid)))
+        if (!(buf = dbr_unpackl(buf, &body->sess_logon.uid)))
             goto fail1;
         break;
     case DBR_SESS_LOGOFF:
-        if (!(buf = dbr_unpackl(buf, &body->sess_logoff.tid)))
+        if (!(buf = dbr_unpackl(buf, &body->sess_logoff.uid)))
             goto fail1;
         break;
     case DBR_STATUS_REP:
         buf = dbr_unpackf(buf, STATUS_REP_FORMAT,
                           &body->status_rep.num,
                           DBR_ERRMSG_MAX, body->status_rep.msg);
-        break;
-    case DBR_TRADER_LIST_REP:
-        if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
-            goto fail1;
-        dbr_queue_init(&q);
-        for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
-            if (!(buf = read_trader(buf, pool, &q))) {
-                elm_pool_free_entity_list(pool, DBR_ENTITY_TRADER, dbr_queue_first(&q));
-                goto fail1;
-            }
-        }
-        body->entity_list_rep.first = dbr_queue_first(&q);
         break;
     case DBR_ACCNT_LIST_REP:
         if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
@@ -569,6 +523,18 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_contr(buf, pool, &q))) {
                 elm_pool_free_entity_list(pool, DBR_ENTITY_CONTR, dbr_queue_first(&q));
+                goto fail1;
+            }
+        }
+        body->entity_list_rep.first = dbr_queue_first(&q);
+        break;
+    case DBR_MEMB_LIST_REP:
+        if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
+            goto fail1;
+        dbr_queue_init(&q);
+        for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
+            if (!(buf = read_memb(buf, pool, &q))) {
+                elm_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -605,18 +571,6 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
             if (!(buf = read_posn(buf, pool, &q))) {
                 elm_pool_free_entity_list(pool, DBR_ENTITY_POSN, dbr_queue_first(&q));
-                goto fail1;
-            }
-        }
-        body->entity_list_rep.first = dbr_queue_first(&q);
-        break;
-    case DBR_MEMB_LIST_REP:
-        if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
-            goto fail1;
-        dbr_queue_init(&q);
-        for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
-            if (!(buf = read_memb(buf, pool, &q))) {
-                elm_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
                 goto fail1;
             }
         }
@@ -660,8 +614,8 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_PLACE_ORDER_REQ:
         if (!(buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,
-                                &body->place_order_req.tid,
-                                &body->place_order_req.aid,
+                                &body->place_order_req.uid,
+                                &body->place_order_req.gid,
                                 &body->place_order_req.cid,
                                 &body->place_order_req.settl_date,
                                 DBR_REF_MAX, body->place_order_req.ref,
@@ -673,27 +627,27 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         if (!(buf = dbr_unpackf(buf, REVISE_ORDER_ID_REQ_FORMAT,
-                                &body->revise_order_id_req.tid,
+                                &body->revise_order_id_req.uid,
                                 &body->revise_order_id_req.id,
                                 &body->revise_order_id_req.lots)))
             goto fail1;
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         if (!(buf = dbr_unpackf(buf, REVISE_ORDER_REF_REQ_FORMAT,
-                                &body->revise_order_ref_req.tid,
+                                &body->revise_order_ref_req.uid,
                                 DBR_REF_MAX, body->revise_order_ref_req.ref,
                                 &body->revise_order_ref_req.lots)))
             goto fail1;
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         if (!(buf = dbr_unpackf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
-                                &body->cancel_order_id_req.tid,
+                                &body->cancel_order_id_req.uid,
                                 &body->cancel_order_id_req.id)))
             goto fail1;
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
         if (!(buf = dbr_unpackf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
-                                &body->cancel_order_ref_req.tid,
+                                &body->cancel_order_ref_req.uid,
                                 DBR_REF_MAX, body->cancel_order_ref_req.ref)))
             goto fail1;
         break;

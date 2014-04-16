@@ -40,14 +40,14 @@ class IHandler : public DbrIHandler {
         static_cast<DerivedT*>(handler)->on_ready();
     }
     static void
-    on_logon(DbrHandler handler, DbrIden tid) noexcept
+    on_logon(DbrHandler handler, DbrIden uid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logon(tid);
+        static_cast<DerivedT*>(handler)->on_logon(uid);
     }
     static void
-    on_logoff(DbrHandler handler, DbrIden tid) noexcept
+    on_logoff(DbrHandler handler, DbrIden uid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logoff(tid);
+        static_cast<DerivedT*>(handler)->on_logoff(uid);
     }
     static void
     on_reset(DbrHandler handler) noexcept
@@ -132,15 +132,15 @@ on_ready(DbrHandler handler) noexcept
 }
 
 inline void
-on_logon(DbrHandler handler, DbrIden tid) noexcept
+on_logon(DbrHandler handler, DbrIden uid) noexcept
 {
-    handler->vtbl->on_logon(handler, tid);
+    handler->vtbl->on_logon(handler, uid);
 }
 
 inline void
-on_logoff(DbrHandler handler, DbrIden tid) noexcept
+on_logoff(DbrHandler handler, DbrIden uid) noexcept
 {
-    handler->vtbl->on_logoff(handler, tid);
+    handler->vtbl->on_logoff(handler, uid);
 }
 
 inline void

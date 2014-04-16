@@ -26,17 +26,6 @@
 
 using namespace dbr;
 
-TEST_CASE(model_trader)
-{
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_TRADER>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "WRAMIREZ", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
-}
-
 TEST_CASE(model_accnt)
 {
     Model model;

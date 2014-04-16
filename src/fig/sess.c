@@ -18,7 +18,6 @@
 #include <dbr/sess.h>
 
 #include "accnt.h"
-#include "trader.h"
 
 #include <dbr/err.h>
 
@@ -62,10 +61,10 @@ decref(struct DbrSess* sess, DbrKey key)
     return refs;
 }
 
-DBR_API DbrTrader
-dbr_sess_trader_entry(struct DbrRbNode* node)
+DBR_API DbrAccnt
+dbr_sess_user_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct FigTrader, sess_node_, node);
+    return dbr_implof(struct FigAccnt, sess_node_, node);
 }
 
 DBR_API void
@@ -78,7 +77,7 @@ dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
     sess->pool = pool;
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->traders);
+    dbr_tree_init(&sess->users);
     sess->marker_ = 0;
     dbr_slnode_init(&sess->uuid_node_);
 }
@@ -99,34 +98,34 @@ dbr_sess_reset(struct DbrSess* sess)
 {
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->traders);
+    dbr_tree_init(&sess->users);
     sess->marker_ = 0;
     dbr_slnode_init(&sess->uuid_node_);
 }
 
 DBR_API DbrBool
-dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
+dbr_sess_logon(struct DbrSess* sess, DbrAccnt user)
 {
-    if (trader->sess) {
-        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", trader->rec->mnem);
+    if (user->sess) {
+        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", user->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = dbr_trader_first_group(trader);
-    for (; node != DBR_TRADER_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_group_entry(node);
+    struct DbrRbNode* node = dbr_accnt_first_group(user);
+    for (; node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(node);
         if (incref(sess, memb->group.rec->id) == 0)
             goto fail2;
     }
 
-    trader->sess = sess;
-    dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
+    user->sess = sess;
+    dbr_tree_insert(&sess->users, user->rec->id, &user->sess_node_);
     return DBR_TRUE;
  fail2:
     // Rollback subs.
     for (node = dbr_rbnode_prev(node);
-         node != DBR_TRADER_END_GROUP; node = dbr_rbnode_prev(node)) {
-        struct DbrMemb* memb = dbr_trader_group_entry(node);
+         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_prev(node)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(node);
         decref(sess, memb->group.rec->id);
     }
  fail1:
@@ -134,14 +133,14 @@ dbr_sess_logon(struct DbrSess* sess, DbrTrader trader)
 }
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrTrader trader, DbrBool clear)
+dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user, DbrBool clear)
 {
-    dbr_tree_remove(&sess->traders, &trader->sess_node_);
-    trader->sess = NULL;
+    dbr_tree_remove(&sess->users, &user->sess_node_);
+    user->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_trader_first_group(trader);
-         node != DBR_TRADER_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_trader_group_entry(node);
+    for (struct DbrRbNode* node = dbr_accnt_first_group(user);
+         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(node);
         if (decref(sess, memb->group.rec->id) == 0 && clear) {
             DbrAccnt accnt = memb->group.rec->accnt.state;
             if (accnt)

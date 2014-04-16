@@ -19,7 +19,6 @@
 
 #include "accnt.h"
 #include "cache.h"
-#include "trader.h"
 
 #include <dbr/conv.h> // dbr_book_key()
 #include <dbr/err.h>
@@ -70,14 +69,13 @@ enum {
     READY       = 0x00,
     DELTA_WAIT  = 0x01,
     OPEN_WAIT   = 0x02,
-    TRADER_WAIT = 0x04,
-    ACCNT_WAIT  = 0x08,
-    CONTR_WAIT  = 0x10,
-    SNAP_WAIT   = 0x20,
-    CLOSE_WAIT  = 0x40,
-    CLOSED      = 0x80,
+    ACCNT_WAIT  = 0x04,
+    CONTR_WAIT  = 0x08,
+    SNAP_WAIT   = 0x10,
+    CLOSE_WAIT  = 0x20,
+    CLOSED      = 0x40,
 
-    REC_WAIT    = TRADER_WAIT | ACCNT_WAIT | CONTR_WAIT,
+    REC_WAIT    = ACCNT_WAIT | CONTR_WAIT,
     ALL_WAIT    = DELTA_WAIT | OPEN_WAIT | REC_WAIT | SNAP_WAIT
 };
 
@@ -108,9 +106,6 @@ static void
 term_state(struct DbrRec* rec)
 {
     switch (rec->type) {
-    case DBR_ENTITY_TRADER:
-        fig_trader_term(rec);
-        break;
     case DBR_ENTITY_ACCNT:
         fig_accnt_term(rec);
         break;
@@ -125,11 +120,19 @@ get_id(struct FigCache* cache, int type, DbrIden id)
     return dbr_shared_rec_entry(node);
 }
 
+static inline struct DbrMemb*
+enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+{
+    memb->user.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->user.id_only);
+    memb->group.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->group.id_only);
+    return memb;
+}
+
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->c.trader.rec = get_id(cache, DBR_ENTITY_TRADER, order->c.trader.id_only);
-    order->c.accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.accnt.id_only);
+    order->c.user.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.user.id_only);
+    order->c.group.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.group.id_only);
     order->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->c.contr.id_only);
     return order;
 }
@@ -137,8 +140,8 @@ enrich_order(struct FigCache* cache, struct DbrOrder* order)
 static inline struct DbrExec*
 enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->c.trader.rec = get_id(cache, DBR_ENTITY_TRADER, exec->c.trader.id_only);
-    exec->c.accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.accnt.id_only);
+    exec->c.user.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.user.id_only);
+    exec->c.group.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.group.id_only);
     exec->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->c.contr.id_only);
     if (exec->cpty.id_only)
         exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
@@ -153,14 +156,6 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
     posn->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, posn->accnt.id_only);
     posn->contr.rec = get_id(cache, DBR_ENTITY_CONTR, posn->contr.id_only);
     return posn;
-}
-
-static inline struct DbrMemb*
-enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
-{
-    memb->group.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->group.id_only);
-    memb->user.rec = get_id(cache, DBR_ENTITY_TRADER, memb->user.id_only);
-    return memb;
 }
 
 static inline struct DbrView*
@@ -194,12 +189,39 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
     dbr_tree_insert(viewups, (DbrKey)view, &view->update_node_);
 }
 
-static DbrTrader
-get_trader(DbrClnt clnt, DbrIden tid)
+static DbrAccnt
+get_accnt(DbrClnt clnt, DbrIden gid)
 {
-    struct DbrRec* trec = get_id(&clnt->cache, DBR_ENTITY_TRADER, tid);
-    assert(trec->trader.state);
-    return trec->trader.state;
+    struct DbrRec* arec = get_id(&clnt->cache, DBR_ENTITY_ACCNT, gid);
+    assert(arec->accnt.state);
+    return arec->accnt.state;
+}
+
+static DbrBool
+emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
+{
+    DbrBool nomem = DBR_FALSE;
+    for (struct DbrSlNode* node = first; node; node = node->next) {
+        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
+
+        DbrAccnt user = memb->user.rec->accnt.state;
+        assert(user);
+        // Transfer ownership.
+        fig_accnt_emplace_group(user, memb);
+
+        DbrAccnt group = fig_accnt_lazy(memb->group.rec, &clnt->ordidx, clnt->pool);
+        if (dbr_likely(group)) {
+            fig_accnt_insert_user(group, memb);
+        } else {
+            // Member is owned by user so no need to free here.
+            nomem = DBR_TRUE;
+        }
+    }
+    if (dbr_unlikely(nomem)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        return DBR_FALSE;
+    }
+    return DBR_TRUE;
 }
 
 static void
@@ -207,10 +229,10 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrOrder* order = enrich_order(&clnt->cache, dbr_shared_order_entry(node));
-        DbrTrader trader = order->c.trader.rec->trader.state;
-        assert(trader);
+        DbrAccnt user = order->c.user.rec->accnt.state;
+        assert(user);
         // Transfer ownership.
-        fig_trader_emplace_order(trader, order);
+        fig_accnt_emplace_order(user, order);
     }
 }
 
@@ -220,10 +242,10 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
         assert(exec->c.state == DBR_STATE_TRADE);
-        DbrTrader trader = exec->c.trader.rec->trader.state;
-        assert(trader);
+        DbrAccnt user = exec->c.user.rec->accnt.state;
+        assert(user);
         // Transfer ownership.
-        fig_trader_insert_trade(trader, exec);
+        fig_accnt_insert_trade(user, exec);
         dbr_exec_decref(exec, clnt->pool);
     }
 }
@@ -236,39 +258,12 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
         node = node->next;
         // Transfer ownership.
-        // All accnts that trader is member of are created in emplace_membs().
+        // All accounts that user is member of are created in emplace_membs().
         DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->ordidx, clnt->pool);
         if (dbr_likely(accnt)) {
             fig_accnt_emplace_posn(accnt, posn);
         } else {
             dbr_pool_free_posn(clnt->pool, posn);
-            nomem = DBR_TRUE;
-        }
-    }
-    if (dbr_unlikely(nomem)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        return DBR_FALSE;
-    }
-    return DBR_TRUE;
-}
-
-static DbrBool
-emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
-{
-    DbrBool nomem = DBR_FALSE;
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
-
-        DbrTrader trader = memb->user.rec->trader.state;
-        assert(trader);
-        // Transfer ownership.
-        fig_trader_emplace_group(trader, memb);
-
-        DbrAccnt accnt = fig_accnt_lazy(memb->group.rec, &clnt->ordidx, clnt->pool);
-        if (dbr_likely(accnt)) {
-            fig_accnt_insert_user(accnt, memb);
-        } else {
-            // Member is owned by trader so no need to free here.
             nomem = DBR_TRUE;
         }
     }
@@ -301,10 +296,10 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
     struct DbrOrder* order = create_order(clnt, exec);
     if (!order)
         return DBR_FALSE;
-    DbrTrader trader = order->c.trader.rec->trader.state;
-    assert(trader);
+    DbrAccnt user = order->c.user.rec->accnt.state;
+    assert(user);
     // Transfer ownership.
-    fig_trader_emplace_order(trader, order);
+    fig_accnt_emplace_order(user, order);
     dbr_exec_incref(exec);
     dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
     return DBR_TRUE;
@@ -313,15 +308,15 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
 static DbrBool
 apply_update(DbrClnt clnt, struct DbrExec* exec)
 {
-    DbrTrader trader = exec->c.trader.rec->trader.state;
-    assert(trader);
-    struct DbrRbNode* node = fig_trader_find_order_id(trader, exec->order);
+    DbrAccnt user = exec->c.user.rec->accnt.state;
+    assert(user);
+    struct DbrRbNode* node = fig_accnt_find_order_id(user, exec->order);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", exec->order);
         return DBR_FALSE;
     }
 
-    struct DbrOrder* order = dbr_trader_order_entry(node);
+    struct DbrOrder* order = dbr_accnt_order_entry(node);
     order->c.state = exec->c.state;
     order->c.lots = exec->c.lots;
     order->c.resd = exec->c.resd;
@@ -332,7 +327,7 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
 
     if (exec->c.state == DBR_STATE_TRADE) {
         // Transfer ownership.
-        fig_trader_insert_trade(trader, exec);
+        fig_accnt_insert_trade(user, exec);
     }
     dbr_exec_incref(exec);
     dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
@@ -686,12 +681,6 @@ dbr_clnt_empty_rec(DbrClnt clnt, int type)
     return fig_cache_empty_rec(&clnt->cache, type);
 }
 
-DBR_API DbrTrader
-dbr_clnt_trader(DbrClnt clnt, struct DbrRec* trec)
-{
-    return fig_trader_lazy(trec, &clnt->ordidx, clnt->pool);
-}
-
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 {
@@ -699,7 +688,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 }
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrTrader trader)
+dbr_clnt_logon(DbrClnt clnt, DbrAccnt user)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -709,7 +698,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGON;
-    body.sess_logon.tid = trader->rec->id;
+    body.sess_logon.uid = user->rec->id;
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -727,7 +716,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrTrader trader)
 }
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader)
+dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -736,7 +725,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGOFF;
-    body.sess_logoff.tid = trader->rec->id;
+    body.sess_logoff.uid = user->rec->id;
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -754,7 +743,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrTrader trader)
 }
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* crec,
+dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
                DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots)
 {
@@ -765,8 +754,8 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_PLACE_ORDER_REQ;
-    body.place_order_req.tid = trader->rec->id;
-    body.place_order_req.aid = accnt->rec->id;
+    body.place_order_req.uid = user->rec->id;
+    body.place_order_req.gid = group->rec->id;
     body.place_order_req.cid = crec->id;
     body.place_order_req.settl_date = settl_date;
     if (ref)
@@ -794,7 +783,7 @@ dbr_clnt_place(DbrClnt clnt, DbrTrader trader, DbrAccnt accnt, struct DbrRec* cr
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots)
+dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -803,7 +792,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_ID_REQ;
-    body.revise_order_id_req.tid = trader->rec->id;
+    body.revise_order_id_req.uid = user->rec->id;
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
@@ -823,7 +812,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrTrader trader, DbrIden id, DbrLots lots)
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lots)
+dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref, DbrLots lots)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -832,7 +821,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_REF_REQ;
-    body.revise_order_ref_req.tid = trader->rec->id;
+    body.revise_order_ref_req.uid = user->rec->id;
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
@@ -852,7 +841,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrTrader trader, const char* ref, DbrLots lot
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id)
+dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -861,7 +850,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
-    body.cancel_order_id_req.tid = trader->rec->id;
+    body.cancel_order_id_req.uid = user->rec->id;
     body.cancel_order_id_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -880,7 +869,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrTrader trader, DbrIden id)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref)
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -889,7 +878,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
-    body.cancel_order_ref_req.tid = trader->rec->id;
+    body.cancel_order_ref_req.uid = user->rec->id;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
     // Reserve so that push cannot fail after send.
@@ -908,7 +897,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrTrader trader, const char* ref)
 }
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id)
+dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id)
 {
     if (clnt->state != READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -917,7 +906,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_ACK_TRADE_REQ;
-    body.ack_trade_req.tid = trader->rec->id;
+    body.ack_trade_req.uid = user->rec->id;
     body.ack_trade_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -927,7 +916,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrTrader trader, DbrIden id)
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
-    fig_trader_remove_trade_id(trader, id);
+    fig_accnt_remove_trade_id(user, id);
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
@@ -1059,16 +1048,16 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_SESS_LOGON:
                 dbr_log_info("logon message");
-                dbr_sess_logon(&clnt->sess, get_trader(clnt, body.sess_logon.tid));
-                dbr_handler_on_logon(handler, body.sess_logon.tid);
+                dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.uid));
+                dbr_handler_on_logon(handler, body.sess_logon.uid);
                 break;
             case DBR_SESS_LOGOFF:
                 dbr_log_info("logoff message");
-                dbr_handler_on_logoff(handler, body.sess_logoff.tid);
+                dbr_handler_on_logoff(handler, body.sess_logoff.uid);
                 {
-                    DbrTrader trader = get_trader(clnt, body.sess_logoff.tid);
-                    dbr_sess_logoff(&clnt->sess, trader, DBR_TRUE);
-                    fig_trader_clear(trader);
+                    DbrAccnt user = get_accnt(clnt, body.sess_logoff.uid);
+                    dbr_sess_logoff(&clnt->sess, user, DBR_TRUE);
+                    fig_accnt_clear(user);
                 }
                 break;
             case DBR_SESS_HEARTBT:
@@ -1077,14 +1066,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_log_info("status message");
                 dbr_handler_on_status(handler, body.req_id, body.status_rep.num,
                                       body.status_rep.msg);
-                break;
-            case DBR_TRADER_LIST_REP:
-                dbr_log_info("trader-list message");
-                clnt->state &= ~TRADER_WAIT;
-                fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_TRADER,
-                                           body.entity_list_rep.first, body.entity_list_rep.count_);
-                if (!(clnt->state & ALL_WAIT))
-                    dbr_handler_on_ready(handler);
                 break;
             case DBR_ACCNT_LIST_REP:
                 dbr_log_info("accnt-list message");
@@ -1102,6 +1083,15 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
                 break;
+            case DBR_MEMB_LIST_REP:
+                dbr_log_info("memb-list message");
+                // This function can fail is there is no memory available for a lazily created
+                // account.
+                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first))) {
+                    sess_reset(clnt);
+                    goto fail1;
+                }
+                break;
             case DBR_ORDER_LIST_REP:
                 dbr_log_info("order-list message");
                 emplace_order_list(clnt, body.entity_list_rep.first);
@@ -1115,15 +1105,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 // This function can fail is there is no memory available for a lazily created
                 // account.
                 if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first))) {
-                    sess_reset(clnt);
-                    goto fail1;
-                }
-                break;
-            case DBR_MEMB_LIST_REP:
-                dbr_log_info("memb-list message");
-                // This function can fail is there is no memory available for a lazily created
-                // account.
-                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first))) {
                     sess_reset(clnt);
                     goto fail1;
                 }
@@ -1222,9 +1203,9 @@ dbr_clnt_trclear(DbrClnt clnt)
         node = node->next;
         // Free completed orders.
         if (dbr_exec_done(exec)) {
-            DbrTrader trader = exec->c.trader.rec->trader.state;
-            assert(trader);
-            struct DbrOrder* order = fig_trader_release_order_id(trader, exec->order);
+            DbrAccnt user = exec->c.user.rec->accnt.state;
+            assert(user);
+            struct DbrOrder* order = fig_accnt_release_order_id(user, exec->order);
             if (order)
                 dbr_pool_free_order(clnt->pool, order);
         }

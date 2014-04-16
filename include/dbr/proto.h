@@ -23,10 +23,10 @@
 #include <stddef.h> // size_t
 
 struct DbrRec;
+struct DbrMemb;
 struct DbrOrder;
 struct DbrExec;
 struct DbrPosn;
-struct DbrMemb;
 struct DbrView;
 
 /**
@@ -46,22 +46,6 @@ dbr_write_rec(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
 dbr_read_rec(const char* buf, struct DbrRec* rec);
-
-/** @} */
-
-/**
- * @addtogroup ProtoTrader
- * @{
- */
-
-DBR_API size_t
-dbr_trader_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_write_trader(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_read_trader(const char* buf, struct DbrRec* rec);
 
 /** @} */
 
@@ -94,6 +78,22 @@ dbr_write_contr(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
 dbr_read_contr(const char* buf, struct DbrRec* rec);
+
+/** @} */
+
+/**
+ * @addtogroup ProtoMemb
+ * @{
+ */
+
+DBR_API size_t
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_API char*
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_API const char*
+dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
 /** @} */
 
@@ -142,22 +142,6 @@ dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API const char*
 dbr_read_posn(const char* buf, struct DbrPosn* posn);
-
-/** @} */
-
-/**
- * @addtogroup ProtoMemb
- * @{
- */
-
-DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb);
 
 /** @} */
 

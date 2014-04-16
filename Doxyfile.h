@@ -136,11 +136,6 @@
  */
 
 /**
- * @defgroup TypesTrader Trader
- * @ingroup TypesRec
- */
-
-/**
  * @defgroup TypesAccnt Account
  * @ingroup TypesRec
  */
@@ -148,6 +143,11 @@
 /**
  * @defgroup TypesContr Contract
  * @ingroup TypesRec
+ */
+
+/**
+ * @defgroup TypesMemb Member
+ * @ingroup Types
  */
 
 /**
@@ -167,11 +167,6 @@
 
 /**
  * @defgroup TypesMatch Match
- * @ingroup Types
- */
-
-/**
- * @defgroup TypesMemb Member
  * @ingroup Types
  */
 
@@ -217,6 +212,11 @@
  */
 
 /**
+ * @defgroup PoolMemb Member
+ * @ingroup Pool
+ */
+
+/**
  * @defgroup PoolOrder Order
  * @ingroup Pool
  */
@@ -238,11 +238,6 @@
 
 /**
  * @defgroup PoolPosn Position
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolMemb Member
  * @ingroup Pool
  */
 
@@ -278,11 +273,6 @@
  */
 
 /**
- * @defgroup ProtoTrader Trader
- * @ingroup ProtoRec
- */
-
-/**
  * @defgroup ProtoAccnt Account
  * @ingroup ProtoRec
  */
@@ -293,17 +283,17 @@
  */
 
 /**
+ * @defgroup ProtoMemb Member
+ * @ingroup Proto
+ */
+
+/**
  * @defgroup ProtoOrder Order
  * @ingroup Proto
  */
 
 /**
  * @defgroup ProtoExec Execution
- * @ingroup Proto
- */
-
-/**
- * @defgroup ProtoMemb Member
  * @ingroup Proto
  */
 
@@ -348,37 +338,32 @@
  */
 
 /**
- * @defgroup Trader Trader
- * @ingroup Fig
- */
-
-/**
- * @defgroup TraderOrder Order
- * @ingroup Trader
- */
-
-/**
- * @defgroup TraderTrade Trade
- * @ingroup Trader
- */
-
-/**
- * @defgroup TraderGroup Group
- * @ingroup Trader
- */
-
-/**
  * @defgroup Accnt Account
  * @ingroup Fig
  */
 
 /**
- * @defgroup AccntPosn Position
+ * @defgroup AccntUser User
  * @ingroup Accnt
  */
 
 /**
- * @defgroup AccntUser User
+ * @defgroup AccntGroup Group
+ * @ingroup Accnt
+ */
+
+/**
+ * @defgroup AccntOrder Order
+ * @ingroup Accnt
+ */
+
+/**
+ * @defgroup AccntTrade Trade
+ * @ingroup Accnt
+ */
+
+/**
+ * @defgroup AccntPosn Position
  * @ingroup Accnt
  */
 
@@ -419,7 +404,7 @@
  */
 
 /**
- * @defgroup SessTrader Trader
+ * @defgroup SessAccnt Accnt
  * @ingroup Sess
  */
 

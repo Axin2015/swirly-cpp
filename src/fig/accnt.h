@@ -57,6 +57,48 @@ fig_accnt_rec(const struct FigAccnt* accnt)
     return accnt->rec;
 }
 
+// User.
+
+#define FIG_ACCNT_END_USER DBR_TREE_END
+
+// This does not transfer ownership.
+
+static inline void
+fig_accnt_insert_user(struct FigAccnt* accnt, struct DbrMemb* memb)
+{
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+    {
+        struct DbrRbNode* node = dbr_tree_insert(&accnt->users, memb->user.rec->id,
+                                                 &memb->group_node_);
+        assert(node == &memb->group_node_);
+    }
+#pragma GCC diagnostic pop
+}
+
+static inline struct DbrRbNode*
+fig_accnt_find_user_id(const struct FigAccnt* accnt, DbrIden id)
+{
+    return dbr_tree_find(&accnt->users, id);
+}
+
+static inline struct DbrRbNode*
+fig_accnt_first_user(const struct FigAccnt* accnt)
+{
+    return dbr_tree_first(&accnt->users);
+}
+
+static inline struct DbrRbNode*
+fig_accnt_last_user(const struct FigAccnt* accnt)
+{
+    return dbr_tree_last(&accnt->users);
+}
+
+static inline DbrBool
+fig_accnt_empty_user(const struct FigAccnt* accnt)
+{
+    return dbr_tree_empty(&accnt->users);
+}
 
 // Group.
 
@@ -99,49 +141,6 @@ static inline DbrBool
 fig_accnt_empty_group(const struct FigAccnt* accnt)
 {
     return dbr_tree_empty(&accnt->groups);
-}
-
-// User.
-
-#define FIG_ACCNT_END_USER DBR_TREE_END
-
-// This does not transfer ownership.
-
-static inline void
-fig_accnt_insert_user(struct FigAccnt* accnt, struct DbrMemb* memb)
-{
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-    {
-        struct DbrRbNode* node = dbr_tree_insert(&accnt->users, memb->user.rec->id,
-                                                 &memb->group_node_);
-        assert(node == &memb->group_node_);
-    }
-#pragma GCC diagnostic pop
-}
-
-static inline struct DbrRbNode*
-fig_accnt_find_user_id(const struct FigAccnt* accnt, DbrIden id)
-{
-    return dbr_tree_find(&accnt->users, id);
-}
-
-static inline struct DbrRbNode*
-fig_accnt_first_user(const struct FigAccnt* accnt)
-{
-    return dbr_tree_first(&accnt->users);
-}
-
-static inline struct DbrRbNode*
-fig_accnt_last_user(const struct FigAccnt* accnt)
-{
-    return dbr_tree_last(&accnt->users);
-}
-
-static inline DbrBool
-fig_accnt_empty_user(const struct FigAccnt* accnt)
-{
-    return dbr_tree_empty(&accnt->users);
 }
 
 // Order.

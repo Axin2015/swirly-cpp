@@ -64,18 +64,18 @@ public:
     {
         return impl_->order;
     }
-    TraderRecRef
-    trec() const noexcept
+    AccntRecRef
+    user() const noexcept
     {
-        return TraderRecRef{*impl_->c.trader.rec};
+        return AccntRecRef{*impl_->c.user.rec};
     }
     AccntRecRef
-    arec() const noexcept
+    group() const noexcept
     {
-        return AccntRecRef{*impl_->c.accnt.rec};
+        return AccntRecRef{*impl_->c.group.rec};
     }
     ContrRecRef
-    crec() const noexcept
+    contr() const noexcept
     {
         return ContrRecRef{*impl_->c.contr.rec};
     }
@@ -161,9 +161,9 @@ operator <<(std::ostream& os, ExecRef exec)
 {
     return os << "id=" << exec.id()
               << ",order=" << exec.order()
-              << ",trec=" << exec.trec().mnem()
-              << ",arec=" << exec.arec().mnem()
-              << ",crec=" << exec.crec().mnem()
+              << ",user=" << exec.user().mnem()
+              << ",group=" << exec.group().mnem()
+              << ",contr=" << exec.contr().mnem()
               << ",settl_date=" << exec.settl_date()
               << ",ref=" << exec.ref()
               << ",state=" << exec.state()

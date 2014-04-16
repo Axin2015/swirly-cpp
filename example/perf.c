@@ -16,6 +16,7 @@
  *  02110-1301 USA.
  */
 
+#include <dbr/accnt.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
 #include <dbr/pool.h>
@@ -23,7 +24,6 @@
 #include <dbr/sess.h>
 #include <dbr/sqljourn.h>
 #include <dbr/sqlmodel.h>
-#include <dbr/trader.h>
 #include <dbr/util.h>
 #include <dbr/zmqjourn.h>
 
@@ -87,24 +87,24 @@ run(void)
 {
     const DbrDate settl_date = 20140307;
 
-    struct DbrRec* trec = find_rec_mnem(DBR_ENTITY_TRADER, "WRAMIREZ");
-    if (dbr_unlikely(!trec))
+    struct DbrRec* urec = find_rec_mnem(DBR_ENTITY_ACCNT, "WRAMIREZ");
+    if (dbr_unlikely(!urec))
         goto fail1;
 
-    struct DbrRec* arec = find_rec_mnem(DBR_ENTITY_ACCNT, "DBRA");
-    if (dbr_unlikely(!arec))
+    struct DbrRec* grec = find_rec_mnem(DBR_ENTITY_ACCNT, "DBRA");
+    if (dbr_unlikely(!grec))
         goto fail1;
 
     struct DbrRec* crec = find_rec_mnem(DBR_ENTITY_CONTR, "EURUSD");
     if (dbr_unlikely(!crec))
         goto fail1;
 
-    DbrTrader trader = dbr_serv_trader(serv, trec);
-    if (dbr_unlikely(!trader))
+    DbrAccnt user = dbr_serv_accnt(serv, urec);
+    if (dbr_unlikely(!user))
         goto fail1;
 
-    DbrAccnt accnt = dbr_serv_accnt(serv, arec);
-    if (dbr_unlikely(!accnt))
+    DbrAccnt group = dbr_serv_accnt(serv, grec);
+    if (dbr_unlikely(!group))
         goto fail1;
 
     struct DbrBook* book = dbr_serv_book(serv, crec, settl_date);
@@ -117,7 +117,7 @@ run(void)
     if (dbr_unlikely(!sess))
         goto fail1;
 
-    if (dbr_unlikely(!dbr_sess_logon(sess, trader)))
+    if (dbr_unlikely(!dbr_sess_logon(sess, user)))
         goto fail1;
 
     enum { ITERS = 500 };
@@ -125,13 +125,13 @@ run(void)
     for (int i = 0; i < ITERS; ++i) {
 
         const tsc_t start = tsc();
-        if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
+        if (dbr_unlikely(!dbr_serv_place(serv, user, group, book, NULL,
                                          DBR_ACTION_BUY, 12345, 1, 0))) {
             dbr_err_perror("dbr_serv_place() failed");
             goto fail2;
         }
 
-        if (dbr_unlikely(!dbr_serv_place(serv, trader, accnt, book, NULL,
+        if (dbr_unlikely(!dbr_serv_place(serv, user, group, book, NULL,
                                          DBR_ACTION_SELL, 12345, 1, 0))) {
             dbr_err_perror("dbr_serv_place() failed");
             goto fail2;
@@ -142,9 +142,9 @@ run(void)
         dbr_serv_clear(serv);
 
         struct DbrRbNode* node;
-        while ((node = dbr_trader_first_trade(trader)) != DBR_TRADER_END_TRADE) {
-            struct DbrExec* trade = dbr_trader_trade_entry(node);
-            if (!dbr_serv_ack_trade(serv, trader, trade->id)) {
+        while ((node = dbr_accnt_first_trade(user)) != DBR_ACCNT_END_TRADE) {
+            struct DbrExec* trade = dbr_accnt_trade_entry(node);
+            if (!dbr_serv_ack_trade(serv, user, trade->id)) {
                 dbr_err_perror("dbr_serv_ack_trade() failed");
                 goto fail2;
             }
@@ -154,10 +154,10 @@ run(void)
     const int orders = ITERS * 2;
     dbr_log_info("orders=%d, total=%.3f ms, per_order=%.3f ms", orders, ms, ms / orders);
 
-    dbr_sess_logoff(sess, trader, DBR_FALSE);
+    dbr_sess_logoff(sess, user, DBR_FALSE);
     return DBR_TRUE;
  fail2:
-    dbr_sess_logoff(sess, trader, DBR_FALSE);
+    dbr_sess_logoff(sess, user, DBR_FALSE);
  fail1:
     return DBR_FALSE;
 }

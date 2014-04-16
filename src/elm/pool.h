@@ -46,9 +46,9 @@ struct ElmSmallEntry {
         struct ElmSmallEntry* next;
         // Small data structures.
         struct DbrRbNode rbnode;
+        struct DbrMemb memb;
         struct DbrLevel level;
         struct DbrMatch match;
-        struct DbrMemb memb;
         struct DbrSub sub;
         struct DbrSess sess;
     };
@@ -127,6 +127,20 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
     elm_pool_free_large(pool, entry);
 }
 
+static inline struct DbrMemb*
+elm_pool_alloc_memb(struct ElmPool* pool)
+{
+    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool);
+    return entry ? &entry->memb : NULL;
+}
+
+static inline void
+elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
+{
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)memb;
+    elm_pool_free_small(pool, entry);
+}
+
 static inline struct DbrOrder*
 elm_pool_alloc_order(struct ElmPool* pool)
 {
@@ -195,20 +209,6 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
 {
     struct ElmLargeEntry* entry = (struct ElmLargeEntry*)posn;
     elm_pool_free_large(pool, entry);
-}
-
-static inline struct DbrMemb*
-elm_pool_alloc_memb(struct ElmPool* pool)
-{
-    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool);
-    return entry ? &entry->memb : NULL;
-}
-
-static inline void
-elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
-{
-    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)memb;
-    elm_pool_free_small(pool, entry);
 }
 
 static inline struct DbrView*
@@ -307,6 +307,22 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
     elm_pool_free_large(pool, entry);
 }
 
+static inline struct DbrMemb*
+elm_pool_alloc_memb_(struct ElmPool* pool, const char* file, int line)
+{
+    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool, file, line);
+    dbr_log_debug3("allocating memb %p in %s at %d", entry, file, line);
+    return entry ? &entry->memb : NULL;
+}
+
+static inline void
+elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
+{
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)memb;
+    dbr_log_debug3("freeing memb %p from %s at %d", entry, entry->file, entry->line);
+    elm_pool_free_small(pool, entry);
+}
+
 static inline struct DbrOrder*
 elm_pool_alloc_order_(struct ElmPool* pool, const char* file, int line)
 {
@@ -387,22 +403,6 @@ elm_pool_free_posn(struct ElmPool* pool, struct DbrPosn* posn)
     elm_pool_free_large(pool, entry);
 }
 
-static inline struct DbrMemb*
-elm_pool_alloc_memb_(struct ElmPool* pool, const char* file, int line)
-{
-    struct ElmSmallEntry* entry = elm_pool_alloc_small(pool, file, line);
-    dbr_log_debug3("allocating memb %p in %s at %d", entry, file, line);
-    return entry ? &entry->memb : NULL;
-}
-
-static inline void
-elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
-{
-    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)memb;
-    dbr_log_debug3("freeing memb %p from %s at %d", entry, entry->file, entry->line);
-    elm_pool_free_small(pool, entry);
-}
-
 static inline struct DbrView*
 elm_pool_alloc_view_(struct ElmPool* pool, const char* file, int line)
 {
@@ -469,6 +469,8 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
 
 #define elm_pool_alloc_rec(pool)                    \
     elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_memb(pool)                   \
+    elm_pool_alloc_memb_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_order(pool)                  \
     elm_pool_alloc_order_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_level(pool)                  \
@@ -479,8 +481,6 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
     elm_pool_alloc_match_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_posn(pool)                   \
     elm_pool_alloc_posn_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_memb(pool)                   \
-    elm_pool_alloc_memb_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_view(pool)                   \
     elm_pool_alloc_view_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_book(pool)                   \

@@ -18,7 +18,8 @@
 #ifndef FIG_SESSIDX_H
 #define FIG_SESSIDX_H
 
-#include "trader.h"
+#include <dbr/stack.h>
+#include <dbr/types.h>
 
 // Index of sessions by reference.
 

@@ -89,9 +89,6 @@ dbr_serv_empty_rec(DbrServ serv, int type);
 
 /** @} */
 
-DBR_API DbrTrader
-dbr_serv_trader(DbrServ serv, struct DbrRec* trec);
-
 DBR_API DbrAccnt
 dbr_serv_accnt(DbrServ serv, struct DbrRec* arec);
 
@@ -107,7 +104,7 @@ dbr_serv_sess(DbrServ serv, const DbrUuid uuid);
  */
 
 DBR_API struct DbrOrder*
-dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* book,
+dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots);
 
 // Assumes that order already belongs to this side.
@@ -117,21 +114,21 @@ dbr_serv_place(DbrServ serv, DbrTrader trader, DbrAccnt accnt, struct DbrBook* b
 // 3. greater than original lots.
 
 DBR_API struct DbrOrder*
-dbr_serv_revise_id(DbrServ serv, DbrTrader trader, DbrIden id, DbrLots lots);
+dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_serv_revise_ref(DbrServ serv, DbrTrader trader, const char* ref, DbrLots lots);
+dbr_serv_revise_ref(DbrServ serv, DbrAccnt user, const char* ref, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_serv_cancel_id(DbrServ serv, DbrTrader trader, DbrIden id);
+dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id);
 
 DBR_API struct DbrOrder*
-dbr_serv_cancel_ref(DbrServ serv, DbrTrader trader, const char* ref);
+dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref);
 
 // Invalidates any pointers to the trade.
 
 DBR_API DbrBool
-dbr_serv_ack_trade(DbrServ serv, DbrTrader trader, DbrIden id);
+dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id);
 
 DBR_API void
 dbr_serv_mdclear(DbrServ serv);

@@ -25,25 +25,6 @@ using namespace dbr;
 using namespace std;
 
 shared_ptr<DbrRec>
-create_trader(Pool& pool, DbrIden id, const char* mnem, const char* display, const char* email)
-{
-    auto deleter = [&pool](DbrRec* rec) {
-        pool.free_rec(rec);
-    };
-    std::shared_ptr<DbrRec> rec(pool.alloc_rec(), deleter);
-    dbr_rec_init(rec.get());
-
-    rec->type = DBR_ENTITY_TRADER;
-    rec->id = id;
-    strncpy(rec->mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec->display, display, DBR_DISPLAY_MAX);
-
-    // Body.
-    strncpy(rec->trader.email, email, DBR_EMAIL_MAX);
-    return rec;
-}
-
-shared_ptr<DbrRec>
 create_accnt(Pool& pool, DbrIden id, const char* mnem, const char* display, const char* email)
 {
     auto deleter = [&pool](DbrRec* rec) {
@@ -96,8 +77,23 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
     return rec;
 }
 
+shared_ptr<DbrMemb>
+create_memb(Pool& pool, DbrIden uid, DbrIden gid)
+{
+    auto deleter = [&pool](DbrMemb* memb) {
+        pool.free_memb(memb);
+    };
+    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
+    dbr_memb_init(memb.get());
+
+    memb->group.id_only = gid;
+    memb->user.id_only = uid;
+
+    return memb;
+}
+
 shared_ptr<DbrOrder>
-create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& contr,
+create_order(Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now)
 {
@@ -109,8 +105,8 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 
     order->level = NULL;
     order->id = id;
-    order->c.trader.rec = &trader;
-    order->c.accnt.rec = &accnt;
+    order->c.user.rec = &user;
+    order->c.group.rec = &group;
     order->c.contr.rec = &contr;
     order->c.settl_date = settl_date;
     if (ref)
@@ -134,7 +130,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& cont
 }
 
 shared_ptr<DbrOrder>
-create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
+create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now)
 {
@@ -146,8 +142,8 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 
     order->level = NULL;
     order->id = id;
-    order->c.trader.id_only = tid;
-    order->c.accnt.id_only = aid;
+    order->c.user.id_only = uid;
+    order->c.group.id_only = gid;
     order->c.contr.id_only = cid;
     order->c.settl_date = settl_date;
     if (ref)
@@ -171,7 +167,7 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
 }
 
 shared_ptr<DbrExec>
-create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden aid,
+create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now)
@@ -184,8 +180,8 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden aid,
 
     ptr->id = id;
     ptr->order = order;
-    ptr->c.trader.id_only = tid;
-    ptr->c.accnt.id_only = aid;
+    ptr->c.user.id_only = uid;
+    ptr->c.group.id_only = gid;
     ptr->c.contr.id_only = cid;
     ptr->c.settl_date = settl_date;
     if (ref)
@@ -207,19 +203,4 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden aid,
     ptr->created = now;
 
     return ptr;
-}
-
-shared_ptr<DbrMemb>
-create_memb(Pool& pool, DbrIden tid, DbrIden aid)
-{
-    auto deleter = [&pool](DbrMemb* memb) {
-        pool.free_memb(memb);
-    };
-    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
-    dbr_memb_init(memb.get());
-
-    memb->group.id_only = aid;
-    memb->user.id_only = tid;
-
-    return memb;
 }

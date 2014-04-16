@@ -24,7 +24,6 @@
 #include <dbrpp/order.hpp>
 #include <dbrpp/sess.hpp>
 #include <dbrpp/slnode.hpp>
-#include <dbrpp/trader.hpp>
 
 #include <dbr/serv.h>
 
@@ -164,7 +163,6 @@ public:
     }
 };
 
-typedef ServRecs<DBR_ENTITY_TRADER> ServTraderRecs;
 typedef ServRecs<DBR_ENTITY_ACCNT> ServAccntRecs;
 typedef ServRecs<DBR_ENTITY_CONTR> ServContrRecs;
 
@@ -813,11 +811,6 @@ public:
     {
         return ServRecs<TypeN>{impl_};
     }
-    ServTraderRecs
-    trecs() const noexcept
-    {
-        return ServTraderRecs{impl_};
-    }
     ServAccntRecs
     arecs() const noexcept
     {
@@ -829,14 +822,6 @@ public:
         return ServContrRecs{impl_};
     }
     /** @} */
-    Trader
-    trader(DbrRec& trec) const
-    {
-        DbrTrader trader = dbr_serv_trader(impl_, &trec);
-        if (!trader)
-            throw_exception();
-        return Trader{trader};
-    }
     Accnt
     accnt(DbrRec& arec) const
     {
@@ -862,51 +847,51 @@ public:
         return SessRef{*sess};
     }
     OrderRef
-    place(DbrTrader trader, DbrAccnt accnt, DbrBook& book, const char* ref, int action,
+    place(DbrAccnt user, DbrAccnt group, DbrBook& book, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min_lots)
     {
-        DbrOrder* const order = dbr_serv_place(impl_, trader, accnt, &book, ref, action, ticks,
+        DbrOrder* const order = dbr_serv_place(impl_, user, group, &book, ref, action, ticks,
                                                lots, min_lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    revise(DbrTrader trader, DbrIden id, DbrLots lots)
+    revise(DbrAccnt user, DbrIden id, DbrLots lots)
     {
-        DbrOrder* const order = dbr_serv_revise_id(impl_, trader, id, lots);
+        DbrOrder* const order = dbr_serv_revise_id(impl_, user, id, lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    revise(DbrTrader trader, const char* ref, DbrLots lots)
+    revise(DbrAccnt user, const char* ref, DbrLots lots)
     {
-        DbrOrder* const order = dbr_serv_revise_ref(impl_, trader, ref, lots);
+        DbrOrder* const order = dbr_serv_revise_ref(impl_, user, ref, lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    cancel(DbrTrader trader, DbrIden id)
+    cancel(DbrAccnt user, DbrIden id)
     {
-        DbrOrder* const order = dbr_serv_cancel_id(impl_, trader, id);
+        DbrOrder* const order = dbr_serv_cancel_id(impl_, user, id);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    cancel(DbrTrader trader, const char* ref)
+    cancel(DbrAccnt user, const char* ref)
     {
-        DbrOrder* const order = dbr_serv_cancel_ref(impl_, trader, ref);
+        DbrOrder* const order = dbr_serv_cancel_ref(impl_, user, ref);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     void
-    ack_trade(DbrTrader trader, DbrIden id)
+    ack_trade(DbrAccnt user, DbrIden id)
     {
-        if (!dbr_serv_ack_trade(impl_, trader, id))
+        if (!dbr_serv_ack_trade(impl_, user, id))
             throw_exception();
     }
     void

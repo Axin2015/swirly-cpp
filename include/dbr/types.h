@@ -59,17 +59,17 @@ typedef DbrIncs DbrLicks;
 
 enum DbrEntity {
     /**
-     * Trader.
-     */
-    DBR_ENTITY_TRADER = 1,
-    /**
      * Account.
      */
-    DBR_ENTITY_ACCNT,
+    DBR_ENTITY_ACCNT = 1,
     /**
      * Contract.
      */
     DBR_ENTITY_CONTR,
+    /**
+     * Membership.
+     */
+    DBR_ENTITY_MEMB,
     /**
      * Order.
      */
@@ -81,11 +81,7 @@ enum DbrEntity {
     /**
      * Position.
      */
-    DBR_ENTITY_POSN,
-    /**
-     * Membership.
-     */
-    DBR_ENTITY_MEMB
+    DBR_ENTITY_POSN
 };
 
 /** @} */
@@ -120,12 +116,6 @@ enum DbrReg {
  */
 
 typedef struct ElmPool* DbrPool;
-
-/**
- * @addtogroup Trader
- */
-
-typedef struct FigTrader* DbrTrader;
 
 /**
  * @addtogroup Accnt
@@ -189,10 +179,6 @@ struct DbrRec {
     union {
         struct {
             DbrEmail email;
-            DbrTrader state;
-        } trader;
-        struct {
-            DbrEmail email;
             DbrAccnt state;
         } accnt;
         struct {
@@ -243,6 +229,42 @@ dbr_shared_rec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
+ * @addtogroup TypesMemb
+ * @{
+ */
+
+struct DbrMemb {
+    /**
+     * @publicsection
+     */
+    union DbrURec user;
+    union DbrURec group;
+    /**
+     * @privatesection
+     */
+    // Singly-linked for data model.
+    struct DbrSlNode shared_node_;
+    struct DbrRbNode user_node_;
+    struct DbrRbNode group_node_;
+};
+
+static inline void
+dbr_memb_init(struct DbrMemb* memb)
+{
+    dbr_slnode_init(&memb->shared_node_);
+    dbr_rbnode_init(&memb->user_node_);
+    dbr_rbnode_init(&memb->group_node_);
+}
+
+static inline struct DbrMemb*
+dbr_shared_memb_entry(struct DbrSlNode* node)
+{
+    return dbr_implof(struct DbrMemb, shared_node_, node);
+}
+
+/** @} */
+
+/**
  * @addtogroup Types
  * @{
  */
@@ -264,8 +286,8 @@ enum DbrAction {
  */
 
 struct DbrCommon {
-    union DbrURec trader;
-    union DbrURec accnt;
+    union DbrURec user;
+    union DbrURec group;
     union DbrURec contr;
     DbrDate settl_date;
     // Ref is optional.
@@ -503,42 +525,6 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesMemb
- * @{
- */
-
-struct DbrMemb {
-    /**
-     * @publicsection
-     */
-    union DbrURec group;
-    union DbrURec user;
-    /**
-     * @privatesection
-     */
-    // Singly-linked for data model.
-    struct DbrSlNode shared_node_;
-    struct DbrRbNode group_node_;
-    struct DbrRbNode user_node_;
-};
-
-static inline void
-dbr_memb_init(struct DbrMemb* memb)
-{
-    dbr_slnode_init(&memb->shared_node_);
-    dbr_rbnode_init(&memb->group_node_);
-    dbr_rbnode_init(&memb->user_node_);
-}
-
-static inline struct DbrMemb*
-dbr_shared_memb_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrMemb, shared_node_, node);
-}
-
-/** @} */
-
-/**
  * @addtogroup TypesPosn
  * @{
  */
@@ -693,7 +679,7 @@ struct DbrSess {
      */
     DbrMillis hbint;
     struct DbrTree subs;
-    struct DbrTree traders;
+    struct DbrTree users;
     /**
      * @privatesection
      */

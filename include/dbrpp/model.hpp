@@ -208,7 +208,6 @@ public:
     }
 };
 
-typedef ModelRecs<DBR_ENTITY_TRADER> ModelTraderRecs;
 typedef ModelRecs<DBR_ENTITY_ACCNT> ModelAccntRecs;
 typedef ModelRecs<DBR_ENTITY_CONTR> ModelContrRecs;
 

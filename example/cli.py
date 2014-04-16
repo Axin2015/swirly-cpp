@@ -38,11 +38,11 @@ class RequestHandler(Handler):
     def on_ready(self):
         log_info('on_ready')
 
-    def on_logon(self, tid):
-        log_info('on_logon: {0}'.format(tid))
+    def on_logon(self, uid):
+        log_info('on_logon: {0}'.format(uid))
 
-    def on_logoff(self, tid):
-        log_info('on_logoff: {0}'.format(tid))
+    def on_logoff(self, uid):
+        log_info('on_logoff: {0}'.format(uid))
 
     def on_reset(self):
         log_info('on_reset')
@@ -94,46 +94,21 @@ class LogonRequest(object):
     def __init__(self, mnem):
         self.mnem = mnem
     def __call__(self, clnt):
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        if not trec:
-            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
+        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
+        if not arec:
+            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
             raise Error()
-        return clnt.logon(trec)
+        return clnt.logon(arec)
 
 class LogoffRequest(object):
     def __init__(self, mnem):
         self.mnem = mnem
     def __call__(self, clnt):
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        if not trec:
-            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
+        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
+        if not arec:
+            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
             raise Error()
-        return clnt.logoff(trec)
-
-class TraderRequest(object):
-    @staticmethod
-    def to_dict(trec):
-        return {
-            'id': trec.id,
-            'mnem': trec.mnem,
-            'display': trec.display,
-            'email': trec.email
-        }
-    def __init__(self, *mnems):
-        self.mnems = set(mnems)
-    def __call__(self, clnt):
-        traders = []
-        if self.mnems:
-            for mnem in self.mnems:
-                trec = clnt.find_rec_mnem(ENTITY_TRADER, mnem)
-                if not trec:
-                    err_set(EINVAL, "no such trader '{0}'".format(mnem))
-                    raise Error()
-                traders.append(TraderRequest.to_dict(trec))
-        else:
-            traders = [TraderRequest.to_dict(trec)
-                       for trec in clnt.list_rec(ENTITY_TRADER)]
-        return traders
+        return clnt.logoff(arec)
 
 class AccntRequest(object):
     @staticmethod
@@ -196,6 +171,26 @@ class ContrRequest(object):
                       for crec in clnt.list_rec(ENTITY_CONTR)]
         return contrs
 
+class GroupRequest(object):
+    @staticmethod
+    def to_dict(memb):
+        return {
+            'uid': memb.uid,
+            'gid': memb.gid
+        }
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        membs = []
+        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
+        if not arec:
+            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
+            raise Error()
+        accnt = clnt.accnt(arec)
+        membs = [GroupRequest.to_dict(memb)
+                 for memb in accnt.list_group()]
+        return membs
+
 class OrderRequest(object):
     @staticmethod
     def to_dict(order):
@@ -206,13 +201,13 @@ class OrderRequest(object):
         self.mnem = mnem
     def __call__(self, clnt):
         orders = []
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        if not trec:
-            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
+        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
+        if not arec:
+            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
             raise Error()
-        trader = clnt.trader(trec)
+        accnt = clnt.accnt(arec)
         orders = [OrderRequest.to_dict(order)
-                  for order in trader.list_order()]
+                  for order in accnt.list_order()]
         return orders
 
 class TradeRequest(object):
@@ -225,34 +220,14 @@ class TradeRequest(object):
         self.mnem = mnem
     def __call__(self, clnt):
         trades = []
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        if not trec:
-            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
+        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
+        if not arec:
+            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
             raise Error()
-        trader = clnt.trader(trec)
+        accnt = clnt.accnt(arec)
         trades = [ExecRequest.to_dict(exc)
-                  for exc in trader.list_trade()]
+                  for exc in accnt.list_trade()]
         return trades
-
-class MembRequest(object):
-    @staticmethod
-    def to_dict(memb):
-        return {
-            'aid': memb.aid,
-            'tid': memb.tid
-        }
-    def __init__(self, mnem):
-        self.mnem = mnem
-    def __call__(self, clnt):
-        membs = []
-        trec = clnt.find_rec_mnem(ENTITY_TRADER, self.mnem)
-        if not trec:
-            err_set(EINVAL, "no such trader '{0}'".format(self.mnem))
-            raise Error()
-        trader = clnt.trader(trec)
-        membs = [MembRequest.to_dict(memb)
-                 for memb in trader.list_group()]
-        return membs
 
 class PosnRequest(object):
     def __init__(self, mnem):
@@ -325,29 +300,26 @@ class AsyncClnt(object):
             self.thread.join()
             self.is_closed = True
 
-    def traders(self, *mnems):
-        print(self.async.sendAndRecv(TraderRequest(*mnems)))
-
-    def accnts(self, *mnems):
-        print(self.async.sendAndRecv(AccntRequest(*mnems)))
-
-    def contrs(self, *mnems):
-        print(self.async.sendAndRecv(ContrRequest(*mnems)))
-
     def logon(self, mnem):
         self.async.sendAndRecv(LogonRequest(mnem))
 
     def logoff(self, mnem):
         self.async.sendAndRecv(LogoffRequest(mnem))
 
+    def accnts(self, *mnems):
+        print(self.async.sendAndRecv(AccntRequest(*mnems)))
+
+    def groups(self, mnem):
+        print(self.async.sendAndRecv(GroupRequest(mnem)))
+
+    def contrs(self, *mnems):
+        print(self.async.sendAndRecv(ContrRequest(*mnems)))
+
     def orders(self, mnem):
         print(self.async.sendAndRecv(OrderRequest(mnem)))
 
     def trades(self, mnem):
         print(self.async.sendAndRecv(TradeRequest(mnem)))
-
-    def membs(self, mnem):
-        print(self.async.sendAndRecv(MembRequest(mnem)))
 
     def posns(self):
         log_info('posns')

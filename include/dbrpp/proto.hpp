@@ -25,34 +25,6 @@
 namespace dbr {
 
 /**
- * @addtogroup ProtoTrader
- * @{
- */
-
-inline size_t
-trader_len(const DbrRec& trec) noexcept
-{
-    return dbr_trader_len(&trec);
-}
-
-inline char*
-write_trader(char* buf, const DbrRec& trec) noexcept
-{
-    return dbr_write_trader(buf, &trec);
-}
-
-inline const char*
-read_trader(const char* buf, DbrRec& trec)
-{
-    buf = dbr_read_trader(buf, &trec);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
-
-/** @} */
-
-/**
  * @addtogroup ProtoAccnt
  * @{
  */
@@ -109,6 +81,34 @@ read_contr(const char* buf, DbrRec& crec)
 /** @} */
 
 /**
+ * @addtogroup ProtoMemb
+ * @{
+ */
+
+inline size_t
+memb_len(const DbrMemb& memb, DbrBool enriched) noexcept
+{
+    return dbr_memb_len(&memb, enriched);
+}
+
+inline char*
+write_memb(char* buf, const DbrMemb& memb, DbrBool enriched) noexcept
+{
+    return dbr_write_memb(buf, &memb, enriched);
+}
+
+inline const char*
+read_memb(const char* buf, DbrMemb& memb)
+{
+    buf = dbr_read_memb(buf, &memb);
+    if (!buf)
+        throw_exception();
+    return buf;
+}
+
+/** @} */
+
+/**
  * @addtogroup ProtoOrder
  * @{
  */
@@ -157,34 +157,6 @@ inline const char*
 read_exec(const char* buf, DbrExec& exec)
 {
     buf = dbr_read_exec(buf, &exec);
-    if (!buf)
-        throw_exception();
-    return buf;
-}
-
-/** @} */
-
-/**
- * @addtogroup ProtoMemb
- * @{
- */
-
-inline size_t
-memb_len(const DbrMemb& memb, DbrBool enriched) noexcept
-{
-    return dbr_memb_len(&memb, enriched);
-}
-
-inline char*
-write_memb(char* buf, const DbrMemb& memb, DbrBool enriched) noexcept
-{
-    return dbr_write_memb(buf, &memb, enriched);
-}
-
-inline const char*
-read_memb(const char* buf, DbrMemb& memb)
-{
-    buf = dbr_read_memb(buf, &memb);
     if (!buf)
         throw_exception();
     return buf;

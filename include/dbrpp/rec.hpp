@@ -94,41 +94,11 @@ public:
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, RecRef trec)
+operator <<(std::ostream& os, RecRef rec)
 {
-    return os << "id=" << trec.id()
-              << ",mnem=" << trec.mnem()
-              << ",display=" << trec.display();
-}
-
-/** @} */
-
-/**
- * @addtogroup TypesTrader
- * @{
- */
-
-class TraderRecRef : public RecRefBase {
-public:
-    explicit
-    TraderRecRef(DbrRec& impl) noexcept
-        : RecRefBase{impl}
-    {
-    }
-    Email
-    email() const noexcept
-    {
-        return Email{impl_->trader.email};
-    }
-};
-
-inline std::ostream&
-operator <<(std::ostream& os, TraderRecRef trec)
-{
-    return os << "id=" << trec.id()
-              << ",mnem=" << trec.mnem()
-              << ",display=" << trec.display()
-              << ",email=" << trec.email();
+    return os << "id=" << rec.id()
+              << ",mnem=" << rec.mnem()
+              << ",display=" << rec.display();
 }
 
 /** @} */

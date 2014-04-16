@@ -18,6 +18,7 @@
 #include "sessidx.h"
 
 #include <dbr/err.h>
+#include <dbr/pool.h>
 #include <dbr/sess.h>
 #include <dbr/slnode.h>
 #include <dbr/types.h>

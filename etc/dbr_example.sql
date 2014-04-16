@@ -222,43 +222,43 @@ INSERT INTO contr (mnem, display, asset, ccy, tick_numer,
         VALUES ('ZW', 'ZW', 'ZW', 'USD', 1, 400, 5000, 1, 2, 1, 10)
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('WRAMIREZ', 'Wayne Ramirez', 'wayne.ramirez@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('SFLORES', 'Steven Flores', 'steven.flores@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('JWRIGHT', 'Juan Wright', 'juan.wright@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('VCAMPBEL', 'Virginia Campbell', 'virginia.campbell@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('GWILSON', 'George Wilson', 'george.wilson@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('BJONES', 'Bobby Jones', 'bobby.jones@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('TLEE', 'Todd Lee', 'todd.lee@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('EEDWARDS', 'Emily Edwards', 'emily.edwards@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('RALEXAND', 'Raymond Alexander', 'raymond.alexander@doobry.org')
 ;
 
-INSERT INTO trader (mnem, display, email)
+INSERT INTO accnt (mnem, display, email)
         VALUES ('JTHOMAS', 'Joseph Thomas', 'joseph.thomas@doobry.org')
 ;
 
@@ -270,80 +270,80 @@ INSERT INTO accnt (mnem, display, email)
         VALUES ('DBRB', 'Account B', 'dbrb@doobry.org')
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRA'),
-        (SELECT id FROM trader WHERE mnem = 'WRAMIREZ')
+        (SELECT id FROM accnt WHERE mnem = 'WRAMIREZ'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRA')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'WRAMIREZ')
+        (SELECT id FROM accnt WHERE mnem = 'WRAMIREZ'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'SFLORES')
+        (SELECT id FROM accnt WHERE mnem = 'SFLORES'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'JWRIGHT')
+        (SELECT id FROM accnt WHERE mnem = 'JWRIGHT'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'VCAMPBEL')
+        (SELECT id FROM accnt WHERE mnem = 'VCAMPBEL'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'GWILSON')
+        (SELECT id FROM accnt WHERE mnem = 'GWILSON'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'BJONES')
+        (SELECT id FROM accnt WHERE mnem = 'BJONES'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'TLEE')
+        (SELECT id FROM accnt WHERE mnem = 'TLEE'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'EEDWARDS')
+        (SELECT id FROM accnt WHERE mnem = 'EEDWARDS'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'RALEXAND')
+        (SELECT id FROM accnt WHERE mnem = 'RALEXAND'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (accnt, trader)
+INSERT INTO memb (user, group_)
         VALUES (
-        (SELECT id FROM accnt WHERE mnem = 'DBRB'),
-        (SELECT id FROM trader WHERE mnem = 'JTHOMAS')
+        (SELECT id FROM accnt WHERE mnem = 'JTHOMAS'),
+        (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 

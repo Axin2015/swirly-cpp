@@ -117,23 +117,6 @@ CREATE VIEW contr_v AS
   ON c.asset = a.mnem
 ;
 
-CREATE TABLE trader (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  mnem TEXT NOT NULL UNIQUE,
-  display TEXT NOT NULL UNIQUE,
-  email TEXT NOT NULL UNIQUE
-)
-;
-
-CREATE VIEW trader_v AS
-  SELECT
-  t.id,
-  t.mnem,
-  t.display,
-  t.email
-  FROM trader t
-;
-
 CREATE TABLE accnt (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL UNIQUE,
@@ -152,28 +135,28 @@ CREATE VIEW accnt_v AS
 ;
 
 CREATE TABLE memb (
-  accnt INTEGER NOT NULL REFERENCES accnt (id),
-  trader INTEGER NOT NULL REFERENCES trader (id),
-  PRIMARY KEY (accnt, trader)
+  user INTEGER NOT NULL REFERENCES accnt (id),
+  group_ INTEGER NOT NULL REFERENCES accnt (id),
+  PRIMARY KEY (user, group_)
 )
 ;
 
 CREATE VIEW memb_v AS
   SELECT
-  a.mnem accnt,
-  t.mnem trader
+  u.mnem user,
+  g.mnem group_
   FROM memb m
-  INNER JOIN accnt a
-  ON m.accnt = a.id
-  INNER JOIN trader t
-  ON m.trader = t.id
-  ORDER BY m.accnt
+  INNER JOIN accnt u
+  ON m.user = u.id
+  INNER JOIN accnt g
+  ON m.group_ = g.id
+  ORDER BY u.id
 ;
 
 CREATE TABLE order_ (
   id INTEGER PRIMARY KEY,
-  trader INTEGER NOT NULL REFERENCES trader (id),
-  accnt INTEGER NOT NULL REFERENCES accnt (id),
+  user INTEGER NOT NULL REFERENCES accnt (id),
+  group_ INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
   ref TEXT NULL,
@@ -188,15 +171,15 @@ CREATE TABLE order_ (
   min_lots INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL,
-  CONSTRAINT order_trader_ref_uq UNIQUE (trader, ref)
+  CONSTRAINT order_user_ref_uq UNIQUE (user, ref)
 )
 ;
 
 CREATE VIEW order_v AS
   SELECT
   o.id,
-  t.mnem trader,
-  a.mnem accnt,
+  u.mnem user,
+  g.mnem group_,
   c.mnem contr,
   o.settl_date,
   o.ref,
@@ -212,10 +195,10 @@ CREATE VIEW order_v AS
   o.created,
   o.modified
   FROM order_ o
-  INNER JOIN trader t
-  ON o.trader = t.id
-  INNER JOIN accnt a
-  ON o.accnt = a.id
+  INNER JOIN accnt u
+  ON o.user = u.id
+  INNER JOIN accnt g
+  ON o.group_ = g.id
   INNER JOIN contr c
   ON o.contr = c.id
   INNER JOIN state s
@@ -227,8 +210,8 @@ CREATE VIEW order_v AS
 CREATE TABLE exec (
   id INTEGER PRIMARY KEY,
   order_ INTEGER NOT NULL REFERENCES order_ (id),
-  trader INTEGER NOT NULL REFERENCES trader (id),
-  accnt INTEGER NOT NULL REFERENCES accnt (id),
+  user INTEGER NOT NULL REFERENCES accnt (id),
+  group_ INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_date INTEGER NOT NULL,
   ref TEXT NULL,
@@ -256,8 +239,8 @@ CREATE TRIGGER before_insert_on_exec
 BEGIN
   INSERT INTO order_ (
     id,
-    trader,
-    accnt,
+    user,
+    group_,
     contr,
     settl_date,
     ref,
@@ -274,8 +257,8 @@ BEGIN
     modified
   ) VALUES (
     new.order_,
-    new.trader,
-    new.accnt,
+    new.user,
+    new.group_,
     new.contr,
     new.settl_date,
     new.ref,
@@ -315,8 +298,8 @@ CREATE VIEW exec_v AS
   SELECT
   e.id,
   e.order_,
-  t.mnem trader,
-  a.mnem accnt,
+  u.mnem user,
+  g.mnem group_,
   c.mnem contr,
   e.settl_date,
   e.ref,
@@ -336,10 +319,10 @@ CREATE VIEW exec_v AS
   e.created,
   e.modified
   FROM exec e
-  INNER JOIN trader t
-  ON e.trader = t.id
-  INNER JOIN accnt a
-  ON e.accnt = a.id
+  INNER JOIN accnt u
+  ON e.user = u.id
+  INNER JOIN accnt g
+  ON e.group_ = g.id
   INNER JOIN contr c
   ON e.contr = c.id
   INNER JOIN state s
@@ -356,8 +339,8 @@ CREATE VIEW trade_v AS
   SELECT
   e.id,
   e.order_,
-  e.trader,
-  e.accnt,
+  e.user,
+  e.group_,
   e.contr,
   e.settl_date,
   e.ref,
@@ -381,7 +364,7 @@ CREATE VIEW trade_v AS
 
 CREATE VIEW posn_v AS
   SELECT
-  e.accnt,
+  e.group_ accnt,
   e.contr,
   e.settl_date,
   e.action,
@@ -389,7 +372,7 @@ CREATE VIEW posn_v AS
   SUM(e.last_lots) lots
   FROM exec e
   WHERE e.state = 4
-  GROUP BY e.accnt, e.contr, e.settl_date, e.action
+  GROUP BY e.group_, e.contr, e.settl_date, e.action
 ;
 
 COMMIT TRANSACTION

@@ -38,24 +38,17 @@ main(int argc, char* argv[])
         Serv serv("doobry.bin", journ.get(), pool);
         serv.load(model.get());
 
-        cout << "traders:\n";
-        for (auto rec : serv.trecs()) {
-            TraderRecRef ref(rec);
-            cout << ref << endl;
-            cout << ref.mnem() << " orders:" << endl;
-            Trader trader = serv.trader(ref);
-            for (auto ref : trader.orders())
-                cout << OrderRef(ref) << endl;
-            cout << ref.mnem() << " trades:" << endl;
-            for (auto ref : trader.trades())
-                cout << ExecRef(ref) << endl;
-        }
-
         cout << "accnts:\n";
         for (auto rec : serv.arecs()) {
             AccntRecRef ref(rec);
             cout << ref << endl;
             Accnt accnt = serv.accnt(ref);
+            cout << ref.mnem() << " orders:" << endl;
+            for (auto ref : accnt.orders())
+                cout << OrderRef(ref) << endl;
+            cout << ref.mnem() << " trades:" << endl;
+            for (auto ref : accnt.trades())
+                cout << ExecRef(ref) << endl;
             cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
                 cout << PosnRef(ref) << endl;

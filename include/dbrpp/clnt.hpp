@@ -22,7 +22,6 @@
 #include <dbrpp/except.hpp>
 #include <dbrpp/order.hpp>
 #include <dbrpp/slnode.hpp>
-#include <dbrpp/trader.hpp>
 
 #include <dbr/clnt.h>
 
@@ -162,7 +161,6 @@ public:
     }
 };
 
-typedef ClntRecs<DBR_ENTITY_TRADER> ClntTraderRecs;
 typedef ClntRecs<DBR_ENTITY_ACCNT> ClntAccntRecs;
 typedef ClntRecs<DBR_ENTITY_CONTR> ClntContrRecs;
 
@@ -819,11 +817,6 @@ public:
     {
         return ClntRecs<TypeN>{impl_};
     }
-    ClntTraderRecs
-    trecs() const noexcept
-    {
-        return ClntTraderRecs{impl_};
-    }
     ClntAccntRecs
     arecs() const noexcept
     {
@@ -835,11 +828,6 @@ public:
         return ClntContrRecs{impl_};
     }
     /** @} */
-    Trader
-    trader(DbrRec& trec) const noexcept
-    {
-        return Trader{dbr_clnt_trader(impl_, &trec)};
-    }
     Accnt
     accnt(DbrRec& arec) const
     {
@@ -849,67 +837,67 @@ public:
         return Accnt{accnt};
     }
     DbrIden
-    logon(DbrTrader trader)
+    logon(DbrAccnt user)
     {
-        DbrIden req_id = dbr_clnt_logon(impl_, trader);
+        DbrIden req_id = dbr_clnt_logon(impl_, user);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    logoff(DbrTrader trader)
+    logoff(DbrAccnt user)
     {
-        DbrIden req_id = dbr_clnt_logoff(impl_, trader);
+        DbrIden req_id = dbr_clnt_logoff(impl_, user);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    place(DbrTrader trader, DbrAccnt accnt, DbrRec& crec, DbrDate settl_date, const char* ref,
+    place(DbrAccnt user, DbrAccnt group, DbrRec& crec, DbrDate settl_date, const char* ref,
           int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
     {
-        DbrIden req_id = dbr_clnt_place(impl_, trader, accnt, &crec, settl_date, ref, action,
+        DbrIden req_id = dbr_clnt_place(impl_, user, group, &crec, settl_date, ref, action,
                                         ticks, lots, min_lots);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    revise(DbrTrader trader, DbrIden id, DbrLots lots)
+    revise(DbrAccnt user, DbrIden id, DbrLots lots)
     {
-        DbrIden req_id = dbr_clnt_revise_id(impl_, trader, id, lots);
+        DbrIden req_id = dbr_clnt_revise_id(impl_, user, id, lots);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    revise(DbrTrader trader, const char* ref, DbrLots lots)
+    revise(DbrAccnt user, const char* ref, DbrLots lots)
     {
-        DbrIden req_id = dbr_clnt_revise_ref(impl_, trader, ref, lots);
+        DbrIden req_id = dbr_clnt_revise_ref(impl_, user, ref, lots);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    cancel(DbrTrader trader, DbrIden id)
+    cancel(DbrAccnt user, DbrIden id)
     {
-        DbrIden req_id = dbr_clnt_cancel_id(impl_, trader, id);
+        DbrIden req_id = dbr_clnt_cancel_id(impl_, user, id);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    cancel(DbrTrader trader, const char* ref)
+    cancel(DbrAccnt user, const char* ref)
     {
-        DbrIden req_id = dbr_clnt_cancel_ref(impl_, trader, ref);
+        DbrIden req_id = dbr_clnt_cancel_ref(impl_, user, ref);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    ack_trade(DbrTrader trader, DbrIden id)
+    ack_trade(DbrAccnt user, DbrIden id)
     {
-        DbrIden req_id = dbr_clnt_ack_trade(impl_, trader, id);
+        DbrIden req_id = dbr_clnt_ack_trade(impl_, user, id);
         if (req_id < 0)
             throw_exception();
         return req_id;

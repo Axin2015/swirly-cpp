@@ -97,19 +97,6 @@ insert_mnem(struct FigCache* cache, struct DbrRec* rec)
 }
 
 static void
-emplace_trader(struct FigCache* cache, struct DbrSlNode* first, size_t size)
-{
-    assert(!cache->first_trader);
-    cache->first_trader = first;
-    cache->trader_size = size;
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_shared_rec_entry(node);
-        insert_id(cache, rec);
-        insert_mnem(cache, rec);
-    }
-}
-
-static void
 emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
 {
     assert(!cache->first_accnt);
@@ -140,8 +127,6 @@ fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPo
 {
     cache->term_state = term_state ? term_state : term_state_noop;
     cache->pool = pool;
-    cache->first_trader = NULL;
-    cache->trader_size = 0;
     cache->first_accnt = NULL;
     cache->accnt_size = 0;
     cache->first_contr = NULL;
@@ -155,7 +140,6 @@ fig_cache_term(struct FigCache* cache)
 {
     free_rec_list(cache->first_contr, cache->term_state, cache->pool);
     free_rec_list(cache->first_accnt, cache->term_state, cache->pool);
-    free_rec_list(cache->first_trader, cache->term_state, cache->pool);
 }
 
 DBR_EXTERN void
@@ -171,9 +155,6 @@ DBR_EXTERN void
 fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
 {
     switch (type) {
-    case DBR_ENTITY_TRADER:
-        emplace_trader(cache, first, size);
-        break;
     case DBR_ENTITY_ACCNT:
         emplace_accnt(cache, first, size);
         break;
@@ -191,11 +172,6 @@ fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
 {
     struct DbrSlNode* first;
     switch (type) {
-    case DBR_ENTITY_TRADER:
-        first = cache->first_trader;
-        if (size)
-            *size = cache->trader_size;
-        break;
     case DBR_ENTITY_ACCNT:
         first = cache->first_accnt;
         if (size)
@@ -217,9 +193,6 @@ fig_cache_empty_rec(struct FigCache* cache, int type)
 {
     struct DbrSlNode* first;
     switch (type) {
-    case DBR_ENTITY_TRADER:
-        first = cache->first_trader;
-        break;
     case DBR_ENTITY_ACCNT:
         first = cache->first_accnt;
         break;

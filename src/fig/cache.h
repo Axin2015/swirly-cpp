@@ -34,8 +34,6 @@
 struct FigCache {
     void (*term_state)(struct DbrRec*);
     DbrPool pool;
-    struct DbrSlNode* first_trader;
-    size_t trader_size;
     struct DbrSlNode* first_accnt;
     size_t accnt_size;
     struct DbrSlNode* first_contr;

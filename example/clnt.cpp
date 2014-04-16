@@ -38,11 +38,11 @@ public:
     {
     }
     void
-    on_logon(DbrIden tid) noexcept
+    on_logon(DbrIden uid) noexcept
     {
     }
     void
-    on_logoff(DbrIden tid) noexcept
+    on_logoff(DbrIden uid) noexcept
     {
     }
     void
@@ -99,11 +99,6 @@ main(int argc, char* argv[])
         } while (!clnt.is_ready());
         cout << endl;
 
-        cout << "traders:\n";
-        for (auto rec : clnt.trecs()) {
-            TraderRecRef ref(rec);
-            cout << ref << endl;
-        }
         cout << "accnts:\n";
         for (auto rec : clnt.arecs()) {
             AccntRecRef ref(rec);

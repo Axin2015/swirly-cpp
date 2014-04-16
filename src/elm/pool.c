@@ -86,9 +86,9 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     // Small entrys.
     dbr_log_debug1("small entries:");
     dbr_log_debug1("sizeof DbrRbNode: %zu", sizeof(struct DbrRbNode));
+    dbr_log_debug1("sizeof DbrMemb:   %zu", sizeof(struct DbrMemb));
     dbr_log_debug1("sizeof DbrLevel:  %zu", sizeof(struct DbrLevel));
     dbr_log_debug1("sizeof DbrMatch:  %zu", sizeof(struct DbrMatch));
-    dbr_log_debug1("sizeof DbrMemb:   %zu", sizeof(struct DbrMemb));
     dbr_log_debug1("sizeof DbrSub:    %zu", sizeof(struct DbrSub));
     dbr_log_debug1("sizeof DbrSess:   %zu", sizeof(struct DbrSess));
 
@@ -190,13 +190,19 @@ elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* firs
 {
     struct DbrSlNode* node = first;
     switch (type) {
-    case DBR_ENTITY_TRADER:
     case DBR_ENTITY_ACCNT:
     case DBR_ENTITY_CONTR:
         while (node) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
             node = node->next;
             dbr_pool_free_rec(pool, rec);
+        }
+        break;
+    case DBR_ENTITY_MEMB:
+        while (node) {
+            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            node = node->next;
+            dbr_pool_free_memb(pool, memb);
         }
         break;
     case DBR_ENTITY_ORDER:
@@ -221,13 +227,6 @@ elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* firs
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
             node = node->next;
             dbr_pool_free_posn(pool, posn);
-        }
-        break;
-    case DBR_ENTITY_MEMB:
-        while (node) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            node = node->next;
-            dbr_pool_free_memb(pool, memb);
         }
         break;
     default:
@@ -285,6 +284,18 @@ DBR_API void
 dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
 {
     elm_pool_free_rec(pool, rec);
+}
+
+DBR_API struct DbrMemb*
+dbr_pool_alloc_memb(DbrPool pool)
+{
+    return elm_pool_alloc_memb(pool);
+}
+
+DBR_API void
+dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
+{
+    elm_pool_free_memb(pool, memb);
 }
 
 DBR_API struct DbrOrder*
@@ -345,18 +356,6 @@ DBR_API void
 dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
 {
     elm_pool_free_posn(pool, posn);
-}
-
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool)
-{
-    return elm_pool_alloc_memb(pool);
-}
-
-DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
-{
-    elm_pool_free_memb(pool, memb);
 }
 
 DBR_API struct DbrView*

@@ -35,13 +35,12 @@ enum {
     DBR_SESS_LOGOFF,
 
     DBR_STATUS_REP,
-    DBR_TRADER_LIST_REP,
     DBR_ACCNT_LIST_REP,
     DBR_CONTR_LIST_REP,
+    DBR_MEMB_LIST_REP,
     DBR_ORDER_LIST_REP,
     DBR_EXEC_LIST_REP,
     DBR_POSN_LIST_REP,
-    DBR_MEMB_LIST_REP,
     DBR_VIEW_LIST_REP,
     DBR_EXEC_REP,
     DBR_POSN_REP,
@@ -73,10 +72,10 @@ struct DbrBody {
             int hbint;
         } sess_open;
         struct {
-            DbrIden tid;
+            DbrIden uid;
         } sess_logon;
         struct {
-            DbrIden tid;
+            DbrIden uid;
         } sess_logoff;
         // Reply.
         struct {
@@ -85,10 +84,10 @@ struct DbrBody {
         } status_rep;
         struct {
             // dbr_shared_rec_entry()
+            // dbr_shared_memb_entry()
             // dbr_shared_order_entry()
             // dbr_shared_exec_entry()
             // dbr_shared_posn_entry()
-            // dbr_shared_memb_entry()
             struct DbrSlNode* first;
             /**
              * @privatesection
@@ -116,8 +115,8 @@ struct DbrBody {
             int type;
         } sess_entity_req;
         struct {
-            DbrIden tid;
-            DbrIden aid;
+            DbrIden uid;
+            DbrIden gid;
             DbrIden cid;
             DbrDate settl_date;
             DbrRef ref;
@@ -127,25 +126,25 @@ struct DbrBody {
             DbrLots min_lots;
         } place_order_req;
         struct {
-            DbrIden tid;
+            DbrIden uid;
             DbrIden id;
             DbrLots lots;
         } revise_order_id_req;
         struct {
-            DbrIden tid;
+            DbrIden uid;
             DbrRef ref;
             DbrLots lots;
         } revise_order_ref_req;
         struct {
-            DbrIden tid;
+            DbrIden uid;
             DbrIden id;
         } cancel_order_id_req;
         struct {
-            DbrIden tid;
+            DbrIden uid;
             DbrRef ref;
         } cancel_order_ref_req;
         struct {
-            DbrIden tid;
+            DbrIden uid;
             DbrIden id;
         } ack_trade_req;
         struct {

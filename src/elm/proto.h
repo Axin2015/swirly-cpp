@@ -30,15 +30,6 @@ DBR_EXTERN const char*
 elm_read_rec(const char* buf, struct DbrRec* rec);
 
 DBR_EXTERN size_t
-elm_trader_len(const struct DbrRec* rec);
-
-DBR_EXTERN char*
-elm_write_trader(char* buf, const struct DbrRec* rec);
-
-DBR_EXTERN const char*
-elm_read_trader(const char* buf, struct DbrRec* rec);
-
-DBR_EXTERN size_t
 elm_accnt_len(const struct DbrRec* rec);
 
 DBR_EXTERN char*
@@ -57,6 +48,15 @@ DBR_EXTERN const char*
 elm_read_contr(const char* buf, struct DbrRec* rec);
 
 DBR_EXTERN size_t
+elm_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_EXTERN char*
+elm_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+
+DBR_EXTERN const char*
+elm_read_memb(const char* buf, struct DbrMemb* memb);
+
+DBR_EXTERN size_t
 elm_order_len(const struct DbrOrder* order, DbrBool enriched);
 
 DBR_EXTERN char*
@@ -73,15 +73,6 @@ elm_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
 
 DBR_EXTERN const char*
 elm_read_exec(const char* buf, struct DbrExec* exec);
-
-DBR_EXTERN size_t
-elm_memb_len(const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_EXTERN char*
-elm_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
-
-DBR_EXTERN const char*
-elm_read_memb(const char* buf, struct DbrMemb* memb);
 
 DBR_EXTERN size_t
 elm_posn_len(const struct DbrPosn* posn, DbrBool enriched);

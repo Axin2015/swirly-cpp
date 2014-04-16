@@ -27,10 +27,6 @@ class Pool;
 }
 
 std::shared_ptr<DbrRec>
-create_trader(dbr::Pool& pool, DbrIden id, const char* mnem, const char* display,
-              const char* email);
-
-std::shared_ptr<DbrRec>
 create_accnt(dbr::Pool& pool, DbrIden id, const char* mnem, const char* display,
              const char* email);
 
@@ -40,47 +36,47 @@ create_contr(dbr::Pool& pool, DbrIden id, const char* mnem, const char* display,
              int tick_denom, int lot_numer, int lot_denom, int pip_dp, DbrLots min_lots,
              DbrLots max_lots);
 
+std::shared_ptr<DbrMemb>
+create_memb(dbr::Pool& pool, DbrIden uid, DbrIden gid);
+
 std::shared_ptr<DbrOrder>
-create_order(dbr::Pool& pool, DbrIden id, DbrRec& trader, DbrRec& accnt, DbrRec& contr,
+create_order(dbr::Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrOrder>
-create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden aid, DbrIden cid,
+create_order(dbr::Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
              DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrExec>
-create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden aid,
+create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
              DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now);
 
-std::shared_ptr<DbrMemb>
-create_memb(dbr::Pool& pool, DbrIden tid, DbrIden aid);
-
 inline std::shared_ptr<DbrRec>
 create_wramirez(dbr::Pool& pool)
 {
-    return create_trader(pool, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
+    return create_accnt(pool, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
 }
 
 inline std::shared_ptr<DbrRec>
 create_sflores(dbr::Pool& pool)
 {
-    return create_trader(pool, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
+    return create_accnt(pool, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
 }
 
 inline std::shared_ptr<DbrRec>
 create_dbra(dbr::Pool& pool)
 {
-    return create_accnt(pool, 1, "DBRA", "Account A", "dbra@doobry.org");
+    return create_accnt(pool, 3, "DBRA", "Account A", "dbra@doobry.org");
 }
 
 inline std::shared_ptr<DbrRec>
 create_dbrb(dbr::Pool& pool)
 {
-    return create_accnt(pool, 1, "DBRB", "Account B", "dbrb@doobry.org");
+    return create_accnt(pool, 4, "DBRB", "Account B", "dbrb@doobry.org");
 }
 
 inline std::shared_ptr<DbrRec>

@@ -196,32 +196,6 @@ dbr_accnt_rec(DbrAccnt accnt)
     return fig_accnt_rec(accnt);
 }
 
-// AccntGroup
-
-DBR_API struct DbrRbNode*
-dbr_accnt_find_group_id(DbrAccnt accnt, DbrIden id)
-{
-    return fig_accnt_find_group_id(accnt, id);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_group(DbrAccnt accnt)
-{
-    return fig_accnt_first_group(accnt);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_last_group(DbrAccnt accnt)
-{
-    return fig_accnt_last_group(accnt);
-}
-
-DBR_API DbrBool
-dbr_accnt_empty_group(DbrAccnt accnt)
-{
-    return fig_accnt_empty_group(accnt);
-}
-
 // AccntUser
 
 DBR_API struct DbrRbNode*
@@ -246,6 +220,32 @@ DBR_API DbrBool
 dbr_accnt_empty_user(DbrAccnt accnt)
 {
     return fig_accnt_empty_user(accnt);
+}
+
+// AccntGroup
+
+DBR_API struct DbrRbNode*
+dbr_accnt_find_group_id(DbrAccnt accnt, DbrIden id)
+{
+    return fig_accnt_find_group_id(accnt, id);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_first_group(DbrAccnt accnt)
+{
+    return fig_accnt_first_group(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_group(DbrAccnt accnt)
+{
+    return fig_accnt_last_group(accnt);
+}
+
+DBR_API DbrBool
+dbr_accnt_empty_group(DbrAccnt accnt)
+{
+    return fig_accnt_empty_group(accnt);
 }
 
 // AccntOrder

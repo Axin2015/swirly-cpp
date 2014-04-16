@@ -24,12 +24,11 @@
 
 #include <stdlib.h> // abort()
 
-static const char TRADER_FORMAT[] = "lmss";
 static const char ACCNT_FORMAT[] = "lmss";
 static const char CONTR_FORMAT[] = "lmsmmmiiiiill";
+static const char MEMB_FORMAT[] = "ll";
 static const char ORDER_FORMAT[] = "llllisiilllllllll";
 static const char EXEC_FORMAT[] = "lllllisiillllllllill";
-static const char MEMB_FORMAT[] = "ll";
 static const char POSN_FORMAT[] = "lllllll";
 static const char VIEW_FORMAT[] = "lillzllzllzllzllzllzl";
 
@@ -38,9 +37,6 @@ elm_rec_len(const struct DbrRec* rec)
 {
     size_t n = dbr_packleni(rec->type);
     switch (rec->type) {
-    case DBR_ENTITY_TRADER:
-        n += dbr_trader_len(rec);
-        break;
     case DBR_ENTITY_ACCNT:
         n += dbr_accnt_len(rec);
         break;
@@ -58,9 +54,6 @@ elm_write_rec(char* buf, const struct DbrRec* rec)
 {
     buf = dbr_packi(buf, rec->type);
     switch (rec->type) {
-    case DBR_ENTITY_TRADER:
-        buf = dbr_write_trader(buf, rec);
-        break;
     case DBR_ENTITY_ACCNT:
         buf = dbr_write_accnt(buf, rec);
         break;
@@ -78,9 +71,6 @@ elm_read_rec(const char* buf, struct DbrRec* rec)
 {
     buf = dbr_unpacki(buf, &rec->type);
     switch (rec->type) {
-    case DBR_ENTITY_TRADER:
-        buf = dbr_read_trader(buf, rec);
-        break;
     case DBR_ENTITY_ACCNT:
         buf = dbr_read_accnt(buf, rec);
         break;
@@ -92,32 +82,6 @@ elm_read_rec(const char* buf, struct DbrRec* rec)
         buf = NULL;
     }
     return buf;
-}
-
-DBR_EXTERN size_t
-elm_trader_len(const struct DbrRec* rec)
-{
-    return dbr_packlenf(TRADER_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                        DBR_EMAIL_MAX, rec->trader.email);
-}
-
-DBR_EXTERN char*
-elm_write_trader(char* buf, const struct DbrRec* rec)
-{
-    return dbr_packf(buf, TRADER_FORMAT,
-                     rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                     DBR_EMAIL_MAX, rec->trader.email);
-}
-
-DBR_EXTERN const char*
-elm_read_trader(const char* buf, struct DbrRec* rec)
-{
-    rec->type = DBR_ENTITY_TRADER;
-    rec->trader.state = NULL;
-    return dbr_unpackf(buf, TRADER_FORMAT,
-                       &rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                       DBR_EMAIL_MAX, rec->trader.email);
 }
 
 DBR_EXTERN size_t
@@ -188,119 +152,6 @@ elm_read_contr(const char* buf, struct DbrRec* rec)
 }
 
 DBR_EXTERN size_t
-elm_order_len(const struct DbrOrder* order, DbrBool enriched)
-{
-    size_t n;
-    if (enriched) {
-        n = dbr_packlenf(ORDER_FORMAT,
-                         order->id, order->c.trader.rec->id, order->c.accnt.rec->id,
-                         order->c.contr.rec->id, order->c.settl_date, DBR_REF_MAX, order->c.ref,
-                         order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                         order->c.min_lots, order->created, order->modified);
-    } else {
-        n = dbr_packlenf(ORDER_FORMAT,
-                         order->id, order->c.trader.id_only, order->c.accnt.id_only,
-                         order->c.contr.id_only, order->c.settl_date, DBR_REF_MAX, order->c.ref,
-                         order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                         order->c.min_lots, order->created, order->modified);
-    }
-    return n;
-}
-
-DBR_EXTERN char*
-elm_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
-{
-    if (enriched) {
-        buf = dbr_packf(buf, ORDER_FORMAT,
-                        order->id, order->c.trader.rec->id, order->c.accnt.rec->id,
-                        order->c.contr.rec->id, order->c.settl_date, DBR_REF_MAX,
-                        order->c.ref, order->c.state, order->c.action, order->c.ticks,
-                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
-                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
-    } else {
-        buf = dbr_packf(buf, ORDER_FORMAT,
-                        order->id, order->c.trader.id_only, order->c.accnt.id_only,
-                        order->c.contr.id_only, order->c.settl_date, DBR_REF_MAX,
-                        order->c.ref, order->c.state, order->c.action, order->c.ticks,
-                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
-                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
-    }
-    return buf;
-}
-
-DBR_EXTERN const char*
-elm_read_order(const char* buf, struct DbrOrder* order)
-{
-    return dbr_unpackf(buf, ORDER_FORMAT,
-                       &order->id, &order->c.trader.id_only, &order->c.accnt.id_only,
-                       &order->c.contr.id_only, &order->c.settl_date, DBR_REF_MAX,
-                       order->c.ref, &order->c.state, &order->c.action, &order->c.ticks,
-                       &order->c.lots, &order->c.resd, &order->c.exec, &order->c.last_ticks,
-                       &order->c.last_lots, &order->c.min_lots, &order->created, &order->modified);
-}
-
-DBR_EXTERN size_t
-elm_exec_len(const struct DbrExec* exec, DbrBool enriched)
-{
-    size_t n;
-    if (enriched) {
-        const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
-        n = dbr_packlenf(EXEC_FORMAT,
-                         exec->id, exec->order, exec->c.trader.rec->id, exec->c.accnt.rec->id,
-                         exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
-                         exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
-    } else {
-        n = dbr_packlenf(EXEC_FORMAT,
-                         exec->id, exec->order, exec->c.trader.id_only, exec->c.accnt.id_only,
-                         exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
-                         exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
-                         exec->created);
-    }
-    return n;
-}
-
-DBR_EXTERN char*
-elm_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
-{
-    if (enriched) {
-        const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
-        buf = dbr_packf(buf, EXEC_FORMAT,
-                        exec->id, exec->order, exec->c.trader.rec->id, exec->c.accnt.rec->id,
-                        exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
-                        exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                        exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
-    } else {
-        buf = dbr_packf(buf, EXEC_FORMAT,
-                        exec->id, exec->order, exec->c.trader.id_only, exec->c.accnt.id_only,
-                        exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
-                        exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                        exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
-                        exec->created);
-    }
-    return buf;
-}
-
-DBR_EXTERN const char*
-elm_read_exec(const char* buf, struct DbrExec* exec)
-{
-    return dbr_unpackf(buf, EXEC_FORMAT,
-                       &exec->id, &exec->order, &exec->c.trader.id_only, &exec->c.accnt.id_only,
-                       &exec->c.contr.id_only, &exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
-                       &exec->c.state, &exec->c.action, &exec->c.ticks, &exec->c.lots,
-                       &exec->c.resd, &exec->c.exec, &exec->c.last_ticks, &exec->c.last_lots,
-                       &exec->c.min_lots, &exec->match, &exec->role, &exec->cpty.id_only,
-                       &exec->created);
-}
-
-DBR_EXTERN size_t
 elm_memb_len(const struct DbrMemb* memb, DbrBool enriched)
 {
     size_t n;
@@ -331,6 +182,119 @@ DBR_EXTERN const char*
 elm_read_memb(const char* buf, struct DbrMemb* memb)
 {
     return dbr_unpackf(buf, MEMB_FORMAT, &memb->group.id_only, &memb->user.id_only);
+}
+
+DBR_EXTERN size_t
+elm_order_len(const struct DbrOrder* order, DbrBool enriched)
+{
+    size_t n;
+    if (enriched) {
+        n = dbr_packlenf(ORDER_FORMAT,
+                         order->id, order->c.user.rec->id, order->c.group.rec->id,
+                         order->c.contr.rec->id, order->c.settl_date, DBR_REF_MAX, order->c.ref,
+                         order->c.state, order->c.action, order->c.ticks, order->c.lots,
+                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
+                         order->c.min_lots, order->created, order->modified);
+    } else {
+        n = dbr_packlenf(ORDER_FORMAT,
+                         order->id, order->c.user.id_only, order->c.group.id_only,
+                         order->c.contr.id_only, order->c.settl_date, DBR_REF_MAX, order->c.ref,
+                         order->c.state, order->c.action, order->c.ticks, order->c.lots,
+                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
+                         order->c.min_lots, order->created, order->modified);
+    }
+    return n;
+}
+
+DBR_EXTERN char*
+elm_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
+{
+    if (enriched) {
+        buf = dbr_packf(buf, ORDER_FORMAT,
+                        order->id, order->c.user.rec->id, order->c.group.rec->id,
+                        order->c.contr.rec->id, order->c.settl_date, DBR_REF_MAX,
+                        order->c.ref, order->c.state, order->c.action, order->c.ticks,
+                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
+                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
+    } else {
+        buf = dbr_packf(buf, ORDER_FORMAT,
+                        order->id, order->c.user.id_only, order->c.group.id_only,
+                        order->c.contr.id_only, order->c.settl_date, DBR_REF_MAX,
+                        order->c.ref, order->c.state, order->c.action, order->c.ticks,
+                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
+                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
+    }
+    return buf;
+}
+
+DBR_EXTERN const char*
+elm_read_order(const char* buf, struct DbrOrder* order)
+{
+    return dbr_unpackf(buf, ORDER_FORMAT,
+                       &order->id, &order->c.user.id_only, &order->c.group.id_only,
+                       &order->c.contr.id_only, &order->c.settl_date, DBR_REF_MAX,
+                       order->c.ref, &order->c.state, &order->c.action, &order->c.ticks,
+                       &order->c.lots, &order->c.resd, &order->c.exec, &order->c.last_ticks,
+                       &order->c.last_lots, &order->c.min_lots, &order->created, &order->modified);
+}
+
+DBR_EXTERN size_t
+elm_exec_len(const struct DbrExec* exec, DbrBool enriched)
+{
+    size_t n;
+    if (enriched) {
+        const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
+        n = dbr_packlenf(EXEC_FORMAT,
+                         exec->id, exec->order, exec->c.user.rec->id, exec->c.group.rec->id,
+                         exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                         exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
+                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
+                         exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
+    } else {
+        n = dbr_packlenf(EXEC_FORMAT,
+                         exec->id, exec->order, exec->c.user.id_only, exec->c.group.id_only,
+                         exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                         exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
+                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
+                         exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                         exec->created);
+    }
+    return n;
+}
+
+DBR_EXTERN char*
+elm_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
+{
+    if (enriched) {
+        const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
+        buf = dbr_packf(buf, EXEC_FORMAT,
+                        exec->id, exec->order, exec->c.user.rec->id, exec->c.group.rec->id,
+                        exec->c.contr.rec->id, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                        exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
+                        exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
+                        exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
+    } else {
+        buf = dbr_packf(buf, EXEC_FORMAT,
+                        exec->id, exec->order, exec->c.user.id_only, exec->c.group.id_only,
+                        exec->c.contr.id_only, exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                        exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
+                        exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
+                        exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                        exec->created);
+    }
+    return buf;
+}
+
+DBR_EXTERN const char*
+elm_read_exec(const char* buf, struct DbrExec* exec)
+{
+    return dbr_unpackf(buf, EXEC_FORMAT,
+                       &exec->id, &exec->order, &exec->c.user.id_only, &exec->c.group.id_only,
+                       &exec->c.contr.id_only, &exec->c.settl_date, DBR_REF_MAX, exec->c.ref,
+                       &exec->c.state, &exec->c.action, &exec->c.ticks, &exec->c.lots,
+                       &exec->c.resd, &exec->c.exec, &exec->c.last_ticks, &exec->c.last_lots,
+                       &exec->c.min_lots, &exec->match, &exec->role, &exec->cpty.id_only,
+                       &exec->created);
 }
 
 DBR_EXTERN size_t
@@ -461,24 +425,6 @@ dbr_read_rec(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API size_t
-dbr_trader_len(const struct DbrRec* rec)
-{
-    return elm_trader_len(rec);
-}
-
-DBR_API char*
-dbr_write_trader(char* buf, const struct DbrRec* rec)
-{
-    return elm_write_trader(buf, rec);
-}
-
-DBR_API const char*
-dbr_read_trader(const char* buf, struct DbrRec* rec)
-{
-    return elm_read_trader(buf, rec);
-}
-
-DBR_API size_t
 dbr_accnt_len(const struct DbrRec* rec)
 {
     return elm_accnt_len(rec);
@@ -515,6 +461,24 @@ dbr_read_contr(const char* buf, struct DbrRec* rec)
 }
 
 DBR_API size_t
+dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched)
+{
+    return elm_memb_len(memb, enriched);
+}
+
+DBR_API char*
+dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
+{
+    return elm_write_memb(buf, memb, enriched);
+}
+
+DBR_API const char*
+dbr_read_memb(const char* buf, struct DbrMemb* memb)
+{
+    return elm_read_memb(buf, memb);
+}
+
+DBR_API size_t
 dbr_order_len(const struct DbrOrder* order, DbrBool enriched)
 {
     return elm_order_len(order, enriched);
@@ -548,24 +512,6 @@ DBR_API const char*
 dbr_read_exec(const char* buf, struct DbrExec* exec)
 {
     return elm_read_exec(buf, exec);
-}
-
-DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched)
-{
-    return elm_memb_len(memb, enriched);
-}
-
-DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
-{
-    return elm_write_memb(buf, memb, enriched);
-}
-
-DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb)
-{
-    return elm_read_memb(buf, memb);
 }
 
 DBR_API size_t

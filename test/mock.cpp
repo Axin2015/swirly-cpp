@@ -27,44 +27,6 @@ using namespace std;
 namespace {
 
 void
-set_trader(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
-           const char* email)
-{
-    rec.type = DBR_ENTITY_TRADER;
-    rec.id = id;
-    strncpy(rec.mnem, mnem, DBR_MNEM_MAX);
-    strncpy(rec.display, display, DBR_DISPLAY_MAX);
-    strncpy(rec.trader.email, email, DBR_EMAIL_MAX);
-    rec.trader.state = nullptr;
-}
-
-ssize_t
-read_trader(DbrPool pool, DbrSlNode*& first)
-{
-    ssize_t size = 0;
-
-    DbrQueue rq;
-    dbr_queue_init(&rq);
-
-    DbrRec* rec = dbr_pool_alloc_rec(pool);
-    check(rec);
-    dbr_rec_init(rec);
-    set_trader(*rec, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
-    dbr_queue_insert_back(&rq, &rec->shared_node_);
-    ++size;
-
-    rec = dbr_pool_alloc_rec(pool);
-    check(rec);
-    dbr_rec_init(rec);
-    set_trader(*rec, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
-    dbr_queue_insert_back(&rq, &rec->shared_node_);
-    ++size;
-
-    first = rq.first;
-    return size;
-}
-
-void
 set_accnt(DbrRec& rec, DbrIden id, const char* mnem, const char* display,
           const char* email)
 {
@@ -87,14 +49,28 @@ read_accnt(DbrPool pool, DbrSlNode*& first)
     DbrRec* rec = dbr_pool_alloc_rec(pool);
     check(rec);
     dbr_rec_init(rec);
-    set_accnt(*rec, 1, "DBRA", "Account A", "dbra@doobry.org");
+    set_accnt(*rec, 1, "WRAMIREZ", "Wayne Ramirez", "wayne.ramirez@doobry.org");
     dbr_queue_insert_back(&rq, &rec->shared_node_);
     ++size;
 
     rec = dbr_pool_alloc_rec(pool);
     check(rec);
     dbr_rec_init(rec);
-    set_accnt(*rec, 2, "DBRB", "Account B", "dbrb@doobry.org");
+    set_accnt(*rec, 2, "SFLORES", "Steven Flores", "steven.flores@doobry.org");
+    dbr_queue_insert_back(&rq, &rec->shared_node_);
+    ++size;
+
+    rec = dbr_pool_alloc_rec(pool);
+    check(rec);
+    dbr_rec_init(rec);
+    set_accnt(*rec, 3, "DBRA", "Account A", "dbra@doobry.org");
+    dbr_queue_insert_back(&rq, &rec->shared_node_);
+    ++size;
+
+    rec = dbr_pool_alloc_rec(pool);
+    check(rec);
+    dbr_rec_init(rec);
+    set_accnt(*rec, 4, "DBRB", "Account B", "dbrb@doobry.org");
     dbr_queue_insert_back(&rq, &rec->shared_node_);
     ++size;
 
@@ -151,27 +127,6 @@ read_contr(DbrPool pool, DbrSlNode*& first)
     return size;
 }
 
-ssize_t
-read_order(DbrPool pool, DbrSlNode*& first)
-{
-    first = nullptr;
-    return 0;
-}
-
-ssize_t
-read_trade(DbrPool pool, DbrSlNode*& first)
-{
-    first = nullptr;
-    return 0;
-}
-
-ssize_t
-read_posn(DbrPool pool, DbrSlNode*& first)
-{
-    first = nullptr;
-    return 0;
-}
-
 void
 set_memb(DbrMemb& memb, DbrIden gid, DbrIden uid)
 {
@@ -210,6 +165,27 @@ read_memb(DbrPool pool, DbrSlNode*& first)
 
     first = rq.first;
     return size;
+}
+
+ssize_t
+read_order(DbrPool pool, DbrSlNode*& first)
+{
+    first = nullptr;
+    return 0;
+}
+
+ssize_t
+read_trade(DbrPool pool, DbrSlNode*& first)
+{
+    first = nullptr;
+    return 0;
+}
+
+ssize_t
+read_posn(DbrPool pool, DbrSlNode*& first)
+{
+    first = nullptr;
+    return 0;
 }
 } // anonymous
 
@@ -251,14 +227,14 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
     ssize_t ret = -1;
     try {
         switch (type) {
-        case DBR_ENTITY_TRADER:
-            ret = read_trader(pool, first);
-            break;
         case DBR_ENTITY_ACCNT:
             ret = read_accnt(pool, first);
             break;
         case DBR_ENTITY_CONTR:
             ret = read_contr(pool, first);
+            break;
+        case DBR_ENTITY_MEMB:
+            ret = read_memb(pool, first);
             break;
         case DBR_ENTITY_ORDER:
             ret = read_order(pool, first);
@@ -268,9 +244,6 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
             break;
         case DBR_ENTITY_POSN:
             ret = read_posn(pool, first);
-            break;
-        case DBR_ENTITY_MEMB:
-            ret = read_memb(pool, first);
             break;
         default:
             dbr_err_setf(DBR_EINVAL, "invalid type '%d'", type);

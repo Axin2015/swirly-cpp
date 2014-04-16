@@ -45,22 +45,22 @@ public:
         return impl_;
     }
     AccntRecRef
+    user() const noexcept
+    {
+        return AccntRecRef{*impl_->user.rec};
+    }
+    AccntRecRef
     group() const noexcept
     {
         return AccntRecRef{*impl_->group.rec};
-    }
-    TraderRecRef
-    user() const noexcept
-    {
-        return TraderRecRef{*impl_->user.rec};
     }
 };
 
 inline std::ostream&
 operator <<(std::ostream& os, MembRef memb)
 {
-    return os << "group=" << memb.group().mnem()
-              << ",user=" << memb.user().mnem();
+    return os << "user=" << memb.user().mnem()
+              << ",group=" << memb.group().mnem();
 }
 
 /** @} */

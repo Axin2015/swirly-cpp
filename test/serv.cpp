@@ -27,11 +27,6 @@ template <int TypeN>
 struct TypeTraits;
 
 template <>
-struct TypeTraits<DBR_ENTITY_TRADER> {
-    typedef TraderRecRef TypeRecRef;
-};
-
-template <>
 struct TypeTraits<DBR_ENTITY_ACCNT> {
     typedef AccntRecRef TypeRecRef;
 };
@@ -57,25 +52,6 @@ get_rec_mnem(Serv& serv, const char* mnem)
     auto it = serv.recs<TypeN>().find(mnem);
     check(it != serv.recs<TypeN>().end());
     return typename TypeTraits<TypeN>::TypeRecRef(*it);
-}
-
-TEST_CASE(serv_trader)
-{
-    Journ journ;
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    Serv serv(nullptr, &journ, pool);
-    serv.load(&model);
-
-    check(serv.trecs().find("BAD") == serv.trecs().end());
-
-    TraderRecRef trec = get_rec_mnem<DBR_ENTITY_TRADER>(serv, "WRAMIREZ");
-    check(trec == get_rec_id<DBR_ENTITY_TRADER>(serv, trec.id()));
-    check(trec.mnem() == Mnem("WRAMIREZ"));
-
-    // Body.
-    check(trec.display() == Display("Wayne Ramirez"));
-    check(trec.email() == Email("wayne.ramirez@doobry.org"));
 }
 
 TEST_CASE(serv_accnt)
@@ -150,23 +126,23 @@ TEST_CASE(serv_place)
     Serv serv(nullptr, &journ, pool);
     serv.load(&model);
 
-    auto tit = serv.trecs().find("WRAMIREZ");
-    check(tit != serv.trecs().end());
+    auto uit = serv.arecs().find("WRAMIREZ");
+    check(uit != serv.arecs().end());
 
-    auto ait = serv.arecs().find("DBRA");
-    check(ait != serv.arecs().end());
+    auto git = serv.arecs().find("DBRA");
+    check(git != serv.arecs().end());
 
     auto cit = serv.crecs().find("EURUSD");
     check(cit != serv.crecs().end());
 
-    auto trader = serv.trader(TraderRecRef(*tit));
-    auto accnt = serv.accnt(AccntRecRef(*ait));
+    auto user = serv.accnt(AccntRecRef(*uit));
+    auto group = serv.accnt(AccntRecRef(*git));
     auto book = serv.book(ContrRecRef(*cit), 20130824);
 
     DbrUuid uuid;
     uuid_generate(uuid);
     auto sess = serv.sess(uuid);
-    sess.logon(trader);
+    sess.logon(user);
 
-    serv.place(trader, accnt, book, nullptr, DBR_ACTION_BUY, 12345, 1, 0);
+    serv.place(user, group, book, nullptr, DBR_ACTION_BUY, 12345, 1, 0);
 }
