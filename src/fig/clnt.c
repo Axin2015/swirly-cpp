@@ -190,9 +190,9 @@ insert_viewup(struct DbrTree* viewups, struct DbrView* view)
 }
 
 static DbrAccnt
-get_accnt(DbrClnt clnt, DbrIden gid)
+get_accnt(DbrClnt clnt, DbrIden aid)
 {
-    struct DbrRec* arec = get_id(&clnt->cache, DBR_ENTITY_ACCNT, gid);
+    struct DbrRec* arec = get_id(&clnt->cache, DBR_ENTITY_ACCNT, aid);
     assert(arec->accnt.state);
     return arec->accnt.state;
 }

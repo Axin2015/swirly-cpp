@@ -312,6 +312,115 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
 }
 
 static DbrBool
+sess_group(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
+{
+    struct DbrBody rep;
+
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_accnt_first_group(accnt);
+         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(node);
+        dbr_queue_insert_back(&q, &memb->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_MEMB_LIST_REP;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
+    if (!ok)
+        dbr_err_perror("dbr_send_msg() failed");
+    return ok;
+}
+
+static DbrBool
+sess_order(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
+{
+    struct DbrBody rep;
+
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_accnt_first_order(accnt);
+         node != DBR_ACCNT_END_ORDER; node = dbr_rbnode_next(node)) {
+        struct DbrOrder* order = dbr_accnt_order_entry(node);
+        dbr_queue_insert_back(&q, &order->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_ORDER_LIST_REP;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
+    if (!ok)
+        dbr_err_perror("dbr_send_msg() failed");
+    return ok;
+}
+
+static DbrBool
+sess_exec(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
+{
+    struct DbrBody rep;
+
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_accnt_first_trade(accnt);
+         node != DBR_ACCNT_END_TRADE; node = dbr_rbnode_next(node)) {
+        struct DbrExec* exec = dbr_accnt_trade_entry(node);
+        dbr_queue_insert_back(&q, &exec->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_EXEC_LIST_REP;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
+    if (!ok)
+        dbr_err_perror("dbr_send_msg() failed");
+    return ok;
+}
+
+static DbrBool
+sess_posn(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
+{
+    struct DbrBody rep;
+
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+
+    // Send positions for each group that the account (user) belongs to.
+
+    // For each account.
+    for (struct DbrRbNode* gnode = dbr_accnt_first_group(accnt);
+         gnode != DBR_ACCNT_END_GROUP; gnode = dbr_rbnode_next(gnode)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(gnode);
+        struct DbrRec* arec = memb->group.rec;
+        DbrAccnt group = dbr_serv_accnt(serv, arec);
+        if (!group) {
+            status_err(&rep, req_id);
+            goto fail1;
+        }
+        // Is this session already subscribed to this group?
+        const int subs = dbr_sess_subs(sess, group);
+        if (subs > 1)
+            continue;
+        // This logon represents the first subscription to this group, so the initial positions for
+        // this group must be sent.
+        assert(subs == 1);
+        // Copy each posn to entity node.
+        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(group);
+             pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {
+            struct DbrPosn* posn = dbr_accnt_posn_entry(pnode);
+            dbr_queue_insert_back(&q, &posn->shared_node_);
+        }
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_POSN_LIST_REP;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
+    if (!ok)
+        dbr_err_perror("dbr_send_msg() failed");
+    return ok;
+ fail1:
+    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
+        dbr_err_perror("dbr_send_msg() failed");
+    return DBR_FALSE;
+}
+
+static DbrBool
 sess_book(struct DbrSess* sess, DbrIden req_id, DbrMillis now)
 {
     struct DbrBody rep;
@@ -339,114 +448,6 @@ sess_book(struct DbrSess* sess, DbrIden req_id, DbrMillis now)
     return ok;
  fail1:
     free_view_list(q.first);
-    return DBR_FALSE;
-}
-
-static DbrBool
-sess_group(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
-{
-    struct DbrBody rep;
-
-    // Copy to entity node.
-    struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_group(user);
-         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        dbr_queue_insert_back(&q, &memb->shared_node_);
-    }
-    rep.req_id = req_id;
-    rep.type = DBR_MEMB_LIST_REP;
-    rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
-    if (!ok)
-        dbr_err_perror("dbr_send_msg() failed");
-    return ok;
-}
-
-static DbrBool
-sess_order(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
-{
-    struct DbrBody rep;
-
-    // Copy to entity node.
-    struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_order(user);
-         node != DBR_ACCNT_END_ORDER; node = dbr_rbnode_next(node)) {
-        struct DbrOrder* order = dbr_accnt_order_entry(node);
-        dbr_queue_insert_back(&q, &order->shared_node_);
-    }
-    rep.req_id = req_id;
-    rep.type = DBR_ORDER_LIST_REP;
-    rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
-    if (!ok)
-        dbr_err_perror("dbr_send_msg() failed");
-    return ok;
-}
-
-static DbrBool
-sess_exec(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
-{
-    struct DbrBody rep;
-
-    // Copy to entity node.
-    struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_trade(user);
-         node != DBR_ACCNT_END_TRADE; node = dbr_rbnode_next(node)) {
-        struct DbrExec* exec = dbr_accnt_trade_entry(node);
-        dbr_queue_insert_back(&q, &exec->shared_node_);
-    }
-    rep.req_id = req_id;
-    rep.type = DBR_EXEC_LIST_REP;
-    rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
-    if (!ok)
-        dbr_err_perror("dbr_send_msg() failed");
-    return ok;
-}
-
-static DbrBool
-sess_posn(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
-{
-    struct DbrBody rep;
-
-    struct DbrQueue q = DBR_QUEUE_INIT(q);
-
-    // Send positions for each account that the user is a member of.
-
-    // For each account.
-    for (struct DbrRbNode* gnode = dbr_accnt_first_group(user);
-         gnode != DBR_ACCNT_END_GROUP; gnode = dbr_rbnode_next(gnode)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(gnode);
-        struct DbrRec* arec = memb->group.rec;
-        DbrAccnt accnt = dbr_serv_accnt(serv, arec);
-        if (!accnt) {
-            status_err(&rep, req_id);
-            goto fail1;
-        }
-        const int subs = dbr_sess_subs(sess, accnt);
-        if (subs > 1)
-            continue;
-        // This logon represents the first subscription to this account, so the initial positions
-        // for this account must be sent.
-        assert(subs == 1);
-        // Copy each posn to entity node.
-        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(accnt);
-             pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {
-            struct DbrPosn* posn = dbr_accnt_posn_entry(pnode);
-            dbr_queue_insert_back(&q, &posn->shared_node_);
-        }
-    }
-    rep.req_id = req_id;
-    rep.type = DBR_POSN_LIST_REP;
-    rep.entity_list_rep.first = dbr_queue_first(&q);
-    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
-    if (!ok)
-        dbr_err_perror("dbr_send_msg() failed");
-    return ok;
- fail1:
-    if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
-        dbr_err_perror("dbr_send_msg() failed");
     return DBR_FALSE;
 }
 
