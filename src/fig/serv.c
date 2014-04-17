@@ -195,19 +195,31 @@ emplace_membs(DbrServ serv, DbrModel model)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
+        struct DbrMemb* umemb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
 
-        struct FigAccnt* accnt = fig_accnt_lazy(memb->group.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!accnt))
+        // Clone member for group.
+        struct DbrMemb* gmemb = dbr_pool_alloc_memb(serv->pool);
+        if (!gmemb)
             goto fail2;
+        dbr_memb_init(gmemb);
+        gmemb->user.rec = umemb->user.rec;
+        gmemb->group.rec = umemb->group.rec;
 
-        struct FigAccnt* user = fig_accnt_lazy(memb->user.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!user))
+        struct FigAccnt* user = fig_accnt_lazy(umemb->user.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!user)) {
+            dbr_pool_free_memb(serv->pool, gmemb);
             goto fail2;
+        }
+
+        struct FigAccnt* group = fig_accnt_lazy(umemb->group.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!group)) {
+            dbr_pool_free_memb(serv->pool, gmemb);
+            goto fail2;
+        }
 
         // Transfer ownership.
-        fig_accnt_insert_user(accnt, memb);
-        fig_accnt_emplace_group(user, memb);
+        fig_accnt_emplace_user(group, umemb);
+        fig_accnt_emplace_group(user, gmemb);
     }
     return DBR_TRUE;
  fail2:

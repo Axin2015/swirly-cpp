@@ -30,8 +30,8 @@ struct FigAccnt {
     struct DbrRec* rec;
     struct FigOrdIdx* ordidx;
     DbrPool pool;
-    struct DbrTree groups;
     struct DbrTree users;
+    struct DbrTree groups;
     struct DbrTree orders;
     struct DbrTree trades;
     struct DbrTree posns;
@@ -61,10 +61,10 @@ fig_accnt_rec(const struct FigAccnt* accnt)
 
 #define FIG_ACCNT_END_USER DBR_TREE_END
 
-// This does not transfer ownership.
+// Transfer ownership to state.
 
 static inline void
-fig_accnt_insert_user(struct FigAccnt* accnt, struct DbrMemb* memb)
+fig_accnt_emplace_user(struct FigAccnt* accnt, struct DbrMemb* memb)
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"

@@ -197,31 +197,28 @@ get_accnt(DbrClnt clnt, DbrIden aid)
     return arec->accnt.state;
 }
 
-static DbrBool
-emplace_memb_list(DbrClnt clnt, struct DbrSlNode* first)
+static void
+emplace_user_list(DbrClnt clnt, struct DbrSlNode* first)
 {
-    DbrBool nomem = DBR_FALSE;
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
+        DbrAccnt group = memb->group.rec->accnt.state;
+        assert(group);
+        // Transfer ownership.
+        fig_accnt_emplace_user(group, memb);
+    }
+}
 
+static void
+emplace_group_list(DbrClnt clnt, struct DbrSlNode* first)
+{
+    for (struct DbrSlNode* node = first; node; node = node->next) {
+        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
         DbrAccnt user = memb->user.rec->accnt.state;
         assert(user);
         // Transfer ownership.
         fig_accnt_emplace_group(user, memb);
-
-        DbrAccnt group = fig_accnt_lazy(memb->group.rec, &clnt->ordidx, clnt->pool);
-        if (dbr_likely(group)) {
-            fig_accnt_insert_user(group, memb);
-        } else {
-            // Member is owned by user so no need to free here.
-            nomem = DBR_TRUE;
-        }
     }
-    if (dbr_unlikely(nomem)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        return DBR_FALSE;
-    }
-    return DBR_TRUE;
 }
 
 static void
@@ -1083,14 +1080,13 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 if (!(clnt->state & ALL_WAIT))
                     dbr_handler_on_ready(handler);
                 break;
-            case DBR_MEMB_LIST_REP:
-                dbr_log_info("memb-list message");
-                // This function can fail is there is no memory available for a lazily created
-                // account.
-                if (dbr_unlikely(!emplace_memb_list(clnt, body.entity_list_rep.first))) {
-                    sess_reset(clnt);
-                    goto fail1;
-                }
+            case DBR_USER_LIST_REP:
+                dbr_log_info("user-list message");
+                emplace_user_list(clnt, body.entity_list_rep.first);
+                break;
+            case DBR_GROUP_LIST_REP:
+                dbr_log_info("group-list message");
+                emplace_group_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_ORDER_LIST_REP:
                 dbr_log_info("order-list message");

@@ -218,7 +218,8 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
         break;
-    case DBR_MEMB_LIST_REP:
+    case DBR_USER_LIST_REP:
+    case DBR_GROUP_LIST_REP:
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrMemb* memb = dbr_shared_memb_entry(node);
@@ -370,7 +371,8 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
             buf = elm_write_contr(buf, rec);
         }
         break;
-    case DBR_MEMB_LIST_REP:
+    case DBR_USER_LIST_REP:
+    case DBR_GROUP_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrMemb* memb = dbr_shared_memb_entry(node);
@@ -528,7 +530,8 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         }
         body->entity_list_rep.first = dbr_queue_first(&q);
         break;
-    case DBR_MEMB_LIST_REP:
+    case DBR_USER_LIST_REP:
+    case DBR_GROUP_LIST_REP:
         if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
             goto fail1;
         dbr_queue_init(&q);

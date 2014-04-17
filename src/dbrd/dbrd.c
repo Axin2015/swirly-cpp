@@ -312,6 +312,27 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
 }
 
 static DbrBool
+sess_user(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
+{
+    struct DbrBody rep;
+
+    // Copy to entity node.
+    struct DbrQueue q = DBR_QUEUE_INIT(q);
+    for (struct DbrRbNode* node = dbr_accnt_first_user(accnt);
+         node != DBR_ACCNT_END_USER; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_accnt_user_entry(node);
+        dbr_queue_insert_back(&q, &memb->shared_node_);
+    }
+    rep.req_id = req_id;
+    rep.type = DBR_USER_LIST_REP;
+    rep.entity_list_rep.first = dbr_queue_first(&q);
+    const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
+    if (!ok)
+        dbr_err_perror("dbr_send_msg() failed");
+    return ok;
+}
+
+static DbrBool
 sess_group(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
 {
     struct DbrBody rep;
@@ -324,7 +345,7 @@ sess_group(struct DbrSess* sess, DbrIden req_id, DbrAccnt accnt)
         dbr_queue_insert_back(&q, &memb->shared_node_);
     }
     rep.req_id = req_id;
-    rep.type = DBR_MEMB_LIST_REP;
+    rep.type = DBR_GROUP_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
@@ -506,9 +527,10 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     rep.type = DBR_SESS_LOGON;
     rep.sess_logon.uid = uid;
     return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
+        && sess_user(sess, 0, user)
+        && sess_group(sess, 0, user)
         && sess_order(sess, 0, user)
         && sess_exec(sess, 0, user)
-        && sess_group(sess, 0, user)
         && sess_posn(sess, 0, user);
  fail1:
     if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))

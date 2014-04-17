@@ -26,6 +26,18 @@
 #include <stdlib.h>
 
 static void
+free_users(struct FigAccnt* accnt)
+{
+    assert(accnt);
+    struct DbrRbNode* node;
+    while ((node = accnt->users.root)) {
+        struct DbrMemb* memb = dbr_accnt_user_entry(node);
+        dbr_tree_remove(&accnt->users, node);
+        dbr_pool_free_memb(accnt->pool, memb);
+    }
+}
+
+static void
 free_groups(struct FigAccnt* accnt)
 {
     assert(accnt);
@@ -88,8 +100,8 @@ fig_accnt_lazy(struct DbrRec* arec, struct FigOrdIdx* ordidx, DbrPool pool)
         accnt->rec = arec;
         accnt->ordidx = ordidx;
         accnt->pool = pool;
-        dbr_tree_init(&accnt->groups);
         dbr_tree_init(&accnt->users);
+        dbr_tree_init(&accnt->groups);
         dbr_tree_init(&accnt->orders);
         dbr_tree_init(&accnt->trades);
         dbr_tree_init(&accnt->posns);
@@ -120,8 +132,8 @@ fig_accnt_clear(struct FigAccnt* accnt)
     free_posns(accnt);
     free_execs(accnt);
     free_orders(accnt);
-    dbr_tree_init(&accnt->users);
     free_groups(accnt);
+    free_users(accnt);
 }
 
 DBR_EXTERN struct DbrPosn*
