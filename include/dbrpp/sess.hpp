@@ -289,7 +289,7 @@ public:
         return dbr_sess_subs(impl_, user);
     }
     /**
-     * @addtogroup SessAccnt
+     * @addtogroup SessUser
      * @{
      */
     SessUsers

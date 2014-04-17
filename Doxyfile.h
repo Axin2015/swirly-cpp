@@ -404,7 +404,7 @@
  */
 
 /**
- * @defgroup SessAccnt Accnt
+ * @defgroup SessUser User
  * @ingroup Sess
  */
 
