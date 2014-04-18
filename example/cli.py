@@ -171,6 +171,26 @@ class ContrRequest(object):
                       for crec in clnt.list_rec(ENTITY_CONTR)]
         return contrs
 
+class UserRequest(object):
+    @staticmethod
+    def to_dict(memb):
+        return {
+            'uid': memb.uid,
+            'gid': memb.gid
+        }
+    def __init__(self, mnem):
+        self.mnem = mnem
+    def __call__(self, clnt):
+        membs = []
+        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
+        if not arec:
+            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
+            raise Error()
+        accnt = clnt.accnt(arec)
+        membs = [UserRequest.to_dict(memb)
+                 for memb in accnt.list_user()]
+        return membs
+
 class GroupRequest(object):
     @staticmethod
     def to_dict(memb):
@@ -308,6 +328,9 @@ class AsyncClnt(object):
 
     def accnts(self, *mnems):
         print(self.async.sendAndRecv(AccntRequest(*mnems)))
+
+    def users(self, mnem):
+        print(self.async.sendAndRecv(UserRequest(mnem)))
 
     def groups(self, mnem):
         print(self.async.sendAndRecv(GroupRequest(mnem)))
