@@ -151,7 +151,7 @@ dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user)
 }
 
 DBR_API void
-dbr_sess_logoff_and_clear(struct DbrSess* sess, DbrAccnt user)
+dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt user)
 {
     dbr_tree_remove(&sess->users, &user->sess_node_);
     user->sess = NULL;
@@ -162,12 +162,12 @@ dbr_sess_logoff_and_clear(struct DbrSess* sess, DbrAccnt user)
         if (decref(sess, memb->group.rec->id) == 0) {
             DbrAccnt group = memb->group.rec->accnt.state;
             if (group)
-                fig_accnt_clear_group(group);
+                fig_accnt_reset_group(group);
         }
     }
     if (decref(sess, user->rec->id) == 0)
-        fig_accnt_clear_group(user);
-    fig_accnt_clear_user(user);
+        fig_accnt_reset_group(user);
+    fig_accnt_reset_user(user);
 }
 
 DBR_API int

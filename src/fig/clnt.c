@@ -1053,7 +1053,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_handler_on_logoff(handler, body.sess_logoff.uid);
                 {
                     DbrAccnt user = get_accnt(clnt, body.sess_logoff.uid);
-                    dbr_sess_logoff_and_clear(&clnt->sess, user);
+                    dbr_sess_logoff_and_reset(&clnt->sess, user);
                 }
                 break;
             case DBR_SESS_HEARTBT:

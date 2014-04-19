@@ -40,8 +40,12 @@ dbr_sess_logon(struct DbrSess* sess, DbrAccnt user);
 DBR_API void
 dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user);
 
+/**
+ * Logoff and reset state associated with @a user.
+ */
+
 DBR_API void
-dbr_sess_logoff_and_clear(struct DbrSess* sess, DbrAccnt user);
+dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt user);
 
 DBR_API int
 dbr_sess_subs(struct DbrSess* sess, DbrAccnt user);

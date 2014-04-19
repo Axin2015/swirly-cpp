@@ -25,11 +25,13 @@
  */
 
 /**
+ * Container types.
  * @defgroup Cont Container
  * @ingroup Ash
  */
 
 /**
+ * Node-based types.
  * @defgroup Node Node
  * @ingroup Cont
  * @example slnode.cpp
@@ -54,27 +56,32 @@
  */
 
 /**
+ * Doubly-linked list.
  * @defgroup List List
  * @ingroup Cont
  */
 
 /**
+ * Priority queue.
  * @defgroup Prioq Prioq
  * @ingroup Cont
  * @example prioq.cpp
  */
 
 /**
+ * Singly-linked queue.
  * @defgroup Queue Queue
  * @ingroup Cont
  */
 
 /**
+ * Stack.
  * @defgroup Stack Stack
  * @ingroup Cont
  */
 
 /**
+ * Red-black tree.
  * @defgroup Tree Tree
  * @ingroup Cont
  */
@@ -97,6 +104,7 @@
  */
 
 /**
+ * Lexical tokeniser.
  * @defgroup Lexer Lexer
  * @ingroup Ash
  */
@@ -204,6 +212,7 @@
  */
 
 /**
+ * Memory pool.
  * @defgroup Pool Pool
  * @ingroup Elm
  * @example pool.cpp

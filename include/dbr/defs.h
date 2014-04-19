@@ -34,7 +34,7 @@
 
 enum {
     /**
-     * Boolean logical DBR_FALSE.
+     * Boolean logical false.
      */
     DBR_FALSE,
     /**
@@ -52,7 +52,11 @@ enum {
      * Maximum length of log messages.
      */
     DBR_LOGMSG_MAX = 512,
-    DBR_UUID_MAX = 36,
+    /**
+     * A UUID is represented by 32 lowercase hexadecimal digits, displayed in five groups separated
+     * by hyphens.
+     */
+    DBR_UUID_MAX = 36
 };
 
 /**
