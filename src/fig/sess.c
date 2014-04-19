@@ -32,7 +32,7 @@ incref(struct DbrSess* sess, DbrKey key)
     struct DbrRbNode* node = dbr_tree_pfind(&sess->subs, key);
     if (!node || node->key != key) {
         if (!(sub = dbr_pool_alloc_sub(sess->pool)))
-            return 0;
+            return -1;
         dbr_sub_init(sub);
 
         struct DbrRbNode* parent = node;
@@ -111,10 +111,13 @@ dbr_sess_logon(struct DbrSess* sess, DbrAccnt user)
         goto fail1;
     }
 
+    if (incref(sess, user->rec->id) < 0)
+        goto fail1;
+
     struct DbrRbNode* node = dbr_accnt_first_group(user);
     for (; node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        if (incref(sess, memb->group.rec->id) == 0)
+        if (incref(sess, memb->group.rec->id) < 0)
             goto fail2;
     }
 
@@ -128,12 +131,13 @@ dbr_sess_logon(struct DbrSess* sess, DbrAccnt user)
         struct DbrMemb* memb = dbr_accnt_group_entry(node);
         decref(sess, memb->group.rec->id);
     }
+    decref(sess, user->rec->id);
  fail1:
     return DBR_FALSE;
 }
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user, DbrBool clear)
+dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user)
 {
     dbr_tree_remove(&sess->users, &user->sess_node_);
     user->sess = NULL;
@@ -141,12 +145,29 @@ dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user, DbrBool clear)
     for (struct DbrRbNode* node = dbr_accnt_first_group(user);
          node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
         struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        if (decref(sess, memb->group.rec->id) == 0 && clear) {
-            DbrAccnt accnt = memb->group.rec->accnt.state;
-            if (accnt)
-                fig_accnt_clear(accnt);
+        decref(sess, memb->group.rec->id);
+    }
+    decref(sess, user->rec->id);
+}
+
+DBR_API void
+dbr_sess_logoff_and_clear(struct DbrSess* sess, DbrAccnt user)
+{
+    dbr_tree_remove(&sess->users, &user->sess_node_);
+    user->sess = NULL;
+
+    for (struct DbrRbNode* node = dbr_accnt_first_group(user);
+         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
+        struct DbrMemb* memb = dbr_accnt_group_entry(node);
+        if (decref(sess, memb->group.rec->id) == 0) {
+            DbrAccnt group = memb->group.rec->accnt.state;
+            if (group)
+                fig_accnt_clear_group(group);
         }
     }
+    if (decref(sess, user->rec->id) == 0)
+        fig_accnt_clear_group(user);
+    fig_accnt_clear_user(user);
 }
 
 DBR_API int

@@ -1053,8 +1053,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_handler_on_logoff(handler, body.sess_logoff.uid);
                 {
                     DbrAccnt user = get_accnt(clnt, body.sess_logoff.uid);
-                    dbr_sess_logoff(&clnt->sess, user, DBR_TRUE);
-                    fig_accnt_clear(user);
+                    dbr_sess_logoff_and_clear(&clnt->sess, user);
                 }
                 break;
             case DBR_SESS_HEARTBT:
@@ -1185,13 +1184,13 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 }
 
 DBR_API void
-dbr_clnt_mdclear(DbrClnt clnt)
+dbr_clnt_clear_md(DbrClnt clnt)
 {
     dbr_tree_init(&clnt->viewups);
 }
 
 DBR_API void
-dbr_clnt_trclear(DbrClnt clnt)
+dbr_clnt_clear_tr(DbrClnt clnt)
 {
     struct DbrSlNode* node = clnt->execs.first;
     while (node) {

@@ -131,16 +131,16 @@ DBR_API DbrBool
 dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id);
 
 DBR_API void
-dbr_serv_mdclear(DbrServ serv);
+dbr_serv_clear_md(DbrServ serv);
 
 DBR_API void
-dbr_serv_trclear(DbrServ serv);
+dbr_serv_clear_tr(DbrServ serv);
 
 static inline void
 dbr_serv_clear(DbrServ serv)
 {
-    dbr_serv_mdclear(serv);
-    dbr_serv_trclear(serv);
+    dbr_serv_clear_md(serv);
+    dbr_serv_clear_tr(serv);
 }
 
 /**

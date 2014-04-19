@@ -878,11 +878,11 @@ cdef class Clnt(object):
             raise Error()
         return <bint>ret;
 
-    def mdclear(self):
-        dbr_clnt_mdclear(self.impl_)
+    def clear_md(self):
+        dbr_clnt_clear_md(self.impl_)
 
-    def trclear(self):
-        dbr_clnt_trclear(self.impl_)
+    def clear_tr(self):
+        dbr_clnt_clear_tr(self.impl_)
 
     def clear(self):
         dbr_clnt_clear(self.impl_)

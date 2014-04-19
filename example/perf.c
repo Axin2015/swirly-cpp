@@ -154,10 +154,10 @@ run(void)
     const int orders = ITERS * 2;
     dbr_log_info("orders=%d, total=%.3f ms, per_order=%.3f ms", orders, ms, ms / orders);
 
-    dbr_sess_logoff(sess, user, DBR_FALSE);
+    dbr_sess_logoff(sess, user);
     return DBR_TRUE;
  fail2:
-    dbr_sess_logoff(sess, user, DBR_FALSE);
+    dbr_sess_logoff(sess, user);
  fail1:
     return DBR_FALSE;
 }

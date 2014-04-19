@@ -464,9 +464,9 @@ cdef extern from "dbr/clnt.h":
 
     int dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
 
-    void dbr_clnt_mdclear(DbrClnt clnt) nogil
+    void dbr_clnt_clear_md(DbrClnt clnt) nogil
 
-    void dbr_clnt_trclear(DbrClnt clnt) nogil
+    void dbr_clnt_clear_tr(DbrClnt clnt) nogil
 
     void dbr_clnt_clear(DbrClnt clnt) nogil
 

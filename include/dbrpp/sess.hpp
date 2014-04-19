@@ -279,9 +279,14 @@ public:
         return dbr_sess_logon(impl_, user);
     }
     void
-    logoff(DbrAccnt user, DbrBool clear)
+    logoff(DbrAccnt user)
     {
-        return dbr_sess_logoff(impl_, user, clear);
+        return dbr_sess_logoff(impl_, user);
+    }
+    void
+    logoff_and_clear(DbrAccnt user)
+    {
+        return dbr_sess_logoff_and_clear(impl_, user);
     }
     int
     subs(DbrAccnt user) const noexcept

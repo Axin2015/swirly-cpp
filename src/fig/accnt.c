@@ -121,19 +121,25 @@ fig_accnt_term(struct DbrRec* arec)
     struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
-        fig_accnt_clear(accnt);
+        fig_accnt_clear_user(accnt);
+        fig_accnt_clear_group(accnt);
         free(accnt);
     }
 }
 
 DBR_EXTERN void
-fig_accnt_clear(struct FigAccnt* accnt)
+fig_accnt_clear_user(struct FigAccnt* accnt)
 {
-    free_posns(accnt);
     free_execs(accnt);
     free_orders(accnt);
     free_groups(accnt);
     free_users(accnt);
+}
+
+DBR_EXTERN void
+fig_accnt_clear_group(struct FigAccnt* accnt)
+{
+    free_posns(accnt);
 }
 
 DBR_EXTERN struct DbrPosn*

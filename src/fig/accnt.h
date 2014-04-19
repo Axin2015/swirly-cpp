@@ -49,7 +49,10 @@ DBR_EXTERN void
 fig_accnt_term(struct DbrRec* arec);
 
 DBR_EXTERN void
-fig_accnt_clear(struct FigAccnt* accnt);
+fig_accnt_clear_user(struct FigAccnt* accnt);
+
+DBR_EXTERN void
+fig_accnt_clear_group(struct FigAccnt* accnt);
 
 static inline struct DbrRec*
 fig_accnt_rec(const struct FigAccnt* accnt)

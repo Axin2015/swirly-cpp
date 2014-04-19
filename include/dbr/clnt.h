@@ -158,16 +158,16 @@ DBR_API int
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 DBR_API void
-dbr_clnt_mdclear(DbrClnt clnt);
+dbr_clnt_clear_md(DbrClnt clnt);
 
 DBR_API void
-dbr_clnt_trclear(DbrClnt clnt);
+dbr_clnt_clear_tr(DbrClnt clnt);
 
 static inline void
 dbr_clnt_clear(DbrClnt clnt)
 {
-    dbr_clnt_mdclear(clnt);
-    dbr_clnt_trclear(clnt);
+    dbr_clnt_clear_md(clnt);
+    dbr_clnt_clear_tr(clnt);
 }
 
 /**

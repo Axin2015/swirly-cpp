@@ -38,7 +38,10 @@ DBR_API DbrBool
 dbr_sess_logon(struct DbrSess* sess, DbrAccnt user);
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user, DbrBool clear);
+dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user);
+
+DBR_API void
+dbr_sess_logoff_and_clear(struct DbrSess* sess, DbrAccnt user);
 
 DBR_API int
 dbr_sess_subs(struct DbrSess* sess, DbrAccnt user);

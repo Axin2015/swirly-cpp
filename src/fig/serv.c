@@ -836,13 +836,13 @@ dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id)
 }
 
 DBR_API void
-dbr_serv_mdclear(DbrServ serv)
+dbr_serv_clear_md(DbrServ serv)
 {
     dbr_tree_init(&serv->bookups);
 }
 
 DBR_API void
-dbr_serv_trclear(DbrServ serv)
+dbr_serv_clear_tr(DbrServ serv)
 {
     struct DbrSlNode* node = serv->execs.first;
     while (node) {
