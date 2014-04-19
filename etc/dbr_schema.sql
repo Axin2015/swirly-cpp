@@ -84,7 +84,7 @@ CREATE TABLE asset (
 CREATE TABLE contr (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL UNIQUE,
-  display TEXT NOT NULL UNIQUE,
+  display TEXT NOT NULL,
   asset TEXT NOT NULL REFERENCES asset (mnem),
   ccy TEXT NOT NULL REFERENCES asset (mnem),
   tick_numer INTEGER NOT NULL,
@@ -120,8 +120,11 @@ CREATE VIEW contr_v AS
 CREATE TABLE accnt (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mnem TEXT NOT NULL UNIQUE,
-  display TEXT NOT NULL UNIQUE,
-  email TEXT NOT NULL UNIQUE
+  display TEXT NOT NULL,
+  -- No unique constraint on email because this would be hard to
+  -- vailidate in practice at runtime when accounts are dynamically
+  -- created.
+  email TEXT NOT NULL
 )
 ;
 
