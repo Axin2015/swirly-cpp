@@ -344,21 +344,21 @@ elm_view_len(const struct DbrView* view, DbrBool enriched)
         n = dbr_packlenf(VIEW_FORMAT,
                          view->contr.rec->id, view->settl_date,
                          view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
-                         view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                         view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
                          view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
-                         view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                         view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
                          view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                         view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
                          view->created);
     } else {
         n = dbr_packlenf(VIEW_FORMAT,
                          view->contr.id_only, view->settl_date,
                          view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
-                         view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                         view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
                          view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
-                         view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                         view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
                          view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                         view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                         view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
                          view->created);
     }
     return n;
@@ -371,22 +371,22 @@ elm_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
         buf = dbr_packf(buf, VIEW_FORMAT,
                         view->contr.rec->id, view->settl_date,
                         view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
-                        view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                        view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
-                        view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                        view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                        view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
                         view->created);
 
     } else {
         buf = dbr_packf(buf, VIEW_FORMAT,
                         view->contr.id_only, view->settl_date,
                         view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
-                        view->ask_ticks[0], view->ask_lots[0], view->ask_count[0],
+                        view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
-                        view->ask_ticks[1], view->ask_lots[1], view->ask_count[1],
+                        view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                        view->ask_ticks[2], view->ask_lots[2], view->ask_count[2],
+                        view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
                         view->created);
     }
     return buf;
@@ -398,11 +398,11 @@ elm_read_view(const char* buf, struct DbrView* view)
     return dbr_unpackf(buf, VIEW_FORMAT,
                        &view->contr.id_only, &view->settl_date,
                        &view->bid_ticks[0], &view->bid_lots[0], &view->bid_count[0],
-                       &view->ask_ticks[0], &view->ask_lots[0], &view->ask_count[0],
+                       &view->offer_ticks[0], &view->offer_lots[0], &view->offer_count[0],
                        &view->bid_ticks[1], &view->bid_lots[1], &view->bid_count[1],
-                       &view->ask_ticks[1], &view->ask_lots[1], &view->ask_count[1],
+                       &view->offer_ticks[1], &view->offer_lots[1], &view->offer_count[1],
                        &view->bid_ticks[2], &view->bid_lots[2], &view->bid_count[2],
-                       &view->ask_ticks[2], &view->ask_lots[2], &view->ask_count[2],
+                       &view->offer_ticks[2], &view->offer_lots[2], &view->offer_count[2],
                        &view->created);
 }
 

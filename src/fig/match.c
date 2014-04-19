@@ -228,7 +228,7 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* b
 
     if (taker->c.action == DBR_ACTION_BUY) {
         // Paid when the taker lifts the offer.
-        side = &book->ask_side;
+        side = &book->offer_side;
         direct = DBR_PAID;
     } else {
         assert(taker->c.action == DBR_ACTION_SELL);

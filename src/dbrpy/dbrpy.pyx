@@ -409,23 +409,23 @@ cdef class View(object):
     cdef public DbrIden cid
     cdef public DbrDate settl_date
     cdef public list list_bid
-    cdef public list list_ask
+    cdef public list list_offer
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'View({0.cid!r}, {0.settl_date!r}, {0.list_bid[0]!r}, {0.list_ask[0]!r})'.format(self)
+        return 'View({0.cid!r}, {0.settl_date!r}, {0.list_bid[0]!r}, {0.list_offer[0]!r})'.format(self)
 
 cdef View make_view(DbrpyView* view):
     cdef obj = View.__new__(View)
     obj.cid = view.contr.rec.id
     obj.settl_date = view.settl_date
     obj.list_bid = []
-    obj.list_ask = []
+    obj.list_offer = []
     cdef size_t i
     for i in range(LEVEL_MAX):
         obj.list_bid.append(Level(view.bid_ticks[i], view.bid_lots[i], view.bid_count[i]))
     for i in range(LEVEL_MAX):
-        obj.list_ask.append(Level(view.ask_ticks[i], view.ask_lots[i], view.ask_count[i]))
+        obj.list_offer.append(Level(view.offer_ticks[i], view.offer_lots[i], view.offer_count[i]))
     return obj
 
 # Pool

@@ -36,16 +36,19 @@
  */
 
 /**
+ * Doubly-linked node.
  * @defgroup DlNode DlNode
  * @ingroup Node
  */
 
 /**
+ * Red-black node.
  * @defgroup RbNode RbNode
  * @ingroup Node
  */
 
 /**
+ * Singly-linked node.
  * @defgroup SlNode SlNode
  * @ingroup Node
  */
@@ -338,6 +341,7 @@
  */
 
 /**
+ * Accounts represent both users and groups.
  * @defgroup Accnt Account
  * @ingroup Fig
  */
@@ -368,22 +372,26 @@
  */
 
 /**
+ * An Order Book comprises two sides: one for Bids and one for Offers.
  * @defgroup Side Side
  * @ingroup Fig
  * @example side.cpp
  */
 
 /**
+ * The orders for each side are ordered by price and time.
  * @defgroup SideOrder Order
  * @ingroup Side
  */
 
 /**
+ * Each level is an aggregation of orders by price.
  * @defgroup SideLevel Level
  * @ingroup Side
  */
 
 /**
+ * Last traded.
  * @defgroup SideLast Last
  * @ingroup Side
  */

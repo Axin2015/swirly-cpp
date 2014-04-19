@@ -27,7 +27,7 @@ dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, Dbr
     book->crec = crec;
     book->settl_date = settl_date;
     dbr_side_init(&book->bid_side, pool);
-    dbr_side_init(&book->ask_side, pool);
+    dbr_side_init(&book->offer_side, pool);
     dbr_rbnode_init(&book->serv_node_);
     dbr_rbnode_init(&book->update_node_);
 }
@@ -36,7 +36,7 @@ DBR_API void
 dbr_book_term(struct DbrBook* book)
 {
     dbr_side_term(&book->bid_side);
-    dbr_side_term(&book->ask_side);
+    dbr_side_term(&book->offer_side);
 }
 
 DBR_API struct DbrView*
@@ -46,10 +46,10 @@ dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now)
     view->settl_date = book->settl_date;
 
     struct DbrSide* bid_side = &book->bid_side;
-    struct DbrSide* ask_side = &book->ask_side;
+    struct DbrSide* offer_side = &book->offer_side;
 
     struct DbrRbNode* bid_it = dbr_side_first_level(bid_side);
-    struct DbrRbNode* ask_it = dbr_side_first_level(ask_side);
+    struct DbrRbNode* offer_it = dbr_side_first_level(offer_side);
 
     for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
         if (bid_it != DBR_SIDE_END_LEVEL) {
@@ -63,16 +63,16 @@ dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now)
             view->bid_lots[i] = 0;
             view->bid_count[i] = 0;
         }
-        if (ask_it != DBR_SIDE_END_LEVEL) {
-            struct DbrLevel* level = dbr_side_level_entry(ask_it);
-            view->ask_ticks[i] = level->ticks;
-            view->ask_lots[i] = level->lots;
-            view->ask_count[i] = level->count;
-            ask_it = dbr_rbnode_next(ask_it);
+        if (offer_it != DBR_SIDE_END_LEVEL) {
+            struct DbrLevel* level = dbr_side_level_entry(offer_it);
+            view->offer_ticks[i] = level->ticks;
+            view->offer_lots[i] = level->lots;
+            view->offer_count[i] = level->count;
+            offer_it = dbr_rbnode_next(offer_it);
         } else {
-            view->ask_ticks[i] = 0;
-            view->ask_lots[i] = 0;
-            view->ask_count[i] = 0;
+            view->offer_ticks[i] = 0;
+            view->offer_lots[i] = 0;
+            view->offer_count[i] = 0;
         }
     }
 

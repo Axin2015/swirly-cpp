@@ -129,9 +129,21 @@ typedef struct FigAccnt* DbrAccnt;
  */
 
 enum {
+    /**
+     * Maximum display characters.
+     */
     DBR_DISPLAY_MAX = 64,
+    /**
+     * Maximum email characters.
+     */
     DBR_EMAIL_MAX = 64,
+    /**
+     * Maximum mnemonic characters.
+     */
     DBR_MNEM_MAX = 16,
+    /**
+     * Maximum reference characters.
+     */
     DBR_REF_MAX = 64
 };
 
@@ -290,7 +302,9 @@ struct DbrCommon {
     union DbrURec group;
     union DbrURec contr;
     DbrDate settl_date;
-    // Ref is optional.
+    /**
+     * Ref is optional.
+     */
     DbrRef ref;
     /**
      * @sa enum DbrState
@@ -301,15 +315,23 @@ struct DbrCommon {
      */
     int action;
     DbrTicks ticks;
-    // Must be greater than zero.
+    /**
+     * Must be greater than zero.
+     */
     DbrLots lots;
-    // Must be greater than zero.
+    /**
+     * Must be greater than zero.
+     */
     DbrLots resd;
-    // Must not be greater that lots.
+    /**
+     * Must not be greater that lots.
+     */
     DbrLots exec;
     DbrTicks last_ticks;
     DbrLots last_lots;
-    // Minimum to be filled by this order.
+    /**
+     * Minimum to be filled by this order.
+     */
     DbrLots min_lots;
 };
 
@@ -324,7 +346,9 @@ struct DbrOrder {
     /**
      * @publicsection
      */
-    // Set when order is associated with book.
+    /**
+     * Set when order is associated with book.
+     */
     struct DbrLevel* level;
     DbrIden id;
     struct DbrCommon c;
@@ -376,9 +400,13 @@ struct DbrLevel {
      */
     struct DbrOrder* first_order;
     DbrTicks ticks;
-    // Must be greater than zero.
+    /**
+     * Must be greater than zero.
+     */
     DbrLots lots;
-    // Must be greater than zero.
+    /**
+     * Must be greater than zero.
+     */
     size_t count;
     /**
      * @privatesection
@@ -580,9 +608,9 @@ struct DbrView {
     DbrTicks bid_ticks[DBR_LEVEL_MAX];
     DbrLots bid_lots[DBR_LEVEL_MAX];
     size_t bid_count[DBR_LEVEL_MAX];
-    DbrTicks ask_ticks[DBR_LEVEL_MAX];
-    DbrLots ask_lots[DBR_LEVEL_MAX];
-    size_t ask_count[DBR_LEVEL_MAX];
+    DbrTicks offer_ticks[DBR_LEVEL_MAX];
+    DbrLots offer_lots[DBR_LEVEL_MAX];
+    size_t offer_count[DBR_LEVEL_MAX];
     DbrMillis created;
     /**
      * @privatesection
@@ -618,7 +646,9 @@ struct DbrSide {
     DbrPool pool;
     struct DbrTree levels;
     struct DbrList orders;
-    // Last trade information.
+    /**
+     * Last trade information.
+     */
     DbrTicks last_ticks;
     DbrLots last_lots;
     DbrMillis last_time;
@@ -635,7 +665,7 @@ struct DbrBook {
     struct DbrRec* crec;
     DbrDate settl_date;
     struct DbrSide bid_side;
-    struct DbrSide ask_side;
+    struct DbrSide offer_side;
     /**
      * @privatesection
      */

@@ -54,7 +54,9 @@ DBR_API DbrClnt
 dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* traddr, DbrIden seed,
                 DbrMillis tmout, DbrPool pool);
 
-// No-op if clnt is null.
+/**
+ * No-op if @a clnt is null.
+ */
 
 DBR_API void
 dbr_clnt_destroy(DbrClnt clnt);
@@ -78,22 +80,29 @@ dbr_clnt_rec_entry(struct DbrSlNode* node)
     return dbr_implof(struct DbrRec, shared_node_, node);
 }
 
-// Null if record does not exist.
+/**
+ * @return NULL if record does not exist.
+ */
 
 DBR_API struct DbrSlNode*
 dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id);
 
-// Null if record does not exist.
-// This function compares DBR_MNEM_MAX characters of mnem at most.
+/**
+ * Compares #DBR_MNEM_MAX characters of mnem at most.
+ *
+ * @return NULL if record does not exist.
+ */
 
 DBR_API struct DbrSlNode*
 dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem);
 
 /**
- * Returns first record of requested type.
+ * @return first record of requested type.
  */
 
-// Size is optional.
+/**
+ * Size is optional.
+ */
 
 DBR_API struct DbrSlNode*
 dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size);
@@ -122,11 +131,13 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
                DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots);
 
-// Assumes that order already belongs to this side.
-// Reduced lots must not be:
-// 1. less than executed lots;
-// 2. less than min lots;
-// 3. greater than original lots.
+/**
+ * Assumes that order already belongs to this side.
+ * Reduced lots must not be:
+ * - less than executed lots;
+ * - less than min lots;
+ * - greater than original lots.
+ */
 
 DBR_API DbrIden
 dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots);
@@ -139,8 +150,6 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id);
 
 DBR_API DbrIden
 dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref);
-
-// Invalidates any pointers to the trade.
 
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id);

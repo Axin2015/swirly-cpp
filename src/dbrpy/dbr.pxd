@@ -263,9 +263,9 @@ cdef extern from "dbr/types.h":
         DbrTicks bid_ticks[DBR_LEVEL_MAX]
         DbrLots bid_lots[DBR_LEVEL_MAX]
         size_t bid_count[DBR_LEVEL_MAX]
-        DbrTicks ask_ticks[DBR_LEVEL_MAX]
-        DbrLots ask_lots[DBR_LEVEL_MAX]
-        size_t ask_count[DBR_LEVEL_MAX]
+        DbrTicks offer_ticks[DBR_LEVEL_MAX]
+        DbrLots offer_lots[DBR_LEVEL_MAX]
+        size_t offer_count[DBR_LEVEL_MAX]
 
     ctypedef struct DbrSide:
         pass

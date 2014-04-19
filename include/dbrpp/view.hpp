@@ -70,19 +70,19 @@ public:
         return impl_->bid_count[level];
     }
     DbrTicks
-    ask_ticks(size_t level) const noexcept
+    offer_ticks(size_t level) const noexcept
     {
-        return impl_->ask_ticks[level];
+        return impl_->offer_ticks[level];
     }
     DbrLots
-    ask_lots(size_t level) const noexcept
+    offer_lots(size_t level) const noexcept
     {
-        return impl_->ask_lots[level];
+        return impl_->offer_lots[level];
     }
     size_t
-    ask_count(size_t level) const noexcept
+    offer_count(size_t level) const noexcept
     {
-        return impl_->ask_count[level];
+        return impl_->offer_count[level];
     }
     DbrMillis
     created() const noexcept
@@ -99,9 +99,9 @@ operator <<(std::ostream& os, ViewRef view)
               << ",bid_ticks=" << view.bid_ticks(0)
               << ",bid_lots=" << view.bid_lots(0)
               << ",bid_count=" << view.bid_count(0)
-              << ",ask_ticks=" << view.ask_ticks(0)
-              << ",ask_lots=" << view.ask_lots(0)
-              << ",ask_count=" << view.ask_count(0)
+              << ",offer_ticks=" << view.offer_ticks(0)
+              << ",offer_lots=" << view.offer_lots(0)
+              << ",offer_count=" << view.offer_count(0)
               << ",created=" << view.created();
 }
 

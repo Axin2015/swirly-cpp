@@ -93,9 +93,9 @@ public:
         return SideRef{*dbr_book_bid_side(&impl_)};
     }
     SideRef
-    ask_side() const noexcept
+    offer_side() const noexcept
     {
-        return SideRef{*dbr_book_ask_side(&impl_)};
+        return SideRef{*dbr_book_offer_side(&impl_)};
     }
 };
 
@@ -155,9 +155,9 @@ public:
         return SideRef{*dbr_book_bid_side(impl_)};
     }
     SideRef
-    ask_side() const noexcept
+    offer_side() const noexcept
     {
-        return SideRef{*dbr_book_ask_side(impl_)};
+        return SideRef{*dbr_book_offer_side(impl_)};
     }
 };
 

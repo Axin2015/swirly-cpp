@@ -555,9 +555,9 @@ public:
                 "|bid_count "
                 "|bid_lots  "
                 "|bid_ticks "
-                "|ask_ticks "
-                "|ask_lots  "
-                "|ask_count "
+                "|offer_ticks "
+                "|offer_lots  "
+                "|offer_count "
                 "|" << endl;
             cout <<
                 "|----------"
@@ -585,10 +585,10 @@ public:
                              << '|' << right << setw(10) << "- "
                              << '|' << right << setw(10) << "- ";
                     }
-                    if (ref.ask_count(i) > 0) {
-                        cout << '|' << right << setw(10) << ref.ask_ticks(i)
-                             << '|' << right << setw(10) << ref.ask_lots(i)
-                             << '|' << right << setw(10) << ref.ask_count(i);
+                    if (ref.offer_count(i) > 0) {
+                        cout << '|' << right << setw(10) << ref.offer_ticks(i)
+                             << '|' << right << setw(10) << ref.offer_lots(i)
+                             << '|' << right << setw(10) << ref.offer_count(i);
                     } else {
                         cout << '|' << right << setw(10) << "- "
                              << '|' << right << setw(10) << "- "
@@ -968,9 +968,9 @@ public:
             "|bid_count "
             "|bid_lots  "
             "|bid_ticks "
-            "|ask_ticks "
-            "|ask_lots  "
-            "|ask_count "
+            "|offer_ticks "
+            "|offer_lots  "
+            "|offer_count "
             "|" << endl;
         cout <<
             "|----------"
@@ -1002,10 +1002,10 @@ public:
                      << '|' << right << setw(10) << "- "
                      << '|' << right << setw(10) << "- ";
             }
-            if (ref.ask_count(i) > 0) {
-                cout << '|' << right << setw(10) << ref.ask_ticks(i)
-                     << '|' << right << setw(10) << ref.ask_lots(i)
-                     << '|' << right << setw(10) << ref.ask_count(i);
+            if (ref.offer_count(i) > 0) {
+                cout << '|' << right << setw(10) << ref.offer_ticks(i)
+                     << '|' << right << setw(10) << ref.offer_lots(i)
+                     << '|' << right << setw(10) << ref.offer_count(i);
             } else {
                 cout << '|' << right << setw(10) << "- "
                      << '|' << right << setw(10) << "- "

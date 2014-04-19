@@ -37,13 +37,15 @@ typedef struct FigServ* DbrServ;
  *
  * @param pool Pool.
  *
- * @return Handle to newly created Servange or null on failure.
+ * @return Handle to newly created Server or null on failure.
  */
 
 DBR_API DbrServ
 dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool);
 
-// No-op if serv is null.
+/**
+ * No-op if @a serv is null.
+ */
 
 DBR_API void
 dbr_serv_destroy(DbrServ serv);
@@ -64,22 +66,29 @@ dbr_serv_rec_entry(struct DbrSlNode* node)
     return dbr_implof(struct DbrRec, shared_node_, node);
 }
 
-// Null if record does not exist.
+/**
+ * @return NULL if record does not exist.
+ */
 
 DBR_API struct DbrSlNode*
 dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id);
 
-// Null if record does not exist.
-// This function compares DBR_MNEM_MAX characters of mnem at most.
+/**
+ * This function compares #DBR_MNEM_MAX characters of mnem at most.
+ *
+ * @return NULL if record does not exist.
+ */
 
 DBR_API struct DbrSlNode*
 dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem);
 
 /**
- * Returns first record of requested type.
+ * @return first record of requested type.
  */
 
-// Size is optional.
+/**
+ * Size is optional.
+ */
 
 DBR_API struct DbrSlNode*
 dbr_serv_first_rec(DbrServ serv, int type, size_t* size);
@@ -107,11 +116,13 @@ DBR_API struct DbrOrder*
 dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots);
 
-// Assumes that order already belongs to this side.
-// Reduced lots must not be:
-// 1. less than executed lots;
-// 2. less than min lots;
-// 3. greater than original lots.
+/**
+ * Assumes that order already belongs to this side.
+ * Reduced lots must not be:
+ * - less than executed lots;
+ * - less than min lots;
+ * - greater than original lots.
+ */
 
 DBR_API struct DbrOrder*
 dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots);
@@ -124,8 +135,6 @@ dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id);
 
 DBR_API struct DbrOrder*
 dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref);
-
-// Invalidates any pointers to the trade.
 
 DBR_API DbrBool
 dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id);

@@ -60,7 +60,9 @@ enum {
 };
 
 enum {
-    // No-op is used for heartbeating.
+    /**
+     * No-op is used for heartbeating.
+     */
     DBR_SESS_HEARTBT = DBR_SESS_NOOP
 };
 

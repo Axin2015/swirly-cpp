@@ -39,7 +39,9 @@ dbr_tree_init(struct DbrTree* tree)
     tree->root = NULL;
 }
 
-// Returns either the newly inserted node or existing node with matching key.
+/**
+ * @return either the newly inserted node or existing node with matching key.
+ */
 
 DBR_API struct DbrRbNode*
 dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node);

@@ -25,7 +25,9 @@
  * @{
  */
 
-// The factory will be called from a separate thread.
+/**
+ * The factory will be called from a separate thread.
+ */
 
 DBR_API DbrJourn
 dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void* arg);

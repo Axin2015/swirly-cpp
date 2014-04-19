@@ -29,8 +29,9 @@
 DBR_API void
 dbr_side_init(struct DbrSide* side, DbrPool pool);
 
-// Levels associated with side are also freed.
-// Assumes that pointer is not null.
+/**
+ * Levels associated with side are also freed. Assumes that pointer is not null.
+ */
 
 DBR_API void
 dbr_side_term(struct DbrSide* side);
@@ -48,23 +49,27 @@ dbr_side_order_entry(struct DbrDlNode* node)
     return dbr_implof(struct DbrOrder, side_node_, node);
 }
 
-/** @} */
-
-// Insert order without affecting revision information.
-// Assumes that order does not already belong to a side. I.e. it assumes that level is null.
-// Assumes that order-id and party-ref (if ref is not empty) are unique. The dbr_side_find_ref() can
-// be used to detect duplicate party-refs. Returns false if level allocation fails.
+/**
+ * Insert order into side. Assumes that the order does not already belong to a side. I.e. it assumes
+ * that level member is null. Assumes that order-id and reference are unique.
+ *
+ * @return false if level allocation fails.
+ */
 
 DBR_API DbrBool
 dbr_side_insert_order(struct DbrSide* side, struct DbrOrder* order);
 
-// Internal housekeeping aside, the state of the order is not affected by this function.
+/**
+ * Internal housekeeping aside, the state of the order is not affected by this function.
+ */
 
 DBR_API void
 dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order);
 
-// Reduce residual lots by lots. If the resulting residual is zero, then the order is removed from
-// the side.
+/**
+ * Reduce residual lots by lots. If the resulting residual is zero, then the order is removed from
+ * the side.
+ */
 
 DBR_API void
 dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, DbrMillis now);

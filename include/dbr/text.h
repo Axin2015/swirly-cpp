@@ -26,7 +26,9 @@
  */
 
 struct DbrPriceText {
-    // 10 decimal digits + 3 nulls + dp + sign + pad
+    /**
+     * 10 decimal digits + 3 nulls + dp + sign + pad
+     */
     char buf[16];
     char* small;
     char* pips;

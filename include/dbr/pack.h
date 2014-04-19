@@ -35,7 +35,7 @@ DBR_API char*
 dbr_packi(char* buf, int i);
 
 /**
- * Returns NULL on error.
+ * @return NULL on error.
  */
 
 DBR_API const char*
@@ -48,7 +48,7 @@ DBR_API char*
 dbr_packl(char* buf, long l);
 
 /**
- * Returns NULL on error.
+ * @return NULL on error.
  */
 
 DBR_API const char*
@@ -67,7 +67,7 @@ dbr_packz(char* buf, size_t z)
 }
 
 /**
- * Returns NULL on error.
+ * @return NULL on error.
  */
 
 static inline const char*
@@ -86,7 +86,7 @@ DBR_API char*
 dbr_packs(char* buf, const char* s, size_t m);
 
 /**
- * Returns NULL on error.
+ * @return NULL on error.
  */
 
 DBR_API const char*
@@ -99,7 +99,7 @@ DBR_API char*
 dbr_packf(char* buf, const char* format, ...);
 
 /**
- * Returns NULL on error.
+ * @return NULL on error.
  */
 
 DBR_API const char*
@@ -112,7 +112,7 @@ DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args);
 
 /**
- * Returns NULL on error.
+ * @return NULL on error.
  */
 
 DBR_API const char*

@@ -370,9 +370,9 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
             exist->bid_ticks[i] = view->bid_ticks[i];
             exist->bid_lots[i] = view->bid_lots[i];
             exist->bid_count[i] = view->bid_count[i];
-            exist->ask_ticks[i] = view->ask_ticks[i];
-            exist->ask_lots[i] = view->ask_lots[i];
-            exist->ask_count[i] = view->ask_count[i];
+            exist->offer_ticks[i] = view->offer_ticks[i];
+            exist->offer_lots[i] = view->offer_lots[i];
+            exist->offer_count[i] = view->offer_count[i];
             exist->created = view->created;
         }
 

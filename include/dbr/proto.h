@@ -35,7 +35,7 @@ struct DbrView;
  */
 
 /**
- * Returns -1 if type is unrecognised.
+ * @return -1 if type is unrecognised.
  */
 
 DBR_API size_t

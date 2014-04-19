@@ -74,12 +74,12 @@ typedef long DbrKey;
 typedef unsigned char DbrUuid[16];
 
 /**
- * Returns the smallest of a and b. If both are equivalent, a is returned.
+ * @return the smallest of @a a and @a b. If both are equivalent, @a a is returned.
  */
 #define dbr_min(a, b) ((a) <= (b) ? (a) : (b))
 
 /**
- * Returns the largest of a and b. If both are equivalent, a is returned.
+ * @return the largest of @a a and @a b. If both are equivalent, @a a is returned.
  */
 #define dbr_max(a, b) ((a) >= (b) ? (a) : (b))
 

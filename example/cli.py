@@ -269,7 +269,7 @@ class ViewRequest(object):
             'cid': view.cid,
             'settl_date': view.settl_date,
             'list_bid': [ViewRequest.level_dict(level) for level in view.list_bid],
-            'list_ask': [ViewRequest.level_dict(level) for level in view.list_ask]
+            'list_offer': [ViewRequest.level_dict(level) for level in view.list_offer]
         }
     def __init__(self, mnems, settl_dates):
         self.mnems = set(mnems)
