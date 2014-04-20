@@ -71,18 +71,23 @@ enum DbrErrno {
 };
 
 /**
- * Clear current error message.
+ * Clear last error message.
  */
 
 DBR_API void
 dbr_err_clear(void);
 
 /**
- * Print current error with string prefix using logger.
+ * Print last error with string prefix using logger.
  */
 
 DBR_API void
 dbr_err_perror(const char* s);
+
+/**
+ * @privatesection
+ * @{
+ */
 
 DBR_API void
 dbr_err_set_(int num, const char* file, int line, const char* msg);
@@ -102,22 +107,49 @@ dbr_err_printf_(int num, const char* file, int line, const char* format, ...);
 DBR_API void
 dbr_err_vprintf_(int num, const char* file, int line, const char* format, va_list args);
 
+/** @} */
+
+/**
+ * The last error number.
+ */
+
 DBR_API int
 dbr_err_num(void);
+
+/**
+ * The file in which the last error occurred.
+ */
 
 DBR_API const char*
 dbr_err_file(void);
 
+/**
+ * The line at which the last error occurred.
+ */
+
 DBR_API int
 dbr_err_line(void);
+
+/**
+ * The last error message.
+ */
 
 DBR_API const char*
 dbr_err_msg(void);
 
+/**
+ * Set the last error message.
+ */
 #define dbr_err_set(num, msg)                               \
     dbr_err_set_(num, __FILE__, __LINE__, msg)
+/**
+ * Set the last error message using printf-style formatting.
+ */
 #define dbr_err_setf(num, ...)                              \
     dbr_err_setf_(num, __FILE__, __LINE__, __VA_ARGS__)
+/**
+ * Set the last error message using vprintf-style formatting.
+ */
 #define dbr_err_vsetf(num, format, args)                    \
     dbr_err_vsetf_(num, __FILE__, __LINE__, format, args)
 #define dbr_err_print(num, msg)                             \
