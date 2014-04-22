@@ -186,9 +186,9 @@ class UsersRequest(object):
         if not urec:
             err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(urec)
+        user = clnt.accnt(urec)
         membs = [UsersRequest.to_dict(memb)
-                 for memb in accnt.list_user()]
+                 for memb in user.list_user()]
         return membs
 
 class GroupsRequest(object):
@@ -206,9 +206,9 @@ class GroupsRequest(object):
         if not urec:
             err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(urec)
+        user = clnt.accnt(urec)
         membs = [GroupsRequest.to_dict(memb)
-                 for memb in accnt.list_group()]
+                 for memb in user.list_group()]
         return membs
 
 class OrdersRequest(object):
@@ -241,9 +241,9 @@ class OrdersRequest(object):
         if not urec:
             err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(urec)
+        user = clnt.accnt(urec)
         orders = [OrdersRequest.to_dict(order)
-                  for order in accnt.list_order()]
+                  for order in user.list_order()]
         return orders
 
 class TradesRequest(object):
@@ -279,9 +279,9 @@ class TradesRequest(object):
         if not urec:
             err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(urec)
+        user = clnt.accnt(urec)
         trades = [TradesRequest.to_dict(exc)
-                  for exc in accnt.list_trade()]
+                  for exc in user.list_trade()]
         return trades
 
 class PosnsRequest(object):
@@ -304,9 +304,9 @@ class PosnsRequest(object):
         if not urec:
             err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(urec)
+        user = clnt.accnt(urec)
         posns = [PosnsRequest.to_dict(posn)
-                 for posn in accnt.list_posn()]
+                 for posn in user.list_posn()]
         return posns
 
 class ViewsRequest(object):
