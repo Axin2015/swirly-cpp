@@ -626,11 +626,11 @@ cdef void on_close(DbrHandler handler) with gil:
 cdef void on_ready(DbrHandler handler) with gil:
     (<object>handler_target(handler)).on_ready()
 
-cdef void on_logon(DbrHandler handler, DbrIden uid) with gil:
-    (<object>handler_target(handler)).on_logon(uid)
+cdef void on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid) with gil:
+    (<object>handler_target(handler)).on_logon(req_id, uid)
 
-cdef void on_logoff(DbrHandler handler, DbrIden uid) with gil:
-    (<object>handler_target(handler)).on_logoff(uid)
+cdef void on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid) with gil:
+    (<object>handler_target(handler)).on_logoff(req_id, uid)
 
 cdef void on_reset(DbrHandler handler) with gil:
     (<object>handler_target(handler)).on_reset()
@@ -686,10 +686,10 @@ cdef class Handler(object):
     def on_ready(self):
         pass
 
-    def on_logon(self, uid):
+    def on_logon(self, req_id, uid):
         pass
 
-    def on_logoff(self, uid):
+    def on_logoff(self, req_id, uid):
         pass
 
     def on_reset(self):

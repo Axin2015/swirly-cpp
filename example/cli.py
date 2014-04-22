@@ -38,11 +38,11 @@ class RequestHandler(Handler):
     def on_ready(self):
         log_notice('on_ready')
 
-    def on_logon(self, uid):
-        log_notice('on_logon: {0}'.format(uid))
+    def on_logon(self, req_id, uid):
+        log_notice('on_logon: {0}: {1}'.format(req_id, uid))
 
-    def on_logoff(self, uid):
-        log_notice('on_logoff: {0}'.format(uid))
+    def on_logoff(self, req_id, uid):
+        log_notice('on_logoff: {0}: {1}'.format(req_id, uid))
 
     def on_reset(self):
         log_notice('on_reset')

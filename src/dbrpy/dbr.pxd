@@ -389,9 +389,9 @@ cdef extern from "dbr/handler.h":
 
         void on_ready(DbrHandler handler) nogil
 
-        void on_logon(DbrHandler handler, DbrIden uid) nogil
+        void on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid) nogil
 
-        void on_logoff(DbrHandler handler, DbrIden uid) nogil
+        void on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid) nogil
 
         void on_reset(DbrHandler handler) nogil
 

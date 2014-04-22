@@ -388,13 +388,13 @@ public:
         cout << "ready\n";
     }
     void
-    on_logon(DbrIden uid) noexcept
+    on_logon(DbrIden req_id, DbrIden uid) noexcept
     {
         cout << "logon\n";
         user_ = clnt_.accnt(*clnt_.arecs().find(uid));
     }
     void
-    on_logoff(DbrIden uid) noexcept
+    on_logoff(DbrIden req_id, DbrIden uid) noexcept
     {
         cout << "logoff\n";
         user_ = nullptr;

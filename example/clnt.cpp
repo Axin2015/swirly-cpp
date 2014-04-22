@@ -38,11 +38,11 @@ public:
     {
     }
     void
-    on_logon(DbrIden uid) noexcept
+    on_logon(DbrIden req_id, DbrIden uid) noexcept
     {
     }
     void
-    on_logoff(DbrIden uid) noexcept
+    on_logoff(DbrIden req_id, DbrIden uid) noexcept
     {
     }
     void

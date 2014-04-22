@@ -1046,11 +1046,11 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_SESS_LOGON:
                 dbr_log_info("logon message");
                 dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.uid));
-                dbr_handler_on_logon(handler, body.sess_logon.uid);
+                dbr_handler_on_logon(handler, body.req_id, body.sess_logon.uid);
                 break;
             case DBR_SESS_LOGOFF:
                 dbr_log_info("logoff message");
-                dbr_handler_on_logoff(handler, body.sess_logoff.uid);
+                dbr_handler_on_logoff(handler, body.req_id, body.sess_logoff.uid);
                 {
                     DbrAccnt user = get_accnt(clnt, body.sess_logoff.uid);
                     dbr_sess_logoff_and_reset(&clnt->sess, user);
