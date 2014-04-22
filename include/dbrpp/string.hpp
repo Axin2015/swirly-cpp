@@ -18,11 +18,14 @@
 #ifndef DBRPP_STRING_HPP
 #define DBRPP_STRING_HPP
 
-#include <iostream>
-#include <limits>
-#include <string>
-
 #include <cstring>
+#include <iostream>
+#include <iterator>
+#include <limits>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 namespace dbr {
 
@@ -30,6 +33,70 @@ namespace dbr {
  * @addtogroup String
  * @{
  */
+
+template <typename T>
+T
+ston(const char* s);
+
+template<>
+inline double
+ston(const char* s)
+{
+    errno = 0;
+    char* end;
+    double d = strtod(s, &end);
+    if (0 != errno || *end)
+        throw std::invalid_argument(s);
+    return d;
+}
+
+template<>
+inline long
+ston(const char* s)
+{
+    errno = 0;
+    char* end;
+    long l = strtol(s, &end, 10);
+    if (0 != errno || *end)
+        throw std::invalid_argument(s);
+    return l;
+}
+
+template<>
+inline int
+ston(const char* s)
+{
+    long l = ston<long>(s);
+    if (l < std::numeric_limits<int>::min() || std::numeric_limits<int>::max() < l)
+        throw std::invalid_argument(s);
+    return static_cast<int>(l);
+}
+
+
+template <typename T>
+inline std::string
+join(T begin, T end, const char* delim = " ")
+{
+    std::ostringstream ss;
+    std::copy(begin, end, std::ostream_iterator<std::string>(ss, delim));
+    return ss.str();
+}
+
+inline std::string
+join(const std::vector<std::string>& v, const char* delim = " ")
+{
+    return join(v.cbegin(), v.cend(), delim);
+}
+
+inline std::vector<std::string>&
+split(const std::string& s, std::vector<std::string>& v)
+{
+    std::istringstream is(s);
+    std::string tok;
+    while (is >> tok && tok[0] != '#')
+        v.push_back(tok);
+    return v;
+}
 
 inline std::string
 strncpy(const char* src, size_t n)

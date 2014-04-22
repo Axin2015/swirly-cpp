@@ -6,9 +6,6 @@ INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIRS}")
 ADD_EXECUTABLE(dbr_clnt clnt.cpp)
 TARGET_LINK_LIBRARIES(dbr_clnt fig_static)
 
-ADD_EXECUTABLE(dbr_cli cli.cpp)
-TARGET_LINK_LIBRARIES(dbr_cli fir_static)
-
 ADD_EXECUTABLE(dbr_dump dump.cpp)
 TARGET_LINK_LIBRARIES(dbr_dump fir_static)
 

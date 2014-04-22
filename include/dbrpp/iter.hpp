@@ -405,6 +405,52 @@ operator !=(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noe
 
 /** @} */
 
+/**
+ * @addtogroup String
+ * @{
+ */
+
+template <typename T>
+class JoinIterator : public std::iterator<std::output_iterator_tag, void, void, void, void> {
+    std::ostream* os_;
+    const char* delim_;
+    bool first_;
+public:
+    JoinIterator(std::ostream& os, const char* delim)
+        : os_(&os),
+          delim_(delim),
+          first_(true)
+    {
+    }
+    JoinIterator&
+    operator =(T value)
+    {
+        if (first_)
+            first_ = false;
+        else
+            *os_ << delim_;
+        *os_ << value;
+        return *this;
+    }
+    JoinIterator&
+    operator *()
+    {
+        return *this;
+    }
+    JoinIterator&
+    operator ++()
+    {
+        return *this;
+    }
+    JoinIterator&
+    operator ++(int)
+    {
+        return *this;
+    }
+};
+
+/** @} */
+
 } // dbr
 
 #endif // DBRPP_ITER_HPP
