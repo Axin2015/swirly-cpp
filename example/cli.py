@@ -296,17 +296,17 @@ class PosnsRequest(object):
             'sell_licks': posn.sell_licks,
             'sell_lots': posn.sell_lots
         }
-    def __init__(self, umnem):
-        self.umnem = umnem
+    def __init__(self, gmnem):
+        self.gmnem = gmnem
     def __call__(self, clnt):
         posns = []
-        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
-        if not urec:
-            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
+        grec = clnt.find_rec_mnem(ENTITY_ACCNT, self.gmnem)
+        if not grec:
+            err_set(EINVAL, "no such account '{0}'".format(self.gmnem))
             raise Error()
-        user = clnt.accnt(urec)
+        group = clnt.accnt(grec)
         posns = [PosnsRequest.to_dict(posn)
-                 for posn in user.list_posn()]
+                 for posn in group.list_posn()]
         return posns
 
 class ViewsRequest(object):
@@ -481,8 +481,8 @@ class AsyncClnt(object):
         print(self.async.sendAndRecv(TradesRequest(umnem)))
 
     def posns(self):
-        umnem = self.env['user']
-        print(self.async.sendAndRecv(PosnsRequest(umnem)))
+        gmnem = self.env['group']
+        print(self.async.sendAndRecv(PosnsRequest(gmnem)))
 
     def view(self):
         log_notice('view')
