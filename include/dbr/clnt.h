@@ -166,8 +166,16 @@ dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id);
 DBR_API int
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
+/**
+ * Clear view updates.
+ */
+
 DBR_API void
 dbr_clnt_clear_md(DbrClnt clnt);
+
+/**
+ * Clear completed orders, executions and position updates.
+ */
 
 DBR_API void
 dbr_clnt_clear_tr(DbrClnt clnt);

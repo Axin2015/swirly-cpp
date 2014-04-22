@@ -90,26 +90,6 @@ class CloseRequest(object):
     def __call__(self, clnt):
         return clnt.close()
 
-class LogonRequest(object):
-    def __init__(self, mnem):
-        self.mnem = mnem
-    def __call__(self, clnt):
-        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
-        if not arec:
-            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
-            raise Error()
-        return clnt.logon(arec)
-
-class LogoffRequest(object):
-    def __init__(self, mnem):
-        self.mnem = mnem
-    def __call__(self, clnt):
-        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
-        if not arec:
-            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
-            raise Error()
-        return clnt.logoff(arec)
-
 class AccntsRequest(object):
     @staticmethod
     def to_dict(arec):
@@ -171,6 +151,26 @@ class ContrsRequest(object):
                       for crec in clnt.list_rec(ENTITY_CONTR)]
         return contrs
 
+class LogonRequest(object):
+    def __init__(self, umnem):
+        self.umnem = umnem
+    def __call__(self, clnt):
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
+            raise Error()
+        return clnt.logon(urec)
+
+class LogoffRequest(object):
+    def __init__(self, umnem):
+        self.umnem = umnem
+    def __call__(self, clnt):
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
+            raise Error()
+        return clnt.logoff(urec)
+
 class UsersRequest(object):
     @staticmethod
     def to_dict(memb):
@@ -178,15 +178,15 @@ class UsersRequest(object):
             'uid': memb.uid,
             'gid': memb.gid
         }
-    def __init__(self, mnem):
-        self.mnem = mnem
+    def __init__(self, umnem):
+        self.umnem = umnem
     def __call__(self, clnt):
         membs = []
-        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
-        if not arec:
-            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(arec)
+        accnt = clnt.accnt(urec)
         membs = [UsersRequest.to_dict(memb)
                  for memb in accnt.list_user()]
         return membs
@@ -198,15 +198,15 @@ class GroupsRequest(object):
             'uid': memb.uid,
             'gid': memb.gid
         }
-    def __init__(self, mnem):
-        self.mnem = mnem
+    def __init__(self, umnem):
+        self.umnem = umnem
     def __call__(self, clnt):
         membs = []
-        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
-        if not arec:
-            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(arec)
+        accnt = clnt.accnt(urec)
         membs = [GroupsRequest.to_dict(memb)
                  for memb in accnt.list_group()]
         return membs
@@ -233,15 +233,15 @@ class OrdersRequest(object):
             'created': order.created,
             'modified': order.modified
         }
-    def __init__(self, mnem):
-        self.mnem = mnem
+    def __init__(self, umnem):
+        self.umnem = umnem
     def __call__(self, clnt):
         orders = []
-        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
-        if not arec:
-            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(arec)
+        accnt = clnt.accnt(urec)
         orders = [OrdersRequest.to_dict(order)
                   for order in accnt.list_order()]
         return orders
@@ -250,26 +250,64 @@ class TradesRequest(object):
     @staticmethod
     def to_dict(exc):
         return {
-            'id': exc.id
+            'id': exc.id,
+            'order': exc.order,
+            'uid': exc.uid,
+            'gid': exc.gid,
+            'cid': exc.cid,
+            'settl_date': exc.settl_date,
+            'ref': exc.ref,
+            'state': exc.state,
+            'action': exc.action,
+            'ticks': exc.ticks,
+            'lots': exc.lots,
+            'resd': exc.resd,
+            'exc': exc.exc,
+            'last_ticks': exc.last_ticks,
+            'last_lots': exc.last_lots,
+            'min_lots': exc.min_lots,
+            'match': exc.match,
+            'role': exc.role,
+            'cpty': exc.cpty,
+            'created': exc.created
         }
-    def __init__(self, mnem):
-        self.mnem = mnem
+    def __init__(self, umnem):
+        self.umnem = umnem
     def __call__(self, clnt):
         trades = []
-        arec = clnt.find_rec_mnem(ENTITY_ACCNT, self.mnem)
-        if not arec:
-            err_set(EINVAL, "no such account '{0}'".format(self.mnem))
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
             raise Error()
-        accnt = clnt.accnt(arec)
+        accnt = clnt.accnt(urec)
         trades = [TradesRequest.to_dict(exc)
                   for exc in accnt.list_trade()]
         return trades
 
 class PosnsRequest(object):
-    def __init__(self, mnem):
-        self.mnem = mnem
+    @staticmethod
+    def to_dict(posn):
+        return {
+            'gid': posn.gid,
+            'cid': posn.cid,
+            'settl_date': posn.settl_date,
+            'buy_licks': posn.buy_licks,
+            'buy_lots': posn.buy_lots,
+            'sell_licks': posn.sell_licks,
+            'sell_lots': posn.sell_lots
+        }
+    def __init__(self, umnem):
+        self.umnem = umnem
     def __call__(self, clnt):
-        return []
+        posns = []
+        urec = clnt.find_rec_mnem(ENTITY_ACCNT, self.umnem)
+        if not urec:
+            err_set(EINVAL, "no such account '{0}'".format(self.umnem))
+            raise Error()
+        accnt = clnt.accnt(urec)
+        posns = [PosnsRequest.to_dict(posn)
+                 for posn in accnt.list_posn()]
+        return posns
 
 class ViewsRequest(object):
     @staticmethod
@@ -398,6 +436,7 @@ class AsyncClnt(object):
     def __init__(self):
         uuid = uuid1()
         log_notice('uuid: {0}'.format(uuid))
+        self.env = {}
         self.ctx = ZmqCtx()
         self.thread = Thread(target = worker, args = (self.ctx, uuid))
         self.thread.start()
@@ -411,64 +450,83 @@ class AsyncClnt(object):
             self.thread.join()
             self.is_closed = True
 
-    def logon(self, mnem):
-        self.async.sendAndRecv(LogonRequest(mnem))
-
-    def logoff(self, mnem):
-        self.async.sendAndRecv(LogoffRequest(mnem))
-
     def accnts(self, *mnems):
         print(self.async.sendAndRecv(AccntsRequest(*mnems)))
 
     def contrs(self, *mnems):
         print(self.async.sendAndRecv(ContrsRequest(*mnems)))
 
-    def users(self, mnem):
-        print(self.async.sendAndRecv(UsersRequest(mnem)))
+    def logon(self):
+        umnem = self.env['user']
+        self.async.sendAndRecv(LogonRequest(umnem))
 
-    def groups(self, mnem):
-        print(self.async.sendAndRecv(GroupsRequest(mnem)))
+    def logoff(self):
+        umnem = self.env['user']
+        self.async.sendAndRecv(LogoffRequest(umnem))
 
-    def orders(self, mnem):
-        print(self.async.sendAndRecv(OrdersRequest(mnem)))
+    def users(self):
+        umnem = self.env['user']
+        print(self.async.sendAndRecv(UsersRequest(umnem)))
 
-    def trades(self, mnem):
-        print(self.async.sendAndRecv(TradesRequest(mnem)))
+    def groups(self):
+        umnem = self.env['user']
+        print(self.async.sendAndRecv(GroupsRequest(umnem)))
+
+    def orders(self):
+        umnem = self.env['user']
+        print(self.async.sendAndRecv(OrdersRequest(umnem)))
+
+    def trades(self):
+        umnem = self.env['user']
+        print(self.async.sendAndRecv(TradesRequest(umnem)))
 
     def posns(self):
-        log_notice('posns')
+        umnem = self.env['user']
+        print(self.async.sendAndRecv(PosnsRequest(umnem)))
 
     def view(self):
         log_notice('view')
 
-    def buy(self, umnem, gmnem, cmnem, settl_date, ref, ticks, lots, min_lots):
-        print(self.async.sendAndRecv(PlaceRequest(umnem, gmnem, cmnem, settl_date, ref,
-                                                  ACTION_BUY, ticks, lots, min_lots)))
+    def buy(self, ticks, lots):
+        umnem = self.env['user']
+        gmnem = self.env['group']
+        cmnem = self.env['contr']
+        settl_date = int(self.env['settl_date'])
+        print(self.async.sendAndRecv(PlaceRequest(umnem, gmnem, cmnem, settl_date, '',
+                                                  ACTION_BUY, int(ticks), int(lots), 0)))
 
-    def sell(self, umnem, gmnem, cmnem, settl_date, ref, ticks, lots, min_lots):
-        print(self.async.sendAndRecv(PlaceRequest(umnem, gmnem, cmnem, settl_date, ref,
-                                                  ACTION_SELL, ticks, lots, min_lots)))
+    def sell(self, ticks, lots):
+        umnem = self.env['user']
+        gmnem = self.env['group']
+        cmnem = self.env['contr']
+        settl_date = int(self.env['settl_date'])
+        print(self.async.sendAndRecv(PlaceRequest(umnem, gmnem, cmnem, settl_date, '',
+                                                  ACTION_SELL, int(ticks), int(lots), 0)))
 
-    def revise(self, umnem, id, lots):
+    def revise(self, id, lots):
+        umnem = self.env['user']
         print(self.async.sendAndRecv(ReviseRequest(umnem, id, lots)))
 
-    def cancel(self, umnem, *ids):
+    def cancel(self, *ids):
+        umnem = self.env['user']
         print(self.async.sendAndRecv(CancelRequest(umnem, *ids)))
 
     def ack_trades(self, *args):
+        umnem = self.env['user']
         print(self.async.sendAndRecv(AckTradesRequest(umnem, *ids)))
 
     def echo(self, *args):
         log_notice('echo: ' + ','.join(args))
 
-    def env(self):
-        log_notice('env')
+    def penv(self):
+        for k, v in self.env.iteritems():
+            print('{0}: {1}'.format(k, v))
 
     def set(self, name, value):
-        log_notice('set: {0},{1}'.format(name, value))
+        self.env[name] = value
 
     def unset(self, name):
-        log_notice('unset: {0}'.format(name))
+        del self.env[name]
 
     def quit(self):
         self.close()
