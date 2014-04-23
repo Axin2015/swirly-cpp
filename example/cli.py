@@ -477,6 +477,57 @@ print_contrs = make_table([
     '>min_lots',
     '>max_lots'])
 
+print_users = make_table([
+    '<uid',
+    '<gid'])
+
+print_groups = make_table([
+    '<uid',
+    '<gid'])
+
+print_orders = make_table([
+    '>id',
+    '>gid',
+    '>cid',
+    '>settl_date',
+    '>state',
+    '>action',
+    '>ticks',
+    '>lots',
+    '>resd',
+    '>exc',
+    '>last_ticks',
+    '>last_lots'])
+
+print_trades = make_table([
+    '>id',
+    '>order',
+    '>gid',
+    '>cid',
+    '>settl_date',
+    '>state',
+    '>action',
+    '>ticks',
+    '>lots',
+    '>resd',
+    '>exc',
+    '>last_ticks',
+    '>last_lots',
+    '>role',
+    '>cpty'])
+
+print_posns = make_table([
+    '>cid',
+    '>settl_date',
+    '>buy_licks',
+    '>buy_lots',
+    '>sell_licks',
+    '>sell_lots'])
+
+print_env = make_table([
+    '<key',
+    '<value'])
+
 class AsyncClnt(object):
     def __init__(self):
         uuid = uuid1()
@@ -511,23 +562,23 @@ class AsyncClnt(object):
 
     def users(self):
         umnem = self.env['user']
-        print(self.async.sendAndRecv(UsersRequest(umnem)))
+        print_users(self.async.sendAndRecv(UsersRequest(umnem)))
 
     def groups(self):
         umnem = self.env['user']
-        print(self.async.sendAndRecv(GroupsRequest(umnem)))
+        print_groups(self.async.sendAndRecv(GroupsRequest(umnem)))
 
     def orders(self):
         umnem = self.env['user']
-        print(self.async.sendAndRecv(OrdersRequest(umnem)))
+        print_orders(self.async.sendAndRecv(OrdersRequest(umnem)))
 
     def trades(self):
         umnem = self.env['user']
-        print(self.async.sendAndRecv(TradesRequest(umnem)))
+        print_trades(self.async.sendAndRecv(TradesRequest(umnem)))
 
     def posns(self):
         gmnem = self.env['group']
-        print(self.async.sendAndRecv(PosnsRequest(gmnem)))
+        print_posns(self.async.sendAndRecv(PosnsRequest(gmnem)))
 
     def view(self):
         log_notice('view')
@@ -564,8 +615,7 @@ class AsyncClnt(object):
         log_notice('echo: ' + ','.join(args))
 
     def penv(self):
-        for k, v in self.env.iteritems():
-            print('{0}: {1}'.format(k, v))
+        print_env([{'key': k, 'value': v} for k, v in self.env.iteritems()])
 
     def set(self, name, value):
         self.env[name] = value
@@ -575,9 +625,6 @@ class AsyncClnt(object):
 
     def quit(self):
         self.close()
-
-    def test(self):
-        self.buy('WRAMIREZ', 'DBRA', 'EURUSD', 20140420, '', 12345, 1, 0)
 
 @contextmanager
 def async_clnt():
