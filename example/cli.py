@@ -432,6 +432,51 @@ class AckTradesRequest(object):
             arr.append(clnt.ack_trade(user, int(id)))
         return arr
 
+def widths(keys, recs):
+    ws = {key: len(key) for key in keys}
+    for rec in recs:
+        for key in keys:
+            ws[key] = max(len(str(rec[key])), ws[key])
+    return ws
+
+def make_table(specs):
+
+    pairs = [(spec[0], spec[1:]) for spec in specs]
+    keys = [pair[1] for pair in pairs]
+
+    head_fmt = '|{:<{' + '}}|{:<{'.join(keys) + '}}|'
+    sep_fmt = '|{0:-<{' + '}}+{0:-<{'.join(keys) + '}}|'
+    rec_fmt = '|' + '|'.join(['{0[' + pair[1] + ']:' + pair[0] + '{' + pair[1] + '}}'
+                              for pair in pairs]) + '|'
+
+    def fn(recs):
+        ws = widths(keys, recs)
+        print(head_fmt.format(*keys, **ws))
+        print(sep_fmt.format('', **ws))
+        for rec in recs:
+            print(rec_fmt.format(rec, **ws))
+
+    return fn
+
+print_accnts = make_table([
+    '<mnem',
+    '<display',
+    '<email'])
+
+print_contrs = make_table([
+    '<mnem',
+    '<display',
+    '<asset_type',
+    '<asset',
+    '<ccy',
+    '>tick_numer',
+    '>tick_denom',
+    '>lot_numer',
+    '>lot_denom',
+    '>pip_dp',
+    '>min_lots',
+    '>max_lots'])
+
 class AsyncClnt(object):
     def __init__(self):
         uuid = uuid1()
@@ -451,10 +496,10 @@ class AsyncClnt(object):
             self.is_closed = True
 
     def accnts(self, *mnems):
-        print(self.async.sendAndRecv(AccntsRequest(*mnems)))
+        print_accnts(self.async.sendAndRecv(AccntsRequest(*mnems)))
 
     def contrs(self, *mnems):
-        print(self.async.sendAndRecv(ContrsRequest(*mnems)))
+        print_contrs(self.async.sendAndRecv(ContrsRequest(*mnems)))
 
     def logon(self):
         umnem = self.env['user']
