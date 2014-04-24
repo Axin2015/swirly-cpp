@@ -789,24 +789,18 @@ cdef class Clnt(object):
             raise Error()
         return make_accnt(accnt, arec)
 
-    def logon(self, AccntRec arec):
-        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
-        if accnt is NULL:
-            raise Error()
+    def logon(self, Accnt user):
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_logon(self.impl_, accnt)
+            id = dbr_clnt_logon(self.impl_, user.impl_)
         if id < 0:
             raise Error()
         return id
 
-    def logoff(self, AccntRec arec):
-        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
-        if accnt is NULL:
-            raise Error()
+    def logoff(self, Accnt user):
         cdef DbrIden id
         with nogil:
-            id = dbr_clnt_logoff(self.impl_, accnt)
+            id = dbr_clnt_logoff(self.impl_, user.impl_)
         if id < 0:
             raise Error()
         return id
