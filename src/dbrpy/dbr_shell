@@ -9,6 +9,23 @@ import os, shlex, sys
 
 TMOUT = 5000
 
+ACTIONS = {
+    ACTION_BUY: 'BUY',
+    ACTION_SELL: 'SELL'
+}
+
+ROLES = {
+    ROLE_MAKER: 'MAKER',
+    ROLE_TAKER: 'TAKER'
+}
+
+STATES = {
+    STATE_NEW: 'NEW',
+    STATE_REVISE: 'REVISE',
+    STATE_CANCEL: 'CANCEL',
+    STATE_TRADE: 'TRADE'
+}
+
 def get_arec_id(clnt, id):
     arec = clnt.find_rec_id(ENTITY_ACCNT, id)
     if not arec:
@@ -228,7 +245,6 @@ class OrdersRequest(object):
         urec = get_arec_id(clnt, order.uid)
         grec = get_arec_id(clnt, order.gid)
         crec = get_crec_id(clnt, order.cid)
-        price = crec.ticks_to_price(order.ticks)
         return {
             'id': order.id,
             'umnem': urec.mnem,
@@ -236,13 +252,13 @@ class OrdersRequest(object):
             'cmnem': crec.mnem,
             'settl_date': order.settl_date,
             'ref': order.ref,
-            'state': order.state,
-            'action': order.action,
-            'price': price,
+            'state': STATES[order.state],
+            'action': ACTIONS[order.action],
+            'price': crec.ticks_to_price(order.ticks),
             'lots': order.lots,
             'resd': order.resd,
             'exc': order.exc,
-            'last_ticks': order.last_ticks,
+            'last_price': crec.ticks_to_price(order.last_ticks),
             'last_lots': order.last_lots,
             'min_lots': order.min_lots,
             'created': order.created,
@@ -261,26 +277,29 @@ class OrdersRequest(object):
 class TradesRequest(object):
     @staticmethod
     def to_dict(clnt, exc):
+        urec = get_arec_id(clnt, exc.uid)
+        grec = get_arec_id(clnt, exc.gid)
+        crec = get_crec_id(clnt, exc.cid)
         return {
             'id': exc.id,
             'order': exc.order,
-            'uid': exc.uid,
-            'gid': exc.gid,
-            'cid': exc.cid,
+            'umnem': urec.mnem,
+            'gmnem': grec.mnem,
+            'cmnem': crec.mnem,
             'settl_date': exc.settl_date,
             'ref': exc.ref,
-            'state': exc.state,
-            'action': exc.action,
-            'ticks': exc.ticks,
+            'state': STATES[exc.state],
+            'action': ACTIONS[exc.action],
+            'price': crec.ticks_to_price(exc.ticks),
             'lots': exc.lots,
             'resd': exc.resd,
             'exc': exc.exc,
-            'last_ticks': exc.last_ticks,
+            'last_price': crec.ticks_to_price(exc.last_ticks),
             'last_lots': exc.last_lots,
             'min_lots': exc.min_lots,
             'match': exc.match,
-            'role': exc.role,
-            'cpty': exc.cpty,
+            'role':  ROLES[exc.role] if exc.state == STATE_TRADE else None,
+            'cpty': get_arec_id(clnt, exc.gid).mnem if exc.state == STATE_TRADE else None,
             'created': exc.created
         }
     def __init__(self, umnem):
@@ -296,13 +315,17 @@ class TradesRequest(object):
 class PosnsRequest(object):
     @staticmethod
     def to_dict(clnt, posn):
+        grec = get_arec_id(clnt, posn.gid)
+        crec = get_crec_id(clnt, posn.cid)
+        buy_ticks = float(posn.buy_licks) / posn.buy_lots
+        sell_ticks = float(posn.sell_licks) / posn.sell_lots
         return {
-            'gid': posn.gid,
-            'cid': posn.cid,
+            'gnnem': grec.mnem,
+            'cmnem': crec.mnem,
             'settl_date': posn.settl_date,
-            'buy_licks': posn.buy_licks,
+            'buy_price': buy_ticks * crec.price_inc,
             'buy_lots': posn.buy_lots,
-            'sell_licks': posn.sell_licks,
+            'sell_price': sell_ticks * crec.price_inc,
             'sell_lots': posn.sell_lots
         }
     def __init__(self, gmnem):
@@ -475,42 +498,42 @@ print_groups = make_table([
     '<gid'])
 
 print_orders = make_table([
-    '>id',
+    '<id',
     '<gmnem',
     '<cmnem',
-    '>settl_date',
-    '>state',
-    '>action',
+    '<settl_date',
+    '<state',
+    '<action',
     '>price',
     '>lots',
     '>resd',
     '>exc',
-    '>last_ticks',
+    '>last_price',
     '>last_lots'])
 
 print_trades = make_table([
-    '>id',
-    '>order',
-    '>gid',
-    '>cid',
-    '>settl_date',
-    '>state',
-    '>action',
-    '>ticks',
+    '<id',
+    '<order',
+    '<gmnem',
+    '<cmnem',
+    '<settl_date',
+    '<state',
+    '<action',
+    '>price',
     '>lots',
     '>resd',
     '>exc',
-    '>last_ticks',
+    '>last_price',
     '>last_lots',
-    '>role',
-    '>cpty'])
+    '<role',
+    '<cpty'])
 
 print_posns = make_table([
-    '>cid',
-    '>settl_date',
-    '>buy_licks',
+    '<cmnem',
+    '<settl_date',
+    '>buy_price',
     '>buy_lots',
-    '>sell_licks',
+    '>sell_price',
     '>sell_lots'])
 
 print_env = make_table([
