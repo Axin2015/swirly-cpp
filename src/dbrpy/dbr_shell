@@ -54,8 +54,13 @@ def get_crec_mnem(clnt, mnem):
         raise Error()
     return crec
 
+def prompt():
+    sys.stdout.write('> ')
+    sys.stdout.flush()
+
 def parse(lex, obj):
     toks = []
+    prompt()
     while not obj.is_closed:
         tok = lex.get_token()
         if tok == lex.eof:
@@ -69,6 +74,7 @@ def parse(lex, obj):
                 except Exception as e:
                     log_error('error: ' + str(e))
                 toks = []
+            prompt()
         else:
             toks.append(tok)
 
