@@ -344,29 +344,55 @@ class PosnsRequest(object):
                  for posn in group.list_posn()]
         return posns
 
+class LevelsRequest(object):
+    @staticmethod
+    def to_dict(clnt, view,  i):
+        crec = get_crec_id(clnt, view.cid)
+        return {
+            'cmnem': crec.mnem,
+            'settl_date': view.settl_date,
+            'level': i + 1,
+            'bid_price': crec.ticks_to_price(view.list_bid[i].ticks),
+            'bid_lots': view.list_bid[i].lots,
+            'bid_count': view.list_bid[i].count,
+            'offer_price': crec.ticks_to_price(view.list_offer[i].ticks),
+            'offer_lots': view.list_offer[i].lots,
+            'offer_count': view.list_offer[i].count
+        }
+    def __init__(self, cmnem, settl_date):
+        self.cmnem = cmnem
+        self.settl_date = int(settl_date)
+    def __call__(self, clnt):
+        levels = []
+        crec = get_crec_mnem(clnt, self.cmnem)
+        view = clnt.find_view(crec.id, self.settl_date)
+        if view:
+            for i in range(3):
+                levels.append(LevelsRequest.to_dict(clnt, view, i))
+        return levels
+
 class ViewsRequest(object):
     @staticmethod
-    def level_dict(clnt, level):
+    def to_dict(clnt, view,  i):
+        crec = get_crec_id(clnt, view.cid)
         return {
-            'ticks': level.ticks,
-            'lots': level.lots,
-            'count': level.count
-        }
-    @staticmethod
-    def to_dict(clnt, view):
-        return {
-            'cid': view.cid,
+            'cmnem': crec.mnem,
             'settl_date': view.settl_date,
-            'list_bid': [ViewsRequest.level_dict(clnt, level) for level in view.list_bid],
-            'list_offer': [ViewsRequest.level_dict(clnt, level) for level in view.list_offer]
+            'level': i + 1,
+            'bid_price': crec.ticks_to_price(view.list_bid[i].ticks),
+            'bid_lots': view.list_bid[i].lots,
+            'bid_count': view.list_bid[i].count,
+            'offer_price': crec.ticks_to_price(view.list_offer[i].ticks),
+            'offer_lots': view.list_offer[i].lots,
+            'offer_count': view.list_offer[i].count
         }
-    def __init__(self, mnems, settl_dates):
-        self.mnems = set(mnems)
+    def __init__(self, cmnems, settl_dates):
+        self.cmnems = set(cmnems)
         self.settl_dates = {int(x) for x in settl_dates}
     def __call__(self, clnt):
         cids = set()
-        for mnem in self.mnems:
-            crec = get_crec_mnem(clnt, mnem)
+        for cmnem in self.cmnems:
+            crec = get_crec_mnem(clnt, cmnem)
             cids.add(crec.id)
         views = []
         if cids:
@@ -376,19 +402,19 @@ class ViewsRequest(object):
                     for settl_date in self.settl_dates:
                         view = clnt.find_view(crec.id, settl_date)
                         if view:
-                            views.append(ViewsRequest.to_dict(clnt, view))
+                            views.append(ViewsRequest.to_dict(clnt, view, 0))
             else:
                 # Cids only.
-                views = [ViewsRequest.to_dict(clnt, view) for view in clnt.list_view()
+                views = [ViewsRequest.to_dict(clnt, view, 0) for view in clnt.list_view()
                          if view.cid in cids]
         else:
             if self.settl_dates:
                 # Settl_dates only.
-                views = [ViewsRequest.to_dict(clnt, view) for view in clnt.list_view()
+                views = [ViewsRequest.to_dict(clnt, view, 0) for view in clnt.list_view()
                          if view.settl_date in self.settl_dates]
             else:
                 # Neither cids nor settl_dates.
-                views = [ViewsRequest.to_dict(clnt, view) for view in clnt.list_view()]
+                views = [ViewsRequest.to_dict(clnt, view, 0) for view in clnt.list_view()]
         return views
 
 class PlaceRequest(object):
@@ -541,12 +567,27 @@ print_posns = make_table([
     '>sell_price',
     '>sell_lots'])
 
+print_levels = make_table([
+    '<cmnem',
+    '<settl_date',
+    '>level',
+    '>bid_price',
+    '>bid_lots',
+    '>bid_count',
+    '>offer_price',
+    '>offer_lots',
+    '>offer_count'])
 
 print_views = make_table([
-    '<cid',
+    '<cmnem',
     '<settl_date',
-    '<list_bid',
-    '<list_offer'])
+    '>level',
+    '>bid_price',
+    '>bid_lots',
+    '>bid_count',
+    '>offer_price',
+    '>offer_lots',
+    '>offer_count'])
 
 print_env = make_table([
     '<key',
@@ -604,10 +645,13 @@ class AsyncClnt(object):
         gmnem = self.env['group']
         print_posns(self.async.sendAndRecv(PosnsRequest(gmnem)))
 
-    def views(self):
+    def levels(self):
         cmnem = self.env['contr']
         settl_date = int(self.env['settl_date'])
-        print_views(self.async.sendAndRecv(ViewsRequest([cmnem], [settl_date])))
+        print_levels(self.async.sendAndRecv(LevelsRequest(cmnem, settl_date)))
+
+    def views(self):
+        print_views(self.async.sendAndRecv(ViewsRequest([], [])))
 
     def buy(self, lots, price):
         umnem = self.env['user']
@@ -633,7 +677,7 @@ class AsyncClnt(object):
         umnem = self.env['user']
         print(self.async.sendAndRecv(CancelRequest(umnem, *ids)))
 
-    def ack_trades(self, *args):
+    def ack_trades(self, *ids):
         umnem = self.env['user']
         print(self.async.sendAndRecv(AckTradesRequest(umnem, *ids)))
 

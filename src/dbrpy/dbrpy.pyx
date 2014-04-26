@@ -286,7 +286,7 @@ cdef class Order(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Order({0.id!r})'.format(self)
+        return 'Order({0.id!r}, {0.uid!r}, {0.gid!r}, {0.cid!r}, {0.settl_date!r}, {0.ref!r}, {0.state!r}, {0.action!r}, {0.ticks!r}, {0.lots!r}, {0.resd!r}, {0.exc!r}, {0.last_ticks!r}, {0.last_lots!r}, {0.min_lots!r}, {0.created!r}, {0.modified!r})'.format(self)
 
 cdef Order make_order(DbrpyOrder* order):
     cdef obj = Order.__new__(Order)
@@ -350,7 +350,7 @@ cdef class Exec(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Exec({0.id!r})'.format(self)
+        return 'Exec({0.id!r}, {0.order!r}, {0.uid!r}, {0.gid!r}, {0.cid!r}, {0.settl_date!r}, {0.ref!r}, {0.state!r}, {0.action!r}, {0.ticks!r}, {0.lots!r}, {0.resd!r}, {0.exc!r}, {0.last_ticks!r}, {0.last_lots!r}, {0.min_lots!r}, {0.match!r}, {0.role!r}, {0.cpty!r}, {0.created!r})'.format(self)
 
 cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
@@ -390,7 +390,7 @@ cdef class Posn(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Posn({0.gid!r}, {0.cid!r}, {0.settl_date!r})'.format(self)
+        return 'Posn({0.gid!r}, {0.cid!r}, {0.settl_date!r}, {0.buy_licks!r}, {0.buy_lots!r}, {0.sell_licks!r}, {0.sell_lots!r})'.format(self)
 
 cdef Posn make_posn(DbrpyPosn* posn):
     cdef obj = Posn.__new__(Posn)
