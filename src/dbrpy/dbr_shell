@@ -366,9 +366,8 @@ class ViewsRequest(object):
     def __call__(self, clnt):
         cids = set()
         for mnem in self.mnems:
-            crec = clnt.find_rec_mnem(ENTITY_CONTR, mnem)
-            if crec:
-                cids.add(crec.id)
+            crec = get_crec_mnem(clnt, mnem)
+            cids.add(crec.id)
         views = []
         if cids:
             if self.settl_dates:
@@ -542,6 +541,13 @@ print_posns = make_table([
     '>sell_price',
     '>sell_lots'])
 
+
+print_views = make_table([
+    '<cid',
+    '<settl_date',
+    '<list_bid',
+    '<list_offer'])
+
 print_env = make_table([
     '<key',
     '<value'])
@@ -598,8 +604,10 @@ class AsyncClnt(object):
         gmnem = self.env['group']
         print_posns(self.async.sendAndRecv(PosnsRequest(gmnem)))
 
-    def view(self):
-        log_notice('view')
+    def views(self):
+        cmnem = self.env['contr']
+        settl_date = int(self.env['settl_date'])
+        print_views(self.async.sendAndRecv(ViewsRequest([cmnem], [settl_date])))
 
     def buy(self, lots, price):
         umnem = self.env['user']

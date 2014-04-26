@@ -76,6 +76,6 @@ dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now)
         }
     }
 
-    view->settl_date = now;
+    view->created = now;
     return view;
 }

@@ -397,7 +397,7 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrHandler handler)
         // Transfer ownership or free.
         enrich_view(&clnt->cache, view);
         view = apply_viewup(clnt, view);
-        if (dbr_unlikely(!view))
+        if (dbr_likely(view))
             dbr_handler_on_view(handler, view);
     }
     dbr_handler_on_flush(handler);
