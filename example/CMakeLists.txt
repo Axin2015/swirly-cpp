@@ -11,3 +11,9 @@ TARGET_LINK_LIBRARIES(dbr_dump fir_static)
 
 ADD_EXECUTABLE(dbr_perf perf.c)
 TARGET_LINK_LIBRARIES(dbr_perf fir_static)
+
+ADD_EXECUTABLE(dbr_jdtoymd jdtoymd.c)
+TARGET_LINK_LIBRARIES(dbr_jdtoymd ash_static)
+
+ADD_EXECUTABLE(dbr_ymdtojd ymdtojd.c)
+TARGET_LINK_LIBRARIES(dbr_ymdtojd ash_static)
