@@ -39,8 +39,8 @@ lazy_level(struct DbrSide* side, struct DbrOrder* order)
         level->ticks = order->c.ticks;
         level->lots = order->c.resd;
         level->count = 1;
-        dbr_log_debug2("insert level: contr=%.16s,settl_date=%d,ticks=%ld",
-                       order->contr.rec->mnem, order->settl_date, order->ticks);
+        dbr_log_debug2("insert level: contr=%.16s,settl_day=%d,ticks=%ld",
+                       order->contr.rec->mnem, order->settl_day, order->ticks);
         dbr_tree_pinsert(&side->levels, key, &level->side_node_, node);
     } else {
         level = dbr_side_level_entry(node);
@@ -128,8 +128,8 @@ dbr_side_remove_order(struct DbrSide* side, struct DbrOrder* order)
     if (--level->count <= 0) {
         // Remove level.
         assert(level->lots == 0);
-        dbr_log_debug2("remove level: contr=%.16s,settl_date=%d,ticks=%ld",
-                       order->contr.rec->mnem, order->settl_date, order->ticks);
+        dbr_log_debug2("remove level: contr=%.16s,settl_day=%d,ticks=%ld",
+                       order->contr.rec->mnem, order->settl_day, order->ticks);
         dbr_tree_remove(&side->levels, &level->side_node_);
         dbr_pool_free_level(side->pool, level);
     } else if (level->first_order == order) {

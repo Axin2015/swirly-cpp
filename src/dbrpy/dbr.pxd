@@ -133,7 +133,6 @@ cdef extern from "dbr/util.h":
 
 cdef extern from "dbr/types.h":
 
-    ctypedef int DbrDate
     ctypedef long DbrIncs
     ctypedef long DbrMillis
     ctypedef DbrIncs DbrLots
@@ -222,7 +221,7 @@ cdef extern from "dbr/types.h":
         DbrURec user
         DbrURec group
         DbrURec contr
-        DbrDate settl_date
+        DbrJd settl_day
         DbrRef ref
         int state
         int action
@@ -269,7 +268,7 @@ cdef extern from "dbr/types.h":
     ctypedef struct DbrPosn:
         DbrURec accnt
         DbrURec contr
-        DbrDate settl_date
+        DbrJd settl_day
         DbrLicks buy_licks
         DbrLots buy_lots
         DbrLicks sell_licks
@@ -280,7 +279,7 @@ cdef extern from "dbr/types.h":
 
     ctypedef struct DbrView:
         DbrURec contr
-        DbrDate settl_date
+        DbrJd settl_day
         DbrTicks bid_ticks[DBR_LEVEL_MAX]
         DbrLots bid_lots[DBR_LEVEL_MAX]
         size_t bid_count[DBR_LEVEL_MAX]
@@ -464,7 +463,7 @@ cdef extern from "dbr/clnt.h":
     DbrIden dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user) nogil
 
     DbrIden dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, DbrRec* crec,
-                           DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+                           DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
                            DbrLots lots, DbrLots min_lots) nogil
 
     DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots) nogil
@@ -493,7 +492,7 @@ cdef extern from "dbr/clnt.h":
 
     DbrView* dbr_clnt_view_entry(DbrRbNode* node) nogil
 
-    DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date) nogil
+    DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day) nogil
 
     DbrRbNode* dbr_clnt_first_view(DbrClnt clnt) nogil
 

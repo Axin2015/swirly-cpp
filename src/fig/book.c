@@ -22,10 +22,10 @@
 #include <stdlib.h>
 
 DBR_API void
-dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, DbrPool pool)
+dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrJd settl_day, DbrPool pool)
 {
     book->crec = crec;
-    book->settl_date = settl_date;
+    book->settl_day = settl_day;
     dbr_side_init(&book->bid_side, pool);
     dbr_side_init(&book->offer_side, pool);
     dbr_rbnode_init(&book->serv_node_);
@@ -43,7 +43,7 @@ DBR_API struct DbrView*
 dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now)
 {
     view->contr.rec = book->crec;
-    view->settl_date = book->settl_date;
+    view->settl_day = book->settl_day;
 
     struct DbrSide* bid_side = &book->bid_side;
     struct DbrSide* offer_side = &book->offer_side;

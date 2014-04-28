@@ -94,7 +94,7 @@ create_memb(Pool& pool, DbrIden uid, DbrIden gid)
 
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
-             DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+             DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now)
 {
     auto deleter = [&pool](DbrOrder* order) {
@@ -108,7 +108,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
     order->c.user.rec = &user;
     order->c.group.rec = &group;
     order->c.contr.rec = &contr;
-    order->c.settl_date = settl_date;
+    order->c.settl_day = settl_day;
     if (ref)
         strncpy(order->c.ref, ref, DBR_REF_MAX);
     else
@@ -131,7 +131,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
 
 shared_ptr<DbrOrder>
 create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
-             DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+             DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now)
 {
     auto deleter = [&pool](DbrOrder* order) {
@@ -145,7 +145,7 @@ create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
     order->c.user.id_only = uid;
     order->c.group.id_only = gid;
     order->c.contr.id_only = cid;
-    order->c.settl_date = settl_date;
+    order->c.settl_day = settl_day;
     if (ref)
         strncpy(order->c.ref, ref, DBR_REF_MAX);
     else
@@ -168,7 +168,7 @@ create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
 
 shared_ptr<DbrExec>
 create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
-             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrIden cid, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now)
 {
@@ -183,7 +183,7 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
     ptr->c.user.id_only = uid;
     ptr->c.group.id_only = gid;
     ptr->c.contr.id_only = cid;
-    ptr->c.settl_date = settl_date;
+    ptr->c.settl_day = settl_day;
     if (ref)
         strncpy(ptr->c.ref, ref, DBR_REF_MAX);
     else

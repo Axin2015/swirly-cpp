@@ -36,9 +36,9 @@ TEST_CASE(side_orders)
     auto now = dbr_millis();
 
     // Two orders at the same price level.
-    auto apple = create_order(pool, 1, *user, *group, *contr, 20130827,
+    auto apple = create_order(pool, 1, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
                               "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    auto orange = create_order(pool, 2, *user, *group, *contr, 20130827,
+    auto orange = create_order(pool, 2, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
                                "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
 
     Side side(pool);
@@ -127,12 +127,12 @@ TEST_CASE(side_levels)
     auto contr = create_eurusd(pool);
     auto now = dbr_millis();
 
-    auto apple = create_order(pool, 1, *user, *group, *contr, 20130827,
+    auto apple = create_order(pool, 1, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
                               "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    auto orange = create_order(pool, 2, *user, *group, *contr, 20130827,
+    auto orange = create_order(pool, 2, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
                                "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
     // Best inserted last.
-    auto pear = create_order(pool, 3, *user, *group, *contr, 20130827,
+    auto pear = create_order(pool, 3, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
                              "pear", DBR_ACTION_BUY, 12346, 30, 0, now);
 
     Side side(pool);

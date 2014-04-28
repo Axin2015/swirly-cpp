@@ -49,10 +49,10 @@ public:
     {
         return ContrRecRef{*impl_->contr.rec};
     }
-    DbrDate
-    settl_date() const noexcept
+    DbrJd
+    settl_day() const noexcept
     {
-        return impl_->settl_date;
+        return impl_->settl_day;
     }
     DbrTicks
     bid_ticks(size_t level) const noexcept
@@ -95,7 +95,7 @@ inline std::ostream&
 operator <<(std::ostream& os, ViewRef view)
 {
     return os << "crec=" << view.crec().mnem()
-              << ",settl_date=" << view.settl_date()
+              << ",settl_day=" << view.settl_day()
               << ",bid_ticks=" << view.bid_ticks(0)
               << ",bid_lots=" << view.bid_lots(0)
               << ",bid_count=" << view.bid_count(0)

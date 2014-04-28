@@ -102,7 +102,7 @@ DBR_API DbrAccnt
 dbr_serv_accnt(DbrServ serv, struct DbrRec* arec);
 
 DBR_API struct DbrBook*
-dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date);
+dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrJd settl_day);
 
 DBR_API struct DbrSess*
 dbr_serv_sess(DbrServ serv, const DbrUuid uuid);
@@ -211,7 +211,7 @@ dbr_serv_book_entry(struct DbrRbNode* node)
 }
 
 DBR_API struct DbrRbNode*
-dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrDate settl_date);
+dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrJd settl_day);
 
 DBR_API struct DbrRbNode*
 dbr_serv_first_book(DbrServ serv);

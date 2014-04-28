@@ -28,7 +28,7 @@
 #include <string.h>
 
 #define INSERT_EXEC_SQL                                                 \
-    "INSERT INTO exec (id, order_, user, group_, contr, settl_date,"    \
+    "INSERT INTO exec (id, order_, user, group_, contr, settl_day,"     \
     " ref, state, action, ticks, lots, resd, exec, last_ticks,"         \
     " last_lots, min_lots, match, acked, role, cpty, created,"          \
     " modified)"                                                        \
@@ -53,20 +53,20 @@
     " FROM memb ORDER BY user"
 
 #define SELECT_ORDER_SQL                                                \
-    "SELECT id, user, group_, contr, settl_date, ref, state,"           \
+    "SELECT id, user, group_, contr, settl_day, ref, state,"            \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, created, modified"                                      \
     " FROM order_ WHERE resd > 0 ORDER BY id"
 
 #define SELECT_TRADE_SQL                                                \
-    "SELECT id, order_, user, group_, contr, settl_date, ref,"          \
+    "SELECT id, order_, user, group_, contr, settl_day, ref,"           \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, match, role, cpty, created"                             \
     " FROM trade_v WHERE acked = 0 ORDER BY id"
 
 #define SELECT_POSN_SQL                                                 \
-    "SELECT accnt, contr, settl_date, action, licks, lots"              \
-    " FROM posn_v ORDER BY accnt, contr, settl_date, action"
+    "SELECT accnt, contr, settl_day, action, licks, lots"               \
+    " FROM posn_v ORDER BY accnt, contr, settl_day, action"
 
 // Only called if failure occurs during cache load, so no need to free state members as they will
 // not have been allocated.
@@ -141,7 +141,7 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
         USER,
         GROUP,
         CONTR,
-        SETTL_DATE,
+        SETTL_DAY,
         REF,
         STATE,
         ACTION,
@@ -196,7 +196,7 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
             goto fail1;
     }
 
-    rc = sqlite3_bind_int(stmt, SETTL_DATE, exec->c.settl_date);
+    rc = sqlite3_bind_int(stmt, SETTL_DAY, exec->c.settl_day);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -542,7 +542,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         USER,
         GROUP,
         CONTR,
-        SETTL_DATE,
+        SETTL_DAY,
         REF,
         STATE,
         ACTION,
@@ -579,7 +579,7 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             order->c.user.id_only = sqlite3_column_int64(stmt, USER);
             order->c.group.id_only = sqlite3_column_int64(stmt, GROUP);
             order->c.contr.id_only = sqlite3_column_int64(stmt, CONTR);
-            order->c.settl_date = sqlite3_column_int(stmt, SETTL_DATE);
+            order->c.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
                 strncpy(order->c.ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
@@ -597,12 +597,12 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             order->created = sqlite3_column_int64(stmt, CREATED);
             order->modified = sqlite3_column_int64(stmt, MODIFIED);
 
-            dbr_log_debug3("order: id=%ld,user=%ld,group=%ld,contr=%ld,settl_date=%d,"
+            dbr_log_debug3("order: id=%ld,user=%ld,group=%ld,contr=%ld,settl_day=%d,"
                            "ref=%.64s,state=%d,action=%d,ticks=%ld,lots=%ld,resd=%ld,"
                            "exec=%ld,last_ticks=%ld,last_lots=%ld,min_lots=%ld,"
                            "created=%ld,modified=%ld",
                            order->id, order->c.user.id_only, order->c.group.id_only,
-                           order->c.contr.id_only, order->c.settl_date, order->c.ref,
+                           order->c.contr.id_only, order->c.settl_day, order->c.ref,
                            order->c.state, order->c.action, order->c.ticks, order->c.lots,
                            order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
                            order->c.min_lots, order->created, order->modified);
@@ -640,7 +640,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         USER,
         GROUP,
         CONTR,
-        SETTL_DATE,
+        SETTL_DAY,
         REF,
         ACTION,
         TICKS,
@@ -678,7 +678,7 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             exec->c.user.id_only = sqlite3_column_int64(stmt, USER);
             exec->c.group.id_only = sqlite3_column_int64(stmt, GROUP);
             exec->c.contr.id_only = sqlite3_column_int64(stmt, CONTR);
-            exec->c.settl_date = sqlite3_column_int(stmt, SETTL_DATE);
+            exec->c.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
                 strncpy(exec->c.ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
@@ -701,12 +701,12 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 ? sqlite3_column_int64(stmt, CPTY) : 0;
             exec->created = sqlite3_column_int64(stmt, CREATED);
 
-            dbr_log_debug3("exec: id=%ld,order=%ld,user=%ld,group=%ld,contr=%ld,settl_date=%d,"
+            dbr_log_debug3("exec: id=%ld,order=%ld,user=%ld,group=%ld,contr=%ld,settl_day=%d,"
                            "ref=%.64s,action=%d,ticks=%ld,lots=%ld,resd=%ld,exec=%ld,"
                            "last_ticks=%ld,last_lots=%ld,min_lots=%ld,match=%ld,role=%d,cpty=%ld,"
                            "created=%ld",
                            exec->id, exec->order, exec->c.user.id_only, exec->c.group.id_only,
-                           exec->c.contr.id_only, exec->c.settl_date, exec->c.ref, exec->c.action,
+                           exec->c.contr.id_only, exec->c.settl_day, exec->c.ref, exec->c.action,
                            exec->c.ticks, exec->c.lots, exec->c.resd, exec->c.exec,
                            exec->c.last_ticks, exec->c.last_lots, exec->c.min_lots,
                            exec->match, exec->role, exec->cpty.id_only, exec->created);
@@ -741,7 +741,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
     enum {
         ACCNT,
         CONTR,
-        SETTL_DATE,
+        SETTL_DAY,
         ACTION,
         LICKS,
         LOTS
@@ -763,11 +763,11 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             const DbrIden accnt = sqlite3_column_int64(stmt, ACCNT);
             const DbrIden contr = sqlite3_column_int64(stmt, CONTR);
-            const DbrDate settl_date = sqlite3_column_int(stmt, SETTL_DATE);
+            const DbrJd settl_day = sqlite3_column_int(stmt, SETTL_DAY);
 
             // Posn is null for first row.
             if (posn && posn->accnt.id_only == accnt && posn->contr.id_only == contr
-                && posn->settl_date == settl_date) {
+                && posn->settl_day == settl_day) {
 
                 // Set other side.
 
@@ -790,7 +790,7 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             posn->accnt.id_only = accnt;
             posn->contr.id_only = contr;
-            posn->settl_date = settl_date;
+            posn->settl_day = settl_day;
 
             const int action = sqlite3_column_int(stmt, ACTION);
             if (action == DBR_ACTION_BUY) {
@@ -806,9 +806,9 @@ select_posn(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 posn->sell_lots = sqlite3_column_int64(stmt, LOTS);
             }
 
-            dbr_log_debug3("posn: accnt=%ld,contr=%ld,settl_date=%d,buy_licks=%ld,buy_lots=%ld,"
+            dbr_log_debug3("posn: accnt=%ld,contr=%ld,settl_day=%d,buy_licks=%ld,buy_lots=%ld,"
                            "sell_licks=%ld,sell_lots=%ld",
-                           posn->accnt.id_only, posn->contr.id_only, posn->settl_date,
+                           posn->accnt.id_only, posn->contr.id_only, posn->settl_day,
                            posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
 
             dbr_queue_insert_back(&pq, &posn->shared_node_);

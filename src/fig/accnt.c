@@ -146,7 +146,7 @@ DBR_EXTERN struct DbrPosn*
 fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
     // Synthetic key from contract and settlment date.
-    const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_date);
+    const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_day);
     struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
     if (node != &posn->accnt_node_) {
         struct DbrPosn* exist = dbr_accnt_posn_entry(node);
@@ -155,7 +155,7 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 
         assert(exist->accnt.rec == posn->accnt.rec);
         assert(exist->contr.rec == posn->contr.rec);
-        assert(exist->settl_date == posn->settl_date);
+        assert(exist->settl_day == posn->settl_day);
 
         exist->buy_licks = posn->buy_licks;
         exist->buy_lots = posn->buy_lots;
@@ -169,7 +169,7 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 }
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date,
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
                struct FigOrdIdx* ordidx, DbrPool pool)
 {
     assert(arec);
@@ -178,7 +178,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date,
     assert(crec);
     assert(crec->type == DBR_ENTITY_CONTR);
 
-    const DbrIden key = dbr_book_key(crec->id, settl_date);
+    const DbrIden key = dbr_book_key(crec->id, settl_day);
     struct FigAccnt* accnt = fig_accnt_lazy(arec, ordidx, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
@@ -192,14 +192,14 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date,
 
         posn->accnt.rec = arec;
         posn->contr.rec = crec;
-        posn->settl_date = settl_date;
+        posn->settl_day = settl_day;
         posn->buy_licks = 0;
         posn->buy_lots = 0;
         posn->sell_licks = 0;
         posn->sell_lots = 0;
 
-        dbr_log_debug2("insert posn: accnt=%.16s, contr=%.16s, settl_date=%d",
-                       arec->mnem, crec->mnem, settl_date);
+        dbr_log_debug2("insert posn: accnt=%.16s, contr=%.16s, settl_day=%d",
+                       arec->mnem, crec->mnem, settl_day);
 
         struct DbrRbNode* parent = node;
         dbr_tree_pinsert(&accnt->posns, key, &posn->accnt_node_, parent);

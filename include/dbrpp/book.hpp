@@ -41,9 +41,9 @@ public:
         dbr_book_term(&impl_);
     }
     explicit
-    Book(DbrRec& crec, DbrDate settl_date, DbrPool pool) noexcept
+    Book(DbrRec& crec, DbrJd settl_day, DbrPool pool) noexcept
     {
-        dbr_book_init(&impl_, &crec, settl_date, pool);
+        dbr_book_init(&impl_, &crec, settl_day, pool);
     }
     operator DbrBook&() noexcept
     {
@@ -75,17 +75,17 @@ public:
     DbrKey
     key() const noexcept
     {
-        return dbr_book_key(impl_.crec->id, impl_.settl_date);
+        return dbr_book_key(impl_.crec->id, impl_.settl_day);
     }
     ContrRecRef
     crec() const noexcept
     {
         return ContrRecRef{*dbr_book_crec(&impl_)};
     }
-    DbrDate
-    settl_date() const noexcept
+    DbrJd
+    settl_day() const noexcept
     {
-        return dbr_book_settl_date(&impl_);
+        return dbr_book_settl_day(&impl_);
     }
     SideRef
     bid_side() const noexcept
@@ -104,7 +104,7 @@ operator <<(std::ostream& os, const Book& book)
 {
     return os << "key=" << book.key()
               << ",crec=" << book.crec().mnem()
-              << ",settl_date" << book.settl_date();
+              << ",settl_day" << book.settl_day();
 }
 
 class BookRef {
@@ -137,17 +137,17 @@ public:
     DbrKey
     key() const noexcept
     {
-        return dbr_book_key(impl_->crec->id, impl_->settl_date);
+        return dbr_book_key(impl_->crec->id, impl_->settl_day);
     }
     ContrRecRef
     crec() const noexcept
     {
         return ContrRecRef{*dbr_book_crec(impl_)};
     }
-    DbrDate
-    settl_date() const noexcept
+    DbrJd
+    settl_day() const noexcept
     {
-        return dbr_book_settl_date(impl_);
+        return dbr_book_settl_day(impl_);
     }
     SideRef
     bid_side() const noexcept
@@ -166,7 +166,7 @@ operator <<(std::ostream& os, BookRef book)
 {
     return os << "key=" << book.key()
               << ",crec=" << book.crec().mnem()
-              << ",settl_date" << book.settl_date();
+              << ",settl_day" << book.settl_day();
 }
 
 /** @} */

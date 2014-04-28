@@ -543,14 +543,14 @@ public:
     // Find.
 
     Iterator
-    find(DbrIden cid, DbrDate settl_date) noexcept
+    find(DbrIden cid, DbrJd settl_day) noexcept
     {
-        return dbr_serv_find_book(serv_, cid, settl_date);
+        return dbr_serv_find_book(serv_, cid, settl_day);
     }
     ConstIterator
-    find(DbrIden cid, DbrDate settl_date) const noexcept
+    find(DbrIden cid, DbrJd settl_day) const noexcept
     {
-        return dbr_serv_find_book(serv_, cid, settl_date);
+        return dbr_serv_find_book(serv_, cid, settl_day);
     }
 
     // Accessor.
@@ -831,9 +831,9 @@ public:
         return Accnt{accnt};
     }
     BookRef
-    book(DbrRec& crec, DbrDate settl_date) const
+    book(DbrRec& crec, DbrJd settl_day) const
     {
-        DbrBook* const book = dbr_serv_book(impl_, &crec, settl_date);
+        DbrBook* const book = dbr_serv_book(impl_, &crec, settl_day);
         if (!book)
             throw_exception();
         return BookRef{*book};

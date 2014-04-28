@@ -79,10 +79,10 @@ public:
     {
         return ContrRecRef{*impl_->c.contr.rec};
     }
-    DbrDate
-    settl_date() const noexcept
+    DbrJd
+    settl_day() const noexcept
     {
-        return impl_->c.settl_date;
+        return impl_->c.settl_day;
     }
     Ref
     ref() const noexcept
@@ -164,7 +164,7 @@ operator <<(std::ostream& os, ExecRef exec)
               << ",user=" << exec.user().mnem()
               << ",group=" << exec.group().mnem()
               << ",contr=" << exec.contr().mnem()
-              << ",settl_date=" << exec.settl_date()
+              << ",settl_day=" << exec.settl_day()
               << ",ref=" << exec.ref()
               << ",state=" << exec.state()
               << ",action=" << exec.action()

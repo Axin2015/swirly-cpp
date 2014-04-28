@@ -308,7 +308,7 @@ static inline void
 fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
     // Synthetic key from contract and settlment date.
-    const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_date);
+    const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_day);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {
@@ -322,7 +322,7 @@ DBR_EXTERN struct DbrPosn*
 fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn);
 
 DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrDate settl_date,
+fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
                struct FigOrdIdx* ordidx, DbrPool pool);
 
 static inline struct DbrRbNode*

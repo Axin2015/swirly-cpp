@@ -113,9 +113,9 @@ TEST_CASE(serv_book)
     check(it != serv.crecs().end());
 
     ContrRecRef crec(*it);
-    BookRef book = serv.book(*it, 20130824);
+    BookRef book = serv.book(*it, 2456731);
     check(book.crec() == crec);
-    check(book.settl_date() == 20130824);
+    check(book.settl_day() == 2456731);
 }
 
 TEST_CASE(serv_place)
@@ -137,7 +137,7 @@ TEST_CASE(serv_place)
 
     auto user = serv.accnt(AccntRecRef(*uit));
     auto group = serv.accnt(AccntRecRef(*git));
-    auto book = serv.book(ContrRecRef(*cit), 20130824);
+    auto book = serv.book(ContrRecRef(*cit), dbr_ymd_to_jd(2014, 3, 14));
 
     DbrUuid uuid;
     uuid_generate(uuid);

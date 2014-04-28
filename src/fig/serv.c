@@ -118,20 +118,20 @@ insert_bookup(struct DbrTree* bookups, struct DbrBook* book)
 }
 
 static inline struct DbrBook*
-get_book(DbrServ serv, DbrIden cid, DbrDate settl_date)
+get_book(DbrServ serv, DbrIden cid, DbrJd settl_day)
 {
-    const DbrIden key = dbr_book_key(cid, settl_date);
+    const DbrIden key = dbr_book_key(cid, settl_day);
 	struct DbrRbNode* node = dbr_tree_find(&serv->books, key);
     return node ? serv_book_entry(node) : NULL;
 }
 
 static struct DbrBook*
-lazy_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
+lazy_book(DbrServ serv, struct DbrRec* crec, DbrJd settl_day)
 {
     assert(crec);
     assert(crec->type == DBR_ENTITY_CONTR);
 
-    const DbrIden key = dbr_book_key(crec->id, settl_date);
+    const DbrIden key = dbr_book_key(crec->id, settl_day);
     struct DbrBook* book;
 	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);
     if (!node || node->key != key) {
@@ -140,7 +140,7 @@ lazy_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
             dbr_err_set(DBR_ENOMEM, "out of memory");
             return NULL;
         }
-        dbr_book_init(book, crec, settl_date, serv->pool);
+        dbr_book_init(book, crec, settl_day, serv->pool);
         struct DbrRbNode* parent = node;
         dbr_tree_pinsert(&serv->books, key, &book->serv_node_, parent);
     } else
@@ -245,7 +245,7 @@ emplace_orders(DbrServ serv, DbrModel model)
         struct DbrBook* book;
         if (!dbr_order_done(order)) {
 
-            book = lazy_book(serv, order->c.contr.rec, order->c.settl_date);
+            book = lazy_book(serv, order->c.contr.rec, order->c.settl_day);
             if (dbr_unlikely(!book))
                 goto fail2;
 
@@ -506,9 +506,9 @@ dbr_serv_accnt(DbrServ serv, struct DbrRec* arec)
 }
 
 DBR_API struct DbrBook*
-dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrDate settl_date)
+dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrJd settl_day)
 {
-    return lazy_book(serv, crec, settl_date);
+    return lazy_book(serv, crec, settl_day);
 }
 
 DBR_API struct DbrSess*
@@ -544,7 +544,7 @@ dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book
     new_order->c.user.rec = fig_accnt_rec(user);
     new_order->c.group.rec = fig_accnt_rec(group);
     new_order->c.contr.rec = book->crec;
-    new_order->c.settl_date = book->settl_date;
+    new_order->c.settl_day = book->settl_day;
     if (ref)
         strncpy(new_order->c.ref, ref, DBR_REF_MAX);
     else
@@ -650,7 +650,7 @@ dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
     assert(book);
     dbr_book_revise(book, order, lots, now);
     insert_bookup(&serv->bookups, book);
@@ -707,7 +707,7 @@ dbr_serv_revise_ref(DbrServ serv, DbrAccnt user, const char* ref, DbrLots lots)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
     assert(book);
     dbr_book_revise(book, order, lots, now);
     insert_bookup(&serv->bookups, book);
@@ -752,7 +752,7 @@ dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
     assert(book);
     dbr_book_cancel(book, order, now);
     insert_bookup(&serv->bookups, book);
@@ -796,7 +796,7 @@ dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_date);
+    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
     assert(book);
     dbr_book_cancel(book, order, now);
     insert_bookup(&serv->bookups, book);
@@ -895,9 +895,9 @@ dbr_serv_empty_posnup(DbrServ serv)
 // Book
 
 DBR_API struct DbrRbNode*
-dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrDate settl_date)
+dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrJd settl_day)
 {
-    const DbrIden key = dbr_book_key(cid, settl_date);
+    const DbrIden key = dbr_book_key(cid, settl_day);
 	return dbr_tree_find(&serv->books, key);
 }
 

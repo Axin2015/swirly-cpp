@@ -600,7 +600,7 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
         status_err(&rep, req_id);
         goto fail1;
     }
-    struct DbrBook* book = dbr_serv_book(serv, crec, req->place_order_req.settl_date);
+    struct DbrBook* book = dbr_serv_book(serv, crec, req->place_order_req.settl_day);
     if (!book) {
         status_err(&rep, req_id);
         goto fail1;

@@ -128,7 +128,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user);
 
 DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
-               DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+               DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots);
 
 /**
@@ -246,7 +246,7 @@ dbr_clnt_view_entry(struct DbrRbNode* node)
 }
 
 DBR_API struct DbrRbNode*
-dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date);
+dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day);
 
 DBR_API struct DbrRbNode*
 dbr_clnt_first_view(DbrClnt clnt);

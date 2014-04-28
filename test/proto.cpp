@@ -114,7 +114,7 @@ TEST_CASE(proto_order)
     DbrIden contr = 11;
     auto now = dbr_millis();
 
-    auto in = create_order(pool, 1, user, group, contr, 20130827,
+    auto in = create_order(pool, 1, user, group, contr, dbr_ymd_to_jd(2014, 3, 14),
                            "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
 
     auto len = order_len(*in, false);
@@ -130,7 +130,7 @@ TEST_CASE(proto_order)
     check(out.c.user.id_only == in->c.user.id_only);
     check(out.c.group.id_only == in->c.group.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
-    check(out.c.settl_date == in->c.settl_date);
+    check(out.c.settl_day == in->c.settl_day);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
     check(out.c.state == in->c.state);
     check(out.c.action == in->c.action);
@@ -154,8 +154,9 @@ TEST_CASE(proto_trade)
     DbrIden cpty = 13;
     auto now = dbr_millis();
 
-    auto in = create_trade(pool, 1, 2, user, group, contr, 20130827, "apple", DBR_ACTION_BUY,
-                           12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER, cpty, now);
+    auto in = create_trade(pool, 1, 2, user, group, contr, dbr_ymd_to_jd(2014, 3, 14), "apple",
+                           DBR_ACTION_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER,
+                           cpty, now);
 
     auto len = exec_len(*in, false);
     char buf[len];
@@ -171,7 +172,7 @@ TEST_CASE(proto_trade)
     check(out.c.user.id_only == in->c.user.id_only);
     check(out.c.group.id_only == in->c.group.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
-    check(out.c.settl_date == in->c.settl_date);
+    check(out.c.settl_day == in->c.settl_day);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
     check(out.c.state == in->c.state);
     check(out.c.action == in->c.action);

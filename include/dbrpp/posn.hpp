@@ -54,10 +54,10 @@ public:
     {
         return ContrRecRef{*impl_->contr.rec};
     }
-    DbrDate
-    settl_date() const noexcept
+    DbrJd
+    settl_day() const noexcept
     {
-        return impl_->settl_date;
+        return impl_->settl_day;
     }
     DbrLicks
     buy_licks() const noexcept
@@ -86,7 +86,7 @@ operator <<(std::ostream& os, PosnRef posn)
 {
     return os << "arec=" << posn.arec().mnem()
               << ",crec=" << posn.crec().mnem()
-              << ",settl_date=" << posn.settl_date()
+              << ",settl_day=" << posn.settl_day()
               << ",buy_licks=" << posn.buy_licks()
               << ",buy_lots=" << posn.buy_lots()
               << ",sell_licks=" << posn.sell_licks()

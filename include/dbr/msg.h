@@ -121,7 +121,7 @@ struct DbrBody {
             DbrIden uid;
             DbrIden gid;
             DbrIden cid;
-            DbrDate settl_date;
+            DbrJd settl_day;
             DbrRef ref;
             int action;
             DbrTicks ticks;

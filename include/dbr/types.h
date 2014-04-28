@@ -18,6 +18,7 @@
 #ifndef DBR_TYPES_H
 #define DBR_TYPES_H
 
+#include <dbr/date.h>
 #include <dbr/list.h>
 #include <dbr/queue.h>
 #include <dbr/slnode.h>
@@ -30,11 +31,6 @@
  * @{
  */
 
-/**
- * ISO8601 format: "%Y%m%d".
- */
-
-typedef int DbrDate;
 typedef long DbrIncs;
 
 /**
@@ -301,7 +297,7 @@ struct DbrCommon {
     union DbrURec user;
     union DbrURec group;
     union DbrURec contr;
-    DbrDate settl_date;
+    DbrJd settl_day;
     /**
      * Ref is optional.
      */
@@ -563,7 +559,7 @@ struct DbrPosn {
      */
     union DbrURec accnt;
     union DbrURec contr;
-    DbrDate settl_date;
+    DbrJd settl_day;
     DbrLicks buy_licks;
     DbrLots buy_lots;
     DbrLicks sell_licks;
@@ -604,7 +600,7 @@ enum {
 
 struct DbrView {
     union DbrURec contr;
-    DbrDate settl_date;
+    DbrJd settl_day;
     DbrTicks bid_ticks[DBR_LEVEL_MAX];
     DbrLots bid_lots[DBR_LEVEL_MAX];
     size_t bid_count[DBR_LEVEL_MAX];
@@ -663,7 +659,7 @@ struct DbrSide {
 
 struct DbrBook {
     struct DbrRec* crec;
-    DbrDate settl_date;
+    DbrJd settl_day;
     struct DbrSide bid_side;
     struct DbrSide offer_side;
     /**

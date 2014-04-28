@@ -58,7 +58,7 @@ main(int argc, char* argv[])
         for (auto rec : serv.crecs()) {
             ContrRecRef ref(rec);
             cout << ref << endl;
-            serv.book(ref, 20130827);
+            serv.book(ref, dbr_ymd_to_jd(2014, 3, 14));
         }
         return 0;
     } catch (const exception& e) {

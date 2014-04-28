@@ -41,17 +41,17 @@ create_memb(dbr::Pool& pool, DbrIden uid, DbrIden gid);
 
 std::shared_ptr<DbrOrder>
 create_order(dbr::Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
-             DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+             DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrOrder>
 create_order(dbr::Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
-             DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+             DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrExec>
 create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
-             DbrIden cid, DbrDate settl_date, const char* ref, int action, DbrTicks ticks,
+             DbrIden cid, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now);
 

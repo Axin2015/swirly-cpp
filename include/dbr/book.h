@@ -27,7 +27,7 @@
  */
 
 DBR_API void
-dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrDate settl_date, DbrPool pool);
+dbr_book_init(struct DbrBook* book, struct DbrRec* crec, DbrJd settl_day, DbrPool pool);
 
 DBR_API void
 dbr_book_term(struct DbrBook* book);
@@ -76,10 +76,10 @@ dbr_book_crec(struct DbrBook* book)
     return book->crec;
 }
 
-static inline DbrDate
-dbr_book_settl_date(struct DbrBook* book)
+static inline DbrJd
+dbr_book_settl_day(struct DbrBook* book)
 {
-    return book->settl_date;
+    return book->settl_day;
 }
 
 static inline struct DbrSide*

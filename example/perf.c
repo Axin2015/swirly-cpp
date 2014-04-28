@@ -85,7 +85,7 @@ load(DbrServ serv, const char* path)
 static DbrBool
 run(void)
 {
-    const DbrDate settl_date = 20140307;
+    const DbrJd settl_day = dbr_ymd_to_jd(2014, 3, 14);
 
     struct DbrRec* urec = find_rec_mnem(DBR_ENTITY_ACCNT, "WRAMIREZ");
     if (dbr_unlikely(!urec))
@@ -107,7 +107,7 @@ run(void)
     if (dbr_unlikely(!group))
         goto fail1;
 
-    struct DbrBook* book = dbr_serv_book(serv, crec, settl_date);
+    struct DbrBook* book = dbr_serv_book(serv, crec, settl_day);
     if (dbr_unlikely(!book))
         goto fail1;
 

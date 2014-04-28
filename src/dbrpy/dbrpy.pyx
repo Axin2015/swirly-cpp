@@ -323,7 +323,7 @@ cdef class Order(object):
     cdef public DbrIden uid
     cdef public DbrIden gid
     cdef public DbrIden cid
-    cdef public DbrDate settl_date
+    cdef public DbrJd settl_day
     cdef public bytes ref
     cdef public int state
     cdef public int action
@@ -339,7 +339,7 @@ cdef class Order(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Order({0.id!r}, {0.uid!r}, {0.gid!r}, {0.cid!r}, {0.settl_date!r}, {0.ref!r}, {0.state!r}, {0.action!r}, {0.ticks!r}, {0.lots!r}, {0.resd!r}, {0.exc!r}, {0.last_ticks!r}, {0.last_lots!r}, {0.min_lots!r}, {0.created!r}, {0.modified!r})'.format(self)
+        return 'Order({0.id!r}, {0.uid!r}, {0.gid!r}, {0.cid!r}, {0.settl_day!r}, {0.ref!r}, {0.state!r}, {0.action!r}, {0.ticks!r}, {0.lots!r}, {0.resd!r}, {0.exc!r}, {0.last_ticks!r}, {0.last_lots!r}, {0.min_lots!r}, {0.created!r}, {0.modified!r})'.format(self)
 
 cdef Order make_order(DbrpyOrder* order):
     cdef obj = Order.__new__(Order)
@@ -347,7 +347,7 @@ cdef Order make_order(DbrpyOrder* order):
     obj.uid = order.c.user.rec.id
     obj.gid = order.c.group.rec.id
     obj.cid = order.c.contr.rec.id
-    obj.settl_date = order.c.settl_date
+    obj.settl_day = order.c.settl_day
     obj.ref = order.c.ref[:string.strnlen(order.c.ref, DBR_REF_MAX)]
     obj.state = order.c.state
     obj.action = order.c.action
@@ -385,7 +385,7 @@ cdef class Exec(object):
     cdef public DbrIden uid
     cdef public DbrIden gid
     cdef public DbrIden cid
-    cdef public DbrDate settl_date
+    cdef public DbrJd settl_day
     cdef public bytes ref
     cdef public int state
     cdef public int action
@@ -403,7 +403,7 @@ cdef class Exec(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Exec({0.id!r}, {0.order!r}, {0.uid!r}, {0.gid!r}, {0.cid!r}, {0.settl_date!r}, {0.ref!r}, {0.state!r}, {0.action!r}, {0.ticks!r}, {0.lots!r}, {0.resd!r}, {0.exc!r}, {0.last_ticks!r}, {0.last_lots!r}, {0.min_lots!r}, {0.match!r}, {0.role!r}, {0.cpty!r}, {0.created!r})'.format(self)
+        return 'Exec({0.id!r}, {0.order!r}, {0.uid!r}, {0.gid!r}, {0.cid!r}, {0.settl_day!r}, {0.ref!r}, {0.state!r}, {0.action!r}, {0.ticks!r}, {0.lots!r}, {0.resd!r}, {0.exc!r}, {0.last_ticks!r}, {0.last_lots!r}, {0.min_lots!r}, {0.match!r}, {0.role!r}, {0.cpty!r}, {0.created!r})'.format(self)
 
 cdef Exec make_exec(DbrpyExec* exc):
     cdef obj = Exec.__new__(Exec)
@@ -412,7 +412,7 @@ cdef Exec make_exec(DbrpyExec* exc):
     obj.uid = exc.c.user.rec.id
     obj.gid = exc.c.group.rec.id
     obj.cid = exc.c.contr.rec.id
-    obj.settl_date = exc.c.settl_date
+    obj.settl_day = exc.c.settl_day
     obj.ref = exc.c.ref[:string.strnlen(exc.c.ref, DBR_REF_MAX)]
     obj.state = exc.c.state
     obj.action = exc.c.action
@@ -435,7 +435,7 @@ def exec_done(Exec exc):
 cdef class Posn(object):
     cdef public DbrIden gid
     cdef public DbrIden cid
-    cdef public DbrDate settl_date
+    cdef public DbrJd settl_day
     cdef public DbrLicks buy_licks
     cdef public DbrLots buy_lots
     cdef public DbrLicks sell_licks
@@ -443,13 +443,13 @@ cdef class Posn(object):
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'Posn({0.gid!r}, {0.cid!r}, {0.settl_date!r}, {0.buy_licks!r}, {0.buy_lots!r}, {0.sell_licks!r}, {0.sell_lots!r})'.format(self)
+        return 'Posn({0.gid!r}, {0.cid!r}, {0.settl_day!r}, {0.buy_licks!r}, {0.buy_lots!r}, {0.sell_licks!r}, {0.sell_lots!r})'.format(self)
 
 cdef Posn make_posn(DbrpyPosn* posn):
     cdef obj = Posn.__new__(Posn)
     obj.gid = posn.accnt.rec.id
     obj.cid = posn.contr.rec.id
-    obj.settl_date = posn.settl_date
+    obj.settl_day = posn.settl_day
     obj.buy_licks = posn.buy_licks
     obj.buy_lots = posn.buy_lots
     obj.sell_licks = posn.sell_licks
@@ -460,18 +460,18 @@ LEVEL_MAX = DBR_LEVEL_MAX
 
 cdef class View(object):
     cdef public DbrIden cid
-    cdef public DbrDate settl_date
+    cdef public DbrJd settl_day
     cdef public list list_bid
     cdef public list list_offer
     def __init__(self):
         raise TypeError("init called")
     def __repr__(self):
-        return 'View({0.cid!r}, {0.settl_date!r}, {0.list_bid[0]!r}, {0.list_offer[0]!r})'.format(self)
+        return 'View({0.cid!r}, {0.settl_day!r}, {0.list_bid[0]!r}, {0.list_offer[0]!r})'.format(self)
 
 cdef View make_view(DbrpyView* view):
     cdef obj = View.__new__(View)
     obj.cid = view.contr.rec.id
-    obj.settl_date = view.settl_date
+    obj.settl_day = view.settl_day
     obj.list_bid = []
     obj.list_offer = []
     cdef size_t i
@@ -858,12 +858,12 @@ cdef class Clnt(object):
             raise Error()
         return id
 
-    def place(self, Accnt user, Accnt group, ContrRec crec, DbrDate settl_date,
+    def place(self, Accnt user, Accnt group, ContrRec crec, DbrJd settl_day,
               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots):
         cdef DbrIden id
         with nogil:
             id = dbr_clnt_place(self.impl_, user.impl_, group.impl_, crec.impl_,
-                                settl_date, ref, action, ticks, lots, min_lots)
+                                settl_day, ref, action, ticks, lots, min_lots)
         if id < 0:
             raise Error()
         return id
@@ -934,8 +934,8 @@ cdef class Clnt(object):
     def clear(self):
         dbr_clnt_clear(self.impl_)
 
-    def find_view(self, DbrIden cid, DbrDate settl_date):
-        cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_date)
+    def find_view(self, DbrIden cid, DbrJd settl_day):
+        cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_day)
         return make_view(dbr_clnt_view_entry(node)) if node is not NULL else None
     def list_view(self):
         views = []

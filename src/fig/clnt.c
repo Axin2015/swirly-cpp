@@ -348,7 +348,7 @@ apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 static struct DbrView*
 apply_viewup(DbrClnt clnt, struct DbrView* view)
 {
-    const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_date);
+    const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_day);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
     if (node != &view->clnt_node_) {
 
@@ -364,7 +364,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
         // Update existing position.
 
         assert(exist->contr.rec == view->contr.rec);
-        assert(exist->settl_date == view->settl_date);
+        assert(exist->settl_day == view->settl_day);
 
         for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
             exist->bid_ticks[i] = view->bid_ticks[i];
@@ -741,7 +741,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user)
 
 DBR_API DbrIden
 dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
-               DbrDate settl_date, const char* ref, int action, DbrTicks ticks, DbrLots lots,
+               DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots)
 {
     if (clnt->state != READY) {
@@ -754,7 +754,7 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
     body.place_order_req.uid = user->rec->id;
     body.place_order_req.gid = group->rec->id;
     body.place_order_req.cid = crec->id;
-    body.place_order_req.settl_date = settl_date;
+    body.place_order_req.settl_day = settl_day;
     if (ref)
         strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);
     else
@@ -1241,9 +1241,9 @@ dbr_clnt_empty_posnup(DbrClnt clnt)
 }
 
 DBR_API struct DbrRbNode*
-dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrDate settl_date)
+dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day)
 {
-    const DbrIden key = dbr_book_key(cid, settl_date);
+    const DbrIden key = dbr_book_key(cid, settl_day);
     return dbr_tree_find(&clnt->views, key);
 }
 

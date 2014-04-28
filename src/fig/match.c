@@ -84,7 +84,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     DbrLots last_lots = 0;
 
     struct DbrRec* crec = book->crec;
-    DbrDate settl_date = book->settl_date;
+    DbrJd settl_day = book->settl_day;
 
     struct DbrDlNode* node = dbr_side_first_order(side),
         * end = dbr_side_end_order(side);
@@ -101,7 +101,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         dbr_match_init(match);
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->c.group.rec, crec, settl_date,
+        struct DbrPosn* posn = fig_accnt_posn(maker->c.group.rec, crec, settl_day,
                                               ordidx, pool);
         if (!posn) {
             // No need to free accnt or posn.
@@ -147,7 +147,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         taker_exec->c.user.rec = taker->c.user.rec;
         taker_exec->c.group.rec = taker->c.group.rec;
         taker_exec->c.contr.rec = crec;
-        taker_exec->c.settl_date = settl_date;
+        taker_exec->c.settl_day = settl_day;
         strncpy(taker_exec->c.ref, taker->c.ref, DBR_REF_MAX);
         taker_exec->c.state = DBR_STATE_TRADE;
         taker_exec->c.action = taker->c.action;
@@ -169,7 +169,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         maker_exec->c.user.rec = maker->c.user.rec;
         maker_exec->c.group.rec = maker->c.group.rec;
         maker_exec->c.contr.rec = crec;
-        maker_exec->c.settl_date = settl_date;
+        maker_exec->c.settl_day = settl_day;
         strncpy(maker_exec->c.ref, maker->c.ref, DBR_REF_MAX);
         maker_exec->c.state = DBR_STATE_TRADE;
         maker_exec->c.action = maker->c.action;
@@ -199,7 +199,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     if (!dbr_queue_empty(&trans->matches)) {
 
         // Avoid allocating position when there are no matches.
-        if (!(trans->taker_posn = fig_accnt_posn(taker->c.group.rec, crec, settl_date,
+        if (!(trans->taker_posn = fig_accnt_posn(taker->c.group.rec, crec, settl_day,
                                                  ordidx, pool)))
             goto fail1;
 

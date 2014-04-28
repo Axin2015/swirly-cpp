@@ -161,7 +161,7 @@ CREATE TABLE order_ (
   user INTEGER NOT NULL REFERENCES accnt (id),
   group_ INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
-  settl_date INTEGER NOT NULL,
+  settl_day INTEGER NOT NULL,
   ref TEXT NULL,
   state INTEGER NOT NULL REFERENCES state (id),
   action INTEGER NOT NULL REFERENCES action (id),
@@ -184,7 +184,7 @@ CREATE VIEW order_v AS
   u.mnem user,
   g.mnem group_,
   c.mnem contr,
-  o.settl_date,
+  o.settl_day,
   o.ref,
   s.mnem state,
   n.mnem action,
@@ -216,7 +216,7 @@ CREATE TABLE exec (
   user INTEGER NOT NULL REFERENCES accnt (id),
   group_ INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
-  settl_date INTEGER NOT NULL,
+  settl_day INTEGER NOT NULL,
   ref TEXT NULL,
   state INTEGER NOT NULL REFERENCES state (id),
   action INTEGER NOT NULL REFERENCES action (id),
@@ -245,7 +245,7 @@ BEGIN
     user,
     group_,
     contr,
-    settl_date,
+    settl_day,
     ref,
     state,
     action,
@@ -263,7 +263,7 @@ BEGIN
     new.user,
     new.group_,
     new.contr,
-    new.settl_date,
+    new.settl_day,
     new.ref,
     new.state,
     new.action,
@@ -304,7 +304,7 @@ CREATE VIEW exec_v AS
   u.mnem user,
   g.mnem group_,
   c.mnem contr,
-  e.settl_date,
+  e.settl_day,
   e.ref,
   s.mnem state,
   n.mnem action,
@@ -345,7 +345,7 @@ CREATE VIEW trade_v AS
   e.user,
   e.group_,
   e.contr,
-  e.settl_date,
+  e.settl_day,
   e.ref,
   e.action,
   e.ticks,
@@ -369,13 +369,13 @@ CREATE VIEW posn_v AS
   SELECT
   e.group_ accnt,
   e.contr,
-  e.settl_date,
+  e.settl_day,
   e.action,
   SUM(e.last_lots * e.last_ticks) licks,
   SUM(e.last_lots) lots
   FROM exec e
   WHERE e.state = 4
-  GROUP BY e.group_, e.contr, e.settl_date, e.action
+  GROUP BY e.group_, e.contr, e.settl_day, e.action
 ;
 
 COMMIT TRANSACTION

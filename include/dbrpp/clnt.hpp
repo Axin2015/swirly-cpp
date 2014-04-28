@@ -541,14 +541,14 @@ public:
     // Find.
 
     Iterator
-    find(DbrIden cid, DbrDate settl_date) noexcept
+    find(DbrIden cid, DbrJd settl_day) noexcept
     {
-        return dbr_clnt_find_view(clnt_, cid, settl_date);
+        return dbr_clnt_find_view(clnt_, cid, settl_day);
     }
     ConstIterator
-    find(DbrIden cid, DbrDate settl_date) const noexcept
+    find(DbrIden cid, DbrJd settl_day) const noexcept
     {
-        return dbr_clnt_find_view(clnt_, cid, settl_date);
+        return dbr_clnt_find_view(clnt_, cid, settl_day);
     }
 
     // Accessor.
@@ -853,10 +853,10 @@ public:
         return req_id;
     }
     DbrIden
-    place(DbrAccnt user, DbrAccnt group, DbrRec& crec, DbrDate settl_date, const char* ref,
+    place(DbrAccnt user, DbrAccnt group, DbrRec& crec, DbrJd settl_day, const char* ref,
           int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
     {
-        DbrIden req_id = dbr_clnt_place(impl_, user, group, &crec, settl_date, ref, action,
+        DbrIden req_id = dbr_clnt_place(impl_, user, group, &crec, settl_day, ref, action,
                                         ticks, lots, min_lots);
         if (req_id < 0)
             throw_exception();
