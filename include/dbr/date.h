@@ -18,15 +18,45 @@
 #ifndef DBR_DATE_H
 #define DBR_DATE_H
 
+/**
+ * @addtogroup Date
+ * @{
+ */
+
+/**
+ * Julian day.
+ */
+
 typedef int DbrJd;
 
+/**
+ * Gregorian date.
+ */
+
 struct DbrYmd {
-    int year, mon, day;
+    /**
+     * Year between 1801 and 2099 inclusive.
+     */
+    int year;
+    /**
+     * Month between 1 and 12 inclusive.
+     */
+    int mon;
+    /**
+     * Day of month between 1 and 31 inclusive.
+     */
+    int day;
 };
+
+/**
+ * Gregorian date to Julian day.
+ */
 
 static inline DbrJd
 dbr_ymd_to_jd(int year, int mon, int day)
 {
+    // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
+    // Almanac for Computers.
     // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
     const int i = year, j = mon, k = day;
@@ -35,9 +65,15 @@ dbr_ymd_to_jd(int year, int mon, int day)
         - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4;
 }
 
+/**
+ * Julian day to Gregorian date.
+ */
+
 static inline void
 dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
 {
+    // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
+    // Almanac for Computers.
     // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
     int l = jd + 68569;
@@ -56,16 +92,50 @@ dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
     ymd->day = k;
 }
 
+/**
+ * Gregorian date to Modified Julian day.
+ * Epoch is November 17, 1858.
+ */
+
 static inline DbrJd
 dbr_ymd_to_mjd(int year, int mon, int day)
 {
     return dbr_ymd_to_jd(year, mon, day) - 2400000;
 }
 
+/**
+ * Modified Julian day to Gregorian date.
+ * Epoch is November 17, 1858.
+ */
+
 static inline void
 dbr_mjd_to_ymd(DbrJd mjd, struct DbrYmd* ymd)
 {
     return dbr_mjd_to_ymd(mjd + 2400000, ymd);
 }
+
+/**
+ * Gregorian date to Truncated Julian day.
+ * Epoch is May 24, 1968.
+ */
+
+static inline DbrJd
+dbr_ymd_to_tjd(int year, int mon, int day)
+{
+    return dbr_ymd_to_jd(year, mon, day) - 2440000;
+}
+
+/**
+ * Truncated Julian day to Gregorian date.
+ * Epoch is May 24, 1968.
+ */
+
+static inline void
+dbr_tjd_to_ymd(DbrJd tjd, struct DbrYmd* ymd)
+{
+    return dbr_mjd_to_ymd(tjd + 2440000, ymd);
+}
+
+/** @} */
 
 #endif // DBR_DATE_H

@@ -25,6 +25,12 @@
  */
 
 /**
+ * Julian and Gregorian date conversions.
+ * @defgroup Date Date
+ * @ingroup Ash
+ */
+
+/**
  * Container types.
  * @defgroup Cont Container
  * @ingroup Ash
