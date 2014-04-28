@@ -6,9 +6,12 @@ cimport zmq
 from cpython cimport Py_DECREF, Py_INCREF
 from cpython.ref cimport PyObject
 
+import datetime
 import uuid
 
 cdef extern from "dbrpy/dbrpy.h":
+
+    ctypedef DbrYmd DbrpyYmd
 
     ctypedef DbrRbNode DbrpyRbNode
     ctypedef DbrSlNode DbrpySlNode
@@ -28,6 +31,56 @@ from inspect import currentframe, getframeinfo
 # Defs
 
 ERRMSG_MAX = DBR_ERRMSG_MAX
+
+# Date
+
+def ymd_to_jd(int year, int mon, int mday):
+    return dbr_ymd_to_jd(year, mon, mday)
+
+def jd_to_ymd(DbrJd jd):
+    cdef DbrpyYmd ymd
+    dbr_jd_to_ymd(jd, &ymd)
+    return (ymd.year, ymd.mon, ymd.mday)
+
+def ymd_to_mjd(int year, int mon, int mday):
+    return dbr_ymd_to_mjd(year, mon, mday)
+
+def mjd_to_ymd(DbrJd mjd):
+    cdef DbrpyYmd ymd
+    dbr_mjd_to_ymd(mjd, &ymd)
+    return (ymd.year, ymd.mon, ymd.mday)
+
+def ymd_to_tjd(int year, int mon, int mday):
+    return dbr_ymd_to_tjd(year, mon, mday)
+
+def tjd_to_ymd(DbrJd tjd):
+    cdef DbrpyYmd ymd
+    dbr_tjd_to_ymd(tjd, &ymd)
+    return (ymd.year, ymd.mon, ymd.mday)
+
+def date_to_jd(dt):
+    return dbr_ymd_to_jd(dt.year, dt.month, dt.day)
+
+def jd_to_date(DbrJd jd):
+    cdef DbrpyYmd ymd
+    dbr_jd_to_ymd(jd, &ymd)
+    return datetime.date(ymd.year, ymd.mon, ymd.mday)
+
+def date_to_mjd(dt):
+    return dbr_ymd_to_mjd(dt.year, dt.month, dt.day)
+
+def mjd_to_date(DbrJd mjd):
+    cdef DbrpyYmd ymd
+    dbr_mjd_to_ymd(mjd, &ymd)
+    return datetime.date(ymd.year, ymd.mon, ymd.mday)
+
+def date_to_tjd(dt):
+    return dbr_ymd_to_tjd(dt.year, dt.month, dt.day)
+
+def tjd_to_date(DbrJd tjd):
+    cdef DbrpyYmd ymd
+    dbr_tjd_to_ymd(tjd, &ymd)
+    return datetime.date(ymd.year, ymd.mon, ymd.mday)
 
 # Err
 

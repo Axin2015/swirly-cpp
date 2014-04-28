@@ -12,6 +12,27 @@ cdef extern from "dbr/defs.h":
     ctypedef long DbrKey
     ctypedef unsigned char DbrUuid[16]
 
+cdef extern from "dbr/date.h":
+
+    ctypedef int DbrJd
+
+    ctypedef struct DbrYmd:
+        int year
+        int mon
+        int mday
+
+    DbrJd dbr_ymd_to_jd(int year, int mon, int mday) nogil
+
+    void dbr_jd_to_ymd(DbrJd jd, DbrYmd* ymd) nogil
+
+    DbrJd dbr_ymd_to_mjd(int year, int mon, int mday) nogil
+
+    void dbr_mjd_to_ymd(DbrJd mjd, DbrYmd* ymd) nogil
+
+    DbrJd dbr_ymd_to_tjd(int year, int mon, int mday) nogil
+
+    void dbr_tjd_to_ymd(DbrJd tjd, DbrYmd* ymd) nogil
+
 cdef extern from "dbr/rbnode.h":
 
     ctypedef struct DbrRbNode

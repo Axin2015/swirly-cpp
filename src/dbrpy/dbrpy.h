@@ -20,6 +20,8 @@
 
 // Hack to work-around missing struct tags in code generation for these types.
 
+typedef struct DbrYmd DbrpyYmd;
+
 typedef struct DbrRbNode DbrpyRbNode;
 typedef struct DbrSlNode DbrpySlNode;
 

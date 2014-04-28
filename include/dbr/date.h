@@ -45,7 +45,7 @@ struct DbrYmd {
     /**
      * Day of month between 1 and 31 inclusive.
      */
-    int day;
+    int mday;
 };
 
 /**
@@ -53,13 +53,13 @@ struct DbrYmd {
  */
 
 static inline DbrJd
-dbr_ymd_to_jd(int year, int mon, int day)
+dbr_ymd_to_jd(int year, int mon, int mday)
 {
     // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
     // Almanac for Computers.
     // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-    const int i = year, j = mon, k = day;
+    const int i = year, j = mon, k = mday;
     return k - 32075
         + 1461 * (i + 4800 + (j - 14) / 12) / 4 + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
         - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4;
@@ -89,7 +89,7 @@ dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
 
     ymd->year = i;
     ymd->mon = j;
-    ymd->day = k;
+    ymd->mday = k;
 }
 
 /**
@@ -98,9 +98,9 @@ dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
  */
 
 static inline DbrJd
-dbr_ymd_to_mjd(int year, int mon, int day)
+dbr_ymd_to_mjd(int year, int mon, int mday)
 {
-    return dbr_ymd_to_jd(year, mon, day) - 2400000;
+    return dbr_ymd_to_jd(year, mon, mday) - 2400000;
 }
 
 /**
@@ -120,9 +120,9 @@ dbr_mjd_to_ymd(DbrJd mjd, struct DbrYmd* ymd)
  */
 
 static inline DbrJd
-dbr_ymd_to_tjd(int year, int mon, int day)
+dbr_ymd_to_tjd(int year, int mon, int mday)
 {
-    return dbr_ymd_to_jd(year, mon, day) - 2440000;
+    return dbr_ymd_to_jd(year, mon, mday) - 2440000;
 }
 
 /**

@@ -31,6 +31,6 @@ main(int argc, char* argv[])
 
     struct DbrYmd ymd;
     dbr_jd_to_ymd(atoi(argv[1]), &ymd);
-    printf("%04d%02d%02d\n", ymd.year, ymd.mon, ymd.day);
+    printf("%04d%02d%02d\n", ymd.year, ymd.mon, ymd.mday);
     return 0;
 }
