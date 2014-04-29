@@ -18,7 +18,6 @@
 #ifndef DBR_BOOK_H
 #define DBR_BOOK_H
 
-#include <dbr/conv.h> // dbr_book_key()
 #include <dbr/side.h>
 
 /**

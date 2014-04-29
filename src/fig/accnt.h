@@ -22,7 +22,6 @@
 
 #include "ordidx.h"
 
-#include <dbr/conv.h> // dbr_book_key()
 #include <dbr/refcount.h>
 #include <dbr/tree.h>
 

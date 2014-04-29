@@ -118,16 +118,6 @@ dbr_dp_to_real(int dp)
     return pow(10, -dp);
 }
 
-/**
- * Synthetic book key from contract and settlment date.
- */
-
-static inline DbrKey
-dbr_book_key(DbrIden cid, DbrJd settl_day)
-{
-    return cid * 100000000L + settl_day;
-}
-
 /** @} */
 
 #endif // DBR_CONV_H

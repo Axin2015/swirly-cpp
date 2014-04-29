@@ -669,6 +669,24 @@ struct DbrBook {
     struct DbrRbNode update_node_;
 };
 
+/**
+ * Synthetic book key from contract and settlment-date.
+ */
+
+static inline DbrKey
+dbr_book_key(DbrIden cid, DbrJd settl_day)
+{
+    enum {
+        // 16 million ids.
+        ID_MASK = (1 << 24) - 1,
+        // 16 bits is sufficient for truncated Julian day.
+        JD_MASK = (1 << 16) - 1
+    };
+    // Truncated Julian Day (TJD).
+    settl_day -= 2440000;
+    return ((((DbrKey)cid) & ID_MASK) << 16) | (((DbrKey)settl_day) & JD_MASK);
+}
+
 /** @} */
 
 /**
