@@ -120,7 +120,7 @@ insert_bookup(struct DbrTree* bookups, struct DbrBook* book)
 static inline struct DbrBook*
 get_book(DbrServ serv, DbrIden cid, DbrJd settl_day)
 {
-    const DbrIden key = dbr_book_key(cid, settl_day);
+    const DbrKey key = dbr_book_key(cid, settl_day);
 	struct DbrRbNode* node = dbr_tree_find(&serv->books, key);
     return node ? serv_book_entry(node) : NULL;
 }
@@ -131,7 +131,7 @@ lazy_book(DbrServ serv, struct DbrRec* crec, DbrJd settl_day)
     assert(crec);
     assert(crec->type == DBR_ENTITY_CONTR);
 
-    const DbrIden key = dbr_book_key(crec->id, settl_day);
+    const DbrKey key = dbr_book_key(crec->id, settl_day);
     struct DbrBook* book;
 	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);
     if (!node || node->key != key) {
@@ -897,7 +897,7 @@ dbr_serv_empty_posnup(DbrServ serv)
 DBR_API struct DbrRbNode*
 dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrJd settl_day)
 {
-    const DbrIden key = dbr_book_key(cid, settl_day);
+    const DbrKey key = dbr_book_key(cid, settl_day);
 	return dbr_tree_find(&serv->books, key);
 }
 

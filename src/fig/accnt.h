@@ -306,8 +306,7 @@ fig_accnt_empty_trade(const struct FigAccnt* accnt)
 static inline void
 fig_accnt_emplace_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
-    // Synthetic key from contract and settlment date.
-    const DbrIden key = dbr_book_key(posn->contr.rec->id, posn->settl_day);
+    const DbrKey key = dbr_book_key(posn->contr.rec->id, posn->settl_day);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
     {

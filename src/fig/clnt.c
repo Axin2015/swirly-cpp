@@ -182,12 +182,6 @@ insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
     dbr_tree_insert(posnups, (DbrKey)posn, &posn->update_node_);
 }
 
-static inline void
-insert_viewup(struct DbrTree* viewups, struct DbrView* view)
-{
-    dbr_tree_insert(viewups, (DbrKey)view, &view->update_node_);
-}
-
 static DbrAccnt
 get_accnt(DbrClnt clnt, DbrIden aid)
 {
@@ -347,7 +341,7 @@ apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 static struct DbrView*
 apply_viewup(DbrClnt clnt, struct DbrView* view)
 {
-    const DbrIden key = dbr_book_key(view->contr.rec->id, view->settl_day);
+    const DbrKey key = dbr_view_key(view->contr.rec->id, view->settl_day);
     struct DbrRbNode* node = dbr_tree_insert(&clnt->views, key, &view->clnt_node_);
     if (node != &view->clnt_node_) {
 
@@ -378,7 +372,7 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
         dbr_pool_free_view(clnt->pool, view);
         view = exist;
     }
-    insert_viewup(&clnt->viewups, view);
+    dbr_tree_insert(&clnt->viewups, key, &view->update_node_);
     return view;
 }
 
@@ -1242,7 +1236,7 @@ dbr_clnt_empty_posnup(DbrClnt clnt)
 DBR_API struct DbrRbNode*
 dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day)
 {
-    const DbrIden key = dbr_book_key(cid, settl_day);
+    const DbrKey key = dbr_book_key(cid, settl_day);
     return dbr_tree_find(&clnt->views, key);
 }
 
