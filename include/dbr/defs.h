@@ -71,7 +71,7 @@ typedef long DbrIden;
  * Key type used by associative containers.
  * @sa struct RbNode
  */
-typedef long DbrKey;
+typedef unsigned long DbrKey;
 /**
  * Universally unique identifier.
  */

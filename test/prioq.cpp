@@ -32,7 +32,7 @@ TEST_CASE(prioq_push)
         ++n;
     }
 
-    long prev = 0;
+    DbrKey prev = 0;
 
     const struct DbrElem* elem;
     while ((elem = dbr_prioq_top(&pq))) {
@@ -60,7 +60,7 @@ TEST_CASE(prioq_remove)
         if (dbr_prioq_remove(&pq, rand() % 2048))
             --n;
 
-    long prev = 0;
+    DbrKey prev = 0;
 
     const struct DbrElem* elem;
     while ((elem = dbr_prioq_top(&pq))) {
@@ -87,7 +87,7 @@ TEST_CASE(prioq_replace)
     for (int i = 1; i <= 1024; ++i)
         dbr_prioq_replace(&pq, i, rand() % 2048);
 
-    long prev = 0;
+    DbrKey prev = 0;
 
     const struct DbrElem* elem;
     while ((elem = dbr_prioq_top(&pq))) {

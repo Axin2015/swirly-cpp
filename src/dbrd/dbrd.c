@@ -73,32 +73,32 @@ static void* trsock = NULL;
 static struct DbrPrioq prioq = { 0 };
 
 static inline DbrBool
-is_hbtmr(DbrKey tmr)
+is_hbtmr(DbrIden tmr)
 {
     // Heartbeat timers are even numbered.
     return (tmr & 0x1) == 0;
 }
 
-static inline DbrKey
+static inline DbrIden
 sess_to_hbtmr(struct DbrSess* sess)
 {
-    return (DbrKey)sess;
+    return (DbrIden)sess;
 }
 
 static inline struct DbrSess*
-hbtmr_to_sess(DbrKey hbtmr)
+hbtmr_to_sess(DbrIden hbtmr)
 {
     return (struct DbrSess*)hbtmr;
 }
 
-static inline DbrKey
+static inline DbrIden
 sess_to_trtmr(struct DbrSess* sess)
 {
-    return ((DbrKey)sess) + 1;
+    return ((DbrIden)sess) + 1;
 }
 
 static inline struct DbrSess*
-trtmr_to_sess(DbrKey trtmr)
+trtmr_to_sess(DbrIden trtmr)
 {
     return (struct DbrSess*)(trtmr - 1);
 }

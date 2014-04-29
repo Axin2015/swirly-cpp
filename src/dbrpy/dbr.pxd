@@ -9,7 +9,7 @@ cdef extern from "dbr/defs.h":
 
     ctypedef int DbrBool
     ctypedef long DbrIden
-    ctypedef long DbrKey
+    ctypedef unsigned long DbrKey
     ctypedef unsigned char DbrUuid[16]
 
 cdef extern from "dbr/date.h":
