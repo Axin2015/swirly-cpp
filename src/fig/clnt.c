@@ -179,7 +179,8 @@ free_views(struct DbrTree* views, DbrPool pool)
 static inline void
 insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
 {
-    dbr_tree_insert(posnups, (DbrKey)posn, &posn->update_node_);
+    const DbrKey key = dbr_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
+    dbr_tree_insert(posnups, key, &posn->update_node_);
 }
 
 static DbrAccnt
@@ -1236,7 +1237,7 @@ dbr_clnt_empty_posnup(DbrClnt clnt)
 DBR_API struct DbrRbNode*
 dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day)
 {
-    const DbrKey key = dbr_book_key(cid, settl_day);
+    const DbrKey key = dbr_view_key(cid, settl_day);
     return dbr_tree_find(&clnt->views, key);
 }
 

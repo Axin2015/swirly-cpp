@@ -108,19 +108,13 @@ enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
 static inline void
 insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
 {
-    dbr_tree_insert(posnups, (DbrKey)posn, &posn->update_node_);
-}
-
-static inline void
-insert_bookup(struct DbrTree* bookups, struct DbrBook* book)
-{
-    dbr_tree_insert(bookups, (DbrKey)book, &book->update_node_);
+    const DbrKey key = dbr_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
+    dbr_tree_insert(posnups, key, &posn->update_node_);
 }
 
 static inline struct DbrBook*
-get_book(DbrServ serv, DbrIden cid, DbrJd settl_day)
+get_book(DbrServ serv, DbrKey key)
 {
-    const DbrKey key = dbr_book_key(cid, settl_day);
 	struct DbrRbNode* node = dbr_tree_find(&serv->books, key);
     return node ? serv_book_entry(node) : NULL;
 }
@@ -587,7 +581,8 @@ dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book
 
     // Final commit phase cannot fail.
     fig_accnt_emplace_order(user, new_order);
-    insert_bookup(&serv->bookups, book);
+    const DbrKey key = dbr_book_key(book->crec->id, book->settl_day);
+    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
     // Commit trans to cycle and free matches.
     commit_trans(serv, user, book, &trans, now);
     return new_order;
@@ -650,10 +645,11 @@ dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
+    const DbrKey key = dbr_book_key(order->c.contr.rec->id, order->c.settl_day);
+    struct DbrBook* book = get_book(serv, key);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    insert_bookup(&serv->bookups, book);
+    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
@@ -707,10 +703,11 @@ dbr_serv_revise_ref(DbrServ serv, DbrAccnt user, const char* ref, DbrLots lots)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
+    const DbrKey key = dbr_book_key(order->c.contr.rec->id, order->c.settl_day);
+    struct DbrBook* book = get_book(serv, key);
     assert(book);
     dbr_book_revise(book, order, lots, now);
-    insert_bookup(&serv->bookups, book);
+    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
@@ -752,10 +749,11 @@ dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
+    const DbrKey key = dbr_book_key(order->c.contr.rec->id, order->c.settl_day);
+    struct DbrBook* book = get_book(serv, key);
     assert(book);
     dbr_book_cancel(book, order, now);
-    insert_bookup(&serv->bookups, book);
+    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
@@ -796,10 +794,11 @@ dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref)
         goto fail2;
 
     // Final commit phase cannot fail.
-    struct DbrBook* book = get_book(serv, order->c.contr.rec->id, order->c.settl_day);
+    const DbrKey key = dbr_book_key(order->c.contr.rec->id, order->c.settl_day);
+    struct DbrBook* book = get_book(serv, key);
     assert(book);
     dbr_book_cancel(book, order, now);
-    insert_bookup(&serv->bookups, book);
+    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
     dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:

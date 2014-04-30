@@ -44,6 +44,21 @@ public:
     {
         return impl_;
     }
+    bool
+    operator ==(ViewRef rhs) const noexcept
+    {
+        return key() == rhs.key();
+    }
+    bool
+    operator !=(ViewRef rhs) const noexcept
+    {
+        return key() != rhs.key();
+    }
+    DbrKey
+    key() const noexcept
+    {
+        return dbr_view_key(impl_->contr.rec->id, impl_->settl_day);
+    }
     ContrRecRef
     crec() const noexcept
     {

@@ -44,6 +44,21 @@ public:
     {
         return impl_;
     }
+    bool
+    operator ==(PosnRef rhs) const noexcept
+    {
+        return key() == rhs.key();
+    }
+    bool
+    operator !=(PosnRef rhs) const noexcept
+    {
+        return key() != rhs.key();
+    }
+    DbrKey
+    key() const noexcept
+    {
+        return dbr_posn_key(impl_->accnt.rec->id, impl_->contr.rec->id, impl_->settl_day);
+    }
     AccntRecRef
     arec() const noexcept
     {

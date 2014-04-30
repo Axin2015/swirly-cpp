@@ -144,7 +144,7 @@ fig_accnt_reset_group(struct FigAccnt* accnt)
 DBR_EXTERN struct DbrPosn*
 fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 {
-    const DbrKey key = dbr_book_key(posn->contr.rec->id, posn->settl_day);
+    const DbrKey key = dbr_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
     struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
     if (node != &posn->accnt_node_) {
         struct DbrPosn* exist = dbr_accnt_posn_entry(node);
@@ -176,7 +176,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
     assert(crec);
     assert(crec->type == DBR_ENTITY_CONTR);
 
-    const DbrKey key = dbr_book_key(crec->id, settl_day);
+    const DbrKey key = dbr_posn_key(arec->id, crec->id, settl_day);
     struct FigAccnt* accnt = fig_accnt_lazy(arec, ordidx, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
