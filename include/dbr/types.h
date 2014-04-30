@@ -595,9 +595,9 @@ dbr_posn_key(DbrIden aid, DbrIden cid, DbrJd settl_day)
         JD_MASK = (1 << 16) - 1
     };
     // Truncated Julian Day (TJD).
-    settl_day -= 2440000;
+    const DbrJd tjd = dbr_jd_to_tjd(settl_day);
     return ((((DbrKey)aid) & ID_MASK) << 40) | ((((DbrKey)cid) & ID_MASK) << 16)
-        | (((DbrKey)settl_day) & JD_MASK);
+        | (((DbrKey)tjd) & JD_MASK);
 }
 
 static inline struct DbrPosn*
@@ -658,8 +658,8 @@ dbr_view_key(DbrIden cid, DbrJd settl_day)
         JD_MASK = (1 << 16) - 1
     };
     // Truncated Julian Day (TJD).
-    settl_day -= 2440000;
-    return ((((DbrKey)cid) & ID_MASK) << 16) | (((DbrKey)settl_day) & JD_MASK);
+    const DbrJd tjd = dbr_jd_to_tjd(settl_day);
+    return ((((DbrKey)cid) & ID_MASK) << 16) | (((DbrKey)tjd) & JD_MASK);
 }
 
 static inline struct DbrView*
@@ -720,8 +720,8 @@ dbr_book_key(DbrIden cid, DbrJd settl_day)
         JD_MASK = (1 << 16) - 1
     };
     // Truncated Julian Day (TJD).
-    settl_day -= 2440000;
-    return ((((DbrKey)cid) & ID_MASK) << 16) | (((DbrKey)settl_day) & JD_MASK);
+    const DbrJd tjd = dbr_jd_to_tjd(settl_day);
+    return ((((DbrKey)cid) & ID_MASK) << 16) | (((DbrKey)tjd) & JD_MASK);
 }
 
 /** @} */

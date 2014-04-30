@@ -14,6 +14,7 @@ cdef extern from "dbr/defs.h":
 
 cdef extern from "dbr/date.h":
 
+    ctypedef int DbrIsoDate
     ctypedef int DbrJd
 
     ctypedef struct DbrYmd:
@@ -21,17 +22,21 @@ cdef extern from "dbr/date.h":
         int mon
         int mday
 
+    DbrIsoDate dbr_ymd_to_iso(int year, int mon, int mday) nogil
+
+    DbrYmd* dbr_iso_to_ymd(DbrIsoDate iso, DbrYmd* ymd) nogil
+
     DbrJd dbr_ymd_to_jd(int year, int mon, int mday) nogil
 
-    void dbr_jd_to_ymd(DbrJd jd, DbrYmd* ymd) nogil
+    DbrYmd* dbr_jd_to_ymd(DbrJd jd, DbrYmd* ymd) nogil
 
-    DbrJd dbr_ymd_to_mjd(int year, int mon, int mday) nogil
+    DbrJd dbr_jd_to_mjd(DbrJd jd) nogil
 
-    void dbr_mjd_to_ymd(DbrJd mjd, DbrYmd* ymd) nogil
+    DbrJd dbr_mjd_to_jd(DbrJd mjd) nogil
 
-    DbrJd dbr_ymd_to_tjd(int year, int mon, int mday) nogil
+    DbrJd dbr_jd_to_tjd(DbrJd jd) nogil
 
-    void dbr_tjd_to_ymd(DbrJd tjd, DbrYmd* ymd) nogil
+    DbrJd dbr_tjd_to_jd(DbrJd tjd) nogil
 
 cdef extern from "dbr/rbnode.h":
 

@@ -18,10 +18,18 @@
 #ifndef DBR_DATE_H
 #define DBR_DATE_H
 
+#include <assert.h>
+
 /**
  * @addtogroup Date
  * @{
  */
+
+/**
+ * ISO8601 date in yyymmdd format.
+ */
+
+typedef int DbrIsoDate;
 
 /**
  * Julian day.
@@ -49,6 +57,31 @@ struct DbrYmd {
 };
 
 /**
+ * Gregorian to ISO8601 date.
+ */
+
+static inline DbrIsoDate
+dbr_ymd_to_iso(int year, int mon, int mday)
+{
+    assert(mon <= 12);
+    assert(mday <= 31);
+    return year * 10000 + mon * 100 + mday;
+}
+
+/**
+ * ISO8601 to Gregorian date.
+ */
+
+static inline struct DbrYmd*
+dbr_iso_to_ymd(DbrIsoDate iso, struct DbrYmd* ymd)
+{
+    ymd->year = iso / 10000;
+    ymd->mon = iso / 100 % 100;
+    ymd->mday = iso % 100;
+    return ymd;
+}
+
+/**
  * Gregorian date to Julian day.
  */
 
@@ -69,7 +102,7 @@ dbr_ymd_to_jd(int year, int mon, int mday)
  * Julian day to Gregorian date.
  */
 
-static inline void
+static inline struct DbrYmd*
 dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
 {
     // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
@@ -90,39 +123,40 @@ dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
     ymd->year = i;
     ymd->mon = j;
     ymd->mday = k;
+    return ymd;
 }
 
 /**
- * Gregorian date to Modified Julian day.
+ * Juilian day to Modified Julian day.
  * Epoch is November 17, 1858.
  */
 
 static inline DbrJd
-dbr_ymd_to_mjd(int year, int mon, int mday)
+dbr_jd_to_mjd(DbrJd jd)
 {
-    return dbr_ymd_to_jd(year, mon, mday) - 2400000;
+    return jd - 2400000;
 }
 
 /**
- * Modified Julian day to Gregorian date.
+ * Modified Julian day to Julian day.
  * Epoch is November 17, 1858.
  */
 
-static inline void
-dbr_mjd_to_ymd(DbrJd mjd, struct DbrYmd* ymd)
+static inline DbrJd
+dbr_mjd_to_jd(DbrJd mjd)
 {
-    return dbr_mjd_to_ymd(mjd + 2400000, ymd);
+    return mjd + 2400000;
 }
 
 /**
- * Gregorian date to Truncated Julian day.
+ * Julian day to Truncated Julian day.
  * Epoch is May 24, 1968.
  */
 
 static inline DbrJd
-dbr_ymd_to_tjd(int year, int mon, int mday)
+dbr_jd_to_tjd(DbrJd jd)
 {
-    return dbr_ymd_to_jd(year, mon, mday) - 2440000;
+    return jd - 2440000;
 }
 
 /**
@@ -130,10 +164,10 @@ dbr_ymd_to_tjd(int year, int mon, int mday)
  * Epoch is May 24, 1968.
  */
 
-static inline void
-dbr_tjd_to_ymd(DbrJd tjd, struct DbrYmd* ymd)
+static inline DbrJd
+dbr_tjd_to_jd(DbrJd tjd)
 {
-    return dbr_mjd_to_ymd(tjd + 2440000, ymd);
+    return tjd + 2440000;
 }
 
 /** @} */

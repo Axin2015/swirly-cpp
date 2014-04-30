@@ -32,55 +32,55 @@ from inspect import currentframe, getframeinfo
 
 ERRMSG_MAX = DBR_ERRMSG_MAX
 
-# Date
+# Iso Date
+
+def ymd_to_iso(int year, int mon, int mday):
+    return dbr_ymd_to_iso(year, mon, mday)
+
+def date_to_iso(dt):
+    return dbr_ymd_to_iso(dt.year, dt.month, dt.day)
+
+def iso_to_ymd(DbrIsoDate iso):
+    cdef DbrpyYmd ymd
+    dbr_iso_to_ymd(iso, &ymd)
+    return (ymd.year, ymd.mon, ymd.mday)
+
+def iso_to_date(DbrIsoDate iso):
+    cdef DbrpyYmd ymd
+    dbr_iso_to_ymd(iso, &ymd)
+    return datetime.date(ymd.year, ymd.mon, ymd.mday)
+
+# Julian Day.
 
 def ymd_to_jd(int year, int mon, int mday):
     return dbr_ymd_to_jd(year, mon, mday)
+
+def date_to_jd(dt):
+    return dbr_ymd_to_jd(dt.year, dt.month, dt.day)
 
 def jd_to_ymd(DbrJd jd):
     cdef DbrpyYmd ymd
     dbr_jd_to_ymd(jd, &ymd)
     return (ymd.year, ymd.mon, ymd.mday)
 
-def ymd_to_mjd(int year, int mon, int mday):
-    return dbr_ymd_to_mjd(year, mon, mday)
-
-def mjd_to_ymd(DbrJd mjd):
-    cdef DbrpyYmd ymd
-    dbr_mjd_to_ymd(mjd, &ymd)
-    return (ymd.year, ymd.mon, ymd.mday)
-
-def ymd_to_tjd(int year, int mon, int mday):
-    return dbr_ymd_to_tjd(year, mon, mday)
-
-def tjd_to_ymd(DbrJd tjd):
-    cdef DbrpyYmd ymd
-    dbr_tjd_to_ymd(tjd, &ymd)
-    return (ymd.year, ymd.mon, ymd.mday)
-
-def date_to_jd(dt):
-    return dbr_ymd_to_jd(dt.year, dt.month, dt.day)
-
 def jd_to_date(DbrJd jd):
     cdef DbrpyYmd ymd
     dbr_jd_to_ymd(jd, &ymd)
     return datetime.date(ymd.year, ymd.mon, ymd.mday)
 
-def date_to_mjd(dt):
-    return dbr_ymd_to_mjd(dt.year, dt.month, dt.day)
+# Julian Conversions.
 
-def mjd_to_date(DbrJd mjd):
-    cdef DbrpyYmd ymd
-    dbr_mjd_to_ymd(mjd, &ymd)
-    return datetime.date(ymd.year, ymd.mon, ymd.mday)
+def jd_to_mjd(DbrJd jd):
+    return dbr_jd_to_mjd(jd)
 
-def date_to_tjd(dt):
-    return dbr_ymd_to_tjd(dt.year, dt.month, dt.day)
+def mjd_to_jd(DbrJd mjd):
+    return dbr_mjd_to_jd(mjd)
 
-def tjd_to_date(DbrJd tjd):
-    cdef DbrpyYmd ymd
-    dbr_tjd_to_ymd(tjd, &ymd)
-    return datetime.date(ymd.year, ymd.mon, ymd.mday)
+def jd_to_tjd(DbrJd jd):
+    return dbr_jd_to_tjd(jd)
+
+def tjd_to_jd(DbrJd tjd):
+    return dbr_tjd_to_jd(tjd)
 
 # Err
 
