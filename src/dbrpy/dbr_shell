@@ -26,6 +26,12 @@ STATES = {
     STATE_TRADE: 'TRADE'
 }
 
+def iso_to_jd(iso):
+    return ymd_to_jd(*iso_to_ymd(int(iso)))
+
+def jd_to_iso(jd):
+    return ymd_to_iso(*jd_to_ymd(jd))
+
 def get_arec_id(clnt, id):
     arec = clnt.find_rec_id(ENTITY_ACCNT, id)
     if not arec:
@@ -256,7 +262,7 @@ class OrdersRequest(object):
             'umnem': urec.mnem,
             'gmnem': grec.mnem,
             'cmnem': crec.mnem,
-            'settl_date': order.settl_date,
+            'settl_date': jd_to_iso(order.settl_day),
             'ref': order.ref,
             'state': STATES[order.state],
             'action': ACTIONS[order.action],
@@ -292,7 +298,7 @@ class TradesRequest(object):
             'umnem': urec.mnem,
             'gmnem': grec.mnem,
             'cmnem': crec.mnem,
-            'settl_date': exc.settl_date,
+            'settl_date': jd_to_iso(exc.settl_day),
             'ref': exc.ref,
             'state': STATES[exc.state],
             'action': ACTIONS[exc.action],
@@ -328,7 +334,7 @@ class PosnsRequest(object):
         return {
             'gnnem': grec.mnem,
             'cmnem': crec.mnem,
-            'settl_date': posn.settl_date,
+            'settl_date': jd_to_iso(posn.settl_day),
             'buy_price': buy_ticks * crec.price_inc,
             'buy_lots': posn.buy_lots,
             'sell_price': sell_ticks * crec.price_inc,
@@ -350,7 +356,7 @@ class LevelsRequest(object):
         crec = get_crec_id(clnt, view.cid)
         return {
             'cmnem': crec.mnem,
-            'settl_date': view.settl_date,
+            'settl_date': jd_to_iso(view.settl_day),
             'level': i + 1,
             'bid_price': crec.ticks_to_price(view.list_bid[i].ticks),
             'bid_lots': view.list_bid[i].lots,
@@ -361,11 +367,11 @@ class LevelsRequest(object):
         }
     def __init__(self, cmnem, settl_date):
         self.cmnem = cmnem
-        self.settl_date = int(settl_date)
+        self.settl_day = iso_to_jd(settl_date)
     def __call__(self, clnt):
         levels = []
         crec = get_crec_mnem(clnt, self.cmnem)
-        view = clnt.find_view(crec.id, self.settl_date)
+        view = clnt.find_view(crec.id, self.settl_day)
         if view:
             for i in range(3):
                 levels.append(LevelsRequest.to_dict(clnt, view, i))
@@ -377,7 +383,7 @@ class ViewsRequest(object):
         crec = get_crec_id(clnt, view.cid)
         return {
             'cmnem': crec.mnem,
-            'settl_date': view.settl_date,
+            'settl_date': jd_to_iso(view.settl_day),
             'level': i + 1,
             'bid_price': crec.ticks_to_price(view.list_bid[i].ticks),
             'bid_lots': view.list_bid[i].lots,
@@ -388,7 +394,7 @@ class ViewsRequest(object):
         }
     def __init__(self, cmnems, settl_dates):
         self.cmnems = set(cmnems)
-        self.settl_dates = {int(x) for x in settl_dates}
+        self.settl_days = {iso_to_jd(x) for x in settl_dates}
     def __call__(self, clnt):
         cids = set()
         for cmnem in self.cmnems:
@@ -396,11 +402,11 @@ class ViewsRequest(object):
             cids.add(crec.id)
         views = []
         if cids:
-            if self.settl_dates:
-                # Cids and settl_dates.
+            if self.settl_days:
+                # Cids and settl_days.
                 for cid in cids:
-                    for settl_date in self.settl_dates:
-                        view = clnt.find_view(crec.id, settl_date)
+                    for settl_day in self.settl_days:
+                        view = clnt.find_view(crec.id, settl_day)
                         if view:
                             views.append(ViewsRequest.to_dict(clnt, view, 0))
             else:
@@ -408,12 +414,12 @@ class ViewsRequest(object):
                 views = [ViewsRequest.to_dict(clnt, view, 0) for view in clnt.list_view()
                          if view.cid in cids]
         else:
-            if self.settl_dates:
-                # Settl_dates only.
+            if self.settl_days:
+                # Settl_days only.
                 views = [ViewsRequest.to_dict(clnt, view, 0) for view in clnt.list_view()
-                         if view.settl_date in self.settl_dates]
+                         if view.settl_day in self.settl_days]
             else:
-                # Neither cids nor settl_dates.
+                # Neither cids nor settl_days.
                 views = [ViewsRequest.to_dict(clnt, view, 0) for view in clnt.list_view()]
         return views
 
@@ -422,7 +428,7 @@ class PlaceRequest(object):
         self.umnem = umnem
         self.gmnem = gmnem
         self.cmnem = cmnem
-        self.settl_date = settl_date
+        self.settl_day = iso_to_jd(settl_date)
         self.ref = ref
         self.action = action
         self.price = price
@@ -435,7 +441,7 @@ class PlaceRequest(object):
         group = clnt.accnt(grec)
         crec = get_crec_mnem(clnt, self.cmnem)
         ticks = crec.price_to_ticks(self.price)
-        return clnt.place(user, group, crec, self.settl_date, self.ref,
+        return clnt.place(user, group, crec, self.settl_day, self.ref,
                           self.action, ticks, self.lots, self.min_lots)
 
 class ReviseRequest(object):
