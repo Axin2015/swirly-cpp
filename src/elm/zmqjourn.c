@@ -21,6 +21,7 @@
 #include "pool.h"
 
 #include <dbr/err.h>
+#include <dbr/refcount.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -210,7 +211,7 @@ start_routine(void* arg)
         case DBR_INSERT_EXEC_REQ:
             if (!dbr_journ_insert_exec(journ, body.insert_exec_req.exec, DBR_FALSE))
                 dbr_err_perror("dbr_journ_insert_exec() failed");
-            elm_pool_free_exec(&pool, body.insert_exec_req.exec);
+            dbr_exec_decref(body.insert_exec_req.exec, &pool);
             break;
         case DBR_UPDATE_EXEC_REQ:
             if (!dbr_journ_update_exec(journ, body.update_exec_req.id,
