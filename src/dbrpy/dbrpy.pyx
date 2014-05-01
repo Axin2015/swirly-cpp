@@ -533,6 +533,8 @@ cdef object async_recv(DbrAsync async):
         ret = dbr_async_recv(async, &val)
     if ret == DBR_FALSE:
         raise Error()
+    # Casting to a Python object here will increase the reference
+    # count to >= 2.
     return <object>val
 
 cdef class Async(object):
@@ -551,16 +553,19 @@ cdef class Async(object):
             dbr_async_destroy(self.impl_)
 
     def send(self, object val):
+        # Retain reference before passing plain pointer to dbr_async_send().
         Py_INCREF(val)
         cdef DbrBool ret
         with nogil:
             ret = dbr_async_send(self.impl_, <PyObject*>val)
         if ret == DBR_FALSE:
+            # If send failed, then release reference.
             Py_DECREF(val)
             raise Error()
 
     def recv(self):
         cdef object val = async_recv(self.impl_)
+        # Decrement additional reference from async_recv().
         Py_DECREF(val)
         # Re-raise exceptions on asynchronous thread.
         if isinstance(val, Exception):
