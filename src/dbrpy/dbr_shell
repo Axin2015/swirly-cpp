@@ -140,7 +140,6 @@ def worker(ctx, uuid):
         try:
             if not clnt.dispatch(TMOUT, handler):
                 break
-            clnt.clear()
         except Error as e:
             log_error('error: ' + str(e))
 

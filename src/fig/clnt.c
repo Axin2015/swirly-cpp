@@ -89,10 +89,7 @@ struct FigClnt {
     unsigned state;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
-    struct DbrQueue execs;
     struct DbrTree views;
-    struct DbrTree posnups;
-    struct DbrTree viewups;
     struct DbrPrioq prioq;
     DbrMillis mdlast;
     // Internal request-id for open or close.
@@ -291,8 +288,6 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
     assert(user);
     // Transfer ownership.
     fig_accnt_emplace_order(user, order);
-    dbr_exec_incref(exec);
-    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
     return DBR_TRUE;
 }
 
@@ -320,8 +315,6 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
         // Transfer ownership.
         fig_accnt_insert_trade(user, exec);
     }
-    dbr_exec_incref(exec);
-    dbr_queue_insert_back(&clnt->execs, &exec->shared_node_);
     return DBR_TRUE;
 }
 
@@ -335,7 +328,6 @@ apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
         return NULL;
     }
     posn = fig_accnt_update_posn(accnt, posn);
-    insert_posnup(&clnt->posnups, posn);
     return posn;
 }
 
@@ -373,7 +365,6 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
         dbr_pool_free_view(clnt->pool, view);
         view = exist;
     }
-    dbr_tree_insert(&clnt->viewups, key, &view->update_node_);
     return view;
 }
 
@@ -428,10 +419,8 @@ sess_reset(DbrClnt clnt)
     fig_cache_reset(&clnt->cache);
     fig_ordidx_init(&clnt->ordidx);
     free_views(&clnt->views, clnt->pool);
-    dbr_clnt_clear(clnt); // viewups, execs and posnups.
     dbr_prioq_reset(&clnt->prioq);
     clnt->mdlast = 0;
-    dbr_clnt_clear(clnt);
 }
 
 static DbrIden
@@ -545,11 +534,8 @@ dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* t
     // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
-    dbr_queue_init(&clnt->execs);
     // 7.
     dbr_tree_init(&clnt->views);
-    dbr_tree_init(&clnt->posnups);
-    dbr_tree_init(&clnt->viewups);
     // 8.
     if (!dbr_prioq_init(&clnt->prioq))
         goto fail6;
@@ -607,8 +593,6 @@ DBR_API void
 dbr_clnt_destroy(DbrClnt clnt)
 {
     if (clnt) {
-        // Ensure that executions are freed.
-        dbr_clnt_clear(clnt);
         // 8.
         dbr_prioq_term(&clnt->prioq);
         // 7.
@@ -1177,63 +1161,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
     return -1;
 }
 
-DBR_API void
-dbr_clnt_clear_md(DbrClnt clnt)
-{
-    dbr_tree_init(&clnt->viewups);
-}
-
-DBR_API void
-dbr_clnt_clear_tr(DbrClnt clnt)
-{
-    struct DbrSlNode* node = clnt->execs.first;
-    while (node) {
-        struct DbrExec* exec = dbr_clnt_exec_entry(node);
-        node = node->next;
-        // Free completed orders.
-        if (dbr_exec_done(exec)) {
-            DbrAccnt user = exec->c.user.rec->accnt.state;
-            assert(user);
-            struct DbrOrder* order = fig_accnt_release_order_id(user, exec->order);
-            if (order)
-                dbr_pool_free_order(clnt->pool, order);
-        }
-        dbr_exec_decref(exec, clnt->pool);
-    }
-    dbr_queue_init(&clnt->execs);
-    dbr_tree_init(&clnt->posnups);
-}
-
-DBR_API struct DbrSlNode*
-dbr_clnt_first_exec(DbrClnt clnt)
-{
-    return dbr_queue_first(&clnt->execs);
-}
-
-DBR_API DbrBool
-dbr_clnt_empty_exec(DbrClnt clnt)
-{
-    return dbr_queue_empty(&clnt->execs);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_first_posnup(DbrClnt clnt)
-{
-    return dbr_tree_first(&clnt->posnups);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_last_posnup(DbrClnt clnt)
-{
-    return dbr_tree_last(&clnt->posnups);
-}
-
-DBR_API DbrBool
-dbr_clnt_empty_posnup(DbrClnt clnt)
-{
-    return dbr_tree_empty(&clnt->posnups);
-}
-
 DBR_API struct DbrRbNode*
 dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day)
 {
@@ -1257,24 +1184,6 @@ DBR_API DbrBool
 dbr_clnt_empty_view(DbrClnt clnt)
 {
     return dbr_tree_empty(&clnt->views);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_first_viewup(DbrClnt clnt)
-{
-    return dbr_tree_first(&clnt->viewups);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_last_viewup(DbrClnt clnt)
-{
-    return dbr_tree_last(&clnt->viewups);
-}
-
-DBR_API DbrBool
-dbr_clnt_empty_viewup(DbrClnt clnt)
-{
-    return dbr_tree_empty(&clnt->viewups);
 }
 
 DBR_API const unsigned char*

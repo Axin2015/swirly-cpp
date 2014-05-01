@@ -442,16 +442,6 @@
  */
 
 /**
- * @defgroup ClntExec Execution
- * @ingroup Clnt
- */
-
-/**
- * @defgroup ClntPosn Position
- * @ingroup Clnt
- */
-
-/**
  * @defgroup ClntView View
  * @ingroup Clnt
  */

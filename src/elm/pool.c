@@ -216,7 +216,7 @@ elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* firs
         while (node) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
             node = node->next;
-            // Inline version of dbr_exec_decref() to avoid cycle.
+            // Inline version of dbr_exec_decref() to avoid cyclic dependency.
             assert(exec->refs_ >= 1);
             if (--exec->refs_ == 0)
                 dbr_pool_free_exec(pool, exec);

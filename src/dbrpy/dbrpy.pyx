@@ -930,15 +930,6 @@ cdef class Clnt(object):
             raise Error()
         return <bint>ret;
 
-    def clear_md(self):
-        dbr_clnt_clear_md(self.impl_)
-
-    def clear_tr(self):
-        dbr_clnt_clear_tr(self.impl_)
-
-    def clear(self):
-        dbr_clnt_clear(self.impl_)
-
     def find_view(self, DbrIden cid, DbrJd settl_day):
         cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_day)
         return make_view(dbr_clnt_view_entry(node)) if node is not NULL else None

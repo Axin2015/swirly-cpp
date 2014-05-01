@@ -489,12 +489,6 @@ cdef extern from "dbr/clnt.h":
 
     int dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
 
-    void dbr_clnt_clear_md(DbrClnt clnt) nogil
-
-    void dbr_clnt_clear_tr(DbrClnt clnt) nogil
-
-    void dbr_clnt_clear(DbrClnt clnt) nogil
-
     DbrView* dbr_clnt_view_entry(DbrRbNode* node) nogil
 
     DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day) nogil

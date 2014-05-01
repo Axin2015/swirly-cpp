@@ -167,72 +167,6 @@ DBR_API int
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 /**
- * Clear view updates.
- */
-
-DBR_API void
-dbr_clnt_clear_md(DbrClnt clnt);
-
-/**
- * Clear completed orders, executions and position updates.
- */
-
-DBR_API void
-dbr_clnt_clear_tr(DbrClnt clnt);
-
-static inline void
-dbr_clnt_clear(DbrClnt clnt)
-{
-    dbr_clnt_clear_md(clnt);
-    dbr_clnt_clear_tr(clnt);
-}
-
-/**
- * @addtogroup ClntExec
- * @{
- */
-
-#define DBR_CLNT_END_EXEC NULL
-
-static inline struct DbrExec*
-dbr_clnt_exec_entry(struct DbrSlNode* node)
-{
-    return dbr_implof(struct DbrExec, shared_node_, node);
-}
-
-DBR_API struct DbrSlNode*
-dbr_clnt_first_exec(DbrClnt clnt);
-
-DBR_API DbrBool
-dbr_clnt_empty_exec(DbrClnt clnt);
-
-/** @} */
-
-/**
- * @addtogroup ClntPosn
- * @{
- */
-
-#define DBR_CLNT_END_POSNUP NULL
-
-static inline struct DbrPosn*
-dbr_clnt_posnup_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrPosn, update_node_, node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_first_posnup(DbrClnt clnt);
-
-DBR_API struct DbrRbNode*
-dbr_clnt_last_posnup(DbrClnt clnt);
-
-DBR_API DbrBool
-dbr_clnt_empty_posnup(DbrClnt clnt);
-
-/** @} */
-
-/**
  * @addtogroup ClntView
  * @{
  */
@@ -256,23 +190,6 @@ dbr_clnt_last_view(DbrClnt clnt);
 
 DBR_API DbrBool
 dbr_clnt_empty_view(DbrClnt clnt);
-
-#define DBR_CLNT_END_VIEWUP NULL
-
-static inline struct DbrView*
-dbr_clnt_viewup_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrView, update_node_, node);
-}
-
-DBR_API struct DbrRbNode*
-dbr_clnt_first_viewup(DbrClnt clnt);
-
-DBR_API struct DbrRbNode*
-dbr_clnt_last_viewup(DbrClnt clnt);
-
-DBR_API DbrBool
-dbr_clnt_empty_viewup(DbrClnt clnt);
 
 /** @} */
 
