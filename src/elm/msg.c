@@ -32,10 +32,11 @@
 
 static const char STATUS_REP_FORMAT[] = "is";
 static const char PLACE_ORDER_REQ_FORMAT[] = "lllisilll";
-static const char CANCEL_ORDER_ID_REQ_FORMAT[] = "ll";
-static const char CANCEL_ORDER_REF_REQ_FORMAT[] = "ls";
 static const char REVISE_ORDER_ID_REQ_FORMAT[] = "lll";
 static const char REVISE_ORDER_REF_REQ_FORMAT[] = "lsl";
+static const char CANCEL_ORDER_ID_REQ_FORMAT[] = "ll";
+static const char CANCEL_ORDER_REF_REQ_FORMAT[] = "ls";
+static const char ACK_TRADE_REQ_FORMAT[] = "ll";
 static const char UPDATE_EXEC_REQ_FORMAT[] = "li";
 
 static void
@@ -305,7 +306,9 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
                           DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
-        n += dbr_packlenl(body->ack_trade_req.id);
+        n += dbr_packlenf(ACK_TRADE_REQ_FORMAT,
+                          body->ack_trade_req.uid,
+                          body->ack_trade_req.id);
         break;
     case DBR_READ_ENTITY_REQ:
         n += dbr_packleni(body->read_entity_req.type);
@@ -439,7 +442,7 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         buf = dbr_packf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
-                        body->cancel_order_ref_req.uid,
+                        body->cancel_order_id_req.uid,
                         body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
@@ -448,7 +451,9 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
                         DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
-        buf = dbr_packl(buf, body->ack_trade_req.id);
+        buf = dbr_packf(buf, ACK_TRADE_REQ_FORMAT,
+                        body->ack_trade_req.uid,
+                        body->ack_trade_req.id);
         break;
     case DBR_READ_ENTITY_REQ:
         buf = dbr_packi(buf, body->read_entity_req.type);
@@ -655,7 +660,9 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         break;
     case DBR_ACK_TRADE_REQ:
-        if (!(buf = dbr_unpackl(buf, &body->ack_trade_req.id)))
+        if (!(buf = dbr_unpackf(buf, ACK_TRADE_REQ_FORMAT,
+                                &body->ack_trade_req.uid,
+                                &body->ack_trade_req.id)))
             goto fail1;
         break;
     case DBR_READ_ENTITY_REQ:
