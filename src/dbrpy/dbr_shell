@@ -140,14 +140,14 @@ class UserRequest(object):
             'uid': memb.uid,
             'gid': memb.gid
         }
-    def __init__(self, umnem):
-        self.umnem = umnem
+    def __init__(self, amnem):
+        self.amnem = amnem
     def __call__(self, clnt):
         membs = []
-        urec = get_arec_mnem(clnt, self.umnem)
-        user = clnt.accnt(urec)
+        arec = get_arec_mnem(clnt, self.amnem)
+        accnt = clnt.accnt(arec)
         membs = [UserRequest.to_dict(clnt, memb)
-                 for memb in user.list_user()]
+                 for memb in accnt.list_user()]
         return membs
 
 class GroupRequest(object):
@@ -157,14 +157,14 @@ class GroupRequest(object):
             'uid': memb.uid,
             'gid': memb.gid
         }
-    def __init__(self, umnem):
-        self.umnem = umnem
+    def __init__(self, amnem):
+        self.amnem = amnem
     def __call__(self, clnt):
         membs = []
-        urec = get_arec_mnem(clnt, self.umnem)
-        user = clnt.accnt(urec)
+        arec = get_arec_mnem(clnt, self.amnem)
+        accnt = clnt.accnt(arec)
         membs = [GroupRequest.to_dict(clnt, memb)
-                 for memb in user.list_group()]
+                 for memb in accnt.list_group()]
         return membs
 
 class OrderRequest(object):
