@@ -136,9 +136,11 @@ class LogoffRequest(object):
 class UserRequest(object):
     @staticmethod
     def to_dict(clnt, memb):
+        urec = get_arec_id(clnt, memb.uid)
+        grec = get_arec_id(clnt, memb.gid)
         return {
-            'uid': memb.uid,
-            'gid': memb.gid
+            'umnem': urec.mnem,
+            'gmnem': grec.mnem
         }
     def __init__(self, amnem):
         self.amnem = amnem
@@ -153,9 +155,11 @@ class UserRequest(object):
 class GroupRequest(object):
     @staticmethod
     def to_dict(clnt, memb):
+        urec = get_arec_id(clnt, memb.uid)
+        grec = get_arec_id(clnt, memb.gid)
         return {
-            'uid': memb.uid,
-            'gid': memb.gid
+            'umnem': urec.mnem,
+            'gmnem': grec.mnem
         }
     def __init__(self, amnem):
         self.amnem = amnem
@@ -502,12 +506,12 @@ print_contr = make_table([
     '>max_lots'])
 
 print_user = make_table([
-    '<uid',
-    '<gid'])
+    '<umnem',
+    '<gmnem'])
 
 print_group = make_table([
-    '<uid',
-    '<gid'])
+    '<umnem',
+    '<gmnem'])
 
 print_order = make_table([
     '<id',
