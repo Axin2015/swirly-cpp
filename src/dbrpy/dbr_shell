@@ -299,18 +299,17 @@ class LevelRequest(object):
 
 class ViewRequest(object):
     @staticmethod
-    def to_dict(clnt, view,  i):
+    def to_dict(clnt, view):
         crec = get_crec_id(clnt, view.cid)
         return {
             'cmnem': crec.mnem,
             'settl_date': jd_to_iso(view.settl_day),
-            'level': i + 1,
-            'bid_price': crec.ticks_to_price(view.list_bid[i].ticks),
-            'bid_lots': view.list_bid[i].lots,
-            'bid_count': view.list_bid[i].count,
-            'offer_price': crec.ticks_to_price(view.list_offer[i].ticks),
-            'offer_lots': view.list_offer[i].lots,
-            'offer_count': view.list_offer[i].count
+            'bid_price': crec.ticks_to_price(view.list_bid[0].ticks),
+            'bid_lots': view.list_bid[0].lots,
+            'bid_count': view.list_bid[0].count,
+            'offer_price': crec.ticks_to_price(view.list_offer[0].ticks),
+            'offer_lots': view.list_offer[0].lots,
+            'offer_count': view.list_offer[0].count
         }
     def __init__(self, cmnems, settl_dates):
         self.cmnems = set(cmnems)
@@ -328,19 +327,19 @@ class ViewRequest(object):
                     for settl_day in self.settl_days:
                         view = clnt.find_view(crec.id, settl_day)
                         if view:
-                            views.append(ViewRequest.to_dict(clnt, view, 0))
+                            views.append(ViewRequest.to_dict(clnt, view))
             else:
                 # Cids only.
-                views = [ViewRequest.to_dict(clnt, view, 0) for view in clnt.list_view()
+                views = [ViewRequest.to_dict(clnt, view) for view in clnt.list_view()
                          if view.cid in cids]
         else:
             if self.settl_days:
                 # Settl_days only.
-                views = [ViewRequest.to_dict(clnt, view, 0) for view in clnt.list_view()
+                views = [ViewRequest.to_dict(clnt, view) for view in clnt.list_view()
                          if view.settl_day in self.settl_days]
             else:
                 # Neither cids nor settl_days.
-                views = [ViewRequest.to_dict(clnt, view, 0) for view in clnt.list_view()]
+                views = [ViewRequest.to_dict(clnt, view) for view in clnt.list_view()]
         return views
 
 class PlaceRequest(object):
@@ -566,7 +565,6 @@ print_level = make_table([
 print_view = make_table([
     '<cmnem',
     '<settl_date',
-    '>level',
     '>bid_price',
     '>bid_lots',
     '>bid_count',
