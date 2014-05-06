@@ -139,8 +139,8 @@ class UserRequest(object):
         urec = get_arec_id(clnt, memb.uid)
         grec = get_arec_id(clnt, memb.gid)
         return {
-            'umnem': urec.mnem,
-            'gmnem': grec.mnem
+            'user': urec.mnem,
+            'group': grec.mnem
         }
     def __init__(self, amnem):
         self.amnem = amnem
@@ -158,8 +158,8 @@ class GroupRequest(object):
         urec = get_arec_id(clnt, memb.uid)
         grec = get_arec_id(clnt, memb.gid)
         return {
-            'umnem': urec.mnem,
-            'gmnem': grec.mnem
+            'user': urec.mnem,
+            'group': grec.mnem
         }
     def __init__(self, amnem):
         self.amnem = amnem
@@ -179,9 +179,9 @@ class OrderRequest(object):
         crec = get_crec_id(clnt, order.cid)
         return {
             'id': order.id,
-            'umnem': urec.mnem,
-            'gmnem': grec.mnem,
-            'cmnem': crec.mnem,
+            'user': urec.mnem,
+            'group': grec.mnem,
+            'contr': crec.mnem,
             'settl_date': jd_to_iso(order.settl_day),
             'ref': order.ref,
             'state': STATES[order.state],
@@ -215,9 +215,9 @@ class TradeRequest(object):
         return {
             'id': exc.id,
             'order': exc.order,
-            'umnem': urec.mnem,
-            'gmnem': grec.mnem,
-            'cmnem': crec.mnem,
+            'user': urec.mnem,
+            'group': grec.mnem,
+            'contr': crec.mnem,
             'settl_date': jd_to_iso(exc.settl_day),
             'ref': exc.ref,
             'state': STATES[exc.state],
@@ -230,7 +230,7 @@ class TradeRequest(object):
             'last_lots': exc.last_lots,
             'min_lots': exc.min_lots,
             'match': exc.match,
-            'role':  ROLES[exc.role] if exc.state == STATE_TRADE else None,
+            'role': ROLES[exc.role] if exc.state == STATE_TRADE else None,
             'cpty': get_arec_id(clnt, exc.gid).mnem if exc.state == STATE_TRADE else None,
             'created': exc.created
         }
@@ -252,8 +252,8 @@ class PosnRequest(object):
         buy_ticks = float(posn.buy_licks) / posn.buy_lots
         sell_ticks = float(posn.sell_licks) / posn.sell_lots
         return {
-            'gnnem': grec.mnem,
-            'cmnem': crec.mnem,
+            'group': grec.mnem,
+            'contr': crec.mnem,
             'settl_date': jd_to_iso(posn.settl_day),
             'buy_price': buy_ticks * crec.price_inc,
             'buy_lots': posn.buy_lots,
@@ -275,7 +275,7 @@ class LevelRequest(object):
     def to_dict(clnt, view,  i):
         crec = get_crec_id(clnt, view.cid)
         return {
-            'cmnem': crec.mnem,
+            'contr': crec.mnem,
             'settl_date': jd_to_iso(view.settl_day),
             'level': i + 1,
             'bid_price': crec.ticks_to_price(view.list_bid[i].ticks),
@@ -302,7 +302,7 @@ class ViewRequest(object):
     def to_dict(clnt, view):
         crec = get_crec_id(clnt, view.cid)
         return {
-            'cmnem': crec.mnem,
+            'contr': crec.mnem,
             'settl_date': jd_to_iso(view.settl_day),
             'bid_price': crec.ticks_to_price(view.list_bid[0].ticks),
             'bid_lots': view.list_bid[0].lots,
@@ -505,17 +505,17 @@ print_contr = make_table([
     '>max_lots'])
 
 print_user = make_table([
-    '<umnem',
-    '<gmnem'])
+    '<user',
+    '<group'])
 
 print_group = make_table([
-    '<umnem',
-    '<gmnem'])
+    '<user',
+    '<group'])
 
 print_order = make_table([
     '<id',
-    '<gmnem',
-    '<cmnem',
+    '<group',
+    '<contr',
     '<settl_date',
     '<state',
     '<action',
@@ -529,8 +529,8 @@ print_order = make_table([
 print_trade = make_table([
     '<id',
     '<order',
-    '<gmnem',
-    '<cmnem',
+    '<group',
+    '<contr',
     '<settl_date',
     '<state',
     '<action',
@@ -544,7 +544,7 @@ print_trade = make_table([
     '<cpty'])
 
 print_posn = make_table([
-    '<cmnem',
+    '<contr',
     '<settl_date',
     '>buy_price',
     '>buy_lots',
@@ -552,7 +552,7 @@ print_posn = make_table([
     '>sell_lots'])
 
 print_level = make_table([
-    '<cmnem',
+    '<contr',
     '<settl_date',
     '>level',
     '>bid_price',
@@ -563,7 +563,7 @@ print_level = make_table([
     '>offer_count'])
 
 print_view = make_table([
-    '<cmnem',
+    '<contr',
     '<settl_date',
     '>bid_price',
     '>bid_lots',
