@@ -18,13 +18,11 @@
 
 #include "plugin.h"
 
-#include "base.h"
 #include "log.h"
 #include "buffer.h"
+#include "response.h"
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string.h> // strncmp()
 
 /*
   plugin_config
@@ -49,7 +47,10 @@ typedef struct {
 
 typedef struct {
 	PLUGIN_DATA;
-	buffer* match_buf;
+
+	buffer *query_str;
+	array *get_params;
+
 	plugin_config** config_storage;
 	plugin_config conf;
 } plugin_data;
@@ -136,6 +137,50 @@ patch_connection(server* srv, connection* con, plugin_data* p)
 
 #undef PATCH
 
+static int split_get_params(array *get_params, buffer *qrystr) {
+	size_t is_key = 1;
+	size_t i;
+	char *key = NULL, *val = NULL;
+
+	key = qrystr->ptr;
+
+	/* we need the \0 */
+	for (i = 0; i < qrystr->used; i++) {
+		switch(qrystr->ptr[i]) {
+		case '=':
+			if (is_key) {
+				val = qrystr->ptr + i + 1;
+				qrystr->ptr[i] = '\0';
+				is_key = 0;
+			}
+			break;
+		case '&':
+		case '\0': /* fin symbol */
+			if (!is_key) {
+				data_string *ds;
+				/* we need at least a = since the last & */
+
+				/* terminate the value */
+				qrystr->ptr[i] = '\0';
+
+				if (NULL == (ds = (data_string *)array_get_unused_element(get_params,
+                                                                          TYPE_STRING))) {
+					ds = data_string_init();
+				}
+				buffer_copy_string_len(ds->key, key, strlen(key));
+				buffer_copy_string_len(ds->value, val, strlen(val));
+				array_insert_unique(get_params, (data_unset *)ds);
+			}
+
+			key = qrystr->ptr + i + 1;
+			val = NULL;
+			is_key = 1;
+			break;
+		}
+	}
+	return 0;
+}
+
 /*
   init
   ====
@@ -149,8 +194,43 @@ mod_doobry_init()
 {
 	plugin_data* p;
 	p = calloc(1, sizeof(*p));
-	p->match_buf = buffer_init();
+	p->query_str = buffer_init();
+	p->get_params = array_init();
 	return p;
+}
+
+/*
+  free
+  ====
+
+  The free function is called at the end of the life of a plugin and is used to tell the plugin to
+  release all allocated memory. Keep in mind that it is preferred not to let the program termination
+  clean up memory for you. Free what ever you have malloced. Use valgrind or something else to
+  verify your work.
+*/
+
+static handler_t
+mod_doobry_free(server* srv, void* p_d)
+{
+	plugin_data* p = p_d;
+	if (!p)
+        return HANDLER_GO_ON;
+
+	if (p->config_storage) {
+		size_t i;
+		for (i = 0; i < srv->config_context->used; i++) {
+			plugin_config* s = p->config_storage[i];
+
+			if (!s) continue;
+			array_free(s->match);
+			free(s);
+		}
+		free(p->config_storage);
+	}
+	buffer_free(p->query_str);
+	array_free(p->get_params);
+	free(p);
+	return HANDLER_GO_ON;
 }
 
 /*
@@ -173,6 +253,14 @@ mod_doobry_set_defaults(server* srv, void* p_d)
 	plugin_data* p = p_d;
 	size_t i = 0;
 
+    /*
+      Example config:
+
+      doobry.array = (
+        "foo",
+        "bar"
+      )
+    */
 	config_values_t cv[] = {
 		{ "doobry.array",  NULL, T_CONFIG_ARRAY, T_CONFIG_SCOPE_CONNECTION },
 		{ NULL, NULL, T_CONFIG_UNSET, T_CONFIG_SCOPE_UNSET }
@@ -197,39 +285,6 @@ mod_doobry_set_defaults(server* srv, void* p_d)
 			return HANDLER_ERROR;
 		}
 	}
-	return HANDLER_GO_ON;
-}
-
-/*
-  cleanup
-  =======
-
-  The cleanup function is called at the end of the life of a plugin and is used to tell the plugin
-  to release all allocated memory. Keep in mind that it is preferred not to let the program
-  termination clean up memory for you. Free what ever you have malloced. Use valgrind or something
-  else to verify your work.
-*/
-
-static handler_t
-mod_doobry_cleanup(server* srv, void* p_d)
-{
-	plugin_data* p = p_d;
-	if (!p)
-        return HANDLER_GO_ON;
-
-	if (p->config_storage) {
-		size_t i;
-		for (i = 0; i < srv->config_context->used; i++) {
-			plugin_config* s = p->config_storage[i];
-
-			if (!s) continue;
-			array_free(s->match);
-			free(s);
-		}
-		free(p->config_storage);
-	}
-	buffer_free(p->match_buf);
-	free(p);
 	return HANDLER_GO_ON;
 }
 
@@ -289,8 +344,26 @@ mod_doobry_handle_uri(server* srv, connection* con, void* p_d)
 
         // Match tail of URI path with value.
 		if (0 == strncmp(con->uri.path->ptr + s_len - ct_len, ds->value->ptr, ct_len)) {
-			con->http_status = 403;
-			return HANDLER_FINISHED;
+
+			array_reset(p->get_params);
+			buffer_copy_string_buffer(p->query_str, con->uri.query);
+			split_get_params(p->get_params, p->query_str);
+
+            buffer* b = chunkqueue_get_append_buffer(con->write_queue);
+            buffer_append_string_len(b, CONST_STR_LEN("Hello, World\n"));
+
+            data_string* foo = (data_string*)array_get_element(p->get_params, "foo");
+			if (foo) {
+                buffer_append_string_buffer(b, foo->value);
+                buffer_append_string_len(b, CONST_STR_LEN("\n"));
+			}
+
+            response_header_overwrite(srv, con, CONST_STR_LEN("Content-Type"),
+                                      CONST_STR_LEN("text/plain"));
+            con->file_finished = 1;
+
+            con->http_status = 200;
+            return HANDLER_FINISHED;
 		}
 	}
 
@@ -313,8 +386,8 @@ mod_doobry_plugin_init(plugin* p)
 	p->version = LIGHTTPD_VERSION_ID;
 	p->name = buffer_init_string("doobry");
 	p->init = mod_doobry_init;
+	p->cleanup = mod_doobry_free;
 	p->set_defaults = mod_doobry_set_defaults;
-	p->cleanup = mod_doobry_cleanup;
 	p->handle_uri_clean = mod_doobry_handle_uri;
 	p->data = NULL;
 	return 0;
