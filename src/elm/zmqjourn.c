@@ -34,7 +34,7 @@ enum { HWM = 0 };
 
 struct FirZmqJourn {
     void* sock;
-    pthread_t thread;
+    pthread_t child;
     struct DbrIJourn i_journ;
 };
 
@@ -82,9 +82,9 @@ destroy(DbrJourn journ)
     zmq_close(impl->sock);
 
     void* ret;
-    const int err = pthread_join(impl->thread, &ret);
+    const int err = pthread_join(impl->child, &ret);
     if (dbr_unlikely(err)) {
-        dbr_err_printf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
+        dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
     }
     free(impl);
 }
@@ -275,8 +275,8 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
         goto fail4;
     }
 
-    pthread_t thread;
-    const int err = pthread_create(&thread, NULL, start_routine, state);
+    pthread_t child;
+    const int err = pthread_create(&child, NULL, start_routine, state);
     if (dbr_unlikely(err)) {
         dbr_err_setf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
         goto fail4;
@@ -295,20 +295,22 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
             if (dbr_unlikely(body.status_rep.num != 0)) {
                 dbr_err_set(body.status_rep.num, body.status_rep.msg);
                 void* ret;
-                pthread_join(thread, &ret);
+                const int err = pthread_join(impl->child, &ret);
+                if (dbr_unlikely(err)) {
+                    dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
+                }
                 goto fail4;
             }
             break;
-        }
-        if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
+        } else if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
             // This unlikely failure scenario is not easily dealt with, so we simply abort.
             abort();
         }
-        // DBR_EINTR
+        // Continue while DBR_EINTR.
     }
 
     impl->sock = sock;
-    impl->thread = thread;
+    impl->child = child;
     impl->i_journ.vtbl = &JOURN_VTBL;
     return &impl->i_journ;
  fail4:

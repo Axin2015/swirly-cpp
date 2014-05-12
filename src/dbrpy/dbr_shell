@@ -578,10 +578,10 @@ print_env = make_table([
 
 class AsyncClnt(object):
     def __init__(self):
-        uuid = uuid1()
-        log_notice('uuid: {0}'.format(uuid))
         self.env = {}
         self.ctx = ZmqCtx()
+        uuid = uuid1()
+        log_notice('uuid: {0}'.format(uuid))
         self.thread = Thread(target = worker, args = (self.ctx, uuid))
         self.thread.start()
         self.async = Async(self.ctx, uuid)
