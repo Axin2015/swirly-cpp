@@ -42,8 +42,8 @@ public:
         : impl_{nullptr}
     {
     }
-    Async(void* ctx, const DbrUuid uuid)
-        : impl_{dbr_async_create(ctx, uuid)}
+    Async(void* zctx, const DbrUuid uuid)
+        : impl_{dbr_async_create(zctx, uuid)}
     {
         if (!impl_)
             throw_exception();

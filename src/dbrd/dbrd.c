@@ -64,7 +64,7 @@ enum {
     TRTMOUT = (TRINT * 3) / 2
 };
 
-static void* ctx = NULL;
+static void* zctx = NULL;
 static DbrJourn journ = NULL;
 static DbrPool pool = NULL;
 static DbrServ serv = NULL;
@@ -1038,13 +1038,13 @@ main(int argc, char* argv[])
     dbr_log_info("journsize: %d", config.journsize);
     dbr_log_info("poolsize:  %d", config.poolsize);
 
-    ctx = zmq_ctx_new();
-    if (!ctx) {
+    zctx = zmq_ctx_new();
+    if (!zctx) {
         dbr_err_printf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
         goto exit1;
     }
 
-    journ = dbr_zmqjourn_create(ctx, config.journsize, factory, config.dbfile);
+    journ = dbr_zmqjourn_create(zctx, config.journsize, factory, config.dbfile);
     if (!journ) {
         dbr_err_perror("dbr_sqljourn_create() failed");
         goto exit2;
@@ -1067,7 +1067,7 @@ main(int argc, char* argv[])
         goto exit5;
     }
 
-    mdsock = zmq_socket(ctx, ZMQ_PUB);
+    mdsock = zmq_socket(zctx, ZMQ_PUB);
     if (!mdsock) {
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit5;
@@ -1080,7 +1080,7 @@ main(int argc, char* argv[])
         goto exit6;
     }
 
-    trsock = zmq_socket(ctx, ZMQ_ROUTER);
+    trsock = zmq_socket(zctx, ZMQ_ROUTER);
     if (!trsock) {
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit6;
@@ -1122,7 +1122,7 @@ main(int argc, char* argv[])
  exit3:
     dbr_journ_destroy(journ);
  exit2:
-    zmq_ctx_destroy(ctx);
+    zmq_ctx_destroy(zctx);
  exit1:
     return status;
 }

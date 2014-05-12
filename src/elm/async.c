@@ -30,14 +30,14 @@ struct ElmAsync {
 };
 
 DBR_API DbrAsync
-dbr_async_create(void* ctx, const DbrUuid uuid)
+dbr_async_create(void* zctx, const DbrUuid uuid)
 {
     DbrAsync async = malloc(sizeof(struct ElmAsync));
     if (dbr_unlikely(!async)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
     }
-    void* sock = zmq_socket(ctx, ZMQ_REQ);
+    void* sock = zmq_socket(zctx, ZMQ_REQ);
     if (dbr_unlikely(!sock)) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;

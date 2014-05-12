@@ -30,7 +30,7 @@
  */
 
 DBR_API DbrJourn
-dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void* arg);
+dbr_zmqjourn_create(void* zctx, size_t capacity, DbrJourn (*factory)(void*), void* arg);
 
 /** @} */
 

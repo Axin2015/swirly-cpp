@@ -32,7 +32,7 @@ enum {
 };
 
 struct DbrLexer {
-    void (*cb)(void* ctx, const char*, size_t);
+    void (*cb)(void* zctx, const char*, size_t);
     void* ctx;
     int cs;
     char tok[DBR_TOK_MAX + 1];
@@ -40,7 +40,7 @@ struct DbrLexer {
 };
 
 DBR_API void
-dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* ctx);
+dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* zctx);
 
 DBR_API void
 dbr_lexer_reset(struct DbrLexer* lexer);

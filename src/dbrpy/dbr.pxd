@@ -333,7 +333,7 @@ cdef extern from "dbr/async.h":
 
     ctypedef ElmAsync* DbrAsync
 
-    DbrAsync dbr_async_create(void* ctx, const DbrUuid uuid) nogil
+    DbrAsync dbr_async_create(void* zctx, const DbrUuid uuid) nogil
 
     void dbr_async_destroy(DbrAsync async) nogil
 
@@ -441,7 +441,7 @@ cdef extern from "dbr/clnt.h":
 
     ctypedef FigClnt* DbrClnt
 
-    DbrClnt dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr,
+    DbrClnt dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr,
                             const char* traddr, DbrIden seed, DbrMillis tmout,
                             DbrPool pool) nogil
 

@@ -464,7 +464,7 @@ sess_open(DbrClnt clnt, DbrMillis now)
 }
 
 DBR_API DbrClnt
-dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
+dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
                 DbrIden seed, DbrMillis tmout, DbrPool pool)
 {
     // 1.
@@ -478,7 +478,7 @@ dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* t
     dbr_sess_init(&clnt->sess, uuid, pool);
 
     // 3.
-    void* mdsock = zmq_socket(ctx, ZMQ_SUB);
+    void* mdsock = zmq_socket(zctx, ZMQ_SUB);
     if (!mdsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
@@ -493,7 +493,7 @@ dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* t
     }
 
     // 4.
-    void* trsock = zmq_socket(ctx, ZMQ_DEALER);
+    void* trsock = zmq_socket(zctx, ZMQ_DEALER);
     if (!trsock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
@@ -507,7 +507,7 @@ dbr_clnt_create(void* ctx, const DbrUuid uuid, const char* mdaddr, const char* t
     }
 
     // 5.
-    void* asock = zmq_socket(ctx, ZMQ_REP);
+    void* asock = zmq_socket(zctx, ZMQ_REP);
     if (!asock) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;

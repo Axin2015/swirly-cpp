@@ -538,12 +538,12 @@ cdef object async_recv(DbrAsync async):
     return <object>val
 
 cdef class Async(object):
-    cdef ZmqCtx ctx_
+    cdef ZmqCtx zctx_
     cdef DbrAsync impl_
 
-    def __cinit__(self, ZmqCtx ctx, uuid):
-        self.ctx_ = ctx # Incref.
-        self.impl_ = dbr_async_create(ctx.impl_, uuid.bytes)
+    def __cinit__(self, ZmqCtx zctx, uuid):
+        self.zctx_ = zctx # Incref.
+        self.impl_ = dbr_async_create(zctx.impl_, uuid.bytes)
         if self.impl_ is NULL:
             raise Error()
 
@@ -795,15 +795,15 @@ cdef class ZmqCtx(object):
 # Clnt
 
 cdef class Clnt(object):
-    cdef ZmqCtx ctx_
+    cdef ZmqCtx zctx_
     cdef Pool pool_
     cdef DbrClnt impl_
 
-    def __cinit__(self, ZmqCtx ctx, uuid, const char* mdaddr, const char* traddr,
+    def __cinit__(self, ZmqCtx zctx, uuid, const char* mdaddr, const char* traddr,
                   DbrIden seed, DbrMillis tmout, Pool pool):
-        self.ctx_ = ctx   # Incref.
+        self.zctx_ = zctx   # Incref.
         self.pool_ = pool # Incref.
-        self.impl_ = dbr_clnt_create(ctx.impl_, uuid.bytes, mdaddr, traddr, seed, tmout, pool.impl_)
+        self.impl_ = dbr_clnt_create(zctx.impl_, uuid.bytes, mdaddr, traddr, seed, tmout, pool.impl_)
         if self.impl_ is NULL:
             raise Error()
 

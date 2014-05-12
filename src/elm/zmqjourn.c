@@ -124,7 +124,7 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 };
 
 struct State {
-    void* ctx;
+    void* zctx;
     size_t capacity;
     DbrJourn (*factory)(void*);
     void* arg;
@@ -150,7 +150,7 @@ start_routine(void* arg)
     // The socket cannot be created in the parent. The zguide says:
     // Remember: Do not use or close sockets except in the thread that created them.
 
-    void* sock = zmq_socket(state->ctx, ZMQ_PAIR);
+    void* sock = zmq_socket(state->zctx, ZMQ_PAIR);
     if (dbr_unlikely(!sock)) {
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto exit2;
@@ -233,7 +233,7 @@ start_routine(void* arg)
 }
 
 DBR_API DbrJourn
-dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void* arg)
+dbr_zmqjourn_create(void* zctx, size_t capacity, DbrJourn (*factory)(void*), void* arg)
 {
     struct FirZmqJourn* impl = malloc(sizeof(struct FirZmqJourn));
     if (dbr_unlikely(!impl)) {
@@ -247,7 +247,7 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
         goto fail2;
     }
 
-    state->ctx = ctx;
+    state->zctx = zctx;
     state->capacity = capacity;
     state->factory = factory;
     state->arg = arg;
@@ -256,7 +256,7 @@ dbr_zmqjourn_create(void* ctx, size_t capacity, DbrJourn (*factory)(void*), void
     // Socket address is uniquely constructed from memory address.
     sprintf(state->addr, "inproc://%p", impl);
 
-    void* sock = zmq_socket(ctx, ZMQ_PAIR);
+    void* sock = zmq_socket(zctx, ZMQ_PAIR);
     if (dbr_unlikely(!sock)) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
