@@ -432,6 +432,11 @@
  */
 
 /**
+ * @defgroup Ctx Context
+ * @ingroup Fig
+ */
+
+/**
  * @defgroup Clnt Client
  * @ingroup Fig
  */
