@@ -51,8 +51,8 @@ typedef struct FigClnt* DbrClnt;
  */
 
 DBR_API DbrClnt
-dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr, DbrIden seed,
-                DbrMillis tmout, DbrPool pool);
+dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
+                DbrIden seed, DbrMillis tmout, DbrPool pool);
 
 /**
  * No-op if @a clnt is null.

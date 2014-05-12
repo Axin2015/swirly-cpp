@@ -18,10 +18,21 @@
 #ifndef DBR_CTX_H
 #define DBR_CTX_H
 
+#include <dbr/types.h>
+
 /**
  * @addtogroup Ctx
  * @{
  */
+
+typedef struct FigCtx* DbrCtx;
+
+DBR_API DbrCtx
+dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout,
+               size_t capacity);
+
+DBR_API void
+dbr_ctx_destroy(DbrCtx ctx);
 
 /** @} */
 

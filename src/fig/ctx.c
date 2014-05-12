@@ -16,3 +16,31 @@
  *  02110-1301 USA.
  */
 #include <dbr/ctx.h>
+
+#include <dbr/err.h>
+
+#include <stdlib.h> // malloc()
+
+struct FigCtx {
+    int unused;
+};
+
+DBR_API DbrCtx
+dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout,
+               size_t capacity)
+{
+    DbrCtx ctx = malloc(sizeof(struct FigCtx));
+    if (dbr_unlikely(!ctx)) {
+        dbr_err_set(DBR_ENOMEM, "out of memory");
+        goto fail1;
+    }
+    return ctx;
+ fail1:
+    return NULL;
+}
+
+DBR_API void
+dbr_ctx_destroy(DbrCtx ctx)
+{
+    free(ctx);
+}
