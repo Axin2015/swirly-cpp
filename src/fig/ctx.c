@@ -19,6 +19,7 @@
 
 #include <dbr/clnt.h>
 #include <dbr/err.h>
+#include <dbr/log.h>
 #include <dbr/pool.h>
 #include <dbr/util.h>
 
@@ -49,6 +50,7 @@ struct Init {
     DbrIden seed;
     DbrMillis tmout;
     size_t capacity;
+    DbrHandler handler;
 
     DbrCtx ctx;
     pthread_mutex_t mutex;
@@ -75,13 +77,24 @@ start_routine(void* arg)
     if (!clnt)
         goto fail2;
 
+    DbrHandler handler = init->handler;
+
     pthread_mutex_lock(&init->mutex);
     init->state = SUCCESS;
     pthread_cond_signal(&init->cond);
     pthread_mutex_unlock(&init->mutex);
     // The init pointer is left dangling beyond this point.
 
-    // Run loop.
+    // Dispatch loop.
+    for (;;) {
+        const int ret = dbr_clnt_dispatch(clnt, TMOUT, handler);
+        if (ret < 0)
+            dbr_err_perror("dbr_clnt_dispatch() failed");
+        else if (!ret) {
+            dbr_log_info("exiting thread");
+            break;
+        }
+    }
 
     dbr_clnt_destroy(clnt);
     dbr_pool_destroy(pool);
@@ -101,7 +114,7 @@ start_routine(void* arg)
 
 DBR_API DbrCtx
 dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout,
-               size_t capacity)
+               size_t capacity, DbrHandler handler)
 {
     DbrCtx ctx = malloc(sizeof(struct FigCtx));
     if (dbr_unlikely(!ctx)) {
@@ -115,10 +128,14 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
         .seed = seed,
         .tmout = tmout,
         .capacity = capacity,
+        .handler = handler,
+
         .ctx = ctx,
         .mutex = PTHREAD_MUTEX_INITIALIZER,
         .cond = PTHREAD_COND_INITIALIZER,
-        .state = INIT
+        .state = INIT,
+        .err_num = 0,
+        .err_msg = ""
     };
 
     // Null terminated by initialiser.
