@@ -838,12 +838,6 @@ cdef class Clnt(object):
 cdef class ClntRef(object):
     cdef DbrClnt impl_
 
-    def __cinit__(self):
-        pass
-
-    def __dealloc__(self):
-        pass
-
     def reset(self):
         dbr_clnt_reset(self.impl_)
 
@@ -970,6 +964,11 @@ cdef class ClntRef(object):
     def uuid(self):
         return uuid.UUID(bytes = dbr_clnt_uuid(self.impl_))
 
+cdef ClntRef make_clnt_ref(DbrClnt impl):
+    obj = ClntRef()
+    obj.impl_ = impl
+    return obj
+
 # Handler
 
 cdef struct HandlerImpl:
@@ -982,41 +981,41 @@ cdef inline void* handler_target(DbrHandler handler) nogil:
     return impl.target
 
 cdef void on_close(DbrHandler handler, DbrClnt clnt) with gil:
-    (<object>handler_target(handler)).on_close()
+    (<object>handler_target(handler)).on_close(make_clnt_ref(clnt))
 
 cdef void on_ready(DbrHandler handler, DbrClnt clnt) with gil:
-    (<object>handler_target(handler)).on_ready()
+    (<object>handler_target(handler)).on_ready(make_clnt_ref(clnt))
 
 cdef void on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) with gil:
-    (<object>handler_target(handler)).on_logon(req_id, uid)
+    (<object>handler_target(handler)).on_logon(make_clnt_ref(clnt), req_id, uid)
 
 cdef void on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) with gil:
-    (<object>handler_target(handler)).on_logoff(req_id, uid)
+    (<object>handler_target(handler)).on_logoff(make_clnt_ref(clnt), req_id, uid)
 
 cdef void on_reset(DbrHandler handler, DbrClnt clnt) with gil:
-    (<object>handler_target(handler)).on_reset()
+    (<object>handler_target(handler)).on_reset(make_clnt_ref(clnt))
 
 cdef void on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id) with gil:
-    (<object>handler_target(handler)).on_timeout(req_id)
+    (<object>handler_target(handler)).on_timeout(make_clnt_ref(clnt), req_id)
 
 cdef void on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num,
                     const char* msg) with gil:
-    (<object>handler_target(handler)).on_status(req_id, num, msg)
+    (<object>handler_target(handler)).on_status(make_clnt_ref(clnt), req_id, num, msg)
 
 cdef void on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrpyExec* exc) with gil:
-    (<object>handler_target(handler)).on_exec(req_id, make_exec(exc))
+    (<object>handler_target(handler)).on_exec(make_clnt_ref(clnt), req_id, make_exec(exc))
 
 cdef void on_posn(DbrHandler handler, DbrClnt clnt, DbrpyPosn* posn) with gil:
-    (<object>handler_target(handler)).on_posn(make_posn(posn))
+    (<object>handler_target(handler)).on_posn(make_clnt_ref(clnt), make_posn(posn))
 
 cdef void on_view(DbrHandler handler, DbrClnt clnt, DbrpyView* view) with gil:
-    (<object>handler_target(handler)).on_view(make_view(view))
+    (<object>handler_target(handler)).on_view(make_clnt_ref(clnt), make_view(view))
 
 cdef void on_flush(DbrHandler handler, DbrClnt clnt) with gil:
-    (<object>handler_target(handler)).on_flush()
+    (<object>handler_target(handler)).on_flush(make_clnt_ref(clnt))
 
 cdef void* on_async(DbrHandler handler, DbrClnt clnt, void* arg) with gil:
-    cdef object ret = (<object>handler_target(handler)).on_async(<object>arg)
+    cdef object ret = (<object>handler_target(handler)).on_async(make_clnt_ref(clnt), <object>arg)
     Py_INCREF(ret)
     Py_DECREF(<object>arg)
     return <void*>ret
@@ -1041,40 +1040,40 @@ cdef class Handler(object):
         self.impl_.target = <PyObject*>self
         self.impl_.handler.vtbl = &self.vtbl_
 
-    def on_close(self):
+    def on_close(self, clnt):
         pass
 
-    def on_ready(self):
+    def on_ready(self, clnt):
         pass
 
-    def on_logon(self, req_id, uid):
+    def on_logon(self, clnt, req_id, uid):
         pass
 
-    def on_logoff(self, req_id, uid):
+    def on_logoff(self, clnt, req_id, uid):
         pass
 
-    def on_reset(self):
+    def on_reset(self, clnt):
         pass
 
-    def on_timeout(self, req_id):
+    def on_timeout(self, clnt, req_id):
         pass
 
-    def on_status(self, req_id, num, msg):
+    def on_status(self, clnt, req_id, num, msg):
         pass
 
-    def on_exec(self, req_id, exc):
+    def on_exec(self, clnt, req_id, exc):
         pass
 
-    def on_posn(self, posn):
+    def on_posn(self, clnt, posn):
         pass
 
-    def on_view(self, view):
+    def on_view(self, clnt, view):
         pass
 
-    def on_flush(self):
+    def on_flush(self, clnt):
         pass
 
-    def on_async(self, arg):
+    def on_async(self, clnt, arg):
         return arg
 
 def dispatch(Clnt clnt, DbrMillis ms, Handler handler):

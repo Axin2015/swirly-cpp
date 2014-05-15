@@ -401,47 +401,46 @@ class AckTradeRequest(object):
         return arr
 
 class RequestHandler(Handler):
-    def __init__(self, clnt):
+    def __init__(self):
         super(RequestHandler, self).__init__()
-        self.clnt = clnt
 
-    def on_close(self):
+    def on_close(self, clnt):
         log_notice('on_close')
 
-    def on_ready(self):
+    def on_ready(self, clnt):
         log_notice('on_ready')
 
-    def on_logon(self, req_id, uid):
+    def on_logon(self, clnt, req_id, uid):
         log_notice('on_logon: {0}: {1}'.format(req_id, uid))
 
-    def on_logoff(self, req_id, uid):
+    def on_logoff(self, clnt, req_id, uid):
         log_notice('on_logoff: {0}: {1}'.format(req_id, uid))
 
-    def on_reset(self):
+    def on_reset(self, clnt):
         log_notice('on_reset')
 
-    def on_timeout(self, req_id):
+    def on_timeout(self, clnt, req_id):
         log_notice('on_timeout: {0}'.format(req_id))
 
-    def on_status(self, req_id, num, msg):
+    def on_status(self, clnt, req_id, num, msg):
         log_notice('on_status: {0}: {2} ({1})'.format(req_id, num, msg))
 
-    def on_exec(self, req_id, exc):
+    def on_exec(self, clnt, req_id, exc):
         log_notice('on_exec: {0}: {1}'.format(req_id, exc))
 
-    def on_posn(self, posn):
+    def on_posn(self, clnt, posn):
         log_notice('on_posn: {0}'.format(posn))
 
-    def on_view(self, view):
+    def on_view(self, clnt, view):
         log_notice('on_view: {0}'.format(view))
 
-    def on_flush(self):
+    def on_flush(self, clnt):
         pass
 
-    def on_async(self, fn):
+    def on_async(self, clnt, fn):
         ret = None
         try:
-            ret = fn(self.clnt)
+            ret = fn(clnt)
         except Exception as e:
             ret = e
         return ret
@@ -451,10 +450,10 @@ def worker(ctx, uuid):
     pool = Pool(8 * 1024 * 1024)
     clnt = Clnt(ctx, uuid, 'tcp://localhost:3270', 'tcp://localhost:3271',
                 millis(), TMOUT, pool)
-    handler = RequestHandler(clnt)
+    handler = RequestHandler()
     while True:
         try:
-            if not clnt.dispatch(TMOUT, handler):
+            if not dispatch(clnt, TMOUT, handler):
                 break
         except Error as e:
             log_error('error: ' + str(e))
