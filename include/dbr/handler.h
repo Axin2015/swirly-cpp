@@ -20,12 +20,14 @@
 
 #include <dbr/defs.h>
 
+typedef struct FigClnt* DbrClnt;
+
 struct DbrExec;
 struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup Handler
+ * @addtogroup Clnt
  * @{
  */
 
@@ -41,82 +43,82 @@ typedef struct DbrIHandler {
 struct DbrHandlerVtbl {
 
     void
-    (*on_close)(DbrHandler handler);
+    (*on_close)(DbrHandler handler, DbrClnt clnt);
 
     void
-    (*on_ready)(DbrHandler handler);
+    (*on_ready)(DbrHandler handler, DbrClnt clnt);
 
     void
-    (*on_logon)(DbrHandler handler, DbrIden req_id, DbrIden uid);
+    (*on_logon)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid);
 
     void
-    (*on_logoff)(DbrHandler handler, DbrIden req_id, DbrIden uid);
+    (*on_logoff)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid);
 
     void
-    (*on_reset)(DbrHandler handler);
+    (*on_reset)(DbrHandler handler, DbrClnt clnt);
 
     void
-    (*on_timeout)(DbrHandler handler, DbrIden req_id);
+    (*on_timeout)(DbrHandler handler, DbrClnt clnt, DbrIden req_id);
 
     void
-    (*on_status)(DbrHandler handler, DbrIden req_id, int num, const char* msg);
+    (*on_status)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg);
 
     void
-    (*on_exec)(DbrHandler handler, DbrIden req_id, struct DbrExec* exec);
+    (*on_exec)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, struct DbrExec* exec);
 
     void
-    (*on_posn)(DbrHandler handler, struct DbrPosn* posn);
+    (*on_posn)(DbrHandler handler, DbrClnt clnt, struct DbrPosn* posn);
 
     void
-    (*on_view)(DbrHandler handler, struct DbrView* view);
+    (*on_view)(DbrHandler handler, DbrClnt clnt, struct DbrView* view);
 
     void
-    (*on_flush)(DbrHandler handler);
+    (*on_flush)(DbrHandler handler, DbrClnt clnt);
 
     void*
-    (*on_async)(DbrHandler handler, void* val);
+    (*on_async)(DbrHandler handler, DbrClnt clnt, void* val);
 };
 
 static inline void
-dbr_handler_on_close(DbrHandler handler)
+dbr_handler_on_close(DbrHandler handler, DbrClnt clnt)
 {
-    handler->vtbl->on_close(handler);
+    handler->vtbl->on_close(handler, clnt);
 }
 
 static inline void
-dbr_handler_on_ready(DbrHandler handler)
+dbr_handler_on_ready(DbrHandler handler, DbrClnt clnt)
 {
-    handler->vtbl->on_ready(handler);
+    handler->vtbl->on_ready(handler, clnt);
 }
 
 static inline void
-dbr_handler_on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid)
+dbr_handler_on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
 {
-    handler->vtbl->on_logon(handler, req_id, uid);
+    handler->vtbl->on_logon(handler, clnt, req_id, uid);
 }
 
 static inline void
-dbr_handler_on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid)
+dbr_handler_on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
 {
-    handler->vtbl->on_logoff(handler, req_id, uid);
+    handler->vtbl->on_logoff(handler, clnt, req_id, uid);
 }
 
 static inline void
-dbr_handler_on_reset(DbrHandler handler)
+dbr_handler_on_reset(DbrHandler handler, DbrClnt clnt)
 {
-    handler->vtbl->on_reset(handler);
+    handler->vtbl->on_reset(handler, clnt);
 }
 
 static inline void
-dbr_handler_on_timeout(DbrHandler handler, DbrIden req_id)
+dbr_handler_on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id)
 {
-    handler->vtbl->on_timeout(handler, req_id);
+    handler->vtbl->on_timeout(handler, clnt, req_id);
 }
 
 static inline void
-dbr_handler_on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg)
+dbr_handler_on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg)
 {
-    handler->vtbl->on_status(handler, req_id, num, msg);
+    handler->vtbl->on_status(handler, clnt, req_id, num, msg);
 }
 
 /**
@@ -125,33 +127,33 @@ dbr_handler_on_status(DbrHandler handler, DbrIden req_id, int num, const char* m
  */
 
 static inline void
-dbr_handler_on_exec(DbrHandler handler, DbrIden req_id, struct DbrExec* exec)
+dbr_handler_on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, struct DbrExec* exec)
 {
-    handler->vtbl->on_exec(handler, req_id, exec);
+    handler->vtbl->on_exec(handler, clnt, req_id, exec);
 }
 
 static inline void
-dbr_handler_on_posn(DbrHandler handler, struct DbrPosn* posn)
+dbr_handler_on_posn(DbrHandler handler, DbrClnt clnt, struct DbrPosn* posn)
 {
-    handler->vtbl->on_posn(handler, posn);
+    handler->vtbl->on_posn(handler, clnt, posn);
 }
 
 static inline void
-dbr_handler_on_view(DbrHandler handler, struct DbrView* view)
+dbr_handler_on_view(DbrHandler handler, DbrClnt clnt, struct DbrView* view)
 {
-    handler->vtbl->on_view(handler, view);
+    handler->vtbl->on_view(handler, clnt, view);
 }
 
 static inline void
-dbr_handler_on_flush(DbrHandler handler)
+dbr_handler_on_flush(DbrHandler handler, DbrClnt clnt)
 {
-    handler->vtbl->on_flush(handler);
+    handler->vtbl->on_flush(handler, clnt);
 }
 
 static inline void*
-dbr_handler_on_async(DbrHandler handler, void* val)
+dbr_handler_on_async(DbrHandler handler, DbrClnt clnt, void* val)
 {
-    return handler->vtbl->on_async(handler, val);
+    return handler->vtbl->on_async(handler, clnt, val);
 }
 
 /** @} */

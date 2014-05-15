@@ -417,11 +417,6 @@
  */
 
 /**
- * @defgroup Handler Handler
- * @ingroup Fig
- */
-
-/**
  * @defgroup Sess Session
  * @ingroup Fig
  */

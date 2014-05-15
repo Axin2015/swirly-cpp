@@ -23,6 +23,8 @@ cdef extern from "dbrpy/dbrpy.h":
     ctypedef DbrPosn DbrpyPosn
     ctypedef DbrView DbrpyView
 
+    ctypedef FigClnt FigpyClnt
+
     ctypedef DbrHandlerVtbl DbrpyHandlerVtbl
     ctypedef DbrIHandler DbrpyIHandler
 
@@ -524,6 +526,24 @@ def real_to_dp(double d):
 def dp_to_real(int dp):
     return dbr_dp_to_real(dp)
 
+# Zmq
+
+cdef class ZmqCtx(object):
+    cdef void* impl_
+
+    def __cinit__(self):
+        self.impl_ = zmq.zmq_ctx_new()
+        if self.impl_ is NULL:
+            fi = getframeinfo(currentframe())
+            dbr_err_setf_(DBR_EIO, fi.filename, fi.lineno,
+                              "zmq_ctx_new() failed: %s", zmq.zmq_strerror(zmq.zmq_errno()))
+            raise Error()
+
+    def __dealloc__(self):
+        if self.impl_ is not NULL:
+            dbr_log_info('destroying ctx')
+            zmq.zmq_ctx_destroy(self.impl_)
+
 # Async
 
 cdef object async_recv(DbrAsync async):
@@ -667,131 +687,6 @@ cdef Accnt make_accnt(DbrAccnt accnt, AccntRec rec):
     obj.rec = rec
     return obj
 
-# Handler
-
-cdef struct HandlerImpl:
-    PyObject* target
-    DbrpyIHandler handler
-
-cdef inline void* handler_target(DbrHandler handler) nogil:
-    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
-    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
-    return impl.target
-
-cdef void on_close(DbrHandler handler) with gil:
-    (<object>handler_target(handler)).on_close()
-
-cdef void on_ready(DbrHandler handler) with gil:
-    (<object>handler_target(handler)).on_ready()
-
-cdef void on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid) with gil:
-    (<object>handler_target(handler)).on_logon(req_id, uid)
-
-cdef void on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid) with gil:
-    (<object>handler_target(handler)).on_logoff(req_id, uid)
-
-cdef void on_reset(DbrHandler handler) with gil:
-    (<object>handler_target(handler)).on_reset()
-
-cdef void on_timeout(DbrHandler handler, DbrIden req_id) with gil:
-    (<object>handler_target(handler)).on_timeout(req_id)
-
-cdef void on_status(DbrHandler handler, DbrIden req_id, int num,
-                    const char* msg) with gil:
-    (<object>handler_target(handler)).on_status(req_id, num, msg)
-
-cdef void on_exec(DbrHandler handler, DbrIden req_id, DbrpyExec* exc) with gil:
-    (<object>handler_target(handler)).on_exec(req_id, make_exec(exc))
-
-cdef void on_posn(DbrHandler handler, DbrpyPosn* posn) with gil:
-    (<object>handler_target(handler)).on_posn(make_posn(posn))
-
-cdef void on_view(DbrHandler handler, DbrpyView* view) with gil:
-    (<object>handler_target(handler)).on_view(make_view(view))
-
-cdef void on_flush(DbrHandler handler) with gil:
-    (<object>handler_target(handler)).on_flush()
-
-cdef void* on_async(DbrHandler handler, void* arg) with gil:
-    cdef object ret = (<object>handler_target(handler)).on_async(<object>arg)
-    Py_INCREF(ret)
-    Py_DECREF(<object>arg)
-    return <void*>ret
-
-cdef class Handler(object):
-    cdef DbrpyHandlerVtbl vtbl_
-    cdef HandlerImpl impl_
-
-    def __init__(self):
-        self.vtbl_.on_close = on_close
-        self.vtbl_.on_ready = on_ready
-        self.vtbl_.on_logon = on_logon
-        self.vtbl_.on_logoff = on_logoff
-        self.vtbl_.on_reset = on_reset
-        self.vtbl_.on_timeout = on_timeout
-        self.vtbl_.on_status = on_status
-        self.vtbl_.on_exec = on_exec
-        self.vtbl_.on_posn = on_posn
-        self.vtbl_.on_view = on_view
-        self.vtbl_.on_flush = on_flush
-        self.vtbl_.on_async = on_async
-        self.impl_.target = <PyObject*>self
-        self.impl_.handler.vtbl = &self.vtbl_
-
-    def on_close(self):
-        pass
-
-    def on_ready(self):
-        pass
-
-    def on_logon(self, req_id, uid):
-        pass
-
-    def on_logoff(self, req_id, uid):
-        pass
-
-    def on_reset(self):
-        pass
-
-    def on_timeout(self, req_id):
-        pass
-
-    def on_status(self, req_id, num, msg):
-        pass
-
-    def on_exec(self, req_id, exc):
-        pass
-
-    def on_posn(self, posn):
-        pass
-
-    def on_view(self, view):
-        pass
-
-    def on_flush(self):
-        pass
-
-    def on_async(self, arg):
-        return arg
-
-# Zmq
-
-cdef class ZmqCtx(object):
-    cdef void* impl_
-
-    def __cinit__(self):
-        self.impl_ = zmq.zmq_ctx_new()
-        if self.impl_ is NULL:
-            fi = getframeinfo(currentframe())
-            dbr_err_setf_(DBR_EIO, fi.filename, fi.lineno,
-                              "zmq_ctx_new() failed: %s", zmq.zmq_strerror(zmq.zmq_errno()))
-            raise Error()
-
-    def __dealloc__(self):
-        if self.impl_ is not NULL:
-            dbr_log_info('destroying ctx')
-            zmq.zmq_ctx_destroy(self.impl_)
-
 # Clnt
 
 cdef class Clnt(object):
@@ -922,13 +817,142 @@ cdef class Clnt(object):
     def canceltimer(self, DbrIden id):
         dbr_clnt_canceltimer(self.impl_, id)
 
-    def dispatch(self, DbrMillis ms, Handler handler):
-        cdef DbrBool ret
-        with nogil:
-            ret = dbr_clnt_dispatch(self.impl_, ms, &handler.impl_.handler)
-        if ret < 0:
+    def find_view(self, DbrIden cid, DbrJd settl_day):
+        cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_day)
+        return make_view(dbr_clnt_view_entry(node)) if node is not NULL else None
+    def list_view(self):
+        views = []
+        cdef DbrpyRbNode* node = dbr_clnt_first_view(self.impl_)
+        while node is not NULL:
+            views.append(make_view(dbr_clnt_view_entry(node)))
+            node = dbr_rbnode_next(node)
+        return views
+    def empty_view(self):
+        return <bint>dbr_clnt_empty_view(self.impl_)
+
+    def uuid(self):
+        return uuid.UUID(bytes = dbr_clnt_uuid(self.impl_))
+
+# ClntRef
+
+cdef class ClntRef(object):
+    cdef DbrClnt impl_
+
+    def __cinit__(self):
+        pass
+
+    def __dealloc__(self):
+        pass
+
+    def reset(self):
+        dbr_clnt_reset(self.impl_)
+
+    def close(self):
+        cdef DbrIden id = dbr_clnt_close(self.impl_)
+        if id < 0:
             raise Error()
-        return <bint>ret;
+        return id
+
+    def find_rec_id(self, int type, DbrIden id):
+        cdef DbrpySlNode* node = dbr_clnt_find_rec_id(self.impl_, type, id)
+        return make_rec(dbr_shared_rec_entry(node)) if node is not NULL else None
+
+    def find_rec_mnem(self, int type, const char* mnem):
+        cdef DbrpySlNode* node = dbr_clnt_find_rec_mnem(self.impl_, type, mnem)
+        return make_rec(dbr_shared_rec_entry(node)) if node is not NULL else None
+
+    def list_rec(self, int type):
+        recs = []
+        cdef size_t size = 0
+        cdef DbrpySlNode* node = dbr_clnt_first_rec(self.impl_, type, &size)
+        while node is not NULL:
+            recs.append(make_rec(dbr_shared_rec_entry(node)))
+            node = dbr_slnode_next(node)
+        return recs
+
+    def empty_rec(self, int type):
+        return <bint>dbr_clnt_empty_rec(self.impl_, type)
+
+    def accnt(self, AccntRec arec):
+        cdef DbrAccnt accnt = dbr_clnt_accnt(self.impl_, arec.impl_)
+        if accnt is NULL:
+            raise Error()
+        return make_accnt(accnt, arec)
+
+    def logon(self, Accnt user):
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_logon(self.impl_, user.impl_)
+        if id < 0:
+            raise Error()
+        return id
+
+    def logoff(self, Accnt user):
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_logoff(self.impl_, user.impl_)
+        if id < 0:
+            raise Error()
+        return id
+
+    def place(self, Accnt user, Accnt group, ContrRec crec, DbrJd settl_day,
+              const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots):
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_place(self.impl_, user.impl_, group.impl_, crec.impl_,
+                                settl_day, ref, action, ticks, lots, min_lots)
+        if id < 0:
+            raise Error()
+        return id
+
+    def revise_id(self, Accnt user, DbrIden id, DbrLots lots):
+        with nogil:
+            id = dbr_clnt_revise_id(self.impl_, user.impl_, id, lots)
+        if id < 0:
+            raise Error()
+        return id
+
+    def revise_ref(self, Accnt user, const char* ref, DbrLots lots):
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_revise_ref(self.impl_, user.impl_, ref, lots)
+        if id < 0:
+            raise Error()
+        return id
+
+    def cancel_id(self, Accnt user, DbrIden id):
+        with nogil:
+            id = dbr_clnt_cancel_id(self.impl_, user.impl_, id)
+        if id < 0:
+            raise Error()
+        return id
+
+    def cancel_ref(self, Accnt user, const char* ref):
+        cdef DbrIden id
+        with nogil:
+            id = dbr_clnt_cancel_ref(self.impl_, user.impl_, ref)
+        if id < 0:
+            raise Error()
+        return id
+
+    def ack_trade(self, Accnt user, DbrIden id):
+        with nogil:
+            id = dbr_clnt_ack_trade(self.impl_, user.impl_, id)
+        if id < 0:
+            raise Error()
+        return id
+
+    def is_ready(self):
+        return <bint>dbr_clnt_is_ready(self.impl_)
+
+    def settimer(self, DbrMillis absms):
+        cdef DbrIden id = dbr_clnt_settimer(self.impl_, absms)
+        if id < 0:
+            raise Error()
+        return id
+
+    def canceltimer(self, DbrIden id):
+        dbr_clnt_canceltimer(self.impl_, id)
 
     def find_view(self, DbrIden cid, DbrJd settl_day):
         cdef DbrpyRbNode* node = dbr_clnt_find_view(self.impl_, cid, settl_day)
@@ -945,3 +969,118 @@ cdef class Clnt(object):
 
     def uuid(self):
         return uuid.UUID(bytes = dbr_clnt_uuid(self.impl_))
+
+# Handler
+
+cdef struct HandlerImpl:
+    PyObject* target
+    DbrpyIHandler handler
+
+cdef inline void* handler_target(DbrHandler handler) nogil:
+    cdef size_t offset = <size_t>&(<HandlerImpl*>NULL).handler
+    cdef HandlerImpl* impl = <HandlerImpl*>(<char*>handler - offset)
+    return impl.target
+
+cdef void on_close(DbrHandler handler, DbrClnt clnt) with gil:
+    (<object>handler_target(handler)).on_close()
+
+cdef void on_ready(DbrHandler handler, DbrClnt clnt) with gil:
+    (<object>handler_target(handler)).on_ready()
+
+cdef void on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) with gil:
+    (<object>handler_target(handler)).on_logon(req_id, uid)
+
+cdef void on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) with gil:
+    (<object>handler_target(handler)).on_logoff(req_id, uid)
+
+cdef void on_reset(DbrHandler handler, DbrClnt clnt) with gil:
+    (<object>handler_target(handler)).on_reset()
+
+cdef void on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id) with gil:
+    (<object>handler_target(handler)).on_timeout(req_id)
+
+cdef void on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num,
+                    const char* msg) with gil:
+    (<object>handler_target(handler)).on_status(req_id, num, msg)
+
+cdef void on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrpyExec* exc) with gil:
+    (<object>handler_target(handler)).on_exec(req_id, make_exec(exc))
+
+cdef void on_posn(DbrHandler handler, DbrClnt clnt, DbrpyPosn* posn) with gil:
+    (<object>handler_target(handler)).on_posn(make_posn(posn))
+
+cdef void on_view(DbrHandler handler, DbrClnt clnt, DbrpyView* view) with gil:
+    (<object>handler_target(handler)).on_view(make_view(view))
+
+cdef void on_flush(DbrHandler handler, DbrClnt clnt) with gil:
+    (<object>handler_target(handler)).on_flush()
+
+cdef void* on_async(DbrHandler handler, DbrClnt clnt, void* arg) with gil:
+    cdef object ret = (<object>handler_target(handler)).on_async(<object>arg)
+    Py_INCREF(ret)
+    Py_DECREF(<object>arg)
+    return <void*>ret
+
+cdef class Handler(object):
+    cdef DbrpyHandlerVtbl vtbl_
+    cdef HandlerImpl impl_
+
+    def __init__(self):
+        self.vtbl_.on_close = on_close
+        self.vtbl_.on_ready = on_ready
+        self.vtbl_.on_logon = on_logon
+        self.vtbl_.on_logoff = on_logoff
+        self.vtbl_.on_reset = on_reset
+        self.vtbl_.on_timeout = on_timeout
+        self.vtbl_.on_status = on_status
+        self.vtbl_.on_exec = on_exec
+        self.vtbl_.on_posn = on_posn
+        self.vtbl_.on_view = on_view
+        self.vtbl_.on_flush = on_flush
+        self.vtbl_.on_async = on_async
+        self.impl_.target = <PyObject*>self
+        self.impl_.handler.vtbl = &self.vtbl_
+
+    def on_close(self):
+        pass
+
+    def on_ready(self):
+        pass
+
+    def on_logon(self, req_id, uid):
+        pass
+
+    def on_logoff(self, req_id, uid):
+        pass
+
+    def on_reset(self):
+        pass
+
+    def on_timeout(self, req_id):
+        pass
+
+    def on_status(self, req_id, num, msg):
+        pass
+
+    def on_exec(self, req_id, exc):
+        pass
+
+    def on_posn(self, posn):
+        pass
+
+    def on_view(self, view):
+        pass
+
+    def on_flush(self):
+        pass
+
+    def on_async(self, arg):
+        return arg
+
+def dispatch(Clnt clnt, DbrMillis ms, Handler handler):
+    cdef DbrBool ret
+    with nogil:
+        ret = dbr_clnt_dispatch(clnt.impl_, ms, &handler.impl_.handler)
+    if ret < 0:
+        raise Error()
+    return <bint>ret;

@@ -15,4 +15,31 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/prioq.h>
+#ifndef DBRPP_DISPATCH_HPP
+#define DBRPP_DISPATCH_HPP
+
+#include <dbrpp/except.hpp>
+
+#include <dbr/dispatch.h>
+
+namespace dbr {
+
+/**
+ * @addtogroup Clnt
+ * @{
+ */
+
+inline bool
+dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
+{
+    const int ret = dbr_clnt_dispatch(clnt, ms, handler);
+    if (ret < 0)
+        throw_exception();
+    return ret == DBR_TRUE;
+}
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_DISPATCH_HPP

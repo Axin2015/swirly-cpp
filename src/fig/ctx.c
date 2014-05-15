@@ -18,6 +18,7 @@
 #include <dbr/ctx.h>
 
 #include <dbr/clnt.h>
+#include <dbr/dispatch.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
 #include <dbr/pool.h>

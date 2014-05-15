@@ -23,71 +23,71 @@
 namespace dbr {
 
 /**
- * @addtogroup Handler
+ * @addtogroup Clnt
  * @{
  */
 
 template <class DerivedT>
 class IHandler : public DbrIHandler {
     static void
-    on_close(DbrHandler handler) noexcept
+    on_close(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_close();
+        static_cast<DerivedT*>(handler)->on_close(clnt);
     }
     static void
-    on_ready(DbrHandler handler) noexcept
+    on_ready(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_ready();
+        static_cast<DerivedT*>(handler)->on_ready(clnt);
     }
     static void
-    on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid) noexcept
+    on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logon(req_id, uid);
+        static_cast<DerivedT*>(handler)->on_logon(clnt, req_id, uid);
     }
     static void
-    on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid) noexcept
+    on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logoff(req_id, uid);
+        static_cast<DerivedT*>(handler)->on_logoff(clnt, req_id, uid);
     }
     static void
-    on_reset(DbrHandler handler) noexcept
+    on_reset(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_reset();
+        static_cast<DerivedT*>(handler)->on_reset(clnt);
     }
     static void
-    on_timeout(DbrHandler handler, DbrIden req_id) noexcept
+    on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_timeout(req_id);
+        static_cast<DerivedT*>(handler)->on_timeout(clnt, req_id);
     }
     static void
-    on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) noexcept
+    on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_status(req_id, num, msg);
+        static_cast<DerivedT*>(handler)->on_status(clnt, req_id, num, msg);
     }
     static void
-    on_exec(DbrHandler handler, DbrIden req_id, DbrExec* exec) noexcept
+    on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrExec* exec) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_exec(req_id, *exec);
+        static_cast<DerivedT*>(handler)->on_exec(clnt, req_id, *exec);
     }
     static void
-    on_posn(DbrHandler handler, DbrPosn* posn) noexcept
+    on_posn(DbrHandler handler, DbrClnt clnt, DbrPosn* posn) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_posn(*posn);
+        static_cast<DerivedT*>(handler)->on_posn(clnt, *posn);
     }
     static void
-    on_view(DbrHandler handler, DbrView* view) noexcept
+    on_view(DbrHandler handler, DbrClnt clnt, DbrView* view) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_view(*view);
+        static_cast<DerivedT*>(handler)->on_view(clnt, *view);
     }
     static void
-    on_flush(DbrHandler handler) noexcept
+    on_flush(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_flush();
+        static_cast<DerivedT*>(handler)->on_flush(clnt);
     }
     static void*
-    on_async(DbrHandler handler, void* val) noexcept
+    on_async(DbrHandler handler, DbrClnt clnt, void* val) noexcept
     {
-        return static_cast<DerivedT*>(handler)->on_async(val);
+        return static_cast<DerivedT*>(handler)->on_async(clnt, val);
     }
     static const DbrHandlerVtbl*
     vtbl() noexcept
@@ -120,75 +120,75 @@ public:
 };
 
 inline void
-on_close(DbrHandler handler) noexcept
+on_close(DbrHandler handler, DbrClnt clnt) noexcept
 {
-    handler->vtbl->on_close(handler);
+    handler->vtbl->on_close(handler, clnt);
 }
 
 inline void
-on_ready(DbrHandler handler) noexcept
+on_ready(DbrHandler handler, DbrClnt clnt) noexcept
 {
-    handler->vtbl->on_ready(handler);
+    handler->vtbl->on_ready(handler, clnt);
 }
 
 inline void
-on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid) noexcept
+on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
 {
-    handler->vtbl->on_logon(handler, req_id, uid);
+    handler->vtbl->on_logon(handler, clnt, req_id, uid);
 }
 
 inline void
-on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid) noexcept
+on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
 {
-    handler->vtbl->on_logoff(handler, req_id, uid);
+    handler->vtbl->on_logoff(handler, clnt, req_id, uid);
 }
 
 inline void
-on_reset(DbrHandler handler) noexcept
+on_reset(DbrHandler handler, DbrClnt clnt) noexcept
 {
-    handler->vtbl->on_reset(handler);
+    handler->vtbl->on_reset(handler, clnt);
 }
 
 inline void
-on_timeout(DbrHandler handler, DbrIden req_id) noexcept
+on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id) noexcept
 {
-    handler->vtbl->on_timeout(handler, req_id);
+    handler->vtbl->on_timeout(handler, clnt, req_id);
 }
 
 inline void
-on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) noexcept
+on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg) noexcept
 {
-    handler->vtbl->on_status(handler, req_id, num, msg);
+    handler->vtbl->on_status(handler, clnt, req_id, num, msg);
 }
 
 inline void
-on_exec(DbrHandler handler, DbrIden req_id, DbrExec& exec) noexcept
+on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrExec& exec) noexcept
 {
-    handler->vtbl->on_exec(handler, req_id, &exec);
+    handler->vtbl->on_exec(handler, clnt, req_id, &exec);
 }
 
 inline void
-on_posn(DbrHandler handler, DbrPosn& posn) noexcept
+on_posn(DbrHandler handler, DbrClnt clnt, DbrPosn& posn) noexcept
 {
-    handler->vtbl->on_posn(handler, &posn);
+    handler->vtbl->on_posn(handler, clnt, &posn);
 }
 
 inline void
-on_view(DbrHandler handler, DbrView& view) noexcept
+on_view(DbrHandler handler, DbrClnt clnt, DbrView& view) noexcept
 {
-    handler->vtbl->on_view(handler, &view);
+    handler->vtbl->on_view(handler, clnt, &view);
 }
 
 inline void
-on_flush(DbrHandler handler) noexcept
+on_flush(DbrHandler handler, DbrClnt clnt) noexcept
 {
-    handler->vtbl->on_flush(handler);
+    handler->vtbl->on_flush(handler, clnt);
 }
 
 inline void*
-on_async(DbrHandler handler, void* val) noexcept
+on_async(DbrHandler handler, DbrClnt clnt, void* val) noexcept
 {
-    return handler->vtbl->on_async(handler, val);
+    return handler->vtbl->on_async(handler, clnt, val);
 }
 
 /** @} */

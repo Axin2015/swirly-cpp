@@ -399,41 +399,6 @@ cdef extern from "dbr/accnt.h":
 
     DbrBool dbr_accnt_logged_on(DbrAccnt accnt) nogil
 
-cdef extern from "dbr/handler.h":
-
-    ctypedef struct DbrHandlerVtbl
-
-    ctypedef struct DbrIHandler:
-        const DbrHandlerVtbl* vtbl
-
-    ctypedef DbrIHandler* DbrHandler
-
-    ctypedef struct DbrHandlerVtbl:
-
-        void on_close(DbrHandler handler) nogil
-
-        void on_ready(DbrHandler handler) nogil
-
-        void on_logon(DbrHandler handler, DbrIden req_id, DbrIden uid) nogil
-
-        void on_logoff(DbrHandler handler, DbrIden req_id, DbrIden uid) nogil
-
-        void on_reset(DbrHandler handler) nogil
-
-        void on_timeout(DbrHandler handler, DbrIden req_id) nogil
-
-        void on_status(DbrHandler handler, DbrIden req_id, int num, const char* msg) nogil
-
-        void on_exec(DbrHandler handler, DbrIden req_id, DbrExec* exc) nogil
-
-        void on_posn(DbrHandler handler, DbrPosn* posn) nogil
-
-        void on_view(DbrHandler handler, DbrView* view) nogil
-
-        void on_flush(DbrHandler handler) nogil
-
-        void* on_async(DbrHandler handler, void* val) nogil
-
 cdef extern from "dbr/clnt.h":
 
     ctypedef struct FigClnt:
@@ -473,7 +438,8 @@ cdef extern from "dbr/clnt.h":
 
     DbrIden dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots) nogil
 
-    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref, DbrLots lots) nogil
+    DbrIden dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref,
+                                DbrLots lots) nogil
 
     DbrIden dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id) nogil
 
@@ -487,8 +453,6 @@ cdef extern from "dbr/clnt.h":
 
     void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id) nogil
 
-    int dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
-
     DbrView* dbr_clnt_view_entry(DbrRbNode* node) nogil
 
     DbrRbNode* dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day) nogil
@@ -500,3 +464,43 @@ cdef extern from "dbr/clnt.h":
     DbrBool dbr_clnt_empty_view(DbrClnt clnt) nogil
 
     const unsigned char* dbr_clnt_uuid(DbrClnt clnt) nogil
+
+cdef extern from "dbr/handler.h":
+
+    ctypedef struct DbrHandlerVtbl
+
+    ctypedef struct DbrIHandler:
+        const DbrHandlerVtbl* vtbl
+
+    ctypedef DbrIHandler* DbrHandler
+
+    ctypedef struct DbrHandlerVtbl:
+
+        void on_close(DbrHandler handler, DbrClnt clnt) nogil
+
+        void on_ready(DbrHandler handler, DbrClnt clnt) nogil
+
+        void on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) nogil
+
+        void on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) nogil
+
+        void on_reset(DbrHandler handler, DbrClnt clnt) nogil
+
+        void on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id) nogil
+
+        void on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num,
+                       const char* msg) nogil
+
+        void on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrExec* exc) nogil
+
+        void on_posn(DbrHandler handler, DbrClnt clnt, DbrPosn* posn) nogil
+
+        void on_view(DbrHandler handler, DbrClnt clnt, DbrView* view) nogil
+
+        void on_flush(DbrHandler handler, DbrClnt clnt) nogil
+
+        void* on_async(DbrHandler handler, DbrClnt clnt, void* val) nogil
+
+cdef extern from "dbr/dispatch.h":
+
+    int dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil

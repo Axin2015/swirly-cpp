@@ -16,6 +16,7 @@
  *  02110-1301 USA.
  */
 #include <dbrpp/clnt.hpp>
+#include <dbrpp/dispatch.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/handler.hpp>
 #include <dbrpp/zmqctx.hpp>
@@ -30,51 +31,51 @@ using namespace std;
 class Handler : public dbr::IHandler<Handler> {
 public:
     void
-    on_close() noexcept
+    on_close(DbrClnt clnt) noexcept
     {
     }
     void
-    on_ready() noexcept
+    on_ready(DbrClnt clnt) noexcept
     {
     }
     void
-    on_logon(DbrIden req_id, DbrIden uid) noexcept
+    on_logon(DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
     {
     }
     void
-    on_logoff(DbrIden req_id, DbrIden uid) noexcept
+    on_logoff(DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
     {
     }
     void
-    on_reset() noexcept
+    on_reset(DbrClnt clnt) noexcept
     {
     }
     void
-    on_timeout(DbrIden req_id) noexcept
+    on_timeout(DbrClnt clnt, DbrIden req_id) noexcept
     {
     }
     void
-    on_status(DbrIden req_id, int num, const char* msg) noexcept
+    on_status(DbrClnt clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
     }
     void
-    on_exec(DbrIden req_id, DbrExec& exec) noexcept
+    on_exec(DbrClnt clnt, DbrIden req_id, DbrExec& exec) noexcept
     {
     }
     void
-    on_posn(DbrPosn& posn) noexcept
+    on_posn(DbrClnt clnt, DbrPosn& posn) noexcept
     {
     }
     void
-    on_view(DbrView& view) noexcept
+    on_view(DbrClnt clnt, DbrView& view) noexcept
     {
     }
     void
-    on_flush() noexcept
+    on_flush(DbrClnt clnt) noexcept
     {
     }
     void*
-    on_async(void* val) noexcept
+    on_async(DbrClnt clnt, void* val) noexcept
     {
         return val;
     }
@@ -95,7 +96,7 @@ main(int argc, char* argv[])
         Handler handler;
         do {
             cout << '.';
-            clnt.dispatch(250, &handler);
+            dispatch(clnt, 250, &handler);
         } while (!clnt.is_ready());
         cout << endl;
 

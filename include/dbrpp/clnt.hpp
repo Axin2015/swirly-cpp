@@ -514,13 +514,165 @@ public:
     {
         dbr_clnt_canceltimer(impl_, id);
     }
-    bool
-    dispatch(DbrMillis ms, DbrHandler handler)
+    /**
+     * @addtogroup ClntView
+     * @{
+     */
+    ClntViews
+    views() const noexcept
     {
-        const int ret = dbr_clnt_dispatch(impl_, ms, handler);
-        if (ret < 0)
+        return ClntViews{impl_};
+    }
+    /** @} */
+    const unsigned char*
+    uuid() const noexcept
+    {
+        return dbr_clnt_uuid(impl_);
+    }
+};
+
+class ClntRef {
+    DbrClnt impl_;
+public:
+    explicit
+    ClntRef(DbrClnt impl) noexcept
+        : impl_{impl}
+    {
+    }
+    operator DbrClnt() const noexcept
+    {
+        return impl_;
+    }
+    void
+    swap(ClntRef& rhs) noexcept
+    {
+        std::swap(impl_, rhs.impl_);
+    }
+    void
+    reset() noexcept
+    {
+        dbr_clnt_reset(impl_);
+    }
+    DbrIden
+    close()
+    {
+        DbrIden req_id = dbr_clnt_close(impl_);
+        if (req_id < 0)
             throw_exception();
-        return ret == DBR_TRUE;
+        return req_id;
+    }
+    /**
+     * @addtogroup ClntRec
+     * @{
+     */
+    template <int TypeN>
+    ClntRecs<TypeN>
+    recs() const noexcept
+    {
+        return ClntRecs<TypeN>{impl_};
+    }
+    ClntAccntRecs
+    arecs() const noexcept
+    {
+        return ClntAccntRecs{impl_};
+    }
+    ClntContrRecs
+    crecs() const noexcept
+    {
+        return ClntContrRecs{impl_};
+    }
+    /** @} */
+    Accnt
+    accnt(DbrRec& arec) const
+    {
+        DbrAccnt accnt = dbr_clnt_accnt(impl_, &arec);
+        if (!accnt)
+            throw_exception();
+        return Accnt{accnt};
+    }
+    DbrIden
+    logon(DbrAccnt user)
+    {
+        DbrIden req_id = dbr_clnt_logon(impl_, user);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    logoff(DbrAccnt user)
+    {
+        DbrIden req_id = dbr_clnt_logoff(impl_, user);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    place(DbrAccnt user, DbrAccnt group, DbrRec& crec, DbrJd settl_day, const char* ref,
+          int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
+    {
+        DbrIden req_id = dbr_clnt_place(impl_, user, group, &crec, settl_day, ref, action,
+                                        ticks, lots, min_lots);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    revise(DbrAccnt user, DbrIden id, DbrLots lots)
+    {
+        DbrIden req_id = dbr_clnt_revise_id(impl_, user, id, lots);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    revise(DbrAccnt user, const char* ref, DbrLots lots)
+    {
+        DbrIden req_id = dbr_clnt_revise_ref(impl_, user, ref, lots);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    cancel(DbrAccnt user, DbrIden id)
+    {
+        DbrIden req_id = dbr_clnt_cancel_id(impl_, user, id);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    cancel(DbrAccnt user, const char* ref)
+    {
+        DbrIden req_id = dbr_clnt_cancel_ref(impl_, user, ref);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    DbrIden
+    ack_trade(DbrAccnt user, DbrIden id)
+    {
+        DbrIden req_id = dbr_clnt_ack_trade(impl_, user, id);
+        if (req_id < 0)
+            throw_exception();
+        return req_id;
+    }
+    bool
+    is_ready() const noexcept
+    {
+        return dbr_clnt_is_ready(impl_) == DBR_TRUE;
+    }
+    DbrIden
+    settimer(DbrMillis absms)
+    {
+        const DbrIden id = dbr_clnt_settimer(impl_, absms);
+        if (id < 0)
+            throw_exception();
+        return id;
+    }
+    void
+    canceltimer(DbrIden id)
+    {
+        dbr_clnt_canceltimer(impl_, id);
     }
     /**
      * @addtogroup ClntView

@@ -18,7 +18,6 @@
 #ifndef DBR_CLNT_H
 #define DBR_CLNT_H
 
-#include <dbr/handler.h>
 #include <dbr/types.h>
 
 #include <stddef.h>
@@ -162,9 +161,6 @@ dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms);
 
 DBR_API void
 dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id);
-
-DBR_API int
-dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 /**
  * @addtogroup ClntView

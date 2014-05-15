@@ -15,4 +15,20 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/text.h>
+#ifndef DBR_DISPATCH_H
+#define DBR_DISPATCH_H
+
+#include <dbr/clnt.h>
+#include <dbr/handler.h>
+
+/**
+ * @addtogroup Clnt
+ * @{
+ */
+
+DBR_API int
+dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
+
+/** @} */
+
+#endif // DBR_DISPATCH_H
