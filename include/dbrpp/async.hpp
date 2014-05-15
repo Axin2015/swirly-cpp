@@ -30,7 +30,12 @@ namespace dbr {
  */
 
 class Async {
+    friend class Ctx;
     DbrAsync impl_;
+    Async(DbrAsync impl) noexcept
+        : impl_{impl}
+    {
+    }
 public:
     ~Async() noexcept
     {

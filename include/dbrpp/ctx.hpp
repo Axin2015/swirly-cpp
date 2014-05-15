@@ -18,6 +18,8 @@
 #ifndef DBRPP_CTX_HPP
 #define DBRPP_CTX_HPP
 
+#include <dbrpp/async.hpp>
+
 #include <dbr/ctx.h>
 
 namespace dbr {
@@ -26,6 +28,70 @@ namespace dbr {
  * @addtogroup Ctx
  * @{
  */
+
+class Ctx {
+    DbrCtx impl_;
+public:
+    ~Ctx() noexcept
+    {
+        if (impl_)
+            dbr_ctx_destroy(impl_);
+    }
+    constexpr
+    Ctx(decltype(nullptr)) noexcept
+        : impl_{nullptr}
+    {
+    }
+    Ctx(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout, size_t capacity,
+        DbrHandler handler)
+        : impl_{dbr_ctx_create(mdaddr, traddr, seed, tmout, capacity, handler)}
+    {
+        if (!impl_)
+            throw_exception();
+    }
+    operator DbrCtx() const noexcept
+    {
+        return impl_;
+    }
+
+    // Copy semantics.
+
+    Ctx(const Ctx&) = delete;
+
+    Ctx&
+    operator =(const Ctx&) = delete;
+
+    // Move semantics.
+
+    Ctx(Ctx&& rhs) noexcept
+        : impl_{nullptr}
+    {
+        swap(rhs);
+    }
+    Ctx&
+    operator =(Ctx&& rhs) noexcept
+    {
+        if (impl_) {
+            dbr_ctx_destroy(impl_);
+            impl_ = nullptr;
+        }
+        swap(rhs);
+        return *this;
+    }
+    void
+    swap(Ctx& rhs) noexcept
+    {
+        std::swap(impl_, rhs.impl_);
+    }
+    Async
+    async()
+    {
+        DbrAsync impl = dbr_ctx_async(impl_);
+        if (!impl)
+            throw_exception();
+        return Async(impl);
+    }
+};
 
 /** @} */
 

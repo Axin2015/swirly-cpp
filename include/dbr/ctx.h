@@ -18,6 +18,7 @@
 #ifndef DBR_CTX_H
 #define DBR_CTX_H
 
+#include <dbr/async.h>
 #include <dbr/handler.h>
 #include <dbr/types.h>
 
@@ -34,6 +35,9 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
 
 DBR_API void
 dbr_ctx_destroy(DbrCtx ctx);
+
+DBR_API DbrAsync
+dbr_ctx_async(DbrCtx ctx);
 
 /** @} */
 

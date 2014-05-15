@@ -197,3 +197,9 @@ dbr_ctx_destroy(DbrCtx ctx)
     zmq_ctx_destroy(ctx->zctx);
     free(ctx);
 }
+
+DBR_API DbrAsync
+dbr_ctx_async(DbrCtx ctx)
+{
+    return dbr_async_create(ctx->zctx, ctx->uuid);
+}
