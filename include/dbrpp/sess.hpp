@@ -248,7 +248,9 @@ public:
 inline std::ostream&
 operator <<(std::ostream& os, const Sess& sess)
 {
-    return os << "uuid=" << sess.uuid();
+    char buf[DBR_UUID_MAX + 1];
+    uuid_unparse_lower(sess.uuid(), buf);
+    return os << "uuid=" << buf;
 }
 
 class SessRef {

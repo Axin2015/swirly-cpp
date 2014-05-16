@@ -39,6 +39,9 @@ dbr_ctx_destroy(DbrCtx ctx);
 DBR_API DbrAsync
 dbr_ctx_async(DbrCtx ctx);
 
+DBR_API const unsigned char*
+dbr_ctx_uuid(DbrCtx ctx);
+
 /** @} */
 
 #endif // DBR_CTX_H

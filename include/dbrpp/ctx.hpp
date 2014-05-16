@@ -22,6 +22,10 @@
 
 #include <dbr/ctx.h>
 
+#include <uuid/uuid.h>
+
+#include <iostream>
+
 namespace dbr {
 
 /**
@@ -91,7 +95,20 @@ public:
             throw_exception();
         return Async(impl);
     }
+    const unsigned char*
+    uuid() const noexcept
+    {
+        return dbr_ctx_uuid(impl_);
+    }
 };
+
+inline std::ostream&
+operator <<(std::ostream& os, const Ctx& ctx)
+{
+    char buf[DBR_UUID_MAX + 1];
+    uuid_unparse_lower(ctx.uuid(), buf);
+    return os << "uuid=" << buf;
+}
 
 /** @} */
 

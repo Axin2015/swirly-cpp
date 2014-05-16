@@ -95,6 +95,8 @@ main(int argc, char* argv[])
         Handler handler;
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
                 dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
+
+        cout << ctx << endl;
         Async async = ctx.async();
         apply(async, [](ClntRef clnt) {
                 clnt.close();

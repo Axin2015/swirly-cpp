@@ -531,6 +531,14 @@ public:
     }
 };
 
+inline std::ostream&
+operator <<(std::ostream& os, const Clnt& clnt)
+{
+    char buf[DBR_UUID_MAX + 1];
+    uuid_unparse_lower(clnt.uuid(), buf);
+    return os << "uuid=" << buf;
+}
+
 class ClntRef {
     DbrClnt impl_;
 public:
@@ -690,6 +698,14 @@ public:
         return dbr_clnt_uuid(impl_);
     }
 };
+
+inline std::ostream&
+operator <<(std::ostream& os, ClntRef clnt)
+{
+    char buf[DBR_UUID_MAX + 1];
+    uuid_unparse_lower(clnt.uuid(), buf);
+    return os << "uuid=" << buf;
+}
 
 /** @} */
 

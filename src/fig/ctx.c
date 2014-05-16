@@ -203,3 +203,9 @@ dbr_ctx_async(DbrCtx ctx)
 {
     return dbr_async_create(ctx->zctx, ctx->uuid);
 }
+
+DBR_API const unsigned char*
+dbr_ctx_uuid(DbrCtx ctx)
+{
+    return ctx->uuid;
+}
