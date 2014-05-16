@@ -34,7 +34,7 @@ typedef struct FigClnt* DbrClnt;
 /**
  * Create client.
  *
- * @param ctx ZeroMQ context.
+ * @param zctx ZeroMQ context.
  *
  * @param uuid Unique session-id.
  *
