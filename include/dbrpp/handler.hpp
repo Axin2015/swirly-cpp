@@ -18,6 +18,8 @@
 #ifndef DBRPP_HANDLER_HPP
 #define DBRPP_HANDLER_HPP
 
+#include <dbrpp/clnt.hpp>
+
 #include <dbr/handler.h>
 
 namespace dbr {
@@ -32,62 +34,62 @@ class IHandler : public DbrIHandler {
     static void
     on_close(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_close(clnt);
+        static_cast<DerivedT*>(handler)->on_close(ClntRef(clnt));
     }
     static void
     on_ready(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_ready(clnt);
+        static_cast<DerivedT*>(handler)->on_ready(ClntRef(clnt));
     }
     static void
     on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logon(clnt, req_id, uid);
+        static_cast<DerivedT*>(handler)->on_logon(ClntRef(clnt), req_id, uid);
     }
     static void
     on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logoff(clnt, req_id, uid);
+        static_cast<DerivedT*>(handler)->on_logoff(ClntRef(clnt), req_id, uid);
     }
     static void
     on_reset(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_reset(clnt);
+        static_cast<DerivedT*>(handler)->on_reset(ClntRef(clnt));
     }
     static void
     on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_timeout(clnt, req_id);
+        static_cast<DerivedT*>(handler)->on_timeout(ClntRef(clnt), req_id);
     }
     static void
     on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_status(clnt, req_id, num, msg);
+        static_cast<DerivedT*>(handler)->on_status(ClntRef(clnt), req_id, num, msg);
     }
     static void
     on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrExec* exec) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_exec(clnt, req_id, *exec);
+        static_cast<DerivedT*>(handler)->on_exec(ClntRef(clnt), req_id, *exec);
     }
     static void
     on_posn(DbrHandler handler, DbrClnt clnt, DbrPosn* posn) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_posn(clnt, *posn);
+        static_cast<DerivedT*>(handler)->on_posn(ClntRef(clnt), *posn);
     }
     static void
     on_view(DbrHandler handler, DbrClnt clnt, DbrView* view) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_view(clnt, *view);
+        static_cast<DerivedT*>(handler)->on_view(ClntRef(clnt), *view);
     }
     static void
     on_flush(DbrHandler handler, DbrClnt clnt) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_flush(clnt);
+        static_cast<DerivedT*>(handler)->on_flush(ClntRef(clnt));
     }
     static void*
     on_async(DbrHandler handler, DbrClnt clnt, void* val) noexcept
     {
-        return static_cast<DerivedT*>(handler)->on_async(clnt, val);
+        return static_cast<DerivedT*>(handler)->on_async(ClntRef(clnt), val);
     }
     static const DbrHandlerVtbl*
     vtbl() noexcept

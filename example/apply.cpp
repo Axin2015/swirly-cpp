@@ -30,59 +30,59 @@ using namespace std;
 class Handler : public IHandler<Handler> {
 public:
     void
-    on_close(DbrClnt clnt) noexcept
+    on_close(ClntRef clnt) noexcept
     {
     }
     void
-    on_ready(DbrClnt clnt) noexcept
+    on_ready(ClntRef clnt) noexcept
     {
     }
     void
-    on_logon(DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
     }
     void
-    on_logoff(DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
     }
     void
-    on_reset(DbrClnt clnt) noexcept
+    on_reset(ClntRef clnt) noexcept
     {
     }
     void
-    on_timeout(DbrClnt clnt, DbrIden req_id) noexcept
+    on_timeout(ClntRef clnt, DbrIden req_id) noexcept
     {
     }
     void
-    on_status(DbrClnt clnt, DbrIden req_id, int num, const char* msg) noexcept
+    on_status(ClntRef clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
     }
     void
-    on_exec(DbrClnt clnt, DbrIden req_id, DbrExec& exec) noexcept
+    on_exec(ClntRef clnt, DbrIden req_id, DbrExec& exec) noexcept
     {
     }
     void
-    on_posn(DbrClnt clnt, DbrPosn& posn) noexcept
+    on_posn(ClntRef clnt, DbrPosn& posn) noexcept
     {
     }
     void
-    on_view(DbrClnt clnt, DbrView& view) noexcept
+    on_view(ClntRef clnt, DbrView& view) noexcept
     {
     }
     void
-    on_flush(DbrClnt clnt) noexcept
+    on_flush(ClntRef clnt) noexcept
     {
     }
     void*
-    on_async(DbrClnt clnt, void* val) noexcept
+    on_async(ClntRef clnt, void* val) noexcept
     {
-        auto fn = static_cast<std::function<void* (DbrClnt)>*>(val);
+        auto fn = static_cast<std::function<void* (ClntRef)>*>(val);
         return (*fn)(clnt);
     }
 };
 
 void*
-apply(Async& async, std::function<void* (DbrClnt)> fn)
+apply(Async& async, std::function<void* (ClntRef)> fn)
 {
     async.send(&fn);
     return async.recv();
@@ -96,8 +96,8 @@ main(int argc, char* argv[])
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
                 dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
         Async async = ctx.async();
-        apply(async, [](DbrClnt clnt) {
-                dbr_clnt_close(clnt);
+        apply(async, [](ClntRef clnt) {
+                clnt.close();
                 return nullptr;
             });
 

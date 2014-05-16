@@ -18,9 +18,7 @@
 #ifndef DBR_HANDLER_H
 #define DBR_HANDLER_H
 
-#include <dbr/defs.h>
-
-typedef struct FigClnt* DbrClnt;
+#include <dbr/clnt.h>
 
 struct DbrExec;
 struct DbrPosn;
