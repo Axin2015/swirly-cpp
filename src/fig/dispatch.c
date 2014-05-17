@@ -406,7 +406,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_log_info("close message");
                 clnt->state = FIG_CLOSED;
                 dbr_handler_on_close(handler, clnt);
-                break;
+                return DBR_FALSE;
             case DBR_SESS_LOGON:
                 dbr_log_info("logon message");
                 dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.uid));

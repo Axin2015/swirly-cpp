@@ -19,6 +19,7 @@
 #include <dbrpp/handler.hpp>
 
 #include <dbr/clnt.h>
+#include <dbr/log.h>
 #include <dbr/util.h>
 
 #include <functional>
@@ -82,25 +83,32 @@ public:
 };
 
 void*
-apply(Async& async, std::function<void* (ClntRef)> fn)
+sendAndRecv(Async& async, std::function<void* (ClntRef)> fn)
 {
     async.send(&fn);
     return async.recv();
 }
 
+void
+sendOnly(Async& async, std::function<void (ClntRef)> fn)
+{
+    async.send(&fn);
+}
+
 int
 main(int argc, char* argv[])
 {
+    dbr_log_setlogger(dbr_log_serv);
     try {
         Handler handler;
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
                 dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
 
         cout << ctx << endl;
+
         Async async = ctx.async();
-        apply(async, [](ClntRef clnt) {
+        sendOnly(async, [](ClntRef clnt) {
                 clnt.close();
-                return nullptr;
             });
 
         cout << "exiting\n";

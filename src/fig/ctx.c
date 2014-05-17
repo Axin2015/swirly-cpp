@@ -53,6 +53,9 @@ struct Init {
     size_t capacity;
     DbrHandler handler;
 
+    int level;
+    DbrLogger logger;
+
     DbrCtx ctx;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
@@ -67,6 +70,11 @@ start_routine(void* arg)
     enum { TMOUT = 5000 };
 
     struct Init* init = arg;
+
+    // Inherit parent's level and logger.
+    dbr_log_setlevel(init->level);
+    dbr_log_setlogger(init->logger);
+
     DbrCtx ctx = init->ctx;
 
     DbrPool pool = dbr_pool_create(init->capacity);
@@ -130,6 +138,9 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
         .tmout = tmout,
         .capacity = capacity,
         .handler = handler,
+
+        .level = dbr_log_level(),
+        .logger = dbr_log_logger(),
 
         .ctx = ctx,
         .mutex = PTHREAD_MUTEX_INITIALIZER,
