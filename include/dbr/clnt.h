@@ -153,9 +153,6 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref);
 DBR_API DbrIden
 dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id);
 
-DBR_API DbrBool
-dbr_clnt_is_ready(DbrClnt clnt);
-
 DBR_API DbrIden
 dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms);
 
@@ -191,6 +188,12 @@ dbr_clnt_empty_view(DbrClnt clnt);
 
 DBR_API const unsigned char*
 dbr_clnt_uuid(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_is_closed(DbrClnt clnt);
+
+DBR_API DbrBool
+dbr_clnt_is_ready(DbrClnt clnt);
 
 /** @} */
 

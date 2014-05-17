@@ -447,8 +447,6 @@ cdef extern from "dbr/clnt.h":
 
     DbrIden dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id) nogil
 
-    DbrBool dbr_clnt_is_ready(DbrClnt clnt) nogil
-
     DbrIden dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms) nogil
 
     void dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id) nogil
@@ -464,6 +462,10 @@ cdef extern from "dbr/clnt.h":
     DbrBool dbr_clnt_empty_view(DbrClnt clnt) nogil
 
     const unsigned char* dbr_clnt_uuid(DbrClnt clnt) nogil
+
+    DbrBool dbr_clnt_is_closed(DbrClnt clnt) nogil
+
+    DbrBool dbr_clnt_is_ready(DbrClnt clnt) nogil
 
 cdef extern from "dbr/handler.h":
 

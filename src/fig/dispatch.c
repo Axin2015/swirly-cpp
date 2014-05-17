@@ -312,6 +312,12 @@ DBR_API int
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
     assert(ms >= 0);
+
+    if (clnt->state == FIG_CLOSED) {
+        dbr_err_set(DBR_EBUSY, "client is closed");
+        goto fail1;
+    }
+
     DbrMillis now = dbr_millis();
     const DbrMillis absms = now + ms;
     // At least one iteration.

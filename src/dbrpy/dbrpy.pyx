@@ -805,9 +805,6 @@ cdef class Clnt(object):
             raise Error()
         return id
 
-    def is_ready(self):
-        return <bint>dbr_clnt_is_ready(self.impl_)
-
     def settimer(self, DbrMillis absms):
         cdef DbrIden id = dbr_clnt_settimer(self.impl_, absms)
         if id < 0:
@@ -832,6 +829,12 @@ cdef class Clnt(object):
 
     def uuid(self):
         return uuid.UUID(bytes = dbr_clnt_uuid(self.impl_))
+
+    def is_closed(self):
+        return <bint>dbr_clnt_is_closed(self.impl_)
+
+    def is_ready(self):
+        return <bint>dbr_clnt_is_ready(self.impl_)
 
 # ClntRef
 
@@ -936,9 +939,6 @@ cdef class ClntRef(object):
             raise Error()
         return id
 
-    def is_ready(self):
-        return <bint>dbr_clnt_is_ready(self.impl_)
-
     def settimer(self, DbrMillis absms):
         cdef DbrIden id = dbr_clnt_settimer(self.impl_, absms)
         if id < 0:
@@ -963,6 +963,12 @@ cdef class ClntRef(object):
 
     def uuid(self):
         return uuid.UUID(bytes = dbr_clnt_uuid(self.impl_))
+
+    def is_closed(self):
+        return <bint>dbr_clnt_is_closed(self.impl_)
+
+    def is_ready(self):
+        return <bint>dbr_clnt_is_ready(self.impl_)
 
 cdef ClntRef make_clnt_ref(DbrClnt impl):
     obj = ClntRef()

@@ -496,11 +496,6 @@ public:
             throw_exception();
         return req_id;
     }
-    bool
-    is_ready() const noexcept
-    {
-        return dbr_clnt_is_ready(impl_) == DBR_TRUE;
-    }
     DbrIden
     settimer(DbrMillis absms)
     {
@@ -528,6 +523,16 @@ public:
     uuid() const noexcept
     {
         return dbr_clnt_uuid(impl_);
+    }
+    bool
+    is_closed() const noexcept
+    {
+        return dbr_clnt_is_closed(impl_) == DBR_TRUE;
+    }
+    bool
+    is_ready() const noexcept
+    {
+        return dbr_clnt_is_ready(impl_) == DBR_TRUE;
     }
 };
 
@@ -664,11 +669,6 @@ public:
             throw_exception();
         return req_id;
     }
-    bool
-    is_ready() const noexcept
-    {
-        return dbr_clnt_is_ready(impl_) == DBR_TRUE;
-    }
     DbrIden
     settimer(DbrMillis absms)
     {
@@ -696,6 +696,16 @@ public:
     uuid() const noexcept
     {
         return dbr_clnt_uuid(impl_);
+    }
+    bool
+    is_closed() const noexcept
+    {
+        return dbr_clnt_is_closed(impl_) == DBR_TRUE;
+    }
+    bool
+    is_ready() const noexcept
+    {
+        return dbr_clnt_is_ready(impl_) == DBR_TRUE;
     }
 };
 

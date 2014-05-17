@@ -543,12 +543,6 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id)
     return -1;
 }
 
-DBR_API DbrBool
-dbr_clnt_is_ready(DbrClnt clnt)
-{
-    return clnt->state == FIG_READY;
-}
-
 DBR_API DbrIden
 dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
 {
@@ -593,4 +587,16 @@ DBR_API const unsigned char*
 dbr_clnt_uuid(DbrClnt clnt)
 {
     return clnt->sess.uuid;
+}
+
+DBR_API DbrBool
+dbr_clnt_is_closed(DbrClnt clnt)
+{
+    return clnt->state == FIG_CLOSED;
+}
+
+DBR_API DbrBool
+dbr_clnt_is_ready(DbrClnt clnt)
+{
+    return clnt->state == FIG_READY;
 }
