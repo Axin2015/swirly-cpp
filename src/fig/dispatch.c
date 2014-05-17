@@ -308,7 +308,7 @@ async_recv(void* sock, void** val)
     return DBR_TRUE;
 }
 
-DBR_API int
+DBR_API DbrBool
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
     assert(ms >= 0);
@@ -362,7 +362,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             } else if (id == clnt->close_id) {
                 clnt->state = FIG_CLOSED;
                 dbr_handler_on_close(handler, clnt);
-                return DBR_FALSE;
+                goto done;
             } else {
                 // Assumed that these "top-half" handlers do not block.
                 dbr_handler_on_timeout(handler, clnt, id);
@@ -412,7 +412,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_log_info("close message");
                 clnt->state = FIG_CLOSED;
                 dbr_handler_on_close(handler, clnt);
-                return DBR_FALSE;
+                goto done;
             case DBR_SESS_LOGON:
                 dbr_log_info("logon message");
                 dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.uid));
@@ -548,8 +548,9 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto fail1;
         }
     } while (now < absms);
-    return !(clnt->state & FIG_CLOSED) ? DBR_TRUE : DBR_FALSE;
+ done:
+    return DBR_TRUE;
  fail1:
-    return -1;
+    return DBR_FALSE;
 }
 

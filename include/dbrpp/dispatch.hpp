@@ -29,13 +29,11 @@ namespace dbr {
  * @{
  */
 
-inline bool
+inline void
 dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
-    const int ret = dbr_clnt_dispatch(clnt, ms, handler);
-    if (ret < 0)
+    if (!dbr_clnt_dispatch(clnt, ms, handler))
         throw_exception();
-    return ret == DBR_TRUE;
 }
 
 /** @} */

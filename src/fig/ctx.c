@@ -95,15 +95,11 @@ start_routine(void* arg)
     // The init pointer is left dangling beyond this point.
 
     // Dispatch loop.
-    for (;;) {
-        const int ret = dbr_clnt_dispatch(clnt, TMOUT, handler);
-        if (ret < 0)
+    while (!dbr_clnt_is_closed(clnt)) {
+        if (!dbr_clnt_dispatch(clnt, TMOUT, handler))
             dbr_err_perror("dbr_clnt_dispatch() failed");
-        else if (!ret) {
-            dbr_log_info("exiting thread");
-            break;
-        }
     }
+    dbr_log_info("exiting thread");
 
     dbr_clnt_destroy(clnt);
     dbr_pool_destroy(pool);

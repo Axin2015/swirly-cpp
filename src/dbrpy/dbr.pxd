@@ -505,4 +505,4 @@ cdef extern from "dbr/handler.h":
 
 cdef extern from "dbr/dispatch.h":
 
-    int dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil
+    DbrBool dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler) nogil

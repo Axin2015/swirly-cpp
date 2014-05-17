@@ -26,7 +26,7 @@
  * @{
  */
 
-DBR_API int
+DBR_API DbrBool
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 /** @} */

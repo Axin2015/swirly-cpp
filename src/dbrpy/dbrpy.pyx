@@ -1086,6 +1086,5 @@ def dispatch(Clnt clnt, DbrMillis ms, Handler handler):
     cdef DbrBool ret
     with nogil:
         ret = dbr_clnt_dispatch(clnt.impl_, ms, &handler.impl_.handler)
-    if ret < 0:
+    if ret == DBR_FALSE:
         raise Error()
-    return <bint>ret;

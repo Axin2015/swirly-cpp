@@ -94,10 +94,12 @@ main(int argc, char* argv[])
 
         // TODO: more robust logic.
         Handler handler;
-        do {
+        while (!clnt.is_closed()) {
             cout << '.';
             dispatch(clnt, 250, &handler);
-        } while (!clnt.is_ready());
+            if (clnt.is_ready())
+                break;
+        }
         cout << endl;
 
         cout << "accnts:\n";
@@ -110,6 +112,9 @@ main(int argc, char* argv[])
             ContrRecRef ref(rec);
             cout << ref << endl;
         }
+        clnt.close();
+        while (!clnt.is_closed())
+            dispatch(clnt, 250, &handler);
         return 0;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;
