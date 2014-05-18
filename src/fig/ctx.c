@@ -93,6 +93,8 @@ start_routine(void* arg)
     pthread_cond_signal(&init->cond);
     pthread_mutex_unlock(&init->mutex);
     // The init pointer is left dangling beyond this point.
+    // Fail-fast if accessed due to logic-error.
+    init = NULL;
 
     // Dispatch loop.
     while (!dbr_clnt_is_closed(clnt)) {
@@ -128,6 +130,7 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
     }
 
     struct Init init = {
+
         .mdaddr = { 0 },
         .traddr = { 0 },
         .seed = seed,
@@ -181,15 +184,15 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
         void* ret;
         const int err = pthread_join(ctx->child, &ret);
         if (err)
-            dbr_err_printf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
+            dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
     }
  fail3:
     zmq_ctx_destroy(ctx->zctx);
  fail2:
     pthread_cond_destroy(&init.cond);
     pthread_mutex_destroy(&init.mutex);
- fail1:
     free(ctx);
+ fail1:
     return NULL;
 }
 
@@ -199,7 +202,7 @@ dbr_ctx_destroy(DbrCtx ctx)
     void* ret;
     const int err = pthread_join(ctx->child, &ret);
     if (err)
-        dbr_err_printf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
+        dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
 
     zmq_ctx_destroy(ctx->zctx);
     free(ctx);

@@ -23,21 +23,21 @@
 
 #include <stdlib.h>
 
-struct FirSqlJourn {
+struct SqlJourn {
     struct FirSqlite sqlite;
     struct DbrIJourn i_journ;
 };
 
-static inline struct FirSqlJourn*
+static inline struct SqlJourn*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct FirSqlJourn, i_journ, journ);
+    return dbr_implof(struct SqlJourn, i_journ, journ);
 }
 
 static void
 destroy(DbrJourn journ)
 {
-    struct FirSqlJourn* impl = journ_implof(journ);
+    struct SqlJourn* impl = journ_implof(journ);
     fir_sqlite_term(&impl->sqlite);
     free(impl);
 }
@@ -45,7 +45,7 @@ destroy(DbrJourn journ)
 static DbrBool
 insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
-    struct FirSqlJourn* impl = journ_implof(journ);
+    struct SqlJourn* impl = journ_implof(journ);
     struct FirSqlite* sqlite = &impl->sqlite;
 
     if (!fir_sqlite_begin_trans(sqlite))
@@ -69,7 +69,7 @@ insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 static DbrBool
 insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 {
-    struct FirSqlJourn* impl = journ_implof(journ);
+    struct SqlJourn* impl = journ_implof(journ);
     struct FirSqlite* sqlite = &impl->sqlite;
     return fir_sqlite_insert_exec(sqlite, exec, enriched);
 }
@@ -77,7 +77,7 @@ insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 static DbrBool
 update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
-    struct FirSqlJourn* impl = journ_implof(journ);
+    struct SqlJourn* impl = journ_implof(journ);
     struct FirSqlite* sqlite = &impl->sqlite;
     return fir_sqlite_update_exec(sqlite, id, modified);
 }
@@ -92,7 +92,7 @@ static const struct DbrJournVtbl JOURN_VTBL = {
 DBR_API DbrJourn
 dbr_sqljourn_create(const char* path)
 {
-    struct FirSqlJourn* impl = malloc(sizeof(struct FirSqlJourn));
+    struct SqlJourn* impl = malloc(sizeof(struct SqlJourn));
     if (dbr_unlikely(!impl)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;

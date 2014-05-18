@@ -32,13 +32,13 @@
 
 enum { HWM = 0 };
 
-struct FirZmqJourn {
+struct ZmqJourn {
     void* sock;
     pthread_t child;
     struct DbrIJourn i_journ;
 };
 
-DBR_EXTERN DbrBool
+static DbrBool
 send_body(void* sock, struct DbrBody* body, DbrBool enriched)
 {
     const size_t len = dbr_body_len(body, enriched);
@@ -57,20 +57,20 @@ send_body(void* sock, struct DbrBody* body, DbrBool enriched)
     return DBR_FALSE;
 }
 
-static inline struct FirZmqJourn*
+static inline struct ZmqJourn*
 journ_implof(DbrJourn journ)
 {
-    return dbr_implof(struct FirZmqJourn, i_journ, journ);
+    return dbr_implof(struct ZmqJourn, i_journ, journ);
 }
 
 static void
 destroy(DbrJourn journ)
 {
-    struct FirZmqJourn* impl = journ_implof(journ);
+    struct ZmqJourn* impl = journ_implof(journ);
 
     for (;;) {
         // Send poison pill.
-        struct DbrBody body = { .req_id = 0, .type = DBR_SESS_NOOP };
+        struct DbrBody body = { .req_id = 0, .type = DBR_SESS_CLOSE };
         if (dbr_likely(elm_send_body(impl->sock, &body, DBR_FALSE)))
             break;
         if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
@@ -92,7 +92,7 @@ destroy(DbrJourn journ)
 static DbrBool
 insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
-    struct FirZmqJourn* impl = journ_implof(journ);
+    struct ZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
                             .insert_exec_list_req = { .first = first, .count_ = 0 } };
     return send_body(impl->sock, &body, enriched);
@@ -101,7 +101,7 @@ insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 static DbrBool
 insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 {
-    struct FirZmqJourn* impl = journ_implof(journ);
+    struct ZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_REQ,
                             .insert_exec_req = { .exec = exec } };
     return send_body(impl->sock, &body, enriched);
@@ -110,7 +110,7 @@ insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 static DbrBool
 update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
-    struct FirZmqJourn* impl = journ_implof(journ);
+    struct ZmqJourn* impl = journ_implof(journ);
     struct DbrBody body = { .req_id = 0, .type = DBR_UPDATE_EXEC_REQ,
                             .update_exec_req = { .id = id, .modified = modified } };
     return send_body(impl->sock, &body, DBR_FALSE);
@@ -200,7 +200,7 @@ start_routine(void* arg)
             goto exit4;
         }
         switch (body.type) {
-        case DBR_SESS_NOOP:
+        case DBR_SESS_CLOSE:
             // Poison pill.
             goto exit4;
         case DBR_INSERT_EXEC_LIST_REQ:
@@ -235,7 +235,7 @@ start_routine(void* arg)
 DBR_API DbrJourn
 dbr_zmqjourn_create(void* zctx, size_t capacity, DbrJourn (*factory)(void*), void* arg)
 {
-    struct FirZmqJourn* impl = malloc(sizeof(struct FirZmqJourn));
+    struct ZmqJourn* impl = malloc(sizeof(struct ZmqJourn));
     if (dbr_unlikely(!impl)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;

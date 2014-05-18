@@ -23,21 +23,21 @@
 
 #include <stdlib.h>
 
-struct FirSqlModel {
+struct SqlModel {
     struct FirSqlite sqlite;
     struct DbrIModel i_model;
 };
 
-static inline struct FirSqlModel*
+static inline struct SqlModel*
 model_implof(DbrModel model)
 {
-    return dbr_implof(struct FirSqlModel, i_model, model);
+    return dbr_implof(struct SqlModel, i_model, model);
 }
 
 static void
 destroy(DbrModel model)
 {
-    struct FirSqlModel* impl = model_implof(model);
+    struct SqlModel* impl = model_implof(model);
     fir_sqlite_term(&impl->sqlite);
     free(impl);
 }
@@ -45,7 +45,7 @@ destroy(DbrModel model)
 static ssize_t
 read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
 {
-    struct FirSqlModel* impl = model_implof(model);
+    struct SqlModel* impl = model_implof(model);
     struct FirSqlite* sqlite = &impl->sqlite;
     return fir_sqlite_select_entity(sqlite, type, pool, first);
 }
@@ -58,7 +58,7 @@ static const struct DbrModelVtbl MODEL_VTBL = {
 DBR_API DbrModel
 dbr_sqlmodel_create(const char* path)
 {
-    struct FirSqlModel* impl = malloc(sizeof(struct FirSqlModel));
+    struct SqlModel* impl = malloc(sizeof(struct SqlModel));
     if (dbr_unlikely(!impl)) {
         dbr_err_set(DBR_ENOMEM, "out of memory");
         goto fail1;
