@@ -129,6 +129,12 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
         goto fail1;
     }
 
+    if (!(ctx->zctx = zmq_ctx_new())) {
+        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
+        goto fail2;
+    }
+    uuid_generate(ctx->uuid);
+
     struct Init init = {
 
         .mdaddr = { 0 },
@@ -152,13 +158,6 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
     // Null terminated by initialiser.
     strncpy(init.mdaddr, mdaddr, ADDR_MAX);
     strncpy(init.traddr, traddr, ADDR_MAX);
-
-    if (!(ctx->zctx = zmq_ctx_new())) {
-        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail2;
-    }
-
-    uuid_generate(ctx->uuid);
 
     const int err = pthread_create(&ctx->child, NULL, start_routine, &init);
     if (err) {
@@ -188,9 +187,9 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
     }
  fail3:
     zmq_ctx_destroy(ctx->zctx);
- fail2:
     pthread_cond_destroy(&init.cond);
     pthread_mutex_destroy(&init.mutex);
+ fail2:
     free(ctx);
  fail1:
     return NULL;
