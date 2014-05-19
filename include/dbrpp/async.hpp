@@ -101,6 +101,12 @@ public:
             throw_exception();
         return val;
     }
+    void
+    close()
+    {
+        if (!dbr_async_close(impl_))
+            throw_exception();
+    }
 };
 
 /** @} */

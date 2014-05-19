@@ -25,6 +25,8 @@
  * @{
  */
 
+#define DBR_ASYNC_CLOSE ((void*)~0)
+
 typedef struct ElmAsync* DbrAsync;
 
 DBR_API DbrAsync
@@ -38,6 +40,13 @@ dbr_async_send(DbrAsync async, void* val);
 
 DBR_API DbrBool
 dbr_async_recv(DbrAsync async, void** val);
+
+static inline DbrBool
+dbr_async_close(DbrAsync async)
+{
+    const void* val = DBR_ASYNC_CLOSE;
+    return dbr_async_send(async, &val);
+}
 
 /** @} */
 

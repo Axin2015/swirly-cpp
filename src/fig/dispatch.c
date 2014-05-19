@@ -542,10 +542,15 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (!async_recv(clnt->asock, &val))
                 goto fail1;
 
-            val = dbr_handler_on_async(handler, clnt, val);
-
-            if (!async_send(clnt->asock, val))
-                goto fail1;
+            if (dbr_unlikely(val == (void*)~0)) {
+                if (fig_sess_close(clnt, now) < 0)
+                    goto fail1;
+                clnt->state |= FIG_CLOSE_WAIT;
+            } else {
+                val = dbr_handler_on_async(handler, clnt, val);
+                if (!async_send(clnt->asock, val))
+                    goto fail1;
+            }
         }
     } while (now < absms);
  done:
@@ -553,4 +558,3 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
  fail1:
     return DBR_FALSE;
 }
-

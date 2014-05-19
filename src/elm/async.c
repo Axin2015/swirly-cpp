@@ -20,10 +20,11 @@
 #include <dbr/err.h>
 #include <dbr/types.h>
 
-#include <stdlib.h> // malloc()
-
 #include <uuid/uuid.h>
+
 #include <zmq.h>
+
+#include <stdlib.h> // malloc()
 
 struct ElmAsync {
     void* sock;

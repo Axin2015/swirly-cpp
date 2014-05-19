@@ -265,13 +265,7 @@ dbr_clnt_reset(DbrClnt clnt)
 DBR_API DbrIden
 dbr_clnt_close(DbrClnt clnt)
 {
-    const DbrMillis now = dbr_millis();
-    const DbrIden req_id = fig_sess_close(clnt, now);
-    if (req_id < 0)
-        goto fail1;
-    return req_id;
- fail1:
-    return -1;
+    return fig_sess_close(clnt, dbr_millis());
 }
 
 DBR_API struct DbrSlNode*
