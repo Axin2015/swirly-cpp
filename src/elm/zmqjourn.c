@@ -22,20 +22,28 @@
 
 #include <dbr/err.h>
 #include <dbr/refcount.h>
+#include <dbr/log.h>
+#include <dbr/pool.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <uuid/uuid.h>
+
+#include <zmq.h>
+
+#include <stdlib.h> // malloc()
 #include <string.h> // strerror()
 
 #include <pthread.h>
-#include <zmq.h>
 
 enum { HWM = 0 };
 
 struct ZmqJourn {
+    // Shared state.
+    void* zctx;
+    struct DbrIJourn i_journ;
+
+    // Thread state confined to parent.
     void* sock;
     pthread_t child;
-    struct DbrIJourn i_journ;
 };
 
 static DbrBool
@@ -123,37 +131,54 @@ static const struct DbrJournVtbl JOURN_VTBL = {
     .update_exec = update_exec
 };
 
-struct State {
-    void* zctx;
+enum { INIT = -1, SUCCESS = 0, FAILURE = 1 };
+enum { INPROC_LEN = sizeof("inproc://") - 1 };
+
+struct Init {
+
     size_t capacity;
     DbrJourn (*factory)(void*);
     void* arg;
+
     int level;
     DbrLogger logger;
-    // Sizeof string literal includes null terminator.
-    char addr[sizeof("inproc://0x0123456789ABCDEF")];
+
+    struct ZmqJourn* impl;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    char addr[INPROC_LEN + DBR_UUID_MAX + 1];
+    int state;
+    int err_num;
+    char err_msg[DBR_ERRMSG_MAX];
 };
 
 static void*
 start_routine(void* arg)
 {
-    struct State* state = arg;
+    enum { TMOUT = 5000 };
+
+    struct Init* init = arg;
+    struct ZmqJourn* impl = init->impl;
 
     // Inherit parent's level and logger.
-    dbr_log_setlevel(state->level);
-    dbr_log_setlogger(state->logger);
+    dbr_log_setlevel(init->level);
+    dbr_log_setlogger(init->logger);
 
     struct ElmPool pool;
     if (!elm_pool_init(&pool, 8 * 1024 * 1024))
-        goto exit1;
+        goto fail1;
+
+    DbrJourn journ = init->factory(init->arg);
+    if (!journ)
+        goto fail2;
 
     // The socket cannot be created in the parent. The zguide says:
     // Remember: Do not use or close sockets except in the thread that created them.
 
-    void* sock = zmq_socket(state->zctx, ZMQ_PAIR);
+    void* sock = zmq_socket(impl->zctx, ZMQ_PAIR);
     if (dbr_unlikely(!sock)) {
         dbr_err_printf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto exit2;
+        goto fail3;
     }
     const int opt = 0;
     zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
@@ -161,48 +186,36 @@ start_routine(void* arg)
     const int hwm = HWM;
     if (dbr_unlikely(zmq_setsockopt(sock, ZMQ_SNDHWM, &hwm, sizeof(int))) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_setsockopt() failed: %s", zmq_strerror(zmq_errno()));
-        goto exit3;
+        goto fail4;
     }
 
-    if (dbr_unlikely(zmq_connect(sock, state->addr) < 0)) {
+    if (dbr_unlikely(zmq_connect(sock, init->addr) < 0)) {
         dbr_err_printf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
-        goto exit3;
+        goto fail4;
     }
 
-    struct DbrBody body = { .req_id = 0, .type = DBR_STATUS_REP,
-                            .status_rep = { .num = 0, .msg = "" } };
-    DbrJourn journ = state->factory(state->arg);
-    // Nullify parent pointer as precaution after use.
-    state->arg = NULL;
-
-    if (dbr_unlikely(!journ)) {
-        dbr_err_perror("state->factory() failed");
-        // Reply to parent with error status.
-        body.status_rep.num = dbr_err_num();
-        strncpy(body.status_rep.msg, dbr_err_msg(), DBR_ERRMSG_MAX);
-        if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE)))
-            dbr_err_perror("elm_send_body() failed");
-        goto exit3;
-    }
-
-    if (dbr_unlikely(!elm_send_body(sock, &body, DBR_FALSE))) {
-        dbr_err_perror("elm_send_body() failed");
-        goto exit4;
-    }
+    pthread_mutex_lock(&init->mutex);
+    init->state = SUCCESS;
+    pthread_cond_signal(&init->cond);
+    pthread_mutex_unlock(&init->mutex);
+    // The init pointer is left dangling beyond this point.
+    // Fail-fast if accessed due to logic-error.
+    init = NULL;
 
     for (;;) {
+        struct DbrBody body;
         if (dbr_unlikely(!elm_recv_body(sock, &pool, &body))) {
             if (dbr_err_num() == DBR_EINTR) {
                 dbr_log_warn("thread interrupted");
                 continue;
             }
             dbr_err_perror("elm_recv_body() failed");
-            goto exit4;
+            goto done;
         }
         switch (body.type) {
         case DBR_SESS_CLOSE:
             // Poison pill.
-            goto exit4;
+            goto done;
         case DBR_INSERT_EXEC_LIST_REQ:
             if (!dbr_journ_insert_exec_list(journ, body.insert_exec_list_req.first, DBR_FALSE))
                 dbr_err_perror("dbr_journ_insert_exec_list() failed");
@@ -220,15 +233,26 @@ start_routine(void* arg)
             break;
         }
     }
- exit4:
-    dbr_journ_destroy(journ);
- exit3:
-    zmq_close(sock);
- exit2:
-    elm_pool_term(&pool);
- exit1:
-    free(state);
+ done:
     dbr_log_info("exiting thread");
+    zmq_close(sock);
+    dbr_journ_destroy(journ);
+    elm_pool_term(&pool);
+    return NULL;
+ fail4:
+    zmq_close(sock);
+ fail3:
+    dbr_journ_destroy(journ);
+ fail2:
+    elm_pool_term(&pool);
+ fail1:
+    init->err_num = dbr_err_num();
+    strncpy(init->err_msg, dbr_err_msg(), DBR_ERRMSG_MAX);
+
+    pthread_mutex_lock(&init->mutex);
+    init->state = FAILURE;
+    pthread_cond_signal(&init->cond);
+    pthread_mutex_unlock(&init->mutex);
     return NULL;
 }
 
@@ -241,83 +265,82 @@ dbr_zmqjourn_create(void* zctx, size_t capacity, DbrJourn (*factory)(void*), voi
         goto fail1;
     }
 
-    struct State* state = malloc(sizeof(struct State));
-    if (dbr_unlikely(!state)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+    impl->zctx = zctx;
+    impl->i_journ.vtbl = &JOURN_VTBL;
+
+    struct Init init = {
+
+        .capacity = capacity,
+        .factory = factory,
+        .arg = arg,
+
+        .level = dbr_log_level(),
+        .logger = dbr_log_logger(),
+
+        .impl = impl,
+        .mutex = PTHREAD_MUTEX_INITIALIZER,
+        .cond = PTHREAD_COND_INITIALIZER,
+        .addr = { 0 },
+        .state = INIT,
+        .err_num = 0,
+        .err_msg = ""
+    };
+
+    DbrUuid uuid;
+    uuid_generate(uuid);
+    __builtin_memcpy(init.addr, "inproc://", INPROC_LEN);
+    uuid_unparse_lower(uuid, init.addr + INPROC_LEN);
+
+    impl->sock = zmq_socket(zctx, ZMQ_PAIR);
+    if (dbr_unlikely(!impl->sock)) {
+        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
-
-    state->zctx = zctx;
-    state->capacity = capacity;
-    state->factory = factory;
-    state->arg = arg;
-    state->level = dbr_log_level();
-    state->logger = dbr_log_logger();
-    // Socket address is uniquely constructed from memory address.
-    sprintf(state->addr, "inproc://%p", impl);
-
-    void* sock = zmq_socket(zctx, ZMQ_PAIR);
-    if (dbr_unlikely(!sock)) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail3;
-    }
     const int opt = 0;
-    zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
+    zmq_setsockopt(impl->sock, ZMQ_LINGER, &opt, sizeof(opt));
 
     const int hwm = HWM;
-    if (dbr_unlikely(zmq_setsockopt(sock, ZMQ_RCVHWM, &hwm, sizeof(int))) < 0) {
+    if (dbr_unlikely(zmq_setsockopt(impl->sock, ZMQ_RCVHWM, &hwm, sizeof(int))) < 0) {
         dbr_err_setf(DBR_EIO, "zmq_setsockopt() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail4;
+        goto fail3;
     }
 
-    if (dbr_unlikely(zmq_bind(sock, state->addr) < 0)) {
+    if (dbr_unlikely(zmq_bind(impl->sock, init.addr) < 0)) {
         dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail4;
+        goto fail3;
     }
 
-    pthread_t child;
-    const int err = pthread_create(&child, NULL, start_routine, state);
-    if (dbr_unlikely(err)) {
+    const int err = pthread_create(&impl->child, NULL, start_routine, &init);
+    if (err) {
         dbr_err_setf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
+        goto fail3;
+    }
+
+    pthread_mutex_lock(&init.mutex);
+    while (init.state == INIT)
+        pthread_cond_wait(&init.cond, &init.mutex);
+    pthread_mutex_unlock(&init.mutex);
+
+    if (init.state == FAILURE) {
+        dbr_err_set(init.err_num, init.err_msg);
         goto fail4;
     }
 
-    // Thread now owns state.
-    state = NULL;
-
-    for (;;) {
-        // Noop does not allocate memory.
-        DbrPool pool = NULL;
-        struct DbrBody body;
-        if (dbr_likely(elm_recv_body(sock, pool, &body))) {
-            assert(body.type == DBR_STATUS_REP);
-            // The factory function called by the thread may have failed.
-            if (dbr_unlikely(body.status_rep.num != 0)) {
-                dbr_err_set(body.status_rep.num, body.status_rep.msg);
-                void* ret;
-                const int err = pthread_join(impl->child, &ret);
-                if (dbr_unlikely(err)) {
-                    dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
-                }
-                goto fail4;
-            }
-            break;
-        } else if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
-            // This unlikely failure scenario is not easily dealt with, so we simply abort.
-            abort();
-        }
-        // Continue while DBR_EINTR.
-    }
-
-    impl->sock = sock;
-    impl->child = child;
-    impl->i_journ.vtbl = &JOURN_VTBL;
+    pthread_cond_destroy(&init.cond);
+    pthread_mutex_destroy(&init.mutex);
     return &impl->i_journ;
  fail4:
-    zmq_close(sock);
+    {
+        void* ret;
+        const int err = pthread_join(impl->child, &ret);
+        if (err)
+            dbr_err_printf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
+    }
  fail3:
-    free(state);
+    zmq_close(impl->sock);
  fail2:
+    pthread_cond_destroy(&init.cond);
+    pthread_mutex_destroy(&init.mutex);
     free(impl);
  fail1:
     return NULL;

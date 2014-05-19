@@ -70,12 +70,11 @@ start_routine(void* arg)
     enum { TMOUT = 5000 };
 
     struct Init* init = arg;
+    DbrCtx ctx = init->ctx;
 
     // Inherit parent's level and logger.
     dbr_log_setlevel(init->level);
     dbr_log_setlogger(init->logger);
-
-    DbrCtx ctx = init->ctx;
 
     DbrPool pool = dbr_pool_create(init->capacity);
     if (!pool)
