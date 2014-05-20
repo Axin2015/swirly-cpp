@@ -33,50 +33,62 @@ public:
     void
     on_close(ClntRef clnt) noexcept
     {
+        cout << "on_close\n";
     }
     void
     on_ready(ClntRef clnt) noexcept
     {
+        cout << "on_ready\n";
     }
     void
     on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
+        cout << "on_logon\n";
     }
     void
     on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
+        cout << "on_logoff\n";
     }
     void
     on_reset(ClntRef clnt) noexcept
     {
+        cout << "on_reset\n";
     }
     void
     on_timeout(ClntRef clnt, DbrIden req_id) noexcept
     {
+        cout << "on_timeout\n";
     }
     void
     on_status(ClntRef clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
+        cout << "on_status\n";
     }
     void
     on_exec(ClntRef clnt, DbrIden req_id, DbrExec& exec) noexcept
     {
+        cout << "on_exec\n";
     }
     void
     on_posn(ClntRef clnt, DbrPosn& posn) noexcept
     {
+        cout << "on_posn\n";
     }
     void
     on_view(ClntRef clnt, DbrView& view) noexcept
     {
+        cout << "on_view\n";
     }
     void
     on_flush(ClntRef clnt) noexcept
     {
+        cout << "on_flush\n";
     }
     void*
     on_async(ClntRef clnt, void* val) noexcept
     {
+        cout << "on_async\n";
         auto fn = static_cast<std::function<void* (ClntRef)>*>(val);
         return (*fn)(clnt);
     }
@@ -89,15 +101,21 @@ sendAndRecv(Async& async, std::function<void* (ClntRef)> fn)
     return async.recv();
 }
 
+void
+log_ios(int level, const char* msg)
+{
+    ostream& os = level > DBR_LOG_WARN ? cout : cerr;
+    os << msg << endl;
+}
+
 int
 main(int argc, char* argv[])
 {
-    dbr_log_setlogger(dbr_log_serv);
+    dbr_log_setlogger(log_ios);
     try {
         Handler handler;
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
                 dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
-
         cout << ctx << endl;
 
         Async async = ctx.async();

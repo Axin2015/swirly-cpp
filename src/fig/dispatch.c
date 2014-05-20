@@ -360,6 +360,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_err_setf(DBR_ETIMEOUT, "transaction socket timeout");
                 goto fail1;
             } else if (id == clnt->close_id) {
+                dbr_log_info("close timeout");
                 clnt->state = FIG_CLOSED;
                 dbr_handler_on_close(handler, clnt);
                 goto done;
