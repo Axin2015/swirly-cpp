@@ -75,6 +75,20 @@ dbr_async_destroy(DbrAsync async)
 }
 
 DBR_API DbrBool
+dbr_async_close(DbrAsync async)
+{
+    if (!dbr_async_send(async, DBR_ASYNC_CLOSE))
+        return DBR_FALSE;
+#if 0
+    // Ignore reply.
+    // FIXME: what if there is no reply?
+    void* val;
+    dbr_async_recv(async, &val);
+#endif
+    return DBR_TRUE;
+}
+
+DBR_API DbrBool
 dbr_async_send(DbrAsync async, void* val)
 {
     if (dbr_unlikely(zmq_send(async->sock, &val, sizeof(void*), 0) != sizeof(void*))) {

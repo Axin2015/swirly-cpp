@@ -36,16 +36,13 @@ DBR_API void
 dbr_async_destroy(DbrAsync async);
 
 DBR_API DbrBool
+dbr_async_close(DbrAsync async);
+
+DBR_API DbrBool
 dbr_async_send(DbrAsync async, void* val);
 
 DBR_API DbrBool
 dbr_async_recv(DbrAsync async, void** val);
-
-static inline DbrBool
-dbr_async_close(DbrAsync async)
-{
-    return dbr_async_send(async, DBR_ASYNC_CLOSE);
-}
 
 /** @} */
 
