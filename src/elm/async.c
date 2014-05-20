@@ -24,24 +24,13 @@
 
 #include <zmq.h>
 
-#include <stdlib.h> // malloc()
-
-struct ElmAsync {
-    void* sock;
-};
-
 DBR_API DbrAsync
 dbr_async_create(void* zctx, const DbrUuid uuid)
 {
-    DbrAsync async = malloc(sizeof(struct ElmAsync));
-    if (dbr_unlikely(!async)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        goto fail1;
-    }
     void* sock = zmq_socket(zctx, ZMQ_REQ);
     if (dbr_unlikely(!sock)) {
         dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail2;
+        goto fail1;
     }
     const int opt = 0;
     zmq_setsockopt(sock, ZMQ_LINGER, &opt, sizeof(opt));
@@ -53,14 +42,11 @@ dbr_async_create(void* zctx, const DbrUuid uuid)
 
     if (dbr_unlikely(zmq_connect(sock, addr) < 0)) {
         dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
-        goto fail3;
+        goto fail2;
     }
-    async->sock = sock;
-    return async;
- fail3:
-    zmq_close(sock);
+    return sock;
  fail2:
-    free(async);
+    zmq_close(sock);
  fail1:
     return NULL;
 }
@@ -68,10 +54,9 @@ dbr_async_create(void* zctx, const DbrUuid uuid)
 DBR_API void
 dbr_async_destroy(DbrAsync async)
 {
-    if (async) {
-        zmq_close(async->sock);
-        free(async);
-    }
+    void* sock = async;
+    if (async)
+        zmq_close(sock);
 }
 
 DBR_API DbrBool
@@ -91,7 +76,8 @@ dbr_async_close(DbrAsync async)
 DBR_API DbrBool
 dbr_async_send(DbrAsync async, void* val)
 {
-    if (dbr_unlikely(zmq_send(async->sock, &val, sizeof(void*), 0) != sizeof(void*))) {
+    void* sock = async;
+    if (dbr_unlikely(zmq_send(sock, &val, sizeof(void*), 0) != sizeof(void*))) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
@@ -101,7 +87,8 @@ dbr_async_send(DbrAsync async, void* val)
 DBR_API DbrBool
 dbr_async_recv(DbrAsync async, void** val)
 {
-    if (dbr_unlikely(zmq_recv(async->sock, val, sizeof(void*), 0) != sizeof(void*))) {
+    void* sock = async;
+    if (dbr_unlikely(zmq_recv(sock, val, sizeof(void*), 0) != sizeof(void*))) {
         const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
         dbr_err_setf(num, "zmq_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
