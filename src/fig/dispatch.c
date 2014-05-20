@@ -546,11 +546,12 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 if (fig_sess_close(clnt, now) < 0)
                     goto fail1;
                 clnt->state |= FIG_CLOSE_WAIT;
-            } else {
+                val = NULL;
+            } else
                 val = dbr_handler_on_async(handler, clnt, val);
-                if (!async_send(clnt->asock, val))
-                    goto fail1;
-            }
+
+            if (!async_send(clnt->asock, val))
+                goto fail1;
         }
     } while (now < absms);
  done:

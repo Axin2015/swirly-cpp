@@ -44,8 +44,7 @@ dbr_async_recv(DbrAsync async, void** val);
 static inline DbrBool
 dbr_async_close(DbrAsync async)
 {
-    const void* val = DBR_ASYNC_CLOSE;
-    return dbr_async_send(async, &val);
+    return dbr_async_send(async, DBR_ASYNC_CLOSE);
 }
 
 /** @} */

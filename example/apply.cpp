@@ -89,12 +89,6 @@ sendAndRecv(Async& async, std::function<void* (ClntRef)> fn)
     return async.recv();
 }
 
-void
-sendOnly(Async& async, std::function<void (ClntRef)> fn)
-{
-    async.send(&fn);
-}
-
 int
 main(int argc, char* argv[])
 {
@@ -107,10 +101,15 @@ main(int argc, char* argv[])
         cout << ctx << endl;
 
         Async async = ctx.async();
-        sendOnly(async, [](ClntRef clnt) {
-                clnt.close();
+        sendAndRecv(async, [](ClntRef clnt) {
+                for (auto rec : clnt.crecs()) {
+                    ContrRecRef ref(rec);
+                    cout << ref << endl;
+                }
+                return nullptr;
             });
-
+        cout << "closing\n";
+        async.close();
         cout << "exiting\n";
         return 0;
     } catch (const exception& e) {

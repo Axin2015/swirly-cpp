@@ -97,7 +97,7 @@ public:
     recv()
     {
         void* val;
-        if (!dbr_async_send(impl_, &val))
+        if (!dbr_async_recv(impl_, &val))
             throw_exception();
         return val;
     }
