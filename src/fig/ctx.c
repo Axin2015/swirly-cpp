@@ -197,6 +197,13 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
 DBR_API void
 dbr_ctx_destroy(DbrCtx ctx)
 {
+    // Best effort to close clnt owned by child thread.
+    DbrAsync async = dbr_async_create(ctx->zctx, ctx->uuid);
+    if (async) {
+        dbr_async_close(async);
+        dbr_async_destroy(async);
+    }
+
     void* ret;
     const int err = pthread_join(ctx->child, &ret);
     if (err)
