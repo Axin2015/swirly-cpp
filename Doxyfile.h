@@ -128,6 +128,11 @@
  */
 
 /**
+ * @defgroup Sem Semaphore
+ * @ingroup Ash
+ */
+
+/**
  * @defgroup String String
  * @ingroup Ash
  */

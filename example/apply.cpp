@@ -126,8 +126,6 @@ main(int argc, char* argv[])
                 }
                 return nullptr;
             });
-        cout << "closing\n";
-        async.close();
         cout << "exiting\n";
         return 0;
     } catch (const exception& e) {
