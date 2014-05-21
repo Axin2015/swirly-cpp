@@ -17,6 +17,7 @@
  */
 #include <dbrpp/ctx.hpp>
 #include <dbrpp/handler.hpp>
+#include <dbrpp/sem.hpp>
 
 #include <dbr/clnt.h>
 #include <dbr/log.h>
@@ -29,6 +30,7 @@ using namespace dbr;
 using namespace std;
 
 class Handler : public IHandler<Handler> {
+    Sem ready_;
 public:
     void
     on_close(ClntRef clnt) noexcept
@@ -39,6 +41,7 @@ public:
     on_ready(ClntRef clnt) noexcept
     {
         cout << "on_ready\n";
+        ready_.post();
     }
     void
     on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
@@ -92,6 +95,11 @@ public:
         auto fn = static_cast<std::function<void* (ClntRef)>*>(val);
         return (*fn)(clnt);
     }
+    void
+    wait()
+    {
+        ready_.wait();
+    }
 };
 
 void*
@@ -117,6 +125,7 @@ main(int argc, char* argv[])
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
                 dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
         cout << ctx << endl;
+        handler.wait();
 
         Async async = ctx.async();
         sendAndRecv(async, [](ClntRef clnt) {
