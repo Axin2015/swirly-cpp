@@ -68,6 +68,11 @@ fig_sess_reset(DbrClnt clnt)
 DBR_EXTERN DbrIden
 fig_sess_close(DbrClnt clnt, DbrMillis now)
 {
+    if (clnt->state == FIG_DELTA_WAIT) {
+        clnt->state |= FIG_CLOSE_WAIT;
+        return 0;
+    }
+
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
         goto fail1;
@@ -78,6 +83,7 @@ fig_sess_close(DbrClnt clnt, DbrMillis now)
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
+    clnt->state |= FIG_CLOSE_WAIT;
     dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return req_id;
@@ -98,6 +104,7 @@ fig_sess_open(DbrClnt clnt, DbrMillis now)
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
+    clnt->state |= FIG_OPEN_WAIT;
     dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return req_id;

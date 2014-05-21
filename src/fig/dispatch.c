@@ -322,6 +322,12 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
     const DbrMillis absms = now + ms;
     // At least one iteration.
     do {
+        if (clnt->state == (FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
+            dbr_log_info("close immediate");
+            clnt->state = FIG_CLOSED;
+            dbr_handler_on_close(handler, clnt);
+            goto done;
+        }
         const struct DbrElem* elem;
         while ((elem = dbr_prioq_top(&clnt->prioq))) {
             if (elem->key > now) {
@@ -342,7 +348,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (id == FIG_MDTMR) {
-                if (clnt->state != FIG_DELTA_WAIT) {
+                if (!(FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
                     fig_sess_reset(clnt);
                     dbr_handler_on_reset(handler, clnt);
                 }
@@ -351,7 +357,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_err_setf(DBR_ETIMEOUT, "market-data socket timeout");
                 goto fail1;
             } else if (id == FIG_TRTMR) {
-                if (clnt->state != FIG_DELTA_WAIT) {
+                if (!(FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
                     fig_sess_reset(clnt);
                     dbr_handler_on_reset(handler, clnt);
                 }
@@ -439,7 +445,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 clnt->state &= ~FIG_ACCNT_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_ACCNT,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
-                if (!(clnt->state & FIG_ALL_WAIT))
+                if (clnt->state == FIG_READY)
                     dbr_handler_on_ready(handler, clnt);
                 break;
             case DBR_CONTR_LIST_REP:
@@ -447,7 +453,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 clnt->state &= ~FIG_CONTR_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_CONTR,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
-                if (!(clnt->state & FIG_ALL_WAIT))
+                if (clnt->state == FIG_READY)
                     dbr_handler_on_ready(handler, clnt);
                 break;
             case DBR_USER_LIST_REP:
@@ -479,7 +485,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_log_info("view-list message");
                 clnt->state &= ~FIG_SNAP_WAIT;
                 apply_views(clnt, body.view_list_rep.first, handler);
-                if (!(clnt->state & FIG_ALL_WAIT))
+                if (clnt->state == FIG_READY)
                     dbr_handler_on_ready(handler, clnt);
                 break;
             case DBR_EXEC_REP:
@@ -524,10 +530,16 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             switch (body.type) {
             case DBR_VIEW_LIST_REP:
                 if (dbr_unlikely(clnt->state & FIG_DELTA_WAIT)) {
+                    if (clnt->state == (FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
+                        dbr_log_info("close immediate");
+                        clnt->state = FIG_CLOSED;
+                        dbr_handler_on_close(handler, clnt);
+                        goto done;
+                    }
+                    // Otherwise proceed with open request.
+                    clnt->state &= ~FIG_DELTA_WAIT;
                     if (fig_sess_open(clnt, now) < 0)
                         goto fail1;
-                    clnt->state &= ~FIG_DELTA_WAIT;
-                    clnt->state |= FIG_OPEN_WAIT;
                 } else
                     apply_views(clnt, body.view_list_rep.first, handler);
                 break;
@@ -546,7 +558,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (dbr_unlikely(val == (void*)~0)) {
                 if (fig_sess_close(clnt, now) < 0)
                     goto fail1;
-                clnt->state |= FIG_CLOSE_WAIT;
                 val = NULL;
             } else
                 val = dbr_handler_on_async(handler, clnt, val);
