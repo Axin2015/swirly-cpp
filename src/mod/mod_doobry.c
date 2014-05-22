@@ -34,7 +34,7 @@
 */
 
 typedef struct {
-	array* match;
+	array* matchuri;
 } plugin_config;
 
 /*
@@ -48,8 +48,8 @@ typedef struct {
 typedef struct {
 	PLUGIN_DATA;
 
-	buffer *query_str;
-	array *get_params;
+	buffer* query_str;
+	array* get_params;
 
 	plugin_config** config_storage;
 	plugin_config conf;
@@ -110,7 +110,7 @@ patch_connection(server* srv, connection* con, plugin_data* p)
 	size_t i, j;
 	plugin_config* s = p->config_storage[0];
 
-	PATCH(match);
+	PATCH(matchuri);
 
 	// Skip the first, the global context.
 	for (i = 1; i < srv->config_context->used; i++) {
@@ -127,7 +127,7 @@ patch_connection(server* srv, connection* con, plugin_data* p)
 			data_unset* du = dc->value->data[j];
 
 			if (buffer_is_equal_string(du->key, CONST_STR_LEN("doobry.array"))) {
-				PATCH(match);
+				PATCH(matchuri);
 			}
 		}
 	}
@@ -137,10 +137,10 @@ patch_connection(server* srv, connection* con, plugin_data* p)
 
 #undef PATCH
 
-static int split_get_params(array *get_params, buffer *qrystr) {
+static int split_get_params(array* get_params, buffer* qrystr) {
 	size_t is_key = 1;
 	size_t i;
-	char *key = NULL, *val = NULL;
+	char* key = NULL, * val = NULL;
 
 	key = qrystr->ptr;
 
@@ -157,19 +157,19 @@ static int split_get_params(array *get_params, buffer *qrystr) {
 		case '&':
 		case '\0': /* fin symbol */
 			if (!is_key) {
-				data_string *ds;
+				data_string* ds;
 				/* we need at least a = since the last & */
 
 				/* terminate the value */
 				qrystr->ptr[i] = '\0';
 
-				if (NULL == (ds = (data_string *)array_get_unused_element(get_params,
-                                                                          TYPE_STRING))) {
+				if (NULL == (ds = (data_string*)array_get_unused_element(get_params,
+                                                                         TYPE_STRING))) {
 					ds = data_string_init();
 				}
 				buffer_copy_string_len(ds->key, key, strlen(key));
 				buffer_copy_string_len(ds->value, val, strlen(val));
-				array_insert_unique(get_params, (data_unset *)ds);
+				array_insert_unique(get_params, (data_unset*)ds);
 			}
 
 			key = qrystr->ptr + i + 1;
@@ -220,9 +220,9 @@ mod_doobry_free(server* srv, void* p_d)
 		size_t i;
 		for (i = 0; i < srv->config_context->used; i++) {
 			plugin_config* s = p->config_storage[i];
-
-			if (!s) continue;
-			array_free(s->match);
+			if (!s)
+                continue;
+			array_free(s->matchuri);
 			free(s);
 		}
 		free(p->config_storage);
@@ -256,13 +256,13 @@ mod_doobry_set_defaults(server* srv, void* p_d)
     /*
       Example config:
 
-      doobry.array = (
+      doobry.matchuri = (
         "foo",
         "bar"
       )
     */
 	config_values_t cv[] = {
-		{ "doobry.array",  NULL, T_CONFIG_ARRAY, T_CONFIG_SCOPE_CONNECTION },
+		{ "doobry.matchuri",  NULL, T_CONFIG_ARRAY, T_CONFIG_SCOPE_CONNECTION },
 		{ NULL, NULL, T_CONFIG_UNSET, T_CONFIG_SCOPE_UNSET }
 	};
 
@@ -275,9 +275,9 @@ mod_doobry_set_defaults(server* srv, void* p_d)
 		plugin_config* s;
 
 		s = calloc(1, sizeof(plugin_config));
-		s->match = array_init();
+		s->matchuri = array_init();
 
-		cv[0].destination = s->match;
+		cv[0].destination = s->matchuri;
 		p->config_storage[i] = s;
 
 		if (0 != config_insert_values_global(srv, ((data_config*)srv
@@ -332,8 +332,8 @@ mod_doobry_handle_uri(server* srv, connection* con, void* p_d)
 
 	s_len = con->uri.path->used - 1;
 
-	for (k = 0; k < p->conf.match->used; k++) {
-		data_string* ds = (data_string*)p->conf.match->data[k];
+	for (k = 0; k < p->conf.matchuri->used; k++) {
+		data_string* ds = (data_string*)p->conf.matchuri->data[k];
 		int ct_len = ds->value->used - 1;
 
 		if (ct_len > s_len)
