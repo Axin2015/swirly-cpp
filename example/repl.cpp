@@ -19,6 +19,9 @@
 #include <dbrpp/shlex.hpp>
 #include <dbrpp/handler.hpp>
 
+#include <dbr/log.h>
+#include <dbr/util.h>
+
 #include <climits> // PATH_MAX
 #include <functional>
 #include <fstream>
@@ -202,7 +205,7 @@ join(const vector<string>& v, const char* delim = " ")
 // Read-eval-print loop (REPL).
 
 class Repl {
-    typedef pair<Arity, function<void (Arg, Arg)> > Cmd;
+    typedef pair<function<void (Arg, Arg)>, Arity> Cmd;
     typedef map<string, Cmd> Cmds;
     Cmds cmds_;
     bool quit_;
@@ -212,9 +215,9 @@ public:
     {
     }
     void
-    cmd(const string& name, Arity arity, const function<void (Arg, Arg)>& fun)
+    bind(const string& name, const function<void (Arg, Arg)>& fun, Arity arity)
     {
-        cmds_[name] = make_pair(arity, fun);
+        cmds_[name] = make_pair(fun, arity);
     }
     void
     eval(const string& name, Arg begin, Arg end)
@@ -222,10 +225,10 @@ public:
         Cmds::const_iterator cmd = cmds_.find(name);
         if (cmd != cmds_.end()) {
             // Remaining tokens are the arguments.
-            const Arity arity = cmd->second.first;
+            const Arity arity = cmd->second.second;
             if (arity < 0 || arity == distance(begin, end)) {
                 try {
-                    cmd->second.second(begin, end);
+                    cmd->second.first(begin, end);
                 } catch (const DbrException& e) {
                     cerr << "exception: " << e.what() << endl;
                 } catch (const InvalidArgument& e) {
@@ -283,120 +286,215 @@ argc(Arg begin, Arg end)
     return distance(begin, end);
 }
 
-class Handler {
+void*
+sendAndRecv(Async& async, std::function<void* (ClntRef)> fn)
+{
+    async.send(&fn);
+    return async.recv();
+}
+
+class Handler : public IHandler<Handler> {
 public:
+    // IHandler<Handler>
     void
-    accnt(Arg begin, Arg end)
+    on_close(ClntRef clnt) noexcept
+    {
+        cout << "on_close\n";
+    }
+    void
+    on_ready(ClntRef clnt) noexcept
+    {
+        cout << "on_ready\n";
+    }
+    void
+    on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
+    {
+        cout << "on_logon\n";
+    }
+    void
+    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
+    {
+        cout << "on_logoff\n";
+    }
+    void
+    on_reset(ClntRef clnt) noexcept
+    {
+        cout << "on_reset\n";
+    }
+    void
+    on_timeout(ClntRef clnt, DbrIden req_id) noexcept
+    {
+        cout << "on_timeout\n";
+    }
+    void
+    on_status(ClntRef clnt, DbrIden req_id, int num, const char* msg) noexcept
+    {
+        cout << "on_status\n";
+    }
+    void
+    on_exec(ClntRef clnt, DbrIden req_id, DbrExec& exec) noexcept
+    {
+        cout << "on_exec\n";
+    }
+    void
+    on_posn(ClntRef clnt, DbrPosn& posn) noexcept
+    {
+        cout << "on_posn\n";
+    }
+    void
+    on_view(ClntRef clnt, DbrView& view) noexcept
+    {
+        cout << "on_view\n";
+    }
+    void
+    on_flush(ClntRef clnt) noexcept
+    {
+    }
+    void*
+    on_async(ClntRef clnt, void* val) noexcept
+    {
+        cout << "on_async\n";
+        auto fn = static_cast<std::function<void* (ClntRef)>*>(val);
+        return (*fn)(clnt);
+    }
+    // This.
+    void
+    accnt(Async& async, Arg begin, Arg end)
     {
     }
     void
-    contr(Arg begin, Arg end)
+    contr(Async& async, Arg begin, Arg end)
+    {
+        sendAndRecv(async, [](ClntRef clnt) {
+                for (auto rec : clnt.crecs()) {
+                    ContrRecRef ref(rec);
+                    cout << ref << endl;
+                }
+                return nullptr;
+            });
+    }
+    void
+    logon(Async& async, Arg begin, Arg end)
     {
     }
     void
-    logon(Arg begin, Arg end)
+    logoff(Async& async, Arg begin, Arg end)
     {
     }
     void
-    logoff(Arg begin, Arg end)
+    user(Async& async, Arg begin, Arg end)
     {
     }
     void
-    user(Arg begin, Arg end)
+    group(Async& async, Arg begin, Arg end)
     {
     }
     void
-    group(Arg begin, Arg end)
+    order(Async& async, Arg begin, Arg end)
     {
     }
     void
-    order(Arg begin, Arg end)
+    trade(Async& async, Arg begin, Arg end)
     {
     }
     void
-    trade(Arg begin, Arg end)
+    posn(Async& async, Arg begin, Arg end)
     {
     }
     void
-    posn(Arg begin, Arg end)
+    level(Async& async, Arg begin, Arg end)
     {
     }
     void
-    level(Arg begin, Arg end)
+    view(Async& async, Arg begin, Arg end)
     {
     }
     void
-    view(Arg begin, Arg end)
+    buy(Async& async, Arg begin, Arg end)
     {
     }
     void
-    place(int action, Arg begin, Arg end)
+    sell(Async& async, Arg begin, Arg end)
     {
     }
     void
-    revise(Arg begin, Arg end)
+    revise(Async& async, Arg begin, Arg end)
     {
     }
     void
-    cancel(Arg begin, Arg end)
+    cancel(Async& async, Arg begin, Arg end)
     {
     }
     void
-    ack_trade(Arg begin, Arg end)
+    ack_trade(Async& async, Arg begin, Arg end)
     {
     }
     void
-    echo(Arg begin, Arg end)
+    echo(Async& async, Arg begin, Arg end)
     {
     }
     void
-    penv(Arg begin, Arg end)
+    penv(Async& async, Arg begin, Arg end)
     {
     }
     void
-    set(Arg begin, Arg end)
+    set(Async& async, Arg begin, Arg end)
     {
     }
     void
-    unset(Arg begin, Arg end)
+    unset(Async& async, Arg begin, Arg end)
     {
     }
     void
-    quit(Arg begin, Arg end)
+    quit(Async& async, Arg begin, Arg end)
     {
         throw Quit();
     }
 };
+
+void
+log_ios(int level, const char* msg)
+{
+    ostream& os = level > DBR_LOG_WARN ? cout : cerr;
+    os << msg << endl;
+}
+
 }
 
 int
 main(int argc, char* argv[])
 {
+    dbr_log_setlogger(log_ios);
     try {
         Handler handler;
-        Repl repl;
+        Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
+                dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
+        cout << ctx << endl;
 
-        repl.cmd("accnt", 0, bind(&Handler::accnt, ref(handler), _1, _2));
-        repl.cmd("contr", 0, bind(&Handler::contr, ref(handler), _1, _2));
-        repl.cmd("logon", 0, bind(&Handler::logon, ref(handler), _1, _2));
-        repl.cmd("logoff", 0, bind(&Handler::logoff, ref(handler), _1, _2));
-        repl.cmd("user", 0, bind(&Handler::user, ref(handler), _1, _2));
-        repl.cmd("group", 0, bind(&Handler::group, ref(handler), _1, _2));
-        repl.cmd("order", 0, bind(&Handler::order, ref(handler), _1, _2));
-        repl.cmd("trade", 0, bind(&Handler::trade, ref(handler), _1, _2));
-        repl.cmd("posn", 0, bind(&Handler::posn, ref(handler), _1, _2));
-        repl.cmd("level", 0, bind(&Handler::level, ref(handler), _1, _2));
-        repl.cmd("view", 0, bind(&Handler::view, ref(handler), _1, _2));
-        repl.cmd("buy", 2, bind(&Handler::place, ref(handler), DBR_ACTION_BUY, _1, _2));
-        repl.cmd("sell", 2, bind(&Handler::place, ref(handler), DBR_ACTION_SELL, _1, _2));
-        repl.cmd("revise", 2, bind(&Handler::revise, ref(handler), _1, _2));
-        repl.cmd("cancel", -1, bind(&Handler::cancel, ref(handler), _1, _2));
-        repl.cmd("ack_trade", -1, bind(&Handler::ack_trade, ref(handler), _1, _2));
-        repl.cmd("echo", -1, bind(&Handler::echo, ref(handler), _1, _2));
-        repl.cmd("penv", 0, bind(&Handler::penv, ref(handler), _1, _2));
-        repl.cmd("set", 2, bind(&Handler::set, ref(handler), _1, _2));
-        repl.cmd("unset", 1, bind(&Handler::unset, ref(handler), _1, _2));
-        repl.cmd("quit", 0, bind(&Handler::quit, ref(handler), _1, _2));
+        Async async = ctx.async();
+
+        Repl repl;
+        repl.bind("accnt", bind(&Handler::accnt, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("contr", bind(&Handler::contr, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("logon", bind(&Handler::logon, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("logoff", bind(&Handler::logoff, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("user", bind(&Handler::user, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("group", bind(&Handler::group, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("order", bind(&Handler::order, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("trade", bind(&Handler::trade, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("posn", bind(&Handler::posn, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("level", bind(&Handler::level, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("view", bind(&Handler::view, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("buy", bind(&Handler::buy, ref(handler), ref(async), _1, _2), 2);
+        repl.bind("sell", bind(&Handler::sell, ref(handler), ref(async), _1, _2), 2);
+        repl.bind("revise", bind(&Handler::revise, ref(handler), ref(async), _1, _2), 2);
+        repl.bind("cancel", bind(&Handler::cancel, ref(handler), ref(async), _1, _2), -1);
+        repl.bind("ack_trade", bind(&Handler::ack_trade, ref(handler), ref(async), _1, _2), -1);
+        repl.bind("echo", bind(&Handler::echo, ref(handler), ref(async), _1, _2), -1);
+        repl.bind("penv", bind(&Handler::penv, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("set", bind(&Handler::set, ref(handler), ref(async), _1, _2), 2);
+        repl.bind("unset", bind(&Handler::unset, ref(handler), ref(async), _1, _2), 1);
+        repl.bind("quit", bind(&Handler::quit, ref(handler), ref(async), _1, _2), 0);
 
         char path[PATH_MAX];
         sprintf(path, "%s/.doobryrc", getenv("HOME"));
