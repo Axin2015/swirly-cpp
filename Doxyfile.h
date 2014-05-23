@@ -111,7 +111,7 @@
 
 /**
  * Lexical tokeniser.
- * @defgroup Lexer Lexer
+ * @defgroup Shlex Lexer
  * @ingroup Ash
  */
 

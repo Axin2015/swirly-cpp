@@ -15,58 +15,58 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_LEXER_HPP
-#define DBRPP_LEXER_HPP
+#ifndef DBRPP_SHLEX_HPP
+#define DBRPP_SHLEX_HPP
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/lexer.h>
+#include <dbr/shlex.h>
 
 namespace dbr {
 
 /**
- * @addtogroup Lexer
+ * @addtogroup Shlex
  * @{
  */
 
 template <typename FnT>
-class Lexer {
+class Shlex {
     FnT fn_;
-    DbrLexer lexer_;
+    DbrShlex shlex_;
     static void
     cb(void* ctx, const char* tok, size_t len) noexcept
     {
-        static_cast<Lexer*>(ctx)->fn_(tok, len);
+        static_cast<Shlex*>(ctx)->fn_(tok, len);
     }
 public:
     explicit
-    Lexer(FnT fn) noexcept
+    Shlex(FnT fn) noexcept
         : fn_{fn}
     {
-        dbr_lexer_init(&lexer_, cb, this);
+        dbr_shlex_init(&shlex_, cb, this);
     }
     void
     reset() noexcept
     {
-        dbr_lexer_reset(&lexer_);
+        dbr_shlex_reset(&shlex_);
     }
     void
     exec(const char* buf, size_t size)
     {
-        if (!dbr_lexer_exec(&lexer_, buf, size))
+        if (!dbr_shlex_exec(&shlex_, buf, size))
             throw_exception();
     }
 };
 
 template <typename FnT>
-Lexer<FnT>
-make_lexer(FnT fn)
+Shlex<FnT>
+make_shlex(FnT fn)
 {
-    return Lexer<FnT>{fn};
+    return Shlex<FnT>{fn};
 }
 
 /** @} */
 
 } // dbr
 
-#endif // DBRPP_LEXER_HPP
+#endif // DBRPP_SHLEX_HPP

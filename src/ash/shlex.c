@@ -1,5 +1,5 @@
 
-#line 1 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 1 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 // -*- c -*-
 /*
  *  Copyright (C) 2013, 2014 Mark Aylett <mark.aylett@gmail.com>
@@ -18,30 +18,30 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/lexer.h>
+#include <dbr/shlex.h>
 #include <dbr/err.h>
 
 #include <stddef.h> // NULL
 
 
-#line 81 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 81 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 
 
 
-#line 32 "/Users/marayl/repo/doobry/src/ash/lexer.c"
-static const char _lexer_actions[] = {
+#line 32 "/Users/marayl/repo/doobry/src/ash/shlex.c"
+static const char _shlex_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 2, 0, 1, 2, 3, 
 	0, 2, 3, 4, 3, 3, 0, 1
 	
 };
 
-static const char _lexer_key_offsets[] = {
+static const char _shlex_key_offsets[] = {
 	0, 0, 7, 14, 21, 23, 24, 25, 
 	27, 28, 29, 36, 37
 };
 
-static const char _lexer_trans_keys[] = {
+static const char _shlex_trans_keys[] = {
 	32, 39, 92, 9, 10, 34, 35, 9, 
 	10, 32, 34, 35, 39, 92, 9, 10, 
 	32, 34, 35, 39, 92, 34, 92, 10, 
@@ -50,22 +50,22 @@ static const char _lexer_trans_keys[] = {
 	34, 35, 39, 92, 0
 };
 
-static const char _lexer_single_lengths[] = {
+static const char _shlex_single_lengths[] = {
 	0, 3, 7, 7, 2, 1, 1, 2, 
 	1, 1, 5, 1, 7
 };
 
-static const char _lexer_range_lengths[] = {
+static const char _shlex_range_lengths[] = {
 	0, 2, 0, 0, 0, 0, 0, 0, 
 	0, 0, 1, 0, 0
 };
 
-static const char _lexer_index_offsets[] = {
+static const char _shlex_index_offsets[] = {
 	0, 0, 6, 14, 22, 25, 27, 29, 
 	32, 34, 36, 43, 45
 };
 
-static const char _lexer_trans_targs[] = {
+static const char _shlex_trans_targs[] = {
 	2, 2, 11, 2, 2, 1, 3, 12, 
 	3, 4, 6, 7, 9, 1, 3, 12, 
 	3, 4, 6, 7, 9, 1, 2, 5, 
@@ -75,7 +75,7 @@ static const char _lexer_trans_targs[] = {
 	4, 6, 7, 9, 1, 0
 };
 
-static const char _lexer_trans_actions[] = {
+static const char _shlex_trans_actions[] = {
 	5, 5, 0, 5, 5, 3, 7, 17, 
 	7, 14, 7, 14, 14, 20, 0, 9, 
 	0, 1, 0, 1, 1, 11, 0, 0, 
@@ -85,54 +85,54 @@ static const char _lexer_trans_actions[] = {
 	1, 0, 1, 1, 11, 0
 };
 
-static const int lexer_start = 12;
-static const int lexer_error = 0;
+static const int shlex_start = 12;
+static const int shlex_error = 0;
 
-static const int lexer_en_main = 12;
+static const int shlex_en_main = 12;
 
 
-#line 84 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 84 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 
 DBR_API void
-dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* ctx)
+dbr_shlex_init(struct DbrShlex* shlex, void (*cb)(void*, const char*, size_t), void* ctx)
 {
-    lexer->cb = cb;
-    lexer->ctx = ctx;
+    shlex->cb = cb;
+    shlex->ctx = ctx;
 
     int cs;
     
-#line 105 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 105 "/Users/marayl/repo/doobry/src/ash/shlex.c"
 	{
-	cs = lexer_start;
+	cs = shlex_start;
 	}
 
-#line 93 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
-    lexer->cs = cs;
+#line 93 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
+    shlex->cs = cs;
 }
 
 DBR_API void
-dbr_lexer_reset(struct DbrLexer* lexer)
+dbr_shlex_reset(struct DbrShlex* shlex)
 {
     int cs;
     
-#line 119 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 119 "/Users/marayl/repo/doobry/src/ash/shlex.c"
 	{
-	cs = lexer_start;
+	cs = shlex_start;
 	}
 
-#line 101 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
-    lexer->cs = cs;
+#line 101 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
+    shlex->cs = cs;
 }
 
 DBR_API DbrBool
-dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
+dbr_shlex_exec(struct DbrShlex* shlex, const char* buf, size_t size)
 {
 	const char* p = buf;
 	const char* pe = p + size;
 
-    int cs = lexer->cs;
+    int cs = shlex->cs;
 	
-#line 136 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 136 "/Users/marayl/repo/doobry/src/ash/shlex.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -145,10 +145,10 @@ dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
 	if ( cs == 0 )
 		goto _out;
 _resume:
-	_keys = _lexer_trans_keys + _lexer_key_offsets[cs];
-	_trans = _lexer_index_offsets[cs];
+	_keys = _shlex_trans_keys + _shlex_key_offsets[cs];
+	_trans = _shlex_index_offsets[cs];
 
-	_klen = _lexer_single_lengths[cs];
+	_klen = _shlex_single_lengths[cs];
 	if ( _klen > 0 ) {
 		const char *_lower = _keys;
 		const char *_mid;
@@ -171,7 +171,7 @@ _resume:
 		_trans += _klen;
 	}
 
-	_klen = _lexer_range_lengths[cs];
+	_klen = _shlex_range_lengths[cs];
 	if ( _klen > 0 ) {
 		const char *_lower = _keys;
 		const char *_mid;
@@ -194,54 +194,54 @@ _resume:
 	}
 
 _match:
-	cs = _lexer_trans_targs[_trans];
+	cs = _shlex_trans_targs[_trans];
 
-	if ( _lexer_trans_actions[_trans] == 0 )
+	if ( _shlex_trans_actions[_trans] == 0 )
 		goto _again;
 
-	_acts = _lexer_actions + _lexer_trans_actions[_trans];
+	_acts = _shlex_actions + _shlex_trans_actions[_trans];
 	_nacts = (unsigned int) *_acts++;
 	while ( _nacts-- > 0 )
 	{
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 29 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 29 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 	{
-        lexer->len = 0;
+        shlex->len = 0;
     }
 	break;
 	case 1:
-#line 32 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 32 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 	{
-        if (lexer->len < DBR_TOK_MAX)
-            lexer->tok[lexer->len++] = (*p);
+        if (shlex->len < DBR_TOK_MAX)
+            shlex->tok[shlex->len++] = (*p);
         else {
-            cs = lexer_error;
+            cs = shlex_error;
             {p++; goto _out; }
         }
     }
 	break;
 	case 2:
-#line 40 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 40 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 	{
         p--;
     }
 	break;
 	case 3:
-#line 43 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 43 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 	{
-        lexer->tok[lexer->len] = '\0';
-        lexer->cb(lexer->ctx, lexer->tok, lexer->len);
+        shlex->tok[shlex->len] = '\0';
+        shlex->cb(shlex->ctx, shlex->tok, shlex->len);
     }
 	break;
 	case 4:
-#line 47 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
+#line 47 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
 	{
-        lexer->cb(lexer->ctx, NULL, 0);
+        shlex->cb(shlex->ctx, NULL, 0);
     }
 	break;
-#line 245 "/Users/marayl/repo/doobry/src/ash/lexer.c"
+#line 245 "/Users/marayl/repo/doobry/src/ash/shlex.c"
 		}
 	}
 
@@ -254,12 +254,12 @@ _again:
 	_out: {}
 	}
 
-#line 112 "/Users/marayl/repo/doobry/src/ash/lexer.rl"
-    lexer->cs = cs;
+#line 112 "/Users/marayl/repo/doobry/src/ash/shlex.rl"
+    shlex->cs = cs;
 
-    if (cs == lexer_error) {
+    if (cs == shlex_error) {
         dbr_err_set(DBR_EINVAL, "lexical error");
-        dbr_lexer_reset(lexer);
+        dbr_shlex_reset(shlex);
         return DBR_FALSE;
     }
 	return DBR_TRUE;

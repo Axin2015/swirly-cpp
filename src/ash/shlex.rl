@@ -16,24 +16,24 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/lexer.h>
+#include <dbr/shlex.h>
 #include <dbr/err.h>
 
 #include <stddef.h> // NULL
 
 %%{
-    machine lexer;
+    machine shlex;
 
 	any_except_nl = any - '\n';
 
     action begin_tok {
-        lexer->len = 0;
+        shlex->len = 0;
     }
     action add_char {
-        if (lexer->len < DBR_TOK_MAX)
-            lexer->tok[lexer->len++] = fc;
+        if (shlex->len < DBR_TOK_MAX)
+            shlex->tok[shlex->len++] = fc;
         else {
-            cs = lexer_error;
+            cs = shlex_error;
             fbreak;
         }
     }
@@ -41,11 +41,11 @@
         fhold;
     }
     action end_tok {
-        lexer->tok[lexer->len] = '\0';
-        lexer->cb(lexer->ctx, lexer->tok, lexer->len);
+        shlex->tok[shlex->len] = '\0';
+        shlex->cb(shlex->ctx, shlex->tok, shlex->len);
     }
     action end_line {
-        lexer->cb(lexer->ctx, NULL, 0);
+        shlex->cb(shlex->ctx, NULL, 0);
     }
     tok = (
         start: (
@@ -83,37 +83,37 @@
 %% write data nofinal;
 
 DBR_API void
-dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* ctx)
+dbr_shlex_init(struct DbrShlex* shlex, void (*cb)(void*, const char*, size_t), void* ctx)
 {
-    lexer->cb = cb;
-    lexer->ctx = ctx;
+    shlex->cb = cb;
+    shlex->ctx = ctx;
 
     int cs;
     %% write init;
-    lexer->cs = cs;
+    shlex->cs = cs;
 }
 
 DBR_API void
-dbr_lexer_reset(struct DbrLexer* lexer)
+dbr_shlex_reset(struct DbrShlex* shlex)
 {
     int cs;
     %% write init;
-    lexer->cs = cs;
+    shlex->cs = cs;
 }
 
 DBR_API DbrBool
-dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size)
+dbr_shlex_exec(struct DbrShlex* shlex, const char* buf, size_t size)
 {
 	const char* p = buf;
 	const char* pe = p + size;
 
-    int cs = lexer->cs;
+    int cs = shlex->cs;
 	%% write exec;
-    lexer->cs = cs;
+    shlex->cs = cs;
 
-    if (cs == lexer_error) {
+    if (cs == shlex_error) {
         dbr_err_set(DBR_EINVAL, "lexical error");
-        dbr_lexer_reset(lexer);
+        dbr_shlex_reset(shlex);
         return DBR_FALSE;
     }
 	return DBR_TRUE;

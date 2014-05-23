@@ -15,37 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/clnt.hpp>
-#include <dbrpp/exec.hpp>
-#include <dbrpp/lexer.hpp>
-#include <dbrpp/pool.hpp>
-#include <dbrpp/posn.hpp>
+#include <dbrpp/ctx.hpp>
+#include <dbrpp/shlex.hpp>
 #include <dbrpp/handler.hpp>
-#include <dbrpp/view.hpp>
-#include <dbrpp/zmqctx.hpp>
 
-#include <dbr/msg.h>
-#include <dbr/util.h>
-
-#include <algorithm>
-#include <cassert>
-#include <cerrno>
 #include <climits> // PATH_MAX
 #include <functional>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <iterator>
-#include <limits>
 #include <map>
-#include <sstream>
-#include <stdexcept>
-#include <vector>
-
-#include <sys/types.h>
-#include <unistd.h>
-
-//#pragma GCC diagnostic ignored "-Wunused-function"
 
 using namespace dbr;
 using namespace std;
@@ -275,7 +253,7 @@ public:
     read(istream& is, const char* prompt = nullptr)
     {
         vector<string> toks;
-        auto lexer = make_lexer([this, &toks](const char* tok, size_t len) {
+        auto shlex = make_shlex([this, &toks](const char* tok, size_t len) {
                 if (tok)
                     toks.push_back(tok);
                 else {
@@ -289,7 +267,7 @@ public:
         while (!quit_ && getline(is, line)) {
             line += '\n';
             try {
-                lexer.exec(line.data(), line.size());
+                shlex.exec(line.data(), line.size());
             } catch (const exception& e) {
                 cerr << e.what() << endl;
             }

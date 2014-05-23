@@ -15,15 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_LEXER_H
-#define DBR_LEXER_H
+#ifndef DBR_SHLEX_H
+#define DBR_SHLEX_H
 
 #include <dbr/defs.h>
 
 #include <sys/types.h>
 
 /**
- * @addtogroup Lexer
+ * @addtogroup Shlex
  * @{
  */
 
@@ -31,7 +31,7 @@ enum {
     DBR_TOK_MAX = 127,
 };
 
-struct DbrLexer {
+struct DbrShlex {
     void (*cb)(void* zctx, const char*, size_t);
     void* ctx;
     int cs;
@@ -40,14 +40,14 @@ struct DbrLexer {
 };
 
 DBR_API void
-dbr_lexer_init(struct DbrLexer* lexer, void (*cb)(void*, const char*, size_t), void* zctx);
+dbr_shlex_init(struct DbrShlex* shlex, void (*cb)(void*, const char*, size_t), void* zctx);
 
 DBR_API void
-dbr_lexer_reset(struct DbrLexer* lexer);
+dbr_shlex_reset(struct DbrShlex* shlex);
 
 DBR_API DbrBool
-dbr_lexer_exec(struct DbrLexer* lexer, const char* buf, size_t size);
+dbr_shlex_exec(struct DbrShlex* shlex, const char* buf, size_t size);
 
 /** @} */
 
-#endif // DBR_LEXER_H
+#endif // DBR_SHLEX_H
