@@ -290,6 +290,8 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrHandler handler)
 static DbrBool
 async_send(void* sock, void* val)
 {
+    // FIXME: is this required with zmq_send?
+    dbr_wmb();
     if (zmq_send(sock, &val, sizeof(void*), 0) != sizeof(void*)) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
@@ -305,6 +307,8 @@ async_recv(void* sock, void** val)
         dbr_err_setf(num, "zmq_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
+    // FIXME: is this required with zmq_recv?
+    dbr_rmb();
     return DBR_TRUE;
 }
 

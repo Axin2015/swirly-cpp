@@ -111,6 +111,10 @@ typedef unsigned char DbrUuid[16];
 #define dbr_offsetof(st, m) __builtin_offsetof(st, m)
 #define dbr_implof(s, m, p) (s*)((char*)(p) - dbr_offsetof(s, m))
 
+// FIXME: Review memory barrier usage.
+#define dbr_wmb() do { } while (0)
+#define dbr_rmb() do { } while (0)
+
 /** @} */
 
 #endif // DBR_DEFS_H

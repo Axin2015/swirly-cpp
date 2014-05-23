@@ -77,6 +77,9 @@ DBR_API DbrBool
 dbr_async_send(DbrAsync async, void* val)
 {
     void* sock = async;
+
+    // FIXME: is this required with zmq_send?
+    dbr_wmb();
     if (dbr_unlikely(zmq_send(sock, &val, sizeof(void*), 0) != sizeof(void*))) {
         dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
@@ -93,5 +96,7 @@ dbr_async_recv(DbrAsync async, void** val)
         dbr_err_setf(num, "zmq_recv() failed: %s", zmq_strerror(zmq_errno()));
         return DBR_FALSE;
     }
+    // FIXME: is this required with zmq_recv?
+    dbr_rmb();
     return DBR_TRUE;
 }
