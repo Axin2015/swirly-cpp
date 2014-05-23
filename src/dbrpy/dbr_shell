@@ -716,7 +716,7 @@ if __name__ == '__main__':
         lex = shlex.shlex(sys.stdin)
         lex.wordchars = 'abcdfeghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.'
         home = os.environ['HOME']
-        rcfile = os.path.join(home, '.dbr_clirc')
+        rcfile = os.path.join(home, '.doobryrc')
         if os.path.isfile(rcfile):
             lex.push_source(open(rcfile, 'r'), rcfile)
         with async_clnt() as ac:

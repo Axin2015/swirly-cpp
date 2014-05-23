@@ -12,6 +12,9 @@ TARGET_LINK_LIBRARIES(dbr_clnt fig_static)
 ADD_EXECUTABLE(dbr_dump dump.cpp)
 TARGET_LINK_LIBRARIES(dbr_dump fir_static)
 
+ADD_EXECUTABLE(dbr_repl repl.cpp)
+TARGET_LINK_LIBRARIES(dbr_repl fir_static)
+
 ADD_EXECUTABLE(dbr_perf perf.c)
 TARGET_LINK_LIBRARIES(dbr_perf fir_static)
 
