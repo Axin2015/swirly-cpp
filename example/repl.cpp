@@ -448,6 +448,7 @@ public:
     void
     quit(Async& async, Arg begin, Arg end)
     {
+        async.close();
         throw Quit();
     }
 };
