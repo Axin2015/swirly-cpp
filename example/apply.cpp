@@ -103,7 +103,7 @@ public:
 };
 
 void*
-sendAndRecv(Async& async, std::function<void* (ClntRef)> fn)
+call(Async& async, std::function<void* (ClntRef)> fn)
 {
     async.send(&fn);
     return async.recv();
@@ -128,7 +128,7 @@ main(int argc, char* argv[])
         handler.wait();
 
         Async async = ctx.async();
-        sendAndRecv(async, [](ClntRef clnt) {
+        call(async, [](ClntRef clnt) {
                 for (auto rec : clnt.crecs()) {
                     ContrRecRef ref(rec);
                     cout << ref << endl;

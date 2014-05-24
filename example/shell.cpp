@@ -25,6 +25,7 @@
 #include <climits> // PATH_MAX
 #include <functional>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 
@@ -286,11 +287,54 @@ argc(Arg begin, Arg end)
     return distance(begin, end);
 }
 
-void*
-sendAndRecv(Async& async, std::function<void* (ClntRef)> fn)
+void
+call(Async& async, std::function<void (ClntRef)> fn)
 {
     async.send(&fn);
-    return async.recv();
+    async.recv();
+}
+
+template <size_t COLS>
+void
+print_table(ostream& os,
+            const array<const char*, COLS>& head,
+            const array<size_t, COLS>& width,
+            const vector<array<string, COLS>>& rows)
+{
+    os << '|';
+    for (size_t i = 0; i < COLS; ++i) {
+        auto flags = os.flags();
+        os.setf(ios_base::left, ios_base::adjustfield);
+        os.width(width[i]);
+        os << head[i] + 1;
+        os.flags(flags);
+        os << '|';
+    }
+    os << endl;
+
+    os << '+';
+    for (size_t i = 0; i < COLS; ++i) {
+        auto fill = os.fill('-');
+        os.width(width[i]);
+        os << "";
+        os.fill(fill);
+        os << '+';
+    }
+    os << endl;
+
+    for (const auto& row : rows) {
+        os << '|';
+        for (size_t i = 0; i < COLS; ++i) {
+            auto flags = os.flags();
+            os.setf(*head[i] == '>' ? ios_base::right : ios_base::left,
+                    ios_base::adjustfield);
+            os.width(width[i]);
+            os << row[i];
+            os.flags(flags);
+            os << '|';
+        }
+        os << endl;
+    }
 }
 
 class Handler : public IHandler<Handler> {
@@ -361,16 +405,37 @@ public:
     void
     accnt(Async& async, Arg begin, Arg end)
     {
+        enum { COLS = 3 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<mnem",
+            "<display",
+            "<email"};
+        array<size_t, COLS> width;
+        for (size_t i = 0; i < COLS; ++i)
+            width[i] = strlen(head[i] + 1);
+
+        vector<row> rows;
+        call(async, [&width, &rows](ClntRef clnt) {
+                for (auto rec : clnt.arecs()) {
+                    AccntRecRef ref(rec);
+                    row r{ref.mnem().str(), ref.display().str(), ref.email().str()};
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     contr(Async& async, Arg begin, Arg end)
     {
-        sendAndRecv(async, [](ClntRef clnt) {
+        call(async, [](ClntRef clnt) {
                 for (auto rec : clnt.crecs()) {
                     ContrRecRef ref(rec);
                     cout << ref << endl;
                 }
-                return nullptr;
             });
     }
     void
