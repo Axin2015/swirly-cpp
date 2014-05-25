@@ -171,7 +171,7 @@ public:
 };
 
 template <typename PolicyT>
-bool
+inline bool
 operator ==(BiDirectionalIterator<PolicyT> lhs,
             ConstBiDirectionalIterator<PolicyT> rhs) noexcept
 {
@@ -179,7 +179,7 @@ operator ==(BiDirectionalIterator<PolicyT> lhs,
 }
 
 template <typename PolicyT>
-bool
+inline bool
 operator ==(ConstBiDirectionalIterator<PolicyT> lhs,
             BiDirectionalIterator<PolicyT> rhs) noexcept
 {
@@ -187,7 +187,7 @@ operator ==(ConstBiDirectionalIterator<PolicyT> lhs,
 }
 
 template <typename PolicyT>
-bool
+inline bool
 operator !=(BiDirectionalIterator<PolicyT> lhs,
             ConstBiDirectionalIterator<PolicyT> rhs) noexcept
 {
@@ -195,7 +195,7 @@ operator !=(BiDirectionalIterator<PolicyT> lhs,
 }
 
 template <typename PolicyT>
-bool
+inline bool
 operator !=(ConstBiDirectionalIterator<PolicyT> lhs,
             BiDirectionalIterator<PolicyT> rhs) noexcept
 {
@@ -376,28 +376,28 @@ public:
 };
 
 template <typename PolicyT>
-bool
+inline bool
 operator ==(ForwardIterator<PolicyT> lhs, ConstForwardIterator<PolicyT> rhs) noexcept
 {
     return ConstForwardIterator<PolicyT>{lhs} == rhs;
 }
 
 template <typename PolicyT>
-bool
+inline bool
 operator ==(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noexcept
 {
     return lhs == ConstForwardIterator<PolicyT>{rhs};
 }
 
 template <typename PolicyT>
-bool
+inline bool
 operator !=(ForwardIterator<PolicyT> lhs, ConstForwardIterator<PolicyT> rhs) noexcept
 {
     return ConstForwardIterator<PolicyT>{lhs} != rhs;
 }
 
 template <typename PolicyT>
-bool
+inline bool
 operator !=(ConstForwardIterator<PolicyT> lhs, ForwardIterator<PolicyT> rhs) noexcept
 {
     return lhs != ConstForwardIterator<PolicyT>{rhs};

@@ -221,7 +221,14 @@ public:
 };
 
 template <std::size_t MaxN>
-std::ostream&
+inline std::string
+to_string(const NString<MaxN>& nstr)
+{
+    return nstr.str();
+}
+
+template <std::size_t MaxN>
+inline std::ostream&
 operator <<(std::ostream& os, const NString<MaxN>& nstr)
 {
     // FIXME: write() ignores stream formatters.
@@ -231,42 +238,42 @@ operator <<(std::ostream& os, const NString<MaxN>& nstr)
 }
 
 template <std::size_t MaxN>
-bool
+inline bool
 operator ==(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
 {
     return strncmp(lhs.data(), rhs.data(), MaxN) == 0;
 }
 
 template <std::size_t MaxN>
-bool
+inline bool
 operator !=(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
 {
     return strncmp(lhs.data(), rhs.data(), MaxN) != 0;
 }
 
 template <std::size_t MaxN>
-bool
+inline bool
 operator <(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
 {
     return strncmp(lhs.data(), rhs.data(), MaxN) < 0;
 }
 
 template <std::size_t MaxN>
-bool
+inline bool
 operator <=(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
 {
     return strncmp(lhs.data(), rhs.data(), MaxN) <= 0;
 }
 
 template <std::size_t MaxN>
-bool
+inline bool
 operator >(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
 {
     return strncmp(lhs.data(), rhs.data(), MaxN) > 0;
 }
 
 template <std::size_t MaxN>
-bool
+inline bool
 operator >=(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
 {
     return strncmp(lhs.data(), rhs.data(), MaxN) >= 0;

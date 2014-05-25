@@ -421,9 +421,9 @@ public:
                 for (auto rec : clnt.arecs()) {
                     AccntRecRef ref(rec);
                     row r{
-                        ref.mnem().str(),
-                        ref.display().str(),
-                        ref.email().str()
+                        to_string(ref.mnem()),
+                        to_string(ref.display()),
+                        to_string(ref.email())
                     };
                     for (size_t i = 0; i < COLS; ++i)
                         width[i] = max(width[i], r[i].size());
@@ -461,11 +461,11 @@ public:
                 for (auto rec : clnt.crecs()) {
                     ContrRecRef ref(rec);
                     row r{
-                        ref.mnem().str(),
-                        ref.display().str(),
-                        ref.asset_type().str(),
-                        ref.asset().str(),
-                        ref.ccy().str(),
+                        to_string(ref.mnem()),
+                        to_string(ref.display()),
+                        to_string(ref.asset_type()),
+                        to_string(ref.asset()),
+                        to_string(ref.ccy()),
                         to_string(ref.tick_numer()),
                         to_string(ref.tick_denom()),
                         to_string(ref.lot_numer()),
