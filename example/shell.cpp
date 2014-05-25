@@ -420,7 +420,11 @@ public:
         call(async, [&width, &rows](ClntRef clnt) {
                 for (auto rec : clnt.arecs()) {
                     AccntRecRef ref(rec);
-                    row r{ref.mnem().str(), ref.display().str(), ref.email().str()};
+                    row r{
+                        ref.mnem().str(),
+                        ref.display().str(),
+                        ref.email().str()
+                    };
                     for (size_t i = 0; i < COLS; ++i)
                         width[i] = max(width[i], r[i].size());
                     rows.emplace_back(r);
@@ -431,12 +435,52 @@ public:
     void
     contr(Async& async, Arg begin, Arg end)
     {
-        call(async, [](ClntRef clnt) {
+        enum { COLS = 12 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<mnem",
+            "<display",
+            "<asset_type",
+            "<asset",
+            "<ccy",
+            ">tick_numer",
+            ">tick_denom",
+            ">lot_numer",
+            ">lot_denom",
+            ">pip_dp",
+            ">min_lots",
+            ">max_lots"};
+
+        array<size_t, COLS> width;
+        for (size_t i = 0; i < COLS; ++i)
+            width[i] = strlen(head[i] + 1);
+
+        vector<row> rows;
+        call(async, [&width, &rows](ClntRef clnt) {
                 for (auto rec : clnt.crecs()) {
                     ContrRecRef ref(rec);
-                    cout << ref << endl;
+                    row r{
+                        ref.mnem().str(),
+                        ref.display().str(),
+                        ref.asset_type().str(),
+                        ref.asset().str(),
+                        ref.ccy().str(),
+                        to_string(ref.tick_numer()),
+                        to_string(ref.tick_denom()),
+                        to_string(ref.lot_numer()),
+                        to_string(ref.lot_denom()),
+                        to_string(ref.pip_dp()),
+                        to_string(ref.min_lots()),
+                        to_string(ref.max_lots())
+                    };
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
                 }
             });
+        print_table(cout, head, width, rows);
+
     }
     void
     logon(Async& async, Arg begin, Arg end)
