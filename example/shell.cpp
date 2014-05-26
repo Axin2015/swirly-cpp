@@ -295,6 +295,16 @@ call(Async& async, std::function<void (ClntRef)> fn)
 }
 
 template <size_t COLS>
+array<size_t, COLS>
+head_width(const array<const char*, COLS>& head)
+{
+    array<size_t, COLS> width;
+    for (size_t i = 0; i < COLS; ++i)
+        width[i] = strlen(head[i] + 1);
+    return width;
+}
+
+template <size_t COLS>
 void
 print_table(ostream& os,
             const array<const char*, COLS>& head,
@@ -412,10 +422,7 @@ public:
             "<mnem",
             "<display",
             "<email"};
-        array<size_t, COLS> width;
-        for (size_t i = 0; i < COLS; ++i)
-            width[i] = strlen(head[i] + 1);
-
+        auto width = head_width(head);
         vector<row> rows;
         call(async, [&width, &rows](ClntRef clnt) {
                 for (auto rec : clnt.arecs()) {
@@ -451,11 +458,7 @@ public:
             ">pip_dp",
             ">min_lots",
             ">max_lots"};
-
-        array<size_t, COLS> width;
-        for (size_t i = 0; i < COLS; ++i)
-            width[i] = strlen(head[i] + 1);
-
+        auto width = head_width(head);
         vector<row> rows;
         call(async, [&width, &rows](ClntRef clnt) {
                 for (auto rec : clnt.crecs()) {
@@ -480,7 +483,6 @@ public:
                 }
             });
         print_table(cout, head, width, rows);
-
     }
     void
     logon(Async& async, Arg begin, Arg end)
