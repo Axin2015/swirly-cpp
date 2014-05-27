@@ -348,6 +348,9 @@ print_table(ostream& os,
 }
 
 class Handler : public IHandler<Handler> {
+    // Main thread.
+    map<string, string> env_;
+    // Context thread.
 public:
     // IHandler<Handler>
     void
@@ -543,18 +546,40 @@ public:
     void
     echo(Async& async, Arg begin, Arg end)
     {
+        copy(begin, end, JoinIterator<string>(cout, " "));
+        cout << endl;
     }
     void
     penv(Async& async, Arg begin, Arg end)
     {
+        enum { COLS = 2 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<name",
+            "<value"};
+        auto width = head_width(head);
+        vector<row> rows;
+        for (auto nv : env_) {
+            row r{nv.first, nv.second};
+            for (size_t i = 0; i < COLS; ++i)
+                width[i] = max(width[i], r[i].size());
+            rows.emplace_back(r);
+        }
+        print_table(cout, head, width, rows);
     }
     void
     set(Async& async, Arg begin, Arg end)
     {
+        const string& name = *begin++;
+        const string& value = *begin++;
+        env_[name] = value;
     }
     void
     unset(Async& async, Arg begin, Arg end)
     {
+        const string& name = *begin++;
+        env_.erase(name);
     }
     void
     quit(Async& async, Arg begin, Arg end)
