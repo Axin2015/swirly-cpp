@@ -153,15 +153,15 @@ public:
 
 template <typename T>
 T
-ston(const char* s);
+ston(const string& s);
 
 template<>
 double
-ston(const char* s)
+ston(const string& s)
 {
     errno = 0;
     char* end;
-    double d = strtod(s, &end);
+    double d = strtod(s.c_str(), &end);
     if (0 != errno || *end)
         throw InvalidArgument(s);
     return d;
@@ -169,11 +169,11 @@ ston(const char* s)
 
 template<>
 long
-ston(const char* s)
+ston(const string& s)
 {
     errno = 0;
     char* end;
-    long l = strtol(s, &end, 10);
+    long l = strtol(s.c_str(), &end, 10);
     if (0 != errno || *end)
         throw InvalidArgument(s);
     return l;
@@ -181,9 +181,9 @@ ston(const char* s)
 
 template<>
 int
-ston(const char* s)
+ston(const string& s)
 {
-    long l = ston<long>(s);
+    long l = ston<long>(s.c_str());
     if (l < numeric_limits<int>::min() || numeric_limits<int>::max() < l)
         throw InvalidArgument(s);
     return static_cast<int>(l);
@@ -509,10 +509,10 @@ public:
     {
         const string umnem = get("user");
         call(async, [umnem](ClntRef clnt) {
-                auto it = clnt.arecs().find(umnem.c_str());
-                if (it == clnt.arecs().end())
+                auto uit = clnt.arecs().find(umnem.c_str());
+                if (uit == clnt.arecs().end())
                     throw InvalidArgument(umnem);
-                clnt.logon(clnt.accnt(*it));
+                clnt.logon(clnt.accnt(*uit));
             });
     }
     void
@@ -520,10 +520,10 @@ public:
     {
         const string umnem = get("user");
         call(async, [umnem](ClntRef clnt) {
-                auto it = clnt.arecs().find(umnem.c_str());
-                if (it == clnt.arecs().end())
+                auto uit = clnt.arecs().find(umnem.c_str());
+                if (uit == clnt.arecs().end())
                     throw InvalidArgument(umnem);
-                clnt.logoff(clnt.accnt(*it));
+                clnt.logoff(clnt.accnt(*uit));
             });
     }
     void
@@ -565,10 +565,27 @@ public:
     void
     revise(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        const auto id = ston<DbrIden>(*begin++);
+        const auto lots = ston<DbrLots>(*begin++);
+        call(async, [umnem, id, lots](ClntRef clnt) {
+                auto uit = clnt.arecs().find(umnem.c_str());
+                if (uit == clnt.arecs().end())
+                    throw InvalidArgument(umnem);
+                clnt.revise(clnt.accnt(*uit), id, lots);
+            });
     }
     void
     cancel(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        const auto id = ston<DbrIden>(*begin++);
+        call(async, [umnem, id](ClntRef clnt) {
+                auto uit = clnt.arecs().find(umnem.c_str());
+                if (uit == clnt.arecs().end())
+                    throw InvalidArgument(umnem);
+                clnt.cancel(clnt.accnt(*uit), id);
+            });
     }
     void
     ack_trade(Async& async, Arg begin, Arg end)
