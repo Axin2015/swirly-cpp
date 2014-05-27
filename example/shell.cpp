@@ -351,6 +351,15 @@ class Handler : public IHandler<Handler> {
     // Main thread.
     map<string, string> env_;
     // Context thread.
+
+    const string&
+    get(const string& name)
+    {
+        auto it = env_.find(name);
+        if (it == env_.end())
+            throw InvalidState(string(name).append(" not set"));
+        return it->second;
+    }
 public:
     // IHandler<Handler>
     void
@@ -410,9 +419,17 @@ public:
     void*
     on_async(ClntRef clnt, void* val) noexcept
     {
-        cout << "on_async\n";
-        auto fn = static_cast<std::function<void* (ClntRef)>*>(val);
-        return (*fn)(clnt);
+        try {
+            auto fn = static_cast<std::function<void (ClntRef)>*>(val);
+            (*fn)(clnt);
+        } catch (const DbrException& e) {
+            cerr << "exception: " << e.what() << endl;
+        } catch (const InvalidArgument& e) {
+            cerr << "invalid argument: " << e.what() << endl;
+        } catch (const InvalidState& e) {
+            cerr << "invalid state: " << e.what() << endl;
+        }
+        return nullptr;
     }
     // This.
     void
@@ -490,10 +507,24 @@ public:
     void
     logon(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        call(async, [umnem](ClntRef clnt) {
+                auto it = clnt.arecs().find(umnem.c_str());
+                if (it == clnt.arecs().end())
+                    throw InvalidArgument(umnem);
+                clnt.logon(clnt.accnt(*it));
+            });
     }
     void
     logoff(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        call(async, [umnem](ClntRef clnt) {
+                auto it = clnt.arecs().find(umnem.c_str());
+                if (it == clnt.arecs().end())
+                    throw InvalidArgument(umnem);
+                clnt.logoff(clnt.accnt(*it));
+            });
     }
     void
     user(Async& async, Arg begin, Arg end)
