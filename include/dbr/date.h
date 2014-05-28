@@ -127,6 +127,30 @@ dbr_jd_to_ymd(DbrJd jd, struct DbrYmd* ymd)
 }
 
 /**
+ * ISO8601 to Julian day.
+ */
+
+static inline DbrJd
+dbr_iso_to_jd(DbrIsoDate iso)
+{
+    struct DbrYmd ymd;
+    dbr_iso_to_ymd(iso, &ymd);
+    return dbr_ymd_to_jd(ymd.year, ymd.mon, ymd.mday);
+}
+
+/**
+ * Julian day to ISO8601.
+ */
+
+static inline DbrIsoDate
+dbr_jd_to_iso(DbrJd jd)
+{
+    struct DbrYmd ymd;
+    dbr_jd_to_ymd(jd, &ymd);
+    return dbr_ymd_to_iso(ymd.year, ymd.mon, ymd.mday);
+}
+
+/**
  * Juilian day to Modified Julian day.
  * Epoch is November 17, 1858.
  */

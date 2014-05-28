@@ -16,8 +16,10 @@
  *  02110-1301 USA.
  */
 #include <dbrpp/ctx.hpp>
-#include <dbrpp/shlex.hpp>
+#include <dbrpp/exec.hpp>
 #include <dbrpp/handler.hpp>
+#include <dbrpp/memb.hpp>
+#include <dbrpp/shlex.hpp>
 
 #include <dbr/log.h>
 #include <dbr/util.h>
@@ -39,63 +41,6 @@ typedef int Arity;
 typedef vector<string>::const_iterator Arg;
 
 typedef invalid_argument InvalidArgument;
-
-const char*
-straction(int action) noexcept
-{
-    const char* sym;
-    switch (action) {
-    case DBR_ACTION_BUY:
-        sym = "BUY";
-        break;
-    case DBR_ACTION_SELL:
-        sym = "SELL";
-        break;
-    default:
-        throw InvalidArgument("action");
-    }
-    return sym;
-}
-
-const char*
-strrole(int role) noexcept
-{
-    const char* sym;
-    switch (role) {
-    case DBR_ROLE_MAKER:
-        sym = "MAKER";
-        break;
-    case DBR_ROLE_TAKER:
-        sym = "TAKER";
-        break;
-    default:
-        throw InvalidArgument("role");
-    }
-    return sym;
-}
-
-const char*
-strstate(int state) noexcept
-{
-    const char* sym;
-    switch (state) {
-    case DBR_STATE_NEW:
-        sym = "NEW";
-        break;
-    case DBR_STATE_REVISE:
-        sym = "REVISE";
-        break;
-    case DBR_STATE_CANCEL:
-        sym = "CANCEL";
-        break;
-    case DBR_STATE_TRADE:
-        sym = "TRADE";
-        break;
-    default:
-        throw InvalidArgument("state");
-    }
-    return sym;
-}
 
 class InvalidState : public logic_error {
 public:
@@ -304,6 +249,99 @@ head_width(const array<const char*, COLS>& head)
     return width;
 }
 
+const char*
+straction(int action) noexcept
+{
+    const char* sym;
+    switch (action) {
+    case DBR_ACTION_BUY:
+        sym = "BUY";
+        break;
+    case DBR_ACTION_SELL:
+        sym = "SELL";
+        break;
+    default:
+        throw InvalidArgument("action");
+    }
+    return sym;
+}
+
+const char*
+strrole(int role) noexcept
+{
+    const char* sym;
+    switch (role) {
+    case DBR_ROLE_MAKER:
+        sym = "MAKER";
+        break;
+    case DBR_ROLE_TAKER:
+        sym = "TAKER";
+        break;
+    default:
+        throw InvalidArgument("role");
+    }
+    return sym;
+}
+
+const char*
+strstate(int state) noexcept
+{
+    const char* sym;
+    switch (state) {
+    case DBR_STATE_NEW:
+        sym = "NEW";
+        break;
+    case DBR_STATE_REVISE:
+        sym = "REVISE";
+        break;
+    case DBR_STATE_CANCEL:
+        sym = "CANCEL";
+        break;
+    case DBR_STATE_TRADE:
+        sym = "TRADE";
+        break;
+    default:
+        throw InvalidArgument("state");
+    }
+    return sym;
+}
+
+AccntRecRef
+get_arec(ClntRef clnt, DbrIden id)
+{
+    auto it = clnt.arecs().find(id);
+    if (it == clnt.arecs().end())
+        throw InvalidArgument(to_string(id));
+    return AccntRecRef(*it);
+}
+
+AccntRecRef
+get_arec(ClntRef clnt, const char* mnem)
+{
+    auto it = clnt.arecs().find(mnem);
+    if (it == clnt.arecs().end())
+        throw InvalidArgument(mnem);
+    return AccntRecRef(*it);
+}
+
+AccntRecRef
+get_crec(ClntRef clnt, DbrIden id)
+{
+    auto it = clnt.crecs().find(id);
+    if (it == clnt.crecs().end())
+        throw InvalidArgument(to_string(id));
+    return AccntRecRef(*it);
+}
+
+AccntRecRef
+get_crec(ClntRef clnt, const char* mnem)
+{
+    auto it = clnt.crecs().find(mnem);
+    if (it == clnt.crecs().end())
+        throw InvalidArgument(mnem);
+    return AccntRecRef(*it);
+}
+
 template <size_t COLS>
 void
 print_table(ostream& os,
@@ -509,10 +547,7 @@ public:
     {
         const string umnem = get("user");
         call(async, [umnem](ClntRef clnt) {
-                auto uit = clnt.arecs().find(umnem.c_str());
-                if (uit == clnt.arecs().end())
-                    throw InvalidArgument(umnem);
-                clnt.logon(clnt.accnt(*uit));
+                clnt.logon(clnt.accnt(get_arec(clnt, umnem.c_str())));
             });
     }
     void
@@ -520,27 +555,170 @@ public:
     {
         const string umnem = get("user");
         call(async, [umnem](ClntRef clnt) {
-                auto uit = clnt.arecs().find(umnem.c_str());
-                if (uit == clnt.arecs().end())
-                    throw InvalidArgument(umnem);
-                clnt.logoff(clnt.accnt(*uit));
+                clnt.logoff(clnt.accnt(get_arec(clnt, umnem.c_str())));
             });
     }
     void
     user(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+
+        enum { COLS = 2 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<user",
+            "<group"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [umnem, &width, &rows](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                for (auto memb : Accnt(clnt.accnt(urec)).users()) {
+                    MembRef ref(memb);
+                    row r{
+                        to_string(ref.user().mnem()),
+                        to_string(ref.group().mnem())
+                    };
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     group(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+
+        enum { COLS = 2 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<user",
+            "<group"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [umnem, &width, &rows](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                for (auto memb : Accnt(clnt.accnt(urec)).groups()) {
+                    MembRef ref(memb);
+                    row r{
+                        to_string(ref.user().mnem()),
+                        to_string(ref.group().mnem())
+                    };
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     order(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+
+        enum { COLS = 12 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<id",
+            "<group",
+            "<contr",
+            "<settl_date",
+            "<state",
+            "<action",
+            ">price",
+            ">lots",
+            ">resd",
+            ">exec",
+            ">last_price",
+            ">last_lots"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [umnem, &width, &rows](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                for (auto order : Accnt(clnt.accnt(urec)).orders()) {
+                    OrderRef ref(order);
+                    row r{
+                        to_string(ref.id()),
+                        to_string(ref.group().mnem()),
+                        to_string(ref.contr().mnem()),
+                        to_string(dbr_jd_to_iso(ref.settl_day())),
+                        strstate(ref.state()),
+                        straction(ref.action()),
+                        to_string(ref.contr().ticks_to_price(ref.ticks())),
+                        to_string(ref.lots()),
+                        to_string(ref.resd()),
+                        to_string(ref.exec()),
+                        to_string(ref.contr().ticks_to_price(ref.last_ticks())),
+                        to_string(ref.last_lots()),
+                    };
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     trade(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+
+        enum { COLS = 15 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<id",
+            "<order",
+            "<group",
+            "<contr",
+            "<settl_date",
+            "<state",
+            "<action",
+            ">price",
+            ">lots",
+            ">resd",
+            ">exc",
+            ">last_price",
+            ">last_lots",
+            "<role",
+            "<cpty"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [umnem, &width, &rows](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                for (auto trade : Accnt(clnt.accnt(urec)).trades()) {
+                    ExecRef ref(trade);
+                    row r{
+                        to_string(ref.id()),
+                        to_string(ref.order()),
+                        to_string(ref.group().mnem()),
+                        to_string(ref.contr().mnem()),
+                        to_string(dbr_jd_to_iso(ref.settl_day())),
+                        strstate(ref.state()),
+                        straction(ref.action()),
+                        to_string(ref.contr().ticks_to_price(ref.ticks())),
+                        to_string(ref.lots()),
+                        to_string(ref.resd()),
+                        to_string(ref.exec()),
+                        to_string(ref.contr().ticks_to_price(ref.last_ticks())),
+                        to_string(ref.last_lots()),
+                        strrole(ref.role()),
+                        to_string(ref.cpty().mnem())
+                    };
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     posn(Async& async, Arg begin, Arg end)
