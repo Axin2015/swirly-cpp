@@ -324,22 +324,22 @@ get_arec(ClntRef clnt, const char* mnem)
     return AccntRecRef(*it);
 }
 
-AccntRecRef
+ContrRecRef
 get_crec(ClntRef clnt, DbrIden id)
 {
     auto it = clnt.crecs().find(id);
     if (it == clnt.crecs().end())
         throw InvalidArgument(to_string(id));
-    return AccntRecRef(*it);
+    return ContrRecRef(*it);
 }
 
-AccntRecRef
+ContrRecRef
 get_crec(ClntRef clnt, const char* mnem)
 {
     auto it = clnt.crecs().find(mnem);
     if (it == clnt.crecs().end())
         throw InvalidArgument(mnem);
-    return AccntRecRef(*it);
+    return ContrRecRef(*it);
 }
 
 template <size_t COLS>
@@ -735,10 +735,36 @@ public:
     void
     buy(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        const string gmnem = get("group");
+        const string cmnem = get("contr");
+        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date")));
+        const auto price = ston<double>(*begin++);
+        const auto lots = ston<DbrLots>(*begin++);
+        call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                auto grec = get_arec(clnt, gmnem.c_str());
+                auto crec = get_crec(clnt, cmnem.c_str());
+                return clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
+                                  nullptr, DBR_ACTION_BUY, crec.price_to_ticks(price), lots, 0);
+            });
     }
     void
     sell(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        const string gmnem = get("group");
+        const string cmnem = get("contr");
+        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date")));
+        const auto price = ston<double>(*begin++);
+        const auto lots = ston<DbrLots>(*begin++);
+        call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                auto grec = get_arec(clnt, gmnem.c_str());
+                auto crec = get_crec(clnt, cmnem.c_str());
+                return clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
+                                  nullptr, DBR_ACTION_SELL, crec.price_to_ticks(price), lots, 0);
+            });
     }
     void
     revise(Async& async, Arg begin, Arg end)
@@ -747,10 +773,8 @@ public:
         const auto id = ston<DbrIden>(*begin++);
         const auto lots = ston<DbrLots>(*begin++);
         call(async, [umnem, id, lots](ClntRef clnt) {
-                auto uit = clnt.arecs().find(umnem.c_str());
-                if (uit == clnt.arecs().end())
-                    throw InvalidArgument(umnem);
-                clnt.revise(clnt.accnt(*uit), id, lots);
+                auto urec = get_arec(clnt, umnem.c_str());
+                clnt.revise(clnt.accnt(urec), id, lots);
             });
     }
     void
@@ -759,10 +783,8 @@ public:
         const string umnem = get("user");
         const auto id = ston<DbrIden>(*begin++);
         call(async, [umnem, id](ClntRef clnt) {
-                auto uit = clnt.arecs().find(umnem.c_str());
-                if (uit == clnt.arecs().end())
-                    throw InvalidArgument(umnem);
-                clnt.cancel(clnt.accnt(*uit), id);
+                auto urec = get_arec(clnt, umnem.c_str());
+                clnt.cancel(clnt.accnt(urec), id);
             });
     }
     void
