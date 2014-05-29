@@ -21,6 +21,7 @@
 #include <dbrpp/memb.hpp>
 #include <dbrpp/posn.hpp>
 #include <dbrpp/shlex.hpp>
+#include <dbrpp/view.hpp>
 
 #include <dbr/log.h>
 #include <dbr/util.h>
@@ -762,12 +763,126 @@ public:
         print_table(cout, head, width, rows);
     }
     void
-    level(Async& async, Arg begin, Arg end)
+    top(Async& async, Arg begin, Arg end)
     {
+        enum {
+            BID_PRICE = 2,
+            BID_LOTS,
+            BID_COUNT,
+            OFFER_PRICE,
+            OFFER_LOTS,
+            OFFER_COUNT,
+            COLS
+        };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<contr",
+            "<settl_date",
+            ">bid_price",
+            ">bid_lots",
+            ">bid_count",
+            ">offer_price",
+            ">offer_lots",
+            ">offer_count"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [&width, &rows](ClntRef clnt) {
+                for (auto view : clnt.views()) {
+                    ViewRef ref(view);
+                    row r{
+                        to_string(ref.crec().mnem()),
+                        to_string(dbr_jd_to_iso(ref.settl_day())),
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                    };
+                    if (ref.bid_count(0) > 0) {
+                        r[BID_PRICE] = to_string(ref.crec().ticks_to_price(ref.bid_ticks(0)));
+                        r[BID_LOTS] = to_string(ref.bid_lots(0));
+                        r[BID_COUNT] = to_string(ref.bid_count(0));
+                    }
+                    if (ref.offer_count(0) > 0) {
+                        r[OFFER_PRICE] = to_string(ref.crec().ticks_to_price(ref.offer_ticks(0)));
+                        r[OFFER_LOTS] = to_string(ref.offer_lots(0));
+                        r[OFFER_COUNT] = to_string(ref.offer_count(0));
+                    }
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
-    view(Async& async, Arg begin, Arg end)
+    depth(Async& async, Arg begin, Arg end)
     {
+        const string cmnem = get("contr");
+        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date")));
+
+        enum {
+            BID_PRICE = 3,
+            BID_LOTS,
+            BID_COUNT,
+            OFFER_PRICE,
+            OFFER_LOTS,
+            OFFER_COUNT,
+            COLS
+        };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<contr",
+            "<settl_date",
+            ">level",
+            ">bid_price",
+            ">bid_lots",
+            ">bid_count",
+            ">offer_price",
+            ">offer_lots",
+            ">offer_count"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [cmnem, settl_day, &width, &rows](ClntRef clnt) {
+                auto crec = get_crec(clnt, cmnem.c_str());
+                auto it = clnt.views().find(crec.id(), settl_day);
+                if (it == clnt.views().end())
+                    return;
+
+                ViewRef ref(*it);
+                for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
+                    row r{
+                        to_string(ref.crec().mnem()),
+                        to_string(dbr_jd_to_iso(ref.settl_day())),
+                        to_string(i),
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                        "-",
+                    };
+                    if (ref.bid_count(i) > 0) {
+                        r[BID_PRICE] = to_string(ref.crec().ticks_to_price(ref.bid_ticks(i)));
+                        r[BID_LOTS] = to_string(ref.bid_lots(i));
+                        r[BID_COUNT] = to_string(ref.bid_count(i));
+                    }
+                    if (ref.offer_count(i) > 0) {
+                        r[OFFER_PRICE] = to_string(ref.crec().ticks_to_price(ref.offer_ticks(i)));
+                        r[OFFER_LOTS] = to_string(ref.offer_lots(i));
+                        r[OFFER_COUNT] = to_string(ref.offer_count(i));
+                    }
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     buy(Async& async, Arg begin, Arg end)
@@ -828,7 +943,7 @@ public:
             });
     }
     void
-    ack_trade(Async& async, Arg begin, Arg end)
+    ack(Async& async, Arg begin, Arg end)
     {
         const string umnem = get("user");
         vector<DbrIden> ids;
@@ -917,13 +1032,13 @@ main(int argc, char* argv[])
         repl.bind("order", bind(&Handler::order, ref(handler), ref(async), _1, _2), 0);
         repl.bind("trade", bind(&Handler::trade, ref(handler), ref(async), _1, _2), 0);
         repl.bind("posn", bind(&Handler::posn, ref(handler), ref(async), _1, _2), 0);
-        repl.bind("level", bind(&Handler::level, ref(handler), ref(async), _1, _2), 0);
-        repl.bind("view", bind(&Handler::view, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("top", bind(&Handler::top, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("depth", bind(&Handler::depth, ref(handler), ref(async), _1, _2), 0);
         repl.bind("buy", bind(&Handler::buy, ref(handler), ref(async), _1, _2), 2);
         repl.bind("sell", bind(&Handler::sell, ref(handler), ref(async), _1, _2), 2);
         repl.bind("revise", bind(&Handler::revise, ref(handler), ref(async), _1, _2), 2);
         repl.bind("cancel", bind(&Handler::cancel, ref(handler), ref(async), _1, _2), -1);
-        repl.bind("ack_trade", bind(&Handler::ack_trade, ref(handler), ref(async), _1, _2), -1);
+        repl.bind("ack", bind(&Handler::ack, ref(handler), ref(async), _1, _2), -1);
         repl.bind("echo", bind(&Handler::echo, ref(handler), ref(async), _1, _2), -1);
         repl.bind("penv", bind(&Handler::penv, ref(handler), ref(async), _1, _2), 0);
         repl.bind("set", bind(&Handler::set, ref(handler), ref(async), _1, _2), 2);
