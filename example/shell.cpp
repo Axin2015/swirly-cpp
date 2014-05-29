@@ -1050,7 +1050,7 @@ main(int argc, char* argv[])
         ifstream cfg(path);
         if (cfg.is_open())
             repl.read(cfg);
-        repl.read(cin, "> ");
+        repl.read(cin, "doobry> ");
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;
     }
