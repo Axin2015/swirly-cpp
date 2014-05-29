@@ -21,7 +21,7 @@
 #include <pthread.h>
 
 /**
- * @addtogroup Sem
+ * @addtogroup Thread
  * @{
  */
 

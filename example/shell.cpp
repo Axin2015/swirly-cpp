@@ -19,6 +19,7 @@
 #include <dbrpp/exec.hpp>
 #include <dbrpp/handler.hpp>
 #include <dbrpp/memb.hpp>
+#include <dbrpp/mutex.hpp>
 #include <dbrpp/posn.hpp>
 #include <dbrpp/shlex.hpp>
 #include <dbrpp/view.hpp>
@@ -28,6 +29,7 @@
 
 #include <algorithm>
 #include <climits> // PATH_MAX
+#include <deque>
 #include <functional>
 #include <fstream>
 #include <iomanip>
@@ -39,9 +41,6 @@ using namespace std;
 using namespace std::placeholders;
 
 namespace {
-
-typedef int Arity;
-typedef vector<string>::const_iterator Arg;
 
 typedef invalid_argument InvalidArgument;
 
@@ -136,6 +135,9 @@ ston(const string& s)
         throw InvalidArgument(s);
     return static_cast<int>(l);
 }
+
+typedef int Arity;
+typedef vector<string>::const_iterator Arg;
 
 string
 join(Arg begin, Arg end, const char* delim = " ")
@@ -1001,11 +1003,28 @@ public:
     }
 };
 
+class Log {
+    Mutex mutex_;
+    deque<string> lines_;
+public:
+    void
+    append(int level, const char* msg)
+    {
+        Lock l(mutex_);
+        lines_.push_back(msg);
+    }
+    void
+    flush()
+    {
+        Lock l(mutex_);
+        copy(lines_.begin(), lines_.end(), ostream_iterator<string>(cout, "\n"));
+    }
+} log;
+
 void
 log_ios(int level, const char* msg)
 {
-    ostream& os = level > DBR_LOG_WARN ? cout : cerr;
-    os << msg << endl;
+    log.append(level, msg);
 }
 
 }

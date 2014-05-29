@@ -15,10 +15,10 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_SEM_HPP
-#define DBRPP_SEM_HPP
+#ifndef DBRPP_MUTEX_HPP
+#define DBRPP_MUTEX_HPP
 
-#include <dbr/sem.h>
+#include <pthread.h>
 
 namespace dbr {
 
@@ -27,44 +27,32 @@ namespace dbr {
  * @{
  */
 
-class Sem {
-    mutable DbrSem impl_;
+class Mutex {
+    friend class Lock;
+    pthread_mutex_t impl_;
 public:
-    ~Sem() noexcept
+    ~Mutex() noexcept
     {
-        dbr_sem_term(&impl_);
+        pthread_mutex_destroy(&impl_);
+    }
+    Mutex()
+    {
+        pthread_mutex_init(&impl_, NULL);
+    }
+};
+
+class Lock {
+    Mutex& mutex_;
+public:
+    ~Lock() noexcept
+    {
+        pthread_mutex_unlock(&mutex_.impl_);
     }
     explicit
-    Sem(int count = 0)
+    Lock(Mutex& mutex)
+        : mutex_(mutex)
     {
-        dbr_sem_init(&impl_, count);
-    }
-    operator DbrSem&() noexcept
-    {
-        return impl_;
-    }
-    DbrSem*
-    c_arg() noexcept
-    {
-        return &impl_;
-    }
-
-    // Copy semantics.
-
-    Sem(const Sem&) = delete;
-
-    Sem&
-    operator =(const Sem&) = delete;
-
-    void
-    post(int n = 1)
-    {
-        dbr_sem_post(&impl_, n);
-    }
-    void
-    wait(int n = 1)
-    {
-        dbr_sem_wait(&impl_, n);
+        pthread_mutex_lock(&mutex.impl_);
     }
 };
 
@@ -72,4 +60,4 @@ public:
 
 } // dbr
 
-#endif // DBRPP_SEM_HPP
+#endif // DBRPP_MUTEX_HPP

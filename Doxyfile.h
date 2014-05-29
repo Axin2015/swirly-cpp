@@ -128,12 +128,12 @@
  */
 
 /**
- * @defgroup Sem Semaphore
+ * @defgroup String String
  * @ingroup Ash
  */
 
 /**
- * @defgroup String String
+ * @defgroup Thread Thread
  * @ingroup Ash
  */
 
