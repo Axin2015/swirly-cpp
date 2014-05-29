@@ -19,6 +19,7 @@
 #include <dbrpp/exec.hpp>
 #include <dbrpp/handler.hpp>
 #include <dbrpp/memb.hpp>
+#include <dbrpp/posn.hpp>
 #include <dbrpp/shlex.hpp>
 
 #include <dbr/log.h>
@@ -577,8 +578,8 @@ public:
                 for (auto memb : Accnt(clnt.accnt(urec)).users()) {
                     MembRef ref(memb);
                     row r{
-                        to_string(ref.user().mnem()),
-                        to_string(ref.group().mnem())
+                        to_string(ref.urec().mnem()),
+                        to_string(ref.grec().mnem())
                     };
                     for (size_t i = 0; i < COLS; ++i)
                         width[i] = max(width[i], r[i].size());
@@ -606,8 +607,8 @@ public:
                 for (auto memb : Accnt(clnt.accnt(urec)).groups()) {
                     MembRef ref(memb);
                     row r{
-                        to_string(ref.user().mnem()),
-                        to_string(ref.group().mnem())
+                        to_string(ref.urec().mnem()),
+                        to_string(ref.grec().mnem())
                     };
                     for (size_t i = 0; i < COLS; ++i)
                         width[i] = max(width[i], r[i].size());
@@ -646,16 +647,16 @@ public:
                     OrderRef ref(order);
                     row r{
                         to_string(ref.id()),
-                        to_string(ref.group().mnem()),
-                        to_string(ref.contr().mnem()),
+                        to_string(ref.grec().mnem()),
+                        to_string(ref.crec().mnem()),
                         to_string(dbr_jd_to_iso(ref.settl_day())),
                         strstate(ref.state()),
                         straction(ref.action()),
-                        to_string(ref.contr().ticks_to_price(ref.ticks())),
+                        to_string(ref.crec().ticks_to_price(ref.ticks())),
                         to_string(ref.lots()),
                         to_string(ref.resd()),
                         to_string(ref.exec()),
-                        to_string(ref.contr().ticks_to_price(ref.last_ticks())),
+                        to_string(ref.crec().ticks_to_price(ref.last_ticks())),
                         to_string(ref.last_lots()),
                     };
                     for (size_t i = 0; i < COLS; ++i)
@@ -699,16 +700,16 @@ public:
                     row r{
                         to_string(ref.id()),
                         to_string(ref.order()),
-                        to_string(ref.group().mnem()),
-                        to_string(ref.contr().mnem()),
+                        to_string(ref.grec().mnem()),
+                        to_string(ref.crec().mnem()),
                         to_string(dbr_jd_to_iso(ref.settl_day())),
                         strstate(ref.state()),
                         straction(ref.action()),
-                        to_string(ref.contr().ticks_to_price(ref.ticks())),
+                        to_string(ref.crec().ticks_to_price(ref.ticks())),
                         to_string(ref.lots()),
                         to_string(ref.resd()),
                         to_string(ref.exec()),
-                        to_string(ref.contr().ticks_to_price(ref.last_ticks())),
+                        to_string(ref.crec().ticks_to_price(ref.last_ticks())),
                         to_string(ref.last_lots()),
                         strrole(ref.role()),
                         to_string(ref.cpty().mnem())
@@ -723,6 +724,41 @@ public:
     void
     posn(Async& async, Arg begin, Arg end)
     {
+        const string gmnem = get("group");
+
+        enum { COLS = 6 };
+        typedef array<string, COLS> row;
+
+        const array<const char*, COLS> head{
+            "<contr",
+            "<settl_date",
+            ">buy_price",
+            ">buy_lots",
+            ">sell_price",
+            ">sell_lots"};
+        auto width = head_width(head);
+        vector<row> rows;
+
+        call(async, [gmnem, &width, &rows](ClntRef clnt) {
+                auto grec = get_arec(clnt, gmnem.c_str());
+                for (auto posn : Accnt(clnt.accnt(grec)).posns()) {
+                    PosnRef ref(posn);
+                    const auto buy_ticks = static_cast<double>(ref.buy_licks()) / ref.buy_lots();
+                    const auto sell_ticks = static_cast<double>(ref.sell_licks()) / ref.sell_lots();
+                    row r{
+                        to_string(ref.crec().mnem()),
+                        to_string(dbr_jd_to_iso(ref.settl_day())),
+                        to_string(ref.crec().ticks_to_price(buy_ticks)),
+                        to_string(ref.buy_lots()),
+                        to_string(ref.crec().ticks_to_price(sell_ticks)),
+                        to_string(ref.sell_lots())
+                    };
+                    for (size_t i = 0; i < COLS; ++i)
+                        width[i] = max(width[i], r[i].size());
+                    rows.emplace_back(r);
+                }
+            });
+        print_table(cout, head, width, rows);
     }
     void
     level(Async& async, Arg begin, Arg end)
