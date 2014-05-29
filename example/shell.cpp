@@ -25,6 +25,7 @@
 #include <dbr/log.h>
 #include <dbr/util.h>
 
+#include <algorithm>
 #include <climits> // PATH_MAX
 #include <functional>
 #include <fstream>
@@ -748,9 +749,9 @@ public:
                     row r{
                         to_string(ref.crec().mnem()),
                         to_string(dbr_jd_to_iso(ref.settl_day())),
-                        to_string(ref.crec().ticks_to_price(buy_ticks)),
+                        to_string(buy_ticks * ref.crec().price_inc()),
                         to_string(ref.buy_lots()),
-                        to_string(ref.crec().ticks_to_price(sell_ticks)),
+                        to_string(sell_ticks * ref.crec().price_inc()),
                         to_string(ref.sell_lots())
                     };
                     for (size_t i = 0; i < COLS; ++i)
@@ -817,15 +818,27 @@ public:
     cancel(Async& async, Arg begin, Arg end)
     {
         const string umnem = get("user");
-        const auto id = ston<DbrIden>(*begin++);
-        call(async, [umnem, id](ClntRef clnt) {
+        vector<DbrIden> ids;
+        transform(begin, end, back_inserter(ids), ston<DbrIden>);
+        call(async, [umnem, ids](ClntRef clnt) {
                 auto urec = get_arec(clnt, umnem.c_str());
-                clnt.cancel(clnt.accnt(urec), id);
+                auto user = clnt.accnt(urec);
+                for (auto id : ids)
+                    clnt.cancel(user, id);
             });
     }
     void
     ack_trade(Async& async, Arg begin, Arg end)
     {
+        const string umnem = get("user");
+        vector<DbrIden> ids;
+        transform(begin, end, back_inserter(ids), ston<DbrIden>);
+        call(async, [umnem, ids](ClntRef clnt) {
+                auto urec = get_arec(clnt, umnem.c_str());
+                auto user = clnt.accnt(urec);
+                for (auto id : ids)
+                    clnt.ack_trade(user, id);
+            });
     }
     void
     echo(Async& async, Arg begin, Arg end)
