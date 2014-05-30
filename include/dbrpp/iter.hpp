@@ -239,11 +239,11 @@ struct ReverseBiDirectionalPolicy {
 };
 
 template <typename PolicyT>
-using ReverseBiDirectionalIterator = BiDirectionalIterator<ReverseBiDirectionalPolicy<PolicyT> >;
+using ReverseBiDirectionalIterator = BiDirectionalIterator<ReverseBiDirectionalPolicy<PolicyT>>;
 
 template <typename PolicyT>
 using ConstReverseBiDirectionalIterator = ConstBiDirectionalIterator<
-    ReverseBiDirectionalPolicy<PolicyT> >;
+    ReverseBiDirectionalPolicy<PolicyT>>;
 
 template <class PolicyT>
 class ConstForwardIterator;

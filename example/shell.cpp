@@ -33,6 +33,7 @@
 #include <functional>
 #include <fstream>
 #include <iomanip>
+#include <list>
 #include <map>
 
 #include <unistd.h> // usleep()
@@ -81,7 +82,7 @@ public:
     void
     bind(const string& name, const function<void (Arg, Arg)>& fun, Arity arity)
     {
-        cmds_[name] = make_pair(fun, arity);
+        cmds_[name] = {fun, arity};
     }
     void
     eval(const string& name, Arg begin, Arg end)
@@ -925,8 +926,42 @@ public:
 };
 
 class LogBuffer {
+    typedef tuple<DbrMillis, int, string> Entry;
     Mutex mutex_;
-    vector<string> lines_;
+    list<Entry> entries_;
+    void
+    print(ostream& os, const Entry& entry) const
+    {
+        DbrMillis ms;
+        int level;
+        string msg;
+
+        tie(ms, level, msg) = entry;
+
+        const time_t now = ms / 1000;
+        struct tm tm;
+        localtime_r(&now, &tm);
+
+        char buf[sizeof("Mar 12 06:26:39")];
+        strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &tm);
+
+        os << buf << '.';
+
+        auto fill = os.fill('0');
+        os.width(3);
+        os << (ms % 1000);
+        os.fill(fill);
+
+        os << ' ';
+
+        auto flags = os.flags();
+        os.setf(ios_base::left, ios_base::adjustfield);
+        os.width(6);
+        os << dbr_log_label(level);
+        os.flags(flags);
+
+        os << msg << endl;
+    }
 public:
     ~LogBuffer() noexcept
     {
@@ -936,14 +971,18 @@ public:
     append(int level, const char* msg)
     {
         Lock l(mutex_);
-        lines_.push_back(msg);
+        entries_.emplace_back(dbr_millis(), level, msg);
     }
     void
     flush()
     {
-        Lock l(mutex_);
-        copy(lines_.begin(), lines_.end(), ostream_iterator<string>(cout, "\n"));
-        lines_.clear();
+        list<Entry> entries;
+        {
+            Lock l(mutex_);
+            entries.swap(entries_);
+        }
+        for (const auto& entry : entries)
+            print(cout, entry);
     }
 } log_buffer;
 
