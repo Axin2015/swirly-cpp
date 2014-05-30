@@ -22,6 +22,7 @@
 #include <dbrpp/mutex.hpp>
 #include <dbrpp/posn.hpp>
 #include <dbrpp/shlex.hpp>
+#include <dbrpp/string.hpp>
 #include <dbrpp/view.hpp>
 
 #include <dbr/log.h>
@@ -33,7 +34,6 @@
 #include <functional>
 #include <fstream>
 #include <iomanip>
-#include <iostream>
 #include <map>
 
 using namespace dbr;
@@ -59,99 +59,8 @@ public:
 
 struct Quit { };
 
-template <typename T>
-class JoinIterator : public iterator<output_iterator_tag, void, void, void, void> {
-    ostream* os_;
-    const char* delim_;
-    bool first_;
-public:
-    JoinIterator(ostream& os, const char* delim)
-        : os_(&os),
-          delim_(delim),
-          first_(true)
-    {
-    }
-    JoinIterator&
-    operator =(T value)
-    {
-        if (first_)
-            first_ = false;
-        else
-            *os_ << delim_;
-        *os_ << value;
-        return *this;
-    }
-    JoinIterator&
-    operator *()
-    {
-        return *this;
-    }
-    JoinIterator&
-    operator ++()
-    {
-        return *this;
-    }
-    JoinIterator&
-    operator ++(int)
-    {
-        return *this;
-    }
-};
-
-template <typename T>
-T
-ston(const string& s);
-
-template<>
-double
-ston(const string& s)
-{
-    errno = 0;
-    char* end;
-    double d = strtod(s.c_str(), &end);
-    if (0 != errno || *end)
-        throw InvalidArgument(s);
-    return d;
-}
-
-template<>
-long
-ston(const string& s)
-{
-    errno = 0;
-    char* end;
-    long l = strtol(s.c_str(), &end, 10);
-    if (0 != errno || *end)
-        throw InvalidArgument(s);
-    return l;
-}
-
-template<>
-int
-ston(const string& s)
-{
-    long l = ston<long>(s.c_str());
-    if (l < numeric_limits<int>::min() || numeric_limits<int>::max() < l)
-        throw InvalidArgument(s);
-    return static_cast<int>(l);
-}
-
 typedef int Arity;
 typedef vector<string>::const_iterator Arg;
-
-string
-join(Arg begin, Arg end, const char* delim = " ")
-{
-    ostringstream ss;
-    copy(begin, end, ostream_iterator<string>(ss, delim));
-    return ss.str();
-}
-
-string
-join(const vector<string>& v, const char* delim = " ")
-{
-    return join(v.begin(), v.end(), delim);
-}
 
 // Read-eval-print loop (REPL).
 
@@ -824,7 +733,7 @@ public:
     depth(Async& async, Arg begin, Arg end)
     {
         const string cmnem = get("contr");
-        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date")));
+        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
 
         enum {
             BID_PRICE = 3,
@@ -892,9 +801,9 @@ public:
         const string umnem = get("user");
         const string gmnem = get("group");
         const string cmnem = get("contr");
-        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date")));
-        const auto price = ston<double>(*begin++);
-        const auto lots = ston<DbrLots>(*begin++);
+        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
+        const auto price = ston<double>((*begin++).c_str());
+        const auto lots = ston<DbrLots>((*begin++).c_str());
         call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
                 auto urec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
@@ -909,9 +818,9 @@ public:
         const string umnem = get("user");
         const string gmnem = get("group");
         const string cmnem = get("contr");
-        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date")));
-        const auto price = ston<double>(*begin++);
-        const auto lots = ston<DbrLots>(*begin++);
+        const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
+        const auto price = ston<double>((*begin++).c_str());
+        const auto lots = ston<DbrLots>((*begin++).c_str());
         call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
                 auto urec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
@@ -924,8 +833,8 @@ public:
     revise(Async& async, Arg begin, Arg end)
     {
         const string umnem = get("user");
-        const auto id = ston<DbrIden>(*begin++);
-        const auto lots = ston<DbrLots>(*begin++);
+        const auto id = ston<DbrIden>((*begin++).c_str());
+        const auto lots = ston<DbrLots>((*begin++).c_str());
         call(async, [umnem, id, lots](ClntRef clnt) {
                 auto urec = get_arec(clnt, umnem.c_str());
                 clnt.revise(clnt.accnt(urec), id, lots);
@@ -936,7 +845,9 @@ public:
     {
         const string umnem = get("user");
         vector<DbrIden> ids;
-        transform(begin, end, back_inserter(ids), ston<DbrIden>);
+        transform(begin, end, back_inserter(ids), [](const string& arg) {
+                return ston<DbrIden>(arg.c_str());
+            });
         call(async, [umnem, ids](ClntRef clnt) {
                 auto urec = get_arec(clnt, umnem.c_str());
                 auto user = clnt.accnt(urec);
@@ -949,7 +860,9 @@ public:
     {
         const string umnem = get("user");
         vector<DbrIden> ids;
-        transform(begin, end, back_inserter(ids), ston<DbrIden>);
+        transform(begin, end, back_inserter(ids), [](const string& arg) {
+                return ston<DbrIden>(arg.c_str());
+            });
         call(async, [umnem, ids](ClntRef clnt) {
                 auto urec = get_arec(clnt, umnem.c_str());
                 auto user = clnt.accnt(urec);
