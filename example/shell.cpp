@@ -29,12 +29,13 @@
 #include <dbr/util.h>
 
 #include <algorithm>
-#include <climits> // PATH_MAX
-#include <deque>
+#include <climits>  // PATH_MAX
 #include <functional>
 #include <fstream>
 #include <iomanip>
 #include <map>
+
+#include <unistd.h> // usleep()
 
 using namespace dbr;
 using namespace std;
@@ -68,10 +69,13 @@ class Repl {
     typedef pair<function<void (Arg, Arg)>, Arity> Cmd;
     typedef map<string, Cmd> Cmds;
     Cmds cmds_;
+    function<void ()> flush_;
     bool quit_;
 public:
-    Repl() noexcept
-    : quit_(false)
+    explicit
+    Repl(const function<void ()>& flush) noexcept
+      : flush_(flush),
+        quit_(false)
     {
     }
     void
@@ -116,12 +120,16 @@ public:
     read(istream& is, const char* prompt = nullptr)
     {
         vector<string> toks;
-        auto shlex = make_shlex([this, &toks](const char* tok, size_t len) {
+        auto shlex = make_shlex([this, prompt, &toks](const char* tok, size_t len) {
                 if (tok)
                     toks.push_back(tok);
                 else {
                     eval(toks);
                     toks.clear();
+                    // Wait 25ms for response when running interactively.
+                    if (prompt)
+                        usleep(25 * 1000);
+                    flush_();
                 }
             });
         if (prompt)
@@ -317,52 +325,52 @@ public:
     void
     on_close(ClntRef clnt) noexcept
     {
-        cout << "on_close\n";
+        dbr_log_info("on_close");
     }
     void
     on_ready(ClntRef clnt) noexcept
     {
-        cout << "on_ready\n";
+        dbr_log_info("on_ready");
     }
     void
     on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        cout << "on_logon\n";
+        dbr_log_info("on_logon");
     }
     void
     on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        cout << "on_logoff\n";
+        dbr_log_info("on_logoff");
     }
     void
     on_reset(ClntRef clnt) noexcept
     {
-        cout << "on_reset\n";
+        dbr_log_info("on_reset");
     }
     void
     on_timeout(ClntRef clnt, DbrIden req_id) noexcept
     {
-        cout << "on_timeout\n";
+        dbr_log_info("on_timeout");
     }
     void
     on_status(ClntRef clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
-        cout << "on_status\n";
+        dbr_log_info("on_status");
     }
     void
     on_exec(ClntRef clnt, DbrIden req_id, DbrExec& exec) noexcept
     {
-        cout << "on_exec\n";
+        dbr_log_info("on_exec");
     }
     void
     on_posn(ClntRef clnt, DbrPosn& posn) noexcept
     {
-        cout << "on_posn\n";
+        dbr_log_info("on_posn");
     }
     void
     on_view(ClntRef clnt, DbrView& view) noexcept
     {
-        cout << "on_view\n";
+        dbr_log_info("on_view");
     }
     void
     on_flush(ClntRef clnt) noexcept
@@ -916,10 +924,14 @@ public:
     }
 };
 
-class Log {
+class LogBuffer {
     Mutex mutex_;
-    deque<string> lines_;
+    vector<string> lines_;
 public:
+    ~LogBuffer() noexcept
+    {
+        flush();
+    }
     void
     append(int level, const char* msg)
     {
@@ -931,13 +943,14 @@ public:
     {
         Lock l(mutex_);
         copy(lines_.begin(), lines_.end(), ostream_iterator<string>(cout, "\n"));
+        lines_.clear();
     }
-} log;
+} log_buffer;
 
 void
 log_ios(int level, const char* msg)
 {
-    log.append(level, msg);
+    log_buffer.append(level, msg);
 }
 
 }
@@ -950,11 +963,10 @@ main(int argc, char* argv[])
         Handler handler;
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
                 dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
-        cout << ctx << endl;
 
         Async async = ctx.async();
 
-        Repl repl;
+        Repl repl(bind(&LogBuffer::flush, ref(log_buffer)));
         repl.bind("accnt", bind(&Handler::accnt, ref(handler), ref(async), _1, _2), 0);
         repl.bind("contr", bind(&Handler::contr, ref(handler), ref(async), _1, _2), 0);
         repl.bind("logon", bind(&Handler::logon, ref(handler), ref(async), _1, _2), 0);
@@ -983,6 +995,7 @@ main(int argc, char* argv[])
         if (cfg.is_open())
             repl.read(cfg);
         repl.read(cin, "doobry> ");
+        cout << endl;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;
     }
