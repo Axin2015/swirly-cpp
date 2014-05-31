@@ -70,12 +70,14 @@ class Repl {
     typedef pair<function<void (Arg, Arg)>, Arity> Cmd;
     typedef map<string, Cmd> Cmds;
     Cmds cmds_;
+    function<vector<string> (const string&)> predict_;
     function<void ()> flush_;
     bool quit_;
 public:
-    explicit
-    Repl(const function<void ()>& flush) noexcept
-      : flush_(flush),
+    Repl(const function<vector<string> (const string&)>& predict,
+         const function<void ()>& flush) noexcept
+      : predict_(predict),
+        flush_(flush),
         quit_(false)
     {
     }
@@ -85,36 +87,46 @@ public:
         cmds_[name] = {fun, arity};
     }
     void
-    eval(const string& name, Arg begin, Arg end)
+    eval(const string& abbrev, Arg begin, Arg end)
     {
-        Cmds::const_iterator cmd = cmds_.find(name);
-        if (cmd != cmds_.end()) {
-            // Remaining tokens are the arguments.
-            const Arity arity = cmd->second.second;
-            if (arity < 0 || arity == distance(begin, end)) {
-                try {
-                    cmd->second.first(begin, end);
-                } catch (const DbrException& e) {
-                    cerr << "exception: " << e.what() << endl;
-                } catch (const InvalidArgument& e) {
-                    cerr << "invalid argument: " << e.what() << endl;
-                } catch (const InvalidState& e) {
-                    cerr << "invalid state: " << e.what() << endl;
-                } catch (const Quit&) {
-                    quit_ = true;
-                }
-            } else
-                cerr << "invalid argument(s): " << join(begin, end) << endl;
+        vector<string> names = predict_(abbrev);
+        const auto size = names.size();
+        if (size != 1) {
+            cerr << "invalid command: " << abbrev << endl;
+            if (size > 1) {
+                cerr << "did you mean? ";
+                copy(names.begin(), names.end(), ostream_iterator<string>(cerr, " "));
+                cerr << endl;
+            }
+            return;
+        }
+
+        const string& name = names.front();
+        const auto& cmd = cmds_[name];
+        // Remaining tokens are the arguments.
+        const Arity arity = cmd.second;
+        if (arity < 0 || arity == distance(begin, end)) {
+            try {
+                cmd.first(begin, end);
+            } catch (const DbrException& e) {
+                cerr << name << ": exception: " << e.what() << endl;
+            } catch (const InvalidArgument& e) {
+                cerr << name << ": invalid argument: " << e.what() << endl;
+            } catch (const InvalidState& e) {
+                cerr << name << ": invalid state: " << e.what() << endl;
+            } catch (const Quit&) {
+                quit_ = true;
+            }
         } else
-            cerr << "invalid command: " << name << endl;
+            cerr << name << ": invalid argument(s): " << join(begin, end) << endl;
     }
     void
     eval(const vector<string>& toks)
     {
         if (!toks.empty()) {
             Arg begin = toks.begin();
-            const string& name = *begin++;
-            eval(name, begin, toks.end());
+            const string& abbrev = *begin++;
+            eval(abbrev, begin, toks.end());
         }
     }
     void
@@ -992,6 +1004,91 @@ log_ios(int level, const char* msg)
     log_buffer.append(level, msg);
 }
 
+size_t
+prefix(string::const_iterator it, string::const_iterator end, const char* s)
+{
+    const char* p = s;
+    while (it != end && *it == *p)
+        ++it, ++p;
+    return it == end ? p - s : 0;
+}
+
+vector<string>
+match(string::const_iterator it, string::const_iterator end, const char* s1)
+{
+    vector<string> v;
+    const auto p1 = prefix(it, end, s1);
+    if (p1 != 0)
+        v.emplace_back(s1);
+    return v;
+}
+
+vector<string>
+match(string::const_iterator it, string::const_iterator end, const char* s1, const char* s2)
+{
+    vector<string> v;
+    const auto p1 = prefix(it, end, s1);
+    const auto p2 = prefix(it, end, s2);
+    if (p1 != 0 || p2 != 0) {
+        if (p1 >= p2)
+            v.emplace_back(s1);
+        if (p2 >= p1)
+            v.emplace_back(s2);
+    }
+    return v;
+}
+
+vector<string>
+predict(const string& tok)
+{
+    vector<string> v;
+    switch (tok[0]) {
+    case 'a':
+        v = match(tok.begin(), tok.end(), "accnt", "ack");
+        break;
+    case 'b':
+        v = match(tok.begin(), tok.end(), "buy");
+        break;
+    case 'c':
+        v = match(tok.begin(), tok.end(), "cancel", "contr");
+        break;
+    case 'd':
+        v = match(tok.begin(), tok.end(), "depth");
+        break;
+    case 'e':
+        v = match(tok.begin(), tok.end(), "echo");
+        break;
+    case 'g':
+        v = match(tok.begin(), tok.end(), "group");
+        break;
+    case 'l':
+        v = match(tok.begin(), tok.end(), "logoff", "logon");
+        break;
+    case 'o':
+        v = match(tok.begin(), tok.end(), "order");
+        break;
+    case 'p':
+        v = match(tok.begin(), tok.end(), "penv", "posn");
+        break;
+    case 'q':
+        v = match(tok.begin(), tok.end(), "quit");
+        break;
+    case 'r':
+        v = match(tok.begin(), tok.end(), "revise");
+        break;
+    case 's':
+        v = match(tok.begin(), tok.end(), "sell", "set");
+        break;
+    case 't':
+        v = match(tok.begin(), tok.end(), "top", "trade");
+        break;
+    case 'u':
+        v = match(tok.begin(), tok.end(), "unset", "user");
+        break;
+    }
+    return v;
+}
+
 }
 
 int
@@ -1005,7 +1102,7 @@ main(int argc, char* argv[])
 
         Async async = ctx.async();
 
-        Repl repl(bind(&LogBuffer::flush, ref(log_buffer)));
+        Repl repl(predict, bind(&LogBuffer::flush, ref(log_buffer)));
         repl.bind("accnt", bind(&Handler::accnt, ref(handler), ref(async), _1, _2), 0);
         repl.bind("contr", bind(&Handler::contr, ref(handler), ref(async), _1, _2), 0);
         repl.bind("logon", bind(&Handler::logon, ref(handler), ref(async), _1, _2), 0);
