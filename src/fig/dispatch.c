@@ -327,7 +327,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
     // At least one iteration.
     do {
         if (clnt->state == (FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
-            dbr_log_info("close immediate");
+            dbr_log_debug1("close immediate");
             clnt->state = FIG_CLOSED;
             dbr_handler_on_close(handler, clnt);
             goto done;
@@ -370,7 +370,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_err_setf(DBR_ETIMEOUT, "transaction socket timeout");
                 goto fail1;
             } else if (id == clnt->close_id) {
-                dbr_log_info("close timeout");
+                dbr_log_debug1("close timeout");
                 clnt->state = FIG_CLOSED;
                 dbr_handler_on_close(handler, clnt);
                 goto done;
@@ -411,7 +411,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 
             switch (body.type) {
             case DBR_SESS_OPEN:
-                dbr_log_info("open message");
+                dbr_log_debug1("open message");
                 clnt->sess.hbint = body.sess_open.hbint;
                 clnt->state &= ~FIG_OPEN_WAIT;
                 clnt->state |= (FIG_REC_WAIT | FIG_SNAP_WAIT);
@@ -420,17 +420,17 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 break;
             case DBR_SESS_CLOSE:
-                dbr_log_info("close message");
+                dbr_log_debug1("close message");
                 clnt->state = FIG_CLOSED;
                 dbr_handler_on_close(handler, clnt);
                 goto done;
             case DBR_SESS_LOGON:
-                dbr_log_info("logon message");
+                dbr_log_debug1("logon message");
                 dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.uid));
                 dbr_handler_on_logon(handler, clnt, body.req_id, body.sess_logon.uid);
                 break;
             case DBR_SESS_LOGOFF:
-                dbr_log_info("logoff message");
+                dbr_log_debug1("logoff message");
                 dbr_handler_on_logoff(handler, clnt, body.req_id, body.sess_logoff.uid);
                 {
                     DbrAccnt user = get_accnt(clnt, body.sess_logoff.uid);
@@ -440,12 +440,12 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_SESS_HEARTBT:
                 break;
             case DBR_STATUS_REP:
-                dbr_log_info("status message");
+                dbr_log_debug1("status message");
                 dbr_handler_on_status(handler, clnt, body.req_id, body.status_rep.num,
                                       body.status_rep.msg);
                 break;
             case DBR_ACCNT_LIST_REP:
-                dbr_log_info("accnt-list message");
+                dbr_log_debug1("accnt-list message");
                 clnt->state &= ~FIG_ACCNT_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_ACCNT,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
@@ -453,7 +453,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     dbr_handler_on_ready(handler, clnt);
                 break;
             case DBR_CONTR_LIST_REP:
-                dbr_log_info("contr-list message");
+                dbr_log_debug1("contr-list message");
                 clnt->state &= ~FIG_CONTR_WAIT;
                 fig_cache_emplace_rec_list(&clnt->cache, DBR_ENTITY_CONTR,
                                            body.entity_list_rep.first, body.entity_list_rep.count_);
@@ -461,23 +461,23 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     dbr_handler_on_ready(handler, clnt);
                 break;
             case DBR_USER_LIST_REP:
-                dbr_log_info("user-list message");
+                dbr_log_debug1("user-list message");
                 emplace_user_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_GROUP_LIST_REP:
-                dbr_log_info("group-list message");
+                dbr_log_debug1("group-list message");
                 emplace_group_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_ORDER_LIST_REP:
-                dbr_log_info("order-list message");
+                dbr_log_debug1("order-list message");
                 emplace_order_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_EXEC_LIST_REP:
-                dbr_log_info("exec-list message");
+                dbr_log_debug1("exec-list message");
                 emplace_exec_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_POSN_LIST_REP:
-                dbr_log_info("posn-list message");
+                dbr_log_debug1("posn-list message");
                 // This function can fail is there is no memory available for a lazily created
                 // account.
                 if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first))) {
@@ -486,14 +486,14 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 }
                 break;
             case DBR_VIEW_LIST_REP:
-                dbr_log_info("view-list message");
+                dbr_log_debug1("view-list message");
                 clnt->state &= ~FIG_SNAP_WAIT;
                 apply_views(clnt, body.view_list_rep.first, handler);
                 if (clnt->state == FIG_READY)
                     dbr_handler_on_ready(handler, clnt);
                 break;
             case DBR_EXEC_REP:
-                dbr_log_info("exec message");
+                dbr_log_debug1("exec message");
                 enrich_exec(&clnt->cache, body.exec_rep.exec);
                 switch (body.exec_rep.exec->c.state) {
                 case DBR_STATE_NEW:
@@ -509,7 +509,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_exec_decref(body.exec_rep.exec, clnt->pool);
                 break;
             case DBR_POSN_REP:
-                dbr_log_info("posn message");
+                dbr_log_debug1("posn message");
                 enrich_posn(&clnt->cache, body.posn_rep.posn);
                 // This function can fail is there is no memory available for a lazily created
                 // account.
@@ -535,7 +535,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_VIEW_LIST_REP:
                 if (dbr_unlikely(clnt->state & FIG_DELTA_WAIT)) {
                     if (clnt->state == (FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
-                        dbr_log_info("close immediate");
+                        dbr_log_debug1("close immediate");
                         clnt->state = FIG_CLOSED;
                         dbr_handler_on_close(handler, clnt);
                         goto done;

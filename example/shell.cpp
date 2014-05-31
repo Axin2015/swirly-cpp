@@ -338,52 +338,52 @@ public:
     void
     on_close(ClntRef clnt) noexcept
     {
-        dbr_log_info("on_close");
+        dbr_log_info("close received");
     }
     void
     on_ready(ClntRef clnt) noexcept
     {
-        dbr_log_info("on_ready");
+        dbr_log_info("ready received");
     }
     void
     on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        dbr_log_info("on_logon");
+        dbr_log_info("logon received");
     }
     void
     on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
     {
-        dbr_log_info("on_logoff");
+        dbr_log_info("logoff received");
     }
     void
     on_reset(ClntRef clnt) noexcept
     {
-        dbr_log_info("on_reset");
+        dbr_log_info("reset received");
     }
     void
     on_timeout(ClntRef clnt, DbrIden req_id) noexcept
     {
-        dbr_log_info("on_timeout");
+        dbr_log_info("timeout received");
     }
     void
     on_status(ClntRef clnt, DbrIden req_id, int num, const char* msg) noexcept
     {
-        dbr_log_info("on_status");
+        dbr_log_info("status received");
     }
     void
     on_exec(ClntRef clnt, DbrIden req_id, DbrExec& exec) noexcept
     {
-        dbr_log_info("on_exec");
+        dbr_log_info("exec received");
     }
     void
     on_posn(ClntRef clnt, DbrPosn& posn) noexcept
     {
-        dbr_log_info("on_posn");
+        dbr_log_info("posn received");
     }
     void
     on_view(ClntRef clnt, DbrView& view) noexcept
     {
-        dbr_log_info("on_view");
+        dbr_log_info("view received");
     }
     void
     on_flush(ClntRef clnt) noexcept
@@ -1094,6 +1094,7 @@ predict(const string& tok)
 int
 main(int argc, char* argv[])
 {
+    dbr_log_setlevel(DBR_LOG_INFO);
     dbr_log_setlogger(log_ios);
     try {
         Handler handler;

@@ -53,7 +53,7 @@ alloc_mem(struct ElmPool* pool, size_t size)
 #if DBR_DEBUG_LEVEL >= 1
     const size_t page = new_used / pool->pagesize;
     if (pool->used == 0 || page > pool->used / pool->pagesize)
-        dbr_log_info("allocating page %zu", page + 1);
+        dbr_log_debug1("allocating page %zu", page + 1);
 #endif // DBR_DEBUG_LEVEL >= 1
     // Allocate entry from virtual memory.
     void* addr = pool->addr + pool->used;
