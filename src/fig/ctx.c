@@ -17,6 +17,8 @@
  */
 #include <dbr/ctx.h>
 
+#include "async.h"
+
 #include <dbr/clnt.h>
 #include <dbr/dispatch.h>
 #include <dbr/err.h>
@@ -198,11 +200,13 @@ DBR_API void
 dbr_ctx_destroy(DbrCtx ctx)
 {
     // Best effort to close clnt owned by child thread.
-    DbrAsync async = dbr_async_create(ctx->zctx, ctx->uuid);
-    if (async) {
-        dbr_async_close(async);
-        dbr_async_destroy(async);
-    }
+    void* sock = fig_async_create(ctx->zctx, ctx->uuid);
+    if (sock) {
+        if (!fig_async_close(sock))
+            dbr_err_perror("fig_async_close() failed");
+        fig_async_destroy(sock);
+    } else
+        dbr_err_perror("fig_async_create() failed");
 
     void* ret;
     const int err = pthread_join(ctx->child, &ret);

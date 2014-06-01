@@ -52,7 +52,7 @@ free_views(struct DbrTree* views, DbrPool pool)
 }
 
 DBR_EXTERN void
-fig_sess_reset(DbrClnt clnt)
+fig_clnt_sess_reset(DbrClnt clnt)
 {
     // This function does not schedule any new timers.
 
@@ -66,7 +66,7 @@ fig_sess_reset(DbrClnt clnt)
 }
 
 DBR_EXTERN DbrIden
-fig_sess_close(DbrClnt clnt, DbrMillis now)
+fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
 {
     if (clnt->state == FIG_DELTA_WAIT) {
         clnt->state |= FIG_CLOSE_WAIT;
@@ -92,7 +92,7 @@ fig_sess_close(DbrClnt clnt, DbrMillis now)
 }
 
 DBR_EXTERN DbrIden
-fig_sess_open(DbrClnt clnt, DbrMillis now)
+fig_clnt_sess_open(DbrClnt clnt, DbrMillis now)
 {
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -264,7 +264,7 @@ dbr_clnt_destroy(DbrClnt clnt)
 DBR_API void
 dbr_clnt_reset(DbrClnt clnt)
 {
-    fig_sess_reset(clnt);
+    fig_clnt_sess_reset(clnt);
     // Cannot fail due to prioq reset.
     dbr_prioq_push(&clnt->prioq, FIG_MDTMR, dbr_millis() + FIG_MDTMOUT);
 }
@@ -272,7 +272,7 @@ dbr_clnt_reset(DbrClnt clnt)
 DBR_API DbrIden
 dbr_clnt_close(DbrClnt clnt)
 {
-    return fig_sess_close(clnt, dbr_millis());
+    return fig_clnt_sess_close(clnt, dbr_millis());
 }
 
 DBR_API struct DbrSlNode*

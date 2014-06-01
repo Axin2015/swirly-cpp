@@ -88,12 +88,6 @@ public:
         std::swap(impl_, rhs.impl_);
     }
     void
-    close()
-    {
-        if (!dbr_async_close(impl_))
-            throw_exception();
-    }
-    void
     send(void* val)
     {
         if (!dbr_async_send(impl_, val))

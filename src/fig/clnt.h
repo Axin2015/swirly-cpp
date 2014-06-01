@@ -91,12 +91,12 @@ struct FigClnt {
 };
 
 DBR_EXTERN void
-fig_sess_reset(DbrClnt clnt);
+fig_clnt_sess_reset(DbrClnt clnt);
 
 DBR_EXTERN DbrIden
-fig_sess_close(DbrClnt clnt, DbrMillis now);
+fig_clnt_sess_close(DbrClnt clnt, DbrMillis now);
 
 DBR_EXTERN DbrIden
-fig_sess_open(DbrClnt clnt, DbrMillis now);
+fig_clnt_sess_open(DbrClnt clnt, DbrMillis now);
 
 #endif // FIG_CLNT_H

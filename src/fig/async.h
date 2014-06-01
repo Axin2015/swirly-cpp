@@ -15,30 +15,26 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_ASYNC_H
-#define DBR_ASYNC_H
+#ifndef FIG_ASYNC_H
+#define FIG_ASYNC_H
 
-#include <dbr/defs.h>
+#include <dbr/async.h>
 
-/**
- * @addtogroup Async
- * @{
- */
+#define FIG_ASYNC_CLOSE ((void*)~0)
 
-typedef struct ElmAsync* DbrAsync;
+DBR_EXTERN void*
+fig_async_create(void* zctx, const DbrUuid uuid);
 
-DBR_API DbrAsync
-dbr_async_create(void* zctx, const DbrUuid uuid);
+DBR_EXTERN void
+fig_async_destroy(void* sock);
 
-DBR_API void
-dbr_async_destroy(DbrAsync async);
+DBR_EXTERN DbrBool
+fig_async_send(void* sock, void* val);
 
-DBR_API DbrBool
-dbr_async_send(DbrAsync async, void* val);
+DBR_EXTERN DbrBool
+fig_async_recv(void* sock, void** val);
 
-DBR_API DbrBool
-dbr_async_recv(DbrAsync async, void** val);
+DBR_EXTERN DbrBool
+fig_async_close(void* sock);
 
-/** @} */
-
-#endif // DBR_ASYNC_H
+#endif // FIG_ASYNC_H

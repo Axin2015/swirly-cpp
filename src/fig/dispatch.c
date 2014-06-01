@@ -353,7 +353,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 // Next heartbeat may have already expired.
             } else if (id == FIG_MDTMR) {
                 if (!(FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
-                    fig_sess_reset(clnt);
+                    fig_clnt_sess_reset(clnt);
                     dbr_handler_on_reset(handler, clnt);
                 }
                 // Cannot fail due to pop.
@@ -362,7 +362,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto fail1;
             } else if (id == FIG_TRTMR) {
                 if (!(FIG_DELTA_WAIT | FIG_CLOSE_WAIT)) {
-                    fig_sess_reset(clnt);
+                    fig_clnt_sess_reset(clnt);
                     dbr_handler_on_reset(handler, clnt);
                 }
                 // Cannot fail due to pop.
@@ -481,7 +481,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 // This function can fail is there is no memory available for a lazily created
                 // account.
                 if (dbr_unlikely(!emplace_posn_list(clnt, body.entity_list_rep.first))) {
-                    fig_sess_reset(clnt);
+                    fig_clnt_sess_reset(clnt);
                     goto fail1;
                 }
                 break;
@@ -542,7 +542,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     }
                     // Otherwise proceed with open request.
                     clnt->state &= ~FIG_DELTA_WAIT;
-                    if (fig_sess_open(clnt, now) < 0)
+                    if (fig_clnt_sess_open(clnt, now) < 0)
                         goto fail1;
                 } else
                     apply_views(clnt, body.view_list_rep.first, handler);
@@ -560,7 +560,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto fail1;
 
             if (dbr_unlikely(val == (void*)~0)) {
-                if (fig_sess_close(clnt, now) < 0)
+                if (fig_clnt_sess_close(clnt, now) < 0)
                     goto fail1;
                 val = NULL;
             } else
