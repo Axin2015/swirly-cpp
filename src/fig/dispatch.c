@@ -18,6 +18,7 @@
 #include <dbr/dispatch.h>
 
 #include "accnt.h"
+#include "async.h"
 #include "clnt.h"
 
 #include <dbr/err.h>
@@ -287,31 +288,6 @@ apply_views(DbrClnt clnt, struct DbrSlNode* first, DbrHandler handler)
     dbr_handler_on_flush(handler, clnt);
 }
 
-static DbrBool
-async_send(void* sock, void* val)
-{
-    // FIXME: is this required with zmq_send?
-    dbr_wmb();
-    if (zmq_send(sock, &val, sizeof(void*), 0) != sizeof(void*)) {
-        dbr_err_setf(DBR_EIO, "zmq_send() failed: %s", zmq_strerror(zmq_errno()));
-        return DBR_FALSE;
-    }
-    return DBR_TRUE;
-}
-
-static DbrBool
-async_recv(void* sock, void** val)
-{
-    if (zmq_recv(sock, val, sizeof(void*), 0) != sizeof(void*)) {
-        const int num = zmq_errno() == EINTR ? DBR_EINTR : DBR_EIO;
-        dbr_err_setf(num, "zmq_recv() failed: %s", zmq_strerror(zmq_errno()));
-        return DBR_FALSE;
-    }
-    // FIXME: is this required with zmq_recv?
-    dbr_rmb();
-    return DBR_TRUE;
-}
-
 DBR_API DbrBool
 dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
 {
@@ -556,7 +532,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
         if ((clnt->items[FIG_ASOCK].revents & ZMQ_POLLIN)) {
 
             void* val;
-            if (!async_recv(clnt->asock, &val))
+            if (!fig_async_recv(clnt->asock, &val))
                 goto fail1;
 
             if (dbr_unlikely(val == (void*)~0)) {
@@ -566,7 +542,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             } else
                 val = dbr_handler_on_async(handler, clnt, val);
 
-            if (!async_send(clnt->asock, val))
+            if (!fig_async_send(clnt->asock, val))
                 goto fail1;
         }
     } while (now < absms);
