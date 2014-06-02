@@ -9,7 +9,7 @@ package "Doobry Daemon" {
 }
 dbr_serv - ZMQ
 
-package "Desktop Client" {
+package "Doobry Shell" {
   [dbr_clnt] <<library>>
 }
 ZMQ <.. [dbr_clnt]
