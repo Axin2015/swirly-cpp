@@ -91,6 +91,9 @@ struct FigClnt {
 };
 
 DBR_EXTERN void
+fig_clnt_log_state(unsigned state);
+
+DBR_EXTERN void
 fig_clnt_sess_reset(DbrClnt clnt);
 
 DBR_EXTERN DbrIden

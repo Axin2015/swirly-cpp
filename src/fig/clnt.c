@@ -20,6 +20,7 @@
 #include "accnt.h"
 
 #include <dbr/err.h>
+#include <dbr/log.h>
 #include <dbr/msg.h>
 #include <dbr/sess.h>
 #include <dbr/util.h>
@@ -52,12 +53,40 @@ free_views(struct DbrTree* views, DbrPool pool)
 }
 
 DBR_EXTERN void
+fig_clnt_log_state(unsigned state)
+{
+    if (state == 0) {
+        dbr_log_info("state: READY");
+        return;
+    }
+    char buf[sizeof("DELTA_WAIT|OPEN_WAIT|ACCNT_WAIT|CONTR_WAIT|SNAP_WAIT|CLOSE_WAIT|CLOSED")] = "";
+    if (state & FIG_DELTA_WAIT)
+        strcat(buf, "|DELTA_WAIT");
+    if (state & FIG_OPEN_WAIT)
+        strcat(buf, "|OPEN_WAIT");
+    if (state & FIG_ACCNT_WAIT)
+        strcat(buf, "|ACCNT_WAIT");
+    if (state & FIG_CONTR_WAIT)
+        strcat(buf, "|CONTR_WAIT");
+    if (state & FIG_SNAP_WAIT)
+        strcat(buf, "|SNAP_WAIT");
+    if (state & FIG_CLOSE_WAIT)
+        strcat(buf, "|CLOSE_WAIT");
+    if (state & FIG_CLOSED)
+        strcat(buf, "|CLOSED");
+    if (buf[0] == '|')
+        buf[0] = ' ';
+    dbr_log_info("state:%s", buf);
+}
+
+DBR_EXTERN void
 fig_clnt_sess_reset(DbrClnt clnt)
 {
     // This function does not schedule any new timers.
 
     dbr_sess_reset(&clnt->sess);
     clnt->state = FIG_DELTA_WAIT;
+    fig_clnt_log_state(clnt->state);
     fig_cache_reset(&clnt->cache);
     fig_ordidx_init(&clnt->ordidx);
     free_views(&clnt->views, clnt->pool);
@@ -70,6 +99,7 @@ fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
 {
     if (clnt->state == FIG_DELTA_WAIT) {
         clnt->state |= FIG_CLOSE_WAIT;
+        fig_clnt_log_state(clnt->state);
         return 0;
     }
 
@@ -84,6 +114,7 @@ fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
         goto fail1;
 
     clnt->state |= FIG_CLOSE_WAIT;
+    fig_clnt_log_state(clnt->state);
     dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return req_id;
@@ -105,6 +136,7 @@ fig_clnt_sess_open(DbrClnt clnt, DbrMillis now)
         goto fail1;
 
     clnt->state |= FIG_OPEN_WAIT;
+    fig_clnt_log_state(clnt->state);
     dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
     dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return req_id;
@@ -180,6 +212,7 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     clnt->tmout = tmout;
     clnt->pool = pool;
     clnt->state = FIG_DELTA_WAIT;
+    fig_clnt_log_state(clnt->state);
     // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
