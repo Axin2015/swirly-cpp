@@ -52,11 +52,12 @@ free_views(struct DbrTree* views, DbrPool pool)
     }
 }
 
+#if DBR_DEBUG_LEVEL >= 1
 DBR_EXTERN void
 fig_clnt_log_state(unsigned state)
 {
     if (state == 0) {
-        dbr_log_info("state: READY");
+        dbr_log_debug1("state: READY");
         return;
     }
     char buf[sizeof("DELTA_WAIT|OPEN_WAIT|ACCNT_WAIT|CONTR_WAIT|SNAP_WAIT|CLOSE_WAIT|CLOSED")] = "";
@@ -76,8 +77,9 @@ fig_clnt_log_state(unsigned state)
         strcat(buf, "|CLOSED");
     if (buf[0] == '|')
         buf[0] = ' ';
-    dbr_log_info("state:%s", buf);
+    dbr_log_debug1("state:%s", buf);
 }
+#endif // DBR_DEBUG_LEVEL >= 1
 
 DBR_EXTERN void
 fig_clnt_sess_reset(DbrClnt clnt)

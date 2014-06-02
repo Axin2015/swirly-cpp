@@ -90,8 +90,13 @@ struct FigClnt {
     zmq_pollitem_t items[FIG_NSOCK];
 };
 
+#if DBR_DEBUG_LEVEL >= 1
 DBR_EXTERN void
 fig_clnt_log_state(unsigned state);
+#else  // DBR_DEBUG_LEVEL < 1
+static inline void
+fig_clnt_log_state(unsigned state) { }
+#endif // DBR_DEBUG_LEVEL < 1
 
 DBR_EXTERN void
 fig_clnt_sess_reset(DbrClnt clnt);
