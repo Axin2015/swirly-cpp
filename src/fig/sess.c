@@ -96,6 +96,7 @@ dbr_sess_term(struct DbrSess* sess)
 DBR_API void
 dbr_sess_reset(struct DbrSess* sess)
 {
+    dbr_sess_term(sess);
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
     dbr_tree_init(&sess->users);
