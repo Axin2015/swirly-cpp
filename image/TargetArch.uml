@@ -14,12 +14,12 @@ package "Desktop Client" {
 }
 ZMQ <.. [dbr_clnt]
 
-package "Web Server" {
-  [dbrpy] <<module>>
+package "LigHTTPd" {
+  [dbr_mod] <<module>>
 }
-ZMQ <.. [dbrpy]
+ZMQ <.. [dbr_mod]
 
-dbrpy - HTTP
+dbr_mod - HTTP
 
 cloud Internet {
   [Web 2.0 Client]
