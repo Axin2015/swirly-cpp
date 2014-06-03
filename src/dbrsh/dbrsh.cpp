@@ -29,6 +29,7 @@
 #include <dbr/util.h>
 
 #include <algorithm>
+#include <array>
 #include <climits>  // PATH_MAX
 #include <functional>
 #include <fstream>
@@ -37,6 +38,10 @@
 #include <map>
 
 #include <unistd.h> // usleep()
+
+// Suppress complaints by Clang 5.1.0.
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#pragma GCC diagnostic ignored "-Wunused-function"
 
 using namespace dbr;
 using namespace std;
@@ -411,10 +416,11 @@ public:
         enum { COLS = 3 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<mnem",
             "<display",
-            "<email"};
+            "<email"
+        };
         auto width = head_width(head);
         vector<row> rows;
         call(async, [&width, &rows](ClntRef clnt) {
@@ -438,7 +444,7 @@ public:
         enum { COLS = 12 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<mnem",
             "<display",
             "<asset_type",
@@ -450,7 +456,8 @@ public:
             ">lot_denom",
             ">pip_dp",
             ">min_lots",
-            ">max_lots"};
+            ">max_lots"
+        };
         auto width = head_width(head);
         vector<row> rows;
         call(async, [&width, &rows](ClntRef clnt) {
@@ -501,9 +508,10 @@ public:
         enum { COLS = 2 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<user",
-            "<group"};
+            "<group"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -530,9 +538,10 @@ public:
         enum { COLS = 2 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<user",
-            "<group"};
+            "<group"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -559,7 +568,7 @@ public:
         enum { COLS = 12 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<id",
             "<group",
             "<contr",
@@ -571,7 +580,8 @@ public:
             ">resd",
             ">exec",
             ">last_price",
-            ">last_lots"};
+            ">last_lots"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -608,7 +618,7 @@ public:
         enum { COLS = 15 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<id",
             "<order",
             "<group",
@@ -623,7 +633,8 @@ public:
             ">last_price",
             ">last_lots",
             "<role",
-            "<cpty"};
+            "<cpty"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -663,13 +674,14 @@ public:
         enum { COLS = 6 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<contr",
             "<settl_date",
             ">buy_price",
             ">buy_lots",
             ">sell_price",
-            ">sell_lots"};
+            ">sell_lots"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -708,7 +720,7 @@ public:
         };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<contr",
             "<settl_date",
             ">bid_price",
@@ -716,7 +728,8 @@ public:
             ">bid_count",
             ">offer_price",
             ">offer_lots",
-            ">offer_count"};
+            ">offer_count"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -767,7 +780,7 @@ public:
         };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<contr",
             "<settl_date",
             ">level",
@@ -776,7 +789,8 @@ public:
             ">bid_count",
             ">offer_price",
             ">offer_lots",
-            ">offer_count"};
+            ">offer_count"
+        };
         auto width = head_width(head);
         vector<row> rows;
 
@@ -829,8 +843,8 @@ public:
                 auto urec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
                 auto crec = get_crec(clnt, cmnem.c_str());
-                return clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
-                                  nullptr, DBR_ACTION_BUY, crec.price_to_ticks(price), lots, 0);
+                clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
+                           nullptr, DBR_ACTION_BUY, crec.price_to_ticks(price), lots, 0);
             });
     }
     void
@@ -846,8 +860,8 @@ public:
                 auto urec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
                 auto crec = get_crec(clnt, cmnem.c_str());
-                return clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
-                                  nullptr, DBR_ACTION_SELL, crec.price_to_ticks(price), lots, 0);
+                clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
+                           nullptr, DBR_ACTION_SELL, crec.price_to_ticks(price), lots, 0);
             });
     }
     void
@@ -903,9 +917,10 @@ public:
         enum { COLS = 2 };
         typedef array<string, COLS> row;
 
-        const array<const char*, COLS> head{
+        const array<const char*, COLS> head = {
             "<name",
-            "<value"};
+            "<value"
+        };
         auto width = head_width(head);
         vector<row> rows;
         for (auto nv : env_) {
