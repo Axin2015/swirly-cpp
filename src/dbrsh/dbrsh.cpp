@@ -401,11 +401,11 @@ public:
             auto fn = static_cast<std::function<void (ClntRef)>*>(val);
             (*fn)(clnt);
         } catch (const DbrException& e) {
-            cerr << "exception: " << e.what() << endl;
+            dbr_log_error("exception: {}", e.what());
         } catch (const InvalidArgument& e) {
-            cerr << "invalid argument: " << e.what() << endl;
+            dbr_log_error("invalid argument: {}", e.what());
         } catch (const InvalidState& e) {
-            cerr << "invalid state: " << e.what() << endl;
+            dbr_log_error("invalid state: {}", e.what());
         }
         return nullptr;
     }
