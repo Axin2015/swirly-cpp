@@ -39,13 +39,13 @@ struct DbrView;
  */
 
 DBR_API size_t
-dbr_rec_len(const struct DbrRec* rec);
+dbr_proto_rec_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_write_rec(char* buf, const struct DbrRec* rec);
+dbr_proto_write_rec(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_read_rec(const char* buf, struct DbrRec* rec);
+dbr_proto_read_rec(const char* buf, struct DbrRec* rec);
 
 /** @} */
 
@@ -55,13 +55,13 @@ dbr_read_rec(const char* buf, struct DbrRec* rec);
  */
 
 DBR_API size_t
-dbr_accnt_len(const struct DbrRec* rec);
+dbr_proto_accnt_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_write_accnt(char* buf, const struct DbrRec* rec);
+dbr_proto_write_accnt(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_read_accnt(const char* buf, struct DbrRec* rec);
+dbr_proto_read_accnt(const char* buf, struct DbrRec* rec);
 
 /** @} */
 
@@ -71,13 +71,13 @@ dbr_read_accnt(const char* buf, struct DbrRec* rec);
  */
 
 DBR_API size_t
-dbr_contr_len(const struct DbrRec* rec);
+dbr_proto_contr_len(const struct DbrRec* rec);
 
 DBR_API char*
-dbr_write_contr(char* buf, const struct DbrRec* rec);
+dbr_proto_write_contr(char* buf, const struct DbrRec* rec);
 
 DBR_API const char*
-dbr_read_contr(const char* buf, struct DbrRec* rec);
+dbr_proto_read_contr(const char* buf, struct DbrRec* rec);
 
 /** @} */
 
@@ -87,13 +87,13 @@ dbr_read_contr(const char* buf, struct DbrRec* rec);
  */
 
 DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+dbr_proto_memb_len(const struct DbrMemb* memb, DbrBool enriched);
 
 DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+dbr_proto_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
 
 DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb);
+dbr_proto_read_memb(const char* buf, struct DbrMemb* memb);
 
 /** @} */
 
@@ -103,13 +103,13 @@ dbr_read_memb(const char* buf, struct DbrMemb* memb);
  */
 
 DBR_API size_t
-dbr_order_len(const struct DbrOrder* order, DbrBool enriched);
+dbr_proto_order_len(const struct DbrOrder* order, DbrBool enriched);
 
 DBR_API char*
-dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
+dbr_proto_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
 
 DBR_API const char*
-dbr_read_order(const char* buf, struct DbrOrder* order);
+dbr_proto_read_order(const char* buf, struct DbrOrder* order);
 
 /** @} */
 
@@ -119,13 +119,13 @@ dbr_read_order(const char* buf, struct DbrOrder* order);
  */
 
 DBR_API size_t
-dbr_exec_len(const struct DbrExec* exec, DbrBool enriched);
+dbr_proto_exec_len(const struct DbrExec* exec, DbrBool enriched);
 
 DBR_API char*
-dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
+dbr_proto_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
 
 DBR_API const char*
-dbr_read_exec(const char* buf, struct DbrExec* exec);
+dbr_proto_read_exec(const char* buf, struct DbrExec* exec);
 
 /** @} */
 
@@ -135,13 +135,13 @@ dbr_read_exec(const char* buf, struct DbrExec* exec);
  */
 
 DBR_API size_t
-dbr_posn_len(const struct DbrPosn* posn, DbrBool enriched);
+dbr_proto_posn_len(const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API char*
-dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
+dbr_proto_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
 
 DBR_API const char*
-dbr_read_posn(const char* buf, struct DbrPosn* posn);
+dbr_proto_read_posn(const char* buf, struct DbrPosn* posn);
 
 /** @} */
 
@@ -151,13 +151,13 @@ dbr_read_posn(const char* buf, struct DbrPosn* posn);
  */
 
 DBR_API size_t
-dbr_view_len(const struct DbrView* view, DbrBool enriched);
+dbr_proto_view_len(const struct DbrView* view, DbrBool enriched);
 
 DBR_API char*
-dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched);
+dbr_proto_write_view(char* buf, const struct DbrView* view, DbrBool enriched);
 
 DBR_API const char*
-dbr_read_view(const char* buf, struct DbrView* view);
+dbr_proto_read_view(const char* buf, struct DbrView* view);
 
 /** @} */
 

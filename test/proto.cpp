@@ -31,13 +31,13 @@ TEST_CASE(proto_accnt)
     Pool pool(8 * 1024 * 1024);
     auto in = create_dbra(pool);
 
-    auto len = accnt_len(*in);
+    auto len = proto_accnt_len(*in);
     char buf[len];
-    const char* end = write_accnt(buf, *in);
+    const char* end = proto_write_accnt(buf, *in);
     check(buf + len == end);
 
     DbrRec out;
-    end = read_accnt(buf, out);
+    end = proto_read_accnt(buf, out);
     check(buf + len == end);
 
     check(out.type == in->type);
@@ -54,13 +54,13 @@ TEST_CASE(proto_contr)
     Pool pool(8 * 1024 * 1024);
     auto in = create_eurusd(pool);
 
-    auto len = contr_len(*in);
+    auto len = proto_contr_len(*in);
     char buf[len];
-    const char* end = write_contr(buf, *in);
+    const char* end = proto_write_contr(buf, *in);
     check(buf + len == end);
 
     DbrRec out;
-    end = read_contr(buf, out);
+    end = proto_read_contr(buf, out);
     check(buf + len == end);
 
     check(out.type == in->type);
@@ -93,13 +93,13 @@ TEST_CASE(proto_memb)
 
     auto in = create_memb(pool, user, group);
 
-    auto len = memb_len(*in, false);
+    auto len = proto_memb_len(*in, false);
     char buf[len];
-    const char* end = write_memb(buf, *in, false);
+    const char* end = proto_write_memb(buf, *in, false);
     check(buf + len == end);
 
     DbrMemb out;
-    end = read_memb(buf, out);
+    end = proto_read_memb(buf, out);
     check(buf + len == end);
 
     check(out.user.id_only == in->user.id_only);
@@ -117,13 +117,13 @@ TEST_CASE(proto_order)
     auto in = create_order(pool, 1, user, group, contr, dbr_ymd_to_jd(2014, 3, 14),
                            "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
 
-    auto len = order_len(*in, false);
+    auto len = proto_order_len(*in, false);
     char buf[len];
-    const char* end = write_order(buf, *in, false);
+    const char* end = proto_write_order(buf, *in, false);
     check(buf + len == end);
 
     DbrOrder out;
-    end = read_order(buf, out);
+    end = proto_read_order(buf, out);
     check(buf + len == end);
 
     check(out.id == in->id);
@@ -158,13 +158,13 @@ TEST_CASE(proto_trade)
                            DBR_ACTION_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER,
                            cpty, now);
 
-    auto len = exec_len(*in, false);
+    auto len = proto_exec_len(*in, false);
     char buf[len];
-    const char* end = write_exec(buf, *in, false);
+    const char* end = proto_write_exec(buf, *in, false);
     check(buf + len == end);
 
     DbrExec out;
-    end = read_exec(buf, out);
+    end = proto_read_exec(buf, out);
     check(buf + len == end);
 
     check(out.id == in->id);

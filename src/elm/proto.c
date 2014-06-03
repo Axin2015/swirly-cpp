@@ -33,15 +33,15 @@ static const char POSN_FORMAT[] = "lllllll";
 static const char VIEW_FORMAT[] = "lillzllzllzllzllzllzl";
 
 DBR_EXTERN size_t
-elm_rec_len(const struct DbrRec* rec)
+elm_proto_rec_len(const struct DbrRec* rec)
 {
     size_t n = dbr_packleni(rec->type);
     switch (rec->type) {
     case DBR_ENTITY_ACCNT:
-        n += dbr_accnt_len(rec);
+        n += dbr_proto_accnt_len(rec);
         break;
     case DBR_ENTITY_CONTR:
-        n += dbr_contr_len(rec);
+        n += dbr_proto_contr_len(rec);
         break;
     default:
         abort();
@@ -50,15 +50,15 @@ elm_rec_len(const struct DbrRec* rec)
 }
 
 DBR_EXTERN char*
-elm_write_rec(char* buf, const struct DbrRec* rec)
+elm_proto_write_rec(char* buf, const struct DbrRec* rec)
 {
     buf = dbr_packi(buf, rec->type);
     switch (rec->type) {
     case DBR_ENTITY_ACCNT:
-        buf = dbr_write_accnt(buf, rec);
+        buf = dbr_proto_write_accnt(buf, rec);
         break;
     case DBR_ENTITY_CONTR:
-        buf = dbr_write_contr(buf, rec);
+        buf = dbr_proto_write_contr(buf, rec);
         break;
     default:
         abort();
@@ -67,15 +67,15 @@ elm_write_rec(char* buf, const struct DbrRec* rec)
 }
 
 DBR_EXTERN const char*
-elm_read_rec(const char* buf, struct DbrRec* rec)
+elm_proto_read_rec(const char* buf, struct DbrRec* rec)
 {
     buf = dbr_unpacki(buf, &rec->type);
     switch (rec->type) {
     case DBR_ENTITY_ACCNT:
-        buf = dbr_read_accnt(buf, rec);
+        buf = dbr_proto_read_accnt(buf, rec);
         break;
     case DBR_ENTITY_CONTR:
-        buf = dbr_read_contr(buf, rec);
+        buf = dbr_proto_read_contr(buf, rec);
         break;
     default:
         dbr_err_setf(DBR_EIO, "invalid type %d", rec->type);
@@ -85,7 +85,7 @@ elm_read_rec(const char* buf, struct DbrRec* rec)
 }
 
 DBR_EXTERN size_t
-elm_accnt_len(const struct DbrRec* rec)
+elm_proto_accnt_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(ACCNT_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -93,7 +93,7 @@ elm_accnt_len(const struct DbrRec* rec)
 }
 
 DBR_EXTERN char*
-elm_write_accnt(char* buf, const struct DbrRec* rec)
+elm_proto_write_accnt(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, ACCNT_FORMAT,
                      rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -101,7 +101,7 @@ elm_write_accnt(char* buf, const struct DbrRec* rec)
 }
 
 DBR_EXTERN const char*
-elm_read_accnt(const char* buf, struct DbrRec* rec)
+elm_proto_read_accnt(const char* buf, struct DbrRec* rec)
 {
     rec->type = DBR_ENTITY_ACCNT;
     rec->accnt.state = NULL;
@@ -111,7 +111,7 @@ elm_read_accnt(const char* buf, struct DbrRec* rec)
 }
 
 DBR_EXTERN size_t
-elm_contr_len(const struct DbrRec* rec)
+elm_proto_contr_len(const struct DbrRec* rec)
 {
     return dbr_packlenf(CONTR_FORMAT,
                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -122,7 +122,7 @@ elm_contr_len(const struct DbrRec* rec)
 }
 
 DBR_EXTERN char*
-elm_write_contr(char* buf, const struct DbrRec* rec)
+elm_proto_write_contr(char* buf, const struct DbrRec* rec)
 {
     return dbr_packf(buf, CONTR_FORMAT,
                      rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
@@ -133,7 +133,7 @@ elm_write_contr(char* buf, const struct DbrRec* rec)
 }
 
 DBR_EXTERN const char*
-elm_read_contr(const char* buf, struct DbrRec* rec)
+elm_proto_read_contr(const char* buf, struct DbrRec* rec)
 {
     rec->type = DBR_ENTITY_CONTR;
     const char* end = dbr_unpackf(buf, CONTR_FORMAT,
@@ -152,7 +152,7 @@ elm_read_contr(const char* buf, struct DbrRec* rec)
 }
 
 DBR_EXTERN size_t
-elm_memb_len(const struct DbrMemb* memb, DbrBool enriched)
+elm_proto_memb_len(const struct DbrMemb* memb, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
@@ -166,7 +166,7 @@ elm_memb_len(const struct DbrMemb* memb, DbrBool enriched)
 }
 
 DBR_EXTERN char*
-elm_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
+elm_proto_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, MEMB_FORMAT,
@@ -179,13 +179,13 @@ elm_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 }
 
 DBR_EXTERN const char*
-elm_read_memb(const char* buf, struct DbrMemb* memb)
+elm_proto_read_memb(const char* buf, struct DbrMemb* memb)
 {
     return dbr_unpackf(buf, MEMB_FORMAT, &memb->group.id_only, &memb->user.id_only);
 }
 
 DBR_EXTERN size_t
-elm_order_len(const struct DbrOrder* order, DbrBool enriched)
+elm_proto_order_len(const struct DbrOrder* order, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
@@ -207,7 +207,7 @@ elm_order_len(const struct DbrOrder* order, DbrBool enriched)
 }
 
 DBR_EXTERN char*
-elm_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
+elm_proto_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, ORDER_FORMAT,
@@ -228,7 +228,7 @@ elm_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 }
 
 DBR_EXTERN const char*
-elm_read_order(const char* buf, struct DbrOrder* order)
+elm_proto_read_order(const char* buf, struct DbrOrder* order)
 {
     return dbr_unpackf(buf, ORDER_FORMAT,
                        &order->id, &order->c.user.id_only, &order->c.group.id_only,
@@ -239,7 +239,7 @@ elm_read_order(const char* buf, struct DbrOrder* order)
 }
 
 DBR_EXTERN size_t
-elm_exec_len(const struct DbrExec* exec, DbrBool enriched)
+elm_proto_exec_len(const struct DbrExec* exec, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
@@ -263,7 +263,7 @@ elm_exec_len(const struct DbrExec* exec, DbrBool enriched)
 }
 
 DBR_EXTERN char*
-elm_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
+elm_proto_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
 {
     if (enriched) {
         const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
@@ -286,7 +286,7 @@ elm_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
 }
 
 DBR_EXTERN const char*
-elm_read_exec(const char* buf, struct DbrExec* exec)
+elm_proto_read_exec(const char* buf, struct DbrExec* exec)
 {
     return dbr_unpackf(buf, EXEC_FORMAT,
                        &exec->id, &exec->order, &exec->c.user.id_only, &exec->c.group.id_only,
@@ -298,7 +298,7 @@ elm_read_exec(const char* buf, struct DbrExec* exec)
 }
 
 DBR_EXTERN size_t
-elm_posn_len(const struct DbrPosn* posn, DbrBool enriched)
+elm_proto_posn_len(const struct DbrPosn* posn, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
@@ -314,7 +314,7 @@ elm_posn_len(const struct DbrPosn* posn, DbrBool enriched)
 }
 
 DBR_EXTERN char*
-elm_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
+elm_proto_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, POSN_FORMAT,
@@ -329,7 +329,7 @@ elm_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
 }
 
 DBR_EXTERN const char*
-elm_read_posn(const char* buf, struct DbrPosn* posn)
+elm_proto_read_posn(const char* buf, struct DbrPosn* posn)
 {
     return dbr_unpackf(buf, POSN_FORMAT,
                        &posn->accnt.id_only, &posn->contr.id_only, &posn->settl_day,
@@ -337,7 +337,7 @@ elm_read_posn(const char* buf, struct DbrPosn* posn)
 }
 
 DBR_EXTERN size_t
-elm_view_len(const struct DbrView* view, DbrBool enriched)
+elm_proto_view_len(const struct DbrView* view, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
@@ -365,7 +365,7 @@ elm_view_len(const struct DbrView* view, DbrBool enriched)
 }
 
 DBR_EXTERN char*
-elm_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
+elm_proto_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, VIEW_FORMAT,
@@ -393,7 +393,7 @@ elm_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
 }
 
 DBR_EXTERN const char*
-elm_read_view(const char* buf, struct DbrView* view)
+elm_proto_read_view(const char* buf, struct DbrView* view)
 {
     return dbr_unpackf(buf, VIEW_FORMAT,
                        &view->contr.id_only, &view->settl_day,
@@ -407,145 +407,145 @@ elm_read_view(const char* buf, struct DbrView* view)
 }
 
 DBR_API size_t
-dbr_rec_len(const struct DbrRec* rec)
+dbr_proto_rec_len(const struct DbrRec* rec)
 {
-    return elm_rec_len(rec);
+    return elm_proto_rec_len(rec);
 }
 
 DBR_API char*
-dbr_write_rec(char* buf, const struct DbrRec* rec)
+dbr_proto_write_rec(char* buf, const struct DbrRec* rec)
 {
-    return elm_write_rec(buf, rec);
+    return elm_proto_write_rec(buf, rec);
 }
 
 DBR_API const char*
-dbr_read_rec(const char* buf, struct DbrRec* rec)
+dbr_proto_read_rec(const char* buf, struct DbrRec* rec)
 {
-    return elm_read_rec(buf, rec);
+    return elm_proto_read_rec(buf, rec);
 }
 
 DBR_API size_t
-dbr_accnt_len(const struct DbrRec* rec)
+dbr_proto_accnt_len(const struct DbrRec* rec)
 {
-    return elm_accnt_len(rec);
+    return elm_proto_accnt_len(rec);
 }
 
 DBR_API char*
-dbr_write_accnt(char* buf, const struct DbrRec* rec)
+dbr_proto_write_accnt(char* buf, const struct DbrRec* rec)
 {
-    return elm_write_accnt(buf, rec);
+    return elm_proto_write_accnt(buf, rec);
 }
 
 DBR_API const char*
-dbr_read_accnt(const char* buf, struct DbrRec* rec)
+dbr_proto_read_accnt(const char* buf, struct DbrRec* rec)
 {
-    return elm_read_accnt(buf, rec);
+    return elm_proto_read_accnt(buf, rec);
 }
 
 DBR_API size_t
-dbr_contr_len(const struct DbrRec* rec)
+dbr_proto_contr_len(const struct DbrRec* rec)
 {
-    return elm_contr_len(rec);
+    return elm_proto_contr_len(rec);
 }
 
 DBR_API char*
-dbr_write_contr(char* buf, const struct DbrRec* rec)
+dbr_proto_write_contr(char* buf, const struct DbrRec* rec)
 {
-    return elm_write_contr(buf, rec);
+    return elm_proto_write_contr(buf, rec);
 }
 
 DBR_API const char*
-dbr_read_contr(const char* buf, struct DbrRec* rec)
+dbr_proto_read_contr(const char* buf, struct DbrRec* rec)
 {
-    return elm_read_contr(buf, rec);
+    return elm_proto_read_contr(buf, rec);
 }
 
 DBR_API size_t
-dbr_memb_len(const struct DbrMemb* memb, DbrBool enriched)
+dbr_proto_memb_len(const struct DbrMemb* memb, DbrBool enriched)
 {
-    return elm_memb_len(memb, enriched);
+    return elm_proto_memb_len(memb, enriched);
 }
 
 DBR_API char*
-dbr_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
+dbr_proto_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched)
 {
-    return elm_write_memb(buf, memb, enriched);
+    return elm_proto_write_memb(buf, memb, enriched);
 }
 
 DBR_API const char*
-dbr_read_memb(const char* buf, struct DbrMemb* memb)
+dbr_proto_read_memb(const char* buf, struct DbrMemb* memb)
 {
-    return elm_read_memb(buf, memb);
+    return elm_proto_read_memb(buf, memb);
 }
 
 DBR_API size_t
-dbr_order_len(const struct DbrOrder* order, DbrBool enriched)
+dbr_proto_order_len(const struct DbrOrder* order, DbrBool enriched)
 {
-    return elm_order_len(order, enriched);
+    return elm_proto_order_len(order, enriched);
 }
 
 DBR_API char*
-dbr_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
+dbr_proto_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 {
-    return elm_write_order(buf, order, enriched);
+    return elm_proto_write_order(buf, order, enriched);
 }
 
 DBR_API const char*
-dbr_read_order(const char* buf, struct DbrOrder* order)
+dbr_proto_read_order(const char* buf, struct DbrOrder* order)
 {
-    return elm_read_order(buf, order);
+    return elm_proto_read_order(buf, order);
 }
 
 DBR_API size_t
-dbr_exec_len(const struct DbrExec* exec, DbrBool enriched)
+dbr_proto_exec_len(const struct DbrExec* exec, DbrBool enriched)
 {
-    return elm_exec_len(exec, enriched);
+    return elm_proto_exec_len(exec, enriched);
 }
 
 DBR_API char*
-dbr_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
+dbr_proto_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
 {
-    return elm_write_exec(buf, exec, enriched);
+    return elm_proto_write_exec(buf, exec, enriched);
 }
 
 DBR_API const char*
-dbr_read_exec(const char* buf, struct DbrExec* exec)
+dbr_proto_read_exec(const char* buf, struct DbrExec* exec)
 {
-    return elm_read_exec(buf, exec);
+    return elm_proto_read_exec(buf, exec);
 }
 
 DBR_API size_t
-dbr_posn_len(const struct DbrPosn* posn, DbrBool enriched)
+dbr_proto_posn_len(const struct DbrPosn* posn, DbrBool enriched)
 {
-    return elm_posn_len(posn, enriched);
+    return elm_proto_posn_len(posn, enriched);
 }
 
 DBR_API char*
-dbr_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
+dbr_proto_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched)
 {
-    return elm_write_posn(buf, posn, enriched);
+    return elm_proto_write_posn(buf, posn, enriched);
 }
 
 DBR_API const char*
-dbr_read_posn(const char* buf, struct DbrPosn* posn)
+dbr_proto_read_posn(const char* buf, struct DbrPosn* posn)
 {
-    return elm_read_posn(buf, posn);
+    return elm_proto_read_posn(buf, posn);
 }
 
 DBR_API size_t
-dbr_view_len(const struct DbrView* view, DbrBool enriched)
+dbr_proto_view_len(const struct DbrView* view, DbrBool enriched)
 {
-    return elm_view_len(view, enriched);
+    return elm_proto_view_len(view, enriched);
 }
 
 DBR_API char*
-dbr_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
+dbr_proto_write_view(char* buf, const struct DbrView* view, DbrBool enriched)
 {
-    return elm_write_view(buf, view, enriched);
+    return elm_proto_write_view(buf, view, enriched);
 }
 
 DBR_API const char*
-dbr_read_view(const char* buf, struct DbrView* view)
+dbr_proto_read_view(const char* buf, struct DbrView* view)
 {
-    return elm_read_view(buf, view);
+    return elm_proto_read_view(buf, view);
 }

@@ -58,7 +58,7 @@ read_accnt(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_rec_init(rec);
 
-    if (!(buf = elm_read_accnt(buf, rec))) {
+    if (!(buf = elm_proto_read_accnt(buf, rec))) {
         elm_pool_free_rec(pool, rec);
         goto fail1;
     }
@@ -76,7 +76,7 @@ read_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_rec_init(rec);
 
-    if (!(buf = elm_read_contr(buf, rec))) {
+    if (!(buf = elm_proto_read_contr(buf, rec))) {
         elm_pool_free_rec(pool, rec);
         goto fail1;
     }
@@ -94,7 +94,7 @@ read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_memb_init(memb);
 
-    if (!(buf = elm_read_memb(buf, memb))) {
+    if (!(buf = elm_proto_read_memb(buf, memb))) {
         elm_pool_free_memb(pool, memb);
         goto fail1;
     }
@@ -112,7 +112,7 @@ read_order(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_order_init(order);
 
-    if (!(buf = elm_read_order(buf, order))) {
+    if (!(buf = elm_proto_read_order(buf, order))) {
         elm_pool_free_order(pool, order);
         goto fail1;
     }
@@ -130,7 +130,7 @@ read_exec(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_exec_init(exec);
 
-    if (!(buf = elm_read_exec(buf, exec))) {
+    if (!(buf = elm_proto_read_exec(buf, exec))) {
         dbr_exec_decref(exec, pool);
         goto fail1;
     }
@@ -149,7 +149,7 @@ read_posn(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_posn_init(posn);
 
-    if (!(buf = elm_read_posn(buf, posn))) {
+    if (!(buf = elm_proto_read_posn(buf, posn))) {
         elm_pool_free_posn(pool, posn);
         goto fail1;
     }
@@ -167,7 +167,7 @@ read_view(const char* buf, DbrPool pool, struct DbrQueue* queue)
         goto fail1;
     dbr_view_init(view);
 
-    if (!(buf = elm_read_view(buf, view))) {
+    if (!(buf = elm_proto_read_view(buf, view))) {
         elm_pool_free_view(pool, view);
         goto fail1;
     }
@@ -205,7 +205,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
-            n += elm_accnt_len(rec);
+            n += elm_proto_accnt_len(rec);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -214,7 +214,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
-            n += elm_contr_len(rec);
+            n += elm_proto_contr_len(rec);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -224,7 +224,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            n += elm_memb_len(memb, enriched);
+            n += elm_proto_memb_len(memb, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -233,7 +233,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrOrder* order = dbr_shared_order_entry(node);
-            n += elm_order_len(order, enriched);
+            n += elm_proto_order_len(order, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -242,7 +242,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
-            n += elm_exec_len(exec, enriched);
+            n += elm_proto_exec_len(exec, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -251,7 +251,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
-            n += elm_posn_len(posn, enriched);
+            n += elm_proto_posn_len(posn, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_packlenz(body->entity_list_rep.count_);
@@ -260,16 +260,16 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->view_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
             struct DbrView* view = dbr_shared_view_entry(node);
-            n += elm_view_len(view, enriched);
+            n += elm_proto_view_len(view, enriched);
             ++body->view_list_rep.count_;
         }
         n += dbr_packlenz(body->view_list_rep.count_);
         break;
     case DBR_EXEC_REP:
-        n += elm_exec_len(body->exec_rep.exec, enriched);
+        n += elm_proto_exec_len(body->exec_rep.exec, enriched);
         break;
     case DBR_POSN_REP:
-        n += elm_posn_len(body->posn_rep.posn, enriched);
+        n += elm_proto_posn_len(body->posn_rep.posn, enriched);
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
@@ -317,13 +317,13 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         body->insert_exec_list_req.count_ = 0;
         for (struct DbrSlNode* node = body->insert_exec_list_req.first; node; node = node->next) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
-            n += elm_exec_len(exec, enriched);
+            n += elm_proto_exec_len(exec, enriched);
             ++body->insert_exec_list_req.count_;
         }
         n += dbr_packlenz(body->insert_exec_list_req.count_);
         break;
     case DBR_INSERT_EXEC_REQ:
-        n += elm_exec_len(body->insert_exec_req.exec, enriched);
+        n += elm_proto_exec_len(body->insert_exec_req.exec, enriched);
         break;
     case DBR_UPDATE_EXEC_REQ:
         n += dbr_packlenf(UPDATE_EXEC_REQ_FORMAT,
@@ -364,14 +364,14 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
-            buf = elm_write_accnt(buf, rec);
+            buf = elm_proto_write_accnt(buf, rec);
         }
         break;
     case DBR_CONTR_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrRec* rec = dbr_shared_rec_entry(node);
-            buf = elm_write_contr(buf, rec);
+            buf = elm_proto_write_contr(buf, rec);
         }
         break;
     case DBR_USER_LIST_REP:
@@ -379,42 +379,42 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            buf = elm_write_memb(buf, memb, enriched);
+            buf = elm_proto_write_memb(buf, memb, enriched);
         }
         break;
     case DBR_ORDER_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrOrder* order = dbr_shared_order_entry(node);
-            buf = elm_write_order(buf, order, enriched);
+            buf = elm_proto_write_order(buf, order, enriched);
         }
         break;
     case DBR_EXEC_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
-            buf = elm_write_exec(buf, exec, enriched);
+            buf = elm_proto_write_exec(buf, exec, enriched);
         }
         break;
     case DBR_POSN_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
             struct DbrPosn* posn = dbr_shared_posn_entry(node);
-            buf = elm_write_posn(buf, posn, enriched);
+            buf = elm_proto_write_posn(buf, posn, enriched);
         }
         break;
     case DBR_VIEW_LIST_REP:
         buf = dbr_packz(buf, body->view_list_rep.count_);
         for (struct DbrSlNode* node = body->view_list_rep.first; node; node = node->next) {
             struct DbrView* view = dbr_shared_view_entry(node);
-            buf = elm_write_view(buf, view, enriched);
+            buf = elm_proto_write_view(buf, view, enriched);
         }
         break;
     case DBR_EXEC_REP:
-        buf = elm_write_exec(buf, body->exec_rep.exec, enriched);
+        buf = elm_proto_write_exec(buf, body->exec_rep.exec, enriched);
         break;
     case DBR_POSN_REP:
-        buf = elm_write_posn(buf, body->posn_rep.posn, enriched);
+        buf = elm_proto_write_posn(buf, body->posn_rep.posn, enriched);
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
@@ -462,11 +462,11 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         buf = dbr_packz(buf, body->insert_exec_list_req.count_);
         for (struct DbrSlNode* node = body->insert_exec_list_req.first; node; node = node->next) {
             struct DbrExec* exec = dbr_shared_exec_entry(node);
-            buf = elm_write_exec(buf, exec, enriched);
+            buf = elm_proto_write_exec(buf, exec, enriched);
         }
         break;
     case DBR_INSERT_EXEC_REQ:
-        buf = elm_write_exec(buf, body->insert_exec_req.exec, enriched);
+        buf = elm_proto_write_exec(buf, body->insert_exec_req.exec, enriched);
         break;
     case DBR_UPDATE_EXEC_REQ:
         buf = dbr_packf(buf, UPDATE_EXEC_REQ_FORMAT,
@@ -603,7 +603,7 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         dbr_exec_init(body->exec_rep.exec);
 
-        if (!(buf = elm_read_exec(buf, body->exec_rep.exec))) {
+        if (!(buf = elm_proto_read_exec(buf, body->exec_rep.exec))) {
             dbr_exec_decref(body->exec_rep.exec, pool);
             goto fail1;
         }
@@ -615,7 +615,7 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         dbr_posn_init(body->posn_rep.posn);
 
-        if (!(buf = elm_read_posn(buf, body->posn_rep.posn))) {
+        if (!(buf = elm_proto_read_posn(buf, body->posn_rep.posn))) {
             elm_pool_free_posn(pool, body->posn_rep.posn);
             goto fail1;
         }
@@ -687,7 +687,7 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
             goto fail1;
         dbr_exec_init(body->exec_rep.exec);
 
-        if (!(buf = elm_read_exec(buf, body->insert_exec_req.exec))) {
+        if (!(buf = elm_proto_read_exec(buf, body->insert_exec_req.exec))) {
             dbr_exec_decref(body->insert_exec_req.exec, pool);
             goto fail1;
         }
