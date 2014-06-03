@@ -1141,7 +1141,7 @@ main(int argc, char* argv[])
         repl.bind("quit", bind(&Handler::quit, ref(handler), ref(async), _1, _2), 0);
 
         char path[PATH_MAX];
-        sprintf(path, "%s/.doobryrc", getenv("HOME"));
+        sprintf(path, "%s/.dbrshrc", getenv("HOME"));
         ifstream cfg(path);
         if (cfg.is_open())
             repl.read(cfg);
