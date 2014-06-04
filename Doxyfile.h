@@ -223,6 +223,11 @@
  */
 
 /**
+ * @defgroup Format Format
+ * @ingroup Elm
+ */
+
+/**
  * Memory pool.
  * @defgroup Pool Pool
  * @ingroup Elm
@@ -328,6 +333,52 @@
 /**
  * @defgroup ProtoView View
  * @ingroup Proto
+ */
+
+/**
+ * @defgroup Json Json
+ * @ingroup Elm
+ * @example json.cpp
+ */
+
+/**
+ * @defgroup JsonRec Record
+ * @ingroup Json
+ */
+
+/**
+ * @defgroup JsonAccnt Account
+ * @ingroup JsonRec
+ */
+
+/**
+ * @defgroup JsonContr Contract
+ * @ingroup JsonRec
+ */
+
+/**
+ * @defgroup JsonMemb Member
+ * @ingroup Json
+ */
+
+/**
+ * @defgroup JsonOrder Order
+ * @ingroup Json
+ */
+
+/**
+ * @defgroup JsonExec Execution
+ * @ingroup Json
+ */
+
+/**
+ * @defgroup JsonPosn Position
+ * @ingroup Json
+ */
+
+/**
+ * @defgroup JsonView View
+ * @ingroup Json
  */
 
 /**
@@ -475,11 +526,6 @@
 /**
  * @defgroup ServBook Book
  * @ingroup Serv
- */
-
-/**
- * @defgroup Text Text
- * @ingroup Fig
  */
 
 /**

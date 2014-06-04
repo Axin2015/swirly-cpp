@@ -15,29 +15,29 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_TEXT_H
-#define DBR_TEXT_H
+#ifndef ELM_FORMAT_H
+#define ELM_FORMAT_H
 
-#include <dbr/defs.h>
+#include <dbr/format.h>
 
-/**
- * @addtogroup Text
- * @{
- */
+#include <stddef.h> // size_t
 
-struct DbrPriceText {
-    /**
-     * 10 decimal digits + 3 nulls + dp + sign + pad
-     */
-    char buf[16];
-    char* small;
-    char* pips;
-    char* big;
-};
+DBR_EXTERN const char*
+elm_action_str(int action);
 
-DBR_API void
-dbr_price_text(double price, int price_dp, int pip_dp, struct DbrPriceText* ps);
+DBR_EXTERN size_t
+elm_action_len(int action);
 
-/** @} */
+DBR_EXTERN const char*
+elm_role_str(int role);
 
-#endif // DBR_TEXT_H
+DBR_EXTERN size_t
+elm_role_len(int role);
+
+DBR_EXTERN const char*
+elm_state_str(int state);
+
+DBR_EXTERN size_t
+elm_state_len(int state);
+
+#endif // ELM_FORMAT_H

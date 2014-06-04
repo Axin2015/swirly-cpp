@@ -190,7 +190,7 @@ head_width(const array<const char*, COLS>& head)
 }
 
 const char*
-straction(int action) noexcept
+action_str(int action) noexcept
 {
     const char* sym;
     switch (action) {
@@ -207,7 +207,7 @@ straction(int action) noexcept
 }
 
 const char*
-strrole(int role) noexcept
+role_str(int role) noexcept
 {
     const char* sym;
     switch (role) {
@@ -224,7 +224,7 @@ strrole(int role) noexcept
 }
 
 const char*
-strstate(int state) noexcept
+state_str(int state) noexcept
 {
     const char* sym;
     switch (state) {
@@ -594,8 +594,8 @@ public:
                         to_string(ref.grec().mnem()),
                         to_string(ref.crec().mnem()),
                         to_string(dbr_jd_to_iso(ref.settl_day())),
-                        strstate(ref.state()),
-                        straction(ref.action()),
+                        state_str(ref.state()),
+                        action_str(ref.action()),
                         to_string(ref.crec().ticks_to_price(ref.ticks())),
                         to_string(ref.lots()),
                         to_string(ref.resd()),
@@ -648,15 +648,15 @@ public:
                         to_string(ref.grec().mnem()),
                         to_string(ref.crec().mnem()),
                         to_string(dbr_jd_to_iso(ref.settl_day())),
-                        strstate(ref.state()),
-                        straction(ref.action()),
+                        state_str(ref.state()),
+                        action_str(ref.action()),
                         to_string(ref.crec().ticks_to_price(ref.ticks())),
                         to_string(ref.lots()),
                         to_string(ref.resd()),
                         to_string(ref.exec()),
                         to_string(ref.crec().ticks_to_price(ref.last_ticks())),
                         to_string(ref.last_lots()),
-                        strrole(ref.role()),
+                        role_str(ref.role()),
                         to_string(ref.cpty().mnem())
                     };
                     for (size_t i = 0; i < COLS; ++i)

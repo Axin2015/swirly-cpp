@@ -21,7 +21,7 @@
 #include <dbrpp/types.hpp>
 
 #include <dbr/conv.h>
-#include <dbr/text.h>
+#include <dbr/format.h>
 
 namespace dbr {
 
@@ -236,12 +236,12 @@ public:
     {
         return dbr_incs_to_real(ticks, price_inc());
     }
-    DbrPriceText
-    price_text(double price) const noexcept
+    DbrPriceString
+    price_string(double price) const noexcept
     {
-        DbrPriceText pt;
-        dbr_price_text(price, price_dp(), pip_dp(), &pt);
-        return pt;
+        DbrPriceString ps;
+        dbr_format_price(price, price_dp(), pip_dp(), &ps);
+        return ps;
     }
 };
 
