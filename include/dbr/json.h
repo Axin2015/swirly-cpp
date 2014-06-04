@@ -30,23 +30,6 @@ struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup JsonRec
- * @{
- */
-
-/**
- * @return -1 if type is unrecognised.
- */
-
-DBR_API size_t
-dbr_json_rec_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_json_write_rec(char* buf, const struct DbrRec* rec);
-
-/** @} */
-
-/**
  * @addtogroup JsonAccnt
  * @{
  */

@@ -17,22 +17,11 @@
  */
 #include <dbr/json.h>
 
+#include <dbr/format.h>
 #include <dbr/types.h>
 
 #include <assert.h>
 #include <string.h>
-
-DBR_API size_t
-dbr_json_rec_len(const struct DbrRec* rec)
-{
-    return 0;
-}
-
-DBR_API char*
-dbr_json_write_rec(char* buf, const struct DbrRec* rec)
-{
-    return buf;
-}
 
 DBR_API size_t
 dbr_json_accnt_len(const struct DbrRec* rec)
@@ -54,8 +43,6 @@ dbr_json_accnt_len(const struct DbrRec* rec)
 DBR_API char*
 dbr_json_write_accnt(char* buf, const struct DbrRec* rec)
 {
-    return buf;
-#if 0
     assert(rec->type == DBR_ENTITY_ACCNT);
     static const char ACCNT_FORMAT[] =
         "{\"mnem\":\"%m\","
@@ -66,7 +53,6 @@ dbr_json_write_accnt(char* buf, const struct DbrRec* rec)
                       rec->mnem,
                       DBR_DISPLAY_MAX, rec->display,
                       DBR_EMAIL_MAX, rec->accnt.email);
-#endif
 }
 
 DBR_API size_t

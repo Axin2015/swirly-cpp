@@ -41,7 +41,7 @@ printi(char* buf, int i)
     } else
         ui = i;
 
-    char* cp = (buf += dbr_intdig(i));
+    char* cp = (buf += dbr_int_dig(i));
     do {
         *--cp = DIGITS[ui % 10];
     } while ((ui /= 10));
@@ -64,7 +64,7 @@ printl(char* buf, long l)
     } else
         ul = l;
 
-    char* cp = (buf += dbr_longdig(l));
+    char* cp = (buf += dbr_long_dig(l));
     do {
         *--cp = DIGITS[ul % 10];
     } while ((ul /= 10));

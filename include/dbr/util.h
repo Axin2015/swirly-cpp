@@ -29,21 +29,21 @@
  */
 
 DBR_API int
-dbr_intdig(int i);
+dbr_int_dig(int i);
 
 DBR_API int
-dbr_longdig(long l);
+dbr_long_dig(long l);
 
 static inline size_t
-dbr_intlen(int i)
+dbr_int_len(int i)
 {
-    return dbr_intdig(i) + (i < 0 ? 1 : 0);
+    return dbr_int_dig(i) + (i < 0 ? 1 : 0);
 }
 
 static inline size_t
-dbr_longlen(long l)
+dbr_long_len(long l)
 {
-    return dbr_longdig(l) + (l < 0 ? 1 : 0);
+    return dbr_long_dig(l) + (l < 0 ? 1 : 0);
 }
 
 static inline const char*

@@ -21,7 +21,7 @@
 #include <sys/time.h>
 
 DBR_API int
-dbr_intdig(int i)
+dbr_int_dig(int i)
 {
     if (i < 0)
         i = (i == INT_MIN) ? INT_MAX : -i;
@@ -48,7 +48,7 @@ dbr_intdig(int i)
 }
 
 DBR_API int
-dbr_longdig(long l)
+dbr_long_dig(long l)
 {
     if (l < 0)
         l = (l == LONG_MIN) ? LONG_MAX : -l;

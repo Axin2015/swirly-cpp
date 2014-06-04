@@ -342,11 +342,6 @@
  */
 
 /**
- * @defgroup JsonRec Record
- * @ingroup Json
- */
-
-/**
  * @defgroup JsonAccnt Account
  * @ingroup JsonRec
  */
