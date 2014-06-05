@@ -61,10 +61,10 @@ dbr_json_write_contr(char* buf, const struct DbrRec* rec);
  */
 
 DBR_API size_t
-dbr_json_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+dbr_json_memb_len(const struct DbrMemb* memb);
 
 DBR_API char*
-dbr_json_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+dbr_json_write_memb(char* buf, const struct DbrMemb* memb);
 
 /** @} */
 
@@ -74,10 +74,10 @@ dbr_json_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
  */
 
 DBR_API size_t
-dbr_json_order_len(const struct DbrOrder* order, DbrBool enriched);
+dbr_json_order_len(const struct DbrOrder* order);
 
 DBR_API char*
-dbr_json_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
+dbr_json_write_order(char* buf, const struct DbrOrder* order);
 
 /** @} */
 
@@ -87,10 +87,10 @@ dbr_json_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched);
  */
 
 DBR_API size_t
-dbr_json_exec_len(const struct DbrExec* exec, DbrBool enriched);
+dbr_json_exec_len(const struct DbrExec* exec);
 
 DBR_API char*
-dbr_json_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
+dbr_json_write_exec(char* buf, const struct DbrExec* exec);
 
 /** @} */
 
@@ -100,10 +100,10 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched);
  */
 
 DBR_API size_t
-dbr_json_posn_len(const struct DbrPosn* posn, DbrBool enriched);
+dbr_json_posn_len(const struct DbrPosn* posn);
 
 DBR_API char*
-dbr_json_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
+dbr_json_write_posn(char* buf, const struct DbrPosn* posn);
 
 /** @} */
 
@@ -113,10 +113,10 @@ dbr_json_write_posn(char* buf, const struct DbrPosn* posn, DbrBool enriched);
  */
 
 DBR_API size_t
-dbr_json_view_len(const struct DbrView* view, DbrBool enriched);
+dbr_json_view_len(const struct DbrView* view);
 
 DBR_API char*
-dbr_json_write_view(char* buf, const struct DbrView* view, DbrBool enriched);
+dbr_json_write_view(char* buf, const struct DbrView* view);
 
 /** @} */
 
