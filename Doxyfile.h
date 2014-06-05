@@ -225,6 +225,7 @@
 /**
  * @defgroup Format Format
  * @ingroup Elm
+ * @example format.cpp
  */
 
 /**
@@ -296,6 +297,11 @@
  */
 
 /**
+ * @defgroup ProtoRec Record
+ * @ingroup Proto
+ */
+
+/**
  * @defgroup ProtoAccnt Account
  * @ingroup ProtoRec
  */
@@ -333,7 +339,11 @@
 /**
  * @defgroup Json Json
  * @ingroup Elm
- * @example json.cpp
+ */
+
+/**
+ * @defgroup JsonRec Record
+ * @ingroup Json
  */
 
 /**
