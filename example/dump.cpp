@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/exec.hpp>
+#include <dbrpp/json.hpp>
 #include <dbrpp/pool.hpp>
 #include <dbrpp/posn.hpp>
 #include <dbrpp/serv.hpp>
@@ -41,14 +41,20 @@ main(int argc, char* argv[])
         cout << "accnts:\n";
         for (auto rec : serv.arecs()) {
             AccntRecRef ref(rec);
-            cout << ref << endl;
+            cout << to_json(ref) << endl;
             Accnt accnt = serv.accnt(ref);
+            cout << ref.mnem() << " users:" << endl;
+            for (auto ref : accnt.users())
+                cout << to_json(MembRef(ref)) << endl;
+            cout << ref.mnem() << " groups:" << endl;
+            for (auto ref : accnt.groups())
+                cout << to_json(MembRef(ref)) << endl;
             cout << ref.mnem() << " orders:" << endl;
             for (auto ref : accnt.orders())
-                cout << OrderRef(ref) << endl;
+                cout << to_json(OrderRef(ref)) << endl;
             cout << ref.mnem() << " trades:" << endl;
             for (auto ref : accnt.trades())
-                cout << ExecRef(ref) << endl;
+                cout << to_json(ExecRef(ref)) << endl;
             cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
                 cout << PosnRef(ref) << endl;
@@ -57,7 +63,7 @@ main(int argc, char* argv[])
         cout << "contrs:\n";
         for (auto rec : serv.crecs()) {
             ContrRecRef ref(rec);
-            cout << ref << endl;
+            cout << to_json(ref) << endl;
             serv.book(ref, dbr_ymd_to_jd(2014, 3, 14));
         }
         return 0;

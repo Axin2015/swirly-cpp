@@ -890,16 +890,6 @@ public:
         return AccntRecRef{*dbr_accnt_rec(impl_)};
     }
     /**
-     * @addtogroup AccntGroup
-     * @{
-     */
-    AccntGroups
-    groups() const noexcept
-    {
-        return AccntGroups{impl_};
-    }
-    /** @} */
-    /**
      * @addtogroup AccntUser
      * @{
      */
@@ -907,6 +897,16 @@ public:
     users() const noexcept
     {
         return AccntUsers{impl_};
+    }
+    /** @} */
+    /**
+     * @addtogroup AccntGroup
+     * @{
+     */
+    AccntGroups
+    groups() const noexcept
+    {
+        return AccntGroups{impl_};
     }
     /** @} */
     /**
