@@ -21,15 +21,6 @@
 #include <dbr/proto.h>
 
 DBR_EXTERN size_t
-elm_proto_rec_len(const struct DbrRec* rec);
-
-DBR_EXTERN char*
-elm_proto_write_rec(char* buf, const struct DbrRec* rec);
-
-DBR_EXTERN const char*
-elm_proto_read_rec(const char* buf, struct DbrRec* rec);
-
-DBR_EXTERN size_t
 elm_proto_accnt_len(const struct DbrRec* rec);
 
 DBR_EXTERN char*

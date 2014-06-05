@@ -19,6 +19,7 @@
 
 #include <dbr/format.h>
 #include <dbr/types.h>
+#include <dbr/util.h>
 
 #include <assert.h>
 #include <string.h>
@@ -58,7 +59,40 @@ dbr_json_write_accnt(char* buf, const struct DbrRec* rec)
 DBR_API size_t
 dbr_json_contr_len(const struct DbrRec* rec)
 {
-    return 0;
+    assert(rec->type == DBR_ENTITY_CONTR);
+    enum {
+        CONTR_SIZE =
+        sizeof("{\"mnem\":\"\","
+               "\"display\":\"\","
+               "\"asset_type\":\"\","
+               "\"asset\":\"\","
+               "\"ccy\":\"\","
+               "\"tick_numer\":,"
+               "\"tick_denom\":,"
+               "\"lot_numer\":,"
+               "\"lot_denom\":,"
+               "\"price_dp\":,"
+               "\"pip_dp\":,"
+               "\"qty_dp\":,"
+               "\"min_lots\":,"
+               "\"max_lots\":}") - 1
+    };
+
+    return CONTR_SIZE
+        + strnlen(rec->mnem, DBR_MNEM_MAX)
+        + strnlen(rec->display, DBR_DISPLAY_MAX)
+        + strnlen(rec->contr.asset_type, DBR_MNEM_MAX)
+        + strnlen(rec->contr.asset, DBR_MNEM_MAX)
+        + strnlen(rec->contr.ccy, DBR_MNEM_MAX)
+        + dbr_int_len(rec->contr.tick_numer)
+        + dbr_int_len(rec->contr.tick_denom)
+        + dbr_int_len(rec->contr.lot_numer)
+        + dbr_int_len(rec->contr.lot_denom)
+        + dbr_int_len(rec->contr.price_dp)
+        + dbr_int_len(rec->contr.pip_dp)
+        + dbr_int_len(rec->contr.qty_dp)
+        + dbr_long_len(rec->contr.min_lots)
+        + dbr_long_len(rec->contr.max_lots);
 }
 
 DBR_API char*

@@ -33,63 +33,11 @@ static const char POSN_FORMAT[] = "lllllll";
 static const char VIEW_FORMAT[] = "lillzllzllzllzllzllzl";
 
 DBR_EXTERN size_t
-elm_proto_rec_len(const struct DbrRec* rec)
-{
-    size_t n = dbr_packleni(rec->type);
-    switch (rec->type) {
-    case DBR_ENTITY_ACCNT:
-        n += dbr_proto_accnt_len(rec);
-        break;
-    case DBR_ENTITY_CONTR:
-        n += dbr_proto_contr_len(rec);
-        break;
-    default:
-        abort();
-    }
-    return n;
-}
-
-DBR_EXTERN char*
-elm_proto_write_rec(char* buf, const struct DbrRec* rec)
-{
-    buf = dbr_packi(buf, rec->type);
-    switch (rec->type) {
-    case DBR_ENTITY_ACCNT:
-        buf = dbr_proto_write_accnt(buf, rec);
-        break;
-    case DBR_ENTITY_CONTR:
-        buf = dbr_proto_write_contr(buf, rec);
-        break;
-    default:
-        abort();
-    }
-    return buf;
-}
-
-DBR_EXTERN const char*
-elm_proto_read_rec(const char* buf, struct DbrRec* rec)
-{
-    buf = dbr_unpacki(buf, &rec->type);
-    switch (rec->type) {
-    case DBR_ENTITY_ACCNT:
-        buf = dbr_proto_read_accnt(buf, rec);
-        break;
-    case DBR_ENTITY_CONTR:
-        buf = dbr_proto_read_contr(buf, rec);
-        break;
-    default:
-        dbr_err_setf(DBR_EIO, "invalid type %d", rec->type);
-        buf = NULL;
-    }
-    return buf;
-}
-
-DBR_EXTERN size_t
 elm_proto_accnt_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(ACCNT_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                        DBR_EMAIL_MAX, rec->accnt.email);
+    return dbr_pack_lenf(ACCNT_FORMAT,
+                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                         DBR_EMAIL_MAX, rec->accnt.email);
 }
 
 DBR_EXTERN char*
@@ -113,12 +61,12 @@ elm_proto_read_accnt(const char* buf, struct DbrRec* rec)
 DBR_EXTERN size_t
 elm_proto_contr_len(const struct DbrRec* rec)
 {
-    return dbr_packlenf(CONTR_FORMAT,
-                        rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
-                        rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
-                        rec->contr.tick_numer, rec->contr.tick_denom, rec->contr.lot_numer,
-                        rec->contr.lot_denom, rec->contr.pip_dp, rec->contr.min_lots,
-                        rec->contr.max_lots);
+    return dbr_pack_lenf(CONTR_FORMAT,
+                         rec->id, rec->mnem, DBR_DISPLAY_MAX, rec->display,
+                         rec->contr.asset_type, rec->contr.asset, rec->contr.ccy,
+                         rec->contr.tick_numer, rec->contr.tick_denom, rec->contr.lot_numer,
+                         rec->contr.lot_denom, rec->contr.pip_dp, rec->contr.min_lots,
+                         rec->contr.max_lots);
 }
 
 DBR_EXTERN char*
@@ -156,11 +104,11 @@ elm_proto_memb_len(const struct DbrMemb* memb, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
-        n = dbr_packlenf(MEMB_FORMAT,
-                         memb->group.rec->id, memb->user.rec->id);
+        n = dbr_pack_lenf(MEMB_FORMAT,
+                          memb->group.rec->id, memb->user.rec->id);
     } else {
-        n = dbr_packlenf(MEMB_FORMAT,
-                         memb->group.id_only, memb->user.id_only);
+        n = dbr_pack_lenf(MEMB_FORMAT,
+                          memb->group.id_only, memb->user.id_only);
     }
     return n;
 }
@@ -189,19 +137,19 @@ elm_proto_order_len(const struct DbrOrder* order, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
-        n = dbr_packlenf(ORDER_FORMAT,
-                         order->id, order->c.user.rec->id, order->c.group.rec->id,
-                         order->c.contr.rec->id, order->c.settl_day, DBR_REF_MAX, order->c.ref,
-                         order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                         order->c.min_lots, order->created, order->modified);
+        n = dbr_pack_lenf(ORDER_FORMAT,
+                          order->id, order->c.user.rec->id, order->c.group.rec->id,
+                          order->c.contr.rec->id, order->c.settl_day, DBR_REF_MAX, order->c.ref,
+                          order->c.state, order->c.action, order->c.ticks, order->c.lots,
+                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
+                          order->c.min_lots, order->created, order->modified);
     } else {
-        n = dbr_packlenf(ORDER_FORMAT,
-                         order->id, order->c.user.id_only, order->c.group.id_only,
-                         order->c.contr.id_only, order->c.settl_day, DBR_REF_MAX, order->c.ref,
-                         order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                         order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                         order->c.min_lots, order->created, order->modified);
+        n = dbr_pack_lenf(ORDER_FORMAT,
+                          order->id, order->c.user.id_only, order->c.group.id_only,
+                          order->c.contr.id_only, order->c.settl_day, DBR_REF_MAX, order->c.ref,
+                          order->c.state, order->c.action, order->c.ticks, order->c.lots,
+                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
+                          order->c.min_lots, order->created, order->modified);
     }
     return n;
 }
@@ -244,20 +192,20 @@ elm_proto_exec_len(const struct DbrExec* exec, DbrBool enriched)
     size_t n;
     if (enriched) {
         const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
-        n = dbr_packlenf(EXEC_FORMAT,
-                         exec->id, exec->order, exec->c.user.rec->id, exec->c.group.rec->id,
-                         exec->c.contr.rec->id, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                         exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
+        n = dbr_pack_lenf(EXEC_FORMAT,
+                          exec->id, exec->order, exec->c.user.rec->id, exec->c.group.rec->id,
+                          exec->c.contr.rec->id, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
+                          exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
+                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
+                          exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
     } else {
-        n = dbr_packlenf(EXEC_FORMAT,
-                         exec->id, exec->order, exec->c.user.id_only, exec->c.group.id_only,
-                         exec->c.contr.id_only, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                         exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                         exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                         exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
-                         exec->created);
+        n = dbr_pack_lenf(EXEC_FORMAT,
+                          exec->id, exec->order, exec->c.user.id_only, exec->c.group.id_only,
+                          exec->c.contr.id_only, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
+                          exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
+                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
+                          exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                          exec->created);
     }
     return n;
 }
@@ -302,13 +250,13 @@ elm_proto_posn_len(const struct DbrPosn* posn, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
-        n = dbr_packlenf(POSN_FORMAT,
-                         posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day,
-                         posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+        n = dbr_pack_lenf(POSN_FORMAT,
+                          posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day,
+                          posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
     } else {
-        n = dbr_packlenf(POSN_FORMAT,
-                         posn->accnt.id_only, posn->contr.id_only, posn->settl_day,
-                         posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
+        n = dbr_pack_lenf(POSN_FORMAT,
+                          posn->accnt.id_only, posn->contr.id_only, posn->settl_day,
+                          posn->buy_licks, posn->buy_lots, posn->sell_licks, posn->sell_lots);
     }
     return n;
 }
@@ -341,25 +289,25 @@ elm_proto_view_len(const struct DbrView* view, DbrBool enriched)
 {
     size_t n;
     if (enriched) {
-        n = dbr_packlenf(VIEW_FORMAT,
-                         view->contr.rec->id, view->settl_day,
-                         view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
-                         view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
-                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
-                         view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
-                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                         view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
-                         view->created);
+        n = dbr_pack_lenf(VIEW_FORMAT,
+                          view->contr.rec->id, view->settl_day,
+                          view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
+                          view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
+                          view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
+                          view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
+                          view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
+                          view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
+                          view->created);
     } else {
-        n = dbr_packlenf(VIEW_FORMAT,
-                         view->contr.id_only, view->settl_day,
-                         view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
-                         view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
-                         view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
-                         view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
-                         view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
-                         view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
-                         view->created);
+        n = dbr_pack_lenf(VIEW_FORMAT,
+                          view->contr.id_only, view->settl_day,
+                          view->bid_ticks[0], view->bid_lots[0], view->bid_count[0],
+                          view->offer_ticks[0], view->offer_lots[0], view->offer_count[0],
+                          view->bid_ticks[1], view->bid_lots[1], view->bid_count[1],
+                          view->offer_ticks[1], view->offer_lots[1], view->offer_count[1],
+                          view->bid_ticks[2], view->bid_lots[2], view->bid_count[2],
+                          view->offer_ticks[2], view->offer_lots[2], view->offer_count[2],
+                          view->created);
     }
     return n;
 }
@@ -404,24 +352,6 @@ elm_proto_read_view(const char* buf, struct DbrView* view)
                        &view->bid_ticks[2], &view->bid_lots[2], &view->bid_count[2],
                        &view->offer_ticks[2], &view->offer_lots[2], &view->offer_count[2],
                        &view->created);
-}
-
-DBR_API size_t
-dbr_proto_rec_len(const struct DbrRec* rec)
-{
-    return elm_proto_rec_len(rec);
-}
-
-DBR_API char*
-dbr_proto_write_rec(char* buf, const struct DbrRec* rec)
-{
-    return elm_proto_write_rec(buf, rec);
-}
-
-DBR_API const char*
-dbr_proto_read_rec(const char* buf, struct DbrRec* rec)
-{
-    return elm_proto_read_rec(buf, rec);
 }
 
 DBR_API size_t

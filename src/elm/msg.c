@@ -180,26 +180,26 @@ read_view(const char* buf, DbrPool pool, struct DbrQueue* queue)
 DBR_EXTERN size_t
 elm_body_len(struct DbrBody* body, DbrBool enriched)
 {
-    size_t n = dbr_packlenl(body->req_id);
-    n += dbr_packleni(body->type);
+    size_t n = dbr_pack_lenl(body->req_id);
+    n += dbr_pack_leni(body->type);
     switch (body->type) {
     case DBR_SESS_NOOP:
         break;
     case DBR_SESS_OPEN:
-        n += dbr_packleni(body->sess_open.hbint);
+        n += dbr_pack_leni(body->sess_open.hbint);
         break;
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        n += dbr_packlenl(body->sess_logon.uid);
+        n += dbr_pack_lenl(body->sess_logon.uid);
         break;
     case DBR_SESS_LOGOFF:
-        n += dbr_packlenl(body->sess_logoff.uid);
+        n += dbr_pack_lenl(body->sess_logoff.uid);
         break;
     case DBR_STATUS_REP:
-        n += dbr_packlenf(STATUS_REP_FORMAT,
-                          body->status_rep.num,
-                          DBR_ERRMSG_MAX, body->status_rep.msg);
+        n += dbr_pack_lenf(STATUS_REP_FORMAT,
+                           body->status_rep.num,
+                           DBR_ERRMSG_MAX, body->status_rep.msg);
         break;
     case DBR_ACCNT_LIST_REP:
         body->entity_list_rep.count_ = 0;
@@ -208,7 +208,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_accnt_len(rec);
             ++body->entity_list_rep.count_;
         }
-        n += dbr_packlenz(body->entity_list_rep.count_);
+        n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
     case DBR_CONTR_LIST_REP:
         body->entity_list_rep.count_ = 0;
@@ -217,7 +217,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_contr_len(rec);
             ++body->entity_list_rep.count_;
         }
-        n += dbr_packlenz(body->entity_list_rep.count_);
+        n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
     case DBR_USER_LIST_REP:
     case DBR_GROUP_LIST_REP:
@@ -227,7 +227,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_memb_len(memb, enriched);
             ++body->entity_list_rep.count_;
         }
-        n += dbr_packlenz(body->entity_list_rep.count_);
+        n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
     case DBR_ORDER_LIST_REP:
         body->entity_list_rep.count_ = 0;
@@ -236,7 +236,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_order_len(order, enriched);
             ++body->entity_list_rep.count_;
         }
-        n += dbr_packlenz(body->entity_list_rep.count_);
+        n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
     case DBR_EXEC_LIST_REP:
         body->entity_list_rep.count_ = 0;
@@ -245,7 +245,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_exec_len(exec, enriched);
             ++body->entity_list_rep.count_;
         }
-        n += dbr_packlenz(body->entity_list_rep.count_);
+        n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
     case DBR_POSN_LIST_REP:
         body->entity_list_rep.count_ = 0;
@@ -254,7 +254,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_posn_len(posn, enriched);
             ++body->entity_list_rep.count_;
         }
-        n += dbr_packlenz(body->entity_list_rep.count_);
+        n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
     case DBR_VIEW_LIST_REP:
         body->view_list_rep.count_ = 0;
@@ -263,7 +263,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_view_len(view, enriched);
             ++body->view_list_rep.count_;
         }
-        n += dbr_packlenz(body->view_list_rep.count_);
+        n += dbr_pack_lenz(body->view_list_rep.count_);
         break;
     case DBR_EXEC_REP:
         n += elm_proto_exec_len(body->exec_rep.exec, enriched);
@@ -272,46 +272,46 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         n += elm_proto_posn_len(body->posn_rep.posn, enriched);
         break;
     case DBR_PLACE_ORDER_REQ:
-        n += dbr_packlenf(PLACE_ORDER_REQ_FORMAT,
-                          body->place_order_req.uid,
-                          body->place_order_req.gid,
-                          body->place_order_req.cid,
-                          body->place_order_req.settl_day,
-                          DBR_REF_MAX, body->place_order_req.ref,
-                          body->place_order_req.action,
-                          body->place_order_req.ticks,
-                          body->place_order_req.lots,
-                          body->place_order_req.min_lots);
+        n += dbr_pack_lenf(PLACE_ORDER_REQ_FORMAT,
+                           body->place_order_req.uid,
+                           body->place_order_req.gid,
+                           body->place_order_req.cid,
+                           body->place_order_req.settl_day,
+                           DBR_REF_MAX, body->place_order_req.ref,
+                           body->place_order_req.action,
+                           body->place_order_req.ticks,
+                           body->place_order_req.lots,
+                           body->place_order_req.min_lots);
         break;
     case DBR_REVISE_ORDER_ID_REQ:
-        n += dbr_packlenf(REVISE_ORDER_ID_REQ_FORMAT,
-                          body->revise_order_id_req.uid,
-                          body->revise_order_id_req.id,
-                          body->revise_order_id_req.lots);
+        n += dbr_pack_lenf(REVISE_ORDER_ID_REQ_FORMAT,
+                           body->revise_order_id_req.uid,
+                           body->revise_order_id_req.id,
+                           body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
-        n += dbr_packlenf(REVISE_ORDER_REF_REQ_FORMAT,
-                          body->revise_order_ref_req.uid,
-                          DBR_REF_MAX, body->revise_order_ref_req.ref,
-                          body->revise_order_ref_req.lots);
+        n += dbr_pack_lenf(REVISE_ORDER_REF_REQ_FORMAT,
+                           body->revise_order_ref_req.uid,
+                           DBR_REF_MAX, body->revise_order_ref_req.ref,
+                           body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
-        n += dbr_packlenf(CANCEL_ORDER_ID_REQ_FORMAT,
-                          body->cancel_order_id_req.uid,
-                          body->cancel_order_id_req.id);
+        n += dbr_pack_lenf(CANCEL_ORDER_ID_REQ_FORMAT,
+                           body->cancel_order_id_req.uid,
+                           body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
-        n += dbr_packlenf(CANCEL_ORDER_REF_REQ_FORMAT,
-                          body->cancel_order_ref_req.uid,
-                          DBR_REF_MAX, body->cancel_order_ref_req.ref);
+        n += dbr_pack_lenf(CANCEL_ORDER_REF_REQ_FORMAT,
+                           body->cancel_order_ref_req.uid,
+                           DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
-        n += dbr_packlenf(ACK_TRADE_REQ_FORMAT,
-                          body->ack_trade_req.uid,
-                          body->ack_trade_req.id);
+        n += dbr_pack_lenf(ACK_TRADE_REQ_FORMAT,
+                           body->ack_trade_req.uid,
+                           body->ack_trade_req.id);
         break;
     case DBR_READ_ENTITY_REQ:
-        n += dbr_packleni(body->read_entity_req.type);
+        n += dbr_pack_leni(body->read_entity_req.type);
         break;
     case DBR_INSERT_EXEC_LIST_REQ:
         body->insert_exec_list_req.count_ = 0;
@@ -320,15 +320,15 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
             n += elm_proto_exec_len(exec, enriched);
             ++body->insert_exec_list_req.count_;
         }
-        n += dbr_packlenz(body->insert_exec_list_req.count_);
+        n += dbr_pack_lenz(body->insert_exec_list_req.count_);
         break;
     case DBR_INSERT_EXEC_REQ:
         n += elm_proto_exec_len(body->insert_exec_req.exec, enriched);
         break;
     case DBR_UPDATE_EXEC_REQ:
-        n += dbr_packlenf(UPDATE_EXEC_REQ_FORMAT,
-                          body->update_exec_req.id,
-                          body->update_exec_req.modified);
+        n += dbr_pack_lenf(UPDATE_EXEC_REQ_FORMAT,
+                           body->update_exec_req.id,
+                           body->update_exec_req.modified);
         break;
     default:
         abort();

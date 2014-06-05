@@ -195,7 +195,7 @@ unpack64(const char* buf)
 }
 
 DBR_API size_t
-dbr_packleni(int i)
+dbr_pack_leni(int i)
 {
     size_t n;
     if (-64 <= i && i <= 63) {
@@ -265,7 +265,7 @@ dbr_unpacki(const char* buf, int* i)
 }
 
 DBR_API size_t
-dbr_packlenl(long l)
+dbr_pack_lenl(long l)
 {
     size_t n;
     if (-64 <= l && l <= 63) {
@@ -346,10 +346,10 @@ dbr_unpackl(const char* buf, long* l)
 }
 
 DBR_API size_t
-dbr_packlens(const char* s, size_t m)
+dbr_pack_lens(const char* s, size_t m)
 {
     const size_t n = strnlen(s, m);
-    return dbr_packlenz(n) + n;
+    return dbr_pack_lenz(n) + n;
 }
 
 DBR_API char*
@@ -379,12 +379,12 @@ dbr_unpacks(const char* buf, char* s, size_t m)
 }
 
 DBR_API size_t
-dbr_packlenf(const char* format, ...)
+dbr_pack_lenf(const char* format, ...)
 {
     size_t n;
     va_list args;
     va_start(args, format);
-    n = dbr_vpacklenf(format, args);
+    n = dbr_vpack_lenf(format, args);
     va_end(args);
     return n;
 }
@@ -410,7 +410,7 @@ dbr_unpackf(const char* buf, const char* format, ...)
 }
 
 DBR_API size_t
-dbr_vpacklenf(const char* format, va_list args)
+dbr_vpack_lenf(const char* format, va_list args)
 {
     size_t n = 0;
     for (const char* cp = format; *cp != '\0'; ++cp) {
@@ -419,22 +419,22 @@ dbr_vpacklenf(const char* format, va_list args)
         switch (*cp) {
         case 'd':
         case 'i':
-            n += dbr_packleni(va_arg(args, int));
+            n += dbr_pack_leni(va_arg(args, int));
             break;
         case 'l':
-            n += dbr_packlenl(va_arg(args, long));
+            n += dbr_pack_lenl(va_arg(args, long));
             break;
         case 'z':
-            n += dbr_packlenz(va_arg(args, size_t));
+            n += dbr_pack_lenz(va_arg(args, size_t));
             break;
         case 'm':
             s = va_arg(args, const char*);
-            n += dbr_packlens(s, MNEM_MAX);
+            n += dbr_pack_lens(s, MNEM_MAX);
             break;
         case 's':
             m = va_arg(args, int);
             s = va_arg(args, const char*);
-            n += dbr_packlens(s, m);
+            n += dbr_pack_lens(s, m);
             break;
         default:
             abort();

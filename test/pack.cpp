@@ -200,31 +200,31 @@ TEST_CASE(pack_strf)
     check(strcmp(s, "test") == 0);
 }
 
-TEST_CASE(packleni)
+TEST_CASE(pack_leni)
 {
-    check(dbr_packleni(-64) == 1);
-    check(dbr_packleni(63) == 1);
-    check(dbr_packleni(SCHAR_MIN) == 2);
-    check(dbr_packleni(SCHAR_MAX) == 2);
-    check(dbr_packleni(SHRT_MIN) == 3);
-    check(dbr_packleni(SHRT_MAX) == 3);
-    check(dbr_packleni(INT_MIN) == 5);
-    check(dbr_packleni(INT_MAX) == 5);
+    check(dbr_pack_leni(-64) == 1);
+    check(dbr_pack_leni(63) == 1);
+    check(dbr_pack_leni(SCHAR_MIN) == 2);
+    check(dbr_pack_leni(SCHAR_MAX) == 2);
+    check(dbr_pack_leni(SHRT_MIN) == 3);
+    check(dbr_pack_leni(SHRT_MAX) == 3);
+    check(dbr_pack_leni(INT_MIN) == 5);
+    check(dbr_pack_leni(INT_MAX) == 5);
 }
 
-TEST_CASE(packlenl)
+TEST_CASE(pack_lenl)
 {
-    check(dbr_packlenl(LONG_MIN) == 9);
-    check(dbr_packlenl(LONG_MAX) == 9);
+    check(dbr_pack_lenl(LONG_MIN) == 9);
+    check(dbr_pack_lenl(LONG_MAX) == 9);
 }
 
-TEST_CASE(packlens)
+TEST_CASE(pack_lens)
 {
-    check(dbr_packlens("test", 16) == 5);
-    check(dbr_packlens("test", 3) == 4);
+    check(dbr_pack_lens("test", 16) == 5);
+    check(dbr_pack_lens("test", 3) == 4);
 }
 
-TEST_CASE(packlenf)
+TEST_CASE(pack_lenf)
 {
-    check(dbr_packlenf("iiiilm", 63, SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX, "test") == 25);
+    check(dbr_pack_lenf("iiiilm", 63, SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX, "test") == 25);
 }

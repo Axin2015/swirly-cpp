@@ -29,7 +29,7 @@
  */
 
 DBR_API size_t
-dbr_packleni(int i);
+dbr_pack_leni(int i);
 
 DBR_API char*
 dbr_packi(char* buf, int i);
@@ -42,7 +42,7 @@ DBR_API const char*
 dbr_unpacki(const char* buf, int* i);
 
 DBR_API size_t
-dbr_packlenl(long l);
+dbr_pack_lenl(long l);
 
 DBR_API char*
 dbr_packl(char* buf, long l);
@@ -55,9 +55,9 @@ DBR_API const char*
 dbr_unpackl(const char* buf, long* l);
 
 static inline size_t
-dbr_packlenz(size_t z)
+dbr_pack_lenz(size_t z)
 {
-    return dbr_packlenl(z);
+    return dbr_pack_lenl(z);
 }
 
 static inline char*
@@ -80,7 +80,7 @@ dbr_unpackz(const char* buf, size_t* z)
 }
 
 DBR_API size_t
-dbr_packlens(const char* s, size_t m);
+dbr_pack_lens(const char* s, size_t m);
 
 DBR_API char*
 dbr_packs(char* buf, const char* s, size_t m);
@@ -93,7 +93,7 @@ DBR_API const char*
 dbr_unpacks(const char* buf, char* s, size_t m);
 
 DBR_API size_t
-dbr_packlenf(const char* format, ...);
+dbr_pack_lenf(const char* format, ...);
 
 DBR_API char*
 dbr_packf(char* buf, const char* format, ...);
@@ -106,7 +106,7 @@ DBR_API const char*
 dbr_unpackf(const char* buf, const char* format, ...);
 
 DBR_API size_t
-dbr_vpacklenf(const char* format, va_list args);
+dbr_vpack_lenf(const char* format, va_list args);
 
 DBR_API char*
 dbr_vpackf(char* buf, const char* format, va_list args);

@@ -30,26 +30,6 @@ struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup ProtoRec
- * @{
- */
-
-/**
- * @return -1 if type is unrecognised.
- */
-
-DBR_API size_t
-dbr_proto_rec_len(const struct DbrRec* rec);
-
-DBR_API char*
-dbr_proto_write_rec(char* buf, const struct DbrRec* rec);
-
-DBR_API const char*
-dbr_proto_read_rec(const char* buf, struct DbrRec* rec);
-
-/** @} */
-
-/**
  * @addtogroup ProtoAccnt
  * @{
  */
