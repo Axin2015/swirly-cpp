@@ -42,8 +42,6 @@ typedef struct FigClnt* DbrClnt;
  *
  * @param traddr Address of trading endpoint.
  *
- * @param seed Seed identifier. Must be positive.
- *
  * @param tmout Request timeout.
  *
  * @param pool Pool.
@@ -51,7 +49,7 @@ typedef struct FigClnt* DbrClnt;
 
 DBR_API DbrClnt
 dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
-                DbrIden seed, DbrMillis tmout, DbrPool pool);
+                DbrMillis tmout, DbrPool pool);
 
 /**
  * No-op if @a clnt is null.

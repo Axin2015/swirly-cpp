@@ -21,7 +21,6 @@
 
 #include <dbr/clnt.h>
 #include <dbr/log.h>
-#include <dbr/util.h>
 
 #include <functional>
 #include <iostream>
@@ -123,7 +122,7 @@ main(int argc, char* argv[])
     try {
         Handler handler;
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
-                dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
+                5000, 8 * 1024 * 1024, &handler);
         cout << ctx << endl;
         handler.wait();
 

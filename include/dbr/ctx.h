@@ -30,8 +30,8 @@
 typedef struct FigCtx* DbrCtx;
 
 DBR_API DbrCtx
-dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout,
-               size_t capacity, DbrHandler handler);
+dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t capacity,
+               DbrHandler handler);
 
 DBR_API void
 dbr_ctx_destroy(DbrCtx ctx);

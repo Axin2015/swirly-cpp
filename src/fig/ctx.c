@@ -50,7 +50,6 @@ struct Init {
 
     char mdaddr[ADDR_MAX + 1];
     char traddr[ADDR_MAX + 1];
-    DbrIden seed;
     DbrMillis tmout;
     size_t capacity;
     DbrHandler handler;
@@ -83,7 +82,7 @@ start_routine(void* arg)
         goto fail1;
 
     DbrClnt clnt = dbr_clnt_create(ctx->zctx, ctx->uuid, init->mdaddr, init->traddr,
-                                   init->seed, init->tmout, pool);
+                                   init->tmout, pool);
     if (!clnt)
         goto fail2;
 
@@ -121,8 +120,8 @@ start_routine(void* arg)
 }
 
 DBR_API DbrCtx
-dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout,
-               size_t capacity, DbrHandler handler)
+dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t capacity,
+               DbrHandler handler)
 {
     DbrCtx ctx = malloc(sizeof(struct FigCtx));
     if (dbr_unlikely(!ctx)) {
@@ -140,7 +139,6 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis t
 
         .mdaddr = { 0 },
         .traddr = { 0 },
-        .seed = seed,
         .tmout = tmout,
         .capacity = capacity,
         .handler = handler,

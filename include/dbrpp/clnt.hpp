@@ -348,8 +348,8 @@ public:
     {
     }
     Clnt(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
-         DbrIden seed, DbrMillis tmout, DbrPool pool)
-        : impl_{dbr_clnt_create(zctx, uuid, mdaddr, traddr, seed, tmout, pool)}
+         DbrMillis tmout, DbrPool pool)
+        : impl_{dbr_clnt_create(zctx, uuid, mdaddr, traddr, tmout, pool)}
     {
         if (!impl_)
             throw_exception();

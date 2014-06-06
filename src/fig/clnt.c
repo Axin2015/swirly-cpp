@@ -148,7 +148,7 @@ fig_clnt_sess_open(DbrClnt clnt, DbrMillis now)
 
 DBR_API DbrClnt
 dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
-                DbrIden seed, DbrMillis tmout, DbrPool pool)
+                DbrMillis tmout, DbrPool pool)
 {
     // 1.
     DbrClnt clnt = malloc(sizeof(struct FigClnt));
@@ -210,7 +210,7 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     clnt->mdsock = mdsock;
     clnt->trsock = trsock;
     clnt->asock = asock;
-    clnt->id = seed;
+    clnt->id = 1;
     clnt->tmout = tmout;
     clnt->pool = pool;
     clnt->state = FIG_DELTA_WAIT;

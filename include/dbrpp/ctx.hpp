@@ -46,9 +46,9 @@ public:
         : impl_{nullptr}
     {
     }
-    Ctx(const char* mdaddr, const char* traddr, DbrIden seed, DbrMillis tmout, size_t capacity,
+    Ctx(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t capacity,
         DbrHandler handler)
-        : impl_{dbr_ctx_create(mdaddr, traddr, seed, tmout, capacity, handler)}
+        : impl_{dbr_ctx_create(mdaddr, traddr, tmout, capacity, handler)}
     {
         if (!impl_)
             throw_exception();

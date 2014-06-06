@@ -26,18 +26,18 @@
 #include <dbrpp/view.hpp>
 
 #include <dbr/log.h>
-#include <dbr/util.h>
+#include <dbr/util.h> // dbr_millis()
 
 #include <algorithm>
 #include <array>
-#include <climits>  // PATH_MAX
+#include <climits>    // PATH_MAX
 #include <functional>
 #include <fstream>
 #include <iomanip>
 #include <list>
 #include <map>
 
-#include <unistd.h> // usleep()
+#include <unistd.h>   // usleep()
 
 // Suppress complaints by Clang 5.1.0.
 #pragma GCC diagnostic ignored "-Wmissing-braces"
@@ -1112,8 +1112,8 @@ main(int argc, char* argv[])
     dbr_log_setlogger(log_ios);
     try {
         Handler handler;
-        Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",
-                dbr_millis(), 5000, 8 * 1024 * 1024, &handler);
+        Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271", 5000,
+                8 * 1024 * 1024, &handler);
 
         Async async = ctx.async();
 
