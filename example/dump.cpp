@@ -57,14 +57,13 @@ main(int argc, char* argv[])
                 cout << to_json(ExecRef(ref)) << endl;
             cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
-                cout << PosnRef(ref) << endl;
+                cout << to_json(PosnRef(ref)) << endl;
         }
 
         cout << "contrs:\n";
         for (auto rec : serv.crecs()) {
             ContrRecRef ref(rec);
             cout << to_json(ref) << endl;
-            serv.book(ref, dbr_ymd_to_jd(2014, 3, 14));
         }
         return 0;
     } catch (const exception& e) {

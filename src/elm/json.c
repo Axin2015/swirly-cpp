@@ -337,23 +337,104 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec)
 DBR_API size_t
 dbr_json_posn_len(const struct DbrPosn* posn)
 {
-    return 0;
+    enum {
+        POSN_SIZE =
+        sizeof("{\"accnt\":\"\","
+               "\"contr\":\"\","
+               "\"settl_day\":,"
+               "\"buy_licks\":,"
+               "\"buy_lots\":,"
+               "\"sell_licks\":,"
+               "\"sell_lots\":}") - 1
+    };
+
+    return POSN_SIZE
+        + strnlen(posn->accnt.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(posn->contr.rec->mnem, DBR_MNEM_MAX)
+        + dbr_int_len(posn->settl_day)
+        + dbr_long_len(posn->buy_licks)
+        + dbr_long_len(posn->buy_lots)
+        + dbr_long_len(posn->sell_licks)
+        + dbr_long_len(posn->sell_lots);
 }
 
 DBR_API char*
 dbr_json_write_posn(char* buf, const struct DbrPosn* posn)
 {
-    return NULL;
+    static const char POSN_FORMAT[] =
+        "{\"accnt\":\"%m\","
+        "\"contr\":\"%m\","
+        "\"settl_day\":%d,"
+        "\"buy_licks\":%l,"
+        "\"buy_lots\":%l,"
+        "\"sell_licks\":%l,"
+        "\"sell_lots\":%l}";
+
+    return dbr_format(buf, POSN_FORMAT,
+                      posn->accnt.rec->mnem,
+                      posn->contr.rec->mnem,
+                      posn->settl_day,
+                      posn->buy_licks,
+                      posn->buy_lots,
+                      posn->sell_licks,
+                      posn->sell_lots);
 }
 
 DBR_API size_t
 dbr_json_view_len(const struct DbrView* view)
 {
-    return 0;
+    enum { LEVELS = 3 };
+    enum {
+        SIDE_SIZE =
+        sizeof("\"contr\":\"\","
+               "\"settl_day\":,"
+               "\"bid_ticks\":[,,],"
+               "\"bid_lots\":[,,],"
+               "\"bid_count\":[,,],"
+               "\"offer_ticks\":[,,],"
+               "\"offer_lots\":[,,],"
+               "\"offer_count\":[,,],"
+               "\"created\":}") - 1
+    };
+
+    size_t len = SIDE_SIZE
+        + strnlen(view->contr.rec->mnem, DBR_MNEM_MAX)
+        + dbr_int_len(view->settl_day)
+        + dbr_long_len(view->created);
+
+    for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
+        len += dbr_long_len(view->bid_ticks[i]);
+        len += dbr_long_len(view->bid_lots[i]);
+        len += dbr_long_len(view->bid_count[i]);
+        len += dbr_long_len(view->offer_ticks[i]);
+        len += dbr_long_len(view->offer_lots[i]);
+        len += dbr_long_len(view->offer_count[i]);
+    }
+    return len;
 }
 
 DBR_API char*
 dbr_json_write_view(char* buf, const struct DbrView* view)
 {
-    return NULL;
+    static const char VIEW_FORMAT[] =
+        "\"contr\":\"%m\","
+        "\"settl_day\":%d,"
+        "\"bid_ticks\":[%l,%l,%l],"
+        "\"bid_lots\":[%l,%l,%l],"
+        "\"bid_count\":[%l,%l,%l],"
+        "\"offer_ticks\":[%l,%l,%l],"
+        "\"offer_lots\":[%l,%l,%l],"
+        "\"offer_count\":[%l,%l,%l],"
+        "\"created\":%l}";
+
+    return dbr_format(buf, VIEW_FORMAT,
+                      view->contr.rec->mnem,
+                      view->settl_day,
+                      view->bid_ticks[0], view->bid_ticks[1], view->bid_ticks[2],
+                      view->bid_lots[0], view->bid_lots[1], view->bid_lots[2],
+                      view->bid_count[0], view->bid_count[1], view->bid_count[2],
+                      view->offer_ticks[0], view->offer_ticks[1], view->offer_ticks[2],
+                      view->offer_lots[0], view->offer_lots[1], view->offer_lots[2],
+                      view->offer_count[0], view->offer_count[1], view->offer_count[2],
+                      view->created);
 }

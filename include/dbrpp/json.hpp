@@ -21,7 +21,9 @@
 #include <dbrpp/exec.hpp>
 #include <dbrpp/memb.hpp>
 #include <dbrpp/order.hpp>
+#include <dbrpp/posn.hpp>
 #include <dbrpp/rec.hpp>
+#include <dbrpp/view.hpp>
 
 #include <dbr/json.h>
 
@@ -119,12 +121,32 @@ to_json(ExecRef ref)
  * @{
  */
 
+inline std::string
+to_json(PosnRef ref)
+{
+    std::string s;
+    s.resize(dbr_json_posn_len(ref.c_arg()) + 1);
+    dbr_json_write_posn(&s[0], ref.c_arg());
+    s.resize(s.size() - 1);
+    return s;
+}
+
 /** @} */
 
 /**
  * @addtogroup JsonView
  * @{
  */
+
+inline std::string
+to_json(ViewRef ref)
+{
+    std::string s;
+    s.resize(dbr_json_view_len(ref.c_arg()) + 1);
+    dbr_json_write_view(&s[0], ref.c_arg());
+    s.resize(s.size() - 1);
+    return s;
+}
 
 /** @} */
 

@@ -261,8 +261,8 @@ apply_viewup(DbrClnt clnt, struct DbrView* view)
             exist->offer_ticks[i] = view->offer_ticks[i];
             exist->offer_lots[i] = view->offer_lots[i];
             exist->offer_count[i] = view->offer_count[i];
-            exist->created = view->created;
         }
+        exist->created = view->created;
 
         dbr_pool_free_view(clnt->pool, view);
         view = exist;
