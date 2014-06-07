@@ -23,7 +23,6 @@
 #include <dbr/dispatch.h>
 #include <dbr/err.h>
 #include <dbr/log.h>
-#include <dbr/pool.h>
 #include <dbr/util.h>
 
 #include <uuid/uuid.h>

@@ -18,11 +18,9 @@
 #ifndef DBR_CLNT_H
 #define DBR_CLNT_H
 
-#include <dbr/types.h>
+#include <dbr/pool.h>
 
 #include <stddef.h>
-
-typedef struct ElmPool* DbrPool;
 
 /**
  * @addtogroup Clnt
