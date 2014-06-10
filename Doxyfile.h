@@ -488,21 +488,6 @@
  */
 
 /**
- * @defgroup Clnt Client
- * @ingroup Fig
- */
-
-/**
- * @defgroup ClntRec Record
- * @ingroup Clnt
- */
-
-/**
- * @defgroup ClntView View
- * @ingroup Clnt
- */
-
-/**
  * @defgroup Serv Server
  * @ingroup Fig
  * @example serv.cpp
@@ -526,6 +511,26 @@
 /**
  * @defgroup ServBook Book
  * @ingroup Serv
+ */
+
+/**
+ * @defgroup Clnt Client
+ * @ingroup Fig
+ */
+
+/**
+ * @defgroup ClntRec Record
+ * @ingroup Clnt
+ */
+
+/**
+ * @defgroup ClntView View
+ * @ingroup Clnt
+ */
+
+/**
+ * @defgroup Task Task
+ * @ingroup Fig
  */
 
 /**
