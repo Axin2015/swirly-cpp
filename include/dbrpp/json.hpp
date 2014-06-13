@@ -18,13 +18,6 @@
 #ifndef DBRPP_JSON_HPP
 #define DBRPP_JSON_HPP
 
-#include <dbrpp/exec.hpp>
-#include <dbrpp/memb.hpp>
-#include <dbrpp/order.hpp>
-#include <dbrpp/posn.hpp>
-#include <dbrpp/rec.hpp>
-#include <dbrpp/view.hpp>
-
 #include <dbr/json.h>
 
 #include <string>
@@ -36,12 +29,24 @@ namespace dbr {
  * @{
  */
 
+inline size_t
+json_accnt_len(const DbrRec& arec) noexcept
+{
+    return dbr_json_accnt_len(&arec);
+}
+
+inline char*
+json_write_accnt(char* buf, const DbrRec& arec) noexcept
+{
+    return dbr_json_write_accnt(buf, &arec);
+}
+
 inline std::string
-to_json(AccntRecRef ref)
+json_write_accnt(const DbrRec& arec)
 {
     std::string s;
-    s.resize(dbr_json_accnt_len(ref.c_arg()) + 1);
-    dbr_json_write_accnt(&s[0], ref.c_arg());
+    s.resize(dbr_json_accnt_len(&arec) + 1);
+    dbr_json_write_accnt(&s[0], &arec);
     s.resize(s.size() - 1);
     return s;
 }
@@ -53,12 +58,24 @@ to_json(AccntRecRef ref)
  * @{
  */
 
+inline size_t
+json_contr_len(const DbrRec& crec) noexcept
+{
+    return dbr_json_contr_len(&crec);
+}
+
+inline char*
+json_write_contr(char* buf, const DbrRec& crec) noexcept
+{
+    return dbr_json_write_contr(buf, &crec);
+}
+
 inline std::string
-to_json(ContrRecRef ref)
+json_write_contr(const DbrRec& crec)
 {
     std::string s;
-    s.resize(dbr_json_contr_len(ref.c_arg()) + 1);
-    dbr_json_write_contr(&s[0], ref.c_arg());
+    s.resize(dbr_json_contr_len(&crec) + 1);
+    dbr_json_write_contr(&s[0], &crec);
     s.resize(s.size() - 1);
     return s;
 }
@@ -70,12 +87,24 @@ to_json(ContrRecRef ref)
  * @{
  */
 
+inline size_t
+json_memb_len(const DbrMemb& memb) noexcept
+{
+    return dbr_json_memb_len(&memb);
+}
+
+inline char*
+json_write_memb(char* buf, const DbrMemb& memb) noexcept
+{
+    return dbr_json_write_memb(buf, &memb);
+}
+
 inline std::string
-to_json(MembRef ref)
+json_write_memb(const DbrMemb& memb) noexcept
 {
     std::string s;
-    s.resize(dbr_json_memb_len(ref.c_arg()) + 1);
-    dbr_json_write_memb(&s[0], ref.c_arg());
+    s.resize(dbr_json_memb_len(&memb) + 1);
+    dbr_json_write_memb(&s[0], &memb);
     s.resize(s.size() - 1);
     return s;
 }
@@ -87,12 +116,24 @@ to_json(MembRef ref)
  * @{
  */
 
+inline size_t
+json_order_len(const DbrOrder& order) noexcept
+{
+    return dbr_json_order_len(&order);
+}
+
+inline char*
+json_write_order(char* buf, const DbrOrder& order) noexcept
+{
+    return dbr_json_write_order(buf, &order);
+}
+
 inline std::string
-to_json(OrderRef ref)
+json_write_order(const DbrOrder& order) noexcept
 {
     std::string s;
-    s.resize(dbr_json_order_len(ref.c_arg()) + 1);
-    dbr_json_write_order(&s[0], ref.c_arg());
+    s.resize(dbr_json_order_len(&order) + 1);
+    dbr_json_write_order(&s[0], &order);
     s.resize(s.size() - 1);
     return s;
 }
@@ -104,12 +145,24 @@ to_json(OrderRef ref)
  * @{
  */
 
+inline size_t
+json_exec_len(const DbrExec& exec) noexcept
+{
+    return dbr_json_exec_len(&exec);
+}
+
+inline char*
+json_write_exec(char* buf, const DbrExec& exec) noexcept
+{
+    return dbr_json_write_exec(buf, &exec);
+}
+
 inline std::string
-to_json(ExecRef ref)
+json_write_exec(const DbrExec& exec) noexcept
 {
     std::string s;
-    s.resize(dbr_json_exec_len(ref.c_arg()) + 1);
-    dbr_json_write_exec(&s[0], ref.c_arg());
+    s.resize(dbr_json_exec_len(&exec) + 1);
+    dbr_json_write_exec(&s[0], &exec);
     s.resize(s.size() - 1);
     return s;
 }
@@ -121,12 +174,24 @@ to_json(ExecRef ref)
  * @{
  */
 
+inline size_t
+json_posn_len(const DbrPosn& posn) noexcept
+{
+    return dbr_json_posn_len(&posn);
+}
+
+inline char*
+json_write_posn(char* buf, const DbrPosn& posn) noexcept
+{
+    return dbr_json_write_posn(buf, &posn);
+}
+
 inline std::string
-to_json(PosnRef ref)
+json_write_posn(const DbrPosn& posn) noexcept
 {
     std::string s;
-    s.resize(dbr_json_posn_len(ref.c_arg()) + 1);
-    dbr_json_write_posn(&s[0], ref.c_arg());
+    s.resize(dbr_json_posn_len(&posn) + 1);
+    dbr_json_write_posn(&s[0], &posn);
     s.resize(s.size() - 1);
     return s;
 }
@@ -138,12 +203,24 @@ to_json(PosnRef ref)
  * @{
  */
 
+inline size_t
+json_view_len(const DbrView& view) noexcept
+{
+    return dbr_json_view_len(&view);
+}
+
+inline char*
+json_write_view(char* buf, const DbrView& view) noexcept
+{
+    return dbr_json_write_view(buf, &view);
+}
+
 inline std::string
-to_json(ViewRef ref)
+json_write_view(const DbrView& view) noexcept
 {
     std::string s;
-    s.resize(dbr_json_view_len(ref.c_arg()) + 1);
-    dbr_json_write_view(&s[0], ref.c_arg());
+    s.resize(dbr_json_view_len(&view) + 1);
+    dbr_json_write_view(&s[0], &view);
     s.resize(s.size() - 1);
     return s;
 }

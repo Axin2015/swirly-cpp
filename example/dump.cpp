@@ -41,29 +41,28 @@ main(int argc, char* argv[])
         cout << "accnts:\n";
         for (auto rec : serv.arecs()) {
             AccntRecRef ref(rec);
-            cout << to_json(ref) << endl;
+            cout << json_write_accnt(rec) << endl;
             Accnt accnt = serv.accnt(ref);
             cout << ref.mnem() << " users:" << endl;
             for (auto ref : accnt.users())
-                cout << to_json(MembRef(ref)) << endl;
+                cout << json_write_memb(ref) << endl;
             cout << ref.mnem() << " groups:" << endl;
             for (auto ref : accnt.groups())
-                cout << to_json(MembRef(ref)) << endl;
+                cout << json_write_memb(ref) << endl;
             cout << ref.mnem() << " orders:" << endl;
             for (auto ref : accnt.orders())
-                cout << to_json(OrderRef(ref)) << endl;
+                cout << json_write_order(ref) << endl;
             cout << ref.mnem() << " trades:" << endl;
             for (auto ref : accnt.trades())
-                cout << to_json(ExecRef(ref)) << endl;
+                cout << json_write_exec(ref) << endl;
             cout << ref.mnem() << " posns:" << endl;
             for (auto ref : accnt.posns())
-                cout << to_json(PosnRef(ref)) << endl;
+                cout << json_write_posn(ref) << endl;
         }
 
         cout << "contrs:\n";
         for (auto rec : serv.crecs()) {
-            ContrRecRef ref(rec);
-            cout << to_json(ref) << endl;
+            cout << json_write_contr(rec) << endl;
         }
         return 0;
     } catch (const exception& e) {
