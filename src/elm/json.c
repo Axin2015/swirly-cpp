@@ -247,7 +247,7 @@ dbr_json_exec_len(const struct DbrExec* exec)
     enum {
         EXEC_SIZE =
         sizeof("{\"id\":,"
-               "{\"order\":,"
+               "\"order\":,"
                "\"user\":\"\","
                "\"group\":\"\","
                "\"contr\":\"\","
@@ -330,7 +330,7 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec)
                       exec->c.last_lots,
                       exec->match,
                       exec->role,
-                      exec->cpty,
+                      exec->cpty.rec->mnem,
                       exec->created);
 }
 

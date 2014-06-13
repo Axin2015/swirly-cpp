@@ -166,6 +166,45 @@ create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
     return order;
 }
 
+std::shared_ptr<DbrExec>
+create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& user, DbrRec& group,
+             DbrRec& contr, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
+             DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
+             DbrIden match, int role, DbrRec& cpty, DbrMillis now)
+{
+    auto deleter = [&pool](DbrExec* exec) {
+        pool.free_exec(exec);
+    };
+    std::shared_ptr<DbrExec> ptr(pool.alloc_exec(), deleter);
+    dbr_exec_init(ptr.get());
+
+    ptr->id = id;
+    ptr->order = order;
+    ptr->c.user.rec = &user;
+    ptr->c.group.rec = &group;
+    ptr->c.contr.rec = &contr;
+    ptr->c.settl_day = settl_day;
+    if (ref)
+        strncpy(ptr->c.ref, ref, DBR_REF_MAX);
+    else
+        ptr->c.ref[0] = '\0';
+    ptr->c.state = 0;
+    ptr->c.action = action;
+    ptr->c.ticks = ticks;
+    ptr->c.lots = lots;
+    ptr->c.resd = resd;
+    ptr->c.exec = exec;
+    ptr->c.last_ticks = last_ticks;
+    ptr->c.last_lots = last_lots;
+    ptr->c.min_lots = 0;
+    ptr->match = match;
+    ptr->role = role;
+    ptr->cpty.rec = &cpty;
+    ptr->created = now;
+
+    return ptr;
+}
+
 shared_ptr<DbrExec>
 create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
              DbrIden cid, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
