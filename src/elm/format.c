@@ -262,6 +262,10 @@ dbr_vformat(char* buf, const char* format, va_list args)
                 i = va_arg(args, int);
                 buf = printi(buf, i);
                 break;
+            case 'j':
+                i = va_arg(args, int);
+                buf = printi(buf, dbr_jd_to_iso(i));
+                break;
             case 'l':
                 l = va_arg(args, long);
                 buf = printl(buf, l);

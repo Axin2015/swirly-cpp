@@ -168,7 +168,7 @@ dbr_json_order_len(const struct DbrOrder* order)
                "\"user\":\"\","
                "\"group\":\"\","
                "\"contr\":\"\","
-               "\"settl_day\":,"
+               "\"settl_date\":,"
                "\"ref\":\"\","
                "\"state\":\"\","
                "\"action\":\"\","
@@ -187,7 +187,7 @@ dbr_json_order_len(const struct DbrOrder* order)
         + strnlen(order->c.user.rec->mnem, DBR_MNEM_MAX)
         + strnlen(order->c.group.rec->mnem, DBR_MNEM_MAX)
         + strnlen(order->c.contr.rec->mnem, DBR_MNEM_MAX)
-        + dbr_int_len(order->c.settl_day)
+        + 8
         + strnlen(order->c.ref, DBR_REF_MAX)
         + elm_state_len(order->c.state)
         + elm_action_len(order->c.action)
@@ -209,7 +209,7 @@ dbr_json_write_order(char* buf, const struct DbrOrder* order)
         "\"user\":\"%m\","
         "\"group\":\"%m\","
         "\"contr\":\"%m\","
-        "\"settl_day\":%d,"
+        "\"settl_date\":%j,"
         "\"ref\":\"%s\","
         "\"state\":\"%S\","
         "\"action\":\"%A\","
@@ -251,7 +251,7 @@ dbr_json_exec_len(const struct DbrExec* exec)
                "\"user\":\"\","
                "\"group\":\"\","
                "\"contr\":\"\","
-               "\"settl_day\":,"
+               "\"settl_date\":,"
                "\"ref\":\"\","
                "\"state\":\"\","
                "\"action\":\"\","
@@ -272,7 +272,7 @@ dbr_json_exec_len(const struct DbrExec* exec)
         + strnlen(exec->c.user.rec->mnem, DBR_MNEM_MAX)
         + strnlen(exec->c.group.rec->mnem, DBR_MNEM_MAX)
         + strnlen(exec->c.contr.rec->mnem, DBR_MNEM_MAX)
-        + dbr_int_len(exec->c.settl_day)
+        + 8
         + strnlen(exec->c.ref, DBR_REF_MAX)
         + elm_state_len(exec->c.state)
         + elm_action_len(exec->c.action)
@@ -297,7 +297,7 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec)
         "\"user\":\"%m\","
         "\"group\":\"%m\","
         "\"contr\":\"%m\","
-        "\"settl_day\":%d,"
+        "\"settl_date\":%j,"
         "\"ref\":\"%s\","
         "\"state\":\"%S\","
         "\"action\":\"%A\","
@@ -341,7 +341,7 @@ dbr_json_posn_len(const struct DbrPosn* posn)
         POSN_SIZE =
         sizeof("{\"accnt\":\"\","
                "\"contr\":\"\","
-               "\"settl_day\":,"
+               "\"settl_date\":,"
                "\"buy_licks\":,"
                "\"buy_lots\":,"
                "\"sell_licks\":,"
@@ -351,7 +351,7 @@ dbr_json_posn_len(const struct DbrPosn* posn)
     return POSN_SIZE
         + strnlen(posn->accnt.rec->mnem, DBR_MNEM_MAX)
         + strnlen(posn->contr.rec->mnem, DBR_MNEM_MAX)
-        + dbr_int_len(posn->settl_day)
+        + 8
         + dbr_long_len(posn->buy_licks)
         + dbr_long_len(posn->buy_lots)
         + dbr_long_len(posn->sell_licks)
@@ -364,7 +364,7 @@ dbr_json_write_posn(char* buf, const struct DbrPosn* posn)
     static const char POSN_FORMAT[] =
         "{\"accnt\":\"%m\","
         "\"contr\":\"%m\","
-        "\"settl_day\":%d,"
+        "\"settl_date\":%j,"
         "\"buy_licks\":%l,"
         "\"buy_lots\":%l,"
         "\"sell_licks\":%l,"
@@ -386,8 +386,8 @@ dbr_json_view_len(const struct DbrView* view)
     enum { LEVELS = 3 };
     enum {
         SIDE_SIZE =
-        sizeof("\"contr\":\"\","
-               "\"settl_day\":,"
+        sizeof("{\"contr\":\"\","
+               "\"settl_date\":,"
                "\"bid_ticks\":[,,],"
                "\"bid_lots\":[,,],"
                "\"bid_count\":[,,],"
@@ -399,7 +399,7 @@ dbr_json_view_len(const struct DbrView* view)
 
     size_t len = SIDE_SIZE
         + strnlen(view->contr.rec->mnem, DBR_MNEM_MAX)
-        + dbr_int_len(view->settl_day)
+        + 8
         + dbr_long_len(view->created);
 
     for (size_t i = 0; i < DBR_LEVEL_MAX; ++i) {
@@ -417,8 +417,8 @@ DBR_API char*
 dbr_json_write_view(char* buf, const struct DbrView* view)
 {
     static const char VIEW_FORMAT[] =
-        "\"contr\":\"%m\","
-        "\"settl_day\":%d,"
+        "{\"contr\":\"%m\","
+        "\"settl_date\":%j,"
         "\"bid_ticks\":[%l,%l,%l],"
         "\"bid_lots\":[%l,%l,%l],"
         "\"bid_count\":[%l,%l,%l],"
