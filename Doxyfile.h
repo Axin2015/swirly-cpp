@@ -403,6 +403,11 @@
  */
 
 /**
+ * @defgroup Rest Rest
+ * @ingroup Elm
+ */
+
+/**
  * @defgroup Zmq ZeroMQ
  * @ingroup Elm
  */

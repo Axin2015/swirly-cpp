@@ -15,58 +15,52 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_SHLEX_HPP
-#define DBRPP_SHLEX_HPP
+#ifndef DBRPP_REST_HPP
+#define DBRPP_REST_HPP
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/shlex.h>
+#include <dbr/rest.h>
 
 namespace dbr {
 
 /**
- * @addtogroup Shlex
+ * @addtogroup Rest
  * @{
  */
 
-template <typename FnT>
-class Shlex {
-    FnT fn_;
-    DbrShlex impl_;
-    static void
-    cb(void* ctx, const char* tok, size_t len) noexcept
-    {
-        static_cast<Shlex*>(ctx)->fn_(tok, len);
-    }
+class Rest {
+    DbrRest impl_;
 public:
-    explicit
-    Shlex(FnT fn) noexcept
-        : fn_{fn}
+    Rest() noexcept
     {
-        dbr_shlex_init(&impl_, cb, this);
+        dbr_rest_init(&impl_);
     }
     void
     reset() noexcept
     {
-        dbr_shlex_reset(&impl_);
+        dbr_rest_init(&impl_);
     }
-    void
-    exec(const char* buf, size_t size)
+    bool
+    rurl(const char* buf, size_t size)
     {
-        if (!dbr_shlex_exec(&impl_, buf, size))
+        const int ret = dbr_rest_rurl(&impl_, buf, size);
+        if (ret < 0)
             throw_exception();
+        return ret;
+    }
+    bool
+    json(const char* buf, size_t size)
+    {
+        const int ret = dbr_rest_json(&impl_, buf, size);
+        if (ret < 0)
+            throw_exception();
+        return ret;
     }
 };
-
-template <typename FnT>
-Shlex<FnT>
-make_shlex(FnT fn)
-{
-    return Shlex<FnT>{fn};
-}
 
 /** @} */
 
 } // dbr
 
-#endif // DBRPP_SHLEX_HPP
+#endif // DBRPP_REST_HPP
