@@ -1145,7 +1145,7 @@ main(int argc, char* argv[])
         ifstream cfg(path);
         if (cfg.is_open())
             repl.read(cfg);
-        repl.read(cin, "doobry> ");
+        repl.read(cin, "dbrsh> ");
         cout << endl;
     } catch (const exception& e) {
         cerr << "error: " << e.what() << endl;

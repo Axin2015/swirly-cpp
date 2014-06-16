@@ -93,8 +93,7 @@ inum(const struct DbrRest* rest)
         if (rest->str.count < rest->str.max)
             rest->str.buf[rest->str.count++] = fc;
         else {
-            dbr_err_set(DBR_EINVAL, "max string length exceeded");
-            cs = json_error;
+            cs = json_error; msg = "max string length exceeded";
             fbreak;
         }
     }
@@ -189,22 +188,19 @@ inum(const struct DbrRest* rest)
 
     action begin_method {
         if ((rest->fields & DBR_METHOD_MASK) != 0) {
-            dbr_err_set(DBR_EINVAL, "method already specified");
-            cs = json_error;
+            cs = json_error; msg = "method already specified";
             fbreak;
         }
     }
     action begin_resrc {
         if ((rest->fields & DBR_RESRC_MASK) != 0) {
-            dbr_err_set(DBR_EINVAL, "resrc already specified");
-            cs = json_error;
+            cs = json_error; msg = "resrc already specified";
             fbreak;
         }
     }
     action begin_id {
         if (rest->fields & DBR_PARAM_ID) {
-            dbr_err_set(DBR_EINVAL, "id already specified");
-            cs = json_error;
+            cs = json_error; msg = "id already specified";
             fbreak;
         }
     }
@@ -214,8 +210,7 @@ inum(const struct DbrRest* rest)
     }
     action begin_accnt {
         if (rest->fields & DBR_PARAM_ACCNT) {
-            dbr_err_set(DBR_EINVAL, "accnt already specified");
-            cs = json_error;
+            cs = json_error; msg = "accnt already specified";
             fbreak;
         }
         rest->str.buf = rest->accnt;
@@ -226,8 +221,7 @@ inum(const struct DbrRest* rest)
     }
     action begin_ref {
         if (rest->fields & DBR_PARAM_REF) {
-            dbr_err_set(DBR_EINVAL, "ref already specified");
-            cs = json_error;
+            cs = json_error; msg = "ref already specified";
             fbreak;
         }
         rest->str.buf = rest->ref;
@@ -238,8 +232,7 @@ inum(const struct DbrRest* rest)
     }
     action begin_action {
         if (rest->fields & DBR_PARAM_ACTION) {
-            dbr_err_set(DBR_EINVAL, "action already specified");
-            cs = json_error;
+            cs = json_error; msg = "action already specified";
             fbreak;
         }
     }
@@ -248,8 +241,7 @@ inum(const struct DbrRest* rest)
     }
     action begin_ticks {
         if (rest->fields & DBR_PARAM_TICKS) {
-            dbr_err_set(DBR_EINVAL, "ticks already specified");
-            cs = json_error;
+            cs = json_error; msg = "ticks already specified";
             fbreak;
         }
     }
@@ -259,8 +251,7 @@ inum(const struct DbrRest* rest)
     }
     action begin_lots {
         if (rest->fields & DBR_PARAM_LOTS) {
-            dbr_err_set(DBR_EINVAL, "lots already specified");
-            cs = json_error;
+            cs = json_error; msg = "lots already specified";
             fbreak;
         }
     }
@@ -301,13 +292,16 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 {
 	const char* p = buf;
 	const char* pe = p + size;
+    const char* msg = "parse error";
 
     int cs = rest->cs;
 	%% write exec;
     rest->cs = cs;
 
-	if (cs == json_error)
+	if (cs == json_error) {
+        dbr_err_set(DBR_EINVAL, msg);
 		return -1;
+    }
 
 	if (cs < json_first_final)
 		return 0;
@@ -333,8 +327,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
         if (str.count < str.max)
             str.buf[str.count++] = fc;
         else {
-            dbr_err_set(DBR_EINVAL, "max string length exceeded");
-            cs = rurl_error;
+            cs = rurl_error; msg = "max string length exceeded";
             fbreak;
         }
     }
@@ -346,8 +339,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     action begin_id {
         if (rest->fields & DBR_PARAM_ID) {
-            dbr_err_set(DBR_EINVAL, "id already specified");
-            cs = rurl_error;
+            cs = rurl_error; msg = "id already specified";
             fbreak;
         }
     }
@@ -360,8 +352,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     action begin_accnt {
         if (rest->fields & DBR_PARAM_ACCNT) {
-            dbr_err_set(DBR_EINVAL, "accnt already specified");
-            cs = rurl_error;
+            cs = rurl_error; msg = "accnt already specified";
             fbreak;
         }
         str.buf = rest->accnt;
@@ -374,8 +365,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     action begin_contr {
         if (rest->fields & DBR_PARAM_CONTR) {
-            dbr_err_set(DBR_EINVAL, "contr already specified");
-            cs = rurl_error;
+            cs = rurl_error; msg = "contr already specified";
             fbreak;
         }
         str.buf = rest->contr;
@@ -431,8 +421,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     action begin_resrc {
         if ((rest->fields & DBR_RESRC_MASK) != 0) {
-            dbr_err_set(DBR_EINVAL, "resrc already specified");
-            cs = rurl_error;
+            cs = rurl_error; msg = "resrc already specified";
             fbreak;
         }
     }
@@ -449,6 +438,7 @@ dbr_rest_rurl(struct DbrRest* rest, const char* buf, size_t size)
 	const char* p = buf;
 	const char* pe = p + size;
     const char* eof = pe;
+    const char* msg = "parse error";
 
     long inum;
     struct {
@@ -460,8 +450,10 @@ dbr_rest_rurl(struct DbrRest* rest, const char* buf, size_t size)
     %% write init;
     %% write exec;
 
-	if (cs == rurl_error)
+	if (cs == rurl_error) {
+        dbr_err_set(DBR_EINVAL, msg);
 		return -1;
+    }
 
 	if (cs < rurl_first_final)
 		return 0;
