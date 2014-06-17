@@ -6,3 +6,4 @@ FILE(GLOB dbrsh_SOURCES "*.cpp")
 
 ADD_EXECUTABLE(dbrsh ${dbrsh_SOURCES})
 TARGET_LINK_LIBRARIES(dbrsh fir_static)
+INSTALL(TARGETS dbrsh DESTINATION bin)

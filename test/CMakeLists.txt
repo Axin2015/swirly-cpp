@@ -11,8 +11,6 @@ FILE(GLOB test_SOURCES "*.cpp")
 ADD_EXECUTABLE(dbr_test ${test_SOURCES})
 TARGET_LINK_LIBRARIES(dbr_test elm_static fig_static)
 
-INSTALL(TARGETS dbr_test DESTINATION bin)
-
 ADD_CUSTOM_COMMAND(
   DEPENDS ${test_SOURCES}
   COMMAND grep -h "^TEST_CASE" ${test_SOURCES} >${CMAKE_CURRENT_BINARY_DIR}/test_cases.txt
