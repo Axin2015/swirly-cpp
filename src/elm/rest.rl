@@ -26,6 +26,15 @@ inum(const struct DbrRest* rest)
     return rest->num.sign * rest->num.idigits;
 }
 
+#if 0
+static double
+fnum(const struct DbrRest* rest)
+{
+    const double fract = rest->num.fdigits / pow(10, rest->num.fcount);
+    return rest->num.sign * (rest->num.idigits + fract);
+}
+#endif
+
 %%{
     machine json;
 
@@ -163,7 +172,7 @@ inum(const struct DbrRest* rest)
     action market_resrc {
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
     }
-    resrc  = '"logon"'i %logon_resrc
+    resrc  =  '"logon"'i %logon_resrc
             | '"logoff"'i %logoff_resrc
             | '"accnt"'i %accnt_resrc
             | '"contr"'i %contr_resrc
@@ -219,6 +228,38 @@ inum(const struct DbrRest* rest)
     action end_accnt {
         rest->fields |= DBR_PARAM_ACCNT;
     }
+    action begin_group {
+        if (rest->fields & DBR_PARAM_GROUP) {
+            cs = json_error; msg = "group already specified";
+            fbreak;
+        }
+        rest->str.buf = rest->group;
+        rest->str.max = DBR_MNEM_MAX;
+    }
+    action end_group {
+        rest->fields |= DBR_PARAM_GROUP;
+    }
+    action begin_contr {
+        if (rest->fields & DBR_PARAM_CONTR) {
+            cs = json_error; msg = "contr already specified";
+            fbreak;
+        }
+        rest->str.buf = rest->contr;
+        rest->str.max = DBR_MNEM_MAX;
+    }
+    action end_contr {
+        rest->fields |= DBR_PARAM_CONTR;
+    }
+    action begin_settl_date {
+        if (rest->fields & DBR_PARAM_SETTL_DATE) {
+            cs = json_error; msg = "settl-date already specified";
+            fbreak;
+        }
+    }
+    action end_settl_date {
+        rest->fields |= DBR_PARAM_SETTL_DATE;
+        rest->settl_date = inum(rest);
+    }
     action begin_ref {
         if (rest->fields & DBR_PARAM_REF) {
             cs = json_error; msg = "ref already specified";
@@ -238,6 +279,7 @@ inum(const struct DbrRest* rest)
     }
     action end_action {
         rest->fields |= DBR_PARAM_ACTION;
+        rest->action = inum(rest);
     }
     action begin_ticks {
         if (rest->fields & DBR_PARAM_TICKS) {
@@ -259,14 +301,28 @@ inum(const struct DbrRest* rest)
         rest->fields |= DBR_PARAM_LOTS;
         rest->lots = inum(rest);
     }
+    action begin_min_lots {
+        if (rest->fields & DBR_PARAM_MIN_LOTS) {
+            cs = json_error; msg = "min-lots already specified";
+            fbreak;
+        }
+    }
+    action end_min_lots {
+        rest->fields |= DBR_PARAM_MIN_LOTS;
+        rest->min_lots = inum(rest);
+    }
     pair = '"method"'i colon method >begin_method
          | '"resrc"'i colon resrc >begin_resrc
          | '"id"'i colon inum >begin_id %end_id
          | '"accnt"'i colon str >begin_accnt %end_accnt
+         | '"group"'i colon str >begin_group %end_group
+         | '"contr"'i colon str >begin_contr %end_contr
+         | '"settl_date"'i colon inum >begin_settl_date %end_settl_date
          | '"ref"'i colon str >begin_ref %end_ref
          | '"action"'i colon action_ >begin_action %end_action
          | '"ticks"'i colon inum >begin_ticks %end_ticks
-         | '"lots"'i colon inum >begin_lots %end_lots;
+         | '"lots"'i colon inum >begin_lots %end_lots
+         | '"min_lots"'i colon inum >begin_min_lots %end_min_lots;
 
     members = pair (comma pair)*;
 
@@ -361,6 +417,8 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
     action end_accnt {
         rest->fields |= DBR_PARAM_ACCNT;
     }
+    opt_accnt = ('/' str) >begin_accnt %end_accnt
+               | '';
     req_accnt = ('/' str) >begin_accnt %end_accnt;
 
     action begin_contr {
@@ -410,8 +468,8 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     resrc =  'logon' %logon_resrc
            | 'logoff' %logoff_resrc
-           | 'accnt' %accnt_resrc
-           | 'contr' %contr_resrc
+           | ('accnt' opt_accnt) %accnt_resrc
+           | ('contr' opt_contr) %contr_resrc
            | ('user' req_accnt) %user_resrc
            | ('group' req_accnt) %group_resrc
            | ('order' req_accnt opt_id) %order_resrc

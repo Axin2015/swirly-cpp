@@ -19,6 +19,7 @@
 #define DBRPP_REST_HPP
 
 #include <dbrpp/except.hpp>
+#include <dbrpp/types.hpp>
 
 #include <dbr/rest.h>
 
@@ -56,6 +57,56 @@ public:
         if (ret < 0)
             throw_exception();
         return ret;
+    }
+    unsigned
+    fields() const noexcept
+    {
+        return impl_.fields;
+    }
+    Mnem
+    accnt() const noexcept
+    {
+        return Mnem{impl_.accnt};
+    }
+    Mnem
+    group() const noexcept
+    {
+        return Mnem{impl_.group};
+    }
+    Mnem
+    contr() const noexcept
+    {
+        return Mnem{impl_.contr};
+    }
+    DbrIsoDate
+    settl_date() const noexcept
+    {
+        return impl_.settl_date;
+    }
+    Ref
+    ref() const noexcept
+    {
+        return Ref{impl_.ref};
+    }
+    int
+    action() const noexcept
+    {
+        return impl_.action;
+    }
+    DbrTicks
+    ticks() const noexcept
+    {
+        return impl_.ticks;
+    }
+    DbrLots
+    lots() const noexcept
+    {
+        return impl_.lots;
+    }
+    DbrLots
+    min_lots() const noexcept
+    {
+        return impl_.min_lots;
     }
 };
 

@@ -27,12 +27,38 @@ main(int argc, char* argv[])
 {
     try {
         Rest rest;
-
         cout << "rest> ";
+
         string line;
         while (getline(cin, line)) {
             if (!rest.json(line.data(), line.size()))
                 continue;
+
+            switch (rest.fields()) {
+            case DBR_METHOD_POST | DBR_RESRC_LOGON | DBR_PARAM_ACCNT:
+                cout << "post logon: " << rest.accnt() << endl;
+                break;
+            case DBR_METHOD_POST | DBR_RESRC_LOGOFF | DBR_PARAM_ACCNT:
+                cout << "post logoff: " << rest.accnt() << endl;
+                break;
+            case DBR_METHOD_GET | DBR_RESRC_ACCNT:
+                cout << "get accnt" << endl;
+                break;
+            case DBR_METHOD_GET | DBR_RESRC_ACCNT | DBR_PARAM_ACCNT:
+                cout << "get accnt: " << rest.accnt() << endl;
+                break;
+            case DBR_METHOD_GET | DBR_RESRC_CONTR:
+                cout << "get contr" << endl;
+                break;
+            case DBR_METHOD_GET | DBR_RESRC_CONTR | DBR_PARAM_CONTR:
+                cout << "get contr: " << rest.contr() << endl;
+                break;
+            default:
+                cerr << "invalid request\n";
+                break;
+            }
+
+            rest.reset();
             cout << "rest> ";
         }
         return 0;

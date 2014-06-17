@@ -28,71 +28,98 @@ inum(const struct DbrRest* rest)
     return rest->num.sign * rest->num.idigits;
 }
 
+#if 0
+static double
+fnum(const struct DbrRest* rest)
+{
+    const double fract = rest->num.fdigits / pow(10, rest->num.fcount);
+    return rest->num.sign * (rest->num.idigits + fract);
+}
+#endif
 
-#line 277 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+
+#line 333 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 
 
 
-#line 37 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 46 "/Users/marayl/repo/doobry/src/elm/rest.c"
 static const char _json_actions[] = {
 	0, 1, 2, 1, 4, 1, 6, 1, 
 	7, 1, 8, 1, 9, 1, 10, 1, 
 	11, 1, 12, 1, 13, 1, 14, 1, 
 	15, 1, 16, 1, 17, 1, 18, 1, 
 	19, 1, 20, 1, 23, 1, 24, 1, 
-	26, 1, 31, 1, 34, 1, 36, 2, 
-	5, 28, 2, 5, 30, 2, 21, 32, 
-	2, 22, 32, 2, 25, 0, 2, 27, 
-	3, 2, 29, 3, 2, 33, 0, 2, 
-	35, 0, 3, 25, 0, 1, 3, 25, 
-	0, 2, 3, 33, 0, 1, 3, 33, 
-	0, 2, 3, 35, 0, 1, 3, 35, 
-	0, 2
+	26, 1, 34, 1, 37, 1, 40, 1, 
+	42, 1, 44, 2, 5, 28, 2, 5, 
+	30, 2, 5, 32, 2, 5, 36, 2, 
+	21, 38, 2, 22, 38, 2, 25, 0, 
+	2, 27, 3, 2, 29, 3, 2, 31, 
+	3, 2, 33, 0, 2, 35, 3, 2, 
+	39, 0, 2, 41, 0, 2, 43, 0, 
+	3, 25, 0, 1, 3, 25, 0, 2, 
+	3, 33, 0, 1, 3, 33, 0, 2, 
+	3, 39, 0, 1, 3, 39, 0, 2, 
+	3, 41, 0, 1, 3, 41, 0, 2, 
+	3, 43, 0, 1, 3, 43, 0, 2
+	
 };
 
 static const short _json_key_offsets[] = {
-	0, 0, 4, 9, 21, 23, 27, 29, 
-	31, 32, 36, 40, 42, 47, 52, 56, 
-	56, 58, 60, 62, 63, 67, 71, 75, 
-	77, 79, 80, 85, 87, 89, 91, 92, 
-	97, 99, 100, 104, 111, 113, 120, 122, 
-	124, 126, 127, 131, 138, 140, 147, 149, 
-	151, 153, 155, 157, 158, 162, 166, 174, 
-	176, 178, 180, 182, 184, 185, 190, 192, 
-	194, 195, 200, 202, 204, 206, 207, 212, 
-	216, 218, 220, 221, 226, 228, 229, 234, 
-	236, 240, 241, 245, 249, 251, 256, 256, 
-	258, 260, 261, 265, 269, 287, 289, 291, 
-	293, 295, 296, 301, 303, 305, 307, 309, 
-	310, 315, 317, 319, 321, 323, 324, 329, 
-	331, 333, 335, 339, 341, 342, 347, 348, 
-	353, 355, 357, 359, 361, 363, 364, 369, 
-	371, 373, 375, 377, 378, 383, 385, 387, 
-	389, 390, 395, 397, 399, 401, 403, 404, 
-	409, 411, 413, 415, 416, 421, 423, 425, 
-	427, 429, 430, 434, 441, 443, 450
+	0, 0, 4, 9, 27, 29, 33, 35, 
+	37, 38, 42, 46, 48, 53, 58, 62, 
+	62, 64, 66, 68, 69, 73, 77, 81, 
+	83, 85, 86, 91, 93, 95, 97, 98, 
+	103, 105, 107, 109, 111, 112, 116, 120, 
+	122, 127, 127, 129, 131, 133, 135, 136, 
+	140, 144, 146, 151, 151, 153, 154, 158, 
+	165, 167, 174, 176, 178, 180, 181, 185, 
+	192, 194, 201, 205, 207, 209, 211, 213, 
+	214, 218, 222, 230, 232, 234, 236, 238, 
+	240, 241, 246, 248, 250, 251, 256, 258, 
+	260, 262, 263, 268, 272, 274, 276, 277, 
+	282, 284, 285, 290, 292, 293, 295, 297, 
+	299, 301, 302, 306, 313, 315, 322, 324, 
+	328, 329, 333, 337, 339, 344, 344, 346, 
+	348, 349, 353, 357, 375, 377, 379, 381, 
+	383, 384, 389, 391, 393, 395, 397, 398, 
+	403, 405, 407, 409, 411, 412, 417, 419, 
+	421, 423, 427, 429, 430, 435, 436, 441, 
+	443, 445, 447, 449, 451, 452, 457, 459, 
+	461, 463, 465, 466, 471, 473, 475, 477, 
+	478, 483, 485, 487, 489, 491, 492, 497, 
+	499, 501, 503, 504, 509, 511, 513, 515, 
+	517, 518, 520, 522, 524, 526, 527, 531, 
+	538, 540, 547, 549, 551, 553, 555, 556, 
+	560, 567, 569, 576
 };
 
 static const char _json_trans_keys[] = {
 	32, 123, 9, 13, 32, 34, 125, 9, 
-	13, 65, 73, 76, 77, 82, 84, 97, 
-	105, 108, 109, 114, 116, 67, 99, 67, 
-	84, 99, 116, 78, 110, 84, 116, 34, 
+	13, 65, 67, 71, 73, 76, 77, 82, 
+	83, 84, 97, 99, 103, 105, 108, 109, 
+	114, 115, 116, 67, 99, 67, 84, 99, 
+	116, 78, 110, 84, 116, 34, 32, 58, 
+	9, 13, 32, 34, 9, 13, 34, 92, 
+	32, 44, 125, 9, 13, 32, 44, 125, 
+	9, 13, 32, 34, 9, 13, 73, 105, 
+	79, 111, 78, 110, 34, 32, 58, 9, 
+	13, 32, 34, 9, 13, 66, 83, 98, 
+	115, 85, 117, 89, 121, 34, 32, 44, 
+	125, 9, 13, 69, 101, 76, 108, 76, 
+	108, 34, 32, 44, 125, 9, 13, 79, 
+	111, 78, 110, 84, 116, 82, 114, 34, 
 	32, 58, 9, 13, 32, 34, 9, 13, 
-	34, 92, 32, 44, 125, 9, 13, 32, 
-	44, 125, 9, 13, 32, 34, 9, 13, 
-	73, 105, 79, 111, 78, 110, 34, 32, 
-	58, 9, 13, 32, 34, 9, 13, 66, 
-	83, 98, 115, 85, 117, 89, 121, 34, 
-	32, 44, 125, 9, 13, 69, 101, 76, 
-	108, 76, 108, 34, 32, 44, 125, 9, 
-	13, 68, 100, 34, 32, 58, 9, 13, 
-	32, 43, 45, 9, 13, 48, 57, 48, 
-	57, 32, 44, 125, 9, 13, 48, 57, 
-	79, 111, 84, 116, 83, 115, 34, 32, 
-	58, 9, 13, 32, 43, 45, 9, 13, 
-	48, 57, 48, 57, 32, 44, 125, 9, 
-	13, 48, 57, 69, 101, 84, 116, 72, 
+	34, 92, 32, 44, 125, 9, 13, 82, 
+	114, 79, 111, 85, 117, 80, 112, 34, 
+	32, 58, 9, 13, 32, 34, 9, 13, 
+	34, 92, 32, 44, 125, 9, 13, 68, 
+	100, 34, 32, 58, 9, 13, 32, 43, 
+	45, 9, 13, 48, 57, 48, 57, 32, 
+	44, 125, 9, 13, 48, 57, 79, 111, 
+	84, 116, 83, 115, 34, 32, 58, 9, 
+	13, 32, 43, 45, 9, 13, 48, 57, 
+	48, 57, 32, 44, 125, 9, 13, 48, 
+	57, 69, 73, 101, 105, 84, 116, 72, 
 	104, 79, 111, 68, 100, 34, 32, 58, 
 	9, 13, 32, 34, 9, 13, 68, 71, 
 	72, 80, 100, 103, 104, 112, 69, 101, 
@@ -103,7 +130,11 @@ static const char _json_trans_keys[] = {
 	44, 125, 9, 13, 79, 85, 111, 117, 
 	83, 115, 84, 116, 34, 32, 44, 125, 
 	9, 13, 84, 116, 34, 32, 44, 125, 
-	9, 13, 69, 101, 70, 83, 102, 115, 
+	9, 13, 78, 110, 95, 76, 108, 79, 
+	111, 84, 116, 83, 115, 34, 32, 58, 
+	9, 13, 32, 43, 45, 9, 13, 48, 
+	57, 48, 57, 32, 44, 125, 9, 13, 
+	48, 57, 69, 101, 70, 83, 102, 115, 
 	34, 32, 58, 9, 13, 32, 34, 9, 
 	13, 34, 92, 32, 44, 125, 9, 13, 
 	82, 114, 67, 99, 34, 32, 58, 9, 
@@ -126,34 +157,45 @@ static const char _json_trans_keys[] = {
 	125, 9, 13, 82, 114, 65, 97, 68, 
 	100, 69, 101, 34, 32, 44, 125, 9, 
 	13, 83, 115, 69, 101, 82, 114, 34, 
-	32, 44, 125, 9, 13, 73, 105, 67, 
-	99, 75, 107, 83, 115, 34, 32, 58, 
-	9, 13, 32, 43, 45, 9, 13, 48, 
-	57, 48, 57, 32, 44, 125, 9, 13, 
-	48, 57, 32, 9, 13, 0
+	32, 44, 125, 9, 13, 69, 101, 84, 
+	116, 84, 116, 76, 108, 95, 68, 100, 
+	65, 97, 84, 116, 69, 101, 34, 32, 
+	58, 9, 13, 32, 43, 45, 9, 13, 
+	48, 57, 48, 57, 32, 44, 125, 9, 
+	13, 48, 57, 73, 105, 67, 99, 75, 
+	107, 83, 115, 34, 32, 58, 9, 13, 
+	32, 43, 45, 9, 13, 48, 57, 48, 
+	57, 32, 44, 125, 9, 13, 48, 57, 
+	32, 9, 13, 0
 };
 
 static const char _json_single_lengths[] = {
-	0, 2, 3, 12, 2, 4, 2, 2, 
+	0, 2, 3, 18, 2, 4, 2, 2, 
 	1, 2, 2, 2, 3, 3, 2, 0, 
 	2, 2, 2, 1, 2, 2, 4, 2, 
 	2, 1, 3, 2, 2, 2, 1, 3, 
-	2, 1, 2, 3, 0, 3, 2, 2, 
-	2, 1, 2, 3, 0, 3, 2, 2, 
-	2, 2, 2, 1, 2, 2, 8, 2, 
-	2, 2, 2, 2, 1, 3, 2, 2, 
-	1, 3, 2, 2, 2, 1, 3, 4, 
-	2, 2, 1, 3, 2, 1, 3, 2, 
-	4, 1, 2, 2, 2, 3, 0, 2, 
-	2, 1, 2, 2, 18, 2, 2, 2, 
-	2, 1, 3, 2, 2, 2, 2, 1, 
-	3, 2, 2, 2, 2, 1, 3, 2, 
-	2, 2, 4, 2, 1, 3, 1, 3, 
-	2, 2, 2, 2, 2, 1, 3, 2, 
-	2, 2, 2, 1, 3, 2, 2, 2, 
+	2, 2, 2, 2, 1, 2, 2, 2, 
+	3, 0, 2, 2, 2, 2, 1, 2, 
+	2, 2, 3, 0, 2, 1, 2, 3, 
+	0, 3, 2, 2, 2, 1, 2, 3, 
+	0, 3, 4, 2, 2, 2, 2, 1, 
+	2, 2, 8, 2, 2, 2, 2, 2, 
+	1, 3, 2, 2, 1, 3, 2, 2, 
+	2, 1, 3, 4, 2, 2, 1, 3, 
+	2, 1, 3, 2, 1, 2, 2, 2, 
+	2, 1, 2, 3, 0, 3, 2, 4, 
+	1, 2, 2, 2, 3, 0, 2, 2, 
+	1, 2, 2, 18, 2, 2, 2, 2, 
 	1, 3, 2, 2, 2, 2, 1, 3, 
-	2, 2, 2, 1, 3, 2, 2, 2, 
-	2, 1, 2, 3, 0, 3, 1
+	2, 2, 2, 2, 1, 3, 2, 2, 
+	2, 4, 2, 1, 3, 1, 3, 2, 
+	2, 2, 2, 2, 1, 3, 2, 2, 
+	2, 2, 1, 3, 2, 2, 2, 1, 
+	3, 2, 2, 2, 2, 1, 3, 2, 
+	2, 2, 1, 3, 2, 2, 2, 2, 
+	1, 2, 2, 2, 2, 1, 2, 3, 
+	0, 3, 2, 2, 2, 2, 1, 2, 
+	3, 0, 3, 1
 };
 
 static const char _json_range_lengths[] = {
@@ -161,206 +203,265 @@ static const char _json_range_lengths[] = {
 	0, 1, 1, 0, 1, 1, 1, 0, 
 	0, 0, 0, 0, 1, 1, 0, 0, 
 	0, 0, 1, 0, 0, 0, 0, 1, 
-	0, 0, 1, 2, 1, 2, 0, 0, 
-	0, 0, 1, 2, 1, 2, 0, 0, 
-	0, 0, 0, 0, 1, 1, 0, 0, 
-	0, 0, 0, 0, 0, 1, 0, 0, 
-	0, 1, 0, 0, 0, 0, 1, 0, 
-	0, 0, 0, 1, 0, 0, 1, 0, 
-	0, 0, 1, 1, 0, 1, 0, 0, 
-	0, 0, 1, 1, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 1, 1, 0, 
+	1, 0, 0, 0, 0, 0, 0, 1, 
+	1, 0, 1, 0, 0, 0, 1, 2, 
+	1, 2, 0, 0, 0, 0, 1, 2, 
+	1, 2, 0, 0, 0, 0, 0, 0, 
+	1, 1, 0, 0, 0, 0, 0, 0, 
+	0, 1, 0, 0, 0, 1, 0, 0, 
+	0, 0, 1, 0, 0, 0, 0, 1, 
 	0, 0, 1, 0, 0, 0, 0, 0, 
-	1, 0, 0, 0, 0, 0, 1, 0, 
-	0, 0, 0, 0, 0, 1, 0, 1, 
-	0, 0, 0, 0, 0, 0, 1, 0, 
-	0, 0, 0, 0, 1, 0, 0, 0, 
+	0, 0, 1, 2, 1, 2, 0, 0, 
+	0, 1, 1, 0, 1, 0, 0, 0, 
+	0, 1, 1, 0, 0, 0, 0, 0, 
 	0, 1, 0, 0, 0, 0, 0, 1, 
-	0, 0, 0, 0, 1, 0, 0, 0, 
-	0, 0, 1, 2, 1, 2, 1
+	0, 0, 0, 0, 0, 1, 0, 0, 
+	0, 0, 0, 0, 1, 0, 1, 0, 
+	0, 0, 0, 0, 0, 1, 0, 0, 
+	0, 0, 0, 1, 0, 0, 0, 0, 
+	1, 0, 0, 0, 0, 0, 1, 0, 
+	0, 0, 0, 1, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 1, 2, 
+	1, 2, 0, 0, 0, 0, 0, 1, 
+	2, 1, 2, 1
 };
 
 static const short _json_index_offsets[] = {
-	0, 0, 4, 9, 22, 25, 30, 33, 
-	36, 38, 42, 46, 49, 54, 59, 63, 
-	64, 67, 70, 73, 75, 79, 83, 88, 
-	91, 94, 96, 101, 104, 107, 110, 112, 
-	117, 120, 122, 126, 132, 134, 140, 143, 
-	146, 149, 151, 155, 161, 163, 169, 172, 
-	175, 178, 181, 184, 186, 190, 194, 203, 
-	206, 209, 212, 215, 218, 220, 225, 228, 
-	231, 233, 238, 241, 244, 247, 249, 254, 
-	259, 262, 265, 267, 272, 275, 277, 282, 
-	285, 290, 292, 296, 300, 303, 308, 309, 
-	312, 315, 317, 321, 325, 344, 347, 350, 
-	353, 356, 358, 363, 366, 369, 372, 375, 
-	377, 382, 385, 388, 391, 394, 396, 401, 
-	404, 407, 410, 415, 418, 420, 425, 427, 
-	432, 435, 438, 441, 444, 447, 449, 454, 
-	457, 460, 463, 466, 468, 473, 476, 479, 
-	482, 484, 489, 492, 495, 498, 501, 503, 
-	508, 511, 514, 517, 519, 524, 527, 530, 
-	533, 536, 538, 542, 548, 550, 556
-};
-
-static const unsigned char _json_indicies[] = {
-	0, 2, 0, 1, 2, 3, 4, 2, 
-	1, 5, 6, 7, 8, 9, 10, 5, 
-	6, 7, 8, 9, 10, 1, 11, 11, 
-	1, 12, 13, 12, 13, 1, 14, 14, 
-	1, 15, 15, 1, 16, 1, 16, 17, 
-	16, 1, 17, 18, 17, 1, 20, 21, 
-	19, 22, 23, 24, 22, 1, 25, 26, 
-	4, 25, 1, 26, 3, 26, 1, 19, 
-	27, 27, 1, 28, 28, 1, 29, 29, 
-	1, 30, 1, 30, 31, 30, 1, 31, 
-	32, 31, 1, 33, 34, 33, 34, 1, 
-	35, 35, 1, 36, 36, 1, 37, 1, 
-	38, 39, 40, 38, 1, 41, 41, 1, 
-	42, 42, 1, 43, 43, 1, 44, 1, 
-	45, 46, 47, 45, 1, 48, 48, 1, 
-	49, 1, 49, 50, 49, 1, 50, 51, 
-	52, 50, 53, 1, 54, 1, 55, 56, 
-	57, 55, 54, 1, 58, 58, 1, 59, 
-	59, 1, 60, 60, 1, 61, 1, 61, 
-	62, 61, 1, 62, 63, 64, 62, 65, 
-	1, 66, 1, 67, 68, 69, 67, 66, 
-	1, 70, 70, 1, 71, 71, 1, 72, 
-	72, 1, 73, 73, 1, 74, 74, 1, 
-	75, 1, 75, 76, 75, 1, 76, 77, 
-	76, 1, 78, 79, 80, 81, 78, 79, 
-	80, 81, 1, 82, 82, 1, 83, 83, 
-	1, 84, 84, 1, 85, 85, 1, 86, 
-	86, 1, 87, 1, 88, 89, 90, 88, 
-	1, 91, 91, 1, 92, 92, 1, 93, 
-	1, 94, 95, 96, 94, 1, 97, 97, 
-	1, 98, 98, 1, 99, 99, 1, 100, 
-	1, 101, 102, 103, 101, 1, 104, 105, 
-	104, 105, 1, 106, 106, 1, 107, 107, 
-	1, 108, 1, 109, 110, 111, 109, 1, 
-	112, 112, 1, 113, 1, 114, 115, 116, 
-	114, 1, 117, 117, 1, 118, 119, 118, 
-	119, 1, 120, 1, 120, 121, 120, 1, 
-	121, 122, 121, 1, 124, 125, 123, 126, 
-	127, 128, 126, 1, 123, 129, 129, 1, 
-	130, 130, 1, 131, 1, 131, 132, 131, 
-	1, 132, 133, 132, 1, 134, 135, 136, 
-	137, 138, 139, 140, 141, 142, 134, 135, 
-	136, 137, 138, 139, 140, 141, 142, 1, 
-	143, 143, 1, 144, 144, 1, 145, 145, 
-	1, 146, 146, 1, 147, 1, 148, 149, 
-	150, 148, 1, 151, 151, 1, 152, 152, 
-	1, 153, 153, 1, 154, 154, 1, 155, 
-	1, 156, 157, 158, 156, 1, 159, 159, 
-	1, 160, 160, 1, 161, 161, 1, 162, 
-	162, 1, 163, 1, 164, 165, 166, 164, 
-	1, 167, 167, 1, 168, 168, 1, 169, 
-	169, 1, 170, 171, 170, 171, 1, 172, 
-	172, 1, 173, 1, 174, 175, 176, 174, 
-	1, 177, 1, 178, 179, 180, 178, 1, 
-	181, 181, 1, 182, 182, 1, 183, 183, 
-	1, 184, 184, 1, 185, 185, 1, 186, 
-	1, 187, 188, 189, 187, 1, 190, 190, 
-	1, 191, 191, 1, 192, 192, 1, 193, 
-	193, 1, 194, 1, 195, 196, 197, 195, 
-	1, 198, 198, 1, 199, 199, 1, 200, 
-	200, 1, 201, 1, 202, 203, 204, 202, 
-	1, 205, 205, 1, 206, 206, 1, 207, 
-	207, 1, 208, 208, 1, 209, 1, 210, 
-	211, 212, 210, 1, 213, 213, 1, 214, 
-	214, 1, 215, 215, 1, 216, 1, 217, 
-	218, 219, 217, 1, 220, 220, 1, 221, 
-	221, 1, 222, 222, 1, 223, 223, 1, 
-	224, 1, 224, 225, 224, 1, 225, 226, 
-	227, 225, 228, 1, 229, 1, 230, 231, 
-	232, 230, 229, 1, 4, 4, 1, 0
+	0, 0, 4, 9, 28, 31, 36, 39, 
+	42, 44, 48, 52, 55, 60, 65, 69, 
+	70, 73, 76, 79, 81, 85, 89, 94, 
+	97, 100, 102, 107, 110, 113, 116, 118, 
+	123, 126, 129, 132, 135, 137, 141, 145, 
+	148, 153, 154, 157, 160, 163, 166, 168, 
+	172, 176, 179, 184, 185, 188, 190, 194, 
+	200, 202, 208, 211, 214, 217, 219, 223, 
+	229, 231, 237, 242, 245, 248, 251, 254, 
+	256, 260, 264, 273, 276, 279, 282, 285, 
+	288, 290, 295, 298, 301, 303, 308, 311, 
+	314, 317, 319, 324, 329, 332, 335, 337, 
+	342, 345, 347, 352, 355, 357, 360, 363, 
+	366, 369, 371, 375, 381, 383, 389, 392, 
+	397, 399, 403, 407, 410, 415, 416, 419, 
+	422, 424, 428, 432, 451, 454, 457, 460, 
+	463, 465, 470, 473, 476, 479, 482, 484, 
+	489, 492, 495, 498, 501, 503, 508, 511, 
+	514, 517, 522, 525, 527, 532, 534, 539, 
+	542, 545, 548, 551, 554, 556, 561, 564, 
+	567, 570, 573, 575, 580, 583, 586, 589, 
+	591, 596, 599, 602, 605, 608, 610, 615, 
+	618, 621, 624, 626, 631, 634, 637, 640, 
+	643, 645, 648, 651, 654, 657, 659, 663, 
+	669, 671, 677, 680, 683, 686, 689, 691, 
+	695, 701, 703, 709
 };
 
 static const unsigned char _json_trans_targs[] = {
-	1, 0, 2, 3, 158, 4, 32, 38, 
-	46, 79, 149, 5, 6, 16, 7, 8, 
-	9, 10, 11, 11, 12, 15, 13, 14, 
-	158, 13, 14, 17, 18, 19, 20, 21, 
-	22, 23, 27, 24, 25, 26, 13, 14, 
-	158, 28, 29, 30, 31, 13, 14, 158, 
-	33, 34, 35, 36, 36, 37, 37, 13, 
-	14, 158, 39, 40, 41, 42, 43, 44, 
-	44, 45, 45, 13, 14, 158, 47, 48, 
-	49, 50, 51, 52, 53, 54, 55, 62, 
-	66, 71, 56, 57, 58, 59, 60, 61, 
-	13, 14, 158, 63, 64, 65, 13, 14, 
-	158, 67, 68, 69, 70, 13, 14, 158, 
-	72, 76, 73, 74, 75, 13, 14, 158, 
-	77, 78, 13, 14, 158, 80, 81, 87, 
-	82, 83, 84, 84, 85, 86, 13, 14, 
-	158, 88, 89, 90, 91, 92, 93, 99, 
-	105, 111, 120, 127, 133, 138, 144, 94, 
-	95, 96, 97, 98, 13, 14, 158, 100, 
-	101, 102, 103, 104, 13, 14, 158, 106, 
-	107, 108, 109, 110, 13, 14, 158, 112, 
-	113, 114, 115, 118, 116, 117, 13, 14, 
-	158, 119, 13, 14, 158, 121, 122, 123, 
-	124, 125, 126, 13, 14, 158, 128, 129, 
-	130, 131, 132, 13, 14, 158, 134, 135, 
-	136, 137, 13, 14, 158, 139, 140, 141, 
-	142, 143, 13, 14, 158, 145, 146, 147, 
-	148, 13, 14, 158, 150, 151, 152, 153, 
-	154, 155, 156, 156, 157, 157, 13, 14, 
-	158
+	1, 2, 1, 0, 2, 3, 203, 2, 
+	0, 4, 32, 42, 52, 58, 66, 110, 
+	180, 194, 4, 32, 42, 52, 58, 66, 
+	110, 180, 194, 0, 5, 5, 0, 6, 
+	16, 6, 16, 0, 7, 7, 0, 8, 
+	8, 0, 9, 0, 9, 10, 9, 0, 
+	10, 11, 10, 0, 12, 15, 11, 13, 
+	14, 203, 13, 0, 13, 14, 203, 13, 
+	0, 14, 3, 14, 0, 11, 17, 17, 
+	0, 18, 18, 0, 19, 19, 0, 20, 
+	0, 20, 21, 20, 0, 21, 22, 21, 
+	0, 23, 27, 23, 27, 0, 24, 24, 
+	0, 25, 25, 0, 26, 0, 13, 14, 
+	203, 13, 0, 28, 28, 0, 29, 29, 
+	0, 30, 30, 0, 31, 0, 13, 14, 
+	203, 13, 0, 33, 33, 0, 34, 34, 
+	0, 35, 35, 0, 36, 36, 0, 37, 
+	0, 37, 38, 37, 0, 38, 39, 38, 
+	0, 40, 41, 39, 13, 14, 203, 13, 
+	0, 39, 43, 43, 0, 44, 44, 0, 
+	45, 45, 0, 46, 46, 0, 47, 0, 
+	47, 48, 47, 0, 48, 49, 48, 0, 
+	50, 51, 49, 13, 14, 203, 13, 0, 
+	49, 53, 53, 0, 54, 0, 54, 55, 
+	54, 0, 55, 56, 56, 55, 57, 0, 
+	57, 0, 13, 14, 203, 13, 57, 0, 
+	59, 59, 0, 60, 60, 0, 61, 61, 
+	0, 62, 0, 62, 63, 62, 0, 63, 
+	64, 64, 63, 65, 0, 65, 0, 13, 
+	14, 203, 13, 65, 0, 67, 99, 67, 
+	99, 0, 68, 68, 0, 69, 69, 0, 
+	70, 70, 0, 71, 71, 0, 72, 0, 
+	72, 73, 72, 0, 73, 74, 73, 0, 
+	75, 82, 86, 91, 75, 82, 86, 91, 
+	0, 76, 76, 0, 77, 77, 0, 78, 
+	78, 0, 79, 79, 0, 80, 80, 0, 
+	81, 0, 13, 14, 203, 13, 0, 83, 
+	83, 0, 84, 84, 0, 85, 0, 13, 
+	14, 203, 13, 0, 87, 87, 0, 88, 
+	88, 0, 89, 89, 0, 90, 0, 13, 
+	14, 203, 13, 0, 92, 96, 92, 96, 
+	0, 93, 93, 0, 94, 94, 0, 95, 
+	0, 13, 14, 203, 13, 0, 97, 97, 
+	0, 98, 0, 13, 14, 203, 13, 0, 
+	100, 100, 0, 101, 0, 102, 102, 0, 
+	103, 103, 0, 104, 104, 0, 105, 105, 
+	0, 106, 0, 106, 107, 106, 0, 107, 
+	108, 108, 107, 109, 0, 109, 0, 13, 
+	14, 203, 13, 109, 0, 111, 111, 0, 
+	112, 118, 112, 118, 0, 113, 0, 113, 
+	114, 113, 0, 114, 115, 114, 0, 116, 
+	117, 115, 13, 14, 203, 13, 0, 115, 
+	119, 119, 0, 120, 120, 0, 121, 0, 
+	121, 122, 121, 0, 122, 123, 122, 0, 
+	124, 130, 136, 142, 151, 158, 164, 169, 
+	175, 124, 130, 136, 142, 151, 158, 164, 
+	169, 175, 0, 125, 125, 0, 126, 126, 
+	0, 127, 127, 0, 128, 128, 0, 129, 
+	0, 13, 14, 203, 13, 0, 131, 131, 
+	0, 132, 132, 0, 133, 133, 0, 134, 
+	134, 0, 135, 0, 13, 14, 203, 13, 
+	0, 137, 137, 0, 138, 138, 0, 139, 
+	139, 0, 140, 140, 0, 141, 0, 13, 
+	14, 203, 13, 0, 143, 143, 0, 144, 
+	144, 0, 145, 145, 0, 146, 149, 146, 
+	149, 0, 147, 147, 0, 148, 0, 13, 
+	14, 203, 13, 0, 150, 0, 13, 14, 
+	203, 13, 0, 152, 152, 0, 153, 153, 
+	0, 154, 154, 0, 155, 155, 0, 156, 
+	156, 0, 157, 0, 13, 14, 203, 13, 
+	0, 159, 159, 0, 160, 160, 0, 161, 
+	161, 0, 162, 162, 0, 163, 0, 13, 
+	14, 203, 13, 0, 165, 165, 0, 166, 
+	166, 0, 167, 167, 0, 168, 0, 13, 
+	14, 203, 13, 0, 170, 170, 0, 171, 
+	171, 0, 172, 172, 0, 173, 173, 0, 
+	174, 0, 13, 14, 203, 13, 0, 176, 
+	176, 0, 177, 177, 0, 178, 178, 0, 
+	179, 0, 13, 14, 203, 13, 0, 181, 
+	181, 0, 182, 182, 0, 183, 183, 0, 
+	184, 184, 0, 185, 0, 186, 186, 0, 
+	187, 187, 0, 188, 188, 0, 189, 189, 
+	0, 190, 0, 190, 191, 190, 0, 191, 
+	192, 192, 191, 193, 0, 193, 0, 13, 
+	14, 203, 13, 193, 0, 195, 195, 0, 
+	196, 196, 0, 197, 197, 0, 198, 198, 
+	0, 199, 0, 199, 200, 199, 0, 200, 
+	201, 201, 200, 202, 0, 202, 0, 13, 
+	14, 203, 13, 202, 0, 203, 203, 0, 
+	0
 };
 
-static const char _json_trans_actions[] = {
+static const unsigned char _json_trans_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 62, 3, 0, 0, 47, 47, 
-	47, 0, 0, 0, 0, 0, 0, 0, 
-	41, 0, 0, 0, 0, 0, 53, 53, 
-	53, 0, 0, 0, 0, 56, 56, 56, 
-	0, 0, 0, 59, 74, 78, 1, 39, 
-	39, 39, 0, 0, 0, 0, 0, 71, 
-	90, 94, 1, 45, 45, 45, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 72, 0, 0, 0, 0, 3, 51, 
+	51, 51, 51, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 3, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 43, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 63, 63, 
+	63, 63, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 66, 66, 
+	66, 66, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 78, 0, 
+	0, 0, 0, 3, 57, 57, 57, 57, 
+	0, 3, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 75, 0, 0, 
+	0, 0, 3, 54, 54, 54, 54, 0, 
+	3, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 69, 96, 0, 100, 0, 
+	1, 0, 39, 39, 39, 39, 1, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	90, 120, 0, 124, 0, 1, 0, 47, 
+	47, 47, 47, 1, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 35, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	5, 5, 5, 0, 0, 0, 7, 7, 
-	7, 0, 0, 0, 0, 9, 9, 9, 
-	0, 0, 0, 0, 0, 11, 11, 11, 
-	0, 0, 13, 13, 13, 0, 0, 0, 
-	0, 0, 65, 3, 0, 0, 50, 50, 
-	50, 0, 0, 0, 0, 37, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 19, 19, 19, 0, 
-	0, 0, 0, 0, 21, 21, 21, 0, 
-	0, 0, 0, 0, 25, 25, 25, 0, 
-	0, 0, 0, 0, 0, 0, 17, 17, 
-	17, 0, 15, 15, 15, 0, 0, 0, 
-	0, 0, 0, 33, 33, 33, 0, 0, 
-	0, 0, 0, 27, 27, 27, 0, 0, 
-	0, 0, 31, 31, 31, 0, 0, 0, 
-	0, 0, 29, 29, 29, 0, 0, 0, 
-	0, 23, 23, 23, 0, 0, 0, 0, 
-	0, 0, 68, 82, 86, 1, 43, 43, 
-	43
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 5, 5, 5, 5, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 7, 
+	7, 7, 7, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 9, 
+	9, 9, 9, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 11, 11, 11, 11, 0, 0, 0, 
+	0, 0, 0, 13, 13, 13, 13, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	93, 128, 0, 132, 0, 1, 0, 49, 
+	49, 49, 49, 1, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 84, 0, 0, 0, 
+	0, 3, 60, 60, 60, 60, 0, 3, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 37, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 19, 19, 19, 19, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 21, 21, 21, 21, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 25, 
+	25, 25, 25, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 17, 
+	17, 17, 17, 0, 0, 0, 15, 15, 
+	15, 15, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 33, 33, 33, 33, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 27, 
+	27, 27, 27, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 31, 
+	31, 31, 31, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 29, 29, 29, 29, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 23, 23, 23, 23, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	81, 104, 0, 108, 0, 1, 0, 41, 
+	41, 41, 41, 1, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 
+	87, 112, 0, 116, 0, 1, 0, 45, 
+	45, 45, 45, 1, 0, 0, 0, 0, 
+	0
 };
 
 static const int json_start = 1;
-static const int json_first_final = 158;
+static const int json_first_final = 203;
 static const int json_error = 0;
 
 static const int json_en_main = 1;
 
 
-#line 280 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 336 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 
 DBR_API void
 dbr_rest_init(struct DbrRest* rest)
 {
     int cs;
     
-#line 359 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 460 "/Users/marayl/repo/doobry/src/elm/rest.c"
 	{
 	cs = json_start;
 	}
 
-#line 286 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 342 "/Users/marayl/repo/doobry/src/elm/rest.rl"
     rest->cs = cs;
     rest->fields = 0;
 }
@@ -374,7 +475,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     int cs = rest->cs;
 	
-#line 378 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 479 "/Users/marayl/repo/doobry/src/elm/rest.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -436,7 +537,6 @@ _resume:
 	}
 
 _match:
-	_trans = _json_indicies[_trans];
 	cs = _json_trans_targs[_trans];
 
 	if ( _json_trans_actions[_trans] == 0 )
@@ -449,7 +549,7 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 32 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 41 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->num.sign = 1;
         rest->num.idigits = 0;
@@ -458,25 +558,25 @@ _match:
     }
 	break;
 	case 1:
-#line 38 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 47 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->num.sign = -1;
     }
 	break;
 	case 2:
-#line 41 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 50 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->num.idigits = rest->num.idigits * 10 + ((*p) - '0');
     }
 	break;
 	case 3:
-#line 89 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 98 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->str.count = 0;
     }
 	break;
 	case 4:
-#line 92 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 101 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->str.count < rest->str.max)
             rest->str.buf[rest->str.count++] = (*p);
@@ -487,116 +587,116 @@ _match:
     }
 	break;
 	case 5:
-#line 100 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 109 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->str.count < rest->str.max)
             rest->str.buf[rest->str.count] = '\0';
     }
 	break;
 	case 6:
-#line 115 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 124 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_DELETE;
     }
 	break;
 	case 7:
-#line 118 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 127 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_GET;
     }
 	break;
 	case 8:
-#line 121 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 130 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_HEAD;
     }
 	break;
 	case 9:
-#line 124 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 133 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_POST;
     }
 	break;
 	case 10:
-#line 127 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 136 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_PUT;
     }
 	break;
 	case 11:
-#line 136 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 145 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
     }
 	break;
 	case 12:
-#line 139 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 148 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
     }
 	break;
 	case 13:
-#line 142 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 151 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
     }
 	break;
 	case 14:
-#line 145 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 154 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
     }
 	break;
 	case 15:
-#line 148 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 157 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
     }
 	break;
 	case 16:
-#line 151 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 160 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
     }
 	break;
 	case 17:
-#line 154 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 163 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
     }
 	break;
 	case 18:
-#line 157 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 166 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
     }
 	break;
 	case 19:
-#line 160 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 169 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
     }
 	break;
 	case 20:
-#line 163 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 172 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
     }
 	break;
 	case 21:
-#line 177 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 186 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->action = DBR_ACTION_BUY;
     }
 	break;
 	case 22:
-#line 180 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 189 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->action = DBR_ACTION_SELL;
     }
 	break;
 	case 23:
-#line 189 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 198 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if ((rest->fields & DBR_METHOD_MASK) != 0) {
             cs = json_error; msg = "method already specified";
@@ -605,7 +705,7 @@ _match:
     }
 	break;
 	case 24:
-#line 195 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 204 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if ((rest->fields & DBR_RESRC_MASK) != 0) {
             cs = json_error; msg = "resrc already specified";
@@ -614,7 +714,7 @@ _match:
     }
 	break;
 	case 25:
-#line 201 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 210 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_ID) {
             cs = json_error; msg = "id already specified";
@@ -623,14 +723,14 @@ _match:
     }
 	break;
 	case 26:
-#line 207 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 216 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ID;
         rest->id = inum(rest);
     }
 	break;
 	case 27:
-#line 211 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 220 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_ACCNT) {
             cs = json_error; msg = "accnt already specified";
@@ -641,13 +741,63 @@ _match:
     }
 	break;
 	case 28:
-#line 219 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 228 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ACCNT;
     }
 	break;
 	case 29:
-#line 222 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 231 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        if (rest->fields & DBR_PARAM_GROUP) {
+            cs = json_error; msg = "group already specified";
+            {p++; goto _out; }
+        }
+        rest->str.buf = rest->group;
+        rest->str.max = DBR_MNEM_MAX;
+    }
+	break;
+	case 30:
+#line 239 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        rest->fields |= DBR_PARAM_GROUP;
+    }
+	break;
+	case 31:
+#line 242 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        if (rest->fields & DBR_PARAM_CONTR) {
+            cs = json_error; msg = "contr already specified";
+            {p++; goto _out; }
+        }
+        rest->str.buf = rest->contr;
+        rest->str.max = DBR_MNEM_MAX;
+    }
+	break;
+	case 32:
+#line 250 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        rest->fields |= DBR_PARAM_CONTR;
+    }
+	break;
+	case 33:
+#line 253 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        if (rest->fields & DBR_PARAM_SETTL_DATE) {
+            cs = json_error; msg = "settl-date already specified";
+            {p++; goto _out; }
+        }
+    }
+	break;
+	case 34:
+#line 259 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        rest->fields |= DBR_PARAM_SETTL_DATE;
+        rest->settl_date = inum(rest);
+    }
+	break;
+	case 35:
+#line 263 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_REF) {
             cs = json_error; msg = "ref already specified";
@@ -657,14 +807,14 @@ _match:
         rest->str.max = DBR_REF_MAX;
     }
 	break;
-	case 30:
-#line 230 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 36:
+#line 271 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_REF;
     }
 	break;
-	case 31:
-#line 233 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 37:
+#line 274 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_ACTION) {
             cs = json_error; msg = "action already specified";
@@ -672,14 +822,15 @@ _match:
         }
     }
 	break;
-	case 32:
-#line 239 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 38:
+#line 280 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ACTION;
+        rest->action = inum(rest);
     }
 	break;
-	case 33:
-#line 242 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 39:
+#line 284 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_TICKS) {
             cs = json_error; msg = "ticks already specified";
@@ -687,15 +838,15 @@ _match:
         }
     }
 	break;
-	case 34:
-#line 248 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 40:
+#line 290 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_TICKS;
         rest->ticks = inum(rest);
     }
 	break;
-	case 35:
-#line 252 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 41:
+#line 294 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_LOTS) {
             cs = json_error; msg = "lots already specified";
@@ -703,14 +854,30 @@ _match:
         }
     }
 	break;
-	case 36:
-#line 258 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	case 42:
+#line 300 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_LOTS;
         rest->lots = inum(rest);
     }
 	break;
-#line 714 "/Users/marayl/repo/doobry/src/elm/rest.c"
+	case 43:
+#line 304 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        if (rest->fields & DBR_PARAM_MIN_LOTS) {
+            cs = json_error; msg = "min-lots already specified";
+            {p++; goto _out; }
+        }
+    }
+	break;
+	case 44:
+#line 310 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+	{
+        rest->fields |= DBR_PARAM_MIN_LOTS;
+        rest->min_lots = inum(rest);
+    }
+	break;
+#line 881 "/Users/marayl/repo/doobry/src/elm/rest.c"
 		}
 	}
 
@@ -723,7 +890,7 @@ _again:
 	_out: {}
 	}
 
-#line 299 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 355 "/Users/marayl/repo/doobry/src/elm/rest.rl"
     rest->cs = cs;
 
 	if (cs == json_error) {
@@ -738,21 +905,23 @@ _again:
 }
 
 
-#line 430 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 488 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 
 
 
-#line 746 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 913 "/Users/marayl/repo/doobry/src/elm/rest.c"
 static const char _rurl_actions[] = {
 	0, 1, 1, 1, 3, 1, 7, 1, 
 	11, 1, 12, 1, 13, 1, 14, 1, 
 	20, 1, 21, 2, 0, 1, 2, 2, 
 	3, 2, 6, 17, 2, 6, 18, 2, 
-	9, 20, 3, 4, 8, 15, 3, 4, 
-	8, 16, 3, 4, 8, 17, 3, 4, 
-	8, 18, 3, 4, 8, 19, 3, 4, 
-	10, 20, 4, 4, 8, 5, 17, 4, 
-	4, 8, 5, 18
+	7, 13, 2, 9, 14, 2, 9, 20, 
+	3, 4, 8, 13, 3, 4, 8, 15, 
+	3, 4, 8, 16, 3, 4, 8, 17, 
+	3, 4, 8, 18, 3, 4, 8, 19, 
+	3, 4, 10, 14, 3, 4, 10, 20, 
+	4, 4, 8, 5, 17, 4, 4, 8, 
+	5, 18
 };
 
 static const char _rurl_key_offsets[] = {
@@ -762,9 +931,9 @@ static const char _rurl_key_offsets[] = {
 	32, 33, 34, 35, 36, 37, 38, 39, 
 	40, 41, 42, 43, 44, 45, 46, 47, 
 	48, 49, 50, 51, 52, 53, 54, 55, 
-	56, 57, 58, 58, 59, 60, 61, 62, 
-	63, 64, 65, 66, 68, 71, 72, 73, 
-	75, 78
+	56, 57, 58, 59, 60, 60, 61, 62, 
+	63, 64, 65, 66, 67, 68, 69, 70, 
+	72, 75, 76, 77, 79, 82
 };
 
 static const char _rurl_trans_keys[] = {
@@ -776,8 +945,9 @@ static const char _rurl_trans_keys[] = {
 	47, 111, 115, 110, 47, 47, 114, 97, 
 	100, 101, 47, 47, 115, 101, 114, 47, 
 	47, 47, 47, 47, 47, 47, 47, 47, 
-	47, 47, 48, 57, 47, 48, 57, 47, 
-	47, 48, 57, 47, 48, 57, 47, 0
+	47, 47, 47, 47, 47, 47, 48, 57, 
+	47, 48, 57, 47, 47, 48, 57, 47, 
+	48, 57, 47, 0
 };
 
 static const char _rurl_single_lengths[] = {
@@ -787,9 +957,9 @@ static const char _rurl_single_lengths[] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 
 	1, 1, 1, 1, 1, 1, 1, 1, 
 	1, 1, 1, 1, 1, 1, 1, 1, 
-	1, 1, 0, 1, 1, 1, 1, 1, 
-	1, 1, 1, 0, 1, 1, 1, 0, 
-	1, 1
+	1, 1, 1, 1, 0, 1, 1, 1, 
+	1, 1, 1, 1, 1, 1, 1, 0, 
+	1, 1, 1, 0, 1, 1
 };
 
 static const char _rurl_range_lengths[] = {
@@ -800,8 +970,8 @@ static const char _rurl_range_lengths[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 1, 1, 0, 0, 1, 
-	1, 0
+	0, 0, 0, 0, 0, 0, 0, 1, 
+	1, 0, 0, 1, 1, 0
 };
 
 static const unsigned char _rurl_index_offsets[] = {
@@ -811,30 +981,31 @@ static const unsigned char _rurl_index_offsets[] = {
 	55, 57, 59, 61, 63, 65, 67, 69, 
 	71, 73, 75, 77, 79, 81, 83, 85, 
 	87, 89, 91, 93, 95, 97, 99, 101, 
-	103, 105, 107, 108, 110, 112, 114, 116, 
-	118, 120, 122, 124, 126, 129, 131, 133, 
-	135, 138
+	103, 105, 107, 109, 111, 112, 114, 116, 
+	118, 120, 122, 124, 126, 128, 130, 132, 
+	134, 137, 139, 141, 143, 146
 };
 
 static const char _rurl_trans_targs[] = {
 	2, 0, 3, 7, 11, 17, 22, 27, 
 	33, 38, 44, 0, 4, 0, 5, 0, 
 	6, 0, 49, 0, 8, 0, 9, 0, 
-	10, 0, 51, 0, 12, 0, 13, 0, 
-	14, 0, 15, 0, 16, 0, 0, 52, 
-	18, 0, 19, 0, 20, 0, 21, 54, 
-	0, 53, 0, 23, 0, 24, 0, 25, 
-	0, 26, 0, 55, 0, 28, 0, 29, 
+	10, 0, 53, 0, 12, 0, 13, 0, 
+	14, 0, 15, 0, 16, 0, 0, 56, 
+	18, 0, 19, 0, 20, 0, 21, 58, 
+	0, 57, 0, 23, 0, 24, 0, 25, 
+	0, 26, 0, 59, 0, 28, 0, 29, 
 	0, 30, 0, 31, 0, 32, 0, 0, 
-	58, 34, 0, 35, 0, 36, 0, 37, 
-	0, 0, 61, 39, 0, 40, 0, 41, 
-	0, 42, 0, 43, 0, 0, 62, 45, 
+	62, 34, 0, 35, 0, 36, 0, 37, 
+	0, 0, 65, 39, 0, 40, 0, 41, 
+	0, 42, 0, 43, 0, 0, 66, 45, 
 	0, 46, 0, 47, 0, 48, 0, 0, 
-	65, 50, 0, 0, 50, 0, 50, 52, 
-	50, 0, 50, 0, 56, 0, 0, 57, 
-	50, 57, 59, 58, 60, 0, 50, 60, 
-	0, 50, 61, 63, 62, 64, 0, 50, 
-	64, 0, 50, 65, 0
+	69, 50, 0, 0, 51, 52, 51, 0, 
+	54, 0, 0, 55, 52, 55, 52, 56, 
+	52, 0, 52, 0, 60, 0, 0, 61, 
+	52, 61, 63, 62, 64, 0, 52, 64, 
+	0, 52, 65, 67, 66, 68, 0, 52, 
+	68, 0, 52, 69, 0
 };
 
 static const char _rurl_trans_actions[] = {
@@ -851,11 +1022,12 @@ static const char _rurl_trans_actions[] = {
 	0, 0, 22, 0, 0, 0, 0, 0, 
 	0, 0, 0, 5, 0, 0, 22, 0, 
 	0, 0, 0, 0, 0, 5, 0, 0, 
-	22, 11, 0, 0, 13, 0, 38, 3, 
-	9, 0, 7, 0, 31, 0, 0, 22, 
-	54, 3, 58, 3, 19, 0, 25, 1, 
-	0, 50, 3, 63, 3, 19, 0, 28, 
-	1, 0, 34, 3, 0
+	22, 31, 0, 0, 22, 40, 3, 0, 
+	34, 0, 0, 22, 64, 3, 48, 3, 
+	9, 0, 7, 0, 37, 0, 0, 22, 
+	68, 3, 72, 3, 19, 0, 25, 1, 
+	0, 60, 3, 77, 3, 19, 0, 28, 
+	1, 0, 44, 3, 0
 };
 
 static const char _rurl_eof_actions[] = {
@@ -865,9 +1037,9 @@ static const char _rurl_eof_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 11, 0, 13, 38, 9, 7, 15, 
-	0, 54, 42, 0, 25, 50, 46, 0, 
-	28, 34
+	0, 11, 0, 40, 0, 13, 0, 64, 
+	48, 9, 7, 15, 0, 68, 52, 0, 
+	25, 60, 56, 0, 28, 44
 };
 
 static const int rurl_start = 1;
@@ -877,7 +1049,7 @@ static const int rurl_error = 0;
 static const int rurl_en_main = 1;
 
 
-#line 433 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 491 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 
 DBR_API int
 dbr_rest_rurl(struct DbrRest* rest, const char* buf, size_t size)
@@ -896,14 +1068,14 @@ dbr_rest_rurl(struct DbrRest* rest, const char* buf, size_t size)
     } str;
 
     
-#line 900 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1072 "/Users/marayl/repo/doobry/src/elm/rest.c"
 	{
 	cs = rurl_start;
 	}
 
-#line 451 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 509 "/Users/marayl/repo/doobry/src/elm/rest.rl"
     
-#line 907 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1079 "/Users/marayl/repo/doobry/src/elm/rest.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -977,25 +1149,25 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 315 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 371 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         inum = 0;
     }
 	break;
 	case 1:
-#line 318 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 374 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         inum = inum * 10 + ((*p) - '0');
     }
 	break;
 	case 2:
-#line 323 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 379 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         str.count = 0;
     }
 	break;
 	case 3:
-#line 326 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 382 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (str.count < str.max)
             str.buf[str.count++] = (*p);
@@ -1006,14 +1178,14 @@ _match:
     }
 	break;
 	case 4:
-#line 334 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 390 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (str.count < str.max)
             str.buf[str.count] = '\0';
     }
 	break;
 	case 5:
-#line 340 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 396 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_ID) {
             cs = rurl_error; msg = "id already specified";
@@ -1022,14 +1194,14 @@ _match:
     }
 	break;
 	case 6:
-#line 346 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 402 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ID;
         rest->id = inum;
     }
 	break;
 	case 7:
-#line 353 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 409 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_ACCNT) {
             cs = rurl_error; msg = "accnt already specified";
@@ -1040,13 +1212,13 @@ _match:
     }
 	break;
 	case 8:
-#line 361 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 417 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ACCNT;
     }
 	break;
 	case 9:
-#line 366 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 424 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (rest->fields & DBR_PARAM_CONTR) {
             cs = rurl_error; msg = "contr already specified";
@@ -1057,73 +1229,73 @@ _match:
     }
 	break;
 	case 10:
-#line 374 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 432 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_CONTR;
     }
 	break;
 	case 11:
-#line 380 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 438 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
     }
 	break;
 	case 12:
-#line 383 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 441 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
     }
 	break;
 	case 13:
-#line 386 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 444 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
     }
 	break;
 	case 14:
-#line 389 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 447 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
     }
 	break;
 	case 15:
-#line 392 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 450 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
     }
 	break;
 	case 16:
-#line 395 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 453 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
     }
 	break;
 	case 17:
-#line 398 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 456 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
     }
 	break;
 	case 18:
-#line 401 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 459 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
     }
 	break;
 	case 19:
-#line 404 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 462 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
     }
 	break;
 	case 20:
-#line 407 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 465 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
     }
 	break;
 	case 21:
-#line 422 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 480 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if ((rest->fields & DBR_RESRC_MASK) != 0) {
             cs = rurl_error; msg = "resrc already specified";
@@ -1131,7 +1303,7 @@ _match:
         }
     }
 	break;
-#line 1135 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1307 "/Users/marayl/repo/doobry/src/elm/rest.c"
 		}
 	}
 
@@ -1148,92 +1320,92 @@ _again:
 	while ( __nacts-- > 0 ) {
 		switch ( *__acts++ ) {
 	case 4:
-#line 334 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 390 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         if (str.count < str.max)
             str.buf[str.count] = '\0';
     }
 	break;
 	case 6:
-#line 346 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 402 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ID;
         rest->id = inum;
     }
 	break;
 	case 8:
-#line 361 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 417 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_ACCNT;
     }
 	break;
 	case 10:
-#line 374 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 432 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields |= DBR_PARAM_CONTR;
     }
 	break;
 	case 11:
-#line 380 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 438 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
     }
 	break;
 	case 12:
-#line 383 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 441 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
     }
 	break;
 	case 13:
-#line 386 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 444 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
     }
 	break;
 	case 14:
-#line 389 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 447 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
     }
 	break;
 	case 15:
-#line 392 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 450 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
     }
 	break;
 	case 16:
-#line 395 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 453 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
     }
 	break;
 	case 17:
-#line 398 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 456 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
     }
 	break;
 	case 18:
-#line 401 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 459 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
     }
 	break;
 	case 19:
-#line 404 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 462 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
     }
 	break;
 	case 20:
-#line 407 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 465 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
         rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
     }
 	break;
-#line 1237 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1409 "/Users/marayl/repo/doobry/src/elm/rest.c"
 		}
 	}
 	}
@@ -1241,7 +1413,7 @@ _again:
 	_out: {}
 	}
 
-#line 452 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 510 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 
 	if (cs == rurl_error) {
         dbr_err_set(DBR_EINVAL, msg);

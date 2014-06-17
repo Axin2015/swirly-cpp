@@ -41,10 +41,10 @@ enum DbrMethod {
 };
 
 enum DbrResrc {
-    DBR_RESRC_ACCNT   =  1 << 16,
-    DBR_RESRC_CONTR   =  2 << 16,
-    DBR_RESRC_LOGON   =  3 << 16,
-    DBR_RESRC_LOGOFF  =  4 << 16,
+    DBR_RESRC_LOGON   =  1 << 16,
+    DBR_RESRC_LOGOFF  =  2 << 16,
+    DBR_RESRC_ACCNT   =  3 << 16,
+    DBR_RESRC_CONTR   =  4 << 16,
     DBR_RESRC_USER    =  5 << 16,
     DBR_RESRC_GROUP   =  6 << 16,
     DBR_RESRC_ORDER   =  7 << 16,
@@ -84,7 +84,6 @@ struct DbrRest {
     unsigned fields;
     DbrIden id;
     DbrMnem accnt;
-    DbrMnem user;
     DbrMnem group;
     DbrMnem contr;
     DbrIsoDate settl_date;
