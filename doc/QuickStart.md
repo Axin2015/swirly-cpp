@@ -1,4 +1,4 @@
-Quick Start
+Quick Start {#QuickStart}
 ===========
 
 Environment Variables
@@ -15,7 +15,6 @@ It is recommended that you also modify your environment, so that the binaries in
 
     PATH=$PATH:$DOOBRY_HOME/bin; export PATH
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$DOOBRY_HOME/lib; export LD_LIBRARY_PATH
-    PYTHONPATH=$DOOBRY_HOME/lib; export PYTHONPATH
 
 Dependencies
 ------------
@@ -29,8 +28,8 @@ To build Doobry from source, you will need:
 - [SQLite] - for database management;
 - [ZeroMQ] - for messaging.
 
-Installing
-----------
+Build from Source
+-----------------
 
 The following sections assume that `DOOBRY_SOURCE` is equal to `SOURCE_DIR/doobry`, and that
 `DOOBRY_BUILD` is equal to `BUILD_DIR/doobry`.
@@ -44,7 +43,7 @@ Download the source from [GitHub](http://github.com/doobry-org):
 
 The `SOURCE_DIR/doobry` directory should now contain the source.
 
-### Configuration ###
+### Configure ###
 
 Configure using `cmake` as follows from the build directory:
 
@@ -54,18 +53,26 @@ Configure using `cmake` as follows from the build directory:
     $ cmake $SOURCE_DIR/doobry -DCMAKE_INSTALL_PREFIX=$DOOBRY_HOME
 
 This step will produce Unix Makefiles by default.
+See CMake Options for more information.
 
-### Build ###
+### Make ###
 
-Assuming that you have write access to the default installation path:
+Compile the code in the build directory using the `make` command:
 
     $ cd $BUILD_DIR/doobry
     $ make
+
+### Install ###
+
+Install to `CMAKE_INSTALL_PREFIX`:
+
     $ make install
 
-See CMake Options for more information.
+Next Steps
+----------
 
-### Tutorial ###
+- use the [admin guide](AdminGuide.html) to create a database and start the daemon;
+- start the shell and walk through the steps in the [tutorial](Tutorial.html).
 
 [GCC]: http://gcc.gnu.org/
 [Clang]: http://clang.llvm.org/

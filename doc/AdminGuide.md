@@ -1,8 +1,16 @@
-Admin Guide
+Admin Guide {#AdminGuide}
 ===========
 
-Configuration
--------------
+Database Creation
+-----------------
+
+The example database can be created as follows:
+
+    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_schema.sql 
+    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_example.sql 
+
+Daemon Configuration
+--------------------
 
 ### Synopsis ###
 
@@ -16,13 +24,6 @@ Configuration
 | poolsize  | size of main mempool in bytes       |
 
 ### Bank ###
-
-### Database ###
-
-The example database can be created as follows:
-
-    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_schema.sql 
-    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_example.sql 
 
 ### Logger ###
 
@@ -46,8 +47,8 @@ The `logfile` option is ignored unless `daemon=yes`:
     journsize = 1048576
     poolsize = 8388608
 
-Operations
-----------
+Daemon Operations
+-----------------
 
 ### Starting ###
 

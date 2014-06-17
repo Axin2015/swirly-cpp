@@ -1,4 +1,4 @@
-Target Architecture
+Target Architecture {#TargetArchitecture}
 ===================
 
 ![Target Architecture](@ref TargetArch.png)

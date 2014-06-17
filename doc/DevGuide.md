@@ -1,4 +1,4 @@
-Dev Guide
+Dev Guide {#DevGuide}
 =========
 
 CMake Options
