@@ -20,8 +20,6 @@
 
 #include <dbr/err.h>
 
-#pragma GCC diagnostic ignored "-Wunused-const-variable"
-
 static long
 inum(const struct DbrRest* rest)
 {

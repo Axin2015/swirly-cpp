@@ -3,6 +3,12 @@ INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src")
 INCLUDE_DIRECTORIES("${LIBUUID_INCLUDE_DIRS}")
 INCLUDE_DIRECTORIES("${ZEROMQ_INCLUDE_DIRS}")
 
+IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -Werror -Wno-unused-variable -Wno-maybe-uninitialized -fstrict-aliasing -fvisibility=hidden")
+ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  SET(CMAKE_C_FLAGS "-std=c11 -Wall -Werror -Werror -Wno-unused-const-variable -fstrict-aliasing -fvisibility=hidden")
+ENDIF()
+
 IF(RAGEL)
   ADD_CUSTOM_COMMAND(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
