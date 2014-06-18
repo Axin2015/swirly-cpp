@@ -20,6 +20,8 @@
 
 #include <dbr/err.h>
 
+#pragma GCC diagnostic ignored "-Wunused-const-variable"
+
 static long
 inum(const struct DbrRest* rest)
 {
@@ -421,6 +423,19 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
                | '';
     req_accnt = ('/' str) >begin_accnt %end_accnt;
 
+    action begin_group {
+        if (rest->fields & DBR_PARAM_GROUP) {
+            cs = rurl_error; msg = "group already specified";
+            fbreak;
+        }
+        str.buf = rest->group;
+        str.max = DBR_MNEM_MAX;
+    }
+    action end_group {
+        rest->fields |= DBR_PARAM_GROUP;
+    }
+    req_group = ('/' str) >begin_group %end_group;
+
     action begin_contr {
         if (rest->fields & DBR_PARAM_CONTR) {
             cs = rurl_error; msg = "contr already specified";
@@ -474,7 +489,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
            | ('group' req_accnt) %group_resrc
            | ('order' req_accnt opt_id) %order_resrc
            | ('trade' req_accnt opt_id) %trade_resrc
-           | ('posn' req_accnt) %posn_resrc
+           | ('posn' req_group) %posn_resrc
            | ('market' opt_contr) %market_resrc;
 
     action begin_resrc {

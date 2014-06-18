@@ -411,6 +411,22 @@ public:
     }
     // This.
     void
+    logon(Async& async, Arg begin, Arg end)
+    {
+        const string umnem = get("user");
+        call(async, [umnem](ClntRef clnt) {
+                clnt.logon(clnt.accnt(get_arec(clnt, umnem.c_str())));
+            });
+    }
+    void
+    logoff(Async& async, Arg begin, Arg end)
+    {
+        const string umnem = get("user");
+        call(async, [umnem](ClntRef clnt) {
+                clnt.logoff(clnt.accnt(get_arec(clnt, umnem.c_str())));
+            });
+    }
+    void
     accnt(Async& async, Arg begin, Arg end)
     {
         enum { COLS = 3 };
@@ -483,22 +499,6 @@ public:
                 }
             });
         print_table(cout, head, width, rows);
-    }
-    void
-    logon(Async& async, Arg begin, Arg end)
-    {
-        const string umnem = get("user");
-        call(async, [umnem](ClntRef clnt) {
-                clnt.logon(clnt.accnt(get_arec(clnt, umnem.c_str())));
-            });
-    }
-    void
-    logoff(Async& async, Arg begin, Arg end)
-    {
-        const string umnem = get("user");
-        call(async, [umnem](ClntRef clnt) {
-                clnt.logoff(clnt.accnt(get_arec(clnt, umnem.c_str())));
-            });
     }
     void
     user(Async& async, Arg begin, Arg end)

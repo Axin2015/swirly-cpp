@@ -63,6 +63,11 @@ public:
     {
         return impl_.fields;
     }
+    DbrIden
+    id() const noexcept
+    {
+        return impl_.id;
+    }
     Mnem
     accnt() const noexcept
     {
