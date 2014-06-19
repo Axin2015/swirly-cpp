@@ -46,28 +46,30 @@ SET(dbr_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/stub.cpp)
 
 # C header files.
 
-FILE(GLOB dbr_HEADERS RELATIVE ${PROJECT_SOURCE_DIR}/include/dbr
-  "${PROJECT_SOURCE_DIR}/include/dbr/*.h")
+FILE(GLOB_RECURSE dbr_HEADERS RELATIVE ${PROJECT_SOURCE_DIR}/include
+  "${PROJECT_SOURCE_DIR}/include/*.h")
 FOREACH(header ${dbr_HEADERS})
 
-  STRING(REGEX REPLACE ".h\$" ".c" source ${header})
-  MESSAGE(STATUS "generate dbr_${source} from ${header}")
+  STRING(REPLACE "/" "_" source ${header})
+  STRING(REGEX REPLACE ".h\$" ".c" source ${source})
+  MESSAGE(STATUS "generate ${source} from ${header}")
 
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dbr_${source} "#include <dbr/${header}>")
-  SET(dbr_SOURCES ${dbr_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/dbr_${source})
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${source} "#include <${header}>")
+  SET(dbr_SOURCES ${dbr_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/${source})
 ENDFOREACH()
 
 # C++ header files.
 
-FILE(GLOB dbrpp_HEADERS RELATIVE ${PROJECT_SOURCE_DIR}/include/dbrpp
-  "${PROJECT_SOURCE_DIR}/include/dbrpp/*.hpp")
+FILE(GLOB_RECURSE dbrpp_HEADERS RELATIVE ${PROJECT_SOURCE_DIR}/include
+  "${PROJECT_SOURCE_DIR}/include/*.hpp")
 FOREACH(header ${dbrpp_HEADERS})
 
-  STRING(REGEX REPLACE ".hpp\$" ".cpp" source ${header})
-  MESSAGE(STATUS "generate dbrpp_${source} from ${header}")
+  STRING(REPLACE "/" "_" source ${header})
+  STRING(REGEX REPLACE ".hpp\$" ".cpp" source ${source})
+  MESSAGE(STATUS "generate ${source} from ${header}")
 
-  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dbrpp_${source} "#include <dbrpp/${header}>")
-  SET(dbrpp_SOURCES ${dbrpp_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/dbrpp_${source})
+  FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${source} "#include <${header}>")
+  SET(dbrpp_SOURCES ${dbrpp_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/${source})
 ENDFOREACH()
 
 # Stub executable for compilation.
