@@ -580,7 +580,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id)
 }
 
 DBR_API DbrIden
-dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
+dbr_clnt_set_timer(DbrClnt clnt, DbrMillis absms)
 {
     DbrIden id = clnt->id++;
     if (!dbr_prioq_push(&clnt->prioq, id, absms))
@@ -589,7 +589,7 @@ dbr_clnt_settimer(DbrClnt clnt, DbrMillis absms)
 }
 
 DBR_API void
-dbr_clnt_canceltimer(DbrClnt clnt, DbrIden id)
+dbr_clnt_cancel_timer(DbrClnt clnt, DbrIden id)
 {
     dbr_prioq_remove(&clnt->prioq, id);
 }

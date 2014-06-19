@@ -497,17 +497,17 @@ public:
         return req_id;
     }
     DbrIden
-    settimer(DbrMillis absms)
+    set_timer(DbrMillis absms)
     {
-        const DbrIden id = dbr_clnt_settimer(impl_, absms);
+        const DbrIden id = dbr_clnt_set_timer(impl_, absms);
         if (id < 0)
             throw_exception();
         return id;
     }
     void
-    canceltimer(DbrIden id)
+    cancel_timer(DbrIden id)
     {
-        dbr_clnt_canceltimer(impl_, id);
+        dbr_clnt_cancel_timer(impl_, id);
     }
     /**
      * @addtogroup ClntView
@@ -670,17 +670,17 @@ public:
         return req_id;
     }
     DbrIden
-    settimer(DbrMillis absms)
+    set_timer(DbrMillis absms)
     {
-        const DbrIden id = dbr_clnt_settimer(impl_, absms);
+        const DbrIden id = dbr_clnt_set_timer(impl_, absms);
         if (id < 0)
             throw_exception();
         return id;
     }
     void
-    canceltimer(DbrIden id)
+    cancel_timer(DbrIden id)
     {
-        dbr_clnt_canceltimer(impl_, id);
+        dbr_clnt_cancel_timer(impl_, id);
     }
     /**
      * @addtogroup ClntView
