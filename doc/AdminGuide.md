@@ -6,8 +6,8 @@ Database Creation
 
 The example database can be created as follows:
 
-    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_schema.sql 
-    $ sqlite3 doobry.db $DOOBRY_HOME/etc/dbr_example.sql 
+    $ sqlite3 doobry.db \< $DOOBRY_HOME/etc/dbr_schema.sql
+    $ sqlite3 doobry.db \< $DOOBRY_HOME/etc/dbr_example.sql
 
 Daemon Configuration
 --------------------
