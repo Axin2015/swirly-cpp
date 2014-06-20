@@ -17,9 +17,10 @@
  */
 #include <dbr/fig/side.h>
 
+#include <dbr/elm/pool.h>
+
 #include <dbr/ash/err.h>
 #include <dbr/ash/log.h>
-#include <dbr/elm/pool.h>
 
 #include <stdlib.h>
 

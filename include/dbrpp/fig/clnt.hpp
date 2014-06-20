@@ -19,8 +19,10 @@
 #define DBRPP_FIG_CLNT_HPP
 
 #include <dbrpp/fig/accnt.hpp>
-#include <dbrpp/ash/except.hpp>
+
 #include <dbrpp/elm/order.hpp>
+
+#include <dbrpp/ash/except.hpp>
 #include <dbrpp/ash/slnode.hpp>
 
 #include <dbr/fig/clnt.h>

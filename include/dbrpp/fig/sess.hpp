@@ -18,10 +18,11 @@
 #ifndef DBRPP_FIG_SESS_HPP
 #define DBRPP_FIG_SESS_HPP
 
+#include <dbrpp/elm/types.hpp>
+
 #include <dbrpp/ash/except.hpp>
 #include <dbrpp/ash/iter.hpp>
 #include <dbrpp/ash/rbnode.hpp>
-#include <dbrpp/elm/types.hpp>
 
 #include <dbr/fig/sess.h>
 

@@ -23,8 +23,9 @@
 #include "ordidx.h"
 #include "sessidx.h"
 
-#include <dbr/ash/bank.h>
 #include <dbr/fig/book.h>
+
+#include <dbr/ash/bank.h>
 #include <dbr/ash/err.h>
 #include <dbr/ash/queue.h>
 #include <dbr/ash/util.h>

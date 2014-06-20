@@ -18,8 +18,9 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/elm/pool.hpp>
 #include <dbrpp/fig/serv.hpp>
+
+#include <dbrpp/elm/pool.hpp>
 
 using namespace dbr;
 

@@ -18,8 +18,9 @@
 #ifndef DBR_ASH_REST_H
 #define DBR_ASH_REST_H
 
-#include <dbr/ash/defs.h>
 #include <dbr/elm/types.h>
+
+#include <dbr/ash/defs.h>
 
 /**
  * @addtogroup Rest

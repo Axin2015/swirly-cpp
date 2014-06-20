@@ -19,10 +19,12 @@
 
 #include "accnt.h"
 
+#include <dbr/fig/side.h>
+
+#include <dbr/elm/refcount.h>
+
 #include <dbr/ash/bank.h>
 #include <dbr/ash/queue.h>
-#include <dbr/elm/refcount.h>
-#include <dbr/fig/side.h>
 
 #include <string.h>
 

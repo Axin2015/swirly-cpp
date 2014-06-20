@@ -19,11 +19,12 @@
 #include "pool.h"
 #include "proto.h"
 
+#include <dbr/elm/proto.h>
+#include <dbr/elm/refcount.h>
+
 #include <dbr/ash/err.h>
 #include <dbr/ash/pack.h>
-#include <dbr/elm/proto.h>
 #include <dbr/ash/queue.h>
-#include <dbr/elm/refcount.h>
 
 #include <stdlib.h> // abort()
 #include <string.h>

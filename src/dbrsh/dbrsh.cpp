@@ -16,14 +16,17 @@
  *  02110-1301 USA.
  */
 #include <dbrpp/fig/ctx.hpp>
-#include <dbrpp/elm/exec.hpp>
+
 #include <dbrpp/fig/handler.hpp>
+
+#include <dbrpp/elm/exec.hpp>
 #include <dbrpp/elm/memb.hpp>
-#include <dbrpp/ash/mutex.hpp>
 #include <dbrpp/elm/posn.hpp>
+#include <dbrpp/elm/view.hpp>
+
+#include <dbrpp/ash/mutex.hpp>
 #include <dbrpp/ash/shlex.hpp>
 #include <dbrpp/ash/string.hpp>
-#include <dbrpp/elm/view.hpp>
 
 #include <dbr/ash/log.h>
 #include <dbr/ash/util.h> // dbr_millis()

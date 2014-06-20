@@ -18,7 +18,7 @@
 #ifndef DBRPP_FIG_DISPATCH_HPP
 #define DBRPP_FIG_DISPATCH_HPP
 
-#include <dbrpp/except.hpp>
+#include <dbrpp/ash/except.hpp>
 
 #include <dbr/fig/dispatch.h>
 

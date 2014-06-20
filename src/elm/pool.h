@@ -19,10 +19,10 @@
 #define ELM_POOL_H
 
 #include <dbr/elm/pool.h>
+#include <dbr/elm/types.h>
 
 #include <dbr/ash/log.h>
 #include <dbr/ash/slnode.h>
-#include <dbr/elm/types.h>
 
 struct ElmSmallBlock;
 struct ElmLargeBlock;

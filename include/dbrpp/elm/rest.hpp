@@ -18,8 +18,9 @@
 #ifndef DBRPP_ELM_REST_HPP
 #define DBRPP_ELM_REST_HPP
 
-#include <dbrpp/ash/except.hpp>
 #include <dbrpp/elm/types.hpp>
+
+#include <dbrpp/ash/except.hpp>
 
 #include <dbr/elm/rest.h>
 

@@ -18,10 +18,11 @@
 #include "factory.hpp"
 #include "test.hpp"
 
+#include <dbrpp/fig/side.hpp>
+
 #include <dbrpp/elm/level.hpp>
 #include <dbrpp/elm/order.hpp>
 #include <dbrpp/elm/pool.hpp>
-#include <dbrpp/fig/side.hpp>
 
 #include <dbr/ash/util.h>
 

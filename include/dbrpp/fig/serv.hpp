@@ -20,9 +20,11 @@
 
 #include <dbrpp/fig/accnt.hpp>
 #include <dbrpp/fig/book.hpp>
-#include <dbrpp/ash/except.hpp>
-#include <dbrpp/elm/order.hpp>
 #include <dbrpp/fig/sess.hpp>
+
+#include <dbrpp/elm/order.hpp>
+
+#include <dbrpp/ash/except.hpp>
 #include <dbrpp/ash/slnode.hpp>
 
 #include <dbr/fig/serv.h>

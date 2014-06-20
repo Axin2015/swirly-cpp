@@ -18,9 +18,10 @@
 #include "proto.h"
 
 #include <dbr/elm/conv.h>
+#include <dbr/elm/types.h>
+
 #include <dbr/ash/err.h>
 #include <dbr/ash/pack.h>
-#include <dbr/elm/types.h>
 
 #include <stdlib.h> // abort()
 

@@ -20,8 +20,9 @@
 
 // Record cache.
 
-#include <dbr/ash/stack.h>
 #include <dbr/elm/types.h>
+
+#include <dbr/ash/stack.h>
 
 #include <assert.h>
 

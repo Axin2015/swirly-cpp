@@ -17,8 +17,9 @@
  */
 #include "cache.h"
 
-#include <dbr/ash/err.h>
 #include <dbr/elm/pool.h>
+
+#include <dbr/ash/err.h>
 
 #include <stdlib.h> // abort()
 #include <string.h>

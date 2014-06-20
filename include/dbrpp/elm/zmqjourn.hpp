@@ -18,7 +18,7 @@
 #ifndef DBRPP_ELM_ZMQJOURN_HPP
 #define DBRPP_ELM_ZMQJOURN_HPP
 
-#include <dbrpp/journ.hpp>
+#include <dbrpp/elm/journ.hpp>
 
 #include <dbr/elm/zmqjourn.h>
 

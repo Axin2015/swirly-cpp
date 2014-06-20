@@ -18,7 +18,7 @@
 #ifndef DBRPP_ASH_BANK_HPP
 #define DBRPP_ASH_BANK_HPP
 
-#include <dbrpp/except.hpp>
+#include <dbrpp/ash/except.hpp>
 
 #include <dbr/ash/bank.h>
 
