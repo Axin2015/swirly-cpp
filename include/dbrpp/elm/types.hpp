@@ -15,24 +15,27 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ELM_TYPES_HPP
+#define DBRPP_ELM_TYPES_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/ash/string.hpp>
 
-#include <dbr/fig/accnt.h>
+#include <dbr/elm/types.h>
 
-#include <algorithm> // find_if()
+namespace dbr {
 
-using namespace dbr;
+/**
+ * @addtogroup TypesRec
+ * @{
+ */
 
-TEST_CASE(model_accnt)
-{
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
-}
+typedef NString<DBR_DISPLAY_MAX> Display;
+typedef NString<DBR_EMAIL_MAX> Email;
+typedef NString<DBR_MNEM_MAX> Mnem;
+typedef NString<DBR_REF_MAX> Ref;
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ELM_TYPES_HPP

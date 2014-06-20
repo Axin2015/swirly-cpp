@@ -15,15 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/ctx.hpp>
-#include <dbrpp/exec.hpp>
-#include <dbrpp/handler.hpp>
-#include <dbrpp/memb.hpp>
-#include <dbrpp/mutex.hpp>
-#include <dbrpp/posn.hpp>
-#include <dbrpp/shlex.hpp>
-#include <dbrpp/string.hpp>
-#include <dbrpp/view.hpp>
+#include <dbrpp/fig/ctx.hpp>
+#include <dbrpp/elm/exec.hpp>
+#include <dbrpp/fig/handler.hpp>
+#include <dbrpp/elm/memb.hpp>
+#include <dbrpp/ash/mutex.hpp>
+#include <dbrpp/elm/posn.hpp>
+#include <dbrpp/ash/shlex.hpp>
+#include <dbrpp/ash/string.hpp>
+#include <dbrpp/elm/view.hpp>
 
 #include <dbr/ash/log.h>
 #include <dbr/ash/util.h> // dbr_millis()

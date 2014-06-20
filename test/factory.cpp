@@ -17,7 +17,7 @@
  */
 #include "factory.hpp"
 
-#include <dbrpp/pool.hpp>
+#include <dbrpp/elm/pool.hpp>
 
 #include <dbr/elm/conv.h>
 

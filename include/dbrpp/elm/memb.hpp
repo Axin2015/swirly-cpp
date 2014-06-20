@@ -15,24 +15,56 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ELM_MEMB_HPP
+#define DBRPP_ELM_MEMB_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/elm/rec.hpp>
 
-#include <dbr/fig/accnt.h>
+namespace dbr {
 
-#include <algorithm> // find_if()
+/**
+ * @addtogroup TypesMemb
+ * @{
+ */
 
-using namespace dbr;
+class MembRef {
+    DbrMemb* impl_;
+public:
+    explicit
+    MembRef(DbrMemb& impl) noexcept
+        : impl_{&impl}
+    {
+    }
+    operator DbrMemb&() const noexcept
+    {
+        return *impl_;
+    }
+    DbrMemb*
+    c_arg() noexcept
+    {
+        return impl_;
+    }
+    AccntRecRef
+    urec() const noexcept
+    {
+        return AccntRecRef{*impl_->user.rec};
+    }
+    AccntRecRef
+    grec() const noexcept
+    {
+        return AccntRecRef{*impl_->group.rec};
+    }
+};
 
-TEST_CASE(model_accnt)
+inline std::ostream&
+operator <<(std::ostream& os, MembRef memb)
 {
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
+    return os << "user=" << memb.urec().mnem()
+              << ",group=" << memb.grec().mnem();
 }
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ELM_MEMB_HPP

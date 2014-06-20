@@ -15,13 +15,14 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbrpp/json.hpp>
-#include <dbrpp/pool.hpp>
-#include <dbrpp/posn.hpp>
-#include <dbrpp/serv.hpp>
+#include <dbrpp/fig/serv.hpp>
 
-#include <dbrpp/sqljourn.hpp>
-#include <dbrpp/sqlmodel.hpp>
+#include <dbrpp/elm/json.hpp>
+#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/elm/posn.hpp>
+
+#include <dbrpp/fir/sqljourn.hpp>
+#include <dbrpp/fir/sqlmodel.hpp>
 
 using namespace dbr;
 using namespace std;

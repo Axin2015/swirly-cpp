@@ -15,24 +15,55 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ASH_RBNODE_HPP
+#define DBRPP_ASH_RBNODE_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbr/ash/rbnode.h>
 
-#include <dbr/fig/accnt.h>
+namespace dbr {
 
-#include <algorithm> // find_if()
+/**
+ * @addtogroup Node
+ * @{
+ */
 
-using namespace dbr;
+template <typename NodeT>
+struct NodeTraits;
 
-TEST_CASE(model_accnt)
-{
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
-}
+/** @} */
+
+/**
+ * @addtogroup RbNode
+ * @{
+ */
+
+template<>
+struct NodeTraits<DbrRbNode> {
+    typedef DbrRbNode Node;
+    static Node*
+    next(Node* node) noexcept
+    {
+        return dbr_rbnode_next(node);
+    }
+    static const Node*
+    next(const Node* node) noexcept
+    {
+        return dbr_rbnode_next(const_cast<Node*>(node));
+    }
+    static Node*
+    prev(Node* node) noexcept
+    {
+        return dbr_rbnode_prev(node);
+    }
+    static const Node*
+    prev(const Node* node) noexcept
+    {
+        return dbr_rbnode_prev(const_cast<Node*>(node));
+    }
+};
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ASH_RBNODE_HPP

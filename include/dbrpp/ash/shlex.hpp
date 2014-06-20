@@ -15,24 +15,58 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ASH_SHLEX_HPP
+#define DBRPP_ASH_SHLEX_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/ash/except.hpp>
 
-#include <dbr/fig/accnt.h>
+#include <dbr/ash/shlex.h>
 
-#include <algorithm> // find_if()
+namespace dbr {
 
-using namespace dbr;
+/**
+ * @addtogroup Shlex
+ * @{
+ */
 
-TEST_CASE(model_accnt)
+template <typename FnT>
+class Shlex {
+    FnT fn_;
+    DbrShlex impl_;
+    static void
+    cb(void* ctx, const char* tok, size_t len) noexcept
+    {
+        static_cast<Shlex*>(ctx)->fn_(tok, len);
+    }
+public:
+    explicit
+    Shlex(FnT fn) noexcept
+        : fn_{fn}
+    {
+        dbr_shlex_init(&impl_, cb, this);
+    }
+    void
+    reset() noexcept
+    {
+        dbr_shlex_reset(&impl_);
+    }
+    void
+    exec(const char* buf, size_t size)
+    {
+        if (!dbr_shlex_exec(&impl_, buf, size))
+            throw_exception();
+    }
+};
+
+template <typename FnT>
+Shlex<FnT>
+make_shlex(FnT fn)
 {
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
+    return Shlex<FnT>{fn};
 }
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ASH_SHLEX_HPP

@@ -17,7 +17,7 @@
  */
 #include "test.hpp"
 
-#include <dbrpp/except.hpp>
+#include <dbrpp/ash/except.hpp>
 
 #include <iostream>
 

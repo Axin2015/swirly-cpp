@@ -18,8 +18,8 @@
 #ifndef MOCK_HPP
 #define MOCK_HPP
 
-#include <dbrpp/journ.hpp>
-#include <dbrpp/model.hpp>
+#include <dbrpp/elm/journ.hpp>
+#include <dbrpp/elm/model.hpp>
 
 class Journ : public dbr::IJourn<Journ> {
 public:

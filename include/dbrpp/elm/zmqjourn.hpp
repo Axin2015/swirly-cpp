@@ -15,24 +15,31 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ELM_ZMQJOURN_HPP
+#define DBRPP_ELM_ZMQJOURN_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/journ.hpp>
 
-#include <dbr/fig/accnt.h>
+#include <dbr/elm/zmqjourn.h>
 
-#include <algorithm> // find_if()
+namespace dbr {
 
-using namespace dbr;
+/**
+ * @addtogroup Zmq
+ * @{
+ */
 
-TEST_CASE(model_accnt)
+inline JournPtr
+zmqjourn_create(void* zctx, size_t capacity, DbrJourn (*factory)(void*), void* arg)
 {
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
+    JournPtr ptr{dbr_zmqjourn_create(zctx, capacity, factory, arg)};
+    if (!ptr)
+        throw_exception();
+    return ptr;
 }
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ELM_ZMQJOURN_HPP

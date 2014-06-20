@@ -19,8 +19,8 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/pool.hpp>
-#include <dbrpp/proto.hpp>
+#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/elm/proto.hpp>
 
 #include <dbr/ash/util.h> // dbr_millis()
 

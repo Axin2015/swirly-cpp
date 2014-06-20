@@ -15,24 +15,45 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ASH_SLNODE_HPP
+#define DBRPP_ASH_SLNODE_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbr/ash/slnode.h>
 
-#include <dbr/fig/accnt.h>
+namespace dbr {
 
-#include <algorithm> // find_if()
+/**
+ * @addtogroup Node
+ * @{
+ */
 
-using namespace dbr;
+template <typename NodeT>
+struct NodeTraits;
 
-TEST_CASE(model_accnt)
-{
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
-}
+/** @} */
+
+/**
+ * @addtogroup SlNode
+ * @{
+ */
+
+template<>
+struct NodeTraits<DbrSlNode> {
+    typedef DbrSlNode Node;
+    static Node*
+    next(Node* node) noexcept
+    {
+        return node->next;
+    }
+    static const Node*
+    next(const Node* node) noexcept
+    {
+        return node->next;
+    }
+};
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ASH_SLNODE_HPP

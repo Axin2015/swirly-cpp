@@ -15,24 +15,49 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ASH_MUTEX_HPP
+#define DBRPP_ASH_MUTEX_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <pthread.h>
 
-#include <dbr/fig/accnt.h>
+namespace dbr {
 
-#include <algorithm> // find_if()
+/**
+ * @addtogroup Thread
+ * @{
+ */
 
-using namespace dbr;
+class Mutex {
+    friend class Lock;
+    pthread_mutex_t impl_;
+public:
+    ~Mutex() noexcept
+    {
+        pthread_mutex_destroy(&impl_);
+    }
+    Mutex()
+    {
+        pthread_mutex_init(&impl_, NULL);
+    }
+};
 
-TEST_CASE(model_accnt)
-{
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
-}
+class Lock {
+    Mutex& mutex_;
+public:
+    ~Lock() noexcept
+    {
+        pthread_mutex_unlock(&mutex_.impl_);
+    }
+    explicit
+    Lock(Mutex& mutex)
+        : mutex_(mutex)
+    {
+        pthread_mutex_lock(&mutex.impl_);
+    }
+};
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ASH_MUTEX_HPP

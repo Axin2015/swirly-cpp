@@ -15,24 +15,31 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_FIR_SQLMODEL_HPP
+#define DBRPP_FIR_SQLMODEL_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbrpp/elm/model.hpp>
 
-#include <dbr/fig/accnt.h>
+#include <dbr/fir/sqlmodel.h>
 
-#include <algorithm> // find_if()
+namespace dbr {
 
-using namespace dbr;
+/**
+ * @addtogroup Sql
+ * @{
+ */
 
-TEST_CASE(model_accnt)
+inline ModelPtr
+sqlmodel_create(const char* path)
 {
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
+    ModelPtr ptr{dbr_sqlmodel_create(path)};
+    if (!ptr)
+        throw_exception();
+    return ptr;
 }
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_FIR_SQLMODEL_HPP

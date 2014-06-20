@@ -15,24 +15,61 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "mock.hpp"
-#include "test.hpp"
+#ifndef DBRPP_ASH_SEM_HPP
+#define DBRPP_ASH_SEM_HPP
 
-#include <dbrpp/elm/pool.hpp>
+#include <dbr/ash/sem.h>
 
-#include <dbr/fig/accnt.h>
+namespace dbr {
 
-#include <algorithm> // find_if()
+/**
+ * @addtogroup Thread
+ * @{
+ */
 
-using namespace dbr;
+class Sem {
+    mutable DbrSem impl_;
+public:
+    ~Sem() noexcept
+    {
+        dbr_sem_term(&impl_);
+    }
+    explicit
+    Sem(int count = 0)
+    {
+        dbr_sem_init(&impl_, count);
+    }
+    operator DbrSem&() noexcept
+    {
+        return impl_;
+    }
+    DbrSem*
+    c_arg() noexcept
+    {
+        return &impl_;
+    }
 
-TEST_CASE(model_accnt)
-{
-    Model model;
-    Pool pool(8 * 1024 * 1024);
-    auto recs = read_entity<DBR_ENTITY_ACCNT>(&model, pool);
-    auto it = std::find_if(recs.begin(), recs.end(), [](const DbrRec& rec) {
-            return strncmp(rec.mnem, "DBRA", DBR_MNEM_MAX) == 0;
-        });
-    check(it != recs.end());
-}
+    // Copy semantics.
+
+    Sem(const Sem&) = delete;
+
+    Sem&
+    operator =(const Sem&) = delete;
+
+    void
+    post(int n = 1)
+    {
+        dbr_sem_post(&impl_, n);
+    }
+    void
+    wait(int n = 1)
+    {
+        dbr_sem_wait(&impl_, n);
+    }
+};
+
+/** @} */
+
+} // dbr
+
+#endif // DBRPP_ASH_SEM_HPP
