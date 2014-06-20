@@ -21,7 +21,7 @@
 #include <dbrpp/except.hpp>
 #include <dbrpp/types.hpp>
 
-#include <dbr/rest.h>
+#include <dbr/elm/rest.h>
 
 namespace dbr {
 

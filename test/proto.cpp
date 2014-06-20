@@ -22,7 +22,7 @@
 #include <dbrpp/pool.hpp>
 #include <dbrpp/proto.hpp>
 
-#include <dbr/util.h> // dbr_millis()
+#include <dbr/ash/util.h> // dbr_millis()
 
 using namespace dbr;
 

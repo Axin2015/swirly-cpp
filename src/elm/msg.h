@@ -18,7 +18,7 @@
 #ifndef ELM_MSG_H
 #define ELM_MSG_H
 
-#include <dbr/msg.h>
+#include <dbr/elm/msg.h>
 
 DBR_EXTERN size_t
 elm_body_len(struct DbrBody* body, DbrBool enriched);

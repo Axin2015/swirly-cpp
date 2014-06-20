@@ -20,7 +20,7 @@
 
 #include <dbrpp/string.hpp>
 
-#include <dbr/types.h>
+#include <dbr/elm/types.h>
 
 namespace dbr {
 

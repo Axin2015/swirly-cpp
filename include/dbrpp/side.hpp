@@ -23,7 +23,7 @@
 #include <dbrpp/iter.hpp>
 #include <dbrpp/rbnode.hpp>
 
-#include <dbr/side.h>
+#include <dbr/fig/side.h>
 
 #include <iostream>
 #include <limits>

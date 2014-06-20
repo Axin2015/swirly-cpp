@@ -18,7 +18,7 @@
 #ifndef FIR_SQLITE_H
 #define FIR_SQLITE_H
 
-#include <dbr/types.h>
+#include <dbr/elm/types.h>
 
 #include <sys/types.h> // ssize_t
 

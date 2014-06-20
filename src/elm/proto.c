@@ -17,10 +17,10 @@
  */
 #include "proto.h"
 
-#include <dbr/conv.h>
-#include <dbr/err.h>
-#include <dbr/pack.h>
-#include <dbr/types.h>
+#include <dbr/elm/conv.h>
+#include <dbr/ash/err.h>
+#include <dbr/ash/pack.h>
+#include <dbr/elm/types.h>
 
 #include <stdlib.h> // abort()
 

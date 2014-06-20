@@ -18,7 +18,7 @@
 #ifndef TEST_HPP
 #define TEST_HPP
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <cmath>    // fabs()
 #include <cstring>  // strcmp()

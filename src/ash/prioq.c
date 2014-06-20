@@ -15,9 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/prioq.h>
+#include <dbr/ash/prioq.h>
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <assert.h>
 #include <stdlib.h> // malloc()

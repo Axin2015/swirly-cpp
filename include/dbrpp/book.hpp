@@ -21,7 +21,7 @@
 #include <dbrpp/rec.hpp>
 #include <dbrpp/side.hpp>
 
-#include <dbr/book.h>
+#include <dbr/fig/book.h>
 
 #include <iostream>
 

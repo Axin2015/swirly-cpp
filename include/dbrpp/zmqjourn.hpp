@@ -20,7 +20,7 @@
 
 #include <dbrpp/journ.hpp>
 
-#include <dbr/zmqjourn.h>
+#include <dbr/elm/zmqjourn.h>
 
 namespace dbr {
 

@@ -18,7 +18,7 @@
 #ifndef FIG_ASYNC_H
 #define FIG_ASYNC_H
 
-#include <dbr/async.h>
+#include <dbr/fig/async.h>
 
 #define FIG_ASYNC_CLOSE ((void*)~0)
 

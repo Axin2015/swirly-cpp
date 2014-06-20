@@ -25,7 +25,7 @@
 #include <dbrpp/sess.hpp>
 #include <dbrpp/slnode.hpp>
 
-#include <dbr/serv.h>
+#include <dbr/fig/serv.h>
 
 namespace dbr {
 

@@ -15,17 +15,17 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/dispatch.h>
+#include <dbr/fig/dispatch.h>
 
 #include "accnt.h"
 #include "async.h"
 #include "clnt.h"
 
-#include <dbr/err.h>
-#include <dbr/log.h>
-#include <dbr/msg.h>
-#include <dbr/sess.h>
-#include <dbr/util.h>
+#include <dbr/ash/err.h>
+#include <dbr/ash/log.h>
+#include <dbr/elm/msg.h>
+#include <dbr/fig/sess.h>
+#include <dbr/ash/util.h>
 
 #include <limits.h>
 

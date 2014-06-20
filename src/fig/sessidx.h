@@ -18,8 +18,8 @@
 #ifndef FIG_SESSIDX_H
 #define FIG_SESSIDX_H
 
-#include <dbr/stack.h>
-#include <dbr/types.h>
+#include <dbr/ash/stack.h>
+#include <dbr/elm/types.h>
 
 // Index of sessions by reference.
 

@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/rbnode.h>
+#include <dbr/ash/rbnode.h>
 
 DBR_API struct DbrRbNode*
 dbr_rbnode_next(struct DbrRbNode* node)

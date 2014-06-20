@@ -17,8 +17,8 @@
  */
 #include "test.hpp"
 
-#include <dbr/format.h>
-#include <dbr/types.h>
+#include <dbr/elm/format.h>
+#include <dbr/elm/types.h>
 
 #include <limits.h>
 

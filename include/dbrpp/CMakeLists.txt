@@ -1,2 +1,0 @@
-FILE(GLOB cxx_HEADERS "*.hpp")
-INSTALL(FILES ${cxx_HEADERS} DESTINATION include/dbrpp)

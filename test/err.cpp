@@ -17,7 +17,7 @@
  */
 #include "test.hpp"
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 TEST_CASE(err_clear)
 {

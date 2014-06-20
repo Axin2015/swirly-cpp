@@ -18,7 +18,7 @@
 #ifndef DBRPP_JSON_HPP
 #define DBRPP_JSON_HPP
 
-#include <dbr/json.h>
+#include <dbr/elm/json.h>
 
 #include <string>
 

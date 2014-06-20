@@ -15,11 +15,11 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/sess.h>
+#include <dbr/fig/sess.h>
 
 #include "accnt.h"
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <string.h> // strncpy()
 

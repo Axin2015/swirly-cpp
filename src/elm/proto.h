@@ -18,7 +18,7 @@
 #ifndef ELM_PROTO_H
 #define ELM_PROTO_H
 
-#include <dbr/proto.h>
+#include <dbr/elm/proto.h>
 
 DBR_EXTERN size_t
 elm_proto_accnt_len(const struct DbrRec* rec);

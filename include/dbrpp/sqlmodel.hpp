@@ -20,7 +20,7 @@
 
 #include <dbrpp/model.hpp>
 
-#include <dbr/sqlmodel.h>
+#include <dbr/fir/sqlmodel.h>
 
 namespace dbr {
 

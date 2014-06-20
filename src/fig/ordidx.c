@@ -17,8 +17,8 @@
  */
 #include "ordidx.h"
 
-#include <dbr/slnode.h>
-#include <dbr/types.h>
+#include <dbr/ash/slnode.h>
+#include <dbr/elm/types.h>
 
 #include <string.h>
 

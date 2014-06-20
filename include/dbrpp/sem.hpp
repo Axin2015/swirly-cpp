@@ -18,7 +18,7 @@
 #ifndef DBRPP_SEM_HPP
 #define DBRPP_SEM_HPP
 
-#include <dbr/sem.h>
+#include <dbr/ash/sem.h>
 
 namespace dbr {
 

@@ -18,7 +18,7 @@
 #ifndef DBRPP_SLNODE_HPP
 #define DBRPP_SLNODE_HPP
 
-#include <dbr/slnode.h>
+#include <dbr/ash/slnode.h>
 
 namespace dbr {
 

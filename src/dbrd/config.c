@@ -17,8 +17,8 @@
  */
 #include "config.h"
 
-#include <dbr/err.h>
-#include <dbr/util.h>
+#include <dbr/ash/err.h>
+#include <dbr/ash/util.h>
 
 #include <errno.h>
 #include <stdlib.h>

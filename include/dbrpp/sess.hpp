@@ -23,7 +23,7 @@
 #include <dbrpp/rbnode.hpp>
 #include <dbrpp/types.hpp>
 
-#include <dbr/sess.h>
+#include <dbr/fig/sess.h>
 
 #include <iostream>
 #include <limits>

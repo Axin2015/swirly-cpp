@@ -22,8 +22,8 @@
 #include <dbrpp/iter.hpp>
 #include <dbrpp/slnode.hpp>
 
-#include <dbr/model.h>
-#include <dbr/pool.h>
+#include <dbr/elm/model.h>
+#include <dbr/elm/pool.h>
 
 #include <limits> // numeric_limits<>
 #include <memory> // unique_ptr<>

@@ -17,9 +17,9 @@
  */
 #include "test.hpp"
 
-#include <dbr/list.h>
-#include <dbr/queue.h>
-#include <dbr/stack.h>
+#include <dbr/ash/list.h>
+#include <dbr/ash/queue.h>
+#include <dbr/ash/stack.h>
 
 struct SlElem {
     int id;

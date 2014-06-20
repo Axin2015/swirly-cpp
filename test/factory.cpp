@@ -19,7 +19,7 @@
 
 #include <dbrpp/pool.hpp>
 
-#include <dbr/conv.h>
+#include <dbr/elm/conv.h>
 
 using namespace dbr;
 using namespace std;

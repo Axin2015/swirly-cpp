@@ -18,7 +18,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <dbr/defs.h>
+#include <dbr/ash/defs.h>
 
 #include <limits.h> // PATH_MAX
 #include <stdio.h>

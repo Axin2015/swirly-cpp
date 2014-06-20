@@ -20,7 +20,7 @@
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/async.h>
+#include <dbr/fig/async.h>
 
 namespace dbr {
 

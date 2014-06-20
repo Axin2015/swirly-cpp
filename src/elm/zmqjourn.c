@@ -15,15 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/zmqjourn.h>
+#include <dbr/elm/zmqjourn.h>
 
 #include "msg.h"
 #include "pool.h"
 
-#include <dbr/err.h>
-#include <dbr/refcount.h>
-#include <dbr/log.h>
-#include <dbr/pool.h>
+#include <dbr/ash/err.h>
+#include <dbr/elm/refcount.h>
+#include <dbr/ash/log.h>
+#include <dbr/elm/pool.h>
 
 #include <uuid/uuid.h>
 

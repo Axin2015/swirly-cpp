@@ -18,7 +18,7 @@
 #ifndef DBRPP_LEVEL_HPP
 #define DBRPP_LEVEL_HPP
 
-#include <dbr/types.h>
+#include <dbr/elm/types.h>
 
 #include <iostream>
 

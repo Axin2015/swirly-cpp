@@ -15,9 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/bank.h>
+#include <dbr/ash/bank.h>
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <errno.h>
 #include <stdlib.h> // free()

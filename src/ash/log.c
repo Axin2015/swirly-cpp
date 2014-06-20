@@ -15,9 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/log.h>
+#include <dbr/ash/log.h>
 
-#include <dbr/util.h>
+#include <dbr/ash/util.h>
 
 #include <assert.h>
 #include <stdio.h>

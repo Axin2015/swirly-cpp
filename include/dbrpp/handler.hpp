@@ -20,7 +20,7 @@
 
 #include <dbrpp/clnt.hpp>
 
-#include <dbr/handler.h>
+#include <dbr/fig/handler.h>
 
 namespace dbr {
 

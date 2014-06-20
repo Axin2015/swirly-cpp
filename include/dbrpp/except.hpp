@@ -18,7 +18,7 @@
 #ifndef DBRPP_EXCEPT_HPP
 #define DBRPP_EXCEPT_HPP
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <cstring>
 #include <stdexcept>

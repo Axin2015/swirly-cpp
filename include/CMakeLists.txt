@@ -1,2 +1,5 @@
-ADD_SUBDIRECTORY(dbr)
-ADD_SUBDIRECTORY(dbrpp)
+INSTALL(DIRECTORY ${PROJECT_SOURCE_DIR}/include/
+                  DESTINATION include
+                  FILES_MATCHING
+                  PATTERN "*.h"
+                  PATTERN "*.hpp")

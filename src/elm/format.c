@@ -17,8 +17,8 @@
  */
 #include "format.h"
 
-#include <dbr/types.h>
-#include <dbr/util.h>
+#include <dbr/elm/types.h>
+#include <dbr/ash/util.h>
 
 #include <math.h>
 #include <stdlib.h> // abort()

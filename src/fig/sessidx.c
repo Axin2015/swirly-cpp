@@ -17,11 +17,11 @@
  */
 #include "sessidx.h"
 
-#include <dbr/err.h>
-#include <dbr/pool.h>
-#include <dbr/sess.h>
-#include <dbr/slnode.h>
-#include <dbr/types.h>
+#include <dbr/ash/err.h>
+#include <dbr/elm/pool.h>
+#include <dbr/fig/sess.h>
+#include <dbr/ash/slnode.h>
+#include <dbr/elm/types.h>
 
 #include <string.h>
 

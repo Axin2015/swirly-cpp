@@ -23,7 +23,7 @@
 #include <dbrpp/rec.hpp>
 #include <dbrpp/sess.hpp>
 
-#include <dbr/accnt.h>
+#include <dbr/fig/accnt.h>
 
 #include <iostream>
 #include <limits>

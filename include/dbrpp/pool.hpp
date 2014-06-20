@@ -20,7 +20,7 @@
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/pool.h>
+#include <dbr/elm/pool.h>
 
 namespace dbr {
 

@@ -17,7 +17,7 @@
  */
 #include "test.hpp"
 
-#include <dbr/util.h>
+#include <dbr/ash/util.h>
 
 #include <limits.h>
 

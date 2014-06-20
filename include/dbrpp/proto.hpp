@@ -20,7 +20,7 @@
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/proto.h>
+#include <dbr/elm/proto.h>
 
 namespace dbr {
 

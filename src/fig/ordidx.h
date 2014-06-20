@@ -20,8 +20,8 @@
 
 // Index of orders by reference.
 
-#include <dbr/defs.h>
-#include <dbr/stack.h>
+#include <dbr/ash/defs.h>
+#include <dbr/ash/stack.h>
 
 struct DbrOrder;
 

@@ -18,7 +18,7 @@
 #ifndef FACTORY_HPP
 #define FACTORY_HPP
 
-#include <dbr/types.h>
+#include <dbr/elm/types.h>
 
 #include <memory>
 

@@ -20,7 +20,7 @@
 
 #include <dbrpp/journ.hpp>
 
-#include <dbr/sqljourn.h>
+#include <dbr/fir/sqljourn.h>
 
 namespace dbr {
 

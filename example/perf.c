@@ -16,16 +16,16 @@
  *  02110-1301 USA.
  */
 
-#include <dbr/accnt.h>
-#include <dbr/err.h>
-#include <dbr/log.h>
-#include <dbr/pool.h>
-#include <dbr/serv.h>
-#include <dbr/sess.h>
-#include <dbr/sqljourn.h>
-#include <dbr/sqlmodel.h>
-#include <dbr/util.h>
-#include <dbr/zmqjourn.h>
+#include <dbr/fig/accnt.h>
+#include <dbr/ash/err.h>
+#include <dbr/ash/log.h>
+#include <dbr/elm/pool.h>
+#include <dbr/fig/serv.h>
+#include <dbr/fig/sess.h>
+#include <dbr/fir/sqljourn.h>
+#include <dbr/fir/sqlmodel.h>
+#include <dbr/ash/util.h>
+#include <dbr/elm/zmqjourn.h>
 
 #include <stdlib.h>
 

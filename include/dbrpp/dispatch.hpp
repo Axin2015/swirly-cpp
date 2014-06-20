@@ -20,7 +20,7 @@
 
 #include <dbrpp/except.hpp>
 
-#include <dbr/dispatch.h>
+#include <dbr/fig/dispatch.h>
 
 namespace dbr {
 

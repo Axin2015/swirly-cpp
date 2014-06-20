@@ -23,7 +23,7 @@
 #include <dbrpp/order.hpp>
 #include <dbrpp/slnode.hpp>
 
-#include <dbr/clnt.h>
+#include <dbr/fig/clnt.h>
 
 namespace dbr {
 

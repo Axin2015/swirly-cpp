@@ -18,12 +18,12 @@
 #ifndef FIG_ACCNT_H
 #define FIG_ACCNT_H
 
-#include <dbr/accnt.h>
+#include <dbr/fig/accnt.h>
 
 #include "ordidx.h"
 
-#include <dbr/refcount.h>
-#include <dbr/tree.h>
+#include <dbr/elm/refcount.h>
+#include <dbr/ash/tree.h>
 
 struct FigAccnt {
     struct DbrRec* rec;

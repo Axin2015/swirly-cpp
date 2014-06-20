@@ -18,12 +18,12 @@
 #ifndef FIG_CLNT_H
 #define FIG_CLNT_H
 
-#include <dbr/clnt.h>
+#include <dbr/fig/clnt.h>
 
 #include "cache.h"
 #include "ordidx.h"
 
-#include <dbr/prioq.h>
+#include <dbr/ash/prioq.h>
 
 #include <zmq.h>
 

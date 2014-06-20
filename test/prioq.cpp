@@ -17,7 +17,7 @@
  */
 #include "test.hpp"
 
-#include <dbr/prioq.h>
+#include <dbr/ash/prioq.h>
 
 #include <stdlib.h> // rand()
 

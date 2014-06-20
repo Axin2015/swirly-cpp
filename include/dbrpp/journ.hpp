@@ -22,7 +22,7 @@
 #include <dbrpp/exec.hpp>
 #include <dbrpp/order.hpp>
 
-#include <dbr/journ.h>
+#include <dbr/elm/journ.h>
 
 #include <memory> // unique_ptr<>
 

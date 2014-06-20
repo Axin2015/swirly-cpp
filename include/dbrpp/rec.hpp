@@ -20,8 +20,8 @@
 
 #include <dbrpp/types.hpp>
 
-#include <dbr/conv.h>
-#include <dbr/format.h>
+#include <dbr/elm/conv.h>
+#include <dbr/elm/format.h>
 
 namespace dbr {
 

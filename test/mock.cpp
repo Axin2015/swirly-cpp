@@ -18,8 +18,8 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbr/pool.h>
-#include <dbr/queue.h>
+#include <dbr/elm/pool.h>
+#include <dbr/ash/queue.h>
 
 using namespace dbr;
 using namespace std;

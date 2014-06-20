@@ -18,22 +18,22 @@
 
 #include "config.h"
 
-#include <dbr/accnt.h>
-#include <dbr/book.h>
-#include <dbr/daemon.h>
-#include <dbr/err.h>
-#include <dbr/serv.h>
-#include <dbr/log.h>
-#include <dbr/msg.h>
-#include <dbr/pool.h>
-#include <dbr/prioq.h>
-#include <dbr/queue.h>
-#include <dbr/sess.h>
-#include <dbr/sqljourn.h>
-#include <dbr/sqlmodel.h>
-#include <dbr/tree.h>
-#include <dbr/util.h>
-#include <dbr/zmqjourn.h>
+#include <dbr/fig/accnt.h>
+#include <dbr/fig/book.h>
+#include <dbr/ash/daemon.h>
+#include <dbr/ash/err.h>
+#include <dbr/fig/serv.h>
+#include <dbr/ash/log.h>
+#include <dbr/elm/msg.h>
+#include <dbr/elm/pool.h>
+#include <dbr/ash/prioq.h>
+#include <dbr/ash/queue.h>
+#include <dbr/fig/sess.h>
+#include <dbr/fir/sqljourn.h>
+#include <dbr/fir/sqlmodel.h>
+#include <dbr/ash/tree.h>
+#include <dbr/ash/util.h>
+#include <dbr/elm/zmqjourn.h>
 
 #include <assert.h>
 #include <fcntl.h>

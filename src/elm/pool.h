@@ -18,11 +18,11 @@
 #ifndef ELM_POOL_H
 #define ELM_POOL_H
 
-#include <dbr/pool.h>
+#include <dbr/elm/pool.h>
 
-#include <dbr/log.h>
-#include <dbr/slnode.h>
-#include <dbr/types.h>
+#include <dbr/ash/log.h>
+#include <dbr/ash/slnode.h>
+#include <dbr/elm/types.h>
 
 struct ElmSmallBlock;
 struct ElmLargeBlock;

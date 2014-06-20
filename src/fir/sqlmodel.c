@@ -15,11 +15,11 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/sqlmodel.h>
+#include <dbr/fir/sqlmodel.h>
 
 #include "sqlite.h"
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <stdlib.h>
 

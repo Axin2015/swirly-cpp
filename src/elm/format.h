@@ -18,7 +18,7 @@
 #ifndef ELM_FORMAT_H
 #define ELM_FORMAT_H
 
-#include <dbr/format.h>
+#include <dbr/elm/format.h>
 
 #include <stddef.h> // size_t
 

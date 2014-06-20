@@ -20,7 +20,7 @@
 
 #include <dbrpp/pool.hpp>
 
-#include <dbr/accnt.h>
+#include <dbr/fig/accnt.h>
 
 #include <algorithm> // find_if()
 

@@ -15,11 +15,11 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/side.h>
+#include <dbr/fig/side.h>
 
-#include <dbr/err.h>
-#include <dbr/log.h>
-#include <dbr/pool.h>
+#include <dbr/ash/err.h>
+#include <dbr/ash/log.h>
+#include <dbr/elm/pool.h>
 
 #include <stdlib.h>
 

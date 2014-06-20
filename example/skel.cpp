@@ -19,8 +19,8 @@
 #include <dbrpp/handler.hpp>
 #include <dbrpp/sem.hpp>
 
-#include <dbr/clnt.h>
-#include <dbr/log.h>
+#include <dbr/fig/clnt.h>
+#include <dbr/ash/log.h>
 
 #include <functional>
 #include <iostream>

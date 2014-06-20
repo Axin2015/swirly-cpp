@@ -18,8 +18,8 @@
 #ifndef FIG_MATCH_H
 #define FIG_MATCH_H
 
-#include <dbr/journ.h>
-#include <dbr/types.h>
+#include <dbr/elm/journ.h>
+#include <dbr/elm/types.h>
 
 struct DbrBank;
 struct FigOrdIdx;

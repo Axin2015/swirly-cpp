@@ -15,9 +15,9 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include <dbr/daemon.h>
+#include <dbr/ash/daemon.h>
 
-#include <dbr/err.h>
+#include <dbr/ash/err.h>
 
 #include <errno.h>
 #include <fcntl.h>    // open()

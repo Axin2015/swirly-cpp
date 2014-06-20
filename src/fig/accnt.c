@@ -17,9 +17,9 @@
  */
 #include "accnt.h"
 
-#include <dbr/err.h>
-#include <dbr/log.h>
-#include <dbr/pool.h>
+#include <dbr/ash/err.h>
+#include <dbr/ash/log.h>
+#include <dbr/elm/pool.h>
 
 #include <assert.h>
 #include <stdlib.h>
