@@ -18,7 +18,7 @@
 #include "config.h"
 
 #include <dbr/ash/err.h>
-#include <dbr/ash/util.h>
+#include <dbr/ash/string.h>
 
 #include <errno.h>
 #include <stdlib.h>

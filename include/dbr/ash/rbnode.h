@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_RBNODE_H
 #define DBR_ASH_RBNODE_H
 
+/**
+ * @file
+ * Red-black node.
+ */
+
 #include <dbr/ash/defs.h>
 
 #include <stddef.h> // NULL

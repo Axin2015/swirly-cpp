@@ -23,7 +23,7 @@
 namespace dbr {
 
 /**
- * @addtogroup Thread
+ * @addtogroup Sem
  * @{
  */
 

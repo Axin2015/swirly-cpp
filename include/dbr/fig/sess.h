@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_SESS_H
-#define DBR_CLNT_SESS_H
+#ifndef DBR_FIG_SESS_H
+#define DBR_FIG_SESS_H
 
 #include <dbr/elm/types.h>
 
@@ -50,13 +50,6 @@ dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt user);
 DBR_API int
 dbr_sess_subs(struct DbrSess* sess, DbrAccnt user);
 
-/** @} */
-
-/**
- * @addtogroup SessUser
- * @{
- */
-
 #define DBR_SESS_END_USER NULL
 
 DBR_API DbrAccnt
@@ -88,4 +81,4 @@ dbr_sess_empty_user(const struct DbrSess* sess)
 
 /** @} */
 
-#endif // DBR_CLNT_SESS_H
+#endif // DBR_FIG_SESS_H

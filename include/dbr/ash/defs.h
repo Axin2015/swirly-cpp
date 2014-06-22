@@ -18,11 +18,6 @@
 #ifndef DBR_ASH_DEFS_H
 #define DBR_ASH_DEFS_H
 
-/**
- * @addtogroup Defs
- * @{
- */
-
 #if !defined(__cplusplus)
 # define DBR_EXTERN extern
 #else  // defined(__cplusplus)
@@ -32,16 +27,10 @@
 
 #define DBR_API DBR_EXTERN __attribute__((visibility ("default")))
 
-enum {
-    /**
-     * Boolean logical false.
-     */
-    DBR_FALSE,
-    /**
-     * Boolean logical true.
-     */
-    DBR_TRUE
-};
+/**
+ * @addtogroup Types
+ * @{
+ */
 
 enum {
     /**
@@ -57,6 +46,17 @@ enum {
      * by hyphens.
      */
     DBR_UUID_MAX = 36
+};
+
+enum {
+    /**
+     * Boolean logical false.
+     */
+    DBR_FALSE,
+    /**
+     * Boolean logical true.
+     */
+    DBR_TRUE
 };
 
 /**
@@ -76,6 +76,13 @@ typedef unsigned long DbrKey;
  * Universally unique identifier.
  */
 typedef unsigned char DbrUuid[16];
+
+/** @} */
+
+/**
+ * @addtogroup Util
+ * @{
+ */
 
 /**
  * @return the smallest of @a a and @a b. If both are equivalent, @a a is returned.

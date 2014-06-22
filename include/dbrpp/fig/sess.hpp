@@ -34,7 +34,7 @@
 namespace dbr {
 
 /**
- * @addtogroup SessUser
+ * @addtogroup Sess
  * @{
  */
 
@@ -194,13 +194,6 @@ public:
     }
 };
 
-/** @} */
-
-/**
- * @addtogroup Sess
- * @{
- */
-
 class Sess {
     mutable DbrSess impl_;
 public:
@@ -234,16 +227,11 @@ public:
     {
         return impl_.uuid;
     }
-    /**
-     * @addtogroup SessUser
-     * @{
-     */
     SessUsers
     users() const noexcept
     {
         return SessUsers{impl_};
     }
-    /** @} */
 };
 
 inline std::ostream&
@@ -296,16 +284,11 @@ public:
     {
         return dbr_sess_subs(impl_, user);
     }
-    /**
-     * @addtogroup SessUser
-     * @{
-     */
     SessUsers
     users() const noexcept
     {
         return SessUsers{*impl_};
     }
-    /** @} */
 };
 
 inline std::ostream&

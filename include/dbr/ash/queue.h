@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_QUEUE_H
 #define DBR_ASH_QUEUE_H
 
+/**
+ * @file
+ * Singly-linked queue.
+ */
+
 #include <dbr/ash/defs.h>
 #include <dbr/ash/slnode.h>
 

@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_CLNT_H
-#define DBR_CLNT_CLNT_H
+#ifndef DBR_FIG_CLNT_H
+#define DBR_FIG_CLNT_H
 
 #include <dbr/elm/pool.h>
 
@@ -62,11 +62,6 @@ dbr_clnt_reset(DbrClnt clnt);
 DBR_API DbrIden
 dbr_clnt_close(DbrClnt clnt);
 
-/**
- * @addtogroup ClntRec
- * @{
- */
-
 #define DBR_CLNT_END_REC NULL
 
 static inline struct DbrRec*
@@ -104,8 +99,6 @@ dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size);
 
 DBR_API DbrBool
 dbr_clnt_empty_rec(DbrClnt clnt, int type);
-
-/** @} */
 
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
@@ -155,11 +148,6 @@ dbr_clnt_set_timer(DbrClnt clnt, DbrMillis absms);
 DBR_API void
 dbr_clnt_cancel_timer(DbrClnt clnt, DbrIden id);
 
-/**
- * @addtogroup ClntView
- * @{
- */
-
 #define DBR_CLNT_END_VIEW NULL
 
 static inline struct DbrView*
@@ -180,8 +168,6 @@ dbr_clnt_last_view(DbrClnt clnt);
 DBR_API DbrBool
 dbr_clnt_empty_view(DbrClnt clnt);
 
-/** @} */
-
 DBR_API const unsigned char*
 dbr_clnt_uuid(DbrClnt clnt);
 
@@ -193,4 +179,4 @@ dbr_clnt_is_ready(DbrClnt clnt);
 
 /** @} */
 
-#endif // DBR_CLNT_CLNT_H
+#endif // DBR_FIG_CLNT_H

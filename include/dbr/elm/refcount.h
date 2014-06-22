@@ -21,7 +21,7 @@
 #include <dbr/elm/pool.h>
 
 /**
- * @addtogroup TypesExec
+ * @addtogroup Exec
  * @{
  */
 

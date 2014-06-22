@@ -21,7 +21,7 @@
 #include <dbr/elm/journ.h>
 
 /**
- * @addtogroup Sql
+ * @addtogroup Journ
  * @{
  */
 

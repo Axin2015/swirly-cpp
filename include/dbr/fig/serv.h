@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_SERV_H
-#define DBR_CLNT_SERV_H
+#ifndef DBR_FIG_SERV_H
+#define DBR_FIG_SERV_H
 
 #include <dbr/elm/journ.h>
 #include <dbr/elm/model.h>
@@ -49,11 +49,6 @@ dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool);
 
 DBR_API void
 dbr_serv_destroy(DbrServ serv);
-
-/**
- * @addtogroup ServRec
- * @{
- */
 
 DBR_API DbrBool
 dbr_serv_load(DbrServ serv, DbrModel model);
@@ -95,8 +90,6 @@ dbr_serv_first_rec(DbrServ serv, int type, size_t* size);
 
 DBR_API DbrBool
 dbr_serv_empty_rec(DbrServ serv, int type);
-
-/** @} */
 
 DBR_API DbrAccnt
 dbr_serv_accnt(DbrServ serv, struct DbrRec* arec);
@@ -152,11 +145,6 @@ dbr_serv_clear(DbrServ serv)
     dbr_serv_clear_tr(serv);
 }
 
-/**
- * @addtogroup ServExec
- * @{
- */
-
 #define DBR_SERV_END_EXEC NULL
 
 static inline struct DbrExec*
@@ -170,13 +158,6 @@ dbr_serv_first_exec(DbrServ serv);
 
 DBR_API DbrBool
 dbr_serv_empty_exec(DbrServ serv);
-
-/** @} */
-
-/**
- * @addtogroup ServPosn
- * @{
- */
 
 #define DBR_SERV_END_POSNUP NULL
 
@@ -194,13 +175,6 @@ dbr_serv_last_posnup(DbrServ serv);
 
 DBR_API DbrBool
 dbr_serv_empty_posnup(DbrServ serv);
-
-/** @} */
-
-/**
- * @addtogroup ServBook
- * @{
- */
 
 #define DBR_SERV_END_BOOK NULL
 
@@ -241,6 +215,4 @@ dbr_serv_empty_bookup(DbrServ serv);
 
 /** @} */
 
-/** @} */
-
-#endif // DBR_CLNT_SERV_H
+#endif // DBR_FIG_SERV_H

@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup Zmq
+ * @addtogroup Journ
  * @{
  */
 

@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_TREE_H
 #define DBR_ASH_TREE_H
 
+/**
+ * @file
+ * Red-black tree.
+ */
+
 #include <dbr/ash/defs.h>
 #include <dbr/ash/rbnode.h>
 

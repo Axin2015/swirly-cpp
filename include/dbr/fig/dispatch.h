@@ -15,14 +15,14 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_DISPATCH_H
-#define DBR_CLNT_DISPATCH_H
+#ifndef DBR_FIG_DISPATCH_H
+#define DBR_FIG_DISPATCH_H
 
 #include <dbr/fig/clnt.h>
 #include <dbr/fig/handler.h>
 
 /**
- * @addtogroup Clnt
+ * @addtogroup Dispatch
  * @{
  */
 
@@ -31,4 +31,4 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler);
 
 /** @} */
 
-#endif // DBR_CLNT_DISPATCH_H
+#endif // DBR_FIG_DISPATCH_H

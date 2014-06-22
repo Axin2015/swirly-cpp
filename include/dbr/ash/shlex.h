@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_SHLEX_H
 #define DBR_ASH_SHLEX_H
 
+/**
+ * @file
+ * Lexical tokeniser.
+ */
+
 #include <dbr/ash/defs.h>
 
 #include <sys/types.h>

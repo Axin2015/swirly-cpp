@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_CTX_H
-#define DBR_CLNT_CTX_H
+#ifndef DBR_FIG_CTX_H
+#define DBR_FIG_CTX_H
 
 #include <dbr/fig/async.h>
 #include <dbr/fig/handler.h>
@@ -45,4 +45,4 @@ dbr_ctx_uuid(DbrCtx ctx);
 
 /** @} */
 
-#endif // DBR_CLNT_CTX_H
+#endif // DBR_FIG_CTX_H

@@ -21,7 +21,7 @@
 #include <dbr/elm/model.h>
 
 /**
- * @addtogroup Sql
+ * @addtogroup Model
  * @{
  */
 

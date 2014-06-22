@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_LIST_H
 #define DBR_ASH_LIST_H
 
+/**
+ * @file
+ * Doubly-linked list.
+ */
+
 #include <dbr/ash/defs.h>
 #include <dbr/ash/dlnode.h>
 

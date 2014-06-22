@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_DLNODE_H
 #define DBR_ASH_DLNODE_H
 
+/**
+ * @file
+ * Doubly-linked node.
+ */
+
 #include <assert.h>
 #include <stddef.h> // NULL
 

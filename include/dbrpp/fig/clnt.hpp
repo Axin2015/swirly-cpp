@@ -30,7 +30,7 @@
 namespace dbr {
 
 /**
- * @addtogroup ClntRec
+ * @addtogroup Clnt
  * @{
  */
 
@@ -165,13 +165,6 @@ public:
 
 typedef ClntRecs<DBR_ENTITY_ACCNT> ClntAccntRecs;
 typedef ClntRecs<DBR_ENTITY_CONTR> ClntContrRecs;
-
-/** @} */
-
-/**
- * @addtogroup ClntView
- * @{
- */
 
 class ClntViews {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -329,13 +322,6 @@ public:
     }
 };
 
-/** @} */
-
-/**
- * @addtogroup Clnt
- * @{
- */
-
 class Clnt {
     DbrClnt impl_;
 public:
@@ -403,10 +389,6 @@ public:
             throw_exception();
         return req_id;
     }
-    /**
-     * @addtogroup ClntRec
-     * @{
-     */
     template <int TypeN>
     ClntRecs<TypeN>
     recs() const noexcept
@@ -423,7 +405,6 @@ public:
     {
         return ClntContrRecs{impl_};
     }
-    /** @} */
     Accnt
     accnt(DbrRec& arec) const
     {
@@ -511,16 +492,11 @@ public:
     {
         dbr_clnt_cancel_timer(impl_, id);
     }
-    /**
-     * @addtogroup ClntView
-     * @{
-     */
     ClntViews
     views() const noexcept
     {
         return ClntViews{impl_};
     }
-    /** @} */
     const unsigned char*
     uuid() const noexcept
     {
@@ -576,10 +552,6 @@ public:
             throw_exception();
         return req_id;
     }
-    /**
-     * @addtogroup ClntRec
-     * @{
-     */
     template <int TypeN>
     ClntRecs<TypeN>
     recs() const noexcept
@@ -596,7 +568,6 @@ public:
     {
         return ClntContrRecs{impl_};
     }
-    /** @} */
     Accnt
     accnt(DbrRec& arec) const
     {
@@ -684,16 +655,11 @@ public:
     {
         dbr_clnt_cancel_timer(impl_, id);
     }
-    /**
-     * @addtogroup ClntView
-     * @{
-     */
     ClntViews
     views() const noexcept
     {
         return ClntViews{impl_};
     }
-    /** @} */
     const unsigned char*
     uuid() const noexcept
     {

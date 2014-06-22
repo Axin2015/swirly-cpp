@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_LOG_H
 #define DBR_ASH_LOG_H
 
+/**
+ * @file
+ * Each thread has its own logger.
+ */
+
 #include <dbr/ash/defs.h>
 
 #include <stdarg.h> // va_list

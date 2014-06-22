@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_SLNODE_H
 #define DBR_ASH_SLNODE_H
 
+/**
+ * @file
+ * Singly-linked node.
+ */
+
 #include <assert.h>
 #include <stddef.h> // NULL
 

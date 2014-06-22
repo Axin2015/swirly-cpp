@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_ERR_H
 #define DBR_ASH_ERR_H
 
+/**
+ * @file
+ * Each thread has its own error information.
+ */
+
 #include <dbr/ash/defs.h>
 
 #include <stdarg.h> // va_list

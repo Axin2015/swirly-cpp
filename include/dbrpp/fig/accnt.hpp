@@ -33,7 +33,7 @@
 namespace dbr {
 
 /**
- * @addtogroup AccntUser
+ * @addtogroup Accnt
  * @{
  */
 
@@ -193,13 +193,6 @@ public:
     }
 };
 
-/** @} */
-
-/**
- * @addtogroup AccntGroup
- * @{
- */
-
 class AccntGroups {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrMemb Entry;
@@ -355,13 +348,6 @@ public:
         return dbr_accnt_empty_group(accnt_);
     }
 };
-
-/** @} */
-
-/**
- * @addtogroup AccntOrder
- * @{
- */
 
 class AccntOrders {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -531,13 +517,6 @@ public:
     }
 };
 
-/** @} */
-
-/**
- * @addtogroup AccntTrade
- * @{
- */
-
 class AccntTrades {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef DbrExec Entry;
@@ -693,13 +672,6 @@ public:
         return dbr_accnt_empty_trade(accnt_);
     }
 };
-
-/** @} */
-
-/**
- * @addtogroup AccntPosn
- * @{
- */
 
 class AccntPosns {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -857,13 +829,6 @@ public:
     }
 };
 
-/** @} */
-
-/**
- * @addtogroup Accnt
- * @{
- */
-
 class Accnt {
     DbrAccnt impl_;
 public:
@@ -891,56 +856,31 @@ public:
     {
         return AccntRecRef{*dbr_accnt_rec(impl_)};
     }
-    /**
-     * @addtogroup AccntUser
-     * @{
-     */
     AccntUsers
     users() const noexcept
     {
         return AccntUsers{impl_};
     }
-    /** @} */
-    /**
-     * @addtogroup AccntGroup
-     * @{
-     */
     AccntGroups
     groups() const noexcept
     {
         return AccntGroups{impl_};
     }
-    /** @} */
-    /**
-     * @addtogroup AccntOrder
-     * @{
-     */
     AccntOrders
     orders() const noexcept
     {
         return AccntOrders{impl_};
     }
-    /** @} */
-    /**
-     * @addtogroup AccntTrade
-     * @{
-     */
     AccntTrades
     trades() const noexcept
     {
         return AccntTrades{impl_};
     }
-    /** @} */
-    /**
-     * @addtogroup AccntPosn
-     * @{
-     */
     AccntPosns
     posns() const noexcept
     {
         return AccntPosns{impl_};
     }
-    /** @} */
     DbrBool
     logged_on() const noexcept
     {

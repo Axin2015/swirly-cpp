@@ -80,49 +80,17 @@ enum DbrEntity {
     DBR_ENTITY_POSN
 };
 
-/** @} */
-
-/**
- * @addtogroup Bank
- */
-
-enum DbrReg {
-    /**
-     * Order identifier register index.
-     */
-    DBR_REG_ORDER = 0,
-    /**
-     * Execution identifier register index.
-     */
-    DBR_REG_EXEC,
-    /**
-     * Match identifier register index.
-     */
-    DBR_REG_MATCH,
-    /**
-     * Number of registers in @ref DbrBank file.
-     */
-    DBR_REG_LEN
+enum DbrState {
+    DBR_STATE_NEW = 1,
+    DBR_STATE_REVISE,
+    DBR_STATE_CANCEL,
+    DBR_STATE_TRADE
 };
 
-/** @} */
-
-/**
- * @addtogroup Pool
- */
-
-typedef struct ElmPool* DbrPool;
-
-/**
- * @addtogroup Accnt
- */
-
-typedef struct FigAccnt* DbrAccnt;
-
-/**
- * @addtogroup TypesRec
- * @{
- */
+enum DbrAction {
+    DBR_ACTION_BUY = 1,
+    DBR_ACTION_SELL = -1
+};
 
 enum {
     /**
@@ -166,6 +134,50 @@ typedef char DbrMnem[DBR_MNEM_MAX];
  */
 
 typedef char DbrRef[DBR_REF_MAX];
+
+/** @} */
+
+/**
+ * @addtogroup Bank
+ */
+
+enum DbrReg {
+    /**
+     * Order identifier register index.
+     */
+    DBR_REG_ORDER = 0,
+    /**
+     * Execution identifier register index.
+     */
+    DBR_REG_EXEC,
+    /**
+     * Match identifier register index.
+     */
+    DBR_REG_MATCH,
+    /**
+     * Number of registers in @ref DbrBank file.
+     */
+    DBR_REG_LEN
+};
+
+/** @} */
+
+/**
+ * @addtogroup Pool
+ */
+
+typedef struct ElmPool* DbrPool;
+
+/**
+ * @addtogroup Accnt
+ */
+
+typedef struct FigAccnt* DbrAccnt;
+
+/**
+ * @addtogroup Rec
+ * @{
+ */
 
 /**
  * Union used for record enrichment.
@@ -237,7 +249,7 @@ dbr_shared_rec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesMemb
+ * @addtogroup Memb
  * @{
  */
 
@@ -273,21 +285,9 @@ dbr_shared_memb_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup Types
+ * @addtogroup Common
  * @{
  */
-
-enum DbrState {
-    DBR_STATE_NEW = 1,
-    DBR_STATE_REVISE,
-    DBR_STATE_CANCEL,
-    DBR_STATE_TRADE
-};
-
-enum DbrAction {
-    DBR_ACTION_BUY = 1,
-    DBR_ACTION_SELL = -1
-};
 
 /**
  * Fields common to both DbrOrder and DbrExec.
@@ -334,7 +334,7 @@ struct DbrCommon {
 /** @} */
 
 /**
- * @addtogroup TypesOrder
+ * @addtogroup Order
  * @{
  */
 
@@ -386,7 +386,8 @@ dbr_shared_order_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesLevel
+ * A level is an aggregation of orders by price.
+ * @addtogroup Level
  * @{
  */
 
@@ -419,7 +420,7 @@ dbr_level_init(struct DbrLevel* level)
 /** @} */
 
 /**
- * @addtogroup TypesExec
+ * @addtogroup Exec
  * @{
  */
 
@@ -486,7 +487,7 @@ dbr_shared_exec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesMatch
+ * @addtogroup Match
  * @{
  */
 
@@ -549,7 +550,7 @@ dbr_trans_match_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesPosn
+ * @addtogroup Posn
  * @{
  */
 
@@ -609,7 +610,7 @@ dbr_shared_posn_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesView
+ * @addtogroup View
  * @{
  */
 
@@ -671,13 +672,17 @@ dbr_shared_view_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup TypesSide
+ * An Order Book comprises two sides: one for Bids and one for Offers.
+ * @addtogroup Side
  * @{
  */
 
 struct DbrSide {
     DbrPool pool;
     struct DbrTree levels;
+    /**
+     * The orders for each side are ordered by price and time.
+     */
     struct DbrList orders;
     /**
      * Last trade information.
@@ -690,7 +695,7 @@ struct DbrSide {
 /** @} */
 
 /**
- * @addtogroup TypesBook
+ * @addtogroup Book
  * @{
  */
 
@@ -727,7 +732,7 @@ dbr_book_key(DbrIden cid, DbrJd settl_day)
 /** @} */
 
 /**
- * @addtogroup TypesSess
+ * @addtogroup Sess
  * @{
  */
 
@@ -746,12 +751,6 @@ dbr_sub_init(struct DbrSub* sub)
     dbr_rbnode_init(&sub->sess_node_);
 }
 
-static inline struct DbrSub*
-dbr_sess_sub_entry(struct DbrRbNode* node)
-{
-    return dbr_implof(struct DbrSub, sess_node_, node);
-}
-
 struct DbrSess {
     DbrUuid uuid;
     DbrPool pool;
@@ -768,6 +767,12 @@ struct DbrSess {
     // FigSessIdx bucket list.
     struct DbrSlNode uuid_node_;
 };
+
+static inline struct DbrSub*
+dbr_sess_sub_entry(struct DbrRbNode* node)
+{
+    return dbr_implof(struct DbrSub, sess_node_, node);
+}
 
 /** @} */
 

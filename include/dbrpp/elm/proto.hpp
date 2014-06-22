@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup ProtoAccnt
+ * @addtogroup AccntRec
  * @{
  */
 
@@ -53,7 +53,7 @@ proto_read_accnt(const char* buf, DbrRec& arec)
 /** @} */
 
 /**
- * @addtogroup ProtoContr
+ * @addtogroup ContrRec
  * @{
  */
 
@@ -81,7 +81,7 @@ proto_read_contr(const char* buf, DbrRec& crec)
 /** @} */
 
 /**
- * @addtogroup ProtoMemb
+ * @addtogroup Memb
  * @{
  */
 
@@ -109,7 +109,7 @@ proto_read_memb(const char* buf, DbrMemb& memb)
 /** @} */
 
 /**
- * @addtogroup ProtoOrder
+ * @addtogroup Order
  * @{
  */
 
@@ -137,7 +137,7 @@ proto_read_order(const char* buf, DbrOrder& order)
 /** @} */
 
 /**
- * @addtogroup ProtoExec
+ * @addtogroup Exec
  * @{
  */
 
@@ -165,7 +165,7 @@ proto_read_exec(const char* buf, DbrExec& exec)
 /** @} */
 
 /**
- * @addtogroup ProtoPosn
+ * @addtogroup Posn
  * @{
  */
 
@@ -193,7 +193,7 @@ proto_read_posn(const char* buf, DbrPosn& posn)
 /** @} */
 
 /**
- * @addtogroup ProtoView
+ * @addtogroup View
  * @{
  */
 

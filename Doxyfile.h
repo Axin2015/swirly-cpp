@@ -16,30 +16,59 @@
  *  02110-1301 USA.
  */
 /**
- * @defgroup Ash Ash
- */
-
-/**
- * @defgroup Defs Defs
- * @ingroup Ash
+ * @defgroup Base Base
  */
 
 /**
  * Julian and Gregorian date conversions.
  * @defgroup Date Date
- * @ingroup Ash
+ * @ingroup Base
  */
 
 /**
- * Container types.
- * @defgroup Cont Container
- * @ingroup Ash
+ * Each thread has its own error information.
+ * @defgroup Err Error
+ * @ingroup Base
+ * @example err.cpp
+ */
+
+/**
+ * @defgroup Format Format
+ * @ingroup Base
+ * @example format.cpp
+ */
+
+/**
+ * Lexical tokeniser.
+ * @defgroup Shlex Lexer
+ * @ingroup Base
+ */
+
+/**
+ * @defgroup Pack Pack
+ * @ingroup Base
+ * @example pack.cpp
+ */
+
+/**
+ * @defgroup String String
+ * @ingroup Base
+ */
+
+/**
+ * @defgroup Util Utility
+ * @ingroup Base
+ * @example util.cpp
+ */
+
+/**
+ * @defgroup Types Types
  */
 
 /**
  * Node-based types.
  * @defgroup Node Node
- * @ingroup Cont
+ * @ingroup Types
  * @example slnode.cpp
  */
 
@@ -59,6 +88,17 @@
  * Singly-linked node.
  * @defgroup SlNode SlNode
  * @ingroup Node
+ */
+
+/**
+ * Container types.
+ * @defgroup Cont Container
+ * @ingroup Types
+ */
+
+/**
+ * @defgroup Iter Iterator
+ * @ingroup Cont
  */
 
 /**
@@ -93,457 +133,193 @@
  */
 
 /**
- * @defgroup Bank Bank
- * @ingroup Ash
+ * @defgroup System System
  */
 
 /**
  * @defgroup Daemon Daemon
- * @ingroup Ash
- */
-
-/**
- * Each thread has its own error information.
- * @defgroup Err Error
- * @ingroup Ash
- * @example err.cpp
- */
-
-/**
- * Lexical tokeniser.
- * @defgroup Shlex Lexer
- * @ingroup Ash
+ * @ingroup System
  */
 
 /**
  * Each thread has its own logger.
  * @defgroup Log Log
- * @ingroup Ash
+ * @ingroup System
  */
 
 /**
- * @defgroup Pack Pack
- * @ingroup Ash
- * @example pack.cpp
+ * @defgroup Mutex Mutex
+ * @ingroup System
  */
 
 /**
- * @defgroup String String
- * @ingroup Ash
+ * @defgroup Sem Semaphore
+ * @ingroup System
  */
 
 /**
  * @defgroup Thread Thread
- * @ingroup Ash
+ * @ingroup System
  */
 
 /**
- * @defgroup Util Utility
- * @ingroup Ash
- * @example util.cpp
- */
-
-/**
- * @defgroup Elm Elm
- */
-
-/**
- * @defgroup Types Types
- * @ingroup Elm
- */
-
-/**
- * @defgroup TypesRec Record
+ * @defgroup Rec Record
  * @ingroup Types
  */
 
 /**
- * @defgroup TypesAccnt Account
- * @ingroup TypesRec
+ * @defgroup AccntRec Accnt
+ * @ingroup Rec
  */
 
 /**
- * @defgroup TypesContr Contract
- * @ingroup TypesRec
+ * @defgroup ContrRec Contract
+ * @ingroup Rec
  */
 
 /**
- * @defgroup TypesMemb Member
+ * @defgroup Memb Member
  * @ingroup Types
  */
 
 /**
- * @defgroup TypesOrder Order
+ * @defgroup Common Common
  * @ingroup Types
  */
 
 /**
- * @defgroup TypesLevel Level
+ * @defgroup Exec Execution
  * @ingroup Types
  */
 
 /**
- * @defgroup TypesExec Execution
+ * @defgroup Match Match
  * @ingroup Types
  */
 
 /**
- * @defgroup TypesMatch Match
- * @ingroup Types
- */
-
-/**
- * @defgroup TypesPosn Position
- * @ingroup Types
- */
-
-/**
- * @defgroup TypesView View
- * @ingroup Types
- */
-
-/**
- * @defgroup TypesSide Side
- * @ingroup Types
- */
-
-/**
- * @defgroup TypesBook Book
- * @ingroup Types
- */
-
-/**
- * @defgroup TypesSess Session
+ * @defgroup Posn Position
  * @ingroup Types
  */
 
 /**
  * @defgroup Conv Conversion
- * @ingroup Elm
- */
-
-/**
- * @defgroup Format Format
- * @ingroup Elm
- * @example format.cpp
+ * @ingroup Types
  */
 
 /**
  * Memory pool.
  * @defgroup Pool Pool
- * @ingroup Elm
  * @example pool.cpp
  */
 
 /**
- * @defgroup PoolRec Record
- * @ingroup Pool
+ * @defgroup IO IO
  */
 
 /**
- * @defgroup PoolMemb Member
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolOrder Order
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolLevel Level
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolExec Execution
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolMatch Match
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolPosn Position
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolView View
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolSide Side
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolBook Book
- * @ingroup Pool
- */
-
-/**
- * @defgroup PoolSess Session
- * @ingroup Pool
- */
-
-/**
- * @defgroup Proto Proto
- * @ingroup Elm
- * @example proto.cpp
- */
-
-/**
- * @defgroup ProtoRec Record
- * @ingroup Proto
- */
-
-/**
- * @defgroup ProtoAccnt Account
- * @ingroup ProtoRec
- */
-
-/**
- * @defgroup ProtoContr Contract
- * @ingroup ProtoRec
- */
-
-/**
- * @defgroup ProtoMemb Member
- * @ingroup Proto
- */
-
-/**
- * @defgroup ProtoOrder Order
- * @ingroup Proto
- */
-
-/**
- * @defgroup ProtoExec Execution
- * @ingroup Proto
- */
-
-/**
- * @defgroup ProtoPosn Position
- * @ingroup Proto
- */
-
-/**
- * @defgroup ProtoView View
- * @ingroup Proto
- */
-
-/**
- * @defgroup Json Json
- * @ingroup Elm
- * @example json.cpp
- */
-
-/**
- * @defgroup JsonRec Record
- * @ingroup Json
- */
-
-/**
- * @defgroup JsonAccnt Account
- * @ingroup JsonRec
- */
-
-/**
- * @defgroup JsonContr Contract
- * @ingroup JsonRec
- */
-
-/**
- * @defgroup JsonMemb Member
- * @ingroup Json
- */
-
-/**
- * @defgroup JsonOrder Order
- * @ingroup Json
- */
-
-/**
- * @defgroup JsonExec Execution
- * @ingroup Json
- */
-
-/**
- * @defgroup JsonPosn Position
- * @ingroup Json
- */
-
-/**
- * @defgroup JsonView View
- * @ingroup Json
- */
-
-/**
- * @defgroup Async Async
- * @ingroup Elm
+ * @defgroup Bank Bank
+ * @ingroup IO
  */
 
 /**
  * @defgroup Journ Journal
- * @ingroup Elm
+ * @ingroup IO
  */
 
 /**
  * @defgroup Model Model
- * @ingroup Elm
+ * @ingroup IO
  * @example model.cpp
  */
 
 /**
  * @defgroup Msg Msg
- * @ingroup Elm
+ * @ingroup IO
  */
 
 /**
  * @defgroup Rest Rest
- * @ingroup Elm
+ * @ingroup IO
  */
 
 /**
  * @defgroup Zmq ZeroMQ
- * @ingroup Elm
- */
-
-/**
- * @defgroup Fig Fig
+ * @ingroup IO
  */
 
 /**
  * Accounts represent both users and groups.
  * @defgroup Accnt Account
- * @ingroup Fig
- */
-
-/**
- * @defgroup AccntUser User
- * @ingroup Accnt
- */
-
-/**
- * @defgroup AccntGroup Group
- * @ingroup Accnt
- */
-
-/**
- * @defgroup AccntOrder Order
- * @ingroup Accnt
- */
-
-/**
- * @defgroup AccntTrade Trade
- * @ingroup Accnt
- */
-
-/**
- * @defgroup AccntPosn Position
- * @ingroup Accnt
  */
 
 /**
  * An Order Book comprises two sides: one for Bids and one for Offers.
+ * @defgroup Book Book
+ */
+
+/**
  * @defgroup Side Side
- * @ingroup Fig
+ * @ingroup Book
  * @example side.cpp
  */
 
 /**
  * The orders for each side are ordered by price and time.
- * @defgroup SideOrder Order
- * @ingroup Side
+ * @defgroup Order Order
+ * @ingroup Book
  */
 
 /**
  * Each level is an aggregation of orders by price.
- * @defgroup SideLevel Level
- * @ingroup Side
+ * @defgroup Level Level
+ * @ingroup Book
  */
 
 /**
- * Last traded.
- * @defgroup SideLast Last
- * @ingroup Side
- */
-
-/**
- * @defgroup Book Book
- * @ingroup Fig
+ * @defgroup View View
+ * @ingroup Book
  */
 
 /**
  * @defgroup Sess Session
- * @ingroup Fig
- */
-
-/**
- * @defgroup SessUser User
- * @ingroup Sess
- */
-
-/**
- * @defgroup Ctx Context
- * @ingroup Fig
  */
 
 /**
  * @defgroup Serv Server
- * @ingroup Fig
  * @example serv.cpp
  */
 
 /**
- * @defgroup ServRec Record
- * @ingroup Serv
- */
-
-/**
- * @defgroup ServExec Execution
- * @ingroup Serv
- */
-
-/**
- * @defgroup ServPosn Position
- * @ingroup Serv
- */
-
-/**
- * @defgroup ServBook Book
- * @ingroup Serv
+ * @defgroup Client Client
  */
 
 /**
  * @defgroup Clnt Client
- * @ingroup Fig
+ * @ingroup Client
  */
 
 /**
- * @defgroup ClntRec Record
- * @ingroup Clnt
+ * @defgroup Dispatch Dispatch
+ * @ingroup Client
  */
 
 /**
- * @defgroup ClntView View
- * @ingroup Clnt
+ * @defgroup Handler Handler
+ * @ingroup Client
+ */
+
+/**
+ * @defgroup Ctx Context
+ * @ingroup Client
+ */
+
+/**
+ * @defgroup Async Async
+ * @ingroup Client
  */
 
 /**
  * @defgroup Task Task
- * @ingroup Fig
- */
-
-/**
- * @defgroup Fir Fir
- */
-
-/**
- * @defgroup Sql Sql
- * @ingroup Fir
+ * @ingroup Client
  */

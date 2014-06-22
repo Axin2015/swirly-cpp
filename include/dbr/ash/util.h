@@ -20,7 +20,6 @@
 
 #include <dbr/ash/defs.h>
 
-#include <ctype.h>  // isspace()
 #include <stddef.h> // size_t
 
 /**
@@ -44,24 +43,6 @@ static inline size_t
 dbr_long_len(long l)
 {
     return dbr_long_dig(l) + (l < 0 ? 1 : 0);
-}
-
-static inline const char*
-dbr_ltrim(const char* begin, const char* end)
-{
-    // Skip leading whitespace.
-    while (begin != end && isspace(*begin))
-        ++begin;
-    return begin;
-}
-
-static inline const char*
-dbr_rtrim(const char* begin, const char* end)
-{
-    // Skip trailing whitespace.
-    while (begin != end && isspace(*(end - 1)))
-        --end;
-    return end;
 }
 
 /**

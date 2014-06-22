@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_PRIOQ_H
 #define DBR_ASH_PRIOQ_H
 
+/**
+ * @file
+ * Priority queue.
+ */
+
 #include <dbr/ash/defs.h>
 
 #include <stddef.h> // size_t

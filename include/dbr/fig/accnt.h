@@ -15,8 +15,13 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_ACCNT_H
-#define DBR_CLNT_ACCNT_H
+#ifndef DBR_FIG_ACCNT_H
+#define DBR_FIG_ACCNT_H
+
+/**
+ * @file
+ * Accounts represent both users and groups.
+ */
 
 #include <dbr/elm/types.h>
 
@@ -31,13 +36,6 @@
 
 DBR_API struct DbrRec*
 dbr_accnt_rec(DbrAccnt accnt);
-
-/** @} */
-
-/**
- * @addtogroup AccntUser
- * @{
- */
 
 #define DBR_ACCNT_END_USER NULL
 
@@ -59,13 +57,6 @@ dbr_accnt_last_user(DbrAccnt accnt);
 DBR_API DbrBool
 dbr_accnt_empty_user(DbrAccnt accnt);
 
-/** @} */
-
-/**
- * @addtogroup AccntGroup
- * @{
- */
-
 #define DBR_ACCNT_END_GROUP NULL
 
 static inline struct DbrMemb*
@@ -85,13 +76,6 @@ dbr_accnt_last_group(DbrAccnt accnt);
 
 DBR_API DbrBool
 dbr_accnt_empty_group(DbrAccnt accnt);
-
-/** @} */
-
-/**
- * @addtogroup AccntOrder
- * @{
- */
 
 #define DBR_ACCNT_END_ORDER NULL
 
@@ -116,13 +100,6 @@ dbr_accnt_last_order(DbrAccnt accnt);
 DBR_API DbrBool
 dbr_accnt_empty_order(DbrAccnt accnt);
 
-/** @} */
-
-/**
- * @addtogroup AccntTrade
- * @{
- */
-
 #define DBR_ACCNT_END_TRADE NULL
 
 static inline struct DbrExec*
@@ -142,13 +119,6 @@ dbr_accnt_last_trade(DbrAccnt accnt);
 
 DBR_API DbrBool
 dbr_accnt_empty_trade(DbrAccnt accnt);
-
-/** @} */
-
-/**
- * @addtogroup AccntPosn
- * @{
- */
 
 #define DBR_ACCNT_END_POSN NULL
 
@@ -170,13 +140,6 @@ dbr_accnt_last_posn(DbrAccnt accnt);
 DBR_API DbrBool
 dbr_accnt_empty_posn(DbrAccnt accnt);
 
-/** @} */
-
-/**
- * @addtogroup Accnt
- * @{
- */
-
 DBR_API DbrBool
 dbr_accnt_logged_on(DbrAccnt accnt);
 
@@ -185,4 +148,4 @@ dbr_accnt_sess(DbrAccnt accnt);
 
 /** @} */
 
-#endif // DBR_CLNT_ACCNT_H
+#endif // DBR_FIG_ACCNT_H

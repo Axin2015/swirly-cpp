@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_STACK_H
 #define DBR_ASH_STACK_H
 
+/**
+ * @file
+ * Stack.
+ */
+
 #include <dbr/ash/defs.h>
 #include <dbr/ash/slnode.h>
 

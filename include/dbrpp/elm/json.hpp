@@ -25,7 +25,7 @@
 namespace dbr {
 
 /**
- * @addtogroup JsonAccnt
+ * @addtogroup AccntRec
  * @{
  */
 
@@ -54,7 +54,7 @@ json_write_accnt(const DbrRec& arec)
 /** @} */
 
 /**
- * @addtogroup JsonContr
+ * @addtogroup ContrRec
  * @{
  */
 
@@ -83,7 +83,7 @@ json_write_contr(const DbrRec& crec)
 /** @} */
 
 /**
- * @addtogroup JsonMemb
+ * @addtogroup Memb
  * @{
  */
 
@@ -112,7 +112,7 @@ json_write_memb(const DbrMemb& memb) noexcept
 /** @} */
 
 /**
- * @addtogroup JsonOrder
+ * @addtogroup Order
  * @{
  */
 
@@ -141,7 +141,7 @@ json_write_order(const DbrOrder& order) noexcept
 /** @} */
 
 /**
- * @addtogroup JsonExec
+ * @addtogroup Exec
  * @{
  */
 
@@ -170,7 +170,7 @@ json_write_exec(const DbrExec& exec) noexcept
 /** @} */
 
 /**
- * @addtogroup JsonPosn
+ * @addtogroup Posn
  * @{
  */
 
@@ -199,7 +199,7 @@ json_write_posn(const DbrPosn& posn) noexcept
 /** @} */
 
 /**
- * @addtogroup JsonView
+ * @addtogroup View
  * @{
  */
 

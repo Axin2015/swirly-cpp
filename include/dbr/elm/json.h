@@ -30,7 +30,7 @@ struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup JsonAccnt
+ * @addtogroup AccntRec
  * @{
  */
 
@@ -43,7 +43,7 @@ dbr_json_write_accnt(char* buf, const struct DbrRec* rec);
 /** @} */
 
 /**
- * @addtogroup JsonContr
+ * @addtogroup ContrRec
  * @{
  */
 
@@ -56,7 +56,7 @@ dbr_json_write_contr(char* buf, const struct DbrRec* rec);
 /** @} */
 
 /**
- * @addtogroup JsonMemb
+ * @addtogroup Memb
  * @{
  */
 
@@ -69,7 +69,7 @@ dbr_json_write_memb(char* buf, const struct DbrMemb* memb);
 /** @} */
 
 /**
- * @addtogroup JsonOrder
+ * @addtogroup Order
  * @{
  */
 
@@ -82,7 +82,7 @@ dbr_json_write_order(char* buf, const struct DbrOrder* order);
 /** @} */
 
 /**
- * @addtogroup JsonExec
+ * @addtogroup Exec
  * @{
  */
 
@@ -95,7 +95,7 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec);
 /** @} */
 
 /**
- * @addtogroup JsonPosn
+ * @addtogroup Posn
  * @{
  */
 
@@ -108,7 +108,7 @@ dbr_json_write_posn(char* buf, const struct DbrPosn* posn);
 /** @} */
 
 /**
- * @addtogroup JsonView
+ * @addtogroup View
  * @{
  */
 

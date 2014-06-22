@@ -32,7 +32,7 @@
 namespace dbr {
 
 /**
- * @addtogroup ServRec
+ * @addtogroup Serv
  * @{
  */
 
@@ -168,13 +168,6 @@ public:
 typedef ServRecs<DBR_ENTITY_ACCNT> ServAccntRecs;
 typedef ServRecs<DBR_ENTITY_CONTR> ServContrRecs;
 
-/** @} */
-
-/**
- * @addtogroup ServExec
- * @{
- */
-
 class ServExecs {
     struct Policy : NodeTraits<DbrSlNode> {
         typedef DbrExec Entry;
@@ -280,13 +273,6 @@ public:
         return dbr_serv_empty_exec(serv_);
     }
 };
-
-/** @} */
-
-/**
- * @addtogroup ServPosn
- * @{
- */
 
 class ServPosnups {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -430,13 +416,6 @@ public:
         return dbr_serv_empty_posnup(serv_);
     }
 };
-
-/** @} */
-
-/**
- * @addtogroup ServBook
- * @{
- */
 
 class ServBooks {
     struct Policy : NodeTraits<DbrRbNode> {
@@ -737,13 +716,6 @@ public:
     }
 };
 
-/** @} */
-
-/**
- * @addtogroup Serv
- * @{
- */
-
 class Serv {
     DbrServ impl_;
 public:
@@ -797,10 +769,6 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
-    /**
-     * @addtogroup ServRec
-     * @{
-     */
     void
     load(DbrModel model)
     {
@@ -823,7 +791,6 @@ public:
     {
         return ServContrRecs{impl_};
     }
-    /** @} */
     Accnt
     accnt(DbrRec& arec) const
     {
@@ -901,30 +868,16 @@ public:
     {
         dbr_serv_clear(impl_);
     }
-    /**
-     * @addtogroup ServExec
-     * @{
-     */
     ServExecs
     execs() const noexcept
     {
         return ServExecs{impl_};
     }
-    /** @} */
-    /**
-     * @addtogroup ServPosn
-     * @{
-     */
     ServPosnups
     posnups() const noexcept
     {
         return ServPosnups{impl_};
     }
-    /** @} */
-    /**
-     * @addtogroup ServBook
-     * @{
-     */
     ServBooks
     books() const noexcept
     {
@@ -935,7 +888,6 @@ public:
     {
         return ServBookups{impl_};
     }
-    /** @} */
 };
 
 /** @} */

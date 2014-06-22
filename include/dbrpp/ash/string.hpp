@@ -18,6 +18,8 @@
 #ifndef DBRPP_ASH_STRING_HPP
 #define DBRPP_ASH_STRING_HPP
 
+#include <dbr/ash/string.h>
+
 #include <cstring>
 #include <iostream>
 #include <iterator>

@@ -23,7 +23,7 @@
 namespace dbr {
 
 /**
- * @addtogroup TypesMemb
+ * @addtogroup Memb
  * @{
  */
 

@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_HANDLER_H
-#define DBR_CLNT_HANDLER_H
+#ifndef DBR_FIG_HANDLER_H
+#define DBR_FIG_HANDLER_H
 
 #include <dbr/fig/clnt.h>
 
@@ -25,7 +25,7 @@ struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup Clnt
+ * @addtogroup Handler
  * @{
  */
 
@@ -156,4 +156,4 @@ dbr_handler_on_async(DbrHandler handler, DbrClnt clnt, void* val)
 
 /** @} */
 
-#endif // DBR_CLNT_HANDLER_H
+#endif // DBR_FIG_HANDLER_H

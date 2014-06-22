@@ -26,7 +26,7 @@
 namespace dbr {
 
 /**
- * @addtogroup TypesRec
+ * @addtogroup Rec
  * @{
  */
 
@@ -104,7 +104,7 @@ operator <<(std::ostream& os, RecRef rec)
 /** @} */
 
 /**
- * @addtogroup TypesAccnt
+ * @addtogroup AccntRec
  * @{
  */
 
@@ -134,7 +134,7 @@ operator <<(std::ostream& os, AccntRecRef arec)
 /** @} */
 
 /**
- * @addtogroup TypesContr
+ * @addtogroup ContrRec
  * @{
  */
 

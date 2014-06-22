@@ -23,7 +23,7 @@
 namespace dbr {
 
 /**
- * @addtogroup TypesView
+ * @addtogroup View
  * @{
  */
 

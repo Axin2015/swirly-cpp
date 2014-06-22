@@ -16,8 +16,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_SIDE_H
-#define DBR_CLNT_SIDE_H
+#ifndef DBR_FIG_SIDE_H
+#define DBR_FIG_SIDE_H
 
 #include <dbr/elm/types.h>
 
@@ -35,13 +35,6 @@ dbr_side_init(struct DbrSide* side, DbrPool pool);
 
 DBR_API void
 dbr_side_term(struct DbrSide* side);
-
-/** @} */
-
-/**
- * @addtogroup SideOrder
- * @{
- */
 
 static inline struct DbrOrder*
 dbr_side_order_entry(struct DbrDlNode* node)
@@ -123,13 +116,6 @@ dbr_side_empty_order(const struct DbrSide* side)
     return dbr_list_empty(&side->orders);
 }
 
-/** @} */
-
-/**
- * @addtogroup SideLevel
- * @{
- */
-
 #define DBR_SIDE_END_LEVEL NULL
 
 static inline struct DbrLevel*
@@ -162,13 +148,6 @@ dbr_side_empty_level(const struct DbrSide* side)
     return dbr_tree_empty(&side->levels);
 }
 
-/** @} */
-
-/**
- * @addtogroup SideLast
- * @{
- */
-
 static inline DbrTicks
 dbr_side_last_ticks(const struct DbrSide* side)
 {
@@ -189,4 +168,4 @@ dbr_side_last_time(const struct DbrSide* side)
 
 /** @} */
 
-#endif // DBR_CLNT_SIDE_H
+#endif // DBR_FIG_SIDE_H

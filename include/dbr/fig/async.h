@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_ASYNC_H
-#define DBR_CLNT_ASYNC_H
+#ifndef DBR_FIG_ASYNC_H
+#define DBR_FIG_ASYNC_H
 
 #include <dbr/ash/defs.h>
 
@@ -41,4 +41,4 @@ dbr_async_recv(DbrAsync async, void** val);
 
 /** @} */
 
-#endif // DBR_CLNT_ASYNC_H
+#endif // DBR_FIG_ASYNC_H

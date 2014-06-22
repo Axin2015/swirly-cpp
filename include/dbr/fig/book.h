@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_CLNT_BOOK_H
-#define DBR_CLNT_BOOK_H
+#ifndef DBR_FIG_BOOK_H
+#define DBR_FIG_BOOK_H
 
 #include <dbr/fig/side.h>
 
@@ -98,4 +98,4 @@ dbr_book_view(struct DbrBook* book, struct DbrView* view, DbrMillis now);
 
 /** @} */
 
-#endif // DBR_CLNT_BOOK_H
+#endif // DBR_FIG_BOOK_H

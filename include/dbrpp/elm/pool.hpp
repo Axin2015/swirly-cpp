@@ -83,10 +83,6 @@ public:
     {
         std::swap(impl_, rhs.impl_);
     }
-    /**
-     * @addtogroup PoolRec
-     * @{
-     */
     DbrRec*
     alloc_rec()
     {
@@ -100,11 +96,6 @@ public:
     {
         dbr_pool_free_rec(impl_, rec);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolMemb
-     * @{
-     */
     DbrMemb*
     alloc_memb()
     {
@@ -118,11 +109,6 @@ public:
     {
         dbr_pool_free_memb(impl_, memb);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolOrder
-     * @{
-     */
     DbrOrder*
     alloc_order()
     {
@@ -136,11 +122,6 @@ public:
     {
         dbr_pool_free_order(impl_, order);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolLevel
-     * @{
-     */
     DbrLevel*
     alloc_level()
     {
@@ -154,11 +135,6 @@ public:
     {
         dbr_pool_free_level(impl_, level);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolExec
-     * @{
-     */
     DbrExec*
     alloc_exec()
     {
@@ -172,11 +148,6 @@ public:
     {
         dbr_pool_free_exec(impl_, exec);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolMatch
-     * @{
-     */
     DbrMatch*
     alloc_match()
     {
@@ -190,11 +161,6 @@ public:
     {
         dbr_pool_free_match(impl_, match);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolPosn
-     * @{
-     */
     DbrPosn*
     alloc_posn()
     {
@@ -208,11 +174,6 @@ public:
     {
         dbr_pool_free_posn(impl_, posn);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolView
-     * @{
-     */
     DbrView*
     alloc_view()
     {
@@ -226,11 +187,6 @@ public:
     {
         dbr_pool_free_view(impl_, view);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolBook
-     * @{
-     */
     DbrBook*
     alloc_book()
     {
@@ -244,11 +200,6 @@ public:
     {
         dbr_pool_free_book(impl_, book);
     }
-    /** @} */
-    /**
-     * @addtogroup PoolSess
-     * @{
-     */
     DbrSub*
     alloc_sub()
     {
@@ -275,7 +226,6 @@ public:
     {
         dbr_pool_free_sess(impl_, sess);
     }
-    /** @} */
 };
 
 /** @} */

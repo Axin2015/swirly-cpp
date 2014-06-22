@@ -18,6 +18,11 @@
 #ifndef DBR_ASH_DATE_H
 #define DBR_ASH_DATE_H
 
+/**
+ * @file
+ * Julian and Gregorian date conversions.
+ */
+
 #include <assert.h>
 
 /**

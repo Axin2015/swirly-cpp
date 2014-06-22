@@ -30,7 +30,7 @@ struct DbrPosn;
 struct DbrView;
 
 /**
- * @addtogroup ProtoAccnt
+ * @addtogroup AccntRec
  * @{
  */
 
@@ -46,7 +46,7 @@ dbr_proto_read_accnt(const char* buf, struct DbrRec* rec);
 /** @} */
 
 /**
- * @addtogroup ProtoContr
+ * @addtogroup ContrRec
  * @{
  */
 
@@ -62,7 +62,7 @@ dbr_proto_read_contr(const char* buf, struct DbrRec* rec);
 /** @} */
 
 /**
- * @addtogroup ProtoMemb
+ * @addtogroup Memb
  * @{
  */
 
@@ -78,7 +78,7 @@ dbr_proto_read_memb(const char* buf, struct DbrMemb* memb);
 /** @} */
 
 /**
- * @addtogroup ProtoOrder
+ * @addtogroup Order
  * @{
  */
 
@@ -94,7 +94,7 @@ dbr_proto_read_order(const char* buf, struct DbrOrder* order);
 /** @} */
 
 /**
- * @addtogroup ProtoExec
+ * @addtogroup Exec
  * @{
  */
 
@@ -110,7 +110,7 @@ dbr_proto_read_exec(const char* buf, struct DbrExec* exec);
 /** @} */
 
 /**
- * @addtogroup ProtoPosn
+ * @addtogroup Posn
  * @{
  */
 
@@ -126,7 +126,7 @@ dbr_proto_read_posn(const char* buf, struct DbrPosn* posn);
 /** @} */
 
 /**
- * @addtogroup ProtoView
+ * @addtogroup View
  * @{
  */
 
