@@ -23,6 +23,7 @@
 #include <sys/types.h> // mode_t
 
 /**
+ * Run program as daemon process.
  * @addtogroup Daemon
  * @{
  */

@@ -23,19 +23,15 @@
  * Julian and Gregorian date conversions.
  * @defgroup Date Date
  * @ingroup Base
+ * @example jdtoymd.c
+ * @example ymdtojd.c
  */
 
 /**
- * Each thread has its own error information.
+ * Thread-specific error information.
  * @defgroup Err Error
  * @ingroup Base
  * @example err.cpp
- */
-
-/**
- * @defgroup Format Format
- * @ingroup Base
- * @example format.cpp
  */
 
 /**
@@ -45,17 +41,20 @@
  */
 
 /**
+ * Binary encoding.
  * @defgroup Pack Pack
  * @ingroup Base
  * @example pack.cpp
  */
 
 /**
+ * String functions.
  * @defgroup String String
  * @ingroup Base
  */
 
 /**
+ * Utility functions.
  * @defgroup Util Utility
  * @ingroup Base
  * @example util.cpp
@@ -128,17 +127,46 @@
  */
 
 /**
- * @defgroup Types Types
+ * @defgroup System System
  */
 
 /**
+ * Process daemonisation.
+ * @defgroup Daemon Daemon
+ * @ingroup System
+ */
+
+/**
+ * Thread-specific logger.
+ * @defgroup Log Log
+ * @ingroup System
+ */
+
+/**
+ * @defgroup Mutex Mutex
+ * @ingroup System
+ */
+
+/**
+ * @defgroup Sem Semaphore
+ * @ingroup System
+ */
+
+/**
+ * @defgroup Domain Domain
+ * @example json.cpp
+ * @example proto.cpp
+ */
+
+/**
+ * Simple type definitions.
  * @defgroup Simple Simple
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
  * @defgroup Rec Record
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
@@ -153,83 +181,65 @@
 
 /**
  * @defgroup Memb Member
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
  * @defgroup Common Common
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
  * @defgroup Order Order
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
  * @defgroup Exec Execution
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
  * @defgroup Match Match
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
  * @defgroup Posn Position
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
+ * Type conversions.
  * @defgroup Conv Conversion
- * @ingroup Types
+ * @ingroup Domain
  */
 
 /**
- * @defgroup System System
- */
-
-/**
- * @defgroup Daemon Daemon
- * @ingroup System
- */
-
-/**
- * Each thread has its own logger.
- * @defgroup Log Log
- * @ingroup System
- */
-
-/**
- * @defgroup Mutex Mutex
- * @ingroup System
+ * @defgroup Core Core
  */
 
 /**
  * Memory pool.
  * @defgroup Pool Pool
- * @ingroup System
+ * @ingroup Core
  * @example pool.cpp
  */
 
 /**
- * @defgroup Sem Semaphore
- * @ingroup System
- */
-
-/**
- * @defgroup Thread Thread
- * @ingroup System
- */
-
-/**
  * @defgroup IO IO
+ * @ingroup Core
  */
 
 /**
  * @defgroup Bank Bank
  * @ingroup IO
+ */
+
+/**
+ * @defgroup Format Format
+ * @ingroup IO
+ * @example format.cpp
  */
 
 /**
@@ -249,8 +259,10 @@
  */
 
 /**
+ * Restful parser.
  * @defgroup Rest Rest
  * @ingroup IO
+ * @example rest.cpp
  */
 
 /**
@@ -261,22 +273,24 @@
 /**
  * Accounts represent both users and groups.
  * @defgroup Accnt Account
+ * @ingroup Core
  */
 
 /**
- * An Order Book comprises two sides: one for Bids and one for Offers.
+ * Order-book comprising bid and offer sides.
  * @defgroup Book Book
+ * @ingroup Core
  */
 
 /**
- * The orders for each side are ordered by price and time.
+ * Side ordered by price and time.
  * @defgroup Side Side
  * @ingroup Book
  * @example side.cpp
  */
 
 /**
- * Each level is an aggregation of orders by price.
+ * Price level is an aggregation of orders by price.
  * @defgroup Level Level
  * @ingroup Book
  */
@@ -288,15 +302,20 @@
 
 /**
  * @defgroup Sess Session
+ * @ingroup Core
  */
 
 /**
  * @defgroup Serv Server
+ * @ingroup Core
+ * @example dump.cpp
+ * @example perf.c
  * @example serv.cpp
  */
 
 /**
  * @defgroup Client Client
+ * @ingroup Core
  */
 
 /**
@@ -312,16 +331,19 @@
 /**
  * @defgroup Handler Handler
  * @ingroup Client
+ * @example skel.cpp
  */
 
 /**
  * @defgroup Ctx Context
  * @ingroup Client
+ * @example skel.cpp
  */
 
 /**
  * @defgroup Async Async
  * @ingroup Client
+ * @example skel.cpp
  */
 
 /**

@@ -615,6 +615,9 @@ dbr_shared_posn_entry(struct DbrSlNode* node)
  */
 
 enum {
+    /**
+     * Maximum price levels in view.
+     */
     DBR_LEVEL_MAX = 3
 };
 
