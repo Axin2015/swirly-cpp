@@ -14,7 +14,7 @@ package "Doobry Shell" {
 }
 ZMQ <.. [dbr_clnt]
 
-package "LigHTTPd" {
+package "Nginx" {
   [dbr_mod] <<module>>
 }
 ZMQ <.. [dbr_mod]
