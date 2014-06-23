@@ -8,8 +8,8 @@ Doobry is an open-source matching engine written in C11. The target platform is 
 source-code is [freely available on GitHub](http://github.com/doobry-org).
 
 Matching engines are used in financial trading systems to match buyers and sellers in a
-market-place. Traders place bids and offers into an order-book. These orders can be revised and
-cancelled. A trade happens when a bid and offer match on price. Market participants can see the
+market-place. Traders place bids and offers into a central order-book. These orders can be revised
+and cancelled. A trade happens when a bid and offer match on price. Market participants can see the
 liquidity currently available in the order-book.
 
 Who can use it?
