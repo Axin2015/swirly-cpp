@@ -62,13 +62,14 @@
  */
 
 /**
- * @defgroup Types Types
+ * Container types.
+ * @defgroup Cont Container
  */
 
 /**
  * Node-based types.
  * @defgroup Node Node
- * @ingroup Types
+ * @ingroup Cont
  * @example slnode.cpp
  */
 
@@ -88,12 +89,6 @@
  * Singly-linked node.
  * @defgroup SlNode SlNode
  * @ingroup Node
- */
-
-/**
- * Container types.
- * @defgroup Cont Container
- * @ingroup Types
  */
 
 /**
@@ -133,33 +128,12 @@
  */
 
 /**
- * @defgroup System System
+ * @defgroup Types Types
  */
 
 /**
- * @defgroup Daemon Daemon
- * @ingroup System
- */
-
-/**
- * Each thread has its own logger.
- * @defgroup Log Log
- * @ingroup System
- */
-
-/**
- * @defgroup Mutex Mutex
- * @ingroup System
- */
-
-/**
- * @defgroup Sem Semaphore
- * @ingroup System
- */
-
-/**
- * @defgroup Thread Thread
- * @ingroup System
+ * @defgroup Simple Simple
+ * @ingroup Types
  */
 
 /**
@@ -188,6 +162,11 @@
  */
 
 /**
+ * @defgroup Order Order
+ * @ingroup Types
+ */
+
+/**
  * @defgroup Exec Execution
  * @ingroup Types
  */
@@ -208,9 +187,40 @@
  */
 
 /**
+ * @defgroup System System
+ */
+
+/**
+ * @defgroup Daemon Daemon
+ * @ingroup System
+ */
+
+/**
+ * Each thread has its own logger.
+ * @defgroup Log Log
+ * @ingroup System
+ */
+
+/**
+ * @defgroup Mutex Mutex
+ * @ingroup System
+ */
+
+/**
  * Memory pool.
  * @defgroup Pool Pool
+ * @ingroup System
  * @example pool.cpp
+ */
+
+/**
+ * @defgroup Sem Semaphore
+ * @ingroup System
+ */
+
+/**
+ * @defgroup Thread Thread
+ * @ingroup System
  */
 
 /**
@@ -259,15 +269,10 @@
  */
 
 /**
+ * The orders for each side are ordered by price and time.
  * @defgroup Side Side
  * @ingroup Book
  * @example side.cpp
- */
-
-/**
- * The orders for each side are ordered by price and time.
- * @defgroup Order Order
- * @ingroup Book
  */
 
 /**

@@ -27,7 +27,7 @@
 #include <sys/types.h> // ssize_t
 
 /**
- * @addtogroup Types
+ * @addtogroup Simple
  * @{
  */
 
