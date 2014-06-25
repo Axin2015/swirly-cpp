@@ -1,4 +1,5 @@
 ngx_addon_name=ngx_http_doobry_module
 HTTP_MODULES="$HTTP_MODULES ngx_http_doobry_module"
 NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_doobry_module.c"
+CORE_INCS="$CORE_INCS $DOOBRY_HOME/include"
 CORE_LIBS="$CORE_LIBS -L$DOOBRY_HOME/lib -ldbr_fig"
