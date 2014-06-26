@@ -20,6 +20,7 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 
+#include <dbr/ash.h>
 #include <dbr/fig.h>
 
 typedef struct {
@@ -28,50 +29,99 @@ typedef struct {
     ngx_str_t traddr;
     ngx_uint_t tmout;
     ngx_uint_t capacity;
+
+    struct DbrIHandler i_handler;
     DbrCtx ctx;
 } ngx_http_doobry_loc_conf_t;
 
+#if 0
+static inline ngx_http_doobry_loc_conf_t*
+handler_implof(DbrHandler handler)
+{
+    return dbr_implof(ngx_http_doobry_loc_conf_t, i_handler, handler);
+}
+#endif
+
 static void
-ngx_http_doobry_cleanup(void* data)
+on_close(DbrHandler handler, DbrClnt clnt)
 {
+    dbr_log_error("on_close()");
 }
 
-static void*
-ngx_http_doobry_create_loc_conf(ngx_conf_t* cf)
+static void
+on_ready(DbrHandler handler, DbrClnt clnt)
 {
-    ngx_http_doobry_loc_conf_t* lcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_doobry_loc_conf_t));
-    if (!lcf) {
-        ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to allocate local config");
-        return NULL;
-    }
-
-    lcf->tmout = NGX_CONF_UNSET_UINT;
-    lcf->capacity = NGX_CONF_UNSET_UINT;
-
-    ngx_pool_cleanup_t* cln = ngx_pool_cleanup_add(cf->pool, 0);
-    if (!cln) {
-        ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to allocate pool cleanup");
-        return NULL;
-    }
-
-    cln->handler = ngx_http_doobry_cleanup;
-    cln->data = lcf;
-    return lcf;
+    dbr_log_error("on_ready()");
 }
 
-static char*
-ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
+static void
+on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
 {
-    ngx_http_doobry_loc_conf_t* parent = prev;
-    ngx_http_doobry_loc_conf_t* child = conf;
-
-    ngx_conf_merge_str_value(child->mdaddr, parent->mdaddr, "tcp://localhost:3270");
-    ngx_conf_merge_str_value(child->traddr, parent->traddr, "tcp://localhost:3271");
-    ngx_conf_merge_uint_value(child->tmout, parent->tmout, 5000);
-    ngx_conf_merge_uint_value(child->capacity, parent->capacity, 8 * 1024 * 1024);
-
-    return NGX_CONF_OK;
+    dbr_log_error("on_logon()");
 }
+
+static void
+on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
+{
+    dbr_log_error("on_logoff()");
+}
+
+static void
+on_reset(DbrHandler handler, DbrClnt clnt)
+{
+    dbr_log_error("on_reset()");
+}
+
+static void
+on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id)
+{
+    dbr_log_error("on_timeout()");
+}
+
+static void
+on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg)
+{
+    dbr_log_error("on_status()");
+}
+
+static void
+on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, struct DbrExec* exec)
+{
+    dbr_log_error("on_exec()");
+}
+
+static void
+on_posn(DbrHandler handler, DbrClnt clnt, struct DbrPosn* posn)
+{
+    dbr_log_error("on_posn()");
+}
+
+static void
+on_view(DbrHandler handler, DbrClnt clnt, struct DbrView* view)
+{
+    dbr_log_error("on_view()");
+}
+
+static void
+on_flush(DbrHandler handler, DbrClnt clnt)
+{
+    dbr_log_debug2("on_flush()");
+}
+
+static const struct DbrHandlerVtbl HANDLER_VTBL = {
+    .on_close = on_close,
+    .on_ready = on_ready,
+    .on_logon = on_logon,
+    .on_logoff = on_logoff,
+    .on_reset = on_reset,
+    .on_timeout = on_timeout,
+    .on_status = on_status,
+    .on_exec = on_exec,
+    .on_posn = on_posn,
+    .on_view = on_view,
+    .on_flush = on_flush,
+    .on_async = dbr_task_on_async
+};
 
 static ngx_int_t
 ngx_http_doobry_handler(ngx_http_request_t* r)
@@ -97,6 +147,79 @@ ngx_http_doobry_handler(ngx_http_request_t* r)
 
     ngx_http_send_header(r);
     return ngx_http_output_filter(r, &out);
+}
+
+static void
+ngx_http_doobry_cleanup(void* data)
+{
+    ngx_http_doobry_loc_conf_t* lcf = data;
+    dbr_ctx_destroy(lcf->ctx);
+}
+
+static void*
+ngx_http_doobry_create_loc_conf(ngx_conf_t* cf)
+{
+    ngx_http_doobry_loc_conf_t* lcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_doobry_loc_conf_t));
+    if (!lcf) {
+        ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to allocate local config");
+        return NULL;
+    }
+
+    lcf->doobry = DBR_FALSE;
+    ngx_str_null(&lcf->mdaddr);
+    ngx_str_null(&lcf->traddr);
+    lcf->tmout = NGX_CONF_UNSET_UINT;
+    lcf->capacity = NGX_CONF_UNSET_UINT;
+
+    lcf->i_handler.vtbl = &HANDLER_VTBL;
+    lcf->ctx = NULL;
+
+    return lcf;
+}
+
+static char*
+ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
+{
+    // Install doobry handler.
+    ngx_http_core_loc_conf_t* clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
+    clcf->handler = ngx_http_doobry_handler;
+
+    ngx_http_doobry_loc_conf_t* pcf = prev;
+    ngx_http_doobry_loc_conf_t* lcf = conf;
+
+    ngx_conf_merge_str_value(lcf->mdaddr, pcf->mdaddr, "tcp://localhost:3270");
+    ngx_conf_merge_str_value(lcf->traddr, pcf->traddr, "tcp://localhost:3271");
+    ngx_conf_merge_uint_value(lcf->tmout, pcf->tmout, 5000);
+    ngx_conf_merge_uint_value(lcf->capacity, pcf->capacity, 8 * 1024 * 1024);
+
+    if (lcf->doobry) {
+
+        // Null terminate strings.
+
+        char* mdaddr = alloca(lcf->mdaddr.len + 1);
+        ngx_memcpy(mdaddr, lcf->mdaddr.data, lcf->mdaddr.len);
+        mdaddr[lcf->mdaddr.len] = '\0';
+
+        char* traddr = alloca(lcf->traddr.len + 1);
+        ngx_memcpy(traddr, lcf->traddr.data, lcf->traddr.len);
+        traddr[lcf->traddr.len] = '\0';
+
+        lcf->ctx = dbr_ctx_create(mdaddr, traddr, lcf->tmout, lcf->capacity, &lcf->i_handler);
+        if (!lcf->ctx) {
+            ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to create context");
+            return NGX_CONF_ERROR;
+        }
+
+        ngx_pool_cleanup_t* cln = ngx_pool_cleanup_add(cf->pool, 0);
+        if (!cln) {
+            ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to allocate pool cleanup");
+            return NGX_CONF_ERROR;
+        }
+
+        cln->handler = ngx_http_doobry_cleanup;
+        cln->data = lcf;
+    }
+    return NGX_CONF_OK;
 }
 
 static char*
@@ -214,8 +337,8 @@ static ngx_command_t ngx_http_doobry_commands[] = {
         .name = ngx_string("doobry"),
         .type = NGX_HTTP_LOC_CONF | NGX_CONF_NOARGS,
         .set = ngx_http_doobry,
-        .conf = 0,
-        .offset = 0,
+        .conf = NGX_HTTP_LOC_CONF_OFFSET,
+        .offset = offsetof(ngx_http_doobry_loc_conf_t, doobry),
         .post = NULL
     },
     {
