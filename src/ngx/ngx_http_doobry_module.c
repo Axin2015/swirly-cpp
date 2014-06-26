@@ -123,6 +123,12 @@ static const struct DbrHandlerVtbl HANDLER_VTBL = {
     .on_async = dbr_task_on_async
 };
 
+static void
+ngx_http_doobry_log(int level, const char* msg)
+{
+    ngx_log_stderr(0, msg);
+}
+
 static ngx_int_t
 ngx_http_doobry_handler(ngx_http_request_t* r)
 {
@@ -161,7 +167,7 @@ ngx_http_doobry_create_loc_conf(ngx_conf_t* cf)
 {
     ngx_http_doobry_loc_conf_t* lcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_doobry_loc_conf_t));
     if (!lcf) {
-        ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to allocate local config");
+        ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to allocate local config");
         return NULL;
     }
 
@@ -180,6 +186,8 @@ ngx_http_doobry_create_loc_conf(ngx_conf_t* cf)
 static char*
 ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
 {
+    dbr_log_setlogger(ngx_http_doobry_log);
+
     // Install doobry handler.
     ngx_http_core_loc_conf_t* clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
     clcf->handler = ngx_http_doobry_handler;
@@ -206,13 +214,13 @@ ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
 
         lcf->ctx = dbr_ctx_create(mdaddr, traddr, lcf->tmout, lcf->capacity, &lcf->i_handler);
         if (!lcf->ctx) {
-            ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to create context");
+            ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to create context");
             return NGX_CONF_ERROR;
         }
 
         ngx_pool_cleanup_t* cln = ngx_pool_cleanup_add(cf->pool, 0);
         if (!cln) {
-            ngx_log_error(NGX_LOG_ERR, cf->log, 0, "failed to allocate pool cleanup");
+            ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to allocate pool cleanup");
             return NGX_CONF_ERROR;
         }
 
