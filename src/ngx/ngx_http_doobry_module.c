@@ -145,6 +145,111 @@ ngx_http_doobry_send_header(ngx_http_request_t* r, size_t len)
 }
 
 static ngx_int_t
+ngx_http_doobry_logon_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                 ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_logoff_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                  ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                      ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_accnt_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                 ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_contr(ngx_http_request_t* r, struct DbrRest* rest,
+                      ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_contr_with_contr(ngx_http_request_t* r, struct DbrRest* rest,
+                                 ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_user_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_group_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                 ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_order_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                 ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_order_with_accnt_and_id(ngx_http_request_t* r, struct DbrRest* rest,
+                                        ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_trade_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
+                                 ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_trade_with_accnt_and_id(ngx_http_request_t* r, struct DbrRest* rest,
+                                        ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_posn_with_group(ngx_http_request_t* r, struct DbrRest* rest,
+                                        ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_market(ngx_http_request_t* r, struct DbrRest* rest,
+                      ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
+ngx_http_doobry_market_with_contr(ngx_http_request_t* r, struct DbrRest* rest,
+                                  ngx_http_doobry_response_t* s)
+{
+    return NGX_OK;
+}
+
+static ngx_int_t
 ngx_http_doobry_handler(ngx_http_request_t* r)
 {
     ngx_log_debug2(NGX_LOG_INFO, r->connection->log, 0, "uri: %*s",
@@ -173,49 +278,49 @@ ngx_http_doobry_handler(ngx_http_request_t* r)
     ngx_http_doobry_response_t s = { .len = 0, .buf = NULL };
     switch (rest.fields) {
     case DBR_RESRC_LOGON | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_logon_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_LOGOFF | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_logoff_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_ACCNT | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_accnt_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_CONTR:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_contr(r, &rest, &s);
         break;
     case DBR_RESRC_CONTR | DBR_PARAM_CONTR:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_contr_with_contr(r, &rest, &s);
         break;
     case DBR_RESRC_USER | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_user_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_GROUP | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_group_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_ORDER | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_order_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_ORDER | DBR_PARAM_ACCNT | DBR_PARAM_ID:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_order_with_accnt_and_id(r, &rest, &s);
         break;
     case DBR_RESRC_TRADE | DBR_PARAM_ACCNT:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_trade_with_accnt(r, &rest, &s);
         break;
     case DBR_RESRC_TRADE | DBR_PARAM_ACCNT | DBR_PARAM_ID:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_trade_with_accnt_and_id(r, &rest, &s);
         break;
     case DBR_RESRC_POSN | DBR_PARAM_GROUP:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_posn_with_group(r, &rest, &s);
         break;
     case DBR_RESRC_MARKET:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_market(r, &rest, &s);
         break;
     case DBR_RESRC_MARKET | DBR_PARAM_CONTR:
-        rc = NGX_OK;
+        rc = ngx_http_doobry_market_with_contr(r, &rest, &s);
         break;
     default:
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "unsupported fields");
