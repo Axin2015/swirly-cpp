@@ -33,12 +33,16 @@ typedef struct {
 
     struct DbrIHandler i_handler;
     DbrCtx ctx;
+    DbrAsync async;
 } ngx_http_doobry_loc_conf_t;
 
 typedef struct {
     size_t len;
     ngx_buf_t* buf;
 } ngx_http_doobry_response_t;
+
+static ngx_http_doobry_loc_conf_t*
+ngx_http_doobry_loc_conf(ngx_http_request_t* r);
 
 #if 0
 static inline ngx_http_doobry_loc_conf_t*
@@ -144,10 +148,27 @@ ngx_http_doobry_send_header(ngx_http_request_t* r, size_t len)
     return ngx_http_send_header(r);
 }
 
+struct AccntTask {
+    ngx_buf_t* buf;
+};
+
+static int
+ngx_http_doobry_accnt_task(DbrHandler handler, DbrClnt clnt, void* arg)
+{
+    //ngx_http_doobry_loc_conf_t* lcf = handler_implof(handler);
+    struct AccntTask* t = arg;
+    ngx_buf_t* buf = t->buf;
+    assert(buf);
+    return 0;
+}
+
 static ngx_int_t
 ngx_http_doobry_logon_with_accnt(ngx_http_request_t* r, struct DbrRest* rest,
                                  ngx_http_doobry_response_t* s)
 {
+    ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(r);
+    struct AccntTask t = { NULL };
+    dbr_task_call(lcf->async, ngx_http_doobry_accnt_task, &t);
     return NGX_OK;
 }
 
@@ -230,14 +251,14 @@ ngx_http_doobry_trade_with_accnt_and_id(ngx_http_request_t* r, struct DbrRest* r
 
 static ngx_int_t
 ngx_http_doobry_posn_with_group(ngx_http_request_t* r, struct DbrRest* rest,
-                                        ngx_http_doobry_response_t* s)
+                                ngx_http_doobry_response_t* s)
 {
     return NGX_OK;
 }
 
 static ngx_int_t
 ngx_http_doobry_market(ngx_http_request_t* r, struct DbrRest* rest,
-                      ngx_http_doobry_response_t* s)
+                       ngx_http_doobry_response_t* s)
 {
     return NGX_OK;
 }
@@ -358,6 +379,7 @@ static void
 ngx_http_doobry_cleanup(void* data)
 {
     ngx_http_doobry_loc_conf_t* lcf = data;
+    dbr_async_destroy(lcf->async);
     dbr_ctx_destroy(lcf->ctx);
 }
 
@@ -378,6 +400,7 @@ ngx_http_doobry_create_loc_conf(ngx_conf_t* cf)
 
     lcf->i_handler.vtbl = &HANDLER_VTBL;
     lcf->ctx = NULL;
+    lcf->async = NULL;
 
     return lcf;
 }
@@ -414,19 +437,31 @@ ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
         lcf->ctx = dbr_ctx_create(mdaddr, traddr, lcf->tmout, lcf->capacity, &lcf->i_handler);
         if (!lcf->ctx) {
             ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to create context");
-            return NGX_CONF_ERROR;
+            goto fail1;
+        }
+
+        lcf->async = dbr_ctx_async(lcf->ctx);
+        if (!lcf->async) {
+            ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to create async");
+            goto fail2;
         }
 
         ngx_pool_cleanup_t* cln = ngx_pool_cleanup_add(cf->pool, 0);
         if (!cln) {
             ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to allocate pool cleanup");
-            return NGX_CONF_ERROR;
+            goto fail3;
         }
 
         cln->handler = ngx_http_doobry_cleanup;
         cln->data = lcf;
     }
     return NGX_CONF_OK;
+ fail3:
+    dbr_async_destroy(lcf->async);
+ fail2:
+    dbr_ctx_destroy(lcf->ctx);
+ fail1:
+    return NGX_CONF_ERROR;
 }
 
 static char*
@@ -619,3 +654,9 @@ ngx_module_t ngx_http_doobry_module = {
     .exit_master = ngx_http_doobry_exit_master,
     NGX_MODULE_V1_PADDING
 };
+
+static ngx_http_doobry_loc_conf_t*
+ngx_http_doobry_loc_conf(ngx_http_request_t* r)
+{
+    return ngx_http_get_module_loc_conf(r, ngx_http_doobry_module);
+}
