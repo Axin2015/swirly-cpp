@@ -21,6 +21,7 @@
 #include <ngx_http.h>
 
 #include <dbr/ash.h>
+#include <dbr/elm.h>
 #include <dbr/fig.h>
 
 typedef struct {
@@ -33,6 +34,11 @@ typedef struct {
     struct DbrIHandler i_handler;
     DbrCtx ctx;
 } ngx_http_doobry_loc_conf_t;
+
+typedef struct {
+    size_t len;
+    ngx_buf_t* buf;
+} ngx_http_doobry_response_t;
 
 #if 0
 static inline ngx_http_doobry_loc_conf_t*
@@ -130,29 +136,117 @@ ngx_http_doobry_log(int level, const char* msg)
 }
 
 static ngx_int_t
+ngx_http_doobry_send_header(ngx_http_request_t* r, size_t len)
+{
+    ngx_str_set(&r->headers_out.content_type, "application/json");
+    r->headers_out.content_length_n = len;
+    r->headers_out.status = NGX_HTTP_OK;
+    return ngx_http_send_header(r);
+}
+
+static ngx_int_t
 ngx_http_doobry_handler(ngx_http_request_t* r)
 {
-    r->headers_out.content_type.len = sizeof("text/plain") - 1;
-    r->headers_out.content_type.data = (u_char*)"text/plain";
+    ngx_log_debug2(NGX_LOG_INFO, r->connection->log, 0, "uri: %*s",
+                   r->uri_end - r->uri_start, r->uri_start);
 
-    ngx_buf_t* b = ngx_pcalloc(r->pool, sizeof(ngx_buf_t));
-    ngx_chain_t out = {
-        .buf = b,
-        .next = NULL
-    };
+    ngx_int_t rc;
+    if (!(r->method & (NGX_HTTP_POST | NGX_HTTP_PUT))) {
+        rc = ngx_http_discard_request_body(r);
+        if (rc != NGX_OK)
+            return rc;
+    }
 
-    static u_char msg[] = "Test";
+    struct DbrRest rest;
+    dbr_rest_init(&rest);
+    switch (dbr_rest_rurl(&rest, (const char*)r->uri_start + 4, r->uri_end - r->uri_start - 4)) {
+    case -1:
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "url parse error");
+        // Fallthrough.
+    case 0:
+        // The request cannot be fulfilled due to bad syntax.
+        return NGX_HTTP_BAD_REQUEST;
+    case 1:
+        break;
+    }
 
-    b->pos = msg;
-    b->last = msg + sizeof(msg);
-    b->memory = 1;
-    b->last_buf = 1;
+    ngx_http_doobry_response_t s = { .len = 0, .buf = NULL };
+    switch (rest.fields) {
+    case DBR_RESRC_LOGON | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_LOGOFF | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_ACCNT | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_CONTR:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_CONTR | DBR_PARAM_CONTR:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_USER | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_GROUP | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_ORDER | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_ORDER | DBR_PARAM_ACCNT | DBR_PARAM_ID:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_TRADE | DBR_PARAM_ACCNT:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_TRADE | DBR_PARAM_ACCNT | DBR_PARAM_ID:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_POSN | DBR_PARAM_GROUP:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_MARKET:
+        rc = NGX_OK;
+        break;
+    case DBR_RESRC_MARKET | DBR_PARAM_CONTR:
+        rc = NGX_OK;
+        break;
+    default:
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "unsupported fields");
+        if (r->method & (NGX_HTTP_POST | NGX_HTTP_PUT))
+            ngx_http_discard_request_body(r);
+        // The request cannot be fulfilled due to bad syntax.
+        return NGX_HTTP_BAD_REQUEST;
+    }
 
-    r->headers_out.status = NGX_HTTP_OK;
-    r->headers_out.content_length_n = sizeof(msg);
+    if (rc != NGX_OK)
+        return rc;
 
-    ngx_http_send_header(r);
-    return ngx_http_output_filter(r, &out);
+    rc = ngx_http_doobry_send_header(r, s.len);
+    if (rc == NGX_ERROR || rc > NGX_OK || r->header_only) {
+        ngx_pfree(r->pool, s.buf->start);
+        ngx_pfree(r->pool, s.buf);
+    }
+
+    if (s.buf) {
+
+        ngx_chain_t out;
+        out.buf = s.buf;
+        out.next = NULL;
+
+        rc = ngx_http_output_filter(r, &out);
+        if (rc != NGX_OK) {
+            ngx_pfree(r->pool, s.buf->start);
+            ngx_pfree(r->pool, s.buf);
+        }
+    }
+    return rc;
 }
 
 static void
@@ -165,7 +259,7 @@ ngx_http_doobry_cleanup(void* data)
 static void*
 ngx_http_doobry_create_loc_conf(ngx_conf_t* cf)
 {
-    ngx_http_doobry_loc_conf_t* lcf = ngx_pcalloc(cf->pool, sizeof(ngx_http_doobry_loc_conf_t));
+    ngx_http_doobry_loc_conf_t* lcf = ngx_palloc(cf->pool, sizeof(ngx_http_doobry_loc_conf_t));
     if (!lcf) {
         ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to allocate local config");
         return NULL;
@@ -204,11 +298,11 @@ ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
 
         // Null terminate strings.
 
-        char* mdaddr = alloca(lcf->mdaddr.len + 1);
+        char mdaddr[lcf->mdaddr.len + 1];
         ngx_memcpy(mdaddr, lcf->mdaddr.data, lcf->mdaddr.len);
         mdaddr[lcf->mdaddr.len] = '\0';
 
-        char* traddr = alloca(lcf->traddr.len + 1);
+        char traddr[lcf->traddr.len + 1];
         ngx_memcpy(traddr, lcf->traddr.data, lcf->traddr.len);
         traddr[lcf->traddr.len] = '\0';
 
