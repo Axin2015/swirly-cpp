@@ -596,91 +596,91 @@ _match:
 	case 6:
 #line 124 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_DELETE;
+        dbr_rest_set_method(rest, DBR_METHOD_DELETE);
     }
 	break;
 	case 7:
 #line 127 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_GET;
+        dbr_rest_set_method(rest, DBR_METHOD_GET);
     }
 	break;
 	case 8:
 #line 130 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_HEAD;
+        dbr_rest_set_method(rest, DBR_METHOD_HEAD);
     }
 	break;
 	case 9:
 #line 133 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_POST;
+        dbr_rest_set_method(rest, DBR_METHOD_POST);
     }
 	break;
 	case 10:
 #line 136 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_PUT;
+        dbr_rest_set_method(rest, DBR_METHOD_PUT);
     }
 	break;
 	case 11:
 #line 145 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
     }
 	break;
 	case 12:
 #line 148 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
     }
 	break;
 	case 13:
 #line 151 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
     }
 	break;
 	case 14:
 #line 154 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
+        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
 	break;
 	case 15:
 #line 157 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
     }
 	break;
 	case 16:
 #line 160 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
+        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
     }
 	break;
 	case 17:
 #line 163 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
     }
 	break;
 	case 18:
 #line 166 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
     }
 	break;
 	case 19:
 #line 169 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
+        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
 	break;
 	case 20:
 #line 172 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
+        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
     }
 	break;
 	case 21:
@@ -725,7 +725,7 @@ _match:
 	case 26:
 #line 216 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ID;
+        dbr_rest_set_param(rest, DBR_PARAM_ID);
         rest->id = inum(rest);
     }
 	break;
@@ -743,7 +743,7 @@ _match:
 	case 28:
 #line 228 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ACCNT;
+        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
     }
 	break;
 	case 29:
@@ -760,7 +760,7 @@ _match:
 	case 30:
 #line 239 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_GROUP;
+        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
     }
 	break;
 	case 31:
@@ -777,7 +777,7 @@ _match:
 	case 32:
 #line 250 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_CONTR;
+        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
     }
 	break;
 	case 33:
@@ -792,7 +792,7 @@ _match:
 	case 34:
 #line 259 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_SETTL_DATE;
+        dbr_rest_set_param(rest, DBR_PARAM_SETTL_DATE);
         rest->settl_date = inum(rest);
     }
 	break;
@@ -810,7 +810,7 @@ _match:
 	case 36:
 #line 271 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_REF;
+        dbr_rest_set_param(rest, DBR_PARAM_REF);
     }
 	break;
 	case 37:
@@ -825,7 +825,7 @@ _match:
 	case 38:
 #line 280 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ACTION;
+        dbr_rest_set_param(rest, DBR_PARAM_ACTION);
         rest->action = inum(rest);
     }
 	break;
@@ -841,7 +841,7 @@ _match:
 	case 40:
 #line 290 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_TICKS;
+        dbr_rest_set_param(rest, DBR_PARAM_TICKS);
         rest->ticks = inum(rest);
     }
 	break;
@@ -857,7 +857,7 @@ _match:
 	case 42:
 #line 300 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_LOTS;
+        dbr_rest_set_param(rest, DBR_PARAM_LOTS);
         rest->lots = inum(rest);
     }
 	break;
@@ -873,7 +873,7 @@ _match:
 	case 44:
 #line 310 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_MIN_LOTS;
+        dbr_rest_set_param(rest, DBR_PARAM_MIN_LOTS);
         rest->min_lots = inum(rest);
     }
 	break;
@@ -1196,7 +1196,7 @@ _match:
 	case 6:
 #line 402 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ID;
+        dbr_rest_set_param(rest, DBR_PARAM_ID);
         rest->id = inum;
     }
 	break;
@@ -1214,7 +1214,7 @@ _match:
 	case 8:
 #line 417 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ACCNT;
+        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
     }
 	break;
 	case 9:
@@ -1231,7 +1231,7 @@ _match:
 	case 10:
 #line 432 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_GROUP;
+        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
     }
 	break;
 	case 11:
@@ -1248,67 +1248,67 @@ _match:
 	case 12:
 #line 445 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_CONTR;
+        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
     }
 	break;
 	case 13:
 #line 451 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
     }
 	break;
 	case 14:
 #line 454 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
     }
 	break;
 	case 15:
 #line 457 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
     }
 	break;
 	case 16:
 #line 460 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
+        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
 	break;
 	case 17:
 #line 463 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
     }
 	break;
 	case 18:
 #line 466 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
+        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
     }
 	break;
 	case 19:
 #line 469 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
     }
 	break;
 	case 20:
 #line 472 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
     }
 	break;
 	case 21:
 #line 475 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
+        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
 	break;
 	case 22:
 #line 478 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
+        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
     }
 	break;
 	case 23:
@@ -1346,86 +1346,86 @@ _again:
 	case 6:
 #line 402 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ID;
+        dbr_rest_set_param(rest, DBR_PARAM_ID);
         rest->id = inum;
     }
 	break;
 	case 8:
 #line 417 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_ACCNT;
+        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
     }
 	break;
 	case 10:
 #line 432 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_GROUP;
+        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
     }
 	break;
 	case 12:
 #line 445 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields |= DBR_PARAM_CONTR;
+        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
     }
 	break;
 	case 13:
 #line 451 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
     }
 	break;
 	case 14:
 #line 454 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
     }
 	break;
 	case 15:
 #line 457 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
     }
 	break;
 	case 16:
 #line 460 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
+        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
 	break;
 	case 17:
 #line 463 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
     }
 	break;
 	case 18:
 #line 466 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
+        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
     }
 	break;
 	case 19:
 #line 469 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
     }
 	break;
 	case 20:
 #line 472 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
     }
 	break;
 	case 21:
 #line 475 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
+        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
 	break;
 	case 22:
 #line 478 "/Users/marayl/repo/doobry/src/elm/rest.rl"
 	{
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
+        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
     }
 	break;
 #line 1432 "/Users/marayl/repo/doobry/src/elm/rest.c"

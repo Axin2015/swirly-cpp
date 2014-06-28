@@ -122,19 +122,19 @@ fnum(const struct DbrRest* rest)
     ) >begin_str %end_str;
 
     action delete_method {
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_DELETE;
+        dbr_rest_set_method(rest, DBR_METHOD_DELETE);
     }
     action get_method {
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_GET;
+        dbr_rest_set_method(rest, DBR_METHOD_GET);
     }
     action head_method {
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_HEAD;
+        dbr_rest_set_method(rest, DBR_METHOD_HEAD);
     }
     action post_method {
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_POST;
+        dbr_rest_set_method(rest, DBR_METHOD_POST);
     }
     action put_method {
-        rest->fields = (rest->fields & ~DBR_METHOD_MASK) | DBR_METHOD_PUT;
+        dbr_rest_set_method(rest, DBR_METHOD_PUT);
     }
     method  = '"delete"'i %delete_method
             | '"get"'i %get_method
@@ -143,34 +143,34 @@ fnum(const struct DbrRest* rest)
             | '"put"'i %put_method;
 
     action logon_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
     }
     action logoff_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
     }
     action accnt_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
     }
     action contr_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
+        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
     action user_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
     }
     action group_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
+        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
     }
     action order_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
     }
     action trade_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
     }
     action posn_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
+        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
     action market_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
+        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
     }
     resrc  =  '"logon"'i %logon_resrc
             | '"logoff"'i %logoff_resrc
@@ -214,7 +214,7 @@ fnum(const struct DbrRest* rest)
         }
     }
     action end_id {
-        rest->fields |= DBR_PARAM_ID;
+        dbr_rest_set_param(rest, DBR_PARAM_ID);
         rest->id = inum(rest);
     }
     action begin_accnt {
@@ -226,7 +226,7 @@ fnum(const struct DbrRest* rest)
         rest->str.max = DBR_MNEM_MAX;
     }
     action end_accnt {
-        rest->fields |= DBR_PARAM_ACCNT;
+        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
     }
     action begin_group {
         if (rest->fields & DBR_PARAM_GROUP) {
@@ -237,7 +237,7 @@ fnum(const struct DbrRest* rest)
         rest->str.max = DBR_MNEM_MAX;
     }
     action end_group {
-        rest->fields |= DBR_PARAM_GROUP;
+        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
     }
     action begin_contr {
         if (rest->fields & DBR_PARAM_CONTR) {
@@ -248,7 +248,7 @@ fnum(const struct DbrRest* rest)
         rest->str.max = DBR_MNEM_MAX;
     }
     action end_contr {
-        rest->fields |= DBR_PARAM_CONTR;
+        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
     }
     action begin_settl_date {
         if (rest->fields & DBR_PARAM_SETTL_DATE) {
@@ -257,7 +257,7 @@ fnum(const struct DbrRest* rest)
         }
     }
     action end_settl_date {
-        rest->fields |= DBR_PARAM_SETTL_DATE;
+        dbr_rest_set_param(rest, DBR_PARAM_SETTL_DATE);
         rest->settl_date = inum(rest);
     }
     action begin_ref {
@@ -269,7 +269,7 @@ fnum(const struct DbrRest* rest)
         rest->str.max = DBR_REF_MAX;
     }
     action end_ref {
-        rest->fields |= DBR_PARAM_REF;
+        dbr_rest_set_param(rest, DBR_PARAM_REF);
     }
     action begin_action {
         if (rest->fields & DBR_PARAM_ACTION) {
@@ -278,7 +278,7 @@ fnum(const struct DbrRest* rest)
         }
     }
     action end_action {
-        rest->fields |= DBR_PARAM_ACTION;
+        dbr_rest_set_param(rest, DBR_PARAM_ACTION);
         rest->action = inum(rest);
     }
     action begin_ticks {
@@ -288,7 +288,7 @@ fnum(const struct DbrRest* rest)
         }
     }
     action end_ticks {
-        rest->fields |= DBR_PARAM_TICKS;
+        dbr_rest_set_param(rest, DBR_PARAM_TICKS);
         rest->ticks = inum(rest);
     }
     action begin_lots {
@@ -298,7 +298,7 @@ fnum(const struct DbrRest* rest)
         }
     }
     action end_lots {
-        rest->fields |= DBR_PARAM_LOTS;
+        dbr_rest_set_param(rest, DBR_PARAM_LOTS);
         rest->lots = inum(rest);
     }
     action begin_min_lots {
@@ -308,7 +308,7 @@ fnum(const struct DbrRest* rest)
         }
     }
     action end_min_lots {
-        rest->fields |= DBR_PARAM_MIN_LOTS;
+        dbr_rest_set_param(rest, DBR_PARAM_MIN_LOTS);
         rest->min_lots = inum(rest);
     }
     pair = '"method"'i colon method >begin_method
@@ -400,7 +400,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
         }
     }
     action end_id {
-        rest->fields |= DBR_PARAM_ID;
+        dbr_rest_set_param(rest, DBR_PARAM_ID);
         rest->id = inum;
     }
     opt_id = ('/' inum) >begin_id %end_id
@@ -415,7 +415,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
         str.max = DBR_MNEM_MAX;
     }
     action end_accnt {
-        rest->fields |= DBR_PARAM_ACCNT;
+        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
     }
     opt_accnt = ('/' str) >begin_accnt %end_accnt
                | '';
@@ -430,7 +430,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
         str.max = DBR_MNEM_MAX;
     }
     action end_group {
-        rest->fields |= DBR_PARAM_GROUP;
+        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
     }
     req_group = ('/' str) >begin_group %end_group;
 
@@ -443,40 +443,40 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
         str.max = DBR_MNEM_MAX;
     }
     action end_contr {
-        rest->fields |= DBR_PARAM_CONTR;
+        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
     }
     opt_contr = ('/' str) >begin_contr %end_contr
                | '';
 
     action logon_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGON;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
     }
     action logoff_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_LOGOFF;
+        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
     }
     action accnt_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ACCNT;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
     }
     action contr_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_CONTR;
+        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
     action user_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_USER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
     }
     action group_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_GROUP;
+        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
     }
     action order_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_ORDER;
+        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
     }
     action trade_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_TRADE;
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
     }
     action posn_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_POSN;
+        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
     action market_resrc {
-        rest->fields = (rest->fields & ~DBR_RESRC_MASK) | DBR_RESRC_MARKET;
+        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
     }
 
     resrc =  'logon' %logon_resrc
