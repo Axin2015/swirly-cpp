@@ -467,7 +467,43 @@ ngx_http_doobry_group_with_accnt(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_order_with_accnt_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt user = get_accnt(clnt, t->rest.accnt);
+    if (!user)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRbNode* first = dbr_accnt_first_order(user);
+
+    size_t len = sizeof("[]") - 1;
+    for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_ORDER;
+         node = dbr_rbnode_next(node)) {
+        struct DbrOrder* order = dbr_accnt_order_entry(node);
+        if (node != first)
+            len += sizeof(",") - 1;
+        len += dbr_json_order_len(order);
+    }
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    *b->last++ = '[';
+    for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_ORDER;
+         node = dbr_rbnode_next(node)) {
+        struct DbrOrder* order = dbr_accnt_order_entry(node);
+        if (node != first)
+            *b->last++ = ',';
+        b->last = (u_char*)dbr_json_write_order((char*)b->last, order);
+    }
+    *b->last++ = ']';
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -493,7 +529,43 @@ ngx_http_doobry_order_with_accnt_and_id(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_trade_with_accnt_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt user = get_accnt(clnt, t->rest.accnt);
+    if (!user)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRbNode* first = dbr_accnt_first_trade(user);
+
+    size_t len = sizeof("[]") - 1;
+    for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_TRADE;
+         node = dbr_rbnode_next(node)) {
+        struct DbrExec* trade = dbr_accnt_trade_entry(node);
+        if (node != first)
+            len += sizeof(",") - 1;
+        len += dbr_json_exec_len(trade);
+    }
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    *b->last++ = '[';
+    for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_TRADE;
+         node = dbr_rbnode_next(node)) {
+        struct DbrExec* trade = dbr_accnt_trade_entry(node);
+        if (node != first)
+            *b->last++ = ',';
+        b->last = (u_char*)dbr_json_write_exec((char*)b->last, trade);
+    }
+    *b->last++ = ']';
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -519,7 +591,43 @@ ngx_http_doobry_trade_with_accnt_and_id(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_posn_with_group_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt group = get_accnt(clnt, t->rest.group);
+    if (!group)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRbNode* first = dbr_accnt_first_posn(group);
+
+    size_t len = sizeof("[]") - 1;
+    for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_POSN;
+         node = dbr_rbnode_next(node)) {
+        struct DbrPosn* posn = dbr_accnt_posn_entry(node);
+        if (node != first)
+            len += sizeof(",") - 1;
+        len += dbr_json_posn_len(posn);
+    }
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    *b->last++ = '[';
+    for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_POSN;
+         node = dbr_rbnode_next(node)) {
+        struct DbrPosn* posn = dbr_accnt_posn_entry(node);
+        if (node != first)
+            *b->last++ = ',';
+        b->last = (u_char*)dbr_json_write_posn((char*)b->last, posn);
+    }
+    *b->last++ = ']';
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -532,7 +640,40 @@ ngx_http_doobry_posn_with_group(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_market_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+
+    struct DbrRbNode* first = dbr_clnt_first_view(clnt);
+
+    size_t len = sizeof("[]") - 1;
+    for (struct DbrRbNode* node = first; node != DBR_CLNT_END_VIEW;
+         node = dbr_rbnode_next(node)) {
+        struct DbrView* view = dbr_clnt_view_entry(node);
+        if (node != first)
+            len += sizeof(",") - 1;
+        len += dbr_json_view_len(view);
+    }
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    *b->last++ = '[';
+    for (struct DbrRbNode* node = first; node != DBR_CLNT_END_VIEW;
+         node = dbr_rbnode_next(node)) {
+        struct DbrView* view = dbr_clnt_view_entry(node);
+        if (node != first)
+            *b->last++ = ',';
+        b->last = (u_char*)dbr_json_write_view((char*)b->last, view);
+    }
+    *b->last++ = ']';
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
