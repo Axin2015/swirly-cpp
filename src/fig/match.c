@@ -103,7 +103,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         dbr_match_init(match);
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->c.group.rec, crec, settl_day,
+        struct DbrPosn* posn = fig_accnt_posn(maker->c.giveup.rec, crec, settl_day,
                                               ordidx, pool);
         if (!posn) {
             // No need to free accnt or posn.
@@ -146,8 +146,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         // Taker trade.
         taker_exec->id = taker_id;
         taker_exec->order = taker->id;
-        taker_exec->c.user.rec = taker->c.user.rec;
-        taker_exec->c.group.rec = taker->c.group.rec;
+        taker_exec->c.trader.rec = taker->c.trader.rec;
+        taker_exec->c.giveup.rec = taker->c.giveup.rec;
         taker_exec->c.contr.rec = crec;
         taker_exec->c.settl_day = settl_day;
         strncpy(taker_exec->c.ref, taker->c.ref, DBR_REF_MAX);
@@ -162,14 +162,14 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         taker_exec->c.min_lots = taker->c.min_lots;
         taker_exec->match = match->id;
         taker_exec->role = DBR_ROLE_TAKER;
-        taker_exec->cpty.rec = maker->c.group.rec;
+        taker_exec->cpty.rec = maker->c.giveup.rec;
         taker_exec->created = now;
 
         // Maker trade.
         maker_exec->id = maker_id;
         maker_exec->order = maker->id;
-        maker_exec->c.user.rec = maker->c.user.rec;
-        maker_exec->c.group.rec = maker->c.group.rec;
+        maker_exec->c.trader.rec = maker->c.trader.rec;
+        maker_exec->c.giveup.rec = maker->c.giveup.rec;
         maker_exec->c.contr.rec = crec;
         maker_exec->c.settl_day = settl_day;
         strncpy(maker_exec->c.ref, maker->c.ref, DBR_REF_MAX);
@@ -184,7 +184,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         maker_exec->c.min_lots = maker->c.min_lots;
         maker_exec->match = match->id;
         maker_exec->role = DBR_ROLE_MAKER;
-        maker_exec->cpty.rec = taker->c.group.rec;
+        maker_exec->cpty.rec = taker->c.giveup.rec;
         maker_exec->created = now;
 
         match->taker_exec = taker_exec;
@@ -201,7 +201,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     if (!dbr_queue_empty(&trans->matches)) {
 
         // Avoid allocating position when there are no matches.
-        if (!(trans->taker_posn = fig_accnt_posn(taker->c.group.rec, crec, settl_day,
+        if (!(trans->taker_posn = fig_accnt_posn(taker->c.giveup.rec, crec, settl_day,
                                                  ordidx, pool)))
             goto fail1;
 

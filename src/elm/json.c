@@ -135,29 +135,29 @@ dbr_json_write_contr(char* buf, const struct DbrRec* rec)
 }
 
 DBR_API size_t
-dbr_json_memb_len(const struct DbrMemb* memb)
+dbr_json_perm_len(const struct DbrPerm* perm)
 {
     enum {
-        MEMB_SIZE =
-        sizeof("{\"user\":\"\","
-               "\"group\":\"\"}") - 1
+        PERM_SIZE =
+        sizeof("{\"trader\":\"\","
+               "\"giveup\":\"\"}") - 1
     };
 
-    return MEMB_SIZE
-        + strnlen(memb->user.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(memb->group.rec->mnem, DBR_MNEM_MAX);
+    return PERM_SIZE
+        + strnlen(perm->trader.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(perm->giveup.rec->mnem, DBR_MNEM_MAX);
 }
 
 DBR_API char*
-dbr_json_write_memb(char* buf, const struct DbrMemb* memb)
+dbr_json_write_perm(char* buf, const struct DbrPerm* perm)
 {
-    static const char MEMB_FORMAT[] =
-        "{\"user\":\"%m\","
-        "\"group\":\"%m\"}";
+    static const char PERM_FORMAT[] =
+        "{\"trader\":\"%m\","
+        "\"giveup\":\"%m\"}";
 
-    return dbr_format(buf, MEMB_FORMAT,
-                      memb->user.rec->mnem,
-                      memb->group.rec->mnem);
+    return dbr_format(buf, PERM_FORMAT,
+                      perm->trader.rec->mnem,
+                      perm->giveup.rec->mnem);
 }
 
 DBR_API size_t
@@ -166,8 +166,8 @@ dbr_json_order_len(const struct DbrOrder* order)
     enum {
         ORDER_SIZE =
         sizeof("{\"id\":,"
-               "\"user\":\"\","
-               "\"group\":\"\","
+               "\"trader\":\"\","
+               "\"giveup\":\"\","
                "\"contr\":\"\","
                "\"settl_date\":,"
                "\"ref\":\"\","
@@ -185,8 +185,8 @@ dbr_json_order_len(const struct DbrOrder* order)
 
     return ORDER_SIZE
         + dbr_long_len(order->id)
-        + strnlen(order->c.user.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(order->c.group.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(order->c.trader.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(order->c.giveup.rec->mnem, DBR_MNEM_MAX)
         + strnlen(order->c.contr.rec->mnem, DBR_MNEM_MAX)
         + 8
         + strnlen(order->c.ref, DBR_REF_MAX)
@@ -207,8 +207,8 @@ dbr_json_write_order(char* buf, const struct DbrOrder* order)
 {
     static const char ORDER_FORMAT[] =
         "{\"id\":%l,"
-        "\"user\":\"%m\","
-        "\"group\":\"%m\","
+        "\"trader\":\"%m\","
+        "\"giveup\":\"%m\","
         "\"contr\":\"%m\","
         "\"settl_date\":%j,"
         "\"ref\":\"%s\","
@@ -225,8 +225,8 @@ dbr_json_write_order(char* buf, const struct DbrOrder* order)
 
     return dbr_format(buf, ORDER_FORMAT,
                       order->id,
-                      order->c.user.rec->mnem,
-                      order->c.group.rec->mnem,
+                      order->c.trader.rec->mnem,
+                      order->c.giveup.rec->mnem,
                       order->c.contr.rec->mnem,
                       order->c.settl_day,
                       DBR_REF_MAX, order->c.ref,
@@ -249,8 +249,8 @@ dbr_json_exec_len(const struct DbrExec* exec)
         EXEC_SIZE =
         sizeof("{\"id\":,"
                "\"order\":,"
-               "\"user\":\"\","
-               "\"group\":\"\","
+               "\"trader\":\"\","
+               "\"giveup\":\"\","
                "\"contr\":\"\","
                "\"settl_date\":,"
                "\"ref\":\"\","
@@ -270,8 +270,8 @@ dbr_json_exec_len(const struct DbrExec* exec)
     return EXEC_SIZE
         + dbr_long_len(exec->id)
         + dbr_long_len(exec->order)
-        + strnlen(exec->c.user.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(exec->c.group.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(exec->c.trader.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(exec->c.giveup.rec->mnem, DBR_MNEM_MAX)
         + strnlen(exec->c.contr.rec->mnem, DBR_MNEM_MAX)
         + 8
         + strnlen(exec->c.ref, DBR_REF_MAX)
@@ -295,8 +295,8 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec)
     static const char EXEC_FORMAT[] =
         "{\"id\":%l,"
         "\"order\":%l,"
-        "\"user\":\"%m\","
-        "\"group\":\"%m\","
+        "\"trader\":\"%m\","
+        "\"giveup\":\"%m\","
         "\"contr\":\"%m\","
         "\"settl_date\":%j,"
         "\"ref\":\"%s\","
@@ -316,8 +316,8 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec)
     return dbr_format(buf, EXEC_FORMAT,
                       exec->id,
                       exec->order,
-                      exec->c.user.rec->mnem,
-                      exec->c.group.rec->mnem,
+                      exec->c.trader.rec->mnem,
+                      exec->c.giveup.rec->mnem,
                       exec->c.contr.rec->mnem,
                       exec->c.settl_day,
                       DBR_REF_MAX, exec->c.ref,

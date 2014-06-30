@@ -136,14 +136,14 @@ TEST_CASE(serv_place)
     auto cit = serv.crecs().find("EURUSD");
     check(cit != serv.crecs().end());
 
-    auto user = serv.accnt(AccntRecRef(*uit));
-    auto group = serv.accnt(AccntRecRef(*git));
+    auto trader = serv.accnt(AccntRecRef(*uit));
+    auto giveup = serv.accnt(AccntRecRef(*git));
     auto book = serv.book(ContrRecRef(*cit), dbr_ymd_to_jd(2014, 3, 14));
 
     DbrUuid uuid;
     uuid_generate(uuid);
     auto sess = serv.sess(uuid);
-    sess.logon(user);
+    sess.logon(trader);
 
-    serv.place(user, group, book, nullptr, DBR_ACTION_BUY, 12345, 1, 0);
+    serv.place(trader, giveup, book, nullptr, DBR_ACTION_BUY, 12345, 1, 0);
 }

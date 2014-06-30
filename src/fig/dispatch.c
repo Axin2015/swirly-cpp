@@ -39,19 +39,19 @@ get_id(struct FigCache* cache, int type, DbrIden id)
     return dbr_shared_rec_entry(node);
 }
 
-static inline struct DbrMemb*
-enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+static inline struct DbrPerm*
+enrich_perm(struct FigCache* cache, struct DbrPerm* perm)
 {
-    memb->user.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->user.id_only);
-    memb->group.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->group.id_only);
-    return memb;
+    perm->trader.rec = get_id(cache, DBR_ENTITY_ACCNT, perm->trader.id_only);
+    perm->giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, perm->giveup.id_only);
+    return perm;
 }
 
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->c.user.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.user.id_only);
-    order->c.group.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.group.id_only);
+    order->c.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.trader.id_only);
+    order->c.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.giveup.id_only);
     order->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->c.contr.id_only);
     return order;
 }
@@ -59,8 +59,8 @@ enrich_order(struct FigCache* cache, struct DbrOrder* order)
 static inline struct DbrExec*
 enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->c.user.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.user.id_only);
-    exec->c.group.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.group.id_only);
+    exec->c.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.trader.id_only);
+    exec->c.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.giveup.id_only);
     exec->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->c.contr.id_only);
     if (exec->cpty.id_only)
         exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
@@ -93,26 +93,26 @@ get_accnt(DbrClnt clnt, DbrIden aid)
 }
 
 static void
-emplace_user_list(DbrClnt clnt, struct DbrSlNode* first)
+emplace_trader_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
-        DbrAccnt group = memb->group.rec->accnt.state;
-        assert(group);
+        struct DbrPerm* perm = enrich_perm(&clnt->cache, dbr_shared_perm_entry(node));
+        DbrAccnt giveup = perm->giveup.rec->accnt.state;
+        assert(giveup);
         // Transfer ownership.
-        fig_accnt_emplace_user(group, memb);
+        fig_accnt_emplace_trader(giveup, perm);
     }
 }
 
 static void
-emplace_group_list(DbrClnt clnt, struct DbrSlNode* first)
+emplace_giveup_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrMemb* memb = enrich_memb(&clnt->cache, dbr_shared_memb_entry(node));
-        DbrAccnt user = memb->user.rec->accnt.state;
-        assert(user);
+        struct DbrPerm* perm = enrich_perm(&clnt->cache, dbr_shared_perm_entry(node));
+        DbrAccnt trader = perm->trader.rec->accnt.state;
+        assert(trader);
         // Transfer ownership.
-        fig_accnt_emplace_group(user, memb);
+        fig_accnt_emplace_giveup(trader, perm);
     }
 }
 
@@ -121,10 +121,10 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrOrder* order = enrich_order(&clnt->cache, dbr_shared_order_entry(node));
-        DbrAccnt user = order->c.user.rec->accnt.state;
-        assert(user);
+        DbrAccnt trader = order->c.trader.rec->accnt.state;
+        assert(trader);
         // Transfer ownership.
-        fig_accnt_emplace_order(user, order);
+        fig_accnt_emplace_order(trader, order);
     }
 }
 
@@ -134,10 +134,10 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
         assert(exec->c.state == DBR_STATE_TRADE);
-        DbrAccnt user = exec->c.user.rec->accnt.state;
-        assert(user);
+        DbrAccnt trader = exec->c.trader.rec->accnt.state;
+        assert(trader);
         // Transfer ownership.
-        fig_accnt_insert_trade(user, exec);
+        fig_accnt_insert_trade(trader, exec);
         dbr_exec_decref(exec, clnt->pool);
     }
 }
@@ -150,7 +150,7 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         struct DbrPosn* posn = enrich_posn(&clnt->cache, dbr_shared_posn_entry(node));
         node = node->next;
         // Transfer ownership.
-        // All accounts that user is member of are created in emplace_membs().
+        // All accounts that trader is member of are created in emplace_perms().
         DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->ordidx, clnt->pool);
         if (dbr_likely(accnt)) {
             fig_accnt_emplace_posn(accnt, posn);
@@ -188,19 +188,19 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
     struct DbrOrder* order = create_order(clnt, exec);
     if (!order)
         return DBR_FALSE;
-    DbrAccnt user = order->c.user.rec->accnt.state;
-    assert(user);
+    DbrAccnt trader = order->c.trader.rec->accnt.state;
+    assert(trader);
     // Transfer ownership.
-    fig_accnt_emplace_order(user, order);
+    fig_accnt_emplace_order(trader, order);
     return DBR_TRUE;
 }
 
 static DbrBool
 apply_update(DbrClnt clnt, struct DbrExec* exec)
 {
-    DbrAccnt user = exec->c.user.rec->accnt.state;
-    assert(user);
-    struct DbrRbNode* node = fig_accnt_find_order_id(user, exec->order);
+    DbrAccnt trader = exec->c.trader.rec->accnt.state;
+    assert(trader);
+    struct DbrRbNode* node = fig_accnt_find_order_id(trader, exec->order);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", exec->order);
         return DBR_FALSE;
@@ -217,7 +217,7 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
 
     if (exec->c.state == DBR_STATE_TRADE) {
         // Transfer ownership.
-        fig_accnt_insert_trade(user, exec);
+        fig_accnt_insert_trade(trader, exec);
     }
     return DBR_TRUE;
 }
@@ -417,8 +417,8 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_log_debug1("logoff message");
                 dbr_handler_on_logoff(handler, clnt, body.req_id, body.sess_logoff.uid);
                 {
-                    DbrAccnt user = get_accnt(clnt, body.sess_logoff.uid);
-                    dbr_sess_logoff_and_reset(&clnt->sess, user);
+                    DbrAccnt trader = get_accnt(clnt, body.sess_logoff.uid);
+                    dbr_sess_logoff_and_reset(&clnt->sess, trader);
                 }
                 break;
             case DBR_SESS_HEARTBT:
@@ -446,13 +446,13 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 if (clnt->state == FIG_READY)
                     dbr_handler_on_ready(handler, clnt);
                 break;
-            case DBR_USER_LIST_REP:
-                dbr_log_debug1("user-list message");
-                emplace_user_list(clnt, body.entity_list_rep.first);
+            case DBR_TRADER_LIST_REP:
+                dbr_log_debug1("trader-list message");
+                emplace_trader_list(clnt, body.entity_list_rep.first);
                 break;
-            case DBR_GROUP_LIST_REP:
-                dbr_log_debug1("group-list message");
-                emplace_group_list(clnt, body.entity_list_rep.first);
+            case DBR_GIVEUP_LIST_REP:
+                dbr_log_debug1("giveup-list message");
+                emplace_giveup_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_ORDER_LIST_REP:
                 dbr_log_debug1("order-list message");

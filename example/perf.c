@@ -89,8 +89,8 @@ run(void)
 {
     const DbrJd settl_day = dbr_ymd_to_jd(2014, 3, 14);
 
-    struct DbrRec* urec = find_rec_mnem(DBR_ENTITY_ACCNT, "WRAMIREZ");
-    if (dbr_unlikely(!urec))
+    struct DbrRec* trec = find_rec_mnem(DBR_ENTITY_ACCNT, "WRAMIREZ");
+    if (dbr_unlikely(!trec))
         goto fail1;
 
     struct DbrRec* grec = find_rec_mnem(DBR_ENTITY_ACCNT, "DBRA");
@@ -101,12 +101,12 @@ run(void)
     if (dbr_unlikely(!crec))
         goto fail1;
 
-    DbrAccnt user = dbr_serv_accnt(serv, urec);
-    if (dbr_unlikely(!user))
+    DbrAccnt trader = dbr_serv_accnt(serv, trec);
+    if (dbr_unlikely(!trader))
         goto fail1;
 
-    DbrAccnt group = dbr_serv_accnt(serv, grec);
-    if (dbr_unlikely(!group))
+    DbrAccnt giveup = dbr_serv_accnt(serv, grec);
+    if (dbr_unlikely(!giveup))
         goto fail1;
 
     struct DbrBook* book = dbr_serv_book(serv, crec, settl_day);
@@ -119,7 +119,7 @@ run(void)
     if (dbr_unlikely(!sess))
         goto fail1;
 
-    if (dbr_unlikely(!dbr_sess_logon(sess, user)))
+    if (dbr_unlikely(!dbr_sess_logon(sess, trader)))
         goto fail1;
 
     enum { ITERS = 500 };
@@ -127,13 +127,13 @@ run(void)
     for (int i = 0; i < ITERS; ++i) {
 
         const tsc_t start = tsc();
-        if (dbr_unlikely(!dbr_serv_place(serv, user, group, book, NULL,
+        if (dbr_unlikely(!dbr_serv_place(serv, trader, giveup, book, NULL,
                                          DBR_ACTION_BUY, 12345, 1, 0))) {
             dbr_err_perror("dbr_serv_place() failed");
             goto fail2;
         }
 
-        if (dbr_unlikely(!dbr_serv_place(serv, user, group, book, NULL,
+        if (dbr_unlikely(!dbr_serv_place(serv, trader, giveup, book, NULL,
                                          DBR_ACTION_SELL, 12345, 1, 0))) {
             dbr_err_perror("dbr_serv_place() failed");
             goto fail2;
@@ -144,9 +144,9 @@ run(void)
         dbr_serv_clear(serv);
 
         struct DbrRbNode* node;
-        while ((node = dbr_accnt_first_trade(user)) != DBR_ACCNT_END_TRADE) {
+        while ((node = dbr_accnt_first_trade(trader)) != DBR_ACCNT_END_TRADE) {
             struct DbrExec* trade = dbr_accnt_trade_entry(node);
-            if (!dbr_serv_ack_trade(serv, user, trade->id)) {
+            if (!dbr_serv_ack_trade(serv, trader, trade->id)) {
                 dbr_err_perror("dbr_serv_ack_trade() failed");
                 goto fail2;
             }
@@ -156,10 +156,10 @@ run(void)
     const int orders = ITERS * 2;
     dbr_log_info("orders=%d, total=%.3f ms, per_order=%.3f ms", orders, ms, ms / orders);
 
-    dbr_sess_logoff(sess, user);
+    dbr_sess_logoff(sess, trader);
     return DBR_TRUE;
  fail2:
-    dbr_sess_logoff(sess, user);
+    dbr_sess_logoff(sess, trader);
  fail1:
     return DBR_FALSE;
 }

@@ -39,13 +39,13 @@ DBR_EXTERN const char*
 elm_proto_read_contr(const char* buf, struct DbrRec* rec);
 
 DBR_EXTERN size_t
-elm_proto_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+elm_proto_perm_len(const struct DbrPerm* perm, DbrBool enriched);
 
 DBR_EXTERN char*
-elm_proto_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+elm_proto_write_perm(char* buf, const struct DbrPerm* perm, DbrBool enriched);
 
 DBR_EXTERN const char*
-elm_proto_read_memb(const char* buf, struct DbrMemb* memb);
+elm_proto_read_perm(const char* buf, struct DbrPerm* perm);
 
 DBR_EXTERN size_t
 elm_proto_order_len(const struct DbrOrder* order, DbrBool enriched);

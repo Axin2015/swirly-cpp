@@ -137,29 +137,29 @@ CREATE VIEW accnt_v AS
   FROM accnt a
 ;
 
-CREATE TABLE memb (
-  user INTEGER NOT NULL REFERENCES accnt (id),
-  group_ INTEGER NOT NULL REFERENCES accnt (id),
-  PRIMARY KEY (user, group_)
+CREATE TABLE perm (
+  trader INTEGER NOT NULL REFERENCES accnt (id),
+  giveup INTEGER NOT NULL REFERENCES accnt (id),
+  PRIMARY KEY (trader, giveup)
 )
 ;
 
-CREATE VIEW memb_v AS
+CREATE VIEW perm_v AS
   SELECT
-  u.mnem user,
-  g.mnem group_
-  FROM memb m
-  INNER JOIN accnt u
-  ON m.user = u.id
+  t.mnem trader,
+  g.mnem giveup
+  FROM perm p
+  INNER JOIN accnt t
+  ON p.trader = t.id
   INNER JOIN accnt g
-  ON m.group_ = g.id
-  ORDER BY u.id
+  ON p.giveup = g.id
+  ORDER BY t.id
 ;
 
 CREATE TABLE order_ (
   id INTEGER PRIMARY KEY,
-  user INTEGER NOT NULL REFERENCES accnt (id),
-  group_ INTEGER NOT NULL REFERENCES accnt (id),
+  trader INTEGER NOT NULL REFERENCES accnt (id),
+  giveup INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_day INTEGER NOT NULL,
   ref TEXT NULL,
@@ -174,15 +174,15 @@ CREATE TABLE order_ (
   min_lots INTEGER NOT NULL,
   created INTEGER NOT NULL,
   modified INTEGER NOT NULL,
-  CONSTRAINT order_user_ref_uq UNIQUE (user, ref)
+  CONSTRAINT order_trader_ref_uq UNIQUE (trader, ref)
 )
 ;
 
 CREATE VIEW order_v AS
   SELECT
   o.id,
-  u.mnem user,
-  g.mnem group_,
+  t.mnem trader,
+  g.mnem giveup,
   c.mnem contr,
   o.settl_day,
   o.ref,
@@ -198,10 +198,10 @@ CREATE VIEW order_v AS
   o.created,
   o.modified
   FROM order_ o
-  INNER JOIN accnt u
-  ON o.user = u.id
+  INNER JOIN accnt t
+  ON o.trader = t.id
   INNER JOIN accnt g
-  ON o.group_ = g.id
+  ON o.giveup = g.id
   INNER JOIN contr c
   ON o.contr = c.id
   INNER JOIN state s
@@ -213,8 +213,8 @@ CREATE VIEW order_v AS
 CREATE TABLE exec (
   id INTEGER PRIMARY KEY,
   order_ INTEGER NOT NULL REFERENCES order_ (id),
-  user INTEGER NOT NULL REFERENCES accnt (id),
-  group_ INTEGER NOT NULL REFERENCES accnt (id),
+  trader INTEGER NOT NULL REFERENCES accnt (id),
+  giveup INTEGER NOT NULL REFERENCES accnt (id),
   contr INTEGER NOT NULL REFERENCES contr (id),
   settl_day INTEGER NOT NULL,
   ref TEXT NULL,
@@ -242,8 +242,8 @@ CREATE TRIGGER before_insert_on_exec
 BEGIN
   INSERT INTO order_ (
     id,
-    user,
-    group_,
+    trader,
+    giveup,
     contr,
     settl_day,
     ref,
@@ -260,8 +260,8 @@ BEGIN
     modified
   ) VALUES (
     new.order_,
-    new.user,
-    new.group_,
+    new.trader,
+    new.giveup,
     new.contr,
     new.settl_day,
     new.ref,
@@ -301,8 +301,8 @@ CREATE VIEW exec_v AS
   SELECT
   e.id,
   e.order_,
-  u.mnem user,
-  g.mnem group_,
+  t.mnem trader,
+  g.mnem giveup,
   c.mnem contr,
   e.settl_day,
   e.ref,
@@ -322,10 +322,10 @@ CREATE VIEW exec_v AS
   e.created,
   e.modified
   FROM exec e
-  INNER JOIN accnt u
-  ON e.user = u.id
+  INNER JOIN accnt t
+  ON e.trader = t.id
   INNER JOIN accnt g
-  ON e.group_ = g.id
+  ON e.giveup = g.id
   INNER JOIN contr c
   ON e.contr = c.id
   INNER JOIN state s
@@ -342,8 +342,8 @@ CREATE VIEW trade_v AS
   SELECT
   e.id,
   e.order_,
-  e.user,
-  e.group_,
+  e.trader,
+  e.giveup,
   e.contr,
   e.settl_day,
   e.ref,
@@ -367,7 +367,7 @@ CREATE VIEW trade_v AS
 
 CREATE VIEW posn_v AS
   SELECT
-  e.group_ accnt,
+  e.giveup accnt,
   e.contr,
   e.settl_day,
   e.action,
@@ -375,7 +375,7 @@ CREATE VIEW posn_v AS
   SUM(e.last_lots) lots
   FROM exec e
   WHERE e.state = 4
-  GROUP BY e.group_, e.contr, e.settl_day, e.action
+  GROUP BY e.giveup, e.contr, e.settl_day, e.action
 ;
 
 COMMIT TRANSACTION

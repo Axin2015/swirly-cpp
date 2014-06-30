@@ -86,7 +86,7 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     // Small entrys.
     dbr_log_debug1("small entries:");
     dbr_log_debug1("sizeof DbrRbNode: %zu", sizeof(struct DbrRbNode));
-    dbr_log_debug1("sizeof DbrMemb:   %zu", sizeof(struct DbrMemb));
+    dbr_log_debug1("sizeof DbrPerm:   %zu", sizeof(struct DbrPerm));
     dbr_log_debug1("sizeof DbrLevel:  %zu", sizeof(struct DbrLevel));
     dbr_log_debug1("sizeof DbrMatch:  %zu", sizeof(struct DbrMatch));
     dbr_log_debug1("sizeof DbrSub:    %zu", sizeof(struct DbrSub));
@@ -198,11 +198,11 @@ elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* firs
             dbr_pool_free_rec(pool, rec);
         }
         break;
-    case DBR_ENTITY_MEMB:
+    case DBR_ENTITY_PERM:
         while (node) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
+            struct DbrPerm* perm = dbr_shared_perm_entry(node);
             node = node->next;
-            dbr_pool_free_memb(pool, memb);
+            dbr_pool_free_perm(pool, perm);
         }
         break;
     case DBR_ENTITY_ORDER:
@@ -286,16 +286,16 @@ dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
     elm_pool_free_rec(pool, rec);
 }
 
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool)
+DBR_API struct DbrPerm*
+dbr_pool_alloc_perm(DbrPool pool)
 {
-    return elm_pool_alloc_memb(pool);
+    return elm_pool_alloc_perm(pool);
 }
 
 DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb)
+dbr_pool_free_perm(DbrPool pool, struct DbrPerm* perm)
 {
-    elm_pool_free_memb(pool, memb);
+    elm_pool_free_perm(pool, perm);
 }
 
 DBR_API struct DbrOrder*

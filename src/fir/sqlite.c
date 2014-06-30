@@ -29,7 +29,7 @@
 #include <string.h>
 
 #define INSERT_EXEC_SQL                                                 \
-    "INSERT INTO exec (id, order_, user, group_, contr, settl_day,"     \
+    "INSERT INTO exec (id, order_, trader, giveup, contr, settl_day,"   \
     " ref, state, action, ticks, lots, resd, exec, last_ticks,"         \
     " last_lots, min_lots, match, acked, role, cpty, created,"          \
     " modified)"                                                        \
@@ -49,18 +49,18 @@
     " tick_denom, lot_numer, lot_denom, pip_dp, min_lots, max_lots"     \
     " FROM contr_v ORDER BY id"
 
-#define SELECT_MEMB_SQL                                                 \
-    "SELECT user, group_"                                               \
-    " FROM memb ORDER BY user"
+#define SELECT_PERM_SQL                                                 \
+    "SELECT trader, giveup"                                             \
+    " FROM perm ORDER BY trader"
 
 #define SELECT_ORDER_SQL                                                \
-    "SELECT id, user, group_, contr, settl_day, ref, state,"            \
+    "SELECT id, trader, giveup, contr, settl_day, ref, state,"          \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, created, modified"                                      \
     " FROM order_ WHERE resd > 0 ORDER BY id"
 
 #define SELECT_TRADE_SQL                                                \
-    "SELECT id, order_, user, group_, contr, settl_day, ref,"           \
+    "SELECT id, order_, trader, giveup, contr, settl_day, ref,"         \
     " action, ticks, lots, resd, exec, last_ticks, last_lots,"          \
     " min_lots, match, role, cpty, created"                             \
     " FROM trade_v WHERE acked = 0 ORDER BY id"
@@ -139,8 +139,8 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
     enum {
         ID = 1,
         ORDER,
-        USER,
-        GROUP,
+        TRADER,
+        GIVEUP,
         CONTR,
         SETTL_DAY,
         REF,
@@ -170,11 +170,11 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
 
     if (enriched) {
 
-        rc = sqlite3_bind_int64(stmt, USER, exec->c.user.rec->id);
+        rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.rec->id);
         if (rc != SQLITE_OK)
             goto fail1;
 
-        rc = sqlite3_bind_int64(stmt, GROUP, exec->c.group.rec->id);
+        rc = sqlite3_bind_int64(stmt, GIVEUP, exec->c.giveup.rec->id);
         if (rc != SQLITE_OK)
             goto fail1;
 
@@ -184,11 +184,11 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
 
     } else {
 
-        rc = sqlite3_bind_int64(stmt, USER, exec->c.user.id_only);
+        rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.id_only);
         if (rc != SQLITE_OK)
             goto fail1;
 
-        rc = sqlite3_bind_int64(stmt, GROUP, exec->c.group.id_only);
+        rc = sqlite3_bind_int64(stmt, GIVEUP, exec->c.giveup.id_only);
         if (rc != SQLITE_OK)
             goto fail1;
 
@@ -481,14 +481,14 @@ select_contr(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 }
 
 static ssize_t
-select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
+select_perm(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
-        USER,
-        GROUP
+        TRADER,
+        GIVEUP
     };
 
-    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_MEMB_SQL);
+    sqlite3_stmt* stmt = prepare(sqlite->db, SELECT_PERM_SQL);
     if (!stmt)
         goto fail1;
 
@@ -500,18 +500,18 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
         int rc = sqlite3_step(stmt);
         if (rc == SQLITE_ROW) {
 
-            struct DbrMemb* memb = dbr_pool_alloc_memb(pool);
-            if (!memb)
+            struct DbrPerm* perm = dbr_pool_alloc_perm(pool);
+            if (!perm)
                 goto fail2;
-            dbr_memb_init(memb);
+            dbr_perm_init(perm);
 
-            memb->user.id_only = sqlite3_column_int64(stmt, USER);
-            memb->group.id_only = sqlite3_column_int64(stmt, GROUP);
+            perm->trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            perm->giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
 
-            dbr_log_debug3("memb: user=%ld,group=%ld",
-                           memb->user.id_only, memb->group.id_only);
+            dbr_log_debug3("perm: trader=%ld,giveup=%ld",
+                           perm->trader.id_only, perm->giveup.id_only);
 
-            dbr_queue_insert_back(&mq, &memb->shared_node_);
+            dbr_queue_insert_back(&mq, &perm->shared_node_);
             ++size;
 
         } else if (rc == SQLITE_DONE) {
@@ -529,7 +529,7 @@ select_memb(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
  fail2:
     sqlite3_clear_bindings(stmt);
     sqlite3_finalize(stmt);
-    dbr_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&mq));
+    dbr_pool_free_entity_list(pool, DBR_ENTITY_PERM, dbr_queue_first(&mq));
     *first = NULL;
  fail1:
     return -1;
@@ -540,8 +540,8 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 {
     enum {
         ID,
-        USER,
-        GROUP,
+        TRADER,
+        GIVEUP,
         CONTR,
         SETTL_DAY,
         REF,
@@ -577,8 +577,8 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             order->level = NULL;
             order->id = sqlite3_column_int64(stmt, ID);
-            order->c.user.id_only = sqlite3_column_int64(stmt, USER);
-            order->c.group.id_only = sqlite3_column_int64(stmt, GROUP);
+            order->c.trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            order->c.giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
             order->c.contr.id_only = sqlite3_column_int64(stmt, CONTR);
             order->c.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
@@ -598,11 +598,11 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
             order->created = sqlite3_column_int64(stmt, CREATED);
             order->modified = sqlite3_column_int64(stmt, MODIFIED);
 
-            dbr_log_debug3("order: id=%ld,user=%ld,group=%ld,contr=%ld,settl_day=%d,"
+            dbr_log_debug3("order: id=%ld,trader=%ld,giveup=%ld,contr=%ld,settl_day=%d,"
                            "ref=%.64s,state=%d,action=%d,ticks=%ld,lots=%ld,resd=%ld,"
                            "exec=%ld,last_ticks=%ld,last_lots=%ld,min_lots=%ld,"
                            "created=%ld,modified=%ld",
-                           order->id, order->c.user.id_only, order->c.group.id_only,
+                           order->id, order->c.trader.id_only, order->c.giveup.id_only,
                            order->c.contr.id_only, order->c.settl_day, order->c.ref,
                            order->c.state, order->c.action, order->c.ticks, order->c.lots,
                            order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
@@ -638,8 +638,8 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
     enum {
         ID,
         ORDER,
-        USER,
-        GROUP,
+        TRADER,
+        GIVEUP,
         CONTR,
         SETTL_DAY,
         REF,
@@ -676,8 +676,8 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             exec->id = sqlite3_column_int64(stmt, ID);
             exec->order = sqlite3_column_int64(stmt, ORDER);
-            exec->c.user.id_only = sqlite3_column_int64(stmt, USER);
-            exec->c.group.id_only = sqlite3_column_int64(stmt, GROUP);
+            exec->c.trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            exec->c.giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
             exec->c.contr.id_only = sqlite3_column_int64(stmt, CONTR);
             exec->c.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
@@ -702,11 +702,11 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                 ? sqlite3_column_int64(stmt, CPTY) : 0;
             exec->created = sqlite3_column_int64(stmt, CREATED);
 
-            dbr_log_debug3("exec: id=%ld,order=%ld,user=%ld,group=%ld,contr=%ld,settl_day=%d,"
+            dbr_log_debug3("exec: id=%ld,order=%ld,trader=%ld,giveup=%ld,contr=%ld,settl_day=%d,"
                            "ref=%.64s,action=%d,ticks=%ld,lots=%ld,resd=%ld,exec=%ld,"
                            "last_ticks=%ld,last_lots=%ld,min_lots=%ld,match=%ld,role=%d,cpty=%ld,"
                            "created=%ld",
-                           exec->id, exec->order, exec->c.user.id_only, exec->c.group.id_only,
+                           exec->id, exec->order, exec->c.trader.id_only, exec->c.giveup.id_only,
                            exec->c.contr.id_only, exec->c.settl_day, exec->c.ref, exec->c.action,
                            exec->c.ticks, exec->c.lots, exec->c.resd, exec->c.exec,
                            exec->c.last_ticks, exec->c.last_lots, exec->c.min_lots,
@@ -938,8 +938,8 @@ fir_sqlite_select_entity(struct FirSqlite* sqlite, int type, DbrPool pool,
     case DBR_ENTITY_CONTR:
         ret = select_contr(sqlite, pool, first);
         break;
-    case DBR_ENTITY_MEMB:
-        ret = select_memb(sqlite, pool, first);
+    case DBR_ENTITY_PERM:
+        ret = select_perm(sqlite, pool, first);
         break;
     case DBR_ENTITY_ORDER:
         ret = select_order(sqlite, pool, first);

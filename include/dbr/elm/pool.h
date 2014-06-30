@@ -44,11 +44,11 @@ dbr_pool_alloc_rec(DbrPool pool);
 DBR_API void
 dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec);
 
-DBR_API struct DbrMemb*
-dbr_pool_alloc_memb(DbrPool pool);
+DBR_API struct DbrPerm*
+dbr_pool_alloc_perm(DbrPool pool);
 
 DBR_API void
-dbr_pool_free_memb(DbrPool pool, struct DbrMemb* memb);
+dbr_pool_free_perm(DbrPool pool, struct DbrPerm* perm);
 
 DBR_API struct DbrOrder*
 dbr_pool_alloc_order(DbrPool pool);

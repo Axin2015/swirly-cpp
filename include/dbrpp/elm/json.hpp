@@ -83,28 +83,28 @@ json_write_contr(const DbrRec& crec)
 /** @} */
 
 /**
- * @addtogroup Memb
+ * @addtogroup Perm
  * @{
  */
 
 inline size_t
-json_memb_len(const DbrMemb& memb) noexcept
+json_perm_len(const DbrPerm& perm) noexcept
 {
-    return dbr_json_memb_len(&memb);
+    return dbr_json_perm_len(&perm);
 }
 
 inline char*
-json_write_memb(char* buf, const DbrMemb& memb) noexcept
+json_write_perm(char* buf, const DbrPerm& perm) noexcept
 {
-    return dbr_json_write_memb(buf, &memb);
+    return dbr_json_write_perm(buf, &perm);
 }
 
 inline std::string
-json_write_memb(const DbrMemb& memb) noexcept
+json_write_perm(const DbrPerm& perm) noexcept
 {
     std::string s;
-    s.resize(dbr_json_memb_len(&memb) + 1);
-    dbr_json_write_memb(&s[0], &memb);
+    s.resize(dbr_json_perm_len(&perm) + 1);
+    dbr_json_write_perm(&s[0], &perm);
     s.resize(s.size() - 1);
     return s;
 }

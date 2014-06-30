@@ -343,7 +343,7 @@ dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 }
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrAccnt user)
+dbr_clnt_logon(DbrClnt clnt, DbrAccnt trader)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -353,7 +353,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrAccnt user)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGON;
-    body.sess_logon.uid = user->rec->id;
+    body.sess_logon.uid = trader->rec->id;
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -371,7 +371,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrAccnt user)
 }
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user)
+dbr_clnt_logoff(DbrClnt clnt, DbrAccnt trader)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -380,7 +380,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_SESS_LOGOFF;
-    body.sess_logoff.uid = user->rec->id;
+    body.sess_logoff.uid = trader->rec->id;
 
     // Reserve so that push cannot fail after send.
     if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
@@ -398,7 +398,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user)
 }
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
+dbr_clnt_place(DbrClnt clnt, DbrAccnt trader, DbrAccnt giveup, struct DbrRec* crec,
                DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots)
 {
@@ -409,8 +409,8 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_PLACE_ORDER_REQ;
-    body.place_order_req.uid = user->rec->id;
-    body.place_order_req.gid = group->rec->id;
+    body.place_order_req.uid = trader->rec->id;
+    body.place_order_req.gid = giveup->rec->id;
     body.place_order_req.cid = crec->id;
     body.place_order_req.settl_day = settl_day;
     if (ref)
@@ -438,7 +438,7 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots)
+dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt trader, DbrIden id, DbrLots lots)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -447,7 +447,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_ID_REQ;
-    body.revise_order_id_req.uid = user->rec->id;
+    body.revise_order_id_req.uid = trader->rec->id;
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
@@ -467,7 +467,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots)
 }
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref, DbrLots lots)
+dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt trader, const char* ref, DbrLots lots)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -476,7 +476,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref, DbrLots lots)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_REVISE_ORDER_REF_REQ;
-    body.revise_order_ref_req.uid = user->rec->id;
+    body.revise_order_ref_req.uid = trader->rec->id;
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
@@ -496,7 +496,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref, DbrLots lots)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id)
+dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt trader, DbrIden id)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -505,7 +505,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
-    body.cancel_order_id_req.uid = user->rec->id;
+    body.cancel_order_id_req.uid = trader->rec->id;
     body.cancel_order_id_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -524,7 +524,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id)
 }
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref)
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt trader, const char* ref)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -533,7 +533,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
-    body.cancel_order_ref_req.uid = user->rec->id;
+    body.cancel_order_ref_req.uid = trader->rec->id;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
 
     // Reserve so that push cannot fail after send.
@@ -552,7 +552,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref)
 }
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id)
+dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt trader, DbrIden id)
 {
     if (clnt->state != FIG_READY) {
         dbr_err_set(DBR_EBUSY, "client not ready");
@@ -561,7 +561,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id)
     struct DbrBody body;
     body.req_id = clnt->id++;
     body.type = DBR_ACK_TRADE_REQ;
-    body.ack_trade_req.uid = user->rec->id;
+    body.ack_trade_req.uid = trader->rec->id;
     body.ack_trade_req.id = id;
 
     // Reserve so that push cannot fail after send.
@@ -571,7 +571,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id)
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
 
-    fig_accnt_remove_trade_id(user, id);
+    fig_accnt_remove_trade_id(trader, id);
 
     const DbrMillis now = dbr_millis();
     dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);

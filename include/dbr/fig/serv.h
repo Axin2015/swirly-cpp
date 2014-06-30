@@ -106,7 +106,7 @@ dbr_serv_sess(DbrServ serv, const DbrUuid uuid);
  */
 
 DBR_API struct DbrOrder*
-dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book,
+dbr_serv_place(DbrServ serv, DbrAccnt trader, DbrAccnt giveup, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots);
 
 /**
@@ -118,19 +118,19 @@ dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book
  */
 
 DBR_API struct DbrOrder*
-dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots);
+dbr_serv_revise_id(DbrServ serv, DbrAccnt trader, DbrIden id, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_serv_revise_ref(DbrServ serv, DbrAccnt user, const char* ref, DbrLots lots);
+dbr_serv_revise_ref(DbrServ serv, DbrAccnt trader, const char* ref, DbrLots lots);
 
 DBR_API struct DbrOrder*
-dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id);
+dbr_serv_cancel_id(DbrServ serv, DbrAccnt trader, DbrIden id);
 
 DBR_API struct DbrOrder*
-dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref);
+dbr_serv_cancel_ref(DbrServ serv, DbrAccnt trader, const char* ref);
 
 DBR_API DbrBool
-dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id);
+dbr_serv_ack_trade(DbrServ serv, DbrAccnt trader, DbrIden id);
 
 DBR_API void
 dbr_serv_clear_md(DbrServ serv);

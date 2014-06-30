@@ -270,77 +270,77 @@ INSERT INTO accnt (mnem, display, email)
         VALUES ('DBRB', 'Account B', 'dbrb@doobry.org')
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'WRAMIREZ'),
         (SELECT id FROM accnt WHERE mnem = 'DBRA')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'WRAMIREZ'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'SFLORES'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'JWRIGHT'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'VCAMPBEL'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'GWILSON'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'BJONES'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'TLEE'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'EEDWARDS'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'RALEXAND'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')
         )
 ;
 
-INSERT INTO memb (user, group_)
+INSERT INTO perm (trader, giveup)
         VALUES (
         (SELECT id FROM accnt WHERE mnem = 'JTHOMAS'),
         (SELECT id FROM accnt WHERE mnem = 'DBRB')

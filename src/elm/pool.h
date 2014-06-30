@@ -46,7 +46,7 @@ struct ElmSmallEntry {
         struct ElmSmallEntry* next;
         // Small data structures.
         struct DbrRbNode rbnode;
-        struct DbrMemb memb;
+        struct DbrPerm perm;
         struct DbrLevel level;
         struct DbrMatch match;
         struct DbrSub sub;
@@ -127,17 +127,17 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
     elm_pool_free_large(pool, entry);
 }
 
-static inline struct DbrMemb*
-elm_pool_alloc_memb(struct ElmPool* pool)
+static inline struct DbrPerm*
+elm_pool_alloc_perm(struct ElmPool* pool)
 {
     struct ElmSmallEntry* entry = elm_pool_alloc_small(pool);
-    return entry ? &entry->memb : NULL;
+    return entry ? &entry->perm : NULL;
 }
 
 static inline void
-elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
+elm_pool_free_perm(struct ElmPool* pool, struct DbrPerm* perm)
 {
-    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)memb;
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)perm;
     elm_pool_free_small(pool, entry);
 }
 
@@ -307,19 +307,19 @@ elm_pool_free_rec(struct ElmPool* pool, struct DbrRec* rec)
     elm_pool_free_large(pool, entry);
 }
 
-static inline struct DbrMemb*
-elm_pool_alloc_memb_(struct ElmPool* pool, const char* file, int line)
+static inline struct DbrPerm*
+elm_pool_alloc_perm_(struct ElmPool* pool, const char* file, int line)
 {
     struct ElmSmallEntry* entry = elm_pool_alloc_small(pool, file, line);
-    dbr_log_debug3("allocating memb %p in %s at %d", entry, file, line);
-    return entry ? &entry->memb : NULL;
+    dbr_log_debug3("allocating perm %p in %s at %d", entry, file, line);
+    return entry ? &entry->perm : NULL;
 }
 
 static inline void
-elm_pool_free_memb(struct ElmPool* pool, struct DbrMemb* memb)
+elm_pool_free_perm(struct ElmPool* pool, struct DbrPerm* perm)
 {
-    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)memb;
-    dbr_log_debug3("freeing memb %p from %s at %d", entry, entry->file, entry->line);
+    struct ElmSmallEntry* entry = (struct ElmSmallEntry*)perm;
+    dbr_log_debug3("freeing perm %p from %s at %d", entry, entry->file, entry->line);
     elm_pool_free_small(pool, entry);
 }
 
@@ -469,8 +469,8 @@ elm_pool_free_sess(struct ElmPool* pool, struct DbrSess* sess)
 
 #define elm_pool_alloc_rec(pool)                    \
     elm_pool_alloc_rec_(pool, __FILE__, __LINE__)
-#define elm_pool_alloc_memb(pool)                   \
-    elm_pool_alloc_memb_(pool, __FILE__, __LINE__)
+#define elm_pool_alloc_perm(pool)                   \
+    elm_pool_alloc_perm_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_order(pool)                  \
     elm_pool_alloc_order_(pool, __FILE__, __LINE__)
 #define elm_pool_alloc_level(pool)                  \

@@ -71,19 +71,19 @@ get_id(struct FigCache* cache, int type, DbrIden id)
     return dbr_shared_rec_entry(node);
 }
 
-static inline struct DbrMemb*
-enrich_memb(struct FigCache* cache, struct DbrMemb* memb)
+static inline struct DbrPerm*
+enrich_perm(struct FigCache* cache, struct DbrPerm* perm)
 {
-    memb->user.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->user.id_only);
-    memb->group.rec = get_id(cache, DBR_ENTITY_ACCNT, memb->group.id_only);
-    return memb;
+    perm->trader.rec = get_id(cache, DBR_ENTITY_ACCNT, perm->trader.id_only);
+    perm->giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, perm->giveup.id_only);
+    return perm;
 }
 
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->c.user.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.user.id_only);
-    order->c.group.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.group.id_only);
+    order->c.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.trader.id_only);
+    order->c.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.giveup.id_only);
     order->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->c.contr.id_only);
     return order;
 }
@@ -91,8 +91,8 @@ enrich_order(struct FigCache* cache, struct DbrOrder* order)
 static inline struct DbrExec*
 enrich_trade(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->c.user.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.user.id_only);
-    exec->c.group.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.group.id_only);
+    exec->c.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.trader.id_only);
+    exec->c.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.giveup.id_only);
     exec->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->c.contr.id_only);
     exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
     return exec;
@@ -183,46 +183,46 @@ emplace_rec_list(DbrServ serv, DbrModel model, int type)
 }
 
 static DbrBool
-emplace_membs(DbrServ serv, DbrModel model)
+emplace_perms(DbrServ serv, DbrModel model)
 {
     struct DbrSlNode* node;
-    if (dbr_model_read_entity(model, DBR_ENTITY_MEMB, serv->pool, &node) < 0)
+    if (dbr_model_read_entity(model, DBR_ENTITY_PERM, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrMemb* umemb = enrich_memb(&serv->cache, dbr_shared_memb_entry(node));
+        struct DbrPerm* uperm = enrich_perm(&serv->cache, dbr_shared_perm_entry(node));
 
-        // Clone member for group.
-        struct DbrMemb* gmemb = dbr_pool_alloc_memb(serv->pool);
-        if (!gmemb)
+        // Clone member for giveup.
+        struct DbrPerm* gperm = dbr_pool_alloc_perm(serv->pool);
+        if (!gperm)
             goto fail2;
-        dbr_memb_init(gmemb);
-        gmemb->user.rec = umemb->user.rec;
-        gmemb->group.rec = umemb->group.rec;
+        dbr_perm_init(gperm);
+        gperm->trader.rec = uperm->trader.rec;
+        gperm->giveup.rec = uperm->giveup.rec;
 
-        struct FigAccnt* user = fig_accnt_lazy(umemb->user.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!user)) {
-            dbr_pool_free_memb(serv->pool, gmemb);
+        struct FigAccnt* trader = fig_accnt_lazy(uperm->trader.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!trader)) {
+            dbr_pool_free_perm(serv->pool, gperm);
             goto fail2;
         }
 
-        struct FigAccnt* group = fig_accnt_lazy(umemb->group.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!group)) {
-            dbr_pool_free_memb(serv->pool, gmemb);
+        struct FigAccnt* giveup = fig_accnt_lazy(uperm->giveup.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!giveup)) {
+            dbr_pool_free_perm(serv->pool, gperm);
             goto fail2;
         }
 
         // Transfer ownership.
-        fig_accnt_emplace_user(group, umemb);
-        fig_accnt_emplace_group(user, gmemb);
+        fig_accnt_emplace_trader(giveup, uperm);
+        fig_accnt_emplace_giveup(trader, gperm);
     }
     return DBR_TRUE;
  fail2:
     // Free tail.
     do {
-        struct DbrMemb* memb = dbr_shared_memb_entry(node);
+        struct DbrPerm* perm = dbr_shared_perm_entry(node);
         node = node->next;
-        dbr_pool_free_memb(serv->pool, memb);
+        dbr_pool_free_perm(serv->pool, perm);
     } while (node);
  fail1:
     return DBR_FALSE;
@@ -249,15 +249,15 @@ emplace_orders(DbrServ serv, DbrModel model)
         } else
             book = NULL;
 
-        struct FigAccnt* user = fig_accnt_lazy(order->c.user.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!user)) {
+        struct FigAccnt* trader = fig_accnt_lazy(order->c.trader.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!trader)) {
             if (book)
                 dbr_book_remove(book, order);
             goto fail2;
         }
 
         // Transfer ownership.
-        fig_accnt_emplace_order(user, order);
+        fig_accnt_emplace_order(trader, order);
     }
     return DBR_TRUE;
  fail2:
@@ -280,12 +280,12 @@ emplace_trades(DbrServ serv, DbrModel model)
 
     for (; node; node = node->next) {
         struct DbrExec* exec = enrich_trade(&serv->cache, dbr_shared_exec_entry(node));
-        struct FigAccnt* user = fig_accnt_lazy(exec->c.user.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!user))
+        struct FigAccnt* trader = fig_accnt_lazy(exec->c.trader.rec, &serv->ordidx, serv->pool);
+        if (dbr_unlikely(!trader))
             goto fail2;
 
         // Transfer ownership.
-        fig_accnt_insert_trade(user, exec);
+        fig_accnt_insert_trade(trader, exec);
         dbr_exec_decref(exec, serv->pool);
     }
     return DBR_TRUE;
@@ -377,7 +377,7 @@ commit_trans(DbrServ serv, struct FigAccnt* taker, struct DbrBook* book,
         insert_posnup(&serv->posnups, match->maker_posn);
 
         // Must succeed because maker order exists.
-        struct FigAccnt* maker = fig_accnt_lazy(maker_order->c.user.rec, &serv->ordidx,
+        struct FigAccnt* maker = fig_accnt_lazy(maker_order->c.trader.rec, &serv->ordidx,
                                                   serv->pool);
         assert(maker);
 
@@ -462,7 +462,7 @@ dbr_serv_load(DbrServ serv, DbrModel model)
 {
     return emplace_rec_list(serv, model, DBR_ENTITY_ACCNT)
         && emplace_rec_list(serv, model, DBR_ENTITY_CONTR)
-        && emplace_membs(serv, model)
+        && emplace_perms(serv, model)
         && emplace_orders(serv, model)
         && emplace_trades(serv, model)
         && emplace_posns(serv, model);
@@ -515,11 +515,11 @@ dbr_serv_sess(DbrServ serv, const DbrUuid uuid)
 // Exec
 
 DBR_API struct DbrOrder*
-dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book,
+dbr_serv_place(DbrServ serv, DbrAccnt trader, DbrAccnt giveup, struct DbrBook* book,
                const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
 {
-    if (!fig_accnt_logged_on(user)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", user->rec->mnem);
+    if (!fig_accnt_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
@@ -536,8 +536,8 @@ dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book
 
     new_order->level = NULL;
     new_order->id = dbr_bank_add_fetch(&serv->bank, DBR_REG_ORDER, 1L);
-    new_order->c.user.rec = fig_accnt_rec(user);
-    new_order->c.group.rec = fig_accnt_rec(group);
+    new_order->c.trader.rec = fig_accnt_rec(trader);
+    new_order->c.giveup.rec = fig_accnt_rec(giveup);
     new_order->c.contr.rec = book->crec;
     new_order->c.settl_day = book->settl_day;
     if (ref)
@@ -581,11 +581,11 @@ dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book
         goto fail5;
 
     // Final commit phase cannot fail.
-    fig_accnt_emplace_order(user, new_order);
+    fig_accnt_emplace_order(trader, new_order);
     const DbrKey key = dbr_book_key(book->crec->id, book->settl_day);
     dbr_tree_insert(&serv->bookups, key, &book->update_node_);
     // Commit trans to cycle and free matches.
-    commit_trans(serv, user, book, &trans, now);
+    commit_trans(serv, trader, book, &trans, now);
     return new_order;
  fail5:
     if (!dbr_order_done(new_order))
@@ -601,14 +601,14 @@ dbr_serv_place(DbrServ serv, DbrAccnt user, DbrAccnt group, struct DbrBook* book
 }
 
 DBR_API struct DbrOrder*
-dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots)
+dbr_serv_revise_id(DbrServ serv, DbrAccnt trader, DbrIden id, DbrLots lots)
 {
-    if (!fig_accnt_logged_on(user)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", user->rec->mnem);
+    if (!fig_accnt_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = fig_accnt_find_order_id(user, id);
+    struct DbrRbNode* node = fig_accnt_find_order_id(trader, id);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
@@ -660,14 +660,14 @@ dbr_serv_revise_id(DbrServ serv, DbrAccnt user, DbrIden id, DbrLots lots)
 }
 
 DBR_API struct DbrOrder*
-dbr_serv_revise_ref(DbrServ serv, DbrAccnt user, const char* ref, DbrLots lots)
+dbr_serv_revise_ref(DbrServ serv, DbrAccnt trader, const char* ref, DbrLots lots)
 {
-    if (!fig_accnt_logged_on(user)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", user->rec->mnem);
+    if (!fig_accnt_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrOrder* order = fig_accnt_find_order_ref(user, ref);
+    struct DbrOrder* order = fig_accnt_find_order_ref(trader, ref);
     if (!order) {
         dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
@@ -718,14 +718,14 @@ dbr_serv_revise_ref(DbrServ serv, DbrAccnt user, const char* ref, DbrLots lots)
 }
 
 DBR_API struct DbrOrder*
-dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id)
+dbr_serv_cancel_id(DbrServ serv, DbrAccnt trader, DbrIden id)
 {
-    if (!fig_accnt_logged_on(user)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", user->rec->mnem);
+    if (!fig_accnt_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = fig_accnt_find_order_id(user, id);
+    struct DbrRbNode* node = fig_accnt_find_order_id(trader, id);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
         goto fail1;
@@ -764,14 +764,14 @@ dbr_serv_cancel_id(DbrServ serv, DbrAccnt user, DbrIden id)
 }
 
 DBR_API struct DbrOrder*
-dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref)
+dbr_serv_cancel_ref(DbrServ serv, DbrAccnt trader, const char* ref)
 {
-    if (!fig_accnt_logged_on(user)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", user->rec->mnem);
+    if (!fig_accnt_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrOrder* order = fig_accnt_find_order_ref(user, ref);
+    struct DbrOrder* order = fig_accnt_find_order_ref(trader, ref);
     if (!order) {
         dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
@@ -809,14 +809,14 @@ dbr_serv_cancel_ref(DbrServ serv, DbrAccnt user, const char* ref)
 }
 
 DBR_API DbrBool
-dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id)
+dbr_serv_ack_trade(DbrServ serv, DbrAccnt trader, DbrIden id)
 {
-    if (!fig_accnt_logged_on(user)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", user->rec->mnem);
+    if (!fig_accnt_logged_on(trader)) {
+        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = fig_accnt_find_trade_id(user, id);
+    struct DbrRbNode* node = fig_accnt_find_trade_id(trader, id);
     if (!node) {
         dbr_err_setf(DBR_EINVAL, "no such trade '%ld'", id);
         goto fail1;
@@ -829,7 +829,7 @@ dbr_serv_ack_trade(DbrServ serv, DbrAccnt user, DbrIden id)
     // No need to update timestamps on trade because it is immediately freed.
 
     struct DbrExec* exec = dbr_accnt_trade_entry(node);
-    fig_accnt_remove_trade(user, exec);
+    fig_accnt_remove_trade(trader, exec);
     return DBR_TRUE;
  fail1:
     return DBR_FALSE;
@@ -850,9 +850,9 @@ dbr_serv_clear_tr(DbrServ serv)
         node = node->next;
         // Free completed orders.
         if (dbr_exec_done(exec)) {
-            DbrAccnt user = exec->c.user.rec->accnt.state;
-            assert(user);
-            struct DbrOrder* order = fig_accnt_release_order_id(user, exec->order);
+            DbrAccnt trader = exec->c.trader.rec->accnt.state;
+            assert(trader);
+            struct DbrOrder* order = fig_accnt_release_order_id(trader, exec->order);
             if (order)
                 dbr_pool_free_order(serv->pool, order);
         }

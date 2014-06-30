@@ -46,8 +46,8 @@ enum DbrResrc {
     DBR_RESRC_LOGOFF  =  2 << 16,
     DBR_RESRC_ACCNT   =  3 << 16,
     DBR_RESRC_CONTR   =  4 << 16,
-    DBR_RESRC_USER    =  5 << 16,
-    DBR_RESRC_GROUP   =  6 << 16,
+    DBR_RESRC_TRADER  =  5 << 16,
+    DBR_RESRC_GIVEUP  =  6 << 16,
     DBR_RESRC_ORDER   =  7 << 16,
     DBR_RESRC_TRADE   =  8 << 16,
     DBR_RESRC_POSN    =  9 << 16,
@@ -57,7 +57,7 @@ enum DbrResrc {
 enum DbrParam {
     DBR_PARAM_ID         = 1 << 0,
     DBR_PARAM_ACCNT      = 1 << 1,
-    DBR_PARAM_GROUP      = 1 << 2,
+    DBR_PARAM_GIVEUP     = 1 << 2,
     DBR_PARAM_CONTR      = 1 << 3,
     DBR_PARAM_SETTL_DATE = 1 << 4,
     DBR_PARAM_REF        = 1 << 5,
@@ -85,7 +85,7 @@ struct DbrRest {
     unsigned fields;
     DbrIden id;
     DbrMnem accnt;
-    DbrMnem group;
+    DbrMnem giveup;
     DbrMnem contr;
     DbrIsoDate settl_date;
     DbrRef ref;

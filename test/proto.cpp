@@ -85,36 +85,36 @@ TEST_CASE(proto_contr)
     check(out.contr.max_lots == in->contr.max_lots);
 }
 
-TEST_CASE(proto_memb)
+TEST_CASE(proto_perm)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden user = 5;
-    DbrIden group = 7;
+    DbrIden trader = 5;
+    DbrIden giveup = 7;
 
-    auto in = create_memb(pool, user, group);
+    auto in = create_perm(pool, trader, giveup);
 
-    auto len = proto_memb_len(*in, false);
+    auto len = proto_perm_len(*in, false);
     char buf[len];
-    const char* end = proto_write_memb(buf, *in, false);
+    const char* end = proto_write_perm(buf, *in, false);
     check(buf + len == end);
 
-    DbrMemb out;
-    end = proto_read_memb(buf, out);
+    DbrPerm out;
+    end = proto_read_perm(buf, out);
     check(buf + len == end);
 
-    check(out.user.id_only == in->user.id_only);
-    check(out.group.id_only == in->group.id_only);
+    check(out.trader.id_only == in->trader.id_only);
+    check(out.giveup.id_only == in->giveup.id_only);
 }
 
 TEST_CASE(proto_order)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden user = 5;
-    DbrIden group = 7;
+    DbrIden trader = 5;
+    DbrIden giveup = 7;
     DbrIden contr = 11;
     auto now = dbr_millis();
 
-    auto in = create_order(pool, 1, user, group, contr, dbr_ymd_to_jd(2014, 3, 14),
+    auto in = create_order(pool, 1, trader, giveup, contr, dbr_ymd_to_jd(2014, 3, 14),
                            "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
 
     auto len = proto_order_len(*in, false);
@@ -127,8 +127,8 @@ TEST_CASE(proto_order)
     check(buf + len == end);
 
     check(out.id == in->id);
-    check(out.c.user.id_only == in->c.user.id_only);
-    check(out.c.group.id_only == in->c.group.id_only);
+    check(out.c.trader.id_only == in->c.trader.id_only);
+    check(out.c.giveup.id_only == in->c.giveup.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_day == in->c.settl_day);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));
@@ -148,13 +148,13 @@ TEST_CASE(proto_order)
 TEST_CASE(proto_trade)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden user = 5;
-    DbrIden group = 7;
+    DbrIden trader = 5;
+    DbrIden giveup = 7;
     DbrIden contr = 11;
     DbrIden cpty = 13;
     auto now = dbr_millis();
 
-    auto in = create_trade(pool, 1, 2, user, group, contr, dbr_ymd_to_jd(2014, 3, 14), "apple",
+    auto in = create_trade(pool, 1, 2, trader, giveup, contr, dbr_ymd_to_jd(2014, 3, 14), "apple",
                            DBR_ACTION_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER,
                            cpty, now);
 
@@ -169,8 +169,8 @@ TEST_CASE(proto_trade)
 
     check(out.id == in->id);
     check(out.order == in->order);
-    check(out.c.user.id_only == in->c.user.id_only);
-    check(out.c.group.id_only == in->c.group.id_only);
+    check(out.c.trader.id_only == in->c.trader.id_only);
+    check(out.c.giveup.id_only == in->c.giveup.id_only);
     check(out.c.contr.id_only == in->c.contr.id_only);
     check(out.c.settl_day == in->c.settl_day);
     check(sequal(out.c.ref, in->c.ref, DBR_REF_MAX));

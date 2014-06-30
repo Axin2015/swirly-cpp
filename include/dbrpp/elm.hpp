@@ -22,7 +22,7 @@
 #include <dbrpp/elm/journ.hpp>
 #include <dbrpp/elm/json.hpp>
 #include <dbrpp/elm/level.hpp>
-#include <dbrpp/elm/memb.hpp>
+#include <dbrpp/elm/perm.hpp>
 #include <dbrpp/elm/model.hpp>
 #include <dbrpp/elm/order.hpp>
 #include <dbrpp/elm/pool.hpp>

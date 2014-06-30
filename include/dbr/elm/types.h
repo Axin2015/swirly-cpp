@@ -63,9 +63,9 @@ enum DbrEntity {
      */
     DBR_ENTITY_CONTR,
     /**
-     * Membership.
+     * Permission.
      */
-    DBR_ENTITY_MEMB,
+    DBR_ENTITY_PERM,
     /**
      * Order.
      */
@@ -249,37 +249,37 @@ dbr_shared_rec_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup Memb
+ * @addtogroup Perm
  * @{
  */
 
-struct DbrMemb {
+struct DbrPerm {
     /**
      * @publicsection
      */
-    union DbrURec user;
-    union DbrURec group;
+    union DbrURec trader;
+    union DbrURec giveup;
     /**
      * @privatesection
      */
     // Singly-linked for data model.
     struct DbrSlNode shared_node_;
-    struct DbrRbNode user_node_;
-    struct DbrRbNode group_node_;
+    struct DbrRbNode trader_node_;
+    struct DbrRbNode giveup_node_;
 };
 
 static inline void
-dbr_memb_init(struct DbrMemb* memb)
+dbr_perm_init(struct DbrPerm* perm)
 {
-    dbr_slnode_init(&memb->shared_node_);
-    dbr_rbnode_init(&memb->user_node_);
-    dbr_rbnode_init(&memb->group_node_);
+    dbr_slnode_init(&perm->shared_node_);
+    dbr_rbnode_init(&perm->trader_node_);
+    dbr_rbnode_init(&perm->giveup_node_);
 }
 
-static inline struct DbrMemb*
-dbr_shared_memb_entry(struct DbrSlNode* node)
+static inline struct DbrPerm*
+dbr_shared_perm_entry(struct DbrSlNode* node)
 {
-    return dbr_implof(struct DbrMemb, shared_node_, node);
+    return dbr_implof(struct DbrPerm, shared_node_, node);
 }
 
 /** @} */
@@ -294,8 +294,14 @@ dbr_shared_memb_entry(struct DbrSlNode* node)
  */
 
 struct DbrCommon {
-    union DbrURec user;
-    union DbrURec group;
+    /**
+     * The executing trader.
+     */
+    union DbrURec trader;
+    /**
+     * The give-up counter-party.
+     */
+    union DbrURec giveup;
     union DbrURec contr;
     DbrJd settl_day;
     /**
@@ -762,7 +768,7 @@ struct DbrSess {
      */
     DbrMillis hbint;
     struct DbrTree subs;
-    struct DbrTree users;
+    struct DbrTree traders;
     /**
      * @privatesection
      */

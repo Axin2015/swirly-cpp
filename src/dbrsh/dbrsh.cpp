@@ -20,7 +20,7 @@
 #include <dbrpp/fig/handler.hpp>
 
 #include <dbrpp/elm/exec.hpp>
-#include <dbrpp/elm/memb.hpp>
+#include <dbrpp/elm/perm.hpp>
 #include <dbrpp/elm/posn.hpp>
 #include <dbrpp/elm/view.hpp>
 
@@ -416,7 +416,7 @@ public:
     void
     logon(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
         call(async, [umnem](ClntRef clnt) {
                 clnt.logon(clnt.accnt(get_arec(clnt, umnem.c_str())));
             });
@@ -424,7 +424,7 @@ public:
     void
     logoff(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
         call(async, [umnem](ClntRef clnt) {
                 clnt.logoff(clnt.accnt(get_arec(clnt, umnem.c_str())));
             });
@@ -504,26 +504,26 @@ public:
         print_table(cout, head, width, rows);
     }
     void
-    user(Async& async, Arg begin, Arg end)
+    trader(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
 
         enum { COLS = 2 };
         typedef array<string, COLS> row;
 
         const array<const char*, COLS> head = {
-            "<user",
-            "<group"
+            "<trader",
+            "<giveup"
         };
         auto width = head_width(head);
         vector<row> rows;
 
         call(async, [umnem, &width, &rows](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                for (auto memb : Accnt(clnt.accnt(urec)).users()) {
-                    MembRef ref(memb);
+                auto trec = get_arec(clnt, umnem.c_str());
+                for (auto perm : Accnt(clnt.accnt(trec)).traders()) {
+                    PermRef ref(perm);
                     row r{
-                        to_string(ref.urec().mnem()),
+                        to_string(ref.trec().mnem()),
                         to_string(ref.grec().mnem())
                     };
                     for (size_t i = 0; i < COLS; ++i)
@@ -534,26 +534,26 @@ public:
         print_table(cout, head, width, rows);
     }
     void
-    group(Async& async, Arg begin, Arg end)
+    giveup(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
 
         enum { COLS = 2 };
         typedef array<string, COLS> row;
 
         const array<const char*, COLS> head = {
-            "<user",
-            "<group"
+            "<trader",
+            "<giveup"
         };
         auto width = head_width(head);
         vector<row> rows;
 
         call(async, [umnem, &width, &rows](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                for (auto memb : Accnt(clnt.accnt(urec)).groups()) {
-                    MembRef ref(memb);
+                auto trec = get_arec(clnt, umnem.c_str());
+                for (auto perm : Accnt(clnt.accnt(trec)).giveups()) {
+                    PermRef ref(perm);
                     row r{
-                        to_string(ref.urec().mnem()),
+                        to_string(ref.trec().mnem()),
                         to_string(ref.grec().mnem())
                     };
                     for (size_t i = 0; i < COLS; ++i)
@@ -566,14 +566,14 @@ public:
     void
     order(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
 
         enum { COLS = 12 };
         typedef array<string, COLS> row;
 
         const array<const char*, COLS> head = {
             "<id",
-            "<group",
+            "<giveup",
             "<contr",
             "<settl_date",
             "<state",
@@ -589,8 +589,8 @@ public:
         vector<row> rows;
 
         call(async, [umnem, &width, &rows](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                for (auto order : Accnt(clnt.accnt(urec)).orders()) {
+                auto trec = get_arec(clnt, umnem.c_str());
+                for (auto order : Accnt(clnt.accnt(trec)).orders()) {
                     OrderRef ref(order);
                     row r{
                         to_string(ref.id()),
@@ -616,7 +616,7 @@ public:
     void
     trade(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
 
         enum { COLS = 15 };
         typedef array<string, COLS> row;
@@ -624,7 +624,7 @@ public:
         const array<const char*, COLS> head = {
             "<id",
             "<order",
-            "<group",
+            "<giveup",
             "<contr",
             "<settl_date",
             "<state",
@@ -642,8 +642,8 @@ public:
         vector<row> rows;
 
         call(async, [umnem, &width, &rows](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                for (auto trade : Accnt(clnt.accnt(urec)).trades()) {
+                auto trec = get_arec(clnt, umnem.c_str());
+                for (auto trade : Accnt(clnt.accnt(trec)).trades()) {
                     ExecRef ref(trade);
                     row r{
                         to_string(ref.id()),
@@ -672,7 +672,7 @@ public:
     void
     posn(Async& async, Arg begin, Arg end)
     {
-        const string gmnem = get("group");
+        const string gmnem = get("giveup");
 
         enum { COLS = 6 };
         typedef array<string, COLS> row;
@@ -836,76 +836,76 @@ public:
     void
     buy(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
-        const string gmnem = get("group");
+        const string umnem = get("trader");
+        const string gmnem = get("giveup");
         const string cmnem = get("contr");
         const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
         const auto price = ston<double>((*begin++).c_str());
         const auto lots = ston<DbrLots>((*begin++).c_str());
         call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
+                auto trec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
                 auto crec = get_crec(clnt, cmnem.c_str());
-                clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
+                clnt.place(clnt.accnt(trec), clnt.accnt(grec), crec, settl_day,
                            nullptr, DBR_ACTION_BUY, crec.price_to_ticks(price), lots, 0);
             });
     }
     void
     sell(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
-        const string gmnem = get("group");
+        const string umnem = get("trader");
+        const string gmnem = get("giveup");
         const string cmnem = get("contr");
         const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
         const auto price = ston<double>((*begin++).c_str());
         const auto lots = ston<DbrLots>((*begin++).c_str());
         call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
+                auto trec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
                 auto crec = get_crec(clnt, cmnem.c_str());
-                clnt.place(clnt.accnt(urec), clnt.accnt(grec), crec, settl_day,
+                clnt.place(clnt.accnt(trec), clnt.accnt(grec), crec, settl_day,
                            nullptr, DBR_ACTION_SELL, crec.price_to_ticks(price), lots, 0);
             });
     }
     void
     revise(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
         const auto id = ston<DbrIden>((*begin++).c_str());
         const auto lots = ston<DbrLots>((*begin++).c_str());
         call(async, [umnem, id, lots](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                clnt.revise(clnt.accnt(urec), id, lots);
+                auto trec = get_arec(clnt, umnem.c_str());
+                clnt.revise(clnt.accnt(trec), id, lots);
             });
     }
     void
     cancel(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
         vector<DbrIden> ids;
         transform(begin, end, back_inserter(ids), [](const string& arg) {
                 return ston<DbrIden>(arg.c_str());
             });
         call(async, [umnem, ids](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                auto user = clnt.accnt(urec);
+                auto trec = get_arec(clnt, umnem.c_str());
+                auto trader = clnt.accnt(trec);
                 for (auto id : ids)
-                    clnt.cancel(user, id);
+                    clnt.cancel(trader, id);
             });
     }
     void
     ack(Async& async, Arg begin, Arg end)
     {
-        const string umnem = get("user");
+        const string umnem = get("trader");
         vector<DbrIden> ids;
         transform(begin, end, back_inserter(ids), [](const string& arg) {
                 return ston<DbrIden>(arg.c_str());
             });
         call(async, [umnem, ids](ClntRef clnt) {
-                auto urec = get_arec(clnt, umnem.c_str());
-                auto user = clnt.accnt(urec);
+                auto trec = get_arec(clnt, umnem.c_str());
+                auto trader = clnt.accnt(trec);
                 for (auto id : ids)
-                    clnt.ack_trade(user, id);
+                    clnt.ack_trade(trader, id);
             });
     }
     void
@@ -1031,26 +1031,27 @@ prefix(string::const_iterator it, string::const_iterator end, const char* s)
 }
 
 vector<string>
-match(string::const_iterator it, string::const_iterator end, const char* s1)
+match(string::const_iterator it, string::const_iterator end, std::initializer_list<const char*> ls)
 {
     vector<string> v;
-    const auto p1 = prefix(it, end, s1);
-    if (p1 != 0)
-        v.emplace_back(s1);
-    return v;
-}
-
-vector<string>
-match(string::const_iterator it, string::const_iterator end, const char* s1, const char* s2)
-{
-    vector<string> v;
-    const auto p1 = prefix(it, end, s1);
-    const auto p2 = prefix(it, end, s2);
-    if (p1 != 0 || p2 != 0) {
-        if (p1 >= p2)
-            v.emplace_back(s1);
-        if (p2 >= p1)
-            v.emplace_back(s2);
+    size_t m = 0;
+    for (const char* s : ls) {
+        const size_t n = prefix(it, end, s);
+        if (n < m) {
+            // Ignore those with shorter matching prefix.
+            continue;
+        }
+        if (n == strlen(s)) {
+            // Exact match.
+            v = {s};
+            break;
+        }
+        if (n > m) {
+            // New max prefix.
+            m = n;
+            v.clear();
+        }
+        v.push_back(s);
     }
     return v;
 }
@@ -1061,46 +1062,46 @@ predict(const string& tok)
     vector<string> v;
     switch (tok[0]) {
     case 'a':
-        v = match(tok.begin(), tok.end(), "accnt", "ack");
+        v = match(tok.begin(), tok.end(), {"accnt", "ack"});
         break;
     case 'b':
-        v = match(tok.begin(), tok.end(), "buy");
+        v = match(tok.begin(), tok.end(), {"buy"});
         break;
     case 'c':
-        v = match(tok.begin(), tok.end(), "cancel", "contr");
+        v = match(tok.begin(), tok.end(), {"cancel", "contr"});
         break;
     case 'd':
-        v = match(tok.begin(), tok.end(), "depth");
+        v = match(tok.begin(), tok.end(), {"depth"});
         break;
     case 'e':
-        v = match(tok.begin(), tok.end(), "echo");
+        v = match(tok.begin(), tok.end(), {"echo"});
         break;
     case 'g':
-        v = match(tok.begin(), tok.end(), "group");
+        v = match(tok.begin(), tok.end(), {"giveup"});
         break;
     case 'l':
-        v = match(tok.begin(), tok.end(), "logoff", "logon");
+        v = match(tok.begin(), tok.end(), {"logoff", "logon"});
         break;
     case 'o':
-        v = match(tok.begin(), tok.end(), "order");
+        v = match(tok.begin(), tok.end(), {"order"});
         break;
     case 'p':
-        v = match(tok.begin(), tok.end(), "penv", "posn");
+        v = match(tok.begin(), tok.end(), {"penv", "posn"});
         break;
     case 'q':
-        v = match(tok.begin(), tok.end(), "quit");
+        v = match(tok.begin(), tok.end(), {"quit"});
         break;
     case 'r':
-        v = match(tok.begin(), tok.end(), "revise");
+        v = match(tok.begin(), tok.end(), {"revise"});
         break;
     case 's':
-        v = match(tok.begin(), tok.end(), "sell", "set");
+        v = match(tok.begin(), tok.end(), {"sell", "set"});
         break;
     case 't':
-        v = match(tok.begin(), tok.end(), "top", "trade");
+        v = match(tok.begin(), tok.end(), {"top", "trade", "trader"});
         break;
     case 'u':
-        v = match(tok.begin(), tok.end(), "unset", "user");
+        v = match(tok.begin(), tok.end(), {"unset"});
         break;
     }
     return v;
@@ -1125,8 +1126,8 @@ main(int argc, char* argv[])
         repl.bind("contr", bind(&Handler::contr, ref(handler), ref(async), _1, _2), 0);
         repl.bind("logon", bind(&Handler::logon, ref(handler), ref(async), _1, _2), 0);
         repl.bind("logoff", bind(&Handler::logoff, ref(handler), ref(async), _1, _2), 0);
-        repl.bind("user", bind(&Handler::user, ref(handler), ref(async), _1, _2), 0);
-        repl.bind("group", bind(&Handler::group, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("trader", bind(&Handler::trader, ref(handler), ref(async), _1, _2), 0);
+        repl.bind("giveup", bind(&Handler::giveup, ref(handler), ref(async), _1, _2), 0);
         repl.bind("order", bind(&Handler::order, ref(handler), ref(async), _1, _2), 0);
         repl.bind("trade", bind(&Handler::trade, ref(handler), ref(async), _1, _2), 0);
         repl.bind("posn", bind(&Handler::posn, ref(handler), ref(async), _1, _2), 0);

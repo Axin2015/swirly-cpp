@@ -104,10 +104,10 @@ DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrAccnt user);
+dbr_clnt_logon(DbrClnt clnt, DbrAccnt trader);
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user);
+dbr_clnt_logoff(DbrClnt clnt, DbrAccnt trader);
 
 /**
  * Place order.
@@ -115,7 +115,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrAccnt user);
  */
 
 DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
+dbr_clnt_place(DbrClnt clnt, DbrAccnt trader, DbrAccnt giveup, struct DbrRec* crec,
                DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
                DbrLots min_lots);
 
@@ -128,19 +128,19 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt user, DbrAccnt group, struct DbrRec* crec,
  */
 
 DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt user, DbrIden id, DbrLots lots);
+dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt trader, DbrIden id, DbrLots lots);
 
 DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt user, const char* ref, DbrLots lots);
+dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt trader, const char* ref, DbrLots lots);
 
 DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt user, DbrIden id);
+dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt trader, DbrIden id);
 
 DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt user, const char* ref);
+dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt trader, const char* ref);
 
 DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt user, DbrIden id);
+dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt trader, DbrIden id);
 
 DBR_API DbrIden
 dbr_clnt_set_timer(DbrClnt clnt, DbrMillis absms);

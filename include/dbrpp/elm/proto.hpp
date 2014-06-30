@@ -81,26 +81,26 @@ proto_read_contr(const char* buf, DbrRec& crec)
 /** @} */
 
 /**
- * @addtogroup Memb
+ * @addtogroup Perm
  * @{
  */
 
 inline size_t
-proto_memb_len(const DbrMemb& memb, DbrBool enriched) noexcept
+proto_perm_len(const DbrPerm& perm, DbrBool enriched) noexcept
 {
-    return dbr_proto_memb_len(&memb, enriched);
+    return dbr_proto_perm_len(&perm, enriched);
 }
 
 inline char*
-proto_write_memb(char* buf, const DbrMemb& memb, DbrBool enriched) noexcept
+proto_write_perm(char* buf, const DbrPerm& perm, DbrBool enriched) noexcept
 {
-    return dbr_proto_write_memb(buf, &memb, enriched);
+    return dbr_proto_write_perm(buf, &perm, enriched);
 }
 
 inline const char*
-proto_read_memb(const char* buf, DbrMemb& memb)
+proto_read_perm(const char* buf, DbrPerm& perm)
 {
-    buf = dbr_proto_read_memb(buf, &memb);
+    buf = dbr_proto_read_perm(buf, &perm);
     if (!buf)
         throw_exception();
     return buf;

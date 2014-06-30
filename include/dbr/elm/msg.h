@@ -37,8 +37,8 @@ enum {
     DBR_STATUS_REP,
     DBR_ACCNT_LIST_REP,
     DBR_CONTR_LIST_REP,
-    DBR_USER_LIST_REP,
-    DBR_GROUP_LIST_REP,
+    DBR_TRADER_LIST_REP,
+    DBR_GIVEUP_LIST_REP,
     DBR_ORDER_LIST_REP,
     DBR_EXEC_LIST_REP,
     DBR_POSN_LIST_REP,
@@ -87,7 +87,7 @@ struct DbrBody {
         } status_rep;
         struct {
             // dbr_shared_rec_entry()
-            // dbr_shared_memb_entry()
+            // dbr_shared_perm_entry()
             // dbr_shared_order_entry()
             // dbr_shared_exec_entry()
             // dbr_shared_posn_entry()

@@ -75,9 +75,9 @@ public:
         return Mnem{impl_.accnt};
     }
     Mnem
-    group() const noexcept
+    giveup() const noexcept
     {
-        return Mnem{impl_.group};
+        return Mnem{impl_.giveup};
     }
     Mnem
     contr() const noexcept

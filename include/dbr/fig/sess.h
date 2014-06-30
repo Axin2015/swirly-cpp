@@ -35,48 +35,48 @@ DBR_API void
 dbr_sess_reset(struct DbrSess* sess);
 
 DBR_API DbrBool
-dbr_sess_logon(struct DbrSess* sess, DbrAccnt user);
+dbr_sess_logon(struct DbrSess* sess, DbrAccnt trader);
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user);
+dbr_sess_logoff(struct DbrSess* sess, DbrAccnt trader);
 
 /**
- * Logoff and reset state associated with @a user.
+ * Logoff and reset state associated with @a trader.
  */
 
 DBR_API void
-dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt user);
+dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt trader);
 
 DBR_API int
-dbr_sess_subs(struct DbrSess* sess, DbrAccnt user);
+dbr_sess_subs(struct DbrSess* sess, DbrAccnt trader);
 
-#define DBR_SESS_END_USER NULL
+#define DBR_SESS_END_TRADER NULL
 
 DBR_API DbrAccnt
-dbr_sess_user_entry(struct DbrRbNode* node);
+dbr_sess_trader_entry(struct DbrRbNode* node);
 
 static inline struct DbrRbNode*
-dbr_sess_find_user(const struct DbrSess* sess, DbrIden id)
+dbr_sess_find_trader(const struct DbrSess* sess, DbrIden id)
 {
-    return dbr_tree_find(&sess->users, id);
+    return dbr_tree_find(&sess->traders, id);
 }
 
 static inline struct DbrRbNode*
-dbr_sess_first_user(const struct DbrSess* sess)
+dbr_sess_first_trader(const struct DbrSess* sess)
 {
-    return dbr_tree_first(&sess->users);
+    return dbr_tree_first(&sess->traders);
 }
 
 static inline struct DbrRbNode*
-dbr_sess_last_user(const struct DbrSess* sess)
+dbr_sess_last_trader(const struct DbrSess* sess)
 {
-    return dbr_tree_last(&sess->users);
+    return dbr_tree_last(&sess->traders);
 }
 
 static inline DbrBool
-dbr_sess_empty_user(const struct DbrSess* sess)
+dbr_sess_empty_trader(const struct DbrSess* sess)
 {
-    return dbr_tree_empty(&sess->users);
+    return dbr_tree_empty(&sess->traders);
 }
 
 /** @} */

@@ -96,18 +96,18 @@ public:
     {
         dbr_pool_free_rec(impl_, rec);
     }
-    DbrMemb*
-    alloc_memb()
+    DbrPerm*
+    alloc_perm()
     {
-        DbrMemb* const memb = dbr_pool_alloc_memb(impl_);
-        if (!memb)
+        DbrPerm* const perm = dbr_pool_alloc_perm(impl_);
+        if (!perm)
             throw_exception();
-        return memb;
+        return perm;
     }
     void
-    free_memb(DbrMemb* memb) noexcept
+    free_perm(DbrPerm* perm) noexcept
     {
-        dbr_pool_free_memb(impl_, memb);
+        dbr_pool_free_perm(impl_, perm);
     }
     DbrOrder*
     alloc_order()

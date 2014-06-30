@@ -88,18 +88,18 @@ read_contr(const char* buf, DbrPool pool, struct DbrQueue* queue)
 }
 
 static const char*
-read_memb(const char* buf, DbrPool pool, struct DbrQueue* queue)
+read_perm(const char* buf, DbrPool pool, struct DbrQueue* queue)
 {
-    struct DbrMemb* memb = elm_pool_alloc_memb(pool);
-    if (!memb)
+    struct DbrPerm* perm = elm_pool_alloc_perm(pool);
+    if (!perm)
         goto fail1;
-    dbr_memb_init(memb);
+    dbr_perm_init(perm);
 
-    if (!(buf = elm_proto_read_memb(buf, memb))) {
-        elm_pool_free_memb(pool, memb);
+    if (!(buf = elm_proto_read_perm(buf, perm))) {
+        elm_pool_free_perm(pool, perm);
         goto fail1;
     }
-    dbr_queue_insert_back(queue, &memb->shared_node_);
+    dbr_queue_insert_back(queue, &perm->shared_node_);
     return buf;
  fail1:
     return NULL;
@@ -220,12 +220,12 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         }
         n += dbr_pack_lenz(body->entity_list_rep.count_);
         break;
-    case DBR_USER_LIST_REP:
-    case DBR_GROUP_LIST_REP:
+    case DBR_TRADER_LIST_REP:
+    case DBR_GIVEUP_LIST_REP:
         body->entity_list_rep.count_ = 0;
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            n += elm_proto_memb_len(memb, enriched);
+            struct DbrPerm* perm = dbr_shared_perm_entry(node);
+            n += elm_proto_perm_len(perm, enriched);
             ++body->entity_list_rep.count_;
         }
         n += dbr_pack_lenz(body->entity_list_rep.count_);
@@ -375,12 +375,12 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
             buf = elm_proto_write_contr(buf, rec);
         }
         break;
-    case DBR_USER_LIST_REP:
-    case DBR_GROUP_LIST_REP:
+    case DBR_TRADER_LIST_REP:
+    case DBR_GIVEUP_LIST_REP:
         buf = dbr_packz(buf, body->entity_list_rep.count_);
         for (struct DbrSlNode* node = body->entity_list_rep.first; node; node = node->next) {
-            struct DbrMemb* memb = dbr_shared_memb_entry(node);
-            buf = elm_proto_write_memb(buf, memb, enriched);
+            struct DbrPerm* perm = dbr_shared_perm_entry(node);
+            buf = elm_proto_write_perm(buf, perm, enriched);
         }
         break;
     case DBR_ORDER_LIST_REP:
@@ -536,14 +536,14 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         }
         body->entity_list_rep.first = dbr_queue_first(&q);
         break;
-    case DBR_USER_LIST_REP:
-    case DBR_GROUP_LIST_REP:
+    case DBR_TRADER_LIST_REP:
+    case DBR_GIVEUP_LIST_REP:
         if (!(buf = dbr_unpackz(buf, &body->entity_list_rep.count_)))
             goto fail1;
         dbr_queue_init(&q);
         for (size_t i = 0; i < body->entity_list_rep.count_; ++i) {
-            if (!(buf = read_memb(buf, pool, &q))) {
-                elm_pool_free_entity_list(pool, DBR_ENTITY_MEMB, dbr_queue_first(&q));
+            if (!(buf = read_perm(buf, pool, &q))) {
+                elm_pool_free_entity_list(pool, DBR_ENTITY_PERM, dbr_queue_first(&q));
                 goto fail1;
             }
         }

@@ -44,12 +44,12 @@ main(int argc, char* argv[])
             AccntRecRef ref(rec);
             cout << json_write_accnt(rec) << endl;
             Accnt accnt = serv.accnt(ref);
-            cout << ref.mnem() << " users:" << endl;
-            for (auto ref : accnt.users())
-                cout << json_write_memb(ref) << endl;
-            cout << ref.mnem() << " groups:" << endl;
-            for (auto ref : accnt.groups())
-                cout << json_write_memb(ref) << endl;
+            cout << ref.mnem() << " traders:" << endl;
+            for (auto ref : accnt.traders())
+                cout << json_write_perm(ref) << endl;
+            cout << ref.mnem() << " giveups:" << endl;
+            for (auto ref : accnt.giveups())
+                cout << json_write_perm(ref) << endl;
             cout << ref.mnem() << " orders:" << endl;
             for (auto ref : accnt.orders())
                 cout << json_write_order(ref) << endl;

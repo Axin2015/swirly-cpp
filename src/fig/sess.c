@@ -62,7 +62,7 @@ decref(struct DbrSess* sess, DbrKey key)
 }
 
 DBR_API DbrAccnt
-dbr_sess_user_entry(struct DbrRbNode* node)
+dbr_sess_trader_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct FigAccnt, sess_node_, node);
 }
@@ -77,7 +77,7 @@ dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
     sess->pool = pool;
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->users);
+    dbr_tree_init(&sess->traders);
     sess->marker_ = 0;
     dbr_slnode_init(&sess->uuid_node_);
 }
@@ -99,76 +99,76 @@ dbr_sess_reset(struct DbrSess* sess)
     dbr_sess_term(sess);
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->users);
+    dbr_tree_init(&sess->traders);
     sess->marker_ = 0;
     dbr_slnode_init(&sess->uuid_node_);
 }
 
 DBR_API DbrBool
-dbr_sess_logon(struct DbrSess* sess, DbrAccnt user)
+dbr_sess_logon(struct DbrSess* sess, DbrAccnt trader)
 {
-    if (user->sess) {
-        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", user->rec->mnem);
+    if (trader->sess) {
+        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    if (incref(sess, user->rec->id) < 0)
+    if (incref(sess, trader->rec->id) < 0)
         goto fail1;
 
-    struct DbrRbNode* node = dbr_accnt_first_group(user);
-    for (; node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        if (incref(sess, memb->group.rec->id) < 0)
+    struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+    for (; node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+        if (incref(sess, perm->giveup.rec->id) < 0)
             goto fail2;
     }
 
-    user->sess = sess;
-    dbr_tree_insert(&sess->users, user->rec->id, &user->sess_node_);
+    trader->sess = sess;
+    dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
     return DBR_TRUE;
  fail2:
     // Rollback subs.
     for (node = dbr_rbnode_prev(node);
-         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_prev(node)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        decref(sess, memb->group.rec->id);
+         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_prev(node)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+        decref(sess, perm->giveup.rec->id);
     }
-    decref(sess, user->rec->id);
+    decref(sess, trader->rec->id);
  fail1:
     return DBR_FALSE;
 }
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrAccnt user)
+dbr_sess_logoff(struct DbrSess* sess, DbrAccnt trader)
 {
-    dbr_tree_remove(&sess->users, &user->sess_node_);
-    user->sess = NULL;
+    dbr_tree_remove(&sess->traders, &trader->sess_node_);
+    trader->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_accnt_first_group(user);
-         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        decref(sess, memb->group.rec->id);
+    for (struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+        decref(sess, perm->giveup.rec->id);
     }
-    decref(sess, user->rec->id);
+    decref(sess, trader->rec->id);
 }
 
 DBR_API void
-dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt user)
+dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt trader)
 {
-    dbr_tree_remove(&sess->users, &user->sess_node_);
-    user->sess = NULL;
+    dbr_tree_remove(&sess->traders, &trader->sess_node_);
+    trader->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_accnt_first_group(user);
-         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        if (decref(sess, memb->group.rec->id) == 0) {
-            DbrAccnt group = memb->group.rec->accnt.state;
-            if (group)
-                fig_accnt_reset_group(group);
+    for (struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+        if (decref(sess, perm->giveup.rec->id) == 0) {
+            DbrAccnt giveup = perm->giveup.rec->accnt.state;
+            if (giveup)
+                fig_accnt_reset_giveup(giveup);
         }
     }
-    if (decref(sess, user->rec->id) == 0)
-        fig_accnt_reset_group(user);
-    fig_accnt_reset_user(user);
+    if (decref(sess, trader->rec->id) == 0)
+        fig_accnt_reset_giveup(trader);
+    fig_accnt_reset_trader(trader);
 }
 
 DBR_API int

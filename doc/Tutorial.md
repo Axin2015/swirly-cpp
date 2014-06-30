@@ -13,10 +13,10 @@ This tutorial assumes that you have:
 Set the following variables in `$HOME/.dbrshrc`:
 
     # -*- sh -*-
-    set user WRAMIREZ
-    set group DBRA
     set contr EURUSD
+    set giveup DBRA
     set settl_date 20140314
+    set trader WRAMIREZ
 
 And then run the shell command:
 
@@ -37,9 +37,9 @@ The `penv` command prints the configuration:
     |name      |value   |
     +----------+--------+
     |contr     |EURUSD  |
-    |group     |DBRA    |
+    |giveup    |DBRA    |
     |settl_date|20140314|
-    |user      |WRAMIREZ|
+    |trader    |WRAMIREZ|
 
 Logon using the `logon` command:
 
@@ -70,11 +70,11 @@ Then `sell` to create the opposing side of the market:
 Use the `order` command to view your resting orders:
 
     dbrsh> order
-    |id|group|contr |settl_date|state|action|price   |lots|resd|exec|last_price|last_lots|
-    +--+-----+------+----------+-----+------+--------+----+----+----+----------+---------+
-    |2 |DBRA |EURUSD|20140314  |NEW  |BUY   |1.234400|  10|  10|   0|  0.000000|        0|
-    |3 |DBRA |EURUSD|20140314  |NEW  |BUY   |1.234300|  20|  20|   0|  0.000000|        0|
-    |4 |DBRA |EURUSD|20140314  |NEW  |SELL  |1.234600|  15|  15|   0|  0.000000|        0|
+    |id|giveup|contr |settl_date|state|action|price   |lots|resd|exec|last_price|last_lots|
+    +--+------+------+----------+-----+------+--------+----+----+----+----------+---------+
+    |2 |DBRA  |EURUSD|20140314  |NEW  |BUY   |1.234400|  10|  10|   0|  0.000000|        0|
+    |3 |DBRA  |EURUSD|20140314  |NEW  |BUY   |1.234300|  20|  20|   0|  0.000000|        0|
+    |4 |DBRA  |EURUSD|20140314  |NEW  |SELL  |1.234600|  15|  15|   0|  0.000000|        0|
 
 Market Data
 -----------
@@ -109,22 +109,22 @@ Now cross the spread to create a trade:
 And view the trades using the `trade` command:
 
     dbrsh> trade
-    |id|order|group|contr |settl_date|state|action|price   |lots|resd|exc|last_price|last_lots|role |cpty|
-    +--+-----+-----+------+----------+-----+------+--------+----+----+---+----------+---------+-----+----+
-    |6 |5    |DBRA |EURUSD|20140314  |TRADE|SELL  |1.234400|   5|   0|  5|  1.234400|        5|TAKER|DBRA|
-    |7 |2    |DBRA |EURUSD|20140314  |TRADE|BUY   |1.234400|  10|   5|  5|  1.234400|        5|MAKER|DBRA|
+    |id|order|giveup|contr |settl_date|state|action|price   |lots|resd|exc|last_price|last_lots|role |cpty|
+    +--+-----+------+------+----------+-----+------+--------+----+----+---+----------+---------+-----+----+
+    |6 |5    |DBRA  |EURUSD|20140314  |TRADE|SELL  |1.234400|   5|   0|  5|  1.234400|        5|TAKER|DBRA|
+    |7 |2    |DBRA  |EURUSD|20140314  |TRADE|BUY   |1.234400|  10|   5|  5|  1.234400|        5|MAKER|DBRA|
 
 Note that we are both MAKER and TAKER in this example because we traded with ourselves!
 
 The `order` and `depth` commands reflect the changes to the order-book:
 
     dbrsh> order
-    |id|group|contr |settl_date|state|action|price   |lots|resd|exec|last_price|last_lots|
-    +--+-----+------+----------+-----+------+--------+----+----+----+----------+---------+
-    |2 |DBRA |EURUSD|20140314  |TRADE|BUY   |1.234400|  10|   5|   5|  1.234400|        5|
-    |3 |DBRA |EURUSD|20140314  |NEW  |BUY   |1.234300|  20|  20|   0|  0.000000|        0|
-    |4 |DBRA |EURUSD|20140314  |NEW  |SELL  |1.234600|  15|  15|   0|  0.000000|        0|
-    |5 |DBRA |EURUSD|20140314  |TRADE|SELL  |1.234400|   5|   0|   5|  1.234400|        5|
+    |id|giveup|contr |settl_date|state|action|price   |lots|resd|exec|last_price|last_lots|
+    +--+------+------+----------+-----+------+--------+----+----+----+----------+---------+
+    |2 |DBRA  |EURUSD|20140314  |TRADE|BUY   |1.234400|  10|   5|   5|  1.234400|        5|
+    |3 |DBRA  |EURUSD|20140314  |NEW  |BUY   |1.234300|  20|  20|   0|  0.000000|        0|
+    |4 |DBRA  |EURUSD|20140314  |NEW  |SELL  |1.234600|  15|  15|   0|  0.000000|        0|
+    |5 |DBRA  |EURUSD|20140314  |TRADE|SELL  |1.234400|   5|   0|   5|  1.234400|        5|
 
     dbrsh> depth
     |contr |settl_date|level|bid_price|bid_lots|bid_count|offer_price|offer_lots|offer_count|

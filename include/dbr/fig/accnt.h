@@ -20,7 +20,7 @@
 
 /**
  * @file
- * Accounts represent both users and groups.
+ * Accounts represent both traders and giveups.
  */
 
 #include <dbr/elm/types.h>
@@ -37,45 +37,45 @@
 DBR_API struct DbrRec*
 dbr_accnt_rec(DbrAccnt accnt);
 
-#define DBR_ACCNT_END_USER NULL
+#define DBR_ACCNT_END_TRADER NULL
 
-static inline struct DbrMemb*
-dbr_accnt_user_entry(struct DbrRbNode* node)
+static inline struct DbrPerm*
+dbr_accnt_trader_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrMemb, group_node_, node);
+    return dbr_implof(struct DbrPerm, giveup_node_, node);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_find_user_id(DbrAccnt accnt, DbrIden id);
+dbr_accnt_find_trader_id(DbrAccnt accnt, DbrIden id);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_first_user(DbrAccnt accnt);
+dbr_accnt_first_trader(DbrAccnt accnt);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_last_user(DbrAccnt accnt);
+dbr_accnt_last_trader(DbrAccnt accnt);
 
 DBR_API DbrBool
-dbr_accnt_empty_user(DbrAccnt accnt);
+dbr_accnt_empty_trader(DbrAccnt accnt);
 
-#define DBR_ACCNT_END_GROUP NULL
+#define DBR_ACCNT_END_GIVEUP NULL
 
-static inline struct DbrMemb*
-dbr_accnt_group_entry(struct DbrRbNode* node)
+static inline struct DbrPerm*
+dbr_accnt_giveup_entry(struct DbrRbNode* node)
 {
-    return dbr_implof(struct DbrMemb, user_node_, node);
+    return dbr_implof(struct DbrPerm, trader_node_, node);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_find_group_id(DbrAccnt accnt, DbrIden id);
+dbr_accnt_find_giveup_id(DbrAccnt accnt, DbrIden id);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_first_group(DbrAccnt accnt);
+dbr_accnt_first_giveup(DbrAccnt accnt);
 
 DBR_API struct DbrRbNode*
-dbr_accnt_last_group(DbrAccnt accnt);
+dbr_accnt_last_giveup(DbrAccnt accnt);
 
 DBR_API DbrBool
-dbr_accnt_empty_group(DbrAccnt accnt);
+dbr_accnt_empty_giveup(DbrAccnt accnt);
 
 #define DBR_ACCNT_END_ORDER NULL
 

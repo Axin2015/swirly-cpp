@@ -154,11 +154,11 @@ fnum(const struct DbrRest* rest)
     action contr_resrc {
         dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
-    action user_resrc {
-        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
+    action trader_resrc {
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADER);
     }
-    action group_resrc {
-        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
+    action giveup_resrc {
+        dbr_rest_set_resrc(rest, DBR_RESRC_GIVEUP);
     }
     action order_resrc {
         dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
@@ -176,8 +176,8 @@ fnum(const struct DbrRest* rest)
             | '"logoff"'i %logoff_resrc
             | '"accnt"'i %accnt_resrc
             | '"contr"'i %contr_resrc
-            | '"user"'i %user_resrc
-            | '"group"'i %group_resrc
+            | '"trader"'i %trader_resrc
+            | '"giveup"'i %giveup_resrc
             | '"order"'i %order_resrc
             | '"trade"'i %trade_resrc
             | '"posn"'i %posn_resrc
@@ -228,16 +228,16 @@ fnum(const struct DbrRest* rest)
     action end_accnt {
         dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
     }
-    action begin_group {
-        if (rest->fields & DBR_PARAM_GROUP) {
-            cs = json_error; msg = "group already specified";
+    action begin_giveup {
+        if (rest->fields & DBR_PARAM_GIVEUP) {
+            cs = json_error; msg = "giveup already specified";
             fbreak;
         }
-        rest->str.buf = rest->group;
+        rest->str.buf = rest->giveup;
         rest->str.max = DBR_MNEM_MAX;
     }
-    action end_group {
-        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
+    action end_giveup {
+        dbr_rest_set_param(rest, DBR_PARAM_GIVEUP);
     }
     action begin_contr {
         if (rest->fields & DBR_PARAM_CONTR) {
@@ -315,7 +315,7 @@ fnum(const struct DbrRest* rest)
          | '"resrc"'i colon resrc >begin_resrc
          | '"id"'i colon inum >begin_id %end_id
          | '"accnt"'i colon str >begin_accnt %end_accnt
-         | '"group"'i colon str >begin_group %end_group
+         | '"giveup"'i colon str >begin_giveup %end_giveup
          | '"contr"'i colon str >begin_contr %end_contr
          | '"settl_date"'i colon inum >begin_settl_date %end_settl_date
          | '"ref"'i colon str >begin_ref %end_ref
@@ -421,18 +421,18 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
                | '';
     req_accnt = ('/' str) >begin_accnt %end_accnt;
 
-    action begin_group {
-        if (rest->fields & DBR_PARAM_GROUP) {
-            cs = rurl_error; msg = "group already specified";
+    action begin_giveup {
+        if (rest->fields & DBR_PARAM_GIVEUP) {
+            cs = rurl_error; msg = "giveup already specified";
             fbreak;
         }
-        str.buf = rest->group;
+        str.buf = rest->giveup;
         str.max = DBR_MNEM_MAX;
     }
-    action end_group {
-        dbr_rest_set_param(rest, DBR_PARAM_GROUP);
+    action end_giveup {
+        dbr_rest_set_param(rest, DBR_PARAM_GIVEUP);
     }
-    req_group = ('/' str) >begin_group %end_group;
+    req_giveup = ('/' str) >begin_giveup %end_giveup;
 
     action begin_contr {
         if (rest->fields & DBR_PARAM_CONTR) {
@@ -460,11 +460,11 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
     action contr_resrc {
         dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
     }
-    action user_resrc {
-        dbr_rest_set_resrc(rest, DBR_RESRC_USER);
+    action trader_resrc {
+        dbr_rest_set_resrc(rest, DBR_RESRC_TRADER);
     }
-    action group_resrc {
-        dbr_rest_set_resrc(rest, DBR_RESRC_GROUP);
+    action giveup_resrc {
+        dbr_rest_set_resrc(rest, DBR_RESRC_GIVEUP);
     }
     action order_resrc {
         dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
@@ -483,11 +483,11 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
            | 'logoff' %logoff_resrc
            | ('accnt' opt_accnt) %accnt_resrc
            | ('contr' opt_contr) %contr_resrc
-           | ('user' req_accnt) %user_resrc
-           | ('group' req_accnt) %group_resrc
+           | ('trader' req_accnt) %trader_resrc
+           | ('giveup' req_accnt) %giveup_resrc
            | ('order' req_accnt opt_id) %order_resrc
            | ('trade' req_accnt opt_id) %trade_resrc
-           | ('posn' req_group) %posn_resrc
+           | ('posn' req_giveup) %posn_resrc
            | ('market' opt_contr) %market_resrc;
 
     action begin_resrc {

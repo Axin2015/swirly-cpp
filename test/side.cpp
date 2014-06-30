@@ -31,15 +31,15 @@ using namespace dbr;
 TEST_CASE(side_orders)
 {
     Pool pool(8 * 1024 * 1024);
-    auto user = create_wramirez(pool);
-    auto group = create_dbra(pool);
+    auto trader = create_wramirez(pool);
+    auto giveup = create_dbra(pool);
     auto contr = create_eurusd(pool);
     auto now = dbr_millis();
 
     // Two orders at the same price level.
-    auto apple = create_order(pool, 1, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
+    auto apple = create_order(pool, 1, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
                               "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    auto orange = create_order(pool, 2, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
+    auto orange = create_order(pool, 2, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
                                "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
 
     Side side(pool);
@@ -123,17 +123,17 @@ TEST_CASE(side_orders)
 TEST_CASE(side_levels)
 {
     Pool pool(8 * 1024 * 1024);
-    auto user = create_wramirez(pool);
-    auto group = create_dbra(pool);
+    auto trader = create_wramirez(pool);
+    auto giveup = create_dbra(pool);
     auto contr = create_eurusd(pool);
     auto now = dbr_millis();
 
-    auto apple = create_order(pool, 1, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
+    auto apple = create_order(pool, 1, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
                               "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    auto orange = create_order(pool, 2, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
+    auto orange = create_order(pool, 2, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
                                "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
     // Best inserted last.
-    auto pear = create_order(pool, 3, *user, *group, *contr, dbr_ymd_to_jd(2014, 3, 14),
+    auto pear = create_order(pool, 3, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
                              "pear", DBR_ACTION_BUY, 12346, 30, 0, now);
 
     Side side(pool);

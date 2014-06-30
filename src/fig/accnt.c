@@ -26,26 +26,26 @@
 #include <stdlib.h>
 
 static void
-free_users(struct FigAccnt* accnt)
+free_traders(struct FigAccnt* accnt)
 {
     assert(accnt);
     struct DbrRbNode* node;
-    while ((node = accnt->users.root)) {
-        struct DbrMemb* memb = dbr_accnt_user_entry(node);
-        dbr_tree_remove(&accnt->users, node);
-        dbr_pool_free_memb(accnt->pool, memb);
+    while ((node = accnt->traders.root)) {
+        struct DbrPerm* perm = dbr_accnt_trader_entry(node);
+        dbr_tree_remove(&accnt->traders, node);
+        dbr_pool_free_perm(accnt->pool, perm);
     }
 }
 
 static void
-free_groups(struct FigAccnt* accnt)
+free_giveups(struct FigAccnt* accnt)
 {
     assert(accnt);
     struct DbrRbNode* node;
-    while ((node = accnt->groups.root)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        dbr_tree_remove(&accnt->groups, node);
-        dbr_pool_free_memb(accnt->pool, memb);
+    while ((node = accnt->giveups.root)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+        dbr_tree_remove(&accnt->giveups, node);
+        dbr_pool_free_perm(accnt->pool, perm);
     }
 }
 
@@ -100,8 +100,8 @@ fig_accnt_lazy(struct DbrRec* arec, struct FigOrdIdx* ordidx, DbrPool pool)
         accnt->rec = arec;
         accnt->ordidx = ordidx;
         accnt->pool = pool;
-        dbr_tree_init(&accnt->users);
-        dbr_tree_init(&accnt->groups);
+        dbr_tree_init(&accnt->traders);
+        dbr_tree_init(&accnt->giveups);
         dbr_tree_init(&accnt->orders);
         dbr_tree_init(&accnt->trades);
         dbr_tree_init(&accnt->posns);
@@ -121,23 +121,23 @@ fig_accnt_term(struct DbrRec* arec)
     struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
-        fig_accnt_reset_user(accnt);
-        fig_accnt_reset_group(accnt);
+        fig_accnt_reset_trader(accnt);
+        fig_accnt_reset_giveup(accnt);
         free(accnt);
     }
 }
 
 DBR_EXTERN void
-fig_accnt_reset_user(struct FigAccnt* accnt)
+fig_accnt_reset_trader(struct FigAccnt* accnt)
 {
     free_execs(accnt);
     free_orders(accnt);
-    free_groups(accnt);
-    free_users(accnt);
+    free_giveups(accnt);
+    free_traders(accnt);
 }
 
 DBR_EXTERN void
-fig_accnt_reset_group(struct FigAccnt* accnt)
+fig_accnt_reset_giveup(struct FigAccnt* accnt)
 {
     free_posns(accnt);
 }
@@ -213,56 +213,56 @@ dbr_accnt_rec(DbrAccnt accnt)
     return fig_accnt_rec(accnt);
 }
 
-// AccntUser
+// AccntTrader
 
 DBR_API struct DbrRbNode*
-dbr_accnt_find_user_id(DbrAccnt accnt, DbrIden id)
+dbr_accnt_find_trader_id(DbrAccnt accnt, DbrIden id)
 {
-    return fig_accnt_find_user_id(accnt, id);
+    return fig_accnt_find_trader_id(accnt, id);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_first_user(DbrAccnt accnt)
+dbr_accnt_first_trader(DbrAccnt accnt)
 {
-    return fig_accnt_first_user(accnt);
+    return fig_accnt_first_trader(accnt);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_last_user(DbrAccnt accnt)
+dbr_accnt_last_trader(DbrAccnt accnt)
 {
-    return fig_accnt_last_user(accnt);
+    return fig_accnt_last_trader(accnt);
 }
 
 DBR_API DbrBool
-dbr_accnt_empty_user(DbrAccnt accnt)
+dbr_accnt_empty_trader(DbrAccnt accnt)
 {
-    return fig_accnt_empty_user(accnt);
+    return fig_accnt_empty_trader(accnt);
 }
 
-// AccntGroup
+// AccntGiveup
 
 DBR_API struct DbrRbNode*
-dbr_accnt_find_group_id(DbrAccnt accnt, DbrIden id)
+dbr_accnt_find_giveup_id(DbrAccnt accnt, DbrIden id)
 {
-    return fig_accnt_find_group_id(accnt, id);
-}
-
-DBR_API struct DbrRbNode*
-dbr_accnt_first_group(DbrAccnt accnt)
-{
-    return fig_accnt_first_group(accnt);
+    return fig_accnt_find_giveup_id(accnt, id);
 }
 
 DBR_API struct DbrRbNode*
-dbr_accnt_last_group(DbrAccnt accnt)
+dbr_accnt_first_giveup(DbrAccnt accnt)
 {
-    return fig_accnt_last_group(accnt);
+    return fig_accnt_first_giveup(accnt);
+}
+
+DBR_API struct DbrRbNode*
+dbr_accnt_last_giveup(DbrAccnt accnt)
+{
+    return fig_accnt_last_giveup(accnt);
 }
 
 DBR_API DbrBool
-dbr_accnt_empty_group(DbrAccnt accnt)
+dbr_accnt_empty_giveup(DbrAccnt accnt)
 {
-    return fig_accnt_empty_group(accnt);
+    return fig_accnt_empty_giveup(accnt);
 }
 
 // AccntOrder

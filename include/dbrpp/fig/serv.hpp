@@ -816,51 +816,51 @@ public:
         return SessRef{*sess};
     }
     OrderRef
-    place(DbrAccnt user, DbrAccnt group, DbrBook& book, const char* ref, int action,
+    place(DbrAccnt trader, DbrAccnt giveup, DbrBook& book, const char* ref, int action,
           DbrTicks ticks, DbrLots lots, DbrLots min_lots)
     {
-        DbrOrder* const order = dbr_serv_place(impl_, user, group, &book, ref, action, ticks,
+        DbrOrder* const order = dbr_serv_place(impl_, trader, giveup, &book, ref, action, ticks,
                                                lots, min_lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    revise(DbrAccnt user, DbrIden id, DbrLots lots)
+    revise(DbrAccnt trader, DbrIden id, DbrLots lots)
     {
-        DbrOrder* const order = dbr_serv_revise_id(impl_, user, id, lots);
+        DbrOrder* const order = dbr_serv_revise_id(impl_, trader, id, lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    revise(DbrAccnt user, const char* ref, DbrLots lots)
+    revise(DbrAccnt trader, const char* ref, DbrLots lots)
     {
-        DbrOrder* const order = dbr_serv_revise_ref(impl_, user, ref, lots);
+        DbrOrder* const order = dbr_serv_revise_ref(impl_, trader, ref, lots);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    cancel(DbrAccnt user, DbrIden id)
+    cancel(DbrAccnt trader, DbrIden id)
     {
-        DbrOrder* const order = dbr_serv_cancel_id(impl_, user, id);
+        DbrOrder* const order = dbr_serv_cancel_id(impl_, trader, id);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     OrderRef
-    cancel(DbrAccnt user, const char* ref)
+    cancel(DbrAccnt trader, const char* ref)
     {
-        DbrOrder* const order = dbr_serv_cancel_ref(impl_, user, ref);
+        DbrOrder* const order = dbr_serv_cancel_ref(impl_, trader, ref);
         if (!order)
             throw_exception();
         return OrderRef{*order};
     }
     void
-    ack_trade(DbrAccnt user, DbrIden id)
+    ack_trade(DbrAccnt trader, DbrIden id)
     {
-        if (!dbr_serv_ack_trade(impl_, user, id))
+        if (!dbr_serv_ack_trade(impl_, trader, id))
             throw_exception();
     }
     void

@@ -129,39 +129,39 @@ read_contr(DbrPool pool, DbrSlNode*& first)
 }
 
 void
-set_memb(DbrMemb& memb, DbrIden gid, DbrIden uid)
+set_perm(DbrPerm& perm, DbrIden gid, DbrIden uid)
 {
-    memb.group.id_only = gid;
-    memb.user.id_only = uid;
+    perm.giveup.id_only = gid;
+    perm.trader.id_only = uid;
 }
 
 ssize_t
-read_memb(DbrPool pool, DbrSlNode*& first)
+read_perm(DbrPool pool, DbrSlNode*& first)
 {
     ssize_t size = 0;
 
     DbrQueue rq;
     dbr_queue_init(&rq);
 
-    DbrMemb* memb = dbr_pool_alloc_memb(pool);
-    check(memb);
-    dbr_memb_init(memb);
-    set_memb(*memb, 1, 1);
-    dbr_queue_insert_back(&rq, &memb->shared_node_);
+    DbrPerm* perm = dbr_pool_alloc_perm(pool);
+    check(perm);
+    dbr_perm_init(perm);
+    set_perm(*perm, 1, 1);
+    dbr_queue_insert_back(&rq, &perm->shared_node_);
     ++size;
 
-    memb = dbr_pool_alloc_memb(pool);
-    check(memb);
-    dbr_memb_init(memb);
-    set_memb(*memb, 2, 1);
-    dbr_queue_insert_back(&rq, &memb->shared_node_);
+    perm = dbr_pool_alloc_perm(pool);
+    check(perm);
+    dbr_perm_init(perm);
+    set_perm(*perm, 2, 1);
+    dbr_queue_insert_back(&rq, &perm->shared_node_);
     ++size;
 
-    memb = dbr_pool_alloc_memb(pool);
-    check(memb);
-    dbr_memb_init(memb);
-    set_memb(*memb, 2, 2);
-    dbr_queue_insert_back(&rq, &memb->shared_node_);
+    perm = dbr_pool_alloc_perm(pool);
+    check(perm);
+    dbr_perm_init(perm);
+    set_perm(*perm, 2, 2);
+    dbr_queue_insert_back(&rq, &perm->shared_node_);
     ++size;
 
     first = rq.first;
@@ -234,8 +234,8 @@ Model::read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept
         case DBR_ENTITY_CONTR:
             ret = read_contr(pool, first);
             break;
-        case DBR_ENTITY_MEMB:
-            ret = read_memb(pool, first);
+        case DBR_ENTITY_PERM:
+            ret = read_perm(pool, first);
             break;
         case DBR_ENTITY_ORDER:
             ret = read_order(pool, first);

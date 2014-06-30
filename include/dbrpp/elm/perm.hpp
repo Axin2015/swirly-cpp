@@ -15,56 +15,56 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_ELM_MEMB_HPP
-#define DBRPP_ELM_MEMB_HPP
+#ifndef DBRPP_ELM_PERM_HPP
+#define DBRPP_ELM_PERM_HPP
 
 #include <dbrpp/elm/rec.hpp>
 
 namespace dbr {
 
 /**
- * @addtogroup Memb
+ * @addtogroup Perm
  * @{
  */
 
-class MembRef {
-    DbrMemb* impl_;
+class PermRef {
+    DbrPerm* impl_;
 public:
     explicit
-    MembRef(DbrMemb& impl) noexcept
+    PermRef(DbrPerm& impl) noexcept
         : impl_{&impl}
     {
     }
-    operator DbrMemb&() const noexcept
+    operator DbrPerm&() const noexcept
     {
         return *impl_;
     }
-    DbrMemb*
+    DbrPerm*
     c_arg() noexcept
     {
         return impl_;
     }
     AccntRecRef
-    urec() const noexcept
+    trec() const noexcept
     {
-        return AccntRecRef{*impl_->user.rec};
+        return AccntRecRef{*impl_->trader.rec};
     }
     AccntRecRef
     grec() const noexcept
     {
-        return AccntRecRef{*impl_->group.rec};
+        return AccntRecRef{*impl_->giveup.rec};
     }
 };
 
 inline std::ostream&
-operator <<(std::ostream& os, MembRef memb)
+operator <<(std::ostream& os, PermRef perm)
 {
-    return os << "user=" << memb.urec().mnem()
-              << ",group=" << memb.grec().mnem();
+    return os << "trader=" << perm.trec().mnem()
+              << ",giveup=" << perm.grec().mnem();
 }
 
 /** @} */
 
 } // dbr
 
-#endif // DBRPP_ELM_MEMB_HPP
+#endif // DBRPP_ELM_PERM_HPP

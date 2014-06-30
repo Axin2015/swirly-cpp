@@ -36,11 +36,11 @@ create_contr(dbr::Pool& pool, DbrIden id, const char* mnem, const char* display,
              int tick_denom, int lot_numer, int lot_denom, int pip_dp, DbrLots min_lots,
              DbrLots max_lots);
 
-std::shared_ptr<DbrMemb>
-create_memb(dbr::Pool& pool, DbrIden uid, DbrIden gid);
+std::shared_ptr<DbrPerm>
+create_perm(dbr::Pool& pool, DbrIden uid, DbrIden gid);
 
 std::shared_ptr<DbrOrder>
-create_order(dbr::Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
+create_order(dbr::Pool& pool, DbrIden id, DbrRec& trader, DbrRec& giveup, DbrRec& contr,
              DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now);
 
@@ -50,7 +50,7 @@ create_order(dbr::Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
              DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrExec>
-create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& user, DbrRec& group,
+create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& trader, DbrRec& giveup,
              DbrRec& contr, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrRec& cpty, DbrMillis now);

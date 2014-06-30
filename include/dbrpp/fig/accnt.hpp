@@ -37,18 +37,18 @@ namespace dbr {
  * @{
  */
 
-class AccntUsers {
+class AccntTraders {
     struct Policy : NodeTraits<DbrRbNode> {
-        typedef DbrMemb Entry;
+        typedef DbrPerm Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_accnt_user_entry(node);
+            return dbr_accnt_trader_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_accnt_user_entry(const_cast<Node*>(node));
+            return dbr_accnt_trader_entry(const_cast<Node*>(node));
         }
     };
     DbrAccnt accnt_;
@@ -85,12 +85,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    AccntUsers(DbrAccnt accnt) noexcept
+    AccntTraders(DbrAccnt accnt) noexcept
         : accnt_{accnt}
     {
     }
     void
-    swap(AccntUsers& rhs) noexcept
+    swap(AccntTraders& rhs) noexcept
     {
         std::swap(accnt_, rhs.accnt_);
     }
@@ -100,22 +100,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_accnt_first_user(accnt_);
+        return dbr_accnt_first_trader(accnt_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_accnt_first_user(accnt_);
+        return dbr_accnt_first_trader(accnt_);
     }
     Iterator
     end() noexcept
     {
-        return DBR_ACCNT_END_USER;
+        return DBR_ACCNT_END_TRADER;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_ACCNT_END_USER;
+        return DBR_ACCNT_END_TRADER;
     }
 
     // ReverseIterator.
@@ -123,22 +123,22 @@ public:
     ReverseIterator
     rbegin() noexcept
     {
-        return dbr_accnt_last_user(accnt_);
+        return dbr_accnt_last_trader(accnt_);
     }
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return dbr_accnt_last_user(accnt_);
+        return dbr_accnt_last_trader(accnt_);
     }
     ReverseIterator
     rend() noexcept
     {
-        return DBR_ACCNT_END_USER;
+        return DBR_ACCNT_END_TRADER;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return DBR_ACCNT_END_USER;
+        return DBR_ACCNT_END_TRADER;
     }
 
     // Find.
@@ -146,12 +146,12 @@ public:
     Iterator
     find(DbrTicks ticks) noexcept
     {
-        return dbr_accnt_find_user_id(accnt_, ticks);
+        return dbr_accnt_find_trader_id(accnt_, ticks);
     }
     ConstIterator
     find(DbrTicks ticks) const noexcept
     {
-        return dbr_accnt_find_user_id(accnt_, ticks);
+        return dbr_accnt_find_trader_id(accnt_, ticks);
     }
 
     // Accessor.
@@ -189,22 +189,22 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_accnt_empty_user(accnt_);
+        return dbr_accnt_empty_trader(accnt_);
     }
 };
 
-class AccntGroups {
+class AccntGiveups {
     struct Policy : NodeTraits<DbrRbNode> {
-        typedef DbrMemb Entry;
+        typedef DbrPerm Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_accnt_group_entry(node);
+            return dbr_accnt_giveup_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_accnt_group_entry(const_cast<Node*>(node));
+            return dbr_accnt_giveup_entry(const_cast<Node*>(node));
         }
     };
     DbrAccnt accnt_;
@@ -241,12 +241,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    AccntGroups(DbrAccnt accnt) noexcept
+    AccntGiveups(DbrAccnt accnt) noexcept
         : accnt_{accnt}
     {
     }
     void
-    swap(AccntGroups& rhs) noexcept
+    swap(AccntGiveups& rhs) noexcept
     {
         std::swap(accnt_, rhs.accnt_);
     }
@@ -256,22 +256,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_accnt_first_group(accnt_);
+        return dbr_accnt_first_giveup(accnt_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_accnt_first_group(accnt_);
+        return dbr_accnt_first_giveup(accnt_);
     }
     Iterator
     end() noexcept
     {
-        return DBR_ACCNT_END_GROUP;
+        return DBR_ACCNT_END_GIVEUP;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_ACCNT_END_GROUP;
+        return DBR_ACCNT_END_GIVEUP;
     }
 
     // ReverseIterator.
@@ -279,22 +279,22 @@ public:
     ReverseIterator
     rbegin() noexcept
     {
-        return dbr_accnt_last_group(accnt_);
+        return dbr_accnt_last_giveup(accnt_);
     }
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return dbr_accnt_last_group(accnt_);
+        return dbr_accnt_last_giveup(accnt_);
     }
     ReverseIterator
     rend() noexcept
     {
-        return DBR_ACCNT_END_GROUP;
+        return DBR_ACCNT_END_GIVEUP;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return DBR_ACCNT_END_GROUP;
+        return DBR_ACCNT_END_GIVEUP;
     }
 
     // Find.
@@ -302,12 +302,12 @@ public:
     Iterator
     find(DbrTicks ticks) noexcept
     {
-        return dbr_accnt_find_group_id(accnt_, ticks);
+        return dbr_accnt_find_giveup_id(accnt_, ticks);
     }
     ConstIterator
     find(DbrTicks ticks) const noexcept
     {
-        return dbr_accnt_find_group_id(accnt_, ticks);
+        return dbr_accnt_find_giveup_id(accnt_, ticks);
     }
 
     // Accessor.
@@ -345,7 +345,7 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_accnt_empty_group(accnt_);
+        return dbr_accnt_empty_giveup(accnt_);
     }
 };
 
@@ -856,15 +856,15 @@ public:
     {
         return AccntRecRef{*dbr_accnt_rec(impl_)};
     }
-    AccntUsers
-    users() const noexcept
+    AccntTraders
+    traders() const noexcept
     {
-        return AccntUsers{impl_};
+        return AccntTraders{impl_};
     }
-    AccntGroups
-    groups() const noexcept
+    AccntGiveups
+    giveups() const noexcept
     {
-        return AccntGroups{impl_};
+        return AccntGiveups{impl_};
     }
     AccntOrders
     orders() const noexcept

@@ -23,7 +23,7 @@
 #include <stddef.h> // size_t
 
 struct DbrRec;
-struct DbrMemb;
+struct DbrPerm;
 struct DbrOrder;
 struct DbrExec;
 struct DbrPosn;
@@ -56,15 +56,15 @@ dbr_json_write_contr(char* buf, const struct DbrRec* rec);
 /** @} */
 
 /**
- * @addtogroup Memb
+ * @addtogroup Perm
  * @{
  */
 
 DBR_API size_t
-dbr_json_memb_len(const struct DbrMemb* memb);
+dbr_json_perm_len(const struct DbrPerm* perm);
 
 DBR_API char*
-dbr_json_write_memb(char* buf, const struct DbrMemb* memb);
+dbr_json_write_perm(char* buf, const struct DbrPerm* perm);
 
 /** @} */
 

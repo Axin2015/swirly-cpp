@@ -180,7 +180,7 @@
  */
 
 /**
- * @defgroup Memb Member
+ * @defgroup Perm Member
  * @ingroup Domain
  */
 
@@ -271,7 +271,7 @@
  */
 
 /**
- * Accounts represent both users and groups.
+ * Accounts represent both traders and giveups.
  * @defgroup Accnt Account
  * @ingroup Core
  */

@@ -77,23 +77,23 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
     return rec;
 }
 
-shared_ptr<DbrMemb>
-create_memb(Pool& pool, DbrIden uid, DbrIden gid)
+shared_ptr<DbrPerm>
+create_perm(Pool& pool, DbrIden uid, DbrIden gid)
 {
-    auto deleter = [&pool](DbrMemb* memb) {
-        pool.free_memb(memb);
+    auto deleter = [&pool](DbrPerm* perm) {
+        pool.free_perm(perm);
     };
-    std::shared_ptr<DbrMemb> memb(pool.alloc_memb(), deleter);
-    dbr_memb_init(memb.get());
+    std::shared_ptr<DbrPerm> perm(pool.alloc_perm(), deleter);
+    dbr_perm_init(perm.get());
 
-    memb->group.id_only = gid;
-    memb->user.id_only = uid;
+    perm->giveup.id_only = gid;
+    perm->trader.id_only = uid;
 
-    return memb;
+    return perm;
 }
 
 shared_ptr<DbrOrder>
-create_order(Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
+create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& giveup, DbrRec& contr,
              DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now)
 {
@@ -105,8 +105,8 @@ create_order(Pool& pool, DbrIden id, DbrRec& user, DbrRec& group, DbrRec& contr,
 
     order->level = NULL;
     order->id = id;
-    order->c.user.rec = &user;
-    order->c.group.rec = &group;
+    order->c.trader.rec = &trader;
+    order->c.giveup.rec = &giveup;
     order->c.contr.rec = &contr;
     order->c.settl_day = settl_day;
     if (ref)
@@ -142,8 +142,8 @@ create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
 
     order->level = NULL;
     order->id = id;
-    order->c.user.id_only = uid;
-    order->c.group.id_only = gid;
+    order->c.trader.id_only = uid;
+    order->c.giveup.id_only = gid;
     order->c.contr.id_only = cid;
     order->c.settl_day = settl_day;
     if (ref)
@@ -167,7 +167,7 @@ create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
 }
 
 std::shared_ptr<DbrExec>
-create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& user, DbrRec& group,
+create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& trader, DbrRec& giveup,
              DbrRec& contr, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrRec& cpty, DbrMillis now)
@@ -180,8 +180,8 @@ create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& user, DbrRec& g
 
     ptr->id = id;
     ptr->order = order;
-    ptr->c.user.rec = &user;
-    ptr->c.group.rec = &group;
+    ptr->c.trader.rec = &trader;
+    ptr->c.giveup.rec = &giveup;
     ptr->c.contr.rec = &contr;
     ptr->c.settl_day = settl_day;
     if (ref)
@@ -219,8 +219,8 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
 
     ptr->id = id;
     ptr->order = order;
-    ptr->c.user.id_only = uid;
-    ptr->c.group.id_only = gid;
+    ptr->c.trader.id_only = uid;
+    ptr->c.giveup.id_only = gid;
     ptr->c.contr.id_only = cid;
     ptr->c.settl_day = settl_day;
     if (ref)

@@ -53,11 +53,11 @@ main(int argc, char* argv[])
             case DBR_METHOD_GET | DBR_RESRC_CONTR | DBR_PARAM_CONTR:
                 cout << "get contr: mnem=" << rest.contr() << endl;
                 break;
-            case DBR_METHOD_GET | DBR_RESRC_USER | DBR_PARAM_ACCNT:
-                cout << "get user: accnt=" << rest.accnt() << endl;
+            case DBR_METHOD_GET | DBR_RESRC_TRADER | DBR_PARAM_ACCNT:
+                cout << "get trader: accnt=" << rest.accnt() << endl;
                 break;
-            case DBR_METHOD_GET | DBR_RESRC_GROUP | DBR_PARAM_ACCNT:
-                cout << "get group: accnt=" << rest.accnt() << endl;
+            case DBR_METHOD_GET | DBR_RESRC_GIVEUP | DBR_PARAM_ACCNT:
+                cout << "get giveup: accnt=" << rest.accnt() << endl;
                 break;
             case DBR_METHOD_DELETE | DBR_RESRC_ORDER | DBR_PARAM_ACCNT | DBR_PARAM_ID:
                 cout << "delete order: accnt=" << rest.accnt()
@@ -72,11 +72,11 @@ main(int argc, char* argv[])
                      << ",id=" << rest.id()
                      << endl;
                 break;
-            case DBR_METHOD_POST | DBR_RESRC_ORDER | DBR_PARAM_ACCNT | DBR_PARAM_GROUP
+            case DBR_METHOD_POST | DBR_RESRC_ORDER | DBR_PARAM_ACCNT | DBR_PARAM_GIVEUP
                 | DBR_PARAM_CONTR | DBR_PARAM_SETTL_DATE | DBR_PARAM_REF | DBR_PARAM_ACTION
                 | DBR_PARAM_TICKS | DBR_PARAM_LOTS | DBR_PARAM_MIN_LOTS:
                 cout << "post order: accnt=" << rest.accnt()
-                     << ",group=" << rest.group()
+                     << ",giveup=" << rest.giveup()
                      << ",contr=" << rest.contr()
                      << ",settl_date=" << rest.settl_date()
                      << ",ref=" << rest.ref()
@@ -105,8 +105,8 @@ main(int argc, char* argv[])
                      << ",id=" << rest.id()
                      << endl;
                 break;
-            case DBR_METHOD_GET | DBR_RESRC_POSN | DBR_PARAM_GROUP:
-                cout << "get posn: group=" << rest.group() << endl;
+            case DBR_METHOD_GET | DBR_RESRC_POSN | DBR_PARAM_GIVEUP:
+                cout << "get posn: giveup=" << rest.giveup() << endl;
                 break;
             case DBR_METHOD_GET | DBR_RESRC_MARKET:
                 cout << "get view:" << endl;

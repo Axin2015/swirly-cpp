@@ -177,16 +177,16 @@ flush_posnup(struct DbrPosn* posn)
 
     struct DbrBody rep = { .req_id = 0, .type = DBR_POSN_REP, .posn_rep.posn = posn };
 
-    // Send position update to each user that is a member of this account.
+    // Send position update to each trader that is a member of this account.
 
     DbrAccnt accnt = dbr_serv_accnt(serv, posn->accnt.rec);
-    for (struct DbrRbNode* node = dbr_accnt_first_user(accnt);
-         node != DBR_ACCNT_END_USER; node = dbr_rbnode_next(node)) {
+    for (struct DbrRbNode* node = dbr_accnt_first_trader(accnt);
+         node != DBR_ACCNT_END_TRADER; node = dbr_rbnode_next(node)) {
 
-        struct DbrMemb* memb = dbr_accnt_user_entry(node);
-        DbrAccnt user = memb->user.rec->accnt.state;
-        struct DbrSess* other = dbr_accnt_sess(user);
-        // Next if user not logged-on or the position has already been sent.
+        struct DbrPerm* perm = dbr_accnt_trader_entry(node);
+        DbrAccnt trader = perm->trader.rec->accnt.state;
+        struct DbrSess* other = dbr_accnt_sess(trader);
+        // Next if trader not logged-on or the position has already been sent.
         if (!other || other->marker_ == marker)
             continue;
 
@@ -198,7 +198,7 @@ flush_posnup(struct DbrPosn* posn)
             goto fail1;
         }
 
-        // FIXME: pack message once for all users.
+        // FIXME: pack message once for all traders.
         if (!dbr_send_body(trsock, &rep, DBR_TRUE)) {
             dbr_err_perror("dbr_send_body() failed");
             goto fail1;
@@ -259,10 +259,10 @@ trflush(struct DbrSess* sess, const struct DbrBody* req)
         for (node = dbr_slnode_next(node);
              node != DBR_SERV_END_EXEC; node = dbr_slnode_next(node)) {
             struct DbrExec* exec = dbr_serv_exec_entry(node);
-            // Send execution on associated user's session.
-            DbrAccnt user = exec->c.user.rec->accnt.state;
-            // Null if user is not logged-on.
-            struct DbrSess* other = dbr_accnt_sess(user);
+            // Send execution on associated trader's session.
+            DbrAccnt trader = exec->c.trader.rec->accnt.state;
+            // Null if trader is not logged-on.
+            struct DbrSess* other = dbr_accnt_sess(trader);
             if (other && !send_exec(other, 0, exec))
                 goto fail1;
         }
@@ -315,19 +315,19 @@ sess_contr(struct DbrSess* sess, DbrIden req_id)
 }
 
 static DbrBool
-sess_user(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
+sess_trader(struct DbrSess* sess, DbrIden req_id, DbrAccnt trader)
 {
     struct DbrBody rep;
 
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_user(user);
-         node != DBR_ACCNT_END_USER; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_accnt_user_entry(node);
-        dbr_queue_insert_back(&q, &memb->shared_node_);
+    for (struct DbrRbNode* node = dbr_accnt_first_trader(trader);
+         node != DBR_ACCNT_END_TRADER; node = dbr_rbnode_next(node)) {
+        struct DbrPerm* perm = dbr_accnt_trader_entry(node);
+        dbr_queue_insert_back(&q, &perm->shared_node_);
     }
     rep.req_id = req_id;
-    rep.type = DBR_USER_LIST_REP;
+    rep.type = DBR_TRADER_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
@@ -336,19 +336,19 @@ sess_user(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
 }
 
 static DbrBool
-sess_group(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
+sess_giveup(struct DbrSess* sess, DbrIden req_id, DbrAccnt trader)
 {
     struct DbrBody rep;
 
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_group(user);
-         node != DBR_ACCNT_END_GROUP; node = dbr_rbnode_next(node)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(node);
-        dbr_queue_insert_back(&q, &memb->shared_node_);
+    for (struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+        dbr_queue_insert_back(&q, &perm->shared_node_);
     }
     rep.req_id = req_id;
-    rep.type = DBR_GROUP_LIST_REP;
+    rep.type = DBR_GIVEUP_LIST_REP;
     rep.entity_list_rep.first = dbr_queue_first(&q);
     const DbrBool ok = dbr_send_msg(trsock, sess->uuid, &rep, DBR_TRUE);
     if (!ok)
@@ -357,13 +357,13 @@ sess_group(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
 }
 
 static DbrBool
-sess_order(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
+sess_order(struct DbrSess* sess, DbrIden req_id, DbrAccnt trader)
 {
     struct DbrBody rep;
 
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_order(user);
+    for (struct DbrRbNode* node = dbr_accnt_first_order(trader);
          node != DBR_ACCNT_END_ORDER; node = dbr_rbnode_next(node)) {
         struct DbrOrder* order = dbr_accnt_order_entry(node);
         dbr_queue_insert_back(&q, &order->shared_node_);
@@ -378,13 +378,13 @@ sess_order(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
 }
 
 static DbrBool
-sess_exec(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
+sess_exec(struct DbrSess* sess, DbrIden req_id, DbrAccnt trader)
 {
     struct DbrBody rep;
 
     // Copy to entity node.
     struct DbrQueue q = DBR_QUEUE_INIT(q);
-    for (struct DbrRbNode* node = dbr_accnt_first_trade(user);
+    for (struct DbrRbNode* node = dbr_accnt_first_trade(trader);
          node != DBR_ACCNT_END_TRADE; node = dbr_rbnode_next(node)) {
         struct DbrExec* exec = dbr_accnt_trade_entry(node);
         dbr_queue_insert_back(&q, &exec->shared_node_);
@@ -399,42 +399,42 @@ sess_exec(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
 }
 
 static DbrBool
-sess_posn(struct DbrSess* sess, DbrIden req_id, DbrAccnt user)
+sess_posn(struct DbrSess* sess, DbrIden req_id, DbrAccnt trader)
 {
     struct DbrBody rep;
 
     struct DbrQueue q = DBR_QUEUE_INIT(q);
 
-    // Send positions for each group that the account (user) belongs to.
+    // Send positions for each giveup that the account (trader) belongs to.
 
-    // The initial positions must be sent if this is the this first subscription to this user.
-    if (dbr_sess_subs(sess, user) == 1) {
+    // The initial positions must be sent if this is the this first subscription to this trader.
+    if (dbr_sess_subs(sess, trader) == 1) {
         // Copy each posn to entity node.
-        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(user);
+        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(trader);
              pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {
             struct DbrPosn* posn = dbr_accnt_posn_entry(pnode);
             dbr_queue_insert_back(&q, &posn->shared_node_);
         }
     }
-    // For each group.
-    for (struct DbrRbNode* gnode = dbr_accnt_first_group(user);
-         gnode != DBR_ACCNT_END_GROUP; gnode = dbr_rbnode_next(gnode)) {
-        struct DbrMemb* memb = dbr_accnt_group_entry(gnode);
-        struct DbrRec* grec = memb->group.rec;
-        DbrAccnt group = dbr_serv_accnt(serv, grec);
-        if (!group) {
+    // For each giveup.
+    for (struct DbrRbNode* gnode = dbr_accnt_first_giveup(trader);
+         gnode != DBR_ACCNT_END_GIVEUP; gnode = dbr_rbnode_next(gnode)) {
+        struct DbrPerm* perm = dbr_accnt_giveup_entry(gnode);
+        struct DbrRec* grec = perm->giveup.rec;
+        DbrAccnt giveup = dbr_serv_accnt(serv, grec);
+        if (!giveup) {
             status_err(&rep, req_id);
             goto fail1;
         }
-        // Is this session already subscribed to this group?
-        const int subs = dbr_sess_subs(sess, group);
+        // Is this session already subscribed to this giveup?
+        const int subs = dbr_sess_subs(sess, giveup);
         if (subs > 1)
             continue;
-        // This logon represents the first subscription to this group, so the initial positions for
-        // this group must be sent.
+        // This logon represents the first subscription to this giveup, so the initial positions for
+        // this giveup must be sent.
         assert(subs == 1);
         // Copy each posn to entity node.
-        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(group);
+        for (struct DbrRbNode* pnode = dbr_accnt_first_posn(giveup);
              pnode != DBR_ACCNT_END_POSN; pnode = dbr_rbnode_next(pnode)) {
             struct DbrPosn* posn = dbr_accnt_posn_entry(pnode);
             dbr_queue_insert_back(&q, &posn->shared_node_);
@@ -512,10 +512,10 @@ sess_close(struct DbrSess* sess, DbrIden req_id)
     dbr_prioq_remove(&prioq, sess_to_hbtmr(sess));
     dbr_prioq_remove(&prioq, sess_to_trtmr(sess));
 
-    for (struct DbrRbNode* node = dbr_sess_first_user(sess);
-         node != DBR_SESS_END_USER; node = dbr_rbnode_next(node)) {
-        DbrAccnt user = dbr_sess_user_entry(node);
-        dbr_sess_logoff(sess, user);
+    for (struct DbrRbNode* node = dbr_sess_first_trader(sess);
+         node != DBR_SESS_END_TRADER; node = dbr_rbnode_next(node)) {
+        DbrAccnt trader = dbr_sess_trader_entry(node);
+        dbr_sess_logoff(sess, trader);
         // TODO: implicit logoff?
     }
     struct DbrBody rep = { .req_id = req_id, .type = DBR_SESS_CLOSE };
@@ -529,8 +529,8 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->sess_logon.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user || !dbr_sess_logon(sess, user)) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader || !dbr_sess_logon(sess, trader)) {
         status_err(&rep, req_id);
         goto fail1;
     }
@@ -539,11 +539,11 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     rep.type = DBR_SESS_LOGON;
     rep.sess_logon.uid = uid;
     return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
-        && sess_user(sess, 0, user)
-        && sess_group(sess, 0, user)
-        && sess_order(sess, 0, user)
-        && sess_exec(sess, 0, user)
-        && sess_posn(sess, 0, user);
+        && sess_trader(sess, 0, trader)
+        && sess_giveup(sess, 0, trader)
+        && sess_order(sess, 0, trader)
+        && sess_exec(sess, 0, trader)
+        && sess_posn(sess, 0, trader);
  fail1:
     if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
@@ -557,12 +557,12 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->sess_logoff.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    dbr_sess_logoff(sess, user);
+    dbr_sess_logoff(sess, trader);
 
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGOFF;
@@ -581,8 +581,8 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->place_order_req.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
@@ -598,8 +598,8 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
                     req->place_order_req.cid);
         goto fail1;
     }
-    DbrAccnt group = dbr_serv_accnt(serv, grec);
-    if (!group) {
+    DbrAccnt giveup = dbr_serv_accnt(serv, grec);
+    if (!giveup) {
         status_err(&rep, req_id);
         goto fail1;
     }
@@ -615,7 +615,7 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
     const DbrLots lots = req->place_order_req.lots;
     const DbrLots min_lots = req->place_order_req.min_lots;
 
-    struct DbrOrder* order = dbr_serv_place(serv, user, group, book, ref, action, ticks,
+    struct DbrOrder* order = dbr_serv_place(serv, trader, giveup, book, ref, action, ticks,
                                             lots, min_lots);
     if (!order) {
         status_err(&rep, req_id);
@@ -635,15 +635,15 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->revise_order_id_req.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
     const DbrIden id = req->revise_order_id_req.id;
     const DbrLots lots = req->revise_order_id_req.lots;
 
-    struct DbrOrder* order = dbr_serv_revise_id(serv, user, id, lots);
+    struct DbrOrder* order = dbr_serv_revise_id(serv, trader, id, lots);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
@@ -662,15 +662,15 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->revise_order_ref_req.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
     const char* ref = req->revise_order_ref_req.ref;
     const DbrLots lots = req->revise_order_ref_req.lots;
 
-    struct DbrOrder* order = dbr_serv_revise_ref(serv, user, ref, lots);
+    struct DbrOrder* order = dbr_serv_revise_ref(serv, trader, ref, lots);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
@@ -689,14 +689,14 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->cancel_order_id_req.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
     const DbrIden id = req->cancel_order_id_req.id;
 
-    struct DbrOrder* order = dbr_serv_cancel_id(serv, user, id);
+    struct DbrOrder* order = dbr_serv_cancel_id(serv, trader, id);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
@@ -715,14 +715,14 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->cancel_order_ref_req.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
     const char* ref = req->cancel_order_ref_req.ref;
 
-    struct DbrOrder* order = dbr_serv_cancel_ref(serv, user, ref);
+    struct DbrOrder* order = dbr_serv_cancel_ref(serv, trader, ref);
     if (!order) {
         status_err(&rep, req_id);
         goto fail1;
@@ -741,14 +741,14 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
 
     const DbrIden req_id = req->req_id;
     const DbrIden uid = req->ack_trade_req.uid;
-    DbrAccnt user = get_accnt(uid);
-    if (!user) {
+    DbrAccnt trader = get_accnt(uid);
+    if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
     }
     const DbrIden id = req->ack_trade_req.id;
 
-    if (!dbr_serv_ack_trade(serv, user, id)) {
+    if (!dbr_serv_ack_trade(serv, trader, id)) {
         status_err(&rep, req_id);
         goto fail1;
     }

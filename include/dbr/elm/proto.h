@@ -23,7 +23,7 @@
 #include <stddef.h> // size_t
 
 struct DbrRec;
-struct DbrMemb;
+struct DbrPerm;
 struct DbrOrder;
 struct DbrExec;
 struct DbrPosn;
@@ -62,18 +62,18 @@ dbr_proto_read_contr(const char* buf, struct DbrRec* rec);
 /** @} */
 
 /**
- * @addtogroup Memb
+ * @addtogroup Perm
  * @{
  */
 
 DBR_API size_t
-dbr_proto_memb_len(const struct DbrMemb* memb, DbrBool enriched);
+dbr_proto_perm_len(const struct DbrPerm* perm, DbrBool enriched);
 
 DBR_API char*
-dbr_proto_write_memb(char* buf, const struct DbrMemb* memb, DbrBool enriched);
+dbr_proto_write_perm(char* buf, const struct DbrPerm* perm, DbrBool enriched);
 
 DBR_API const char*
-dbr_proto_read_memb(const char* buf, struct DbrMemb* memb);
+dbr_proto_read_perm(const char* buf, struct DbrPerm* perm);
 
 /** @} */
 
