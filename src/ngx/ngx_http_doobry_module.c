@@ -438,8 +438,8 @@ ngx_http_doobry_get_contr_with_contr(DbrHandler handler, DbrClnt clnt, void* arg
     if (node == DBR_CLNT_END_REC)
         return NGX_HTTP_NOT_FOUND;
 
-    struct DbrRec* arec = dbr_clnt_rec_entry(node);
-    const size_t len = dbr_json_contr_len(arec);
+    struct DbrRec* crec = dbr_clnt_rec_entry(node);
+    const size_t len = dbr_json_contr_len(crec);
 
     t->len = len;
     if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
@@ -449,7 +449,7 @@ ngx_http_doobry_get_contr_with_contr(DbrHandler handler, DbrClnt clnt, void* arg
     if (!b)
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
 
-    b->last = (u_char*)dbr_json_write_contr((char*)b->last, arec);
+    b->last = (u_char*)dbr_json_write_contr((char*)b->last, crec);
 
     b->last_buf = 1;
     t->buf = b;
@@ -930,7 +930,50 @@ ngx_http_doobry_view(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_get_view_with_contr(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+
+    struct DbrSlNode* node = dbr_clnt_find_rec_mnem(clnt, DBR_ENTITY_CONTR, t->rest.contr);
+    if (node == DBR_CLNT_END_REC)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRec* crec = dbr_clnt_rec_entry(node);
+    struct DbrRbNode* first = dbr_clnt_first_view(clnt);
+
+    size_t len = sizeof("[]") - 1, n = 0;
+    for (struct DbrRbNode* node = first; node != DBR_CLNT_END_VIEW;
+         node = dbr_rbnode_next(node)) {
+        struct DbrView* view = dbr_clnt_view_entry(node);
+        if (view->contr.rec->id != crec->id)
+            continue;
+        if (n++ > 0)
+            len += sizeof(",") - 1;
+        len += dbr_json_view_len(view);
+    }
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    n = 0;
+    *b->last++ = '[';
+    for (struct DbrRbNode* node = first; node != DBR_CLNT_END_VIEW;
+         node = dbr_rbnode_next(node)) {
+        struct DbrView* view = dbr_clnt_view_entry(node);
+        if (view->contr.rec->id != crec->id)
+            continue;
+        if (n++ > 0)
+            *b->last++ = ',';
+        b->last = (u_char*)dbr_json_write_view((char*)b->last, view);
+    }
+    *b->last++ = ']';
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
