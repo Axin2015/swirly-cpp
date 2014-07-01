@@ -421,19 +421,6 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
                | '';
     req_accnt = ('/' str) >begin_accnt %end_accnt;
 
-    action begin_giveup {
-        if (rest->fields & DBR_PARAM_GIVEUP) {
-            cs = rurl_error; msg = "giveup already specified";
-            fbreak;
-        }
-        str.buf = rest->giveup;
-        str.max = DBR_MNEM_MAX;
-    }
-    action end_giveup {
-        dbr_rest_set_param(rest, DBR_PARAM_GIVEUP);
-    }
-    req_giveup = ('/' str) >begin_giveup %end_giveup;
-
     action begin_contr {
         if (rest->fields & DBR_PARAM_CONTR) {
             cs = rurl_error; msg = "contr already specified";
@@ -487,7 +474,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
            | ('giveup' req_accnt) %giveup_resrc
            | ('order' req_accnt opt_id) %order_resrc
            | ('trade' req_accnt opt_id) %trade_resrc
-           | ('posn' req_giveup) %posn_resrc
+           | ('posn' req_accnt) %posn_resrc
            | ('market' opt_contr) %market_resrc;
 
     action begin_resrc {

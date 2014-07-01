@@ -105,8 +105,8 @@ main(int argc, char* argv[])
                      << ",id=" << rest.id()
                      << endl;
                 break;
-            case DBR_METHOD_GET | DBR_RESRC_POSN | DBR_PARAM_GIVEUP:
-                cout << "get posn: giveup=" << rest.giveup() << endl;
+            case DBR_METHOD_GET | DBR_RESRC_POSN | DBR_PARAM_ACCNT:
+                cout << "get posn: accnt=" << rest.accnt() << endl;
                 break;
             case DBR_METHOD_GET | DBR_RESRC_MARKET:
                 cout << "get view:" << endl;

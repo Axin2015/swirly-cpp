@@ -230,7 +230,7 @@ ngx_http_doobry_logoff_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
     DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
-    if (!trader)
+    if (!accnt)
         return NGX_HTTP_NOT_FOUND;
 
     dbr_clnt_logoff(clnt, accnt);
@@ -468,11 +468,11 @@ static int
 ngx_http_doobry_order_with_accnt_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
-    DbrAccnt trader = get_accnt(clnt, t->rest.accnt);
-    if (!trader)
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt)
         return NGX_HTTP_NOT_FOUND;
 
-    struct DbrRbNode* first = dbr_accnt_first_order(trader);
+    struct DbrRbNode* first = dbr_accnt_first_order(accnt);
 
     size_t len = sizeof("[]") - 1;
     for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_ORDER;
@@ -530,11 +530,11 @@ static int
 ngx_http_doobry_trade_with_accnt_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
-    DbrAccnt trader = get_accnt(clnt, t->rest.accnt);
-    if (!trader)
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt)
         return NGX_HTTP_NOT_FOUND;
 
-    struct DbrRbNode* first = dbr_accnt_first_trade(trader);
+    struct DbrRbNode* first = dbr_accnt_first_trade(accnt);
 
     size_t len = sizeof("[]") - 1;
     for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_TRADE;
@@ -589,14 +589,14 @@ ngx_http_doobry_trade_with_accnt_and_id(ngx_http_doobry_task_t* t)
 }
 
 static int
-ngx_http_doobry_posn_with_giveup_task(DbrHandler handler, DbrClnt clnt, void* arg)
+ngx_http_doobry_posn_with_accnt_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
-    DbrAccnt giveup = get_accnt(clnt, t->rest.giveup);
-    if (!giveup)
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt)
         return NGX_HTTP_NOT_FOUND;
 
-    struct DbrRbNode* first = dbr_accnt_first_posn(giveup);
+    struct DbrRbNode* first = dbr_accnt_first_posn(accnt);
 
     size_t len = sizeof("[]") - 1;
     for (struct DbrRbNode* node = first; node != DBR_ACCNT_END_POSN;
@@ -634,7 +634,7 @@ static ngx_int_t
 ngx_http_doobry_posn_with_giveup(ngx_http_doobry_task_t* t)
 {
     ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(t->request);
-    return dbr_task_call(lcf->async, ngx_http_doobry_posn_with_giveup_task, t);
+    return dbr_task_call(lcf->async, ngx_http_doobry_posn_with_accnt_task, t);
 }
 
 static int
@@ -751,7 +751,7 @@ ngx_http_doobry_handler(ngx_http_request_t* r)
     case DBR_RESRC_TRADE | DBR_PARAM_ACCNT | DBR_PARAM_ID:
         rc = ngx_http_doobry_trade_with_accnt_and_id(&t);
         break;
-    case DBR_RESRC_POSN | DBR_PARAM_GIVEUP:
+    case DBR_RESRC_POSN | DBR_PARAM_ACCNT:
         rc = ngx_http_doobry_posn_with_giveup(&t);
         break;
     case DBR_RESRC_MARKET:
