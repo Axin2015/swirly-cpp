@@ -45,12 +45,12 @@ public:
         ready_.post();
     }
     void
-    on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logon(ClntRef clnt, DbrIden req_id, DbrIden aid) noexcept
     {
         cout << "on_logon\n";
     }
     void
-    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden aid) noexcept
     {
         cout << "on_logoff\n";
     }

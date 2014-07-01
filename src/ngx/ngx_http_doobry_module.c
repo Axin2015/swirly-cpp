@@ -120,13 +120,13 @@ on_ready(DbrHandler handler, DbrClnt clnt)
 }
 
 static void
-on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
+on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid)
 {
     dbr_log_error("on_logon()");
 }
 
 static void
-on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
+on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid)
 {
     dbr_log_error("on_logoff()");
 }
@@ -207,11 +207,11 @@ static int
 ngx_http_doobry_logon_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
-    DbrAccnt trader = get_accnt(clnt, t->rest.accnt);
-    if (!trader)
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt)
         return NGX_HTTP_NOT_FOUND;
 
-    dbr_clnt_logon(clnt, trader);
+    dbr_clnt_logon(clnt, accnt);
     return NGX_HTTP_ACCEPTED;
 }
 
@@ -229,11 +229,11 @@ static int
 ngx_http_doobry_logoff_task(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
-    DbrAccnt trader = get_accnt(clnt, t->rest.accnt);
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!trader)
         return NGX_HTTP_NOT_FOUND;
 
-    dbr_clnt_logoff(clnt, trader);
+    dbr_clnt_logoff(clnt, accnt);
     return NGX_HTTP_ACCEPTED;
 }
 

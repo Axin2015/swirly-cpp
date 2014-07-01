@@ -104,10 +104,10 @@ DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec);
 
 DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrAccnt trader);
+dbr_clnt_logon(DbrClnt clnt, DbrAccnt accnt);
 
 DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrAccnt trader);
+dbr_clnt_logoff(DbrClnt clnt, DbrAccnt accnt);
 
 /**
  * Place order.

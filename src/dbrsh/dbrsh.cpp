@@ -354,12 +354,12 @@ public:
         dbr_log_info("ready received");
     }
     void
-    on_logon(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logon(ClntRef clnt, DbrIden req_id, DbrIden aid) noexcept
     {
         dbr_log_info("logon received");
     }
     void
-    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden aid) noexcept
     {
         dbr_log_info("logoff received");
     }

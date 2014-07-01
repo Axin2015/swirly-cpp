@@ -192,10 +192,10 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        n += dbr_pack_lenl(body->sess_logon.uid);
+        n += dbr_pack_lenl(body->sess_logon.aid);
         break;
     case DBR_SESS_LOGOFF:
-        n += dbr_pack_lenl(body->sess_logoff.uid);
+        n += dbr_pack_lenl(body->sess_logoff.aid);
         break;
     case DBR_STATUS_REP:
         n += dbr_pack_lenf(STATUS_REP_FORMAT,
@@ -274,7 +274,7 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         n += dbr_pack_lenf(PLACE_ORDER_REQ_FORMAT,
-                           body->place_order_req.uid,
+                           body->place_order_req.tid,
                            body->place_order_req.gid,
                            body->place_order_req.cid,
                            body->place_order_req.settl_day,
@@ -286,29 +286,29 @@ elm_body_len(struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         n += dbr_pack_lenf(REVISE_ORDER_ID_REQ_FORMAT,
-                           body->revise_order_id_req.uid,
+                           body->revise_order_id_req.tid,
                            body->revise_order_id_req.id,
                            body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         n += dbr_pack_lenf(REVISE_ORDER_REF_REQ_FORMAT,
-                           body->revise_order_ref_req.uid,
+                           body->revise_order_ref_req.tid,
                            DBR_REF_MAX, body->revise_order_ref_req.ref,
                            body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         n += dbr_pack_lenf(CANCEL_ORDER_ID_REQ_FORMAT,
-                           body->cancel_order_id_req.uid,
+                           body->cancel_order_id_req.tid,
                            body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
         n += dbr_pack_lenf(CANCEL_ORDER_REF_REQ_FORMAT,
-                           body->cancel_order_ref_req.uid,
+                           body->cancel_order_ref_req.tid,
                            DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
         n += dbr_pack_lenf(ACK_TRADE_REQ_FORMAT,
-                           body->ack_trade_req.uid,
+                           body->ack_trade_req.tid,
                            body->ack_trade_req.id);
         break;
     case DBR_READ_ENTITY_REQ:
@@ -351,10 +351,10 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        buf = dbr_packl(buf, body->sess_logon.uid);
+        buf = dbr_packl(buf, body->sess_logon.aid);
         break;
     case DBR_SESS_LOGOFF:
-        buf = dbr_packl(buf, body->sess_logoff.uid);
+        buf = dbr_packl(buf, body->sess_logoff.aid);
         break;
     case DBR_STATUS_REP:
         buf = dbr_packf(buf, STATUS_REP_FORMAT,
@@ -419,7 +419,7 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_PLACE_ORDER_REQ:
         buf = dbr_packf(buf, PLACE_ORDER_REQ_FORMAT,
-                        body->place_order_req.uid,
+                        body->place_order_req.tid,
                         body->place_order_req.gid,
                         body->place_order_req.cid,
                         body->place_order_req.settl_day,
@@ -431,29 +431,29 @@ elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_ID_REQ_FORMAT,
-                        body->revise_order_id_req.uid,
+                        body->revise_order_id_req.tid,
                         body->revise_order_id_req.id,
                         body->revise_order_id_req.lots);
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         buf = dbr_packf(buf, REVISE_ORDER_REF_REQ_FORMAT,
-                        body->revise_order_ref_req.uid,
+                        body->revise_order_ref_req.tid,
                         DBR_REF_MAX, body->revise_order_ref_req.ref,
                         body->revise_order_ref_req.lots);
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         buf = dbr_packf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
-                        body->cancel_order_id_req.uid,
+                        body->cancel_order_id_req.tid,
                         body->cancel_order_id_req.id);
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
         buf = dbr_packf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
-                        body->cancel_order_ref_req.uid,
+                        body->cancel_order_ref_req.tid,
                         DBR_REF_MAX, body->cancel_order_ref_req.ref);
         break;
     case DBR_ACK_TRADE_REQ:
         buf = dbr_packf(buf, ACK_TRADE_REQ_FORMAT,
-                        body->ack_trade_req.uid,
+                        body->ack_trade_req.tid,
                         body->ack_trade_req.id);
         break;
     case DBR_READ_ENTITY_REQ:
@@ -500,11 +500,11 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     case DBR_SESS_CLOSE:
         break;
     case DBR_SESS_LOGON:
-        if (!(buf = dbr_unpackl(buf, &body->sess_logon.uid)))
+        if (!(buf = dbr_unpackl(buf, &body->sess_logon.aid)))
             goto fail1;
         break;
     case DBR_SESS_LOGOFF:
-        if (!(buf = dbr_unpackl(buf, &body->sess_logoff.uid)))
+        if (!(buf = dbr_unpackl(buf, &body->sess_logoff.aid)))
             goto fail1;
         break;
     case DBR_STATUS_REP:
@@ -623,7 +623,7 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_PLACE_ORDER_REQ:
         if (!(buf = dbr_unpackf(buf, PLACE_ORDER_REQ_FORMAT,
-                                &body->place_order_req.uid,
+                                &body->place_order_req.tid,
                                 &body->place_order_req.gid,
                                 &body->place_order_req.cid,
                                 &body->place_order_req.settl_day,
@@ -636,33 +636,33 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
         break;
     case DBR_REVISE_ORDER_ID_REQ:
         if (!(buf = dbr_unpackf(buf, REVISE_ORDER_ID_REQ_FORMAT,
-                                &body->revise_order_id_req.uid,
+                                &body->revise_order_id_req.tid,
                                 &body->revise_order_id_req.id,
                                 &body->revise_order_id_req.lots)))
             goto fail1;
         break;
     case DBR_REVISE_ORDER_REF_REQ:
         if (!(buf = dbr_unpackf(buf, REVISE_ORDER_REF_REQ_FORMAT,
-                                &body->revise_order_ref_req.uid,
+                                &body->revise_order_ref_req.tid,
                                 DBR_REF_MAX, body->revise_order_ref_req.ref,
                                 &body->revise_order_ref_req.lots)))
             goto fail1;
         break;
     case DBR_CANCEL_ORDER_ID_REQ:
         if (!(buf = dbr_unpackf(buf, CANCEL_ORDER_ID_REQ_FORMAT,
-                                &body->cancel_order_id_req.uid,
+                                &body->cancel_order_id_req.tid,
                                 &body->cancel_order_id_req.id)))
             goto fail1;
         break;
     case DBR_CANCEL_ORDER_REF_REQ:
         if (!(buf = dbr_unpackf(buf, CANCEL_ORDER_REF_REQ_FORMAT,
-                                &body->cancel_order_ref_req.uid,
+                                &body->cancel_order_ref_req.tid,
                                 DBR_REF_MAX, body->cancel_order_ref_req.ref)))
             goto fail1;
         break;
     case DBR_ACK_TRADE_REQ:
         if (!(buf = dbr_unpackf(buf, ACK_TRADE_REQ_FORMAT,
-                                &body->ack_trade_req.uid,
+                                &body->ack_trade_req.tid,
                                 &body->ack_trade_req.id)))
             goto fail1;
         break;

@@ -78,7 +78,7 @@ create_contr(Pool& pool, DbrIden id, const char* mnem, const char* display, cons
 }
 
 shared_ptr<DbrPerm>
-create_perm(Pool& pool, DbrIden uid, DbrIden gid)
+create_perm(Pool& pool, DbrIden tid, DbrIden gid)
 {
     auto deleter = [&pool](DbrPerm* perm) {
         pool.free_perm(perm);
@@ -87,7 +87,7 @@ create_perm(Pool& pool, DbrIden uid, DbrIden gid)
     dbr_perm_init(perm.get());
 
     perm->giveup.id_only = gid;
-    perm->trader.id_only = uid;
+    perm->trader.id_only = tid;
 
     return perm;
 }
@@ -130,7 +130,7 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& giveup, DbrRec& con
 }
 
 shared_ptr<DbrOrder>
-create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
+create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden gid, DbrIden cid,
              DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now)
 {
@@ -142,7 +142,7 @@ create_order(Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
 
     order->level = NULL;
     order->id = id;
-    order->c.trader.id_only = uid;
+    order->c.trader.id_only = tid;
     order->c.giveup.id_only = gid;
     order->c.contr.id_only = cid;
     order->c.settl_day = settl_day;
@@ -206,7 +206,7 @@ create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& trader, DbrRec&
 }
 
 shared_ptr<DbrExec>
-create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
+create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden gid,
              DbrIden cid, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now)
@@ -219,7 +219,7 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
 
     ptr->id = id;
     ptr->order = order;
-    ptr->c.trader.id_only = uid;
+    ptr->c.trader.id_only = tid;
     ptr->c.giveup.id_only = gid;
     ptr->c.contr.id_only = cid;
     ptr->c.settl_day = settl_day;

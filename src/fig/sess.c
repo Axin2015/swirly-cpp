@@ -62,7 +62,7 @@ decref(struct DbrSess* sess, DbrKey key)
 }
 
 DBR_API DbrAccnt
-dbr_sess_trader_entry(struct DbrRbNode* node)
+dbr_sess_accnt_entry(struct DbrRbNode* node)
 {
     return dbr_implof(struct FigAccnt, sess_node_, node);
 }
@@ -77,7 +77,7 @@ dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
     sess->pool = pool;
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->traders);
+    dbr_tree_init(&sess->accnts);
     sess->marker_ = 0;
     dbr_slnode_init(&sess->uuid_node_);
 }
@@ -99,31 +99,31 @@ dbr_sess_reset(struct DbrSess* sess)
     dbr_sess_term(sess);
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->traders);
+    dbr_tree_init(&sess->accnts);
     sess->marker_ = 0;
     dbr_slnode_init(&sess->uuid_node_);
 }
 
 DBR_API DbrBool
-dbr_sess_logon(struct DbrSess* sess, DbrAccnt trader)
+dbr_sess_logon(struct DbrSess* sess, DbrAccnt accnt)
 {
-    if (trader->sess) {
-        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", trader->rec->mnem);
+    if (accnt->sess) {
+        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", accnt->rec->mnem);
         goto fail1;
     }
 
-    if (incref(sess, trader->rec->id) < 0)
+    if (incref(sess, accnt->rec->id) < 0)
         goto fail1;
 
-    struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+    struct DbrRbNode* node = dbr_accnt_first_giveup(accnt);
     for (; node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
         struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
         if (incref(sess, perm->giveup.rec->id) < 0)
             goto fail2;
     }
 
-    trader->sess = sess;
-    dbr_tree_insert(&sess->traders, trader->rec->id, &trader->sess_node_);
+    accnt->sess = sess;
+    dbr_tree_insert(&sess->accnts, accnt->rec->id, &accnt->sess_node_);
     return DBR_TRUE;
  fail2:
     // Rollback subs.
@@ -132,32 +132,32 @@ dbr_sess_logon(struct DbrSess* sess, DbrAccnt trader)
         struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
         decref(sess, perm->giveup.rec->id);
     }
-    decref(sess, trader->rec->id);
+    decref(sess, accnt->rec->id);
  fail1:
     return DBR_FALSE;
 }
 
 DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrAccnt trader)
+dbr_sess_logoff(struct DbrSess* sess, DbrAccnt accnt)
 {
-    dbr_tree_remove(&sess->traders, &trader->sess_node_);
-    trader->sess = NULL;
+    dbr_tree_remove(&sess->accnts, &accnt->sess_node_);
+    accnt->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+    for (struct DbrRbNode* node = dbr_accnt_first_giveup(accnt);
          node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
         struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
         decref(sess, perm->giveup.rec->id);
     }
-    decref(sess, trader->rec->id);
+    decref(sess, accnt->rec->id);
 }
 
 DBR_API void
-dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt trader)
+dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt accnt)
 {
-    dbr_tree_remove(&sess->traders, &trader->sess_node_);
-    trader->sess = NULL;
+    dbr_tree_remove(&sess->accnts, &accnt->sess_node_);
+    accnt->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_accnt_first_giveup(trader);
+    for (struct DbrRbNode* node = dbr_accnt_first_giveup(accnt);
          node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
         struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
         if (decref(sess, perm->giveup.rec->id) == 0) {
@@ -166,9 +166,9 @@ dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt trader)
                 fig_accnt_reset_giveup(giveup);
         }
     }
-    if (decref(sess, trader->rec->id) == 0)
-        fig_accnt_reset_giveup(trader);
-    fig_accnt_reset_trader(trader);
+    if (decref(sess, accnt->rec->id) == 0)
+        fig_accnt_reset_giveup(accnt);
+    fig_accnt_reset_trader(accnt);
 }
 
 DBR_API int

@@ -414,17 +414,17 @@ public:
         return Accnt{accnt};
     }
     DbrIden
-    logon(DbrAccnt trader)
+    logon(DbrAccnt accnt)
     {
-        DbrIden req_id = dbr_clnt_logon(impl_, trader);
+        DbrIden req_id = dbr_clnt_logon(impl_, accnt);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    logoff(DbrAccnt trader)
+    logoff(DbrAccnt accnt)
     {
-        DbrIden req_id = dbr_clnt_logoff(impl_, trader);
+        DbrIden req_id = dbr_clnt_logoff(impl_, accnt);
         if (req_id < 0)
             throw_exception();
         return req_id;
@@ -577,17 +577,17 @@ public:
         return Accnt{accnt};
     }
     DbrIden
-    logon(DbrAccnt trader)
+    logon(DbrAccnt accnt)
     {
-        DbrIden req_id = dbr_clnt_logon(impl_, trader);
+        DbrIden req_id = dbr_clnt_logon(impl_, accnt);
         if (req_id < 0)
             throw_exception();
         return req_id;
     }
     DbrIden
-    logoff(DbrAccnt trader)
+    logoff(DbrAccnt accnt)
     {
-        DbrIden req_id = dbr_clnt_logoff(impl_, trader);
+        DbrIden req_id = dbr_clnt_logoff(impl_, accnt);
         if (req_id < 0)
             throw_exception();
         return req_id;

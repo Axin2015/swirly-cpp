@@ -75,10 +75,10 @@ struct DbrBody {
             int hbint;
         } sess_open;
         struct {
-            DbrIden uid;
+            DbrIden aid;
         } sess_logon;
         struct {
-            DbrIden uid;
+            DbrIden aid;
         } sess_logoff;
         // Reply.
         struct {
@@ -118,7 +118,7 @@ struct DbrBody {
             int type;
         } sess_entity_req;
         struct {
-            DbrIden uid;
+            DbrIden tid;
             DbrIden gid;
             DbrIden cid;
             DbrJd settl_day;
@@ -129,25 +129,25 @@ struct DbrBody {
             DbrLots min_lots;
         } place_order_req;
         struct {
-            DbrIden uid;
+            DbrIden tid;
             DbrIden id;
             DbrLots lots;
         } revise_order_id_req;
         struct {
-            DbrIden uid;
+            DbrIden tid;
             DbrRef ref;
             DbrLots lots;
         } revise_order_ref_req;
         struct {
-            DbrIden uid;
+            DbrIden tid;
             DbrIden id;
         } cancel_order_id_req;
         struct {
-            DbrIden uid;
+            DbrIden tid;
             DbrRef ref;
         } cancel_order_ref_req;
         struct {
-            DbrIden uid;
+            DbrIden tid;
             DbrIden id;
         } ack_trade_req;
         struct {

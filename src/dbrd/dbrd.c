@@ -512,9 +512,9 @@ sess_close(struct DbrSess* sess, DbrIden req_id)
     dbr_prioq_remove(&prioq, sess_to_hbtmr(sess));
     dbr_prioq_remove(&prioq, sess_to_trtmr(sess));
 
-    for (struct DbrRbNode* node = dbr_sess_first_trader(sess);
-         node != DBR_SESS_END_TRADER; node = dbr_rbnode_next(node)) {
-        DbrAccnt trader = dbr_sess_trader_entry(node);
+    for (struct DbrRbNode* node = dbr_sess_first_accnt(sess);
+         node != DBR_SESS_END_ACCNT; node = dbr_rbnode_next(node)) {
+        DbrAccnt trader = dbr_sess_accnt_entry(node);
         dbr_sess_logoff(sess, trader);
         // TODO: implicit logoff?
     }
@@ -528,22 +528,22 @@ sess_logon(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->sess_logon.uid;
-    DbrAccnt trader = get_accnt(uid);
-    if (!trader || !dbr_sess_logon(sess, trader)) {
+    const DbrIden aid = req->sess_logon.aid;
+    DbrAccnt accnt = get_accnt(aid);
+    if (!accnt || !dbr_sess_logon(sess, accnt)) {
         status_err(&rep, req_id);
         goto fail1;
     }
 
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGON;
-    rep.sess_logon.uid = uid;
+    rep.sess_logon.aid = aid;
     return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
-        && sess_trader(sess, 0, trader)
-        && sess_giveup(sess, 0, trader)
-        && sess_order(sess, 0, trader)
-        && sess_exec(sess, 0, trader)
-        && sess_posn(sess, 0, trader);
+        && sess_trader(sess, 0, accnt)
+        && sess_giveup(sess, 0, accnt)
+        && sess_order(sess, 0, accnt)
+        && sess_exec(sess, 0, accnt)
+        && sess_posn(sess, 0, accnt);
  fail1:
     if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
         dbr_err_perror("dbr_send_msg() failed");
@@ -556,17 +556,17 @@ sess_logoff(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->sess_logoff.uid;
-    DbrAccnt trader = get_accnt(uid);
-    if (!trader) {
+    const DbrIden aid = req->sess_logoff.aid;
+    DbrAccnt accnt = get_accnt(aid);
+    if (!accnt) {
         status_err(&rep, req_id);
         goto fail1;
     }
-    dbr_sess_logoff(sess, trader);
+    dbr_sess_logoff(sess, accnt);
 
     rep.req_id = req_id;
     rep.type = DBR_SESS_LOGOFF;
-    rep.sess_logoff.uid = uid;
+    rep.sess_logoff.aid = aid;
     return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE);
  fail1:
     if (!dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE))
@@ -580,8 +580,8 @@ place_order(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->place_order_req.uid;
-    DbrAccnt trader = get_accnt(uid);
+    const DbrIden tid = req->place_order_req.tid;
+    DbrAccnt trader = get_accnt(tid);
     if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
@@ -634,8 +634,8 @@ revise_order_id(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->revise_order_id_req.uid;
-    DbrAccnt trader = get_accnt(uid);
+    const DbrIden tid = req->revise_order_id_req.tid;
+    DbrAccnt trader = get_accnt(tid);
     if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
@@ -661,8 +661,8 @@ revise_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->revise_order_ref_req.uid;
-    DbrAccnt trader = get_accnt(uid);
+    const DbrIden tid = req->revise_order_ref_req.tid;
+    DbrAccnt trader = get_accnt(tid);
     if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
@@ -688,8 +688,8 @@ cancel_order_id(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->cancel_order_id_req.uid;
-    DbrAccnt trader = get_accnt(uid);
+    const DbrIden tid = req->cancel_order_id_req.tid;
+    DbrAccnt trader = get_accnt(tid);
     if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
@@ -714,8 +714,8 @@ cancel_order_ref(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->cancel_order_ref_req.uid;
-    DbrAccnt trader = get_accnt(uid);
+    const DbrIden tid = req->cancel_order_ref_req.tid;
+    DbrAccnt trader = get_accnt(tid);
     if (!trader) {
         status_err(&rep, req_id);
         goto fail1;
@@ -740,8 +740,8 @@ ack_trade(struct DbrSess* sess, const struct DbrBody* req)
     struct DbrBody rep;
 
     const DbrIden req_id = req->req_id;
-    const DbrIden uid = req->ack_trade_req.uid;
-    DbrAccnt trader = get_accnt(uid);
+    const DbrIden tid = req->ack_trade_req.tid;
+    DbrAccnt trader = get_accnt(tid);
     if (!trader) {
         status_err(&rep, req_id);
         goto fail1;

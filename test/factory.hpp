@@ -37,7 +37,7 @@ create_contr(dbr::Pool& pool, DbrIden id, const char* mnem, const char* display,
              DbrLots max_lots);
 
 std::shared_ptr<DbrPerm>
-create_perm(dbr::Pool& pool, DbrIden uid, DbrIden gid);
+create_perm(dbr::Pool& pool, DbrIden tid, DbrIden gid);
 
 std::shared_ptr<DbrOrder>
 create_order(dbr::Pool& pool, DbrIden id, DbrRec& trader, DbrRec& giveup, DbrRec& contr,
@@ -45,7 +45,7 @@ create_order(dbr::Pool& pool, DbrIden id, DbrRec& trader, DbrRec& giveup, DbrRec
              DbrLots min_lots, DbrMillis now);
 
 std::shared_ptr<DbrOrder>
-create_order(dbr::Pool& pool, DbrIden id, DbrIden uid, DbrIden gid, DbrIden cid,
+create_order(dbr::Pool& pool, DbrIden id, DbrIden tid, DbrIden gid, DbrIden cid,
              DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
              DbrLots min_lots, DbrMillis now);
 
@@ -56,7 +56,7 @@ create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& trader, DbrRec&
              DbrIden match, int role, DbrRec& cpty, DbrMillis now);
 
 std::shared_ptr<DbrExec>
-create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrIden uid, DbrIden gid,
+create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden gid,
              DbrIden cid, DbrJd settl_day, const char* ref, int action, DbrTicks ticks,
              DbrLots lots, DbrLots resd, DbrLots exec, DbrTicks last_ticks, DbrLots last_lots,
              DbrIden match, int role, DbrIden cpty, DbrMillis now);

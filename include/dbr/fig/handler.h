@@ -47,10 +47,10 @@ struct DbrHandlerVtbl {
     (*on_ready)(DbrHandler handler, DbrClnt clnt);
 
     void
-    (*on_logon)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid);
+    (*on_logon)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid);
 
     void
-    (*on_logoff)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid);
+    (*on_logoff)(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid);
 
     void
     (*on_reset)(DbrHandler handler, DbrClnt clnt);
@@ -90,15 +90,15 @@ dbr_handler_on_ready(DbrHandler handler, DbrClnt clnt)
 }
 
 static inline void
-dbr_handler_on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
+dbr_handler_on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid)
 {
-    handler->vtbl->on_logon(handler, clnt, req_id, uid);
+    handler->vtbl->on_logon(handler, clnt, req_id, aid);
 }
 
 static inline void
-dbr_handler_on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid)
+dbr_handler_on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid)
 {
-    handler->vtbl->on_logoff(handler, clnt, req_id, uid);
+    handler->vtbl->on_logoff(handler, clnt, req_id, aid);
 }
 
 static inline void

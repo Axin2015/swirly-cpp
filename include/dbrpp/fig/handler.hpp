@@ -42,14 +42,14 @@ class IHandler : public DbrIHandler {
         static_cast<DerivedT*>(handler)->on_ready(ClntRef(clnt));
     }
     static void
-    on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logon(ClntRef(clnt), req_id, uid);
+        static_cast<DerivedT*>(handler)->on_logon(ClntRef(clnt), req_id, aid);
     }
     static void
-    on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
+    on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid) noexcept
     {
-        static_cast<DerivedT*>(handler)->on_logoff(ClntRef(clnt), req_id, uid);
+        static_cast<DerivedT*>(handler)->on_logoff(ClntRef(clnt), req_id, aid);
     }
     static void
     on_reset(DbrHandler handler, DbrClnt clnt) noexcept
@@ -134,15 +134,15 @@ on_ready(DbrHandler handler, DbrClnt clnt) noexcept
 }
 
 inline void
-on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
+on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid) noexcept
 {
-    handler->vtbl->on_logon(handler, clnt, req_id, uid);
+    handler->vtbl->on_logon(handler, clnt, req_id, aid);
 }
 
 inline void
-on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden uid) noexcept
+on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid) noexcept
 {
-    handler->vtbl->on_logoff(handler, clnt, req_id, uid);
+    handler->vtbl->on_logoff(handler, clnt, req_id, aid);
 }
 
 inline void

@@ -410,15 +410,15 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 goto done;
             case DBR_SESS_LOGON:
                 dbr_log_debug1("logon message");
-                dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.uid));
-                dbr_handler_on_logon(handler, clnt, body.req_id, body.sess_logon.uid);
+                dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.aid));
+                dbr_handler_on_logon(handler, clnt, body.req_id, body.sess_logon.aid);
                 break;
             case DBR_SESS_LOGOFF:
                 dbr_log_debug1("logoff message");
-                dbr_handler_on_logoff(handler, clnt, body.req_id, body.sess_logoff.uid);
+                dbr_handler_on_logoff(handler, clnt, body.req_id, body.sess_logoff.aid);
                 {
-                    DbrAccnt trader = get_accnt(clnt, body.sess_logoff.uid);
-                    dbr_sess_logoff_and_reset(&clnt->sess, trader);
+                    DbrAccnt accnt = get_accnt(clnt, body.sess_logoff.aid);
+                    dbr_sess_logoff_and_reset(&clnt->sess, accnt);
                 }
                 break;
             case DBR_SESS_HEARTBT:

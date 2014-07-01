@@ -38,18 +38,18 @@ namespace dbr {
  * @{
  */
 
-class SessTraders {
+class SessAccnts {
     struct Policy : NodeTraits<DbrRbNode> {
         typedef FigAccnt Entry;
         static Entry*
         entry(Node* node)
         {
-            return dbr_sess_trader_entry(node);
+            return dbr_sess_accnt_entry(node);
         }
         static const Entry*
         entry(const Node* node)
         {
-            return dbr_sess_trader_entry(const_cast<Node*>(node));
+            return dbr_sess_accnt_entry(const_cast<Node*>(node));
         }
     };
     DbrSess* sess_;
@@ -86,12 +86,12 @@ public:
     typedef SizeType size_type;
 
     explicit
-    SessTraders(DbrSess& sess) noexcept
+    SessAccnts(DbrSess& sess) noexcept
         : sess_{&sess}
     {
     }
     void
-    swap(SessTraders& rhs) noexcept
+    swap(SessAccnts& rhs) noexcept
     {
         std::swap(sess_, rhs.sess_);
     }
@@ -101,22 +101,22 @@ public:
     Iterator
     begin() noexcept
     {
-        return dbr_sess_first_trader(sess_);
+        return dbr_sess_first_accnt(sess_);
     }
     ConstIterator
     begin() const noexcept
     {
-        return dbr_sess_first_trader(sess_);
+        return dbr_sess_first_accnt(sess_);
     }
     Iterator
     end() noexcept
     {
-        return DBR_SESS_END_TRADER;
+        return DBR_SESS_END_ACCNT;
     }
     ConstIterator
     end() const noexcept
     {
-        return DBR_SESS_END_TRADER;
+        return DBR_SESS_END_ACCNT;
     }
 
     // ReverseIterator.
@@ -124,22 +124,22 @@ public:
     ReverseIterator
     rbegin() noexcept
     {
-        return dbr_sess_last_trader(sess_);
+        return dbr_sess_last_accnt(sess_);
     }
     ConstReverseIterator
     rbegin() const noexcept
     {
-        return dbr_sess_last_trader(sess_);
+        return dbr_sess_last_accnt(sess_);
     }
     ReverseIterator
     rend() noexcept
     {
-        return DBR_SESS_END_TRADER;
+        return DBR_SESS_END_ACCNT;
     }
     ConstReverseIterator
     rend() const noexcept
     {
-        return DBR_SESS_END_TRADER;
+        return DBR_SESS_END_ACCNT;
     }
 
     // Find.
@@ -147,12 +147,12 @@ public:
     Iterator
     find(DbrTicks ticks) noexcept
     {
-        return dbr_sess_find_trader(sess_, ticks);
+        return dbr_sess_find_accnt(sess_, ticks);
     }
     ConstIterator
     find(DbrTicks ticks) const noexcept
     {
-        return dbr_sess_find_trader(sess_, ticks);
+        return dbr_sess_find_accnt(sess_, ticks);
     }
 
     // Accessor.
@@ -190,7 +190,7 @@ public:
     bool
     empty() const noexcept
     {
-        return dbr_sess_empty_trader(sess_);
+        return dbr_sess_empty_accnt(sess_);
     }
 };
 
@@ -227,10 +227,10 @@ public:
     {
         return impl_.uuid;
     }
-    SessTraders
-    traders() const noexcept
+    SessAccnts
+    accnts() const noexcept
     {
-        return SessTraders{impl_};
+        return SessAccnts{impl_};
     }
 };
 
@@ -265,29 +265,29 @@ public:
         return impl_->uuid;
     }
     DbrBool
-    logon(DbrAccnt trader)
+    logon(DbrAccnt accnt)
     {
-        return dbr_sess_logon(impl_, trader);
+        return dbr_sess_logon(impl_, accnt);
     }
     void
-    logoff(DbrAccnt trader)
+    logoff(DbrAccnt accnt)
     {
-        return dbr_sess_logoff(impl_, trader);
+        return dbr_sess_logoff(impl_, accnt);
     }
     void
-    logoff_and_reset(DbrAccnt trader)
+    logoff_and_reset(DbrAccnt accnt)
     {
-        return dbr_sess_logoff_and_reset(impl_, trader);
+        return dbr_sess_logoff_and_reset(impl_, accnt);
     }
     int
-    subs(DbrAccnt trader) const noexcept
+    subs(DbrAccnt accnt) const noexcept
     {
-        return dbr_sess_subs(impl_, trader);
+        return dbr_sess_subs(impl_, accnt);
     }
-    SessTraders
-    traders() const noexcept
+    SessAccnts
+    accnts() const noexcept
     {
-        return SessTraders{*impl_};
+        return SessAccnts{*impl_};
     }
 };
 

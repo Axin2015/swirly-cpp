@@ -129,10 +129,10 @@ read_contr(DbrPool pool, DbrSlNode*& first)
 }
 
 void
-set_perm(DbrPerm& perm, DbrIden gid, DbrIden uid)
+set_perm(DbrPerm& perm, DbrIden gid, DbrIden tid)
 {
     perm.giveup.id_only = gid;
-    perm.trader.id_only = uid;
+    perm.trader.id_only = tid;
 }
 
 ssize_t
