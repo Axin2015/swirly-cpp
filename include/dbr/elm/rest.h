@@ -51,7 +51,7 @@ enum DbrResrc {
     DBR_RESRC_ORDER   =  7 << 16,
     DBR_RESRC_TRADE   =  8 << 16,
     DBR_RESRC_POSN    =  9 << 16,
-    DBR_RESRC_MARKET  = 10 << 16
+    DBR_RESRC_VIEW    = 10 << 16
 };
 
 enum DbrParam {

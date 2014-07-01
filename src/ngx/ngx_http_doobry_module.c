@@ -871,7 +871,7 @@ ngx_http_doobry_posn_with_accnt(ngx_http_doobry_task_t* t)
 }
 
 static int
-ngx_http_doobry_get_market(DbrHandler handler, DbrClnt clnt, void* arg)
+ngx_http_doobry_get_view(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
 
@@ -910,7 +910,7 @@ ngx_http_doobry_get_market(DbrHandler handler, DbrClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_doobry_market(ngx_http_doobry_task_t* t)
+ngx_http_doobry_view(ngx_http_doobry_task_t* t)
 {
     ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(t->request);
 
@@ -918,7 +918,7 @@ ngx_http_doobry_market(ngx_http_doobry_task_t* t)
     switch (dbr_rest_get_method(&t->rest)) {
     case DBR_METHOD_GET:
     case DBR_METHOD_HEAD:
-        rc = dbr_task_call(lcf->async, ngx_http_doobry_get_market, t);
+        rc = dbr_task_call(lcf->async, ngx_http_doobry_get_view, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -928,13 +928,13 @@ ngx_http_doobry_market(ngx_http_doobry_task_t* t)
 }
 
 static int
-ngx_http_doobry_get_market_with_contr(DbrHandler handler, DbrClnt clnt, void* arg)
+ngx_http_doobry_get_view_with_contr(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     return NGX_HTTP_NO_CONTENT;
 }
 
 static ngx_int_t
-ngx_http_doobry_market_with_contr(ngx_http_doobry_task_t* t)
+ngx_http_doobry_view_with_contr(ngx_http_doobry_task_t* t)
 {
     ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(t->request);
 
@@ -942,7 +942,7 @@ ngx_http_doobry_market_with_contr(ngx_http_doobry_task_t* t)
     switch (dbr_rest_get_method(&t->rest)) {
     case DBR_METHOD_GET:
     case DBR_METHOD_HEAD:
-        rc = dbr_task_call(lcf->async, ngx_http_doobry_get_market_with_contr, t);
+        rc = dbr_task_call(lcf->async, ngx_http_doobry_get_view_with_contr, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -1009,11 +1009,11 @@ ngx_http_doobry_handler(ngx_http_request_t* r)
     case DBR_RESRC_POSN | DBR_PARAM_ACCNT:
         rc = ngx_http_doobry_posn_with_accnt(&t);
         break;
-    case DBR_RESRC_MARKET:
-        rc = ngx_http_doobry_market(&t);
+    case DBR_RESRC_VIEW:
+        rc = ngx_http_doobry_view(&t);
         break;
-    case DBR_RESRC_MARKET | DBR_PARAM_CONTR:
-        rc = ngx_http_doobry_market_with_contr(&t);
+    case DBR_RESRC_VIEW | DBR_PARAM_CONTR:
+        rc = ngx_http_doobry_view_with_contr(&t);
         break;
     default:
         ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "unsupported fields");

@@ -108,10 +108,10 @@ main(int argc, char* argv[])
             case DBR_METHOD_GET | DBR_RESRC_POSN | DBR_PARAM_ACCNT:
                 cout << "get posn: accnt=" << rest.accnt() << endl;
                 break;
-            case DBR_METHOD_GET | DBR_RESRC_MARKET:
+            case DBR_METHOD_GET | DBR_RESRC_VIEW:
                 cout << "get view:" << endl;
                 break;
-            case DBR_METHOD_GET | DBR_RESRC_MARKET | DBR_PARAM_CONTR:
+            case DBR_METHOD_GET | DBR_RESRC_VIEW | DBR_PARAM_CONTR:
                 cout << "get depth: contr=" << rest.contr() << endl;
                 break;
             default:

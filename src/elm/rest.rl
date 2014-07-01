@@ -169,8 +169,8 @@ fnum(const struct DbrRest* rest)
     action posn_resrc {
         dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
-    action market_resrc {
-        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
+    action view_resrc {
+        dbr_rest_set_resrc(rest, DBR_RESRC_VIEW);
     }
     resrc  =  '"logon"'i %logon_resrc
             | '"logoff"'i %logoff_resrc
@@ -181,7 +181,7 @@ fnum(const struct DbrRest* rest)
             | '"order"'i %order_resrc
             | '"trade"'i %trade_resrc
             | '"posn"'i %posn_resrc
-            | '"market"'i %market_resrc;
+            | '"view"'i %view_resrc;
 
     action buy_action {
         rest->action = DBR_ACTION_BUY;
@@ -462,8 +462,8 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
     action posn_resrc {
         dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
     }
-    action market_resrc {
-        dbr_rest_set_resrc(rest, DBR_RESRC_MARKET);
+    action view_resrc {
+        dbr_rest_set_resrc(rest, DBR_RESRC_VIEW);
     }
 
     resrc =  'logon' %logon_resrc
@@ -475,7 +475,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
            | ('order' req_accnt opt_id) %order_resrc
            | ('trade' req_accnt opt_id) %trade_resrc
            | ('posn' req_accnt) %posn_resrc
-           | ('market' opt_contr) %market_resrc;
+           | ('view' opt_contr) %view_resrc;
 
     action begin_resrc {
         if ((rest->fields & DBR_RESRC_MASK) != 0) {
