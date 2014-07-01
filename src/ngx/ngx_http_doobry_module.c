@@ -329,7 +329,28 @@ ngx_http_doobry_accnt(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_get_accnt_with_accnt(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+
+    struct DbrSlNode* node = dbr_clnt_find_rec_mnem(clnt, DBR_ENTITY_ACCNT, t->rest.accnt);
+    if (node == DBR_CLNT_END_REC)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRec* arec = dbr_clnt_rec_entry(node);
+    const size_t len = dbr_json_accnt_len(arec);
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    b->last = (u_char*)dbr_json_write_accnt((char*)b->last, arec);
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -411,7 +432,28 @@ ngx_http_doobry_contr(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_get_contr_with_contr(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+
+    struct DbrSlNode* node = dbr_clnt_find_rec_mnem(clnt, DBR_ENTITY_CONTR, t->rest.contr);
+    if (node == DBR_CLNT_END_REC)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRec* arec = dbr_clnt_rec_entry(node);
+    const size_t len = dbr_json_contr_len(arec);
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    b->last = (u_char*)dbr_json_write_contr((char*)b->last, arec);
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -615,7 +657,31 @@ ngx_http_doobry_order_with_accnt(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_get_order_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRbNode* node = dbr_accnt_find_order_id(accnt, t->rest.id);
+    if (node == DBR_ACCNT_END_ORDER)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrOrder* order = dbr_accnt_order_entry(node);
+    const size_t len = dbr_json_order_len(order);
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    b->last = (u_char*)dbr_json_write_order((char*)b->last, order);
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -699,7 +765,31 @@ ngx_http_doobry_trade_with_accnt(ngx_http_doobry_task_t* t)
 static int
 ngx_http_doobry_get_trade_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NO_CONTENT;
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrRbNode* node = dbr_accnt_find_trade_id(accnt, t->rest.id);
+    if (node == DBR_ACCNT_END_TRADE)
+        return NGX_HTTP_NOT_FOUND;
+
+    struct DbrExec* trade = dbr_accnt_trade_entry(node);
+    const size_t len = dbr_json_exec_len(trade);
+
+    t->len = len;
+    if (dbr_rest_get_method(&t->rest) == DBR_METHOD_HEAD)
+        return NGX_OK;
+
+    ngx_buf_t* b = ngx_create_temp_buf(t->request->pool, len + 1);
+    if (!b)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    b->last = (u_char*)dbr_json_write_exec((char*)b->last, trade);
+
+    b->last_buf = 1;
+    t->buf = b;
+    return NGX_OK;
 }
 
 static ngx_int_t
@@ -937,17 +1027,15 @@ ngx_http_doobry_handler(ngx_http_request_t* r)
         return rc;
 
     rc = ngx_http_doobry_send_header(r, t.len);
-    if (rc == NGX_ERROR || rc > NGX_OK || r->header_only) {
-        ngx_pfree(r->pool, t.buf->start);
-        ngx_pfree(r->pool, t.buf);
-    }
-
     if (t.buf) {
 
-        ngx_chain_t out;
-        out.buf = t.buf;
-        out.next = NULL;
+        if (rc != NGX_OK) {
+            ngx_pfree(r->pool, t.buf->start);
+            ngx_pfree(r->pool, t.buf);
+            return rc;
+        }
 
+        ngx_chain_t out = { .buf = t.buf, .next = NULL };
         rc = ngx_http_output_filter(r, &out);
         if (rc != NGX_OK) {
             ngx_pfree(r->pool, t.buf->start);
