@@ -714,19 +714,51 @@ ngx_http_doobry_get_order_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, vo
     return NGX_OK;
 }
 
+static int
+ngx_http_doobry_put_order_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, void* arg)
+{
+    return NGX_HTTP_NOT_FOUND;
+}
+
 static void
 ngx_http_doobry_order_with_accnt_and_id_handler(ngx_http_request_t* r)
 {
     ngx_http_doobry_task_t* t;
     ngx_int_t rc = ngx_http_doobry_parse_body(r, &t);
-    if (rc != NGX_OK) {
-        ngx_http_finalize_request(r, rc);
-        return;
+    if (rc != NGX_OK)
+        goto done;
+
+    if (t->rest.fields != (DBR_METHOD_PUT | DBR_RESRC_ORDER | DBR_PARAM_ACCNT | DBR_PARAM_ID
+                           | DBR_PARAM_LOTS)) {
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "unsupported fields");
+        // The request cannot be fulfilled due to bad syntax.
+        rc = NGX_HTTP_BAD_REQUEST;
+        goto done;
     }
 
-    // TODO.
+    ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(t->request);
+    rc = dbr_task_call(lcf->async, ngx_http_doobry_put_order_with_accnt_and_id, t);
+    if (rc != NGX_OK)
+        goto done;
 
-    ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
+    rc = ngx_http_doobry_send_header(r, t->len);
+    if (t->buf) {
+
+        if (rc != NGX_OK) {
+            ngx_pfree(r->pool, t->buf->start);
+            ngx_pfree(r->pool, t->buf);
+            goto done;
+        }
+
+        ngx_chain_t out = { .buf = t->buf, .next = NULL };
+        rc = ngx_http_output_filter(r, &out);
+        if (rc != NGX_OK) {
+            ngx_pfree(r->pool, t->buf->start);
+            ngx_pfree(r->pool, t->buf);
+        }
+    }
+ done:
+    ngx_http_finalize_request(r, rc);
 }
 
 static ngx_int_t
