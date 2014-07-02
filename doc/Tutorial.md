@@ -51,19 +51,19 @@ Order
 
 Use the `buy` command to buy 10 lots:
 
-    dbrsh> buy 1.2344 10
+    dbrsh> buy 10 1.2344
     Jun 19 06:27:51.201 INFO  exec received
     Jun 19 06:27:52.036 INFO  view received
 
 Place a second order at the next price level:
 
-    dbrsh> buy 1.2343 20
+    dbrsh> buy 20 1.2343
     Jun 19 06:29:56.126 INFO  exec received
     Jun 19 06:29:58.001 INFO  view received
 
 Then `sell` to create the opposing side of the market:
 
-    brsh> sell 1.2346 15
+    brsh> sell 15 1.2346
     Jun 19 06:32:59.280 INFO  exec received
     Jun 19 06:33:00.000 INFO  view received
 
@@ -100,7 +100,7 @@ Trade
 
 Now cross the spread to create a trade:
 
-    brsh> sell 1.2344 5
+    brsh> sell 5 1.2344
     Jun 19 06:39:26.368 INFO  exec received
     Jun 19 06:39:26.368 INFO  exec received
     Jun 19 06:39:26.368 INFO  exec received

@@ -840,8 +840,8 @@ public:
         const string gmnem = get("giveup");
         const string cmnem = get("contr");
         const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
-        const auto price = ston<double>((*begin++).c_str());
         const auto lots = ston<DbrLots>((*begin++).c_str());
+        const auto price = ston<double>((*begin++).c_str());
         call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
                 auto trec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
@@ -857,8 +857,8 @@ public:
         const string gmnem = get("giveup");
         const string cmnem = get("contr");
         const auto settl_day = dbr_iso_to_jd(ston<DbrIsoDate>(get("settl_date").c_str()));
-        const auto price = ston<double>((*begin++).c_str());
         const auto lots = ston<DbrLots>((*begin++).c_str());
+        const auto price = ston<double>((*begin++).c_str());
         call(async, [umnem, gmnem, cmnem, settl_day, price, lots](ClntRef clnt) {
                 auto trec = get_arec(clnt, umnem.c_str());
                 auto grec = get_arec(clnt, gmnem.c_str());
