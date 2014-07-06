@@ -242,7 +242,7 @@ ngx_http_doobry_get_logon(DbrHandler handler, DbrClnt clnt, void* arg)
         return NGX_HTTP_NOT_FOUND;
 
     dbr_clnt_logon(clnt, accnt);
-    return NGX_HTTP_ACCEPTED;
+    return NGX_HTTP_NO_CONTENT;
 }
 
 static ngx_int_t
@@ -275,7 +275,7 @@ ngx_http_doobry_get_logoff(DbrHandler handler, DbrClnt clnt, void* arg)
         return NGX_HTTP_NOT_FOUND;
 
     dbr_clnt_logoff(clnt, accnt);
-    return NGX_HTTP_ACCEPTED;
+    return NGX_HTTP_NO_CONTENT;
 }
 
 static ngx_int_t
