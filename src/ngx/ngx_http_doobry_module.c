@@ -1087,7 +1087,7 @@ ngx_http_doobry_view_with_contr(ngx_http_doobry_task_t* t)
 static ngx_int_t
 ngx_http_doobry_handler(ngx_http_request_t* r)
 {
-    ngx_log_debug2(NGX_LOG_INFO, r->connection->log, 0, "uri: %*s",
+    ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "uri: %*s",
                    r->uri_end - r->uri_start, r->uri_start);
 
     ngx_int_t rc;
@@ -1213,10 +1213,6 @@ ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
 {
     dbr_log_setlogger(ngx_http_doobry_log);
 
-    // Install doobry handler.
-    ngx_http_core_loc_conf_t* clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-    clcf->handler = ngx_http_doobry_handler;
-
     ngx_http_doobry_loc_conf_t* pcf = prev;
     ngx_http_doobry_loc_conf_t* lcf = conf;
 
@@ -1226,6 +1222,11 @@ ngx_http_doobry_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
     ngx_conf_merge_uint_value(lcf->capacity, pcf->capacity, 8 * 1024 * 1024);
 
     if (lcf->doobry) {
+
+        // Install doobry handler.
+        ngx_http_core_loc_conf_t* clcf
+            = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
+        clcf->handler = ngx_http_doobry_handler;
 
         // Null terminate strings.
 
