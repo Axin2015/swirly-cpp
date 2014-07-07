@@ -95,7 +95,11 @@ function postRequest(path, data, fn) {
         method: 'POST',
         hostname: 'localhost',
         port: 8080,
-        path: path
+        path: path,
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length
+        }
     };
     var req = http.request(options, fn);
     req.write(data);
@@ -120,12 +124,12 @@ function Model(trader, giveup) {
 
     var getAndSetOrder = function() {
         getRequest('/api/order/' + trader, function(res) {
+            console.log('get order status: ' + res.statusCode);
             var body = '';
             res.on('data', function(chunk) {
                 body += chunk;
             });
             res.on('end', function() {
-                console.log('order received');
                 that.order = JSON.parse(body);
             });
         }).on('error', function(e) {
@@ -135,12 +139,12 @@ function Model(trader, giveup) {
 
     var getAndSetTrade = function() {
         getRequest('/api/trade/' + trader, function(res) {
+            console.log('get trade status: ' + res.statusCode);
             var body = '';
             res.on('data', function(chunk) {
                 body += chunk;
             });
             res.on('end', function() {
-                console.log('trade received');
                 that.trade = JSON.parse(body);
             });
         }).on('error', function(e) {
@@ -150,12 +154,12 @@ function Model(trader, giveup) {
 
     var getAndSetPosn = function() {
         getRequest('/api/posn/' + giveup, function(res) {
+            console.log('get posn status: ' + res.statusCode);
             var body = '';
             res.on('data', function(chunk) {
                 body += chunk;
             });
             res.on('end', function() {
-                console.log('posn received');
                 that.posn = JSON.parse(body);
             });
         }).on('error', function(e) {
@@ -183,13 +187,17 @@ function Model(trader, giveup) {
 
     var getAndSetAccnt = function() {
         getRequest('/api/accnt', function(res) {
+            console.log('get accnt status: ' + res.statusCode);
             var body = '';
             res.on('data', function(chunk) {
                 body += chunk;
             });
             res.on('end', function() {
-                console.log('accnt received');
-                that.accnt = JSON.parse(body);
+                var dict = [];
+                each(JSON.parse(body), function(x) {
+                    dict[x.mnem] = x;
+                });
+                that.accnt = dict;
                 maybeRefresh();
             });
         }).on('error', function(e) {
@@ -199,12 +207,12 @@ function Model(trader, giveup) {
 
     var getAndSetContr = function() {
         getRequest('/api/contr', function(res) {
+            console.log('get contr status: ' + res.statusCode);
             var body = '';
             res.on('data', function(chunk) {
                 body += chunk;
             });
             res.on('end', function() {
-                console.log('contr received');
                 var dict = [];
                 each(JSON.parse(body), function(x) {
                     x.price_inc = priceInc(x);
@@ -221,13 +229,17 @@ function Model(trader, giveup) {
 
     var getAndSetView = function() {
         getRequest('/api/view', function(res) {
+            console.log('get view status: ' + res.statusCode);
             var body = '';
             res.on('data', function(chunk) {
                 body += chunk;
             });
             res.on('end', function() {
-                console.log('view received');
-                that.view = JSON.parse(body);
+                var dict = [];
+                each(JSON.parse(body), function(x) {
+                    dict[[x.contr, x.settl_date]] = x;
+                });
+                that.view = dict;
                 maybeRefresh();
             });
         }).on('error', function(e) {
@@ -236,7 +248,7 @@ function Model(trader, giveup) {
     };
 
     getRequest('/api/logon', function(res) {
-        console.log('logon complete: ' + res.statusCode);
+        console.log('get logon status: ' + res.statusCode);
         getAndSetAccnt();
         getAndSetContr();
         getAndSetView();
@@ -259,11 +271,15 @@ Model.prototype.placeOrder = function(contr, settl_date, ref, action, price, lot
         lots: new Number(lots),
         min_lots: new Number(min_lots)
     });
-    console.log(data);
+    postRequest('/api/order/' + this.trader, data, function(res) {
+        console.log('post order status: ' + res.statusCode);
+    }).on('error', function(e) {
+        console.log('error: ' + e.message);
+    });
 }
 
 var model = new Model('WRAMIREZ', 'DBRA');
 
 setInterval(function() {
-    model.placeOrder('EURUSD', 20140314, '', 'BUY', 1.2345, 10, 1);
+    model.placeOrder('EURUSD', 20140314, '', 'BUY', 1.2345, 10, 0);
 }, 2000);
