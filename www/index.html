@@ -1,11 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>Doobry</title>
-    <link rel="stylesheet" href="/css/doobry.css">
+    <meta charset="utf-8"/>
+    <title>Doobry Trader</title>
+	<link href="/css/jquery-ui-1.11.0.css" rel="stylesheet">
+	<link href="/css/doobry.css" rel="stylesheet">
+	<script src="/js/jquery-1.11.1.js"></script>
+	<script src="/js/jquery-ui-1.11.0.js"></script>
+    <script src="/js/doobry.js"></script>
+    <script>
+      $(documentReady);
+    </script>
   </head>
   <body>
-    <p>Welcome to Doobry!</p>
+    <div id="main">
+      <table class="ui-widget ui-widget-content">
+        <thead>
+          <tr class="ui-widget-header">
+            <th>contr</th>
+            <th>settl_date</th>
+            <th>bid_price</th>
+            <th>bid_lots</th>
+            <th>bid_count</th>
+            <th>offer_price</th>
+            <th>offer_lots</th>
+            <th>offer_count</th>
+            <th>action</th>
+          </tr>
+        </thead>
+	    <tbody id="view-tbody">
+	    </tbody>
+      </table>
+      <p>
+	    <label for="subscribe-view" class="ui-widget">View</label>
+	    <input type="text" id="subscribe-view" class="text ui-widget-content ui-corner-all"/>
+        <button id="subscribe-submit">Subscribe</button>
+        <button id="refresh-submit">Refresh</button>
+      </p>
+    </div>
+    <div id="sidebar" class="ui-dialog-content ui-widget-content ui-corner-all">
+    </div>
+    <div id="tabs">
+      <ul>
+        <li><a href="#order-tab">Order</a></li>
+        <li><a href="#trade-tab">Trade</a></li>
+        <li><a href="#posn-tab">Posn</a></li>
+      </ul>
+      <div id="order-tab">
+        <table class="ui-widget ui-widget-content">
+          <thead>
+            <tr class="ui-widget-header">
+              <th>id</th>
+              <th>user</th>
+              <th>group</th>
+              <th>contr</th>
+              <th>settl_date</th>
+              <th>ref</th>
+              <th>state</th>
+              <th>action</th>
+              <th>price</th>
+              <th>lots</th>
+              <th>resd</th>
+              <th>exc</th>
+              <th>last_price</th>
+              <th>last_lots</th>
+              <th>min_lots</th>
+              <th>created</th>
+              <th>modified</th>
+              <th>action</th>
+            </tr>
+          </thead>
+	      <tbody id="order-tbody">
+	      </tbody>
+        </table>
+        <button id="new-order-open">New Order...</button>
+      </div>
+      <div id="trade-tab">
+        <table class="ui-widget ui-widget-content">
+          <thead>
+            <tr class="ui-widget-header">
+              <th>id</th>
+              <th>order</th>
+              <th>user</th>
+              <th>group</th>
+              <th>contr</th>
+              <th>settl_date</th>
+              <th>ref</th>
+              <th>state</th>
+              <th>action</th>
+              <th>price</th>
+              <th>lots</th>
+              <th>resd</th>
+              <th>exc</th>
+              <th>last_price</th>
+              <th>last_lots</th>
+              <th>min_lots</th>
+              <th>match</th>
+              <th>role</th>
+              <th>cpty</th>
+              <th>created</th>
+              <th>action</th>
+            </tr>
+          </thead>
+	      <tbody id="trade-tbody">
+	      </tbody>
+        </table>
+      </div>
+      <div id="posn-tab">
+        <table class="ui-widget ui-widget-content">
+          <thead>
+            <tr class="ui-widget-header">
+              <th>group</th>
+              <th>contr</th>
+              <th>settl_date</th>
+              <th>buy_price</th>
+              <th>buy_lots</th>
+              <th>sell_price</th>
+              <th>sell_lots</th>
+            </tr>
+          </thead>
+	      <tbody id="posn-tbody">
+	      </tbody>
+        </table>
+      </div>
+    </div>
+    <div id="new-order-form" title="New Order" class="dbr-form">
+	  <form>
+	    <fieldset>
+		  <label for="new-order-contr">Contr</label>
+		  <input type="text" id="new-order-contr" class="text ui-widget-content ui-corner-all"/>
+		  <label for="new-order-price">Price</label>
+		  <input type="text" id="new-order-price" class="text ui-widget-content ui-corner-all"/>
+		  <label for="new-order-lots">Lots</label>
+		  <input type="text" id="new-order-lots" class="text ui-widget-content ui-corner-all"/>
+	    </fieldset>
+	  </form>
+    </div>
+    <div id="error-dialog" title="Error">
+	  <p><strong><span id="error-num"></span>:</strong>
+        <span id="error-msg"></span></p>
+    </div>
   </body>
 </html>
