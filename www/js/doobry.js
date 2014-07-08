@@ -84,6 +84,13 @@
             fn(k, arr[k]);
         }
     };
+    dbr.mapValue = function(arr, fn) {
+        var out = [];
+        for (var k in arr) {
+            out.push(fn(arr[k]));
+        }
+        return out;
+    }
     dbr.createRow = function() {
         var tr = document.createElement('tr');
         for (var i = 0; i < arguments.length; ++i) {
@@ -150,9 +157,12 @@ function Model(trader, giveup, pass, ready) {
         dbr.eachValue(that.views, that.enrichView.bind(that));
 
         var filter = dbr.getViewFilter();
+        console.log('view filter is ' + filter);
         dbr.eachValue(filter, function(k) {
-            if (k in model.contrs)
+            if (k in model.contrs) {
+                console.log('set filter for ' + k);
                 model.filter[k] = true;
+            }
         });
 
         $('#view-tbody').replaceWith(that.createViews());
@@ -162,7 +172,7 @@ function Model(trader, giveup, pass, ready) {
             }
         });
 
-        console.log('ready()');
+        console.log('ready');
         ready(that);
 
         setInterval(function() {
@@ -208,6 +218,7 @@ function Model(trader, giveup, pass, ready) {
 }
 
 Model.prototype.subscribe = function(k) {
+    console.log('subscribe: ' + k);
     if (k in this.contrs) {
         this.filter[k] = true;
         dbr.setViewFilter(Object.keys(this.filter));
@@ -221,6 +232,7 @@ Model.prototype.subscribe = function(k) {
 }
 
 Model.prototype.unsubscribe = function(k) {
+    console.log('unsubscribe: ' + k);
     if (k in this.filter) {
         delete this.filter[k];
         dbr.setViewFilter(Object.keys(this.filter));
@@ -275,8 +287,12 @@ Model.prototype.enrichPosn = function(v) {
 
 Model.prototype.enrichView = function(v) {
     v.contr = this.contrs[v.contr];
-    v.bid_price = dbr.ticksToPrice(v.bid_ticks, v.contr);
-    v.offer_price = dbr.ticksToPrice(v.offer_ticks, v.contr);
+    v.bid_price = dbr.mapValue(v.bid_ticks, function(w) {
+        return dbr.ticksToPrice(w, v.contr);
+    });
+    v.offer_price = dbr.mapValue(v.offer_ticks, function(w) {
+        return dbr.ticksToPrice(w, v.contr);
+    });
 };
 
 Model.prototype.createAccnts = function() {
@@ -420,15 +436,18 @@ Model.prototype.createViews = function() {
     var ks = Object.keys(this.views).sort();
     for (var i = 0; i < ks.length; ++i) {
         var k = ks[i];
-        if (!(k in this.filter))
+        if (!(k.split(',')[0] in this.filter))
             continue;
         var v = this.views[k];
         var tr = dbr.createRow(
-            v.mnem,
             v.contr.mnem,
-            v.tenor,
-            v.bid_price + '/' + v.bid_resd,
-            v.offer_price + '/' + v.offer_resd
+            v.settl_date,
+            v.bid_price[0],
+            v.bid_lots[0],
+            v.bid_count[0],
+            v.offer_price[0],
+            v.offer_lots[0],
+            v.offer_count[0]
         );
         var td = document.createElement('td');
         var a = dbr.createAction('Unsubscribe', this.unsubscribe.bind(this, v.mnem));
@@ -520,15 +539,12 @@ Model.prototype.refreshViews = function() {
         type: 'get',
         url: '/api/view'
     }).done(function(arr) {
+        var dict = [];
         $.each(arr, function(k, v) {
-            var w = that.views[[v.contr, v.settl_date]];
-            w.bid_price = dbr.ticksToPrice(v.bid_ticks, w.contr);
-            w.bid_lots = v.bid_lots;
-            w.bid_count = v.bid_count;
-            w.offer_price = dbr.ticksToPrice(v.offer_ticks, w.contr);
-            w.offer_lots = v.offer_lots;
-            w.offer_count = v.offer_count;
+            dict[[v.contr, v.settl_date]] = v;
         });
+        that.views = dict;
+        dbr.eachValue(that.views, that.enrichView.bind(that));
         $('#view-tbody').replaceWith(that.createViews());
         $('#view-tbody button').button({
             icons: {
