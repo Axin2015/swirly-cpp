@@ -115,12 +115,12 @@
     root.dbr = dbr;
 }).call(this);
 
-function Model(umnem, gmnem, pass, ready) {
+function Model(trader, giveup, pass, ready) {
 
     var that = this;
 
-    this.umnem = umnem;
-    this.gmnem = gmnem;
+    this.trader = trader;
+    this.giveup = giveup;
     this.filter = [];
 
     this.accnts = undefined;
@@ -132,7 +132,7 @@ function Model(umnem, gmnem, pass, ready) {
 
     this.views = undefined;
 
-    var auth = 'Basic ' + btoa(umnem + ':' + pass);
+    var auth = 'Basic ' + btoa(trader + ':' + pass);
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Authorization', auth);
@@ -162,11 +162,12 @@ function Model(umnem, gmnem, pass, ready) {
             }
         });
 
+        console.log('ready()');
         ready(that);
 
         setInterval(function() {
-            //that.refresh();
-        }, 1000);
+            that.refresh();
+        }, 2000);
     };
 
     $.ajax({
@@ -243,6 +244,7 @@ Model.prototype.enrichContr = function(v) {
 Model.prototype.enrichOrder = function(v) {
     v.contr = this.contrs[v.contr];
     v.price = dbr.ticksToPrice(v.ticks, v.contr);
+    v.last_price = dbr.ticksToPrice(v.last_ticks, v.contr);
     v.created = new Date(v.created);
     v.modified = new Date(v.modified);
 };
@@ -250,6 +252,7 @@ Model.prototype.enrichOrder = function(v) {
 Model.prototype.enrichTrade = function(v) {
     v.contr = this.contrs[v.contr];
     v.price = dbr.ticksToPrice(v.ticks, v.contr);
+    v.last_price = dbr.ticksToPrice(v.last_ticks, v.contr);
     v.created = new Date(v.created);
     v.modified = new Date(v.modified);
 };
@@ -323,19 +326,18 @@ Model.prototype.createOrders = function() {
         var v = this.orders[ks[i]];
         var tr = dbr.createRow(
             v.id,
-            v.rev,
-            v.status,
-            v.trader,
-            v.accnt,
-            v.ref,
+            v.giveup,
             v.contr.mnem,
+            v.settl_date,
+            v.ref,
+            v.state,
             v.action,
             v.price,
+            v.lots,
             v.resd,
             v.exec,
-            v.lots,
-            v.created,
-            v.modified);
+            v.last_price,
+            v.last_lots);
         var td = document.createElement('td');
         var a = dbr.createAction('Cancel', this.cancelOrder.bind(this, v.id));
         td.appendChild(a);
@@ -353,25 +355,23 @@ Model.prototype.createTrades = function() {
         var v = this.trades[ks[i]];
         var tr = dbr.createRow(
             v.id,
-            v.match,
             v.order,
-            v.order_rev,
-            v.trader,
-            v.accnt,
-            v.ref,
+            v.giveup,
             v.contr.mnem,
-            v.cpty,
-            v.role,
+            v.settl_date,
+            v.ref,
+            v.state,
             v.action,
             v.price,
+            v.lots,
             v.resd,
             v.exec,
-            v.lots,
-            v.settl_date,
-            v.created,
-            v.modified);
+            v.last_price,
+            v.last_lots,
+            v.role,
+            v.cpty);
         var td = document.createElement('td');
-        var a = dbr.createAction('Ack', this.archiveTrade.bind(this, v.id));
+        var a = dbr.createAction('Ack', this.ackTrade.bind(this, v.id));
         td.appendChild(a);
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -451,7 +451,7 @@ Model.prototype.refreshOrders = function() {
     var that = this;
     $.ajax({
         type: 'get',
-        url: '/api/order/' + that.umnem
+        url: '/api/order/' + that.trader
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
@@ -468,7 +468,7 @@ Model.prototype.refreshTrades = function() {
     var that = this;
     $.ajax({
         type: 'get',
-        url: '/api/trade/' + that.gmnem
+        url: '/api/trade/' + that.trader
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
@@ -485,7 +485,7 @@ Model.prototype.refreshPosns = function() {
     var that = this;
     $.ajax({
         type: 'get',
-        url: '/api/posn/' + that.gmnem
+        url: '/api/posn/' + that.giveup
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
@@ -559,13 +559,13 @@ Model.prototype.showContr = function(v) {
 
 Model.prototype.submitOrder = function(contr, action, price, lots) {
     var that = this;
-    var contr = this.contrs[contr].contr;
+    var contr = this.contrs[contr];
     var ticks = dbr.priceToTicks(price, contr);
     $.ajax({
         type: 'post',
-        url: '/api/order/' + that.umnem,
+        url: '/api/order/' + that.trader,
         data: JSON.stringify({
-            accnt: that.gmnem,
+            accnt: that.giveup,
             contr: contr,
             action: action,
             ticks: ticks,
@@ -607,7 +607,7 @@ Model.prototype.cancelOrder = function(id) {
     var that = this;
     $.ajax({
         type: 'put',
-        url: '/api/order/' + that.umnem + '/' + id,
+        url: '/api/order/' + that.trader + '/' + id,
         data: '{"lots":0}'
     }).done(function(v) {
         v.contr = that.contrs[v.contr];
@@ -629,7 +629,7 @@ Model.prototype.ackTrade = function(id) {
     var that = this;
     $.ajax({
         type: 'delete',
-        url: '/api/trade/' + that.gmnem + '/' + id
+        url: '/api/trade/' + that.giveup + '/' + id
     }).done(function(v) {
         delete that.trades['_' + id];
         $('#trade-tbody').replaceWith(that.createTrades());
