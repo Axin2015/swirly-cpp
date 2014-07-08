@@ -33,21 +33,15 @@
         }
         return value;
     };
-    dbr.setMarketFilter = function(filter) {
-        dbr.setCookie('markets', filter.join(','));
+    dbr.setViewFilter = function(filter) {
+        dbr.setCookie('views', filter.join(','));
     }
-    dbr.getMarketFilter = function() {
-        var cookie = dbr.getCookie('markets');
+    dbr.getViewFilter = function() {
+        var cookie = dbr.getCookie('views');
         return cookie ? cookie.split(',') : [];
     }
     dbr.fractToReal = function(numer, denom) {
         return numer / denom;
-    };
-    dbr.priceInc = function(instr) {
-        return dbr.fractToReal(instr.tick_numer, instr.tick_denom).toFixed(instr.price_dp);
-    };
-    dbr.qtyInc = function(instr) {
-        return dbr.fractToReal(instr.lot_numer, instr.lot_denom).toFixed(instr.qty_dp);
     };
     dbr.realToIncs = function(real, inc_size) {
         return Math.round(real / inc_size);
@@ -55,18 +49,26 @@
     dbr.incsToReal = function(incs, inc_size) {
         return incs * inc_size;
     };
-    dbr.qtyToLots = function(qty, instr) {
-        return dbr.realToIncs(qty, instr.qty_inc);
+    dbr.qtyToLots = function(qty, contr) {
+        return dbr.realToIncs(qty, contr.qty_inc);
     };
-    dbr.lotsToQty = function(lots, instr) {
-        return dbr.incsToReal(lots, instr.qty_inc).toFixed(instr.qty_dp);
+    dbr.lotsToQty = function(lots, contr) {
+        return dbr.incsToReal(lots, contr.qty_inc).toFixed(contr.qty_dp);
     };
-    dbr.priceToTicks = function(price, instr) {
-        return dbr.realToIncs(price, instr.price_inc);
+    dbr.priceToTicks = function(price, contr) {
+        return dbr.realToIncs(price, contr.price_inc);
     };
-    dbr.ticksToPrice = function(ticks, instr) {
-        return dbr.incsToReal(ticks, instr.price_inc).toFixed(instr.price_dp);
+    dbr.ticksToPrice = function(ticks, contr) {
+        return dbr.incsToReal(ticks, contr.price_inc).toFixed(contr.price_dp);
     };
+
+    dbr.qtyInc = function(contr) {
+        return dbr.fractToReal(contr.lot_numer, contr.lot_denom).toFixed(contr.qty_dp);
+    };
+    dbr.priceInc = function(contr) {
+        return dbr.fractToReal(contr.tick_numer, contr.tick_denom).toFixed(contr.price_dp);
+    };
+
     dbr.eachKey = function(arr, fn) {
         for (var k in arr) {
             fn(k);
@@ -113,23 +115,24 @@
     root.dbr = dbr;
 }).call(this);
 
-function Model(trader, accnt, pass, ready) {
+function Model(umnem, gmnem, pass, ready) {
 
     var that = this;
 
-    this.trader = trader;
-    this.accnt = accnt;
+    this.umnem = umnem;
+    this.gmnem = gmnem;
     this.filter = [];
 
-    this.instrs = undefined;
-    this.markets = undefined;
-    this.traders = undefined;
     this.accnts = undefined;
+    this.contrs = undefined;
+
     this.orders = undefined;
     this.trades = undefined;
     this.posns = undefined;
 
-    var auth = 'Basic ' + btoa(trader + ':' + pass);
+    this.views = undefined;
+
+    var auth = 'Basic ' + btoa(umnem + ':' + pass);
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Authorization', auth);
@@ -137,77 +140,38 @@ function Model(trader, accnt, pass, ready) {
     });
 
     var enrich = function() {
-        if (that.instrs === undefined
-            || that.markets === undefined
-            || that.traders === undefined
-            || that.accnts === undefined)
+        if (that.accnts === undefined
+            || that.contrs === undefined
+            || that.views === undefined)
             return;
 
-        var filter = dbr.getMarketFilter();
+        dbr.eachValue(that.accnts, that.enrichAccnt.bind(that));
+        dbr.eachValue(that.contrs, that.enrichContr.bind(that));
+        dbr.eachValue(that.views, that.enrichView.bind(that));
+
+        var filter = dbr.getViewFilter();
         dbr.eachValue(filter, function(k) {
-            if (k in model.markets)
+            if (k in model.contrs)
                 model.filter[k] = true;
         });
 
-        dbr.eachValue(that.instrs, that.enrichInstr.bind(that));
-
-        dbr.eachValue(that.markets, that.enrichMarket.bind(that));
-        $('#market-tbody').replaceWith(that.createMarkets());
-        $('#market-tbody button').button({
+        $('#view-tbody').replaceWith(that.createViews());
+        $('#view-tbody button').button({
             icons: {
                 primary: 'ui-icon-trash'
             }
         });
 
-        dbr.eachValue(that.traders, that.enrichTrader.bind(that));
-        dbr.eachValue(that.accnts, that.enrichAccnt.bind(that));
-
         ready(that);
 
         setInterval(function() {
-            that.refresh();
-        }, 500);
+            //that.refresh();
+        }, 1000);
     };
 
     $.ajax({
         type: 'get',
-        url: '/api/instr/'
-    }).done(function(arr) {
-        var dict = [];
-        $.each(arr, function(k, v) {
-            dict[v.mnem] = v;
-        });
-        that.instrs = dict;
-        enrich();
-    });
-
-    $.ajax({
-        type: 'get',
-        url: '/api/market/'
-    }).done(function(arr) {
-        var dict = [];
-        $.each(arr, function(k, v) {
-            dict[v.mnem] = v;
-        });
-        that.markets = dict;
-        enrich();
-    });
-
-    $.ajax({
-        type: 'get',
-        url: '/api/trader/'
-    }).done(function(arr) {
-        var dict = [];
-        $.each(arr, function(k, v) {
-            dict[v.mnem] = v;
-        });
-        that.traders = dict;
-        enrich();
-    });
-
-    $.ajax({
-        type: 'get',
-        url: '/api/accnt/'
+        url: '/api/accnt'
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
@@ -216,14 +180,38 @@ function Model(trader, accnt, pass, ready) {
         that.accnts = dict;
         enrich();
     });
+
+    $.ajax({
+        type: 'get',
+        url: '/api/contr'
+    }).done(function(arr) {
+        var dict = [];
+        $.each(arr, function(k, v) {
+            dict[v.mnem] = v;
+        });
+        that.contrs = dict;
+        enrich();
+    });
+
+    $.ajax({
+        type: 'get',
+        url: '/api/view'
+    }).done(function(arr) {
+        var dict = [];
+        $.each(arr, function(k, v) {
+            dict[[v.contr, v.settl_date]] = v;
+        });
+        that.views = dict;
+        enrich();
+    });
 }
 
 Model.prototype.subscribe = function(k) {
-    if (k in this.markets) {
+    if (k in this.contrs) {
         this.filter[k] = true;
-        dbr.setMarketFilter(Object.keys(this.filter));
-        $('#market-tbody').replaceWith(this.createMarkets());
-        $('#market-tbody button').button({
+        dbr.setViewFilter(Object.keys(this.filter));
+        $('#view-tbody').replaceWith(this.createViews());
+        $('#view-tbody button').button({
             icons: {
                 primary: 'ui-icon-trash'
             }
@@ -234,9 +222,9 @@ Model.prototype.subscribe = function(k) {
 Model.prototype.unsubscribe = function(k) {
     if (k in this.filter) {
         delete this.filter[k];
-        dbr.setMarketFilter(Object.keys(this.filter));
-        $('#market-tbody').replaceWith(this.createMarkets());
-        $('#market-tbody button').button({
+        dbr.setViewFilter(Object.keys(this.filter));
+        $('#view-tbody').replaceWith(this.createViews());
+        $('#view-tbody button').button({
             icons: {
                 primary: 'ui-icon-trash'
             }
@@ -244,39 +232,30 @@ Model.prototype.unsubscribe = function(k) {
     }
 }
 
-Model.prototype.enrichInstr = function(v) {
+Model.prototype.enrichAccnt = function(v) {
+};
+
+Model.prototype.enrichContr = function(v) {
     v.price_inc = dbr.priceInc(v);
     v.qty_inc = dbr.qtyInc(v);
 };
 
-Model.prototype.enrichMarket = function(v) {
-    v.instr = this.instrs[v.instr];
-    v.bid_price = dbr.ticksToPrice(v.bid_ticks, v.instr);
-    v.ask_price = dbr.ticksToPrice(v.ask_ticks, v.instr);
-};
-
-Model.prototype.enrichTrader = function(v) {
-};
-
-Model.prototype.enrichAccnt = function(v) {
-};
-
 Model.prototype.enrichOrder = function(v) {
-    v.market = this.markets[v.market];
-    v.price = dbr.ticksToPrice(v.ticks, v.market.instr);
+    v.contr = this.contrs[v.contr];
+    v.price = dbr.ticksToPrice(v.ticks, v.contr);
     v.created = new Date(v.created);
     v.modified = new Date(v.modified);
 };
 
 Model.prototype.enrichTrade = function(v) {
-    v.market = this.markets[v.market];
-    v.price = dbr.ticksToPrice(v.ticks, v.market.instr);
+    v.contr = this.contrs[v.contr];
+    v.price = dbr.ticksToPrice(v.ticks, v.contr);
     v.created = new Date(v.created);
     v.modified = new Date(v.modified);
 };
 
 Model.prototype.enrichPosn = function(v) {
-    v.instr = this.instrs[v.instr];
+    v.contr = this.contrs[v.contr];
     if (v.buy_lots > 0) {
         v.buy_ticks = dbr.fractToReal(v.buy_licks, v.buy_lots);
     } else {
@@ -287,74 +266,14 @@ Model.prototype.enrichPosn = function(v) {
     } else {
         v.sell_ticks = 0;
     }
-    v.buy_price = dbr.ticksToPrice(v.buy_ticks, v.instr);
-    v.sell_price = dbr.ticksToPrice(v.sell_ticks, v.instr);
+    v.buy_price = dbr.ticksToPrice(v.buy_ticks, v.contr);
+    v.sell_price = dbr.ticksToPrice(v.sell_ticks, v.contr);
 };
 
-Model.prototype.createInstrs = function() {
-    var tbody = document.createElement('tbody');
-    tbody.id = 'instr-tbody';
-    var ks = Object.keys(this.instrs).sort();
-    for (var i = 0; i < ks.length; ++i) {
-        var v = this.instrs[ks[i]];
-        tbody.appendChild(dbr.createRow(
-            v.mnem,
-            v.display,
-            v.asset_type,
-            v.instr_type,
-            v.asset,
-            v.ccy,
-            v.price_inc,
-            v.qty_inc,
-            v.price_dp,
-            v.pip_dp,
-            v.qty_dp,
-            v.min_lots,
-            v.max_lots
-        ));
-    }
-    return tbody;
-};
-
-Model.prototype.createMarkets = function() {
-    var tbody = document.createElement('tbody');
-    tbody.id = 'market-tbody';
-    var ks = Object.keys(this.markets).sort();
-    for (var i = 0; i < ks.length; ++i) {
-        var k = ks[i];
-        if (!(k in this.filter))
-            continue;
-        var v = this.markets[k];
-        var tr = dbr.createRow(
-            v.mnem,
-            v.instr.mnem,
-            v.tenor,
-            v.bid_price + '/' + v.bid_resd,
-            v.ask_price + '/' + v.ask_resd
-        );
-        var td = document.createElement('td');
-        var a = dbr.createAction('Unsubscribe', this.unsubscribe.bind(this, v.mnem));
-        td.appendChild(a);
-        tr.appendChild(td);
-        tr.onclick = this.showInstr.bind(this, v.instr);
-        tbody.appendChild(tr);
-    }
-    return tbody;
-};
-
-Model.prototype.createTraders = function() {
-    var tbody = document.createElement('tbody');
-    tbody.id = 'trader-tbody';
-    var ks = Object.keys(this.traders).sort();
-    for (var i = 0; i < ks.length; ++i) {
-        var v = this.traders[ks[i]];
-        tbody.appendChild(dbr.createRow(
-            v.mnem,
-            v.display,
-            v.email
-        ));
-    }
-    return tbody;
+Model.prototype.enrichView = function(v) {
+    v.contr = this.contrs[v.contr];
+    v.bid_price = dbr.ticksToPrice(v.bid_ticks, v.contr);
+    v.offer_price = dbr.ticksToPrice(v.offer_ticks, v.contr);
 };
 
 Model.prototype.createAccnts = function() {
@@ -372,17 +291,25 @@ Model.prototype.createAccnts = function() {
     return tbody;
 };
 
-Model.prototype.createDepth = function(v) {
+Model.prototype.createContrs = function() {
     var tbody = document.createElement('tbody');
-    tbody.id = 'depth-tbody';
-    for (i = 0; i < v.bid_side.count.length; ++i) {
+    tbody.id = 'contr-tbody';
+    var ks = Object.keys(this.contrs).sort();
+    for (var i = 0; i < ks.length; ++i) {
+        var v = this.contrs[ks[i]];
         tbody.appendChild(dbr.createRow(
-            v.bid_side.count[i],
-            v.bid_side.price[i],
-            v.bid_side.resd[i],
-            v.ask_side.count[i],
-            v.ask_side.price[i],
-            v.ask_side.resd[i]
+            v.mnem,
+            v.display,
+            v.asset_type,
+            v.asset,
+            v.ccy,
+            v.price_inc,
+            v.qty_inc,
+            v.price_dp,
+            v.pip_dp,
+            v.qty_dp,
+            v.min_lots,
+            v.max_lots
         ));
     }
     return tbody;
@@ -401,7 +328,7 @@ Model.prototype.createOrders = function() {
             v.trader,
             v.accnt,
             v.ref,
-            v.market.mnem,
+            v.contr.mnem,
             v.action,
             v.price,
             v.resd,
@@ -410,9 +337,7 @@ Model.prototype.createOrders = function() {
             v.created,
             v.modified);
         var td = document.createElement('td');
-        var a = v.resd > 0
-            ? dbr.createAction('Cancel', this.cancelOrder.bind(this, v.id))
-            : dbr.createAction('Archive', this.archiveOrder.bind(this, v.id));
+        var a = dbr.createAction('Cancel', this.cancelOrder.bind(this, v.id));
         td.appendChild(a);
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -434,7 +359,7 @@ Model.prototype.createTrades = function() {
             v.trader,
             v.accnt,
             v.ref,
-            v.market.mnem,
+            v.contr.mnem,
             v.cpty,
             v.role,
             v.action,
@@ -446,7 +371,7 @@ Model.prototype.createTrades = function() {
             v.created,
             v.modified);
         var td = document.createElement('td');
-        var a = dbr.createAction('Archive', this.archiveTrade.bind(this, v.id));
+        var a = dbr.createAction('Ack', this.archiveTrade.bind(this, v.id));
         td.appendChild(a);
         tr.appendChild(td);
         tbody.appendChild(tr);
@@ -462,7 +387,7 @@ Model.prototype.createPosns = function() {
         var v = this.posns[ks[i]];
         tbody.appendChild(dbr.createRow(
             v.accnt,
-            v.instr.mnem,
+            v.contr.mnem,
             v.settl_date,
             v.buy_price,
             v.buy_lots,
@@ -473,57 +398,60 @@ Model.prototype.createPosns = function() {
     return tbody;
 };
 
+Model.prototype.createLevels = function(v) {
+    var tbody = document.createElement('tbody');
+    tbody.id = 'levels-tbody';
+    for (i = 0; i < v.bid_side.count.length; ++i) {
+        tbody.appendChild(dbr.createRow(
+            v.bid_side.count[i],
+            v.bid_side.price[i],
+            v.bid_side.resd[i],
+            v.offer_side.count[i],
+            v.offer_side.price[i],
+            v.offer_side.resd[i]
+        ));
+    }
+    return tbody;
+};
+
+Model.prototype.createViews = function() {
+    var tbody = document.createElement('tbody');
+    tbody.id = 'view-tbody';
+    var ks = Object.keys(this.views).sort();
+    for (var i = 0; i < ks.length; ++i) {
+        var k = ks[i];
+        if (!(k in this.filter))
+            continue;
+        var v = this.views[k];
+        var tr = dbr.createRow(
+            v.mnem,
+            v.contr.mnem,
+            v.tenor,
+            v.bid_price + '/' + v.bid_resd,
+            v.offer_price + '/' + v.offer_resd
+        );
+        var td = document.createElement('td');
+        var a = dbr.createAction('Unsubscribe', this.unsubscribe.bind(this, v.mnem));
+        td.appendChild(a);
+        tr.appendChild(td);
+        tr.onclick = this.showContr.bind(this, v.contr);
+        tbody.appendChild(tr);
+    }
+    return tbody;
+};
+
 Model.prototype.refresh = function() {
-    this.refreshMarket();
-    this.refreshOrder();
-    this.refreshTrade();
-    this.refreshPosn();
+    this.refreshOrders();
+    this.refreshTrades();
+    this.refreshPosns();
+    this.refreshViews();
 }
 
-Model.prototype.refreshDepth = function(market) {
+Model.prototype.refreshOrders = function() {
     var that = this;
     $.ajax({
         type: 'get',
-        url: '/api/depth/' + market
-    }).done(function(v) {
-        var w = model.markets[v.market];
-        v.bid_side.price = new Array(v.bid_side.ticks.length);
-        v.ask_side.price = new Array(v.ask_side.ticks.length);
-        for (i = 0; i < v.bid_side.count.length; ++i) {
-            v.bid_side.price[i] = dbr.ticksToPrice(v.bid_side.ticks[i], w.instr);
-            v.ask_side.price[i] = dbr.ticksToPrice(v.ask_side.ticks[i], w.instr);
-        }
-        $('#depth-tbody').replaceWith(that.createDepth(v));
-    });
-};
-
-Model.prototype.refreshMarket = function() {
-    var that = this;
-    $.ajax({
-        type: 'get',
-        url: '/api/market/'
-    }).done(function(arr) {
-        $.each(arr, function(k, v) {
-            var w = that.markets[v.mnem];
-            w.bid_price = dbr.ticksToPrice(v.bid_ticks, w.instr);
-            w.bid_resd = v.bid_resd;
-            w.ask_price = dbr.ticksToPrice(v.ask_ticks, w.instr);
-            w.ask_resd = v.ask_resd;
-        });
-        $('#market-tbody').replaceWith(that.createMarkets());
-        $('#market-tbody button').button({
-            icons: {
-                primary: 'ui-icon-trash'
-            }
-        });
-    });
-};
-
-Model.prototype.refreshOrder = function() {
-    var that = this;
-    $.ajax({
-        type: 'get',
-        url: '/api/order/' + that.trader
+        url: '/api/order/' + that.umnem
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
@@ -536,11 +464,11 @@ Model.prototype.refreshOrder = function() {
     });
 };
 
-Model.prototype.refreshTrade = function() {
+Model.prototype.refreshTrades = function() {
     var that = this;
     $.ajax({
         type: 'get',
-        url: '/api/trade/' + that.accnt
+        url: '/api/trade/' + that.gmnem
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
@@ -553,15 +481,15 @@ Model.prototype.refreshTrade = function() {
     });
 };
 
-Model.prototype.refreshPosn = function() {
+Model.prototype.refreshPosns = function() {
     var that = this;
     $.ajax({
         type: 'get',
-        url: '/api/posn/' + that.accnt
+        url: '/api/posn/' + that.gmnem
     }).done(function(arr) {
         var dict = [];
         $.each(arr, function(k, v) {
-            dict[v.instr] = v;
+            dict[[v.group, v.contr, v.settl_date]] = v;
         });
         that.posns = dict;
         dbr.eachValue(that.posns, that.enrichPosn.bind(that));
@@ -569,33 +497,76 @@ Model.prototype.refreshPosn = function() {
     });
 };
 
-Model.prototype.showInstr = function(v) {
+Model.prototype.refreshLevels = function(contr) {
+    var that = this;
+    $.ajax({
+        type: 'get',
+        url: '/api/levels/' + contr
+    }).done(function(v) {
+        var w = model.contrs[v.contr];
+        v.bid_side.price = new Array(v.bid_side.ticks.length);
+        v.offer_side.price = new Array(v.offer_side.ticks.length);
+        for (i = 0; i < v.bid_side.count.length; ++i) {
+            v.bid_side.price[i] = dbr.ticksToPrice(v.bid_side.ticks[i], w.contr);
+            v.offer_side.price[i] = dbr.ticksToPrice(v.offer_side.ticks[i], w.contr);
+        }
+        $('#levels-tbody').replaceWith(that.createLevels(v));
+    });
+};
+
+Model.prototype.refreshViews = function() {
+    var that = this;
+    $.ajax({
+        type: 'get',
+        url: '/api/view'
+    }).done(function(arr) {
+        $.each(arr, function(k, v) {
+            var w = that.views[[v.contr, v.settl_date]];
+            w.bid_price = dbr.ticksToPrice(v.bid_ticks, w.contr);
+            w.bid_lots = v.bid_lots;
+            w.bid_count = v.bid_count;
+            w.offer_price = dbr.ticksToPrice(v.offer_ticks, w.contr);
+            w.offer_lots = v.offer_lots;
+            w.offer_count = v.offer_count;
+        });
+        $('#view-tbody').replaceWith(that.createViews());
+        $('#view-tbody button').button({
+            icons: {
+                primary: 'ui-icon-trash'
+            }
+        });
+    });
+};
+
+Model.prototype.showContr = function(v) {
     var div = document.createElement('div');
     div.id = 'sidebar';
     div.className = 'ui-dialog-content ui-widget-content ui-corner-all';
     dbr.appendField(div, 'Mnem', v.mnem);
     dbr.appendField(div, 'Display', v.display);
     dbr.appendField(div, 'Asset Type', v.asset_type);
-    dbr.appendField(div, 'Instr Type', v.instr_type);
     dbr.appendField(div, 'Asset', v.asset);
     dbr.appendField(div, 'Ccy', v.ccy);
     dbr.appendField(div, 'Price Inc', v.price_inc);
     dbr.appendField(div, 'Qty Inc', v.qty_inc);
+    dbr.appendField(div, 'Price Dp', v.price_dp);
+    dbr.appendField(div, 'Pip Dp', v.pip_dp);
+    dbr.appendField(div, 'Qty Dp', v.qty_dp);
     dbr.appendField(div, 'Min Lots', v.min_lots);
     dbr.appendField(div, 'Max Lots', v.max_lots);
     $('#sidebar').replaceWith(div);
 };
 
-Model.prototype.submitOrder = function(market, action, price, lots) {
+Model.prototype.submitOrder = function(contr, action, price, lots) {
     var that = this;
-    var instr = this.markets[market].instr;
-    var ticks = dbr.priceToTicks(price, instr);
+    var contr = this.contrs[contr].contr;
+    var ticks = dbr.priceToTicks(price, contr);
     $.ajax({
         type: 'post',
-        url: '/api/order/' + that.trader,
+        url: '/api/order/' + that.umnem,
         data: JSON.stringify({
-            accnt: that.accnt,
-            market: market,
+            accnt: that.gmnem,
+            contr: contr,
             action: action,
             ticks: ticks,
             lots: new Number(lots)
@@ -607,7 +578,7 @@ Model.prototype.submitOrder = function(market, action, price, lots) {
         var w = v.new_posn;
         if (w !== null) {
             that.enrichPosn(w);
-            that.posns[w.instr.mnem] = w;
+            that.posns[w.contr.mnem] = w;
             $('#posn-tbody').replaceWith(that.createPosns());
         }
         for (var i in v.orders) {
@@ -636,11 +607,11 @@ Model.prototype.cancelOrder = function(id) {
     var that = this;
     $.ajax({
         type: 'put',
-        url: '/api/order/' + that.trader + '/' + id,
+        url: '/api/order/' + that.umnem + '/' + id,
         data: '{"lots":0}'
     }).done(function(v) {
-        v.market = that.markets[v.market];
-        v.price = dbr.ticksToPrice(v.ticks, v.market.instr);
+        v.contr = that.contrs[v.contr];
+        v.price = dbr.ticksToPrice(v.ticks, v.contr);
         v.created = new Date(v.created);
         v.modified = new Date(v.modified);
         that.orders['_' + v.id] = v;
@@ -654,28 +625,11 @@ Model.prototype.cancelOrder = function(id) {
     });
 };
 
-Model.prototype.archiveOrder = function(id) {
+Model.prototype.ackTrade = function(id) {
     var that = this;
     $.ajax({
         type: 'delete',
-        url: '/api/order/' + that.trader + '/' + id
-    }).done(function(v) {
-        delete that.orders['_' + id];
-        $('#order-tbody').replaceWith(that.createOrders());
-        $('#order-tbody button').button();
-    }).fail(function(r) {
-        var v = $.parseJSON(r.responseText);
-        $('#error-num').html(v.num);
-        $('#error-msg').html(v.msg);
-		$('#error-dialog').dialog('open');
-    });
-};
-
-Model.prototype.archiveTrade = function(id) {
-    var that = this;
-    $.ajax({
-        type: 'delete',
-        url: '/api/trade/' + that.accnt + '/' + id
+        url: '/api/trade/' + that.gmnem + '/' + id
     }).done(function(v) {
         delete that.trades['_' + id];
         $('#trade-tbody').replaceWith(that.createTrades());
@@ -686,7 +640,6 @@ Model.prototype.archiveTrade = function(id) {
         $('#error-msg').html(v.msg);
 		$('#error-dialog').dialog('open');
     });
-
 };
 
 var model = null;
@@ -695,17 +648,22 @@ var model = null;
 
 function documentReady() {
 
-    var sub_market = $('#subscribe-market');
+    var sub_contr = $('#subscribe-contr');
 
     model = new Model('WRAMIREZ', 'DBRA', 'test', function(model) {
-	    sub_market.autocomplete({
-		    source: Object.keys(model.markets)
+	    sub_contr.autocomplete({
+		    source: Object.keys(model.contrs)
 	    });
     });
 
     $('#subscribe-submit').button()
         .click(function(event) {
-            model.subscribe(sub_market.val());
+            model.subscribe(sub_contr.val());
+		});
+
+    $('#refresh-submit').button()
+        .click(function(event) {
+            model.refresh();
 		});
 
     $('#tabs').tabs();
@@ -714,26 +672,26 @@ function documentReady() {
 	    .button()
 	    .click(function() {
 	        $('#new-order-form').dialog('open');
-	        $('#new-order-market').autocomplete({
-		        source: Object.keys(model.markets)
+	        $('#new-order-contr').autocomplete({
+		        source: Object.keys(model.contrs)
 	        });
 		});
 
-	var market = $('#new-order-market'),
+	var contr = $('#new-order-contr'),
 	    price = $('#new-order-price'),
 	    lots = $('#new-order-lots'),
-	    allFields = $([]).add(market).add(price).add(lots);
+	    allFields = $([]).add(contr).add(price).add(lots);
 
 	$('#new-order-form').dialog({
 		autoOpen: false,
 		modal: true,
 		buttons: {
 			Buy: function() {
-                model.submitOrder(market.val(), 'BUY', price.val(), lots.val());
+                model.submitOrder(contr.val(), 'BUY', price.val(), lots.val());
 	            $(this).dialog('close');
 	        },
 			Sell: function() {
-                model.submitOrder(market.val(), 'SELL', price.val(), lots.val());
+                model.submitOrder(contr.val(), 'SELL', price.val(), lots.val());
 	            $(this).dialog('close');
 	        }
 		},
