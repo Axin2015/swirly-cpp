@@ -161,7 +161,7 @@ function Model(trader, giveup, pass, ready) {
         dbr.eachValue(filter, function(k) {
             if (k in model.contrs) {
                 console.log('set filter for ' + k);
-                model.filter[k] = true;
+                that.filter[k] = true;
             }
         });
 
@@ -450,7 +450,7 @@ Model.prototype.createViews = function() {
             v.offer_count[0]
         );
         var td = document.createElement('td');
-        var a = dbr.createAction('Unsubscribe', this.unsubscribe.bind(this, v.mnem));
+        var a = dbr.createAction('Unsubscribe', this.unsubscribe.bind(this, v.contr.mnem));
         td.appendChild(a);
         tr.appendChild(td);
         tr.onclick = this.showContr.bind(this, v.contr);
