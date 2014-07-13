@@ -666,6 +666,55 @@ ngx_http_doobry_get_order_with_accnt(DbrHandler handler, DbrClnt clnt, void* arg
     return NGX_OK;
 }
 
+static int
+ngx_http_doobry_post_order_with_accnt(DbrHandler handler, DbrClnt clnt, void* arg)
+{
+    return NGX_HTTP_NOT_FOUND;
+}
+
+static void
+ngx_http_doobry_order_with_accnt_handler(ngx_http_request_t* r)
+{
+    ngx_http_doobry_task_t* t;
+    ngx_int_t rc = ngx_http_doobry_parse_body(r, &t);
+    if (rc != NGX_OK)
+        goto done;
+
+    if (t->rest.fields != (DBR_METHOD_POST | DBR_RESRC_ORDER | DBR_PARAM_ACCNT
+                           | DBR_PARAM_GIVEUP | DBR_PARAM_CONTR | DBR_PARAM_SETTL_DATE
+                           | DBR_PARAM_REF | DBR_PARAM_ACTION | DBR_PARAM_TICKS
+                           | DBR_PARAM_LOTS | DBR_PARAM_MIN_LOTS)) {
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "unsupported fields");
+        // The request cannot be fulfilled due to bad syntax.
+        rc = NGX_HTTP_BAD_REQUEST;
+        goto done;
+    }
+
+    ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(t->request);
+    rc = dbr_task_call(lcf->async, ngx_http_doobry_post_order_with_accnt, t);
+    if (rc != NGX_OK)
+        goto done;
+
+    rc = ngx_http_doobry_send_header(r, t->len);
+    if (t->buf) {
+
+        if (rc != NGX_OK) {
+            ngx_pfree(r->pool, t->buf->start);
+            ngx_pfree(r->pool, t->buf);
+            goto done;
+        }
+
+        ngx_chain_t out = { .buf = t->buf, .next = NULL };
+        rc = ngx_http_output_filter(r, &out);
+        if (rc != NGX_OK) {
+            ngx_pfree(r->pool, t->buf->start);
+            ngx_pfree(r->pool, t->buf);
+        }
+    }
+ done:
+    ngx_http_finalize_request(r, rc);
+}
+
 static ngx_int_t
 ngx_http_doobry_order_with_accnt(ngx_http_doobry_task_t* t)
 {
@@ -676,6 +725,19 @@ ngx_http_doobry_order_with_accnt(ngx_http_doobry_task_t* t)
     case DBR_METHOD_GET:
     case DBR_METHOD_HEAD:
         rc = dbr_task_call(lcf->async, ngx_http_doobry_get_order_with_accnt, t);
+        break;
+    case DBR_METHOD_POST:
+        {
+            ngx_http_cleanup_t* cln = ngx_http_cleanup_add(t->request,
+                                                           sizeof(ngx_http_doobry_task_t));
+            if (!cln)
+                return NGX_HTTP_INTERNAL_SERVER_ERROR;
+            memcpy(cln->data, t, sizeof(ngx_http_doobry_task_t));
+        }
+        rc = ngx_http_read_client_request_body(t->request,
+                                               ngx_http_doobry_order_with_accnt_handler);
+        if (rc < NGX_HTTP_SPECIAL_RESPONSE)
+            rc = NGX_DONE;
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
