@@ -439,3 +439,29 @@ dbr_json_write_view(char* buf, const struct DbrView* view)
                       view->offer_count[0], view->offer_count[1], view->offer_count[2],
                       view->created);
 }
+
+DBR_API size_t
+dbr_json_err_len(int num, const char* msg)
+{
+    enum {
+        ERR_SIZE =
+        sizeof("{\"num\":,"
+               "\"msg\":\"\"}") - 1
+    };
+
+    return ERR_SIZE
+        + dbr_int_len(num)
+        + strnlen(msg, DBR_ERRMSG_MAX);
+}
+
+DBR_API char*
+dbr_json_write_err(char* buf, int num, const char* msg)
+{
+    static const char ERR_FORMAT[] =
+        "{\"num\":\"%d\","
+        "\"msg\":\"%s\"}";
+
+    return dbr_format(buf, ERR_FORMAT,
+                      num,
+                      DBR_ERRMSG_MAX, msg);
+}

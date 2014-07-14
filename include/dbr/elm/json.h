@@ -120,4 +120,17 @@ dbr_json_write_view(char* buf, const struct DbrView* view);
 
 /** @} */
 
+/**
+ * @addtogroup Err
+ * @{
+ */
+
+DBR_API size_t
+dbr_json_err_len(int num, const char* msg);
+
+DBR_API char*
+dbr_json_write_err(char* buf, int num, const char* err);
+
+/** @} */
+
 #endif // DBR_ASH_JSON_H

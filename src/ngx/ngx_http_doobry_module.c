@@ -57,6 +57,17 @@ get_accnt(DbrClnt clnt, const char* mnem)
     return dbr_clnt_accnt(clnt, dbr_clnt_rec_entry(node));
 }
 
+static struct DbrRec*
+get_contr(DbrClnt clnt, const char* mnem)
+{
+    struct DbrSlNode* node = dbr_clnt_find_rec_mnem(clnt, DBR_ENTITY_CONTR, mnem);
+    if (node == DBR_CLNT_END_REC) {
+        dbr_err_setf(DBR_EINVAL, "no such contract '%.16s'", mnem);
+        return NULL;
+    }
+    return dbr_clnt_rec_entry(node);
+}
+
 #if 0
 static inline ngx_http_doobry_loc_conf_t*
 handler_implof(DbrHandler handler)
@@ -464,11 +475,10 @@ ngx_http_doobry_get_contr_with_contr(DbrHandler handler, DbrClnt clnt, void* arg
 {
     ngx_http_doobry_task_t* t = arg;
 
-    struct DbrSlNode* node = dbr_clnt_find_rec_mnem(clnt, DBR_ENTITY_CONTR, t->rest.contr);
-    if (node == DBR_CLNT_END_REC)
+    struct DbrRec* crec = get_contr(clnt, t->rest.contr);
+    if (!crec)
         return NGX_HTTP_NOT_FOUND;
 
-    struct DbrRec* crec = dbr_clnt_rec_entry(node);
     const size_t len = dbr_json_contr_len(crec);
 
     t->len = len;
@@ -669,7 +679,28 @@ ngx_http_doobry_get_order_with_accnt(DbrHandler handler, DbrClnt clnt, void* arg
 static int
 ngx_http_doobry_post_order_with_accnt(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NOT_FOUND;
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt trader = get_accnt(clnt, t->rest.accnt);
+    if (!trader)
+        return NGX_HTTP_NOT_FOUND;
+
+    DbrAccnt giveup = get_accnt(clnt, t->rest.giveup);
+    if (!giveup)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    struct DbrRec* crec = get_contr(clnt, t->rest.contr);
+    if (!crec)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    const DbrJd settl_day = dbr_iso_to_jd(t->rest.settl_date);
+
+    const DbrIden id = dbr_clnt_place(clnt, trader, giveup, crec, settl_day, t->rest.ref,
+                                      t->rest.action, t->rest.ticks, t->rest.lots,
+                                      t->rest.min_lots);
+    if (id < 0)
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+
+    return NGX_HTTP_OK;
 }
 
 static void
@@ -1084,11 +1115,10 @@ ngx_http_doobry_get_view_with_contr(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_http_doobry_task_t* t = arg;
 
-    struct DbrSlNode* node = dbr_clnt_find_rec_mnem(clnt, DBR_ENTITY_CONTR, t->rest.contr);
-    if (node == DBR_CLNT_END_REC)
+    struct DbrRec* crec = get_contr(clnt, t->rest.contr);
+    if (!crec)
         return NGX_HTTP_NOT_FOUND;
 
-    struct DbrRec* crec = dbr_clnt_rec_entry(node);
     struct DbrRbNode* first = dbr_clnt_first_view(clnt);
 
     size_t len = sizeof("[]") - 1, n = 0;
