@@ -204,7 +204,7 @@ action_str(int action) noexcept
         sym = "SELL";
         break;
     default:
-        throw InvalidArgument("action");
+        throw InvalidArgument(string("action: ") + to_string(action));
     }
     return sym;
 }
@@ -221,7 +221,7 @@ role_str(int role) noexcept
         sym = "TAKER";
         break;
     default:
-        throw InvalidArgument("role");
+        throw InvalidArgument(string("role: ") + to_string(role));
     }
     return sym;
 }
@@ -244,7 +244,7 @@ state_str(int state) noexcept
         sym = "TRADE";
         break;
     default:
-        throw InvalidArgument("state");
+        throw InvalidArgument(string("state: ") + to_string(state));
     }
     return sym;
 }

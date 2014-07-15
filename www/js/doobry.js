@@ -573,7 +573,7 @@ Model.prototype.showContr = function(v) {
     $('#sidebar').replaceWith(div);
 };
 
-Model.prototype.submitOrder = function(contr, action, price, lots) {
+Model.prototype.submitOrder = function(contr, settl_date, action, price, lots) {
     var that = this;
     var contr = this.contrs[contr];
     var ticks = dbr.priceToTicks(price, contr);
@@ -581,11 +581,14 @@ Model.prototype.submitOrder = function(contr, action, price, lots) {
         type: 'post',
         url: '/api/order/' + that.trader,
         data: JSON.stringify({
-            accnt: that.giveup,
-            contr: contr,
+            giveup: that.giveup,
+            contr: contr.mnem,
+            settl_date: parseInt(settl_date),
+            ref: '',
             action: action,
             ticks: ticks,
-            lots: new Number(lots)
+            lots: parseInt(lots),
+            min_lots: 0
         })
     }).done(function(v) {
         var w = v.new_order;
@@ -694,20 +697,21 @@ function documentReady() {
 		});
 
 	var contr = $('#new-order-contr'),
+        settl_date = $('#new-order-settl-date'),
 	    price = $('#new-order-price'),
 	    lots = $('#new-order-lots'),
-	    allFields = $([]).add(contr).add(price).add(lots);
+	    allFields = $([]).add(contr).add(settl_date).add(price).add(lots);
 
 	$('#new-order-form').dialog({
 		autoOpen: false,
 		modal: true,
 		buttons: {
 			Buy: function() {
-                model.submitOrder(contr.val(), 'BUY', price.val(), lots.val());
+                model.submitOrder(contr.val(), settl_date.val(), 'BUY', price.val(), lots.val());
 	            $(this).dialog('close');
 	        },
 			Sell: function() {
-                model.submitOrder(contr.val(), 'SELL', price.val(), lots.val());
+                model.submitOrder(contr.val(), settl_date.val(), 'SELL', price.val(), lots.val());
 	            $(this).dialog('close');
 	        }
 		},

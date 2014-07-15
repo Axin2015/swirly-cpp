@@ -279,7 +279,6 @@ fnum(const struct DbrRest* rest)
     }
     action end_action {
         dbr_rest_set_param(rest, DBR_PARAM_ACTION);
-        rest->action = inum(rest);
     }
     action begin_ticks {
         if (rest->fields & DBR_PARAM_TICKS) {
