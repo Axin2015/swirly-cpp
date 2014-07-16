@@ -810,10 +810,10 @@ ngx_http_doobry_post_order_with_accnt(DbrHandler handler, DbrClnt clnt, void* ar
     }
 
     const DbrJd settl_day = dbr_iso_to_jd(t->rest.settl_date);
-
-    if (dbr_clnt_place(clnt, trader, giveup, crec, settl_day, t->rest.ref,
-                       t->rest.action, t->rest.ticks, t->rest.lots,
-                       t->rest.min_lots) < 0) {
+    const DbrIden id = dbr_clnt_place(clnt, trader, giveup, crec, settl_day, t->rest.ref,
+                                      t->rest.action, t->rest.ticks, t->rest.lots,
+                                      t->rest.min_lots);
+    if (id < 0) {
         rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
         goto done;
     }
@@ -932,7 +932,26 @@ ngx_http_doobry_get_order_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, vo
 static int
 ngx_http_doobry_put_order_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, void* arg)
 {
-    return NGX_HTTP_NOT_FOUND;
+    ngx_int_t rc;
+
+    ngx_http_doobry_task_t* t = arg;
+
+    DbrAccnt trader = get_accnt(clnt, t->rest.accnt);
+    if (!trader) {
+        rc = NGX_HTTP_NOT_FOUND;
+        goto done;
+    }
+
+    const DbrIden id = t->rest.lots > 0
+        ? dbr_clnt_revise_id(clnt, trader, t->rest.id, t->rest.lots)
+        : dbr_clnt_cancel_id(clnt, trader, t->rest.id);
+    if (id < 0) {
+        rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
+        goto done;
+    }
+    rc = NGX_OK;
+ done:
+    return rc;
 }
 
 static void
