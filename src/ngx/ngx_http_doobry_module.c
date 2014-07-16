@@ -1347,8 +1347,8 @@ ngx_http_doobry_handler(ngx_http_request_t* r)
 {
     ngx_int_t rc;
 
-    ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "uri: %*s",
-                   r->uri_end - r->uri_start, r->uri_start);
+    ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "user: %V",
+                  &r->headers_in.user);
 
     ngx_http_doobry_task_t t;
     ngx_http_doobry_task_init(&t, r);
