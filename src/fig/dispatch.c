@@ -493,6 +493,14 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     break;
                 }
                 dbr_handler_on_exec(handler, clnt, body.req_id, body.exec_rep.exec);
+                if (dbr_exec_done(body.exec_rep.exec)) {
+                    struct DbrExec* exec = body.exec_rep.exec;
+                    DbrAccnt trader = exec->c.trader.rec->accnt.state;
+                    assert(trader);
+                    struct DbrOrder* order = fig_accnt_release_order_id(trader, exec->order);
+                    if (order)
+                        dbr_pool_free_order(clnt->pool, order);
+                }
                 dbr_exec_decref(body.exec_rep.exec, clnt->pool);
                 break;
             case DBR_POSN_REP:
