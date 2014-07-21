@@ -80,61 +80,61 @@ handler_implof(DbrHandler handler)
 static void
 on_close(DbrHandler handler, DbrClnt clnt)
 {
-    dbr_log_error("on_close()");
+    dbr_log_info("on_close()");
 }
 
 static void
 on_ready(DbrHandler handler, DbrClnt clnt)
 {
-    dbr_log_error("on_ready()");
+    dbr_log_info("on_ready()");
 }
 
 static void
 on_logon(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid)
 {
-    dbr_log_error("on_logon()");
+    dbr_log_info("on_logon()");
 }
 
 static void
 on_logoff(DbrHandler handler, DbrClnt clnt, DbrIden req_id, DbrIden aid)
 {
-    dbr_log_error("on_logoff()");
+    dbr_log_info("on_logoff()");
 }
 
 static void
 on_reset(DbrHandler handler, DbrClnt clnt)
 {
-    dbr_log_error("on_reset()");
+    dbr_log_info("on_reset()");
 }
 
 static void
 on_timeout(DbrHandler handler, DbrClnt clnt, DbrIden req_id)
 {
-    dbr_log_error("on_timeout()");
+    dbr_log_info("on_timeout()");
 }
 
 static void
 on_status(DbrHandler handler, DbrClnt clnt, DbrIden req_id, int num, const char* msg)
 {
-    dbr_log_error("on_status()");
+    dbr_log_info("on_status()");
 }
 
 static void
 on_exec(DbrHandler handler, DbrClnt clnt, DbrIden req_id, struct DbrExec* exec)
 {
-    dbr_log_error("on_exec()");
+    dbr_log_info("on_exec()");
 }
 
 static void
 on_posn(DbrHandler handler, DbrClnt clnt, struct DbrPosn* posn)
 {
-    dbr_log_error("on_posn()");
+    dbr_log_info("on_posn()");
 }
 
 static void
 on_view(DbrHandler handler, DbrClnt clnt, struct DbrView* view)
 {
-    dbr_log_error("on_view()");
+    dbr_log_info("on_view()");
 }
 
 static void
@@ -266,7 +266,17 @@ ngx_http_doobry_task_send(ngx_http_doobry_task_t* t)
 static void
 ngx_http_doobry_log(int level, const char* msg)
 {
-    ngx_log_stderr(0, msg);
+    const long ms = dbr_millis();
+    const time_t now = ms / 1000;
+
+    struct tm tm;
+    localtime_r(&now, &tm);
+
+    char buf[sizeof("Mar 12 06:26:39")];
+    strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &tm);
+
+    fprintf(stderr, "%s.%03d %-6s [%d]: %s\n", buf, (int)(ms % 1000), dbr_log_label(level),
+            (int)getpid(), msg);
 }
 
 static int

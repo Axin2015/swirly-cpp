@@ -333,6 +333,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                     goto fail1;
                 // Next heartbeat may have already expired.
             } else if (id == FIG_MDTMR) {
+                dbr_log_debug1("market-data socket timeout");
                 if (!(clnt->state & (FIG_DELTA_WAIT | FIG_CLOSE_WAIT))) {
                     fig_clnt_sess_reset(clnt);
                     dbr_handler_on_reset(handler, clnt);
@@ -342,6 +343,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_err_setf(DBR_ETIMEOUT, "market-data socket timeout");
                 goto fail1;
             } else if (id == FIG_TRTMR) {
+                dbr_log_debug1("transaction socket timeout");
                 if (!(clnt->state & (FIG_DELTA_WAIT | FIG_CLOSE_WAIT))) {
                     fig_clnt_sess_reset(clnt);
                     dbr_handler_on_reset(handler, clnt);
@@ -394,6 +396,10 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             switch (body.type) {
             case DBR_SESS_OPEN:
                 dbr_log_debug1("open message");
+                if (!(clnt->state & FIG_OPEN_WAIT)) {
+                    dbr_log_warn("open message ignored");
+                    break;
+                }
                 clnt->sess.hbint = body.sess_open.hbint;
                 clnt->state &= ~FIG_OPEN_WAIT;
                 clnt->state |= (FIG_REC_WAIT | FIG_SNAP_WAIT);
@@ -404,10 +410,24 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_SESS_CLOSE:
                 dbr_log_debug1("close message");
+                if (clnt->state == FIG_DELTA_WAIT || clnt->state == FIG_OPEN_WAIT) {
+                    dbr_log_warn("close message ignored");
+                    break;
+                }
+                // Set closed status before handler is called.
+                const unsigned prev = clnt->state;
                 clnt->state = FIG_CLOSED;
                 fig_clnt_log_state(clnt->state);
                 dbr_handler_on_close(handler, clnt);
-                goto done;
+                // If we were originally expecting a close, then we're done.
+                if ((prev & FIG_CLOSE_WAIT))
+                    goto done;
+                // Reset if state remains closed after handler has been called.
+                if (clnt->state == FIG_CLOSED) {
+                    fig_clnt_sess_reset(clnt);
+                    dbr_handler_on_reset(handler, clnt);
+                }
+                break;
             case DBR_SESS_LOGON:
                 dbr_log_debug1("logon message");
                 dbr_sess_logon(&clnt->sess, get_accnt(clnt, body.sess_logon.aid));
@@ -422,6 +442,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 }
                 break;
             case DBR_SESS_HEARTBT:
+                dbr_log_debug3("heartbeat");
                 break;
             case DBR_STATUS_REP:
                 dbr_log_debug1("status message");
@@ -448,6 +469,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_TRADER_LIST_REP:
                 dbr_log_debug1("trader-list message");
+
                 emplace_trader_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_GIVEUP_LIST_REP:

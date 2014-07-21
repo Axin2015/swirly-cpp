@@ -101,6 +101,11 @@ fig_clnt_sess_reset(DbrClnt clnt)
 DBR_EXTERN DbrIden
 fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
 {
+    if (clnt->state == FIG_CLOSED) {
+        dbr_err_set(DBR_EINVAL, "client already closed");
+        goto fail1;
+    }
+
     if (clnt->state == FIG_DELTA_WAIT) {
         clnt->state |= FIG_CLOSE_WAIT;
         fig_clnt_log_state(clnt->state);

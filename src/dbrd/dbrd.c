@@ -873,7 +873,7 @@ run(struct Config* config)
             } else if (is_hbtmr(id)) {
                 struct DbrSess* sess = hbtmr_to_sess(id);
                 uuid_unparse_lower(sess->uuid, buf);
-                dbr_log_debug1("session heartbeat to '%.36s'", buf);
+                dbr_log_debug3("session heartbeat to '%.36s'", buf);
                 dbr_prioq_push(&prioq, id, key + sess->hbint);
                 struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
                 if (!dbr_send_msg(trsock, sess->uuid, &body, DBR_FALSE))
@@ -935,7 +935,7 @@ run(struct Config* config)
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_SESS_HEARTBT:
-                dbr_log_debug1("session heartbeat from '%.36s'", buf);
+                dbr_log_debug3("session heartbeat from '%.36s'", buf);
                 dbr_prioq_replace(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
                 break;
             case DBR_PLACE_ORDER_REQ:
