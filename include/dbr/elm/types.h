@@ -763,10 +763,11 @@ dbr_sub_init(struct DbrSub* sub)
 struct DbrSess {
     DbrUuid uuid;
     DbrPool pool;
+    int sid;
     /**
      * The heartbeat interval requested by remote side.
      */
-    DbrMillis hbint;
+    int hbint;
     struct DbrTree subs;
     struct DbrTree accnts;
     /**

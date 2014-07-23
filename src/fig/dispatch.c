@@ -328,7 +328,8 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (id == FIG_HBTMR) {
                 // Cannot fail due to pop.
                 dbr_prioq_push(&clnt->prioq, id, key + clnt->sess.hbint);
-                struct DbrBody body = { .req_id = 0, .type = DBR_SESS_HEARTBT };
+                struct DbrBody body = { .req_id = 0, .sid = clnt->sess.sid,
+                                        .type = DBR_SESS_HEARTBT };
                 if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
                     goto fail1;
                 // Next heartbeat may have already expired.
@@ -388,6 +389,11 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             if (!dbr_recv_body(clnt->trsock, clnt->pool, &body))
                 goto fail1;
 
+            if (body.sid < clnt->sess.sid) {
+                dbr_log_warn("ignoring message from session %d", body.sid);
+                goto mdsock;
+            }
+
             if (body.req_id > 0)
                 dbr_prioq_remove(&clnt->prioq, body.req_id);
 
@@ -396,10 +402,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             switch (body.type) {
             case DBR_SESS_OPEN:
                 dbr_log_debug1("open message");
-                if (!(clnt->state & FIG_OPEN_WAIT)) {
-                    dbr_log_warn("open message ignored");
-                    break;
-                }
                 clnt->sess.hbint = body.sess_open.hbint;
                 clnt->state &= ~FIG_OPEN_WAIT;
                 clnt->state |= (FIG_REC_WAIT | FIG_SNAP_WAIT);
@@ -410,10 +412,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_SESS_CLOSE:
                 dbr_log_debug1("close message");
-                if (clnt->state == FIG_DELTA_WAIT || clnt->state == FIG_OPEN_WAIT) {
-                    dbr_log_warn("close message ignored");
-                    break;
-                }
                 // Set closed status before handler is called.
                 const unsigned prev = clnt->state;
                 clnt->state = FIG_CLOSED;
@@ -541,6 +539,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             }
         }
 
+    mdsock:
         if ((clnt->items[FIG_MDSOCK].revents & ZMQ_POLLIN)) {
 
             if (!dbr_recv_body(clnt->mdsock, clnt->pool, &body))

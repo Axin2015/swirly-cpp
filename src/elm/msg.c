@@ -182,6 +182,7 @@ DBR_EXTERN size_t
 elm_body_len(struct DbrBody* body, DbrBool enriched)
 {
     size_t n = dbr_pack_lenl(body->req_id);
+    n += dbr_pack_leni(body->sid);
     n += dbr_pack_leni(body->type);
     switch (body->type) {
     case DBR_SESS_NOOP:
@@ -341,6 +342,7 @@ DBR_EXTERN char*
 elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched)
 {
     buf = dbr_packl(buf, body->req_id);
+    buf = dbr_packi(buf, body->sid);
     buf = dbr_packi(buf, body->type);
     switch (body->type) {
     case DBR_SESS_NOOP:
@@ -484,10 +486,14 @@ elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body)
     DbrIden req_id;
     if (!(buf = dbr_unpackl(buf, &req_id)))
         goto fail1;
+    int sid;
+    if (!(buf = dbr_unpacki(buf, &sid)))
+        goto fail1;
     int type;
     if (!(buf = dbr_unpacki(buf, &type)))
         goto fail1;
     body->req_id = req_id;
+    body->sid = sid;
     body->type = type;
     struct DbrQueue q;
     switch (type) {

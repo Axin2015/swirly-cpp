@@ -117,7 +117,7 @@ fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
         goto fail1;
 
     const DbrIden req_id = clnt->close_id;
-    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_CLOSE };
+    struct DbrBody body = { .req_id = req_id, .sid = clnt->sess.sid, .type = DBR_SESS_CLOSE };
 
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
@@ -139,7 +139,7 @@ fig_clnt_sess_open(DbrClnt clnt, DbrMillis now)
         goto fail1;
 
     const DbrIden req_id = clnt->open_id;
-    struct DbrBody body = { .req_id = req_id, .type = DBR_SESS_OPEN,
+    struct DbrBody body = { .req_id = req_id, .sid = clnt->sess.sid, .type = DBR_SESS_OPEN,
                             .sess_open = { .hbint = FIG_TRINT } };
     if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
         goto fail1;
@@ -357,6 +357,7 @@ dbr_clnt_logon(DbrClnt clnt, DbrAccnt accnt)
 
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_SESS_LOGON;
     body.sess_logon.aid = accnt->rec->id;
 
@@ -384,6 +385,7 @@ dbr_clnt_logoff(DbrClnt clnt, DbrAccnt accnt)
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_SESS_LOGOFF;
     body.sess_logoff.aid = accnt->rec->id;
 
@@ -413,6 +415,7 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt trader, DbrAccnt giveup, struct DbrRec* cr
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_PLACE_ORDER_REQ;
     body.place_order_req.tid = trader->rec->id;
     body.place_order_req.gid = giveup->rec->id;
@@ -451,6 +454,7 @@ dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt trader, DbrIden id, DbrLots lots)
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_REVISE_ORDER_ID_REQ;
     body.revise_order_id_req.tid = trader->rec->id;
     body.revise_order_id_req.id = id;
@@ -480,6 +484,7 @@ dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt trader, const char* ref, DbrLots lots
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_REVISE_ORDER_REF_REQ;
     body.revise_order_ref_req.tid = trader->rec->id;
     strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
@@ -509,6 +514,7 @@ dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt trader, DbrIden id)
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_CANCEL_ORDER_ID_REQ;
     body.cancel_order_id_req.tid = trader->rec->id;
     body.cancel_order_id_req.id = id;
@@ -537,6 +543,7 @@ dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt trader, const char* ref)
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_CANCEL_ORDER_REF_REQ;
     body.cancel_order_ref_req.tid = trader->rec->id;
     strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
@@ -565,6 +572,7 @@ dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt trader, DbrIden id)
     }
     struct DbrBody body;
     body.req_id = clnt->id++;
+    body.sid = clnt->sess.sid;
     body.type = DBR_ACK_TRADE_REQ;
     body.ack_trade_req.tid = trader->rec->id;
     body.ack_trade_req.id = id;

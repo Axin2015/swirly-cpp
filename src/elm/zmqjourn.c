@@ -79,7 +79,7 @@ destroy(DbrJourn journ)
 
     for (;;) {
         // Send poison pill.
-        struct DbrBody body = { .req_id = 0, .type = DBR_SESS_CLOSE };
+        struct DbrBody body = { .req_id = 0, .sid = 0, .type = DBR_SESS_CLOSE };
         if (dbr_likely(elm_send_body(impl->sock, &body, DBR_FALSE)))
             break;
         if (dbr_unlikely(dbr_err_num() != DBR_EINTR)) {
@@ -102,7 +102,7 @@ static DbrBool
 insert_exec_list(DbrJourn journ, struct DbrSlNode* first, DbrBool enriched)
 {
     struct ZmqJourn* impl = journ_implof(journ);
-    struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
+    struct DbrBody body = { .req_id = 0, .sid = 0, .type = DBR_INSERT_EXEC_LIST_REQ,
                             .insert_exec_list_req = { .first = first, .count_ = 0 } };
     return send_body(impl->sock, &body, enriched);
 }
@@ -111,7 +111,7 @@ static DbrBool
 insert_exec(DbrJourn journ, struct DbrExec* exec, DbrBool enriched)
 {
     struct ZmqJourn* impl = journ_implof(journ);
-    struct DbrBody body = { .req_id = 0, .type = DBR_INSERT_EXEC_REQ,
+    struct DbrBody body = { .req_id = 0, .sid = 0, .type = DBR_INSERT_EXEC_REQ,
                             .insert_exec_req = { .exec = exec } };
     return send_body(impl->sock, &body, enriched);
 }
@@ -120,7 +120,7 @@ static DbrBool
 update_exec(DbrJourn journ, DbrIden id, DbrMillis modified)
 {
     struct ZmqJourn* impl = journ_implof(journ);
-    struct DbrBody body = { .req_id = 0, .type = DBR_UPDATE_EXEC_REQ,
+    struct DbrBody body = { .req_id = 0, .sid = 0, .type = DBR_UPDATE_EXEC_REQ,
                             .update_exec_req = { .id = id, .modified = modified } };
     return send_body(impl->sock, &body, DBR_FALSE);
 }

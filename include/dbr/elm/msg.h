@@ -68,6 +68,7 @@ enum {
 
 struct DbrBody {
     DbrIden req_id;
+    int sid;
 	int type;
 	union {
         // Session.

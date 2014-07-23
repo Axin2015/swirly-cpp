@@ -75,6 +75,7 @@ dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
     else
         uuid_generate(sess->uuid);
     sess->pool = pool;
+    sess->sid = 1;
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
     dbr_tree_init(&sess->accnts);
@@ -97,6 +98,7 @@ DBR_API void
 dbr_sess_reset(struct DbrSess* sess)
 {
     dbr_sess_term(sess);
+    ++sess->sid;
     sess->hbint = 0;
     dbr_tree_init(&sess->subs);
     dbr_tree_init(&sess->accnts);
