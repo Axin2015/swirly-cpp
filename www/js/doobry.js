@@ -376,7 +376,6 @@ Model.prototype.createTrades = function() {
             v.contr.mnem,
             v.settl_date,
             v.ref,
-            v.state,
             v.action,
             v.price,
             v.lots,
@@ -591,29 +590,7 @@ Model.prototype.submitOrder = function(contr, settl_date, action, price, lots) {
             min_lots: 0
         })
     }).done(function(v) {
-        var w = v.new_order;
-        that.enrichOrder(w);
-        that.orders['_' + w.id] = w;
-        var w = v.new_posn;
-        if (w !== null) {
-            that.enrichPosn(w);
-            that.posns[w.contr.mnem] = w;
-            $('#posn-tbody').replaceWith(that.createPosns());
-        }
-        for (var i in v.orders) {
-            w = v.orders[i];
-            that.enrichOrder(w);
-            that.orders['_' + w.id] = w;
-        }
-        $('#order-tbody').replaceWith(that.createOrders())
-        $('#order-tbody button').button();
-        for (var i in v.trades) {
-            w = v.trades[i];
-            that.enrichTrade(w);
-            that.trades['_' + w.id] = w;
-        }
-        $('#trade-tbody').replaceWith(that.createTrades());
-        $('#trade-tbody button').button();
+        // TODO: display pending new.
     }).fail(function(r) {
         var v = $.parseJSON(r.responseText);
         $('#error-num').html(v.num);

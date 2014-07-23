@@ -508,16 +508,16 @@ sess_open(struct DbrSess* sess, const struct DbrBody* req, DbrMillis now)
     const int sid = req->sid;
 
     // Open represents the start of a new session.
+    sess->sid = sid;
     sess->hbint = req->sess_open.hbint;
-    sess->hbintx = req->sess_open.hbint;
 
     struct DbrBody rep = { .req_id = req_id, .sid = sid, .type = DBR_SESS_OPEN,
                            .sess_open = { .hbint = TRINT } };
     return dbr_send_msg(trsock, sess->uuid, &rep, DBR_FALSE)
         && sess_accnt(sess, 0)
         && sess_contr(sess, 0)
+        && sess_book(sess, 0, now)
         && dbr_prioq_push(&prioq, sess_to_hbtmr(sess), now + sess->hbint)
-        && dbr_prioq_push(&prioq, sess_to_hbtmr(sess), now + sess->hbintx)
         && dbr_prioq_push(&prioq, sess_to_trtmr(sess), now + TRTMOUT);
  fail1:
     return DBR_FALSE;
@@ -903,7 +903,6 @@ run(struct Config* config)
                 struct DbrSess* sess = hbtmr_to_sess(id);
                 uuid_unparse_lower(sess->uuid, buf);
                 dbr_prioq_push(&prioq, id, key + sess->hbint);
-                dbr_prioq_push(&prioq, id, key + sess->hbintx);
                 struct DbrBody body = { .req_id = 0, .sid = sess->sid, .type = DBR_SESS_HEARTBT };
                 if (!dbr_send_msg(trsock, sess->uuid, &body, DBR_FALSE))
                     goto fail1;

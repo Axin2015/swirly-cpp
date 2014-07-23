@@ -827,7 +827,7 @@ ngx_http_doobry_post_order_with_accnt(DbrHandler handler, DbrClnt clnt, void* ar
         rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
         goto done;
     }
-    rc = NGX_OK;
+    rc = NGX_HTTP_NO_CONTENT;
  done:
     return rc;
 }
@@ -959,7 +959,7 @@ ngx_http_doobry_put_order_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, vo
         rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
         goto done;
     }
-    rc = NGX_OK;
+    rc = NGX_HTTP_NO_CONTENT;
  done:
     return rc;
 }
