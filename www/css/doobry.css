@@ -1,59 +1,57 @@
 body {
-	color: #fff;
-	background-color: #333;
-	font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
-	font-size: 62.5%;
+    color: #fff;
+    background-color: #333;
+    font-family: "Trebuchet MS", "Arial", "Helvetica", "Verdana", "sans-serif";
+    font-size: 62.5%;
 }
 
 body input.text {
     padding: .4em;
 }
 
-#main {
-    float: left;
-    width: 75%;
+h1 {
+    text-align: center;
 }
 
-#main tbody tr:hover {
+#view {
+}
+
+#view tbody tr:hover {
     cursor: pointer;
 }
 
-#sidebar {
-    float: right;
-    width: 20%;
-    padding: 1em;
-    min-height: 350px;
-}
-
-#sidebar .dbr-field-name, #sidebar .dbr-field-value {
-    display: block;
-    width: 40%;
-    float: left;
-}
-
-#sidebar .dbr-field-name {
-    text-align: right;
-}
-
-#sidebar br {
-    clear: left;
-}
-
-#tabs {
-    float: left;
-    width: 75%;
-}
-
-#main table, #tabs table {
-    margin: 1em 0;
+#view table, #tabs table {
     border-collapse: collapse;
+    margin: 1em 0;
     width: 100%;
 }
 
-#main table td, #main table th, #tabs table td, #tabs table th {
+#view table td, #view table th, #tabs table td, #tabs table th {
     border: 1px solid #eee;
     padding: .6em 10px;
     text-align: left;
+}
+
+#tabs {
+}
+
+#info {
+    min-height: 380px;
+    padding: 1em;
+}
+
+#info .dbr-field-name, #info .dbr-field-value {
+    display: block;
+    float: left;
+    width: 40%;
+}
+
+#info .dbr-field-name {
+    text-align: right;
+}
+
+#info br {
+    clear: left;
 }
 
 .dbr-form fieldset {

@@ -555,7 +555,7 @@ Model.prototype.refreshViews = function() {
 
 Model.prototype.showContr = function(v) {
     var div = document.createElement('div');
-    div.id = 'sidebar';
+    div.id = 'info';
     div.className = 'ui-dialog-content ui-widget-content ui-corner-all';
     dbr.appendField(div, 'Mnem', v.mnem);
     dbr.appendField(div, 'Display', v.display);
@@ -569,7 +569,7 @@ Model.prototype.showContr = function(v) {
     dbr.appendField(div, 'Qty Dp', v.qty_dp);
     dbr.appendField(div, 'Min Lots', v.min_lots);
     dbr.appendField(div, 'Max Lots', v.max_lots);
-    $('#sidebar').replaceWith(div);
+    $('#info').replaceWith(div);
 };
 
 Model.prototype.submitOrder = function(contr, settl_date, action, price, lots) {
