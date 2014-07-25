@@ -345,7 +345,6 @@ Model.prototype.createOrders = function() {
             v.giveup,
             v.contr.mnem,
             v.settl_date,
-            v.ref,
             v.state,
             v.action,
             v.price,
@@ -375,16 +374,13 @@ Model.prototype.createTrades = function() {
             v.giveup,
             v.contr.mnem,
             v.settl_date,
-            v.ref,
             v.action,
             v.price,
             v.lots,
             v.resd,
             v.exec,
             v.last_price,
-            v.last_lots,
-            v.role,
-            v.cpty);
+            v.last_lots);
         var td = document.createElement('td');
         var a = dbr.createAction('Ack', this.ackTrade.bind(this, v.id));
         td.appendChild(a);
@@ -556,7 +552,7 @@ Model.prototype.refreshViews = function() {
 Model.prototype.showContr = function(v) {
     var div = document.createElement('div');
     div.id = 'info';
-    div.className = 'ui-dialog-content ui-widget-content ui-corner-all';
+    div.className = 'ui-widget-content ui-corner-all';
     dbr.appendField(div, 'Mnem', v.mnem);
     dbr.appendField(div, 'Display', v.display);
     dbr.appendField(div, 'Asset Type', v.asset_type);
