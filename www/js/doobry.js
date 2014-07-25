@@ -621,7 +621,7 @@ Model.prototype.ackTrade = function(id) {
     var that = this;
     $.ajax({
         type: 'delete',
-        url: '/api/trade/' + that.giveup + '/' + id
+        url: '/api/trade/' + that.trader + '/' + id
     }).done(function(v) {
         delete that.trades['_' + id];
         $('#trade-tbody').replaceWith(that.createTrades());

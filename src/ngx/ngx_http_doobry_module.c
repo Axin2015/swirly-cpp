@@ -290,7 +290,11 @@ ngx_http_doobry_get_logon(DbrHandler handler, DbrClnt clnt, void* arg)
         rc = NGX_HTTP_NOT_FOUND;
         goto done;
     }
-    dbr_clnt_logon(clnt, accnt);
+    const DbrIden id = dbr_clnt_logon(clnt, accnt);
+    if (id < 0) {
+        rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
+        goto done;
+    }
     rc = NGX_HTTP_NO_CONTENT;
  done:
     return rc;
@@ -329,8 +333,11 @@ ngx_http_doobry_get_logoff(DbrHandler handler, DbrClnt clnt, void* arg)
         rc = NGX_HTTP_NOT_FOUND;
         goto done;
     }
-
-    dbr_clnt_logoff(clnt, accnt);
+    const DbrIden id = dbr_clnt_logoff(clnt, accnt);
+    if (id < 0) {
+        rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
+        goto done;
+    }
     rc = NGX_HTTP_NO_CONTENT;
  done:
     return rc;
@@ -1097,6 +1104,27 @@ ngx_http_doobry_trade_with_accnt(ngx_http_doobry_task_t* t)
 }
 
 static int
+ngx_http_doobry_delete_trade_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, void* arg)
+{
+    ngx_int_t rc;
+
+    ngx_http_doobry_task_t* t = arg;
+    DbrAccnt accnt = get_accnt(clnt, t->rest.accnt);
+    if (!accnt) {
+        rc = NGX_HTTP_NOT_FOUND;
+        goto done;
+    }
+    const DbrIden id = dbr_clnt_ack_trade(clnt, accnt, t->rest.id);
+    if (id < 0) {
+        rc = ngx_http_doobry_task_err(t, dbr_err_num(), dbr_err_msg());
+        goto done;
+    }
+    rc = NGX_HTTP_NO_CONTENT;
+ done:
+    return rc;
+}
+
+static int
 ngx_http_doobry_get_trade_with_accnt_and_id(DbrHandler handler, DbrClnt clnt, void* arg)
 {
     ngx_int_t rc;
@@ -1146,6 +1174,9 @@ ngx_http_doobry_trade_with_accnt_and_id(ngx_http_doobry_task_t* t)
     ngx_http_doobry_loc_conf_t* lcf = ngx_http_doobry_loc_conf(t->request);
 
     switch (dbr_rest_get_method(&t->rest)) {
+    case DBR_METHOD_DELETE:
+        rc = dbr_task_call(lcf->async, ngx_http_doobry_delete_trade_with_accnt_and_id, t);
+        break;
     case DBR_METHOD_GET:
     case DBR_METHOD_HEAD:
         rc = dbr_task_call(lcf->async, ngx_http_doobry_get_trade_with_accnt_and_id, t);
