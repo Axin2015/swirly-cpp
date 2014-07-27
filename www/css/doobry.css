@@ -16,7 +16,7 @@ h1 {
 	font-size: .7em;
 }
 
-#view tbody tr:hover {
+#view tbody tr:hover, #tabs tbody tr:hover {
     cursor: pointer;
 }
 
@@ -43,15 +43,18 @@ h1 {
     padding: 2em 0;
 }
 
-#info .dbr-field-name, #info .dbr-field-value {
+#info .dbr-field-name {
     display: block;
     float: left;
-    width: 40%;
-}
-
-#info .dbr-field-name {
     padding: 0 1em;
     text-align: right;
+    width: 35%;
+}
+
+#info .dbr-field-value {
+    display: block;
+    float: left;
+    width: 45%;
 }
 
 #info br {

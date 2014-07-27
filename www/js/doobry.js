@@ -357,6 +357,7 @@ Model.prototype.createOrders = function() {
         var a = dbr.createAction('Cancel', this.cancelOrder.bind(this, v.id));
         td.appendChild(a);
         tr.appendChild(td);
+        tr.onclick = this.showOrder.bind(this, v);
         tbody.appendChild(tr);
     }
     return tbody;
@@ -385,6 +386,7 @@ Model.prototype.createTrades = function() {
         var a = dbr.createAction('Ack', this.ackTrade.bind(this, v.id));
         td.appendChild(a);
         tr.appendChild(td);
+        tr.onclick = this.showTrade.bind(this, v);
         tbody.appendChild(tr);
     }
     return tbody;
@@ -565,6 +567,55 @@ Model.prototype.showContr = function(v) {
     dbr.appendField(div, 'Qty Dp', v.qty_dp);
     dbr.appendField(div, 'Min Lots', v.min_lots);
     dbr.appendField(div, 'Max Lots', v.max_lots);
+    $('#info').replaceWith(div);
+};
+
+Model.prototype.showTrade = function(v) {
+    var div = document.createElement('div');
+    div.id = 'info';
+    div.className = 'ui-widget-content ui-corner-all';
+    dbr.appendField(div, 'Id', v.id);
+    dbr.appendField(div, 'Order', v.order);
+    dbr.appendField(div, 'Trader', v.trader);
+    dbr.appendField(div, 'Giveup', v.giveup);
+    dbr.appendField(div, 'Contr', v.contr.mnem);
+    dbr.appendField(div, 'Settl Date', v.settl_date);
+    dbr.appendField(div, 'Ref', v.ref);
+    dbr.appendField(div, 'State', v.state);
+    dbr.appendField(div, 'Action', v.action);
+    dbr.appendField(div, 'Price', v.price);
+    dbr.appendField(div, 'Lots', v.lots);
+    dbr.appendField(div, 'Resd', v.resd);
+    dbr.appendField(div, 'Exec', v.exec);
+    dbr.appendField(div, 'Last Price', v.last_price);
+    dbr.appendField(div, 'Last Lots', v.last_lots);
+    dbr.appendField(div, 'Match', v.match);
+    dbr.appendField(div, 'Role', v.role);
+    dbr.appendField(div, 'Cpty', v.cpty);
+    dbr.appendField(div, 'Created', v.created);
+    $('#info').replaceWith(div);
+};
+
+Model.prototype.showOrder = function(v) {
+    var div = document.createElement('div');
+    div.id = 'info';
+    div.className = 'ui-widget-content ui-corner-all';
+    dbr.appendField(div, 'Id', v.id);
+    dbr.appendField(div, 'Trader', v.trader);
+    dbr.appendField(div, 'Giveup', v.giveup);
+    dbr.appendField(div, 'Contr', v.contr.mnem);
+    dbr.appendField(div, 'Settl Date', v.settl_date);
+    dbr.appendField(div, 'Ref', v.ref);
+    dbr.appendField(div, 'State', v.state);
+    dbr.appendField(div, 'Action', v.action);
+    dbr.appendField(div, 'Price', v.price);
+    dbr.appendField(div, 'Lots', v.lots);
+    dbr.appendField(div, 'Resd', v.resd);
+    dbr.appendField(div, 'Exec', v.exec);
+    dbr.appendField(div, 'Last Price', v.last_price);
+    dbr.appendField(div, 'Last Lots', v.last_lots);
+    dbr.appendField(div, 'Created', v.created);
+    dbr.appendField(div, 'Modified', v.modified);
     $('#info').replaceWith(div);
 };
 
