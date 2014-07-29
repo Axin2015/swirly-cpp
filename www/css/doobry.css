@@ -5,18 +5,25 @@ body {
 }
 
 body input.text {
-    padding: .4em;
+    padding: .3em;
 }
 
 h1 {
     text-align: center;
 }
 
+#toolbar {
+    padding: .3em;
+    display: inline-block;
+    width: 100%;
+}
+
 #view {
-	font-size: .7em;
+    font-size: .7em;
 }
 
 #view tbody tr:hover, #tabs tbody tr:hover {
+    background: #333;
     cursor: pointer;
 }
 
@@ -33,12 +40,11 @@ h1 {
 }
 
 #tabs {
-	font-size: .8em;
+    font-size: .8em;
 }
 
 #info {
-	font-size: .9em;
-    margin: .8em 0;
+    font-size: .9em;
     min-height: 380px;
     padding: 2em 0;
 }

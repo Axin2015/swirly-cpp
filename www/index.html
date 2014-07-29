@@ -22,29 +22,42 @@
       </div>
       <div class="grid_9">
         <div id="view">
+          <p>
+	        <label for="contr" class="ui-widget">Contr:</label>
+	        <input type="text" id="contr" class="text ui-widget-content ui-corner-all"/>
+	        <label for="settl-date" class="ui-widget">Settl Date:</label>
+	        <input type="text" id="settl-date" class="text ui-widget-content ui-corner-all"/>
+	        <label for="price" class="ui-widget">Price:</label>
+	        <input type="text" id="price" class="text ui-widget-content ui-corner-all"/>
+	        <label for="lots" class="ui-widget">Lots:</label>
+	        <input id="lots"/>
+            <button id="buy">Buy</button>
+            <button id="sell">Sell</button>
+          </p>
+          <div id="toolbar" class="ui-widget-header ui-corner-all">
+            <button id="subscribe">Subscribe</button>
+            <button id="unsubscribe">Unsubscribe</button>
+            <button id="revise">Revise Order</button>
+            <button id="cancel">Cancel Order</button>
+            <button id="ack">Ack Trade</button>
+          </div>
           <table class="ui-widget ui-widget-content">
             <thead>
               <tr class="ui-widget-header">
-                <th>contr</th>
-                <th>settl_date</th>
-                <th>bid_price</th>
-                <th>bid_lots</th>
-                <th>bid_count</th>
-                <th>offer_price</th>
-                <th>offer_lots</th>
-                <th>offer_count</th>
-                <th>action</th>
+                <th><input type="checkbox" id="contr-all"/></th>
+                <th>Contr</th>
+                <th>Settl Date</th>
+                <th>Bid Price</th>
+                <th>Bid Lots</th>
+                <th>Bid Count</th>
+                <th>Offer Price</th>
+                <th>Offer Lots</th>
+                <th>Offer Count</th>
               </tr>
             </thead>
 	        <tbody id="view-tbody">
 	        </tbody>
           </table>
-          <p>
-	        <label for="subscribe-contr" class="ui-widget">View</label>
-	        <input type="text" id="subscribe-contr" class="text ui-widget-content ui-corner-all"/>
-            <button id="subscribe-submit">Subscribe</button>
-            <button id="refresh-submit">Refresh</button>
-          </p>
         </div>
         <div id="tabs">
           <ul>
@@ -56,43 +69,42 @@
             <table class="ui-widget ui-widget-content">
               <thead>
                 <tr class="ui-widget-header">
-                  <th>id</th>
-                  <th>giveup</th>
-                  <th>contr</th>
-                  <th>settl_date</th>
-                  <th>state</th>
-                  <th>action</th>
-                  <th>price</th>
-                  <th>lots</th>
-                  <th>resd</th>
-                  <th>exec</th>
-                  <th>last_price</th>
-                  <th>last_lots</th>
-                  <th>action</th>
+                  <th><input type="checkbox" id="order-all"/></th>
+                  <th>Id</th>
+                  <th>Giveup</th>
+                  <th>Contr</th>
+                  <th>Settl Date</th>
+                  <th>State</th>
+                  <th>Action</th>
+                  <th>Price</th>
+                  <th>Lots</th>
+                  <th>Resd</th>
+                  <th>Exec</th>
+                  <th>Last Price</th>
+                  <th>Last Lots</th>
                 </tr>
               </thead>
 	          <tbody id="order-tbody">
 	          </tbody>
             </table>
-            <button id="new-order-open">New Order...</button>
           </div>
           <div id="trade-tab">
             <table class="ui-widget ui-widget-content">
               <thead>
                 <tr class="ui-widget-header">
-                  <th>id</th>
-                  <th>order</th>
-                  <th>giveup</th>
-                  <th>contr</th>
-                  <th>settl_date</th>
-                  <th>action</th>
-                  <th>price</th>
-                  <th>lots</th>
-                  <th>resd</th>
-                  <th>exec</th>
-                  <th>last_price</th>
-                  <th>last_lots</th>
-                  <th>action</th>
+                  <th><input type="checkbox" id="trade-all"/></th>
+                  <th>Id</th>
+                  <th>Order</th>
+                  <th>Giveup</th>
+                  <th>Contr</th>
+                  <th>Settl Date</th>
+                  <th>Action</th>
+                  <th>Price</th>
+                  <th>Lots</th>
+                  <th>Resd</th>
+                  <th>Exec</th>
+                  <th>Last Price</th>
+                  <th>Last Lots</th>
                 </tr>
               </thead>
 	          <tbody id="trade-tbody">
@@ -103,13 +115,14 @@
             <table class="ui-widget ui-widget-content">
               <thead>
                 <tr class="ui-widget-header">
-                  <th>accnt</th>
-                  <th>contr</th>
-                  <th>settl_date</th>
-                  <th>buy_price</th>
-                  <th>buy_lots</th>
-                  <th>sell_price</th>
-                  <th>sell_lots</th>
+                  <th><input type="checkbox" id="posn-all"/></th>
+                  <th>Accnt</th>
+                  <th>Contr</th>
+                  <th>Settl Date</th>
+                  <th>Buy Price</th>
+                  <th>Buy Lots</th>
+                  <th>Sell Price</th>
+                  <th>Sell Lots</th>
                 </tr>
               </thead>
 	          <tbody id="posn-tbody">
@@ -122,20 +135,6 @@
         <div id="info" class="ui-widget-content ui-corner-all">
         </div>
       </div>
-    </div>
-    <div id="new-order-form" title="New Order" class="dbr-form">
-	  <form>
-	    <fieldset>
-		  <label for="new-order-contr">Contr</label>
-		  <input type="text" id="new-order-contr" class="text ui-widget-content ui-corner-all"/>
-		  <label for="new-order-settl-date">Settl Date</label>
-		  <input type="text" id="new-order-settl-date" class="text ui-widget-content ui-corner-all"/>
-		  <label for="new-order-price">Price</label>
-		  <input type="text" id="new-order-price" class="text ui-widget-content ui-corner-all"/>
-		  <label for="new-order-lots">Lots</label>
-		  <input type="text" id="new-order-lots" class="text ui-widget-content ui-corner-all"/>
-	    </fieldset>
-	  </form>
     </div>
     <div id="error-dialog" title="Error">
 	  <p><strong><span id="error-num"></span>:</strong>

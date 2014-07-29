@@ -93,6 +93,13 @@
     }
     dbr.createRow = function() {
         var tr = document.createElement('tr');
+
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        var td = document.createElement('td');
+        td.appendChild(cb);
+        tr.appendChild(td);
+
         for (var i = 0; i < arguments.length; ++i) {
             var td = document.createElement('td');
             td.innerText = arguments[i];
@@ -100,12 +107,6 @@
         }
         return tr;
     };
-    dbr.createAction = function(label, fn) {
-        var button = document.createElement('button');
-        button.innerText = label;
-        button.onclick = fn;
-        return button;
-    }
     dbr.appendField = function(elem, name, value) {
         var fname = document.createElement('span');
         fname.className = 'dbr-field-name';
@@ -295,45 +296,6 @@ Model.prototype.enrichView = function(v) {
     });
 };
 
-Model.prototype.createAccnts = function() {
-    var tbody = document.createElement('tbody');
-    tbody.id = 'accnt-tbody';
-    var ks = Object.keys(this.accnts).sort();
-    for (var i = 0; i < ks.length; ++i) {
-        var v = this.accnts[ks[i]];
-        tbody.appendChild(dbr.createRow(
-            v.mnem,
-            v.display,
-            v.email
-        ));
-    }
-    return tbody;
-};
-
-Model.prototype.createContrs = function() {
-    var tbody = document.createElement('tbody');
-    tbody.id = 'contr-tbody';
-    var ks = Object.keys(this.contrs).sort();
-    for (var i = 0; i < ks.length; ++i) {
-        var v = this.contrs[ks[i]];
-        tbody.appendChild(dbr.createRow(
-            v.mnem,
-            v.display,
-            v.asset_type,
-            v.asset,
-            v.ccy,
-            v.price_inc,
-            v.qty_inc,
-            v.price_dp,
-            v.pip_dp,
-            v.qty_dp,
-            v.min_lots,
-            v.max_lots
-        ));
-    }
-    return tbody;
-};
-
 Model.prototype.createOrders = function() {
     var tbody = document.createElement('tbody');
     tbody.id = 'order-tbody';
@@ -353,11 +315,9 @@ Model.prototype.createOrders = function() {
             v.exec,
             v.last_price,
             v.last_lots);
-        var td = document.createElement('td');
-        var a = dbr.createAction('Cancel', this.cancelOrder.bind(this, v.id));
-        td.appendChild(a);
-        tr.appendChild(td);
-        tr.onclick = this.showOrder.bind(this, v);
+        tr.onclick = this.setContext.bind(this, v.contr.mnem, v.settl_date, v.price, v.lots);
+        tr.onmouseleave = this.clearInfo.bind(this);
+        tr.onmouseover = this.setOrderInfo.bind(this, v);
         tbody.appendChild(tr);
     }
     return tbody;
@@ -382,11 +342,9 @@ Model.prototype.createTrades = function() {
             v.exec,
             v.last_price,
             v.last_lots);
-        var td = document.createElement('td');
-        var a = dbr.createAction('Ack', this.ackTrade.bind(this, v.id));
-        td.appendChild(a);
-        tr.appendChild(td);
-        tr.onclick = this.showTrade.bind(this, v);
+        tr.onclick = this.setContext.bind(this, v.contr.mnem, v.settl_date, v.price, v.lots);
+        tr.onmouseleave = this.clearInfo.bind(this);
+        tr.onmouseover = this.setTradeInfo.bind(this, v);
         tbody.appendChild(tr);
     }
     return tbody;
@@ -411,22 +369,6 @@ Model.prototype.createPosns = function() {
     return tbody;
 };
 
-Model.prototype.createLevels = function(v) {
-    var tbody = document.createElement('tbody');
-    tbody.id = 'levels-tbody';
-    for (i = 0; i < v.bid_side.count.length; ++i) {
-        tbody.appendChild(dbr.createRow(
-            v.bid_side.count[i],
-            v.bid_side.price[i],
-            v.bid_side.resd[i],
-            v.offer_side.count[i],
-            v.offer_side.price[i],
-            v.offer_side.resd[i]
-        ));
-    }
-    return tbody;
-};
-
 Model.prototype.createViews = function() {
     var tbody = document.createElement('tbody');
     tbody.id = 'view-tbody';
@@ -446,11 +388,9 @@ Model.prototype.createViews = function() {
             v.offer_lots[0],
             v.offer_count[0]
         );
-        var td = document.createElement('td');
-        var a = dbr.createAction('Unsubscribe', this.unsubscribe.bind(this, v.contr.mnem));
-        td.appendChild(a);
-        tr.appendChild(td);
-        tr.onclick = this.showContr.bind(this, v.contr);
+        tr.onclick = this.setContext.bind(this, v.contr.mnem, v.settl_date, '', '');
+        tr.onmouseleave = this.clearInfo.bind(this);
+        tr.onmouseover = this.setContrInfo.bind(this, v.contr);
         tbody.appendChild(tr);
     }
     return tbody;
@@ -513,23 +453,6 @@ Model.prototype.refreshPosns = function() {
     });
 };
 
-Model.prototype.refreshLevels = function(contr) {
-    var that = this;
-    $.ajax({
-        type: 'get',
-        url: '/api/levels/' + contr
-    }).done(function(v) {
-        var w = model.contrs[v.contr];
-        v.bid_side.price = new Array(v.bid_side.ticks.length);
-        v.offer_side.price = new Array(v.offer_side.ticks.length);
-        for (i = 0; i < v.bid_side.count.length; ++i) {
-            v.bid_side.price[i] = dbr.ticksToPrice(v.bid_side.ticks[i], w.contr);
-            v.offer_side.price[i] = dbr.ticksToPrice(v.offer_side.ticks[i], w.contr);
-        }
-        $('#levels-tbody').replaceWith(that.createLevels(v));
-    });
-};
-
 Model.prototype.refreshViews = function() {
     var that = this;
     $.ajax({
@@ -551,7 +474,28 @@ Model.prototype.refreshViews = function() {
     });
 };
 
-Model.prototype.showContr = function(v) {
+Model.prototype.clearContext = function() {
+	$('#contr').val('');
+	$('#settl-date').val('');
+	$('#price').val('');
+	$('#lots').val('');
+}
+
+Model.prototype.setContext = function(contr, settl_date, price, lots) {
+	$('#contr').val(contr);
+	$('#settl-date').val(settl_date);
+	$('#price').val(price);
+	$('#lots').val(lots);
+}
+
+Model.prototype.clearInfo = function() {
+    var div = document.createElement('div');
+    div.id = 'info';
+    div.className = 'ui-widget-content ui-corner-all';
+    $('#info').replaceWith(div);
+};
+
+Model.prototype.setContrInfo = function(v) {
     var div = document.createElement('div');
     div.id = 'info';
     div.className = 'ui-widget-content ui-corner-all';
@@ -570,7 +514,7 @@ Model.prototype.showContr = function(v) {
     $('#info').replaceWith(div);
 };
 
-Model.prototype.showTrade = function(v) {
+Model.prototype.setTradeInfo = function(v) {
     var div = document.createElement('div');
     div.id = 'info';
     div.className = 'ui-widget-content ui-corner-all';
@@ -596,7 +540,7 @@ Model.prototype.showTrade = function(v) {
     $('#info').replaceWith(div);
 };
 
-Model.prototype.showOrder = function(v) {
+Model.prototype.setOrderInfo = function(v) {
     var div = document.createElement('div');
     div.id = 'info';
     div.className = 'ui-widget-content ui-corner-all';
@@ -691,58 +635,39 @@ var model = null;
 
 function documentReady() {
 
-    var sub_contr = $('#subscribe-contr');
+	var contr = $('#contr'),
+        settl_date = $('#settl-date'),
+	    price = $('#price'),
+	    lots = $('#lots');
 
     model = new Model('WRAMIREZ', 'DBRA', 'test', function(model) {
-	    sub_contr.autocomplete({
+	    contr.autocomplete({
 		    source: Object.keys(model.contrs)
 	    });
     });
 
-    $('#subscribe-submit').button()
+    $('#subscribe').button()
         .click(function(event) {
-            model.subscribe(sub_contr.val());
+            model.subscribe(contr.val());
 		});
-
-    $('#refresh-submit').button()
+    $('#unsubscribe').button()
         .click(function(event) {
-            model.refresh();
+            model.unsubscribe(contr.val());
 		});
-
-    $('#tabs').tabs();
-
-	$('#new-order-open')
-	    .button()
+    $('#buy').button()
 	    .click(function() {
-	        $('#new-order-form').dialog('open');
-	        $('#new-order-contr').autocomplete({
-		        source: Object.keys(model.contrs)
-	        });
+            model.submitOrder(contr.val(), settl_date.val(), 'BUY', price.val(), lots.val());
 		});
+    $('#sell').button()
+	    .click(function() {
+            model.submitOrder(contr.val(), settl_date.val(), 'SELL', price.val(), lots.val());
+		});
+    $('#revise').button();
+    $('#cancel').button();
+    $('#ack').button();
 
-	var contr = $('#new-order-contr'),
-        settl_date = $('#new-order-settl-date'),
-	    price = $('#new-order-price'),
-	    lots = $('#new-order-lots'),
-	    allFields = $([]).add(contr).add(settl_date).add(price).add(lots);
-
-	$('#new-order-form').dialog({
-		autoOpen: false,
-		modal: true,
-		buttons: {
-			Buy: function() {
-                model.submitOrder(contr.val(), settl_date.val(), 'BUY', price.val(), lots.val());
-	            $(this).dialog('close');
-	        },
-			Sell: function() {
-                model.submitOrder(contr.val(), settl_date.val(), 'SELL', price.val(), lots.val());
-	            $(this).dialog('close');
-	        }
-		},
-		close: function() {
-			allFields.val('').removeClass('ui-state-error');
-		}
-	});
+    $('#lots').spinner();
+    $('#tabs').tabs();
 
 	$('#error-dialog').dialog({
 		autoOpen: false,
