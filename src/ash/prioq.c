@@ -26,7 +26,7 @@
     Heap invariant:
 
     If c is a child node of p, then p <= c.
-    I.e. every node is greater than or equal to its parent.
+    I.e. every node is less than or equal to its parent.
 
       1234567
       1327465

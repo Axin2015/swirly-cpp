@@ -101,7 +101,7 @@ split(const std::string& s, std::vector<std::string>& v)
 }
 
 inline std::string
-strncpy(const char* src, size_t n)
+strncpy(const char* src, std::size_t n)
 {
     std::string dst;
     for (; n > 0; --n, ++src) {
@@ -112,10 +112,29 @@ strncpy(const char* src, size_t n)
     return dst;
 }
 
-template <size_t MaxN>
+inline int
+lexncmp(const char* lhs, const char* rhs, std::size_t lhn, std::size_t rhn)
+{
+    std::size_t n = std::min(lhn, rhn);
+    for ( ; n > 0; ++lhs, ++rhs, --n) {
+        if (*lhs != *rhs)
+            return *lhs < *rhs ? -1 : 1;
+        if (*lhs == '\0')
+            return 0;
+    }
+    if (lhn < rhn)
+        return *rhs == '\0' ? 0 : -1;
+    if (lhn > rhn)
+        return *lhs == '\0' ? 0 : 1;
+    return 0;
+}
+
+template <std::size_t MaxN = std::numeric_limits<std::size_t>::max()>
+class NString;
+
+template <std::size_t MaxN>
 class NString {
     const char* begin_;
-    mutable size_t size_;
 public:
     typedef char ValueType;
     typedef const char* ConstPointer;
@@ -140,9 +159,9 @@ public:
     typedef DifferenceType distance_type;
     typedef SizeType size_type;
 public:
-    NString(const char* begin, size_t size = std::numeric_limits<SizeType>::max()) noexcept
-        : begin_{begin},
-          size_{size}
+    explicit
+    NString(const char* begin) noexcept
+        : begin_{begin}
     {
     }
 
@@ -171,13 +190,13 @@ public:
     ConstIterator
     find(char ch) const noexcept
     {
-        const char* match{strchr(begin(), ch)};
+        const char* match = strchr(begin(), ch);
         return match ? ConstIterator{match} : end();
     }
     ConstIterator
     find(const char* str) const noexcept
     {
-        const char* match{strstr(begin(), str)};
+        const char* match = strstr(begin(), str);
         return match ? ConstIterator{match} : end();
     }
 
@@ -196,9 +215,7 @@ public:
     SizeType
     size() const noexcept
     {
-        if (size_ > MaxN)
-            size_ = strnlen(begin_, MaxN);
-        return size_;
+        return strnlen(begin_, MaxN);
     }
     SizeType
     max_size() const noexcept
@@ -222,6 +239,114 @@ public:
     }
 };
 
+template <>
+class NString<std::numeric_limits<std::size_t>::max()> {
+    const char* begin_;
+    const char* end_;
+public:
+    typedef char ValueType;
+    typedef const char* ConstPointer;
+    typedef const char& ConstReference;
+
+    typedef const char* ConstIterator;
+    typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef std::size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef ConstIterator const_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+public:
+    NString(const char* begin, const char* end) noexcept
+        : begin_{begin},
+          end_{end}
+    {
+    }
+
+    // Iterator.
+
+    const_iterator
+    begin() const noexcept
+    {
+        return begin_;
+    }
+    const_iterator
+    end() const noexcept
+    {
+        return end_;
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return ConstReverseIterator{end()};
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return ConstReverseIterator{begin()};
+    }
+    ConstIterator
+    find(char ch) const noexcept
+    {
+        const char* match = strchr(begin(), ch);
+        return match ? ConstIterator{match} : end();
+    }
+    ConstIterator
+    find(const char* str) const noexcept
+    {
+        const char* match = strstr(begin(), str);
+        return match ? ConstIterator{match} : end();
+    }
+
+    // Accessor.
+
+    ValueType
+    front() const noexcept
+    {
+        return *begin();
+    }
+    ValueType
+    back() const noexcept
+    {
+        return *(end() - 1);
+    }
+    SizeType
+    size() const noexcept
+    {
+        return end_ - begin_;
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return size();
+    }
+    bool
+    empty() const noexcept
+    {
+        return begin_ == end_;
+    }
+    const char*
+    data() const noexcept
+    {
+        return begin_;
+    }
+    std::string
+    str() const
+    {
+        return std::string(begin_, end_);
+    }
+};
+
 template <std::size_t MaxN>
 inline std::string
 to_string(const NString<MaxN>& nstr)
@@ -239,46 +364,130 @@ operator <<(std::ostream& os, const NString<MaxN>& nstr)
     return os << nstr.str();
 }
 
-template <std::size_t MaxN>
+template <std::size_t MaxL, std::size_t MaxR>
 inline bool
-operator ==(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
+operator ==(const NString<MaxL>& lhs, const NString<MaxR>& rhs) noexcept
 {
-    return strncmp(lhs.data(), rhs.data(), MaxN) == 0;
+    return lexncmp(lhs.data(), rhs.data(), MaxL, MaxR) == 0;
 }
 
-template <std::size_t MaxN>
+template <std::size_t MaxL>
 inline bool
-operator !=(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
+operator ==(const NString<MaxL>& lhs, const char* rhs) noexcept
 {
-    return strncmp(lhs.data(), rhs.data(), MaxN) != 0;
+    return lexncmp(lhs.data(), rhs, MaxL, std::numeric_limits<std::size_t>::max()) == 0;
 }
 
-template <std::size_t MaxN>
+template <std::size_t MaxR>
 inline bool
-operator <(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
+operator ==(const char* lhs, const NString<MaxR>& rhs) noexcept
 {
-    return strncmp(lhs.data(), rhs.data(), MaxN) < 0;
+    return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), MaxR) == 0;
 }
 
-template <std::size_t MaxN>
+template <std::size_t MaxL, std::size_t MaxR>
 inline bool
-operator <=(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
+operator !=(const NString<MaxL>& lhs, const NString<MaxR>& rhs) noexcept
 {
-    return strncmp(lhs.data(), rhs.data(), MaxN) <= 0;
+    return lexncmp(lhs.data(), rhs.data(), MaxL, MaxR) != 0;
 }
 
-template <std::size_t MaxN>
+template <std::size_t MaxL>
 inline bool
-operator >(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
+operator !=(const NString<MaxL>& lhs, const char* rhs) noexcept
 {
-    return strncmp(lhs.data(), rhs.data(), MaxN) > 0;
+    return lexncmp(lhs.data(), rhs, MaxL, std::numeric_limits<std::size_t>::max()) != 0;
 }
 
-template <std::size_t MaxN>
+template <std::size_t MaxR>
 inline bool
-operator >=(const NString<MaxN>& lhs, const NString<MaxN>& rhs) noexcept
+operator !=(const char* lhs, const NString<MaxR>& rhs) noexcept
 {
-    return strncmp(lhs.data(), rhs.data(), MaxN) >= 0;
+    return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), MaxR) != 0;
+}
+
+template <std::size_t MaxL, std::size_t MaxR>
+inline bool
+operator <(const NString<MaxL>& lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs.data(), MaxL, MaxR) < 0;
+}
+
+template <std::size_t MaxL>
+inline bool
+operator <(const NString<MaxL>& lhs, const char* rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs, MaxL, std::numeric_limits<std::size_t>::max()) < 0;
+}
+
+template <std::size_t MaxR>
+inline bool
+operator <(const char* lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), MaxR) < 0;
+}
+
+template <std::size_t MaxL, std::size_t MaxR>
+inline bool
+operator <=(const NString<MaxL>& lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs.data(), MaxL, MaxR) <= 0;
+}
+
+template <std::size_t MaxL>
+inline bool
+operator <=(const NString<MaxL>& lhs, const char* rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs, MaxL, std::numeric_limits<std::size_t>::max()) <= 0;
+}
+
+template <std::size_t MaxR>
+inline bool
+operator <=(const char* lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), MaxR) <= 0;
+}
+
+template <std::size_t MaxL, std::size_t MaxR>
+inline bool
+operator >(const NString<MaxL>& lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs.data(), MaxL, MaxR) > 0;
+}
+
+template <std::size_t MaxL>
+inline bool
+operator >(const NString<MaxL>& lhs, const char* rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs, MaxL, std::numeric_limits<std::size_t>::max()) > 0;
+}
+
+template <std::size_t MaxR>
+inline bool
+operator >(const char* lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), MaxR) > 0;
+}
+
+template <std::size_t MaxL, std::size_t MaxR>
+inline bool
+operator >=(const NString<MaxL>& lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs.data(), MaxL, MaxR) >= 0;
+}
+
+template <std::size_t MaxL>
+inline bool
+operator >=(const NString<MaxL>& lhs, const char* rhs) noexcept
+{
+    return lexncmp(lhs.data(), rhs, MaxL, std::numeric_limits<std::size_t>::max()) >= 0;
+}
+
+template <std::size_t MaxR>
+inline bool
+operator >=(const char* lhs, const NString<MaxR>& rhs) noexcept
+{
+    return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), MaxR) >= 0;
 }
 
 inline std::size_t
