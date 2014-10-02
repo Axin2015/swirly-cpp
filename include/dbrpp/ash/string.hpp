@@ -132,113 +132,6 @@ lexncmp(const char* lhs, const char* rhs, std::size_t lhn, std::size_t rhn)
 template <std::size_t MaxN = std::numeric_limits<std::size_t>::max()>
 class NString;
 
-template <std::size_t MaxN>
-class NString {
-    const char* begin_;
-public:
-    typedef char ValueType;
-    typedef const char* ConstPointer;
-    typedef const char& ConstReference;
-
-    typedef const char* ConstIterator;
-    typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
-
-    typedef std::ptrdiff_t DifferenceType;
-    typedef std::size_t SizeType;
-
-    // Standard typedefs.
-
-    typedef ValueType value_type;
-    typedef ConstPointer const_pointer;
-    typedef ConstReference const_reference;
-
-    typedef ConstIterator const_iterator;
-    typedef ConstReverseIterator const_reverse_iterator;
-
-    typedef DifferenceType difference_type;
-    typedef DifferenceType distance_type;
-    typedef SizeType size_type;
-public:
-    explicit
-    NString(const char* begin) noexcept
-        : begin_{begin}
-    {
-    }
-
-    // Iterator.
-
-    const_iterator
-    begin() const noexcept
-    {
-        return begin_;
-    }
-    const_iterator
-    end() const noexcept
-    {
-        return begin_ + size();
-    }
-    ConstReverseIterator
-    rbegin() const noexcept
-    {
-        return ConstReverseIterator{end()};
-    }
-    ConstReverseIterator
-    rend() const noexcept
-    {
-        return ConstReverseIterator{begin()};
-    }
-    ConstIterator
-    find(char ch) const noexcept
-    {
-        const char* match = strchr(begin(), ch);
-        return match ? ConstIterator{match} : end();
-    }
-    ConstIterator
-    find(const char* str) const noexcept
-    {
-        const char* match = strstr(begin(), str);
-        return match ? ConstIterator{match} : end();
-    }
-
-    // Accessor.
-
-    ValueType
-    front() const noexcept
-    {
-        return *begin();
-    }
-    ValueType
-    back() const noexcept
-    {
-        return *(end() - 1);
-    }
-    SizeType
-    size() const noexcept
-    {
-        return strnlen(begin_, MaxN);
-    }
-    SizeType
-    max_size() const noexcept
-    {
-        return MaxN;
-    }
-    bool
-    empty() const noexcept
-    {
-        return size() == 0;
-    }
-    const char*
-    data() const noexcept
-    {
-        return begin_;
-    }
-    std::string
-    str() const
-    {
-        return strncpy(begin_, MaxN);
-    }
-};
-
 template <>
 class NString<std::numeric_limits<std::size_t>::max()> {
     const char* begin_;
@@ -307,6 +200,13 @@ public:
         const char* match = strstr(begin(), str);
         return match ? ConstIterator{match} : end();
     }
+    NString<>
+    substr(SizeType pos = 0,
+           SizeType count = std::numeric_limits<std::size_t>::max()) const noexcept
+    {
+        const char* begin = std::min(this->begin() + pos, end());
+        return NString<>(begin, std::min(begin + count, end()));
+    }
 
     // Accessor.
 
@@ -344,6 +244,120 @@ public:
     str() const
     {
         return std::string(begin_, end_);
+    }
+};
+
+template <std::size_t MaxN>
+class NString {
+    const char* begin_;
+public:
+    typedef char ValueType;
+    typedef const char* ConstPointer;
+    typedef const char& ConstReference;
+
+    typedef const char* ConstIterator;
+    typedef std::reverse_iterator<ConstIterator> ConstReverseIterator;
+
+    typedef std::ptrdiff_t DifferenceType;
+    typedef std::size_t SizeType;
+
+    // Standard typedefs.
+
+    typedef ValueType value_type;
+    typedef ConstPointer const_pointer;
+    typedef ConstReference const_reference;
+
+    typedef ConstIterator const_iterator;
+    typedef ConstReverseIterator const_reverse_iterator;
+
+    typedef DifferenceType difference_type;
+    typedef DifferenceType distance_type;
+    typedef SizeType size_type;
+public:
+    explicit
+    NString(const char* begin) noexcept
+        : begin_{begin}
+    {
+    }
+
+    // Iterator.
+
+    const_iterator
+    begin() const noexcept
+    {
+        return begin_;
+    }
+    const_iterator
+    end() const noexcept
+    {
+        return begin_ + size();
+    }
+    ConstReverseIterator
+    rbegin() const noexcept
+    {
+        return ConstReverseIterator{end()};
+    }
+    ConstReverseIterator
+    rend() const noexcept
+    {
+        return ConstReverseIterator{begin()};
+    }
+    ConstIterator
+    find(char ch) const noexcept
+    {
+        const char* match = strchr(begin(), ch);
+        return match ? ConstIterator{match} : end();
+    }
+    ConstIterator
+    find(const char* str) const noexcept
+    {
+        const char* match = strstr(begin(), str);
+        return match ? ConstIterator{match} : end();
+    }
+    NString<>
+    substr(SizeType pos = 0,
+           SizeType count = std::numeric_limits<std::size_t>::max()) const noexcept
+    {
+        const char* begin = std::min(this->begin() + pos, end());
+        return NString<>(begin, std::min(begin + count, end()));
+    }
+
+    // Accessor.
+
+    ValueType
+    front() const noexcept
+    {
+        return *begin();
+    }
+    ValueType
+    back() const noexcept
+    {
+        return *(end() - 1);
+    }
+    SizeType
+    size() const noexcept
+    {
+        return strnlen(begin_, MaxN);
+    }
+    SizeType
+    max_size() const noexcept
+    {
+        return MaxN;
+    }
+    bool
+    empty() const noexcept
+    {
+        return size() == 0;
+    }
+    const char*
+    data() const noexcept
+    {
+        return begin_;
+    }
+    std::string
+    str() const
+    {
+        return strncpy(begin_, MaxN);
     }
 };
 

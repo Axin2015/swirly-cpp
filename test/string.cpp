@@ -45,3 +45,13 @@ TEST_CASE(string_equality)
     check(s != "abcxxx");
     check("abcxxx" != s);
 }
+
+TEST_CASE(string_substr)
+{
+    NString<10> s("0123456789");
+
+    check(s.substr() == "0123456789");
+    check(s.substr(4) == "456789");
+    check(s.substr(0, 4) == "0123");
+    check(s.substr(4, 4) == "4567");
+}
