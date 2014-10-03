@@ -71,4 +71,9 @@ TEST_CASE(string_size)
     check(s.max_size() == 10);
     check(s.size() == 5);
     check(s.max_size() == 5);
+
+    s = CString("0123456789", MaxSize<5>());
+    check(s.max_size() == 5);
+    check(s.size() == 5);
+    check(s.max_size() == 5);
 }
