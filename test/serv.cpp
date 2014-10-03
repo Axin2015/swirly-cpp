@@ -67,11 +67,11 @@ TEST_CASE(serv_accnt)
 
     AccntRecRef arec = get_rec_mnem<DBR_ENTITY_ACCNT>(serv, "DBRA");
     check(arec == get_rec_id<DBR_ENTITY_ACCNT>(serv, arec.id()));
-    check(arec.mnem() == Mnem("DBRA"));
+    check(arec.mnem() == "DBRA");
 
     // Body.
-    check(arec.display() == Display("Account A"));
-    check(arec.email() == Email("dbra@doobry.org"));
+    check(arec.display() == "Account A");
+    check(arec.email() == "dbra@doobry.org");
 }
 
 TEST_CASE(serv_contr)
@@ -86,13 +86,13 @@ TEST_CASE(serv_contr)
 
     ContrRecRef crec = get_rec_mnem<DBR_ENTITY_CONTR>(serv, "EURUSD");
     check(crec == get_rec_id<DBR_ENTITY_CONTR>(serv, crec.id()));
-    check(crec.mnem() == Mnem("EURUSD"));
+    check(crec.mnem() == "EURUSD");
 
     // Body.
-    check(crec.display() == Display("EURUSD"));
-    check(crec.asset_type() == Mnem("CURRENCY"));
-    check(crec.asset() == Mnem("EUR"));
-    check(crec.ccy() == Mnem("USD"));
+    check(crec.display() == "EURUSD");
+    check(crec.asset_type() == "CURRENCY");
+    check(crec.asset() == "EUR");
+    check(crec.ccy() == "USD");
     check(fequal(crec.price_inc(), 0.0001));
     check(fequal(crec.qty_inc(), 1e6));
     check(crec.price_dp() == 4);

@@ -69,30 +69,30 @@ public:
     {
         return impl_.id;
     }
-    Mnem
+    CString
     accnt() const noexcept
     {
-        return Mnem{impl_.accnt};
+        return CString{impl_.accnt, MNEM_MAX};
     }
-    Mnem
+    CString
     giveup() const noexcept
     {
-        return Mnem{impl_.giveup};
+        return CString{impl_.giveup, MNEM_MAX};
     }
-    Mnem
+    CString
     contr() const noexcept
     {
-        return Mnem{impl_.contr};
+        return CString{impl_.contr, MNEM_MAX};
     }
     DbrIsoDate
     settl_date() const noexcept
     {
         return impl_.settl_date;
     }
-    Ref
+    CString
     ref() const noexcept
     {
-        return Ref{impl_.ref};
+        return CString{impl_.ref, REF_MAX};
     }
     int
     action() const noexcept
