@@ -72,15 +72,15 @@ public:
     {
         return impl_->id;
     }
-    CString
+    RString
     mnem() const noexcept
     {
-        return CString{impl_->mnem, MNEM_MAX};
+        return RString{impl_->mnem, MNEM_MAX};
     }
-    CString
+    RString
     display() const noexcept
     {
-        return CString{impl_->display, DISPLAY_MAX};
+        return RString{impl_->display, DISPLAY_MAX};
     }
 };
 
@@ -115,10 +115,10 @@ public:
         : RecRefBase{impl}
     {
     }
-    CString
+    RString
     email() const noexcept
     {
-        return CString{impl_->accnt.email, EMAIL_MAX};
+        return RString{impl_->accnt.email, EMAIL_MAX};
     }
 };
 
@@ -145,20 +145,20 @@ public:
         : RecRefBase{impl}
     {
     }
-    CString
+    RString
     asset_type() const noexcept
     {
-        return CString{impl_->contr.asset_type, MNEM_MAX};
+        return RString{impl_->contr.asset_type, MNEM_MAX};
     }
-    CString
+    RString
     asset() const noexcept
     {
-        return CString{impl_->contr.asset, MNEM_MAX};
+        return RString{impl_->contr.asset, MNEM_MAX};
     }
-    CString
+    RString
     ccy() const noexcept
     {
-        return CString{impl_->contr.ccy, MNEM_MAX};
+        return RString{impl_->contr.ccy, MNEM_MAX};
     }
     int
     tick_numer() const noexcept

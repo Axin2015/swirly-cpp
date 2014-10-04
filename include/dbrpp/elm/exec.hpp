@@ -84,10 +84,10 @@ public:
     {
         return impl_->c.settl_day;
     }
-    CString
+    RString
     ref() const noexcept
     {
-        return CString{impl_->c.ref, REF_MAX};
+        return RString{impl_->c.ref, REF_MAX};
     }
     int
     state() const noexcept

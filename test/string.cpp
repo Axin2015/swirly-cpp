@@ -37,7 +37,7 @@ TEST_CASE(string_lexncmp)
 
 TEST_CASE(string_equality)
 {
-    CString s("abcxxx", MaxSize<3>());
+    RString s("abcxxx", MaxSize<3>());
 
     check(s == "abc");
     check("abc" == s);
@@ -48,7 +48,7 @@ TEST_CASE(string_equality)
 
 TEST_CASE(string_substr)
 {
-    CString s("0123456789", MaxSize<10>());
+    RString s("0123456789", MaxSize<10>());
 
     check(s.substr() == "0123456789");
     check(s.substr(4) == "456789");
@@ -58,21 +58,21 @@ TEST_CASE(string_substr)
 
 TEST_CASE(string_size)
 {
-    CString s("0123456789");
+    RString s("0123456789");
     check(s.max_size() == std::numeric_limits<std::ptrdiff_t>::max());
     check(s.size() == 10);
     check(s.max_size() == 10);
 
-    s = CString("0123456789", 5);
+    s = RString("0123456789", 5);
     check(s.max_size() == 5);
     check(s.size() == 5);
 
-    s = CString("01234", MaxSize<10>());
+    s = RString("01234", MaxSize<10>());
     check(s.max_size() == 10);
     check(s.size() == 5);
     check(s.max_size() == 5);
 
-    s = CString("0123456789", MaxSize<5>());
+    s = RString("0123456789", MaxSize<5>());
     check(s.max_size() == 5);
     check(s.size() == 5);
     check(s.max_size() == 5);
