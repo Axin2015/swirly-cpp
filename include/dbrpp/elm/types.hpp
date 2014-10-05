@@ -29,16 +29,6 @@ namespace dbr {
  * @{
  */
 
-typedef MaxSize<DBR_DISPLAY_MAX> DisplayMax;
-typedef MaxSize<DBR_EMAIL_MAX> EmailMax;
-typedef MaxSize<DBR_MNEM_MAX> MnemMax;
-typedef MaxSize<DBR_REF_MAX> RefMax;
-
-const auto DISPLAY_MAX = DisplayMax();
-const auto EMAIL_MAX = EmailMax();
-const auto MNEM_MAX = MnemMax();
-const auto REF_MAX = RefMax();
-
 /** @} */
 
 } // dbr

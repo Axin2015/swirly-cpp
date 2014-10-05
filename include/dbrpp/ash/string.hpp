@@ -128,13 +128,24 @@ lexncmp(const char* lhs, const char* rhs, std::size_t lhn, std::size_t rhn)
     return 0;
 }
 
-template <std::size_t N>
-struct MaxSize {
-    static const std::size_t VALUE = N;
+class MaxSize {
+    size_t max_size_;
+public:
+    constexpr explicit
+    MaxSize(size_t max_size) noexcept
+      : max_size_(static_cast<std::ptrdiff_t>(max_size))
+    {
+    }
+    constexpr
+    operator std::ptrdiff_t() const noexcept
+    {
+        return max_size_;
+    }
 };
 
-class RString {
+class StringRef {
     const char* begin_;
+    // Length calculation may be deferred.
     mutable std::ptrdiff_t size_;
 public:
     typedef char ValueType;
@@ -160,20 +171,28 @@ public:
     typedef DifferenceType distance_type;
     typedef SizeType size_type;
 public:
-    RString(const char* begin) noexcept
+    constexpr
+    StringRef() noexcept
+        : begin_{""},
+          size_{0}
+    {
+    }
+    constexpr
+    StringRef(const char* begin) noexcept
         : begin_{begin},
           size_{-std::numeric_limits<std::ptrdiff_t>::max()}
     {
     }
-    RString(const char* begin, std::size_t size) noexcept
+    constexpr
+    StringRef(const char* begin, std::size_t size) noexcept
         : begin_{begin},
           size_{static_cast<std::ptrdiff_t>(size)}
     {
     }
-    template <std::size_t N>
-    RString(const char* begin, MaxSize<N>) noexcept
+    constexpr
+    StringRef(const char* begin, MaxSize max_size) noexcept
         : begin_{begin},
-          size_{-static_cast<std::ptrdiff_t>(MaxSize<N>::VALUE)}
+          size_{-static_cast<std::ptrdiff_t>(max_size)}
     {
     }
 
@@ -211,13 +230,16 @@ public:
         const char* match = strstr(begin(), str);
         return match ? ConstIterator{match} : end();
     }
-    RString
+    StringRef
     substr(SizeType pos = 0,
            SizeType count = std::numeric_limits<std::size_t>::max()) const noexcept
     {
-        // TODO: keep it simple for now, but may be able to avoid call to size()?
+        if (size_ < 0) {
+            count = std::min(count, max_size() - pos);
+            return StringRef(begin() + pos, MaxSize(count));
+        }
         count = std::min(count, size() - pos);
-        return RString(begin() + pos, count);
+        return StringRef(begin() + pos, count);
     }
 
     // Accessor.
@@ -262,13 +284,13 @@ public:
 };
 
 inline std::string
-to_string(const RString& rstr)
+to_string(const StringRef& rstr)
 {
     return rstr.str();
 }
 
 inline std::ostream&
-operator <<(std::ostream& os, const RString& rstr)
+operator <<(std::ostream& os, const StringRef& rstr)
 {
     // FIXME: write() ignores stream formatters.
     // os.write(rstr.data(), rstr.size());
@@ -277,109 +299,109 @@ operator <<(std::ostream& os, const RString& rstr)
 }
 
 inline bool
-operator ==(const RString& lhs, const RString& rhs) noexcept
+operator ==(const StringRef& lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs.data(), lhs.max_size(), rhs.max_size()) == 0;
 }
 
 inline bool
-operator ==(const RString& lhs, const char* rhs) noexcept
+operator ==(const StringRef& lhs, const char* rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs, lhs.max_size(), std::numeric_limits<std::size_t>::max()) == 0;
 }
 
 inline bool
-operator ==(const char* lhs, const RString& rhs) noexcept
+operator ==(const char* lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), rhs.max_size()) == 0;
 }
 
 inline bool
-operator !=(const RString& lhs, const RString& rhs) noexcept
+operator !=(const StringRef& lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs.data(), lhs.max_size(), rhs.max_size()) != 0;
 }
 
 inline bool
-operator !=(const RString& lhs, const char* rhs) noexcept
+operator !=(const StringRef& lhs, const char* rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs, lhs.max_size(), std::numeric_limits<std::size_t>::max()) != 0;
 }
 
 inline bool
-operator !=(const char* lhs, const RString& rhs) noexcept
+operator !=(const char* lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), rhs.max_size()) != 0;
 }
 
 inline bool
-operator <(const RString& lhs, const RString& rhs) noexcept
+operator <(const StringRef& lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs.data(), lhs.max_size(), rhs.max_size()) < 0;
 }
 
 inline bool
-operator <(const RString& lhs, const char* rhs) noexcept
+operator <(const StringRef& lhs, const char* rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs, lhs.max_size(), std::numeric_limits<std::size_t>::max()) < 0;
 }
 
 inline bool
-operator <(const char* lhs, const RString& rhs) noexcept
+operator <(const char* lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), rhs.max_size()) < 0;
 }
 
 inline bool
-operator <=(const RString& lhs, const RString& rhs) noexcept
+operator <=(const StringRef& lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs.data(), lhs.max_size(), rhs.max_size()) <= 0;
 }
 
 inline bool
-operator <=(const RString& lhs, const char* rhs) noexcept
+operator <=(const StringRef& lhs, const char* rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs, lhs.max_size(), std::numeric_limits<std::size_t>::max()) <= 0;
 }
 
 inline bool
-operator <=(const char* lhs, const RString& rhs) noexcept
+operator <=(const char* lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), rhs.max_size()) <= 0;
 }
 
 inline bool
-operator >(const RString& lhs, const RString& rhs) noexcept
+operator >(const StringRef& lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs.data(), lhs.max_size(), rhs.max_size()) > 0;
 }
 
 inline bool
-operator >(const RString& lhs, const char* rhs) noexcept
+operator >(const StringRef& lhs, const char* rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs, lhs.max_size(), std::numeric_limits<std::size_t>::max()) > 0;
 }
 
 inline bool
-operator >(const char* lhs, const RString& rhs) noexcept
+operator >(const char* lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), rhs.max_size()) > 0;
 }
 
 inline bool
-operator >=(const RString& lhs, const RString& rhs) noexcept
+operator >=(const StringRef& lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs.data(), lhs.max_size(), rhs.max_size()) >= 0;
 }
 
 inline bool
-operator >=(const RString& lhs, const char* rhs) noexcept
+operator >=(const StringRef& lhs, const char* rhs) noexcept
 {
     return lexncmp(lhs.data(), rhs, lhs.max_size(), std::numeric_limits<std::size_t>::max()) >= 0;
 }
 
 inline bool
-operator >=(const char* lhs, const RString& rhs) noexcept
+operator >=(const char* lhs, const StringRef& rhs) noexcept
 {
     return lexncmp(lhs, rhs.data(), std::numeric_limits<std::size_t>::max(), rhs.max_size()) >= 0;
 }
@@ -393,9 +415,9 @@ strnhash(const char* s, std::size_t n) noexcept
     return h;
 }
 
-struct RStringHash {
+struct StringRefHash {
 
-    typedef RString ArgumentType;
+    typedef StringRef ArgumentType;
     typedef std::size_t ResultType;
 
     // Standard typedefs.

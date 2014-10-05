@@ -69,30 +69,30 @@ public:
     {
         return impl_.id;
     }
-    RString
+    StringRef
     accnt() const noexcept
     {
-        return RString{impl_.accnt, MNEM_MAX};
+        return StringRef{impl_.accnt, MaxSize{DBR_MNEM_MAX}};
     }
-    RString
+    StringRef
     giveup() const noexcept
     {
-        return RString{impl_.giveup, MNEM_MAX};
+        return StringRef{impl_.giveup, MaxSize{DBR_MNEM_MAX}};
     }
-    RString
+    StringRef
     contr() const noexcept
     {
-        return RString{impl_.contr, MNEM_MAX};
+        return StringRef{impl_.contr, MaxSize{DBR_MNEM_MAX}};
     }
     DbrIsoDate
     settl_date() const noexcept
     {
         return impl_.settl_date;
     }
-    RString
+    StringRef
     ref() const noexcept
     {
-        return RString{impl_.ref, REF_MAX};
+        return StringRef{impl_.ref, MaxSize{DBR_REF_MAX}};
     }
     int
     action() const noexcept

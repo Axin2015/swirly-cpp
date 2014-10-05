@@ -79,10 +79,10 @@ public:
     {
         return impl_->c.settl_day;
     }
-    RString
+    StringRef
     ref() const noexcept
     {
-        return RString{impl_->c.ref, REF_MAX};
+        return StringRef{impl_->c.ref, MaxSize{DBR_REF_MAX}};
     }
     int
     state() const noexcept
