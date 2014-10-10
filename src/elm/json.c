@@ -185,19 +185,19 @@ dbr_json_order_len(const struct DbrOrder* order)
 
     return ORDER_SIZE
         + dbr_long_len(order->id)
-        + strnlen(order->c.trader.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(order->c.giveup.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(order->c.contr.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(order->i.trader.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(order->i.giveup.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(order->i.contr.rec->mnem, DBR_MNEM_MAX)
         + 8
-        + strnlen(order->c.ref, DBR_REF_MAX)
-        + elm_state_len(order->c.state)
-        + elm_action_len(order->c.action)
-        + dbr_long_len(order->c.ticks)
-        + dbr_long_len(order->c.lots)
-        + dbr_long_len(order->c.resd)
-        + dbr_long_len(order->c.exec)
-        + dbr_long_len(order->c.last_ticks)
-        + dbr_long_len(order->c.last_lots)
+        + strnlen(order->i.ref, DBR_REF_MAX)
+        + elm_state_len(order->i.state)
+        + elm_action_len(order->i.action)
+        + dbr_long_len(order->i.ticks)
+        + dbr_long_len(order->i.lots)
+        + dbr_long_len(order->i.resd)
+        + dbr_long_len(order->i.exec)
+        + dbr_long_len(order->i.last_ticks)
+        + dbr_long_len(order->i.last_lots)
         + dbr_long_len(order->created)
         + dbr_long_len(order->modified);
 }
@@ -225,19 +225,19 @@ dbr_json_write_order(char* buf, const struct DbrOrder* order)
 
     return dbr_format(buf, ORDER_FORMAT,
                       order->id,
-                      order->c.trader.rec->mnem,
-                      order->c.giveup.rec->mnem,
-                      order->c.contr.rec->mnem,
-                      order->c.settl_day,
-                      DBR_REF_MAX, order->c.ref,
-                      order->c.state,
-                      order->c.action,
-                      order->c.ticks,
-                      order->c.lots,
-                      order->c.resd,
-                      order->c.exec,
-                      order->c.last_ticks,
-                      order->c.last_lots,
+                      order->i.trader.rec->mnem,
+                      order->i.giveup.rec->mnem,
+                      order->i.contr.rec->mnem,
+                      order->i.settl_day,
+                      DBR_REF_MAX, order->i.ref,
+                      order->i.state,
+                      order->i.action,
+                      order->i.ticks,
+                      order->i.lots,
+                      order->i.resd,
+                      order->i.exec,
+                      order->i.last_ticks,
+                      order->i.last_lots,
                       order->created,
                       order->modified);
 }
@@ -270,19 +270,19 @@ dbr_json_exec_len(const struct DbrExec* exec)
     return EXEC_SIZE
         + dbr_long_len(exec->id)
         + dbr_long_len(exec->order)
-        + strnlen(exec->c.trader.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(exec->c.giveup.rec->mnem, DBR_MNEM_MAX)
-        + strnlen(exec->c.contr.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(exec->i.trader.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(exec->i.giveup.rec->mnem, DBR_MNEM_MAX)
+        + strnlen(exec->i.contr.rec->mnem, DBR_MNEM_MAX)
         + 8
-        + strnlen(exec->c.ref, DBR_REF_MAX)
-        + elm_state_len(exec->c.state)
-        + elm_action_len(exec->c.action)
-        + dbr_long_len(exec->c.ticks)
-        + dbr_long_len(exec->c.lots)
-        + dbr_long_len(exec->c.resd)
-        + dbr_long_len(exec->c.exec)
-        + dbr_long_len(exec->c.last_ticks)
-        + dbr_long_len(exec->c.last_lots)
+        + strnlen(exec->i.ref, DBR_REF_MAX)
+        + elm_state_len(exec->i.state)
+        + elm_action_len(exec->i.action)
+        + dbr_long_len(exec->i.ticks)
+        + dbr_long_len(exec->i.lots)
+        + dbr_long_len(exec->i.resd)
+        + dbr_long_len(exec->i.exec)
+        + dbr_long_len(exec->i.last_ticks)
+        + dbr_long_len(exec->i.last_lots)
         + dbr_long_len(exec->match)
         + elm_role_len(exec->role)
         + strnlen(exec->cpty.rec->mnem, DBR_MNEM_MAX)
@@ -316,19 +316,19 @@ dbr_json_write_exec(char* buf, const struct DbrExec* exec)
     return dbr_format(buf, EXEC_FORMAT,
                       exec->id,
                       exec->order,
-                      exec->c.trader.rec->mnem,
-                      exec->c.giveup.rec->mnem,
-                      exec->c.contr.rec->mnem,
-                      exec->c.settl_day,
-                      DBR_REF_MAX, exec->c.ref,
-                      exec->c.state,
-                      exec->c.action,
-                      exec->c.ticks,
-                      exec->c.lots,
-                      exec->c.resd,
-                      exec->c.exec,
-                      exec->c.last_ticks,
-                      exec->c.last_lots,
+                      exec->i.trader.rec->mnem,
+                      exec->i.giveup.rec->mnem,
+                      exec->i.contr.rec->mnem,
+                      exec->i.settl_day,
+                      DBR_REF_MAX, exec->i.ref,
+                      exec->i.state,
+                      exec->i.action,
+                      exec->i.ticks,
+                      exec->i.lots,
+                      exec->i.resd,
+                      exec->i.exec,
+                      exec->i.last_ticks,
+                      exec->i.last_lots,
                       exec->match,
                       exec->role,
                       exec->cpty.rec->mnem,

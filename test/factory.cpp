@@ -105,24 +105,24 @@ create_order(Pool& pool, DbrIden id, DbrRec& trader, DbrRec& giveup, DbrRec& con
 
     order->level = NULL;
     order->id = id;
-    order->c.trader.rec = &trader;
-    order->c.giveup.rec = &giveup;
-    order->c.contr.rec = &contr;
-    order->c.settl_day = settl_day;
+    order->i.trader.rec = &trader;
+    order->i.giveup.rec = &giveup;
+    order->i.contr.rec = &contr;
+    order->i.settl_day = settl_day;
     if (ref)
-        strncpy(order->c.ref, ref, DBR_REF_MAX);
+        strncpy(order->i.ref, ref, DBR_REF_MAX);
     else
-        order->c.ref[0] = '\0';
+        order->i.ref[0] = '\0';
 
-    order->c.state = 0;
-    order->c.action = action;
-    order->c.ticks = ticks;
-    order->c.lots = lots;
-    order->c.resd = lots;
-    order->c.exec = 0;
-    order->c.last_ticks = 0;
-    order->c.last_lots = 0;
-    order->c.min_lots = min_lots;
+    order->i.state = 0;
+    order->i.action = action;
+    order->i.ticks = ticks;
+    order->i.lots = lots;
+    order->i.resd = lots;
+    order->i.exec = 0;
+    order->i.last_ticks = 0;
+    order->i.last_lots = 0;
+    order->i.min_lots = min_lots;
     order->created = now;
     order->modified = now;
 
@@ -142,24 +142,24 @@ create_order(Pool& pool, DbrIden id, DbrIden tid, DbrIden gid, DbrIden cid,
 
     order->level = NULL;
     order->id = id;
-    order->c.trader.id_only = tid;
-    order->c.giveup.id_only = gid;
-    order->c.contr.id_only = cid;
-    order->c.settl_day = settl_day;
+    order->i.trader.id_only = tid;
+    order->i.giveup.id_only = gid;
+    order->i.contr.id_only = cid;
+    order->i.settl_day = settl_day;
     if (ref)
-        strncpy(order->c.ref, ref, DBR_REF_MAX);
+        strncpy(order->i.ref, ref, DBR_REF_MAX);
     else
-        order->c.ref[0] = '\0';
+        order->i.ref[0] = '\0';
 
-    order->c.state = 0;
-    order->c.action = action;
-    order->c.ticks = ticks;
-    order->c.lots = lots;
-    order->c.resd = lots;
-    order->c.exec = 0;
-    order->c.last_ticks = 0;
-    order->c.last_lots = 0;
-    order->c.min_lots = min_lots;
+    order->i.state = 0;
+    order->i.action = action;
+    order->i.ticks = ticks;
+    order->i.lots = lots;
+    order->i.resd = lots;
+    order->i.exec = 0;
+    order->i.last_ticks = 0;
+    order->i.last_lots = 0;
+    order->i.min_lots = min_lots;
     order->created = now;
     order->modified = now;
 
@@ -180,23 +180,23 @@ create_trade(dbr::Pool& pool, DbrIden id, DbrIden order, DbrRec& trader, DbrRec&
 
     ptr->id = id;
     ptr->order = order;
-    ptr->c.trader.rec = &trader;
-    ptr->c.giveup.rec = &giveup;
-    ptr->c.contr.rec = &contr;
-    ptr->c.settl_day = settl_day;
+    ptr->i.trader.rec = &trader;
+    ptr->i.giveup.rec = &giveup;
+    ptr->i.contr.rec = &contr;
+    ptr->i.settl_day = settl_day;
     if (ref)
-        strncpy(ptr->c.ref, ref, DBR_REF_MAX);
+        strncpy(ptr->i.ref, ref, DBR_REF_MAX);
     else
-        ptr->c.ref[0] = '\0';
-    ptr->c.state = 0;
-    ptr->c.action = action;
-    ptr->c.ticks = ticks;
-    ptr->c.lots = lots;
-    ptr->c.resd = resd;
-    ptr->c.exec = exec;
-    ptr->c.last_ticks = last_ticks;
-    ptr->c.last_lots = last_lots;
-    ptr->c.min_lots = 0;
+        ptr->i.ref[0] = '\0';
+    ptr->i.state = 0;
+    ptr->i.action = action;
+    ptr->i.ticks = ticks;
+    ptr->i.lots = lots;
+    ptr->i.resd = resd;
+    ptr->i.exec = exec;
+    ptr->i.last_ticks = last_ticks;
+    ptr->i.last_lots = last_lots;
+    ptr->i.min_lots = 0;
     ptr->match = match;
     ptr->role = role;
     ptr->cpty.rec = &cpty;
@@ -219,23 +219,23 @@ create_trade(Pool& pool, DbrIden id, DbrIden order, DbrIden tid, DbrIden gid,
 
     ptr->id = id;
     ptr->order = order;
-    ptr->c.trader.id_only = tid;
-    ptr->c.giveup.id_only = gid;
-    ptr->c.contr.id_only = cid;
-    ptr->c.settl_day = settl_day;
+    ptr->i.trader.id_only = tid;
+    ptr->i.giveup.id_only = gid;
+    ptr->i.contr.id_only = cid;
+    ptr->i.settl_day = settl_day;
     if (ref)
-        strncpy(ptr->c.ref, ref, DBR_REF_MAX);
+        strncpy(ptr->i.ref, ref, DBR_REF_MAX);
     else
-        ptr->c.ref[0] = '\0';
-    ptr->c.state = 0;
-    ptr->c.action = action;
-    ptr->c.ticks = ticks;
-    ptr->c.lots = lots;
-    ptr->c.resd = resd;
-    ptr->c.exec = exec;
-    ptr->c.last_ticks = last_ticks;
-    ptr->c.last_lots = last_lots;
-    ptr->c.min_lots = 0;
+        ptr->i.ref[0] = '\0';
+    ptr->i.state = 0;
+    ptr->i.action = action;
+    ptr->i.ticks = ticks;
+    ptr->i.lots = lots;
+    ptr->i.resd = resd;
+    ptr->i.exec = exec;
+    ptr->i.last_ticks = last_ticks;
+    ptr->i.last_lots = last_lots;
+    ptr->i.min_lots = 0;
     ptr->match = match;
     ptr->role = role;
     ptr->cpty.id_only = cpty;

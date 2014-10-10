@@ -162,7 +162,7 @@ fig_accnt_emplace_order(struct FigAccnt* accnt, struct DbrOrder* order)
         assert(node == &order->accnt_node_);
     }
 #pragma GCC diagnostic pop
-    if (order->c.ref[0] != '\0')
+    if (order->i.ref[0] != '\0')
         fig_ordidx_insert(accnt->ordidx, order);
 }
 
@@ -173,8 +173,8 @@ fig_accnt_release_order(struct FigAccnt* accnt, struct DbrOrder* order)
 {
     dbr_tree_remove(&accnt->orders, &order->accnt_node_);
     dbr_rbnode_init(&order->accnt_node_);
-    if (order->c.ref[0] != '\0')
-        fig_ordidx_remove(accnt->ordidx, accnt->rec->id, order->c.ref);
+    if (order->i.ref[0] != '\0')
+        fig_ordidx_remove(accnt->ordidx, accnt->rec->id, order->i.ref);
 }
 
 // Release ownership from state.

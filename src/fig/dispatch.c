@@ -50,18 +50,18 @@ enrich_perm(struct FigCache* cache, struct DbrPerm* perm)
 static inline struct DbrOrder*
 enrich_order(struct FigCache* cache, struct DbrOrder* order)
 {
-    order->c.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.trader.id_only);
-    order->c.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, order->c.giveup.id_only);
-    order->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->c.contr.id_only);
+    order->i.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, order->i.trader.id_only);
+    order->i.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, order->i.giveup.id_only);
+    order->i.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->i.contr.id_only);
     return order;
 }
 
 static inline struct DbrExec*
 enrich_exec(struct FigCache* cache, struct DbrExec* exec)
 {
-    exec->c.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.trader.id_only);
-    exec->c.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->c.giveup.id_only);
-    exec->c.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->c.contr.id_only);
+    exec->i.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->i.trader.id_only);
+    exec->i.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->i.giveup.id_only);
+    exec->i.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->i.contr.id_only);
     if (exec->cpty.id_only)
         exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
     else
@@ -121,7 +121,7 @@ emplace_order_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrOrder* order = enrich_order(&clnt->cache, dbr_shared_order_entry(node));
-        DbrAccnt trader = order->c.trader.rec->accnt.state;
+        DbrAccnt trader = order->i.trader.rec->accnt.state;
         assert(trader);
         // Transfer ownership.
         fig_accnt_emplace_order(trader, order);
@@ -133,8 +133,8 @@ emplace_exec_list(DbrClnt clnt, struct DbrSlNode* first)
 {
     for (struct DbrSlNode* node = first; node; node = node->next) {
         struct DbrExec* exec = enrich_exec(&clnt->cache, dbr_shared_exec_entry(node));
-        assert(exec->c.state == DBR_STATE_TRADE);
-        DbrAccnt trader = exec->c.trader.rec->accnt.state;
+        assert(exec->i.state == DBR_STATE_TRADE);
+        DbrAccnt trader = exec->i.trader.rec->accnt.state;
         assert(trader);
         // Transfer ownership.
         fig_accnt_insert_trade(trader, exec);
@@ -176,7 +176,7 @@ create_order(DbrClnt clnt, struct DbrExec* exec)
 
     order->level = NULL;
     order->id = exec->order;
-    __builtin_memcpy(&order->c, &exec->c, sizeof(struct DbrCommon));
+    __builtin_memcpy(&order->i, &exec->i, sizeof(struct DbrCommon));
     order->created = exec->created;
     order->modified = exec->created;
     return order;
@@ -188,7 +188,7 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
     struct DbrOrder* order = create_order(clnt, exec);
     if (!order)
         return DBR_FALSE;
-    DbrAccnt trader = order->c.trader.rec->accnt.state;
+    DbrAccnt trader = order->i.trader.rec->accnt.state;
     assert(trader);
     // Transfer ownership.
     fig_accnt_emplace_order(trader, order);
@@ -198,7 +198,7 @@ apply_new(DbrClnt clnt, struct DbrExec* exec)
 static DbrBool
 apply_update(DbrClnt clnt, struct DbrExec* exec)
 {
-    DbrAccnt trader = exec->c.trader.rec->accnt.state;
+    DbrAccnt trader = exec->i.trader.rec->accnt.state;
     assert(trader);
     struct DbrRbNode* node = fig_accnt_find_order_id(trader, exec->order);
     if (!node) {
@@ -207,15 +207,15 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
     }
 
     struct DbrOrder* order = dbr_accnt_order_entry(node);
-    order->c.state = exec->c.state;
-    order->c.lots = exec->c.lots;
-    order->c.resd = exec->c.resd;
-    order->c.exec = exec->c.exec;
-    order->c.last_ticks = exec->c.last_ticks;
-    order->c.last_lots = exec->c.last_lots;
+    order->i.state = exec->i.state;
+    order->i.lots = exec->i.lots;
+    order->i.resd = exec->i.resd;
+    order->i.exec = exec->i.exec;
+    order->i.last_ticks = exec->i.last_ticks;
+    order->i.last_lots = exec->i.last_lots;
     order->modified = exec->created;
 
-    if (exec->c.state == DBR_STATE_TRADE) {
+    if (exec->i.state == DBR_STATE_TRADE) {
         // Transfer ownership.
         fig_accnt_insert_trade(trader, exec);
     }
@@ -467,7 +467,6 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 break;
             case DBR_TRADER_LIST_REP:
                 dbr_log_debug1("trader-list message");
-
                 emplace_trader_list(clnt, body.entity_list_rep.first);
                 break;
             case DBR_GIVEUP_LIST_REP:
@@ -502,7 +501,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
             case DBR_EXEC_REP:
                 dbr_log_debug1("exec message");
                 enrich_exec(&clnt->cache, body.exec_rep.exec);
-                switch (body.exec_rep.exec->c.state) {
+                switch (body.exec_rep.exec->i.state) {
                 case DBR_STATE_NEW:
                     apply_new(clnt, body.exec_rep.exec);
                     break;
@@ -515,7 +514,7 @@ dbr_clnt_dispatch(DbrClnt clnt, DbrMillis ms, DbrHandler handler)
                 dbr_handler_on_exec(handler, clnt, body.req_id, body.exec_rep.exec);
                 if (dbr_exec_done(body.exec_rep.exec)) {
                     struct DbrExec* exec = body.exec_rep.exec;
-                    DbrAccnt trader = exec->c.trader.rec->accnt.state;
+                    DbrAccnt trader = exec->i.trader.rec->accnt.state;
                     assert(trader);
                     struct DbrOrder* order = fig_accnt_release_order_id(trader, exec->order);
                     if (order)

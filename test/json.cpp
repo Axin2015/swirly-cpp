@@ -36,7 +36,7 @@ TEST_CASE(json_order)
 
     auto in = create_order(pool, 1, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
                            "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    in->c.state = DBR_STATE_NEW;
+    in->i.state = DBR_STATE_NEW;
 
     auto len = dbr_json_order_len(in.get());
     char buf[len + 1];
@@ -58,7 +58,7 @@ TEST_CASE(json_trade)
     auto in = create_trade(pool, 1, 2, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14), "apple",
                            DBR_ACTION_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER,
                            *cpty, now);
-    in->c.state = DBR_STATE_TRADE;
+    in->i.state = DBR_STATE_TRADE;
 
     auto len = dbr_json_exec_len(in.get());
     char buf[len + 1];

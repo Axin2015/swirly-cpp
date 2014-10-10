@@ -265,7 +265,7 @@ trflush(struct DbrSess* sess, const struct DbrBody* req)
              node != DBR_SERV_END_EXEC; node = dbr_slnode_next(node)) {
             struct DbrExec* exec = dbr_serv_exec_entry(node);
             // Send execution on associated trader's session.
-            DbrAccnt trader = exec->c.trader.rec->accnt.state;
+            DbrAccnt trader = exec->i.trader.rec->accnt.state;
             // Null if trader is not logged-on.
             struct DbrSess* other = dbr_accnt_sess(trader);
             if (other && !send_exec(other, 0, exec))

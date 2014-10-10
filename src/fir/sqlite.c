@@ -170,77 +170,77 @@ bind_insert_exec(struct FirSqlite* sqlite, const struct DbrExec* exec, DbrBool e
 
     if (enriched) {
 
-        rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.rec->id);
+        rc = sqlite3_bind_int64(stmt, TRADER, exec->i.trader.rec->id);
         if (rc != SQLITE_OK)
             goto fail1;
 
-        rc = sqlite3_bind_int64(stmt, GIVEUP, exec->c.giveup.rec->id);
+        rc = sqlite3_bind_int64(stmt, GIVEUP, exec->i.giveup.rec->id);
         if (rc != SQLITE_OK)
             goto fail1;
 
-        rc = sqlite3_bind_int64(stmt, CONTR, exec->c.contr.rec->id);
+        rc = sqlite3_bind_int64(stmt, CONTR, exec->i.contr.rec->id);
         if (rc != SQLITE_OK)
             goto fail1;
 
     } else {
 
-        rc = sqlite3_bind_int64(stmt, TRADER, exec->c.trader.id_only);
+        rc = sqlite3_bind_int64(stmt, TRADER, exec->i.trader.id_only);
         if (rc != SQLITE_OK)
             goto fail1;
 
-        rc = sqlite3_bind_int64(stmt, GIVEUP, exec->c.giveup.id_only);
+        rc = sqlite3_bind_int64(stmt, GIVEUP, exec->i.giveup.id_only);
         if (rc != SQLITE_OK)
             goto fail1;
 
-        rc = sqlite3_bind_int64(stmt, CONTR, exec->c.contr.id_only);
+        rc = sqlite3_bind_int64(stmt, CONTR, exec->i.contr.id_only);
         if (rc != SQLITE_OK)
             goto fail1;
     }
 
-    rc = sqlite3_bind_int(stmt, SETTL_DAY, exec->c.settl_day);
+    rc = sqlite3_bind_int(stmt, SETTL_DAY, exec->i.settl_day);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    if (exec->c.ref[0] != '\0')
-        rc = bind_text(stmt, REF, exec->c.ref, DBR_REF_MAX);
+    if (exec->i.ref[0] != '\0')
+        rc = bind_text(stmt, REF, exec->i.ref, DBR_REF_MAX);
     else
         rc = sqlite3_bind_null(stmt, REF);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, STATE, exec->c.state);
+    rc = sqlite3_bind_int(stmt, STATE, exec->i.state);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int(stmt, ACTION, exec->c.action);
+    rc = sqlite3_bind_int(stmt, ACTION, exec->i.action);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, TICKS, exec->c.ticks);
+    rc = sqlite3_bind_int64(stmt, TICKS, exec->i.ticks);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LOTS, exec->c.lots);
+    rc = sqlite3_bind_int64(stmt, LOTS, exec->i.lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, RESD, exec->c.resd);
+    rc = sqlite3_bind_int64(stmt, RESD, exec->i.resd);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, EXEC, exec->c.exec);
+    rc = sqlite3_bind_int64(stmt, EXEC, exec->i.exec);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LAST_TICKS, exec->c.last_ticks);
+    rc = sqlite3_bind_int64(stmt, LAST_TICKS, exec->i.last_ticks);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, LAST_LOTS, exec->c.last_lots);
+    rc = sqlite3_bind_int64(stmt, LAST_LOTS, exec->i.last_lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
-    rc = sqlite3_bind_int64(stmt, MIN_LOTS, exec->c.min_lots);
+    rc = sqlite3_bind_int64(stmt, MIN_LOTS, exec->i.min_lots);
     if (rc != SQLITE_OK)
         goto fail1;
 
@@ -577,24 +577,24 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             order->level = NULL;
             order->id = sqlite3_column_int64(stmt, ID);
-            order->c.trader.id_only = sqlite3_column_int64(stmt, TRADER);
-            order->c.giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
-            order->c.contr.id_only = sqlite3_column_int64(stmt, CONTR);
-            order->c.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
+            order->i.trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            order->i.giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
+            order->i.contr.id_only = sqlite3_column_int64(stmt, CONTR);
+            order->i.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
-                strncpy(order->c.ref,
+                strncpy(order->i.ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
-                order->c.ref[0] = '\0';
-            order->c.state = sqlite3_column_int(stmt, STATE);
-            order->c.action = sqlite3_column_int(stmt, ACTION);
-            order->c.ticks = sqlite3_column_int64(stmt, TICKS);
-            order->c.lots = sqlite3_column_int64(stmt, LOTS);
-            order->c.resd = sqlite3_column_int64(stmt, RESD);
-            order->c.exec = sqlite3_column_int64(stmt, EXEC);
-            order->c.last_ticks = sqlite3_column_int64(stmt, LAST_TICKS);
-            order->c.last_lots = sqlite3_column_int64(stmt, LAST_LOTS);
-            order->c.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
+                order->i.ref[0] = '\0';
+            order->i.state = sqlite3_column_int(stmt, STATE);
+            order->i.action = sqlite3_column_int(stmt, ACTION);
+            order->i.ticks = sqlite3_column_int64(stmt, TICKS);
+            order->i.lots = sqlite3_column_int64(stmt, LOTS);
+            order->i.resd = sqlite3_column_int64(stmt, RESD);
+            order->i.exec = sqlite3_column_int64(stmt, EXEC);
+            order->i.last_ticks = sqlite3_column_int64(stmt, LAST_TICKS);
+            order->i.last_lots = sqlite3_column_int64(stmt, LAST_LOTS);
+            order->i.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
             order->created = sqlite3_column_int64(stmt, CREATED);
             order->modified = sqlite3_column_int64(stmt, MODIFIED);
 
@@ -602,11 +602,11 @@ select_order(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                            "ref=%.64s,state=%d,action=%d,ticks=%ld,lots=%ld,resd=%ld,"
                            "exec=%ld,last_ticks=%ld,last_lots=%ld,min_lots=%ld,"
                            "created=%ld,modified=%ld",
-                           order->id, order->c.trader.id_only, order->c.giveup.id_only,
-                           order->c.contr.id_only, order->c.settl_day, order->c.ref,
-                           order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                           order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                           order->c.min_lots, order->created, order->modified);
+                           order->id, order->i.trader.id_only, order->i.giveup.id_only,
+                           order->i.contr.id_only, order->i.settl_day, order->i.ref,
+                           order->i.state, order->i.action, order->i.ticks, order->i.lots,
+                           order->i.resd, order->i.exec, order->i.last_ticks, order->i.last_lots,
+                           order->i.min_lots, order->created, order->modified);
 
             dbr_queue_insert_back(&oq, &order->shared_node_);
             ++size;
@@ -676,24 +676,24 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
 
             exec->id = sqlite3_column_int64(stmt, ID);
             exec->order = sqlite3_column_int64(stmt, ORDER);
-            exec->c.trader.id_only = sqlite3_column_int64(stmt, TRADER);
-            exec->c.giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
-            exec->c.contr.id_only = sqlite3_column_int64(stmt, CONTR);
-            exec->c.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
+            exec->i.trader.id_only = sqlite3_column_int64(stmt, TRADER);
+            exec->i.giveup.id_only = sqlite3_column_int64(stmt, GIVEUP);
+            exec->i.contr.id_only = sqlite3_column_int64(stmt, CONTR);
+            exec->i.settl_day = sqlite3_column_int(stmt, SETTL_DAY);
             if (sqlite3_column_type(stmt, REF) != SQLITE_NULL)
-                strncpy(exec->c.ref,
+                strncpy(exec->i.ref,
                         (const char*)sqlite3_column_text(stmt, REF), DBR_REF_MAX);
             else
-                exec->c.ref[0] = '\0';
-            exec->c.state = DBR_STATE_TRADE;
-            exec->c.action = sqlite3_column_int(stmt, ACTION);
-            exec->c.ticks = sqlite3_column_int64(stmt, TICKS);
-            exec->c.lots = sqlite3_column_int64(stmt, LOTS);
-            exec->c.resd = sqlite3_column_int64(stmt, RESD);
-            exec->c.exec = sqlite3_column_int64(stmt, EXEC);
-            exec->c.last_ticks = sqlite3_column_int64(stmt, LAST_TICKS);
-            exec->c.last_lots = sqlite3_column_int64(stmt, LAST_LOTS);
-            exec->c.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
+                exec->i.ref[0] = '\0';
+            exec->i.state = DBR_STATE_TRADE;
+            exec->i.action = sqlite3_column_int(stmt, ACTION);
+            exec->i.ticks = sqlite3_column_int64(stmt, TICKS);
+            exec->i.lots = sqlite3_column_int64(stmt, LOTS);
+            exec->i.resd = sqlite3_column_int64(stmt, RESD);
+            exec->i.exec = sqlite3_column_int64(stmt, EXEC);
+            exec->i.last_ticks = sqlite3_column_int64(stmt, LAST_TICKS);
+            exec->i.last_lots = sqlite3_column_int64(stmt, LAST_LOTS);
+            exec->i.min_lots = sqlite3_column_int64(stmt, MIN_LOTS);
             exec->match = sqlite3_column_type(stmt, MATCH) != SQLITE_NULL
                 ? sqlite3_column_int64(stmt, MATCH) : 0;
             exec->role = sqlite3_column_type(stmt, ROLE) != SQLITE_NULL
@@ -706,10 +706,10 @@ select_trade(struct FirSqlite* sqlite, DbrPool pool, struct DbrSlNode** first)
                            "ref=%.64s,action=%d,ticks=%ld,lots=%ld,resd=%ld,exec=%ld,"
                            "last_ticks=%ld,last_lots=%ld,min_lots=%ld,match=%ld,role=%d,cpty=%ld,"
                            "created=%ld",
-                           exec->id, exec->order, exec->c.trader.id_only, exec->c.giveup.id_only,
-                           exec->c.contr.id_only, exec->c.settl_day, exec->c.ref, exec->c.action,
-                           exec->c.ticks, exec->c.lots, exec->c.resd, exec->c.exec,
-                           exec->c.last_ticks, exec->c.last_lots, exec->c.min_lots,
+                           exec->id, exec->order, exec->i.trader.id_only, exec->i.giveup.id_only,
+                           exec->i.contr.id_only, exec->i.settl_day, exec->i.ref, exec->i.action,
+                           exec->i.ticks, exec->i.lots, exec->i.resd, exec->i.exec,
+                           exec->i.last_ticks, exec->i.last_lots, exec->i.min_lots,
                            exec->match, exec->role, exec->cpty.id_only, exec->created);
 
             dbr_queue_insert_back(&tq, &exec->shared_node_);

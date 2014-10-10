@@ -40,33 +40,33 @@ dbr_book_side(struct DbrBook* book, int action)
 static inline DbrBool
 dbr_book_insert(struct DbrBook* book, struct DbrOrder* order)
 {
-    return dbr_side_insert_order(dbr_book_side(book, order->c.action), order);
+    return dbr_side_insert_order(dbr_book_side(book, order->i.action), order);
 }
 
 static inline void
 dbr_book_remove(struct DbrBook* book, struct DbrOrder* order)
 {
     assert(order);
-    dbr_side_remove_order(dbr_book_side(book, order->c.action), order);
+    dbr_side_remove_order(dbr_book_side(book, order->i.action), order);
 }
 
 static inline void
 dbr_book_take(struct DbrBook* book, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
-    dbr_side_take_order(dbr_book_side(book, order->c.action), order, lots, now);
+    dbr_side_take_order(dbr_book_side(book, order->i.action), order, lots, now);
 }
 
 static inline void
 dbr_book_revise(struct DbrBook* book, struct DbrOrder* order, DbrLots lots, DbrMillis now)
 {
-    dbr_side_revise_order(dbr_book_side(book, order->c.action), order, lots, now);
+    dbr_side_revise_order(dbr_book_side(book, order->i.action), order, lots, now);
 }
 
 static inline void
 dbr_book_cancel(struct DbrBook* book, struct DbrOrder* order, DbrMillis now)
 {
     assert(order);
-    dbr_side_cancel_order(dbr_book_side(book, order->c.action), order, now);
+    dbr_side_cancel_order(dbr_book_side(book, order->i.action), order, now);
 }
 
 static inline struct DbrRec*

@@ -67,72 +67,72 @@ public:
     AccntRecRef
     trec() const noexcept
     {
-        return AccntRecRef{*impl_->c.trader.rec};
+        return AccntRecRef{*impl_->i.trader.rec};
     }
     AccntRecRef
     grec() const noexcept
     {
-        return AccntRecRef{*impl_->c.giveup.rec};
+        return AccntRecRef{*impl_->i.giveup.rec};
     }
     ContrRecRef
     crec() const noexcept
     {
-        return ContrRecRef{*impl_->c.contr.rec};
+        return ContrRecRef{*impl_->i.contr.rec};
     }
     DbrJd
     settl_day() const noexcept
     {
-        return impl_->c.settl_day;
+        return impl_->i.settl_day;
     }
     StringRef
     ref() const noexcept
     {
-        return StringRef{impl_->c.ref, MaxSize{DBR_REF_MAX}};
+        return StringRef{impl_->i.ref, MaxSize{DBR_REF_MAX}};
     }
     int
     state() const noexcept
     {
-        return impl_->c.state;
+        return impl_->i.state;
     }
     int
     action() const noexcept
     {
-        return impl_->c.action;
+        return impl_->i.action;
     }
     DbrTicks
     ticks() const noexcept
     {
-        return impl_->c.ticks;
+        return impl_->i.ticks;
     }
     DbrLots
     lots() const noexcept
     {
-        return impl_->c.lots;
+        return impl_->i.lots;
     }
     DbrLots
     resd() const noexcept
     {
-        return impl_->c.resd;
+        return impl_->i.resd;
     }
     DbrLots
     exec() const noexcept
     {
-        return impl_->c.exec;
+        return impl_->i.exec;
     }
     DbrTicks
     last_ticks() const noexcept
     {
-        return impl_->c.last_ticks;
+        return impl_->i.last_ticks;
     }
     DbrLots
     last_lots() const noexcept
     {
-        return impl_->c.last_lots;
+        return impl_->i.last_lots;
     }
     DbrLots
     min_lots() const noexcept
     {
-        return impl_->c.min_lots;
+        return impl_->i.min_lots;
     }
     DbrIden
     match() const noexcept

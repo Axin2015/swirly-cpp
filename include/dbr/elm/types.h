@@ -285,7 +285,7 @@ dbr_shared_perm_entry(struct DbrSlNode* node)
 /** @} */
 
 /**
- * @addtogroup Common
+ * @addtogroup Instruct
  * @{
  */
 
@@ -353,7 +353,7 @@ struct DbrOrder {
      */
     struct DbrLevel* level;
     DbrIden id;
-    struct DbrCommon c;
+    struct DbrCommon i;
     DbrMillis created;
     DbrMillis modified;
     /**
@@ -380,7 +380,7 @@ dbr_order_init(struct DbrOrder* order)
 static inline DbrBool
 dbr_order_done(const struct DbrOrder* order)
 {
-    return order->c.resd == 0;
+    return order->i.resd == 0;
 }
 
 static inline struct DbrOrder*
@@ -441,7 +441,7 @@ struct DbrExec {
      */
     DbrIden id;
     DbrIden order;
-    struct DbrCommon c;
+    struct DbrCommon i;
     /**
      * @sa struct DbrMatch
      */
@@ -481,7 +481,7 @@ dbr_exec_init(struct DbrExec* exec)
 static inline DbrBool
 dbr_exec_done(const struct DbrExec* exec)
 {
-    return exec->c.resd == 0;
+    return exec->i.resd == 0;
 }
 
 static inline struct DbrExec*

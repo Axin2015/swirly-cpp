@@ -70,10 +70,10 @@ dbr_side_take_order(struct DbrSide* side, struct DbrOrder* order, DbrLots lots, 
 static inline DbrBool
 dbr_side_place_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
-    assert(order->c.lots > 0 && order->c.lots >= order->c.min_lots);
-    order->c.state = DBR_STATE_NEW;
-    order->c.resd = order->c.lots;
-    order->c.exec = 0;
+    assert(order->i.lots > 0 && order->i.lots >= order->i.min_lots);
+    order->i.state = DBR_STATE_NEW;
+    order->i.resd = order->i.lots;
+    order->i.exec = 0;
     order->created = now;
     order->modified = now;
     return dbr_side_insert_order(side, order);
@@ -86,9 +86,9 @@ static inline void
 dbr_side_cancel_order(struct DbrSide* side, struct DbrOrder* order, DbrMillis now)
 {
     dbr_side_remove_order(side, order);
-    order->c.state = DBR_STATE_CANCEL;
+    order->i.state = DBR_STATE_CANCEL;
     // Note that executed lots is not affected.
-    order->c.resd = 0;
+    order->i.resd = 0;
     order->modified = now;
 }
 

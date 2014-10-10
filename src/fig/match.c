@@ -71,9 +71,9 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 {
     return direct == DBR_PAID
         // Paid when the taker lifts the offer.
-        ? maker->c.ticks - taker->c.ticks
+        ? maker->i.ticks - taker->i.ticks
         // Given when the taker hits the bid.
-        : taker->c.ticks - maker->c.ticks;
+        : taker->i.ticks - maker->i.ticks;
 }
 
 static DbrBool
@@ -90,7 +90,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
     struct DbrDlNode* node = dbr_side_first_order(side),
         * end = dbr_side_end_order(side);
-    for (; taken < taker->c.resd && node != end; node = node->next) {
+    for (; taken < taker->i.resd && node != end; node = node->next) {
 
         struct DbrOrder* maker = dbr_side_order_entry(node);
 
@@ -103,7 +103,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
             goto fail1;
         dbr_match_init(match);
 
-        struct DbrPosn* posn = fig_accnt_posn(maker->c.giveup.rec, crec, settl_day,
+        struct DbrPosn* posn = fig_accnt_posn(maker->i.giveup.rec, crec, settl_day,
                                               ordidx, pool);
         if (!posn) {
             // No need to free accnt or posn.
@@ -134,8 +134,8 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         match->id = match_id;
         match->maker_order = maker;
         match->maker_posn = posn;
-        match->ticks = maker->c.ticks;
-        match->lots = dbr_min(taker->c.resd - taken, maker->c.resd);
+        match->ticks = maker->i.ticks;
+        match->lots = dbr_min(taker->i.resd - taken, maker->i.resd);
 
         taken += match->lots;
         last_ticks = match->ticks;
@@ -146,45 +146,45 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         // Taker trade.
         taker_exec->id = taker_id;
         taker_exec->order = taker->id;
-        taker_exec->c.trader.rec = taker->c.trader.rec;
-        taker_exec->c.giveup.rec = taker->c.giveup.rec;
-        taker_exec->c.contr.rec = crec;
-        taker_exec->c.settl_day = settl_day;
-        strncpy(taker_exec->c.ref, taker->c.ref, DBR_REF_MAX);
-        taker_exec->c.state = DBR_STATE_TRADE;
-        taker_exec->c.action = taker->c.action;
-        taker_exec->c.ticks = taker->c.ticks;
-        taker_exec->c.lots = taker->c.lots;
-        taker_exec->c.resd = taker->c.resd - taken;
-        taker_exec->c.exec = taker->c.exec + taken;
-        taker_exec->c.last_ticks = match->ticks;
-        taker_exec->c.last_lots = match->lots;
-        taker_exec->c.min_lots = taker->c.min_lots;
+        taker_exec->i.trader.rec = taker->i.trader.rec;
+        taker_exec->i.giveup.rec = taker->i.giveup.rec;
+        taker_exec->i.contr.rec = crec;
+        taker_exec->i.settl_day = settl_day;
+        strncpy(taker_exec->i.ref, taker->i.ref, DBR_REF_MAX);
+        taker_exec->i.state = DBR_STATE_TRADE;
+        taker_exec->i.action = taker->i.action;
+        taker_exec->i.ticks = taker->i.ticks;
+        taker_exec->i.lots = taker->i.lots;
+        taker_exec->i.resd = taker->i.resd - taken;
+        taker_exec->i.exec = taker->i.exec + taken;
+        taker_exec->i.last_ticks = match->ticks;
+        taker_exec->i.last_lots = match->lots;
+        taker_exec->i.min_lots = taker->i.min_lots;
         taker_exec->match = match->id;
         taker_exec->role = DBR_ROLE_TAKER;
-        taker_exec->cpty.rec = maker->c.giveup.rec;
+        taker_exec->cpty.rec = maker->i.giveup.rec;
         taker_exec->created = now;
 
         // Maker trade.
         maker_exec->id = maker_id;
         maker_exec->order = maker->id;
-        maker_exec->c.trader.rec = maker->c.trader.rec;
-        maker_exec->c.giveup.rec = maker->c.giveup.rec;
-        maker_exec->c.contr.rec = crec;
-        maker_exec->c.settl_day = settl_day;
-        strncpy(maker_exec->c.ref, maker->c.ref, DBR_REF_MAX);
-        maker_exec->c.state = DBR_STATE_TRADE;
-        maker_exec->c.action = maker->c.action;
-        maker_exec->c.ticks = maker->c.ticks;
-        maker_exec->c.lots = maker->c.lots;
-        maker_exec->c.resd = maker->c.resd - match->lots;
-        maker_exec->c.exec = maker->c.exec + match->lots;
-        maker_exec->c.last_ticks = match->ticks;
-        maker_exec->c.last_lots = match->lots;
-        maker_exec->c.min_lots = maker->c.min_lots;
+        maker_exec->i.trader.rec = maker->i.trader.rec;
+        maker_exec->i.giveup.rec = maker->i.giveup.rec;
+        maker_exec->i.contr.rec = crec;
+        maker_exec->i.settl_day = settl_day;
+        strncpy(maker_exec->i.ref, maker->i.ref, DBR_REF_MAX);
+        maker_exec->i.state = DBR_STATE_TRADE;
+        maker_exec->i.action = maker->i.action;
+        maker_exec->i.ticks = maker->i.ticks;
+        maker_exec->i.lots = maker->i.lots;
+        maker_exec->i.resd = maker->i.resd - match->lots;
+        maker_exec->i.exec = maker->i.exec + match->lots;
+        maker_exec->i.last_ticks = match->ticks;
+        maker_exec->i.last_lots = match->lots;
+        maker_exec->i.min_lots = maker->i.min_lots;
         maker_exec->match = match->id;
         maker_exec->role = DBR_ROLE_MAKER;
-        maker_exec->cpty.rec = taker->c.giveup.rec;
+        maker_exec->cpty.rec = taker->i.giveup.rec;
         maker_exec->created = now;
 
         match->taker_exec = taker_exec;
@@ -201,16 +201,16 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
     if (!dbr_queue_empty(&trans->matches)) {
 
         // Avoid allocating position when there are no matches.
-        if (!(trans->taker_posn = fig_accnt_posn(taker->c.giveup.rec, crec, settl_day,
+        if (!(trans->taker_posn = fig_accnt_posn(taker->i.giveup.rec, crec, settl_day,
                                                  ordidx, pool)))
             goto fail1;
 
         // Commit taker order.
-        taker->c.state = DBR_STATE_TRADE;
-        taker->c.resd -= taken;
-        taker->c.exec += taken;
-        taker->c.last_ticks = last_ticks;
-        taker->c.last_lots = last_lots;
+        taker->i.state = DBR_STATE_TRADE;
+        taker->i.resd -= taken;
+        taker->i.exec += taken;
+        taker->i.last_ticks = last_ticks;
+        taker->i.last_lots = last_lots;
 
     } else
         trans->taker_posn = NULL;
@@ -228,12 +228,12 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* b
     struct DbrSide* side;
     int direct;
 
-    if (taker->c.action == DBR_ACTION_BUY) {
+    if (taker->i.action == DBR_ACTION_BUY) {
         // Paid when the taker lifts the offer.
         side = &book->offer_side;
         direct = DBR_PAID;
     } else {
-        assert(taker->c.action == DBR_ACTION_SELL);
+        assert(taker->i.action == DBR_ACTION_SELL);
         // Given when the taker hits the bid.
         side = &book->bid_side;
         direct = DBR_GIVEN;

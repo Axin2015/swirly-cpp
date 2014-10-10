@@ -139,18 +139,18 @@ elm_proto_order_len(const struct DbrOrder* order, DbrBool enriched)
     size_t n;
     if (enriched) {
         n = dbr_pack_lenf(ORDER_FORMAT,
-                          order->id, order->c.trader.rec->id, order->c.giveup.rec->id,
-                          order->c.contr.rec->id, order->c.settl_day, DBR_REF_MAX, order->c.ref,
-                          order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                          order->c.min_lots, order->created, order->modified);
+                          order->id, order->i.trader.rec->id, order->i.giveup.rec->id,
+                          order->i.contr.rec->id, order->i.settl_day, DBR_REF_MAX, order->i.ref,
+                          order->i.state, order->i.action, order->i.ticks, order->i.lots,
+                          order->i.resd, order->i.exec, order->i.last_ticks, order->i.last_lots,
+                          order->i.min_lots, order->created, order->modified);
     } else {
         n = dbr_pack_lenf(ORDER_FORMAT,
-                          order->id, order->c.trader.id_only, order->c.giveup.id_only,
-                          order->c.contr.id_only, order->c.settl_day, DBR_REF_MAX, order->c.ref,
-                          order->c.state, order->c.action, order->c.ticks, order->c.lots,
-                          order->c.resd, order->c.exec, order->c.last_ticks, order->c.last_lots,
-                          order->c.min_lots, order->created, order->modified);
+                          order->id, order->i.trader.id_only, order->i.giveup.id_only,
+                          order->i.contr.id_only, order->i.settl_day, DBR_REF_MAX, order->i.ref,
+                          order->i.state, order->i.action, order->i.ticks, order->i.lots,
+                          order->i.resd, order->i.exec, order->i.last_ticks, order->i.last_lots,
+                          order->i.min_lots, order->created, order->modified);
     }
     return n;
 }
@@ -160,18 +160,18 @@ elm_proto_write_order(char* buf, const struct DbrOrder* order, DbrBool enriched)
 {
     if (enriched) {
         buf = dbr_packf(buf, ORDER_FORMAT,
-                        order->id, order->c.trader.rec->id, order->c.giveup.rec->id,
-                        order->c.contr.rec->id, order->c.settl_day, DBR_REF_MAX,
-                        order->c.ref, order->c.state, order->c.action, order->c.ticks,
-                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
-                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
+                        order->id, order->i.trader.rec->id, order->i.giveup.rec->id,
+                        order->i.contr.rec->id, order->i.settl_day, DBR_REF_MAX,
+                        order->i.ref, order->i.state, order->i.action, order->i.ticks,
+                        order->i.lots, order->i.resd, order->i.exec, order->i.last_ticks,
+                        order->i.last_lots, order->i.min_lots, order->created, order->modified);
     } else {
         buf = dbr_packf(buf, ORDER_FORMAT,
-                        order->id, order->c.trader.id_only, order->c.giveup.id_only,
-                        order->c.contr.id_only, order->c.settl_day, DBR_REF_MAX,
-                        order->c.ref, order->c.state, order->c.action, order->c.ticks,
-                        order->c.lots, order->c.resd, order->c.exec, order->c.last_ticks,
-                        order->c.last_lots, order->c.min_lots, order->created, order->modified);
+                        order->id, order->i.trader.id_only, order->i.giveup.id_only,
+                        order->i.contr.id_only, order->i.settl_day, DBR_REF_MAX,
+                        order->i.ref, order->i.state, order->i.action, order->i.ticks,
+                        order->i.lots, order->i.resd, order->i.exec, order->i.last_ticks,
+                        order->i.last_lots, order->i.min_lots, order->created, order->modified);
     }
     return buf;
 }
@@ -180,11 +180,11 @@ DBR_EXTERN const char*
 elm_proto_read_order(const char* buf, struct DbrOrder* order)
 {
     return dbr_unpackf(buf, ORDER_FORMAT,
-                       &order->id, &order->c.trader.id_only, &order->c.giveup.id_only,
-                       &order->c.contr.id_only, &order->c.settl_day, DBR_REF_MAX,
-                       order->c.ref, &order->c.state, &order->c.action, &order->c.ticks,
-                       &order->c.lots, &order->c.resd, &order->c.exec, &order->c.last_ticks,
-                       &order->c.last_lots, &order->c.min_lots, &order->created, &order->modified);
+                       &order->id, &order->i.trader.id_only, &order->i.giveup.id_only,
+                       &order->i.contr.id_only, &order->i.settl_day, DBR_REF_MAX,
+                       order->i.ref, &order->i.state, &order->i.action, &order->i.ticks,
+                       &order->i.lots, &order->i.resd, &order->i.exec, &order->i.last_ticks,
+                       &order->i.last_lots, &order->i.min_lots, &order->created, &order->modified);
 }
 
 DBR_EXTERN size_t
@@ -194,18 +194,18 @@ elm_proto_exec_len(const struct DbrExec* exec, DbrBool enriched)
     if (enriched) {
         const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
         n = dbr_pack_lenf(EXEC_FORMAT,
-                          exec->id, exec->order, exec->c.trader.rec->id, exec->c.giveup.rec->id,
-                          exec->c.contr.rec->id, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                          exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                          exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
+                          exec->id, exec->order, exec->i.trader.rec->id, exec->i.giveup.rec->id,
+                          exec->i.contr.rec->id, exec->i.settl_day, DBR_REF_MAX, exec->i.ref,
+                          exec->i.state, exec->i.action, exec->i.ticks, exec->i.lots,
+                          exec->i.resd, exec->i.exec, exec->i.last_ticks, exec->i.last_lots,
+                          exec->i.min_lots, exec->match, exec->role, cpty, exec->created);
     } else {
         n = dbr_pack_lenf(EXEC_FORMAT,
-                          exec->id, exec->order, exec->c.trader.id_only, exec->c.giveup.id_only,
-                          exec->c.contr.id_only, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                          exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                          exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                          exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                          exec->id, exec->order, exec->i.trader.id_only, exec->i.giveup.id_only,
+                          exec->i.contr.id_only, exec->i.settl_day, DBR_REF_MAX, exec->i.ref,
+                          exec->i.state, exec->i.action, exec->i.ticks, exec->i.lots,
+                          exec->i.resd, exec->i.exec, exec->i.last_ticks, exec->i.last_lots,
+                          exec->i.min_lots, exec->match, exec->role, exec->cpty.id_only,
                           exec->created);
     }
     return n;
@@ -217,18 +217,18 @@ elm_proto_write_exec(char* buf, const struct DbrExec* exec, DbrBool enriched)
     if (enriched) {
         const DbrIden cpty = exec->cpty.rec ? exec->cpty.rec->id : 0;
         buf = dbr_packf(buf, EXEC_FORMAT,
-                        exec->id, exec->order, exec->c.trader.rec->id, exec->c.giveup.rec->id,
-                        exec->c.contr.rec->id, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                        exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                        exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->c.min_lots, exec->match, exec->role, cpty, exec->created);
+                        exec->id, exec->order, exec->i.trader.rec->id, exec->i.giveup.rec->id,
+                        exec->i.contr.rec->id, exec->i.settl_day, DBR_REF_MAX, exec->i.ref,
+                        exec->i.state, exec->i.action, exec->i.ticks, exec->i.lots,
+                        exec->i.resd, exec->i.exec, exec->i.last_ticks, exec->i.last_lots,
+                        exec->i.min_lots, exec->match, exec->role, cpty, exec->created);
     } else {
         buf = dbr_packf(buf, EXEC_FORMAT,
-                        exec->id, exec->order, exec->c.trader.id_only, exec->c.giveup.id_only,
-                        exec->c.contr.id_only, exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                        exec->c.state, exec->c.action, exec->c.ticks, exec->c.lots,
-                        exec->c.resd, exec->c.exec, exec->c.last_ticks, exec->c.last_lots,
-                        exec->c.min_lots, exec->match, exec->role, exec->cpty.id_only,
+                        exec->id, exec->order, exec->i.trader.id_only, exec->i.giveup.id_only,
+                        exec->i.contr.id_only, exec->i.settl_day, DBR_REF_MAX, exec->i.ref,
+                        exec->i.state, exec->i.action, exec->i.ticks, exec->i.lots,
+                        exec->i.resd, exec->i.exec, exec->i.last_ticks, exec->i.last_lots,
+                        exec->i.min_lots, exec->match, exec->role, exec->cpty.id_only,
                         exec->created);
     }
     return buf;
@@ -238,11 +238,11 @@ DBR_EXTERN const char*
 elm_proto_read_exec(const char* buf, struct DbrExec* exec)
 {
     return dbr_unpackf(buf, EXEC_FORMAT,
-                       &exec->id, &exec->order, &exec->c.trader.id_only, &exec->c.giveup.id_only,
-                       &exec->c.contr.id_only, &exec->c.settl_day, DBR_REF_MAX, exec->c.ref,
-                       &exec->c.state, &exec->c.action, &exec->c.ticks, &exec->c.lots,
-                       &exec->c.resd, &exec->c.exec, &exec->c.last_ticks, &exec->c.last_lots,
-                       &exec->c.min_lots, &exec->match, &exec->role, &exec->cpty.id_only,
+                       &exec->id, &exec->order, &exec->i.trader.id_only, &exec->i.giveup.id_only,
+                       &exec->i.contr.id_only, &exec->i.settl_day, DBR_REF_MAX, exec->i.ref,
+                       &exec->i.state, &exec->i.action, &exec->i.ticks, &exec->i.lots,
+                       &exec->i.resd, &exec->i.exec, &exec->i.last_ticks, &exec->i.last_lots,
+                       &exec->i.min_lots, &exec->match, &exec->role, &exec->cpty.id_only,
                        &exec->created);
 }
 
