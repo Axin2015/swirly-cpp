@@ -195,6 +195,11 @@ public:
           size_{-static_cast<std::ptrdiff_t>(max_size)}
     {
     }
+    void
+    rebase(std::ptrdiff_t delta) noexcept
+    {
+        begin_ += delta;
+    }
 
     // Iterator.
 
@@ -244,6 +249,11 @@ public:
 
     // Accessor.
 
+    const char&
+    operator [](SizeType pos) const
+    {
+        return *(begin() + pos);
+    }
     ValueType
     front() const noexcept
     {
@@ -292,10 +302,8 @@ to_string(const StringRef& rstr)
 inline std::ostream&
 operator <<(std::ostream& os, const StringRef& rstr)
 {
-    // FIXME: write() ignores stream formatters.
-    // os.write(rstr.data(), rstr.size());
-    // Work-around:
-    return os << rstr.str();
+    std::copy(rstr.begin(), rstr.end(), std::ostream_iterator<char>{os});
+    return os;
 }
 
 inline bool
