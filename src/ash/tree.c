@@ -29,7 +29,9 @@
  */
 #include <dbr/ash/tree.h>
 
-enum { BLACK = 0, RED = 1 };
+#include <assert.h>
+
+enum { NONE = 0, BLACK = 1, RED = 2 };
 
 static int
 cmp(DbrKey lhs, DbrKey rhs)
@@ -48,7 +50,7 @@ static void
 set(DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
 {
     node->key = key;
-    node->left = node->right = NULL;
+    node->right = node->left = NULL;
     node->parent = parent;
     node->color = RED;
 }
@@ -212,6 +214,7 @@ dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node)
     struct DbrRbNode* tmp;
     struct DbrRbNode* parent = NULL;
     int comp = 0;
+    assert(node->color == NONE);
     tmp = tree->root;
     while (tmp) {
         parent = tmp;
@@ -238,6 +241,7 @@ dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node)
 DBR_API void
 dbr_tree_pinsert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
 {
+    assert(node->color == NONE);
     set(key, node, parent);
     if (parent) {
         int comp = cmp(key, parent->key);
@@ -310,6 +314,7 @@ dbr_tree_remove(struct DbrTree* tree, struct DbrRbNode* node)
  color:
     if (color == BLACK)
         remove_color(tree, parent, child);
+    old->color = NONE;
     return old;
 }
 
