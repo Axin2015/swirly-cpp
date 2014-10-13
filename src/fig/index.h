@@ -15,8 +15,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef FIG_ORDIDX_H
-#define FIG_ORDIDX_H
+#ifndef FIG_INDEX_H
+#define FIG_INDEX_H
 
 // Index of orders by reference.
 
@@ -25,32 +25,32 @@
 
 struct DbrOrder;
 
-#ifndef FIG_ORDIDX_BUCKETS
-#define FIG_ORDIDX_BUCKETS 257
-#endif // FIG_ORDIDX_BUCKETS
+#ifndef FIG_INDEX_BUCKETS
+#define FIG_INDEX_BUCKETS 257
+#endif // FIG_INDEX_BUCKETS
 
-struct FigOrdIdx {
+struct FigIndex {
     struct {
         struct DbrStack refs;
-    } buckets[FIG_ORDIDX_BUCKETS];
+    } buckets[FIG_INDEX_BUCKETS];
 };
 
 DBR_EXTERN void
-fig_ordidx_init(struct FigOrdIdx* ordidx);
+fig_index_init(struct FigIndex* index);
 
 static inline void
-fig_ordidx_reset(struct FigOrdIdx* ordidx)
+fig_index_reset(struct FigIndex* index)
 {
-    fig_ordidx_init(ordidx);
+    fig_index_init(index);
 }
 
 DBR_EXTERN void
-fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order);
+fig_index_insert(struct FigIndex* index, struct DbrOrder* order);
 
 DBR_EXTERN struct DbrOrder*
-fig_ordidx_remove(struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
+fig_index_remove(struct FigIndex* index, DbrIden trid, const char* ref);
 
 DBR_EXTERN struct DbrOrder*
-fig_ordidx_find(const struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
+fig_index_find(const struct FigIndex* index, DbrIden trid, const char* ref);
 
-#endif // FIG_ORDIDX_H
+#endif // FIG_INDEX_H

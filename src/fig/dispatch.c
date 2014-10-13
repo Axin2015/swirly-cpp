@@ -151,7 +151,7 @@ emplace_posn_list(DbrClnt clnt, struct DbrSlNode* first)
         node = node->next;
         // Transfer ownership.
         // All accounts that trader is member of are created in emplace_perms().
-        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->ordidx, clnt->pool);
+        DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->index, clnt->pool);
         if (dbr_likely(accnt)) {
             fig_accnt_emplace_posn(accnt, posn);
         } else {
@@ -225,7 +225,7 @@ apply_update(DbrClnt clnt, struct DbrExec* exec)
 static struct DbrPosn*
 apply_posnup(DbrClnt clnt, struct DbrPosn* posn)
 {
-    DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->ordidx, clnt->pool);
+    DbrAccnt accnt = fig_accnt_lazy(posn->accnt.rec, &clnt->index, clnt->pool);
     if (dbr_unlikely(!accnt)) {
         dbr_pool_free_posn(accnt->pool, posn);
         dbr_err_set(DBR_ENOMEM, "out of memory");

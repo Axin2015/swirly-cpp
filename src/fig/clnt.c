@@ -92,7 +92,7 @@ fig_clnt_sess_reset(DbrClnt clnt)
     clnt->state = FIG_DELTA_WAIT;
     fig_clnt_log_state(clnt->state);
     fig_cache_reset(&clnt->cache);
-    fig_ordidx_init(&clnt->ordidx);
+    fig_index_init(&clnt->index);
     free_views(&clnt->views, clnt->pool);
     dbr_prioq_reset(&clnt->prioq);
     clnt->mdlast = 0;
@@ -224,7 +224,7 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     fig_clnt_log_state(clnt->state);
     // 6.
     fig_cache_init(&clnt->cache, term_state, pool);
-    fig_ordidx_init(&clnt->ordidx);
+    fig_index_init(&clnt->index);
     // 7.
     dbr_tree_init(&clnt->views);
     // 8.
@@ -344,7 +344,7 @@ dbr_clnt_empty_rec(DbrClnt clnt, int type)
 DBR_API DbrAccnt
 dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
 {
-    return fig_accnt_lazy(arec, &clnt->ordidx, clnt->pool);
+    return fig_accnt_lazy(arec, &clnt->index, clnt->pool);
 }
 
 DBR_API DbrIden

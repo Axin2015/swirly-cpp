@@ -21,7 +21,7 @@
 #include <dbr/fig/clnt.h>
 
 #include "cache.h"
-#include "ordidx.h"
+#include "index.h"
 
 #include <dbr/ash/prioq.h>
 
@@ -80,7 +80,7 @@ struct FigClnt {
     DbrPool pool;
     unsigned state;
     struct FigCache cache;
-    struct FigOrdIdx ordidx;
+    struct FigIndex index;
     struct DbrTree views;
     struct DbrPrioq prioq;
     DbrMillis mdlast;

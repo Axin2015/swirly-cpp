@@ -15,7 +15,7 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#include "ordidx.h"
+#include "index.h"
 
 #include <dbr/elm/types.h>
 
@@ -45,28 +45,28 @@ hash_ref(DbrIden trid, const char* ref)
 }
 
 DBR_EXTERN void
-fig_ordidx_init(struct FigOrdIdx* ordidx)
+fig_index_init(struct FigIndex* index)
 {
     // Zero buckets.
-    memset(ordidx->buckets, 0, sizeof(ordidx->buckets));
+    memset(index->buckets, 0, sizeof(index->buckets));
 }
 
 DBR_EXTERN void
-fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order)
+fig_index_insert(struct FigIndex* index, struct DbrOrder* order)
 {
     if (order->i.ref[0] != '\0') {
-        const size_t bucket = hash_ref(order->i.trader.rec->id, order->i.ref) % FIG_ORDIDX_BUCKETS;
-        struct DbrStack* refs = &ordidx->buckets[bucket].refs;
+        const size_t bucket = hash_ref(order->i.trader.rec->id, order->i.ref) % FIG_INDEX_BUCKETS;
+        struct DbrStack* refs = &index->buckets[bucket].refs;
         dbr_stack_push(refs, &order->ref_node_);
     }
 }
 
 DBR_EXTERN struct DbrOrder*
-fig_ordidx_remove(struct FigOrdIdx* ordidx, DbrIden trid, const char* ref)
+fig_index_remove(struct FigIndex* index, DbrIden trid, const char* ref)
 {
     assert(ref);
-    const size_t bucket = hash_ref(trid, ref) % FIG_ORDIDX_BUCKETS;
-    for (struct DbrSlNode** node = &ordidx->buckets[bucket].refs.first;
+    const size_t bucket = hash_ref(trid, ref) % FIG_INDEX_BUCKETS;
+    for (struct DbrSlNode** node = &index->buckets[bucket].refs.first;
          *node; node = &(*node)->next) {
         struct DbrOrder* order = order_entry_ref(*node);
         if (equal_ref(order, trid, ref)) {
@@ -79,11 +79,11 @@ fig_ordidx_remove(struct FigOrdIdx* ordidx, DbrIden trid, const char* ref)
 }
 
 DBR_EXTERN struct DbrOrder*
-fig_ordidx_find(const struct FigOrdIdx* ordidx, DbrIden trid, const char* ref)
+fig_index_find(const struct FigIndex* index, DbrIden trid, const char* ref)
 {
     assert(ref);
-    const size_t bucket = hash_ref(trid, ref) % FIG_ORDIDX_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&ordidx->buckets[bucket].refs);
+    const size_t bucket = hash_ref(trid, ref) % FIG_INDEX_BUCKETS;
+    for (struct DbrSlNode* node = dbr_stack_first(&index->buckets[bucket].refs);
          node; node = node->next) {
         struct DbrOrder* order = order_entry_ref(node);
         if (equal_ref(order, trid, ref))
