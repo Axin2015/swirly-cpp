@@ -18,9 +18,8 @@
 #ifndef DBRPP_FIG_BOOK_HPP
 #define DBRPP_FIG_BOOK_HPP
 
-#include <dbrpp/fig/side.hpp>
-
 #include <dbrpp/elm/rec.hpp>
+#include <dbrpp/elm/side.hpp>
 
 #include <dbr/fig/book.h>
 

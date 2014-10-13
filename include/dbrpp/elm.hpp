@@ -30,6 +30,7 @@
 #include <dbrpp/elm/proto.hpp>
 #include <dbrpp/elm/rec.hpp>
 #include <dbrpp/elm/rest.hpp>
+#include <dbrpp/elm/side.hpp>
 #include <dbrpp/elm/types.hpp>
 #include <dbrpp/elm/view.hpp>
 #include <dbrpp/elm/zmqctx.hpp>

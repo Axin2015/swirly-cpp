@@ -27,7 +27,6 @@
 #include <dbr/fig/handler.h>
 #include <dbr/fig/serv.h>
 #include <dbr/fig/sess.h>
-#include <dbr/fig/side.h>
 #include <dbr/fig/task.h>
 
 #endif // DBR_FIG_H

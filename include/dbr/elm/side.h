@@ -16,8 +16,8 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBR_FIG_SIDE_H
-#define DBR_FIG_SIDE_H
+#ifndef DBR_ELM_SIDE_H
+#define DBR_ELM_SIDE_H
 
 #include <dbr/elm/types.h>
 
@@ -168,4 +168,4 @@ dbr_side_last_time(const struct DbrSide* side)
 
 /** @} */
 
-#endif // DBR_FIG_SIDE_H
+#endif // DBR_ELM_SIDE_H

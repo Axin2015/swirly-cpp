@@ -27,6 +27,5 @@
 #include <dbrpp/fig/handler.hpp>
 #include <dbrpp/fig/serv.hpp>
 #include <dbrpp/fig/sess.hpp>
-#include <dbrpp/fig/side.hpp>
 
 #endif // DBRPP_FIG_HPP

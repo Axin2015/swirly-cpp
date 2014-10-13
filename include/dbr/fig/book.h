@@ -18,7 +18,7 @@
 #ifndef DBR_FIG_BOOK_H
 #define DBR_FIG_BOOK_H
 
-#include <dbr/fig/side.h>
+#include <dbr/elm/side.h>
 
 /**
  * @addtogroup Book

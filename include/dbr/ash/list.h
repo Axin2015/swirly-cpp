@@ -59,6 +59,7 @@ dbr_list_insert_back(struct DbrList* list, struct DbrDlNode* new_node)
 static inline struct DbrDlNode*
 dbr_list_remove_first(struct DbrList* list)
 {
+    assert(list->end.next != &list->end);
     struct DbrDlNode* node = list->end.next;
     dbr_dlnode_remove(node);
     return node;
@@ -67,6 +68,7 @@ dbr_list_remove_first(struct DbrList* list)
 static inline struct DbrDlNode*
 dbr_list_remove_last(struct DbrList* list)
 {
+    assert(list->end.next != &list->end);
     struct DbrDlNode* node = list->end.prev;
     dbr_dlnode_remove(node);
     return node;

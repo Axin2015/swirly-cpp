@@ -15,15 +15,15 @@
  *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  *  02110-1301 USA.
  */
-#ifndef DBRPP_FIG_SIDE_HPP
-#define DBRPP_FIG_SIDE_HPP
+#ifndef DBRPP_ELM_SIDE_HPP
+#define DBRPP_ELM_SIDE_HPP
 
 #include <dbrpp/ash/dlnode.hpp>
 #include <dbrpp/ash/except.hpp>
 #include <dbrpp/ash/iter.hpp>
 #include <dbrpp/ash/rbnode.hpp>
 
-#include <dbr/fig/side.h>
+#include <dbr/elm/side.h>
 
 #include <iostream>
 #include <limits>
@@ -486,4 +486,4 @@ operator <<(std::ostream& os, SideRef side)
 
 } // dbr
 
-#endif // DBRPP_FIG_SIDE_HPP
+#endif // DBRPP_ELM_SIDE_HPP

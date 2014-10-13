@@ -28,6 +28,7 @@
 #include <dbr/elm/proto.h>
 #include <dbr/elm/refcount.h>
 #include <dbr/elm/rest.h>
+#include <dbr/elm/side.h>
 #include <dbr/elm/types.h>
 #include <dbr/elm/zmqjourn.h>
 
