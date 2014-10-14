@@ -20,7 +20,7 @@
 #include "accnt.h"
 #include "cache.h"
 #include "match.h"
-#include "index.h"
+#include "ordidx.h"
 #include "sessidx.h"
 
 #include <dbr/fig/book.h>
@@ -38,7 +38,7 @@ struct FigServ {
     DbrJourn journ;
     DbrPool pool;
     struct FigCache cache;
-    struct FigIndex index;
+    struct FigOrdIdx ordidx;
     struct FigSessIdx sessidx;
     struct DbrTree books;
 
@@ -200,13 +200,13 @@ emplace_perms(DbrServ serv, DbrModel model)
         gperm->trader.rec = uperm->trader.rec;
         gperm->giveup.rec = uperm->giveup.rec;
 
-        struct FigAccnt* trader = fig_accnt_lazy(uperm->trader.rec, &serv->index, serv->pool);
+        struct FigAccnt* trader = fig_accnt_lazy(uperm->trader.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader)) {
             dbr_pool_free_perm(serv->pool, gperm);
             goto fail2;
         }
 
-        struct FigAccnt* giveup = fig_accnt_lazy(uperm->giveup.rec, &serv->index, serv->pool);
+        struct FigAccnt* giveup = fig_accnt_lazy(uperm->giveup.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!giveup)) {
             dbr_pool_free_perm(serv->pool, gperm);
             goto fail2;
@@ -249,7 +249,7 @@ emplace_orders(DbrServ serv, DbrModel model)
         } else
             book = NULL;
 
-        struct FigAccnt* trader = fig_accnt_lazy(order->i.trader.rec, &serv->index, serv->pool);
+        struct FigAccnt* trader = fig_accnt_lazy(order->i.trader.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader)) {
             if (book)
                 dbr_book_remove(book, order);
@@ -280,7 +280,7 @@ emplace_trades(DbrServ serv, DbrModel model)
 
     for (; node; node = node->next) {
         struct DbrExec* exec = enrich_trade(&serv->cache, dbr_shared_exec_entry(node));
-        struct FigAccnt* trader = fig_accnt_lazy(exec->i.trader.rec, &serv->index, serv->pool);
+        struct FigAccnt* trader = fig_accnt_lazy(exec->i.trader.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!trader))
             goto fail2;
 
@@ -309,7 +309,7 @@ emplace_posns(DbrServ serv, DbrModel model)
 
     for (; node; node = node->next) {
         struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_shared_posn_entry(node));
-        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, &serv->index, serv->pool);
+        struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, &serv->ordidx, serv->pool);
         if (dbr_unlikely(!accnt))
             goto fail2;
 
@@ -377,7 +377,7 @@ commit_trans(DbrServ serv, struct FigAccnt* taker, struct DbrBook* book,
         insert_posnup(&serv->posnups, match->maker_posn);
 
         // Must succeed because maker order exists.
-        struct FigAccnt* maker = fig_accnt_lazy(maker_order->i.trader.rec, &serv->index,
+        struct FigAccnt* maker = fig_accnt_lazy(maker_order->i.trader.rec, &serv->ordidx,
                                                   serv->pool);
         assert(maker);
 
@@ -419,7 +419,7 @@ dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool)
     serv->pool = pool;
     // 3.
     fig_cache_init(&serv->cache, term_state, pool);
-    fig_index_init(&serv->index);
+    fig_ordidx_init(&serv->ordidx);
     // 4.
     fig_sessidx_init(&serv->sessidx, pool);
     // 5.
@@ -497,7 +497,7 @@ dbr_serv_empty_rec(DbrServ serv, int type)
 DBR_API DbrAccnt
 dbr_serv_accnt(DbrServ serv, struct DbrRec* arec)
 {
-    return fig_accnt_lazy(arec, &serv->index, serv->pool);
+    return fig_accnt_lazy(arec, &serv->ordidx, serv->pool);
 }
 
 DBR_API struct DbrBook*
@@ -566,7 +566,7 @@ dbr_serv_place(DbrServ serv, DbrAccnt trader, DbrAccnt giveup, struct DbrBook* b
     dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
 
     // Order fields are updated on match.
-    if (!fig_match_orders(book, new_order, &serv->bank, serv->journ, &serv->index,
+    if (!fig_match_orders(book, new_order, &serv->bank, serv->journ, &serv->ordidx,
                           serv->pool, &trans))
         goto fail3;
 

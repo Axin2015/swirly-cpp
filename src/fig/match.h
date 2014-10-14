@@ -22,7 +22,7 @@
 #include <dbr/elm/types.h>
 
 struct DbrBank;
-struct FigIndex;
+struct FigOrdIdx;
 
 // Used by matching engine to build a list of matches.
 
@@ -30,6 +30,6 @@ struct FigIndex;
 
 DBR_EXTERN DbrBool
 fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 DbrJourn journ, struct FigIndex* index, DbrPool pool, struct DbrTrans* trans);
+                 DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans);
 
 #endif // FIG_MATCH_H

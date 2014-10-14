@@ -21,7 +21,7 @@
 #include <dbr/ash/stack.h>
 #include <dbr/elm/types.h>
 
-// Index of sessions by reference.
+// OrdIdx of sessions by reference.
 
 struct DbrSess;
 

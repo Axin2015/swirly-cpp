@@ -77,7 +77,7 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 
 static DbrBool
 match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
-             struct DbrBank* bank, DbrJourn journ, struct FigIndex* index, DbrPool pool,
+             struct DbrBank* bank, DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool,
              struct DbrTrans* trans)
 {
     DbrLots taken = 0;
@@ -103,7 +103,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
         dbr_match_init(match);
 
         struct DbrPosn* posn = fig_accnt_posn(maker->i.giveup.rec, crec, settl_day,
-                                              index, pool);
+                                              ordidx, pool);
         if (!posn) {
             // No need to free accnt or posn.
             dbr_pool_free_match(pool, match);
@@ -201,7 +201,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
         // Avoid allocating position when there are no matches.
         if (!(trans->taker_posn = fig_accnt_posn(taker->i.giveup.rec, crec, settl_day,
-                                                 index, pool)))
+                                                 ordidx, pool)))
             goto fail1;
 
         // Commit taker order.
@@ -222,7 +222,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
 DBR_EXTERN DbrBool
 fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 DbrJourn journ, struct FigIndex* index, DbrPool pool, struct DbrTrans* trans)
+                 DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans)
 {
     struct DbrSide* side;
     int direct;
@@ -238,5 +238,5 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* b
         direct = DBR_GIVEN;
     }
 
-    return match_orders(book, taker, side, direct, bank, journ, index, pool, trans);
+    return match_orders(book, taker, side, direct, bank, journ, ordidx, pool, trans);
 }

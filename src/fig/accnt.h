@@ -20,7 +20,7 @@
 
 #include <dbr/fig/accnt.h>
 
-#include "index.h"
+#include "ordidx.h"
 
 #include <dbr/elm/refcount.h>
 
@@ -28,7 +28,7 @@
 
 struct FigAccnt {
     struct DbrRec* rec;
-    struct FigIndex* index;
+    struct FigOrdIdx* ordidx;
     DbrPool pool;
     struct DbrTree traders;
     struct DbrTree giveups;
@@ -41,7 +41,7 @@ struct FigAccnt {
 };
 
 DBR_EXTERN struct FigAccnt*
-fig_accnt_lazy(struct DbrRec* arec, struct FigIndex* index, DbrPool pool);
+fig_accnt_lazy(struct DbrRec* arec, struct FigOrdIdx* ordidx, DbrPool pool);
 
 // Assumes that arec pointer is not null.
 
@@ -163,7 +163,7 @@ fig_accnt_emplace_order(struct FigAccnt* accnt, struct DbrOrder* order)
     }
 #pragma GCC diagnostic pop
     if (order->i.ref[0] != '\0')
-        fig_index_insert(accnt->index, order);
+        fig_ordidx_insert(accnt->ordidx, order);
 }
 
 // Release ownership from state.
@@ -174,7 +174,7 @@ fig_accnt_release_order(struct FigAccnt* accnt, struct DbrOrder* order)
     dbr_tree_remove(&accnt->orders, &order->accnt_node_);
     dbr_rbnode_init(&order->accnt_node_);
     if (order->i.ref[0] != '\0')
-        fig_index_remove(accnt->index, accnt->rec->id, order->i.ref);
+        fig_ordidx_remove(accnt->ordidx, accnt->rec->id, order->i.ref);
 }
 
 // Release ownership from state.
@@ -196,7 +196,7 @@ static inline struct DbrOrder*
 fig_accnt_release_order_ref(struct FigAccnt* accnt, const char* ref)
 {
     assert(ref);
-    struct DbrOrder* order = fig_index_remove(accnt->index, accnt->rec->id, ref);
+    struct DbrOrder* order = fig_ordidx_remove(accnt->ordidx, accnt->rec->id, ref);
     if (order) {
         dbr_tree_remove(&accnt->orders, &order->accnt_node_);
         dbr_rbnode_init(&order->accnt_node_);
@@ -216,7 +216,7 @@ static inline struct DbrOrder*
 fig_accnt_find_order_ref(const struct FigAccnt* accnt, const char* ref)
 {
     assert(ref);
-    return fig_index_find(accnt->index, accnt->rec->id, ref);
+    return fig_ordidx_find(accnt->ordidx, accnt->rec->id, ref);
 }
 
 static inline struct DbrRbNode*
@@ -322,7 +322,7 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn);
 
 DBR_EXTERN struct DbrPosn*
 fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
-               struct FigIndex* index, DbrPool pool);
+               struct FigOrdIdx* ordidx, DbrPool pool);
 
 static inline struct DbrRbNode*
 fig_accnt_find_posn_id(const struct FigAccnt* accnt, DbrIden id)

@@ -86,7 +86,7 @@ free_posns(struct FigAccnt* accnt)
 }
 
 DBR_EXTERN struct FigAccnt*
-fig_accnt_lazy(struct DbrRec* arec, struct FigIndex* index, DbrPool pool)
+fig_accnt_lazy(struct DbrRec* arec, struct FigOrdIdx* ordidx, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ENTITY_ACCNT);
@@ -98,7 +98,7 @@ fig_accnt_lazy(struct DbrRec* arec, struct FigIndex* index, DbrPool pool)
             return NULL;
         }
         accnt->rec = arec;
-        accnt->index = index;
+        accnt->ordidx = ordidx;
         accnt->pool = pool;
         dbr_tree_init(&accnt->traders);
         dbr_tree_init(&accnt->giveups);
@@ -169,7 +169,7 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
 
 DBR_EXTERN struct DbrPosn*
 fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
-               struct FigIndex* index, DbrPool pool)
+               struct FigOrdIdx* ordidx, DbrPool pool)
 {
     assert(arec);
     assert(arec->type == DBR_ENTITY_ACCNT);
@@ -178,7 +178,7 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
     assert(crec->type == DBR_ENTITY_CONTR);
 
     const DbrKey key = dbr_posn_key(arec->id, crec->id, settl_day);
-    struct FigAccnt* accnt = fig_accnt_lazy(arec, index, pool);
+    struct FigAccnt* accnt = fig_accnt_lazy(arec, ordidx, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
 
