@@ -3,9 +3,9 @@
  */
 #include "test.hpp"
 
-#include <dbrpp/elm/pool.hpp>
+#include <scpp/elm/pool.hpp>
 
-using namespace dbr;
+using namespace sc;
 
 TEST_CASE(pool_create)
 {
@@ -14,5 +14,5 @@ TEST_CASE(pool_create)
 
 TEST_CASE(pool_destroy)
 {
-    dbr_pool_destroy(NULL);
+    sc_pool_destroy(NULL);
 }

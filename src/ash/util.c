@@ -1,13 +1,13 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/ash/util.h>
+#include <sc/ash/util.h>
 
 #include <limits.h>
 #include <sys/time.h>
 
-DBR_API int
-dbr_int_dig(int i)
+SC_API int
+sc_int_dig(int i)
 {
     if (i < 0)
         i = (i == INT_MIN) ? INT_MAX : -i;
@@ -33,8 +33,8 @@ dbr_int_dig(int i)
     return d;
 }
 
-DBR_API int
-dbr_long_dig(long l)
+SC_API int
+sc_long_dig(long l)
 {
     if (l < 0)
         l = (l == LONG_MIN) ? LONG_MAX : -l;
@@ -77,8 +77,8 @@ dbr_long_dig(long l)
     return d;
 }
 
-DBR_API long
-dbr_millis()
+SC_API long
+sc_millis()
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);

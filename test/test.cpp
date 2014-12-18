@@ -3,7 +3,7 @@
  */
 #include "test.hpp"
 
-#include <dbrpp/ash/except.hpp>
+#include <scpp/ash/except.hpp>
 
 #include <iostream>
 
@@ -34,7 +34,7 @@ run(const TestCase& tc)
         cout << " fail" << endl;
         cerr << e.file() << ':' << e.line() << ": " << e.what() << endl;
         exit(1);
-    } catch (const dbr::DbrException& e) {
+    } catch (const sc::ScException& e) {
         cout << " fail" << endl;
         cerr << e.file() << ':' << e.line() << ": " << e.what() << " (" << e.num() << ')' << endl;
         exit(1);

@@ -4,12 +4,12 @@
 #ifndef FIG_CLNT_H
 #define FIG_CLNT_H
 
-#include <dbr/fig/clnt.h>
+#include <sc/fig/clnt.h>
 
 #include "cache.h"
 #include "ordidx.h"
 
-#include <dbr/ash/prioq.h>
+#include <sc/ash/prioq.h>
 
 #include <zmq.h>
 
@@ -57,40 +57,40 @@ enum {
 };
 
 struct FigClnt {
-    struct DbrSess sess;
+    struct ScSess sess;
     void* mdsock;
     void* trsock;
     void* asock;
-    DbrIden id;
-    DbrMillis tmout;
-    DbrPool pool;
+    ScIden id;
+    ScMillis tmout;
+    ScPool pool;
     unsigned state;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
-    struct DbrTree views;
-    struct DbrPrioq prioq;
-    DbrMillis mdlast;
+    struct ScTree views;
+    struct ScPrioq prioq;
+    ScMillis mdlast;
     // Internal request-id for open or close.
-    DbrIden close_id;
-    DbrIden open_id;
+    ScIden close_id;
+    ScIden open_id;
     zmq_pollitem_t items[FIG_NSOCK];
 };
 
-#if DBR_DEBUG_LEVEL >= 1
-DBR_EXTERN void
+#if SC_DEBUG_LEVEL >= 1
+SC_EXTERN void
 fig_clnt_log_state(unsigned state);
-#else  // DBR_DEBUG_LEVEL < 1
+#else  // SC_DEBUG_LEVEL < 1
 static inline void
 fig_clnt_log_state(unsigned state) { }
-#endif // DBR_DEBUG_LEVEL < 1
+#endif // SC_DEBUG_LEVEL < 1
 
-DBR_EXTERN void
-fig_clnt_sess_reset(DbrClnt clnt);
+SC_EXTERN void
+fig_clnt_sess_reset(ScClnt clnt);
 
-DBR_EXTERN DbrIden
-fig_clnt_sess_close(DbrClnt clnt, DbrMillis now);
+SC_EXTERN ScIden
+fig_clnt_sess_close(ScClnt clnt, ScMillis now);
 
-DBR_EXTERN DbrIden
-fig_clnt_sess_open(DbrClnt clnt, DbrMillis now);
+SC_EXTERN ScIden
+fig_clnt_sess_open(ScClnt clnt, ScMillis now);
 
 #endif // FIG_CLNT_H

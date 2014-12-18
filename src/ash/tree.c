@@ -27,14 +27,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <dbr/ash/tree.h>
+#include <sc/ash/tree.h>
 
 #include <assert.h>
 
 enum { NONE = 0, BLACK = 1, RED = 2 };
 
 static int
-cmp(DbrKey lhs, DbrKey rhs)
+cmp(ScKey lhs, ScKey rhs)
 {
     int i;
     if (lhs < rhs)
@@ -47,7 +47,7 @@ cmp(DbrKey lhs, DbrKey rhs)
 }
 
 static void
-set(DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
+set(ScKey key, struct ScRbNode* node, struct ScRbNode* parent)
 {
     node->key = key;
     node->right = node->left = NULL;
@@ -56,14 +56,14 @@ set(DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
 }
 
 static void
-set_blackred(struct DbrRbNode* black, struct DbrRbNode* red)
+set_blackred(struct ScRbNode* black, struct ScRbNode* red)
 {
     black->color = BLACK;
     red->color = RED;
 }
 
 static void
-rotate_left(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
+rotate_left(struct ScTree* tree, struct ScRbNode* node, struct ScRbNode* tmp)
 {
     tmp = node->right;
     if ((node->right = tmp->left))
@@ -80,7 +80,7 @@ rotate_left(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
 }
 
 static void
-rotate_right(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp)
+rotate_right(struct ScTree* tree, struct ScRbNode* node, struct ScRbNode* tmp)
 {
     tmp = node->left;
     if ((node->left = tmp->right))
@@ -97,9 +97,9 @@ rotate_right(struct DbrTree* tree, struct DbrRbNode* node, struct DbrRbNode* tmp
 }
 
 static void
-insert_color(struct DbrTree* tree, struct DbrRbNode* node)
+insert_color(struct ScTree* tree, struct ScRbNode* node)
 {
-    struct DbrRbNode* parent, * gparent, * tmp;
+    struct ScRbNode* parent, * gparent, * tmp;
     while ((parent = node->parent) && parent->color == RED) {
         gparent = parent->parent;
         if (parent == gparent->left) {
@@ -140,9 +140,9 @@ insert_color(struct DbrTree* tree, struct DbrRbNode* node)
 }
 
 static void
-remove_color(struct DbrTree* tree, struct DbrRbNode* parent, struct DbrRbNode* node)
+remove_color(struct ScTree* tree, struct ScRbNode* parent, struct ScRbNode* node)
 {
-    struct DbrRbNode* tmp;
+    struct ScRbNode* tmp;
     while ((!node || node->color == BLACK) && node != tree->root) {
         if (parent->left == node) {
             tmp = parent->right;
@@ -158,7 +158,7 @@ remove_color(struct DbrTree* tree, struct DbrRbNode* parent, struct DbrRbNode* n
                 parent = node->parent;
             } else {
                 if (!tmp->right || tmp->right->color == BLACK) {
-                    struct DbrRbNode* oleft;
+                    struct ScRbNode* oleft;
                     if ((oleft = tmp->left))
                         oleft->color = BLACK;
                     tmp->color = RED;
@@ -187,7 +187,7 @@ remove_color(struct DbrTree* tree, struct DbrRbNode* parent, struct DbrRbNode* n
                 parent = node->parent;
             } else {
                 if (!tmp->left || tmp->left->color == BLACK) {
-                    struct DbrRbNode* oright;
+                    struct ScRbNode* oright;
                     if ((oright = tmp->right))
                         oright->color = BLACK;
                     tmp->color = RED;
@@ -208,11 +208,11 @@ remove_color(struct DbrTree* tree, struct DbrRbNode* parent, struct DbrRbNode* n
         node->color = BLACK;
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node)
+SC_API struct ScRbNode*
+sc_tree_insert(struct ScTree* tree, ScKey key, struct ScRbNode* node)
 {
-    struct DbrRbNode* tmp;
-    struct DbrRbNode* parent = NULL;
+    struct ScRbNode* tmp;
+    struct ScRbNode* parent = NULL;
     int comp = 0;
     assert(node->color == NONE);
     tmp = tree->root;
@@ -238,8 +238,8 @@ dbr_tree_insert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node)
     return node;
 }
 
-DBR_API void
-dbr_tree_pinsert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node, struct DbrRbNode* parent)
+SC_API void
+sc_tree_pinsert(struct ScTree* tree, ScKey key, struct ScRbNode* node, struct ScRbNode* parent)
 {
     assert(node->color == NONE);
     set(key, node, parent);
@@ -254,17 +254,17 @@ dbr_tree_pinsert(struct DbrTree* tree, DbrKey key, struct DbrRbNode* node, struc
     insert_color(tree, node);
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_remove(struct DbrTree* tree, struct DbrRbNode* node)
+SC_API struct ScRbNode*
+sc_tree_remove(struct ScTree* tree, struct ScRbNode* node)
 {
-    struct DbrRbNode* child, * parent, * old = node;
+    struct ScRbNode* child, * parent, * old = node;
     int color;
     if (!node->left)
         child = node->right;
     else if (!node->right)
         child = node->left;
     else {
-        struct DbrRbNode* left;
+        struct ScRbNode* left;
         node = node->right;
         while ((left = node->left))
             node = left;
@@ -318,10 +318,10 @@ dbr_tree_remove(struct DbrTree* tree, struct DbrRbNode* node)
     return old;
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_find(const struct DbrTree* tree, DbrKey key)
+SC_API struct ScRbNode*
+sc_tree_find(const struct ScTree* tree, ScKey key)
 {
-    struct DbrRbNode* tmp = tree->root;
+    struct ScRbNode* tmp = tree->root;
     int comp;
     while (tmp) {
         comp = cmp(key, tmp->key);
@@ -335,11 +335,11 @@ dbr_tree_find(const struct DbrTree* tree, DbrKey key)
     return NULL;
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_nfind(const struct DbrTree* tree, DbrKey key)
+SC_API struct ScRbNode*
+sc_tree_nfind(const struct ScTree* tree, ScKey key)
 {
-    struct DbrRbNode* tmp = tree->root;
-    struct DbrRbNode* res = NULL;
+    struct ScRbNode* tmp = tree->root;
+    struct ScRbNode* res = NULL;
     int comp;
     while (tmp) {
         comp = cmp(key, tmp->key);
@@ -355,11 +355,11 @@ dbr_tree_nfind(const struct DbrTree* tree, DbrKey key)
     return res;
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_pfind(const struct DbrTree* tree, DbrKey key)
+SC_API struct ScRbNode*
+sc_tree_pfind(const struct ScTree* tree, ScKey key)
 {
-    struct DbrRbNode* tmp = tree->root;
-    struct DbrRbNode* parent = NULL;
+    struct ScRbNode* tmp = tree->root;
+    struct ScRbNode* parent = NULL;
     int comp;
     while (tmp) {
         parent = tmp;
@@ -374,11 +374,11 @@ dbr_tree_pfind(const struct DbrTree* tree, DbrKey key)
     return parent;
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_first(const struct DbrTree* tree)
+SC_API struct ScRbNode*
+sc_tree_first(const struct ScTree* tree)
 {
-    struct DbrRbNode* tmp = tree->root;
-    struct DbrRbNode* parent = NULL;
+    struct ScRbNode* tmp = tree->root;
+    struct ScRbNode* parent = NULL;
     while (tmp) {
         parent = tmp;
         tmp = tmp->left;
@@ -386,11 +386,11 @@ dbr_tree_first(const struct DbrTree* tree)
     return parent;
 }
 
-DBR_API struct DbrRbNode*
-dbr_tree_last(const struct DbrTree* tree)
+SC_API struct ScRbNode*
+sc_tree_last(const struct ScTree* tree)
 {
-    struct DbrRbNode* tmp = tree->root;
-    struct DbrRbNode* parent = NULL;
+    struct ScRbNode* tmp = tree->root;
+    struct ScRbNode* parent = NULL;
     while (tmp) {
         parent = tmp;
         tmp = tmp->right;

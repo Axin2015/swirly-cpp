@@ -3,9 +3,9 @@
  */
 #include "test.hpp"
 
-#include <dbrpp/ash/string.hpp>
+#include <scpp/ash/string.hpp>
 
-using namespace dbr;
+using namespace sc;
 
 TEST_CASE(string_lexncmp)
 {

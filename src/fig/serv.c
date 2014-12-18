@@ -1,7 +1,7 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/fig/serv.h>
+#include <sc/fig/serv.h>
 
 #include "accnt.h"
 #include "cache.h"
@@ -9,192 +9,192 @@
 #include "ordidx.h"
 #include "sessidx.h"
 
-#include <dbr/fig/book.h>
+#include <sc/fig/book.h>
 
-#include <dbr/ash/bank.h>
-#include <dbr/ash/err.h>
-#include <dbr/ash/queue.h>
-#include <dbr/ash/util.h>
+#include <sc/ash/bank.h>
+#include <sc/ash/err.h>
+#include <sc/ash/queue.h>
+#include <sc/ash/util.h>
 
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
 
 struct FigServ {
-    struct DbrBank bank;
-    DbrJourn journ;
-    DbrPool pool;
+    struct ScBank bank;
+    ScJourn journ;
+    ScPool pool;
     struct FigCache cache;
     struct FigOrdIdx ordidx;
     struct FigSessIdx sessidx;
-    struct DbrTree books;
+    struct ScTree books;
 
-    struct DbrQueue execs;
-    struct DbrTree posnups;
-    struct DbrTree bookups;
+    struct ScQueue execs;
+    struct ScTree posnups;
+    struct ScTree bookups;
 };
 
-static inline struct DbrBook*
-serv_book_entry(struct DbrRbNode* node)
+static inline struct ScBook*
+serv_book_entry(struct ScRbNode* node)
 {
-    return dbr_implof(struct DbrBook, serv_node_, node);
+    return sc_implof(struct ScBook, serv_node_, node);
 }
 
 static void
-term_state(struct DbrRec* rec)
+term_state(struct ScRec* rec)
 {
     switch (rec->type) {
-    case DBR_ENTITY_ACCNT:
+    case SC_ENTITY_ACCNT:
         fig_accnt_term(rec);
         break;
     }
 }
 
-static inline struct DbrRec*
-get_id(struct FigCache* cache, int type, DbrIden id)
+static inline struct ScRec*
+get_id(struct FigCache* cache, int type, ScIden id)
 {
-    struct DbrSlNode* node = fig_cache_find_rec_id(cache, type, id);
+    struct ScSlNode* node = fig_cache_find_rec_id(cache, type, id);
     assert(node != FIG_CACHE_END_REC);
-    return dbr_shared_rec_entry(node);
+    return sc_shared_rec_entry(node);
 }
 
-static inline struct DbrPerm*
-enrich_perm(struct FigCache* cache, struct DbrPerm* perm)
+static inline struct ScPerm*
+enrich_perm(struct FigCache* cache, struct ScPerm* perm)
 {
-    perm->trader.rec = get_id(cache, DBR_ENTITY_ACCNT, perm->trader.id_only);
-    perm->giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, perm->giveup.id_only);
+    perm->trader.rec = get_id(cache, SC_ENTITY_ACCNT, perm->trader.id_only);
+    perm->giveup.rec = get_id(cache, SC_ENTITY_ACCNT, perm->giveup.id_only);
     return perm;
 }
 
-static inline struct DbrOrder*
-enrich_order(struct FigCache* cache, struct DbrOrder* order)
+static inline struct ScOrder*
+enrich_order(struct FigCache* cache, struct ScOrder* order)
 {
-    order->i.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, order->i.trader.id_only);
-    order->i.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, order->i.giveup.id_only);
-    order->i.contr.rec = get_id(cache, DBR_ENTITY_CONTR, order->i.contr.id_only);
+    order->i.trader.rec = get_id(cache, SC_ENTITY_ACCNT, order->i.trader.id_only);
+    order->i.giveup.rec = get_id(cache, SC_ENTITY_ACCNT, order->i.giveup.id_only);
+    order->i.contr.rec = get_id(cache, SC_ENTITY_CONTR, order->i.contr.id_only);
     return order;
 }
 
-static inline struct DbrExec*
-enrich_trade(struct FigCache* cache, struct DbrExec* exec)
+static inline struct ScExec*
+enrich_trade(struct FigCache* cache, struct ScExec* exec)
 {
-    exec->i.trader.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->i.trader.id_only);
-    exec->i.giveup.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->i.giveup.id_only);
-    exec->i.contr.rec = get_id(cache, DBR_ENTITY_CONTR, exec->i.contr.id_only);
-    exec->cpty.rec = get_id(cache, DBR_ENTITY_ACCNT, exec->cpty.id_only);
+    exec->i.trader.rec = get_id(cache, SC_ENTITY_ACCNT, exec->i.trader.id_only);
+    exec->i.giveup.rec = get_id(cache, SC_ENTITY_ACCNT, exec->i.giveup.id_only);
+    exec->i.contr.rec = get_id(cache, SC_ENTITY_CONTR, exec->i.contr.id_only);
+    exec->cpty.rec = get_id(cache, SC_ENTITY_ACCNT, exec->cpty.id_only);
     return exec;
 }
 
-static inline struct DbrPosn*
-enrich_posn(struct FigCache* cache, struct DbrPosn* posn)
+static inline struct ScPosn*
+enrich_posn(struct FigCache* cache, struct ScPosn* posn)
 {
-    posn->accnt.rec = get_id(cache, DBR_ENTITY_ACCNT, posn->accnt.id_only);
-    posn->contr.rec = get_id(cache, DBR_ENTITY_CONTR, posn->contr.id_only);
+    posn->accnt.rec = get_id(cache, SC_ENTITY_ACCNT, posn->accnt.id_only);
+    posn->contr.rec = get_id(cache, SC_ENTITY_CONTR, posn->contr.id_only);
     return posn;
 }
 
 static inline void
-insert_posnup(struct DbrTree* posnups, struct DbrPosn* posn)
+insert_posnup(struct ScTree* posnups, struct ScPosn* posn)
 {
-    const DbrKey key = dbr_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
-    dbr_tree_insert(posnups, key, &posn->update_node_);
+    const ScKey key = sc_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
+    sc_tree_insert(posnups, key, &posn->update_node_);
 }
 
-static inline struct DbrBook*
-get_book(DbrServ serv, DbrKey key)
+static inline struct ScBook*
+get_book(ScServ serv, ScKey key)
 {
-	struct DbrRbNode* node = dbr_tree_find(&serv->books, key);
+	struct ScRbNode* node = sc_tree_find(&serv->books, key);
     return node ? serv_book_entry(node) : NULL;
 }
 
-static struct DbrBook*
-lazy_book(DbrServ serv, struct DbrRec* crec, DbrJd settl_day)
+static struct ScBook*
+lazy_book(ScServ serv, struct ScRec* crec, ScJd settl_day)
 {
     assert(crec);
-    assert(crec->type == DBR_ENTITY_CONTR);
+    assert(crec->type == SC_ENTITY_CONTR);
 
-    const DbrKey key = dbr_book_key(crec->id, settl_day);
-    struct DbrBook* book;
-	struct DbrRbNode* node = dbr_tree_pfind(&serv->books, key);
+    const ScKey key = sc_book_key(crec->id, settl_day);
+    struct ScBook* book;
+	struct ScRbNode* node = sc_tree_pfind(&serv->books, key);
     if (!node || node->key != key) {
-        book = dbr_pool_alloc_book(serv->pool);
-        if (dbr_unlikely(!book)) {
-            dbr_err_set(DBR_ENOMEM, "out of memory");
+        book = sc_pool_alloc_book(serv->pool);
+        if (sc_unlikely(!book)) {
+            sc_err_set(SC_ENOMEM, "out of memory");
             return NULL;
         }
-        dbr_book_init(book, crec, settl_day, serv->pool);
-        struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&serv->books, key, &book->serv_node_, parent);
+        sc_book_init(book, crec, settl_day, serv->pool);
+        struct ScRbNode* parent = node;
+        sc_tree_pinsert(&serv->books, key, &book->serv_node_, parent);
     } else
         book = serv_book_entry(node);
     return book;
 }
 
 static void
-free_books(struct DbrTree* books, DbrPool pool)
+free_books(struct ScTree* books, ScPool pool)
 {
     assert(books);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = books->root)) {
-        struct DbrBook* book = serv_book_entry(node);
-        dbr_tree_remove(books, node);
-        dbr_book_term(book);
-        dbr_pool_free_book(pool, book);
+        struct ScBook* book = serv_book_entry(node);
+        sc_tree_remove(books, node);
+        sc_book_term(book);
+        sc_pool_free_book(pool, book);
     }
 }
 
 static void
-free_match_list(struct DbrSlNode* first, DbrPool pool)
+free_match_list(struct ScSlNode* first, ScPool pool)
 {
-    struct DbrSlNode* node = first;
+    struct ScSlNode* node = first;
     while (node) {
-        struct DbrMatch* match = dbr_trans_match_entry(node);
+        struct ScMatch* match = sc_trans_match_entry(node);
         node = node->next;
         // Not committed so match object still owns the trades.
-        dbr_exec_decref(match->taker_exec, pool);
-        dbr_exec_decref(match->maker_exec, pool);
-        dbr_pool_free_match(pool, match);
+        sc_exec_decref(match->taker_exec, pool);
+        sc_exec_decref(match->maker_exec, pool);
+        sc_pool_free_match(pool, match);
     }
 }
 
-static DbrBool
-emplace_rec_list(DbrServ serv, DbrModel model, int type)
+static ScBool
+emplace_rec_list(ScServ serv, ScModel model, int type)
 {
-    struct DbrSlNode* node;
-    ssize_t size = dbr_model_read_entity(model, type, serv->pool, &node);
+    struct ScSlNode* node;
+    ssize_t size = sc_model_read_entity(model, type, serv->pool, &node);
     if (size < 0)
-        return DBR_FALSE;
+        return SC_FALSE;
 
     fig_cache_emplace_rec_list(&serv->cache, type, node, size);
-    return DBR_TRUE;
+    return SC_TRUE;
 }
 
-static DbrBool
-emplace_perms(DbrServ serv, DbrModel model)
+static ScBool
+emplace_perms(ScServ serv, ScModel model)
 {
-    struct DbrSlNode* node;
-    if (dbr_model_read_entity(model, DBR_ENTITY_PERM, serv->pool, &node) < 0)
+    struct ScSlNode* node;
+    if (sc_model_read_entity(model, SC_ENTITY_PERM, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPerm* uperm = enrich_perm(&serv->cache, dbr_shared_perm_entry(node));
+        struct ScPerm* uperm = enrich_perm(&serv->cache, sc_shared_perm_entry(node));
 
         // Clone member for giveup.
-        struct DbrPerm* gperm = dbr_pool_alloc_perm(serv->pool);
+        struct ScPerm* gperm = sc_pool_alloc_perm(serv->pool);
         if (!gperm)
             goto fail2;
-        dbr_perm_init(gperm);
+        sc_perm_init(gperm);
         gperm->trader.rec = uperm->trader.rec;
         gperm->giveup.rec = uperm->giveup.rec;
 
         struct FigAccnt* trader = fig_accnt_lazy(uperm->trader.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!trader)) {
-            dbr_pool_free_perm(serv->pool, gperm);
+        if (sc_unlikely(!trader)) {
+            sc_pool_free_perm(serv->pool, gperm);
             goto fail2;
         }
 
         struct FigAccnt* giveup = fig_accnt_lazy(uperm->giveup.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!giveup)) {
-            dbr_pool_free_perm(serv->pool, gperm);
+        if (sc_unlikely(!giveup)) {
+            sc_pool_free_perm(serv->pool, gperm);
             goto fail2;
         }
 
@@ -202,129 +202,129 @@ emplace_perms(DbrServ serv, DbrModel model)
         fig_accnt_emplace_trader(giveup, uperm);
         fig_accnt_emplace_giveup(trader, gperm);
     }
-    return DBR_TRUE;
+    return SC_TRUE;
  fail2:
     // Free tail.
     do {
-        struct DbrPerm* perm = dbr_shared_perm_entry(node);
+        struct ScPerm* perm = sc_shared_perm_entry(node);
         node = node->next;
-        dbr_pool_free_perm(serv->pool, perm);
+        sc_pool_free_perm(serv->pool, perm);
     } while (node);
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-static DbrBool
-emplace_orders(DbrServ serv, DbrModel model)
+static ScBool
+emplace_orders(ScServ serv, ScModel model)
 {
-    struct DbrSlNode* node;
-    if (dbr_model_read_entity(model, DBR_ENTITY_ORDER, serv->pool, &node) < 0)
+    struct ScSlNode* node;
+    if (sc_model_read_entity(model, SC_ENTITY_ORDER, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrOrder* order = enrich_order(&serv->cache, dbr_shared_order_entry(node));
-        struct DbrBook* book;
-        if (!dbr_order_done(order)) {
+        struct ScOrder* order = enrich_order(&serv->cache, sc_shared_order_entry(node));
+        struct ScBook* book;
+        if (!sc_order_done(order)) {
 
             book = lazy_book(serv, order->i.contr.rec, order->i.settl_day);
-            if (dbr_unlikely(!book))
+            if (sc_unlikely(!book))
                 goto fail2;
 
-            if (dbr_unlikely(!dbr_book_insert(book, order)))
+            if (sc_unlikely(!sc_book_insert(book, order)))
                 goto fail2;
         } else
             book = NULL;
 
         struct FigAccnt* trader = fig_accnt_lazy(order->i.trader.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!trader)) {
+        if (sc_unlikely(!trader)) {
             if (book)
-                dbr_book_remove(book, order);
+                sc_book_remove(book, order);
             goto fail2;
         }
 
         // Transfer ownership.
         fig_accnt_emplace_order(trader, order);
     }
-    return DBR_TRUE;
+    return SC_TRUE;
  fail2:
     // Free tail.
     do {
-        struct DbrOrder* order = dbr_shared_order_entry(node);
+        struct ScOrder* order = sc_shared_order_entry(node);
         node = node->next;
-        dbr_pool_free_order(serv->pool, order);
+        sc_pool_free_order(serv->pool, order);
     } while (node);
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-static DbrBool
-emplace_trades(DbrServ serv, DbrModel model)
+static ScBool
+emplace_trades(ScServ serv, ScModel model)
 {
-    struct DbrSlNode* node;
-    if (dbr_model_read_entity(model, DBR_ENTITY_EXEC, serv->pool, &node) < 0)
+    struct ScSlNode* node;
+    if (sc_model_read_entity(model, SC_ENTITY_EXEC, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrExec* exec = enrich_trade(&serv->cache, dbr_shared_exec_entry(node));
+        struct ScExec* exec = enrich_trade(&serv->cache, sc_shared_exec_entry(node));
         struct FigAccnt* trader = fig_accnt_lazy(exec->i.trader.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!trader))
+        if (sc_unlikely(!trader))
             goto fail2;
 
         // Transfer ownership.
         fig_accnt_insert_trade(trader, exec);
-        dbr_exec_decref(exec, serv->pool);
+        sc_exec_decref(exec, serv->pool);
     }
-    return DBR_TRUE;
+    return SC_TRUE;
  fail2:
     // Free tail.
     do {
-        struct DbrExec* exec = dbr_shared_exec_entry(node);
+        struct ScExec* exec = sc_shared_exec_entry(node);
         node = node->next;
-        dbr_exec_decref(exec, serv->pool);
+        sc_exec_decref(exec, serv->pool);
     } while (node);
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-static DbrBool
-emplace_posns(DbrServ serv, DbrModel model)
+static ScBool
+emplace_posns(ScServ serv, ScModel model)
 {
-    struct DbrSlNode* node;
-    if (dbr_model_read_entity(model, DBR_ENTITY_POSN, serv->pool, &node) < 0)
+    struct ScSlNode* node;
+    if (sc_model_read_entity(model, SC_ENTITY_POSN, serv->pool, &node) < 0)
         goto fail1;
 
     for (; node; node = node->next) {
-        struct DbrPosn* posn = enrich_posn(&serv->cache, dbr_shared_posn_entry(node));
+        struct ScPosn* posn = enrich_posn(&serv->cache, sc_shared_posn_entry(node));
         struct FigAccnt* accnt = fig_accnt_lazy(posn->accnt.rec, &serv->ordidx, serv->pool);
-        if (dbr_unlikely(!accnt))
+        if (sc_unlikely(!accnt))
             goto fail2;
 
         // Transfer ownership.
         fig_accnt_emplace_posn(accnt, posn);
     }
-    return DBR_TRUE;
+    return SC_TRUE;
  fail2:
     // Free tail.
     do {
-        struct DbrPosn* posn = dbr_shared_posn_entry(node);
+        struct ScPosn* posn = sc_shared_posn_entry(node);
         node = node->next;
-        dbr_pool_free_posn(serv->pool, posn);
+        sc_pool_free_posn(serv->pool, posn);
     } while (node);
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-static struct DbrExec*
-create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
+static struct ScExec*
+create_exec(ScServ serv, struct ScOrder* order, ScMillis now)
 {
-    struct DbrExec* exec = dbr_pool_alloc_exec(serv->pool);
+    struct ScExec* exec = sc_pool_alloc_exec(serv->pool);
     if (!exec)
         return NULL;
-    dbr_exec_init(exec);
+    sc_exec_init(exec);
 
-    exec->id = dbr_bank_add_fetch(&serv->bank, DBR_REG_EXEC, 1L);
+    exec->id = sc_bank_add_fetch(&serv->bank, SC_REG_EXEC, 1L);
     exec->order = order->id;
-    __builtin_memcpy(&exec->i, &order->i, sizeof(struct DbrCommon));
+    __builtin_memcpy(&exec->i, &order->i, sizeof(struct ScCommon));
     exec->match = 0;
     exec->role = 0;
     exec->cpty.id_only = 0;
@@ -333,14 +333,14 @@ create_exec(DbrServ serv, struct DbrOrder* order, DbrMillis now)
 }
 
 static inline void
-apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
+apply_posn(struct ScPosn* posn, const struct ScExec* exec)
 {
     const double licks = exec->i.last_lots * exec->i.last_ticks;
-    if (exec->i.action == DBR_ACTION_BUY) {
+    if (exec->i.action == SC_ACTION_BUY) {
         posn->buy_licks += licks;
         posn->buy_lots += exec->i.last_lots;
     } else {
-        assert(exec->i.action == DBR_ACTION_SELL);
+        assert(exec->i.action == SC_ACTION_SELL);
         posn->sell_licks += licks;
         posn->sell_lots += exec->i.last_lots;
     }
@@ -349,17 +349,17 @@ apply_posn(struct DbrPosn* posn, const struct DbrExec* exec)
 // Assumes that maker lots have not been reduced since matching took place.
 
 static void
-commit_trans(DbrServ serv, struct FigAccnt* taker, struct DbrBook* book,
-             struct DbrTrans* trans, DbrMillis now)
+commit_trans(ScServ serv, struct FigAccnt* taker, struct ScBook* book,
+             struct ScTrans* trans, ScMillis now)
 {
-    while (!dbr_queue_empty(&trans->matches)) {
+    while (!sc_queue_empty(&trans->matches)) {
 
-        struct DbrSlNode* node = dbr_queue_pop(&trans->matches);
-        struct DbrMatch* match = dbr_trans_match_entry(node);
-        struct DbrOrder* maker_order = match->maker_order;
+        struct ScSlNode* node = sc_queue_pop(&trans->matches);
+        struct ScMatch* match = sc_trans_match_entry(node);
+        struct ScOrder* maker_order = match->maker_order;
 
         // Reduce maker.
-        dbr_book_take(book, maker_order, match->lots, now);
+        sc_book_take(book, maker_order, match->lots, now);
         insert_posnup(&serv->posnups, match->maker_posn);
 
         // Must succeed because maker order exists.
@@ -379,26 +379,26 @@ commit_trans(DbrServ serv, struct FigAccnt* taker, struct DbrBook* book,
 
         // Exec ownership is effectively transferred to serv->execs outside of loop, so no need to
         // decrement Exec reference count here.
-        dbr_pool_free_match(serv->pool, match);
+        sc_pool_free_match(serv->pool, match);
     }
 
-    dbr_queue_join(&serv->execs, &trans->execs);
+    sc_queue_join(&serv->execs, &trans->execs);
     if (trans->taker_posn)
         insert_posnup(&serv->posnups, trans->taker_posn);
 }
 
-DBR_API DbrServ
-dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool)
+SC_API ScServ
+sc_serv_create(const char* bank, ScJourn journ, ScPool pool)
 {
     // 1.
-    DbrServ serv = malloc(sizeof(struct FigServ));
-    if (dbr_unlikely(!serv)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+    ScServ serv = malloc(sizeof(struct FigServ));
+    if (sc_unlikely(!serv)) {
+        sc_err_set(SC_ENOMEM, "out of memory");
         goto fail1;
     }
 
     // 2.
-    if (!dbr_bank_init(&serv->bank, bank, DBR_REG_LEN))
+    if (!sc_bank_init(&serv->bank, bank, SC_REG_LEN))
         goto fail2;
 
     serv->journ = journ;
@@ -409,11 +409,11 @@ dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool)
     // 4.
     fig_sessidx_init(&serv->sessidx, pool);
     // 5.
-    dbr_tree_init(&serv->books);
+    sc_tree_init(&serv->books);
 
-    dbr_queue_init(&serv->execs);
-    dbr_tree_init(&serv->posnups);
-    dbr_tree_init(&serv->bookups);
+    sc_queue_init(&serv->execs);
+    sc_tree_init(&serv->posnups);
+    sc_tree_init(&serv->bookups);
 
     return serv;
  fail2:
@@ -422,12 +422,12 @@ dbr_serv_create(const char* bank, DbrJourn journ, DbrPool pool)
     return NULL;
 }
 
-DBR_API void
-dbr_serv_destroy(DbrServ serv)
+SC_API void
+sc_serv_destroy(ScServ serv)
 {
     if (serv) {
         // Ensure that executions are freed.
-        dbr_serv_clear(serv);
+        sc_serv_clear(serv);
         // 5.
         free_books(&serv->books, serv->pool);
         // 4.
@@ -435,7 +435,7 @@ dbr_serv_destroy(DbrServ serv)
         // 3.
         fig_cache_term(&serv->cache);
         // 2.
-        dbr_bank_term(&serv->bank);
+        sc_bank_term(&serv->bank);
         // 1.
         free(serv);
     }
@@ -443,94 +443,94 @@ dbr_serv_destroy(DbrServ serv)
 
 // Cache
 
-DBR_API DbrBool
-dbr_serv_load(DbrServ serv, DbrModel model)
+SC_API ScBool
+sc_serv_load(ScServ serv, ScModel model)
 {
-    return emplace_rec_list(serv, model, DBR_ENTITY_ACCNT)
-        && emplace_rec_list(serv, model, DBR_ENTITY_CONTR)
+    return emplace_rec_list(serv, model, SC_ENTITY_ACCNT)
+        && emplace_rec_list(serv, model, SC_ENTITY_CONTR)
         && emplace_perms(serv, model)
         && emplace_orders(serv, model)
         && emplace_trades(serv, model)
         && emplace_posns(serv, model);
 }
 
-DBR_API struct DbrSlNode*
-dbr_serv_find_rec_id(DbrServ serv, int type, DbrIden id)
+SC_API struct ScSlNode*
+sc_serv_find_rec_id(ScServ serv, int type, ScIden id)
 {
     return fig_cache_find_rec_id(&serv->cache, type, id);
 }
 
-DBR_API struct DbrSlNode*
-dbr_serv_find_rec_mnem(DbrServ serv, int type, const char* mnem)
+SC_API struct ScSlNode*
+sc_serv_find_rec_mnem(ScServ serv, int type, const char* mnem)
 {
     return fig_cache_find_rec_mnem(&serv->cache, type, mnem);
 }
 
-DBR_API struct DbrSlNode*
-dbr_serv_first_rec(DbrServ serv, int type, size_t* size)
+SC_API struct ScSlNode*
+sc_serv_first_rec(ScServ serv, int type, size_t* size)
 {
     return fig_cache_first_rec(&serv->cache, type, size);
 }
 
-DBR_API DbrBool
-dbr_serv_empty_rec(DbrServ serv, int type)
+SC_API ScBool
+sc_serv_empty_rec(ScServ serv, int type)
 {
     return fig_cache_empty_rec(&serv->cache, type);
 }
 
 // Pool
 
-DBR_API DbrAccnt
-dbr_serv_accnt(DbrServ serv, struct DbrRec* arec)
+SC_API ScAccnt
+sc_serv_accnt(ScServ serv, struct ScRec* arec)
 {
     return fig_accnt_lazy(arec, &serv->ordidx, serv->pool);
 }
 
-DBR_API struct DbrBook*
-dbr_serv_book(DbrServ serv, struct DbrRec* crec, DbrJd settl_day)
+SC_API struct ScBook*
+sc_serv_book(ScServ serv, struct ScRec* crec, ScJd settl_day)
 {
     return lazy_book(serv, crec, settl_day);
 }
 
-DBR_API struct DbrSess*
-dbr_serv_sess(DbrServ serv, const DbrUuid uuid)
+SC_API struct ScSess*
+sc_serv_sess(ScServ serv, const ScUuid uuid)
 {
     return fig_sessidx_lazy(&serv->sessidx, uuid);
 }
 
 // Exec
 
-DBR_API struct DbrOrder*
-dbr_serv_place(DbrServ serv, DbrAccnt trader, DbrAccnt giveup, struct DbrBook* book,
-               const char* ref, int action, DbrTicks ticks, DbrLots lots, DbrLots min_lots)
+SC_API struct ScOrder*
+sc_serv_place(ScServ serv, ScAccnt trader, ScAccnt giveup, struct ScBook* book,
+               const char* ref, int action, ScTicks ticks, ScLots lots, ScLots min_lots)
 {
     if (!fig_accnt_logged_on(trader)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        sc_err_setf(SC_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
     if (lots == 0 || lots < min_lots) {
-        dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
+        sc_err_setf(SC_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
 
-    const DbrMillis now = dbr_millis();
-    struct DbrOrder* new_order = dbr_pool_alloc_order(serv->pool);
+    const ScMillis now = sc_millis();
+    struct ScOrder* new_order = sc_pool_alloc_order(serv->pool);
     if (!new_order)
         goto fail1;
-    dbr_order_init(new_order);
+    sc_order_init(new_order);
 
     new_order->level = NULL;
-    new_order->id = dbr_bank_add_fetch(&serv->bank, DBR_REG_ORDER, 1L);
+    new_order->id = sc_bank_add_fetch(&serv->bank, SC_REG_ORDER, 1L);
     new_order->i.trader.rec = fig_accnt_rec(trader);
     new_order->i.giveup.rec = fig_accnt_rec(giveup);
     new_order->i.contr.rec = book->crec;
     new_order->i.settl_day = book->settl_day;
     if (ref)
-        strncpy(new_order->i.ref, ref, DBR_REF_MAX);
+        strncpy(new_order->i.ref, ref, SC_REF_MAX);
     else
         new_order->i.ref[0] = '\0';
-    new_order->i.state = DBR_STATE_NEW;
+    new_order->i.state = SC_STATE_NEW;
     new_order->i.action = action;
     new_order->i.ticks = ticks;
     new_order->i.lots = lots;
@@ -542,66 +542,66 @@ dbr_serv_place(DbrServ serv, DbrAccnt trader, DbrAccnt giveup, struct DbrBook* b
     new_order->created = now;
     new_order->modified = now;
 
-    struct DbrExec* new_exec = create_exec(serv, new_order, now);
+    struct ScExec* new_exec = create_exec(serv, new_order, now);
     if (!new_exec)
         goto fail2;
 
-    struct DbrTrans trans;
-    dbr_trans_init(&trans);
+    struct ScTrans trans;
+    sc_trans_init(&trans);
 
-    dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
+    sc_queue_insert_front(&trans.execs, &new_exec->shared_node_);
 
     // Order fields are updated on match.
     if (!fig_match_orders(book, new_order, &serv->bank, &serv->ordidx, serv->pool, &trans))
         goto fail3;
 
     // Place incomplete order in book.
-    if (!dbr_order_done(new_order) && !dbr_book_insert(book, new_order))
+    if (!sc_order_done(new_order) && !sc_book_insert(book, new_order))
         goto fail4;
 
     // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
     // unfilled quantity.
 
-    if (!dbr_journ_insert_exec_list(serv->journ, trans.execs.first, DBR_TRUE))
+    if (!sc_journ_insert_exec_list(serv->journ, trans.execs.first, SC_TRUE))
         goto fail5;
 
     // Final commit phase cannot fail.
     fig_accnt_emplace_order(trader, new_order);
-    const DbrKey key = dbr_book_key(book->crec->id, book->settl_day);
-    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
+    const ScKey key = sc_book_key(book->crec->id, book->settl_day);
+    sc_tree_insert(&serv->bookups, key, &book->update_node_);
     // Commit trans to cycle and free matches.
     commit_trans(serv, trader, book, &trans, now);
     return new_order;
  fail5:
-    if (!dbr_order_done(new_order))
-        dbr_book_remove(book, new_order);
+    if (!sc_order_done(new_order))
+        sc_book_remove(book, new_order);
  fail4:
-    free_match_list(dbr_queue_first(&trans.matches), serv->pool);
+    free_match_list(sc_queue_first(&trans.matches), serv->pool);
  fail3:
-    dbr_exec_decref(new_exec, serv->pool);
+    sc_exec_decref(new_exec, serv->pool);
  fail2:
-    dbr_pool_free_order(serv->pool, new_order);
+    sc_pool_free_order(serv->pool, new_order);
  fail1:
     return NULL;
 }
 
-DBR_API struct DbrOrder*
-dbr_serv_revise_id(DbrServ serv, DbrAccnt trader, DbrIden id, DbrLots lots)
+SC_API struct ScOrder*
+sc_serv_revise_id(ScServ serv, ScAccnt trader, ScIden id, ScLots lots)
 {
     if (!fig_accnt_logged_on(trader)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        sc_err_setf(SC_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = fig_accnt_find_order_id(trader, id);
+    struct ScRbNode* node = fig_accnt_find_order_id(trader, id);
     if (!node) {
-        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
+        sc_err_setf(SC_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
-    struct DbrOrder* order = dbr_accnt_order_entry(node);
-    if (dbr_order_done(order)) {
-        dbr_err_setf(DBR_EINVAL, "order complete '%ld'", id);
+    struct ScOrder* order = sc_accnt_order_entry(node);
+    if (sc_order_done(order)) {
+        sc_err_setf(SC_EINVAL, "order complete '%ld'", id);
         goto fail1;
     }
 
@@ -611,55 +611,55 @@ dbr_serv_revise_id(DbrServ serv, DbrAccnt trader, DbrIden id, DbrLots lots)
     // 3. greater than original lots.
 
     if (lots == 0 || lots < order->i.min_lots || lots < order->i.exec || lots > order->i.lots) {
-        dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
+        sc_err_setf(SC_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
 
-    const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = create_exec(serv, order, now);
+    const ScMillis now = sc_millis();
+    struct ScExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
     // Revise.
-    exec->i.state = DBR_STATE_REVISE;
-    const DbrLots delta = exec->i.lots - lots;
+    exec->i.state = SC_STATE_REVISE;
+    const ScLots delta = exec->i.lots - lots;
     assert(delta >= 0);
     exec->i.lots = lots;
     exec->i.resd -= delta;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
+    if (!sc_journ_insert_exec(serv->journ, exec, SC_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
-    const DbrKey key = dbr_book_key(order->i.contr.rec->id, order->i.settl_day);
-    struct DbrBook* book = get_book(serv, key);
+    const ScKey key = sc_book_key(order->i.contr.rec->id, order->i.settl_day);
+    struct ScBook* book = get_book(serv, key);
     assert(book);
-    dbr_book_revise(book, order, lots, now);
-    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
-    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
+    sc_book_revise(book, order, lots, now);
+    sc_tree_insert(&serv->bookups, key, &book->update_node_);
+    sc_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_exec_decref(exec, serv->pool);
+    sc_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
 
-DBR_API struct DbrOrder*
-dbr_serv_revise_ref(DbrServ serv, DbrAccnt trader, const char* ref, DbrLots lots)
+SC_API struct ScOrder*
+sc_serv_revise_ref(ScServ serv, ScAccnt trader, const char* ref, ScLots lots)
 {
     if (!fig_accnt_logged_on(trader)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        sc_err_setf(SC_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrOrder* order = fig_accnt_find_order_ref(trader, ref);
+    struct ScOrder* order = fig_accnt_find_order_ref(trader, ref);
     if (!order) {
-        dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
+        sc_err_setf(SC_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
     }
 
-    if (dbr_order_done(order)) {
-        dbr_err_setf(DBR_EINVAL, "order complete '%.64s'", ref);
+    if (sc_order_done(order)) {
+        sc_err_setf(SC_EINVAL, "order complete '%.64s'", ref);
         goto fail1;
     }
 
@@ -669,255 +669,255 @@ dbr_serv_revise_ref(DbrServ serv, DbrAccnt trader, const char* ref, DbrLots lots
     // 3. greater than original lots.
 
     if (lots == 0 || lots < order->i.min_lots || lots < order->i.exec || lots > order->i.lots) {
-        dbr_err_setf(DBR_EINVAL, "invalid lots '%ld'", lots);
+        sc_err_setf(SC_EINVAL, "invalid lots '%ld'", lots);
         goto fail1;
     }
 
-    const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = create_exec(serv, order, now);
+    const ScMillis now = sc_millis();
+    struct ScExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
     // Revise.
-    exec->i.state = DBR_STATE_REVISE;
-    const DbrLots delta = exec->i.lots - lots;
+    exec->i.state = SC_STATE_REVISE;
+    const ScLots delta = exec->i.lots - lots;
     assert(delta >= 0);
     exec->i.lots = lots;
     exec->i.resd -= delta;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
+    if (!sc_journ_insert_exec(serv->journ, exec, SC_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
-    const DbrKey key = dbr_book_key(order->i.contr.rec->id, order->i.settl_day);
-    struct DbrBook* book = get_book(serv, key);
+    const ScKey key = sc_book_key(order->i.contr.rec->id, order->i.settl_day);
+    struct ScBook* book = get_book(serv, key);
     assert(book);
-    dbr_book_revise(book, order, lots, now);
-    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
-    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
+    sc_book_revise(book, order, lots, now);
+    sc_tree_insert(&serv->bookups, key, &book->update_node_);
+    sc_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_exec_decref(exec, serv->pool);
+    sc_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
 
-DBR_API struct DbrOrder*
-dbr_serv_cancel_id(DbrServ serv, DbrAccnt trader, DbrIden id)
+SC_API struct ScOrder*
+sc_serv_cancel_id(ScServ serv, ScAccnt trader, ScIden id)
 {
     if (!fig_accnt_logged_on(trader)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        sc_err_setf(SC_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = fig_accnt_find_order_id(trader, id);
+    struct ScRbNode* node = fig_accnt_find_order_id(trader, id);
     if (!node) {
-        dbr_err_setf(DBR_EINVAL, "no such order '%ld'", id);
+        sc_err_setf(SC_EINVAL, "no such order '%ld'", id);
         goto fail1;
     }
 
-    struct DbrOrder* order = dbr_accnt_order_entry(node);
-    if (dbr_order_done(order)) {
-        dbr_err_setf(DBR_EINVAL, "order complete '%ld'", id);
+    struct ScOrder* order = sc_accnt_order_entry(node);
+    if (sc_order_done(order)) {
+        sc_err_setf(SC_EINVAL, "order complete '%ld'", id);
         goto fail1;
     }
 
-    const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = create_exec(serv, order, now);
+    const ScMillis now = sc_millis();
+    struct ScExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
     // Cancel.
-    exec->i.state = DBR_STATE_CANCEL;
+    exec->i.state = SC_STATE_CANCEL;
     exec->i.resd = 0;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
+    if (!sc_journ_insert_exec(serv->journ, exec, SC_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
-    const DbrKey key = dbr_book_key(order->i.contr.rec->id, order->i.settl_day);
-    struct DbrBook* book = get_book(serv, key);
+    const ScKey key = sc_book_key(order->i.contr.rec->id, order->i.settl_day);
+    struct ScBook* book = get_book(serv, key);
     assert(book);
-    dbr_book_cancel(book, order, now);
-    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
-    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
+    sc_book_cancel(book, order, now);
+    sc_tree_insert(&serv->bookups, key, &book->update_node_);
+    sc_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_exec_decref(exec, serv->pool);
+    sc_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
 
-DBR_API struct DbrOrder*
-dbr_serv_cancel_ref(DbrServ serv, DbrAccnt trader, const char* ref)
+SC_API struct ScOrder*
+sc_serv_cancel_ref(ScServ serv, ScAccnt trader, const char* ref)
 {
     if (!fig_accnt_logged_on(trader)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        sc_err_setf(SC_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrOrder* order = fig_accnt_find_order_ref(trader, ref);
+    struct ScOrder* order = fig_accnt_find_order_ref(trader, ref);
     if (!order) {
-        dbr_err_setf(DBR_EINVAL, "no such order '%.64s'", ref);
+        sc_err_setf(SC_EINVAL, "no such order '%.64s'", ref);
         goto fail1;
     }
 
-    if (dbr_order_done(order)) {
-        dbr_err_setf(DBR_EINVAL, "order complete '%.64s'", ref);
+    if (sc_order_done(order)) {
+        sc_err_setf(SC_EINVAL, "order complete '%.64s'", ref);
         goto fail1;
     }
 
-    const DbrMillis now = dbr_millis();
-    struct DbrExec* exec = create_exec(serv, order, now);
+    const ScMillis now = sc_millis();
+    struct ScExec* exec = create_exec(serv, order, now);
     if (!exec)
         goto fail1;
 
     // Cancel.
-    exec->i.state = DBR_STATE_CANCEL;
+    exec->i.state = SC_STATE_CANCEL;
     exec->i.resd = 0;
 
-    if (!dbr_journ_insert_exec(serv->journ, exec, DBR_TRUE))
+    if (!sc_journ_insert_exec(serv->journ, exec, SC_TRUE))
         goto fail2;
 
     // Final commit phase cannot fail.
-    const DbrKey key = dbr_book_key(order->i.contr.rec->id, order->i.settl_day);
-    struct DbrBook* book = get_book(serv, key);
+    const ScKey key = sc_book_key(order->i.contr.rec->id, order->i.settl_day);
+    struct ScBook* book = get_book(serv, key);
     assert(book);
-    dbr_book_cancel(book, order, now);
-    dbr_tree_insert(&serv->bookups, key, &book->update_node_);
-    dbr_queue_insert_back(&serv->execs, &exec->shared_node_);
+    sc_book_cancel(book, order, now);
+    sc_tree_insert(&serv->bookups, key, &book->update_node_);
+    sc_queue_insert_back(&serv->execs, &exec->shared_node_);
     return order;
  fail2:
-    dbr_exec_decref(exec, serv->pool);
+    sc_exec_decref(exec, serv->pool);
  fail1:
     return NULL;
 }
 
-DBR_API DbrBool
-dbr_serv_ack_trade(DbrServ serv, DbrAccnt trader, DbrIden id)
+SC_API ScBool
+sc_serv_ack_trade(ScServ serv, ScAccnt trader, ScIden id)
 {
     if (!fig_accnt_logged_on(trader)) {
-        dbr_err_setf(DBR_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
+        sc_err_setf(SC_EEXIST, "not logged-on '%.16s'", trader->rec->mnem);
         goto fail1;
     }
 
-    struct DbrRbNode* node = fig_accnt_find_trade_id(trader, id);
+    struct ScRbNode* node = fig_accnt_find_trade_id(trader, id);
     if (!node) {
-        dbr_err_setf(DBR_EINVAL, "no such trade '%ld'", id);
+        sc_err_setf(SC_EINVAL, "no such trade '%ld'", id);
         goto fail1;
     }
 
-    const DbrMillis now = dbr_millis();
-    if (!dbr_journ_update_exec(serv->journ, node->key, now))
+    const ScMillis now = sc_millis();
+    if (!sc_journ_update_exec(serv->journ, node->key, now))
         goto fail1;
 
     // No need to update timestamps on trade because it is immediately freed.
 
-    struct DbrExec* exec = dbr_accnt_trade_entry(node);
+    struct ScExec* exec = sc_accnt_trade_entry(node);
     fig_accnt_remove_trade(trader, exec);
-    return DBR_TRUE;
+    return SC_TRUE;
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-DBR_API void
-dbr_serv_clear_md(DbrServ serv)
+SC_API void
+sc_serv_clear_md(ScServ serv)
 {
-    dbr_tree_init(&serv->bookups);
+    sc_tree_init(&serv->bookups);
 }
 
-DBR_API void
-dbr_serv_clear_tr(DbrServ serv)
+SC_API void
+sc_serv_clear_tr(ScServ serv)
 {
-    struct DbrSlNode* node = serv->execs.first;
+    struct ScSlNode* node = serv->execs.first;
     while (node) {
-        struct DbrExec* exec = dbr_serv_exec_entry(node);
+        struct ScExec* exec = sc_serv_exec_entry(node);
         node = node->next;
         // Free completed orders.
-        if (dbr_exec_done(exec)) {
-            DbrAccnt trader = exec->i.trader.rec->accnt.state;
+        if (sc_exec_done(exec)) {
+            ScAccnt trader = exec->i.trader.rec->accnt.state;
             assert(trader);
-            struct DbrOrder* order = fig_accnt_release_order_id(trader, exec->order);
+            struct ScOrder* order = fig_accnt_release_order_id(trader, exec->order);
             if (order)
-                dbr_pool_free_order(serv->pool, order);
+                sc_pool_free_order(serv->pool, order);
         }
-        dbr_exec_decref(exec, serv->pool);
+        sc_exec_decref(exec, serv->pool);
     }
-    dbr_queue_init(&serv->execs);
-    dbr_tree_init(&serv->posnups);
+    sc_queue_init(&serv->execs);
+    sc_tree_init(&serv->posnups);
 }
 
-DBR_API struct DbrSlNode*
-dbr_serv_first_exec(DbrServ serv)
+SC_API struct ScSlNode*
+sc_serv_first_exec(ScServ serv)
 {
-    return dbr_queue_first(&serv->execs);
+    return sc_queue_first(&serv->execs);
 }
 
-DBR_API DbrBool
-dbr_serv_empty_exec(DbrServ serv)
+SC_API ScBool
+sc_serv_empty_exec(ScServ serv)
 {
-    return dbr_queue_empty(&serv->execs);
+    return sc_queue_empty(&serv->execs);
 }
 
-DBR_API struct DbrRbNode*
-dbr_serv_first_posnup(DbrServ serv)
+SC_API struct ScRbNode*
+sc_serv_first_posnup(ScServ serv)
 {
-    return dbr_tree_first(&serv->posnups);
+    return sc_tree_first(&serv->posnups);
 }
 
-DBR_API struct DbrRbNode*
-dbr_serv_last_posnup(DbrServ serv)
+SC_API struct ScRbNode*
+sc_serv_last_posnup(ScServ serv)
 {
-    return dbr_tree_last(&serv->posnups);
+    return sc_tree_last(&serv->posnups);
 }
 
-DBR_API DbrBool
-dbr_serv_empty_posnup(DbrServ serv)
+SC_API ScBool
+sc_serv_empty_posnup(ScServ serv)
 {
-    return dbr_tree_empty(&serv->posnups);
+    return sc_tree_empty(&serv->posnups);
 }
 
 // Book
 
-DBR_API struct DbrRbNode*
-dbr_serv_find_book(DbrServ serv, DbrIden cid, DbrJd settl_day)
+SC_API struct ScRbNode*
+sc_serv_find_book(ScServ serv, ScIden cid, ScJd settl_day)
 {
-    const DbrKey key = dbr_book_key(cid, settl_day);
-	return dbr_tree_find(&serv->books, key);
+    const ScKey key = sc_book_key(cid, settl_day);
+	return sc_tree_find(&serv->books, key);
 }
 
-DBR_API struct DbrRbNode*
-dbr_serv_first_book(DbrServ serv)
+SC_API struct ScRbNode*
+sc_serv_first_book(ScServ serv)
 {
-    return dbr_tree_first(&serv->books);
+    return sc_tree_first(&serv->books);
 }
 
-DBR_API struct DbrRbNode*
-dbr_serv_last_book(DbrServ serv)
+SC_API struct ScRbNode*
+sc_serv_last_book(ScServ serv)
 {
-    return dbr_tree_last(&serv->books);
+    return sc_tree_last(&serv->books);
 }
 
-DBR_API DbrBool
-dbr_serv_empty_book(DbrServ serv)
+SC_API ScBool
+sc_serv_empty_book(ScServ serv)
 {
-    return dbr_tree_empty(&serv->books);
+    return sc_tree_empty(&serv->books);
 }
 
-DBR_API struct DbrRbNode*
-dbr_serv_first_bookup(DbrServ serv)
+SC_API struct ScRbNode*
+sc_serv_first_bookup(ScServ serv)
 {
-    return dbr_tree_first(&serv->bookups);
+    return sc_tree_first(&serv->bookups);
 }
 
-DBR_API struct DbrRbNode*
-dbr_serv_last_bookup(DbrServ serv)
+SC_API struct ScRbNode*
+sc_serv_last_bookup(ScServ serv)
 {
-    return dbr_tree_last(&serv->bookups);
+    return sc_tree_last(&serv->bookups);
 }
 
-DBR_API DbrBool
-dbr_serv_empty_bookup(DbrServ serv)
+SC_API ScBool
+sc_serv_empty_bookup(ScServ serv)
 {
-    return dbr_tree_empty(&serv->bookups);
+    return sc_tree_empty(&serv->bookups);
 }

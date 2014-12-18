@@ -4,28 +4,28 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/fig/serv.hpp>
+#include <scpp/fig/serv.hpp>
 
-#include <dbrpp/elm/pool.hpp>
+#include <scpp/elm/pool.hpp>
 
-using namespace dbr;
+using namespace sc;
 
 template <int TypeN>
 struct TypeTraits;
 
 template <>
-struct TypeTraits<DBR_ENTITY_ACCNT> {
+struct TypeTraits<SC_ENTITY_ACCNT> {
     typedef AccntRecRef TypeRecRef;
 };
 
 template <>
-struct TypeTraits<DBR_ENTITY_CONTR> {
+struct TypeTraits<SC_ENTITY_CONTR> {
     typedef ContrRecRef TypeRecRef;
 };
 
 template <int TypeN>
 static typename TypeTraits<TypeN>::TypeRecRef
-get_rec_id(Serv& serv, DbrIden id)
+get_rec_id(Serv& serv, ScIden id)
 {
     auto it = serv.recs<TypeN>().find(id);
     check(it != serv.recs<TypeN>().end());
@@ -51,13 +51,13 @@ TEST_CASE(serv_accnt)
 
     check(serv.arecs().find("BAD") == serv.arecs().end());
 
-    AccntRecRef arec = get_rec_mnem<DBR_ENTITY_ACCNT>(serv, "DBRA");
-    check(arec == get_rec_id<DBR_ENTITY_ACCNT>(serv, arec.id()));
-    check(arec.mnem() == "DBRA");
+    AccntRecRef arec = get_rec_mnem<SC_ENTITY_ACCNT>(serv, "SCA");
+    check(arec == get_rec_id<SC_ENTITY_ACCNT>(serv, arec.id()));
+    check(arec.mnem() == "SCA");
 
     // Body.
     check(arec.display() == "Account A");
-    check(arec.email() == "dbra@doobry.org");
+    check(arec.email() == "sca@swirlycloud.com");
 }
 
 TEST_CASE(serv_contr)
@@ -70,8 +70,8 @@ TEST_CASE(serv_contr)
 
     check(serv.crecs().find("BAD") == serv.crecs().end());
 
-    ContrRecRef crec = get_rec_mnem<DBR_ENTITY_CONTR>(serv, "EURUSD");
-    check(crec == get_rec_id<DBR_ENTITY_CONTR>(serv, crec.id()));
+    ContrRecRef crec = get_rec_mnem<SC_ENTITY_CONTR>(serv, "EURUSD");
+    check(crec == get_rec_id<SC_ENTITY_CONTR>(serv, crec.id()));
     check(crec.mnem() == "EURUSD");
 
     // Body.
@@ -116,7 +116,7 @@ TEST_CASE(serv_place)
     auto uit = serv.arecs().find("WRAMIREZ");
     check(uit != serv.arecs().end());
 
-    auto git = serv.arecs().find("DBRA");
+    auto git = serv.arecs().find("SCA");
     check(git != serv.arecs().end());
 
     auto cit = serv.crecs().find("EURUSD");
@@ -124,12 +124,12 @@ TEST_CASE(serv_place)
 
     auto trader = serv.accnt(AccntRecRef(*uit));
     auto giveup = serv.accnt(AccntRecRef(*git));
-    auto book = serv.book(ContrRecRef(*cit), dbr_ymd_to_jd(2014, 3, 14));
+    auto book = serv.book(ContrRecRef(*cit), sc_ymd_to_jd(2014, 3, 14));
 
-    DbrUuid uuid;
+    ScUuid uuid;
     uuid_generate(uuid);
     auto sess = serv.sess(uuid);
     sess.logon(trader);
 
-    serv.place(trader, giveup, book, nullptr, DBR_ACTION_BUY, 12345, 1, 0);
+    serv.place(trader, giveup, book, nullptr, SC_ACTION_BUY, 12345, 1, 0);
 }

@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/fig/ctx.h>
+#include <sc/fig/ctx.h>
 
 #include "async.h"
 
-#include <dbr/fig/clnt.h>
-#include <dbr/fig/dispatch.h>
+#include <sc/fig/clnt.h>
+#include <sc/fig/dispatch.h>
 
-#include <dbr/ash/err.h>
-#include <dbr/ash/log.h>
-#include <dbr/ash/util.h>
+#include <sc/ash/err.h>
+#include <sc/ash/log.h>
+#include <sc/ash/util.h>
 
 #include <uuid/uuid.h>
 
@@ -24,7 +24,7 @@
 struct FigCtx {
     // Shared state.
     void* zctx;
-    DbrUuid uuid;
+    ScUuid uuid;
     // Thread state confined to parent.
     pthread_t child;
 };
@@ -36,19 +36,19 @@ struct Init {
 
     char mdaddr[ADDR_MAX + 1];
     char traddr[ADDR_MAX + 1];
-    DbrMillis tmout;
+    ScMillis tmout;
     size_t capacity;
-    DbrHandler handler;
+    ScHandler handler;
 
     int level;
-    DbrLogger logger;
+    ScLogger logger;
 
-    DbrCtx ctx;
+    ScCtx ctx;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
     int state;
     int err_num;
-    char err_msg[DBR_ERRMSG_MAX];
+    char err_msg[SC_ERRMSG_MAX];
 };
 
 static void*
@@ -57,22 +57,22 @@ start_routine(void* arg)
     enum { TMOUT = 5000 };
 
     struct Init* init = arg;
-    DbrCtx ctx = init->ctx;
+    ScCtx ctx = init->ctx;
 
     // Inherit parent's level and logger.
-    dbr_log_setlevel(init->level);
-    dbr_log_setlogger(init->logger);
+    sc_log_setlevel(init->level);
+    sc_log_setlogger(init->logger);
 
-    DbrPool pool = dbr_pool_create(init->capacity);
+    ScPool pool = sc_pool_create(init->capacity);
     if (!pool)
         goto fail1;
 
-    DbrClnt clnt = dbr_clnt_create(ctx->zctx, ctx->uuid, init->mdaddr, init->traddr,
+    ScClnt clnt = sc_clnt_create(ctx->zctx, ctx->uuid, init->mdaddr, init->traddr,
                                    init->tmout, pool);
     if (!clnt)
         goto fail2;
 
-    DbrHandler handler = init->handler;
+    ScHandler handler = init->handler;
 
     pthread_mutex_lock(&init->mutex);
     init->state = SUCCESS;
@@ -83,20 +83,20 @@ start_routine(void* arg)
     init = NULL;
 
     // Dispatch loop.
-    while (!dbr_clnt_is_closed(clnt)) {
-        if (!dbr_clnt_dispatch(clnt, TMOUT, handler))
-            dbr_err_perror("dbr_clnt_dispatch() failed");
+    while (!sc_clnt_is_closed(clnt)) {
+        if (!sc_clnt_dispatch(clnt, TMOUT, handler))
+            sc_err_perror("sc_clnt_dispatch() failed");
     }
-    dbr_log_info("exiting thread");
+    sc_log_info("exiting thread");
 
-    dbr_clnt_destroy(clnt);
-    dbr_pool_destroy(pool);
+    sc_clnt_destroy(clnt);
+    sc_pool_destroy(pool);
     return NULL;
  fail2:
-    dbr_pool_destroy(pool);
+    sc_pool_destroy(pool);
  fail1:
-    init->err_num = dbr_err_num();
-    strncpy(init->err_msg, dbr_err_msg(), DBR_ERRMSG_MAX);
+    init->err_num = sc_err_num();
+    strncpy(init->err_msg, sc_err_msg(), SC_ERRMSG_MAX);
 
     pthread_mutex_lock(&init->mutex);
     init->state = FAILURE;
@@ -105,18 +105,18 @@ start_routine(void* arg)
     return NULL;
 }
 
-DBR_API DbrCtx
-dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t capacity,
-               DbrHandler handler)
+SC_API ScCtx
+sc_ctx_create(const char* mdaddr, const char* traddr, ScMillis tmout, size_t capacity,
+               ScHandler handler)
 {
-    DbrCtx ctx = malloc(sizeof(struct FigCtx));
-    if (dbr_unlikely(!ctx)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+    ScCtx ctx = malloc(sizeof(struct FigCtx));
+    if (sc_unlikely(!ctx)) {
+        sc_err_set(SC_ENOMEM, "out of memory");
         goto fail1;
     }
 
     if (!(ctx->zctx = zmq_ctx_new())) {
-        dbr_err_setf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     uuid_generate(ctx->uuid);
@@ -129,8 +129,8 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t c
         .capacity = capacity,
         .handler = handler,
 
-        .level = dbr_log_level(),
-        .logger = dbr_log_logger(),
+        .level = sc_log_level(),
+        .logger = sc_log_logger(),
 
         .ctx = ctx,
         .mutex = PTHREAD_MUTEX_INITIALIZER,
@@ -146,7 +146,7 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t c
 
     const int err = pthread_create(&ctx->child, NULL, start_routine, &init);
     if (err) {
-        dbr_err_setf(DBR_ESYSTEM, "pthread_create() failed: %s", strerror(err));
+        sc_err_setf(SC_ESYSTEM, "pthread_create() failed: %s", strerror(err));
         goto fail3;
     }
 
@@ -156,7 +156,7 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t c
     pthread_mutex_unlock(&init.mutex);
 
     if (init.state == FAILURE) {
-        dbr_err_set(init.err_num, init.err_msg);
+        sc_err_set(init.err_num, init.err_msg);
         goto fail4;
     }
 
@@ -168,7 +168,7 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t c
         void* ret;
         const int err = pthread_join(ctx->child, &ret);
         if (err)
-            dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
+            sc_err_printf(SC_ESYSTEM, "pthread_join() failed: %s", strerror(err));
     }
  fail3:
     zmq_ctx_destroy(ctx->zctx);
@@ -180,35 +180,35 @@ dbr_ctx_create(const char* mdaddr, const char* traddr, DbrMillis tmout, size_t c
     return NULL;
 }
 
-DBR_API void
-dbr_ctx_destroy(DbrCtx ctx)
+SC_API void
+sc_ctx_destroy(ScCtx ctx)
 {
     // Best effort to close clnt owned by child thread.
     void* sock = fig_async_create(ctx->zctx, ctx->uuid);
     if (sock) {
         if (!fig_async_close(sock))
-            dbr_err_perror("fig_async_close() failed");
+            sc_err_perror("fig_async_close() failed");
         fig_async_destroy(sock);
     } else
-        dbr_err_perror("fig_async_create() failed");
+        sc_err_perror("fig_async_create() failed");
 
     void* ret;
     const int err = pthread_join(ctx->child, &ret);
     if (err)
-        dbr_err_printf(DBR_ESYSTEM, "pthread_join() failed: %s", strerror(err));
+        sc_err_printf(SC_ESYSTEM, "pthread_join() failed: %s", strerror(err));
 
     zmq_ctx_destroy(ctx->zctx);
     free(ctx);
 }
 
-DBR_API DbrAsync
-dbr_ctx_async(DbrCtx ctx)
+SC_API ScAsync
+sc_ctx_async(ScCtx ctx)
 {
-    return dbr_async_create(ctx->zctx, ctx->uuid);
+    return sc_async_create(ctx->zctx, ctx->uuid);
 }
 
-DBR_API const unsigned char*
-dbr_ctx_uuid(DbrCtx ctx)
+SC_API const unsigned char*
+sc_ctx_uuid(ScCtx ctx)
 {
     return ctx->uuid;
 }

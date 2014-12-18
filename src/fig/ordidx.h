@@ -6,10 +6,10 @@
 
 // OrdIdx of orders by reference.
 
-#include <dbr/ash/defs.h>
-#include <dbr/ash/stack.h>
+#include <sc/ash/defs.h>
+#include <sc/ash/stack.h>
 
-struct DbrOrder;
+struct ScOrder;
 
 #ifndef FIG_ORDIDX_BUCKETS
 #define FIG_ORDIDX_BUCKETS 257
@@ -17,11 +17,11 @@ struct DbrOrder;
 
 struct FigOrdIdx {
     struct {
-        struct DbrStack refs;
+        struct ScStack refs;
     } buckets[FIG_ORDIDX_BUCKETS];
 };
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_ordidx_init(struct FigOrdIdx* ordidx);
 
 static inline void
@@ -30,13 +30,13 @@ fig_ordidx_reset(struct FigOrdIdx* ordidx)
     fig_ordidx_init(ordidx);
 }
 
-DBR_EXTERN void
-fig_ordidx_insert(struct FigOrdIdx* ordidx, struct DbrOrder* order);
+SC_EXTERN void
+fig_ordidx_insert(struct FigOrdIdx* ordidx, struct ScOrder* order);
 
-DBR_EXTERN struct DbrOrder*
-fig_ordidx_remove(struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
+SC_EXTERN struct ScOrder*
+fig_ordidx_remove(struct FigOrdIdx* ordidx, ScIden trid, const char* ref);
 
-DBR_EXTERN struct DbrOrder*
-fig_ordidx_find(const struct FigOrdIdx* ordidx, DbrIden trid, const char* ref);
+SC_EXTERN struct ScOrder*
+fig_ordidx_find(const struct FigOrdIdx* ordidx, ScIden trid, const char* ref);
 
 #endif // FIG_ORDIDX_H

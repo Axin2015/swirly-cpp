@@ -5,34 +5,34 @@
 #include "mock.hpp"
 #include "test.hpp"
 
-#include <dbrpp/elm/pool.hpp>
-#include <dbrpp/elm/proto.hpp>
+#include <scpp/elm/pool.hpp>
+#include <scpp/elm/proto.hpp>
 
-#include <dbr/ash/util.h> // dbr_millis()
+#include <sc/ash/util.h> // sc_millis()
 
-using namespace dbr;
+using namespace sc;
 
 TEST_CASE(proto_accnt)
 {
     Pool pool(8 * 1024 * 1024);
-    auto in = create_dbra(pool);
+    auto in = create_sca(pool);
 
     auto len = proto_accnt_len(*in);
     char buf[len];
     const char* end = proto_write_accnt(buf, *in);
     check(buf + len == end);
 
-    DbrRec out;
+    ScRec out;
     end = proto_read_accnt(buf, out);
     check(buf + len == end);
 
     check(out.type == in->type);
     check(out.id == in->id);
-    check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
-    check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
+    check(sequal(out.mnem, in->mnem, SC_MNEM_MAX));
+    check(sequal(out.display, in->display, SC_DISPLAY_MAX));
 
     // Body.
-    check(sequal(out.accnt.email, in->accnt.email, DBR_EMAIL_MAX));
+    check(sequal(out.accnt.email, in->accnt.email, SC_EMAIL_MAX));
 }
 
 TEST_CASE(proto_contr)
@@ -45,19 +45,19 @@ TEST_CASE(proto_contr)
     const char* end = proto_write_contr(buf, *in);
     check(buf + len == end);
 
-    DbrRec out;
+    ScRec out;
     end = proto_read_contr(buf, out);
     check(buf + len == end);
 
     check(out.type == in->type);
     check(out.id == in->id);
-    check(sequal(out.mnem, in->mnem, DBR_MNEM_MAX));
-    check(sequal(out.display, in->display, DBR_DISPLAY_MAX));
+    check(sequal(out.mnem, in->mnem, SC_MNEM_MAX));
+    check(sequal(out.display, in->display, SC_DISPLAY_MAX));
 
     // Body.
-    check(sequal(out.contr.asset_type, in->contr.asset_type, DBR_MNEM_MAX));
-    check(sequal(out.contr.asset, in->contr.asset, DBR_MNEM_MAX));
-    check(sequal(out.contr.ccy, in->contr.ccy, DBR_MNEM_MAX));
+    check(sequal(out.contr.asset_type, in->contr.asset_type, SC_MNEM_MAX));
+    check(sequal(out.contr.asset, in->contr.asset, SC_MNEM_MAX));
+    check(sequal(out.contr.ccy, in->contr.ccy, SC_MNEM_MAX));
     check(out.contr.tick_numer == in->contr.tick_numer);
     check(out.contr.tick_denom == in->contr.tick_denom);
     check(fequal(out.contr.price_inc, in->contr.price_inc));
@@ -74,8 +74,8 @@ TEST_CASE(proto_contr)
 TEST_CASE(proto_perm)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden trader = 5;
-    DbrIden giveup = 7;
+    ScIden trader = 5;
+    ScIden giveup = 7;
 
     auto in = create_perm(pool, trader, giveup);
 
@@ -84,7 +84,7 @@ TEST_CASE(proto_perm)
     const char* end = proto_write_perm(buf, *in, false);
     check(buf + len == end);
 
-    DbrPerm out;
+    ScPerm out;
     end = proto_read_perm(buf, out);
     check(buf + len == end);
 
@@ -95,20 +95,20 @@ TEST_CASE(proto_perm)
 TEST_CASE(proto_order)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden trader = 5;
-    DbrIden giveup = 7;
-    DbrIden contr = 11;
-    auto now = dbr_millis();
+    ScIden trader = 5;
+    ScIden giveup = 7;
+    ScIden contr = 11;
+    auto now = sc_millis();
 
-    auto in = create_order(pool, 1, trader, giveup, contr, dbr_ymd_to_jd(2014, 3, 14),
-                           "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
+    auto in = create_order(pool, 1, trader, giveup, contr, sc_ymd_to_jd(2014, 3, 14),
+                           "apple", SC_ACTION_BUY, 12345, 10, 0, now);
 
     auto len = proto_order_len(*in, false);
     char buf[len];
     const char* end = proto_write_order(buf, *in, false);
     check(buf + len == end);
 
-    DbrOrder out;
+    ScOrder out;
     end = proto_read_order(buf, out);
     check(buf + len == end);
 
@@ -117,7 +117,7 @@ TEST_CASE(proto_order)
     check(out.i.giveup.id_only == in->i.giveup.id_only);
     check(out.i.contr.id_only == in->i.contr.id_only);
     check(out.i.settl_day == in->i.settl_day);
-    check(sequal(out.i.ref, in->i.ref, DBR_REF_MAX));
+    check(sequal(out.i.ref, in->i.ref, SC_REF_MAX));
     check(out.i.state == in->i.state);
     check(out.i.action == in->i.action);
     check(out.i.ticks == in->i.ticks);
@@ -134,14 +134,14 @@ TEST_CASE(proto_order)
 TEST_CASE(proto_trade)
 {
     Pool pool(8 * 1024 * 1024);
-    DbrIden trader = 5;
-    DbrIden giveup = 7;
-    DbrIden contr = 11;
-    DbrIden cpty = 13;
-    auto now = dbr_millis();
+    ScIden trader = 5;
+    ScIden giveup = 7;
+    ScIden contr = 11;
+    ScIden cpty = 13;
+    auto now = sc_millis();
 
-    auto in = create_trade(pool, 1, 2, trader, giveup, contr, dbr_ymd_to_jd(2014, 3, 14), "apple",
-                           DBR_ACTION_BUY, 12345, 10, 0, 10, 12345, 10, 3, DBR_ROLE_TAKER,
+    auto in = create_trade(pool, 1, 2, trader, giveup, contr, sc_ymd_to_jd(2014, 3, 14), "apple",
+                           SC_ACTION_BUY, 12345, 10, 0, 10, 12345, 10, 3, SC_ROLE_TAKER,
                            cpty, now);
 
     auto len = proto_exec_len(*in, false);
@@ -149,7 +149,7 @@ TEST_CASE(proto_trade)
     const char* end = proto_write_exec(buf, *in, false);
     check(buf + len == end);
 
-    DbrExec out;
+    ScExec out;
     end = proto_read_exec(buf, out);
     check(buf + len == end);
 
@@ -159,7 +159,7 @@ TEST_CASE(proto_trade)
     check(out.i.giveup.id_only == in->i.giveup.id_only);
     check(out.i.contr.id_only == in->i.contr.id_only);
     check(out.i.settl_day == in->i.settl_day);
-    check(sequal(out.i.ref, in->i.ref, DBR_REF_MAX));
+    check(sequal(out.i.ref, in->i.ref, SC_REF_MAX));
     check(out.i.state == in->i.state);
     check(out.i.action == in->i.action);
     check(out.i.ticks == in->i.ticks);

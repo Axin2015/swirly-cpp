@@ -1,10 +1,10 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/ash/rbnode.h>
+#include <sc/ash/rbnode.h>
 
-DBR_API struct DbrRbNode*
-dbr_rbnode_next(struct DbrRbNode* node)
+SC_API struct ScRbNode*
+sc_rbnode_next(struct ScRbNode* node)
 {
     if (node->right) {
         node = node->right;
@@ -22,8 +22,8 @@ dbr_rbnode_next(struct DbrRbNode* node)
     return node;
 }
 
-DBR_API struct DbrRbNode*
-dbr_rbnode_prev(struct DbrRbNode* node)
+SC_API struct ScRbNode*
+sc_rbnode_prev(struct ScRbNode* node)
 {
     if (node->left) {
         node = node->left;

@@ -3,41 +3,41 @@
  */
 #include "sessidx.h"
 
-#include <dbr/fig/sess.h>
+#include <sc/fig/sess.h>
 
-#include <dbr/elm/pool.h>
-#include <dbr/elm/types.h>
+#include <sc/elm/pool.h>
+#include <sc/elm/types.h>
 
-#include <dbr/ash/err.h>
-#include <dbr/ash/slnode.h>
+#include <sc/ash/err.h>
+#include <sc/ash/slnode.h>
 
 #include <string.h>
 
-static inline struct DbrSess*
-sess_entry_uuid(struct DbrSlNode* node)
+static inline struct ScSess*
+sess_entry_uuid(struct ScSlNode* node)
 {
-    return dbr_implof(struct DbrSess, uuid_node_, node);
+    return sc_implof(struct ScSess, uuid_node_, node);
 }
 
 static inline void
-free_sess_list(struct DbrSlNode* node, DbrPool pool)
+free_sess_list(struct ScSlNode* node, ScPool pool)
 {
     while (node) {
-        struct DbrSess* sess = sess_entry_uuid(node);
+        struct ScSess* sess = sess_entry_uuid(node);
         node = node->next;
-        dbr_sess_term(sess);
-        dbr_pool_free_sess(pool, sess);
+        sc_sess_term(sess);
+        sc_pool_free_sess(pool, sess);
     }
 }
 
-static inline DbrBool
-equal_uuid(const struct DbrSess* sess, const DbrUuid uuid)
+static inline ScBool
+equal_uuid(const struct ScSess* sess, const ScUuid uuid)
 {
     return __builtin_memcmp(sess->uuid, uuid, 16) == 0;
 }
 
 static inline size_t
-hash_uuid(const DbrUuid uuid)
+hash_uuid(const ScUuid uuid)
 {
     size_t h = 0;
     for (int i = 0; i < 16; ++uuid, ++i)
@@ -45,15 +45,15 @@ hash_uuid(const DbrUuid uuid)
     return h;
 }
 
-DBR_EXTERN void
-fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool)
+SC_EXTERN void
+fig_sessidx_init(struct FigSessIdx* sessidx, ScPool pool)
 {
     sessidx->pool = pool;
     // Zero buckets.
     memset(sessidx->buckets, 0, sizeof(sessidx->buckets));
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_sessidx_term(struct FigSessIdx* sessidx)
 {
     // Free each bucket.
@@ -61,25 +61,25 @@ fig_sessidx_term(struct FigSessIdx* sessidx)
         free_sess_list(sessidx->buckets[i].uuids.first, sessidx->pool);
 }
 
-DBR_EXTERN struct DbrSess*
-fig_sessidx_lazy(struct FigSessIdx* sessidx, const DbrUuid uuid)
+SC_EXTERN struct ScSess*
+fig_sessidx_lazy(struct FigSessIdx* sessidx, const ScUuid uuid)
 {
     assert(uuid);
 
-    struct DbrSess* sess;
+    struct ScSess* sess;
 
     const size_t bucket = hash_uuid(uuid) % FIG_SESSIDX_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&sessidx->buckets[bucket].uuids);
+    for (struct ScSlNode* node = sc_stack_first(&sessidx->buckets[bucket].uuids);
          node; node = node->next) {
         sess = sess_entry_uuid(node);
         if (equal_uuid(sess, uuid))
             goto done;
     }
-    if (!(sess = dbr_pool_alloc_sess(sessidx->pool)))
+    if (!(sess = sc_pool_alloc_sess(sessidx->pool)))
         goto done;
 
-    dbr_sess_init(sess, uuid, sessidx->pool);
-    dbr_stack_push(&sessidx->buckets[bucket].uuids, &sess->uuid_node_);
+    sc_sess_init(sess, uuid, sessidx->pool);
+    sc_stack_push(&sessidx->buckets[bucket].uuids, &sess->uuid_node_);
  done:
     return sess;
 }

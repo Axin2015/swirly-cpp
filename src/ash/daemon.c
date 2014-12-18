@@ -1,9 +1,9 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/ash/daemon.h>
+#include <sc/ash/daemon.h>
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <errno.h>
 #include <fcntl.h>    // open()
@@ -12,12 +12,12 @@
 
 #include <sys/stat.h> // umask()
 
-DBR_API DbrBool
-dbr_daemon(const char* wd, mode_t mask)
+SC_API ScBool
+sc_daemon(const char* wd, mode_t mask)
 {
     pid_t pid = fork();
     if (pid < 0) {
-        dbr_err_setf(DBR_ESYSTEM, "fork() failed: %s", strerror(errno));
+        sc_err_setf(SC_ESYSTEM, "fork() failed: %s", strerror(errno));
         goto fail1;
     }
     if (pid != 0) {
@@ -27,7 +27,7 @@ dbr_daemon(const char* wd, mode_t mask)
 
     // Detach from controlling terminal by making process a session leader.
     if (setsid() < 0) {
-        dbr_err_setf(DBR_ESYSTEM, "setsid() failed: %s", strerror(errno));
+        sc_err_setf(SC_ESYSTEM, "setsid() failed: %s", strerror(errno));
         goto fail1;
     }
 
@@ -35,7 +35,7 @@ dbr_daemon(const char* wd, mode_t mask)
     // regain access to a controlling terminal.
     pid = fork();
     if (pid < 0) {
-        dbr_err_setf(DBR_ESYSTEM, "fork() failed: %s", strerror(errno));
+        sc_err_setf(SC_ESYSTEM, "fork() failed: %s", strerror(errno));
         goto fail1;
     }
     if (pid != 0)
@@ -43,7 +43,7 @@ dbr_daemon(const char* wd, mode_t mask)
 
     // Change the current working directory.
     if (chdir(wd) < 0) {
-        dbr_err_setf(DBR_EIO, "chdir() failed: %s", strerror(errno));
+        sc_err_setf(SC_EIO, "chdir() failed: %s", strerror(errno));
         goto fail1;
     }
 
@@ -53,7 +53,7 @@ dbr_daemon(const char* wd, mode_t mask)
     // Re-open standard input.
     close(STDIN_FILENO);
     if (open("/dev/null", O_RDONLY) < 0) {
-        dbr_err_setf(DBR_EIO, "open() failed: %s", strerror(errno));
+        sc_err_setf(SC_EIO, "open() failed: %s", strerror(errno));
         goto fail1;
     }
 
@@ -63,7 +63,7 @@ dbr_daemon(const char* wd, mode_t mask)
         close(fd);
 
     // Note that the standard output handles are unchanged.
-    return DBR_TRUE;
+    return SC_TRUE;
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }

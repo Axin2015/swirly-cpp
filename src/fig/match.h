@@ -4,17 +4,17 @@
 #ifndef FIG_MATCH_H
 #define FIG_MATCH_H
 
-#include <dbr/elm/types.h>
+#include <sc/elm/types.h>
 
-struct DbrBank;
+struct ScBank;
 struct FigOrdIdx;
 
 // Used by matching engine to build a list of matches.
 
 // Match taker with list of maker orders.
 
-DBR_EXTERN DbrBool
-fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans);
+SC_EXTERN ScBool
+fig_match_orders(struct ScBook* book, struct ScOrder* taker, struct ScBank* bank,
+                 struct FigOrdIdx* ordidx, ScPool pool, struct ScTrans* trans);
 
 #endif // FIG_MATCH_H

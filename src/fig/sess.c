@@ -1,60 +1,60 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/fig/sess.h>
+#include <sc/fig/sess.h>
 
 #include "accnt.h"
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <string.h> // strncpy()
 
 #include <uuid/uuid.h>
 
 static int
-incref(struct DbrSess* sess, DbrKey key)
+incref(struct ScSess* sess, ScKey key)
 {
-    struct DbrSub* sub;
-    struct DbrRbNode* node = dbr_tree_pfind(&sess->subs, key);
+    struct ScSub* sub;
+    struct ScRbNode* node = sc_tree_pfind(&sess->subs, key);
     if (!node || node->key != key) {
-        if (!(sub = dbr_pool_alloc_sub(sess->pool)))
+        if (!(sub = sc_pool_alloc_sub(sess->pool)))
             return -1;
-        dbr_sub_init(sub);
+        sc_sub_init(sub);
 
-        struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&sess->subs, key, &sub->sess_node_, parent);
+        struct ScRbNode* parent = node;
+        sc_tree_pinsert(&sess->subs, key, &sub->sess_node_, parent);
     } else {
-        sub = dbr_sess_sub_entry(node);
+        sub = sc_sess_sub_entry(node);
         ++sub->refs_;
     }
     return sub->refs_;
 }
 
 static int
-decref(struct DbrSess* sess, DbrKey key)
+decref(struct ScSess* sess, ScKey key)
 {
     int refs;
-    struct DbrRbNode* node = dbr_tree_find(&sess->subs, key);
+    struct ScRbNode* node = sc_tree_find(&sess->subs, key);
     if (node) {
-        struct DbrSub* sub = dbr_sess_sub_entry(node);
+        struct ScSub* sub = sc_sess_sub_entry(node);
         refs = --sub->refs_;
         if (refs == 0) {
-            dbr_tree_remove(&sess->subs, node);
-            dbr_pool_free_sub(sess->pool, sub);
+            sc_tree_remove(&sess->subs, node);
+            sc_pool_free_sub(sess->pool, sub);
         }
     } else
         refs = 0;
     return refs;
 }
 
-DBR_API DbrAccnt
-dbr_sess_accnt_entry(struct DbrRbNode* node)
+SC_API ScAccnt
+sc_sess_accnt_entry(struct ScRbNode* node)
 {
-    return dbr_implof(struct FigAccnt, sess_node_, node);
+    return sc_implof(struct FigAccnt, sess_node_, node);
 }
 
-DBR_API void
-dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
+SC_API void
+sc_sess_init(struct ScSess* sess, const ScUuid uuid, ScPool pool)
 {
     if (uuid)
         uuid_copy(sess->uuid, uuid);
@@ -63,93 +63,93 @@ dbr_sess_init(struct DbrSess* sess, const DbrUuid uuid, DbrPool pool)
     sess->pool = pool;
     sess->sid = 1;
     sess->hbint = 0;
-    dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->accnts);
+    sc_tree_init(&sess->subs);
+    sc_tree_init(&sess->accnts);
     sess->marker_ = 0;
-    dbr_slnode_init(&sess->uuid_node_);
+    sc_slnode_init(&sess->uuid_node_);
 }
 
-DBR_API void
-dbr_sess_term(struct DbrSess* sess)
+SC_API void
+sc_sess_term(struct ScSess* sess)
 {
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = sess->subs.root)) {
-        struct DbrSub* sub = dbr_sess_sub_entry(node);
-        dbr_tree_remove(&sess->subs, node);
-        dbr_pool_free_sub(sess->pool, sub);
+        struct ScSub* sub = sc_sess_sub_entry(node);
+        sc_tree_remove(&sess->subs, node);
+        sc_pool_free_sub(sess->pool, sub);
     }
 }
 
-DBR_API void
-dbr_sess_reset(struct DbrSess* sess)
+SC_API void
+sc_sess_reset(struct ScSess* sess)
 {
-    dbr_sess_term(sess);
+    sc_sess_term(sess);
     ++sess->sid;
     sess->hbint = 0;
-    dbr_tree_init(&sess->subs);
-    dbr_tree_init(&sess->accnts);
+    sc_tree_init(&sess->subs);
+    sc_tree_init(&sess->accnts);
     sess->marker_ = 0;
-    dbr_slnode_init(&sess->uuid_node_);
+    sc_slnode_init(&sess->uuid_node_);
 }
 
-DBR_API DbrBool
-dbr_sess_logon(struct DbrSess* sess, DbrAccnt accnt)
+SC_API ScBool
+sc_sess_logon(struct ScSess* sess, ScAccnt accnt)
 {
     if (accnt->sess) {
-        dbr_err_setf(DBR_EEXIST, "already logged-on '%.16s'", accnt->rec->mnem);
+        sc_err_setf(SC_EEXIST, "already logged-on '%.16s'", accnt->rec->mnem);
         goto fail1;
     }
 
     if (incref(sess, accnt->rec->id) < 0)
         goto fail1;
 
-    struct DbrRbNode* node = dbr_accnt_first_giveup(accnt);
-    for (; node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
-        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+    struct ScRbNode* node = sc_accnt_first_giveup(accnt);
+    for (; node != SC_ACCNT_END_GIVEUP; node = sc_rbnode_next(node)) {
+        struct ScPerm* perm = sc_accnt_giveup_entry(node);
         if (incref(sess, perm->giveup.rec->id) < 0)
             goto fail2;
     }
 
     accnt->sess = sess;
-    dbr_tree_insert(&sess->accnts, accnt->rec->id, &accnt->sess_node_);
-    return DBR_TRUE;
+    sc_tree_insert(&sess->accnts, accnt->rec->id, &accnt->sess_node_);
+    return SC_TRUE;
  fail2:
     // Rollback subs.
-    for (node = dbr_rbnode_prev(node);
-         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_prev(node)) {
-        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+    for (node = sc_rbnode_prev(node);
+         node != SC_ACCNT_END_GIVEUP; node = sc_rbnode_prev(node)) {
+        struct ScPerm* perm = sc_accnt_giveup_entry(node);
         decref(sess, perm->giveup.rec->id);
     }
     decref(sess, accnt->rec->id);
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-DBR_API void
-dbr_sess_logoff(struct DbrSess* sess, DbrAccnt accnt)
+SC_API void
+sc_sess_logoff(struct ScSess* sess, ScAccnt accnt)
 {
-    dbr_tree_remove(&sess->accnts, &accnt->sess_node_);
+    sc_tree_remove(&sess->accnts, &accnt->sess_node_);
     accnt->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_accnt_first_giveup(accnt);
-         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
-        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+    for (struct ScRbNode* node = sc_accnt_first_giveup(accnt);
+         node != SC_ACCNT_END_GIVEUP; node = sc_rbnode_next(node)) {
+        struct ScPerm* perm = sc_accnt_giveup_entry(node);
         decref(sess, perm->giveup.rec->id);
     }
     decref(sess, accnt->rec->id);
 }
 
-DBR_API void
-dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt accnt)
+SC_API void
+sc_sess_logoff_and_reset(struct ScSess* sess, ScAccnt accnt)
 {
-    dbr_tree_remove(&sess->accnts, &accnt->sess_node_);
+    sc_tree_remove(&sess->accnts, &accnt->sess_node_);
     accnt->sess = NULL;
 
-    for (struct DbrRbNode* node = dbr_accnt_first_giveup(accnt);
-         node != DBR_ACCNT_END_GIVEUP; node = dbr_rbnode_next(node)) {
-        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
+    for (struct ScRbNode* node = sc_accnt_first_giveup(accnt);
+         node != SC_ACCNT_END_GIVEUP; node = sc_rbnode_next(node)) {
+        struct ScPerm* perm = sc_accnt_giveup_entry(node);
         if (decref(sess, perm->giveup.rec->id) == 0) {
-            DbrAccnt giveup = perm->giveup.rec->accnt.state;
+            ScAccnt giveup = perm->giveup.rec->accnt.state;
             if (giveup)
                 fig_accnt_reset_giveup(giveup);
         }
@@ -159,13 +159,13 @@ dbr_sess_logoff_and_reset(struct DbrSess* sess, DbrAccnt accnt)
     fig_accnt_reset_trader(accnt);
 }
 
-DBR_API int
-dbr_sess_subs(struct DbrSess* sess, DbrAccnt accnt)
+SC_API int
+sc_sess_subs(struct ScSess* sess, ScAccnt accnt)
 {
     int refs;
-    struct DbrRbNode* node = dbr_tree_find(&sess->subs, accnt->rec->id);
+    struct ScRbNode* node = sc_tree_find(&sess->subs, accnt->rec->id);
     if (node) {
-        struct DbrSub* sub = dbr_sess_sub_entry(node);
+        struct ScSub* sub = sc_sess_sub_entry(node);
         refs = sub->refs_;
     } else
         refs = 0;

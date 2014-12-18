@@ -4,31 +4,31 @@
 #ifndef FIG_SESSIDX_H
 #define FIG_SESSIDX_H
 
-#include <dbr/ash/stack.h>
-#include <dbr/elm/types.h>
+#include <sc/ash/stack.h>
+#include <sc/elm/types.h>
 
 // OrdIdx of sessions by reference.
 
-struct DbrSess;
+struct ScSess;
 
 #ifndef FIG_SESSIDX_BUCKETS
 #define FIG_SESSIDX_BUCKETS 257
 #endif // FIG_SESSIDX_BUCKETS
 
 struct FigSessIdx {
-    DbrPool pool;
+    ScPool pool;
     struct {
-        struct DbrStack uuids;
+        struct ScStack uuids;
     } buckets[FIG_SESSIDX_BUCKETS];
 };
 
-DBR_EXTERN void
-fig_sessidx_init(struct FigSessIdx* sessidx, DbrPool pool);
+SC_EXTERN void
+fig_sessidx_init(struct FigSessIdx* sessidx, ScPool pool);
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_sessidx_term(struct FigSessIdx* sessidx);
 
-DBR_EXTERN struct DbrSess*
-fig_sessidx_lazy(struct FigSessIdx* sessidx, const DbrUuid uuid);
+SC_EXTERN struct ScSess*
+fig_sessidx_lazy(struct FigSessIdx* sessidx, const ScUuid uuid);
 
 #endif // FIG_SESSIDX_H

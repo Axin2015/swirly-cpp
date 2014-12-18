@@ -1,19 +1,19 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbrpp/fig/ctx.hpp>
-#include <dbrpp/fig/handler.hpp>
+#include <scpp/fig/ctx.hpp>
+#include <scpp/fig/handler.hpp>
 
-#include <dbrpp/ash/sem.hpp>
+#include <scpp/ash/sem.hpp>
 
-#include <dbr/fig/clnt.h>
+#include <sc/fig/clnt.h>
 
-#include <dbr/ash/log.h>
+#include <sc/ash/log.h>
 
 #include <functional>
 #include <iostream>
 
-using namespace dbr;
+using namespace sc;
 using namespace std;
 
 class Handler : public IHandler<Handler> {
@@ -31,12 +31,12 @@ public:
         ready_.post();
     }
     void
-    on_logon(ClntRef clnt, DbrIden req_id, DbrIden aid) noexcept
+    on_logon(ClntRef clnt, ScIden req_id, ScIden aid) noexcept
     {
         cout << "on_logon\n";
     }
     void
-    on_logoff(ClntRef clnt, DbrIden req_id, DbrIden aid) noexcept
+    on_logoff(ClntRef clnt, ScIden req_id, ScIden aid) noexcept
     {
         cout << "on_logoff\n";
     }
@@ -46,27 +46,27 @@ public:
         cout << "on_reset\n";
     }
     void
-    on_timeout(ClntRef clnt, DbrIden req_id) noexcept
+    on_timeout(ClntRef clnt, ScIden req_id) noexcept
     {
         cout << "on_timeout\n";
     }
     void
-    on_status(ClntRef clnt, DbrIden req_id, int num, const char* msg) noexcept
+    on_status(ClntRef clnt, ScIden req_id, int num, const char* msg) noexcept
     {
         cout << "on_status\n";
     }
     void
-    on_exec(ClntRef clnt, DbrIden req_id, DbrExec& exec) noexcept
+    on_exec(ClntRef clnt, ScIden req_id, ScExec& exec) noexcept
     {
         cout << "on_exec\n";
     }
     void
-    on_posn(ClntRef clnt, DbrPosn& posn) noexcept
+    on_posn(ClntRef clnt, ScPosn& posn) noexcept
     {
         cout << "on_posn\n";
     }
     void
-    on_view(ClntRef clnt, DbrView& view) noexcept
+    on_view(ClntRef clnt, ScView& view) noexcept
     {
         cout << "on_view\n";
     }
@@ -99,14 +99,14 @@ call(Async& async, std::function<void* (ClntRef)> fn)
 void
 log_ios(int level, const char* msg)
 {
-    ostream& os = level > DBR_LOG_WARN ? cout : cerr;
+    ostream& os = level > SC_LOG_WARN ? cout : cerr;
     os << msg << endl;
 }
 
 int
 main(int argc, char* argv[])
 {
-    dbr_log_setlogger(log_ios);
+    sc_log_setlogger(log_ios);
     try {
         Handler handler;
         Ctx ctx("tcp://localhost:3270", "tcp://localhost:3271",

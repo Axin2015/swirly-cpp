@@ -3,7 +3,7 @@
  */
 #include "pool.h"
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <errno.h>
 #include <string.h> // strerror()
@@ -14,46 +14,46 @@
 #include <sys/types.h>
 #include <sys/mman.h>
 
-#if DBR_DEBUG_ALLOC
+#if SC_DEBUG_ALLOC
 static inline struct ElmSmallEntry*
-small_entry(struct DbrRbNode* node)
+small_entry(struct ScRbNode* node)
 {
-    return dbr_implof(struct ElmSmallEntry, pool_node_, node);
+    return sc_implof(struct ElmSmallEntry, pool_node_, node);
 }
 
 static inline struct ElmLargeEntry*
-large_entry(struct DbrRbNode* node)
+large_entry(struct ScRbNode* node)
 {
-    return dbr_implof(struct ElmLargeEntry, pool_node_, node);
+    return sc_implof(struct ElmLargeEntry, pool_node_, node);
 }
-#endif // DBR_DEBUG_ALLOC
+#endif // SC_DEBUG_ALLOC
 
 static void*
 alloc_mem(struct ElmPool* pool, size_t size)
 {
     const size_t new_used = pool->used + size;
     if (new_used > pool->capacity) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+        sc_err_set(SC_ENOMEM, "out of memory");
         return NULL;
     }
-#if DBR_DEBUG_LEVEL >= 1
+#if SC_DEBUG_LEVEL >= 1
     const size_t page = new_used / pool->pagesize;
     if (pool->used == 0 || page > pool->used / pool->pagesize)
-        dbr_log_debug1("allocating page %zu", page + 1);
-#endif // DBR_DEBUG_LEVEL >= 1
+        sc_log_debug1("allocating page %zu", page + 1);
+#endif // SC_DEBUG_LEVEL >= 1
     // Allocate entry from virtual memory.
     void* addr = pool->addr + pool->used;
     pool->used = new_used;
     return addr;
 }
 
-DBR_EXTERN DbrBool
+SC_EXTERN ScBool
 elm_pool_init(struct ElmPool* pool, size_t capacity)
 {
     void* addr = mmap(NULL, capacity, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
     if (addr == MAP_FAILED) {
-        dbr_err_setf(DBR_ENOMEM, "mmap() failed: %s", strerror(errno));
-        return DBR_FALSE;
+        sc_err_setf(SC_ENOMEM, "mmap() failed: %s", strerror(errno));
+        return SC_FALSE;
     }
 
     pool->addr = addr;
@@ -64,45 +64,45 @@ elm_pool_init(struct ElmPool* pool, size_t capacity)
     pool->first_small = NULL;
     pool->first_large = NULL;
 
-#if DBR_DEBUG_ALLOC
-    dbr_tree_init(&pool->allocs_small);
-    dbr_tree_init(&pool->allocs_large);
-#endif // DBR_DEBUG_ALLOC
+#if SC_DEBUG_ALLOC
+    sc_tree_init(&pool->allocs_small);
+    sc_tree_init(&pool->allocs_large);
+#endif // SC_DEBUG_ALLOC
 
     // Small entrys.
-    dbr_log_debug1("small entries:");
-    dbr_log_debug1("sizeof DbrRbNode: %zu", sizeof(struct DbrRbNode));
-    dbr_log_debug1("sizeof DbrPerm:   %zu", sizeof(struct DbrPerm));
-    dbr_log_debug1("sizeof DbrLevel:  %zu", sizeof(struct DbrLevel));
-    dbr_log_debug1("sizeof DbrMatch:  %zu", sizeof(struct DbrMatch));
-    dbr_log_debug1("sizeof DbrSub:    %zu", sizeof(struct DbrSub));
-    dbr_log_debug1("sizeof DbrSess:   %zu", sizeof(struct DbrSess));
+    sc_log_debug1("small entries:");
+    sc_log_debug1("sizeof ScRbNode: %zu", sizeof(struct ScRbNode));
+    sc_log_debug1("sizeof ScPerm:   %zu", sizeof(struct ScPerm));
+    sc_log_debug1("sizeof ScLevel:  %zu", sizeof(struct ScLevel));
+    sc_log_debug1("sizeof ScMatch:  %zu", sizeof(struct ScMatch));
+    sc_log_debug1("sizeof ScSub:    %zu", sizeof(struct ScSub));
+    sc_log_debug1("sizeof ScSess:   %zu", sizeof(struct ScSess));
 
     // Large entrys.
-    dbr_log_debug1("large entries:");
-    dbr_log_debug1("sizeof DbrRec:    %zu", sizeof(struct DbrRec));
-    dbr_log_debug1("sizeof DbrOrder:  %zu", sizeof(struct DbrOrder));
-    dbr_log_debug1("sizeof DbrExec:   %zu", sizeof(struct DbrExec));
-    dbr_log_debug1("sizeof DbrPosn:   %zu", sizeof(struct DbrPosn));
-    dbr_log_debug1("sizeof DbrView:   %zu", sizeof(struct DbrView));
-    dbr_log_debug1("sizeof DbrBook:   %zu", sizeof(struct DbrBook));
+    sc_log_debug1("large entries:");
+    sc_log_debug1("sizeof ScRec:    %zu", sizeof(struct ScRec));
+    sc_log_debug1("sizeof ScOrder:  %zu", sizeof(struct ScOrder));
+    sc_log_debug1("sizeof ScExec:   %zu", sizeof(struct ScExec));
+    sc_log_debug1("sizeof ScPosn:   %zu", sizeof(struct ScPosn));
+    sc_log_debug1("sizeof ScView:   %zu", sizeof(struct ScView));
+    sc_log_debug1("sizeof ScBook:   %zu", sizeof(struct ScBook));
 
-    return DBR_TRUE;
+    return SC_TRUE;
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 elm_pool_term(struct ElmPool* pool)
 {
     assert(pool);
     munmap(pool->addr, pool->capacity);
 }
 
-DBR_EXTERN struct ElmSmallEntry*
-#if !DBR_DEBUG_ALLOC
+SC_EXTERN struct ElmSmallEntry*
+#if !SC_DEBUG_ALLOC
 elm_pool_alloc_small(struct ElmPool* pool)
-#else  // DBR_DEBUG_ALLOC
+#else  // SC_DEBUG_ALLOC
 elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
-#endif // DBR_DEBUG_ALLOC
+#endif // SC_DEBUG_ALLOC
 {
     struct ElmSmallEntry* entry;
     if (pool->first_small) {
@@ -112,21 +112,21 @@ elm_pool_alloc_small(struct ElmPool* pool, const char* file, int line)
     } else if (!(entry = alloc_mem(pool, sizeof(struct ElmSmallEntry))))
         return NULL;
 
-#if DBR_DEBUG_ALLOC
+#if SC_DEBUG_ALLOC
     entry->file = file;
     entry->line = line;
-    dbr_tree_insert(&pool->allocs_small, (DbrKey)entry, &entry->pool_node_);
-#endif // DBR_DEBUG_ALLOC
+    sc_tree_insert(&pool->allocs_small, (ScKey)entry, &entry->pool_node_);
+#endif // SC_DEBUG_ALLOC
 
     return entry;
 }
 
-DBR_EXTERN struct ElmLargeEntry*
-#if !DBR_DEBUG_ALLOC
+SC_EXTERN struct ElmLargeEntry*
+#if !SC_DEBUG_ALLOC
 elm_pool_alloc_large(struct ElmPool* pool)
-#else  // DBR_DEBUG_ALLOC
+#else  // SC_DEBUG_ALLOC
 elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
-#endif // DBR_DEBUG_ALLOC
+#endif // SC_DEBUG_ALLOC
 {
     struct ElmLargeEntry* entry;
     if (pool->first_large) {
@@ -136,83 +136,83 @@ elm_pool_alloc_large(struct ElmPool* pool, const char* file, int line)
     } else if (!(entry = alloc_mem(pool, sizeof(struct ElmLargeEntry))))
         return NULL;
 
-#if DBR_DEBUG_ALLOC
+#if SC_DEBUG_ALLOC
     entry->file = file;
     entry->line = line;
-    dbr_tree_insert(&pool->allocs_large, (DbrKey)entry, &entry->pool_node_);
-#endif // DBR_DEBUG_ALLOC
+    sc_tree_insert(&pool->allocs_large, (ScKey)entry, &entry->pool_node_);
+#endif // SC_DEBUG_ALLOC
 
     return entry;
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 elm_pool_free_small(struct ElmPool* pool, struct ElmSmallEntry* entry)
 {
     if (entry) {
-#if DBR_DEBUG_ALLOC
-        dbr_tree_remove(&pool->allocs_small, &entry->pool_node_);
-#endif // DBR_DEBUG_ALLOC
+#if SC_DEBUG_ALLOC
+        sc_tree_remove(&pool->allocs_small, &entry->pool_node_);
+#endif // SC_DEBUG_ALLOC
         // Push onto free-list.
         entry->next = pool->first_small;
         pool->first_small = entry;
     }
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 elm_pool_free_large(struct ElmPool* pool, struct ElmLargeEntry* entry)
 {
     if (entry) {
-#if DBR_DEBUG_ALLOC
-        dbr_tree_remove(&pool->allocs_large, &entry->pool_node_);
-#endif // DBR_DEBUG_ALLOC
+#if SC_DEBUG_ALLOC
+        sc_tree_remove(&pool->allocs_large, &entry->pool_node_);
+#endif // SC_DEBUG_ALLOC
         // Push onto free-list.
         entry->next = pool->first_large;
         pool->first_large = entry;
     }
 }
 
-DBR_EXTERN void
-elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* first)
+SC_EXTERN void
+elm_pool_free_entity_list(struct ElmPool* pool, int type, struct ScSlNode* first)
 {
-    struct DbrSlNode* node = first;
+    struct ScSlNode* node = first;
     switch (type) {
-    case DBR_ENTITY_ACCNT:
-    case DBR_ENTITY_CONTR:
+    case SC_ENTITY_ACCNT:
+    case SC_ENTITY_CONTR:
         while (node) {
-            struct DbrRec* rec = dbr_shared_rec_entry(node);
+            struct ScRec* rec = sc_shared_rec_entry(node);
             node = node->next;
-            dbr_pool_free_rec(pool, rec);
+            sc_pool_free_rec(pool, rec);
         }
         break;
-    case DBR_ENTITY_PERM:
+    case SC_ENTITY_PERM:
         while (node) {
-            struct DbrPerm* perm = dbr_shared_perm_entry(node);
+            struct ScPerm* perm = sc_shared_perm_entry(node);
             node = node->next;
-            dbr_pool_free_perm(pool, perm);
+            sc_pool_free_perm(pool, perm);
         }
         break;
-    case DBR_ENTITY_ORDER:
+    case SC_ENTITY_ORDER:
         while (node) {
-            struct DbrOrder* order = dbr_shared_order_entry(node);
+            struct ScOrder* order = sc_shared_order_entry(node);
             node = node->next;
-            dbr_pool_free_order(pool, order);
+            sc_pool_free_order(pool, order);
         }
         break;
-    case DBR_ENTITY_EXEC:
+    case SC_ENTITY_EXEC:
         while (node) {
-            struct DbrExec* exec = dbr_shared_exec_entry(node);
+            struct ScExec* exec = sc_shared_exec_entry(node);
             node = node->next;
-            // Inline version of dbr_exec_decref() to avoid cyclic dependency.
+            // Inline version of sc_exec_decref() to avoid cyclic dependency.
             assert(exec->refs_ >= 1);
             if (--exec->refs_ == 0)
-                dbr_pool_free_exec(pool, exec);
+                sc_pool_free_exec(pool, exec);
         }
         break;
-    case DBR_ENTITY_POSN:
+    case SC_ENTITY_POSN:
         while (node) {
-            struct DbrPosn* posn = dbr_shared_posn_entry(node);
+            struct ScPosn* posn = sc_shared_posn_entry(node);
             node = node->next;
-            dbr_pool_free_posn(pool, posn);
+            sc_pool_free_posn(pool, posn);
         }
         break;
     default:
@@ -220,16 +220,16 @@ elm_pool_free_entity_list(struct ElmPool* pool, int type, struct DbrSlNode* firs
     }
 }
 
-DBR_API DbrPool
-dbr_pool_create(size_t capacity)
+SC_API ScPool
+sc_pool_create(size_t capacity)
 {
-    DbrPool pool = malloc(sizeof(struct ElmPool));
-    if (dbr_unlikely(!pool)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+    ScPool pool = malloc(sizeof(struct ElmPool));
+    if (sc_unlikely(!pool)) {
+        sc_err_set(SC_ENOMEM, "out of memory");
         goto fail1;
     }
 
-    if (dbr_unlikely(!elm_pool_init(pool, capacity)))
+    if (sc_unlikely(!elm_pool_init(pool, capacity)))
         goto fail2;
 
     return pool;
@@ -239,161 +239,161 @@ dbr_pool_create(size_t capacity)
     return NULL;
 }
 
-DBR_API void
-dbr_pool_destroy(DbrPool pool)
+SC_API void
+sc_pool_destroy(ScPool pool)
 {
     if (pool) {
-#if DBR_DEBUG_ALLOC
-        for (struct DbrRbNode* node = dbr_tree_first(&pool->allocs_small);
-             node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
+#if SC_DEBUG_ALLOC
+        for (struct ScRbNode* node = sc_tree_first(&pool->allocs_small);
+             node != SC_TREE_END; node = sc_rbnode_next(node)) {
             struct ElmSmallEntry* small = small_entry(node);
-            dbr_log_warn("memory leak in %s at %d", small->file, small->line);
+            sc_log_warn("memory leak in %s at %d", small->file, small->line);
         }
-        for (struct DbrRbNode* node = dbr_tree_first(&pool->allocs_large);
-             node != DBR_TREE_END; node = dbr_rbnode_next(node)) {
+        for (struct ScRbNode* node = sc_tree_first(&pool->allocs_large);
+             node != SC_TREE_END; node = sc_rbnode_next(node)) {
             struct ElmLargeEntry* large = large_entry(node);
-            dbr_log_warn("memory leak in %s at %d", large->file, large->line);
+            sc_log_warn("memory leak in %s at %d", large->file, large->line);
         }
-#endif // DBR_DEBUG_ALLOC
+#endif // SC_DEBUG_ALLOC
         elm_pool_term(pool);
         free(pool);
     }
 }
 
-DBR_API struct DbrRec*
-dbr_pool_alloc_rec(DbrPool pool)
+SC_API struct ScRec*
+sc_pool_alloc_rec(ScPool pool)
 {
     return elm_pool_alloc_rec(pool);
 }
 
-DBR_API void
-dbr_pool_free_rec(DbrPool pool, struct DbrRec* rec)
+SC_API void
+sc_pool_free_rec(ScPool pool, struct ScRec* rec)
 {
     elm_pool_free_rec(pool, rec);
 }
 
-DBR_API struct DbrPerm*
-dbr_pool_alloc_perm(DbrPool pool)
+SC_API struct ScPerm*
+sc_pool_alloc_perm(ScPool pool)
 {
     return elm_pool_alloc_perm(pool);
 }
 
-DBR_API void
-dbr_pool_free_perm(DbrPool pool, struct DbrPerm* perm)
+SC_API void
+sc_pool_free_perm(ScPool pool, struct ScPerm* perm)
 {
     elm_pool_free_perm(pool, perm);
 }
 
-DBR_API struct DbrOrder*
-dbr_pool_alloc_order(DbrPool pool)
+SC_API struct ScOrder*
+sc_pool_alloc_order(ScPool pool)
 {
     return elm_pool_alloc_order(pool);
 }
 
-DBR_API void
-dbr_pool_free_order(DbrPool pool, struct DbrOrder* order)
+SC_API void
+sc_pool_free_order(ScPool pool, struct ScOrder* order)
 {
     elm_pool_free_order(pool, order);
 }
 
-DBR_API struct DbrLevel*
-dbr_pool_alloc_level(DbrPool pool)
+SC_API struct ScLevel*
+sc_pool_alloc_level(ScPool pool)
 {
     return elm_pool_alloc_level(pool);
 }
 
-DBR_API void
-dbr_pool_free_level(DbrPool pool, struct DbrLevel* level)
+SC_API void
+sc_pool_free_level(ScPool pool, struct ScLevel* level)
 {
     elm_pool_free_level(pool, level);
 }
 
-DBR_API struct DbrExec*
-dbr_pool_alloc_exec(DbrPool pool)
+SC_API struct ScExec*
+sc_pool_alloc_exec(ScPool pool)
 {
     return elm_pool_alloc_exec(pool);
 }
 
-DBR_API void
-dbr_pool_free_exec(DbrPool pool, struct DbrExec* exec)
+SC_API void
+sc_pool_free_exec(ScPool pool, struct ScExec* exec)
 {
     elm_pool_free_exec(pool, exec);
 }
 
-DBR_API struct DbrMatch*
-dbr_pool_alloc_match(DbrPool pool)
+SC_API struct ScMatch*
+sc_pool_alloc_match(ScPool pool)
 {
     return elm_pool_alloc_match(pool);
 }
 
-DBR_API void
-dbr_pool_free_match(DbrPool pool, struct DbrMatch* match)
+SC_API void
+sc_pool_free_match(ScPool pool, struct ScMatch* match)
 {
     elm_pool_free_match(pool, match);
 }
 
-DBR_API struct DbrPosn*
-dbr_pool_alloc_posn(DbrPool pool)
+SC_API struct ScPosn*
+sc_pool_alloc_posn(ScPool pool)
 {
     return elm_pool_alloc_posn(pool);
 }
 
-DBR_API void
-dbr_pool_free_posn(DbrPool pool, struct DbrPosn* posn)
+SC_API void
+sc_pool_free_posn(ScPool pool, struct ScPosn* posn)
 {
     elm_pool_free_posn(pool, posn);
 }
 
-DBR_API struct DbrView*
-dbr_pool_alloc_view(DbrPool pool)
+SC_API struct ScView*
+sc_pool_alloc_view(ScPool pool)
 {
     return elm_pool_alloc_view(pool);
 }
 
-DBR_API void
-dbr_pool_free_view(DbrPool pool, struct DbrView* view)
+SC_API void
+sc_pool_free_view(ScPool pool, struct ScView* view)
 {
     elm_pool_free_view(pool, view);
 }
 
-DBR_API struct DbrBook*
-dbr_pool_alloc_book(DbrPool pool)
+SC_API struct ScBook*
+sc_pool_alloc_book(ScPool pool)
 {
     return elm_pool_alloc_book(pool);
 }
 
-DBR_API void
-dbr_pool_free_book(DbrPool pool, struct DbrBook* book)
+SC_API void
+sc_pool_free_book(ScPool pool, struct ScBook* book)
 {
     elm_pool_free_book(pool, book);
 }
 
-DBR_API struct DbrSub*
-dbr_pool_alloc_sub(DbrPool pool)
+SC_API struct ScSub*
+sc_pool_alloc_sub(ScPool pool)
 {
     return elm_pool_alloc_sub(pool);
 }
 
-DBR_API void
-dbr_pool_free_sub(DbrPool pool, struct DbrSub* sub)
+SC_API void
+sc_pool_free_sub(ScPool pool, struct ScSub* sub)
 {
     elm_pool_free_sub(pool, sub);
 }
 
-DBR_API struct DbrSess*
-dbr_pool_alloc_sess(DbrPool pool)
+SC_API struct ScSess*
+sc_pool_alloc_sess(ScPool pool)
 {
     return elm_pool_alloc_sess(pool);
 }
 
-DBR_API void
-dbr_pool_free_sess(DbrPool pool, struct DbrSess* sess)
+SC_API void
+sc_pool_free_sess(ScPool pool, struct ScSess* sess)
 {
     elm_pool_free_sess(pool, sess);
 }
 
-DBR_API void
-dbr_pool_free_entity_list(DbrPool pool, int type, struct DbrSlNode* first)
+SC_API void
+sc_pool_free_entity_list(ScPool pool, int type, struct ScSlNode* first)
 {
     elm_pool_free_entity_list(pool, type, first);
 }

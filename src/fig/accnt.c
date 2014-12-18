@@ -3,10 +3,10 @@
  */
 #include "accnt.h"
 
-#include <dbr/elm/pool.h>
+#include <sc/elm/pool.h>
 
-#include <dbr/ash/err.h>
-#include <dbr/ash/log.h>
+#include <sc/ash/err.h>
+#include <sc/ash/log.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -15,11 +15,11 @@ static void
 free_traders(struct FigAccnt* accnt)
 {
     assert(accnt);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = accnt->traders.root)) {
-        struct DbrPerm* perm = dbr_accnt_trader_entry(node);
-        dbr_tree_remove(&accnt->traders, node);
-        dbr_pool_free_perm(accnt->pool, perm);
+        struct ScPerm* perm = sc_accnt_trader_entry(node);
+        sc_tree_remove(&accnt->traders, node);
+        sc_pool_free_perm(accnt->pool, perm);
     }
 }
 
@@ -27,11 +27,11 @@ static void
 free_giveups(struct FigAccnt* accnt)
 {
     assert(accnt);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = accnt->giveups.root)) {
-        struct DbrPerm* perm = dbr_accnt_giveup_entry(node);
-        dbr_tree_remove(&accnt->giveups, node);
-        dbr_pool_free_perm(accnt->pool, perm);
+        struct ScPerm* perm = sc_accnt_giveup_entry(node);
+        sc_tree_remove(&accnt->giveups, node);
+        sc_pool_free_perm(accnt->pool, perm);
     }
 }
 
@@ -39,11 +39,11 @@ static void
 free_orders(struct FigAccnt* accnt)
 {
     assert(accnt);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = accnt->orders.root)) {
-        struct DbrOrder* order = dbr_accnt_order_entry(node);
+        struct ScOrder* order = sc_accnt_order_entry(node);
         fig_accnt_release_order(accnt, order);
-        dbr_pool_free_order(accnt->pool, order);
+        sc_pool_free_order(accnt->pool, order);
     }
 }
 
@@ -51,11 +51,11 @@ static void
 free_execs(struct FigAccnt* accnt)
 {
     assert(accnt);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = accnt->trades.root)) {
-        struct DbrExec* exec = dbr_accnt_trade_entry(node);
-        dbr_tree_remove(&accnt->trades, node);
-        dbr_exec_decref(exec, accnt->pool);
+        struct ScExec* exec = sc_accnt_trade_entry(node);
+        sc_tree_remove(&accnt->trades, node);
+        sc_exec_decref(exec, accnt->pool);
     }
 }
 
@@ -63,47 +63,47 @@ static void
 free_posns(struct FigAccnt* accnt)
 {
     assert(accnt);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = accnt->posns.root)) {
-        struct DbrPosn* posn = dbr_accnt_posn_entry(node);
-        dbr_tree_remove(&accnt->posns, node);
-        dbr_pool_free_posn(accnt->pool, posn);
+        struct ScPosn* posn = sc_accnt_posn_entry(node);
+        sc_tree_remove(&accnt->posns, node);
+        sc_pool_free_posn(accnt->pool, posn);
     }
 }
 
-DBR_EXTERN struct FigAccnt*
-fig_accnt_lazy(struct DbrRec* arec, struct FigOrdIdx* ordidx, DbrPool pool)
+SC_EXTERN struct FigAccnt*
+fig_accnt_lazy(struct ScRec* arec, struct FigOrdIdx* ordidx, ScPool pool)
 {
     assert(arec);
-    assert(arec->type == DBR_ENTITY_ACCNT);
+    assert(arec->type == SC_ENTITY_ACCNT);
     struct FigAccnt* accnt = arec->accnt.state;
-    if (dbr_unlikely(!accnt)) {
+    if (sc_unlikely(!accnt)) {
         accnt = malloc(sizeof(struct FigAccnt));
-        if (dbr_unlikely(!accnt)) {
-            dbr_err_set(DBR_ENOMEM, "out of memory");
+        if (sc_unlikely(!accnt)) {
+            sc_err_set(SC_ENOMEM, "out of memory");
             return NULL;
         }
         accnt->rec = arec;
         accnt->ordidx = ordidx;
         accnt->pool = pool;
-        dbr_tree_init(&accnt->traders);
-        dbr_tree_init(&accnt->giveups);
-        dbr_tree_init(&accnt->orders);
-        dbr_tree_init(&accnt->trades);
-        dbr_tree_init(&accnt->posns);
+        sc_tree_init(&accnt->traders);
+        sc_tree_init(&accnt->giveups);
+        sc_tree_init(&accnt->orders);
+        sc_tree_init(&accnt->trades);
+        sc_tree_init(&accnt->posns);
         accnt->sess = NULL;
-        dbr_rbnode_init(&accnt->sess_node_);
+        sc_rbnode_init(&accnt->sess_node_);
 
         arec->accnt.state = accnt;
     }
     return accnt;
 }
 
-DBR_EXTERN void
-fig_accnt_term(struct DbrRec* arec)
+SC_EXTERN void
+fig_accnt_term(struct ScRec* arec)
 {
     assert(arec);
-    assert(arec->type == DBR_ENTITY_ACCNT);
+    assert(arec->type == SC_ENTITY_ACCNT);
     struct FigAccnt* accnt = arec->accnt.state;
     if (accnt) {
         arec->accnt.state = NULL;
@@ -113,7 +113,7 @@ fig_accnt_term(struct DbrRec* arec)
     }
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_accnt_reset_trader(struct FigAccnt* accnt)
 {
     free_execs(accnt);
@@ -122,19 +122,19 @@ fig_accnt_reset_trader(struct FigAccnt* accnt)
     free_traders(accnt);
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_accnt_reset_giveup(struct FigAccnt* accnt)
 {
     free_posns(accnt);
 }
 
-DBR_EXTERN struct DbrPosn*
-fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
+SC_EXTERN struct ScPosn*
+fig_accnt_update_posn(struct FigAccnt* accnt, struct ScPosn* posn)
 {
-    const DbrKey key = dbr_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
-    struct DbrRbNode* node = dbr_tree_insert(&accnt->posns, key, &posn->accnt_node_);
+    const ScKey key = sc_posn_key(posn->accnt.rec->id, posn->contr.rec->id, posn->settl_day);
+    struct ScRbNode* node = sc_tree_insert(&accnt->posns, key, &posn->accnt_node_);
     if (node != &posn->accnt_node_) {
-        struct DbrPosn* exist = dbr_accnt_posn_entry(node);
+        struct ScPosn* exist = sc_accnt_posn_entry(node);
 
         // Update existing position.
 
@@ -147,34 +147,34 @@ fig_accnt_update_posn(struct FigAccnt* accnt, struct DbrPosn* posn)
         exist->sell_licks = posn->sell_licks;
         exist->sell_lots = posn->sell_lots;
 
-        dbr_pool_free_posn(accnt->pool, posn);
+        sc_pool_free_posn(accnt->pool, posn);
         posn = exist;
     }
     return posn;
 }
 
-DBR_EXTERN struct DbrPosn*
-fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
-               struct FigOrdIdx* ordidx, DbrPool pool)
+SC_EXTERN struct ScPosn*
+fig_accnt_posn(struct ScRec* arec, struct ScRec* crec, ScJd settl_day,
+               struct FigOrdIdx* ordidx, ScPool pool)
 {
     assert(arec);
-    assert(arec->type == DBR_ENTITY_ACCNT);
+    assert(arec->type == SC_ENTITY_ACCNT);
 
     assert(crec);
-    assert(crec->type == DBR_ENTITY_CONTR);
+    assert(crec->type == SC_ENTITY_CONTR);
 
-    struct DbrPosn* posn;
+    struct ScPosn* posn;
 
     struct FigAccnt* accnt = fig_accnt_lazy(arec, ordidx, pool);
-    if (dbr_unlikely(!accnt))
+    if (sc_unlikely(!accnt))
         return NULL;
 
-    const DbrKey key = dbr_posn_key(arec->id, crec->id, settl_day);
-	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, key);
+    const ScKey key = sc_posn_key(arec->id, crec->id, settl_day);
+	struct ScRbNode* node = sc_tree_pfind(&accnt->posns, key);
     if (!node || node->key != key) {
-        if (!(posn = dbr_pool_alloc_posn(accnt->pool)))
+        if (!(posn = sc_pool_alloc_posn(accnt->pool)))
             return NULL;
-        dbr_posn_init(posn);
+        sc_posn_init(posn);
 
         posn->accnt.rec = arec;
         posn->contr.rec = crec;
@@ -184,168 +184,168 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
         posn->sell_licks = 0;
         posn->sell_lots = 0;
 
-        dbr_log_debug2("insert posn: accnt=%.16s, contr=%.16s, settl_day=%d",
+        sc_log_debug2("insert posn: accnt=%.16s, contr=%.16s, settl_day=%d",
                        arec->mnem, crec->mnem, settl_day);
 
-        struct DbrRbNode* parent = node;
-        dbr_tree_pinsert(&accnt->posns, key, &posn->accnt_node_, parent);
+        struct ScRbNode* parent = node;
+        sc_tree_pinsert(&accnt->posns, key, &posn->accnt_node_, parent);
     } else
-        posn = dbr_accnt_posn_entry(node);
+        posn = sc_accnt_posn_entry(node);
     return posn;
 }
 
-DBR_API struct DbrRec*
-dbr_accnt_rec(DbrAccnt accnt)
+SC_API struct ScRec*
+sc_accnt_rec(ScAccnt accnt)
 {
     return fig_accnt_rec(accnt);
 }
 
 // AccntTrader
 
-DBR_API struct DbrRbNode*
-dbr_accnt_find_trader_id(DbrAccnt accnt, DbrIden id)
+SC_API struct ScRbNode*
+sc_accnt_find_trader_id(ScAccnt accnt, ScIden id)
 {
     return fig_accnt_find_trader_id(accnt, id);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_first_trader(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_first_trader(ScAccnt accnt)
 {
     return fig_accnt_first_trader(accnt);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_last_trader(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_last_trader(ScAccnt accnt)
 {
     return fig_accnt_last_trader(accnt);
 }
 
-DBR_API DbrBool
-dbr_accnt_empty_trader(DbrAccnt accnt)
+SC_API ScBool
+sc_accnt_empty_trader(ScAccnt accnt)
 {
     return fig_accnt_empty_trader(accnt);
 }
 
 // AccntGiveup
 
-DBR_API struct DbrRbNode*
-dbr_accnt_find_giveup_id(DbrAccnt accnt, DbrIden id)
+SC_API struct ScRbNode*
+sc_accnt_find_giveup_id(ScAccnt accnt, ScIden id)
 {
     return fig_accnt_find_giveup_id(accnt, id);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_first_giveup(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_first_giveup(ScAccnt accnt)
 {
     return fig_accnt_first_giveup(accnt);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_last_giveup(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_last_giveup(ScAccnt accnt)
 {
     return fig_accnt_last_giveup(accnt);
 }
 
-DBR_API DbrBool
-dbr_accnt_empty_giveup(DbrAccnt accnt)
+SC_API ScBool
+sc_accnt_empty_giveup(ScAccnt accnt)
 {
     return fig_accnt_empty_giveup(accnt);
 }
 
 // AccntOrder
 
-DBR_API struct DbrRbNode*
-dbr_accnt_find_order_id(DbrAccnt accnt, DbrIden id)
+SC_API struct ScRbNode*
+sc_accnt_find_order_id(ScAccnt accnt, ScIden id)
 {
     return fig_accnt_find_order_id(accnt, id);
 }
 
-DBR_API struct DbrOrder*
-dbr_accnt_find_order_ref(DbrAccnt accnt, const char* ref)
+SC_API struct ScOrder*
+sc_accnt_find_order_ref(ScAccnt accnt, const char* ref)
 {
     return fig_accnt_find_order_ref(accnt, ref);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_first_order(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_first_order(ScAccnt accnt)
 {
     return fig_accnt_first_order(accnt);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_last_order(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_last_order(ScAccnt accnt)
 {
     return fig_accnt_last_order(accnt);
 }
 
-DBR_API DbrBool
-dbr_accnt_empty_order(DbrAccnt accnt)
+SC_API ScBool
+sc_accnt_empty_order(ScAccnt accnt)
 {
     return fig_accnt_empty_order(accnt);
 }
 
 // AccntTrade
 
-DBR_API struct DbrRbNode*
-dbr_accnt_find_trade_id(DbrAccnt accnt, DbrIden id)
+SC_API struct ScRbNode*
+sc_accnt_find_trade_id(ScAccnt accnt, ScIden id)
 {
     return fig_accnt_find_trade_id(accnt, id);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_first_trade(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_first_trade(ScAccnt accnt)
 {
     return fig_accnt_first_trade(accnt);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_last_trade(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_last_trade(ScAccnt accnt)
 {
     return fig_accnt_last_trade(accnt);
 }
 
-DBR_API DbrBool
-dbr_accnt_empty_trade(DbrAccnt accnt)
+SC_API ScBool
+sc_accnt_empty_trade(ScAccnt accnt)
 {
     return fig_accnt_empty_trade(accnt);
 }
 
 // AccntPosn.
 
-DBR_API struct DbrRbNode*
-dbr_accnt_find_posn_id(DbrAccnt accnt, DbrIden id)
+SC_API struct ScRbNode*
+sc_accnt_find_posn_id(ScAccnt accnt, ScIden id)
 {
     return fig_accnt_find_posn_id(accnt, id);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_first_posn(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_first_posn(ScAccnt accnt)
 {
     return fig_accnt_first_posn(accnt);
 }
 
-DBR_API struct DbrRbNode*
-dbr_accnt_last_posn(DbrAccnt accnt)
+SC_API struct ScRbNode*
+sc_accnt_last_posn(ScAccnt accnt)
 {
     return fig_accnt_last_posn(accnt);
 }
 
-DBR_API DbrBool
-dbr_accnt_empty_posn(DbrAccnt accnt)
+SC_API ScBool
+sc_accnt_empty_posn(ScAccnt accnt)
 {
     return fig_accnt_empty_posn(accnt);
 }
 
 // Accnt
 
-DBR_API DbrBool
-dbr_accnt_logged_on(DbrAccnt accnt)
+SC_API ScBool
+sc_accnt_logged_on(ScAccnt accnt)
 {
     return fig_accnt_logged_on(accnt);
 }
 
-DBR_API struct DbrSess*
-dbr_accnt_sess(DbrAccnt accnt)
+SC_API struct ScSess*
+sc_accnt_sess(ScAccnt accnt)
 {
     return fig_accnt_sess(accnt);
 }

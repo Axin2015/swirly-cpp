@@ -1,12 +1,12 @@
 SET(etc_FILES
-  FindDoobry.cmake
+  FindSwirly.cmake
   FindLibUuid.cmake
   FindZeroMQ.cmake
-  dbr_example.sql
-  dbr_mime.types
-  dbr_nginx.conf
-  dbr_schema.sql
-  doobry.conf
+  sc_example.sql
+  sc_mime.types
+  sc_nginx.conf
+  sc_schema.sql
+  swirly.conf
 )
 
 INSTALL(FILES ${etc_FILES} DESTINATION etc)

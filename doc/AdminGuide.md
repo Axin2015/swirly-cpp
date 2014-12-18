@@ -6,8 +6,8 @@ Database Creation
 
 The example database can be created as follows:
 
-    $ sqlite3 doobry.db < $DOOBRY_HOME/etc/dbr_schema.sql
-    $ sqlite3 doobry.db < $DOOBRY_HOME/etc/dbr_example.sql
+    $ sqlite3 swirly.db < $SWIRLY_HOME/etc/sc_schema.sql
+    $ sqlite3 swirly.db < $SWIRLY_HOME/etc/sc_example.sql
 
 Daemon Configuration
 --------------------
@@ -40,9 +40,9 @@ The `logfile` option is ignored unless `daemon=yes`:
 
     daemon = yes
 
-    bankfile = doobry.bin
-    dbfile = doobry.db
-    logfile = doobry.log
+    bankfile = swirly.bin
+    dbfile = swirly.db
+    logfile = swirly.log
 
     journsize = 1048576
     poolsize = 8388608
@@ -52,9 +52,9 @@ Daemon Operations
 
 ### Starting ###
 
-The `dbrd` server is typically started as follows:
+The `scd` server is typically started as follows:
 
-    $ dbrd -f doobry.conf
+    $ scd -f swirly.conf
 
 ### Log Rotation ###
 
@@ -62,5 +62,5 @@ If the `daemon` and `logfile` options are set, then the daemon process will resp
 re-opening the logfile. This behaviour can be use to rotate the log, as the following example
 demonstrates:
 
-    $ mv doobry.log doobry.log.1
-    $ killall -HUP dbrd
+    $ mv swirly.log swirly.log.1
+    $ killall -HUP scd

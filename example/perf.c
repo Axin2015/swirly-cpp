@@ -1,19 +1,19 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/fir/sqljourn.h>
-#include <dbr/fir/sqlmodel.h>
+#include <sc/fir/sqljourn.h>
+#include <sc/fir/sqlmodel.h>
 
-#include <dbr/fig/accnt.h>
-#include <dbr/fig/serv.h>
-#include <dbr/fig/sess.h>
+#include <sc/fig/accnt.h>
+#include <sc/fig/serv.h>
+#include <sc/fig/sess.h>
 
-#include <dbr/elm/pool.h>
-#include <dbr/elm/zmqjourn.h>
+#include <sc/elm/pool.h>
+#include <sc/elm/zmqjourn.h>
 
-#include <dbr/ash/err.h>
-#include <dbr/ash/log.h>
-#include <dbr/ash/util.h>
+#include <sc/ash/err.h>
+#include <sc/ash/log.h>
+#include <sc/ash/util.h>
 
 #include <stdlib.h>
 
@@ -21,9 +21,9 @@
 #include <zmq.h>
 
 static void* zctx = NULL;
-static DbrJourn journ = NULL;
-static DbrPool pool = NULL;
-static DbrServ serv = NULL;
+static ScJourn journ = NULL;
+static ScPool pool = NULL;
+static ScServ serv = NULL;
 
 // Time Stamp Counter.
 
@@ -38,74 +38,74 @@ tsc(void)
     return (((tsc_t)high) << 32) | ((tsc_t)low);
 }
 
-static struct DbrRec*
+static struct ScRec*
 find_rec_mnem(int type, const char* mnem)
 {
-    struct DbrSlNode* node = dbr_serv_find_rec_mnem(serv, type, mnem);
-    if (dbr_unlikely(!node)) {
-        dbr_err_setf(DBR_EINVAL, "no such record '%.16s'", mnem);
+    struct ScSlNode* node = sc_serv_find_rec_mnem(serv, type, mnem);
+    if (sc_unlikely(!node)) {
+        sc_err_setf(SC_EINVAL, "no such record '%.16s'", mnem);
         return NULL;
     }
-    return dbr_serv_rec_entry(node);
+    return sc_serv_rec_entry(node);
 }
 
-static DbrJourn
+static ScJourn
 factory(void* arg)
 {
-    return dbr_sqljourn_create((const char*)arg);
+    return sc_sqljourn_create((const char*)arg);
 }
 
-static DbrBool
-load(DbrServ serv, const char* path)
+static ScBool
+load(ScServ serv, const char* path)
 {
-    DbrBool ret;
+    ScBool ret;
 
-    DbrModel model = dbr_sqlmodel_create("doobry.db");
-    if (dbr_likely(model)) {
-        ret = dbr_serv_load(serv, model);
-        dbr_model_destroy(model);
+    ScModel model = sc_sqlmodel_create("swirly.db");
+    if (sc_likely(model)) {
+        ret = sc_serv_load(serv, model);
+        sc_model_destroy(model);
     } else
-        ret = DBR_FALSE;
+        ret = SC_FALSE;
 
     return ret;
 }
 
-static DbrBool
+static ScBool
 run(void)
 {
-    const DbrJd settl_day = dbr_ymd_to_jd(2014, 3, 14);
+    const ScJd settl_day = sc_ymd_to_jd(2014, 3, 14);
 
-    struct DbrRec* trec = find_rec_mnem(DBR_ENTITY_ACCNT, "WRAMIREZ");
-    if (dbr_unlikely(!trec))
+    struct ScRec* trec = find_rec_mnem(SC_ENTITY_ACCNT, "WRAMIREZ");
+    if (sc_unlikely(!trec))
         goto fail1;
 
-    struct DbrRec* grec = find_rec_mnem(DBR_ENTITY_ACCNT, "DBRA");
-    if (dbr_unlikely(!grec))
+    struct ScRec* grec = find_rec_mnem(SC_ENTITY_ACCNT, "SCA");
+    if (sc_unlikely(!grec))
         goto fail1;
 
-    struct DbrRec* crec = find_rec_mnem(DBR_ENTITY_CONTR, "EURUSD");
-    if (dbr_unlikely(!crec))
+    struct ScRec* crec = find_rec_mnem(SC_ENTITY_CONTR, "EURUSD");
+    if (sc_unlikely(!crec))
         goto fail1;
 
-    DbrAccnt trader = dbr_serv_accnt(serv, trec);
-    if (dbr_unlikely(!trader))
+    ScAccnt trader = sc_serv_accnt(serv, trec);
+    if (sc_unlikely(!trader))
         goto fail1;
 
-    DbrAccnt giveup = dbr_serv_accnt(serv, grec);
-    if (dbr_unlikely(!giveup))
+    ScAccnt giveup = sc_serv_accnt(serv, grec);
+    if (sc_unlikely(!giveup))
         goto fail1;
 
-    struct DbrBook* book = dbr_serv_book(serv, crec, settl_day);
-    if (dbr_unlikely(!book))
+    struct ScBook* book = sc_serv_book(serv, crec, settl_day);
+    if (sc_unlikely(!book))
         goto fail1;
 
-    DbrUuid uuid;
+    ScUuid uuid;
     uuid_generate(uuid);
-    struct DbrSess* sess = dbr_serv_sess(serv, uuid);
-    if (dbr_unlikely(!sess))
+    struct ScSess* sess = sc_serv_sess(serv, uuid);
+    if (sc_unlikely(!sess))
         goto fail1;
 
-    if (dbr_unlikely(!dbr_sess_logon(sess, trader)))
+    if (sc_unlikely(!sc_sess_logon(sess, trader)))
         goto fail1;
 
     enum { ITERS = 500 };
@@ -113,41 +113,41 @@ run(void)
     for (int i = 0; i < ITERS; ++i) {
 
         const tsc_t start = tsc();
-        if (dbr_unlikely(!dbr_serv_place(serv, trader, giveup, book, NULL,
-                                         DBR_ACTION_BUY, 12345, 1, 0))) {
-            dbr_err_perror("dbr_serv_place() failed");
+        if (sc_unlikely(!sc_serv_place(serv, trader, giveup, book, NULL,
+                                         SC_ACTION_BUY, 12345, 1, 0))) {
+            sc_err_perror("sc_serv_place() failed");
             goto fail2;
         }
 
-        if (dbr_unlikely(!dbr_serv_place(serv, trader, giveup, book, NULL,
-                                         DBR_ACTION_SELL, 12345, 1, 0))) {
-            dbr_err_perror("dbr_serv_place() failed");
+        if (sc_unlikely(!sc_serv_place(serv, trader, giveup, book, NULL,
+                                         SC_ACTION_SELL, 12345, 1, 0))) {
+            sc_err_perror("sc_serv_place() failed");
             goto fail2;
         }
         const tsc_t finish = tsc();
         total += finish - start;
 
-        dbr_serv_clear(serv);
+        sc_serv_clear(serv);
 
-        struct DbrRbNode* node;
-        while ((node = dbr_accnt_first_trade(trader)) != DBR_ACCNT_END_TRADE) {
-            struct DbrExec* trade = dbr_accnt_trade_entry(node);
-            if (!dbr_serv_ack_trade(serv, trader, trade->id)) {
-                dbr_err_perror("dbr_serv_ack_trade() failed");
+        struct ScRbNode* node;
+        while ((node = sc_accnt_first_trade(trader)) != SC_ACCNT_END_TRADE) {
+            struct ScExec* trade = sc_accnt_trade_entry(node);
+            if (!sc_serv_ack_trade(serv, trader, trade->id)) {
+                sc_err_perror("sc_serv_ack_trade() failed");
                 goto fail2;
             }
         }
     }
     const double ms = total / 1e6;
     const int orders = ITERS * 2;
-    dbr_log_info("orders=%d, total=%.3f ms, per_order=%.3f ms", orders, ms, ms / orders);
+    sc_log_info("orders=%d, total=%.3f ms, per_order=%.3f ms", orders, ms, ms / orders);
 
-    dbr_sess_logoff(sess, trader);
-    return DBR_TRUE;
+    sc_sess_logoff(sess, trader);
+    return SC_TRUE;
  fail2:
-    dbr_sess_logoff(sess, trader);
+    sc_sess_logoff(sess, trader);
  fail1:
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
 int
@@ -157,45 +157,45 @@ main(int argc, char* argv[])
 
     zctx = zmq_ctx_new();
     if (!zctx) {
-        dbr_err_printf(DBR_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_printf(SC_EIO, "zmq_ctx_new() failed: %s", zmq_strerror(zmq_errno()));
         goto exit1;
     }
 
-    journ = dbr_zmqjourn_create(zctx, 1 * 1024 * 1024, factory, "doobry.db");
+    journ = sc_zmqjourn_create(zctx, 1 * 1024 * 1024, factory, "swirly.db");
     if (!journ) {
-        dbr_err_perror("dbr_sqljourn_create() failed");
+        sc_err_perror("sc_sqljourn_create() failed");
         goto exit2;
     }
 
-    pool = dbr_pool_create(8 * 1024 * 1024);
+    pool = sc_pool_create(8 * 1024 * 1024);
     if (!pool) {
-        dbr_err_perror("dbr_pool_create() failed");
+        sc_err_perror("sc_pool_create() failed");
         goto exit3;
     }
 
-    serv = dbr_serv_create("doobry.bin", journ, pool);
+    serv = sc_serv_create("swirly.bin", journ, pool);
     if (!serv) {
-        dbr_err_perror("dbr_serv_create() failed");
+        sc_err_perror("sc_serv_create() failed");
         goto exit4;
     }
 
-    if (!load(serv, "doobry.db")) {
-        dbr_err_perror("load() failed");
+    if (!load(serv, "swirly.db")) {
+        sc_err_perror("load() failed");
         goto exit5;
     }
 
     if (!run()) {
-        dbr_err_perror("run() failed");
+        sc_err_perror("run() failed");
         goto exit5;
     }
 
     status = EXIT_SUCCESS;
  exit5:
-    dbr_serv_destroy(serv);
+    sc_serv_destroy(serv);
  exit4:
-    dbr_pool_destroy(pool);
+    sc_pool_destroy(pool);
  exit3:
-    dbr_journ_destroy(journ);
+    sc_journ_destroy(journ);
  exit2:
     zmq_ctx_destroy(zctx);
  exit1:

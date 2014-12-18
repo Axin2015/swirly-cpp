@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbrpp/fig/serv.hpp>
+#include <scpp/fig/serv.hpp>
 
-#include <dbrpp/elm/json.hpp>
-#include <dbrpp/elm/pool.hpp>
-#include <dbrpp/elm/posn.hpp>
+#include <scpp/elm/json.hpp>
+#include <scpp/elm/pool.hpp>
+#include <scpp/elm/posn.hpp>
 
-#include <dbrpp/fir/sqljourn.hpp>
-#include <dbrpp/fir/sqlmodel.hpp>
+#include <scpp/fir/sqljourn.hpp>
+#include <scpp/fir/sqlmodel.hpp>
 
-using namespace dbr;
+using namespace sc;
 using namespace std;
 
 int
@@ -20,9 +20,9 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         Pool pool(8 * 1024 * 1024);
-        auto journ = sqljourn_create("doobry.db");
-        auto model = sqlmodel_create("doobry.db");
-        Serv serv("doobry.bin", journ.get(), pool);
+        auto journ = sqljourn_create("swirly.db");
+        auto model = sqlmodel_create("swirly.db");
+        Serv serv("swirly.bin", journ.get(), pool);
         serv.load(model.get());
 
         cout << "accnts:\n";

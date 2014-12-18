@@ -2,7 +2,7 @@
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
 
-#include <dbr/ash/date.h>
+#include <sc/ash/date.h>
 
 #include <stdio.h>
 #include <stdlib.h> // atoi()
@@ -11,7 +11,7 @@ int
 main(int argc, char* argv[])
 {
     if (argc != 2) {
-        fprintf(stderr, "usage: dbr_ymdtojd <ymd>\n");
+        fprintf(stderr, "usage: sc_ymdtojd <ymd>\n");
         return 1;
     }
     int ymd = atoi(argv[1]);
@@ -20,7 +20,7 @@ main(int argc, char* argv[])
     const int mon = ymd % 100;
     ymd /= 100;
     const int year = ymd;
-    const DbrJd jd = dbr_ymd_to_jd(year, mon, day);
+    const ScJd jd = sc_ymd_to_jd(year, mon, day);
     printf("%d\n", jd);
     return 0;
 }

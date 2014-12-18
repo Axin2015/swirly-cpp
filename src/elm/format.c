@@ -3,9 +3,9 @@
  */
 #include "format.h"
 
-#include <dbr/elm/types.h>
+#include <sc/elm/types.h>
 
-#include <dbr/ash/util.h>
+#include <sc/ash/util.h>
 
 #include <math.h>
 #include <stdlib.h> // abort()
@@ -28,7 +28,7 @@ printi(char* buf, int i)
     } else
         ui = i;
 
-    char* cp = (buf += dbr_int_dig(i));
+    char* cp = (buf += sc_int_dig(i));
     do {
         *--cp = DIGITS[ui % 10];
     } while ((ui /= 10));
@@ -51,7 +51,7 @@ printl(char* buf, long l)
     } else
         ul = l;
 
-    char* cp = (buf += dbr_long_dig(l));
+    char* cp = (buf += sc_long_dig(l));
     do {
         *--cp = DIGITS[ul % 10];
     } while ((ul /= 10));
@@ -59,15 +59,15 @@ printl(char* buf, long l)
     return buf;
 }
 
-DBR_EXTERN const char*
+SC_EXTERN const char*
 elm_action_str(int action)
 {
     const char* sym;
     switch (action) {
-    case DBR_ACTION_BUY:
+    case SC_ACTION_BUY:
         sym = "BUY";
         break;
-    case DBR_ACTION_SELL:
+    case SC_ACTION_SELL:
         sym = "SELL";
         break;
     default:
@@ -76,15 +76,15 @@ elm_action_str(int action)
     return sym;
 }
 
-DBR_EXTERN size_t
+SC_EXTERN size_t
 elm_action_len(int action)
 {
     size_t len;
     switch (action) {
-    case DBR_ACTION_BUY:
+    case SC_ACTION_BUY:
         len = sizeof("BUY") - 1;
         break;
-    case DBR_ACTION_SELL:
+    case SC_ACTION_SELL:
         len = sizeof("SELL") - 1;
         break;
     default:
@@ -93,15 +93,15 @@ elm_action_len(int action)
     return len;
 }
 
-DBR_EXTERN const char*
+SC_EXTERN const char*
 elm_role_str(int role)
 {
     const char* sym;
     switch (role) {
-    case DBR_ROLE_MAKER:
+    case SC_ROLE_MAKER:
         sym = "MAKER";
         break;
-    case DBR_ROLE_TAKER:
+    case SC_ROLE_TAKER:
         sym = "TAKER";
         break;
     default:
@@ -110,15 +110,15 @@ elm_role_str(int role)
     return sym;
 }
 
-DBR_EXTERN size_t
+SC_EXTERN size_t
 elm_role_len(int role)
 {
     size_t len;
     switch (role) {
-    case DBR_ROLE_MAKER:
+    case SC_ROLE_MAKER:
         len = sizeof("MAKER") - 1;
         break;
-    case DBR_ROLE_TAKER:
+    case SC_ROLE_TAKER:
         len = sizeof("TAKER") - 1;
         break;
     default:
@@ -127,21 +127,21 @@ elm_role_len(int role)
     return len;
 }
 
-DBR_EXTERN const char*
+SC_EXTERN const char*
 elm_state_str(int state)
 {
     const char* sym;
     switch (state) {
-    case DBR_STATE_NEW:
+    case SC_STATE_NEW:
         sym = "NEW";
         break;
-    case DBR_STATE_REVISE:
+    case SC_STATE_REVISE:
         sym = "REVISE";
         break;
-    case DBR_STATE_CANCEL:
+    case SC_STATE_CANCEL:
         sym = "CANCEL";
         break;
-    case DBR_STATE_TRADE:
+    case SC_STATE_TRADE:
         sym = "TRADE";
         break;
     default:
@@ -150,21 +150,21 @@ elm_state_str(int state)
     return sym;
 }
 
-DBR_EXTERN size_t
+SC_EXTERN size_t
 elm_state_len(int state)
 {
     size_t len;
     switch (state) {
-    case DBR_STATE_NEW:
+    case SC_STATE_NEW:
         len = sizeof("NEW") - 1;
         break;
-    case DBR_STATE_REVISE:
+    case SC_STATE_REVISE:
         len = sizeof("REVISE") - 1;
         break;
-    case DBR_STATE_CANCEL:
+    case SC_STATE_CANCEL:
         len = sizeof("CANCEL") - 1;
         break;
-    case DBR_STATE_TRADE:
+    case SC_STATE_TRADE:
         len = sizeof("TRADE") - 1;
         break;
     default:
@@ -173,8 +173,8 @@ elm_state_len(int state)
     return len;
 }
 
-DBR_API void
-dbr_price_format(double price, int price_dp, int pip_dp, struct DbrPriceString* ps)
+SC_API void
+sc_price_format(double price, int price_dp, int pip_dp, struct ScPriceString* ps)
 {
     static const char DIGITS[] = "0123456789";
 
@@ -218,8 +218,8 @@ dbr_price_format(double price, int price_dp, int pip_dp, struct DbrPriceString* 
     ps->big = cp + 1;
 }
 
-DBR_API char*
-dbr_vformat(char* buf, const char* format, va_list args)
+SC_API char*
+sc_vformat(char* buf, const char* format, va_list args)
 {
     assert(buf);
     assert(format);
@@ -251,14 +251,14 @@ dbr_vformat(char* buf, const char* format, va_list args)
                 break;
             case 'j':
                 i = va_arg(args, int);
-                buf = printi(buf, dbr_jd_to_iso(i));
+                buf = printi(buf, sc_jd_to_iso(i));
                 break;
             case 'l':
                 l = va_arg(args, long);
                 buf = printl(buf, l);
                 break;
             case 'm':
-                i = DBR_MNEM_MAX;
+                i = SC_MNEM_MAX;
                 s = va_arg(args, const char*);
                 // stpncpy() zero pads so cannot use.
                 for (; *s != '\0' && i > 0; ++s, --i)
@@ -284,12 +284,12 @@ dbr_vformat(char* buf, const char* format, va_list args)
     return buf;
 }
 
-DBR_API char*
-dbr_format(char* buf, const char* format, ...)
+SC_API char*
+sc_format(char* buf, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
-    buf = dbr_vformat(buf, format, args);
+    buf = sc_vformat(buf, format, args);
     va_end(args);
     return buf;
 }

@@ -5,13 +5,13 @@
 
 #include "accnt.h"
 
-#include <dbr/fig/sess.h>
+#include <sc/fig/sess.h>
 
-#include <dbr/elm/msg.h>
+#include <sc/elm/msg.h>
 
-#include <dbr/ash/err.h>
-#include <dbr/ash/log.h>
-#include <dbr/ash/util.h>
+#include <sc/ash/err.h>
+#include <sc/ash/log.h>
+#include <sc/ash/util.h>
 
 #include <stdlib.h> // malloc()
 #include <string.h> // strncpy()
@@ -19,33 +19,33 @@
 #include <uuid/uuid.h>
 
 static void
-term_state(struct DbrRec* rec)
+term_state(struct ScRec* rec)
 {
     switch (rec->type) {
-    case DBR_ENTITY_ACCNT:
+    case SC_ENTITY_ACCNT:
         fig_accnt_term(rec);
         break;
     }
 }
 
 static void
-free_views(struct DbrTree* views, DbrPool pool)
+free_views(struct ScTree* views, ScPool pool)
 {
     assert(views);
-    struct DbrRbNode* node;
+    struct ScRbNode* node;
     while ((node = views->root)) {
-        struct DbrView* view = dbr_clnt_view_entry(node);
-        dbr_tree_remove(views, node);
-        dbr_pool_free_view(pool, view);
+        struct ScView* view = sc_clnt_view_entry(node);
+        sc_tree_remove(views, node);
+        sc_pool_free_view(pool, view);
     }
 }
 
-#if DBR_DEBUG_LEVEL >= 1
-DBR_EXTERN void
+#if SC_DEBUG_LEVEL >= 1
+SC_EXTERN void
 fig_clnt_log_state(unsigned state)
 {
     if (state == 0) {
-        dbr_log_debug1("state: READY");
+        sc_log_debug1("state: READY");
         return;
     }
     char buf[sizeof("DELTA_WAIT|OPEN_WAIT|ACCNT_WAIT|CONTR_WAIT|SNAP_WAIT|CLOSE_WAIT|CLOSED")] = "";
@@ -65,30 +65,30 @@ fig_clnt_log_state(unsigned state)
         strcat(buf, "|CLOSED");
     if (buf[0] == '|')
         buf[0] = ' ';
-    dbr_log_debug1("state:%s", buf);
+    sc_log_debug1("state:%s", buf);
 }
-#endif // DBR_DEBUG_LEVEL >= 1
+#endif // SC_DEBUG_LEVEL >= 1
 
-DBR_EXTERN void
-fig_clnt_sess_reset(DbrClnt clnt)
+SC_EXTERN void
+fig_clnt_sess_reset(ScClnt clnt)
 {
     // This function does not schedule any new timers.
 
-    dbr_sess_reset(&clnt->sess);
+    sc_sess_reset(&clnt->sess);
     clnt->state = FIG_DELTA_WAIT;
     fig_clnt_log_state(clnt->state);
     fig_cache_reset(&clnt->cache);
     fig_ordidx_init(&clnt->ordidx);
     free_views(&clnt->views, clnt->pool);
-    dbr_prioq_reset(&clnt->prioq);
+    sc_prioq_reset(&clnt->prioq);
     clnt->mdlast = 0;
 }
 
-DBR_EXTERN DbrIden
-fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
+SC_EXTERN ScIden
+fig_clnt_sess_close(ScClnt clnt, ScMillis now)
 {
     if (clnt->state == FIG_CLOSED) {
-        dbr_err_set(DBR_EINVAL, "client already closed");
+        sc_err_set(SC_EINVAL, "client already closed");
         goto fail1;
     }
 
@@ -99,64 +99,64 @@ fig_clnt_sess_close(DbrClnt clnt, DbrMillis now)
     }
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    const DbrIden req_id = clnt->close_id;
-    struct DbrBody body = { .req_id = req_id, .sid = clnt->sess.sid, .type = DBR_SESS_CLOSE };
+    const ScIden req_id = clnt->close_id;
+    struct ScBody body = { .req_id = req_id, .sid = clnt->sess.sid, .type = SC_SESS_CLOSE };
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
     clnt->state |= FIG_CLOSE_WAIT;
     fig_clnt_log_state(clnt->state);
-    dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    sc_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return req_id;
  fail1:
     return -1;
 }
 
-DBR_EXTERN DbrIden
-fig_clnt_sess_open(DbrClnt clnt, DbrMillis now)
+SC_EXTERN ScIden
+fig_clnt_sess_open(ScClnt clnt, ScMillis now)
 {
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    const DbrIden req_id = clnt->open_id;
-    struct DbrBody body = { .req_id = req_id, .sid = clnt->sess.sid, .type = DBR_SESS_OPEN,
+    const ScIden req_id = clnt->open_id;
+    struct ScBody body = { .req_id = req_id, .sid = clnt->sess.sid, .type = SC_SESS_OPEN,
                             .sess_open = { .hbint = FIG_TRINT } };
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
     clnt->state |= FIG_OPEN_WAIT;
     fig_clnt_log_state(clnt->state);
-    dbr_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    sc_prioq_push(&clnt->prioq, req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrClnt
-dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* traddr,
-                DbrMillis tmout, DbrPool pool)
+SC_API ScClnt
+sc_clnt_create(void* zctx, const ScUuid uuid, const char* mdaddr, const char* traddr,
+                ScMillis tmout, ScPool pool)
 {
     // 1.
-    DbrClnt clnt = malloc(sizeof(struct FigClnt));
-    if (dbr_unlikely(!clnt)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+    ScClnt clnt = malloc(sizeof(struct FigClnt));
+    if (sc_unlikely(!clnt)) {
+        sc_err_set(SC_ENOMEM, "out of memory");
         goto fail1;
     }
 
     // 2.
-    dbr_sess_init(&clnt->sess, uuid, pool);
+    sc_sess_init(&clnt->sess, uuid, pool);
 
     // 3.
     void* mdsock = zmq_socket(zctx, ZMQ_SUB);
     if (!mdsock) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail2;
     }
     const int opt = 0;
@@ -164,39 +164,39 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     zmq_setsockopt(mdsock, ZMQ_SUBSCRIBE, "", 0);
 
     if (zmq_connect(mdsock, mdaddr) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
 
     // 4.
     void* trsock = zmq_socket(zctx, ZMQ_DEALER);
     if (!trsock) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail3;
     }
     zmq_setsockopt(trsock, ZMQ_LINGER, &opt, sizeof(opt));
     zmq_setsockopt(trsock, ZMQ_IDENTITY, clnt->sess.uuid, 16);
 
     if (zmq_connect(trsock, traddr) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_connect() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;
     }
 
     // 5.
     void* asock = zmq_socket(zctx, ZMQ_REP);
     if (!asock) {
-        dbr_err_setf(DBR_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_socket() failed: %s", zmq_strerror(zmq_errno()));
         goto fail4;
     }
     zmq_setsockopt(asock, ZMQ_LINGER, &opt, sizeof(opt));
 
     enum { INPROC_LEN = sizeof("inproc://") - 1 };
-    char aaddr[INPROC_LEN + DBR_UUID_MAX + 1];
+    char aaddr[INPROC_LEN + SC_UUID_MAX + 1];
     __builtin_memcpy(aaddr, "inproc://", INPROC_LEN);
     uuid_unparse_lower(clnt->sess.uuid, aaddr + INPROC_LEN);
 
     if (zmq_bind(asock, aaddr) < 0) {
-        dbr_err_setf(DBR_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
+        sc_err_setf(SC_EIO, "zmq_bind() failed: %s", zmq_strerror(zmq_errno()));
         goto fail5;
     }
 
@@ -212,9 +212,9 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     fig_cache_init(&clnt->cache, term_state, pool);
     fig_ordidx_init(&clnt->ordidx);
     // 7.
-    dbr_tree_init(&clnt->views);
+    sc_tree_init(&clnt->views);
     // 8.
-    if (!dbr_prioq_init(&clnt->prioq))
+    if (!sc_prioq_init(&clnt->prioq))
         goto fail6;
 
     clnt->mdlast = 0;
@@ -236,13 +236,13 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     clnt->items[FIG_ASOCK].events = ZMQ_POLLIN;
     clnt->items[FIG_ASOCK].revents = 0;
 
-    if (!dbr_prioq_push(&clnt->prioq, FIG_MDTMR, dbr_millis() + FIG_MDTMOUT))
+    if (!sc_prioq_push(&clnt->prioq, FIG_MDTMR, sc_millis() + FIG_MDTMOUT))
         goto fail7;
 
     return clnt;
  fail7:
     // 8.
-    dbr_prioq_term(&clnt->prioq);
+    sc_prioq_term(&clnt->prioq);
  fail6:
     // 7.
     free_views(&clnt->views, pool);
@@ -259,19 +259,19 @@ dbr_clnt_create(void* zctx, const DbrUuid uuid, const char* mdaddr, const char* 
     zmq_close(mdsock);
  fail2:
     // 2.
-    dbr_sess_term(&clnt->sess);
+    sc_sess_term(&clnt->sess);
     // 1.
     free(clnt);
  fail1:
     return NULL;
 }
 
-DBR_API void
-dbr_clnt_destroy(DbrClnt clnt)
+SC_API void
+sc_clnt_destroy(ScClnt clnt)
 {
     if (clnt) {
         // 8.
-        dbr_prioq_term(&clnt->prioq);
+        sc_prioq_term(&clnt->prioq);
         // 7.
         free_views(&clnt->views, clnt->pool);
         // 6.
@@ -283,132 +283,132 @@ dbr_clnt_destroy(DbrClnt clnt)
         // 3.
         zmq_close(clnt->mdsock);
         // 2.
-        dbr_sess_term(&clnt->sess);
+        sc_sess_term(&clnt->sess);
         // 1.
         free(clnt);
     }
 }
 
-DBR_API void
-dbr_clnt_reset(DbrClnt clnt)
+SC_API void
+sc_clnt_reset(ScClnt clnt)
 {
     fig_clnt_sess_reset(clnt);
     // Cannot fail due to prioq reset.
-    dbr_prioq_push(&clnt->prioq, FIG_MDTMR, dbr_millis() + FIG_MDTMOUT);
+    sc_prioq_push(&clnt->prioq, FIG_MDTMR, sc_millis() + FIG_MDTMOUT);
 }
 
-DBR_API DbrIden
-dbr_clnt_close(DbrClnt clnt)
+SC_API ScIden
+sc_clnt_close(ScClnt clnt)
 {
-    return fig_clnt_sess_close(clnt, dbr_millis());
+    return fig_clnt_sess_close(clnt, sc_millis());
 }
 
-DBR_API struct DbrSlNode*
-dbr_clnt_find_rec_id(DbrClnt clnt, int type, DbrIden id)
+SC_API struct ScSlNode*
+sc_clnt_find_rec_id(ScClnt clnt, int type, ScIden id)
 {
     return fig_cache_find_rec_id(&clnt->cache, type, id);
 }
 
-DBR_API struct DbrSlNode*
-dbr_clnt_find_rec_mnem(DbrClnt clnt, int type, const char* mnem)
+SC_API struct ScSlNode*
+sc_clnt_find_rec_mnem(ScClnt clnt, int type, const char* mnem)
 {
     return fig_cache_find_rec_mnem(&clnt->cache, type, mnem);
 }
 
-DBR_API struct DbrSlNode*
-dbr_clnt_first_rec(DbrClnt clnt, int type, size_t* size)
+SC_API struct ScSlNode*
+sc_clnt_first_rec(ScClnt clnt, int type, size_t* size)
 {
     return fig_cache_first_rec(&clnt->cache, type, size);
 }
 
-DBR_API DbrBool
-dbr_clnt_empty_rec(DbrClnt clnt, int type)
+SC_API ScBool
+sc_clnt_empty_rec(ScClnt clnt, int type)
 {
     return fig_cache_empty_rec(&clnt->cache, type);
 }
 
-DBR_API DbrAccnt
-dbr_clnt_accnt(DbrClnt clnt, struct DbrRec* arec)
+SC_API ScAccnt
+sc_clnt_accnt(ScClnt clnt, struct ScRec* arec)
 {
     return fig_accnt_lazy(arec, &clnt->ordidx, clnt->pool);
 }
 
-DBR_API DbrIden
-dbr_clnt_logon(DbrClnt clnt, DbrAccnt accnt)
+SC_API ScIden
+sc_clnt_logon(ScClnt clnt, ScAccnt accnt)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
 
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_SESS_LOGON;
+    body.type = SC_SESS_LOGON;
     body.sess_logon.aid = accnt->rec->id;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_logoff(DbrClnt clnt, DbrAccnt accnt)
+SC_API ScIden
+sc_clnt_logoff(ScClnt clnt, ScAccnt accnt)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_SESS_LOGOFF;
+    body.type = SC_SESS_LOGOFF;
     body.sess_logoff.aid = accnt->rec->id;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_place(DbrClnt clnt, DbrAccnt trader, DbrAccnt giveup, struct DbrRec* crec,
-               DbrJd settl_day, const char* ref, int action, DbrTicks ticks, DbrLots lots,
-               DbrLots min_lots)
+SC_API ScIden
+sc_clnt_place(ScClnt clnt, ScAccnt trader, ScAccnt giveup, struct ScRec* crec,
+               ScJd settl_day, const char* ref, int action, ScTicks ticks, ScLots lots,
+               ScLots min_lots)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_PLACE_ORDER_REQ;
+    body.type = SC_PLACE_ORDER_REQ;
     body.place_order_req.tid = trader->rec->id;
     body.place_order_req.gid = giveup->rec->id;
     body.place_order_req.cid = crec->id;
     body.place_order_req.settl_day = settl_day;
     if (ref)
-        strncpy(body.place_order_req.ref, ref, DBR_REF_MAX);
+        strncpy(body.place_order_req.ref, ref, SC_REF_MAX);
     else
         body.place_order_req.ref[0] = '\0';
     body.place_order_req.action = action;
@@ -417,223 +417,223 @@ dbr_clnt_place(DbrClnt clnt, DbrAccnt trader, DbrAccnt giveup, struct DbrRec* cr
     body.place_order_req.min_lots = min_lots;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_revise_id(DbrClnt clnt, DbrAccnt trader, DbrIden id, DbrLots lots)
+SC_API ScIden
+sc_clnt_revise_id(ScClnt clnt, ScAccnt trader, ScIden id, ScLots lots)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_REVISE_ORDER_ID_REQ;
+    body.type = SC_REVISE_ORDER_ID_REQ;
     body.revise_order_id_req.tid = trader->rec->id;
     body.revise_order_id_req.id = id;
     body.revise_order_id_req.lots = lots;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_revise_ref(DbrClnt clnt, DbrAccnt trader, const char* ref, DbrLots lots)
+SC_API ScIden
+sc_clnt_revise_ref(ScClnt clnt, ScAccnt trader, const char* ref, ScLots lots)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_REVISE_ORDER_REF_REQ;
+    body.type = SC_REVISE_ORDER_REF_REQ;
     body.revise_order_ref_req.tid = trader->rec->id;
-    strncpy(body.revise_order_ref_req.ref, ref, DBR_REF_MAX);
+    strncpy(body.revise_order_ref_req.ref, ref, SC_REF_MAX);
     body.revise_order_ref_req.lots = lots;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_cancel_id(DbrClnt clnt, DbrAccnt trader, DbrIden id)
+SC_API ScIden
+sc_clnt_cancel_id(ScClnt clnt, ScAccnt trader, ScIden id)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_CANCEL_ORDER_ID_REQ;
+    body.type = SC_CANCEL_ORDER_ID_REQ;
     body.cancel_order_id_req.tid = trader->rec->id;
     body.cancel_order_id_req.id = id;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_cancel_ref(DbrClnt clnt, DbrAccnt trader, const char* ref)
+SC_API ScIden
+sc_clnt_cancel_ref(ScClnt clnt, ScAccnt trader, const char* ref)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_CANCEL_ORDER_REF_REQ;
+    body.type = SC_CANCEL_ORDER_REF_REQ;
     body.cancel_order_ref_req.tid = trader->rec->id;
-    strncpy(body.cancel_order_ref_req.ref, ref, DBR_REF_MAX);
+    strncpy(body.cancel_order_ref_req.ref, ref, SC_REF_MAX);
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_ack_trade(DbrClnt clnt, DbrAccnt trader, DbrIden id)
+SC_API ScIden
+sc_clnt_ack_trade(ScClnt clnt, ScAccnt trader, ScIden id)
 {
     if (clnt->state != FIG_READY) {
-        dbr_err_set(DBR_EBUSY, "client not ready");
+        sc_err_set(SC_EBUSY, "client not ready");
         goto fail1;
     }
-    struct DbrBody body;
+    struct ScBody body;
     body.req_id = clnt->id++;
     body.sid = clnt->sess.sid;
-    body.type = DBR_ACK_TRADE_REQ;
+    body.type = SC_ACK_TRADE_REQ;
     body.ack_trade_req.tid = trader->rec->id;
     body.ack_trade_req.id = id;
 
     // Reserve so that push cannot fail after send.
-    if (!dbr_prioq_reserve(&clnt->prioq, dbr_prioq_size(&clnt->prioq) + 1))
+    if (!sc_prioq_reserve(&clnt->prioq, sc_prioq_size(&clnt->prioq) + 1))
         goto fail1;
 
-    if (!dbr_send_body(clnt->trsock, &body, DBR_FALSE))
+    if (!sc_send_body(clnt->trsock, &body, SC_FALSE))
         goto fail1;
 
     fig_accnt_remove_trade_id(trader, id);
 
-    const DbrMillis now = dbr_millis();
-    dbr_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
-    dbr_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
+    const ScMillis now = sc_millis();
+    sc_prioq_push(&clnt->prioq, body.req_id, now + clnt->tmout);
+    sc_prioq_replace(&clnt->prioq, FIG_HBTMR, now + clnt->sess.hbint);
     return body.req_id;
  fail1:
     return -1;
 }
 
-DBR_API DbrIden
-dbr_clnt_set_timer(DbrClnt clnt, DbrMillis absms)
+SC_API ScIden
+sc_clnt_set_timer(ScClnt clnt, ScMillis absms)
 {
-    DbrIden id = clnt->id++;
-    if (!dbr_prioq_push(&clnt->prioq, id, absms))
+    ScIden id = clnt->id++;
+    if (!sc_prioq_push(&clnt->prioq, id, absms))
         id = -1;
     return id;
 }
 
-DBR_API void
-dbr_clnt_cancel_timer(DbrClnt clnt, DbrIden id)
+SC_API void
+sc_clnt_cancel_timer(ScClnt clnt, ScIden id)
 {
-    dbr_prioq_remove(&clnt->prioq, id);
+    sc_prioq_remove(&clnt->prioq, id);
 }
 
-DBR_API struct DbrRbNode*
-dbr_clnt_find_view(DbrClnt clnt, DbrIden cid, DbrJd settl_day)
+SC_API struct ScRbNode*
+sc_clnt_find_view(ScClnt clnt, ScIden cid, ScJd settl_day)
 {
-    const DbrKey key = dbr_view_key(cid, settl_day);
-    return dbr_tree_find(&clnt->views, key);
+    const ScKey key = sc_view_key(cid, settl_day);
+    return sc_tree_find(&clnt->views, key);
 }
 
-DBR_API struct DbrRbNode*
-dbr_clnt_first_view(DbrClnt clnt)
+SC_API struct ScRbNode*
+sc_clnt_first_view(ScClnt clnt)
 {
-    return dbr_tree_first(&clnt->views);
+    return sc_tree_first(&clnt->views);
 }
 
-DBR_API struct DbrRbNode*
-dbr_clnt_last_view(DbrClnt clnt)
+SC_API struct ScRbNode*
+sc_clnt_last_view(ScClnt clnt)
 {
-    return dbr_tree_last(&clnt->views);
+    return sc_tree_last(&clnt->views);
 }
 
-DBR_API DbrBool
-dbr_clnt_empty_view(DbrClnt clnt)
+SC_API ScBool
+sc_clnt_empty_view(ScClnt clnt)
 {
-    return dbr_tree_empty(&clnt->views);
+    return sc_tree_empty(&clnt->views);
 }
 
-DBR_API const unsigned char*
-dbr_clnt_uuid(DbrClnt clnt)
+SC_API const unsigned char*
+sc_clnt_uuid(ScClnt clnt)
 {
     return clnt->sess.uuid;
 }
 
-DBR_API DbrBool
-dbr_clnt_is_closed(DbrClnt clnt)
+SC_API ScBool
+sc_clnt_is_closed(ScClnt clnt)
 {
     return clnt->state == FIG_CLOSED;
 }
 
-DBR_API DbrBool
-dbr_clnt_is_ready(DbrClnt clnt)
+SC_API ScBool
+sc_clnt_is_ready(ScClnt clnt)
 {
     return clnt->state == FIG_READY;
 }

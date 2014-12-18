@@ -1,9 +1,9 @@
 // -*- c -*-
 /*
- *  02110-1301 USA.
+ *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/ash/shlex.h>
-#include <dbr/ash/err.h>
+#include <sc/ash/shlex.h>
+#include <sc/ash/err.h>
 
 #include <stddef.h> // NULL
 
@@ -16,7 +16,7 @@
         shlex->len = 0;
     }
     action add_char {
-        if (shlex->len < DBR_TOK_MAX)
+        if (shlex->len < SC_TOK_MAX)
             shlex->tok[shlex->len++] = fc;
         else {
             cs = shlex_error;
@@ -68,8 +68,8 @@
 
 %% write data nofinal;
 
-DBR_API void
-dbr_shlex_init(struct DbrShlex* shlex, void (*cb)(void*, const char*, size_t), void* ctx)
+SC_API void
+sc_shlex_init(struct ScShlex* shlex, void (*cb)(void*, const char*, size_t), void* ctx)
 {
     shlex->cb = cb;
     shlex->ctx = ctx;
@@ -79,16 +79,16 @@ dbr_shlex_init(struct DbrShlex* shlex, void (*cb)(void*, const char*, size_t), v
     shlex->cs = cs;
 }
 
-DBR_API void
-dbr_shlex_reset(struct DbrShlex* shlex)
+SC_API void
+sc_shlex_reset(struct ScShlex* shlex)
 {
     int cs;
     %% write init;
     shlex->cs = cs;
 }
 
-DBR_API DbrBool
-dbr_shlex_exec(struct DbrShlex* shlex, const char* buf, size_t size)
+SC_API ScBool
+sc_shlex_exec(struct ScShlex* shlex, const char* buf, size_t size)
 {
 	const char* p = buf;
 	const char* pe = p + size;
@@ -98,9 +98,9 @@ dbr_shlex_exec(struct DbrShlex* shlex, const char* buf, size_t size)
     shlex->cs = cs;
 
     if (cs == shlex_error) {
-        dbr_err_set(DBR_EINVAL, "lexical error");
-        dbr_shlex_reset(shlex);
-        return DBR_FALSE;
+        sc_err_set(SC_EINVAL, "lexical error");
+        sc_shlex_reset(shlex);
+        return SC_FALSE;
     }
-	return DBR_TRUE;
+	return SC_TRUE;
 }

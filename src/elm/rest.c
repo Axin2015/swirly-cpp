@@ -1,22 +1,22 @@
 
-#line 1 "/Users/marayl/repo/doobry/src/elm/rest.rl"
- *  You should have received a copy of the GNU General Public License along with this program; if
- *  not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
- *  02110-1301 USA.
+#line 1 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
+// -*- c -*-
+/*
+ *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/elm/rest.h>
+#include <sc/elm/rest.h>
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 static long
-inum(const struct DbrRest* rest)
+inum(const struct ScRest* rest)
 {
     return rest->num.sign * rest->num.idigits;
 }
 
 #if 0
 static double
-fnum(const struct DbrRest* rest)
+fnum(const struct ScRest* rest)
 {
     const double fract = rest->num.fdigits / pow(10, rest->num.fcount);
     return rest->num.sign * (rest->num.idigits + fract);
@@ -24,11 +24,11 @@ fnum(const struct DbrRest* rest)
 #endif
 
 
-#line 332 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 318 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 
 
 
-#line 46 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 32 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 static const char _json_actions[] = {
 	0, 1, 2, 1, 4, 1, 6, 1, 
 	7, 1, 8, 1, 9, 1, 10, 1, 
@@ -430,25 +430,25 @@ static const int json_error = 0;
 static const int json_en_main = 1;
 
 
-#line 335 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 321 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 
-DBR_API void
-dbr_rest_init(struct DbrRest* rest)
+SC_API void
+sc_rest_init(struct ScRest* rest)
 {
     int cs;
     
-#line 455 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 441 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 	{
 	cs = json_start;
 	}
 
-#line 341 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 327 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
     rest->cs = cs;
     rest->fields = 0;
 }
 
-DBR_API int
-dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
+SC_API int
+sc_rest_json(struct ScRest* rest, const char* buf, size_t size)
 {
 	const char* p = buf;
 	const char* pe = p + size;
@@ -456,7 +456,7 @@ dbr_rest_json(struct DbrRest* rest, const char* buf, size_t size)
 
     int cs = rest->cs;
 	
-#line 474 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 460 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -530,7 +530,7 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 41 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 27 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         rest->num.sign = 1;
         rest->num.idigits = 0;
@@ -539,25 +539,25 @@ _match:
     }
 	break;
 	case 1:
-#line 47 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 33 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         rest->num.sign = -1;
     }
 	break;
 	case 2:
-#line 50 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 36 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         rest->num.idigits = rest->num.idigits * 10 + ((*p) - '0');
     }
 	break;
 	case 3:
-#line 98 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 84 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         rest->str.count = 0;
     }
 	break;
 	case 4:
-#line 101 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 87 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         if (rest->str.count < rest->str.max)
             rest->str.buf[rest->str.count++] = (*p);
@@ -568,296 +568,296 @@ _match:
     }
 	break;
 	case 5:
-#line 109 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 95 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         if (rest->str.count < rest->str.max)
             rest->str.buf[rest->str.count] = '\0';
     }
 	break;
 	case 6:
-#line 124 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 110 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_method(rest, DBR_METHOD_DELETE);
+        sc_rest_set_method(rest, SC_METHOD_DELETE);
     }
 	break;
 	case 7:
-#line 127 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 113 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_method(rest, DBR_METHOD_GET);
+        sc_rest_set_method(rest, SC_METHOD_GET);
     }
 	break;
 	case 8:
-#line 130 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 116 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_method(rest, DBR_METHOD_HEAD);
+        sc_rest_set_method(rest, SC_METHOD_HEAD);
     }
 	break;
 	case 9:
-#line 133 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 119 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_method(rest, DBR_METHOD_POST);
+        sc_rest_set_method(rest, SC_METHOD_POST);
     }
 	break;
 	case 10:
-#line 136 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 122 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_method(rest, DBR_METHOD_PUT);
+        sc_rest_set_method(rest, SC_METHOD_PUT);
     }
 	break;
 	case 11:
-#line 145 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 131 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
+        sc_rest_set_resrc(rest, SC_RESRC_LOGON);
     }
 	break;
 	case 12:
-#line 148 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 134 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
+        sc_rest_set_resrc(rest, SC_RESRC_LOGOFF);
     }
 	break;
 	case 13:
-#line 151 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 137 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
+        sc_rest_set_resrc(rest, SC_RESRC_ACCNT);
     }
 	break;
 	case 14:
-#line 154 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 140 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
+        sc_rest_set_resrc(rest, SC_RESRC_CONTR);
     }
 	break;
 	case 15:
-#line 157 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 143 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_TRADER);
+        sc_rest_set_resrc(rest, SC_RESRC_TRADER);
     }
 	break;
 	case 16:
-#line 160 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 146 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_GIVEUP);
+        sc_rest_set_resrc(rest, SC_RESRC_GIVEUP);
     }
 	break;
 	case 17:
-#line 163 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 149 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
+        sc_rest_set_resrc(rest, SC_RESRC_ORDER);
     }
 	break;
 	case 18:
-#line 166 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 152 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
+        sc_rest_set_resrc(rest, SC_RESRC_TRADE);
     }
 	break;
 	case 19:
-#line 169 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 155 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
+        sc_rest_set_resrc(rest, SC_RESRC_POSN);
     }
 	break;
 	case 20:
-#line 172 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 158 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_VIEW);
+        sc_rest_set_resrc(rest, SC_RESRC_VIEW);
     }
 	break;
 	case 21:
-#line 186 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 172 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        rest->action = DBR_ACTION_BUY;
+        rest->action = SC_ACTION_BUY;
     }
 	break;
 	case 22:
-#line 189 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 175 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        rest->action = DBR_ACTION_SELL;
+        rest->action = SC_ACTION_SELL;
     }
 	break;
 	case 23:
-#line 198 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 184 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if ((rest->fields & DBR_METHOD_MASK) != 0) {
+        if ((rest->fields & SC_METHOD_MASK) != 0) {
             cs = json_error; msg = "method already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 24:
-#line 204 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 190 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if ((rest->fields & DBR_RESRC_MASK) != 0) {
+        if ((rest->fields & SC_RESRC_MASK) != 0) {
             cs = json_error; msg = "resrc already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 25:
-#line 210 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 196 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_ID) {
+        if (rest->fields & SC_PARAM_ID) {
             cs = json_error; msg = "id already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 26:
-#line 216 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 202 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ID);
+        sc_rest_set_param(rest, SC_PARAM_ID);
         rest->id = inum(rest);
     }
 	break;
 	case 27:
-#line 220 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 206 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_ACCNT) {
+        if (rest->fields & SC_PARAM_ACCNT) {
             cs = json_error; msg = "accnt already specified";
             {p++; goto _out; }
         }
         rest->str.buf = rest->accnt;
-        rest->str.max = DBR_MNEM_MAX;
+        rest->str.max = SC_MNEM_MAX;
     }
 	break;
 	case 28:
-#line 228 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 214 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
+        sc_rest_set_param(rest, SC_PARAM_ACCNT);
     }
 	break;
 	case 29:
-#line 231 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 217 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_GIVEUP) {
+        if (rest->fields & SC_PARAM_GIVEUP) {
             cs = json_error; msg = "giveup already specified";
             {p++; goto _out; }
         }
         rest->str.buf = rest->giveup;
-        rest->str.max = DBR_MNEM_MAX;
+        rest->str.max = SC_MNEM_MAX;
     }
 	break;
 	case 30:
-#line 239 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 225 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_GIVEUP);
+        sc_rest_set_param(rest, SC_PARAM_GIVEUP);
     }
 	break;
 	case 31:
-#line 242 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 228 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_CONTR) {
+        if (rest->fields & SC_PARAM_CONTR) {
             cs = json_error; msg = "contr already specified";
             {p++; goto _out; }
         }
         rest->str.buf = rest->contr;
-        rest->str.max = DBR_MNEM_MAX;
+        rest->str.max = SC_MNEM_MAX;
     }
 	break;
 	case 32:
-#line 250 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 236 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
+        sc_rest_set_param(rest, SC_PARAM_CONTR);
     }
 	break;
 	case 33:
-#line 253 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 239 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_SETTL_DATE) {
+        if (rest->fields & SC_PARAM_SETTL_DATE) {
             cs = json_error; msg = "settl-date already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 34:
-#line 259 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 245 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_SETTL_DATE);
+        sc_rest_set_param(rest, SC_PARAM_SETTL_DATE);
         rest->settl_date = inum(rest);
     }
 	break;
 	case 35:
-#line 263 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 249 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_REF) {
+        if (rest->fields & SC_PARAM_REF) {
             cs = json_error; msg = "ref already specified";
             {p++; goto _out; }
         }
         rest->str.buf = rest->ref;
-        rest->str.max = DBR_REF_MAX;
+        rest->str.max = SC_REF_MAX;
     }
 	break;
 	case 36:
-#line 271 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 257 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_REF);
+        sc_rest_set_param(rest, SC_PARAM_REF);
     }
 	break;
 	case 37:
-#line 274 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 260 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_ACTION) {
+        if (rest->fields & SC_PARAM_ACTION) {
             cs = json_error; msg = "action already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 38:
-#line 280 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 266 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ACTION);
+        sc_rest_set_param(rest, SC_PARAM_ACTION);
     }
 	break;
 	case 39:
-#line 283 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 269 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_TICKS) {
+        if (rest->fields & SC_PARAM_TICKS) {
             cs = json_error; msg = "ticks already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 40:
-#line 289 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 275 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_TICKS);
+        sc_rest_set_param(rest, SC_PARAM_TICKS);
         rest->ticks = inum(rest);
     }
 	break;
 	case 41:
-#line 293 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 279 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_LOTS) {
+        if (rest->fields & SC_PARAM_LOTS) {
             cs = json_error; msg = "lots already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 42:
-#line 299 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 285 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_LOTS);
+        sc_rest_set_param(rest, SC_PARAM_LOTS);
         rest->lots = inum(rest);
     }
 	break;
 	case 43:
-#line 303 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 289 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_MIN_LOTS) {
+        if (rest->fields & SC_PARAM_MIN_LOTS) {
             cs = json_error; msg = "min-lots already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 44:
-#line 309 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 295 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_MIN_LOTS);
+        sc_rest_set_param(rest, SC_PARAM_MIN_LOTS);
         rest->min_lots = inum(rest);
     }
 	break;
-#line 875 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 861 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 		}
 	}
 
@@ -870,11 +870,11 @@ _again:
 	_out: {}
 	}
 
-#line 354 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 340 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
     rest->cs = cs;
 
 	if (cs == json_error) {
-        dbr_err_set(DBR_EINVAL, msg);
+        sc_err_set(SC_EINVAL, msg);
 		return -1;
     }
 
@@ -885,11 +885,11 @@ _again:
 }
 
 
-#line 487 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 473 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 
 
 
-#line 907 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 893 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 static const char _rurl_actions[] = {
 	0, 1, 1, 1, 3, 1, 7, 1, 
 	11, 1, 12, 1, 13, 1, 14, 1, 
@@ -1026,10 +1026,10 @@ static const int rurl_error = 0;
 static const int rurl_en_main = 1;
 
 
-#line 490 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 476 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 
-DBR_API int
-dbr_rest_rurl(struct DbrRest* rest, const char* buf, size_t size)
+SC_API int
+sc_rest_rurl(struct ScRest* rest, const char* buf, size_t size)
 {
     int cs;
 	const char* p = buf;
@@ -1045,14 +1045,14 @@ dbr_rest_rurl(struct DbrRest* rest, const char* buf, size_t size)
     } str;
 
     
-#line 1063 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1049 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 	{
 	cs = rurl_start;
 	}
 
-#line 508 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 494 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
     
-#line 1070 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1056 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -1126,25 +1126,25 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 370 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 356 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         inum = 0;
     }
 	break;
 	case 1:
-#line 373 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 359 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         inum = inum * 10 + ((*p) - '0');
     }
 	break;
 	case 2:
-#line 378 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 364 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         str.count = 0;
     }
 	break;
 	case 3:
-#line 381 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 367 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         if (str.count < str.max)
             str.buf[str.count++] = (*p);
@@ -1155,132 +1155,132 @@ _match:
     }
 	break;
 	case 4:
-#line 389 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 375 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         if (str.count < str.max)
             str.buf[str.count] = '\0';
     }
 	break;
 	case 5:
-#line 395 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 381 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_ID) {
+        if (rest->fields & SC_PARAM_ID) {
             cs = rurl_error; msg = "id already specified";
             {p++; goto _out; }
         }
     }
 	break;
 	case 6:
-#line 401 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 387 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ID);
+        sc_rest_set_param(rest, SC_PARAM_ID);
         rest->id = inum;
     }
 	break;
 	case 7:
-#line 408 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 394 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_ACCNT) {
+        if (rest->fields & SC_PARAM_ACCNT) {
             cs = rurl_error; msg = "accnt already specified";
             {p++; goto _out; }
         }
         str.buf = rest->accnt;
-        str.max = DBR_MNEM_MAX;
+        str.max = SC_MNEM_MAX;
     }
 	break;
 	case 8:
-#line 416 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 402 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
+        sc_rest_set_param(rest, SC_PARAM_ACCNT);
     }
 	break;
 	case 9:
-#line 423 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 409 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if (rest->fields & DBR_PARAM_CONTR) {
+        if (rest->fields & SC_PARAM_CONTR) {
             cs = rurl_error; msg = "contr already specified";
             {p++; goto _out; }
         }
         str.buf = rest->contr;
-        str.max = DBR_MNEM_MAX;
+        str.max = SC_MNEM_MAX;
     }
 	break;
 	case 10:
-#line 431 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 417 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
+        sc_rest_set_param(rest, SC_PARAM_CONTR);
     }
 	break;
 	case 11:
-#line 437 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 423 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
+        sc_rest_set_resrc(rest, SC_RESRC_LOGON);
     }
 	break;
 	case 12:
-#line 440 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 426 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
+        sc_rest_set_resrc(rest, SC_RESRC_LOGOFF);
     }
 	break;
 	case 13:
-#line 443 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 429 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
+        sc_rest_set_resrc(rest, SC_RESRC_ACCNT);
     }
 	break;
 	case 14:
-#line 446 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 432 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
+        sc_rest_set_resrc(rest, SC_RESRC_CONTR);
     }
 	break;
 	case 15:
-#line 449 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 435 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_TRADER);
+        sc_rest_set_resrc(rest, SC_RESRC_TRADER);
     }
 	break;
 	case 16:
-#line 452 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 438 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_GIVEUP);
+        sc_rest_set_resrc(rest, SC_RESRC_GIVEUP);
     }
 	break;
 	case 17:
-#line 455 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 441 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
+        sc_rest_set_resrc(rest, SC_RESRC_ORDER);
     }
 	break;
 	case 18:
-#line 458 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 444 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
+        sc_rest_set_resrc(rest, SC_RESRC_TRADE);
     }
 	break;
 	case 19:
-#line 461 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 447 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
+        sc_rest_set_resrc(rest, SC_RESRC_POSN);
     }
 	break;
 	case 20:
-#line 464 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 450 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_VIEW);
+        sc_rest_set_resrc(rest, SC_RESRC_VIEW);
     }
 	break;
 	case 21:
-#line 479 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 465 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        if ((rest->fields & DBR_RESRC_MASK) != 0) {
+        if ((rest->fields & SC_RESRC_MASK) != 0) {
             cs = rurl_error; msg = "resrc already specified";
             {p++; goto _out; }
         }
     }
 	break;
-#line 1298 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1284 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 		}
 	}
 
@@ -1297,92 +1297,92 @@ _again:
 	while ( __nacts-- > 0 ) {
 		switch ( *__acts++ ) {
 	case 4:
-#line 389 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 375 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
         if (str.count < str.max)
             str.buf[str.count] = '\0';
     }
 	break;
 	case 6:
-#line 401 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 387 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ID);
+        sc_rest_set_param(rest, SC_PARAM_ID);
         rest->id = inum;
     }
 	break;
 	case 8:
-#line 416 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 402 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_ACCNT);
+        sc_rest_set_param(rest, SC_PARAM_ACCNT);
     }
 	break;
 	case 10:
-#line 431 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 417 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_param(rest, DBR_PARAM_CONTR);
+        sc_rest_set_param(rest, SC_PARAM_CONTR);
     }
 	break;
 	case 11:
-#line 437 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 423 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_LOGON);
+        sc_rest_set_resrc(rest, SC_RESRC_LOGON);
     }
 	break;
 	case 12:
-#line 440 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 426 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_LOGOFF);
+        sc_rest_set_resrc(rest, SC_RESRC_LOGOFF);
     }
 	break;
 	case 13:
-#line 443 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 429 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_ACCNT);
+        sc_rest_set_resrc(rest, SC_RESRC_ACCNT);
     }
 	break;
 	case 14:
-#line 446 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 432 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_CONTR);
+        sc_rest_set_resrc(rest, SC_RESRC_CONTR);
     }
 	break;
 	case 15:
-#line 449 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 435 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_TRADER);
+        sc_rest_set_resrc(rest, SC_RESRC_TRADER);
     }
 	break;
 	case 16:
-#line 452 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 438 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_GIVEUP);
+        sc_rest_set_resrc(rest, SC_RESRC_GIVEUP);
     }
 	break;
 	case 17:
-#line 455 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 441 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_ORDER);
+        sc_rest_set_resrc(rest, SC_RESRC_ORDER);
     }
 	break;
 	case 18:
-#line 458 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 444 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_TRADE);
+        sc_rest_set_resrc(rest, SC_RESRC_TRADE);
     }
 	break;
 	case 19:
-#line 461 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 447 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_POSN);
+        sc_rest_set_resrc(rest, SC_RESRC_POSN);
     }
 	break;
 	case 20:
-#line 464 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 450 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 	{
-        dbr_rest_set_resrc(rest, DBR_RESRC_VIEW);
+        sc_rest_set_resrc(rest, SC_RESRC_VIEW);
     }
 	break;
-#line 1400 "/Users/marayl/repo/doobry/src/elm/rest.c"
+#line 1386 "/Users/marayl/repo/swirlyc/src/elm/rest.c"
 		}
 	}
 	}
@@ -1390,10 +1390,10 @@ _again:
 	_out: {}
 	}
 
-#line 509 "/Users/marayl/repo/doobry/src/elm/rest.rl"
+#line 495 "/Users/marayl/repo/swirlyc/src/elm/rest.rl"
 
 	if (cs == rurl_error) {
-        dbr_err_set(DBR_EINVAL, msg);
+        sc_err_set(SC_EINVAL, msg);
 		return -1;
     }
 

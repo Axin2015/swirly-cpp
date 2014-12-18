@@ -1,9 +1,9 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/ash/prioq.h>
+#include <sc/ash/prioq.h>
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <assert.h>
 #include <stdlib.h> // malloc()
@@ -91,8 +91,8 @@
 
  */
 
-static inline DbrBool
-invariant(struct DbrPrioq* pq, size_t c, size_t p)
+static inline ScBool
+invariant(struct ScPrioq* pq, size_t c, size_t p)
 {
     return pq->elems[p].key <= pq->elems[c].key;
 }
@@ -112,15 +112,15 @@ parent(size_t i)
 }
 
 static inline void
-swap(struct DbrPrioq* pq, size_t i, size_t j)
+swap(struct ScPrioq* pq, size_t i, size_t j)
 {
-    struct DbrElem tmp = pq->elems[i];
+    struct ScElem tmp = pq->elems[i];
     pq->elems[i] = pq->elems[j];
     pq->elems[j] = tmp;
 }
 
 static size_t
-sift_up(struct DbrPrioq* pq, size_t c)
+sift_up(struct ScPrioq* pq, size_t c)
 {
     size_t p;
     // While child is not root.
@@ -135,7 +135,7 @@ sift_up(struct DbrPrioq* pq, size_t c)
 }
 
 static size_t
-sift_down(struct DbrPrioq* pq, size_t p)
+sift_down(struct ScPrioq* pq, size_t p)
 {
     const size_t n = pq->size;
     size_t c;
@@ -153,72 +153,72 @@ sift_down(struct DbrPrioq* pq, size_t p)
     return p;
 }
 
-static DbrBool
-grow(struct DbrPrioq* pq, size_t capacity)
+static ScBool
+grow(struct ScPrioq* pq, size_t capacity)
 {
     // One-based index.
-    struct DbrElem* elems = realloc(pq->elems, sizeof(struct DbrElem) * (1 + capacity));
+    struct ScElem* elems = realloc(pq->elems, sizeof(struct ScElem) * (1 + capacity));
     if (!elems) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        return DBR_FALSE;
+        sc_err_set(SC_ENOMEM, "out of memory");
+        return SC_FALSE;
     }
     // Commit.
     pq->capacity = capacity;
     pq->elems = elems;
-    return DBR_TRUE;
+    return SC_TRUE;
 }
 
-static inline DbrBool
-reserve(struct DbrPrioq* pq, size_t capacity)
+static inline ScBool
+reserve(struct ScPrioq* pq, size_t capacity)
 {
     // If desired capacity is less than or equal to the current capacity, the return true, otherwise
     // grow by 50%.
-    return capacity <= pq->capacity ? DBR_TRUE
-        : grow(pq, dbr_max(capacity, (pq->capacity * 3) / 2));
+    return capacity <= pq->capacity ? SC_TRUE
+        : grow(pq, sc_max(capacity, (pq->capacity * 3) / 2));
 }
 
-DBR_API void
-dbr_prioq_term(struct DbrPrioq* pq)
+SC_API void
+sc_prioq_term(struct ScPrioq* pq)
 {
     free(pq->elems);
 }
 
-DBR_API DbrBool
-dbr_prioq_init(struct DbrPrioq* pq)
+SC_API ScBool
+sc_prioq_init(struct ScPrioq* pq)
 {
     pq->size = 0;
     // Initial capacity.
     pq->capacity = 64;
     // One-based index.
-    pq->elems = malloc(sizeof(struct DbrElem) * (1 + pq->capacity));
+    pq->elems = malloc(sizeof(struct ScElem) * (1 + pq->capacity));
     if (!pq->elems) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
-        return DBR_FALSE;
+        sc_err_set(SC_ENOMEM, "out of memory");
+        return SC_FALSE;
     }
-    return DBR_TRUE;
+    return SC_TRUE;
 }
 
-DBR_API DbrBool
-dbr_prioq_reserve(struct DbrPrioq* pq, size_t capacity)
+SC_API ScBool
+sc_prioq_reserve(struct ScPrioq* pq, size_t capacity)
 {
     return reserve(pq, capacity);
 }
 
-DBR_API DbrBool
-dbr_prioq_push(struct DbrPrioq* pq, DbrIden id, DbrKey key)
+SC_API ScBool
+sc_prioq_push(struct ScPrioq* pq, ScIden id, ScKey key)
 {
     if (!reserve(pq, pq->size + 1))
-        return DBR_FALSE;
+        return SC_FALSE;
     // Push back.
     pq->elems[++pq->size].id = id;
     pq->elems[pq->size].key = key;
     // Restore invariant.
     sift_up(pq, pq->size);
-    return DBR_TRUE;
+    return SC_TRUE;
 }
 
-DBR_API void
-dbr_prioq_pop(struct DbrPrioq* pq)
+SC_API void
+sc_prioq_pop(struct ScPrioq* pq)
 {
     assert(pq->size > 0);
     // Fill gap with last.
@@ -227,11 +227,11 @@ dbr_prioq_pop(struct DbrPrioq* pq)
     sift_down(pq, 1);
 }
 
-DBR_API DbrBool
-dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
+SC_API ScBool
+sc_prioq_remove(struct ScPrioq* pq, ScIden id)
 {
     if (pq->size == 0)
-        return DBR_FALSE;
+        return SC_FALSE;
     // Linear search all except last.
     size_t i;
     for (i = 1; i < pq->size; ++i)
@@ -242,18 +242,18 @@ dbr_prioq_remove(struct DbrPrioq* pq, DbrIden id)
             // Shift down if not shifted up.
             if (sift_up(pq, i) == i)
                 sift_down(pq, i);
-            return DBR_TRUE;
+            return SC_TRUE;
         }
     // Gap fill is not required when last is removed.
     if (pq->elems[i].id == id) {
         pq->size--;
-        return DBR_TRUE;
+        return SC_TRUE;
     }
-    return DBR_FALSE;
+    return SC_FALSE;
 }
 
-DBR_API DbrBool
-dbr_prioq_replace(struct DbrPrioq* pq, DbrIden id, DbrKey key)
+SC_API ScBool
+sc_prioq_replace(struct ScPrioq* pq, ScIden id, ScKey key)
 {
     // Linear search.
     for (size_t i = 1; i <= pq->size; ++i)
@@ -264,7 +264,7 @@ dbr_prioq_replace(struct DbrPrioq* pq, DbrIden id, DbrKey key)
             // Shift down if not shifted up.
             if (sift_up(pq, i) == i)
                 sift_down(pq, i);
-            return DBR_TRUE;
+            return SC_TRUE;
         }
-    return DBR_FALSE;
+    return SC_FALSE;
 }

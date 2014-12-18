@@ -4,28 +4,28 @@
 #include "factory.hpp"
 #include "test.hpp"
 
-#include <dbrpp/elm/level.hpp>
-#include <dbrpp/elm/order.hpp>
-#include <dbrpp/elm/pool.hpp>
-#include <dbrpp/elm/side.hpp>
+#include <scpp/elm/level.hpp>
+#include <scpp/elm/order.hpp>
+#include <scpp/elm/pool.hpp>
+#include <scpp/elm/side.hpp>
 
-#include <dbr/ash/util.h>
+#include <sc/ash/util.h>
 
-using namespace dbr;
+using namespace sc;
 
 TEST_CASE(side_orders)
 {
     Pool pool(8 * 1024 * 1024);
     auto trader = create_wramirez(pool);
-    auto giveup = create_dbra(pool);
+    auto giveup = create_sca(pool);
     auto contr = create_eurusd(pool);
-    auto now = dbr_millis();
+    auto now = sc_millis();
 
     // Two orders at the same price level.
-    auto apple = create_order(pool, 1, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
-                              "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    auto orange = create_order(pool, 2, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
-                               "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
+    auto apple = create_order(pool, 1, *trader, *giveup, *contr, sc_ymd_to_jd(2014, 3, 14),
+                              "apple", SC_ACTION_BUY, 12345, 10, 0, now);
+    auto orange = create_order(pool, 2, *trader, *giveup, *contr, sc_ymd_to_jd(2014, 3, 14),
+                               "orange", SC_ACTION_BUY, 12345, 20, 0, now);
 
     Side side(pool);
 
@@ -45,7 +45,7 @@ TEST_CASE(side_orders)
     side.place_order(*apple, now);
     side.place_order(*orange, now);
 
-    check(apple->i.state == DBR_STATE_NEW);
+    check(apple->i.state == SC_STATE_NEW);
     check(apple->i.resd == 10);
     check(apple->i.exec == 0);
     check(apple->i.last_ticks == -1);
@@ -65,9 +65,9 @@ TEST_CASE(side_orders)
     check(level.count() == 2);
 
     // Revise first order.
-    side.revise_order(*apple, 5, dbr_millis());
+    side.revise_order(*apple, 5, sc_millis());
 
-    check(apple->i.state == DBR_STATE_REVISE);
+    check(apple->i.state == SC_STATE_REVISE);
     check(apple->i.resd == 5);
     check(apple->i.exec == 0);
     check(apple->i.last_ticks == -1);
@@ -85,9 +85,9 @@ TEST_CASE(side_orders)
     check(level.count() == 2);
 
     // Cancel second order.
-    side.cancel_order(*orange, dbr_millis());
+    side.cancel_order(*orange, sc_millis());
 
-    check(orange->i.state == DBR_STATE_CANCEL);
+    check(orange->i.state == SC_STATE_CANCEL);
     check(orange->i.resd == 0);
     check(orange->i.exec == 0);
     check(orange->i.last_ticks == -1);
@@ -109,22 +109,22 @@ TEST_CASE(side_levels)
 {
     Pool pool(8 * 1024 * 1024);
     auto trader = create_wramirez(pool);
-    auto giveup = create_dbra(pool);
+    auto giveup = create_sca(pool);
     auto contr = create_eurusd(pool);
-    auto now = dbr_millis();
+    auto now = sc_millis();
 
-    auto apple = create_order(pool, 1, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
-                              "apple", DBR_ACTION_BUY, 12345, 10, 0, now);
-    auto orange = create_order(pool, 2, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
-                               "orange", DBR_ACTION_BUY, 12345, 20, 0, now);
+    auto apple = create_order(pool, 1, *trader, *giveup, *contr, sc_ymd_to_jd(2014, 3, 14),
+                              "apple", SC_ACTION_BUY, 12345, 10, 0, now);
+    auto orange = create_order(pool, 2, *trader, *giveup, *contr, sc_ymd_to_jd(2014, 3, 14),
+                               "orange", SC_ACTION_BUY, 12345, 20, 0, now);
     // Best inserted last.
-    auto pear = create_order(pool, 3, *trader, *giveup, *contr, dbr_ymd_to_jd(2014, 3, 14),
-                             "pear", DBR_ACTION_BUY, 12346, 30, 0, now);
+    auto pear = create_order(pool, 3, *trader, *giveup, *contr, sc_ymd_to_jd(2014, 3, 14),
+                             "pear", SC_ACTION_BUY, 12346, 30, 0, now);
 
     Side side(pool);
-    side.place_order(*apple, dbr_millis());
-    side.place_order(*orange, dbr_millis());
-    side.place_order(*pear, dbr_millis());
+    side.place_order(*apple, sc_millis());
+    side.place_order(*orange, sc_millis());
+    side.place_order(*pear, sc_millis());
 
     check(side.levels().size() == 2);
     check(side.orders().size() == 3);

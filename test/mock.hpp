@@ -4,31 +4,31 @@
 #ifndef MOCK_HPP
 #define MOCK_HPP
 
-#include <dbrpp/elm/journ.hpp>
-#include <dbrpp/elm/model.hpp>
+#include <scpp/elm/journ.hpp>
+#include <scpp/elm/model.hpp>
 
-class Journ : public dbr::IJourn<Journ> {
+class Journ : public sc::IJourn<Journ> {
 public:
     void
     destroy() noexcept;
 
-    DbrBool
-    insert_exec_list(DbrSlNode* first, DbrBool enriched) noexcept;
+    ScBool
+    insert_exec_list(ScSlNode* first, ScBool enriched) noexcept;
 
-    DbrBool
-    insert_exec(DbrExec& exec, DbrBool enriched) noexcept;
+    ScBool
+    insert_exec(ScExec& exec, ScBool enriched) noexcept;
 
-    DbrBool
-    update_exec(DbrIden id, DbrMillis modified) noexcept;
+    ScBool
+    update_exec(ScIden id, ScMillis modified) noexcept;
 };
 
-class Model : public dbr::IModel<Model> {
+class Model : public sc::IModel<Model> {
 public:
     void
     destroy() noexcept;
 
     ssize_t
-    read_entity(int type, DbrPool pool, DbrSlNode*& first) noexcept;
+    read_entity(int type, ScPool pool, ScSlNode*& first) noexcept;
 };
 
 #endif // MOCK_HPP

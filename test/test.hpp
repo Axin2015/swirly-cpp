@@ -4,7 +4,7 @@
 #ifndef TEST_HPP
 #define TEST_HPP
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <cmath>    // fabs()
 #include <cstring>  // strcmp()
@@ -13,7 +13,7 @@
 class TestException : public std::exception {
     const char* file_;
     int line_;
-    char msg_[DBR_ERRMSG_MAX + 1];
+    char msg_[SC_ERRMSG_MAX + 1];
 public:
     virtual
     ~TestException() noexcept
@@ -23,8 +23,8 @@ public:
     {
         file_ = file;
         line_ = line;
-        strncpy(msg_, msg, DBR_ERRMSG_MAX);
-        msg_[DBR_ERRMSG_MAX] = '\0';
+        strncpy(msg_, msg, SC_ERRMSG_MAX);
+        msg_[SC_ERRMSG_MAX] = '\0';
     }
     virtual const char*
     what() const noexcept

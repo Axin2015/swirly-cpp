@@ -4,23 +4,23 @@
 #ifndef FIG_ASYNC_H
 #define FIG_ASYNC_H
 
-#include <dbr/fig/async.h>
+#include <sc/fig/async.h>
 
 #define FIG_ASYNC_CLOSE ((void*)~0)
 
-DBR_EXTERN void*
-fig_async_create(void* zctx, const DbrUuid uuid);
+SC_EXTERN void*
+fig_async_create(void* zctx, const ScUuid uuid);
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_async_destroy(void* sock);
 
-DBR_EXTERN DbrBool
+SC_EXTERN ScBool
 fig_async_send(void* sock, void* val);
 
-DBR_EXTERN DbrBool
+SC_EXTERN ScBool
 fig_async_recv(void* sock, void** val);
 
-DBR_EXTERN DbrBool
+SC_EXTERN ScBool
 fig_async_close(void* sock);
 
 #endif // FIG_ASYNC_H

@@ -4,27 +4,27 @@
 #ifndef ELM_MSG_H
 #define ELM_MSG_H
 
-#include <dbr/elm/msg.h>
+#include <sc/elm/msg.h>
 
-DBR_EXTERN size_t
-elm_body_len(struct DbrBody* body, DbrBool enriched);
+SC_EXTERN size_t
+elm_body_len(struct ScBody* body, ScBool enriched);
 
-DBR_EXTERN char*
-elm_write_body(char* buf, const struct DbrBody* body, DbrBool enriched);
+SC_EXTERN char*
+elm_write_body(char* buf, const struct ScBody* body, ScBool enriched);
 
-DBR_EXTERN const char*
-elm_read_body(const char* buf, DbrPool pool, struct DbrBody* body);
+SC_EXTERN const char*
+elm_read_body(const char* buf, ScPool pool, struct ScBody* body);
 
-DBR_EXTERN DbrBool
-elm_send_body(void* sock, struct DbrBody* body, DbrBool enriched);
+SC_EXTERN ScBool
+elm_send_body(void* sock, struct ScBody* body, ScBool enriched);
 
-DBR_EXTERN DbrBool
-elm_send_msg(void* sock, const DbrUuid uuid, struct DbrBody* body, DbrBool enriched);
+SC_EXTERN ScBool
+elm_send_msg(void* sock, const ScUuid uuid, struct ScBody* body, ScBool enriched);
 
-DBR_EXTERN DbrBool
-elm_recv_body(void* sock, DbrPool pool, struct DbrBody* body);
+SC_EXTERN ScBool
+elm_recv_body(void* sock, ScPool pool, struct ScBody* body);
 
-DBR_EXTERN DbrBool
-elm_recv_msg(void* sock, DbrPool pool, struct DbrMsg* msg);
+SC_EXTERN ScBool
+elm_recv_msg(void* sock, ScPool pool, struct ScMsg* msg);
 
 #endif // ELM_MSG_H

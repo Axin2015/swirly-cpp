@@ -1,9 +1,9 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/ash/log.h>
+#include <sc/ash/log.h>
 
-#include <dbr/ash/util.h>
+#include <sc/ash/util.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -22,36 +22,36 @@ static const char* LABELS[] = {
 
 static __thread struct {
     int level;
-    DbrLogger logger;
+    ScLogger logger;
 } log = {
-#if DBR_DEBUG_LEVEL >= 1
-    .level = DBR_LOG_DEBUG1,
-#else  // DBR_DEBUG_LEVEL < 1
-    .level = DBR_LOG_INFO,
-#endif // DBR_DEBUG_LEVEL < 1
-    .logger = dbr_log_clnt
+#if SC_DEBUG_LEVEL >= 1
+    .level = SC_LOG_DEBUG1,
+#else  // SC_DEBUG_LEVEL < 1
+    .level = SC_LOG_INFO,
+#endif // SC_DEBUG_LEVEL < 1
+    .logger = sc_log_clnt
 };
 
-DBR_API const char*
-dbr_log_label(int level)
+SC_API const char*
+sc_log_label(int level)
 {
-    return LABELS[level < DBR_LOG_DEBUG1 ? level : DBR_LOG_DEBUG1];
+    return LABELS[level < SC_LOG_DEBUG1 ? level : SC_LOG_DEBUG1];
 }
 
-DBR_API int
-dbr_log_level(void)
+SC_API int
+sc_log_level(void)
 {
     return log.level;
 }
 
-DBR_API DbrLogger
-dbr_log_logger(void)
+SC_API ScLogger
+sc_log_logger(void)
 {
     return log.logger;
 }
 
-DBR_API int
-dbr_log_setlevel(int level)
+SC_API int
+sc_log_setlevel(int level)
 {
     assert(level >= 0);
     int prev = log.level;
@@ -59,26 +59,26 @@ dbr_log_setlevel(int level)
     return prev;
 }
 
-DBR_API DbrLogger
-dbr_log_setlogger(DbrLogger logger)
+SC_API ScLogger
+sc_log_setlogger(ScLogger logger)
 {
     assert(logger);
-    DbrLogger prev = log.logger;
+    ScLogger prev = log.logger;
     log.logger = logger;
     return prev;
 }
 
-DBR_API void
-dbr_log_clnt(int level, const char* msg)
+SC_API void
+sc_log_clnt(int level, const char* msg)
 {
-    FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
+    FILE* stream = level > SC_LOG_WARN ? stdout : stderr;
     fprintf(stream, "%s\n", msg);
 }
 
-DBR_API void
-dbr_log_serv(int level, const char* msg)
+SC_API void
+sc_log_serv(int level, const char* msg)
 {
-    const long ms = dbr_millis();
+    const long ms = sc_millis();
     const time_t now = ms / 1000;
 
     struct tm tm;
@@ -87,29 +87,29 @@ dbr_log_serv(int level, const char* msg)
     char buf[sizeof("Mar 12 06:26:39")];
     strftime(buf, sizeof(buf), "%b %d %H:%M:%S", &tm);
 
-    FILE* stream = level > DBR_LOG_WARN ? stdout : stderr;
-    fprintf(stream, "%s.%03d %-6s [%d]: %s\n", buf, (int)(ms % 1000), dbr_log_label(level),
+    FILE* stream = level > SC_LOG_WARN ? stdout : stderr;
+    fprintf(stream, "%s.%03d %-6s [%d]: %s\n", buf, (int)(ms % 1000), sc_log_label(level),
             (int)getpid(), msg);
 }
 
-DBR_API void
-dbr_log_syslog(int level, const char* msg)
+SC_API void
+sc_log_syslog(int level, const char* msg)
 {
     int priority;
     switch (level) {
-    case DBR_LOG_CRIT:
+    case SC_LOG_CRIT:
         priority = LOG_CRIT;
         break;
-    case DBR_LOG_ERROR:
+    case SC_LOG_ERROR:
         priority = LOG_ERR;
         break;
-    case DBR_LOG_WARN:
+    case SC_LOG_WARN:
         priority = LOG_WARNING;
         break;
-    case DBR_LOG_NOTICE:
+    case SC_LOG_NOTICE:
         priority = LOG_NOTICE;
         break;
-    case DBR_LOG_INFO:
+    case SC_LOG_INFO:
         priority = LOG_INFO;
         break;
     default:
@@ -118,27 +118,27 @@ dbr_log_syslog(int level, const char* msg)
     syslog(priority, "%s", msg);
 }
 
-DBR_API void
-dbr_log_printf(int level, const char* format, ...)
+SC_API void
+sc_log_printf(int level, const char* format, ...)
 {
     if (level > log.level)
         return;
 
     va_list args;
     va_start(args, format);
-    char msg[DBR_LOGMSG_MAX + 1];
+    char msg[SC_LOGMSG_MAX + 1];
     vsnprintf(msg, sizeof(msg), format, args);
     log.logger(level, msg);
     va_end(args);
 }
 
-DBR_API void
-dbr_log_vprintf(int level, const char* format, va_list args)
+SC_API void
+sc_log_vprintf(int level, const char* format, va_list args)
 {
     if (level > log.level)
         return;
 
-    char msg[DBR_LOGMSG_MAX + 1];
+    char msg[SC_LOGMSG_MAX + 1];
     vsnprintf(msg, sizeof(msg), format, args);
     log.logger(level, msg);
 }

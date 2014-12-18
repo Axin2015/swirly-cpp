@@ -3,11 +3,11 @@
  */
 #include "test.hpp"
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 TEST_CASE(err_clear)
 {
-    dbr_err_clear();
-    check(dbr_err_num() == 0);
-    check(*dbr_err_msg() == '\0');
+    sc_err_clear();
+    check(sc_err_num() == 0);
+    check(*sc_err_msg() == '\0');
 }

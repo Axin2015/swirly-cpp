@@ -1,27 +1,27 @@
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
  */
-#include <dbr/fir/sqlmodel.h>
+#include <sc/fir/sqlmodel.h>
 
 #include "sqlite.h"
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <stdlib.h>
 
 struct SqlModel {
     struct FirSqlite sqlite;
-    struct DbrIModel i_model;
+    struct ScIModel i_model;
 };
 
 static inline struct SqlModel*
-model_implof(DbrModel model)
+model_implof(ScModel model)
 {
-    return dbr_implof(struct SqlModel, i_model, model);
+    return sc_implof(struct SqlModel, i_model, model);
 }
 
 static void
-destroy(DbrModel model)
+destroy(ScModel model)
 {
     struct SqlModel* impl = model_implof(model);
     fir_sqlite_term(&impl->sqlite);
@@ -29,24 +29,24 @@ destroy(DbrModel model)
 }
 
 static ssize_t
-read_entity(DbrModel model, int type, DbrPool pool, struct DbrSlNode** first)
+read_entity(ScModel model, int type, ScPool pool, struct ScSlNode** first)
 {
     struct SqlModel* impl = model_implof(model);
     struct FirSqlite* sqlite = &impl->sqlite;
     return fir_sqlite_select_entity(sqlite, type, pool, first);
 }
 
-static const struct DbrModelVtbl MODEL_VTBL = {
+static const struct ScModelVtbl MODEL_VTBL = {
     .destroy = destroy,
     .read_entity = read_entity
 };
 
-DBR_API DbrModel
-dbr_sqlmodel_create(const char* path)
+SC_API ScModel
+sc_sqlmodel_create(const char* path)
 {
     struct SqlModel* impl = malloc(sizeof(struct SqlModel));
-    if (dbr_unlikely(!impl)) {
-        dbr_err_set(DBR_ENOMEM, "out of memory");
+    if (sc_unlikely(!impl)) {
+        sc_err_set(SC_ENOMEM, "out of memory");
         goto fail1;
     }
 

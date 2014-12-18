@@ -3,55 +3,55 @@
  */
 #include "cache.h"
 
-#include <dbr/elm/pool.h>
+#include <sc/elm/pool.h>
 
-#include <dbr/ash/err.h>
+#include <sc/ash/err.h>
 
 #include <stdlib.h> // abort()
 #include <string.h>
 
-static inline struct DbrRec*
-rec_entry_id(struct DbrSlNode* node)
+static inline struct ScRec*
+rec_entry_id(struct ScSlNode* node)
 {
-    return dbr_implof(struct DbrRec, id_node_, node);
+    return sc_implof(struct ScRec, id_node_, node);
 }
 
-static inline struct DbrRec*
-rec_entry_mnem(struct DbrSlNode* node)
+static inline struct ScRec*
+rec_entry_mnem(struct ScSlNode* node)
 {
-    return dbr_implof(struct DbrRec, mnem_node_, node);
+    return sc_implof(struct ScRec, mnem_node_, node);
 }
 
 static void
-term_state_noop(struct DbrRec* rec)
+term_state_noop(struct ScRec* rec)
 {
 }
 
 static inline void
-free_rec_list(struct DbrSlNode* node, void (*term_state)(struct DbrRec*), DbrPool pool)
+free_rec_list(struct ScSlNode* node, void (*term_state)(struct ScRec*), ScPool pool)
 {
     while (node) {
-        struct DbrRec* rec = dbr_shared_rec_entry(node);
+        struct ScRec* rec = sc_shared_rec_entry(node);
         node = node->next;
         term_state(rec);
-        dbr_pool_free_rec(pool, rec);
+        sc_pool_free_rec(pool, rec);
     }
 }
 
-static inline DbrBool
-equal_id(const struct DbrRec* rec, int type, DbrIden id)
+static inline ScBool
+equal_id(const struct ScRec* rec, int type, ScIden id)
 {
     return rec->type == type && rec->id == id;
 }
 
-static inline DbrBool
-equal_mnem(const struct DbrRec* rec, int type, const char* mnem)
+static inline ScBool
+equal_mnem(const struct ScRec* rec, int type, const char* mnem)
 {
-    return rec->type == type && strncmp(rec->mnem, mnem, DBR_MNEM_MAX) == 0;
+    return rec->type == type && strncmp(rec->mnem, mnem, SC_MNEM_MAX) == 0;
 }
 
 static inline size_t
-hash_id(int type, DbrIden id)
+hash_id(int type, ScIden id)
 {
     size_t h = type;
     h ^= id + 0x9e3779b9 + (h << 6) + (h >> 2);
@@ -62,55 +62,55 @@ static inline size_t
 hash_mnem(int type, const char* mnem)
 {
     size_t h = type;
-    for (int i = 0; *mnem != '\0' && i < DBR_MNEM_MAX; ++mnem, ++i)
+    for (int i = 0; *mnem != '\0' && i < SC_MNEM_MAX; ++mnem, ++i)
         h = 31 * h + *mnem;
     return h;
 }
 
 static inline void
-insert_id(struct FigCache* cache, struct DbrRec* rec)
+insert_id(struct FigCache* cache, struct ScRec* rec)
 {
     const size_t bucket = hash_id(rec->type, rec->id) % FIG_CACHE_BUCKETS;
-    struct DbrStack* ids = &cache->buckets[bucket].ids;
-    dbr_stack_push(ids, &rec->id_node_);
+    struct ScStack* ids = &cache->buckets[bucket].ids;
+    sc_stack_push(ids, &rec->id_node_);
 }
 
 static inline void
-insert_mnem(struct FigCache* cache, struct DbrRec* rec)
+insert_mnem(struct FigCache* cache, struct ScRec* rec)
 {
     const size_t bucket = hash_mnem(rec->type, rec->mnem) % FIG_CACHE_BUCKETS;
-    struct DbrStack* mnems = &cache->buckets[bucket].mnems;
-    dbr_stack_push(mnems, &rec->mnem_node_);
+    struct ScStack* mnems = &cache->buckets[bucket].mnems;
+    sc_stack_push(mnems, &rec->mnem_node_);
 }
 
 static void
-emplace_accnt(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+emplace_accnt(struct FigCache* cache, struct ScSlNode* first, size_t size)
 {
     assert(!cache->first_accnt);
     cache->first_accnt = first;
     cache->accnt_size = size;
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_shared_rec_entry(node);
+    for (struct ScSlNode* node = first; node; node = node->next) {
+        struct ScRec* rec = sc_shared_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
 }
 
 static void
-emplace_contr(struct FigCache* cache, struct DbrSlNode* first, size_t size)
+emplace_contr(struct FigCache* cache, struct ScSlNode* first, size_t size)
 {
     assert(!cache->first_contr);
     cache->first_contr = first;
     cache->contr_size = size;
-    for (struct DbrSlNode* node = first; node; node = node->next) {
-        struct DbrRec* rec = dbr_shared_rec_entry(node);
+    for (struct ScSlNode* node = first; node; node = node->next) {
+        struct ScRec* rec = sc_shared_rec_entry(node);
         insert_id(cache, rec);
         insert_mnem(cache, rec);
     }
 }
 
-DBR_EXTERN void
-fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPool pool)
+SC_EXTERN void
+fig_cache_init(struct FigCache* cache, void (*term_state)(struct ScRec*), ScPool pool)
 {
     cache->term_state = term_state ? term_state : term_state_noop;
     cache->pool = pool;
@@ -122,76 +122,76 @@ fig_cache_init(struct FigCache* cache, void (*term_state)(struct DbrRec*), DbrPo
     memset(cache->buckets, 0, sizeof(cache->buckets));
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_cache_term(struct FigCache* cache)
 {
     free_rec_list(cache->first_contr, cache->term_state, cache->pool);
     free_rec_list(cache->first_accnt, cache->term_state, cache->pool);
 }
 
-DBR_EXTERN void
+SC_EXTERN void
 fig_cache_reset(struct FigCache* cache)
 {
-    void (*term_state)(struct DbrRec*) = cache->term_state;
-    DbrPool pool = cache->pool;
+    void (*term_state)(struct ScRec*) = cache->term_state;
+    ScPool pool = cache->pool;
     fig_cache_term(cache);
     fig_cache_init(cache, term_state, pool);
 }
 
-DBR_EXTERN void
-fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size)
+SC_EXTERN void
+fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct ScSlNode* first, size_t size)
 {
     switch (type) {
-    case DBR_ENTITY_ACCNT:
+    case SC_ENTITY_ACCNT:
         emplace_accnt(cache, first, size);
         break;
-    case DBR_ENTITY_CONTR:
+    case SC_ENTITY_CONTR:
         emplace_contr(cache, first, size);
         break;
     default:
-        assert(DBR_FALSE);
+        assert(SC_FALSE);
         break;
     }
 }
 
-DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id)
+SC_EXTERN struct ScSlNode*
+fig_cache_find_rec_id(const struct FigCache* cache, int type, ScIden id)
 {
     const size_t bucket = hash_id(type, id) % FIG_CACHE_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].ids);
+    for (struct ScSlNode* node = sc_stack_first(&cache->buckets[bucket].ids);
          node; node = node->next) {
-        struct DbrRec* rec = rec_entry_id(node);
+        struct ScRec* rec = rec_entry_id(node);
         if (equal_id(rec, type, id))
             return &rec->shared_node_;
     }
     return NULL;
 }
 
-DBR_EXTERN struct DbrSlNode*
+SC_EXTERN struct ScSlNode*
 fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem)
 {
     assert(mnem);
     const size_t bucket = hash_mnem(type, mnem) % FIG_CACHE_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].mnems);
+    for (struct ScSlNode* node = sc_stack_first(&cache->buckets[bucket].mnems);
          node; node = node->next) {
-        struct DbrRec* rec = rec_entry_mnem(node);
+        struct ScRec* rec = rec_entry_mnem(node);
         if (equal_mnem(rec, type, mnem))
             return &rec->shared_node_;
     }
     return NULL;
 }
 
-DBR_EXTERN struct DbrSlNode*
+SC_EXTERN struct ScSlNode*
 fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
 {
-    struct DbrSlNode* first;
+    struct ScSlNode* first;
     switch (type) {
-    case DBR_ENTITY_ACCNT:
+    case SC_ENTITY_ACCNT:
         first = cache->first_accnt;
         if (size)
             *size = cache->accnt_size;
         break;
-    case DBR_ENTITY_CONTR:
+    case SC_ENTITY_CONTR:
         first = cache->first_contr;
         if (size)
             *size = cache->contr_size;
@@ -202,15 +202,15 @@ fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
     return first;
 }
 
-DBR_EXTERN DbrBool
+SC_EXTERN ScBool
 fig_cache_empty_rec(struct FigCache* cache, int type)
 {
-    struct DbrSlNode* first;
+    struct ScSlNode* first;
     switch (type) {
-    case DBR_ENTITY_ACCNT:
+    case SC_ENTITY_ACCNT:
         first = cache->first_accnt;
         break;
-    case DBR_ENTITY_CONTR:
+    case SC_ENTITY_CONTR:
         first = cache->first_contr;
         break;
     default:
