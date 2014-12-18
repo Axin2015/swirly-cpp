@@ -56,8 +56,8 @@ TEST_CASE(side_orders)
     orange->i.last_lots = -1;
 
     // Place orders.
-    side.place_order(*apple, dbr_millis());
-    side.place_order(*orange, dbr_millis());
+    side.place_order(*apple, now);
+    side.place_order(*orange, now);
 
     check(apple->i.state == DBR_STATE_NEW);
     check(apple->i.resd == 10);

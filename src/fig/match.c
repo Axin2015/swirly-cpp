@@ -77,8 +77,7 @@ spread(struct DbrOrder* taker, struct DbrOrder* maker, int direct)
 
 static DbrBool
 match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide* side, int direct,
-             struct DbrBank* bank, DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool,
-             struct DbrTrans* trans)
+             struct DbrBank* bank, struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans)
 {
     DbrLots taken = 0;
     DbrTicks last_ticks = 0;
@@ -222,7 +221,7 @@ match_orders(struct DbrBook* book, struct DbrOrder* taker, const struct DbrSide*
 
 DBR_EXTERN DbrBool
 fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* bank,
-                 DbrJourn journ, struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans)
+                 struct FigOrdIdx* ordidx, DbrPool pool, struct DbrTrans* trans)
 {
     struct DbrSide* side;
     int direct;
@@ -238,5 +237,5 @@ fig_match_orders(struct DbrBook* book, struct DbrOrder* taker, struct DbrBank* b
         direct = DBR_GIVEN;
     }
 
-    return match_orders(book, taker, side, direct, bank, journ, ordidx, pool, trans);
+    return match_orders(book, taker, side, direct, bank, ordidx, pool, trans);
 }

@@ -177,12 +177,13 @@ fig_accnt_posn(struct DbrRec* arec, struct DbrRec* crec, DbrJd settl_day,
     assert(crec);
     assert(crec->type == DBR_ENTITY_CONTR);
 
-    const DbrKey key = dbr_posn_key(arec->id, crec->id, settl_day);
+    struct DbrPosn* posn;
+
     struct FigAccnt* accnt = fig_accnt_lazy(arec, ordidx, pool);
     if (dbr_unlikely(!accnt))
         return NULL;
 
-    struct DbrPosn* posn;
+    const DbrKey key = dbr_posn_key(arec->id, crec->id, settl_day);
 	struct DbrRbNode* node = dbr_tree_pfind(&accnt->posns, key);
     if (!node || node->key != key) {
         if (!(posn = dbr_pool_alloc_posn(accnt->pool)))

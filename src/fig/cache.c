@@ -169,6 +169,33 @@ fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* f
 }
 
 DBR_EXTERN struct DbrSlNode*
+fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id)
+{
+    const size_t bucket = hash_id(type, id) % FIG_CACHE_BUCKETS;
+    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].ids);
+         node; node = node->next) {
+        struct DbrRec* rec = rec_entry_id(node);
+        if (equal_id(rec, type, id))
+            return &rec->shared_node_;
+    }
+    return NULL;
+}
+
+DBR_EXTERN struct DbrSlNode*
+fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem)
+{
+    assert(mnem);
+    const size_t bucket = hash_mnem(type, mnem) % FIG_CACHE_BUCKETS;
+    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].mnems);
+         node; node = node->next) {
+        struct DbrRec* rec = rec_entry_mnem(node);
+        if (equal_mnem(rec, type, mnem))
+            return &rec->shared_node_;
+    }
+    return NULL;
+}
+
+DBR_EXTERN struct DbrSlNode*
 fig_cache_first_rec(struct FigCache* cache, int type, size_t* size)
 {
     struct DbrSlNode* first;
@@ -204,31 +231,4 @@ fig_cache_empty_rec(struct FigCache* cache, int type)
         abort();
     }
     return first == FIG_CACHE_END_REC;
-}
-
-DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id)
-{
-    const size_t bucket = hash_id(type, id) % FIG_CACHE_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].ids);
-         node; node = node->next) {
-        struct DbrRec* rec = rec_entry_id(node);
-        if (equal_id(rec, type, id))
-            return &rec->shared_node_;
-    }
-    return NULL;
-}
-
-DBR_EXTERN struct DbrSlNode*
-fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem)
-{
-    assert(mnem);
-    const size_t bucket = hash_mnem(type, mnem) % FIG_CACHE_BUCKETS;
-    for (struct DbrSlNode* node = dbr_stack_first(&cache->buckets[bucket].mnems);
-         node; node = node->next) {
-        struct DbrRec* rec = rec_entry_mnem(node);
-        if (equal_mnem(rec, type, mnem))
-            return &rec->shared_node_;
-    }
-    return NULL;
 }

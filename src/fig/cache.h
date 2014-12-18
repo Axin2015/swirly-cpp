@@ -62,15 +62,15 @@ DBR_EXTERN void
 fig_cache_emplace_rec_list(struct FigCache* cache, int type, struct DbrSlNode* first, size_t size);
 
 DBR_EXTERN struct DbrSlNode*
-fig_cache_first_rec(struct FigCache* cache, int type, size_t* size);
-
-DBR_EXTERN DbrBool
-fig_cache_empty_rec(struct FigCache* cache, int type);
-
-DBR_EXTERN struct DbrSlNode*
 fig_cache_find_rec_id(const struct FigCache* cache, int type, DbrIden id);
 
 DBR_EXTERN struct DbrSlNode*
 fig_cache_find_rec_mnem(const struct FigCache* cache, int type, const char* mnem);
+
+DBR_EXTERN struct DbrSlNode*
+fig_cache_first_rec(struct FigCache* cache, int type, size_t* size);
+
+DBR_EXTERN DbrBool
+fig_cache_empty_rec(struct FigCache* cache, int type);
 
 #endif // FIG_CACHE_H

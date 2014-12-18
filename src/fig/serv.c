@@ -566,8 +566,7 @@ dbr_serv_place(DbrServ serv, DbrAccnt trader, DbrAccnt giveup, struct DbrBook* b
     dbr_queue_insert_front(&trans.execs, &new_exec->shared_node_);
 
     // Order fields are updated on match.
-    if (!fig_match_orders(book, new_order, &serv->bank, serv->journ, &serv->ordidx,
-                          serv->pool, &trans))
+    if (!fig_match_orders(book, new_order, &serv->bank, &serv->ordidx, serv->pool, &trans))
         goto fail3;
 
     // Place incomplete order in book.
