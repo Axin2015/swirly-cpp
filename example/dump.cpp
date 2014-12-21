@@ -20,9 +20,9 @@ main(int argc, char* argv[])
     cerr.sync_with_stdio(true);
     try {
         Pool pool(8 * 1024 * 1024);
-        auto journ = sqljourn_create("swirly.db");
-        auto model = sqlmodel_create("swirly.db");
-        Serv serv("swirly.bin", journ.get(), pool);
+        auto journ = sqljourn_create("twirly.db");
+        auto model = sqlmodel_create("twirly.db");
+        Serv serv("twirly.bin", journ.get(), pool);
         serv.load(model.get());
 
         cout << "accnts:\n";

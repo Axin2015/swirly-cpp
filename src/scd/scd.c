@@ -1000,8 +1000,8 @@ main(int argc, char* argv[])
     struct Config config = {
         .daemon = SC_FALSE,
         .prefix = "",
-        .bankfile = "swirly.bin",
-        .dbfile = "swirly.db",
+        .bankfile = "twirly.bin",
+        .dbfile = "twirly.db",
         .logfile = "",
         .journsize = 1 * 1024 * 1024,
         .poolsize = 1 * 1024 * 1024

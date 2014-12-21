@@ -11,7 +11,7 @@
 #include <sc/fig.h>
 
 typedef struct {
-    ScBool swirly;
+    ScBool twirly;
     ngx_str_t mdaddr;
     ngx_str_t traddr;
     ngx_uint_t tmout;
@@ -20,7 +20,7 @@ typedef struct {
     struct ScIHandler i_handler;
     ScCtx ctx;
     ScAsync async;
-} ngx_http_swirly_loc_conf_t;
+} ngx_http_twirly_loc_conf_t;
 
 typedef struct {
     ngx_http_request_t* request;
@@ -28,10 +28,10 @@ typedef struct {
     ngx_int_t status;
     size_t len;
     ngx_buf_t* buf;
-} ngx_http_swirly_task_t;
+} ngx_http_twirly_task_t;
 
-static ngx_http_swirly_loc_conf_t*
-ngx_http_swirly_loc_conf(ngx_http_request_t* r);
+static ngx_http_twirly_loc_conf_t*
+ngx_http_twirly_loc_conf(ngx_http_request_t* r);
 
 static ScAccnt
 get_accnt(ScClnt clnt, const char* mnem)
@@ -56,10 +56,10 @@ get_contr(ScClnt clnt, const char* mnem)
 }
 
 #if 0
-static inline ngx_http_swirly_loc_conf_t*
+static inline ngx_http_twirly_loc_conf_t*
 handler_implof(ScHandler handler)
 {
-    return sc_implof(ngx_http_swirly_loc_conf_t, i_handler, handler);
+    return sc_implof(ngx_http_twirly_loc_conf_t, i_handler, handler);
 }
 #endif
 
@@ -145,7 +145,7 @@ static const struct ScHandlerVtbl HANDLER_VTBL = {
 };
 
 static void
-ngx_http_swirly_task_init(ngx_http_swirly_task_t* t, ngx_http_request_t* r)
+ngx_http_twirly_task_init(ngx_http_twirly_task_t* t, ngx_http_request_t* r)
 {
     t->request = r;
     sc_rest_init(&t->rest);
@@ -155,7 +155,7 @@ ngx_http_swirly_task_init(ngx_http_swirly_task_t* t, ngx_http_request_t* r)
 }
 
 static void
-ngx_http_swirly_task_term(ngx_http_swirly_task_t* t)
+ngx_http_twirly_task_term(ngx_http_twirly_task_t* t)
 {
     if (t->buf) {
         ngx_http_request_t* r = t->request;
@@ -165,7 +165,7 @@ ngx_http_swirly_task_term(ngx_http_swirly_task_t* t)
 }
 
 static ngx_int_t
-ngx_http_swirly_task_err(ngx_http_swirly_task_t* t, int num, const char* msg)
+ngx_http_twirly_task_err(ngx_http_twirly_task_t* t, int num, const char* msg)
 {
     ngx_int_t rc;
 
@@ -191,7 +191,7 @@ ngx_http_swirly_task_err(ngx_http_swirly_task_t* t, int num, const char* msg)
 }
 
 static ngx_int_t
-ngx_http_swirly_task_parse(ngx_http_swirly_task_t* t)
+ngx_http_twirly_task_parse(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
@@ -203,7 +203,7 @@ ngx_http_swirly_task_parse(ngx_http_swirly_task_t* t)
         if (!b->in_file) {
             const size_t size = b->last - b->pos;
             if (sc_rest_json(&t->rest, (const char*)b->pos, size) != 1) {
-                rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+                rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
                 goto done;
             }
         } else {
@@ -214,7 +214,7 @@ ngx_http_swirly_task_parse(ngx_http_swirly_task_t* t)
                 goto done;
             }
             if (sc_rest_json(&t->rest, (const char*)buf, size) != 1) {
-                rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+                rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
                 goto done;
             }
         }
@@ -225,7 +225,7 @@ ngx_http_swirly_task_parse(ngx_http_swirly_task_t* t)
 }
 
 static ngx_int_t
-ngx_http_swirly_task_send(ngx_http_swirly_task_t* t)
+ngx_http_twirly_task_send(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
@@ -250,7 +250,7 @@ ngx_http_swirly_task_send(ngx_http_swirly_task_t* t)
 }
 
 static void
-ngx_http_swirly_log(int level, const char* msg)
+ngx_http_twirly_log(int level, const char* msg)
 {
     const long ms = sc_millis();
     const time_t now = ms / 1000;
@@ -266,11 +266,11 @@ ngx_http_swirly_log(int level, const char* msg)
 }
 
 static int
-ngx_http_swirly_get_logon(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_logon(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -278,7 +278,7 @@ ngx_http_swirly_get_logon(ScHandler handler, ScClnt clnt, void* arg)
     }
     const ScIden id = sc_clnt_logon(clnt, accnt);
     if (id < 0) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
     rc = NGX_HTTP_NO_CONTENT;
@@ -287,11 +287,11 @@ ngx_http_swirly_get_logon(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_logon(ngx_http_swirly_task_t* t)
+ngx_http_twirly_logon(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
     // Testing.
     sc_rest_set_param(&t->rest, SC_PARAM_ACCNT);
     strncpy(t->rest.accnt, "WRAMIREZ", SC_MNEM_MAX);
@@ -299,7 +299,7 @@ ngx_http_swirly_logon(ngx_http_swirly_task_t* t)
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_logon, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_logon, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -309,11 +309,11 @@ ngx_http_swirly_logon(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_logoff(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_logoff(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -321,7 +321,7 @@ ngx_http_swirly_get_logoff(ScHandler handler, ScClnt clnt, void* arg)
     }
     const ScIden id = sc_clnt_logoff(clnt, accnt);
     if (id < 0) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
     rc = NGX_HTTP_NO_CONTENT;
@@ -330,11 +330,11 @@ ngx_http_swirly_get_logoff(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_logoff(ngx_http_swirly_task_t* t)
+ngx_http_twirly_logoff(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
     // Testing.
     sc_rest_set_param(&t->rest, SC_PARAM_ACCNT);
     strncpy(t->rest.accnt, "WRAMIREZ", SC_MNEM_MAX);
@@ -342,7 +342,7 @@ ngx_http_swirly_logoff(ngx_http_swirly_task_t* t)
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_logoff, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_logoff, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -352,11 +352,11 @@ ngx_http_swirly_logoff(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     struct ScSlNode* first = sc_clnt_first_rec(clnt, SC_ENTITY_ACCNT, NULL);
 
@@ -399,16 +399,16 @@ ngx_http_swirly_get_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_accnt, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -418,11 +418,11 @@ ngx_http_swirly_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_accnt_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_accnt_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     struct ScSlNode* node = sc_clnt_find_rec_mnem(clnt, SC_ENTITY_ACCNT, t->rest.accnt);
     if (node == SC_CLNT_END_REC) {
@@ -454,16 +454,16 @@ ngx_http_swirly_get_accnt_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_accnt_with_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_accnt_with_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_accnt_with_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_accnt_with_accnt, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -473,11 +473,11 @@ ngx_http_swirly_accnt_with_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_contr(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_contr(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     struct ScSlNode* first = sc_clnt_first_rec(clnt, SC_ENTITY_CONTR, NULL);
 
@@ -520,16 +520,16 @@ ngx_http_swirly_get_contr(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_contr(ngx_http_swirly_task_t* t)
+ngx_http_twirly_contr(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_contr, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_contr, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -539,11 +539,11 @@ ngx_http_swirly_contr(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_contr_with_contr(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_contr_with_contr(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     struct ScRec* crec = get_contr(clnt, t->rest.contr);
     if (!crec) {
@@ -575,16 +575,16 @@ ngx_http_swirly_get_contr_with_contr(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_contr_with_contr(ngx_http_swirly_task_t* t)
+ngx_http_twirly_contr_with_contr(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_contr_with_contr, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_contr_with_contr, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -594,11 +594,11 @@ ngx_http_swirly_contr_with_contr(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_trader_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_trader_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -646,16 +646,16 @@ ngx_http_swirly_get_trader_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_trader_with_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_trader_with_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_trader_with_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_trader_with_accnt, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -665,11 +665,11 @@ ngx_http_swirly_trader_with_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_giveup_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_giveup_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -717,16 +717,16 @@ ngx_http_swirly_get_giveup_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_giveup_with_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_giveup_with_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_giveup_with_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_giveup_with_accnt, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -736,11 +736,11 @@ ngx_http_swirly_giveup_with_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -788,11 +788,11 @@ ngx_http_swirly_get_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static int
-ngx_http_swirly_post_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_post_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     ScAccnt trader = get_accnt(clnt, t->rest.accnt);
     if (!trader) {
@@ -802,13 +802,13 @@ ngx_http_swirly_post_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 
     ScAccnt giveup = get_accnt(clnt, t->rest.giveup);
     if (!giveup) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
 
     struct ScRec* crec = get_contr(clnt, t->rest.contr);
     if (!crec) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
 
@@ -817,7 +817,7 @@ ngx_http_swirly_post_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
                                       t->rest.action, t->rest.ticks, t->rest.lots,
                                       t->rest.min_lots);
     if (id < 0) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
     rc = NGX_HTTP_NO_CONTENT;
@@ -826,14 +826,14 @@ ngx_http_swirly_post_order_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static void
-ngx_http_swirly_order_with_accnt_handler(ngx_http_request_t* r)
+ngx_http_twirly_order_with_accnt_handler(ngx_http_request_t* r)
 {
     ngx_int_t rc;
 
     ngx_http_cleanup_t* cln = r->cleanup;
-    ngx_http_swirly_task_t* t = cln->data;
+    ngx_http_twirly_task_t* t = cln->data;
 
-    rc = ngx_http_swirly_task_parse(t);
+    rc = ngx_http_twirly_task_parse(t);
     if (rc != NGX_OK || t->buf)
         goto final;
 
@@ -841,43 +841,43 @@ ngx_http_swirly_order_with_accnt_handler(ngx_http_request_t* r)
                            | SC_PARAM_GIVEUP | SC_PARAM_CONTR | SC_PARAM_SETTL_DATE
                            | SC_PARAM_REF | SC_PARAM_ACTION | SC_PARAM_TICKS
                            | SC_PARAM_LOTS | SC_PARAM_MIN_LOTS)) {
-        rc = ngx_http_swirly_task_err(t, SC_EINVAL, "unsupported fields");
+        rc = ngx_http_twirly_task_err(t, SC_EINVAL, "unsupported fields");
         goto final;
     }
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(r);
-    rc = sc_task_call(lcf->async, ngx_http_swirly_post_order_with_accnt, t);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(r);
+    rc = sc_task_call(lcf->async, ngx_http_twirly_post_order_with_accnt, t);
 
  final:
     if (rc == NGX_OK)
-        rc = ngx_http_swirly_task_send(t);
-    ngx_http_swirly_task_term(t);
+        rc = ngx_http_twirly_task_send(t);
+    ngx_http_twirly_task_term(t);
     ngx_http_finalize_request(r, rc);
 }
 
 static ngx_int_t
-ngx_http_swirly_order_with_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_order_with_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
     ngx_http_request_t* r = t->request;
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(r);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(r);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_order_with_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_order_with_accnt, t);
         break;
     case SC_METHOD_POST:
         {
-            ngx_http_cleanup_t* cln = ngx_http_cleanup_add(r, sizeof(ngx_http_swirly_task_t));
+            ngx_http_cleanup_t* cln = ngx_http_cleanup_add(r, sizeof(ngx_http_twirly_task_t));
             if (!cln) {
                 rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
                 break;
             }
-            memcpy(cln->data, t, sizeof(ngx_http_swirly_task_t));
+            memcpy(cln->data, t, sizeof(ngx_http_twirly_task_t));
         }
-        rc = ngx_http_read_client_request_body(r, ngx_http_swirly_order_with_accnt_handler);
+        rc = ngx_http_read_client_request_body(r, ngx_http_twirly_order_with_accnt_handler);
         if (rc < NGX_HTTP_SPECIAL_RESPONSE)
             rc = NGX_DONE;
         break;
@@ -889,11 +889,11 @@ ngx_http_swirly_order_with_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ngx_http_request_t* r = t->request;
 
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
@@ -933,11 +933,11 @@ ngx_http_swirly_get_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void
 }
 
 static int
-ngx_http_swirly_put_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_put_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     ScAccnt trader = get_accnt(clnt, t->rest.accnt);
     if (!trader) {
@@ -949,7 +949,7 @@ ngx_http_swirly_put_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void
         ? sc_clnt_revise_id(clnt, trader, t->rest.id, t->rest.lots)
         : sc_clnt_cancel_id(clnt, trader, t->rest.id);
     if (id < 0) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
     rc = NGX_HTTP_NO_CONTENT;
@@ -958,56 +958,56 @@ ngx_http_swirly_put_order_with_accnt_and_id(ScHandler handler, ScClnt clnt, void
 }
 
 static void
-ngx_http_swirly_order_with_accnt_and_id_handler(ngx_http_request_t* r)
+ngx_http_twirly_order_with_accnt_and_id_handler(ngx_http_request_t* r)
 {
     ngx_int_t rc;
 
     ngx_http_cleanup_t* cln = r->cleanup;
-    ngx_http_swirly_task_t* t = cln->data;
+    ngx_http_twirly_task_t* t = cln->data;
 
-    rc = ngx_http_swirly_task_parse(t);
+    rc = ngx_http_twirly_task_parse(t);
     if (rc != NGX_OK || t->buf)
         goto final;
 
     if (t->rest.fields != (SC_METHOD_PUT | SC_RESRC_ORDER | SC_PARAM_ACCNT | SC_PARAM_ID
                            | SC_PARAM_LOTS)) {
-        rc = ngx_http_swirly_task_err(t, SC_EINVAL, "unsupported fields");
+        rc = ngx_http_twirly_task_err(t, SC_EINVAL, "unsupported fields");
         goto final;
     }
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(r);
-    rc = sc_task_call(lcf->async, ngx_http_swirly_put_order_with_accnt_and_id, t);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(r);
+    rc = sc_task_call(lcf->async, ngx_http_twirly_put_order_with_accnt_and_id, t);
 
  final:
     if (rc == NGX_OK)
-        rc = ngx_http_swirly_task_send(t);
-    ngx_http_swirly_task_term(t);
+        rc = ngx_http_twirly_task_send(t);
+    ngx_http_twirly_task_term(t);
     ngx_http_finalize_request(r, rc);
 }
 
 static ngx_int_t
-ngx_http_swirly_order_with_accnt_and_id(ngx_http_swirly_task_t* t)
+ngx_http_twirly_order_with_accnt_and_id(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
     ngx_http_request_t* r = t->request;
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(r);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(r);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_order_with_accnt_and_id, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_order_with_accnt_and_id, t);
         break;
     case SC_METHOD_PUT:
         {
-            ngx_http_cleanup_t* cln = ngx_http_cleanup_add(r, sizeof(ngx_http_swirly_task_t));
+            ngx_http_cleanup_t* cln = ngx_http_cleanup_add(r, sizeof(ngx_http_twirly_task_t));
             if (!cln) {
                 rc = NGX_HTTP_INTERNAL_SERVER_ERROR;
                 break;
             }
-            memcpy(cln->data, t, sizeof(ngx_http_swirly_task_t));
+            memcpy(cln->data, t, sizeof(ngx_http_twirly_task_t));
         }
-        rc = ngx_http_read_client_request_body(r, ngx_http_swirly_order_with_accnt_and_id_handler);
+        rc = ngx_http_read_client_request_body(r, ngx_http_twirly_order_with_accnt_and_id_handler);
         if (rc < NGX_HTTP_SPECIAL_RESPONSE)
             rc = NGX_DONE;
         break;
@@ -1019,11 +1019,11 @@ ngx_http_swirly_order_with_accnt_and_id(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_trade_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_trade_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -1071,16 +1071,16 @@ ngx_http_swirly_get_trade_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_trade_with_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_trade_with_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_trade_with_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_trade_with_accnt, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -1090,11 +1090,11 @@ ngx_http_swirly_trade_with_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_delete_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_delete_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -1102,7 +1102,7 @@ ngx_http_swirly_delete_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, v
     }
     const ScIden id = sc_clnt_ack_trade(clnt, accnt, t->rest.id);
     if (id < 0) {
-        rc = ngx_http_swirly_task_err(t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(t, sc_err_num(), sc_err_msg());
         goto done;
     }
     rc = NGX_HTTP_NO_CONTENT;
@@ -1111,11 +1111,11 @@ ngx_http_swirly_delete_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, v
 }
 
 static int
-ngx_http_swirly_get_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -1153,19 +1153,19 @@ ngx_http_swirly_get_trade_with_accnt_and_id(ScHandler handler, ScClnt clnt, void
 }
 
 static ngx_int_t
-ngx_http_swirly_trade_with_accnt_and_id(ngx_http_swirly_task_t* t)
+ngx_http_twirly_trade_with_accnt_and_id(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_DELETE:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_delete_trade_with_accnt_and_id, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_delete_trade_with_accnt_and_id, t);
         break;
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_trade_with_accnt_and_id, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_trade_with_accnt_and_id, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -1175,11 +1175,11 @@ ngx_http_swirly_trade_with_accnt_and_id(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_posn_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_posn_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
     ScAccnt accnt = get_accnt(clnt, t->rest.accnt);
     if (!accnt) {
         rc = NGX_HTTP_NOT_FOUND;
@@ -1227,16 +1227,16 @@ ngx_http_swirly_get_posn_with_accnt(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_posn_with_accnt(ngx_http_swirly_task_t* t)
+ngx_http_twirly_posn_with_accnt(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_posn_with_accnt, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_posn_with_accnt, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -1246,11 +1246,11 @@ ngx_http_swirly_posn_with_accnt(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_view(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_view(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     struct ScRbNode* first = sc_clnt_first_view(clnt);
 
@@ -1293,16 +1293,16 @@ ngx_http_swirly_get_view(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_view(ngx_http_swirly_task_t* t)
+ngx_http_twirly_view(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_view, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_view, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -1312,11 +1312,11 @@ ngx_http_swirly_view(ngx_http_swirly_task_t* t)
 }
 
 static int
-ngx_http_swirly_get_view_with_contr(ScHandler handler, ScClnt clnt, void* arg)
+ngx_http_twirly_get_view_with_contr(ScHandler handler, ScClnt clnt, void* arg)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_task_t* t = arg;
+    ngx_http_twirly_task_t* t = arg;
 
     struct ScRec* crec = get_contr(clnt, t->rest.contr);
     if (!crec) {
@@ -1370,16 +1370,16 @@ ngx_http_swirly_get_view_with_contr(ScHandler handler, ScClnt clnt, void* arg)
 }
 
 static ngx_int_t
-ngx_http_swirly_view_with_contr(ngx_http_swirly_task_t* t)
+ngx_http_twirly_view_with_contr(ngx_http_twirly_task_t* t)
 {
     ngx_int_t rc;
 
-    ngx_http_swirly_loc_conf_t* lcf = ngx_http_swirly_loc_conf(t->request);
+    ngx_http_twirly_loc_conf_t* lcf = ngx_http_twirly_loc_conf(t->request);
 
     switch (sc_rest_get_method(&t->rest)) {
     case SC_METHOD_GET:
     case SC_METHOD_HEAD:
-        rc = sc_task_call(lcf->async, ngx_http_swirly_get_view_with_contr, t);
+        rc = sc_task_call(lcf->async, ngx_http_twirly_get_view_with_contr, t);
         break;
     default:
         rc = NGX_HTTP_NOT_ALLOWED;
@@ -1389,15 +1389,15 @@ ngx_http_swirly_view_with_contr(ngx_http_swirly_task_t* t)
 }
 
 static ngx_int_t
-ngx_http_swirly_handler(ngx_http_request_t* r)
+ngx_http_twirly_handler(ngx_http_request_t* r)
 {
     ngx_int_t rc;
 
     ngx_log_error(NGX_LOG_INFO, r->connection->log, 0, "user: %V",
                   &r->headers_in.user);
 
-    ngx_http_swirly_task_t t;
-    ngx_http_swirly_task_init(&t, r);
+    ngx_http_twirly_task_t t;
+    ngx_http_twirly_task_init(&t, r);
 
     if (!(r->method & (NGX_HTTP_POST | NGX_HTTP_PUT))) {
         rc = ngx_http_discard_request_body(r);
@@ -1431,58 +1431,58 @@ ngx_http_swirly_handler(ngx_http_request_t* r)
 
     if (sc_rest_rurl(&t.rest, (const char*)r->uri_start + 4,
                       r->uri_end - r->uri_start - 4) != 1) {
-        rc = ngx_http_swirly_task_err(&t, sc_err_num(), sc_err_msg());
+        rc = ngx_http_twirly_task_err(&t, sc_err_num(), sc_err_msg());
         goto final;
     }
 
     switch (t.rest.fields & ~SC_METHOD_MASK) {
     case SC_RESRC_LOGON:
-        rc = ngx_http_swirly_logon(&t);
+        rc = ngx_http_twirly_logon(&t);
         break;
     case SC_RESRC_LOGOFF:
-        rc = ngx_http_swirly_logoff(&t);
+        rc = ngx_http_twirly_logoff(&t);
         break;
     case SC_RESRC_ACCNT:
-        rc = ngx_http_swirly_accnt(&t);
+        rc = ngx_http_twirly_accnt(&t);
         break;
     case SC_RESRC_ACCNT | SC_PARAM_ACCNT:
-        rc = ngx_http_swirly_accnt_with_accnt(&t);
+        rc = ngx_http_twirly_accnt_with_accnt(&t);
         break;
     case SC_RESRC_CONTR:
-        rc = ngx_http_swirly_contr(&t);
+        rc = ngx_http_twirly_contr(&t);
         break;
     case SC_RESRC_CONTR | SC_PARAM_CONTR:
-        rc = ngx_http_swirly_contr_with_contr(&t);
+        rc = ngx_http_twirly_contr_with_contr(&t);
         break;
     case SC_RESRC_TRADER | SC_PARAM_ACCNT:
-        rc = ngx_http_swirly_trader_with_accnt(&t);
+        rc = ngx_http_twirly_trader_with_accnt(&t);
         break;
     case SC_RESRC_GIVEUP | SC_PARAM_ACCNT:
-        rc = ngx_http_swirly_giveup_with_accnt(&t);
+        rc = ngx_http_twirly_giveup_with_accnt(&t);
         break;
     case SC_RESRC_ORDER | SC_PARAM_ACCNT:
-        rc = ngx_http_swirly_order_with_accnt(&t);
+        rc = ngx_http_twirly_order_with_accnt(&t);
         break;
     case SC_RESRC_ORDER | SC_PARAM_ACCNT | SC_PARAM_ID:
-        rc = ngx_http_swirly_order_with_accnt_and_id(&t);
+        rc = ngx_http_twirly_order_with_accnt_and_id(&t);
         break;
     case SC_RESRC_TRADE | SC_PARAM_ACCNT:
-        rc = ngx_http_swirly_trade_with_accnt(&t);
+        rc = ngx_http_twirly_trade_with_accnt(&t);
         break;
     case SC_RESRC_TRADE | SC_PARAM_ACCNT | SC_PARAM_ID:
-        rc = ngx_http_swirly_trade_with_accnt_and_id(&t);
+        rc = ngx_http_twirly_trade_with_accnt_and_id(&t);
         break;
     case SC_RESRC_POSN | SC_PARAM_ACCNT:
-        rc = ngx_http_swirly_posn_with_accnt(&t);
+        rc = ngx_http_twirly_posn_with_accnt(&t);
         break;
     case SC_RESRC_VIEW:
-        rc = ngx_http_swirly_view(&t);
+        rc = ngx_http_twirly_view(&t);
         break;
     case SC_RESRC_VIEW | SC_PARAM_CONTR:
-        rc = ngx_http_swirly_view_with_contr(&t);
+        rc = ngx_http_twirly_view_with_contr(&t);
         break;
     default:
-        rc = ngx_http_swirly_task_err(&t, SC_EINVAL, "unsupported fields");
+        rc = ngx_http_twirly_task_err(&t, SC_EINVAL, "unsupported fields");
         goto final;
     }
 
@@ -1494,29 +1494,29 @@ ngx_http_swirly_handler(ngx_http_request_t* r)
 
  final:
     if (rc == NGX_OK)
-        rc = ngx_http_swirly_task_send(&t);
-    ngx_http_swirly_task_term(&t);
+        rc = ngx_http_twirly_task_send(&t);
+    ngx_http_twirly_task_term(&t);
     return rc;
 }
 
 static void
-ngx_http_swirly_cleanup_loc_conf(void* data)
+ngx_http_twirly_cleanup_loc_conf(void* data)
 {
-    ngx_http_swirly_loc_conf_t* lcf = data;
+    ngx_http_twirly_loc_conf_t* lcf = data;
     sc_async_destroy(lcf->async);
     sc_ctx_destroy(lcf->ctx);
 }
 
 static void*
-ngx_http_swirly_create_loc_conf(ngx_conf_t* cf)
+ngx_http_twirly_create_loc_conf(ngx_conf_t* cf)
 {
-    ngx_http_swirly_loc_conf_t* lcf = ngx_palloc(cf->pool, sizeof(ngx_http_swirly_loc_conf_t));
+    ngx_http_twirly_loc_conf_t* lcf = ngx_palloc(cf->pool, sizeof(ngx_http_twirly_loc_conf_t));
     if (!lcf) {
         ngx_conf_log_error(NGX_LOG_ERR, cf, 0, "failed to allocate local config");
         return NULL;
     }
 
-    lcf->swirly = SC_FALSE;
+    lcf->twirly = SC_FALSE;
     ngx_str_null(&lcf->mdaddr);
     ngx_str_null(&lcf->traddr);
     lcf->tmout = NGX_CONF_UNSET_UINT;
@@ -1530,24 +1530,24 @@ ngx_http_swirly_create_loc_conf(ngx_conf_t* cf)
 }
 
 static char*
-ngx_http_swirly_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
+ngx_http_twirly_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
 {
-    sc_log_setlogger(ngx_http_swirly_log);
+    sc_log_setlogger(ngx_http_twirly_log);
 
-    ngx_http_swirly_loc_conf_t* pcf = prev;
-    ngx_http_swirly_loc_conf_t* lcf = conf;
+    ngx_http_twirly_loc_conf_t* pcf = prev;
+    ngx_http_twirly_loc_conf_t* lcf = conf;
 
     ngx_conf_merge_str_value(lcf->mdaddr, pcf->mdaddr, "tcp://localhost:3270");
     ngx_conf_merge_str_value(lcf->traddr, pcf->traddr, "tcp://localhost:3271");
     ngx_conf_merge_uint_value(lcf->tmout, pcf->tmout, 5000);
     ngx_conf_merge_uint_value(lcf->capacity, pcf->capacity, 8 * 1024 * 1024);
 
-    if (lcf->swirly) {
+    if (lcf->twirly) {
 
-        // Install swirly handler.
+        // Install twirly handler.
         ngx_http_core_loc_conf_t* clcf
             = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-        clcf->handler = ngx_http_swirly_handler;
+        clcf->handler = ngx_http_twirly_handler;
 
         // Null terminate strings.
 
@@ -1577,7 +1577,7 @@ ngx_http_swirly_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
             goto fail3;
         }
 
-        cln->handler = ngx_http_swirly_cleanup_loc_conf;
+        cln->handler = ngx_http_twirly_cleanup_loc_conf;
         cln->data = lcf;
     }
     return NGX_CONF_OK;
@@ -1590,97 +1590,97 @@ ngx_http_swirly_merge_loc_conf(ngx_conf_t* cf, void* prev, void* conf)
 }
 
 static char*
-ngx_http_swirly(ngx_conf_t* cf, ngx_command_t* cmd, void* conf)
+ngx_http_twirly(ngx_conf_t* cf, ngx_command_t* cmd, void* conf)
 {
     ngx_http_core_loc_conf_t* clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-    // Handler for the 'swirly' directive.
-    clcf->handler = ngx_http_swirly_handler;
+    // Handler for the 'twirly' directive.
+    clcf->handler = ngx_http_twirly_handler;
 
-    ngx_http_swirly_loc_conf_t* lcf = conf;
-    lcf->swirly = SC_TRUE;
+    ngx_http_twirly_loc_conf_t* lcf = conf;
+    lcf->twirly = SC_TRUE;
 
     return NGX_CONF_OK;
 }
 
 static char*
-ngx_http_swirly_mdaddr(ngx_conf_t* cf, void* post, void* data)
+ngx_http_twirly_mdaddr(ngx_conf_t* cf, void* post, void* data)
 {
     return NGX_CONF_OK;
 }
 
 static char*
-ngx_http_swirly_traddr(ngx_conf_t* cf, void* post, void* data)
+ngx_http_twirly_traddr(ngx_conf_t* cf, void* post, void* data)
 {
     return NGX_CONF_OK;
 }
 
 static char*
-ngx_http_swirly_tmout(ngx_conf_t* cf, void* post, void* data)
+ngx_http_twirly_tmout(ngx_conf_t* cf, void* post, void* data)
 {
     return NGX_CONF_OK;
 }
 
 static char*
-ngx_http_swirly_capacity(ngx_conf_t* cf, void* post, void* data)
+ngx_http_twirly_capacity(ngx_conf_t* cf, void* post, void* data)
 {
     return NGX_CONF_OK;
 }
 
-static ngx_conf_post_handler_pt ngx_http_swirly_mdaddr_p = ngx_http_swirly_mdaddr;
-static ngx_conf_post_handler_pt ngx_http_swirly_traddr_p = ngx_http_swirly_traddr;
-static ngx_conf_post_handler_pt ngx_http_swirly_tmout_p = ngx_http_swirly_tmout;
-static ngx_conf_post_handler_pt ngx_http_swirly_capacity_p = ngx_http_swirly_capacity;
+static ngx_conf_post_handler_pt ngx_http_twirly_mdaddr_p = ngx_http_twirly_mdaddr;
+static ngx_conf_post_handler_pt ngx_http_twirly_traddr_p = ngx_http_twirly_traddr;
+static ngx_conf_post_handler_pt ngx_http_twirly_tmout_p = ngx_http_twirly_tmout;
+static ngx_conf_post_handler_pt ngx_http_twirly_capacity_p = ngx_http_twirly_capacity;
 
 // Never called?
 static ngx_int_t
-ngx_http_swirly_init_master(ngx_log_t* log)
+ngx_http_twirly_init_master(ngx_log_t* log)
 {
     ngx_log_error(NGX_LOG_NOTICE, log, 0, "init_master()");
     return NGX_OK;
 }
 
 static ngx_int_t
-ngx_http_swirly_init_module(ngx_cycle_t* cycle)
+ngx_http_twirly_init_module(ngx_cycle_t* cycle)
 {
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "init_module()");
     return NGX_OK;
 }
 
 static ngx_int_t
-ngx_http_swirly_init_process(ngx_cycle_t* cycle)
+ngx_http_twirly_init_process(ngx_cycle_t* cycle)
 {
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "init_process()");
     return NGX_OK;
 }
 
 static ngx_int_t
-ngx_http_swirly_init_thread(ngx_cycle_t* cycle)
+ngx_http_twirly_init_thread(ngx_cycle_t* cycle)
 {
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "term_thread()");
     return NGX_OK;
 }
 
 static void
-ngx_http_swirly_exit_thread(ngx_cycle_t* cycle)
+ngx_http_twirly_exit_thread(ngx_cycle_t* cycle)
 {
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "exit_thread()");
 }
 
 static void
-ngx_http_swirly_exit_process(ngx_cycle_t* cycle)
+ngx_http_twirly_exit_process(ngx_cycle_t* cycle)
 {
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "exit_process()");
 }
 
 static void
-ngx_http_swirly_exit_master(ngx_cycle_t* cycle)
+ngx_http_twirly_exit_master(ngx_cycle_t* cycle)
 {
     ngx_log_error(NGX_LOG_NOTICE, cycle->log, 0, "exit_master()");
 }
 
 // The context type required for http modules.
 
-static ngx_http_module_t ngx_http_swirly_module_ctx = {
+static ngx_http_module_t ngx_http_twirly_module_ctx = {
     // ngx_int_t (*preconfiguration)(ngx_conf_t* cf);
     .preconfiguration = NULL,
     // ngx_int_t (*postconfiguration)(ngx_conf_t* cf);
@@ -1694,94 +1694,94 @@ static ngx_http_module_t ngx_http_swirly_module_ctx = {
     // char* (*merge_srv_conf)(ngx_conf_t* cf, void* prev, void* conf);
     .merge_srv_conf = NULL,
     // void* (*create_loc_conf)(ngx_conf_t* cf);
-    .create_loc_conf = ngx_http_swirly_create_loc_conf,
+    .create_loc_conf = ngx_http_twirly_create_loc_conf,
     // char* (*merge_loc_conf)(ngx_conf_t* cf, void* prev, void* conf);
-    .merge_loc_conf = ngx_http_swirly_merge_loc_conf
+    .merge_loc_conf = ngx_http_twirly_merge_loc_conf
 };
 
-static ngx_command_t ngx_http_swirly_commands[] = {
+static ngx_command_t ngx_http_twirly_commands[] = {
     {
-        .name = ngx_string("swirly"),
+        .name = ngx_string("twirly"),
         .type = NGX_HTTP_LOC_CONF | NGX_CONF_NOARGS,
-        .set = ngx_http_swirly,
+        .set = ngx_http_twirly,
         .conf = NGX_HTTP_LOC_CONF_OFFSET,
-        .offset = offsetof(ngx_http_swirly_loc_conf_t, swirly),
+        .offset = offsetof(ngx_http_twirly_loc_conf_t, twirly),
         .post = NULL
     },
     {
-        .name = ngx_string("swirly_mdaddr"),
+        .name = ngx_string("twirly_mdaddr"),
         .type = NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
         .set = ngx_conf_set_str_slot,
         .conf = NGX_HTTP_LOC_CONF_OFFSET,
-        .offset = offsetof(ngx_http_swirly_loc_conf_t, mdaddr),
-        .post = &ngx_http_swirly_mdaddr_p
+        .offset = offsetof(ngx_http_twirly_loc_conf_t, mdaddr),
+        .post = &ngx_http_twirly_mdaddr_p
     },
     {
-        .name = ngx_string("swirly_traddr"),
+        .name = ngx_string("twirly_traddr"),
         .type = NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
         .set = ngx_conf_set_str_slot,
         .conf = NGX_HTTP_LOC_CONF_OFFSET,
-        .offset = offsetof(ngx_http_swirly_loc_conf_t, traddr),
-        .post = &ngx_http_swirly_traddr_p
+        .offset = offsetof(ngx_http_twirly_loc_conf_t, traddr),
+        .post = &ngx_http_twirly_traddr_p
     },
     {
-        .name = ngx_string("swirly_tmout"),
+        .name = ngx_string("twirly_tmout"),
         .type = NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
         .set = ngx_conf_set_num_slot,
         .conf = NGX_HTTP_LOC_CONF_OFFSET,
-        .offset = offsetof(ngx_http_swirly_loc_conf_t, tmout),
-        .post = &ngx_http_swirly_tmout_p
+        .offset = offsetof(ngx_http_twirly_loc_conf_t, tmout),
+        .post = &ngx_http_twirly_tmout_p
     },
     {
-        .name = ngx_string("swirly_capacity"),
+        .name = ngx_string("twirly_capacity"),
         .type = NGX_HTTP_LOC_CONF | NGX_CONF_TAKE1,
         .set = ngx_conf_set_num_slot,
         .conf = NGX_HTTP_LOC_CONF_OFFSET,
-        .offset = offsetof(ngx_http_swirly_loc_conf_t, capacity),
-        .post = &ngx_http_swirly_capacity_p
+        .offset = offsetof(ngx_http_twirly_loc_conf_t, capacity),
+        .post = &ngx_http_twirly_capacity_p
     },
     ngx_null_command
 };
 
-ngx_module_t ngx_http_swirly_module = {
+ngx_module_t ngx_http_twirly_module = {
     // version - contains the version of Nginx API (currently it is 1).
     NGX_MODULE_V1,
     // ctx - points to a global context of the module (the actual type of structure this pointer
     // points to depends on the value of type field).
     // void* ctx;
-    .ctx = &ngx_http_swirly_module_ctx,
+    .ctx = &ngx_http_twirly_module_ctx,
     // commands - points to a vector of descriptors of module commands.
     // ngx_command_t* commands;
-    .commands = ngx_http_swirly_commands,
+    .commands = ngx_http_twirly_commands,
     // type - contains the type of the module: NGX_HTTP_MODULE, NGX_EVENT_MODULE, NGX_MAIL_MODULE
     // and others.
     // ngx_uint_t type;
     .type = NGX_HTTP_MODULE,
     // ngx_int_t (*init_master)(ngx_log_t* log);
-    .init_master = ngx_http_swirly_init_master,
+    .init_master = ngx_http_twirly_init_master,
     // init_module - points to a handler, that is called upon initialisation of the module in the
     // main process before entering the event loop.
     // ngx_int_t (*init_module)(ngx_cycle_t* cycle);
-    .init_module = ngx_http_swirly_init_module,
+    .init_module = ngx_http_twirly_init_module,
     // init_process - points to a handler, that is called upon initialisation of the module in a
     // worker process.
     // ngx_int_t (*init_process)(ngx_cycle_t* cycle);
-    .init_process = ngx_http_swirly_init_process,
+    .init_process = ngx_http_twirly_init_process,
     // ngx_int_t (*init_thread)(ngx_cycle_t* cycle);
-    .init_thread = ngx_http_swirly_init_thread,
+    .init_thread = ngx_http_twirly_init_thread,
     // void (*exit_thread)(ngx_cycle_t* cycle);
-    .exit_thread = ngx_http_swirly_exit_thread,
+    .exit_thread = ngx_http_twirly_exit_thread,
     // exit_process - points to a handler, that is called upon termination of a worker process.
     // void (*exit_process)(ngx_cycle_t* cycle);
-    .exit_process = ngx_http_swirly_exit_process,
+    .exit_process = ngx_http_twirly_exit_process,
     // exit_master - points to a handler, that is called upon termination of the master process.
     // void (*exit_master)(ngx_cycle_t* cycle);
-    .exit_master = ngx_http_swirly_exit_master,
+    .exit_master = ngx_http_twirly_exit_master,
     NGX_MODULE_V1_PADDING
 };
 
-static ngx_http_swirly_loc_conf_t*
-ngx_http_swirly_loc_conf(ngx_http_request_t* r)
+static ngx_http_twirly_loc_conf_t*
+ngx_http_twirly_loc_conf(ngx_http_request_t* r)
 {
-    return ngx_http_get_module_loc_conf(r, ngx_http_swirly_module);
+    return ngx_http_get_module_loc_conf(r, ngx_http_twirly_module);
 }

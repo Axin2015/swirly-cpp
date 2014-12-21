@@ -60,7 +60,7 @@ load(ScServ serv, const char* path)
 {
     ScBool ret;
 
-    ScModel model = sc_sqlmodel_create("swirly.db");
+    ScModel model = sc_sqlmodel_create("twirly.db");
     if (sc_likely(model)) {
         ret = sc_serv_load(serv, model);
         sc_model_destroy(model);
@@ -161,7 +161,7 @@ main(int argc, char* argv[])
         goto exit1;
     }
 
-    journ = sc_zmqjourn_create(zctx, 1 * 1024 * 1024, factory, "swirly.db");
+    journ = sc_zmqjourn_create(zctx, 1 * 1024 * 1024, factory, "twirly.db");
     if (!journ) {
         sc_err_perror("sc_sqljourn_create() failed");
         goto exit2;
@@ -173,13 +173,13 @@ main(int argc, char* argv[])
         goto exit3;
     }
 
-    serv = sc_serv_create("swirly.bin", journ, pool);
+    serv = sc_serv_create("twirly.bin", journ, pool);
     if (!serv) {
         sc_err_perror("sc_serv_create() failed");
         goto exit4;
     }
 
-    if (!load(serv, "swirly.db")) {
+    if (!load(serv, "twirly.db")) {
         sc_err_perror("load() failed");
         goto exit5;
     }

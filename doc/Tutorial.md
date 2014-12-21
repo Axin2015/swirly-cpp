@@ -5,8 +5,8 @@ Start the Shell
 ---------------
 
 This tutorial assumes that you have:
-- set the `SWIRLY_HOME` environment variable;
-- built and installed Swirly;
+- set the `TWIRLY_HOME` environment variable;
+- built and installed Twirly;
 - created the example database;
 - run the `scd` daemon.
 
@@ -20,7 +20,7 @@ Set the following variables in `$HOME/.scshrc`:
 
 And then run the shell command:
 
-    $ $SWIRLY_HOME/bin/scsh
+    $ $TWIRLY_HOME/bin/scsh
     scsh>
 
 Session

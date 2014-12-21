@@ -1,5 +1,5 @@
 
-#line 1 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 1 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 // -*- c -*-
 /*
  *  Copyright (C) 2013, 2014 Swirly Cloud Limited. All rights reserved.
@@ -10,11 +10,11 @@
 #include <stddef.h> // NULL
 
 
-#line 67 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 67 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 
 
 
-#line 18 "/Users/marayl/repo/swirlyc/src/ash/shlex.c"
+#line 18 "/Users/marayl/repo/twirlyc/src/ash/shlex.c"
 static const char _shlex_actions[] = {
 	0, 1, 0, 1, 1, 1, 2, 1, 
 	3, 1, 4, 2, 0, 1, 2, 3, 
@@ -77,7 +77,7 @@ static const int shlex_error = 0;
 static const int shlex_en_main = 12;
 
 
-#line 70 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 70 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 
 SC_API void
 sc_shlex_init(struct ScShlex* shlex, void (*cb)(void*, const char*, size_t), void* ctx)
@@ -87,12 +87,12 @@ sc_shlex_init(struct ScShlex* shlex, void (*cb)(void*, const char*, size_t), voi
 
     int cs;
     
-#line 91 "/Users/marayl/repo/swirlyc/src/ash/shlex.c"
+#line 91 "/Users/marayl/repo/twirlyc/src/ash/shlex.c"
 	{
 	cs = shlex_start;
 	}
 
-#line 79 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 79 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
     shlex->cs = cs;
 }
 
@@ -101,12 +101,12 @@ sc_shlex_reset(struct ScShlex* shlex)
 {
     int cs;
     
-#line 105 "/Users/marayl/repo/swirlyc/src/ash/shlex.c"
+#line 105 "/Users/marayl/repo/twirlyc/src/ash/shlex.c"
 	{
 	cs = shlex_start;
 	}
 
-#line 87 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 87 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
     shlex->cs = cs;
 }
 
@@ -118,7 +118,7 @@ sc_shlex_exec(struct ScShlex* shlex, const char* buf, size_t size)
 
     int cs = shlex->cs;
 	
-#line 122 "/Users/marayl/repo/swirlyc/src/ash/shlex.c"
+#line 122 "/Users/marayl/repo/twirlyc/src/ash/shlex.c"
 	{
 	int _klen;
 	unsigned int _trans;
@@ -192,13 +192,13 @@ _match:
 		switch ( *_acts++ )
 		{
 	case 0:
-#line 15 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 15 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 	{
         shlex->len = 0;
     }
 	break;
 	case 1:
-#line 18 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 18 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 	{
         if (shlex->len < SC_TOK_MAX)
             shlex->tok[shlex->len++] = (*p);
@@ -209,25 +209,25 @@ _match:
     }
 	break;
 	case 2:
-#line 26 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 26 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 	{
         p--;
     }
 	break;
 	case 3:
-#line 29 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 29 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 	{
         shlex->tok[shlex->len] = '\0';
         shlex->cb(shlex->ctx, shlex->tok, shlex->len);
     }
 	break;
 	case 4:
-#line 33 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 33 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
 	{
         shlex->cb(shlex->ctx, NULL, 0);
     }
 	break;
-#line 231 "/Users/marayl/repo/swirlyc/src/ash/shlex.c"
+#line 231 "/Users/marayl/repo/twirlyc/src/ash/shlex.c"
 		}
 	}
 
@@ -240,7 +240,7 @@ _again:
 	_out: {}
 	}
 
-#line 98 "/Users/marayl/repo/swirlyc/src/ash/shlex.rl"
+#line 98 "/Users/marayl/repo/twirlyc/src/ash/shlex.rl"
     shlex->cs = cs;
 
     if (cs == shlex_error) {
