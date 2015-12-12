@@ -6,8 +6,8 @@ Database Creation
 
 The example database can be created as follows:
 
-    $ sqlite3 twirly.db < $TWIRLY_HOME/etc/sc_schema.sql
-    $ sqlite3 twirly.db < $TWIRLY_HOME/etc/sc_example.sql
+    $ sqlite3 swirly.db < $SWIRLY_HOME/etc/sc_schema.sql
+    $ sqlite3 swirly.db < $SWIRLY_HOME/etc/sc_example.sql
 
 Daemon Configuration
 --------------------
@@ -40,9 +40,9 @@ The `logfile` option is ignored unless `daemon=yes`:
 
     daemon = yes
 
-    bankfile = twirly.bin
-    dbfile = twirly.db
-    logfile = twirly.log
+    bankfile = swirly.bin
+    dbfile = swirly.db
+    logfile = swirly.log
 
     journsize = 1048576
     poolsize = 8388608
@@ -54,7 +54,7 @@ Daemon Operations
 
 The `scd` server is typically started as follows:
 
-    $ scd -f twirly.conf
+    $ scd -f swirly.conf
 
 ### Log Rotation ###
 
@@ -62,5 +62,5 @@ If the `daemon` and `logfile` options are set, then the daemon process will resp
 re-opening the logfile. This behaviour can be use to rotate the log, as the following example
 demonstrates:
 
-    $ mv twirly.log twirly.log.1
+    $ mv swirly.log swirly.log.1
     $ killall -HUP scd

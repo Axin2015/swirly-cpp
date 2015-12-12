@@ -1,0 +1,117 @@
+/*
+ * Swirly Order-Book and Matching-Engine.
+ * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program; if
+ * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+ * 02110-1301, USA.
+ */
+#ifndef SWIRLY_ELM_TYPES_HPP
+#define SWIRLY_ELM_TYPES_HPP
+
+#include <swirly/ash/string.hpp>
+
+namespace swirly {
+
+using Incs = long;
+
+/**
+ * Milliseconds since Unix epoch.
+ */
+using Millis = long;
+
+using Lots = Incs;
+
+/**
+ * Unit representing the minimum price increment.
+ */
+using Ticks = Incs;
+
+/**
+ * Sum of lots and ticks.
+ */
+using Cost = Incs;
+
+/**
+ * Maximum display characters.
+ */
+constexpr std::size_t DISPLAY_MAX = 64;
+
+/**
+ * Maximum email characters.
+ */
+constexpr std::size_t EMAIL_MAX = 64;
+
+/**
+ * Maximum mnemonic characters.
+ */
+constexpr std::size_t MNEM_MAX = 16;
+
+/**
+ * Maximum reference characters.
+ */
+constexpr std::size_t REF_MAX = 64;
+
+/**
+ * Description suitable for display on user-interface.
+ */
+using Display = StringBuf<DISPLAY_MAX>;
+
+/**
+ * Email address.
+ */
+using Email = StringBuf<EMAIL_MAX>;
+
+/**
+ * Memorable identifier.
+ */
+using Mnem = StringBuf<MNEM_MAX>;
+
+/**
+ * Reference.
+ */
+using Ref = StringBuf<REF_MAX>;
+
+enum class RecType {
+    /**
+     * Asset.
+     */
+    ASSET = 1,
+    /**
+     * Contract.
+     */
+    CONTR,
+    /**
+     * Market.
+     */
+    MARKET,
+    /**
+     * Trader.
+     */
+    TRADER
+};
+
+SWIRLY_API const char* enumToString(RecType type);
+
+enum class AssetType {
+    COMMODITY = 1,
+    CORPORATE,
+    CURRENCY,
+    EQUITY,
+    GOVERNMENT,
+    INDEX
+};
+
+SWIRLY_API const char* enumToString(AssetType type);
+
+} // swirly
+
+#endif // SWIRLY_ELM_TYPES_HPP

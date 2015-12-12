@@ -6,20 +6,20 @@ Environment Variables
 
 This guide may refer to the following environment variables:
 
-- `TWIRLY_BUILD` - build directory;
-- `TWIRLY_HOME` - installation directory;
-- `TWIRLY_SOURCE` - source directory.
+- `SWIRLY_BUILD` - build directory;
+- `SWIRLY_HOME` - installation directory;
+- `SWIRLY_SOURCE` - source directory.
 
 It is recommended that you also modify your environment, so that the binaries installed under
-`TWIRLY_HOME` can be located at runtime:
+`SWIRLY_HOME` can be located at runtime:
 
-    PATH=$PATH:$TWIRLY_HOME/bin; export PATH
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TWIRLY_HOME/lib; export LD_LIBRARY_PATH
+    PATH=$PATH:$SWIRLY_HOME/bin; export PATH
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$SWIRLY_HOME/lib; export LD_LIBRARY_PATH
 
 Dependencies
 ------------
 
-To build Twirly from source, you will need:
+To build Swirly from source, you will need:
 
 - [GCC] or [Clang] - with support for C11;
 - [CMake] - for Makefile generation;
@@ -31,26 +31,26 @@ To build Twirly from source, you will need:
 Build from Source
 -----------------
 
-The following sections assume that `TWIRLY_SOURCE` is equal to `SOURCE_DIR/twirlyc`, and that
-`TWIRLY_BUILD` is equal to `BUILD_DIR/twirlyc`.
+The following sections assume that `SWIRLY_SOURCE` is equal to `SOURCE_DIR/swirlyc`, and that
+`SWIRLY_BUILD` is equal to `BUILD_DIR/swirlyc`.
 
 ### Download ###
 
 Download the source from [GitHub](http://github.com/swirlycloud):
 
     $ cd $SOURCE_DIR
-    $ git clone https://github.com/swirlycloud/twirlyc.git twirlyc
+    $ git clone https://github.com/swirlycloud/swirlyc.git swirlyc
 
-The `SOURCE_DIR/twirlyc` directory should now contain the source.
+The `SOURCE_DIR/swirlyc` directory should now contain the source.
 
 ### Configure ###
 
 Configure using `cmake` as follows from the build directory:
 
     $ cd $BUILD_DIR
-    $ mkdir -p twirlyc
-    $ cd twirlyc
-    $ cmake $SOURCE_DIR/twirlyc -DCMAKE_INSTALL_PREFIX=$TWIRLY_HOME
+    $ mkdir -p swirlyc
+    $ cd swirlyc
+    $ cmake $SOURCE_DIR/swirlyc -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME
 
 This step will produce Unix Makefiles by default.
 See CMake Options for more information.
@@ -59,7 +59,7 @@ See CMake Options for more information.
 
 Compile the code in the build directory using the `make` command:
 
-    $ cd $BUILD_DIR/twirlyc
+    $ cd $BUILD_DIR/swirlyc
     $ make
 
 ### Install ###
