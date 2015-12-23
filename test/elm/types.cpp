@@ -18,11 +18,38 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace swirly;
+
 BOOST_AUTO_TEST_SUITE(types)
 
-BOOST_AUTO_TEST_CASE(test1)
+BOOST_AUTO_TEST_CASE(assetType)
 {
-    BOOST_CHECK(true);
+    BOOST_CHECK_EQUAL(enumToString(AssetType::COMMODITY), "COMMODITY");
+}
+
+BOOST_AUTO_TEST_CASE(direct)
+{
+    BOOST_CHECK_EQUAL(enumToString(Direct::PAID), "PAID");
+}
+
+BOOST_AUTO_TEST_CASE(recType)
+{
+    BOOST_CHECK_EQUAL(enumToString(RecType::ASSET), "ASSET");
+}
+
+BOOST_AUTO_TEST_CASE(role)
+{
+    BOOST_CHECK_EQUAL(enumToString(Role::MAKER), "MAKER");
+}
+
+BOOST_AUTO_TEST_CASE(side)
+{
+    BOOST_CHECK_EQUAL(enumToString(Side::BUY), "BUY");
+}
+
+BOOST_AUTO_TEST_CASE(state)
+{
+    BOOST_CHECK_EQUAL(enumToString(State::NEW), "NEW");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

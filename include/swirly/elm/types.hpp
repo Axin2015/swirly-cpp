@@ -80,6 +80,30 @@ using Mnem = StringBuf<MNEM_MAX>;
  */
 using Ref = StringBuf<REF_MAX>;
 
+enum class AssetType {
+    COMMODITY = 1,
+    CORPORATE,
+    CURRENCY,
+    EQUITY,
+    GOVERNMENT,
+    INDEX
+};
+
+SWIRLY_API const char* enumToString(AssetType type);
+
+enum class Direct {
+    /**
+     * Aggressor buys. I.e. taker lifts the offer.
+     */
+    PAID = 1,
+    /**
+     * Aggressor sells. I.e. taker hits the bid.
+     */
+    GIVEN = -1
+};
+
+SWIRLY_API const char* enumToString(Direct direct);
+
 enum class RecType {
     /**
      * Asset.
@@ -101,16 +125,51 @@ enum class RecType {
 
 SWIRLY_API const char* enumToString(RecType type);
 
-enum class AssetType {
-    COMMODITY = 1,
-    CORPORATE,
-    CURRENCY,
-    EQUITY,
-    GOVERNMENT,
-    INDEX
+enum class Role {
+    /**
+     * Passive buyer or seller that receives the spread.
+     */
+    MAKER = 1,
+    /**
+     * Aggressive buyer or seller that crosses the market and pays the spread.
+     */
+    TAKER
 };
 
-SWIRLY_API const char* enumToString(AssetType type);
+SWIRLY_API const char* enumToString(Role role);
+
+enum class Side {
+    BUY = 1,
+    SELL = -1
+};
+
+SWIRLY_API const char* enumToString(Side side);
+
+enum class State {
+    NONE = 0,
+    /**
+     * Initial state of a resting order placed in the order-book.
+     */
+    NEW,
+    /**
+     * State of a resting order that has been revised.
+     */
+    REVISE,
+    /**
+     * State of a resting order that has been cancelled.
+     */
+    CANCEL,
+    /**
+     * State of an order that has been partially or fully filled.
+     */
+    TRADE,
+    /**
+     * State of a resting order that is pending cancel.
+     */
+    PECAN
+};
+
+SWIRLY_API const char* enumToString(State state);
 
 } // swirly
 

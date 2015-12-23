@@ -20,6 +20,28 @@ using namespace std;
 
 namespace swirly {
 
+const char* enumToString(AssetType type)
+{
+    switch (type) {
+    SWIRLY_ENUM_CASE(AssetType, COMMODITY);
+    SWIRLY_ENUM_CASE(AssetType, CORPORATE);
+    SWIRLY_ENUM_CASE(AssetType, CURRENCY);
+    SWIRLY_ENUM_CASE(AssetType, EQUITY);
+    SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
+    SWIRLY_ENUM_CASE(AssetType, INDEX);
+    }
+    terminate();
+}
+
+const char* enumToString(Direct direct)
+{
+    switch (direct) {
+    SWIRLY_ENUM_CASE(Direct, PAID);
+    SWIRLY_ENUM_CASE(Direct, GIVEN);
+    }
+    terminate();
+}
+
 const char* enumToString(RecType type)
 {
     switch (type) {
@@ -31,15 +53,33 @@ const char* enumToString(RecType type)
     terminate();
 }
 
-const char* enumToString(AssetType type)
+const char* enumToString(Role role)
 {
-    switch (type) {
-    SWIRLY_ENUM_CASE(AssetType, COMMODITY);
-    SWIRLY_ENUM_CASE(AssetType, CORPORATE);
-    SWIRLY_ENUM_CASE(AssetType, CURRENCY);
-    SWIRLY_ENUM_CASE(AssetType, EQUITY);
-    SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
-    SWIRLY_ENUM_CASE(AssetType, INDEX);
+    switch (role) {
+    SWIRLY_ENUM_CASE(Role, MAKER);
+    SWIRLY_ENUM_CASE(Role, TAKER);
+    }
+    terminate();
+}
+
+const char* enumToString(Side side)
+{
+    switch (side) {
+    SWIRLY_ENUM_CASE(Side, BUY);
+    SWIRLY_ENUM_CASE(Side, SELL);
+    }
+    terminate();
+}
+
+const char* enumToString(State state)
+{
+    switch (state) {
+    SWIRLY_ENUM_CASE(State, NONE);
+    SWIRLY_ENUM_CASE(State, NEW);
+    SWIRLY_ENUM_CASE(State, REVISE);
+    SWIRLY_ENUM_CASE(State, CANCEL);
+    SWIRLY_ENUM_CASE(State, TRADE);
+    SWIRLY_ENUM_CASE(State, PECAN);
     }
     terminate();
 }

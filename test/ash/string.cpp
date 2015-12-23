@@ -18,11 +18,34 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
+using namespace swirly;
+
+namespace swirly {
+enum class Test {
+    FOO = 1,
+    BAR
+};
+
+const char* enumToString(Test t)
+{
+    switch (t) {
+    SWIRLY_ENUM_CASE(Test, FOO);
+    SWIRLY_ENUM_CASE(Test, BAR);
+    }
+    terminate();
+}
+}
+
 BOOST_AUTO_TEST_SUITE(string)
 
-BOOST_AUTO_TEST_CASE(test1)
+BOOST_AUTO_TEST_CASE(enumInsertOp)
 {
-    BOOST_CHECK(true);
+    BOOST_CHECK_EQUAL(lexical_cast<std::string>(Test::FOO), "FOO");
+    BOOST_CHECK_EQUAL(lexical_cast<std::string>(Test::BAR), "BAR");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
