@@ -21,6 +21,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
 class SWIRLY_API Trader : public Rec {
 protected:
     const Email email_;
@@ -47,6 +52,8 @@ public:
         return email_;
     }
 };
+
+/** @} */
 
 } // swirly
 

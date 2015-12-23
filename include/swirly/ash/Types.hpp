@@ -20,6 +20,11 @@
 namespace swirly {
 
 /**
+ * @addtogroup Date
+ * @{
+ */
+
+/**
  * ISO8601 date in yyymmdd format.
  */
 typedef int IsoDate;
@@ -28,6 +33,8 @@ typedef int IsoDate;
  * Julian day.
  */
 typedef int Jd;
+
+/** @} */
 
 } // swirly
 

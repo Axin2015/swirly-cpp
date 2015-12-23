@@ -23,6 +23,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Util
+ * @{
+ */
+
 class SWIRLY_API RefCounted {
     mutable int refs_ = 0;
     friend void intrusive_ptr_add_ref(const RefCounted* ptr) noexcept
@@ -50,6 +55,8 @@ public:
 };
 
 using RefCountedPtr = boost::intrusive_ptr<RefCounted>;
+
+/** @} */
 
 } // swirly
 

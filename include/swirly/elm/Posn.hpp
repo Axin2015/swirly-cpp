@@ -23,6 +23,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
 class SWIRLY_API Posn : public RefCounted {
 protected:
     const Mnem trader_;
@@ -49,6 +54,8 @@ public:
 };
 
 using PosnPtr = boost::intrusive_ptr<Posn>;
+
+/** @} */
 
 } // swirly
 

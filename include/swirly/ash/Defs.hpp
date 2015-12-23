@@ -17,7 +17,21 @@
 #ifndef SWIRLY_ASH_DEFS_HPP
 #define SWIRLY_ASH_DEFS_HPP
 
+/**
+ * @addtogroup Util
+ * @{
+ */
+
+/**
+ * Macro for exporting classes and functions that compose the public API.
+ */
 #define SWIRLY_API __attribute__((visibility ("default")))
+
+/**
+ * Helper macro for implementing enumToString() case statements.
+ */
 #define SWIRLY_ENUM_CASE(type, val) case type::val: return #val; break
+
+/** @} */
 
 #endif // SWIRLY_ASH_DEFS_HPP

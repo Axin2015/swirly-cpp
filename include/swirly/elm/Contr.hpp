@@ -21,6 +21,14 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
+/**
+ * A specification that stipulates the terms and conditions of sale.
+ */
 class SWIRLY_API Contr : public Rec {
 protected:
     const Mnem asset_;
@@ -109,6 +117,8 @@ public:
         return maxLots_;
     }
 };
+
+/** @} */
 
 } // swirly
 

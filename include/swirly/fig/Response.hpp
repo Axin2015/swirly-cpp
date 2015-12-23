@@ -21,6 +21,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup App
+ * @{
+ */
+
 class SWIRLY_API Response {
 public:
     constexpr Response() noexcept = default;
@@ -34,6 +39,8 @@ public:
     constexpr Response(Response&&) = default;
     Response& operator =(Response&&) = default;
 };
+
+/** @} */
 
 } // swirly
 

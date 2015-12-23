@@ -27,6 +27,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
 class SWIRLY_API Rec : public Comparable<Rec> {
 protected:
     const RecType type_;
@@ -144,6 +149,8 @@ public:
         return set_.cend();
     }
 };
+
+/** @} */
 
 } // swirly
 

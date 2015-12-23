@@ -21,6 +21,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup App
+ * @{
+ */
+
 class SWIRLY_API Serv {
 public:
     constexpr Serv() noexcept = default;
@@ -34,6 +39,8 @@ public:
     constexpr Serv(Serv&&) = default;
     Serv& operator =(Serv&&) = default;
 };
+
+/** @} */
 
 } // swirly
 

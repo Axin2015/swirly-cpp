@@ -26,6 +26,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Util
+ * @{
+ */
+
 using StringView = std::experimental::string_view;
 
 template <std::size_t MaxN>
@@ -131,6 +136,8 @@ inline std::ostream& operator <<(std::ostream& os, EnumT val)
 {
     return os << enumToString(val);
 }
+
+/** @} */
 
 } // swirly
 

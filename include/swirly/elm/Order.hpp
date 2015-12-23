@@ -21,6 +21,14 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
+/**
+ * An instruction to buy or sell goods or services.
+ */
 class SWIRLY_API Order : public Request {
 protected:
     const Mnem trader_;
@@ -42,6 +50,8 @@ public:
 };
 
 using OrderPtr = boost::intrusive_ptr<Order>;
+
+/** @} */
 
 } // swirly
 

@@ -23,6 +23,14 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
+/**
+ * A place where buyers and sellers come together to exchange goods or services.
+ */
 class SWIRLY_API Market : public Rec {
 protected:
     const Mnem contr_;
@@ -61,6 +69,8 @@ public:
         return state_;
     }
 };
+
+/** @} */
 
 } // swirly
 

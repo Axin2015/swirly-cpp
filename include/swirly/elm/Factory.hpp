@@ -22,6 +22,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
 class SWIRLY_API Factory {
 protected:
     virtual std::unique_ptr<Asset> doNewAsset(const char* mnem, const char* display,
@@ -69,6 +74,8 @@ public:
     BasicFactory(BasicFactory&&) = default;
     BasicFactory& operator =(BasicFactory&&) = default;
 };
+
+/** @} */
 
 } // swirly
 

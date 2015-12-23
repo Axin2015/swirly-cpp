@@ -23,6 +23,11 @@ namespace swirly {
 
 class Factory;
 
+/**
+ * @addtogroup IO
+ * @{
+ */
+
 class SWIRLY_API Model {
 protected:
     virtual RecSet doReadAsset(const Factory& factory) const = 0;
@@ -44,6 +49,8 @@ public:
         return doReadAsset(factory);
     }
 };
+
+/** @} */
 
 } // swirly
 

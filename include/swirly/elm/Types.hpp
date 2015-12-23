@@ -21,6 +21,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Domain
+ * @{
+ */
+
 using Incs = long;
 
 /**
@@ -170,6 +175,8 @@ enum class State {
 };
 
 SWIRLY_API const char* enumToString(State state);
+
+/** @} */
 
 } // swirly
 

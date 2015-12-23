@@ -21,6 +21,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Util
+ * @{
+ */
+
 template <typename TypeT>
 struct Comparable {
     friend constexpr bool operator ==(const TypeT& lhs, const TypeT& rhs) noexcept
@@ -81,6 +86,8 @@ inline constexpr int compare(IntegralT lhs, IntegralT rhs)
         i = 0;
     return i;
 }
+
+/** @} */
 
 } // swirly
 

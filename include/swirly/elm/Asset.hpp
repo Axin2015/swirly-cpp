@@ -21,6 +21,14 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
+/**
+ * An item of value.
+ */
 class SWIRLY_API Asset : public Rec {
 protected:
     const AssetType type_;
@@ -46,6 +54,8 @@ public:
         return type_;
     }
 };
+
+/** @} */
 
 } // swirly
 

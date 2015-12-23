@@ -23,6 +23,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup Domain
+ * @{
+ */
+
 inline constexpr long roundHalfAway(double real)
 {
     return static_cast<long>(real < 0.0 ? real - 0.5 : real + 0.5);
@@ -98,6 +103,8 @@ inline double dpToReal(int dp)
 {
     return std::pow(10, -dp);
 }
+
+/** @} */
 
 } // swirly
 

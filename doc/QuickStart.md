@@ -23,10 +23,6 @@ To build Swirly from source, you will need:
 
 - [GCC] or [Clang] - with support for C11;
 - [CMake] - for Makefile generation;
-- [LibUuid] - for session identifiers;
-- [Ragel] - if you intend to change `shlex.rl`;
-- [SQLite] - for database management;
-- [ZeroMQ] - for messaging.
 
 Build from Source
 -----------------
@@ -68,16 +64,6 @@ Install to `CMAKE_INSTALL_PREFIX`:
 
     $ make install
 
-Next Steps
-----------
-
-- use the [admin guide](AdminGuide.html) to create a database and start the daemon;
-- start the shell and walk through the steps in the [tutorial](Tutorial.html).
-
 [GCC]: http://gcc.gnu.org/
 [Clang]: http://clang.llvm.org/
 [CMake]: http://www.cmake.org/
-[LibUuid]: http://linux.die.net/man/3/libuuid
-[Ragel]: http://www.complang.org/ragel/
-[SQLite]: http://sqlite.org/
-[ZeroMQ]: http://zeromq.org/
