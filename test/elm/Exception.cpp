@@ -14,29 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_DEFS_HPP
-#define SWIRLY_ASH_DEFS_HPP
+#include <swirly/elm/Exception.hpp>
 
-/**
- * @addtogroup Util
- * @{
- */
+#include <boost/test/unit_test.hpp>
 
-/**
- * Macro for exporting classes and functions that compose the public API.
- */
-#define SWIRLY_API __attribute__((visibility ("default")))
+using namespace swirly;
 
-/**
- * Helper macro for implementing enumToString() case statements.
- */
-#define SWIRLY_ENUM_CASE(type, val) case type::val: return #val; break
+BOOST_AUTO_TEST_SUITE(ExceptionSuite)
 
-/**
- * Helper macro for "%.*s" arguments.
- */
-#define SWIRLY_STR(x) static_cast<int>((x).size()), (x).data()
+BOOST_AUTO_TEST_CASE(ServExceptionCase)
+{
+    BOOST_CHECK_THROW(throwException<ServException>("[%d]", 123), ServException);
+}
 
-/** @} */
-
-#endif // SWIRLY_ASH_DEFS_HPP
+BOOST_AUTO_TEST_SUITE_END()

@@ -14,29 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_DEFS_HPP
-#define SWIRLY_ASH_DEFS_HPP
+#include <swirly/ash/Exception.hpp>
 
-/**
- * @addtogroup Util
- * @{
- */
+#include <cstdio> // vsnprintf()
 
-/**
- * Macro for exporting classes and functions that compose the public API.
- */
-#define SWIRLY_API __attribute__((visibility ("default")))
+using namespace std;
 
-/**
- * Helper macro for implementing enumToString() case statements.
- */
-#define SWIRLY_ENUM_CASE(type, val) case type::val: return #val; break
+namespace swirly {
 
-/**
- * Helper macro for "%.*s" arguments.
- */
-#define SWIRLY_STR(x) static_cast<int>((x).size()), (x).data()
+Exception::~Exception() noexcept = default;
 
-/** @} */
+const char* Exception::what() const noexcept
+{
+    return msg_;
+}
 
-#endif // SWIRLY_ASH_DEFS_HPP
+void format(Exception& e, const char* fmt, ...) noexcept
+{
+    va_list args;
+    va_start(args, fmt);
+    format(e, fmt, args);
+    va_end(args);
+}
+
+void format(Exception& e, const char* fmt, std::va_list args) noexcept
+{
+    const auto ret = std::vsnprintf(e.msg_, sizeof(e.msg_), fmt, args);
+    if (ret < 0)
+        std::terminate();
+}
+
+} // swirly
