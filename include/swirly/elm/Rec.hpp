@@ -79,6 +79,16 @@ public:
 };
 
 class SWIRLY_API RecSet {
+    struct MnemComp {
+        bool operator()(const StringView& lhs, const Rec& rhs) const noexcept
+        {
+            return lhs < rhs.mnem();
+        }
+        bool operator()(const Rec& lhs, const StringView& rhs) const noexcept
+        {
+            return lhs.mnem() < rhs;
+        }
+    };
     using Option = boost::intrusive::member_hook<Rec, boost::intrusive::set_member_hook<>, &Rec::set_hook_>;
     using Set = boost::intrusive::set<Rec, Option>;
     Set set_;
@@ -101,24 +111,24 @@ public:
     RecSet(RecSet&&) = default;
     RecSet& operator =(RecSet&&) = default;
 
-    bool insert(std::unique_ptr<Rec> rec) noexcept
+    Rec& insert(std::unique_ptr<Rec> rec) noexcept
     {
         auto ret = set_.insert(*rec);
         if (ret.second) {
             // Take ownership if inserted.
             rec.release();
         }
-        return ret.second;
+        return *ret.first;
     }
 
-    void insertOrReplace(std::unique_ptr<Rec> rec) noexcept
+    Rec& insertOrReplace(std::unique_ptr<Rec> rec) noexcept
     {
         auto ret = set_.insert(*rec);
         if (!ret.second) {
             // Replace if exists.
             set_.replace_node(ret.first, *rec);
         }
-        rec.release();
+        return *rec.release();
     }
 
     // Begin.
@@ -130,9 +140,15 @@ public:
     {
         return set_.begin();
     }
-    ConstIterator cbegin() const noexcept
+
+    // Find.
+    Iterator find(const StringView& mnem) noexcept
     {
-        return set_.cbegin();
+        return set_.find(mnem, MnemComp());
+    }
+    ConstIterator find(const StringView& mnem) const noexcept
+    {
+        return set_.find(mnem, MnemComp());
     }
 
     // End.
