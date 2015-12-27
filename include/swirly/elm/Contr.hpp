@@ -50,9 +50,9 @@ protected:
     const Lots maxLots_;
 
 public:
-    Contr(const char* mnem, const char* display, const char* asset, const char* ccy,
-          int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-          Lots minLots, Lots maxLots) noexcept;
+    Contr(const StringView& mnem, const StringView& display, const StringView& asset,
+          const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+          int pipDp, Lots minLots, Lots maxLots) noexcept;
 
     ~Contr() noexcept override;
 
@@ -66,11 +66,11 @@ public:
 
     StringView asset() const noexcept
     {
-        return asset_;
+        return asset_.view();
     }
     StringView ccy() const noexcept
     {
-        return ccy_;
+        return ccy_.view();
     }
     int lotNumer() const noexcept
     {

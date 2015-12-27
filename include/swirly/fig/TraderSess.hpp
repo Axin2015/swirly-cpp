@@ -28,7 +28,7 @@ namespace swirly {
 
 class SWIRLY_API TraderSess : public Trader {
 public:
-    TraderSess(const char* mnem, const char* display, const char* email) noexcept
+    TraderSess(const StringView& mnem, const StringView& display, const StringView& email) noexcept
     :   Trader{mnem, display, email}
     {
     }

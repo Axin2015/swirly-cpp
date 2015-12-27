@@ -31,7 +31,7 @@ protected:
     const Email email_;
 
 public:
-    Trader(const char* mnem, const char* display, const char* email) noexcept
+    Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
     :   Rec{RecType::MARKET, mnem, display},
         email_{email}
     {
@@ -49,7 +49,7 @@ public:
 
     StringView email() const noexcept
     {
-        return email_;
+        return email_.view();
     }
 };
 

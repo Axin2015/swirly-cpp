@@ -20,7 +20,7 @@
 
 namespace swirly {
 
-Market::Market(const char* mnem, const char* display, const char* contr,
+Market::Market(const StringView& mnem, const StringView& display, const StringView& contr,
                Jd settlDay, Jd expiryDay, int state) noexcept
 :   Rec{RecType::MARKET, mnem, display},
     contr_{contr},

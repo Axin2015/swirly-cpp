@@ -33,7 +33,7 @@ class SWIRLY_API Order : public Request {
 protected:
     const Mnem trader_;
 public:
-    constexpr explicit Order(const char* trader) noexcept
+    constexpr explicit Order(const StringView& trader) noexcept
     :   Request{trader}
     {
     }

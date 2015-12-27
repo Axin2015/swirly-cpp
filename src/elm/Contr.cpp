@@ -20,9 +20,9 @@
 
 namespace swirly {
 
-Contr::Contr(const char* mnem, const char* display, const char* asset, const char* ccy,
-             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-             Lots minLots, Lots maxLots) noexcept
+Contr::Contr(const StringView& mnem, const StringView& display, const StringView& asset,
+             const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+             int pipDp, Lots minLots, Lots maxLots) noexcept
 :   Rec{RecType::CONTR, mnem, display},
     asset_{asset},
     ccy_{ccy},

@@ -29,10 +29,10 @@ namespace swirly {
 
 class SWIRLY_API Factory {
 protected:
-    virtual std::unique_ptr<Asset> doNewAsset(const char* mnem, const char* display,
+    virtual std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                               AssetType type) const = 0;
 
-    virtual OrderPtr doNewOrder(const char* trader) const = 0;
+    virtual OrderPtr doNewOrder(const StringView& trader) const = 0;
 public:
     Factory() noexcept = default;
     virtual ~Factory() noexcept;
@@ -45,11 +45,12 @@ public:
     constexpr Factory(Factory&&) noexcept = default;
     Factory& operator =(Factory&&) noexcept = default;
 
-    std::unique_ptr<Asset> newAsset(const char* mnem, const char* display, AssetType type) const
+    std::unique_ptr<Asset> newAsset(const StringView& mnem, const StringView& display,
+                                    AssetType type) const
     {
         return doNewAsset(mnem, display, type);
     }
-    OrderPtr newOrder(const char* trader) const
+    OrderPtr newOrder(const StringView& trader) const
     {
         return doNewOrder(trader);
     }
@@ -57,10 +58,10 @@ public:
 
 class SWIRLY_API BasicFactory : public Factory {
 protected:
-    std::unique_ptr<Asset> doNewAsset(const char* mnem, const char* display,
+    std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                       AssetType type) const override;
 
-    OrderPtr doNewOrder(const char* trader) const override;
+    OrderPtr doNewOrder(const StringView& trader) const override;
 
 public:
     BasicFactory() noexcept = default;

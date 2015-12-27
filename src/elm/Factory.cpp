@@ -22,13 +22,13 @@ namespace swirly {
 
 Factory::~Factory() noexcept = default;
 
-unique_ptr<Asset> BasicFactory::doNewAsset(const char* mnem, const char* display,
+unique_ptr<Asset> BasicFactory::doNewAsset(const StringView& mnem, const StringView& display,
                                            AssetType type) const
 {
     return make_unique<Asset>(mnem, display, type);
 }
 
-OrderPtr BasicFactory::doNewOrder(const char* trader) const
+OrderPtr BasicFactory::doNewOrder(const StringView& trader) const
 {
     return new Order{trader};
 }

@@ -40,7 +40,7 @@ protected:
 public:
     boost::intrusive::set_member_hook<> set_hook_;
 
-    Rec(RecType type, const char* mnem, const char* display) noexcept
+    Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
     :   type_{type},
         mnem_{mnem},
         display_{display}
@@ -70,11 +70,11 @@ public:
     }
     StringView mnem() const noexcept
     {
-        return mnem_;
+        return mnem_.view();
     }
     StringView display() const noexcept
     {
-        return display_;
+        return display_.view();
     }
 };
 

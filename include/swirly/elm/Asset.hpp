@@ -33,7 +33,7 @@ class SWIRLY_API Asset : public Rec {
 protected:
     const AssetType type_;
 public:
-    Asset(const char* mnem, const char* display, AssetType type) noexcept
+    Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept
     :   Rec{RecType::ASSET, mnem, display},
         type_{type}
     {

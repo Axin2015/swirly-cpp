@@ -39,8 +39,8 @@ protected:
     int state_;
 
 public:
-    Market(const char* mnem, const char* display, const char* contr, Jd settlDay, Jd expiryDay,
-           int state) noexcept;
+    Market(const StringView& mnem, const StringView& display, const StringView& contr,
+           Jd settlDay, Jd expiryDay, int state) noexcept;
 
     ~Market() noexcept override;
 
@@ -54,7 +54,7 @@ public:
 
     StringView contr() const noexcept
     {
-        return contr_;
+        return contr_.view();
     }
     Jd settlDay() const noexcept
     {

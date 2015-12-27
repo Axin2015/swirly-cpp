@@ -32,7 +32,7 @@ class SWIRLY_API Posn : public RefCounted {
 protected:
     const Mnem trader_;
 public:
-    constexpr explicit Posn(const char* trader) noexcept
+    constexpr explicit Posn(const StringView& trader) noexcept
     :   trader_{trader}
     {
     }
@@ -49,7 +49,7 @@ public:
 
     StringView trader() const noexcept
     {
-        return trader_;
+        return trader_.view();
     }
 };
 
