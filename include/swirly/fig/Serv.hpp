@@ -17,9 +17,13 @@
 #ifndef SWIRLY_FIG_SERV_HPP
 #define SWIRLY_FIG_SERV_HPP
 
-#include <swirly/ash/Defs.hpp>
+#include <swirly/ash/String.hpp>
+
+#include <memory> // unique_ptr<>
 
 namespace swirly {
+
+class TraderSess;
 
 /**
  * @addtogroup App
@@ -27,17 +31,25 @@ namespace swirly {
  */
 
 class SWIRLY_API Serv {
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 public:
-    constexpr Serv() noexcept = default;
+
+    Serv();
     ~Serv() noexcept;
 
     // Copy.
-    constexpr Serv(const Serv&) = default;
-    Serv& operator =(const Serv&) = default;
+    Serv(const Serv&) = delete;
+    Serv& operator =(const Serv&) = delete;
 
     // Move.
-    constexpr Serv(Serv&&) = default;
-    Serv& operator =(Serv&&) = default;
+    Serv(Serv&&);
+    Serv& operator =(Serv&&);
+
+    const TraderSess& createTrader(const StringView& mnem, const StringView& display,
+                                   const StringView& email);
+
+    const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
 };
 
 /** @} */

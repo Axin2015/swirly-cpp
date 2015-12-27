@@ -16,10 +16,42 @@
  */
 #include <swirly/fig/Serv.hpp>
 
+#include <swirly/fig/TraderSess.hpp>
+
+#include <swirly/elm/Exception.hpp>
+
+using namespace std;
+
 namespace swirly {
 
-Serv::~Serv() noexcept
+struct Serv::Impl {
+    RecSet traders;
+};
+
+Serv::Serv()
+:   impl_{make_unique<Impl>()}
 {
+}
+
+Serv::~Serv() noexcept = default;
+
+Serv::Serv(Serv&&) = default;
+
+Serv& Serv::operator =(Serv&&) = default;
+
+const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
+                                     const StringView& email)
+{
+    Rec& rec = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email));
+    return static_cast<TraderSess&>(rec);
+}
+
+const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& display)
+{
+    auto it = impl_->traders.find(mnem);
+    if (it == impl_->traders.end())
+        throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+    return static_cast<const TraderSess&>(*it);
 }
 
 } // swirly
