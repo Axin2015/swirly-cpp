@@ -1,5 +1,5 @@
-How It Works {#HowItWorks}
-============
+Design {#Design}
+======
 
 Matching-engines are used in financial trading systems to match buyers and sellers in a
 market-place. Market-makers place bids and offers into a central limit order-book. Market-makers can

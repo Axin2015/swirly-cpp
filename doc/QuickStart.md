@@ -32,12 +32,16 @@ The following sections assume that `SWIRLY_SOURCE` is equal to `SOURCE_DIR/swirl
 
 ### Download ###
 
-Download the source from [GitHub](http://github.com/swirlycloud):
+Clone the project from the [master repository](http://github.com/swirlycloud/swirlyc) or your own
+personal fork:
 
     $ cd $SOURCE_DIR
     $ git clone https://github.com/swirlycloud/swirlyc.git swirlyc
 
 The `SOURCE_DIR/swirlyc` directory should now contain the source.
+
+A [Zip archive](https://github.com/swirlycloud/swirlyc/archive/master.zip) can also be download as
+an alternative.
 
 ### Configure ###
 
@@ -67,3 +71,17 @@ Install to `CMAKE_INSTALL_PREFIX`:
 [GCC]: http://gcc.gnu.org/
 [Clang]: http://clang.llvm.org/
 [CMake]: http://www.cmake.org/
+
+Github Fork
+-----------
+
+Add remote upstream to fork:
+
+    $ git remote add upstream git@github.com:swirlycloud/swirlyc.git
+
+Sync local fork:
+
+    $ git checkout master
+    $ git fetch upstream
+    $ git rebase upstream/master
+    $ git push origin
