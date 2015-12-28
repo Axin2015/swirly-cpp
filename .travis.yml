@@ -1,0 +1,27 @@
+language: cpp
+
+compiler:
+  - g++-5
+
+addons:
+  apt:
+    sources:
+      - boost-latest
+      - ubuntu-toolchain-r-test
+    packages:
+      - cmake
+      - g++-5
+      - libboost1.55-all-dev
+
+install:
+  - export CC=gcc-5
+  - export CXX=g++-5
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make
+  - make test
