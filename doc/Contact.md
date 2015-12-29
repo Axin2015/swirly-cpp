@@ -1,22 +1,29 @@
 Contact {#Contact}
 =======
 
+Development
+-----------
+
+| Resource    | Address                                    |
+| ----------- | ------------------------------             |
+| GitHub      | <http://github.com/swirlycloud/swirlyc>    |
+| Travis CI   | <http://travis-ci.org/swirlycloud/swirlyc> |
+
 Email Groups
 ------------
 
-| Group       | Address                          |
+| Resource    | Address                          |
 | ----------- | ------------------------------   |
 | Information | <mailto:info@swirlycloud.com>    |
 | Sales       | <mailto:sales@swirlycloud.com>   |
 | Support     | <mailto:support@swirlycloud.com> |
 
-Social Websites
----------------
+Social Media
+------------
 
-| Website     | Address                                      |
+| Resource    | Address                                      |
 | ----------- | ------------------------------               |
 | Facebook    | <http://www.facebook.com/swirlycloud>        |
-| GitHub      | <http://github.com/swirlycloud>              |
 | Google+     | <http://google.com/+SwirlyCloudDotCom>       |
 | Twitter     | <http://twitter.com/swirly_cloud>            |
 | YouTube     | <http://www.youtube.com/c/SwirlyCloudDotCom> |

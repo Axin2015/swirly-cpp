@@ -1,5 +1,5 @@
-Quick Start {#QuickStart}
-===========
+Developer {#Developer}
+=========
 
 Environment Variables
 ---------------------
@@ -21,8 +21,9 @@ Dependencies
 
 To build Swirly from source, you will need:
 
-- [GCC] or [Clang] - with support for C11;
 - [CMake] - for Makefile generation;
+- [GCC] or [Clang] - with support for C++14;
+- [Boost] - for additional library dependencies.
 
 Build from Source
 -----------------
@@ -52,7 +53,15 @@ Configure using `cmake` as follows from the build directory:
     $ cd swirlyc
     $ cmake $SOURCE_DIR/swirlyc -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME
 
-This step will produce Unix Makefiles by default.
+This step will produce Unix Makefiles by default. The build-type and compiler can be set using the
+following options:
+
+    $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
+        -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER=gcc-5 \
+        -DCMAKE_CXX_COMPILER=g++-5
+
 See CMake Options for more information.
 
 ### Make ###
@@ -68,20 +77,16 @@ Install to `CMAKE_INSTALL_PREFIX`:
 
     $ make install
 
-[GCC]: http://gcc.gnu.org/
+[Boost]: http://www.boost.org/
 [Clang]: http://clang.llvm.org/
 [CMake]: http://www.cmake.org/
+[GCC]: http://gcc.gnu.org/
 
-Github Fork
------------
+Documentation
+-------------
 
-Add remote upstream to fork:
+Testing
+-------
 
-    $ git remote add upstream git@github.com:swirlycloud/swirlyc.git
-
-Sync local fork:
-
-    $ git checkout master
-    $ git fetch upstream
-    $ git rebase upstream/master
-    $ git push origin
+Each header-file should have its own unit-test. The header-file should be the first file included in
+the unit-test to ensure that the header-file is self-sufficient.
