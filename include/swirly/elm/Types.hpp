@@ -46,6 +46,11 @@ using Ticks = Incs;
 using Cost = Incs;
 
 /**
+ * Bitfield representing the state of a Market.
+ */
+using MarketState = unsigned;
+
+/**
  * Maximum display characters.
  */
 constexpr std::size_t DISPLAY_MAX = 64;

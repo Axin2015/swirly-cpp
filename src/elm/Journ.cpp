@@ -14,23 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Market.hpp>
+#include <swirly/elm/Journ.hpp>
 
-#include <cassert>
+using namespace std;
 
 namespace swirly {
 
-Market::Market(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jd settlDay, Jd expiryDay, MarketState state) noexcept
-:   Rec{RecType::MARKET, mnem, display},
-    contr_{contr},
-    settlDay_{settlDay},
-    expiryDay_{expiryDay},
-    state_{state}
-{
-    assert((settlDay == 0) == (expiryDay == 0));
-}
-
-Market::~Market() noexcept = default;
+Journ::~Journ() noexcept = default;
 
 } // swirly

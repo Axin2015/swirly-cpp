@@ -14,23 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Market.hpp>
+#include <swirly/elm/Journ.hpp>
 
-#include <cassert>
+#include <boost/test/unit_test.hpp>
 
-namespace swirly {
+BOOST_AUTO_TEST_SUITE(JournSuite)
 
-Market::Market(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jd settlDay, Jd expiryDay, MarketState state) noexcept
-:   Rec{RecType::MARKET, mnem, display},
-    contr_{contr},
-    settlDay_{settlDay},
-    expiryDay_{expiryDay},
-    state_{state}
+BOOST_AUTO_TEST_CASE(Test1Case)
 {
-    assert((settlDay == 0) == (expiryDay == 0));
+    BOOST_CHECK(true);
 }
 
-Market::~Market() noexcept = default;
-
-} // swirly
+BOOST_AUTO_TEST_SUITE_END()
