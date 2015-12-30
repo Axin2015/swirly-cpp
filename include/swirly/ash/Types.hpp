@@ -27,12 +27,17 @@ namespace swirly {
 /**
  * ISO8601 date in yyymmdd format.
  */
-typedef int IsoDate;
+using IsoDate = int;
 
 /**
  * Julian day.
  */
-typedef int Jd;
+using Jd = int;
+
+/**
+ * Milliseconds since Unix epoch.
+ */
+using Millis = long;
 
 /** @} */
 

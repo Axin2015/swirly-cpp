@@ -19,17 +19,29 @@
 #include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/Exception.hpp>
+#include <swirly/elm/MarketBook.hpp>
+
+#include "EmailSet.hpp"
 
 using namespace std;
 
 namespace swirly {
 
 struct Serv::Impl {
+    Impl(const Model& model, Journ& journ, Millis now)
+    : journ{journ}
+    {
+    }
+    Journ& journ;
+    RecSet assets;
+    RecSet contrs;
+    RecSet markets;
     RecSet traders;
+    detail::EmailSet emailIdx;
 };
 
-Serv::Serv()
-:   impl_{make_unique<Impl>()}
+Serv::Serv(const Model& model, Journ& journ, Millis now)
+:   impl_{make_unique<Impl>(model, journ, now)}
 {
 }
 
@@ -51,7 +63,49 @@ const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& d
     auto it = impl_->traders.find(mnem);
     if (it == impl_->traders.end())
         throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+    it->setDisplay(display);
     return static_cast<const TraderSess&>(*it);
+}
+
+const RecSet& Serv::assets() const noexcept
+{
+    return impl_->assets;
+}
+
+const RecSet& Serv::contrs() const noexcept
+{
+    return impl_->contrs;
+}
+
+const RecSet& Serv::markets() const noexcept
+{
+    return impl_->markets;
+}
+
+const RecSet& Serv::traders() const noexcept
+{
+    return impl_->traders;
+}
+
+const MarketBook& Serv::market(const StringView& mnem) const
+{
+    auto it = impl_->markets.find(mnem);
+    if (it == impl_->markets.end())
+        throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
+    return static_cast<const MarketBook&>(*it);
+}
+
+const TraderSess& Serv::trader(const StringView& mnem) const
+{
+    auto it = impl_->traders.find(mnem);
+    if (it == impl_->traders.end())
+        throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+    return static_cast<const TraderSess&>(*it);
+}
+
+Optional<TraderSess> Serv::findTraderByEmail(const StringView& email) const
+{
+    return {};
 }
 
 } // swirly

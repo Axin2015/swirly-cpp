@@ -57,6 +57,11 @@ public:
     Rec(Rec&&) = default;
     Rec& operator =(Rec&&) = default;
 
+    void setDisplay(const StringView& display) noexcept
+    {
+        display_ = display;
+    }
+
     int compare(const Rec& rhs) const noexcept
     {
         int ret {swirly::compare(type_, rhs.type_)};
@@ -135,6 +140,7 @@ public:
             set_.replace_node(result.first, *rec);
             delete prev;
         }
+        // Take ownership.
         return *rec.release();
     }
 

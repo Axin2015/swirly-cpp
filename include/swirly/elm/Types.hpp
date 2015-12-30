@@ -28,11 +28,6 @@ namespace swirly {
 
 using Incs = long;
 
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = long;
-
 using Lots = Incs;
 
 /**
