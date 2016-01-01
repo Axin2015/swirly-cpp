@@ -14,33 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_TYPES_HPP
-#define SWIRLY_ASH_TYPES_HPP
+#include <swirly/elm/MarketBook.hpp>
+
+#include <cassert>
 
 namespace swirly {
 
-/**
- * @addtogroup Date
- * @{
- */
+MarketBook::MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
+                       Jd settlDay, Jd expiryDay, MarketState state) noexcept
+:   Market{mnem, display, contr, settlDay, expiryDay, state}
+{
+}
 
-/**
- * ISO8601 date in yyymmdd format.
- */
-using IsoDate = int;
-
-/**
- * Julian day.
- */
-using Jd = int;
-
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = long;
-
-/** @} */
+MarketBook::~MarketBook() noexcept = default;
 
 } // swirly
-
-#endif // SWIRLY_ASH_TYPES_HPP

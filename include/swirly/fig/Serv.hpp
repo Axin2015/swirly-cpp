@@ -17,12 +17,18 @@
 #ifndef SWIRLY_FIG_SERV_HPP
 #define SWIRLY_FIG_SERV_HPP
 
+#include <swirly/ash/Optional.hpp>
 #include <swirly/ash/String.hpp>
+#include <swirly/ash/Types.hpp>
 
 #include <memory> // unique_ptr<>
 
 namespace swirly {
 
+class Journ;
+class MarketBook;
+class Model;
+class RecSet;
 class TraderSess;
 
 /**
@@ -35,7 +41,8 @@ class SWIRLY_API Serv {
     std::unique_ptr<Impl> impl_;
 public:
 
-    Serv();
+    Serv(const Model& model, Journ& journ, Millis now);
+
     ~Serv() noexcept;
 
     // Copy.
@@ -50,6 +57,20 @@ public:
                                    const StringView& email);
 
     const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
+
+    const RecSet& assets() const noexcept;
+
+    const RecSet& contrs() const noexcept;
+
+    const RecSet& markets() const noexcept;
+
+    const RecSet& traders() const noexcept;
+
+    const MarketBook& market(const StringView& mnem) const;
+
+    const TraderSess& trader(const StringView& mnem) const;
+
+    Optional<TraderSess> findTraderByEmail(const StringView& email) const;
 };
 
 /** @} */

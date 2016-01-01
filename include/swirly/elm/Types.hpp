@@ -28,11 +28,6 @@ namespace swirly {
 
 using Incs = long;
 
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = long;
-
 using Lots = Incs;
 
 /**
@@ -44,6 +39,11 @@ using Ticks = Incs;
  * Sum of lots and ticks.
  */
 using Cost = Incs;
+
+/**
+ * Bitfield representing the state of a Market.
+ */
+using MarketState = unsigned;
 
 /**
  * Maximum display characters.

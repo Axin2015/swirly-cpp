@@ -14,33 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_TYPES_HPP
-#define SWIRLY_ASH_TYPES_HPP
+#ifndef SWIRLY_ASH_OPTIONAL_HPP
+#define SWIRLY_ASH_OPTIONAL_HPP
+
+#include <experimental/optional>
 
 namespace swirly {
 
 /**
- * @addtogroup Date
+ * @addtogroup Util
  * @{
  */
 
-/**
- * ISO8601 date in yyymmdd format.
- */
-using IsoDate = int;
-
-/**
- * Julian day.
- */
-using Jd = int;
-
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = long;
+template<class TypeT>
+using Optional = std::experimental::optional<TypeT>;
 
 /** @} */
 
 } // swirly
 
-#endif // SWIRLY_ASH_TYPES_HPP
+#endif // SWIRLY_ASH_OPTIONAL_HPP

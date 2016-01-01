@@ -14,52 +14,36 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_TRADER_HPP
-#define SWIRLY_ELM_TRADER_HPP
+#ifndef SWIRLY_ELM_MARKETBOOK_HPP
+#define SWIRLY_ELM_MARKETBOOK_HPP
 
-#include <swirly/elm/Rec.hpp>
-
-#include <boost/intrusive/unordered_set.hpp>
+#include <swirly/elm/Market.hpp>
 
 namespace swirly {
 
 /**
- * @addtogroup Entity
+ * @addtogroup Book
  * @{
  */
 
-class SWIRLY_API Trader : public Rec {
-    using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
-protected:
-    const Email email_;
-
+class SWIRLY_API MarketBook : public Market {
 public:
-    boost::intrusive::unordered_set_member_hook<LinkModeOption> email_hook_;
+    MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
+               Jd settlDay, Jd expiryDay, MarketState state) noexcept;
 
-    Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
-    :   Rec{RecType::MARKET, mnem, display},
-        email_{email}
-    {
-    }
-
-    ~Trader() noexcept override;
+    ~MarketBook() noexcept override;
 
     // Copy.
-    Trader(const Trader&) = default;
-    Trader& operator =(const Trader&) = default;
+    MarketBook(const MarketBook&) = default;
+    MarketBook& operator =(const MarketBook&) = default;
 
     // Move.
-    Trader(Trader&&) = default;
-    Trader& operator =(Trader&&) = default;
-
-    StringView email() const noexcept
-    {
-        return email_.view();
-    }
+    MarketBook(MarketBook&&) = default;
+    MarketBook& operator =(MarketBook&&) = default;
 };
 
 /** @} */
 
 } // swirly
 
-#endif // SWIRLY_ELM_TRADER_HPP
+#endif // SWIRLY_ELM_MARKETBOOK_HPP

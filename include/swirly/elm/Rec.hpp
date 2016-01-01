@@ -38,7 +38,7 @@ protected:
     const Mnem mnem_;
     Display display_;
 public:
-    boost::intrusive::set_member_hook<> set_hook_;
+    boost::intrusive::set_member_hook<> mnem_hook_;
 
     Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
     :   type_{type},
@@ -56,6 +56,11 @@ public:
     // Move.
     Rec(Rec&&) = default;
     Rec& operator =(Rec&&) = default;
+
+    void setDisplay(const StringView& display) noexcept
+    {
+        display_ = display;
+    }
 
     int compare(const Rec& rhs) const noexcept
     {
@@ -79,7 +84,7 @@ public:
 };
 
 class SWIRLY_API RecSet {
-    struct MnemComp {
+    struct KeyValueCompare {
         bool operator()(const StringView& lhs, const Rec& rhs) const noexcept
         {
             return lhs < rhs.mnem();
@@ -89,8 +94,13 @@ class SWIRLY_API RecSet {
             return lhs.mnem() < rhs;
         }
     };
-    using Option = boost::intrusive::member_hook<Rec, boost::intrusive::set_member_hook<>, &Rec::set_hook_>;
-    using Set = boost::intrusive::set<Rec, Option>;
+    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+    using MemberHookOption = boost::intrusive::member_hook<Rec, decltype(Rec::mnem_hook_),
+                                                           &Rec::mnem_hook_>;
+    using Set = boost::intrusive::set<Rec,
+                                      ConstantTimeSizeOption,
+                                      MemberHookOption
+                                      >;
     Set set_;
 public:
     using Iterator = typename Set::iterator;
@@ -113,22 +123,39 @@ public:
 
     Rec& insert(std::unique_ptr<Rec> rec) noexcept
     {
-        auto ret = set_.insert(*rec);
-        if (ret.second) {
+        auto result = set_.insert(*rec);
+        if (result.second) {
             // Take ownership if inserted.
             rec.release();
         }
-        return *ret.first;
+        return *result.first;
     }
 
     Rec& insertOrReplace(std::unique_ptr<Rec> rec) noexcept
     {
-        auto ret = set_.insert(*rec);
-        if (!ret.second) {
+        auto result = set_.insert(*rec);
+        if (!result.second) {
             // Replace if exists.
-            set_.replace_node(ret.first, *rec);
+            auto* prev = &*result.first;
+            set_.replace_node(result.first, *rec);
+            delete prev;
         }
+        // Take ownership.
         return *rec.release();
+    }
+
+    template <typename TypeT, typename... ArgsT>
+    TypeT& emplace(ArgsT&&... args)
+    {
+        return static_cast<
+            TypeT&>(insert(std::make_unique<TypeT>(std::forward<ArgsT>(args)...)));
+    }
+
+    template <typename TypeT, typename... ArgsT>
+    TypeT& emplaceOrReplace(ArgsT&&... args)
+    {
+        return static_cast<
+            TypeT&>(insertOrReplace(std::make_unique<TypeT>(std::forward<ArgsT>(args)...)));
     }
 
     // Begin.
@@ -140,15 +167,9 @@ public:
     {
         return set_.begin();
     }
-
-    // Find.
-    Iterator find(const StringView& mnem) noexcept
+    ConstIterator cbegin() const noexcept
     {
-        return set_.find(mnem, MnemComp());
-    }
-    ConstIterator find(const StringView& mnem) const noexcept
-    {
-        return set_.find(mnem, MnemComp());
+        return set_.cbegin();
     }
 
     // End.
@@ -163,6 +184,16 @@ public:
     ConstIterator cend() const noexcept
     {
         return set_.cend();
+    }
+
+    // Find.
+    Iterator find(const StringView& mnem) noexcept
+    {
+        return set_.find(mnem, KeyValueCompare());
+    }
+    ConstIterator find(const StringView& mnem) const noexcept
+    {
+        return set_.find(mnem, KeyValueCompare());
     }
 };
 

@@ -36,11 +36,11 @@ protected:
     const Mnem contr_;
     const Jd settlDay_;
     const Jd expiryDay_;
-    int state_;
+    MarketState state_;
 
 public:
     Market(const StringView& mnem, const StringView& display, const StringView& contr,
-           Jd settlDay, Jd expiryDay, int state) noexcept;
+           Jd settlDay, Jd expiryDay, MarketState state) noexcept;
 
     ~Market() noexcept override;
 
@@ -64,7 +64,7 @@ public:
     {
         return expiryDay_;
     }
-    int state() const noexcept
+    MarketState state() const noexcept
     {
         return state_;
     }

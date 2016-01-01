@@ -14,33 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_TYPES_HPP
-#define SWIRLY_ASH_TYPES_HPP
+#include <swirly/elm/Journ.hpp>
 
-namespace swirly {
+#include <boost/test/unit_test.hpp>
 
-/**
- * @addtogroup Date
- * @{
- */
+BOOST_AUTO_TEST_SUITE(JournSuite)
 
-/**
- * ISO8601 date in yyymmdd format.
- */
-using IsoDate = int;
+BOOST_AUTO_TEST_CASE(Test1Case)
+{
+    BOOST_CHECK(true);
+}
 
-/**
- * Julian day.
- */
-using Jd = int;
-
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = long;
-
-/** @} */
-
-} // swirly
-
-#endif // SWIRLY_ASH_TYPES_HPP
+BOOST_AUTO_TEST_SUITE_END()

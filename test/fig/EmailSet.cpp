@@ -14,33 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_TYPES_HPP
-#define SWIRLY_ASH_TYPES_HPP
+#include <EmailSet.hpp>
 
-namespace swirly {
+#include <boost/test/unit_test.hpp>
 
-/**
- * @addtogroup Date
- * @{
- */
+using namespace std;
+using namespace swirly;
 
-/**
- * ISO8601 date in yyymmdd format.
- */
-using IsoDate = int;
+BOOST_AUTO_TEST_SUITE(EmailSetSuite)
 
-/**
- * Julian day.
- */
-using Jd = int;
+BOOST_AUTO_TEST_CASE(EmailSetCase)
+{
+    detail::EmailSet s;
+    {
+        auto trader = make_unique<Trader>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
+        BOOST_CHECK(s.insert(*trader));
+        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
+        // Auto-unlink.
+    }
+    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
+}
 
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = long;
-
-/** @} */
-
-} // swirly
-
-#endif // SWIRLY_ASH_TYPES_HPP
+BOOST_AUTO_TEST_SUITE_END()

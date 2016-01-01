@@ -68,6 +68,7 @@ public:
     {
         len_ = rhs.size();
         std::memcpy(buf_, rhs.data(), len_);
+        return *this;
     }
 
     // Move.
