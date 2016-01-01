@@ -26,6 +26,8 @@ namespace swirly {
  * @{
  */
 
+using Iden = long;
+
 using Incs = long;
 
 using Lots = Incs;

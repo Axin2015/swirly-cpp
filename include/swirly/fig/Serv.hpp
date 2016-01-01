@@ -17,7 +17,8 @@
 #ifndef SWIRLY_FIG_SERV_HPP
 #define SWIRLY_FIG_SERV_HPP
 
-#include <swirly/ash/Optional.hpp>
+#include <swirly/elm/Types.hpp>
+
 #include <swirly/ash/String.hpp>
 #include <swirly/ash/Types.hpp>
 
@@ -70,7 +71,11 @@ public:
 
     const TraderSess& trader(const StringView& mnem) const;
 
-    Optional<TraderSess> findTraderByEmail(const StringView& email) const;
+    const TraderSess* findTraderByEmail(const StringView& email) const;
+
+    const MarketBook& createMarket(const StringView& mnem, const StringView& display,
+                                   const StringView& contr, Jd settlDay, Jd expiryDay,
+                                   MarketState state, Millis now);
 };
 
 /** @} */

@@ -14,47 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_TRADER_HPP
-#define SWIRLY_ELM_TRADER_HPP
+#include <TraderSessSet.hpp>
 
-#include <swirly/elm/Rec.hpp>
+#include <boost/test/unit_test.hpp>
 
-namespace swirly {
+using namespace std;
+using namespace swirly;
 
-/**
- * @addtogroup Entity
- * @{
- */
+BOOST_AUTO_TEST_SUITE(TraderSessSetSuite)
 
-class SWIRLY_API Trader : public Rec {
-protected:
-    const Email email_;
-
-public:
-    Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
-    :   Rec{RecType::MARKET, mnem, display},
-        email_{email}
+BOOST_AUTO_TEST_CASE(TraderSessSetCase)
+{
+    detail::TraderSessSet s;
     {
+        auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
+        BOOST_CHECK(s.insert(*trader));
+        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
+        // Auto-unlink.
     }
+    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
+}
 
-    ~Trader() noexcept override;
-
-    // Copy.
-    Trader(const Trader&) = default;
-    Trader& operator =(const Trader&) = default;
-
-    // Move.
-    Trader(Trader&&) = default;
-    Trader& operator =(Trader&&) = default;
-
-    StringView email() const noexcept
-    {
-        return email_.view();
-    }
-};
-
-/** @} */
-
-} // swirly
-
-#endif // SWIRLY_ELM_TRADER_HPP
+BOOST_AUTO_TEST_SUITE_END()

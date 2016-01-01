@@ -28,6 +28,32 @@ unique_ptr<Asset> BasicFactory::doNewAsset(const StringView& mnem, const StringV
     return make_unique<Asset>(mnem, display, type);
 }
 
+unique_ptr<Contr> BasicFactory::doNewContr(const StringView& mnem, const StringView& display,
+                                           const StringView& asset, const StringView& ccy,
+                                           int lotNumer, int lotDenom,
+                                           int tickNumer, int tickDenom, int pipDp,
+                                           Lots minLots, Lots maxLots) const
+{
+    return make_unique<Contr>(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer, tickDenom,
+                              pipDp, minLots, maxLots);
+}
+
+unique_ptr<Market> BasicFactory::doNewMarket(const StringView& mnem, const StringView& display,
+                                             const StringView& contr, Jd settlDay,
+                                             Jd expiryDay, MarketState state, Lots lastLots,
+                                             Ticks lastTicks, Millis lastTime, Iden maxOrderId,
+                                             Iden maxExecId, Iden maxQuoteId) const
+{
+    // Note that the last six arguments are unused in this base implementation.
+    return make_unique<Market>(mnem, display, contr, settlDay, expiryDay, state);
+}
+
+unique_ptr<Trader> BasicFactory::doNewTrader(const StringView& mnem, const StringView& display,
+                                             const StringView& email) const
+{
+    return make_unique<Trader>(mnem, display, email);
+}
+
 OrderPtr BasicFactory::doNewOrder(const StringView& trader) const
 {
     return new Order{trader};

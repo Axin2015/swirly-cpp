@@ -14,25 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <EmailSet.hpp>
+#include <ServFactory.hpp>
 
 #include <boost/test/unit_test.hpp>
 
-using namespace std;
-using namespace swirly;
+BOOST_AUTO_TEST_SUITE(ServFactorySuite)
 
-BOOST_AUTO_TEST_SUITE(EmailSetSuite)
-
-BOOST_AUTO_TEST_CASE(EmailSetCase)
+BOOST_AUTO_TEST_CASE(Test1Case)
 {
-    detail::EmailSet s;
-    {
-        auto trader = make_unique<Trader>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
-        BOOST_CHECK(s.insert(*trader));
-        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
-        // Auto-unlink.
-    }
-    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
+    BOOST_CHECK(true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

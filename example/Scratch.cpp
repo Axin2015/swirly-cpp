@@ -37,6 +37,21 @@ protected:
         s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
         return s;
     }
+    RecSet doReadContr(const Factory& factory) const override
+    {
+        RecSet s;
+        return s;
+    }
+    RecSet doReadMarket(const Factory& factory) const override
+    {
+        RecSet s;
+        return s;
+    }
+    RecSet doReadTrader(const Factory& factory) const override
+    {
+        RecSet s;
+        return s;
+    }
 
 public:
     MockModel() noexcept = default;

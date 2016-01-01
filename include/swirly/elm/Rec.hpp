@@ -38,7 +38,7 @@ protected:
     const Mnem mnem_;
     Display display_;
 public:
-    boost::intrusive::set_member_hook<> mnem_hook_;
+    boost::intrusive::set_member_hook<> mnemHook_;
 
     Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
     :   type_{type},
@@ -95,8 +95,8 @@ class SWIRLY_API RecSet {
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<Rec, decltype(Rec::mnem_hook_),
-                                                           &Rec::mnem_hook_>;
+    using MemberHookOption = boost::intrusive::member_hook<Rec, decltype(Rec::mnemHook_),
+                                                           &Rec::mnemHook_>;
     using Set = boost::intrusive::set<Rec,
                                       ConstantTimeSizeOption,
                                       MemberHookOption
