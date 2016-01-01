@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Rec.hpp>
 
+#include <boost/intrusive/unordered_set.hpp>
+
 namespace swirly {
 
 /**
@@ -27,10 +29,13 @@ namespace swirly {
  */
 
 class SWIRLY_API Trader : public Rec {
+    using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 protected:
     const Email email_;
 
 public:
+    boost::intrusive::unordered_set_member_hook<LinkModeOption> email_hook_;
+
     Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
     :   Rec{RecType::MARKET, mnem, display},
         email_{email}
