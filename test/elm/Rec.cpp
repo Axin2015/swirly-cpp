@@ -18,11 +18,54 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
+namespace {
+class Foo : public Rec {
+    int& alive_;
+public:
+    Foo(const StringView& mnem, const StringView& display, int& alive) noexcept
+    :   Rec{RecType::ASSET, mnem, display},
+        alive_{alive}
+    {
+        ++alive;
+    }
+
+    ~Foo() noexcept override
+    {
+        --alive_;
+    }
+};
+} // anonymous
+
 BOOST_AUTO_TEST_SUITE(RecSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(RecSetCase)
 {
-    BOOST_CHECK(true);
+    int alive{0};
+    {
+        RecSet s;
+
+        Foo& foo1 = s.emplace<Foo>("FOO", "Foo One", alive);
+        BOOST_CHECK_EQUAL(alive, 1);
+        BOOST_CHECK_EQUAL(foo1.mnem(), "FOO");
+        BOOST_CHECK_EQUAL(foo1.display(), "Foo One");
+        BOOST_CHECK(s.find("FOO") != s.end());
+
+        // Duplicate.
+        Foo& foo2 = s.emplace<Foo>("FOO", "Foo Two", alive);
+        BOOST_CHECK_EQUAL(alive, 1);
+        BOOST_CHECK_EQUAL(&foo2, &foo1);
+
+        // Replace.
+        Foo& foo3 = s.emplaceOrReplace<Foo>("FOO", "Foo Three", alive);
+        BOOST_CHECK_EQUAL(alive, 1);
+        BOOST_CHECK_NE(&foo3, &foo1);
+        BOOST_CHECK_EQUAL(foo3.mnem(), "FOO");
+        BOOST_CHECK_EQUAL(foo3.display(), "Foo Three");
+    }
+    BOOST_CHECK_EQUAL(alive, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
