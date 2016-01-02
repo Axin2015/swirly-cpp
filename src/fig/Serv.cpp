@@ -52,7 +52,8 @@ Serv::Serv(const Model& model, Journ& journ, Millis now)
     impl_->traders = model.readTrader(impl_->factory);
 
     for (auto& rec : impl_->traders) {
-        impl_->emailIdx.insert(static_cast<TraderSess&>(rec));
+        auto& trader = static_cast<TraderSess&>(rec);
+        impl_->emailIdx.insert(trader);
     }
 }
 
@@ -61,22 +62,6 @@ Serv::~Serv() noexcept = default;
 Serv::Serv(Serv&&) = default;
 
 Serv& Serv::operator =(Serv&&) = default;
-
-const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
-                                     const StringView& email)
-{
-    Rec& rec = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email));
-    return static_cast<TraderSess&>(rec);
-}
-
-const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& display)
-{
-    auto it = impl_->traders.find(mnem);
-    if (it == impl_->traders.end())
-        throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
-    it->setDisplay(display);
-    return static_cast<const TraderSess&>(*it);
-}
 
 const RecSet& Serv::assets() const noexcept
 {
@@ -98,12 +83,53 @@ const RecSet& Serv::traders() const noexcept
     return impl_->traders;
 }
 
+const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
+                                     const StringView& contr, Jd settlDay, Jd expiryDay,
+                                     MarketState state, Millis now)
+{
+    const auto& rec = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
+                                                                     expiryDay, state));
+    const auto& market = static_cast<const MarketBook&>(rec);
+    return market;
+}
+
+const MarketBook& Serv::updateMarket(const StringView& mnem, const StringView& display,
+                                     MarketState state, Millis now)
+{
+    auto it = impl_->markets.find(mnem);
+    if (it == impl_->markets.end())
+        throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
+    auto& market = static_cast<MarketBook&>(*it);
+    market.setDisplay(display);
+    market.setState(state);
+    return market;
+}
+
 const MarketBook& Serv::market(const StringView& mnem) const
 {
     auto it = impl_->markets.find(mnem);
     if (it == impl_->markets.end())
         throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
-    return static_cast<const MarketBook&>(*it);
+    const auto& market = static_cast<const MarketBook&>(*it);
+    return market;
+}
+
+const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
+                                     const StringView& email)
+{
+    Rec& rec = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email));
+    const auto& trader = static_cast<const TraderSess&>(rec);
+    return trader;
+}
+
+const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& display)
+{
+    auto it = impl_->traders.find(mnem);
+    if (it == impl_->traders.end())
+        throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+    auto& trader = static_cast<TraderSess&>(*it);
+    trader.setDisplay(display);
+    return trader;
 }
 
 const TraderSess& Serv::trader(const StringView& mnem) const
@@ -111,7 +137,8 @@ const TraderSess& Serv::trader(const StringView& mnem) const
     auto it = impl_->traders.find(mnem);
     if (it == impl_->traders.end())
         throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
-    return static_cast<const TraderSess&>(*it);
+    const auto& trader = static_cast<const TraderSess&>(*it);
+    return trader;
 }
 
 const TraderSess* Serv::findTraderByEmail(const StringView& email) const
@@ -121,15 +148,6 @@ const TraderSess* Serv::findTraderByEmail(const StringView& email) const
     if (it != impl_->emailIdx.end())
         trader = &*it;
     return trader;
-}
-
-const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
-                                     const StringView& contr, Jd settlDay, Jd expiryDay,
-                                     MarketState state, Millis now)
-{
-    const auto& rec = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
-                                                                     expiryDay, state));
-    return static_cast<const MarketBook&>(rec);
 }
 
 } // swirly

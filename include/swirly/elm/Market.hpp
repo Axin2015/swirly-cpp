@@ -52,6 +52,10 @@ public:
     Market(Market&&) = default;
     Market& operator =(Market&&) = default;
 
+    void setState(MarketState state) noexcept
+    {
+        state_ = state;
+    }
     StringView contr() const noexcept
     {
         return contr_.view();

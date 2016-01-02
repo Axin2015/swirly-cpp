@@ -54,11 +54,6 @@ public:
     Serv(Serv&&);
     Serv& operator =(Serv&&);
 
-    const TraderSess& createTrader(const StringView& mnem, const StringView& display,
-                                   const StringView& email);
-
-    const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
-
     const RecSet& assets() const noexcept;
 
     const RecSet& contrs() const noexcept;
@@ -67,15 +62,22 @@ public:
 
     const RecSet& traders() const noexcept;
 
+    const MarketBook& createMarket(const StringView& mnem, const StringView& display,
+                                   const StringView& contr, Jd settlDay, Jd expiryDay,
+                                   MarketState state, Millis now);
+
+    const MarketBook& updateMarket(const StringView& mnem, const StringView& display,
+                                   MarketState state, Millis now);
     const MarketBook& market(const StringView& mnem) const;
+
+    const TraderSess& createTrader(const StringView& mnem, const StringView& display,
+                                   const StringView& email);
+
+    const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
 
     const TraderSess& trader(const StringView& mnem) const;
 
     const TraderSess* findTraderByEmail(const StringView& email) const;
-
-    const MarketBook& createMarket(const StringView& mnem, const StringView& display,
-                                   const StringView& contr, Jd settlDay, Jd expiryDay,
-                                   MarketState state, Millis now);
 };
 
 /** @} */
