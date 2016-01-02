@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(OrderSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(OrderCase)
 {
     BOOST_CHECK(true);
 }

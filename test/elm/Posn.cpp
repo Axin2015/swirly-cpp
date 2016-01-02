@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(PosnSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(PosnCase)
 {
     BOOST_CHECK(true);
 }

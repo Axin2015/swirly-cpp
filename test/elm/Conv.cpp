@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(ConvSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(ConvCase)
 {
     BOOST_CHECK(true);
 }

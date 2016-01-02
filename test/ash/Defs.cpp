@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(DefsSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(DefsCase)
 {
     BOOST_CHECK(true);
 }

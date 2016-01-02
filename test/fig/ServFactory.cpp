@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(ServFactorySuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(ServFactoryCase)
 {
     BOOST_CHECK(true);
 }

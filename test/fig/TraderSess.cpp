@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(TraderSessSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(TraderSessCase)
 {
     BOOST_CHECK(true);
 }
