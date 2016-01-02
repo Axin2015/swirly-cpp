@@ -18,11 +18,42 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
+namespace {
+class Foo : public RefCounted {
+    int& alive_;
+public:
+    explicit Foo(int& alive) noexcept
+    :   alive_{alive}
+    {
+        ++alive;
+    }
+
+    ~Foo() noexcept override
+    {
+        --alive_;
+    }
+};
+} // anonymous
+
 BOOST_AUTO_TEST_SUITE(RefCountedSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(RefCountedCase)
 {
-    BOOST_CHECK(true);
+    int alive{0};
+    {
+        auto ptr1 = makeRefCounted<Foo>(alive);
+        BOOST_CHECK_EQUAL(alive, 1);
+        BOOST_CHECK_EQUAL(ptr1->refCount(), 1);
+        {
+            auto ptr2 = ptr1;
+            BOOST_CHECK_EQUAL(ptr1->refCount(), 2);
+        }
+        BOOST_CHECK_EQUAL(ptr1->refCount(), 1);
+    }
+    BOOST_CHECK_EQUAL(alive, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
             cout << asset << endl;
         }
 
-        RequestPtr req{new Request{"MARAYL"}};
+        RequestPtr req{makeRefCounted<Request>("MARAYL")};
         cout << req->trader() << endl;
         return 0;
     } catch (const std::exception& e) {

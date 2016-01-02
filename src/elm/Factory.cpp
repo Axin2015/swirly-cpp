@@ -56,7 +56,7 @@ unique_ptr<Trader> BasicFactory::doNewTrader(const StringView& mnem, const Strin
 
 OrderPtr BasicFactory::doNewOrder(const StringView& trader) const
 {
-    return new Order{trader};
+    return makeRefCounted<Order>(trader);
 }
 
 BasicFactory::~BasicFactory() noexcept = default;
