@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(RequestSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(RequestCase)
 {
     BOOST_CHECK(true);
 }

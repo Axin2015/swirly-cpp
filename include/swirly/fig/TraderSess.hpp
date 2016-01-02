@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Trader.hpp>
 
+#include <boost/intrusive/unordered_set.hpp>
+
 namespace swirly {
 
 /**
@@ -27,7 +29,10 @@ namespace swirly {
  */
 
 class SWIRLY_API TraderSess : public Trader {
+    using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 public:
+    boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
+
     TraderSess(const StringView& mnem, const StringView& display, const StringView& email) noexcept
     :   Trader{mnem, display, email}
     {

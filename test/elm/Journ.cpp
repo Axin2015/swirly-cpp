@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(JournSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(JournCase)
 {
     BOOST_CHECK(true);
 }

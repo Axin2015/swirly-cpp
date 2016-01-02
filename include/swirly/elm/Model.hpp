@@ -32,6 +32,12 @@ class SWIRLY_API Model {
 protected:
     virtual RecSet doReadAsset(const Factory& factory) const = 0;
 
+    virtual RecSet doReadContr(const Factory& factory) const = 0;
+
+    virtual RecSet doReadMarket(const Factory& factory) const = 0;
+
+    virtual RecSet doReadTrader(const Factory& factory) const = 0;
+
 public:
     Model() noexcept = default;
     virtual ~Model() noexcept;
@@ -47,6 +53,18 @@ public:
     RecSet readAsset(const Factory& factory) const
     {
         return doReadAsset(factory);
+    }
+    RecSet readContr(const Factory& factory) const
+    {
+        return doReadContr(factory);
+    }
+    RecSet readMarket(const Factory& factory) const
+    {
+        return doReadMarket(factory);
+    }
+    RecSet readTrader(const Factory& factory) const
+    {
+        return doReadTrader(factory);
     }
 };
 

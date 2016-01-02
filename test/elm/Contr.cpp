@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(ContrSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(ContrCase)
 {
     BOOST_CHECK(true);
 }

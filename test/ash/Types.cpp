@@ -20,7 +20,7 @@
 
 BOOST_AUTO_TEST_SUITE(TypesSuite)
 
-BOOST_AUTO_TEST_CASE(Test1Case)
+BOOST_AUTO_TEST_CASE(TypesCase)
 {
     BOOST_CHECK(true);
 }

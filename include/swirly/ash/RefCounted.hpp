@@ -29,7 +29,7 @@ namespace swirly {
  */
 
 class SWIRLY_API RefCounted {
-    mutable int refs_ = 0;
+    mutable int refs_ = 1;
     friend void intrusive_ptr_add_ref(const RefCounted* ptr) noexcept
     {
         ++ptr->refs_;
@@ -52,9 +52,20 @@ public:
     // Move.
     constexpr RefCounted(RefCounted&&) noexcept = default;
     RefCounted& operator =(RefCounted&&) noexcept = default;
+
+    int refCount() const
+    {
+        return refs_;
+    }
 };
 
 using RefCountedPtr = boost::intrusive_ptr<RefCounted>;
+
+template <typename TypeT, typename... ArgsT>
+boost::intrusive_ptr<TypeT> makeRefCounted(ArgsT&&... args)
+{
+    return {new TypeT{std::forward<ArgsT>(args)...}, false};
+}
 
 /** @} */
 

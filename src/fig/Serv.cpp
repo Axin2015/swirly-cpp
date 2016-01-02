@@ -20,8 +20,10 @@
 
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/MarketBook.hpp>
+#include <swirly/elm/Model.hpp>
 
-#include "EmailSet.hpp"
+#include "ServFactory.hpp"
+#include "TraderSessSet.hpp"
 
 using namespace std;
 
@@ -33,16 +35,25 @@ struct Serv::Impl {
     {
     }
     Journ& journ;
+    detail::ServFactory factory;
     RecSet assets;
     RecSet contrs;
     RecSet markets;
     RecSet traders;
-    detail::EmailSet emailIdx;
+    detail::TraderSessSet emailIdx;
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)
 :   impl_{make_unique<Impl>(model, journ, now)}
 {
+    impl_->assets = model.readAsset(impl_->factory);
+    impl_->contrs = model.readContr(impl_->factory);
+    impl_->markets = model.readMarket(impl_->factory);
+    impl_->traders = model.readTrader(impl_->factory);
+
+    for (auto& rec : impl_->traders) {
+        impl_->emailIdx.insert(static_cast<TraderSess&>(rec));
+    }
 }
 
 Serv::~Serv() noexcept = default;
@@ -103,9 +114,22 @@ const TraderSess& Serv::trader(const StringView& mnem) const
     return static_cast<const TraderSess&>(*it);
 }
 
-Optional<TraderSess> Serv::findTraderByEmail(const StringView& email) const
+const TraderSess* Serv::findTraderByEmail(const StringView& email) const
 {
-    return {};
+    const TraderSess* trader{nullptr};
+    auto it = impl_->emailIdx.find(email);
+    if (it != impl_->emailIdx.end())
+        trader = &*it;
+    return trader;
+}
+
+const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
+                                     const StringView& contr, Jd settlDay, Jd expiryDay,
+                                     MarketState state, Millis now)
+{
+    const auto& rec = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
+                                                                     expiryDay, state));
+    return static_cast<const MarketBook&>(rec);
 }
 
 } // swirly
