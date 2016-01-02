@@ -2,30 +2,47 @@ language: cpp
 
 sudo: false
 
-os:
-  - linux
-  - osx
-
-compiler:
-  - clang++
-  - g++
-
-addons:
-  apt:
-    sources:
-      - boost-latest
-      - llvm-toolchain-precise
-      - ubuntu-toolchain-r-test
-    packages:
-      - cmake
-      - clang-3.8
-      - g++-5
-      - libboost1.55-all-dev
-
 matrix:
-  exclude:
-    - os: osx
+  include:
+    - os: linux
+      compiler: clang++
+      addons:
+        apt:
+          sources: ['boost-latest', 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise']
+          packages: ['cmake', 'clang-3.8', 'libboost1.55-all-dev']
+      env: CMAKE_BUILD_TYPE=DEBUG
+
+    - os: linux
+      compiler: clang++
+      addons:
+        apt:
+          sources: ['boost-latest', 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise']
+          packages: ['cmake', 'clang-3.8', 'libboost1.55-all-dev']
+      env: CMAKE_BUILD_TYPE=RELEASE
+
+    - os: linux
       compiler: g++
+      addons:
+        apt:
+          sources: ['boost-latest', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'g++-5', 'libboost1.55-all-dev']
+      env: CMAKE_BUILD_TYPE=DEBUG
+
+    - os: linux
+      compiler: g++
+      addons:
+        apt:
+          sources: ['boost-latest', 'ubuntu-toolchain-r-test']
+          packages: ['cmake', 'g++-5', 'libboost1.55-all-dev']
+      env: CMAKE_BUILD_TYPE=RELEASE
+
+    - os: osx
+      compiler: clang++
+      env: CMAKE_BUILD_TYPE=DEBUG
+
+    - os: osx
+      compiler: clang++
+      env: CMAKE_BUILD_TYPE=RELEASE
 
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -48,7 +65,7 @@ install:
 before_script:
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ..
 
 script:
   - make
