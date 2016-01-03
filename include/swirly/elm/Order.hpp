@@ -33,7 +33,7 @@ class SWIRLY_API Order : public Request {
 protected:
     const Mnem trader_;
 public:
-    constexpr explicit Order(const StringView& trader) noexcept
+    explicit Order(const StringView& trader) noexcept
     :   Request{trader}
     {
     }
@@ -41,12 +41,12 @@ public:
     ~Order() noexcept override;
 
     // Copy.
-    constexpr Order(const Order&) noexcept = default;
-    Order& operator =(const Order&) noexcept = default;
+    Order(const Order&) = default;
+    Order& operator =(const Order&) = default;
 
     // Move.
-    constexpr Order(Order&&) noexcept = default;
-    Order& operator =(Order&&) noexcept = default;
+    Order(Order&&) = default;
+    Order& operator =(Order&&) = default;
 };
 
 using OrderPtr = boost::intrusive_ptr<Order>;

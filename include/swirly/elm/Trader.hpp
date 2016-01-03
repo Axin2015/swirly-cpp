@@ -31,6 +31,8 @@ protected:
     const Email email_;
 
 public:
+    boost::intrusive::set_member_hook<> mnemHook_;
+
     Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
     :   Rec{RecType::MARKET, mnem, display},
         email_{email}
@@ -52,6 +54,8 @@ public:
         return email_.view();
     }
 };
+
+using TraderSet = RecSet<Trader>;
 
 /** @} */
 

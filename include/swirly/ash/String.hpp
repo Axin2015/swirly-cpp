@@ -92,17 +92,17 @@ public:
     template <std::size_t MaxR>
     constexpr int compare(const StringBuf<MaxR>& rhs) const noexcept
     {
-        int ret {std::memcmp(buf_, rhs.data(), std::min(len_, rhs.size()))};
-        if (ret == 0)
-            ret = swirly::compare(len_, rhs.size());
-        return ret;
+        int result{std::memcmp(buf_, rhs.data(), std::min(len_, rhs.size()))};
+        if (result == 0)
+            result = swirly::compare(len_, rhs.size());
+        return result;
     }
     constexpr int compare(const StringView& rhs) const noexcept
     {
-        int ret {std::memcmp(buf_, rhs.data(), std::min(len_, rhs.size()))};
-        if (ret == 0)
-            ret = swirly::compare(len_, rhs.size());
-        return ret;
+        int result{std::memcmp(buf_, rhs.data(), std::min(len_, rhs.size()))};
+        if (result == 0)
+            result = swirly::compare(len_, rhs.size());
+        return result;
     }
     constexpr const char* data() const noexcept
     {

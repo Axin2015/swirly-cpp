@@ -33,6 +33,8 @@ class SWIRLY_API Asset : public Rec {
 protected:
     const AssetType type_;
 public:
+    boost::intrusive::set_member_hook<> mnemHook_;
+
     Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept
     :   Rec{RecType::ASSET, mnem, display},
         type_{type}
@@ -54,6 +56,8 @@ public:
         return type_;
     }
 };
+
+using AssetSet = RecSet<Asset>;
 
 /** @} */
 

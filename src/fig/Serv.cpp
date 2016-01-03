@@ -36,10 +36,10 @@ struct Serv::Impl {
     }
     Journ& journ;
     detail::ServFactory factory;
-    RecSet assets;
-    RecSet contrs;
-    RecSet markets;
-    RecSet traders;
+    AssetSet assets;
+    ContrSet contrs;
+    MarketSet markets;
+    TraderSet traders;
     detail::TraderSessSet emailIdx;
 };
 
@@ -63,22 +63,22 @@ Serv::Serv(Serv&&) = default;
 
 Serv& Serv::operator =(Serv&&) = default;
 
-const RecSet& Serv::assets() const noexcept
+const AssetSet& Serv::assets() const noexcept
 {
     return impl_->assets;
 }
 
-const RecSet& Serv::contrs() const noexcept
+const ContrSet& Serv::contrs() const noexcept
 {
     return impl_->contrs;
 }
 
-const RecSet& Serv::markets() const noexcept
+const MarketSet& Serv::markets() const noexcept
 {
     return impl_->markets;
 }
 
-const RecSet& Serv::traders() const noexcept
+const TraderSet& Serv::traders() const noexcept
 {
     return impl_->traders;
 }

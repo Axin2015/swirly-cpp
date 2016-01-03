@@ -38,8 +38,6 @@ protected:
     const Mnem mnem_;
     Display display_;
 public:
-    boost::intrusive::set_member_hook<> mnemHook_;
-
     Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
     :   type_{type},
         mnem_{mnem},
@@ -64,12 +62,12 @@ public:
 
     int compare(const Rec& rhs) const noexcept
     {
-        int ret {swirly::compare(type_, rhs.type_)};
-        if (ret == 0)
-            ret = mnem_.compare(rhs.mnem_);
-        return ret;
+        int result{swirly::compare(type_, rhs.type_)};
+        if (result == 0)
+            result = mnem_.compare(rhs.mnem_);
+        return result;
     }
-    RecType recType() const noexcept
+    RecType type() const noexcept
     {
         return type_;
     }
@@ -83,7 +81,19 @@ public:
     }
 };
 
-class SWIRLY_API RecSet {
+/**
+ * Record set keyed by mnemonic. Records are identified by mnemonic only, so instances should not be
+ * used as heterogeneous Record containers, where Records of different types may share the same
+ * identity.
+ */
+template <typename RecT>
+class RecSet {
+    struct ValueCompare {
+        bool operator()(const Rec& lhs, const Rec& rhs) const noexcept
+        {
+            return lhs.mnem().compare(rhs.mnem());
+        }
+    };
     struct KeyValueCompare {
         bool operator()(const StringView& lhs, const Rec& rhs) const noexcept
         {
@@ -95,19 +105,22 @@ class SWIRLY_API RecSet {
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<Rec, decltype(Rec::mnemHook_),
-                                                           &Rec::mnemHook_>;
-    using Set = boost::intrusive::set<Rec,
+    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using MemberHookOption = boost::intrusive::member_hook<RecT, decltype(RecT::mnemHook_),
+                                                           &RecT::mnemHook_>;
+    using Set = boost::intrusive::set<RecT,
                                       ConstantTimeSizeOption,
+                                      CompareOption,
                                       MemberHookOption
                                       >;
+    using ValuePtr = std::unique_ptr<RecT>;
+
     Set set_;
-public:
+ public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
 
     RecSet() = default;
-
     ~RecSet() noexcept
     {
         set_.clear_and_dispose([](Rec* ptr) { delete ptr; });
@@ -121,7 +134,7 @@ public:
     RecSet(RecSet&&) = default;
     RecSet& operator =(RecSet&&) = default;
 
-    Rec& insert(std::unique_ptr<Rec> rec) noexcept
+    RecT& insert(ValuePtr rec) noexcept
     {
         auto result = set_.insert(*rec);
         if (result.second) {
@@ -131,7 +144,7 @@ public:
         return *result.first;
     }
 
-    Rec& insertOrReplace(std::unique_ptr<Rec> rec) noexcept
+    RecT& insertOrReplace(ValuePtr rec) noexcept
     {
         auto result = set_.insert(*rec);
         if (!result.second) {
@@ -144,18 +157,16 @@ public:
         return *rec.release();
     }
 
-    template <typename TypeT, typename... ArgsT>
-    TypeT& emplace(ArgsT&&... args)
+    template <typename... ArgsT>
+    RecT& emplace(ArgsT&&... args)
     {
-        return static_cast<
-            TypeT&>(insert(std::make_unique<TypeT>(std::forward<ArgsT>(args)...)));
+        return insert(std::make_unique<RecT>(std::forward<ArgsT>(args)...));
     }
 
-    template <typename TypeT, typename... ArgsT>
-    TypeT& emplaceOrReplace(ArgsT&&... args)
+    template <typename... ArgsT>
+    RecT& emplaceOrReplace(ArgsT&&... args)
     {
-        return static_cast<
-            TypeT&>(insertOrReplace(std::make_unique<TypeT>(std::forward<ArgsT>(args)...)));
+        return insertOrReplace(std::make_unique<RecT>(std::forward<ArgsT>(args)...));
     }
 
     // Begin.

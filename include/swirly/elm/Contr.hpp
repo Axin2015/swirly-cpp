@@ -50,6 +50,8 @@ protected:
     const Lots maxLots_;
 
 public:
+    boost::intrusive::set_member_hook<> mnemHook_;
+
     Contr(const StringView& mnem, const StringView& display, const StringView& asset,
           const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
           int pipDp, Lots minLots, Lots maxLots) noexcept;
@@ -117,6 +119,8 @@ public:
         return maxLots_;
     }
 };
+
+using ContrSet = RecSet<Contr>;
 
 /** @} */
 

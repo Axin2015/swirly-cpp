@@ -18,11 +18,60 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
+namespace {
+class Foo : public Request {
+    int& alive_;
+public:
+    boost::intrusive::set_member_hook<> refHook_;
+
+    Foo(const StringView& trader, int& alive) noexcept
+    :   Request{trader},
+        alive_{alive}
+    {
+        ++alive;
+    }
+
+    ~Foo() noexcept override
+    {
+        --alive_;
+    }
+};
+
+using FooPtr = boost::intrusive_ptr<Foo>;
+
+} // anonymous
+
 BOOST_AUTO_TEST_SUITE(RequestSuite)
 
-BOOST_AUTO_TEST_CASE(RequestCase)
+BOOST_AUTO_TEST_CASE(RequestIdSetCase)
 {
-    BOOST_CHECK(true);
+    int alive{0};
+    {
+        RequestIdSet<Foo> s;
+
+        FooPtr foo1{s.emplace("FOO", alive)};
+        BOOST_CHECK_EQUAL(alive, 1);
+        BOOST_CHECK_EQUAL(foo1->refs(), 2);
+        BOOST_CHECK_EQUAL(foo1->trader(), "FOO");
+        BOOST_CHECK(s.find("", 0) != s.end());
+
+        // Duplicate.
+        FooPtr foo2{s.emplace("FOO", alive)};
+        BOOST_CHECK_EQUAL(alive, 1);
+        BOOST_CHECK_EQUAL(foo2->refs(), 3);
+        BOOST_CHECK_EQUAL(foo2, foo1);
+
+        // Replace.
+        FooPtr foo3{s.emplaceOrReplace("FOO", alive)};
+        BOOST_CHECK_EQUAL(alive, 2);
+        BOOST_CHECK_EQUAL(foo3->refs(), 2);
+        BOOST_CHECK_NE(foo3, foo1);
+        BOOST_CHECK_EQUAL(foo3->trader(), "FOO");
+    }
+    BOOST_CHECK_EQUAL(alive, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

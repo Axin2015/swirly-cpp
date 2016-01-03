@@ -23,33 +23,33 @@ namespace swirly {
 
 inline std::ostream& operator <<(std::ostream& os, const Rec& rec)
 {
-    return os << rec.recType() << ' ' << rec.mnem() << ' ' << rec.display();
+    return os << rec.type() << ' ' << rec.mnem() << ' ' << rec.display();
 }
 
 class MockModel : public Model {
 protected:
-    RecSet doReadAsset(const Factory& factory) const override
+    AssetSet doReadAsset(const Factory& factory) const override
     {
-        RecSet s;
+        AssetSet s;
         s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
         s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
         s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
         s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
         return s;
     }
-    RecSet doReadContr(const Factory& factory) const override
+    ContrSet doReadContr(const Factory& factory) const override
     {
-        RecSet s;
+        ContrSet s;
         return s;
     }
-    RecSet doReadMarket(const Factory& factory) const override
+    MarketSet doReadMarket(const Factory& factory) const override
     {
-        RecSet s;
+        MarketSet s;
         return s;
     }
-    RecSet doReadTrader(const Factory& factory) const override
+    TraderSet doReadTrader(const Factory& factory) const override
     {
-        RecSet s;
+        TraderSet s;
         return s;
     }
 
@@ -77,10 +77,9 @@ int main(int argc, char* argv[])
     try {
         BasicFactory f;
         MockModel m;
-        auto s = m.readAsset(f);
+        auto assets = m.readAsset(f);
         cout << "--\n";
-        for (const auto& r : s) {
-            const auto& asset = static_cast<const Asset&>(r);
+        for (const auto& asset : assets) {
             cout << asset << endl;
         }
 
