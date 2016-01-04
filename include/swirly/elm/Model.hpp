@@ -17,7 +17,10 @@
 #ifndef SWIRLY_ELM_MODEL_HPP
 #define SWIRLY_ELM_MODEL_HPP
 
-#include <swirly/elm/Rec.hpp>
+#include <swirly/elm/Asset.hpp>
+#include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Market.hpp>
+#include <swirly/elm/Trader.hpp>
 
 namespace swirly {
 
@@ -30,13 +33,13 @@ class Factory;
 
 class SWIRLY_API Model {
 protected:
-    virtual RecSet doReadAsset(const Factory& factory) const = 0;
+    virtual AssetSet doReadAsset(const Factory& factory) const = 0;
 
-    virtual RecSet doReadContr(const Factory& factory) const = 0;
+    virtual ContrSet doReadContr(const Factory& factory) const = 0;
 
-    virtual RecSet doReadMarket(const Factory& factory) const = 0;
+    virtual MarketSet doReadMarket(const Factory& factory) const = 0;
 
-    virtual RecSet doReadTrader(const Factory& factory) const = 0;
+    virtual TraderSet doReadTrader(const Factory& factory) const = 0;
 
 public:
     Model() noexcept = default;
@@ -50,19 +53,19 @@ public:
     constexpr Model(Model&&) noexcept = default;
     Model& operator =(Model&&) noexcept = default;
 
-    RecSet readAsset(const Factory& factory) const
+    AssetSet readAsset(const Factory& factory) const
     {
         return doReadAsset(factory);
     }
-    RecSet readContr(const Factory& factory) const
+    ContrSet readContr(const Factory& factory) const
     {
         return doReadContr(factory);
     }
-    RecSet readMarket(const Factory& factory) const
+    MarketSet readMarket(const Factory& factory) const
     {
         return doReadMarket(factory);
     }
-    RecSet readTrader(const Factory& factory) const
+    TraderSet readTrader(const Factory& factory) const
     {
         return doReadTrader(factory);
     }

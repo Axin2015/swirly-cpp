@@ -39,6 +39,8 @@ protected:
     MarketState state_;
 
 public:
+    boost::intrusive::set_member_hook<> mnemHook_;
+
     Market(const StringView& mnem, const StringView& display, const StringView& contr,
            Jd settlDay, Jd expiryDay, MarketState state) noexcept;
 
@@ -52,6 +54,10 @@ public:
     Market(Market&&) = default;
     Market& operator =(Market&&) = default;
 
+    void setState(MarketState state) noexcept
+    {
+        state_ = state;
+    }
     StringView contr() const noexcept
     {
         return contr_.view();
@@ -69,6 +75,8 @@ public:
         return state_;
     }
 };
+
+using MarketSet = RecSet<Market>;
 
 /** @} */
 

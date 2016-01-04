@@ -17,19 +17,16 @@
 #ifndef SWIRLY_FIG_SERV_HPP
 #define SWIRLY_FIG_SERV_HPP
 
-#include <swirly/elm/Types.hpp>
-
-#include <swirly/ash/String.hpp>
-#include <swirly/ash/Types.hpp>
-
-#include <memory> // unique_ptr<>
+#include <swirly/elm/Asset.hpp>
+#include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Market.hpp>
+#include <swirly/elm/Trader.hpp>
 
 namespace swirly {
 
 class Journ;
 class MarketBook;
 class Model;
-class RecSet;
 class TraderSess;
 
 /**
@@ -54,28 +51,30 @@ public:
     Serv(Serv&&);
     Serv& operator =(Serv&&);
 
+    const AssetSet& assets() const noexcept;
+
+    const ContrSet& contrs() const noexcept;
+
+    const MarketSet& markets() const noexcept;
+
+    const TraderSet& traders() const noexcept;
+
+    const MarketBook& createMarket(const StringView& mnem, const StringView& display,
+                                   const StringView& contr, Jd settlDay, Jd expiryDay,
+                                   MarketState state, Millis now);
+
+    const MarketBook& updateMarket(const StringView& mnem, const StringView& display,
+                                   MarketState state, Millis now);
+    const MarketBook& market(const StringView& mnem) const;
+
     const TraderSess& createTrader(const StringView& mnem, const StringView& display,
                                    const StringView& email);
 
     const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
 
-    const RecSet& assets() const noexcept;
-
-    const RecSet& contrs() const noexcept;
-
-    const RecSet& markets() const noexcept;
-
-    const RecSet& traders() const noexcept;
-
-    const MarketBook& market(const StringView& mnem) const;
-
     const TraderSess& trader(const StringView& mnem) const;
 
     const TraderSess* findTraderByEmail(const StringView& email) const;
-
-    const MarketBook& createMarket(const StringView& mnem, const StringView& display,
-                                   const StringView& contr, Jd settlDay, Jd expiryDay,
-                                   MarketState state, Millis now);
 };
 
 /** @} */

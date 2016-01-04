@@ -46,12 +46,12 @@ BOOST_AUTO_TEST_CASE(RefCountedCase)
     {
         auto ptr1 = makeRefCounted<Foo>(alive);
         BOOST_CHECK_EQUAL(alive, 1);
-        BOOST_CHECK_EQUAL(ptr1->refCount(), 1);
+        BOOST_CHECK_EQUAL(ptr1->refs(), 1);
         {
             auto ptr2 = ptr1;
-            BOOST_CHECK_EQUAL(ptr1->refCount(), 2);
+            BOOST_CHECK_EQUAL(ptr1->refs(), 2);
         }
-        BOOST_CHECK_EQUAL(ptr1->refCount(), 1);
+        BOOST_CHECK_EQUAL(ptr1->refs(), 1);
     }
     BOOST_CHECK_EQUAL(alive, 0);
 }
