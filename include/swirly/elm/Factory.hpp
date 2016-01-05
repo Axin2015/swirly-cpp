@@ -36,7 +36,7 @@ class Trader;
  */
 
 class SWIRLY_API Factory {
-protected:
+ protected:
     virtual std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                               AssetType type) const = 0;
 
@@ -55,8 +55,14 @@ protected:
     virtual std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                                 const StringView& email) const = 0;
 
-    virtual OrderPtr doNewOrder(const StringView& trader) const = 0;
-public:
+    virtual OrderPtr doNewOrder(const StringView& trader, const StringView& market,
+                                const StringView& contr, Jd settlDay, Iden id,
+                                const StringView& ref, Iden quoteId, State state, Side side,
+                                Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                                Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                                Millis created, Millis modified) const = 0;
+
+ public:
     Factory() noexcept = default;
     virtual ~Factory() noexcept;
 
@@ -102,14 +108,30 @@ public:
     {
         return doNewTrader(mnem, display, email);
     }
-    OrderPtr newOrder(const StringView& trader) const
+    OrderPtr newOrder(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, Iden quoteId, State state, Side side,
+                      Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                      Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                      Millis created, Millis modified) const
     {
-        return doNewOrder(trader);
+        return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, state, side, lots,
+                          ticks, resd, exec, cost, lastLots, lastTicks, minLots, pecan, created,
+                          modified);
+    }
+
+    OrderPtr newOrder(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, Iden quoteId, Side side,
+                      Lots lots, Ticks ticks, Lots minLots, Millis created) const
+    {
+        return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, State::NEW, side, lots,
+                          ticks, lots, 0, 0, 0, 0, minLots, false, created, created);
     }
 };
 
 class SWIRLY_API BasicFactory : public Factory {
-protected:
+ protected:
     std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                       AssetType type) const override;
 
@@ -128,9 +150,14 @@ protected:
     std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                         const StringView& email) const override;
 
-    OrderPtr doNewOrder(const StringView& trader) const override;
+    OrderPtr doNewOrder(const StringView& trader, const StringView& market,
+                        const StringView& contr, Jd settlDay, Iden id,
+                        const StringView& ref, Iden quoteId, State state, Side side,
+                        Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                        Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                        Millis created, Millis modified) const override;
 
-public:
+ public:
     BasicFactory() noexcept = default;
     ~BasicFactory() noexcept override;
 

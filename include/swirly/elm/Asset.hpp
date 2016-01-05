@@ -30,9 +30,8 @@ namespace swirly {
  * An item of value.
  */
 class SWIRLY_API Asset : public Rec {
-protected:
     const AssetType type_;
-public:
+ public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept

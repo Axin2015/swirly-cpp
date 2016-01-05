@@ -54,9 +54,16 @@ unique_ptr<Trader> BasicFactory::doNewTrader(const StringView& mnem, const Strin
     return make_unique<Trader>(mnem, display, email);
 }
 
-OrderPtr BasicFactory::doNewOrder(const StringView& trader) const
+OrderPtr BasicFactory::doNewOrder(const StringView& trader, const StringView& market,
+                                  const StringView& contr, Jd settlDay, Iden id,
+                                  const StringView& ref, Iden quoteId, State state, Side side,
+                                  Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                                  Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                                  Millis created, Millis modified) const
 {
-    return makeRefCounted<Order>(trader);
+    return makeRefCounted<Order>(trader, market, contr, settlDay, id, ref, quoteId, state, side,
+                                 lots, ticks, resd, exec, cost, lastLots, lastTicks, minLots,
+                                 pecan, created, modified);
 }
 
 BasicFactory::~BasicFactory() noexcept = default;

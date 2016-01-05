@@ -32,7 +32,7 @@ class Factory;
  */
 
 class SWIRLY_API Model {
-protected:
+ protected:
     virtual AssetSet doReadAsset(const Factory& factory) const = 0;
 
     virtual ContrSet doReadContr(const Factory& factory) const = 0;
@@ -41,7 +41,7 @@ protected:
 
     virtual TraderSet doReadTrader(const Factory& factory) const = 0;
 
-public:
+ public:
     Model() noexcept = default;
     virtual ~Model() noexcept;
 

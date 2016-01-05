@@ -24,7 +24,7 @@ using namespace swirly;
 namespace {
 class Foo : public RefCounted {
     int& alive_;
-public:
+ public:
     explicit Foo(int& alive) noexcept
     :   alive_{alive}
     {

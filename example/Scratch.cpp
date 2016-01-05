@@ -27,7 +27,7 @@ inline std::ostream& operator <<(std::ostream& os, const Rec& rec)
 }
 
 class MockModel : public Model {
-protected:
+ protected:
     AssetSet doReadAsset(const Factory& factory) const override
     {
         AssetSet s;
@@ -53,7 +53,7 @@ protected:
         return s;
     }
 
-public:
+ public:
     MockModel() noexcept = default;
     virtual ~MockModel() noexcept = default;
 
@@ -83,7 +83,8 @@ int main(int argc, char* argv[])
             cout << asset << endl;
         }
 
-        RequestPtr req{makeRefCounted<Request>("MARAYL")};
+        RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0, 1, "",
+                                               Side::BUY, 10, 0)};
         cout << req->trader() << endl;
         return 0;
     } catch (const std::exception& e) {

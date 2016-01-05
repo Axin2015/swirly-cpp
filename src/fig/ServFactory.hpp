@@ -23,7 +23,7 @@ namespace swirly {
 namespace detail {
 
 class ServFactory : public BasicFactory {
-protected:
+ protected:
     std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
                                         const StringView& contr, Jd settlDay,
                                         Jd expiryDay, MarketState state, Lots lastLots,
@@ -33,7 +33,7 @@ protected:
     std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                         const StringView& email) const override;
 
-public:
+ public:
     ServFactory() noexcept = default;
     ~ServFactory() noexcept override;
 

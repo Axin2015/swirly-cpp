@@ -41,7 +41,7 @@ template <std::size_t MaxN>
 class SWIRLY_API StringBuf {
     std::size_t len_ = 0;
     char buf_[MaxN];
-public:
+ public:
     template <std::size_t MaxR>
     constexpr StringBuf(const StringBuf<MaxR>& rhs) noexcept
     {

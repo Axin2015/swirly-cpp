@@ -30,11 +30,46 @@ namespace swirly {
  * An instruction to buy or sell goods or services.
  */
 class SWIRLY_API Order : public Request {
-protected:
-    const Mnem trader_;
-public:
-    explicit Order(const StringView& trader) noexcept
-    :   Request{trader}
+
+    const Iden quoteId_;
+    State state_;
+    const Ticks ticks_;
+    /**
+     * Must be greater than zero.
+     */
+    Lots resd_;
+    Lots quotd_{0};
+    /**
+     * Must not be greater that lots.
+     */
+    Lots exec_;
+    Cost cost_;
+    Lots lastLots_;
+    Ticks lastTicks_;
+    /**
+     * Minimum to be filled by this order.
+     */
+    const Lots minLots_;
+    bool pecan_;
+    Millis modified_;
+
+ public:
+    Order(const StringView& trader, const StringView& market, const StringView& contr,
+          Jd settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
+          Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
+          Lots minLots, bool pecan, Millis created, Millis modified) noexcept
+    :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+        quoteId_{quoteId},
+        state_{state},
+        ticks_{ticks},
+        resd_{resd},
+        exec_{exec},
+        cost_{cost},
+        lastLots_{lastLots},
+        lastTicks_{lastTicks},
+        minLots_{minLots},
+        pecan_{pecan},
+        modified_{modified}
     {
     }
 
@@ -47,9 +82,59 @@ public:
     // Move.
     Order(Order&&) = default;
     Order& operator =(Order&&) = default;
+
+    Iden quoteId() const noexcept
+    {
+        return quoteId_;
+    }
+    State state() const noexcept
+    {
+        return state_;
+    }
+    Ticks ticks() const noexcept
+    {
+        return ticks_;
+    }
+    Lots resd() const noexcept
+    {
+        return resd_;
+    }
+    Lots quotd() const noexcept
+    {
+        return quotd_;
+    }
+    Lots exec() const noexcept
+    {
+        return exec_;
+    }
+    Cost cost() const noexcept
+    {
+        return cost_;
+    }
+    Lots lastLots() const noexcept
+    {
+        return lastLots_;
+    }
+    Ticks lastTicks() const noexcept
+    {
+        return lastTicks_;
+    }
+    Lots minLots() const noexcept
+    {
+        return minLots_;
+    }
+    bool pecan() const noexcept
+    {
+        return pecan_;
+    }
+    Millis modified() const noexcept
+    {
+        return modified_;
+    }
 };
 
 using OrderPtr = boost::intrusive_ptr<Order>;
+using OrderIdSet = RequestIdSet<Order>;
 
 /** @} */
 

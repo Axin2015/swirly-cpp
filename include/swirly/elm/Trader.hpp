@@ -27,10 +27,9 @@ namespace swirly {
  */
 
 class SWIRLY_API Trader : public Rec {
-protected:
     const Email email_;
 
-public:
+ public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept

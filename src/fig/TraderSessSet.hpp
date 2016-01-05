@@ -66,7 +66,7 @@ class TraderSessSet {
 
     BucketType buckets_[BUCKETS];
     Set set_;
-public:
+ public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
 

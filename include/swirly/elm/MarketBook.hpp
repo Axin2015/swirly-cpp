@@ -27,7 +27,7 @@ namespace swirly {
  */
 
 class SWIRLY_API MarketBook : public Market {
-public:
+ public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
                Jd settlDay, Jd expiryDay, MarketState state) noexcept;
 

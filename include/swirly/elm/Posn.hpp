@@ -29,9 +29,9 @@ namespace swirly {
  */
 
 class SWIRLY_API Posn : public RefCounted {
-protected:
+ protected:
     const Mnem trader_;
-public:
+ public:
     constexpr explicit Posn(const StringView& trader) noexcept
     :   trader_{trader}
     {
