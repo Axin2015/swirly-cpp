@@ -14,7 +14,7 @@ ENDIF()
 
 STRING(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
 
-SET(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter")
+SET(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
 SET(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
 
 ADD_DEFINITIONS(-DBOOST_NO_AUTO_PTR=1)
