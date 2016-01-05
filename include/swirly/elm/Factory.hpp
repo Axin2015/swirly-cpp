@@ -19,9 +19,10 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Trader.hpp>
 #include <swirly/elm/Order.hpp>
+#include <swirly/elm/Trader.hpp>
 
 namespace swirly {
 
@@ -61,6 +62,13 @@ class SWIRLY_API Factory {
                                 Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                                 Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
                                 Millis created, Millis modified) const = 0;
+
+    virtual ExecPtr doNewExec(const StringView& trader, const StringView& market,
+                              const StringView& contr, Jd settlDay, Iden id,
+                              const StringView& ref, Iden orderId, Iden quoteId, State state,
+                              Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                              Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                              Role role, const StringView& cpty, Millis created) const = 0;
 
  public:
     Factory() noexcept = default;
@@ -128,6 +136,28 @@ class SWIRLY_API Factory {
         return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, State::NEW, side, lots,
                           ticks, lots, 0, 0, 0, 0, minLots, false, created, created);
     }
+
+    ExecPtr newExec(const StringView& trader, const StringView& market,
+                    const StringView& contr, Jd settlDay, Iden id,
+                    const StringView& ref, Iden orderId, Iden quoteId, State state,
+                    Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                    Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                    Role role, const StringView& cpty, Millis created) const
+    {
+        return doNewExec(trader, market, contr, settlDay, id, ref, orderId, quoteId, state, side,
+                         lots, ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId,
+                         role, cpty, created);
+    }
+
+    ExecPtr newExec(const Order& order, Iden id, Millis created) const
+    {
+        return doNewExec(order.trader(), order.market(), order.contr(), order.settlDay(),
+                         id, order.ref(), order.id(), order.quoteId(), order.state(),
+                         order.side(), order.lots(), order.ticks(), order.resd(),
+                         order.exec(), order.cost(), order.lastLots(), order.lastTicks(),
+                         order.minLots(), 0, Role::NONE, StringView{}, created);
+    }
+
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -156,6 +186,13 @@ class SWIRLY_API BasicFactory : public Factory {
                         Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                         Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
                         Millis created, Millis modified) const override;
+
+    ExecPtr doNewExec(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, Iden orderId, Iden quoteId, State state,
+                      Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                      Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                      Role role, const StringView& cpty, Millis created) const override;
 
  public:
     BasicFactory() noexcept = default;

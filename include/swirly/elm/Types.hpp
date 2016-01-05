@@ -134,9 +134,13 @@ SWIRLY_API const char* enumToString(RecType type);
 
 enum class Role {
     /**
+     * No role.
+     */
+    NONE = 0,
+    /**
      * Passive buyer or seller that receives the spread.
      */
-    MAKER = 1,
+    MAKER,
     /**
      * Aggressive buyer or seller that crosses the market and pays the spread.
      */

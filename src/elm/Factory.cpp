@@ -66,6 +66,18 @@ OrderPtr BasicFactory::doNewOrder(const StringView& trader, const StringView& ma
                                  pecan, created, modified);
 }
 
+ExecPtr BasicFactory::doNewExec(const StringView& trader, const StringView& market,
+                                const StringView& contr, Jd settlDay, Iden id,
+                                const StringView& ref, Iden orderId, Iden quoteId, State state,
+                                Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                                Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                                Role role, const StringView& cpty, Millis created) const
+{
+    return makeRefCounted<Exec>(trader, market, contr, settlDay, id, ref, orderId, quoteId, state,
+                                side, lots, ticks, resd, exec, cost, lastLots, lastTicks, minLots,
+                                matchId, role, cpty, created);
+}
+
 BasicFactory::~BasicFactory() noexcept = default;
 
 } // swirly
