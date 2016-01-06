@@ -78,6 +78,12 @@ ExecPtr BasicFactory::doNewExec(const StringView& trader, const StringView& mark
                                 matchId, role, cpty, created);
 }
 
+PosnPtr BasicFactory::doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                                Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const
+{
+    return makeRefCounted<Posn>(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
+}
+
 BasicFactory::~BasicFactory() noexcept = default;
 
 } // swirly

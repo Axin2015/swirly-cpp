@@ -22,6 +22,7 @@
 #include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
 #include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
 #include <swirly/elm/Trader.hpp>
 
 namespace swirly {
@@ -69,6 +70,9 @@ class SWIRLY_API Factory {
                               Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                               Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
                               Role role, const StringView& cpty, Millis created) const = 0;
+
+    virtual PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                              Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const = 0;
 
  public:
     Factory() noexcept = default;
@@ -158,6 +162,16 @@ class SWIRLY_API Factory {
                          order.minLots(), 0, Role::NONE, StringView{}, created);
     }
 
+    PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                    Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const
+    {
+        return doNewPosn(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
+    }
+
+    PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay) const
+    {
+        return doNewPosn(trader, contr, settlDay, 0, 0, 0, 0);
+    }
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -193,6 +207,9 @@ class SWIRLY_API BasicFactory : public Factory {
                       Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                       Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
                       Role role, const StringView& cpty, Millis created) const override;
+
+    PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                      Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const override;
 
  public:
     BasicFactory() noexcept = default;
