@@ -4,27 +4,53 @@ INCLUDE(FindJava)
 FIND_PACKAGE(Java COMPONENTS Runtime)
 
 SET(outfiles)
-IF(Java_JAVA_EXECUTABLE AND NOT "${PLANTUML}" STREQUAL "PLANTUML-NOTFOUND" AND DOT)
+IF(DOT)
 
-  MESSAGE(STATUS "plantuml found: ${PLANTUML}")
+  MESSAGE(STATUS "Dot found: ${DOT}")
 
-  FILE(GLOB infiles RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.uml")
+  SET(names
+    Ash
+    Elm
+    Fig
+  )
 
-  FOREACH(infile ${infiles})
+  FOREACH(name ${names})
 
-    STRING(REGEX REPLACE ".uml\$" ".png" outfile "${infile}")
-    MESSAGE(STATUS "generate ${outfile} from ${infile}")
+    SET(outfile ${name}Depend.png)
 
+    STRING(TOLOWER ${name} lname)
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${PROJECT_BINARY_DIR}/share/doc/html/${outfile}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      COMMAND ${Java_JAVA_EXECUTABLE} -jar ${PLANTUML} -graphvizdot ${DOT}
-              -o ${PROJECT_BINARY_DIR}/share/doc/html ${infile}
-      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${infile})
+      OUTPUT "${PROJECT_BINARY_DIR}/image/${outfile}"
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+      COMMAND "${PERL}" etc/dotdepend.pl ${lname}
+              | dot -Tpng >"${PROJECT_BINARY_DIR}/image/${outfile}"
+      DEPENDS ${lname}_shared)
 
-    SET(outfiles ${outfiles} ${PROJECT_BINARY_DIR}/share/doc/html/${outfile})
+    SET(outfiles ${outfiles} "${PROJECT_BINARY_DIR}/image/${outfile}")
   ENDFOREACH()
+
+  IF(Java_JAVA_EXECUTABLE AND NOT "${PLANTUML}" STREQUAL "PLANTUML-NOTFOUND")
+
+    MESSAGE(STATUS "Plantuml found: ${PLANTUML}")
+
+    FILE(GLOB infiles RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+      "${CMAKE_CURRENT_SOURCE_DIR}/*.uml")
+
+    FOREACH(infile ${infiles})
+
+      STRING(REGEX REPLACE ".uml\$" ".png" outfile ${infile})
+      MESSAGE(STATUS "Generate ${outfile} from ${infile}")
+
+      ADD_CUSTOM_COMMAND(
+        OUTPUT "${PROJECT_BINARY_DIR}/image/${outfile}"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${PLANTUML}" -graphvizdot "${DOT}"
+                -o "${PROJECT_BINARY_DIR}/image" "${infile}"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${infile}")
+
+      SET(outfiles ${outfiles} "${PROJECT_BINARY_DIR}/image/${outfile}")
+    ENDFOREACH()
+  ENDIF()
 ENDIF()
 
 ADD_CUSTOM_TARGET(image ALL DEPENDS ${outfiles})
