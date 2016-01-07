@@ -156,6 +156,10 @@ enum class Side {
 
 SWIRLY_API const char* enumToString(Side side);
 
+/**
+ * Order states.
+ * @image html OrderState.png
+ */
 enum class State {
     NONE = 0,
     /**

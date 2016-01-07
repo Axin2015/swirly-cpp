@@ -8,7 +8,7 @@ General purpose components.
 
 Elm Library
 -----------
-Domain-specific component.
+Domain-specific components.
 ![Elm Depends](@ref ElmDepend.png)
 
 Fig Library
