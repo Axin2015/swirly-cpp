@@ -14,46 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/RefCounted.hpp>
+#include <swirly/elm/Exec.hpp>
 
 #include <boost/test/unit_test.hpp>
 
-using namespace std;
-using namespace swirly;
+BOOST_AUTO_TEST_SUITE(ExecSuite)
 
-namespace {
-class Foo : public RefCounted {
-    int& alive_;
- public:
-    explicit Foo(int& alive) noexcept
-    :   alive_{alive}
-    {
-        ++alive;
-    }
-
-    ~Foo() noexcept override
-    {
-        --alive_;
-    }
-};
-} // anonymous
-
-BOOST_AUTO_TEST_SUITE(RefCountedSuite)
-
-BOOST_AUTO_TEST_CASE(RefCountedCase)
+BOOST_AUTO_TEST_CASE(ExecCase)
 {
-    int alive{0};
-    {
-        auto ptr1 = makeRefCounted<Foo>(alive);
-        BOOST_CHECK_EQUAL(alive, 1);
-        BOOST_CHECK_EQUAL(ptr1->refs(), 1);
-        {
-            auto ptr2 = ptr1;
-            BOOST_CHECK_EQUAL(ptr1->refs(), 2);
-        }
-        BOOST_CHECK_EQUAL(ptr1->refs(), 1);
-    }
-    BOOST_CHECK_EQUAL(alive, 0);
+    BOOST_CHECK(true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -56,6 +56,7 @@ const char* enumToString(RecType type)
 const char* enumToString(Role role)
 {
     switch (role) {
+    SWIRLY_ENUM_CASE(Role, NONE);
     SWIRLY_ENUM_CASE(Role, MAKER);
     SWIRLY_ENUM_CASE(Role, TAKER);
     }

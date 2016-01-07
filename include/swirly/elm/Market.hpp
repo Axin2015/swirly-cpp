@@ -32,13 +32,12 @@ namespace swirly {
  * A place where buyers and sellers come together to exchange goods or services.
  */
 class SWIRLY_API Market : public Rec {
-protected:
     const Mnem contr_;
     const Jd settlDay_;
     const Jd expiryDay_;
     MarketState state_;
 
-public:
+ public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Market(const StringView& mnem, const StringView& display, const StringView& contr,

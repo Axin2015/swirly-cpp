@@ -37,7 +37,7 @@ class TraderSess;
 class SWIRLY_API Serv {
     struct Impl;
     std::unique_ptr<Impl> impl_;
-public:
+ public:
 
     Serv(const Model& model, Journ& journ, Millis now);
 

@@ -36,7 +36,7 @@ class SWIRLY_API Exception : public std::exception {
     friend void format(Exception& e, const char* fmt, std::va_list args) noexcept;
 
     char msg_[128] = {'\0'};
-public:
+ public:
     Exception() noexcept = default;
 
     ~Exception() noexcept override;

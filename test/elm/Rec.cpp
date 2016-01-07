@@ -24,7 +24,7 @@ using namespace swirly;
 namespace {
 class Foo : public Rec {
     int& alive_;
-public:
+ public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Foo(const StringView& mnem, const StringView& display, int& alive) noexcept

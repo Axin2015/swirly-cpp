@@ -20,6 +20,7 @@
 #include <swirly/elm/Types.hpp>
 
 #include <swirly/ash/RefCounted.hpp>
+#include <swirly/ash/Types.hpp>
 
 namespace swirly {
 
@@ -29,11 +30,25 @@ namespace swirly {
  */
 
 class SWIRLY_API Posn : public RefCounted {
-protected:
+
     const Mnem trader_;
-public:
-    constexpr explicit Posn(const StringView& trader) noexcept
-    :   trader_{trader}
+    const Mnem contr_;
+    Jd settlDay_;
+    Lots buyLots_;
+    Cost buyCost_;
+    Lots sellLots_;
+    Cost sellCost_;
+
+ public:
+    Posn(const StringView& trader, const StringView& contr, Jd settlDay,
+         Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) noexcept
+    :   trader_{trader},
+        contr_{contr},
+        settlDay_{settlDay},
+        buyLots_{buyLots},
+        buyCost_{buyCost},
+        sellLots_{sellLots},
+        sellCost_{sellCost}
     {
     }
 
@@ -50,6 +65,30 @@ public:
     StringView trader() const noexcept
     {
         return trader_.view();
+    }
+    StringView contr() const noexcept
+    {
+        return contr_.view();
+    }
+    Jd settlDay() const noexcept
+    {
+        return settlDay_;
+    }
+    Lots buyLots() const noexcept
+    {
+        return buyLots_;
+    }
+    Cost buyCost() const noexcept
+    {
+        return buyCost_;
+    }
+    Lots sellLots() const noexcept
+    {
+        return sellLots_;
+    }
+    Cost sellCost() const noexcept
+    {
+        return sellCost_;
     }
 };
 

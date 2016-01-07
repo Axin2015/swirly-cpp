@@ -14,52 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_ASSET_HPP
-#define SWIRLY_ELM_ASSET_HPP
-
-#include <swirly/elm/Rec.hpp>
+#include <swirly/elm/Exec.hpp>
 
 namespace swirly {
 
-/**
- * @addtogroup Entity
- * @{
- */
-
-/**
- * An item of value.
- */
-class SWIRLY_API Asset : public Rec {
-    const AssetType type_;
- public:
-    boost::intrusive::set_member_hook<> mnemHook_;
-
-    Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept
-    :   Rec{RecType::ASSET, mnem, display},
-        type_{type}
-    {
-    }
-
-    ~Asset() noexcept override;
-
-    // Copy.
-    Asset(const Asset&) = default;
-    Asset& operator =(const Asset&) = default;
-
-    // Move.
-    Asset(Asset&&) = default;
-    Asset& operator =(Asset&&) = default;
-
-    AssetType assetType() const noexcept
-    {
-        return type_;
-    }
-};
-
-using AssetSet = RecSet<Asset>;
-
-/** @} */
+Exec::~Exec() noexcept = default;
 
 } // swirly
-
-#endif // SWIRLY_ELM_ASSET_HPP

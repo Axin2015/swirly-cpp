@@ -30,7 +30,6 @@ namespace swirly {
  * A specification that stipulates the terms and conditions of sale.
  */
 class SWIRLY_API Contr : public Rec {
-protected:
     const Mnem asset_;
     const Mnem ccy_;
     const int lotNumer_;
@@ -49,7 +48,7 @@ protected:
     const Lots minLots_;
     const Lots maxLots_;
 
-public:
+ public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Contr(const StringView& mnem, const StringView& display, const StringView& asset,

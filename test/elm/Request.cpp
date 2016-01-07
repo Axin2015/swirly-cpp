@@ -24,11 +24,11 @@ using namespace swirly;
 namespace {
 class Foo : public Request {
     int& alive_;
-public:
+ public:
     boost::intrusive::set_member_hook<> refHook_;
 
-    Foo(const StringView& trader, int& alive) noexcept
-    :   Request{trader},
+    Foo(const StringView& market, Iden id, int& alive) noexcept
+    :   Request{"", market, "", 0, id, "", Side::BUY, 0, 0},
         alive_{alive}
     {
         ++alive;
@@ -52,24 +52,24 @@ BOOST_AUTO_TEST_CASE(RequestIdSetCase)
     {
         RequestIdSet<Foo> s;
 
-        FooPtr foo1{s.emplace("FOO", alive)};
+        FooPtr foo1{s.emplace("FOO", 1, alive)};
         BOOST_CHECK_EQUAL(alive, 1);
         BOOST_CHECK_EQUAL(foo1->refs(), 2);
-        BOOST_CHECK_EQUAL(foo1->trader(), "FOO");
-        BOOST_CHECK(s.find("", 0) != s.end());
+        BOOST_CHECK_EQUAL(foo1->market(), "FOO");
+        BOOST_CHECK(s.find("FOO", 1) != s.end());
 
         // Duplicate.
-        FooPtr foo2{s.emplace("FOO", alive)};
+        FooPtr foo2{s.emplace("FOO", 1, alive)};
         BOOST_CHECK_EQUAL(alive, 1);
         BOOST_CHECK_EQUAL(foo2->refs(), 3);
         BOOST_CHECK_EQUAL(foo2, foo1);
 
         // Replace.
-        FooPtr foo3{s.emplaceOrReplace("FOO", alive)};
+        FooPtr foo3{s.emplaceOrReplace("FOO", 1, alive)};
         BOOST_CHECK_EQUAL(alive, 2);
         BOOST_CHECK_EQUAL(foo3->refs(), 2);
         BOOST_CHECK_NE(foo3, foo1);
-        BOOST_CHECK_EQUAL(foo3->trader(), "FOO");
+        BOOST_CHECK_EQUAL(foo3->market(), "FOO");
     }
     BOOST_CHECK_EQUAL(alive, 0);
 }

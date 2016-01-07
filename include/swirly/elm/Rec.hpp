@@ -33,11 +33,11 @@ namespace swirly {
  */
 
 class SWIRLY_API Rec : public Comparable<Rec> {
-protected:
+ protected:
     const RecType type_;
     const Mnem mnem_;
     Display display_;
-public:
+ public:
     Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
     :   type_{type},
         mnem_{mnem},

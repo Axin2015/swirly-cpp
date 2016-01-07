@@ -29,12 +29,12 @@ namespace swirly {
  */
 
 class SWIRLY_API Journ {
-protected:
+ protected:
     virtual void doCreateMarket(const StringView& mnem, const StringView& display,
                                 const StringView& contr, Jd settlDay, Jd expiryDay,
                                 MarketState state) = 0;
 
-public:
+ public:
     Journ() noexcept = default;
     virtual ~Journ() noexcept;
 

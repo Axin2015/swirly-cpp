@@ -32,7 +32,7 @@ namespace swirly {
  */
 
 class SWIRLY_API Request : public RefCounted {
-protected:
+ protected:
     /**
      * The executing trader.
      */
@@ -49,17 +49,19 @@ protected:
     Lots lots_;
     const Millis created_;
 
-public:
-    explicit Request(const StringView& trader) noexcept
+ public:
+    Request(const StringView& trader, const StringView& market, const StringView& contr,
+            Jd settlDay, Iden id, const StringView& ref, Side side, Lots lots,
+            Millis created) noexcept
     :   trader_{trader},
-        market_{},
-        contr_{},
-        settlDay_{},
-        id_{},
-        ref_{},
-        side_{},
-        lots_{},
-        created_{}
+        market_{market},
+        contr_{contr},
+        settlDay_{settlDay},
+        id_{id},
+        ref_{ref},
+        side_{side},
+        lots_{lots},
+        created_{created}
     {
     }
 
@@ -162,7 +164,7 @@ class RequestIdSet {
     using ValuePtr = boost::intrusive_ptr<RequestT>;
 
     Set set_;
-public:
+ public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
 

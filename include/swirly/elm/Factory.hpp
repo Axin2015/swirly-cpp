@@ -19,9 +19,11 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Trader.hpp>
 #include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
+#include <swirly/elm/Trader.hpp>
 
 namespace swirly {
 
@@ -36,7 +38,7 @@ class Trader;
  */
 
 class SWIRLY_API Factory {
-protected:
+ protected:
     virtual std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                               AssetType type) const = 0;
 
@@ -55,8 +57,24 @@ protected:
     virtual std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                                 const StringView& email) const = 0;
 
-    virtual OrderPtr doNewOrder(const StringView& trader) const = 0;
-public:
+    virtual OrderPtr doNewOrder(const StringView& trader, const StringView& market,
+                                const StringView& contr, Jd settlDay, Iden id,
+                                const StringView& ref, Iden quoteId, State state, Side side,
+                                Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                                Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                                Millis created, Millis modified) const = 0;
+
+    virtual ExecPtr doNewExec(const StringView& trader, const StringView& market,
+                              const StringView& contr, Jd settlDay, Iden id,
+                              const StringView& ref, Iden orderId, Iden quoteId, State state,
+                              Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                              Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                              Role role, const StringView& cpty, Millis created) const = 0;
+
+    virtual PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                              Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const = 0;
+
+ public:
     Factory() noexcept = default;
     virtual ~Factory() noexcept;
 
@@ -102,14 +120,62 @@ public:
     {
         return doNewTrader(mnem, display, email);
     }
-    OrderPtr newOrder(const StringView& trader) const
+    OrderPtr newOrder(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, Iden quoteId, State state, Side side,
+                      Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                      Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                      Millis created, Millis modified) const
     {
-        return doNewOrder(trader);
+        return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, state, side, lots,
+                          ticks, resd, exec, cost, lastLots, lastTicks, minLots, pecan, created,
+                          modified);
+    }
+
+    OrderPtr newOrder(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, Iden quoteId, Side side,
+                      Lots lots, Ticks ticks, Lots minLots, Millis created) const
+    {
+        return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, State::NEW, side, lots,
+                          ticks, lots, 0, 0, 0, 0, minLots, false, created, created);
+    }
+
+    ExecPtr newExec(const StringView& trader, const StringView& market,
+                    const StringView& contr, Jd settlDay, Iden id,
+                    const StringView& ref, Iden orderId, Iden quoteId, State state,
+                    Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                    Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                    Role role, const StringView& cpty, Millis created) const
+    {
+        return doNewExec(trader, market, contr, settlDay, id, ref, orderId, quoteId, state, side,
+                         lots, ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId,
+                         role, cpty, created);
+    }
+
+    ExecPtr newExec(const Order& order, Iden id, Millis created) const
+    {
+        return doNewExec(order.trader(), order.market(), order.contr(), order.settlDay(),
+                         id, order.ref(), order.id(), order.quoteId(), order.state(),
+                         order.side(), order.lots(), order.ticks(), order.resd(),
+                         order.exec(), order.cost(), order.lastLots(), order.lastTicks(),
+                         order.minLots(), 0, Role::NONE, StringView{}, created);
+    }
+
+    PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                    Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const
+    {
+        return doNewPosn(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
+    }
+
+    PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay) const
+    {
+        return doNewPosn(trader, contr, settlDay, 0, 0, 0, 0);
     }
 };
 
 class SWIRLY_API BasicFactory : public Factory {
-protected:
+ protected:
     std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                       AssetType type) const override;
 
@@ -128,9 +194,24 @@ protected:
     std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                         const StringView& email) const override;
 
-    OrderPtr doNewOrder(const StringView& trader) const override;
+    OrderPtr doNewOrder(const StringView& trader, const StringView& market,
+                        const StringView& contr, Jd settlDay, Iden id,
+                        const StringView& ref, Iden quoteId, State state, Side side,
+                        Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                        Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
+                        Millis created, Millis modified) const override;
 
-public:
+    ExecPtr doNewExec(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, Iden orderId, Iden quoteId, State state,
+                      Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                      Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+                      Role role, const StringView& cpty, Millis created) const override;
+
+    PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
+                      Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const override;
+
+ public:
     BasicFactory() noexcept = default;
     ~BasicFactory() noexcept override;
 

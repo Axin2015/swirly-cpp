@@ -27,7 +27,7 @@ namespace swirly {
  */
 
 class SWIRLY_API Response {
-public:
+ public:
     constexpr Response() noexcept = default;
     ~Response() noexcept = default;
 

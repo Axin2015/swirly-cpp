@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_ORDER_HPP
-#define SWIRLY_ELM_ORDER_HPP
+#ifndef SWIRLY_ELM_EXEC_HPP
+#define SWIRLY_ELM_EXEC_HPP
 
 #include <swirly/elm/Request.hpp>
 
@@ -27,10 +27,13 @@ namespace swirly {
  */
 
 /**
- * An instruction to buy or sell goods or services.
+ * A transaction that occurs as an @ref Order transitions through a workflow.
+ *
+ * Trade executions represent the exchange of goods or services between counter-parties.
  */
-class SWIRLY_API Order : public Request {
+class SWIRLY_API Exec : public Request {
 
+    const Iden orderId_;
     const Iden quoteId_;
     State state_;
     const Ticks ticks_;
@@ -38,7 +41,6 @@ class SWIRLY_API Order : public Request {
      * Must be greater than zero.
      */
     Lots resd_;
-    Lots quotd_{0};
     /**
      * Must not be greater that lots.
      */
@@ -50,15 +52,18 @@ class SWIRLY_API Order : public Request {
      * Minimum to be filled by this order.
      */
     const Lots minLots_;
-    bool pecan_;
-    Millis modified_;
+    Iden matchId_;
+    Role role_;
+    Mnem cpty_;
 
  public:
-    Order(const StringView& trader, const StringView& market, const StringView& contr,
-          Jd settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
-          Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-          Lots minLots, bool pecan, Millis created, Millis modified) noexcept
+    Exec(const StringView& trader, const StringView& market, const StringView& contr,
+         Jd settlDay, Iden id, const StringView& ref, Iden orderId, Iden quoteId, State state,
+         Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
+         Ticks lastTicks, Lots minLots, Iden matchId, Role role, const StringView& cpty,
+         Millis created) noexcept
     :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+        orderId_{orderId},
         quoteId_{quoteId},
         state_{state},
         ticks_{ticks},
@@ -68,21 +73,26 @@ class SWIRLY_API Order : public Request {
         lastLots_{lastLots},
         lastTicks_{lastTicks},
         minLots_{minLots},
-        pecan_{pecan},
-        modified_{modified}
+        matchId_{matchId},
+        role_{role},
+        cpty_{cpty}
     {
     }
 
-    ~Order() noexcept override;
+    ~Exec() noexcept override;
 
     // Copy.
-    Order(const Order&) = default;
-    Order& operator =(const Order&) = default;
+    Exec(const Exec&) = default;
+    Exec& operator =(const Exec&) = default;
 
     // Move.
-    Order(Order&&) = default;
-    Order& operator =(Order&&) = default;
+    Exec(Exec&&) = default;
+    Exec& operator =(Exec&&) = default;
 
+    Iden orderId() const noexcept
+    {
+        return orderId_;
+    }
     Iden quoteId() const noexcept
     {
         return quoteId_;
@@ -98,10 +108,6 @@ class SWIRLY_API Order : public Request {
     Lots resd() const noexcept
     {
         return resd_;
-    }
-    Lots quotd() const noexcept
-    {
-        return quotd_;
     }
     Lots exec() const noexcept
     {
@@ -123,21 +129,25 @@ class SWIRLY_API Order : public Request {
     {
         return minLots_;
     }
-    bool pecan() const noexcept
+    Iden matchId() const noexcept
     {
-        return pecan_;
+        return matchId_;
     }
-    Millis modified() const noexcept
+    Role role() const noexcept
     {
-        return modified_;
+        return role_;
+    }
+    StringView cpty() const noexcept
+    {
+        return cpty_.view();
     }
 };
 
-using OrderPtr = boost::intrusive_ptr<Order>;
-using OrderIdSet = RequestIdSet<Order>;
+using ExecPtr = boost::intrusive_ptr<Exec>;
+using ExecIdSet = RequestIdSet<Exec>;
 
 /** @} */
 
 } // swirly
 
-#endif // SWIRLY_ELM_ORDER_HPP
+#endif // SWIRLY_ELM_EXEC_HPP

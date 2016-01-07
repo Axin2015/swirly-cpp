@@ -27,7 +27,7 @@ namespace swirly {
  */
 
 class SWIRLY_API ServException : public Exception {
-public:
+ public:
     ServException() noexcept = default;
 
     ~ServException() noexcept override;
@@ -47,7 +47,7 @@ public:
  * repeat the request without modifications.
  */
 class SWIRLY_API BadRequestException : public ServException {
-public:
+ public:
     BadRequestException() noexcept = default;
 
     ~BadRequestException() noexcept override;
@@ -62,7 +62,7 @@ public:
 };
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
-public:
+ public:
     AlreadyExistsException() noexcept = default;
 
     ~AlreadyExistsException() noexcept override;
@@ -77,7 +77,7 @@ public:
 };
 
 class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
-public:
+ public:
     RefAlreadyExistsException() noexcept = default;
 
     ~RefAlreadyExistsException() noexcept override;
@@ -92,7 +92,7 @@ public:
 };
 
 class SWIRLY_API InvalidException : public BadRequestException {
-public:
+ public:
     InvalidException() noexcept = default;
 
     ~InvalidException() noexcept override;
@@ -107,7 +107,7 @@ public:
 };
 
 class SWIRLY_API InvalidLotsException : public InvalidException {
-public:
+ public:
     InvalidLotsException() noexcept = default;
 
     ~InvalidLotsException() noexcept override;
@@ -122,7 +122,7 @@ public:
 };
 
 class SWIRLY_API InvalidTicksException : public InvalidException {
-public:
+ public:
     InvalidTicksException() noexcept = default;
 
     ~InvalidTicksException() noexcept override;
@@ -137,7 +137,7 @@ public:
 };
 
 class SWIRLY_API TooLateException : public BadRequestException {
-public:
+ public:
     TooLateException() noexcept = default;
 
     ~TooLateException() noexcept override;
@@ -159,7 +159,7 @@ public:
  * status code 404 (Not Found) can be used instead.
  */
 class SWIRLY_API ForbiddenException : public ServException {
-public:
+ public:
     ForbiddenException() noexcept = default;
 
     ~ForbiddenException() noexcept override;
@@ -177,7 +177,7 @@ public:
  * The server encountered an unexpected condition which prevented it from fulfilling the request.
  */
 class SWIRLY_API InternalException : public ServException {
-public:
+ public:
     InternalException() noexcept = default;
 
     ~InternalException() noexcept override;
@@ -192,7 +192,7 @@ public:
 };
 
 class SWIRLY_API LiquidityUnavailableException : public InternalException {
-public:
+ public:
     LiquidityUnavailableException() noexcept = default;
 
     ~LiquidityUnavailableException() noexcept override;
@@ -213,7 +213,7 @@ public:
  * requested resource.
  */
 class SWIRLY_API MethodNotAllowedException : public ServException {
-public:
+ public:
     MethodNotAllowedException() noexcept = default;
 
     ~MethodNotAllowedException() noexcept override;
@@ -236,7 +236,7 @@ public:
  * applicable.
  */
 class SWIRLY_API NotFoundException : public ServException {
-public:
+ public:
     NotFoundException() noexcept = default;
 
     ~NotFoundException() noexcept override;
@@ -251,7 +251,7 @@ public:
 };
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
-public:
+ public:
     MarketClosedException() noexcept = default;
 
     ~MarketClosedException() noexcept override;
@@ -266,7 +266,7 @@ public:
 };
 
 class SWIRLY_API MarketNotFoundException : public NotFoundException {
-public:
+ public:
     MarketNotFoundException() noexcept = default;
 
     ~MarketNotFoundException() noexcept override;
@@ -281,7 +281,7 @@ public:
 };
 
 class SWIRLY_API OrderNotFoundException : public NotFoundException {
-public:
+ public:
     OrderNotFoundException() noexcept = default;
 
     ~OrderNotFoundException() noexcept override;
@@ -296,7 +296,7 @@ public:
 };
 
 class SWIRLY_API QuoteNotFoundException : public NotFoundException {
-public:
+ public:
     QuoteNotFoundException() noexcept = default;
 
     ~QuoteNotFoundException() noexcept override;
@@ -311,7 +311,7 @@ public:
 };
 
 class SWIRLY_API TraderNotFoundException : public NotFoundException {
-public:
+ public:
     TraderNotFoundException() noexcept = default;
 
     ~TraderNotFoundException() noexcept override;
@@ -333,7 +333,7 @@ public:
  * response.
  */
 class SWIRLY_API ServiceUnavailableException : public ServException {
-public:
+ public:
     ServiceUnavailableException() noexcept = default;
 
     ~ServiceUnavailableException() noexcept override;
@@ -355,7 +355,7 @@ public:
  * status code 404 (Not Found) can be used instead.
  */
 class SWIRLY_API UnauthorizedException : public ServException {
-public:
+ public:
     UnauthorizedException() noexcept = default;
 
     ~UnauthorizedException() noexcept override;
