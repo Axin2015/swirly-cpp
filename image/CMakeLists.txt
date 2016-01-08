@@ -22,9 +22,10 @@ IF(DOT)
     ADD_CUSTOM_COMMAND(
       OUTPUT "${PROJECT_BINARY_DIR}/image/${outfile}"
       WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-      COMMAND "${PERL}" etc/dotdepend.pl ${lname}
+      COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${lname}
               | dot -Tpng >"${PROJECT_BINARY_DIR}/image/${outfile}"
-      DEPENDS ${lname}_shared)
+      DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl"
+              ${lname}_shared)
 
     SET(outfiles ${outfiles} "${PROJECT_BINARY_DIR}/image/${outfile}")
   ENDFOREACH()
