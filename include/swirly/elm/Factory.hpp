@@ -21,8 +21,8 @@
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
+#include <swirly/elm/Quote.hpp>
 #include <swirly/elm/Trader.hpp>
 
 namespace swirly {
@@ -73,6 +73,11 @@ class SWIRLY_API Factory {
 
     virtual PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
                               Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const = 0;
+
+    virtual QuotePtr doNewQuote(const StringView& trader, const StringView& market,
+                                const StringView& contr, Jd settlDay, Iden id,
+                                const StringView& ref, const OrderPtr& order, Side side,
+                                Lots lots, Ticks ticks, Millis created, Millis expiry) const = 0;
 
  public:
     Factory() noexcept = default;
@@ -172,6 +177,15 @@ class SWIRLY_API Factory {
     {
         return doNewPosn(trader, contr, settlDay, 0, 0, 0, 0);
     }
+
+    QuotePtr newQuote(const StringView& trader, const StringView& market,
+                      const StringView& contr, Jd settlDay, Iden id,
+                      const StringView& ref, const OrderPtr& order, Side side,
+                      Lots lots, Ticks ticks, Millis created, Millis expiry) const
+    {
+        return doNewQuote(trader, market, contr, settlDay, id, ref, order, side, lots, ticks,
+                          created, expiry);
+    }
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -210,6 +224,11 @@ class SWIRLY_API BasicFactory : public Factory {
 
     PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jd settlDay,
                       Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const override;
+
+    QuotePtr doNewQuote(const StringView& trader, const StringView& market,
+                        const StringView& contr, Jd settlDay, Iden id,
+                        const StringView& ref, const OrderPtr& order, Side side,
+                        Lots lots, Ticks ticks, Millis created, Millis expiry) const override;
 
  public:
     BasicFactory() noexcept = default;
