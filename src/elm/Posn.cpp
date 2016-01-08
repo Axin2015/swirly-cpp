@@ -20,4 +20,33 @@ namespace swirly {
 
 Posn::~Posn() noexcept = default;
 
+TraderPosnSet::~TraderPosnSet() noexcept
+{
+    set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });
+}
+
+TraderPosnSet::ValuePtr TraderPosnSet::insert(const ValuePtr& request) noexcept
+{
+    auto result = set_.insert(*request);
+    if (result.second) {
+        // Take ownership if inserted.
+        request->addRef();
+    }
+    return &*result.first;
+}
+
+TraderPosnSet::ValuePtr TraderPosnSet::insertOrReplace(const ValuePtr& request) noexcept
+{
+    auto result = set_.insert(*request);
+    if (!result.second) {
+        // Replace if exists.
+        auto& prev = *result.first;
+        set_.replace_node(result.first, *request);
+        prev.release();
+    }
+    // Take ownership.
+    request->addRef();
+    return request;
+}
+
 } // swirly

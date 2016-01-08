@@ -18,6 +18,7 @@
 #define SWIRLY_ELM_TRADERSESS_HPP
 
 #include <swirly/elm/Exec.hpp>
+#include <swirly/elm/Posn.hpp>
 #include <swirly/elm/Quote.hpp>
 #include <swirly/elm/Trader.hpp>
 
@@ -35,6 +36,7 @@ class SWIRLY_API TraderSess : public Trader {
 
     OrderIdSet orders_;
     ExecIdSet trades_;
+    TraderPosnSet posns_;
     QuoteIdSet quotes_;
 
  public:
