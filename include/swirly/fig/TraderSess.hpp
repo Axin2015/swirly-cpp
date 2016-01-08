@@ -17,6 +17,9 @@
 #ifndef SWIRLY_ELM_TRADERSESS_HPP
 #define SWIRLY_ELM_TRADERSESS_HPP
 
+#include <swirly/elm/Exec.hpp>
+#include <swirly/elm/Posn.hpp>
+#include <swirly/elm/Quote.hpp>
 #include <swirly/elm/Trader.hpp>
 
 #include <boost/intrusive/unordered_set.hpp>
@@ -30,6 +33,12 @@ namespace swirly {
 
 class SWIRLY_API TraderSess : public Trader {
     using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
+
+    OrderIdSet orders_;
+    ExecIdSet trades_;
+    TraderPosnSet posns_;
+    QuoteIdSet quotes_;
+
  public:
     boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 

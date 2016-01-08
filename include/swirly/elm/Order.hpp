@@ -54,6 +54,8 @@ class SWIRLY_API Order : public Request {
     Millis modified_;
 
  public:
+    boost::intrusive::set_member_hook<> idHook_;
+
     Order(const StringView& trader, const StringView& market, const StringView& contr,
           Jd settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
           Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,

@@ -84,6 +84,15 @@ PosnPtr BasicFactory::doNewPosn(const StringView& trader, const StringView& cont
     return makeRefCounted<Posn>(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
 }
 
+QuotePtr BasicFactory::doNewQuote(const StringView& trader, const StringView& market,
+                                  const StringView& contr, Jd settlDay, Iden id,
+                                  const StringView& ref, const OrderPtr& order, Side side,
+                                  Lots lots, Ticks ticks, Millis created, Millis expiry) const
+{
+    return makeRefCounted<Quote>(trader, market, contr, settlDay, id, ref, order, side, lots,
+                                 ticks, created, expiry);
+}
+
 BasicFactory::~BasicFactory() noexcept = default;
 
 } // swirly

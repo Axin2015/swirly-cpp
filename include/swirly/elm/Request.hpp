@@ -154,8 +154,8 @@ class RequestIdSet {
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<RequestT, decltype(RequestT::refHook_),
-                                                           &RequestT::refHook_>;
+    using MemberHookOption = boost::intrusive::member_hook<RequestT, decltype(RequestT::idHook_),
+                                                           &RequestT::idHook_>;
     using Set = boost::intrusive::set<RequestT,
                                       ConstantTimeSizeOption,
                                       CompareOption,

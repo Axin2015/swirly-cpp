@@ -8,7 +8,7 @@ my $cxx = $ENV{CXX} || 'g++';
 my $lib = shift;
 $lib or die "Library name not specified";
 
-my $makedepend = "$cxx -MM -MG -Iinclude include/swirly/$lib/*.hpp src/$lib/*.[ch]pp";
+my $makedepend = "$cxx -std=c++14 -MM -MG -Iinclude include/swirly/$lib/*.hpp src/$lib/*.[ch]pp";
 my $tred = 'tred';
 
 sub ltrim {
@@ -44,7 +44,7 @@ sub parsedep {
 my ($comp, %comps);
 my $cont = 0;
 
-foreach (`$makedepend 2>/dev/null`) {
+foreach (`$makedepend`) {
 
     chomp;
 

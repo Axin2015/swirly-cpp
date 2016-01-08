@@ -22,6 +22,8 @@
 #include <swirly/ash/RefCounted.hpp>
 #include <swirly/ash/Types.hpp>
 
+#include <boost/intrusive/set.hpp>
+
 namespace swirly {
 
 /**
@@ -40,6 +42,8 @@ class SWIRLY_API Posn : public RefCounted {
     Cost sellCost_;
 
  public:
+    boost::intrusive::set_member_hook<> traderHook_;
+
     Posn(const StringView& trader, const StringView& contr, Jd settlDay,
          Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) noexcept
     :   trader_{trader},
@@ -55,12 +59,12 @@ class SWIRLY_API Posn : public RefCounted {
     ~Posn() noexcept override;
 
     // Copy.
-    constexpr Posn(const Posn&) noexcept = default;
-    Posn& operator =(const Posn&) noexcept = default;
+    Posn(const Posn&) = default;
+    Posn& operator =(const Posn&) = default;
 
     // Move.
-    constexpr Posn(Posn&&) noexcept = default;
-    Posn& operator =(Posn&&) noexcept = default;
+    Posn(Posn&&) = default;
+    Posn& operator =(Posn&&) = default;
 
     StringView trader() const noexcept
     {
@@ -93,6 +97,120 @@ class SWIRLY_API Posn : public RefCounted {
 };
 
 using PosnPtr = boost::intrusive_ptr<Posn>;
+
+class SWIRLY_API TraderPosnSet {
+    using Key = std::tuple<StringView, Jd>;
+    struct ValueCompare {
+        int compare(const Posn& lhs, const Posn& rhs) const noexcept
+        {
+            int result{lhs.contr().compare(rhs.contr())};
+            if (result == 0)
+                result = swirly::compare(lhs.settlDay(), rhs.settlDay());
+            return result;
+        }
+        bool operator()(const Posn& lhs, const Posn& rhs) const noexcept
+        {
+            return compare(lhs, rhs) < 0;
+        }
+    };
+    struct KeyValueCompare {
+        bool operator()(const Key& lhs, const Posn& rhs) const noexcept
+        {
+            int result{std::get<0>(lhs).compare(rhs.contr())};
+            if (result == 0)
+                result = swirly::compare(std::get<1>(lhs), rhs.settlDay());
+            return result < 0;
+        }
+        bool operator()(const Posn& lhs, const Key& rhs) const noexcept
+        {
+            int result{lhs.contr().compare(std::get<0>(rhs))};
+            if (result == 0)
+                result = swirly::compare(lhs.settlDay(), std::get<1>(rhs));
+            return result < 0;
+        }
+    };
+    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using MemberHookOption = boost::intrusive::member_hook<Posn, decltype(Posn::traderHook_),
+                                                           &Posn::traderHook_>;
+    using Set = boost::intrusive::set<Posn,
+                                      ConstantTimeSizeOption,
+                                      CompareOption,
+                                      MemberHookOption
+                                      >;
+    using ValuePtr = boost::intrusive_ptr<Posn>;
+
+    Set set_;
+ public:
+    using Iterator = typename Set::iterator;
+    using ConstIterator = typename Set::const_iterator;
+
+    TraderPosnSet() = default;
+
+    ~TraderPosnSet() noexcept;
+
+    // Copy.
+    TraderPosnSet(const TraderPosnSet&) = delete;
+    TraderPosnSet& operator =(const TraderPosnSet&) = delete;
+
+    // Move.
+    TraderPosnSet(TraderPosnSet&&) = default;
+    TraderPosnSet& operator =(TraderPosnSet&&) = default;
+
+    ValuePtr insert(const ValuePtr& request) noexcept;
+
+    ValuePtr insertOrReplace(const ValuePtr& request) noexcept;
+
+    template <typename... ArgsT>
+    ValuePtr emplace(ArgsT&&... args)
+    {
+        return insert(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
+    }
+
+    template <typename... ArgsT>
+    ValuePtr emplaceOrReplace(ArgsT&&... args)
+    {
+        return insertOrReplace(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
+    }
+
+    // Begin.
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+
+    // End.
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+
+    // Find.
+    Iterator find(const StringView& contr, Jd settlDay) noexcept
+    {
+        return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
+    }
+    ConstIterator find(const StringView& contr, Jd settlDay) const noexcept
+    {
+        return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
+    }
+};
 
 /** @} */
 

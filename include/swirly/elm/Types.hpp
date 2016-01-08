@@ -19,6 +19,8 @@
 
 #include <swirly/ash/String.hpp>
 
+#include <cstdint>
+
 namespace swirly {
 
 /**
@@ -26,9 +28,9 @@ namespace swirly {
  * @{
  */
 
-using Iden = long;
+using Iden = int64_t;
 
-using Incs = long;
+using Incs = int64_t;
 
 using Lots = Incs;
 

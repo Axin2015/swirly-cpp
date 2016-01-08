@@ -28,9 +28,9 @@ namespace swirly {
  * @{
  */
 
-inline constexpr long roundHalfAway(double real)
+inline constexpr int64_t roundHalfAway(double real)
 {
-    return static_cast<long>(real < 0.0 ? real - 0.5 : real + 0.5);
+    return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
 }
 
 inline constexpr double fractToReal(int numer, int denom)

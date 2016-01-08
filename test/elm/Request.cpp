@@ -25,7 +25,7 @@ namespace {
 class Foo : public Request {
     int& alive_;
  public:
-    boost::intrusive::set_member_hook<> refHook_;
+    boost::intrusive::set_member_hook<> idHook_;
 
     Foo(const StringView& market, Iden id, int& alive) noexcept
     :   Request{"", market, "", 0, id, "", Side::BUY, 0, 0},
