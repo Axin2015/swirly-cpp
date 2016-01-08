@@ -17,6 +17,8 @@
 #ifndef SWIRLY_ASH_TYPES_HPP
 #define SWIRLY_ASH_TYPES_HPP
 
+#include <cstdint>
+
 namespace swirly {
 
 /**
@@ -37,7 +39,7 @@ using Jd = int;
 /**
  * Milliseconds since Unix epoch.
  */
-using Millis = long;
+using Millis = int64_t;
 
 /** @} */
 
