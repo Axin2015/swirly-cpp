@@ -17,7 +17,7 @@
 #ifndef SWIRLY_ELM_LEVEL_HPP
 #define SWIRLY_ELM_LEVEL_HPP
 
-#include <swirly/ash/Defs.hpp>
+#include <swirly/elm/Order.hpp>
 
 namespace swirly {
 
@@ -26,9 +26,47 @@ namespace swirly {
  * @{
  */
 
-class SWIRLY_API Level {
+using LevelKey = Ticks;
+
+namespace detail {
+
+/**
+ * Synthetic level key.
+ */
+inline constexpr LevelKey composeKey(Side side, Ticks ticks)
+{
+    return side == Side::BUY ? -ticks : ticks;
+}
+
+} // detail
+
+/**
+ * Price level.
+ *
+ * A price level is an aggregation of orders by price. I.e. the sum of all orders in the book at the
+ * same price.
+ */
+class SWIRLY_API Level : public Comparable<Level> {
+    const Order* firstOrder_;
+    const LevelKey key_;
+    const Ticks ticks_;
+    /**
+     * Must be greater than zero.
+     */
+    Lots resd_;
+    Lots quotd_;
+    /**
+     * Must be greater than zero.
+     */
+    int count_;
  public:
-    Level() noexcept
+    explicit Level(const Order& firstOrder) noexcept
+    :   firstOrder_{&firstOrder},
+        key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
+        ticks_{firstOrder.ticks()},
+        resd_{firstOrder.resd()},
+        quotd_{firstOrder.quotd()},
+        count_{1}
     {
     }
 
@@ -41,6 +79,35 @@ class SWIRLY_API Level {
     // Move.
     Level(Level&&) = default;
     Level& operator =(Level&&) = default;
+
+    int compare(const Level& rhs) const noexcept
+    {
+        return swirly::compare(key_, rhs.key_);
+    }
+    const Order& firstOrder() const noexcept
+    {
+        return *firstOrder_;
+    }
+    LevelKey key() const noexcept
+    {
+        return key_;
+    }
+    Ticks ticks() const noexcept
+    {
+        return ticks_;
+    }
+    Lots resd() const noexcept
+    {
+        return resd_;
+    }
+    Lots quotd() const noexcept
+    {
+        return quotd_;
+    }
+    int count() const noexcept
+    {
+        return count_;
+    }
 };
 
 /** @} */

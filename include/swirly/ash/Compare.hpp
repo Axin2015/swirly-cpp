@@ -27,7 +27,11 @@ namespace swirly {
  */
 
 template <typename TypeT>
-struct Comparable {
+class Comparable {
+protected:
+    ~Comparable() noexcept = default;
+
+public:
     friend constexpr bool operator ==(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
