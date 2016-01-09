@@ -18,11 +18,32 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
 BOOST_AUTO_TEST_SUITE(PosnSuite)
 
-BOOST_AUTO_TEST_CASE(PosnCase)
+BOOST_AUTO_TEST_CASE(TraderPosnSetCase)
 {
-    BOOST_CHECK(true);
+    TraderPosnSet s;
+
+    PosnPtr posn1{s.emplace("MARAYL", "EURUSD", 1, 0, 0, 0, 0)};
+    BOOST_CHECK_EQUAL(posn1->refs(), 2);
+    BOOST_CHECK_EQUAL(posn1->contr(), "EURUSD");
+    BOOST_CHECK_EQUAL(posn1->settlDay(), 1);
+    BOOST_CHECK(s.find("EURUSD", 1) != s.end());
+
+    // Duplicate.
+    PosnPtr posn2{s.emplace("MARAYL", "EURUSD", 1, 0, 0, 0, 0)};
+    BOOST_CHECK_EQUAL(posn2->refs(), 3);
+    BOOST_CHECK_EQUAL(posn2, posn1);
+
+    // Replace.
+    PosnPtr posn3{s.emplaceOrReplace("MARAYL", "EURUSD", 1, 0, 0, 0, 0)};
+    BOOST_CHECK_EQUAL(posn3->refs(), 2);
+    BOOST_CHECK_NE(posn3, posn1);
+    BOOST_CHECK_EQUAL(posn3->contr(), "EURUSD");
+    BOOST_CHECK_EQUAL(posn3->settlDay(), 1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
