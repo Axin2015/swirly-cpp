@@ -14,8 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Posn.hpp>
-
 #include <swirly/ash/JulianDay.hpp>
 
 #include <boost/test/unit_test.hpp>
@@ -23,31 +21,24 @@
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(PosnSuite)
+BOOST_AUTO_TEST_SUITE(JulianDaySuite)
 
-BOOST_AUTO_TEST_CASE(TraderPosnSetCase)
+BOOST_AUTO_TEST_CASE(YmdToIsoCase)
 {
-    constexpr auto settlDay = ymdToJd(2014, 2, 14);
+    BOOST_CHECK_EQUAL(20140314, ymdToIso(2014, 2, 14));
+}
 
-    TraderPosnSet s;
+BOOST_AUTO_TEST_CASE(YmdToJdCase)
+{
+    BOOST_CHECK_EQUAL(2456731, ymdToJd(2014, 2, 14));
+    // AD 1978 January 1, 0h UT is JD 2443509.5 and AD 1978 July 21, 15h UT, is JD 2443711.125.
+    BOOST_CHECK_EQUAL(2443510, ymdToJd(1978, 0, 1));
+    BOOST_CHECK_EQUAL(2443711, ymdToJd(1978, 6, 21));
+}
 
-    PosnPtr posn1{s.emplace("MARAYL", "EURUSD", settlDay, 0, 0, 0, 0)};
-    BOOST_CHECK_EQUAL(posn1->refs(), 2);
-    BOOST_CHECK_EQUAL(posn1->contr(), "EURUSD");
-    BOOST_CHECK_EQUAL(posn1->settlDay(), settlDay);
-    BOOST_CHECK(s.find("EURUSD", settlDay) != s.end());
-
-    // Duplicate.
-    PosnPtr posn2{s.emplace("MARAYL", "EURUSD", settlDay, 0, 0, 0, 0)};
-    BOOST_CHECK_EQUAL(posn2->refs(), 3);
-    BOOST_CHECK_EQUAL(posn2, posn1);
-
-    // Replace.
-    PosnPtr posn3{s.emplaceOrReplace("MARAYL", "EURUSD", settlDay, 0, 0, 0, 0)};
-    BOOST_CHECK_EQUAL(posn3->refs(), 2);
-    BOOST_CHECK_NE(posn3, posn1);
-    BOOST_CHECK_EQUAL(posn3->contr(), "EURUSD");
-    BOOST_CHECK_EQUAL(posn3->settlDay(), settlDay);
+BOOST_AUTO_TEST_CASE(JdToMillisCase)
+{
+    BOOST_CHECK_EQUAL(1394798400000L, jdToMillis(ymdToJd(2014, 2, 14)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
