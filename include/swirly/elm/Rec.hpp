@@ -91,7 +91,7 @@ class RecSet {
     struct ValueCompare {
         bool operator()(const Rec& lhs, const Rec& rhs) const noexcept
         {
-            return lhs.mnem().compare(rhs.mnem());
+            return lhs.mnem() < rhs.mnem();
         }
     };
     struct KeyValueCompare {
