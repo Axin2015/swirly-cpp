@@ -21,8 +21,16 @@
 namespace swirly {
 
 MarketBook::MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-                       Jd settlDay, Jd expiryDay, MarketState state) noexcept
-:   Market{mnem, display, contr, settlDay, expiryDay, state}
+                       Jd settlDay, Jd expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
+                       Millis lastTime, Iden maxOrderId, Iden maxExecId, Iden maxQuoteId) noexcept
+:   Market{mnem, display, contr, settlDay, expiryDay, state},
+    lastLots_{lastLots},
+    lastTicks_{lastTicks},
+    lastTime_{lastTime},
+    view_{mnem, contr, settlDay, lastLots, lastTicks, lastTime},
+    maxOrderId_{maxOrderId},
+    maxExecId_{maxExecId},
+    maxQuoteId_{maxQuoteId}
 {
 }
 

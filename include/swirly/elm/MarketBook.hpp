@@ -17,7 +17,9 @@
 #ifndef SWIRLY_ELM_MARKETBOOK_HPP
 #define SWIRLY_ELM_MARKETBOOK_HPP
 
+#include <swirly/elm/BookSide.hpp>
 #include <swirly/elm/Market.hpp>
+#include <swirly/elm/MarketView.hpp>
 
 namespace swirly {
 
@@ -27,9 +29,22 @@ namespace swirly {
  */
 
 class SWIRLY_API MarketBook : public Market {
+
+    Lots lastLots_;
+    Ticks lastTicks_;
+    Millis lastTime_;
+    // Two sides constitute the book.
+    BookSide bidSide_;
+    BookSide offerSide_;
+    MarketView view_;
+    Iden maxOrderId_;
+    Iden maxExecId_;
+    Iden maxQuoteId_;
+
  public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jd settlDay, Jd expiryDay, MarketState state) noexcept;
+               Jd settlDay, Jd expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
+               Millis lastTime, Iden maxOrderId, Iden maxExecId, Iden maxQuoteId) noexcept;
 
     ~MarketBook() noexcept override;
 
@@ -40,6 +55,43 @@ class SWIRLY_API MarketBook : public Market {
     // Move.
     MarketBook(MarketBook&&) = default;
     MarketBook& operator =(MarketBook&&) = default;
+
+    Lots lastLots() const noexcept
+    {
+        return lastLots_;
+    }
+    Ticks lastTicks() const noexcept
+    {
+        return lastTicks_;
+    }
+    Millis lastTime() const noexcept
+    {
+        return lastTime_;
+    }
+    const BookSide& bidSide() const noexcept
+    {
+        return bidSide_;
+    }
+    const BookSide& offerSide() const noexcept
+    {
+        return offerSide_;
+    }
+    const MarketView& view() const noexcept
+    {
+        return view_;
+    }
+    Iden maxOrderId() const noexcept
+    {
+        return maxOrderId_;
+    }
+    Iden maxExecId() const noexcept
+    {
+        return maxExecId_;
+    }
+    Iden maxQuoteId() const noexcept
+    {
+        return maxQuoteId_;
+    }
 };
 
 /** @} */
