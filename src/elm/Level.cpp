@@ -14,15 +14,38 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Level.hpp>
 
 namespace swirly {
 
-Order::~Order() noexcept = default;
+Level::~Level() noexcept = default;
 
-OrderList::~OrderList() noexcept
+LevelSet::~LevelSet() noexcept
 {
-    list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
+    set_.clear_and_dispose([](Level* ptr) { delete ptr; });
+}
+
+Level& LevelSet::insert(ValuePtr rec) noexcept
+{
+    auto result = set_.insert(*rec);
+    if (result.second) {
+        // Take ownership if inserted.
+        rec.release();
+    }
+    return *result.first;
+}
+
+Level& LevelSet::insertOrReplace(ValuePtr rec) noexcept
+{
+    auto result = set_.insert(*rec);
+    if (!result.second) {
+        // Replace if exists.
+        auto* prev = &*result.first;
+        set_.replace_node(result.first, *rec);
+        delete prev;
+    }
+    // Take ownership.
+    return *rec.release();
 }
 
 } // swirly

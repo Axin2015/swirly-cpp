@@ -14,15 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Order.hpp>
+#include <swirly/elm/MarketData.hpp>
 
 namespace swirly {
 
-Order::~Order() noexcept = default;
-
-OrderList::~OrderList() noexcept
-{
-    list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
-}
+MarketData::~MarketData() noexcept = default;
 
 } // swirly

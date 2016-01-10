@@ -14,40 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Posn.hpp>
-
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/elm/Level.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(PosnSuite)
+BOOST_AUTO_TEST_SUITE(LevelSuite)
 
-BOOST_AUTO_TEST_CASE(TraderPosnSetCase)
+BOOST_AUTO_TEST_CASE(LevelSetCase)
 {
-    constexpr auto settlDay = ymdToJd(2014, 2, 14);
+    const Order order{"MARAYL", "EURUSD", "EURUSD", 0, 0, "", 0, State::NEW, Side::BUY,
+            10, 12345, 0, 0, 0, 0, 0, 0, false, 0, 0};
 
-    TraderPosnSet s;
+    LevelSet s;
 
-    PosnPtr posn1{s.emplace("MARAYL", "EURUSD", settlDay, 0, 0, 0, 0)};
-    BOOST_CHECK_EQUAL(posn1->refs(), 2);
-    BOOST_CHECK_EQUAL(posn1->contr(), "EURUSD");
-    BOOST_CHECK_EQUAL(posn1->settlDay(), settlDay);
-    BOOST_CHECK(s.find("EURUSD", settlDay) != s.end());
+    Level& level1{s.emplace(order)};
+    BOOST_CHECK_EQUAL(level1.key(), -12345);
+    BOOST_CHECK(s.find(Side::BUY, 12345) != s.end());
 
     // Duplicate.
-    PosnPtr posn2{s.emplace("MARAYL", "EURUSD", settlDay, 0, 0, 0, 0)};
-    BOOST_CHECK_EQUAL(posn2->refs(), 3);
-    BOOST_CHECK_EQUAL(posn2, posn1);
+    Level& level2{s.emplace(order)};
+    BOOST_CHECK_EQUAL(&level2, &level1);
 
     // Replace.
-    PosnPtr posn3{s.emplaceOrReplace("MARAYL", "EURUSD", settlDay, 0, 0, 0, 0)};
-    BOOST_CHECK_EQUAL(posn3->refs(), 2);
-    BOOST_CHECK_NE(posn3, posn1);
-    BOOST_CHECK_EQUAL(posn3->contr(), "EURUSD");
-    BOOST_CHECK_EQUAL(posn3->settlDay(), settlDay);
+    Level& level3{s.emplaceOrReplace(order)};
+    BOOST_CHECK_NE(&level3, &level1);
+    BOOST_CHECK_EQUAL(level3.key(), -12345);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

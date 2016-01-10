@@ -14,15 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Order.hpp>
+#include <swirly/elm/MarketView.hpp>
 
 namespace swirly {
 
-Order::~Order() noexcept = default;
-
-OrderList::~OrderList() noexcept
+MarketView::MarketView(const StringView& market, const StringView& contr, Jd settlDay, Lots lastLots,
+                       Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept
+:   market_{market},
+    contr_{contr},
+    settlDay_{settlDay},
+    lastLots_{lastLots},
+    lastTicks_{lastTicks},
+    lastTime_{lastTime},
+    data_{data}
 {
-    list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
 }
+
+MarketView::MarketView(const StringView& market, const StringView& contr, Jd settlDay, Lots lastLots,
+                       Ticks lastTicks, Millis lastTime) noexcept
+:   market_{market},
+    contr_{contr},
+    settlDay_{settlDay},
+    lastLots_{lastLots},
+    lastTicks_{lastTicks},
+    lastTime_{lastTime},
+    data_{}
+{
+}
+
+MarketView::~MarketView() noexcept = default;
 
 } // swirly

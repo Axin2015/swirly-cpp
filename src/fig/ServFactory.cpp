@@ -31,7 +31,8 @@ unique_ptr<Market> ServFactory::doNewMarket(const StringView& mnem, const String
                                             Ticks lastTicks, Millis lastTime, Iden maxOrderId,
                                             Iden maxExecId, Iden maxQuoteId) const
 {
-    return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state);
+    return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state, lastLots,
+                                   lastTicks, lastTime, maxOrderId, maxExecId, maxQuoteId);
 }
 
 unique_ptr<Trader> ServFactory::doNewTrader(const StringView& mnem, const StringView& display,

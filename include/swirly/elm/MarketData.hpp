@@ -14,15 +14,37 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Order.hpp>
+#ifndef SWIRLY_ELM_MARKETDATA_HPP
+#define SWIRLY_ELM_MARKETDATA_HPP
+
+#include <swirly/ash/Defs.hpp>
 
 namespace swirly {
 
-Order::~Order() noexcept = default;
+/**
+ * @addtogroup Domain
+ * @{
+ */
 
-OrderList::~OrderList() noexcept
-{
-    list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
-}
+class SWIRLY_API MarketData {
+ public:
+    MarketData() noexcept
+    {
+    }
+
+    ~MarketData() noexcept;
+
+    // Copy.
+    MarketData(const MarketData&) = default;
+    MarketData& operator =(const MarketData&) = default;
+
+    // Move.
+    MarketData(MarketData&&) = default;
+    MarketData& operator =(MarketData&&) = default;
+};
+
+/** @} */
 
 } // swirly
+
+#endif // SWIRLY_ELM_MARKETDATA_HPP

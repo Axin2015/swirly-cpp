@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Order.hpp>
+#include <swirly/elm/BookSide.hpp>
 
-namespace swirly {
+#include <boost/test/unit_test.hpp>
 
-Order::~Order() noexcept = default;
+BOOST_AUTO_TEST_SUITE(BookSideSuite)
 
-OrderList::~OrderList() noexcept
+BOOST_AUTO_TEST_CASE(BookSideCase)
 {
-    list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
+    BOOST_CHECK(true);
 }
 
-} // swirly
+BOOST_AUTO_TEST_SUITE_END()

@@ -56,6 +56,7 @@ BOOST_AUTO_TEST_CASE(RequestIdSetCase)
         BOOST_CHECK_EQUAL(alive, 1);
         BOOST_CHECK_EQUAL(foo1->refs(), 2);
         BOOST_CHECK_EQUAL(foo1->market(), "FOO");
+        BOOST_CHECK_EQUAL(foo1->id(), 1);
         BOOST_CHECK(s.find("FOO", 1) != s.end());
 
         // Duplicate.
@@ -70,6 +71,7 @@ BOOST_AUTO_TEST_CASE(RequestIdSetCase)
         BOOST_CHECK_EQUAL(foo3->refs(), 2);
         BOOST_CHECK_NE(foo3, foo1);
         BOOST_CHECK_EQUAL(foo3->market(), "FOO");
+        BOOST_CHECK_EQUAL(foo3->id(), 1);
     }
     BOOST_CHECK_EQUAL(alive, 0);
 }

@@ -14,15 +14,39 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Order.hpp>
+#ifndef SWIRLY_ELM_BOOKSIDE_HPP
+#define SWIRLY_ELM_BOOKSIDE_HPP
+
+#include <swirly/elm/Level.hpp>
 
 namespace swirly {
 
-Order::~Order() noexcept = default;
+/**
+ * @addtogroup Book
+ * @{
+ */
 
-OrderList::~OrderList() noexcept
-{
-    list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
-}
+class SWIRLY_API BookSide {
+    LevelSet levels_;
+    OrderList orders_;
+ public:
+    BookSide() noexcept
+    {
+    }
+
+    ~BookSide() noexcept;
+
+    // Copy.
+    BookSide(const BookSide&) = default;
+    BookSide& operator =(const BookSide&) = default;
+
+    // Move.
+    BookSide(BookSide&&) = default;
+    BookSide& operator =(BookSide&&) = default;
+};
+
+/** @} */
 
 } // swirly
+
+#endif // SWIRLY_ELM_BOOKSIDE_HPP
