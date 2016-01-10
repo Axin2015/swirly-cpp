@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Request.hpp>
 
+#include <boost/intrusive/list.hpp>
+
 namespace swirly {
 
 /**
@@ -55,6 +57,7 @@ class SWIRLY_API Order : public Request {
 
  public:
     boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::list_member_hook<> listHook_;
 
     Order(const StringView& trader, const StringView& market, const StringView& contr,
           Jd settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
@@ -137,6 +140,62 @@ class SWIRLY_API Order : public Request {
 
 using OrderPtr = boost::intrusive_ptr<Order>;
 using OrderIdSet = RequestIdSet<Order>;
+
+class SWIRLY_API OrderList {
+    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+    using MemberHookOption = boost::intrusive::member_hook<Order, decltype(Order::listHook_),
+                                                           &Order::listHook_>;
+    using List = boost::intrusive::list<Order,
+                                        ConstantTimeSizeOption,
+                                        MemberHookOption
+                                        >;
+    using ValuePtr = boost::intrusive_ptr<Order>;
+
+    List list_;
+ public:
+    using Iterator = typename List::iterator;
+    using ConstIterator = typename List::const_iterator;
+
+    OrderList() = default;
+
+    ~OrderList() noexcept;
+
+    // Copy.
+    OrderList(const OrderList&) = delete;
+    OrderList& operator =(const OrderList&) = delete;
+
+    // Move.
+    OrderList(OrderList&&) = default;
+    OrderList& operator =(OrderList&&) = default;
+
+    // Begin.
+    Iterator begin() noexcept
+    {
+        return list_.begin();
+    }
+    ConstIterator begin() const noexcept
+    {
+        return list_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return list_.cbegin();
+    }
+
+    // End.
+    Iterator end() noexcept
+    {
+        return list_.end();
+    }
+    ConstIterator end() const noexcept
+    {
+        return list_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return list_.cend();
+    }
+};
 
 /** @} */
 

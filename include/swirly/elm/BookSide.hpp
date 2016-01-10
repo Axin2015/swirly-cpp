@@ -17,7 +17,7 @@
 #ifndef SWIRLY_ELM_BOOKSIDE_HPP
 #define SWIRLY_ELM_BOOKSIDE_HPP
 
-#include <swirly/ash/Defs.hpp>
+#include <swirly/elm/Level.hpp>
 
 namespace swirly {
 
@@ -27,6 +27,8 @@ namespace swirly {
  */
 
 class SWIRLY_API BookSide {
+    LevelSet levels_;
+    OrderList orders_;
  public:
     BookSide() noexcept
     {
