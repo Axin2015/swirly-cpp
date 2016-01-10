@@ -60,6 +60,8 @@ class SWIRLY_API Level : public Comparable<Level> {
      */
     int count_;
  public:
+    boost::intrusive::set_member_hook<> keyHook_;
+
     explicit Level(const Order& firstOrder) noexcept
     :   firstOrder_{&firstOrder},
         key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
@@ -107,6 +109,105 @@ class SWIRLY_API Level : public Comparable<Level> {
     int count() const noexcept
     {
         return count_;
+    }
+};
+
+class SWIRLY_API LevelSet {
+    struct ValueCompare {
+        bool operator()(const Level& lhs, const Level& rhs) const noexcept
+        {
+            return lhs.key() < rhs.key();
+        }
+    };
+    struct KeyValueCompare {
+        bool operator()(LevelKey lhs, const Level& rhs) const noexcept
+        {
+            return lhs < rhs.key();
+        }
+        bool operator()(const Level& lhs, LevelKey rhs) const noexcept
+        {
+            return lhs.key() < rhs;
+        }
+    };
+    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using MemberHookOption = boost::intrusive::member_hook<Level, decltype(Level::keyHook_),
+                                                           &Level::keyHook_>;
+    using Set = boost::intrusive::set<Level,
+                                      ConstantTimeSizeOption,
+                                      CompareOption,
+                                      MemberHookOption
+                                      >;
+    using ValuePtr = std::unique_ptr<Level>;
+
+    Set set_;
+ public:
+    using Iterator = typename Set::iterator;
+    using ConstIterator = typename Set::const_iterator;
+
+    LevelSet() = default;
+    ~LevelSet() noexcept;
+
+    // Copy.
+    LevelSet(const LevelSet&) = delete;
+    LevelSet& operator =(const LevelSet&) = delete;
+
+    // Move.
+    LevelSet(LevelSet&&) = default;
+    LevelSet& operator =(LevelSet&&) = default;
+
+    Level& insert(ValuePtr rec) noexcept;
+
+    Level& insertOrReplace(ValuePtr rec) noexcept;
+
+    template <typename... ArgsT>
+    Level& emplace(ArgsT&&... args)
+    {
+        return insert(std::make_unique<Level>(std::forward<ArgsT>(args)...));
+    }
+
+    template <typename... ArgsT>
+    Level& emplaceOrReplace(ArgsT&&... args)
+    {
+        return insertOrReplace(std::make_unique<Level>(std::forward<ArgsT>(args)...));
+    }
+
+    // Begin.
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+
+    // End.
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+
+    // Find.
+    Iterator find(Side side, Ticks ticks) noexcept
+    {
+        return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
+    }
+    ConstIterator find(Side side, Ticks ticks) const noexcept
+    {
+        return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
     }
 };
 

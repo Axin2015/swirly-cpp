@@ -20,4 +20,32 @@ namespace swirly {
 
 Level::~Level() noexcept = default;
 
+LevelSet::~LevelSet() noexcept
+{
+    set_.clear_and_dispose([](Level* ptr) { delete ptr; });
+}
+
+Level& LevelSet::insert(ValuePtr rec) noexcept
+{
+    auto result = set_.insert(*rec);
+    if (result.second) {
+        // Take ownership if inserted.
+        rec.release();
+    }
+    return *result.first;
+}
+
+Level& LevelSet::insertOrReplace(ValuePtr rec) noexcept
+{
+    auto result = set_.insert(*rec);
+    if (!result.second) {
+        // Replace if exists.
+        auto* prev = &*result.first;
+        set_.replace_node(result.first, *rec);
+        delete prev;
+    }
+    // Take ownership.
+    return *rec.release();
+}
+
 } // swirly

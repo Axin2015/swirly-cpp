@@ -18,11 +18,30 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
 BOOST_AUTO_TEST_SUITE(LevelSuite)
 
-BOOST_AUTO_TEST_CASE(LevelCase)
+BOOST_AUTO_TEST_CASE(LevelSetCase)
 {
-    BOOST_CHECK(true);
+    const Order order{"MARAYL", "EURUSD", "EURUSD", 0, 0, "", 0, State::NEW, Side::BUY,
+            10, 12345, 0, 0, 0, 0, 0, 0, false, 0, 0};
+
+    LevelSet s;
+
+    Level& level1{s.emplace(order)};
+    BOOST_CHECK_EQUAL(level1.key(), -12345);
+    BOOST_CHECK(s.find(Side::BUY, 12345) != s.end());
+
+    // Duplicate.
+    Level& level2{s.emplace(order)};
+    BOOST_CHECK_EQUAL(&level2, &level1);
+
+    // Replace.
+    Level& level3{s.emplaceOrReplace(order)};
+    BOOST_CHECK_NE(&level3, &level1);
+    BOOST_CHECK_EQUAL(level3.key(), -12345);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
