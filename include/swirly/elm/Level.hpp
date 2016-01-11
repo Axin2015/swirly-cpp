@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Order.hpp>
 
+#include <memory>
+
 namespace swirly {
 
 /**
