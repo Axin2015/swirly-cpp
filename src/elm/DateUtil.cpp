@@ -14,20 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/MarketData.hpp>
+#include <swirly/elm/DateUtil.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <boost/date_time/local_time/local_time.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+namespace lt = boost::local_time;
+namespace pt = boost::posix_time;
 
 using namespace std;
-using namespace swirly;
 
-static_assert(sizeof(MarketData) <= 1*64, "crossed cache-line boundary");
+namespace swirly {
 
-BOOST_AUTO_TEST_SUITE(MarketDataSuite)
+namespace {
 
-BOOST_AUTO_TEST_CASE(MarketDataCase)
+// http://www.di-mgt.com.au/wclock/tz.html
+
+// America/New_York.
+const lt::time_zone_ptr NY{new lt::posix_time_zone{"EST-5EDT,M3.2.0/2,M11.1.0/2"}};
+
+// Roll at 5pm.
+constexpr int ROLL_HOUR{17};
+
+inline pt::ptime millisToPtime(Millis ms)
 {
-    BOOST_CHECK(true);
+    return pt::from_time_t(ms / 1000L) + pt::milliseconds(ms % 1000L);
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+} // anonymous
+
+Jd getBusDay(Millis ms)
+{
+    lt::local_date_time ldt{millisToPtime(ms), NY};
+    // Add 7 hours to 17.00 will roll the date.
+    ldt += pt::hours(24 - ROLL_HOUR);
+    return ldt.local_time().date().julian_day();
+}
+
+} // swirly

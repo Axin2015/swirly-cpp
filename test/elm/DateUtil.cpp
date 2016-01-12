@@ -14,20 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/MarketData.hpp>
+#include <swirly/elm/DateUtil.hpp>
+
+#include <swirly/ash/JulianDay.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-static_assert(sizeof(MarketData) <= 1*64, "crossed cache-line boundary");
+BOOST_AUTO_TEST_SUITE(DateUtilSuite)
 
-BOOST_AUTO_TEST_SUITE(MarketDataSuite)
-
-BOOST_AUTO_TEST_CASE(MarketDataCase)
+BOOST_AUTO_TEST_CASE(GetBusDayCase)
 {
-    BOOST_CHECK(true);
+    // Business days roll at 5pm New York.
+
+    // Friday, March 14, 2014
+    // 21.00 UTC
+    // 17.00 EDT (UTC-4 hours)
+
+    // 20.59 UTC
+    BOOST_CHECK_EQUAL(getBusDay(1394830799000L), ymdToJd(2014, 2, 14));
+
+    // 21.00 UTC
+    BOOST_CHECK_EQUAL(getBusDay(1394830800000L), ymdToJd(2014, 2, 15));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

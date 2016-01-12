@@ -18,6 +18,11 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
+static_assert(sizeof(Asset) <= 3*64, "crossed cache-line boundary");
+
 BOOST_AUTO_TEST_SUITE(AssetSuite)
 
 BOOST_AUTO_TEST_CASE(AssetCase)

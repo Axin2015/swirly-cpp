@@ -14,20 +14,33 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/MarketData.hpp>
+#ifndef SWIRLY_ELM_DATEUTIL_HPP
+#define SWIRLY_ELM_DATEUTIL_HPP
 
-#include <boost/test/unit_test.hpp>
+#include <swirly/elm/Types.hpp>
 
-using namespace std;
-using namespace swirly;
+#include <swirly/ash/Types.hpp>
 
-static_assert(sizeof(MarketData) <= 1*64, "crossed cache-line boundary");
+namespace swirly {
 
-BOOST_AUTO_TEST_SUITE(MarketDataSuite)
+/**
+ * @addtogroup Date
+ * @{
+ */
 
-BOOST_AUTO_TEST_CASE(MarketDataCase)
-{
-    BOOST_CHECK(true);
-}
+/**
+ * Get the business day from a transaction time.
+ *
+ * Business day rolls at 5pm New York.
+ *
+ * @param ms
+ *            The milliseconds since epoch.
+ * @return the business day.
+ */
+SWIRLY_API Jd getBusDay(Millis ms);
 
-BOOST_AUTO_TEST_SUITE_END()
+/** @} */
+
+} // swirly
+
+#endif // SWIRLY_ELM_DATEUTIL_HPP
