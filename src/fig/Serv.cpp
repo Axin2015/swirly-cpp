@@ -150,4 +150,117 @@ const TraderSess* Serv::findTraderByEmail(const StringView& email) const
     return trader;
 }
 
+void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref,
+                       Iden quoteId, Side side, Lots lots, Ticks ticks, Lots minLots,
+                       Millis now, Response& resp)
+{
+}
+
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
+                       Response& resp)
+{
+}
+
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots,
+                       Millis now, Response& resp)
+{
+}
+
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Lots lots,
+                       Millis now, Response& resp)
+{
+}
+
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now,
+                       Response& resp)
+{
+}
+
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now,
+                       Response& resp)
+{
+}
+
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
+                       Response& resp)
+{
+}
+
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Millis now,
+                       Response& resp)
+{
+}
+
+void Serv::cancelOrder(TraderSess& sess, Millis now)
+{
+}
+
+void Serv::cancelOrder(MarketBook& book, Millis now)
+{
+}
+
+void Serv::archiveOrder(TraderSess& sess, Order& order, Millis now)
+{
+}
+
+void Serv::archiveOrder(TraderSess& sess, const StringView& market, Iden id, Millis now)
+{
+}
+
+void Serv::archiveOrder(TraderSess& sess, Millis now)
+{
+}
+
+void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenVector& ids,
+                        Millis now)
+{
+}
+
+ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, const StringView& ref,
+                          Side side, Lots lots, Ticks ticks, Role role, const StringView& cpty,
+                          Millis created)
+{
+    return {};
+}
+
+void Serv::archiveTrade(TraderSess& sess, Exec& trade, Millis now)
+{
+}
+
+void Serv::archiveTrade(TraderSess& sess, const StringView& market, Iden id, Millis now)
+{
+}
+
+void Serv::archiveTrade(TraderSess& sess, Millis now)
+{
+}
+
+void Serv::archiveTrade(TraderSess& sess, const StringView& market, const IdenVector& ids,
+                        Millis now)
+{
+}
+
+QuotePtr Serv::createQuote(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                           Lots lots, Millis now)
+{
+    return {};
+}
+
+void Serv::expireEndOfDay(Millis now)
+{
+}
+
+void Serv::settlEndOfDay(Millis now)
+{
+}
+
+void Serv::poll(Millis now)
+{
+}
+
+Millis Serv::getTimeout() const noexcept
+{
+    return 0;
+}
+
 } // swirly

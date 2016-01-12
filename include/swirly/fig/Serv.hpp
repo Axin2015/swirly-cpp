@@ -19,20 +19,27 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
+#include <swirly/elm/Quote.hpp>
 #include <swirly/elm/Trader.hpp>
+
+#include <vector>
 
 namespace swirly {
 
 class Journ;
 class MarketBook;
 class Model;
+class Response;
 class TraderSess;
 
 /**
  * @addtogroup App
  * @{
  */
+
+using IdenVector = std::vector<Iden>;
 
 class SWIRLY_API Serv {
     struct Impl;
@@ -65,6 +72,7 @@ class SWIRLY_API Serv {
 
     const MarketBook& updateMarket(const StringView& mnem, const StringView& display,
                                    MarketState state, Millis now);
+
     const MarketBook& market(const StringView& mnem) const;
 
     const TraderSess& createTrader(const StringView& mnem, const StringView& display,
@@ -75,6 +83,98 @@ class SWIRLY_API Serv {
     const TraderSess& trader(const StringView& mnem) const;
 
     const TraderSess* findTraderByEmail(const StringView& email) const;
+
+    void createOrder(TraderSess& sess, MarketBook& book, const StringView& ref,
+                     Iden quoteId, Side side, Lots lots, Ticks ticks, Lots minLots,
+                     Millis now, Response& resp);
+
+    void reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
+                     Response& resp);
+
+    void reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots,
+                     Millis now, Response& resp);
+
+    void reviseOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Lots lots,
+                     Millis now, Response& resp);
+
+    void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now,
+                     Response& resp);
+
+    void cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now,
+                     Response& resp);
+
+    void cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
+                     Response& resp);
+
+    void cancelOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Millis now,
+                     Response& resp);
+
+    /**
+     * Cancels all orders.
+     *
+     * @param sess
+     *            The session.
+     * @param now
+     *            The current time.
+     */
+    void cancelOrder(TraderSess& sess, Millis now);
+
+    void cancelOrder(MarketBook& book, Millis now);
+
+    void archiveOrder(TraderSess& sess, Order& order, Millis now);
+
+    void archiveOrder(TraderSess& sess, const StringView& market, Iden id, Millis now);
+
+    /**
+     * Archive all orders.
+     *
+     * @param sess
+     *            The session.
+     * @param now
+     *            The current time.
+     */
+    void archiveOrder(TraderSess& sess, Millis now);
+
+    void archiveOrder(TraderSess& sess, const StringView& market, const IdenVector& ids,
+                      Millis now);
+
+    ExecPtr createTrade(TraderSess& sess, MarketBook& book, const StringView& ref,
+                        Side side, Lots lots, Ticks ticks, Role role, const StringView& cpty,
+                        Millis created);
+
+    void archiveTrade(TraderSess& sess, Exec& trade, Millis now);
+
+    void archiveTrade(TraderSess& sess, const StringView& market, Iden id, Millis now);
+
+    /**
+     * Archive all trades.
+     *
+     * @param sess
+     *            The session.
+     * @param now
+     *            The current time.
+     */
+    void archiveTrade(TraderSess& sess, Millis now);
+
+    void archiveTrade(TraderSess& sess, const StringView& market, const IdenVector& ids,
+                      Millis now);
+
+    QuotePtr createQuote(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                         Lots lots, Millis now);
+
+    /**
+     * This method may partially fail.
+     *
+     * @param now
+     *            The current time.
+     */
+    void expireEndOfDay(Millis now);
+
+    void settlEndOfDay(Millis now);
+
+    void poll(Millis now);
+
+    Millis getTimeout() const noexcept;
 };
 
 /** @} */
