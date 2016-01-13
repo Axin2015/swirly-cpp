@@ -56,6 +56,21 @@ class SWIRLY_API MarketBook : public Market {
     MarketBook(MarketBook&&) = default;
     MarketBook& operator =(MarketBook&&) = default;
 
+    Iden allocOrderId() noexcept
+    {
+        return ++maxOrderId_;
+    }
+
+    Iden allocExecId() noexcept
+    {
+        return ++maxExecId_;
+    }
+
+    Iden allocQuoteId() noexcept
+    {
+        return ++maxQuoteId_;
+    }
+
     Lots lastLots() const noexcept
     {
         return lastLots_;
