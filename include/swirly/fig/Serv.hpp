@@ -24,7 +24,7 @@
 #include <swirly/elm/Quote.hpp>
 #include <swirly/elm/Trader.hpp>
 
-#include <vector>
+#include <swirly/ash/Array.hpp>
 
 namespace swirly {
 
@@ -39,7 +39,7 @@ class TraderSess;
  * @{
  */
 
-using IdenVector = std::vector<Iden>;
+using IdenView = ArrayView<Iden>;
 
 class SWIRLY_API Serv {
     struct Impl;
@@ -94,7 +94,7 @@ class SWIRLY_API Serv {
     void reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots,
                      Millis now, Response& resp);
 
-    void reviseOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Lots lots,
+    void reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots,
                      Millis now, Response& resp);
 
     void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now,
@@ -106,7 +106,7 @@ class SWIRLY_API Serv {
     void cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
                      Response& resp);
 
-    void cancelOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Millis now,
+    void cancelOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Millis now,
                      Response& resp);
 
     /**
@@ -135,7 +135,7 @@ class SWIRLY_API Serv {
      */
     void archiveOrder(TraderSess& sess, Millis now);
 
-    void archiveOrder(TraderSess& sess, const StringView& market, const IdenVector& ids,
+    void archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids,
                       Millis now);
 
     ExecPtr createTrade(TraderSess& sess, MarketBook& book, const StringView& ref,
@@ -156,7 +156,7 @@ class SWIRLY_API Serv {
      */
     void archiveTrade(TraderSess& sess, Millis now);
 
-    void archiveTrade(TraderSess& sess, const StringView& market, const IdenVector& ids,
+    void archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids,
                       Millis now);
 
     QuotePtr createQuote(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
