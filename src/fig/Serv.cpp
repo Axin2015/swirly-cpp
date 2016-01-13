@@ -19,8 +19,11 @@
 #include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/Exception.hpp>
+#include <swirly/elm/DateUtil.hpp>
 #include <swirly/elm/MarketBook.hpp>
 #include <swirly/elm/Model.hpp>
+
+#include <swirly/ash/JulianDay.hpp>
 
 #include "ServFactory.hpp"
 #include "TraderSessSet.hpp"
@@ -30,10 +33,7 @@ using namespace std;
 namespace swirly {
 
 struct Serv::Impl {
-    Impl(const Model& model, Journ& journ, Millis now)
-    : journ{journ}
-    {
-    }
+
     Journ& journ;
     detail::ServFactory factory;
     AssetSet assets;
@@ -41,6 +41,15 @@ struct Serv::Impl {
     MarketSet markets;
     TraderSet traders;
     detail::TraderSessSet emailIdx;
+
+    Impl(const Model& model, Journ& journ, Millis now) noexcept
+    : journ{journ}
+    {
+    }
+    ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
+    {
+        return factory.newExec(order, book.allocExecId(), now);
+    }
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)
@@ -154,6 +163,21 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
                        Iden quoteId, Side side, Lots lots, Ticks ticks, Lots minLots,
                        Millis now, Response& resp)
 {
+    const auto busDay = getBusDay(now);
+    if (book.expiryDay() && book.expiryDay() < busDay) {
+        throwException<MarketClosedException>("market for '%.*s' in '%d' has expired",
+                                              SWIRLY_STR(book.contr()),
+                                              maybeJdToIso(book.settlDay()));
+    }
+    if (lots == 0 || lots < minLots) {
+        throwException<InvalidLotsException>("invalid lots '%d'", lots);
+    }
+    const auto orderId = book.allocOrderId();
+    auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
+                                         orderId, ref, quoteId, side, lots, ticks, minLots, now);
+    auto exec = impl_->newExec(book, *order, now);
+
+
 }
 
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
