@@ -44,4 +44,8 @@ MarketView::MarketView(const StringView& market, const StringView& contr, Jd set
 
 MarketView::~MarketView() noexcept = default;
 
+MarketView::MarketView(const MarketView&) = default;
+
+MarketView::MarketView(MarketView&&) = default;
+
 } // swirly

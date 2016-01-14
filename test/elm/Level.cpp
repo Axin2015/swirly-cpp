@@ -16,6 +16,8 @@
  */
 #include <swirly/elm/Level.hpp>
 
+#include <swirly/elm/Order.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 using namespace std;

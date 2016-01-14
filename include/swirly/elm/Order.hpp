@@ -81,12 +81,12 @@ class SWIRLY_API Order : public Request {
     ~Order() noexcept override;
 
     // Copy.
-    Order(const Order&) = default;
-    Order& operator =(const Order&) = default;
+    Order(const Order&) = delete;
+    Order& operator =(const Order&) = delete;
 
     // Move.
-    Order(Order&&) = default;
-    Order& operator =(Order&&) = default;
+    Order(Order&&);
+    Order& operator =(Order&&) = delete;
 
     Iden quoteId() const noexcept
     {
@@ -165,8 +165,8 @@ class SWIRLY_API OrderList {
     OrderList& operator =(const OrderList&) = delete;
 
     // Move.
-    OrderList(OrderList&&) = default;
-    OrderList& operator =(OrderList&&) = default;
+    OrderList(OrderList&&);
+    OrderList& operator =(OrderList&&);
 
     // Begin.
     Iterator begin() noexcept

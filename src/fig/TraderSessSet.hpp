@@ -25,7 +25,7 @@ namespace detail {
 /**
  * Unordered TraderSess set keyed by email.
  */
-class TraderSessSet {
+class SWIRLY_API TraderSessSet {
     static constexpr std::size_t BUCKETS = 101;
     struct ValueHash {
         std::size_t operator ()(const TraderSess& trader) const noexcept
@@ -75,15 +75,15 @@ class TraderSessSet {
     {
     }
 
-    ~TraderSessSet() noexcept = default;
+    ~TraderSessSet() noexcept;
 
     // Copy.
     TraderSessSet(const TraderSessSet&) = delete;
     TraderSessSet& operator =(const TraderSessSet&) = delete;
 
     // Move.
-    TraderSessSet(TraderSessSet&&) = default;
-    TraderSessSet& operator =(TraderSessSet&&) = default;
+    TraderSessSet(TraderSessSet&&);
+    TraderSessSet& operator =(TraderSessSet&&);
 
     bool insert(TraderSess& trader) noexcept
     {

@@ -20,9 +20,15 @@ namespace swirly {
 
 Order::~Order() noexcept = default;
 
+Order::Order(Order&&) = default;
+
 OrderList::~OrderList() noexcept
 {
     list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
 }
+
+OrderList::OrderList(OrderList&&) = default;
+
+OrderList& OrderList::operator =(OrderList&&) = default;
 
 } // swirly

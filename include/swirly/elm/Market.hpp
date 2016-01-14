@@ -46,12 +46,12 @@ class SWIRLY_API Market : public Rec {
     ~Market() noexcept override;
 
     // Copy.
-    Market(const Market&) = default;
-    Market& operator =(const Market&) = default;
+    Market(const Market&);
+    Market& operator =(const Market&) = delete;
 
     // Move.
-    Market(Market&&) = default;
-    Market& operator =(Market&&) = default;
+    Market(Market&&);
+    Market& operator =(Market&&) = delete;
 
     void setState(MarketState state) noexcept
     {

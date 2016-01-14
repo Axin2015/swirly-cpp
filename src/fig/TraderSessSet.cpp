@@ -14,38 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_BOOKSIDE_HPP
-#define SWIRLY_ELM_BOOKSIDE_HPP
-
-#include <swirly/elm/Level.hpp>
-#include <swirly/elm/Order.hpp>
+#include "TraderSessSet.hpp"
 
 namespace swirly {
+namespace detail {
 
-/**
- * @addtogroup Book
- * @{
- */
+TraderSessSet::~TraderSessSet() noexcept = default;
 
-class SWIRLY_API BookSide {
-    LevelSet levels_;
-    OrderList orders_;
- public:
-    BookSide() = default;
+TraderSessSet::TraderSessSet(TraderSessSet&&) = default;
 
-    ~BookSide() noexcept;
+TraderSessSet& TraderSessSet::operator =(TraderSessSet&&) = default;
 
-    // Copy.
-    BookSide(const BookSide&) = delete;
-    BookSide& operator =(const BookSide&) = delete;
-
-    // Move.
-    BookSide(BookSide&&);
-    BookSide& operator =(BookSide&&) = delete;
-};
-
-/** @} */
-
+} // detail
 } // swirly
-
-#endif // SWIRLY_ELM_BOOKSIDE_HPP

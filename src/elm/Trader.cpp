@@ -20,4 +20,8 @@ namespace swirly {
 
 Trader::~Trader() noexcept = default;
 
+Trader::Trader(const Trader&) = default;
+
+Trader::Trader(Trader&&) = default;
+
 } // swirly

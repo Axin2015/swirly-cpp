@@ -33,4 +33,8 @@ Market::Market(const StringView& mnem, const StringView& display, const StringVi
 
 Market::~Market() noexcept = default;
 
+Market::Market(const Market&) = default;
+
+Market::Market(Market&&) = default;
+
 } // swirly

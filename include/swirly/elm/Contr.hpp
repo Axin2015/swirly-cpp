@@ -58,12 +58,12 @@ class SWIRLY_API Contr : public Rec {
     ~Contr() noexcept override;
 
     // Copy.
-    Contr(const Contr&) = default;
-    Contr& operator =(const Contr&) = default;
+    Contr(const Contr&);
+    Contr& operator =(const Contr&) = delete;
 
     // Move.
-    Contr(Contr&&) = default;
-    Contr& operator =(Contr&&) = default;
+    Contr(Contr&&);
+    Contr& operator =(Contr&&) = delete;
 
     StringView asset() const noexcept
     {

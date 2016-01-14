@@ -59,12 +59,12 @@ class SWIRLY_API Posn : public RefCounted {
     ~Posn() noexcept override;
 
     // Copy.
-    Posn(const Posn&) = default;
-    Posn& operator =(const Posn&) = default;
+    Posn(const Posn&) = delete;
+    Posn& operator =(const Posn&) = delete;
 
     // Move.
-    Posn(Posn&&) = default;
-    Posn& operator =(Posn&&) = default;
+    Posn(Posn&&);
+    Posn& operator =(Posn&&) = delete;
 
     StringView trader() const noexcept
     {
@@ -154,8 +154,8 @@ class SWIRLY_API TraderPosnSet {
     TraderPosnSet& operator =(const TraderPosnSet&) = delete;
 
     // Move.
-    TraderPosnSet(TraderPosnSet&&) = default;
-    TraderPosnSet& operator =(TraderPosnSet&&) = default;
+    TraderPosnSet(TraderPosnSet&&);
+    TraderPosnSet& operator =(TraderPosnSet&&);
 
     ValuePtr insert(const ValuePtr& request) noexcept;
 

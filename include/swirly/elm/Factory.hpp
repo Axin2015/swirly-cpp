@@ -17,20 +17,13 @@
 #ifndef SWIRLY_ELM_FACTORY_HPP
 #define SWIRLY_ELM_FACTORY_HPP
 
-#include <swirly/elm/Asset.hpp>
-#include <swirly/elm/Contr.hpp>
-#include <swirly/elm/Exec.hpp>
-#include <swirly/elm/Market.hpp>
-#include <swirly/elm/Posn.hpp>
-#include <swirly/elm/Quote.hpp>
-#include <swirly/elm/Trader.hpp>
+#include <swirly/elm/Types.hpp>
+
+#include <swirly/ash/Types.hpp>
+
+#include <memory>
 
 namespace swirly {
-
-class Asset;
-class Contr;
-class Market;
-class Trader;
 
 /**
  * @addtogroup Entity
@@ -84,108 +77,65 @@ class SWIRLY_API Factory {
     virtual ~Factory() noexcept;
 
     // Copy.
-    constexpr Factory(const Factory&) noexcept = default;
+    Factory(const Factory&) noexcept = default;
     Factory& operator =(const Factory&) noexcept = default;
 
     // Move.
-    constexpr Factory(Factory&&) noexcept = default;
+    Factory(Factory&&) noexcept = default;
     Factory& operator =(Factory&&) noexcept = default;
 
     std::unique_ptr<Asset> newAsset(const StringView& mnem, const StringView& display,
-                                    AssetType type) const
-    {
-        return doNewAsset(mnem, display, type);
-    }
+                                    AssetType type) const;
+
     std::unique_ptr<Contr> newContr(const StringView& mnem, const StringView& display,
                                     const StringView& asset, const StringView& ccy,
                                     int lotNumer, int lotDenom,
                                     int tickNumer, int tickDenom, int pipDp,
-                                    Lots minLots, Lots maxLots) const
-    {
-        return doNewContr(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer, tickDenom,
-                          pipDp, minLots, maxLots);
-    }
+                                    Lots minLots, Lots maxLots) const;
+
     std::unique_ptr<Market> newMarket(const StringView& mnem, const StringView& display,
                                       const StringView& contr, Jd settlDay,
                                       Jd expiryDay, MarketState state, Lots lastLots,
                                       Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                      Iden maxExecId, Iden maxQuoteId) const
-    {
-        return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, lastLots, lastTicks,
-                           lastTime, maxOrderId, maxExecId, maxQuoteId);
-    }
+                                      Iden maxExecId, Iden maxQuoteId) const;
+
     std::unique_ptr<Market> newMarket(const StringView& mnem, const StringView& display,
                                       const StringView& contr, Jd settlDay,
-                                      Jd expiryDay, MarketState state) const
-    {
-        return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, 0, 0, 0, 0, 0, 0);
-    }
+                                      Jd expiryDay, MarketState state) const;
+
     std::unique_ptr<Trader> newTrader(const StringView& mnem, const StringView& display,
-                                      const StringView& email) const
-    {
-        return doNewTrader(mnem, display, email);
-    }
+                                      const StringView& email) const;
+
     OrderPtr newOrder(const StringView& trader, const StringView& market,
                       const StringView& contr, Jd settlDay, Iden id,
                       const StringView& ref, Iden quoteId, State state, Side side,
                       Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                       Lots lastLots, Ticks lastTicks, Lots minLots, bool pecan,
-                      Millis created, Millis modified) const
-    {
-        return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, state, side, lots,
-                          ticks, resd, exec, cost, lastLots, lastTicks, minLots, pecan, created,
-                          modified);
-    }
+                      Millis created, Millis modified) const;
 
     OrderPtr newOrder(const StringView& trader, const StringView& market,
                       const StringView& contr, Jd settlDay, Iden id,
                       const StringView& ref, Iden quoteId, Side side,
-                      Lots lots, Ticks ticks, Lots minLots, Millis created) const
-    {
-        return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, State::NEW, side, lots,
-                          ticks, lots, 0, 0, 0, 0, minLots, false, created, created);
-    }
+                      Lots lots, Ticks ticks, Lots minLots, Millis created) const;
 
     ExecPtr newExec(const StringView& trader, const StringView& market,
                     const StringView& contr, Jd settlDay, Iden id,
                     const StringView& ref, Iden orderId, Iden quoteId, State state,
                     Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                     Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
-                    Role role, const StringView& cpty, Millis created) const
-    {
-        return doNewExec(trader, market, contr, settlDay, id, ref, orderId, quoteId, state, side,
-                         lots, ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId,
-                         role, cpty, created);
-    }
+                    Role role, const StringView& cpty, Millis created) const;
 
-    ExecPtr newExec(const Order& order, Iden id, Millis created) const
-    {
-        return doNewExec(order.trader(), order.market(), order.contr(), order.settlDay(),
-                         id, order.ref(), order.id(), order.quoteId(), order.state(),
-                         order.side(), order.lots(), order.ticks(), order.resd(),
-                         order.exec(), order.cost(), order.lastLots(), order.lastTicks(),
-                         order.minLots(), 0, Role::NONE, StringView{}, created);
-    }
+    ExecPtr newExec(const Order& order, Iden id, Millis created) const;
 
     PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay,
-                    Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const
-    {
-        return doNewPosn(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
-    }
+                    Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const;
 
-    PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay) const
-    {
-        return doNewPosn(trader, contr, settlDay, 0, 0, 0, 0);
-    }
+    PosnPtr newPosn(const StringView& trader, const StringView& contr, Jd settlDay) const;
 
     QuotePtr newQuote(const StringView& trader, const StringView& market,
                       const StringView& contr, Jd settlDay, Iden id,
                       const StringView& ref, const OrderPtr& order, Side side,
-                      Lots lots, Ticks ticks, Millis created, Millis expiry) const
-    {
-        return doNewQuote(trader, market, contr, settlDay, id, ref, order, side, lots, ticks,
-                          created, expiry);
-    }
+                      Lots lots, Ticks ticks, Millis created, Millis expiry) const;
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -235,12 +185,12 @@ class SWIRLY_API BasicFactory : public Factory {
     ~BasicFactory() noexcept override;
 
     // Copy.
-    BasicFactory(const BasicFactory&) = default;
-    BasicFactory& operator =(const BasicFactory&) = default;
+    BasicFactory(const BasicFactory&) noexcept = default;
+    BasicFactory& operator =(const BasicFactory&) noexcept = default;
 
     // Move.
-    BasicFactory(BasicFactory&&) = default;
-    BasicFactory& operator =(BasicFactory&&) = default;
+    BasicFactory(BasicFactory&&) noexcept = default;
+    BasicFactory& operator =(BasicFactory&&) noexcept = default;
 };
 
 /** @} */

@@ -84,12 +84,12 @@ class SWIRLY_API Exec : public Request {
     ~Exec() noexcept override;
 
     // Copy.
-    Exec(const Exec&) = default;
-    Exec& operator =(const Exec&) = default;
+    Exec(const Exec&) = delete;
+    Exec& operator =(const Exec&) = delete;
 
     // Move.
-    Exec(Exec&&) = default;
-    Exec& operator =(Exec&&) = default;
+    Exec(Exec&&);
+    Exec& operator =(Exec&&) = delete;
 
     Iden orderId() const noexcept
     {

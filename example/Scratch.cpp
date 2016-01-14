@@ -16,6 +16,7 @@
  */
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Model.hpp>
+#include <swirly/elm/Request.hpp>
 
 #include <iostream>
 

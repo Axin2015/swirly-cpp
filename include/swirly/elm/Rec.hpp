@@ -48,12 +48,12 @@ class SWIRLY_API Rec : public Comparable<Rec> {
     virtual ~Rec() noexcept;
 
     // Copy.
-    Rec(const Rec&) = default;
-    Rec& operator =(const Rec&) = default;
+    Rec(const Rec&);
+    Rec& operator =(const Rec&) = delete;
 
     // Move.
-    Rec(Rec&&) = default;
-    Rec& operator =(Rec&&) = default;
+    Rec(Rec&&);
+    Rec& operator =(Rec&&) = delete;
 
     void setDisplay(const StringView& display) noexcept
     {

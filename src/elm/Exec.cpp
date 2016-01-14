@@ -20,4 +20,6 @@ namespace swirly {
 
 Exec::~Exec() noexcept = default;
 
+Exec::Exec(Exec&&) = default;
+
 } // swirly

@@ -17,7 +17,9 @@
 #ifndef SWIRLY_ELM_QUOTE_HPP
 #define SWIRLY_ELM_QUOTE_HPP
 
-#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Request.hpp>
+
+#include <boost/intrusive/list.hpp>
 
 namespace swirly {
 
@@ -37,23 +39,17 @@ class SWIRLY_API Quote : public Request {
 
     Quote(const StringView& trader, const StringView& market, const StringView& contr,
           Jd settlDay, Iden id, const StringView& ref, const OrderPtr& order, Side side,
-          Lots lots, Ticks ticks, Millis created, Millis expiry) noexcept
-    :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-        order_{order},
-        ticks_{ticks},
-        expiry_{expiry}
-    {
-    }
+          Lots lots, Ticks ticks, Millis created, Millis expiry) noexcept;
 
     ~Quote() noexcept override;
 
     // Copy.
-    Quote(const Quote&) = default;
-    Quote& operator =(const Quote&) = default;
+    Quote(const Quote&) = delete;
+    Quote& operator =(const Quote&) = delete;
 
     // Move.
-    Quote(Quote&&) = default;
-    Quote& operator =(Quote&&) = default;
+    Quote(Quote&&);
+    Quote& operator =(Quote&&) = delete;
 
     const OrderPtr& order() const noexcept
     {

@@ -197,6 +197,11 @@ SWIRLY_API const char* enumToString(State state);
  * @{
  */
 
+class Asset;
+class Contr;
+class Market;
+class Trader;
+
 class Exec;
 class Order;
 class Posn;

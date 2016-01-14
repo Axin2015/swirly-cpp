@@ -68,12 +68,12 @@ class SWIRLY_API Request : public RefCounted {
     ~Request() noexcept override;
 
     // Copy.
-    Request(const Request&) = default;
-    Request& operator =(const Request&) = default;
+    Request(const Request&) = delete;
+    Request& operator =(const Request&) = delete;
 
     // Move.
-    Request(Request&&) = default;
-    Request& operator =(Request&&) = default;
+    Request(Request&&);
+    Request& operator =(Request&&) = delete;
 
     StringView trader() const noexcept
     {

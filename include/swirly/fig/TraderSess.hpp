@@ -18,6 +18,7 @@
 #define SWIRLY_ELM_TRADERSESS_HPP
 
 #include <swirly/elm/Exec.hpp>
+#include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 #include <swirly/elm/Quote.hpp>
 #include <swirly/elm/Trader.hpp>
@@ -50,12 +51,12 @@ class SWIRLY_API TraderSess : public Trader {
     ~TraderSess() noexcept override;
 
     // Copy.
-    TraderSess(const TraderSess&) = default;
-    TraderSess& operator =(const TraderSess&) = default;
+    TraderSess(const TraderSess&) = delete;
+    TraderSess& operator =(const TraderSess&) = delete;
 
     // Move.
-    TraderSess(TraderSess&&) = default;
-    TraderSess& operator =(TraderSess&&) = default;
+    TraderSess(TraderSess&&);
+    TraderSess& operator =(TraderSess&&) = delete;
 };
 
 /** @} */

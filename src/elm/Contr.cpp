@@ -42,4 +42,8 @@ Contr::Contr(const StringView& mnem, const StringView& display, const StringView
 
 Contr::~Contr() noexcept = default;
 
+Contr::Contr(const Contr&) = default;
+
+Contr::Contr(Contr&&) = default;
+
 } // swirly

@@ -20,4 +20,6 @@ namespace swirly {
 
 TraderSess::~TraderSess() noexcept = default;
 
+TraderSess::TraderSess(TraderSess&&) = default;
+
 } // swirly
