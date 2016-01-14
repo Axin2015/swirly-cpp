@@ -16,18 +16,22 @@
  */
 #include <swirly/fig/Response.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <swirly/elm/Exec.hpp>
+#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
 
-using namespace std;
-using namespace swirly;
+namespace swirly {
 
-BOOST_AUTO_TEST_SUITE(ResponseSuite)
+Response::Response() noexcept = default;
 
-BOOST_AUTO_TEST_CASE(ResponseCase)
-{
-    Response r;
-    Response s{r};
-    BOOST_CHECK(true);
-}
+Response::~Response() noexcept = default;
 
-BOOST_AUTO_TEST_SUITE_END()
+Response::Response(const Response&) = default;
+
+Response& Response::operator =(const Response&) = default;
+
+Response::Response(Response&&) noexcept = default;
+
+Response& Response::operator =(Response&&) noexcept = default;
+
+} // swirly

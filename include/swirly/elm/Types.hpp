@@ -19,6 +19,8 @@
 
 #include <swirly/ash/String.hpp>
 
+#include <boost/intrusive_ptr.hpp>
+
 #include <cstdint>
 
 namespace swirly {
@@ -187,6 +189,23 @@ enum class State {
 };
 
 SWIRLY_API const char* enumToString(State state);
+
+/** @} */
+
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
+class Exec;
+class Order;
+class Posn;
+class Quote;
+
+using ExecPtr = boost::intrusive_ptr<Exec>;
+using OrderPtr = boost::intrusive_ptr<Order>;
+using PosnPtr = boost::intrusive_ptr<Posn>;
+using QuotePtr = boost::intrusive_ptr<Quote>;
 
 /** @} */
 
