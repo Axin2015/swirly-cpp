@@ -25,6 +25,10 @@ using namespace std;
 using namespace swirly;
 
 namespace swirly {
+namespace {
+constexpr StringView name = "StringView"_sv;
+} // anonymous
+
 enum class Test {
     FOO = 1,
     BAR

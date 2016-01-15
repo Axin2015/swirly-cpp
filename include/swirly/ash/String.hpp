@@ -33,6 +33,10 @@ namespace swirly {
 
 using StringView = std::experimental::string_view;
 
+constexpr StringView operator ""_sv(const char* str, std::size_t len) noexcept
+{
+    return {str, len};
+}
 
 /**
  * String buffer with fixed upper-bound.
