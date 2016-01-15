@@ -25,8 +25,8 @@ namespace detail {
 class ServFactory : public BasicFactory {
  protected:
     std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                        const StringView& contr, Jd settlDay,
-                                        Jd expiryDay, MarketState state, Lots lastLots,
+                                        const StringView& contr, Jday settlDay,
+                                        Jday expiryDay, MarketState state, Lots lastLots,
                                         Ticks lastTicks, Millis lastTime, Iden maxOrderId,
                                         Iden maxExecId, Iden maxQuoteId) const override;
 

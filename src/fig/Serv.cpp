@@ -93,7 +93,7 @@ const TraderSet& Serv::traders() const noexcept
 }
 
 const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
-                                     const StringView& contr, Jd settlDay, Jd expiryDay,
+                                     const StringView& contr, Jday settlDay, Jday expiryDay,
                                      MarketState state, Millis now)
 {
     const auto& rec = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
@@ -164,7 +164,7 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
                        Millis now, Response& resp)
 {
     const auto busDay = getBusDay(now);
-    if (book.expiryDay() && book.expiryDay() < busDay) {
+    if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
         throwException<MarketClosedException>("market for '%.*s' in '%d' has expired",
                                               SWIRLY_STR(book.contr()),
                                               maybeJdToIso(book.settlDay()));
@@ -284,7 +284,7 @@ void Serv::poll(Millis now)
 
 Millis Serv::getTimeout() const noexcept
 {
-    return 0;
+    return 0_ms;
 }
 
 } // swirly

@@ -28,7 +28,7 @@ class Foo : public Request {
     boost::intrusive::set_member_hook<> idHook_;
 
     Foo(const StringView& market, Iden id, int& alive) noexcept
-    :   Request{"", market, "", 0, id, "", Side::BUY, 0, 0},
+    :   Request{"", market, "", 0_jd, id, "", Side::BUY, 0, 0_ms},
         alive_{alive}
     {
         ++alive;

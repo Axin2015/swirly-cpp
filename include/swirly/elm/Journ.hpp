@@ -31,7 +31,7 @@ namespace swirly {
 class SWIRLY_API Journ {
  protected:
     virtual void doCreateMarket(const StringView& mnem, const StringView& display,
-                                const StringView& contr, Jd settlDay, Jd expiryDay,
+                                const StringView& contr, Jday settlDay, Jday expiryDay,
                                 MarketState state) = 0;
 
  public:
@@ -47,7 +47,7 @@ class SWIRLY_API Journ {
     Journ& operator =(Journ&&) noexcept = default;
 
     void createMarket(const StringView& mnem, const StringView& display,
-                      const StringView& contr, Jd settlDay, Jd expiryDay,
+                      const StringView& contr, Jday settlDay, Jday expiryDay,
                       MarketState state)
     {
         return doCreateMarket(mnem, display, contr, settlDay, expiryDay, state);

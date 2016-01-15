@@ -17,6 +17,8 @@
 #ifndef SWIRLY_ASH_TYPES_HPP
 #define SWIRLY_ASH_TYPES_HPP
 
+#include <swirly/ash/Enum.hpp>
+
 #include <cstdint>
 
 namespace swirly {
@@ -29,17 +31,32 @@ namespace swirly {
 /**
  * ISO8601 date in yyymmdd format.
  */
-using IsoDate = int;
+enum class IsoDate : int { };
+
+constexpr IsoDate operator ""_dt(unsigned long long val) noexcept
+{
+    return box<IsoDate>(val);
+}
 
 /**
  * Julian day.
  */
-using Jd = int;
+enum class Jday : int { };
+
+constexpr Jday operator ""_jd(unsigned long long val) noexcept
+{
+    return box<Jday>(val);
+}
 
 /**
  * Milliseconds since Unix epoch.
  */
-using Millis = int64_t;
+enum class Millis : int64_t { };
+
+constexpr Millis operator ""_ms(unsigned long long val) noexcept
+{
+    return box<Millis>(val);
+}
 
 /** @} */
 

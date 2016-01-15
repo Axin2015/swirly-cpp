@@ -38,7 +38,7 @@ class SWIRLY_API Quote : public Request {
     boost::intrusive::set_member_hook<> idHook_;
 
     Quote(const StringView& trader, const StringView& market, const StringView& contr,
-          Jd settlDay, Iden id, const StringView& ref, const OrderPtr& order, Side side,
+          Jday settlDay, Iden id, const StringView& ref, const OrderPtr& order, Side side,
           Lots lots, Ticks ticks, Millis created, Millis expiry) noexcept;
 
     ~Quote() noexcept override;

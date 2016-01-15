@@ -21,14 +21,14 @@
 namespace swirly {
 
 Market::Market(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jd settlDay, Jd expiryDay, MarketState state) noexcept
+               Jday settlDay, Jday expiryDay, MarketState state) noexcept
 :   Rec{RecType::MARKET, mnem, display},
     contr_{contr},
     settlDay_{settlDay},
     expiryDay_{expiryDay},
     state_{state}
 {
-    assert((settlDay == 0) == (expiryDay == 0));
+    assert((settlDay == 0_jd) == (expiryDay == 0_jd));
 }
 
 Market::~Market() noexcept = default;

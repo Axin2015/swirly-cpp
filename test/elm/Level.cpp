@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_SUITE(LevelSuite)
 
 BOOST_AUTO_TEST_CASE(LevelSetCase)
 {
-    const Order order{"MARAYL", "EURUSD", "EURUSD", 0, 0, "", 0, State::NEW, Side::BUY,
-            10, 12345, 0, 0, 0, 0, 0, 0, false, 0, 0};
+    const Order order{"MARAYL", "EURUSD", "EURUSD", 0_jd, 0, "", 0, State::NEW, Side::BUY,
+            10, 12345, 0, 0, 0, 0, 0, 0, false, 0_ms, 0_ms};
 
     LevelSet s;
 

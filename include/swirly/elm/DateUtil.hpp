@@ -37,7 +37,7 @@ namespace swirly {
  *            The milliseconds since epoch.
  * @return the business day.
  */
-SWIRLY_API Jd getBusDay(Millis ms);
+SWIRLY_API Jday getBusDay(Millis ms);
 
 /** @} */
 

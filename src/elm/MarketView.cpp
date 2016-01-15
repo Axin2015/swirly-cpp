@@ -18,8 +18,9 @@
 
 namespace swirly {
 
-MarketView::MarketView(const StringView& market, const StringView& contr, Jd settlDay, Lots lastLots,
-                       Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept
+MarketView::MarketView(const StringView& market, const StringView& contr, Jday settlDay,
+                       Lots lastLots, Ticks lastTicks, Millis lastTime,
+                       const MarketData& data) noexcept
 :   market_{market},
     contr_{contr},
     settlDay_{settlDay},
@@ -30,8 +31,8 @@ MarketView::MarketView(const StringView& market, const StringView& contr, Jd set
 {
 }
 
-MarketView::MarketView(const StringView& market, const StringView& contr, Jd settlDay, Lots lastLots,
-                       Ticks lastTicks, Millis lastTime) noexcept
+MarketView::MarketView(const StringView& market, const StringView& contr, Jday settlDay,
+                       Lots lastLots, Ticks lastTicks, Millis lastTime) noexcept
 :   market_{market},
     contr_{contr},
     settlDay_{settlDay},

@@ -18,31 +18,12 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <boost/lexical_cast.hpp>
-
-using namespace boost;
 using namespace std;
 using namespace swirly;
 
-namespace swirly {
 namespace {
 constexpr StringView name = "StringView"_sv;
 } // anonymous
-
-enum class Test {
-    FOO = 1,
-    BAR
-};
-
-const char* enumToString(Test t)
-{
-    switch (t) {
-    SWIRLY_ENUM_CASE(Test, FOO);
-    SWIRLY_ENUM_CASE(Test, BAR);
-    }
-    terminate();
-}
-} // swirly
 
 BOOST_AUTO_TEST_SUITE(StringSuite)
 
@@ -73,12 +54,6 @@ BOOST_AUTO_TEST_CASE(UpperBoundCase)
     sb = "Barx";
     BOOST_CHECK_EQUAL(sb.size(), 3UL);
     BOOST_CHECK_EQUAL(sb, "Bar");
-}
-
-BOOST_AUTO_TEST_CASE(EnumInsertOpCase)
-{
-    BOOST_CHECK_EQUAL(lexical_cast<string>(Test::FOO), "FOO");
-    BOOST_CHECK_EQUAL(lexical_cast<string>(Test::BAR), "BAR");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

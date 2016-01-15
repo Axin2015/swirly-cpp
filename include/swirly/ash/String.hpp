@@ -236,17 +236,9 @@ inline constexpr bool operator >=(const StringView& lhs, const StringBuf<MaxN>& 
 }
 
 template <std::size_t MaxN>
-inline constexpr
-std::ostream& operator <<(std::ostream& os, const StringBuf<MaxN>& rhs) noexcept
+inline constexpr std::ostream& operator <<(std::ostream& os, const StringBuf<MaxN>& rhs) noexcept
 {
     return os << rhs.view();
-}
-
-template <typename EnumT,
-          typename std::enable_if_t<std::is_enum<EnumT>::value>* = nullptr>
-inline std::ostream& operator <<(std::ostream& os, EnumT val)
-{
-    return os << enumToString(val);
 }
 
 /** @} */

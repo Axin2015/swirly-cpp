@@ -65,7 +65,7 @@ class SWIRLY_API Serv {
     const TraderSet& traders() const noexcept;
 
     const MarketBook& createMarket(const StringView& mnem, const StringView& display,
-                                   const StringView& contr, Jd settlDay, Jd expiryDay,
+                                   const StringView& contr, Jday settlDay, Jday expiryDay,
                                    MarketState state, Millis now);
 
     const MarketBook& updateMarket(const StringView& mnem, const StringView& display,

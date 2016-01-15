@@ -39,7 +39,7 @@ class SWIRLY_API Request : public RefCounted {
     const Mnem trader_;
     const Mnem market_;
     const Mnem contr_;
-    const Jd settlDay_;
+    const Jday settlDay_;
     const Iden id_;
     /**
      * Ref is optional.
@@ -51,7 +51,7 @@ class SWIRLY_API Request : public RefCounted {
 
  public:
     Request(const StringView& trader, const StringView& market, const StringView& contr,
-            Jd settlDay, Iden id, const StringView& ref, Side side, Lots lots,
+            Jday settlDay, Iden id, const StringView& ref, Side side, Lots lots,
             Millis created) noexcept
     :   trader_{trader},
         market_{market},
@@ -87,7 +87,7 @@ class SWIRLY_API Request : public RefCounted {
     {
         return contr_.view();
     }
-    Jd settlDay() const noexcept
+    Jday settlDay() const noexcept
     {
         return settlDay_;
     }

@@ -33,15 +33,15 @@ namespace swirly {
  */
 class SWIRLY_API Market : public Rec {
     const Mnem contr_;
-    const Jd settlDay_;
-    const Jd expiryDay_;
+    const Jday settlDay_;
+    const Jday expiryDay_;
     MarketState state_;
 
  public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Market(const StringView& mnem, const StringView& display, const StringView& contr,
-           Jd settlDay, Jd expiryDay, MarketState state) noexcept;
+           Jday settlDay, Jday expiryDay, MarketState state) noexcept;
 
     ~Market() noexcept override;
 
@@ -61,11 +61,11 @@ class SWIRLY_API Market : public Rec {
     {
         return contr_.view();
     }
-    Jd settlDay() const noexcept
+    Jday settlDay() const noexcept
     {
         return settlDay_;
     }
-    Jd expiryDay() const noexcept
+    Jday expiryDay() const noexcept
     {
         return expiryDay_;
     }

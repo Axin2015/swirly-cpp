@@ -43,8 +43,9 @@ class SWIRLY_API MarketBook : public Market {
 
  public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jd settlDay, Jd expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
-               Millis lastTime, Iden maxOrderId, Iden maxExecId, Iden maxQuoteId) noexcept;
+               Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
+               Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
+               Iden maxQuoteId) noexcept;
 
     ~MarketBook() noexcept override;
 

@@ -36,17 +36,17 @@ class SWIRLY_API MarketView {
 
     const Mnem market_;
     const Mnem contr_;
-    const Jd settlDay_;
+    const Jday settlDay_;
     Lots lastLots_;
     Ticks lastTicks_;
     Millis lastTime_;
     const MarketData data_;
 
  public:
-    MarketView(const StringView& market, const StringView& contr, Jd settlDay, Lots lastLots,
+    MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
                Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept;
 
-    MarketView(const StringView& market, const StringView& contr, Jd settlDay, Lots lastLots,
+    MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
                Ticks lastTicks, Millis lastTime) noexcept;
 
     ~MarketView() noexcept;
@@ -67,7 +67,7 @@ class SWIRLY_API MarketView {
     {
         return contr_.view();
     }
-    Jd settlDay() const noexcept
+    Jday settlDay() const noexcept
     {
         return settlDay_;
     }

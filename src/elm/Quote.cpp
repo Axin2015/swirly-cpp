@@ -21,7 +21,7 @@
 namespace swirly {
 
 Quote::Quote(const StringView& trader, const StringView& market, const StringView& contr,
-             Jd settlDay, Iden id, const StringView& ref, const OrderPtr& order, Side side,
+             Jday settlDay, Iden id, const StringView& ref, const OrderPtr& order, Side side,
              Lots lots, Ticks ticks, Millis created, Millis expiry) noexcept
 :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
     order_{order},
