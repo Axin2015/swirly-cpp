@@ -20,7 +20,7 @@ using namespace std;
 
 namespace swirly {
 
-const char* enumToString(AssetType type)
+const char* enumString(AssetType type)
 {
     switch (type) {
     SWIRLY_ENUM_CASE(AssetType, COMMODITY);
@@ -33,7 +33,7 @@ const char* enumToString(AssetType type)
     terminate();
 }
 
-const char* enumToString(Direct direct)
+const char* enumString(Direct direct)
 {
     switch (direct) {
     SWIRLY_ENUM_CASE(Direct, PAID);
@@ -42,7 +42,7 @@ const char* enumToString(Direct direct)
     terminate();
 }
 
-const char* enumToString(RecType type)
+const char* enumString(RecType type)
 {
     switch (type) {
     SWIRLY_ENUM_CASE(RecType, ASSET);
@@ -53,7 +53,7 @@ const char* enumToString(RecType type)
     terminate();
 }
 
-const char* enumToString(Role role)
+const char* enumString(Role role)
 {
     switch (role) {
     SWIRLY_ENUM_CASE(Role, NONE);
@@ -63,7 +63,7 @@ const char* enumToString(Role role)
     terminate();
 }
 
-const char* enumToString(Side side)
+const char* enumString(Side side)
 {
     switch (side) {
     SWIRLY_ENUM_CASE(Side, BUY);
@@ -72,7 +72,7 @@ const char* enumToString(Side side)
     terminate();
 }
 
-const char* enumToString(State state)
+const char* enumString(State state)
 {
     switch (state) {
     SWIRLY_ENUM_CASE(State, NONE);

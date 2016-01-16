@@ -35,7 +35,7 @@ class SWIRLY_API Posn : public RefCounted {
 
     const Mnem trader_;
     const Mnem contr_;
-    Jd settlDay_;
+    Jday settlDay_;
     Lots buyLots_;
     Cost buyCost_;
     Lots sellLots_;
@@ -44,7 +44,7 @@ class SWIRLY_API Posn : public RefCounted {
  public:
     boost::intrusive::set_member_hook<> traderHook_;
 
-    Posn(const StringView& trader, const StringView& contr, Jd settlDay,
+    Posn(const StringView& trader, const StringView& contr, Jday settlDay,
          Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) noexcept
     :   trader_{trader},
         contr_{contr},
@@ -59,12 +59,12 @@ class SWIRLY_API Posn : public RefCounted {
     ~Posn() noexcept override;
 
     // Copy.
-    Posn(const Posn&) = default;
-    Posn& operator =(const Posn&) = default;
+    Posn(const Posn&) = delete;
+    Posn& operator =(const Posn&) = delete;
 
     // Move.
-    Posn(Posn&&) = default;
-    Posn& operator =(Posn&&) = default;
+    Posn(Posn&&);
+    Posn& operator =(Posn&&) = delete;
 
     StringView trader() const noexcept
     {
@@ -74,7 +74,7 @@ class SWIRLY_API Posn : public RefCounted {
     {
         return contr_.view();
     }
-    Jd settlDay() const noexcept
+    Jday settlDay() const noexcept
     {
         return settlDay_;
     }
@@ -99,7 +99,7 @@ class SWIRLY_API Posn : public RefCounted {
 using PosnPtr = boost::intrusive_ptr<Posn>;
 
 class SWIRLY_API TraderPosnSet {
-    using Key = std::tuple<StringView, Jd>;
+    using Key = std::tuple<StringView, Jday>;
     struct ValueCompare {
         int compare(const Posn& lhs, const Posn& rhs) const noexcept
         {
@@ -154,8 +154,8 @@ class SWIRLY_API TraderPosnSet {
     TraderPosnSet& operator =(const TraderPosnSet&) = delete;
 
     // Move.
-    TraderPosnSet(TraderPosnSet&&) = default;
-    TraderPosnSet& operator =(TraderPosnSet&&) = default;
+    TraderPosnSet(TraderPosnSet&&);
+    TraderPosnSet& operator =(TraderPosnSet&&);
 
     ValuePtr insert(const ValuePtr& request) noexcept;
 
@@ -202,11 +202,11 @@ class SWIRLY_API TraderPosnSet {
     }
 
     // Find.
-    Iterator find(const StringView& contr, Jd settlDay) noexcept
+    Iterator find(const StringView& contr, Jday settlDay) noexcept
     {
         return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
     }
-    ConstIterator find(const StringView& contr, Jd settlDay) const noexcept
+    ConstIterator find(const StringView& contr, Jday settlDay) const noexcept
     {
         return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
     }

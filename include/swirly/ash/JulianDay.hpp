@@ -35,13 +35,13 @@ inline constexpr IsoDate ymdToIso(int year, int mon, int mday)
 {
     assert(mon <= 11);
     assert(mday <= 31);
-    return year * 10000 + (mon + 1) * 100 + mday;
+    return box<IsoDate>(year * 10000 + (mon + 1) * 100 + mday);
 }
 
 /**
  * Gregorian date to Julian day.
  */
-inline constexpr Jd ymdToJd(int year, int mon, int mday)
+inline constexpr Jday ymdToJd(int year, int mon, int mday)
 {
     // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's
     // Almanac for Computers.
@@ -50,32 +50,33 @@ inline constexpr Jd ymdToJd(int year, int mon, int mday)
     const auto i = year;
     const auto j = mon + 1;
     const auto k = mday;
-    return k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
-        + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
-        - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4;
+    return box<Jday>(k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
+                     + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
+                     - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4);
 }
 
 /**
  * ISO8601 to Julian day.
  */
-inline constexpr Jd isoToJd(IsoDate iso)
+inline constexpr Jday isoToJd(IsoDate iso)
 {
-    const auto year = iso / 10000;
-    const auto mon = (iso / 100 % 100) - 1;
-    const auto mday = iso % 100;
+    const auto n = unbox(iso);
+    const auto year = n / 10000;
+    const auto mon = (n / 100 % 100) - 1;
+    const auto mday = n % 100;
     return ymdToJd(year, mon, mday);
 }
 
 /**
  * Julian day to ISO8601.
  */
-inline constexpr IsoDate jdToIso(Jd jd)
+inline constexpr IsoDate jdToIso(Jday jd)
 {
     // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
     // Almanac for Computers.
     // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-    auto l = jd + 68569;
+    auto l = unbox(jd) + 68569;
     const auto n = 4 * l / 146097;
     l = l - (146097 * n + 3) / 4;
     auto i = 4000 * (l + 1) / 1461001;
@@ -86,67 +87,67 @@ inline constexpr IsoDate jdToIso(Jd jd)
     j = j + 2 - 12 * l;
     i = 100 * (n - 49) + i + l;
 
-    return i * 10000 + j * 100 + k;
+    return box<IsoDate>(i * 10000 + j * 100 + k);
 }
 
 /**
  * Juilian day to Modified Julian day. Epoch is November 17, 1858.
  */
-inline constexpr Jd jdToMjd(Jd jd)
+inline constexpr Jday jdToMjd(Jday jd)
 {
-    return jd - 2400000;
+    return jd - 2400000_jd;
 }
 
 /**
  * Modified Julian day to Julian day. Epoch is November 17, 1858.
  */
-inline constexpr Jd mjdToJd(Jd mjd)
+inline constexpr Jday mjdToJd(Jday mjd)
 {
-    return mjd + 2400000;
+    return mjd + 2400000_jd;
 }
 
 /**
  * Julian day to Truncated Julian day. Epoch is May 24, 1968.
  */
-inline constexpr Jd jdToTjd(Jd jd)
+inline constexpr Jday jdToTjd(Jday jd)
 {
-    return jd - 2440000;
+    return jd - 2440000_jd;
 }
 
 /**
  * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
  */
-inline constexpr Jd tjdToJd(Jd tjd)
+inline constexpr Jday tjdToJd(Jday tjd)
 {
-    return tjd + 2440000;
+    return tjd + 2440000_jd;
 }
 
 /**
  * Julian day to milliseconds since Unix epoch.
  */
-inline constexpr Millis jdToMillis(Jd jd)
+inline constexpr Millis jdToMs(Jday jd)
 {
     // Julian day for January 1st, 1970.
-    const Jd jdUnixEpoc = 2440588;
-    const Millis millisInDay = 24 * 60 * 60 * 1000;
+    const Jday jdUnixEpoc = 2440588_jd;
+    const int64_t msInDay = 24 * 60 * 60 * 1000;
     // Add half day for 12pm.
-    return (jd - jdUnixEpoc) * millisInDay + (millisInDay >> 1);
+    return box<Millis>(unbox(jd - jdUnixEpoc) * msInDay + (msInDay >> 1));
 }
 
 /**
  * Julian day to ISO8601 if argument is non-zero.
  */
-inline constexpr IsoDate maybeJdToIso(Jd jd)
+inline constexpr IsoDate maybeJdToIso(Jday jd)
 {
-    return jd != 0 ? jdToIso(jd) : 0;
+    return jd != 0_jd ? jdToIso(jd) : 0_dt;
 }
 
 /**
  * ISO8601 to Julian day if argument is non-zero.
  */
-inline constexpr Jd maybeIsoToJd(IsoDate iso)
+inline constexpr Jday maybeIsoToJd(IsoDate iso)
 {
-    return iso != 0 ? isoToJd(iso) : 0;
+    return iso != 0_dt ? isoToJd(iso) : 0_jd;
 }
 
 /** @} */

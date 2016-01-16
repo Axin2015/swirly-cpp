@@ -33,13 +33,18 @@ namespace swirly {
 
 using StringView = std::experimental::string_view;
 
+constexpr StringView operator ""_sv(const char* str, std::size_t len) noexcept
+{
+    return {str, len};
+}
 
 /**
  * String buffer with fixed upper-bound.
  */
 template <std::size_t MaxN>
 class SWIRLY_API StringBuf {
-    std::size_t len_ = 0;
+    // Length in the first cache-line.
+    std::size_t len_;
     char buf_[MaxN];
  public:
     template <std::size_t MaxR>
@@ -231,17 +236,9 @@ inline constexpr bool operator >=(const StringView& lhs, const StringBuf<MaxN>& 
 }
 
 template <std::size_t MaxN>
-inline constexpr
-std::ostream& operator <<(std::ostream& os, const StringBuf<MaxN>& rhs) noexcept
+inline constexpr std::ostream& operator <<(std::ostream& os, const StringBuf<MaxN>& rhs) noexcept
 {
     return os << rhs.view();
-}
-
-template <typename EnumT,
-          typename std::enable_if_t<std::is_enum<EnumT>::value>* = nullptr>
-inline std::ostream& operator <<(std::ostream& os, EnumT val)
-{
-    return os << enumToString(val);
 }
 
 /** @} */

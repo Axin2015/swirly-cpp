@@ -16,6 +16,7 @@
  */
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Model.hpp>
+#include <swirly/elm/Request.hpp>
 
 #include <iostream>
 
@@ -83,8 +84,8 @@ int main(int argc, char* argv[])
             cout << asset << endl;
         }
 
-        RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0, 1, "",
-                                               Side::BUY, 10, 0)};
+        RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1, "",
+                                               Side::BUY, 10, 0_ms)};
         cout << req->trader() << endl;
         return 0;
     } catch (const std::exception& e) {

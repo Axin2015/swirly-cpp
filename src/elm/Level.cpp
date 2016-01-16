@@ -16,14 +16,32 @@
  */
 #include <swirly/elm/Level.hpp>
 
+#include <swirly/elm/Order.hpp>
+
 namespace swirly {
 
+Level::Level(const Order& firstOrder) noexcept
+:   firstOrder_{&firstOrder},
+    key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
+    ticks_{firstOrder.ticks()},
+    resd_{firstOrder.resd()},
+    quotd_{firstOrder.quotd()},
+    count_{1}
+{
+}
+
 Level::~Level() noexcept = default;
+
+Level::Level(Level&&) = default;
 
 LevelSet::~LevelSet() noexcept
 {
     set_.clear_and_dispose([](Level* ptr) { delete ptr; });
 }
+
+LevelSet::LevelSet(LevelSet&&) = default;
+
+LevelSet& LevelSet::operator =(LevelSet&&) = default;
 
 Level& LevelSet::insert(ValuePtr rec) noexcept
 {

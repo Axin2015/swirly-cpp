@@ -17,9 +17,13 @@
 #ifndef SWIRLY_FIG_RESPONSE_HPP
 #define SWIRLY_FIG_RESPONSE_HPP
 
-#include <swirly/ash/Defs.hpp>
+#include <swirly/elm/Types.hpp>
+
+#include <vector>
 
 namespace swirly {
+
+class MarketBook;
 
 /**
  * @addtogroup App
@@ -27,17 +31,31 @@ namespace swirly {
  */
 
 class SWIRLY_API Response {
+
+    using Orders = std::vector<OrderPtr>;
+    using Execs = std::vector<ExecPtr>;
+
+    const MarketBook* book_{nullptr};
+    Orders orders_;
+    Execs execs_;
+    PosnPtr posn_;
+
  public:
-    constexpr Response() noexcept = default;
-    ~Response() noexcept = default;
+    Response() noexcept;
+    ~Response() noexcept;
 
     // Copy.
-    constexpr Response(const Response&) = default;
-    Response& operator =(const Response&) = default;
+    Response(const Response&);
+    Response& operator =(const Response&);
 
     // Move.
-    constexpr Response(Response&&) = default;
-    Response& operator =(Response&&) = default;
+    Response(Response&&) noexcept;
+    Response& operator =(Response&&) noexcept;
+
+    const MarketBook& book() const noexcept
+    {
+        return *book_;
+    }
 };
 
 /** @} */

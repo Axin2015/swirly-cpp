@@ -17,7 +17,10 @@
 #ifndef SWIRLY_ELM_TYPES_HPP
 #define SWIRLY_ELM_TYPES_HPP
 
+#include <swirly/ash/Enum.hpp>
 #include <swirly/ash/String.hpp>
+
+#include <boost/intrusive_ptr.hpp>
 
 #include <cstdint>
 
@@ -98,7 +101,15 @@ enum class AssetType {
     INDEX
 };
 
-SWIRLY_API const char* enumToString(AssetType type);
+SWIRLY_API const char* enumString(AssetType type);
+
+template <>
+struct EnumTraits<AssetType> {
+    static void print(std::ostream& os, AssetType val) noexcept
+    {
+        os << enumString(val);
+    }
+};
 
 enum class Direct {
     /**
@@ -111,7 +122,15 @@ enum class Direct {
     GIVEN = -1
 };
 
-SWIRLY_API const char* enumToString(Direct direct);
+SWIRLY_API const char* enumString(Direct direct);
+
+template <>
+struct EnumTraits<Direct> {
+    static void print(std::ostream& os, Direct val) noexcept
+    {
+        os << enumString(val);
+    }
+};
 
 enum class RecType {
     /**
@@ -132,7 +151,15 @@ enum class RecType {
     TRADER
 };
 
-SWIRLY_API const char* enumToString(RecType type);
+SWIRLY_API const char* enumString(RecType type);
+
+template <>
+struct EnumTraits<RecType> {
+    static void print(std::ostream& os, RecType val) noexcept
+    {
+        os << enumString(val);
+    }
+};
 
 enum class Role {
     /**
@@ -149,14 +176,30 @@ enum class Role {
     TAKER
 };
 
-SWIRLY_API const char* enumToString(Role role);
+SWIRLY_API const char* enumString(Role role);
+
+template <>
+struct EnumTraits<Role> {
+    static void print(std::ostream& os, Role val) noexcept
+    {
+        os << enumString(val);
+    }
+};
 
 enum class Side {
     BUY = 1,
     SELL = -1
 };
 
-SWIRLY_API const char* enumToString(Side side);
+SWIRLY_API const char* enumString(Side side);
+
+template <>
+struct EnumTraits<Side> {
+    static void print(std::ostream& os, Side val) noexcept
+    {
+        os << enumString(val);
+    }
+};
 
 /**
  * Order states.
@@ -186,7 +229,37 @@ enum class State {
     PECAN
 };
 
-SWIRLY_API const char* enumToString(State state);
+SWIRLY_API const char* enumString(State state);
+
+template <>
+struct EnumTraits<State> {
+    static void print(std::ostream& os, State val) noexcept
+    {
+        os << enumString(val);
+    }
+};
+
+/** @} */
+
+/**
+ * @addtogroup Entity
+ * @{
+ */
+
+class Asset;
+class Contr;
+class Market;
+class Trader;
+
+class Exec;
+class Order;
+class Posn;
+class Quote;
+
+using ExecPtr = boost::intrusive_ptr<Exec>;
+using OrderPtr = boost::intrusive_ptr<Order>;
+using PosnPtr = boost::intrusive_ptr<Posn>;
+using QuotePtr = boost::intrusive_ptr<Quote>;
 
 /** @} */
 

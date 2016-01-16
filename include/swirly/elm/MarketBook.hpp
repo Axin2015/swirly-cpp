@@ -43,8 +43,9 @@ class SWIRLY_API MarketBook : public Market {
 
  public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jd settlDay, Jd expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
-               Millis lastTime, Iden maxOrderId, Iden maxExecId, Iden maxQuoteId) noexcept;
+               Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
+               Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
+               Iden maxQuoteId) noexcept;
 
     ~MarketBook() noexcept override;
 
@@ -55,6 +56,21 @@ class SWIRLY_API MarketBook : public Market {
     // Move.
     MarketBook(MarketBook&&) = default;
     MarketBook& operator =(MarketBook&&) = default;
+
+    Iden allocOrderId() noexcept
+    {
+        return ++maxOrderId_;
+    }
+
+    Iden allocExecId() noexcept
+    {
+        return ++maxExecId_;
+    }
+
+    Iden allocQuoteId() noexcept
+    {
+        return ++maxQuoteId_;
+    }
 
     Lots lastLots() const noexcept
     {

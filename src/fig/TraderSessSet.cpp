@@ -14,27 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/MarketBook.hpp>
-
-#include <cassert>
+#include "TraderSessSet.hpp"
 
 namespace swirly {
+namespace detail {
 
-MarketBook::MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-                       Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-                       Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
-                       Iden maxQuoteId) noexcept
-:   Market{mnem, display, contr, settlDay, expiryDay, state},
-    lastLots_{lastLots},
-    lastTicks_{lastTicks},
-    lastTime_{lastTime},
-    view_{mnem, contr, settlDay, lastLots, lastTicks, lastTime},
-    maxOrderId_{maxOrderId},
-    maxExecId_{maxExecId},
-    maxQuoteId_{maxQuoteId}
-{
-}
+TraderSessSet::~TraderSessSet() noexcept = default;
 
-MarketBook::~MarketBook() noexcept = default;
+TraderSessSet::TraderSessSet(TraderSessSet&&) = default;
 
+TraderSessSet& TraderSessSet::operator =(TraderSessSet&&) = default;
+
+} // detail
 } // swirly

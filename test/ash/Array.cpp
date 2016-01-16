@@ -14,46 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/String.hpp>
+#include <swirly/ash/Array.hpp>
 
 #include <boost/test/unit_test.hpp>
+
+#include <numeric> // accumulate()
 
 using namespace std;
 using namespace swirly;
 
-namespace {
-constexpr StringView name = "StringView"_sv;
-} // anonymous
+BOOST_AUTO_TEST_SUITE(ArraySuite)
 
-BOOST_AUTO_TEST_SUITE(StringSuite)
-
-BOOST_AUTO_TEST_CASE(EmptyCase)
+BOOST_AUTO_TEST_CASE(ArrayViewCase)
 {
-    StringBuf<3> sb;
-    BOOST_CHECK(sb.empty());
-    BOOST_CHECK_EQUAL(sb.size(), 0UL);
-    BOOST_CHECK_EQUAL(sb.compare(""), 0);
-    BOOST_CHECK_EQUAL(sb, StringBuf<3>{""});
-}
+    BOOST_CHECK(!ArrayView<int>{}.data());
+    BOOST_CHECK(ArrayView<int>{}.empty());
+    BOOST_CHECK_EQUAL(ArrayView<int>{}.size(), 0UL);
 
-BOOST_AUTO_TEST_CASE(NonEmptyCase)
-{
-    StringBuf<3> sb{"Foo"};
-    BOOST_CHECK(!sb.empty());
-    BOOST_CHECK_EQUAL(sb.size(), 3UL);
-    BOOST_CHECK_EQUAL(sb.compare("Foo"), 0);
-    BOOST_CHECK_EQUAL(sb, StringBuf<3>{"Foo"});
-}
+    int arr[] = { 101, 202, 303 };
+    ArrayView<int> av{arr, 3};
 
-BOOST_AUTO_TEST_CASE(UpperBoundCase)
-{
-    StringBuf<3> sb{"Foox"};
-    BOOST_CHECK_EQUAL(sb.size(), 3UL);
-    BOOST_CHECK_EQUAL(sb, "Foo");
+    BOOST_CHECK(av.data());
+    BOOST_CHECK(!av.empty());
+    BOOST_CHECK_EQUAL(av.size(), 3UL);
 
-    sb = "Barx";
-    BOOST_CHECK_EQUAL(sb.size(), 3UL);
-    BOOST_CHECK_EQUAL(sb, "Bar");
+    BOOST_CHECK_EQUAL(av[0], arr[0]);
+    BOOST_CHECK_EQUAL(av[1], arr[1]);
+    BOOST_CHECK_EQUAL(av[2], arr[2]);
+
+    BOOST_CHECK_EQUAL(av.front(), arr[0]);
+    BOOST_CHECK_EQUAL(av.back(), arr[2]);
+
+    BOOST_CHECK(equal(av.begin(), av.end(), arr));
+    int rev[] = { 303, 202, 101 };
+
+    BOOST_CHECK(equal(av.rbegin(), av.rend(), rev));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -18,10 +18,15 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace std;
+using namespace swirly;
+
 BOOST_AUTO_TEST_SUITE(ResponseSuite)
 
 BOOST_AUTO_TEST_CASE(ResponseCase)
 {
+    Response r;
+    Response s{r};
     BOOST_CHECK(true);
 }
 

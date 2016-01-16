@@ -20,4 +20,8 @@ namespace swirly {
 
 Asset::~Asset() noexcept = default;
 
+Asset::Asset(const Asset&) = default;
+
+Asset::Asset(Asset&&) = default;
+
 } // swirly

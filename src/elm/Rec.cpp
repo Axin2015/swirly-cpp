@@ -20,4 +20,8 @@ namespace swirly {
 
 Rec::~Rec() noexcept = default;
 
+Rec::Rec(const Rec&) = default;
+
+Rec::Rec(Rec&&) = default;
+
 } // swirly

@@ -20,10 +20,16 @@ namespace swirly {
 
 Posn::~Posn() noexcept = default;
 
+Posn::Posn(Posn&&) = default;
+
 TraderPosnSet::~TraderPosnSet() noexcept
 {
     set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });
 }
+
+TraderPosnSet::TraderPosnSet(TraderPosnSet&&) = default;
+
+TraderPosnSet& TraderPosnSet::operator =(TraderPosnSet&&) = default;
 
 TraderPosnSet::ValuePtr TraderPosnSet::insert(const ValuePtr& request) noexcept
 {

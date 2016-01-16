@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Rec.hpp>
 
+#include <swirly/ash/Types.hpp>
+
 namespace swirly {
 
 /**
@@ -43,12 +45,12 @@ class SWIRLY_API Asset : public Rec {
     ~Asset() noexcept override;
 
     // Copy.
-    Asset(const Asset&) = default;
-    Asset& operator =(const Asset&) = default;
+    Asset(const Asset&);
+    Asset& operator =(const Asset&) = delete;
 
     // Move.
-    Asset(Asset&&) = default;
-    Asset& operator =(Asset&&) = default;
+    Asset(Asset&&);
+    Asset& operator =(Asset&&) = delete;
 
     AssetType assetType() const noexcept
     {

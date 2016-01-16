@@ -14,27 +14,48 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/ash/Enum.hpp>
 
-#include <cassert>
+#include <boost/test/unit_test.hpp>
+
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
+using namespace swirly;
 
 namespace swirly {
 
-MarketBook::MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-                       Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-                       Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
-                       Iden maxQuoteId) noexcept
-:   Market{mnem, display, contr, settlDay, expiryDay, state},
-    lastLots_{lastLots},
-    lastTicks_{lastTicks},
-    lastTime_{lastTime},
-    view_{mnem, contr, settlDay, lastLots, lastTicks, lastTime},
-    maxOrderId_{maxOrderId},
-    maxExecId_{maxExecId},
-    maxQuoteId_{maxQuoteId}
+enum class Test {
+    FOO = 1,
+    BAR
+};
+
+const char* enumString(Test t)
 {
+    switch (t) {
+    SWIRLY_ENUM_CASE(Test, FOO);
+    SWIRLY_ENUM_CASE(Test, BAR);
+    }
+    terminate();
 }
 
-MarketBook::~MarketBook() noexcept = default;
+template <>
+struct EnumTraits<Test> {
+    static void print(std::ostream& os, Test val) noexcept
+    {
+        os << enumString(val);
+    }
+};
 
 } // swirly
+
+BOOST_AUTO_TEST_SUITE(EnumSuite)
+
+BOOST_AUTO_TEST_CASE(EnumCase)
+{
+    BOOST_CHECK_EQUAL(lexical_cast<string>(Test::FOO), "FOO");
+    BOOST_CHECK_EQUAL(lexical_cast<string>(Test::BAR), "BAR");
+}
+
+BOOST_AUTO_TEST_SUITE_END()

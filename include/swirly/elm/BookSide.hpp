@@ -18,6 +18,7 @@
 #define SWIRLY_ELM_BOOKSIDE_HPP
 
 #include <swirly/elm/Level.hpp>
+#include <swirly/elm/Order.hpp>
 
 namespace swirly {
 
@@ -30,19 +31,17 @@ class SWIRLY_API BookSide {
     LevelSet levels_;
     OrderList orders_;
  public:
-    BookSide() noexcept
-    {
-    }
+    BookSide() = default;
 
     ~BookSide() noexcept;
 
     // Copy.
-    BookSide(const BookSide&) = default;
-    BookSide& operator =(const BookSide&) = default;
+    BookSide(const BookSide&) = delete;
+    BookSide& operator =(const BookSide&) = delete;
 
     // Move.
-    BookSide(BookSide&&) = default;
-    BookSide& operator =(BookSide&&) = default;
+    BookSide(BookSide&&);
+    BookSide& operator =(BookSide&&) = delete;
 };
 
 /** @} */

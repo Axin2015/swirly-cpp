@@ -41,12 +41,12 @@ class SWIRLY_API Trader : public Rec {
     ~Trader() noexcept override;
 
     // Copy.
-    Trader(const Trader&) = default;
-    Trader& operator =(const Trader&) = default;
+    Trader(const Trader&);
+    Trader& operator =(const Trader&) = delete;
 
     // Move.
-    Trader(Trader&&) = default;
-    Trader& operator =(Trader&&) = default;
+    Trader(Trader&&);
+    Trader& operator =(Trader&&) = delete;
 
     StringView email() const noexcept
     {

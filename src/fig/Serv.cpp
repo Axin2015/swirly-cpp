@@ -19,8 +19,11 @@
 #include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/Exception.hpp>
+#include <swirly/elm/DateUtil.hpp>
 #include <swirly/elm/MarketBook.hpp>
 #include <swirly/elm/Model.hpp>
+
+#include <swirly/ash/JulianDay.hpp>
 
 #include "ServFactory.hpp"
 #include "TraderSessSet.hpp"
@@ -30,10 +33,7 @@ using namespace std;
 namespace swirly {
 
 struct Serv::Impl {
-    Impl(const Model& model, Journ& journ, Millis now)
-    : journ{journ}
-    {
-    }
+
     Journ& journ;
     detail::ServFactory factory;
     AssetSet assets;
@@ -41,6 +41,15 @@ struct Serv::Impl {
     MarketSet markets;
     TraderSet traders;
     detail::TraderSessSet emailIdx;
+
+    Impl(const Model& model, Journ& journ, Millis now) noexcept
+    : journ{journ}
+    {
+    }
+    ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
+    {
+        return factory.newExec(order, book.allocExecId(), now);
+    }
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)
@@ -84,7 +93,7 @@ const TraderSet& Serv::traders() const noexcept
 }
 
 const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
-                                     const StringView& contr, Jd settlDay, Jd expiryDay,
+                                     const StringView& contr, Jday settlDay, Jday expiryDay,
                                      MarketState state, Millis now)
 {
     const auto& rec = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
@@ -154,6 +163,21 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
                        Iden quoteId, Side side, Lots lots, Ticks ticks, Lots minLots,
                        Millis now, Response& resp)
 {
+    const auto busDay = getBusDay(now);
+    if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
+        throwException<MarketClosedException>("market for '%.*s' in '%d' has expired",
+                                              SWIRLY_STR(book.contr()),
+                                              maybeJdToIso(book.settlDay()));
+    }
+    if (lots == 0 || lots < minLots) {
+        throwException<InvalidLotsException>("invalid lots '%d'", lots);
+    }
+    const auto orderId = book.allocOrderId();
+    auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
+                                         orderId, ref, quoteId, side, lots, ticks, minLots, now);
+    auto exec = impl_->newExec(book, *order, now);
+
+
 }
 
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
@@ -166,7 +190,7 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref
 {
 }
 
-void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Lots lots,
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots,
                        Millis now, Response& resp)
 {
 }
@@ -186,7 +210,7 @@ void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref
 {
 }
 
-void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const IdenVector& ids, Millis now,
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Millis now,
                        Response& resp)
 {
 }
@@ -211,7 +235,7 @@ void Serv::archiveOrder(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenVector& ids,
+void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids,
                         Millis now)
 {
 }
@@ -235,7 +259,7 @@ void Serv::archiveTrade(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveTrade(TraderSess& sess, const StringView& market, const IdenVector& ids,
+void Serv::archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids,
                         Millis now)
 {
 }
@@ -260,7 +284,7 @@ void Serv::poll(Millis now)
 
 Millis Serv::getTimeout() const noexcept
 {
-    return 0;
+    return 0_ms;
 }
 
 } // swirly

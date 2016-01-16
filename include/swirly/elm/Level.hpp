@@ -17,7 +17,9 @@
 #ifndef SWIRLY_ELM_LEVEL_HPP
 #define SWIRLY_ELM_LEVEL_HPP
 
-#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Types.hpp>
+
+#include <boost/intrusive/set.hpp>
 
 #include <memory>
 
@@ -64,25 +66,17 @@ class SWIRLY_API Level : public Comparable<Level> {
  public:
     boost::intrusive::set_member_hook<> keyHook_;
 
-    explicit Level(const Order& firstOrder) noexcept
-    :   firstOrder_{&firstOrder},
-        key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
-        ticks_{firstOrder.ticks()},
-        resd_{firstOrder.resd()},
-        quotd_{firstOrder.quotd()},
-        count_{1}
-    {
-    }
+    explicit Level(const Order& firstOrder) noexcept;
 
     ~Level() noexcept;
 
     // Copy.
-    Level(const Level&) = default;
-    Level& operator =(const Level&) = default;
+    Level(const Level&) = delete;
+    Level& operator =(const Level&) = delete;
 
     // Move.
-    Level(Level&&) = default;
-    Level& operator =(Level&&) = default;
+    Level(Level&&);
+    Level& operator =(Level&&) = delete;
 
     int compare(const Level& rhs) const noexcept
     {
@@ -155,8 +149,8 @@ class SWIRLY_API LevelSet {
     LevelSet& operator =(const LevelSet&) = delete;
 
     // Move.
-    LevelSet(LevelSet&&) = default;
-    LevelSet& operator =(LevelSet&&) = default;
+    LevelSet(LevelSet&&);
+    LevelSet& operator =(LevelSet&&);
 
     Level& insert(ValuePtr rec) noexcept;
 

@@ -60,7 +60,7 @@ class SWIRLY_API Exec : public Request {
     boost::intrusive::set_member_hook<> idHook_;
 
     Exec(const StringView& trader, const StringView& market, const StringView& contr,
-         Jd settlDay, Iden id, const StringView& ref, Iden orderId, Iden quoteId, State state,
+         Jday settlDay, Iden id, const StringView& ref, Iden orderId, Iden quoteId, State state,
          Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
          Ticks lastTicks, Lots minLots, Iden matchId, Role role, const StringView& cpty,
          Millis created) noexcept
@@ -84,12 +84,12 @@ class SWIRLY_API Exec : public Request {
     ~Exec() noexcept override;
 
     // Copy.
-    Exec(const Exec&) = default;
-    Exec& operator =(const Exec&) = default;
+    Exec(const Exec&) = delete;
+    Exec& operator =(const Exec&) = delete;
 
     // Move.
-    Exec(Exec&&) = default;
-    Exec& operator =(Exec&&) = default;
+    Exec(Exec&&);
+    Exec& operator =(Exec&&) = delete;
 
     Iden orderId() const noexcept
     {

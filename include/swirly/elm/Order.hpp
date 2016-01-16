@@ -60,7 +60,7 @@ class SWIRLY_API Order : public Request {
     boost::intrusive::list_member_hook<> listHook_;
 
     Order(const StringView& trader, const StringView& market, const StringView& contr,
-          Jd settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
+          Jday settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
           Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
           Lots minLots, bool pecan, Millis created, Millis modified) noexcept
     :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
@@ -81,12 +81,12 @@ class SWIRLY_API Order : public Request {
     ~Order() noexcept override;
 
     // Copy.
-    Order(const Order&) = default;
-    Order& operator =(const Order&) = default;
+    Order(const Order&) = delete;
+    Order& operator =(const Order&) = delete;
 
     // Move.
-    Order(Order&&) = default;
-    Order& operator =(Order&&) = default;
+    Order(Order&&);
+    Order& operator =(Order&&) = delete;
 
     Iden quoteId() const noexcept
     {
@@ -165,8 +165,8 @@ class SWIRLY_API OrderList {
     OrderList& operator =(const OrderList&) = delete;
 
     // Move.
-    OrderList(OrderList&&) = default;
-    OrderList& operator =(OrderList&&) = default;
+    OrderList(OrderList&&);
+    OrderList& operator =(OrderList&&);
 
     // Begin.
     Iterator begin() noexcept

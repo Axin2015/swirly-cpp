@@ -28,11 +28,6 @@
 #define SWIRLY_API __attribute__((visibility ("default")))
 
 /**
- * Helper macro for implementing enumToString() case statements.
- */
-#define SWIRLY_ENUM_CASE(type, val) case type::val: return #val; break
-
-/**
  * Helper macro for "%.*s" arguments.
  */
 #define SWIRLY_STR(x) static_cast<int>((x).size()), (x).data()

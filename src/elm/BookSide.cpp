@@ -20,4 +20,6 @@ namespace swirly {
 
 BookSide::~BookSide() noexcept = default;
 
+BookSide::BookSide(BookSide&&) = default;
+
 } // swirly

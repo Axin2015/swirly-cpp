@@ -14,27 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/fig/Response.hpp>
 
-#include <cassert>
+#include <swirly/elm/Exec.hpp>
+#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
 
 namespace swirly {
 
-MarketBook::MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-                       Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-                       Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
-                       Iden maxQuoteId) noexcept
-:   Market{mnem, display, contr, settlDay, expiryDay, state},
-    lastLots_{lastLots},
-    lastTicks_{lastTicks},
-    lastTime_{lastTime},
-    view_{mnem, contr, settlDay, lastLots, lastTicks, lastTime},
-    maxOrderId_{maxOrderId},
-    maxExecId_{maxExecId},
-    maxQuoteId_{maxQuoteId}
-{
-}
+Response::Response() noexcept = default;
 
-MarketBook::~MarketBook() noexcept = default;
+Response::~Response() noexcept = default;
+
+Response::Response(const Response&) = default;
+
+Response& Response::operator =(const Response&) = default;
+
+Response::Response(Response&&) noexcept = default;
+
+Response& Response::operator =(Response&&) noexcept = default;
 
 } // swirly
