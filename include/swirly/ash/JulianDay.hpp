@@ -95,6 +95,7 @@ inline constexpr IsoDate jdToIso(Jday jd)
  */
 inline constexpr Jday jdToMjd(Jday jd)
 {
+    using namespace enumops;
     return jd - 2400000_jd;
 }
 
@@ -103,6 +104,7 @@ inline constexpr Jday jdToMjd(Jday jd)
  */
 inline constexpr Jday mjdToJd(Jday mjd)
 {
+    using namespace enumops;
     return mjd + 2400000_jd;
 }
 
@@ -111,6 +113,7 @@ inline constexpr Jday mjdToJd(Jday mjd)
  */
 inline constexpr Jday jdToTjd(Jday jd)
 {
+    using namespace enumops;
     return jd - 2440000_jd;
 }
 
@@ -119,6 +122,7 @@ inline constexpr Jday jdToTjd(Jday jd)
  */
 inline constexpr Jday tjdToJd(Jday tjd)
 {
+    using namespace enumops;
     return tjd + 2440000_jd;
 }
 
@@ -127,6 +131,7 @@ inline constexpr Jday tjdToJd(Jday tjd)
  */
 inline constexpr Millis jdToMs(Jday jd)
 {
+    using namespace enumops;
     // Julian day for January 1st, 1970.
     const Jday jdUnixEpoc = 2440588_jd;
     const int64_t msInDay = 24 * 60 * 60 * 1000;
