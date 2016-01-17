@@ -61,7 +61,8 @@ std::unique_ptr<Market> Factory::newMarket(const StringView& mnem, const StringV
                                            const StringView& contr, Jday settlDay,
                                            Jday expiryDay, MarketState state) const
 {
-    return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, 0, 0, 0_ms, 0, 0, 0);
+    return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, 0_lts, 0_tks, 0_ms,
+                       0_id, 0_id, 0_id);
 }
 
 std::unique_ptr<Trader> Factory::newTrader(const StringView& mnem, const StringView& display,
@@ -88,7 +89,7 @@ OrderPtr Factory::newOrder(const StringView& trader, const StringView& market,
                            Lots lots, Ticks ticks, Lots minLots, Millis created) const
 {
     return doNewOrder(trader, market, contr, settlDay, id, ref, quoteId, State::NEW, side, lots,
-                      ticks, lots, 0, 0, 0, 0, minLots, false, created, created);
+                      ticks, lots, 0_lts, 0_cst, 0_lts, 0_tks, minLots, false, created, created);
 }
 
 ExecPtr Factory::newExec(const StringView& trader, const StringView& market,
@@ -109,7 +110,7 @@ ExecPtr Factory::newExec(const Order& order, Iden id, Millis created) const
                      id, order.ref(), order.id(), order.quoteId(), order.state(),
                      order.side(), order.lots(), order.ticks(), order.resd(),
                      order.exec(), order.cost(), order.lastLots(), order.lastTicks(),
-                     order.minLots(), 0, Role::NONE, StringView{}, created);
+                     order.minLots(), 0_id, Role::NONE, StringView{}, created);
 }
 
 PosnPtr Factory::newPosn(const StringView& trader, const StringView& contr, Jday settlDay,
@@ -120,7 +121,7 @@ PosnPtr Factory::newPosn(const StringView& trader, const StringView& contr, Jday
 
 PosnPtr Factory::newPosn(const StringView& trader, const StringView& contr, Jday settlDay) const
 {
-    return doNewPosn(trader, contr, settlDay, 0, 0, 0, 0);
+    return doNewPosn(trader, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst);
 }
 
 QuotePtr Factory::newQuote(const StringView& trader, const StringView& market,

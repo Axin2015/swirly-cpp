@@ -40,7 +40,7 @@ class SWIRLY_API Order : public Request {
      * Must be greater than zero.
      */
     Lots resd_;
-    Lots quotd_{0};
+    Lots quotd_{0_lts};
     /**
      * Must not be greater that lots.
      */

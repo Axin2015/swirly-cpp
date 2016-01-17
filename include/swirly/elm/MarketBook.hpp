@@ -59,19 +59,19 @@ class SWIRLY_API MarketBook : public Market {
 
     Iden allocOrderId() noexcept
     {
+        using namespace enumops;
         return ++maxOrderId_;
     }
-
     Iden allocExecId() noexcept
     {
+        using namespace enumops;
         return ++maxExecId_;
     }
-
     Iden allocQuoteId() noexcept
     {
+        using namespace enumops;
         return ++maxQuoteId_;
     }
-
     Lots lastLots() const noexcept
     {
         return lastLots_;

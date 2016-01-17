@@ -53,7 +53,7 @@ inline constexpr double incsToReal(Incs incs, double incSize)
  */
 inline constexpr Lots qtyToLots(double qty, double qtyInc)
 {
-    return realToIncs(qty, qtyInc);
+    return box<Lots>(realToIncs(qty, qtyInc));
 }
 
 /**
@@ -61,7 +61,7 @@ inline constexpr Lots qtyToLots(double qty, double qtyInc)
  */
 inline constexpr double lotsToQty(Lots lots, double qtyInc)
 {
-    return incsToReal(lots, qtyInc);
+    return incsToReal(unbox(lots), qtyInc);
 }
 
 /**
@@ -69,7 +69,7 @@ inline constexpr double lotsToQty(Lots lots, double qtyInc)
  */
 inline constexpr Ticks priceToTicks(double price, double priceInc)
 {
-    return realToIncs(price, priceInc);
+    return box<Ticks>(realToIncs(price, priceInc));
 }
 
 /**
@@ -77,7 +77,7 @@ inline constexpr Ticks priceToTicks(double price, double priceInc)
  */
 inline constexpr double ticksToPrice(Ticks ticks, double priceInc)
 {
-    return incsToReal(ticks, priceInc);
+    return incsToReal(unbox(ticks), priceInc);
 }
 
 /**
