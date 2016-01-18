@@ -37,7 +37,7 @@ namespace detail {
 /**
  * Synthetic level key.
  */
-inline constexpr LevelKey composeKey(Side side, Ticks ticks)
+constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
 {
     using namespace enumops;
     return unbox(side == Side::BUY ? -ticks : ticks);

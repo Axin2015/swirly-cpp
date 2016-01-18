@@ -31,7 +31,7 @@ namespace swirly {
 /**
  * Gregorian to ISO8601 date.
  */
-inline constexpr IsoDate ymdToIso(int year, int mon, int mday)
+constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
 {
     assert(mon <= 11);
     assert(mday <= 31);
@@ -41,7 +41,7 @@ inline constexpr IsoDate ymdToIso(int year, int mon, int mday)
 /**
  * Gregorian date to Julian day.
  */
-inline constexpr Jday ymdToJd(int year, int mon, int mday)
+constexpr Jday ymdToJd(int year, int mon, int mday) noexcept
 {
     // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's
     // Almanac for Computers.
@@ -58,7 +58,7 @@ inline constexpr Jday ymdToJd(int year, int mon, int mday)
 /**
  * ISO8601 to Julian day.
  */
-inline constexpr Jday isoToJd(IsoDate iso)
+constexpr Jday isoToJd(IsoDate iso) noexcept
 {
     const auto n = unbox(iso);
     const auto year = n / 10000;
@@ -70,7 +70,7 @@ inline constexpr Jday isoToJd(IsoDate iso)
 /**
  * Julian day to ISO8601.
  */
-inline constexpr IsoDate jdToIso(Jday jd)
+constexpr IsoDate jdToIso(Jday jd) noexcept
 {
     // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
     // Almanac for Computers.
@@ -93,7 +93,7 @@ inline constexpr IsoDate jdToIso(Jday jd)
 /**
  * Juilian day to Modified Julian day. Epoch is November 17, 1858.
  */
-inline constexpr Jday jdToMjd(Jday jd)
+constexpr Jday jdToMjd(Jday jd) noexcept
 {
     using namespace enumops;
     return jd - 2400000_jd;
@@ -102,7 +102,7 @@ inline constexpr Jday jdToMjd(Jday jd)
 /**
  * Modified Julian day to Julian day. Epoch is November 17, 1858.
  */
-inline constexpr Jday mjdToJd(Jday mjd)
+constexpr Jday mjdToJd(Jday mjd) noexcept
 {
     using namespace enumops;
     return mjd + 2400000_jd;
@@ -111,7 +111,7 @@ inline constexpr Jday mjdToJd(Jday mjd)
 /**
  * Julian day to Truncated Julian day. Epoch is May 24, 1968.
  */
-inline constexpr Jday jdToTjd(Jday jd)
+constexpr Jday jdToTjd(Jday jd) noexcept
 {
     using namespace enumops;
     return jd - 2440000_jd;
@@ -120,7 +120,7 @@ inline constexpr Jday jdToTjd(Jday jd)
 /**
  * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
  */
-inline constexpr Jday tjdToJd(Jday tjd)
+constexpr Jday tjdToJd(Jday tjd) noexcept
 {
     using namespace enumops;
     return tjd + 2440000_jd;
@@ -129,7 +129,7 @@ inline constexpr Jday tjdToJd(Jday tjd)
 /**
  * Julian day to milliseconds since Unix epoch.
  */
-inline constexpr Millis jdToMs(Jday jd)
+constexpr Millis jdToMs(Jday jd) noexcept
 {
     using namespace enumops;
     // Julian day for January 1st, 1970.
@@ -142,7 +142,7 @@ inline constexpr Millis jdToMs(Jday jd)
 /**
  * Julian day to ISO8601 if argument is non-zero.
  */
-inline constexpr IsoDate maybeJdToIso(Jday jd)
+constexpr IsoDate maybeJdToIso(Jday jd) noexcept
 {
     return jd != 0_jd ? jdToIso(jd) : 0_dt;
 }
@@ -150,7 +150,7 @@ inline constexpr IsoDate maybeJdToIso(Jday jd)
 /**
  * ISO8601 to Julian day if argument is non-zero.
  */
-inline constexpr Jday maybeIsoToJd(IsoDate iso)
+constexpr Jday maybeIsoToJd(IsoDate iso) noexcept
 {
     return iso != 0_dt ? isoToJd(iso) : 0_jd;
 }

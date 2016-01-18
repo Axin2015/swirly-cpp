@@ -65,7 +65,7 @@ public:
 
 template <typename EnumT,
           typename std::enable_if_t<std::is_enum<EnumT>::value>* = nullptr>
-inline constexpr int compare(EnumT lhs, EnumT rhs)
+constexpr int compare(EnumT lhs, EnumT rhs) noexcept
 {
     int i {};
     if (lhs < rhs)
@@ -79,7 +79,7 @@ inline constexpr int compare(EnumT lhs, EnumT rhs)
 
 template <typename IntegralT,
           typename std::enable_if_t<std::is_integral<IntegralT>::value>* = nullptr>
-inline constexpr int compare(IntegralT lhs, IntegralT rhs)
+constexpr int compare(IntegralT lhs, IntegralT rhs) noexcept
 {
     int i {};
     if (lhs < rhs)
