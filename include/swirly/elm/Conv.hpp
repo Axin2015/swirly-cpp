@@ -28,22 +28,22 @@ namespace swirly {
  * @{
  */
 
-inline constexpr int64_t roundHalfAway(double real)
+constexpr int64_t roundHalfAway(double real) noexcept
 {
     return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
 }
 
-inline constexpr double fractToReal(int numer, int denom)
+constexpr double fractToReal(int numer, int denom) noexcept
 {
     return static_cast<double>(numer) / static_cast<double>(denom);
 }
 
-inline constexpr Incs realToIncs(double real, double incSize)
+constexpr Incs realToIncs(double real, double incSize) noexcept
 {
     return roundHalfAway(real / incSize);
 }
 
-inline constexpr double incsToReal(Incs incs, double incSize)
+constexpr double incsToReal(Incs incs, double incSize) noexcept
 {
     return incs * incSize;
 }
@@ -51,39 +51,39 @@ inline constexpr double incsToReal(Incs incs, double incSize)
 /**
  * Convert quantity to lots.
  */
-inline constexpr Lots qtyToLots(double qty, double qtyInc)
+constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
 {
-    return realToIncs(qty, qtyInc);
+    return box<Lots>(realToIncs(qty, qtyInc));
 }
 
 /**
  * Convert lots to quantity.
  */
-inline constexpr double lotsToQty(Lots lots, double qtyInc)
+constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
 {
-    return incsToReal(lots, qtyInc);
+    return incsToReal(unbox(lots), qtyInc);
 }
 
 /**
  * Convert price to ticks.
  */
-inline constexpr Ticks priceToTicks(double price, double priceInc)
+constexpr Ticks priceToTicks(double price, double priceInc) noexcept
 {
-    return realToIncs(price, priceInc);
+    return box<Ticks>(realToIncs(price, priceInc));
 }
 
 /**
  * Convert ticks to price.
  */
-inline constexpr double ticksToPrice(Ticks ticks, double priceInc)
+constexpr double ticksToPrice(Ticks ticks, double priceInc) noexcept
 {
-    return incsToReal(ticks, priceInc);
+    return incsToReal(unbox(ticks), priceInc);
 }
 
 /**
  * Number of decimal places in real.
  */
-inline constexpr int realToDp(double d)
+constexpr int realToDp(double d) noexcept
 {
     int dp{0};
     for (; dp < 9; ++dp) {
@@ -99,7 +99,7 @@ inline constexpr int realToDp(double d)
 /**
  * Decimal places as real.
  */
-inline double dpToReal(int dp)
+inline double dpToReal(int dp) noexcept
 {
     return std::pow(10, -dp);
 }

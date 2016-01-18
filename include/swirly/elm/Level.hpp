@@ -30,16 +30,17 @@ namespace swirly {
  * @{
  */
 
-using LevelKey = Ticks;
+using LevelKey = std::underlying_type_t<Ticks>;
 
 namespace detail {
 
 /**
  * Synthetic level key.
  */
-inline constexpr LevelKey composeKey(Side side, Ticks ticks)
+constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
 {
-    return side == Side::BUY ? -ticks : ticks;
+    using namespace enumops;
+    return unbox(side == Side::BUY ? -ticks : ticks);
 }
 
 } // detail

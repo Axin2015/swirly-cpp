@@ -169,7 +169,7 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
                                               SWIRLY_STR(book.contr()),
                                               maybeJdToIso(book.settlDay()));
     }
-    if (lots == 0 || lots < minLots) {
+    if (lots == 0_lts || lots < minLots) {
         throwException<InvalidLotsException>("invalid lots '%d'", lots);
     }
     const auto orderId = book.allocOrderId();

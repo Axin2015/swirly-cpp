@@ -31,21 +31,41 @@ namespace swirly {
  * @{
  */
 
-using Iden = int64_t;
+enum class Iden : int64_t { };
+
+constexpr Iden operator ""_id(unsigned long long val) noexcept
+{
+    return box<Iden>(val);
+}
 
 using Incs = int64_t;
 
-using Lots = Incs;
+enum class Lots : Incs { };
+
+constexpr Lots operator ""_lts(unsigned long long val) noexcept
+{
+    return box<Lots>(val);
+}
 
 /**
  * Unit representing the minimum price increment.
  */
-using Ticks = Incs;
+enum class Ticks : Incs { };
+
+constexpr Ticks operator ""_tks(unsigned long long val) noexcept
+{
+    return box<Ticks>(val);
+}
 
 /**
  * Sum of lots and ticks.
  */
-using Cost = Incs;
+enum class Cost : Incs { };
+
+constexpr Cost operator ""_cst(unsigned long long val) noexcept
+{
+    return box<Cost>(val);
+}
 
 /**
  * Bitfield representing the state of a Market.

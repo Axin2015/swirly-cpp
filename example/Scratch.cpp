@@ -84,8 +84,8 @@ int main(int argc, char* argv[])
             cout << asset << endl;
         }
 
-        RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1, "",
-                                               Side::BUY, 10, 0_ms)};
+        RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1_id, "",
+                                               Side::BUY, 10_lts, 0_ms)};
         cout << req->trader() << endl;
         return 0;
     } catch (const std::exception& e) {
