@@ -35,12 +35,12 @@ namespace swirly {
 struct Serv::Impl {
 
     Journ& journ;
-    detail::ServFactory factory;
+    ServFactory factory;
     AssetSet assets;
     ContrSet contrs;
     MarketSet markets;
     TraderSet traders;
-    detail::TraderSessSet emailIdx;
+    TraderSessSet emailIdx;
 
     Impl(const Model& model, Journ& journ, Millis now) noexcept
     : journ{journ}

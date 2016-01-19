@@ -20,7 +20,6 @@
 #include <swirly/fig/TraderSess.hpp>
 
 namespace swirly {
-namespace detail {
 
 /**
  * Unordered TraderSess set keyed by email.
@@ -129,7 +128,6 @@ class SWIRLY_API TraderSessSet {
     }
 };
 
-} // detail
 } // swirly
 
 #endif // SWIRLY_FIG_TRADERSESS_HPP

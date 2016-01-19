@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_SUITE(TraderSessSetSuite)
 
 BOOST_AUTO_TEST_CASE(TraderSessSetCase)
 {
-    detail::TraderSessSet s;
+    TraderSessSet s;
     {
         auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
         BOOST_CHECK(s.insert(*trader));

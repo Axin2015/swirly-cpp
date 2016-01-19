@@ -17,7 +17,6 @@
 #include "TraderSessSet.hpp"
 
 namespace swirly {
-namespace detail {
 
 TraderSessSet::~TraderSessSet() noexcept = default;
 
@@ -25,5 +24,4 @@ TraderSessSet::TraderSessSet(TraderSessSet&&) = default;
 
 TraderSessSet& TraderSessSet::operator =(TraderSessSet&&) = default;
 
-} // detail
 } // swirly
