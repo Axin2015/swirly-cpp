@@ -14,25 +14,43 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <TraderSessSet.hpp>
+#ifndef SWIRLY_ASH_FINALLY_HPP
+#define SWIRLY_ASH_FINALLY_HPP
 
-#include <boost/test/unit_test.hpp>
+#include <utility>
 
-using namespace std;
-using namespace swirly;
+/**
+ * @addtogroup Util
+ * @{
+ */
 
-BOOST_AUTO_TEST_SUITE(TraderSessSetSuite)
-
-BOOST_AUTO_TEST_CASE(TraderSessSetCase)
-{
-    TraderSessSet s;
+template <typename FnT>
+class Finally {
+    FnT fn_;
+public:
+    explicit Finally(FnT fn) noexcept
+    :   fn_{std::move(fn)}
     {
-        auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
-        BOOST_CHECK(s.insert(*trader));
-        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
-        // Auto-unlink.
     }
-    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
+    ~Finally() noexcept
+    {
+        fn_();
+    }
+    // Copy.
+    Finally(const Finally&) = delete;
+    Finally& operator =(const Finally&) = delete;
+
+    // Move.
+    Finally(Finally&&) = default;
+    Finally& operator =(Finally&&) = delete;
+};
+
+template <typename FnT>
+auto makeFinally(FnT fn) noexcept
+{
+    return Finally<FnT>{std::move(fn)};
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+/** @} */
+
+#endif // SWIRLY_ASH_FINALLY_HPP

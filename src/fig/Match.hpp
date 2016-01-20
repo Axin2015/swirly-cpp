@@ -14,25 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <TraderSessSet.hpp>
+#ifndef SWIRLY_FIG_MATCH_HPP
+#define SWIRLY_FIG_MATCH_HPP
 
-#include <boost/test/unit_test.hpp>
+#include <swirly/elm/Types.hpp>
 
-using namespace std;
-using namespace swirly;
+namespace swirly {
 
-BOOST_AUTO_TEST_SUITE(TraderSessSetSuite)
+/**
+ * @addtogroup App
+ * @{
+ */
 
-BOOST_AUTO_TEST_CASE(TraderSessSetCase)
-{
-    TraderSessSet s;
-    {
-        auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
-        BOOST_CHECK(s.insert(*trader));
-        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
-        // Auto-unlink.
-    }
-    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
-}
+class Match {
+    const Lots lots;
+    const OrderPtr makerOrder;
+    const ExecPtr makerTrade;
+    const PosnPtr makerPosn;
+    const ExecPtr takerTrade;
+ public:
+    Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
+          const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
-BOOST_AUTO_TEST_SUITE_END()
+    ~Match() noexcept;
+
+    // Copy.
+    Match(const Match&);
+    Match& operator =(const Match&) = delete;
+
+    // Move.
+    Match(Match&&);
+    Match& operator =(Match&&) = delete;
+};
+
+/** @} */
+
+} // swirly
+
+#endif // SWIRLY_FIG_MATCH_HPP

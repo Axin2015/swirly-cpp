@@ -23,7 +23,6 @@
 using namespace std;
 
 namespace swirly {
-namespace detail {
 
 unique_ptr<Market> ServFactory::doNewMarket(const StringView& mnem, const StringView& display,
                                             const StringView& contr, Jday settlDay,
@@ -43,5 +42,4 @@ unique_ptr<Trader> ServFactory::doNewTrader(const StringView& mnem, const String
 
 ServFactory::~ServFactory() noexcept = default;
 
-} // detail
 } // swirly

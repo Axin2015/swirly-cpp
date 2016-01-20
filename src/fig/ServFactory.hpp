@@ -20,7 +20,6 @@
 #include <swirly/elm/Factory.hpp>
 
 namespace swirly {
-namespace detail {
 
 class ServFactory : public BasicFactory {
  protected:
@@ -46,7 +45,6 @@ class ServFactory : public BasicFactory {
     ServFactory& operator =(ServFactory&&) = default;
 };
 
-} // detail
 } // swirly
 
 #endif // SWIRLY_FIG_SERVFACTORY_HPP

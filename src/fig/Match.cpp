@@ -14,25 +14,28 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <TraderSessSet.hpp>
+#include "Match.hpp"
 
-#include <boost/test/unit_test.hpp>
+#include <swirly/elm/Exec.hpp>
+#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
 
-using namespace std;
-using namespace swirly;
+namespace swirly {
 
-BOOST_AUTO_TEST_SUITE(TraderSessSetSuite)
-
-BOOST_AUTO_TEST_CASE(TraderSessSetCase)
+Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
+             const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
+:   lots{lots},
+    makerOrder{makerOrder},
+    makerTrade{makerTrade},
+    makerPosn{makerPosn},
+    takerTrade{takerTrade}
 {
-    TraderSessSet s;
-    {
-        auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com");
-        BOOST_CHECK(s.insert(*trader));
-        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
-        // Auto-unlink.
-    }
-    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+Match::~Match() noexcept = default;
+
+Match::Match(const Match&) = default;
+
+Match::Match(Match&&) = default;
+
+} // swirly
