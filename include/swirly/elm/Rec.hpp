@@ -134,37 +134,51 @@ class RecSet {
     RecSet(RecSet&&) = default;
     RecSet& operator =(RecSet&&) = default;
 
-    RecT& insert(ValuePtr rec) noexcept
+    Iterator insert(ValuePtr value) noexcept
     {
-        auto result = set_.insert(*rec);
-        if (result.second) {
+        Iterator it;
+        bool inserted;
+        std::tie(it, inserted) = set_.insert(*value);
+        if (inserted) {
             // Take ownership if inserted.
-            rec.release();
+            value.release();
         }
-        return *result.first;
+        return it;
     }
-
-    RecT& insertOrReplace(ValuePtr rec) noexcept
+    Iterator insertHint(ConstIterator hint, ValuePtr value) noexcept
     {
-        auto result = set_.insert(*rec);
-        if (!result.second) {
+        auto it = set_.insert(hint, *value);
+        // Take ownership.
+        value.release();
+        return it;
+    }
+    Iterator insertOrReplace(ValuePtr value) noexcept
+    {
+        Iterator it;
+        bool inserted;
+        std::tie(it, inserted) = set_.insert(*value);
+        if (!inserted) {
             // Replace if exists.
-            auto* prev = &*result.first;
-            set_.replace_node(result.first, *rec);
-            delete prev;
+            ValuePtr prev{&*it};
+            set_.replace_node(it, *value);
+            it = set_.iterator_to(*value);
         }
         // Take ownership.
-        return *rec.release();
+        value.release();
+        return it;
     }
-
     template <typename... ArgsT>
-    RecT& emplace(ArgsT&&... args)
+    Iterator emplace(ArgsT&&... args)
     {
         return insert(std::make_unique<RecT>(std::forward<ArgsT>(args)...));
     }
-
     template <typename... ArgsT>
-    RecT& emplaceOrReplace(ArgsT&&... args)
+    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    {
+        return insertHint(hint, std::make_unique<RecT>(std::forward<ArgsT>(args)...));
+    }
+    template <typename... ArgsT>
+    Iterator emplaceOrReplace(ArgsT&&... args)
     {
         return insertOrReplace(std::make_unique<RecT>(std::forward<ArgsT>(args)...));
     }
@@ -205,6 +219,18 @@ class RecSet {
     ConstIterator find(const StringView& mnem) const noexcept
     {
         return set_.find(mnem, KeyValueCompare());
+    }
+    std::pair<Iterator, bool> findHint(const StringView& mnem) noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(mnem, comp);
+        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& mnem) const noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(mnem, comp);
+        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
     }
 };
 

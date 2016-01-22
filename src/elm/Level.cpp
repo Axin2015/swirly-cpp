@@ -18,6 +18,8 @@
 
 #include <swirly/elm/Order.hpp>
 
+using namespace std;
+
 namespace swirly {
 
 Level::Level(const Order& firstOrder) noexcept
@@ -43,27 +45,40 @@ LevelSet::LevelSet(LevelSet&&) = default;
 
 LevelSet& LevelSet::operator =(LevelSet&&) = default;
 
-Level& LevelSet::insert(ValuePtr rec) noexcept
+LevelSet::Iterator LevelSet::insert(ValuePtr value) noexcept
 {
-    auto result = set_.insert(*rec);
-    if (result.second) {
+    Iterator it;
+    bool inserted;
+    tie(it, inserted) = set_.insert(*value);
+    if (inserted) {
         // Take ownership if inserted.
-        rec.release();
+        value.release();
     }
-    return *result.first;
+    return it;
 }
 
-Level& LevelSet::insertOrReplace(ValuePtr rec) noexcept
+LevelSet::Iterator LevelSet::insertHint(ConstIterator hint, ValuePtr value) noexcept
 {
-    auto result = set_.insert(*rec);
-    if (!result.second) {
+    auto it = set_.insert(hint, *value);
+    // Take ownership.
+    value.release();
+    return it;
+}
+
+LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
+{
+    Iterator it;
+    bool inserted;
+    std::tie(it, inserted) = set_.insert(*value);
+    if (!inserted) {
         // Replace if exists.
-        auto* prev = &*result.first;
-        set_.replace_node(result.first, *rec);
-        delete prev;
+        ValuePtr prev{&*it};
+        set_.replace_node(it, *value);
+        it = set_.iterator_to(*value);
     }
     // Take ownership.
-    return *rec.release();
+    value.release();
+    return it;
 }
 
 } // swirly

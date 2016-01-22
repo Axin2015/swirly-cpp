@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(RequestIdSetCase)
     {
         RequestIdSet<Foo> s;
 
-        FooPtr foo1{s.emplace("FOO", 1_id, alive)};
+        FooPtr foo1{&*s.emplace("FOO", 1_id, alive)};
         BOOST_CHECK_EQUAL(alive, 1);
         BOOST_CHECK_EQUAL(foo1->refs(), 2);
         BOOST_CHECK_EQUAL(foo1->market(), "FOO");
@@ -60,13 +60,13 @@ BOOST_AUTO_TEST_CASE(RequestIdSetCase)
         BOOST_CHECK(s.find("FOO", 1_id) != s.end());
 
         // Duplicate.
-        FooPtr foo2{s.emplace("FOO", 1_id, alive)};
+        FooPtr foo2{&*s.emplace("FOO", 1_id, alive)};
         BOOST_CHECK_EQUAL(alive, 1);
         BOOST_CHECK_EQUAL(foo2->refs(), 3);
         BOOST_CHECK_EQUAL(foo2, foo1);
 
         // Replace.
-        FooPtr foo3{s.emplaceOrReplace("FOO", 1_id, alive)};
+        FooPtr foo3{&*s.emplaceOrReplace("FOO", 1_id, alive)};
         BOOST_CHECK_EQUAL(alive, 2);
         BOOST_CHECK_EQUAL(foo3->refs(), 2);
         BOOST_CHECK_NE(foo3, foo1);

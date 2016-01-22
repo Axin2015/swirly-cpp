@@ -157,18 +157,24 @@ class SWIRLY_API TraderPosnSet {
     TraderPosnSet(TraderPosnSet&&);
     TraderPosnSet& operator =(TraderPosnSet&&);
 
-    ValuePtr insert(const ValuePtr& request) noexcept;
+    Iterator insert(const ValuePtr& value) noexcept;
 
-    ValuePtr insertOrReplace(const ValuePtr& request) noexcept;
+    Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept;
+
+    Iterator insertOrReplace(const ValuePtr& value) noexcept;
 
     template <typename... ArgsT>
-    ValuePtr emplace(ArgsT&&... args)
+    Iterator emplace(ArgsT&&... args)
     {
         return insert(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
     }
-
     template <typename... ArgsT>
-    ValuePtr emplaceOrReplace(ArgsT&&... args)
+    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    {
+        return insertHint(hint, makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
+    }
+    template <typename... ArgsT>
+    Iterator emplaceOrReplace(ArgsT&&... args)
     {
         return insertOrReplace(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
     }
@@ -209,6 +215,20 @@ class SWIRLY_API TraderPosnSet {
     ConstIterator find(const StringView& contr, Jday settlDay) const noexcept
     {
         return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
+    }
+    std::pair<Iterator, bool> findHint(const StringView& contr, Jday settlDay) noexcept
+    {
+        const auto key = std::make_tuple(contr, settlDay);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& contr, Jday settlDay) const noexcept
+    {
+        const auto key = std::make_tuple(contr, settlDay);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
 };
 

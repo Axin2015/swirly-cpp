@@ -183,38 +183,51 @@ class RequestIdSet {
     RequestIdSet(RequestIdSet&&) = default;
     RequestIdSet& operator =(RequestIdSet&&) = default;
 
-    ValuePtr insert(const ValuePtr& request) noexcept
+    Iterator insert(const ValuePtr& value) noexcept
     {
-        auto result = set_.insert(*request);
-        if (result.second) {
+        Iterator it;
+        bool inserted;
+        std::tie(it, inserted) = set_.insert(*value);
+        if (inserted) {
             // Take ownership if inserted.
-            request->addRef();
+            value->addRef();
         }
-        return &*result.first;
+        return it;
     }
-
-    ValuePtr insertOrReplace(const ValuePtr& request) noexcept
+    Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept
     {
-        auto result = set_.insert(*request);
-        if (!result.second) {
+        auto it = set_.insert(hint, *value);
+        // Take ownership.
+        value->addRef();
+        return it;
+    }
+    Iterator insertOrReplace(const ValuePtr& value) noexcept
+    {
+        Iterator it;
+        bool inserted;
+        std::tie(it, inserted) = set_.insert(*value);
+        if (!inserted) {
             // Replace if exists.
-            auto& prev = *result.first;
-            set_.replace_node(result.first, *request);
-            prev.release();
+            ValuePtr prev{&*it, false};
+            set_.replace_node(it, *value);
+            it = set_.iterator_to(*value);
         }
         // Take ownership.
-        request->addRef();
-        return request;
+        value->addRef();
+        return it;
     }
-
     template <typename... ArgsT>
-    ValuePtr emplace(ArgsT&&... args)
+    Iterator emplace(ArgsT&&... args)
     {
         return insert(makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
     }
-
     template <typename... ArgsT>
-    ValuePtr emplaceOrReplace(ArgsT&&... args)
+    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    {
+        return insertHint(hint, makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
+    }
+    template <typename... ArgsT>
+    Iterator emplaceOrReplace(ArgsT&&... args)
     {
         return insertOrReplace(makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
     }
@@ -255,6 +268,20 @@ class RequestIdSet {
     ConstIterator find(const StringView& market, Iden id) const noexcept
     {
         return set_.find(std::make_tuple(market, id), KeyValueCompare());
+    }
+    std::pair<Iterator, bool> findHint(const StringView& market, Iden id) noexcept
+    {
+        const auto key = std::make_tuple(market, id);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& market, Iden id) const noexcept
+    {
+        const auto key = std::make_tuple(market, id);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
 };
 
