@@ -22,7 +22,14 @@ BOOST_AUTO_TEST_SUITE(FinallySuite)
 
 BOOST_AUTO_TEST_CASE(FinallyCase)
 {
-    BOOST_CHECK(true);
+    bool success{false};
+    {
+        auto finally = makeFinally([&success]() {
+                success = true;
+            });
+        BOOST_CHECK(!success);
+    }
+    BOOST_CHECK(success);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

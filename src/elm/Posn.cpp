@@ -31,28 +31,40 @@ TraderPosnSet::TraderPosnSet(TraderPosnSet&&) = default;
 
 TraderPosnSet& TraderPosnSet::operator =(TraderPosnSet&&) = default;
 
-TraderPosnSet::ValuePtr TraderPosnSet::insert(const ValuePtr& request) noexcept
+TraderPosnSet::Iterator TraderPosnSet::insert(const ValuePtr& value) noexcept
 {
-    auto result = set_.insert(*request);
-    if (result.second) {
+    Iterator it;
+    bool inserted;
+    std::tie(it, inserted) = set_.insert(*value);
+    if (inserted) {
         // Take ownership if inserted.
-        request->addRef();
+        value->addRef();
     }
-    return &*result.first;
+    return it;
 }
 
-TraderPosnSet::ValuePtr TraderPosnSet::insertOrReplace(const ValuePtr& request) noexcept
+TraderPosnSet::Iterator TraderPosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
 {
-    auto result = set_.insert(*request);
-    if (!result.second) {
+    auto it = set_.insert(hint, *value);
+    // Take ownership.
+    value->addRef();
+    return it;
+}
+
+TraderPosnSet::Iterator TraderPosnSet::insertOrReplace(const ValuePtr& value) noexcept
+{
+    Iterator it;
+    bool inserted;
+    std::tie(it, inserted) = set_.insert(*value);
+    if (!inserted) {
         // Replace if exists.
-        auto& prev = *result.first;
-        set_.replace_node(result.first, *request);
-        prev.release();
+        ValuePtr prev{&*it, false};
+        set_.replace_node(it, *value);
+        it = set_.iterator_to(*value);
     }
     // Take ownership.
-    request->addRef();
-    return request;
+    value->addRef();
+    return it;
 }
 
 } // swirly

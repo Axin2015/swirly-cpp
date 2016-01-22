@@ -33,19 +33,19 @@ BOOST_AUTO_TEST_CASE(TraderPosnSetCase)
 
     TraderPosnSet s;
 
-    PosnPtr posn1{s.emplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
+    PosnPtr posn1{&*s.emplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
     BOOST_CHECK_EQUAL(posn1->refs(), 2);
     BOOST_CHECK_EQUAL(posn1->contr(), "EURUSD");
     BOOST_CHECK_EQUAL(posn1->settlDay(), settlDay);
     BOOST_CHECK(s.find("EURUSD", settlDay) != s.end());
 
     // Duplicate.
-    PosnPtr posn2{s.emplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
+    PosnPtr posn2{&*s.emplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
     BOOST_CHECK_EQUAL(posn2->refs(), 3);
     BOOST_CHECK_EQUAL(posn2, posn1);
 
     // Replace.
-    PosnPtr posn3{s.emplaceOrReplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
+    PosnPtr posn3{&*s.emplaceOrReplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
     BOOST_CHECK_EQUAL(posn3->refs(), 2);
     BOOST_CHECK_NE(posn3, posn1);
     BOOST_CHECK_EQUAL(posn3->contr(), "EURUSD");

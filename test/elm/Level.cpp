@@ -32,16 +32,16 @@ BOOST_AUTO_TEST_CASE(LevelSetCase)
 
     LevelSet s;
 
-    Level& level1{s.emplace(order)};
+    Level& level1{*s.emplace(order)};
     BOOST_CHECK_EQUAL(level1.key(), -12345);
     BOOST_CHECK(s.find(Side::BUY, 12345_tks) != s.end());
 
     // Duplicate.
-    Level& level2{s.emplace(order)};
+    Level& level2{*s.emplace(order)};
     BOOST_CHECK_EQUAL(&level2, &level1);
 
     // Replace.
-    Level& level3{s.emplaceOrReplace(order)};
+    Level& level3{*s.emplaceOrReplace(order)};
     BOOST_CHECK_NE(&level3, &level1);
     BOOST_CHECK_EQUAL(level3.key(), -12345);
 }

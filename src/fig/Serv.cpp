@@ -96,9 +96,9 @@ const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& d
                                      const StringView& contr, Jday settlDay, Jday expiryDay,
                                      MarketState state, Millis now)
 {
-    const auto& rec = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
-                                                                     expiryDay, state));
-    const auto& market = static_cast<const MarketBook&>(rec);
+    auto it = impl_->markets.insert(impl_->factory.newMarket(mnem, display, contr, settlDay,
+                                                             expiryDay, state));
+    const auto& market = static_cast<const MarketBook&>(*it);
     return market;
 }
 
@@ -126,8 +126,8 @@ const MarketBook& Serv::market(const StringView& mnem) const
 const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
                                      const StringView& email)
 {
-    Rec& rec = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email));
-    const auto& trader = static_cast<const TraderSess&>(rec);
+    auto it = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email));
+    const auto& trader = static_cast<const TraderSess&>(*it);
     return trader;
 }
 

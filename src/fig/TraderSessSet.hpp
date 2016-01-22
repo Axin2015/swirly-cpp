@@ -86,7 +86,9 @@ class SWIRLY_API TraderSessSet {
 
     bool insert(TraderSess& trader) noexcept
     {
-        return set_.insert(trader).second;
+        bool inserted;
+        std::tie(std::ignore, inserted) = set_.insert(trader);
+        return inserted;
     }
 
     // Begin.

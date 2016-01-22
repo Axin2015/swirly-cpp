@@ -153,18 +153,24 @@ class SWIRLY_API LevelSet {
     LevelSet(LevelSet&&);
     LevelSet& operator =(LevelSet&&);
 
-    Level& insert(ValuePtr rec) noexcept;
+    Iterator insert(ValuePtr value) noexcept;
 
-    Level& insertOrReplace(ValuePtr rec) noexcept;
+    Iterator insertHint(ConstIterator hint, ValuePtr value) noexcept;
+
+    Iterator insertOrReplace(ValuePtr value) noexcept;
 
     template <typename... ArgsT>
-    Level& emplace(ArgsT&&... args)
+    Iterator emplace(ArgsT&&... args)
     {
         return insert(std::make_unique<Level>(std::forward<ArgsT>(args)...));
     }
-
     template <typename... ArgsT>
-    Level& emplaceOrReplace(ArgsT&&... args)
+    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    {
+        return insertHint(hint, std::make_unique<Level>(std::forward<ArgsT>(args)...));
+    }
+    template <typename... ArgsT>
+    Iterator emplaceOrReplace(ArgsT&&... args)
     {
         return insertOrReplace(std::make_unique<Level>(std::forward<ArgsT>(args)...));
     }
@@ -205,6 +211,20 @@ class SWIRLY_API LevelSet {
     ConstIterator find(Side side, Ticks ticks) const noexcept
     {
         return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
+    }
+    std::pair<Iterator, bool> findHint(Side side, Ticks ticks) noexcept
+    {
+        const auto key = detail::composeKey(side, ticks);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
+    std::pair<ConstIterator, bool> findHint(Side side, Ticks ticks) const noexcept
+    {
+        const auto key = detail::composeKey(side, ticks);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
     }
 };
 
