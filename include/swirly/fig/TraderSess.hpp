@@ -42,8 +42,18 @@ class SWIRLY_API TraderSess : public Trader {
     ExecIdSet trades_;
     TraderPosnSet posns_;
     QuoteIdSet quotes_;
+    OrderRefSet refIdx_;
 
  public:
+    // Dirty bits.
+    static constexpr unsigned DIRTY_EMAIL{1 << 0};
+    static constexpr unsigned DIRTY_ORDER{1 << 1};
+    static constexpr unsigned DIRTY_TRADE{1 << 2};
+    static constexpr unsigned DIRTY_POSN{1 << 3};
+    static constexpr unsigned DIRTY_QUOTE{1 << 4};
+    static constexpr unsigned DIRTY_ALL = DIRTY_EMAIL | DIRTY_ORDER | DIRTY_TRADE | DIRTY_POSN
+        | DIRTY_QUOTE;
+
     boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 
     TraderSess(const StringView& mnem, const StringView& display, const StringView& email,
@@ -63,7 +73,46 @@ class SWIRLY_API TraderSess : public Trader {
     TraderSess(TraderSess&&);
     TraderSess& operator =(TraderSess&&) = delete;
 
+    void insertOrder(const OrderPtr& order) noexcept
+    {
+        assert(order->trader() == mnem_);
+        orders_.insert(order);
+        if (!order->ref().empty())
+            refIdx_.insert(order);
+    }
+    void removeOrder(const Order& order) noexcept
+    {
+        assert(order.trader() == mnem_);
+        orders_.remove(order);
+        if (!order.ref().empty())
+            refIdx_.remove(order);
+    }
+    void insertTrade(const ExecPtr& trade) noexcept
+    {
+        assert(trade->trader() == mnem_);
+        trades_.insert(trade);
+    }
+    void removeOrder(const Exec& trade) noexcept
+    {
+        assert(trade.trader() == mnem_);
+        trades_.remove(trade);
+    }
+    void insertPosn(const PosnPtr& posn) noexcept
+    {
+        assert(posn->trader() == mnem_);
+        posns_.insert(posn);
+    }
     PosnPtr lazyPosn(const StringView& contr, Jday settlDay) throw (std::bad_alloc);
+
+    void insertQuote(const QuotePtr& quote) noexcept
+    {
+        assert(quote->trader() == mnem_);
+        quotes_.insert(quote);
+    }
+    void removeQuote(const Quote& quote) noexcept
+    {
+        quotes_.remove(quote);
+    }
 };
 
 /** @} */

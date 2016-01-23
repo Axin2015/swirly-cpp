@@ -52,6 +52,17 @@ class SWIRLY_API Response {
     Response(Response&&) noexcept;
     Response& operator =(Response&&) noexcept;
 
+    void reset(const MarketBook& book) noexcept
+    {
+        book_ = &book;
+        clearAll();
+    }
+    void reset(const MarketBook& book, const OrderPtr& order, const ExecPtr& exec);
+
+    void clearAll() noexcept;
+
+    void clearMatches() noexcept;
+
     const MarketBook& book() const noexcept
     {
         return *book_;
