@@ -249,6 +249,17 @@ class SWIRLY_API OrderList {
     OrderList(OrderList&&);
     OrderList& operator =(OrderList&&);
 
+    Iterator insertBack(const OrderPtr& value) noexcept;
+
+    Iterator insertBefore(const OrderPtr& value, const Order& next) noexcept;
+
+    void remove(const Order& level) noexcept;
+
+    static ConstIterator toIterator(const Order& order) noexcept
+    {
+        return List::s_iterator_to(order);
+    }
+
     // Begin.
     Iterator begin() noexcept
     {
