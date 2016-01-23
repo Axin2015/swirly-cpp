@@ -16,10 +16,90 @@
  */
 #include <swirly/elm/BookSide.hpp>
 
+using namespace std;
+
 namespace swirly {
+
+LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw (std::bad_alloc)
+{
+    LevelSet::Iterator it;
+    bool found;
+    tie(it, found) = levels_.findHint(order->side(), order->ticks());
+    if (!found) {
+        it = levels_.emplaceHint(it, *order);
+    } else {
+        it->addOrder(*order);
+    }
+    order->setLevel(&*it);
+    return it;
+}
+
+void BookSide::reduceLevel(const Order& order, Lots rDelta, Lots qDelta) noexcept
+{
+    using namespace enumops;
+
+    assert(order.level() != nullptr);
+    assert(rDelta >= 0_lts);
+    assert(rDelta <= order.resd());
+
+    if (rDelta < order.resd()) {
+        // Reduce level's resd by delta.
+        Level* const level{order.level()};
+        assert(level != nullptr);
+        level->reduce(rDelta, qDelta);
+    } else {
+        assert(rDelta == order.resd());
+        removeOrder(order);
+    }
+}
 
 BookSide::~BookSide() noexcept = default;
 
 BookSide::BookSide(BookSide&&) = default;
+
+void BookSide::insertOrder(const OrderPtr& order) throw (std::bad_alloc)
+{
+    assert(order->level() != nullptr);
+    assert(order->ticks() != 0_tks);
+    assert(order->resd() > 0_lts);
+    assert(order->exec() <= order->lots());
+    assert(order->lots() > 0_lts);
+    assert(order->minLots() >= 0_lts);
+
+    auto it = insertLevel(order);
+    // Next level.
+    ++it;
+    if (it != levels_.end()) {
+        // Insert order after the level's last order.
+        // I.e. insert order before the next level's first order.
+        orders_.insertBefore(order, it->firstOrder());
+    } else {
+        orders_.insertBack(order);
+    }
+}
+
+void BookSide::removeOrder(const Order& order) noexcept
+{
+    Level* const level{order.level()};
+    if (level == nullptr)
+        return;
+
+    level->subOrder(order);
+
+    if (level->count() == 0) {
+        // Remove level.
+        assert(level->resd() == 0_lts);
+        levels_.remove(*level);
+    } else if (&level->firstOrder() == &order) {
+        // First order at this level is being removed.
+        auto it = OrderList::toIterator(order);
+        level->setFirstOrder(*++it);
+    }
+
+    orders_.remove(order);
+
+    // No longer associated with side.
+    order.setLevel(nullptr);
+}
 
 } // swirly
