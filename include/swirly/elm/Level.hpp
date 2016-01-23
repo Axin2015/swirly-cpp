@@ -177,6 +177,8 @@ class SWIRLY_API LevelSet {
 
     Iterator insertOrReplace(ValuePtr value) noexcept;
 
+    void remove(const Level& level) noexcept;
+
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)
     {

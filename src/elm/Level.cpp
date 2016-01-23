@@ -110,4 +110,10 @@ LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
     return it;
 }
 
+void LevelSet::remove(const Level& level) noexcept
+{
+    set_.erase_and_dispose(Set::s_iterator_to(level),
+                           [](Level* ptr) { delete ptr; });
+}
+
 } // swirly
