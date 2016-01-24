@@ -21,7 +21,7 @@
 
 namespace swirly {
 
-class ServFactory : public BasicFactory {
+class SWIRLY_API ServFactory : public BasicFactory {
  protected:
     std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
                                         const StringView& contr, Jday settlDay,

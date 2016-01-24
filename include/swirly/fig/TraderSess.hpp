@@ -27,6 +27,8 @@
 
 namespace swirly {
 
+class Factory;
+
 /**
  * @addtogroup Entity
  * @{
@@ -35,6 +37,7 @@ namespace swirly {
 class SWIRLY_API TraderSess : public Trader {
     using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
+    const Factory& factory_;
     OrderIdSet orders_;
     ExecIdSet trades_;
     TraderPosnSet posns_;
@@ -43,8 +46,10 @@ class SWIRLY_API TraderSess : public Trader {
  public:
     boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 
-    TraderSess(const StringView& mnem, const StringView& display, const StringView& email) noexcept
-    :   Trader{mnem, display, email}
+    TraderSess(const StringView& mnem, const StringView& display, const StringView& email,
+               const Factory& factory) noexcept
+    :   Trader{mnem, display, email},
+        factory_{factory}
     {
     }
 
@@ -57,6 +62,8 @@ class SWIRLY_API TraderSess : public Trader {
     // Move.
     TraderSess(TraderSess&&);
     TraderSess& operator =(TraderSess&&) = delete;
+
+    PosnPtr lazyPosn(const StringView& contr, Jday settlDay) throw (std::bad_alloc);
 };
 
 /** @} */
