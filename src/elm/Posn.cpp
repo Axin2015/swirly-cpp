@@ -60,7 +60,7 @@ TraderPosnSet::Iterator TraderPosnSet::insertOrReplace(const ValuePtr& value) no
         // Replace if exists.
         ValuePtr prev{&*it, false};
         set_.replace_node(it, *value);
-        it = set_.iterator_to(*value);
+        it = Set::s_iterator_to(*value);
     }
     // Take ownership.
     value->addRef();

@@ -17,11 +17,14 @@
 #ifndef SWIRLY_ELM_ORDER_HPP
 #define SWIRLY_ELM_ORDER_HPP
 
+#include <swirly/elm/Conv.hpp>
 #include <swirly/elm/Request.hpp>
 
 #include <boost/intrusive/list.hpp>
 
 namespace swirly {
+
+class Level;
 
 /**
  * @addtogroup Entity
@@ -32,6 +35,9 @@ namespace swirly {
  * An instruction to buy or sell goods or services.
  */
 class SWIRLY_API Order : public Request {
+
+    // Internals.
+    mutable Level* level_{nullptr};
 
     const Iden quoteId_;
     State state_;
@@ -88,6 +94,77 @@ class SWIRLY_API Order : public Request {
     Order(Order&&);
     Order& operator =(Order&&) = delete;
 
+    void setLevel(Level* level) const noexcept
+    {
+        level_ = level;
+    }
+    void create(Millis now) noexcept
+    {
+        assert(lots_ > 0_lts);
+        assert(lots_ >= minLots_);
+        state_ = State::NEW;
+        resd_ = lots_;
+        exec_ = 0_lts;
+        cost_ = 0_cst;
+        modified_ = now;
+    }
+    void revise(Lots lots, Millis now) noexcept
+    {
+        using namespace enumops;
+        assert(lots > 0_lts);
+        assert(lots >= exec_);
+        assert(lots >= minLots_);
+        assert(lots <= lots_);
+        const auto delta = lots_ - lots;
+        assert(delta >= 0_lts);
+        state_ = State::REVISE;
+        lots_ = lots;
+        resd_ -= delta;
+        modified_ = now;
+    }
+    void cancel(Millis now) noexcept
+    {
+        if (quotd_ <= 0_lts) {
+            state_ = State::CANCEL;
+            // Note that executed lots is not affected.
+            resd_ = 0_lts;
+            pecan_ = false;
+        } else {
+            state_ = State::PECAN;
+            pecan_ = true;
+        }
+        modified_ = now;
+    }
+    void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks,
+               Millis now) noexcept
+    {
+        using namespace enumops;
+        state_ = State::TRADE;
+        resd_ -= takenLots;
+        exec_ += takenLots;
+        cost_ += takenCost;
+        lastLots_ = lastLots;
+        lastTicks_ = lastTicks;
+        modified_ = now;
+    }
+    void trade(Lots lastLots, Ticks lastTicks, Millis now) noexcept
+    {
+        trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, now);
+    }
+    void addQuote(Lots lots) noexcept
+    {
+        using namespace enumops;
+        quotd_ += lots;
+    }
+    void subQuote(Lots lots) noexcept
+    {
+        using namespace enumops;
+        quotd_ -= lots;
+    }
+    Level* level() const noexcept
+    {
+        return level_;
+    }
     Iden quoteId() const noexcept
     {
         return quoteId_;
@@ -128,6 +205,10 @@ class SWIRLY_API Order : public Request {
     {
         return minLots_;
     }
+    bool done() const noexcept
+    {
+        return resd_ == 0_lts;
+    }
     bool pecan() const noexcept
     {
         return pecan_;
@@ -167,6 +248,17 @@ class SWIRLY_API OrderList {
     // Move.
     OrderList(OrderList&&);
     OrderList& operator =(OrderList&&);
+
+    Iterator insertBack(const OrderPtr& value) noexcept;
+
+    Iterator insertBefore(const OrderPtr& value, const Order& next) noexcept;
+
+    void remove(const Order& level) noexcept;
+
+    static ConstIterator toIterator(const Order& order) noexcept
+    {
+        return List::s_iterator_to(order);
+    }
 
     // Begin.
     Iterator begin() noexcept

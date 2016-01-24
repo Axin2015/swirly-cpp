@@ -16,10 +16,25 @@
  */
 #include <swirly/fig/TraderSess.hpp>
 
+#include <swirly/elm/Factory.hpp>
+
+using namespace std;
+
 namespace swirly {
 
 TraderSess::~TraderSess() noexcept = default;
 
 TraderSess::TraderSess(TraderSess&&) = default;
+
+PosnPtr TraderSess::lazyPosn(const StringView& contr, Jday settlDay) throw (std::bad_alloc)
+{
+    TraderPosnSet::Iterator it;
+    bool found;
+    tie(it, found) = posns_.findHint(contr, settlDay);
+    if (!found) {
+        it = posns_.insertHint(it, factory_.newPosn(mnem_.view(), contr, settlDay));
+    }
+    return &*it;
+}
 
 } // swirly

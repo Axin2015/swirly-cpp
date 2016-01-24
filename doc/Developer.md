@@ -77,11 +77,6 @@ Install to `CMAKE_INSTALL_PREFIX`:
 
     $ make install
 
-[Boost]: http://www.boost.org/
-[Clang]: http://clang.llvm.org/
-[CMake]: http://www.cmake.org/
-[GCC]: http://gcc.gnu.org/
-
 Documentation
 -------------
 
@@ -90,3 +85,8 @@ Testing
 
 Each header-file should have its own unit-test. The header-file should be the first file included in
 the unit-test to ensure that the header-file is self-sufficient.
+
+[Boost]: http://www.boost.org/
+[Clang]: http://clang.llvm.org/
+[CMake]: http://www.cmake.org/
+[GCC]: http://gcc.gnu.org/

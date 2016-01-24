@@ -30,6 +30,14 @@ namespace swirly {
 class SWIRLY_API BookSide {
     LevelSet levels_;
     OrderList orders_;
+
+    /**
+     * Insert level. This function will only throw if a new level cannot be allocated.
+     */
+    LevelSet::Iterator insertLevel(const OrderPtr& order) throw (std::bad_alloc);
+
+    void reduceLevel(const Order& order, Lots rDelta, Lots qDelta) noexcept;
+
  public:
     BookSide() = default;
 
@@ -42,6 +50,58 @@ class SWIRLY_API BookSide {
     // Move.
     BookSide(BookSide&&);
     BookSide& operator =(BookSide&&) = delete;
+
+    /**
+     * Insert order into side. Assumes that the order does not already belong to a side. I.e. it
+     * assumes that level member is null. Assumes that order-id and reference are unique. This
+     * function will only throw if a new level cannot be allocated.
+     */
+    void insertOrder(const OrderPtr& order) throw (std::bad_alloc);
+
+    /**
+     * Remove order from side. Internal housekeeping aside, the state of the order is not affected
+     * by this function.
+     */
+    void removeOrder(const Order& order) noexcept;
+
+    void createOrder(const OrderPtr& order, Millis now) throw (std::bad_alloc)
+    {
+        order->create(now);
+        insertOrder(order);
+    }
+    void reviseOrder(Order& order, Lots lots, Millis now) noexcept
+    {
+        using namespace enumops;
+
+        assert(order.level() != nullptr);
+        assert(lots > 0_lts);
+        assert(lots >= order.exec());
+        assert(lots >= order.minLots());
+        assert(lots <= order.lots());
+
+        const Lots rDelta = order.lots() - lots;
+
+        // FIXME: should also quotd be reduced?
+        reduceLevel(order, rDelta, 0_lts);
+        order.revise(lots, now);
+    }
+    void cancelOrder(Order& order, Millis now) noexcept
+    {
+        removeOrder(order);
+        order.cancel(now);
+    }
+    /**
+     * Reduce residual lots by lots. If the resulting residual is zero, then the order is removed
+     * from the side.
+     */
+    void takeOrder(Order& order, Lots lots, Millis now) noexcept
+    {
+        assert(order.level() != nullptr);
+
+        // FIXME: should also quotd be reduced?
+        reduceLevel(order, lots, 0_lts);
+        order.trade(lots, order.ticks(), now);
+    }
 };
 
 /** @} */

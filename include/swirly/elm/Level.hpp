@@ -79,6 +79,24 @@ class SWIRLY_API Level : public Comparable<Level> {
     Level(Level&&);
     Level& operator =(Level&&) = delete;
 
+    void setFirstOrder(const Order& firstOrder) noexcept
+    {
+        firstOrder_ = &firstOrder;
+    }
+    void reduce(Lots rDelta, Lots qDelta) noexcept
+    {
+        using namespace enumops;
+        resd_ -= rDelta;
+        quotd_ -= qDelta;
+    }
+    void addOrder(const Order& order) noexcept;
+
+    void subOrder(const Order& order) noexcept;
+
+    void addQuote(const Quote& quote) noexcept;
+
+    void subQuote(const Quote& quote) noexcept;
+
     int compare(const Level& rhs) const noexcept
     {
         return swirly::compare(key_, rhs.key_);
@@ -158,6 +176,8 @@ class SWIRLY_API LevelSet {
     Iterator insertHint(ConstIterator hint, ValuePtr value) noexcept;
 
     Iterator insertOrReplace(ValuePtr value) noexcept;
+
+    void remove(const Level& level) noexcept;
 
     template <typename... ArgsT>
     Iterator emplace(ArgsT&&... args)

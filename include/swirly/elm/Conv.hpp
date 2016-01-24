@@ -104,6 +104,14 @@ inline double dpToReal(int dp) noexcept
     return std::pow(10, -dp);
 }
 
+/**
+ * Cost from lots and ticks.
+ */
+inline Cost cost(Lots lots, Ticks ticks) noexcept
+{
+    return box<Cost>(unbox(lots) * unbox(ticks));
+}
+
 /** @} */
 
 } // swirly

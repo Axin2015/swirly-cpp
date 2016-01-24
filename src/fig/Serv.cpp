@@ -126,7 +126,7 @@ const MarketBook& Serv::market(const StringView& mnem) const
 const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
                                      const StringView& email)
 {
-    auto it = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email));
+    auto it = impl_->traders.insert(make_unique<TraderSess>(mnem, display, email, impl_->factory));
     const auto& trader = static_cast<const TraderSess&>(*it);
     return trader;
 }

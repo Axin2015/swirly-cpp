@@ -17,6 +17,7 @@
 #include <swirly/elm/Level.hpp>
 
 #include <swirly/elm/Order.hpp>
+#include <swirly/elm/Quote.hpp>
 
 using namespace std;
 
@@ -35,6 +36,34 @@ Level::Level(const Order& firstOrder) noexcept
 Level::~Level() noexcept = default;
 
 Level::Level(Level&&) = default;
+
+void Level::addOrder(const Order& order) noexcept
+{
+    using namespace enumops;
+    resd_ += order.resd();
+    quotd_ += order.quotd();
+    ++count_;
+}
+
+void Level::subOrder(const Order& order) noexcept
+{
+    using namespace enumops;
+    resd_ -= order.resd();
+    quotd_ -= order.quotd();
+    --count_;
+}
+
+void Level::addQuote(const Quote& quote) noexcept
+{
+    using namespace enumops;
+    quotd_ += quote.lots();
+}
+
+void Level::subQuote(const Quote& quote) noexcept
+{
+    using namespace enumops;
+    quotd_ -= quote.lots();
+}
 
 LevelSet::~LevelSet() noexcept
 {
@@ -74,11 +103,17 @@ LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
         // Replace if exists.
         ValuePtr prev{&*it};
         set_.replace_node(it, *value);
-        it = set_.iterator_to(*value);
+        it = Set::s_iterator_to(*value);
     }
     // Take ownership.
     value.release();
     return it;
+}
+
+void LevelSet::remove(const Level& level) noexcept
+{
+    set_.erase_and_dispose(Set::s_iterator_to(level),
+                           [](Level* ptr) { delete ptr; });
 }
 
 } // swirly

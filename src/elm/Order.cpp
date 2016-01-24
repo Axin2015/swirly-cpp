@@ -31,4 +31,26 @@ OrderList::OrderList(OrderList&&) = default;
 
 OrderList& OrderList::operator =(OrderList&&) = default;
 
+OrderList::Iterator OrderList::insertBack(const OrderPtr& value) noexcept
+{
+    list_.push_back(*value);
+    // Take ownership.
+    value->addRef();
+    return List::s_iterator_to(*value);
+}
+
+OrderList::Iterator OrderList::insertBefore(const OrderPtr& value, const Order& next) noexcept
+{
+    auto it = list_.insert(List::s_iterator_to(next), *value);
+    // Take ownership.
+    value->addRef();
+    return it;
+}
+
+void OrderList::remove(const Order& order) noexcept
+{
+    list_.erase_and_dispose(List::s_iterator_to(order),
+                            [](Order* ptr) { ptr->release(); });
+}
+
 } // swirly
