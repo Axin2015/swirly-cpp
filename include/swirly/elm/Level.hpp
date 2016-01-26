@@ -59,7 +59,6 @@ class SWIRLY_API Level : public Comparable<Level> {
      * Must be greater than zero.
      */
     Lots resd_;
-    Lots quotd_;
     /**
      * Must be greater than zero.
      */
@@ -83,19 +82,14 @@ class SWIRLY_API Level : public Comparable<Level> {
     {
         firstOrder_ = &firstOrder;
     }
-    void reduce(Lots rDelta, Lots qDelta) noexcept
+    void reduce(Lots delta) noexcept
     {
         using namespace enumops;
-        resd_ -= rDelta;
-        quotd_ -= qDelta;
+        resd_ -= delta;
     }
     void addOrder(const Order& order) noexcept;
 
     void subOrder(const Order& order) noexcept;
-
-    void addQuote(const Quote& quote) noexcept;
-
-    void subQuote(const Quote& quote) noexcept;
 
     int compare(const Level& rhs) const noexcept
     {
@@ -116,10 +110,6 @@ class SWIRLY_API Level : public Comparable<Level> {
     Lots resd() const noexcept
     {
         return resd_;
-    }
-    Lots quotd() const noexcept
-    {
-        return quotd_;
     }
     int count() const noexcept
     {

@@ -34,22 +34,39 @@ LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw (std::bad_
     return it;
 }
 
-void BookSide::reduceLevel(const Order& order, Lots rDelta, Lots qDelta) noexcept
+void BookSide::removeOrder(Level& level, const Order& order) noexcept
+{
+    level.subOrder(order);
+
+    if (level.count() == 0) {
+        // Remove level.
+        assert(level.resd() == 0_lts);
+        levels_.remove(level);
+    } else if (&level.firstOrder() == &order) {
+        // First order at this level is being removed.
+        auto it = OrderList::toIterator(order);
+        level.setFirstOrder(*++it);
+    }
+
+    orders_.remove(order);
+
+    // No longer associated with side.
+    order.setLevel(nullptr);
+}
+
+void BookSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcept
 {
     using namespace enumops;
 
-    assert(order.level() != nullptr);
-    assert(rDelta >= 0_lts);
-    assert(rDelta <= order.resd());
+    assert(delta >= 0_lts);
+    assert(delta <= order.resd());
 
-    if (rDelta < order.resd()) {
+    if (delta < order.resd()) {
         // Reduce level's resd by delta.
-        Level* const level{order.level()};
-        assert(level != nullptr);
-        level->reduce(rDelta, qDelta);
+        level.reduce(delta);
     } else {
-        assert(rDelta == order.resd());
-        removeOrder(order);
+        assert(delta == order.resd());
+        removeOrder(level, order);
     }
 }
 
@@ -76,30 +93,6 @@ void BookSide::insertOrder(const OrderPtr& order) throw (std::bad_alloc)
     } else {
         orders_.insertBack(order);
     }
-}
-
-void BookSide::removeOrder(const Order& order) noexcept
-{
-    Level* const level{order.level()};
-    if (level == nullptr)
-        return;
-
-    level->subOrder(order);
-
-    if (level->count() == 0) {
-        // Remove level.
-        assert(level->resd() == 0_lts);
-        levels_.remove(*level);
-    } else if (&level->firstOrder() == &order) {
-        // First order at this level is being removed.
-        auto it = OrderList::toIterator(order);
-        level->setFirstOrder(*++it);
-    }
-
-    orders_.remove(order);
-
-    // No longer associated with side.
-    order.setLevel(nullptr);
 }
 
 } // swirly
