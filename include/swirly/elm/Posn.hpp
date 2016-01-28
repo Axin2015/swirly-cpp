@@ -108,20 +108,20 @@ class SWIRLY_API TraderPosnSet {
                 result = swirly::compare(lhs.settlDay(), rhs.settlDay());
             return result;
         }
-        bool operator()(const Posn& lhs, const Posn& rhs) const noexcept
+        bool operator ()(const Posn& lhs, const Posn& rhs) const noexcept
         {
             return compare(lhs, rhs) < 0;
         }
     };
     struct KeyValueCompare {
-        bool operator()(const Key& lhs, const Posn& rhs) const noexcept
+        bool operator ()(const Key& lhs, const Posn& rhs) const noexcept
         {
             int result{std::get<0>(lhs).compare(rhs.contr())};
             if (result == 0)
                 result = swirly::compare(std::get<1>(lhs), rhs.settlDay());
             return result < 0;
         }
-        bool operator()(const Posn& lhs, const Key& rhs) const noexcept
+        bool operator ()(const Posn& lhs, const Key& rhs) const noexcept
         {
             int result{lhs.contr().compare(std::get<0>(rhs))};
             if (result == 0)

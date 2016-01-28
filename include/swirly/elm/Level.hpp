@@ -119,17 +119,17 @@ class SWIRLY_API Level : public Comparable<Level> {
 
 class SWIRLY_API LevelSet {
     struct ValueCompare {
-        bool operator()(const Level& lhs, const Level& rhs) const noexcept
+        bool operator ()(const Level& lhs, const Level& rhs) const noexcept
         {
             return lhs.key() < rhs.key();
         }
     };
     struct KeyValueCompare {
-        bool operator()(LevelKey lhs, const Level& rhs) const noexcept
+        bool operator ()(LevelKey lhs, const Level& rhs) const noexcept
         {
             return lhs < rhs.key();
         }
-        bool operator()(const Level& lhs, LevelKey rhs) const noexcept
+        bool operator ()(const Level& lhs, LevelKey rhs) const noexcept
         {
             return lhs.key() < rhs;
         }

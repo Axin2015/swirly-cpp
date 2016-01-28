@@ -89,17 +89,17 @@ class SWIRLY_API Rec : public Comparable<Rec> {
 template <typename RecT>
 class RecSet {
     struct ValueCompare {
-        bool operator()(const Rec& lhs, const Rec& rhs) const noexcept
+        bool operator ()(const Rec& lhs, const Rec& rhs) const noexcept
         {
             return lhs.mnem() < rhs.mnem();
         }
     };
     struct KeyValueCompare {
-        bool operator()(const StringView& lhs, const Rec& rhs) const noexcept
+        bool operator ()(const StringView& lhs, const Rec& rhs) const noexcept
         {
             return lhs < rhs.mnem();
         }
-        bool operator()(const Rec& lhs, const StringView& rhs) const noexcept
+        bool operator ()(const Rec& lhs, const StringView& rhs) const noexcept
         {
             return lhs.mnem() < rhs;
         }

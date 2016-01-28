@@ -63,6 +63,7 @@ class SWIRLY_API Order : public Request {
 
  public:
     boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> refHook_;
     boost::intrusive::list_member_hook<> listHook_;
 
     Order(const StringView& trader, const StringView& market, const StringView& contr,
@@ -221,6 +222,135 @@ class SWIRLY_API Order : public Request {
 
 using OrderPtr = boost::intrusive_ptr<Order>;
 using OrderIdSet = RequestIdSet<Order>;
+
+class SWIRLY_API OrderRefSet {
+    struct ValueCompare {
+        int compare(const Order& lhs, const Order& rhs) const noexcept
+        {
+            int result{lhs.contr().compare(rhs.contr())};
+            if (result == 0)
+                result = swirly::compare(lhs.settlDay(), rhs.settlDay());
+            return result;
+        }
+        bool operator ()(const Order& lhs, const Order& rhs) const noexcept
+        {
+            return compare(lhs, rhs) < 0;
+        }
+    };
+    struct KeyValueCompare {
+        bool operator ()(const StringView& lhs, const Order& rhs) const noexcept
+        {
+            return lhs.compare(rhs.ref()) < 0;
+        }
+        bool operator ()(const Order& lhs, const StringView& rhs) const noexcept
+        {
+            return lhs.ref().compare(rhs) < 0;
+        }
+    };
+    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+    using CompareOption = boost::intrusive::compare<ValueCompare>;
+    using MemberHookOption = boost::intrusive::member_hook<Order, decltype(Order::refHook_),
+                                                           &Order::refHook_>;
+    using Set = boost::intrusive::set<Order,
+                                      ConstantTimeSizeOption,
+                                      CompareOption,
+                                      MemberHookOption
+                                      >;
+    using ValuePtr = boost::intrusive_ptr<Order>;
+
+    Set set_;
+ public:
+    using Iterator = typename Set::iterator;
+    using ConstIterator = typename Set::const_iterator;
+
+    OrderRefSet() = default;
+
+    ~OrderRefSet() noexcept;
+
+    // Copy.
+    OrderRefSet(const OrderRefSet&) = delete;
+    OrderRefSet& operator =(const OrderRefSet&) = delete;
+
+    // Move.
+    OrderRefSet(OrderRefSet&&);
+    OrderRefSet& operator =(OrderRefSet&&);
+
+    Iterator insert(const ValuePtr& value) noexcept;
+
+    Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept;
+
+    Iterator insertOrReplace(const ValuePtr& value) noexcept;
+
+    template <typename... ArgsT>
+    Iterator emplace(ArgsT&&... args)
+    {
+        return insert(makeRefCounted<Order>(std::forward<ArgsT>(args)...));
+    }
+    template <typename... ArgsT>
+    Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
+    {
+        return insertHint(hint, makeRefCounted<Order>(std::forward<ArgsT>(args)...));
+    }
+    template <typename... ArgsT>
+    Iterator emplaceOrReplace(ArgsT&&... args)
+    {
+        return insertOrReplace(makeRefCounted<Order>(std::forward<ArgsT>(args)...));
+    }
+    void remove(const Order& value) noexcept
+    {
+        set_.erase(value);
+    }
+
+    // Begin.
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+
+    // End.
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+
+    // Find.
+    Iterator find(const StringView& ref) noexcept
+    {
+        return set_.find(ref, KeyValueCompare());
+    }
+    ConstIterator find(const StringView& ref) const noexcept
+    {
+        return set_.find(ref, KeyValueCompare());
+    }
+    std::pair<Iterator, bool> findHint(const StringView& ref) noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(ref, comp);
+        return std::make_pair(it, it != set_.end() && !comp(ref, *it));
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& ref) const noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(ref, comp);
+        return std::make_pair(it, it != set_.end() && !comp(ref, *it));
+    }
+};
 
 class SWIRLY_API OrderList {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;

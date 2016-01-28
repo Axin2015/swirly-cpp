@@ -22,6 +22,51 @@ Order::~Order() noexcept = default;
 
 Order::Order(Order&&) = default;
 
+OrderRefSet::~OrderRefSet() noexcept
+{
+    set_.clear_and_dispose([](Order* ptr) { ptr->release(); });
+}
+
+OrderRefSet::OrderRefSet(OrderRefSet&&) = default;
+
+OrderRefSet& OrderRefSet::operator =(OrderRefSet&&) = default;
+
+OrderRefSet::Iterator OrderRefSet::insert(const ValuePtr& value) noexcept
+{
+    Iterator it;
+    bool inserted;
+    std::tie(it, inserted) = set_.insert(*value);
+    if (inserted) {
+        // Take ownership if inserted.
+        value->addRef();
+    }
+    return it;
+}
+
+OrderRefSet::Iterator OrderRefSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+{
+    auto it = set_.insert(hint, *value);
+    // Take ownership.
+    value->addRef();
+    return it;
+}
+
+OrderRefSet::Iterator OrderRefSet::insertOrReplace(const ValuePtr& value) noexcept
+{
+    Iterator it;
+    bool inserted;
+    std::tie(it, inserted) = set_.insert(*value);
+    if (!inserted) {
+        // Replace if exists.
+        ValuePtr prev{&*it, false};
+        set_.replace_node(it, *value);
+        it = Set::s_iterator_to(*value);
+    }
+    // Take ownership.
+    value->addRef();
+    return it;
+}
+
 OrderList::~OrderList() noexcept
 {
     list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
