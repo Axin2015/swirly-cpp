@@ -51,6 +51,8 @@ class SWIRLY_API Quote : public Request {
     Quote(Quote&&);
     Quote& operator =(Quote&&) = delete;
 
+    void clearOrder() noexcept;
+
     const OrderPtr& order() const noexcept
     {
         return order_;

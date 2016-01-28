@@ -33,18 +33,18 @@ class SWIRLY_API TraderSessSet {
         }
     };
     struct ValueEqual {
-        bool operator()(const TraderSess& lhs, const TraderSess& rhs) const noexcept
+        bool operator ()(const TraderSess& lhs, const TraderSess& rhs) const noexcept
         {
             return lhs.email() == rhs.email();
         }
     };
     using KeyHash = std::hash<StringView>;
     struct KeyValueEqual {
-        bool operator()(const StringView& lhs, const TraderSess& rhs) const noexcept
+        bool operator ()(const StringView& lhs, const TraderSess& rhs) const noexcept
         {
             return lhs == rhs.email();
         }
-        bool operator()(const TraderSess& lhs, const StringView& rhs) const noexcept
+        bool operator ()(const TraderSess& lhs, const StringView& rhs) const noexcept
         {
             return lhs.email() == rhs;
         }

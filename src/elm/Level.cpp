@@ -17,7 +17,6 @@
 #include <swirly/elm/Level.hpp>
 
 #include <swirly/elm/Order.hpp>
-#include <swirly/elm/Quote.hpp>
 
 using namespace std;
 
@@ -28,7 +27,6 @@ Level::Level(const Order& firstOrder) noexcept
     key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
     ticks_{firstOrder.ticks()},
     resd_{firstOrder.resd()},
-    quotd_{firstOrder.quotd()},
     count_{1}
 {
 }
@@ -41,7 +39,6 @@ void Level::addOrder(const Order& order) noexcept
 {
     using namespace enumops;
     resd_ += order.resd();
-    quotd_ += order.quotd();
     ++count_;
 }
 
@@ -49,20 +46,7 @@ void Level::subOrder(const Order& order) noexcept
 {
     using namespace enumops;
     resd_ -= order.resd();
-    quotd_ -= order.quotd();
     --count_;
-}
-
-void Level::addQuote(const Quote& quote) noexcept
-{
-    using namespace enumops;
-    quotd_ += quote.lots();
-}
-
-void Level::subQuote(const Quote& quote) noexcept
-{
-    using namespace enumops;
-    quotd_ -= quote.lots();
 }
 
 LevelSet::~LevelSet() noexcept

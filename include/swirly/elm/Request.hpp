@@ -131,20 +131,20 @@ class RequestIdSet {
                 result = swirly::compare(lhs.id(), rhs.id());
             return result;
         }
-        bool operator()(const Request& lhs, const Request& rhs) const noexcept
+        bool operator ()(const Request& lhs, const Request& rhs) const noexcept
         {
             return compare(lhs, rhs) < 0;
         }
     };
     struct KeyValueCompare {
-        bool operator()(const Key& lhs, const Request& rhs) const noexcept
+        bool operator ()(const Key& lhs, const Request& rhs) const noexcept
         {
             int result{std::get<0>(lhs).compare(rhs.market())};
             if (result == 0)
                 result = swirly::compare(std::get<1>(lhs), rhs.id());
             return result < 0;
         }
-        bool operator()(const Request& lhs, const Key& rhs) const noexcept
+        bool operator ()(const Request& lhs, const Key& rhs) const noexcept
         {
             int result{lhs.market().compare(std::get<0>(rhs))};
             if (result == 0)
@@ -230,6 +230,10 @@ class RequestIdSet {
     Iterator emplaceOrReplace(ArgsT&&... args)
     {
         return insertOrReplace(makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
+    }
+    void remove(const RequestT& value) noexcept
+    {
+        set_.erase(value);
     }
 
     // Begin.

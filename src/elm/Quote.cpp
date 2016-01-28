@@ -34,4 +34,9 @@ Quote::~Quote() noexcept = default;
 
 Quote::Quote(Quote&&) = default;
 
+void Quote::clearOrder() noexcept
+{
+    order_ = nullptr;
+}
+
 } // swirly

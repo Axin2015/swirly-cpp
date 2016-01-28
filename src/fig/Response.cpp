@@ -34,4 +34,27 @@ Response::Response(Response&&) noexcept = default;
 
 Response& Response::operator =(Response&&) noexcept = default;
 
+void Response::reset(const MarketBook& book, const OrderPtr& order, const ExecPtr& exec)
+{
+    reset(book);
+    orders_.push_back(order);
+    execs_.push_back(exec);
+}
+
+void Response::clearAll() noexcept
+{
+    orders_.clear();
+    execs_.clear();
+    posn_ = nullptr;
+}
+
+void Response::clearMatches() noexcept
+{
+    if (!orders_.empty())
+        orders_.resize(1);
+    if (!execs_.empty())
+        execs_.resize(1);
+    posn_ = nullptr;
+}
+
 } // swirly
