@@ -57,12 +57,21 @@ This step will produce Unix Makefiles by default. The build-type and compiler ca
 following options:
 
     $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
-        -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME \
         -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME \
         -DCMAKE_C_COMPILER=gcc-5 \
         -DCMAKE_CXX_COMPILER=g++-5
 
-See CMake Options for more information.
+Build times can be reduced during development by disabling static libraries and compiler
+optimisations:
+
+    $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
+        -DENABLE_STATIC_LIBS=OFF \
+        -DCMAKE_BUILD_TYPE=DEBUG
+
+Note that both shared and static libraries are built by default.
+
+See [CMake Documentation](https://cmake.org/documentation) for further information.
 
 ### Make ###
 
