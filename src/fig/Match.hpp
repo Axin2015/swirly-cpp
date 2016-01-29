@@ -26,13 +26,13 @@ namespace swirly {
  * @{
  */
 
-class Match {
+struct Match {
     const Lots lots;
     const OrderPtr makerOrder;
     const ExecPtr makerTrade;
     const PosnPtr makerPosn;
     const ExecPtr takerTrade;
- public:
+
     Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
           const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
