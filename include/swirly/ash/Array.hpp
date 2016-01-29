@@ -57,6 +57,12 @@ public:
         ptr_{ptr}
     {
     }
+    template <typename TypeU, std::size_t SizeN>
+    constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept
+    :   len_{SizeN},
+        ptr_{arr}
+    {
+    }
     constexpr ArrayView() noexcept
     :   len_{0},
         ptr_{nullptr}
@@ -140,6 +146,20 @@ public:
         return len_;
     }
 };
+
+template <typename TypeT>
+constexpr ArrayView<std::remove_volatile_t<TypeT>>
+makeArrayView(const TypeT* ptr, std::size_t len) noexcept
+{
+    return {ptr, len};
+}
+
+template <typename TypeT, std::size_t SizeN>
+constexpr ArrayView<std::remove_cv_t<TypeT>>
+makeArrayView(TypeT (&arr)[SizeN]) noexcept
+{
+    return {arr};
+}
 
 /** @} */
 
