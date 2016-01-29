@@ -26,7 +26,7 @@ namespace swirly {
  * @{
  */
 
-template<class TypeT>
+template <typename TypeT>
 using Optional = std::experimental::optional<TypeT>;
 
 /** @} */
