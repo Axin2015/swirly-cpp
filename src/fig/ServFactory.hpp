@@ -27,7 +27,7 @@ class SWIRLY_API ServFactory : public BasicFactory {
                                         const StringView& contr, Jday settlDay,
                                         Jday expiryDay, MarketState state, Lots lastLots,
                                         Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                        Iden maxExecId, Iden maxQuoteId) const override;
+                                        Iden maxExecId) const override;
 
     std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                         const StringView& email) const override;

@@ -80,7 +80,6 @@ const char* enumString(State state)
     SWIRLY_ENUM_CASE(State, REVISE);
     SWIRLY_ENUM_CASE(State, CANCEL);
     SWIRLY_ENUM_CASE(State, TRADE);
-    SWIRLY_ENUM_CASE(State, PECAN);
     }
     terminate();
 }

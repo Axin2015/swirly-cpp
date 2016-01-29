@@ -39,14 +39,12 @@ class SWIRLY_API Order : public Request {
     // Internals.
     mutable Level* level_{nullptr};
 
-    const Iden quoteId_;
     State state_;
     const Ticks ticks_;
     /**
      * Must be greater than zero.
      */
     Lots resd_;
-    Lots quotd_{0_lts};
     /**
      * Must not be greater that lots.
      */
@@ -58,7 +56,6 @@ class SWIRLY_API Order : public Request {
      * Minimum to be filled by this order.
      */
     const Lots minLots_;
-    bool pecan_;
     Millis modified_;
 
  public:
@@ -67,11 +64,10 @@ class SWIRLY_API Order : public Request {
     boost::intrusive::list_member_hook<> listHook_;
 
     Order(const StringView& trader, const StringView& market, const StringView& contr,
-          Jday settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
-          Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-          Lots minLots, bool pecan, Millis created, Millis modified) noexcept
+          Jday settlDay, Iden id, const StringView& ref, State state, Side side, Lots lots,
+          Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
+          Lots minLots, Millis created, Millis modified) noexcept
     :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-        quoteId_{quoteId},
         state_{state},
         ticks_{ticks},
         resd_{resd},
@@ -80,7 +76,6 @@ class SWIRLY_API Order : public Request {
         lastLots_{lastLots},
         lastTicks_{lastTicks},
         minLots_{minLots},
-        pecan_{pecan},
         modified_{modified}
     {
     }
@@ -125,15 +120,9 @@ class SWIRLY_API Order : public Request {
     }
     void cancel(Millis now) noexcept
     {
-        if (quotd_ <= 0_lts) {
-            state_ = State::CANCEL;
-            // Note that executed lots is not affected.
-            resd_ = 0_lts;
-            pecan_ = false;
-        } else {
-            state_ = State::PECAN;
-            pecan_ = true;
-        }
+        state_ = State::CANCEL;
+        // Note that executed lots is not affected.
+        resd_ = 0_lts;
         modified_ = now;
     }
     void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks,
@@ -152,23 +141,9 @@ class SWIRLY_API Order : public Request {
     {
         trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, now);
     }
-    void addQuote(Lots lots) noexcept
-    {
-        using namespace enumops;
-        quotd_ += lots;
-    }
-    void subQuote(Lots lots) noexcept
-    {
-        using namespace enumops;
-        quotd_ -= lots;
-    }
     Level* level() const noexcept
     {
         return level_;
-    }
-    Iden quoteId() const noexcept
-    {
-        return quoteId_;
     }
     State state() const noexcept
     {
@@ -181,10 +156,6 @@ class SWIRLY_API Order : public Request {
     Lots resd() const noexcept
     {
         return resd_;
-    }
-    Lots quotd() const noexcept
-    {
-        return quotd_;
     }
     Lots exec() const noexcept
     {
@@ -209,10 +180,6 @@ class SWIRLY_API Order : public Request {
     bool done() const noexcept
     {
         return resd_ == 0_lts;
-    }
-    bool pecan() const noexcept
-    {
-        return pecan_;
     }
     Millis modified() const noexcept
     {

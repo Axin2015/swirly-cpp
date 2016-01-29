@@ -242,11 +242,7 @@ enum class State {
     /**
      * State of an order that has been partially or fully filled.
      */
-    TRADE,
-    /**
-     * State of a resting order that is pending cancel.
-     */
-    PECAN
+    TRADE
 };
 
 SWIRLY_API const char* enumString(State state);

@@ -34,7 +34,6 @@ namespace swirly {
 class SWIRLY_API Exec : public Request {
 
     const Iden orderId_;
-    const Iden quoteId_;
     State state_;
     const Ticks ticks_;
     /**
@@ -60,13 +59,12 @@ class SWIRLY_API Exec : public Request {
     boost::intrusive::set_member_hook<> idHook_;
 
     Exec(const StringView& trader, const StringView& market, const StringView& contr,
-         Jday settlDay, Iden id, const StringView& ref, Iden orderId, Iden quoteId, State state,
+         Jday settlDay, Iden id, const StringView& ref, Iden orderId, State state,
          Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
          Ticks lastTicks, Lots minLots, Iden matchId, Role role, const StringView& cpty,
          Millis created) noexcept
     :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
         orderId_{orderId},
-        quoteId_{quoteId},
         state_{state},
         ticks_{ticks},
         resd_{resd},
@@ -94,10 +92,6 @@ class SWIRLY_API Exec : public Request {
     Iden orderId() const noexcept
     {
         return orderId_;
-    }
-    Iden quoteId() const noexcept
-    {
-        return quoteId_;
     }
     State state() const noexcept
     {

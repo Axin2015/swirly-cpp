@@ -82,9 +82,8 @@ class SWIRLY_API Serv {
 
     const TraderSess* findTraderByEmail(const StringView& email) const;
 
-    void createOrder(TraderSess& sess, MarketBook& book, const StringView& ref,
-                     Iden quoteId, Side side, Lots lots, Ticks ticks, Lots minLots,
-                     Millis now, Response& resp);
+    void createOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                     Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp);
 
     void reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
                      Response& resp);
@@ -156,9 +155,6 @@ class SWIRLY_API Serv {
 
     void archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids,
                       Millis now);
-
-    QuotePtr createQuote(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
-                         Lots lots, Millis now);
 
     /**
      * This method may partially fail.

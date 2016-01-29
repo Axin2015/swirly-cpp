@@ -39,7 +39,6 @@ class SWIRLY_API MarketBook : public Market {
     MarketView view_;
     Iden maxOrderId_;
     Iden maxExecId_;
-    Iden maxQuoteId_;
 
     BookSide& side(Side side) noexcept
     {
@@ -53,8 +52,7 @@ class SWIRLY_API MarketBook : public Market {
  public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
                Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-               Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
-               Iden maxQuoteId) noexcept;
+               Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept;
 
     ~MarketBook() noexcept override;
 
@@ -103,11 +101,6 @@ class SWIRLY_API MarketBook : public Market {
         using namespace enumops;
         return ++maxExecId_;
     }
-    Iden allocQuoteId() noexcept
-    {
-        using namespace enumops;
-        return ++maxQuoteId_;
-    }
     Lots lastLots() const noexcept
     {
         return lastLots_;
@@ -139,10 +132,6 @@ class SWIRLY_API MarketBook : public Market {
     Iden maxExecId() const noexcept
     {
         return maxExecId_;
-    }
-    Iden maxQuoteId() const noexcept
-    {
-        return maxQuoteId_;
     }
 };
 
