@@ -59,11 +59,11 @@ class SWIRLY_API Contr : public Rec {
 
     // Copy.
     Contr(const Contr&);
-    Contr& operator =(const Contr&) = delete;
+    Contr& operator=(const Contr&) = delete;
 
     // Move.
     Contr(Contr&&);
-    Contr& operator =(Contr&&) = delete;
+    Contr& operator=(Contr&&) = delete;
 
     StringView asset() const noexcept
     {

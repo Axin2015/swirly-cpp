@@ -24,9 +24,9 @@ namespace swirly {
 class SWIRLY_API ServFactory : public BasicFactory {
  protected:
     std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                        const StringView& contr, Jday settlDay,
-                                        Jday expiryDay, MarketState state, Lots lastLots,
-                                        Ticks lastTicks, Millis lastTime, Iden maxOrderId,
+                                        const StringView& contr, Jday settlDay, Jday expiryDay,
+                                        MarketState state, Lots lastLots, Ticks lastTicks,
+                                        Millis lastTime, Iden maxOrderId,
                                         Iden maxExecId) const override;
 
     std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
@@ -38,11 +38,11 @@ class SWIRLY_API ServFactory : public BasicFactory {
 
     // Copy.
     ServFactory(const ServFactory&) = default;
-    ServFactory& operator =(const ServFactory&) = default;
+    ServFactory& operator=(const ServFactory&) = default;
 
     // Move.
     ServFactory(ServFactory&&) = default;
-    ServFactory& operator =(ServFactory&&) = default;
+    ServFactory& operator=(ServFactory&&) = default;
 };
 
 } // swirly

@@ -27,9 +27,9 @@
 template <typename FnT>
 class Finally {
     FnT fn_;
-public:
-    explicit Finally(FnT fn) noexcept
-    :   fn_{std::move(fn)}
+
+ public:
+    explicit Finally(FnT fn) noexcept : fn_{std::move(fn)}
     {
     }
     ~Finally() noexcept
@@ -38,11 +38,11 @@ public:
     }
     // Copy.
     Finally(const Finally&) = delete;
-    Finally& operator =(const Finally&) = delete;
+    Finally& operator=(const Finally&) = delete;
 
     // Move.
     Finally(Finally&&) = default;
-    Finally& operator =(Finally&&) = delete;
+    Finally& operator=(Finally&&) = delete;
 };
 
 template <typename FnT>

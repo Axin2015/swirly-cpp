@@ -67,16 +67,16 @@ class SWIRLY_API Order : public Request {
           Jday settlDay, Iden id, const StringView& ref, State state, Side side, Lots lots,
           Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
           Lots minLots, Millis created, Millis modified) noexcept
-    :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-        state_{state},
-        ticks_{ticks},
-        resd_{resd},
-        exec_{exec},
-        cost_{cost},
-        lastLots_{lastLots},
-        lastTicks_{lastTicks},
-        minLots_{minLots},
-        modified_{modified}
+        : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+          state_{state},
+          ticks_{ticks},
+          resd_{resd},
+          exec_{exec},
+          cost_{cost},
+          lastLots_{lastLots},
+          lastTicks_{lastTicks},
+          minLots_{minLots},
+          modified_{modified}
     {
     }
 
@@ -84,11 +84,11 @@ class SWIRLY_API Order : public Request {
 
     // Copy.
     Order(const Order&) = delete;
-    Order& operator =(const Order&) = delete;
+    Order& operator=(const Order&) = delete;
 
     // Move.
     Order(Order&&);
-    Order& operator =(Order&&) = delete;
+    Order& operator=(Order&&) = delete;
 
     void setLevel(Level* level) const noexcept
     {
@@ -125,8 +125,7 @@ class SWIRLY_API Order : public Request {
         resd_ = 0_lts;
         modified_ = now;
     }
-    void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks,
-               Millis now) noexcept
+    void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks, Millis now) noexcept
     {
         using namespace enumops;
         state_ = State::TRADE;
@@ -199,33 +198,31 @@ class SWIRLY_API OrderRefSet {
                 result = swirly::compare(lhs.settlDay(), rhs.settlDay());
             return result;
         }
-        bool operator ()(const Order& lhs, const Order& rhs) const noexcept
+        bool operator()(const Order& lhs, const Order& rhs) const noexcept
         {
             return compare(lhs, rhs) < 0;
         }
     };
     struct KeyValueCompare {
-        bool operator ()(const StringView& lhs, const Order& rhs) const noexcept
+        bool operator()(const StringView& lhs, const Order& rhs) const noexcept
         {
             return lhs.compare(rhs.ref()) < 0;
         }
-        bool operator ()(const Order& lhs, const StringView& rhs) const noexcept
+        bool operator()(const Order& lhs, const StringView& rhs) const noexcept
         {
             return lhs.ref().compare(rhs) < 0;
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<Order, decltype(Order::refHook_),
-                                                           &Order::refHook_>;
-    using Set = boost::intrusive::set<Order,
-                                      ConstantTimeSizeOption,
-                                      CompareOption,
-                                      MemberHookOption
-                                      >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Order, decltype(Order::refHook_), &Order::refHook_>;
+    using Set
+        = boost::intrusive::set<Order, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
 
     Set set_;
+
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -236,11 +233,11 @@ class SWIRLY_API OrderRefSet {
 
     // Copy.
     OrderRefSet(const OrderRefSet&) = delete;
-    OrderRefSet& operator =(const OrderRefSet&) = delete;
+    OrderRefSet& operator=(const OrderRefSet&) = delete;
 
     // Move.
     OrderRefSet(OrderRefSet&&);
-    OrderRefSet& operator =(OrderRefSet&&);
+    OrderRefSet& operator=(OrderRefSet&&);
 
     Iterator insert(const ValuePtr& value) noexcept;
 
@@ -321,15 +318,13 @@ class SWIRLY_API OrderRefSet {
 
 class SWIRLY_API OrderList {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<Order, decltype(Order::listHook_),
-                                                           &Order::listHook_>;
-    using List = boost::intrusive::list<Order,
-                                        ConstantTimeSizeOption,
-                                        MemberHookOption
-                                        >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Order, decltype(Order::listHook_), &Order::listHook_>;
+    using List = boost::intrusive::list<Order, ConstantTimeSizeOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
 
     List list_;
+
  public:
     using Iterator = typename List::iterator;
     using ConstIterator = typename List::const_iterator;
@@ -340,11 +335,11 @@ class SWIRLY_API OrderList {
 
     // Copy.
     OrderList(const OrderList&) = delete;
-    OrderList& operator =(const OrderList&) = delete;
+    OrderList& operator=(const OrderList&) = delete;
 
     // Move.
     OrderList(OrderList&&);
-    OrderList& operator =(OrderList&&);
+    OrderList& operator=(OrderList&&);
 
     Iterator insertBack(const OrderPtr& value) noexcept;
 

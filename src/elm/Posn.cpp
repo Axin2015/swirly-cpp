@@ -29,7 +29,7 @@ TraderPosnSet::~TraderPosnSet() noexcept
 
 TraderPosnSet::TraderPosnSet(TraderPosnSet&&) = default;
 
-TraderPosnSet& TraderPosnSet::operator =(TraderPosnSet&&) = default;
+TraderPosnSet& TraderPosnSet::operator=(TraderPosnSet&&) = default;
 
 TraderPosnSet::Iterator TraderPosnSet::insert(const ValuePtr& value) noexcept
 {
@@ -43,7 +43,8 @@ TraderPosnSet::Iterator TraderPosnSet::insert(const ValuePtr& value) noexcept
     return it;
 }
 
-TraderPosnSet::Iterator TraderPosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+TraderPosnSet::Iterator TraderPosnSet::insertHint(ConstIterator hint,
+                                                  const ValuePtr& value) noexcept
 {
     auto it = set_.insert(hint, *value);
     // Take ownership.

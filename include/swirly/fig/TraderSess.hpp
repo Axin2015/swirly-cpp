@@ -46,9 +46,8 @@ class SWIRLY_API TraderSess : public Trader {
     boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 
     TraderSess(const StringView& mnem, const StringView& display, const StringView& email,
-               const Factory& factory) noexcept
-    :   Trader{mnem, display, email},
-        factory_{factory}
+               const Factory& factory) noexcept : Trader{mnem, display, email},
+                                                  factory_{factory}
     {
     }
 
@@ -56,11 +55,11 @@ class SWIRLY_API TraderSess : public Trader {
 
     // Copy.
     TraderSess(const TraderSess&) = delete;
-    TraderSess& operator =(const TraderSess&) = delete;
+    TraderSess& operator=(const TraderSess&) = delete;
 
     // Move.
     TraderSess(TraderSess&&);
-    TraderSess& operator =(TraderSess&&) = delete;
+    TraderSess& operator=(TraderSess&&) = delete;
 
     void insertOrder(const OrderPtr& order) noexcept
     {
@@ -91,7 +90,7 @@ class SWIRLY_API TraderSess : public Trader {
         assert(posn->trader() == mnem_);
         posns_.insert(posn);
     }
-    PosnPtr lazyPosn(const StringView& contr, Jday settlDay) throw (std::bad_alloc);
+    PosnPtr lazyPosn(const StringView& contr, Jday settlDay) throw(std::bad_alloc);
 };
 
 /** @} */

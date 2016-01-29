@@ -36,11 +36,11 @@ class SWIRLY_API MarketData {
 
     // Copy.
     MarketData(const MarketData&) = default;
-    MarketData& operator =(const MarketData&) = default;
+    MarketData& operator=(const MarketData&) = default;
 
     // Move.
     MarketData(MarketData&&) = default;
-    MarketData& operator =(MarketData&&) = default;
+    MarketData& operator=(MarketData&&) = default;
 };
 
 /** @} */

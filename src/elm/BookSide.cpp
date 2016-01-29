@@ -20,7 +20,7 @@ using namespace std;
 
 namespace swirly {
 
-LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw (std::bad_alloc)
+LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw(std::bad_alloc)
 {
     LevelSet::Iterator it;
     bool found;
@@ -74,7 +74,7 @@ BookSide::~BookSide() noexcept = default;
 
 BookSide::BookSide(BookSide&&) = default;
 
-void BookSide::insertOrder(const OrderPtr& order) throw (std::bad_alloc)
+void BookSide::insertOrder(const OrderPtr& order) throw(std::bad_alloc)
 {
     assert(order->level() != nullptr);
     assert(order->ticks() != 0_tks);

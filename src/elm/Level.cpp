@@ -23,11 +23,11 @@ using namespace std;
 namespace swirly {
 
 Level::Level(const Order& firstOrder) noexcept
-:   firstOrder_{&firstOrder},
-    key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
-    ticks_{firstOrder.ticks()},
-    resd_{firstOrder.resd()},
-    count_{1}
+    : firstOrder_{&firstOrder},
+      key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
+      ticks_{firstOrder.ticks()},
+      resd_{firstOrder.resd()},
+      count_{1}
 {
 }
 
@@ -56,7 +56,7 @@ LevelSet::~LevelSet() noexcept
 
 LevelSet::LevelSet(LevelSet&&) = default;
 
-LevelSet& LevelSet::operator =(LevelSet&&) = default;
+LevelSet& LevelSet::operator=(LevelSet&&) = default;
 
 LevelSet::Iterator LevelSet::insert(ValuePtr value) noexcept
 {
@@ -96,8 +96,7 @@ LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
 
 void LevelSet::remove(const Level& level) noexcept
 {
-    set_.erase_and_dispose(Set::s_iterator_to(level),
-                           [](Level* ptr) { delete ptr; });
+    set_.erase_and_dispose(Set::s_iterator_to(level), [](Level* ptr) { delete ptr; });
 }
 
 } // swirly

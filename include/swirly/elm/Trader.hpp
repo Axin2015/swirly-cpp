@@ -33,8 +33,8 @@ class SWIRLY_API Trader : public Rec {
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
-    :   Rec{RecType::MARKET, mnem, display},
-        email_{email}
+        : Rec{RecType::MARKET, mnem, display},
+          email_{email}
     {
     }
 
@@ -42,11 +42,11 @@ class SWIRLY_API Trader : public Rec {
 
     // Copy.
     Trader(const Trader&);
-    Trader& operator =(const Trader&) = delete;
+    Trader& operator=(const Trader&) = delete;
 
     // Move.
     Trader(Trader&&);
-    Trader& operator =(Trader&&) = delete;
+    Trader& operator=(Trader&&) = delete;
 
     StringView email() const noexcept
     {

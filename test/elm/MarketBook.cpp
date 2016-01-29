@@ -21,7 +21,7 @@
 using namespace std;
 using namespace swirly;
 
-static_assert(sizeof(MarketBook) <= 7*64, "crossed cache-line boundary");
+static_assert(sizeof(MarketBook) <= 7 * 64, "crossed cache-line boundary");
 
 BOOST_AUTO_TEST_SUITE(MarketBookSuite)
 

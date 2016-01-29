@@ -58,24 +58,23 @@ class SWIRLY_API Exec : public Request {
  public:
     boost::intrusive::set_member_hook<> idHook_;
 
-    Exec(const StringView& trader, const StringView& market, const StringView& contr,
-         Jday settlDay, Iden id, const StringView& ref, Iden orderId, State state,
-         Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-         Ticks lastTicks, Lots minLots, Iden matchId, Role role, const StringView& cpty,
-         Millis created) noexcept
-    :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-        orderId_{orderId},
-        state_{state},
-        ticks_{ticks},
-        resd_{resd},
-        exec_{exec},
-        cost_{cost},
-        lastLots_{lastLots},
-        lastTicks_{lastTicks},
-        minLots_{minLots},
-        matchId_{matchId},
-        role_{role},
-        cpty_{cpty}
+    Exec(const StringView& trader, const StringView& market, const StringView& contr, Jday settlDay,
+         Iden id, const StringView& ref, Iden orderId, State state, Side side, Lots lots,
+         Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+         Iden matchId, Role role, const StringView& cpty, Millis created) noexcept
+        : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+          orderId_{orderId},
+          state_{state},
+          ticks_{ticks},
+          resd_{resd},
+          exec_{exec},
+          cost_{cost},
+          lastLots_{lastLots},
+          lastTicks_{lastTicks},
+          minLots_{minLots},
+          matchId_{matchId},
+          role_{role},
+          cpty_{cpty}
     {
     }
 
@@ -83,11 +82,11 @@ class SWIRLY_API Exec : public Request {
 
     // Copy.
     Exec(const Exec&) = delete;
-    Exec& operator =(const Exec&) = delete;
+    Exec& operator=(const Exec&) = delete;
 
     // Move.
     Exec(Exec&&);
-    Exec& operator =(Exec&&) = delete;
+    Exec& operator=(Exec&&) = delete;
 
     Iden orderId() const noexcept
     {

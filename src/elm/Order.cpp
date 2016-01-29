@@ -29,7 +29,7 @@ OrderRefSet::~OrderRefSet() noexcept
 
 OrderRefSet::OrderRefSet(OrderRefSet&&) = default;
 
-OrderRefSet& OrderRefSet::operator =(OrderRefSet&&) = default;
+OrderRefSet& OrderRefSet::operator=(OrderRefSet&&) = default;
 
 OrderRefSet::Iterator OrderRefSet::insert(const ValuePtr& value) noexcept
 {
@@ -74,7 +74,7 @@ OrderList::~OrderList() noexcept
 
 OrderList::OrderList(OrderList&&) = default;
 
-OrderList& OrderList::operator =(OrderList&&) = default;
+OrderList& OrderList::operator=(OrderList&&) = default;
 
 OrderList::Iterator OrderList::insertBack(const OrderPtr& value) noexcept
 {
@@ -94,8 +94,7 @@ OrderList::Iterator OrderList::insertBefore(const OrderPtr& value, const Order& 
 
 void OrderList::remove(const Order& order) noexcept
 {
-    list_.erase_and_dispose(List::s_iterator_to(order),
-                            [](Order* ptr) { ptr->release(); });
+    list_.erase_and_dispose(List::s_iterator_to(order), [](Order* ptr) { ptr->release(); });
 }
 
 } // swirly

@@ -25,10 +25,9 @@ using namespace std;
 namespace swirly {
 
 unique_ptr<Market> ServFactory::doNewMarket(const StringView& mnem, const StringView& display,
-                                            const StringView& contr, Jday settlDay,
-                                            Jday expiryDay, MarketState state, Lots lastLots,
-                                            Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                            Iden maxExecId) const
+                                            const StringView& contr, Jday settlDay, Jday expiryDay,
+                                            MarketState state, Lots lastLots, Ticks lastTicks,
+                                            Millis lastTime, Iden maxOrderId, Iden maxExecId) const
 {
     return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state, lastLots,
                                    lastTicks, lastTime, maxOrderId, maxExecId);

@@ -22,6 +22,6 @@ TraderSessSet::~TraderSessSet() noexcept = default;
 
 TraderSessSet::TraderSessSet(TraderSessSet&&) = default;
 
-TraderSessSet& TraderSessSet::operator =(TraderSessSet&&) = default;
+TraderSessSet& TraderSessSet::operator=(TraderSessSet&&) = default;
 
 } // swirly

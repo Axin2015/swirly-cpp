@@ -47,11 +47,11 @@ class SWIRLY_API Model {
 
     // Copy.
     constexpr Model(const Model&) noexcept = default;
-    Model& operator =(const Model&) noexcept = default;
+    Model& operator=(const Model&) noexcept = default;
 
     // Move.
     constexpr Model(Model&&) noexcept = default;
-    Model& operator =(Model&&) noexcept = default;
+    Model& operator=(Model&&) noexcept = default;
 
     AssetSet readAsset(const Factory& factory) const
     {

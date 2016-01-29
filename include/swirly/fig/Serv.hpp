@@ -42,19 +42,19 @@ using IdenView = ArrayView<Iden>;
 class SWIRLY_API Serv {
     struct Impl;
     std::unique_ptr<Impl> impl_;
- public:
 
+ public:
     Serv(const Model& model, Journ& journ, Millis now);
 
     ~Serv() noexcept;
 
     // Copy.
     Serv(const Serv&) = delete;
-    Serv& operator =(const Serv&) = delete;
+    Serv& operator=(const Serv&) = delete;
 
     // Move.
     Serv(Serv&&);
-    Serv& operator =(Serv&&);
+    Serv& operator=(Serv&&);
 
     const AssetSet& assets() const noexcept;
 
@@ -91,14 +91,12 @@ class SWIRLY_API Serv {
     void reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots,
                      Millis now, Response& resp);
 
-    void reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots,
-                     Millis now, Response& resp);
-
-    void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now,
+    void reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots, Millis now,
                      Response& resp);
 
-    void cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now,
-                     Response& resp);
+    void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp);
+
+    void cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, Response& resp);
 
     void cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
                      Response& resp);
@@ -132,12 +130,10 @@ class SWIRLY_API Serv {
      */
     void archiveOrder(TraderSess& sess, Millis now);
 
-    void archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids,
-                      Millis now);
+    void archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now);
 
-    ExecPtr createTrade(TraderSess& sess, MarketBook& book, const StringView& ref,
-                        Side side, Lots lots, Ticks ticks, Role role, const StringView& cpty,
-                        Millis created);
+    ExecPtr createTrade(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                        Lots lots, Ticks ticks, Role role, const StringView& cpty, Millis created);
 
     void archiveTrade(TraderSess& sess, Exec& trade, Millis now);
 
@@ -153,8 +149,7 @@ class SWIRLY_API Serv {
      */
     void archiveTrade(TraderSess& sess, Millis now);
 
-    void archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids,
-                      Millis now);
+    void archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now);
 
     /**
      * This method may partially fail.

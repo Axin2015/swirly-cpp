@@ -28,11 +28,11 @@ Response::~Response() noexcept = default;
 
 Response::Response(const Response&) = default;
 
-Response& Response::operator =(const Response&) = default;
+Response& Response::operator=(const Response&) = default;
 
 Response::Response(Response&&) noexcept = default;
 
-Response& Response::operator =(Response&&) noexcept = default;
+Response& Response::operator=(Response&&) noexcept = default;
 
 void Response::reset(const MarketBook& book, const OrderPtr& order, const ExecPtr& exec)
 {

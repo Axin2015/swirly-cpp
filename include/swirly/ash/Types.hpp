@@ -31,9 +31,9 @@ namespace swirly {
 /**
  * ISO8601 date in yyymmdd format.
  */
-enum class IsoDate : int { };
+enum class IsoDate : int {};
 
-constexpr IsoDate operator ""_dt(unsigned long long val) noexcept
+constexpr IsoDate operator""_dt(unsigned long long val) noexcept
 {
     return box<IsoDate>(val);
 }
@@ -41,9 +41,9 @@ constexpr IsoDate operator ""_dt(unsigned long long val) noexcept
 /**
  * Julian day.
  */
-enum class Jday : int { };
+enum class Jday : int {};
 
-constexpr Jday operator ""_jd(unsigned long long val) noexcept
+constexpr Jday operator""_jd(unsigned long long val) noexcept
 {
     return box<Jday>(val);
 }
@@ -51,9 +51,9 @@ constexpr Jday operator ""_jd(unsigned long long val) noexcept
 /**
  * Milliseconds since Unix epoch.
  */
-enum class Millis : int64_t { };
+enum class Millis : int64_t {};
 
-constexpr Millis operator ""_ms(unsigned long long val) noexcept
+constexpr Millis operator""_ms(unsigned long long val) noexcept
 {
     return box<Millis>(val);
 }

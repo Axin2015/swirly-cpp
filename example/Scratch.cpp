@@ -22,7 +22,7 @@
 
 namespace swirly {
 
-inline std::ostream& operator <<(std::ostream& os, const Rec& rec)
+inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
 {
     return os << rec.type() << ' ' << rec.mnem() << ' ' << rec.display();
 }
@@ -60,11 +60,11 @@ class MockModel : public Model {
 
     // Copy.
     constexpr MockModel(const MockModel&) noexcept = default;
-    MockModel& operator =(const MockModel&) noexcept = default;
+    MockModel& operator=(const MockModel&) noexcept = default;
 
     // Move.
     constexpr MockModel(MockModel&&) noexcept = default;
-    MockModel& operator =(MockModel&&) noexcept = default;
+    MockModel& operator=(MockModel&&) noexcept = default;
 };
 
 } // swirly

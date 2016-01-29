@@ -23,7 +23,7 @@
 using namespace std;
 using namespace swirly;
 
-static_assert(sizeof(Posn) <= 3*64, "crossed cache-line boundary");
+static_assert(sizeof(Posn) <= 3 * 64, "crossed cache-line boundary");
 
 BOOST_AUTO_TEST_SUITE(PosnSuite)
 

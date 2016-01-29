@@ -32,7 +32,8 @@ class SWIRLY_API Journ {
  protected:
     virtual void doCreateMarket(const StringView& mnem, const StringView& display,
                                 const StringView& contr, Jday settlDay, Jday expiryDay,
-                                MarketState state) = 0;
+                                MarketState state)
+        = 0;
 
  public:
     Journ() noexcept = default;
@@ -40,15 +41,14 @@ class SWIRLY_API Journ {
 
     // Copy.
     constexpr Journ(const Journ&) noexcept = default;
-    Journ& operator =(const Journ&) noexcept = default;
+    Journ& operator=(const Journ&) noexcept = default;
 
     // Move.
     constexpr Journ(Journ&&) noexcept = default;
-    Journ& operator =(Journ&&) noexcept = default;
+    Journ& operator=(Journ&&) noexcept = default;
 
-    void createMarket(const StringView& mnem, const StringView& display,
-                      const StringView& contr, Jday settlDay, Jday expiryDay,
-                      MarketState state)
+    void createMarket(const StringView& mnem, const StringView& display, const StringView& contr,
+                      Jday settlDay, Jday expiryDay, MarketState state)
     {
         return doCreateMarket(mnem, display, contr, settlDay, expiryDay, state);
     }

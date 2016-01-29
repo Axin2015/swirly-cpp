@@ -25,7 +25,7 @@
 /**
  * Macro for exporting classes and functions that compose the public API.
  */
-#define SWIRLY_API __attribute__((visibility ("default")))
+#define SWIRLY_API __attribute__((visibility("default")))
 
 /**
  * Helper macro for "%.*s" arguments.

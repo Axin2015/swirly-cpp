@@ -36,6 +36,7 @@ class SWIRLY_API Exception : public std::exception {
     friend void format(Exception& e, const char* fmt, std::va_list args) noexcept;
 
     char msg_[128] = {'\0'};
+
  public:
     Exception() noexcept = default;
 
@@ -46,7 +47,7 @@ class SWIRLY_API Exception : public std::exception {
     {
         *this = rhs;
     }
-    Exception& operator =(const Exception& rhs) noexcept
+    Exception& operator=(const Exception& rhs) noexcept
     {
         std::strcpy(msg_, rhs.msg_);
         return *this;
@@ -54,7 +55,7 @@ class SWIRLY_API Exception : public std::exception {
 
     // Move.
     Exception(Exception&&) noexcept = default;
-    Exception& operator =(Exception&&) noexcept = default;
+    Exception& operator=(Exception&&) noexcept = default;
 
     const char* what() const noexcept override;
 };

@@ -24,9 +24,7 @@ BOOST_AUTO_TEST_CASE(FinallyCase)
 {
     bool success{false};
     {
-        auto finally = makeFinally([&success]() {
-                success = true;
-            });
+        auto finally = makeFinally([&success]() { success = true; });
         BOOST_CHECK(!success);
     }
     BOOST_CHECK(success);

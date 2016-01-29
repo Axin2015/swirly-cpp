@@ -31,18 +31,18 @@ namespace swirly {
  * @{
  */
 
-enum class Iden : int64_t { };
+enum class Iden : int64_t {};
 
-constexpr Iden operator ""_id(unsigned long long val) noexcept
+constexpr Iden operator""_id(unsigned long long val) noexcept
 {
     return box<Iden>(val);
 }
 
 using Incs = int64_t;
 
-enum class Lots : Incs { };
+enum class Lots : Incs {};
 
-constexpr Lots operator ""_lts(unsigned long long val) noexcept
+constexpr Lots operator""_lts(unsigned long long val) noexcept
 {
     return box<Lots>(val);
 }
@@ -50,9 +50,9 @@ constexpr Lots operator ""_lts(unsigned long long val) noexcept
 /**
  * Unit representing the minimum price increment.
  */
-enum class Ticks : Incs { };
+enum class Ticks : Incs {};
 
-constexpr Ticks operator ""_tks(unsigned long long val) noexcept
+constexpr Ticks operator""_tks(unsigned long long val) noexcept
 {
     return box<Ticks>(val);
 }
@@ -60,9 +60,9 @@ constexpr Ticks operator ""_tks(unsigned long long val) noexcept
 /**
  * Sum of lots and ticks.
  */
-enum class Cost : Incs { };
+enum class Cost : Incs {};
 
-constexpr Cost operator ""_cst(unsigned long long val) noexcept
+constexpr Cost operator""_cst(unsigned long long val) noexcept
 {
     return box<Cost>(val);
 }
@@ -112,14 +112,7 @@ using Mnem = StringBuf<MNEM_MAX>;
  */
 using Ref = StringBuf<REF_MAX>;
 
-enum class AssetType {
-    COMMODITY = 1,
-    CORPORATE,
-    CURRENCY,
-    EQUITY,
-    GOVERNMENT,
-    INDEX
-};
+enum class AssetType { COMMODITY = 1, CORPORATE, CURRENCY, EQUITY, GOVERNMENT, INDEX };
 
 SWIRLY_API const char* enumString(AssetType type);
 
@@ -206,10 +199,7 @@ struct EnumTraits<Role> {
     }
 };
 
-enum class Side {
-    BUY = 1,
-    SELL = -1
-};
+enum class Side { BUY = 1, SELL = -1 };
 
 SWIRLY_API const char* enumString(Side side);
 

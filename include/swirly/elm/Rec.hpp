@@ -37,11 +37,12 @@ class SWIRLY_API Rec : public Comparable<Rec> {
     const RecType type_;
     const Mnem mnem_;
     Display display_;
+
  public:
     Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
-    :   type_{type},
-        mnem_{mnem},
-        display_{display}
+        : type_{type},
+          mnem_{mnem},
+          display_{display}
     {
     }
 
@@ -49,11 +50,11 @@ class SWIRLY_API Rec : public Comparable<Rec> {
 
     // Copy.
     Rec(const Rec&);
-    Rec& operator =(const Rec&) = delete;
+    Rec& operator=(const Rec&) = delete;
 
     // Move.
     Rec(Rec&&);
-    Rec& operator =(Rec&&) = delete;
+    Rec& operator=(Rec&&) = delete;
 
     void setDisplay(const StringView& display) noexcept
     {
@@ -89,33 +90,31 @@ class SWIRLY_API Rec : public Comparable<Rec> {
 template <typename RecT>
 class RecSet {
     struct ValueCompare {
-        bool operator ()(const Rec& lhs, const Rec& rhs) const noexcept
+        bool operator()(const Rec& lhs, const Rec& rhs) const noexcept
         {
             return lhs.mnem() < rhs.mnem();
         }
     };
     struct KeyValueCompare {
-        bool operator ()(const StringView& lhs, const Rec& rhs) const noexcept
+        bool operator()(const StringView& lhs, const Rec& rhs) const noexcept
         {
             return lhs < rhs.mnem();
         }
-        bool operator ()(const Rec& lhs, const StringView& rhs) const noexcept
+        bool operator()(const Rec& lhs, const StringView& rhs) const noexcept
         {
             return lhs.mnem() < rhs;
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<RecT, decltype(RecT::mnemHook_),
-                                                           &RecT::mnemHook_>;
-    using Set = boost::intrusive::set<RecT,
-                                      ConstantTimeSizeOption,
-                                      CompareOption,
-                                      MemberHookOption
-                                      >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<RecT, decltype(RecT::mnemHook_), &RecT::mnemHook_>;
+    using Set
+        = boost::intrusive::set<RecT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<RecT>;
 
     Set set_;
+
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -128,11 +127,11 @@ class RecSet {
 
     // Copy.
     RecSet(const RecSet&) = delete;
-    RecSet& operator =(const RecSet&) = delete;
+    RecSet& operator=(const RecSet&) = delete;
 
     // Move.
     RecSet(RecSet&&) = default;
-    RecSet& operator =(RecSet&&) = default;
+    RecSet& operator=(RecSet&&) = default;
 
     Iterator insert(ValuePtr value) noexcept
     {

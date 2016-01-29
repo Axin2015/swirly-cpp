@@ -33,6 +33,7 @@ namespace swirly {
  */
 class SWIRLY_API RefCounted {
     mutable int refs_ = 1;
+
  protected:
     virtual ~RefCounted() noexcept;
 
@@ -41,11 +42,11 @@ class SWIRLY_API RefCounted {
 
     // Copy.
     constexpr RefCounted(const RefCounted&) noexcept = default;
-    RefCounted& operator =(const RefCounted&) noexcept = default;
+    RefCounted& operator=(const RefCounted&) noexcept = default;
 
     // Move.
     constexpr RefCounted(RefCounted&&) noexcept = default;
-    RefCounted& operator =(RefCounted&&) noexcept = default;
+    RefCounted& operator=(RefCounted&&) noexcept = default;
 
     void addRef() const noexcept
     {

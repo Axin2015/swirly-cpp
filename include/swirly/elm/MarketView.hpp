@@ -53,11 +53,11 @@ class SWIRLY_API MarketView {
 
     // Copy.
     MarketView(const MarketView&);
-    MarketView& operator =(const MarketView&) = delete;
+    MarketView& operator=(const MarketView&) = delete;
 
     // Move.
     MarketView(MarketView&&);
-    MarketView& operator =(MarketView&&) = delete;
+    MarketView& operator=(MarketView&&) = delete;
 
     StringView market() const noexcept
     {

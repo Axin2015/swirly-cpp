@@ -52,16 +52,15 @@ class SWIRLY_API Request : public RefCounted {
  public:
     Request(const StringView& trader, const StringView& market, const StringView& contr,
             Jday settlDay, Iden id, const StringView& ref, Side side, Lots lots,
-            Millis created) noexcept
-    :   trader_{trader},
-        market_{market},
-        contr_{contr},
-        settlDay_{settlDay},
-        id_{id},
-        ref_{ref},
-        side_{side},
-        lots_{lots},
-        created_{created}
+            Millis created) noexcept : trader_{trader},
+                                       market_{market},
+                                       contr_{contr},
+                                       settlDay_{settlDay},
+                                       id_{id},
+                                       ref_{ref},
+                                       side_{side},
+                                       lots_{lots},
+                                       created_{created}
     {
     }
 
@@ -69,11 +68,11 @@ class SWIRLY_API Request : public RefCounted {
 
     // Copy.
     Request(const Request&) = delete;
-    Request& operator =(const Request&) = delete;
+    Request& operator=(const Request&) = delete;
 
     // Move.
     Request(Request&&);
-    Request& operator =(Request&&) = delete;
+    Request& operator=(Request&&) = delete;
 
     StringView trader() const noexcept
     {
@@ -131,20 +130,20 @@ class RequestIdSet {
                 result = swirly::compare(lhs.id(), rhs.id());
             return result;
         }
-        bool operator ()(const Request& lhs, const Request& rhs) const noexcept
+        bool operator()(const Request& lhs, const Request& rhs) const noexcept
         {
             return compare(lhs, rhs) < 0;
         }
     };
     struct KeyValueCompare {
-        bool operator ()(const Key& lhs, const Request& rhs) const noexcept
+        bool operator()(const Key& lhs, const Request& rhs) const noexcept
         {
             int result{std::get<0>(lhs).compare(rhs.market())};
             if (result == 0)
                 result = swirly::compare(std::get<1>(lhs), rhs.id());
             return result < 0;
         }
-        bool operator ()(const Request& lhs, const Key& rhs) const noexcept
+        bool operator()(const Request& lhs, const Key& rhs) const noexcept
         {
             int result{lhs.market().compare(std::get<0>(rhs))};
             if (result == 0)
@@ -154,16 +153,14 @@ class RequestIdSet {
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<RequestT, decltype(RequestT::idHook_),
-                                                           &RequestT::idHook_>;
-    using Set = boost::intrusive::set<RequestT,
-                                      ConstantTimeSizeOption,
-                                      CompareOption,
-                                      MemberHookOption
-                                      >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<RequestT, decltype(RequestT::idHook_), &RequestT::idHook_>;
+    using Set
+        = boost::intrusive::set<RequestT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<RequestT>;
 
     Set set_;
+
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -177,11 +174,11 @@ class RequestIdSet {
 
     // Copy.
     RequestIdSet(const RequestIdSet&) = delete;
-    RequestIdSet& operator =(const RequestIdSet&) = delete;
+    RequestIdSet& operator=(const RequestIdSet&) = delete;
 
     // Move.
     RequestIdSet(RequestIdSet&&) = default;
-    RequestIdSet& operator =(RequestIdSet&&) = default;
+    RequestIdSet& operator=(RequestIdSet&&) = default;
 
     Iterator insert(const ValuePtr& value) noexcept
     {

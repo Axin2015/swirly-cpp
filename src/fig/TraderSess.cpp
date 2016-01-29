@@ -26,7 +26,7 @@ TraderSess::~TraderSess() noexcept = default;
 
 TraderSess::TraderSess(TraderSess&&) = default;
 
-PosnPtr TraderSess::lazyPosn(const StringView& contr, Jday settlDay) throw (std::bad_alloc)
+PosnPtr TraderSess::lazyPosn(const StringView& contr, Jday settlDay) throw(std::bad_alloc)
 {
     TraderPosnSet::Iterator it;
     bool found;

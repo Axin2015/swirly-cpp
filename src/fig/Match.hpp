@@ -40,11 +40,11 @@ struct Match {
 
     // Copy.
     Match(const Match&);
-    Match& operator =(const Match&) = delete;
+    Match& operator=(const Match&) = delete;
 
     // Move.
     Match(Match&&);
-    Match& operator =(Match&&) = delete;
+    Match& operator=(Match&&) = delete;
 };
 
 /** @} */

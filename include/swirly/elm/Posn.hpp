@@ -44,15 +44,14 @@ class SWIRLY_API Posn : public RefCounted {
  public:
     boost::intrusive::set_member_hook<> traderHook_;
 
-    Posn(const StringView& trader, const StringView& contr, Jday settlDay,
-         Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) noexcept
-    :   trader_{trader},
-        contr_{contr},
-        settlDay_{settlDay},
-        buyLots_{buyLots},
-        buyCost_{buyCost},
-        sellLots_{sellLots},
-        sellCost_{sellCost}
+    Posn(const StringView& trader, const StringView& contr, Jday settlDay, Lots buyLots,
+         Cost buyCost, Lots sellLots, Cost sellCost) noexcept : trader_{trader},
+                                                                contr_{contr},
+                                                                settlDay_{settlDay},
+                                                                buyLots_{buyLots},
+                                                                buyCost_{buyCost},
+                                                                sellLots_{sellLots},
+                                                                sellCost_{sellCost}
     {
     }
 
@@ -60,11 +59,11 @@ class SWIRLY_API Posn : public RefCounted {
 
     // Copy.
     Posn(const Posn&) = delete;
-    Posn& operator =(const Posn&) = delete;
+    Posn& operator=(const Posn&) = delete;
 
     // Move.
     Posn(Posn&&);
-    Posn& operator =(Posn&&) = delete;
+    Posn& operator=(Posn&&) = delete;
 
     StringView trader() const noexcept
     {
@@ -108,20 +107,20 @@ class SWIRLY_API TraderPosnSet {
                 result = swirly::compare(lhs.settlDay(), rhs.settlDay());
             return result;
         }
-        bool operator ()(const Posn& lhs, const Posn& rhs) const noexcept
+        bool operator()(const Posn& lhs, const Posn& rhs) const noexcept
         {
             return compare(lhs, rhs) < 0;
         }
     };
     struct KeyValueCompare {
-        bool operator ()(const Key& lhs, const Posn& rhs) const noexcept
+        bool operator()(const Key& lhs, const Posn& rhs) const noexcept
         {
             int result{std::get<0>(lhs).compare(rhs.contr())};
             if (result == 0)
                 result = swirly::compare(std::get<1>(lhs), rhs.settlDay());
             return result < 0;
         }
-        bool operator ()(const Posn& lhs, const Key& rhs) const noexcept
+        bool operator()(const Posn& lhs, const Key& rhs) const noexcept
         {
             int result{lhs.contr().compare(std::get<0>(rhs))};
             if (result == 0)
@@ -131,16 +130,14 @@ class SWIRLY_API TraderPosnSet {
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<Posn, decltype(Posn::traderHook_),
-                                                           &Posn::traderHook_>;
-    using Set = boost::intrusive::set<Posn,
-                                      ConstantTimeSizeOption,
-                                      CompareOption,
-                                      MemberHookOption
-                                      >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Posn, decltype(Posn::traderHook_), &Posn::traderHook_>;
+    using Set
+        = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Posn>;
 
     Set set_;
+
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -151,11 +148,11 @@ class SWIRLY_API TraderPosnSet {
 
     // Copy.
     TraderPosnSet(const TraderPosnSet&) = delete;
-    TraderPosnSet& operator =(const TraderPosnSet&) = delete;
+    TraderPosnSet& operator=(const TraderPosnSet&) = delete;
 
     // Move.
     TraderPosnSet(TraderPosnSet&&);
-    TraderPosnSet& operator =(TraderPosnSet&&);
+    TraderPosnSet& operator=(TraderPosnSet&&);
 
     Iterator insert(const ValuePtr& value) noexcept;
 

@@ -47,11 +47,11 @@ class SWIRLY_API Market : public Rec {
 
     // Copy.
     Market(const Market&);
-    Market& operator =(const Market&) = delete;
+    Market& operator=(const Market&) = delete;
 
     // Move.
     Market(Market&&);
-    Market& operator =(Market&&) = delete;
+    Market& operator=(Market&&) = delete;
 
     void setState(MarketState state) noexcept
     {

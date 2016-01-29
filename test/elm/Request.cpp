@@ -24,12 +24,13 @@ using namespace swirly;
 namespace {
 class Foo : public Request {
     int& alive_;
+
  public:
     boost::intrusive::set_member_hook<> idHook_;
 
     Foo(const StringView& market, Iden id, int& alive) noexcept
-    :   Request{"", market, "", 0_jd, id, "", Side::BUY, 0_lts, 0_ms},
-        alive_{alive}
+        : Request{"", market, "", 0_jd, id, "", Side::BUY, 0_lts, 0_ms},
+          alive_{alive}
     {
         ++alive;
     }

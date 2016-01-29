@@ -51,20 +51,20 @@ class SWIRLY_API MarketBook : public Market {
 
  public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-               Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept;
+               Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
+               Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept;
 
     ~MarketBook() noexcept override;
 
     // Copy.
     MarketBook(const MarketBook&) = default;
-    MarketBook& operator =(const MarketBook&) = default;
+    MarketBook& operator=(const MarketBook&) = default;
 
     // Move.
     MarketBook(MarketBook&&) = default;
-    MarketBook& operator =(MarketBook&&) = default;
+    MarketBook& operator=(MarketBook&&) = default;
 
-    void insertOrder(const OrderPtr& order) throw (std::bad_alloc)
+    void insertOrder(const OrderPtr& order) throw(std::bad_alloc)
     {
         side(order->side()).insertOrder(order);
     }
@@ -72,7 +72,7 @@ class SWIRLY_API MarketBook : public Market {
     {
         side(order.side()).removeOrder(order);
     }
-    void createOrder(const OrderPtr& order, Millis now) throw (std::bad_alloc)
+    void createOrder(const OrderPtr& order, Millis now) throw(std::bad_alloc)
     {
         side(order->side()).createOrder(order, now);
     }

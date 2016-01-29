@@ -30,19 +30,18 @@ namespace swirly {
 /**
  * Helper macro for implementing enumString() case statements.
  */
-#define SWIRLY_ENUM_CASE(type, val) case type::val: return #val; break
+#define SWIRLY_ENUM_CASE(type, val)                                                                \
+    case type::val:                                                                                \
+        return #val;                                                                               \
+        break
 
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
 {
     return static_cast<EnumT>(val);
 }
 
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
 {
     return static_cast<typename std::underlying_type_t<EnumT>>(val);
@@ -56,10 +55,8 @@ struct EnumTraits {
     }
 };
 
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-std::ostream& operator <<(std::ostream& os, EnumT val) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+std::ostream& operator<<(std::ostream& os, EnumT val) noexcept
 {
     EnumTraits<EnumT>::print(os, val);
     return os;
@@ -72,10 +69,8 @@ namespace enumops {
 /**
  * Addition assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator +=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator+=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) + unbox(rhs));
     return lhs;
@@ -84,10 +79,8 @@ constexpr EnumT& operator +=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Subtraction assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator -=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator-=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) - unbox(rhs));
     return lhs;
@@ -96,10 +89,8 @@ constexpr EnumT& operator -=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Multiplication assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator *=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator*=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) * unbox(rhs));
     return lhs;
@@ -108,10 +99,8 @@ constexpr EnumT& operator *=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Division assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator /=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator/=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) / unbox(rhs));
     return lhs;
@@ -120,10 +109,8 @@ constexpr EnumT& operator /=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Modulo assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator %=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator%=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) % unbox(rhs));
     return lhs;
@@ -132,10 +119,8 @@ constexpr EnumT& operator %=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Bitwise AND assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator &=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator&=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) & unbox(rhs));
     return lhs;
@@ -144,10 +129,8 @@ constexpr EnumT& operator &=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Bitwise OR assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator |=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator|=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) | unbox(rhs));
     return lhs;
@@ -156,10 +139,8 @@ constexpr EnumT& operator |=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Bitwise XOR assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator ^=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator^=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) ^ unbox(rhs));
     return lhs;
@@ -168,10 +149,8 @@ constexpr EnumT& operator ^=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Bitwise left shift assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator <<=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator<<=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) << unbox(rhs));
     return lhs;
@@ -180,10 +159,8 @@ constexpr EnumT& operator <<=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Bitwise right shift assignment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator >>=(EnumT& lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator>>=(EnumT& lhs, EnumT rhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) >> unbox(rhs));
     return lhs;
@@ -194,10 +171,8 @@ constexpr EnumT& operator >>=(EnumT& lhs, EnumT rhs) noexcept
 /**
  * Pre-increment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator ++(EnumT& lhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator++(EnumT& lhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) + 1);
     return lhs;
@@ -206,10 +181,8 @@ constexpr EnumT& operator ++(EnumT& lhs) noexcept
 /**
  * Pre-decrement.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT& operator --(EnumT& lhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT& operator--(EnumT& lhs) noexcept
 {
     lhs = box<EnumT>(unbox(lhs) - 1);
     return lhs;
@@ -218,10 +191,8 @@ constexpr EnumT& operator --(EnumT& lhs) noexcept
 /**
  * Post-increment.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator ++(EnumT& lhs, int) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator++(EnumT& lhs, int)noexcept
 {
     const EnumT prev{lhs};
     lhs = box<EnumT>(unbox(lhs) + 1);
@@ -231,10 +202,8 @@ constexpr EnumT operator ++(EnumT& lhs, int) noexcept
 /**
  * Post-decrement.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator --(EnumT& lhs, int) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator--(EnumT& lhs, int)noexcept
 {
     const EnumT prev{lhs};
     lhs = box<EnumT>(unbox(lhs) - 1);
@@ -246,10 +215,8 @@ constexpr EnumT operator --(EnumT& lhs, int) noexcept
 /**
  * Unary plus.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator +(EnumT lhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator+(EnumT lhs) noexcept
 {
     return box<EnumT>(+unbox(lhs));
 }
@@ -257,10 +224,8 @@ constexpr EnumT operator +(EnumT lhs) noexcept
 /**
  * Unary minus.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator -(EnumT lhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator-(EnumT lhs) noexcept
 {
     return box<EnumT>(-unbox(lhs));
 }
@@ -268,10 +233,8 @@ constexpr EnumT operator -(EnumT lhs) noexcept
 /**
  * Addition.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator +(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator+(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) + unbox(rhs));
 }
@@ -279,10 +242,8 @@ constexpr EnumT operator +(EnumT lhs, EnumT rhs) noexcept
 /**
  * Subtraction.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator -(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator-(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) - unbox(rhs));
 }
@@ -290,10 +251,8 @@ constexpr EnumT operator -(EnumT lhs, EnumT rhs) noexcept
 /**
  * Multiplication.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator *(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator*(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) * unbox(rhs));
 }
@@ -301,10 +260,8 @@ constexpr EnumT operator *(EnumT lhs, EnumT rhs) noexcept
 /**
  * Division.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator /(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator/(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) / unbox(rhs));
 }
@@ -312,10 +269,8 @@ constexpr EnumT operator /(EnumT lhs, EnumT rhs) noexcept
 /**
  * Modulo.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator %(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator%(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) % unbox(rhs));
 }
@@ -323,10 +278,8 @@ constexpr EnumT operator %(EnumT lhs, EnumT rhs) noexcept
 /**
  * Bitwise NOT.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator ~(EnumT lhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator~(EnumT lhs) noexcept
 {
     return box<EnumT>(~unbox(lhs));
 }
@@ -334,10 +287,8 @@ constexpr EnumT operator ~(EnumT lhs) noexcept
 /**
  * Bitwise AND.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator &(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator&(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) & unbox(rhs));
 }
@@ -345,10 +296,8 @@ constexpr EnumT operator &(EnumT lhs, EnumT rhs) noexcept
 /**
  * Bitwise OR.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator |(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator|(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) | unbox(rhs));
 }
@@ -356,10 +305,8 @@ constexpr EnumT operator |(EnumT lhs, EnumT rhs) noexcept
 /**
  * Bitwise XOR.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator ^(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator^(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) ^ unbox(rhs));
 }
@@ -367,10 +314,8 @@ constexpr EnumT operator ^(EnumT lhs, EnumT rhs) noexcept
 /**
  * Bitwise left shift.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator <<(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator<<(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) << unbox(rhs));
 }
@@ -378,10 +323,8 @@ constexpr EnumT operator <<(EnumT lhs, EnumT rhs) noexcept
 /**
  * Bitwise right shift.
  */
-template <typename EnumT,
-          typename = std::enable_if_t<std::is_enum<EnumT>::value>
-          >
-constexpr EnumT operator >>(EnumT lhs, EnumT rhs) noexcept
+template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
+constexpr EnumT operator>>(EnumT lhs, EnumT rhs) noexcept
 {
     return box<EnumT>(unbox(lhs) >> unbox(rhs));
 }

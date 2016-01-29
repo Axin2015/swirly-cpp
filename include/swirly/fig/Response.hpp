@@ -46,11 +46,11 @@ class SWIRLY_API Response {
 
     // Copy.
     Response(const Response&);
-    Response& operator =(const Response&);
+    Response& operator=(const Response&);
 
     // Move.
     Response(Response&&) noexcept;
-    Response& operator =(Response&&) noexcept;
+    Response& operator=(Response&&) noexcept;
 
     void reset(const MarketBook& book) noexcept
     {

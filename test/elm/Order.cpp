@@ -21,7 +21,7 @@
 using namespace std;
 using namespace swirly;
 
-static_assert(sizeof(Order) <= 6*64, "crossed cache-line boundary");
+static_assert(sizeof(Order) <= 6 * 64, "crossed cache-line boundary");
 
 BOOST_AUTO_TEST_SUITE(OrderSuite)
 
