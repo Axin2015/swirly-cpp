@@ -237,7 +237,18 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
                 book.removeOrder(*order);
             }
         });
-        // FIXME: write to journal.
+
+        const size_t len{1 + matches.size() * 2};
+        Exec* execs[len];
+
+        execs[0] = exec.get();
+        int i{1};
+        for (const auto& match : matches) {
+            execs[i] = match.makerTrade.get();
+            execs[i + 1] = match.takerTrade.get();
+            i += 2;
+        }
+        impl_->journ.createExec(book.mnem(), makeArrayView(execs, len));
         success = true;
     }
     // Avoid allocating position when there are no matches.
