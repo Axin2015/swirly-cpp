@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -20,7 +20,7 @@ using namespace std;
 
 namespace swirly {
 
-LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw (std::bad_alloc)
+LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw(std::bad_alloc)
 {
     LevelSet::Iterator it;
     bool found;
@@ -74,7 +74,7 @@ BookSide::~BookSide() noexcept = default;
 
 BookSide::BookSide(BookSide&&) = default;
 
-void BookSide::insertOrder(const OrderPtr& order) throw (std::bad_alloc)
+void BookSide::insertOrder(const OrderPtr& order) throw(std::bad_alloc)
 {
     assert(order->level() != nullptr);
     assert(order->ticks() != 0_tks);

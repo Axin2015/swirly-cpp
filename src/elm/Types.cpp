@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -23,12 +23,12 @@ namespace swirly {
 const char* enumString(AssetType type)
 {
     switch (type) {
-    SWIRLY_ENUM_CASE(AssetType, COMMODITY);
-    SWIRLY_ENUM_CASE(AssetType, CORPORATE);
-    SWIRLY_ENUM_CASE(AssetType, CURRENCY);
-    SWIRLY_ENUM_CASE(AssetType, EQUITY);
-    SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
-    SWIRLY_ENUM_CASE(AssetType, INDEX);
+        SWIRLY_ENUM_CASE(AssetType, COMMODITY);
+        SWIRLY_ENUM_CASE(AssetType, CORPORATE);
+        SWIRLY_ENUM_CASE(AssetType, CURRENCY);
+        SWIRLY_ENUM_CASE(AssetType, EQUITY);
+        SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
+        SWIRLY_ENUM_CASE(AssetType, INDEX);
     }
     terminate();
 }
@@ -36,8 +36,8 @@ const char* enumString(AssetType type)
 const char* enumString(Direct direct)
 {
     switch (direct) {
-    SWIRLY_ENUM_CASE(Direct, PAID);
-    SWIRLY_ENUM_CASE(Direct, GIVEN);
+        SWIRLY_ENUM_CASE(Direct, PAID);
+        SWIRLY_ENUM_CASE(Direct, GIVEN);
     }
     terminate();
 }
@@ -45,10 +45,10 @@ const char* enumString(Direct direct)
 const char* enumString(RecType type)
 {
     switch (type) {
-    SWIRLY_ENUM_CASE(RecType, ASSET);
-    SWIRLY_ENUM_CASE(RecType, CONTR);
-    SWIRLY_ENUM_CASE(RecType, MARKET);
-    SWIRLY_ENUM_CASE(RecType, TRADER);
+        SWIRLY_ENUM_CASE(RecType, ASSET);
+        SWIRLY_ENUM_CASE(RecType, CONTR);
+        SWIRLY_ENUM_CASE(RecType, MARKET);
+        SWIRLY_ENUM_CASE(RecType, TRADER);
     }
     terminate();
 }
@@ -56,9 +56,9 @@ const char* enumString(RecType type)
 const char* enumString(Role role)
 {
     switch (role) {
-    SWIRLY_ENUM_CASE(Role, NONE);
-    SWIRLY_ENUM_CASE(Role, MAKER);
-    SWIRLY_ENUM_CASE(Role, TAKER);
+        SWIRLY_ENUM_CASE(Role, NONE);
+        SWIRLY_ENUM_CASE(Role, MAKER);
+        SWIRLY_ENUM_CASE(Role, TAKER);
     }
     terminate();
 }
@@ -66,8 +66,8 @@ const char* enumString(Role role)
 const char* enumString(Side side)
 {
     switch (side) {
-    SWIRLY_ENUM_CASE(Side, BUY);
-    SWIRLY_ENUM_CASE(Side, SELL);
+        SWIRLY_ENUM_CASE(Side, BUY);
+        SWIRLY_ENUM_CASE(Side, SELL);
     }
     terminate();
 }
@@ -75,12 +75,11 @@ const char* enumString(Side side)
 const char* enumString(State state)
 {
     switch (state) {
-    SWIRLY_ENUM_CASE(State, NONE);
-    SWIRLY_ENUM_CASE(State, NEW);
-    SWIRLY_ENUM_CASE(State, REVISE);
-    SWIRLY_ENUM_CASE(State, CANCEL);
-    SWIRLY_ENUM_CASE(State, TRADE);
-    SWIRLY_ENUM_CASE(State, PECAN);
+        SWIRLY_ENUM_CASE(State, NONE);
+        SWIRLY_ENUM_CASE(State, NEW);
+        SWIRLY_ENUM_CASE(State, REVISE);
+        SWIRLY_ENUM_CASE(State, CANCEL);
+        SWIRLY_ENUM_CASE(State, TRADE);
     }
     terminate();
 }

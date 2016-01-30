@@ -115,7 +115,6 @@ Where type is: order, trade, posn, quote, or view.
 | lots        | Long               | Yes   |
 | ticks       | Long               | Yes   |
 | ref         | String             | No    |
-| quoteId     | Long               | No    |
 | minLots     | Long               | No    |
 
 ### Create Trade ###

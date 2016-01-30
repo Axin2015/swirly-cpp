@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -20,26 +20,25 @@ namespace swirly {
 
 MarketView::MarketView(const StringView& market, const StringView& contr, Jday settlDay,
                        Lots lastLots, Ticks lastTicks, Millis lastTime,
-                       const MarketData& data) noexcept
-:   market_{market},
-    contr_{contr},
-    settlDay_{settlDay},
-    lastLots_{lastLots},
-    lastTicks_{lastTicks},
-    lastTime_{lastTime},
-    data_{data}
+                       const MarketData& data) noexcept : market_{market},
+                                                          contr_{contr},
+                                                          settlDay_{settlDay},
+                                                          lastLots_{lastLots},
+                                                          lastTicks_{lastTicks},
+                                                          lastTime_{lastTime},
+                                                          data_{data}
 {
 }
 
 MarketView::MarketView(const StringView& market, const StringView& contr, Jday settlDay,
                        Lots lastLots, Ticks lastTicks, Millis lastTime) noexcept
-:   market_{market},
-    contr_{contr},
-    settlDay_{settlDay},
-    lastLots_{lastLots},
-    lastTicks_{lastTicks},
-    lastTime_{lastTime},
-    data_{}
+    : market_{market},
+      contr_{contr},
+      settlDay_{settlDay},
+      lastLots_{lastLots},
+      lastTicks_{lastTicks},
+      lastTime_{lastTime},
+      data_{}
 {
 }
 

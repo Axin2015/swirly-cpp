@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -23,20 +23,20 @@ namespace swirly {
 Contr::Contr(const StringView& mnem, const StringView& display, const StringView& asset,
              const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
              int pipDp, Lots minLots, Lots maxLots) noexcept
-:   Rec{RecType::CONTR, mnem, display},
-    asset_{asset},
-    ccy_{ccy},
-    lotNumer_{lotNumer},
-    lotDenom_{lotDenom},
-    qtyInc_{fractToReal(lotNumer, lotDenom)},
-    tickNumer_{tickNumer},
-    tickDenom_{tickDenom},
-    priceInc_{fractToReal(tickNumer, tickDenom)},
-    pipDp_{pipDp},
-    qtyDp_{realToDp(qtyInc_)},
-    priceDp_{realToDp(priceInc_)},
-    minLots_{minLots},
-    maxLots_{maxLots}
+    : Rec{RecType::CONTR, mnem, display},
+      asset_{asset},
+      ccy_{ccy},
+      lotNumer_{lotNumer},
+      lotDenom_{lotDenom},
+      qtyInc_{fractToReal(lotNumer, lotDenom)},
+      tickNumer_{tickNumer},
+      tickDenom_{tickDenom},
+      priceInc_{fractToReal(tickNumer, tickDenom)},
+      pipDp_{pipDp},
+      qtyDp_{realToDp(qtyInc_)},
+      priceDp_{realToDp(priceInc_)},
+      minLots_{minLots},
+      maxLots_{maxLots}
 {
 }
 

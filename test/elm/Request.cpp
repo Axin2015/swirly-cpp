@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -24,12 +24,13 @@ using namespace swirly;
 namespace {
 class Foo : public Request {
     int& alive_;
+
  public:
     boost::intrusive::set_member_hook<> idHook_;
 
     Foo(const StringView& market, Iden id, int& alive) noexcept
-    :   Request{"", market, "", 0_jd, id, "", Side::BUY, 0_lts, 0_ms},
-        alive_{alive}
+        : Request{"", market, "", 0_jd, id, "", Side::BUY, 0_lts, 0_ms},
+          alive_{alive}
     {
         ++alive;
     }

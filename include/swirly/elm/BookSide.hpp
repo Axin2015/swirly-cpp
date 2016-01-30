@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -34,7 +34,7 @@ class SWIRLY_API BookSide {
     /**
      * Insert level. This function will only throw if a new level cannot be allocated.
      */
-    LevelSet::Iterator insertLevel(const OrderPtr& order) throw (std::bad_alloc);
+    LevelSet::Iterator insertLevel(const OrderPtr& order) throw(std::bad_alloc);
 
     void removeOrder(Level& level, const Order& order) noexcept;
 
@@ -47,18 +47,18 @@ class SWIRLY_API BookSide {
 
     // Copy.
     BookSide(const BookSide&) = delete;
-    BookSide& operator =(const BookSide&) = delete;
+    BookSide& operator=(const BookSide&) = delete;
 
     // Move.
     BookSide(BookSide&&);
-    BookSide& operator =(BookSide&&) = delete;
+    BookSide& operator=(BookSide&&) = delete;
 
     /**
      * Insert order into side. Assumes that the order does not already belong to a side. I.e. it
      * assumes that level member is null. Assumes that order-id and reference are unique. This
      * function will only throw if a new level cannot be allocated.
      */
-    void insertOrder(const OrderPtr& order) throw (std::bad_alloc);
+    void insertOrder(const OrderPtr& order) throw(std::bad_alloc);
 
     /**
      * Remove order from side. Internal housekeeping aside, the state of the order is not affected
@@ -71,7 +71,7 @@ class SWIRLY_API BookSide {
             removeOrder(*level, order);
         }
     }
-    void createOrder(const OrderPtr& order, Millis now) throw (std::bad_alloc)
+    void createOrder(const OrderPtr& order, Millis now) throw(std::bad_alloc)
     {
         order->create(now);
         insertOrder(order);

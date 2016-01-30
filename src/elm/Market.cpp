@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -22,11 +22,11 @@ namespace swirly {
 
 Market::Market(const StringView& mnem, const StringView& display, const StringView& contr,
                Jday settlDay, Jday expiryDay, MarketState state) noexcept
-:   Rec{RecType::MARKET, mnem, display},
-    contr_{contr},
-    settlDay_{settlDay},
-    expiryDay_{expiryDay},
-    state_{state}
+    : Rec{RecType::MARKET, mnem, display},
+      contr_{contr},
+      settlDay_{settlDay},
+      expiryDay_{expiryDay},
+      state_{state}
 {
     assert((settlDay == 0_jd) == (expiryDay == 0_jd));
 }

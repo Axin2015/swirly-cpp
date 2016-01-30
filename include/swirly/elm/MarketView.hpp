@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -53,11 +53,11 @@ class SWIRLY_API MarketView {
 
     // Copy.
     MarketView(const MarketView&);
-    MarketView& operator =(const MarketView&) = delete;
+    MarketView& operator=(const MarketView&) = delete;
 
     // Move.
     MarketView(MarketView&&);
-    MarketView& operator =(MarketView&&) = delete;
+    MarketView& operator=(MarketView&&) = delete;
 
     StringView market() const noexcept
     {

@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -26,13 +26,13 @@ namespace swirly {
  * @{
  */
 
-class Match {
+struct Match {
     const Lots lots;
     const OrderPtr makerOrder;
     const ExecPtr makerTrade;
     const PosnPtr makerPosn;
     const ExecPtr takerTrade;
- public:
+
     Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
           const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
@@ -40,11 +40,11 @@ class Match {
 
     // Copy.
     Match(const Match&);
-    Match& operator =(const Match&) = delete;
+    Match& operator=(const Match&) = delete;
 
     // Move.
     Match(Match&&);
-    Match& operator =(Match&&) = delete;
+    Match& operator=(Match&&) = delete;
 };
 
 /** @} */

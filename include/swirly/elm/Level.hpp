@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -63,6 +63,7 @@ class SWIRLY_API Level : public Comparable<Level> {
      * Must be greater than zero.
      */
     int count_;
+
  public:
     boost::intrusive::set_member_hook<> keyHook_;
 
@@ -72,11 +73,11 @@ class SWIRLY_API Level : public Comparable<Level> {
 
     // Copy.
     Level(const Level&) = delete;
-    Level& operator =(const Level&) = delete;
+    Level& operator=(const Level&) = delete;
 
     // Move.
     Level(Level&&);
-    Level& operator =(Level&&) = delete;
+    Level& operator=(Level&&) = delete;
 
     void setFirstOrder(const Order& firstOrder) noexcept
     {
@@ -119,33 +120,31 @@ class SWIRLY_API Level : public Comparable<Level> {
 
 class SWIRLY_API LevelSet {
     struct ValueCompare {
-        bool operator ()(const Level& lhs, const Level& rhs) const noexcept
+        bool operator()(const Level& lhs, const Level& rhs) const noexcept
         {
             return lhs.key() < rhs.key();
         }
     };
     struct KeyValueCompare {
-        bool operator ()(LevelKey lhs, const Level& rhs) const noexcept
+        bool operator()(LevelKey lhs, const Level& rhs) const noexcept
         {
             return lhs < rhs.key();
         }
-        bool operator ()(const Level& lhs, LevelKey rhs) const noexcept
+        bool operator()(const Level& lhs, LevelKey rhs) const noexcept
         {
             return lhs.key() < rhs;
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<Level, decltype(Level::keyHook_),
-                                                           &Level::keyHook_>;
-    using Set = boost::intrusive::set<Level,
-                                      ConstantTimeSizeOption,
-                                      CompareOption,
-                                      MemberHookOption
-                                      >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Level, decltype(Level::keyHook_), &Level::keyHook_>;
+    using Set
+        = boost::intrusive::set<Level, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<Level>;
 
     Set set_;
+
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -155,11 +154,11 @@ class SWIRLY_API LevelSet {
 
     // Copy.
     LevelSet(const LevelSet&) = delete;
-    LevelSet& operator =(const LevelSet&) = delete;
+    LevelSet& operator=(const LevelSet&) = delete;
 
     // Move.
     LevelSet(LevelSet&&);
-    LevelSet& operator =(LevelSet&&);
+    LevelSet& operator=(LevelSet&&);
 
     Iterator insert(ValuePtr value) noexcept;
 

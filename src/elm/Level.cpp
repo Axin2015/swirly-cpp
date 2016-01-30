@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -23,11 +23,11 @@ using namespace std;
 namespace swirly {
 
 Level::Level(const Order& firstOrder) noexcept
-:   firstOrder_{&firstOrder},
-    key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
-    ticks_{firstOrder.ticks()},
-    resd_{firstOrder.resd()},
-    count_{1}
+    : firstOrder_{&firstOrder},
+      key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
+      ticks_{firstOrder.ticks()},
+      resd_{firstOrder.resd()},
+      count_{1}
 {
 }
 
@@ -56,7 +56,7 @@ LevelSet::~LevelSet() noexcept
 
 LevelSet::LevelSet(LevelSet&&) = default;
 
-LevelSet& LevelSet::operator =(LevelSet&&) = default;
+LevelSet& LevelSet::operator=(LevelSet&&) = default;
 
 LevelSet::Iterator LevelSet::insert(ValuePtr value) noexcept
 {
@@ -96,8 +96,7 @@ LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
 
 void LevelSet::remove(const Level& level) noexcept
 {
-    set_.erase_and_dispose(Set::s_iterator_to(level),
-                           [](Level* ptr) { delete ptr; });
+    set_.erase_and_dispose(Set::s_iterator_to(level), [](Level* ptr) { delete ptr; });
 }
 
 } // swirly

@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -59,11 +59,11 @@ class SWIRLY_API Contr : public Rec {
 
     // Copy.
     Contr(const Contr&);
-    Contr& operator =(const Contr&) = delete;
+    Contr& operator=(const Contr&) = delete;
 
     // Move.
     Contr(Contr&&);
-    Contr& operator =(Contr&&) = delete;
+    Contr& operator=(Contr&&) = delete;
 
     StringView asset() const noexcept
     {

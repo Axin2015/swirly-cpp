@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -25,13 +25,12 @@ using namespace std;
 namespace swirly {
 
 unique_ptr<Market> ServFactory::doNewMarket(const StringView& mnem, const StringView& display,
-                                            const StringView& contr, Jday settlDay,
-                                            Jday expiryDay, MarketState state, Lots lastLots,
-                                            Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                            Iden maxExecId, Iden maxQuoteId) const
+                                            const StringView& contr, Jday settlDay, Jday expiryDay,
+                                            MarketState state, Lots lastLots, Ticks lastTicks,
+                                            Millis lastTime, Iden maxOrderId, Iden maxExecId) const
 {
     return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state, lastLots,
-                                   lastTicks, lastTime, maxOrderId, maxExecId, maxQuoteId);
+                                   lastTicks, lastTime, maxOrderId, maxExecId);
 }
 
 unique_ptr<Trader> ServFactory::doNewTrader(const StringView& mnem, const StringView& display,

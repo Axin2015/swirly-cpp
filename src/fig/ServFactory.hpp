@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -24,10 +24,10 @@ namespace swirly {
 class SWIRLY_API ServFactory : public BasicFactory {
  protected:
     std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                        const StringView& contr, Jday settlDay,
-                                        Jday expiryDay, MarketState state, Lots lastLots,
-                                        Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                        Iden maxExecId, Iden maxQuoteId) const override;
+                                        const StringView& contr, Jday settlDay, Jday expiryDay,
+                                        MarketState state, Lots lastLots, Ticks lastTicks,
+                                        Millis lastTime, Iden maxOrderId,
+                                        Iden maxExecId) const override;
 
     std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
                                         const StringView& email) const override;
@@ -38,11 +38,11 @@ class SWIRLY_API ServFactory : public BasicFactory {
 
     // Copy.
     ServFactory(const ServFactory&) = default;
-    ServFactory& operator =(const ServFactory&) = default;
+    ServFactory& operator=(const ServFactory&) = default;
 
     // Move.
     ServFactory(ServFactory&&) = default;
-    ServFactory& operator =(ServFactory&&) = default;
+    ServFactory& operator=(ServFactory&&) = default;
 };
 
 } // swirly

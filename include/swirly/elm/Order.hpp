@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -39,14 +39,12 @@ class SWIRLY_API Order : public Request {
     // Internals.
     mutable Level* level_{nullptr};
 
-    const Iden quoteId_;
     State state_;
     const Ticks ticks_;
     /**
      * Must be greater than zero.
      */
     Lots resd_;
-    Lots quotd_{0_lts};
     /**
      * Must not be greater that lots.
      */
@@ -58,7 +56,6 @@ class SWIRLY_API Order : public Request {
      * Minimum to be filled by this order.
      */
     const Lots minLots_;
-    bool pecan_;
     Millis modified_;
 
  public:
@@ -67,21 +64,19 @@ class SWIRLY_API Order : public Request {
     boost::intrusive::list_member_hook<> listHook_;
 
     Order(const StringView& trader, const StringView& market, const StringView& contr,
-          Jday settlDay, Iden id, const StringView& ref, Iden quoteId, State state, Side side,
-          Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-          Lots minLots, bool pecan, Millis created, Millis modified) noexcept
-    :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-        quoteId_{quoteId},
-        state_{state},
-        ticks_{ticks},
-        resd_{resd},
-        exec_{exec},
-        cost_{cost},
-        lastLots_{lastLots},
-        lastTicks_{lastTicks},
-        minLots_{minLots},
-        pecan_{pecan},
-        modified_{modified}
+          Jday settlDay, Iden id, const StringView& ref, State state, Side side, Lots lots,
+          Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
+          Lots minLots, Millis created, Millis modified) noexcept
+        : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+          state_{state},
+          ticks_{ticks},
+          resd_{resd},
+          exec_{exec},
+          cost_{cost},
+          lastLots_{lastLots},
+          lastTicks_{lastTicks},
+          minLots_{minLots},
+          modified_{modified}
     {
     }
 
@@ -89,11 +84,11 @@ class SWIRLY_API Order : public Request {
 
     // Copy.
     Order(const Order&) = delete;
-    Order& operator =(const Order&) = delete;
+    Order& operator=(const Order&) = delete;
 
     // Move.
     Order(Order&&);
-    Order& operator =(Order&&) = delete;
+    Order& operator=(Order&&) = delete;
 
     void setLevel(Level* level) const noexcept
     {
@@ -125,19 +120,12 @@ class SWIRLY_API Order : public Request {
     }
     void cancel(Millis now) noexcept
     {
-        if (quotd_ <= 0_lts) {
-            state_ = State::CANCEL;
-            // Note that executed lots is not affected.
-            resd_ = 0_lts;
-            pecan_ = false;
-        } else {
-            state_ = State::PECAN;
-            pecan_ = true;
-        }
+        state_ = State::CANCEL;
+        // Note that executed lots is not affected.
+        resd_ = 0_lts;
         modified_ = now;
     }
-    void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks,
-               Millis now) noexcept
+    void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks, Millis now) noexcept
     {
         using namespace enumops;
         state_ = State::TRADE;
@@ -152,23 +140,9 @@ class SWIRLY_API Order : public Request {
     {
         trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, now);
     }
-    void addQuote(Lots lots) noexcept
-    {
-        using namespace enumops;
-        quotd_ += lots;
-    }
-    void subQuote(Lots lots) noexcept
-    {
-        using namespace enumops;
-        quotd_ -= lots;
-    }
     Level* level() const noexcept
     {
         return level_;
-    }
-    Iden quoteId() const noexcept
-    {
-        return quoteId_;
     }
     State state() const noexcept
     {
@@ -181,10 +155,6 @@ class SWIRLY_API Order : public Request {
     Lots resd() const noexcept
     {
         return resd_;
-    }
-    Lots quotd() const noexcept
-    {
-        return quotd_;
     }
     Lots exec() const noexcept
     {
@@ -210,10 +180,6 @@ class SWIRLY_API Order : public Request {
     {
         return resd_ == 0_lts;
     }
-    bool pecan() const noexcept
-    {
-        return pecan_;
-    }
     Millis modified() const noexcept
     {
         return modified_;
@@ -232,33 +198,31 @@ class SWIRLY_API OrderRefSet {
                 result = swirly::compare(lhs.settlDay(), rhs.settlDay());
             return result;
         }
-        bool operator ()(const Order& lhs, const Order& rhs) const noexcept
+        bool operator()(const Order& lhs, const Order& rhs) const noexcept
         {
             return compare(lhs, rhs) < 0;
         }
     };
     struct KeyValueCompare {
-        bool operator ()(const StringView& lhs, const Order& rhs) const noexcept
+        bool operator()(const StringView& lhs, const Order& rhs) const noexcept
         {
             return lhs.compare(rhs.ref()) < 0;
         }
-        bool operator ()(const Order& lhs, const StringView& rhs) const noexcept
+        bool operator()(const Order& lhs, const StringView& rhs) const noexcept
         {
             return lhs.ref().compare(rhs) < 0;
         }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption = boost::intrusive::member_hook<Order, decltype(Order::refHook_),
-                                                           &Order::refHook_>;
-    using Set = boost::intrusive::set<Order,
-                                      ConstantTimeSizeOption,
-                                      CompareOption,
-                                      MemberHookOption
-                                      >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Order, decltype(Order::refHook_), &Order::refHook_>;
+    using Set
+        = boost::intrusive::set<Order, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
 
     Set set_;
+
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -269,11 +233,11 @@ class SWIRLY_API OrderRefSet {
 
     // Copy.
     OrderRefSet(const OrderRefSet&) = delete;
-    OrderRefSet& operator =(const OrderRefSet&) = delete;
+    OrderRefSet& operator=(const OrderRefSet&) = delete;
 
     // Move.
     OrderRefSet(OrderRefSet&&);
-    OrderRefSet& operator =(OrderRefSet&&);
+    OrderRefSet& operator=(OrderRefSet&&);
 
     Iterator insert(const ValuePtr& value) noexcept;
 
@@ -354,15 +318,13 @@ class SWIRLY_API OrderRefSet {
 
 class SWIRLY_API OrderList {
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using MemberHookOption = boost::intrusive::member_hook<Order, decltype(Order::listHook_),
-                                                           &Order::listHook_>;
-    using List = boost::intrusive::list<Order,
-                                        ConstantTimeSizeOption,
-                                        MemberHookOption
-                                        >;
+    using MemberHookOption
+        = boost::intrusive::member_hook<Order, decltype(Order::listHook_), &Order::listHook_>;
+    using List = boost::intrusive::list<Order, ConstantTimeSizeOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
 
     List list_;
+
  public:
     using Iterator = typename List::iterator;
     using ConstIterator = typename List::const_iterator;
@@ -373,11 +335,11 @@ class SWIRLY_API OrderList {
 
     // Copy.
     OrderList(const OrderList&) = delete;
-    OrderList& operator =(const OrderList&) = delete;
+    OrderList& operator=(const OrderList&) = delete;
 
     // Move.
     OrderList(OrderList&&);
-    OrderList& operator =(OrderList&&);
+    OrderList& operator=(OrderList&&);
 
     Iterator insertBack(const OrderPtr& value) noexcept;
 

@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -28,46 +28,45 @@ namespace swirly {
 
 template <typename TypeT>
 class Comparable {
-protected:
+ protected:
     ~Comparable() noexcept = default;
 
-public:
-    friend constexpr bool operator ==(const TypeT& lhs, const TypeT& rhs) noexcept
+ public:
+    friend constexpr bool operator==(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) == 0;
     }
 
-    friend constexpr bool operator !=(const TypeT& lhs, const TypeT& rhs) noexcept
+    friend constexpr bool operator!=(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) != 0;
     }
 
-    friend constexpr bool operator <(const TypeT& lhs, const TypeT& rhs) noexcept
+    friend constexpr bool operator<(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) < 0;
     }
 
-    friend constexpr bool operator <=(const TypeT& lhs, const TypeT& rhs) noexcept
+    friend constexpr bool operator<=(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) <= 0;
     }
 
-    friend constexpr bool operator >(const TypeT& lhs, const TypeT& rhs) noexcept
+    friend constexpr bool operator>(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) > 0;
     }
 
-    friend constexpr bool operator >=(const TypeT& lhs, const TypeT& rhs) noexcept
+    friend constexpr bool operator>=(const TypeT& lhs, const TypeT& rhs) noexcept
     {
         return lhs.compare(rhs) >= 0;
     }
 };
 
-template <typename EnumT,
-          typename std::enable_if_t<std::is_enum<EnumT>::value>* = nullptr>
+template <typename EnumT, typename std::enable_if_t<std::is_enum<EnumT>::value>* = nullptr>
 constexpr int compare(EnumT lhs, EnumT rhs) noexcept
 {
-    int i {};
+    int i{};
     if (lhs < rhs)
         i = -1;
     else if (lhs > rhs)
@@ -81,7 +80,7 @@ template <typename IntegralT,
           typename std::enable_if_t<std::is_integral<IntegralT>::value>* = nullptr>
 constexpr int compare(IntegralT lhs, IntegralT rhs) noexcept
 {
-    int i {};
+    int i{};
     if (lhs < rhs)
         i = -1;
     else if (lhs > rhs)

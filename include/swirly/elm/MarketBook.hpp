@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -39,7 +39,6 @@ class SWIRLY_API MarketBook : public Market {
     MarketView view_;
     Iden maxOrderId_;
     Iden maxExecId_;
-    Iden maxQuoteId_;
 
     BookSide& side(Side side) noexcept
     {
@@ -52,21 +51,20 @@ class SWIRLY_API MarketBook : public Market {
 
  public:
     MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-               Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-               Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId,
-               Iden maxQuoteId) noexcept;
+               Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
+               Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept;
 
     ~MarketBook() noexcept override;
 
     // Copy.
     MarketBook(const MarketBook&) = default;
-    MarketBook& operator =(const MarketBook&) = default;
+    MarketBook& operator=(const MarketBook&) = default;
 
     // Move.
     MarketBook(MarketBook&&) = default;
-    MarketBook& operator =(MarketBook&&) = default;
+    MarketBook& operator=(MarketBook&&) = default;
 
-    void insertOrder(const OrderPtr& order) throw (std::bad_alloc)
+    void insertOrder(const OrderPtr& order) throw(std::bad_alloc)
     {
         side(order->side()).insertOrder(order);
     }
@@ -74,7 +72,7 @@ class SWIRLY_API MarketBook : public Market {
     {
         side(order.side()).removeOrder(order);
     }
-    void createOrder(const OrderPtr& order, Millis now) throw (std::bad_alloc)
+    void createOrder(const OrderPtr& order, Millis now) throw(std::bad_alloc)
     {
         side(order->side()).createOrder(order, now);
     }
@@ -102,11 +100,6 @@ class SWIRLY_API MarketBook : public Market {
     {
         using namespace enumops;
         return ++maxExecId_;
-    }
-    Iden allocQuoteId() noexcept
-    {
-        using namespace enumops;
-        return ++maxQuoteId_;
     }
     Lots lastLots() const noexcept
     {
@@ -139,10 +132,6 @@ class SWIRLY_API MarketBook : public Market {
     Iden maxExecId() const noexcept
     {
         return maxExecId_;
-    }
-    Iden maxQuoteId() const noexcept
-    {
-        return maxQuoteId_;
     }
 };
 

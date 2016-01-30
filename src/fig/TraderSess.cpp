@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -26,7 +26,7 @@ TraderSess::~TraderSess() noexcept = default;
 
 TraderSess::TraderSess(TraderSess&&) = default;
 
-PosnPtr TraderSess::lazyPosn(const StringView& contr, Jday settlDay) throw (std::bad_alloc)
+PosnPtr TraderSess::lazyPosn(const StringView& contr, Jday settlDay) throw(std::bad_alloc)
 {
     TraderPosnSet::Iterator it;
     bool found;

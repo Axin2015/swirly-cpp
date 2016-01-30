@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -19,8 +19,9 @@
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/TraderSess.hpp>
 
-#include <swirly/elm/Exception.hpp>
 #include <swirly/elm/DateUtil.hpp>
+#include <swirly/elm/Exception.hpp>
+#include <swirly/elm/Journ.hpp>
 #include <swirly/elm/MarketBook.hpp>
 #include <swirly/elm/Model.hpp>
 
@@ -54,25 +55,8 @@ struct Serv::Impl {
     TraderSet traders;
     TraderSessSet emailIdx;
 
-    Impl(const Model& model, Journ& journ, Millis now) noexcept
-    : journ{journ}
+    Impl(const Model& model, Journ& journ, Millis now) noexcept : journ{journ}
     {
-    }
-    void setDirty(unsigned dirty) noexcept
-    {
-        // FIXME: not implemented.
-    }
-    void setDirty(const TraderSess& next, unsigned dirty) noexcept
-    {
-        // FIXME: not implemented.
-    }
-    void setDirty(const MarketBook& next) noexcept
-    {
-        // FIXME: not implemented.
-    }
-    void updateDirty() noexcept
-    {
-        // FIXME: not implemented.
     }
     MarketBookPtr newMarket(const StringView& mnem, const StringView& display,
                             const StringView& contr, Jday settlDay, Jday expiryDay,
@@ -95,37 +79,10 @@ struct Serv::Impl {
     {
         return factory.newExec(order, book.allocExecId(), now);
     }
-    void matchOrders(const TraderSess& takerSess, const MarketBook& book,
-                     const Order& takerOrder, Millis now, vector<Match>& matches) const
+    void matchOrders(const TraderSess& takerSess, const MarketBook& book, const Order& takerOrder,
+                     Millis now, vector<Match>& matches) const
     {
         // FIXME: not implemented.
-    }
-    QuotePtr matchQuote(const TraderSess& takerSess, const MarketBook& book,
-                        const Order& takerOrder, Millis now, vector<Match>& matches) const
-    {
-        // FIXME: not implemented.
-        return {};
-    }
-    void insertQuote(TraderSess& sess, const QuotePtr& quote) noexcept
-    {
-        OrderPtr order{quote->order()};
-        assert(order != nullptr);
-
-        setDirty(sess, TraderSess::DIRTY_QUOTE);
-
-        order->addQuote(quote->lots());
-        sess.insertQuote(quote);
-    }
-    void removeQuote(TraderSess& sess, Quote& quote) noexcept
-    {
-        OrderPtr order{quote.order()};
-        assert(order != nullptr);
-
-        setDirty(sess, TraderSess::DIRTY_QUOTE);
-
-        quote.clearOrder();
-        order->subQuote(quote.lots());
-        sess.removeQuote(quote);
     }
     // Assumes that maker lots have not been reduced since matching took place.
     void commitMatches(const TraderSess& taker, const MarketBook& book,
@@ -137,7 +94,7 @@ struct Serv::Impl {
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)
-:   impl_{make_unique<Impl>(model, journ, now)}
+    : impl_{make_unique<Impl>(model, journ, now)}
 {
     impl_->assets = model.readAsset(impl_->factory);
     impl_->contrs = model.readContr(impl_->factory);
@@ -154,7 +111,7 @@ Serv::~Serv() noexcept = default;
 
 Serv::Serv(Serv&&) = default;
 
-Serv& Serv::operator =(Serv&&) = default;
+Serv& Serv::operator=(Serv&&) = default;
 
 const AssetSet& Serv::assets() const noexcept
 {
@@ -180,8 +137,8 @@ const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& d
                                      const StringView& contr, Jday settlDay, Jday expiryDay,
                                      MarketState state, Millis now)
 {
-    auto it = impl_->markets.insert(impl_->newMarket(mnem, display, contr, settlDay,
-                                                     expiryDay, state));
+    auto it
+        = impl_->markets.insert(impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state));
     const auto& market = static_cast<const MarketBook&>(*it);
     return market;
 }
@@ -243,9 +200,8 @@ const TraderSess* Serv::findTraderByEmail(const StringView& email) const
     return trader;
 }
 
-void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref,
-                       Iden quoteId, Side side, Lots lots, Ticks ticks, Lots minLots,
-                       Millis now, Response& resp)
+void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                       Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
     const auto busDay = getBusDay(now);
     if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
@@ -258,36 +214,41 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
     }
     const auto orderId = book.allocOrderId();
     auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
-                                         orderId, ref, quoteId, side, lots, ticks, minLots, now);
+                                         orderId, ref, side, lots, ticks, minLots, now);
     auto exec = impl_->newExec(book, *order, now);
     resp.reset(book, order, exec);
 
     vector<Match> matches;
     // Order fields are updated on match.
-    QuotePtr quote;
-    if (quoteId == 0_id) {
-        impl_->matchOrders(sess, book, *order, now, matches);
-        // Place incomplete order in market. N.B. done() is sufficient here because the order cannot
-        // be pending cancellation.
-        if (!order->done()) {
-            // This may fail if level cannot be allocated.
-            book.insertOrder(order);
-        }
-    } else {
-        quote = impl_->matchQuote(sess, book, *order, now, matches);
-        assert(order->done());
+    impl_->matchOrders(sess, book, *order, now, matches);
+    // Place incomplete order in market. N.B. done() is sufficient here because the order cannot be
+    // pending cancellation.
+    if (!order->done()) {
+        // This may fail if level cannot be allocated.
+        book.insertOrder(order);
     }
     {
         // TODO: IOC orders would need an additional revision for the unsolicited cancellation of
         // any unfilled quantity.
         bool success{false};
         auto finally = makeFinally([&book, &order, &success]() {
-                if (!success && !order->done()) {
-                    // Undo market insertion.
-                    book.removeOrder(*order);
-                }
-            });
-        // FIXME: write to journal.
+            if (!success && !order->done()) {
+                // Undo market insertion.
+                book.removeOrder(*order);
+            }
+        });
+
+        const size_t len{1 + matches.size() * 2};
+        Exec* execs[len];
+
+        execs[0] = exec.get();
+        int i{1};
+        for (const auto& match : matches) {
+            execs[i] = match.makerTrade.get();
+            execs[i + 1] = match.takerTrade.get();
+            i += 2;
+        }
+        impl_->journ.createExec(book.mnem(), makeArrayView(execs, len));
         success = true;
     }
     // Avoid allocating position when there are no matches.
@@ -300,24 +261,13 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref
 
     // Commit phase.
 
-    impl_->setDirty(book);
-    if (quote) {
-        // Previously quoted orders are archived immediately, so there is no need to store them in
-        // the trader's session.
-        impl_->removeQuote(sess, *quote);
-    } else {
-        sess.insertOrder(order);
-    }
+    sess.insertOrder(order);
 
     // Commit matches.
     if (!matches.empty()) {
         assert(posn);
         impl_->commitMatches(sess, book, matches, *posn, now, resp);
-    } else {
-        // There are no matches.
-        impl_->setDirty(sess, TraderSess::DIRTY_ORDER);
     }
-    impl_->updateDirty();
 }
 
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
@@ -335,13 +285,11 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, 
 {
 }
 
-void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now,
-                       Response& resp)
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp)
 {
 }
 
-void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now,
-                       Response& resp)
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, Response& resp)
 {
 }
 
@@ -375,14 +323,12 @@ void Serv::archiveOrder(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids,
-                        Millis now)
+void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now)
 {
 }
 
-ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, const StringView& ref,
-                          Side side, Lots lots, Ticks ticks, Role role, const StringView& cpty,
-                          Millis created)
+ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                          Lots lots, Ticks ticks, Role role, const StringView& cpty, Millis created)
 {
     return {};
 }
@@ -399,15 +345,8 @@ void Serv::archiveTrade(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids,
-                        Millis now)
+void Serv::archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now)
 {
-}
-
-QuotePtr Serv::createQuote(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
-                           Lots lots, Millis now)
-{
-    return {};
 }
 
 void Serv::expireEndOfDay(Millis now)

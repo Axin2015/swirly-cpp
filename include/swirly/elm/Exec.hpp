@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -34,7 +34,6 @@ namespace swirly {
 class SWIRLY_API Exec : public Request {
 
     const Iden orderId_;
-    const Iden quoteId_;
     State state_;
     const Ticks ticks_;
     /**
@@ -59,25 +58,23 @@ class SWIRLY_API Exec : public Request {
  public:
     boost::intrusive::set_member_hook<> idHook_;
 
-    Exec(const StringView& trader, const StringView& market, const StringView& contr,
-         Jday settlDay, Iden id, const StringView& ref, Iden orderId, Iden quoteId, State state,
-         Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-         Ticks lastTicks, Lots minLots, Iden matchId, Role role, const StringView& cpty,
-         Millis created) noexcept
-    :   Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-        orderId_{orderId},
-        quoteId_{quoteId},
-        state_{state},
-        ticks_{ticks},
-        resd_{resd},
-        exec_{exec},
-        cost_{cost},
-        lastLots_{lastLots},
-        lastTicks_{lastTicks},
-        minLots_{minLots},
-        matchId_{matchId},
-        role_{role},
-        cpty_{cpty}
+    Exec(const StringView& trader, const StringView& market, const StringView& contr, Jday settlDay,
+         Iden id, const StringView& ref, Iden orderId, State state, Side side, Lots lots,
+         Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+         Iden matchId, Role role, const StringView& cpty, Millis created) noexcept
+        : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+          orderId_{orderId},
+          state_{state},
+          ticks_{ticks},
+          resd_{resd},
+          exec_{exec},
+          cost_{cost},
+          lastLots_{lastLots},
+          lastTicks_{lastTicks},
+          minLots_{minLots},
+          matchId_{matchId},
+          role_{role},
+          cpty_{cpty}
     {
     }
 
@@ -85,19 +82,15 @@ class SWIRLY_API Exec : public Request {
 
     // Copy.
     Exec(const Exec&) = delete;
-    Exec& operator =(const Exec&) = delete;
+    Exec& operator=(const Exec&) = delete;
 
     // Move.
     Exec(Exec&&);
-    Exec& operator =(Exec&&) = delete;
+    Exec& operator=(Exec&&) = delete;
 
     Iden orderId() const noexcept
     {
         return orderId_;
-    }
-    Iden quoteId() const noexcept
-    {
-        return quoteId_;
     }
     State state() const noexcept
     {

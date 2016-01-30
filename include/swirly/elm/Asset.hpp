@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -33,12 +33,13 @@ namespace swirly {
  */
 class SWIRLY_API Asset : public Rec {
     const AssetType type_;
+
  public:
     boost::intrusive::set_member_hook<> mnemHook_;
 
     Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept
-    :   Rec{RecType::ASSET, mnem, display},
-        type_{type}
+        : Rec{RecType::ASSET, mnem, display},
+          type_{type}
     {
     }
 
@@ -46,11 +47,11 @@ class SWIRLY_API Asset : public Rec {
 
     // Copy.
     Asset(const Asset&);
-    Asset& operator =(const Asset&) = delete;
+    Asset& operator=(const Asset&) = delete;
 
     // Move.
     Asset(Asset&&);
-    Asset& operator =(Asset&&) = delete;
+    Asset& operator=(Asset&&) = delete;
 
     AssetType assetType() const noexcept
     {

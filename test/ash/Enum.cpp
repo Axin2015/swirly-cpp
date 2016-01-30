@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -26,14 +26,9 @@ using namespace swirly;
 
 namespace swirly {
 
-enum class Test : int {
-    FOO = 1,
-    BAR = 2,
-    BAZ = 4,
-    QUX = 8
-};
+enum class Test : int { FOO = 1, BAR = 2, BAZ = 4, QUX = 8 };
 
-constexpr Test operator ""_test(unsigned long long val) noexcept
+constexpr Test operator""_test(unsigned long long val) noexcept
 {
     return box<Test>(val);
 }
@@ -41,10 +36,10 @@ constexpr Test operator ""_test(unsigned long long val) noexcept
 const char* enumString(Test t)
 {
     switch (t) {
-    SWIRLY_ENUM_CASE(Test, FOO);
-    SWIRLY_ENUM_CASE(Test, BAR);
-    SWIRLY_ENUM_CASE(Test, BAZ);
-    SWIRLY_ENUM_CASE(Test, QUX);
+        SWIRLY_ENUM_CASE(Test, FOO);
+        SWIRLY_ENUM_CASE(Test, BAR);
+        SWIRLY_ENUM_CASE(Test, BAZ);
+        SWIRLY_ENUM_CASE(Test, QUX);
     }
     terminate();
 }

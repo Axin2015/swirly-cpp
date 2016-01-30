@@ -1,6 +1,6 @@
 /*
  * Swirly Order-Book and Matching-Engine.
- * Copyright (C) 2013, 2015 Swirly Cloud Limited.
+ * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -34,7 +34,7 @@ class ArrayView {
     std::size_t len_;
     const TypeT* ptr_;
 
-public:
+ public:
     using value_type = TypeT;
 
     using pointer = const TypeT*;
@@ -52,14 +52,14 @@ public:
     using difference_type = ptrdiff_t;
     using size_type = std::size_t;
 
-    constexpr ArrayView(const TypeT* ptr, std::size_t len) noexcept
-    :   len_{len},
-        ptr_{ptr}
+    constexpr ArrayView(const TypeT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr}
     {
     }
-    constexpr ArrayView() noexcept
-    :   len_{0},
-        ptr_{nullptr}
+    template <typename TypeU, std::size_t SizeN>
+    constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept : len_{SizeN}, ptr_{arr}
+    {
+    }
+    constexpr ArrayView() noexcept : len_{0}, ptr_{nullptr}
     {
     }
 
@@ -67,11 +67,11 @@ public:
 
     // Copy.
     constexpr ArrayView(const ArrayView& rhs) noexcept = default;
-    constexpr ArrayView& operator =(const ArrayView& rhs) noexcept = default;
+    constexpr ArrayView& operator=(const ArrayView& rhs) noexcept = default;
 
     // Move.
     constexpr ArrayView(ArrayView&&) noexcept = default;
-    constexpr ArrayView& operator =(ArrayView&&) noexcept = default;
+    constexpr ArrayView& operator=(ArrayView&&) noexcept = default;
 
     void clear() noexcept
     {
@@ -115,7 +115,7 @@ public:
     {
         return const_reverse_iterator(begin());
     }
-    constexpr const TypeT& operator [](size_type pos) const noexcept
+    constexpr const TypeT& operator[](size_type pos) const noexcept
     {
         return ptr_[pos];
     }
@@ -140,6 +140,19 @@ public:
         return len_;
     }
 };
+
+template <typename TypeT>
+constexpr ArrayView<std::remove_volatile_t<TypeT>> makeArrayView(const TypeT* ptr,
+                                                                 std::size_t len) noexcept
+{
+    return {ptr, len};
+}
+
+template <typename TypeT, std::size_t SizeN>
+constexpr ArrayView<std::remove_cv_t<TypeT>> makeArrayView(TypeT (&arr)[SizeN]) noexcept
+{
+    return {arr};
+}
 
 /** @} */
 
