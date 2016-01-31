@@ -28,13 +28,13 @@ BOOST_AUTO_TEST_CASE(FormatCase)
 
     Exception e;
 
-    format(e, "[%d]", 123);
+    e.format("[%d]", 123);
     BOOST_CHECK(std::strcmp(e.what(), "[123]") == 0);
 
-    format(e, "[%.*s]", 3, "Foox");
+    e.format("[%.*s]", 3, "Foox");
     BOOST_CHECK(std::strcmp(e.what(), "[Foo]") == 0);
 
-    format(e, "[%.*s]", SWIRLY_STR("Bar"s));
+    e.format("[%.*s]", SWIRLY_STR("Bar"s));
     BOOST_CHECK(std::strcmp(e.what(), "[Bar]") == 0);
 }
 

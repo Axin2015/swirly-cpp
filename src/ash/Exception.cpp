@@ -24,24 +24,24 @@ namespace swirly {
 
 Exception::~Exception() noexcept = default;
 
-const char* Exception::what() const noexcept
-{
-    return msg_;
-}
-
-void format(Exception& e, const char* fmt, ...) noexcept
+void Exception::format(const char* fmt, ...) noexcept
 {
     va_list args;
     va_start(args, fmt);
-    format(e, fmt, args);
+    format(fmt, args);
     va_end(args);
 }
 
-void format(Exception& e, const char* fmt, std::va_list args) noexcept
+void Exception::format(const char* fmt, std::va_list args) noexcept
 {
-    const auto ret = std::vsnprintf(e.msg_, sizeof(e.msg_), fmt, args);
+    const auto ret = std::vsnprintf(msg_, sizeof(msg_), fmt, args);
     if (ret < 0)
         std::terminate();
+}
+
+const char* Exception::what() const noexcept
+{
+    return msg_;
 }
 
 } // swirly

@@ -32,9 +32,6 @@ namespace swirly {
 
 class SWIRLY_API Exception : public std::exception {
 
-    friend void format(Exception& e, const char* fmt, ...) noexcept;
-    friend void format(Exception& e, const char* fmt, std::va_list args) noexcept;
-
     char msg_[128] = {'\0'};
 
  public:
@@ -57,12 +54,12 @@ class SWIRLY_API Exception : public std::exception {
     Exception(Exception&&) noexcept = default;
     Exception& operator=(Exception&&) noexcept = default;
 
+    void format(const char* fmt, ...) noexcept;
+
+    void format(const char* fmt, std::va_list args) noexcept;
+
     const char* what() const noexcept override;
 };
-
-SWIRLY_API void format(Exception& e, const char* fmt, ...) noexcept;
-
-SWIRLY_API void format(Exception& e, const char* fmt, std::va_list args) noexcept;
 
 template <typename ExceptionT>
 ExceptionT makeException(const char* fmt, ...)
@@ -70,7 +67,7 @@ ExceptionT makeException(const char* fmt, ...)
     ExceptionT e;
     va_list args;
     va_start(args, fmt);
-    format(e, fmt, args);
+    e.format(fmt, args);
     va_end(args);
     return e;
 }
@@ -81,7 +78,7 @@ template <typename ExceptionT>
     ExceptionT e;
     va_list args;
     va_start(args, fmt);
-    format(e, fmt, args);
+    e.format(fmt, args);
     va_end(args);
     throw e;
 }
