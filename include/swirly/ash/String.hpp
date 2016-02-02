@@ -38,16 +38,24 @@ constexpr StringView operator""_sv(const char* str, std::size_t len) noexcept
     return {str, len};
 }
 
+template <std::size_t MaxN>
+struct StringData {
+
+    // Length in the first cache-line.
+    std::size_t len;
+    char buf[MaxN];
+};
+
 /**
  * String buffer with fixed upper-bound.
  */
 template <std::size_t MaxN>
-class SWIRLY_API StringBuf {
-    // Length in the first cache-line.
-    std::size_t len_;
-    char buf_[MaxN];
-
+class StringBuf : protected StringData<MaxN> {
+    using StringData<MaxN>::len;
+    using StringData<MaxN>::buf;
  public:
+    using Data = StringData<MaxN>;
+
     template <std::size_t MaxR>
     constexpr StringBuf(const StringBuf<MaxR>& rhs) noexcept
     {
@@ -57,9 +65,9 @@ class SWIRLY_API StringBuf {
     {
         *this = rhs;
     }
-
-    constexpr StringBuf() noexcept : len_{0}
+    constexpr StringBuf() noexcept
     {
+        len = 0;
     }
 
     ~StringBuf() noexcept = default;
@@ -71,8 +79,8 @@ class SWIRLY_API StringBuf {
     }
     constexpr StringBuf& operator=(const StringBuf& rhs) noexcept
     {
-        len_ = rhs.size();
-        std::memcpy(buf_, rhs.data(), len_);
+        len = rhs.size();
+        std::memcpy(buf, rhs.data(), len);
         return *this;
     }
 
@@ -83,47 +91,46 @@ class SWIRLY_API StringBuf {
     template <std::size_t MaxR>
     constexpr StringBuf& operator=(const StringBuf<MaxR>& rhs) noexcept
     {
-        len_ = std::min(rhs.size(), MaxN);
-        std::memcpy(buf_, rhs.data(), len_);
+        len = std::min(rhs.size(), MaxN);
+        std::memcpy(buf, rhs.data(), len);
         return *this;
     }
     constexpr StringBuf& operator=(const StringView& rhs) noexcept
     {
-        len_ = std::min(rhs.size(), MaxN);
-        std::memcpy(buf_, rhs.data(), len_);
+        len = std::min(rhs.size(), MaxN);
+        std::memcpy(buf, rhs.data(), len);
         return *this;
     }
-
     template <std::size_t MaxR>
     constexpr int compare(const StringBuf<MaxR>& rhs) const noexcept
     {
-        int result{std::memcmp(buf_, rhs.data(), std::min(len_, rhs.size()))};
+        int result{std::memcmp(buf, rhs.data(), std::min(len, rhs.size()))};
         if (result == 0)
-            result = swirly::compare(len_, rhs.size());
+            result = swirly::compare(len, rhs.size());
         return result;
     }
     constexpr int compare(const StringView& rhs) const noexcept
     {
-        int result{std::memcmp(buf_, rhs.data(), std::min(len_, rhs.size()))};
+        int result{std::memcmp(buf, rhs.data(), std::min(len, rhs.size()))};
         if (result == 0)
-            result = swirly::compare(len_, rhs.size());
+            result = swirly::compare(len, rhs.size());
         return result;
     }
     constexpr const char* data() const noexcept
     {
-        return buf_;
+        return buf;
     }
     constexpr bool empty() const noexcept
     {
-        return len_ == 0;
+        return len == 0;
     }
     constexpr size_t size() const noexcept
     {
-        return len_;
+        return len;
     }
     constexpr StringView view() const noexcept
     {
-        return {buf_, len_};
+        return {buf, len};
     }
 };
 
