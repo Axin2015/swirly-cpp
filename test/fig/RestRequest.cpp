@@ -14,34 +14,21 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Exception.hpp>
+#include <RestRequest.hpp>
 
-#include <cstdio> // vsnprintf()
+#include <boost/test/unit_test.hpp>
 
 using namespace std;
+using namespace swirly;
 
-namespace swirly {
+BOOST_AUTO_TEST_SUITE(RestRequestSuite)
 
-Exception::~Exception() noexcept = default;
-
-void Exception::format(const char* fmt, ...) noexcept
+BOOST_AUTO_TEST_CASE(RestRequestCase)
 {
-    va_list args;
-    va_start(args, fmt);
-    format(fmt, args);
-    va_end(args);
+    RestRequest rr;
+    rr.parse(R"({"mnem":"test"})"_sv);
+    BOOST_CHECK_EQUAL(rr.fields(), RestRequest::MNEM);
+    BOOST_CHECK_EQUAL(rr.mnem(), "test");
 }
 
-void Exception::format(const char* fmt, std::va_list args) noexcept
-{
-    const auto ret = std::vsnprintf(msg_, sizeof(msg_), fmt, args);
-    if (ret < 0)
-        std::terminate();
-}
-
-const char* Exception::what() const noexcept
-{
-    return msg_;
-}
-
-} // swirly
+BOOST_AUTO_TEST_SUITE_END()

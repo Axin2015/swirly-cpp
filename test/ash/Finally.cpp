@@ -18,6 +18,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+using namespace swirly;
+
 BOOST_AUTO_TEST_SUITE(FinallySuite)
 
 BOOST_AUTO_TEST_CASE(FinallyCase)

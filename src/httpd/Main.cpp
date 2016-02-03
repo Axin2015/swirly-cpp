@@ -16,9 +16,82 @@
  */
 #include "mongoose.h"
 
+#include <swirly/ash/Exception.hpp>
+
 #include <iostream>
 
 using namespace std;
+
+namespace mg {
+
+class Error : public swirly::Exception {
+ public:
+    Error() noexcept = default;
+
+    ~Error() noexcept = default;
+
+    // Copy.
+    Error(const Error&) noexcept = default;
+    Error& operator=(const Error&) noexcept = default;
+
+    // Move.
+    Error(Error&&) noexcept = default;
+    Error& operator=(Error&&) noexcept = default;
+};
+
+// Mongoose event manager.
+
+template <typename DerivedT>
+class MgrBase {
+    mg_mgr mgr_;
+
+    static void handler(mg_connection* conn, int event, void* data)
+    {
+        auto* self = static_cast<DerivedT*>(conn->user_data);
+        switch (event) {
+        case MG_EV_CLOSE:
+            conn->user_data = nullptr;
+            break;
+        case MG_EV_HTTP_REQUEST:
+            self->httpRequest(*conn, *static_cast<http_message*>(data));
+            break;
+        }
+    }
+
+ protected:
+    MgrBase() noexcept
+    {
+        mg_mgr_init(&mgr_, this);
+    }
+    ~MgrBase() noexcept
+    {
+        mg_mgr_free(&mgr_);
+    }
+
+ public:
+    // Copy.
+    MgrBase(const MgrBase&) = delete;
+    MgrBase& operator=(const MgrBase&) = delete;
+
+    // Move.
+    MgrBase(MgrBase&&) = delete;
+    MgrBase& operator=(MgrBase&&) = delete;
+
+    mg_connection& bind(const char* addr)
+    {
+        auto* conn = mg_bind(&mgr_, addr, handler);
+        if (!conn)
+            swirly::throwException<Error>("mg_bind() failed");
+        conn->user_data = this;
+        return *conn;
+    }
+    time_t poll(int milli)
+    {
+        return mg_mgr_poll(&mgr_, milli);
+    }
+};
+
+} // mg
 
 namespace {
 
@@ -26,34 +99,32 @@ constexpr char HTTP_PORT[] = "8000";
 
 static struct mg_serve_http_opts httpOpts;
 
-void ev_handler(mg_connection* nc, int ev, void* p)
-{
-    if (ev == MG_EV_HTTP_REQUEST) {
-        mg_serve_http(nc, static_cast<http_message*>(p), httpOpts);
+class Mgr : public mg::MgrBase<Mgr> {
+ public:
+    void httpRequest(mg_connection& nc, http_message& data)
+    {
+        mg_serve_http(&nc, &data, httpOpts);
     }
-}
+};
 
 } // anonymous
 
 int main(int argc, char* argv[])
 {
     try {
-        mg_mgr mgr;
-        mg_connection* nc;
 
-        mg_mgr_init(&mgr, nullptr);
-        nc = mg_bind(&mgr, HTTP_PORT, ev_handler);
+        Mgr mgr;
+        auto& conn = mgr.bind(HTTP_PORT);
+        mg_set_protocol_http_websocket(&conn);
 
-        mg_set_protocol_http_websocket(nc);
         httpOpts.document_root = ".";
         httpOpts.dav_document_root = ".";
         httpOpts.enable_directory_listing = "yes";
 
         cout << "Starting web server on port " << HTTP_PORT << endl;
         for (;;) {
-            mg_mgr_poll(&mgr, 1000);
+            mgr.poll(1000);
         }
-        mg_mgr_free(&mgr);
 
         return 0;
     } catch (const exception& e) {

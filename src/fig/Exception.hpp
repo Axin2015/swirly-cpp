@@ -14,34 +14,35 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#ifndef SWIRLY_FIG_EXCEPTION_HPP
+#define SWIRLY_FIG_EXCEPTION_HPP
+
 #include <swirly/ash/Exception.hpp>
-
-#include <cstdio> // vsnprintf()
-
-using namespace std;
 
 namespace swirly {
 
-Exception::~Exception() noexcept = default;
+/**
+ * @addtogroup Exception
+ * @{
+ */
 
-void Exception::format(const char* fmt, ...) noexcept
-{
-    va_list args;
-    va_start(args, fmt);
-    format(fmt, args);
-    va_end(args);
-}
+class SWIRLY_API ParseException : public Exception {
+ public:
+    ParseException() noexcept = default;
 
-void Exception::format(const char* fmt, std::va_list args) noexcept
-{
-    const auto ret = std::vsnprintf(msg_, sizeof(msg_), fmt, args);
-    if (ret < 0)
-        std::terminate();
-}
+    ~ParseException() noexcept override;
 
-const char* Exception::what() const noexcept
-{
-    return msg_;
-}
+    // Copy.
+    ParseException(const ParseException&) noexcept = default;
+    ParseException& operator=(const ParseException&) noexcept = default;
+
+    // Move.
+    ParseException(ParseException&&) noexcept = default;
+    ParseException& operator=(ParseException&&) noexcept = default;
+};
+
+/** @} */
 
 } // swirly
+
+#endif // SWIRLY_FIG_EXCEPTION_HPP

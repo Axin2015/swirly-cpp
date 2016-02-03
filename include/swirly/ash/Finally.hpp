@@ -19,6 +19,8 @@
 
 #include <utility>
 
+namespace swirly {
+
 /**
  * @addtogroup Util
  * @{
@@ -52,5 +54,7 @@ auto makeFinally(FnT fn) noexcept
 }
 
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ASH_FINALLY_HPP
