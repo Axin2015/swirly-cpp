@@ -60,7 +60,7 @@ namespace {
         if (len < str_.max)
             str_.buf[len++] = fc;
         else {
-            cs = json_error; msg = "max string length exceeded";
+            cs = json_error; msg = "max length exceeded";
             fbreak;
         }
     }
@@ -75,32 +75,11 @@ namespace {
         )
     ) >beginStr;
 
-    action buySide {
-        side_ = Side::BUY;
+    action nullMnem {
+        fields_ &= ~RestRequest::MNEM;
+        mnem_.len = 0;
     }
-    action sellSide {
-        side_ = Side::SELL;
-    }
-    side = '"BUY"'i %buySide
-         | '"SELL"'i %sellSide;
-
-    action makerRole {
-        role_ = Role::MAKER;
-    }
-    action takerRole {
-        role_ = Role::TAKER;
-    }
-    role = '"MAKER"'i %makerRole
-         | '"TAKER"'i %takerRole;
-
-    colon = space* ':' space*;
-    comma = space* ',' space*;
-
     action beginMnem {
-        if (fields_ & RestRequest::MNEM) {
-            cs = json_error; msg = "mnem already specified";
-            fbreak;
-        }
         str_.len = &mnem_.len;
         str_.buf = mnem_.buf;
         str_.max = MNEM_MAX;
@@ -108,11 +87,14 @@ namespace {
     action endMnem {
         fields_ |= RestRequest::MNEM;
     }
+    mnem = 'null' %nullMnem
+         | str >beginMnem %endMnem;
+
+    action nullDisplay {
+        fields_ &= ~RestRequest::DISPLAY;
+        display_.len = 0;
+    }
     action beginDisplay {
-        if (fields_ & RestRequest::DISPLAY) {
-            cs = json_error; msg = "display already specified";
-            fbreak;
-        }
         str_.len = &display_.len;
         str_.buf = display_.buf;
         str_.max = DISPLAY_MAX;
@@ -120,11 +102,14 @@ namespace {
     action endDisplay {
         fields_ |= RestRequest::DISPLAY;
     }
+    display = 'null' %nullDisplay
+            | str >beginDisplay %endDisplay;
+
+    action nullEmail {
+        fields_ &= ~RestRequest::EMAIL;
+        email_.len = 0;
+    }
     action beginEmail {
-        if (fields_ & RestRequest::EMAIL) {
-            cs = json_error; msg = "email already specified";
-            fbreak;
-        }
         str_.len = &email_.len;
         str_.buf = email_.buf;
         str_.max = EMAIL_MAX;
@@ -132,11 +117,14 @@ namespace {
     action endEmail {
         fields_ |= RestRequest::EMAIL;
     }
+    email = 'null' %nullEmail
+          | str >beginEmail %endEmail;
+
+    action nullTrader {
+        fields_ &= ~RestRequest::TRADER;
+        trader_.len = 0;
+    }
     action beginTrader {
-        if (fields_ & RestRequest::TRADER) {
-            cs = json_error; msg = "trader already specified";
-            fbreak;
-        }
         str_.len = &trader_.len;
         str_.buf = trader_.buf;
         str_.max = MNEM_MAX;
@@ -144,11 +132,14 @@ namespace {
     action endTrader {
         fields_ |= RestRequest::TRADER;
     }
+    trader = 'null' %nullTrader
+           | str >beginTrader %endTrader;
+
+    action nullContr {
+        fields_ &= ~RestRequest::CONTR;
+        contr_.len = 0;
+    }
     action beginContr {
-        if (fields_ & RestRequest::CONTR) {
-            cs = json_error; msg = "contr already specified";
-            fbreak;
-        }
         str_.len = &contr_.len;
         str_.buf = contr_.buf;
         str_.max = MNEM_MAX;
@@ -156,31 +147,36 @@ namespace {
     action endContr {
         fields_ |= RestRequest::CONTR;
     }
-    action beginSettlDate {
-        if (fields_ & RestRequest::SETTL_DATE) {
-            cs = json_error; msg = "settl-date already specified";
-            fbreak;
-        }
+    contr = 'null' %nullContr
+          | str >beginContr %endContr;
+
+    action nullSettlDate {
+        fields_ &= ~RestRequest::SETTL_DATE;
+        settlDate_ = 0_dt;
     }
     action endSettlDate {
         fields_ |= RestRequest::SETTL_DATE;
         settlDate_ = box<IsoDate>(num());
     }
-    action beginExpiryDate {
-        if (fields_ & RestRequest::EXPIRY_DATE) {
-            cs = json_error; msg = "expiry-date already specified";
-            fbreak;
-        }
+    settlDate = 'null' %nullSettlDate
+              | num %endSettlDate;
+
+    action nullExpiryDate {
+        fields_ &= ~RestRequest::EXPIRY_DATE;
+        expiryDate_ = 0_dt;
     }
     action endExpiryDate {
         fields_ |= RestRequest::EXPIRY_DATE;
         expiryDate_ = box<IsoDate>(num());
     }
+    expiryDate = 'null' %nullExpiryDate
+               | num %endExpiryDate;
+
+    action nullRef {
+        fields_ &= ~RestRequest::REF;
+        ref_.len = 0;
+    }
     action beginRef {
-        if (fields_ & RestRequest::REF) {
-            cs = json_error; msg = "ref already specified";
-            fbreak;
-        }
         str_.len = &ref_.len;
         str_.buf = ref_.buf;
         str_.max = REF_MAX;
@@ -188,69 +184,94 @@ namespace {
     action endRef {
         fields_ |= RestRequest::REF;
     }
-    action beginState {
-        if (fields_ & RestRequest::STATE) {
-            cs = json_error; msg = "state already specified";
-            fbreak;
-        }
+    ref = 'null' %nullRef
+        | str >beginRef %endRef;
+
+    action nullState {
+        fields_ &= ~RestRequest::STATE;
+        state_ = 0;
     }
     action endState {
-        fields_ |= RestRequest::STATE;
-        state_ = num();
-    }
-    action beginSide {
-        if (fields_ & RestRequest::SIDE) {
-            cs = json_error; msg = "side already specified";
-            fbreak;
+        if (num_.sign >= 0) {
+            fields_ |= RestRequest::STATE;
+            state_ = num();
+        } else {
+            cs = json_error; msg = "negative state field";
         }
     }
-    action endSide {
-        fields_ |= RestRequest::SIDE;
-    }
-    action beginTicks {
-        if (fields_ & RestRequest::TICKS) {
-            cs = json_error; msg = "ticks already specified";
-            fbreak;
-        }
+    state = 'null' %nullState
+          | num %endState;
+
+    action nullTicks {
+        fields_ &= ~RestRequest::TICKS;
+        ticks_ = 0_tks;
     }
     action endTicks {
         fields_ |= RestRequest::TICKS;
         ticks_ = box<Ticks>(num());
     }
-    action beginLots {
-        if (fields_ & RestRequest::LOTS) {
-            cs = json_error; msg = "lots already specified";
-            fbreak;
-        }
+    ticks = 'null' %nullTicks
+          | num %endTicks;
+
+    action nullSide {
+        fields_ &= ~RestRequest::SIDE;
+        side_ = box<Side>(0);
+    }
+    action buySide {
+        fields_ |= RestRequest::SIDE;
+        side_ = Side::BUY;
+    }
+    action sellSide {
+        fields_ |= RestRequest::SIDE;
+        side_ = Side::SELL;
+    }
+    side = 'null' %nullSide
+         | '"BUY"'i %buySide
+         | '"SELL"'i %sellSide;
+
+    action nullLots {
+        fields_ &= ~RestRequest::LOTS;
+        lots_ = 0_lts;
     }
     action endLots {
         fields_ |= RestRequest::LOTS;
         lots_ = box<Lots>(num());
     }
-    action beginMinLots {
-        if (fields_ & RestRequest::MIN_LOTS) {
-            cs = json_error; msg = "min-lots already specified";
-            fbreak;
-        }
+    lots = 'null' %nullLots
+         | num %endLots;
+
+    action nullMinLots {
+        fields_ &= ~RestRequest::MIN_LOTS;
+        minLots_ = 0_lts;
     }
     action endMinLots {
         fields_ |= RestRequest::MIN_LOTS;
         minLots_ = box<Lots>(num());
     }
-    action beginRole {
-        if (fields_ & RestRequest::ROLE) {
-            cs = json_error; msg = "role already specified";
-            fbreak;
-        }
+    minLots = 'null' %nullMinLots
+            | num %endMinLots;
+
+    action nullRole {
+        fields_ &= ~RestRequest::ROLE;
+        role_ = Role::NONE;
     }
-    action endRole {
+    action makerRole {
         fields_ |= RestRequest::ROLE;
+        role_ = Role::MAKER;
+    }
+    action takerRole {
+        fields_ |= RestRequest::ROLE;
+        role_ = Role::TAKER;
+    }
+    role = 'null' %nullRole
+         | '"MAKER"'i %makerRole
+         | '"TAKER"'i %takerRole;
+
+    action nullCpty {
+        fields_ &= ~RestRequest::CPTY;
+        cpty_.len = 0;
     }
     action beginCpty {
-        if (fields_ & RestRequest::CPTY) {
-            cs = json_error; msg = "cpty already specified";
-            fbreak;
-        }
         str_.len = &cpty_.len;
         str_.buf = cpty_.buf;
         str_.max = MNEM_MAX;
@@ -258,22 +279,27 @@ namespace {
     action endCpty {
         fields_ |= RestRequest::CPTY;
     }
+    cpty = 'null' %nullCpty
+         | str >beginCpty %endCpty;
 
-    pair = '"mnem"'i colon str >beginMnem %endMnem
-         | '"display"'i colon str >beginDisplay %endDisplay
-         | '"email"'i colon str >beginEmail %endEmail
-         | '"trader"'i colon str >beginTrader %endTrader
-         | '"contr"'i colon str >beginContr %endContr
-         | '"settlDate"'i colon num >beginSettlDate %endSettlDate
-         | '"expiryDate"'i colon num >beginExpiryDate %endExpiryDate
-         | '"ref"'i colon str >beginRef %endRef
-         | '"state"'i colon num >beginState %endState
-         | '"side"'i colon side >beginSide %endSide
-         | '"lots"'i colon num >beginLots %endLots
-         | '"ticks"'i colon num >beginTicks %endTicks
-         | '"minMots"'i colon num >beginMinLots %endMinLots
-         | '"role"'i colon role >beginRole %endRole
-         | '"cpty"'i colon str >beginCpty %endCpty;
+    colon = space* ':' space*;
+    comma = space* ',' space*;
+
+    pair = '"mnem"'i colon mnem
+         | '"display"'i colon display
+         | '"email"'i colon email
+         | '"trader"'i colon trader
+         | '"contr"'i colon contr
+         | '"settlDate"'i colon settlDate
+         | '"expiryDate"'i colon expiryDate
+         | '"ref"'i colon ref
+         | '"state"'i colon state
+         | '"side"'i colon side
+         | '"lots"'i colon lots
+         | '"ticks"'i colon ticks
+         | '"minLots"'i colon minLots
+         | '"role"'i colon role
+         | '"cpty"'i colon cpty;
 
     members = pair (comma pair)*;
 
@@ -289,13 +315,32 @@ namespace {
 
 RestRequest::~RestRequest() noexcept = default;
 
-void RestRequest::reset() noexcept
+void RestRequest::reset(bool clear) noexcept
 {
-    auto cs = cs_;
+    decltype(cs_) cs;
     %% write init;
     cs_ = cs;
 
+    if (!clear)
+        return;
+
     fields_ = 0;
+
+    mnem_.len = 0;
+    display_.len = 0;
+    email_.len = 0;
+    trader_.len = 0;
+    contr_.len = 0;
+    settlDate_ = 0_dt;
+    expiryDate_ = 0_dt;
+    ref_.len = 0;
+    state_ = 0;
+    side_ = box<Side>(0);
+    lots_ = 0_lts;
+    ticks_ = 0_tks;
+    minLots_ = 0_lts;
+    role_ = Role::NONE;
+    cpty_.len = 0;
 }
 
 bool RestRequest::parse(const StringView& buf)

@@ -33,7 +33,7 @@ class SWIRLY_API RestRequest {
     int cs_;
     union {
         struct {
-            bool sign;
+            int sign;
             std::size_t digits;
         } num_;
         struct {
@@ -98,7 +98,7 @@ class SWIRLY_API RestRequest {
     RestRequest(RestRequest&&) = delete;
     RestRequest& operator=(RestRequest&&) = delete;
 
-    void reset() noexcept;
+    void reset(bool clear = true) noexcept;
 
     bool parse(const StringView& buf);
 
