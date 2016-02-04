@@ -17,12 +17,18 @@
 #include "mongoose.h"
 
 #include <swirly/ash/Exception.hpp>
+#include <swirly/ash/String.hpp>
 
 #include <iostream>
 
 using namespace std;
 
 namespace mg {
+
+swirly::StringView toView(const mg_str& str) noexcept
+{
+    return {str.p, str.len};
+}
 
 class Error : public swirly::Exception {
  public:
@@ -39,6 +45,49 @@ class Error : public swirly::Exception {
     Error& operator=(Error&&) noexcept = default;
 };
 
+class HttpMessage {
+    http_message* impl_;
+
+ public:
+    HttpMessage(http_message* impl) noexcept : impl_{impl}
+    {
+    }
+    ~HttpMessage() noexcept = default;
+
+    // Copy.
+    HttpMessage(const HttpMessage&) noexcept = default;
+    HttpMessage& operator=(const HttpMessage&) noexcept = default;
+
+    // Move.
+    HttpMessage(HttpMessage&&) noexcept = default;
+    HttpMessage& operator=(HttpMessage&&) noexcept = default;
+
+    auto get() const noexcept
+    {
+        return impl_;
+    }
+    auto method() const noexcept
+    {
+        return toView(impl_->method);
+    }
+    auto uri() const noexcept
+    {
+        return toView(impl_->uri);
+    }
+    auto proto() const noexcept
+    {
+        return toView(impl_->proto);
+    }
+    auto queryString() const noexcept
+    {
+        return toView(impl_->query_string);
+    }
+    auto body() const noexcept
+    {
+        return toView(impl_->body);
+    }
+};
+
 // Mongoose event manager.
 
 template <typename DerivedT>
@@ -53,7 +102,7 @@ class MgrBase {
             conn->user_data = nullptr;
             break;
         case MG_EV_HTTP_REQUEST:
-            self->httpRequest(*conn, *static_cast<http_message*>(data));
+            self->httpRequest(*conn, static_cast<http_message*>(data));
             break;
         }
     }
@@ -101,9 +150,10 @@ static struct mg_serve_http_opts httpOpts;
 
 class Mgr : public mg::MgrBase<Mgr> {
  public:
-    void httpRequest(mg_connection& nc, http_message& data)
+    void httpRequest(mg_connection& nc, mg::HttpMessage data)
     {
-        mg_serve_http(&nc, &data, httpOpts);
+        cout << data.method() << ' ' << data.uri() << endl;
+        mg_serve_http(&nc, data.get(), httpOpts);
     }
 };
 
