@@ -134,7 +134,7 @@ class SWIRLY_API Exec : public Request {
     }
     StringView cpty() const noexcept
     {
-        return cpty_.view();
+        return +cpty_;
     }
 };
 

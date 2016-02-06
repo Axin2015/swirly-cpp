@@ -32,7 +32,7 @@ PosnPtr TraderSess::lazyPosn(const StringView& contr, Jday settlDay) throw(std::
     bool found;
     tie(it, found) = posns_.findHint(contr, settlDay);
     if (!found) {
-        it = posns_.insertHint(it, factory_.newPosn(mnem_.view(), contr, settlDay));
+        it = posns_.insertHint(it, factory_.newPosn(+mnem_, contr, settlDay));
     }
     return &*it;
 }

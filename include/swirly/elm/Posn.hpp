@@ -65,31 +65,31 @@ class SWIRLY_API Posn : public RefCounted {
     Posn(Posn&&);
     Posn& operator=(Posn&&) = delete;
 
-    StringView trader() const noexcept
+    auto trader() const noexcept
     {
-        return trader_.view();
+        return +trader_;
     }
-    StringView contr() const noexcept
+    auto contr() const noexcept
     {
-        return contr_.view();
+        return +contr_;
     }
-    Jday settlDay() const noexcept
+    auto settlDay() const noexcept
     {
         return settlDay_;
     }
-    Lots buyLots() const noexcept
+    auto buyLots() const noexcept
     {
         return buyLots_;
     }
-    Cost buyCost() const noexcept
+    auto buyCost() const noexcept
     {
         return buyCost_;
     }
-    Lots sellLots() const noexcept
+    auto sellLots() const noexcept
     {
         return sellLots_;
     }
-    Cost sellCost() const noexcept
+    auto sellCost() const noexcept
     {
         return sellCost_;
     }

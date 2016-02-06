@@ -68,17 +68,17 @@ class SWIRLY_API Rec : public Comparable<Rec> {
             result = mnem_.compare(rhs.mnem_);
         return result;
     }
-    RecType type() const noexcept
+    auto type() const noexcept
     {
         return type_;
     }
-    StringView mnem() const noexcept
+    auto mnem() const noexcept
     {
-        return mnem_.view();
+        return +mnem_;
     }
-    StringView display() const noexcept
+    auto display() const noexcept
     {
-        return display_.view();
+        return +display_;
     }
 };
 

@@ -25,7 +25,7 @@ using namespace std;
 
 namespace mg {
 
-swirly::StringView toView(const mg_str& str) noexcept
+swirly::StringView operator+(const mg_str& str) noexcept
 {
     return {str.p, str.len};
 }
@@ -68,23 +68,23 @@ class HttpMessage {
     }
     auto method() const noexcept
     {
-        return toView(impl_->method);
+        return +impl_->method;
     }
     auto uri() const noexcept
     {
-        return toView(impl_->uri);
+        return +impl_->uri;
     }
     auto proto() const noexcept
     {
-        return toView(impl_->proto);
+        return +impl_->proto;
     }
     auto queryString() const noexcept
     {
-        return toView(impl_->query_string);
+        return +impl_->query_string;
     }
     auto body() const noexcept
     {
-        return toView(impl_->body);
+        return +impl_->body;
     }
 };
 
