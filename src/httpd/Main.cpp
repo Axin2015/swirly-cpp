@@ -17,20 +17,100 @@
 #include "mongoose.h"
 
 #include <swirly/ash/Exception.hpp>
-#include <swirly/ash/String.hpp>
+#include <swirly/ash/Tokeniser.hpp>
 
 #include <iostream>
 
-using namespace std;
-
+namespace swirly {
 namespace mg {
 
-swirly::StringView operator+(const mg_str& str) noexcept
+class StreamBuf : public std::streambuf {
+    mbuf buf_;
+
+ protected:
+    int_type overflow(int_type c) noexcept override
+    {
+        if (c != traits_type::eof()) {
+            const char z = c;
+            if (mbuf_append(&buf_, &z, 1) != 1)
+                c = traits_type::eof();
+        }
+        return c;
+    }
+    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override
+    {
+        return mbuf_append(&buf_, s, count);
+    }
+
+ public:
+    StreamBuf() noexcept
+    {
+        mbuf_init(&buf_, 4096);
+    }
+    ~StreamBuf() noexcept
+    {
+        mbuf_free(&buf_);
+    }
+
+    // Copy.
+    StreamBuf(const StreamBuf& rhs) = delete;
+    StreamBuf& operator=(const StreamBuf& rhs) = delete;
+
+    // Move.
+    StreamBuf(StreamBuf&&) = delete;
+    StreamBuf& operator=(StreamBuf&&) = delete;
+
+    void reset() noexcept
+    {
+        buf_.len = 0;
+    }
+    const char_type* data() const noexcept
+    {
+        return buf_.buf;
+    }
+    std::streamsize size() const noexcept
+    {
+        return buf_.len;
+    }
+};
+
+class OStream : public std::ostream {
+    StreamBuf buf_;
+
+ public:
+    OStream() : std::ostream{nullptr}
+    {
+        rdbuf(&buf_);
+    }
+
+    // Copy.
+    OStream(const OStream& rhs) = delete;
+    OStream& operator=(const OStream& rhs) = delete;
+
+    // Move.
+    OStream(OStream&&) = delete;
+    OStream& operator=(OStream&&) = delete;
+
+    void reset() noexcept
+    {
+        buf_.reset();
+    }
+    const char_type* data() const noexcept
+    {
+        return buf_.data();
+    }
+    std::streamsize size() const noexcept
+    {
+        return buf_.size();
+    }
+};
+
+StringView operator+(const mg_str& str) noexcept
 {
     return {str.p, str.len};
 }
 
-class Error : public swirly::Exception {
+class Error : public Exception {
  public:
     Error() noexcept = default;
 
@@ -130,7 +210,7 @@ class MgrBase {
     {
         auto* conn = mg_bind(&mgr_, addr, handler);
         if (!conn)
-            swirly::throwException<Error>("mg_bind() failed");
+            throwException<Error>("mg_bind() failed");
         conn->user_data = this;
         return *conn;
     }
@@ -141,19 +221,68 @@ class MgrBase {
 };
 
 } // mg
+} // swirly
+
+using namespace std;
+using namespace swirly;
 
 namespace {
 
-constexpr char HTTP_PORT[] = "8000";
+constexpr char HTTP_PORT[] = "8080";
 
 static struct mg_serve_http_opts httpOpts;
 
 class Mgr : public mg::MgrBase<Mgr> {
+    mg::OStream os_;
+    Tokeniser<'/'> uri_;
+    void reset(StringView sv) noexcept
+    {
+        os_.reset();
+
+        // Remove leading slash.
+        if (sv.front() == '/')
+            sv.remove_prefix(1);
+        uri_.reset(sv);
+    }
+
  public:
     void httpRequest(mg_connection& nc, mg::HttpMessage data)
     {
-        cout << data.method() << ' ' << data.uri() << endl;
-        mg_serve_http(&nc, data.get(), httpOpts);
+        reset(data.uri());
+
+        if (!uri_.empty()) {
+
+            auto tok = uri_.top();
+            uri_.pop();
+
+            if (tok == "rec") {
+                recRequest(data);
+            } else if (tok == "sess") {
+                sessRequest(data);
+            } else if (tok == "view") {
+                viewRequest(data);
+            } else {
+                mg_serve_http(&nc, data.get(), httpOpts);
+                return;
+            }
+
+            const auto len = static_cast<int>(os_.size());
+            mg_printf(&nc, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%.*s", len, len,
+                      os_.data());
+        }
+    }
+    void recRequest(mg::HttpMessage data)
+    {
+        cout << "rec: " << data.method() << ' ' << data.uri() << endl;
+        os_ << R"({"mnem":"EURUSD"})";
+    }
+    void sessRequest(mg::HttpMessage data)
+    {
+        cout << "sess: " << data.method() << ' ' << data.uri() << endl;
+    }
+    void viewRequest(mg::HttpMessage data)
+    {
+        cout << "view: " << data.method() << ' ' << data.uri() << endl;
     }
 };
 
