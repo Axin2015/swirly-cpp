@@ -48,9 +48,9 @@ class SWIRLY_API Trader : public Rec {
     Trader(Trader&&);
     Trader& operator=(Trader&&) = delete;
 
-    StringView email() const noexcept
+    auto email() const noexcept
     {
-        return email_.view();
+        return +email_;
     }
 };
 

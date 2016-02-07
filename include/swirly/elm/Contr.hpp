@@ -65,55 +65,55 @@ class SWIRLY_API Contr : public Rec {
     Contr(Contr&&);
     Contr& operator=(Contr&&) = delete;
 
-    StringView asset() const noexcept
+    auto asset() const noexcept
     {
-        return asset_.view();
+        return +asset_;
     }
-    StringView ccy() const noexcept
+    auto ccy() const noexcept
     {
-        return ccy_.view();
+        return +ccy_;
     }
-    int lotNumer() const noexcept
+    auto lotNumer() const noexcept
     {
         return lotNumer_;
     }
-    int lotDenom() const noexcept
+    auto lotDenom() const noexcept
     {
         return lotDenom_;
     }
-    double qtyInc() const noexcept
+    auto qtyInc() const noexcept
     {
         return qtyInc_;
     }
-    int tickNumer() const noexcept
+    auto tickNumer() const noexcept
     {
         return tickNumer_;
     }
-    int tickDenom() const noexcept
+    auto tickDenom() const noexcept
     {
         return tickDenom_;
     }
-    double priceInc() const noexcept
+    auto priceInc() const noexcept
     {
         return priceInc_;
     }
-    int pipDp() const noexcept
+    auto pipDp() const noexcept
     {
         return pipDp_;
     }
-    int qtyDp() const noexcept
+    auto qtyDp() const noexcept
     {
         return qtyDp_;
     }
-    int priceDp() const noexcept
+    auto priceDp() const noexcept
     {
         return priceDp_;
     }
-    Lots minLots() const noexcept
+    auto minLots() const noexcept
     {
         return minLots_;
     }
-    Lots maxLots() const noexcept
+    auto maxLots() const noexcept
     {
         return maxLots_;
     }

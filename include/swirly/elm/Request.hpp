@@ -74,39 +74,39 @@ class SWIRLY_API Request : public RefCounted {
     Request(Request&&);
     Request& operator=(Request&&) = delete;
 
-    StringView trader() const noexcept
+    auto trader() const noexcept
     {
-        return trader_.view();
+        return +trader_;
     }
-    StringView market() const noexcept
+    auto market() const noexcept
     {
-        return market_.view();
+        return +market_;
     }
-    StringView contr() const noexcept
+    auto contr() const noexcept
     {
-        return contr_.view();
+        return +contr_;
     }
-    Jday settlDay() const noexcept
+    auto settlDay() const noexcept
     {
         return settlDay_;
     }
-    Iden id() const noexcept
+    auto id() const noexcept
     {
         return id_;
     }
-    StringView ref() const noexcept
+    auto ref() const noexcept
     {
-        return ref_.view();
+        return +ref_;
     }
-    Side side() const noexcept
+    auto side() const noexcept
     {
         return side_;
     }
-    Lots lots() const noexcept
+    auto lots() const noexcept
     {
         return lots_;
     }
-    Millis created() const noexcept
+    auto created() const noexcept
     {
         return created_;
     }

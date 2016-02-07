@@ -57,19 +57,19 @@ class SWIRLY_API Market : public Rec {
     {
         state_ = state;
     }
-    StringView contr() const noexcept
+    auto contr() const noexcept
     {
-        return contr_.view();
+        return +contr_;
     }
-    Jday settlDay() const noexcept
+    auto settlDay() const noexcept
     {
         return settlDay_;
     }
-    Jday expiryDay() const noexcept
+    auto expiryDay() const noexcept
     {
         return expiryDay_;
     }
-    MarketState state() const noexcept
+    auto state() const noexcept
     {
         return state_;
     }

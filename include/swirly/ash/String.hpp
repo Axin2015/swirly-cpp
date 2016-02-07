@@ -46,6 +46,12 @@ struct StringData {
     char buf[MaxN];
 };
 
+template <std::size_t MaxN>
+constexpr StringView operator+(const StringData<MaxN>& s) noexcept
+{
+    return {s.buf, s.len};
+}
+
 /**
  * String buffer with fixed upper-bound.
  */
@@ -53,6 +59,7 @@ template <std::size_t MaxN>
 class StringBuf : protected StringData<MaxN> {
     using StringData<MaxN>::len;
     using StringData<MaxN>::buf;
+
  public:
     using Data = StringData<MaxN>;
 
@@ -128,11 +135,13 @@ class StringBuf : protected StringData<MaxN> {
     {
         return len;
     }
-    constexpr StringView view() const noexcept
-    {
-        return {buf, len};
-    }
 };
+
+template <std::size_t MaxN>
+constexpr StringView operator+(const StringBuf<MaxN>& s) noexcept
+{
+    return {s.data(), s.size()};
+}
 
 template <std::size_t MaxL, std::size_t MaxR>
 constexpr bool operator==(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs) noexcept
@@ -245,7 +254,7 @@ constexpr bool operator>=(const StringView& lhs, const StringBuf<MaxN>& rhs) noe
 template <std::size_t MaxN>
 constexpr std::ostream& operator<<(std::ostream& os, const StringBuf<MaxN>& rhs) noexcept
 {
-    return os << rhs.view();
+    return os << +rhs;
 }
 
 /** @} */

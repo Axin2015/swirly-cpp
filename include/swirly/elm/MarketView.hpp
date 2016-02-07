@@ -59,27 +59,27 @@ class SWIRLY_API MarketView {
     MarketView(MarketView&&);
     MarketView& operator=(MarketView&&) = delete;
 
-    StringView market() const noexcept
+    auto market() const noexcept
     {
-        return market_.view();
+        return +market_;
     }
-    StringView contr() const noexcept
+    auto contr() const noexcept
     {
-        return contr_.view();
+        return +contr_;
     }
-    Jday settlDay() const noexcept
+    auto settlDay() const noexcept
     {
         return settlDay_;
     }
-    Lots lastLots() const noexcept
+    auto lastLots() const noexcept
     {
         return lastLots_;
     }
-    Ticks lastTicks() const noexcept
+    auto lastTicks() const noexcept
     {
         return lastTicks_;
     }
-    Millis lastTime() const noexcept
+    auto lastTime() const noexcept
     {
         return lastTime_;
     }
