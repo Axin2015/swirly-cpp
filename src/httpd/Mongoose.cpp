@@ -14,40 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIR_REST_HPP
-#define SWIRLY_FIR_REST_HPP
-
-#include <swirly/fig/Serv.hpp>
+#include "Mongoose.hpp"
 
 namespace swirly {
-
-/**
- * @addtogroup Rest
- * @{
- */
-
-class SWIRLY_API Rest {
-    Serv serv_;
-
- public:
-    Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now}
-    {
-    }
-    ~Rest() noexcept;
-
-    // Copy.
-    Rest(const Rest&) = delete;
-    Rest& operator=(const Rest&) = delete;
-
-    // Move.
-    Rest(Rest&&);
-    Rest& operator=(Rest&&);
-
-    void assets(Millis now, std::ostream& out) const;
-};
-
-/** @} */
-
+namespace mg {
+} // mg
 } // swirly
-
-#endif // SWIRLY_FIR_REST_HPP

@@ -56,7 +56,7 @@ class MockModel : public Model {
 
  public:
     MockModel() noexcept = default;
-    virtual ~MockModel() noexcept = default;
+    ~MockModel() noexcept override = default;
 
     // Copy.
     constexpr MockModel(const MockModel&) noexcept = default;

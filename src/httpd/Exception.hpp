@@ -14,40 +14,37 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIR_REST_HPP
-#define SWIRLY_FIR_REST_HPP
+#ifndef SWIRLY_HTTPD_EXCEPTION_HPP
+#define SWIRLY_HTTPD_EXCEPTION_HPP
 
-#include <swirly/fig/Serv.hpp>
+#include <swirly/ash/Exception.hpp>
 
 namespace swirly {
+namespace mg {
 
 /**
- * @addtogroup Rest
+ * @addtogroup App
  * @{
  */
 
-class SWIRLY_API Rest {
-    Serv serv_;
-
+class Error : public Exception {
  public:
-    Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now}
-    {
-    }
-    ~Rest() noexcept;
+    Error() noexcept = default;
+
+    ~Error() noexcept;
 
     // Copy.
-    Rest(const Rest&) = delete;
-    Rest& operator=(const Rest&) = delete;
+    Error(const Error&) noexcept = default;
+    Error& operator=(const Error&) noexcept = default;
 
     // Move.
-    Rest(Rest&&);
-    Rest& operator=(Rest&&);
-
-    void assets(Millis now, std::ostream& out) const;
+    Error(Error&&) noexcept = default;
+    Error& operator=(Error&&) noexcept = default;
 };
 
 /** @} */
 
+} // mg
 } // swirly
 
-#endif // SWIRLY_FIR_REST_HPP
+#endif // SWIRLY_HTTPD_EXCEPTION_HPP

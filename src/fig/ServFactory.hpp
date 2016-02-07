@@ -21,6 +21,11 @@
 
 namespace swirly {
 
+/**
+ * @addtogroup App
+ * @{
+ */
+
 class SWIRLY_API ServFactory : public BasicFactory {
  protected:
     std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
@@ -44,6 +49,8 @@ class SWIRLY_API ServFactory : public BasicFactory {
     ServFactory(ServFactory&&) = default;
     ServFactory& operator=(ServFactory&&) = default;
 };
+
+/** @} */
 
 } // swirly
 

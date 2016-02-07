@@ -24,4 +24,8 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
+void Rest::assets(Millis now, std::ostream& out) const
+{
+}
+
 } // swirly

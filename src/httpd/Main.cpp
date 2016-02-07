@@ -14,214 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "mongoose.h"
+#include "Mock.hpp"
+#include "Mongoose.hpp"
+#include "Stream.hpp"
 
-#include <swirly/ash/Exception.hpp>
+#include <swirly/fir/Rest.hpp>
+
+#include <swirly/ash/Time.hpp>
 #include <swirly/ash/Tokeniser.hpp>
 
 #include <iostream>
-
-namespace swirly {
-namespace mg {
-
-class StreamBuf : public std::streambuf {
-    mbuf buf_;
-
- protected:
-    int_type overflow(int_type c) noexcept override
-    {
-        if (c != traits_type::eof()) {
-            const char z = c;
-            if (mbuf_append(&buf_, &z, 1) != 1)
-                c = traits_type::eof();
-        }
-        return c;
-    }
-    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override
-    {
-        return mbuf_append(&buf_, s, count);
-    }
-
- public:
-    StreamBuf() noexcept
-    {
-        mbuf_init(&buf_, 4096);
-    }
-    ~StreamBuf() noexcept
-    {
-        mbuf_free(&buf_);
-    }
-
-    // Copy.
-    StreamBuf(const StreamBuf& rhs) = delete;
-    StreamBuf& operator=(const StreamBuf& rhs) = delete;
-
-    // Move.
-    StreamBuf(StreamBuf&&) = delete;
-    StreamBuf& operator=(StreamBuf&&) = delete;
-
-    void reset() noexcept
-    {
-        buf_.len = 0;
-    }
-    const char_type* data() const noexcept
-    {
-        return buf_.buf;
-    }
-    std::streamsize size() const noexcept
-    {
-        return buf_.len;
-    }
-};
-
-class OStream : public std::ostream {
-    StreamBuf buf_;
-
- public:
-    OStream() : std::ostream{nullptr}
-    {
-        rdbuf(&buf_);
-    }
-
-    // Copy.
-    OStream(const OStream& rhs) = delete;
-    OStream& operator=(const OStream& rhs) = delete;
-
-    // Move.
-    OStream(OStream&&) = delete;
-    OStream& operator=(OStream&&) = delete;
-
-    void reset() noexcept
-    {
-        buf_.reset();
-    }
-    const char_type* data() const noexcept
-    {
-        return buf_.data();
-    }
-    std::streamsize size() const noexcept
-    {
-        return buf_.size();
-    }
-};
-
-StringView operator+(const mg_str& str) noexcept
-{
-    return {str.p, str.len};
-}
-
-class Error : public Exception {
- public:
-    Error() noexcept = default;
-
-    ~Error() noexcept = default;
-
-    // Copy.
-    Error(const Error&) noexcept = default;
-    Error& operator=(const Error&) noexcept = default;
-
-    // Move.
-    Error(Error&&) noexcept = default;
-    Error& operator=(Error&&) noexcept = default;
-};
-
-class HttpMessage {
-    http_message* impl_;
-
- public:
-    HttpMessage(http_message* impl) noexcept : impl_{impl}
-    {
-    }
-    ~HttpMessage() noexcept = default;
-
-    // Copy.
-    HttpMessage(const HttpMessage&) noexcept = default;
-    HttpMessage& operator=(const HttpMessage&) noexcept = default;
-
-    // Move.
-    HttpMessage(HttpMessage&&) noexcept = default;
-    HttpMessage& operator=(HttpMessage&&) noexcept = default;
-
-    auto get() const noexcept
-    {
-        return impl_;
-    }
-    auto method() const noexcept
-    {
-        return +impl_->method;
-    }
-    auto uri() const noexcept
-    {
-        return +impl_->uri;
-    }
-    auto proto() const noexcept
-    {
-        return +impl_->proto;
-    }
-    auto queryString() const noexcept
-    {
-        return +impl_->query_string;
-    }
-    auto body() const noexcept
-    {
-        return +impl_->body;
-    }
-};
-
-// Mongoose event manager.
-
-template <typename DerivedT>
-class MgrBase {
-    mg_mgr mgr_;
-
-    static void handler(mg_connection* conn, int event, void* data)
-    {
-        auto* self = static_cast<DerivedT*>(conn->user_data);
-        switch (event) {
-        case MG_EV_CLOSE:
-            conn->user_data = nullptr;
-            break;
-        case MG_EV_HTTP_REQUEST:
-            self->httpRequest(*conn, static_cast<http_message*>(data));
-            break;
-        }
-    }
-
- protected:
-    MgrBase() noexcept
-    {
-        mg_mgr_init(&mgr_, this);
-    }
-    ~MgrBase() noexcept
-    {
-        mg_mgr_free(&mgr_);
-    }
-
- public:
-    // Copy.
-    MgrBase(const MgrBase&) = delete;
-    MgrBase& operator=(const MgrBase&) = delete;
-
-    // Move.
-    MgrBase(MgrBase&&) = delete;
-    MgrBase& operator=(MgrBase&&) = delete;
-
-    mg_connection& bind(const char* addr)
-    {
-        auto* conn = mg_bind(&mgr_, addr, handler);
-        if (!conn)
-            throwException<Error>("mg_bind() failed");
-        conn->user_data = this;
-        return *conn;
-    }
-    time_t poll(int milli)
-    {
-        return mg_mgr_poll(&mgr_, milli);
-    }
-};
-
-} // mg
-} // swirly
 
 using namespace std;
 using namespace swirly;
@@ -232,12 +34,13 @@ constexpr char HTTP_PORT[] = "8080";
 
 static struct mg_serve_http_opts httpOpts;
 
-class Mgr : public mg::MgrBase<Mgr> {
-    mg::OStream os_;
+class RestServ : public mg::Mgr<RestServ> {
+    Rest& rest_;
+    mg::OStream out_;
     Tokeniser<'/'> uri_;
     void reset(StringView sv) noexcept
     {
-        os_.reset();
+        out_.reset();
 
         // Remove leading slash.
         if (sv.front() == '/')
@@ -246,43 +49,82 @@ class Mgr : public mg::MgrBase<Mgr> {
     }
 
  public:
+    explicit RestServ(Rest& rest) noexcept : rest_(rest)
+    {
+    }
     void httpRequest(mg_connection& nc, mg::HttpMessage data)
     {
         reset(data.uri());
 
         if (!uri_.empty()) {
 
-            auto tok = uri_.top();
+            const auto tok = uri_.top();
             uri_.pop();
+            const auto method = data.method();
 
             if (tok == "rec") {
-                recRequest(data);
+                if (method == "GET") {
+                    getRec(data);
+                } else if (method == "POST") {
+                    postRec(data);
+                } else if (method == "PUT") {
+                    putRec(data);
+                } else {
+                    // FIXME.
+                }
             } else if (tok == "sess") {
-                sessRequest(data);
+                if (method == "GET") {
+                    getSess(data);
+                } else if (method == "POST") {
+                    postSess(data);
+                } else if (method == "PUT") {
+                    putSess(data);
+                } else if (method == "DELETE") {
+                    deleteSess(data);
+                } else {
+                    // FIXME.
+                }
             } else if (tok == "view") {
-                viewRequest(data);
+                if (method == "GET") {
+                    getView(data);
+                } else {
+                    // FIXME.
+                }
             } else {
                 mg_serve_http(&nc, data.get(), httpOpts);
                 return;
             }
 
-            const auto len = static_cast<int>(os_.size());
+            const auto len = static_cast<int>(out_.size());
             mg_printf(&nc, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%.*s", len, len,
-                      os_.data());
+                      out_.data());
         }
     }
-    void recRequest(mg::HttpMessage data)
+    void getRec(mg::HttpMessage data)
     {
-        cout << "rec: " << data.method() << ' ' << data.uri() << endl;
-        os_ << R"({"mnem":"EURUSD"})";
+        rest_.assets(now(), out_);
+        out_ << R"({"mnem":"EURUSD"})";
     }
-    void sessRequest(mg::HttpMessage data)
+    void postRec(mg::HttpMessage data)
     {
-        cout << "sess: " << data.method() << ' ' << data.uri() << endl;
     }
-    void viewRequest(mg::HttpMessage data)
+    void putRec(mg::HttpMessage data)
     {
-        cout << "view: " << data.method() << ' ' << data.uri() << endl;
+    }
+    void getSess(mg::HttpMessage data)
+    {
+    }
+    void postSess(mg::HttpMessage data)
+    {
+    }
+    void putSess(mg::HttpMessage data)
+    {
+    }
+    void deleteSess(mg::HttpMessage data)
+    {
+    }
+    void getView(mg::HttpMessage data)
+    {
     }
 };
 
@@ -292,8 +134,12 @@ int main(int argc, char* argv[])
 {
     try {
 
-        Mgr mgr;
-        auto& conn = mgr.bind(HTTP_PORT);
+        MockModel model;
+        MockJourn journ;
+        Rest rest{model, journ, now()};
+
+        RestServ rs{rest};
+        auto& conn = rs.bind(HTTP_PORT);
         mg_set_protocol_http_websocket(&conn);
 
         httpOpts.document_root = ".";
@@ -302,7 +148,7 @@ int main(int argc, char* argv[])
 
         cout << "Starting web server on port " << HTTP_PORT << endl;
         for (;;) {
-            mgr.poll(1000);
+            rs.poll(1000);
         }
 
         return 0;

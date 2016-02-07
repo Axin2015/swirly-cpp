@@ -14,40 +14,32 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIR_REST_HPP
-#define SWIRLY_FIR_REST_HPP
-
-#include <swirly/fig/Serv.hpp>
+#include "Stream.hpp"
 
 namespace swirly {
+namespace mg {
 
-/**
- * @addtogroup Rest
- * @{
- */
-
-class SWIRLY_API Rest {
-    Serv serv_;
-
- public:
-    Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now}
-    {
+StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
+{
+    if (c != traits_type::eof()) {
+        const char z = c;
+        if (mbuf_append(&buf_, &z, 1) != 1)
+            c = traits_type::eof();
     }
-    ~Rest() noexcept;
+    return c;
+}
 
-    // Copy.
-    Rest(const Rest&) = delete;
-    Rest& operator=(const Rest&) = delete;
+std::streamsize StreamBuf::xsputn(const char_type* s, std::streamsize count) noexcept
+{
+    return mbuf_append(&buf_, s, count);
+}
 
-    // Move.
-    Rest(Rest&&);
-    Rest& operator=(Rest&&);
+StreamBuf::~StreamBuf() noexcept
+{
+    mbuf_free(&buf_);
+}
 
-    void assets(Millis now, std::ostream& out) const;
-};
+OStream::~OStream() noexcept = default;
 
-/** @} */
-
+} // mg
 } // swirly
-
-#endif // SWIRLY_FIR_REST_HPP

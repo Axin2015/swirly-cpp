@@ -22,6 +22,11 @@
 namespace swirly {
 
 /**
+ * @addtogroup App
+ * @{
+ */
+
+/**
  * Unordered TraderSess set keyed by email.
  */
 class SWIRLY_API TraderSessSet {
@@ -126,6 +131,8 @@ class SWIRLY_API TraderSessSet {
         return set_.find(email, KeyHash(), KeyValueEqual());
     }
 };
+
+/** @} */
 
 } // swirly
 
