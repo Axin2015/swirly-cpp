@@ -14,35 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIG_EXCEPTION_HPP
-#define SWIRLY_FIG_EXCEPTION_HPP
+#include <swirly/fir/Rest.hpp>
 
-#include <swirly/ash/Exception.hpp>
+#include <boost/test/unit_test.hpp>
 
-namespace swirly {
+BOOST_AUTO_TEST_SUITE(RestSuite)
 
-/**
- * @addtogroup Exception
- * @{
- */
+BOOST_AUTO_TEST_CASE(RestCase)
+{
+    BOOST_CHECK(true);
+}
 
-class SWIRLY_API ParseException : public Exception {
- public:
-    ParseException() noexcept = default;
-
-    ~ParseException() noexcept override;
-
-    // Copy.
-    ParseException(const ParseException&) noexcept = default;
-    ParseException& operator=(const ParseException&) noexcept = default;
-
-    // Move.
-    ParseException(ParseException&&) noexcept = default;
-    ParseException& operator=(ParseException&&) noexcept = default;
-};
-
-/** @} */
-
-} // swirly
-
-#endif // SWIRLY_FIG_EXCEPTION_HPP
+BOOST_AUTO_TEST_SUITE_END()

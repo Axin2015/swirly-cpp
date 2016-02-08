@@ -35,7 +35,6 @@
 #include <regex>
 
 using namespace std;
-using namespace swirly;
 
 namespace swirly {
 namespace {

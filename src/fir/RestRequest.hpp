@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIG_RESTREQUEST_HPP
-#define SWIRLY_FIG_RESTREQUEST_HPP
+#ifndef SWIRLY_FIR_RESTREQUEST_HPP
+#define SWIRLY_FIR_RESTREQUEST_HPP
 
 #include <swirly/elm/Types.hpp>
 
@@ -172,4 +172,4 @@ class SWIRLY_API RestRequest {
 
 } // swirly
 
-#endif // SWIRLY_FIG_RESTREQUEST_HPP
+#endif // SWIRLY_FIR_RESTREQUEST_HPP

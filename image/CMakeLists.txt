@@ -12,6 +12,7 @@ IF(DOT)
     Ash
     Elm
     Fig
+    Fir
   )
 
   FOREACH(name ${names})
