@@ -34,9 +34,10 @@ namespace swirly {
 
 class SWIRLY_API Rec : public Comparable<Rec> {
  public:
-  Rec(RecType type, const StringView& mnem, const StringView& display) noexcept : type_{type},
-                                                                                  mnem_{mnem},
-                                                                                  display_{display}
+  Rec(RecType type, const std::string_view& mnem, const std::string_view& display) noexcept
+    : type_{type},
+      mnem_{mnem},
+      display_{display}
   {
   }
 
@@ -60,7 +61,7 @@ class SWIRLY_API Rec : public Comparable<Rec> {
   auto type() const noexcept { return type_; }
   auto mnem() const noexcept { return +mnem_; }
   auto display() const noexcept { return +display_; }
-  void setDisplay(const StringView& display) noexcept { display_ = display; }
+  void setDisplay(const std::string_view& display) noexcept { display_ = display; }
 
  protected:
   const RecType type_;
@@ -82,11 +83,11 @@ class RecSet {
     }
   };
   struct KeyValueCompare {
-    bool operator()(const StringView& lhs, const Rec& rhs) const noexcept
+    bool operator()(const std::string_view& lhs, const Rec& rhs) const noexcept
     {
       return lhs < rhs.mnem();
     }
-    bool operator()(const Rec& lhs, const StringView& rhs) const noexcept
+    bool operator()(const Rec& lhs, const std::string_view& rhs) const noexcept
     {
       return lhs.mnem() < rhs;
     }
@@ -127,18 +128,21 @@ class RecSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(const StringView& mnem) const noexcept
+  ConstIterator find(const std::string_view& mnem) const noexcept
   {
     return set_.find(mnem, KeyValueCompare());
   }
-  Iterator find(const StringView& mnem) noexcept { return set_.find(mnem, KeyValueCompare()); }
-  std::pair<ConstIterator, bool> findHint(const StringView& mnem) const noexcept
+  Iterator find(const std::string_view& mnem) noexcept
+  {
+    return set_.find(mnem, KeyValueCompare());
+  }
+  std::pair<ConstIterator, bool> findHint(const std::string_view& mnem) const noexcept
   {
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(mnem, comp);
     return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
   }
-  std::pair<Iterator, bool> findHint(const StringView& mnem) noexcept
+  std::pair<Iterator, bool> findHint(const std::string_view& mnem) noexcept
   {
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(mnem, comp);

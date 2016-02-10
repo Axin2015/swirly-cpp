@@ -31,9 +31,9 @@ namespace swirly {
  */
 class SWIRLY_API Contr : public Rec {
  public:
-  Contr(const StringView& mnem, const StringView& display, const StringView& asset,
-        const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-        Lots minLots, Lots maxLots) noexcept;
+  Contr(const std::string_view& mnem, const std::string_view& display,
+        const std::string_view& asset, const std::string_view& ccy, int lotNumer, int lotDenom,
+        int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
 
   ~Contr() noexcept override;
 

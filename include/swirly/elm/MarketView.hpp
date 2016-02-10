@@ -34,11 +34,11 @@ namespace swirly {
  */
 class SWIRLY_API MarketView {
  public:
-  MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
-             Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept;
+  MarketView(const std::string_view& market, const std::string_view& contr, Jday settlDay,
+             Lots lastLots, Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept;
 
-  MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
-             Ticks lastTicks, Millis lastTime) noexcept;
+  MarketView(const std::string_view& market, const std::string_view& contr, Jday settlDay,
+             Lots lastLots, Ticks lastTicks, Millis lastTime) noexcept;
 
   ~MarketView() noexcept;
 

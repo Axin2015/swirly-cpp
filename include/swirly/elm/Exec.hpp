@@ -33,10 +33,11 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public Request {
  public:
-  Exec(const StringView& trader, const StringView& market, const StringView& contr, Jday settlDay,
-       Iden id, const StringView& ref, Iden orderId, State state, Side side, Lots lots, Ticks ticks,
-       Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
-       Role role, const StringView& cpty, Millis created) noexcept
+  Exec(const std::string_view& trader, const std::string_view& market,
+       const std::string_view& contr, Jday settlDay, Iden id, const std::string_view& ref,
+       Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
+       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role,
+       const std::string_view& cpty, Millis created) noexcept
     : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
       orderId_{orderId},
       state_{state},
@@ -74,7 +75,7 @@ class SWIRLY_API Exec : public Request {
   Lots minLots() const noexcept { return minLots_; }
   Iden matchId() const noexcept { return matchId_; }
   Role role() const noexcept { return role_; }
-  StringView cpty() const noexcept { return +cpty_; }
+  std::string_view cpty() const noexcept { return +cpty_; }
   boost::intrusive::set_member_hook<> idHook_;
 
  private:

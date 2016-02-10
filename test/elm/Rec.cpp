@@ -24,7 +24,7 @@ using namespace swirly;
 namespace {
 class Foo : public Rec {
  public:
-  Foo(const StringView& mnem, const StringView& display, int& alive) noexcept
+  Foo(const string_view& mnem, const string_view& display, int& alive) noexcept
     : Rec{RecType::ASSET, mnem, display},
       alive_{alive}
   {

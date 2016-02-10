@@ -31,7 +31,7 @@ namespace mg {
  * @{
  */
 
-inline StringView operator+(const mg_str& str) noexcept
+inline std::string_view operator+(const mg_str& str) noexcept
 {
   return {str.p, str.len};
 }

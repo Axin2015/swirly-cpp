@@ -60,24 +60,24 @@ class SWIRLY_API RestRequest {
   RestRequest& operator=(RestRequest&&) = delete;
 
   unsigned fields() const noexcept { return fields_; }
-  StringView mnem() const noexcept { return {mnem_.buf, mnem_.len}; }
-  StringView display() const noexcept { return {display_.buf, display_.len}; }
-  StringView email() const noexcept { return {email_.buf, email_.len}; }
-  StringView trader() const noexcept { return {trader_.buf, trader_.len}; }
-  StringView contr() const noexcept { return {contr_.buf, contr_.len}; }
+  std::string_view mnem() const noexcept { return {mnem_.buf, mnem_.len}; }
+  std::string_view display() const noexcept { return {display_.buf, display_.len}; }
+  std::string_view email() const noexcept { return {email_.buf, email_.len}; }
+  std::string_view trader() const noexcept { return {trader_.buf, trader_.len}; }
+  std::string_view contr() const noexcept { return {contr_.buf, contr_.len}; }
   IsoDate settlDate() const noexcept { return settlDate_; }
   IsoDate expiryDate() const noexcept { return expiryDate_; }
-  StringView ref() const noexcept { return {ref_.buf, ref_.len}; }
+  std::string_view ref() const noexcept { return {ref_.buf, ref_.len}; }
   MarketState state() const noexcept { return state_; }
   Side side() const noexcept { return side_; }
   Lots lots() const noexcept { return lots_; }
   Ticks ticks() const noexcept { return ticks_; }
   Lots minLots() const noexcept { return minLots_; }
   Role role() const noexcept { return role_; }
-  StringView cpty() const noexcept { return {cpty_.buf, cpty_.len}; }
+  std::string_view cpty() const noexcept { return {cpty_.buf, cpty_.len}; }
   void reset(bool clear = true) noexcept;
 
-  bool parse(const StringView& buf);
+  bool parse(const std::string_view& buf);
 
  private:
   int cs_;

@@ -18,11 +18,14 @@
 
 #include <cassert>
 
+using namespace std;
+
 namespace swirly {
 
-MarketBook::MarketBook(const StringView& mnem, const StringView& display, const StringView& contr,
-                       Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
-                       Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept
+MarketBook::MarketBook(const string_view& mnem, const string_view& display,
+                       const string_view& contr, Jday settlDay, Jday expiryDay, MarketState state,
+                       Lots lastLots, Ticks lastTicks, Millis lastTime, Iden maxOrderId,
+                       Iden maxExecId) noexcept
   : Market{mnem, display, contr, settlDay, expiryDay, state},
     lastLots_{lastLots},
     lastTicks_{lastTicks},

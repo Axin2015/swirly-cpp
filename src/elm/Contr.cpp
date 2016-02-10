@@ -18,10 +18,12 @@
 
 #include <swirly/elm/Conv.hpp>
 
+using namespace std;
+
 namespace swirly {
 
-Contr::Contr(const StringView& mnem, const StringView& display, const StringView& asset,
-             const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+Contr::Contr(const string_view& mnem, const string_view& display, const string_view& asset,
+             const string_view& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
              int pipDp, Lots minLots, Lots maxLots) noexcept
   : Rec{RecType::CONTR, mnem, display},
     asset_{asset},

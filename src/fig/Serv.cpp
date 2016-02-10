@@ -47,8 +47,8 @@ struct Serv::Impl {
   using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
 
   Impl(const Model& model, Journ& journ, Millis now) noexcept : journ{journ} {}
-  MarketBookPtr newMarket(const StringView& mnem, const StringView& display,
-                          const StringView& contr, Jday settlDay, Jday expiryDay,
+  MarketBookPtr newMarket(const string_view& mnem, const string_view& display,
+                          const string_view& contr, Jday settlDay, Jday expiryDay,
                           MarketState state) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
@@ -56,8 +56,8 @@ struct Serv::Impl {
     auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
     return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
   }
-  TraderSessPtr newTrader(const StringView& mnem, const StringView& display,
-                          const StringView& email) const
+  TraderSessPtr newTrader(const string_view& mnem, const string_view& display,
+                          const string_view& email) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
       throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
@@ -129,8 +129,8 @@ const TraderSet& Serv::traders() const noexcept
   return impl_->traders;
 }
 
-const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
-                                     const StringView& contr, Jday settlDay, Jday expiryDay,
+const MarketBook& Serv::createMarket(const string_view& mnem, const string_view& display,
+                                     const string_view& contr, Jday settlDay, Jday expiryDay,
                                      MarketState state, Millis now)
 {
   auto it
@@ -139,7 +139,7 @@ const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& d
   return market;
 }
 
-const MarketBook& Serv::updateMarket(const StringView& mnem, const StringView& display,
+const MarketBook& Serv::updateMarket(const string_view& mnem, const string_view& display,
                                      MarketState state, Millis now)
 {
   auto it = impl_->markets.find(mnem);
@@ -151,7 +151,7 @@ const MarketBook& Serv::updateMarket(const StringView& mnem, const StringView& d
   return market;
 }
 
-const MarketBook& Serv::market(const StringView& mnem) const
+const MarketBook& Serv::market(const string_view& mnem) const
 {
   auto it = impl_->markets.find(mnem);
   if (it == impl_->markets.end())
@@ -160,15 +160,15 @@ const MarketBook& Serv::market(const StringView& mnem) const
   return market;
 }
 
-const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
-                                     const StringView& email)
+const TraderSess& Serv::createTrader(const string_view& mnem, const string_view& display,
+                                     const string_view& email)
 {
   auto it = impl_->traders.insert(impl_->newTrader(mnem, display, email));
   auto& trader = static_cast<TraderSess&>(*it);
   return trader;
 }
 
-const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& display)
+const TraderSess& Serv::updateTrader(const string_view& mnem, const string_view& display)
 {
   auto it = impl_->traders.find(mnem);
   if (it == impl_->traders.end())
@@ -178,7 +178,7 @@ const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& d
   return trader;
 }
 
-const TraderSess& Serv::trader(const StringView& mnem) const
+const TraderSess& Serv::trader(const string_view& mnem) const
 {
   auto it = impl_->traders.find(mnem);
   if (it == impl_->traders.end())
@@ -187,7 +187,7 @@ const TraderSess& Serv::trader(const StringView& mnem) const
   return trader;
 }
 
-const TraderSess* Serv::findTraderByEmail(const StringView& email) const
+const TraderSess* Serv::findTraderByEmail(const string_view& email) const
 {
   const TraderSess* trader{nullptr};
   auto it = impl_->emailIdx.find(email);
@@ -196,7 +196,7 @@ const TraderSess* Serv::findTraderByEmail(const StringView& email) const
   return trader;
 }
 
-void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+void Serv::createOrder(TraderSess& sess, MarketBook& book, const string_view& ref, Side side,
                        Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
   const auto busDay = getBusDay(now);
@@ -270,7 +270,7 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, M
 {
 }
 
-void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots,
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const string_view& ref, Lots lots,
                        Millis now, Response& resp)
 {
 }
@@ -288,7 +288,7 @@ void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, 
 {
 }
 
-void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const string_view& ref, Millis now,
                        Response& resp)
 {
 }
@@ -310,7 +310,7 @@ void Serv::archiveOrder(TraderSess& sess, Order& order, Millis now)
 {
 }
 
-void Serv::archiveOrder(TraderSess& sess, const StringView& market, Iden id, Millis now)
+void Serv::archiveOrder(TraderSess& sess, const string_view& market, Iden id, Millis now)
 {
 }
 
@@ -318,12 +318,14 @@ void Serv::archiveOrder(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now)
+void Serv::archiveOrder(TraderSess& sess, const string_view& market, const IdenView& ids,
+                        Millis now)
 {
 }
 
-ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
-                          Lots lots, Ticks ticks, Role role, const StringView& cpty, Millis created)
+ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, const string_view& ref, Side side,
+                          Lots lots, Ticks ticks, Role role, const string_view& cpty,
+                          Millis created)
 {
   return {};
 }
@@ -332,7 +334,7 @@ void Serv::archiveTrade(TraderSess& sess, Exec& trade, Millis now)
 {
 }
 
-void Serv::archiveTrade(TraderSess& sess, const StringView& market, Iden id, Millis now)
+void Serv::archiveTrade(TraderSess& sess, const string_view& market, Iden id, Millis now)
 {
 }
 
@@ -340,7 +342,8 @@ void Serv::archiveTrade(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now)
+void Serv::archiveTrade(TraderSess& sess, const string_view& market, const IdenView& ids,
+                        Millis now)
 {
 }
 

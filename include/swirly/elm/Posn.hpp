@@ -33,14 +33,14 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted {
  public:
-  Posn(const StringView& trader, const StringView& contr, Jday settlDay, Lots buyLots, Cost buyCost,
-       Lots sellLots, Cost sellCost) noexcept : trader_{trader},
-                                                contr_{contr},
-                                                settlDay_{settlDay},
-                                                buyLots_{buyLots},
-                                                buyCost_{buyCost},
-                                                sellLots_{sellLots},
-                                                sellCost_{sellCost}
+  Posn(const std::string_view& trader, const std::string_view& contr, Jday settlDay, Lots buyLots,
+       Cost buyCost, Lots sellLots, Cost sellCost) noexcept : trader_{trader},
+                                                              contr_{contr},
+                                                              settlDay_{settlDay},
+                                                              buyLots_{buyLots},
+                                                              buyCost_{buyCost},
+                                                              sellLots_{sellLots},
+                                                              sellCost_{sellCost}
   {
   }
   ~Posn() noexcept override;
@@ -75,7 +75,7 @@ class SWIRLY_API Posn : public RefCounted {
 using PosnPtr = boost::intrusive_ptr<Posn>;
 
 class SWIRLY_API TraderPosnSet {
-  using Key = std::tuple<StringView, Jday>;
+  using Key = std::tuple<std::string_view, Jday>;
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
@@ -139,22 +139,23 @@ class SWIRLY_API TraderPosnSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(const StringView& contr, Jday settlDay) const noexcept
+  ConstIterator find(const std::string_view& contr, Jday settlDay) const noexcept
   {
     return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
   }
-  Iterator find(const StringView& contr, Jday settlDay) noexcept
+  Iterator find(const std::string_view& contr, Jday settlDay) noexcept
   {
     return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(const StringView& contr, Jday settlDay) const noexcept
+  std::pair<ConstIterator, bool> findHint(const std::string_view& contr, Jday settlDay) const
+    noexcept
   {
     const auto key = std::make_tuple(contr, settlDay);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(const StringView& contr, Jday settlDay) noexcept
+  std::pair<Iterator, bool> findHint(const std::string_view& contr, Jday settlDay) noexcept
   {
     const auto key = std::make_tuple(contr, settlDay);
     const auto comp = KeyValueCompare();

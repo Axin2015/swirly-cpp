@@ -112,7 +112,7 @@ using Mnem = StringBuf<MNEM_MAX>;
  */
 using Ref = StringBuf<REF_MAX>;
 
-using MarketId = std::pair<StringView, Iden>;
+using MarketId = std::pair<std::string_view, Iden>;
 
 enum class AssetType { COMMODITY = 1, CORPORATE, CURRENCY, EQUITY, GOVERNMENT, INDEX };
 

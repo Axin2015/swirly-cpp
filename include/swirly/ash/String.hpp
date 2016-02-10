@@ -24,6 +24,10 @@
 
 #include <cstring>
 
+namespace std {
+using string_view = experimental::string_view;
+}
+
 namespace swirly {
 
 /**
@@ -31,9 +35,7 @@ namespace swirly {
  * @{
  */
 
-using StringView = std::experimental::string_view;
-
-constexpr StringView operator""_sv(const char* str, std::size_t len) noexcept
+constexpr std::string_view operator""_sv(const char* str, std::size_t len) noexcept
 {
   return {str, len};
 }
@@ -47,7 +49,7 @@ struct StringData {
 };
 
 template <std::size_t MaxN>
-constexpr StringView operator+(const StringData<MaxN>& s) noexcept
+constexpr std::string_view operator+(const StringData<MaxN>& s) noexcept
 {
   return {s.buf, s.len};
 }
@@ -65,7 +67,7 @@ class StringBuf : protected StringData<MaxN> {
   {
     *this = rhs;
   }
-  constexpr StringBuf(const StringView& rhs) noexcept { *this = rhs; }
+  constexpr StringBuf(const std::string_view& rhs) noexcept { *this = rhs; }
   constexpr StringBuf() noexcept { len = 0; }
 
   ~StringBuf() noexcept = default;
@@ -90,7 +92,7 @@ class StringBuf : protected StringData<MaxN> {
     std::memcpy(buf, rhs.data(), len);
     return *this;
   }
-  constexpr StringBuf& operator=(const StringView& rhs) noexcept
+  constexpr StringBuf& operator=(const std::string_view& rhs) noexcept
   {
     len = std::min(rhs.size(), MaxN);
     std::memcpy(buf, rhs.data(), len);
@@ -104,7 +106,7 @@ class StringBuf : protected StringData<MaxN> {
       result = swirly::compare(len, rhs.size());
     return result;
   }
-  constexpr int compare(const StringView& rhs) const noexcept
+  constexpr int compare(const std::string_view& rhs) const noexcept
   {
     int result{std::memcmp(buf, rhs.data(), std::min(len, rhs.size()))};
     if (result == 0)
@@ -121,7 +123,7 @@ class StringBuf : protected StringData<MaxN> {
 };
 
 template <std::size_t MaxN>
-constexpr StringView operator+(const StringBuf<MaxN>& s) noexcept
+constexpr std::string_view operator+(const StringBuf<MaxN>& s) noexcept
 {
   return {s.data(), s.size()};
 }
@@ -133,13 +135,13 @@ constexpr bool operator==(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs
 }
 
 template <std::size_t MaxN>
-constexpr bool operator==(const StringBuf<MaxN>& lhs, const StringView& rhs) noexcept
+constexpr bool operator==(const StringBuf<MaxN>& lhs, const std::string_view& rhs) noexcept
 {
   return lhs.compare(rhs) == 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator==(const StringView& lhs, const StringBuf<MaxN>& rhs) noexcept
+constexpr bool operator==(const std::string_view& lhs, const StringBuf<MaxN>& rhs) noexcept
 {
   return 0 == rhs.compare(lhs);
 }
@@ -151,13 +153,13 @@ constexpr bool operator!=(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs
 }
 
 template <std::size_t MaxN>
-constexpr bool operator!=(const StringBuf<MaxN>& lhs, const StringView& rhs) noexcept
+constexpr bool operator!=(const StringBuf<MaxN>& lhs, const std::string_view& rhs) noexcept
 {
   return lhs.compare(rhs) != 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator!=(const StringView& lhs, const StringBuf<MaxN>& rhs) noexcept
+constexpr bool operator!=(const std::string_view& lhs, const StringBuf<MaxN>& rhs) noexcept
 {
   return 0 != rhs.compare(lhs);
 }
@@ -169,13 +171,13 @@ constexpr bool operator<(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs)
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<(const StringBuf<MaxN>& lhs, const StringView& rhs) noexcept
+constexpr bool operator<(const StringBuf<MaxN>& lhs, const std::string_view& rhs) noexcept
 {
   return lhs.compare(rhs) < 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<(const StringView& lhs, const StringBuf<MaxN>& rhs) noexcept
+constexpr bool operator<(const std::string_view& lhs, const StringBuf<MaxN>& rhs) noexcept
 {
   return 0 < rhs.compare(lhs);
 }
@@ -187,13 +189,13 @@ constexpr bool operator<=(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<=(const StringBuf<MaxN>& lhs, const StringView& rhs) noexcept
+constexpr bool operator<=(const StringBuf<MaxN>& lhs, const std::string_view& rhs) noexcept
 {
   return lhs.compare(rhs) <= 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<=(const StringView& lhs, const StringBuf<MaxN>& rhs) noexcept
+constexpr bool operator<=(const std::string_view& lhs, const StringBuf<MaxN>& rhs) noexcept
 {
   return 0 <= rhs.compare(lhs);
 }
@@ -205,13 +207,13 @@ constexpr bool operator>(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs)
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>(const StringBuf<MaxN>& lhs, const StringView& rhs) noexcept
+constexpr bool operator>(const StringBuf<MaxN>& lhs, const std::string_view& rhs) noexcept
 {
   return lhs.compare(rhs) > 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>(const StringView& lhs, const StringBuf<MaxN>& rhs) noexcept
+constexpr bool operator>(const std::string_view& lhs, const StringBuf<MaxN>& rhs) noexcept
 {
   return 0 > rhs.compare(lhs);
 }
@@ -223,13 +225,13 @@ constexpr bool operator>=(const StringBuf<MaxL>& lhs, const StringBuf<MaxR>& rhs
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>=(const StringBuf<MaxN>& lhs, const StringView& rhs) noexcept
+constexpr bool operator>=(const StringBuf<MaxN>& lhs, const std::string_view& rhs) noexcept
 {
   return lhs.compare(rhs) >= 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>=(const StringView& lhs, const StringBuf<MaxN>& rhs) noexcept
+constexpr bool operator>=(const std::string_view& lhs, const StringBuf<MaxN>& rhs) noexcept
 {
   return 0 >= rhs.compare(lhs);
 }

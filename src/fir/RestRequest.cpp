@@ -21,13 +21,15 @@
 
 #include "Exception.hpp"
 
+using namespace std;
+
 namespace swirly {
 
 namespace {
 
-#line 310 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 312 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
 
-#line 34 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
+#line 36 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
 static const char _json_actions[]
   = {0,  1, 0,  1, 2,  1, 4,  1, 5,  1,  7,  1, 8,  1, 10, 1,  11, 1, 13, 1, 14, 1, 16, 1, 17, 1,
      19, 1, 20, 1, 21, 1, 22, 1, 23, 1,  24, 1, 26, 1, 27, 1,  28, 1, 29, 1, 30, 1, 31, 1, 32, 1,
@@ -199,7 +201,7 @@ static const int json_error = 0;
 
 static const int json_en_main = 1;
 
-#line 313 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 315 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
 
 } // anonymous
 
@@ -209,12 +211,12 @@ void RestRequest::reset(bool clear) noexcept
 {
   decltype(cs_) cs;
 
-#line 475 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
+#line 477 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
   {
     cs = json_start;
   }
 
-#line 322 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 324 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
   cs_ = cs;
 
   if (!clear)
@@ -239,7 +241,7 @@ void RestRequest::reset(bool clear) noexcept
   cpty_.len = 0;
 }
 
-bool RestRequest::parse(const StringView& buf)
+bool RestRequest::parse(const string_view& buf)
 {
   const char* p{buf.data()};
   const char* pe{p + buf.size()};
@@ -247,7 +249,7 @@ bool RestRequest::parse(const StringView& buf)
 
   auto cs = cs_;
 
-#line 513 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
+#line 515 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
   {
     int _klen;
     unsigned int _trans;
@@ -319,28 +321,28 @@ bool RestRequest::parse(const StringView& buf)
     while (_nacts-- > 0) {
       switch (*_acts++) {
       case 0:
-#line 29 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 31 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         num_.sign = 1;
         num_.digits = 0;
       } break;
       case 1:
-#line 33 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 35 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         num_.sign = -1;
       } break;
       case 2:
-#line 36 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 38 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         num_.digits = num_.digits * 10 + ((*p) - '0');
       } break;
       case 3:
-#line 55 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 57 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         *str_.len = 0;
       } break;
       case 4:
-#line 58 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 60 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         auto& len = *str_.len;
         if (len < str_.max)
@@ -355,145 +357,145 @@ bool RestRequest::parse(const StringView& buf)
         }
       } break;
       case 5:
-#line 78 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 80 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::MNEM;
         mnem_.len = 0;
       } break;
       case 6:
-#line 82 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 84 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &mnem_.len;
         str_.buf = mnem_.buf;
         str_.max = MNEM_MAX;
       } break;
       case 7:
-#line 87 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 89 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::MNEM;
       } break;
       case 8:
-#line 93 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 95 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::DISPLAY;
         display_.len = 0;
       } break;
       case 9:
-#line 97 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 99 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &display_.len;
         str_.buf = display_.buf;
         str_.max = DISPLAY_MAX;
       } break;
       case 10:
-#line 102 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 104 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::DISPLAY;
       } break;
       case 11:
-#line 108 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 110 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::EMAIL;
         email_.len = 0;
       } break;
       case 12:
-#line 112 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 114 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &email_.len;
         str_.buf = email_.buf;
         str_.max = EMAIL_MAX;
       } break;
       case 13:
-#line 117 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 119 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::EMAIL;
       } break;
       case 14:
-#line 123 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 125 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::TRADER;
         trader_.len = 0;
       } break;
       case 15:
-#line 127 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 129 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &trader_.len;
         str_.buf = trader_.buf;
         str_.max = MNEM_MAX;
       } break;
       case 16:
-#line 132 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 134 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::TRADER;
       } break;
       case 17:
-#line 138 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 140 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::CONTR;
         contr_.len = 0;
       } break;
       case 18:
-#line 142 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 144 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &contr_.len;
         str_.buf = contr_.buf;
         str_.max = MNEM_MAX;
       } break;
       case 19:
-#line 147 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 149 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::CONTR;
       } break;
       case 20:
-#line 153 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 155 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::SETTL_DATE;
         settlDate_ = 0_dt;
       } break;
       case 21:
-#line 157 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 159 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::SETTL_DATE;
         settlDate_ = box<IsoDate>(num());
       } break;
       case 22:
-#line 164 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 166 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::EXPIRY_DATE;
         expiryDate_ = 0_dt;
       } break;
       case 23:
-#line 168 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 170 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::EXPIRY_DATE;
         expiryDate_ = box<IsoDate>(num());
       } break;
       case 24:
-#line 175 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 177 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::REF;
         ref_.len = 0;
       } break;
       case 25:
-#line 179 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 181 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &ref_.len;
         str_.buf = ref_.buf;
         str_.max = REF_MAX;
       } break;
       case 26:
-#line 184 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 186 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::REF;
       } break;
       case 27:
-#line 190 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 192 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::STATE;
         state_ = 0;
       } break;
       case 28:
-#line 194 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 196 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         if (num_.sign >= 0) {
           fields_ |= RestRequest::STATE;
@@ -504,96 +506,96 @@ bool RestRequest::parse(const StringView& buf)
         }
       } break;
       case 29:
-#line 205 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 207 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::TICKS;
         ticks_ = 0_tks;
       } break;
       case 30:
-#line 209 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 211 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::TICKS;
         ticks_ = box<Ticks>(num());
       } break;
       case 31:
-#line 216 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 218 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::SIDE;
         side_ = box<Side>(0);
       } break;
       case 32:
-#line 220 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 222 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::SIDE;
         side_ = Side::BUY;
       } break;
       case 33:
-#line 224 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 226 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::SIDE;
         side_ = Side::SELL;
       } break;
       case 34:
-#line 232 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 234 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::LOTS;
         lots_ = 0_lts;
       } break;
       case 35:
-#line 236 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 238 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::LOTS;
         lots_ = box<Lots>(num());
       } break;
       case 36:
-#line 243 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 245 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::MIN_LOTS;
         minLots_ = 0_lts;
       } break;
       case 37:
-#line 247 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 249 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::MIN_LOTS;
         minLots_ = box<Lots>(num());
       } break;
       case 38:
-#line 254 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 256 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::ROLE;
         role_ = Role::NONE;
       } break;
       case 39:
-#line 258 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 260 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::ROLE;
         role_ = Role::MAKER;
       } break;
       case 40:
-#line 262 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 264 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::ROLE;
         role_ = Role::TAKER;
       } break;
       case 41:
-#line 270 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 272 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ &= ~RestRequest::CPTY;
         cpty_.len = 0;
       } break;
       case 42:
-#line 274 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 276 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         str_.len = &cpty_.len;
         str_.buf = cpty_.buf;
         str_.max = MNEM_MAX;
       } break;
       case 43:
-#line 279 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 281 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         fields_ |= RestRequest::CPTY;
       } break;
-#line 900 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
+#line 902 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
       }
     }
 
@@ -608,7 +610,7 @@ bool RestRequest::parse(const StringView& buf)
   }
   }
 
-#line 354 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
+#line 356 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
   cs_ = cs;
 
   if (cs == json_error)

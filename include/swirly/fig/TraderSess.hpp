@@ -37,9 +37,10 @@ class SWIRLY_API TraderSess : public Trader {
   using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
  public:
-  TraderSess(const StringView& mnem, const StringView& display, const StringView& email,
-             const Factory& factory) noexcept : Trader{mnem, display, email},
-                                                factory_{factory}
+  TraderSess(const std::string_view& mnem, const std::string_view& display,
+             const std::string_view& email, const Factory& factory) noexcept
+    : Trader{mnem, display, email},
+      factory_{factory}
   {
   }
   ~TraderSess() noexcept override;
@@ -81,7 +82,7 @@ class SWIRLY_API TraderSess : public Trader {
     assert(posn->trader() == mnem_);
     posns_.insert(posn);
   }
-  PosnPtr lazyPosn(const StringView& contr, Jday settlDay) throw(std::bad_alloc);
+  PosnPtr lazyPosn(const std::string_view& contr, Jday settlDay) throw(std::bad_alloc);
 
   boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 

@@ -34,7 +34,7 @@ class SWIRLY_API TraderSessSet {
   struct ValueHash {
     std::size_t operator()(const TraderSess& trader) const noexcept
     {
-      return std::hash<StringView>()(trader.email());
+      return std::hash<std::string_view>()(trader.email());
     }
   };
   struct ValueEqual {
@@ -43,13 +43,13 @@ class SWIRLY_API TraderSessSet {
       return lhs.email() == rhs.email();
     }
   };
-  using KeyHash = std::hash<StringView>;
+  using KeyHash = std::hash<std::string_view>;
   struct KeyValueEqual {
-    bool operator()(const StringView& lhs, const TraderSess& rhs) const noexcept
+    bool operator()(const std::string_view& lhs, const TraderSess& rhs) const noexcept
     {
       return lhs == rhs.email();
     }
-    bool operator()(const TraderSess& lhs, const StringView& rhs) const noexcept
+    bool operator()(const TraderSess& lhs, const std::string_view& rhs) const noexcept
     {
       return lhs.email() == rhs;
     }
@@ -102,11 +102,11 @@ class SWIRLY_API TraderSessSet {
   ConstIterator cend() const noexcept { return set_.cend(); }
 
   // Find.
-  Iterator find(const StringView& email) noexcept
+  Iterator find(const std::string_view& email) noexcept
   {
     return set_.find(email, KeyHash(), KeyValueEqual());
   }
-  ConstIterator find(const StringView& email) const noexcept
+  ConstIterator find(const std::string_view& email) const noexcept
   {
     return set_.find(email, KeyHash(), KeyValueEqual());
   }

@@ -22,7 +22,7 @@ using namespace std;
 using namespace swirly;
 
 namespace {
-constexpr StringView name = "StringView"_sv;
+constexpr string_view name = "string_view"_sv;
 } // anonymous
 
 BOOST_AUTO_TEST_SUITE(StringSuite)

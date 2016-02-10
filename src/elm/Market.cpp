@@ -18,9 +18,11 @@
 
 #include <cassert>
 
+using namespace std;
+
 namespace swirly {
 
-Market::Market(const StringView& mnem, const StringView& display, const StringView& contr,
+Market::Market(const string_view& mnem, const string_view& display, const string_view& contr,
                Jday settlDay, Jday expiryDay, MarketState state) noexcept
   : Rec{RecType::MARKET, mnem, display},
     contr_{contr},

@@ -43,82 +43,90 @@ class SWIRLY_API Factory {
   Factory(Factory&&) noexcept = default;
   Factory& operator=(Factory&&) noexcept = default;
 
-  std::unique_ptr<Asset> newAsset(const StringView& mnem, const StringView& display,
+  std::unique_ptr<Asset> newAsset(const std::string_view& mnem, const std::string_view& display,
                                   AssetType type) const;
 
-  std::unique_ptr<Contr> newContr(const StringView& mnem, const StringView& display,
-                                  const StringView& asset, const StringView& ccy, int lotNumer,
-                                  int lotDenom, int tickNumer, int tickDenom, int pipDp,
-                                  Lots minLots, Lots maxLots) const;
+  std::unique_ptr<Contr> newContr(const std::string_view& mnem, const std::string_view& display,
+                                  const std::string_view& asset, const std::string_view& ccy,
+                                  int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+                                  int pipDp, Lots minLots, Lots maxLots) const;
 
-  std::unique_ptr<Market> newMarket(const StringView& mnem, const StringView& display,
-                                    const StringView& contr, Jday settlDay, Jday expiryDay,
+  std::unique_ptr<Market> newMarket(const std::string_view& mnem, const std::string_view& display,
+                                    const std::string_view& contr, Jday settlDay, Jday expiryDay,
                                     MarketState state, Lots lastLots, Ticks lastTicks,
                                     Millis lastTime, Iden maxOrderId, Iden maxExecId) const;
 
-  std::unique_ptr<Market> newMarket(const StringView& mnem, const StringView& display,
-                                    const StringView& contr, Jday settlDay, Jday expiryDay,
+  std::unique_ptr<Market> newMarket(const std::string_view& mnem, const std::string_view& display,
+                                    const std::string_view& contr, Jday settlDay, Jday expiryDay,
                                     MarketState state) const;
 
-  std::unique_ptr<Trader> newTrader(const StringView& mnem, const StringView& display,
-                                    const StringView& email) const;
+  std::unique_ptr<Trader> newTrader(const std::string_view& mnem, const std::string_view& display,
+                                    const std::string_view& email) const;
 
-  OrderPtr newOrder(const StringView& trader, const StringView& market, const StringView& contr,
-                    Jday settlDay, Iden id, const StringView& ref, State state, Side side,
-                    Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-                    Ticks lastTicks, Lots minLots, Millis created, Millis modified) const;
+  OrderPtr newOrder(const std::string_view& trader, const std::string_view& market,
+                    const std::string_view& contr, Jday settlDay, Iden id,
+                    const std::string_view& ref, State state, Side side, Lots lots, Ticks ticks,
+                    Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+                    Millis created, Millis modified) const;
 
-  OrderPtr newOrder(const StringView& trader, const StringView& market, const StringView& contr,
-                    Jday settlDay, Iden id, const StringView& ref, Side side, Lots lots,
-                    Ticks ticks, Lots minLots, Millis created) const;
+  OrderPtr newOrder(const std::string_view& trader, const std::string_view& market,
+                    const std::string_view& contr, Jday settlDay, Iden id,
+                    const std::string_view& ref, Side side, Lots lots, Ticks ticks, Lots minLots,
+                    Millis created) const;
 
-  ExecPtr newExec(const StringView& trader, const StringView& market, const StringView& contr,
-                  Jday settlDay, Iden id, const StringView& ref, Iden orderId, State state,
-                  Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-                  Ticks lastTicks, Lots minLots, Iden matchId, Role role, const StringView& cpty,
+  ExecPtr newExec(const std::string_view& trader, const std::string_view& market,
+                  const std::string_view& contr, Jday settlDay, Iden id,
+                  const std::string_view& ref, Iden orderId, State state, Side side, Lots lots,
+                  Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
+                  Lots minLots, Iden matchId, Role role, const std::string_view& cpty,
                   Millis created) const;
 
   ExecPtr newExec(const Order& order, Iden id, Millis created) const;
 
-  PosnPtr newPosn(const StringView& trader, const StringView& contr, Jday settlDay, Lots buyLots,
-                  Cost buyCost, Lots sellLots, Cost sellCost) const;
+  PosnPtr newPosn(const std::string_view& trader, const std::string_view& contr, Jday settlDay,
+                  Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const;
 
-  PosnPtr newPosn(const StringView& trader, const StringView& contr, Jday settlDay) const;
+  PosnPtr newPosn(const std::string_view& trader, const std::string_view& contr,
+                  Jday settlDay) const;
 
  protected:
-  virtual std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
+  virtual std::unique_ptr<Asset> doNewAsset(const std::string_view& mnem,
+                                            const std::string_view& display,
                                             AssetType type) const = 0;
 
-  virtual std::unique_ptr<Contr> doNewContr(const StringView& mnem, const StringView& display,
-                                            const StringView& asset, const StringView& ccy,
-                                            int lotNumer, int lotDenom, int tickNumer,
-                                            int tickDenom, int pipDp, Lots minLots,
-                                            Lots maxLots) const = 0;
+  virtual std::unique_ptr<Contr>
+  doNewContr(const std::string_view& mnem, const std::string_view& display,
+             const std::string_view& asset, const std::string_view& ccy, int lotNumer, int lotDenom,
+             int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) const = 0;
 
-  virtual std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                              const StringView& contr, Jday settlDay,
+  virtual std::unique_ptr<Market> doNewMarket(const std::string_view& mnem,
+                                              const std::string_view& display,
+                                              const std::string_view& contr, Jday settlDay,
                                               Jday expiryDay, MarketState state, Lots lastLots,
                                               Ticks lastTicks, Millis lastTime, Iden maxOrderId,
                                               Iden maxExecId) const = 0;
 
-  virtual std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
-                                              const StringView& email) const = 0;
+  virtual std::unique_ptr<Trader> doNewTrader(const std::string_view& mnem,
+                                              const std::string_view& display,
+                                              const std::string_view& email) const = 0;
 
-  virtual OrderPtr doNewOrder(const StringView& trader, const StringView& market,
-                              const StringView& contr, Jday settlDay, Iden id,
-                              const StringView& ref, State state, Side side, Lots lots, Ticks ticks,
-                              Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-                              Lots minLots, Millis created, Millis modified) const = 0;
+  virtual OrderPtr doNewOrder(const std::string_view& trader, const std::string_view& market,
+                              const std::string_view& contr, Jday settlDay, Iden id,
+                              const std::string_view& ref, State state, Side side, Lots lots,
+                              Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
+                              Ticks lastTicks, Lots minLots, Millis created,
+                              Millis modified) const = 0;
 
-  virtual ExecPtr doNewExec(const StringView& trader, const StringView& market,
-                            const StringView& contr, Jday settlDay, Iden id, const StringView& ref,
-                            Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd,
-                            Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
-                            Iden matchId, Role role, const StringView& cpty,
-                            Millis created) const = 0;
+  virtual ExecPtr doNewExec(const std::string_view& trader, const std::string_view& market,
+                            const std::string_view& contr, Jday settlDay, Iden id,
+                            const std::string_view& ref, Iden orderId, State state, Side side,
+                            Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
+                            Ticks lastTicks, Lots minLots, Iden matchId, Role role,
+                            const std::string_view& cpty, Millis created) const = 0;
 
-  virtual PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jday settlDay,
-                            Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const = 0;
+  virtual PosnPtr doNewPosn(const std::string_view& trader, const std::string_view& contr,
+                            Jday settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
+                            Cost sellCost) const = 0;
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -135,37 +143,38 @@ class SWIRLY_API BasicFactory : public Factory {
   BasicFactory& operator=(BasicFactory&&) noexcept = default;
 
  protected:
-  std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
+  std::unique_ptr<Asset> doNewAsset(const std::string_view& mnem, const std::string_view& display,
                                     AssetType type) const override;
 
-  std::unique_ptr<Contr> doNewContr(const StringView& mnem, const StringView& display,
-                                    const StringView& asset, const StringView& ccy, int lotNumer,
-                                    int lotDenom, int tickNumer, int tickDenom, int pipDp,
-                                    Lots minLots, Lots maxLots) const override;
+  std::unique_ptr<Contr> doNewContr(const std::string_view& mnem, const std::string_view& display,
+                                    const std::string_view& asset, const std::string_view& ccy,
+                                    int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+                                    int pipDp, Lots minLots, Lots maxLots) const override;
 
-  std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                      const StringView& contr, Jday settlDay, Jday expiryDay,
+  std::unique_ptr<Market> doNewMarket(const std::string_view& mnem, const std::string_view& display,
+                                      const std::string_view& contr, Jday settlDay, Jday expiryDay,
                                       MarketState state, Lots lastLots, Ticks lastTicks,
                                       Millis lastTime, Iden maxOrderId,
                                       Iden maxExecId) const override;
 
-  std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
-                                      const StringView& email) const override;
+  std::unique_ptr<Trader> doNewTrader(const std::string_view& mnem, const std::string_view& display,
+                                      const std::string_view& email) const override;
 
-  OrderPtr doNewOrder(const StringView& trader, const StringView& market, const StringView& contr,
-                      Jday settlDay, Iden id, const StringView& ref, State state, Side side,
-                      Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-                      Ticks lastTicks, Lots minLots, Millis created,
-                      Millis modified) const override;
+  OrderPtr doNewOrder(const std::string_view& trader, const std::string_view& market,
+                      const std::string_view& contr, Jday settlDay, Iden id,
+                      const std::string_view& ref, State state, Side side, Lots lots, Ticks ticks,
+                      Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+                      Millis created, Millis modified) const override;
 
-  ExecPtr doNewExec(const StringView& trader, const StringView& market, const StringView& contr,
-                    Jday settlDay, Iden id, const StringView& ref, Iden orderId, State state,
-                    Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
-                    Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role,
-                    const StringView& cpty, Millis created) const override;
+  ExecPtr doNewExec(const std::string_view& trader, const std::string_view& market,
+                    const std::string_view& contr, Jday settlDay, Iden id,
+                    const std::string_view& ref, Iden orderId, State state, Side side, Lots lots,
+                    Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
+                    Lots minLots, Iden matchId, Role role, const std::string_view& cpty,
+                    Millis created) const override;
 
-  PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jday settlDay, Lots buyLots,
-                    Cost buyCost, Lots sellLots, Cost sellCost) const override;
+  PosnPtr doNewPosn(const std::string_view& trader, const std::string_view& contr, Jday settlDay,
+                    Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const override;
 };
 
 /** @} */

@@ -37,7 +37,7 @@ static struct mg_serve_http_opts httpOpts;
 class RestServ : public mg::Mgr<RestServ> {
  public:
   explicit RestServ(Rest& rest) noexcept : rest_(rest) {}
-  void reset(StringView sv) noexcept
+  void reset(string_view sv) noexcept
   {
     out_.reset();
 
