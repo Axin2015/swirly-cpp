@@ -31,9 +31,6 @@ namespace swirly {
  */
 
 class SWIRLY_API Exception : public std::exception {
-
-    char msg_[128] = {'\0'};
-
  public:
     Exception() noexcept = default;
 
@@ -54,11 +51,14 @@ class SWIRLY_API Exception : public std::exception {
     Exception(Exception&&) noexcept = default;
     Exception& operator=(Exception&&) noexcept = default;
 
+    const char* what() const noexcept override;
+
     void format(const char* fmt, ...) noexcept;
 
     void format(const char* fmt, std::va_list args) noexcept;
 
-    const char* what() const noexcept override;
+ private:
+    char msg_[128] = {'\0'};
 };
 
 template <typename ExceptionT>

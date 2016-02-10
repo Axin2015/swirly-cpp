@@ -40,9 +40,6 @@ class TraderSess;
 using IdenView = ArrayView<Iden>;
 
 class SWIRLY_API Serv {
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
-
  public:
     Serv(const Model& model, Journ& journ, Millis now);
 
@@ -164,6 +161,10 @@ class SWIRLY_API Serv {
     void poll(Millis now);
 
     Millis getTimeout() const noexcept;
+
+ private:
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
 };
 
 /** @} */

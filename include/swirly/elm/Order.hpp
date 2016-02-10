@@ -35,34 +35,7 @@ class Level;
  * An instruction to buy or sell goods or services.
  */
 class SWIRLY_API Order : public Request {
-
-    // Internals.
-    mutable Level* level_{nullptr};
-
-    State state_;
-    const Ticks ticks_;
-    /**
-     * Must be greater than zero.
-     */
-    Lots resd_;
-    /**
-     * Must not be greater that lots.
-     */
-    Lots exec_;
-    Cost cost_;
-    Lots lastLots_;
-    Ticks lastTicks_;
-    /**
-     * Minimum to be filled by this order.
-     */
-    const Lots minLots_;
-    Millis modified_;
-
  public:
-    boost::intrusive::set_member_hook<> idHook_;
-    boost::intrusive::set_member_hook<> refHook_;
-    boost::intrusive::list_member_hook<> listHook_;
-
     Order(const StringView& trader, const StringView& market, const StringView& contr,
           Jday settlDay, Iden id, const StringView& ref, State state, Side side, Lots lots,
           Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
@@ -90,6 +63,50 @@ class SWIRLY_API Order : public Request {
     Order(Order&&);
     Order& operator=(Order&&) = delete;
 
+    Level* level() const noexcept
+    {
+        return level_;
+    }
+    State state() const noexcept
+    {
+        return state_;
+    }
+    Ticks ticks() const noexcept
+    {
+        return ticks_;
+    }
+    Lots resd() const noexcept
+    {
+        return resd_;
+    }
+    Lots exec() const noexcept
+    {
+        return exec_;
+    }
+    Cost cost() const noexcept
+    {
+        return cost_;
+    }
+    Lots lastLots() const noexcept
+    {
+        return lastLots_;
+    }
+    Ticks lastTicks() const noexcept
+    {
+        return lastTicks_;
+    }
+    Lots minLots() const noexcept
+    {
+        return minLots_;
+    }
+    bool done() const noexcept
+    {
+        return resd_ == 0_lts;
+    }
+    Millis modified() const noexcept
+    {
+        return modified_;
+    }
     void setLevel(Level* level) const noexcept
     {
         level_ = level;
@@ -140,50 +157,32 @@ class SWIRLY_API Order : public Request {
     {
         trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, now);
     }
-    Level* level() const noexcept
-    {
-        return level_;
-    }
-    State state() const noexcept
-    {
-        return state_;
-    }
-    Ticks ticks() const noexcept
-    {
-        return ticks_;
-    }
-    Lots resd() const noexcept
-    {
-        return resd_;
-    }
-    Lots exec() const noexcept
-    {
-        return exec_;
-    }
-    Cost cost() const noexcept
-    {
-        return cost_;
-    }
-    Lots lastLots() const noexcept
-    {
-        return lastLots_;
-    }
-    Ticks lastTicks() const noexcept
-    {
-        return lastTicks_;
-    }
-    Lots minLots() const noexcept
-    {
-        return minLots_;
-    }
-    bool done() const noexcept
-    {
-        return resd_ == 0_lts;
-    }
-    Millis modified() const noexcept
-    {
-        return modified_;
-    }
+    boost::intrusive::set_member_hook<> idHook_;
+    boost::intrusive::set_member_hook<> refHook_;
+    boost::intrusive::list_member_hook<> listHook_;
+
+ private:
+    // Internals.
+    mutable Level* level_{nullptr};
+
+    State state_;
+    const Ticks ticks_;
+    /**
+     * Must be greater than zero.
+     */
+    Lots resd_;
+    /**
+     * Must not be greater that lots.
+     */
+    Lots exec_;
+    Cost cost_;
+    Lots lastLots_;
+    Ticks lastTicks_;
+    /**
+     * Minimum to be filled by this order.
+     */
+    const Lots minLots_;
+    Millis modified_;
 };
 
 using OrderPtr = boost::intrusive_ptr<Order>;
@@ -221,8 +220,6 @@ class SWIRLY_API OrderRefSet {
         = boost::intrusive::set<Order, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
 
-    Set set_;
-
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -239,6 +236,55 @@ class SWIRLY_API OrderRefSet {
     OrderRefSet(OrderRefSet&&);
     OrderRefSet& operator=(OrderRefSet&&);
 
+    // Begin.
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+
+    // End.
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+
+    // Find.
+    ConstIterator find(const StringView& ref) const noexcept
+    {
+        return set_.find(ref, KeyValueCompare());
+    }
+    Iterator find(const StringView& ref) noexcept
+    {
+        return set_.find(ref, KeyValueCompare());
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& ref) const noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(ref, comp);
+        return std::make_pair(it, it != set_.end() && !comp(ref, *it));
+    }
+    std::pair<Iterator, bool> findHint(const StringView& ref) noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(ref, comp);
+        return std::make_pair(it, it != set_.end() && !comp(ref, *it));
+    }
     Iterator insert(const ValuePtr& value) noexcept;
 
     Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept;
@@ -265,55 +311,8 @@ class SWIRLY_API OrderRefSet {
         set_.erase(value);
     }
 
-    // Begin.
-    Iterator begin() noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator begin() const noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator cbegin() const noexcept
-    {
-        return set_.cbegin();
-    }
-
-    // End.
-    Iterator end() noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator end() const noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator cend() const noexcept
-    {
-        return set_.cend();
-    }
-
-    // Find.
-    Iterator find(const StringView& ref) noexcept
-    {
-        return set_.find(ref, KeyValueCompare());
-    }
-    ConstIterator find(const StringView& ref) const noexcept
-    {
-        return set_.find(ref, KeyValueCompare());
-    }
-    std::pair<Iterator, bool> findHint(const StringView& ref) noexcept
-    {
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(ref, comp);
-        return std::make_pair(it, it != set_.end() && !comp(ref, *it));
-    }
-    std::pair<ConstIterator, bool> findHint(const StringView& ref) const noexcept
-    {
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(ref, comp);
-        return std::make_pair(it, it != set_.end() && !comp(ref, *it));
-    }
+ private:
+    Set set_;
 };
 
 class SWIRLY_API OrderList {
@@ -322,8 +321,6 @@ class SWIRLY_API OrderList {
         = boost::intrusive::member_hook<Order, decltype(Order::listHook_), &Order::listHook_>;
     using List = boost::intrusive::list<Order, ConstantTimeSizeOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Order>;
-
-    List list_;
 
  public:
     using Iterator = typename List::iterator;
@@ -341,22 +338,12 @@ class SWIRLY_API OrderList {
     OrderList(OrderList&&);
     OrderList& operator=(OrderList&&);
 
-    Iterator insertBack(const OrderPtr& value) noexcept;
-
-    Iterator insertBefore(const OrderPtr& value, const Order& next) noexcept;
-
-    void remove(const Order& level) noexcept;
-
     static ConstIterator toIterator(const Order& order) noexcept
     {
         return List::s_iterator_to(order);
     }
 
     // Begin.
-    Iterator begin() noexcept
-    {
-        return list_.begin();
-    }
     ConstIterator begin() const noexcept
     {
         return list_.begin();
@@ -365,12 +352,12 @@ class SWIRLY_API OrderList {
     {
         return list_.cbegin();
     }
+    Iterator begin() noexcept
+    {
+        return list_.begin();
+    }
 
     // End.
-    Iterator end() noexcept
-    {
-        return list_.end();
-    }
     ConstIterator end() const noexcept
     {
         return list_.end();
@@ -379,6 +366,18 @@ class SWIRLY_API OrderList {
     {
         return list_.cend();
     }
+    Iterator end() noexcept
+    {
+        return list_.end();
+    }
+    Iterator insertBack(const OrderPtr& value) noexcept;
+
+    Iterator insertBefore(const OrderPtr& value, const Order& next) noexcept;
+
+    void remove(const Order& level) noexcept;
+
+ private:
+    List list_;
 };
 
 /** @} */

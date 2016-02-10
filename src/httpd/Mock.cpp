@@ -20,6 +20,15 @@
 
 namespace swirly {
 
+MockModel::MockModel() noexcept = default;
+MockModel::~MockModel() noexcept = default;
+
+constexpr MockModel::MockModel(const MockModel&) noexcept = default;
+MockModel& MockModel::operator=(const MockModel&) noexcept = default;
+
+constexpr MockModel::MockModel(MockModel&&) noexcept = default;
+MockModel& MockModel::operator=(MockModel&&) noexcept = default;
+
 AssetSet MockModel::doReadAsset(const Factory& factory) const
 {
     AssetSet s;
@@ -48,14 +57,14 @@ TraderSet MockModel::doReadTrader(const Factory& factory) const
     return s;
 }
 
-MockModel::MockModel() noexcept = default;
-MockModel::~MockModel() noexcept = default;
+MockJourn::MockJourn() noexcept = default;
+MockJourn::~MockJourn() noexcept = default;
 
-constexpr MockModel::MockModel(const MockModel&) noexcept = default;
-MockModel& MockModel::operator=(const MockModel&) noexcept = default;
+constexpr MockJourn::MockJourn(const MockJourn&) noexcept = default;
+MockJourn& MockJourn::operator=(const MockJourn&) noexcept = default;
 
-constexpr MockModel::MockModel(MockModel&&) noexcept = default;
-MockModel& MockModel::operator=(MockModel&&) noexcept = default;
+constexpr MockJourn::MockJourn(MockJourn&&) noexcept = default;
+MockJourn& MockJourn::operator=(MockJourn&&) noexcept = default;
 
 void MockJourn::doCreateMarket(const StringView& mnem, const StringView& display,
                                const StringView& contr, Jday settlDay, Jday expiryDay,
@@ -113,14 +122,5 @@ void MockJourn::doArchiveTrade(const StringView& market, const ArrayView<Iden>& 
 void MockJourn::doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified)
 {
 }
-
-MockJourn::MockJourn() noexcept = default;
-MockJourn::~MockJourn() noexcept = default;
-
-constexpr MockJourn::MockJourn(const MockJourn&) noexcept = default;
-MockJourn& MockJourn::operator=(const MockJourn&) noexcept = default;
-
-constexpr MockJourn::MockJourn(MockJourn&&) noexcept = default;
-MockJourn& MockJourn::operator=(MockJourn&&) noexcept = default;
 
 } // swirly

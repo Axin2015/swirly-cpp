@@ -24,6 +24,8 @@ using namespace std;
 
 namespace swirly {
 
+ServFactory::~ServFactory() noexcept = default;
+
 unique_ptr<Market> ServFactory::doNewMarket(const StringView& mnem, const StringView& display,
                                             const StringView& contr, Jday settlDay, Jday expiryDay,
                                             MarketState state, Lots lastLots, Ticks lastTicks,
@@ -38,7 +40,5 @@ unique_ptr<Trader> ServFactory::doNewTrader(const StringView& mnem, const String
 {
     return make_unique<TraderSess>(mnem, display, email, *this);
 }
-
-ServFactory::~ServFactory() noexcept = default;
 
 } // swirly

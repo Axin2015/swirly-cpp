@@ -31,7 +31,6 @@ class SWIRLY_API MarketData {
     MarketData() noexcept
     {
     }
-
     ~MarketData() noexcept;
 
     // Copy.

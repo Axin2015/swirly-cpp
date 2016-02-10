@@ -52,21 +52,7 @@ constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
  * same price.
  */
 class SWIRLY_API Level : public Comparable<Level> {
-    const Order* firstOrder_;
-    const LevelKey key_;
-    const Ticks ticks_;
-    /**
-     * Must be greater than zero.
-     */
-    Lots resd_;
-    /**
-     * Must be greater than zero.
-     */
-    int count_;
-
  public:
-    boost::intrusive::set_member_hook<> keyHook_;
-
     explicit Level(const Order& firstOrder) noexcept;
 
     ~Level() noexcept;
@@ -78,19 +64,6 @@ class SWIRLY_API Level : public Comparable<Level> {
     // Move.
     Level(Level&&);
     Level& operator=(Level&&) = delete;
-
-    void setFirstOrder(const Order& firstOrder) noexcept
-    {
-        firstOrder_ = &firstOrder;
-    }
-    void reduce(Lots delta) noexcept
-    {
-        using namespace enumops;
-        resd_ -= delta;
-    }
-    void addOrder(const Order& order) noexcept;
-
-    void subOrder(const Order& order) noexcept;
 
     int compare(const Level& rhs) const noexcept
     {
@@ -116,6 +89,33 @@ class SWIRLY_API Level : public Comparable<Level> {
     {
         return count_;
     }
+    void setFirstOrder(const Order& firstOrder) noexcept
+    {
+        firstOrder_ = &firstOrder;
+    }
+    void reduce(Lots delta) noexcept
+    {
+        using namespace enumops;
+        resd_ -= delta;
+    }
+    void addOrder(const Order& order) noexcept;
+
+    void subOrder(const Order& order) noexcept;
+
+    boost::intrusive::set_member_hook<> keyHook_;
+
+ private:
+    const Order* firstOrder_;
+    const LevelKey key_;
+    const Ticks ticks_;
+    /**
+     * Must be greater than zero.
+     */
+    Lots resd_;
+    /**
+     * Must be greater than zero.
+     */
+    int count_;
 };
 
 class SWIRLY_API LevelSet {
@@ -143,8 +143,6 @@ class SWIRLY_API LevelSet {
         = boost::intrusive::set<Level, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<Level>;
 
-    Set set_;
-
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -160,6 +158,57 @@ class SWIRLY_API LevelSet {
     LevelSet(LevelSet&&);
     LevelSet& operator=(LevelSet&&);
 
+    // Begin.
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+
+    // End.
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+
+    // Find.
+    ConstIterator find(Side side, Ticks ticks) const noexcept
+    {
+        return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
+    }
+    Iterator find(Side side, Ticks ticks) noexcept
+    {
+        return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
+    }
+    std::pair<ConstIterator, bool> findHint(Side side, Ticks ticks) const noexcept
+    {
+        const auto key = detail::composeKey(side, ticks);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
+    std::pair<Iterator, bool> findHint(Side side, Ticks ticks) noexcept
+    {
+        const auto key = detail::composeKey(side, ticks);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
     Iterator insert(ValuePtr value) noexcept;
 
     Iterator insertHint(ConstIterator hint, ValuePtr value) noexcept;
@@ -184,57 +233,8 @@ class SWIRLY_API LevelSet {
         return insertOrReplace(std::make_unique<Level>(std::forward<ArgsT>(args)...));
     }
 
-    // Begin.
-    Iterator begin() noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator begin() const noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator cbegin() const noexcept
-    {
-        return set_.cbegin();
-    }
-
-    // End.
-    Iterator end() noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator end() const noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator cend() const noexcept
-    {
-        return set_.cend();
-    }
-
-    // Find.
-    Iterator find(Side side, Ticks ticks) noexcept
-    {
-        return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
-    }
-    ConstIterator find(Side side, Ticks ticks) const noexcept
-    {
-        return set_.find(detail::composeKey(side, ticks), KeyValueCompare());
-    }
-    std::pair<Iterator, bool> findHint(Side side, Ticks ticks) noexcept
-    {
-        const auto key = detail::composeKey(side, ticks);
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(key, comp);
-        return std::make_pair(it, it != set_.end() && !comp(key, *it));
-    }
-    std::pair<ConstIterator, bool> findHint(Side side, Ticks ticks) const noexcept
-    {
-        const auto key = detail::composeKey(side, ticks);
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(key, comp);
-        return std::make_pair(it, it != set_.end() && !comp(key, *it));
-    }
+ private:
+    Set set_;
 };
 
 /** @} */

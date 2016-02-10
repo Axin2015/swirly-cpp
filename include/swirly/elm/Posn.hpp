@@ -32,18 +32,7 @@ namespace swirly {
  */
 
 class SWIRLY_API Posn : public RefCounted {
-
-    const Mnem trader_;
-    const Mnem contr_;
-    Jday settlDay_;
-    Lots buyLots_;
-    Cost buyCost_;
-    Lots sellLots_;
-    Cost sellCost_;
-
  public:
-    boost::intrusive::set_member_hook<> traderHook_;
-
     Posn(const StringView& trader, const StringView& contr, Jday settlDay, Lots buyLots,
          Cost buyCost, Lots sellLots, Cost sellCost) noexcept : trader_{trader},
                                                                 contr_{contr},
@@ -54,7 +43,6 @@ class SWIRLY_API Posn : public RefCounted {
                                                                 sellCost_{sellCost}
     {
     }
-
     ~Posn() noexcept override;
 
     // Copy.
@@ -93,6 +81,16 @@ class SWIRLY_API Posn : public RefCounted {
     {
         return sellCost_;
     }
+    boost::intrusive::set_member_hook<> traderHook_;
+
+ private:
+    const Mnem trader_;
+    const Mnem contr_;
+    Jday settlDay_;
+    Lots buyLots_;
+    Cost buyCost_;
+    Lots sellLots_;
+    Cost sellCost_;
 };
 
 using PosnPtr = boost::intrusive_ptr<Posn>;
@@ -136,8 +134,6 @@ class SWIRLY_API TraderPosnSet {
         = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<Posn>;
 
-    Set set_;
-
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -154,6 +150,57 @@ class SWIRLY_API TraderPosnSet {
     TraderPosnSet(TraderPosnSet&&);
     TraderPosnSet& operator=(TraderPosnSet&&);
 
+    // Begin.
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+
+    // End.
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+
+    // Find.
+    ConstIterator find(const StringView& contr, Jday settlDay) const noexcept
+    {
+        return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
+    }
+    Iterator find(const StringView& contr, Jday settlDay) noexcept
+    {
+        return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& contr, Jday settlDay) const noexcept
+    {
+        const auto key = std::make_tuple(contr, settlDay);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
+    std::pair<Iterator, bool> findHint(const StringView& contr, Jday settlDay) noexcept
+    {
+        const auto key = std::make_tuple(contr, settlDay);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
     Iterator insert(const ValuePtr& value) noexcept;
 
     Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept;
@@ -176,57 +223,8 @@ class SWIRLY_API TraderPosnSet {
         return insertOrReplace(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
     }
 
-    // Begin.
-    Iterator begin() noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator begin() const noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator cbegin() const noexcept
-    {
-        return set_.cbegin();
-    }
-
-    // End.
-    Iterator end() noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator end() const noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator cend() const noexcept
-    {
-        return set_.cend();
-    }
-
-    // Find.
-    Iterator find(const StringView& contr, Jday settlDay) noexcept
-    {
-        return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
-    }
-    ConstIterator find(const StringView& contr, Jday settlDay) const noexcept
-    {
-        return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
-    }
-    std::pair<Iterator, bool> findHint(const StringView& contr, Jday settlDay) noexcept
-    {
-        const auto key = std::make_tuple(contr, settlDay);
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(key, comp);
-        return std::make_pair(it, it != set_.end() && !comp(key, *it));
-    }
-    std::pair<ConstIterator, bool> findHint(const StringView& contr, Jday settlDay) const noexcept
-    {
-        const auto key = std::make_tuple(contr, settlDay);
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(key, comp);
-        return std::make_pair(it, it != set_.end() && !comp(key, *it));
-    }
+ private:
+    Set set_;
 };
 
 /** @} */

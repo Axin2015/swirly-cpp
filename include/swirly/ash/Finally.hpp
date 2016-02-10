@@ -28,8 +28,6 @@ namespace swirly {
 
 template <typename FnT>
 class Finally {
-    FnT fn_;
-
  public:
     explicit Finally(FnT fn) noexcept : fn_{std::move(fn)}
     {
@@ -45,6 +43,9 @@ class Finally {
     // Move.
     Finally(Finally&&) = default;
     Finally& operator=(Finally&&) = delete;
+
+ private:
+    FnT fn_;
 };
 
 template <typename FnT>

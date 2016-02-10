@@ -30,44 +30,6 @@ namespace swirly {
 
 Factory::~Factory() noexcept = default;
 
-std::unique_ptr<Asset> Factory::newAsset(const StringView& mnem, const StringView& display,
-                                         AssetType type) const
-{
-    return doNewAsset(mnem, display, type);
-}
-
-std::unique_ptr<Contr> Factory::newContr(const StringView& mnem, const StringView& display,
-                                         const StringView& asset, const StringView& ccy,
-                                         int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-                                         int pipDp, Lots minLots, Lots maxLots) const
-{
-    return doNewContr(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer, tickDenom, pipDp,
-                      minLots, maxLots);
-}
-
-std::unique_ptr<Market> Factory::newMarket(const StringView& mnem, const StringView& display,
-                                           const StringView& contr, Jday settlDay, Jday expiryDay,
-                                           MarketState state, Lots lastLots, Ticks lastTicks,
-                                           Millis lastTime, Iden maxOrderId, Iden maxExecId) const
-{
-    return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, lastLots, lastTicks,
-                       lastTime, maxOrderId, maxExecId);
-}
-
-std::unique_ptr<Market> Factory::newMarket(const StringView& mnem, const StringView& display,
-                                           const StringView& contr, Jday settlDay, Jday expiryDay,
-                                           MarketState state) const
-{
-    return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, 0_lts, 0_tks, 0_ms, 0_id,
-                       0_id);
-}
-
-std::unique_ptr<Trader> Factory::newTrader(const StringView& mnem, const StringView& display,
-                                           const StringView& email) const
-{
-    return doNewTrader(mnem, display, email);
-}
-
 OrderPtr Factory::newOrder(const StringView& trader, const StringView& market,
                            const StringView& contr, Jday settlDay, Iden id, const StringView& ref,
                            State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
@@ -114,6 +76,46 @@ PosnPtr Factory::newPosn(const StringView& trader, const StringView& contr, Jday
 {
     return doNewPosn(trader, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst);
 }
+
+std::unique_ptr<Asset> Factory::newAsset(const StringView& mnem, const StringView& display,
+                                         AssetType type) const
+{
+    return doNewAsset(mnem, display, type);
+}
+
+std::unique_ptr<Contr> Factory::newContr(const StringView& mnem, const StringView& display,
+                                         const StringView& asset, const StringView& ccy,
+                                         int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+                                         int pipDp, Lots minLots, Lots maxLots) const
+{
+    return doNewContr(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer, tickDenom, pipDp,
+                      minLots, maxLots);
+}
+
+std::unique_ptr<Market> Factory::newMarket(const StringView& mnem, const StringView& display,
+                                           const StringView& contr, Jday settlDay, Jday expiryDay,
+                                           MarketState state, Lots lastLots, Ticks lastTicks,
+                                           Millis lastTime, Iden maxOrderId, Iden maxExecId) const
+{
+    return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, lastLots, lastTicks,
+                       lastTime, maxOrderId, maxExecId);
+}
+
+std::unique_ptr<Market> Factory::newMarket(const StringView& mnem, const StringView& display,
+                                           const StringView& contr, Jday settlDay, Jday expiryDay,
+                                           MarketState state) const
+{
+    return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, 0_lts, 0_tks, 0_ms, 0_id,
+                       0_id);
+}
+
+std::unique_ptr<Trader> Factory::newTrader(const StringView& mnem, const StringView& display,
+                                           const StringView& email) const
+{
+    return doNewTrader(mnem, display, email);
+}
+
+BasicFactory::~BasicFactory() noexcept = default;
 
 unique_ptr<Asset> BasicFactory::doNewAsset(const StringView& mnem, const StringView& display,
                                            AssetType type) const
@@ -173,7 +175,5 @@ PosnPtr BasicFactory::doNewPosn(const StringView& trader, const StringView& cont
 {
     return makeRefCounted<Posn>(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
 }
-
-BasicFactory::~BasicFactory() noexcept = default;
 
 } // swirly

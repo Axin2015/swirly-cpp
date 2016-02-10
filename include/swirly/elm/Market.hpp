@@ -32,14 +32,7 @@ namespace swirly {
  * A place where buyers and sellers come together to exchange goods or services.
  */
 class SWIRLY_API Market : public Rec {
-    const Mnem contr_;
-    const Jday settlDay_;
-    const Jday expiryDay_;
-    MarketState state_;
-
  public:
-    boost::intrusive::set_member_hook<> mnemHook_;
-
     Market(const StringView& mnem, const StringView& display, const StringView& contr,
            Jday settlDay, Jday expiryDay, MarketState state) noexcept;
 
@@ -53,10 +46,6 @@ class SWIRLY_API Market : public Rec {
     Market(Market&&);
     Market& operator=(Market&&) = delete;
 
-    void setState(MarketState state) noexcept
-    {
-        state_ = state;
-    }
     auto contr() const noexcept
     {
         return +contr_;
@@ -73,6 +62,17 @@ class SWIRLY_API Market : public Rec {
     {
         return state_;
     }
+    void setState(MarketState state) noexcept
+    {
+        state_ = state;
+    }
+    boost::intrusive::set_member_hook<> mnemHook_;
+
+ private:
+    const Mnem contr_;
+    const Jday settlDay_;
+    const Jday expiryDay_;
+    MarketState state_;
 };
 
 using MarketSet = RecSet<Market>;

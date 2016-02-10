@@ -19,6 +19,11 @@
 namespace swirly {
 namespace mg {
 
+StreamBuf::~StreamBuf() noexcept
+{
+    mbuf_free(&buf_);
+}
+
 StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
 {
     if (c != traits_type::eof()) {
@@ -32,11 +37,6 @@ StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
 std::streamsize StreamBuf::xsputn(const char_type* s, std::streamsize count) noexcept
 {
     return mbuf_append(&buf_, s, count);
-}
-
-StreamBuf::~StreamBuf() noexcept
-{
-    mbuf_free(&buf_);
 }
 
 OStream::~OStream() noexcept = default;

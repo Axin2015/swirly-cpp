@@ -28,15 +28,6 @@ namespace swirly {
  */
 
 class MockModel : public Model {
- protected:
-    AssetSet doReadAsset(const Factory& factory) const override;
-
-    ContrSet doReadContr(const Factory& factory) const override;
-
-    MarketSet doReadMarket(const Factory& factory) const override;
-
-    TraderSet doReadTrader(const Factory& factory) const override;
-
  public:
     MockModel() noexcept;
     ~MockModel() noexcept override;
@@ -48,9 +39,30 @@ class MockModel : public Model {
     // Move.
     constexpr MockModel(MockModel&&) noexcept;
     MockModel& operator=(MockModel&&) noexcept;
+
+ protected:
+    AssetSet doReadAsset(const Factory& factory) const override;
+
+    ContrSet doReadContr(const Factory& factory) const override;
+
+    MarketSet doReadMarket(const Factory& factory) const override;
+
+    TraderSet doReadTrader(const Factory& factory) const override;
 };
 
 class MockJourn : public Journ {
+ public:
+    MockJourn() noexcept;
+    ~MockJourn() noexcept override;
+
+    // Copy.
+    constexpr MockJourn(const MockJourn&) noexcept;
+    MockJourn& operator=(const MockJourn&) noexcept;
+
+    // Move.
+    constexpr MockJourn(MockJourn&&) noexcept;
+    MockJourn& operator=(MockJourn&&) noexcept;
+
  protected:
     void doCreateMarket(const StringView& mnem, const StringView& display, const StringView& contr,
                         Jday settlDay, Jday expiryDay, MarketState state) override;
@@ -82,18 +94,6 @@ class MockJourn : public Journ {
                         Millis modified) override;
 
     void doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified) override;
-
- public:
-    MockJourn() noexcept;
-    ~MockJourn() noexcept override;
-
-    // Copy.
-    constexpr MockJourn(const MockJourn&) noexcept;
-    MockJourn& operator=(const MockJourn&) noexcept;
-
-    // Move.
-    constexpr MockJourn(MockJourn&&) noexcept;
-    MockJourn& operator=(MockJourn&&) noexcept;
 };
 
 /** @} */

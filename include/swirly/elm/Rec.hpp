@@ -33,11 +33,6 @@ namespace swirly {
  */
 
 class SWIRLY_API Rec : public Comparable<Rec> {
- protected:
-    const RecType type_;
-    const Mnem mnem_;
-    Display display_;
-
  public:
     Rec(RecType type, const StringView& mnem, const StringView& display) noexcept
         : type_{type},
@@ -55,11 +50,6 @@ class SWIRLY_API Rec : public Comparable<Rec> {
     // Move.
     Rec(Rec&&);
     Rec& operator=(Rec&&) = delete;
-
-    void setDisplay(const StringView& display) noexcept
-    {
-        display_ = display;
-    }
 
     int compare(const Rec& rhs) const noexcept
     {
@@ -80,6 +70,15 @@ class SWIRLY_API Rec : public Comparable<Rec> {
     {
         return +display_;
     }
+    void setDisplay(const StringView& display) noexcept
+    {
+        display_ = display;
+    }
+
+ protected:
+    const RecType type_;
+    const Mnem mnem_;
+    Display display_;
 };
 
 /**
@@ -113,8 +112,6 @@ class RecSet {
         = boost::intrusive::set<RecT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<RecT>;
 
-    Set set_;
-
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -133,6 +130,55 @@ class RecSet {
     RecSet(RecSet&&) = default;
     RecSet& operator=(RecSet&&) = default;
 
+    // Begin.
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+
+    // End.
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+
+    // Find.
+    ConstIterator find(const StringView& mnem) const noexcept
+    {
+        return set_.find(mnem, KeyValueCompare());
+    }
+    Iterator find(const StringView& mnem) noexcept
+    {
+        return set_.find(mnem, KeyValueCompare());
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& mnem) const noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(mnem, comp);
+        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
+    }
+    std::pair<Iterator, bool> findHint(const StringView& mnem) noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(mnem, comp);
+        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
+    }
     Iterator insert(ValuePtr value) noexcept
     {
         Iterator it;
@@ -182,55 +228,8 @@ class RecSet {
         return insertOrReplace(std::make_unique<RecT>(std::forward<ArgsT>(args)...));
     }
 
-    // Begin.
-    Iterator begin() noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator begin() const noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator cbegin() const noexcept
-    {
-        return set_.cbegin();
-    }
-
-    // End.
-    Iterator end() noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator end() const noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator cend() const noexcept
-    {
-        return set_.cend();
-    }
-
-    // Find.
-    Iterator find(const StringView& mnem) noexcept
-    {
-        return set_.find(mnem, KeyValueCompare());
-    }
-    ConstIterator find(const StringView& mnem) const noexcept
-    {
-        return set_.find(mnem, KeyValueCompare());
-    }
-    std::pair<Iterator, bool> findHint(const StringView& mnem) noexcept
-    {
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(mnem, comp);
-        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
-    }
-    std::pair<ConstIterator, bool> findHint(const StringView& mnem) const noexcept
-    {
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(mnem, comp);
-        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
-    }
+ private:
+    Set set_;
 };
 
 /** @} */

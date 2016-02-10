@@ -31,42 +31,6 @@ namespace swirly {
  */
 
 class SWIRLY_API Factory {
- protected:
-    virtual std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
-                                              AssetType type) const = 0;
-
-    virtual std::unique_ptr<Contr> doNewContr(const StringView& mnem, const StringView& display,
-                                              const StringView& asset, const StringView& ccy,
-                                              int lotNumer, int lotDenom, int tickNumer,
-                                              int tickDenom, int pipDp, Lots minLots,
-                                              Lots maxLots) const = 0;
-
-    virtual std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                                const StringView& contr, Jday settlDay,
-                                                Jday expiryDay, MarketState state, Lots lastLots,
-                                                Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                                Iden maxExecId) const = 0;
-
-    virtual std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
-                                                const StringView& email) const = 0;
-
-    virtual OrderPtr doNewOrder(const StringView& trader, const StringView& market,
-                                const StringView& contr, Jday settlDay, Iden id,
-                                const StringView& ref, State state, Side side, Lots lots,
-                                Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-                                Ticks lastTicks, Lots minLots, Millis created,
-                                Millis modified) const = 0;
-
-    virtual ExecPtr doNewExec(const StringView& trader, const StringView& market,
-                              const StringView& contr, Jday settlDay, Iden id,
-                              const StringView& ref, Iden orderId, State state, Side side,
-                              Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
-                              Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role,
-                              const StringView& cpty, Millis created) const = 0;
-
-    virtual PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jday settlDay,
-                              Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const = 0;
-
  public:
     Factory() noexcept = default;
     virtual ~Factory() noexcept;
@@ -120,9 +84,57 @@ class SWIRLY_API Factory {
                     Cost buyCost, Lots sellLots, Cost sellCost) const;
 
     PosnPtr newPosn(const StringView& trader, const StringView& contr, Jday settlDay) const;
+
+ protected:
+    virtual std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
+                                              AssetType type) const = 0;
+
+    virtual std::unique_ptr<Contr> doNewContr(const StringView& mnem, const StringView& display,
+                                              const StringView& asset, const StringView& ccy,
+                                              int lotNumer, int lotDenom, int tickNumer,
+                                              int tickDenom, int pipDp, Lots minLots,
+                                              Lots maxLots) const = 0;
+
+    virtual std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
+                                                const StringView& contr, Jday settlDay,
+                                                Jday expiryDay, MarketState state, Lots lastLots,
+                                                Ticks lastTicks, Millis lastTime, Iden maxOrderId,
+                                                Iden maxExecId) const = 0;
+
+    virtual std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
+                                                const StringView& email) const = 0;
+
+    virtual OrderPtr doNewOrder(const StringView& trader, const StringView& market,
+                                const StringView& contr, Jday settlDay, Iden id,
+                                const StringView& ref, State state, Side side, Lots lots,
+                                Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
+                                Ticks lastTicks, Lots minLots, Millis created,
+                                Millis modified) const = 0;
+
+    virtual ExecPtr doNewExec(const StringView& trader, const StringView& market,
+                              const StringView& contr, Jday settlDay, Iden id,
+                              const StringView& ref, Iden orderId, State state, Side side,
+                              Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                              Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role,
+                              const StringView& cpty, Millis created) const = 0;
+
+    virtual PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jday settlDay,
+                              Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const = 0;
 };
 
 class SWIRLY_API BasicFactory : public Factory {
+ public:
+    BasicFactory() noexcept = default;
+    ~BasicFactory() noexcept override;
+
+    // Copy.
+    BasicFactory(const BasicFactory&) noexcept = default;
+    BasicFactory& operator=(const BasicFactory&) noexcept = default;
+
+    // Move.
+    BasicFactory(BasicFactory&&) noexcept = default;
+    BasicFactory& operator=(BasicFactory&&) noexcept = default;
+
  protected:
     std::unique_ptr<Asset> doNewAsset(const StringView& mnem, const StringView& display,
                                       AssetType type) const override;
@@ -155,18 +167,6 @@ class SWIRLY_API BasicFactory : public Factory {
 
     PosnPtr doNewPosn(const StringView& trader, const StringView& contr, Jday settlDay,
                       Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const override;
-
- public:
-    BasicFactory() noexcept = default;
-    ~BasicFactory() noexcept override;
-
-    // Copy.
-    BasicFactory(const BasicFactory&) noexcept = default;
-    BasicFactory& operator=(const BasicFactory&) noexcept = default;
-
-    // Move.
-    BasicFactory(BasicFactory&&) noexcept = default;
-    BasicFactory& operator=(BasicFactory&&) noexcept = default;
 };
 
 /** @} */

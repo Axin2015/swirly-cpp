@@ -32,15 +32,6 @@ class Factory;
  */
 
 class SWIRLY_API Model {
- protected:
-    virtual AssetSet doReadAsset(const Factory& factory) const = 0;
-
-    virtual ContrSet doReadContr(const Factory& factory) const = 0;
-
-    virtual MarketSet doReadMarket(const Factory& factory) const = 0;
-
-    virtual TraderSet doReadTrader(const Factory& factory) const = 0;
-
  public:
     Model() noexcept = default;
     virtual ~Model() noexcept;
@@ -69,6 +60,15 @@ class SWIRLY_API Model {
     {
         return doReadTrader(factory);
     }
+
+ protected:
+    virtual AssetSet doReadAsset(const Factory& factory) const = 0;
+
+    virtual ContrSet doReadContr(const Factory& factory) const = 0;
+
+    virtual MarketSet doReadMarket(const Factory& factory) const = 0;
+
+    virtual TraderSet doReadTrader(const Factory& factory) const = 0;
 };
 
 /** @} */

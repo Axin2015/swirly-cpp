@@ -32,23 +32,6 @@ namespace swirly {
  */
 
 class SWIRLY_API Request : public RefCounted {
- protected:
-    /**
-     * The executing trader.
-     */
-    const Mnem trader_;
-    const Mnem market_;
-    const Mnem contr_;
-    const Jday settlDay_;
-    const Iden id_;
-    /**
-     * Ref is optional.
-     */
-    const Ref ref_;
-    const Side side_;
-    Lots lots_;
-    const Millis created_;
-
  public:
     Request(const StringView& trader, const StringView& market, const StringView& contr,
             Jday settlDay, Iden id, const StringView& ref, Side side, Lots lots,
@@ -63,7 +46,6 @@ class SWIRLY_API Request : public RefCounted {
                                        created_{created}
     {
     }
-
     ~Request() noexcept override;
 
     // Copy.
@@ -110,6 +92,23 @@ class SWIRLY_API Request : public RefCounted {
     {
         return created_;
     }
+
+ protected:
+    /**
+     * The executing trader.
+     */
+    const Mnem trader_;
+    const Mnem market_;
+    const Mnem contr_;
+    const Jday settlDay_;
+    const Iden id_;
+    /**
+     * Ref is optional.
+     */
+    const Ref ref_;
+    const Side side_;
+    Lots lots_;
+    const Millis created_;
 };
 
 using RequestPtr = boost::intrusive_ptr<Request>;
@@ -159,8 +158,6 @@ class RequestIdSet {
         = boost::intrusive::set<RequestT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = boost::intrusive_ptr<RequestT>;
 
-    Set set_;
-
  public:
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
@@ -180,6 +177,57 @@ class RequestIdSet {
     RequestIdSet(RequestIdSet&&) = default;
     RequestIdSet& operator=(RequestIdSet&&) = default;
 
+    // Begin.
+    ConstIterator begin() const noexcept
+    {
+        return set_.begin();
+    }
+    ConstIterator cbegin() const noexcept
+    {
+        return set_.cbegin();
+    }
+    Iterator begin() noexcept
+    {
+        return set_.begin();
+    }
+
+    // End.
+    ConstIterator end() const noexcept
+    {
+        return set_.end();
+    }
+    ConstIterator cend() const noexcept
+    {
+        return set_.cend();
+    }
+    Iterator end() noexcept
+    {
+        return set_.end();
+    }
+
+    // Find.
+    ConstIterator find(const StringView& market, Iden id) const noexcept
+    {
+        return set_.find(std::make_tuple(market, id), KeyValueCompare());
+    }
+    Iterator find(const StringView& market, Iden id) noexcept
+    {
+        return set_.find(std::make_tuple(market, id), KeyValueCompare());
+    }
+    std::pair<ConstIterator, bool> findHint(const StringView& market, Iden id) const noexcept
+    {
+        const auto key = std::make_tuple(market, id);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
+    std::pair<Iterator, bool> findHint(const StringView& market, Iden id) noexcept
+    {
+        const auto key = std::make_tuple(market, id);
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(key, comp);
+        return std::make_pair(it, it != set_.end() && !comp(key, *it));
+    }
     Iterator insert(const ValuePtr& value) noexcept
     {
         Iterator it;
@@ -233,57 +281,8 @@ class RequestIdSet {
         set_.erase(value);
     }
 
-    // Begin.
-    Iterator begin() noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator begin() const noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator cbegin() const noexcept
-    {
-        return set_.cbegin();
-    }
-
-    // End.
-    Iterator end() noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator end() const noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator cend() const noexcept
-    {
-        return set_.cend();
-    }
-
-    // Find.
-    Iterator find(const StringView& market, Iden id) noexcept
-    {
-        return set_.find(std::make_tuple(market, id), KeyValueCompare());
-    }
-    ConstIterator find(const StringView& market, Iden id) const noexcept
-    {
-        return set_.find(std::make_tuple(market, id), KeyValueCompare());
-    }
-    std::pair<Iterator, bool> findHint(const StringView& market, Iden id) noexcept
-    {
-        const auto key = std::make_tuple(market, id);
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(key, comp);
-        return std::make_pair(it, it != set_.end() && !comp(key, *it));
-    }
-    std::pair<ConstIterator, bool> findHint(const StringView& market, Iden id) const noexcept
-    {
-        const auto key = std::make_tuple(market, id);
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(key, comp);
-        return std::make_pair(it, it != set_.end() && !comp(key, *it));
-    }
+ private:
+    Set set_;
 };
 
 /** @} */

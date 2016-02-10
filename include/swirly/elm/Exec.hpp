@@ -32,32 +32,7 @@ namespace swirly {
  * Trade executions represent the exchange of goods or services between counter-parties.
  */
 class SWIRLY_API Exec : public Request {
-
-    const Iden orderId_;
-    State state_;
-    const Ticks ticks_;
-    /**
-     * Must be greater than zero.
-     */
-    Lots resd_;
-    /**
-     * Must not be greater that lots.
-     */
-    Lots exec_;
-    Cost cost_;
-    Lots lastLots_;
-    Ticks lastTicks_;
-    /**
-     * Minimum to be filled by this order.
-     */
-    const Lots minLots_;
-    Iden matchId_;
-    Role role_;
-    Mnem cpty_;
-
  public:
-    boost::intrusive::set_member_hook<> idHook_;
-
     Exec(const StringView& trader, const StringView& market, const StringView& contr, Jday settlDay,
          Iden id, const StringView& ref, Iden orderId, State state, Side side, Lots lots,
          Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
@@ -136,6 +111,30 @@ class SWIRLY_API Exec : public Request {
     {
         return +cpty_;
     }
+    boost::intrusive::set_member_hook<> idHook_;
+
+ private:
+    const Iden orderId_;
+    State state_;
+    const Ticks ticks_;
+    /**
+     * Must be greater than zero.
+     */
+    Lots resd_;
+    /**
+     * Must not be greater that lots.
+     */
+    Lots exec_;
+    Cost cost_;
+    Lots lastLots_;
+    Ticks lastTicks_;
+    /**
+     * Minimum to be filled by this order.
+     */
+    const Lots minLots_;
+    Iden matchId_;
+    Role role_;
+    Mnem cpty_;
 };
 
 using ExecPtr = boost::intrusive_ptr<Exec>;

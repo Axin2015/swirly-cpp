@@ -33,15 +33,6 @@ namespace swirly {
  * A flattened view of a market.
  */
 class SWIRLY_API MarketView {
-
-    const Mnem market_;
-    const Mnem contr_;
-    const Jday settlDay_;
-    Lots lastLots_;
-    Ticks lastTicks_;
-    Millis lastTime_;
-    const MarketData data_;
-
  public:
     MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
                Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept;
@@ -83,6 +74,15 @@ class SWIRLY_API MarketView {
     {
         return lastTime_;
     }
+
+ private:
+    const Mnem market_;
+    const Mnem contr_;
+    const Jday settlDay_;
+    Lots lastLots_;
+    Ticks lastTicks_;
+    Millis lastTime_;
+    const MarketData data_;
 };
 
 /** @} */

@@ -30,44 +30,6 @@ namespace swirly {
  */
 
 class SWIRLY_API Journ {
- protected:
-    virtual void doCreateMarket(const StringView& mnem, const StringView& display,
-                                const StringView& contr, Jday settlDay, Jday expiryDay,
-                                MarketState state)
-        = 0;
-
-    virtual void doUpdateMarket(const StringView& mnem, const StringView& display,
-                                MarketState state)
-        = 0;
-
-    virtual void doCreateTrader(const StringView& mnem, const StringView& display,
-                                const StringView& email)
-        = 0;
-
-    virtual void doUpdateTrader(const StringView& mnem, const StringView& display) = 0;
-
-    virtual void doCreateExec(const Exec& exec) = 0;
-
-    virtual void doCreateExec(const StringView& market, const ArrayView<Exec*>& execs) = 0;
-
-    virtual void doCreateExec(const ArrayView<Exec*>& execs) = 0;
-
-    virtual void doArchiveOrder(const StringView& market, Iden id, Millis modified) = 0;
-
-    virtual void doArchiveOrder(const StringView& market, const ArrayView<Iden>& ids,
-                                Millis modified)
-        = 0;
-
-    virtual void doArchiveOrder(const ArrayView<MarketId>& ids, Millis modified) = 0;
-
-    virtual void doArchiveTrade(const StringView& market, Iden id, Millis modified) = 0;
-
-    virtual void doArchiveTrade(const StringView& market, const ArrayView<Iden>& ids,
-                                Millis modified)
-        = 0;
-
-    virtual void doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified) = 0;
-
  public:
     Journ() noexcept = default;
     virtual ~Journ() noexcept;
@@ -172,6 +134,44 @@ class SWIRLY_API Journ {
     {
         doArchiveTrade(ids, modified);
     }
+
+ protected:
+    virtual void doCreateMarket(const StringView& mnem, const StringView& display,
+                                const StringView& contr, Jday settlDay, Jday expiryDay,
+                                MarketState state)
+        = 0;
+
+    virtual void doUpdateMarket(const StringView& mnem, const StringView& display,
+                                MarketState state)
+        = 0;
+
+    virtual void doCreateTrader(const StringView& mnem, const StringView& display,
+                                const StringView& email)
+        = 0;
+
+    virtual void doUpdateTrader(const StringView& mnem, const StringView& display) = 0;
+
+    virtual void doCreateExec(const Exec& exec) = 0;
+
+    virtual void doCreateExec(const StringView& market, const ArrayView<Exec*>& execs) = 0;
+
+    virtual void doCreateExec(const ArrayView<Exec*>& execs) = 0;
+
+    virtual void doArchiveOrder(const StringView& market, Iden id, Millis modified) = 0;
+
+    virtual void doArchiveOrder(const StringView& market, const ArrayView<Iden>& ids,
+                                Millis modified)
+        = 0;
+
+    virtual void doArchiveOrder(const ArrayView<MarketId>& ids, Millis modified) = 0;
+
+    virtual void doArchiveTrade(const StringView& market, Iden id, Millis modified) = 0;
+
+    virtual void doArchiveTrade(const StringView& market, const ArrayView<Iden>& ids,
+                                Millis modified)
+        = 0;
+
+    virtual void doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified) = 0;
 };
 
 /** @} */

@@ -35,9 +35,10 @@ constexpr char HTTP_PORT[] = "8080";
 static struct mg_serve_http_opts httpOpts;
 
 class RestServ : public mg::Mgr<RestServ> {
-    Rest& rest_;
-    mg::OStream out_;
-    Tokeniser<'/'> uri_;
+ public:
+    explicit RestServ(Rest& rest) noexcept : rest_(rest)
+    {
+    }
     void reset(StringView sv) noexcept
     {
         out_.reset();
@@ -46,11 +47,6 @@ class RestServ : public mg::Mgr<RestServ> {
         if (sv.front() == '/')
             sv.remove_prefix(1);
         uri_.reset(sv);
-    }
-
- public:
-    explicit RestServ(Rest& rest) noexcept : rest_(rest)
-    {
     }
     void httpRequest(mg_connection& nc, mg::HttpMessage data)
     {
@@ -126,6 +122,11 @@ class RestServ : public mg::Mgr<RestServ> {
     void getView(mg::HttpMessage data)
     {
     }
+
+ private:
+    Rest& rest_;
+    mg::OStream out_;
+    Tokeniser<'/'> uri_;
 };
 
 } // anonymous

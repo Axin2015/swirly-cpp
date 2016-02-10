@@ -37,8 +37,6 @@ inline StringView operator+(const mg_str& str) noexcept
 }
 
 class HttpMessage {
-    http_message* impl_;
-
  public:
     HttpMessage(http_message* impl) noexcept : impl_{impl}
     {
@@ -77,35 +75,13 @@ class HttpMessage {
     {
         return +impl_->body;
     }
+
+ private:
+    http_message* impl_;
 };
 
 template <typename DerivedT>
 class Mgr {
-    mg_mgr mgr_;
-
-    static void handler(mg_connection* conn, int event, void* data)
-    {
-        auto* self = static_cast<DerivedT*>(conn->user_data);
-        switch (event) {
-        case MG_EV_CLOSE:
-            conn->user_data = nullptr;
-            break;
-        case MG_EV_HTTP_REQUEST:
-            self->httpRequest(*conn, static_cast<http_message*>(data));
-            break;
-        }
-    }
-
- protected:
-    Mgr() noexcept
-    {
-        mg_mgr_init(&mgr_, this);
-    }
-    ~Mgr() noexcept
-    {
-        mg_mgr_free(&mgr_);
-    }
-
  public:
     // Copy.
     Mgr(const Mgr&) = delete;
@@ -127,6 +103,32 @@ class Mgr {
     {
         return mg_mgr_poll(&mgr_, milli);
     }
+
+ protected:
+    Mgr() noexcept
+    {
+        mg_mgr_init(&mgr_, this);
+    }
+    ~Mgr() noexcept
+    {
+        mg_mgr_free(&mgr_);
+    }
+
+ private:
+    static void handler(mg_connection* conn, int event, void* data)
+    {
+        auto* self = static_cast<DerivedT*>(conn->user_data);
+        switch (event) {
+        case MG_EV_CLOSE:
+            conn->user_data = nullptr;
+            break;
+        case MG_EV_HTTP_REQUEST:
+            self->httpRequest(*conn, static_cast<http_message*>(data));
+            break;
+        }
+    }
+
+    mg_mgr mgr_;
 };
 
 /** @} */

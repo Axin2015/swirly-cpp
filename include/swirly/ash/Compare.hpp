@@ -28,9 +28,6 @@ namespace swirly {
 
 template <typename TypeT>
 class Comparable {
- protected:
-    ~Comparable() noexcept = default;
-
  public:
     friend constexpr bool operator==(const TypeT& lhs, const TypeT& rhs) noexcept
     {
@@ -61,6 +58,9 @@ class Comparable {
     {
         return lhs.compare(rhs) >= 0;
     }
+
+ protected:
+    ~Comparable() noexcept = default;
 };
 
 template <typename EnumT, typename std::enable_if_t<std::is_enum<EnumT>::value>* = nullptr>

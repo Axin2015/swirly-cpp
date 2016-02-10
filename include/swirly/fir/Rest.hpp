@@ -27,8 +27,6 @@ namespace swirly {
  */
 
 class SWIRLY_API Rest {
-    Serv serv_;
-
  public:
     Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now}
     {
@@ -44,6 +42,9 @@ class SWIRLY_API Rest {
     Rest& operator=(Rest&&);
 
     void assets(Millis now, std::ostream& out) const;
+
+ private:
+    Serv serv_;
 };
 
 /** @} */

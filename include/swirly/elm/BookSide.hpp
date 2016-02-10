@@ -28,18 +28,6 @@ namespace swirly {
  */
 
 class SWIRLY_API BookSide {
-    LevelSet levels_;
-    OrderList orders_;
-
-    /**
-     * Insert level. This function will only throw if a new level cannot be allocated.
-     */
-    LevelSet::Iterator insertLevel(const OrderPtr& order) throw(std::bad_alloc);
-
-    void removeOrder(Level& level, const Order& order) noexcept;
-
-    void reduceLevel(Level& level, const Order& order, Lots delta) noexcept;
-
  public:
     BookSide() = default;
 
@@ -112,6 +100,19 @@ class SWIRLY_API BookSide {
         }
         order.trade(lots, order.ticks(), now);
     }
+
+ private:
+    /**
+     * Insert level. This function will only throw if a new level cannot be allocated.
+     */
+    LevelSet::Iterator insertLevel(const OrderPtr& order) throw(std::bad_alloc);
+
+    void removeOrder(Level& level, const Order& order) noexcept;
+
+    void reduceLevel(Level& level, const Order& order, Lots delta) noexcept;
+
+    LevelSet levels_;
+    OrderList orders_;
 };
 
 /** @} */

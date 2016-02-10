@@ -31,15 +31,6 @@ class MarketBook;
  */
 
 class SWIRLY_API Response {
-
-    using Orders = std::vector<OrderPtr>;
-    using Execs = std::vector<ExecPtr>;
-
-    const MarketBook* book_{nullptr};
-    Orders orders_;
-    Execs execs_;
-    PosnPtr posn_;
-
  public:
     Response() noexcept;
     ~Response() noexcept;
@@ -52,6 +43,10 @@ class SWIRLY_API Response {
     Response(Response&&) noexcept;
     Response& operator=(Response&&) noexcept;
 
+    const MarketBook& book() const noexcept
+    {
+        return *book_;
+    }
     void reset(const MarketBook& book) noexcept
     {
         book_ = &book;
@@ -63,10 +58,14 @@ class SWIRLY_API Response {
 
     void clearMatches() noexcept;
 
-    const MarketBook& book() const noexcept
-    {
-        return *book_;
-    }
+ private:
+    using Orders = std::vector<OrderPtr>;
+    using Execs = std::vector<ExecPtr>;
+
+    const MarketBook* book_{nullptr};
+    Orders orders_;
+    Execs execs_;
+    PosnPtr posn_;
 };
 
 /** @} */

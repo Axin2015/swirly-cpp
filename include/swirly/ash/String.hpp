@@ -57,9 +57,6 @@ constexpr StringView operator+(const StringData<MaxN>& s) noexcept
  */
 template <std::size_t MaxN>
 class StringBuf : protected StringData<MaxN> {
-    using StringData<MaxN>::len;
-    using StringData<MaxN>::buf;
-
  public:
     using Data = StringData<MaxN>;
 
@@ -135,6 +132,10 @@ class StringBuf : protected StringData<MaxN> {
     {
         return len;
     }
+
+ private:
+    using StringData<MaxN>::len;
+    using StringData<MaxN>::buf;
 };
 
 template <std::size_t MaxN>

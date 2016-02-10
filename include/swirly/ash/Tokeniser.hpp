@@ -30,9 +30,6 @@ namespace swirly {
 
 template <char DelimN>
 class Tokeniser {
-    StringView buf_;
-    StringView::const_iterator i_, j_;
-
  public:
     explicit Tokeniser(const StringView& buf) noexcept
     {
@@ -52,6 +49,14 @@ class Tokeniser {
     Tokeniser(Tokeniser&&) noexcept = default;
     Tokeniser& operator=(Tokeniser&&) noexcept = default;
 
+    StringView top() const noexcept
+    {
+        return buf_.substr(i_ - buf_.cbegin(), j_ - i_);
+    }
+    bool empty() const noexcept
+    {
+        return i_ == buf_.cend();
+    }
     void reset(const StringView& buf) noexcept
     {
         buf_ = buf;
@@ -66,14 +71,10 @@ class Tokeniser {
         } else
             i_ = j_;
     }
-    StringView top() const noexcept
-    {
-        return buf_.substr(i_ - buf_.cbegin(), j_ - i_);
-    }
-    bool empty() const noexcept
-    {
-        return i_ == buf_.cend();
-    }
+
+ private:
+    StringView buf_;
+    StringView::const_iterator i_, j_;
 };
 
 /** @} */

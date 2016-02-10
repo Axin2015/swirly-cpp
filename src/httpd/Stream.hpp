@@ -30,13 +30,6 @@ namespace mg {
  */
 
 class StreamBuf : public std::streambuf {
-    mbuf buf_;
-
- protected:
-    int_type overflow(int_type c) noexcept override;
-
-    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
-
  public:
     StreamBuf() noexcept
     {
@@ -52,10 +45,6 @@ class StreamBuf : public std::streambuf {
     StreamBuf(StreamBuf&&) = delete;
     StreamBuf& operator=(StreamBuf&&) = delete;
 
-    void reset() noexcept
-    {
-        buf_.len = 0;
-    }
     const char_type* data() const noexcept
     {
         return buf_.buf;
@@ -64,11 +53,21 @@ class StreamBuf : public std::streambuf {
     {
         return buf_.len;
     }
+    void reset() noexcept
+    {
+        buf_.len = 0;
+    }
+
+ protected:
+    int_type overflow(int_type c) noexcept override;
+
+    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
+
+ private:
+    mbuf buf_;
 };
 
 class OStream : public std::ostream {
-    StreamBuf buf_;
-
  public:
     OStream() : std::ostream{nullptr}
     {
@@ -84,10 +83,6 @@ class OStream : public std::ostream {
     OStream(OStream&&) = delete;
     OStream& operator=(OStream&&) = delete;
 
-    void reset() noexcept
-    {
-        buf_.reset();
-    }
     const char_type* data() const noexcept
     {
         return buf_.data();
@@ -96,6 +91,13 @@ class OStream : public std::ostream {
     {
         return buf_.size();
     }
+    void reset() noexcept
+    {
+        buf_.reset();
+    }
+
+ private:
+    StreamBuf buf_;
 };
 
 /** @} */

@@ -30,27 +30,7 @@ namespace swirly {
  * A specification that stipulates the terms and conditions of sale.
  */
 class SWIRLY_API Contr : public Rec {
-    const Mnem asset_;
-    const Mnem ccy_;
-    const int lotNumer_;
-    const int lotDenom_;
-    // Transient.
-    const double qtyInc_;
-    const int tickNumer_;
-    const int tickDenom_;
-    // Transient.
-    const double priceInc_;
-    const int pipDp_;
-    // Transient.
-    const int qtyDp_;
-    // Transient.
-    const int priceDp_;
-    const Lots minLots_;
-    const Lots maxLots_;
-
  public:
-    boost::intrusive::set_member_hook<> mnemHook_;
-
     Contr(const StringView& mnem, const StringView& display, const StringView& asset,
           const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
           int pipDp, Lots minLots, Lots maxLots) noexcept;
@@ -117,6 +97,26 @@ class SWIRLY_API Contr : public Rec {
     {
         return maxLots_;
     }
+    boost::intrusive::set_member_hook<> mnemHook_;
+
+ private:
+    const Mnem asset_;
+    const Mnem ccy_;
+    const int lotNumer_;
+    const int lotDenom_;
+    // Transient.
+    const double qtyInc_;
+    const int tickNumer_;
+    const int tickDenom_;
+    // Transient.
+    const double priceInc_;
+    const int pipDp_;
+    // Transient.
+    const int qtyDp_;
+    // Transient.
+    const int priceDp_;
+    const Lots minLots_;
+    const Lots maxLots_;
 };
 
 using ContrSet = RecSet<Contr>;

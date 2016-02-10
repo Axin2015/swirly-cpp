@@ -46,14 +46,6 @@ struct Serv::Impl {
     using MarketBookPtr = unique_ptr<MarketBook, default_delete<Market>>;
     using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
 
-    Journ& journ;
-    ServFactory factory;
-    AssetSet assets;
-    ContrSet contrs;
-    MarketSet markets;
-    TraderSet traders;
-    TraderSessSet emailIdx;
-
     Impl(const Model& model, Journ& journ, Millis now) noexcept : journ{journ}
     {
     }
@@ -90,6 +82,14 @@ struct Serv::Impl {
     {
         // FIXME: not implemented.
     }
+
+    Journ& journ;
+    ServFactory factory;
+    AssetSet assets;
+    ContrSet contrs;
+    MarketSet markets;
+    TraderSet traders;
+    TraderSessSet emailIdx;
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)

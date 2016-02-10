@@ -29,11 +29,6 @@ namespace swirly {
 
 template <typename TypeT>
 class ArrayView {
-
-    // Length in the first cache-line.
-    std::size_t len_;
-    const TypeT* ptr_;
-
  public:
     using value_type = TypeT;
 
@@ -62,7 +57,6 @@ class ArrayView {
     constexpr ArrayView() noexcept : len_{0}, ptr_{nullptr}
     {
     }
-
     ~ArrayView() noexcept = default;
 
     // Copy.
@@ -73,16 +67,6 @@ class ArrayView {
     constexpr ArrayView(ArrayView&&) noexcept = default;
     constexpr ArrayView& operator=(ArrayView&&) noexcept = default;
 
-    void clear() noexcept
-    {
-        len_ = 0;
-        ptr_ = nullptr;
-    }
-    void swap(ArrayView& rhs) noexcept
-    {
-        std::swap(len_, rhs.len_);
-        std::swap(ptr_, rhs.ptr_);
-    }
     constexpr const_iterator begin() const noexcept
     {
         return ptr_;
@@ -139,6 +123,21 @@ class ArrayView {
     {
         return len_;
     }
+    void clear() noexcept
+    {
+        len_ = 0;
+        ptr_ = nullptr;
+    }
+    void swap(ArrayView& rhs) noexcept
+    {
+        std::swap(len_, rhs.len_);
+        std::swap(ptr_, rhs.ptr_);
+    }
+
+ private:
+    // Length in the first cache-line.
+    std::size_t len_;
+    const TypeT* ptr_;
 };
 
 template <typename TypeT>

@@ -27,16 +27,6 @@ namespace swirly {
  */
 
 class SWIRLY_API ServFactory : public BasicFactory {
- protected:
-    std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                        const StringView& contr, Jday settlDay, Jday expiryDay,
-                                        MarketState state, Lots lastLots, Ticks lastTicks,
-                                        Millis lastTime, Iden maxOrderId,
-                                        Iden maxExecId) const override;
-
-    std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
-                                        const StringView& email) const override;
-
  public:
     ServFactory() noexcept = default;
     ~ServFactory() noexcept override;
@@ -48,6 +38,16 @@ class SWIRLY_API ServFactory : public BasicFactory {
     // Move.
     ServFactory(ServFactory&&) = default;
     ServFactory& operator=(ServFactory&&) = default;
+
+ protected:
+    std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
+                                        const StringView& contr, Jday settlDay, Jday expiryDay,
+                                        MarketState state, Lots lastLots, Ticks lastTicks,
+                                        Millis lastTime, Iden maxOrderId,
+                                        Iden maxExecId) const override;
+
+    std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
+                                        const StringView& email) const override;
 };
 
 /** @} */

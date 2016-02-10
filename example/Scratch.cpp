@@ -28,6 +28,18 @@ inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
 }
 
 class MockModel : public Model {
+ public:
+    MockModel() noexcept = default;
+    ~MockModel() noexcept override = default;
+
+    // Copy.
+    constexpr MockModel(const MockModel&) noexcept = default;
+    MockModel& operator=(const MockModel&) noexcept = default;
+
+    // Move.
+    constexpr MockModel(MockModel&&) noexcept = default;
+    MockModel& operator=(MockModel&&) noexcept = default;
+
  protected:
     AssetSet doReadAsset(const Factory& factory) const override
     {
@@ -53,18 +65,6 @@ class MockModel : public Model {
         TraderSet s;
         return s;
     }
-
- public:
-    MockModel() noexcept = default;
-    ~MockModel() noexcept override = default;
-
-    // Copy.
-    constexpr MockModel(const MockModel&) noexcept = default;
-    MockModel& operator=(const MockModel&) noexcept = default;
-
-    // Move.
-    constexpr MockModel(MockModel&&) noexcept = default;
-    MockModel& operator=(MockModel&&) noexcept = default;
 };
 
 } // swirly

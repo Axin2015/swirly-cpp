@@ -32,11 +32,6 @@ namespace swirly {
  * Base class for referenced counted objects.
  */
 class SWIRLY_API RefCounted {
-    mutable int refs_ = 1;
-
- protected:
-    virtual ~RefCounted() noexcept;
-
  public:
     constexpr RefCounted() noexcept = default;
 
@@ -62,6 +57,12 @@ class SWIRLY_API RefCounted {
     {
         return refs_;
     }
+
+ protected:
+    virtual ~RefCounted() noexcept;
+
+ private:
+    mutable int refs_ = 1;
 };
 
 using RefCountedPtr = boost::intrusive_ptr<RefCounted>;

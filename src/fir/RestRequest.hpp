@@ -29,42 +29,6 @@ namespace swirly {
  */
 
 class SWIRLY_API RestRequest {
-
-    int cs_;
-    union {
-        struct {
-            int sign;
-            std::size_t digits;
-        } num_;
-        struct {
-            std::size_t* len;
-            char* buf;
-            std::size_t max;
-        } str_;
-    };
-    unsigned fields_;
-
-    Mnem::Data mnem_;
-    Display::Data display_;
-    Email::Data email_;
-    Mnem::Data trader_;
-    Mnem::Data contr_;
-    IsoDate settlDate_;
-    IsoDate expiryDate_;
-    Ref::Data ref_;
-    MarketState state_;
-    Side side_;
-    Lots lots_;
-    Ticks ticks_;
-    Lots minLots_;
-    Role role_;
-    Mnem::Data cpty_;
-
-    long num() const noexcept
-    {
-        return num_.sign * num_.digits;
-    }
-
  public:
     enum : unsigned {
         MNEM = 1 << 0,
@@ -97,10 +61,6 @@ class SWIRLY_API RestRequest {
     // Move.
     RestRequest(RestRequest&&) = delete;
     RestRequest& operator=(RestRequest&&) = delete;
-
-    void reset(bool clear = true) noexcept;
-
-    bool parse(const StringView& buf);
 
     unsigned fields() const noexcept
     {
@@ -165,6 +125,45 @@ class SWIRLY_API RestRequest {
     StringView cpty() const noexcept
     {
         return {cpty_.buf, cpty_.len};
+    }
+    void reset(bool clear = true) noexcept;
+
+    bool parse(const StringView& buf);
+
+ private:
+    int cs_;
+    union {
+        struct {
+            int sign;
+            std::size_t digits;
+        } num_;
+        struct {
+            std::size_t* len;
+            char* buf;
+            std::size_t max;
+        } str_;
+    };
+    unsigned fields_;
+
+    Mnem::Data mnem_;
+    Display::Data display_;
+    Email::Data email_;
+    Mnem::Data trader_;
+    Mnem::Data contr_;
+    IsoDate settlDate_;
+    IsoDate expiryDate_;
+    Ref::Data ref_;
+    MarketState state_;
+    Side side_;
+    Lots lots_;
+    Ticks ticks_;
+    Lots minLots_;
+    Role role_;
+    Mnem::Data cpty_;
+
+    long num() const noexcept
+    {
+        return num_.sign * num_.digits;
     }
 };
 

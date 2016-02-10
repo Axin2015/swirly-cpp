@@ -27,12 +27,6 @@ namespace swirly {
  */
 
 struct Match {
-    const Lots lots;
-    const OrderPtr makerOrder;
-    const ExecPtr makerTrade;
-    const PosnPtr makerPosn;
-    const ExecPtr takerTrade;
-
     Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
           const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
@@ -45,6 +39,12 @@ struct Match {
     // Move.
     Match(Match&&);
     Match& operator=(Match&&) = delete;
+
+    const Lots lots;
+    const OrderPtr makerOrder;
+    const ExecPtr makerTrade;
+    const PosnPtr makerPosn;
+    const ExecPtr takerTrade;
 };
 
 /** @} */

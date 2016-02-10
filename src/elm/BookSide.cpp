@@ -20,6 +20,31 @@ using namespace std;
 
 namespace swirly {
 
+BookSide::~BookSide() noexcept = default;
+
+BookSide::BookSide(BookSide&&) = default;
+
+void BookSide::insertOrder(const OrderPtr& order) throw(std::bad_alloc)
+{
+    assert(order->level() != nullptr);
+    assert(order->ticks() != 0_tks);
+    assert(order->resd() > 0_lts);
+    assert(order->exec() <= order->lots());
+    assert(order->lots() > 0_lts);
+    assert(order->minLots() >= 0_lts);
+
+    auto it = insertLevel(order);
+    // Next level.
+    ++it;
+    if (it != levels_.end()) {
+        // Insert order after the level's last order.
+        // I.e. insert order before the next level's first order.
+        orders_.insertBefore(order, it->firstOrder());
+    } else {
+        orders_.insertBack(order);
+    }
+}
+
 LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw(std::bad_alloc)
 {
     LevelSet::Iterator it;
@@ -67,31 +92,6 @@ void BookSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcep
     } else {
         assert(delta == order.resd());
         removeOrder(level, order);
-    }
-}
-
-BookSide::~BookSide() noexcept = default;
-
-BookSide::BookSide(BookSide&&) = default;
-
-void BookSide::insertOrder(const OrderPtr& order) throw(std::bad_alloc)
-{
-    assert(order->level() != nullptr);
-    assert(order->ticks() != 0_tks);
-    assert(order->resd() > 0_lts);
-    assert(order->exec() <= order->lots());
-    assert(order->lots() > 0_lts);
-    assert(order->minLots() >= 0_lts);
-
-    auto it = insertLevel(order);
-    // Next level.
-    ++it;
-    if (it != levels_.end()) {
-        // Insert order after the level's last order.
-        // I.e. insert order before the next level's first order.
-        orders_.insertBefore(order, it->firstOrder());
-    } else {
-        orders_.insertBack(order);
     }
 }
 

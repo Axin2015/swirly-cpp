@@ -27,17 +27,12 @@ namespace swirly {
  */
 
 class SWIRLY_API Trader : public Rec {
-    const Email email_;
-
  public:
-    boost::intrusive::set_member_hook<> mnemHook_;
-
     Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
         : Rec{RecType::MARKET, mnem, display},
           email_{email}
     {
     }
-
     ~Trader() noexcept override;
 
     // Copy.
@@ -52,6 +47,10 @@ class SWIRLY_API Trader : public Rec {
     {
         return +email_;
     }
+    boost::intrusive::set_member_hook<> mnemHook_;
+
+ private:
+    const Email email_;
 };
 
 using TraderSet = RecSet<Trader>;
