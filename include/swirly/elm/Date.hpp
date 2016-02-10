@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_DATEUTIL_HPP
-#define SWIRLY_ELM_DATEUTIL_HPP
+#ifndef SWIRLY_ELM_DATE_HPP
+#define SWIRLY_ELM_DATE_HPP
 
 #include <swirly/elm/Types.hpp>
 
@@ -43,4 +43,4 @@ SWIRLY_API Jday getBusDay(Millis ms);
 
 } // swirly
 
-#endif // SWIRLY_ELM_DATEUTIL_HPP
+#endif // SWIRLY_ELM_DATE_HPP

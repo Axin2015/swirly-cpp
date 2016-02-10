@@ -19,7 +19,7 @@
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/TraderSess.hpp>
 
-#include <swirly/elm/DateUtil.hpp>
+#include <swirly/elm/Date.hpp>
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/Journ.hpp>
 #include <swirly/elm/MarketBook.hpp>

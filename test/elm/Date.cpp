@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/DateUtil.hpp>
+#include <swirly/elm/Date.hpp>
 
 #include <swirly/ash/JulianDay.hpp>
 
@@ -23,7 +23,7 @@
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(DateUtilSuite)
+BOOST_AUTO_TEST_SUITE(DateSuite)
 
 BOOST_AUTO_TEST_CASE(GetBusDayCase)
 {
