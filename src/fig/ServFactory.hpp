@@ -27,27 +27,27 @@ namespace swirly {
  */
 
 class SWIRLY_API ServFactory : public BasicFactory {
- protected:
-    std::unique_ptr<Market> doNewMarket(const StringView& mnem, const StringView& display,
-                                        const StringView& contr, Jday settlDay, Jday expiryDay,
-                                        MarketState state, Lots lastLots, Ticks lastTicks,
-                                        Millis lastTime, Iden maxOrderId,
-                                        Iden maxExecId) const override;
-
-    std::unique_ptr<Trader> doNewTrader(const StringView& mnem, const StringView& display,
-                                        const StringView& email) const override;
-
  public:
-    ServFactory() noexcept = default;
-    ~ServFactory() noexcept override;
+  ServFactory() noexcept = default;
+  ~ServFactory() noexcept override;
 
-    // Copy.
-    ServFactory(const ServFactory&) = default;
-    ServFactory& operator=(const ServFactory&) = default;
+  // Copy.
+  ServFactory(const ServFactory&) = default;
+  ServFactory& operator=(const ServFactory&) = default;
 
-    // Move.
-    ServFactory(ServFactory&&) = default;
-    ServFactory& operator=(ServFactory&&) = default;
+  // Move.
+  ServFactory(ServFactory&&) = default;
+  ServFactory& operator=(ServFactory&&) = default;
+
+ protected:
+  std::unique_ptr<Market> doNewMarket(const std::string_view& mnem, const std::string_view& display,
+                                      const std::string_view& contr, Jday settlDay, Jday expiryDay,
+                                      MarketState state, Lots lastLots, Ticks lastTicks,
+                                      Millis lastTime, Iden maxOrderId,
+                                      Iden maxExecId) const override;
+
+  std::unique_ptr<Trader> doNewTrader(const std::string_view& mnem, const std::string_view& display,
+                                      const std::string_view& email) const override;
 };
 
 /** @} */

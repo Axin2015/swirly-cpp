@@ -16,9 +16,11 @@
  */
 #include <swirly/elm/MarketView.hpp>
 
+using namespace std;
+
 namespace swirly {
 
-MarketView::MarketView(const StringView& market, const StringView& contr, Jday settlDay,
+MarketView::MarketView(const string_view& market, const string_view& contr, Jday settlDay,
                        Lots lastLots, Ticks lastTicks, Millis lastTime,
                        const MarketData& data) noexcept : market_{market},
                                                           contr_{contr},
@@ -30,15 +32,15 @@ MarketView::MarketView(const StringView& market, const StringView& contr, Jday s
 {
 }
 
-MarketView::MarketView(const StringView& market, const StringView& contr, Jday settlDay,
+MarketView::MarketView(const string_view& market, const string_view& contr, Jday settlDay,
                        Lots lastLots, Ticks lastTicks, Millis lastTime) noexcept
-    : market_{market},
-      contr_{contr},
-      settlDay_{settlDay},
-      lastLots_{lastLots},
-      lastTicks_{lastTicks},
-      lastTime_{lastTime},
-      data_{}
+  : market_{market},
+    contr_{contr},
+    settlDay_{settlDay},
+    lastLots_{lastLots},
+    lastTicks_{lastTicks},
+    lastTime_{lastTime},
+    data_{}
 {
 }
 

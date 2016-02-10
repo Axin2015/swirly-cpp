@@ -24,29 +24,29 @@ BOOST_AUTO_TEST_SUITE(ExceptionSuite)
 
 BOOST_AUTO_TEST_CASE(FormatCase)
 {
-    using namespace std::literals::string_literals;
+  using namespace std::literals::string_literals;
 
-    Exception e;
+  Exception e;
 
-    e.format("[%d]", 123);
-    BOOST_CHECK(std::strcmp(e.what(), "[123]") == 0);
+  e.format("[%d]", 123);
+  BOOST_CHECK(std::strcmp(e.what(), "[123]") == 0);
 
-    e.format("[%.*s]", 3, "Foox");
-    BOOST_CHECK(std::strcmp(e.what(), "[Foo]") == 0);
+  e.format("[%.*s]", 3, "Foox");
+  BOOST_CHECK(std::strcmp(e.what(), "[Foo]") == 0);
 
-    e.format("[%.*s]", SWIRLY_STR("Bar"s));
-    BOOST_CHECK(std::strcmp(e.what(), "[Bar]") == 0);
+  e.format("[%.*s]", SWIRLY_STR("Bar"s));
+  BOOST_CHECK(std::strcmp(e.what(), "[Bar]") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(MakeExceptionCase)
 {
-    auto e = makeException<Exception>("[%d]", 123);
-    BOOST_CHECK(std::strcmp(e.what(), "[123]") == 0);
+  auto e = makeException<Exception>("[%d]", 123);
+  BOOST_CHECK(std::strcmp(e.what(), "[123]") == 0);
 }
 
 BOOST_AUTO_TEST_CASE(ThrowExceptionCase)
 {
-    BOOST_CHECK_THROW(throwException<Exception>("[%d]", 123), Exception);
+  BOOST_CHECK_THROW(throwException<Exception>("[%d]", 123), Exception);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

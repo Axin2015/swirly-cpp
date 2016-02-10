@@ -32,110 +32,74 @@ namespace swirly {
  * Trade executions represent the exchange of goods or services between counter-parties.
  */
 class SWIRLY_API Exec : public Request {
-
-    const Iden orderId_;
-    State state_;
-    const Ticks ticks_;
-    /**
-     * Must be greater than zero.
-     */
-    Lots resd_;
-    /**
-     * Must not be greater that lots.
-     */
-    Lots exec_;
-    Cost cost_;
-    Lots lastLots_;
-    Ticks lastTicks_;
-    /**
-     * Minimum to be filled by this order.
-     */
-    const Lots minLots_;
-    Iden matchId_;
-    Role role_;
-    Mnem cpty_;
-
  public:
-    boost::intrusive::set_member_hook<> idHook_;
+  Exec(const std::string_view& trader, const std::string_view& market,
+       const std::string_view& contr, Jday settlDay, Iden id, const std::string_view& ref,
+       Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
+       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role,
+       const std::string_view& cpty, Millis created) noexcept
+    : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+      orderId_{orderId},
+      state_{state},
+      ticks_{ticks},
+      resd_{resd},
+      exec_{exec},
+      cost_{cost},
+      lastLots_{lastLots},
+      lastTicks_{lastTicks},
+      minLots_{minLots},
+      matchId_{matchId},
+      role_{role},
+      cpty_{cpty}
+  {
+  }
 
-    Exec(const StringView& trader, const StringView& market, const StringView& contr, Jday settlDay,
-         Iden id, const StringView& ref, Iden orderId, State state, Side side, Lots lots,
-         Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
-         Iden matchId, Role role, const StringView& cpty, Millis created) noexcept
-        : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
-          orderId_{orderId},
-          state_{state},
-          ticks_{ticks},
-          resd_{resd},
-          exec_{exec},
-          cost_{cost},
-          lastLots_{lastLots},
-          lastTicks_{lastTicks},
-          minLots_{minLots},
-          matchId_{matchId},
-          role_{role},
-          cpty_{cpty}
-    {
-    }
+  ~Exec() noexcept override;
 
-    ~Exec() noexcept override;
+  // Copy.
+  Exec(const Exec&) = delete;
+  Exec& operator=(const Exec&) = delete;
 
-    // Copy.
-    Exec(const Exec&) = delete;
-    Exec& operator=(const Exec&) = delete;
+  // Move.
+  Exec(Exec&&);
+  Exec& operator=(Exec&&) = delete;
 
-    // Move.
-    Exec(Exec&&);
-    Exec& operator=(Exec&&) = delete;
+  Iden orderId() const noexcept { return orderId_; }
+  State state() const noexcept { return state_; }
+  Ticks ticks() const noexcept { return ticks_; }
+  Lots resd() const noexcept { return resd_; }
+  Lots exec() const noexcept { return exec_; }
+  Cost cost() const noexcept { return cost_; }
+  Lots lastLots() const noexcept { return lastLots_; }
+  Ticks lastTicks() const noexcept { return lastTicks_; }
+  Lots minLots() const noexcept { return minLots_; }
+  Iden matchId() const noexcept { return matchId_; }
+  Role role() const noexcept { return role_; }
+  std::string_view cpty() const noexcept { return +cpty_; }
+  boost::intrusive::set_member_hook<> idHook_;
 
-    Iden orderId() const noexcept
-    {
-        return orderId_;
-    }
-    State state() const noexcept
-    {
-        return state_;
-    }
-    Ticks ticks() const noexcept
-    {
-        return ticks_;
-    }
-    Lots resd() const noexcept
-    {
-        return resd_;
-    }
-    Lots exec() const noexcept
-    {
-        return exec_;
-    }
-    Cost cost() const noexcept
-    {
-        return cost_;
-    }
-    Lots lastLots() const noexcept
-    {
-        return lastLots_;
-    }
-    Ticks lastTicks() const noexcept
-    {
-        return lastTicks_;
-    }
-    Lots minLots() const noexcept
-    {
-        return minLots_;
-    }
-    Iden matchId() const noexcept
-    {
-        return matchId_;
-    }
-    Role role() const noexcept
-    {
-        return role_;
-    }
-    StringView cpty() const noexcept
-    {
-        return +cpty_;
-    }
+ private:
+  const Iden orderId_;
+  State state_;
+  const Ticks ticks_;
+  /**
+   * Must be greater than zero.
+   */
+  Lots resd_;
+  /**
+   * Must not be greater that lots.
+   */
+  Lots exec_;
+  Cost cost_;
+  Lots lastLots_;
+  Ticks lastTicks_;
+  /**
+   * Minimum to be filled by this order.
+   */
+  const Lots minLots_;
+  Iden matchId_;
+  Role role_;
+  Mnem cpty_;
 };
 
 using ExecPtr = boost::intrusive_ptr<Exec>;

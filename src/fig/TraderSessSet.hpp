@@ -30,106 +30,86 @@ namespace swirly {
  * Unordered TraderSess set keyed by email.
  */
 class SWIRLY_API TraderSessSet {
-    static constexpr std::size_t BUCKETS = 101;
-    struct ValueHash {
-        std::size_t operator()(const TraderSess& trader) const noexcept
-        {
-            return std::hash<StringView>()(trader.email());
-        }
-    };
-    struct ValueEqual {
-        bool operator()(const TraderSess& lhs, const TraderSess& rhs) const noexcept
-        {
-            return lhs.email() == rhs.email();
-        }
-    };
-    using KeyHash = std::hash<StringView>;
-    struct KeyValueEqual {
-        bool operator()(const StringView& lhs, const TraderSess& rhs) const noexcept
-        {
-            return lhs == rhs.email();
-        }
-        bool operator()(const TraderSess& lhs, const StringView& rhs) const noexcept
-        {
-            return lhs.email() == rhs;
-        }
-    };
-    using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-    using EqualOption = boost::intrusive::equal<ValueEqual>;
-    using HashOption = boost::intrusive::hash<ValueHash>;
-    using MemberHookOption
-        = boost::intrusive::member_hook<TraderSess, decltype(TraderSess::emailHook_),
-                                        &TraderSess::emailHook_>;
-    using Set = boost::intrusive::unordered_set<TraderSess, ConstantTimeSizeOption, EqualOption,
-                                                HashOption, MemberHookOption>;
-    using BucketType = Set::bucket_type;
-    using BucketTraits = Set::bucket_traits;
+  static constexpr std::size_t BUCKETS = 101;
+  struct ValueHash {
+    std::size_t operator()(const TraderSess& trader) const noexcept
+    {
+      return std::hash<std::string_view>()(trader.email());
+    }
+  };
+  struct ValueEqual {
+    bool operator()(const TraderSess& lhs, const TraderSess& rhs) const noexcept
+    {
+      return lhs.email() == rhs.email();
+    }
+  };
+  using KeyHash = std::hash<std::string_view>;
+  struct KeyValueEqual {
+    bool operator()(const std::string_view& lhs, const TraderSess& rhs) const noexcept
+    {
+      return lhs == rhs.email();
+    }
+    bool operator()(const TraderSess& lhs, const std::string_view& rhs) const noexcept
+    {
+      return lhs.email() == rhs;
+    }
+  };
+  using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
+  using EqualOption = boost::intrusive::equal<ValueEqual>;
+  using HashOption = boost::intrusive::hash<ValueHash>;
+  using MemberHookOption
+    = boost::intrusive::member_hook<TraderSess, decltype(TraderSess::emailHook_),
+                                    &TraderSess::emailHook_>;
+  using Set = boost::intrusive::unordered_set<TraderSess, ConstantTimeSizeOption, EqualOption,
+                                              HashOption, MemberHookOption>;
+  using BucketType = Set::bucket_type;
+  using BucketTraits = Set::bucket_traits;
 
-    BucketType buckets_[BUCKETS];
-    Set set_;
+  BucketType buckets_[BUCKETS];
+  Set set_;
 
  public:
-    using Iterator = typename Set::iterator;
-    using ConstIterator = typename Set::const_iterator;
+  using Iterator = typename Set::iterator;
+  using ConstIterator = typename Set::const_iterator;
 
-    TraderSessSet() : set_{BucketTraits{buckets_, BUCKETS}}
-    {
-    }
+  TraderSessSet() : set_{BucketTraits{buckets_, BUCKETS}} {}
 
-    ~TraderSessSet() noexcept;
+  ~TraderSessSet() noexcept;
 
-    // Copy.
-    TraderSessSet(const TraderSessSet&) = delete;
-    TraderSessSet& operator=(const TraderSessSet&) = delete;
+  // Copy.
+  TraderSessSet(const TraderSessSet&) = delete;
+  TraderSessSet& operator=(const TraderSessSet&) = delete;
 
-    // Move.
-    TraderSessSet(TraderSessSet&&);
-    TraderSessSet& operator=(TraderSessSet&&);
+  // Move.
+  TraderSessSet(TraderSessSet&&);
+  TraderSessSet& operator=(TraderSessSet&&);
 
-    bool insert(TraderSess& trader) noexcept
-    {
-        bool inserted;
-        std::tie(std::ignore, inserted) = set_.insert(trader);
-        return inserted;
-    }
+  bool insert(TraderSess& trader) noexcept
+  {
+    bool inserted;
+    std::tie(std::ignore, inserted) = set_.insert(trader);
+    return inserted;
+  }
 
-    // Begin.
-    Iterator begin() noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator begin() const noexcept
-    {
-        return set_.begin();
-    }
-    ConstIterator cbegin() const noexcept
-    {
-        return set_.cbegin();
-    }
+  // Begin.
+  Iterator begin() noexcept { return set_.begin(); }
+  ConstIterator begin() const noexcept { return set_.begin(); }
+  ConstIterator cbegin() const noexcept { return set_.cbegin(); }
 
-    // End.
-    Iterator end() noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator end() const noexcept
-    {
-        return set_.end();
-    }
-    ConstIterator cend() const noexcept
-    {
-        return set_.cend();
-    }
+  // End.
+  Iterator end() noexcept { return set_.end(); }
+  ConstIterator end() const noexcept { return set_.end(); }
+  ConstIterator cend() const noexcept { return set_.cend(); }
 
-    // Find.
-    Iterator find(const StringView& email) noexcept
-    {
-        return set_.find(email, KeyHash(), KeyValueEqual());
-    }
-    ConstIterator find(const StringView& email) const noexcept
-    {
-        return set_.find(email, KeyHash(), KeyValueEqual());
-    }
+  // Find.
+  Iterator find(const std::string_view& email) noexcept
+  {
+    return set_.find(email, KeyHash(), KeyValueEqual());
+  }
+  ConstIterator find(const std::string_view& email) const noexcept
+  {
+    return set_.find(email, KeyHash(), KeyValueEqual());
+  }
 };
 
 /** @} */

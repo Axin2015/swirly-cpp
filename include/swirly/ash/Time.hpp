@@ -31,7 +31,7 @@ namespace swirly {
  * Milliseconds since Unix epoch.
  */
 
-SWIRLY_API Millis now();
+SWIRLY_API Millis getTimeOfDay();
 
 /** @} */
 

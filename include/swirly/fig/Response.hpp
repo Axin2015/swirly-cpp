@@ -31,42 +31,38 @@ class MarketBook;
  */
 
 class SWIRLY_API Response {
-
-    using Orders = std::vector<OrderPtr>;
-    using Execs = std::vector<ExecPtr>;
-
-    const MarketBook* book_{nullptr};
-    Orders orders_;
-    Execs execs_;
-    PosnPtr posn_;
-
  public:
-    Response() noexcept;
-    ~Response() noexcept;
+  Response() noexcept;
+  ~Response() noexcept;
 
-    // Copy.
-    Response(const Response&);
-    Response& operator=(const Response&);
+  // Copy.
+  Response(const Response&);
+  Response& operator=(const Response&);
 
-    // Move.
-    Response(Response&&) noexcept;
-    Response& operator=(Response&&) noexcept;
+  // Move.
+  Response(Response&&) noexcept;
+  Response& operator=(Response&&) noexcept;
 
-    void reset(const MarketBook& book) noexcept
-    {
-        book_ = &book;
-        clearAll();
-    }
-    void reset(const MarketBook& book, const OrderPtr& order, const ExecPtr& exec);
+  const MarketBook& book() const noexcept { return *book_; }
+  void reset(const MarketBook& book) noexcept
+  {
+    book_ = &book;
+    clearAll();
+  }
+  void reset(const MarketBook& book, const OrderPtr& order, const ExecPtr& exec);
 
-    void clearAll() noexcept;
+  void clearAll() noexcept;
 
-    void clearMatches() noexcept;
+  void clearMatches() noexcept;
 
-    const MarketBook& book() const noexcept
-    {
-        return *book_;
-    }
+ private:
+  using Orders = std::vector<OrderPtr>;
+  using Execs = std::vector<ExecPtr>;
+
+  const MarketBook* book_{nullptr};
+  Orders orders_;
+  Execs execs_;
+  PosnPtr posn_;
 };
 
 /** @} */

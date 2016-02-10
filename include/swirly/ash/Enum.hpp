@@ -31,35 +31,32 @@ namespace swirly {
  * Helper macro for implementing enumString() case statements.
  */
 #define SWIRLY_ENUM_CASE(type, val)                                                                \
-    case type::val:                                                                                \
-        return #val;                                                                               \
-        break
+  case type::val:                                                                                  \
+    return #val;                                                                                   \
+    break
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
 {
-    return static_cast<EnumT>(val);
+  return static_cast<EnumT>(val);
 }
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
 {
-    return static_cast<typename std::underlying_type_t<EnumT>>(val);
+  return static_cast<typename std::underlying_type_t<EnumT>>(val);
 }
 
 template <typename EnumT>
 struct EnumTraits {
-    static void print(std::ostream& os, EnumT val) noexcept
-    {
-        os << unbox(val);
-    }
+  static void print(std::ostream& os, EnumT val) noexcept { os << unbox(val); }
 };
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 std::ostream& operator<<(std::ostream& os, EnumT val) noexcept
 {
-    EnumTraits<EnumT>::print(os, val);
-    return os;
+  EnumTraits<EnumT>::print(os, val);
+  return os;
 }
 
 namespace enumops {
@@ -72,8 +69,8 @@ namespace enumops {
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator+=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) + unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) + unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -82,8 +79,8 @@ constexpr EnumT& operator+=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator-=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) - unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) - unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -92,8 +89,8 @@ constexpr EnumT& operator-=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator*=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) * unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) * unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -102,8 +99,8 @@ constexpr EnumT& operator*=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator/=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) / unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) / unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -112,8 +109,8 @@ constexpr EnumT& operator/=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator%=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) % unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) % unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -122,8 +119,8 @@ constexpr EnumT& operator%=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator&=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) & unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) & unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -132,8 +129,8 @@ constexpr EnumT& operator&=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator|=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) | unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) | unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -142,8 +139,8 @@ constexpr EnumT& operator|=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator^=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) ^ unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) ^ unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -152,8 +149,8 @@ constexpr EnumT& operator^=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator<<=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) << unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) << unbox(rhs));
+  return lhs;
 }
 
 /**
@@ -162,8 +159,8 @@ constexpr EnumT& operator<<=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator>>=(EnumT& lhs, EnumT rhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) >> unbox(rhs));
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) >> unbox(rhs));
+  return lhs;
 }
 
 // Increment/decrement operators
@@ -174,8 +171,8 @@ constexpr EnumT& operator>>=(EnumT& lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator++(EnumT& lhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) + 1);
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) + 1);
+  return lhs;
 }
 
 /**
@@ -184,8 +181,8 @@ constexpr EnumT& operator++(EnumT& lhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT& operator--(EnumT& lhs) noexcept
 {
-    lhs = box<EnumT>(unbox(lhs) - 1);
-    return lhs;
+  lhs = box<EnumT>(unbox(lhs) - 1);
+  return lhs;
 }
 
 /**
@@ -194,9 +191,9 @@ constexpr EnumT& operator--(EnumT& lhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator++(EnumT& lhs, int)noexcept
 {
-    const EnumT prev{lhs};
-    lhs = box<EnumT>(unbox(lhs) + 1);
-    return prev;
+  const EnumT prev{lhs};
+  lhs = box<EnumT>(unbox(lhs) + 1);
+  return prev;
 }
 
 /**
@@ -205,9 +202,9 @@ constexpr EnumT operator++(EnumT& lhs, int)noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator--(EnumT& lhs, int)noexcept
 {
-    const EnumT prev{lhs};
-    lhs = box<EnumT>(unbox(lhs) - 1);
-    return prev;
+  const EnumT prev{lhs};
+  lhs = box<EnumT>(unbox(lhs) - 1);
+  return prev;
 }
 
 // Arithmetic operators
@@ -218,7 +215,7 @@ constexpr EnumT operator--(EnumT& lhs, int)noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator+(EnumT lhs) noexcept
 {
-    return box<EnumT>(+unbox(lhs));
+  return box<EnumT>(+unbox(lhs));
 }
 
 /**
@@ -227,7 +224,7 @@ constexpr EnumT operator+(EnumT lhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator-(EnumT lhs) noexcept
 {
-    return box<EnumT>(-unbox(lhs));
+  return box<EnumT>(-unbox(lhs));
 }
 
 /**
@@ -236,7 +233,7 @@ constexpr EnumT operator-(EnumT lhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator+(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) + unbox(rhs));
+  return box<EnumT>(unbox(lhs) + unbox(rhs));
 }
 
 /**
@@ -245,7 +242,7 @@ constexpr EnumT operator+(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator-(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) - unbox(rhs));
+  return box<EnumT>(unbox(lhs) - unbox(rhs));
 }
 
 /**
@@ -254,7 +251,7 @@ constexpr EnumT operator-(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator*(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) * unbox(rhs));
+  return box<EnumT>(unbox(lhs) * unbox(rhs));
 }
 
 /**
@@ -263,7 +260,7 @@ constexpr EnumT operator*(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator/(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) / unbox(rhs));
+  return box<EnumT>(unbox(lhs) / unbox(rhs));
 }
 
 /**
@@ -272,7 +269,7 @@ constexpr EnumT operator/(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator%(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) % unbox(rhs));
+  return box<EnumT>(unbox(lhs) % unbox(rhs));
 }
 
 /**
@@ -281,7 +278,7 @@ constexpr EnumT operator%(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator~(EnumT lhs) noexcept
 {
-    return box<EnumT>(~unbox(lhs));
+  return box<EnumT>(~unbox(lhs));
 }
 
 /**
@@ -290,7 +287,7 @@ constexpr EnumT operator~(EnumT lhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator&(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) & unbox(rhs));
+  return box<EnumT>(unbox(lhs) & unbox(rhs));
 }
 
 /**
@@ -299,7 +296,7 @@ constexpr EnumT operator&(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator|(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) | unbox(rhs));
+  return box<EnumT>(unbox(lhs) | unbox(rhs));
 }
 
 /**
@@ -308,7 +305,7 @@ constexpr EnumT operator|(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator^(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) ^ unbox(rhs));
+  return box<EnumT>(unbox(lhs) ^ unbox(rhs));
 }
 
 /**
@@ -317,7 +314,7 @@ constexpr EnumT operator^(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator<<(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) << unbox(rhs));
+  return box<EnumT>(unbox(lhs) << unbox(rhs));
 }
 
 /**
@@ -326,7 +323,7 @@ constexpr EnumT operator<<(EnumT lhs, EnumT rhs) noexcept
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT operator>>(EnumT lhs, EnumT rhs) noexcept
 {
-    return box<EnumT>(unbox(lhs) >> unbox(rhs));
+  return box<EnumT>(unbox(lhs) >> unbox(rhs));
 }
 
 } // enumops

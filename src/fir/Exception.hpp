@@ -28,17 +28,17 @@ namespace swirly {
 
 class SWIRLY_API ParseException : public Exception {
  public:
-    ParseException() noexcept = default;
+  ParseException() noexcept = default;
 
-    ~ParseException() noexcept override;
+  ~ParseException() noexcept override;
 
-    // Copy.
-    ParseException(const ParseException&) noexcept = default;
-    ParseException& operator=(const ParseException&) noexcept = default;
+  // Copy.
+  ParseException(const ParseException&) noexcept = default;
+  ParseException& operator=(const ParseException&) noexcept = default;
 
-    // Move.
-    ParseException(ParseException&&) noexcept = default;
-    ParseException& operator=(ParseException&&) noexcept = default;
+  // Move.
+  ParseException(ParseException&&) noexcept = default;
+  ParseException& operator=(ParseException&&) noexcept = default;
 };
 
 /** @} */

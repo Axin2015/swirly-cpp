@@ -30,22 +30,22 @@ namespace swirly {
 
 constexpr int64_t roundHalfAway(double real) noexcept
 {
-    return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
+  return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
 }
 
 constexpr double fractToReal(int numer, int denom) noexcept
 {
-    return static_cast<double>(numer) / static_cast<double>(denom);
+  return static_cast<double>(numer) / static_cast<double>(denom);
 }
 
 constexpr Incs realToIncs(double real, double incSize) noexcept
 {
-    return roundHalfAway(real / incSize);
+  return roundHalfAway(real / incSize);
 }
 
 constexpr double incsToReal(Incs incs, double incSize) noexcept
 {
-    return incs * incSize;
+  return incs * incSize;
 }
 
 /**
@@ -53,7 +53,7 @@ constexpr double incsToReal(Incs incs, double incSize) noexcept
  */
 constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
 {
-    return box<Lots>(realToIncs(qty, qtyInc));
+  return box<Lots>(realToIncs(qty, qtyInc));
 }
 
 /**
@@ -61,7 +61,7 @@ constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
  */
 constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
 {
-    return incsToReal(unbox(lots), qtyInc);
+  return incsToReal(unbox(lots), qtyInc);
 }
 
 /**
@@ -69,7 +69,7 @@ constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
  */
 constexpr Ticks priceToTicks(double price, double priceInc) noexcept
 {
-    return box<Ticks>(realToIncs(price, priceInc));
+  return box<Ticks>(realToIncs(price, priceInc));
 }
 
 /**
@@ -77,7 +77,7 @@ constexpr Ticks priceToTicks(double price, double priceInc) noexcept
  */
 constexpr double ticksToPrice(Ticks ticks, double priceInc) noexcept
 {
-    return incsToReal(unbox(ticks), priceInc);
+  return incsToReal(unbox(ticks), priceInc);
 }
 
 /**
@@ -85,15 +85,15 @@ constexpr double ticksToPrice(Ticks ticks, double priceInc) noexcept
  */
 constexpr int realToDp(double d) noexcept
 {
-    int dp{0};
-    for (; dp < 9; ++dp) {
-        double ip{};
-        const double fp{std::modf(d, &ip)};
-        if (fp < 0.000000001)
-            break;
-        d *= 10;
-    }
-    return dp;
+  int dp{0};
+  for (; dp < 9; ++dp) {
+    double ip{};
+    const double fp{std::modf(d, &ip)};
+    if (fp < 0.000000001)
+      break;
+    d *= 10;
+  }
+  return dp;
 }
 
 /**
@@ -101,7 +101,7 @@ constexpr int realToDp(double d) noexcept
  */
 inline double dpToReal(int dp) noexcept
 {
-    return std::pow(10, -dp);
+  return std::pow(10, -dp);
 }
 
 /**
@@ -109,7 +109,7 @@ inline double dpToReal(int dp) noexcept
  */
 inline Cost cost(Lots lots, Ticks ticks) noexcept
 {
-    return box<Cost>(unbox(lots) * unbox(ticks));
+  return box<Cost>(unbox(lots) * unbox(ticks));
 }
 
 /** @} */

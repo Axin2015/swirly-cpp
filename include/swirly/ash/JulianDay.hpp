@@ -33,9 +33,9 @@ namespace swirly {
  */
 constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
 {
-    assert(mon <= 11);
-    assert(mday <= 31);
-    return box<IsoDate>(year * 10000 + (mon + 1) * 100 + mday);
+  assert(mon <= 11);
+  assert(mday <= 31);
+  return box<IsoDate>(year * 10000 + (mon + 1) * 100 + mday);
 }
 
 /**
@@ -43,16 +43,16 @@ constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
  */
 constexpr Jday ymdToJd(int year, int mon, int mday) noexcept
 {
-    // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's
-    // Almanac for Computers.
-    // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
+  // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
+  // for Computers.
+  // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-    const auto i = year;
-    const auto j = mon + 1;
-    const auto k = mday;
-    return box<Jday>(k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
-                     + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
-                     - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4);
+  const auto i = year;
+  const auto j = mon + 1;
+  const auto k = mday;
+  return box<Jday>(k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
+                   + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
+                   - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4);
 }
 
 /**
@@ -60,11 +60,11 @@ constexpr Jday ymdToJd(int year, int mon, int mday) noexcept
  */
 constexpr Jday isoToJd(IsoDate iso) noexcept
 {
-    const auto n = unbox(iso);
-    const auto year = n / 10000;
-    const auto mon = (n / 100 % 100) - 1;
-    const auto mday = n % 100;
-    return ymdToJd(year, mon, mday);
+  const auto n = unbox(iso);
+  const auto year = n / 10000;
+  const auto mon = (n / 100 % 100) - 1;
+  const auto mday = n % 100;
+  return ymdToJd(year, mon, mday);
 }
 
 /**
@@ -72,22 +72,22 @@ constexpr Jday isoToJd(IsoDate iso) noexcept
  */
 constexpr IsoDate jdToIso(Jday jd) noexcept
 {
-    // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
-    // Almanac for Computers.
-    // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
+  // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
+  // for Computers.
+  // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-    auto l = unbox(jd) + 68569;
-    const auto n = 4 * l / 146097;
-    l = l - (146097 * n + 3) / 4;
-    auto i = 4000 * (l + 1) / 1461001;
-    l = l - 1461 * i / 4 + 31;
-    auto j = 80 * l / 2447;
-    const auto k = l - 2447 * j / 80;
-    l = j / 11;
-    j = j + 2 - 12 * l;
-    i = 100 * (n - 49) + i + l;
+  auto l = unbox(jd) + 68569;
+  const auto n = 4 * l / 146097;
+  l = l - (146097 * n + 3) / 4;
+  auto i = 4000 * (l + 1) / 1461001;
+  l = l - 1461 * i / 4 + 31;
+  auto j = 80 * l / 2447;
+  const auto k = l - 2447 * j / 80;
+  l = j / 11;
+  j = j + 2 - 12 * l;
+  i = 100 * (n - 49) + i + l;
 
-    return box<IsoDate>(i * 10000 + j * 100 + k);
+  return box<IsoDate>(i * 10000 + j * 100 + k);
 }
 
 /**
@@ -95,8 +95,8 @@ constexpr IsoDate jdToIso(Jday jd) noexcept
  */
 constexpr Jday jdToMjd(Jday jd) noexcept
 {
-    using namespace enumops;
-    return jd - 2400000_jd;
+  using namespace enumops;
+  return jd - 2400000_jd;
 }
 
 /**
@@ -104,8 +104,8 @@ constexpr Jday jdToMjd(Jday jd) noexcept
  */
 constexpr Jday mjdToJd(Jday mjd) noexcept
 {
-    using namespace enumops;
-    return mjd + 2400000_jd;
+  using namespace enumops;
+  return mjd + 2400000_jd;
 }
 
 /**
@@ -113,8 +113,8 @@ constexpr Jday mjdToJd(Jday mjd) noexcept
  */
 constexpr Jday jdToTjd(Jday jd) noexcept
 {
-    using namespace enumops;
-    return jd - 2440000_jd;
+  using namespace enumops;
+  return jd - 2440000_jd;
 }
 
 /**
@@ -122,8 +122,8 @@ constexpr Jday jdToTjd(Jday jd) noexcept
  */
 constexpr Jday tjdToJd(Jday tjd) noexcept
 {
-    using namespace enumops;
-    return tjd + 2440000_jd;
+  using namespace enumops;
+  return tjd + 2440000_jd;
 }
 
 /**
@@ -131,12 +131,12 @@ constexpr Jday tjdToJd(Jday tjd) noexcept
  */
 constexpr Millis jdToMs(Jday jd) noexcept
 {
-    using namespace enumops;
-    // Julian day for January 1st, 1970.
-    const Jday jdUnixEpoc = 2440588_jd;
-    const int64_t msInDay = 24 * 60 * 60 * 1000;
-    // Add half day for 12pm.
-    return box<Millis>(unbox(jd - jdUnixEpoc) * msInDay + (msInDay >> 1));
+  using namespace enumops;
+  // Julian day for January 1st, 1970.
+  const Jday jdUnixEpoc = 2440588_jd;
+  const int64_t msInDay = 24 * 60 * 60 * 1000;
+  // Add half day for 12pm.
+  return box<Millis>(unbox(jd - jdUnixEpoc) * msInDay + (msInDay >> 1));
 }
 
 /**
@@ -144,7 +144,7 @@ constexpr Millis jdToMs(Jday jd) noexcept
  */
 constexpr IsoDate maybeJdToIso(Jday jd) noexcept
 {
-    return jd != 0_jd ? jdToIso(jd) : 0_dt;
+  return jd != 0_jd ? jdToIso(jd) : 0_dt;
 }
 
 /**
@@ -152,7 +152,7 @@ constexpr IsoDate maybeJdToIso(Jday jd) noexcept
  */
 constexpr Jday maybeIsoToJd(IsoDate iso) noexcept
 {
-    return iso != 0_dt ? isoToJd(iso) : 0_jd;
+  return iso != 0_dt ? isoToJd(iso) : 0_jd;
 }
 
 /** @} */

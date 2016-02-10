@@ -14,30 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/DateUtil.hpp>
-
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/ash/Stream.hpp>
 
 #include <boost/test/unit_test.hpp>
+
+#include <array>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(DateUtilSuite)
+BOOST_AUTO_TEST_SUITE(StreamSuite)
 
-BOOST_AUTO_TEST_CASE(GetBusDayCase)
+BOOST_AUTO_TEST_CASE(OStreamJoinerCase)
 {
-    // Business days roll at 5pm New York.
-
-    // Friday, March 14, 2014
-    // 21.00 UTC
-    // 17.00 EDT (UTC-4 hours)
-
-    // 20.59 UTC
-    BOOST_CHECK_EQUAL(getBusDay(1394830799000_ms), ymdToJd(2014, 2, 14));
-
-    // 21.00 UTC
-    BOOST_CHECK_EQUAL(getBusDay(1394830800000_ms), ymdToJd(2014, 2, 15));
+  array<string, 3> arr{{"foo", "bar", "baz"}};
+  stringstream ss;
+  copy(arr.begin(), arr.end(), OStreamJoiner(ss, ','));
+  BOOST_CHECK_EQUAL(ss.str(), "foo,bar,baz");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -28,19 +28,16 @@ namespace swirly {
 
 class SWIRLY_API MarketData {
  public:
-    MarketData() noexcept
-    {
-    }
+  MarketData() noexcept {}
+  ~MarketData() noexcept;
 
-    ~MarketData() noexcept;
+  // Copy.
+  MarketData(const MarketData&) = default;
+  MarketData& operator=(const MarketData&) = default;
 
-    // Copy.
-    MarketData(const MarketData&) = default;
-    MarketData& operator=(const MarketData&) = default;
-
-    // Move.
-    MarketData(MarketData&&) = default;
-    MarketData& operator=(MarketData&&) = default;
+  // Move.
+  MarketData(MarketData&&) = default;
+  MarketData& operator=(MarketData&&) = default;
 };
 
 /** @} */

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(ExceptionSuite)
 
 BOOST_AUTO_TEST_CASE(ServExceptionCase)
 {
-    BOOST_CHECK_THROW(throwException<ServException>("[%d]", 123), ServException);
+  BOOST_CHECK_THROW(throwException<ServException>("[%d]", 123), ServException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

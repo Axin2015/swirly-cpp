@@ -26,22 +26,22 @@ Exception::~Exception() noexcept = default;
 
 void Exception::format(const char* fmt, ...) noexcept
 {
-    va_list args;
-    va_start(args, fmt);
-    format(fmt, args);
-    va_end(args);
+  va_list args;
+  va_start(args, fmt);
+  format(fmt, args);
+  va_end(args);
 }
 
 void Exception::format(const char* fmt, std::va_list args) noexcept
 {
-    const auto ret = std::vsnprintf(msg_, sizeof(msg_), fmt, args);
-    if (ret < 0)
-        std::terminate();
+  const auto ret = std::vsnprintf(msg_, sizeof(msg_), fmt, args);
+  if (ret < 0)
+    std::terminate();
 }
 
 const char* Exception::what() const noexcept
 {
-    return msg_;
+  return msg_;
 }
 
 } // swirly

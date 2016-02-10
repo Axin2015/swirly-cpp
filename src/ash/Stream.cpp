@@ -14,41 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/DateUtil.hpp>
+#include <swirly/ash/Stream.hpp>
 
-#include <boost/date_time/local_time/local_time.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-
-namespace lt = boost::local_time;
-namespace pt = boost::posix_time;
-
-using namespace std;
+#include <sys/time.h>
 
 namespace swirly {
 
-namespace {
-
-// http://www.di-mgt.com.au/wclock/tz.html
-
-// America/New_York.
-const lt::time_zone_ptr NY{new lt::posix_time_zone{"EST-5EDT,M3.2.0/2,M11.1.0/2"}};
-
-// Roll at 5pm.
-constexpr int ROLL_HOUR{17};
-
-inline pt::ptime millisToPtime(Millis ms)
-{
-    return pt::from_time_t(unbox(ms) / 1000L) + pt::milliseconds(unbox(ms) % 1000L);
-}
-
-} // anonymous
-
-Jday getBusDay(Millis ms)
-{
-    lt::local_date_time ldt{millisToPtime(ms), NY};
-    // Add 7 hours to 17.00 will roll the date.
-    ldt += pt::hours(24 - ROLL_HOUR);
-    return box<Jday>(ldt.local_time().date().julian_day());
-}
+OStreamJoiner::~OStreamJoiner() noexcept = default;
 
 } // swirly

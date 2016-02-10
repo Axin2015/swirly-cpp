@@ -14,15 +14,33 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Optional.hpp>
+#ifndef SWIRLY_ELM_DATE_HPP
+#define SWIRLY_ELM_DATE_HPP
 
-#include <boost/test/unit_test.hpp>
+#include <swirly/elm/Types.hpp>
 
-BOOST_AUTO_TEST_SUITE(OptionalSuite)
+#include <swirly/ash/Types.hpp>
 
-BOOST_AUTO_TEST_CASE(OptionalCase)
-{
-    BOOST_CHECK(true);
-}
+namespace swirly {
 
-BOOST_AUTO_TEST_SUITE_END()
+/**
+ * @addtogroup Date
+ * @{
+ */
+
+/**
+ * Get the business day from a transaction time.
+ *
+ * Business day rolls at 5pm New York.
+ *
+ * @param ms
+ *            The milliseconds since epoch.
+ * @return the business day.
+ */
+SWIRLY_API Jday getBusDay(Millis ms);
+
+/** @} */
+
+} // swirly
+
+#endif // SWIRLY_ELM_DATE_HPP

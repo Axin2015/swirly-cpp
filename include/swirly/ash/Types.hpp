@@ -35,7 +35,7 @@ enum class IsoDate : int {};
 
 constexpr IsoDate operator""_dt(unsigned long long val) noexcept
 {
-    return box<IsoDate>(val);
+  return box<IsoDate>(val);
 }
 
 /**
@@ -45,7 +45,7 @@ enum class Jday : int {};
 
 constexpr Jday operator""_jd(unsigned long long val) noexcept
 {
-    return box<Jday>(val);
+  return box<Jday>(val);
 }
 
 /**
@@ -55,7 +55,7 @@ enum class Millis : int64_t {};
 
 constexpr Millis operator""_ms(unsigned long long val) noexcept
 {
-    return box<Millis>(val);
+  return box<Millis>(val);
 }
 
 /** @} */

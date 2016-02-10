@@ -34,63 +34,64 @@ class Factory;
  */
 
 class SWIRLY_API TraderSess : public Trader {
-    using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
-
-    const Factory& factory_;
-    OrderIdSet orders_;
-    ExecIdSet trades_;
-    TraderPosnSet posns_;
-    OrderRefSet refIdx_;
+  using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
  public:
-    boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
+  TraderSess(const std::string_view& mnem, const std::string_view& display,
+             const std::string_view& email, const Factory& factory) noexcept
+    : Trader{mnem, display, email},
+      factory_{factory}
+  {
+  }
+  ~TraderSess() noexcept override;
 
-    TraderSess(const StringView& mnem, const StringView& display, const StringView& email,
-               const Factory& factory) noexcept : Trader{mnem, display, email},
-                                                  factory_{factory}
-    {
-    }
+  // Copy.
+  TraderSess(const TraderSess&) = delete;
+  TraderSess& operator=(const TraderSess&) = delete;
 
-    ~TraderSess() noexcept override;
+  // Move.
+  TraderSess(TraderSess&&);
+  TraderSess& operator=(TraderSess&&) = delete;
 
-    // Copy.
-    TraderSess(const TraderSess&) = delete;
-    TraderSess& operator=(const TraderSess&) = delete;
+  void insertOrder(const OrderPtr& order) noexcept
+  {
+    assert(order->trader() == mnem_);
+    orders_.insert(order);
+    if (!order->ref().empty())
+      refIdx_.insert(order);
+  }
+  void removeOrder(const Order& order) noexcept
+  {
+    assert(order.trader() == mnem_);
+    orders_.remove(order);
+    if (!order.ref().empty())
+      refIdx_.remove(order);
+  }
+  void insertTrade(const ExecPtr& trade) noexcept
+  {
+    assert(trade->trader() == mnem_);
+    trades_.insert(trade);
+  }
+  void removeOrder(const Exec& trade) noexcept
+  {
+    assert(trade.trader() == mnem_);
+    trades_.remove(trade);
+  }
+  void insertPosn(const PosnPtr& posn) noexcept
+  {
+    assert(posn->trader() == mnem_);
+    posns_.insert(posn);
+  }
+  PosnPtr lazyPosn(const std::string_view& contr, Jday settlDay) throw(std::bad_alloc);
 
-    // Move.
-    TraderSess(TraderSess&&);
-    TraderSess& operator=(TraderSess&&) = delete;
+  boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 
-    void insertOrder(const OrderPtr& order) noexcept
-    {
-        assert(order->trader() == mnem_);
-        orders_.insert(order);
-        if (!order->ref().empty())
-            refIdx_.insert(order);
-    }
-    void removeOrder(const Order& order) noexcept
-    {
-        assert(order.trader() == mnem_);
-        orders_.remove(order);
-        if (!order.ref().empty())
-            refIdx_.remove(order);
-    }
-    void insertTrade(const ExecPtr& trade) noexcept
-    {
-        assert(trade->trader() == mnem_);
-        trades_.insert(trade);
-    }
-    void removeOrder(const Exec& trade) noexcept
-    {
-        assert(trade.trader() == mnem_);
-        trades_.remove(trade);
-    }
-    void insertPosn(const PosnPtr& posn) noexcept
-    {
-        assert(posn->trader() == mnem_);
-        posns_.insert(posn);
-    }
-    PosnPtr lazyPosn(const StringView& contr, Jday settlDay) throw(std::bad_alloc);
+ private:
+  const Factory& factory_;
+  OrderIdSet orders_;
+  ExecIdSet trades_;
+  TraderPosnSet posns_;
+  OrderRefSet refIdx_;
 };
 
 /** @} */

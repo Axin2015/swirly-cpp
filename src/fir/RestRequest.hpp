@@ -29,143 +29,88 @@ namespace swirly {
  */
 
 class SWIRLY_API RestRequest {
-
-    int cs_;
-    union {
-        struct {
-            int sign;
-            std::size_t digits;
-        } num_;
-        struct {
-            std::size_t* len;
-            char* buf;
-            std::size_t max;
-        } str_;
-    };
-    unsigned fields_;
-
-    Mnem::Data mnem_;
-    Display::Data display_;
-    Email::Data email_;
-    Mnem::Data trader_;
-    Mnem::Data contr_;
-    IsoDate settlDate_;
-    IsoDate expiryDate_;
-    Ref::Data ref_;
-    MarketState state_;
-    Side side_;
-    Lots lots_;
-    Ticks ticks_;
-    Lots minLots_;
-    Role role_;
-    Mnem::Data cpty_;
-
-    long num() const noexcept
-    {
-        return num_.sign * num_.digits;
-    }
-
  public:
-    enum : unsigned {
-        MNEM = 1 << 0,
-        DISPLAY = 1 << 1,
-        EMAIL = 1 << 2,
-        TRADER = 1 << 3,
-        CONTR = 1 << 4,
-        SETTL_DATE = 1 << 5,
-        EXPIRY_DATE = 1 << 6,
-        REF = 1 << 7,
-        STATE = 1 << 8,
-        SIDE = 1 << 9,
-        LOTS = 1 << 10,
-        TICKS = 1 << 11,
-        MIN_LOTS = 1 << 12,
-        ROLE = 1 << 13,
-        CPTY = 1 << 14
-    };
+  enum : unsigned {
+    MNEM = 1 << 0,
+    DISPLAY = 1 << 1,
+    EMAIL = 1 << 2,
+    TRADER = 1 << 3,
+    CONTR = 1 << 4,
+    SETTL_DATE = 1 << 5,
+    EXPIRY_DATE = 1 << 6,
+    REF = 1 << 7,
+    STATE = 1 << 8,
+    SIDE = 1 << 9,
+    LOTS = 1 << 10,
+    TICKS = 1 << 11,
+    MIN_LOTS = 1 << 12,
+    ROLE = 1 << 13,
+    CPTY = 1 << 14
+  };
 
-    RestRequest() noexcept
-    {
-        reset();
-    }
-    ~RestRequest() noexcept;
+  RestRequest() noexcept { reset(); }
+  ~RestRequest() noexcept;
 
-    // Copy.
-    RestRequest(const RestRequest&) = delete;
-    RestRequest& operator=(const RestRequest&) = delete;
+  // Copy.
+  RestRequest(const RestRequest&) = delete;
+  RestRequest& operator=(const RestRequest&) = delete;
 
-    // Move.
-    RestRequest(RestRequest&&) = delete;
-    RestRequest& operator=(RestRequest&&) = delete;
+  // Move.
+  RestRequest(RestRequest&&) = delete;
+  RestRequest& operator=(RestRequest&&) = delete;
 
-    void reset(bool clear = true) noexcept;
+  unsigned fields() const noexcept { return fields_; }
+  std::string_view mnem() const noexcept { return {mnem_.buf, mnem_.len}; }
+  std::string_view display() const noexcept { return {display_.buf, display_.len}; }
+  std::string_view email() const noexcept { return {email_.buf, email_.len}; }
+  std::string_view trader() const noexcept { return {trader_.buf, trader_.len}; }
+  std::string_view contr() const noexcept { return {contr_.buf, contr_.len}; }
+  IsoDate settlDate() const noexcept { return settlDate_; }
+  IsoDate expiryDate() const noexcept { return expiryDate_; }
+  std::string_view ref() const noexcept { return {ref_.buf, ref_.len}; }
+  MarketState state() const noexcept { return state_; }
+  Side side() const noexcept { return side_; }
+  Lots lots() const noexcept { return lots_; }
+  Ticks ticks() const noexcept { return ticks_; }
+  Lots minLots() const noexcept { return minLots_; }
+  Role role() const noexcept { return role_; }
+  std::string_view cpty() const noexcept { return {cpty_.buf, cpty_.len}; }
+  void reset(bool clear = true) noexcept;
 
-    bool parse(const StringView& buf);
+  bool parse(const std::string_view& buf);
 
-    unsigned fields() const noexcept
-    {
-        return fields_;
-    }
-    StringView mnem() const noexcept
-    {
-        return {mnem_.buf, mnem_.len};
-    }
-    StringView display() const noexcept
-    {
-        return {display_.buf, display_.len};
-    }
-    StringView email() const noexcept
-    {
-        return {email_.buf, email_.len};
-    }
-    StringView trader() const noexcept
-    {
-        return {trader_.buf, trader_.len};
-    }
-    StringView contr() const noexcept
-    {
-        return {contr_.buf, contr_.len};
-    }
-    IsoDate settlDate() const noexcept
-    {
-        return settlDate_;
-    }
-    IsoDate expiryDate() const noexcept
-    {
-        return expiryDate_;
-    }
-    StringView ref() const noexcept
-    {
-        return {ref_.buf, ref_.len};
-    }
-    MarketState state() const noexcept
-    {
-        return state_;
-    }
-    Side side() const noexcept
-    {
-        return side_;
-    }
-    Lots lots() const noexcept
-    {
-        return lots_;
-    }
-    Ticks ticks() const noexcept
-    {
-        return ticks_;
-    }
-    Lots minLots() const noexcept
-    {
-        return minLots_;
-    }
-    Role role() const noexcept
-    {
-        return role_;
-    }
-    StringView cpty() const noexcept
-    {
-        return {cpty_.buf, cpty_.len};
-    }
+ private:
+  int cs_;
+  union {
+    struct {
+      int sign;
+      std::size_t digits;
+    } num_;
+    struct {
+      std::size_t* len;
+      char* buf;
+      std::size_t max;
+    } str_;
+  };
+  unsigned fields_;
+
+  Mnem::Data mnem_;
+  Display::Data display_;
+  Email::Data email_;
+  Mnem::Data trader_;
+  Mnem::Data contr_;
+  IsoDate settlDate_;
+  IsoDate expiryDate_;
+  Ref::Data ref_;
+  MarketState state_;
+  Side side_;
+  Lots lots_;
+  Ticks ticks_;
+  Lots minLots_;
+  Role role_;
+  Mnem::Data cpty_;
+
+  long num() const noexcept { return num_.sign * num_.digits; }
 };
 
 /** @} */

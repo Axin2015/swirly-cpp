@@ -27,23 +27,22 @@ namespace swirly {
  */
 
 class SWIRLY_API Rest {
-    Serv serv_;
-
  public:
-    Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now}
-    {
-    }
-    ~Rest() noexcept;
+  Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now} {}
+  ~Rest() noexcept;
 
-    // Copy.
-    Rest(const Rest&) = delete;
-    Rest& operator=(const Rest&) = delete;
+  // Copy.
+  Rest(const Rest&) = delete;
+  Rest& operator=(const Rest&) = delete;
 
-    // Move.
-    Rest(Rest&&);
-    Rest& operator=(Rest&&);
+  // Move.
+  Rest(Rest&&);
+  Rest& operator=(Rest&&);
 
-    void assets(Millis now, std::ostream& out) const;
+  void assets(Millis now, std::ostream& out) const;
+
+ private:
+  Serv serv_;
 };
 
 /** @} */

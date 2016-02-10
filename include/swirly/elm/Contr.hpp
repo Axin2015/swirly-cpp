@@ -30,93 +30,54 @@ namespace swirly {
  * A specification that stipulates the terms and conditions of sale.
  */
 class SWIRLY_API Contr : public Rec {
-    const Mnem asset_;
-    const Mnem ccy_;
-    const int lotNumer_;
-    const int lotDenom_;
-    // Transient.
-    const double qtyInc_;
-    const int tickNumer_;
-    const int tickDenom_;
-    // Transient.
-    const double priceInc_;
-    const int pipDp_;
-    // Transient.
-    const int qtyDp_;
-    // Transient.
-    const int priceDp_;
-    const Lots minLots_;
-    const Lots maxLots_;
-
  public:
-    boost::intrusive::set_member_hook<> mnemHook_;
+  Contr(const std::string_view& mnem, const std::string_view& display,
+        const std::string_view& asset, const std::string_view& ccy, int lotNumer, int lotDenom,
+        int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
 
-    Contr(const StringView& mnem, const StringView& display, const StringView& asset,
-          const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-          int pipDp, Lots minLots, Lots maxLots) noexcept;
+  ~Contr() noexcept override;
 
-    ~Contr() noexcept override;
+  // Copy.
+  Contr(const Contr&);
+  Contr& operator=(const Contr&) = delete;
 
-    // Copy.
-    Contr(const Contr&);
-    Contr& operator=(const Contr&) = delete;
+  // Move.
+  Contr(Contr&&);
+  Contr& operator=(Contr&&) = delete;
 
-    // Move.
-    Contr(Contr&&);
-    Contr& operator=(Contr&&) = delete;
+  auto asset() const noexcept { return +asset_; }
+  auto ccy() const noexcept { return +ccy_; }
+  auto lotNumer() const noexcept { return lotNumer_; }
+  auto lotDenom() const noexcept { return lotDenom_; }
+  auto qtyInc() const noexcept { return qtyInc_; }
+  auto tickNumer() const noexcept { return tickNumer_; }
+  auto tickDenom() const noexcept { return tickDenom_; }
+  auto priceInc() const noexcept { return priceInc_; }
+  auto pipDp() const noexcept { return pipDp_; }
+  auto qtyDp() const noexcept { return qtyDp_; }
+  auto priceDp() const noexcept { return priceDp_; }
+  auto minLots() const noexcept { return minLots_; }
+  auto maxLots() const noexcept { return maxLots_; }
+  boost::intrusive::set_member_hook<> mnemHook_;
 
-    auto asset() const noexcept
-    {
-        return +asset_;
-    }
-    auto ccy() const noexcept
-    {
-        return +ccy_;
-    }
-    auto lotNumer() const noexcept
-    {
-        return lotNumer_;
-    }
-    auto lotDenom() const noexcept
-    {
-        return lotDenom_;
-    }
-    auto qtyInc() const noexcept
-    {
-        return qtyInc_;
-    }
-    auto tickNumer() const noexcept
-    {
-        return tickNumer_;
-    }
-    auto tickDenom() const noexcept
-    {
-        return tickDenom_;
-    }
-    auto priceInc() const noexcept
-    {
-        return priceInc_;
-    }
-    auto pipDp() const noexcept
-    {
-        return pipDp_;
-    }
-    auto qtyDp() const noexcept
-    {
-        return qtyDp_;
-    }
-    auto priceDp() const noexcept
-    {
-        return priceDp_;
-    }
-    auto minLots() const noexcept
-    {
-        return minLots_;
-    }
-    auto maxLots() const noexcept
-    {
-        return maxLots_;
-    }
+ private:
+  const Mnem asset_;
+  const Mnem ccy_;
+  const int lotNumer_;
+  const int lotDenom_;
+  // Transient.
+  const double qtyInc_;
+  const int tickNumer_;
+  const int tickDenom_;
+  // Transient.
+  const double priceInc_;
+  const int pipDp_;
+  // Transient.
+  const int qtyDp_;
+  // Transient.
+  const int priceDp_;
+  const Lots minLots_;
+  const Lots maxLots_;
 };
 
 using ContrSet = RecSet<Contr>;

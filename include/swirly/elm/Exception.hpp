@@ -28,17 +28,17 @@ namespace swirly {
 
 class SWIRLY_API ServException : public Exception {
  public:
-    ServException() noexcept = default;
+  ServException() noexcept = default;
 
-    ~ServException() noexcept override;
+  ~ServException() noexcept override;
 
-    // Copy.
-    ServException(const ServException&) noexcept = default;
-    ServException& operator=(const ServException&) noexcept = default;
+  // Copy.
+  ServException(const ServException&) noexcept = default;
+  ServException& operator=(const ServException&) noexcept = default;
 
-    // Move.
-    ServException(ServException&&) noexcept = default;
-    ServException& operator=(ServException&&) noexcept = default;
+  // Move.
+  ServException(ServException&&) noexcept = default;
+  ServException& operator=(ServException&&) noexcept = default;
 };
 
 /**
@@ -47,107 +47,107 @@ class SWIRLY_API ServException : public Exception {
  */
 class SWIRLY_API BadRequestException : public ServException {
  public:
-    BadRequestException() noexcept = default;
+  BadRequestException() noexcept = default;
 
-    ~BadRequestException() noexcept override;
+  ~BadRequestException() noexcept override;
 
-    // Copy.
-    BadRequestException(const BadRequestException&) noexcept = default;
-    BadRequestException& operator=(const BadRequestException&) noexcept = default;
+  // Copy.
+  BadRequestException(const BadRequestException&) noexcept = default;
+  BadRequestException& operator=(const BadRequestException&) noexcept = default;
 
-    // Move.
-    BadRequestException(BadRequestException&&) noexcept = default;
-    BadRequestException& operator=(BadRequestException&&) noexcept = default;
+  // Move.
+  BadRequestException(BadRequestException&&) noexcept = default;
+  BadRequestException& operator=(BadRequestException&&) noexcept = default;
 };
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
  public:
-    AlreadyExistsException() noexcept = default;
+  AlreadyExistsException() noexcept = default;
 
-    ~AlreadyExistsException() noexcept override;
+  ~AlreadyExistsException() noexcept override;
 
-    // Copy.
-    AlreadyExistsException(const AlreadyExistsException&) noexcept = default;
-    AlreadyExistsException& operator=(const AlreadyExistsException&) noexcept = default;
+  // Copy.
+  AlreadyExistsException(const AlreadyExistsException&) noexcept = default;
+  AlreadyExistsException& operator=(const AlreadyExistsException&) noexcept = default;
 
-    // Move.
-    AlreadyExistsException(AlreadyExistsException&&) noexcept = default;
-    AlreadyExistsException& operator=(AlreadyExistsException&&) noexcept = default;
+  // Move.
+  AlreadyExistsException(AlreadyExistsException&&) noexcept = default;
+  AlreadyExistsException& operator=(AlreadyExistsException&&) noexcept = default;
 };
 
 class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
  public:
-    RefAlreadyExistsException() noexcept = default;
+  RefAlreadyExistsException() noexcept = default;
 
-    ~RefAlreadyExistsException() noexcept override;
+  ~RefAlreadyExistsException() noexcept override;
 
-    // Copy.
-    RefAlreadyExistsException(const RefAlreadyExistsException&) noexcept = default;
-    RefAlreadyExistsException& operator=(const RefAlreadyExistsException&) noexcept = default;
+  // Copy.
+  RefAlreadyExistsException(const RefAlreadyExistsException&) noexcept = default;
+  RefAlreadyExistsException& operator=(const RefAlreadyExistsException&) noexcept = default;
 
-    // Move.
-    RefAlreadyExistsException(RefAlreadyExistsException&&) noexcept = default;
-    RefAlreadyExistsException& operator=(RefAlreadyExistsException&&) noexcept = default;
+  // Move.
+  RefAlreadyExistsException(RefAlreadyExistsException&&) noexcept = default;
+  RefAlreadyExistsException& operator=(RefAlreadyExistsException&&) noexcept = default;
 };
 
 class SWIRLY_API InvalidException : public BadRequestException {
  public:
-    InvalidException() noexcept = default;
+  InvalidException() noexcept = default;
 
-    ~InvalidException() noexcept override;
+  ~InvalidException() noexcept override;
 
-    // Copy.
-    InvalidException(const InvalidException&) noexcept = default;
-    InvalidException& operator=(const InvalidException&) noexcept = default;
+  // Copy.
+  InvalidException(const InvalidException&) noexcept = default;
+  InvalidException& operator=(const InvalidException&) noexcept = default;
 
-    // Move.
-    InvalidException(InvalidException&&) noexcept = default;
-    InvalidException& operator=(InvalidException&&) noexcept = default;
+  // Move.
+  InvalidException(InvalidException&&) noexcept = default;
+  InvalidException& operator=(InvalidException&&) noexcept = default;
 };
 
 class SWIRLY_API InvalidLotsException : public InvalidException {
  public:
-    InvalidLotsException() noexcept = default;
+  InvalidLotsException() noexcept = default;
 
-    ~InvalidLotsException() noexcept override;
+  ~InvalidLotsException() noexcept override;
 
-    // Copy.
-    InvalidLotsException(const InvalidLotsException&) noexcept = default;
-    InvalidLotsException& operator=(const InvalidLotsException&) noexcept = default;
+  // Copy.
+  InvalidLotsException(const InvalidLotsException&) noexcept = default;
+  InvalidLotsException& operator=(const InvalidLotsException&) noexcept = default;
 
-    // Move.
-    InvalidLotsException(InvalidLotsException&&) noexcept = default;
-    InvalidLotsException& operator=(InvalidLotsException&&) noexcept = default;
+  // Move.
+  InvalidLotsException(InvalidLotsException&&) noexcept = default;
+  InvalidLotsException& operator=(InvalidLotsException&&) noexcept = default;
 };
 
 class SWIRLY_API InvalidTicksException : public InvalidException {
  public:
-    InvalidTicksException() noexcept = default;
+  InvalidTicksException() noexcept = default;
 
-    ~InvalidTicksException() noexcept override;
+  ~InvalidTicksException() noexcept override;
 
-    // Copy.
-    InvalidTicksException(const InvalidTicksException&) noexcept = default;
-    InvalidTicksException& operator=(const InvalidTicksException&) noexcept = default;
+  // Copy.
+  InvalidTicksException(const InvalidTicksException&) noexcept = default;
+  InvalidTicksException& operator=(const InvalidTicksException&) noexcept = default;
 
-    // Move.
-    InvalidTicksException(InvalidTicksException&&) noexcept = default;
-    InvalidTicksException& operator=(InvalidTicksException&&) noexcept = default;
+  // Move.
+  InvalidTicksException(InvalidTicksException&&) noexcept = default;
+  InvalidTicksException& operator=(InvalidTicksException&&) noexcept = default;
 };
 
 class SWIRLY_API TooLateException : public BadRequestException {
  public:
-    TooLateException() noexcept = default;
+  TooLateException() noexcept = default;
 
-    ~TooLateException() noexcept override;
+  ~TooLateException() noexcept override;
 
-    // Copy.
-    TooLateException(const TooLateException&) noexcept = default;
-    TooLateException& operator=(const TooLateException&) noexcept = default;
+  // Copy.
+  TooLateException(const TooLateException&) noexcept = default;
+  TooLateException& operator=(const TooLateException&) noexcept = default;
 
-    // Move.
-    TooLateException(TooLateException&&) noexcept = default;
-    TooLateException& operator=(TooLateException&&) noexcept = default;
+  // Move.
+  TooLateException(TooLateException&&) noexcept = default;
+  TooLateException& operator=(TooLateException&&) noexcept = default;
 };
 
 /**
@@ -159,17 +159,17 @@ class SWIRLY_API TooLateException : public BadRequestException {
  */
 class SWIRLY_API ForbiddenException : public ServException {
  public:
-    ForbiddenException() noexcept = default;
+  ForbiddenException() noexcept = default;
 
-    ~ForbiddenException() noexcept override;
+  ~ForbiddenException() noexcept override;
 
-    // Copy.
-    ForbiddenException(const ForbiddenException&) noexcept = default;
-    ForbiddenException& operator=(const ForbiddenException&) noexcept = default;
+  // Copy.
+  ForbiddenException(const ForbiddenException&) noexcept = default;
+  ForbiddenException& operator=(const ForbiddenException&) noexcept = default;
 
-    // Move.
-    ForbiddenException(ForbiddenException&&) noexcept = default;
-    ForbiddenException& operator=(ForbiddenException&&) noexcept = default;
+  // Move.
+  ForbiddenException(ForbiddenException&&) noexcept = default;
+  ForbiddenException& operator=(ForbiddenException&&) noexcept = default;
 };
 
 /**
@@ -177,33 +177,32 @@ class SWIRLY_API ForbiddenException : public ServException {
  */
 class SWIRLY_API InternalException : public ServException {
  public:
-    InternalException() noexcept = default;
+  InternalException() noexcept = default;
 
-    ~InternalException() noexcept override;
+  ~InternalException() noexcept override;
 
-    // Copy.
-    InternalException(const InternalException&) noexcept = default;
-    InternalException& operator=(const InternalException&) noexcept = default;
+  // Copy.
+  InternalException(const InternalException&) noexcept = default;
+  InternalException& operator=(const InternalException&) noexcept = default;
 
-    // Move.
-    InternalException(InternalException&&) noexcept = default;
-    InternalException& operator=(InternalException&&) noexcept = default;
+  // Move.
+  InternalException(InternalException&&) noexcept = default;
+  InternalException& operator=(InternalException&&) noexcept = default;
 };
 
 class SWIRLY_API LiquidityUnavailableException : public InternalException {
  public:
-    LiquidityUnavailableException() noexcept = default;
+  LiquidityUnavailableException() noexcept = default;
 
-    ~LiquidityUnavailableException() noexcept override;
+  ~LiquidityUnavailableException() noexcept override;
 
-    // Copy.
-    LiquidityUnavailableException(const LiquidityUnavailableException&) noexcept = default;
-    LiquidityUnavailableException& operator=(const LiquidityUnavailableException&) noexcept
-        = default;
+  // Copy.
+  LiquidityUnavailableException(const LiquidityUnavailableException&) noexcept = default;
+  LiquidityUnavailableException& operator=(const LiquidityUnavailableException&) noexcept = default;
 
-    // Move.
-    LiquidityUnavailableException(LiquidityUnavailableException&&) noexcept = default;
-    LiquidityUnavailableException& operator=(LiquidityUnavailableException&&) noexcept = default;
+  // Move.
+  LiquidityUnavailableException(LiquidityUnavailableException&&) noexcept = default;
+  LiquidityUnavailableException& operator=(LiquidityUnavailableException&&) noexcept = default;
 };
 
 /**
@@ -213,17 +212,17 @@ class SWIRLY_API LiquidityUnavailableException : public InternalException {
  */
 class SWIRLY_API MethodNotAllowedException : public ServException {
  public:
-    MethodNotAllowedException() noexcept = default;
+  MethodNotAllowedException() noexcept = default;
 
-    ~MethodNotAllowedException() noexcept override;
+  ~MethodNotAllowedException() noexcept override;
 
-    // Copy.
-    MethodNotAllowedException(const MethodNotAllowedException&) noexcept = default;
-    MethodNotAllowedException& operator=(const MethodNotAllowedException&) noexcept = default;
+  // Copy.
+  MethodNotAllowedException(const MethodNotAllowedException&) noexcept = default;
+  MethodNotAllowedException& operator=(const MethodNotAllowedException&) noexcept = default;
 
-    // Move.
-    MethodNotAllowedException(MethodNotAllowedException&&) noexcept = default;
-    MethodNotAllowedException& operator=(MethodNotAllowedException&&) noexcept = default;
+  // Move.
+  MethodNotAllowedException(MethodNotAllowedException&&) noexcept = default;
+  MethodNotAllowedException& operator=(MethodNotAllowedException&&) noexcept = default;
 };
 
 /**
@@ -236,92 +235,92 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
  */
 class SWIRLY_API NotFoundException : public ServException {
  public:
-    NotFoundException() noexcept = default;
+  NotFoundException() noexcept = default;
 
-    ~NotFoundException() noexcept override;
+  ~NotFoundException() noexcept override;
 
-    // Copy.
-    NotFoundException(const NotFoundException&) noexcept = default;
-    NotFoundException& operator=(const NotFoundException&) noexcept = default;
+  // Copy.
+  NotFoundException(const NotFoundException&) noexcept = default;
+  NotFoundException& operator=(const NotFoundException&) noexcept = default;
 
-    // Move.
-    NotFoundException(NotFoundException&&) noexcept = default;
-    NotFoundException& operator=(NotFoundException&&) noexcept = default;
+  // Move.
+  NotFoundException(NotFoundException&&) noexcept = default;
+  NotFoundException& operator=(NotFoundException&&) noexcept = default;
 };
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
  public:
-    MarketClosedException() noexcept = default;
+  MarketClosedException() noexcept = default;
 
-    ~MarketClosedException() noexcept override;
+  ~MarketClosedException() noexcept override;
 
-    // Copy.
-    MarketClosedException(const MarketClosedException&) noexcept = default;
-    MarketClosedException& operator=(const MarketClosedException&) noexcept = default;
+  // Copy.
+  MarketClosedException(const MarketClosedException&) noexcept = default;
+  MarketClosedException& operator=(const MarketClosedException&) noexcept = default;
 
-    // Move.
-    MarketClosedException(MarketClosedException&&) noexcept = default;
-    MarketClosedException& operator=(MarketClosedException&&) noexcept = default;
+  // Move.
+  MarketClosedException(MarketClosedException&&) noexcept = default;
+  MarketClosedException& operator=(MarketClosedException&&) noexcept = default;
 };
 
 class SWIRLY_API MarketNotFoundException : public NotFoundException {
  public:
-    MarketNotFoundException() noexcept = default;
+  MarketNotFoundException() noexcept = default;
 
-    ~MarketNotFoundException() noexcept override;
+  ~MarketNotFoundException() noexcept override;
 
-    // Copy.
-    MarketNotFoundException(const MarketNotFoundException&) noexcept = default;
-    MarketNotFoundException& operator=(const MarketNotFoundException&) noexcept = default;
+  // Copy.
+  MarketNotFoundException(const MarketNotFoundException&) noexcept = default;
+  MarketNotFoundException& operator=(const MarketNotFoundException&) noexcept = default;
 
-    // Move.
-    MarketNotFoundException(MarketNotFoundException&&) noexcept = default;
-    MarketNotFoundException& operator=(MarketNotFoundException&&) noexcept = default;
+  // Move.
+  MarketNotFoundException(MarketNotFoundException&&) noexcept = default;
+  MarketNotFoundException& operator=(MarketNotFoundException&&) noexcept = default;
 };
 
 class SWIRLY_API OrderNotFoundException : public NotFoundException {
  public:
-    OrderNotFoundException() noexcept = default;
+  OrderNotFoundException() noexcept = default;
 
-    ~OrderNotFoundException() noexcept override;
+  ~OrderNotFoundException() noexcept override;
 
-    // Copy.
-    OrderNotFoundException(const OrderNotFoundException&) noexcept = default;
-    OrderNotFoundException& operator=(const OrderNotFoundException&) noexcept = default;
+  // Copy.
+  OrderNotFoundException(const OrderNotFoundException&) noexcept = default;
+  OrderNotFoundException& operator=(const OrderNotFoundException&) noexcept = default;
 
-    // Move.
-    OrderNotFoundException(OrderNotFoundException&&) noexcept = default;
-    OrderNotFoundException& operator=(OrderNotFoundException&&) noexcept = default;
+  // Move.
+  OrderNotFoundException(OrderNotFoundException&&) noexcept = default;
+  OrderNotFoundException& operator=(OrderNotFoundException&&) noexcept = default;
 };
 
 class SWIRLY_API QuoteNotFoundException : public NotFoundException {
  public:
-    QuoteNotFoundException() noexcept = default;
+  QuoteNotFoundException() noexcept = default;
 
-    ~QuoteNotFoundException() noexcept override;
+  ~QuoteNotFoundException() noexcept override;
 
-    // Copy.
-    QuoteNotFoundException(const QuoteNotFoundException&) noexcept = default;
-    QuoteNotFoundException& operator=(const QuoteNotFoundException&) noexcept = default;
+  // Copy.
+  QuoteNotFoundException(const QuoteNotFoundException&) noexcept = default;
+  QuoteNotFoundException& operator=(const QuoteNotFoundException&) noexcept = default;
 
-    // Move.
-    QuoteNotFoundException(QuoteNotFoundException&&) noexcept = default;
-    QuoteNotFoundException& operator=(QuoteNotFoundException&&) noexcept = default;
+  // Move.
+  QuoteNotFoundException(QuoteNotFoundException&&) noexcept = default;
+  QuoteNotFoundException& operator=(QuoteNotFoundException&&) noexcept = default;
 };
 
 class SWIRLY_API TraderNotFoundException : public NotFoundException {
  public:
-    TraderNotFoundException() noexcept = default;
+  TraderNotFoundException() noexcept = default;
 
-    ~TraderNotFoundException() noexcept override;
+  ~TraderNotFoundException() noexcept override;
 
-    // Copy.
-    TraderNotFoundException(const TraderNotFoundException&) noexcept = default;
-    TraderNotFoundException& operator=(const TraderNotFoundException&) noexcept = default;
+  // Copy.
+  TraderNotFoundException(const TraderNotFoundException&) noexcept = default;
+  TraderNotFoundException& operator=(const TraderNotFoundException&) noexcept = default;
 
-    // Move.
-    TraderNotFoundException(TraderNotFoundException&&) noexcept = default;
-    TraderNotFoundException& operator=(TraderNotFoundException&&) noexcept = default;
+  // Move.
+  TraderNotFoundException(TraderNotFoundException&&) noexcept = default;
+  TraderNotFoundException& operator=(TraderNotFoundException&&) noexcept = default;
 };
 
 /**
@@ -333,17 +332,17 @@ class SWIRLY_API TraderNotFoundException : public NotFoundException {
  */
 class SWIRLY_API ServiceUnavailableException : public ServException {
  public:
-    ServiceUnavailableException() noexcept = default;
+  ServiceUnavailableException() noexcept = default;
 
-    ~ServiceUnavailableException() noexcept override;
+  ~ServiceUnavailableException() noexcept override;
 
-    // Copy.
-    ServiceUnavailableException(const ServiceUnavailableException&) noexcept = default;
-    ServiceUnavailableException& operator=(const ServiceUnavailableException&) noexcept = default;
+  // Copy.
+  ServiceUnavailableException(const ServiceUnavailableException&) noexcept = default;
+  ServiceUnavailableException& operator=(const ServiceUnavailableException&) noexcept = default;
 
-    // Move.
-    ServiceUnavailableException(ServiceUnavailableException&&) noexcept = default;
-    ServiceUnavailableException& operator=(ServiceUnavailableException&&) noexcept = default;
+  // Move.
+  ServiceUnavailableException(ServiceUnavailableException&&) noexcept = default;
+  ServiceUnavailableException& operator=(ServiceUnavailableException&&) noexcept = default;
 };
 
 /**
@@ -355,17 +354,17 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
  */
 class SWIRLY_API UnauthorizedException : public ServException {
  public:
-    UnauthorizedException() noexcept = default;
+  UnauthorizedException() noexcept = default;
 
-    ~UnauthorizedException() noexcept override;
+  ~UnauthorizedException() noexcept override;
 
-    // Copy.
-    UnauthorizedException(const UnauthorizedException&) noexcept = default;
-    UnauthorizedException& operator=(const UnauthorizedException&) noexcept = default;
+  // Copy.
+  UnauthorizedException(const UnauthorizedException&) noexcept = default;
+  UnauthorizedException& operator=(const UnauthorizedException&) noexcept = default;
 
-    // Move.
-    UnauthorizedException(UnauthorizedException&&) noexcept = default;
-    UnauthorizedException& operator=(UnauthorizedException&&) noexcept = default;
+  // Move.
+  UnauthorizedException(UnauthorizedException&&) noexcept = default;
+  UnauthorizedException& operator=(UnauthorizedException&&) noexcept = default;
 };
 
 /** @} */
