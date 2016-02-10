@@ -27,17 +27,17 @@ BOOST_AUTO_TEST_SUITE(DateUtilSuite)
 
 BOOST_AUTO_TEST_CASE(GetBusDayCase)
 {
-    // Business days roll at 5pm New York.
+  // Business days roll at 5pm New York.
 
-    // Friday, March 14, 2014
-    // 21.00 UTC
-    // 17.00 EDT (UTC-4 hours)
+  // Friday, March 14, 2014
+  // 21.00 UTC
+  // 17.00 EDT (UTC-4 hours)
 
-    // 20.59 UTC
-    BOOST_CHECK_EQUAL(getBusDay(1394830799000_ms), ymdToJd(2014, 2, 14));
+  // 20.59 UTC
+  BOOST_CHECK_EQUAL(getBusDay(1394830799000_ms), ymdToJd(2014, 2, 14));
 
-    // 21.00 UTC
-    BOOST_CHECK_EQUAL(getBusDay(1394830800000_ms), ymdToJd(2014, 2, 15));
+  // 21.00 UTC
+  BOOST_CHECK_EQUAL(getBusDay(1394830800000_ms), ymdToJd(2014, 2, 15));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

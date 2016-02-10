@@ -31,14 +31,14 @@ unique_ptr<Market> ServFactory::doNewMarket(const StringView& mnem, const String
                                             MarketState state, Lots lastLots, Ticks lastTicks,
                                             Millis lastTime, Iden maxOrderId, Iden maxExecId) const
 {
-    return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state, lastLots,
-                                   lastTicks, lastTime, maxOrderId, maxExecId);
+  return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state, lastLots,
+                                 lastTicks, lastTime, maxOrderId, maxExecId);
 }
 
 unique_ptr<Trader> ServFactory::doNewTrader(const StringView& mnem, const StringView& display,
                                             const StringView& email) const
 {
-    return make_unique<TraderSess>(mnem, display, email, *this);
+  return make_unique<TraderSess>(mnem, display, email, *this);
 }
 
 } // swirly

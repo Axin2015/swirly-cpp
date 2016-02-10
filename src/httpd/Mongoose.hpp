@@ -33,102 +33,73 @@ namespace mg {
 
 inline StringView operator+(const mg_str& str) noexcept
 {
-    return {str.p, str.len};
+  return {str.p, str.len};
 }
 
 class HttpMessage {
  public:
-    HttpMessage(http_message* impl) noexcept : impl_{impl}
-    {
-    }
-    ~HttpMessage() noexcept = default;
+  HttpMessage(http_message* impl) noexcept : impl_{impl} {}
+  ~HttpMessage() noexcept = default;
 
-    // Copy.
-    HttpMessage(const HttpMessage&) noexcept = default;
-    HttpMessage& operator=(const HttpMessage&) noexcept = default;
+  // Copy.
+  HttpMessage(const HttpMessage&) noexcept = default;
+  HttpMessage& operator=(const HttpMessage&) noexcept = default;
 
-    // Move.
-    HttpMessage(HttpMessage&&) noexcept = default;
-    HttpMessage& operator=(HttpMessage&&) noexcept = default;
+  // Move.
+  HttpMessage(HttpMessage&&) noexcept = default;
+  HttpMessage& operator=(HttpMessage&&) noexcept = default;
 
-    auto get() const noexcept
-    {
-        return impl_;
-    }
-    auto method() const noexcept
-    {
-        return +impl_->method;
-    }
-    auto uri() const noexcept
-    {
-        return +impl_->uri;
-    }
-    auto proto() const noexcept
-    {
-        return +impl_->proto;
-    }
-    auto queryString() const noexcept
-    {
-        return +impl_->query_string;
-    }
-    auto body() const noexcept
-    {
-        return +impl_->body;
-    }
+  auto get() const noexcept { return impl_; }
+  auto method() const noexcept { return +impl_->method; }
+  auto uri() const noexcept { return +impl_->uri; }
+  auto proto() const noexcept { return +impl_->proto; }
+  auto queryString() const noexcept { return +impl_->query_string; }
+  auto body() const noexcept { return +impl_->body; }
 
  private:
-    http_message* impl_;
+  http_message* impl_;
 };
 
 template <typename DerivedT>
 class Mgr {
  public:
-    // Copy.
-    Mgr(const Mgr&) = delete;
-    Mgr& operator=(const Mgr&) = delete;
+  // Copy.
+  Mgr(const Mgr&) = delete;
+  Mgr& operator=(const Mgr&) = delete;
 
-    // Move.
-    Mgr(Mgr&&) = delete;
-    Mgr& operator=(Mgr&&) = delete;
+  // Move.
+  Mgr(Mgr&&) = delete;
+  Mgr& operator=(Mgr&&) = delete;
 
-    mg_connection& bind(const char* addr)
-    {
-        auto* conn = mg_bind(&mgr_, addr, handler);
-        if (!conn)
-            throwException<Error>("mg_bind() failed");
-        conn->user_data = this;
-        return *conn;
-    }
-    time_t poll(int milli)
-    {
-        return mg_mgr_poll(&mgr_, milli);
-    }
+  mg_connection& bind(const char* addr)
+  {
+    auto* conn = mg_bind(&mgr_, addr, handler);
+    if (!conn)
+      throwException<Error>("mg_bind() failed");
+    conn->user_data = this;
+    return *conn;
+  }
+  time_t poll(int milli) { return mg_mgr_poll(&mgr_, milli); }
 
  protected:
-    Mgr() noexcept
-    {
-        mg_mgr_init(&mgr_, this);
-    }
-    ~Mgr() noexcept
-    {
-        mg_mgr_free(&mgr_);
-    }
+  Mgr() noexcept { mg_mgr_init(&mgr_, this); }
+  ~Mgr() noexcept { mg_mgr_free(&mgr_); }
 
  private:
-    static void handler(mg_connection* conn, int event, void* data)
-    {
-        auto* self = static_cast<DerivedT*>(conn->user_data);
-        switch (event) {
-        case MG_EV_CLOSE:
-            conn->user_data = nullptr;
-            break;
-        case MG_EV_HTTP_REQUEST:
-            self->httpRequest(*conn, static_cast<http_message*>(data));
-            break;
-        }
+  static void handler(mg_connection* conn, int event, void* data)
+  {
+    auto* self = static_cast<DerivedT*>(conn->user_data);
+    switch (event) {
+    case MG_EV_CLOSE:
+      conn->user_data = nullptr;
+      break;
+    case MG_EV_HTTP_REQUEST:
+      self->httpRequest(*conn, static_cast<http_message*>(data));
+      break;
     }
+  }
 
-    mg_mgr mgr_;
+  mg_mgr mgr_;
 };
 
 /** @} */

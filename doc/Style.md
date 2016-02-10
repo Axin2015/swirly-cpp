@@ -12,7 +12,7 @@ Formatting
 ----------
 
 - spaces instead of tabs;
-- indent by 4 spaces;
+- indent by 2 spaces;
 - lines should not exceed 100 characters.
 
 [ClangFormat] should be used to format source-code changes. The [GitClangFormat] script integrates

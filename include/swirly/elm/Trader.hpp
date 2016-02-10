@@ -28,29 +28,26 @@ namespace swirly {
 
 class SWIRLY_API Trader : public Rec {
  public:
-    Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
-        : Rec{RecType::MARKET, mnem, display},
-          email_{email}
-    {
-    }
-    ~Trader() noexcept override;
+  Trader(const StringView& mnem, const StringView& display, const StringView& email) noexcept
+    : Rec{RecType::MARKET, mnem, display},
+      email_{email}
+  {
+  }
+  ~Trader() noexcept override;
 
-    // Copy.
-    Trader(const Trader&);
-    Trader& operator=(const Trader&) = delete;
+  // Copy.
+  Trader(const Trader&);
+  Trader& operator=(const Trader&) = delete;
 
-    // Move.
-    Trader(Trader&&);
-    Trader& operator=(Trader&&) = delete;
+  // Move.
+  Trader(Trader&&);
+  Trader& operator=(Trader&&) = delete;
 
-    auto email() const noexcept
-    {
-        return +email_;
-    }
-    boost::intrusive::set_member_hook<> mnemHook_;
+  auto email() const noexcept { return +email_; }
+  boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
-    const Email email_;
+  const Email email_;
 };
 
 using TraderSet = RecSet<Trader>;

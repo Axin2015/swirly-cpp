@@ -33,42 +33,30 @@ class Factory;
 
 class SWIRLY_API Model {
  public:
-    Model() noexcept = default;
-    virtual ~Model() noexcept;
+  Model() noexcept = default;
+  virtual ~Model() noexcept;
 
-    // Copy.
-    constexpr Model(const Model&) noexcept = default;
-    Model& operator=(const Model&) noexcept = default;
+  // Copy.
+  constexpr Model(const Model&) noexcept = default;
+  Model& operator=(const Model&) noexcept = default;
 
-    // Move.
-    constexpr Model(Model&&) noexcept = default;
-    Model& operator=(Model&&) noexcept = default;
+  // Move.
+  constexpr Model(Model&&) noexcept = default;
+  Model& operator=(Model&&) noexcept = default;
 
-    AssetSet readAsset(const Factory& factory) const
-    {
-        return doReadAsset(factory);
-    }
-    ContrSet readContr(const Factory& factory) const
-    {
-        return doReadContr(factory);
-    }
-    MarketSet readMarket(const Factory& factory) const
-    {
-        return doReadMarket(factory);
-    }
-    TraderSet readTrader(const Factory& factory) const
-    {
-        return doReadTrader(factory);
-    }
+  AssetSet readAsset(const Factory& factory) const { return doReadAsset(factory); }
+  ContrSet readContr(const Factory& factory) const { return doReadContr(factory); }
+  MarketSet readMarket(const Factory& factory) const { return doReadMarket(factory); }
+  TraderSet readTrader(const Factory& factory) const { return doReadTrader(factory); }
 
  protected:
-    virtual AssetSet doReadAsset(const Factory& factory) const = 0;
+  virtual AssetSet doReadAsset(const Factory& factory) const = 0;
 
-    virtual ContrSet doReadContr(const Factory& factory) const = 0;
+  virtual ContrSet doReadContr(const Factory& factory) const = 0;
 
-    virtual MarketSet doReadMarket(const Factory& factory) const = 0;
+  virtual MarketSet doReadMarket(const Factory& factory) const = 0;
 
-    virtual TraderSet doReadTrader(const Factory& factory) const = 0;
+  virtual TraderSet doReadTrader(const Factory& factory) const = 0;
 };
 
 /** @} */

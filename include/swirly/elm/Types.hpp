@@ -35,7 +35,7 @@ enum class Iden : int64_t {};
 
 constexpr Iden operator""_id(unsigned long long val) noexcept
 {
-    return box<Iden>(val);
+  return box<Iden>(val);
 }
 
 using Incs = int64_t;
@@ -44,7 +44,7 @@ enum class Lots : Incs {};
 
 constexpr Lots operator""_lts(unsigned long long val) noexcept
 {
-    return box<Lots>(val);
+  return box<Lots>(val);
 }
 
 /**
@@ -54,7 +54,7 @@ enum class Ticks : Incs {};
 
 constexpr Ticks operator""_tks(unsigned long long val) noexcept
 {
-    return box<Ticks>(val);
+  return box<Ticks>(val);
 }
 
 /**
@@ -64,7 +64,7 @@ enum class Cost : Incs {};
 
 constexpr Cost operator""_cst(unsigned long long val) noexcept
 {
-    return box<Cost>(val);
+  return box<Cost>(val);
 }
 
 /**
@@ -120,85 +120,73 @@ SWIRLY_API const char* enumString(AssetType type);
 
 template <>
 struct EnumTraits<AssetType> {
-    static void print(std::ostream& os, AssetType val) noexcept
-    {
-        os << enumString(val);
-    }
+  static void print(std::ostream& os, AssetType val) noexcept { os << enumString(val); }
 };
 
 enum class Direct {
-    /**
-     * Aggressor buys. I.e. taker lifts the offer.
-     */
-    PAID = 1,
-    /**
-     * Aggressor sells. I.e. taker hits the bid.
-     */
-    GIVEN = -1
+  /**
+   * Aggressor buys. I.e. taker lifts the offer.
+   */
+  PAID = 1,
+  /**
+   * Aggressor sells. I.e. taker hits the bid.
+   */
+  GIVEN = -1
 };
 
 SWIRLY_API const char* enumString(Direct direct);
 
 template <>
 struct EnumTraits<Direct> {
-    static void print(std::ostream& os, Direct val) noexcept
-    {
-        os << enumString(val);
-    }
+  static void print(std::ostream& os, Direct val) noexcept { os << enumString(val); }
 };
 
 enum class RecType {
-    /**
-     * Asset.
-     */
-    ASSET = 1,
-    /**
-     * Contract.
-     */
-    CONTR,
-    /**
-     * Market.
-     */
-    MARKET,
-    /**
-     * Trader.
-     */
-    TRADER
+  /**
+   * Asset.
+   */
+  ASSET = 1,
+  /**
+   * Contract.
+   */
+  CONTR,
+  /**
+   * Market.
+   */
+  MARKET,
+  /**
+   * Trader.
+   */
+  TRADER
 };
 
 SWIRLY_API const char* enumString(RecType type);
 
 template <>
 struct EnumTraits<RecType> {
-    static void print(std::ostream& os, RecType val) noexcept
-    {
-        os << enumString(val);
-    }
+  static void print(std::ostream& os, RecType val) noexcept { os << enumString(val); }
 };
 
 enum class Role {
-    /**
-     * No role.
-     */
-    NONE = 0,
-    /**
-     * Passive buyer or seller that receives the spread.
-     */
-    MAKER,
-    /**
-     * Aggressive buyer or seller that crosses the market and pays the spread.
-     */
-    TAKER
+  /**
+   * No role.
+   */
+  NONE = 0,
+  /**
+   * Passive buyer or seller that receives the spread.
+   */
+  MAKER,
+  /**
+   * Aggressive buyer or seller that crosses the market and pays the spread.
+   */
+  TAKER
 };
 
 SWIRLY_API const char* enumString(Role role);
 
 template <>
 struct EnumTraits<Role> {
-    static void print(std::ostream& os, Role val) noexcept
-    {
-        os << enumString(val);
-    }
+  static void print(std::ostream& os, Role val) noexcept { os << enumString(val); }
 };
 
 enum class Side { BUY = 1, SELL = -1 };
@@ -207,10 +195,7 @@ SWIRLY_API const char* enumString(Side side);
 
 template <>
 struct EnumTraits<Side> {
-    static void print(std::ostream& os, Side val) noexcept
-    {
-        os << enumString(val);
-    }
+  static void print(std::ostream& os, Side val) noexcept { os << enumString(val); }
 };
 
 /**
@@ -218,33 +203,30 @@ struct EnumTraits<Side> {
  * @image html OrderState.png
  */
 enum class State {
-    NONE = 0,
-    /**
-     * Initial state of a resting order placed in the order-book.
-     */
-    NEW,
-    /**
-     * State of a resting order that has been revised.
-     */
-    REVISE,
-    /**
-     * State of a resting order that has been cancelled.
-     */
-    CANCEL,
-    /**
-     * State of an order that has been partially or fully filled.
-     */
-    TRADE
+  NONE = 0,
+  /**
+   * Initial state of a resting order placed in the order-book.
+   */
+  NEW,
+  /**
+   * State of a resting order that has been revised.
+   */
+  REVISE,
+  /**
+   * State of a resting order that has been cancelled.
+   */
+  CANCEL,
+  /**
+   * State of an order that has been partially or fully filled.
+   */
+  TRADE
 };
 
 SWIRLY_API const char* enumString(State state);
 
 template <>
 struct EnumTraits<State> {
-    static void print(std::ostream& os, State val) noexcept
-    {
-        os << enumString(val);
-    }
+  static void print(std::ostream& os, State val) noexcept { os << enumString(val); }
 };
 
 /** @} */

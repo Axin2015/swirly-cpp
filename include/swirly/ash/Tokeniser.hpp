@@ -31,50 +31,38 @@ namespace swirly {
 template <char DelimN>
 class Tokeniser {
  public:
-    explicit Tokeniser(const StringView& buf) noexcept
-    {
-        reset(buf);
-    }
-    explicit Tokeniser() noexcept
-    {
-        reset("");
-    }
-    ~Tokeniser() noexcept = default;
+  explicit Tokeniser(const StringView& buf) noexcept { reset(buf); }
+  explicit Tokeniser() noexcept { reset(""); }
+  ~Tokeniser() noexcept = default;
 
-    // Copy.
-    Tokeniser(const Tokeniser& rhs) noexcept = default;
-    Tokeniser& operator=(const Tokeniser& rhs) noexcept = default;
+  // Copy.
+  Tokeniser(const Tokeniser& rhs) noexcept = default;
+  Tokeniser& operator=(const Tokeniser& rhs) noexcept = default;
 
-    // Move.
-    Tokeniser(Tokeniser&&) noexcept = default;
-    Tokeniser& operator=(Tokeniser&&) noexcept = default;
+  // Move.
+  Tokeniser(Tokeniser&&) noexcept = default;
+  Tokeniser& operator=(Tokeniser&&) noexcept = default;
 
-    StringView top() const noexcept
-    {
-        return buf_.substr(i_ - buf_.cbegin(), j_ - i_);
-    }
-    bool empty() const noexcept
-    {
-        return i_ == buf_.cend();
-    }
-    void reset(const StringView& buf) noexcept
-    {
-        buf_ = buf;
-        i_ = buf_.cbegin();
-        j_ = std::find(i_, buf_.cend(), DelimN);
-    }
-    void pop() noexcept
-    {
-        if (j_ != buf_.cend()) {
-            i_ = j_ + 1;
-            j_ = std::find(i_, buf_.cend(), DelimN);
-        } else
-            i_ = j_;
-    }
+  StringView top() const noexcept { return buf_.substr(i_ - buf_.cbegin(), j_ - i_); }
+  bool empty() const noexcept { return i_ == buf_.cend(); }
+  void reset(const StringView& buf) noexcept
+  {
+    buf_ = buf;
+    i_ = buf_.cbegin();
+    j_ = std::find(i_, buf_.cend(), DelimN);
+  }
+  void pop() noexcept
+  {
+    if (j_ != buf_.cend()) {
+      i_ = j_ + 1;
+      j_ = std::find(i_, buf_.cend(), DelimN);
+    } else
+      i_ = j_;
+  }
 
  private:
-    StringView buf_;
-    StringView::const_iterator i_, j_;
+  StringView buf_;
+  StringView::const_iterator i_, j_;
 };
 
 /** @} */

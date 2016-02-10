@@ -32,55 +32,52 @@ namespace swirly {
 
 class SWIRLY_API Exception : public std::exception {
  public:
-    Exception() noexcept = default;
+  Exception() noexcept = default;
 
-    ~Exception() noexcept override;
+  ~Exception() noexcept override;
 
-    // Copy.
-    Exception(const Exception& rhs) noexcept
-    {
-        *this = rhs;
-    }
-    Exception& operator=(const Exception& rhs) noexcept
-    {
-        std::strcpy(msg_, rhs.msg_);
-        return *this;
-    }
+  // Copy.
+  Exception(const Exception& rhs) noexcept { *this = rhs; }
+  Exception& operator=(const Exception& rhs) noexcept
+  {
+    std::strcpy(msg_, rhs.msg_);
+    return *this;
+  }
 
-    // Move.
-    Exception(Exception&&) noexcept = default;
-    Exception& operator=(Exception&&) noexcept = default;
+  // Move.
+  Exception(Exception&&) noexcept = default;
+  Exception& operator=(Exception&&) noexcept = default;
 
-    const char* what() const noexcept override;
+  const char* what() const noexcept override;
 
-    void format(const char* fmt, ...) noexcept;
+  void format(const char* fmt, ...) noexcept;
 
-    void format(const char* fmt, std::va_list args) noexcept;
+  void format(const char* fmt, std::va_list args) noexcept;
 
  private:
-    char msg_[128] = {'\0'};
+  char msg_[128] = {'\0'};
 };
 
 template <typename ExceptionT>
 ExceptionT makeException(const char* fmt, ...)
 {
-    ExceptionT e;
-    va_list args;
-    va_start(args, fmt);
-    e.format(fmt, args);
-    va_end(args);
-    return e;
+  ExceptionT e;
+  va_list args;
+  va_start(args, fmt);
+  e.format(fmt, args);
+  va_end(args);
+  return e;
 }
 
 template <typename ExceptionT>
 [[noreturn]] void throwException(const char* fmt, ...)
 {
-    ExceptionT e;
-    va_list args;
-    va_start(args, fmt);
-    e.format(fmt, args);
-    va_end(args);
-    throw e;
+  ExceptionT e;
+  va_list args;
+  va_start(args, fmt);
+  e.format(fmt, args);
+  va_end(args);
+  throw e;
 }
 
 /** @} */

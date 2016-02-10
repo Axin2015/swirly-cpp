@@ -33,30 +33,27 @@ namespace swirly {
  */
 class SWIRLY_API Asset : public Rec {
  public:
-    Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept
-        : Rec{RecType::ASSET, mnem, display},
-          type_{type}
-    {
-    }
+  Asset(const StringView& mnem, const StringView& display, AssetType type) noexcept
+    : Rec{RecType::ASSET, mnem, display},
+      type_{type}
+  {
+  }
 
-    ~Asset() noexcept override;
+  ~Asset() noexcept override;
 
-    // Copy.
-    Asset(const Asset&);
-    Asset& operator=(const Asset&) = delete;
+  // Copy.
+  Asset(const Asset&);
+  Asset& operator=(const Asset&) = delete;
 
-    // Move.
-    Asset(Asset&&);
-    Asset& operator=(Asset&&) = delete;
+  // Move.
+  Asset(Asset&&);
+  Asset& operator=(Asset&&) = delete;
 
-    AssetType assetType() const noexcept
-    {
-        return type_;
-    }
-    boost::intrusive::set_member_hook<> mnemHook_;
+  AssetType assetType() const noexcept { return type_; }
+  boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
-    const AssetType type_;
+  const AssetType type_;
 };
 
 using AssetSet = RecSet<Asset>;

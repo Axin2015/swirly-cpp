@@ -29,17 +29,17 @@ namespace mg {
 
 class Error : public Exception {
  public:
-    Error() noexcept = default;
+  Error() noexcept = default;
 
-    ~Error() noexcept;
+  ~Error() noexcept;
 
-    // Copy.
-    Error(const Error&) noexcept = default;
-    Error& operator=(const Error&) noexcept = default;
+  // Copy.
+  Error(const Error&) noexcept = default;
+  Error& operator=(const Error&) noexcept = default;
 
-    // Move.
-    Error(Error&&) noexcept = default;
-    Error& operator=(Error&&) noexcept = default;
+  // Move.
+  Error(Error&&) noexcept = default;
+  Error& operator=(Error&&) noexcept = default;
 };
 
 /** @} */

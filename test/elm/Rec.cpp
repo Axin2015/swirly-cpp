@@ -24,20 +24,17 @@ using namespace swirly;
 namespace {
 class Foo : public Rec {
  public:
-    Foo(const StringView& mnem, const StringView& display, int& alive) noexcept
-        : Rec{RecType::ASSET, mnem, display},
-          alive_{alive}
-    {
-        ++alive;
-    }
-    ~Foo() noexcept override
-    {
-        --alive_;
-    }
-    boost::intrusive::set_member_hook<> mnemHook_;
+  Foo(const StringView& mnem, const StringView& display, int& alive) noexcept
+    : Rec{RecType::ASSET, mnem, display},
+      alive_{alive}
+  {
+    ++alive;
+  }
+  ~Foo() noexcept override { --alive_; }
+  boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
-    int& alive_;
+  int& alive_;
 };
 } // anonymous
 
@@ -45,29 +42,29 @@ BOOST_AUTO_TEST_SUITE(RecSuite)
 
 BOOST_AUTO_TEST_CASE(RecSetCase)
 {
-    int alive{0};
-    {
-        RecSet<Foo> s;
+  int alive{0};
+  {
+    RecSet<Foo> s;
 
-        Foo& foo1{*s.emplace("FOO", "Foo One", alive)};
-        BOOST_CHECK_EQUAL(alive, 1);
-        BOOST_CHECK_EQUAL(foo1.mnem(), "FOO");
-        BOOST_CHECK_EQUAL(foo1.display(), "Foo One");
-        BOOST_CHECK(s.find("FOO") != s.end());
+    Foo& foo1{*s.emplace("FOO", "Foo One", alive)};
+    BOOST_CHECK_EQUAL(alive, 1);
+    BOOST_CHECK_EQUAL(foo1.mnem(), "FOO");
+    BOOST_CHECK_EQUAL(foo1.display(), "Foo One");
+    BOOST_CHECK(s.find("FOO") != s.end());
 
-        // Duplicate.
-        Foo& foo2{*s.emplace("FOO", "Foo Two", alive)};
-        BOOST_CHECK_EQUAL(alive, 1);
-        BOOST_CHECK_EQUAL(&foo2, &foo1);
+    // Duplicate.
+    Foo& foo2{*s.emplace("FOO", "Foo Two", alive)};
+    BOOST_CHECK_EQUAL(alive, 1);
+    BOOST_CHECK_EQUAL(&foo2, &foo1);
 
-        // Replace.
-        Foo& foo3{*s.emplaceOrReplace("FOO", "Foo Three", alive)};
-        BOOST_CHECK_EQUAL(alive, 1);
-        BOOST_CHECK_NE(&foo3, &foo1);
-        BOOST_CHECK_EQUAL(foo3.mnem(), "FOO");
-        BOOST_CHECK_EQUAL(foo3.display(), "Foo Three");
-    }
-    BOOST_CHECK_EQUAL(alive, 0);
+    // Replace.
+    Foo& foo3{*s.emplaceOrReplace("FOO", "Foo Three", alive)};
+    BOOST_CHECK_EQUAL(alive, 1);
+    BOOST_CHECK_NE(&foo3, &foo1);
+    BOOST_CHECK_EQUAL(foo3.mnem(), "FOO");
+    BOOST_CHECK_EQUAL(foo3.display(), "Foo Three");
+  }
+  BOOST_CHECK_EQUAL(alive, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

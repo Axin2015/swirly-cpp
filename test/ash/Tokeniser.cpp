@@ -24,71 +24,71 @@ BOOST_AUTO_TEST_SUITE(TokeniserSuite)
 
 BOOST_AUTO_TEST_CASE(EmptyCase)
 {
-    Tokeniser<','> toks;
+  Tokeniser<','> toks;
 
-    BOOST_CHECK(toks.empty());
+  BOOST_CHECK(toks.empty());
 
-    toks = Tokeniser<','>{""_sv};
-    BOOST_CHECK(toks.empty());
+  toks = Tokeniser<','>{""_sv};
+  BOOST_CHECK(toks.empty());
 }
 
 BOOST_AUTO_TEST_CASE(DelimCase)
 {
-    Tokeniser<','> toks{","_sv};
+  Tokeniser<','> toks{","_sv};
 
-    BOOST_CHECK(toks.top().empty());
+  BOOST_CHECK(toks.top().empty());
 
-    toks.pop();
-    BOOST_CHECK(toks.empty());
+  toks.pop();
+  BOOST_CHECK(toks.empty());
 }
 
 BOOST_AUTO_TEST_CASE(SingleCase)
 {
-    Tokeniser<','> toks{"foo"_sv};
+  Tokeniser<','> toks{"foo"_sv};
 
-    BOOST_CHECK_EQUAL(toks.top(), "foo");
+  BOOST_CHECK_EQUAL(toks.top(), "foo");
 
-    toks.pop();
-    BOOST_CHECK(toks.empty());
+  toks.pop();
+  BOOST_CHECK(toks.empty());
 }
 
 BOOST_AUTO_TEST_CASE(ManyCase)
 {
-    Tokeniser<','> toks{"foo,bar,baz"_sv};
+  Tokeniser<','> toks{"foo,bar,baz"_sv};
 
-    BOOST_CHECK_EQUAL(toks.top(), "foo");
+  BOOST_CHECK_EQUAL(toks.top(), "foo");
 
-    toks.pop();
-    BOOST_CHECK_EQUAL(toks.top(), "bar");
+  toks.pop();
+  BOOST_CHECK_EQUAL(toks.top(), "bar");
 
-    toks.pop();
-    BOOST_CHECK_EQUAL(toks.top(), "baz");
+  toks.pop();
+  BOOST_CHECK_EQUAL(toks.top(), "baz");
 
-    toks.pop();
-    BOOST_CHECK(toks.empty());
+  toks.pop();
+  BOOST_CHECK(toks.empty());
 }
 
 BOOST_AUTO_TEST_CASE(LeadingCase)
 {
-    Tokeniser<','> toks{",foo"_sv};
+  Tokeniser<','> toks{",foo"_sv};
 
-    BOOST_CHECK(toks.top().empty());
+  BOOST_CHECK(toks.top().empty());
 
-    toks.pop();
-    BOOST_CHECK_EQUAL(toks.top(), "foo");
+  toks.pop();
+  BOOST_CHECK_EQUAL(toks.top(), "foo");
 
-    toks.pop();
-    BOOST_CHECK(toks.empty());
+  toks.pop();
+  BOOST_CHECK(toks.empty());
 }
 
 BOOST_AUTO_TEST_CASE(TrailingCase)
 {
-    Tokeniser<','> toks{"foo,"_sv};
+  Tokeniser<','> toks{"foo,"_sv};
 
-    BOOST_CHECK_EQUAL(toks.top(), "foo");
+  BOOST_CHECK_EQUAL(toks.top(), "foo");
 
-    toks.pop();
-    BOOST_CHECK(toks.empty());
+  toks.pop();
+  BOOST_CHECK(toks.empty());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

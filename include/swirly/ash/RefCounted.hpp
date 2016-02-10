@@ -33,36 +33,30 @@ namespace swirly {
  */
 class SWIRLY_API RefCounted {
  public:
-    constexpr RefCounted() noexcept = default;
+  constexpr RefCounted() noexcept = default;
 
-    // Copy.
-    constexpr RefCounted(const RefCounted&) noexcept = default;
-    RefCounted& operator=(const RefCounted&) noexcept = default;
+  // Copy.
+  constexpr RefCounted(const RefCounted&) noexcept = default;
+  RefCounted& operator=(const RefCounted&) noexcept = default;
 
-    // Move.
-    constexpr RefCounted(RefCounted&&) noexcept = default;
-    RefCounted& operator=(RefCounted&&) noexcept = default;
+  // Move.
+  constexpr RefCounted(RefCounted&&) noexcept = default;
+  RefCounted& operator=(RefCounted&&) noexcept = default;
 
-    void addRef() const noexcept
-    {
-        ++refs_;
+  void addRef() const noexcept { ++refs_; }
+  void release() const noexcept
+  {
+    if (--refs_ <= 0) {
+      delete this;
     }
-    void release() const noexcept
-    {
-        if (--refs_ <= 0) {
-            delete this;
-        }
-    }
-    int refs() const noexcept
-    {
-        return refs_;
-    }
+  }
+  int refs() const noexcept { return refs_; }
 
  protected:
-    virtual ~RefCounted() noexcept;
+  virtual ~RefCounted() noexcept;
 
  private:
-    mutable int refs_ = 1;
+  mutable int refs_ = 1;
 };
 
 using RefCountedPtr = boost::intrusive_ptr<RefCounted>;
@@ -70,17 +64,17 @@ using RefCountedPtr = boost::intrusive_ptr<RefCounted>;
 template <typename TypeT, typename... ArgsT>
 boost::intrusive_ptr<TypeT> makeRefCounted(ArgsT&&... args)
 {
-    return {new TypeT{std::forward<ArgsT>(args)...}, false};
+  return {new TypeT{std::forward<ArgsT>(args)...}, false};
 }
 
 inline void intrusive_ptr_add_ref(const RefCounted* ptr) noexcept
 {
-    ptr->addRef();
+  ptr->addRef();
 }
 
 inline void intrusive_ptr_release(const RefCounted* ptr) noexcept
 {
-    ptr->release();
+  ptr->release();
 }
 
 /** @} */

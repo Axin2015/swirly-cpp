@@ -30,127 +30,81 @@ namespace swirly {
 template <typename TypeT>
 class ArrayView {
  public:
-    using value_type = TypeT;
+  using value_type = TypeT;
 
-    using pointer = const TypeT*;
-    using const_pointer = const TypeT*;
+  using pointer = const TypeT*;
+  using const_pointer = const TypeT*;
 
-    using reference = const TypeT&;
-    using const_reference = const TypeT&;
+  using reference = const TypeT&;
+  using const_reference = const TypeT&;
 
-    using const_iterator = const TypeT*;
-    using iterator = const_iterator;
+  using const_iterator = const TypeT*;
+  using iterator = const_iterator;
 
-    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-    using reverse_iterator = const_reverse_iterator;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+  using reverse_iterator = const_reverse_iterator;
 
-    using difference_type = ptrdiff_t;
-    using size_type = std::size_t;
+  using difference_type = ptrdiff_t;
+  using size_type = std::size_t;
 
-    constexpr ArrayView(const TypeT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr}
-    {
-    }
-    template <typename TypeU, std::size_t SizeN>
-    constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept : len_{SizeN}, ptr_{arr}
-    {
-    }
-    constexpr ArrayView() noexcept : len_{0}, ptr_{nullptr}
-    {
-    }
-    ~ArrayView() noexcept = default;
+  constexpr ArrayView(const TypeT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr} {}
+  template <typename TypeU, std::size_t SizeN>
+  constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept : len_{SizeN}, ptr_{arr}
+  {
+  }
+  constexpr ArrayView() noexcept : len_{0}, ptr_{nullptr} {}
+  ~ArrayView() noexcept = default;
 
-    // Copy.
-    constexpr ArrayView(const ArrayView& rhs) noexcept = default;
-    constexpr ArrayView& operator=(const ArrayView& rhs) noexcept = default;
+  // Copy.
+  constexpr ArrayView(const ArrayView& rhs) noexcept = default;
+  constexpr ArrayView& operator=(const ArrayView& rhs) noexcept = default;
 
-    // Move.
-    constexpr ArrayView(ArrayView&&) noexcept = default;
-    constexpr ArrayView& operator=(ArrayView&&) noexcept = default;
+  // Move.
+  constexpr ArrayView(ArrayView&&) noexcept = default;
+  constexpr ArrayView& operator=(ArrayView&&) noexcept = default;
 
-    constexpr const_iterator begin() const noexcept
-    {
-        return ptr_;
-    }
-    constexpr const_iterator end() const noexcept
-    {
-        return ptr_ + len_;
-    }
-    const_reverse_iterator rbegin() const noexcept
-    {
-        return const_reverse_iterator(end());
-    }
-    const_reverse_iterator rend() const noexcept
-    {
-        return const_reverse_iterator(begin());
-    }
-    constexpr const_iterator cbegin() const noexcept
-    {
-        return ptr_;
-    }
-    constexpr const_iterator cend() const noexcept
-    {
-        return ptr_ + len_;
-    }
-    const_reverse_iterator crbegin() const noexcept
-    {
-        return const_reverse_iterator(end());
-    }
-    const_reverse_iterator crend() const noexcept
-    {
-        return const_reverse_iterator(begin());
-    }
-    constexpr const TypeT& operator[](size_type pos) const noexcept
-    {
-        return ptr_[pos];
-    }
-    constexpr const TypeT& front() const noexcept
-    {
-        return ptr_[0];
-    }
-    constexpr const TypeT& back() const noexcept
-    {
-        return ptr_[len_ - 1];
-    }
-    constexpr const TypeT* data() const noexcept
-    {
-        return ptr_;
-    }
-    constexpr bool empty() const noexcept
-    {
-        return len_ == 0;
-    }
-    constexpr size_t size() const noexcept
-    {
-        return len_;
-    }
-    void clear() noexcept
-    {
-        len_ = 0;
-        ptr_ = nullptr;
-    }
-    void swap(ArrayView& rhs) noexcept
-    {
-        std::swap(len_, rhs.len_);
-        std::swap(ptr_, rhs.ptr_);
-    }
+  constexpr const_iterator begin() const noexcept { return ptr_; }
+  constexpr const_iterator end() const noexcept { return ptr_ + len_; }
+  const_reverse_iterator rbegin() const noexcept { return const_reverse_iterator(end()); }
+  const_reverse_iterator rend() const noexcept { return const_reverse_iterator(begin()); }
+  constexpr const_iterator cbegin() const noexcept { return ptr_; }
+  constexpr const_iterator cend() const noexcept { return ptr_ + len_; }
+  const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(end()); }
+  const_reverse_iterator crend() const noexcept { return const_reverse_iterator(begin()); }
+  constexpr const TypeT& operator[](size_type pos) const noexcept { return ptr_[pos]; }
+  constexpr const TypeT& front() const noexcept { return ptr_[0]; }
+  constexpr const TypeT& back() const noexcept { return ptr_[len_ - 1]; }
+  constexpr const TypeT* data() const noexcept { return ptr_; }
+  constexpr bool empty() const noexcept { return len_ == 0; }
+  constexpr size_t size() const noexcept { return len_; }
+  void clear() noexcept
+  {
+    len_ = 0;
+    ptr_ = nullptr;
+  }
+  void swap(ArrayView& rhs) noexcept
+  {
+    std::swap(len_, rhs.len_);
+    std::swap(ptr_, rhs.ptr_);
+  }
 
  private:
-    // Length in the first cache-line.
-    std::size_t len_;
-    const TypeT* ptr_;
+  // Length in the first cache-line.
+  std::size_t len_;
+  const TypeT* ptr_;
 };
 
 template <typename TypeT>
 constexpr ArrayView<std::remove_volatile_t<TypeT>> makeArrayView(const TypeT* ptr,
                                                                  std::size_t len) noexcept
 {
-    return {ptr, len};
+  return {ptr, len};
 }
 
 template <typename TypeT, std::size_t SizeN>
 constexpr ArrayView<std::remove_cv_t<TypeT>> makeArrayView(TypeT (&arr)[SizeN]) noexcept
 {
-    return {arr};
+  return {arr};
 }
 
 /** @} */

@@ -24,72 +24,72 @@ namespace swirly {
 
 inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
 {
-    return os << rec.type() << ' ' << rec.mnem() << ' ' << rec.display();
+  return os << rec.type() << ' ' << rec.mnem() << ' ' << rec.display();
 }
 
 class MockModel : public Model {
  public:
-    MockModel() noexcept = default;
-    ~MockModel() noexcept override = default;
+  MockModel() noexcept = default;
+  ~MockModel() noexcept override = default;
 
-    // Copy.
-    constexpr MockModel(const MockModel&) noexcept = default;
-    MockModel& operator=(const MockModel&) noexcept = default;
+  // Copy.
+  constexpr MockModel(const MockModel&) noexcept = default;
+  MockModel& operator=(const MockModel&) noexcept = default;
 
-    // Move.
-    constexpr MockModel(MockModel&&) noexcept = default;
-    MockModel& operator=(MockModel&&) noexcept = default;
+  // Move.
+  constexpr MockModel(MockModel&&) noexcept = default;
+  MockModel& operator=(MockModel&&) noexcept = default;
 
  protected:
-    AssetSet doReadAsset(const Factory& factory) const override
-    {
-        AssetSet s;
-        s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
-        s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
-        s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-        s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-        return s;
-    }
-    ContrSet doReadContr(const Factory& factory) const override
-    {
-        ContrSet s;
-        return s;
-    }
-    MarketSet doReadMarket(const Factory& factory) const override
-    {
-        MarketSet s;
-        return s;
-    }
-    TraderSet doReadTrader(const Factory& factory) const override
-    {
-        TraderSet s;
-        return s;
-    }
+  AssetSet doReadAsset(const Factory& factory) const override
+  {
+    AssetSet s;
+    s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
+    s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
+    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
+    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
+    return s;
+  }
+  ContrSet doReadContr(const Factory& factory) const override
+  {
+    ContrSet s;
+    return s;
+  }
+  MarketSet doReadMarket(const Factory& factory) const override
+  {
+    MarketSet s;
+    return s;
+  }
+  TraderSet doReadTrader(const Factory& factory) const override
+  {
+    TraderSet s;
+    return s;
+  }
 };
 
 } // swirly
 
 int main(int argc, char* argv[])
 {
-    using namespace boost;
-    using namespace std;
-    using namespace swirly;
+  using namespace boost;
+  using namespace std;
+  using namespace swirly;
 
-    try {
-        BasicFactory f;
-        MockModel m;
-        auto assets = m.readAsset(f);
-        cout << "--\n";
-        for (const auto& asset : assets) {
-            cout << asset << endl;
-        }
-
-        RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1_id, "",
-                                               Side::BUY, 10_lts, 0_ms)};
-        cout << req->trader() << endl;
-        return 0;
-    } catch (const std::exception& e) {
-        cerr << "error: " << e.what() << endl;
+  try {
+    BasicFactory f;
+    MockModel m;
+    auto assets = m.readAsset(f);
+    cout << "--\n";
+    for (const auto& asset : assets) {
+      cout << asset << endl;
     }
-    return 1;
+
+    RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1_id, "", Side::BUY,
+                                           10_lts, 0_ms)};
+    cout << req->trader() << endl;
+    return 0;
+  } catch (const std::exception& e) {
+    cerr << "error: " << e.what() << endl;
+  }
+  return 1;
 }

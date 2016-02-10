@@ -27,31 +27,31 @@ BOOST_AUTO_TEST_SUITE(ArraySuite)
 
 BOOST_AUTO_TEST_CASE(ArrayViewCase)
 {
-    BOOST_CHECK(!ArrayView<int>{}.data());
-    BOOST_CHECK(ArrayView<int>{}.empty());
-    BOOST_CHECK_EQUAL(ArrayView<int>{}.size(), 0UL);
+  BOOST_CHECK(!ArrayView<int>{}.data());
+  BOOST_CHECK(ArrayView<int>{}.empty());
+  BOOST_CHECK_EQUAL(ArrayView<int>{}.size(), 0UL);
 
-    const int arr[] = {101, 202, 303};
-    ArrayView<int> av{arr};
+  const int arr[] = {101, 202, 303};
+  ArrayView<int> av{arr};
 
-    BOOST_CHECK(av.data());
-    BOOST_CHECK(!av.empty());
-    BOOST_CHECK_EQUAL(av.size(), 3UL);
+  BOOST_CHECK(av.data());
+  BOOST_CHECK(!av.empty());
+  BOOST_CHECK_EQUAL(av.size(), 3UL);
 
-    BOOST_CHECK_EQUAL(av[0], arr[0]);
-    BOOST_CHECK_EQUAL(av[1], arr[1]);
-    BOOST_CHECK_EQUAL(av[2], arr[2]);
+  BOOST_CHECK_EQUAL(av[0], arr[0]);
+  BOOST_CHECK_EQUAL(av[1], arr[1]);
+  BOOST_CHECK_EQUAL(av[2], arr[2]);
 
-    BOOST_CHECK_EQUAL(av.front(), arr[0]);
-    BOOST_CHECK_EQUAL(av.back(), arr[2]);
+  BOOST_CHECK_EQUAL(av.front(), arr[0]);
+  BOOST_CHECK_EQUAL(av.back(), arr[2]);
 
-    BOOST_CHECK(equal(av.begin(), av.end(), arr));
-    int rev[] = {303, 202, 101};
+  BOOST_CHECK(equal(av.begin(), av.end(), arr));
+  int rev[] = {303, 202, 101};
 
-    BOOST_CHECK(equal(av.rbegin(), av.rend(), rev));
+  BOOST_CHECK(equal(av.rbegin(), av.rend(), rev));
 
-    BOOST_CHECK_EQUAL(makeArrayView(arr, 2).size(), 2UL);
-    BOOST_CHECK_EQUAL(makeArrayView(arr).size(), 3UL);
+  BOOST_CHECK_EQUAL(makeArrayView(arr, 2).size(), 2UL);
+  BOOST_CHECK_EQUAL(makeArrayView(arr).size(), 3UL);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

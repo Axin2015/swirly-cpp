@@ -41,130 +41,130 @@ using IdenView = ArrayView<Iden>;
 
 class SWIRLY_API Serv {
  public:
-    Serv(const Model& model, Journ& journ, Millis now);
+  Serv(const Model& model, Journ& journ, Millis now);
 
-    ~Serv() noexcept;
+  ~Serv() noexcept;
 
-    // Copy.
-    Serv(const Serv&) = delete;
-    Serv& operator=(const Serv&) = delete;
+  // Copy.
+  Serv(const Serv&) = delete;
+  Serv& operator=(const Serv&) = delete;
 
-    // Move.
-    Serv(Serv&&);
-    Serv& operator=(Serv&&);
+  // Move.
+  Serv(Serv&&);
+  Serv& operator=(Serv&&);
 
-    const AssetSet& assets() const noexcept;
+  const AssetSet& assets() const noexcept;
 
-    const ContrSet& contrs() const noexcept;
+  const ContrSet& contrs() const noexcept;
 
-    const MarketSet& markets() const noexcept;
+  const MarketSet& markets() const noexcept;
 
-    const TraderSet& traders() const noexcept;
+  const TraderSet& traders() const noexcept;
 
-    const MarketBook& createMarket(const StringView& mnem, const StringView& display,
-                                   const StringView& contr, Jday settlDay, Jday expiryDay,
-                                   MarketState state, Millis now);
+  const MarketBook& createMarket(const StringView& mnem, const StringView& display,
+                                 const StringView& contr, Jday settlDay, Jday expiryDay,
+                                 MarketState state, Millis now);
 
-    const MarketBook& updateMarket(const StringView& mnem, const StringView& display,
-                                   MarketState state, Millis now);
+  const MarketBook& updateMarket(const StringView& mnem, const StringView& display,
+                                 MarketState state, Millis now);
 
-    const MarketBook& market(const StringView& mnem) const;
+  const MarketBook& market(const StringView& mnem) const;
 
-    const TraderSess& createTrader(const StringView& mnem, const StringView& display,
-                                   const StringView& email);
+  const TraderSess& createTrader(const StringView& mnem, const StringView& display,
+                                 const StringView& email);
 
-    const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
+  const TraderSess& updateTrader(const StringView& mnem, const StringView& display);
 
-    const TraderSess& trader(const StringView& mnem) const;
+  const TraderSess& trader(const StringView& mnem) const;
 
-    const TraderSess* findTraderByEmail(const StringView& email) const;
+  const TraderSess* findTraderByEmail(const StringView& email) const;
 
-    void createOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
-                     Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp);
+  void createOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Side side, Lots lots,
+                   Ticks ticks, Lots minLots, Millis now, Response& resp);
 
-    void reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
-                     Response& resp);
+  void reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
+                   Response& resp);
 
-    void reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots,
-                     Millis now, Response& resp);
+  void reviseOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Lots lots, Millis now,
+                   Response& resp);
 
-    void reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots, Millis now,
-                     Response& resp);
+  void reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots, Millis now,
+                   Response& resp);
 
-    void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp);
+  void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp);
 
-    void cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, Response& resp);
+  void cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, Response& resp);
 
-    void cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
-                     Response& resp);
+  void cancelOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Millis now,
+                   Response& resp);
 
-    void cancelOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Millis now,
-                     Response& resp);
+  void cancelOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Millis now,
+                   Response& resp);
 
-    /**
-     * Cancels all orders.
-     *
-     * @param sess
-     *            The session.
-     * @param now
-     *            The current time.
-     */
-    void cancelOrder(TraderSess& sess, Millis now);
+  /**
+   * Cancels all orders.
+   *
+   * @param sess
+   *            The session.
+   * @param now
+   *            The current time.
+   */
+  void cancelOrder(TraderSess& sess, Millis now);
 
-    void cancelOrder(MarketBook& book, Millis now);
+  void cancelOrder(MarketBook& book, Millis now);
 
-    void archiveOrder(TraderSess& sess, Order& order, Millis now);
+  void archiveOrder(TraderSess& sess, Order& order, Millis now);
 
-    void archiveOrder(TraderSess& sess, const StringView& market, Iden id, Millis now);
+  void archiveOrder(TraderSess& sess, const StringView& market, Iden id, Millis now);
 
-    /**
-     * Archive all orders.
-     *
-     * @param sess
-     *            The session.
-     * @param now
-     *            The current time.
-     */
-    void archiveOrder(TraderSess& sess, Millis now);
+  /**
+   * Archive all orders.
+   *
+   * @param sess
+   *            The session.
+   * @param now
+   *            The current time.
+   */
+  void archiveOrder(TraderSess& sess, Millis now);
 
-    void archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now);
+  void archiveOrder(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now);
 
-    ExecPtr createTrade(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
-                        Lots lots, Ticks ticks, Role role, const StringView& cpty, Millis created);
+  ExecPtr createTrade(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
+                      Lots lots, Ticks ticks, Role role, const StringView& cpty, Millis created);
 
-    void archiveTrade(TraderSess& sess, Exec& trade, Millis now);
+  void archiveTrade(TraderSess& sess, Exec& trade, Millis now);
 
-    void archiveTrade(TraderSess& sess, const StringView& market, Iden id, Millis now);
+  void archiveTrade(TraderSess& sess, const StringView& market, Iden id, Millis now);
 
-    /**
-     * Archive all trades.
-     *
-     * @param sess
-     *            The session.
-     * @param now
-     *            The current time.
-     */
-    void archiveTrade(TraderSess& sess, Millis now);
+  /**
+   * Archive all trades.
+   *
+   * @param sess
+   *            The session.
+   * @param now
+   *            The current time.
+   */
+  void archiveTrade(TraderSess& sess, Millis now);
 
-    void archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now);
+  void archiveTrade(TraderSess& sess, const StringView& market, const IdenView& ids, Millis now);
 
-    /**
-     * This method may partially fail.
-     *
-     * @param now
-     *            The current time.
-     */
-    void expireEndOfDay(Millis now);
+  /**
+   * This method may partially fail.
+   *
+   * @param now
+   *            The current time.
+   */
+  void expireEndOfDay(Millis now);
 
-    void settlEndOfDay(Millis now);
+  void settlEndOfDay(Millis now);
 
-    void poll(Millis now);
+  void poll(Millis now);
 
-    Millis getTimeout() const noexcept;
+  Millis getTimeout() const noexcept;
 
  private:
-    struct Impl;
-    std::unique_ptr<Impl> impl_;
+  struct Impl;
+  std::unique_ptr<Impl> impl_;
 };
 
 /** @} */

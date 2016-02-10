@@ -34,55 +34,37 @@ namespace swirly {
  */
 class SWIRLY_API MarketView {
  public:
-    MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
-               Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept;
+  MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
+             Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept;
 
-    MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
-               Ticks lastTicks, Millis lastTime) noexcept;
+  MarketView(const StringView& market, const StringView& contr, Jday settlDay, Lots lastLots,
+             Ticks lastTicks, Millis lastTime) noexcept;
 
-    ~MarketView() noexcept;
+  ~MarketView() noexcept;
 
-    // Copy.
-    MarketView(const MarketView&);
-    MarketView& operator=(const MarketView&) = delete;
+  // Copy.
+  MarketView(const MarketView&);
+  MarketView& operator=(const MarketView&) = delete;
 
-    // Move.
-    MarketView(MarketView&&);
-    MarketView& operator=(MarketView&&) = delete;
+  // Move.
+  MarketView(MarketView&&);
+  MarketView& operator=(MarketView&&) = delete;
 
-    auto market() const noexcept
-    {
-        return +market_;
-    }
-    auto contr() const noexcept
-    {
-        return +contr_;
-    }
-    auto settlDay() const noexcept
-    {
-        return settlDay_;
-    }
-    auto lastLots() const noexcept
-    {
-        return lastLots_;
-    }
-    auto lastTicks() const noexcept
-    {
-        return lastTicks_;
-    }
-    auto lastTime() const noexcept
-    {
-        return lastTime_;
-    }
+  auto market() const noexcept { return +market_; }
+  auto contr() const noexcept { return +contr_; }
+  auto settlDay() const noexcept { return settlDay_; }
+  auto lastLots() const noexcept { return lastLots_; }
+  auto lastTicks() const noexcept { return lastTicks_; }
+  auto lastTime() const noexcept { return lastTime_; }
 
  private:
-    const Mnem market_;
-    const Mnem contr_;
-    const Jday settlDay_;
-    Lots lastLots_;
-    Ticks lastTicks_;
-    Millis lastTime_;
-    const MarketData data_;
+  const Mnem market_;
+  const Mnem contr_;
+  const Jday settlDay_;
+  Lots lastLots_;
+  Ticks lastTicks_;
+  Millis lastTime_;
+  const MarketData data_;
 };
 
 /** @} */

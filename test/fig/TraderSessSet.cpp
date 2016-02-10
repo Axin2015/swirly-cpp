@@ -27,15 +27,15 @@ BOOST_AUTO_TEST_SUITE(TraderSessSetSuite)
 
 BOOST_AUTO_TEST_CASE(TraderSessSetCase)
 {
-    ServFactory f;
-    TraderSessSet s;
-    {
-        auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com", f);
-        BOOST_CHECK(s.insert(*trader));
-        BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
-        // Auto-unlink.
-    }
-    BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
+  ServFactory f;
+  TraderSessSet s;
+  {
+    auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com", f);
+    BOOST_CHECK(s.insert(*trader));
+    BOOST_CHECK(s.find("mark.aylett@gmail.com") != s.end());
+    // Auto-unlink.
+  }
+  BOOST_CHECK(s.find("mark.aylett@gmail.com") == s.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

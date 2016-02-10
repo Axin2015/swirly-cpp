@@ -21,22 +21,22 @@ namespace mg {
 
 StreamBuf::~StreamBuf() noexcept
 {
-    mbuf_free(&buf_);
+  mbuf_free(&buf_);
 }
 
 StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
 {
-    if (c != traits_type::eof()) {
-        const char z = c;
-        if (mbuf_append(&buf_, &z, 1) != 1)
-            c = traits_type::eof();
-    }
-    return c;
+  if (c != traits_type::eof()) {
+    const char z = c;
+    if (mbuf_append(&buf_, &z, 1) != 1)
+      c = traits_type::eof();
+  }
+  return c;
 }
 
 std::streamsize StreamBuf::xsputn(const char_type* s, std::streamsize count) noexcept
 {
-    return mbuf_append(&buf_, s, count);
+  return mbuf_append(&buf_, s, count);
 }
 
 OStream::~OStream() noexcept = default;

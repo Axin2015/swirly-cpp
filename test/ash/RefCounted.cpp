@@ -24,17 +24,11 @@ using namespace swirly;
 namespace {
 class Foo : public RefCounted {
  public:
-    explicit Foo(int& alive) noexcept : alive_{alive}
-    {
-        ++alive;
-    }
-    ~Foo() noexcept override
-    {
-        --alive_;
-    }
+  explicit Foo(int& alive) noexcept : alive_{alive} { ++alive; }
+  ~Foo() noexcept override { --alive_; }
 
  private:
-    int& alive_;
+  int& alive_;
 };
 } // anonymous
 
@@ -42,18 +36,18 @@ BOOST_AUTO_TEST_SUITE(RefCountedSuite)
 
 BOOST_AUTO_TEST_CASE(RefCountedCase)
 {
-    int alive{0};
+  int alive{0};
+  {
+    auto ptr1 = makeRefCounted<Foo>(alive);
+    BOOST_CHECK_EQUAL(alive, 1);
+    BOOST_CHECK_EQUAL(ptr1->refs(), 1);
     {
-        auto ptr1 = makeRefCounted<Foo>(alive);
-        BOOST_CHECK_EQUAL(alive, 1);
-        BOOST_CHECK_EQUAL(ptr1->refs(), 1);
-        {
-            auto ptr2 = ptr1;
-            BOOST_CHECK_EQUAL(ptr1->refs(), 2);
-        }
-        BOOST_CHECK_EQUAL(ptr1->refs(), 1);
+      auto ptr2 = ptr1;
+      BOOST_CHECK_EQUAL(ptr1->refs(), 2);
     }
-    BOOST_CHECK_EQUAL(alive, 0);
+    BOOST_CHECK_EQUAL(ptr1->refs(), 1);
+  }
+  BOOST_CHECK_EQUAL(alive, 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

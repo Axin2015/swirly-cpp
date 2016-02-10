@@ -38,17 +38,17 @@ constexpr int ROLL_HOUR{17};
 
 inline pt::ptime millisToPtime(Millis ms)
 {
-    return pt::from_time_t(unbox(ms) / 1000L) + pt::milliseconds(unbox(ms) % 1000L);
+  return pt::from_time_t(unbox(ms) / 1000L) + pt::milliseconds(unbox(ms) % 1000L);
 }
 
 } // anonymous
 
 Jday getBusDay(Millis ms)
 {
-    lt::local_date_time ldt{millisToPtime(ms), NY};
-    // Add 7 hours to 17.00 will roll the date.
-    ldt += pt::hours(24 - ROLL_HOUR);
-    return box<Jday>(ldt.local_time().date().julian_day());
+  lt::local_date_time ldt{millisToPtime(ms), NY};
+  // Add 7 hours to 17.00 will roll the date.
+  ldt += pt::hours(24 - ROLL_HOUR);
+  return box<Jday>(ldt.local_time().date().julian_day());
 }
 
 } // swirly

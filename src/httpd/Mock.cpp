@@ -31,30 +31,30 @@ MockModel& MockModel::operator=(MockModel&&) noexcept = default;
 
 AssetSet MockModel::doReadAsset(const Factory& factory) const
 {
-    AssetSet s;
-    s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
-    s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
-    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-    return s;
+  AssetSet s;
+  s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
+  s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
+  s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
+  s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
+  return s;
 }
 
 ContrSet MockModel::doReadContr(const Factory& factory) const
 {
-    ContrSet s;
-    return s;
+  ContrSet s;
+  return s;
 }
 
 MarketSet MockModel::doReadMarket(const Factory& factory) const
 {
-    MarketSet s;
-    return s;
+  MarketSet s;
+  return s;
 }
 
 TraderSet MockModel::doReadTrader(const Factory& factory) const
 {
-    TraderSet s;
-    return s;
+  TraderSet s;
+  return s;
 }
 
 MockJourn::MockJourn() noexcept = default;

@@ -29,31 +29,31 @@ BOOST_AUTO_TEST_SUITE(StringSuite)
 
 BOOST_AUTO_TEST_CASE(EmptyCase)
 {
-    StringBuf<3> sb;
-    BOOST_CHECK(sb.empty());
-    BOOST_CHECK_EQUAL(sb.size(), 0UL);
-    BOOST_CHECK_EQUAL(sb.compare(""), 0);
-    BOOST_CHECK_EQUAL(sb, StringBuf<3>{""});
+  StringBuf<3> sb;
+  BOOST_CHECK(sb.empty());
+  BOOST_CHECK_EQUAL(sb.size(), 0UL);
+  BOOST_CHECK_EQUAL(sb.compare(""), 0);
+  BOOST_CHECK_EQUAL(sb, StringBuf<3>{""});
 }
 
 BOOST_AUTO_TEST_CASE(NonEmptyCase)
 {
-    StringBuf<3> sb{"Foo"};
-    BOOST_CHECK(!sb.empty());
-    BOOST_CHECK_EQUAL(sb.size(), 3UL);
-    BOOST_CHECK_EQUAL(sb.compare("Foo"), 0);
-    BOOST_CHECK_EQUAL(sb, StringBuf<3>{"Foo"});
+  StringBuf<3> sb{"Foo"};
+  BOOST_CHECK(!sb.empty());
+  BOOST_CHECK_EQUAL(sb.size(), 3UL);
+  BOOST_CHECK_EQUAL(sb.compare("Foo"), 0);
+  BOOST_CHECK_EQUAL(sb, StringBuf<3>{"Foo"});
 }
 
 BOOST_AUTO_TEST_CASE(UpperBoundCase)
 {
-    StringBuf<3> sb{"Foox"};
-    BOOST_CHECK_EQUAL(sb.size(), 3UL);
-    BOOST_CHECK_EQUAL(sb, "Foo");
+  StringBuf<3> sb{"Foox"};
+  BOOST_CHECK_EQUAL(sb.size(), 3UL);
+  BOOST_CHECK_EQUAL(sb, "Foo");
 
-    sb = "Barx";
-    BOOST_CHECK_EQUAL(sb.size(), 3UL);
-    BOOST_CHECK_EQUAL(sb, "Bar");
+  sb = "Barx";
+  BOOST_CHECK_EQUAL(sb.size(), 3UL);
+  BOOST_CHECK_EQUAL(sb, "Bar");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -43,67 +43,64 @@ static const regex MNEM_PATTERN{"(\\d{4}[- ]){3}\\d{4}"};
 
 struct Serv::Impl {
 
-    using MarketBookPtr = unique_ptr<MarketBook, default_delete<Market>>;
-    using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
+  using MarketBookPtr = unique_ptr<MarketBook, default_delete<Market>>;
+  using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
 
-    Impl(const Model& model, Journ& journ, Millis now) noexcept : journ{journ}
-    {
-    }
-    MarketBookPtr newMarket(const StringView& mnem, const StringView& display,
-                            const StringView& contr, Jday settlDay, Jday expiryDay,
-                            MarketState state) const
-    {
-        if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
-            throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
-        auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
-        return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
-    }
-    TraderSessPtr newTrader(const StringView& mnem, const StringView& display,
-                            const StringView& email) const
-    {
-        if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
-            throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
-        auto up = factory.newTrader(mnem, display, email);
-        return {static_cast<TraderSess*>(up.release()), std::move(up.get_deleter())};
-    }
-    ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
-    {
-        return factory.newExec(order, book.allocExecId(), now);
-    }
-    void matchOrders(const TraderSess& takerSess, const MarketBook& book, const Order& takerOrder,
-                     Millis now, vector<Match>& matches) const
-    {
-        // FIXME: not implemented.
-    }
-    // Assumes that maker lots have not been reduced since matching took place.
-    void commitMatches(const TraderSess& taker, const MarketBook& book,
-                       const vector<Match>& matches, const Posn& takerPosn, Millis now,
-                       Response& resp)
-    {
-        // FIXME: not implemented.
-    }
+  Impl(const Model& model, Journ& journ, Millis now) noexcept : journ{journ} {}
+  MarketBookPtr newMarket(const StringView& mnem, const StringView& display,
+                          const StringView& contr, Jday settlDay, Jday expiryDay,
+                          MarketState state) const
+  {
+    if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
+      throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
+    auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
+    return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
+  }
+  TraderSessPtr newTrader(const StringView& mnem, const StringView& display,
+                          const StringView& email) const
+  {
+    if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
+      throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
+    auto up = factory.newTrader(mnem, display, email);
+    return {static_cast<TraderSess*>(up.release()), std::move(up.get_deleter())};
+  }
+  ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
+  {
+    return factory.newExec(order, book.allocExecId(), now);
+  }
+  void matchOrders(const TraderSess& takerSess, const MarketBook& book, const Order& takerOrder,
+                   Millis now, vector<Match>& matches) const
+  {
+    // FIXME: not implemented.
+  }
+  // Assumes that maker lots have not been reduced since matching took place.
+  void commitMatches(const TraderSess& taker, const MarketBook& book, const vector<Match>& matches,
+                     const Posn& takerPosn, Millis now, Response& resp)
+  {
+    // FIXME: not implemented.
+  }
 
-    Journ& journ;
-    ServFactory factory;
-    AssetSet assets;
-    ContrSet contrs;
-    MarketSet markets;
-    TraderSet traders;
-    TraderSessSet emailIdx;
+  Journ& journ;
+  ServFactory factory;
+  AssetSet assets;
+  ContrSet contrs;
+  MarketSet markets;
+  TraderSet traders;
+  TraderSessSet emailIdx;
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)
-    : impl_{make_unique<Impl>(model, journ, now)}
+  : impl_{make_unique<Impl>(model, journ, now)}
 {
-    impl_->assets = model.readAsset(impl_->factory);
-    impl_->contrs = model.readContr(impl_->factory);
-    impl_->markets = model.readMarket(impl_->factory);
-    impl_->traders = model.readTrader(impl_->factory);
+  impl_->assets = model.readAsset(impl_->factory);
+  impl_->contrs = model.readContr(impl_->factory);
+  impl_->markets = model.readMarket(impl_->factory);
+  impl_->traders = model.readTrader(impl_->factory);
 
-    for (auto& rec : impl_->traders) {
-        auto& trader = static_cast<TraderSess&>(rec);
-        impl_->emailIdx.insert(trader);
-    }
+  for (auto& rec : impl_->traders) {
+    auto& trader = static_cast<TraderSess&>(rec);
+    impl_->emailIdx.insert(trader);
+  }
 }
 
 Serv::~Serv() noexcept = default;
@@ -114,159 +111,158 @@ Serv& Serv::operator=(Serv&&) = default;
 
 const AssetSet& Serv::assets() const noexcept
 {
-    return impl_->assets;
+  return impl_->assets;
 }
 
 const ContrSet& Serv::contrs() const noexcept
 {
-    return impl_->contrs;
+  return impl_->contrs;
 }
 
 const MarketSet& Serv::markets() const noexcept
 {
-    return impl_->markets;
+  return impl_->markets;
 }
 
 const TraderSet& Serv::traders() const noexcept
 {
-    return impl_->traders;
+  return impl_->traders;
 }
 
 const MarketBook& Serv::createMarket(const StringView& mnem, const StringView& display,
                                      const StringView& contr, Jday settlDay, Jday expiryDay,
                                      MarketState state, Millis now)
 {
-    auto it
-        = impl_->markets.insert(impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state));
-    const auto& market = static_cast<const MarketBook&>(*it);
-    return market;
+  auto it
+    = impl_->markets.insert(impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state));
+  const auto& market = static_cast<const MarketBook&>(*it);
+  return market;
 }
 
 const MarketBook& Serv::updateMarket(const StringView& mnem, const StringView& display,
                                      MarketState state, Millis now)
 {
-    auto it = impl_->markets.find(mnem);
-    if (it == impl_->markets.end())
-        throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
-    auto& market = static_cast<MarketBook&>(*it);
-    market.setDisplay(display);
-    market.setState(state);
-    return market;
+  auto it = impl_->markets.find(mnem);
+  if (it == impl_->markets.end())
+    throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
+  auto& market = static_cast<MarketBook&>(*it);
+  market.setDisplay(display);
+  market.setState(state);
+  return market;
 }
 
 const MarketBook& Serv::market(const StringView& mnem) const
 {
-    auto it = impl_->markets.find(mnem);
-    if (it == impl_->markets.end())
-        throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
-    const auto& market = static_cast<const MarketBook&>(*it);
-    return market;
+  auto it = impl_->markets.find(mnem);
+  if (it == impl_->markets.end())
+    throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
+  const auto& market = static_cast<const MarketBook&>(*it);
+  return market;
 }
 
 const TraderSess& Serv::createTrader(const StringView& mnem, const StringView& display,
                                      const StringView& email)
 {
-    auto it = impl_->traders.insert(impl_->newTrader(mnem, display, email));
-    auto& trader = static_cast<TraderSess&>(*it);
-    return trader;
+  auto it = impl_->traders.insert(impl_->newTrader(mnem, display, email));
+  auto& trader = static_cast<TraderSess&>(*it);
+  return trader;
 }
 
 const TraderSess& Serv::updateTrader(const StringView& mnem, const StringView& display)
 {
-    auto it = impl_->traders.find(mnem);
-    if (it == impl_->traders.end())
-        throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
-    auto& trader = static_cast<TraderSess&>(*it);
-    trader.setDisplay(display);
-    return trader;
+  auto it = impl_->traders.find(mnem);
+  if (it == impl_->traders.end())
+    throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+  auto& trader = static_cast<TraderSess&>(*it);
+  trader.setDisplay(display);
+  return trader;
 }
 
 const TraderSess& Serv::trader(const StringView& mnem) const
 {
-    auto it = impl_->traders.find(mnem);
-    if (it == impl_->traders.end())
-        throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
-    const auto& trader = static_cast<const TraderSess&>(*it);
-    return trader;
+  auto it = impl_->traders.find(mnem);
+  if (it == impl_->traders.end())
+    throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+  const auto& trader = static_cast<const TraderSess&>(*it);
+  return trader;
 }
 
 const TraderSess* Serv::findTraderByEmail(const StringView& email) const
 {
-    const TraderSess* trader{nullptr};
-    auto it = impl_->emailIdx.find(email);
-    if (it != impl_->emailIdx.end())
-        trader = &*it;
-    return trader;
+  const TraderSess* trader{nullptr};
+  auto it = impl_->emailIdx.find(email);
+  if (it != impl_->emailIdx.end())
+    trader = &*it;
+  return trader;
 }
 
 void Serv::createOrder(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
                        Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
-    const auto busDay = getBusDay(now);
-    if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
-        throwException<MarketClosedException>("market for '%.*s' in '%d' has expired",
-                                              SWIRLY_STR(book.contr()),
-                                              maybeJdToIso(book.settlDay()));
-    }
-    if (lots == 0_lts || lots < minLots) {
-        throwException<InvalidLotsException>("invalid lots '%d'", lots);
-    }
-    const auto orderId = book.allocOrderId();
-    auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
-                                         orderId, ref, side, lots, ticks, minLots, now);
-    auto exec = impl_->newExec(book, *order, now);
-    resp.reset(book, order, exec);
+  const auto busDay = getBusDay(now);
+  if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
+    throwException<MarketClosedException>("market for '%.*s' in '%d' has expired",
+                                          SWIRLY_STR(book.contr()), maybeJdToIso(book.settlDay()));
+  }
+  if (lots == 0_lts || lots < minLots) {
+    throwException<InvalidLotsException>("invalid lots '%d'", lots);
+  }
+  const auto orderId = book.allocOrderId();
+  auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
+                                       orderId, ref, side, lots, ticks, minLots, now);
+  auto exec = impl_->newExec(book, *order, now);
+  resp.reset(book, order, exec);
 
-    vector<Match> matches;
-    // Order fields are updated on match.
-    impl_->matchOrders(sess, book, *order, now, matches);
-    // Place incomplete order in market. N.B. done() is sufficient here because the order cannot be
-    // pending cancellation.
-    if (!order->done()) {
-        // This may fail if level cannot be allocated.
-        book.insertOrder(order);
-    }
-    {
-        // TODO: IOC orders would need an additional revision for the unsolicited cancellation of
-        // any unfilled quantity.
-        bool success{false};
-        auto finally = makeFinally([&book, &order, &success]() {
-            if (!success && !order->done()) {
-                // Undo market insertion.
-                book.removeOrder(*order);
-            }
-        });
+  vector<Match> matches;
+  // Order fields are updated on match.
+  impl_->matchOrders(sess, book, *order, now, matches);
+  // Place incomplete order in market. N.B. done() is sufficient here because the order cannot be
+  // pending cancellation.
+  if (!order->done()) {
+    // This may fail if level cannot be allocated.
+    book.insertOrder(order);
+  }
+  {
+    // TODO: IOC orders would need an additional revision for the unsolicited cancellation of any
+    // unfilled quantity.
+    bool success{false};
+    auto finally = makeFinally([&book, &order, &success]() {
+      if (!success && !order->done()) {
+        // Undo market insertion.
+        book.removeOrder(*order);
+      }
+    });
 
-        const size_t len{1 + matches.size() * 2};
-        Exec* execs[len];
+    const size_t len{1 + matches.size() * 2};
+    Exec* execs[len];
 
-        execs[0] = exec.get();
-        int i{1};
-        for (const auto& match : matches) {
-            execs[i] = match.makerTrade.get();
-            execs[i + 1] = match.takerTrade.get();
-            i += 2;
-        }
-        impl_->journ.createExec(book.mnem(), makeArrayView(execs, len));
-        success = true;
+    execs[0] = exec.get();
+    int i{1};
+    for (const auto& match : matches) {
+      execs[i] = match.makerTrade.get();
+      execs[i + 1] = match.takerTrade.get();
+      i += 2;
     }
+    impl_->journ.createExec(book.mnem(), makeArrayView(execs, len));
+    success = true;
+  }
+  // Avoid allocating position when there are no matches.
+  PosnPtr posn;
+  if (!matches.empty()) {
     // Avoid allocating position when there are no matches.
-    PosnPtr posn;
-    if (!matches.empty()) {
-        // Avoid allocating position when there are no matches.
-        // N.B. before commit phase, because this may fail.
-        posn = sess.lazyPosn(book.contr(), book.settlDay());
-    }
+    // N.B. before commit phase, because this may fail.
+    posn = sess.lazyPosn(book.contr(), book.settlDay());
+  }
 
-    // Commit phase.
+  // Commit phase.
 
-    sess.insertOrder(order);
+  sess.insertOrder(order);
 
-    // Commit matches.
-    if (!matches.empty()) {
-        assert(posn);
-        impl_->commitMatches(sess, book, matches, *posn, now, resp);
-    }
+  // Commit matches.
+  if (!matches.empty()) {
+    assert(posn);
+    impl_->commitMatches(sess, book, matches, *posn, now, resp);
+  }
 }
 
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
@@ -329,7 +325,7 @@ void Serv::archiveOrder(TraderSess& sess, const StringView& market, const IdenVi
 ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, const StringView& ref, Side side,
                           Lots lots, Ticks ticks, Role role, const StringView& cpty, Millis created)
 {
-    return {};
+  return {};
 }
 
 void Serv::archiveTrade(TraderSess& sess, Exec& trade, Millis now)
@@ -362,7 +358,7 @@ void Serv::poll(Millis now)
 
 Millis Serv::getTimeout() const noexcept
 {
-    return 0_ms;
+  return 0_ms;
 }
 
 } // swirly

@@ -33,46 +33,31 @@ namespace swirly {
  */
 class SWIRLY_API Market : public Rec {
  public:
-    Market(const StringView& mnem, const StringView& display, const StringView& contr,
-           Jday settlDay, Jday expiryDay, MarketState state) noexcept;
+  Market(const StringView& mnem, const StringView& display, const StringView& contr, Jday settlDay,
+         Jday expiryDay, MarketState state) noexcept;
 
-    ~Market() noexcept override;
+  ~Market() noexcept override;
 
-    // Copy.
-    Market(const Market&);
-    Market& operator=(const Market&) = delete;
+  // Copy.
+  Market(const Market&);
+  Market& operator=(const Market&) = delete;
 
-    // Move.
-    Market(Market&&);
-    Market& operator=(Market&&) = delete;
+  // Move.
+  Market(Market&&);
+  Market& operator=(Market&&) = delete;
 
-    auto contr() const noexcept
-    {
-        return +contr_;
-    }
-    auto settlDay() const noexcept
-    {
-        return settlDay_;
-    }
-    auto expiryDay() const noexcept
-    {
-        return expiryDay_;
-    }
-    auto state() const noexcept
-    {
-        return state_;
-    }
-    void setState(MarketState state) noexcept
-    {
-        state_ = state;
-    }
-    boost::intrusive::set_member_hook<> mnemHook_;
+  auto contr() const noexcept { return +contr_; }
+  auto settlDay() const noexcept { return settlDay_; }
+  auto expiryDay() const noexcept { return expiryDay_; }
+  auto state() const noexcept { return state_; }
+  void setState(MarketState state) noexcept { state_ = state; }
+  boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
-    const Mnem contr_;
-    const Jday settlDay_;
-    const Jday expiryDay_;
-    MarketState state_;
+  const Mnem contr_;
+  const Jday settlDay_;
+  const Jday expiryDay_;
+  MarketState state_;
 };
 
 using MarketSet = RecSet<Market>;

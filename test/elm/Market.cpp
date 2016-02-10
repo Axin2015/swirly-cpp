@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(MarketSuite)
 
 BOOST_AUTO_TEST_CASE(MarketCase)
 {
-    BOOST_CHECK(true);
+  BOOST_CHECK(true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

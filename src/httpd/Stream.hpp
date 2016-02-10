@@ -31,73 +31,49 @@ namespace mg {
 
 class StreamBuf : public std::streambuf {
  public:
-    StreamBuf() noexcept
-    {
-        mbuf_init(&buf_, 4096);
-    }
-    ~StreamBuf() noexcept override;
+  StreamBuf() noexcept { mbuf_init(&buf_, 4096); }
+  ~StreamBuf() noexcept override;
 
-    // Copy.
-    StreamBuf(const StreamBuf& rhs) = delete;
-    StreamBuf& operator=(const StreamBuf& rhs) = delete;
+  // Copy.
+  StreamBuf(const StreamBuf& rhs) = delete;
+  StreamBuf& operator=(const StreamBuf& rhs) = delete;
 
-    // Move.
-    StreamBuf(StreamBuf&&) = delete;
-    StreamBuf& operator=(StreamBuf&&) = delete;
+  // Move.
+  StreamBuf(StreamBuf&&) = delete;
+  StreamBuf& operator=(StreamBuf&&) = delete;
 
-    const char_type* data() const noexcept
-    {
-        return buf_.buf;
-    }
-    std::streamsize size() const noexcept
-    {
-        return buf_.len;
-    }
-    void reset() noexcept
-    {
-        buf_.len = 0;
-    }
+  const char_type* data() const noexcept { return buf_.buf; }
+  std::streamsize size() const noexcept { return buf_.len; }
+  void reset() noexcept { buf_.len = 0; }
 
  protected:
-    int_type overflow(int_type c) noexcept override;
+  int_type overflow(int_type c) noexcept override;
 
-    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
+  std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
 
  private:
-    mbuf buf_;
+  mbuf buf_;
 };
 
 class OStream : public std::ostream {
  public:
-    OStream() : std::ostream{nullptr}
-    {
-        rdbuf(&buf_);
-    }
-    ~OStream() noexcept override;
+  OStream() : std::ostream{nullptr} { rdbuf(&buf_); }
+  ~OStream() noexcept override;
 
-    // Copy.
-    OStream(const OStream& rhs) = delete;
-    OStream& operator=(const OStream& rhs) = delete;
+  // Copy.
+  OStream(const OStream& rhs) = delete;
+  OStream& operator=(const OStream& rhs) = delete;
 
-    // Move.
-    OStream(OStream&&) = delete;
-    OStream& operator=(OStream&&) = delete;
+  // Move.
+  OStream(OStream&&) = delete;
+  OStream& operator=(OStream&&) = delete;
 
-    const char_type* data() const noexcept
-    {
-        return buf_.data();
-    }
-    std::streamsize size() const noexcept
-    {
-        return buf_.size();
-    }
-    void reset() noexcept
-    {
-        buf_.reset();
-    }
+  const char_type* data() const noexcept { return buf_.data(); }
+  std::streamsize size() const noexcept { return buf_.size(); }
+  void reset() noexcept { buf_.reset(); }
 
  private:
-    StreamBuf buf_;
+  StreamBuf buf_;
 };
 
 /** @} */

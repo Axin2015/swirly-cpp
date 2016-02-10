@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_SUITE(OptionalSuite)
 
 BOOST_AUTO_TEST_CASE(OptionalCase)
 {
-    BOOST_CHECK(true);
+  BOOST_CHECK(true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

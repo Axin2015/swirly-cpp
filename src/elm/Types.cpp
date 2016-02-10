@@ -22,66 +22,66 @@ namespace swirly {
 
 const char* enumString(AssetType type)
 {
-    switch (type) {
-        SWIRLY_ENUM_CASE(AssetType, COMMODITY);
-        SWIRLY_ENUM_CASE(AssetType, CORPORATE);
-        SWIRLY_ENUM_CASE(AssetType, CURRENCY);
-        SWIRLY_ENUM_CASE(AssetType, EQUITY);
-        SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
-        SWIRLY_ENUM_CASE(AssetType, INDEX);
-    }
-    terminate();
+  switch (type) {
+    SWIRLY_ENUM_CASE(AssetType, COMMODITY);
+    SWIRLY_ENUM_CASE(AssetType, CORPORATE);
+    SWIRLY_ENUM_CASE(AssetType, CURRENCY);
+    SWIRLY_ENUM_CASE(AssetType, EQUITY);
+    SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
+    SWIRLY_ENUM_CASE(AssetType, INDEX);
+  }
+  terminate();
 }
 
 const char* enumString(Direct direct)
 {
-    switch (direct) {
-        SWIRLY_ENUM_CASE(Direct, PAID);
-        SWIRLY_ENUM_CASE(Direct, GIVEN);
-    }
-    terminate();
+  switch (direct) {
+    SWIRLY_ENUM_CASE(Direct, PAID);
+    SWIRLY_ENUM_CASE(Direct, GIVEN);
+  }
+  terminate();
 }
 
 const char* enumString(RecType type)
 {
-    switch (type) {
-        SWIRLY_ENUM_CASE(RecType, ASSET);
-        SWIRLY_ENUM_CASE(RecType, CONTR);
-        SWIRLY_ENUM_CASE(RecType, MARKET);
-        SWIRLY_ENUM_CASE(RecType, TRADER);
-    }
-    terminate();
+  switch (type) {
+    SWIRLY_ENUM_CASE(RecType, ASSET);
+    SWIRLY_ENUM_CASE(RecType, CONTR);
+    SWIRLY_ENUM_CASE(RecType, MARKET);
+    SWIRLY_ENUM_CASE(RecType, TRADER);
+  }
+  terminate();
 }
 
 const char* enumString(Role role)
 {
-    switch (role) {
-        SWIRLY_ENUM_CASE(Role, NONE);
-        SWIRLY_ENUM_CASE(Role, MAKER);
-        SWIRLY_ENUM_CASE(Role, TAKER);
-    }
-    terminate();
+  switch (role) {
+    SWIRLY_ENUM_CASE(Role, NONE);
+    SWIRLY_ENUM_CASE(Role, MAKER);
+    SWIRLY_ENUM_CASE(Role, TAKER);
+  }
+  terminate();
 }
 
 const char* enumString(Side side)
 {
-    switch (side) {
-        SWIRLY_ENUM_CASE(Side, BUY);
-        SWIRLY_ENUM_CASE(Side, SELL);
-    }
-    terminate();
+  switch (side) {
+    SWIRLY_ENUM_CASE(Side, BUY);
+    SWIRLY_ENUM_CASE(Side, SELL);
+  }
+  terminate();
 }
 
 const char* enumString(State state)
 {
-    switch (state) {
-        SWIRLY_ENUM_CASE(State, NONE);
-        SWIRLY_ENUM_CASE(State, NEW);
-        SWIRLY_ENUM_CASE(State, REVISE);
-        SWIRLY_ENUM_CASE(State, CANCEL);
-        SWIRLY_ENUM_CASE(State, TRADE);
-    }
-    terminate();
+  switch (state) {
+    SWIRLY_ENUM_CASE(State, NONE);
+    SWIRLY_ENUM_CASE(State, NEW);
+    SWIRLY_ENUM_CASE(State, REVISE);
+    SWIRLY_ENUM_CASE(State, CANCEL);
+    SWIRLY_ENUM_CASE(State, TRADE);
+  }
+  terminate();
 }
 
 } // swirly

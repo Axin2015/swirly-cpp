@@ -23,20 +23,20 @@ namespace swirly {
 Contr::Contr(const StringView& mnem, const StringView& display, const StringView& asset,
              const StringView& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
              int pipDp, Lots minLots, Lots maxLots) noexcept
-    : Rec{RecType::CONTR, mnem, display},
-      asset_{asset},
-      ccy_{ccy},
-      lotNumer_{lotNumer},
-      lotDenom_{lotDenom},
-      qtyInc_{fractToReal(lotNumer, lotDenom)},
-      tickNumer_{tickNumer},
-      tickDenom_{tickDenom},
-      priceInc_{fractToReal(tickNumer, tickDenom)},
-      pipDp_{pipDp},
-      qtyDp_{realToDp(qtyInc_)},
-      priceDp_{realToDp(priceInc_)},
-      minLots_{minLots},
-      maxLots_{maxLots}
+  : Rec{RecType::CONTR, mnem, display},
+    asset_{asset},
+    ccy_{ccy},
+    lotNumer_{lotNumer},
+    lotDenom_{lotDenom},
+    qtyInc_{fractToReal(lotNumer, lotDenom)},
+    tickNumer_{tickNumer},
+    tickDenom_{tickDenom},
+    priceInc_{fractToReal(tickNumer, tickDenom)},
+    pipDp_{pipDp},
+    qtyDp_{realToDp(qtyInc_)},
+    priceDp_{realToDp(priceInc_)},
+    minLots_{minLots},
+    maxLots_{maxLots}
 {
 }
 
