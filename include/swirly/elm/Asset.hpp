@@ -49,6 +49,8 @@ class SWIRLY_API Asset : public Rec {
   Asset(Asset&&);
   Asset& operator=(Asset&&) = delete;
 
+  void toJson(std::ostream& os) const override;
+
   AssetType assetType() const noexcept { return type_; }
   boost::intrusive::set_member_hook<> mnemHook_;
 

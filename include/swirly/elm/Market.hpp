@@ -46,6 +46,8 @@ class SWIRLY_API Market : public Rec {
   Market(Market&&);
   Market& operator=(Market&&) = delete;
 
+  void toJson(std::ostream& os) const override;
+
   auto contr() const noexcept { return +contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto expiryDay() const noexcept { return expiryDay_; }

@@ -45,6 +45,8 @@ class SWIRLY_API Contr : public Rec {
   Contr(Contr&&);
   Contr& operator=(Contr&&) = delete;
 
+  void toJson(std::ostream& os) const override;
+
   auto asset() const noexcept { return +asset_; }
   auto ccy() const noexcept { return +ccy_; }
   auto lotNumer() const noexcept { return lotNumer_; }

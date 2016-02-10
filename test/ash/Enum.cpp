@@ -46,7 +46,7 @@ const char* enumString(Test t)
 
 template <>
 struct EnumTraits<Test> {
-  static void print(std::ostream& os, Test val) noexcept { os << enumString(val); }
+  static void print(ostream& os, Test val) noexcept { os << enumString(val); }
 };
 
 } // swirly

@@ -43,6 +43,8 @@ class SWIRLY_API Trader : public Rec {
   Trader(Trader&&);
   Trader& operator=(Trader&&) = delete;
 
+  void toJson(std::ostream& os) const override;
+
   auto email() const noexcept { return +email_; }
   boost::intrusive::set_member_hook<> mnemHook_;
 

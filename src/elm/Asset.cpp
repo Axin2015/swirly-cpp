@@ -16,6 +16,8 @@
  */
 #include <swirly/elm/Asset.hpp>
 
+using namespace std;
+
 namespace swirly {
 
 Asset::~Asset() noexcept = default;
@@ -23,5 +25,13 @@ Asset::~Asset() noexcept = default;
 Asset::Asset(const Asset&) = default;
 
 Asset::Asset(Asset&&) = default;
+
+void Asset::toJson(ostream& os) const
+{
+  os << "{\"mnem\":\"" << mnem_ //
+     << "\",\"display\":\"" << display_ //
+     << "\",\"type\":\"" << type_ //
+     << "\"}";
+}
 
 } // swirly

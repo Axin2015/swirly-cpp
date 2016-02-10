@@ -51,6 +51,8 @@ class SWIRLY_API Rec : public Comparable<Rec> {
   Rec(Rec&&);
   Rec& operator=(Rec&&) = delete;
 
+  virtual void toJson(std::ostream& os) const;
+
   int compare(const Rec& rhs) const noexcept
   {
     int result{swirly::compare(type_, rhs.type_)};
@@ -68,6 +70,12 @@ class SWIRLY_API Rec : public Comparable<Rec> {
   const Mnem mnem_;
   Display display_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
+{
+  rec.toJson(os);
+  return os;
+}
 
 /**
  * Record set keyed by mnemonic. Records are identified by mnemonic only, so instances should not be

@@ -16,6 +16,8 @@
  */
 #include <swirly/elm/Trader.hpp>
 
+using namespace std;
+
 namespace swirly {
 
 Trader::~Trader() noexcept = default;
@@ -23,5 +25,13 @@ Trader::~Trader() noexcept = default;
 Trader::Trader(const Trader&) = default;
 
 Trader::Trader(Trader&&) = default;
+
+void Trader::toJson(ostream& os) const
+{
+  os << "{\"mnem\":\"" << mnem_ //
+     << "\",\"display\":\"" << display_ //
+     << "\",\"email\":\"" << email_ //
+     << "\"}";
+}
 
 } // swirly

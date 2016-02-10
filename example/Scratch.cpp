@@ -22,11 +22,6 @@
 
 namespace swirly {
 
-inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
-{
-  return os << rec.type() << ' ' << rec.mnem() << ' ' << rec.display();
-}
-
 class MockModel : public Model {
  public:
   MockModel() noexcept = default;

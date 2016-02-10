@@ -48,4 +48,20 @@ Contr::Contr(const Contr&) = default;
 
 Contr::Contr(Contr&&) = default;
 
+void Contr::toJson(ostream& os) const
+{
+  os << "{\"mnem\":\"" << mnem_ //
+     << "\",\"display\":\"" << display_ //
+     << "\",\"asset\":\"" << asset_ //
+     << "\",\"ccy\":\"" << ccy_ //
+     << "\",\"lotNumer\":" << lotNumer_ //
+     << ",\"lotDenom\":" << lotDenom_ //
+     << ",\"tickNumer\":" << tickNumer_ //
+     << ",\"tickDenom\":" << tickDenom_ //
+     << ",\"pipDp\":" << pipDp_ //
+     << ",\"minLots\":" << minLots_ //
+     << ",\"maxLots\":" << maxLots_ //
+     << "}";
+}
+
 } // swirly

@@ -16,6 +16,8 @@
  */
 #include <swirly/elm/Market.hpp>
 
+#include <swirly/ash/JulianDay.hpp>
+
 #include <cassert>
 
 using namespace std;
@@ -38,5 +40,28 @@ Market::~Market() noexcept = default;
 Market::Market(const Market&) = default;
 
 Market::Market(Market&&) = default;
+
+void Market::toJson(ostream& os) const
+{
+  os << "{\"mnem\":\"" << mnem_ //
+     << "\",\"display\":\"" << display_ //
+     << "\",\"contr\":\"" << contr_ //
+     << "\",\"settlDate\":";
+
+  if (settlDay_ != 0_jd)
+    os << jdToIso(settlDay_);
+  else
+    os << "null";
+
+  os << ",\"expiryDate\":";
+
+  if (expiryDay_ != 0_jd)
+    os << jdToIso(expiryDay_);
+  else
+    os << "null";
+
+  os << ",\"state\":" << state_ //
+     << '}';
+}
 
 } // swirly
