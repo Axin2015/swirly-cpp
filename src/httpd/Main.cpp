@@ -95,7 +95,7 @@ class RestServ : public mg::Mgr<RestServ> {
   }
   void getRec(mg::HttpMessage data)
   {
-    rest_.assets(now(), out_);
+    rest_.assets(getTimeOfDay(), out_);
     out_ << R"({"mnem":"EURUSD"})";
   }
   void postRec(mg::HttpMessage data) {}
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 
     MockModel model;
     MockJourn journ;
-    Rest rest{model, journ, now()};
+    Rest rest{model, journ, getTimeOfDay()};
 
     RestServ rs{rest};
     auto& conn = rs.bind(HTTP_PORT);

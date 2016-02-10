@@ -20,7 +20,7 @@
 
 namespace swirly {
 
-Millis now()
+Millis getTimeOfDay()
 {
   timeval tv;
   gettimeofday(&tv, nullptr);
