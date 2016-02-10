@@ -42,7 +42,6 @@ class MockModel : public Model {
     s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
     s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
     s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
     return s;
   }
   ContrSet doReadContr(const Factory& factory) const override

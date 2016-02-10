@@ -37,13 +37,16 @@ AssetSet MockModel::doReadAsset(const Factory& factory) const
   s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
   s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
   s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-  s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
   return s;
 }
 
 ContrSet MockModel::doReadContr(const Factory& factory) const
 {
   ContrSet s;
+  s.insert(
+    factory.newContr("EURUSD", "EURUSD", "EUR", "USD", 1000000, 1, 1, 10000, 4, 1_lts, 10_lts));
+  s.insert(
+    factory.newContr("GBPUSD", "GBPUSD", "GBP", "USD", 1000000, 1, 1, 10000, 4, 1_lts, 10_lts));
   return s;
 }
 

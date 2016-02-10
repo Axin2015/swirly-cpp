@@ -91,12 +91,28 @@ class RestServ : public mg::Mgr<RestServ> {
 
       const auto len = static_cast<int>(out_.size());
       mg_printf(&nc, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%.*s", len, len, out_.data());
+
+    } else {
+      // FIXME.
     }
   }
   void getRec(mg::HttpMessage data)
   {
-    rest_.assets(getTimeOfDay(), out_);
-    out_ << R"({"mnem":"EURUSD"})";
+    if (!uri_.empty()) {
+
+      const auto tok = uri_.top();
+      uri_.pop();
+
+      if (tok == "asset") {
+        rest_.assets(getTimeOfDay(), out_);
+      } else if (tok == "contr") {
+        rest_.contrs(getTimeOfDay(), out_);
+      } else {
+        // FIXME.
+      }
+    } else {
+      // FIXME.
+    }
   }
   void postRec(mg::HttpMessage data) {}
   void putRec(mg::HttpMessage data) {}
