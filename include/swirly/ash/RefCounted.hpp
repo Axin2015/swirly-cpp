@@ -61,10 +61,10 @@ class SWIRLY_API RefCounted {
 
 using RefCountedPtr = boost::intrusive_ptr<RefCounted>;
 
-template <typename TypeT, typename... ArgsT>
-boost::intrusive_ptr<TypeT> makeRefCounted(ArgsT&&... args)
+template <typename ValueT, typename... ArgsT>
+boost::intrusive_ptr<ValueT> makeRefCounted(ArgsT&&... args)
 {
-  return {new TypeT{std::forward<ArgsT>(args)...}, false};
+  return {new ValueT{std::forward<ArgsT>(args)...}, false};
 }
 
 inline void intrusive_ptr_add_ref(const RefCounted* ptr) noexcept

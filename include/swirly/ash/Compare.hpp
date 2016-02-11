@@ -26,35 +26,35 @@ namespace swirly {
  * @{
  */
 
-template <typename TypeT>
+template <typename ValueT>
 class Comparable {
  public:
-  friend constexpr bool operator==(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator==(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) == 0;
   }
 
-  friend constexpr bool operator!=(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator!=(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) != 0;
   }
 
-  friend constexpr bool operator<(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator<(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) < 0;
   }
 
-  friend constexpr bool operator<=(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator<=(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) <= 0;
   }
 
-  friend constexpr bool operator>(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator>(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) > 0;
   }
 
-  friend constexpr bool operator>=(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator>=(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) >= 0;
   }
