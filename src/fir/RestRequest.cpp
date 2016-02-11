@@ -2,7 +2,7 @@
 #line 1 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
 // -*- C++ -*-
 /*
- * Swirly Order-Book and Matching-Engine.
+ * The Restful Matching-Engine.
  * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the

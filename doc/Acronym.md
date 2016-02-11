@@ -3,9 +3,11 @@ Acronym {#Acronym}
 
 - **API**: Application Programming Interface
 - **BBO**: Best Bid and Offer
+- **COB**: Close Of Business
 - **CLOB**: Central Limit Order-Book
 - **CPU**: Central Processing Unit
 - **ECN**: Electronic Communication Network
+- **EOD**: End Of Day
 - **FOK**: Fill Or Kill
 - **GTC**: Good Till Cancelled
 - **JSON**: Java-Script Object Notation

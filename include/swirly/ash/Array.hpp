@@ -1,5 +1,5 @@
 /*
- * Swirly Order-Book and Matching-Engine.
+ * The Restful Matching-Engine.
  * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -27,18 +27,18 @@ namespace swirly {
  * @{
  */
 
-template <typename TypeT>
+template <typename ValueT>
 class ArrayView {
  public:
-  using value_type = TypeT;
+  using value_type = ValueT;
 
-  using pointer = const TypeT*;
-  using const_pointer = const TypeT*;
+  using pointer = const ValueT*;
+  using const_pointer = const ValueT*;
 
-  using reference = const TypeT&;
-  using const_reference = const TypeT&;
+  using reference = const ValueT&;
+  using const_reference = const ValueT&;
 
-  using const_iterator = const TypeT*;
+  using const_iterator = const ValueT*;
   using iterator = const_iterator;
 
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
@@ -47,7 +47,7 @@ class ArrayView {
   using difference_type = ptrdiff_t;
   using size_type = std::size_t;
 
-  constexpr ArrayView(const TypeT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr} {}
+  constexpr ArrayView(const ValueT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr} {}
   template <typename TypeU, std::size_t SizeN>
   constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept : len_{SizeN}, ptr_{arr}
   {
@@ -71,10 +71,10 @@ class ArrayView {
   constexpr const_iterator cend() const noexcept { return ptr_ + len_; }
   const_reverse_iterator crbegin() const noexcept { return const_reverse_iterator(end()); }
   const_reverse_iterator crend() const noexcept { return const_reverse_iterator(begin()); }
-  constexpr const TypeT& operator[](size_type pos) const noexcept { return ptr_[pos]; }
-  constexpr const TypeT& front() const noexcept { return ptr_[0]; }
-  constexpr const TypeT& back() const noexcept { return ptr_[len_ - 1]; }
-  constexpr const TypeT* data() const noexcept { return ptr_; }
+  constexpr const ValueT& operator[](size_type pos) const noexcept { return ptr_[pos]; }
+  constexpr const ValueT& front() const noexcept { return ptr_[0]; }
+  constexpr const ValueT& back() const noexcept { return ptr_[len_ - 1]; }
+  constexpr const ValueT* data() const noexcept { return ptr_; }
   constexpr bool empty() const noexcept { return len_ == 0; }
   constexpr size_t size() const noexcept { return len_; }
   void clear() noexcept
@@ -91,18 +91,18 @@ class ArrayView {
  private:
   // Length in the first cache-line.
   std::size_t len_;
-  const TypeT* ptr_;
+  const ValueT* ptr_;
 };
 
-template <typename TypeT>
-constexpr ArrayView<std::remove_volatile_t<TypeT>> makeArrayView(const TypeT* ptr,
-                                                                 std::size_t len) noexcept
+template <typename ValueT>
+constexpr ArrayView<std::remove_volatile_t<ValueT>> makeArrayView(const ValueT* ptr,
+                                                                  std::size_t len) noexcept
 {
   return {ptr, len};
 }
 
-template <typename TypeT, std::size_t SizeN>
-constexpr ArrayView<std::remove_cv_t<TypeT>> makeArrayView(TypeT (&arr)[SizeN]) noexcept
+template <typename ValueT, std::size_t SizeN>
+constexpr ArrayView<std::remove_cv_t<ValueT>> makeArrayView(ValueT (&arr)[SizeN]) noexcept
 {
   return {arr};
 }

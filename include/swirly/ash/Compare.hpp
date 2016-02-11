@@ -1,5 +1,5 @@
 /*
- * Swirly Order-Book and Matching-Engine.
+ * The Restful Matching-Engine.
  * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -26,35 +26,35 @@ namespace swirly {
  * @{
  */
 
-template <typename TypeT>
+template <typename ValueT>
 class Comparable {
  public:
-  friend constexpr bool operator==(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator==(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) == 0;
   }
 
-  friend constexpr bool operator!=(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator!=(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) != 0;
   }
 
-  friend constexpr bool operator<(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator<(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) < 0;
   }
 
-  friend constexpr bool operator<=(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator<=(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) <= 0;
   }
 
-  friend constexpr bool operator>(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator>(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) > 0;
   }
 
-  friend constexpr bool operator>=(const TypeT& lhs, const TypeT& rhs) noexcept
+  friend constexpr bool operator>=(const ValueT& lhs, const ValueT& rhs) noexcept
   {
     return lhs.compare(rhs) >= 0;
   }
