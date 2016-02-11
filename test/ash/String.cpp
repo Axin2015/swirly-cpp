@@ -56,4 +56,11 @@ BOOST_AUTO_TEST_CASE(UpperBoundCase)
   BOOST_CHECK_EQUAL(sb, "Bar");
 }
 
+BOOST_AUTO_TEST_CASE(ToStringCase)
+{
+  BOOST_CHECK_EQUAL(toString("foo"_sv), "foo"s);
+  BOOST_CHECK_EQUAL(stoi(toString(12345)), 12345);
+  BOOST_CHECK_EQUAL(stod(toString(12345.67)), 12345.67);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

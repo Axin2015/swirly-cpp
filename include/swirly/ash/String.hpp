@@ -23,6 +23,7 @@
 #include <experimental/string_view>
 
 #include <cstring>
+#include <sstream>
 
 namespace std {
 using string_view = experimental::string_view;
@@ -240,6 +241,20 @@ template <std::size_t MaxN>
 constexpr std::ostream& operator<<(std::ostream& os, const StringBuf<MaxN>& rhs) noexcept
 {
   return os << +rhs;
+}
+
+template <typename ValueT, typename std::enable_if_t<std::is_arithmetic<ValueT>::value>* = nullptr>
+std::string toString(ValueT val)
+{
+  return std::to_string(val);
+}
+
+template <typename ValueT, typename std::enable_if_t<!std::is_arithmetic<ValueT>::value>* = nullptr>
+std::string toString(const ValueT& val)
+{
+  std::stringstream ss;
+  ss << val;
+  return ss.str();
 }
 
 /** @} */
