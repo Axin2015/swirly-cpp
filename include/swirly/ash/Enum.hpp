@@ -17,7 +17,7 @@
 #ifndef SWIRLY_ASH_ENUM_HPP
 #define SWIRLY_ASH_ENUM_HPP
 
-#include <iostream>
+#include <iosfwd>
 #include <type_traits>
 
 namespace swirly {

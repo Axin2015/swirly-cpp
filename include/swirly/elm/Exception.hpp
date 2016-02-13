@@ -19,6 +19,8 @@
 
 #include <swirly/ash/Exception.hpp>
 
+#include <iosfwd>
+
 namespace swirly {
 
 /**
@@ -39,7 +41,17 @@ class SWIRLY_API ServException : public Exception {
   // Move.
   ServException(ServException&&) noexcept = default;
   ServException& operator=(ServException&&) noexcept = default;
+
+  virtual void toJson(std::ostream& os) const;
+
+  virtual int httpStatus() const noexcept = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const ServException& e)
+{
+  e.toJson(os);
+  return os;
+}
 
 /**
  * The request could not be understood by the server due to malformed syntax. The client SHOULD NOT
@@ -58,6 +70,8 @@ class SWIRLY_API BadRequestException : public ServException {
   // Move.
   BadRequestException(BadRequestException&&) noexcept = default;
   BadRequestException& operator=(BadRequestException&&) noexcept = default;
+
+  int httpStatus() const noexcept override;
 };
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
@@ -170,6 +184,8 @@ class SWIRLY_API ForbiddenException : public ServException {
   // Move.
   ForbiddenException(ForbiddenException&&) noexcept = default;
   ForbiddenException& operator=(ForbiddenException&&) noexcept = default;
+
+  int httpStatus() const noexcept override;
 };
 
 /**
@@ -188,21 +204,8 @@ class SWIRLY_API InternalException : public ServException {
   // Move.
   InternalException(InternalException&&) noexcept = default;
   InternalException& operator=(InternalException&&) noexcept = default;
-};
 
-class SWIRLY_API LiquidityUnavailableException : public InternalException {
- public:
-  LiquidityUnavailableException() noexcept = default;
-
-  ~LiquidityUnavailableException() noexcept override;
-
-  // Copy.
-  LiquidityUnavailableException(const LiquidityUnavailableException&) noexcept = default;
-  LiquidityUnavailableException& operator=(const LiquidityUnavailableException&) noexcept = default;
-
-  // Move.
-  LiquidityUnavailableException(LiquidityUnavailableException&&) noexcept = default;
-  LiquidityUnavailableException& operator=(LiquidityUnavailableException&&) noexcept = default;
+  int httpStatus() const noexcept override;
 };
 
 /**
@@ -223,6 +226,8 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
   // Move.
   MethodNotAllowedException(MethodNotAllowedException&&) noexcept = default;
   MethodNotAllowedException& operator=(MethodNotAllowedException&&) noexcept = default;
+
+  int httpStatus() const noexcept override;
 };
 
 /**
@@ -246,6 +251,8 @@ class SWIRLY_API NotFoundException : public ServException {
   // Move.
   NotFoundException(NotFoundException&&) noexcept = default;
   NotFoundException& operator=(NotFoundException&&) noexcept = default;
+
+  int httpStatus() const noexcept override;
 };
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
@@ -343,14 +350,20 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
   // Move.
   ServiceUnavailableException(ServiceUnavailableException&&) noexcept = default;
   ServiceUnavailableException& operator=(ServiceUnavailableException&&) noexcept = default;
+
+  int httpStatus() const noexcept override;
 };
 
 /**
- * The server understood the request, but is refusing to fulfill it. Authorization will not help and
- * the request SHOULD NOT be repeated. If the request method was not HEAD and the server wishes to
- * make public why the request has not been fulfilled, it SHOULD describe the reason for the refusal
- * in the entity. If the server does not wish to make this information available to the client, the
- * status code 404 (Not Found) can be used instead.
+ * The request requires user authentication. The response MUST include a WWW-Authenticate header
+ * field (section 14.47) containing a challenge applicable to the requested resource. The client MAY
+ * repeat the request with a suitable Authorization header field (section 14.8). If the request
+ * already included Authorization credentials, then the 401 response indicates that authorization
+ * has been refused for those credentials. If the 401 response contains the same challenge as the
+ * prior response, and the user agent has already attempted authentication at least once, then the
+ * user SHOULD be presented the entity that was given in the response, since that entity might
+ * include relevant diagnostic information. HTTP access authentication is explained in "HTTP
+ * Authentication: Basic and Digest Access Authentication".
  */
 class SWIRLY_API UnauthorizedException : public ServException {
  public:
@@ -365,6 +378,8 @@ class SWIRLY_API UnauthorizedException : public ServException {
   // Move.
   UnauthorizedException(UnauthorizedException&&) noexcept = default;
   UnauthorizedException& operator=(UnauthorizedException&&) noexcept = default;
+
+  int httpStatus() const noexcept override;
 };
 
 /** @} */

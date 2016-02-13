@@ -16,15 +16,27 @@
  */
 #include <swirly/elm/Exception.hpp>
 
+#include <swirly/ash/String.hpp>
+
 #include <boost/test/unit_test.hpp>
 
 using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(ExceptionSuite)
 
-BOOST_AUTO_TEST_CASE(ServExceptionCase)
+BOOST_AUTO_TEST_CASE(JsonCase)
 {
-  BOOST_CHECK_THROW(throwException<ServException>("[%d]", 123), ServException);
+  auto e = makeException<NotFoundException>("this is a test");
+
+  BOOST_CHECK_EQUAL(toString(e), //
+                    "{\"num\":404"
+                    ",\"msg\":\"this is a test\""
+                    "}");
+}
+
+BOOST_AUTO_TEST_CASE(ThrowExceptionCase)
+{
+  BOOST_CHECK_THROW(throwException<NotFoundException>("[%d]", 123), NotFoundException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
