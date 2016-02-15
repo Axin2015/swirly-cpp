@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_SUITE(AssetSuite)
 
 BOOST_AUTO_TEST_CASE(JsonCase)
 {
-  Asset asset{"GBP", "United Kingdom, Pounds", AssetType::CURRENCY};
+  Asset asset{"GBP", "United Kingdom, Pounds", AssetType::Currency};
 
   BOOST_CHECK_EQUAL(toString(asset), //
                     "{\"mnem\":\"GBP\""

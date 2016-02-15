@@ -38,7 +38,7 @@ using namespace std;
 
 namespace swirly {
 namespace {
-static const regex MNEM_PATTERN{"(\\d{4}[- ]){3}\\d{4}"};
+static const regex mnemPattern{"(\\d{4}[- ]){3}\\d{4}"};
 } // anonymous
 
 struct Serv::Impl {
@@ -51,7 +51,7 @@ struct Serv::Impl {
                           const string_view& contr, Jday settlDay, Jday expiryDay,
                           MarketState state) const
   {
-    if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
+    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern))
       throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
     auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
     return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
@@ -59,7 +59,7 @@ struct Serv::Impl {
   TraderSessPtr newTrader(const string_view& mnem, const string_view& display,
                           const string_view& email) const
   {
-    if (!regex_match(mnem.begin(), mnem.end(), MNEM_PATTERN))
+    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern))
       throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
     auto up = factory.newTrader(mnem, display, email);
     return {static_cast<TraderSess*>(up.release()), std::move(up.get_deleter())};

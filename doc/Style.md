@@ -22,8 +22,8 @@ Naming
 ------
 
 - [CamelCase] naming;
-- types start with upper-case;
-- functions start with lower-case.
+- types and integer constants start with upper-case;
+- functions and non-integer constants start with lower-case.
 
 Big Six
 -------

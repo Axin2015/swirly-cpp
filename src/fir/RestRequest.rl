@@ -1,6 +1,6 @@
 // -*- C++ -*-
 /*
- * Swirly Order-Book and Matching-Engine.
+ * The Restful Matching-Engine.
  * Copyright (C) 2013, 2016 Swirly Cloud Limited.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -78,124 +78,124 @@ namespace {
     ) >beginStr;
 
     action nullMnem {
-        fields_ &= ~RestRequest::MNEM;
+        fields_ &= ~Mnem;
         mnem_.len = 0;
     }
     action beginMnem {
         str_.len = &mnem_.len;
         str_.buf = mnem_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
     }
     action endMnem {
-        fields_ |= RestRequest::MNEM;
+        fields_ |= Mnem;
     }
     mnem = 'null' %nullMnem
          | str >beginMnem %endMnem;
 
     action nullDisplay {
-        fields_ &= ~RestRequest::DISPLAY;
+        fields_ &= ~Display;
         display_.len = 0;
     }
     action beginDisplay {
         str_.len = &display_.len;
         str_.buf = display_.buf;
-        str_.max = DISPLAY_MAX;
+        str_.max = DisplayMax;
     }
     action endDisplay {
-        fields_ |= RestRequest::DISPLAY;
+        fields_ |= Display;
     }
     display = 'null' %nullDisplay
             | str >beginDisplay %endDisplay;
 
     action nullEmail {
-        fields_ &= ~RestRequest::EMAIL;
+        fields_ &= ~Email;
         email_.len = 0;
     }
     action beginEmail {
         str_.len = &email_.len;
         str_.buf = email_.buf;
-        str_.max = EMAIL_MAX;
+        str_.max = EmailMax;
     }
     action endEmail {
-        fields_ |= RestRequest::EMAIL;
+        fields_ |= Email;
     }
     email = 'null' %nullEmail
           | str >beginEmail %endEmail;
 
     action nullTrader {
-        fields_ &= ~RestRequest::TRADER;
+        fields_ &= ~Trader;
         trader_.len = 0;
     }
     action beginTrader {
         str_.len = &trader_.len;
         str_.buf = trader_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
     }
     action endTrader {
-        fields_ |= RestRequest::TRADER;
+        fields_ |= Trader;
     }
     trader = 'null' %nullTrader
            | str >beginTrader %endTrader;
 
     action nullContr {
-        fields_ &= ~RestRequest::CONTR;
+        fields_ &= ~Contr;
         contr_.len = 0;
     }
     action beginContr {
         str_.len = &contr_.len;
         str_.buf = contr_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
     }
     action endContr {
-        fields_ |= RestRequest::CONTR;
+        fields_ |= Contr;
     }
     contr = 'null' %nullContr
           | str >beginContr %endContr;
 
     action nullSettlDate {
-        fields_ &= ~RestRequest::SETTL_DATE;
+        fields_ &= ~SettlDate;
         settlDate_ = 0_dt;
     }
     action endSettlDate {
-        fields_ |= RestRequest::SETTL_DATE;
+        fields_ |= SettlDate;
         settlDate_ = box<IsoDate>(num());
     }
     settlDate = 'null' %nullSettlDate
               | num %endSettlDate;
 
     action nullExpiryDate {
-        fields_ &= ~RestRequest::EXPIRY_DATE;
+        fields_ &= ~ExpiryDate;
         expiryDate_ = 0_dt;
     }
     action endExpiryDate {
-        fields_ |= RestRequest::EXPIRY_DATE;
+        fields_ |= ExpiryDate;
         expiryDate_ = box<IsoDate>(num());
     }
     expiryDate = 'null' %nullExpiryDate
                | num %endExpiryDate;
 
     action nullRef {
-        fields_ &= ~RestRequest::REF;
+        fields_ &= ~Ref;
         ref_.len = 0;
     }
     action beginRef {
         str_.len = &ref_.len;
         str_.buf = ref_.buf;
-        str_.max = REF_MAX;
+        str_.max = RefMax;
     }
     action endRef {
-        fields_ |= RestRequest::REF;
+        fields_ |= Ref;
     }
     ref = 'null' %nullRef
         | str >beginRef %endRef;
 
     action nullState {
-        fields_ &= ~RestRequest::STATE;
+        fields_ &= ~State;
         state_ = 0;
     }
     action endState {
         if (num_.sign >= 0) {
-            fields_ |= RestRequest::STATE;
+            fields_ |= State;
             state_ = num();
         } else {
             cs = json_error; msg = "negative state field";
@@ -205,81 +205,81 @@ namespace {
           | num %endState;
 
     action nullTicks {
-        fields_ &= ~RestRequest::TICKS;
+        fields_ &= ~Ticks;
         ticks_ = 0_tks;
     }
     action endTicks {
-        fields_ |= RestRequest::TICKS;
-        ticks_ = box<Ticks>(num());
+        fields_ |= Ticks;
+        ticks_ = box<swirly::Ticks>(num());
     }
     ticks = 'null' %nullTicks
           | num %endTicks;
 
     action nullSide {
-        fields_ &= ~RestRequest::SIDE;
-        side_ = box<Side>(0);
+        fields_ &= ~Side;
+        side_ = box<swirly::Side>(0);
     }
     action buySide {
-        fields_ |= RestRequest::SIDE;
-        side_ = Side::BUY;
+        fields_ |= Side;
+        side_ = swirly::Side::Buy;
     }
     action sellSide {
-        fields_ |= RestRequest::SIDE;
-        side_ = Side::SELL;
+        fields_ |= Side;
+        side_ = swirly::Side::Sell;
     }
     side = 'null' %nullSide
          | '"BUY"'i %buySide
          | '"SELL"'i %sellSide;
 
     action nullLots {
-        fields_ &= ~RestRequest::LOTS;
+        fields_ &= ~Lots;
         lots_ = 0_lts;
     }
     action endLots {
-        fields_ |= RestRequest::LOTS;
-        lots_ = box<Lots>(num());
+        fields_ |= Lots;
+        lots_ = box<swirly::Lots>(num());
     }
     lots = 'null' %nullLots
          | num %endLots;
 
     action nullMinLots {
-        fields_ &= ~RestRequest::MIN_LOTS;
+        fields_ &= ~MinLots;
         minLots_ = 0_lts;
     }
     action endMinLots {
-        fields_ |= RestRequest::MIN_LOTS;
-        minLots_ = box<Lots>(num());
+        fields_ |= MinLots;
+        minLots_ = box<swirly::Lots>(num());
     }
     minLots = 'null' %nullMinLots
             | num %endMinLots;
 
     action nullRole {
-        fields_ &= ~RestRequest::ROLE;
-        role_ = Role::NONE;
+        fields_ &= ~Role;
+        role_ = swirly::Role::None;
     }
     action makerRole {
-        fields_ |= RestRequest::ROLE;
-        role_ = Role::MAKER;
+        fields_ |= Role;
+        role_ = swirly::Role::Maker;
     }
     action takerRole {
-        fields_ |= RestRequest::ROLE;
-        role_ = Role::TAKER;
+        fields_ |= Role;
+        role_ = swirly::Role::Taker;
     }
     role = 'null' %nullRole
          | '"MAKER"'i %makerRole
          | '"TAKER"'i %takerRole;
 
     action nullCpty {
-        fields_ &= ~RestRequest::CPTY;
+        fields_ &= ~Cpty;
         cpty_.len = 0;
     }
     action beginCpty {
         str_.len = &cpty_.len;
         str_.buf = cpty_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
     }
     action endCpty {
-        fields_ |= RestRequest::CPTY;
+        fields_ |= Cpty;
     }
     cpty = 'null' %nullCpty
          | str >beginCpty %endCpty;
@@ -337,11 +337,11 @@ void RestRequest::reset(bool clear) noexcept
     expiryDate_ = 0_dt;
     ref_.len = 0;
     state_ = 0;
-    side_ = box<Side>(0);
+    side_ = box<swirly::Side>(0);
     lots_ = 0_lts;
     ticks_ = 0_tks;
     minLots_ = 0_lts;
-    role_ = Role::NONE;
+    role_ = swirly::Role::None;
     cpty_.len = 0;
 }
 

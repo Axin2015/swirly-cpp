@@ -27,14 +27,6 @@ namespace swirly {
  * @{
  */
 
-/**
- * Helper macro for implementing enumString() case statements.
- */
-#define SWIRLY_ENUM_CASE(type, val)                                                                \
-  case type::val:                                                                                  \
-    return #val;                                                                                   \
-    break
-
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept
 {

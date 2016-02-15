@@ -28,14 +28,14 @@ BOOST_AUTO_TEST_SUITE(LevelSuite)
 BOOST_AUTO_TEST_CASE(LevelSetCase)
 {
   const Order order{"MARAYL",   "EURUSD",  "EURUSD", 0_jd,      0_id,  "",
-                    State::NEW, Side::BUY, 10_lts,   12345_tks, 0_lts, 0_lts,
+                    State::New, Side::Buy, 10_lts,   12345_tks, 0_lts, 0_lts,
                     0_cst,      0_lts,     0_tks,    0_lts,     0_ms,  0_ms};
 
   LevelSet s;
 
   Level& level1{*s.emplace(order)};
   BOOST_CHECK_EQUAL(level1.key(), -12345);
-  BOOST_CHECK(s.find(Side::BUY, 12345_tks) != s.end());
+  BOOST_CHECK(s.find(Side::Buy, 12345_tks) != s.end());
 
   // Duplicate.
   Level& level2{*s.emplace(order)};

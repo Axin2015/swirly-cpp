@@ -23,12 +23,18 @@ namespace swirly {
 const char* enumString(AssetType type)
 {
   switch (type) {
-    SWIRLY_ENUM_CASE(AssetType, COMMODITY);
-    SWIRLY_ENUM_CASE(AssetType, CORPORATE);
-    SWIRLY_ENUM_CASE(AssetType, CURRENCY);
-    SWIRLY_ENUM_CASE(AssetType, EQUITY);
-    SWIRLY_ENUM_CASE(AssetType, GOVERNMENT);
-    SWIRLY_ENUM_CASE(AssetType, INDEX);
+  case AssetType::Commodity:
+    return "COMMODITY";
+  case AssetType::Corporate:
+    return "CORPORATE";
+  case AssetType::Currency:
+    return "CURRENCY";
+  case AssetType::Equity:
+    return "EQUITY";
+  case AssetType::Government:
+    return "GOVERNMENT";
+  case AssetType::Index:
+    return "INDEX";
   }
   terminate();
 }
@@ -36,8 +42,10 @@ const char* enumString(AssetType type)
 const char* enumString(Direct direct)
 {
   switch (direct) {
-    SWIRLY_ENUM_CASE(Direct, PAID);
-    SWIRLY_ENUM_CASE(Direct, GIVEN);
+  case Direct::Paid:
+    return "PAID";
+  case Direct::Given:
+    return "GIVEN";
   }
   terminate();
 }
@@ -45,10 +53,14 @@ const char* enumString(Direct direct)
 const char* enumString(RecType type)
 {
   switch (type) {
-    SWIRLY_ENUM_CASE(RecType, ASSET);
-    SWIRLY_ENUM_CASE(RecType, CONTR);
-    SWIRLY_ENUM_CASE(RecType, MARKET);
-    SWIRLY_ENUM_CASE(RecType, TRADER);
+  case RecType::Asset:
+    return "ASSET";
+  case RecType::Contr:
+    return "CONTR";
+  case RecType::Market:
+    return "MARKET";
+  case RecType::Trader:
+    return "TRADER";
   }
   terminate();
 }
@@ -56,9 +68,12 @@ const char* enumString(RecType type)
 const char* enumString(Role role)
 {
   switch (role) {
-    SWIRLY_ENUM_CASE(Role, NONE);
-    SWIRLY_ENUM_CASE(Role, MAKER);
-    SWIRLY_ENUM_CASE(Role, TAKER);
+  case Role::None:
+    return "NONE";
+  case Role::Maker:
+    return "MAKER";
+  case Role::Taker:
+    return "TAKER";
   }
   terminate();
 }
@@ -66,8 +81,10 @@ const char* enumString(Role role)
 const char* enumString(Side side)
 {
   switch (side) {
-    SWIRLY_ENUM_CASE(Side, BUY);
-    SWIRLY_ENUM_CASE(Side, SELL);
+  case Side::Buy:
+    return "BUY";
+  case Side::Sell:
+    return "SELL";
   }
   terminate();
 }
@@ -75,11 +92,16 @@ const char* enumString(Side side)
 const char* enumString(State state)
 {
   switch (state) {
-    SWIRLY_ENUM_CASE(State, NONE);
-    SWIRLY_ENUM_CASE(State, NEW);
-    SWIRLY_ENUM_CASE(State, REVISE);
-    SWIRLY_ENUM_CASE(State, CANCEL);
-    SWIRLY_ENUM_CASE(State, TRADE);
+  case State::None:
+    return "NONE";
+  case State::New:
+    return "NEW";
+  case State::Revise:
+    return "REVISE";
+  case State::Cancel:
+    return "CANCEL";
+  case State::Trade:
+    return "TRADE";
   }
   terminate();
 }

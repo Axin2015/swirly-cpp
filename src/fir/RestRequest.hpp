@@ -31,21 +31,21 @@ namespace swirly {
 class SWIRLY_API RestRequest {
  public:
   enum : unsigned {
-    MNEM = 1 << 0,
-    DISPLAY = 1 << 1,
-    EMAIL = 1 << 2,
-    TRADER = 1 << 3,
-    CONTR = 1 << 4,
-    SETTL_DATE = 1 << 5,
-    EXPIRY_DATE = 1 << 6,
-    REF = 1 << 7,
-    STATE = 1 << 8,
-    SIDE = 1 << 9,
-    LOTS = 1 << 10,
-    TICKS = 1 << 11,
-    MIN_LOTS = 1 << 12,
-    ROLE = 1 << 13,
-    CPTY = 1 << 14
+    Mnem = 1 << 0,
+    Display = 1 << 1,
+    Email = 1 << 2,
+    Trader = 1 << 3,
+    Contr = 1 << 4,
+    SettlDate = 1 << 5,
+    ExpiryDate = 1 << 6,
+    Ref = 1 << 7,
+    State = 1 << 8,
+    Side = 1 << 9,
+    Lots = 1 << 10,
+    Ticks = 1 << 11,
+    MinLots = 1 << 12,
+    Role = 1 << 13,
+    Cpty = 1 << 14
   };
 
   RestRequest() noexcept { reset(); }
@@ -69,11 +69,11 @@ class SWIRLY_API RestRequest {
   IsoDate expiryDate() const noexcept { return expiryDate_; }
   std::string_view ref() const noexcept { return {ref_.buf, ref_.len}; }
   MarketState state() const noexcept { return state_; }
-  Side side() const noexcept { return side_; }
-  Lots lots() const noexcept { return lots_; }
-  Ticks ticks() const noexcept { return ticks_; }
-  Lots minLots() const noexcept { return minLots_; }
-  Role role() const noexcept { return role_; }
+  swirly::Side side() const noexcept { return side_; }
+  swirly::Lots lots() const noexcept { return lots_; }
+  swirly::Ticks ticks() const noexcept { return ticks_; }
+  swirly::Lots minLots() const noexcept { return minLots_; }
+  swirly::Role role() const noexcept { return role_; }
   std::string_view cpty() const noexcept { return {cpty_.buf, cpty_.len}; }
   void reset(bool clear = true) noexcept;
 
@@ -103,11 +103,11 @@ class SWIRLY_API RestRequest {
   IsoDate expiryDate_;
   Ref::Data ref_;
   MarketState state_;
-  Side side_;
-  Lots lots_;
-  Ticks ticks_;
-  Lots minLots_;
-  Role role_;
+  swirly::Side side_;
+  swirly::Lots lots_;
+  swirly::Ticks ticks_;
+  swirly::Lots minLots_;
+  swirly::Role role_;
   Mnem::Data cpty_;
 
   long num() const noexcept { return num_.sign * num_.digits; }

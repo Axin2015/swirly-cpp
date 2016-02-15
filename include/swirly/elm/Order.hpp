@@ -79,7 +79,7 @@ class SWIRLY_API Order : public Request {
   {
     assert(lots_ > 0_lts);
     assert(lots_ >= minLots_);
-    state_ = State::NEW;
+    state_ = State::New;
     resd_ = lots_;
     exec_ = 0_lts;
     cost_ = 0_cst;
@@ -94,14 +94,14 @@ class SWIRLY_API Order : public Request {
     assert(lots <= lots_);
     const auto delta = lots_ - lots;
     assert(delta >= 0_lts);
-    state_ = State::REVISE;
+    state_ = State::Revise;
     lots_ = lots;
     resd_ -= delta;
     modified_ = now;
   }
   void cancel(Millis now) noexcept
   {
-    state_ = State::CANCEL;
+    state_ = State::Cancel;
     // Note that executed lots is not affected.
     resd_ = 0_lts;
     modified_ = now;
@@ -109,7 +109,7 @@ class SWIRLY_API Order : public Request {
   void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks, Millis now) noexcept
   {
     using namespace enumops;
-    state_ = State::TRADE;
+    state_ = State::Trade;
     resd_ -= takenLots;
     exec_ += takenLots;
     cost_ += takenCost;

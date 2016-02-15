@@ -26,7 +26,7 @@ using namespace swirly;
 
 namespace swirly {
 
-enum class Test : int { FOO = 1, BAR = 2, BAZ = 4, QUX = 8 };
+enum class Test : int { Foo = 1, Bar = 2, Baz = 4, Qux = 8 };
 
 constexpr Test operator""_test(unsigned long long val) noexcept
 {
@@ -36,10 +36,14 @@ constexpr Test operator""_test(unsigned long long val) noexcept
 const char* enumString(Test t)
 {
   switch (t) {
-    SWIRLY_ENUM_CASE(Test, FOO);
-    SWIRLY_ENUM_CASE(Test, BAR);
-    SWIRLY_ENUM_CASE(Test, BAZ);
-    SWIRLY_ENUM_CASE(Test, QUX);
+  case Test::Foo:
+    return "FOO";
+  case Test::Bar:
+    return "BAR";
+  case Test::Baz:
+    return "BAZ";
+  case Test::Qux:
+    return "QUX";
   }
   terminate();
 }
@@ -236,10 +240,10 @@ BOOST_AUTO_TEST_CASE(EnumOpsCase)
 
 BOOST_AUTO_TEST_CASE(EnumStringCase)
 {
-  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::FOO), "FOO");
-  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::BAR), "BAR");
-  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::BAZ), "BAZ");
-  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::QUX), "QUX");
+  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::Foo), "FOO");
+  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::Bar), "BAR");
+  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::Baz), "BAZ");
+  BOOST_CHECK_EQUAL(lexical_cast<string>(Test::Qux), "QUX");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

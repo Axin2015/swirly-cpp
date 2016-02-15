@@ -31,10 +31,10 @@ namespace {
 // http://www.di-mgt.com.au/wclock/tz.html
 
 // America/New_York.
-const lt::time_zone_ptr NY{new lt::posix_time_zone{"EST-5EDT,M3.2.0/2,M11.1.0/2"}};
+const lt::time_zone_ptr newYork{new lt::posix_time_zone{"EST-5EDT,M3.2.0/2,M11.1.0/2"}};
 
 // Roll at 5pm.
-constexpr int ROLL_HOUR{17};
+constexpr int RollHour{17};
 
 inline pt::ptime millisToPtime(Millis ms)
 {
@@ -45,9 +45,9 @@ inline pt::ptime millisToPtime(Millis ms)
 
 Jday getBusDay(Millis ms)
 {
-  lt::local_date_time ldt{millisToPtime(ms), NY};
+  lt::local_date_time ldt{millisToPtime(ms), newYork};
   // Add 7 hours to 17.00 will roll the date.
-  ldt += pt::hours(24 - ROLL_HOUR);
+  ldt += pt::hours(24 - RollHour);
   return box<Jday>(ldt.local_time().date().julian_day());
 }
 

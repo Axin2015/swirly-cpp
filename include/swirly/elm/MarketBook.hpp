@@ -89,10 +89,10 @@ class SWIRLY_API MarketBook : public Market {
   }
 
  private:
-  BookSide& side(Side side) noexcept { return side == Side::BUY ? bidSide_ : offerSide_; }
+  BookSide& side(Side side) noexcept { return side == Side::Buy ? bidSide_ : offerSide_; }
   const BookSide& side(Side side) const noexcept
   {
-    return side == Side::BUY ? bidSide_ : offerSide_;
+    return side == Side::Buy ? bidSide_ : offerSide_;
   }
 
   Lots lastLots_;

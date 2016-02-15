@@ -34,9 +34,9 @@ MockModel& MockModel::operator=(MockModel&&) noexcept = default;
 AssetSet MockModel::doReadAsset(const Factory& factory) const
 {
   AssetSet s;
-  s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
-  s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
-  s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
+  s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::Currency));
+  s.insert(factory.newAsset("GBP", "Sterling", AssetType::Currency));
+  s.insert(factory.newAsset("USD", "US Dollar", AssetType::Currency));
   return s;
 }
 

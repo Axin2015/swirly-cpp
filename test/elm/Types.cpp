@@ -24,32 +24,32 @@ BOOST_AUTO_TEST_SUITE(TypesSuite)
 
 BOOST_AUTO_TEST_CASE(AssetTypeCase)
 {
-  BOOST_CHECK_EQUAL(enumString(AssetType::COMMODITY), "COMMODITY");
+  BOOST_CHECK_EQUAL(enumString(AssetType::Commodity), "COMMODITY");
 }
 
 BOOST_AUTO_TEST_CASE(DirectCase)
 {
-  BOOST_CHECK_EQUAL(enumString(Direct::PAID), "PAID");
+  BOOST_CHECK_EQUAL(enumString(Direct::Paid), "PAID");
 }
 
 BOOST_AUTO_TEST_CASE(RecTypeCase)
 {
-  BOOST_CHECK_EQUAL(enumString(RecType::ASSET), "ASSET");
+  BOOST_CHECK_EQUAL(enumString(RecType::Asset), "ASSET");
 }
 
 BOOST_AUTO_TEST_CASE(RoleCase)
 {
-  BOOST_CHECK_EQUAL(enumString(Role::MAKER), "MAKER");
+  BOOST_CHECK_EQUAL(enumString(Role::Maker), "MAKER");
 }
 
 BOOST_AUTO_TEST_CASE(SideCase)
 {
-  BOOST_CHECK_EQUAL(enumString(Side::BUY), "BUY");
+  BOOST_CHECK_EQUAL(enumString(Side::Buy), "BUY");
 }
 
 BOOST_AUTO_TEST_CASE(StateCase)
 {
-  BOOST_CHECK_EQUAL(enumString(State::NEW), "NEW");
+  BOOST_CHECK_EQUAL(enumString(State::New), "NEW");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

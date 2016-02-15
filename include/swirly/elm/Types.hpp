@@ -75,46 +75,45 @@ using MarketState = unsigned;
 /**
  * Maximum display characters.
  */
-constexpr std::size_t DISPLAY_MAX = 64;
+constexpr std::size_t DisplayMax{64};
 
 /**
  * Maximum email characters.
  */
-constexpr std::size_t EMAIL_MAX = 64;
+constexpr std::size_t EmailMax{64};
 
 /**
  * Maximum mnemonic characters.
  */
-constexpr std::size_t MNEM_MAX = 16;
+constexpr std::size_t MnemMax{16};
 
 /**
  * Maximum reference characters.
  */
-constexpr std::size_t REF_MAX = 64;
+constexpr std::size_t RefMax{64};
 
 /**
  * Description suitable for display on user-interface.
  */
-using Display = StringBuf<DISPLAY_MAX>;
+using Display = StringBuf<DisplayMax>;
 
 /**
  * Email address.
  */
-using Email = StringBuf<EMAIL_MAX>;
+using Email = StringBuf<EmailMax>;
 
 /**
  * Memorable identifier.
  */
-using Mnem = StringBuf<MNEM_MAX>;
+using Mnem = StringBuf<MnemMax>;
 
 /**
  * Reference.
  */
-using Ref = StringBuf<REF_MAX>;
+using Ref = StringBuf<RefMax>;
 
 using MarketId = std::pair<std::string_view, Iden>;
-
-enum class AssetType { COMMODITY = 1, CORPORATE, CURRENCY, EQUITY, GOVERNMENT, INDEX };
+enum class AssetType { Commodity = 1, Corporate, Currency, Equity, Government, Index };
 
 SWIRLY_API const char* enumString(AssetType type);
 
@@ -127,11 +126,11 @@ enum class Direct {
   /**
    * Aggressor buys. I.e. taker lifts the offer.
    */
-  PAID = 1,
+  Paid = 1,
   /**
    * Aggressor sells. I.e. taker hits the bid.
    */
-  GIVEN = -1
+  Given = -1
 };
 
 SWIRLY_API const char* enumString(Direct direct);
@@ -145,19 +144,19 @@ enum class RecType {
   /**
    * Asset.
    */
-  ASSET = 1,
+  Asset = 1,
   /**
    * Contract.
    */
-  CONTR,
+  Contr,
   /**
    * Market.
    */
-  MARKET,
+  Market,
   /**
    * Trader.
    */
-  TRADER
+  Trader
 };
 
 SWIRLY_API const char* enumString(RecType type);
@@ -171,15 +170,15 @@ enum class Role {
   /**
    * No role.
    */
-  NONE = 0,
+  None = 0,
   /**
    * Passive buyer or seller that receives the spread.
    */
-  MAKER,
+  Maker,
   /**
    * Aggressive buyer or seller that crosses the market and pays the spread.
    */
-  TAKER
+  Taker
 };
 
 SWIRLY_API const char* enumString(Role role);
@@ -189,7 +188,7 @@ struct EnumTraits<Role> {
   static void print(std::ostream& os, Role val) noexcept { os << enumString(val); }
 };
 
-enum class Side { BUY = 1, SELL = -1 };
+enum class Side { Buy = 1, Sell = -1 };
 
 SWIRLY_API const char* enumString(Side side);
 
@@ -203,23 +202,23 @@ struct EnumTraits<Side> {
  * @image html OrderState.png
  */
 enum class State {
-  NONE = 0,
+  None = 0,
   /**
    * Initial state of a resting order placed in the order-book.
    */
-  NEW,
+  New,
   /**
    * State of a resting order that has been revised.
    */
-  REVISE,
+  Revise,
   /**
    * State of a resting order that has been cancelled.
    */
-  CANCEL,
+  Cancel,
   /**
    * State of an order that has been partially or fully filled.
    */
-  TRADE
+  Trade
 };
 
 SWIRLY_API const char* enumString(State state);
