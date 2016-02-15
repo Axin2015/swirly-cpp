@@ -18,6 +18,8 @@
 #include <swirly/elm/Model.hpp>
 #include <swirly/elm/Request.hpp>
 
+#include <swirly/ash/Log.hpp>
+
 #include <iostream>
 
 namespace swirly {
@@ -69,6 +71,8 @@ int main(int argc, char* argv[])
   using namespace std;
   using namespace swirly;
 
+  setLogLevel(LogDebug);
+  SWIRLY_DEBUG(logMsg() << "message: " << 101);
   try {
     BasicFactory f;
     MockModel m;
