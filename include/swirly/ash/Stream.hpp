@@ -19,7 +19,13 @@
 
 #include <swirly/ash/Defs.hpp>
 
+#include <experimental/string_view>
+
 #include <ostream>
+
+namespace std {
+using string_view = experimental::string_view;
+}
 
 namespace swirly {
 
@@ -27,6 +33,66 @@ namespace swirly {
  * @addtogroup Util
  * @{
  */
+
+template <std::size_t MaxN>
+class StringBuf : public std::streambuf {
+ public:
+  StringBuf() noexcept { reset(); }
+  ~StringBuf() noexcept override = default;
+
+  // Copy.
+  StringBuf(const StringBuf& rhs) = delete;
+  StringBuf& operator=(const StringBuf& rhs) = delete;
+
+  // Move.
+  StringBuf(StringBuf&&) = delete;
+  StringBuf& operator=(StringBuf&&) = delete;
+
+  const char* data() const noexcept { return pbase(); }
+  bool empty() const noexcept { return pbase() == pptr(); }
+  std::size_t size() const noexcept { return pptr() - pbase(); }
+  std::string_view str() const noexcept { return {data(), size()}; }
+  void reset() noexcept { setp(buf_, buf_ + MaxN); };
+ private:
+  char buf_[MaxN];
+};
+
+template <std::size_t MaxN>
+class StringBuilder : public std::ostream {
+ public:
+  StringBuilder() : std::ostream{nullptr} { rdbuf(&buf_); }
+  ~StringBuilder() noexcept override = default;
+
+  // Copy.
+  StringBuilder(const StringBuilder& rhs) = delete;
+  StringBuilder& operator=(const StringBuilder& rhs) = delete;
+
+  // Move.
+  StringBuilder(StringBuilder&&) = delete;
+  StringBuilder& operator=(StringBuilder&&) = delete;
+
+  const char* data() const noexcept { return buf_.data(); }
+  bool empty() const noexcept { return buf_.empty(); }
+  std::size_t size() const noexcept { return buf_.size(); }
+  std::string_view str() const noexcept { return buf_.str(); }
+  operator std::string_view() const noexcept { return buf_.str(); }
+  void reset() noexcept
+  {
+    buf_.reset();
+    // Clear rdstate.
+    clear();
+  };
+
+ private:
+  StringBuf<MaxN> buf_;
+};
+
+template <std::size_t MaxN, typename ValueT>
+auto& operator<<(StringBuilder<MaxN>& sb, ValueT&& val)
+{
+  static_cast<std::ostream&>(sb) << std::forward<ValueT>(val);
+  return sb;
+}
 
 /**
  * Stream joiner. This is a simplified version of std::experimental::ostream_joiner, intended as a
