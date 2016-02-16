@@ -29,31 +29,51 @@ BOOST_AUTO_TEST_SUITE(StringSuite)
 
 BOOST_AUTO_TEST_CASE(EmptyCase)
 {
-  StringBuf<3> sb;
+  String<3> sb;
   BOOST_CHECK(sb.empty());
   BOOST_CHECK_EQUAL(sb.size(), 0UL);
   BOOST_CHECK_EQUAL(sb.compare(""), 0);
-  BOOST_CHECK_EQUAL(sb, StringBuf<3>{""});
+  BOOST_CHECK_EQUAL(sb, String<3>{""});
 }
 
 BOOST_AUTO_TEST_CASE(NonEmptyCase)
 {
-  StringBuf<3> sb{"Foo"};
+  String<3> sb{"Foo"};
   BOOST_CHECK(!sb.empty());
   BOOST_CHECK_EQUAL(sb.size(), 3UL);
   BOOST_CHECK_EQUAL(sb.compare("Foo"), 0);
-  BOOST_CHECK_EQUAL(sb, StringBuf<3>{"Foo"});
+  BOOST_CHECK_EQUAL(sb, String<3>{"Foo"});
 }
 
 BOOST_AUTO_TEST_CASE(UpperBoundCase)
 {
-  StringBuf<3> sb{"Foox"};
+  String<3> sb{"Foox"};
   BOOST_CHECK_EQUAL(sb.size(), 3UL);
   BOOST_CHECK_EQUAL(sb, "Foo");
 
   sb = "Barx";
   BOOST_CHECK_EQUAL(sb.size(), 3UL);
   BOOST_CHECK_EQUAL(sb, "Bar");
+}
+
+BOOST_AUTO_TEST_CASE(ClearCase)
+{
+  String<3> sb{"Foo"};
+  sb.clear();
+  BOOST_CHECK(sb.empty());
+}
+
+BOOST_AUTO_TEST_CASE(AssignCase)
+{
+  String<3> sb;
+  sb = "Foo"_sv;
+  BOOST_CHECK_EQUAL(sb.size(), 3UL);
+  BOOST_CHECK_EQUAL(sb, "Foo");
+
+  sb.clear();
+  sb = "Foox"_sv;
+  BOOST_CHECK_EQUAL(sb.size(), 3UL);
+  BOOST_CHECK_EQUAL(sb, "Foo");
 }
 
 BOOST_AUTO_TEST_CASE(ToStringCase)

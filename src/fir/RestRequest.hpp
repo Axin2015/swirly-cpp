@@ -60,21 +60,21 @@ class SWIRLY_API RestRequest {
   RestRequest& operator=(RestRequest&&) = delete;
 
   unsigned fields() const noexcept { return fields_; }
-  std::string_view mnem() const noexcept { return {mnem_.buf, mnem_.len}; }
-  std::string_view display() const noexcept { return {display_.buf, display_.len}; }
-  std::string_view email() const noexcept { return {email_.buf, email_.len}; }
-  std::string_view trader() const noexcept { return {trader_.buf, trader_.len}; }
-  std::string_view contr() const noexcept { return {contr_.buf, contr_.len}; }
+  std::string_view mnem() const noexcept { return +mnem_; }
+  std::string_view display() const noexcept { return +display_; }
+  std::string_view email() const noexcept { return +email_; }
+  std::string_view trader() const noexcept { return +trader_; }
+  std::string_view contr() const noexcept { return +contr_; }
   IsoDate settlDate() const noexcept { return settlDate_; }
   IsoDate expiryDate() const noexcept { return expiryDate_; }
-  std::string_view ref() const noexcept { return {ref_.buf, ref_.len}; }
+  std::string_view ref() const noexcept { return +ref_; }
   MarketState state() const noexcept { return state_; }
   swirly::Side side() const noexcept { return side_; }
   swirly::Lots lots() const noexcept { return lots_; }
   swirly::Ticks ticks() const noexcept { return ticks_; }
   swirly::Lots minLots() const noexcept { return minLots_; }
   swirly::Role role() const noexcept { return role_; }
-  std::string_view cpty() const noexcept { return {cpty_.buf, cpty_.len}; }
+  std::string_view cpty() const noexcept { return +cpty_; }
   void reset(bool clear = true) noexcept;
 
   bool parse(const std::string_view& buf);
@@ -94,21 +94,21 @@ class SWIRLY_API RestRequest {
   };
   unsigned fields_;
 
-  Mnem::Data mnem_;
-  Display::Data display_;
-  Email::Data email_;
-  Mnem::Data trader_;
-  Mnem::Data contr_;
+  StringData<MnemMax> mnem_;
+  StringData<Display> display_;
+  StringData<Email> email_;
+  StringData<Mnem> trader_;
+  StringData<Mnem> contr_;
   IsoDate settlDate_;
   IsoDate expiryDate_;
-  Ref::Data ref_;
+  StringData<Ref> ref_;
   MarketState state_;
   swirly::Side side_;
   swirly::Lots lots_;
   swirly::Ticks ticks_;
   swirly::Lots minLots_;
   swirly::Role role_;
-  Mnem::Data cpty_;
+  StringData<Mnem> cpty_;
 
   long num() const noexcept { return num_.sign * num_.digits; }
 };

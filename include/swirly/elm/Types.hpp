@@ -95,22 +95,22 @@ constexpr std::size_t RefMax{64};
 /**
  * Description suitable for display on user-interface.
  */
-using Display = StringBuf<DisplayMax>;
+using Display = String<DisplayMax>;
 
 /**
  * Email address.
  */
-using Email = StringBuf<EmailMax>;
+using Email = String<EmailMax>;
 
 /**
  * Memorable identifier.
  */
-using Mnem = StringBuf<MnemMax>;
+using Mnem = String<MnemMax>;
 
 /**
  * Reference.
  */
-using Ref = StringBuf<RefMax>;
+using Ref = String<RefMax>;
 
 using MarketId = std::pair<std::string_view, Iden>;
 enum class AssetType { Commodity = 1, Corporate, Currency, Equity, Government, Index };
