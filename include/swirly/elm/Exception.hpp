@@ -30,8 +30,7 @@ namespace swirly {
 
 class SWIRLY_API ServException : public Exception {
  public:
-  ServException() noexcept = default;
-
+  explicit ServException(const std::string_view& what) noexcept : Exception{what} {}
   ~ServException() noexcept override;
 
   // Copy.
@@ -59,8 +58,7 @@ inline std::ostream& operator<<(std::ostream& os, const ServException& e)
  */
 class SWIRLY_API BadRequestException : public ServException {
  public:
-  BadRequestException() noexcept = default;
-
+  explicit BadRequestException(const std::string_view& what) noexcept : ServException{what} {}
   ~BadRequestException() noexcept override;
 
   // Copy.
@@ -76,8 +74,9 @@ class SWIRLY_API BadRequestException : public ServException {
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
  public:
-  AlreadyExistsException() noexcept = default;
-
+  explicit AlreadyExistsException(const std::string_view& what) noexcept : BadRequestException{what}
+  {
+  }
   ~AlreadyExistsException() noexcept override;
 
   // Copy.
@@ -91,6 +90,10 @@ class SWIRLY_API AlreadyExistsException : public BadRequestException {
 
 class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
  public:
+  explicit RefAlreadyExistsException(const std::string_view& what) noexcept
+    : AlreadyExistsException{what}
+  {
+  }
   RefAlreadyExistsException() noexcept = default;
 
   ~RefAlreadyExistsException() noexcept override;
@@ -106,8 +109,7 @@ class SWIRLY_API RefAlreadyExistsException : public AlreadyExistsException {
 
 class SWIRLY_API InvalidException : public BadRequestException {
  public:
-  InvalidException() noexcept = default;
-
+  explicit InvalidException(const std::string_view& what) noexcept : BadRequestException{what} {}
   ~InvalidException() noexcept override;
 
   // Copy.
@@ -121,8 +123,7 @@ class SWIRLY_API InvalidException : public BadRequestException {
 
 class SWIRLY_API InvalidLotsException : public InvalidException {
  public:
-  InvalidLotsException() noexcept = default;
-
+  explicit InvalidLotsException(const std::string_view& what) noexcept : InvalidException{what} {}
   ~InvalidLotsException() noexcept override;
 
   // Copy.
@@ -136,8 +137,7 @@ class SWIRLY_API InvalidLotsException : public InvalidException {
 
 class SWIRLY_API InvalidTicksException : public InvalidException {
  public:
-  InvalidTicksException() noexcept = default;
-
+  explicit InvalidTicksException(const std::string_view& what) noexcept : InvalidException{what} {}
   ~InvalidTicksException() noexcept override;
 
   // Copy.
@@ -151,8 +151,7 @@ class SWIRLY_API InvalidTicksException : public InvalidException {
 
 class SWIRLY_API TooLateException : public BadRequestException {
  public:
-  TooLateException() noexcept = default;
-
+  explicit TooLateException(const std::string_view& what) noexcept : BadRequestException{what} {}
   ~TooLateException() noexcept override;
 
   // Copy.
@@ -173,8 +172,7 @@ class SWIRLY_API TooLateException : public BadRequestException {
  */
 class SWIRLY_API ForbiddenException : public ServException {
  public:
-  ForbiddenException() noexcept = default;
-
+  explicit ForbiddenException(const std::string_view& what) noexcept : ServException{what} {}
   ~ForbiddenException() noexcept override;
 
   // Copy.
@@ -193,8 +191,7 @@ class SWIRLY_API ForbiddenException : public ServException {
  */
 class SWIRLY_API InternalException : public ServException {
  public:
-  InternalException() noexcept = default;
-
+  explicit InternalException(const std::string_view& what) noexcept : ServException{what} {}
   ~InternalException() noexcept override;
 
   // Copy.
@@ -215,8 +212,7 @@ class SWIRLY_API InternalException : public ServException {
  */
 class SWIRLY_API MethodNotAllowedException : public ServException {
  public:
-  MethodNotAllowedException() noexcept = default;
-
+  explicit MethodNotAllowedException(const std::string_view& what) noexcept : ServException{what} {}
   ~MethodNotAllowedException() noexcept override;
 
   // Copy.
@@ -240,8 +236,7 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
  */
 class SWIRLY_API NotFoundException : public ServException {
  public:
-  NotFoundException() noexcept = default;
-
+  explicit NotFoundException(const std::string_view& what) noexcept : ServException{what} {}
   ~NotFoundException() noexcept override;
 
   // Copy.
@@ -257,8 +252,7 @@ class SWIRLY_API NotFoundException : public ServException {
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
  public:
-  MarketClosedException() noexcept = default;
-
+  explicit MarketClosedException(const std::string_view& what) noexcept : NotFoundException{what} {}
   ~MarketClosedException() noexcept override;
 
   // Copy.
@@ -272,8 +266,9 @@ class SWIRLY_API MarketClosedException : public NotFoundException {
 
 class SWIRLY_API MarketNotFoundException : public NotFoundException {
  public:
-  MarketNotFoundException() noexcept = default;
-
+  explicit MarketNotFoundException(const std::string_view& what) noexcept : NotFoundException{what}
+  {
+  }
   ~MarketNotFoundException() noexcept override;
 
   // Copy.
@@ -287,8 +282,9 @@ class SWIRLY_API MarketNotFoundException : public NotFoundException {
 
 class SWIRLY_API OrderNotFoundException : public NotFoundException {
  public:
-  OrderNotFoundException() noexcept = default;
-
+  explicit OrderNotFoundException(const std::string_view& what) noexcept : NotFoundException{what}
+  {
+  }
   ~OrderNotFoundException() noexcept override;
 
   // Copy.
@@ -300,25 +296,11 @@ class SWIRLY_API OrderNotFoundException : public NotFoundException {
   OrderNotFoundException& operator=(OrderNotFoundException&&) noexcept = default;
 };
 
-class SWIRLY_API QuoteNotFoundException : public NotFoundException {
- public:
-  QuoteNotFoundException() noexcept = default;
-
-  ~QuoteNotFoundException() noexcept override;
-
-  // Copy.
-  QuoteNotFoundException(const QuoteNotFoundException&) noexcept = default;
-  QuoteNotFoundException& operator=(const QuoteNotFoundException&) noexcept = default;
-
-  // Move.
-  QuoteNotFoundException(QuoteNotFoundException&&) noexcept = default;
-  QuoteNotFoundException& operator=(QuoteNotFoundException&&) noexcept = default;
-};
-
 class SWIRLY_API TraderNotFoundException : public NotFoundException {
  public:
-  TraderNotFoundException() noexcept = default;
-
+  explicit TraderNotFoundException(const std::string_view& what) noexcept : NotFoundException{what}
+  {
+  }
   ~TraderNotFoundException() noexcept override;
 
   // Copy.
@@ -339,8 +321,9 @@ class SWIRLY_API TraderNotFoundException : public NotFoundException {
  */
 class SWIRLY_API ServiceUnavailableException : public ServException {
  public:
-  ServiceUnavailableException() noexcept = default;
-
+  explicit ServiceUnavailableException(const std::string_view& what) noexcept : ServException{what}
+  {
+  }
   ~ServiceUnavailableException() noexcept override;
 
   // Copy.
@@ -367,8 +350,7 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
  */
 class SWIRLY_API UnauthorizedException : public ServException {
  public:
-  UnauthorizedException() noexcept = default;
-
+  explicit UnauthorizedException(const std::string_view& what) noexcept : ServException{what} {}
   ~UnauthorizedException() noexcept override;
 
   // Copy.

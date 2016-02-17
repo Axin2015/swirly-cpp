@@ -16,32 +16,32 @@
  */
 #include <swirly/ash/Exception.hpp>
 
-#include <cstdio> // vsnprintf()
-
 using namespace std;
 
 namespace swirly {
+namespace {
+thread_local ErrMsg errMsg_;
+} // anonymous
+
+Exception::Exception(const std::string_view& what) noexcept
+{
+  const auto len = min(ErrMsgMax, what.size());
+  if (len > 0)
+    memcpy(what_, what.data(), len);
+  what_[len] = '\0';
+}
 
 Exception::~Exception() noexcept = default;
 
-void Exception::format(const char* fmt, ...) noexcept
-{
-  va_list args;
-  va_start(args, fmt);
-  format(fmt, args);
-  va_end(args);
-}
-
-void Exception::format(const char* fmt, std::va_list args) noexcept
-{
-  const auto ret = std::vsnprintf(msg_, sizeof(msg_), fmt, args);
-  if (ret < 0)
-    std::terminate();
-}
-
 const char* Exception::what() const noexcept
 {
-  return msg_;
+  return what_;
+}
+
+ErrMsg& errMsg() noexcept
+{
+  errMsg_.reset();
+  return errMsg_;
 }
 
 } // swirly

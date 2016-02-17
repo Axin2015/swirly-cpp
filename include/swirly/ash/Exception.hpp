@@ -17,9 +17,8 @@
 #ifndef SWIRLY_ASH_EXCEPTION_HPP
 #define SWIRLY_ASH_EXCEPTION_HPP
 
-#include <swirly/ash/Defs.hpp>
+#include <swirly/ash/Stream.hpp>
 
-#include <cstdarg> // va_list
 #include <cstring> // strcpy()
 #include <exception>
 
@@ -30,9 +29,16 @@ namespace swirly {
  * @{
  */
 
+/**
+ * Maximum error message length.
+ */
+constexpr std::size_t ErrMsgMax{127};
+
+using ErrMsg = StringBuilder<ErrMsgMax>;
+
 class SWIRLY_API Exception : public std::exception {
  public:
-  Exception() noexcept = default;
+  explicit Exception(const std::string_view& what) noexcept;
 
   ~Exception() noexcept override;
 
@@ -40,7 +46,7 @@ class SWIRLY_API Exception : public std::exception {
   Exception(const Exception& rhs) noexcept { *this = rhs; }
   Exception& operator=(const Exception& rhs) noexcept
   {
-    std::strcpy(msg_, rhs.msg_);
+    std::strcpy(what_, rhs.what_);
     return *this;
   }
 
@@ -50,35 +56,16 @@ class SWIRLY_API Exception : public std::exception {
 
   const char* what() const noexcept override;
 
-  void format(const char* fmt, ...) noexcept;
-
-  void format(const char* fmt, std::va_list args) noexcept;
-
  private:
-  char msg_[128] = {'\0'};
+  char what_[ErrMsgMax + 1];
 };
 
-template <typename ExceptionT>
-ExceptionT makeException(const char* fmt, ...)
-{
-  ExceptionT e;
-  va_list args;
-  va_start(args, fmt);
-  e.format(fmt, args);
-  va_end(args);
-  return e;
-}
-
-template <typename ExceptionT>
-[[noreturn]] void throwException(const char* fmt, ...)
-{
-  ExceptionT e;
-  va_list args;
-  va_start(args, fmt);
-  e.format(fmt, args);
-  va_end(args);
-  throw e;
-}
+/**
+ * Thread-local error message. This thread-local instance of StringBuilder can be used to format
+ * error messages before throwing. Note that the StringBuilder is reset each time this function is
+ * called.
+ */
+SWIRLY_API ErrMsg& errMsg() noexcept;
 
 /** @} */
 

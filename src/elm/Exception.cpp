@@ -84,8 +84,6 @@ MarketNotFoundException::~MarketNotFoundException() noexcept = default;
 
 OrderNotFoundException::~OrderNotFoundException() noexcept = default;
 
-QuoteNotFoundException::~QuoteNotFoundException() noexcept = default;
-
 TraderNotFoundException::~TraderNotFoundException() noexcept = default;
 
 ServiceUnavailableException::~ServiceUnavailableException() noexcept = default;

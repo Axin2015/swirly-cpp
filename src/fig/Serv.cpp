@@ -52,7 +52,7 @@ struct Serv::Impl {
                           MarketState state) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), mnemPattern))
-      throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
+      throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
     return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
   }
@@ -60,7 +60,7 @@ struct Serv::Impl {
                           const string_view& email) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), mnemPattern))
-      throwException<InvalidException>("invalid mnem '%.*s'", SWIRLY_STR(mnem));
+      throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     auto up = factory.newTrader(mnem, display, email);
     return {static_cast<TraderSess*>(up.release()), std::move(up.get_deleter())};
   }
@@ -144,7 +144,7 @@ const MarketBook& Serv::updateMarket(const string_view& mnem, const string_view&
 {
   auto it = impl_->markets.find(mnem);
   if (it == impl_->markets.end())
-    throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
+    throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   auto& market = static_cast<MarketBook&>(*it);
   market.setDisplay(display);
   market.setState(state);
@@ -155,7 +155,7 @@ const MarketBook& Serv::market(const string_view& mnem) const
 {
   auto it = impl_->markets.find(mnem);
   if (it == impl_->markets.end())
-    throwException<MarketNotFoundException>("market '%.*s' does not exist", SWIRLY_STR(mnem));
+    throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   const auto& market = static_cast<const MarketBook&>(*it);
   return market;
 }
@@ -172,7 +172,7 @@ const TraderSess& Serv::updateTrader(const string_view& mnem, const string_view&
 {
   auto it = impl_->traders.find(mnem);
   if (it == impl_->traders.end())
-    throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+    throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
   auto& trader = static_cast<TraderSess&>(*it);
   trader.setDisplay(display);
   return trader;
@@ -182,7 +182,7 @@ const TraderSess& Serv::trader(const string_view& mnem) const
 {
   auto it = impl_->traders.find(mnem);
   if (it == impl_->traders.end())
-    throwException<TraderNotFoundException>("trader '%.*s' does not exist", SWIRLY_STR(mnem));
+    throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
   const auto& trader = static_cast<const TraderSess&>(*it);
   return trader;
 }
@@ -200,13 +200,13 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const string_view& re
                        Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
   const auto busDay = getBusDay(now);
-  if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
-    throwException<MarketClosedException>("market for '%.*s' in '%d' has expired",
-                                          SWIRLY_STR(book.contr()), maybeJdToIso(book.settlDay()));
-  }
-  if (lots == 0_lts || lots < minLots) {
-    throwException<InvalidLotsException>("invalid lots '%d'", lots);
-  }
+  if (book.expiryDay() != 0_jd && book.expiryDay() < busDay)
+    throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' in '"
+                                         << maybeJdToIso(book.settlDay()) << "' has expired"};
+
+  if (lots == 0_lts || lots < minLots)
+    throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
+
   const auto orderId = book.allocOrderId();
   auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
                                        orderId, ref, side, lots, ticks, minLots, now);

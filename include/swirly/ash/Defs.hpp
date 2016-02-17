@@ -27,11 +27,6 @@
  */
 #define SWIRLY_API __attribute__((visibility("default")))
 
-/**
- * Helper macro for "%.*s" arguments.
- */
-#define SWIRLY_STR(x) static_cast<int>((x).size()), (x).data()
-
 /** @} */
 
 #endif // SWIRLY_ASH_DEFS_HPP

@@ -356,7 +356,7 @@ bool RestRequest::parse(const string_view& buf)
     cs_ = cs;
 
     if (cs == json_error)
-        swirly::throwException<ParseException>("%s", msg);
+        throw ParseException{msg};
 
     if (cs < json_first_final)
         return false;
