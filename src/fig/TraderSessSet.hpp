@@ -30,7 +30,7 @@ namespace swirly {
  * Unordered TraderSess set keyed by email.
  */
 class SWIRLY_API TraderSessSet {
-  static constexpr std::size_t BUCKETS = 101;
+  static constexpr std::size_t BucketCount{101};
   struct ValueHash {
     std::size_t operator()(const TraderSess& trader) const noexcept
     {
@@ -65,14 +65,14 @@ class SWIRLY_API TraderSessSet {
   using BucketType = Set::bucket_type;
   using BucketTraits = Set::bucket_traits;
 
-  BucketType buckets_[BUCKETS];
+  BucketType buckets_[BucketCount];
   Set set_;
 
  public:
   using Iterator = typename Set::iterator;
   using ConstIterator = typename Set::const_iterator;
 
-  TraderSessSet() : set_{BucketTraits{buckets_, BUCKETS}} {}
+  TraderSessSet() : set_{BucketTraits{buckets_, BucketCount}} {}
 
   ~TraderSessSet() noexcept;
 

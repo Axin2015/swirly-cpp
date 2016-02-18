@@ -16,13 +16,27 @@
  */
 #include <swirly/elm/Exception.hpp>
 
+#include <iostream>
+
 using namespace std;
 
 namespace swirly {
 
 ServException::~ServException() noexcept = default;
 
+void ServException::toJson(ostream& os) const
+{
+  os << "{\"num\":" << httpStatus() //
+     << ",\"msg\":\"" << what() //
+     << "\"}";
+}
+
 BadRequestException::~BadRequestException() noexcept = default;
+
+int BadRequestException::httpStatus() const noexcept
+{
+  return 400;
+}
 
 AlreadyExistsException::~AlreadyExistsException() noexcept = default;
 
@@ -38,13 +52,31 @@ TooLateException::~TooLateException() noexcept = default;
 
 ForbiddenException::~ForbiddenException() noexcept = default;
 
+int ForbiddenException::httpStatus() const noexcept
+{
+  return 403;
+}
+
 InternalException::~InternalException() noexcept = default;
 
-LiquidityUnavailableException::~LiquidityUnavailableException() noexcept = default;
+int InternalException::httpStatus() const noexcept
+{
+  return 500;
+}
 
 MethodNotAllowedException::~MethodNotAllowedException() noexcept = default;
 
+int MethodNotAllowedException::httpStatus() const noexcept
+{
+  return 405;
+}
+
 NotFoundException::~NotFoundException() noexcept = default;
+
+int NotFoundException::httpStatus() const noexcept
+{
+  return 404;
+}
 
 MarketClosedException::~MarketClosedException() noexcept = default;
 
@@ -52,12 +84,20 @@ MarketNotFoundException::~MarketNotFoundException() noexcept = default;
 
 OrderNotFoundException::~OrderNotFoundException() noexcept = default;
 
-QuoteNotFoundException::~QuoteNotFoundException() noexcept = default;
-
 TraderNotFoundException::~TraderNotFoundException() noexcept = default;
 
 ServiceUnavailableException::~ServiceUnavailableException() noexcept = default;
 
+int ServiceUnavailableException::httpStatus() const noexcept
+{
+  return 503;
+}
+
 UnauthorizedException::~UnauthorizedException() noexcept = default;
+
+int UnauthorizedException::httpStatus() const noexcept
+{
+  return 401;
+}
 
 } // swirly

@@ -44,7 +44,7 @@ OrderPtr Factory::newOrder(const string_view& trader, const string_view& market,
                            const string_view& contr, Jday settlDay, Iden id, const string_view& ref,
                            Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) const
 {
-  return doNewOrder(trader, market, contr, settlDay, id, ref, State::NEW, side, lots, ticks, lots,
+  return doNewOrder(trader, market, contr, settlDay, id, ref, State::New, side, lots, ticks, lots,
                     0_lts, 0_cst, 0_lts, 0_tks, minLots, created, created);
 }
 
@@ -63,7 +63,7 @@ ExecPtr Factory::newExec(const Order& order, Iden id, Millis created) const
   return doNewExec(order.trader(), order.market(), order.contr(), order.settlDay(), id, order.ref(),
                    order.id(), order.state(), order.side(), order.lots(), order.ticks(),
                    order.resd(), order.exec(), order.cost(), order.lastLots(), order.lastTicks(),
-                   order.minLots(), 0_id, Role::NONE, string_view{}, created);
+                   order.minLots(), 0_id, Role::None, string_view{}, created);
 }
 
 PosnPtr Factory::newPosn(const string_view& trader, const string_view& contr, Jday settlDay,

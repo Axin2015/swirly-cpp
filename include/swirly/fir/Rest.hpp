@@ -41,6 +41,8 @@ class SWIRLY_API Rest {
 
   void assets(Millis now, std::ostream& out) const;
 
+  void contrs(Millis now, std::ostream& out) const;
+
  private:
   Serv serv_;
 };

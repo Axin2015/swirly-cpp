@@ -16,6 +16,10 @@
  */
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/ash/Stream.hpp>
+
+using namespace std;
+
 namespace swirly {
 
 Rest::~Rest() noexcept = default;
@@ -26,6 +30,18 @@ Rest& Rest::operator=(Rest&&) = default;
 
 void Rest::assets(Millis now, std::ostream& out) const
 {
+  const auto& assets = serv_.assets();
+  out << '[';
+  copy(assets.begin(), assets.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void Rest::contrs(Millis now, std::ostream& out) const
+{
+  const auto& contrs = serv_.contrs();
+  out << '[';
+  copy(contrs.begin(), contrs.end(), OStreamJoiner(out, ','));
+  out << ']';
 }
 
 } // swirly

@@ -14,24 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Trader.hpp>
+#include <swirly/ash/Log.hpp>
 
-using namespace std;
+#include <boost/test/unit_test.hpp>
 
-namespace swirly {
+using namespace swirly;
 
-Trader::~Trader() noexcept = default;
+BOOST_AUTO_TEST_SUITE(LogSuite)
 
-Trader::Trader(const Trader&) = default;
-
-Trader::Trader(Trader&&) = default;
-
-void Trader::toJson(ostream& os) const
+BOOST_AUTO_TEST_CASE(LogLabelCase)
 {
-  os << "{\"mnem\":\"" << mnem_ //
-     << "\",\"display\":\"" << display_ //
-     << "\",\"email\":\"" << email_ //
-     << "\"}";
+  BOOST_CHECK_EQUAL(strcmp(logLabel(-1), "CRIT"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogCrit), "CRIT"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogError), "ERROR"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogWarn), "WARN"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogNotice), "NOTICE"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogInfo), "INFO"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogDebug), "DEBUG"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(99), "DEBUG"), 0);
 }
 
-} // swirly
+BOOST_AUTO_TEST_SUITE_END()

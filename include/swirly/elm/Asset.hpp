@@ -34,7 +34,7 @@ namespace swirly {
 class SWIRLY_API Asset : public Rec {
  public:
   Asset(const std::string_view& mnem, const std::string_view& display, AssetType type) noexcept
-    : Rec{RecType::ASSET, mnem, display},
+    : Rec{RecType::Asset, mnem, display},
       type_{type}
   {
   }
@@ -48,6 +48,8 @@ class SWIRLY_API Asset : public Rec {
   // Move.
   Asset(Asset&&);
   Asset& operator=(Asset&&) = delete;
+
+  void toJson(std::ostream& os) const override;
 
   AssetType assetType() const noexcept { return type_; }
   boost::intrusive::set_member_hook<> mnemHook_;

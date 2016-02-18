@@ -29,7 +29,7 @@ namespace swirly {
 class SWIRLY_API Trader : public Rec {
  public:
   Trader(const std::string_view& mnem, const std::string_view& display,
-         const std::string_view& email) noexcept : Rec{RecType::MARKET, mnem, display},
+         const std::string_view& email) noexcept : Rec{RecType::Market, mnem, display},
                                                    email_{email}
   {
   }
@@ -42,6 +42,8 @@ class SWIRLY_API Trader : public Rec {
   // Move.
   Trader(Trader&&);
   Trader& operator=(Trader&&) = delete;
+
+  void toJson(std::ostream& os) const override;
 
   auto email() const noexcept { return +email_; }
   boost::intrusive::set_member_hook<> mnemHook_;

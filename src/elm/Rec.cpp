@@ -16,6 +16,8 @@
  */
 #include <swirly/elm/Rec.hpp>
 
+using namespace std;
+
 namespace swirly {
 
 Rec::~Rec() noexcept = default;
@@ -23,5 +25,13 @@ Rec::~Rec() noexcept = default;
 Rec::Rec(const Rec&) = default;
 
 Rec::Rec(Rec&&) = default;
+
+void Rec::toJson(ostream& os) const
+{
+  os << "{\"type\":\"" << type_ //
+     << "\",\"mnem\":\"" << mnem_ //
+     << "\",\"display\":\"" << display_ //
+     << "\"}";
+}
 
 } // swirly

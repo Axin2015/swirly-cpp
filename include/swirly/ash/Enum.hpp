@@ -17,7 +17,7 @@
 #ifndef SWIRLY_ASH_ENUM_HPP
 #define SWIRLY_ASH_ENUM_HPP
 
-#include <iostream>
+#include <iosfwd>
 #include <type_traits>
 
 namespace swirly {
@@ -26,14 +26,6 @@ namespace swirly {
  * @addtogroup Util
  * @{
  */
-
-/**
- * Helper macro for implementing enumString() case statements.
- */
-#define SWIRLY_ENUM_CASE(type, val)                                                                \
-  case type::val:                                                                                  \
-    return #val;                                                                                   \
-    break
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 constexpr EnumT box(typename std::underlying_type_t<EnumT> val) noexcept

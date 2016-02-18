@@ -29,8 +29,7 @@ namespace mg {
 
 class Error : public Exception {
  public:
-  Error() noexcept = default;
-
+  explicit Error(const std::string_view& what) noexcept : Exception{what} {}
   ~Error() noexcept;
 
   // Copy.

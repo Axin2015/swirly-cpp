@@ -30,7 +30,7 @@ using namespace swirly;
 
 namespace {
 
-constexpr char HTTP_PORT[] = "8080";
+constexpr char httpPort[] = "8080";
 
 static struct mg_serve_http_opts httpOpts;
 
@@ -91,12 +91,28 @@ class RestServ : public mg::Mgr<RestServ> {
 
       const auto len = static_cast<int>(out_.size());
       mg_printf(&nc, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%.*s", len, len, out_.data());
+
+    } else {
+      // FIXME.
     }
   }
   void getRec(mg::HttpMessage data)
   {
-    rest_.assets(getTimeOfDay(), out_);
-    out_ << R"({"mnem":"EURUSD"})";
+    if (!uri_.empty()) {
+
+      const auto tok = uri_.top();
+      uri_.pop();
+
+      if (tok == "asset") {
+        rest_.assets(getTimeOfDay(), out_);
+      } else if (tok == "contr") {
+        rest_.contrs(getTimeOfDay(), out_);
+      } else {
+        // FIXME.
+      }
+    } else {
+      // FIXME.
+    }
   }
   void postRec(mg::HttpMessage data) {}
   void putRec(mg::HttpMessage data) {}
@@ -123,14 +139,14 @@ int main(int argc, char* argv[])
     Rest rest{model, journ, getTimeOfDay()};
 
     RestServ rs{rest};
-    auto& conn = rs.bind(HTTP_PORT);
+    auto& conn = rs.bind(httpPort);
     mg_set_protocol_http_websocket(&conn);
 
     httpOpts.document_root = ".";
     httpOpts.dav_document_root = ".";
     httpOpts.enable_directory_listing = "yes";
 
-    cout << "Starting web server on port " << HTTP_PORT << endl;
+    cout << "Starting web server on port " << httpPort << endl;
     for (;;) {
       rs.poll(1000);
     }

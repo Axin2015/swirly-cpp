@@ -75,7 +75,7 @@ class Mgr {
   {
     auto* conn = mg_bind(&mgr_, addr, handler);
     if (!conn)
-      throwException<Error>("mg_bind() failed");
+      throw Error{"mg_bind() failed"};
     conn->user_data = this;
     return *conn;
   }

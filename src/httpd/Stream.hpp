@@ -70,7 +70,12 @@ class OStream : public std::ostream {
 
   const char_type* data() const noexcept { return buf_.data(); }
   std::streamsize size() const noexcept { return buf_.size(); }
-  void reset() noexcept { buf_.reset(); }
+  void reset() noexcept
+  {
+    buf_.reset();
+    // Clear rdstate.
+    clear();
+  };
 
  private:
   StreamBuf buf_;

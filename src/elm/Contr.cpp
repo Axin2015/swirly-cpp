@@ -25,7 +25,7 @@ namespace swirly {
 Contr::Contr(const string_view& mnem, const string_view& display, const string_view& asset,
              const string_view& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
              int pipDp, Lots minLots, Lots maxLots) noexcept
-  : Rec{RecType::CONTR, mnem, display},
+  : Rec{RecType::Contr, mnem, display},
     asset_{asset},
     ccy_{ccy},
     lotNumer_{lotNumer},
@@ -47,5 +47,21 @@ Contr::~Contr() noexcept = default;
 Contr::Contr(const Contr&) = default;
 
 Contr::Contr(Contr&&) = default;
+
+void Contr::toJson(ostream& os) const
+{
+  os << "{\"mnem\":\"" << mnem_ //
+     << "\",\"display\":\"" << display_ //
+     << "\",\"asset\":\"" << asset_ //
+     << "\",\"ccy\":\"" << ccy_ //
+     << "\",\"lotNumer\":" << lotNumer_ //
+     << ",\"lotDenom\":" << lotDenom_ //
+     << ",\"tickNumer\":" << tickNumer_ //
+     << ",\"tickDenom\":" << tickDenom_ //
+     << ",\"pipDp\":" << pipDp_ //
+     << ",\"minLots\":" << minLots_ //
+     << ",\"maxLots\":" << maxLots_ //
+     << "}";
+}
 
 } // swirly

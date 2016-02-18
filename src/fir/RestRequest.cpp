@@ -233,11 +233,11 @@ void RestRequest::reset(bool clear) noexcept
   expiryDate_ = 0_dt;
   ref_.len = 0;
   state_ = 0;
-  side_ = box<Side>(0);
+  side_ = box<swirly::Side>(0);
   lots_ = 0_lts;
   ticks_ = 0_tks;
   minLots_ = 0_lts;
-  role_ = Role::NONE;
+  role_ = swirly::Role::None;
   cpty_.len = 0;
 }
 
@@ -359,7 +359,7 @@ bool RestRequest::parse(const string_view& buf)
       case 5:
 #line 80 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::MNEM;
+        fields_ &= ~Mnem;
         mnem_.len = 0;
       } break;
       case 6:
@@ -367,17 +367,17 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &mnem_.len;
         str_.buf = mnem_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
       } break;
       case 7:
 #line 89 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::MNEM;
+        fields_ |= Mnem;
       } break;
       case 8:
 #line 95 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::DISPLAY;
+        fields_ &= ~Display;
         display_.len = 0;
       } break;
       case 9:
@@ -385,17 +385,17 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &display_.len;
         str_.buf = display_.buf;
-        str_.max = DISPLAY_MAX;
+        str_.max = DisplayMax;
       } break;
       case 10:
 #line 104 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::DISPLAY;
+        fields_ |= Display;
       } break;
       case 11:
 #line 110 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::EMAIL;
+        fields_ &= ~Email;
         email_.len = 0;
       } break;
       case 12:
@@ -403,17 +403,17 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &email_.len;
         str_.buf = email_.buf;
-        str_.max = EMAIL_MAX;
+        str_.max = EmailMax;
       } break;
       case 13:
 #line 119 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::EMAIL;
+        fields_ |= Email;
       } break;
       case 14:
 #line 125 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::TRADER;
+        fields_ &= ~Trader;
         trader_.len = 0;
       } break;
       case 15:
@@ -421,17 +421,17 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &trader_.len;
         str_.buf = trader_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
       } break;
       case 16:
 #line 134 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::TRADER;
+        fields_ |= Trader;
       } break;
       case 17:
 #line 140 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::CONTR;
+        fields_ &= ~Contr;
         contr_.len = 0;
       } break;
       case 18:
@@ -439,41 +439,41 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &contr_.len;
         str_.buf = contr_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
       } break;
       case 19:
 #line 149 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::CONTR;
+        fields_ |= Contr;
       } break;
       case 20:
 #line 155 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::SETTL_DATE;
+        fields_ &= ~SettlDate;
         settlDate_ = 0_dt;
       } break;
       case 21:
 #line 159 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::SETTL_DATE;
+        fields_ |= SettlDate;
         settlDate_ = box<IsoDate>(num());
       } break;
       case 22:
 #line 166 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::EXPIRY_DATE;
+        fields_ &= ~ExpiryDate;
         expiryDate_ = 0_dt;
       } break;
       case 23:
 #line 170 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::EXPIRY_DATE;
+        fields_ |= ExpiryDate;
         expiryDate_ = box<IsoDate>(num());
       } break;
       case 24:
 #line 177 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::REF;
+        fields_ &= ~Ref;
         ref_.len = 0;
       } break;
       case 25:
@@ -481,24 +481,24 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &ref_.len;
         str_.buf = ref_.buf;
-        str_.max = REF_MAX;
+        str_.max = RefMax;
       } break;
       case 26:
 #line 186 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::REF;
+        fields_ |= Ref;
       } break;
       case 27:
 #line 192 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::STATE;
+        fields_ &= ~State;
         state_ = 0;
       } break;
       case 28:
 #line 196 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         if (num_.sign >= 0) {
-          fields_ |= RestRequest::STATE;
+          fields_ |= State;
           state_ = num();
         } else {
           cs = json_error;
@@ -508,79 +508,79 @@ bool RestRequest::parse(const string_view& buf)
       case 29:
 #line 207 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::TICKS;
+        fields_ &= ~Ticks;
         ticks_ = 0_tks;
       } break;
       case 30:
 #line 211 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::TICKS;
-        ticks_ = box<Ticks>(num());
+        fields_ |= Ticks;
+        ticks_ = box<swirly::Ticks>(num());
       } break;
       case 31:
 #line 218 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::SIDE;
-        side_ = box<Side>(0);
+        fields_ &= ~Side;
+        side_ = box<swirly::Side>(0);
       } break;
       case 32:
 #line 222 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::SIDE;
-        side_ = Side::BUY;
+        fields_ |= Side;
+        side_ = swirly::Side::Buy;
       } break;
       case 33:
 #line 226 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::SIDE;
-        side_ = Side::SELL;
+        fields_ |= Side;
+        side_ = swirly::Side::Sell;
       } break;
       case 34:
 #line 234 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::LOTS;
+        fields_ &= ~Lots;
         lots_ = 0_lts;
       } break;
       case 35:
 #line 238 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::LOTS;
-        lots_ = box<Lots>(num());
+        fields_ |= Lots;
+        lots_ = box<swirly::Lots>(num());
       } break;
       case 36:
 #line 245 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::MIN_LOTS;
+        fields_ &= ~MinLots;
         minLots_ = 0_lts;
       } break;
       case 37:
 #line 249 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::MIN_LOTS;
-        minLots_ = box<Lots>(num());
+        fields_ |= MinLots;
+        minLots_ = box<swirly::Lots>(num());
       } break;
       case 38:
 #line 256 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::ROLE;
-        role_ = Role::NONE;
+        fields_ &= ~Role;
+        role_ = swirly::Role::None;
       } break;
       case 39:
 #line 260 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::ROLE;
-        role_ = Role::MAKER;
+        fields_ |= Role;
+        role_ = swirly::Role::Maker;
       } break;
       case 40:
 #line 264 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::ROLE;
-        role_ = Role::TAKER;
+        fields_ |= Role;
+        role_ = swirly::Role::Taker;
       } break;
       case 41:
 #line 272 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ &= ~RestRequest::CPTY;
+        fields_ &= ~Cpty;
         cpty_.len = 0;
       } break;
       case 42:
@@ -588,12 +588,12 @@ bool RestRequest::parse(const string_view& buf)
       {
         str_.len = &cpty_.len;
         str_.buf = cpty_.buf;
-        str_.max = MNEM_MAX;
+        str_.max = MnemMax;
       } break;
       case 43:
 #line 281 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
-        fields_ |= RestRequest::CPTY;
+        fields_ |= Cpty;
       } break;
 #line 902 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.cpp"
       }
@@ -614,7 +614,7 @@ bool RestRequest::parse(const string_view& buf)
   cs_ = cs;
 
   if (cs == json_error)
-    swirly::throwException<ParseException>("%s", msg);
+    throw ParseException{msg};
 
   if (cs < json_first_final)
     return false;

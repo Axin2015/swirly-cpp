@@ -14,24 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Trader.hpp>
+#include <swirly/ash/Daemon.hpp>
 
-using namespace std;
+#include <boost/test/unit_test.hpp>
 
-namespace swirly {
+BOOST_AUTO_TEST_SUITE(DaemonSuite)
 
-Trader::~Trader() noexcept = default;
-
-Trader::Trader(const Trader&) = default;
-
-Trader::Trader(Trader&&) = default;
-
-void Trader::toJson(ostream& os) const
+BOOST_AUTO_TEST_CASE(DaemonCase)
 {
-  os << "{\"mnem\":\"" << mnem_ //
-     << "\",\"display\":\"" << display_ //
-     << "\",\"email\":\"" << email_ //
-     << "\"}";
+  BOOST_CHECK(true);
 }
 
-} // swirly
+BOOST_AUTO_TEST_SUITE_END()

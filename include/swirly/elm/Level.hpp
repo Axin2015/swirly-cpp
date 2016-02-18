@@ -40,7 +40,7 @@ namespace detail {
 constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
 {
   using namespace enumops;
-  return unbox(side == Side::BUY ? -ticks : ticks);
+  return unbox(side == Side::Buy ? -ticks : ticks);
 }
 
 } // detail

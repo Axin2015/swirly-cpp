@@ -18,14 +18,11 @@
 #include <swirly/elm/Model.hpp>
 #include <swirly/elm/Request.hpp>
 
+#include <swirly/ash/Log.hpp>
+
 #include <iostream>
 
 namespace swirly {
-
-inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
-{
-  return os << rec.type() << ' ' << rec.mnem() << ' ' << rec.display();
-}
 
 class MockModel : public Model {
  public:
@@ -44,10 +41,9 @@ class MockModel : public Model {
   AssetSet doReadAsset(const Factory& factory) const override
   {
     AssetSet s;
-    s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::CURRENCY));
-    s.insert(factory.newAsset("GBP", "Sterling", AssetType::CURRENCY));
-    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
-    s.insert(factory.newAsset("USD", "US Dollar", AssetType::CURRENCY));
+    s.insert(factory.newAsset("EUR", "Euro Dollar", AssetType::Currency));
+    s.insert(factory.newAsset("GBP", "Sterling", AssetType::Currency));
+    s.insert(factory.newAsset("USD", "US Dollar", AssetType::Currency));
     return s;
   }
   ContrSet doReadContr(const Factory& factory) const override
@@ -75,6 +71,8 @@ int main(int argc, char* argv[])
   using namespace std;
   using namespace swirly;
 
+  setLogLevel(LogDebug);
+  SWIRLY_DEBUG(logMsg() << "message: " << 101);
   try {
     BasicFactory f;
     MockModel m;
@@ -84,7 +82,7 @@ int main(int argc, char* argv[])
       cout << asset << endl;
     }
 
-    RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1_id, "", Side::BUY,
+    RequestPtr req{makeRefCounted<Request>("MARAYL", "EURUSD", "EURUSD", 0_jd, 1_id, "", Side::Buy,
                                            10_lts, 0_ms)};
     cout << req->trader() << endl;
     return 0;

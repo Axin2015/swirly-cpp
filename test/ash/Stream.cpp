@@ -25,6 +25,29 @@ using namespace swirly;
 
 BOOST_AUTO_TEST_SUITE(StreamSuite)
 
+BOOST_AUTO_TEST_CASE(StringBuilderCase)
+{
+  StringBuilder<7> sb;
+  BOOST_CHECK(sb.empty());
+  sb << "foo";
+  BOOST_CHECK_EQUAL(sb.size(), 3UL);
+  BOOST_CHECK_EQUAL(sb.str(), "foo");
+  sb << ',' << "bar";
+  BOOST_CHECK_EQUAL(sb.size(), 7UL);
+  BOOST_CHECK_EQUAL(sb.str(), "foo,bar");
+
+  sb.reset();
+  BOOST_CHECK(sb.empty());
+  sb << 12345678;
+  BOOST_CHECK_EQUAL(sb.size(), 7UL);
+  BOOST_CHECK_EQUAL(sb.str(), "1234567");
+  BOOST_CHECK(!sb);
+
+  sb.reset();
+  BOOST_CHECK(sb);
+  BOOST_CHECK_EQUAL((sb << "test").str(), "test");
+}
+
 BOOST_AUTO_TEST_CASE(OStreamJoinerCase)
 {
   array<string, 3> arr{{"foo", "bar", "baz"}};

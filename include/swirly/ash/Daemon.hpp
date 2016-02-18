@@ -14,24 +14,33 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Trader.hpp>
+#ifndef SWIRLY_ASH_DAEMON_HPP
+#define SWIRLY_ASH_DAEMON_HPP
 
-using namespace std;
+#include <swirly/ash/Defs.hpp>
+
+#include <sys/types.h>
 
 namespace swirly {
 
-Trader::~Trader() noexcept = default;
+/**
+ * @addtogroup Util
+ * @{
+ */
 
-Trader::Trader(const Trader&) = default;
+/**
+ * Daemonise process.
+ *
+ * Detach from controlling terminal and run in the background as a system daemon.
+ *
+ * @param wd Desired working directory.
+ *
+ * @param mask Desired umask.
+ */
+SWIRLY_API void daemon(const char* wd, mode_t mask);
 
-Trader::Trader(Trader&&) = default;
-
-void Trader::toJson(ostream& os) const
-{
-  os << "{\"mnem\":\"" << mnem_ //
-     << "\",\"display\":\"" << display_ //
-     << "\",\"email\":\"" << email_ //
-     << "\"}";
-}
+/** @} */
 
 } // swirly
+
+#endif // SWIRLY_ASH_DAEMON_HPP
