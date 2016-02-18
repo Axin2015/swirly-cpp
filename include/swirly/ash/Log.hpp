@@ -53,7 +53,7 @@ enum : int {
   /**
    * Warning.
    */
-  LogWarn,
+  LogWarning,
   /**
    * Notice.
    */
@@ -131,32 +131,25 @@ SWIRLY_API void sysLogger(int level, const std::string_view& msg) noexcept;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
-#define SWIRLY_CRIT(msg)                                                                           \
-  if (isLogLevel(LogCrit))                                                                         \
-  writeLog(LogCrit, msg)
+// N.B. varargs help ensure that expressions such as the following work correctly:
+// SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
 
-#define SWIRLY_ERROR(msg)                                                                          \
-  if (isLogLevel(LogError))                                                                        \
-  writeLog(LogError, msg)
+#define SWIRLY_LOG(level, ...)                                                                     \
+  do {                                                                                             \
+    if (isLogLevel(level))                                                                         \
+      writeLog(level, __VA_ARGS__);                                                                \
+  } while (false)
 
-#define SWIRLY_WARN(msg)                                                                           \
-  if (isLogLevel(LogWarn))                                                                         \
-  writeLog(LogWarn, msg)
-
-#define SWIRLY_NOTICE(msg)                                                                         \
-  if (isLogLevel(LogNotice))                                                                       \
-  writeLog(LogNotice, msg)
-
-#define SWIRLY_INFO(msg)                                                                           \
-  if (isLogLevel(LogInfo))                                                                         \
-  writeLog(LogInfo, msg)
+#define SWIRLY_CRIT(...) SWIRLY_LOG(LogCrit, __VA_ARGS__)
+#define SWIRLY_ERROR(...) SWIRLY_LOG(LogError, __VA_ARGS__)
+#define SWIRLY_WARNING(...) SWIRLY_LOG(LogWarning, __VA_ARGS__)
+#define SWIRLY_NOTICE(...) SWIRLY_LOG(LogNotice, __VA_ARGS__)
+#define SWIRLY_INFO(...) SWIRLY_LOG(LogInfo, __VA_ARGS__)
 
 #if SWIRLY_ENABLE_DEBUG
-#define SWIRLY_DEBUG(msg)                                                                          \
-  if (isLogLevel(LogDebug))                                                                        \
-  writeLog(LogDebug, msg)
+#define SWIRLY_DEBUG(...) SWIRLY_LOG(LogDebug, __VA_ARGS__)
 #else
-#define SWIRLY_DEBUG(msg)
+#define SWIRLY_DEBUG(...)
 #endif
 
 /** @} */
