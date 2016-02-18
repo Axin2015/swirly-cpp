@@ -33,7 +33,7 @@ using namespace std;
 namespace swirly {
 namespace {
 
-const char* labels_[] = {"CRIT", "ERROR", "WARN", "NOTICE", "INFO", "DEBUG"};
+const char* labels_[] = {"CRIT", "ERROR", "WARNING", "NOTICE", "INFO", "DEBUG"};
 
 // Global log level and logger function.
 atomic<int> level_{LogInfo};
@@ -95,11 +95,15 @@ void stdLogger(int level, const std::string_view& msg) noexcept
   struct tm tm;
   localtime_r(&now, &tm);
 
-  // The following format has an upper-bound of 41 characters:
-  // "%b %d %H:%M:%S.%03d %-6s [%d]: "
-  char head[42];
+  // The following format has an upper-bound of 42 characters:
+  // "%b %d %H:%M:%S.%03d %-7s [%d]: "
+  //
+  // Example:
+  // Mar 14 00:00:00.000 WARNING [0123456789]: msg...
+  // <---------------------------------------->
+  char head[42 + 1];
   size_t hlen = strftime(head, sizeof(head), "%b %d %H:%M:%S", &tm);
-  hlen += sprintf(head + hlen, ".%03d %-6s [%d]: ", static_cast<int>(unbox(ms) % 1000),
+  hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(unbox(ms) % 1000),
                   logLabel(level), static_cast<int>(getpid()));
   char tail = '\n';
   iovec iov[] = {
@@ -108,8 +112,8 @@ void stdLogger(int level, const std::string_view& msg) noexcept
     {&tail, 1} //
   };
 
-  int fd{level > LogWarn ? STDOUT_FILENO : STDERR_FILENO};
-  // Best effort given that this is the logger.
+  int fd{level > LogWarning ? STDOUT_FILENO : STDERR_FILENO};
+// Best effort given that this is the logger.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
   writev(fd, iov, sizeof(iov) / sizeof(iov[0]));
@@ -126,7 +130,7 @@ void sysLogger(int level, const std::string_view& msg) noexcept
   case LogError:
     prio = LOG_ERR;
     break;
-  case LogWarn:
+  case LogWarning:
     prio = LOG_WARNING;
     break;
   case LogNotice:

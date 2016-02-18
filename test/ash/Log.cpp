@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(LogLabelCase)
   BOOST_CHECK_EQUAL(strcmp(logLabel(-1), "CRIT"), 0);
   BOOST_CHECK_EQUAL(strcmp(logLabel(LogCrit), "CRIT"), 0);
   BOOST_CHECK_EQUAL(strcmp(logLabel(LogError), "ERROR"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogWarn), "WARN"), 0);
+  BOOST_CHECK_EQUAL(strcmp(logLabel(LogWarning), "WARNING"), 0);
   BOOST_CHECK_EQUAL(strcmp(logLabel(LogNotice), "NOTICE"), 0);
   BOOST_CHECK_EQUAL(strcmp(logLabel(LogInfo), "INFO"), 0);
   BOOST_CHECK_EQUAL(strcmp(logLabel(LogDebug), "DEBUG"), 0);

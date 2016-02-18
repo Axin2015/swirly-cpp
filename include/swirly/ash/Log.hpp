@@ -53,7 +53,7 @@ enum : int {
   /**
    * Warning.
    */
-  LogWarn,
+  LogWarning,
   /**
    * Notice.
    */
@@ -140,8 +140,8 @@ SWIRLY_API LogMsg& logMsg() noexcept;
   writeLog(LogError, msg)
 
 #define SWIRLY_WARN(msg)                                                                           \
-  if (isLogLevel(LogWarn))                                                                         \
-  writeLog(LogWarn, msg)
+  if (isLogLevel(LogWarning))                                                                      \
+  writeLog(LogWarning, msg)
 
 #define SWIRLY_NOTICE(msg)                                                                         \
   if (isLogLevel(LogNotice))                                                                       \
