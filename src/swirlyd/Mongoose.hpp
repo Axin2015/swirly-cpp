@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_HTTPD_MONGOOSE_HPP
-#define SWIRLY_HTTPD_MONGOOSE_HPP
+#ifndef SWIRLYD_MONGOOSE_HPP
+#define SWIRLYD_MONGOOSE_HPP
 
 #include "Exception.hpp"
 
@@ -107,4 +107,4 @@ class Mgr {
 } // mg
 } // swirly
 
-#endif // SWIRLY_HTTPD_MONGOOSE_HPP
+#endif // SWIRLYD_MONGOOSE_HPP

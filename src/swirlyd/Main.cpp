@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     daemonDesc.add_options() //
       ("daemon,d", //
        "daemonise process") //
-      ("logfile,l", po::value<string>(&logFile)->implicit_value("swirly_httpd.log"), //
+      ("logfile,l", po::value<string>(&logFile)->implicit_value("swirlyd.log"), //
        "log file name") //
       ("working,w", po::value<string>(&workDir)->default_value("/"), //
        "working directory") //
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     po::notify(vm);
 
     if (vm.count("help")) {
-      cout << "Usage: swirly_httpd [options]\n" << desc << endl;
+      cout << "Usage: swirlyd [options]\n" << desc << endl;
       return 1;
     }
 
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
       daemon(workDir.c_str(), 0027);
       if (logFile.empty()) {
         // Daemon uses syslog by default.
-        openlog("swirly_httpd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+        openlog("swirlyd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
         setLogger(sysLogger);
       }
     }

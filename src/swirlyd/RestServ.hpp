@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_HTTPD_RESTSERV_HPP
-#define SWIRLY_HTTPD_RESTSERV_HPP
+#ifndef SWIRLYD_RESTSERV_HPP
+#define SWIRLYD_RESTSERV_HPP
 
 #include "Mongoose.hpp"
 #include "Stream.hpp"
@@ -71,4 +71,4 @@ class RestServ : public mg::Mgr<RestServ> {
 } // mg
 } // swirly
 
-#endif // SWIRLY_HTTPD_RESTSERV_HPP
+#endif // SWIRLYD_RESTSERV_HPP
