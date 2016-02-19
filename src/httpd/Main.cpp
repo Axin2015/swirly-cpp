@@ -15,15 +15,12 @@
  * 02110-1301, USA.
  */
 #include "Mock.hpp"
-#include "Mongoose.hpp"
-#include "Stream.hpp"
+#include "RestServ.hpp"
 
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
-#include <swirly/ash/Tokeniser.hpp>
-
-#include <iostream>
 
 using namespace std;
 using namespace swirly;
@@ -31,114 +28,30 @@ using namespace swirly;
 namespace {
 
 constexpr char httpPort[] = "8080";
+mg_serve_http_opts httpOpts;
 
-static struct mg_serve_http_opts httpOpts;
+volatile sig_atomic_t sig_{0};
 
-class RestServ : public mg::Mgr<RestServ> {
- public:
-  explicit RestServ(Rest& rest) noexcept : rest_(rest) {}
-  void reset(string_view sv) noexcept
-  {
-    out_.reset();
+void sigHandler(int sig) noexcept
+{
+  sig_ = sig;
 
-    // Remove leading slash.
-    if (sv.front() == '/')
-      sv.remove_prefix(1);
-    uri_.reset(sv);
-  }
-  void httpRequest(mg_connection& nc, mg::HttpMessage data)
-  {
-    reset(data.uri());
-
-    if (!uri_.empty()) {
-
-      const auto tok = uri_.top();
-      uri_.pop();
-      const auto method = data.method();
-
-      if (tok == "rec") {
-        if (method == "GET") {
-          getRec(data);
-        } else if (method == "POST") {
-          postRec(data);
-        } else if (method == "PUT") {
-          putRec(data);
-        } else {
-          // FIXME.
-        }
-      } else if (tok == "sess") {
-        if (method == "GET") {
-          getSess(data);
-        } else if (method == "POST") {
-          postSess(data);
-        } else if (method == "PUT") {
-          putSess(data);
-        } else if (method == "DELETE") {
-          deleteSess(data);
-        } else {
-          // FIXME.
-        }
-      } else if (tok == "view") {
-        if (method == "GET") {
-          getView(data);
-        } else {
-          // FIXME.
-        }
-      } else {
-        mg_serve_http(&nc, data.get(), httpOpts);
-        return;
-      }
-
-      const auto len = static_cast<int>(out_.size());
-      mg_printf(&nc, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%.*s", len, len, out_.data());
-
-    } else {
-      // FIXME.
-    }
-  }
-  void getRec(mg::HttpMessage data)
-  {
-    if (!uri_.empty()) {
-
-      const auto tok = uri_.top();
-      uri_.pop();
-
-      if (tok == "asset") {
-        rest_.assets(getTimeOfDay(), out_);
-      } else if (tok == "contr") {
-        rest_.contrs(getTimeOfDay(), out_);
-      } else {
-        // FIXME.
-      }
-    } else {
-      // FIXME.
-    }
-  }
-  void postRec(mg::HttpMessage data) {}
-  void putRec(mg::HttpMessage data) {}
-  void getSess(mg::HttpMessage data) {}
-  void postSess(mg::HttpMessage data) {}
-  void putSess(mg::HttpMessage data) {}
-  void deleteSess(mg::HttpMessage data) {}
-  void getView(mg::HttpMessage data) {}
-
- private:
-  Rest& rest_;
-  mg::OStream out_;
-  Tokeniser<'/'> uri_;
-};
+  // Re-install signal handler.
+  signal(sig, sigHandler);
+}
 
 } // anonymous
 
 int main(int argc, char* argv[])
 {
+  int ret = 1;
   try {
 
     MockModel model;
     MockJourn journ;
     Rest rest{model, journ, getTimeOfDay()};
 
-    RestServ rs{rest};
+    mg::RestServ rs{rest, httpOpts};
     auto& conn = rs.bind(httpPort);
     mg_set_protocol_http_websocket(&conn);
 
@@ -146,14 +59,38 @@ int main(int argc, char* argv[])
     httpOpts.dav_document_root = ".";
     httpOpts.enable_directory_listing = "yes";
 
-    cout << "Starting web server on port " << httpPort << endl;
-    for (;;) {
-      rs.poll(1000);
-    }
+    SWIRLY_NOTICE(logMsg() << "starting web server on port " << httpPort);
 
-    return 0;
+    signal(SIGHUP, sigHandler);
+    signal(SIGINT, sigHandler);
+    signal(SIGTERM, sigHandler);
+
+    bool quit{false};
+    do {
+      rs.poll(1000);
+
+      int sig{sig_};
+      sig_ = 0;
+      switch (sig) {
+      case SIGHUP:
+        SWIRLY_INFO("received SIGHUP"_sv);
+        break;
+      case SIGINT:
+        SWIRLY_INFO("received SIGINT"_sv);
+        quit = true;
+        break;
+      case SIGTERM:
+        SWIRLY_INFO("received SIGTERM"_sv);
+        quit = true;
+        break;
+      }
+    } while (!quit);
+
+    ret = 0;
+
   } catch (const exception& e) {
-    cerr << "error: " << e.what() << endl;
+    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
   }
-  return 1;
+  SWIRLY_NOTICE("exiting web server"_sv);
+  return ret;
 }
