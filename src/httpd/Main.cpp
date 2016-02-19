@@ -26,8 +26,13 @@
 #include <boost/program_options.hpp>
 
 #include <iostream>
+#include <system_error>
 
+#include <cerrno>
+
+#include <fcntl.h> // open()
 #include <syslog.h>
+#include <unistd.h> // dup2()
 
 using namespace std;
 using namespace swirly;
@@ -46,6 +51,17 @@ void sigHandler(int sig) noexcept
   signal(sig, sigHandler);
 }
 
+void openLogFile(const char* path)
+{
+  const int fd{open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP)};
+  if (fd < 0)
+    throw system_error(errno, system_category(), "open() failed");
+
+  dup2(fd, STDOUT_FILENO);
+  dup2(fd, STDERR_FILENO);
+  close(fd);
+}
+
 } // anonymous
 
 int main(int argc, char* argv[])
@@ -56,6 +72,7 @@ int main(int argc, char* argv[])
   try {
 
     string httpPort;
+    string logFile;
     string workDir;
 
     po::options_description generalDesc{"General options"};
@@ -68,6 +85,8 @@ int main(int argc, char* argv[])
     daemonDesc.add_options() //
       ("daemon,d", //
        "daemonise process") //
+      ("logfile,l", po::value<string>(&logFile)->implicit_value("swirly_httpd.log"), //
+       "log file name") //
       ("working,w", po::value<string>(&workDir)->default_value("/"), //
        "working directory") //
       ;
@@ -92,10 +111,15 @@ int main(int argc, char* argv[])
 
     if (vm.count("daemon")) {
       daemon(workDir.c_str(), 0027);
-      // Daemon uses syslog by default.
-      openlog("swirly_httpd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
-      setLogger(sysLogger);
+      if (logFile.empty()) {
+        // Daemon uses syslog by default.
+        openlog("swirly_httpd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+        setLogger(sysLogger);
+      }
     }
+
+    if (!logFile.empty())
+      openLogFile(logFile.c_str());
 
     MockModel model;
     MockJourn journ;
@@ -124,6 +148,8 @@ int main(int argc, char* argv[])
       switch (sig) {
       case SIGHUP:
         SWIRLY_INFO("received SIGHUP"_sv);
+        if (!logFile.empty())
+          openLogFile(logFile.c_str());
         break;
       case SIGINT:
         SWIRLY_INFO("received SIGINT"_sv);
