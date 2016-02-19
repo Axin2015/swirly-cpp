@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_HTTPD_STREAM_HPP
-#define SWIRLY_HTTPD_STREAM_HPP
+#ifndef SWIRLYD_STREAM_HPP
+#define SWIRLYD_STREAM_HPP
 
 #include "mongoose.h"
 
@@ -86,4 +86,4 @@ class OStream : public std::ostream {
 } // mg
 } // swirly
 
-#endif // SWIRLY_HTTPD_STREAM_HPP
+#endif // SWIRLYD_STREAM_HPP

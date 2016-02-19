@@ -46,7 +46,7 @@ FIND_PROGRAM(DOT dot)
 FIND_PROGRAM(PERL perl)
 FIND_PROGRAM(RAGEL ragel)
 
-FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time unit_test_framework)
+FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time program_options unit_test_framework)
 FIND_PACKAGE(Doxygen) # Optional.
 
 IF(DOXYGEN_FOUND)
@@ -80,5 +80,4 @@ ADD_SUBDIRECTORY(image)
 ADD_SUBDIRECTORY(include)
 ADD_SUBDIRECTORY(src)
 
-ADD_SUBDIRECTORY(example)
 ADD_SUBDIRECTORY(test)

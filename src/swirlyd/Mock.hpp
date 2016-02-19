@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_HTTPD_MOCK_HPP
-#define SWIRLY_HTTPD_MOCK_HPP
+#ifndef SWIRLYD_MOCK_HPP
+#define SWIRLYD_MOCK_HPP
 
 #include <swirly/elm/Journ.hpp>
 #include <swirly/elm/Model.hpp>
@@ -101,4 +101,4 @@ class MockJourn : public Journ {
 
 } // swirly
 
-#endif // SWIRLY_HTTPD_MOCK_HPP
+#endif // SWIRLYD_MOCK_HPP

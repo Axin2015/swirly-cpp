@@ -8,8 +8,8 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   SET(CMAKE_C_FLAGS "-std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
 ENDIF()
 
-FILE(GLOB httpd_SOURCES "*.cpp")
+FILE(GLOB swirlyd_SOURCES "*.cpp")
 
-ADD_EXECUTABLE(swirly_httpd ${httpd_SOURCES} mongoose.c)
-TARGET_LINK_LIBRARIES(swirly_httpd fir_shared)
-INSTALL(TARGETS swirly_httpd DESTINATION bin)
+ADD_EXECUTABLE(swirlyd ${swirlyd_SOURCES} mongoose.c)
+TARGET_LINK_LIBRARIES(swirlyd fir_shared ${Boost_PROGRAM_OPTIONS_LIBRARY})
+INSTALL(TARGETS swirlyd DESTINATION bin)

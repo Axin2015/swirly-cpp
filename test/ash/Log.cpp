@@ -24,7 +24,10 @@ using namespace swirly;
 namespace {
 
 template <typename T, typename U>
-struct Foo { T first; U second; };
+struct Foo {
+  T first;
+  U second;
+};
 
 ostream& operator<<(ostream& os, const Foo<int, int>& val)
 {
