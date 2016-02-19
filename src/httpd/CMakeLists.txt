@@ -11,5 +11,5 @@ ENDIF()
 FILE(GLOB httpd_SOURCES "*.cpp")
 
 ADD_EXECUTABLE(swirly_httpd ${httpd_SOURCES} mongoose.c)
-TARGET_LINK_LIBRARIES(swirly_httpd fir_shared)
+TARGET_LINK_LIBRARIES(swirly_httpd fir_shared ${Boost_PROGRAM_OPTIONS_LIBRARY})
 INSTALL(TARGETS swirly_httpd DESTINATION bin)

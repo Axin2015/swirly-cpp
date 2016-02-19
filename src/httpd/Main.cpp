@@ -22,12 +22,15 @@
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
 
+#include <boost/program_options.hpp>
+
+#include <iostream>
+
 using namespace std;
 using namespace swirly;
 
 namespace {
 
-constexpr char httpPort[] = "8080";
 mg_serve_http_opts httpOpts;
 
 volatile sig_atomic_t sig_{0};
@@ -44,15 +47,35 @@ void sigHandler(int sig) noexcept
 
 int main(int argc, char* argv[])
 {
+  namespace po = boost::program_options;
+
   int ret = 1;
   try {
+
+    string httpPort;
+
+    po::options_description desc("options");
+    desc.add_options()
+      ("help,h", "show help message")
+      ("port,p", po::value<string>(&httpPort)->default_value("8080"),
+       "http port")
+      ;
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) {
+      cout << desc << "\n";
+      return 1;
+    }
 
     MockModel model;
     MockJourn journ;
     Rest rest{model, journ, getTimeOfDay()};
 
     mg::RestServ rs{rest, httpOpts};
-    auto& conn = rs.bind(httpPort);
+    auto& conn = rs.bind(httpPort.c_str());
     mg_set_protocol_http_websocket(&conn);
 
     httpOpts.document_root = ".";
