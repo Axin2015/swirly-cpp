@@ -21,7 +21,6 @@
 
 #include <cerrno>
 #include <cstdlib> // quick_exit()
-#include <cstring> // strerror()
 
 #include <fcntl.h> // open()
 #include <unistd.h> // fork()
@@ -36,7 +35,7 @@ void daemon(const char* wd, mode_t mask)
 {
   pid_t pid{fork()};
   if (pid < 0)
-    throw system_error(errno, system_category(), "fork() failed: "s + strerror(errno));
+    throw system_error(errno, system_category(), "fork() failed");
 
   if (pid != 0) {
     // Exit parent process using system version of exit() to avoid flushing standard streams.
@@ -46,13 +45,13 @@ void daemon(const char* wd, mode_t mask)
 
   // Detach from controlling terminal by making process a session leader.
   if (setsid() < 0)
-    throw system_error(errno, system_category(), "setsid() failed: "s + strerror(errno));
+    throw system_error(errno, system_category(), "setsid() failed");
 
   // Forking again ensures that the daemon process is not a session leader, and therefore cannot
   // regain access to a controlling terminal.
   pid = fork();
   if (pid < 0)
-    throw system_error(errno, system_category(), "fork() failed: "s + strerror(errno));
+    throw system_error(errno, system_category(), "fork() failed");
 
   if (pid != 0) {
     // FIXME: use quick_exit() when available on OSX.
@@ -61,7 +60,7 @@ void daemon(const char* wd, mode_t mask)
 
   // Change the current working directory.
   if (chdir(wd) < 0)
-    throw system_error(errno, system_category(), "chdir() failed: %s"s + strerror(errno));
+    throw system_error(errno, system_category(), "chdir() failed");
 
   // Restrict file creation mode. This function is always successful.
   umask(mask);
@@ -69,7 +68,7 @@ void daemon(const char* wd, mode_t mask)
   // Re-open standard input.
   close(STDIN_FILENO);
   if (open("/dev/null", O_RDONLY) < 0)
-    throw system_error(errno, system_category(), "open() failed: %s"s + strerror(errno));
+    throw system_error(errno, system_category(), "open() failed");
 
   // Close all non-standard file handles.
   const int fds{getdtablesize()};

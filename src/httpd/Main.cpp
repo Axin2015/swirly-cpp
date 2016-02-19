@@ -19,12 +19,15 @@
 
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/ash/Daemon.hpp>
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
 
 #include <boost/program_options.hpp>
 
 #include <iostream>
+
+#include <syslog.h>
 
 using namespace std;
 using namespace swirly;
@@ -53,21 +56,45 @@ int main(int argc, char* argv[])
   try {
 
     string httpPort;
+    string workDir;
 
-    po::options_description desc("options");
-    desc.add_options()
-      ("help,h", "show help message")
-      ("port,p", po::value<string>(&httpPort)->default_value("8080"),
-       "http port")
+    po::options_description generalDesc{"General options"};
+    generalDesc.add_options() //
+      ("help,h", //
+       "show help message") //
       ;
+
+    po::options_description daemonDesc{"Daemon options"};
+    daemonDesc.add_options() //
+      ("daemon,d", //
+       "daemonise process") //
+      ("working,w", po::value<string>(&workDir)->default_value("/"), //
+       "working directory") //
+      ;
+
+    po::options_description httpDesc{"Http options"};
+    httpDesc.add_options() //
+      ("port,p", po::value<string>(&httpPort)->default_value("8080"), //
+       "http port") //
+      ;
+
+    po::options_description desc{"Allowed options"};
+    desc.add(generalDesc).add(daemonDesc).add(httpDesc);
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
     if (vm.count("help")) {
-      cout << desc << "\n";
+      cout << "Usage: swirly_httpd [options]\n" << desc << endl;
       return 1;
+    }
+
+    if (vm.count("daemon")) {
+      daemon(workDir.c_str(), 0027);
+      // Daemon uses syslog by default.
+      openlog("swirly_httpd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+      setLogger(sysLogger);
     }
 
     MockModel model;
