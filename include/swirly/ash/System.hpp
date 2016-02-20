@@ -29,15 +29,9 @@ namespace swirly {
  */
 
 /**
- * Daemonise process.
- *
- * Detach from controlling terminal and run in the background as a system daemon.
- *
- * @param wd Desired working directory.
- *
- * @param mask Desired umask.
+ * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
  */
-SWIRLY_API void daemon(const char* wd, mode_t mask);
+SWIRLY_API void daemon();
 
 /** @} */
 
