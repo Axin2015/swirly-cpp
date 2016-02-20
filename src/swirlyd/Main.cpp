@@ -19,8 +19,8 @@
 
 #include <swirly/fir/Rest.hpp>
 
-#include <swirly/ash/Daemon.hpp>
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/System.hpp>
 #include <swirly/ash/Time.hpp>
 
 #include <boost/filesystem.hpp>
