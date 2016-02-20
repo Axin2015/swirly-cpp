@@ -23,6 +23,7 @@
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
 
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
 #include <iostream>
@@ -66,14 +67,15 @@ void openLogFile(const char* path)
 
 int main(int argc, char* argv[])
 {
+  namespace fs = boost::filesystem;
   namespace po = boost::program_options;
 
   int ret = 1;
   try {
 
     string httpPort;
-    string logFile;
-    string workDir;
+    fs::path logFile;
+    fs::path workDir;
 
     po::options_description generalDesc{"General options"};
     generalDesc.add_options() //
@@ -85,9 +87,9 @@ int main(int argc, char* argv[])
     daemonDesc.add_options() //
       ("daemon,d", //
        "daemonise process") //
-      ("logfile,l", po::value<string>(&logFile)->implicit_value("swirlyd.log"), //
+      ("logfile,l", po::value<fs::path>(&logFile)->implicit_value("swirlyd.log"), //
        "log file name") //
-      ("working,w", po::value<string>(&workDir)->default_value("/"), //
+      ("working,w", po::value<fs::path>(&workDir)->default_value("/"), //
        "working directory") //
       ;
 
@@ -109,17 +111,29 @@ int main(int argc, char* argv[])
       return 1;
     }
 
+    if (!workDir.is_absolute())
+      workDir = fs::absolute(workDir, fs::current_path());
+
     if (vm.count("daemon")) {
+
       daemon(workDir.c_str(), 0027);
+
+      // Daemon uses syslog by default.
       if (logFile.empty()) {
-        // Daemon uses syslog by default.
         openlog("swirlyd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
         setLogger(sysLogger);
       }
     }
 
-    if (!logFile.empty())
+    if (!logFile.empty()) {
+
+      // Log file is relative to working directory.
+      if (!logFile.is_absolute())
+        logFile = fs::absolute(logFile, workDir);
+
+      SWIRLY_NOTICE(logMsg() << "opening log file: " << logFile);
       openLogFile(logFile.c_str());
+    }
 
     MockModel model;
     MockJourn journ;
@@ -148,8 +162,10 @@ int main(int argc, char* argv[])
       switch (sig) {
       case SIGHUP:
         SWIRLY_INFO("received SIGHUP"_sv);
-        if (!logFile.empty())
+        if (!logFile.empty()) {
+          SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
           openLogFile(logFile.c_str());
+        }
         break;
       case SIGINT:
         SWIRLY_INFO("received SIGINT"_sv);

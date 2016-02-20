@@ -46,7 +46,8 @@ FIND_PROGRAM(DOT dot)
 FIND_PROGRAM(PERL perl)
 FIND_PROGRAM(RAGEL ragel)
 
-FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time program_options unit_test_framework)
+FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time filesystem program_options
+  system unit_test_framework)
 FIND_PACKAGE(Doxygen) # Optional.
 
 IF(DOXYGEN_FOUND)
