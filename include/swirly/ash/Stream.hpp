@@ -79,8 +79,11 @@ class StringBuilder : public std::ostream {
   void reset() noexcept
   {
     buf_.reset();
-    // Clear rdstate.
     clear();
+    fill(widen(' '));
+    flags(skipws | dec);
+    precision(6);
+    width(0);
   };
 
  private:

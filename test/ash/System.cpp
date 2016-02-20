@@ -14,33 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_DAEMON_HPP
-#define SWIRLY_ASH_DAEMON_HPP
+#include <swirly/ash/System.hpp>
 
-#include <swirly/ash/Defs.hpp>
+#include <boost/test/unit_test.hpp>
 
-#include <sys/types.h>
+BOOST_AUTO_TEST_SUITE(DaemonSuite)
 
-namespace swirly {
+BOOST_AUTO_TEST_CASE(DaemonCase)
+{
+  BOOST_CHECK(true);
+}
 
-/**
- * @addtogroup Util
- * @{
- */
-
-/**
- * Daemonise process.
- *
- * Detach from controlling terminal and run in the background as a system daemon.
- *
- * @param wd Desired working directory.
- *
- * @param mask Desired umask.
- */
-SWIRLY_API void daemon(const char* wd, mode_t mask);
-
-/** @} */
-
-} // swirly
-
-#endif // SWIRLY_ASH_DAEMON_HPP
+BOOST_AUTO_TEST_SUITE_END()

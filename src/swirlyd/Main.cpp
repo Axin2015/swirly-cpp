@@ -19,12 +19,14 @@
 
 #include <swirly/fir/Rest.hpp>
 
-#include <swirly/ash/Daemon.hpp>
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/System.hpp>
 #include <swirly/ash/Time.hpp>
 
+#include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
+#include <iomanip>
 #include <iostream>
 #include <system_error>
 
@@ -33,6 +35,8 @@
 #include <fcntl.h> // open()
 #include <syslog.h>
 #include <unistd.h> // dup2()
+
+#include <sys/stat.h> // umask()
 
 using namespace std;
 using namespace swirly;
@@ -62,38 +66,55 @@ void openLogFile(const char* path)
   close(fd);
 }
 
+mode_t getUMask()
+{
+  mode_t mask{umask(0)};
+  umask(mask);
+  return mask;
+}
+
 } // anonymous
 
 int main(int argc, char* argv[])
 {
+  namespace fs = boost::filesystem;
   namespace po = boost::program_options;
 
   int ret = 1;
   try {
 
+    string authUser;
+    fs::path directory;
     string httpPort;
-    string logFile;
-    string workDir;
+    fs::path logFile;
+    int logLevel;
+    string umask;
 
     po::options_description generalDesc{"General options"};
     generalDesc.add_options() //
       ("help,h", //
        "show help message") //
+      ("log-level,e", po::value<int>(&logLevel)->default_value(LogInfo), //
+       "log level (0-5)") //
       ;
 
     po::options_description daemonDesc{"Daemon options"};
     daemonDesc.add_options() //
-      ("daemon,d", //
-       "daemonise process") //
-      ("logfile,l", po::value<string>(&logFile)->implicit_value("swirlyd.log"), //
-       "log file name") //
-      ("working,w", po::value<string>(&workDir)->default_value("/"), //
+      ("directory,d", po::value<fs::path>(&directory), //
        "working directory") //
+      ("log-file,l", po::value<fs::path>(&logFile)->implicit_value("swirlyd.log"), //
+       "log file name") //
+      ("no-daemon,n", //
+       "run in the foreground") //
+      ("umask,m", po::value<string>(&umask), //
+       "file creation mask") //
       ;
 
     po::options_description httpDesc{"Http options"};
     httpDesc.add_options() //
-      ("port,p", po::value<string>(&httpPort)->default_value("8080"), //
+      ("auth-user,u", po::value<string>(&authUser)->default_value("Auth-User"), //
+       "http auth-user header") //
+      ("http-port,p", po::value<string>(&httpPort)->default_value("8080"), //
        "http port") //
       ;
 
@@ -109,17 +130,56 @@ int main(int argc, char* argv[])
       return 1;
     }
 
-    if (vm.count("daemon")) {
-      daemon(workDir.c_str(), 0027);
+    const bool noDaemon{vm.count("no-daemon") > 0};
+
+    setLogLevel(logLevel);
+
+    if (!directory.empty()) {
+      // Make absolute.
+      if (directory.is_relative())
+        directory = fs::absolute(directory, fs::current_path());
+    } else if (!noDaemon)
+      directory = fs::current_path().root_path();
+
+    // Change the current working directory if specified.
+    if (!directory.empty()) {
+      if (chdir(directory.c_str()) < 0)
+        throw system_error(errno, system_category(), "chdir() failed");
+    } else {
+      assert(noDaemon);
+      directory = fs::current_path();
+    }
+
+    assert(!directory.empty());
+
+    // Restrict file creation mask if specified. This function is always successful.
+    if (!umask.empty()) {
+      // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
+      ::umask(static_cast<mode_t>(stoi(umask, nullptr, 0)));
+    } else if (!noDaemon)
+      ::umask(0027);
+
+    if (!noDaemon) {
+
+      daemon();
+
+      // Daemon uses syslog by default.
       if (logFile.empty()) {
-        // Daemon uses syslog by default.
         openlog("swirlyd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
+        setlogmask(LOG_UPTO(LOG_DEBUG));
         setLogger(sysLogger);
       }
     }
 
-    if (!logFile.empty())
+    if (!logFile.empty()) {
+
+      // Log file is relative to working directory.
+      if (logFile.is_relative())
+        logFile = fs::absolute(logFile, directory);
+
+      SWIRLY_NOTICE(logMsg() << "opening log file: " << logFile);
       openLogFile(logFile.c_str());
+    }
 
     MockModel model;
     MockJourn journ;
@@ -135,6 +195,14 @@ int main(int argc, char* argv[])
 
     SWIRLY_NOTICE(logMsg() << "starting web server on port " << httpPort);
 
+    SWIRLY_INFO(logMsg() << "auth-user: " << authUser);
+    SWIRLY_INFO(logMsg() << "directory: " << directory);
+    SWIRLY_INFO(logMsg() << "http-port: " << httpPort);
+    SWIRLY_INFO(logMsg() << "log-file:  " << logFile);
+    SWIRLY_INFO(logMsg() << "log-level: " << logLevel);
+    SWIRLY_INFO(logMsg() << "no-daemon: " << noDaemon);
+    SWIRLY_INFO(logMsg() << "umask:     0" << setfill('0') << setw(3) << oct << getUMask());
+
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);
     signal(SIGTERM, sigHandler);
@@ -148,8 +216,10 @@ int main(int argc, char* argv[])
       switch (sig) {
       case SIGHUP:
         SWIRLY_INFO("received SIGHUP"_sv);
-        if (!logFile.empty())
+        if (!logFile.empty()) {
+          SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
           openLogFile(logFile.c_str());
+        }
         break;
       case SIGINT:
         SWIRLY_INFO("received SIGINT"_sv);

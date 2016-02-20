@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Daemon.hpp>
+#include <swirly/ash/System.hpp>
 
 #include <string>
 #include <system_error>
@@ -25,13 +25,11 @@
 #include <fcntl.h> // open()
 #include <unistd.h> // fork()
 
-#include <sys/stat.h> // umask()
-
 using namespace std;
 
 namespace swirly {
 
-void daemon(const char* wd, mode_t mask)
+void daemon()
 {
   pid_t pid{fork()};
   if (pid < 0)
@@ -57,13 +55,6 @@ void daemon(const char* wd, mode_t mask)
     // FIXME: use quick_exit() when available on OSX.
     _exit(0);
   }
-
-  // Change the current working directory.
-  if (chdir(wd) < 0)
-    throw system_error(errno, system_category(), "chdir() failed");
-
-  // Restrict file creation mode. This function is always successful.
-  umask(mask);
 
   // Re-open standard input.
   close(STDIN_FILENO);
