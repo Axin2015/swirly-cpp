@@ -90,7 +90,7 @@ void nullLogger(int level, const std::string_view& msg) noexcept
 void stdLogger(int level, const std::string_view& msg) noexcept
 {
   const Millis ms{getTimeOfDay()};
-  const time_t now{unbox(ms) / 1000};
+  const auto now = static_cast<time_t>(unbox(ms) / 1000);
 
   struct tm tm;
   localtime_r(&now, &tm);
