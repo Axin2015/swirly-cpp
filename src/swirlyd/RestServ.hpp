@@ -33,9 +33,8 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  RestServ(Rest& rest, const mg_serve_http_opts& httpOpts) noexcept
-  : rest_(rest),
-    httpOpts_(httpOpts)
+  RestServ(Rest& rest, const mg_serve_http_opts& httpOpts) noexcept : rest_(rest),
+                                                                      httpOpts_(httpOpts)
   {
   }
   ~RestServ() noexcept;
