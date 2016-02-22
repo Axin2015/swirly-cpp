@@ -24,7 +24,11 @@
 #include <swirly/ash/Time.hpp>
 
 #include <boost/filesystem.hpp>
+// Older versions of program_options reference auto_ptr even when BOOST_NO_AUTO_PTR is set.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <boost/program_options.hpp>
+#pragma GCC diagnostic pop
 
 #include <iomanip>
 #include <iostream>
