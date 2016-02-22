@@ -1,5 +1,5 @@
-Rest API {#Rest}
-========
+Restful API {#RestApi}
+===========
 
 Record
 ------

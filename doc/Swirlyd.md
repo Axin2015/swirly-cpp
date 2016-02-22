@@ -1,5 +1,5 @@
-Swirlyd {#Swirlyd}
-=======
+Swirlyd Manual {#Swirlyd}
+==============
 
 Synopsis
 --------
@@ -27,8 +27,11 @@ Working directory. Defaults to the root directory unless the `no-daemon` option 
 ### log-file ###
 
 Log file name. Relative paths are relative to the working directory. The argument is optional and
-defaults to "swirlyd.log". The syslog facility is used by default unless the `log-file` or
-`no-daemon` options are specified.
+defaults to "/var/log/swirlyd/swirlyd.log". The log file's parent directory will be created if it
+does not exist.
+
+The syslog facility is used by default unless either the `log-file` or `no-daemon` option are
+specified.
 
 ### no-daemon ###
 
