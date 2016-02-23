@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
       ("directory,d", po::value<fs::path>(&directory), //
        "working directory") //
       ("log-file,l", po::value<fs::path>(&logFile) //
-       ->implicit_value("/var/log/swirlyd/swirlyd.log"), //
+                       ->implicit_value("/var/log/swirlyd/swirlyd.log"), //
        "log file name") //
       ("no-daemon,n", //
        "run in the foreground") //
@@ -139,22 +139,6 @@ int main(int argc, char* argv[])
 
     setLogLevel(logLevel);
 
-    if (!directory.empty()) {
-      directory = fs::canonical(directory, fs::current_path());
-    } else if (!noDaemon)
-      directory = fs::current_path().root_path();
-
-    // Change the current working directory if specified.
-    if (!directory.empty()) {
-      if (chdir(directory.c_str()) < 0)
-        throw system_error(errno, system_category(), "chdir() failed");
-    } else {
-      assert(noDaemon);
-      directory = fs::current_path();
-    }
-
-    assert(!directory.empty());
-
     // Restrict file creation mask if specified. This function is always successful.
     if (!umask.empty()) {
       // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
@@ -162,8 +146,22 @@ int main(int argc, char* argv[])
     } else if (!noDaemon)
       ::umask(0027);
 
+    if (!directory.empty()) {
+      // Change the current working directory if specified.
+      directory = fs::canonical(directory, fs::current_path());
+      if (chdir(directory.c_str()) < 0)
+        throw system_error(errno, system_category(), "chdir() failed");
+    } else if (!noDaemon) {
+      // Default to root directory if daemon.
+      directory = fs::current_path().root_path();
+    } else {
+      // Otherwise, default to current directory.
+      directory = fs::current_path();
+    }
+
     if (!noDaemon) {
 
+      // Daemonise process.
       daemon();
 
       // Daemon uses syslog by default.
@@ -177,7 +175,7 @@ int main(int argc, char* argv[])
     if (!logFile.empty()) {
 
       // Log file is relative to working directory. We use absolute, rather than canonical here,
-      // because canonical requires the file to exist.
+      // because canonical requires that the file exists.
       if (logFile.is_relative())
         logFile = fs::absolute(logFile, directory);
 
@@ -199,7 +197,7 @@ int main(int argc, char* argv[])
     httpOpts.dav_document_root = ".";
     httpOpts.enable_directory_listing = "yes";
 
-    SWIRLY_NOTICE(logMsg() << "starting web server on port " << httpPort);
+    SWIRLY_NOTICE(logMsg() << "starting swirlyd server on port " << httpPort);
 
     SWIRLY_INFO(logMsg() << "auth-user: " << authUser);
     SWIRLY_INFO(logMsg() << "directory: " << directory);
@@ -243,6 +241,6 @@ int main(int argc, char* argv[])
   } catch (const exception& e) {
     SWIRLY_ERROR(logMsg() << "exception: " << e.what());
   }
-  SWIRLY_NOTICE("exiting web server"_sv);
+  SWIRLY_NOTICE("stopping swirlyd server"_sv);
   return ret;
 }
