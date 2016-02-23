@@ -1,5 +1,5 @@
-Infrastructure {#Infrastructure}
-==============
+The Cloud {#Cloud}
+=========
 
 Cloud Platforms
 ---------------

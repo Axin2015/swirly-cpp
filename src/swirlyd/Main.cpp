@@ -24,7 +24,11 @@
 #include <swirly/ash/Time.hpp>
 
 #include <boost/filesystem.hpp>
+// Older versions of program_options reference auto_ptr even when BOOST_NO_AUTO_PTR is set.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <boost/program_options.hpp>
+#pragma GCC diagnostic pop
 
 #include <iomanip>
 #include <iostream>
@@ -102,7 +106,8 @@ int main(int argc, char* argv[])
     daemonDesc.add_options() //
       ("directory,d", po::value<fs::path>(&directory), //
        "working directory") //
-      ("log-file,l", po::value<fs::path>(&logFile)->implicit_value("swirlyd.log"), //
+      ("log-file,l", po::value<fs::path>(&logFile) //
+       ->implicit_value("/var/log/swirlyd/swirlyd.log"), //
        "log file name") //
       ("no-daemon,n", //
        "run in the foreground") //
@@ -135,9 +140,7 @@ int main(int argc, char* argv[])
     setLogLevel(logLevel);
 
     if (!directory.empty()) {
-      // Make absolute.
-      if (directory.is_relative())
-        directory = fs::absolute(directory, fs::current_path());
+      directory = fs::canonical(directory, fs::current_path());
     } else if (!noDaemon)
       directory = fs::current_path().root_path();
 
@@ -173,9 +176,12 @@ int main(int argc, char* argv[])
 
     if (!logFile.empty()) {
 
-      // Log file is relative to working directory.
+      // Log file is relative to working directory. We use absolute, rather than canonical here,
+      // because canonical requires the file to exist.
       if (logFile.is_relative())
         logFile = fs::absolute(logFile, directory);
+
+      fs::create_directory(logFile.parent_path());
 
       SWIRLY_NOTICE(logMsg() << "opening log file: " << logFile);
       openLogFile(logFile.c_str());

@@ -1,6 +1,8 @@
 Quoting {#Quoting}
 =======
 
+N.B. Quoting is only applicable to the Java port.
+
 Overview
 --------
 

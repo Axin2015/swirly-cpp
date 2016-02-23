@@ -1,5 +1,5 @@
-Style {#Style}
-=====
+Style Guide {#Style}
+===========
 
 Filenames
 ---------

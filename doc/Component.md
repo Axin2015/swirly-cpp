@@ -1,5 +1,5 @@
-Component {#Component}
-=========
+Component Depends {#Component}
+=================
 
 Ash Library
 -----------

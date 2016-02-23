@@ -1,5 +1,5 @@
-Developer {#Developer}
-=========
+Build from Source {#Build}
+=================
 
 Environment Variables
 ---------------------
@@ -85,15 +85,6 @@ Compile the code in the build directory using the `make` command:
 Install to `CMAKE_INSTALL_PREFIX`:
 
     $ make install
-
-Documentation
--------------
-
-Testing
--------
-
-Each header-file should have its own unit-test. The header-file should be the first file included in
-the unit-test to ensure that the header-file is self-sufficient.
 
 [Boost]: http://www.boost.org/
 [Clang]: http://clang.llvm.org/
