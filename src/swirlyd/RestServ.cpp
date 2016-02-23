@@ -36,8 +36,10 @@ void RestServ::reset(string_view sv) noexcept
     sv.remove_prefix(1);
   uri_.reset(sv);
 }
+
 void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 {
+  const auto now = getTimeOfDay();
   reset(data.uri());
 
   if (!uri_.empty()) {
@@ -48,33 +50,34 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 
     if (tok == "rec") {
       if (method == "GET") {
-        getRec(data);
+        getRec(data, now);
       } else if (method == "POST") {
-        postRec(data);
+        postRec(data, now);
       } else if (method == "PUT") {
-        putRec(data);
+        putRec(data, now);
       } else {
         // FIXME.
       }
     } else if (tok == "sess") {
       if (method == "GET") {
-        getSess(data);
+        getSess(data, now);
       } else if (method == "POST") {
-        postSess(data);
+        postSess(data, now);
       } else if (method == "PUT") {
-        putSess(data);
+        putSess(data, now);
       } else if (method == "DELETE") {
-        deleteSess(data);
+        deleteSess(data, now);
       } else {
         // FIXME.
       }
     } else if (tok == "view") {
       if (method == "GET") {
-        getView(data);
+        getView(data, now);
       } else {
         // FIXME.
       }
     } else {
+      // FIXME.
       mg_serve_http(&nc, data.get(), httpOpts_);
       return;
     }
@@ -86,7 +89,8 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
     // FIXME.
   }
 }
-void RestServ::getRec(mg::HttpMessage data)
+
+void RestServ::getRec(mg::HttpMessage data, Millis now)
 {
   if (!uri_.empty()) {
 
@@ -94,9 +98,13 @@ void RestServ::getRec(mg::HttpMessage data)
     uri_.pop();
 
     if (tok == "asset") {
-      rest_.assets(getTimeOfDay(), out_);
+      rest_.assets(now, out_);
     } else if (tok == "contr") {
-      rest_.contrs(getTimeOfDay(), out_);
+      rest_.contrs(now, out_);
+    } else if (tok == "market") {
+      rest_.markets(now, out_);
+    } else if (tok == "trader") {
+      rest_.traders(now, out_);
     } else {
       // FIXME.
     }
@@ -104,25 +112,32 @@ void RestServ::getRec(mg::HttpMessage data)
     // FIXME.
   }
 }
-void RestServ::postRec(mg::HttpMessage data)
+
+void RestServ::postRec(mg::HttpMessage data, Millis now)
 {
 }
-void RestServ::putRec(mg::HttpMessage data)
+
+void RestServ::putRec(mg::HttpMessage data, Millis now)
 {
 }
-void RestServ::getSess(mg::HttpMessage data)
+
+void RestServ::getSess(mg::HttpMessage data, Millis now)
 {
 }
-void RestServ::postSess(mg::HttpMessage data)
+
+void RestServ::postSess(mg::HttpMessage data, Millis now)
 {
 }
-void RestServ::putSess(mg::HttpMessage data)
+
+void RestServ::putSess(mg::HttpMessage data, Millis now)
 {
 }
-void RestServ::deleteSess(mg::HttpMessage data)
+
+void RestServ::deleteSess(mg::HttpMessage data, Millis now)
 {
 }
-void RestServ::getView(mg::HttpMessage data)
+
+void RestServ::getView(mg::HttpMessage data, Millis now)
 {
 }
 

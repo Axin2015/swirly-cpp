@@ -21,6 +21,7 @@
 #include "Stream.hpp"
 
 #include <swirly/ash/Tokeniser.hpp>
+#include <swirly/ash/Types.hpp>
 
 namespace swirly {
 class Rest;
@@ -49,14 +50,14 @@ class RestServ : public mg::Mgr<RestServ> {
 
   void reset(std::string_view sv) noexcept;
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
-  void getRec(mg::HttpMessage data);
-  void postRec(mg::HttpMessage data);
-  void putRec(mg::HttpMessage data);
-  void getSess(mg::HttpMessage data);
-  void postSess(mg::HttpMessage data);
-  void putSess(mg::HttpMessage data);
-  void deleteSess(mg::HttpMessage data);
-  void getView(mg::HttpMessage data);
+  void getRec(mg::HttpMessage data, Millis now);
+  void postRec(mg::HttpMessage data, Millis now);
+  void putRec(mg::HttpMessage data, Millis now);
+  void getSess(mg::HttpMessage data, Millis now);
+  void postSess(mg::HttpMessage data, Millis now);
+  void putSess(mg::HttpMessage data, Millis now);
+  void deleteSess(mg::HttpMessage data, Millis now);
+  void getView(mg::HttpMessage data, Millis now);
 
  private:
   Rest& rest_;

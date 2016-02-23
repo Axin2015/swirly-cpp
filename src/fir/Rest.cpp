@@ -28,7 +28,7 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
-void Rest::assets(Millis now, std::ostream& out) const
+void Rest::assets(Millis now, ostream& out) const
 {
   const auto& assets = serv_.assets();
   out << '[';
@@ -36,11 +36,27 @@ void Rest::assets(Millis now, std::ostream& out) const
   out << ']';
 }
 
-void Rest::contrs(Millis now, std::ostream& out) const
+void Rest::contrs(Millis now, ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   out << '[';
   copy(contrs.begin(), contrs.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void Rest::markets(Millis now, ostream& out) const
+{
+  const auto& markets = serv_.markets();
+  out << '[';
+  copy(markets.begin(), markets.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void Rest::traders(Millis now, ostream& out) const
+{
+  const auto& traders = serv_.traders();
+  out << '[';
+  copy(traders.begin(), traders.end(), OStreamJoiner(out, ','));
   out << ']';
 }
 
