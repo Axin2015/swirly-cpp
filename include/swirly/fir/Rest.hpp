@@ -43,6 +43,10 @@ class SWIRLY_API Rest {
 
   void contrs(Millis now, std::ostream& out) const;
 
+  void markets(Millis now, std::ostream& out) const;
+
+  void traders(Millis now, std::ostream& out) const;
+
  private:
   Serv serv_;
 };
