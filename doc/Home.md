@@ -27,7 +27,7 @@ Developers
 ----------
 
 - [Restful API](@ref RestApi)
-- [Component Depends](@ref Component)
+- [Swirly Libraries](@ref Library)
 - [GitHub Repo](http://github.com/swirlycloud/swirlyc)
 - [Style Guide](@ref Style)
 - [Contributing](@ref Contrib)

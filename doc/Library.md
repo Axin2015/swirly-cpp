@@ -1,5 +1,5 @@
-Component Depends {#Component}
-=================
+Swirly Libraries {#Library}
+================
 
 Ash Library
 -----------
