@@ -18,7 +18,11 @@
 
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/ash/Finally.hpp>
+#include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
+
+#include <chrono>
 
 using namespace std;
 
@@ -39,6 +43,15 @@ void RestServ::reset(string_view sv) noexcept
 
 void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 {
+  using namespace chrono;
+  const auto start = high_resolution_clock::now();
+  auto finally = makeFinally([&data, &start]() {
+    const auto end = high_resolution_clock::now();
+    const auto usec = duration_cast<microseconds>(end - start);
+    SWIRLY_INFO(logMsg() << data.method() << ' ' << data.uri() << " processed in " << usec.count()
+                         << " usec");
+  });
+
   const auto now = getTimeOfDay();
   reset(data.uri());
 
