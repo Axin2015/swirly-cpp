@@ -92,24 +92,38 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 
 void RestServ::getRec(mg::HttpMessage data, Millis now)
 {
-  if (!uri_.empty()) {
+  if (uri_.empty()) {
+
+    const int bs{EntitySet::Asset | EntitySet::Contr | EntitySet::Market};
+    rest_.getRec(bs, now, out_);
+
+  } else {
 
     const auto tok = uri_.top();
     uri_.pop();
 
-    if (tok == "asset") {
-      rest_.assets(now, out_);
-    } else if (tok == "contr") {
-      rest_.contrs(now, out_);
-    } else if (tok == "market") {
-      rest_.markets(now, out_);
-    } else if (tok == "trader") {
-      rest_.traders(now, out_);
+    const auto es = EntitySet::parse(tok);
+    if (es.many()) {
+      rest_.getRec(es, now, out_);
     } else {
-      // FIXME.
+      switch (es.get()) {
+      case EntitySet::Asset:
+        rest_.getAsset(now, out_);
+        break;
+      case EntitySet::Contr:
+        rest_.getContr(now, out_);
+        break;
+      case EntitySet::Market:
+        rest_.getMarket(now, out_);
+        break;
+      case EntitySet::Trader:
+        rest_.getTrader(now, out_);
+        break;
+      default:
+        // FIXME.
+        break;
+      }
     }
-  } else {
-    // FIXME.
   }
 }
 
