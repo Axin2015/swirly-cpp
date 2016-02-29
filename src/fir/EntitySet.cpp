@@ -16,7 +16,7 @@
  */
 #include <swirly/fir/EntitySet.hpp>
 
-#include "Exception.hpp"
+#include <swirly/elm/Exception.hpp>
 
 #include <swirly/ash/Tokeniser.hpp>
 
@@ -46,7 +46,7 @@ int bit(const string_view& sv)
   } else if (sv == "view") {
     i = EntitySet::View;
   } else {
-    throw ParseException{errMsg() << "unknown entity '" << sv << '\''};
+    throw NotFoundException{errMsg() << "unknown entity '" << sv << '\''};
   }
   return i;
 }

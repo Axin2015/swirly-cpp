@@ -16,7 +16,7 @@
  */
 #include <swirly/fir/EntitySet.hpp>
 
-#include <Exception.hpp>
+#include <swirly/elm/Exception.hpp>
 
 #include <swirly/ash/String.hpp>
 
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(TrailingCase)
 
 BOOST_AUTO_TEST_CASE(BadEntityCase)
 {
-  BOOST_CHECK_THROW(EntitySet::parse("bad"_sv), ParseException);
+  BOOST_CHECK_THROW(EntitySet::parse("bad"_sv), NotFoundException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

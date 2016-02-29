@@ -17,7 +17,7 @@
  */
 #include "RestRequest.hpp"
 
-#include "Exception.hpp"
+#include <swirly/elm/Exception.hpp>
 
 using namespace std;
 
@@ -356,7 +356,7 @@ bool RestRequest::parse(const string_view& buf)
     cs_ = cs;
 
     if (cs == json_error)
-        throw ParseException{msg};
+        throw BadRequestException{msg};
 
     if (cs < json_first_final)
         return false;
