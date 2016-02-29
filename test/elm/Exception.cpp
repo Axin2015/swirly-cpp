@@ -29,8 +29,9 @@ BOOST_AUTO_TEST_CASE(JsonCase)
   const NotFoundException e{"this is a test"};
 
   BOOST_CHECK_EQUAL(toString(e), //
-                    "{\"num\":404"
-                    ",\"msg\":\"this is a test\""
+                    "{\"status\":404"
+                    ",\"reason\":\"Not Found\""
+                    ",\"detail\":\"this is a test\""
                     "}");
 }
 

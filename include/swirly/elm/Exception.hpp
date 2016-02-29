@@ -41,9 +41,13 @@ class SWIRLY_API ServException : public Exception {
   ServException(ServException&&) noexcept = default;
   ServException& operator=(ServException&&) noexcept = default;
 
-  virtual void toJson(std::ostream& os) const;
+  static void toJson(int status, const char* reason, const char* detail, std::ostream& os);
+
+  void toJson(std::ostream& os) const { toJson(httpStatus(), httpReason(), what(), os); }
 
   virtual int httpStatus() const noexcept = 0;
+
+  virtual const char* httpReason() const noexcept = 0;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const ServException& e)
@@ -70,6 +74,8 @@ class SWIRLY_API BadRequestException : public ServException {
   BadRequestException& operator=(BadRequestException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 class SWIRLY_API AlreadyExistsException : public BadRequestException {
@@ -184,6 +190,8 @@ class SWIRLY_API ForbiddenException : public ServException {
   ForbiddenException& operator=(ForbiddenException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 /**
@@ -203,6 +211,8 @@ class SWIRLY_API InternalException : public ServException {
   InternalException& operator=(InternalException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 /**
@@ -224,6 +234,8 @@ class SWIRLY_API MethodNotAllowedException : public ServException {
   MethodNotAllowedException& operator=(MethodNotAllowedException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 /**
@@ -248,6 +260,8 @@ class SWIRLY_API NotFoundException : public ServException {
   NotFoundException& operator=(NotFoundException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 class SWIRLY_API MarketClosedException : public NotFoundException {
@@ -335,6 +349,8 @@ class SWIRLY_API ServiceUnavailableException : public ServException {
   ServiceUnavailableException& operator=(ServiceUnavailableException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 /**
@@ -362,6 +378,8 @@ class SWIRLY_API UnauthorizedException : public ServException {
   UnauthorizedException& operator=(UnauthorizedException&&) noexcept = default;
 
   int httpStatus() const noexcept override;
+
+  const char* httpReason() const noexcept override;
 };
 
 /** @} */
