@@ -16,7 +16,7 @@
  */
 #include <RestRequest.hpp>
 
-#include <Exception.hpp>
+#include <swirly/elm/Exception.hpp>
 
 #include <boost/test/unit_test.hpp>
 
@@ -257,28 +257,28 @@ BOOST_AUTO_TEST_CASE(BadFieldCase)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"({"foo":null})"_sv), ParseException);
+  BOOST_CHECK_THROW(rr.parse(R"({"foo":null})"_sv), BadRequestException);
 }
 
 BOOST_AUTO_TEST_CASE(BadTypeCase)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"({"ticks":"101"})"_sv), ParseException);
+  BOOST_CHECK_THROW(rr.parse(R"({"ticks":"101"})"_sv), BadRequestException);
 }
 
 BOOST_AUTO_TEST_CASE(BadObjectCase)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"([{"ticks":101}])"_sv), ParseException);
+  BOOST_CHECK_THROW(rr.parse(R"([{"ticks":101}])"_sv), BadRequestException);
 }
 
 BOOST_AUTO_TEST_CASE(MaxLenCase)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), ParseException);
+  BOOST_CHECK_THROW(rr.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), BadRequestException);
 }
 
 BOOST_AUTO_TEST_CASE(NegativeCase)
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(NegativeCase)
   BOOST_CHECK_EQUAL(rr.ticks(), -1_tks);
 
   rr.reset();
-  BOOST_CHECK_THROW(rr.parse(R"({"state":-1})"_sv), ParseException);
+  BOOST_CHECK_THROW(rr.parse(R"({"state":-1})"_sv), BadRequestException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

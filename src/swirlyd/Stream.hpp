@@ -31,7 +31,7 @@ namespace mg {
 
 class StreamBuf : public std::streambuf {
  public:
-  StreamBuf() noexcept { mbuf_init(&buf_, 4096); }
+  explicit StreamBuf(mbuf& buf) throw(std::bad_alloc);
   ~StreamBuf() noexcept override;
 
   // Copy.
@@ -44,7 +44,8 @@ class StreamBuf : public std::streambuf {
 
   const char_type* data() const noexcept { return buf_.buf; }
   std::streamsize size() const noexcept { return buf_.len; }
-  void reset() noexcept { buf_.len = 0; }
+  void reset() noexcept;
+  void setContentLength(size_t pos, size_t len) noexcept;
 
  protected:
   int_type overflow(int_type c) noexcept override;
@@ -52,12 +53,12 @@ class StreamBuf : public std::streambuf {
   std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
 
  private:
-  mbuf buf_;
+  mbuf& buf_;
 };
 
 class OStream : public std::ostream {
  public:
-  OStream() : std::ostream{nullptr} { rdbuf(&buf_); }
+  OStream();
   ~OStream() noexcept override;
 
   // Copy.
@@ -68,17 +69,19 @@ class OStream : public std::ostream {
   OStream(OStream&&) = delete;
   OStream& operator=(OStream&&) = delete;
 
-  const char_type* data() const noexcept { return buf_.data(); }
-  std::streamsize size() const noexcept { return buf_.size(); }
-  void reset() noexcept
+  StreamBuf* rdbuf() const noexcept { return static_cast<StreamBuf*>(std::ostream::rdbuf()); }
+  const char_type* data() const noexcept { return rdbuf()->data(); }
+  std::streamsize size() const noexcept { return rdbuf()->size(); }
+  StreamBuf* rdbuf(StreamBuf* sb) noexcept
   {
-    buf_.reset();
-    // Clear rdstate.
-    clear();
-  };
+    return static_cast<StreamBuf*>(std::ostream::rdbuf(sb));
+  }
+  void reset(int status, const char* reason) noexcept;
+  void setContentLength() noexcept;
 
  private:
-  StreamBuf buf_;
+  size_t headSize_{0};
+  size_t lengthAt_{0};
 };
 
 /** @} */

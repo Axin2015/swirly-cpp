@@ -66,11 +66,18 @@ class SWIRLY_API EntitySet {
     return bs_ & -bs_;
   }
   bool empty() const noexcept { return bs_ == 0; }
+  int get() const noexcept { return bs_; }
   bool many() const noexcept { return (bs_ & (bs_ - 1)) != 0; }
   bool asset() const noexcept { return (bs_ & Asset) != 0; }
   bool contr() const noexcept { return (bs_ & Contr) != 0; }
   bool market() const noexcept { return (bs_ & Market) != 0; }
   bool trader() const noexcept { return (bs_ & Trader) != 0; }
+  bool order() const noexcept { return (bs_ & Order) != 0; }
+  bool trade() const noexcept { return (bs_ & Trade) != 0; }
+  bool posn() const noexcept { return (bs_ & Posn) != 0; }
+  bool view() const noexcept { return (bs_ & View) != 0; }
+  bool anyRec() const noexcept { return (bs_ & RecMask) != 0; }
+  bool anySess() const noexcept { return (bs_ & SessMask) != 0; }
   int pop() noexcept
   {
     const auto i = top();

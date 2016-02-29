@@ -16,7 +16,7 @@
  */
 #include <swirly/fir/EntitySet.hpp>
 
-#include <Exception.hpp>
+#include <swirly/elm/Exception.hpp>
 
 #include <swirly/ash/String.hpp>
 
@@ -28,100 +28,100 @@ BOOST_AUTO_TEST_SUITE(EntitySetSuite)
 
 BOOST_AUTO_TEST_CASE(ZeroCase)
 {
-  const auto set = EntitySet::parse(""_sv);
-  BOOST_CHECK(!set.many());
-  BOOST_CHECK(!set.asset());
-  BOOST_CHECK(!set.contr());
-  BOOST_CHECK(!set.market());
-  BOOST_CHECK(!set.trader());
+  const auto es = EntitySet::parse(""_sv);
+  BOOST_CHECK(!es.many());
+  BOOST_CHECK(!es.asset());
+  BOOST_CHECK(!es.contr());
+  BOOST_CHECK(!es.market());
+  BOOST_CHECK(!es.trader());
 
   // End.
-  BOOST_CHECK(set.empty());
+  BOOST_CHECK(es.empty());
 }
 
 BOOST_AUTO_TEST_CASE(OneCase)
 {
-  auto set = EntitySet::parse("asset"_sv);
-  BOOST_CHECK(!set.many());
-  BOOST_CHECK(set.asset());
-  BOOST_CHECK(!set.contr());
-  BOOST_CHECK(!set.market());
-  BOOST_CHECK(!set.trader());
+  auto es = EntitySet::parse("asset"_sv);
+  BOOST_CHECK(!es.many());
+  BOOST_CHECK(es.asset());
+  BOOST_CHECK(!es.contr());
+  BOOST_CHECK(!es.market());
+  BOOST_CHECK(!es.trader());
 
   // First.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Asset);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Asset);
 
   // End.
-  BOOST_CHECK(set.empty());
+  BOOST_CHECK(es.empty());
 }
 
 BOOST_AUTO_TEST_CASE(TwoCase)
 {
-  auto set = EntitySet::parse("asset,contr"_sv);
-  BOOST_CHECK(set.many());
-  BOOST_CHECK(set.asset());
-  BOOST_CHECK(set.contr());
-  BOOST_CHECK(!set.market());
-  BOOST_CHECK(!set.trader());
+  auto es = EntitySet::parse("asset,contr"_sv);
+  BOOST_CHECK(es.many());
+  BOOST_CHECK(es.asset());
+  BOOST_CHECK(es.contr());
+  BOOST_CHECK(!es.market());
+  BOOST_CHECK(!es.trader());
 
   // First.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Asset);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Asset);
 
   // Second.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Contr);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Contr);
 
   // End.
-  BOOST_CHECK(set.empty());
+  BOOST_CHECK(es.empty());
 }
 
 BOOST_AUTO_TEST_CASE(ThreeCase)
 {
-  auto set = EntitySet::parse("market,contr,asset"_sv);
-  BOOST_CHECK(set.many());
-  BOOST_CHECK(set.asset());
-  BOOST_CHECK(set.contr());
-  BOOST_CHECK(set.market());
-  BOOST_CHECK(!set.trader());
+  auto es = EntitySet::parse("market,contr,asset"_sv);
+  BOOST_CHECK(es.many());
+  BOOST_CHECK(es.asset());
+  BOOST_CHECK(es.contr());
+  BOOST_CHECK(es.market());
+  BOOST_CHECK(!es.trader());
 
   // First.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Asset);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Asset);
 
   // Second.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Contr);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Contr);
 
   // Third.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Market);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Market);
 
   // End.
-  BOOST_CHECK(set.empty());
+  BOOST_CHECK(es.empty());
 }
 
 BOOST_AUTO_TEST_CASE(TrailingCase)
 {
-  auto set = EntitySet::parse("trader,"_sv);
-  BOOST_CHECK(!set.many());
-  BOOST_CHECK(!set.asset());
-  BOOST_CHECK(!set.contr());
-  BOOST_CHECK(!set.market());
-  BOOST_CHECK(set.trader());
+  auto es = EntitySet::parse("trader,"_sv);
+  BOOST_CHECK(!es.many());
+  BOOST_CHECK(!es.asset());
+  BOOST_CHECK(!es.contr());
+  BOOST_CHECK(!es.market());
+  BOOST_CHECK(es.trader());
 
   // First.
-  BOOST_CHECK(!set.empty());
-  BOOST_CHECK_EQUAL(set.pop(), EntitySet::Trader);
+  BOOST_CHECK(!es.empty());
+  BOOST_CHECK_EQUAL(es.pop(), EntitySet::Trader);
 
   // End.
-  BOOST_CHECK(set.empty());
+  BOOST_CHECK(es.empty());
 }
 
 BOOST_AUTO_TEST_CASE(BadEntityCase)
 {
-  BOOST_CHECK_THROW(EntitySet::parse("bad"_sv), ParseException);
+  BOOST_CHECK_THROW(EntitySet::parse("bad"_sv), NotFoundException);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

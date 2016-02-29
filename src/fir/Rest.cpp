@@ -16,7 +16,7 @@
  */
 #include <swirly/fir/Rest.hpp>
 
-#include <swirly/ash/Stream.hpp>
+#include <swirly/elm/Exception.hpp>
 
 using namespace std;
 
@@ -28,7 +28,40 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
-void Rest::assets(Millis now, ostream& out) const
+void Rest::getRec(EntitySet es, Millis now, std::ostream& out) const
+{
+  int i{0};
+  out << '{';
+  if (es.asset()) {
+    out << "\"assets\":";
+    getAsset(now, out);
+    ++i;
+  }
+  if (es.contr()) {
+    if (i > 0)
+      out << ',';
+    out << "\"contrs\":";
+    getContr(now, out);
+    ++i;
+  }
+  if (es.market()) {
+    if (i > 0)
+      out << ',';
+    out << "\"markets\":";
+    getMarket(now, out);
+    ++i;
+  }
+  if (es.trader()) {
+    if (i > 0)
+      out << ',';
+    out << "\"traders\":";
+    getTrader(now, out);
+    ++i;
+  }
+  out << '}';
+}
+
+void Rest::getAsset(Millis now, ostream& out) const
 {
   const auto& assets = serv_.assets();
   out << '[';
@@ -36,7 +69,16 @@ void Rest::assets(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::contrs(Millis now, ostream& out) const
+void Rest::getAsset(const std::string_view& mnem, Millis now, std::ostream& out) const
+{
+  const auto& assets = serv_.assets();
+  auto it = assets.find(mnem);
+  if (it == assets.end())
+    throw NotFoundException{errMsg() << "asset '" << mnem << "' does not exist"};
+  out << *it;
+}
+
+void Rest::getContr(Millis now, ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   out << '[';
@@ -44,7 +86,16 @@ void Rest::contrs(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::markets(Millis now, ostream& out) const
+void Rest::getContr(const std::string_view& mnem, Millis now, std::ostream& out) const
+{
+  const auto& contrs = serv_.contrs();
+  auto it = contrs.find(mnem);
+  if (it == contrs.end())
+    throw NotFoundException{errMsg() << "contr '" << mnem << "' does not exist"};
+  out << *it;
+}
+
+void Rest::getMarket(Millis now, ostream& out) const
 {
   const auto& markets = serv_.markets();
   out << '[';
@@ -52,12 +103,30 @@ void Rest::markets(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::traders(Millis now, ostream& out) const
+void Rest::getMarket(const std::string_view& mnem, Millis now, std::ostream& out) const
+{
+  const auto& markets = serv_.markets();
+  auto it = markets.find(mnem);
+  if (it == markets.end())
+    throw NotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
+  out << *it;
+}
+
+void Rest::getTrader(Millis now, ostream& out) const
 {
   const auto& traders = serv_.traders();
   out << '[';
   copy(traders.begin(), traders.end(), OStreamJoiner(out, ','));
   out << ']';
+}
+
+void Rest::getTrader(const std::string_view& mnem, Millis now, std::ostream& out) const
+{
+  const auto& traders = serv_.traders();
+  auto it = traders.find(mnem);
+  if (it == traders.end())
+    throw NotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
+  out << *it;
 }
 
 } // swirly

@@ -17,6 +17,8 @@
 #ifndef SWIRLY_FIR_REST_HPP
 #define SWIRLY_FIR_REST_HPP
 
+#include <swirly/fir/EntitySet.hpp>
+
 #include <swirly/fig/Serv.hpp>
 
 namespace swirly {
@@ -39,13 +41,23 @@ class SWIRLY_API Rest {
   Rest(Rest&&);
   Rest& operator=(Rest&&);
 
-  void assets(Millis now, std::ostream& out) const;
+  void getRec(EntitySet es, Millis now, std::ostream& out) const;
 
-  void contrs(Millis now, std::ostream& out) const;
+  void getAsset(Millis now, std::ostream& out) const;
 
-  void markets(Millis now, std::ostream& out) const;
+  void getAsset(const std::string_view& mnem, Millis now, std::ostream& out) const;
 
-  void traders(Millis now, std::ostream& out) const;
+  void getContr(Millis now, std::ostream& out) const;
+
+  void getContr(const std::string_view& mnem, Millis now, std::ostream& out) const;
+
+  void getMarket(Millis now, std::ostream& out) const;
+
+  void getMarket(const std::string_view& mnem, Millis now, std::ostream& out) const;
+
+  void getTrader(Millis now, std::ostream& out) const;
+
+  void getTrader(const std::string_view& mnem, Millis now, std::ostream& out) const;
 
  private:
   Serv serv_;

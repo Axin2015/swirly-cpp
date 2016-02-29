@@ -18,7 +18,18 @@
 
 #include <sys/time.h>
 
+using namespace std;
+
 namespace swirly {
+
+SWIRLY_API void reset(ostream& os) noexcept
+{
+  os.clear();
+  os.fill(os.widen(' '));
+  os.flags(ios_base::skipws | ios_base::dec);
+  os.precision(6);
+  os.width(0);
+};
 
 OStreamJoiner::~OStreamJoiner() noexcept = default;
 

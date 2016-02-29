@@ -16,12 +16,39 @@
  */
 #include "Stream.hpp"
 
+#include <swirly/ash/Stream.hpp>
+#include <swirly/ash/String.hpp>
+
+using namespace std;
+
 namespace swirly {
 namespace mg {
 
-StreamBuf::~StreamBuf() noexcept
+StreamBuf::StreamBuf(mbuf& buf) throw(bad_alloc) : buf_(buf)
 {
-  mbuf_free(&buf_);
+  if (!buf_.buf) {
+    // Pre-allocate buffer.
+    mbuf_init(&buf_, 4096);
+    if (!buf_.buf)
+      throw bad_alloc();
+  }
+}
+
+StreamBuf::~StreamBuf() noexcept = default;
+
+void StreamBuf::reset() noexcept
+{
+  buf_.len = 0;
+}
+
+void StreamBuf::setContentLength(size_t pos, size_t len) noexcept
+{
+  char* ptr{buf_.buf + pos};
+  do {
+    --ptr;
+    *ptr = '0' + len % 10;
+    len /= 10;
+  } while (len > 0);
 }
 
 StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
@@ -39,7 +66,29 @@ std::streamsize StreamBuf::xsputn(const char_type* s, std::streamsize count) noe
   return mbuf_append(&buf_, s, count);
 }
 
+OStream::OStream() : std::ostream{nullptr}
+{
+}
+
 OStream::~OStream() noexcept = default;
+
+void OStream::reset(int status, const char* reason) noexcept
+{
+  rdbuf()->reset();
+  swirly::reset(*this);
+
+  // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space place-holder for
+  // content length. RFC2616 states that field value MAY be preceded by any amount of LWS, though a
+  // single SP is preferred.
+  *this << "HTTP/1.1 " << status << ' ' << reason << "\r\nContent-Length:           \r\n\r\n";
+  headSize_ = size();
+  lengthAt_ = headSize_ - 4;
+}
+
+void OStream::setContentLength() noexcept
+{
+  rdbuf()->setContentLength(lengthAt_, size() - headSize_);
+}
 
 } // mg
 } // swirly
