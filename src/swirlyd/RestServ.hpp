@@ -48,9 +48,14 @@ class RestServ : public mg::Mgr<RestServ> {
   RestServ(RestServ&&) = delete;
   RestServ& operator=(RestServ&&) = delete;
 
-  void reset(std::string_view sv) noexcept;
+  void setUri(std::string_view uri) noexcept;
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
+  void restRequest(mg::HttpMessage data, Millis now);
   void getRec(mg::HttpMessage data, Millis now);
+  void getAsset(mg::HttpMessage data, Millis now);
+  void getContr(mg::HttpMessage data, Millis now);
+  void getMarket(mg::HttpMessage data, Millis now);
+  void getTrader(mg::HttpMessage data, Millis now);
   void postRec(mg::HttpMessage data, Millis now);
   void putRec(mg::HttpMessage data, Millis now);
   void getSess(mg::HttpMessage data, Millis now);
@@ -62,8 +67,9 @@ class RestServ : public mg::Mgr<RestServ> {
  private:
   Rest& rest_;
   const mg_serve_http_opts& httpOpts_;
-  mg::OStream out_;
   Tokeniser<'/'> uri_;
+  mg::OStream out_;
+  bool match_{false};
 };
 
 /** @} */

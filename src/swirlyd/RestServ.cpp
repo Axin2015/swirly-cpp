@@ -18,6 +18,8 @@
 
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/elm/Exception.hpp>
+
 #include <swirly/ash/Finally.hpp>
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
@@ -31,19 +33,18 @@ namespace mg {
 
 RestServ::~RestServ() noexcept = default;
 
-void RestServ::reset(string_view sv) noexcept
+void RestServ::setUri(string_view uri) noexcept
 {
-  out_.reset();
-
   // Remove leading slash.
-  if (sv.front() == '/')
-    sv.remove_prefix(1);
-  uri_.reset(sv);
+  if (uri.front() == '/')
+    uri.remove_prefix(1);
+  uri_.reset(uri);
 }
 
 void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 {
   using namespace chrono;
+
   const auto start = high_resolution_clock::now();
   auto finally = makeFinally([&data, &start]() {
     const auto end = high_resolution_clock::now();
@@ -52,54 +53,69 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
                          << " usec");
   });
 
+  setUri(data.uri());
+
+  if (uri_.empty() || uri_.top() != "api") {
+    mg_serve_http(&nc, data.get(), httpOpts_);
+    return;
+  }
+  uri_.pop();
+
   const auto now = getTimeOfDay();
-  reset(data.uri());
+  // See mg_send().
+  nc.last_io_time = unbox(now) / 1000;
 
-  if (!uri_.empty()) {
+  StreamBuf buf{nc.send_mbuf};
+  out_.rdbuf(&buf);
+  out_.reset(200, "OK");
+  match_ = false;
+  try {
+    restRequest(data, now);
+    if (!match_)
+      throw NotFoundException{"resource does not exist"_sv};
+  } catch (const ServException& e) {
+    out_.reset(e.httpStatus(), e.httpReason());
+    out_ << e;
+  } catch (const exception& e) {
+    const int status{500};
+    const char* const reason{"Internal Server Error"};
+    out_.reset(status, reason);
+    ServException::toJson(status, reason, e.what(), out_);
+  }
+  out_.setContentLength();
+}
 
-    const auto tok = uri_.top();
-    uri_.pop();
-    const auto method = data.method();
+void RestServ::restRequest(mg::HttpMessage data, Millis now)
+{
+  if (uri_.empty())
+    return;
 
-    if (tok == "rec") {
-      if (method == "GET") {
-        getRec(data, now);
-      } else if (method == "POST") {
-        postRec(data, now);
-      } else if (method == "PUT") {
-        putRec(data, now);
-      } else {
-        // FIXME.
-      }
-    } else if (tok == "sess") {
-      if (method == "GET") {
-        getSess(data, now);
-      } else if (method == "POST") {
-        postSess(data, now);
-      } else if (method == "PUT") {
-        putSess(data, now);
-      } else if (method == "DELETE") {
-        deleteSess(data, now);
-      } else {
-        // FIXME.
-      }
-    } else if (tok == "view") {
-      if (method == "GET") {
-        getView(data, now);
-      } else {
-        // FIXME.
-      }
-    } else {
-      // FIXME.
-      mg_serve_http(&nc, data.get(), httpOpts_);
-      return;
+  const auto tok = uri_.top();
+  uri_.pop();
+  const auto method = data.method();
+
+  if (tok == "rec") {
+    if (method == "GET") {
+      getRec(data, now);
+    } else if (method == "POST") {
+      postRec(data, now);
+    } else if (method == "PUT") {
+      putRec(data, now);
     }
-
-    const auto len = static_cast<int>(out_.size());
-    mg_printf(&nc, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n%.*s", len, len, out_.data());
-
-  } else {
-    // FIXME.
+  } else if (tok == "sess") {
+    if (method == "GET") {
+      getSess(data, now);
+    } else if (method == "POST") {
+      postSess(data, now);
+    } else if (method == "PUT") {
+      putSess(data, now);
+    } else if (method == "DELETE") {
+      deleteSess(data, now);
+    }
+  } else if (tok == "view") {
+    if (method == "GET") {
+      getView(data, now);
+    }
   }
 }
 
@@ -109,6 +125,7 @@ void RestServ::getRec(mg::HttpMessage data, Millis now)
 
     const int bs{EntitySet::Asset | EntitySet::Contr | EntitySet::Market};
     rest_.getRec(bs, now, out_);
+    match_ = true;
 
   } else {
 
@@ -117,25 +134,85 @@ void RestServ::getRec(mg::HttpMessage data, Millis now)
 
     const auto es = EntitySet::parse(tok);
     if (es.many()) {
-      rest_.getRec(es, now, out_);
+      if (uri_.empty()) {
+        rest_.getRec(es, now, out_);
+        match_ = true;
+      }
     } else {
       switch (es.get()) {
       case EntitySet::Asset:
-        rest_.getAsset(now, out_);
+        getAsset(data, now);
         break;
       case EntitySet::Contr:
-        rest_.getContr(now, out_);
+        getContr(data, now);
         break;
       case EntitySet::Market:
-        rest_.getMarket(now, out_);
+        getMarket(data, now);
         break;
       case EntitySet::Trader:
-        rest_.getTrader(now, out_);
-        break;
-      default:
-        // FIXME.
+        getTrader(data, now);
         break;
       }
+    }
+  }
+}
+
+void RestServ::getAsset(mg::HttpMessage data, Millis now)
+{
+  if (uri_.empty()) {
+    rest_.getAsset(now, out_);
+    match_ = true;
+  } else {
+    const auto mnem = uri_.top();
+    uri_.pop();
+    if (uri_.empty()) {
+      rest_.getAsset(mnem, now, out_);
+      match_ = true;
+    }
+  }
+}
+
+void RestServ::getContr(mg::HttpMessage data, Millis now)
+{
+  if (uri_.empty()) {
+    rest_.getContr(now, out_);
+    match_ = true;
+  } else {
+    const auto mnem = uri_.top();
+    uri_.pop();
+    if (uri_.empty()) {
+      rest_.getContr(mnem, now, out_);
+      match_ = true;
+    }
+  }
+}
+
+void RestServ::getMarket(mg::HttpMessage data, Millis now)
+{
+  if (uri_.empty()) {
+    rest_.getMarket(now, out_);
+    match_ = true;
+  } else {
+    const auto mnem = uri_.top();
+    uri_.pop();
+    if (uri_.empty()) {
+      rest_.getMarket(mnem, now, out_);
+      match_ = true;
+    }
+  }
+}
+
+void RestServ::getTrader(mg::HttpMessage data, Millis now)
+{
+  if (uri_.empty()) {
+    rest_.getTrader(now, out_);
+    match_ = true;
+  } else {
+    const auto mnem = uri_.top();
+    uri_.pop();
+    if (uri_.empty()) {
+      rest_.getTrader(mnem, now, out_);
+      match_ = true;
     }
   }
 }
