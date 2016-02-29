@@ -34,6 +34,8 @@ namespace swirly {
  * @{
  */
 
+SWIRLY_API void reset(std::ostream& os) noexcept;
+
 template <std::size_t MaxN>
 class StringBuf : public std::streambuf {
  public:
@@ -79,11 +81,7 @@ class StringBuilder : public std::ostream {
   void reset() noexcept
   {
     buf_.reset();
-    clear();
-    fill(widen(' '));
-    flags(skipws | dec);
-    precision(6);
-    width(0);
+    swirly::reset(*this);
   };
 
  private:
