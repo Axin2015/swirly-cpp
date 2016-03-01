@@ -56,8 +56,9 @@ class Tokeniser {
     if (j_ != buf_.cend()) {
       i_ = j_ + 1;
       j_ = std::find(i_, buf_.cend(), DelimN);
-    } else
+    } else {
       i_ = j_;
+    }
   }
 
  private:

@@ -50,10 +50,12 @@ void Response::clearAll() noexcept
 
 void Response::clearMatches() noexcept
 {
-  if (!orders_.empty())
+  if (!orders_.empty()) {
     orders_.resize(1);
-  if (!execs_.empty())
+  }
+  if (!execs_.empty()) {
     execs_.resize(1);
+  }
   posn_ = nullptr;
 }
 

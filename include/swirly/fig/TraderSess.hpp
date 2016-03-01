@@ -57,15 +57,17 @@ class SWIRLY_API TraderSess : public Trader {
   {
     assert(order->trader() == mnem_);
     orders_.insert(order);
-    if (!order->ref().empty())
+    if (!order->ref().empty()) {
       refIdx_.insert(order);
+    }
   }
   void removeOrder(const Order& order) noexcept
   {
     assert(order.trader() == mnem_);
     orders_.remove(order);
-    if (!order.ref().empty())
+    if (!order.ref().empty()) {
       refIdx_.remove(order);
+    }
   }
   void insertTrade(const ExecPtr& trade) noexcept
   {

@@ -36,8 +36,9 @@ RestServ::~RestServ() noexcept = default;
 void RestServ::setUri(string_view uri) noexcept
 {
   // Remove leading slash.
-  if (uri.front() == '/')
+  if (uri.front() == '/') {
     uri.remove_prefix(1);
+  }
   uri_.reset(uri);
 }
 
@@ -71,8 +72,9 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
   match_ = false;
   try {
     restRequest(data, now);
-    if (!match_)
+    if (!match_) {
       throw NotFoundException{"resource does not exist"_sv};
+    }
   } catch (const ServException& e) {
     out_.reset(e.httpStatus(), e.httpReason());
     out_ << e;
@@ -87,8 +89,9 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 
 void RestServ::restRequest(mg::HttpMessage data, Millis now)
 {
-  if (uri_.empty())
+  if (uri_.empty()) {
     return;
+  }
 
   const auto tok = uri_.top();
   uri_.pop();

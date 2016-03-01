@@ -48,18 +48,18 @@ void Market::toJson(ostream& os) const
      << "\",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
 
-  if (settlDay_ != 0_jd)
+  if (settlDay_ != 0_jd) {
     os << jdToIso(settlDay_);
-  else
+  } else {
     os << "null";
-
+  }
   os << ",\"expiryDate\":";
 
-  if (expiryDay_ != 0_jd)
+  if (expiryDay_ != 0_jd) {
     os << jdToIso(expiryDay_);
-  else
+  } else {
     os << "null";
-
+  }
   os << ",\"state\":" << state_ //
      << '}';
 }

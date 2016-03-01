@@ -56,8 +56,9 @@ class SWIRLY_API Rec : public Comparable<Rec> {
   int compare(const Rec& rhs) const noexcept
   {
     int result{swirly::compare(type_, rhs.type_)};
-    if (result == 0)
+    if (result == 0) {
       result = mnem_.compare(rhs.mnem_);
+    }
     return result;
   }
   auto type() const noexcept { return type_; }

@@ -112,15 +112,17 @@ class String {
   constexpr int compare(const char* rdata, std::size_t rlen) const noexcept
   {
     int result{std::memcmp(buf_, rdata, std::min(len_, rlen))};
-    if (result == 0)
+    if (result == 0) {
       result = swirly::compare(len_, rlen);
+    }
     return result;
   }
   constexpr void assign(const char* rdata, std::size_t rlen) noexcept
   {
     len_ = std::min(MaxN, rlen);
-    if (len_ > 0)
+    if (len_ > 0) {
       std::memcpy(buf_, rdata, len_);
+    }
   }
   // Length in the first cache-line.
   std::size_t len_;

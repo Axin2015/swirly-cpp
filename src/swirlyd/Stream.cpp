@@ -29,8 +29,9 @@ StreamBuf::StreamBuf(mbuf& buf) throw(bad_alloc) : buf_(buf)
   if (!buf_.buf) {
     // Pre-allocate buffer.
     mbuf_init(&buf_, 4096);
-    if (!buf_.buf)
+    if (!buf_.buf) {
       throw bad_alloc();
+    }
   }
 }
 
@@ -55,8 +56,9 @@ StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
 {
   if (c != traits_type::eof()) {
     const char z = c;
-    if (mbuf_append(&buf_, &z, 1) != 1)
+    if (mbuf_append(&buf_, &z, 1) != 1) {
       c = traits_type::eof();
+    }
   }
   return c;
 }

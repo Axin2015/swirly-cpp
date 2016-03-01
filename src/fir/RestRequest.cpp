@@ -219,9 +219,9 @@ void RestRequest::reset(bool clear) noexcept
 #line 324 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
   cs_ = cs;
 
-  if (!clear)
+  if (!clear) {
     return;
-
+  }
   fields_ = 0;
 
   mnem_.len = 0;
@@ -345,9 +345,9 @@ bool RestRequest::parse(const string_view& buf)
 #line 60 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
       {
         auto& len = *str_.len;
-        if (len < str_.max)
+        if (len < str_.max) {
           str_.buf[len++] = (*p);
-        else {
+        } else {
           cs = json_error;
           msg = "max length exceeded";
           {
@@ -613,12 +613,12 @@ bool RestRequest::parse(const string_view& buf)
 #line 356 "/Users/marayl/repo/swirlyc/src/fir/RestRequest.rl"
   cs_ = cs;
 
-  if (cs == json_error)
+  if (cs == json_error) {
     throw BadRequestException{msg};
-
-  if (cs < json_first_final)
+  }
+  if (cs < json_first_final) {
     return false;
-
+  }
   return true;
 }
 

@@ -38,22 +38,25 @@ void Rest::getRec(EntitySet es, Millis now, std::ostream& out) const
     ++i;
   }
   if (es.contr()) {
-    if (i > 0)
+    if (i > 0) {
       out << ',';
+    }
     out << "\"contrs\":";
     getContr(now, out);
     ++i;
   }
   if (es.market()) {
-    if (i > 0)
+    if (i > 0) {
       out << ',';
+    }
     out << "\"markets\":";
     getMarket(now, out);
     ++i;
   }
   if (es.trader()) {
-    if (i > 0)
+    if (i > 0) {
       out << ',';
+    }
     out << "\"traders\":";
     getTrader(now, out);
     ++i;
@@ -73,8 +76,9 @@ void Rest::getAsset(const std::string_view& mnem, Millis now, std::ostream& out)
 {
   const auto& assets = serv_.assets();
   auto it = assets.find(mnem);
-  if (it == assets.end())
+  if (it == assets.end()) {
     throw NotFoundException{errMsg() << "asset '" << mnem << "' does not exist"};
+  }
   out << *it;
 }
 
@@ -90,8 +94,9 @@ void Rest::getContr(const std::string_view& mnem, Millis now, std::ostream& out)
 {
   const auto& contrs = serv_.contrs();
   auto it = contrs.find(mnem);
-  if (it == contrs.end())
+  if (it == contrs.end()) {
     throw NotFoundException{errMsg() << "contr '" << mnem << "' does not exist"};
+  }
   out << *it;
 }
 
@@ -107,8 +112,9 @@ void Rest::getMarket(const std::string_view& mnem, Millis now, std::ostream& out
 {
   const auto& markets = serv_.markets();
   auto it = markets.find(mnem);
-  if (it == markets.end())
+  if (it == markets.end()) {
     throw NotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
+  }
   out << *it;
 }
 
@@ -124,8 +130,9 @@ void Rest::getTrader(const std::string_view& mnem, Millis now, std::ostream& out
 {
   const auto& traders = serv_.traders();
   auto it = traders.find(mnem);
-  if (it == traders.end())
+  if (it == traders.end()) {
     throw NotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
+  }
   out << *it;
 }
 
