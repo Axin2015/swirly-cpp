@@ -52,31 +52,51 @@ class RestServ : public mg::Mgr<RestServ> {
   RestServ(RestServ&&) = delete;
   RestServ& operator=(RestServ&&) = delete;
 
-  void setUri(std::string_view uri) noexcept;
+  void reset(mg::HttpMessage data) noexcept;
+
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
   void restRequest(mg::HttpMessage data, Millis now);
-  void getRec(mg::HttpMessage data, Millis now);
-  void getAsset(mg::HttpMessage data, Millis now);
-  void getContr(mg::HttpMessage data, Millis now);
-  void getMarket(mg::HttpMessage data, Millis now);
-  void getTrader(mg::HttpMessage data, Millis now);
-  void postRec(mg::HttpMessage data, Millis now);
-  void putRec(mg::HttpMessage data, Millis now);
-  void getSess(mg::HttpMessage data, Millis now);
-  void postSess(mg::HttpMessage data, Millis now);
-  void putSess(mg::HttpMessage data, Millis now);
-  void deleteSess(mg::HttpMessage data, Millis now);
-  void getView(mg::HttpMessage data, Millis now);
+
+  void recRequest(mg::HttpMessage data, Millis now);
+  void assetRequest(mg::HttpMessage data, Millis now);
+  void contrRequest(mg::HttpMessage data, Millis now);
+  void marketRequest(mg::HttpMessage data, Millis now);
+  void traderRequest(mg::HttpMessage data, Millis now);
+
+  void sessRequest(mg::HttpMessage data, Millis now);
+  void orderRequest(mg::HttpMessage data, Millis now);
+  void tradeRequest(mg::HttpMessage data, Millis now);
+  void posnRequest(mg::HttpMessage data, Millis now);
+
+  void viewRequest(mg::HttpMessage data, Millis now);
 
  private:
-  void splitIds(const std::string_view sv) noexcept;
+  enum : int {
+    // Method values are represented as powers of two for simplicity.
+    MethodGet = 1 << 0,
+    MethodPost = 1 << 1,
+    MethodPut = 1 << 2,
+    MethodDelete = 1 << 3,
+    // Method value mask.
+    MethodMask = MethodGet | MethodPost | MethodPut | MethodDelete,
+
+    // Subsequent bits represent matching components.
+    MatchMethod = 1 << 4,
+    MatchUri = 1 << 5,
+    // Match result mask.
+    MatchMask = MatchMethod | MatchUri
+  };
+
+  bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
+
+  void splitIds(std::string_view sv) noexcept;
 
   Rest& rest_;
   const mg_serve_http_opts& httpOpts_;
+  int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;
   mg::OStream out_;
-  bool match_{false};
 };
 
 /** @} */

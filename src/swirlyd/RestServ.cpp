@@ -33,8 +33,22 @@ namespace mg {
 
 RestServ::~RestServ() noexcept = default;
 
-void RestServ::setUri(string_view uri) noexcept
+void RestServ::reset(mg::HttpMessage data) noexcept
 {
+  state_ = 0;
+
+  const auto method = data.method();
+  if (method == "GET") {
+    state_ |= MethodGet;
+  } else if (method == "POST") {
+    state_ |= MethodPost;
+  } else if (method == "PUT") {
+    state_ |= MethodPut;
+  } else if (method == "DELETE") {
+    state_ |= MethodDelete;
+  }
+
+  auto uri = data.uri();
   // Remove leading slash.
   if (uri.front() == '/') {
     uri.remove_prefix(1);
@@ -54,7 +68,7 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
                          << " usec");
   });
 
-  setUri(data.uri());
+  reset(data);
 
   if (uri_.empty() || uri_.top() != "api") {
     mg_serve_http(&nc, data.get(), httpOpts_);
@@ -69,11 +83,14 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
   StreamBuf buf{nc.send_mbuf};
   out_.rdbuf(&buf);
   out_.reset(200, "OK");
-  match_ = false;
   try {
     restRequest(data, now);
-    if (!match_) {
-      throw NotFoundException{"resource does not exist"_sv};
+    if (!isSet(MatchUri)) {
+      throw NotFoundException{errMsg() << "resource '" << data.uri() << "' does not exist"};
+    }
+    if (!isSet(MatchMethod)) {
+      throw MethodNotAllowedException{errMsg() << "method '" << data.method()
+                                               << "' is not allowed"};
     }
   } catch (const ServException& e) {
     out_.reset(e.httpStatus(), e.httpReason());
@@ -90,162 +107,426 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
 void RestServ::restRequest(mg::HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
+    // /api
     return;
   }
 
   const auto tok = uri_.top();
   uri_.pop();
-  const auto method = data.method();
 
   if (tok == "rec") {
-    if (method == "GET") {
-      getRec(data, now);
-    } else if (method == "POST") {
-      postRec(data, now);
-    } else if (method == "PUT") {
-      putRec(data, now);
-    }
+    // /api/rec
+    recRequest(data, now);
   } else if (tok == "sess") {
-    if (method == "GET") {
-      getSess(data, now);
-    } else if (method == "POST") {
-      postSess(data, now);
-    } else if (method == "PUT") {
-      putSess(data, now);
-    } else if (method == "DELETE") {
-      deleteSess(data, now);
-    }
+    // /api/sess
+    sessRequest(data, now);
   } else if (tok == "view") {
-    if (method == "GET") {
-      getView(data, now);
-    }
+    // /api/view
+    viewRequest(data, now);
   }
 }
 
-void RestServ::getRec(mg::HttpMessage data, Millis now)
+void RestServ::recRequest(mg::HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    const int bs{EntitySet::Asset | EntitySet::Contr | EntitySet::Market};
-    rest_.getRec(bs, now, out_);
-    match_ = true;
+    // /api/rec
+    state_ |= MatchUri;
 
-  } else {
+    if (isSet(MethodGet)) {
+      // GET /api/rec
+      state_ |= MatchMethod;
+      const int bs{EntitySet::Asset | EntitySet::Contr | EntitySet::Market};
+      rest_.getRec(bs, now, out_);
+    }
+    return;
+  }
 
-    const auto tok = uri_.top();
-    uri_.pop();
+  const auto tok = uri_.top();
+  uri_.pop();
 
-    const auto es = EntitySet::parse(tok);
-    if (es.many()) {
-      if (uri_.empty()) {
+  const auto es = EntitySet::parse(tok);
+  if (es.many()) {
+
+    if (uri_.empty()) {
+
+      // /api/rec/entity,entity...
+      state_ |= MatchUri;
+
+      if (isSet(MethodGet)) {
+        // GET /api/rec/entity,entity...
+        state_ |= MatchMethod;
         rest_.getRec(es, now, out_);
-        match_ = true;
-      }
-    } else {
-      switch (es.get()) {
-      case EntitySet::Asset:
-        getAsset(data, now);
-        break;
-      case EntitySet::Contr:
-        getContr(data, now);
-        break;
-      case EntitySet::Market:
-        getMarket(data, now);
-        break;
-      case EntitySet::Trader:
-        getTrader(data, now);
-        break;
       }
     }
+    return;
+  }
+
+  switch (es.get()) {
+  case EntitySet::Asset:
+    assetRequest(data, now);
+    break;
+  case EntitySet::Contr:
+    contrRequest(data, now);
+    break;
+  case EntitySet::Market:
+    marketRequest(data, now);
+    break;
+  case EntitySet::Trader:
+    traderRequest(data, now);
+    break;
   }
 }
 
-void RestServ::getAsset(mg::HttpMessage data, Millis now)
+void RestServ::assetRequest(mg::HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
-    rest_.getAsset(now, out_);
-    match_ = true;
-  } else {
-    const auto mnem = uri_.top();
-    uri_.pop();
-    if (uri_.empty()) {
+
+    // /api/rec/asset
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/rec/asset
+      state_ |= MatchMethod;
+      rest_.getAsset(now, out_);
+    }
+    return;
+  }
+
+  const auto mnem = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/rec/asset/MNEM
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/rec/asset/MNEM
+      state_ |= MatchMethod;
       rest_.getAsset(mnem, now, out_);
-      match_ = true;
     }
+    return;
   }
 }
 
-void RestServ::getContr(mg::HttpMessage data, Millis now)
+void RestServ::contrRequest(mg::HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
-    rest_.getContr(now, out_);
-    match_ = true;
-  } else {
-    const auto mnem = uri_.top();
-    uri_.pop();
-    if (uri_.empty()) {
+
+    // /api/rec/contr
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/rec/contr
+      state_ |= MatchMethod;
+      rest_.getContr(now, out_);
+    }
+    return;
+  }
+
+  const auto mnem = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/rec/contr/MNEM
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/rec/contr/MNEM
+      state_ |= MatchMethod;
       rest_.getContr(mnem, now, out_);
-      match_ = true;
     }
+    return;
   }
 }
 
-void RestServ::getMarket(mg::HttpMessage data, Millis now)
+void RestServ::marketRequest(mg::HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
-    rest_.getMarket(now, out_);
-    match_ = true;
-  } else {
-    const auto mnem = uri_.top();
-    uri_.pop();
-    if (uri_.empty()) {
+
+    // /api/rec/market
+    state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/rec/market
+      state_ |= MatchMethod;
+      rest_.getMarket(now, out_);
+      break;
+    case MethodPost:
+      // POST /api/rec/market
+      state_ |= MatchMethod;
+      rest_.postMarket(now, out_);
+      break;
+    }
+    return;
+  }
+
+  const auto mnem = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/rec/market/MNEM
+    state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/rec/market/MNEM
+      state_ |= MatchMethod;
       rest_.getMarket(mnem, now, out_);
-      match_ = true;
+      break;
+    case MethodPut:
+      // PUT /api/rec/market/MNEM
+      state_ |= MatchMethod;
+      rest_.putMarket(mnem, now, out_);
+      break;
     }
+    return;
   }
 }
 
-void RestServ::getTrader(mg::HttpMessage data, Millis now)
+void RestServ::traderRequest(mg::HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
-    rest_.getTrader(now, out_);
-    match_ = true;
-  } else {
-    const auto mnem = uri_.top();
-    uri_.pop();
-    if (uri_.empty()) {
-      rest_.getTrader(mnem, now, out_);
-      match_ = true;
+
+    // /api/rec/trader
+    state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/rec/trader
+      state_ |= MatchMethod;
+      rest_.getTrader(now, out_);
+      break;
+    case MethodPost:
+      // POST /api/rec/market
+      state_ |= MatchMethod;
+      rest_.postTrader(now, out_);
+      break;
     }
+    return;
+  }
+
+  const auto mnem = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/rec/trader/MNEM
+    state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/rec/trader/MNEM
+      state_ |= MatchMethod;
+      rest_.getTrader(mnem, now, out_);
+      break;
+    case MethodPut:
+      // PUT /api/rec/trader/MNEM
+      state_ |= MatchMethod;
+      rest_.putTrader(mnem, now, out_);
+      break;
+    }
+    return;
   }
 }
 
-void RestServ::postRec(mg::HttpMessage data, Millis now)
+void RestServ::sessRequest(mg::HttpMessage data, Millis now)
 {
+  if (uri_.empty()) {
+
+    // /api/sess
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/sess
+      state_ |= MatchMethod;
+      const int bs{EntitySet::Order | EntitySet::Trade | EntitySet::Posn | EntitySet::View};
+      rest_.getSess(bs, now, out_);
+    }
+    return;
+  }
+
+  const auto tok = uri_.top();
+  uri_.pop();
+
+  const auto es = EntitySet::parse(tok);
+  if (es.many()) {
+
+    if (uri_.empty()) {
+
+      // /api/sess/entity,entity...
+      state_ |= MatchUri;
+
+      if (isSet(MethodGet)) {
+        // GET /api/sess/entity,entity...
+        state_ |= MatchMethod;
+        rest_.getSess(es, now, out_);
+      }
+    }
+    return;
+  }
+
+  switch (es.get()) {
+  case EntitySet::Order:
+    orderRequest(data, now);
+    break;
+  case EntitySet::Trade:
+    tradeRequest(data, now);
+    break;
+  case EntitySet::Posn:
+    posnRequest(data, now);
+    break;
+  case EntitySet::View:
+    viewRequest(data, now);
+    break;
+  }
 }
 
-void RestServ::putRec(mg::HttpMessage data, Millis now)
+void RestServ::orderRequest(mg::HttpMessage data, Millis now)
 {
+  if (uri_.empty()) {
+
+    // /api/sess/order
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/sess/order
+      state_ |= MatchMethod;
+      rest_.getOrder(now, out_);
+    }
+    return;
+  }
+
+  const auto market = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/sess/order/MARKET
+    state_ |= MatchUri;
+
+    if (isSet(MethodPost)) {
+      // POST /api/sess/order/MARKET
+      state_ |= MatchMethod;
+      rest_.postOrder(market, now, out_);
+    }
+    return;
+  }
 }
 
-void RestServ::getSess(mg::HttpMessage data, Millis now)
+void RestServ::tradeRequest(mg::HttpMessage data, Millis now)
 {
+  if (uri_.empty()) {
+
+    // /api/sess/trade
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/sess/trade
+      state_ |= MatchMethod;
+      rest_.getTrade(now, out_);
+    }
+    return;
+  }
+
+  const auto market = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/sess/trade/MARKET
+    state_ |= MatchUri;
+
+    if (isSet(MethodPost)) {
+      // POST /api/sess/trade/MARKET
+      state_ |= MatchMethod;
+      rest_.postTrade(market, now, out_);
+    }
+    return;
+  }
 }
 
-void RestServ::postSess(mg::HttpMessage data, Millis now)
+void RestServ::posnRequest(mg::HttpMessage data, Millis now)
 {
+  if (uri_.empty()) {
+
+    // /api/sess/posn
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/sess/posn
+      state_ |= MatchMethod;
+      rest_.getPosn(now, out_);
+    }
+    return;
+  }
+
+  const auto contr = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/sess/posn/CONTR
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/sess/posn/CONTR
+      state_ |= MatchMethod;
+      rest_.getPosn(contr, now, out_);
+    }
+    return;
+  }
+
+  const auto settlDate = box<IsoDate>(stoul(uri_.top()));
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/sess/posn/CONTR/SETTL_DATE
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/sess/posn/CONTR/SETTL_DATE
+      state_ |= MatchMethod;
+      rest_.getPosn(contr, settlDate, now, out_);
+    }
+    return;
+  }
 }
 
-void RestServ::putSess(mg::HttpMessage data, Millis now)
+void RestServ::viewRequest(mg::HttpMessage data, Millis now)
 {
-}
+  if (uri_.empty()) {
 
-void RestServ::deleteSess(mg::HttpMessage data, Millis now)
-{
-}
+    // /api/view
+    state_ |= MatchUri;
 
-void RestServ::getView(mg::HttpMessage data, Millis now)
-{
+    if (isSet(MethodGet)) {
+      // GET /api/view
+      state_ |= MatchMethod;
+      rest_.getView(now, out_);
+    }
+    return;
+  }
+
+  const auto market = uri_.top();
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/view/MARKET
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /api/view/MARKET
+      rest_.getView(market, now, out_);
+    }
+    return;
+  }
 }
 
 void RestServ::splitIds(string_view sv) noexcept
