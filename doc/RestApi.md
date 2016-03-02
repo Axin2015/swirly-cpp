@@ -4,15 +4,29 @@ Restful API {#RestApi}
 Record
 ------
 
-### Get Record ###
+`GET /api/rec[/entity[,entity]...]`
 
-`GET /<front|back>/rec[/type,...]`
+Get Record entities, where entity is: asset, contr, market or trader.
 
-Where type is: asset, contr, market or trader.
+### Asset ###
 
-### Create Market ###
+`GET /api/rec/asset[/MNEM]`
 
-`POST /back/rec/market`
+Get all Assets or specific Asset with matching mnemonic.
+
+### Contr ###
+
+`GET /api/rec/contr[/MNEM]`
+
+Get all Contracts or specific Contract with matching mnemonic.
+
+### Market ###
+
+`GET /api/rec/market[/MNEM]`
+
+Get all Markets or specific Market with matching mnemonic.
+
+`POST /api/rec/market`
 
 | Name        | Type               | Req'd |
 | ----------- | ------------------ | ----- |
@@ -23,34 +37,24 @@ Where type is: asset, contr, market or trader.
 | expiryDate  | int (ISO8601)      | No    |
 | state       | int (unused)       | No    |
 
-Admin only.
+Create Market. Admin only.
 
-### Create Trader ###
-
-`POST /back/rec/trader`
+`PUT /api/rec/market/MNEM`
 
 | Name        | Type               | Req'd |
 | ----------- | ------------------ | ----- |
-| mnem        | String             | Yes   |
-| display     | String             | Yes   |
-| email       | String             | No    |
-
-If specified, the email address must agree with that of the logged-in user, unless the logged-in
-user is an admin.
-
-### Update Market ###
-
-`PUT /back/rec/market`
-
-| Name        | Type               | Req'd |
-| ----------- | ------------------ | ----- |
-| mnem        | String             | Yes   |
 | display     | String             | Yes   |
 | state       | int (unused)       | No    |
 
-### Update Trader ###
+Update Market. Admin only.
 
-`PUT /back/rec/trader`
+### Trader ###
+
+`GET /api/rec/trader[/MNEM]`
+
+Get all Traders or specific Trader with matching mnemonic.
+
+`POST /api/rec/trader`
 
 | Name        | Type               | Req'd |
 | ----------- | ------------------ | ----- |
@@ -58,56 +62,33 @@ user is an admin.
 | display     | String             | Yes   |
 | email       | String             | No    |
 
-If specified, the email address must agree with that of the logged-in user, unless the logged-in
-user is an admin.
+Create Trader. If specified, the email address must agree with that of the logged-in user, unless
+the logged-in user is an admin.
 
-View
-----
+`PUT /api/rec/trader/MNEM`
 
-### Get View ###
+| Name        | Type               | Req'd |
+| ----------- | ------------------ | ----- |
+| display     | String             | Yes   |
+| email       | String             | No    |
 
-`GET <front|back>/view[/MARKET]`
+Update Trader. If specified, the email address must agree with that of the logged-in user, unless
+the logged-in user is an admin.
 
 Session
 -------
 
-### Get Session ###
+`GET /api/sess[/entity[,entity]...]`
 
-`GET /<front|back>/sess[/type[,type]...]`
+Get Session entities, where entity is: order, trade, posn or view.
 
-Where type is: order, trade, posn, quote, or view.
+### Order ###
 
-### Get Order ###
+`GET /api/sess/order[/MARKET[/ID]]`
 
-`GET /<front|back>/sess/order[/MARKET[/ID]]`
+Get Order(s) with optional filter by market and id.
 
-### Get Trade ###
-
-`GET /<front|back>/sess/trade[/MARKET[/ID]]`
-
-### Get Posn ###
-
-`GET /<front|back>/sess/posn[/CONTR[/SETTL_DATE]]`
-
-### Get Quote ###
-
-`GET /<front|back>/sess/quote[/MARKET[/ID]]`
-
-### Get View ###
-
-`GET /<front|back>/sess/view[/MARKET]`
-
-### Archive Order ###
-
-`DELETE /back/sess/order/MARKET/ID[,ID]...`
-
-### Archive Trade ###
-
-`DELETE /back/sess/trade/MARKET/ID[,ID]...`
-
-### Create Order ###
-
-`POST /back/sess/order/MARKET`
+`POST /api/sess/order/MARKET`
 
 | Name        | Type               | Req'd |
 | ----------- | ------------------ | ----- |
@@ -117,9 +98,27 @@ Where type is: order, trade, posn, quote, or view.
 | ref         | String             | No    |
 | minLots     | Long               | No    |
 
-### Create Trade ###
+Create Order.
 
-`POST /back/sess/trade/MARKET`
+`PUT /api/sess/order/MARKET/ID[,ID]...`
+
+| Name        | Type               | Req'd |
+| ----------- | ------------------ | ----- |
+| lots        | Long               | Yes   |
+
+Cancel or Revise Order. Revise if lots are greater than zero, otherwise Cancel.
+
+`DELETE /api/sess/order/MARKET/ID[,ID]...`
+
+Archive Order(s).
+
+### Trade ###
+
+`GET /api/sess/trade[/MARKET[/ID]]`
+
+Get Trade(s) with optional filter by market and id.
+
+`POST /api/sess/trade/MARKET`
 
 | Name        | Type               | Req'd |
 | ----------- | ------------------ | ----- |
@@ -128,28 +127,30 @@ Where type is: order, trade, posn, quote, or view.
 | lots        | Long               | Yes   |
 | ticks       | Long               | Yes   |
 | ref         | String             | No    |
-| role        | 'Maker' or 'Taker' | No    |
+| role        | 'MAKER' or 'TAKER' | No    |
 | cpty        | String             | No    |
 
-Admin only.
+Create Trade. Admin only.
 
-### Create Quote ###
+`DELETE /api/sess/trade/MARKET/ID[,ID]...`
 
-`POST /back/sess/quote/MARKET`
+Archive Trade(s).
 
-| Name        | Type               | Req'd |
-| ----------- | ------------------ | ----- |
-| side        | 'BUY' or 'SELL'    | Yes   |
-| lots        | Long               | Yes   |
-| ref         | String             | No    |
+### Posn ###
 
-### Cancel Or Revise Order ###
+`GET /api/sess/posn[/CONTR[/SETTL_DATE]]`
 
-`PUT /back/sess/order/MARKET/ID[,ID]...`
+Get Posn(s) with optional filter by contract and settlement-date.
 
-| Name        | Type               | Req'd |
-| ----------- | ------------------ | ----- |
-| lots        | Long               | Yes   |
+View
+----
 
-Revise if lots are greater than zero.
-Cancel otherwise.
+`GET /api/sess/view[/MARKET]`
+
+Get view of the Order-Book with optional filter by market. This is the same as `/api/view` (below),
+except that it allows the view to be fetched in batch along with other session entities.
+
+`GET api/view[/MARKET]`
+
+Get view of the Order-Book with optional filter by market. This is the same as `/api/sess/view`
+(above), except that it is publically available.
