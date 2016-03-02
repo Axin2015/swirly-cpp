@@ -98,8 +98,9 @@ class RequestIdSet {
     int compare(const Request& lhs, const Request& rhs) const noexcept
     {
       int result{lhs.market().compare(rhs.market())};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(lhs.id(), rhs.id());
+      }
       return result;
     }
     bool operator()(const Request& lhs, const Request& rhs) const noexcept
@@ -111,15 +112,17 @@ class RequestIdSet {
     bool operator()(const Key& lhs, const Request& rhs) const noexcept
     {
       int result{std::get<0>(lhs).compare(rhs.market())};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(std::get<1>(lhs), rhs.id());
+      }
       return result < 0;
     }
     bool operator()(const Request& lhs, const Key& rhs) const noexcept
     {
       int result{lhs.market().compare(std::get<0>(rhs))};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(lhs.id(), std::get<1>(rhs));
+      }
       return result < 0;
     }
   };

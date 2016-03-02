@@ -157,8 +157,9 @@ class SWIRLY_API OrderRefSet {
     int compare(const Order& lhs, const Order& rhs) const noexcept
     {
       int result{lhs.contr().compare(rhs.contr())};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(lhs.settlDay(), rhs.settlDay());
+      }
       return result;
     }
     bool operator()(const Order& lhs, const Order& rhs) const noexcept

@@ -124,8 +124,9 @@ class SWIRLY_API OStreamJoiner {
   template <typename ValueT>
   OStreamJoiner& operator=(const ValueT& value)
   {
-    if (!first_)
+    if (!first_) {
       *os_ << delim_;
+    }
     first_ = false;
     *os_ << value;
     return *this;

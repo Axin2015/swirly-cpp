@@ -89,8 +89,9 @@ constexpr int realToDp(double d) noexcept
   for (; dp < 9; ++dp) {
     double ip{};
     const double fp{std::modf(d, &ip)};
-    if (fp < 0.000000001)
+    if (fp < 0.000000001) {
       break;
+    }
     d *= 10;
   }
   return dp;

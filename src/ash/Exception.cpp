@@ -26,8 +26,9 @@ thread_local ErrMsg errMsg_;
 Exception::Exception(const std::string_view& what) noexcept
 {
   const auto len = min(ErrMsgMax, what.size());
-  if (len > 0)
+  if (len > 0) {
     memcpy(what_, what.data(), len);
+  }
   what_[len] = '\0';
 }
 

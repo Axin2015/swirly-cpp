@@ -51,16 +51,18 @@ struct Serv::Impl {
                           const string_view& contr, Jday settlDay, Jday expiryDay,
                           MarketState state) const
   {
-    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern))
+    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
+    }
     auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
     return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
   }
   TraderSessPtr newTrader(const string_view& mnem, const string_view& display,
                           const string_view& email) const
   {
-    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern))
+    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
+    }
     auto up = factory.newTrader(mnem, display, email);
     return {static_cast<TraderSess*>(up.release()), std::move(up.get_deleter())};
   }
@@ -143,8 +145,9 @@ const MarketBook& Serv::updateMarket(const string_view& mnem, const string_view&
                                      MarketState state, Millis now)
 {
   auto it = impl_->markets.find(mnem);
-  if (it == impl_->markets.end())
+  if (it == impl_->markets.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
+  }
   auto& market = static_cast<MarketBook&>(*it);
   market.setDisplay(display);
   market.setState(state);
@@ -154,8 +157,9 @@ const MarketBook& Serv::updateMarket(const string_view& mnem, const string_view&
 const MarketBook& Serv::market(const string_view& mnem) const
 {
   auto it = impl_->markets.find(mnem);
-  if (it == impl_->markets.end())
+  if (it == impl_->markets.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
+  }
   const auto& market = static_cast<const MarketBook&>(*it);
   return market;
 }
@@ -171,8 +175,9 @@ const TraderSess& Serv::createTrader(const string_view& mnem, const string_view&
 const TraderSess& Serv::updateTrader(const string_view& mnem, const string_view& display)
 {
   auto it = impl_->traders.find(mnem);
-  if (it == impl_->traders.end())
+  if (it == impl_->traders.end()) {
     throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
+  }
   auto& trader = static_cast<TraderSess&>(*it);
   trader.setDisplay(display);
   return trader;
@@ -181,8 +186,9 @@ const TraderSess& Serv::updateTrader(const string_view& mnem, const string_view&
 const TraderSess& Serv::trader(const string_view& mnem) const
 {
   auto it = impl_->traders.find(mnem);
-  if (it == impl_->traders.end())
+  if (it == impl_->traders.end()) {
     throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
+  }
   const auto& trader = static_cast<const TraderSess&>(*it);
   return trader;
 }
@@ -191,8 +197,9 @@ const TraderSess* Serv::findTraderByEmail(const string_view& email) const
 {
   const TraderSess* trader{nullptr};
   auto it = impl_->emailIdx.find(email);
-  if (it != impl_->emailIdx.end())
+  if (it != impl_->emailIdx.end()) {
     trader = &*it;
+  }
   return trader;
 }
 
@@ -200,13 +207,13 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, const string_view& re
                        Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
   const auto busDay = getBusDay(now);
-  if (book.expiryDay() != 0_jd && book.expiryDay() < busDay)
+  if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
     throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' in '"
                                          << maybeJdToIso(book.settlDay()) << "' has expired"};
-
-  if (lots == 0_lts || lots < minLots)
+  }
+  if (lots == 0_lts || lots < minLots) {
     throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
-
+  }
   const auto orderId = book.allocOrderId();
   auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
                                        orderId, ref, side, lots, ticks, minLots, now);

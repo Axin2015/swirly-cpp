@@ -32,8 +32,9 @@ namespace swirly {
 void daemon()
 {
   pid_t pid{fork()};
-  if (pid < 0)
+  if (pid < 0) {
     throw system_error(errno, system_category(), "fork() failed");
+  }
 
   if (pid != 0) {
     // Exit parent process using system version of exit() to avoid flushing standard streams.
@@ -42,14 +43,16 @@ void daemon()
   }
 
   // Detach from controlling terminal by making process a session leader.
-  if (setsid() < 0)
+  if (setsid() < 0) {
     throw system_error(errno, system_category(), "setsid() failed");
+  }
 
   // Forking again ensures that the daemon process is not a session leader, and therefore cannot
   // regain access to a controlling terminal.
   pid = fork();
-  if (pid < 0)
+  if (pid < 0) {
     throw system_error(errno, system_category(), "fork() failed");
+  }
 
   if (pid != 0) {
     // FIXME: use quick_exit() when available on OSX.
@@ -58,13 +61,15 @@ void daemon()
 
   // Re-open standard input.
   close(STDIN_FILENO);
-  if (open("/dev/null", O_RDONLY) < 0)
+  if (open("/dev/null", O_RDONLY) < 0) {
     throw system_error(errno, system_category(), "open() failed");
+  }
 
   // Close all non-standard file handles.
   const int fds{getdtablesize()};
-  for (int fd{STDERR_FILENO + 1}; fd < fds; ++fd)
+  for (int fd{STDERR_FILENO + 1}; fd < fds; ++fd) {
     close(fd);
+  }
 
   // Note that the standard output handles are unchanged.
 }

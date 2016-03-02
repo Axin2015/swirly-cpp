@@ -80,8 +80,9 @@ class SWIRLY_API TraderPosnSet {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
       int result{lhs.contr().compare(rhs.contr())};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(lhs.settlDay(), rhs.settlDay());
+      }
       return result;
     }
     bool operator()(const Posn& lhs, const Posn& rhs) const noexcept
@@ -93,15 +94,17 @@ class SWIRLY_API TraderPosnSet {
     bool operator()(const Key& lhs, const Posn& rhs) const noexcept
     {
       int result{std::get<0>(lhs).compare(rhs.contr())};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(std::get<1>(lhs), rhs.settlDay());
+      }
       return result < 0;
     }
     bool operator()(const Posn& lhs, const Key& rhs) const noexcept
     {
       int result{lhs.contr().compare(std::get<0>(rhs))};
-      if (result == 0)
+      if (result == 0) {
         result = swirly::compare(lhs.settlDay(), std::get<1>(rhs));
+      }
       return result < 0;
     }
   };

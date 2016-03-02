@@ -62,8 +62,9 @@ void sigHandler(int sig) noexcept
 void openLogFile(const char* path)
 {
   const int fd{open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP)};
-  if (fd < 0)
+  if (fd < 0) {
     throw system_error(errno, system_category(), "open() failed");
+  }
 
   dup2(fd, STDOUT_FILENO);
   dup2(fd, STDERR_FILENO);
@@ -143,14 +144,16 @@ int main(int argc, char* argv[])
     if (!umask.empty()) {
       // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
       ::umask(static_cast<mode_t>(stoi(umask, nullptr, 0)));
-    } else if (!noDaemon)
+    } else if (!noDaemon) {
       ::umask(0027);
+    }
 
     if (!directory.empty()) {
       // Change the current working directory if specified.
       directory = fs::canonical(directory, fs::current_path());
-      if (chdir(directory.c_str()) < 0)
+      if (chdir(directory.c_str()) < 0) {
         throw system_error(errno, system_category(), "chdir() failed");
+      }
     } else if (!noDaemon) {
       // Default to root directory if daemon.
       directory = fs::current_path().root_path();
@@ -176,8 +179,9 @@ int main(int argc, char* argv[])
 
       // Log file is relative to working directory. We use absolute, rather than canonical here,
       // because canonical requires that the file exists.
-      if (logFile.is_relative())
+      if (logFile.is_relative()) {
         logFile = fs::absolute(logFile, directory);
+      }
 
       fs::create_directory(logFile.parent_path());
 
