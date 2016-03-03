@@ -263,6 +263,8 @@ std::string toString(const ValueT& val)
   return ss.str();
 }
 
+SWIRLY_API unsigned long stoul(const std::string_view& sv) noexcept;
+
 /** @} */
 
 } // swirly
