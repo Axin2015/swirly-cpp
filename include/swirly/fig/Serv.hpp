@@ -37,8 +37,6 @@ class TraderSess;
  * @{
  */
 
-using IdenView = ArrayView<Iden>;
-
 class SWIRLY_API Serv {
  public:
   Serv(const Model& model, Journ& journ, Millis now);
@@ -88,7 +86,7 @@ class SWIRLY_API Serv {
   void reviseOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Lots lots, Millis now,
                    Response& resp);
 
-  void reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots, Millis now,
+  void reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
                    Response& resp);
 
   void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp);
@@ -98,7 +96,7 @@ class SWIRLY_API Serv {
   void cancelOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Millis now,
                    Response& resp);
 
-  void cancelOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Millis now,
+  void cancelOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Millis now,
                    Response& resp);
 
   /**
@@ -127,7 +125,7 @@ class SWIRLY_API Serv {
    */
   void archiveOrder(TraderSess& sess, Millis now);
 
-  void archiveOrder(TraderSess& sess, std::string_view market, const IdenView& ids, Millis now);
+  void archiveOrder(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
 
   ExecPtr createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
                       Lots lots, Ticks ticks, Role role, std::string_view cpty, Millis created);
@@ -146,7 +144,7 @@ class SWIRLY_API Serv {
    */
   void archiveTrade(TraderSess& sess, Millis now);
 
-  void archiveTrade(TraderSess& sess, std::string_view market, const IdenView& ids, Millis now);
+  void archiveTrade(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
 
   /**
    * This method may partially fail.

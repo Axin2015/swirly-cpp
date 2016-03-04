@@ -152,19 +152,19 @@ void MockJourn::doCreateExec(const Exec& exec)
 {
 }
 
-void MockJourn::doCreateExec(string_view market, const ArrayView<Exec*>& execs)
+void MockJourn::doCreateExec(string_view market, ArrayView<Exec*> execs)
 {
 }
 
-void MockJourn::doCreateExec(const ArrayView<Exec*>& execs)
+void MockJourn::doCreateExec(ArrayView<Exec*> execs)
 {
 }
 
-void MockJourn::doArchiveOrder(string_view market, const ArrayView<Iden>& ids, Millis modified)
+void MockJourn::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)
 {
 }
 
-void MockJourn::doArchiveTrade(string_view market, const ArrayView<Iden>& ids, Millis modified)
+void MockJourn::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modified)
 {
 }
 

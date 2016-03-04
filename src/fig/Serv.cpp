@@ -278,7 +278,7 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, string_view ref, Lots
 {
 }
 
-void Serv::reviseOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Lots lots,
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Lots lots,
                        Millis now, Response& resp)
 {
 }
@@ -296,7 +296,7 @@ void Serv::cancelOrder(TraderSess& sess, MarketBook& book, string_view ref, Mill
 {
 }
 
-void Serv::cancelOrder(TraderSess& sess, MarketBook& book, const IdenView& ids, Millis now,
+void Serv::cancelOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Millis now,
                        Response& resp)
 {
 }
@@ -321,7 +321,7 @@ void Serv::archiveOrder(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveOrder(TraderSess& sess, string_view market, const IdenView& ids, Millis now)
+void Serv::archiveOrder(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
 }
 
@@ -343,7 +343,7 @@ void Serv::archiveTrade(TraderSess& sess, Millis now)
 {
 }
 
-void Serv::archiveTrade(TraderSess& sess, string_view market, const IdenView& ids, Millis now)
+void Serv::archiveTrade(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
 }
 
