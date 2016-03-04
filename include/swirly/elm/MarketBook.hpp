@@ -30,10 +30,9 @@ namespace swirly {
 
 class SWIRLY_API MarketBook : public Market {
  public:
-  MarketBook(const std::string_view& mnem, const std::string_view& display,
-             const std::string_view& contr, Jday settlDay, Jday expiryDay, MarketState state,
-             Lots lastLots, Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-             Iden maxExecId) noexcept;
+  MarketBook(std::string_view mnem, std::string_view display, std::string_view contr, Jday settlDay,
+             Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime,
+             Iden maxOrderId, Iden maxExecId) noexcept;
 
   ~MarketBook() noexcept override;
 

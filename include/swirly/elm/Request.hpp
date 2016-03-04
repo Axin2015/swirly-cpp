@@ -33,17 +33,17 @@ namespace swirly {
 
 class SWIRLY_API Request : public RefCounted {
  public:
-  Request(const std::string_view& trader, const std::string_view& market,
-          const std::string_view& contr, Jday settlDay, Iden id, const std::string_view& ref,
-          Side side, Lots lots, Millis created) noexcept : trader_{trader},
-                                                           market_{market},
-                                                           contr_{contr},
-                                                           settlDay_{settlDay},
-                                                           id_{id},
-                                                           ref_{ref},
-                                                           side_{side},
-                                                           lots_{lots},
-                                                           created_{created}
+  Request(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
+          Iden id, std::string_view ref, Side side, Lots lots, Millis created) noexcept
+    : trader_{trader},
+      market_{market},
+      contr_{contr},
+      settlDay_{settlDay},
+      id_{id},
+      ref_{ref},
+      side_{side},
+      lots_{lots},
+      created_{created}
   {
   }
   ~Request() noexcept override;
@@ -164,22 +164,22 @@ class RequestIdSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(const std::string_view& market, Iden id) const noexcept
+  ConstIterator find(std::string_view market, Iden id) const noexcept
   {
     return set_.find(std::make_tuple(market, id), KeyValueCompare());
   }
-  Iterator find(const std::string_view& market, Iden id) noexcept
+  Iterator find(std::string_view market, Iden id) noexcept
   {
     return set_.find(std::make_tuple(market, id), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(const std::string_view& market, Iden id) const noexcept
+  std::pair<ConstIterator, bool> findHint(std::string_view market, Iden id) const noexcept
   {
     const auto key = std::make_tuple(market, id);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(const std::string_view& market, Iden id) noexcept
+  std::pair<Iterator, bool> findHint(std::string_view market, Iden id) noexcept
   {
     const auto key = std::make_tuple(market, id);
     const auto comp = KeyValueCompare();

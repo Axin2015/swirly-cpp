@@ -77,7 +77,7 @@ class SWIRLY_API RestRequest {
   std::string_view cpty() const noexcept { return +cpty_; }
   void reset(bool clear = true) noexcept;
 
-  bool parse(const std::string_view& buf);
+  bool parse(std::string_view buf);
 
  private:
   int cs_;

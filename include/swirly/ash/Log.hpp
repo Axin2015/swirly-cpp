@@ -39,7 +39,7 @@ using LogMsg = StringBuilder<LogMsgMax>;
 /**
  * Logger callback function.
  */
-using Logger = void (*)(int, const std::string_view&);
+using Logger = void (*)(int, std::string_view);
 
 enum : int {
   /**
@@ -106,23 +106,23 @@ SWIRLY_API Logger setLogger(Logger logger) noexcept;
  * level is allowed by the current log level; users are expected to call isLogLevel first, before
  * formatting the log message.
  */
-SWIRLY_API void writeLog(int level, const std::string_view& msg) noexcept;
+SWIRLY_API void writeLog(int level, std::string_view msg) noexcept;
 
 /**
  * Null logger. This logger does nothing and is effectively /dev/null.
  */
-SWIRLY_API void nullLogger(int level, const std::string_view& msg) noexcept;
+SWIRLY_API void nullLogger(int level, std::string_view msg) noexcept;
 
 /**
  * Standard logger. This logger writes to stdout if the log level is greater than LogWarn, and
  * stdout otherwise.
  */
-SWIRLY_API void stdLogger(int level, const std::string_view& msg) noexcept;
+SWIRLY_API void stdLogger(int level, std::string_view msg) noexcept;
 
 /**
  * System logger. This logger calls syslog().
  */
-SWIRLY_API void sysLogger(int level, const std::string_view& msg) noexcept;
+SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
 
 /**
  * Thread-local log message. This thread-local instance of StringBuilder can be used to format log

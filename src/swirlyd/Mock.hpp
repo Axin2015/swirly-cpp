@@ -64,37 +64,25 @@ class MockJourn : public Journ {
   MockJourn& operator=(MockJourn&&) noexcept;
 
  protected:
-  void doCreateMarket(const std::string_view& mnem, const std::string_view& display,
-                      const std::string_view& contr, Jday settlDay, Jday expiryDay,
-                      MarketState state) override;
+  void doCreateMarket(std::string_view mnem, std::string_view display, std::string_view contr,
+                      Jday settlDay, Jday expiryDay, MarketState state) override;
 
-  void doUpdateMarket(const std::string_view& mnem, const std::string_view& display,
-                      MarketState state) override;
+  void doUpdateMarket(std::string_view mnem, std::string_view display, MarketState state) override;
 
-  void doCreateTrader(const std::string_view& mnem, const std::string_view& display,
-                      const std::string_view& email) override;
+  void doCreateTrader(std::string_view mnem, std::string_view display,
+                      std::string_view email) override;
 
-  void doUpdateTrader(const std::string_view& mnem, const std::string_view& display) override;
+  void doUpdateTrader(std::string_view mnem, std::string_view display) override;
 
   void doCreateExec(const Exec& exec) override;
 
-  void doCreateExec(const std::string_view& market, const ArrayView<Exec*>& execs) override;
+  void doCreateExec(std::string_view market, ArrayView<Exec*> execs) override;
 
-  void doCreateExec(const ArrayView<Exec*>& execs) override;
+  void doCreateExec(ArrayView<Exec*> execs) override;
 
-  void doArchiveOrder(const std::string_view& market, Iden id, Millis modified) override;
+  void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
 
-  void doArchiveOrder(const std::string_view& market, const ArrayView<Iden>& ids,
-                      Millis modified) override;
-
-  void doArchiveOrder(const ArrayView<MarketId>& ids, Millis modified) override;
-
-  void doArchiveTrade(const std::string_view& market, Iden id, Millis modified) override;
-
-  void doArchiveTrade(const std::string_view& market, const ArrayView<Iden>& ids,
-                      Millis modified) override;
-
-  void doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified) override;
+  void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
 };
 
 /** @} */

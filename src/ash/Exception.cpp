@@ -23,7 +23,7 @@ namespace {
 thread_local ErrMsg errMsg_;
 } // anonymous
 
-Exception::Exception(const std::string_view& what) noexcept
+Exception::Exception(std::string_view what) noexcept
 {
   const auto len = min(ErrMsgMax, what.size());
   if (len > 0) {

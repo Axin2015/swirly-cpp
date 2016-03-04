@@ -241,7 +241,7 @@ void RestRequest::reset(bool clear) noexcept
   cpty_.len = 0;
 }
 
-bool RestRequest::parse(const string_view& buf)
+bool RestRequest::parse(string_view buf)
 {
   const char* p{buf.data()};
   const char* pe{p + buf.size()};

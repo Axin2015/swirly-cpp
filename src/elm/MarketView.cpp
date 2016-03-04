@@ -20,27 +20,26 @@ using namespace std;
 
 namespace swirly {
 
-MarketView::MarketView(const string_view& market, const string_view& contr, Jday settlDay,
-                       Lots lastLots, Ticks lastTicks, Millis lastTime,
-                       const MarketData& data) noexcept : market_{market},
-                                                          contr_{contr},
-                                                          settlDay_{settlDay},
-                                                          lastLots_{lastLots},
-                                                          lastTicks_{lastTicks},
-                                                          lastTime_{lastTime},
-                                                          data_{data}
-{
-}
-
-MarketView::MarketView(const string_view& market, const string_view& contr, Jday settlDay,
-                       Lots lastLots, Ticks lastTicks, Millis lastTime) noexcept
+MarketView::MarketView(string_view market, string_view contr, Jday settlDay, Lots lastLots,
+                       Ticks lastTicks, Millis lastTime, const MarketData& data) noexcept
   : market_{market},
     contr_{contr},
     settlDay_{settlDay},
     lastLots_{lastLots},
     lastTicks_{lastTicks},
     lastTime_{lastTime},
-    data_{}
+    data_{data}
+{
+}
+
+MarketView::MarketView(string_view market, string_view contr, Jday settlDay, Lots lastLots,
+                       Ticks lastTicks, Millis lastTime) noexcept : market_{market},
+                                                                    contr_{contr},
+                                                                    settlDay_{settlDay},
+                                                                    lastLots_{lastLots},
+                                                                    lastTicks_{lastTicks},
+                                                                    lastTime_{lastTime},
+                                                                    data_{}
 {
 }
 

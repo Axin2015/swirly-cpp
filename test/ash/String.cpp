@@ -83,4 +83,19 @@ BOOST_AUTO_TEST_CASE(ToStringCase)
   BOOST_CHECK_EQUAL(stod(toString(12345.67)), 12345.67);
 }
 
+BOOST_AUTO_TEST_CASE(StoulCase)
+{
+  BOOST_CHECK_EQUAL(stoul(""_sv), 0UL);
+  BOOST_CHECK_EQUAL(stoul("1"_sv), 1UL);
+  BOOST_CHECK_EQUAL(stoul("123"_sv), 123UL);
+  BOOST_CHECK_EQUAL(stoul(" "_sv), 0UL);
+  BOOST_CHECK_EQUAL(stoul(" 1 "_sv), 1UL);
+  BOOST_CHECK_EQUAL(stoul(" 123 "_sv), 123UL);
+  BOOST_CHECK_EQUAL(stoul("x"_sv), 0UL);
+  BOOST_CHECK_EQUAL(stoul(" 1x"_sv), 1UL);
+  BOOST_CHECK_EQUAL(stoul(" 123x"_sv), 123UL);
+  BOOST_CHECK_EQUAL(stoul("x1 "_sv), 0UL);
+  BOOST_CHECK_EQUAL(stoul("x123 "_sv), 0UL);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

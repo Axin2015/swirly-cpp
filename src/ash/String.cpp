@@ -14,36 +14,27 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
+#include <swirly/ash/String.hpp>
 
-#include <swirly/ash/Exception.hpp>
+using namespace std;
 
 namespace swirly {
-namespace mg {
 
-/**
- * @addtogroup App
- * @{
- */
+unsigned long stoul(string_view sv) noexcept
+{
+  long l{0};
+  auto it = sv.begin(), end = sv.end();
 
-class Error : public Exception {
- public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
+  // Skip leading whitespace.
+  while (it != end && isspace(*it)) {
+    ++it;
+  }
+  while (it != end && isdigit(*it)) {
+    l *= 10;
+    l += *it - '0';
+    ++it;
+  }
+  return l;
+}
 
-  // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
-
-  // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
-};
-
-/** @} */
-
-} // mg
 } // swirly
-
-#endif // SWIRLYD_EXCEPTION_HPP

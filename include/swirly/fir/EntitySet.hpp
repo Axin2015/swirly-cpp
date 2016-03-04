@@ -58,7 +58,7 @@ class SWIRLY_API EntitySet {
   EntitySet(EntitySet&&) noexcept = default;
   EntitySet& operator=(EntitySet&&) noexcept = default;
 
-  static EntitySet parse(const std::string_view& sv);
+  static EntitySet parse(std::string_view sv);
 
   int top() const noexcept
   {

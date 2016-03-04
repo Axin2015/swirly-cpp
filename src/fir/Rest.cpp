@@ -28,7 +28,7 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
-void Rest::getRec(EntitySet es, Millis now, std::ostream& out) const
+void Rest::getRec(EntitySet es, Millis now, ostream& out) const
 {
   int i{0};
   out << '{';
@@ -72,7 +72,7 @@ void Rest::getAsset(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getAsset(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::getAsset(string_view mnem, Millis now, ostream& out) const
 {
   const auto& assets = serv_.assets();
   auto it = assets.find(mnem);
@@ -90,7 +90,7 @@ void Rest::getContr(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getContr(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::getContr(string_view mnem, Millis now, ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   auto it = contrs.find(mnem);
@@ -108,7 +108,13 @@ void Rest::getMarket(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getMarket(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::postMarket(Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getMarket(string_view mnem, Millis now, ostream& out) const
 {
   const auto& markets = serv_.markets();
   auto it = markets.find(mnem);
@@ -116,6 +122,12 @@ void Rest::getMarket(const std::string_view& mnem, Millis now, std::ostream& out
     throw NotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
   out << *it;
+}
+
+void Rest::putMarket(string_view mnem, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
 }
 
 void Rest::getTrader(Millis now, ostream& out) const
@@ -126,7 +138,13 @@ void Rest::getTrader(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getTrader(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::postTrader(Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getTrader(string_view mnem, Millis now, ostream& out) const
 {
   const auto& traders = serv_.traders();
   auto it = traders.find(mnem);
@@ -134,6 +152,102 @@ void Rest::getTrader(const std::string_view& mnem, Millis now, std::ostream& out
     throw NotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
   }
   out << *it;
+}
+
+void Rest::putTrader(string_view mnem, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getSess(EntitySet es, Millis now, ostream& out) const
+{
+  int i{0};
+  out << '{';
+  if (es.order()) {
+    out << "\"orders\":";
+    getOrder(now, out);
+    ++i;
+  }
+  if (es.trade()) {
+    if (i > 0) {
+      out << ',';
+    }
+    out << "\"trades\":";
+    getTrade(now, out);
+    ++i;
+  }
+  if (es.posn()) {
+    if (i > 0) {
+      out << ',';
+    }
+    out << "\"posns\":";
+    getPosn(now, out);
+    ++i;
+  }
+  if (es.view()) {
+    if (i > 0) {
+      out << ',';
+    }
+    out << "\"views\":";
+    getView(now, out);
+    ++i;
+  }
+  out << '}';
+}
+
+void Rest::getOrder(Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::postOrder(string_view market, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getTrade(Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::postTrade(string_view market, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getPosn(Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getPosn(string_view contr, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getPosn(string_view contr, IsoDate settlDate, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getView(Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
+}
+
+void Rest::getView(string_view market, Millis now, ostream& out) const
+{
+  // FIXME:
+  out << "[]";
 }
 
 } // swirly

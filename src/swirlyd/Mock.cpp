@@ -131,23 +131,20 @@ MockJourn& MockJourn::operator=(const MockJourn&) noexcept = default;
 constexpr MockJourn::MockJourn(MockJourn&&) noexcept = default;
 MockJourn& MockJourn::operator=(MockJourn&&) noexcept = default;
 
-void MockJourn::doCreateMarket(const string_view& mnem, const string_view& display,
-                               const string_view& contr, Jday settlDay, Jday expiryDay,
-                               MarketState state)
+void MockJourn::doCreateMarket(string_view mnem, string_view display, string_view contr,
+                               Jday settlDay, Jday expiryDay, MarketState state)
 {
 }
 
-void MockJourn::doUpdateMarket(const string_view& mnem, const string_view& display,
-                               MarketState state)
+void MockJourn::doUpdateMarket(string_view mnem, string_view display, MarketState state)
 {
 }
 
-void MockJourn::doCreateTrader(const string_view& mnem, const string_view& display,
-                               const string_view& email)
+void MockJourn::doCreateTrader(string_view mnem, string_view display, string_view email)
 {
 }
 
-void MockJourn::doUpdateTrader(const string_view& mnem, const string_view& display)
+void MockJourn::doUpdateTrader(string_view mnem, string_view display)
 {
 }
 
@@ -155,37 +152,19 @@ void MockJourn::doCreateExec(const Exec& exec)
 {
 }
 
-void MockJourn::doCreateExec(const string_view& market, const ArrayView<Exec*>& execs)
+void MockJourn::doCreateExec(string_view market, ArrayView<Exec*> execs)
 {
 }
 
-void MockJourn::doCreateExec(const ArrayView<Exec*>& execs)
+void MockJourn::doCreateExec(ArrayView<Exec*> execs)
 {
 }
 
-void MockJourn::doArchiveOrder(const string_view& market, Iden id, Millis modified)
+void MockJourn::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)
 {
 }
 
-void MockJourn::doArchiveOrder(const string_view& market, const ArrayView<Iden>& ids,
-                               Millis modified)
-{
-}
-
-void MockJourn::doArchiveOrder(const ArrayView<MarketId>& ids, Millis modified)
-{
-}
-
-void MockJourn::doArchiveTrade(const string_view& market, Iden id, Millis modified)
-{
-}
-
-void MockJourn::doArchiveTrade(const string_view& market, const ArrayView<Iden>& ids,
-                               Millis modified)
-{
-}
-
-void MockJourn::doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified)
+void MockJourn::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modified)
 {
 }
 

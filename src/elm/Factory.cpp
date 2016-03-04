@@ -30,29 +30,28 @@ namespace swirly {
 
 Factory::~Factory() noexcept = default;
 
-OrderPtr Factory::newOrder(const string_view& trader, const string_view& market,
-                           const string_view& contr, Jday settlDay, Iden id, const string_view& ref,
-                           State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-                           Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Millis created,
-                           Millis modified) const
+OrderPtr Factory::newOrder(string_view trader, string_view market, string_view contr, Jday settlDay,
+                           Iden id, string_view ref, State state, Side side, Lots lots, Ticks ticks,
+                           Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
+                           Lots minLots, Millis created, Millis modified) const
 {
   return doNewOrder(trader, market, contr, settlDay, id, ref, state, side, lots, ticks, resd, exec,
                     cost, lastLots, lastTicks, minLots, created, modified);
 }
 
-OrderPtr Factory::newOrder(const string_view& trader, const string_view& market,
-                           const string_view& contr, Jday settlDay, Iden id, const string_view& ref,
-                           Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) const
+OrderPtr Factory::newOrder(string_view trader, string_view market, string_view contr, Jday settlDay,
+                           Iden id, string_view ref, Side side, Lots lots, Ticks ticks,
+                           Lots minLots, Millis created) const
 {
   return doNewOrder(trader, market, contr, settlDay, id, ref, State::New, side, lots, ticks, lots,
                     0_lts, 0_cst, 0_lts, 0_tks, minLots, created, created);
 }
 
-ExecPtr Factory::newExec(const string_view& trader, const string_view& market,
-                         const string_view& contr, Jday settlDay, Iden id, const string_view& ref,
-                         Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd,
-                         Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
-                         Iden matchId, Role role, const string_view& cpty, Millis created) const
+ExecPtr Factory::newExec(string_view trader, string_view market, string_view contr, Jday settlDay,
+                         Iden id, string_view ref, Iden orderId, State state, Side side, Lots lots,
+                         Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
+                         Ticks lastTicks, Lots minLots, Iden matchId, Role role, string_view cpty,
+                         Millis created) const
 {
   return doNewExec(trader, market, contr, settlDay, id, ref, orderId, state, side, lots, ticks,
                    resd, exec, cost, lastLots, lastTicks, minLots, matchId, role, cpty, created);
@@ -66,113 +65,108 @@ ExecPtr Factory::newExec(const Order& order, Iden id, Millis created) const
                    order.minLots(), 0_id, Role::None, string_view{}, created);
 }
 
-PosnPtr Factory::newPosn(const string_view& trader, const string_view& contr, Jday settlDay,
-                         Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const
+PosnPtr Factory::newPosn(string_view trader, string_view contr, Jday settlDay, Lots buyLots,
+                         Cost buyCost, Lots sellLots, Cost sellCost) const
 {
   return doNewPosn(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
 }
 
-PosnPtr Factory::newPosn(const string_view& trader, const string_view& contr, Jday settlDay) const
+PosnPtr Factory::newPosn(string_view trader, string_view contr, Jday settlDay) const
 {
   return doNewPosn(trader, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst);
 }
 
-std::unique_ptr<Asset> Factory::newAsset(const string_view& mnem, const string_view& display,
+std::unique_ptr<Asset> Factory::newAsset(string_view mnem, string_view display,
                                          AssetType type) const
 {
   return doNewAsset(mnem, display, type);
 }
 
-std::unique_ptr<Contr> Factory::newContr(const string_view& mnem, const string_view& display,
-                                         const string_view& asset, const string_view& ccy,
-                                         int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-                                         int pipDp, Lots minLots, Lots maxLots) const
+std::unique_ptr<Contr> Factory::newContr(string_view mnem, string_view display, string_view asset,
+                                         string_view ccy, int lotNumer, int lotDenom, int tickNumer,
+                                         int tickDenom, int pipDp, Lots minLots, Lots maxLots) const
 {
   return doNewContr(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer, tickDenom, pipDp,
                     minLots, maxLots);
 }
 
-std::unique_ptr<Market> Factory::newMarket(const string_view& mnem, const string_view& display,
-                                           const string_view& contr, Jday settlDay, Jday expiryDay,
-                                           MarketState state, Lots lastLots, Ticks lastTicks,
-                                           Millis lastTime, Iden maxOrderId, Iden maxExecId) const
+std::unique_ptr<Market> Factory::newMarket(string_view mnem, string_view display, string_view contr,
+                                           Jday settlDay, Jday expiryDay, MarketState state,
+                                           Lots lastLots, Ticks lastTicks, Millis lastTime,
+                                           Iden maxOrderId, Iden maxExecId) const
 {
   return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, lastLots, lastTicks,
                      lastTime, maxOrderId, maxExecId);
 }
 
-std::unique_ptr<Market> Factory::newMarket(const string_view& mnem, const string_view& display,
-                                           const string_view& contr, Jday settlDay, Jday expiryDay,
-                                           MarketState state) const
+std::unique_ptr<Market> Factory::newMarket(string_view mnem, string_view display, string_view contr,
+                                           Jday settlDay, Jday expiryDay, MarketState state) const
 {
   return doNewMarket(mnem, display, contr, settlDay, expiryDay, state, 0_lts, 0_tks, 0_ms, 0_id,
                      0_id);
 }
 
-std::unique_ptr<Trader> Factory::newTrader(const string_view& mnem, const string_view& display,
-                                           const string_view& email) const
+std::unique_ptr<Trader> Factory::newTrader(string_view mnem, string_view display,
+                                           string_view email) const
 {
   return doNewTrader(mnem, display, email);
 }
 
 BasicFactory::~BasicFactory() noexcept = default;
 
-unique_ptr<Asset> BasicFactory::doNewAsset(const string_view& mnem, const string_view& display,
+unique_ptr<Asset> BasicFactory::doNewAsset(string_view mnem, string_view display,
                                            AssetType type) const
 {
   return make_unique<Asset>(mnem, display, type);
 }
 
-unique_ptr<Contr> BasicFactory::doNewContr(const string_view& mnem, const string_view& display,
-                                           const string_view& asset, const string_view& ccy,
-                                           int lotNumer, int lotDenom, int tickNumer, int tickDenom,
-                                           int pipDp, Lots minLots, Lots maxLots) const
+unique_ptr<Contr> BasicFactory::doNewContr(string_view mnem, string_view display, string_view asset,
+                                           string_view ccy, int lotNumer, int lotDenom,
+                                           int tickNumer, int tickDenom, int pipDp, Lots minLots,
+                                           Lots maxLots) const
 {
   return make_unique<Contr>(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer, tickDenom,
                             pipDp, minLots, maxLots);
 }
 
-unique_ptr<Market> BasicFactory::doNewMarket(const string_view& mnem, const string_view& display,
-                                             const string_view& contr, Jday settlDay,
-                                             Jday expiryDay, MarketState state, Lots lastLots,
-                                             Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                                             Iden maxExecId) const
+unique_ptr<Market> BasicFactory::doNewMarket(string_view mnem, string_view display,
+                                             string_view contr, Jday settlDay, Jday expiryDay,
+                                             MarketState state, Lots lastLots, Ticks lastTicks,
+                                             Millis lastTime, Iden maxOrderId, Iden maxExecId) const
 {
   // Note that the last six arguments are unused in this base implementation.
   return make_unique<Market>(mnem, display, contr, settlDay, expiryDay, state);
 }
 
-unique_ptr<Trader> BasicFactory::doNewTrader(const string_view& mnem, const string_view& display,
-                                             const string_view& email) const
+unique_ptr<Trader> BasicFactory::doNewTrader(string_view mnem, string_view display,
+                                             string_view email) const
 {
   return make_unique<Trader>(mnem, display, email);
 }
 
-OrderPtr BasicFactory::doNewOrder(const string_view& trader, const string_view& market,
-                                  const string_view& contr, Jday settlDay, Iden id,
-                                  const string_view& ref, State state, Side side, Lots lots,
-                                  Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-                                  Ticks lastTicks, Lots minLots, Millis created,
+OrderPtr BasicFactory::doNewOrder(string_view trader, string_view market, string_view contr,
+                                  Jday settlDay, Iden id, string_view ref, State state, Side side,
+                                  Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+                                  Lots lastLots, Ticks lastTicks, Lots minLots, Millis created,
                                   Millis modified) const
 {
   return makeRefCounted<Order>(trader, market, contr, settlDay, id, ref, state, side, lots, ticks,
                                resd, exec, cost, lastLots, lastTicks, minLots, created, modified);
 }
 
-ExecPtr BasicFactory::doNewExec(const string_view& trader, const string_view& market,
-                                const string_view& contr, Jday settlDay, Iden id,
-                                const string_view& ref, Iden orderId, State state, Side side,
-                                Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
+ExecPtr BasicFactory::doNewExec(string_view trader, string_view market, string_view contr,
+                                Jday settlDay, Iden id, string_view ref, Iden orderId, State state,
+                                Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
                                 Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
-                                Role role, const string_view& cpty, Millis created) const
+                                Role role, string_view cpty, Millis created) const
 {
   return makeRefCounted<Exec>(trader, market, contr, settlDay, id, ref, orderId, state, side, lots,
                               ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId, role,
                               cpty, created);
 }
 
-PosnPtr BasicFactory::doNewPosn(const string_view& trader, const string_view& contr, Jday settlDay,
-                                Lots buyLots, Cost buyCost, Lots sellLots, Cost sellCost) const
+PosnPtr BasicFactory::doNewPosn(string_view trader, string_view contr, Jday settlDay, Lots buyLots,
+                                Cost buyCost, Lots sellLots, Cost sellCost) const
 {
   return makeRefCounted<Posn>(trader, contr, settlDay, buyLots, buyCost, sellLots, sellCost);
 }

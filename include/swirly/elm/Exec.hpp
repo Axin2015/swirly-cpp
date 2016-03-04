@@ -33,11 +33,10 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public Request {
  public:
-  Exec(const std::string_view& trader, const std::string_view& market,
-       const std::string_view& contr, Jday settlDay, Iden id, const std::string_view& ref,
-       Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role,
-       const std::string_view& cpty, Millis created) noexcept
+  Exec(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
+       Iden id, std::string_view ref, Iden orderId, State state, Side side, Lots lots, Ticks ticks,
+       Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
+       Role role, std::string_view cpty, Millis created) noexcept
     : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
       orderId_{orderId},
       state_{state},

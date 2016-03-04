@@ -22,10 +22,9 @@ using namespace std;
 
 namespace swirly {
 
-MarketBook::MarketBook(const string_view& mnem, const string_view& display,
-                       const string_view& contr, Jday settlDay, Jday expiryDay, MarketState state,
-                       Lots lastLots, Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-                       Iden maxExecId) noexcept
+MarketBook::MarketBook(string_view mnem, string_view display, string_view contr, Jday settlDay,
+                       Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
+                       Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept
   : Market{mnem, display, contr, settlDay, expiryDay, state},
     lastLots_{lastLots},
     lastTicks_{lastTicks},
