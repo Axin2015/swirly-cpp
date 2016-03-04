@@ -248,5 +248,15 @@ void RestServ::getView(mg::HttpMessage data, Millis now)
 {
 }
 
+void RestServ::splitIds(const string_view& sv) noexcept
+{
+  ids_.clear();
+  Tokeniser<','> toks{sv};
+  while (!toks.empty()) {
+    ids_.push_back(static_cast<Iden>(stoul(toks.top())));
+    toks.pop();
+  }
+}
+
 } // mg
 } // swirly

@@ -23,6 +23,10 @@
 #include <swirly/ash/Tokeniser.hpp>
 #include <swirly/ash/Types.hpp>
 
+#include <swirly/elm/Types.hpp>
+
+#include <vector>
+
 namespace swirly {
 class Rest;
 namespace mg {
@@ -65,9 +69,12 @@ class RestServ : public mg::Mgr<RestServ> {
   void getView(mg::HttpMessage data, Millis now);
 
  private:
+  void splitIds(const std::string_view& sv) noexcept;
+
   Rest& rest_;
   const mg_serve_http_opts& httpOpts_;
   Tokeniser<'/'> uri_;
+  std::vector<Iden> ids_;
   mg::OStream out_;
   bool match_{false};
 };
