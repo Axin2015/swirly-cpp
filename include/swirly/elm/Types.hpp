@@ -112,7 +112,6 @@ using Mnem = String<MnemMax>;
  */
 using Ref = String<RefMax>;
 
-using MarketId = std::pair<std::string_view, Iden>;
 enum class AssetType { Commodity = 1, Corporate, Currency, Equity, Government, Index };
 
 SWIRLY_API const char* enumString(AssetType type);

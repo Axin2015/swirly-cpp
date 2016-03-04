@@ -89,13 +89,6 @@ class SWIRLY_API Journ {
    */
   void createExec(const ArrayView<Exec*>& execs) { doCreateExec(execs); }
   /**
-   * Archive Order.
-   */
-  void archiveOrder(const std::string_view& market, Iden id, Millis modified)
-  {
-    doArchiveOrder(market, id, modified);
-  }
-  /**
    * Archive Orders.
    */
   void archiveOrder(const std::string_view& market, const ArrayView<Iden>& ids, Millis modified)
@@ -103,32 +96,11 @@ class SWIRLY_API Journ {
     doArchiveOrder(market, ids, modified);
   }
   /**
-   * Archive Orders. This overload may be less efficient than ones that are market-specific.
-   */
-  void archiveOrder(const ArrayView<MarketId>& ids, Millis modified)
-  {
-    doArchiveOrder(ids, modified);
-  }
-  /**
-   * Archive Trade.
-   */
-  void archiveTrade(const std::string_view& market, Iden id, Millis modified)
-  {
-    doArchiveTrade(market, id, modified);
-  }
-  /**
    * Archive Trades. This overload may be less efficient than ones that are market-specific.
    */
   void archiveTrade(const std::string_view& market, const ArrayView<Iden>& ids, Millis modified)
   {
     doArchiveTrade(market, ids, modified);
-  }
-  /**
-   * Archive Trades. This overload may be less efficient than ones that are market-specific.
-   */
-  void archiveTrade(const ArrayView<MarketId>& ids, Millis modified)
-  {
-    doArchiveTrade(ids, modified);
   }
 
  protected:
@@ -153,21 +125,13 @@ class SWIRLY_API Journ {
 
   virtual void doCreateExec(const ArrayView<Exec*>& execs) = 0;
 
-  virtual void doArchiveOrder(const std::string_view& market, Iden id, Millis modified) = 0;
-
   virtual void doArchiveOrder(const std::string_view& market, const ArrayView<Iden>& ids,
                               Millis modified)
     = 0;
 
-  virtual void doArchiveOrder(const ArrayView<MarketId>& ids, Millis modified) = 0;
-
-  virtual void doArchiveTrade(const std::string_view& market, Iden id, Millis modified) = 0;
-
   virtual void doArchiveTrade(const std::string_view& market, const ArrayView<Iden>& ids,
                               Millis modified)
     = 0;
-
-  virtual void doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified) = 0;
 };
 
 /** @} */

@@ -82,19 +82,11 @@ class MockJourn : public Journ {
 
   void doCreateExec(const ArrayView<Exec*>& execs) override;
 
-  void doArchiveOrder(const std::string_view& market, Iden id, Millis modified) override;
-
   void doArchiveOrder(const std::string_view& market, const ArrayView<Iden>& ids,
                       Millis modified) override;
 
-  void doArchiveOrder(const ArrayView<MarketId>& ids, Millis modified) override;
-
-  void doArchiveTrade(const std::string_view& market, Iden id, Millis modified) override;
-
   void doArchiveTrade(const std::string_view& market, const ArrayView<Iden>& ids,
                       Millis modified) override;
-
-  void doArchiveTrade(const ArrayView<MarketId>& ids, Millis modified) override;
 };
 
 /** @} */
