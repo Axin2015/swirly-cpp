@@ -13,6 +13,11 @@ IF(NOT CMAKE_BUILD_TYPE)
   #SET(CMAKE_BUILD_TYPE MINSIZEREL)
 ENDIF()
 
+# Enable for use with clang-tidy.
+IF(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+  SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+ENDIF()
+
 STRING(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
 
 SET(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
