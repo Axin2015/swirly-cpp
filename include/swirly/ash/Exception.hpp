@@ -38,7 +38,7 @@ using ErrMsg = StringBuilder<ErrMsgMax>;
 
 class SWIRLY_API Exception : public std::exception {
  public:
-  explicit Exception(const std::string_view& what) noexcept;
+  explicit Exception(std::string_view what) noexcept;
 
   ~Exception() noexcept override;
 

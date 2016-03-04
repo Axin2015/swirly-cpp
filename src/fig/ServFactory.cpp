@@ -26,8 +26,8 @@ namespace swirly {
 
 ServFactory::~ServFactory() noexcept = default;
 
-unique_ptr<Market> ServFactory::doNewMarket(const string_view& mnem, const string_view& display,
-                                            const string_view& contr, Jday settlDay, Jday expiryDay,
+unique_ptr<Market> ServFactory::doNewMarket(string_view mnem, string_view display,
+                                            string_view contr, Jday settlDay, Jday expiryDay,
                                             MarketState state, Lots lastLots, Ticks lastTicks,
                                             Millis lastTime, Iden maxOrderId, Iden maxExecId) const
 {
@@ -35,8 +35,8 @@ unique_ptr<Market> ServFactory::doNewMarket(const string_view& mnem, const strin
                                  lastTicks, lastTime, maxOrderId, maxExecId);
 }
 
-unique_ptr<Trader> ServFactory::doNewTrader(const string_view& mnem, const string_view& display,
-                                            const string_view& email) const
+unique_ptr<Trader> ServFactory::doNewTrader(string_view mnem, string_view display,
+                                            string_view email) const
 {
   return make_unique<TraderSess>(mnem, display, email, *this);
 }

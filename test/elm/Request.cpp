@@ -24,7 +24,7 @@ using namespace swirly;
 namespace {
 class Foo : public Request {
  public:
-  Foo(const string_view& market, Iden id, int& alive) noexcept
+  Foo(string_view market, Iden id, int& alive) noexcept
     : Request{"", market, "", 0_jd, id, "", Side::Buy, 0_lts, 0_ms},
       alive_{alive}
   {

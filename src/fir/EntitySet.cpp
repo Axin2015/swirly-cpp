@@ -26,7 +26,7 @@ namespace swirly {
 
 namespace {
 
-int bit(const string_view& sv)
+int bit(string_view sv)
 {
   int i;
   if (sv == "asset") {
@@ -55,7 +55,7 @@ int bit(const string_view& sv)
 
 EntitySet::~EntitySet() noexcept = default;
 
-EntitySet EntitySet::parse(const string_view& sv)
+EntitySet EntitySet::parse(string_view sv)
 {
   int bs{0};
   Tokeniser<','> toks{sv};

@@ -36,10 +36,10 @@ class Level;
  */
 class SWIRLY_API Order : public Request {
  public:
-  Order(const std::string_view& trader, const std::string_view& market,
-        const std::string_view& contr, Jday settlDay, Iden id, const std::string_view& ref,
-        State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
-        Lots lastLots, Ticks lastTicks, Lots minLots, Millis created, Millis modified) noexcept
+  Order(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
+        Iden id, std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
+        Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Millis created,
+        Millis modified) noexcept
     : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
       state_{state},
       ticks_{ticks},
@@ -168,11 +168,11 @@ class SWIRLY_API OrderRefSet {
     }
   };
   struct KeyValueCompare {
-    bool operator()(const std::string_view& lhs, const Order& rhs) const noexcept
+    bool operator()(std::string_view lhs, const Order& rhs) const noexcept
     {
       return lhs.compare(rhs.ref()) < 0;
     }
-    bool operator()(const Order& lhs, const std::string_view& rhs) const noexcept
+    bool operator()(const Order& lhs, std::string_view rhs) const noexcept
     {
       return lhs.ref().compare(rhs) < 0;
     }
@@ -211,18 +211,18 @@ class SWIRLY_API OrderRefSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(const std::string_view& ref) const noexcept
+  ConstIterator find(std::string_view ref) const noexcept
   {
     return set_.find(ref, KeyValueCompare());
   }
-  Iterator find(const std::string_view& ref) noexcept { return set_.find(ref, KeyValueCompare()); }
-  std::pair<ConstIterator, bool> findHint(const std::string_view& ref) const noexcept
+  Iterator find(std::string_view ref) noexcept { return set_.find(ref, KeyValueCompare()); }
+  std::pair<ConstIterator, bool> findHint(std::string_view ref) const noexcept
   {
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(ref, comp);
     return std::make_pair(it, it != set_.end() && !comp(ref, *it));
   }
-  std::pair<Iterator, bool> findHint(const std::string_view& ref) noexcept
+  std::pair<Iterator, bool> findHint(std::string_view ref) noexcept
   {
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(ref, comp);

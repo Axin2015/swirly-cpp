@@ -20,7 +20,7 @@ using namespace std;
 
 namespace swirly {
 
-unsigned long stoul(const string_view& sv) noexcept
+unsigned long stoul(string_view sv) noexcept
 {
   long l{0};
   auto it = sv.begin(), end = sv.end();

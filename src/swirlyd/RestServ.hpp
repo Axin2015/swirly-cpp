@@ -69,7 +69,7 @@ class RestServ : public mg::Mgr<RestServ> {
   void getView(mg::HttpMessage data, Millis now);
 
  private:
-  void splitIds(const std::string_view& sv) noexcept;
+  void splitIds(const std::string_view sv) noexcept;
 
   Rest& rest_;
   const mg_serve_http_opts& httpOpts_;

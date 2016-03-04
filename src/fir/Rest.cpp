@@ -72,7 +72,7 @@ void Rest::getAsset(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getAsset(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::getAsset(std::string_view mnem, Millis now, std::ostream& out) const
 {
   const auto& assets = serv_.assets();
   auto it = assets.find(mnem);
@@ -90,7 +90,7 @@ void Rest::getContr(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getContr(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::getContr(std::string_view mnem, Millis now, std::ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   auto it = contrs.find(mnem);
@@ -108,7 +108,7 @@ void Rest::getMarket(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getMarket(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::getMarket(std::string_view mnem, Millis now, std::ostream& out) const
 {
   const auto& markets = serv_.markets();
   auto it = markets.find(mnem);
@@ -126,7 +126,7 @@ void Rest::getTrader(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getTrader(const std::string_view& mnem, Millis now, std::ostream& out) const
+void Rest::getTrader(std::string_view mnem, Millis now, std::ostream& out) const
 {
   const auto& traders = serv_.traders();
   auto it = traders.find(mnem);

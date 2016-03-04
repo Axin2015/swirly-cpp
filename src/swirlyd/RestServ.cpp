@@ -248,7 +248,7 @@ void RestServ::getView(mg::HttpMessage data, Millis now)
 {
 }
 
-void RestServ::splitIds(const string_view& sv) noexcept
+void RestServ::splitIds(string_view sv) noexcept
 {
   ids_.clear();
   Tokeniser<','> toks{sv};
