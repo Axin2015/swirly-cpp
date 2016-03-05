@@ -108,12 +108,6 @@ void Rest::getMarket(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::postMarket(Millis now, ostream& out) const
-{
-  // FIXME:
-  out << "[]";
-}
-
 void Rest::getMarket(string_view mnem, Millis now, ostream& out) const
 {
   const auto& markets = serv_.markets();
@@ -124,24 +118,12 @@ void Rest::getMarket(string_view mnem, Millis now, ostream& out) const
   out << *it;
 }
 
-void Rest::putMarket(string_view mnem, Millis now, ostream& out) const
-{
-  // FIXME:
-  out << "[]";
-}
-
 void Rest::getTrader(Millis now, ostream& out) const
 {
   const auto& traders = serv_.traders();
   out << '[';
   copy(traders.begin(), traders.end(), OStreamJoiner(out, ','));
   out << ']';
-}
-
-void Rest::postTrader(Millis now, ostream& out) const
-{
-  // FIXME:
-  out << "[]";
 }
 
 void Rest::getTrader(string_view mnem, Millis now, ostream& out) const
@@ -152,12 +134,6 @@ void Rest::getTrader(string_view mnem, Millis now, ostream& out) const
     throw NotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
   }
   out << *it;
-}
-
-void Rest::putTrader(string_view mnem, Millis now, ostream& out) const
-{
-  // FIXME:
-  out << "[]";
 }
 
 void Rest::getSess(EntitySet es, Millis now, ostream& out) const
@@ -198,56 +174,128 @@ void Rest::getSess(EntitySet es, Millis now, ostream& out) const
 
 void Rest::getOrder(Millis now, ostream& out) const
 {
-  // FIXME:
+  // FIXME: Not implemented.
   out << "[]";
 }
 
-void Rest::postOrder(string_view market, Millis now, ostream& out) const
+void Rest::getOrder(string_view market, Millis now, ostream& out) const
 {
-  // FIXME:
-  out << "[]";
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\"}";
+}
+
+void Rest::getOrder(string_view market, Iden id, Millis now, ostream& out) const
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << ",\"id\":" << id << '}';
 }
 
 void Rest::getTrade(Millis now, ostream& out) const
 {
-  // FIXME:
+  // FIXME: Not implemented.
   out << "[]";
 }
 
-void Rest::postTrade(string_view market, Millis now, ostream& out) const
+void Rest::getTrade(string_view market, Millis now, ostream& out) const
 {
-  // FIXME:
-  out << "[]";
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\"}";
+}
+
+void Rest::getTrade(string_view market, Iden id, Millis now, ostream& out) const
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << ",\"id\":" << id << '}';
 }
 
 void Rest::getPosn(Millis now, ostream& out) const
 {
-  // FIXME:
+  // FIXME: Not implemented.
   out << "[]";
 }
 
 void Rest::getPosn(string_view contr, Millis now, ostream& out) const
 {
-  // FIXME:
-  out << "[]";
+  // FIXME: Not implemented.
+  out << "{\"contr\":\"" << contr << "\"}";
 }
 
 void Rest::getPosn(string_view contr, IsoDate settlDate, Millis now, ostream& out) const
 {
-  // FIXME:
-  out << "[]";
+  // FIXME: Not implemented.
+  out << "{\"contr\":\"" << contr << ",\"settlDate\":" << settlDate << '}';
 }
 
 void Rest::getView(Millis now, ostream& out) const
 {
-  // FIXME:
+  // FIXME: Not implemented.
   out << "[]";
 }
 
 void Rest::getView(string_view market, Millis now, ostream& out) const
 {
-  // FIXME:
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\"}";
+}
+
+void Rest::postMarket(Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
   out << "[]";
+}
+
+void Rest::putMarket(string_view mnem, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"mnem\":\"" << mnem << "\"}";
+}
+
+void Rest::postTrader(Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "[]";
+}
+
+void Rest::putTrader(string_view mnem, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"mnem\":\"" << mnem << "\"}";
+}
+
+void Rest::postOrder(string_view market, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\"}";
+}
+
+void Rest::putOrder(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\",\"ids\":[";
+  copy(ids.begin(), ids.end(), OStreamJoiner(out, ','));
+  out << "]}";
+}
+
+void Rest::deleteOrder(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\",\"ids\":[";
+  copy(ids.begin(), ids.end(), OStreamJoiner(out, ','));
+  out << "]}";
+}
+
+void Rest::postTrade(string_view market, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\"}";
+}
+
+void Rest::deleteTrade(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)
+{
+  // FIXME: Not implemented.
+  out << "{\"market\":\"" << market << "\",\"ids\":[";
+  copy(ids.begin(), ids.end(), OStreamJoiner(out, ','));
+  out << "]}";
 }
 
 } // swirly
