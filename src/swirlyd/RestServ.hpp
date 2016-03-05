@@ -20,6 +20,7 @@
 #include "Mongoose.hpp"
 #include "Stream.hpp"
 
+#include <swirly/ash/Array.hpp>
 #include <swirly/ash/Tokeniser.hpp>
 #include <swirly/ash/Types.hpp>
 
@@ -88,8 +89,9 @@ class RestServ : public mg::Mgr<RestServ> {
   };
 
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
+  ArrayView<Iden> ids() const noexcept { return {&ids_[0], ids_.size()}; }
 
-  void splitIds(std::string_view sv) noexcept;
+  void parseIds(std::string_view sv) noexcept;
 
   Rest& rest_;
   const mg_serve_http_opts& httpOpts_;

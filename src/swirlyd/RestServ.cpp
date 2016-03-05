@@ -409,10 +409,45 @@ void RestServ::orderRequest(mg::HttpMessage data, Millis now)
     // /api/sess/order/MARKET
     state_ |= MatchUri;
 
-    if (isSet(MethodPost)) {
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/sess/order/MARKET
+      state_ |= MatchMethod;
+      rest_.getOrder(market, now, out_);
+      break;
+    case MethodPost:
       // POST /api/sess/order/MARKET
       state_ |= MatchMethod;
       rest_.postOrder(market, now, out_);
+      break;
+    }
+    return;
+  }
+
+  parseIds(uri_.top());
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/sess/order/MARKET/ID,ID...
+    state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/sess/order/MARKET/ID
+      state_ |= MatchMethod;
+      rest_.getOrder(market, ids_[0], now, out_);
+      break;
+    case MethodPut:
+      // PUT /api/sess/order/MARKET/ID,ID...
+      state_ |= MatchMethod;
+      rest_.putOrder(market, ids(), now, out_);
+      break;
+    case MethodDelete:
+      // DELETE /api/sess/order/MARKET/ID,ID...
+      state_ |= MatchMethod;
+      rest_.deleteOrder(market, ids(), now, out_);
+      break;
     }
     return;
   }
@@ -441,10 +476,40 @@ void RestServ::tradeRequest(mg::HttpMessage data, Millis now)
     // /api/sess/trade/MARKET
     state_ |= MatchUri;
 
-    if (isSet(MethodPost)) {
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/sess/trade/MARKET
+      state_ |= MatchMethod;
+      rest_.getTrade(market, now, out_);
+      break;
+    case MethodPost:
       // POST /api/sess/trade/MARKET
       state_ |= MatchMethod;
       rest_.postTrade(market, now, out_);
+      break;
+    }
+    return;
+  }
+
+  parseIds(uri_.top());
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /api/sess/trade/MARKET/ID,ID...
+    state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /api/sess/trade/MARKET/ID
+      state_ |= MatchMethod;
+      rest_.getTrade(market, ids_[0], now, out_);
+      break;
+    case MethodDelete:
+      // DELETE /api/sess/trade/MARKET/ID,ID...
+      state_ |= MatchMethod;
+      rest_.deleteTrade(market, ids(), now, out_);
+      break;
     }
     return;
   }
@@ -523,13 +588,14 @@ void RestServ::viewRequest(mg::HttpMessage data, Millis now)
 
     if (isSet(MethodGet)) {
       // GET /api/view/MARKET
+      state_ |= MatchMethod;
       rest_.getView(market, now, out_);
     }
     return;
   }
 }
 
-void RestServ::splitIds(string_view sv) noexcept
+void RestServ::parseIds(string_view sv) noexcept
 {
   ids_.clear();
   Tokeniser<','> toks{sv};
