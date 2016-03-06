@@ -201,7 +201,7 @@ int main(int argc, char* argv[])
     httpOpts.dav_document_root = ".";
     httpOpts.enable_directory_listing = "yes";
 
-    SWIRLY_NOTICE(logMsg() << "starting swirlyd server on port " << httpPort);
+    SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << httpPort);
 
     SWIRLY_INFO(logMsg() << "auth-user: " << authUser);
     SWIRLY_INFO(logMsg() << "directory: " << directory);
@@ -245,6 +245,6 @@ int main(int argc, char* argv[])
   } catch (const exception& e) {
     SWIRLY_ERROR(logMsg() << "exception: " << e.what());
   }
-  SWIRLY_NOTICE("stopping swirlyd server"_sv);
+  SWIRLY_NOTICE("stopped swirlyd server"_sv);
   return ret;
 }
