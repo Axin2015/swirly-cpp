@@ -55,9 +55,9 @@ FIND_PROGRAM(RAGEL_EXECUTABLE ragel)
 
 FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time filesystem program_options
   system unit_test_framework)
-FIND_PACKAGE(Doxygen)      # Optional.
-FIND_PACKAGE(Perl)         # Optional.
-FIND_PACKAGE(PythonInterp) # Optional.
+FIND_PACKAGE(Doxygen)          # Optional.
+FIND_PACKAGE(Perl)             # Optional.
+FIND_PACKAGE(PythonInterp 2.7) # Optional.
 
 IF(DOXYGEN_FOUND)
 
