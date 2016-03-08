@@ -4,9 +4,9 @@ INCLUDE(FindJava)
 FIND_PACKAGE(Java COMPONENTS Runtime)
 
 SET(outfiles)
-IF(DOT)
+IF(DOT_EXECUTABLE)
 
-  MESSAGE(STATUS "Dot found: ${DOT}")
+  MESSAGE(STATUS "Dot found: ${DOT_EXECUTABLE}")
 
   SET(names
     Ash
@@ -46,7 +46,7 @@ IF(DOT)
       ADD_CUSTOM_COMMAND(
         OUTPUT "${PROJECT_BINARY_DIR}/image/${outfile}"
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${PLANTUML}" -graphvizdot "${DOT}"
+        COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${PLANTUML}" -graphvizdot "${DOT_EXECUTABLE}"
                 -o "${PROJECT_BINARY_DIR}/image" "${infile}"
         DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${infile}")
 
