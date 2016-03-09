@@ -19,7 +19,7 @@ Terminate the daemon process:
 
 Use `/tmp` as the working directory and log messages to a file instead of syslog:
 
-    $ swirlyd -d/tmp -l
+    $ swirlyd -d/tmp -l -
     Feb 21 20:49:38.598 NOTICE  [16916]: opening log file: "/var/log/swirlyd/swirlyd.log"
 
 Log Rotation
