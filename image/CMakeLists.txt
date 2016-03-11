@@ -1,7 +1,4 @@
 INCLUDE(AddFileDependencies)
-INCLUDE(FindJava)
-
-FIND_PACKAGE(Java COMPONENTS Runtime)
 
 SET(outfiles)
 IF(DOT_EXECUTABLE)
@@ -31,28 +28,6 @@ IF(DOT_EXECUTABLE)
     SET(outfiles ${outfiles} "${PROJECT_BINARY_DIR}/image/${outfile}")
   ENDFOREACH()
 
-  IF(Java_JAVA_EXECUTABLE AND NOT "${PLANTUML}" STREQUAL "PLANTUML-NOTFOUND")
-
-    MESSAGE(STATUS "Plantuml found: ${PLANTUML}")
-
-    FILE(GLOB infiles RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
-      "${CMAKE_CURRENT_SOURCE_DIR}/*.uml")
-
-    FOREACH(infile ${infiles})
-
-      STRING(REGEX REPLACE ".uml\$" ".png" outfile ${infile})
-      MESSAGE(STATUS "Generate ${outfile} from ${infile}")
-
-      ADD_CUSTOM_COMMAND(
-        OUTPUT "${PROJECT_BINARY_DIR}/image/${outfile}"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMAND "${Java_JAVA_EXECUTABLE}" -jar "${PLANTUML}" -graphvizdot "${DOT_EXECUTABLE}"
-                -o "${PROJECT_BINARY_DIR}/image" "${infile}"
-        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${infile}")
-
-      SET(outfiles ${outfiles} "${PROJECT_BINARY_DIR}/image/${outfile}")
-    ENDFOREACH()
-  ENDIF()
 ENDIF()
 
 ADD_CUSTOM_TARGET(image ALL DEPENDS ${outfiles})

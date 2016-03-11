@@ -24,7 +24,7 @@
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(Zero)
+SWIRLY_TEST_CASE(EntitySetZero)
 {
   const auto es = EntitySet::parse(""_sv);
   SWIRLY_CHECK(!es.many());
@@ -37,7 +37,7 @@ SWIRLY_TEST_CASE(Zero)
   SWIRLY_CHECK(es.empty());
 }
 
-SWIRLY_TEST_CASE(One)
+SWIRLY_TEST_CASE(EntitySetOne)
 {
   auto es = EntitySet::parse("asset"_sv);
   SWIRLY_CHECK(!es.many());
@@ -54,7 +54,7 @@ SWIRLY_TEST_CASE(One)
   SWIRLY_CHECK(es.empty());
 }
 
-SWIRLY_TEST_CASE(Two)
+SWIRLY_TEST_CASE(EntitySetTwo)
 {
   auto es = EntitySet::parse("asset,contr"_sv);
   SWIRLY_CHECK(es.many());
@@ -75,7 +75,7 @@ SWIRLY_TEST_CASE(Two)
   SWIRLY_CHECK(es.empty());
 }
 
-SWIRLY_TEST_CASE(Three)
+SWIRLY_TEST_CASE(EntitySetThree)
 {
   auto es = EntitySet::parse("market,contr,asset"_sv);
   SWIRLY_CHECK(es.many());
@@ -100,7 +100,7 @@ SWIRLY_TEST_CASE(Three)
   SWIRLY_CHECK(es.empty());
 }
 
-SWIRLY_TEST_CASE(Trailing)
+SWIRLY_TEST_CASE(EntitySetTrailing)
 {
   auto es = EntitySet::parse("trader,"_sv);
   SWIRLY_CHECK(!es.many());
@@ -117,7 +117,7 @@ SWIRLY_TEST_CASE(Trailing)
   SWIRLY_CHECK(es.empty());
 }
 
-SWIRLY_TEST_CASE(BadEntity)
+SWIRLY_TEST_CASE(EntitySetBadEntity)
 {
   SWIRLY_CHECK_THROW(EntitySet::parse("bad"_sv), NotFoundException);
 }
