@@ -16,18 +16,8 @@
  */
 #include <swirly/elm/Exec.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
-using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Exec) <= 6 * 64, "crossed cache-line boundary");
-
-BOOST_AUTO_TEST_SUITE(ExecSuite)
-
-BOOST_AUTO_TEST_CASE(ExecCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()

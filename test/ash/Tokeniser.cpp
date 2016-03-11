@@ -16,79 +16,75 @@
  */
 #include <swirly/ash/Tokeniser.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(TokeniserSuite)
-
-BOOST_AUTO_TEST_CASE(EmptyCase)
+SWIRLY_TEST_CASE(TokeniserEmpty)
 {
   Tokeniser<','> toks;
 
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 
   toks = Tokeniser<','>{""_sv};
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 }
 
-BOOST_AUTO_TEST_CASE(DelimCase)
+SWIRLY_TEST_CASE(TokeniserDelim)
 {
   Tokeniser<','> toks{","_sv};
 
-  BOOST_CHECK(toks.top().empty());
+  SWIRLY_CHECK(toks.top().empty());
 
   toks.pop();
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 }
 
-BOOST_AUTO_TEST_CASE(SingleCase)
+SWIRLY_TEST_CASE(TokeniserSingle)
 {
   Tokeniser<','> toks{"foo"_sv};
 
-  BOOST_CHECK_EQUAL(toks.top(), "foo");
+  SWIRLY_CHECK(toks.top() == "foo");
 
   toks.pop();
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 }
 
-BOOST_AUTO_TEST_CASE(ManyCase)
+SWIRLY_TEST_CASE(TokeniserMany)
 {
   Tokeniser<','> toks{"foo,bar,baz"_sv};
 
-  BOOST_CHECK_EQUAL(toks.top(), "foo");
+  SWIRLY_CHECK(toks.top() == "foo");
 
   toks.pop();
-  BOOST_CHECK_EQUAL(toks.top(), "bar");
+  SWIRLY_CHECK(toks.top() == "bar");
 
   toks.pop();
-  BOOST_CHECK_EQUAL(toks.top(), "baz");
+  SWIRLY_CHECK(toks.top() == "baz");
 
   toks.pop();
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 }
 
-BOOST_AUTO_TEST_CASE(LeadingCase)
+SWIRLY_TEST_CASE(TokeniserLeading)
 {
   Tokeniser<','> toks{",foo"_sv};
 
-  BOOST_CHECK(toks.top().empty());
+  SWIRLY_CHECK(toks.top().empty());
 
   toks.pop();
-  BOOST_CHECK_EQUAL(toks.top(), "foo");
+  SWIRLY_CHECK(toks.top() == "foo");
 
   toks.pop();
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 }
 
-BOOST_AUTO_TEST_CASE(TrailingCase)
+SWIRLY_TEST_CASE(TokeniserTrailing)
 {
   Tokeniser<','> toks{"foo,"_sv};
 
-  BOOST_CHECK_EQUAL(toks.top(), "foo");
+  SWIRLY_CHECK(toks.top() == "foo");
 
   toks.pop();
-  BOOST_CHECK(toks.empty());
+  SWIRLY_CHECK(toks.empty());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

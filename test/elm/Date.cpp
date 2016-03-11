@@ -18,14 +18,12 @@
 
 #include <swirly/ash/JulianDay.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(DateSuite)
-
-BOOST_AUTO_TEST_CASE(GetBusDayCase)
+SWIRLY_TEST_CASE(GetBusDay)
 {
   // Business days roll at 5pm New York.
 
@@ -34,10 +32,8 @@ BOOST_AUTO_TEST_CASE(GetBusDayCase)
   // 17.00 EDT (UTC-4 hours)
 
   // 20.59 UTC
-  BOOST_CHECK_EQUAL(getBusDay(1394830799000_ms), ymdToJd(2014, 2, 14));
+  SWIRLY_CHECK(getBusDay(1394830799000_ms) == ymdToJd(2014, 2, 14));
 
   // 21.00 UTC
-  BOOST_CHECK_EQUAL(getBusDay(1394830800000_ms), ymdToJd(2014, 2, 15));
+  SWIRLY_CHECK(getBusDay(1394830800000_ms) == ymdToJd(2014, 2, 15));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

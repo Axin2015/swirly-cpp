@@ -16,7 +16,7 @@
  */
 #include <swirly/elm/Rec.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -38,33 +38,29 @@ class Foo : public Rec {
 };
 } // anonymous
 
-BOOST_AUTO_TEST_SUITE(RecSuite)
-
-BOOST_AUTO_TEST_CASE(RecSetCase)
+SWIRLY_TEST_CASE(RecSet)
 {
   int alive{0};
   {
     RecSet<Foo> s;
 
     Foo& foo1{*s.emplace("FOO", "Foo One", alive)};
-    BOOST_CHECK_EQUAL(alive, 1);
-    BOOST_CHECK_EQUAL(foo1.mnem(), "FOO");
-    BOOST_CHECK_EQUAL(foo1.display(), "Foo One");
-    BOOST_CHECK(s.find("FOO") != s.end());
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(foo1.mnem() == "FOO");
+    SWIRLY_CHECK(foo1.display() == "Foo One");
+    SWIRLY_CHECK(s.find("FOO") != s.end());
 
     // Duplicate.
     Foo& foo2{*s.emplace("FOO", "Foo Two", alive)};
-    BOOST_CHECK_EQUAL(alive, 1);
-    BOOST_CHECK_EQUAL(&foo2, &foo1);
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(&foo2 == &foo1);
 
     // Replace.
     Foo& foo3{*s.emplaceOrReplace("FOO", "Foo Three", alive)};
-    BOOST_CHECK_EQUAL(alive, 1);
-    BOOST_CHECK_NE(&foo3, &foo1);
-    BOOST_CHECK_EQUAL(foo3.mnem(), "FOO");
-    BOOST_CHECK_EQUAL(foo3.display(), "Foo Three");
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(&foo3 != &foo1);
+    SWIRLY_CHECK(foo3.mnem() == "FOO");
+    SWIRLY_CHECK(foo3.display() == "Foo Three");
   }
-  BOOST_CHECK_EQUAL(alive, 0);
+  SWIRLY_CHECK(alive == 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

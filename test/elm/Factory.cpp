@@ -16,13 +16,4 @@
  */
 #include <swirly/elm/Factory.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(FactorySuite)
-
-BOOST_AUTO_TEST_CASE(FactoryCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#include <test/Test.hpp>

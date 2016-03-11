@@ -16,18 +16,12 @@
  */
 #include <swirly/fig/Response.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
-using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(ResponseSuite)
-
-BOOST_AUTO_TEST_CASE(ResponseCase)
+SWIRLY_TEST_CASE(Response)
 {
   Response r;
   Response s{r};
-  BOOST_CHECK(true);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -16,44 +16,41 @@
  */
 #include <swirly/ash/Stream.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 #include <array>
+#include <sstream>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(StreamSuite)
-
-BOOST_AUTO_TEST_CASE(StringBuilderCase)
+SWIRLY_TEST_CASE(StringBuilder)
 {
   StringBuilder<7> sb;
-  BOOST_CHECK(sb.empty());
+  SWIRLY_CHECK(sb.empty());
   sb << "foo";
-  BOOST_CHECK_EQUAL(sb.size(), 3UL);
-  BOOST_CHECK_EQUAL(sb.str(), "foo");
+  SWIRLY_CHECK(sb.size() == 3UL);
+  SWIRLY_CHECK(sb.str() == "foo");
   sb << ',' << "bar";
-  BOOST_CHECK_EQUAL(sb.size(), 7UL);
-  BOOST_CHECK_EQUAL(sb.str(), "foo,bar");
+  SWIRLY_CHECK(sb.size() == 7UL);
+  SWIRLY_CHECK(sb.str() == "foo,bar");
 
   sb.reset();
-  BOOST_CHECK(sb.empty());
+  SWIRLY_CHECK(sb.empty());
   sb << 12345678;
-  BOOST_CHECK_EQUAL(sb.size(), 7UL);
-  BOOST_CHECK_EQUAL(sb.str(), "1234567");
-  BOOST_CHECK(!sb);
+  SWIRLY_CHECK(sb.size() == 7UL);
+  SWIRLY_CHECK(sb.str() == "1234567");
+  SWIRLY_CHECK(!sb);
 
   sb.reset();
-  BOOST_CHECK(sb);
-  BOOST_CHECK_EQUAL((sb << "test").str(), "test");
+  SWIRLY_CHECK(sb);
+  SWIRLY_CHECK((sb << "test").str() == "test");
 }
 
-BOOST_AUTO_TEST_CASE(OStreamJoinerCase)
+SWIRLY_TEST_CASE(OStreamJoiner)
 {
   array<string, 3> arr{{"foo", "bar", "baz"}};
   stringstream ss;
   copy(arr.begin(), arr.end(), OStreamJoiner(ss, ','));
-  BOOST_CHECK_EQUAL(ss.str(), "foo,bar,baz");
+  SWIRLY_CHECK(ss.str() == "foo,bar,baz");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

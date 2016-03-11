@@ -16,32 +16,28 @@
  */
 #include <swirly/elm/Contr.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
 
-BOOST_AUTO_TEST_SUITE(ContrSuite)
-
-BOOST_AUTO_TEST_CASE(JsonCase)
+SWIRLY_TEST_CASE(ContrToString)
 {
   Contr contr{"EURUSD", "EURUSD", "EUR", "USD", 1000000, 1, 1, 10000, 4, 1_lts, 10_lts};
 
-  BOOST_CHECK_EQUAL(toString(contr), //
-                    "{\"mnem\":\"EURUSD\""
-                    ",\"display\":\"EURUSD\""
-                    ",\"asset\":\"EUR\""
-                    ",\"ccy\":\"USD\""
-                    ",\"lotNumer\":1000000"
-                    ",\"lotDenom\":1"
-                    ",\"tickNumer\":1"
-                    ",\"tickDenom\":10000"
-                    ",\"pipDp\":4"
-                    ",\"minLots\":1"
-                    ",\"maxLots\":10"
-                    "}");
+  SWIRLY_CHECK(toString(contr) == //
+               "{\"mnem\":\"EURUSD\""
+               ",\"display\":\"EURUSD\""
+               ",\"asset\":\"EUR\""
+               ",\"ccy\":\"USD\""
+               ",\"lotNumer\":1000000"
+               ",\"lotDenom\":1"
+               ",\"tickNumer\":1"
+               ",\"tickDenom\":10000"
+               ",\"pipDp\":4"
+               ",\"minLots\":1"
+               ",\"maxLots\":10"
+               "}");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

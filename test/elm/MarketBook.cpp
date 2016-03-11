@@ -16,18 +16,8 @@
  */
 #include <swirly/elm/MarketBook.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
-using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(MarketBook) <= 7 * 64, "crossed cache-line boundary");
-
-BOOST_AUTO_TEST_SUITE(MarketBookSuite)
-
-BOOST_AUTO_TEST_CASE(MarketBookCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()

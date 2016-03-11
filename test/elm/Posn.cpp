@@ -18,38 +18,34 @@
 
 #include <swirly/ash/JulianDay.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Posn) <= 3 * 64, "crossed cache-line boundary");
 
-BOOST_AUTO_TEST_SUITE(PosnSuite)
-
-BOOST_AUTO_TEST_CASE(TraderPosnSetCase)
+SWIRLY_TEST_CASE(TraderPosnSet)
 {
   constexpr auto settlDay = ymdToJd(2014, 2, 14);
 
   TraderPosnSet s;
 
   PosnPtr posn1{&*s.emplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
-  BOOST_CHECK_EQUAL(posn1->refs(), 2);
-  BOOST_CHECK_EQUAL(posn1->contr(), "EURUSD");
-  BOOST_CHECK_EQUAL(posn1->settlDay(), settlDay);
-  BOOST_CHECK(s.find("EURUSD", settlDay) != s.end());
+  SWIRLY_CHECK(posn1->refs() == 2);
+  SWIRLY_CHECK(posn1->contr() == "EURUSD");
+  SWIRLY_CHECK(posn1->settlDay() == settlDay);
+  SWIRLY_CHECK(s.find("EURUSD", settlDay) != s.end());
 
   // Duplicate.
   PosnPtr posn2{&*s.emplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
-  BOOST_CHECK_EQUAL(posn2->refs(), 3);
-  BOOST_CHECK_EQUAL(posn2, posn1);
+  SWIRLY_CHECK(posn2->refs() == 3);
+  SWIRLY_CHECK(posn2 == posn1);
 
   // Replace.
   PosnPtr posn3{&*s.emplaceOrReplace("MARAYL", "EURUSD", settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
-  BOOST_CHECK_EQUAL(posn3->refs(), 2);
-  BOOST_CHECK_NE(posn3, posn1);
-  BOOST_CHECK_EQUAL(posn3->contr(), "EURUSD");
-  BOOST_CHECK_EQUAL(posn3->settlDay(), settlDay);
+  SWIRLY_CHECK(posn3->refs() == 2);
+  SWIRLY_CHECK(posn3 != posn1);
+  SWIRLY_CHECK(posn3->contr() == "EURUSD");
+  SWIRLY_CHECK(posn3->settlDay() == settlDay);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

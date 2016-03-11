@@ -16,7 +16,7 @@
  */
 #include <swirly/ash/String.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -25,77 +25,73 @@ namespace {
 constexpr string_view name = "string_view"_sv;
 } // anonymous
 
-BOOST_AUTO_TEST_SUITE(StringSuite)
-
-BOOST_AUTO_TEST_CASE(EmptyCase)
+SWIRLY_TEST_CASE(StringEmpty)
 {
   String<3> sb;
-  BOOST_CHECK(sb.empty());
-  BOOST_CHECK_EQUAL(sb.size(), 0UL);
-  BOOST_CHECK_EQUAL(sb.compare(""), 0);
-  BOOST_CHECK_EQUAL(sb, String<3>{""});
+  SWIRLY_CHECK(sb.empty());
+  SWIRLY_CHECK(sb.size() == 0UL);
+  SWIRLY_CHECK(sb.compare("") == 0);
+  SWIRLY_CHECK(sb == String<3>{""});
 }
 
-BOOST_AUTO_TEST_CASE(NonEmptyCase)
+SWIRLY_TEST_CASE(StringNonEmpty)
 {
   String<3> sb{"Foo"};
-  BOOST_CHECK(!sb.empty());
-  BOOST_CHECK_EQUAL(sb.size(), 3UL);
-  BOOST_CHECK_EQUAL(sb.compare("Foo"), 0);
-  BOOST_CHECK_EQUAL(sb, String<3>{"Foo"});
+  SWIRLY_CHECK(!sb.empty());
+  SWIRLY_CHECK(sb.size() == 3UL);
+  SWIRLY_CHECK(sb.compare("Foo") == 0);
+  SWIRLY_CHECK(sb == String<3>{"Foo"});
 }
 
-BOOST_AUTO_TEST_CASE(UpperBoundCase)
+SWIRLY_TEST_CASE(StringUpperBound)
 {
   String<3> sb{"Foox"};
-  BOOST_CHECK_EQUAL(sb.size(), 3UL);
-  BOOST_CHECK_EQUAL(sb, "Foo");
+  SWIRLY_CHECK(sb.size() == 3UL);
+  SWIRLY_CHECK(sb == "Foo");
 
   sb = "Barx";
-  BOOST_CHECK_EQUAL(sb.size(), 3UL);
-  BOOST_CHECK_EQUAL(sb, "Bar");
+  SWIRLY_CHECK(sb.size() == 3UL);
+  SWIRLY_CHECK(sb == "Bar");
 }
 
-BOOST_AUTO_TEST_CASE(ClearCase)
+SWIRLY_TEST_CASE(StringClear)
 {
   String<3> sb{"Foo"};
   sb.clear();
-  BOOST_CHECK(sb.empty());
+  SWIRLY_CHECK(sb.empty());
 }
 
-BOOST_AUTO_TEST_CASE(AssignCase)
+SWIRLY_TEST_CASE(StringAssign)
 {
   String<3> sb;
   sb = "Foo"_sv;
-  BOOST_CHECK_EQUAL(sb.size(), 3UL);
-  BOOST_CHECK_EQUAL(sb, "Foo");
+  SWIRLY_CHECK(sb.size() == 3UL);
+  SWIRLY_CHECK(sb == "Foo");
 
   sb.clear();
   sb = "Foox"_sv;
-  BOOST_CHECK_EQUAL(sb.size(), 3UL);
-  BOOST_CHECK_EQUAL(sb, "Foo");
+  SWIRLY_CHECK(sb.size() == 3UL);
+  SWIRLY_CHECK(sb == "Foo");
 }
 
-BOOST_AUTO_TEST_CASE(ToStringCase)
+SWIRLY_TEST_CASE(StringToString)
 {
-  BOOST_CHECK_EQUAL(toString("foo"_sv), "foo"s);
-  BOOST_CHECK_EQUAL(stoi(toString(12345)), 12345);
-  BOOST_CHECK_EQUAL(stod(toString(12345.67)), 12345.67);
+  SWIRLY_CHECK(toString("foo"_sv) == "foo"s);
+  SWIRLY_CHECK(stoi(toString(12345)) == 12345);
+  SWIRLY_CHECK(stod(toString(12345.67)) == 12345.67);
 }
 
-BOOST_AUTO_TEST_CASE(StoulCase)
+SWIRLY_TEST_CASE(Stoul)
 {
-  BOOST_CHECK_EQUAL(stoul(""_sv), 0UL);
-  BOOST_CHECK_EQUAL(stoul("1"_sv), 1UL);
-  BOOST_CHECK_EQUAL(stoul("123"_sv), 123UL);
-  BOOST_CHECK_EQUAL(stoul(" "_sv), 0UL);
-  BOOST_CHECK_EQUAL(stoul(" 1 "_sv), 1UL);
-  BOOST_CHECK_EQUAL(stoul(" 123 "_sv), 123UL);
-  BOOST_CHECK_EQUAL(stoul("x"_sv), 0UL);
-  BOOST_CHECK_EQUAL(stoul(" 1x"_sv), 1UL);
-  BOOST_CHECK_EQUAL(stoul(" 123x"_sv), 123UL);
-  BOOST_CHECK_EQUAL(stoul("x1 "_sv), 0UL);
-  BOOST_CHECK_EQUAL(stoul("x123 "_sv), 0UL);
+  SWIRLY_CHECK(stoul(""_sv) == 0UL);
+  SWIRLY_CHECK(stoul("1"_sv) == 1UL);
+  SWIRLY_CHECK(stoul("123"_sv) == 123UL);
+  SWIRLY_CHECK(stoul(" "_sv) == 0UL);
+  SWIRLY_CHECK(stoul(" 1 "_sv) == 1UL);
+  SWIRLY_CHECK(stoul(" 123 "_sv) == 123UL);
+  SWIRLY_CHECK(stoul("x"_sv) == 0UL);
+  SWIRLY_CHECK(stoul(" 1x"_sv) == 1UL);
+  SWIRLY_CHECK(stoul(" 123x"_sv) == 123UL);
+  SWIRLY_CHECK(stoul("x1 "_sv) == 0UL);
+  SWIRLY_CHECK(stoul("x123 "_sv) == 0UL);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

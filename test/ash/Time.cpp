@@ -16,15 +16,4 @@
  */
 #include <swirly/ash/Time.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-using namespace swirly;
-
-BOOST_AUTO_TEST_SUITE(TimeSuite)
-
-BOOST_AUTO_TEST_CASE(TimeCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#include <test/Test.hpp>

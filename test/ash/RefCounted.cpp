@@ -16,7 +16,7 @@
  */
 #include <swirly/ash/RefCounted.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -32,22 +32,18 @@ class Foo : public RefCounted {
 };
 } // anonymous
 
-BOOST_AUTO_TEST_SUITE(RefCountedSuite)
-
-BOOST_AUTO_TEST_CASE(RefCountedCase)
+SWIRLY_TEST_CASE(RefCounted)
 {
   int alive{0};
   {
     auto ptr1 = makeRefCounted<Foo>(alive);
-    BOOST_CHECK_EQUAL(alive, 1);
-    BOOST_CHECK_EQUAL(ptr1->refs(), 1);
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(ptr1->refs() == 1);
     {
       auto ptr2 = ptr1;
-      BOOST_CHECK_EQUAL(ptr1->refs(), 2);
+      SWIRLY_CHECK(ptr1->refs() == 2);
     }
-    BOOST_CHECK_EQUAL(ptr1->refs(), 1);
+    SWIRLY_CHECK(ptr1->refs() == 1);
   }
-  BOOST_CHECK_EQUAL(alive, 0);
+  SWIRLY_CHECK(alive == 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

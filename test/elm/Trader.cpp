@@ -16,24 +16,20 @@
  */
 #include <swirly/elm/Trader.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Trader) <= 4 * 64, "crossed cache-line boundary");
 
-BOOST_AUTO_TEST_SUITE(TraderSuite)
-
-BOOST_AUTO_TEST_CASE(JsonCase)
+SWIRLY_TEST_CASE(TraderToString)
 {
   Trader trader{"MARAYL", "Mark Aylett", "mark.aylett@gmail.com"};
 
-  BOOST_CHECK_EQUAL(toString(trader), //
-                    "{\"mnem\":\"MARAYL\""
-                    ",\"display\":\"Mark Aylett\""
-                    ",\"email\":\"mark.aylett@gmail.com\""
-                    "}");
+  SWIRLY_CHECK(toString(trader) == //
+               "{\"mnem\":\"MARAYL\""
+               ",\"display\":\"Mark Aylett\""
+               ",\"email\":\"mark.aylett@gmail.com\""
+               "}");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

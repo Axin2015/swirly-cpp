@@ -16,16 +16,12 @@
  */
 #include <swirly/ash/Exception.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(ExceptionSuite)
-
-BOOST_AUTO_TEST_CASE(ExceptionCase)
+SWIRLY_TEST_CASE(Exception)
 {
   Exception e{"Foo"};
-  BOOST_CHECK(std::strcmp(e.what(), "Foo") == 0);
+  SWIRLY_CHECK(std::strcmp(e.what(), "Foo") == 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
