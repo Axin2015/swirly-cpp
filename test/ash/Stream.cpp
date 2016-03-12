@@ -16,7 +16,7 @@
  */
 #include <swirly/ash/Stream.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>
 
 #include <array>
 #include <sstream>

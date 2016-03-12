@@ -20,7 +20,7 @@
 
 #include <swirly/ash/String.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>
 
 using namespace swirly;
 

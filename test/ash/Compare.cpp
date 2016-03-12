@@ -16,4 +16,4 @@
  */
 #include <swirly/ash/Compare.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>

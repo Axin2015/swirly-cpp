@@ -16,4 +16,4 @@
  */
 #include <swirly/elm/Journ.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>

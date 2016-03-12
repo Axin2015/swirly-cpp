@@ -16,4 +16,4 @@
  */
 #include <swirly/fig/Serv.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>

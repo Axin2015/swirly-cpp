@@ -16,7 +16,7 @@
  */
 #include <swirly/ash/Enum.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>
 
 #include <boost/lexical_cast.hpp>
 

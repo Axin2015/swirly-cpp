@@ -16,7 +16,7 @@
  */
 #include <swirly/fig/TraderSess.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>
 
 using namespace swirly;
 
