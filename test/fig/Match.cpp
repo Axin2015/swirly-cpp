@@ -16,16 +16,4 @@
  */
 #include <Match.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-using namespace std;
-using namespace swirly;
-
-BOOST_AUTO_TEST_SUITE(MatchSuite)
-
-BOOST_AUTO_TEST_CASE(MatchCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#include <test/Test.hpp>

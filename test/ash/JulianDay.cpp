@@ -16,29 +16,25 @@
  */
 #include <swirly/ash/JulianDay.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(JulianDaySuite)
-
-BOOST_AUTO_TEST_CASE(YmdToIsoCase)
+SWIRLY_TEST_CASE(YmdToIso)
 {
-  BOOST_CHECK_EQUAL(20140314_dt, ymdToIso(2014, 2, 14));
+  SWIRLY_CHECK(20140314_dt == ymdToIso(2014, 2, 14));
 }
 
-BOOST_AUTO_TEST_CASE(YmdToJdCase)
+SWIRLY_TEST_CASE(YmdToJd)
 {
-  BOOST_CHECK_EQUAL(2456731_jd, ymdToJd(2014, 2, 14));
+  SWIRLY_CHECK(2456731_jd == ymdToJd(2014, 2, 14));
   // AD 1978 January 1, 0h UT is JD 2443509.5 and AD 1978 July 21, 15h UT, is JD 2443711.125.
-  BOOST_CHECK_EQUAL(2443510_jd, ymdToJd(1978, 0, 1));
-  BOOST_CHECK_EQUAL(2443711_jd, ymdToJd(1978, 6, 21));
+  SWIRLY_CHECK(2443510_jd == ymdToJd(1978, 0, 1));
+  SWIRLY_CHECK(2443711_jd == ymdToJd(1978, 6, 21));
 }
 
-BOOST_AUTO_TEST_CASE(JdToMillisCase)
+SWIRLY_TEST_CASE(JdToMillis)
 {
-  BOOST_CHECK_EQUAL(1394798400000_ms, jdToMs(ymdToJd(2014, 2, 14)));
+  SWIRLY_CHECK(1394798400000_ms == jdToMs(ymdToJd(2014, 2, 14)));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

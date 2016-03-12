@@ -16,18 +16,8 @@
  */
 #include <swirly/fig/TraderSess.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
-using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(TraderSess) <= 7 * 64, "crossed cache-line boundary");
-
-BOOST_AUTO_TEST_SUITE(TraderSessSuite)
-
-BOOST_AUTO_TEST_CASE(TraderSessCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()

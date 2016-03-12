@@ -16,24 +16,20 @@
  */
 #include <swirly/elm/Asset.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Asset) <= 3 * 64, "crossed cache-line boundary");
 
-BOOST_AUTO_TEST_SUITE(AssetSuite)
-
-BOOST_AUTO_TEST_CASE(JsonCase)
+SWIRLY_TEST_CASE(AssetToString)
 {
   Asset asset{"GBP", "United Kingdom, Pounds", AssetType::Currency};
 
-  BOOST_CHECK_EQUAL(toString(asset), //
-                    "{\"mnem\":\"GBP\""
-                    ",\"display\":\"United Kingdom, Pounds\""
-                    ",\"type\":\"CURRENCY\""
-                    "}");
+  SWIRLY_CHECK(toString(asset) == //
+               "{\"mnem\":\"GBP\""
+               ",\"display\":\"United Kingdom, Pounds\""
+               ",\"type\":\"CURRENCY\""
+               "}");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

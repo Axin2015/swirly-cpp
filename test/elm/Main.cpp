@@ -14,5 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#define BOOST_TEST_MODULE "Elm Tests"
-#include <boost/test/unit_test.hpp>
+#include <test/Main.hpp>

@@ -16,7 +16,7 @@
  */
 #include <swirly/ash/Log.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -35,21 +35,19 @@ ostream& operator<<(ostream& os, const Foo<int, int>& val)
 }
 } // anonymous
 
-BOOST_AUTO_TEST_SUITE(LogSuite)
-
-BOOST_AUTO_TEST_CASE(LogLabelCase)
+SWIRLY_TEST_CASE(LogLabel)
 {
-  BOOST_CHECK_EQUAL(strcmp(logLabel(-1), "CRIT"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogCrit), "CRIT"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogError), "ERROR"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogWarning), "WARNING"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogNotice), "NOTICE"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogInfo), "INFO"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(LogDebug), "DEBUG"), 0);
-  BOOST_CHECK_EQUAL(strcmp(logLabel(99), "DEBUG"), 0);
+  SWIRLY_CHECK(strcmp(logLabel(-1), "CRIT") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(LogCrit), "CRIT") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(LogError), "ERROR") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(LogWarning), "WARNING") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(LogNotice), "NOTICE") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(LogInfo), "INFO") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(LogDebug), "DEBUG") == 0);
+  SWIRLY_CHECK(strcmp(logLabel(99), "DEBUG") == 0);
 }
 
-BOOST_AUTO_TEST_CASE(LogMacroCase)
+SWIRLY_TEST_CASE(LogMacro)
 {
   SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
   SWIRLY_CRIT(logMsg() << "test: " << Foo<int, int>{10, 20});
@@ -59,5 +57,3 @@ BOOST_AUTO_TEST_CASE(LogMacroCase)
   SWIRLY_INFO(logMsg() << "test" << Foo<int, int>{10, 20});
   SWIRLY_DEBUG(logMsg() << "test" << Foo<int, int>{10, 20});
 }
-
-BOOST_AUTO_TEST_SUITE_END()

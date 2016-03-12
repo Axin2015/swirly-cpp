@@ -16,13 +16,4 @@
  */
 #include <swirly/elm/Model.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(ModelSuite)
-
-BOOST_AUTO_TEST_CASE(ModelCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#include <test/Test.hpp>

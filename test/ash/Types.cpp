@@ -16,13 +16,4 @@
  */
 #include <swirly/ash/Types.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(TypesSuite)
-
-BOOST_AUTO_TEST_CASE(TypesCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#include <test/Test.hpp>

@@ -16,7 +16,7 @@
  */
 #include <swirly/elm/Request.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -41,36 +41,32 @@ using FooPtr = boost::intrusive_ptr<Foo>;
 
 } // anonymous
 
-BOOST_AUTO_TEST_SUITE(RequestSuite)
-
-BOOST_AUTO_TEST_CASE(RequestIdSetCase)
+SWIRLY_TEST_CASE(RequestIdSet)
 {
   int alive{0};
   {
     RequestIdSet<Foo> s;
 
     FooPtr foo1{&*s.emplace("FOO", 1_id, alive)};
-    BOOST_CHECK_EQUAL(alive, 1);
-    BOOST_CHECK_EQUAL(foo1->refs(), 2);
-    BOOST_CHECK_EQUAL(foo1->market(), "FOO");
-    BOOST_CHECK_EQUAL(foo1->id(), 1_id);
-    BOOST_CHECK(s.find("FOO", 1_id) != s.end());
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(foo1->refs() == 2);
+    SWIRLY_CHECK(foo1->market() == "FOO");
+    SWIRLY_CHECK(foo1->id() == 1_id);
+    SWIRLY_CHECK(s.find("FOO", 1_id) != s.end());
 
     // Duplicate.
     FooPtr foo2{&*s.emplace("FOO", 1_id, alive)};
-    BOOST_CHECK_EQUAL(alive, 1);
-    BOOST_CHECK_EQUAL(foo2->refs(), 3);
-    BOOST_CHECK_EQUAL(foo2, foo1);
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(foo2->refs() == 3);
+    SWIRLY_CHECK(foo2 == foo1);
 
     // Replace.
     FooPtr foo3{&*s.emplaceOrReplace("FOO", 1_id, alive)};
-    BOOST_CHECK_EQUAL(alive, 2);
-    BOOST_CHECK_EQUAL(foo3->refs(), 2);
-    BOOST_CHECK_NE(foo3, foo1);
-    BOOST_CHECK_EQUAL(foo3->market(), "FOO");
-    BOOST_CHECK_EQUAL(foo3->id(), 1_id);
+    SWIRLY_CHECK(alive == 2);
+    SWIRLY_CHECK(foo3->refs() == 2);
+    SWIRLY_CHECK(foo3 != foo1);
+    SWIRLY_CHECK(foo3->market() == "FOO");
+    SWIRLY_CHECK(foo3->id() == 1_id);
   }
-  BOOST_CHECK_EQUAL(alive, 0);
+  SWIRLY_CHECK(alive == 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

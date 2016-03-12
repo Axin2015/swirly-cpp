@@ -18,42 +18,38 @@
 
 #include <swirly/ash/JulianDay.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Market) <= 3 * 64, "crossed cache-line boundary");
 
-BOOST_AUTO_TEST_SUITE(MarketSuite)
-
-BOOST_AUTO_TEST_CASE(JsonCase)
+SWIRLY_TEST_CASE(MarketToString)
 {
   Market market{"EURUSD.MAR14"_sv,    "EURUSD March 14"_sv, "EURUSD"_sv,
                 ymdToJd(2014, 2, 14), ymdToJd(2014, 2, 12), 0x01};
 
-  BOOST_CHECK_EQUAL(toString(market), //
-                    "{\"mnem\":\"EURUSD.MAR14\""
-                    ",\"display\":\"EURUSD March 14\""
-                    ",\"contr\":\"EURUSD\""
-                    ",\"settlDate\":20140314"
-                    ",\"expiryDate\":20140312"
-                    ",\"state\":1"
-                    "}");
+  SWIRLY_CHECK(toString(market) == //
+               "{\"mnem\":\"EURUSD.MAR14\""
+               ",\"display\":\"EURUSD March 14\""
+               ",\"contr\":\"EURUSD\""
+               ",\"settlDate\":20140314"
+               ",\"expiryDate\":20140312"
+               ",\"state\":1"
+               "}");
 }
 
-BOOST_AUTO_TEST_CASE(JsonNullCase)
+SWIRLY_TEST_CASE(MarketToStringNull)
 {
   Market market{"EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, 0_jd, 0_jd, 0x01};
 
-  BOOST_CHECK_EQUAL(toString(market), //
-                    "{\"mnem\":\"EURUSD.MAR14\""
-                    ",\"display\":\"EURUSD March 14\""
-                    ",\"contr\":\"EURUSD\""
-                    ",\"settlDate\":null"
-                    ",\"expiryDate\":null"
-                    ",\"state\":1"
-                    "}");
+  SWIRLY_CHECK(toString(market) == //
+               "{\"mnem\":\"EURUSD.MAR14\""
+               ",\"display\":\"EURUSD March 14\""
+               ",\"contr\":\"EURUSD\""
+               ",\"settlDate\":null"
+               ",\"expiryDate\":null"
+               ",\"state\":1"
+               "}");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

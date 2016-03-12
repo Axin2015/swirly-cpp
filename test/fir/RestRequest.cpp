@@ -18,281 +18,277 @@
 
 #include <swirly/elm/Exception.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(RestRequestSuite)
-
-BOOST_AUTO_TEST_CASE(MnemCase)
+SWIRLY_TEST_CASE(RestRequestMnem)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"mnem":"EURUSD"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Mnem);
-  BOOST_CHECK_EQUAL(rr.mnem(), "EURUSD");
+  SWIRLY_CHECK(rr.parse(R"({"mnem":"EURUSD"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Mnem);
+  SWIRLY_CHECK(rr.mnem() == "EURUSD");
 
   rr.reset(false);
-  BOOST_CHECK(rr.parse(R"({"mnem":null})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.mnem().empty());
+  SWIRLY_CHECK(rr.parse(R"({"mnem":null})"_sv));
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.mnem().empty());
 }
 
-BOOST_AUTO_TEST_CASE(DisplayCase)
+SWIRLY_TEST_CASE(RestRequestDisplay)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"display":"Euro Dollar"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Display);
-  BOOST_CHECK_EQUAL(rr.display(), "Euro Dollar");
+  SWIRLY_CHECK(rr.parse(R"({"display":"Euro Dollar"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Display);
+  SWIRLY_CHECK(rr.display() == "Euro Dollar");
 
   rr.reset(false);
-  BOOST_CHECK(rr.parse(R"({"display":null})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.display().empty());
+  SWIRLY_CHECK(rr.parse(R"({"display":null})"_sv));
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.display().empty());
 }
 
-BOOST_AUTO_TEST_CASE(EmailCase)
+SWIRLY_TEST_CASE(RestRequestEmail)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"email":"mark.aylett@gmail.com"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Email);
-  BOOST_CHECK_EQUAL(rr.email(), "mark.aylett@gmail.com");
+  SWIRLY_CHECK(rr.parse(R"({"email":"mark.aylett@gmail.com"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Email);
+  SWIRLY_CHECK(rr.email() == "mark.aylett@gmail.com");
 
   rr.reset(false);
   rr.parse(R"({"email":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.email().empty());
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.email().empty());
 }
 
-BOOST_AUTO_TEST_CASE(TraderCase)
+SWIRLY_TEST_CASE(RestRequestTrader)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"trader":"MARAYL"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Trader);
-  BOOST_CHECK_EQUAL(rr.trader(), "MARAYL");
+  SWIRLY_CHECK(rr.parse(R"({"trader":"MARAYL"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Trader);
+  SWIRLY_CHECK(rr.trader() == "MARAYL");
 
   rr.reset(false);
   rr.parse(R"({"trader":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.trader().empty());
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.trader().empty());
 }
 
-BOOST_AUTO_TEST_CASE(ContrCase)
+SWIRLY_TEST_CASE(RestRequestContr)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"contr":"EURUSD"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Contr);
-  BOOST_CHECK_EQUAL(rr.contr(), "EURUSD");
+  SWIRLY_CHECK(rr.parse(R"({"contr":"EURUSD"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Contr);
+  SWIRLY_CHECK(rr.contr() == "EURUSD");
 
   rr.reset(false);
   rr.parse(R"({"contr":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.contr().empty());
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.contr().empty());
 }
 
-BOOST_AUTO_TEST_CASE(SettlDateCase)
+SWIRLY_TEST_CASE(RestRequestSettlDate)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"settlDate":20140314})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::SettlDate);
-  BOOST_CHECK_EQUAL(rr.settlDate(), 20140314_dt);
+  SWIRLY_CHECK(rr.parse(R"({"settlDate":20140314})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::SettlDate);
+  SWIRLY_CHECK(rr.settlDate() == 20140314_dt);
 
   rr.reset(false);
   rr.parse(R"({"settlDate":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.settlDate(), 0_dt);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.settlDate() == 0_dt);
 }
 
-BOOST_AUTO_TEST_CASE(ExpiryDateCase)
+SWIRLY_TEST_CASE(RestRequestExpiryDate)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"expiryDate":20140314})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::ExpiryDate);
-  BOOST_CHECK_EQUAL(rr.expiryDate(), 20140314_dt);
+  SWIRLY_CHECK(rr.parse(R"({"expiryDate":20140314})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::ExpiryDate);
+  SWIRLY_CHECK(rr.expiryDate() == 20140314_dt);
 
   rr.reset(false);
   rr.parse(R"({"expiryDate":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.expiryDate(), 0_dt);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.expiryDate() == 0_dt);
 }
 
-BOOST_AUTO_TEST_CASE(RefCase)
+SWIRLY_TEST_CASE(RestRequestRef)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"ref":"EURUSD"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Ref);
-  BOOST_CHECK_EQUAL(rr.ref(), "EURUSD");
+  SWIRLY_CHECK(rr.parse(R"({"ref":"EURUSD"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Ref);
+  SWIRLY_CHECK(rr.ref() == "EURUSD");
 
   rr.reset(false);
   rr.parse(R"({"ref":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.ref().empty());
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.ref().empty());
 }
 
-BOOST_AUTO_TEST_CASE(StateCase)
+SWIRLY_TEST_CASE(RestRequestState)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"state":3})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::State);
-  BOOST_CHECK_EQUAL(rr.state(), 3U);
+  SWIRLY_CHECK(rr.parse(R"({"state":3})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::State);
+  SWIRLY_CHECK(rr.state() == 3U);
 
   rr.reset(false);
   rr.parse(R"({"state":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.state(), 0U);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.state() == 0U);
 }
 
-BOOST_AUTO_TEST_CASE(SideCase)
+SWIRLY_TEST_CASE(RestRequestSide)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"side":"BUY"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Side);
-  BOOST_CHECK_EQUAL(rr.side(), Side::Buy);
+  SWIRLY_CHECK(rr.parse(R"({"side":"BUY"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Side);
+  SWIRLY_CHECK(rr.side() == Side::Buy);
 
   rr.reset(false);
   rr.parse(R"({"side":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
+  SWIRLY_CHECK(rr.fields() == 0U);
 }
 
-BOOST_AUTO_TEST_CASE(LotsCase)
+SWIRLY_TEST_CASE(RestRequestLots)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"lots":101})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Lots);
-  BOOST_CHECK_EQUAL(rr.lots(), 101_lts);
+  SWIRLY_CHECK(rr.parse(R"({"lots":101})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Lots);
+  SWIRLY_CHECK(rr.lots() == 101_lts);
 
   rr.reset(false);
   rr.parse(R"({"lots":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.lots(), 0_lts);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.lots() == 0_lts);
 }
 
-BOOST_AUTO_TEST_CASE(TicksCase)
+SWIRLY_TEST_CASE(RestRequestTicks)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"ticks":12345})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Ticks);
-  BOOST_CHECK_EQUAL(rr.ticks(), 12345_tks);
+  SWIRLY_CHECK(rr.parse(R"({"ticks":12345})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Ticks);
+  SWIRLY_CHECK(rr.ticks() == 12345_tks);
 
   rr.reset(false);
   rr.parse(R"({"ticks":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.ticks(), 0_tks);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.ticks() == 0_tks);
 }
 
-BOOST_AUTO_TEST_CASE(MinLotsCase)
+SWIRLY_TEST_CASE(RestRequestMinLots)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"minLots":101})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::MinLots);
-  BOOST_CHECK_EQUAL(rr.minLots(), 101_lts);
+  SWIRLY_CHECK(rr.parse(R"({"minLots":101})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::MinLots);
+  SWIRLY_CHECK(rr.minLots() == 101_lts);
 
   rr.reset(false);
   rr.parse(R"({"minLots":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.minLots(), 0_lts);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.minLots() == 0_lts);
 }
 
-BOOST_AUTO_TEST_CASE(RoleCase)
+SWIRLY_TEST_CASE(RestRequestRole)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"role":"MAKER"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Role);
-  BOOST_CHECK_EQUAL(rr.role(), Role::Maker);
+  SWIRLY_CHECK(rr.parse(R"({"role":"MAKER"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Role);
+  SWIRLY_CHECK(rr.role() == Role::Maker);
 
   rr.reset(false);
   rr.parse(R"({"role":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK_EQUAL(rr.role(), Role::None);
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.role() == Role::None);
 }
 
-BOOST_AUTO_TEST_CASE(CptyCase)
+SWIRLY_TEST_CASE(RestRequestCpty)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"cpty":"MARAYL"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Cpty);
-  BOOST_CHECK_EQUAL(rr.cpty(), "MARAYL");
+  SWIRLY_CHECK(rr.parse(R"({"cpty":"MARAYL"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Cpty);
+  SWIRLY_CHECK(rr.cpty() == "MARAYL");
 
   rr.reset(false);
   rr.parse(R"({"cpty":null})"_sv);
-  BOOST_CHECK_EQUAL(rr.fields(), 0U);
-  BOOST_CHECK(rr.cpty().empty());
+  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.cpty().empty());
 }
 
-BOOST_AUTO_TEST_CASE(MultiCase)
+SWIRLY_TEST_CASE(RestRequestMulti)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"contr":"EURUSD","settlDate":20140314})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Contr | RestRequest::SettlDate);
-  BOOST_CHECK_EQUAL(rr.contr(), "EURUSD");
-  BOOST_CHECK_EQUAL(rr.settlDate(), 20140314_dt);
+  SWIRLY_CHECK(rr.parse(R"({"contr":"EURUSD","settlDate":20140314})"_sv));
+  SWIRLY_CHECK(rr.fields() == (RestRequest::Contr | RestRequest::SettlDate));
+  SWIRLY_CHECK(rr.contr() == "EURUSD");
+  SWIRLY_CHECK(rr.settlDate() == 20140314_dt);
 }
 
-BOOST_AUTO_TEST_CASE(DuplicateCase)
+SWIRLY_TEST_CASE(RestRequestDuplicate)
 {
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"trader":"MARAYL1","trader":"MARAYL2"})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Trader);
-  BOOST_CHECK_EQUAL(rr.trader(), "MARAYL2");
+  SWIRLY_CHECK(rr.parse(R"({"trader":"MARAYL1","trader":"MARAYL2"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Trader);
+  SWIRLY_CHECK(rr.trader() == "MARAYL2");
 }
 
-BOOST_AUTO_TEST_CASE(BadFieldCase)
+SWIRLY_TEST_CASE(RestRequestBadField)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"({"foo":null})"_sv), BadRequestException);
+  SWIRLY_CHECK_THROW(rr.parse(R"({"foo":null})"_sv), BadRequestException);
 }
 
-BOOST_AUTO_TEST_CASE(BadTypeCase)
+SWIRLY_TEST_CASE(RestRequestBadType)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"({"ticks":"101"})"_sv), BadRequestException);
+  SWIRLY_CHECK_THROW(rr.parse(R"({"ticks":"101"})"_sv), BadRequestException);
 }
 
-BOOST_AUTO_TEST_CASE(BadObjectCase)
+SWIRLY_TEST_CASE(RestRequestBadObject)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"([{"ticks":101}])"_sv), BadRequestException);
+  SWIRLY_CHECK_THROW(rr.parse(R"([{"ticks":101}])"_sv), BadRequestException);
 }
 
-BOOST_AUTO_TEST_CASE(MaxLenCase)
+SWIRLY_TEST_CASE(RestRequestMaxLen)
 {
   RestRequest rr;
 
-  BOOST_CHECK_THROW(rr.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), BadRequestException);
+  SWIRLY_CHECK_THROW(rr.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), BadRequestException);
 }
 
-BOOST_AUTO_TEST_CASE(NegativeCase)
+SWIRLY_TEST_CASE(RestRequestNegative)
 {
   using namespace enumops;
 
   RestRequest rr;
 
-  BOOST_CHECK(rr.parse(R"({"ticks":-1})"_sv));
-  BOOST_CHECK_EQUAL(rr.fields(), RestRequest::Ticks);
-  BOOST_CHECK_EQUAL(rr.ticks(), -1_tks);
+  SWIRLY_CHECK(rr.parse(R"({"ticks":-1})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Ticks);
+  SWIRLY_CHECK(rr.ticks() == -1_tks);
 
   rr.reset();
-  BOOST_CHECK_THROW(rr.parse(R"({"state":-1})"_sv), BadRequestException);
+  SWIRLY_CHECK_THROW(rr.parse(R"({"state":-1})"_sv), BadRequestException);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

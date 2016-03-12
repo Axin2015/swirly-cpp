@@ -16,40 +16,36 @@
  */
 #include <swirly/elm/Types.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(TypesSuite)
-
-BOOST_AUTO_TEST_CASE(AssetTypeCase)
+SWIRLY_TEST_CASE(AssetType)
 {
-  BOOST_CHECK_EQUAL(enumString(AssetType::Commodity), "COMMODITY");
+  SWIRLY_CHECK(strcmp(enumString(AssetType::Commodity), "COMMODITY") == 0);
 }
 
-BOOST_AUTO_TEST_CASE(DirectCase)
+SWIRLY_TEST_CASE(Direct)
 {
-  BOOST_CHECK_EQUAL(enumString(Direct::Paid), "PAID");
+  SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
 }
 
-BOOST_AUTO_TEST_CASE(RecTypeCase)
+SWIRLY_TEST_CASE(RecType)
 {
-  BOOST_CHECK_EQUAL(enumString(RecType::Asset), "ASSET");
+  SWIRLY_CHECK(strcmp(enumString(RecType::Asset), "ASSET") == 0);
 }
 
-BOOST_AUTO_TEST_CASE(RoleCase)
+SWIRLY_TEST_CASE(Role)
 {
-  BOOST_CHECK_EQUAL(enumString(Role::Maker), "MAKER");
+  SWIRLY_CHECK(strcmp(enumString(Role::Maker), "MAKER") == 0);
 }
 
-BOOST_AUTO_TEST_CASE(SideCase)
+SWIRLY_TEST_CASE(Side)
 {
-  BOOST_CHECK_EQUAL(enumString(Side::Buy), "BUY");
+  SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
 }
 
-BOOST_AUTO_TEST_CASE(StateCase)
+SWIRLY_TEST_CASE(State)
 {
-  BOOST_CHECK_EQUAL(enumString(State::New), "NEW");
+  SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

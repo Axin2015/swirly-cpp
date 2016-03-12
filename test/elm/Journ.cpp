@@ -16,13 +16,4 @@
  */
 #include <swirly/elm/Journ.hpp>
 
-#include <boost/test/unit_test.hpp>
-
-BOOST_AUTO_TEST_SUITE(JournSuite)
-
-BOOST_AUTO_TEST_CASE(JournCase)
-{
-  BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END()
+#include <test/Test.hpp>

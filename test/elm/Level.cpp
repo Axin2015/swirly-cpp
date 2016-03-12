@@ -18,14 +18,12 @@
 
 #include <swirly/elm/Order.hpp>
 
-#include <boost/test/unit_test.hpp>
+#include <test/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-BOOST_AUTO_TEST_SUITE(LevelSuite)
-
-BOOST_AUTO_TEST_CASE(LevelSetCase)
+SWIRLY_TEST_CASE(LevelSet)
 {
   const Order order{"MARAYL",   "EURUSD",  "EURUSD", 0_jd,      0_id,  "",
                     State::New, Side::Buy, 10_lts,   12345_tks, 0_lts, 0_lts,
@@ -34,17 +32,15 @@ BOOST_AUTO_TEST_CASE(LevelSetCase)
   LevelSet s;
 
   Level& level1{*s.emplace(order)};
-  BOOST_CHECK_EQUAL(level1.key(), -12345);
-  BOOST_CHECK(s.find(Side::Buy, 12345_tks) != s.end());
+  SWIRLY_CHECK(level1.key() == -12345);
+  SWIRLY_CHECK(s.find(Side::Buy, 12345_tks) != s.end());
 
   // Duplicate.
   Level& level2{*s.emplace(order)};
-  BOOST_CHECK_EQUAL(&level2, &level1);
+  SWIRLY_CHECK(&level2 == &level1);
 
   // Replace.
   Level& level3{*s.emplaceOrReplace(order)};
-  BOOST_CHECK_NE(&level3, &level1);
-  BOOST_CHECK_EQUAL(level3.key(), -12345);
+  SWIRLY_CHECK(&level3 != &level1);
+  SWIRLY_CHECK(level3.key() == -12345);
 }
-
-BOOST_AUTO_TEST_SUITE_END()
