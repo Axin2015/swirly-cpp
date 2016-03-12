@@ -20,20 +20,20 @@
 #include <swirly/ash/Defs.hpp>
 #include <swirly/ash/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Util
  * @{
  */
+
+namespace swirly {
 
 /**
  * Milliseconds since Unix epoch.
  */
 SWIRLY_API Millis getTimeOfDay();
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_TIME_HPP

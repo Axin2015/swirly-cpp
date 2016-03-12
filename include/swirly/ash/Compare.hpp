@@ -19,12 +19,12 @@
 
 #include <type_traits>
 
-namespace swirly {
-
 /**
  * @addtogroup Util
  * @{
  */
+
+namespace swirly {
 
 template <typename ValueT>
 class Comparable {
@@ -92,8 +92,8 @@ constexpr int compare(IntegralT lhs, IntegralT rhs) noexcept
   return i;
 }
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_COMPARE_HPP

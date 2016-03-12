@@ -21,12 +21,12 @@
 
 #include <swirly/ash/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 /**
  * An item of value.
@@ -60,8 +60,8 @@ class SWIRLY_API Asset : public Rec {
 
 using AssetSet = RecSet<Asset>;
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_ASSET_HPP

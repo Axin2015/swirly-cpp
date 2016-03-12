@@ -20,12 +20,12 @@
 #include <swirly/elm/Journ.hpp>
 #include <swirly/elm/Model.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup App
  * @{
  */
+
+namespace swirly {
 
 class MockModel : public Model {
  public:
@@ -85,8 +85,8 @@ class MockJourn : public Journ {
   void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLYD_MOCK_HPP

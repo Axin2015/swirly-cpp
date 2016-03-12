@@ -20,12 +20,12 @@
 #include <cstddef> // ptrdiff_t
 #include <iterator>
 
-namespace swirly {
-
 /**
  * @addtogroup Util
  * @{
  */
+
+namespace swirly {
 
 template <typename ValueT>
 class ArrayView {
@@ -107,8 +107,8 @@ constexpr ArrayView<std::remove_cv_t<ValueT>> makeArrayView(ValueT (&arr)[SizeN]
   return {arr};
 }
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_ARRAY_HPP

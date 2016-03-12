@@ -19,12 +19,12 @@
 
 #include <swirly/elm/Rec.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API Trader : public Rec {
  public:
@@ -54,8 +54,8 @@ class SWIRLY_API Trader : public Rec {
 
 using TraderSet = RecSet<Trader>;
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_TRADER_HPP

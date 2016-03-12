@@ -19,12 +19,12 @@
 
 #include <swirly/ash/Defs.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Domain
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API MarketData {
  public:
@@ -40,8 +40,8 @@ class SWIRLY_API MarketData {
   MarketData& operator=(MarketData&&) = default;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_MARKETDATA_HPP

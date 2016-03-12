@@ -22,12 +22,12 @@
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup IO
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API Journ {
  public:
@@ -124,8 +124,8 @@ class SWIRLY_API Journ {
   virtual void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_JOURN_HPP

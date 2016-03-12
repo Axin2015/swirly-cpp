@@ -21,12 +21,12 @@
 
 #include <iosfwd>
 
-namespace swirly {
-
 /**
  * @addtogroup Exception
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API ServException : public Exception {
  public:
@@ -371,8 +371,8 @@ class SWIRLY_API UnauthorizedException : public ServException {
   const char* httpReason() const noexcept override;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_EXCEPTION_HPP

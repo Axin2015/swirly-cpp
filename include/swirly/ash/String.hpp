@@ -29,12 +29,12 @@ namespace std {
 using string_view = experimental::string_view;
 }
 
-namespace swirly {
-
 /**
  * @addtogroup Util
  * @{
  */
+
+namespace swirly {
 
 constexpr std::string_view operator""_sv(const char* str, std::size_t len) noexcept
 {
@@ -265,8 +265,8 @@ std::string toString(const ValueT& val)
 
 SWIRLY_API unsigned long stoul(std::string_view sv) noexcept;
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_STRING_HPP

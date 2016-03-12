@@ -21,13 +21,13 @@
 
 #include <ostream>
 
-namespace swirly {
-namespace mg {
-
 /**
  * @addtogroup App
  * @{
  */
+
+namespace swirly {
+namespace mg {
 
 class StreamBuf : public std::streambuf {
  public:
@@ -84,9 +84,9 @@ class OStream : public std::ostream {
   size_t lengthAt_{0};
 };
 
-/** @} */
-
 } // mg
 } // swirly
+
+/** @} */
 
 #endif // SWIRLYD_STREAM_HPP

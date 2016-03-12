@@ -19,12 +19,12 @@
 
 #include <swirly/ash/Stream.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Log
  * @{
  */
+
+namespace swirly {
 
 /**
  * Maximum log message length when LogMsg is used.
@@ -131,29 +131,29 @@ SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
+} // swirly
+
 // N.B. varargs help ensure that expressions such as the following work correctly:
 // SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
 
 #define SWIRLY_LOG(level, ...)                                                                     \
   do {                                                                                             \
-    if (isLogLevel(level))                                                                         \
-      writeLog(level, __VA_ARGS__);                                                                \
+    if (swirly::isLogLevel(level))                                                                 \
+      swirly::writeLog(level, __VA_ARGS__);                                                        \
   } while (false)
 
-#define SWIRLY_CRIT(...) SWIRLY_LOG(LogCrit, __VA_ARGS__)
-#define SWIRLY_ERROR(...) SWIRLY_LOG(LogError, __VA_ARGS__)
-#define SWIRLY_WARNING(...) SWIRLY_LOG(LogWarning, __VA_ARGS__)
-#define SWIRLY_NOTICE(...) SWIRLY_LOG(LogNotice, __VA_ARGS__)
-#define SWIRLY_INFO(...) SWIRLY_LOG(LogInfo, __VA_ARGS__)
+#define SWIRLY_CRIT(...) SWIRLY_LOG(swirly::LogCrit, __VA_ARGS__)
+#define SWIRLY_ERROR(...) SWIRLY_LOG(swirly::LogError, __VA_ARGS__)
+#define SWIRLY_WARNING(...) SWIRLY_LOG(swirly::LogWarning, __VA_ARGS__)
+#define SWIRLY_NOTICE(...) SWIRLY_LOG(swirly::LogNotice, __VA_ARGS__)
+#define SWIRLY_INFO(...) SWIRLY_LOG(swirly::LogInfo, __VA_ARGS__)
 
 #if SWIRLY_ENABLE_DEBUG
-#define SWIRLY_DEBUG(...) SWIRLY_LOG(LogDebug, __VA_ARGS__)
+#define SWIRLY_DEBUG(...) SWIRLY_LOG(swirly::LogDebug, __VA_ARGS__)
 #else
 #define SWIRLY_DEBUG(...)
 #endif
 
 /** @} */
-
-} // swirly
 
 #endif // SWIRLY_ASH_LOG_HPP

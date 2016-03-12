@@ -66,9 +66,9 @@ SWIRLY_TEST_CASE(LogMacro)
   auto prevLevel = setLogLevel(LogInfo);
   auto prevLogger = setLogger(testLogger);
   auto finally = makeFinally([prevLevel, prevLogger]() {
-      setLogLevel(prevLevel);
-      setLogger(prevLogger);
-    });
+    setLogLevel(prevLevel);
+    setLogger(prevLogger);
+  });
 
   SWIRLY_LOG(LogInfo, logMsg() << "test1: " << Foo<int, int>{10, 20});
   SWIRLY_CHECK(lastLevel == LogInfo);

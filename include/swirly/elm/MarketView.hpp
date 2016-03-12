@@ -22,12 +22,12 @@
 
 #include <swirly/ash/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 /**
  * A flattened view of a market.
@@ -67,8 +67,8 @@ class SWIRLY_API MarketView {
   const MarketData data_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_MARKETVIEW_HPP

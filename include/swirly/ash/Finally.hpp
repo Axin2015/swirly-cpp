@@ -19,12 +19,12 @@
 
 #include <utility>
 
-namespace swirly {
-
 /**
  * @addtogroup Util
  * @{
  */
+
+namespace swirly {
 
 template <typename FnT>
 class Finally {
@@ -49,8 +49,8 @@ auto makeFinally(FnT fn) noexcept
   return Finally<FnT>{std::move(fn)};
 }
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_FINALLY_HPP

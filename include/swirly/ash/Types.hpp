@@ -21,12 +21,12 @@
 
 #include <cstdint>
 
-namespace swirly {
-
 /**
  * @addtogroup Date
  * @{
  */
+
+namespace swirly {
 
 /**
  * ISO8601 date in yyymmdd format.
@@ -58,8 +58,8 @@ constexpr Millis operator""_ms(unsigned long long val) noexcept
   return box<Millis>(val);
 }
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_TYPES_HPP

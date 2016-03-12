@@ -21,20 +21,20 @@
 
 #include <sys/types.h>
 
-namespace swirly {
-
 /**
  * @addtogroup Util
  * @{
  */
+
+namespace swirly {
 
 /**
  * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
  */
 SWIRLY_API void daemon();
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_SYSTEM_HPP

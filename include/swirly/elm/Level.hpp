@@ -23,12 +23,12 @@
 
 #include <memory>
 
-namespace swirly {
-
 /**
  * @addtogroup Book
  * @{
  */
+
+namespace swirly {
 
 using LevelKey = std::underlying_type_t<Ticks>;
 
@@ -191,8 +191,8 @@ class SWIRLY_API LevelSet {
   Set set_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_LEVEL_HPP
