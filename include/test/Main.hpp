@@ -17,33 +17,30 @@
 #include <test/Test.hpp>
 
 #include <iostream>
+#include <map>
 #include <regex>
-
-#undef SWIRLY_TEST_CASE
-#define SWIRLY_TEST_CASE(name) void test##name();
-#include <TestCases.txt>
-
-#undef SWIRLY_TEST_CASE
-#define SWIRLY_TEST_CASE(name) {#name, test##name},
+#include <string>
 
 namespace {
-static const struct TestCase {
-  const char* name;
-  void (*fn)(void);
-} TestCases[] = {
-#include <TestCases.txt>
-};
 
-bool run(const TestCase& tc)
+using TestCases = std::map<std::string, void (*)(void)>;
+
+TestCases& testCases()
+{
+  static TestCases testCases;
+  return testCases;
+}
+
+bool run(const std::string& name, void (*fn)(void))
 {
   using namespace std;
 
   bool pass{false};
 
-  cout << "checking " << tc.name << " ... ";
+  cout << "checking " << name << " ... ";
   cout.flush();
   try {
-    tc.fn();
+    fn();
     cout << "pass" << endl;
     pass = true;
   } catch (const TestException& e) {
@@ -57,6 +54,11 @@ bool run(const TestCase& tc)
 }
 } // anonymous
 
+void addTestCase(const char* name, void (*fn)(void))
+{
+  testCases().emplace(name, fn);
+}
+
 int main(int argc, char* argv[])
 {
   using namespace std;
@@ -68,9 +70,9 @@ int main(int argc, char* argv[])
     // Run specific test-cases according to regex arguments.
     for (int i{1}; i < argc; ++i) {
       const regex pattern{argv[i]};
-      for (auto& tc : TestCases) {
-        if (regex_match(tc.name, pattern)) {
-          if (!run(tc)) {
+      for (auto& tc : testCases()) {
+        if (regex_match(tc.first, pattern)) {
+          if (!run(tc.first, tc.second)) {
             ++failed;
           }
           ++total;
@@ -79,8 +81,8 @@ int main(int argc, char* argv[])
     }
   } else {
     // Run all test-cases.
-    for (auto& tc : TestCases) {
-      if (!run(tc)) {
+    for (auto& tc : testCases()) {
+      if (!run(tc.first, tc.second)) {
         ++failed;
       }
       ++total;

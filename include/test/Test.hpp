@@ -63,6 +63,12 @@ bool checkThrow(FnT fn)
   checkThrow<ExceptionT>([&]() { expr; }) ? (void)0                                                \
                                           : SWIRLY_FAIL("throw expression [" #expr "] failed")
 
-#define SWIRLY_TEST_CASE(name) void test##name(void)
+void addTestCase(const char* name, void (*fn)(void));
+
+#define SWIRLY_TEST_CASE(name)                                                                     \
+  void init##name(void) __attribute__((constructor));                                              \
+  void test##name(void);                                                                           \
+  void init##name(void) { addTestCase(#name, test##name); }                                        \
+  void test##name(void)
 
 #endif // TEST_HPP
