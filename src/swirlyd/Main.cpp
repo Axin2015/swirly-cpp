@@ -104,8 +104,8 @@ Report bugs to: support@swirlycloud.com
 
 void getOpts(int argc, char* argv[], Opts& opts)
 {
-  char ch;
   opterr = 0;
+  int ch;
   while ((ch = getopt(argc, argv, ":d:e:hl:m:np:u:")) != -1) {
     switch (ch) {
     case 'd':
