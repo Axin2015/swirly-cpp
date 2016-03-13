@@ -25,12 +25,12 @@
 
 #include <memory> // unique_ptr<>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API Rec : public Comparable<Rec> {
  public:
@@ -206,8 +206,8 @@ class RecSet {
   Set set_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_REC_HPP

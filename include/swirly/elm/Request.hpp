@@ -24,12 +24,12 @@
 
 #include <boost/intrusive/set.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API Request : public RefCounted {
  public:
@@ -240,8 +240,8 @@ class RequestIdSet {
   Set set_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_REQUEST_HPP

@@ -18,7 +18,7 @@
 
 #include <swirly/ash/JulianDay.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>
 
 using namespace std;
 using namespace swirly;

@@ -21,12 +21,12 @@
 #include <swirly/elm/Market.hpp>
 #include <swirly/elm/MarketView.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Book
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API MarketBook : public Market {
  public:
@@ -105,8 +105,8 @@ class SWIRLY_API MarketBook : public Market {
   Iden maxExecId_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_MARKETBOOK_HPP

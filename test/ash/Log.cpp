@@ -16,7 +16,11 @@
  */
 #include <swirly/ash/Log.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/ash/Finally.hpp>
+
+#include <swirly/tea/Test.hpp>
+
+#include <cstring>
 
 using namespace std;
 using namespace swirly;
@@ -33,6 +37,16 @@ ostream& operator<<(ostream& os, const Foo<int, int>& val)
 {
   return os << '(' << val.first << ',' << val.second << ')';
 }
+
+int lastLevel{};
+string lastMsg{};
+
+void testLogger(int level, std::string_view msg)
+{
+  lastLevel = level;
+  lastMsg.assign(msg.data(), msg.size());
+}
+
 } // anonymous
 
 SWIRLY_TEST_CASE(LogLabel)
@@ -49,11 +63,39 @@ SWIRLY_TEST_CASE(LogLabel)
 
 SWIRLY_TEST_CASE(LogMacro)
 {
-  SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
-  SWIRLY_CRIT(logMsg() << "test: " << Foo<int, int>{10, 20});
-  SWIRLY_ERROR(logMsg() << "test" << Foo<int, int>{10, 20});
-  SWIRLY_WARNING(logMsg() << "test" << Foo<int, int>{10, 20});
-  SWIRLY_NOTICE(logMsg() << "test" << Foo<int, int>{10, 20});
-  SWIRLY_INFO(logMsg() << "test" << Foo<int, int>{10, 20});
-  SWIRLY_DEBUG(logMsg() << "test" << Foo<int, int>{10, 20});
+  auto prevLevel = setLogLevel(LogInfo);
+  auto prevLogger = setLogger(testLogger);
+  auto finally = makeFinally([prevLevel, prevLogger]() {
+    setLogLevel(prevLevel);
+    setLogger(prevLogger);
+  });
+
+  SWIRLY_LOG(LogInfo, logMsg() << "test1: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogInfo);
+  SWIRLY_CHECK(lastMsg == "test1: (10,20)");
+
+  SWIRLY_CRIT(logMsg() << "test2: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogCrit);
+  SWIRLY_CHECK(lastMsg == "test2: (10,20)");
+
+  SWIRLY_ERROR(logMsg() << "test3: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogError);
+  SWIRLY_CHECK(lastMsg == "test3: (10,20)");
+
+  SWIRLY_WARNING(logMsg() << "test4: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogWarning);
+  SWIRLY_CHECK(lastMsg == "test4: (10,20)");
+
+  SWIRLY_NOTICE(logMsg() << "test5: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogNotice);
+  SWIRLY_CHECK(lastMsg == "test5: (10,20)");
+
+  SWIRLY_INFO(logMsg() << "test6: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogInfo);
+  SWIRLY_CHECK(lastMsg == "test6: (10,20)");
+
+  // This should not be logged.
+  SWIRLY_DEBUG(logMsg() << "test7: " << Foo<int, int>{10, 20});
+  SWIRLY_CHECK(lastLevel == LogInfo);
+  SWIRLY_CHECK(lastMsg == "test6: (10,20)");
 }

@@ -20,12 +20,12 @@
 #include <swirly/elm/Level.hpp>
 #include <swirly/elm/Order.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Book
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API BookSide {
  public:
@@ -115,8 +115,8 @@ class SWIRLY_API BookSide {
   OrderList orders_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_BOOKSIDE_HPP

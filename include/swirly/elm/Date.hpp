@@ -21,12 +21,12 @@
 
 #include <swirly/ash/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Date
  * @{
  */
+
+namespace swirly {
 
 /**
  * Get the business day from a transaction time.
@@ -39,8 +39,8 @@ namespace swirly {
  */
 SWIRLY_API Jday getBusDay(Millis ms);
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_DATE_HPP

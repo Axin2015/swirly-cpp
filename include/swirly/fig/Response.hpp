@@ -21,14 +21,14 @@
 
 #include <vector>
 
-namespace swirly {
-
-class MarketBook;
-
 /**
  * @addtogroup App
  * @{
  */
+
+namespace swirly {
+
+class MarketBook;
 
 class SWIRLY_API Response {
  public:
@@ -65,8 +65,8 @@ class SWIRLY_API Response {
   PosnPtr posn_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_FIG_RESPONSE_HPP

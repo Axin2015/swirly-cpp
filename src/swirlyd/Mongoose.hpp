@@ -23,13 +23,13 @@
 
 #include <swirly/ash/String.hpp>
 
-namespace swirly {
-namespace mg {
-
 /**
  * @addtogroup Web
  * @{
  */
+
+namespace swirly {
+namespace mg {
 
 inline std::string_view operator+(const mg_str& str) noexcept
 {
@@ -102,9 +102,9 @@ class Mgr {
   mg_mgr mgr_;
 };
 
-/** @} */
-
 } // mg
 } // swirly
+
+/** @} */
 
 #endif // SWIRLYD_MONGOOSE_HPP

@@ -19,12 +19,12 @@
 
 #include <swirly/elm/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup App
  * @{
  */
+
+namespace swirly {
 
 struct Match {
   Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade, const PosnPtr& makerPosn,
@@ -47,8 +47,8 @@ struct Match {
   const ExecPtr takerTrade;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_FIG_MATCH_HPP

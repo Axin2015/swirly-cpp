@@ -21,12 +21,12 @@
 
 #include <swirly/fig/Serv.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Rest
  * @{
  */
+
+namespace swirly {
 
 class SWIRLY_API Rest {
  public:
@@ -105,8 +105,8 @@ class SWIRLY_API Rest {
   Serv serv_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_FIR_REST_HPP

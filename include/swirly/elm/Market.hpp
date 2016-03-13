@@ -21,12 +21,12 @@
 
 #include <swirly/ash/Types.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 /**
  * A place where buyers and sellers come together to exchange goods or services.
@@ -64,8 +64,8 @@ class SWIRLY_API Market : public Rec {
 
 using MarketSet = RecSet<Market>;
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_MARKET_HPP

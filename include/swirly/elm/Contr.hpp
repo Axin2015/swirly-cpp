@@ -19,12 +19,12 @@
 
 #include <swirly/elm/Rec.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup Entity
  * @{
  */
+
+namespace swirly {
 
 /**
  * A specification that stipulates the terms and conditions of sale.
@@ -84,8 +84,8 @@ class SWIRLY_API Contr : public Rec {
 
 using ContrSet = RecSet<Contr>;
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ELM_CONTR_HPP

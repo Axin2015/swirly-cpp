@@ -19,12 +19,12 @@
 
 #include <swirly/fig/TraderSess.hpp>
 
-namespace swirly {
-
 /**
  * @addtogroup App
  * @{
  */
+
+namespace swirly {
 
 /**
  * Unordered TraderSess set keyed by email.
@@ -112,8 +112,8 @@ class SWIRLY_API TraderSessSet {
   }
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_FIG_TRADERSESS_HPP

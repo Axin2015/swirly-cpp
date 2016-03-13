@@ -21,12 +21,12 @@
 
 #include <cassert>
 
-namespace swirly {
-
 /**
  * @addtogroup Date
  * @{
  */
+
+namespace swirly {
 
 /**
  * Gregorian to ISO8601 date.
@@ -155,8 +155,8 @@ constexpr Jday maybeIsoToJd(IsoDate iso) noexcept
   return iso != 0_dt ? isoToJd(iso) : 0_jd;
 }
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_ASH_JULIANDAY_HPP

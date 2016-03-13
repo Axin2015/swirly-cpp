@@ -24,6 +24,11 @@
 
 #include <swirly/ash/Array.hpp>
 
+/**
+ * @addtogroup App
+ * @{
+ */
+
 namespace swirly {
 
 class Journ;
@@ -31,11 +36,6 @@ class MarketBook;
 class Model;
 class Response;
 class TraderSess;
-
-/**
- * @addtogroup App
- * @{
- */
 
 class SWIRLY_API Serv {
  public:
@@ -165,8 +165,8 @@ class SWIRLY_API Serv {
   std::unique_ptr<Impl> impl_;
 };
 
-/** @} */
-
 } // swirly
+
+/** @} */
 
 #endif // SWIRLY_FIG_SERV_HPP

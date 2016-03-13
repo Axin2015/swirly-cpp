@@ -16,7 +16,7 @@
  */
 #include <swirly/ash/Array.hpp>
 
-#include <test/Test.hpp>
+#include <swirly/tea/Test.hpp>
 
 #include <algorithm> // equal()
 #include <numeric> // accumulate()
