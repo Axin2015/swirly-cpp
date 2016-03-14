@@ -123,11 +123,11 @@ struct EnumTraits<AssetType> {
 
 enum class Direct {
   /**
-   * Aggressor buys. I.e. taker lifts the offer.
+   * Aggressor bought. Taker lifted the offer resulting in a market uptick.
    */
   Paid = 1,
   /**
-   * Aggressor sells. I.e. taker hits the bid.
+   * Aggressor sold. Taker hit the bid resulting in a market dow
    */
   Given = -1
 };

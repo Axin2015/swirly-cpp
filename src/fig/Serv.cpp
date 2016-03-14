@@ -38,7 +38,18 @@ using namespace std;
 
 namespace swirly {
 namespace {
-static const regex mnemPattern{"(\\d{4}[- ]){3}\\d{4}"};
+const regex mnemPattern{"(\\d{4}[- ]){3}\\d{4}"};
+
+Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
+{
+  using namespace enumops;
+  return direct == Direct::Paid
+    // Paid when the taker lifts the offer.
+    ? makerOrder.ticks() - takerOrder.ticks()
+    // Given when the taker hits the bid.
+    : takerOrder.ticks() - makerOrder.ticks();
+}
+
 } // anonymous
 
 struct Serv::Impl {
@@ -54,7 +65,7 @@ struct Serv::Impl {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
     auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
-    return {static_cast<MarketBook*>(up.release()), std::move(up.get_deleter())};
+    return {static_cast<MarketBook*>(up.release()), move(up.get_deleter())};
   }
   TraderSessPtr newTrader(string_view mnem, string_view display, string_view email) const
   {
@@ -62,22 +73,123 @@ struct Serv::Impl {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
     auto up = factory.newTrader(mnem, display, email);
-    return {static_cast<TraderSess*>(up.release()), std::move(up.get_deleter())};
+    return {static_cast<TraderSess*>(up.release()), move(up.get_deleter())};
   }
   ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
   {
     return factory.newExec(order, book.allocExecId(), now);
   }
-  void matchOrders(const TraderSess& takerSess, const MarketBook& book, const Order& takerOrder,
-                   Millis now, vector<Match>& matches) const
+  Match newMatch(MarketBook& book, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
+                 Lots sumLots, Cost sumCost, Millis now)
   {
-    // FIXME: not implemented.
+    const auto makerId = book.allocExecId();
+    const auto takerId = book.allocExecId();
+
+    auto it = traders.find(makerOrder->trader());
+    assert(it != traders.end());
+    auto& makerSess = static_cast<TraderSess&>(*it);
+    auto makerPosn = makerSess.lazyPosn(book.contr(), book.settlDay());
+
+    const auto ticks = makerOrder->ticks();
+
+    auto makerTrade = factory.newExec(*makerOrder, makerId, now);
+    makerTrade->trade(lots, ticks, takerId, Role::Maker, takerOrder.trader());
+
+    auto takerTrade = factory.newExec(takerOrder, takerId, now);
+    takerTrade->trade(sumLots, sumCost, lots, ticks, makerId, Role::Taker, makerOrder->trader());
+
+    return {lots, makerOrder, makerTrade, makerPosn, takerTrade};
   }
-  // Assumes that maker lots have not been reduced since matching took place.
-  void commitMatches(const TraderSess& taker, const MarketBook& book, const vector<Match>& matches,
-                     const Posn& takerPosn, Millis now, Response& resp)
+  void matchOrders(const TraderSess& takerSess, MarketBook& book, Order& takerOrder, BookSide& side,
+                   Direct direct, Millis now)
   {
-    // FIXME: not implemented.
+    using namespace enumops;
+
+    auto sumLots = 0_lts;
+    auto sumCost = 0_cst;
+    auto lastLots = 0_lts;
+    auto lastTicks = 0_tks;
+
+    for (auto& makerOrder : side.orders()) {
+      // Break if order is fully filled.
+      if (sumLots == takerOrder.resd()) {
+        break;
+      }
+      // Only consider orders while prices cross.
+      if (spread(takerOrder, makerOrder, direct) > 0_tks) {
+        break;
+      }
+
+      const auto lots = min(takerOrder.resd() - sumLots, makerOrder.resd());
+      const auto ticks = makerOrder.ticks();
+
+      sumLots += lots;
+      sumCost += cost(lots, ticks);
+      lastLots = lots;
+      lastTicks = ticks;
+
+      auto match = newMatch(book, takerOrder, &makerOrder, lots, sumLots, sumCost, now);
+      matches.push_back(move(match));
+    }
+
+    // FIXME: can this be postponed until commit phase?
+    if (!matches.empty()) {
+      takerOrder.trade(sumLots, sumCost, lastLots, lastTicks, now);
+    }
+  }
+  void matchOrders(const TraderSess& takerSess, MarketBook& book, Order& takerOrder, Millis now)
+  {
+    BookSide* bookSide;
+    Direct direct;
+    if (takerOrder.side() == Side::Buy) {
+      // Paid when the taker lifts the offer.
+      bookSide = &book.offerSide();
+      direct = Direct::Paid;
+    } else {
+      assert(takerOrder.side() == Side::Sell);
+      // Given when the taker hits the bid.
+      bookSide = &book.bidSide();
+      direct = Direct::Given;
+    }
+    matchOrders(takerSess, book, takerOrder, *bookSide, direct, now);
+  }
+  // Assumes that maker lots have not been reduced since matching took place. N.B. this function is
+  // responsible for committing a transaction, so it is particularly important that it does not
+  // throw. This function also assumes that sufficient capacity has been reserved in the response
+  // object, so that no memory allocations take place.
+  void commitMatches(TraderSess& takerSess, MarketBook& book, Posn& takerPosn, Millis now,
+                     Response& resp) noexcept
+  {
+    for (const auto& match : matches) {
+      const auto makerOrder = match.makerOrder;
+      assert(makerOrder);
+      // Reduce maker.
+      book.takeOrder(*makerOrder, match.lots, now);
+      // Must succeed because maker order exists.
+      auto it = traders.find(makerOrder->trader());
+      assert(it != traders.end());
+      auto& makerSess = static_cast<TraderSess&>(*it);
+      // Maker updated first because this is consistent with last-look semantics.
+      // Update maker.
+      const auto makerTrade = match.makerTrade;
+      assert(makerTrade);
+      makerSess.insertTrade(makerTrade);
+      match.makerPosn->addTrade(*makerTrade);
+      // Update taker.
+      const auto takerTrade = match.takerTrade;
+      assert(takerTrade);
+      takerSess.insertTrade(takerTrade);
+      takerPosn.addTrade(*takerTrade);
+
+      // Insert order if trade crossed with self.
+      if (makerOrder->trader() == takerSess.mnem()) {
+        resp.insertOrder(makerOrder);
+        // Maker updated first because this is consistent with last-look semantics.
+        // N.B. the reference count is not incremented here.
+        resp.insertExec(match.makerTrade);
+      }
+      resp.insertExec(match.takerTrade);
+    }
   }
 
   Journ& journ;
@@ -87,6 +199,7 @@ struct Serv::Impl {
   MarketSet markets;
   TraderSet traders;
   TraderSessSet emailIdx;
+  vector<Match> matches;
 };
 
 Serv::Serv(const Model& model, Journ& journ, Millis now)
@@ -129,6 +242,36 @@ const TraderSet& Serv::traders() const noexcept
   return impl_->traders;
 }
 
+MarketBook& Serv::market(string_view mnem) const
+{
+  auto it = impl_->markets.find(mnem);
+  if (it == impl_->markets.end()) {
+    throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
+  }
+  auto& market = static_cast<MarketBook&>(*it);
+  return market;
+}
+
+TraderSess& Serv::trader(string_view mnem) const
+{
+  auto it = impl_->traders.find(mnem);
+  if (it == impl_->traders.end()) {
+    throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
+  }
+  auto& trader = static_cast<TraderSess&>(*it);
+  return trader;
+}
+
+TraderSess* Serv::findTraderByEmail(string_view email) const
+{
+  TraderSess* trader{nullptr};
+  auto it = impl_->emailIdx.find(email);
+  if (it != impl_->emailIdx.end()) {
+    trader = &*it;
+  }
+  return trader;
+}
+
 const MarketBook& Serv::createMarket(string_view mnem, string_view display, string_view contr,
                                      Jday settlDay, Jday expiryDay, MarketState state, Millis now)
 {
@@ -151,16 +294,6 @@ const MarketBook& Serv::updateMarket(string_view mnem, string_view display, Mark
   return market;
 }
 
-const MarketBook& Serv::market(string_view mnem) const
-{
-  auto it = impl_->markets.find(mnem);
-  if (it == impl_->markets.end()) {
-    throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
-  }
-  const auto& market = static_cast<const MarketBook&>(*it);
-  return market;
-}
-
 const TraderSess& Serv::createTrader(string_view mnem, string_view display, string_view email)
 {
   auto it = impl_->traders.insert(impl_->newTrader(mnem, display, email));
@@ -179,26 +312,6 @@ const TraderSess& Serv::updateTrader(string_view mnem, string_view display)
   return trader;
 }
 
-const TraderSess& Serv::trader(string_view mnem) const
-{
-  auto it = impl_->traders.find(mnem);
-  if (it == impl_->traders.end()) {
-    throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
-  }
-  const auto& trader = static_cast<const TraderSess&>(*it);
-  return trader;
-}
-
-const TraderSess* Serv::findTraderByEmail(string_view email) const
-{
-  const TraderSess* trader{nullptr};
-  auto it = impl_->emailIdx.find(email);
-  if (it != impl_->emailIdx.end()) {
-    trader = &*it;
-  }
-  return trader;
-}
-
 void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side side, Lots lots,
                        Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
@@ -214,11 +327,13 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
   auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
                                        orderId, ref, side, lots, ticks, minLots, now);
   auto exec = impl_->newExec(book, *order, now);
-  resp.reset(book, order, exec);
 
-  vector<Match> matches;
   // Order fields are updated on match.
-  impl_->matchOrders(sess, book, *order, now, matches);
+  impl_->matchOrders(sess, book, *order, now);
+  // Ensure that matches are cleared when scope exits.
+  auto& matches = impl_->matches;
+  auto finally = makeFinally([&matches]() { matches.clear(); });
+
   // Place incomplete order in market. N.B. done() is sufficient here because the order cannot be
   // pending cancellation.
   if (!order->done()) {
@@ -236,7 +351,8 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
       }
     });
 
-    const size_t len{1 + matches.size() * 2};
+    // New execution plus 2 trade executions for each match assuming crossed with self.
+    const size_t len{1 + 2 * matches.size()};
     Exec* execs[len];
 
     execs[0] = exec.get();
@@ -257,14 +373,27 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     posn = sess.lazyPosn(book.contr(), book.settlDay());
   }
 
+  resp.reset(book);
+  // New order plus updated order for each match assuming crossed with self.
+  resp.reserveOrders(1 + matches.size());
+  // New execution plus 2 trade executions for each match assuming crossed with self.
+  resp.reserveExecs(1 + 2 * matches.size());
+
   // Commit phase.
 
   sess.insertOrder(order);
 
   // Commit matches.
+
+  // These insert calls are effectively noexcept, because sufficient capacity has been reserved
+  // above.
+  resp.insertOrder(order);
+  resp.insertExec(exec);
+
+  // Commit matches.
   if (!matches.empty()) {
     assert(posn);
-    impl_->commitMatches(sess, book, matches, *posn, now, resp);
+    impl_->commitMatches(sess, book, *posn, now, resp);
   }
 }
 

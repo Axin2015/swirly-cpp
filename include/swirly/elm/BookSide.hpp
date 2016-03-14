@@ -41,6 +41,11 @@ class SWIRLY_API BookSide {
   BookSide(BookSide&&);
   BookSide& operator=(BookSide&&) = delete;
 
+  const LevelSet& levels() const noexcept { return levels_; }
+  const OrderList& orders() const noexcept { return orders_; }
+  LevelSet& levels() noexcept { return levels_; }
+  OrderList& orders() noexcept { return orders_; }
+
   /**
    * Insert order into side. Assumes that the order does not already belong to a side. I.e. it
    * assumes that level member is null. Assumes that order-id and reference are unique. This

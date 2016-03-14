@@ -17,6 +17,8 @@
 #ifndef SWIRLY_ELM_POSN_HPP
 #define SWIRLY_ELM_POSN_HPP
 
+#include <swirly/elm/Conv.hpp>
+#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Types.hpp>
 
 #include <swirly/ash/RefCounted.hpp>
@@ -60,6 +62,50 @@ class SWIRLY_API Posn : public RefCounted {
   auto buyCost() const noexcept { return buyCost_; }
   auto sellLots() const noexcept { return sellLots_; }
   auto sellCost() const noexcept { return sellCost_; }
+
+  void add(const Posn& rhs) noexcept
+  {
+    addBuy(rhs.buyLots_, rhs.buyCost_);
+    addSell(rhs.sellLots_, rhs.sellCost_);
+  }
+  void addBuy(Lots lots, Cost cost) noexcept
+  {
+    using namespace enumops;
+    buyLots_ += lots;
+    buyCost_ += cost;
+  }
+  void addSell(Lots lots, Cost cost) noexcept
+  {
+    using namespace enumops;
+    sellLots_ += lots;
+    sellCost_ += cost;
+  }
+  void addTrade(Side side, Lots lastLots, Ticks lastTicks) noexcept
+  {
+    const auto cost = swirly::cost(lastLots, lastTicks);
+    if (side == Side::Buy) {
+      addBuy(lastLots, cost);
+    } else {
+      assert(side == Side::Sell);
+      addSell(lastLots, cost);
+    }
+  }
+  void addTrade(const Exec& trade) noexcept
+  {
+    addTrade(trade.side(), trade.lastLots(), trade.lastTicks());
+  }
+  /**
+   * This function is typically used to change the settlement-day to zero during settlement.
+   *
+   * @param settlDay
+   *        The new settlement-day.
+   */
+  void setSettlDay(Jday settlDay) noexcept { settlDay_ = settlDay; }
+  void setBuyLots(Lots buyLots) noexcept { buyLots_ = buyLots; }
+  void setBuyCost(Cost buyCost) noexcept { buyCost_ = buyCost; }
+  void setSellLots(Lots sellLots) noexcept { sellLots_ = sellLots; }
+  void setSellCost(Cost sellCost) noexcept { sellCost_ = sellCost; }
+
   boost::intrusive::set_member_hook<> traderHook_;
 
  private:

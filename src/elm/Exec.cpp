@@ -16,10 +16,27 @@
  */
 #include <swirly/elm/Exec.hpp>
 
+using namespace std;
+
 namespace swirly {
 
 Exec::~Exec() noexcept = default;
 
 Exec::Exec(Exec&&) = default;
+
+void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId,
+                 Role role, string_view cpty) noexcept
+{
+  using namespace enumops;
+  state_ = State::Trade;
+  resd_ -= sumLots;
+  exec_ += sumLots;
+  cost_ += sumCost;
+  lastLots_ = lastLots;
+  lastTicks_ = lastTicks;
+  matchId_ = matchId;
+  role_ = role;
+  cpty_ = cpty;
+}
 
 } // swirly
