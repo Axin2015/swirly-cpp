@@ -14,20 +14,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_MOCK_HPP
-#define SWIRLYD_MOCK_HPP
+#ifndef SWIRLY_FIG_MOCK_HPP
+#define SWIRLY_FIG_MOCK_HPP
 
 #include <swirly/elm/Journ.hpp>
 #include <swirly/elm/Model.hpp>
 
 /**
- * @addtogroup App
+ * @addtogroup IO
  * @{
  */
 
 namespace swirly {
 
-class MockModel : public Model {
+class SWIRLY_API MockModel : public Model {
  public:
   MockModel() noexcept;
   ~MockModel() noexcept override;
@@ -50,7 +50,7 @@ class MockModel : public Model {
   TraderSet doReadTrader(const Factory& factory) const override;
 };
 
-class MockJourn : public Journ {
+class SWIRLY_API MockJourn : public Journ {
  public:
   MockJourn() noexcept;
   ~MockJourn() noexcept override;
@@ -89,4 +89,4 @@ class MockJourn : public Journ {
 
 /** @} */
 
-#endif // SWIRLYD_MOCK_HPP
+#endif // SWIRLY_FIG_MOCK_HPP

@@ -16,4 +16,23 @@
  */
 #include <swirly/fig/Serv.hpp>
 
+#include <swirly/fig/Mock.hpp>
+
+#include <swirly/ash/Time.hpp>
+
 #include <swirly/tea/Test.hpp>
+
+using namespace swirly;
+
+SWIRLY_TEST_CASE(ServAssetsFind)
+{
+  MockModel model;
+  MockJourn journ;
+  const auto now = getTimeOfDay();
+  Serv serv{model, journ, now};
+  auto it = serv.assets().find("CHF"_sv);
+  SWIRLY_CHECK(it != serv.assets().end());
+  SWIRLY_CHECK(it->mnem() == "CHF"_sv);
+  SWIRLY_CHECK(it->display() == "Switzerland, Francs"_sv);
+  SWIRLY_CHECK(it->assetType() == AssetType::Currency);
+}

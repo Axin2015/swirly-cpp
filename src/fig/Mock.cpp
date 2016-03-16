@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Mock.hpp"
+#include <swirly/fig/Mock.hpp>
 
 #include <swirly/elm/Factory.hpp>
 
