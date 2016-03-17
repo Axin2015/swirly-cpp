@@ -98,6 +98,17 @@ SWIRLY_API int run(int argc, char* argv[]);
   void init##name() { swirly::test::addTestCase(#name, test##name); }                              \
   void test##name()
 
+#define SWIRLY_FIXTURE_TEST_CASE(name, FixtureT)                                                   \
+  struct name##Fixture : FixtureT {                                                                \
+    void run();                                                                                    \
+  };                                                                                               \
+  SWIRLY_TEST_CASE(name)                                                                           \
+  {                                                                                                \
+    name##Fixture fixture;                                                                         \
+    fixture.run();                                                                                 \
+  }                                                                                                \
+  void name##Fixture::run()
+
 /** @} */
 
 #endif // SWIRLY_TEA_TEST_HPP

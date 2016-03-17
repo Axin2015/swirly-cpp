@@ -24,12 +24,18 @@
 
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ServAssetsFind)
-{
+namespace {
+struct Fixture {
+  Fixture() : now{getTimeOfDay()}, serv{model, journ, now} {}
   MockModel model;
   MockJourn journ;
-  const auto now = getTimeOfDay();
-  Serv serv{model, journ, now};
+  const Millis now;
+  Serv serv;
+};
+} // anonymous
+
+SWIRLY_FIXTURE_TEST_CASE(ServAssetsFind, Fixture)
+{
   auto it = serv.assets().find("CHF"_sv);
   SWIRLY_CHECK(it != serv.assets().end());
   SWIRLY_CHECK(it->mnem() == "CHF"_sv);
