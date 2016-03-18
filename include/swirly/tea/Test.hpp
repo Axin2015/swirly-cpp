@@ -21,6 +21,7 @@
 #define SWIRLY_API __attribute__((visibility("default")))
 #endif // SWIRLY_API
 
+#include <cmath>
 #include <exception>
 
 /**
@@ -77,6 +78,13 @@ SWIRLY_API void addTestCase(const char* name, void (*fn)(void));
  * Run all test-cases.
  */
 SWIRLY_API int run(int argc, char* argv[]);
+
+constexpr auto Epsilon = 1e-7;
+
+inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
+{
+  return std::abs(lhs - rhs) <= delta;
+}
 
 } // test
 } // swirly
