@@ -52,6 +52,8 @@ class SWIRLY_API MarketBook : public Market {
   const MarketView& view() const noexcept { return view_; }
   Iden maxOrderId() const noexcept { return maxOrderId_; }
   Iden maxExecId() const noexcept { return maxExecId_; }
+  BookSide& bidSide() noexcept { return bidSide_; }
+  BookSide& offerSide() noexcept { return offerSide_; }
   void insertOrder(const OrderPtr& order) throw(std::bad_alloc)
   {
     side(order->side()).insertOrder(order);

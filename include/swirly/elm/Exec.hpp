@@ -17,6 +17,7 @@
 #ifndef SWIRLY_ELM_EXEC_HPP
 #define SWIRLY_ELM_EXEC_HPP
 
+#include <swirly/elm/Conv.hpp>
 #include <swirly/elm/Request.hpp>
 
 /**
@@ -75,6 +76,30 @@ class SWIRLY_API Exec : public Request {
   Iden matchId() const noexcept { return matchId_; }
   Role role() const noexcept { return role_; }
   std::string_view cpty() const noexcept { return +cpty_; }
+
+  void revise(Lots lots) noexcept
+  {
+    using namespace enumops;
+    state_ = State::Revise;
+    const auto delta = lots_ - lots;
+    assert(delta >= 0_lts);
+    lots_ = lots;
+    resd_ -= delta;
+  }
+  void cancel() noexcept
+  {
+    state_ = State::Cancel;
+    resd_ = 0_lts;
+  }
+  void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId, Role role,
+             std::string_view cpty) noexcept;
+
+  void trade(Lots lastLots, Ticks lastTicks, Iden matchId, Role role,
+             std::string_view cpty) noexcept
+  {
+    trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, role, cpty);
+  }
+
   boost::intrusive::set_member_hook<> idHook_;
 
  private:

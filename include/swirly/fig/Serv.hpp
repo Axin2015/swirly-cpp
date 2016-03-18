@@ -59,6 +59,12 @@ class SWIRLY_API Serv {
 
   const TraderSet& traders() const noexcept;
 
+  MarketBook& market(std::string_view mnem) const;
+
+  TraderSess& trader(std::string_view mnem) const;
+
+  TraderSess* findTraderByEmail(std::string_view email) const;
+
   const MarketBook& createMarket(std::string_view mnem, std::string_view display,
                                  std::string_view contr, Jday settlDay, Jday expiryDay,
                                  MarketState state, Millis now);
@@ -66,16 +72,10 @@ class SWIRLY_API Serv {
   const MarketBook& updateMarket(std::string_view mnem, std::string_view display, MarketState state,
                                  Millis now);
 
-  const MarketBook& market(std::string_view mnem) const;
-
   const TraderSess& createTrader(std::string_view mnem, std::string_view display,
                                  std::string_view email);
 
   const TraderSess& updateTrader(std::string_view mnem, std::string_view display);
-
-  const TraderSess& trader(std::string_view mnem) const;
-
-  const TraderSess* findTraderByEmail(std::string_view email) const;
 
   void createOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);

@@ -26,7 +26,7 @@ BookSide::BookSide(BookSide&&) = default;
 
 void BookSide::insertOrder(const OrderPtr& order) throw(std::bad_alloc)
 {
-  assert(order->level() != nullptr);
+  assert(order->level() == nullptr);
   assert(order->ticks() != 0_tks);
   assert(order->resd() > 0_lts);
   assert(order->exec() <= order->lots());

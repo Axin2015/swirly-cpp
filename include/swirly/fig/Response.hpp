@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/Types.hpp>
+
 #include <vector>
 
 /**
@@ -32,6 +34,9 @@ class MarketBook;
 
 class SWIRLY_API Response {
  public:
+  using Orders = std::vector<OrderPtr>;
+  using Execs = std::vector<ExecPtr>;
+
   Response() noexcept;
   ~Response() noexcept;
 
@@ -44,21 +49,27 @@ class SWIRLY_API Response {
   Response& operator=(Response&&) noexcept;
 
   const MarketBook& book() const noexcept { return *book_; }
+  const Orders& orders() const noexcept { return orders_; }
+  const Execs& execs() const noexcept { return execs_; }
+
   void reset(const MarketBook& book) noexcept
   {
     book_ = &book;
     clearAll();
   }
-  void reset(const MarketBook& book, const OrderPtr& order, const ExecPtr& exec);
-
   void clearAll() noexcept;
 
   void clearMatches() noexcept;
 
- private:
-  using Orders = std::vector<OrderPtr>;
-  using Execs = std::vector<ExecPtr>;
+  void reserveOrders(std::size_t capacity);
 
+  void reserveExecs(std::size_t capacity);
+
+  void insertOrder(const OrderPtr& order);
+
+  void insertExec(const ExecPtr& exec);
+
+ private:
   const MarketBook* book_{nullptr};
   Orders orders_;
   Execs execs_;
