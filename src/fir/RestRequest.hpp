@@ -95,20 +95,20 @@ class SWIRLY_API RestRequest {
   unsigned fields_;
 
   StringData<MnemMax> mnem_;
-  StringData<Display> display_;
-  StringData<Email> email_;
-  StringData<Mnem> trader_;
-  StringData<Mnem> contr_;
+  StringData<DisplayMax> display_;
+  StringData<EmailMax> email_;
+  StringData<MnemMax> trader_;
+  StringData<MnemMax> contr_;
   IsoDate settlDate_;
   IsoDate expiryDate_;
-  StringData<Ref> ref_;
+  StringData<RefMax> ref_;
   MarketState state_;
   swirly::Side side_;
   swirly::Lots lots_;
   swirly::Ticks ticks_;
   swirly::Lots minLots_;
   swirly::Role role_;
-  StringData<Mnem> cpty_;
+  StringData<MnemMax> cpty_;
 
   long num() const noexcept { return num_.sign * num_.digits; }
 };
