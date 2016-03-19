@@ -23,7 +23,7 @@ IF(DOT_EXECUTABLE)
       COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${lname}
               | dot -Tpng >"${PROJECT_BINARY_DIR}/image/${outfile}"
       DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl"
-              ${lname}_shared)
+              ${lname}_static)
 
     SET(outfiles ${outfiles} "${PROJECT_BINARY_DIR}/image/${outfile}")
   ENDFOREACH()

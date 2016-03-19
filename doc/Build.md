@@ -62,11 +62,11 @@ following options:
         -DCMAKE_C_COMPILER=gcc-5 \
         -DCMAKE_CXX_COMPILER=g++-5
 
-Build times can be reduced during development by disabling static libraries and compiler
+Build times can be reduced during development by disabling shared libraries and compiler
 optimisations:
 
     $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
-        -DENABLE_STATIC_LIBS=OFF \
+        -DENABLE_SHARED_LIBS=OFF \
         -DCMAKE_BUILD_TYPE=DEBUG
 
 Note that both shared and static libraries are built by default.
