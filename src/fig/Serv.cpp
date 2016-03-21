@@ -38,7 +38,7 @@ using namespace std;
 
 namespace swirly {
 namespace {
-const regex mnemPattern{"(\\d{4}[- ]){3}\\d{4}"};
+const regex mnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
 {
@@ -275,8 +275,31 @@ TraderSess* Serv::findTraderByEmail(string_view email) const
 const MarketBook& Serv::createMarket(string_view mnem, string_view display, string_view contr,
                                      Jday settlDay, Jday expiryDay, MarketState state, Millis now)
 {
-  auto it
-    = impl_->markets.insert(impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state));
+  if (impl_->contrs.find(contr) == impl_->contrs.end()) {
+    throw NotFoundException{errMsg() << "contr '" << contr << "' does not exist"};
+  }
+  if (settlDay != 0_jd) {
+    // busDay <= expiryDay <= settlDay.
+    const auto busDay = getBusDay(now);
+    if (settlDay < expiryDay) {
+      throw InvalidException{"settl-day before expiry-day"_sv};
+    }
+    if (expiryDay < busDay) {
+      throw InvalidException{"expiry-day before bus-day"_sv};
+    }
+  } else {
+    if (expiryDay != 0_jd) {
+      throw InvalidException{"expiry-day without settl-day"_sv};
+    }
+  }
+  MarketSet::Iterator it;
+  bool found;
+  tie(it, found) = impl_->markets.findHint(mnem);
+  if (found) {
+    throw AlreadyExistsException{errMsg() << "market '" << mnem << "' already exists"};
+  }
+  it = impl_->markets.insertHint(
+    it, impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state));
   const auto& market = static_cast<const MarketBook&>(*it);
   return market;
 }
@@ -296,8 +319,18 @@ const MarketBook& Serv::updateMarket(string_view mnem, string_view display, Mark
 
 const TraderSess& Serv::createTrader(string_view mnem, string_view display, string_view email)
 {
-  auto it = impl_->traders.insert(impl_->newTrader(mnem, display, email));
+  TraderSet::Iterator it;
+  bool found;
+  tie(it, found) = impl_->traders.findHint(mnem);
+  if (found) {
+    throw AlreadyExistsException{errMsg() << "trader '" << mnem << "' already exists"};
+  }
+  if (impl_->emailIdx.find(email) != impl_->emailIdx.end()) {
+    throw AlreadyExistsException{errMsg() << "email '" << email << "' is already in use"};
+  }
+  it = impl_->traders.insertHint(it, impl_->newTrader(mnem, display, email));
   auto& trader = static_cast<TraderSess&>(*it);
+  impl_->emailIdx.insert(trader);
   return trader;
 }
 
