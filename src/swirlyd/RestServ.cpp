@@ -54,6 +54,7 @@ void RestServ::reset(mg::HttpMessage data) noexcept
     uri.remove_prefix(1);
   }
   uri_.reset(uri);
+  request_.reset();
 }
 
 void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
@@ -84,6 +85,12 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
   out_.rdbuf(&buf);
   out_.reset(200, "OK");
   try {
+    const auto body = data.body();
+    if (!body.empty()) {
+      if (!request_.parse(data.body())) {
+        throw BadRequestException{"request body is incomplete"_sv};
+      }
+    }
     restRequest(data, now);
     if (!isSet(MatchUri)) {
       throw NotFoundException{errMsg() << "resource '" << data.uri() << "' does not exist"};
@@ -258,7 +265,8 @@ void RestServ::marketRequest(mg::HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/rec/market
       state_ |= MatchMethod;
-      rest_.postMarket(now, out_);
+      rest_.postMarket(request_.mnem(), request_.display(), request_.contr(), request_.settlDate(),
+                       request_.expiryDate(), request_.state(), now, out_);
       break;
     }
     return;

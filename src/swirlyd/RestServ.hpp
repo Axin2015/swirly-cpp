@@ -20,11 +20,10 @@
 #include "Mongoose.hpp"
 #include "Stream.hpp"
 
+#include <swirly/fir/RestRequest.hpp>
+
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Tokeniser.hpp>
-#include <swirly/ash/Types.hpp>
-
-#include <swirly/elm/Types.hpp>
 
 #include <vector>
 
@@ -98,6 +97,7 @@ class RestServ : public mg::Mgr<RestServ> {
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;
+  RestRequest request_;
   mg::OStream out_;
 };
 
