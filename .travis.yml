@@ -8,16 +8,16 @@ matrix:
       compiler: clang++
       addons:
         apt:
-          sources: ['boost-latest', 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise']
-          packages: ['cmake', 'clang-3.8', 'libboost1.55-all-dev']
+          sources: ['boost-latest', 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
+          packages: ['cmake', 'clang-3.7', 'libboost1.55-all-dev']
       env: CMAKE_BUILD_TYPE=DEBUG
 
     - os: linux
       compiler: clang++
       addons:
         apt:
-          sources: ['boost-latest', 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise']
-          packages: ['cmake', 'clang-3.8', 'libboost1.55-all-dev']
+          sources: ['boost-latest', 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
+          packages: ['cmake', 'clang-3.7', 'libboost1.55-all-dev']
       env: CMAKE_BUILD_TYPE=RELEASE
 
     - os: linux
@@ -54,7 +54,7 @@ before_install:
 install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       if [ "$CXX" = "clang++" ]; then
-        export CXX=clang++-3.8 CC=clang-3.8;
+        export CXX=clang++-3.7 CC=clang-3.7;
       elif [ "$CXX" = "g++" ]; then
         export CXX=g++-5 CC=gcc-5;
       fi;
