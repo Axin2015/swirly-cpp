@@ -265,6 +265,13 @@ void RestServ::marketRequest(mg::HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/rec/market
       state_ |= MatchMethod;
+
+      constexpr auto required = RestRequest::Mnem | RestRequest::Display | RestRequest::Contr;
+      constexpr auto optional
+        = RestRequest::SettlDate | RestRequest::ExpiryDate | RestRequest::State;
+      if (!request_.valid(required, optional)) {
+        throw InvalidException{"request fields are invalid"_sv};
+      }
       rest_.postMarket(request_.mnem(), request_.display(), request_.contr(), request_.settlDate(),
                        request_.expiryDate(), request_.state(), now, out_);
       break;
