@@ -83,7 +83,9 @@ class SWIRLY_API Rest {
 
   void getView(std::string_view market, Millis now, std::ostream& out) const;
 
-  void postMarket(Millis now, std::ostream& out);
+  void postMarket(std::string_view mnem, std::string_view display, std::string_view contr,
+                  IsoDate settlDate, IsoDate expiryDate, MarketState state, Millis now,
+                  std::ostream& out);
 
   void putMarket(std::string_view mnem, Millis now, std::ostream& out);
 

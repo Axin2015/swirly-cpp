@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <RestRequest.hpp>
+#include <swirly/fir/RestRequest.hpp>
 
 #include <swirly/elm/Exception.hpp>
 
@@ -315,4 +315,18 @@ SWIRLY_TEST_CASE(RestRequestAll)
   SWIRLY_CHECK(rr.minLots() == 101_lts);
   SWIRLY_CHECK(rr.role() == Role::Maker);
   SWIRLY_CHECK(rr.cpty() == "MARAYL"_sv);
+}
+
+SWIRLY_TEST_CASE(RestRequestPartial)
+{
+  RestRequest rr;
+
+  SWIRLY_CHECK(!rr.parse(R"({"mnem":"E)"_sv));
+  SWIRLY_CHECK(!rr.parse(R"(URUSD","di)"_sv));
+  SWIRLY_CHECK(!rr.parse(R"(splay":"Eu)"_sv));
+  SWIRLY_CHECK(rr.parse(R"(ro Dollar"})"_sv));
+
+  SWIRLY_CHECK(rr.fields() == (RestRequest::Mnem | RestRequest::Display));
+  SWIRLY_CHECK(rr.mnem() == "EURUSD"_sv);
+  SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
 }

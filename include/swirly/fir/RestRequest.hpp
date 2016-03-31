@@ -75,6 +75,27 @@ class SWIRLY_API RestRequest {
   swirly::Lots minLots() const noexcept { return minLots_; }
   swirly::Role role() const noexcept { return role_; }
   std::string_view cpty() const noexcept { return +cpty_; }
+  /**
+   * Validate fields.
+   *
+   * @param required Required fields.
+   *
+   * @return true if fields are value.
+   */
+  bool valid(unsigned required) const noexcept { return (fields_ & required) == required; }
+  /**
+   * Validate fields.
+   *
+   * @param required Required fields.
+   *
+   * @param optional Optional fields.
+   *
+   * @return true if fields are value.
+   */
+  bool valid(unsigned required, unsigned optional) const noexcept
+  {
+    return (fields_ & required) == required && (fields_ & ~(required | optional)) == 0;
+  }
   void reset(bool clear = true) noexcept;
 
   bool parse(std::string_view buf);

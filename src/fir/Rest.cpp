@@ -17,6 +17,9 @@
 #include <swirly/fir/Rest.hpp>
 
 #include <swirly/elm/Exception.hpp>
+#include <swirly/elm/MarketBook.hpp>
+
+#include <swirly/ash/JulianDay.hpp>
 
 using namespace std;
 
@@ -238,10 +241,13 @@ void Rest::getView(string_view market, Millis now, ostream& out) const
   out << "{\"market\":\"" << market << "\"}";
 }
 
-void Rest::postMarket(Millis now, ostream& out)
+void Rest::postMarket(string_view mnem, string_view display, string_view contr, IsoDate settlDate,
+                      IsoDate expiryDate, MarketState state, Millis now, ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "[]";
+  const auto settlDay = maybeIsoToJd(settlDate);
+  const auto expiryDay = maybeIsoToJd(expiryDate);
+  const auto& book = serv_.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
+  out << book;
 }
 
 void Rest::putMarket(string_view mnem, Millis now, ostream& out)

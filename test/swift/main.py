@@ -21,7 +21,7 @@ from swift import *
 
 import unittest
 
-class TestSwirly(unittest.TestCase):
+class MarketTest(unittest.TestCase):
 
   @classmethod
   def setUpClass(cls):
@@ -32,14 +32,43 @@ class TestSwirly(unittest.TestCase):
     cls.fixture.close()
     cls = None
 
-  def test_rec(self):
+  def testCreateMarket(self):
     with Connection() as conn:
-      self.assertEqual(conn.send('POST', '/api/rec/market').status, 200)
+      resp = conn.send('POST', '/api/rec/market',
+                       mnem = 'USDJPY.MAR14',
+                       display = 'USDJPY.MAR14',
+                       contr = 'USDJPY',
+                       settlDate = 20170102,
+                       expiryDate = 20170101,
+                       state = 1);
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
+      self.assertEqual(resp.content['display'], 'USDJPY.MAR14')
+      self.assertEqual(resp.content['contr'], 'USDJPY')
+      self.assertEqual(resp.content['settlDate'], 20170102)
+      self.assertEqual(resp.content['expiryDate'], 20170101)
+      self.assertEqual(resp.content['state'], 1)
+
+class SwirlyTest(unittest.TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    cls.fixture = Fixture()
+
+  @classmethod
+  def tearDownClass(cls):
+    cls.fixture.close()
+    cls = None
+
+  def testRec(self):
+    with Connection() as conn:
+      #self.assertEqual(conn.send('POST', '/api/rec/market').status, 200)
       self.assertEqual(conn.send('PUT', '/api/rec/market/EURUSD').status, 200)
       self.assertEqual(conn.send('POST', '/api/rec/trader').status, 200)
       self.assertEqual(conn.send('PUT', '/api/rec/trader/MARAYL').status, 200)
 
-  def test_sess(self):
+  def testSess(self):
     with Connection() as conn:
       self.assertEqual(conn.send('POST', '/api/sess/order/EURUSD').status, 200)
       self.assertEqual(conn.send('PUT', '/api/sess/order/EURUSD/1,2,3').status, 200)

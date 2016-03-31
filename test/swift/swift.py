@@ -106,6 +106,10 @@ class Response(object):
     self.reason = resp.reason
     self.content = json.load(resp)
 
+  def __str__(self):
+    return ('Response(status={},reason="{}",content="{}")'
+            .format(self.status, self.reason, self.content))
+
 class Connection(object):
 
   def __init__(self):
@@ -120,12 +124,10 @@ class Connection(object):
   def close(self):
     self.conn.close()
 
-  def send(self, method, uri):
-    content = json.dumps({
-      'side': 'BUY',
-      'lots': 1,
-      'ticks': 12340
-    })
+  def send(self, method, uri, **kwargs):
+    content = ''
+    if kwargs is not None:
+      content = json.dumps(kwargs);
     conn = self.conn
     conn.putrequest(method, uri)
     conn.putheader('Accept', 'application/json')
