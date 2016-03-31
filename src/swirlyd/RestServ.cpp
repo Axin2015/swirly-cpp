@@ -266,10 +266,10 @@ void RestServ::marketRequest(mg::HttpMessage data, Millis now)
       // POST /api/rec/market
       state_ |= MatchMethod;
 
-      constexpr auto required = RestRequest::Mnem | RestRequest::Display | RestRequest::Contr;
-      constexpr auto optional
+      constexpr auto reqFields = RestRequest::Mnem | RestRequest::Display | RestRequest::Contr;
+      constexpr auto optFields
         = RestRequest::SettlDate | RestRequest::ExpiryDate | RestRequest::State;
-      if (!request_.valid(required, optional)) {
+      if (!request_.valid(reqFields, optFields)) {
         throw InvalidException{"request fields are invalid"_sv};
       }
       rest_.postMarket(request_.mnem(), request_.display(), request_.contr(), request_.settlDate(),
@@ -296,7 +296,21 @@ void RestServ::marketRequest(mg::HttpMessage data, Millis now)
     case MethodPut:
       // PUT /api/rec/market/MNEM
       state_ |= MatchMethod;
-      rest_.putMarket(mnem, now, out_);
+
+      constexpr auto reqFields = 0x0;
+      constexpr auto optFields = RestRequest::Display | RestRequest::State;
+      if (!request_.valid(reqFields, optFields)) {
+        throw InvalidException{"request fields are invalid"_sv};
+      }
+      optional<string_view> display;
+      if ((request_.fields() & RestRequest::Display)) {
+        display = request_.display();
+      }
+      optional<MarketState> state;
+      if ((request_.fields() & RestRequest::State)) {
+        state = request_.state();
+      }
+      rest_.putMarket(mnem, display, state, now, out_);
       break;
     }
     return;

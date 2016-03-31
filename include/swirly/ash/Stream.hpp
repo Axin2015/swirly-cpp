@@ -24,7 +24,7 @@
 #include <ostream>
 
 namespace std {
-using string_view = experimental::string_view;
+using experimental::string_view;
 }
 
 /**

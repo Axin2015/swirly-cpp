@@ -24,6 +24,14 @@
 
 #include <swirly/ash/Array.hpp>
 
+#include <experimental/optional>
+
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+}
+
 /**
  * @addtogroup App
  * @{
@@ -69,8 +77,8 @@ class SWIRLY_API Serv {
                                  std::string_view contr, Jday settlDay, Jday expiryDay,
                                  MarketState state, Millis now);
 
-  const MarketBook& updateMarket(std::string_view mnem, std::string_view display, MarketState state,
-                                 Millis now);
+  const MarketBook& updateMarket(std::string_view mnem, std::optional<std::string_view> display,
+                                 std::optional<MarketState> state, Millis now);
 
   const TraderSess& createTrader(std::string_view mnem, std::string_view display,
                                  std::string_view email);

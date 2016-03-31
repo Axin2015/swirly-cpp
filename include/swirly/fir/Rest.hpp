@@ -87,7 +87,8 @@ class SWIRLY_API Rest {
                   IsoDate settlDate, IsoDate expiryDate, MarketState state, Millis now,
                   std::ostream& out);
 
-  void putMarket(std::string_view mnem, Millis now, std::ostream& out);
+  void putMarket(std::string_view mnem, std::optional<std::string_view> display,
+                 std::optional<MarketState> state, Millis now, std::ostream& out);
 
   void postTrader(Millis now, std::ostream& out);
 
