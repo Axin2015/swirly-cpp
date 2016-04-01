@@ -90,9 +90,10 @@ class SWIRLY_API Rest {
   void putMarket(std::string_view mnem, std::optional<std::string_view> display,
                  std::optional<MarketState> state, Millis now, std::ostream& out);
 
-  void postTrader(Millis now, std::ostream& out);
+  void postTrader(std::string_view mnem, std::string_view display, std::string_view email,
+                  Millis now, std::ostream& out);
 
-  void putTrader(std::string_view mnem, Millis now, std::ostream& out);
+  void putTrader(std::string_view mnem, std::string_view display, Millis now, std::ostream& out);
 
   void postOrder(std::string_view market, Millis now, std::ostream& out);
 

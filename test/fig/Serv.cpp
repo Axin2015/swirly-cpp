@@ -278,14 +278,15 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, Fixture)
 SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
 {
   // Mnemonic too short.
-  SWIRLY_CHECK_THROW(serv.createTrader("x", "Mark Aylett", "mark.aylett@swirlycloud.com"),
+  SWIRLY_CHECK_THROW(serv.createTrader("x", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
                      InvalidException);
 
   // Mnemonic contains invalid characters.
-  SWIRLY_CHECK_THROW(serv.createTrader("MARAYL 2", "Mark Aylett", "mark.aylett@swirlycloud.com"),
-                     InvalidException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("MARAYL 2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    InvalidException);
 
-  auto& sess = serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com");
+  auto& sess = serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now);
   SWIRLY_CHECK(sess.mnem() == "MARAYL2"_sv);
   SWIRLY_CHECK(sess.display() == "Mark Aylett"_sv);
 
@@ -300,18 +301,20 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
   SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@swirlycloud.com"_sv) == &sess);
 
   // Already exists.
-  SWIRLY_CHECK_THROW(serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com"),
-                     AlreadyExistsException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    AlreadyExistsException);
 
   // Email already exists.
-  SWIRLY_CHECK_THROW(serv.createTrader("MARAYL3", "Mark Aylett", "mark.aylett@swirlycloud.com"),
-                     AlreadyExistsException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("MARAYL3", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    AlreadyExistsException);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
 {
-  auto& orig = serv.createTrader("MARAYL2", "Mark Aylettx", "mark.aylett@swirlycloud.com");
-  auto& sess = serv.updateTrader("MARAYL2"_sv, "Mark Aylett"_sv);
+  auto& orig = serv.createTrader("MARAYL2", "Mark Aylettx", "mark.aylett@swirlycloud.com", Now);
+  auto& sess = serv.updateTrader("MARAYL2"_sv, "Mark Aylett"_sv, Now);
 
   SWIRLY_CHECK(&sess == &orig);
 

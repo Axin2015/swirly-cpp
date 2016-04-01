@@ -333,7 +333,14 @@ void RestServ::traderRequest(mg::HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/rec/market
       state_ |= MatchMethod;
-      rest_.postTrader(now, out_);
+
+      // FIXME: Incomplete. See BackRecServlet.java
+      constexpr auto reqFields = RestRequest::Mnem | RestRequest::Display;
+      constexpr auto optFields = RestRequest::Email;
+      if (!request_.valid(reqFields, optFields)) {
+        throw InvalidException{"request fields are invalid"_sv};
+      }
+      rest_.postTrader(request_.mnem(), request_.display(), request_.email(), now, out_);
       break;
     }
     return;
@@ -356,7 +363,13 @@ void RestServ::traderRequest(mg::HttpMessage data, Millis now)
     case MethodPut:
       // PUT /api/rec/trader/MNEM
       state_ |= MatchMethod;
-      rest_.putTrader(mnem, now, out_);
+
+      // FIXME: Incomplete. See BackRecServlet.java
+      constexpr auto reqFields = RestRequest::Display;
+      if (!request_.valid(reqFields)) {
+        throw InvalidException{"request fields are invalid"_sv};
+      }
+      rest_.putTrader(mnem, request_.display(), now, out_);
       break;
     }
     return;

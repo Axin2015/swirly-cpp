@@ -81,9 +81,9 @@ class SWIRLY_API Serv {
                                  std::optional<MarketState> state, Millis now);
 
   const TraderSess& createTrader(std::string_view mnem, std::string_view display,
-                                 std::string_view email);
+                                 std::string_view email, Millis now);
 
-  const TraderSess& updateTrader(std::string_view mnem, std::string_view display);
+  const TraderSess& updateTrader(std::string_view mnem, std::string_view display, Millis now);
 
   void createOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);
