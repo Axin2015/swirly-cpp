@@ -304,20 +304,25 @@ const MarketBook& Serv::createMarket(string_view mnem, string_view display, stri
   return market;
 }
 
-const MarketBook& Serv::updateMarket(string_view mnem, string_view display, MarketState state,
-                                     Millis now)
+const MarketBook& Serv::updateMarket(string_view mnem, optional<string_view> display,
+                                     optional<MarketState> state, Millis now)
 {
   auto it = impl_->markets.find(mnem);
   if (it == impl_->markets.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
   auto& market = static_cast<MarketBook&>(*it);
-  market.setDisplay(display);
-  market.setState(state);
+  if (display) {
+    market.setDisplay(*display);
+  }
+  if (state) {
+    market.setState(*state);
+  }
   return market;
 }
 
-const TraderSess& Serv::createTrader(string_view mnem, string_view display, string_view email)
+const TraderSess& Serv::createTrader(string_view mnem, string_view display, string_view email,
+                                     Millis now)
 {
   TraderSet::Iterator it;
   bool found;
@@ -334,7 +339,7 @@ const TraderSess& Serv::createTrader(string_view mnem, string_view display, stri
   return trader;
 }
 
-const TraderSess& Serv::updateTrader(string_view mnem, string_view display)
+const TraderSess& Serv::updateTrader(string_view mnem, string_view display, Millis now)
 {
   auto it = impl_->traders.find(mnem);
   if (it == impl_->traders.end()) {

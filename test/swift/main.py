@@ -32,23 +32,99 @@ class MarketTest(unittest.TestCase):
     cls.fixture.close()
     cls = None
 
-  def testCreateMarket(self):
+  def testPostMarket(self):
     with Connection() as conn:
       resp = conn.send('POST', '/api/rec/market',
                        mnem = 'USDJPY.MAR14',
-                       display = 'USDJPY.MAR14',
+                       display = 'first',
                        contr = 'USDJPY',
                        settlDate = 20170102,
                        expiryDate = 20170101,
-                       state = 1);
+                       state = 1)
       self.assertEqual(resp.status, 200)
       self.assertEqual(resp.reason, 'OK')
       self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
-      self.assertEqual(resp.content['display'], 'USDJPY.MAR14')
+      self.assertEqual(resp.content['display'], 'first')
       self.assertEqual(resp.content['contr'], 'USDJPY')
       self.assertEqual(resp.content['settlDate'], 20170102)
       self.assertEqual(resp.content['expiryDate'], 20170101)
       self.assertEqual(resp.content['state'], 1)
+
+  def testPutMarket(self):
+    with Connection() as conn:
+
+      # Update display and state.
+      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+                       display = 'second',
+                       state = 2)
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
+      self.assertEqual(resp.content['display'], 'second')
+      self.assertEqual(resp.content['contr'], 'USDJPY')
+      self.assertEqual(resp.content['settlDate'], 20170102)
+      self.assertEqual(resp.content['expiryDate'], 20170101)
+      self.assertEqual(resp.content['state'], 2)
+
+      # Update display only.
+      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+                       display = 'third',
+                       state = None)
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
+      self.assertEqual(resp.content['display'], 'third')
+      self.assertEqual(resp.content['contr'], 'USDJPY')
+      self.assertEqual(resp.content['settlDate'], 20170102)
+      self.assertEqual(resp.content['expiryDate'], 20170101)
+      self.assertEqual(resp.content['state'], 2)
+
+      # Update state only.
+      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+                       display = None,
+                       state = 3)
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
+      self.assertEqual(resp.content['display'], 'third')
+      self.assertEqual(resp.content['contr'], 'USDJPY')
+      self.assertEqual(resp.content['settlDate'], 20170102)
+      self.assertEqual(resp.content['expiryDate'], 20170101)
+      self.assertEqual(resp.content['state'], 3)
+
+class TraderTest(unittest.TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    cls.fixture = Fixture()
+
+  @classmethod
+  def tearDownClass(cls):
+    cls.fixture.close()
+    cls = None
+
+  def testPostMarket(self):
+    with Connection() as conn:
+      resp = conn.send('POST', '/api/rec/trader',
+                       mnem = 'MARAYL2',
+                       display = 'Mark Aylettx',
+                       email = 'mark.aylett@swirlycloud.com')
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(resp.content['mnem'], 'MARAYL2')
+      self.assertEqual(resp.content['display'], 'Mark Aylettx')
+      self.assertEqual(resp.content['email'], 'mark.aylett@swirlycloud.com')
+
+  def testPutMarket(self):
+    with Connection() as conn:
+
+      resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
+                       display = 'Mark Aylett')
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(resp.content['mnem'], 'MARAYL2')
+      self.assertEqual(resp.content['display'], 'Mark Aylett')
+      self.assertEqual(resp.content['email'], 'mark.aylett@swirlycloud.com')
 
 class SwirlyTest(unittest.TestCase):
 
@@ -60,13 +136,6 @@ class SwirlyTest(unittest.TestCase):
   def tearDownClass(cls):
     cls.fixture.close()
     cls = None
-
-  def testRec(self):
-    with Connection() as conn:
-      #self.assertEqual(conn.send('POST', '/api/rec/market').status, 200)
-      self.assertEqual(conn.send('PUT', '/api/rec/market/EURUSD').status, 200)
-      self.assertEqual(conn.send('POST', '/api/rec/trader').status, 200)
-      self.assertEqual(conn.send('PUT', '/api/rec/trader/MARAYL').status, 200)
 
   def testSess(self):
     with Connection() as conn:

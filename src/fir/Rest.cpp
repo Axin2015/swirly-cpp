@@ -16,6 +16,8 @@
  */
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/fig/TraderSess.hpp>
+
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/MarketBook.hpp>
 
@@ -250,22 +252,24 @@ void Rest::postMarket(string_view mnem, string_view display, string_view contr, 
   out << book;
 }
 
-void Rest::putMarket(string_view mnem, Millis now, ostream& out)
+void Rest::putMarket(string_view mnem, optional<string_view> display, optional<MarketState> state,
+                     Millis now, ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "{\"mnem\":\"" << mnem << "\"}";
+  const auto& book = serv_.updateMarket(mnem, display, state, now);
+  out << book;
 }
 
-void Rest::postTrader(Millis now, ostream& out)
+void Rest::postTrader(string_view mnem, string_view display, string_view email, Millis now,
+                      ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "[]";
+  const auto& trader = serv_.createTrader(mnem, display, email, now);
+  out << trader;
 }
 
-void Rest::putTrader(string_view mnem, Millis now, ostream& out)
+void Rest::putTrader(string_view mnem, string_view display, Millis now, ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "{\"mnem\":\"" << mnem << "\"}";
+  const auto& trader = serv_.updateTrader(mnem, display, now);
+  out << trader;
 }
 
 void Rest::postOrder(string_view market, Millis now, ostream& out)

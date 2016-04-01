@@ -221,37 +221,72 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, Fixture)
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, Fixture)
 {
-  auto& orig = serv.createMarket("USDJPY.MAR14"_sv, "USDJPYx March 14"_sv, "USDJPY"_sv, SettlDay,
-                                 ExpiryDay, 0x1, Now);
-  auto& book = serv.updateMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, 0x2, Now);
+  auto& orig
+    = serv.createMarket("USDJPY.MAR14"_sv, "first"_sv, "USDJPY"_sv, SettlDay, ExpiryDay, 0x1, Now);
 
-  SWIRLY_CHECK(&book == &orig);
+  // Update display and state.
+  {
+    auto& book = serv.updateMarket("USDJPY.MAR14"_sv, "second"_sv, 0x2, Now);
 
-  SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
-  SWIRLY_CHECK(book.display() == "USDJPY March 14"_sv);
+    SWIRLY_CHECK(&book == &orig);
 
-  SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
-  SWIRLY_CHECK(book.settlDay() == SettlDay);
-  SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
-  SWIRLY_CHECK(book.state() == 0x2);
+    SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
+    SWIRLY_CHECK(book.display() == "second"_sv);
 
-  SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 2);
-  auto it = serv.markets().find("USDJPY.MAR14"_sv);
-  SWIRLY_CHECK(it != serv.markets().end());
-  SWIRLY_CHECK(&*it == &book);
+    SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
+    SWIRLY_CHECK(book.settlDay() == SettlDay);
+    SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
+    SWIRLY_CHECK(book.state() == 0x2);
+
+    SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 2);
+    auto it = serv.markets().find("USDJPY.MAR14"_sv);
+    SWIRLY_CHECK(it != serv.markets().end());
+    SWIRLY_CHECK(&*it == &book);
+  }
+
+  // Update display only.
+  {
+    auto& book = serv.updateMarket("USDJPY.MAR14"_sv, "third"_sv, nullopt, Now);
+
+    SWIRLY_CHECK(&book == &orig);
+
+    SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
+    SWIRLY_CHECK(book.display() == "third"_sv);
+
+    SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
+    SWIRLY_CHECK(book.settlDay() == SettlDay);
+    SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
+    SWIRLY_CHECK(book.state() == 0x2);
+  }
+
+  // Update state only.
+  {
+    auto& book = serv.updateMarket("USDJPY.MAR14"_sv, nullopt, 0x3, Now);
+
+    SWIRLY_CHECK(&book == &orig);
+
+    SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
+    SWIRLY_CHECK(book.display() == "third"_sv);
+
+    SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
+    SWIRLY_CHECK(book.settlDay() == SettlDay);
+    SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
+    SWIRLY_CHECK(book.state() == 0x3);
+  }
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
 {
   // Mnemonic too short.
-  SWIRLY_CHECK_THROW(serv.createTrader("x", "Mark Aylett", "mark.aylett@swirlycloud.com"),
+  SWIRLY_CHECK_THROW(serv.createTrader("x", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
                      InvalidException);
 
   // Mnemonic contains invalid characters.
-  SWIRLY_CHECK_THROW(serv.createTrader("MARAYL 2", "Mark Aylett", "mark.aylett@swirlycloud.com"),
-                     InvalidException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("MARAYL 2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    InvalidException);
 
-  auto& sess = serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com");
+  auto& sess = serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now);
   SWIRLY_CHECK(sess.mnem() == "MARAYL2"_sv);
   SWIRLY_CHECK(sess.display() == "Mark Aylett"_sv);
 
@@ -266,18 +301,20 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
   SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@swirlycloud.com"_sv) == &sess);
 
   // Already exists.
-  SWIRLY_CHECK_THROW(serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com"),
-                     AlreadyExistsException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    AlreadyExistsException);
 
   // Email already exists.
-  SWIRLY_CHECK_THROW(serv.createTrader("MARAYL3", "Mark Aylett", "mark.aylett@swirlycloud.com"),
-                     AlreadyExistsException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("MARAYL3", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    AlreadyExistsException);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
 {
-  auto& orig = serv.createTrader("MARAYL2", "Mark Aylettx", "mark.aylett@swirlycloud.com");
-  auto& sess = serv.updateTrader("MARAYL2"_sv, "Mark Aylett"_sv);
+  auto& orig = serv.createTrader("MARAYL2", "Mark Aylettx", "mark.aylett@swirlycloud.com", Now);
+  auto& sess = serv.updateTrader("MARAYL2"_sv, "Mark Aylett"_sv, Now);
 
   SWIRLY_CHECK(&sess == &orig);
 
