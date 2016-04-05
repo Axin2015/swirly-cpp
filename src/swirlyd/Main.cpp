@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
     MockJourn journ;
     Rest rest{model, journ, getTimeOfDay()};
 
-    mg::RestServ rs{rest};
+    mg::RestServ rs{rest, opts.authUser};
     auto& conn = rs.bind(opts.httpPort);
     mg_set_protocol_http_websocket(&conn);
 

@@ -54,6 +54,11 @@ class HttpMessage {
   auto uri() const noexcept { return +impl_->uri; }
   auto proto() const noexcept { return +impl_->proto; }
   auto queryString() const noexcept { return +impl_->query_string; }
+  auto header(const char* name) const noexcept
+  {
+    auto* val = mg_get_http_header(impl_, name);
+    return val ? +*val : std::string_view{};
+  }
   auto body() const noexcept { return +impl_->body; }
 
  private:

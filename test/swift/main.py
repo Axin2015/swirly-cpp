@@ -103,7 +103,7 @@ class TraderTest(unittest.TestCase):
     cls.fixture.close()
     cls = None
 
-  def testPostMarket(self):
+  def testPostTrader(self):
     with Connection() as conn:
       resp = conn.send('POST', '/api/rec/trader',
                        mnem = 'MARAYL2',
@@ -115,7 +115,7 @@ class TraderTest(unittest.TestCase):
       self.assertEqual(resp.content['display'], 'Mark Aylettx')
       self.assertEqual(resp.content['email'], 'mark.aylett@swirlycloud.com')
 
-  def testPutMarket(self):
+  def testPutTrader(self):
     with Connection() as conn:
 
       resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
@@ -125,6 +125,37 @@ class TraderTest(unittest.TestCase):
       self.assertEqual(resp.content['mnem'], 'MARAYL2')
       self.assertEqual(resp.content['display'], 'Mark Aylett')
       self.assertEqual(resp.content['email'], 'mark.aylett@swirlycloud.com')
+
+class OrderTest(unittest.TestCase):
+
+  @classmethod
+  def setUpClass(cls):
+    cls.fixture = Fixture()
+    with Connection() as conn:
+      conn.send('POST', '/api/rec/market',
+                mnem = 'USDJPY.MAR14',
+                display = 'first',
+                contr = 'USDJPY',
+                settlDate = 20170102,
+                expiryDate = 20170101,
+                state = 1)
+
+  @classmethod
+  def tearDownClass(cls):
+    cls.fixture.close()
+    cls = None
+
+  def testPostOrder(self):
+    with Connection() as conn:
+      conn.login('MARAYL')
+      resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
+                       side = 'BUY',
+                       lots = 1,
+                       ticks = 12345
+      )
+      print(resp)
+      self.assertEqual(resp.status, 200)
+      self.assertEqual(resp.reason, 'OK')
 
 class SwirlyTest(unittest.TestCase):
 
@@ -139,7 +170,7 @@ class SwirlyTest(unittest.TestCase):
 
   def testSess(self):
     with Connection() as conn:
-      self.assertEqual(conn.send('POST', '/api/sess/order/EURUSD').status, 200)
+      #self.assertEqual(conn.send('POST', '/api/sess/order/EURUSD').status, 200)
       self.assertEqual(conn.send('PUT', '/api/sess/order/EURUSD/1,2,3').status, 200)
       self.assertEqual(conn.send('DELETE', '/api/sess/order/EURUSD/1,2,3').status, 200)
       self.assertEqual(conn.send('POST', '/api/sess/trade/EURUSD').status, 200)

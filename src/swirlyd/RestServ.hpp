@@ -38,7 +38,10 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  explicit RestServ(Rest& rest) noexcept : rest_(rest) { memset(&httpOpts_, 0, sizeof(httpOpts_)); }
+  explicit RestServ(Rest& rest, const char* authUser) noexcept : rest_(rest), authUser_{authUser}
+  {
+    memset(&httpOpts_, 0, sizeof(httpOpts_));
+  }
   ~RestServ() noexcept;
 
   // Copy.
@@ -90,6 +93,7 @@ class RestServ : public mg::Mgr<RestServ> {
   void parseIds(std::string_view sv) noexcept;
 
   Rest& rest_;
+  const char* const authUser_;
   mg_serve_http_opts httpOpts_;
   int state_{0};
   Tokeniser<'/'> uri_;

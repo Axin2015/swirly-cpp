@@ -54,12 +54,8 @@ class SWIRLY_API Response {
   const Orders& orders() const noexcept { return orders_; }
   const Execs& execs() const noexcept { return execs_; }
 
-  void reset(const MarketBook& book) noexcept
-  {
-    book_ = &book;
-    clearAll();
-  }
-  void clearAll() noexcept;
+  void setBook(const MarketBook& book) noexcept { book_ = &book; }
+  void clear() noexcept;
 
   void clearMatches() noexcept;
 

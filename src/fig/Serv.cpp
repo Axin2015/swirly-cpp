@@ -411,7 +411,7 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     posn = sess.lazyPosn(book.contr(), book.settlDay());
   }
 
-  resp.reset(book);
+  resp.setBook(book);
   // New order plus updated order for each match assuming crossed with self.
   resp.reserveOrders(1 + matches.size());
   // New execution plus 2 trade executions for each match assuming crossed with self.

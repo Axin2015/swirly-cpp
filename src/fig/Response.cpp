@@ -61,8 +61,9 @@ void Response::toJson(ostream& os) const
   os << '}';
 }
 
-void Response::clearAll() noexcept
+void Response::clear() noexcept
 {
+  book_ = nullptr;
   orders_.clear();
   execs_.clear();
   posn_ = nullptr;

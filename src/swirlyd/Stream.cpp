@@ -63,12 +63,12 @@ StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
   return c;
 }
 
-std::streamsize StreamBuf::xsputn(const char_type* s, std::streamsize count) noexcept
+streamsize StreamBuf::xsputn(const char_type* s, streamsize count) noexcept
 {
   return mbuf_append(&buf_, s, count);
 }
 
-OStream::OStream() : std::ostream{nullptr}
+OStream::OStream() : ostream{nullptr}
 {
 }
 
