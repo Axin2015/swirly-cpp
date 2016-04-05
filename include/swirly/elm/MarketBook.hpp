@@ -44,6 +44,8 @@ class SWIRLY_API MarketBook : public Market {
   MarketBook(MarketBook&&) = default;
   MarketBook& operator=(MarketBook&&) = default;
 
+  void toJsonView(std::ostream& os) const;
+
   Lots lastLots() const noexcept { return lastLots_; }
   Ticks lastTicks() const noexcept { return lastTicks_; }
   Millis lastTime() const noexcept { return lastTime_; }

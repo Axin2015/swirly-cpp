@@ -16,11 +16,31 @@
  */
 #include <swirly/elm/MarketBook.hpp>
 
+#include <swirly/ash/JulianDay.hpp>
+
 #include <cassert>
 
 using namespace std;
 
 namespace swirly {
+namespace {
+template <typename FnT>
+void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostream& os, FnT fn)
+{
+  enum { Levels = 3 };
+  for (int i{0}; i < Levels; ++i) {
+    if (i > 0) {
+      os << ',';
+    }
+    if (it != end) {
+      os << fn(*it);
+      ++it;
+    } else {
+      os << "null";
+    }
+  }
+}
+} // anonymous
 
 MarketBook::MarketBook(string_view mnem, string_view display, string_view contr, Jday settlDay,
                        Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
@@ -36,5 +56,47 @@ MarketBook::MarketBook(string_view mnem, string_view display, string_view contr,
 }
 
 MarketBook::~MarketBook() noexcept = default;
+
+void MarketBook::toJsonView(ostream& os) const
+{
+  os << "{\"market\":\"" << mnem_ //
+     << "\",\"contr\":\"" << contr_ //
+     << "\",\"settlDate\":";
+  if (settlDay_ != 0_jd) {
+    os << jdToIso(settlDay_);
+  } else {
+    os << "null";
+  }
+  if (lastLots_ != 0_lts) {
+    os << ",\"lastLots\":" << lastLots_ //
+       << ",\"lastTicks\":" << lastTicks_ //
+       << ",\"lastTime\":" << lastTime_;
+  } else {
+    os << ",\"lastLots\":null,\"lastTicks\":null,\"lastTime\":null";
+  }
+
+  const auto& bidLevels = bidSide_.levels();
+  os << ",\"bidTicks\":[";
+  toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
+              [](const auto& level) { return level.ticks(); });
+  os << "],\"bidResd\":[";
+  toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
+               [](const auto& level) { return level.resd(); });
+  os << "],\"bidCount\":[";
+  toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
+               [](const auto& level) { return level.count(); });
+
+  const auto& offerLevels = offerSide_.levels();
+  os << "],\"offerTicks\":[";
+  toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
+              [](const auto& level) { return level.ticks(); });
+  os << "],\"offerResd\":[";
+  toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
+               [](const auto& level) { return level.resd(); });
+  os << "],\"offerCount\":[";
+  toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
+               [](const auto& level) { return level.count(); });
+  os << "]}";
+}
 
 } // swirly

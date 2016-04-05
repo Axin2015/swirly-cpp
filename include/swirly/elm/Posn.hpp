@@ -55,6 +55,8 @@ class SWIRLY_API Posn : public RefCounted {
   Posn(Posn&&);
   Posn& operator=(Posn&&) = delete;
 
+  void toJson(std::ostream& os) const;
+
   auto trader() const noexcept { return +trader_; }
   auto contr() const noexcept { return +contr_; }
   auto settlDay() const noexcept { return settlDay_; }
@@ -117,6 +119,12 @@ class SWIRLY_API Posn : public RefCounted {
   Lots sellLots_;
   Cost sellCost_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Posn& posn)
+{
+  posn.toJson(os);
+  return os;
+}
 
 using PosnPtr = boost::intrusive_ptr<Posn>;
 
