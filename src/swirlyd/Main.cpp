@@ -45,8 +45,6 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-mg_serve_http_opts httpOpts;
-
 volatile sig_atomic_t sig_{0};
 
 void sigHandler(int sig) noexcept
@@ -220,13 +218,9 @@ int main(int argc, char* argv[])
     MockJourn journ;
     Rest rest{model, journ, getTimeOfDay()};
 
-    mg::RestServ rs{rest, httpOpts};
+    mg::RestServ rs{rest};
     auto& conn = rs.bind(opts.httpPort);
     mg_set_protocol_http_websocket(&conn);
-
-    httpOpts.document_root = ".";
-    httpOpts.dav_document_root = ".";
-    httpOpts.enable_directory_listing = "yes";
 
     SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << opts.httpPort);
 
