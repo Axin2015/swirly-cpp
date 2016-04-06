@@ -56,6 +56,8 @@ class SWIRLY_API Request : public RefCounted {
   Request(Request&&);
   Request& operator=(Request&&) = delete;
 
+  virtual void toJson(std::ostream& os) const;
+
   auto trader() const noexcept { return +trader_; }
   auto market() const noexcept { return +market_; }
   auto contr() const noexcept { return +contr_; }
@@ -83,6 +85,12 @@ class SWIRLY_API Request : public RefCounted {
   Lots lots_;
   const Millis created_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Request& request)
+{
+  request.toJson(os);
+  return os;
+}
 
 using RequestPtr = boost::intrusive_ptr<Request>;
 

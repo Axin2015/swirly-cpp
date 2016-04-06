@@ -1,11 +1,6 @@
 # Mongoose does not compile with strict aliasing.
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing")
 
-# Use epoll() on Linux.
-IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  ADD_DEFINITIONS(-DMG_MGR_EV_MGR=1)
-ENDIF()
-
 IF(MG_ENABLE_DEBUG)
   ADD_DEFINITIONS(-DMG_ENABLE_DEBUG)
 ELSE()

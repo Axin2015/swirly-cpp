@@ -16,10 +16,38 @@
  */
 #include <swirly/elm/Request.hpp>
 
+#include <swirly/ash/JulianDay.hpp>
+
+using namespace std;
+
 namespace swirly {
 
 Request::~Request() noexcept = default;
 
 Request::Request(Request&&) = default;
+
+void Request::toJson(ostream& os) const
+{
+  os << "{\"trader\":\"" << trader_ //
+     << "\",\"market\":\"" << market_ //
+     << "\",\"contr\":\"" << contr_ //
+     << "\",\"settlDate\":";
+  if (settlDay_ != 0_jd) {
+    os << jdToIso(settlDay_);
+  } else {
+    os << "null";
+  }
+  os << ",\"id\":" << id_ //
+     << ",\"ref\":";
+  if (!ref_.empty()) {
+    os << '"' << ref_ << '"';
+  } else {
+    os << "null";
+  }
+  os << ",\"side\":\"" << side_ //
+     << "\",\"lots\":" << lots_ //
+     << ",\"created\":" << created_ //
+     << '}';
+}
 
 } // swirly

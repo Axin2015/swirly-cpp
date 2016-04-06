@@ -460,7 +460,18 @@ void RestServ::orderRequest(mg::HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/sess/order/MARKET
       state_ |= MatchMethod;
-      rest_.postOrder(market, now, out_);
+
+      auto trader = data.header(authUser_);
+      if (trader.empty()) {
+        throw UnauthorizedException{"authorisation required"_sv};
+      }
+      constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
+      constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
+      if (!request_.valid(reqFields, optFields)) {
+        throw InvalidException{"request fields are invalid"_sv};
+      }
+      rest_.postOrder(trader, market, request_.ref(), request_.side(), request_.lots(),
+                      request_.ticks(), request_.minLots(), now, out_);
       break;
     }
     return;

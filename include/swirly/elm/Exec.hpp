@@ -64,6 +64,8 @@ class SWIRLY_API Exec : public Request {
   Exec(Exec&&);
   Exec& operator=(Exec&&) = delete;
 
+  void toJson(std::ostream& os) const override;
+
   Iden orderId() const noexcept { return orderId_; }
   State state() const noexcept { return state_; }
   Ticks ticks() const noexcept { return ticks_; }

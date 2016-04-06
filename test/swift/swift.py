@@ -72,7 +72,7 @@ class Fixture(object):
   prog = getProg()
 
   def __init__(self):
-    temp = tempfile.NamedTemporaryFile()
+    temp = tempfile.NamedTemporaryFile(delete = True)
     proc = None
     try:
       proc = Process(Fixture.prog, 3, temp.name, Fixture.port)
@@ -114,6 +114,7 @@ class Connection(object):
 
   def __init__(self):
     self.conn = httplib.HTTPConnection('localhost', Fixture.port)
+    self.user = None
 
   def __enter__(self):
     return self
@@ -124,6 +125,12 @@ class Connection(object):
   def close(self):
     self.conn.close()
 
+  def login(self, user):
+    self.user = user
+
+  def logout(self):
+    self.user = None
+
   def send(self, method, uri, **kwargs):
     content = ''
     if kwargs is not None:
@@ -131,6 +138,8 @@ class Connection(object):
     conn = self.conn
     conn.putrequest(method, uri)
     conn.putheader('Accept', 'application/json')
+    if self.user is not None:
+      conn.putheader('Auth-User', self.user)
     conn.putheader('Content-Length', len(content))
     conn.putheader('Content-Type', 'application/json')
     conn.endheaders()

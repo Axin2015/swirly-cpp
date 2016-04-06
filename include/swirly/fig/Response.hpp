@@ -48,16 +48,14 @@ class SWIRLY_API Response {
   Response(Response&&) noexcept;
   Response& operator=(Response&&) noexcept;
 
+  void toJson(std::ostream& os) const;
+
   const MarketBook& book() const noexcept { return *book_; }
   const Orders& orders() const noexcept { return orders_; }
   const Execs& execs() const noexcept { return execs_; }
 
-  void reset(const MarketBook& book) noexcept
-  {
-    book_ = &book;
-    clearAll();
-  }
-  void clearAll() noexcept;
+  void setBook(const MarketBook& book) noexcept { book_ = &book; }
+  void clear() noexcept;
 
   void clearMatches() noexcept;
 
@@ -75,6 +73,12 @@ class SWIRLY_API Response {
   Execs execs_;
   PosnPtr posn_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Response& resp)
+{
+  resp.toJson(os);
+  return os;
+}
 
 } // swirly
 

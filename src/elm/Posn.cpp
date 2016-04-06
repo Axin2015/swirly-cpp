@@ -16,11 +16,40 @@
  */
 #include <swirly/elm/Posn.hpp>
 
+#include <swirly/ash/JulianDay.hpp>
+
+using namespace std;
+
 namespace swirly {
 
 Posn::~Posn() noexcept = default;
 
 Posn::Posn(Posn&&) = default;
+
+void Posn::toJson(ostream& os) const
+{
+  os << "{\"trader\":\"" << trader_ //
+     << "\",\"contr\":\"" << contr_ //
+     << "\",\"settlDate\":";
+  if (settlDay_ != 0_jd) {
+    os << jdToIso(settlDay_);
+  } else {
+    os << "null";
+  }
+  if (buyLots_ != 0_lts) {
+    os << ",\"buyLots\":" << buyLots_ //
+       << ",\"buyCost\":" << buyCost_;
+  } else {
+    os << ",\"buyLots\":0,\"buyCost\":0";
+  }
+  if (sellLots_ != 0_lts) {
+    os << ",\"sellLots\":" << sellLots_ //
+       << ",\"sellCost\":" << sellCost_;
+  } else {
+    os << ",\"sellLots\":0,\"sellCost\":0";
+  }
+  os << '}';
+}
 
 TraderPosnSet::~TraderPosnSet() noexcept
 {

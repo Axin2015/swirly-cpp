@@ -16,11 +16,57 @@
  */
 #include <swirly/elm/Order.hpp>
 
+#include <swirly/ash/JulianDay.hpp>
+
+using namespace std;
+
 namespace swirly {
 
 Order::~Order() noexcept = default;
 
 Order::Order(Order&&) = default;
+
+void Order::toJson(ostream& os) const
+{
+  os << "{\"trader\":\"" << trader_ //
+     << "\",\"market\":\"" << market_ //
+     << "\",\"contr\":\"" << contr_ //
+     << "\",\"settlDate\":";
+  if (settlDay_ != 0_jd) {
+    os << jdToIso(settlDay_);
+  } else {
+    os << "null";
+  }
+  os << ",\"id\":" << id_ //
+     << ",\"ref\":";
+  if (!ref_.empty()) {
+    os << '"' << ref_ << '"';
+  } else {
+    os << "null";
+  }
+  os << ",\"state\":\"" << state_ //
+     << "\",\"side\":\"" << side_ //
+     << "\",\"lots\":" << lots_ //
+     << ",\"ticks\":" << ticks_ //
+     << ",\"resd\":" << resd_ //
+     << ",\"exec\":" << exec_ //
+     << ",\"cost\":" << cost_;
+  if (lastLots_ != 0_lts) {
+    os << ",\"lastLots\":" << lastLots_ //
+       << ",\"lastTicks\":" << lastTicks_;
+  } else {
+    os << ",\"lastLots\":null,\"lastTicks\":null";
+  }
+  os << ",\"minLots\":";
+  if (minLots_ != 0_lts) {
+    os << minLots_;
+  } else {
+    os << "null";
+  }
+  os << ",\"created\":" << created_ //
+     << ",\"modified\":" << modified_ //
+     << '}';
+}
 
 OrderRefSet::~OrderRefSet() noexcept
 {

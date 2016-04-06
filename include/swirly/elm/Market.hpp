@@ -55,7 +55,7 @@ class SWIRLY_API Market : public Rec {
   void setState(MarketState state) noexcept { state_ = state; }
   boost::intrusive::set_member_hook<> mnemHook_;
 
- private:
+ protected:
   const Mnem contr_;
   const Jday settlDay_;
   const Jday expiryDay_;

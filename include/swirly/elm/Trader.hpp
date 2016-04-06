@@ -48,7 +48,7 @@ class SWIRLY_API Trader : public Rec {
   auto email() const noexcept { return +email_; }
   boost::intrusive::set_member_hook<> mnemHook_;
 
- private:
+ protected:
   const Email email_;
 };
 

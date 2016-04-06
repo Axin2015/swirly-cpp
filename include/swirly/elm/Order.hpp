@@ -63,6 +63,8 @@ class SWIRLY_API Order : public Request {
   Order(Order&&);
   Order& operator=(Order&&) = delete;
 
+  void toJson(std::ostream& os) const override;
+
   Level* level() const noexcept { return level_; }
   State state() const noexcept { return state_; }
   Ticks ticks() const noexcept { return ticks_; }

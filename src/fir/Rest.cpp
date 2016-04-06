@@ -16,6 +16,7 @@
  */
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/fig/Response.hpp>
 #include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/Exception.hpp>
@@ -272,10 +273,14 @@ void Rest::putTrader(string_view mnem, string_view display, Millis now, ostream&
   out << trader;
 }
 
-void Rest::postOrder(string_view market, Millis now, ostream& out)
+void Rest::postOrder(string_view trader, string_view market, string_view ref, Side side, Lots lots,
+                     Ticks ticks, Lots minLots, Millis now, ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\"}";
+  Response resp;
+  auto& sess = serv_.trader(trader);
+  auto& book = serv_.market(market);
+  serv_.createOrder(sess, book, ref, side, lots, ticks, minLots, now, resp);
+  out << resp;
 }
 
 void Rest::putOrder(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)

@@ -17,8 +17,15 @@
 #include <swirly/fig/Response.hpp>
 
 #include <swirly/elm/Exec.hpp>
+#include <swirly/elm/MarketBook.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
+
+#include <swirly/ash/Stream.hpp>
+
+#include <algorithm> // transform()
+
+using namespace std;
 
 namespace swirly {
 
@@ -34,8 +41,29 @@ Response::Response(Response&&) noexcept = default;
 
 Response& Response::operator=(Response&&) noexcept = default;
 
-void Response::clearAll() noexcept
+void Response::toJson(ostream& os) const
 {
+  os << "{\"orders\":[";
+  transform(orders_.begin(), orders_.end(), OStreamJoiner(os, ','),
+            [](const auto& ptr) -> const auto& { return *ptr; });
+  os << "],\"execs\":[";
+  transform(execs_.begin(), execs_.end(), OStreamJoiner(os, ','),
+            [](const auto& ptr) -> const auto& { return *ptr; });
+  os << "],\"posn\":";
+  if (posn_) {
+    os << *posn_;
+  } else {
+    os << "null";
+  }
+  os << ",\"view\":";
+  assert(book_);
+  book_->toJsonView(os);
+  os << '}';
+}
+
+void Response::clear() noexcept
+{
+  book_ = nullptr;
   orders_.clear();
   execs_.clear();
   posn_ = nullptr;
