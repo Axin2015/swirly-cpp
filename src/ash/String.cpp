@@ -20,9 +20,9 @@ using namespace std;
 
 namespace swirly {
 
-unsigned long stoul(string_view sv) noexcept
+uint64_t stou64(string_view sv) noexcept
 {
-  long l{0};
+  uint64_t l{0};
   auto it = sv.begin(), end = sv.end();
 
   // Skip leading whitespace.

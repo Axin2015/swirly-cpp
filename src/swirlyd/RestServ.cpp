@@ -34,7 +34,7 @@ namespace {
 Millis getSwirlyTime(HttpMessage data) noexcept
 {
   auto header = data.header("Swirly-Time");
-  return header.empty() ? getTimeOfDay() : box<Millis>(stoul(header));
+  return header.empty() ? getTimeOfDay() : box<Millis>(stou64(header));
 }
 } // anonymous
 
@@ -606,7 +606,7 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto settlDate = box<IsoDate>(stoul(uri_.top()));
+  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
   uri_.pop();
 
   if (uri_.empty()) {
@@ -660,7 +660,7 @@ void RestServ::parseIds(string_view sv) noexcept
   ids_.clear();
   Tokeniser<','> toks{sv};
   while (!toks.empty()) {
-    ids_.push_back(static_cast<Iden>(stoul(toks.top())));
+    ids_.push_back(static_cast<Iden>(stou64(toks.top())));
     toks.pop();
   }
 }
