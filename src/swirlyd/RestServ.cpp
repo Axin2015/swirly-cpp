@@ -30,10 +30,17 @@ using namespace std;
 
 namespace swirly {
 namespace mg {
+namespace {
+Millis getSwirlyTime(HttpMessage data) noexcept
+{
+  auto header = data.header("Swirly-Time");
+  return header.empty() ? getTimeOfDay() : box<Millis>(stoul(header));
+}
+} // anonymous
 
 RestServ::~RestServ() noexcept = default;
 
-void RestServ::reset(mg::HttpMessage data) noexcept
+void RestServ::reset(HttpMessage data) noexcept
 {
   state_ = 0;
 
@@ -57,7 +64,7 @@ void RestServ::reset(mg::HttpMessage data) noexcept
   request_.reset();
 }
 
-void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
+void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
 {
   using namespace chrono;
 
@@ -77,7 +84,7 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
   }
   uri_.pop();
 
-  const auto now = getTimeOfDay();
+  const auto now = getSwirlyTime(data);
   // See mg_send().
   nc.last_io_time = unbox(now) / 1000;
 
@@ -111,7 +118,7 @@ void RestServ::httpRequest(mg_connection& nc, mg::HttpMessage data)
   out_.setContentLength();
 }
 
-void RestServ::restRequest(mg::HttpMessage data, Millis now)
+void RestServ::restRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
     // /api
@@ -133,7 +140,7 @@ void RestServ::restRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::recRequest(mg::HttpMessage data, Millis now)
+void RestServ::recRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -185,7 +192,7 @@ void RestServ::recRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::assetRequest(mg::HttpMessage data, Millis now)
+void RestServ::assetRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -217,7 +224,7 @@ void RestServ::assetRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::contrRequest(mg::HttpMessage data, Millis now)
+void RestServ::contrRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -249,7 +256,7 @@ void RestServ::contrRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::marketRequest(mg::HttpMessage data, Millis now)
+void RestServ::marketRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -317,7 +324,7 @@ void RestServ::marketRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::traderRequest(mg::HttpMessage data, Millis now)
+void RestServ::traderRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -376,7 +383,7 @@ void RestServ::traderRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::sessRequest(mg::HttpMessage data, Millis now)
+void RestServ::sessRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -428,7 +435,7 @@ void RestServ::sessRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::orderRequest(mg::HttpMessage data, Millis now)
+void RestServ::orderRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -461,7 +468,7 @@ void RestServ::orderRequest(mg::HttpMessage data, Millis now)
       // POST /api/sess/order/MARKET
       state_ |= MatchMethod;
 
-      auto trader = data.header(authUser_);
+      auto trader = data.header(httpUser_);
       if (trader.empty()) {
         throw UnauthorizedException{"authorisation required"_sv};
       }
@@ -506,7 +513,7 @@ void RestServ::orderRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::tradeRequest(mg::HttpMessage data, Millis now)
+void RestServ::tradeRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -568,7 +575,7 @@ void RestServ::tradeRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::posnRequest(mg::HttpMessage data, Millis now)
+void RestServ::posnRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -616,7 +623,7 @@ void RestServ::posnRequest(mg::HttpMessage data, Millis now)
   }
 }
 
-void RestServ::viewRequest(mg::HttpMessage data, Millis now)
+void RestServ::viewRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 

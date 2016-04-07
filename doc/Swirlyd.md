@@ -57,14 +57,14 @@ File creation mode mask. The default is 0027 unless the `no-daemon` option is sp
 Http Options
 ------------
 
-### auth-user ###
-
-`-u name`
-
-Http auth-user header. The default is "Auth-User".
-
 ### http-port ###
 
 `-p port`
 
 Http port. Defaults to 8080.
+
+### http-user ###
+
+`-u name`
+
+Http user header. The default is "Swirly-User".

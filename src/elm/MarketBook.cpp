@@ -78,7 +78,7 @@ void MarketBook::toJsonView(ostream& os) const
   const auto& bidLevels = bidSide_.levels();
   os << ",\"bidTicks\":[";
   toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
-              [](const auto& level) { return level.ticks(); });
+               [](const auto& level) { return level.ticks(); });
   os << "],\"bidResd\":[";
   toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
                [](const auto& level) { return level.resd(); });
@@ -89,7 +89,7 @@ void MarketBook::toJsonView(ostream& os) const
   const auto& offerLevels = offerSide_.levels();
   os << "],\"offerTicks\":[";
   toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
-              [](const auto& level) { return level.ticks(); });
+               [](const auto& level) { return level.ticks(); });
   os << "],\"offerResd\":[";
   toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
                [](const auto& level) { return level.resd(); });
