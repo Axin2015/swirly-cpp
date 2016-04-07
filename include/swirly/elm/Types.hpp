@@ -243,15 +243,22 @@ class Contr;
 class Market;
 class Trader;
 
+class Request;
 class Exec;
 class Order;
 class Posn;
-class Quote;
+
+using RequestPtr = boost::intrusive_ptr<Request>;
+using ConstRequestPtr = boost::intrusive_ptr<const Request>;
 
 using ExecPtr = boost::intrusive_ptr<Exec>;
+using ConstExecPtr = boost::intrusive_ptr<const Exec>;
+
 using OrderPtr = boost::intrusive_ptr<Order>;
+using ConstOrderPtr = boost::intrusive_ptr<const Order>;
+
 using PosnPtr = boost::intrusive_ptr<Posn>;
-using QuotePtr = boost::intrusive_ptr<Quote>;
+using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
 } // swirly
 

@@ -126,8 +126,6 @@ inline std::ostream& operator<<(std::ostream& os, const Posn& posn)
   return os;
 }
 
-using PosnPtr = boost::intrusive_ptr<Posn>;
-
 class SWIRLY_API TraderPosnSet {
   using Key = std::tuple<std::string_view, Jday>;
   struct ValueCompare {

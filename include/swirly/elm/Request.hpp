@@ -92,8 +92,6 @@ inline std::ostream& operator<<(std::ostream& os, const Request& request)
   return os;
 }
 
-using RequestPtr = boost::intrusive_ptr<Request>;
-
 /**
  * Request set keyed by market and id. Requests are identified by market and id only, so instances
  * should not be used as heterogeneous Request containers, where Requests of different types may

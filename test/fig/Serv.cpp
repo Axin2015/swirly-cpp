@@ -340,7 +340,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, Fixture)
   SWIRLY_CHECK(resp.orders().size() == 1);
   SWIRLY_CHECK(resp.execs().size() == 1);
 
-  OrderPtr order{resp.orders().front()};
+  ConstOrderPtr order{resp.orders().front()};
   SWIRLY_CHECK(order->trader() == sess.mnem());
   SWIRLY_CHECK(order->market() == book.mnem());
   SWIRLY_CHECK(order->ref().empty());

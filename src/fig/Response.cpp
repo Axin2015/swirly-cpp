@@ -61,6 +61,16 @@ void Response::toJson(ostream& os) const
   os << '}';
 }
 
+ConstPosnPtr Response::posn() const noexcept
+{
+  return posn_;
+}
+
+void Response::setPosn(PosnPtr posn) noexcept
+{
+  posn_ = posn;
+}
+
 void Response::clear() noexcept
 {
   book_ = nullptr;
@@ -80,6 +90,12 @@ void Response::clearMatches() noexcept
   posn_ = nullptr;
 }
 
+void Response::takeOrder(Order& order, Lots lots, Millis now) noexcept
+{
+  assert(book_);
+  book_->takeOrder(order, lots, now);
+}
+
 void Response::reserveOrders(size_t capacity)
 {
   orders_.reserve(capacity);
@@ -90,14 +106,20 @@ void Response::reserveExecs(size_t capacity)
   execs_.reserve(capacity);
 }
 
-void Response::insertOrder(const OrderPtr& order)
+void Response::insertOrder(ConstOrderPtr order)
 {
   orders_.push_back(order);
 }
 
-void Response::insertExec(const ExecPtr& exec)
+void Response::insertExec(ConstExecPtr exec)
 {
   execs_.push_back(exec);
+}
+
+void Response::addTrade(const Exec& trade) noexcept
+{
+  assert(posn_);
+  posn_->addTrade(trade);
 }
 
 } // swirly

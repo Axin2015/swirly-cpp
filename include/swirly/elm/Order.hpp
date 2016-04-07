@@ -151,7 +151,6 @@ class SWIRLY_API Order : public Request {
   Millis modified_;
 };
 
-using OrderPtr = boost::intrusive_ptr<Order>;
 using OrderIdSet = RequestIdSet<Order>;
 
 class SWIRLY_API OrderRefSet {
