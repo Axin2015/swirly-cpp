@@ -88,6 +88,9 @@ class SWIRLY_API Serv {
   void createOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);
 
+  void reviseOrder(TraderSess& sess, MarketBook& book, Order& order, Lots lots, Millis now,
+                   Response& resp);
+
   void reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
                    Response& resp);
 

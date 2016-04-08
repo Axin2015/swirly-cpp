@@ -17,6 +17,7 @@
 #ifndef SWIRLY_ELM_TRADERSESS_HPP
 #define SWIRLY_ELM_TRADERSESS_HPP
 
+#include <swirly/elm/Exception.hpp>
 #include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
@@ -52,6 +53,25 @@ class SWIRLY_API TraderSess : public Trader {
   TraderSess(TraderSess&&);
   TraderSess& operator=(TraderSess&&) = delete;
 
+  const auto& orders() const noexcept { return orders_; }
+  const auto& trades() const noexcept { return trades_; }
+  const auto& posns() const noexcept { return posns_; }
+  Order& order(std::string_view market, Iden id) noexcept
+  {
+    auto it = orders_.find(market, id);
+    if (it == orders_.end()) {
+      throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
+    }
+    return *it;
+  }
+  Order& order(std::string_view ref) noexcept
+  {
+    auto it = refIdx_.find(ref);
+    if (it == refIdx_.end()) {
+      throw OrderNotFoundException{errMsg() << "order '" << ref << "' does not exist"};
+    }
+    return *it;
+  }
   void insertOrder(const OrderPtr& order) noexcept
   {
     assert(order->trader() == mnem_);

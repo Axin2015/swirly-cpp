@@ -402,6 +402,9 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     impl_->journ.createExec(book.mnem(), makeArrayView(execs, len));
     success = true;
   }
+
+  resp.setBook(book);
+
   // Avoid allocating position when there are no matches.
   if (!matches.empty()) {
     // Avoid allocating position when there are no matches.
@@ -409,7 +412,6 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     resp.setPosn(sess.lazyPosn(book.contr(), book.settlDay()));
   }
 
-  resp.setBook(book);
   // New order plus updated order for each match assuming crossed with self.
   resp.reserveOrders(1 + matches.size());
   // New execution plus 2 trade executions for each match assuming crossed with self.
@@ -433,14 +435,47 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
   }
 }
 
+void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Order& order, Lots lots, Millis now,
+                       Response& resp)
+{
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  // Revised lots must not be:
+  // 1. greater than original lots;
+  // 2. less than executed lots;
+  // 3. less than min lots.
+  if (lots == 0_lts //
+      || lots > order.lots() //
+      || lots < order.exec() //
+      || lots < order.minLots()) {
+    throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
+  }
+  auto exec = impl_->newExec(book, order, now);
+  exec->revise(lots);
+  resp.setBook(book);
+  resp.insertOrder(&order);
+  resp.insertExec(exec);
+
+  impl_->journ.createExec(*exec);
+
+  // Commit phase.
+
+  book.reviseOrder(order, lots, now);
+}
+
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
                        Response& resp)
 {
+  auto& order = sess.order(book.mnem(), id);
+  reviseOrder(sess, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, string_view ref, Lots lots, Millis now,
                        Response& resp)
 {
+  auto& order = sess.order(ref);
+  reviseOrder(sess, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Lots lots,

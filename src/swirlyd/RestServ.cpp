@@ -500,18 +500,19 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/sess/order/MARKET
       state_ |= MatchMethod;
-
-      auto trader = data.header(httpUser_);
-      if (trader.empty()) {
-        throw UnauthorizedException{"authorisation required"_sv};
+      {
+        auto trader = data.header(httpUser_);
+        if (trader.empty()) {
+          throw UnauthorizedException{"authorisation required"_sv};
+        }
+        constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
+        constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postOrder(trader, market, request_.ref(), request_.side(), request_.lots(),
+                        request_.ticks(), request_.minLots(), now, out_);
       }
-      constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
-      constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
-      if (!request_.valid(reqFields, optFields)) {
-        throw InvalidException{"request fields are invalid"_sv};
-      }
-      rest_.postOrder(trader, market, request_.ref(), request_.side(), request_.lots(),
-                      request_.ticks(), request_.minLots(), now, out_);
       break;
     }
     return;
@@ -534,7 +535,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     case MethodPut:
       // PUT /api/sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.putOrder(market, ids(), now, out_);
+      {
+        auto trader = data.header(httpUser_);
+        if (trader.empty()) {
+          throw UnauthorizedException{"authorisation required"_sv};
+        }
+        constexpr auto reqFields = RestRequest::Lots;
+        if (!request_.valid(reqFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.putOrder(trader, market, ids(), request_.lots(), now, out_);
+      }
       break;
     case MethodDelete:
       // DELETE /api/sess/order/MARKET/ID,ID...

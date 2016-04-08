@@ -283,12 +283,22 @@ void Rest::postOrder(string_view trader, string_view market, string_view ref, Si
   out << resp;
 }
 
-void Rest::putOrder(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)
+void Rest::putOrder(string_view trader, string_view market, ArrayView<Iden> ids, Lots lots,
+                    Millis now, ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\",\"ids\":[";
-  copy(ids.begin(), ids.end(), OStreamJoiner(out, ','));
-  out << "]}";
+  Response resp;
+  auto& sess = serv_.trader(trader);
+  auto& book = serv_.market(market);
+  if (lots > 0_lts) {
+    if (ids.size() == 1) {
+      serv_.reviseOrder(sess, book, ids[0], lots, now, resp);
+    } else {
+      serv_.reviseOrder(sess, book, ids, lots, now, resp);
+    }
+  } else {
+    serv_.cancelOrder(sess, book, ids, now, resp);
+  }
+  out << resp;
 }
 
 void Rest::deleteOrder(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)

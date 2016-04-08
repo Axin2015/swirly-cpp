@@ -33,7 +33,6 @@ class TestCase(unittest.TestCase):
 
   def testSess(self):
     with Connection() as conn:
-      self.assertEqual(conn.send('PUT', '/api/sess/order/EURUSD/1,2,3').status, 200)
       self.assertEqual(conn.send('DELETE', '/api/sess/order/EURUSD/1,2,3').status, 200)
       self.assertEqual(conn.send('POST', '/api/sess/trade/EURUSD').status, 200)
       self.assertEqual(conn.send('DELETE', '/api/sess/trade/EURUSD/1,2,3').status, 200)
