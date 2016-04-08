@@ -135,8 +135,9 @@ class SWIRLY_API Serv {
 
   void archiveOrder(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
 
-  ExecPtr createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
-                      Lots lots, Ticks ticks, Role role, std::string_view cpty, Millis created);
+  ConstExecPtr createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
+                           Lots lots, Ticks ticks, Role role, std::string_view cpty,
+                           Millis created);
 
   void archiveTrade(TraderSess& sess, Exec& trade, Millis now);
 

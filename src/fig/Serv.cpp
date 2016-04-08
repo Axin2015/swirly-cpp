@@ -490,8 +490,8 @@ void Serv::archiveOrder(TraderSess& sess, string_view market, ArrayView<Iden> id
 {
 }
 
-ExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side, Lots lots,
-                          Ticks ticks, Role role, string_view cpty, Millis created)
+ConstExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side,
+                               Lots lots, Ticks ticks, Role role, string_view cpty, Millis created)
 {
   return {};
 }
