@@ -75,12 +75,12 @@ mode_t getMask()
 }
 
 struct Opts {
-  const char* authUser{"Auth-User"};
+  bool daemon{true};
   fs::path directory;
   const char* httpPort{"8080"};
+  const char* httpUser{"Swirly-User"};
   fs::path logFile;
   const char* mask{nullptr};
-  bool daemon{true};
 };
 
 void printUsage(ostream& os)
@@ -94,8 +94,8 @@ Options:
   -l path           Write to log-file. Specify '-' for default path.
   -n                Do not daemonise. I.e. run in the foreground.
   -m mode           File creation mode mask. Default is 0027 unless -n.
-  -u name           Http auth-user header. Default is 'Auth-User'.
   -p port           Http port. Default is 8080.
+  -u name           Http user header. Default is 'Swirly-User'.
 
 Report bugs to: support@swirlycloud.com
 )==";
@@ -134,7 +134,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
       opts.httpPort = optarg;
       break;
     case 'u':
-      opts.authUser = optarg;
+      opts.httpUser = optarg;
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
@@ -218,19 +218,19 @@ int main(int argc, char* argv[])
     MockJourn journ;
     Rest rest{model, journ, getTimeOfDay()};
 
-    mg::RestServ rs{rest, opts.authUser};
+    mg::RestServ rs{rest, opts.httpUser};
     auto& conn = rs.bind(opts.httpPort);
     mg_set_protocol_http_websocket(&conn);
 
     SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << opts.httpPort);
 
-    SWIRLY_INFO(logMsg() << "auth-user: " << opts.authUser);
+    SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
     SWIRLY_INFO(logMsg() << "directory: " << opts.directory);
     SWIRLY_INFO(logMsg() << "http-port: " << opts.httpPort);
+    SWIRLY_INFO(logMsg() << "http-user: " << opts.httpUser);
     SWIRLY_INFO(logMsg() << "log-file:  " << opts.logFile);
     SWIRLY_INFO(logMsg() << "log-level: " << getLogLevel());
-    SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
-    SWIRLY_INFO(logMsg() << "umask:     0" << setfill('0') << setw(3) << oct << getMask());
+    SWIRLY_INFO(logMsg() << "mask:     0" << setfill('0') << setw(3) << oct << getMask());
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);

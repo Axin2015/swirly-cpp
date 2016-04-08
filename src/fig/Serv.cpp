@@ -157,14 +157,13 @@ struct Serv::Impl {
   // responsible for committing a transaction, so it is particularly important that it does not
   // throw. This function also assumes that sufficient capacity has been reserved in the response
   // object, so that no memory allocations take place.
-  void commitMatches(TraderSess& takerSess, MarketBook& book, Posn& takerPosn, Millis now,
-                     Response& resp) noexcept
+  void commitMatches(TraderSess& takerSess, Millis now, Response& resp) noexcept
   {
     for (const auto& match : matches) {
       const auto makerOrder = match.makerOrder;
       assert(makerOrder);
       // Reduce maker.
-      book.takeOrder(*makerOrder, match.lots, now);
+      resp.takeOrder(*makerOrder, match.lots, now);
       // Must succeed because maker order exists.
       auto it = traders.find(makerOrder->trader());
       assert(it != traders.end());
@@ -179,7 +178,7 @@ struct Serv::Impl {
       const auto takerTrade = match.takerTrade;
       assert(takerTrade);
       takerSess.insertTrade(takerTrade);
-      takerPosn.addTrade(*takerTrade);
+      resp.addTrade(*takerTrade);
 
       // Insert order if trade crossed with self.
       if (makerOrder->trader() == takerSess.mnem()) {
@@ -188,7 +187,7 @@ struct Serv::Impl {
         // N.B. the reference count is not incremented here.
         resp.insertExec(match.makerTrade);
       }
-      resp.insertExec(match.takerTrade);
+      resp.insertExec(takerTrade);
     }
   }
 
@@ -404,11 +403,10 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     success = true;
   }
   // Avoid allocating position when there are no matches.
-  PosnPtr posn;
   if (!matches.empty()) {
     // Avoid allocating position when there are no matches.
     // N.B. before commit phase, because this may fail.
-    posn = sess.lazyPosn(book.contr(), book.settlDay());
+    resp.setPosn(sess.lazyPosn(book.contr(), book.settlDay()));
   }
 
   resp.setBook(book);
@@ -430,8 +428,8 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
 
   // Commit matches.
   if (!matches.empty()) {
-    assert(posn);
-    impl_->commitMatches(sess, book, *posn, now, resp);
+    assert(resp.posn());
+    impl_->commitMatches(sess, now, resp);
   }
 }
 

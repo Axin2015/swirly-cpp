@@ -41,14 +41,16 @@ class MarketTest(unittest.TestCase):
                        settlDate = 20170102,
                        expiryDate = 20170101,
                        state = 1)
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
-      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
-      self.assertEqual(resp.content['display'], 'first')
-      self.assertEqual(resp.content['contr'], 'USDJPY')
-      self.assertEqual(resp.content['settlDate'], 20170102)
-      self.assertEqual(resp.content['expiryDate'], 20170101)
-      self.assertEqual(resp.content['state'], 1)
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'contr': u'USDJPY',
+        u'display': u'first',
+        u'expiryDate': 20170101,
+        u'mnem': u'USDJPY.MAR14',
+        u'settlDate': 20170102,
+        u'state': 1
+      }, resp.content)
 
   def testPutMarket(self):
     with Connection() as conn:
@@ -57,40 +59,46 @@ class MarketTest(unittest.TestCase):
       resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
                        display = 'second',
                        state = 2)
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
-      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
-      self.assertEqual(resp.content['display'], 'second')
-      self.assertEqual(resp.content['contr'], 'USDJPY')
-      self.assertEqual(resp.content['settlDate'], 20170102)
-      self.assertEqual(resp.content['expiryDate'], 20170101)
-      self.assertEqual(resp.content['state'], 2)
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'contr': u'USDJPY',
+        u'display': u'second',
+        u'expiryDate': 20170101,
+        u'mnem': u'USDJPY.MAR14',
+        u'settlDate': 20170102,
+        u'state': 2
+      }, resp.content)
 
       # Update display only.
       resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
                        display = 'third',
                        state = None)
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
-      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
-      self.assertEqual(resp.content['display'], 'third')
-      self.assertEqual(resp.content['contr'], 'USDJPY')
-      self.assertEqual(resp.content['settlDate'], 20170102)
-      self.assertEqual(resp.content['expiryDate'], 20170101)
-      self.assertEqual(resp.content['state'], 2)
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'contr': u'USDJPY',
+        u'display': u'third',
+        u'expiryDate': 20170101,
+        u'mnem': u'USDJPY.MAR14',
+        u'settlDate': 20170102,
+        u'state': 2
+      }, resp.content)
 
       # Update state only.
       resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
                        display = None,
                        state = 3)
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
-      self.assertEqual(resp.content['mnem'], 'USDJPY.MAR14')
-      self.assertEqual(resp.content['display'], 'third')
-      self.assertEqual(resp.content['contr'], 'USDJPY')
-      self.assertEqual(resp.content['settlDate'], 20170102)
-      self.assertEqual(resp.content['expiryDate'], 20170101)
-      self.assertEqual(resp.content['state'], 3)
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'contr': u'USDJPY',
+        u'display': u'third',
+        u'expiryDate': 20170101,
+        u'mnem': u'USDJPY.MAR14',
+        u'settlDate': 20170102,
+        u'state': 3
+      }, resp.content)
 
 class TraderTest(unittest.TestCase):
 
@@ -109,22 +117,26 @@ class TraderTest(unittest.TestCase):
                        mnem = 'MARAYL2',
                        display = 'Mark Aylettx',
                        email = 'mark.aylett@swirlycloud.com')
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
-      self.assertEqual(resp.content['mnem'], 'MARAYL2')
-      self.assertEqual(resp.content['display'], 'Mark Aylettx')
-      self.assertEqual(resp.content['email'], 'mark.aylett@swirlycloud.com')
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'display': u'Mark Aylettx',
+        u'email': u'mark.aylett@swirlycloud.com',
+        u'mnem': u'MARAYL2'
+      }, resp.content)
 
   def testPutTrader(self):
     with Connection() as conn:
 
       resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
                        display = 'Mark Aylett')
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
-      self.assertEqual(resp.content['mnem'], 'MARAYL2')
-      self.assertEqual(resp.content['display'], 'Mark Aylett')
-      self.assertEqual(resp.content['email'], 'mark.aylett@swirlycloud.com')
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'display': u'Mark Aylett',
+        u'email': u'mark.aylett@swirlycloud.com',
+        u'mnem': u'MARAYL2'
+      }, resp.content)
 
 class OrderTest(unittest.TestCase):
 
@@ -146,16 +158,215 @@ class OrderTest(unittest.TestCase):
     cls = None
 
   def testPostOrder(self):
+    now = 1459974268204
     with Connection() as conn:
-      conn.login('MARAYL')
+      conn.setUser('MARAYL')
+      conn.setTime(now)
       resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
                        side = 'BUY',
                        lots = 1,
                        ticks = 12345
       )
-      print(resp)
-      self.assertEqual(resp.status, 200)
-      self.assertEqual(resp.reason, 'OK')
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'execs': [{
+          u'contr': u'USDJPY',
+          u'cost': 0,
+          u'cpty': None,
+          u'created': now,
+          u'exec': 0,
+          u'id': 1,
+          u'lastLots': None,
+          u'lastTicks': None,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'matchId': None,
+          u'minLots': None,
+          u'orderId': 1,
+          u'ref': None,
+          u'resd': 1,
+          u'role': None,
+          u'settlDate': 20170102,
+          u'side': u'BUY',
+          u'state': u'NEW',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }],
+        u'orders': [{
+          u'contr': u'USDJPY',
+          u'cost': 0,
+          u'created': now,
+          u'exec': 0,
+          u'id': 1,
+          u'lastLots': None,
+          u'lastTicks': None,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'minLots': None,
+          u'modified': now,
+          u'ref': None,
+          u'resd': 1,
+          u'settlDate': 20170102,
+          u'side': u'BUY',
+          u'state': u'NEW',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }],
+        u'posn': None,
+        u'view': {
+          u'bidCount': [1, None, None],
+          u'bidResd': [1, None, None],
+          u'bidTicks': [12345, None, None],
+          u'contr': u'USDJPY',
+          u'lastLots': None,
+          u'lastTicks': None,
+          u'lastTime': None,
+          u'market': u'USDJPY.MAR14',
+          u'offerCount': [None, None, None],
+          u'offerResd': [None, None, None],
+          u'offerTicks': [None, None, None],
+          u'settlDate': 20170102
+        }
+      }, resp.content)
+      resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
+                       side = 'SELL',
+                       lots = 1,
+                       ticks = 12345
+      )
+      self.assertEqual(200, resp.status)
+      self.assertEqual('OK', resp.reason)
+      self.assertDictEqual({
+        u'execs': [{
+          u'contr': u'USDJPY',
+          u'cost': 0,
+          u'cpty': None,
+          u'created': now,
+          u'exec': 0,
+          u'id': 2,
+          u'lastLots': None,
+          u'lastTicks': None,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'matchId': None,
+          u'minLots': None,
+          u'orderId': 2,
+          u'ref': None,
+          u'resd': 1,
+          u'role': None,
+          u'settlDate': 20170102,
+          u'side': u'SELL',
+          u'state': u'NEW',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }, {
+          u'contr': u'USDJPY',
+          u'cost': 12345,
+          u'cpty': u'MARAYL',
+          u'created': now,
+          u'exec': 1,
+          u'id': 3,
+          u'lastLots': 1,
+          u'lastTicks': 12345,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'matchId': 4,
+          u'minLots': None,
+          u'orderId': 1,
+          u'ref': None,
+          u'resd': 0,
+          u'role': u'MAKER',
+          u'settlDate': 20170102,
+          u'side': u'BUY',
+          u'state': u'TRADE',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }, {
+          u'contr': u'USDJPY',
+          u'cost': 12345,
+          u'cpty': u'MARAYL',
+          u'created': now,
+          u'exec': 1,
+          u'id': 4,
+          u'lastLots': 1,
+          u'lastTicks': 12345,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'matchId': 3,
+          u'minLots': None,
+          u'orderId': 2,
+          u'ref': None,
+          u'resd': 0,
+          u'role': u'TAKER',
+          u'settlDate': 20170102,
+          u'side': u'SELL',
+          u'state': u'TRADE',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }],
+        u'orders': [{
+          u'contr': u'USDJPY',
+          u'cost': 12345,
+          u'created': now,
+          u'exec': 1,
+          u'id': 2,
+          u'lastLots': 1,
+          u'lastTicks': 12345,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'minLots': None,
+          u'modified': now,
+          u'ref': None,
+          u'resd': 0,
+          u'settlDate': 20170102,
+          u'side': u'SELL',
+          u'state': u'TRADE',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }, {
+          u'contr': u'USDJPY',
+          u'cost': 12345,
+          u'created': now,
+          u'exec': 1,
+          u'id': 1,
+          u'lastLots': 1,
+          u'lastTicks': 12345,
+          u'lots': 1,
+          u'market': u'USDJPY.MAR14',
+          u'minLots': None,
+          u'modified': now,
+          u'ref': None,
+          u'resd': 0,
+          u'settlDate': 20170102,
+          u'side': u'BUY',
+          u'state': u'TRADE',
+          u'ticks': 12345,
+          u'trader': u'MARAYL'
+        }],
+        u'posn': {
+          u'buyCost': 12345,
+          u'buyLots': 1,
+          u'contr': u'USDJPY',
+          u'sellCost': 12345,
+          u'sellLots': 1,
+          u'settlDate': 20170102,
+          u'trader': u'MARAYL'
+        },
+        u'view': {
+          u'bidCount': [None, None, None],
+          u'bidResd': [None, None, None],
+          u'bidTicks': [None, None, None],
+          u'contr': u'USDJPY',
+          u'lastLots': 1,
+          u'lastTicks': 12345,
+          u'lastTime': now,
+          u'market': u'USDJPY.MAR14',
+          u'offerCount': [None, None, None],
+          u'offerResd': [None, None, None],
+          u'offerTicks': [None, None, None],
+          u'settlDate': 20170102
+        }
+      }, resp.content)
 
 class SwirlyTest(unittest.TestCase):
 
@@ -177,4 +388,5 @@ class SwirlyTest(unittest.TestCase):
       self.assertEqual(conn.send('DELETE', '/api/sess/trade/EURUSD/1,2,3').status, 200)
 
 if __name__ == '__main__':
+  unittest.TestCase.maxDiff = None
   unittest.main()

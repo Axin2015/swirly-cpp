@@ -81,17 +81,18 @@ SWIRLY_TEST_CASE(StringToString)
   SWIRLY_CHECK(stod(toString(12345.67)) == 12345.67);
 }
 
-SWIRLY_TEST_CASE(Stoul)
+SWIRLY_TEST_CASE(Stou64)
 {
-  SWIRLY_CHECK(stoul(""_sv) == 0UL);
-  SWIRLY_CHECK(stoul("1"_sv) == 1UL);
-  SWIRLY_CHECK(stoul("123"_sv) == 123UL);
-  SWIRLY_CHECK(stoul(" "_sv) == 0UL);
-  SWIRLY_CHECK(stoul(" 1 "_sv) == 1UL);
-  SWIRLY_CHECK(stoul(" 123 "_sv) == 123UL);
-  SWIRLY_CHECK(stoul("x"_sv) == 0UL);
-  SWIRLY_CHECK(stoul(" 1x"_sv) == 1UL);
-  SWIRLY_CHECK(stoul(" 123x"_sv) == 123UL);
-  SWIRLY_CHECK(stoul("x1 "_sv) == 0UL);
-  SWIRLY_CHECK(stoul("x123 "_sv) == 0UL);
+  SWIRLY_CHECK(stou64(""_sv) == 0UL);
+  SWIRLY_CHECK(stou64("1"_sv) == 1UL);
+  SWIRLY_CHECK(stou64("123"_sv) == 123UL);
+  SWIRLY_CHECK(stou64(" "_sv) == 0UL);
+  SWIRLY_CHECK(stou64(" 1 "_sv) == 1UL);
+  SWIRLY_CHECK(stou64(" 123 "_sv) == 123UL);
+  SWIRLY_CHECK(stou64("x"_sv) == 0UL);
+  SWIRLY_CHECK(stou64(" 1x"_sv) == 1UL);
+  SWIRLY_CHECK(stou64(" 123x"_sv) == 123UL);
+  SWIRLY_CHECK(stou64("x1 "_sv) == 0UL);
+  SWIRLY_CHECK(stou64("x123 "_sv) == 0UL);
+  SWIRLY_CHECK(stou64("18446744073709551615"_sv) == 18446744073709551615ULL);
 }

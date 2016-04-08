@@ -128,7 +128,6 @@ class SWIRLY_API Exec : public Request {
   Mnem cpty_;
 };
 
-using ExecPtr = boost::intrusive_ptr<Exec>;
 using ExecIdSet = RequestIdSet<Exec>;
 
 } // swirly
