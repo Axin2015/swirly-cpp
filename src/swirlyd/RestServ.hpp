@@ -23,6 +23,7 @@
 #include <swirly/fir/RestRequest.hpp>
 
 #include <swirly/ash/Array.hpp>
+#include <swirly/ash/Math.hpp>
 #include <swirly/ash/Tokeniser.hpp>
 
 #include <vector>
@@ -100,6 +101,7 @@ class RestServ : public mg::Mgr<RestServ> {
   std::vector<Iden> ids_;
   RestRequest request_;
   mg::OStream out_;
+  VarAccum stat_;
 };
 
 } // mg
