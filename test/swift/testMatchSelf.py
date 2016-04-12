@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The Restful Matching-Engine.
 # Copyright (C) 2013, 2016 Swirly Cloud Limited.
 #
@@ -15,130 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-# This script is intended as the basis for automated functional testing.
-
 from swift import *
 
 import unittest
 
-class MarketTest(unittest.TestCase):
-
-  @classmethod
-  def setUpClass(cls):
-    cls.fixture = Fixture()
-
-  @classmethod
-  def tearDownClass(cls):
-    cls.fixture.close()
-    cls = None
-
-  def testPostMarket(self):
-    with Connection() as conn:
-      resp = conn.send('POST', '/api/rec/market',
-                       mnem = 'USDJPY.MAR14',
-                       display = 'first',
-                       contr = 'USDJPY',
-                       settlDate = 20170102,
-                       expiryDate = 20170101,
-                       state = 1)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'first',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 1
-      }, resp.content)
-
-  def testPutMarket(self):
-    with Connection() as conn:
-
-      # Update display and state.
-      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
-                       display = 'second',
-                       state = 2)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'second',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 2
-      }, resp.content)
-
-      # Update display only.
-      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
-                       display = 'third',
-                       state = None)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'third',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 2
-      }, resp.content)
-
-      # Update state only.
-      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
-                       display = None,
-                       state = 3)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'third',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 3
-      }, resp.content)
-
-class TraderTest(unittest.TestCase):
-
-  @classmethod
-  def setUpClass(cls):
-    cls.fixture = Fixture()
-
-  @classmethod
-  def tearDownClass(cls):
-    cls.fixture.close()
-    cls = None
-
-  def testPostTrader(self):
-    with Connection() as conn:
-      resp = conn.send('POST', '/api/rec/trader',
-                       mnem = 'MARAYL2',
-                       display = 'Mark Aylettx',
-                       email = 'mark.aylett@swirlycloud.com')
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'display': u'Mark Aylettx',
-        u'email': u'mark.aylett@swirlycloud.com',
-        u'mnem': u'MARAYL2'
-      }, resp.content)
-
-  def testPutTrader(self):
-    with Connection() as conn:
-
-      resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
-                       display = 'Mark Aylett')
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'display': u'Mark Aylett',
-        u'email': u'mark.aylett@swirlycloud.com',
-        u'mnem': u'MARAYL2'
-      }, resp.content)
-
-class OrderTest(unittest.TestCase):
+class TestCase(unittest.TestCase):
 
   @classmethod
   def setUpClass(cls):
@@ -157,7 +36,10 @@ class OrderTest(unittest.TestCase):
     cls.fixture.close()
     cls = None
 
-  def testPostOrder(self):
+  def setUp(self):
+    self.maxDiff = None
+
+  def testMaker(self):
     now = 1459974268204
     with Connection() as conn:
       conn.setUser('MARAYL')
@@ -229,6 +111,12 @@ class OrderTest(unittest.TestCase):
           u'settlDate': 20170102
         }
       }, resp.content)
+
+  def testTaker(self):
+    now = 1459974268204
+    with Connection() as conn:
+      conn.setUser('MARAYL')
+      conn.setTime(now)
       resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
                        side = 'SELL',
                        lots = 1,
@@ -367,26 +255,3 @@ class OrderTest(unittest.TestCase):
           u'settlDate': 20170102
         }
       }, resp.content)
-
-class SwirlyTest(unittest.TestCase):
-
-  @classmethod
-  def setUpClass(cls):
-    cls.fixture = Fixture()
-
-  @classmethod
-  def tearDownClass(cls):
-    cls.fixture.close()
-    cls = None
-
-  def testSess(self):
-    with Connection() as conn:
-      #self.assertEqual(conn.send('POST', '/api/sess/order/EURUSD').status, 200)
-      self.assertEqual(conn.send('PUT', '/api/sess/order/EURUSD/1,2,3').status, 200)
-      self.assertEqual(conn.send('DELETE', '/api/sess/order/EURUSD/1,2,3').status, 200)
-      self.assertEqual(conn.send('POST', '/api/sess/trade/EURUSD').status, 200)
-      self.assertEqual(conn.send('DELETE', '/api/sess/trade/EURUSD/1,2,3').status, 200)
-
-if __name__ == '__main__':
-  unittest.TestCase.maxDiff = None
-  unittest.main()

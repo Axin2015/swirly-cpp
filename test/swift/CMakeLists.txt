@@ -2,6 +2,6 @@ IF(PYTHONINTERP_FOUND)
 
   ADD_CUSTOM_TARGET(swift
     COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
-            "${PYTHON_EXECUTABLE}" "\"${CMAKE_CURRENT_SOURCE_DIR}/main.py\""
+            "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
     DEPENDS swirlyd)
 ENDIF()
