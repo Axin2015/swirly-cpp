@@ -98,7 +98,8 @@ class SWIRLY_API Rest {
   void postOrder(std::string_view trader, std::string_view market, std::string_view ref, Side side,
                  Lots lots, Ticks ticks, Lots minLots, Millis now, std::ostream& out);
 
-  void putOrder(std::string_view market, ArrayView<Iden> ids, Millis now, std::ostream& out);
+  void putOrder(std::string_view trader, std::string_view market, ArrayView<Iden> ids, Lots lots,
+                Millis now, std::ostream& out);
 
   void deleteOrder(std::string_view market, ArrayView<Iden> ids, Millis now, std::ostream& out);
 
