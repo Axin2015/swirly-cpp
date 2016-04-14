@@ -18,7 +18,6 @@
 #define SWIRLY_ELM_POSN_HPP
 
 #include <swirly/elm/Conv.hpp>
-#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Types.hpp>
 
 #include <swirly/ash/RefCounted.hpp>
@@ -91,10 +90,6 @@ class SWIRLY_API Posn : public RefCounted {
       assert(side == Side::Sell);
       addSell(lastLots, cost);
     }
-  }
-  void addTrade(const Exec& trade) noexcept
-  {
-    addTrade(trade.side(), trade.lastLots(), trade.lastTicks());
   }
   /**
    * This function is typically used to change the settlement-day to zero during settlement.

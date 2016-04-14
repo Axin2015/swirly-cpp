@@ -101,7 +101,7 @@ struct Serv::Impl {
     return {lots, makerOrder, makerTrade, makerPosn, takerTrade};
   }
   void matchOrders(const TraderSess& takerSess, MarketBook& book, Order& takerOrder, BookSide& side,
-                   Direct direct, Millis now)
+                   Direct direct, Millis now, Response& resp)
   {
     using namespace enumops;
 
@@ -129,15 +129,25 @@ struct Serv::Impl {
       lastTicks = ticks;
 
       auto match = newMatch(book, takerOrder, &makerOrder, lots, sumLots, sumCost, now);
+
+      // Insert order if trade crossed with self.
+      if (makerOrder.trader() == takerSess.mnem()) {
+        resp.insertOrder(&makerOrder);
+        // Maker updated first because this is consistent with last-look semantics.
+        // N.B. the reference count is not incremented here.
+        resp.insertExec(match.makerTrade);
+      }
+      resp.insertExec(match.takerTrade);
+
       matches.push_back(move(match));
     }
 
-    // FIXME: can this be postponed until commit phase?
     if (!matches.empty()) {
       takerOrder.trade(sumLots, sumCost, lastLots, lastTicks, now);
     }
   }
-  void matchOrders(const TraderSess& takerSess, MarketBook& book, Order& takerOrder, Millis now)
+  void matchOrders(const TraderSess& takerSess, MarketBook& book, Order& takerOrder, Millis now,
+                   Response& resp)
   {
     BookSide* bookSide;
     Direct direct;
@@ -151,19 +161,18 @@ struct Serv::Impl {
       bookSide = &book.bidSide();
       direct = Direct::Given;
     }
-    matchOrders(takerSess, book, takerOrder, *bookSide, direct, now);
+    matchOrders(takerSess, book, takerOrder, *bookSide, direct, now, resp);
   }
   // Assumes that maker lots have not been reduced since matching took place. N.B. this function is
   // responsible for committing a transaction, so it is particularly important that it does not
-  // throw. This function also assumes that sufficient capacity has been reserved in the response
-  // object, so that no memory allocations take place.
-  void commitMatches(TraderSess& takerSess, Millis now, Response& resp) noexcept
+  // throw.
+  void commitMatches(TraderSess& takerSess, MarketBook& book, Millis now) noexcept
   {
     for (const auto& match : matches) {
       const auto makerOrder = match.makerOrder;
       assert(makerOrder);
       // Reduce maker.
-      resp.takeOrder(*makerOrder, match.lots, now);
+      book.takeOrder(*makerOrder, match.lots, now);
       // Must succeed because maker order exists.
       auto it = traders.find(makerOrder->trader());
       assert(it != traders.end());
@@ -173,21 +182,12 @@ struct Serv::Impl {
       const auto makerTrade = match.makerTrade;
       assert(makerTrade);
       makerSess.insertTrade(makerTrade);
-      match.makerPosn->addTrade(*makerTrade);
+      match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
+                                makerTrade->lastTicks());
       // Update taker.
       const auto takerTrade = match.takerTrade;
       assert(takerTrade);
       takerSess.insertTrade(takerTrade);
-      resp.addTrade(*takerTrade);
-
-      // Insert order if trade crossed with self.
-      if (makerOrder->trader() == takerSess.mnem()) {
-        resp.insertOrder(makerOrder);
-        // Maker updated first because this is consistent with last-look semantics.
-        // N.B. the reference count is not incremented here.
-        resp.insertExec(match.makerTrade);
-      }
-      resp.insertExec(takerTrade);
     }
   }
 
@@ -365,8 +365,10 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
                                        orderId, ref, side, lots, ticks, minLots, now);
   auto exec = impl_->newExec(book, *order, now);
 
+  resp.insertOrder(order);
+  resp.insertExec(exec);
   // Order fields are updated on match.
-  impl_->matchOrders(sess, book, *order, now);
+  impl_->matchOrders(sess, book, *order, now, resp);
   // Ensure that matches are cleared when scope exits.
   auto& matches = impl_->matches;
   auto finally = makeFinally([&matches]() { matches.clear(); });
@@ -406,32 +408,23 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
   resp.setBook(book);
 
   // Avoid allocating position when there are no matches.
+  PosnPtr posn;
   if (!matches.empty()) {
     // Avoid allocating position when there are no matches.
     // N.B. before commit phase, because this may fail.
-    resp.setPosn(sess.lazyPosn(book.contr(), book.settlDay()));
+    posn = sess.lazyPosn(book.contr(), book.settlDay());
+    resp.setPosn(posn);
   }
-
-  // New order plus updated order for each match assuming crossed with self.
-  resp.reserveOrders(1 + matches.size());
-  // New execution plus 2 trade executions for each match assuming crossed with self.
-  resp.reserveExecs(1 + 2 * matches.size());
 
   // Commit phase.
 
   sess.insertOrder(order);
 
   // Commit matches.
-
-  // These insert calls are effectively noexcept, because sufficient capacity has been reserved
-  // above.
-  resp.insertOrder(order);
-  resp.insertExec(exec);
-
-  // Commit matches.
   if (!matches.empty()) {
-    assert(resp.posn());
-    impl_->commitMatches(sess, now, resp);
+    assert(posn);
+    posn->addTrade(order->side(), order->lastLots(), order->lastTicks());
+    impl_->commitMatches(sess, book, now);
   }
 }
 

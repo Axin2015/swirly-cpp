@@ -115,7 +115,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarkets, Fixture)
 
 SWIRLY_FIXTURE_TEST_CASE(ServTraders, Fixture)
 {
-  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 2);
+  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 3);
 
   auto it = serv.traders().find("MARAYL"_sv);
   SWIRLY_CHECK(it != serv.traders().end());
@@ -292,7 +292,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
 
   SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
 
-  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 3);
+  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 4);
   auto it = serv.traders().find("MARAYL2"_sv);
   SWIRLY_CHECK(it != serv.traders().end());
   SWIRLY_CHECK(&*it == &sess);
@@ -323,7 +323,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
 
   SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
 
-  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 3);
+  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 4);
   auto it = serv.traders().find("MARAYL2"_sv);
   SWIRLY_CHECK(it != serv.traders().end());
   SWIRLY_CHECK(&*it == &sess);
