@@ -50,9 +50,9 @@ FIND_PROGRAM(ENV_EXECUTABLE env)
 FIND_PROGRAM(RAGEL_EXECUTABLE ragel)
 
 FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time filesystem system)
-FIND_PACKAGE(Doxygen)          # Optional.
-FIND_PACKAGE(Perl)             # Optional.
-FIND_PACKAGE(PythonInterp 2.7) # Optional.
+FIND_PACKAGE(Doxygen)                # Optional.
+FIND_PACKAGE(Perl)                   # Optional.
+FIND_PACKAGE(PythonInterp 2.7 EXACT) # Optional.
 
 IF(DOXYGEN_FOUND)
 
