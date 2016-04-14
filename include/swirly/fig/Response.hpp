@@ -63,17 +63,9 @@ class SWIRLY_API Response {
 
   void clearMatches() noexcept;
 
-  void takeOrder(Order& order, Lots lots, Millis now) noexcept;
-
-  void reserveOrders(std::size_t capacity);
-
-  void reserveExecs(std::size_t capacity);
-
   void insertOrder(ConstOrderPtr order);
 
   void insertExec(ConstExecPtr exec);
-
-  void addTrade(const Exec& trade) noexcept;
 
  private:
   MarketBook* book_{nullptr};

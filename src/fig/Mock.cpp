@@ -117,6 +117,7 @@ MarketSet MockModel::doReadMarket(const Factory& factory) const
 TraderSet MockModel::doReadTrader(const Factory& factory) const
 {
   TraderSet s;
+  s.insert(factory.newTrader("GOSAYL", "Goska Aylett", "goska.aylett@gmail.com"));
   s.insert(factory.newTrader("MARAYL", "Mark Aylett", "mark.aylett@gmail.com"));
   s.insert(factory.newTrader("SWIRLY", "Swirly Cloud", "info@swirlycloud.com"));
   return s;
