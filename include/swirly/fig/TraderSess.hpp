@@ -93,7 +93,7 @@ class SWIRLY_API TraderSess : public Trader {
     assert(trade->trader() == mnem_);
     trades_.insert(trade);
   }
-  void removeOrder(const Exec& trade) noexcept
+  void removeTrade(const Exec& trade) noexcept
   {
     assert(trade.trader() == mnem_);
     trades_.remove(trade);
