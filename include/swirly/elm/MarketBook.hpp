@@ -19,7 +19,6 @@
 
 #include <swirly/elm/BookSide.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/MarketView.hpp>
 
 /**
  * @addtogroup Book
@@ -27,6 +26,39 @@
  */
 
 namespace swirly {
+
+class MarketBook;
+
+/**
+ * Adapter that provides stream insertion operator for MarketBook::toJsonView().
+ */
+class SWIRLY_API MarketView {
+ public:
+  MarketView(const MarketBook& book) noexcept
+    : book_{&book}
+  {
+  }
+  ~MarketView() noexcept = default;
+
+  // Copy.
+  MarketView(const MarketView&) noexcept = default;
+  MarketView& operator=(const MarketView&) noexcept = default;
+
+  // Move.
+  MarketView(MarketView&&) noexcept = default;
+  MarketView& operator=(MarketView&&) noexcept = default;
+
+  void toJson(std::ostream& os) const;
+
+ private:
+  const MarketBook* book_;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const MarketView& view)
+{
+  view.toJson(os);
+  return os;
+}
 
 class SWIRLY_API MarketBook : public Market {
  public:
@@ -51,9 +83,9 @@ class SWIRLY_API MarketBook : public Market {
   Millis lastTime() const noexcept { return lastTime_; }
   const BookSide& bidSide() const noexcept { return bidSide_; }
   const BookSide& offerSide() const noexcept { return offerSide_; }
-  const MarketView& view() const noexcept { return view_; }
   Iden maxOrderId() const noexcept { return maxOrderId_; }
   Iden maxExecId() const noexcept { return maxExecId_; }
+  MarketView view() const noexcept { return *this; }
   BookSide& bidSide() noexcept { return bidSide_; }
   BookSide& offerSide() noexcept { return offerSide_; }
   void insertOrder(const OrderPtr& order) throw(std::bad_alloc)
@@ -104,10 +136,14 @@ class SWIRLY_API MarketBook : public Market {
   // Two sides constitute the book.
   BookSide bidSide_;
   BookSide offerSide_;
-  MarketView view_;
   Iden maxOrderId_;
   Iden maxExecId_;
 };
+
+inline void MarketView::toJson(std::ostream& os) const
+{
+  book_->toJsonView(os);
+}
 
 } // swirly
 

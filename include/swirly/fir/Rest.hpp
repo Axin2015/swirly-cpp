@@ -59,25 +59,31 @@ class SWIRLY_API Rest {
 
   void getTrader(std::string_view mnem, Millis now, std::ostream& out) const;
 
-  void getSess(EntitySet es, Millis now, std::ostream& out) const;
+  void getSess(std::string_view trader, EntitySet es, Millis now, std::ostream& out) const;
 
-  void getOrder(Millis now, std::ostream& out) const;
+  void getOrder(std::string_view trader, Millis now, std::ostream& out) const;
 
-  void getOrder(std::string_view market, Millis now, std::ostream& out) const;
+  void getOrder(std::string_view trader, std::string_view market, Millis now,
+                std::ostream& out) const;
 
-  void getOrder(std::string_view market, Iden id, Millis now, std::ostream& out) const;
+  void getOrder(std::string_view trader, std::string_view market, Iden id, Millis now,
+                std::ostream& out) const;
 
-  void getTrade(Millis now, std::ostream& out) const;
+  void getTrade(std::string_view trader, Millis now, std::ostream& out) const;
 
-  void getTrade(std::string_view market, Millis now, std::ostream& out) const;
+  void getTrade(std::string_view trader, std::string_view market, Millis now,
+                std::ostream& out) const;
 
-  void getTrade(std::string_view market, Iden id, Millis now, std::ostream& out) const;
+  void getTrade(std::string_view trader, std::string_view market, Iden id, Millis now,
+                std::ostream& out) const;
 
-  void getPosn(Millis now, std::ostream& out) const;
+  void getPosn(std::string_view trader, Millis now, std::ostream& out) const;
 
-  void getPosn(std::string_view contr, Millis now, std::ostream& out) const;
+  void getPosn(std::string_view trader, std::string_view contr, Millis now,
+               std::ostream& out) const;
 
-  void getPosn(std::string_view contr, IsoDate settlDate, Millis now, std::ostream& out) const;
+  void getPosn(std::string_view trader, std::string_view contr, IsoDate settlDate, Millis now,
+               std::ostream& out) const;
 
   void getView(Millis now, std::ostream& out) const;
 

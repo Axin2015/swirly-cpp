@@ -22,6 +22,8 @@
 
 #include <swirly/fir/RestRequest.hpp>
 
+#include <swirly/elm/Exception.hpp>
+
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Math.hpp>
 #include <swirly/ash/Tokeniser.hpp>
@@ -88,6 +90,14 @@ class RestServ : public mg::Mgr<RestServ> {
     MatchMask = MatchMethod | MatchUri
   };
 
+  std::string_view trader(mg::HttpMessage data) const
+  {
+    auto mnem = data.header(httpUser_);
+    if (mnem.empty()) {
+      throw UnauthorizedException{"authorisation required"_sv};
+    }
+    return mnem;
+  }
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
   ArrayView<Iden> ids() const noexcept { return {&ids_[0], ids_.size()}; }
 

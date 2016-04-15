@@ -18,8 +18,6 @@
 
 #include <swirly/fir/Rest.hpp>
 
-#include <swirly/elm/Exception.hpp>
-
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
 
@@ -427,7 +425,7 @@ void RestServ::sessRequest(HttpMessage data, Millis now)
       // GET /api/sess
       state_ |= MatchMethod;
       const int bs{EntitySet::Order | EntitySet::Trade | EntitySet::Posn | EntitySet::View};
-      rest_.getSess(bs, now, out_);
+      rest_.getSess(trader(data), bs, now, out_);
     }
     return;
   }
@@ -446,7 +444,7 @@ void RestServ::sessRequest(HttpMessage data, Millis now)
       if (isSet(MethodGet)) {
         // GET /api/sess/entity,entity...
         state_ |= MatchMethod;
-        rest_.getSess(es, now, out_);
+        rest_.getSess(trader(data), es, now, out_);
       }
     }
     return;
@@ -478,7 +476,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /api/sess/order
       state_ |= MatchMethod;
-      rest_.getOrder(now, out_);
+      rest_.getOrder(trader(data), now, out_);
     }
     return;
   }
@@ -501,16 +499,12 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
       // POST /api/sess/order/MARKET
       state_ |= MatchMethod;
       {
-        auto trader = data.header(httpUser_);
-        if (trader.empty()) {
-          throw UnauthorizedException{"authorisation required"_sv};
-        }
         constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
         constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
         if (!request_.valid(reqFields, optFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postOrder(trader, market, request_.ref(), request_.side(), request_.lots(),
+        rest_.postOrder(trader(data), market, request_.ref(), request_.side(), request_.lots(),
                         request_.ticks(), request_.minLots(), now, out_);
       }
       break;
@@ -530,21 +524,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     case MethodGet:
       // GET /api/sess/order/MARKET/ID
       state_ |= MatchMethod;
-      rest_.getOrder(market, ids_[0], now, out_);
+      rest_.getOrder(trader(data), market, ids_[0], now, out_);
       break;
     case MethodPut:
       // PUT /api/sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
       {
-        auto trader = data.header(httpUser_);
-        if (trader.empty()) {
-          throw UnauthorizedException{"authorisation required"_sv};
-        }
         constexpr auto reqFields = RestRequest::Lots;
         if (!request_.valid(reqFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.putOrder(trader, market, ids(), request_.lots(), now, out_);
+        rest_.putOrder(trader(data), market, ids(), request_.lots(), now, out_);
       }
       break;
     case MethodDelete:
@@ -567,7 +557,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /api/sess/trade
       state_ |= MatchMethod;
-      rest_.getTrade(now, out_);
+      rest_.getTrade(trader(data), now, out_);
     }
     return;
   }
@@ -607,7 +597,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodGet:
       // GET /api/sess/trade/MARKET/ID
       state_ |= MatchMethod;
-      rest_.getTrade(market, ids_[0], now, out_);
+      rest_.getTrade(trader(data), market, ids_[0], now, out_);
       break;
     case MethodDelete:
       // DELETE /api/sess/trade/MARKET/ID,ID...
@@ -629,7 +619,7 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /api/sess/posn
       state_ |= MatchMethod;
-      rest_.getPosn(now, out_);
+      rest_.getPosn(trader(data), now, out_);
     }
     return;
   }
@@ -661,7 +651,7 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /api/sess/posn/CONTR/SETTL_DATE
       state_ |= MatchMethod;
-      rest_.getPosn(contr, settlDate, now, out_);
+      rest_.getPosn(trader(data), contr, settlDate, now, out_);
     }
     return;
   }

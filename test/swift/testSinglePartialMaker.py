@@ -224,8 +224,26 @@ class TestCase(unittest.TestCase):
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
-    self.assertListEqual([
-    ], resp.content)
+    self.assertListEqual([{
+      u'contr': u'USDJPY',
+      u'cost': 24690,
+      u'created': self.now,
+      u'exec': 2,
+      u'id': 1,
+      u'lastLots': 2,
+      u'lastTicks': 12345,
+      u'lots': 5,
+      u'market': u'USDJPY.MAR14',
+      u'minLots': None,
+      u'modified': self.now,
+      u'ref': None,
+      u'resd': 3,
+      u'settlDate': 20170102,
+      u'side': u'BUY',
+      u'state': u'TRADE',
+      u'ticks': 12345,
+      u'trader': u'MARAYL'
+    }], resp.content)
 
   def makerTrade(self, conn):
     conn.setTime(self.now)
@@ -234,8 +252,29 @@ class TestCase(unittest.TestCase):
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
-    self.assertListEqual([
-    ], resp.content)
+    self.assertListEqual([{
+      u'contr': u'USDJPY',
+      u'cost': 24690,
+      u'cpty': u'GOSAYL',
+      u'created': self.now,
+      u'exec': 2,
+      u'id': 3,
+      u'lastLots': 2,
+      u'lastTicks': 12345,
+      u'lots': 5,
+      u'market': u'USDJPY.MAR14',
+      u'matchId': 4,
+      u'minLots': None,
+      u'orderId': 1,
+      u'ref': None,
+      u'resd': 3,
+      u'role': u'MAKER',
+      u'settlDate': 20170102,
+      u'side': u'BUY',
+      u'state': u'TRADE',
+      u'ticks': 12345,
+      u'trader': u'MARAYL'
+    }], resp.content)
 
   def makerPosn(self, conn):
     conn.setTime(self.now)
@@ -244,5 +283,12 @@ class TestCase(unittest.TestCase):
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
-    self.assertListEqual([
-    ], resp.content)
+    self.assertListEqual([{
+      u'buyCost': 24690,
+      u'buyLots': 2,
+      u'contr': u'USDJPY',
+      u'sellCost': 0,
+      u'sellLots': 0,
+      u'settlDate': 20170102,
+      u'trader': u'MARAYL'
+    }], resp.content)
