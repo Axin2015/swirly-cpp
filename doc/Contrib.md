@@ -9,6 +9,12 @@ Set your user-name and email:
     $ git config --global user.name <your name>
     $ git config --global user.email <your email>
 
+The following options may also be useful:
+
+    $ git config --global alias.head 'log --graph --oneline --decorate'
+    $ git config --global core.editor emacsclient
+    $ git config --global rebase.autosquash true
+
 Github Fork
 -----------
 
@@ -18,9 +24,8 @@ Add remote upstream to fork:
 
 Sync local fork:
 
-    $ git checkout master
     $ git fetch upstream
-    $ git rebase upstream/master
+    $ git rebase upstream/master master
     $ git push origin
 
 Style

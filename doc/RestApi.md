@@ -148,9 +148,10 @@ View
 `GET /api/sess/view[/MARKET]`
 
 Get view of the Order-Book with optional filter by market. This is the same as `/api/view` (below),
-except that it allows the view to be fetched in batch along with other session entities.
+except that it allows logged-in users to fetch the view along with other session entities in a
+single HTTP request.
 
 `GET api/view[/MARKET]`
 
 Get view of the Order-Book with optional filter by market. This is the same as `/api/sess/view`
-(above), except that it is publically available.
+(above), except that it does not require a login. (The view is considered public information.)
