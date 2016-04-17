@@ -49,7 +49,6 @@ MarketBook::MarketBook(string_view mnem, string_view display, string_view contr,
     lastLots_{lastLots},
     lastTicks_{lastTicks},
     lastTime_{lastTime},
-    view_{mnem, contr, settlDay, lastLots, lastTicks, lastTime},
     maxOrderId_{maxOrderId},
     maxExecId_{maxExecId}
 {

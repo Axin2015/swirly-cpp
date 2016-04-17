@@ -19,82 +19,84 @@ import unittest
 
 class TestCase(unittest.TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    cls.fixture = Fixture()
-
-  @classmethod
-  def tearDownClass(cls):
-    cls.fixture.close()
-    cls = None
-
-  def setUp(self):
+  def test(self):
     self.maxDiff = None
+    self.now = 1459974268204
+    with Fixture() as fixture:
+      with Connection() as conn:
+        self.createMarket(conn)
+        self.updateDisplayAndState(conn)
+        self.updateDisplayOnly(conn)
+        self.updateStateOnly(conn)
 
-  def testCreate(self):
-    with Connection() as conn:
-      resp = conn.send('POST', '/api/rec/market',
-                       mnem = 'USDJPY.MAR14',
-                       display = 'first',
-                       contr = 'USDJPY',
-                       settlDate = 20170102,
-                       expiryDate = 20170101,
-                       state = 1)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'first',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 1
-      }, resp.content)
+  def createMarket(self, conn):
+    conn.setTime(self.now)
+    conn.setUser('MARAYL')
+    resp = conn.send('POST', '/api/rec/market',
+                     mnem = 'USDJPY.MAR14',
+                     display = 'first',
+                     contr = 'USDJPY',
+                     settlDate = 20170102,
+                     expiryDate = 20170101,
+                     state = 1)
 
-  def testUpdate(self):
-    with Connection() as conn:
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'contr': u'USDJPY',
+      u'display': u'first',
+      u'expiryDate': 20170101,
+      u'mnem': u'USDJPY.MAR14',
+      u'settlDate': 20170102,
+      u'state': 1
+    }, resp.content)
 
-      # Update display and state.
-      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
-                       display = 'second',
-                       state = 2)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'second',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 2
-      }, resp.content)
+  def updateDisplayAndState(self, conn):
+    conn.setTime(self.now)
+    conn.setUser('MARAYL')
+    resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+                     display = 'second',
+                     state = 2)
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'contr': u'USDJPY',
+      u'display': u'second',
+      u'expiryDate': 20170101,
+      u'mnem': u'USDJPY.MAR14',
+      u'settlDate': 20170102,
+      u'state': 2
+    }, resp.content)
 
-      # Update display only.
-      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
-                       display = 'third',
-                       state = None)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'third',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 2
-      }, resp.content)
+  def updateDisplayOnly(self, conn):
+    conn.setTime(self.now)
+    conn.setUser('MARAYL')
+    resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+                     display = 'third',
+                     state = None)
 
-      # Update state only.
-      resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
-                       display = None,
-                       state = 3)
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'contr': u'USDJPY',
-        u'display': u'third',
-        u'expiryDate': 20170101,
-        u'mnem': u'USDJPY.MAR14',
-        u'settlDate': 20170102,
-        u'state': 3
-      }, resp.content)
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'contr': u'USDJPY',
+      u'display': u'third',
+      u'expiryDate': 20170101,
+      u'mnem': u'USDJPY.MAR14',
+      u'settlDate': 20170102,
+      u'state': 2
+    }, resp.content)
+
+  def updateStateOnly(self, conn):
+    resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+                     display = None,
+                     state = 3)
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'contr': u'USDJPY',
+      u'display': u'third',
+      u'expiryDate': 20170101,
+      u'mnem': u'USDJPY.MAR14',
+      u'settlDate': 20170102,
+      u'state': 3
+    }, resp.content)

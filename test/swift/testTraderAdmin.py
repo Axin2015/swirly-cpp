@@ -19,41 +19,36 @@ import unittest
 
 class TestCase(unittest.TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    cls.fixture = Fixture()
-
-  @classmethod
-  def tearDownClass(cls):
-    cls.fixture.close()
-    cls = None
-
-  def setUp(self):
+  def test(self):
     self.maxDiff = None
+    self.now = 1459974268204
+    with Fixture() as fixture:
+      with Connection() as conn:
+        self.createTrader(conn)
+        self.updateTrader(conn)
 
-  def testCreate(self):
-    with Connection() as conn:
-      resp = conn.send('POST', '/api/rec/trader',
-                       mnem = 'MARAYL2',
-                       display = 'Mark Aylettx',
-                       email = 'mark.aylett@swirlycloud.com')
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'display': u'Mark Aylettx',
-        u'email': u'mark.aylett@swirlycloud.com',
-        u'mnem': u'MARAYL2'
-      }, resp.content)
+  def createTrader(self, conn):
+    resp = conn.send('POST', '/api/rec/trader',
+                     mnem = 'MARAYL2',
+                     display = 'Mark Aylettx',
+                     email = 'mark.aylett@swirlycloud.com')
 
-  def testUpdate(self):
-    with Connection() as conn:
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'display': u'Mark Aylettx',
+      u'email': u'mark.aylett@swirlycloud.com',
+      u'mnem': u'MARAYL2'
+    }, resp.content)
 
-      resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
-                       display = 'Mark Aylett')
-      self.assertEqual(200, resp.status)
-      self.assertEqual('OK', resp.reason)
-      self.assertDictEqual({
-        u'display': u'Mark Aylett',
-        u'email': u'mark.aylett@swirlycloud.com',
-        u'mnem': u'MARAYL2'
-      }, resp.content)
+  def updateTrader(self, conn):
+    resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
+                     display = 'Mark Aylett')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'display': u'Mark Aylett',
+      u'email': u'mark.aylett@swirlycloud.com',
+      u'mnem': u'MARAYL2'
+    }, resp.content)

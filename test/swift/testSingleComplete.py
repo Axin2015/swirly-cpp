@@ -27,6 +27,9 @@ class TestCase(unittest.TestCase):
         self.createMarket(conn)
         self.makerBid(conn)
         self.takerSell(conn)
+        self.makerOrder(conn)
+        self.makerTrade(conn)
+        self.makerPosn(conn)
 
   def createMarket(self, conn):
     conn.setTime(self.now)
@@ -115,7 +118,7 @@ class TestCase(unittest.TestCase):
 
   def takerSell(self, conn):
     conn.setTime(self.now)
-    conn.setUser('MARAYL')
+    conn.setUser('GOSAYL')
     resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
                      side = 'SELL',
                      lots = 5,
@@ -145,29 +148,7 @@ class TestCase(unittest.TestCase):
         u'side': u'SELL',
         u'state': u'NEW',
         u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }, {
-        u'contr': u'USDJPY',
-        u'cost': 61725,
-        u'cpty': u'MARAYL',
-        u'created': self.now,
-        u'exec': 5,
-        u'id': 3,
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lots': 5,
-        u'market': u'USDJPY.MAR14',
-        u'matchId': 4,
-        u'minLots': None,
-        u'orderId': 1,
-        u'ref': None,
-        u'resd': 0,
-        u'role': u'MAKER',
-        u'settlDate': 20170102,
-        u'side': u'BUY',
-        u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'trader': u'GOSAYL'
       }, {
         u'contr': u'USDJPY',
         u'cost': 61725,
@@ -189,7 +170,7 @@ class TestCase(unittest.TestCase):
         u'side': u'SELL',
         u'state': u'TRADE',
         u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'trader': u'GOSAYL'
       }],
       u'orders': [{
         u'contr': u'USDJPY',
@@ -209,35 +190,16 @@ class TestCase(unittest.TestCase):
         u'side': u'SELL',
         u'state': u'TRADE',
         u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }, {
-        u'contr': u'USDJPY',
-        u'cost': 61725,
-        u'created': self.now,
-        u'exec': 5,
-        u'id': 1,
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lots': 5,
-        u'market': u'USDJPY.MAR14',
-        u'minLots': None,
-        u'modified': self.now,
-        u'ref': None,
-        u'resd': 0,
-        u'settlDate': 20170102,
-        u'side': u'BUY',
-        u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'trader': u'GOSAYL'
       }],
       u'posn': {
-        u'buyCost': 61725,
-        u'buyLots': 5,
+        u'buyCost': 0,
+        u'buyLots': 0,
         u'contr': u'USDJPY',
         u'sellCost': 61725,
         u'sellLots': 5,
         u'settlDate': 20170102,
-        u'trader': u'MARAYL'
+        u'trader': u'GOSAYL'
       },
       u'view': {
         u'bidCount': [None, None, None],
@@ -254,3 +216,79 @@ class TestCase(unittest.TestCase):
         u'settlDate': 20170102
       }
     }, resp.content)
+
+  def makerOrder(self, conn):
+    conn.setTime(self.now)
+    conn.setUser('MARAYL')
+    resp = conn.send('GET', '/api/sess/order')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertListEqual([{
+      u'contr': u'USDJPY',
+      u'cost': 61725,
+      u'created': self.now,
+      u'exec': 5,
+      u'id': 1,
+      u'lastLots': 5,
+      u'lastTicks': 12345,
+      u'lots': 5,
+      u'market': u'USDJPY.MAR14',
+      u'minLots': None,
+      u'modified': self.now,
+      u'ref': None,
+      u'resd': 0,
+      u'settlDate': 20170102,
+      u'side': u'BUY',
+      u'state': u'TRADE',
+      u'ticks': 12345,
+      u'trader': u'MARAYL'
+    }], resp.content)
+
+  def makerTrade(self, conn):
+    conn.setTime(self.now)
+    conn.setUser('MARAYL')
+    resp = conn.send('GET', '/api/sess/trade')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertListEqual([{
+      u'contr': u'USDJPY',
+      u'cost': 61725,
+      u'cpty': u'GOSAYL',
+      u'created': self.now,
+      u'exec': 5,
+      u'id': 3,
+      u'lastLots': 5,
+      u'lastTicks': 12345,
+      u'lots': 5,
+      u'market': u'USDJPY.MAR14',
+      u'matchId': 4,
+      u'minLots': None,
+      u'orderId': 1,
+      u'ref': None,
+      u'resd': 0,
+      u'role': u'MAKER',
+      u'settlDate': 20170102,
+      u'side': u'BUY',
+      u'state': u'TRADE',
+      u'ticks': 12345,
+      u'trader': u'MARAYL'
+    }], resp.content)
+
+  def makerPosn(self, conn):
+    conn.setTime(self.now)
+    conn.setUser('MARAYL')
+    resp = conn.send('GET', '/api/sess/posn')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertListEqual([{
+      u'buyCost': 61725,
+      u'buyLots': 5,
+      u'contr': u'USDJPY',
+      u'sellCost': 0,
+      u'sellLots': 0,
+      u'settlDate': 20170102,
+      u'trader': u'MARAYL'
+    }], resp.content)

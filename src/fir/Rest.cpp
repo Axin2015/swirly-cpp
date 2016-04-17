@@ -116,12 +116,7 @@ void Rest::getMarket(Millis now, ostream& out) const
 
 void Rest::getMarket(string_view mnem, Millis now, ostream& out) const
 {
-  const auto& markets = serv_.markets();
-  auto it = markets.find(mnem);
-  if (it == markets.end()) {
-    throw NotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
-  }
-  out << *it;
+  out << serv_.market(mnem);
 }
 
 void Rest::getTrader(Millis now, ostream& out) const
@@ -134,21 +129,17 @@ void Rest::getTrader(Millis now, ostream& out) const
 
 void Rest::getTrader(string_view mnem, Millis now, ostream& out) const
 {
-  const auto& traders = serv_.traders();
-  auto it = traders.find(mnem);
-  if (it == traders.end()) {
-    throw NotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
-  }
-  out << *it;
+  out << serv_.trader(mnem);
 }
 
-void Rest::getSess(EntitySet es, Millis now, ostream& out) const
+void Rest::getSess(string_view trader, EntitySet es, Millis now, ostream& out) const
 {
+  auto& sess = serv_.trader(trader);
   int i{0};
   out << '{';
   if (es.order()) {
     out << "\"orders\":";
-    getOrder(now, out);
+    out << "[]";
     ++i;
   }
   if (es.trade()) {
@@ -156,7 +147,7 @@ void Rest::getSess(EntitySet es, Millis now, ostream& out) const
       out << ',';
     }
     out << "\"trades\":";
-    getTrade(now, out);
+    out << "[]";
     ++i;
   }
   if (es.posn()) {
@@ -164,7 +155,7 @@ void Rest::getSess(EntitySet es, Millis now, ostream& out) const
       out << ',';
     }
     out << "\"posns\":";
-    getPosn(now, out);
+    out << "[]";
     ++i;
   }
   if (es.view()) {
@@ -178,70 +169,110 @@ void Rest::getSess(EntitySet es, Millis now, ostream& out) const
   out << '}';
 }
 
-void Rest::getOrder(Millis now, ostream& out) const
+void Rest::getOrder(string_view trader, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "[]";
+  auto& sess = serv_.trader(trader);
+  const auto& orders = sess.orders();
+  out << '[';
+  copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
+  out << ']';
 }
 
-void Rest::getOrder(string_view market, Millis now, ostream& out) const
+void Rest::getOrder(string_view trader, string_view market, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\"}";
+  auto& sess = serv_.trader(trader);
+  const auto& orders = sess.orders();
+  out << '[';
+  copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
+          [market](const auto& order) { return order.market() == market; });
+  out << ']';
 }
 
-void Rest::getOrder(string_view market, Iden id, Millis now, ostream& out) const
+void Rest::getOrder(string_view trader, string_view market, Iden id, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << ",\"id\":" << id << '}';
+  auto& sess = serv_.trader(trader);
+  const auto& orders = sess.orders();
+  auto it = orders.find(market, id);
+  if (it == orders.end()) {
+    throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
+  }
+  out << *it;
 }
 
-void Rest::getTrade(Millis now, ostream& out) const
+void Rest::getTrade(string_view trader, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "[]";
+  auto& sess = serv_.trader(trader);
+  const auto& trades = sess.trades();
+  out << '[';
+  copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
+  out << ']';
 }
 
-void Rest::getTrade(string_view market, Millis now, ostream& out) const
+void Rest::getTrade(string_view trader, string_view market, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\"}";
+  auto& sess = serv_.trader(trader);
+  const auto& trades = sess.trades();
+  out << '[';
+  copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
+          [market](const auto& trade) { return trade.market() == market; });
+  out << ']';
 }
 
-void Rest::getTrade(string_view market, Iden id, Millis now, ostream& out) const
+void Rest::getTrade(string_view trader, string_view market, Iden id, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << ",\"id\":" << id << '}';
+  auto& sess = serv_.trader(trader);
+  const auto& trades = sess.trades();
+  auto it = trades.find(market, id);
+  if (it == trades.end()) {
+    throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
+  }
+  out << *it;
 }
 
-void Rest::getPosn(Millis now, ostream& out) const
+void Rest::getPosn(string_view trader, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "[]";
+  auto& sess = serv_.trader(trader);
+  const auto& posns = sess.posns();
+  out << '[';
+  copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
+  out << ']';
 }
 
-void Rest::getPosn(string_view contr, Millis now, ostream& out) const
+void Rest::getPosn(string_view trader, string_view contr, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"contr\":\"" << contr << "\"}";
+  auto& sess = serv_.trader(trader);
+  const auto& posns = sess.posns();
+  out << '[';
+  copy_if(posns.begin(), posns.end(), OStreamJoiner(out, ','),
+          [contr](const auto& posn) { return posn.contr() == contr; });
+  out << ']';
 }
 
-void Rest::getPosn(string_view contr, IsoDate settlDate, Millis now, ostream& out) const
+void Rest::getPosn(string_view trader, string_view contr, IsoDate settlDate, Millis now,
+                   ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"contr\":\"" << contr << ",\"settlDate\":" << settlDate << '}';
+  auto& sess = serv_.trader(trader);
+  const auto& posns = sess.posns();
+  auto it = posns.find(contr, maybeIsoToJd(settlDate));
+  if (it == posns.end()) {
+    throw NotFoundException{errMsg() << "posn for '" << contr << "' on '" << settlDate
+                                     << "' does not exist"};
+  }
+  out << *it;
 }
 
 void Rest::getView(Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "[]";
+  const auto& markets = serv_.markets();
+  out << '[';
+  transform(markets.begin(), markets.end(), OStreamJoiner(out, ','),
+            [](const auto& market) { return static_cast<const MarketBook&>(market).view(); });
+  out << ']';
 }
 
 void Rest::getView(string_view market, Millis now, ostream& out) const
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\"}";
+  out << serv_.market(market).view();
 }
 
 void Rest::postMarket(string_view mnem, string_view display, string_view contr, IsoDate settlDate,
@@ -276,9 +307,9 @@ void Rest::putTrader(string_view mnem, string_view display, Millis now, ostream&
 void Rest::postOrder(string_view trader, string_view market, string_view ref, Side side, Lots lots,
                      Ticks ticks, Lots minLots, Millis now, ostream& out)
 {
-  Response resp;
   auto& sess = serv_.trader(trader);
   auto& book = serv_.market(market);
+  Response resp;
   serv_.createOrder(sess, book, ref, side, lots, ticks, minLots, now, resp);
   out << resp;
 }
@@ -286,9 +317,9 @@ void Rest::postOrder(string_view trader, string_view market, string_view ref, Si
 void Rest::putOrder(string_view trader, string_view market, ArrayView<Iden> ids, Lots lots,
                     Millis now, ostream& out)
 {
-  Response resp;
   auto& sess = serv_.trader(trader);
   auto& book = serv_.market(market);
+  Response resp;
   if (lots > 0_lts) {
     if (ids.size() == 1) {
       serv_.reviseOrder(sess, book, ids[0], lots, now, resp);

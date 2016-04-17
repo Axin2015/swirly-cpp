@@ -34,9 +34,8 @@ namespace swirly {
 
 class SWIRLY_API Rec : public Comparable<Rec> {
  public:
-  Rec(RecType type, std::string_view mnem, std::string_view display) noexcept : type_{type},
-                                                                                mnem_{mnem},
-                                                                                display_{display}
+  Rec(RecType type, std::string_view mnem, std::string_view display) noexcept
+    : type_{type}, mnem_{mnem}, display_{display}
   {
   }
 
