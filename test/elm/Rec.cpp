@@ -25,8 +25,7 @@ namespace {
 class Foo : public Rec {
  public:
   Foo(string_view mnem, string_view display, int& alive) noexcept
-    : Rec{RecType::Asset, mnem, display},
-      alive_{alive}
+    : Rec{RecType::Asset, mnem, display}, alive_{alive}
   {
     ++alive;
   }

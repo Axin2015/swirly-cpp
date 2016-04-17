@@ -29,8 +29,7 @@ namespace swirly {
 class SWIRLY_API Trader : public Rec {
  public:
   Trader(std::string_view mnem, std::string_view display, std::string_view email) noexcept
-    : Rec{RecType::Market, mnem, display},
-      email_{email}
+    : Rec{RecType::Market, mnem, display}, email_{email}
   {
   }
   ~Trader() noexcept override;

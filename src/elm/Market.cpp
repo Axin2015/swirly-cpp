@@ -25,11 +25,12 @@ using namespace std;
 namespace swirly {
 
 Market::Market(string_view mnem, string_view display, string_view contr, Jday settlDay,
-               Jday expiryDay, MarketState state) noexcept : Rec{RecType::Market, mnem, display},
-                                                             contr_{contr},
-                                                             settlDay_{settlDay},
-                                                             expiryDay_{expiryDay},
-                                                             state_{state}
+               Jday expiryDay, MarketState state) noexcept
+  : Rec{RecType::Market, mnem, display},
+    contr_{contr},
+    settlDay_{settlDay},
+    expiryDay_{expiryDay},
+    state_{state}
 {
   assert((settlDay == 0_jd) == (expiryDay == 0_jd));
 }

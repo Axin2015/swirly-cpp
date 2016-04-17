@@ -59,8 +59,8 @@ class Trace {
       }
     }
   }
-  explicit Trace(VarAccum& var) noexcept : var_(var),
-                                           start_{std::chrono::high_resolution_clock::now()}
+  explicit Trace(VarAccum& var) noexcept
+    : var_(var), start_{std::chrono::high_resolution_clock::now()}
   {
   }
 

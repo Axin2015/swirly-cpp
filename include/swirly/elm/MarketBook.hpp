@@ -34,10 +34,7 @@ class MarketBook;
  */
 class SWIRLY_API MarketView {
  public:
-  MarketView(const MarketBook& book) noexcept
-    : book_{&book}
-  {
-  }
+  MarketView(const MarketBook& book) noexcept : book_{&book} {}
   ~MarketView() noexcept = default;
 
   // Copy.

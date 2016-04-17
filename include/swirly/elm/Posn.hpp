@@ -35,13 +35,14 @@ namespace swirly {
 class SWIRLY_API Posn : public RefCounted {
  public:
   Posn(std::string_view trader, std::string_view contr, Jday settlDay, Lots buyLots, Cost buyCost,
-       Lots sellLots, Cost sellCost) noexcept : trader_{trader},
-                                                contr_{contr},
-                                                settlDay_{settlDay},
-                                                buyLots_{buyLots},
-                                                buyCost_{buyCost},
-                                                sellLots_{sellLots},
-                                                sellCost_{sellCost}
+       Lots sellLots, Cost sellCost) noexcept
+    : trader_{trader},
+      contr_{contr},
+      settlDay_{settlDay},
+      buyLots_{buyLots},
+      buyCost_{buyCost},
+      sellLots_{sellLots},
+      sellCost_{sellCost}
   {
   }
   ~Posn() noexcept override;

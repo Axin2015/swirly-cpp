@@ -39,8 +39,8 @@ class SWIRLY_API TraderSess : public Trader {
 
  public:
   TraderSess(std::string_view mnem, std::string_view display, std::string_view email,
-             const Factory& factory) noexcept : Trader{mnem, display, email},
-                                                factory_{factory}
+             const Factory& factory) noexcept
+    : Trader{mnem, display, email}, factory_{factory}
   {
   }
   ~TraderSess() noexcept override;
