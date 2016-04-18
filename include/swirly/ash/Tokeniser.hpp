@@ -21,12 +21,12 @@
 
 #include <algorithm>
 
+namespace swirly {
+
 /**
  * @addtogroup Util
  * @{
  */
-
-namespace swirly {
 
 template <char DelimN>
 class Tokeniser {
@@ -66,8 +66,8 @@ class Tokeniser {
   std::string_view::const_iterator i_, j_;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ASH_TOKENISER_HPP

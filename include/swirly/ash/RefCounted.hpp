@@ -21,12 +21,12 @@
 
 #include <boost/intrusive_ptr.hpp>
 
+namespace swirly {
+
 /**
  * @addtogroup Util
  * @{
  */
-
-namespace swirly {
 
 /**
  * Base class for referenced counted objects.
@@ -77,8 +77,8 @@ inline void intrusive_ptr_release(const RefCounted* ptr) noexcept
   ptr->release();
 }
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ASH_REFCOUNTED_HPP

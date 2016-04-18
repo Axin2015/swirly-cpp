@@ -21,12 +21,12 @@
 
 #include <cmath>
 
+namespace swirly {
+
 /**
  * @addtogroup Domain
  * @{
  */
-
-namespace swirly {
 
 constexpr int64_t roundHalfAway(double real) noexcept
 {
@@ -113,8 +113,8 @@ inline Cost cost(Lots lots, Ticks ticks) noexcept
   return box<Cost>(unbox(lots) * unbox(ticks));
 }
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_CONV_HPP

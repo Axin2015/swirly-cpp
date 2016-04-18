@@ -27,12 +27,12 @@ namespace std {
 using experimental::string_view;
 }
 
+namespace swirly {
+
 /**
  * @addtogroup Util
  * @{
  */
-
-namespace swirly {
 
 SWIRLY_API void reset(std::ostream& os) noexcept;
 
@@ -141,8 +141,8 @@ class SWIRLY_API OStreamJoiner {
   bool first_{true};
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ASH_STREAM_HPP

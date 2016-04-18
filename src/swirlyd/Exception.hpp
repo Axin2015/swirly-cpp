@@ -19,13 +19,13 @@
 
 #include <swirly/ash/Exception.hpp>
 
+namespace swirly {
+namespace mg {
+
 /**
  * @addtogroup App
  * @{
  */
-
-namespace swirly {
-namespace mg {
 
 class Error : public Exception {
  public:
@@ -41,9 +41,9 @@ class Error : public Exception {
   Error& operator=(Error&&) noexcept = default;
 };
 
+/** @} */
+
 } // mg
 } // swirly
-
-/** @} */
 
 #endif // SWIRLYD_EXCEPTION_HPP

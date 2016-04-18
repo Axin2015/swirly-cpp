@@ -23,12 +23,12 @@
 
 #include <vector>
 
+namespace swirly {
+
 /**
  * @addtogroup App
  * @{
  */
-
-namespace swirly {
 
 class MarketBook;
 
@@ -80,8 +80,8 @@ inline std::ostream& operator<<(std::ostream& os, const Response& resp)
   return os;
 }
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_FIG_RESPONSE_HPP

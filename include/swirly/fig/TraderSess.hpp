@@ -25,14 +25,14 @@
 
 #include <boost/intrusive/unordered_set.hpp>
 
+namespace swirly {
+
+class Factory;
+
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
-
-class Factory;
 
 class SWIRLY_API TraderSess : public Trader {
   using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
@@ -115,8 +115,8 @@ class SWIRLY_API TraderSess : public Trader {
   OrderRefSet refIdx_;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_TRADERSESS_HPP

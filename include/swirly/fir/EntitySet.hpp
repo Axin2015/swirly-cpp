@@ -25,12 +25,12 @@ namespace std {
 using experimental::string_view;
 }
 
+namespace swirly {
+
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
 
 class SWIRLY_API EntitySet {
  public:
@@ -89,8 +89,8 @@ class SWIRLY_API EntitySet {
   int bs_;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_FIR_ENTITYSET_HPP

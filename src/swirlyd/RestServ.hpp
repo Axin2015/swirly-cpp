@@ -30,14 +30,14 @@
 
 #include <vector>
 
+namespace swirly {
+class Rest;
+namespace mg {
+
 /**
  * @addtogroup App
  * @{
  */
-
-namespace swirly {
-class Rest;
-namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
@@ -114,9 +114,9 @@ class RestServ : public mg::Mgr<RestServ> {
   VarAccum stat_;
 };
 
+/** @} */
+
 } // mg
 } // swirly
-
-/** @} */
 
 #endif // SWIRLYD_RESTSERV_HPP
