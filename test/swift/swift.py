@@ -23,6 +23,7 @@ import socket
 import subprocess
 import tempfile
 import time
+import unittest
 
 class Process(object):
 
@@ -148,3 +149,26 @@ class Connection(object):
     conn.endheaders()
     conn.send(content)
     return Response(conn.getresponse())
+
+class RestTestCase(unittest.TestCase):
+
+  def createMarket(self, conn, mnem, contr, settlDate, expiryDate):
+    resp = conn.send('POST', '/api/rec/market',
+                     mnem = mnem,
+                     display = mnem,
+                     contr = contr,
+                     settlDate = settlDate,
+                     expiryDate = expiryDate,
+                     state = 0)
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+
+  def createOrder(self, conn, market, side, lots, ticks):
+    resp = conn.send('POST', '/api/sess/order/' + market,
+                     side = side,
+                     lots = lots,
+                     ticks = ticks)
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
