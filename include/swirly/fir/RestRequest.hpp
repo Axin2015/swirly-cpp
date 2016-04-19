@@ -21,12 +21,12 @@
 
 #include <swirly/ash/Types.hpp>
 
+namespace swirly {
+
 /**
  * @addtogroup Rest
  * @{
  */
-
-namespace swirly {
 
 class SWIRLY_API RestRequest {
  public:
@@ -134,8 +134,8 @@ class SWIRLY_API RestRequest {
   long num() const noexcept { return num_.sign * num_.digits; }
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_FIR_RESTREQUEST_HPP

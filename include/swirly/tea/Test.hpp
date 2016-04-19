@@ -24,13 +24,13 @@
 #include <cmath>
 #include <exception>
 
+namespace swirly {
+namespace test {
+
 /**
  * @addtogroup Test
  * @{
  */
-
-namespace swirly {
-namespace test {
 
 class SWIRLY_API TestException : public std::exception {
   enum { ErrMax = 127 };
@@ -86,8 +86,15 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
   return std::abs(lhs - rhs) <= delta;
 }
 
+/** @} */
+
 } // test
 } // swirly
+
+/**
+ * @addtogroup Test
+ * @{
+ */
 
 #define SWIRLY_FAIL_(file, line, what) throw swirly::test::TestException(file, line, what)
 

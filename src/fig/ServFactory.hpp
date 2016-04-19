@@ -19,12 +19,12 @@
 
 #include <swirly/elm/Factory.hpp>
 
+namespace swirly {
+
 /**
  * @addtogroup App
  * @{
  */
-
-namespace swirly {
 
 class SWIRLY_API ServFactory : public BasicFactory {
  public:
@@ -50,8 +50,8 @@ class SWIRLY_API ServFactory : public BasicFactory {
                                       std::string_view email) const override;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_FIG_SERVFACTORY_HPP

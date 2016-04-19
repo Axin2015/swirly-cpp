@@ -25,12 +25,12 @@
 
 #include <boost/intrusive/set.hpp>
 
+namespace swirly {
+
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted {
  public:
@@ -238,8 +238,8 @@ class SWIRLY_API TraderPosnSet {
   Set set_;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_POSN_HPP

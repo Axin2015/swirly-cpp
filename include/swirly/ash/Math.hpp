@@ -22,12 +22,12 @@
 #include <algorithm>
 #include <cmath>
 
+namespace swirly {
+
 /**
  * @addtogroup Util
  * @{
  */
-
-namespace swirly {
 
 class SWIRLY_API VarAccum {
  public:
@@ -117,8 +117,8 @@ inline double pctile999(double mean, double sd) noexcept
   return mean + 3.0902323 * sd;
 }
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ASH_MATH_HPP

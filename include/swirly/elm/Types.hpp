@@ -24,12 +24,12 @@
 
 #include <cstdint>
 
+namespace swirly {
+
 /**
  * @addtogroup Domain
  * @{
  */
-
-namespace swirly {
 
 enum class Iden : int64_t {};
 
@@ -227,16 +227,12 @@ struct EnumTraits<State> {
   static void print(std::ostream& os, State val) noexcept { os << enumString(val); }
 };
 
-} // swirly
-
 /** @} */
 
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
 
 class Asset;
 class Contr;
@@ -260,8 +256,8 @@ using ConstOrderPtr = boost::intrusive_ptr<const Order>;
 using PosnPtr = boost::intrusive_ptr<Posn>;
 using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_TYPES_HPP

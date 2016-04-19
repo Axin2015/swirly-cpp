@@ -23,12 +23,12 @@
 
 #include <memory>
 
+namespace swirly {
+
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
 
 class SWIRLY_API Factory {
  public:
@@ -168,8 +168,8 @@ class SWIRLY_API BasicFactory : public Factory {
                     Cost buyCost, Lots sellLots, Cost sellCost) const override;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_FACTORY_HPP

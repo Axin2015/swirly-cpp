@@ -22,14 +22,14 @@
 #include <swirly/elm/Market.hpp>
 #include <swirly/elm/Trader.hpp>
 
+namespace swirly {
+
+class Factory;
+
 /**
  * @addtogroup IO
  * @{
  */
-
-namespace swirly {
-
-class Factory;
 
 class SWIRLY_API Model {
  public:
@@ -59,8 +59,8 @@ class SWIRLY_API Model {
   virtual TraderSet doReadTrader(const Factory& factory) const = 0;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_MODEL_HPP

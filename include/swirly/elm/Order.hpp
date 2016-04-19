@@ -22,14 +22,14 @@
 
 #include <boost/intrusive/list.hpp>
 
+namespace swirly {
+
+class Level;
+
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
-
-class Level;
 
 /**
  * An instruction to buy or sell goods or services.
@@ -303,8 +303,8 @@ class SWIRLY_API OrderList {
   List list_;
 };
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_ORDER_HPP

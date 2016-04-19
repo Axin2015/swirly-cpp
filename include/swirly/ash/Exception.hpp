@@ -22,12 +22,12 @@
 #include <cstring> // strcpy()
 #include <exception>
 
+namespace swirly {
+
 /**
  * @addtogroup Exception
  * @{
  */
-
-namespace swirly {
 
 /**
  * Maximum error message length.
@@ -67,8 +67,8 @@ class SWIRLY_API Exception : public std::exception {
  */
 SWIRLY_API ErrMsg& errMsg() noexcept;
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ASH_EXCEPTION_HPP

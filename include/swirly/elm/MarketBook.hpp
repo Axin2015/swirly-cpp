@@ -20,14 +20,14 @@
 #include <swirly/elm/BookSide.hpp>
 #include <swirly/elm/Market.hpp>
 
+namespace swirly {
+
+class MarketBook;
+
 /**
  * @addtogroup Book
  * @{
  */
-
-namespace swirly {
-
-class MarketBook;
 
 /**
  * Adapter that provides stream insertion operator for MarketBook::toJsonView().
@@ -142,8 +142,8 @@ inline void MarketView::toJson(std::ostream& os) const
   book_->toJsonView(os);
 }
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_MARKETBOOK_HPP

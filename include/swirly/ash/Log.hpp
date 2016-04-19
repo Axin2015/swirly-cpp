@@ -19,12 +19,12 @@
 
 #include <swirly/ash/Stream.hpp>
 
+namespace swirly {
+
 /**
  * @addtogroup Log
  * @{
  */
-
-namespace swirly {
 
 /**
  * Maximum log message length when LogMsg is used.
@@ -131,7 +131,14 @@ SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
+/** @} */
+
 } // swirly
+
+/**
+ * @addtogroup Log
+ * @{
+ */
 
 // N.B. varargs help ensure that expressions such as the following work correctly:
 // SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});

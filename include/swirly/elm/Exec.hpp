@@ -20,12 +20,12 @@
 #include <swirly/elm/Conv.hpp>
 #include <swirly/elm/Request.hpp>
 
+namespace swirly {
+
 /**
  * @addtogroup Entity
  * @{
  */
-
-namespace swirly {
 
 /**
  * A transaction that occurs as an @ref Order transitions through a workflow.
@@ -130,8 +130,8 @@ class SWIRLY_API Exec : public Request {
 
 using ExecIdSet = RequestIdSet<Exec>;
 
-} // swirly
-
 /** @} */
+
+} // swirly
 
 #endif // SWIRLY_ELM_EXEC_HPP

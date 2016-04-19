@@ -20,6 +20,10 @@
 
 #include <cassert>
 
+#ifndef SWIRLY_DEPTH
+#define SWIRLY_DEPTH 3
+#endif // SWIRLY_DEPTH
+
 using namespace std;
 
 namespace swirly {
@@ -27,8 +31,7 @@ namespace {
 template <typename FnT>
 void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostream& os, FnT fn)
 {
-  enum { Levels = 3 };
-  for (int i{0}; i < Levels; ++i) {
+  for (int i{0}; i < SWIRLY_DEPTH; ++i) {
     if (i > 0) {
       os << ',';
     }
