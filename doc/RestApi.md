@@ -86,7 +86,7 @@ Get Session entities, where entity is: order, trade, posn or view.
 
 `GET /api/sess/order[/MARKET[/ID]]`
 
-Get Order(s) with optional filter by market and id.
+Get Order(s) with optional filter by Market and Id.
 
 `POST /api/sess/order/MARKET`
 
@@ -116,7 +116,7 @@ Archive Order(s).
 
 `GET /api/sess/trade[/MARKET[/ID]]`
 
-Get Trade(s) with optional filter by market and id.
+Get Trade(s) with optional filter by Market and Id.
 
 `POST /api/sess/trade/MARKET`
 
@@ -140,18 +140,35 @@ Archive Trade(s).
 
 `GET /api/sess/posn[/CONTR[/SETTL_DATE]]`
 
-Get Posn(s) with optional filter by contract and settlement-date.
+Get Posn(s) with optional filter by Contract and Settlement-Date.
 
 View
 ----
 
+`GET /api/view[/MARKET]`
+
+Get view of the Order-Book with optional filter by Market. This is the same as `/api/sess/view`
+(below), except that it does not require a login. (The View is considered public information.)
+
 `GET /api/sess/view[/MARKET]`
 
-Get view of the Order-Book with optional filter by market. This is the same as `/api/view` (below),
-except that it allows logged-in users to fetch the view along with other session entities in a
+Get view of the Order-Book with optional filter by Market. This is the same as `/api/view` (above),
+except that it allows logged-in users to fetch the View along with other session entities in a
 single HTTP request.
 
-`GET api/view[/MARKET]`
+In summary, the View aliases serve different use-cases:
 
-Get view of the Order-Book with optional filter by market. This is the same as `/api/sess/view`
-(above), except that it does not require a login. (The view is considered public information.)
+- `/api/view` - access to View for anonymous users;
+- `/api/sess/view` - alias for authenticated users that allows Order, Trade, Posn and View updates
+  to be retrieved in batch.
+
+These aliases can be thought of as hard- or soft-links in a file-system, in that they are just
+different ways of addressing the same underlying resource.
+
+Although `/api/sess/view` is private, in the sense that a user must be logged-in to access that URL,
+this does not mean that the URL returns a private (or screened) View of the Order-Book.
+
+Future consideration: depending on usage patterns, we may to consider making the anonymous
+`/api/view` alias a delayed feed.
+
+See also [market-data](@ref MarketData).

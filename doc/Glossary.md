@@ -18,6 +18,8 @@ Glossary {#Glossary}
 
 - **e-commerce**: commercial transactions conducted electronically on the Internet.
 
+- **ECN**: Electronic Communication Network.
+
 - **Exchange**: a place where buyers and sellers meet to exchange goods or services.
 
 - **Execution**: a transaction that occurs as an order transitions through a workflow.
@@ -89,6 +91,10 @@ Glossary {#Glossary}
 
 - **Trade-date**: the date on which a trade takes place.
 
+- **View**: an aggregation of an order-book.
+
 - **Volume**: total quantity.
+
+- **VWAP**: volume-weighted average price.
 
 - **Web**: the World Wide Web.
