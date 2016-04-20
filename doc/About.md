@@ -14,7 +14,7 @@ latencies.
 Swirly Cloud Limited is registered company in England and Wales.
 
 - Company Number: 09356194
-- VAT Number: 201 8625 37
+- VAT Number: GB 201 8625 37
 
 Services
 --------
