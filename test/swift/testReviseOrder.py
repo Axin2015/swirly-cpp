@@ -27,13 +27,12 @@ class TestCase(RestTestCase):
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
-        self.reviseDown(conn)
+        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.reviseSingle(conn)
+        self.reviseMulti(conn)
 
-  def reviseDown(self, conn):
-    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1',
-                     side = 'SELL',
-                     lots = 4,
-                     ticks = 12345)
+  def reviseSingle(self, conn):
+    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1', lots = 4);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -44,7 +43,7 @@ class TestCase(RestTestCase):
         u'cpty': None,
         u'created': self.now,
         u'exec': 0,
-        u'id': 2,
+        u'id': 3,
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 4,
@@ -83,8 +82,115 @@ class TestCase(RestTestCase):
       }],
       u'posn': None,
       u'view': {
-        u'bidCount': [1, None, None],
-        u'bidResd': [4, None, None],
+        u'bidCount': [2, None, None],
+        u'bidResd': [9, None, None],
+        u'bidTicks': [12345, None, None],
+        u'contr': u'EURUSD',
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lastTime': None,
+        u'market': u'EURUSD.MAR14',
+        u'offerCount': [None, None, None],
+        u'offerResd': [None, None, None],
+        u'offerTicks': [None, None, None],
+        u'settlDate': 20170102
+      }
+    }, resp.content)
+
+  def reviseMulti(self, conn):
+    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1,2', lots = 3);
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'execs': [{
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'cpty': None,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 4,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
+        u'matchId': None,
+        u'minLots': None,
+        u'orderId': 1,
+        u'ref': None,
+        u'resd': 3,
+        u'role': None,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'REVISE',
+        u'ticks': 12345,
+        u'trader': u'MARAYL'
+      }, {
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'cpty': None,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 5,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
+        u'matchId': None,
+        u'minLots': None,
+        u'orderId': 2,
+        u'ref': None,
+        u'resd': 3,
+        u'role': None,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'REVISE',
+        u'ticks': 12345,
+        u'trader': u'MARAYL'
+      }],
+      u'orders': [{
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 1,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
+        u'minLots': None,
+        u'modified': self.now,
+        u'ref': None,
+        u'resd': 3,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'REVISE',
+        u'ticks': 12345,
+        u'trader': u'MARAYL'
+      }, {
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 2,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
+        u'minLots': None,
+        u'modified': self.now,
+        u'ref': None,
+        u'resd': 3,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'REVISE',
+        u'ticks': 12345,
+        u'trader': u'MARAYL'
+      }],
+      u'posn': None,
+      u'view': {
+        u'bidCount': [2, None, None],
+        u'bidResd': [6, None, None],
         u'bidTicks': [12345, None, None],
         u'contr': u'EURUSD',
         u'lastLots': None,

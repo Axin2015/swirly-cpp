@@ -463,6 +463,39 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, string_view ref, Lots
 void Serv::reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Lots lots,
                        Millis now, Response& resp)
 {
+  resp.setBook(book);
+  for (const auto id : ids) {
+
+    auto& order = sess.order(book.mnem(), id);
+    if (order.done()) {
+      throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+    }
+    // Revised lots must not be:
+    // 1. greater than original lots;
+    // 2. less than executed lots;
+    // 3. less than min lots.
+    if (lots == 0_lts //
+        || lots > order.lots() //
+        || lots < order.exec() //
+        || lots < order.minLots()) {
+      throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
+    }
+    auto exec = impl_->newExec(book, order, now);
+    exec->revise(lots);
+
+    resp.insertOrder(&order);
+    resp.insertExec(exec);
+  }
+
+  impl_->journ.createExec(book.mnem(), resp.execs());
+
+  // Commit phase.
+
+  for (const auto& exec : resp.execs()) {
+    auto it = sess.orders().find(book.mnem(), exec->orderId());
+    assert(it != sess.orders().end());
+    book.reviseOrder(*it, lots, now);
+  }
 }
 
 void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp)

@@ -56,7 +56,8 @@ class SWIRLY_API TraderSess : public Trader {
   const auto& orders() const noexcept { return orders_; }
   const auto& trades() const noexcept { return trades_; }
   const auto& posns() const noexcept { return posns_; }
-  Order& order(std::string_view market, Iden id) noexcept
+  auto& orders() noexcept { return orders_; }
+  Order& order(std::string_view market, Iden id)
   {
     auto it = orders_.find(market, id);
     if (it == orders_.end()) {
@@ -64,7 +65,7 @@ class SWIRLY_API TraderSess : public Trader {
     }
     return *it;
   }
-  Order& order(std::string_view ref) noexcept
+  Order& order(std::string_view ref)
   {
     auto it = refIdx_.find(ref);
     if (it == refIdx_.end()) {
