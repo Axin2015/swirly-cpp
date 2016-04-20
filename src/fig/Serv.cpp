@@ -390,18 +390,7 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
       }
     });
 
-    // New execution plus 2 trade executions for each match assuming crossed with self.
-    const size_t len{1 + 2 * matches.size()};
-    Exec* execs[len];
-
-    execs[0] = exec.get();
-    int i{1};
-    for (const auto& match : matches) {
-      execs[i] = match.makerTrade.get();
-      execs[i + 1] = match.takerTrade.get();
-      i += 2;
-    }
-    impl_->journ.createExec(book.mnem(), makeArrayView(execs, len));
+    impl_->journ.createExec(book.mnem(), resp.execs());
     success = true;
   }
 

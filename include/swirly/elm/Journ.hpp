@@ -22,6 +22,8 @@
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Types.hpp>
 
+#include <vector>
+
 namespace swirly {
 
 /**
@@ -78,11 +80,14 @@ class SWIRLY_API Journ {
   /**
    * Create Executions.
    */
-  void createExec(std::string_view market, ArrayView<Exec*> execs) { doCreateExec(market, execs); }
+  void createExec(std::string_view market, const std::vector<ConstExecPtr>& execs)
+  {
+    doCreateExec(market, execs);
+  }
   /**
    * Create Executions. This overload may be less efficient than ones that are market-specific.
    */
-  void createExec(ArrayView<Exec*> execs) { doCreateExec(execs); }
+  void createExec(const std::vector<ConstExecPtr>& execs) { doCreateExec(execs); }
   /**
    * Archive Orders.
    */
@@ -115,9 +120,9 @@ class SWIRLY_API Journ {
 
   virtual void doCreateExec(const Exec& exec) = 0;
 
-  virtual void doCreateExec(std::string_view market, ArrayView<Exec*> execs) = 0;
+  virtual void doCreateExec(std::string_view market, const std::vector<ConstExecPtr>& execs) = 0;
 
-  virtual void doCreateExec(ArrayView<Exec*> execs) = 0;
+  virtual void doCreateExec(const std::vector<ConstExecPtr>& execs) = 0;
 
   virtual void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
 
