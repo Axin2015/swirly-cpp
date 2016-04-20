@@ -15,111 +15,29 @@
 
 from swift import *
 
-import unittest
-
-class TestCase(unittest.TestCase):
+class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
     self.now = 1459974268204
     with Fixture() as fixture:
       with Connection() as conn:
-        self.createMarket(conn)
-        self.makerBid(conn)
-        self.takerSell(conn)
+        conn.setTime(self.now)
+        conn.setUser('MARAYL')
+
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
+        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+
+        conn.setUser('GOSAYL')
+        self.takeOrder(conn)
+
+        conn.setUser('MARAYL')
         self.makerOrder(conn)
         self.makerTrade(conn)
         self.makerPosn(conn)
 
-  def createMarket(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
-    resp = conn.send('POST', '/api/rec/market',
-                     mnem = 'USDJPY.MAR14',
-                     display = 'first',
-                     contr = 'USDJPY',
-                     settlDate = 20170102,
-                     expiryDate = 20170101,
-                     state = 1)
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-
-  def makerBid(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
-    resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
-                     side = 'BUY',
-                     lots = 5,
-                     ticks = 12345)
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertDictEqual({
-      u'execs': [{
-        u'contr': u'USDJPY',
-        u'cost': 0,
-        u'cpty': None,
-        u'created': self.now,
-        u'exec': 0,
-        u'id': 1,
-        u'lastLots': None,
-        u'lastTicks': None,
-        u'lots': 5,
-        u'market': u'USDJPY.MAR14',
-        u'matchId': None,
-        u'minLots': None,
-        u'orderId': 1,
-        u'ref': None,
-        u'resd': 5,
-        u'role': None,
-        u'settlDate': 20170102,
-        u'side': u'BUY',
-        u'state': u'NEW',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }],
-      u'orders': [{
-        u'contr': u'USDJPY',
-        u'cost': 0,
-        u'created': self.now,
-        u'exec': 0,
-        u'id': 1,
-        u'lastLots': None,
-        u'lastTicks': None,
-        u'lots': 5,
-        u'market': u'USDJPY.MAR14',
-        u'minLots': None,
-        u'modified': self.now,
-        u'ref': None,
-        u'resd': 5,
-        u'settlDate': 20170102,
-        u'side': u'BUY',
-        u'state': u'NEW',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }],
-      u'posn': None,
-      u'view': {
-        u'bidCount': [1, None, None],
-        u'bidResd': [5, None, None],
-        u'bidTicks': [12345, None, None],
-        u'contr': u'USDJPY',
-        u'lastLots': None,
-        u'lastTicks': None,
-        u'lastTime': None,
-        u'market': u'USDJPY.MAR14',
-        u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
-        u'offerTicks': [None, None, None],
-        u'settlDate': 20170102
-      }
-    }, resp.content)
-
-  def takerSell(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('GOSAYL')
-    resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
+  def takeOrder(self, conn):
+    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)
@@ -128,7 +46,7 @@ class TestCase(unittest.TestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -137,7 +55,7 @@ class TestCase(unittest.TestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 5,
-        u'market': u'USDJPY.MAR14',
+        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 2,
@@ -150,7 +68,7 @@ class TestCase(unittest.TestCase):
         u'ticks': 12345,
         u'trader': u'GOSAYL'
       }, {
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 61725,
         u'cpty': u'MARAYL',
         u'created': self.now,
@@ -159,7 +77,7 @@ class TestCase(unittest.TestCase):
         u'lastLots': 5,
         u'lastTicks': 12345,
         u'lots': 5,
-        u'market': u'USDJPY.MAR14',
+        u'market': u'EURUSD.MAR14',
         u'matchId': 3,
         u'minLots': None,
         u'orderId': 2,
@@ -173,7 +91,7 @@ class TestCase(unittest.TestCase):
         u'trader': u'GOSAYL'
       }],
       u'orders': [{
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 61725,
         u'created': self.now,
         u'exec': 5,
@@ -181,7 +99,7 @@ class TestCase(unittest.TestCase):
         u'lastLots': 5,
         u'lastTicks': 12345,
         u'lots': 5,
-        u'market': u'USDJPY.MAR14',
+        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
@@ -195,7 +113,7 @@ class TestCase(unittest.TestCase):
       u'posn': {
         u'buyCost': 0,
         u'buyLots': 0,
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'sellCost': 61725,
         u'sellLots': 5,
         u'settlDate': 20170102,
@@ -205,11 +123,11 @@ class TestCase(unittest.TestCase):
         u'bidCount': [None, None, None],
         u'bidResd': [None, None, None],
         u'bidTicks': [None, None, None],
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'lastLots': 5,
         u'lastTicks': 12345,
         u'lastTime': self.now,
-        u'market': u'USDJPY.MAR14',
+        u'market': u'EURUSD.MAR14',
         u'offerCount': [None, None, None],
         u'offerResd': [None, None, None],
         u'offerTicks': [None, None, None],
@@ -218,14 +136,12 @@ class TestCase(unittest.TestCase):
     }, resp.content)
 
   def makerOrder(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
     resp = conn.send('GET', '/api/sess/order')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
-      u'contr': u'USDJPY',
+      u'contr': u'EURUSD',
       u'cost': 61725,
       u'created': self.now,
       u'exec': 5,
@@ -233,7 +149,7 @@ class TestCase(unittest.TestCase):
       u'lastLots': 5,
       u'lastTicks': 12345,
       u'lots': 5,
-      u'market': u'USDJPY.MAR14',
+      u'market': u'EURUSD.MAR14',
       u'minLots': None,
       u'modified': self.now,
       u'ref': None,
@@ -246,14 +162,12 @@ class TestCase(unittest.TestCase):
     }], resp.content)
 
   def makerTrade(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
     resp = conn.send('GET', '/api/sess/trade')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
-      u'contr': u'USDJPY',
+      u'contr': u'EURUSD',
       u'cost': 61725,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -262,7 +176,7 @@ class TestCase(unittest.TestCase):
       u'lastLots': 5,
       u'lastTicks': 12345,
       u'lots': 5,
-      u'market': u'USDJPY.MAR14',
+      u'market': u'EURUSD.MAR14',
       u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,
@@ -277,8 +191,6 @@ class TestCase(unittest.TestCase):
     }], resp.content)
 
   def makerPosn(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
     resp = conn.send('GET', '/api/sess/posn')
 
     self.assertEqual(200, resp.status)
@@ -286,7 +198,7 @@ class TestCase(unittest.TestCase):
     self.assertListEqual([{
       u'buyCost': 61725,
       u'buyLots': 5,
-      u'contr': u'USDJPY',
+      u'contr': u'EURUSD',
       u'sellCost': 0,
       u'sellLots': 0,
       u'settlDate': 20170102,
