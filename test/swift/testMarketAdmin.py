@@ -15,23 +15,22 @@
 
 from swift import *
 
-import unittest
-
-class TestCase(unittest.TestCase):
+class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
     self.now = 1459974268204
     with Fixture() as fixture:
       with Connection() as conn:
+        conn.setTime(self.now)
+        conn.setUser('MARAYL')
+
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
         self.updateDisplayOnly(conn)
         self.updateStateOnly(conn)
 
   def createMarket(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
     resp = conn.send('POST', '/api/rec/market',
                      mnem = 'USDJPY.MAR14',
                      display = 'first',
@@ -52,8 +51,6 @@ class TestCase(unittest.TestCase):
     }, resp.content)
 
   def updateDisplayAndState(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
     resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
                      display = 'second',
                      state = 2)
@@ -69,8 +66,6 @@ class TestCase(unittest.TestCase):
     }, resp.content)
 
   def updateDisplayOnly(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
     resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
                      display = 'third',
                      state = None)

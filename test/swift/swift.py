@@ -59,11 +59,10 @@ def getProg():
 
 def readLine(file):
   while True:
-    where = file.tell()
+    file.seek(0)
     line = file.readline()
     if not line:
       time.sleep(0.1)
-      file.seek(where)
     else:
       return line
 
@@ -76,7 +75,7 @@ class Fixture(object):
     temp = tempfile.NamedTemporaryFile(delete = True)
     proc = None
     try:
-      proc = Process(Fixture.prog, 3, temp.name, Fixture.port)
+      proc = Process(Fixture.prog, 4, temp.name, Fixture.port)
       try:
         line = readLine(temp)
       except:
@@ -136,7 +135,7 @@ class Connection(object):
   def send(self, method, uri, **kwargs):
     content = ''
     if kwargs is not None:
-      content = json.dumps(kwargs);
+      content = json.dumps(kwargs)
     conn = self.conn
     conn.putrequest(method, uri)
     conn.putheader('Accept', 'application/json')

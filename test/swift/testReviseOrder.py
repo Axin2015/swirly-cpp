@@ -15,97 +15,81 @@
 
 from swift import *
 
-import unittest
-
-class TestCase(unittest.TestCase):
+class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
     self.now = 1459974268204
     with Fixture() as fixture:
       with Connection() as conn:
-        self.createMarket(conn)
-        self.createOrder(conn)
-        self.reviseDown(conn)
+        conn.setTime(self.now)
+        conn.setUser('MARAYL')
 
-  def createMarket(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
-    resp = conn.send('POST', '/api/rec/market',
-                     mnem = 'USDJPY.MAR14',
-                     display = 'first',
-                     contr = 'USDJPY',
-                     settlDate = 20170102,
-                     expiryDate = 20170101,
-                     state = 1)
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
+        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.reviseSingle(conn)
+        self.reviseMulti(conn)
 
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-
-  def createOrder(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
-    resp = conn.send('POST', '/api/sess/order/USDJPY.MAR14',
-                     side = 'BUY',
-                     lots = 5,
-                     ticks = 12345)
+  def reviseSingle(self, conn):
+    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1', lots = 4);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
         u'exec': 0,
-        u'id': 1,
+        u'id': 3,
         u'lastLots': None,
         u'lastTicks': None,
-        u'lots': 5,
-        u'market': u'USDJPY.MAR14',
+        u'lots': 4,
+        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 1,
         u'ref': None,
-        u'resd': 5,
+        u'resd': 4,
         u'role': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
-        u'state': u'NEW',
+        u'state': u'REVISE',
         u'ticks': 12345,
         u'trader': u'MARAYL'
       }],
       u'orders': [{
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
         u'id': 1,
         u'lastLots': None,
         u'lastTicks': None,
-        u'lots': 5,
-        u'market': u'USDJPY.MAR14',
+        u'lots': 4,
+        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 5,
+        u'resd': 4,
         u'settlDate': 20170102,
         u'side': u'BUY',
-        u'state': u'NEW',
+        u'state': u'REVISE',
         u'ticks': 12345,
         u'trader': u'MARAYL'
       }],
       u'posn': None,
       u'view': {
-        u'bidCount': [1, None, None],
-        u'bidResd': [5, None, None],
+        u'bidCount': [2, None, None],
+        u'bidResd': [9, None, None],
         u'bidTicks': [12345, None, None],
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'lastLots': None,
         u'lastTicks': None,
         u'lastTime': None,
-        u'market': u'USDJPY.MAR14',
+        u'market': u'EURUSD.MAR14',
         u'offerCount': [None, None, None],
         u'offerResd': [None, None, None],
         u'offerTicks': [None, None, None],
@@ -113,33 +97,50 @@ class TestCase(unittest.TestCase):
       }
     }, resp.content)
 
-  def reviseDown(self, conn):
-    conn.setTime(self.now)
-    conn.setUser('MARAYL')
-    resp = conn.send('PUT', '/api/sess/order/USDJPY.MAR14/1',
-                     side = 'SELL',
-                     lots = 4,
-                     ticks = 12345)
+  def reviseMulti(self, conn):
+    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1,2', lots = 3);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
         u'exec': 0,
-        u'id': 2,
+        u'id': 4,
         u'lastLots': None,
         u'lastTicks': None,
-        u'lots': 4,
-        u'market': u'USDJPY.MAR14',
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 1,
         u'ref': None,
-        u'resd': 4,
+        u'resd': 3,
+        u'role': None,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'REVISE',
+        u'ticks': 12345,
+        u'trader': u'MARAYL'
+      }, {
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'cpty': None,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 5,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
+        u'matchId': None,
+        u'minLots': None,
+        u'orderId': 2,
+        u'ref': None,
+        u'resd': 3,
         u'role': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
@@ -148,19 +149,38 @@ class TestCase(unittest.TestCase):
         u'trader': u'MARAYL'
       }],
       u'orders': [{
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
         u'id': 1,
         u'lastLots': None,
         u'lastTicks': None,
-        u'lots': 4,
-        u'market': u'USDJPY.MAR14',
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 4,
+        u'resd': 3,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'REVISE',
+        u'ticks': 12345,
+        u'trader': u'MARAYL'
+      }, {
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 2,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 3,
+        u'market': u'EURUSD.MAR14',
+        u'minLots': None,
+        u'modified': self.now,
+        u'ref': None,
+        u'resd': 3,
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'REVISE',
@@ -169,14 +189,14 @@ class TestCase(unittest.TestCase):
       }],
       u'posn': None,
       u'view': {
-        u'bidCount': [1, None, None],
-        u'bidResd': [4, None, None],
+        u'bidCount': [2, None, None],
+        u'bidResd': [6, None, None],
         u'bidTicks': [12345, None, None],
-        u'contr': u'USDJPY',
+        u'contr': u'EURUSD',
         u'lastLots': None,
         u'lastTicks': None,
         u'lastTime': None,
-        u'market': u'USDJPY.MAR14',
+        u'market': u'EURUSD.MAR14',
         u'offerCount': [None, None, None],
         u'offerResd': [None, None, None],
         u'offerTicks': [None, None, None],

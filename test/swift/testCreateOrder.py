@@ -26,14 +26,83 @@ class TestCase(RestTestCase):
         conn.setUser('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
-        self.takeOrder(conn)
+        self.createBid(conn)
+        self.createOffer(conn)
 
-  def takeOrder(self, conn):
+  def createBid(self, conn):
+    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+                     side = 'BUY',
+                     lots = 5,
+                     ticks = 12344)
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'execs': [{
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'cpty': None,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 1,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 5,
+        u'market': u'EURUSD.MAR14',
+        u'matchId': None,
+        u'minLots': None,
+        u'orderId': 1,
+        u'ref': None,
+        u'resd': 5,
+        u'role': None,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'NEW',
+        u'ticks': 12344,
+        u'trader': u'MARAYL'
+      }],
+      u'orders': [{
+        u'contr': u'EURUSD',
+        u'cost': 0,
+        u'created': self.now,
+        u'exec': 0,
+        u'id': 1,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lots': 5,
+        u'market': u'EURUSD.MAR14',
+        u'minLots': None,
+        u'modified': self.now,
+        u'ref': None,
+        u'resd': 5,
+        u'settlDate': 20170102,
+        u'side': u'BUY',
+        u'state': u'NEW',
+        u'ticks': 12344,
+        u'trader': u'MARAYL'
+      }],
+      u'posn': None,
+      u'view': {
+        u'bidCount': [1, None, None],
+        u'bidResd': [5, None, None],
+        u'bidTicks': [12344, None, None],
+        u'contr': u'EURUSD',
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lastTime': None,
+        u'market': u'EURUSD.MAR14',
+        u'offerCount': [None, None, None],
+        u'offerResd': [None, None, None],
+        u'offerTicks': [None, None, None],
+        u'settlDate': 20170102
+      }
+    }, resp.content)
+
+  def createOffer(self, conn):
     resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
-                     ticks = 12345)
+                     ticks = 12346)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -58,113 +127,42 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }, {
-        u'contr': u'EURUSD',
-        u'cost': 61725,
-        u'cpty': u'MARAYL',
-        u'created': self.now,
-        u'exec': 5,
-        u'id': 3,
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lots': 5,
-        u'market': u'EURUSD.MAR14',
-        u'matchId': 4,
-        u'minLots': None,
-        u'orderId': 1,
-        u'ref': None,
-        u'resd': 0,
-        u'role': u'MAKER',
-        u'settlDate': 20170102,
-        u'side': u'BUY',
-        u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }, {
-        u'contr': u'EURUSD',
-        u'cost': 61725,
-        u'cpty': u'MARAYL',
-        u'created': self.now,
-        u'exec': 5,
-        u'id': 4,
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lots': 5,
-        u'market': u'EURUSD.MAR14',
-        u'matchId': 3,
-        u'minLots': None,
-        u'orderId': 2,
-        u'ref': None,
-        u'resd': 0,
-        u'role': u'TAKER',
-        u'settlDate': 20170102,
-        u'side': u'SELL',
-        u'state': u'TRADE',
-        u'ticks': 12345,
+        u'ticks': 12346,
         u'trader': u'MARAYL'
       }],
       u'orders': [{
         u'contr': u'EURUSD',
-        u'cost': 61725,
+        u'cost': 0,
         u'created': self.now,
-        u'exec': 5,
+        u'exec': 0,
         u'id': 2,
-        u'lastLots': 5,
-        u'lastTicks': 12345,
+        u'lastLots': None,
+        u'lastTicks': None,
         u'lots': 5,
         u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 0,
+        u'resd': 5,
         u'settlDate': 20170102,
         u'side': u'SELL',
-        u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
-      }, {
-        u'contr': u'EURUSD',
-        u'cost': 61725,
-        u'created': self.now,
-        u'exec': 5,
-        u'id': 1,
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lots': 5,
-        u'market': u'EURUSD.MAR14',
-        u'minLots': None,
-        u'modified': self.now,
-        u'ref': None,
-        u'resd': 0,
-        u'settlDate': 20170102,
-        u'side': u'BUY',
-        u'state': u'TRADE',
-        u'ticks': 12345,
+        u'state': u'NEW',
+        u'ticks': 12346,
         u'trader': u'MARAYL'
       }],
-      u'posn': {
-        u'buyCost': 61725,
-        u'buyLots': 5,
-        u'contr': u'EURUSD',
-        u'sellCost': 61725,
-        u'sellLots': 5,
-        u'settlDate': 20170102,
-        u'trader': u'MARAYL'
-      },
+      u'posn': None,
       u'view': {
-        u'bidCount': [None, None, None],
-        u'bidResd': [None, None, None],
-        u'bidTicks': [None, None, None],
+        u'bidCount': [1, None, None],
+        u'bidResd': [5, None, None],
+        u'bidTicks': [12344, None, None],
         u'contr': u'EURUSD',
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lastTime': self.now,
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lastTime': None,
         u'market': u'EURUSD.MAR14',
-        u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
-        u'offerTicks': [None, None, None],
+        u'offerCount': [1, None, None],
+        u'offerResd': [5, None, None],
+        u'offerTicks': [12346, None, None],
         u'settlDate': 20170102
       }
     }, resp.content)

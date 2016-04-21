@@ -15,15 +15,16 @@
 
 from swift import *
 
-import unittest
-
-class TestCase(unittest.TestCase):
+class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
     self.now = 1459974268204
     with Fixture() as fixture:
       with Connection() as conn:
+        conn.setTime(self.now)
+        conn.setUser('MARAYL')
+
         self.createTrader(conn)
         self.updateTrader(conn)
 

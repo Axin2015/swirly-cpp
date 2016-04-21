@@ -15,8 +15,6 @@
 
 from swift import *
 
-import unittest
-
 class TestCase(RestTestCase):
 
   def test(self):

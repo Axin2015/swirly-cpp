@@ -80,14 +80,6 @@ class SWIRLY_API RestRequest {
    *
    * @param required Required fields.
    *
-   * @return true if fields are value.
-   */
-  bool valid(unsigned required) const noexcept { return (fields_ & required) == required; }
-  /**
-   * Validate fields.
-   *
-   * @param required Required fields.
-   *
    * @param optional Optional fields.
    *
    * @return true if fields are value.

@@ -404,7 +404,7 @@ void RestServ::traderRequest(HttpMessage data, Millis now)
 
       // FIXME: Incomplete. See BackRecServlet.java
       constexpr auto reqFields = RestRequest::Display;
-      if (!request_.valid(reqFields)) {
+      if (request_.fields() != reqFields) {
         throw InvalidException{"request fields are invalid"_sv};
       }
       rest_.putTrader(mnem, request_.display(), now, out_);
@@ -531,7 +531,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Lots;
-        if (!request_.valid(reqFields)) {
+        if (request_.fields() != reqFields) {
           throw InvalidException{"request fields are invalid"_sv};
         }
         rest_.putOrder(trader(data), market, ids(), request_.lots(), now, out_);
