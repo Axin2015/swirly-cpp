@@ -97,6 +97,8 @@ class Fixture(object):
     try:
       self.proc.close()
     finally:
+      for line in self.temp:
+        print line.strip('\n')
       self.temp.close()
 
 class Response(object):
