@@ -98,8 +98,6 @@ class RestServ : public mg::Mgr<RestServ> {
   }
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
 
-  void parseIds(std::string_view sv) noexcept;
-
   Rest& rest_;
   const char* const httpUser_;
   mg_serve_http_opts httpOpts_;

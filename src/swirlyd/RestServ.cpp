@@ -28,6 +28,23 @@ using namespace std;
 namespace swirly {
 namespace mg {
 namespace {
+
+class ScopedIdens {
+ public:
+  ScopedIdens(string_view sv, vector<Iden>& ids) noexcept : ids_{ids}
+  {
+    Tokeniser<','> toks{sv};
+    while (!toks.empty()) {
+      ids.push_back(static_cast<Iden>(stou64(toks.top())));
+      toks.pop();
+    }
+  }
+  ~ScopedIdens() noexcept { ids_.clear(); }
+
+ private:
+  vector<Iden>& ids_;
+};
+
 // Trace execution time.
 class Trace {
  public:
@@ -512,7 +529,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     return;
   }
 
-  parseIds(uri_.top());
+  ScopedIdens ids{uri_.top(), ids_};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -585,7 +602,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     return;
   }
 
-  parseIds(uri_.top());
+  ScopedIdens ids{uri_.top(), ids_};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -686,16 +703,6 @@ void RestServ::viewRequest(HttpMessage data, Millis now)
       rest_.getView(market, now, out_);
     }
     return;
-  }
-}
-
-void RestServ::parseIds(string_view sv) noexcept
-{
-  ids_.clear();
-  Tokeniser<','> toks{sv};
-  while (!toks.empty()) {
-    ids_.push_back(static_cast<Iden>(stou64(toks.top())));
-    toks.pop();
   }
 }
 
