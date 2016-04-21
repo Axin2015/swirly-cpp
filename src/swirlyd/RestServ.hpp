@@ -28,8 +28,6 @@
 #include <swirly/ash/Math.hpp>
 #include <swirly/ash/Tokeniser.hpp>
 
-#include <vector>
-
 namespace swirly {
 class Rest;
 namespace mg {
@@ -99,7 +97,6 @@ class RestServ : public mg::Mgr<RestServ> {
     return mnem;
   }
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
-  ArrayView<Iden> ids() const noexcept { return {&ids_[0], ids_.size()}; }
 
   void parseIds(std::string_view sv) noexcept;
 

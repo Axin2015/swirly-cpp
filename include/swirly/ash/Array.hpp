@@ -19,6 +19,7 @@
 
 #include <cstddef> // ptrdiff_t
 #include <iterator>
+#include <vector>
 
 namespace swirly {
 
@@ -53,6 +54,10 @@ class ArrayView {
   {
   }
   constexpr ArrayView() noexcept : len_{0}, ptr_{nullptr} {}
+  ArrayView(const std::vector<ValueT>& arr) noexcept
+    : len_{arr.size()}, ptr_{arr.empty() ? nullptr : &arr[0]}
+  {
+  }
   ~ArrayView() noexcept = default;
 
   // Copy.

@@ -534,13 +534,13 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
         if (request_.fields() != reqFields) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.putOrder(trader(data), market, ids(), request_.lots(), now, out_);
+        rest_.putOrder(trader(data), market, ids_, request_.lots(), now, out_);
       }
       break;
     case MethodDelete:
       // DELETE /api/sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteOrder(market, ids(), now, out_);
+      rest_.deleteOrder(market, ids_, now, out_);
       break;
     }
     return;
@@ -602,7 +602,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodDelete:
       // DELETE /api/sess/trade/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteTrade(market, ids(), now, out_);
+      rest_.deleteTrade(market, ids_, now, out_);
       break;
     }
     return;
