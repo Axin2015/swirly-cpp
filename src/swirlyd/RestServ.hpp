@@ -104,6 +104,7 @@ class RestServ : public mg::Mgr<RestServ> {
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;
+  std::vector<std::string_view> mnems_;
   RestRequest request_;
   mg::OStream out_;
   VarAccum stat_;

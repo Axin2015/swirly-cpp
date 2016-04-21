@@ -270,9 +270,16 @@ void Rest::getView(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getView(string_view market, Millis now, ostream& out) const
+void Rest::getView(ArrayView<string_view> markets, Millis now, std::ostream& out) const
 {
-  out << serv_.market(market).view();
+  if (markets.size() == 1) {
+    out << serv_.market(markets[0]).view();
+  } else {
+    out << '[';
+    transform(markets.begin(), markets.end(), OStreamJoiner(out, ','),
+              [this](const auto& market) { return this->serv_.market(market).view(); });
+    out << ']';
+  }
 }
 
 void Rest::postMarket(string_view mnem, string_view display, string_view contr, IsoDate settlDate,

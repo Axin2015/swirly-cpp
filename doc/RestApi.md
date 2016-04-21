@@ -145,12 +145,12 @@ Get Posn(s) with optional filter by Contract and Settlement-Date.
 View
 ----
 
-`GET /api/view[/MARKET]`
+`GET /api/view[/MARKET[,MARKET]...]`
 
 Get view of the Order-Book with optional filter by Market. This is the same as `/api/sess/view`
 (below), except that it does not require a login. (The View is considered public information.)
 
-`GET /api/sess/view[/MARKET]`
+`GET /api/sess/view[/MARKET[,MARKET]...]`
 
 Get view of the Order-Book with optional filter by Market. This is the same as `/api/view` (above),
 except that it allows logged-in users to fetch the View along with other session entities in a

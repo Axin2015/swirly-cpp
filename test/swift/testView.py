@@ -45,6 +45,7 @@ class TestCase(RestTestCase):
 
         self.getViewAll(conn)
         self.getViewSingle(conn)
+        self.getViewMulti(conn)
 
   def getViewAll(self, conn):
     resp = conn.send('GET', '/api/view')
@@ -111,3 +112,36 @@ class TestCase(RestTestCase):
       u'offerTicks': [12346, 12347, 12348],
       u'settlDate': 20170102
     }, resp.content)
+
+  def getViewMulti(self, conn):
+    resp = conn.send('GET', '/api/view/EURUSD.MAR14,USDCHF.MAR14')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertListEqual([{
+      u'bidCount': [1, 2, None],
+      u'bidResd': [3, 12, None],
+      u'bidTicks': [12344, 12343, None],
+      u'contr': u'EURUSD',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'market': u'EURUSD.MAR14',
+      u'offerCount': [1, 1, 1],
+      u'offerResd': [3, 5, 7],
+      u'offerTicks': [12346, 12347, 12348],
+      u'settlDate': 20170102
+    }, {
+      u'bidCount': [1, None, None],
+      u'bidResd': [3, None, None],
+      u'bidTicks': [9344, None, None],
+      u'contr': u'USDCHF',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'market': u'USDCHF.MAR14',
+      u'offerCount': [1, None, None],
+      u'offerResd': [3, None, None],
+      u'offerTicks': [9346, None, None],
+      u'settlDate': 20170102
+    }], resp.content)

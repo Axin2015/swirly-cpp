@@ -30,9 +30,10 @@ Time, Price and Quantity.
 Subscriptions
 -------------
 
-A limitation of the current API is that clients can either obtain Views for all Markets, or
-individual Markets, but there is no provision for more selective filtering. This is likely to be
-addressed after the core Order-Book is functionally complete.
+Although the Rest API does not currently support subscriptions, clients can specify a list of
+markets they wish to receive using a `GET` request similar to the following:
+
+    GET /api/view/EURUSD,GBPUSD,USDCHF
 
 Streaming API
 -------------

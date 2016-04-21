@@ -45,6 +45,22 @@ class ScopedIdens {
   vector<Iden>& ids_;
 };
 
+class ScopedMnems {
+ public:
+  ScopedMnems(string_view sv, vector<string_view>& mnems) noexcept : mnems_{mnems}
+  {
+    Tokeniser<','> toks{sv};
+    while (!toks.empty()) {
+      mnems.push_back(toks.top());
+      toks.pop();
+    }
+  }
+  ~ScopedMnems() noexcept { mnems_.clear(); }
+
+ private:
+  vector<string_view>& mnems_;
+};
+
 // Trace execution time.
 class Trace {
  public:
@@ -689,18 +705,18 @@ void RestServ::viewRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto market = uri_.top();
+  ScopedMnems mnems{uri_.top(), mnems_};
   uri_.pop();
 
   if (uri_.empty()) {
 
-    // /api/view/MARKET
+    // /api/view/MARKET,MARKET...
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/view/MARKET
+      // GET /api/view/MARKET,MARKET...
       state_ |= MatchMethod;
-      rest_.getView(market, now, out_);
+      rest_.getView(mnems_, now, out_);
     }
     return;
   }
