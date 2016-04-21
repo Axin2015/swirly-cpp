@@ -22,8 +22,6 @@
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Types.hpp>
 
-#include <vector>
-
 namespace swirly {
 
 /**

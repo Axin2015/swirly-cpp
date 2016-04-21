@@ -28,6 +28,39 @@ using namespace std;
 namespace swirly {
 namespace mg {
 namespace {
+
+class ScopedIdens {
+ public:
+  ScopedIdens(string_view sv, vector<Iden>& ids) noexcept : ids_{ids}
+  {
+    Tokeniser<','> toks{sv};
+    while (!toks.empty()) {
+      ids.push_back(static_cast<Iden>(stou64(toks.top())));
+      toks.pop();
+    }
+  }
+  ~ScopedIdens() noexcept { ids_.clear(); }
+
+ private:
+  vector<Iden>& ids_;
+};
+
+class ScopedMnems {
+ public:
+  ScopedMnems(string_view sv, vector<string_view>& mnems) noexcept : mnems_{mnems}
+  {
+    Tokeniser<','> toks{sv};
+    while (!toks.empty()) {
+      mnems.push_back(toks.top());
+      toks.pop();
+    }
+  }
+  ~ScopedMnems() noexcept { mnems_.clear(); }
+
+ private:
+  vector<string_view>& mnems_;
+};
+
 // Trace execution time.
 class Trace {
  public:
@@ -512,7 +545,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     return;
   }
 
-  parseIds(uri_.top());
+  ScopedIdens ids{uri_.top(), ids_};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -534,13 +567,13 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
         if (request_.fields() != reqFields) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.putOrder(trader(data), market, ids(), request_.lots(), now, out_);
+        rest_.putOrder(trader(data), market, ids_, request_.lots(), now, out_);
       }
       break;
     case MethodDelete:
       // DELETE /api/sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteOrder(market, ids(), now, out_);
+      rest_.deleteOrder(market, ids_, now, out_);
       break;
     }
     return;
@@ -585,7 +618,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     return;
   }
 
-  parseIds(uri_.top());
+  ScopedIdens ids{uri_.top(), ids_};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -602,7 +635,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodDelete:
       // DELETE /api/sess/trade/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteTrade(market, ids(), now, out_);
+      rest_.deleteTrade(market, ids_, now, out_);
       break;
     }
     return;
@@ -672,30 +705,20 @@ void RestServ::viewRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto market = uri_.top();
+  ScopedMnems mnems{uri_.top(), mnems_};
   uri_.pop();
 
   if (uri_.empty()) {
 
-    // /api/view/MARKET
+    // /api/view/MARKET,MARKET...
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/view/MARKET
+      // GET /api/view/MARKET,MARKET...
       state_ |= MatchMethod;
-      rest_.getView(market, now, out_);
+      rest_.getView(mnems_, now, out_);
     }
     return;
-  }
-}
-
-void RestServ::parseIds(string_view sv) noexcept
-{
-  ids_.clear();
-  Tokeniser<','> toks{sv};
-  while (!toks.empty()) {
-    ids_.push_back(static_cast<Iden>(stou64(toks.top())));
-    toks.pop();
   }
 }
 
