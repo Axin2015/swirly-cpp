@@ -168,10 +168,6 @@ class SWIRLY_API Serv {
 
   void settlEndOfDay(Millis now);
 
-  void poll(Millis now);
-
-  Millis getTimeout() const noexcept;
-
  private:
   struct Impl;
   std::unique_ptr<Impl> impl_;

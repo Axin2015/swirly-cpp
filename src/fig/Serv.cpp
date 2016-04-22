@@ -570,13 +570,4 @@ void Serv::settlEndOfDay(Millis now)
 {
 }
 
-void Serv::poll(Millis now)
-{
-}
-
-Millis Serv::getTimeout() const noexcept
-{
-  return 0_ms;
-}
-
 } // swirly
