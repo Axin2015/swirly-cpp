@@ -78,14 +78,14 @@ class SWIRLY_API Journ {
   /**
    * Create Executions.
    */
-  void createExec(std::string_view market, const std::vector<ConstExecPtr>& execs)
+  void createExec(std::string_view market, ArrayView<ConstExecPtr> execs)
   {
     doCreateExec(market, execs);
   }
   /**
    * Create Executions. This overload may be less efficient than ones that are market-specific.
    */
-  void createExec(const std::vector<ConstExecPtr>& execs) { doCreateExec(execs); }
+  void createExec(ArrayView<ConstExecPtr> execs) { doCreateExec(execs); }
   /**
    * Archive Orders.
    */
@@ -118,9 +118,9 @@ class SWIRLY_API Journ {
 
   virtual void doCreateExec(const Exec& exec) = 0;
 
-  virtual void doCreateExec(std::string_view market, const std::vector<ConstExecPtr>& execs) = 0;
+  virtual void doCreateExec(std::string_view market, ArrayView<ConstExecPtr> execs) = 0;
 
-  virtual void doCreateExec(const std::vector<ConstExecPtr>& execs) = 0;
+  virtual void doCreateExec(ArrayView<ConstExecPtr> execs) = 0;
 
   virtual void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
 

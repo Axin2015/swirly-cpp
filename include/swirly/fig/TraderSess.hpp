@@ -89,6 +89,14 @@ class SWIRLY_API TraderSess : public Trader {
       refIdx_.remove(order);
     }
   }
+  Exec& trade(std::string_view market, Iden id)
+  {
+    auto it = trades_.find(market, id);
+    if (it == trades_.end()) {
+      throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
+    }
+    return *it;
+  }
   void insertTrade(const ExecPtr& trade) noexcept
   {
     assert(trade->trader() == mnem_);

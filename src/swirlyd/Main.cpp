@@ -230,7 +230,7 @@ int main(int argc, char* argv[])
     SWIRLY_INFO(logMsg() << "http-user: " << opts.httpUser);
     SWIRLY_INFO(logMsg() << "log-file:  " << opts.logFile);
     SWIRLY_INFO(logMsg() << "log-level: " << getLogLevel());
-    SWIRLY_INFO(logMsg() << "mask:     0" << setfill('0') << setw(3) << oct << getMask());
+    SWIRLY_INFO(logMsg() << "mask:      " << setfill('0') << setw(3) << oct << getMask());
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);
