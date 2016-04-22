@@ -334,7 +334,11 @@ void Rest::putOrder(string_view trader, string_view market, ArrayView<Iden> ids,
       serv_.reviseOrder(sess, book, ids, lots, now, resp);
     }
   } else {
-    serv_.cancelOrder(sess, book, ids, now, resp);
+    if (ids.size() == 1) {
+      serv_.cancelOrder(sess, book, ids[0], now, resp);
+    } else {
+      serv_.cancelOrder(sess, book, ids, now, resp);
+    }
   }
   out << resp;
 }

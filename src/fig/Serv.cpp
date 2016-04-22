@@ -435,6 +435,7 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, Order& order, Lots lo
   }
   auto exec = impl_->newExec(book, order, now);
   exec->revise(lots);
+
   resp.setBook(book);
   resp.insertOrder(&order);
   resp.insertExec(exec);
@@ -491,8 +492,8 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, 
 
   // Commit phase.
 
-  for (const auto& exec : resp.execs()) {
-    auto it = sess.orders().find(book.mnem(), exec->orderId());
+  for (const auto id : ids) {
+    auto it = sess.orders().find(book.mnem(), id);
     assert(it != sess.orders().end());
     book.reviseOrder(*it, lots, now);
   }
@@ -500,74 +501,129 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, 
 
 void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp)
 {
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  auto exec = impl_->newExec(book, order, now);
+  exec->cancel();
+
+  resp.setBook(book);
+  resp.insertOrder(&order);
+  resp.insertExec(exec);
+
+  impl_->journ.createExec(*exec);
+
+  // Commit phase.
+
+  book.cancelOrder(order, now);
 }
 
 void Serv::cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, Response& resp)
 {
+  auto& order = sess.order(book.mnem(), id);
+  cancelOrder(sess, book, order, now, resp);
 }
 
 void Serv::cancelOrder(TraderSess& sess, MarketBook& book, string_view ref, Millis now,
                        Response& resp)
 {
+  auto& order = sess.order(ref);
+  cancelOrder(sess, book, order, now, resp);
 }
 
 void Serv::cancelOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Millis now,
                        Response& resp)
 {
+  resp.setBook(book);
+  for (const auto id : ids) {
+
+    auto& order = sess.order(book.mnem(), id);
+    if (order.done()) {
+      throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+    }
+    auto exec = impl_->newExec(book, order, now);
+    exec->cancel();
+
+    resp.insertOrder(&order);
+    resp.insertExec(exec);
+  }
+
+  impl_->journ.createExec(book.mnem(), resp.execs());
+
+  // Commit phase.
+
+  for (const auto id : ids) {
+    auto it = sess.orders().find(book.mnem(), id);
+    assert(it != sess.orders().end());
+    book.cancelOrder(*it, now);
+  }
 }
 
 void Serv::cancelOrder(TraderSess& sess, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::cancelOrder(MarketBook& book, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveOrder(TraderSess& sess, Order& order, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveOrder(TraderSess& sess, string_view market, Iden id, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveOrder(TraderSess& sess, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveOrder(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 ConstExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side,
                                Lots lots, Ticks ticks, Role role, string_view cpty, Millis created)
 {
+  // FIXME: Not implemented.
   return {};
 }
 
 void Serv::archiveTrade(TraderSess& sess, Exec& trade, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveTrade(TraderSess& sess, string_view market, Iden id, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveTrade(TraderSess& sess, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::archiveTrade(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::expireEndOfDay(Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 void Serv::settlEndOfDay(Millis now)
 {
+  // FIXME: Not implemented.
 }
 
 } // swirly
