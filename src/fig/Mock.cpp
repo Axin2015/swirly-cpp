@@ -153,11 +153,11 @@ void MockJourn::doCreateExec(const Exec& exec)
 {
 }
 
-void MockJourn::doCreateExec(string_view market, const std::vector<ConstExecPtr>& execs)
+void MockJourn::doCreateExec(string_view market, ArrayView<ConstExecPtr> execs)
 {
 }
 
-void MockJourn::doCreateExec(const std::vector<ConstExecPtr>& execs)
+void MockJourn::doCreateExec(ArrayView<ConstExecPtr> execs)
 {
 }
 
