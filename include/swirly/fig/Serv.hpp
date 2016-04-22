@@ -142,7 +142,7 @@ class SWIRLY_API Serv {
                            Lots lots, Ticks ticks, Role role, std::string_view cpty,
                            Millis created);
 
-  void archiveTrade(TraderSess& sess, Exec& trade, Millis now);
+  void archiveTrade(TraderSess& sess, const Exec& trade, Millis now);
 
   void archiveTrade(TraderSess& sess, std::string_view market, Iden id, Millis now);
 

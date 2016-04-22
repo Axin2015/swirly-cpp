@@ -623,14 +623,24 @@ ConstExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, string_view r
   return {};
 }
 
-void Serv::archiveTrade(TraderSess& sess, Exec& trade, Millis now)
+void Serv::archiveTrade(TraderSess& sess, const Exec& trade, Millis now)
 {
-  // FIXME: Not implemented.
+  if (trade.state() != State::Trade) {
+    throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
+  }
+
+  const auto id = trade.id();
+  impl_->journ.archiveTrade(trade.market(), {&id, 1}, now);
+
+  // Commit phase.
+
+  sess.removeTrade(trade);
 }
 
 void Serv::archiveTrade(TraderSess& sess, string_view market, Iden id, Millis now)
 {
-  // FIXME: Not implemented.
+  auto& trade = sess.trade(market, id);
+  archiveTrade(sess, trade, now);
 }
 
 void Serv::archiveTrade(TraderSess& sess, Millis now)
@@ -640,7 +650,24 @@ void Serv::archiveTrade(TraderSess& sess, Millis now)
 
 void Serv::archiveTrade(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
-  // FIXME: Not implemented.
+  for (const auto id : ids) {
+
+    auto& trade = sess.trade(market, id);
+    if (trade.state() != State::Trade) {
+      throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
+    }
+  }
+
+  impl_->journ.archiveTrade(market, ids, now);
+
+  // Commit phase.
+
+  for (const auto id : ids) {
+
+    auto it = sess.trades().find(market, id);
+    assert(it != sess.trades().end());
+    sess.removeTrade(*it);
+  }
 }
 
 void Serv::expireEndOfDay(Millis now)
