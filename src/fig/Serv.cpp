@@ -569,14 +569,24 @@ void Serv::cancelOrder(MarketBook& book, Millis now)
   // FIXME: Not implemented.
 }
 
-void Serv::archiveOrder(TraderSess& sess, Order& order, Millis now)
+void Serv::archiveOrder(TraderSess& sess, const Order& order, Millis now)
 {
-  // FIXME: Not implemented.
+  if (!order.done()) {
+    throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
+  }
+
+  const auto id = order.id();
+  impl_->journ.archiveOrder(order.market(), {&id, 1}, now);
+
+  // Commit phase.
+
+  sess.removeOrder(order);
 }
 
 void Serv::archiveOrder(TraderSess& sess, string_view market, Iden id, Millis now)
 {
-  // FIXME: Not implemented.
+  auto& order = sess.order(market, id);
+  archiveOrder(sess, order, now);
 }
 
 void Serv::archiveOrder(TraderSess& sess, Millis now)
@@ -586,7 +596,24 @@ void Serv::archiveOrder(TraderSess& sess, Millis now)
 
 void Serv::archiveOrder(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
-  // FIXME: Not implemented.
+  for (const auto id : ids) {
+
+    auto& order = sess.order(market, id);
+    if (!order.done()) {
+      throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
+    }
+  }
+
+  impl_->journ.archiveOrder(market, ids, now);
+
+  // Commit phase.
+
+  for (const auto id : ids) {
+
+    auto it = sess.orders().find(market, id);
+    assert(it != sess.orders().end());
+    sess.removeOrder(*it);
+  }
 }
 
 ConstExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side,

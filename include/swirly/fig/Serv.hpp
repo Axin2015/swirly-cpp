@@ -122,7 +122,7 @@ class SWIRLY_API Serv {
 
   void cancelOrder(MarketBook& book, Millis now);
 
-  void archiveOrder(TraderSess& sess, Order& order, Millis now);
+  void archiveOrder(TraderSess& sess, const Order& order, Millis now);
 
   void archiveOrder(TraderSess& sess, std::string_view market, Iden id, Millis now);
 
