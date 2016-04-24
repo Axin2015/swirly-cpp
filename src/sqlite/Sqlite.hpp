@@ -14,36 +14,28 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
+#ifndef SWIRLY_SQLITE_SQLITE_HPP
+#define SWIRLY_SQLITE_SQLITE_HPP
 
-#include <swirly/ash/Exception.hpp>
+#include <memory>
+
+struct sqlite3;
 
 namespace swirly {
-namespace mg {
+namespace sqlite {
 
 /**
- * @addtogroup Exception
+ * @addtogroup IO
  * @{
  */
 
-class Error : public Exception {
- public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
+using SqlitePtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
 
-  // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
-
-  // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
-};
+SqlitePtr open(const char* path);
 
 /** @} */
 
-} // mg
+} // sqlite
 } // swirly
 
-#endif // SWIRLYD_EXCEPTION_HPP
+#endif // SWIRLY_SQLITE_SQLITE_HPP

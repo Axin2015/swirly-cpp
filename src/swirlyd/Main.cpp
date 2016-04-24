@@ -215,8 +215,8 @@ int main(int argc, char* argv[])
     }
 
     MockModel model;
-    MockJourn journ;
-    Rest rest{model, journ, getTimeOfDay()};
+    JournPtr journ{swirly::createJourn()};
+    Rest rest{model, *journ, getTimeOfDay()};
 
     mg::RestServ rs{rest, opts.httpUser};
     auto& conn = rs.bind(opts.httpPort);

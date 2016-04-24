@@ -14,36 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
-
-#include <swirly/ash/Exception.hpp>
+#include "Exception.hpp"
 
 namespace swirly {
-namespace mg {
+namespace sqlite {
 
-/**
- * @addtogroup Exception
- * @{
- */
+Error::~Error() noexcept = default;
 
-class Error : public Exception {
- public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
-
-  // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
-
-  // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
-};
-
-/** @} */
-
-} // mg
+} // sqlite
 } // swirly
-
-#endif // SWIRLYD_EXCEPTION_HPP

@@ -22,6 +22,17 @@
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Types.hpp>
 
+#include <memory>
+
+namespace swirly {
+class Journ;
+} // swirly
+
+extern "C" {
+SWIRLY_API swirly::Journ* swirly_createJourn(void);
+SWIRLY_API void swirly_destroyJourn(swirly::Journ* journ);
+} // extern "C"
+
 namespace swirly {
 
 /**
@@ -126,6 +137,17 @@ class SWIRLY_API Journ {
 
   virtual void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
 };
+
+using JournPtr = std::unique_ptr<Journ, void (*)(Journ*)>;
+
+/**
+ * Create Journal. This function is intended as a placeholder for Journal plugins.
+ */
+inline JournPtr createJourn()
+{
+  // FIXME: dlopen() Journal plugin and resolve entry points.
+  return {::swirly_createJourn(), ::swirly_destroyJourn};
+}
 
 /** @} */
 
