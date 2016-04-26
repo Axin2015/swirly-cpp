@@ -18,9 +18,9 @@
 
 extern "C" {
 
-SWIRLY_API swirly::Journ* swirly_createJourn(void)
+SWIRLY_API swirly::Journ* swirly_createJourn(const char* connString)
 {
-  return new swirly::sqlite::Journ;
+  return new swirly::sqlite::Journ(connString);
 }
 
 SWIRLY_API void swirly_destroyJourn(swirly::Journ* journ)

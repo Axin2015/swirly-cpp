@@ -31,7 +31,7 @@ namespace sqlite {
 
 class Journ : public swirly::Journ {
  public:
-  Journ();
+  explicit Journ(const char* connString);
   ~Journ() noexcept;
 
   // Copy.

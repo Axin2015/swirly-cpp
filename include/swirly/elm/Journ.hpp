@@ -29,7 +29,7 @@ class Journ;
 } // swirly
 
 extern "C" {
-SWIRLY_API swirly::Journ* swirly_createJourn(void);
+SWIRLY_API swirly::Journ* swirly_createJourn(const char* connString);
 SWIRLY_API void swirly_destroyJourn(swirly::Journ* journ);
 } // extern "C"
 
@@ -142,11 +142,13 @@ using JournPtr = std::unique_ptr<Journ, void (*)(Journ*)>;
 
 /**
  * Create Journal. This function is intended as a placeholder for Journal plugins.
+ *
+ * @param connString Connection string.
  */
-inline JournPtr createJourn()
+inline JournPtr createJourn(const char* connString)
 {
   // FIXME: dlopen() Journal plugin and resolve entry points.
-  return {::swirly_createJourn(), ::swirly_destroyJourn};
+  return {::swirly_createJourn(connString), ::swirly_destroyJourn};
 }
 
 /** @} */
