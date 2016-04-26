@@ -14,13 +14,13 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
+#ifndef SWIRLY_SQLITE_EXCEPTION_HPP
+#define SWIRLY_SQLITE_EXCEPTION_HPP
 
 #include <swirly/ash/Exception.hpp>
 
 namespace swirly {
-namespace mg {
+namespace sqlite {
 
 /**
  * @addtogroup Exception
@@ -43,7 +43,7 @@ class Error : public Exception {
 
 /** @} */
 
-} // mg
+} // sqlite
 } // swirly
 
-#endif // SWIRLYD_EXCEPTION_HPP
+#endif // SWIRLY_SQLITE_EXCEPTION_HPP

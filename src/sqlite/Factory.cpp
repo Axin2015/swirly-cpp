@@ -14,36 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
+#include "Journ.hpp"
 
-#include <swirly/ash/Exception.hpp>
+extern "C" {
 
-namespace swirly {
-namespace mg {
+SWIRLY_API swirly::Journ* swirly_createJourn(void)
+{
+  return new swirly::sqlite::Journ;
+}
 
-/**
- * @addtogroup Exception
- * @{
- */
+SWIRLY_API void swirly_destroyJourn(swirly::Journ* journ)
+{
+  delete journ;
+}
 
-class Error : public Exception {
- public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
-
-  // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
-
-  // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
-};
-
-/** @} */
-
-} // mg
-} // swirly
-
-#endif // SWIRLYD_EXCEPTION_HPP
+} // extern "C"

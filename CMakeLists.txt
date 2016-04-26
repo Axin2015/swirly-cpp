@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(swirlyc)
 
+SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
 SET(CMAKE_VERBOSE_MAKEFILE 1)
 
 # Configuration options:
@@ -58,6 +59,7 @@ FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time filesystem system)
 FIND_PACKAGE(Doxygen)                # Optional.
 FIND_PACKAGE(Perl)                   # Optional.
 FIND_PACKAGE(PythonInterp 2.7 EXACT) # Optional.
+FIND_PACKAGE(SQLite3 REQUIRED)
 
 IF(DOXYGEN_FOUND)
 
@@ -88,12 +90,14 @@ IF(ENABLE_SHARED_LIBS)
   SET(fig_LIBRARY fig_shared)
   SET(fir_LIBRARY fir_shared)
   SET(tea_LIBRARY tea_shared)
+  SET(sqlite_LIBRARY sqlite_shared)
 ELSE()
   SET(ash_LIBRARY ash_static)
   SET(elm_LIBRARY elm_static)
   SET(fig_LIBRARY fig_static)
   SET(fir_LIBRARY fir_static)
   SET(tea_LIBRARY tea_static)
+  SET(sqlite_LIBRARY sqlite_static)
 ENDIF()
 
 ENABLE_TESTING()
