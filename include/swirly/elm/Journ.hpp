@@ -25,15 +25,6 @@
 #include <memory>
 
 namespace swirly {
-class Journ;
-} // swirly
-
-extern "C" {
-SWIRLY_API swirly::Journ* swirly_createJourn(const char* connString);
-SWIRLY_API void swirly_destroyJourn(swirly::Journ* journ);
-} // extern "C"
-
-namespace swirly {
 
 /**
  * @addtogroup IO
@@ -138,18 +129,12 @@ class SWIRLY_API Journ {
   virtual void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
 };
 
-using JournPtr = std::unique_ptr<Journ, void (*)(Journ*)>;
-
 /**
- * Create Journal. This function is intended as a placeholder for Journal plugins.
+ * Make Journal. Forward declaration for Journal backend.
  *
  * @param connString Connection string.
  */
-inline JournPtr createJourn(const char* connString)
-{
-  // FIXME: dlopen() Journal plugin and resolve entry points.
-  return {::swirly_createJourn(connString), ::swirly_destroyJourn};
-}
+SWIRLY_API std::unique_ptr<Journ> makeJourn(const char* connString);
 
 /** @} */
 

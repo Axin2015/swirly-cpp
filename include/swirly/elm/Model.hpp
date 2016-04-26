@@ -59,6 +59,13 @@ class SWIRLY_API Model {
   virtual TraderSet doReadTrader(const Factory& factory) const = 0;
 };
 
+/**
+ * Make Model. Forward declaration for Model backend.
+ *
+ * @param connString Connection string.
+ */
+SWIRLY_API std::unique_ptr<Model> makeModel(const char* connString);
+
 /** @} */
 
 } // swirly
