@@ -13,5 +13,6 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-ADD_SUBDIRECTORY(swirlyd)
-ADD_SUBDIRECTORY(tool)
+ADD_EXECUTABLE(swirly_model Model.cpp)
+TARGET_LINK_LIBRARIES(swirly_model ${sqlite_LIBRARY})
+INSTALL(TARGETS swirly_model DESTINATION bin)
