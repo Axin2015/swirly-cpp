@@ -13,10 +13,18 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(PYTHONINTERP_FOUND)
+FILE(GLOB sqlite_SOURCES "*.cpp")
 
-  ADD_CUSTOM_TARGET(swift
-    COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
-            "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
-    DEPENDS swirlyd)
+INCLUDE_DIRECTORIES(${SQLITE3_INCLUDE_DIRS})
+
+ADD_LIBRARY(sqlite_static STATIC ${sqlite_SOURCES})
+SET_TARGET_PROPERTIES(sqlite_static PROPERTIES OUTPUT_NAME swirly_sqlite)
+TARGET_LINK_LIBRARIES(sqlite_static elm_static ${SQLITE3_LIBRARIES})
+INSTALL(TARGETS sqlite_static DESTINATION lib)
+
+IF(ENABLE_SHARED_LIBS)
+  ADD_LIBRARY(sqlite_shared SHARED ${sqlite_SOURCES})
+  SET_TARGET_PROPERTIES(sqlite_shared PROPERTIES OUTPUT_NAME swirly_sqlite)
+  TARGET_LINK_LIBRARIES(sqlite_shared elm_shared ${SQLITE3_LIBRARIES})
+  INSTALL(TARGETS sqlite_shared DESTINATION lib)
 ENDIF()
