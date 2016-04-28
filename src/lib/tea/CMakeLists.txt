@@ -13,10 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(PYTHONINTERP_FOUND)
+FILE(GLOB tea_SOURCES "*.cpp")
 
-  ADD_CUSTOM_TARGET(swift
-    COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
-            "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
-    DEPENDS swirlyd)
+ADD_LIBRARY(tea_static STATIC ${tea_SOURCES})
+SET_TARGET_PROPERTIES(tea_static PROPERTIES OUTPUT_NAME swirly_tea)
+TARGET_LINK_LIBRARIES(tea_static)
+INSTALL(TARGETS tea_static DESTINATION lib)
+
+IF(ENABLE_SHARED_LIBS)
+  ADD_LIBRARY(tea_shared SHARED ${tea_SOURCES})
+  SET_TARGET_PROPERTIES(tea_shared PROPERTIES OUTPUT_NAME swirly_tea)
+  TARGET_LINK_LIBRARIES(tea_shared)
+  INSTALL(TARGETS tea_shared DESTINATION lib)
 ENDIF()

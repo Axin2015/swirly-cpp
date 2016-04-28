@@ -13,10 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(PYTHONINTERP_FOUND)
+ADD_SUBDIRECTORY(ash)
+ADD_SUBDIRECTORY(elm)
+ADD_SUBDIRECTORY(fig)
+ADD_SUBDIRECTORY(fir)
+ADD_SUBDIRECTORY(tea)
 
-  ADD_CUSTOM_TARGET(swift
-    COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
-            "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
-    DEPENDS swirlyd)
-ENDIF()
+# FIXME: the following libraries should be modules.
+ADD_SUBDIRECTORY(sqlite)

@@ -21,7 +21,7 @@ using namespace std;
 namespace swirly {
 namespace sqlite {
 
-Journ::Journ() : sqlite_ {open(":memory:")}
+Journ::Journ(const char* connString) : sqlite_{open(connString)}
 {
 }
 
@@ -69,4 +69,10 @@ void Journ::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modif
 }
 
 } // sqlite
+
+SWIRLY_API std::unique_ptr<Journ> makeJourn(const char* connString)
+{
+  return make_unique<sqlite::Journ>(connString);
+}
+
 } // swirly

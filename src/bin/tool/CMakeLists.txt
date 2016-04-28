@@ -13,10 +13,6 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(PYTHONINTERP_FOUND)
-
-  ADD_CUSTOM_TARGET(swift
-    COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
-            "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
-    DEPENDS swirlyd)
-ENDIF()
+ADD_EXECUTABLE(swirly_model Model.cpp)
+TARGET_LINK_LIBRARIES(swirly_model ${sqlite_LIBRARY})
+INSTALL(TARGETS swirly_model DESTINATION bin)

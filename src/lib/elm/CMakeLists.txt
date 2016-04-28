@@ -13,10 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(PYTHONINTERP_FOUND)
+FILE(GLOB elm_SOURCES "*.cpp")
 
-  ADD_CUSTOM_TARGET(swift
-    COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
-            "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
-    DEPENDS swirlyd)
+ADD_LIBRARY(elm_static STATIC ${elm_SOURCES})
+SET_TARGET_PROPERTIES(elm_static PROPERTIES OUTPUT_NAME swirly_elm)
+TARGET_LINK_LIBRARIES(elm_static ash_static)
+INSTALL(TARGETS elm_static DESTINATION lib)
+
+IF(ENABLE_SHARED_LIBS)
+  ADD_LIBRARY(elm_shared SHARED ${elm_SOURCES})
+  SET_TARGET_PROPERTIES(elm_shared PROPERTIES OUTPUT_NAME swirly_elm)
+  TARGET_LINK_LIBRARIES(elm_shared ash_shared)
+  INSTALL(TARGETS elm_shared DESTINATION lib)
 ENDIF()
