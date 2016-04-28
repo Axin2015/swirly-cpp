@@ -32,8 +32,9 @@ class Process(object):
       prog,
       '-e' + str(logLevel),
       '-l' + logFile,
+      '-p' + str(port),
       '-n',
-      '-p' + str(port)
+      '-t'
     ])
     self.proc = proc
 

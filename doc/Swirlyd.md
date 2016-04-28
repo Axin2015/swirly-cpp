@@ -6,8 +6,8 @@ Synopsis
 
 Usage: `swirlyd [options]`
 
-General Options
----------------
+Options
+-------
 
 ### help ###
 
@@ -15,22 +15,19 @@ General Options
 
 Show the help message.
 
-### log-level ###
-
-`-e level`
-
-Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 2=Warning, 3=Notice,
-4=Info and 5=Debug. The default is 4 (Info).
-
-Daemon Options
---------------
-
 ### directory ###
 
 `-d directory`
 
 Set working directory. The default is the root directory ('/') unless the `no-daemon` option is
 specified.
+
+### log-level ###
+
+`-e level`
+
+Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 2=Warning, 3=Notice,
+4=Info and 5=Debug. The default is 4 (Info).
 
 ### log-file ###
 
@@ -42,20 +39,11 @@ exist. Relative paths are interpreted relative to the working directory.
 
 N.B. the syslog facility is used by default when no log-file is specified for daemonised processes.
 
-### no-daemon ###
+### mask ###
 
-`-n`
-
-Do not daemonise. I.e. run the process in the foreground.
-
-### umask ###
-
-`-m mode`
+`-m mask`
 
 File creation mode mask. The default is 0027 unless the `no-daemon` option is specified.
-
-Http Options
-------------
 
 ### http-port ###
 
@@ -68,3 +56,15 @@ Http port. Defaults to 8080.
 `-u name`
 
 Http user header. The default is "Swirly-User".
+
+### no-daemon ###
+
+`-n`
+
+Do not daemonise. I.e. run the process in the foreground.
+
+### test ###
+
+`-t`
+
+Run in functional test mode.

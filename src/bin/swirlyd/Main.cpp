@@ -75,12 +75,14 @@ mode_t getMask()
 }
 
 struct Opts {
-  bool daemon{true};
   fs::path directory;
-  const char* httpPort{"8080"};
-  const char* httpUser{"Swirly-User"};
   fs::path logFile;
   const char* mask{nullptr};
+  const char* httpPort{"8080"};
+  const char* httpUser{"Swirly-User"};
+  const char* httpTime{nullptr};
+  bool daemon{true};
+  bool test{false};
 };
 
 void printUsage(ostream& os)
@@ -89,13 +91,14 @@ void printUsage(ostream& os)
 
 Options:
   -h                Show this help message.
-  -e level          Set log-level (0-5). Default is 4.
   -d directory      Set working directory. Default is '/' unless -n.
+  -e level          Set log-level (0-5). Default is 4.
   -l path           Write to log-file. Specify '-' for default path.
-  -n                Do not daemonise. I.e. run in the foreground.
-  -m mode           File creation mode mask. Default is 0027 unless -n.
+  -m mask           File creation mode mask. Default is 0027 unless -n.
   -p port           Http port. Default is 8080.
   -u name           Http user header. Default is 'Swirly-User'.
+  -n                Do not daemonise. I.e. run in the foreground.
+  -t                Run in functional test mode.
 
 Report bugs to: support@swirlycloud.com
 )==";
@@ -105,7 +108,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
 {
   opterr = 0;
   int ch;
-  while ((ch = getopt(argc, argv, ":d:e:hl:m:np:u:")) != -1) {
+  while ((ch = getopt(argc, argv, ":d:e:hl:m:np:tu:")) != -1) {
     switch (ch) {
     case 'd':
       opts.directory = optarg;
@@ -132,6 +135,10 @@ void getOpts(int argc, char* argv[], Opts& opts)
       break;
     case 'p':
       opts.httpPort = optarg;
+      break;
+    case 't':
+      opts.test = true;
+      opts.httpTime = "Swirly-Time";
       break;
     case 'u':
       opts.httpUser = optarg;
@@ -214,23 +221,32 @@ int main(int argc, char* argv[])
       openLogFile(opts.logFile.c_str());
     }
 
-    auto model = swirly::makeModel(":memory:");
-    auto journ = swirly::makeJourn(":memory:");
+    unique_ptr<Model> model;
+    unique_ptr<Journ> journ;
+    if (!opts.test) {
+      model = swirly::makeModel(":memory:");
+      journ = swirly::makeJourn(":memory:");
+    } else {
+      // Use Mock classes for functional testing.
+      model = make_unique<MockModel>();
+      journ = make_unique<MockJourn>();
+    }
     Rest rest{*model, *journ, getTimeOfDay()};
 
-    mg::RestServ rs{rest, opts.httpUser};
+    mg::RestServ rs{rest, opts.httpUser, opts.httpTime};
     auto& conn = rs.bind(opts.httpPort);
     mg_set_protocol_http_websocket(&conn);
 
     SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << opts.httpPort);
 
-    SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
     SWIRLY_INFO(logMsg() << "directory: " << opts.directory);
+    SWIRLY_INFO(logMsg() << "log-level: " << getLogLevel());
+    SWIRLY_INFO(logMsg() << "log-file:  " << opts.logFile);
+    SWIRLY_INFO(logMsg() << "mask:      " << setfill('0') << setw(3) << oct << getMask());
     SWIRLY_INFO(logMsg() << "http-port: " << opts.httpPort);
     SWIRLY_INFO(logMsg() << "http-user: " << opts.httpUser);
-    SWIRLY_INFO(logMsg() << "log-file:  " << opts.logFile);
-    SWIRLY_INFO(logMsg() << "log-level: " << getLogLevel());
-    SWIRLY_INFO(logMsg() << "mask:      " << setfill('0') << setw(3) << oct << getMask());
+    SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "test:      " << (opts.test ? "yes" : "no"));
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);
