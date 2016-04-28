@@ -52,7 +52,7 @@ class Model : public swirly::Model {
   TraderSet doReadTrader(const Factory& factory) const override;
 
  private:
-  SqlitePtr sqlite_;
+  DbPtr db_;
 };
 
 /** @} */

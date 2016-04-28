@@ -18,22 +18,49 @@
 
 #include "Exception.hpp"
 
-#include <sqlite3.h>
+#include <cassert>
 
 using namespace std;
 
 namespace swirly {
 namespace sqlite {
 
-SqlitePtr open(const char* path)
+DbPtr openDb(const char* path)
 {
   sqlite3* db;
   int rc{sqlite3_open_v2(path, &db, SQLITE_OPEN_READWRITE, nullptr)};
-  SqlitePtr ptr{db, sqlite3_close};
+  DbPtr ptr{db, sqlite3_close};
   if (rc != SQLITE_OK) {
-    throw Error{sqlite3_errmsg(db)};
+    throw Error{errMsg() << "failed to open '" << path << "': " << sqlite3_errmsg(db)};
   }
   return ptr;
+}
+
+StmtPtr prepare(sqlite3& db, std::string_view sql)
+{
+  sqlite3_stmt* stmt;
+  int rc{sqlite3_prepare_v2(&db, sql.data(), sql.size(), &stmt, nullptr)};
+  StmtPtr ptr{stmt, sqlite3_finalize};
+  if (rc != SQLITE_OK) {
+    throw Error{errMsg() << "failed to prepare '" << sql << "': " << sqlite3_errmsg(&db)};
+  }
+  return ptr;
+}
+
+bool step(sqlite3_stmt& stmt)
+{
+  int rc{sqlite3_step(&stmt)};
+  switch (rc) {
+  case SQLITE_OK:
+    assert(false);
+  case SQLITE_ROW:
+    return true;
+  case SQLITE_DONE:
+    return false;
+  default:
+    throw Error{errMsg() << "failed to step: " << sqlite3_errstr(rc)};
+    break;
+  }
 }
 
 } // sqlite

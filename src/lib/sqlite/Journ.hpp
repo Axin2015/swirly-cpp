@@ -64,7 +64,7 @@ class Journ : public swirly::Journ {
   void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
 
  private:
-  SqlitePtr sqlite_;
+  DbPtr db_;
 };
 
 /** @} */

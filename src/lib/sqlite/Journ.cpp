@@ -21,7 +21,7 @@ using namespace std;
 namespace swirly {
 namespace sqlite {
 
-Journ::Journ(const char* connString) : sqlite_{open(connString)}
+Journ::Journ(const char* connString) : db_{openDb(connString)}
 {
 }
 

@@ -18,12 +18,31 @@
 
 #include <swirly/elm/Factory.hpp>
 
+#include <iostream>
+
 using namespace std;
 
 namespace swirly {
 namespace sqlite {
+namespace {
 
-Model::Model(const char* connString) : sqlite_{open(connString)}
+constexpr auto SelectAssetSql = //
+  "SELECT mnem, display, type_id FROM asset_t"_sv;
+
+constexpr auto SelectTraderSql = //
+  "SELECT mnem, display, email FROM trader_t"_sv;
+
+constexpr auto SelectContrSql = //
+  "SELECT mnem, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom, pip_dp," //
+  " min_lots, max_lots FROM contr_v"_sv;
+
+constexpr auto SelectMarketSql = //
+  "SELECT mnem, display, contr, settl_day, expiry_day, state, last_lots, last_ticks, last_time," //
+  " max_order_id, max_exec_id FROM market_v"_sv;
+
+} // anonymous
+
+Model::Model(const char* connString) : db_{openDb(connString)}
 {
 }
 
@@ -35,93 +54,109 @@ Model& Model::operator=(Model&&) = default;
 
 AssetSet Model::doReadAsset(const Factory& factory) const
 {
+  enum {
+    Mnem, //
+    Display, //
+    TypeId //
+  };
+
   AssetSet s;
-  // Forex.
-  s.insert(factory.newAsset("CHF", "Switzerland, Francs", AssetType::Currency));
-  s.insert(factory.newAsset("EUR", "Euro Member Countries, Euro", AssetType::Currency));
-  s.insert(factory.newAsset("GBP", "United Kingdom, Pounds", AssetType::Currency));
-  s.insert(factory.newAsset("JPY", "Japan, Yen", AssetType::Currency));
-  s.insert(factory.newAsset("USD", "United States of America, Dollars", AssetType::Currency));
-  s.insert(factory.newAsset("ZAR", "South Africa, Rand", AssetType::Currency));
-  // Coal.
-  s.insert(factory.newAsset("CAP", "Central Appalachia Coal", AssetType::Commodity));
-  s.insert(factory.newAsset("NAP", "Northern Appalachia Coal", AssetType::Commodity));
-  s.insert(factory.newAsset("ILB", "Illinois Basin Coal", AssetType::Commodity));
-  s.insert(factory.newAsset("PRB", "Powder River Basin Coal", AssetType::Commodity));
-  s.insert(factory.newAsset("UIB", "Uinta Basin Coal", AssetType::Commodity));
-  // Coffee.
-  s.insert(factory.newAsset("ETB", "Ethiopia, Birr", AssetType::Currency));
-  s.insert(factory.newAsset("WYCA", "Yirgachefe A", AssetType::Commodity));
-  s.insert(factory.newAsset("WWNA", "Wenago A", AssetType::Commodity));
-  s.insert(factory.newAsset("WKCA", "Kochere A", AssetType::Commodity));
-  s.insert(factory.newAsset("WGAA", "Gelena Abaya A", AssetType::Commodity));
-  // US Corporates.
-  s.insert(factory.newAsset("CSCO", "Cisco Systems Inc", AssetType::Corporate));
-  s.insert(factory.newAsset("DIS", "Walt Disney", AssetType::Corporate));
-  s.insert(factory.newAsset("IBM", "Ibm Corp", AssetType::Corporate));
-  s.insert(factory.newAsset("INTC", "Intel Corp", AssetType::Corporate));
-  s.insert(factory.newAsset("MSFT", "Microsoft Corp", AssetType::Corporate));
-  s.insert(factory.newAsset("VIA", "Viacom Inc", AssetType::Corporate));
-  s.insert(factory.newAsset("VOD", "Vodafone Group Plc", AssetType::Corporate));
-  s.insert(factory.newAsset("VZ", "Verizon Com", AssetType::Corporate));
+
+  StmtPtr stmt{prepare(*db_, SelectAssetSql)};
+  while (step(*stmt)) {
+    s.insert(factory.newAsset(column<string_view>(*stmt, Mnem), //
+                              column<string_view>(*stmt, Display), //
+                              column<AssetType>(*stmt, TypeId)));
+  }
   return s;
 }
 
 ContrSet Model::doReadContr(const Factory& factory) const
 {
+  enum {
+    Mnem, //
+    Display, //
+    Asset, //
+    Ccy, //
+    TickNumer, //
+    TickDenom, //
+    LotNumer, //
+    LotDenom, //
+    PipDp, //
+    MinLots, //
+    MaxLots //
+  };
+
   ContrSet s;
-  // Forex.
-  s.insert(
-    factory.newContr("EURUSD", "EURUSD", "EUR", "USD", 1000000, 1, 1, 10000, 4, 1_lts, 10_lts));
-  s.insert(
-    factory.newContr("GBPUSD", "GBPUSD", "GBP", "USD", 1000000, 1, 1, 10000, 4, 1_lts, 10_lts));
-  s.insert(
-    factory.newContr("USDCHF", "USDCHF", "USD", "CHF", 1000000, 1, 1, 10000, 4, 1_lts, 10_lts));
-  s.insert(
-    factory.newContr("USDJPY", "USDJPY", "USD", "JPY", 1000000, 1, 1, 100, 2, 1_lts, 10_lts));
-  // Coal.
-  s.insert(factory.newContr("CAP", "Central Appalachia Coal", "CAP", "USD", 1000, 1, 1, 20, 2,
-                            1_lts, 10_lts));
-  s.insert(factory.newContr("NAP", "Northern Appalachia Coal", "NAP", "USD", 1000, 1, 1, 20, 2,
-                            1_lts, 10_lts));
-  s.insert(
-    factory.newContr("ILB", "Illinois Basin Coal", "ILB", "USD", 1000, 1, 1, 20, 2, 1_lts, 10_lts));
-  s.insert(factory.newContr("PRB", "Powder River Basin Coal", "PRB", "USD", 1000, 1, 1, 20, 2,
-                            1_lts, 10_lts));
-  s.insert(
-    factory.newContr("UIB", "Uinta Basin Coal", "UIB", "USD", 1000, 1, 1, 20, 2, 1_lts, 10_lts));
-  // Coffee.
-  s.insert(factory.newContr("WYCA", "Yirgachefe A", "WYCA", "ETB", 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  s.insert(factory.newContr("WWNA", "Wenago A", "WWNA", "ETB", 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  s.insert(factory.newContr("WKCA", "Kochere A", "WKCA", "ETB", 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  s.insert(factory.newContr("WGAA", "Gelena Abaya A", "WGAA", "ETB", 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  // US Corporates.
-  s.insert(
-    factory.newContr("CSCO", "Cisco Systems Inc", "CSCO", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(factory.newContr("DIS", "Walt Disney", "DIS", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(factory.newContr("IBM", "Ibm Corp", "IBM", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(factory.newContr("INTC", "Intel Corp", "INTC", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(
-    factory.newContr("MSFT", "Microsoft Corp", "MSFT", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(factory.newContr("VIA", "Viacom Inc", "VIA", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(
-    factory.newContr("VOD", "Vodafone Group Plc", "VOD", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  s.insert(factory.newContr("VZ", "Verizon Com", "VZ", "USD", 1, 1, 1, 1000, 3, 1_lts, 10_lts));
+
+  StmtPtr stmt{prepare(*db_, SelectContrSql)};
+  while (step(*stmt)) {
+    s.insert(factory.newContr(column<string_view>(*stmt, Mnem), //
+                              column<string_view>(*stmt, Display), //
+                              column<string_view>(*stmt, Asset), //
+                              column<string_view>(*stmt, Ccy), //
+                              column<int>(*stmt, LotNumer), //
+                              column<int>(*stmt, LotDenom), //
+                              column<int>(*stmt, TickNumer), //
+                              column<int>(*stmt, TickDenom), //
+                              column<int>(*stmt, PipDp), //
+                              column<Lots>(*stmt, MinLots), //
+                              column<Lots>(*stmt, MaxLots)));
+  }
   return s;
 }
 
 MarketSet Model::doReadMarket(const Factory& factory) const
 {
+  enum { //
+    Mnem, //
+    Display, //
+    Contr, //
+    SettlDay, //
+    ExpiryDay, //
+    State, //
+    LastLots, //
+    LastTicks, //
+    LastTime, //
+    MaxOrderId, //
+    MaxExecId //
+  };
+
   MarketSet s;
+
+  StmtPtr stmt{prepare(*db_, SelectMarketSql)};
+  while (step(*stmt)) {
+    s.insert(factory.newMarket(column<string_view>(*stmt, Mnem), //
+                               column<string_view>(*stmt, Display), //
+                               column<string_view>(*stmt, Contr), //
+                               column<Jday>(*stmt, SettlDay), //
+                               column<Jday>(*stmt, ExpiryDay), //
+                               column<MarketState>(*stmt, State), //
+                               column<Lots>(*stmt, LastLots), //
+                               column<Ticks>(*stmt, LastTicks), //
+                               column<Millis>(*stmt, LastTime), //
+                               column<Iden>(*stmt, MaxOrderId), //
+                               column<Iden>(*stmt, MaxExecId)));
+  }
   return s;
 }
 
 TraderSet Model::doReadTrader(const Factory& factory) const
 {
+  enum { //
+    Mnem, //
+    Display, //
+    Email //
+  };
+
   TraderSet s;
-  s.insert(factory.newTrader("GOSAYL", "Goska Aylett", "goska.aylett@gmail.com"));
-  s.insert(factory.newTrader("MARAYL", "Mark Aylett", "mark.aylett@gmail.com"));
-  s.insert(factory.newTrader("SWIRLY", "Swirly Cloud", "info@swirlycloud.com"));
+
+  StmtPtr stmt{prepare(*db_, SelectTraderSql)};
+  while (step(*stmt)) {
+    s.insert(factory.newTrader(column<string_view>(*stmt, Mnem), //
+                               column<string_view>(*stmt, Display), //
+                               column<string_view>(*stmt, Email)));
+  }
   return s;
 }
 
