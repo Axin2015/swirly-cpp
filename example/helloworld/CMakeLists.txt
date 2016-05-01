@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 PROJECT(helloworld)
 
 IF(DEFINED ENV{SWIRLY_HOME})

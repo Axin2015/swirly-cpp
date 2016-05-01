@@ -21,16 +21,29 @@
 #  SQLITE3_FOUND        - True if SQLite3 found.
 
 # Look for the header file.
-FIND_PATH(SQLITE3_INCLUDE_DIR NAMES sqlite3.h)
+FIND_PATH(SQLITE3_INCLUDE_DIR NAMES sqlite3.h
+          HINTS "$ENV{SQLITE3_HOME}/include")
 
 # Look for the library.
-FIND_LIBRARY(SQLITE3_LIBRARY NAMES sqlite3)
+FIND_LIBRARY(SQLITE3_LIBRARY NAMES sqlite3
+             HINTS "$ENV{SQLITE3_HOME}/lib")
+
+IF(SQLITE3_INCLUDE_DIR)
+  FILE(STRINGS "${SQLITE3_INCLUDE_DIR}/sqlite3.h" _sqlite3_version_raw
+       REGEX "^#define[\t ]+SQLITE_VERSION[\t ]+\"[0-9]+(\\.[0-9]+)+\"")
+  STRING(REGEX REPLACE "^#define[\t ]+SQLITE_VERSION[\t ]+\"([0-9]+(\\.[0-9]+)+)\"" "\\1"
+         SQLITE3_VERSION_STRING "${_sqlite3_version_raw}")
+  UNSET(_sqlite3_version_raw)
+ENDIF()
 
 # Handle the QUIETLY and REQUIRED arguments and set SQLITE3_FOUND to TRUE if all listed variables are TRUE.
 INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SQLITE3 DEFAULT_MSG
-  SQLITE3_INCLUDE_DIR
-  SQLITE3_LIBRARY)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SQLite3
+                                  FOUND_VAR     SQLITE3_FOUND
+                                  REQUIRED_VARS SQLITE3_INCLUDE_DIR
+                                                SQLITE3_LIBRARY
+                                  VERSION_VAR   SQLITE3_VERSION_STRING
+                                  FAIL_MESSAGE  "Failed to find Sqlite3")
 
 MARK_AS_ADVANCED(SQLITE3_INCLUDE_DIR SQLITE3_LIBRARY)
 
@@ -38,4 +51,4 @@ MARK_AS_ADVANCED(SQLITE3_INCLUDE_DIR SQLITE3_LIBRARY)
 IF(SQLITE3_FOUND)
   SET(SQLITE3_INCLUDE_DIRS ${SQLITE3_INCLUDE_DIR})
   SET(SQLITE3_LIBRARIES ${SQLITE3_LIBRARY})
-ENDIF(SQLITE3_FOUND)
+ENDIF()

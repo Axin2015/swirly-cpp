@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 PROJECT(swirlyc)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
@@ -70,11 +70,13 @@ FIND_PROGRAM(DOT_EXECUTABLE dot)
 FIND_PROGRAM(ENV_EXECUTABLE env)
 FIND_PROGRAM(RAGEL_EXECUTABLE ragel)
 
-FIND_PACKAGE(Boost 1.55 REQUIRED COMPONENTS date_time filesystem system)
+FIND_PACKAGE(Boost   1.55  REQUIRED COMPONENTS date_time filesystem system)
+# The sqlite3_errstr() function was added in 3.7.15.
+FIND_PACKAGE(SQLite3 3.7.15 REQUIRED)
+
 FIND_PACKAGE(Doxygen)                # Optional.
 FIND_PACKAGE(Perl)                   # Optional.
 FIND_PACKAGE(PythonInterp 2.7 EXACT) # Optional.
-FIND_PACKAGE(SQLite3 REQUIRED)
 
 IF(DOXYGEN_FOUND)
 
