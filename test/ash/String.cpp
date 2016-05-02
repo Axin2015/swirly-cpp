@@ -96,3 +96,63 @@ SWIRLY_TEST_CASE(Stou64)
   SWIRLY_CHECK(stou64("x123 "_sv) == 0UL);
   SWIRLY_CHECK(stou64("18446744073709551615"_sv) == 18446744073709551615ULL);
 }
+
+SWIRLY_TEST_CASE(LtrimCopy)
+{
+  SWIRLY_CHECK(ltrimCopy(""_sv) == ""_sv);
+  SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\r"_sv) == ""_sv);
+  SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\rfoo "_sv) == "foo "_sv);
+  SWIRLY_CHECK(ltrimCopy("foo"_sv) == "foo"_sv);
+
+  SWIRLY_CHECK(ltrimCopy(""s) == ""s);
+  SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\r"s) == ""s);
+  SWIRLY_CHECK(ltrimCopy(" \t\n\v\f\rfoo "s) == "foo "s);
+  SWIRLY_CHECK(ltrimCopy("foo"s) == "foo"s);
+}
+
+SWIRLY_TEST_CASE(RtrimCopy)
+{
+  SWIRLY_CHECK(rtrimCopy(""_sv) == ""_sv);
+  SWIRLY_CHECK(rtrimCopy(" \t\n\v\f\r"_sv) == ""_sv);
+  SWIRLY_CHECK(rtrimCopy(" foo \t\n\v\f\r"_sv) == " foo"_sv);
+  SWIRLY_CHECK(rtrimCopy("foo"_sv) == "foo"_sv);
+
+  SWIRLY_CHECK(rtrimCopy(""s) == ""s);
+  SWIRLY_CHECK(rtrimCopy(" \t\n\v\f\r"s) == ""s);
+  SWIRLY_CHECK(rtrimCopy(" foo \t\n\v\f\r"s) == " foo"s);
+  SWIRLY_CHECK(rtrimCopy("foo"s) == "foo"s);
+}
+
+SWIRLY_TEST_CASE(TrimCopy)
+{
+  SWIRLY_CHECK(trimCopy(""_sv) == ""_sv);
+  SWIRLY_CHECK(trimCopy(" \t\n\v\f\r"_sv) == ""_sv);
+  SWIRLY_CHECK(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"_sv) == "foo"_sv);
+  SWIRLY_CHECK(trimCopy("foo"_sv) == "foo"_sv);
+
+  SWIRLY_CHECK(trimCopy(""s) == ""s);
+  SWIRLY_CHECK(trimCopy(" \t\n\v\f\r"s) == ""s);
+  SWIRLY_CHECK(trimCopy(" \t\n\v\f\rfoo \t\n\v\f\r"s) == "foo"s);
+  SWIRLY_CHECK(trimCopy("foo"s) == "foo"s);
+}
+
+SWIRLY_TEST_CASE(SplitPair)
+{
+  SWIRLY_CHECK(splitPair(""_sv, '=') == make_pair(""_sv, ""_sv));
+  SWIRLY_CHECK(splitPair("="_sv, '=') == make_pair(""_sv, ""_sv));
+  SWIRLY_CHECK(splitPair("a"_sv, '=') == make_pair("a"_sv, ""_sv));
+  SWIRLY_CHECK(splitPair("a="_sv, '=') == make_pair("a"_sv, ""_sv));
+  SWIRLY_CHECK(splitPair("=b"_sv, '=') == make_pair(""_sv, "b"_sv));
+  SWIRLY_CHECK(splitPair("a=b"_sv, '=') == make_pair("a"_sv, "b"_sv));
+  SWIRLY_CHECK(splitPair("a:b"_sv, ':') == make_pair("a"_sv, "b"_sv));
+  SWIRLY_CHECK(splitPair(" a = b "_sv, '=') == make_pair(" a "_sv, " b "_sv));
+
+  SWIRLY_CHECK(splitPair(""s, '=') == make_pair(""s, ""s));
+  SWIRLY_CHECK(splitPair("="s, '=') == make_pair(""s, ""s));
+  SWIRLY_CHECK(splitPair("a"s, '=') == make_pair("a"s, ""s));
+  SWIRLY_CHECK(splitPair("a="s, '=') == make_pair("a"s, ""s));
+  SWIRLY_CHECK(splitPair("=b"s, '=') == make_pair(""s, "b"s));
+  SWIRLY_CHECK(splitPair("a=b"s, '=') == make_pair("a"s, "b"s));
+  SWIRLY_CHECK(splitPair("a:b"s, ':') == make_pair("a"s, "b"s));
+  SWIRLY_CHECK(splitPair(" a = b "s, '=') == make_pair(" a "s, " b "s));
+}
