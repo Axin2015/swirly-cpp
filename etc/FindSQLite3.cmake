@@ -28,6 +28,10 @@ FIND_PATH(SQLITE3_INCLUDE_DIR NAMES sqlite3.h
 FIND_LIBRARY(SQLITE3_LIBRARY NAMES sqlite3
              HINTS "$ENV{SQLITE3_HOME}/lib")
 
+# Look for the program.
+FIND_PROGRAM(SQLITE3_EXECUTABLE NAMES sqlite3
+             HINTS "$ENV{SQLITE3_HOME}/bin")
+
 IF(SQLITE3_INCLUDE_DIR)
   FILE(STRINGS "${SQLITE3_INCLUDE_DIR}/sqlite3.h" _sqlite3_version_raw
        REGEX "^#define[\t ]+SQLITE_VERSION[\t ]+\"[0-9]+(\\.[0-9]+)+\"")
@@ -42,10 +46,11 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(SQLite3
                                   FOUND_VAR     SQLITE3_FOUND
                                   REQUIRED_VARS SQLITE3_INCLUDE_DIR
                                                 SQLITE3_LIBRARY
+                                                SQLITE3_EXECUTABLE
                                   VERSION_VAR   SQLITE3_VERSION_STRING
                                   FAIL_MESSAGE  "Failed to find Sqlite3")
 
-MARK_AS_ADVANCED(SQLITE3_INCLUDE_DIR SQLITE3_LIBRARY)
+MARK_AS_ADVANCED(SQLITE3_INCLUDE_DIR SQLITE3_LIBRARY SQLITE3_EXECUTABLE)
 
 # Copy the results to the output variables.
 IF(SQLITE3_FOUND)
