@@ -39,7 +39,8 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  explicit RestServ(Rest& rest, const char* httpUser) noexcept : rest_(rest), httpUser_{httpUser}
+  explicit RestServ(Rest& rest, const char* httpUser, const char* httpTime = nullptr) noexcept
+    : rest_(rest), httpUser_{httpUser}, httpTime_{httpTime}
   {
     memset(&httpOpts_, 0, sizeof(httpOpts_));
   }
@@ -100,6 +101,7 @@ class RestServ : public mg::Mgr<RestServ> {
 
   Rest& rest_;
   const char* const httpUser_;
+  const char* const httpTime_;
   mg_serve_http_opts httpOpts_;
   int state_{0};
   Tokeniser<'/'> uri_;

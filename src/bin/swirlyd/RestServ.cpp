@@ -102,9 +102,12 @@ class Trace {
   std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 
-Millis getSwirlyTime(HttpMessage data) noexcept
+Millis getSwirlyTime(HttpMessage data, const char* httpTime = nullptr) noexcept
 {
-  auto header = data.header("Swirly-Time");
+  string_view header;
+  if (httpTime) {
+    header = data.header(httpTime);
+  }
   return header.empty() ? getTimeOfDay() : box<Millis>(stou64(header));
 }
 } // anonymous
@@ -148,7 +151,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
   }
   uri_.pop();
 
-  const auto now = getSwirlyTime(data);
+  const auto now = getSwirlyTime(data, httpTime_);
   // See mg_send().
   nc.last_io_time = unbox(now) / 1000;
 

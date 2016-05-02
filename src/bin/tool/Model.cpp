@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
   int ret = 1;
   try {
 
-    const BasicFactory factory {};
-    auto model = makeModel(":memory:");
+    const BasicFactory factory{};
+    auto model = makeModel(argc > 1 ? argv[1] : "swirly.db");
 
     cout << "{\"assets\":[";
     auto assets = model->readAsset(factory);

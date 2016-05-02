@@ -16,33 +16,36 @@
 INCLUDE(AddFileDependencies)
 
 SET(outfiles)
-IF(DOT_EXECUTABLE)
+IF(SQLITE3_EXECUTABLE)
 
-  MESSAGE(STATUS "Dot found: ${DOT_EXECUTABLE}")
+  MESSAGE(STATUS "Sqlite3 found: ${SQLITE3_EXECUTABLE}")
 
   SET(names
-    Ash
-    Elm
-    Fig
-    Fir
+    coal
+    coffee
+    corp
+    forex
   )
 
   FOREACH(name ${names})
 
-    SET(outfile "${PROJECT_BINARY_DIR}/image/${name}Depend.png")
+    SET(outfile "${PROJECT_BINARY_DIR}/data/${name}.db")
 
-    STRING(TOLOWER ${name} lname)
     ADD_CUSTOM_COMMAND(
       OUTPUT "${outfile}"
-      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-      COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${lname}
-              | "${DOT_EXECUTABLE}" -Tpng >"${outfile}"
-      DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl"
-              ${lname}_static)
+      WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+      COMMAND ${CMAKE_COMMAND} -E remove "${outfile}"
+      COMMAND "${SQLITE3_EXECUTABLE}" "${outfile}" <schema.sql
+      COMMAND "${SQLITE3_EXECUTABLE}" "${outfile}" <${name}.sql
+      DEPENDS schema.sql ${name}.sql)
 
     SET(outfiles ${outfiles} "${outfile}")
   ENDFOREACH()
 
 ENDIF()
 
-ADD_CUSTOM_TARGET(image ALL DEPENDS ${outfiles})
+ADD_CUSTOM_TARGET(data ALL DEPENDS ${outfiles})
+
+FILE(GLOB infiles "*.sql")
+INSTALL(FILES ${infiles}  DESTINATION data)
+INSTALL(FILES ${outfiles} DESTINATION data)

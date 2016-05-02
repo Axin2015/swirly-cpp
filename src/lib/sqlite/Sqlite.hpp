@@ -17,9 +17,16 @@
 #ifndef SWIRLY_SQLITE_SQLITE_HPP
 #define SWIRLY_SQLITE_SQLITE_HPP
 
-#include <memory>
+#include <experimental/string_view>
 
-struct sqlite3;
+#include <sqlite3.h>
+
+#include <memory>
+#include <type_traits>
+
+namespace std {
+using experimental::string_view;
+}
 
 namespace swirly {
 namespace sqlite {
@@ -29,9 +36,49 @@ namespace sqlite {
  * @{
  */
 
-using SqlitePtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
+using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
+using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
 
-SqlitePtr open(const char* path);
+DbPtr openDb(const char* path);
+
+StmtPtr prepare(sqlite3& db, std::string_view sql);
+
+bool step(sqlite3_stmt& stmt);
+
+// FIXME: use is_enum_v<> when C++17.
+template <typename ValueT>
+inline ValueT column(sqlite3_stmt& stmt, int col,
+                     std::enable_if_t<std::is_enum<ValueT>::value, ValueT>* = nullptr) noexcept
+{
+  return static_cast<ValueT>(sqlite3_column_int(&stmt, col));
+}
+
+template <typename ValueT>
+inline ValueT
+column(sqlite3_stmt& stmt, int col,
+       std::enable_if_t<std::is_same<ValueT, int>::value || std::is_same<ValueT, unsigned>::value,
+                        ValueT>* = nullptr) noexcept
+{
+  return sqlite3_column_int(&stmt, col);
+}
+
+template <typename ValueT>
+inline ValueT column(
+  sqlite3_stmt& stmt, int col,
+  std::enable_if_t<std::is_same<ValueT, int64_t>::value || std::is_same<ValueT, uint64_t>::value,
+                   ValueT>* = nullptr) noexcept
+{
+  return sqlite3_column_int64(&stmt, col);
+}
+
+template <typename ValueT>
+inline ValueT column(sqlite3_stmt& stmt, int col,
+                     std::enable_if_t<std::is_same<ValueT, const char*>::value
+                                        || std::is_same<ValueT, std::string_view>::value,
+                                      ValueT>* = nullptr) noexcept
+{
+  return reinterpret_cast<const char*>(sqlite3_column_text(&stmt, col));
+}
 
 /** @} */
 
