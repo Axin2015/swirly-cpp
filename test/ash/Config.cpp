@@ -23,7 +23,16 @@
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(Config)
+namespace {
+template <typename FnT>
+string applyCopy(FnT fn, string s)
+{
+  fn(s);
+  return s;
+}
+} // anonymous
+
+SWIRLY_TEST_CASE(ParseConfig)
 {
   const string text{R"(
 # comment
@@ -50,4 +59,27 @@ st = = uv =
   SWIRLY_CHECK(config["kl"] == "mn");
   SWIRLY_CHECK(config["op"] == "qr");
   SWIRLY_CHECK(config["st"] == "= uv =");
+}
+
+SWIRLY_TEST_CASE(VarInterp)
+{
+  auto fn = makeVarInterp([](const string& name) {
+    string val;
+    if (name == "FOO") {
+      val = "101";
+    } else if (name == "BAR") {
+      val = "202";
+    } else if (name == "BAZ") {
+      val = "${FOO}${BAR}";
+    }
+    return val;
+  });
+  SWIRLY_CHECK(applyCopy(fn, "${FOO}") == "101");
+  SWIRLY_CHECK(applyCopy(fn, "${BAR}") == "202");
+  SWIRLY_CHECK(applyCopy(fn, "${BAZ}") == "101202");
+
+  SWIRLY_CHECK(applyCopy(fn, " ${FOO} ") == " 101 ");
+  // FIXME: recursion is not supported.
+  SWIRLY_CHECK(applyCopy(fn, "${${BAR}}") == "}");
+  SWIRLY_CHECK(applyCopy(fn, "${BAD}") == "");
 }

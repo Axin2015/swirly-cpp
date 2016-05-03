@@ -19,6 +19,7 @@
 
 #include <swirly/ash/String.hpp>
 
+#include <regex>
 #include <string>
 #include <tuple>
 
@@ -28,6 +29,43 @@ namespace swirly {
  * @addtogroup Util
  * @{
  */
+
+template <typename FnT>
+class VarInterp {
+ public:
+  explicit VarInterp(FnT fn) : fn_{fn} {}
+  ~VarInterp() noexcept = default;
+
+  // Copy.
+  VarInterp(const VarInterp&) = default;
+  VarInterp& operator=(const VarInterp&) = default;
+
+  // Move.
+  VarInterp(VarInterp&&) = default;
+  VarInterp& operator=(VarInterp&&) = default;
+
+  void operator()(std::string& s) const
+  {
+    // The approach here is quite simplistic, but it should suffice for basic configs.
+
+    // FIXME: using iterator rather than const_iterator to work-around compilation errors.
+    std::match_results<std::string::iterator> m;
+    while (std::regex_search(s.begin(), s.end(), m, re_)) {
+      const std::string var{fn_(m[1].str())};
+      s.replace(m[0].first, m[0].second, var);
+    }
+  }
+
+ private:
+  FnT fn_;
+  std::regex re_{R"(\$\{([^}]+)\})"};
+};
+
+template <typename FnT>
+inline VarInterp<FnT> makeVarInterp(FnT fn)
+{
+  return VarInterp<FnT>{fn};
+}
 
 template <typename FnT>
 void parseConfig(std::istream& is, FnT fn)
