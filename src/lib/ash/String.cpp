@@ -19,6 +19,9 @@
 using namespace std;
 
 namespace swirly {
+namespace {
+constexpr char Space[] = " \t\n\v\f\r";
+} // anonymous
 
 uint64_t stou64(string_view sv) noexcept
 {
@@ -35,6 +38,56 @@ uint64_t stou64(string_view sv) noexcept
     ++it;
   }
   return l;
+}
+
+void ltrim(string_view& s) noexcept
+{
+  const auto pos = s.find_first_not_of(Space);
+  s.remove_prefix(pos != string_view::npos ? pos : s.size());
+}
+
+void ltrim(string& s) noexcept
+{
+  const auto pos = s.find_first_not_of(Space);
+  s.erase(0, pos != string_view::npos ? pos : s.size());
+}
+
+void rtrim(string_view& s) noexcept
+{
+  const auto pos = s.find_last_not_of(Space);
+  s.remove_suffix(s.size() - (pos != string_view::npos ? pos + 1 : 0));
+}
+
+void rtrim(std::string& s) noexcept
+{
+  const auto pos = s.find_last_not_of(Space);
+  s.erase(pos != string_view::npos ? pos + 1 : 0);
+}
+
+pair<string_view, string_view> splitPair(const string_view& s, char delim) noexcept
+{
+  const auto pos = s.find_first_of(delim);
+  string_view key, val;
+  if (pos == string_view::npos) {
+    key = s;
+  } else {
+    key = s.substr(0, pos);
+    val = s.substr(pos + 1);
+  }
+  return {key, val};
+}
+
+SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim)
+{
+  const auto pos = s.find_first_of(delim);
+  string key, val;
+  if (pos == string::npos) {
+    key = s;
+  } else {
+    key = s.substr(0, pos);
+    val = s.substr(pos + 1);
+  }
+  return {key, val};
 }
 
 } // swirly

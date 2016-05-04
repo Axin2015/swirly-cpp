@@ -265,6 +265,67 @@ std::string toString(const ValueT& val)
 
 SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
 
+SWIRLY_API void ltrim(std::string_view& s) noexcept;
+
+SWIRLY_API void ltrim(std::string& s) noexcept;
+
+SWIRLY_API void rtrim(std::string_view& s) noexcept;
+
+SWIRLY_API void rtrim(std::string& s) noexcept;
+
+inline void trim(std::string_view& s) noexcept
+{
+  ltrim(s);
+  rtrim(s);
+}
+
+inline void trim(std::string& s) noexcept
+{
+  ltrim(s);
+  rtrim(s);
+}
+
+inline std::string_view ltrimCopy(std::string_view s) noexcept
+{
+  ltrim(s);
+  return s;
+}
+
+inline std::string ltrimCopy(std::string s) noexcept
+{
+  ltrim(s);
+  return s;
+}
+
+inline std::string_view rtrimCopy(std::string_view s) noexcept
+{
+  rtrim(s);
+  return s;
+}
+
+inline std::string rtrimCopy(std::string s) noexcept
+{
+  rtrim(s);
+  return s;
+}
+
+inline std::string_view trimCopy(std::string_view s) noexcept
+{
+  trim(s);
+  return s;
+}
+
+inline std::string trimCopy(std::string s) noexcept
+{
+  trim(s);
+  return s;
+}
+
+SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(const std::string_view& s,
+                                                                   char delim) noexcept;
+
+SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim);
+
 /** @} */
 
 } // swirly
