@@ -24,12 +24,31 @@ using namespace std;
 using namespace swirly;
 
 namespace {
+
 template <typename FnT>
 string applyCopy(FnT fn, string s)
 {
   fn(s);
   return s;
 }
+
+string getVar(const string& name)
+{
+  string val;
+  if (name == "FOO") {
+    val = "101";
+  } else if (name == "BAR") {
+    val = "202";
+  } else if (name == "BAZ") {
+    val = "FOO";
+  } else if (name == "QUX") {
+    val = "BAR";
+  } else if (name == "FOOBAR") {
+    val = "${FOO}${BAR}";
+  }
+  return val;
+}
+
 } // anonymous
 
 SWIRLY_TEST_CASE(ParseConfig)
@@ -61,25 +80,84 @@ st = = uv =
   SWIRLY_CHECK(config["st"] == "= uv =");
 }
 
-SWIRLY_TEST_CASE(VarInterp)
+SWIRLY_TEST_CASE(VarInterpBasic)
 {
-  auto fn = makeVarInterp([](const string& name) {
+  VarInterp fn(getVar);
+
+  SWIRLY_CHECK(applyCopy(fn, "${FOO}") == "101");
+  SWIRLY_CHECK(applyCopy(fn, "${BAR}") == "202");
+  SWIRLY_CHECK(applyCopy(fn, "<${FOO}>") == "<101>");
+  SWIRLY_CHECK(applyCopy(fn, "<${FOO} ${BAR}>") == "<101 202>");
+}
+
+SWIRLY_TEST_CASE(VarInterpEmpty)
+{
+  VarInterp fn(getVar);
+
+  SWIRLY_CHECK(applyCopy(fn, "${}").empty());
+  SWIRLY_CHECK(applyCopy(fn, "${123}").empty());
+  SWIRLY_CHECK(applyCopy(fn, "${EMPTY}").empty());
+}
+
+SWIRLY_TEST_CASE(VarInterpEscape)
+{
+  VarInterp fn(getVar);
+
+  SWIRLY_CHECK(applyCopy(fn, "\\\\") == "\\");
+  SWIRLY_CHECK(applyCopy(fn, "\\\\>") == "\\>");
+  SWIRLY_CHECK(applyCopy(fn, "<\\\\") == "<\\");
+  SWIRLY_CHECK(applyCopy(fn, "\\${FOO}") == "${FOO}");
+  SWIRLY_CHECK(applyCopy(fn, "$\\{FOO}") == "${FOO}");
+  SWIRLY_CHECK(applyCopy(fn, "${\\FOO}") == "101");
+  SWIRLY_CHECK(applyCopy(fn, "${FOO\\}") == "${FOO}");
+  SWIRLY_CHECK(applyCopy(fn, "${FOO}\\") == "101\\");
+}
+
+SWIRLY_TEST_CASE(VarInterpPartial)
+{
+  VarInterp fn(getVar);
+
+  SWIRLY_CHECK(applyCopy(fn, "$") == "$");
+  SWIRLY_CHECK(applyCopy(fn, "{") == "{");
+  SWIRLY_CHECK(applyCopy(fn, "}") == "}");
+  SWIRLY_CHECK(applyCopy(fn, "$FOO") == "$FOO");
+  SWIRLY_CHECK(applyCopy(fn, "{FOO") == "{FOO");
+  SWIRLY_CHECK(applyCopy(fn, "${FOO") == "${FOO");
+  SWIRLY_CHECK(applyCopy(fn, "FOO}") == "FOO}");
+  SWIRLY_CHECK(applyCopy(fn, "$${FOO}") == "$101");
+}
+
+SWIRLY_TEST_CASE(VarInterpNested)
+{
+  VarInterp fn(getVar);
+
+  SWIRLY_CHECK(applyCopy(fn, "${FOOBAR}") == "101202");
+  SWIRLY_CHECK(applyCopy(fn, "${${BAZ}}") == "101");
+  SWIRLY_CHECK(applyCopy(fn, "${${BAZ}BAR}") == "101202");
+  SWIRLY_CHECK(applyCopy(fn, "${FOO${QUX}}") == "101202");
+  SWIRLY_CHECK(applyCopy(fn, "${${BAZ}${QUX}}") == "101202");
+}
+
+SWIRLY_TEST_CASE(VarInterpLoop)
+{
+  VarInterp fn([](const string& name) {
     string val;
     if (name == "FOO") {
-      val = "101";
+      val = "${BAR}";
     } else if (name == "BAR") {
-      val = "202";
+      val = "${BAZ}";
     } else if (name == "BAZ") {
-      val = "${FOO}${BAR}";
+      val = "${QUX}";
+    } else if (name == "QUX") {
+      val = "${FOO}";
     }
     return val;
   });
-  SWIRLY_CHECK(applyCopy(fn, "${FOO}") == "101");
-  SWIRLY_CHECK(applyCopy(fn, "${BAR}") == "202");
-  SWIRLY_CHECK(applyCopy(fn, "${BAZ}") == "101202");
 
-  SWIRLY_CHECK(applyCopy(fn, " ${FOO} ") == " 101 ");
-  // FIXME: recursion is not supported.
-  SWIRLY_CHECK(applyCopy(fn, "${${BAR}}") == "}");
-  SWIRLY_CHECK(applyCopy(fn, "${BAD}") == "");
+  SWIRLY_CHECK(applyCopy(fn, "${FOO}").empty());
+  SWIRLY_CHECK(applyCopy(fn, "${FOO}${FOO}").empty());
+  SWIRLY_CHECK(applyCopy(fn, "${FOO${FOO}}").empty());
+  SWIRLY_CHECK(applyCopy(fn, "<${FOO}>") == "<>");
+  SWIRLY_CHECK(applyCopy(fn, "<${FOO${FOO}}>") == "<>");
+  SWIRLY_CHECK(applyCopy(fn, "<${FOO} ${FOO}>") == "< >");
 }
