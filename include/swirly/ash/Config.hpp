@@ -19,7 +19,8 @@
 
 #include <swirly/ash/String.hpp>
 
-#include <regex>
+#include <functional>
+#include <set>
 #include <string>
 #include <tuple>
 
@@ -30,10 +31,9 @@ namespace swirly {
  * @{
  */
 
-template <typename FnT>
-class VarInterp {
+class SWIRLY_API VarInterp {
  public:
-  explicit VarInterp(FnT fn) : fn_{fn} {}
+  explicit VarInterp(std::function<std::string(const std::string&)> fn) : fn_{std::move(fn)} {}
   ~VarInterp() noexcept = default;
 
   // Copy.
@@ -44,28 +44,27 @@ class VarInterp {
   VarInterp(VarInterp&&) = default;
   VarInterp& operator=(VarInterp&&) = default;
 
-  void operator()(std::string& s) const
-  {
-    // The approach here is quite simplistic, but it should suffice for basic configs.
-
-    // FIXME: using iterator rather than const_iterator to work-around compilation errors.
-    std::match_results<std::string::iterator> m;
-    while (std::regex_search(s.begin(), s.end(), m, re_)) {
-      const std::string var{fn_(m[1].str())};
-      s.replace(m[0].first, m[0].second, var);
-    }
-  }
+  void operator()(std::string& s) const { interp(s, std::string::npos, 0); }
 
  private:
-  FnT fn_;
-  std::regex re_{R"(\$\{([^}]+)\})"};
-};
+  /**
+   * Interpolate variables.
+   *
+   * @param s The string to interpolate.
+   *
+   * @param i Position of opening brace or std::string::npos if top-level.
+   *
+   * @param j Starting position of search. The search space is [j, size).
+   *
+   * @param outer Set of names seen at the same position in outer level.
+   *
+   * @return true if closing brace was found for brace at position i.
+   */
+  bool interp(std::string& s, const std::size_t i, std::size_t j,
+              std::set<std::string>* outer = nullptr) const;
 
-template <typename FnT>
-inline VarInterp<FnT> makeVarInterp(FnT fn)
-{
-  return VarInterp<FnT>{fn};
-}
+  std::function<std::string(const std::string&)> fn_;
+};
 
 template <typename FnT>
 void parseConfig(std::istream& is, FnT fn)
