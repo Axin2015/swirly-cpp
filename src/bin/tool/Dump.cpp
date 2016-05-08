@@ -17,7 +17,7 @@
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Model.hpp>
 
-#include <swirly/ash/Log.hpp>
+#include <swirly/ash/Stream.hpp>
 
 #include <iostream>
 

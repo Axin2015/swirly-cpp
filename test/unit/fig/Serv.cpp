@@ -122,7 +122,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServTraders, Fixture)
   SWIRLY_CHECK(it->mnem() == "MARAYL"_sv);
   SWIRLY_CHECK(it->display() == "Mark Aylett"_sv);
 
-  SWIRLY_CHECK(it->email() == "mark.aylett@gmail.com"_sv);
+  SWIRLY_CHECK(it->email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServMarket, Fixture)
@@ -149,20 +149,20 @@ SWIRLY_FIXTURE_TEST_CASE(ServTrader, Fixture)
   SWIRLY_CHECK(sess.mnem() == "MARAYL"_sv);
   SWIRLY_CHECK(sess.display() == "Mark Aylett"_sv);
 
-  SWIRLY_CHECK(sess.email() == "mark.aylett@gmail.com"_sv);
+  SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServFindTraderByEmail, Fixture)
 {
   // Not found.
-  SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@gmail.comx"_sv) == nullptr);
+  SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@swirlycloud.comx"_sv) == nullptr);
 
-  auto* sess = serv.findTraderByEmail("mark.aylett@gmail.com"_sv);
+  auto* sess = serv.findTraderByEmail("mark.aylett@swirlycloud.com"_sv);
   SWIRLY_CHECK(sess != nullptr);
   SWIRLY_CHECK(sess->mnem() == "MARAYL"_sv);
   SWIRLY_CHECK(sess->display() == "Mark Aylett"_sv);
 
-  SWIRLY_CHECK(sess->email() == "mark.aylett@gmail.com"_sv);
+  SWIRLY_CHECK(sess->email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, Fixture)
@@ -278,53 +278,53 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, Fixture)
 SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
 {
   // Mnemonic too short.
-  SWIRLY_CHECK_THROW(serv.createTrader("x", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+  SWIRLY_CHECK_THROW(serv.createTrader("x", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now),
                      InvalidException);
 
   // Mnemonic contains invalid characters.
   SWIRLY_CHECK_THROW(
-    serv.createTrader("MARAYL 2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    serv.createTrader("PIP AYL", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now),
     InvalidException);
 
-  auto& sess = serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now);
-  SWIRLY_CHECK(sess.mnem() == "MARAYL2"_sv);
-  SWIRLY_CHECK(sess.display() == "Mark Aylett"_sv);
+  auto& sess = serv.createTrader("PIPAYL", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now);
+  SWIRLY_CHECK(sess.mnem() == "PIPAYL"_sv);
+  SWIRLY_CHECK(sess.display() == "Pippin Aylett"_sv);
 
-  SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
+  SWIRLY_CHECK(sess.email() == "pippin.aylett@swirlycloud.com"_sv);
 
   SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 4);
-  auto it = serv.traders().find("MARAYL2"_sv);
+  auto it = serv.traders().find("PIPAYL"_sv);
   SWIRLY_CHECK(it != serv.traders().end());
   SWIRLY_CHECK(&*it == &sess);
 
   // Email index has been updated.
-  SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@swirlycloud.com"_sv) == &sess);
+  SWIRLY_CHECK(serv.findTraderByEmail("pippin.aylett@swirlycloud.com"_sv) == &sess);
 
   // Already exists.
   SWIRLY_CHECK_THROW(
-    serv.createTrader("MARAYL2", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    serv.createTrader("PIPAYL", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now),
     AlreadyExistsException);
 
   // Email already exists.
   SWIRLY_CHECK_THROW(
-    serv.createTrader("MARAYL3", "Mark Aylett", "mark.aylett@swirlycloud.com", Now),
+    serv.createTrader("PIPAYL2", "Pippin Aylett 2", "pippin.aylett@swirlycloud.com", Now),
     AlreadyExistsException);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
 {
-  auto& orig = serv.createTrader("MARAYL2", "Mark Aylettx", "mark.aylett@swirlycloud.com", Now);
-  auto& sess = serv.updateTrader("MARAYL2"_sv, "Mark Aylett"_sv, Now);
+  auto& orig = serv.createTrader("PIPAYL", "Pippin Aylettx", "pippin.aylett@swirlycloud.com", Now);
+  auto& sess = serv.updateTrader("PIPAYL"_sv, "Pippin Aylett"_sv, Now);
 
   SWIRLY_CHECK(&sess == &orig);
 
-  SWIRLY_CHECK(sess.mnem() == "MARAYL2"_sv);
-  SWIRLY_CHECK(sess.display() == "Mark Aylett"_sv);
+  SWIRLY_CHECK(sess.mnem() == "PIPAYL"_sv);
+  SWIRLY_CHECK(sess.display() == "Pippin Aylett"_sv);
 
-  SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
+  SWIRLY_CHECK(sess.email() == "pippin.aylett@swirlycloud.com"_sv);
 
   SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 4);
-  auto it = serv.traders().find("MARAYL2"_sv);
+  auto it = serv.traders().find("PIPAYL"_sv);
   SWIRLY_CHECK(it != serv.traders().end());
   SWIRLY_CHECK(&*it == &sess);
 }

@@ -221,22 +221,22 @@ Serv::Serv(Serv&&) = default;
 
 Serv& Serv::operator=(Serv&&) = default;
 
-const AssetSet& Serv::assets() const noexcept
+AssetSet& Serv::assets() const noexcept
 {
   return impl_->assets;
 }
 
-const ContrSet& Serv::contrs() const noexcept
+ContrSet& Serv::contrs() const noexcept
 {
   return impl_->contrs;
 }
 
-const MarketSet& Serv::markets() const noexcept
+MarketSet& Serv::markets() const noexcept
 {
   return impl_->markets;
 }
 
-const TraderSet& Serv::traders() const noexcept
+TraderSet& Serv::traders() const noexcept
 {
   return impl_->traders;
 }
@@ -271,8 +271,8 @@ TraderSess* Serv::findTraderByEmail(string_view email) const
   return trader;
 }
 
-const MarketBook& Serv::createMarket(string_view mnem, string_view display, string_view contr,
-                                     Jday settlDay, Jday expiryDay, MarketState state, Millis now)
+MarketBook& Serv::createMarket(string_view mnem, string_view display, string_view contr,
+                               Jday settlDay, Jday expiryDay, MarketState state, Millis now)
 {
   if (impl_->contrs.find(contr) == impl_->contrs.end()) {
     throw NotFoundException{errMsg() << "contr '" << contr << "' does not exist"};
@@ -297,20 +297,25 @@ const MarketBook& Serv::createMarket(string_view mnem, string_view display, stri
   if (found) {
     throw AlreadyExistsException{errMsg() << "market '" << mnem << "' already exists"};
   }
-  it = impl_->markets.insertHint(
-    it, impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state));
-  const auto& market = static_cast<const MarketBook&>(*it);
+  {
+    auto market = impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state);
+    impl_->journ.createMarket(mnem, display, contr, settlDay, expiryDay, state);
+    it = impl_->markets.insertHint(it, move(market));
+  }
+  auto& market = static_cast<MarketBook&>(*it);
   return market;
 }
 
-const MarketBook& Serv::updateMarket(string_view mnem, optional<string_view> display,
-                                     optional<MarketState> state, Millis now)
+MarketBook& Serv::updateMarket(string_view mnem, optional<string_view> display,
+                               optional<MarketState> state, Millis now)
 {
   auto it = impl_->markets.find(mnem);
   if (it == impl_->markets.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
   auto& market = static_cast<MarketBook&>(*it);
+  impl_->journ.updateMarket(mnem, display ? *display : market.display(),
+                            state ? *state : market.state());
   if (display) {
     market.setDisplay(*display);
   }
@@ -320,8 +325,7 @@ const MarketBook& Serv::updateMarket(string_view mnem, optional<string_view> dis
   return market;
 }
 
-const TraderSess& Serv::createTrader(string_view mnem, string_view display, string_view email,
-                                     Millis now)
+TraderSess& Serv::createTrader(string_view mnem, string_view display, string_view email, Millis now)
 {
   TraderSet::Iterator it;
   bool found;
@@ -332,19 +336,24 @@ const TraderSess& Serv::createTrader(string_view mnem, string_view display, stri
   if (impl_->emailIdx.find(email) != impl_->emailIdx.end()) {
     throw AlreadyExistsException{errMsg() << "email '" << email << "' is already in use"};
   }
-  it = impl_->traders.insertHint(it, impl_->newTrader(mnem, display, email));
+  {
+    auto trader = impl_->newTrader(mnem, display, email);
+    impl_->journ.createTrader(mnem, display, email);
+    it = impl_->traders.insertHint(it, move(trader));
+  }
   auto& trader = static_cast<TraderSess&>(*it);
   impl_->emailIdx.insert(trader);
   return trader;
 }
 
-const TraderSess& Serv::updateTrader(string_view mnem, string_view display, Millis now)
+TraderSess& Serv::updateTrader(string_view mnem, string_view display, Millis now)
 {
   auto it = impl_->traders.find(mnem);
   if (it == impl_->traders.end()) {
     throw TraderNotFoundException{errMsg() << "trader '" << mnem << "' does not exist"};
   }
   auto& trader = static_cast<TraderSess&>(*it);
+  impl_->journ.updateTrader(mnem, display);
   trader.setDisplay(display);
   return trader;
 }

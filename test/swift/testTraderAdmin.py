@@ -30,26 +30,26 @@ class TestCase(RestTestCase):
 
   def createTrader(self, conn):
     resp = conn.send('POST', '/api/rec/trader',
-                     mnem = 'MARAYL2',
-                     display = 'Mark Aylettx',
-                     email = 'mark.aylett@swirlycloud.com')
+                     mnem = 'PIPAYL',
+                     display = 'Pippin Aylettx',
+                     email = 'pippin.aylett@swirlycloud.com')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'display': u'Mark Aylettx',
-      u'email': u'mark.aylett@swirlycloud.com',
-      u'mnem': u'MARAYL2'
+      u'display': u'Pippin Aylettx',
+      u'email': u'pippin.aylett@swirlycloud.com',
+      u'mnem': u'PIPAYL'
     }, resp.content)
 
   def updateTrader(self, conn):
-    resp = conn.send('PUT', '/api/rec/trader/MARAYL2',
-                     display = 'Mark Aylett')
+    resp = conn.send('PUT', '/api/rec/trader/PIPAYL',
+                     display = 'Pippin Aylett')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'display': u'Mark Aylett',
-      u'email': u'mark.aylett@swirlycloud.com',
-      u'mnem': u'MARAYL2'
+      u'display': u'Pippin Aylett',
+      u'email': u'pippin.aylett@swirlycloud.com',
+      u'mnem': u'PIPAYL'
     }, resp.content)

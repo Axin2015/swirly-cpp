@@ -59,13 +59,13 @@ class SWIRLY_API Serv {
   Serv(Serv&&);
   Serv& operator=(Serv&&);
 
-  const AssetSet& assets() const noexcept;
+  AssetSet& assets() const noexcept;
 
-  const ContrSet& contrs() const noexcept;
+  ContrSet& contrs() const noexcept;
 
-  const MarketSet& markets() const noexcept;
+  MarketSet& markets() const noexcept;
 
-  const TraderSet& traders() const noexcept;
+  TraderSet& traders() const noexcept;
 
   MarketBook& market(std::string_view mnem) const;
 
@@ -73,17 +73,16 @@ class SWIRLY_API Serv {
 
   TraderSess* findTraderByEmail(std::string_view email) const;
 
-  const MarketBook& createMarket(std::string_view mnem, std::string_view display,
-                                 std::string_view contr, Jday settlDay, Jday expiryDay,
-                                 MarketState state, Millis now);
+  MarketBook& createMarket(std::string_view mnem, std::string_view display, std::string_view contr,
+                           Jday settlDay, Jday expiryDay, MarketState state, Millis now);
 
-  const MarketBook& updateMarket(std::string_view mnem, std::optional<std::string_view> display,
-                                 std::optional<MarketState> state, Millis now);
+  MarketBook& updateMarket(std::string_view mnem, std::optional<std::string_view> display,
+                           std::optional<MarketState> state, Millis now);
 
-  const TraderSess& createTrader(std::string_view mnem, std::string_view display,
-                                 std::string_view email, Millis now);
+  TraderSess& createTrader(std::string_view mnem, std::string_view display, std::string_view email,
+                           Millis now);
 
-  const TraderSess& updateTrader(std::string_view mnem, std::string_view display, Millis now);
+  TraderSess& updateTrader(std::string_view mnem, std::string_view display, Millis now);
 
   void createOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);
