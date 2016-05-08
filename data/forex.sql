@@ -185,16 +185,16 @@ INSERT INTO contr_t (mnem, display, asset, ccy, lot_numer, lot_denom,
 ;
 
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('EURUSD', 'EURUSD', 'EURUSD', 0, 0, 0)
+       VALUES ('EURUSD', 'EURUSD', 'EURUSD', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('GBPUSD', 'GBPUSD', 'GBPUSD', 0, 0, 0)
+       VALUES ('GBPUSD', 'GBPUSD', 'GBPUSD', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('USDCHF', 'USDCHF', 'USDCHF', 0, 0, 0)
+       VALUES ('USDCHF', 'USDCHF', 'USDCHF', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('USDJPY', 'USDJPY', 'USDJPY', 0, 0, 0)
+       VALUES ('USDJPY', 'USDJPY', 'USDJPY', NULL, NULL, 0)
 ;
 
 COMMIT
