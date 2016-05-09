@@ -361,6 +361,10 @@ TraderSess& Serv::updateTrader(string_view mnem, string_view display, Millis now
 void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side side, Lots lots,
                        Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
+  if (!ref.empty() && sess.refIdx().find(ref) != sess.refIdx().end()) {
+    throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
+  }
+
   const auto busDay = getBusDay(now);
   if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
     throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' in '"
