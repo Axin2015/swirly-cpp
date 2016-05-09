@@ -82,16 +82,16 @@ INSERT INTO contr_t (mnem, display, asset, ccy, lot_numer, lot_denom,
 ;
 
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WYCA', 'Yirgachefe A', 'WYCA', 0, 0, 0)
+       VALUES ('WYCA', 'Yirgachefe A', 'WYCA', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WWNA', 'Wenago A', 'WWNA', 0, 0, 0)
+       VALUES ('WWNA', 'Wenago A', 'WWNA', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WKCA', 'Kochere A', 'WKCA', 0, 0, 0)
+       VALUES ('WKCA', 'Kochere A', 'WKCA', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WGAA', 'Gelena Abaya A', 'WGAA', 0, 0, 0)
+       VALUES ('WGAA', 'Gelena Abaya A', 'WGAA', NULL, NULL, 0)
 ;
 
 COMMIT

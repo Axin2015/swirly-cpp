@@ -61,19 +61,19 @@ INSERT INTO contr_t (mnem, display, asset, ccy, lot_numer, lot_denom,
 ;
 
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('CAP', 'Central Appalachia Coal', 'CAP', 0, 0, 0)
+       VALUES ('CAP', 'Central Appalachia Coal', 'CAP', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('NAP', 'Northern Appalachia Coal', 'NAP', 0, 0, 0)
+       VALUES ('NAP', 'Northern Appalachia Coal', 'NAP', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('ILB', 'Illinois Basin Coal', 'ILB', 0, 0, 0)
+       VALUES ('ILB', 'Illinois Basin Coal', 'ILB', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('PRB', 'Powder River Basin Coal', 'PRB', 0, 0, 0)
+       VALUES ('PRB', 'Powder River Basin Coal', 'PRB', NULL, NULL, 0)
 ;
 INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('UIB', 'Uinta Basin Coal', 'UIB', 0, 0, 0)
+       VALUES ('UIB', 'Uinta Basin Coal', 'UIB', NULL, NULL, 0)
 ;
 
 COMMIT

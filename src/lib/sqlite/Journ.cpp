@@ -16,10 +16,37 @@
  */
 #include "Journ.hpp"
 
+#include <swirly/elm/Exec.hpp>
+
 using namespace std;
 
 namespace swirly {
 namespace sqlite {
+namespace {
+
+constexpr auto InsertMarketSql = //
+  "INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)" //
+  " VALUES (?, ?, ?, ?, ?, ?)"_sv;
+
+constexpr auto UpdateMarketSql = //
+  "UPDATE Market_t SET display = ?2, state = ?3" //
+  " WHERE mnem = ?1"_sv;
+
+constexpr auto InsertTraderSql = //
+  "INSERT INTO trader_t (mnem, display, email)" //
+  " VALUES (?, ?, ?)"_sv;
+
+constexpr auto UpdateTraderSql = //
+  "UPDATE trader_t SET display = ?2" //
+  " WHERE mnem = ?1"_sv;
+
+constexpr auto InsertExecSql = //
+  "INSERT INTO exec_t (trader, market, contr, settl_day, id, ref, order_id," //
+  " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
+  " min_lots, match_id, role_id, cpty, archive, created, modified)" //
+  " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
+
+} // anonymous
 
 Journ::Journ(const char* connString) : db_{openDb(connString)}
 {
@@ -34,30 +61,106 @@ Journ& Journ::operator=(Journ&&) = default;
 void Journ::doCreateMarket(string_view mnem, string_view display, string_view contr, Jday settlDay,
                            Jday expiryDay, MarketState state)
 {
+  StmtPtr stmt{prepare(*db_, InsertMarketSql)};
+
+  ScopedBind bind{*stmt};
+  bind(mnem);
+  bind(display);
+  bind(contr);
+  bind(settlDay, MaybeNull);
+  bind(expiryDay, MaybeNull);
+  bind(state);
+
+  stepOnce(*stmt);
 }
 
 void Journ::doUpdateMarket(string_view mnem, string_view display, MarketState state)
 {
+  StmtPtr stmt{prepare(*db_, UpdateMarketSql)};
+
+  ScopedBind bind{*stmt};
+  bind(mnem);
+  bind(display);
+  bind(state);
+
+  stepOnce(*stmt);
 }
 
 void Journ::doCreateTrader(string_view mnem, string_view display, string_view email)
 {
+  StmtPtr stmt{prepare(*db_, InsertTraderSql)};
+
+  ScopedBind bind{*stmt};
+  bind(mnem);
+  bind(display);
+  bind(email);
+
+  stepOnce(*stmt);
 }
 
 void Journ::doUpdateTrader(string_view mnem, string_view display)
 {
+  StmtPtr stmt{prepare(*db_, UpdateTraderSql)};
+
+  ScopedBind bind{*stmt};
+  bind(mnem);
+  bind(display);
+
+  stepOnce(*stmt);
 }
 
 void Journ::doCreateExec(const Exec& exec)
 {
+  StmtPtr stmt{prepare(*db_, InsertExecSql)};
+
+  ScopedBind bind{*stmt};
+  bind(exec.trader());
+  bind(exec.market());
+  bind(exec.contr());
+  bind(exec.settlDay(), MaybeNull);
+  bind(exec.id());
+  bind(exec.ref(), MaybeNull);
+  bind(exec.orderId(), MaybeNull);
+  bind(exec.state());
+  bind(exec.side());
+  bind(exec.lots());
+  bind(exec.ticks());
+  bind(exec.resd());
+  bind(exec.exec());
+  bind(exec.cost());
+  if (exec.lastLots() > 0_lts) {
+    bind(exec.lastLots());
+    bind(exec.lastTicks());
+  } else {
+    bind(nullptr);
+    bind(nullptr);
+  }
+  bind(exec.minLots());
+  bind(exec.matchId(), MaybeNull);
+  bind(exec.role(), MaybeNull);
+  bind(exec.cpty(), MaybeNull);
+  bind(0); // Archive.
+  bind(exec.created()); // Created.
+  bind(exec.created()); // Modified.
+
+  stepOnce(*stmt);
 }
 
 void Journ::doCreateExec(string_view market, ArrayView<ConstExecPtr> execs)
 {
+  // N.B. the market parameter is unused in the SQLite implementation.
+  doCreateExec(execs);
 }
 
 void Journ::doCreateExec(ArrayView<ConstExecPtr> execs)
 {
+  if (execs.size() == 1) {
+    doCreateExec(*execs.front());
+  } else {
+    for (const auto& exec : execs) {
+      doCreateExec(*exec);
+    }
+  }
 }
 
 void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)

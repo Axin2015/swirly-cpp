@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SQLITE_MODEL_HPP
 #define SWIRLY_SQLITE_MODEL_HPP
 
-#include "Sqlite.hpp"
+#include "Utility.hpp"
 
 #include <swirly/elm/Model.hpp>
 
