@@ -31,9 +31,18 @@ namespace swirly {
  * @{
  */
 
+inline auto getEnv(const std::string& name)
+{
+  const char* const val{getenv(name.c_str())};
+  return val ? std::string{val} : std::string{};
+}
+
 class SWIRLY_API VarInterp {
  public:
-  explicit VarInterp(std::function<std::string(const std::string&)> fn) : fn_{std::move(fn)} {}
+  explicit VarInterp(std::function<std::string(const std::string&)> fn = getEnv)
+    : fn_{std::move(fn)}
+  {
+  }
   ~VarInterp() noexcept = default;
 
   // Copy.
