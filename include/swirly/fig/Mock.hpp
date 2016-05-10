@@ -80,7 +80,11 @@ class SWIRLY_API MockJourn : public Journ {
 
   void doCreateExec(ArrayView<ConstExecPtr> execs) override;
 
+  void doArchiveOrder(std::string_view market, Iden id, Millis modified) override;
+
   void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
+
+  void doArchiveTrade(std::string_view market, Iden id, Millis modified) override;
 
   void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
 };

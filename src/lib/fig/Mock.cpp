@@ -161,7 +161,15 @@ void MockJourn::doCreateExec(ArrayView<ConstExecPtr> execs)
 {
 }
 
+void MockJourn::doArchiveOrder(string_view market, Iden id, Millis modified)
+{
+}
+
 void MockJourn::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)
+{
+}
+
+void MockJourn::doArchiveTrade(string_view market, Iden id, Millis modified)
 {
 }
 

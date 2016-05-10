@@ -46,6 +46,14 @@ constexpr auto InsertExecSql = //
   " min_lots, match_id, role_id, cpty, archive, created, modified)" //
   " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
+constexpr auto UpdateOrderSql = //
+  "UPDATE order_t SET archive = 1, modified = ?3" //
+  " WHERE market = ?1 AND id = ?2"_sv;
+
+constexpr auto UpdateExecSql = //
+  "UPDATE exec_t SET archive = 1, modified = ?3" //
+  " WHERE market = ?1 AND id = ?2"_sv;
+
 } // anonymous
 
 Journ::Journ(const char* connString) : db_{openDb(connString)}
@@ -157,18 +165,62 @@ void Journ::doCreateExec(ArrayView<ConstExecPtr> execs)
   if (execs.size() == 1) {
     doCreateExec(*execs.front());
   } else {
+    ScopedTrans trans{*db_};
     for (const auto& exec : execs) {
       doCreateExec(*exec);
     }
+    trans.commit();
   }
+}
+
+void Journ::doArchiveOrder(string_view market, Iden id, Millis modified)
+{
+  StmtPtr stmt{prepare(*db_, UpdateOrderSql)};
+
+  ScopedBind bind{*stmt};
+  bind(market);
+  bind(id);
+  bind(modified);
+
+  stepOnce(*stmt);
 }
 
 void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)
 {
+  if (ids.size() == 1) {
+    doArchiveOrder(market, ids.front(), modified);
+  } else {
+    ScopedTrans trans{*db_};
+    for (const auto id : ids) {
+      doArchiveOrder(market, id, modified);
+    }
+    trans.commit();
+  }
+}
+
+void Journ::doArchiveTrade(string_view market, Iden id, Millis modified)
+{
+  StmtPtr stmt{prepare(*db_, UpdateExecSql)};
+
+  ScopedBind bind{*stmt};
+  bind(market);
+  bind(id);
+  bind(modified);
+
+  stepOnce(*stmt);
 }
 
 void Journ::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modified)
 {
+  if (ids.size() == 1) {
+    doArchiveTrade(market, ids.front(), modified);
+  } else {
+    ScopedTrans trans{*db_};
+    for (const auto id : ids) {
+      doArchiveTrade(market, id, modified);
+    }
+    trans.commit();
+  }
 }
 
 } // sqlite

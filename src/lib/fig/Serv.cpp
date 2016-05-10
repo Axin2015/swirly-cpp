@@ -588,8 +588,7 @@ void Serv::archiveOrder(TraderSess& sess, const Order& order, Millis now)
     throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
   }
 
-  const auto id = order.id();
-  impl_->journ.archiveOrder(order.market(), {&id, 1}, now);
+  impl_->journ.archiveOrder(order.market(), order.id(), now);
 
   // Commit phase.
 
@@ -642,8 +641,7 @@ void Serv::archiveTrade(TraderSess& sess, const Exec& trade, Millis now)
     throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
   }
 
-  const auto id = trade.id();
-  impl_->journ.archiveTrade(trade.market(), {&id, 1}, now);
+  impl_->journ.archiveTrade(trade.market(), trade.id(), now);
 
   // Commit phase.
 
