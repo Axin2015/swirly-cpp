@@ -633,7 +633,7 @@ _match:
 	{
     str_.len = &mnem_.len;
     str_.buf = mnem_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
 	break;
 	case 7:
@@ -654,7 +654,7 @@ _match:
 	{
     str_.len = &display_.len;
     str_.buf = display_.buf;
-    str_.max = DisplayMax;
+    str_.max = MaxDisplay;
   }
 	break;
 	case 10:
@@ -675,7 +675,7 @@ _match:
 	{
     str_.len = &email_.len;
     str_.buf = email_.buf;
-    str_.max = EmailMax;
+    str_.max = MaxEmail;
   }
 	break;
 	case 13:
@@ -696,7 +696,7 @@ _match:
 	{
     str_.len = &trader_.len;
     str_.buf = trader_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
 	break;
 	case 16:
@@ -717,7 +717,7 @@ _match:
 	{
     str_.len = &contr_.len;
     str_.buf = contr_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
 	break;
 	case 19:
@@ -766,7 +766,7 @@ _match:
 	{
     str_.len = &ref_.len;
     str_.buf = ref_.buf;
-    str_.max = RefMax;
+    str_.max = MaxRef;
   }
 	break;
 	case 26:
@@ -889,7 +889,7 @@ _match:
 	{
     str_.len = &cpty_.len;
     str_.buf = cpty_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
 	break;
 	case 43:

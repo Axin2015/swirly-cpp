@@ -107,21 +107,21 @@ class SWIRLY_API RestRequest {
   };
   unsigned fields_;
 
-  StringData<MnemMax> mnem_;
-  StringData<DisplayMax> display_;
-  StringData<EmailMax> email_;
-  StringData<MnemMax> trader_;
-  StringData<MnemMax> contr_;
+  StringData<MaxMnem> mnem_;
+  StringData<MaxDisplay> display_;
+  StringData<MaxEmail> email_;
+  StringData<MaxMnem> trader_;
+  StringData<MaxMnem> contr_;
   IsoDate settlDate_;
   IsoDate expiryDate_;
-  StringData<RefMax> ref_;
+  StringData<MaxRef> ref_;
   MarketState state_;
   swirly::Side side_;
   swirly::Lots lots_;
   swirly::Ticks ticks_;
   swirly::Lots minLots_;
   swirly::Role role_;
-  StringData<MnemMax> cpty_;
+  StringData<MaxMnem> cpty_;
 
   long num() const noexcept { return num_.sign * num_.digits; }
 };

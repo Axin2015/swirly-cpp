@@ -33,10 +33,10 @@ namespace test {
  */
 
 class SWIRLY_API TestException : public std::exception {
-  enum { ErrMax = 127 };
+  enum { MaxErr = 127 };
   const char* file_;
   int line_;
-  char msg_[ErrMax + 1];
+  char msg_[MaxErr + 1];
 
  public:
   TestException(const char* file, int line, const char* msg) noexcept;

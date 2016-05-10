@@ -65,8 +65,8 @@ TestException::TestException(const char* file, int line, const char* msg) noexce
 {
   file_ = file;
   line_ = line;
-  strncpy(msg_, msg, ErrMax);
-  msg_[ErrMax] = '\0';
+  strncpy(msg_, msg, MaxErr);
+  msg_[MaxErr] = '\0';
 }
 
 TestException::~TestException() noexcept = default;
