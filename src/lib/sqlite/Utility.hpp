@@ -185,9 +185,32 @@ class ScopedStep {
   sqlite3_stmt& stmt_;
 };
 
+class TransCtx {
+ public:
+  explicit TransCtx(sqlite3& db);
+  ~TransCtx() noexcept = default;
+
+  // Copy.
+  TransCtx(const TransCtx&) = delete;
+  TransCtx& operator=(const TransCtx&) = delete;
+
+  // Move.
+  TransCtx(TransCtx&&) = default;
+  TransCtx& operator=(TransCtx&&) = default;
+
+  void begin() { stepOnce(*beginStmt_); }
+  void commit() { stepOnce(*commitStmt_); }
+  void rollback() { stepOnce(*rollbackStmt_); }
+
+ private:
+  StmtPtr beginStmt_;
+  StmtPtr commitStmt_;
+  StmtPtr rollbackStmt_;
+};
+
 class ScopedTrans {
  public:
-  explicit ScopedTrans(sqlite3& db) noexcept : db_{db} { begin(); }
+  explicit ScopedTrans(TransCtx& ctx) noexcept : ctx_{ctx} { ctx.begin(); }
   ~ScopedTrans() noexcept;
   // Copy.
   ScopedTrans(const ScopedTrans&) = delete;
@@ -197,14 +220,14 @@ class ScopedTrans {
   ScopedTrans(ScopedTrans&&) = delete;
   ScopedTrans& operator=(ScopedTrans&&) = delete;
 
-  void commit();
+  void commit()
+  {
+    done_ = true;
+    ctx_.commit();
+  }
 
  private:
-  void begin();
-
-  void rollback();
-
-  sqlite3& db_;
+  TransCtx& ctx_;
   bool done_{false};
 };
 

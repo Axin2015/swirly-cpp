@@ -56,7 +56,16 @@ constexpr auto UpdateExecSql = //
 
 } // anonymous
 
-Journ::Journ(const char* connString) : db_{openDb(connString)}
+Journ::Journ(const char* connString)
+  : db_{openDb(connString)},
+    ctx_{*db_},
+    insertMarketStmt_{prepare(*db_, InsertMarketSql)},
+    updateMarketStmt_{prepare(*db_, UpdateMarketSql)},
+    insertTraderStmt_{prepare(*db_, InsertTraderSql)},
+    updateTraderStmt_{prepare(*db_, UpdateTraderSql)},
+    insertExecStmt_{prepare(*db_, InsertExecSql)},
+    updateOrderStmt_{prepare(*db_, UpdateOrderSql)},
+    updateExecStmt_{prepare(*db_, UpdateExecSql)}
 {
 }
 
@@ -69,9 +78,9 @@ Journ& Journ::operator=(Journ&&) = default;
 void Journ::doCreateMarket(string_view mnem, string_view display, string_view contr, Jday settlDay,
                            Jday expiryDay, MarketState state)
 {
-  StmtPtr stmt{prepare(*db_, InsertMarketSql)};
+  auto& stmt = *insertMarketStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(mnem);
   bind(display);
   bind(contr);
@@ -79,49 +88,49 @@ void Journ::doCreateMarket(string_view mnem, string_view display, string_view co
   bind(expiryDay, MaybeNull);
   bind(state);
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doUpdateMarket(string_view mnem, string_view display, MarketState state)
 {
-  StmtPtr stmt{prepare(*db_, UpdateMarketSql)};
+  auto& stmt = *updateMarketStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(mnem);
   bind(display);
   bind(state);
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doCreateTrader(string_view mnem, string_view display, string_view email)
 {
-  StmtPtr stmt{prepare(*db_, InsertTraderSql)};
+  auto& stmt = *insertTraderStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(mnem);
   bind(display);
   bind(email);
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doUpdateTrader(string_view mnem, string_view display)
 {
-  StmtPtr stmt{prepare(*db_, UpdateTraderSql)};
+  auto& stmt = *updateTraderStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(mnem);
   bind(display);
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doCreateExec(const Exec& exec)
 {
-  StmtPtr stmt{prepare(*db_, InsertExecSql)};
+  auto& stmt = *insertExecStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(exec.trader());
   bind(exec.market());
   bind(exec.contr());
@@ -151,7 +160,7 @@ void Journ::doCreateExec(const Exec& exec)
   bind(exec.created()); // Created.
   bind(exec.created()); // Modified.
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doCreateExec(string_view market, ArrayView<ConstExecPtr> execs)
@@ -165,7 +174,7 @@ void Journ::doCreateExec(ArrayView<ConstExecPtr> execs)
   if (execs.size() == 1) {
     doCreateExec(*execs.front());
   } else {
-    ScopedTrans trans{*db_};
+    ScopedTrans trans{ctx_};
     for (const auto& exec : execs) {
       doCreateExec(*exec);
     }
@@ -175,14 +184,14 @@ void Journ::doCreateExec(ArrayView<ConstExecPtr> execs)
 
 void Journ::doArchiveOrder(string_view market, Iden id, Millis modified)
 {
-  StmtPtr stmt{prepare(*db_, UpdateOrderSql)};
+  auto& stmt = *updateOrderStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(market);
   bind(id);
   bind(modified);
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)
@@ -190,7 +199,7 @@ void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modif
   if (ids.size() == 1) {
     doArchiveOrder(market, ids.front(), modified);
   } else {
-    ScopedTrans trans{*db_};
+    ScopedTrans trans{ctx_};
     for (const auto id : ids) {
       doArchiveOrder(market, id, modified);
     }
@@ -200,14 +209,14 @@ void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modif
 
 void Journ::doArchiveTrade(string_view market, Iden id, Millis modified)
 {
-  StmtPtr stmt{prepare(*db_, UpdateExecSql)};
+  auto& stmt = *updateExecStmt_;
 
-  ScopedBind bind{*stmt};
+  ScopedBind bind{stmt};
   bind(market);
   bind(id);
   bind(modified);
 
-  stepOnce(*stmt);
+  stepOnce(stmt);
 }
 
 void Journ::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modified)
@@ -215,7 +224,7 @@ void Journ::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modif
   if (ids.size() == 1) {
     doArchiveTrade(market, ids.front(), modified);
   } else {
-    ScopedTrans trans{*db_};
+    ScopedTrans trans{ctx_};
     for (const auto id : ids) {
       doArchiveTrade(market, id, modified);
     }

@@ -69,6 +69,14 @@ class Journ : public swirly::Journ {
 
  private:
   DbPtr db_;
+  TransCtx ctx_;
+  StmtPtr insertMarketStmt_;
+  StmtPtr updateMarketStmt_;
+  StmtPtr insertTraderStmt_;
+  StmtPtr updateTraderStmt_;
+  StmtPtr insertExecStmt_;
+  StmtPtr updateOrderStmt_;
+  StmtPtr updateExecStmt_;
 };
 
 /** @} */

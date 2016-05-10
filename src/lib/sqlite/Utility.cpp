@@ -111,35 +111,22 @@ void bind(sqlite3_stmt& stmt, int col, string_view val)
   }
 }
 
+TransCtx::TransCtx(sqlite3& db)
+  : beginStmt_{prepare(db, "BEGIN TRANSACTION"_sv)},
+    commitStmt_{prepare(db, "COMMIT TRANSACTION"_sv)},
+    rollbackStmt_{prepare(db, "ROLLBACK TRANSACTION"_sv)}
+{
+}
+
 ScopedTrans::~ScopedTrans() noexcept
 {
   if (!done_) {
     try {
-      rollback();
+      ctx_.rollback();
     } catch (const exception& e) {
       SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }
   }
-}
-
-void ScopedTrans::commit()
-{
-  done_ = true;
-  StmtPtr stmt{prepare(db_, "COMMIT TRANSACTION"_sv)};
-  stepOnce(*stmt);
-}
-
-void ScopedTrans::begin()
-{
-  StmtPtr stmt{prepare(db_, "BEGIN TRANSACTION"_sv)};
-  stepOnce(*stmt);
-}
-
-void ScopedTrans::rollback()
-{
-  done_ = true;
-  StmtPtr stmt{prepare(db_, "ROLLBACK TRANSACTION"_sv)};
-  stepOnce(*stmt);
 }
 
 } // sqlite
