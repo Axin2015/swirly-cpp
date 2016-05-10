@@ -56,6 +56,7 @@ class SWIRLY_API TraderSess : public Trader {
   const auto& orders() const noexcept { return orders_; }
   const auto& trades() const noexcept { return trades_; }
   const auto& posns() const noexcept { return posns_; }
+  const auto& refIdx() const noexcept { return refIdx_; }
   auto& orders() noexcept { return orders_; }
   Order& order(std::string_view market, Iden id)
   {

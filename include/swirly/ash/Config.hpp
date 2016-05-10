@@ -19,6 +19,8 @@
 
 #include <swirly/ash/String.hpp>
 
+#include <boost/container/flat_map.hpp>
+
 #include <functional>
 #include <set>
 #include <string>
@@ -31,9 +33,18 @@ namespace swirly {
  * @{
  */
 
+inline auto getEnv(const std::string& name)
+{
+  const char* const val{getenv(name.c_str())};
+  return val ? std::string{val} : std::string{};
+}
+
 class SWIRLY_API VarInterp {
  public:
-  explicit VarInterp(std::function<std::string(const std::string&)> fn) : fn_{std::move(fn)} {}
+  explicit VarInterp(std::function<std::string(const std::string&)> fn = getEnv)
+    : fn_{std::move(fn)}
+  {
+  }
   ~VarInterp() noexcept = default;
 
   // Copy.
@@ -88,6 +99,12 @@ void parseConfig(std::istream& is, FnT fn)
     fn(key, val);
   }
 }
+
+/**
+ * Simple config reader with environment variable interpolation.
+ */
+SWIRLY_API void readConfig(std::istream& is,
+                           boost::container::flat_map<std::string, std::string>& config);
 
 /** @} */
 

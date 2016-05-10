@@ -59,12 +59,24 @@ class Journ : public swirly::Journ {
 
   void doCreateExec(ArrayView<ConstExecPtr> execs) override;
 
+  void doArchiveOrder(std::string_view market, Iden id, Millis modified) override;
+
   void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
+
+  void doArchiveTrade(std::string_view market, Iden id, Millis modified) override;
 
   void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
 
  private:
   DbPtr db_;
+  TransCtx ctx_;
+  StmtPtr insertMarketStmt_;
+  StmtPtr updateMarketStmt_;
+  StmtPtr insertTraderStmt_;
+  StmtPtr updateTraderStmt_;
+  StmtPtr insertExecStmt_;
+  StmtPtr updateOrderStmt_;
+  StmtPtr updateExecStmt_;
 };
 
 /** @} */

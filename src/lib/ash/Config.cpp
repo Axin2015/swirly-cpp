@@ -83,4 +83,13 @@ bool VarInterp::interp(string& s, const size_t i, size_t j, set<string>* outer) 
   return false;
 }
 
+void readConfig(istream& is, boost::container::flat_map<string, string>& config)
+{
+  VarInterp interp;
+  parseConfig(is, [&interp, &config](const auto& key, string val) {
+    interp(val);
+    config.emplace(key, move(val));
+  });
+}
+
 } // swirly

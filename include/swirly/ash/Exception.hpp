@@ -32,9 +32,9 @@ namespace swirly {
 /**
  * Maximum error message length.
  */
-constexpr std::size_t ErrMsgMax{127};
+constexpr std::size_t MaxErrMsg{127};
 
-using ErrMsg = StringBuilder<ErrMsgMax>;
+using ErrMsg = StringBuilder<MaxErrMsg>;
 
 class SWIRLY_API Exception : public std::exception {
  public:
@@ -57,7 +57,7 @@ class SWIRLY_API Exception : public std::exception {
   const char* what() const noexcept override;
 
  private:
-  char what_[ErrMsgMax + 1];
+  char what_[MaxErrMsg + 1];
 };
 
 /**

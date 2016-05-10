@@ -29,12 +29,12 @@ namespace swirly {
 /**
  * Maximum log message length when LogMsg is used.
  */
-constexpr std::size_t LogMsgMax{2048};
+constexpr std::size_t MaxLogMsg{2048};
 
 /**
  * Logger callback function.
  */
-using LogMsg = StringBuilder<LogMsgMax>;
+using LogMsg = StringBuilder<MaxLogMsg>;
 
 /**
  * Logger callback function.

@@ -75,42 +75,42 @@ using MarketState = unsigned;
 /**
  * Maximum display characters.
  */
-constexpr std::size_t DisplayMax{64};
+constexpr std::size_t MaxDisplay{64};
 
 /**
  * Maximum email characters.
  */
-constexpr std::size_t EmailMax{64};
+constexpr std::size_t MaxEmail{64};
 
 /**
  * Maximum mnemonic characters.
  */
-constexpr std::size_t MnemMax{16};
+constexpr std::size_t MaxMnem{16};
 
 /**
  * Maximum reference characters.
  */
-constexpr std::size_t RefMax{64};
+constexpr std::size_t MaxRef{64};
 
 /**
  * Description suitable for display on user-interface.
  */
-using Display = String<DisplayMax>;
+using Display = String<MaxDisplay>;
 
 /**
  * Email address.
  */
-using Email = String<EmailMax>;
+using Email = String<MaxEmail>;
 
 /**
  * Memorable identifier.
  */
-using Mnem = String<MnemMax>;
+using Mnem = String<MaxMnem>;
 
 /**
  * Reference.
  */
-using Ref = String<RefMax>;
+using Ref = String<MaxRef>;
 
 enum class AssetType { Commodity = 1, Corporate, Currency, Equity, Government, Index };
 

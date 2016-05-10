@@ -84,7 +84,7 @@ namespace {
   action beginMnem {
     str_.len = &mnem_.len;
     str_.buf = mnem_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
   action endMnem {
     fields_ |= Mnem;
@@ -99,7 +99,7 @@ namespace {
   action beginDisplay {
     str_.len = &display_.len;
     str_.buf = display_.buf;
-    str_.max = DisplayMax;
+    str_.max = MaxDisplay;
   }
   action endDisplay {
     fields_ |= Display;
@@ -114,7 +114,7 @@ namespace {
   action beginEmail {
     str_.len = &email_.len;
     str_.buf = email_.buf;
-    str_.max = EmailMax;
+    str_.max = MaxEmail;
   }
   action endEmail {
     fields_ |= Email;
@@ -129,7 +129,7 @@ namespace {
   action beginTrader {
     str_.len = &trader_.len;
     str_.buf = trader_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
   action endTrader {
     fields_ |= Trader;
@@ -144,7 +144,7 @@ namespace {
   action beginContr {
     str_.len = &contr_.len;
     str_.buf = contr_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
   action endContr {
     fields_ |= Contr;
@@ -181,7 +181,7 @@ namespace {
   action beginRef {
     str_.len = &ref_.len;
     str_.buf = ref_.buf;
-    str_.max = RefMax;
+    str_.max = MaxRef;
   }
   action endRef {
     fields_ |= Ref;
@@ -276,7 +276,7 @@ namespace {
   action beginCpty {
     str_.len = &cpty_.len;
     str_.buf = cpty_.buf;
-    str_.max = MnemMax;
+    str_.max = MaxMnem;
   }
   action endCpty {
     fields_ |= Cpty;

@@ -89,6 +89,13 @@ class SWIRLY_API Journ {
    */
   void createExec(ArrayView<ConstExecPtr> execs) { doCreateExec(execs); }
   /**
+   * Archive Order.
+   */
+  void archiveOrder(std::string_view market, Iden id, Millis modified)
+  {
+    doArchiveOrder(market, id, modified);
+  }
+  /**
    * Archive Orders.
    */
   void archiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified)
@@ -96,7 +103,14 @@ class SWIRLY_API Journ {
     doArchiveOrder(market, ids, modified);
   }
   /**
-   * Archive Trades. This overload may be less efficient than ones that are market-specific.
+   * Archive Trade.
+   */
+  void archiveTrade(std::string_view market, Iden id, Millis modified)
+  {
+    doArchiveTrade(market, id, modified);
+  }
+  /**
+   * Archive Trades.
    */
   void archiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified)
   {
@@ -124,7 +138,11 @@ class SWIRLY_API Journ {
 
   virtual void doCreateExec(ArrayView<ConstExecPtr> execs) = 0;
 
+  virtual void doArchiveOrder(std::string_view market, Iden id, Millis modified) = 0;
+
   virtual void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
+
+  virtual void doArchiveTrade(std::string_view market, Iden id, Millis modified) = 0;
 
   virtual void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
 };
