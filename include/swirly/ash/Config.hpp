@@ -19,6 +19,8 @@
 
 #include <swirly/ash/String.hpp>
 
+#include <boost/container/flat_map.hpp>
+
 #include <functional>
 #include <set>
 #include <string>
@@ -97,6 +99,12 @@ void parseConfig(std::istream& is, FnT fn)
     fn(key, val);
   }
 }
+
+/**
+ * Simple config reader with environment variable interpolation.
+ */
+SWIRLY_API void readConfig(std::istream& is,
+                           boost::container::flat_map<std::string, std::string>& config);
 
 /** @} */
 
