@@ -16,8 +16,11 @@
  */
 #include <swirly/elm/Date.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#pragma GCC diagnostic pop
 
 namespace lt = boost::local_time;
 namespace pt = boost::posix_time;

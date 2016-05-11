@@ -19,7 +19,10 @@
 
 #include <swirly/ash/String.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <boost/container/flat_map.hpp>
+#pragma GCC diagnostic pop
 
 #include <functional>
 #include <set>
