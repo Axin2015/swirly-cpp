@@ -24,7 +24,10 @@
 #include <swirly/ash/System.hpp>
 #include <swirly/ash/Time.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <boost/filesystem.hpp>
+#pragma GCC diagnostic pop
 
 #include <iomanip>
 #include <iostream>
