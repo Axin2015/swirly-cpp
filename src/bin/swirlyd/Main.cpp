@@ -227,8 +227,11 @@ int main(int argc, char* argv[])
     unique_ptr<Model> model;
     unique_ptr<Journ> journ;
     if (!opts.test) {
-      model = swirly::makeModel(":memory:");
-      journ = swirly::makeJourn(":memory:");
+      // FIXME: switch to Sqlite once stable.
+      // model = swirly::makeModel(":memory:");
+      // journ = swirly::makeJourn(":memory:");
+      model = make_unique<MockModel>();
+      journ = make_unique<MockJourn>();
     } else {
       // Use Mock classes for functional testing.
       model = make_unique<MockModel>();
