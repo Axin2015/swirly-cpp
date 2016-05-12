@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Config.hpp>
+#include <swirly/ash/Conf.hpp>
 
 using namespace std;
 
@@ -83,12 +83,12 @@ bool VarInterp::interp(string& s, const size_t i, size_t j, set<string>* outer) 
   return false;
 }
 
-void readConfig(istream& is, boost::container::flat_map<string, string>& config)
+void readConf(istream& is, boost::container::flat_map<string, string>& conf)
 {
   VarInterp interp;
-  parseConfig(is, [&interp, &config](const auto& key, string val) {
+  parseConf(is, [&interp, &conf](const auto& key, string val) {
     interp(val);
-    config.emplace(key, move(val));
+    conf.emplace(key, move(val));
   });
 }
 

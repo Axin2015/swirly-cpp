@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Config.hpp>
+#include <swirly/ash/Conf.hpp>
 
 #include <swirly/tea/Test.hpp>
 
@@ -51,7 +51,7 @@ string getVar(const string& name)
 
 } // anonymous
 
-SWIRLY_TEST_CASE(ParseConfig)
+SWIRLY_TEST_CASE(ParseConf)
 {
   const string text{R"(
 # comment
@@ -68,16 +68,16 @@ st = = uv =
 )"};
 
   istringstream is{text};
-  map<string, string> config;
-  parseConfig(is, [&config](const auto& key, const auto& val) { config.emplace(key, val); });
-  SWIRLY_CHECK(config.size() == 7);
-  SWIRLY_CHECK(config["ab"] == "");
-  SWIRLY_CHECK(config["cd"] == "");
-  SWIRLY_CHECK(config["ef"] == "gh");
-  SWIRLY_CHECK(config[""] == "ij");
-  SWIRLY_CHECK(config["kl"] == "mn");
-  SWIRLY_CHECK(config["op"] == "qr");
-  SWIRLY_CHECK(config["st"] == "= uv =");
+  map<string, string> conf;
+  parseConf(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
+  SWIRLY_CHECK(conf.size() == 7);
+  SWIRLY_CHECK(conf["ab"] == "");
+  SWIRLY_CHECK(conf["cd"] == "");
+  SWIRLY_CHECK(conf["ef"] == "gh");
+  SWIRLY_CHECK(conf[""] == "ij");
+  SWIRLY_CHECK(conf["kl"] == "mn");
+  SWIRLY_CHECK(conf["op"] == "qr");
+  SWIRLY_CHECK(conf["st"] == "= uv =");
 }
 
 SWIRLY_TEST_CASE(VarInterpBasic)

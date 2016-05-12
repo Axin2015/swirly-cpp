@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_CONFIG_HPP
-#define SWIRLY_ASH_CONFIG_HPP
+#ifndef SWIRLY_ASH_CONF_HPP
+#define SWIRLY_ASH_CONF_HPP
 
 #include <swirly/ash/String.hpp>
 
@@ -81,7 +81,7 @@ class SWIRLY_API VarInterp {
 };
 
 template <typename FnT>
-void parseConfig(std::istream& is, FnT fn)
+void parseConf(std::istream& is, FnT fn)
 {
   std::string line;
   while (std::getline(is, line)) {
@@ -104,13 +104,13 @@ void parseConfig(std::istream& is, FnT fn)
 }
 
 /**
- * Simple config reader with environment variable interpolation.
+ * Simple conf reader with environment variable interpolation.
  */
-SWIRLY_API void readConfig(std::istream& is,
-                           boost::container::flat_map<std::string, std::string>& config);
+SWIRLY_API void readConf(std::istream& is,
+                         boost::container::flat_map<std::string, std::string>& conf);
 
 /** @} */
 
 } // swirly
 
-#endif // SWIRLY_ASH_CONFIG_HPP
+#endif // SWIRLY_ASH_CONF_HPP
