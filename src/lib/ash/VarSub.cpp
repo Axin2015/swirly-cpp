@@ -14,17 +14,35 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Config.hpp>
+#include <swirly/ash/VarSub.hpp>
+
+#include <cstdlib> // getenv()
 
 using namespace std;
 
 namespace swirly {
 
-bool VarInterp::interp(string& s, const size_t i, size_t j, set<string>* outer) const
+string getEnv(const string& name)
 {
-  // Position of last interpolation.
+  const char* const val{getenv(name.c_str())};
+  return val ? string{val} : string{};
+}
+
+VarSub::~VarSub() noexcept = default;
+
+// Copy.
+VarSub::VarSub(const VarSub&) = default;
+VarSub& VarSub::operator=(const VarSub&) = default;
+
+// Move.
+VarSub::VarSub(VarSub&&) = default;
+VarSub& VarSub::operator=(VarSub&&) = default;
+
+bool VarSub::substitute(string& s, const size_t i, size_t j, set<string>* outer) const
+{
+  // Position of last substitution.
   size_t last{0};
-  // Names interpolated at 'last' position.
+  // Names substituted at 'last' position.
   set<string> inner;
 
   int state{0};
@@ -45,8 +63,8 @@ bool VarInterp::interp(string& s, const size_t i, size_t j, set<string>* outer) 
           }
           // Reverse to '$'.
           --j;
-          // Descend: search for closing brace and interpolate.
-          if (!interp(s, j, j + 2, &inner)) {
+          // Descend: search for closing brace and substitute.
+          if (!substitute(s, j, j + 2, &inner)) {
             return false;
           }
           continue;
@@ -68,7 +86,7 @@ bool VarInterp::interp(string& s, const size_t i, size_t j, set<string>* outer) 
             s.replace(i, n + 1, fn_(name));
             outer->insert(move(name));
           } else {
-            // Loop detected: this name has already been interpolated at this position.
+            // Loop detected: this name has already been substituted at this position.
             s.erase(i, n + 1);
           }
           // Ascend: matched closing brace.
@@ -81,15 +99,6 @@ bool VarInterp::interp(string& s, const size_t i, size_t j, set<string>* outer) 
   }
   // Ascend: no closing brace.
   return false;
-}
-
-void readConfig(istream& is, boost::container::flat_map<string, string>& config)
-{
-  VarInterp interp;
-  parseConfig(is, [&interp, &config](const auto& key, string val) {
-    interp(val);
-    config.emplace(key, move(val));
-  });
 }
 
 } // swirly
