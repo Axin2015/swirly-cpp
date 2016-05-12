@@ -24,8 +24,6 @@
 #include <boost/container/flat_map.hpp>
 #pragma GCC diagnostic pop
 
-#include <functional>
-#include <set>
 #include <string>
 #include <tuple>
 
@@ -36,52 +34,8 @@ namespace swirly {
  * @{
  */
 
-inline auto getEnv(const std::string& name)
-{
-  const char* const val{getenv(name.c_str())};
-  return val ? std::string{val} : std::string{};
-}
-
-class SWIRLY_API VarInterp {
- public:
-  explicit VarInterp(std::function<std::string(const std::string&)> fn = getEnv)
-    : fn_{std::move(fn)}
-  {
-  }
-  ~VarInterp() noexcept = default;
-
-  // Copy.
-  VarInterp(const VarInterp&) = default;
-  VarInterp& operator=(const VarInterp&) = default;
-
-  // Move.
-  VarInterp(VarInterp&&) = default;
-  VarInterp& operator=(VarInterp&&) = default;
-
-  void operator()(std::string& s) const { interp(s, std::string::npos, 0); }
-
- private:
-  /**
-   * Interpolate variables.
-   *
-   * @param s The string to interpolate.
-   *
-   * @param i Position of opening brace or std::string::npos if top-level.
-   *
-   * @param j Starting position of search. The search space is [j, size).
-   *
-   * @param outer Set of names seen at the same position in outer level.
-   *
-   * @return true if closing brace was found for brace at position i.
-   */
-  bool interp(std::string& s, const std::size_t i, std::size_t j,
-              std::set<std::string>* outer = nullptr) const;
-
-  std::function<std::string(const std::string&)> fn_;
-};
-
 template <typename FnT>
-void parseConf(std::istream& is, FnT fn)
+void parsePairs(std::istream& is, FnT fn)
 {
   std::string line;
   while (std::getline(is, line)) {
@@ -104,7 +58,7 @@ void parseConf(std::istream& is, FnT fn)
 }
 
 /**
- * Simple conf reader with environment variable interpolation.
+ * Simple conf reader with environment variable substitution.
  */
 SWIRLY_API void readConf(std::istream& is,
                          boost::container::flat_map<std::string, std::string>& conf);
