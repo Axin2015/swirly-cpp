@@ -58,10 +58,31 @@ void parsePairs(std::istream& is, FnT fn)
 }
 
 /**
- * Simple conf reader with environment variable substitution.
+ * Simple config reader with environment variable substitution.
  */
-SWIRLY_API void readConf(std::istream& is,
-                         boost::container::flat_map<std::string, std::string>& conf);
+class SWIRLY_API Conf {
+ public:
+  explicit Conf(std::istream& is) { read(is); }
+
+  Conf();
+  ~Conf() noexcept;
+
+  // Copy.
+  Conf(const Conf&);
+  Conf& operator=(const Conf&);
+
+  // Move.
+  Conf(Conf&&);
+  Conf& operator=(Conf&&);
+
+  const char* get(const char* key, const char* dfl = nullptr) const noexcept;
+
+  void clear() noexcept { map_.clear(); }
+  void read(std::istream& is);
+
+ private:
+  boost::container::flat_map<std::string, std::string> map_;
+};
 
 /** @} */
 

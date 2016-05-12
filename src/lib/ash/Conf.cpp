@@ -22,12 +22,29 @@ using namespace std;
 
 namespace swirly {
 
-void readConf(istream& is, boost::container::flat_map<string, string>& conf)
+Conf::Conf() = default;
+Conf::~Conf() noexcept = default;
+
+// Copy.
+Conf::Conf(const Conf&) = default;
+Conf& Conf::operator=(const Conf&) = default;
+
+// Move.
+Conf::Conf(Conf&&) = default;
+Conf& Conf::operator=(Conf&&) = default;
+
+const char* Conf::get(const char* key, const char* dfl) const noexcept
+{
+  auto it = map_.find(key);
+  return it != map_.end() ? it->second.c_str() : dfl;
+}
+
+void Conf::read(std::istream& is)
 {
   VarSub varSub;
-  parsePairs(is, [&varSub, &conf](const auto& key, string val) {
+  parsePairs(is, [this, &varSub](const auto& key, string val) {
     varSub(val);
-    conf.emplace(key, move(val));
+    this->map_.emplace(key, move(val));
   });
 }
 
