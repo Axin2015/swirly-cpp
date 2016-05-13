@@ -33,6 +33,11 @@ namespace swirly {
  */
 SWIRLY_API void daemon();
 
+/**
+ * Get current file mode.
+ */
+SWIRLY_API mode_t fileMode() noexcept;
+
 /** @} */
 
 } // swirly

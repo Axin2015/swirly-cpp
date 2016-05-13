@@ -27,12 +27,10 @@ import unittest
 
 class Process(object):
 
-  def __init__(self, prog, logLevel, logFile, port):
+  def __init__(self, prog, confFile):
     proc = subprocess.Popen([
       prog,
-      '-e' + str(logLevel),
-      '-l' + logFile,
-      '-p' + str(port),
+      '-f' + confFile,
       '-n',
       '-t'
     ])
@@ -67,25 +65,77 @@ def readLine(file):
     else:
       return line
 
+class ConfFile(object):
+  def __init__(self):
+    self.temp = tempfile.NamedTemporaryFile(delete = True)
+
+  def __enter__(self):
+    return self
+
+  def __exit__(self, extype, exval, bt):
+    self.close()
+
+  def close(self):
+    self.temp.close()
+    self.temp = None
+
+  def set(self, key, val):
+    self.temp.write('{}={}\n'.format(key, val))
+    self.temp.flush()
+
+  @property
+  def name(self):
+    return self.temp.name
+
+class LogFile(object):
+  def __init__(self):
+    self.temp = tempfile.NamedTemporaryFile(delete = True)
+
+  def __enter__(self):
+    return self
+
+  def __exit__(self, extype, exval, bt):
+    self.close()
+
+  def close(self):
+    for line in self.temp:
+      print line.strip('\n')
+    self.temp.close()
+    self.temp = None
+
+  def wait(self):
+    readLine(self.temp)
+
+  @property
+  def name(self):
+    return self.temp.name
+
 class Fixture(object):
 
   port = getPort()
   prog = getProg()
 
   def __init__(self):
-    temp = tempfile.NamedTemporaryFile(delete = True)
+    confFile = ConfFile()
+    logFile = None
     proc = None
     try:
-      proc = Process(Fixture.prog, 4, temp.name, Fixture.port)
-      try:
-        line = readLine(temp)
-      except:
-        proc.close()
-        raise
+      logFile = LogFile()
+      confFile.set('log_file', logFile.name)
+      confFile.set('log_level', 5)
+      confFile.set('http_port', Fixture.port)
+      proc = Process(Fixture.prog, confFile.name)
+      logFile.wait()
     except:
-      temp.close()
+      if proc is not None:
+        proc.close()
+      if logFile is not None:
+        logFile.close()
+      confFile.close()
       raise
-    self.temp = temp
+
+    self.confFile = confFile
+    self.logFile = logFile
     self.proc = proc
 
   def __enter__(self):
@@ -95,12 +145,9 @@ class Fixture(object):
     self.close()
 
   def close(self):
-    try:
-      self.proc.close()
-    finally:
-      for line in self.temp:
-        print line.strip('\n')
-      self.temp.close()
+    self.proc.close()
+    self.logFile.close()
+    self.confFile.close()
 
 class Response(object):
 

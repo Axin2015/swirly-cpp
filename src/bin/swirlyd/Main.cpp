@@ -20,6 +20,7 @@
 
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/System.hpp>
 #include <swirly/ash/Time.hpp>
@@ -27,6 +28,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <boost/filesystem.hpp>
+#include <boost/filesystem/fstream.hpp>
 #pragma GCC diagnostic pop
 
 #include <iomanip>
@@ -38,8 +40,6 @@
 #include <fcntl.h> // open()
 #include <syslog.h>
 #include <unistd.h> // dup2()
-
-#include <sys/stat.h> // umask()
 
 using namespace std;
 using namespace swirly;
@@ -62,7 +62,7 @@ void openLogFile(const char* path)
 {
   const int fd{open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP)};
   if (fd < 0) {
-    throw system_error(errno, system_category(), "open() failed");
+    throw system_error(errno, system_category(), "open failed");
   }
 
   dup2(fd, STDOUT_FILENO);
@@ -70,22 +70,10 @@ void openLogFile(const char* path)
   close(fd);
 }
 
-mode_t getMask()
-{
-  mode_t mask{umask(0)};
-  umask(mask);
-  return mask;
-}
-
 struct Opts {
-  fs::path directory;
-  fs::path logFile;
-  const char* mask{nullptr};
-  const char* httpPort{"8080"};
-  const char* httpUser{"Swirly-User"};
-  const char* httpTime{nullptr};
+  fs::path confFile;
   bool daemon{true};
-  bool test{false};
+  bool testMode{false};
 };
 
 void printUsage(ostream& os)
@@ -94,12 +82,7 @@ void printUsage(ostream& os)
 
 Options:
   -h                Show this help message.
-  -d directory      Set working directory. Default is '/' unless -n.
-  -e level          Set log-level (0-5). Default is 4.
-  -l path           Write to log-file. Specify '-' for default path.
-  -m mask           File creation mode mask. Default is 0027 unless -n.
-  -p port           Http port. Default is 8080.
-  -u name           Http user header. Default is 'Swirly-User'.
+  -f path           Path to configuration file.
   -n                Do not daemonise. I.e. run in the foreground.
   -t                Run in functional test mode.
 
@@ -111,40 +94,19 @@ void getOpts(int argc, char* argv[], Opts& opts)
 {
   opterr = 0;
   int ch;
-  while ((ch = getopt(argc, argv, ":d:e:hl:m:np:tu:")) != -1) {
+  while ((ch = getopt(argc, argv, ":f:hnt")) != -1) {
     switch (ch) {
-    case 'd':
-      opts.directory = optarg;
-      break;
-    case 'e':
-      setLogLevel(atoi(optarg));
+    case 'f':
+      opts.confFile = optarg;
       break;
     case 'h':
       printUsage(cout);
       exit(0);
-    case 'l':
-      if (strcmp(optarg, "-") == 0) {
-        // Use default log-file path.
-        opts.logFile = "/var/log/swirlyd/swirlyd.log";
-      } else {
-        opts.logFile = optarg;
-      }
-      break;
-    case 'm':
-      opts.mask = optarg;
-      break;
     case 'n':
       opts.daemon = false;
       break;
-    case 'p':
-      opts.httpPort = optarg;
-      break;
     case 't':
-      opts.test = true;
-      opts.httpTime = "Swirly-Time";
-      break;
-    case 'u':
-      opts.httpUser = optarg;
+      opts.testMode = true;
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
@@ -175,58 +137,75 @@ int main(int argc, char* argv[])
     Opts opts;
     getOpts(argc, argv, opts);
 
-    // Restrict file creation mask if specified. This function is always successful.
-    if (opts.mask) {
+    Conf conf;
+    if (!opts.confFile.empty()) {
+      fs::ifstream is{opts.confFile};
+      if (!is.is_open()) {
+        throw Exception{errMsg() << "open failed: " << opts.confFile};
+      }
+      conf.read(is);
+    }
+
+    const char* const logLevel{conf.get("log_level")};
+    if (logLevel) {
+      setLogLevel(atoi(logLevel));
+    }
+
+    // Restrict file creation mask if specified. The umask function is always successful.
+    const char* const fileMode{conf.get("file_mode")};
+    if (fileMode) {
       // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
-      umask(static_cast<mode_t>(strtol(opts.mask, nullptr, 0)));
+      umask(static_cast<mode_t>(strtol(fileMode, nullptr, 0)));
     } else if (opts.daemon) {
       umask(0027);
     }
 
-    if (!opts.directory.empty()) {
+    fs::path runDir{conf.get("run_dir", "")};
+    if (!runDir.empty()) {
       // Change the current working directory if specified.
-      opts.directory = fs::canonical(opts.directory, fs::current_path());
-      if (chdir(opts.directory.c_str()) < 0) {
-        throw system_error(errno, system_category(), "chdir() failed");
+      runDir = fs::canonical(runDir, fs::current_path());
+      if (chdir(runDir.c_str()) < 0) {
+        throw system_error(errno, system_category(), "chdir failed");
       }
     } else if (opts.daemon) {
       // Default to root directory if daemon.
-      opts.directory = fs::current_path().root_path();
+      runDir = fs::current_path().root_path();
     } else {
       // Otherwise, default to current directory.
-      opts.directory = fs::current_path();
+      runDir = fs::current_path();
     }
 
+    fs::path logFile{conf.get("log_file", "")};
     if (opts.daemon) {
 
       // Daemonise process.
       daemon();
 
       // Daemon uses syslog by default.
-      if (opts.logFile.empty()) {
+      if (logFile.empty()) {
         openlog("swirlyd", LOG_PID | LOG_NDELAY, LOG_LOCAL0);
         setlogmask(LOG_UPTO(LOG_DEBUG));
         setLogger(sysLogger);
       }
     }
 
-    if (!opts.logFile.empty()) {
+    if (!logFile.empty()) {
 
       // Log file is relative to working directory. We use absolute, rather than canonical here,
       // because canonical requires that the file exists.
-      if (opts.logFile.is_relative()) {
-        opts.logFile = fs::absolute(opts.logFile, opts.directory);
+      if (logFile.is_relative()) {
+        logFile = fs::absolute(logFile, runDir);
       }
 
-      fs::create_directory(opts.logFile.parent_path());
+      fs::create_directory(logFile.parent_path());
 
-      SWIRLY_NOTICE(logMsg() << "opening log file: " << opts.logFile);
-      openLogFile(opts.logFile.c_str());
+      SWIRLY_NOTICE(logMsg() << "opening log file: " << logFile);
+      openLogFile(logFile.c_str());
     }
 
     unique_ptr<Model> model;
     unique_ptr<Journ> journ;
-    if (!opts.test) {
+    if (!opts.testMode) {
       // FIXME: switch to Sqlite once stable.
       // model = swirly::makeModel(":memory:");
       // journ = swirly::makeJourn(":memory:");
@@ -237,22 +216,27 @@ int main(int argc, char* argv[])
       model = make_unique<MockModel>();
       journ = make_unique<MockJourn>();
     }
-    Rest rest{*model, *journ, getTimeOfDay()};
+    const char* const httpPort{conf.get("http_port", "8080")};
+    const char* const httpUser{conf.get("http_user", "Swirly-User")};
 
-    mg::RestServ rs{rest, opts.httpUser, opts.httpTime};
-    auto& conn = rs.bind(opts.httpPort);
+    Rest rest{*model, *journ, getTimeOfDay()};
+    mg::RestServ rs{rest, httpUser, opts.testMode ? "Swirly-Time" : nullptr};
+
+    auto& conn = rs.bind(httpPort);
     mg_set_protocol_http_websocket(&conn);
 
-    SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << opts.httpPort);
+    SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << httpPort);
 
-    SWIRLY_INFO(logMsg() << "directory: " << opts.directory);
-    SWIRLY_INFO(logMsg() << "log-level: " << getLogLevel());
-    SWIRLY_INFO(logMsg() << "log-file:  " << opts.logFile);
-    SWIRLY_INFO(logMsg() << "mask:      " << setfill('0') << setw(3) << oct << getMask());
-    SWIRLY_INFO(logMsg() << "http-port: " << opts.httpPort);
-    SWIRLY_INFO(logMsg() << "http-user: " << opts.httpUser);
+    SWIRLY_INFO(logMsg() << "conf_file: " << opts.confFile);
     SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
-    SWIRLY_INFO(logMsg() << "test:      " << (opts.test ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "test_mode: " << (opts.testMode ? "yes" : "no"));
+
+    SWIRLY_INFO(logMsg() << "file_mode: " << setfill('0') << setw(3) << oct << swirly::fileMode());
+    SWIRLY_INFO(logMsg() << "run_dir:   " << runDir);
+    SWIRLY_INFO(logMsg() << "log_file:  " << logFile);
+    SWIRLY_INFO(logMsg() << "log_level: " << getLogLevel());
+    SWIRLY_INFO(logMsg() << "http_port: " << httpPort);
+    SWIRLY_INFO(logMsg() << "http_user: " << httpUser);
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);
@@ -267,9 +251,9 @@ int main(int argc, char* argv[])
       switch (sig) {
       case SIGHUP:
         SWIRLY_INFO("received SIGHUP"_sv);
-        if (!opts.logFile.empty()) {
-          SWIRLY_NOTICE(logMsg() << "reopening log file: " << opts.logFile);
-          openLogFile(opts.logFile.c_str());
+        if (!logFile.empty()) {
+          SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
+          openLogFile(logFile.c_str());
         }
         break;
       case SIGINT:
