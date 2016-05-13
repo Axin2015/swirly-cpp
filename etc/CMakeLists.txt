@@ -16,7 +16,7 @@
 SET(etc_FILES
   FindSQLite3.cmake
   FindSwirly.cmake
-  swirly.conf
+  swirlyd.conf
 )
 
 INSTALL(FILES ${etc_FILES} DESTINATION etc)

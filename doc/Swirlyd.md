@@ -9,62 +9,45 @@ Usage: `swirlyd [options]`
 Options
 -------
 
-### help ###
-
-`-h`
+### -h ###
 
 Show the help message.
 
-### directory ###
+### -n ###
 
-`-d directory`
+Do not daemonise. I.e. run the process in the foreground.
 
-Set working directory. The default is the root directory ('/') unless the `no-daemon` option is
+### -t ###
+
+Run in functional test mode.
+
+Configuration
+-------------
+
+### file_mode ###
+
+File creation mode mask. The default is 0027 unless the no-daemon (-n) option is specified.
+
+### run_dir ###
+
+Set the run directory. The default is the root directory ('/') unless the no-daemon (-n) option is
 specified.
 
-### log-level ###
+### log_file ###
 
-`-e level`
+Write to log-file. The log-file's parent directory will be created if it does not exist. Relative
+paths are interpreted relative to the run directory. The syslog facility is used by default if no
+log-file is specified for daemonised processes.
+
+### log_level ###
 
 Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 2=Warning, 3=Notice,
 4=Info and 5=Debug. The default is 4 (Info).
 
-### log-file ###
+### http_port ###
 
-`-l path`
+nHttp port. Defaults to 8080.
 
-Write to log-file. Specify '-' for the default log-file path. The default log-file path is
-'/var/log/swirlyd/swirlyd.log'. The log-file's parent directory will be created if it does not
-exist. Relative paths are interpreted relative to the working directory.
-
-N.B. the syslog facility is used by default when no log-file is specified for daemonised processes.
-
-### mask ###
-
-`-m mask`
-
-File creation mode mask. The default is 0027 unless the `no-daemon` option is specified.
-
-### http-port ###
-
-`-p port`
-
-Http port. Defaults to 8080.
-
-### http-user ###
-
-`-u name`
+### http_user ###
 
 Http user header. The default is "Swirly-User".
-
-### no-daemon ###
-
-`-n`
-
-Do not daemonise. I.e. run the process in the foreground.
-
-### test ###
-
-`-t`
-
-Run in functional test mode.

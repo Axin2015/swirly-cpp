@@ -25,6 +25,8 @@
 #include <fcntl.h> // open()
 #include <unistd.h> // fork()
 
+#include <sys/stat.h> // umask()
+
 using namespace std;
 
 namespace swirly {
@@ -72,6 +74,13 @@ void daemon()
   }
 
   // Note that the standard output handles are unchanged.
+}
+
+SWIRLY_API mode_t fileMode() noexcept
+{
+  mode_t mode{umask(0)};
+  umask(mode);
+  return mode;
 }
 
 } // swirly
