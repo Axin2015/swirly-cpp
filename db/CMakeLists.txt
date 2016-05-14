@@ -15,7 +15,7 @@
 
 INCLUDE(AddFileDependencies)
 
-SET(outfiles)
+SET(dbfiles)
 IF(SQLITE3_EXECUTABLE)
 
   MESSAGE(STATUS "Sqlite3 found: ${SQLITE3_EXECUTABLE}")
@@ -29,23 +29,23 @@ IF(SQLITE3_EXECUTABLE)
 
   FOREACH(name ${names})
 
-    SET(outfile "${PROJECT_BINARY_DIR}/data/${name}.db")
+    SET(dbfile "${PROJECT_BINARY_DIR}/db/${name}.db")
 
     ADD_CUSTOM_COMMAND(
-      OUTPUT "${outfile}"
+      OUTPUT "${dbfile}"
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-      COMMAND ${CMAKE_COMMAND} -E remove "${outfile}"
-      COMMAND "${SQLITE3_EXECUTABLE}" "${outfile}" <schema.sql
-      COMMAND "${SQLITE3_EXECUTABLE}" "${outfile}" <${name}.sql
+      COMMAND ${CMAKE_COMMAND} -E remove "${dbfile}"
+      COMMAND "${SQLITE3_EXECUTABLE}" "${dbfile}" <schema.sql
+      COMMAND "${SQLITE3_EXECUTABLE}" "${dbfile}" <${name}.sql
       DEPENDS schema.sql ${name}.sql)
 
-    SET(outfiles ${outfiles} "${outfile}")
+    SET(dbfiles ${dbfiles} "${dbfile}")
   ENDFOREACH()
 
 ENDIF()
 
-ADD_CUSTOM_TARGET(data ALL DEPENDS ${outfiles})
+ADD_CUSTOM_TARGET(db ALL DEPENDS ${dbfiles})
 
-FILE(GLOB infiles "*.sql")
-INSTALL(FILES ${infiles}  DESTINATION data)
-INSTALL(FILES ${outfiles} DESTINATION data)
+FILE(GLOB sqlfiles "*.sql")
+INSTALL(FILES ${sqlfiles}  DESTINATION db)
+INSTALL(FILES ${dbfiles} DESTINATION db)

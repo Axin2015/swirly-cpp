@@ -203,23 +203,23 @@ int main(int argc, char* argv[])
       openLogFile(logFile.c_str());
     }
 
-    unique_ptr<Model> model;
     unique_ptr<Journ> journ;
+    unique_ptr<Model> model;
     if (!opts.testMode) {
-      // FIXME: switch to Sqlite once stable.
-      // model = swirly::makeModel(":memory:");
-      // journ = swirly::makeJourn(":memory:");
-      model = make_unique<MockModel>();
-      journ = make_unique<MockJourn>();
+      journ = swirly::makeJourn(conf);
+      model = swirly::makeModel(conf);
     } else {
       // Use Mock classes for functional testing.
-      model = make_unique<MockModel>();
       journ = make_unique<MockJourn>();
+      model = make_unique<MockModel>();
     }
     const char* const httpPort{conf.get("http_port", "8080")};
     const char* const httpUser{conf.get("http_user", "Swirly-User")};
 
-    Rest rest{*model, *journ, getTimeOfDay()};
+    Rest rest{*journ};
+    rest.load(*model);
+    model = nullptr;
+
     mg::RestServ rs{rest, httpUser, opts.testMode ? "Swirly-Time" : nullptr};
 
     auto& conn = rs.bind(httpPort);

@@ -14,19 +14,16 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/Time.hpp>
-
-#include <swirly/elm/Journ.hpp>
-#include <swirly/elm/MarketBook.hpp>
-#include <swirly/elm/Model.hpp>
-
 #include <swirly/fig/Mock.hpp>
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/Serv.hpp>
 #include <swirly/fig/TraderSess.hpp>
 
-#include <iostream>
+#include <swirly/elm/MarketBook.hpp>
+
+#include <swirly/ash/Conf.hpp>
+#include <swirly/ash/Log.hpp>
+#include <swirly/ash/Time.hpp>
 
 using namespace std;
 using namespace swirly;
@@ -60,19 +57,22 @@ int main(int argc, char* argv[])
   int ret = 1;
   try {
 
-    unique_ptr<Model> model;
     unique_ptr<Journ> journ;
-
+    unique_ptr<Model> model;
     if (argc > 1) {
-      const char* const connString{argv[1]};
-      model = swirly::makeModel(connString);
-      journ = swirly::makeJourn(connString);
+      Conf conf;
+      conf.set("sqlite_journ", argv[1]);
+      conf.set("sqlite_model", argv[1]);
+      journ = swirly::makeJourn(conf);
+      model = swirly::makeModel(conf);
     } else {
-      model = make_unique<MockModel>();
       journ = make_unique<MockJourn>();
+      model = make_unique<MockModel>();
     }
 
-    Serv serv{*model, *journ, getTimeOfDay()};
+    Serv serv{*journ};
+    serv.load(*model);
+    model = nullptr;
 
     const auto now = getTimeOfDay();
 

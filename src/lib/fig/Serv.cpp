@@ -57,7 +57,7 @@ struct Serv::Impl {
   using MarketBookPtr = unique_ptr<MarketBook, default_delete<Market>>;
   using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
 
-  Impl(const Model& model, Journ& journ, Millis now) noexcept : journ{journ} {}
+  explicit Impl(Journ& journ) noexcept : journ{journ} {}
   MarketBookPtr newMarket(string_view mnem, string_view display, string_view contr, Jday settlDay,
                           Jday expiryDay, MarketState state) const
   {
@@ -201,18 +201,8 @@ struct Serv::Impl {
   vector<Match> matches;
 };
 
-Serv::Serv(const Model& model, Journ& journ, Millis now)
-  : impl_{make_unique<Impl>(model, journ, now)}
+Serv::Serv(Journ& journ) : impl_{make_unique<Impl>(journ)}
 {
-  impl_->assets = model.readAsset(impl_->factory);
-  impl_->contrs = model.readContr(impl_->factory);
-  impl_->markets = model.readMarket(impl_->factory);
-  impl_->traders = model.readTrader(impl_->factory);
-
-  for (auto& rec : impl_->traders) {
-    auto& trader = static_cast<TraderSess&>(rec);
-    impl_->emailIdx.insert(trader);
-  }
 }
 
 Serv::~Serv() noexcept = default;
@@ -220,6 +210,20 @@ Serv::~Serv() noexcept = default;
 Serv::Serv(Serv&&) = default;
 
 Serv& Serv::operator=(Serv&&) = default;
+
+void Serv::load(const Model& model)
+{
+  impl_->assets = model.readAsset(impl_->factory);
+  impl_->contrs = model.readContr(impl_->factory);
+  impl_->markets = model.readMarket(impl_->factory);
+  impl_->traders = model.readTrader(impl_->factory);
+
+  impl_->emailIdx.clear();
+  for (auto& rec : impl_->traders) {
+    auto& trader = static_cast<TraderSess&>(rec);
+    impl_->emailIdx.insert(trader);
+  }
+}
 
 AssetSet& Serv::assets() const noexcept
 {

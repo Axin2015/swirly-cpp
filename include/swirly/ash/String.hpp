@@ -119,7 +119,7 @@ class String {
   }
   constexpr void assign(const char* rdata, std::size_t rlen) noexcept
   {
-    len_ = std::min(MaxN, rlen);
+    len_ = std::min(rlen, MaxN);
     if (len_ > 0) {
       std::memcpy(buf_, rdata, len_);
     }

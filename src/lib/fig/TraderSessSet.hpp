@@ -101,6 +101,8 @@ class SWIRLY_API TraderSessSet {
   ConstIterator end() const noexcept { return set_.end(); }
   ConstIterator cend() const noexcept { return set_.cend(); }
 
+  void clear() noexcept { set_.clear(); }
+
   // Find.
   Iterator find(std::string_view email) noexcept
   {

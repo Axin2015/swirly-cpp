@@ -47,7 +47,7 @@ class TraderSess;
 
 class SWIRLY_API Serv {
  public:
-  Serv(const Model& model, Journ& journ, Millis now);
+  explicit Serv(Journ& journ);
 
   ~Serv() noexcept;
 
@@ -58,6 +58,8 @@ class SWIRLY_API Serv {
   // Move.
   Serv(Serv&&);
   Serv& operator=(Serv&&);
+
+  void load(const Model& model);
 
   AssetSet& assets() const noexcept;
 
