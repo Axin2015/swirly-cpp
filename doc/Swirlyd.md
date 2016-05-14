@@ -51,3 +51,11 @@ nHttp port. Defaults to 8080.
 ### http_user ###
 
 Http user header. The default is "Swirly-User".
+
+### sqlite_journ ###
+
+Sqlite journal database.
+
+### sqlite_model ###
+
+Sqlite model database.

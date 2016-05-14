@@ -31,7 +31,7 @@ namespace sqlite {
 
 class Model : public swirly::Model {
  public:
-  explicit Model(const char* connString);
+  explicit Model(const Conf& conf);
   ~Model() noexcept;
 
   // Copy.

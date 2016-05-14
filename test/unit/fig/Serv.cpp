@@ -54,10 +54,8 @@ class SWIRLY_API TestModel : public MockModel {
 };
 
 struct Fixture {
-  Fixture() : now{getTimeOfDay()}, serv{model, journ, now} {}
-  TestModel model;
+  Fixture() : serv{journ} { serv.load(TestModel{}); }
   MockJourn journ;
-  const Millis now;
   Serv serv;
 };
 

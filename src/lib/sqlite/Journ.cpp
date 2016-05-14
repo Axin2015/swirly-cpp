@@ -18,6 +18,8 @@
 
 #include <swirly/elm/Exec.hpp>
 
+#include <swirly/ash/Conf.hpp>
+
 using namespace std;
 
 namespace swirly {
@@ -56,8 +58,8 @@ constexpr auto UpdateExecSql = //
 
 } // anonymous
 
-Journ::Journ(const char* connString)
-  : db_{openDb(connString)},
+Journ::Journ(const Conf& conf)
+  : db_{openDb(conf.get("sqlite_journ", "swirly.db"))},
     ctx_{*db_},
     insertMarketStmt_{prepare(*db_, InsertMarketSql)},
     updateMarketStmt_{prepare(*db_, UpdateMarketSql)},
@@ -234,9 +236,9 @@ void Journ::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modif
 
 } // sqlite
 
-SWIRLY_API std::unique_ptr<Journ> makeJourn(const char* connString)
+SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf)
 {
-  return make_unique<sqlite::Journ>(connString);
+  return make_unique<sqlite::Journ>(conf);
 }
 
 } // swirly

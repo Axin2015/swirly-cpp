@@ -24,6 +24,7 @@
 
 namespace swirly {
 
+class Conf;
 class Factory;
 
 /**
@@ -62,9 +63,9 @@ class SWIRLY_API Model {
 /**
  * Make Model. Forward declaration for Model backend.
  *
- * @param connString Connection string.
+ * @param conf Configuration.
  */
-SWIRLY_API std::unique_ptr<Model> makeModel(const char* connString);
+SWIRLY_API std::unique_ptr<Model> makeModel(const Conf& conf);
 
 /** @} */
 

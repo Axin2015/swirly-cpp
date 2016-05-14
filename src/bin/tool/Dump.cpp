@@ -17,6 +17,7 @@
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Model.hpp>
 
+#include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Stream.hpp>
 
 #include <iostream>
@@ -29,8 +30,12 @@ int main(int argc, char* argv[])
   int ret = 1;
   try {
 
+    Conf conf;
+    if (argc > 1) {
+      conf.set("sqlite_model", argv[1]);
+    }
     const BasicFactory factory{};
-    auto model = makeModel(argc > 1 ? argv[1] : "swirly.db");
+    auto model = makeModel(conf);
 
     cout << "{\"assets\":[";
     auto assets = model->readAsset(factory);

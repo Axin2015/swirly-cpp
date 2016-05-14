@@ -79,6 +79,7 @@ class SWIRLY_API Conf {
 
   void clear() noexcept { map_.clear(); }
   void read(std::istream& is);
+  void set(std::string key, std::string val) { map_.emplace(std::move(key), std::move(val)); }
 
  private:
   boost::container::flat_map<std::string, std::string> map_;

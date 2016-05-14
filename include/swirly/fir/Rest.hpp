@@ -30,7 +30,7 @@ namespace swirly {
 
 class SWIRLY_API Rest {
  public:
-  Rest(const Model& model, Journ& journ, Millis now) : serv_{model, journ, now} {}
+  explicit Rest(Journ& journ) : serv_{journ} {}
   ~Rest() noexcept;
 
   // Copy.
@@ -40,6 +40,8 @@ class SWIRLY_API Rest {
   // Move.
   Rest(Rest&&);
   Rest& operator=(Rest&&);
+
+  void load(const Model& model) { serv_.load(model); }
 
   void getRec(EntitySet es, Millis now, std::ostream& out) const;
 

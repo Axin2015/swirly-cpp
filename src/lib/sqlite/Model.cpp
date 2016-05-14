@@ -18,7 +18,7 @@
 
 #include <swirly/elm/Factory.hpp>
 
-#include <iostream>
+#include <swirly/ash/Conf.hpp>
 
 using namespace std;
 
@@ -42,7 +42,7 @@ constexpr auto SelectMarketSql = //
 
 } // anonymous
 
-Model::Model(const char* connString) : db_{openDb(connString)}
+Model::Model(const Conf& conf) : db_{openDb(conf.get("sqlite_model", "swirly.db"))}
 {
 }
 
@@ -162,9 +162,9 @@ TraderSet Model::doReadTrader(const Factory& factory) const
 
 } // sqlite
 
-SWIRLY_API std::unique_ptr<Model> makeModel(const char* connString)
+SWIRLY_API std::unique_ptr<Model> makeModel(const Conf& conf)
 {
-  return make_unique<sqlite::Model>(connString);
+  return make_unique<sqlite::Model>(conf);
 }
 
 } // swirly

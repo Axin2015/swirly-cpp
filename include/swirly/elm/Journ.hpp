@@ -26,6 +26,8 @@
 
 namespace swirly {
 
+class Conf;
+
 /**
  * @addtogroup IO
  * @{
@@ -150,9 +152,9 @@ class SWIRLY_API Journ {
 /**
  * Make Journal. Forward declaration for Journal backend.
  *
- * @param connString Connection string.
+ * @param conf Configuration.
  */
-SWIRLY_API std::unique_ptr<Journ> makeJourn(const char* connString);
+SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf);
 
 /** @} */
 
