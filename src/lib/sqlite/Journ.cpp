@@ -59,7 +59,7 @@ constexpr auto UpdateExecSql = //
 } // anonymous
 
 Journ::Journ(const Conf& conf)
-  : db_{openDb(conf.get("sqlite_journ", "swirly.db"))},
+  : db_{openDb(conf.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, conf)},
     ctx_{*db_},
     insertMarketStmt_{prepare(*db_, InsertMarketSql)},
     updateMarketStmt_{prepare(*db_, UpdateMarketSql)},

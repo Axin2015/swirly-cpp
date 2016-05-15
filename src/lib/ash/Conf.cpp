@@ -39,6 +39,19 @@ const char* Conf::get(const char* key, const char* dfl) const noexcept
   return it != map_.end() ? it->second.c_str() : dfl;
 }
 
+int Conf::get(const char* key, int dfl) const noexcept
+{
+  auto it = map_.find(key);
+  // The atoi() function does not throw.
+  return it != map_.end() ? atoi(it->second.c_str()) : dfl;
+}
+
+bool Conf::get(const char* key, bool dfl) const noexcept
+{
+  auto it = map_.find(key);
+  return it != map_.end() ? stob(it->second, dfl) : dfl;
+}
+
 void Conf::read(std::istream& is)
 {
   VarSub varSub;

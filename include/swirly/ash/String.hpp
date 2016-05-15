@@ -265,6 +265,8 @@ std::string toString(const ValueT& val)
 
 SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
 
+SWIRLY_API bool stob(std::string_view sv, bool dfl = false) noexcept;
+
 SWIRLY_API void ltrim(std::string_view& s) noexcept;
 
 SWIRLY_API void ltrim(std::string& s) noexcept;

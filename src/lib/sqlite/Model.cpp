@@ -42,7 +42,8 @@ constexpr auto SelectMarketSql = //
 
 } // anonymous
 
-Model::Model(const Conf& conf) : db_{openDb(conf.get("sqlite_model", "swirly.db"))}
+Model::Model(const Conf& conf)
+  : db_{openDb(conf.get("sqlite_model", "swirly.db"), SQLITE_OPEN_READONLY, conf)}
 {
 }
 
