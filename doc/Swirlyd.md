@@ -21,8 +21,8 @@ Do not daemonise. I.e. run the process in the foreground.
 
 Run in functional test mode.
 
-Configuration
--------------
+Core Config
+-----------
 
 ### file_mode ###
 
@@ -52,6 +52,9 @@ nHttp port. Defaults to 8080.
 
 Http user header. The default is "Swirly-User".
 
+Sqlite Config
+-------------
+
 ### sqlite_journ ###
 
 Sqlite journal database.
@@ -59,3 +62,11 @@ Sqlite journal database.
 ### sqlite_model ###
 
 Sqlite model database.
+
+### sqlite_enable_trace ###
+
+Enable SQL tracing.
+
+### sqlite_enable_fkey ###
+
+Enable foreign key constraints.

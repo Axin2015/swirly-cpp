@@ -132,8 +132,7 @@ CREATE TABLE market_t (
 CREATE TABLE trader_t (
   mnem CHAR(16) NOT NULL PRIMARY KEY,
   display VARCHAR(64) NOT NULL,
-  email VARCHAR(64) NOT NULL,
-  FOREIGN KEY (email) REFERENCES user_t (email)
+  email VARCHAR(64) NOT NULL UNIQUE
 )
 ;
 
