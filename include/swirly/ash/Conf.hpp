@@ -76,6 +76,8 @@ class SWIRLY_API Conf {
   Conf& operator=(Conf&&);
 
   const char* get(const char* key, const char* dfl = nullptr) const noexcept;
+  int get(const char* key, int dfl) const noexcept;
+  bool get(const char* key, bool dfl) const noexcept;
 
   void clear() noexcept { map_.clear(); }
   void read(std::istream& is);
