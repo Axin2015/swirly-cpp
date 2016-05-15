@@ -40,6 +40,69 @@ uint64_t stou64(string_view sv) noexcept
   return l;
 }
 
+bool stob(string_view sv, bool dfl) noexcept
+{
+  bool val{dfl};
+  switch (sv.size()) {
+  case 1:
+    switch (sv[0]) {
+    case '0':
+    case 'F':
+    case 'N':
+    case 'f':
+    case 'n':
+      val = false;
+      break;
+    case '1':
+    case 'T':
+    case 'Y':
+    case 't':
+    case 'y':
+      val = true;
+      break;
+    }
+    break;
+  case 2:
+    if ((sv[0] == 'N' || sv[0] == 'n') //
+        && (sv[1] == 'O' || sv[1] == 'o')) {
+      val = false;
+    } else if ((sv[0] == 'O' || sv[0] == 'o') //
+               && (sv[1] == 'N' || sv[1] == 'n')) {
+      val = true;
+    }
+    break;
+  case 3:
+    if ((sv[0] == 'O' || sv[0] == 'o') //
+        && (sv[1] == 'F' || sv[1] == 'f') //
+        && (sv[2] == 'F' || sv[2] == 'f')) {
+      val = false;
+    } else if ((sv[0] == 'Y' || sv[0] == 'y') //
+               && (sv[1] == 'E' || sv[1] == 'e') //
+               && (sv[2] == 'S' || sv[2] == 's')) {
+      val = true;
+    }
+    break;
+  case 4:
+    if ((sv[0] == 'T' || sv[0] == 't') //
+        && (sv[1] == 'R' || sv[1] == 'r') //
+        && (sv[2] == 'U' || sv[2] == 'u') //
+        && (sv[3] == 'E' || sv[3] == 'e')) {
+      val = true;
+    }
+    break;
+  case 5:
+    if ((sv[0] == 'F' || sv[0] == 'f') //
+        && (sv[1] == 'A' || sv[1] == 'a') //
+        && (sv[2] == 'L' || sv[2] == 'l') //
+        && (sv[3] == 'S' || sv[3] == 's') //
+        && (sv[4] == 'E' || sv[4] == 'e')) {
+      val = false;
+    }
+    break;
+  }
+  return val;
+}
+
 void ltrim(string_view& s) noexcept
 {
   const auto pos = s.find_first_not_of(Space);

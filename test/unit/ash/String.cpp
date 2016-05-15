@@ -97,6 +97,48 @@ SWIRLY_TEST_CASE(Stou64)
   SWIRLY_CHECK(stou64("18446744073709551615"_sv) == 18446744073709551615ULL);
 }
 
+SWIRLY_TEST_CASE(Stob)
+{
+  SWIRLY_CHECK(stob(""_sv, false) == false);
+  SWIRLY_CHECK(stob(""_sv, true) == true);
+
+  SWIRLY_CHECK(stob("0"_sv, true) == false);
+  SWIRLY_CHECK(stob("F"_sv, true) == false);
+  SWIRLY_CHECK(stob("N"_sv, true) == false);
+  SWIRLY_CHECK(stob("f"_sv, true) == false);
+  SWIRLY_CHECK(stob("n"_sv, true) == false);
+
+  SWIRLY_CHECK(stob("1"_sv, false) == true);
+  SWIRLY_CHECK(stob("T"_sv, false) == true);
+  SWIRLY_CHECK(stob("Y"_sv, false) == true);
+  SWIRLY_CHECK(stob("t"_sv, false) == true);
+  SWIRLY_CHECK(stob("y"_sv, false) == true);
+
+  SWIRLY_CHECK(stob("NO"_sv, true) == false);
+  SWIRLY_CHECK(stob("No"_sv, true) == false);
+  SWIRLY_CHECK(stob("no"_sv, true) == false);
+
+  SWIRLY_CHECK(stob("ON"_sv, false) == true);
+  SWIRLY_CHECK(stob("On"_sv, false) == true);
+  SWIRLY_CHECK(stob("on"_sv, false) == true);
+
+  SWIRLY_CHECK(stob("OFF"_sv, true) == false);
+  SWIRLY_CHECK(stob("Off"_sv, true) == false);
+  SWIRLY_CHECK(stob("off"_sv, true) == false);
+
+  SWIRLY_CHECK(stob("YES"_sv, false) == true);
+  SWIRLY_CHECK(stob("Yes"_sv, false) == true);
+  SWIRLY_CHECK(stob("yes"_sv, false) == true);
+
+  SWIRLY_CHECK(stob("TRUE"_sv, false) == true);
+  SWIRLY_CHECK(stob("True"_sv, false) == true);
+  SWIRLY_CHECK(stob("true"_sv, false) == true);
+
+  SWIRLY_CHECK(stob("FALSE"_sv, true) == false);
+  SWIRLY_CHECK(stob("False"_sv, true) == false);
+  SWIRLY_CHECK(stob("false"_sv, true) == false);
+}
+
 SWIRLY_TEST_CASE(LtrimCopy)
 {
   SWIRLY_CHECK(ltrimCopy(""_sv) == ""_sv);
