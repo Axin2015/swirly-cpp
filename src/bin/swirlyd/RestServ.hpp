@@ -25,7 +25,7 @@
 #include <swirly/elm/Exception.hpp>
 
 #include <swirly/ash/Array.hpp>
-#include <swirly/ash/Math.hpp>
+#include <swirly/ash/Profile.hpp>
 #include <swirly/ash/Tokeniser.hpp>
 
 namespace swirly {
@@ -40,7 +40,7 @@ namespace mg {
 class RestServ : public mg::Mgr<RestServ> {
  public:
   explicit RestServ(Rest& rest, const char* httpUser, const char* httpTime = nullptr) noexcept
-    : rest_(rest), httpUser_{httpUser}, httpTime_{httpTime}
+    : rest_(rest), httpUser_{httpUser}, httpTime_{httpTime}, profile_{"profile"_sv}
   {
     memset(&httpOpts_, 0, sizeof(httpOpts_));
   }
@@ -109,7 +109,7 @@ class RestServ : public mg::Mgr<RestServ> {
   std::vector<std::string_view> mnems_;
   RestRequest request_;
   mg::OStream out_;
-  VarAccum stat_;
+  Profile profile_;
 };
 
 /** @} */
