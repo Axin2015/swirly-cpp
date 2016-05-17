@@ -31,7 +31,7 @@ namespace swirly {
 
 class SWIRLY_API VarAccum {
  public:
-  VarAccum() noexcept = default;
+  constexpr VarAccum() noexcept = default;
   ~VarAccum() noexcept = default;
 
   // Copy.

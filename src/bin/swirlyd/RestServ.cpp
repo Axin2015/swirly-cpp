@@ -18,6 +18,7 @@
 
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/ash/Finally.hpp>
 #include <swirly/ash/Log.hpp>
 #include <swirly/ash/Time.hpp>
 
@@ -61,47 +62,6 @@ class ScopedMnems {
   vector<string_view>& mnems_;
 };
 
-// Trace execution time.
-class Trace {
- public:
-  ~Trace() noexcept
-  {
-    const auto end = std::chrono::high_resolution_clock::now();
-    const std::chrono::duration<double, std::micro> diff{end - start_};
-    const auto usec = diff.count();
-    var_.append(usec);
-
-    const auto sd = stdev(var_);
-    if (!std::isnan(sd)) {
-      if (var_.size() % 10 == 0) {
-        SWIRLY_INFO(logMsg() << "stat: "
-                             << "{\"size\":" << var_.size() //
-                             << ",\"mean\":" << var_.mean() //
-                             << ",\"stdevp\":" << sd //
-                             << ",\"pctile95\":" << pctile95(var_.mean(), sd) //
-                             << ",\"pctile99\":" << pctile99(var_.mean(), sd) //
-                             << ",\"pctile999\":" << pctile999(var_.mean(), sd) //
-                             << ",\"min\":" << var_.min() //
-                             << ",\"max\":" << var_.max() //
-                             << '}');
-      }
-      const auto z = zscore(var_.mean(), sd, usec);
-      // NORMSINV(0.99) = 2.3263479
-      if (z > 2.3263479) {
-        SWIRLY_WARNING(logMsg() << "high latency: " << usec << " usec, " << z << " z-score");
-      }
-    }
-  }
-  explicit Trace(VarAccum& var) noexcept
-    : var_(var), start_{std::chrono::high_resolution_clock::now()}
-  {
-  }
-
- private:
-  VarAccum& var_;
-  std::chrono::time_point<std::chrono::high_resolution_clock> start_;
-};
-
 Millis getSwirlyTime(HttpMessage data, const char* httpTime = nullptr) noexcept
 {
   string_view header;
@@ -142,7 +102,12 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
 {
   using namespace chrono;
 
-  Trace trace{stat_};
+  TimeRecorder tr{profile_};
+  auto finally = makeFinally([this]() {
+    if (this->profile_.size() % 10 == 0) {
+      this->profile_.report();
+    }
+  });
   reset(data);
 
   if (uri_.empty() || uri_.top() != "api") {
