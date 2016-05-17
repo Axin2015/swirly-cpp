@@ -38,7 +38,16 @@ using namespace std;
 
 namespace swirly {
 namespace {
-const regex mnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
+
+// Roll at 5pm.
+constexpr int RollHour{17};
+
+// http://www.di-mgt.com.au/wclock/tz.html
+
+// America/New_York.
+constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
+
+const regex MnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
 {
@@ -61,7 +70,7 @@ struct Serv::Impl {
   MarketBookPtr newMarket(string_view mnem, string_view display, string_view contr, Jday settlDay,
                           Jday expiryDay, MarketState state) const
   {
-    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern)) {
+    if (!regex_match(mnem.begin(), mnem.end(), MnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
     auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
@@ -69,7 +78,7 @@ struct Serv::Impl {
   }
   TraderSessPtr newTrader(string_view mnem, string_view display, string_view email) const
   {
-    if (!regex_match(mnem.begin(), mnem.end(), mnemPattern)) {
+    if (!regex_match(mnem.begin(), mnem.end(), MnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
     auto up = factory.newTrader(mnem, display, email);
@@ -192,6 +201,7 @@ struct Serv::Impl {
   }
 
   Journ& journ;
+  BusinessDay busDay{RollHour, NewYork};
   ServFactory factory;
   AssetSet assets;
   ContrSet contrs;
@@ -283,7 +293,7 @@ MarketBook& Serv::createMarket(string_view mnem, string_view display, string_vie
   }
   if (settlDay != 0_jd) {
     // busDay <= expiryDay <= settlDay.
-    const auto busDay = getBusDay(now);
+    const auto busDay = impl_->busDay(now);
     if (settlDay < expiryDay) {
       throw InvalidException{"settl-day before expiry-day"_sv};
     }
@@ -369,7 +379,7 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
   }
 
-  const auto busDay = getBusDay(now);
+  const auto busDay = impl_->busDay(now);
   if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
     throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' in '"
                                          << maybeJdToIso(book.settlDay()) << "' has expired"};

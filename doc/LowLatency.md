@@ -41,6 +41,19 @@ Install performance analysis tools:
 
     # pacman -S perf
 
+Callgrind
+---------
+
+Install tooling:
+
+    # pacman -S valgrind
+    # pacman -S qcachegrind
+
+Run callgrind:
+
+    $ valgrind --tool=callgrind swirly_bench
+    $ qcachegrind callgrind.out.<pid>
+
 Scheduler
 ---------
 
