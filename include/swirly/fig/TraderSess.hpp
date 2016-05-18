@@ -23,7 +23,10 @@
 #include <swirly/elm/Posn.hpp>
 #include <swirly/elm/Trader.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <boost/intrusive/unordered_set.hpp>
+#pragma GCC diagnostic pop
 
 namespace swirly {
 
