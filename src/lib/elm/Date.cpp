@@ -29,29 +29,34 @@ using namespace std;
 
 namespace swirly {
 
-namespace {
-
-// http://www.di-mgt.com.au/wclock/tz.html
-
-// America/New_York.
-const lt::time_zone_ptr newYork{new lt::posix_time_zone{"EST-5EDT,M3.2.0/2,M11.1.0/2"}};
-
-// Roll at 5pm.
-constexpr int RollHour{17};
-
-inline pt::ptime millisToPtime(Millis ms)
+BusinessDay::BusinessDay(int rollHour, const char* tzname)
+  : rollHour_{rollHour}, timeZone_{new lt::posix_time_zone{tzname}}
 {
-  return pt::from_time_t(unbox(ms) / 1000L) + pt::milliseconds(unbox(ms) % 1000L);
 }
 
-} // anonymous
+// Copy.
+BusinessDay::BusinessDay(const BusinessDay& rhs) noexcept = default;
+BusinessDay& BusinessDay::operator=(const BusinessDay& rhs) = default;
 
-Jday getBusDay(Millis ms)
+// Move.
+BusinessDay::BusinessDay(BusinessDay&&) noexcept = default;
+BusinessDay& BusinessDay::operator=(BusinessDay&&) noexcept = default;
+
+Jday BusinessDay::operator()(Millis ms) const
 {
-  lt::local_date_time ldt{millisToPtime(ms), newYork};
+  const int64_t t{unbox(ms) / 1000L};
+  // Returned cached value if it exists.
+  const auto i = t & 1;
+  if (cache_[i].first == t) {
+    return cache_[i].second;
+  }
+  lt::local_date_time ldt{pt::from_time_t(t), timeZone_};
   // Add 7 hours to 17.00 will roll the date.
-  ldt += pt::hours(24 - RollHour);
-  return box<Jday>(ldt.local_time().date().julian_day());
+  ldt += pt::hours(24 - rollHour_);
+  const auto jd = box<Jday>(ldt.local_time().date().julian_day());
+  // Update cache entry.
+  cache_[i] = {t, jd};
+  return jd;
 }
 
 } // swirly

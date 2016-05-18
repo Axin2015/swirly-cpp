@@ -23,8 +23,22 @@
 using namespace std;
 using namespace swirly;
 
+namespace {
+
+// Roll at 5pm.
+constexpr int RollHour{17};
+
+// http://www.di-mgt.com.au/wclock/tz.html
+
+// America/New_York.
+constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
+
+} // anonymous
+
 SWIRLY_TEST_CASE(GetBusDay)
 {
+  BusinessDay busDay{RollHour, NewYork};
+
   // Business days roll at 5pm New York.
 
   // Friday, March 14, 2014
@@ -32,8 +46,8 @@ SWIRLY_TEST_CASE(GetBusDay)
   // 17.00 EDT (UTC-4 hours)
 
   // 20.59 UTC
-  SWIRLY_CHECK(getBusDay(1394830799000_ms) == ymdToJd(2014, 2, 14));
+  SWIRLY_CHECK(busDay(1394830799000_ms) == ymdToJd(2014, 2, 14));
 
   // 21.00 UTC
-  SWIRLY_CHECK(getBusDay(1394830800000_ms) == ymdToJd(2014, 2, 15));
+  SWIRLY_CHECK(busDay(1394830800000_ms) == ymdToJd(2014, 2, 15));
 }
