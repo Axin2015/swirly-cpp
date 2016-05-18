@@ -42,11 +42,11 @@ SET(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter
 SET(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
 
 IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  SET(CMAKE_C_FLAGS "-std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
-  SET(CMAKE_CXX_FLAGS "-std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt -fno-rtti")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt -fno-rtti")
 ELSEIF("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  SET(CMAKE_C_FLAGS "-std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
-  SET(CMAKE_CXX_FLAGS "-std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
 ENDIF()
 SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
