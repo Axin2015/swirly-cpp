@@ -91,7 +91,13 @@ int main(int argc, char* argv[])
     Response resp;
     Profile maker{"maker"_sv};
     Profile taker{"taker"_sv};
-    for (int i = 0; i < 5000; ++i) {
+    for (int i = 0; i < 5100; ++i) {
+
+      // Reset profiles after warmup period.
+      if (i == 100) {
+        maker.clear();
+        taker.clear();
+      }
 
       const auto now = getTimeOfDay();
 
@@ -99,22 +105,17 @@ int main(int argc, char* argv[])
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Sell, 5_lts, 12348_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 10_lts, 12348_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 5_lts, 12348_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, book, ""_sv, Side::Sell, 10_lts, 12348_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Sell, 5_lts, 12348_tks, 1_lts, now, resp);
-      }
-      {
-        TimeRecorder tr{maker};
-        resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 5_lts, 12347_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 10_lts, 12347_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
@@ -141,36 +142,31 @@ int main(int argc, char* argv[])
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Buy, 5_lts, 12343_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, book, ""_sv, Side::Buy, 10_lts, 12343_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Buy, 5_lts, 12342_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, book, ""_sv, Side::Buy, 10_lts, 12342_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Buy, 5_lts, 12342_tks, 1_lts, now, resp);
-      }
-      {
-        TimeRecorder tr{maker};
-        resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Buy, 5_lts, 12342_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, book, ""_sv, Side::Buy, 10_lts, 12342_tks, 1_lts, now, resp);
       }
 
       // Taker sell-side.
       {
         TimeRecorder tr{taker};
         resp.clear();
-        serv.createOrder(eddayl, book, ""_sv, Side::Sell, 30_lts, 12342_tks, 1_lts, now, resp);
+        serv.createOrder(eddayl, book, ""_sv, Side::Sell, 40_lts, 12342_tks, 1_lts, now, resp);
       }
 
       // Taker buy-side.
       {
         TimeRecorder tr{taker};
         resp.clear();
-        serv.createOrder(pipayl, book, ""_sv, Side::Buy, 30_lts, 12348_tks, 1_lts, now, resp);
+        serv.createOrder(pipayl, book, ""_sv, Side::Buy, 40_lts, 12348_tks, 1_lts, now, resp);
       }
 
       serv.archiveOrder(marayl, now);
