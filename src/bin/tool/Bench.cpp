@@ -14,6 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/fig/MemPool.hpp>
 #include <swirly/fig/Mock.hpp>
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/Serv.hpp>
@@ -54,7 +55,7 @@ TraderSess& createTrader(Serv& serv, string_view mnem, string_view display, stri
 class Archiver {
  public:
   explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
-  void operator()(TraderSess& sess, std::string_view market, Millis now)
+  void operator()(TraderSess& sess, string_view market, Millis now)
   {
     ids_.clear();
     for (const auto& order : sess.orders()) {
@@ -77,12 +78,30 @@ class Archiver {
   vector<Iden> ids_;
 };
 
+MemPool memPool;
+
 } // anonymous
+
+namespace swirly {
+
+void* alloc(size_t size)
+{
+  return memPool.alloc(size);
+}
+
+void dealloc(void* ptr, size_t size) noexcept
+{
+  return memPool.dealloc(ptr, size);
+}
+
+} // swirly
 
 int main(int argc, char* argv[])
 {
   int ret = 1;
   try {
+
+    memPool.reserve(1 << 20);
 
     unique_ptr<Journ> journ;
     unique_ptr<Model> model;

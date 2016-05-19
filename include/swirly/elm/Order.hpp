@@ -20,6 +20,8 @@
 #include <swirly/elm/Conv.hpp>
 #include <swirly/elm/Request.hpp>
 
+#include <swirly/ash/MemAlloc.hpp>
+
 #include <boost/intrusive/list.hpp>
 
 namespace swirly {
@@ -34,7 +36,7 @@ class Level;
 /**
  * An instruction to buy or sell goods or services.
  */
-class SWIRLY_API Order : public Request {
+class SWIRLY_API Order : public Request, public MemAlloc {
  public:
   Order(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
         Iden id, std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,

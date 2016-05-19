@@ -20,6 +20,8 @@
 #include <swirly/elm/Conv.hpp>
 #include <swirly/elm/Request.hpp>
 
+#include <swirly/ash/MemAlloc.hpp>
+
 namespace swirly {
 
 /**
@@ -32,7 +34,7 @@ namespace swirly {
  *
  * Trade executions represent the exchange of goods or services between counter-parties.
  */
-class SWIRLY_API Exec : public Request {
+class SWIRLY_API Exec : public Request, public MemAlloc {
  public:
   Exec(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
        Iden id, std::string_view ref, Iden orderId, State state, Side side, Lots lots, Ticks ticks,

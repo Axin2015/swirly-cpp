@@ -67,7 +67,7 @@ class String {
     assign(rhs.data(), rhs.size());
   }
   constexpr String(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
-  constexpr String() noexcept { clear(); }
+  constexpr String() noexcept = default;
 
   ~String() noexcept = default;
 
@@ -105,7 +105,7 @@ class String {
   }
   constexpr const char* data() const noexcept { return buf_; }
   constexpr bool empty() const noexcept { return len_ == 0; }
-  constexpr size_t size() const noexcept { return len_; }
+  constexpr std::size_t size() const noexcept { return len_; }
   constexpr void clear() noexcept { len_ = 0; }
 
  private:
@@ -125,7 +125,7 @@ class String {
     }
   }
   // Length in the first cache-line.
-  std::size_t len_;
+  std::size_t len_{0};
   char buf_[MaxN];
 };
 

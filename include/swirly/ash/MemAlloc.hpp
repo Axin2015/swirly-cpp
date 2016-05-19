@@ -14,24 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_DEFS_HPP
-#define SWIRLY_ASH_DEFS_HPP
+#ifndef SWIRLY_ASH_MEMALLOC_HPP
+#define SWIRLY_ASH_MEMALLOC_HPP
+
+#include <swirly/ash/Defs.hpp>
+
+#include <new>
+
+namespace swirly {
 
 /**
  * @addtogroup Util
  * @{
  */
 
-/**
- * Macro for exporting weak symbols.
- */
-#define SWIRLY_WEAK __attribute__((visibility("default"), weak))
+SWIRLY_API void* alloc(std::size_t size);
+SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
 
-/**
- * Macro for exporting classes and functions that compose the public API.
- */
-#define SWIRLY_API __attribute__((visibility("default")))
+struct MemAlloc {
+  static void* operator new(std::size_t size) { return alloc(size); }
+  static void operator delete(void* ptr, std::size_t size) { return dealloc(ptr, size); }
+};
 
 /** @} */
 
-#endif // SWIRLY_ASH_DEFS_HPP
+} // swirly
+
+#endif // SWIRLY_ASH_MEMALLOC_HPP

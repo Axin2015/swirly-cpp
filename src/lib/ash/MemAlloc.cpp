@@ -14,35 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Level.hpp>
-
-#include <swirly/elm/Order.hpp>
-
-#include <swirly/tea/Test.hpp>
+#include <swirly/ash/MemAlloc.hpp>
 
 using namespace std;
-using namespace swirly;
 
-static_assert(sizeof(Level) <= 2 * 64, "crossed cache-line boundary");
+namespace swirly {
 
-SWIRLY_TEST_CASE(LevelSet)
+SWIRLY_WEAK void* alloc(std::size_t size);
+SWIRLY_WEAK void dealloc(void* ptr, std::size_t size) noexcept;
+
+void* alloc(size_t size)
 {
-  const Order order{"MARAYL",   "EURUSD",  "EURUSD", 0_jd,      0_id,  "",
-                    State::New, Side::Buy, 10_lts,   12345_tks, 0_lts, 0_lts,
-                    0_cst,      0_lts,     0_tks,    0_lts,     0_ms,  0_ms};
-
-  LevelSet s;
-
-  Level& level1{*s.emplace(order)};
-  SWIRLY_CHECK(level1.key() == -12345);
-  SWIRLY_CHECK(s.find(Side::Buy, 12345_tks) != s.end());
-
-  // Duplicate.
-  Level& level2{*s.emplace(order)};
-  SWIRLY_CHECK(&level2 == &level1);
-
-  // Replace.
-  Level& level3{*s.emplaceOrReplace(order)};
-  SWIRLY_CHECK(&level3 != &level1);
-  SWIRLY_CHECK(level3.key() == -12345);
+  return ::operator new(size);
 }
+
+void dealloc(void* ptr, size_t size) noexcept
+{
+  ::operator delete(ptr);
+}
+
+} // swirly

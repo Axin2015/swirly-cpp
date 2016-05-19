@@ -30,7 +30,7 @@ StreamBuf::StreamBuf(mbuf& buf) throw(bad_alloc) : buf_(buf)
     // Pre-allocate buffer.
     mbuf_init(&buf_, 4096);
     if (!buf_.buf) {
-      throw bad_alloc();
+      throw bad_alloc{};
     }
   }
 }

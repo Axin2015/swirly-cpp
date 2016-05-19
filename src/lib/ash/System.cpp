@@ -35,7 +35,7 @@ void daemon()
 {
   pid_t pid{fork()};
   if (pid < 0) {
-    throw system_error(errno, system_category(), "fork failed");
+    throw system_error{errno, system_category(), "fork failed"};
   }
 
   if (pid != 0) {
@@ -46,14 +46,14 @@ void daemon()
 
   // Detach from controlling terminal by making process a session leader.
   if (setsid() < 0) {
-    throw system_error(errno, system_category(), "setsid failed");
+    throw system_error{errno, system_category(), "setsid failed"};
   }
 
   // Forking again ensures that the daemon process is not a session leader, and therefore cannot
   // regain access to a controlling terminal.
   pid = fork();
   if (pid < 0) {
-    throw system_error(errno, system_category(), "fork failed");
+    throw system_error{errno, system_category(), "fork failed"};
   }
 
   if (pid != 0) {
@@ -64,7 +64,7 @@ void daemon()
   // Re-open standard input.
   close(STDIN_FILENO);
   if (open("/dev/null", O_RDONLY) < 0) {
-    throw system_error(errno, system_category(), "open failed");
+    throw system_error{errno, system_category(), "open failed"};
   }
 
   // Close all non-standard file handles.
