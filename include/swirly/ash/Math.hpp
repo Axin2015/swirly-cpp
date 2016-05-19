@@ -49,6 +49,14 @@ class SWIRLY_API VarAccum {
   double min() const noexcept { return min_; }
   double max() const noexcept { return max_; }
 
+  void clear() noexcept
+  {
+    size_ = 0;
+    mean_ = 0.0;
+    sum2_ = 0.0;
+    min_ = std::numeric_limits<double>::max();
+    max_ = std::numeric_limits<double>::min();
+  }
   void append(double val) noexcept
   {
     ++size_;

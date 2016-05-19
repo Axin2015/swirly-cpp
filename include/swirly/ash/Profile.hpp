@@ -58,6 +58,10 @@ class SWIRLY_API Profile {
    */
   std::size_t size() const noexcept { return var_.size(); }
   /**
+   * Clear profile.
+   */
+  void clear() noexcept { var_.clear(); }
+  /**
    * Add observation to profile.
    *
    * @param val The observation.

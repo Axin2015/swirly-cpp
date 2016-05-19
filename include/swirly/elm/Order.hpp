@@ -157,11 +157,7 @@ class SWIRLY_API OrderRefSet {
   struct ValueCompare {
     int compare(const Order& lhs, const Order& rhs) const noexcept
     {
-      int result{lhs.contr().compare(rhs.contr())};
-      if (result == 0) {
-        result = swirly::compare(lhs.settlDay(), rhs.settlDay());
-      }
-      return result;
+      return lhs.ref().compare(rhs.ref());
     }
     bool operator()(const Order& lhs, const Order& rhs) const noexcept
     {
