@@ -14,31 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Transaction.hpp>
+#include <swirly/fig/AsyncJourn.hpp>
 
-#include <swirly/ash/Log.hpp>
-
-using namespace std;
-
-namespace swirly {
-
-Transactional::~Transactional() noexcept = default;
-
-Transaction::~Transaction() noexcept
-{
-  if (more_ == More::No) {
-    try {
-      target_.reset();
-    } catch (const exception& e) {
-      SWIRLY_ERROR(logMsg() << "failed to reset transaction: " << e.what());
-    }
-  } else if (!done_) {
-    try {
-      target_.tryRollback();
-    } catch (const exception& e) {
-      SWIRLY_ERROR(logMsg() << "failed to rollback transaction: " << e.what());
-    }
-  }
-}
-
-} // swirly
+#include <swirly/tea/Test.hpp>

@@ -98,138 +98,142 @@ void Journ::doRollback()
   stepOnce(*rollbackStmt_);
 }
 
-void Journ::doReset() noexcept
+void Journ::doUpdate(const Msg& msg)
+{
+  dispatch(msg);
+}
+
+void Journ::reset()
 {
   Transactional::reset();
 }
 
-void Journ::doCreateMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
-                           Jday expiryDay, MarketState state)
+void Journ::createMarket(const CreateMarketBody& body)
 {
   auto& stmt = *insertMarketStmt_;
 
   ScopedBind bind{stmt};
-  bind(mnem);
-  bind(display);
-  bind(contr);
-  bind(settlDay, MaybeNull);
-  bind(expiryDay, MaybeNull);
-  bind(state);
+  bind(toStringView(body.mnem));
+  bind(toStringView(body.display));
+  bind(toStringView(body.contr));
+  bind(body.settlDay, MaybeNull);
+  bind(body.expiryDay, MaybeNull);
+  bind(body.state);
 
   stepOnce(stmt);
 }
 
-void Journ::doUpdateMarket(Mnem mnem, string_view display, MarketState state)
+void Journ::updateMarket(const UpdateMarketBody& body)
 {
   auto& stmt = *updateMarketStmt_;
 
   ScopedBind bind{stmt};
-  bind(mnem);
-  bind(display);
-  bind(state);
+  bind(toStringView(body.mnem));
+  bind(toStringView(body.display));
+  bind(body.state);
 
   stepOnce(stmt);
 }
 
-void Journ::doCreateTrader(Mnem mnem, string_view display, string_view email)
+void Journ::createTrader(const CreateTraderBody& body)
 {
   auto& stmt = *insertTraderStmt_;
 
   ScopedBind bind{stmt};
-  bind(mnem);
-  bind(display);
-  bind(email);
+  bind(toStringView(body.mnem));
+  bind(toStringView(body.display));
+  bind(toStringView(body.email));
 
   stepOnce(stmt);
 }
 
-void Journ::doUpdateTrader(Mnem mnem, string_view display)
+void Journ::updateTrader(const UpdateTraderBody& body)
 {
   auto& stmt = *updateTraderStmt_;
 
   ScopedBind bind{stmt};
-  bind(mnem);
-  bind(display);
+  bind(toStringView(body.mnem));
+  bind(toStringView(body.display));
 
   stepOnce(stmt);
 }
 
-void Journ::doCreateExec(const Exec& exec, More more)
+void Journ::createExec(const CreateExecBody& body)
 {
-  Transaction trans{*this, more};
+  Transaction trans{*this, body.more};
   if (failed()) {
     return;
   }
   auto& stmt = *insertExecStmt_;
 
   ScopedBind bind{stmt};
-  bind(exec.trader());
-  bind(exec.market());
-  bind(exec.contr());
-  bind(exec.settlDay(), MaybeNull);
-  bind(exec.id());
-  bind(exec.ref(), MaybeNull);
-  bind(exec.orderId(), MaybeNull);
-  bind(exec.state());
-  bind(exec.side());
-  bind(exec.lots());
-  bind(exec.ticks());
-  bind(exec.resd());
-  bind(exec.exec());
-  bind(exec.cost());
-  if (exec.lastLots() > 0_lts) {
-    bind(exec.lastLots());
-    bind(exec.lastTicks());
+  bind(toStringView(body.trader));
+  bind(toStringView(body.market));
+  bind(toStringView(body.contr));
+  bind(body.settlDay, MaybeNull);
+  bind(body.id);
+  bind(toStringView(body.ref), MaybeNull);
+  bind(body.orderId, MaybeNull);
+  bind(body.state);
+  bind(body.side);
+  bind(body.lots);
+  bind(body.ticks);
+  bind(body.resd);
+  bind(body.exec);
+  bind(body.cost);
+  if (body.lastLots > 0_lts) {
+    bind(body.lastLots);
+    bind(body.lastTicks);
   } else {
     bind(nullptr);
     bind(nullptr);
   }
-  bind(exec.minLots());
-  bind(exec.matchId(), MaybeNull);
-  bind(exec.role(), MaybeNull);
-  bind(exec.cpty(), MaybeNull);
+  bind(body.minLots);
+  bind(body.matchId, MaybeNull);
+  bind(body.role, MaybeNull);
+  bind(toStringView(body.cpty), MaybeNull);
   bind(0); // Archive.
-  bind(exec.created()); // Created.
-  bind(exec.created()); // Modified.
+  bind(body.created); // Created.
+  bind(body.created); // Modified.
 
   stepOnce(stmt);
 }
 
-void Journ::doArchiveOrder(Mnem market, Iden id, Millis modified, More more)
+void Journ::archiveOrder(const ArchiveBody& body)
 {
-  Transaction trans{*this, more};
+  Transaction trans{*this, body.more};
   if (failed()) {
     return;
   }
   auto& stmt = *updateOrderStmt_;
 
   ScopedBind bind{stmt};
-  bind(market);
-  bind(id);
-  bind(modified);
+  bind(toStringView(body.market));
+  bind(body.ids[0]);
+  bind(body.modified);
 
   stepOnce(stmt);
 }
 
-void Journ::doArchiveTrade(Mnem market, Iden id, Millis modified, More more)
+void Journ::archiveTrade(const ArchiveBody& body)
 {
-  Transaction trans{*this, more};
+  Transaction trans{*this, body.more};
   if (failed()) {
     return;
   }
   auto& stmt = *updateExecStmt_;
 
   ScopedBind bind{stmt};
-  bind(market);
-  bind(id);
-  bind(modified);
+  bind(toStringView(body.market));
+  bind(body.ids[0]);
+  bind(body.modified);
 
   stepOnce(stmt);
 }
 
 } // sqlite
 
-SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf)
+std::unique_ptr<Journ> makeJourn(const Conf& conf)
 {
   return make_unique<sqlite::Journ>(conf);
 }

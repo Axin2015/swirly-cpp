@@ -101,7 +101,7 @@ constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(Millis) 
                              / sizeof(Iden)};
 struct SWIRLY_PACKED ArchiveBody {
   char market[MaxMnem];
-  Iden id[MaxIds];
+  Iden ids[MaxIds];
   Millis modified;
   More more;
 };
@@ -133,9 +133,9 @@ struct MsgHandler {
 
   // Move.
   MsgHandler(MsgHandler&&) noexcept = default;
-  MsgHandler& operator=(MsgHandler&&) noexcept = delete;
+  MsgHandler& operator=(MsgHandler&&) noexcept = default;
 
-  void notify(const Msg& msg)
+  void dispatch(const Msg& msg)
   {
     auto* derived = static_cast<DerivedT*>(this);
     switch (msg.type) {

@@ -20,6 +20,7 @@
 #include "Utility.hpp"
 
 #include <swirly/elm/Journ.hpp>
+#include <swirly/elm/Msg.hpp>
 #include <swirly/elm/Transaction.hpp>
 
 namespace swirly {
@@ -30,7 +31,9 @@ namespace sqlite {
  * @{
  */
 
-class Journ : public swirly::Transactional, public swirly::Journ {
+class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHandler<Journ> {
+  friend struct swirly::MsgHandler<Journ>;
+
  public:
   explicit Journ(const Conf& conf);
   ~Journ() noexcept override;
@@ -50,24 +53,25 @@ class Journ : public swirly::Transactional, public swirly::Journ {
 
   void doRollback() override;
 
-  void doReset() noexcept override;
-
-  void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                      Jday expiryDay, MarketState state) override;
-
-  void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state) override;
-
-  void doCreateTrader(Mnem mnem, std::string_view display, std::string_view email) override;
-
-  void doUpdateTrader(Mnem mnem, std::string_view display) override;
-
-  void doCreateExec(const Exec& exec, More more) override;
-
-  void doArchiveOrder(Mnem market, Iden id, Millis modified, More more) override;
-
-  void doArchiveTrade(Mnem market, Iden id, Millis modified, More more) override;
+  void doUpdate(const Msg& msg) override;
 
  private:
+  void reset();
+
+  void createMarket(const CreateMarketBody& body);
+
+  void updateMarket(const UpdateMarketBody& body);
+
+  void createTrader(const CreateTraderBody& body);
+
+  void updateTrader(const UpdateTraderBody& body);
+
+  void createExec(const CreateExecBody& body);
+
+  void archiveOrder(const ArchiveBody& body);
+
+  void archiveTrade(const ArchiveBody& body);
+
   DbPtr db_;
   StmtPtr beginStmt_;
   StmtPtr commitStmt_;

@@ -70,12 +70,25 @@ class SWIRLY_API Transactional {
   /**
    * Rollback transaction.
    */
-  void tryRollback() noexcept;
+  void tryRollback()
+  {
+    if (state_ == Active) {
+      state_ = Failed;
+      doRollback();
+    }
+  }
 
   /**
    * Reset transaction.
    */
-  void reset() noexcept;
+  void reset()
+  {
+    auto prev = state_;
+    state_ = None;
+    if (prev == Active) {
+      doRollback();
+    }
+  }
 
  protected:
   virtual void doBegin() = 0;
@@ -88,7 +101,7 @@ class SWIRLY_API Transactional {
   enum { None, Active, Failed } state_{None};
 };
 
-class Transaction {
+class SWIRLY_API Transaction {
  public:
   Transaction(Transactional& target, More more) : target_(target), more_{more}
   {
@@ -100,14 +113,8 @@ class Transaction {
   {
     target_.tryBegin();
   }
-  ~Transaction() noexcept
-  {
-    if (more_ == More::No) {
-      target_.reset();
-    } else if (!done_) {
-      target_.tryRollback();
-    }
-  }
+  ~Transaction() noexcept;
+
   // Copy.
   Transaction(const Transaction&) = delete;
   Transaction& operator=(const Transaction&) = delete;

@@ -149,36 +149,7 @@ MockJourn& MockJourn::operator=(const MockJourn&) noexcept = default;
 constexpr MockJourn::MockJourn(MockJourn&&) noexcept = default;
 MockJourn& MockJourn::operator=(MockJourn&&) noexcept = default;
 
-void MockJourn::doReset() noexcept
-{
-}
-
-void MockJourn::doCreateMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
-                               Jday expiryDay, MarketState state)
-{
-}
-
-void MockJourn::doUpdateMarket(Mnem mnem, string_view display, MarketState state)
-{
-}
-
-void MockJourn::doCreateTrader(Mnem mnem, string_view display, string_view email)
-{
-}
-
-void MockJourn::doUpdateTrader(Mnem mnem, string_view display)
-{
-}
-
-void MockJourn::doCreateExec(const Exec& exec, More more)
-{
-}
-
-void MockJourn::doArchiveOrder(Mnem market, Iden id, Millis modified, More more)
-{
-}
-
-void MockJourn::doArchiveTrade(Mnem market, Iden id, Millis modified, More more)
+void MockJourn::doUpdate(const Msg& msg)
 {
 }
 

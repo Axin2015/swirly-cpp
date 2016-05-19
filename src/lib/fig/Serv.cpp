@@ -16,6 +16,7 @@
  */
 #include <swirly/fig/Serv.hpp>
 
+#include <swirly/fig/AsyncJourn.hpp>
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/TraderSess.hpp>
 
@@ -192,7 +193,7 @@ struct Serv::Impl {
     }
   }
 
-  Journ& journ;
+  AsyncJourn journ;
   const BusinessDay busDay{RollHour, NewYork};
   const ServFactory factory{};
   AssetSet assets;

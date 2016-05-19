@@ -53,46 +53,46 @@ SWIRLY_TEST_CASE(MsgHandler)
   memset(&m, 0, sizeof(m));
 
   SWIRLY_CHECK(h.resetCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.resetCalls == 1);
 
   m.type = MsgType::Reset;
   SWIRLY_CHECK(h.resetCalls == 1);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.resetCalls == 2);
 
   m.type = MsgType::CreateMarket;
   SWIRLY_CHECK(h.createMarketCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.createMarketCalls == 1);
 
   m.type = MsgType::UpdateMarket;
   SWIRLY_CHECK(h.updateMarketCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.updateMarketCalls == 1);
 
   m.type = MsgType::CreateTrader;
   SWIRLY_CHECK(h.createTraderCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.createTraderCalls == 1);
 
   m.type = MsgType::UpdateTrader;
   SWIRLY_CHECK(h.updateTraderCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.updateTraderCalls == 1);
 
   m.type = MsgType::CreateExec;
   SWIRLY_CHECK(h.createExecCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.createExecCalls == 1);
 
   m.type = MsgType::ArchiveOrder;
   SWIRLY_CHECK(h.archiveOrderCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.archiveOrderCalls == 1);
 
   m.type = MsgType::ArchiveTrade;
   SWIRLY_CHECK(h.archiveTradeCalls == 0);
-  h.notify(m);
+  h.dispatch(m);
   SWIRLY_CHECK(h.archiveTradeCalls == 1);
 }
