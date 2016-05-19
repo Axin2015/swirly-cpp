@@ -25,12 +25,13 @@ using namespace std;
 
 namespace swirly {
 namespace {
+template <std::size_t StepN>
 class MultiPart {
  public:
-  explicit MultiPart(AsyncJourn& journ) noexcept : journ_{journ} {}
+  MultiPart(AsyncJourn& journ, std::size_t total) noexcept : journ_{journ}, window_{total} {}
   ~MultiPart() noexcept
   {
-    if (!done_) {
+    if (!done()) {
       try {
         journ_.reset();
       } catch (const exception& e) {
@@ -38,11 +39,24 @@ class MultiPart {
       }
     }
   }
-  void done() noexcept { done_ = true; }
+
+  // Copy.
+  MultiPart(const MultiPart&) = delete;
+  MultiPart& operator=(const MultiPart&) = delete;
+
+  // Move.
+  MultiPart(MultiPart&&) = delete;
+  MultiPart& operator=(MultiPart&&) = delete;
+
+  std::size_t index() const noexcept { return window_.index(); }
+  std::size_t size() const noexcept { return window_.size(); }
+  More more() const noexcept { return window_.more(); }
+  bool done() const noexcept { return window_.done(); }
+  bool next() noexcept { return window_.next(); }
 
  private:
   AsyncJourn& journ_;
-  bool done_{false};
+  detail::AsyncWindow<StepN> window_;
 };
 
 void worker(MsgPipe& pipe, Journ& journ)
@@ -82,47 +96,26 @@ AsyncJourn::~AsyncJourn() noexcept
 
 void AsyncJourn::createExec(ArrayView<ConstExecPtr> execs)
 {
-  if (execs.size() > 1) {
-    doCreateExec(*execs.front(), More::Yes);
-    MultiPart mp{*this};
-    for (const auto& exec : makeArrayView(&execs[1], execs.size() - 2)) {
-      doCreateExec(*exec, More::Yes);
-    }
-    doCreateExec(*execs.back(), More::No);
-    mp.done();
-  } else {
-    doCreateExec(*execs.front(), More::No);
-  }
+  MultiPart<1> mp{*this, execs.size()};
+  do {
+    doCreateExec(*execs[mp.index()], mp.more());
+  } while (mp.next());
 }
 
 void AsyncJourn::archiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified)
 {
-  if (ids.size() > 1) {
-    doArchiveOrder(market, ids.front(), modified, More::Yes);
-    MultiPart mp{*this};
-    for (const auto id : makeArrayView(&ids[1], ids.size() - 2)) {
-      doArchiveOrder(market, id, modified, More::Yes);
-    }
-    doArchiveOrder(market, ids.back(), modified, More::No);
-    mp.done();
-  } else {
-    doArchiveOrder(market, ids.front(), modified, More::No);
-  }
+  MultiPart<MaxIds> mp{*this, ids.size()};
+  do {
+    doArchiveOrder(market, makeArrayView(&ids[mp.index()], mp.size()), modified, mp.more());
+  } while (mp.next());
 }
 
 void AsyncJourn::archiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified)
 {
-  if (ids.size() > 1) {
-    doArchiveTrade(market, ids.front(), modified, More::Yes);
-    MultiPart mp{*this};
-    for (const auto id : makeArrayView(&ids[1], ids.size() - 2)) {
-      doArchiveTrade(market, id, modified, More::Yes);
-    }
-    doArchiveTrade(market, ids.back(), modified, More::No);
-    mp.done();
-  } else {
-    doArchiveTrade(market, ids.front(), modified, More::No);
-  }
+  MultiPart<MaxIds> mp{*this, ids.size()};
+  do {
+    doArchiveTrade(market, makeArrayView(&ids[mp.index()], mp.size()), modified, mp.more());
+  } while (mp.next());
 }
 
 void AsyncJourn::doReset()
@@ -207,25 +200,45 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
   });
 }
 
-void AsyncJourn::doArchiveOrder(Mnem market, Iden id, Millis modified, More more)
+void AsyncJourn::doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified, More more)
 {
-  pipe_.write([&market, id, modified, more](Msg& msg) {
+  assert(ids.size() <= MaxIds);
+  pipe_.write([&market, ids, modified, more](Msg& msg) {
     msg.type = MsgType::ArchiveOrder;
     auto& body = msg.archive;
     setCString(body.market, market);
-    body.ids[0] = id;
+    // Cannot use copy and fill here because ArchiveBody is a packed struct:
+    // auto it = copy(ids.begin(), ids.end(), begin(body.ids));
+    // fill(it, end(body.ids), 0);
+    size_t i{0};
+    for (; i < ids.size(); ++i) {
+      body.ids[i] = ids[i];
+    }
+    for (; i < MaxIds; ++i) {
+      body.ids[i] = 0_id;
+    }
     body.modified = modified;
     body.more = more;
   });
 }
 
-void AsyncJourn::doArchiveTrade(Mnem market, Iden id, Millis modified, More more)
+void AsyncJourn::doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified, More more)
 {
-  pipe_.write([&market, id, modified, more](Msg& msg) {
+  assert(ids.size() <= MaxIds);
+  pipe_.write([&market, ids, modified, more](Msg& msg) {
     msg.type = MsgType::ArchiveTrade;
     auto& body = msg.archive;
     setCString(body.market, market);
-    body.ids[0] = id;
+    // Cannot use copy and fill here because ArchiveBody is a packed struct:
+    // auto it = copy(ids.begin(), ids.end(), begin(body.ids));
+    // fill(it, end(body.ids), 0);
+    size_t i{0};
+    for (; i < ids.size(); ++i) {
+      body.ids[i] = ids[i];
+    }
+    for (; i < MaxIds; ++i) {
+      body.ids[i] = 0_id;
+    }
     body.modified = modified;
     body.more = more;
   });
