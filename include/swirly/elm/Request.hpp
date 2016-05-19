@@ -103,9 +103,10 @@ class RequestIdSet {
   struct ValueCompare {
     int compare(const Request& lhs, const Request& rhs) const noexcept
     {
-      int result{lhs.market().compare(rhs.market())};
+      // Perform fastest comparisons first.
+      int result{swirly::compare(lhs.id(), rhs.id())};
       if (result == 0) {
-        result = swirly::compare(lhs.id(), rhs.id());
+        result = lhs.market().compare(rhs.market());
       }
       return result;
     }
@@ -117,17 +118,19 @@ class RequestIdSet {
   struct KeyValueCompare {
     bool operator()(const Key& lhs, const Request& rhs) const noexcept
     {
-      int result{std::get<0>(lhs).compare(rhs.market())};
+      // Perform fastest comparisons first.
+      int result{swirly::compare(std::get<1>(lhs), rhs.id())};
       if (result == 0) {
-        result = swirly::compare(std::get<1>(lhs), rhs.id());
+        result = std::get<0>(lhs).compare(rhs.market());
       }
       return result < 0;
     }
     bool operator()(const Request& lhs, const Key& rhs) const noexcept
     {
-      int result{lhs.market().compare(std::get<0>(rhs))};
+      // Perform fastest comparisons first.
+      int result{swirly::compare(lhs.id(), std::get<1>(rhs))};
       if (result == 0) {
-        result = swirly::compare(lhs.id(), std::get<1>(rhs));
+        result = lhs.market().compare(std::get<0>(rhs));
       }
       return result < 0;
     }

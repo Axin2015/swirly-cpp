@@ -127,9 +127,10 @@ class SWIRLY_API TraderPosnSet {
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
-      int result{lhs.contr().compare(rhs.contr())};
+      // Perform fastest comparisons first.
+      int result{swirly::compare(lhs.settlDay(), rhs.settlDay())};
       if (result == 0) {
-        result = swirly::compare(lhs.settlDay(), rhs.settlDay());
+        result = lhs.contr().compare(rhs.contr());
       }
       return result;
     }
@@ -141,17 +142,19 @@ class SWIRLY_API TraderPosnSet {
   struct KeyValueCompare {
     bool operator()(const Key& lhs, const Posn& rhs) const noexcept
     {
-      int result{std::get<0>(lhs).compare(rhs.contr())};
+      // Perform fastest comparisons first.
+      int result{swirly::compare(std::get<1>(lhs), rhs.settlDay())};
       if (result == 0) {
-        result = swirly::compare(std::get<1>(lhs), rhs.settlDay());
+        result = std::get<0>(lhs).compare(rhs.contr());
       }
       return result < 0;
     }
     bool operator()(const Posn& lhs, const Key& rhs) const noexcept
     {
-      int result{lhs.contr().compare(std::get<0>(rhs))};
+      // Perform fastest comparisons first.
+      int result{swirly::compare(lhs.settlDay(), std::get<1>(rhs))};
       if (result == 0) {
-        result = swirly::compare(lhs.settlDay(), std::get<1>(rhs));
+        result = lhs.contr().compare(std::get<0>(rhs));
       }
       return result < 0;
     }
