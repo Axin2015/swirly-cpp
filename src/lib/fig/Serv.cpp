@@ -615,11 +615,6 @@ void Serv::archiveOrder(TraderSess& sess, string_view market, Iden id, Millis no
   archiveOrder(sess, order, now);
 }
 
-void Serv::archiveOrder(TraderSess& sess, Millis now)
-{
-  // FIXME: Not implemented.
-}
-
 void Serv::archiveOrder(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)
 {
   for (const auto id : ids) {
@@ -666,11 +661,6 @@ void Serv::archiveTrade(TraderSess& sess, string_view market, Iden id, Millis no
 {
   auto& trade = sess.trade(market, id);
   archiveTrade(sess, trade, now);
-}
-
-void Serv::archiveTrade(TraderSess& sess, Millis now)
-{
-  // FIXME: Not implemented.
 }
 
 void Serv::archiveTrade(TraderSess& sess, string_view market, ArrayView<Iden> ids, Millis now)

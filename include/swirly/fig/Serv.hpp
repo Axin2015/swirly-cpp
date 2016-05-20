@@ -127,16 +127,6 @@ class SWIRLY_API Serv {
 
   void archiveOrder(TraderSess& sess, std::string_view market, Iden id, Millis now);
 
-  /**
-   * Archive all orders.
-   *
-   * @param sess
-   *            The session.
-   * @param now
-   *            The current time.
-   */
-  void archiveOrder(TraderSess& sess, Millis now);
-
   void archiveOrder(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
 
   ConstExecPtr createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
@@ -146,16 +136,6 @@ class SWIRLY_API Serv {
   void archiveTrade(TraderSess& sess, const Exec& trade, Millis now);
 
   void archiveTrade(TraderSess& sess, std::string_view market, Iden id, Millis now);
-
-  /**
-   * Archive all trades.
-   *
-   * @param sess
-   *            The session.
-   * @param now
-   *            The current time.
-   */
-  void archiveTrade(TraderSess& sess, Millis now);
 
   void archiveTrade(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
 
