@@ -19,6 +19,8 @@
 
 #include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/Types.hpp>
+
 namespace swirly {
 
 class Conf;
@@ -61,6 +63,18 @@ class SWIRLY_API Model {
   {
     doReadTrader(factory, cb);
   }
+  void readOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
+  {
+    doReadOrder(factory, cb);
+  }
+  void readTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
+  {
+    doReadTrade(factory, cb);
+  }
+  void readPosn(Jday busDay, const Factory& factory, const ModelCallback<PosnPtr>& cb) const
+  {
+    doReadPosn(busDay, factory, cb);
+  }
 
  protected:
   virtual void doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const = 0;
@@ -70,6 +84,13 @@ class SWIRLY_API Model {
   virtual void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const = 0;
 
   virtual void doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const = 0;
+
+  virtual void doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const = 0;
+
+  virtual void doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const = 0;
+
+  virtual void doReadPosn(Jday busDay, const Factory& factory,
+                          const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
 /**

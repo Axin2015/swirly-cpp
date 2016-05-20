@@ -111,6 +111,19 @@ void MockModel::doReadTrader(const Factory& factory, const ModelCallback<TraderP
   cb(factory.newTrader("MARAYL", "Mark Aylett", "mark.aylett@swirlycloud.com"));
 }
 
+void MockModel::doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
+{
+}
+
+void MockModel::doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
+{
+}
+
+void MockModel::doReadPosn(Jday busDay, const Factory& factory,
+                           const ModelCallback<PosnPtr>& cb) const
+{
+}
+
 MockJourn::MockJourn() noexcept = default;
 MockJourn::~MockJourn() noexcept = default;
 

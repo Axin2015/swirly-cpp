@@ -18,8 +18,11 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Market.hpp>
+#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
 #include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Conf.hpp>
@@ -43,6 +46,19 @@ constexpr auto SelectContrSql = //
 constexpr auto SelectMarketSql = //
   "SELECT mnem, display, contr, settl_day, expiry_day, state, last_lots, last_ticks, last_time," //
   " max_order_id, max_exec_id FROM market_v"_sv;
+
+constexpr auto SelectOrderSql = //
+  "SELECT trader, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
+  " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
+  " FROM order_t WHERE archive = 0 AND resd > 0;"_sv;
+
+constexpr auto SelectTradeSql = //
+  "SELECT trader, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
+  " exec, cost, last_lots, last_ticks, min_lots, match_id, role_id, cpty, created" //
+  " FROM exec_t WHERE archive = 0 AND state_id = 4;"_sv;
+
+constexpr auto SelectPosnSql = //
+  "SELECT trader, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
 
 } // anonymous
 
@@ -150,6 +166,149 @@ void Model::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>&
     cb(factory.newTrader(column<string_view>(*stmt, Mnem), //
                          column<string_view>(*stmt, Display), //
                          column<string_view>(*stmt, Email)));
+  }
+}
+
+void Model::doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
+{
+  enum { //
+    Trader, //
+    Market, //
+    Contr, //
+    SettlDay, //
+    Id, //
+    Ref, //
+    State, //
+    Side, //
+    Lots, //
+    Ticks, //
+    Resd, //
+    Exec, //
+    Cost, //
+    LastLots, //
+    LastTicks, //
+    MinLots, //
+    Created, //
+    Modified //
+  };
+
+  StmtPtr stmt{prepare(*db_, SelectOrderSql)};
+  while (step(*stmt)) {
+    cb(factory.newOrder(column<string_view>(*stmt, Trader), //
+                        column<string_view>(*stmt, Market), //
+                        column<string_view>(*stmt, Contr), //
+                        column<Jday>(*stmt, SettlDay), //
+                        column<Iden>(*stmt, Id), //
+                        column<string_view>(*stmt, Ref), //
+                        column<swirly::State>(*stmt, State), //
+                        column<swirly::Side>(*stmt, Side), //
+                        column<swirly::Lots>(*stmt, Lots), //
+                        column<swirly::Ticks>(*stmt, Ticks), //
+                        column<swirly::Lots>(*stmt, Resd), //
+                        column<swirly::Lots>(*stmt, Exec), //
+                        column<swirly::Cost>(*stmt, Cost), //
+                        column<swirly::Lots>(*stmt, LastLots), //
+                        column<swirly::Ticks>(*stmt, LastTicks), //
+                        column<swirly::Lots>(*stmt, MinLots), //
+                        column<Millis>(*stmt, Created), //
+                        column<Millis>(*stmt, Modified)));
+  }
+}
+
+void Model::doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
+{
+  enum { //
+    Trader, //
+    Market, //
+    Contr, //
+    SettlDay, //
+    Id, //
+    Ref, //
+    OrderId, //
+    Side, //
+    Lots, //
+    Ticks, //
+    Resd, //
+    Exec, //
+    Cost, //
+    LastLots, //
+    LastTicks, //
+    MinLots, //
+    MatchId, //
+    Role, //
+    Cpty, //
+    Created //
+  };
+
+  StmtPtr stmt{prepare(*db_, SelectTradeSql)};
+  while (step(*stmt)) {
+    cb(factory.newExec(column<string_view>(*stmt, Trader), //
+                       column<string_view>(*stmt, Market), //
+                       column<string_view>(*stmt, Contr), //
+                       column<Jday>(*stmt, SettlDay), //
+                       column<Iden>(*stmt, Id), //
+                       column<string_view>(*stmt, Ref), //
+                       column<Iden>(*stmt, OrderId), //
+                       State::Trade, //
+                       column<swirly::Side>(*stmt, Side), //
+                       column<swirly::Lots>(*stmt, Lots), //
+                       column<swirly::Ticks>(*stmt, Ticks), //
+                       column<swirly::Lots>(*stmt, Resd), //
+                       column<swirly::Lots>(*stmt, Exec), //
+                       column<swirly::Cost>(*stmt, Cost), //
+                       column<swirly::Lots>(*stmt, LastLots), //
+                       column<swirly::Ticks>(*stmt, LastTicks), //
+                       column<swirly::Lots>(*stmt, MinLots), //
+                       column<Iden>(*stmt, MatchId), //
+                       column<swirly::Role>(*stmt, Role), //
+                       column<string_view>(*stmt, Cpty), //
+                       column<Millis>(*stmt, Created)));
+  }
+}
+
+void Model::doReadPosn(Jday busDay, const Factory& factory, const ModelCallback<PosnPtr>& cb) const
+{
+  enum { //
+    Trader, //
+    Contr, //
+    SettlDay, //
+    Side, //
+    Lots, //
+    Cost //
+  };
+
+  PosnSet ps;
+  PosnSet::Iterator it;
+
+  StmtPtr stmt{prepare(*db_, SelectPosnSql)};
+  while (step(*stmt)) {
+    const auto trader = column<string_view>(*stmt, Trader);
+    const auto contr = column<string_view>(*stmt, Contr);
+    auto settlDay = column<Jday>(*stmt, SettlDay);
+
+    // FIXME: review when end of day is implemented.
+    if (settlDay != 0_jd && settlDay <= busDay) {
+      settlDay = 0_jd;
+    }
+
+    bool found;
+    tie(it, found) = ps.findHint(trader, contr, settlDay);
+    if (!found) {
+      it = ps.insertHint(it, factory.newPosn(trader, contr, settlDay));
+    }
+
+    const auto side = column<swirly::Side>(*stmt, Side);
+    const auto lots = column<swirly::Lots>(*stmt, Lots);
+    const auto cost = column<swirly::Cost>(*stmt, Cost);
+    if (side == swirly::Side::Buy) {
+      it->addBuy(lots, cost);
+    } else {
+      it->addSell(lots, cost);
+    }
+  }
+
+  for (it = ps.begin(); it != ps.end();) {
+    cb(ps.remove(it++));
   }
 }
 

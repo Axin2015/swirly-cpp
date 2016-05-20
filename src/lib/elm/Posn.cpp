@@ -51,6 +51,51 @@ void Posn::toJson(ostream& os) const
   os << '}';
 }
 
+PosnSet::~PosnSet() noexcept
+{
+  set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });
+}
+
+PosnSet::PosnSet(PosnSet&&) = default;
+
+PosnSet& PosnSet::operator=(PosnSet&&) = default;
+
+PosnSet::Iterator PosnSet::insert(const ValuePtr& value) noexcept
+{
+  Iterator it;
+  bool inserted;
+  std::tie(it, inserted) = set_.insert(*value);
+  if (inserted) {
+    // Take ownership if inserted.
+    value->addRef();
+  }
+  return it;
+}
+
+PosnSet::Iterator PosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
+{
+  auto it = set_.insert(hint, *value);
+  // Take ownership.
+  value->addRef();
+  return it;
+}
+
+PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
+{
+  Iterator it;
+  bool inserted;
+  std::tie(it, inserted) = set_.insert(*value);
+  if (!inserted) {
+    // Replace if exists.
+    ValuePtr prev{&*it, false};
+    set_.replace_node(it, *value);
+    it = Set::s_iterator_to(*value);
+  }
+  // Take ownership.
+  value->addRef();
+  return it;
+}
+
 TraderPosnSet::~TraderPosnSet() noexcept
 {
   set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });

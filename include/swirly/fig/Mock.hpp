@@ -48,6 +48,13 @@ class SWIRLY_API MockModel : public Model {
   void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const override;
 
   void doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const override;
+
+  void doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const override;
+
+  void doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const override;
+
+  void doReadPosn(Jday busDay, const Factory& factory,
+                  const ModelCallback<PosnPtr>& cb) const override;
 };
 
 class SWIRLY_API MockJourn : public Journ {

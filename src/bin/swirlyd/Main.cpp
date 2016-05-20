@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
     const char* const httpUser{conf.get("http_user", "Swirly-User")};
 
     Rest rest{*journ};
-    rest.load(*model);
+    rest.load(*model, getTimeOfDay());
     model = nullptr;
 
     mg::RestServ rs{rest, httpUser, opts.testMode ? "Swirly-Time" : nullptr};

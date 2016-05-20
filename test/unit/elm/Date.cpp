@@ -23,18 +23,6 @@
 using namespace std;
 using namespace swirly;
 
-namespace {
-
-// Roll at 5pm.
-constexpr int RollHour{17};
-
-// http://www.di-mgt.com.au/wclock/tz.html
-
-// America/New_York.
-constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
-
-} // anonymous
-
 SWIRLY_TEST_CASE(GetBusDay)
 {
   BusinessDay busDay{RollHour, NewYork};

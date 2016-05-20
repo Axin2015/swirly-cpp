@@ -16,13 +16,18 @@
  */
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
+#include <swirly/elm/Date.hpp>
+#include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Market.hpp>
 #include <swirly/elm/Model.hpp>
+#include <swirly/elm/Order.hpp>
+#include <swirly/elm/Posn.hpp>
 #include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Stream.hpp>
+#include <swirly/ash/Time.hpp>
 
 #include <iostream>
 
@@ -38,6 +43,7 @@ int main(int argc, char* argv[])
     if (argc > 1) {
       conf.set("sqlite_model", argv[1]);
     }
+    const BusinessDay busDay{RollHour, NewYork};
     const BasicFactory factory{};
     auto model = makeModel(conf);
 
@@ -60,6 +66,21 @@ int main(int argc, char* argv[])
     {
       OStreamJoiner it(cout, ',');
       model->readTrader(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
+    cout << "],\"orders\":[";
+    {
+      OStreamJoiner it(cout, ',');
+      model->readOrder(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
+    cout << "],\"trades\":[";
+    {
+      OStreamJoiner it(cout, ',');
+      model->readTrade(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
+    cout << "],\"posns\":[";
+    {
+      OStreamJoiner it(cout, ',');
+      model->readPosn(busDay(getTimeOfDay()), factory, [&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "]}\n";
 

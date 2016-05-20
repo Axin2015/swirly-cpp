@@ -33,6 +33,17 @@ namespace swirly {
  */
 
 /**
+ * Roll at 5pm.
+ */
+constexpr int RollHour{17};
+
+/**
+ * America/New_York.
+ * See http://www.di-mgt.com.au/wclock/tz.html
+ */
+constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
+
+/**
  * Business day functor. Date calculations on the critical path can become a performance
  * bottleneck. This class improves performance for the most common use-case by caching the most
  * recent results.
