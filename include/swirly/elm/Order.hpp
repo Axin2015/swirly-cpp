@@ -246,7 +246,10 @@ class SWIRLY_API OrderRefSet {
   {
     return insertOrReplace(makeRefCounted<Order>(std::forward<ArgsT>(args)...));
   }
-  void remove(const Order& value) noexcept { set_.erase(value); }
+  void remove(const Order& value) noexcept
+  {
+    set_.erase_and_dispose(value, [](Order* ptr) { ptr->release(); });
+  }
 
  private:
   Set set_;
