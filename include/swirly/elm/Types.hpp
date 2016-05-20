@@ -23,6 +23,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 #include <cstdint>
+#include <memory>
 
 namespace swirly {
 
@@ -235,24 +236,34 @@ struct EnumTraits<State> {
  */
 
 class Asset;
+using AssetPtr = std::unique_ptr<Asset>;
+using ConstAssetPtr = std::unique_ptr<const Asset>;
+
 class Contr;
+using ContrPtr = std::unique_ptr<Contr>;
+using ConstContrPtr = std::unique_ptr<const Contr>;
+
 class Market;
+using MarketPtr = std::unique_ptr<Market>;
+using ConstMarketPtr = std::unique_ptr<const Market>;
+
 class Trader;
+using TraderPtr = std::unique_ptr<Trader>;
+using ConstTraderPtr = std::unique_ptr<const Trader>;
 
 class Request;
-class Exec;
-class Order;
-class Posn;
-
 using RequestPtr = boost::intrusive_ptr<Request>;
 using ConstRequestPtr = boost::intrusive_ptr<const Request>;
 
+class Exec;
 using ExecPtr = boost::intrusive_ptr<Exec>;
 using ConstExecPtr = boost::intrusive_ptr<const Exec>;
 
+class Order;
 using OrderPtr = boost::intrusive_ptr<Order>;
 using ConstOrderPtr = boost::intrusive_ptr<const Order>;
 
+class Posn;
 using PosnPtr = boost::intrusive_ptr<Posn>;
 using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
