@@ -51,6 +51,32 @@ TraderSess& createTrader(Serv& serv, string_view mnem, string_view display, stri
   return serv.createTrader(mnem, display, email, now);
 }
 
+class Archiver {
+ public:
+  explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
+  void operator()(TraderSess& sess, std::string_view market, Millis now)
+  {
+    ids_.clear();
+    for (const auto& order : sess.orders()) {
+      if (order.market() == market && order.done()) {
+        ids_.push_back(order.id());
+      }
+    }
+    serv_.archiveOrder(sess, market, ids_, now);
+    ids_.clear();
+    for (const auto& trade : sess.trades()) {
+      if (trade.market() == market) {
+        ids_.push_back(trade.id());
+      }
+    }
+    serv_.archiveTrade(sess, market, ids_, now);
+  }
+
+ private:
+  Serv& serv_;
+  vector<Iden> ids_;
+};
+
 } // anonymous
 
 int main(int argc, char* argv[])
@@ -88,9 +114,11 @@ int main(int argc, char* argv[])
     auto& pipayl = createTrader(serv, "PIPAYL"_sv, "Pippin Aylett"_sv,
                                 "pippin.aylett@swirlycloud.com"_sv, now);
 
-    Response resp;
     Profile maker{"maker"_sv};
     Profile taker{"taker"_sv};
+
+    Archiver arch{serv};
+    Response resp;
     for (int i = 0; i < 5100; ++i) {
 
       // Reset profiles after warmup period.
@@ -169,14 +197,10 @@ int main(int argc, char* argv[])
         serv.createOrder(pipayl, book, ""_sv, Side::Buy, 40_lts, 12348_tks, 1_lts, now, resp);
       }
 
-      serv.archiveOrder(marayl, now);
-      serv.archiveTrade(marayl, now);
-      serv.archiveOrder(gosayl, now);
-      serv.archiveTrade(gosayl, now);
-      serv.archiveOrder(eddayl, now);
-      serv.archiveTrade(eddayl, now);
-      serv.archiveOrder(pipayl, now);
-      serv.archiveTrade(pipayl, now);
+      arch(eddayl, "EURUSD"_sv, now);
+      arch(gosayl, "EURUSD"_sv, now);
+      arch(marayl, "EURUSD"_sv, now);
+      arch(pipayl, "EURUSD"_sv, now);
     }
 
     ret = 0;
