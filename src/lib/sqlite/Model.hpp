@@ -43,13 +43,13 @@ class Model : public swirly::Model {
   Model& operator=(Model&&);
 
  protected:
-  AssetSet doReadAsset(const Factory& factory) const override;
+  void doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const override;
 
-  ContrSet doReadContr(const Factory& factory) const override;
+  void doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const override;
 
-  MarketSet doReadMarket(const Factory& factory) const override;
+  void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const override;
 
-  TraderSet doReadTrader(const Factory& factory) const override;
+  void doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const override;
 
  private:
   DbPtr db_;

@@ -223,16 +223,17 @@ Serv& Serv::operator=(Serv&&) = default;
 
 void Serv::load(const Model& model)
 {
-  impl_->assets = model.readAsset(impl_->factory);
-  impl_->contrs = model.readContr(impl_->factory);
-  impl_->markets = model.readMarket(impl_->factory);
-  impl_->traders = model.readTrader(impl_->factory);
-
-  impl_->emailIdx.clear();
-  for (auto& rec : impl_->traders) {
-    auto& trader = static_cast<TraderSess&>(rec);
-    impl_->emailIdx.insert(trader);
-  }
+  model.readAsset(impl_->factory,
+                  [& assets = impl_->assets](auto&& ptr) { assets.insert(move(ptr)); });
+  model.readContr(impl_->factory,
+                  [& contrs = impl_->contrs](auto&& ptr) { contrs.insert(move(ptr)); });
+  model.readMarket(impl_->factory,
+                   [& markets = impl_->markets](auto&& ptr) { markets.insert(move(ptr)); });
+  model.readTrader(impl_->factory,
+                   [& traders = impl_->traders, &emailIdx = impl_->emailIdx ](auto&& ptr) {
+                     emailIdx.insert(static_cast<TraderSess&>(*ptr));
+                     traders.insert(move(ptr));
+                   });
 }
 
 AssetSet& Serv::assets() const noexcept

@@ -14,8 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/elm/Asset.hpp>
+#include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Factory.hpp>
+#include <swirly/elm/Market.hpp>
 #include <swirly/elm/Model.hpp>
+#include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Stream.hpp>
@@ -38,21 +42,25 @@ int main(int argc, char* argv[])
     auto model = makeModel(conf);
 
     cout << "{\"assets\":[";
-    auto assets = model->readAsset(factory);
-    copy(assets.begin(), assets.end(), OStreamJoiner(cout, ','));
-
+    {
+      OStreamJoiner it(cout, ',');
+      model->readAsset(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
     cout << "],\"contrs\":[";
-    auto contrs = model->readContr(factory);
-    copy(contrs.begin(), contrs.end(), OStreamJoiner(cout, ','));
-
+    {
+      OStreamJoiner it(cout, ',');
+      model->readContr(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
     cout << "],\"markets\":[";
-    auto markets = model->readMarket(factory);
-    copy(markets.begin(), markets.end(), OStreamJoiner(cout, ','));
-
+    {
+      OStreamJoiner it(cout, ',');
+      model->readMarket(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
     cout << "],\"traders\":[";
-    auto traders = model->readTrader(factory);
-    copy(traders.begin(), traders.end(), OStreamJoiner(cout, ','));
-
+    {
+      OStreamJoiner it(cout, ',');
+      model->readTrader(factory, [&it](const auto&& ptr) { it = *ptr; });
+    }
     cout << "]}\n";
 
     ret = 0;

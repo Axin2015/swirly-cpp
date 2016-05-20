@@ -44,12 +44,10 @@ constexpr auto Now = jdToMs(Today);
 
 class SWIRLY_API TestModel : public MockModel {
  protected:
-  MarketSet doReadMarket(const Factory& factory) const override
+  void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const override
   {
-    MarketSet s;
-    s.insert(factory.newMarket("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay,
-                               ExpiryDay, 0x1));
-    return s;
+    cb(factory.newMarket("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay, ExpiryDay,
+                         0x1));
   }
 };
 

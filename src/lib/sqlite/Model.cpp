@@ -16,7 +16,11 @@
  */
 #include "Model.hpp"
 
+#include <swirly/elm/Asset.hpp>
+#include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Factory.hpp>
+#include <swirly/elm/Market.hpp>
+#include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Conf.hpp>
 
@@ -53,7 +57,7 @@ Model::Model(Model&&) = default;
 
 Model& Model::operator=(Model&&) = default;
 
-AssetSet Model::doReadAsset(const Factory& factory) const
+void Model::doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const
 {
   enum {
     Mnem, //
@@ -61,18 +65,15 @@ AssetSet Model::doReadAsset(const Factory& factory) const
     TypeId //
   };
 
-  AssetSet s;
-
   StmtPtr stmt{prepare(*db_, SelectAssetSql)};
   while (step(*stmt)) {
-    s.insert(factory.newAsset(column<string_view>(*stmt, Mnem), //
-                              column<string_view>(*stmt, Display), //
-                              column<AssetType>(*stmt, TypeId)));
+    cb(factory.newAsset(column<string_view>(*stmt, Mnem), //
+                        column<string_view>(*stmt, Display), //
+                        column<AssetType>(*stmt, TypeId)));
   }
-  return s;
 }
 
-ContrSet Model::doReadContr(const Factory& factory) const
+void Model::doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const
 {
   enum {
     Mnem, //
@@ -88,26 +89,23 @@ ContrSet Model::doReadContr(const Factory& factory) const
     MaxLots //
   };
 
-  ContrSet s;
-
   StmtPtr stmt{prepare(*db_, SelectContrSql)};
   while (step(*stmt)) {
-    s.insert(factory.newContr(column<string_view>(*stmt, Mnem), //
-                              column<string_view>(*stmt, Display), //
-                              column<string_view>(*stmt, Asset), //
-                              column<string_view>(*stmt, Ccy), //
-                              column<int>(*stmt, LotNumer), //
-                              column<int>(*stmt, LotDenom), //
-                              column<int>(*stmt, TickNumer), //
-                              column<int>(*stmt, TickDenom), //
-                              column<int>(*stmt, PipDp), //
-                              column<Lots>(*stmt, MinLots), //
-                              column<Lots>(*stmt, MaxLots)));
+    cb(factory.newContr(column<string_view>(*stmt, Mnem), //
+                        column<string_view>(*stmt, Display), //
+                        column<string_view>(*stmt, Asset), //
+                        column<string_view>(*stmt, Ccy), //
+                        column<int>(*stmt, LotNumer), //
+                        column<int>(*stmt, LotDenom), //
+                        column<int>(*stmt, TickNumer), //
+                        column<int>(*stmt, TickDenom), //
+                        column<int>(*stmt, PipDp), //
+                        column<Lots>(*stmt, MinLots), //
+                        column<Lots>(*stmt, MaxLots)));
   }
-  return s;
 }
 
-MarketSet Model::doReadMarket(const Factory& factory) const
+void Model::doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
 {
   enum { //
     Mnem, //
@@ -123,26 +121,23 @@ MarketSet Model::doReadMarket(const Factory& factory) const
     MaxExecId //
   };
 
-  MarketSet s;
-
   StmtPtr stmt{prepare(*db_, SelectMarketSql)};
   while (step(*stmt)) {
-    s.insert(factory.newMarket(column<string_view>(*stmt, Mnem), //
-                               column<string_view>(*stmt, Display), //
-                               column<string_view>(*stmt, Contr), //
-                               column<Jday>(*stmt, SettlDay), //
-                               column<Jday>(*stmt, ExpiryDay), //
-                               column<MarketState>(*stmt, State), //
-                               column<Lots>(*stmt, LastLots), //
-                               column<Ticks>(*stmt, LastTicks), //
-                               column<Millis>(*stmt, LastTime), //
-                               column<Iden>(*stmt, MaxOrderId), //
-                               column<Iden>(*stmt, MaxExecId)));
+    cb(factory.newMarket(column<string_view>(*stmt, Mnem), //
+                         column<string_view>(*stmt, Display), //
+                         column<string_view>(*stmt, Contr), //
+                         column<Jday>(*stmt, SettlDay), //
+                         column<Jday>(*stmt, ExpiryDay), //
+                         column<MarketState>(*stmt, State), //
+                         column<Lots>(*stmt, LastLots), //
+                         column<Ticks>(*stmt, LastTicks), //
+                         column<Millis>(*stmt, LastTime), //
+                         column<Iden>(*stmt, MaxOrderId), //
+                         column<Iden>(*stmt, MaxExecId)));
   }
-  return s;
 }
 
-TraderSet Model::doReadTrader(const Factory& factory) const
+void Model::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const
 {
   enum { //
     Mnem, //
@@ -150,15 +145,12 @@ TraderSet Model::doReadTrader(const Factory& factory) const
     Email //
   };
 
-  TraderSet s;
-
   StmtPtr stmt{prepare(*db_, SelectTraderSql)};
   while (step(*stmt)) {
-    s.insert(factory.newTrader(column<string_view>(*stmt, Mnem), //
-                               column<string_view>(*stmt, Display), //
-                               column<string_view>(*stmt, Email)));
+    cb(factory.newTrader(column<string_view>(*stmt, Mnem), //
+                         column<string_view>(*stmt, Display), //
+                         column<string_view>(*stmt, Email)));
   }
-  return s;
 }
 
 } // sqlite

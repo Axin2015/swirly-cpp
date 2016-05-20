@@ -17,10 +17,7 @@
 #ifndef SWIRLY_ELM_MODEL_HPP
 #define SWIRLY_ELM_MODEL_HPP
 
-#include <swirly/elm/Asset.hpp>
-#include <swirly/elm/Contr.hpp>
-#include <swirly/elm/Market.hpp>
-#include <swirly/elm/Trader.hpp>
+#include <swirly/elm/Types.hpp>
 
 namespace swirly {
 
@@ -31,6 +28,9 @@ class Factory;
  * @addtogroup IO
  * @{
  */
+
+template <typename ValuePtrT>
+using ModelCallback = std::function<void(ValuePtrT&&)>;
 
 class SWIRLY_API Model {
  public:
@@ -45,19 +45,31 @@ class SWIRLY_API Model {
   constexpr Model(Model&&) noexcept = default;
   Model& operator=(Model&&) noexcept = default;
 
-  AssetSet readAsset(const Factory& factory) const { return doReadAsset(factory); }
-  ContrSet readContr(const Factory& factory) const { return doReadContr(factory); }
-  MarketSet readMarket(const Factory& factory) const { return doReadMarket(factory); }
-  TraderSet readTrader(const Factory& factory) const { return doReadTrader(factory); }
+  void readAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const
+  {
+    doReadAsset(factory, cb);
+  }
+  void readContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const
+  {
+    doReadContr(factory, cb);
+  }
+  void readMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
+  {
+    doReadMarket(factory, cb);
+  }
+  void readTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const
+  {
+    doReadTrader(factory, cb);
+  }
 
  protected:
-  virtual AssetSet doReadAsset(const Factory& factory) const = 0;
+  virtual void doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const = 0;
 
-  virtual ContrSet doReadContr(const Factory& factory) const = 0;
+  virtual void doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const = 0;
 
-  virtual MarketSet doReadMarket(const Factory& factory) const = 0;
+  virtual void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const = 0;
 
-  virtual TraderSet doReadTrader(const Factory& factory) const = 0;
+  virtual void doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const = 0;
 };
 
 /**
