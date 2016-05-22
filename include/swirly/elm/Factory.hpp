@@ -21,8 +21,6 @@
 
 #include <swirly/ash/Types.hpp>
 
-#include <memory>
-
 namespace swirly {
 
 /**
@@ -43,25 +41,21 @@ class SWIRLY_API Factory {
   Factory(Factory&&) noexcept = default;
   Factory& operator=(Factory&&) noexcept = default;
 
-  std::unique_ptr<Asset> newAsset(std::string_view mnem, std::string_view display,
-                                  AssetType type) const;
+  AssetPtr newAsset(std::string_view mnem, std::string_view display, AssetType type) const;
 
-  std::unique_ptr<Contr> newContr(std::string_view mnem, std::string_view display,
-                                  std::string_view asset, std::string_view ccy, int lotNumer,
-                                  int lotDenom, int tickNumer, int tickDenom, int pipDp,
-                                  Lots minLots, Lots maxLots) const;
+  ContrPtr newContr(std::string_view mnem, std::string_view display, std::string_view asset,
+                    std::string_view ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+                    int pipDp, Lots minLots, Lots maxLots) const;
 
-  std::unique_ptr<Market> newMarket(std::string_view mnem, std::string_view display,
-                                    std::string_view contr, Jday settlDay, Jday expiryDay,
-                                    MarketState state, Lots lastLots, Ticks lastTicks,
-                                    Millis lastTime, Iden maxOrderId, Iden maxExecId) const;
+  MarketPtr newMarket(std::string_view mnem, std::string_view display, std::string_view contr,
+                      Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
+                      Ticks lastTicks, Millis lastTime, Iden maxOrderId, Iden maxExecId) const;
 
-  std::unique_ptr<Market> newMarket(std::string_view mnem, std::string_view display,
-                                    std::string_view contr, Jday settlDay, Jday expiryDay,
-                                    MarketState state) const;
+  MarketPtr newMarket(std::string_view mnem, std::string_view display, std::string_view contr,
+                      Jday settlDay, Jday expiryDay, MarketState state) const;
 
-  std::unique_ptr<Trader> newTrader(std::string_view mnem, std::string_view display,
-                                    std::string_view email) const;
+  TraderPtr newTrader(std::string_view mnem, std::string_view display,
+                      std::string_view email) const;
 
   OrderPtr newOrder(std::string_view trader, std::string_view market, std::string_view contr,
                     Jday settlDay, Iden id, std::string_view ref, State state, Side side, Lots lots,
@@ -86,23 +80,21 @@ class SWIRLY_API Factory {
   PosnPtr newPosn(std::string_view trader, std::string_view contr, Jday settlDay) const;
 
  protected:
-  virtual std::unique_ptr<Asset> doNewAsset(std::string_view mnem, std::string_view display,
-                                            AssetType type) const = 0;
+  virtual AssetPtr doNewAsset(std::string_view mnem, std::string_view display,
+                              AssetType type) const = 0;
 
-  virtual std::unique_ptr<Contr> doNewContr(std::string_view mnem, std::string_view display,
-                                            std::string_view asset, std::string_view ccy,
-                                            int lotNumer, int lotDenom, int tickNumer,
-                                            int tickDenom, int pipDp, Lots minLots,
-                                            Lots maxLots) const = 0;
+  virtual ContrPtr doNewContr(std::string_view mnem, std::string_view display,
+                              std::string_view asset, std::string_view ccy, int lotNumer,
+                              int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+                              Lots maxLots) const = 0;
 
-  virtual std::unique_ptr<Market> doNewMarket(std::string_view mnem, std::string_view display,
-                                              std::string_view contr, Jday settlDay, Jday expiryDay,
-                                              MarketState state, Lots lastLots, Ticks lastTicks,
-                                              Millis lastTime, Iden maxOrderId,
-                                              Iden maxExecId) const = 0;
+  virtual MarketPtr doNewMarket(std::string_view mnem, std::string_view display,
+                                std::string_view contr, Jday settlDay, Jday expiryDay,
+                                MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime,
+                                Iden maxOrderId, Iden maxExecId) const = 0;
 
-  virtual std::unique_ptr<Trader> doNewTrader(std::string_view mnem, std::string_view display,
-                                              std::string_view email) const = 0;
+  virtual TraderPtr doNewTrader(std::string_view mnem, std::string_view display,
+                                std::string_view email) const = 0;
 
   virtual OrderPtr doNewOrder(std::string_view trader, std::string_view market,
                               std::string_view contr, Jday settlDay, Iden id, std::string_view ref,
@@ -135,22 +127,20 @@ class SWIRLY_API BasicFactory : public Factory {
   BasicFactory& operator=(BasicFactory&&) noexcept = default;
 
  protected:
-  std::unique_ptr<Asset> doNewAsset(std::string_view mnem, std::string_view display,
-                                    AssetType type) const override;
+  AssetPtr doNewAsset(std::string_view mnem, std::string_view display,
+                      AssetType type) const override;
 
-  std::unique_ptr<Contr> doNewContr(std::string_view mnem, std::string_view display,
-                                    std::string_view asset, std::string_view ccy, int lotNumer,
-                                    int lotDenom, int tickNumer, int tickDenom, int pipDp,
-                                    Lots minLots, Lots maxLots) const override;
+  ContrPtr doNewContr(std::string_view mnem, std::string_view display, std::string_view asset,
+                      std::string_view ccy, int lotNumer, int lotDenom, int tickNumer,
+                      int tickDenom, int pipDp, Lots minLots, Lots maxLots) const override;
 
-  std::unique_ptr<Market> doNewMarket(std::string_view mnem, std::string_view display,
-                                      std::string_view contr, Jday settlDay, Jday expiryDay,
-                                      MarketState state, Lots lastLots, Ticks lastTicks,
-                                      Millis lastTime, Iden maxOrderId,
-                                      Iden maxExecId) const override;
+  MarketPtr doNewMarket(std::string_view mnem, std::string_view display, std::string_view contr,
+                        Jday settlDay, Jday expiryDay, MarketState state, Lots lastLots,
+                        Ticks lastTicks, Millis lastTime, Iden maxOrderId,
+                        Iden maxExecId) const override;
 
-  std::unique_ptr<Trader> doNewTrader(std::string_view mnem, std::string_view display,
-                                      std::string_view email) const override;
+  TraderPtr doNewTrader(std::string_view mnem, std::string_view display,
+                        std::string_view email) const override;
 
   OrderPtr doNewOrder(std::string_view trader, std::string_view market, std::string_view contr,
                       Jday settlDay, Iden id, std::string_view ref, State state, Side side,

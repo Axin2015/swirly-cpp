@@ -59,7 +59,7 @@ class SWIRLY_API Serv {
   Serv(Serv&&);
   Serv& operator=(Serv&&);
 
-  void load(const Model& model);
+  void load(const Model& model, Millis now);
 
   AssetSet& assets() const noexcept;
 

@@ -39,14 +39,6 @@ using namespace std;
 namespace swirly {
 namespace {
 
-// Roll at 5pm.
-constexpr int RollHour{17};
-
-// http://www.di-mgt.com.au/wclock/tz.html
-
-// America/New_York.
-constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
-
 const regex MnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
@@ -201,8 +193,8 @@ struct Serv::Impl {
   }
 
   Journ& journ;
-  BusinessDay busDay{RollHour, NewYork};
-  ServFactory factory;
+  const BusinessDay busDay{RollHour, NewYork};
+  const ServFactory factory{};
   AssetSet assets;
   ContrSet contrs;
   MarketSet markets;
@@ -221,18 +213,35 @@ Serv::Serv(Serv&&) = default;
 
 Serv& Serv::operator=(Serv&&) = default;
 
-void Serv::load(const Model& model)
+void Serv::load(const Model& model, Millis now)
 {
-  impl_->assets = model.readAsset(impl_->factory);
-  impl_->contrs = model.readContr(impl_->factory);
-  impl_->markets = model.readMarket(impl_->factory);
-  impl_->traders = model.readTrader(impl_->factory);
-
-  impl_->emailIdx.clear();
-  for (auto& rec : impl_->traders) {
-    auto& trader = static_cast<TraderSess&>(rec);
-    impl_->emailIdx.insert(trader);
-  }
+  const auto busDay = impl_->busDay(now);
+  model.readAsset(impl_->factory,
+                  [& assets = impl_->assets](auto&& ptr) { assets.insert(move(ptr)); });
+  model.readContr(impl_->factory,
+                  [& contrs = impl_->contrs](auto&& ptr) { contrs.insert(move(ptr)); });
+  model.readMarket(impl_->factory,
+                   [& markets = impl_->markets](auto&& ptr) { markets.insert(move(ptr)); });
+  model.readTrader(impl_->factory,
+                   [& traders = impl_->traders, &emailIdx = impl_->emailIdx ](auto&& ptr) {
+                     emailIdx.insert(static_cast<TraderSess&>(*ptr));
+                     traders.insert(move(ptr));
+                   });
+  model.readOrder(impl_->factory, [& traders = impl_->traders](auto&& ptr) {
+    auto it = traders.find(ptr->trader());
+    assert(it != traders.end());
+    static_cast<TraderSess&>(*it).insertOrder(ptr);
+  });
+  model.readTrade(impl_->factory, [& traders = impl_->traders](auto&& ptr) {
+    auto it = traders.find(ptr->trader());
+    assert(it != traders.end());
+    static_cast<TraderSess&>(*it).insertTrade(ptr);
+  });
+  model.readPosn(busDay, impl_->factory, [& traders = impl_->traders](auto&& ptr) {
+    auto it = traders.find(ptr->trader());
+    assert(it != traders.end());
+    static_cast<TraderSess&>(*it).insertPosn(ptr);
+  });
 }
 
 AssetSet& Serv::assets() const noexcept

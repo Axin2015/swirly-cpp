@@ -97,11 +97,11 @@ int main(int argc, char* argv[])
       model = make_unique<MockModel>();
     }
 
-    Serv serv{*journ};
-    serv.load(*model);
-    model = nullptr;
-
     const auto now = getTimeOfDay();
+
+    Serv serv{*journ};
+    serv.load(*model, now);
+    model = nullptr;
 
     auto& book = createMarket(serv, "EURUSD"_sv, "EURUSD"_sv, "EURUSD"_sv, 0_jd, 0_jd, 0, now);
 

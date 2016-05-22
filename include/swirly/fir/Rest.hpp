@@ -41,7 +41,7 @@ class SWIRLY_API Rest {
   Rest(Rest&&);
   Rest& operator=(Rest&&);
 
-  void load(const Model& model) { serv_.load(model); }
+  void load(const Model& model, Millis now) { serv_.load(model, now); }
 
   void getRec(EntitySet es, Millis now, std::ostream& out) const;
 

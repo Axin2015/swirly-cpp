@@ -75,8 +75,8 @@ Architecture-specific optimisation flags can be specified for release builds:
 
     $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
       -DCMAKE_BUILD_TYPE=RELEASE \
-      -DCMAKE_C_FLAGS_RELEASE="-march=native -O3 -g" \
-      -DCMAKE_CXX_FLAGS_RELEASE="-march=native -O3 -g"
+      -DCMAKE_C_FLAGS_RELEASE="-march=native -O3" \
+      -DCMAKE_CXX_FLAGS_RELEASE="-march=native -O3"
 
 See [CMake Documentation](https://cmake.org/documentation) for further information.
 

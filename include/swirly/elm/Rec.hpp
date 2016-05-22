@@ -23,8 +23,6 @@
 
 #include <boost/intrusive/set.hpp>
 
-#include <memory> // unique_ptr<>
-
 namespace swirly {
 
 /**

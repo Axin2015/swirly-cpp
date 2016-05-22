@@ -56,13 +56,6 @@ inline bool stepOnce(sqlite3_stmt& stmt)
   return step(stmt);
 }
 
-// FIXME: use is_enum_v<> when C++17.
-template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value>* = nullptr>
-inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
-{
-  return static_cast<ValueT>(sqlite3_column_int(&stmt, col));
-}
-
 template <typename ValueT,
           typename std::enable_if_t<std::is_same<ValueT, int>::value
                                     || std::is_same<ValueT, unsigned>::value>* = nullptr>
@@ -77,6 +70,13 @@ template <typename ValueT,
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
   return sqlite3_column_int64(&stmt, col);
+}
+
+// FIXME: use is_enum_v<> when C++17.
+template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value>* = nullptr>
+inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
+{
+  return static_cast<ValueT>(column<std::underlying_type_t<ValueT>>(stmt, col));
 }
 
 template <typename ValueT,
