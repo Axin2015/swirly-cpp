@@ -1,0 +1,144 @@
+#!/usr/bin/env python2
+
+# The Restful Matching-Engine.
+# Copyright (C) 2013, 2016 Swirly Cloud Limited.
+#
+# This program is free software; you can redistribute it and/or modify it under the terms of the
+# GNU General Public License as published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with this program; if
+# not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA.
+
+from cmd import Cmd
+from collections import Counter
+
+import httplib
+import json
+
+def columnLens(rows):
+  lens = Counter()
+  for row in rows:
+    for k, v in row.iteritems():
+      k += 'Len'
+      lens[k] = max(len(str(v)), lens[k])
+  return lens
+
+def header(*cols):
+  return dict(zip(cols, cols))
+
+def printTable(cols, rows, fmt):
+  rows.insert(0, header(*cols))
+  lens = columnLens(rows)
+  for row in rows:
+    row.update(lens)
+    print fmt.format(**row);
+
+class Response(object):
+
+  def __init__(self, resp):
+    self.status = resp.status
+    self.reason = resp.reason
+    self.content = json.load(resp)
+
+  def __str__(self):
+    return ('Response(status={},reason="{}",content="{}")'
+            .format(self.status, self.reason, self.content))
+
+class Shell(Cmd):
+
+  def __init__(self, host, port):
+    Cmd.__init__(self)
+    self.conn = httplib.HTTPConnection(host, port)
+    self.user = None
+
+  def __enter__(self):
+    return self
+
+  def __exit__(self, extype, exval, bt):
+    self.close()
+
+  def close(self):
+    self.conn.close()
+
+  def setUser(self, user):
+    self.user = user
+
+  def send(self, method, uri, **kwargs):
+    content = ''
+    if kwargs is not None:
+      content = json.dumps(kwargs)
+    conn = self.conn
+    conn.putrequest(method, uri)
+    conn.putheader('Accept', 'application/json')
+    if self.user is not None:
+      conn.putheader('Swirly-User', self.user)
+    conn.putheader('Content-Length', len(content))
+    conn.putheader('Content-Type', 'application/json')
+    conn.endheaders()
+    conn.send(content)
+    return Response(conn.getresponse())
+
+  def do_asset(self, args):
+    """Print assets."""
+    resp = self.send('GET', '/api/rec/asset')
+    cols = [
+      'mnem',
+      'display',
+      'type'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{mnem:<{mnemLen}}'
+      '|{display:<{displayLen}}'
+      '|{type:<{typeLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_contr(self, args):
+    """Print contracts."""
+    resp = self.send('GET', '/api/rec/contr')
+    cols = [
+      'mnem',
+      'display',
+      'asset',
+      'ccy',
+      'lotNumer',
+      'lotDenom',
+      'tickNumer',
+      'tickDenom',
+      'pipDp',
+      'minLots',
+      'maxLots'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{mnem:<{mnemLen}}'
+      '|{display:<{displayLen}}'
+      '|{asset:<{assetLen}}'
+      '|{ccy:<{ccyLen}}'
+      '|{lotNumer:>{lotNumerLen}}'
+      '|{lotDenom:>{lotDenomLen}}'
+      '|{tickNumer:>{tickNumerLen}}'
+      '|{tickDenom:>{tickDenomLen}}'
+      '|{pipDp:>{pipDpLen}}'
+      '|{minLots:>{minLotsLen}}'
+      '|{maxLots:>{maxLotsLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_quit(self, args):
+    """Quit the shell."""
+    raise SystemExit
+
+if __name__ == '__main__':
+  with Shell('localhost', 8080) as shell:
+    shell.prompt = '> '
+    shell.cmdloop('Swirly Shell')
