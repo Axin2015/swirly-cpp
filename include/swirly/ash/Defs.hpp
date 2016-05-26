@@ -23,6 +23,11 @@
  */
 
 /**
+ * Macro for exporting weak symbols.
+ */
+#define SWIRLY_WEAK __attribute__((visibility("default"), weak))
+
+/**
  * Macro for exporting classes and functions that compose the public API.
  */
 #define SWIRLY_API __attribute__((visibility("default")))

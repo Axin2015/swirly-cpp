@@ -45,14 +45,15 @@ template <std::size_t MaxN>
 struct StringData {
 
   // Length in the first cache-line.
-  std::size_t len;
+  // Use int to save space.
+  int len;
   char buf[MaxN];
 };
 
 template <std::size_t MaxN>
 constexpr std::string_view operator+(const StringData<MaxN>& s) noexcept
 {
-  return {s.buf, s.len};
+  return {s.buf, static_cast<std::size_t>(s.len)};
 }
 
 /**
@@ -67,7 +68,7 @@ class String {
     assign(rhs.data(), rhs.size());
   }
   constexpr String(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
-  constexpr String() noexcept { clear(); }
+  constexpr String() noexcept = default;
 
   ~String() noexcept = default;
 
@@ -105,15 +106,15 @@ class String {
   }
   constexpr const char* data() const noexcept { return buf_; }
   constexpr bool empty() const noexcept { return len_ == 0; }
-  constexpr size_t size() const noexcept { return len_; }
+  constexpr std::size_t size() const noexcept { return len_; }
   constexpr void clear() noexcept { len_ = 0; }
 
  private:
   constexpr int compare(const char* rdata, std::size_t rlen) const noexcept
   {
-    int result{std::memcmp(buf_, rdata, std::min(len_, rlen))};
+    int result{std::memcmp(buf_, rdata, std::min(size(), rlen))};
     if (result == 0) {
-      result = swirly::compare(len_, rlen);
+      result = swirly::compare(size(), rlen);
     }
     return result;
   }
@@ -125,7 +126,8 @@ class String {
     }
   }
   // Length in the first cache-line.
-  std::size_t len_;
+  // Use int to save space.
+  int len_{0};
   char buf_[MaxN];
 };
 

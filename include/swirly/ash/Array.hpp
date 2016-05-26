@@ -53,11 +53,11 @@ class ArrayView {
   constexpr ArrayView(TypeU (&arr)[SizeN]) noexcept : len_{SizeN}, ptr_{arr}
   {
   }
-  constexpr ArrayView() noexcept : len_{0}, ptr_{nullptr} {}
   ArrayView(const std::vector<ValueT>& arr) noexcept
     : len_{arr.size()}, ptr_{arr.empty() ? nullptr : &arr[0]}
   {
   }
+  constexpr ArrayView() noexcept = default;
   ~ArrayView() noexcept = default;
 
   // Copy.
@@ -81,7 +81,7 @@ class ArrayView {
   constexpr const ValueT& back() const noexcept { return ptr_[len_ - 1]; }
   constexpr const ValueT* data() const noexcept { return ptr_; }
   constexpr bool empty() const noexcept { return len_ == 0; }
-  constexpr size_t size() const noexcept { return len_; }
+  constexpr std::size_t size() const noexcept { return len_; }
   void clear() noexcept
   {
     len_ = 0;
@@ -95,8 +95,8 @@ class ArrayView {
 
  private:
   // Length in the first cache-line.
-  std::size_t len_;
-  const ValueT* ptr_;
+  std::size_t len_{0};
+  const ValueT* ptr_{nullptr};
 };
 
 template <typename ValueT>

@@ -14,10 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/TraderSess.hpp>
+#include <swirly/ash/MemAlloc.hpp>
 
-#include <swirly/tea/Test.hpp>
+using namespace std;
 
-using namespace swirly;
+namespace swirly {
 
-static_assert(sizeof(TraderSess) <= 6 * 64, "crossed cache-line boundary");
+SWIRLY_WEAK void* alloc(std::size_t size);
+SWIRLY_WEAK void dealloc(void* ptr, std::size_t size) noexcept;
+
+void* alloc(size_t size)
+{
+  return ::operator new(size);
+}
+
+void dealloc(void* ptr, size_t size) noexcept
+{
+  ::operator delete(ptr);
+}
+
+} // swirly

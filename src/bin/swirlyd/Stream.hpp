@@ -45,7 +45,7 @@ class StreamBuf : public std::streambuf {
   const char_type* data() const noexcept { return buf_.buf; }
   std::streamsize size() const noexcept { return buf_.len; }
   void reset() noexcept;
-  void setContentLength(size_t pos, size_t len) noexcept;
+  void setContentLength(size_t pos, std::size_t len) noexcept;
 
  protected:
   int_type overflow(int_type c) noexcept override;
@@ -80,8 +80,8 @@ class OStream : public std::ostream {
   void setContentLength() noexcept;
 
  private:
-  size_t headSize_{0};
-  size_t lengthAt_{0};
+  std::size_t headSize_{0};
+  std::size_t lengthAt_{0};
 };
 
 /** @} */

@@ -20,4 +20,4 @@
 
 using namespace swirly;
 
-static_assert(sizeof(Exec) <= 6 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Exec) <= 5 * 64, "crossed cache-line boundary");

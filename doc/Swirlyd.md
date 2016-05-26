@@ -24,6 +24,10 @@ Run in functional test mode.
 Core Config
 -----------
 
+### mem_pool ###
+
+Mebibytes (MiB) of memory reserved by memory pool.
+
 ### file_mode ###
 
 File creation mode mask. The default is 0027 unless the no-daemon (-n) option is specified.

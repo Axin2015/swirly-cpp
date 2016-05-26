@@ -105,7 +105,6 @@ class SWIRLY_API Posn : public RefCounted {
   void setSellCost(Cost sellCost) noexcept { sellCost_ = sellCost; }
 
   boost::intrusive::set_member_hook<> keyHook_;
-  boost::intrusive::set_member_hook<> traderHook_;
 
  private:
   const Mnem trader_;
@@ -296,7 +295,7 @@ class SWIRLY_API TraderPosnSet {
   using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
   using CompareOption = boost::intrusive::compare<ValueCompare>;
   using MemberHookOption
-    = boost::intrusive::member_hook<Posn, decltype(Posn::traderHook_), &Posn::traderHook_>;
+    = boost::intrusive::member_hook<Posn, decltype(Posn::keyHook_), &Posn::keyHook_>;
   using Set = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
   using ValuePtr = boost::intrusive_ptr<Posn>;
 

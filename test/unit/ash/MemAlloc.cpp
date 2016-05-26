@@ -14,10 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/TraderSess.hpp>
+#include <swirly/ash/MemAlloc.hpp>
 
 #include <swirly/tea/Test.hpp>
-
-using namespace swirly;
-
-static_assert(sizeof(TraderSess) <= 6 * 64, "crossed cache-line boundary");

@@ -14,10 +14,30 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/TraderSess.hpp>
+#ifndef SWIRLY_ASH_MEMALLOC_HPP
+#define SWIRLY_ASH_MEMALLOC_HPP
 
-#include <swirly/tea/Test.hpp>
+#include <swirly/ash/Defs.hpp>
 
-using namespace swirly;
+#include <new>
 
-static_assert(sizeof(TraderSess) <= 6 * 64, "crossed cache-line boundary");
+namespace swirly {
+
+/**
+ * @addtogroup Util
+ * @{
+ */
+
+SWIRLY_API void* alloc(std::size_t size);
+SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
+
+struct MemAlloc {
+  static void* operator new(std::size_t size) { return alloc(size); }
+  static void operator delete(void* ptr, std::size_t size) { return dealloc(ptr, size); }
+};
+
+/** @} */
+
+} // swirly
+
+#endif // SWIRLY_ASH_MEMALLOC_HPP

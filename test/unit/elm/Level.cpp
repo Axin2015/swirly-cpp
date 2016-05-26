@@ -23,6 +23,8 @@
 using namespace std;
 using namespace swirly;
 
+static_assert(sizeof(Level) <= 2 * 64, "crossed cache-line boundary");
+
 SWIRLY_TEST_CASE(LevelSet)
 {
   const Order order{"MARAYL",   "EURUSD",  "EURUSD", 0_jd,      0_id,  "",

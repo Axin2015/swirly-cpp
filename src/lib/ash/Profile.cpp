@@ -50,8 +50,8 @@ void Profile::record(double val) noexcept
   const auto sd = stdev(var_);
   if (!std::isnan(sd)) {
     const auto z = zscore(var_.mean(), sd, val);
-    // NORMSINV(0.99) = 2.3263479
-    if (z > 2.3263479) {
+    // NORMSINV(0.999) = 3.0902323
+    if (z > 3.0902323) {
       SWIRLY_WARNING(logMsg() << '<' << name_ << "> outlier " << val << " with z-score " << z);
     }
   }

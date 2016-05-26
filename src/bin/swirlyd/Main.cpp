@@ -14,6 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/fig/MemPool.hpp>
 #include <swirly/fig/Mock.hpp>
 
 #include "RestServ.hpp"
@@ -62,7 +63,7 @@ void openLogFile(const char* path)
 {
   const int fd{open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP)};
   if (fd < 0) {
-    throw system_error(errno, system_category(), "open failed");
+    throw system_error{errno, system_category(), "open failed"};
   }
 
   dup2(fd, STDOUT_FILENO);
@@ -127,7 +128,23 @@ void getOpts(int argc, char* argv[], Opts& opts)
   }
 }
 
+MemPool memPool;
+
 } // anonymous
+
+namespace swirly {
+
+void* alloc(size_t size)
+{
+  return memPool.alloc(size);
+}
+
+void dealloc(void* ptr, size_t size) noexcept
+{
+  return memPool.dealloc(ptr, size);
+}
+
+} // swirly
 
 int main(int argc, char* argv[])
 {
@@ -145,6 +162,8 @@ int main(int argc, char* argv[])
       }
       conf.read(is);
     }
+
+    memPool.reserve(conf.get("mem_pool", 1) << 20);
 
     const char* const logLevel{conf.get("log_level")};
     if (logLevel) {
@@ -165,7 +184,7 @@ int main(int argc, char* argv[])
       // Change the current working directory if specified.
       runDir = fs::canonical(runDir, fs::current_path());
       if (chdir(runDir.c_str()) < 0) {
-        throw system_error(errno, system_category(), "chdir failed");
+        throw system_error{errno, system_category(), "chdir failed"};
       }
     } else if (opts.daemon) {
       // Default to root directory if daemon.
@@ -231,6 +250,7 @@ int main(int argc, char* argv[])
     SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
     SWIRLY_INFO(logMsg() << "test_mode: " << (opts.testMode ? "yes" : "no"));
 
+    SWIRLY_INFO(logMsg() << "mem_pool:  " << (memPool.capacity() >> 20) << "MiB");
     SWIRLY_INFO(logMsg() << "file_mode: " << setfill('0') << setw(3) << oct << swirly::fileMode());
     SWIRLY_INFO(logMsg() << "run_dir:   " << runDir);
     SWIRLY_INFO(logMsg() << "log_file:  " << logFile);

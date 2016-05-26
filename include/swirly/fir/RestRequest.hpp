@@ -100,9 +100,9 @@ class SWIRLY_API RestRequest {
       std::size_t digits;
     } num_;
     struct {
-      std::size_t* len;
+      int* len;
       char* buf;
-      std::size_t max;
+      int max;
     } str_;
   };
   unsigned fields_;
