@@ -45,14 +45,15 @@ template <std::size_t MaxN>
 struct StringData {
 
   // Length in the first cache-line.
-  std::size_t len;
+  // Use int to save space.
+  int len;
   char buf[MaxN];
 };
 
 template <std::size_t MaxN>
 constexpr std::string_view operator+(const StringData<MaxN>& s) noexcept
 {
-  return {s.buf, s.len};
+  return {s.buf, static_cast<std::size_t>(s.len)};
 }
 
 /**
@@ -111,9 +112,9 @@ class String {
  private:
   constexpr int compare(const char* rdata, std::size_t rlen) const noexcept
   {
-    int result{std::memcmp(buf_, rdata, std::min(len_, rlen))};
+    int result{std::memcmp(buf_, rdata, std::min(size(), rlen))};
     if (result == 0) {
-      result = swirly::compare(len_, rlen);
+      result = swirly::compare(size(), rlen);
     }
     return result;
   }
@@ -125,7 +126,8 @@ class String {
     }
   }
   // Length in the first cache-line.
-  std::size_t len_{0};
+  // Use int to save space.
+  int len_{0};
   char buf_[MaxN];
 };
 
