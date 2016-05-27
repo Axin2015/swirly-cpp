@@ -33,8 +33,8 @@ namespace swirly {
  */
 class SWIRLY_API Market : public Rec {
  public:
-  Market(std::string_view mnem, std::string_view display, std::string_view contr, Jday settlDay,
-         Jday expiryDay, MarketState state) noexcept;
+  Market(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+         MarketState state) noexcept;
 
   ~Market() noexcept override;
 
@@ -48,7 +48,7 @@ class SWIRLY_API Market : public Rec {
 
   void toJson(std::ostream& os) const override;
 
-  auto contr() const noexcept { return +contr_; }
+  auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto expiryDay() const noexcept { return expiryDay_; }
   auto state() const noexcept { return state_; }

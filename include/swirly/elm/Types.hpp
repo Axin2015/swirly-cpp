@@ -84,11 +84,6 @@ constexpr std::size_t MaxDisplay{64};
 constexpr std::size_t MaxEmail{64};
 
 /**
- * Maximum mnemonic characters.
- */
-constexpr std::size_t MaxMnem{16};
-
-/**
  * Maximum reference characters.
  */
 constexpr std::size_t MaxRef{64};
@@ -104,11 +99,6 @@ using Display = String<MaxDisplay>;
 using Email = String<MaxEmail>;
 
 /**
- * Memorable identifier.
- */
-using Mnem = String<MaxMnem>;
-
-/**
  * Reference.
  */
 using Ref = String<MaxRef>;
@@ -119,7 +109,7 @@ SWIRLY_API const char* enumString(AssetType type);
 
 template <>
 struct EnumTraits<AssetType> {
-  static void print(std::ostream& os, AssetType val) noexcept { os << enumString(val); }
+  static void print(std::ostream& os, AssetType val) { os << enumString(val); }
 };
 
 enum class Direct {
@@ -137,7 +127,7 @@ SWIRLY_API const char* enumString(Direct direct);
 
 template <>
 struct EnumTraits<Direct> {
-  static void print(std::ostream& os, Direct val) noexcept { os << enumString(val); }
+  static void print(std::ostream& os, Direct val) { os << enumString(val); }
 };
 
 enum class RecType {
@@ -163,7 +153,7 @@ SWIRLY_API const char* enumString(RecType type);
 
 template <>
 struct EnumTraits<RecType> {
-  static void print(std::ostream& os, RecType val) noexcept { os << enumString(val); }
+  static void print(std::ostream& os, RecType val) { os << enumString(val); }
 };
 
 enum class Role {
@@ -185,7 +175,7 @@ SWIRLY_API const char* enumString(Role role);
 
 template <>
 struct EnumTraits<Role> {
-  static void print(std::ostream& os, Role val) noexcept { os << enumString(val); }
+  static void print(std::ostream& os, Role val) { os << enumString(val); }
 };
 
 enum class Side { Buy = 1, Sell = -1 };
@@ -194,7 +184,7 @@ SWIRLY_API const char* enumString(Side side);
 
 template <>
 struct EnumTraits<Side> {
-  static void print(std::ostream& os, Side val) noexcept { os << enumString(val); }
+  static void print(std::ostream& os, Side val) { os << enumString(val); }
 };
 
 /**
@@ -225,7 +215,7 @@ SWIRLY_API const char* enumString(State state);
 
 template <>
 struct EnumTraits<State> {
-  static void print(std::ostream& os, State val) noexcept { os << enumString(val); }
+  static void print(std::ostream& os, State val) { os << enumString(val); }
 };
 
 /** @} */

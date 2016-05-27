@@ -18,8 +18,7 @@
 #define SWIRLY_SQLITE_UTILITY_HPP
 
 #include <swirly/ash/Finally.hpp>
-
-#include <experimental/string_view>
+#include <swirly/ash/Mnem.hpp>
 
 #include <sqlite3.h>
 
@@ -105,6 +104,8 @@ inline void bind(sqlite3_stmt& stmt, int col, uint64_t val)
 
 void bind(sqlite3_stmt& stmt, int col, std::string_view val);
 
+void bind(sqlite3_stmt& stmt, int col, Mnem val);
+
 constexpr struct MaybeNullTag {
 } MaybeNull{};
 
@@ -119,7 +120,8 @@ inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 }
 
 template <typename ValueT,
-          typename std::enable_if_t<std::is_same<ValueT, std::string_view>::value>* = nullptr>
+          typename std::enable_if_t<std::is_same<ValueT, std::string_view>::value
+                                    || std::is_same<ValueT, Mnem>::value>* = nullptr>
 inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 {
   if (!val.empty()) {

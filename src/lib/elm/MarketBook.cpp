@@ -45,9 +45,9 @@ void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostre
 }
 } // anonymous
 
-MarketBook::MarketBook(string_view mnem, string_view display, string_view contr, Jday settlDay,
-                       Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
-                       Millis lastTime, Iden maxOrderId, Iden maxExecId) noexcept
+MarketBook::MarketBook(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+                       MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime,
+                       Iden maxOrderId, Iden maxExecId) noexcept
   : Market{mnem, display, contr, settlDay, expiryDay, state},
     lastLots_{lastLots},
     lastTicks_{lastTicks},

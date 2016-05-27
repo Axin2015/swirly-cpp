@@ -28,10 +28,11 @@ SWIRLY_TEST_CASE(TraderSessSet)
   ServFactory f;
   TraderSessSet s;
   {
-    auto trader = make_unique<TraderSess>("MARAYL", "Mark Aylett", "mark.aylett@gmail.com", f);
+    auto trader
+      = make_unique<TraderSess>("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@gmail.com"_sv, f);
     SWIRLY_CHECK(s.insert(*trader));
-    SWIRLY_CHECK(s.find("mark.aylett@gmail.com") != s.end());
+    SWIRLY_CHECK(s.find("mark.aylett@gmail.com"_sv) != s.end());
     // Auto-unlink.
   }
-  SWIRLY_CHECK(s.find("mark.aylett@gmail.com") == s.end());
+  SWIRLY_CHECK(s.find("mark.aylett@gmail.com"_sv) == s.end());
 }

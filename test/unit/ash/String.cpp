@@ -22,7 +22,7 @@ using namespace std;
 using namespace swirly;
 
 namespace {
-constexpr string_view name = "string_view"_sv;
+constexpr string_view Name = "string_view"_sv;
 } // anonymous
 
 SWIRLY_TEST_CASE(StringEmpty)
@@ -30,33 +30,33 @@ SWIRLY_TEST_CASE(StringEmpty)
   String<3> sb;
   SWIRLY_CHECK(sb.empty());
   SWIRLY_CHECK(sb.size() == 0UL);
-  SWIRLY_CHECK(sb.compare("") == 0);
-  SWIRLY_CHECK(sb == String<3>{""});
+  SWIRLY_CHECK(sb.compare(""_sv) == 0);
+  SWIRLY_CHECK(sb == String<3>{""_sv});
 }
 
 SWIRLY_TEST_CASE(StringNonEmpty)
 {
-  String<3> sb{"Foo"};
+  String<3> sb{"Foo"_sv};
   SWIRLY_CHECK(!sb.empty());
   SWIRLY_CHECK(sb.size() == 3UL);
-  SWIRLY_CHECK(sb.compare("Foo") == 0);
-  SWIRLY_CHECK(sb == String<3>{"Foo"});
+  SWIRLY_CHECK(sb.compare("Foo"_sv) == 0);
+  SWIRLY_CHECK(sb == String<3>{"Foo"_sv});
 }
 
 SWIRLY_TEST_CASE(StringUpperBound)
 {
-  String<3> sb{"Foox"};
+  String<3> sb{"Foox"_sv};
   SWIRLY_CHECK(sb.size() == 3UL);
-  SWIRLY_CHECK(sb == "Foo");
+  SWIRLY_CHECK(sb == "Foo"_sv);
 
-  sb = "Barx";
+  sb = "Barx"_sv;
   SWIRLY_CHECK(sb.size() == 3UL);
-  SWIRLY_CHECK(sb == "Bar");
+  SWIRLY_CHECK(sb == "Bar"_sv);
 }
 
 SWIRLY_TEST_CASE(StringClear)
 {
-  String<3> sb{"Foo"};
+  String<3> sb{"Foo"_sv};
   sb.clear();
   SWIRLY_CHECK(sb.empty());
 }
@@ -66,12 +66,12 @@ SWIRLY_TEST_CASE(StringAssign)
   String<3> sb;
   sb = "Foo"_sv;
   SWIRLY_CHECK(sb.size() == 3UL);
-  SWIRLY_CHECK(sb == "Foo");
+  SWIRLY_CHECK(sb == "Foo"_sv);
 
   sb.clear();
   sb = "Foox"_sv;
   SWIRLY_CHECK(sb.size() == 3UL);
-  SWIRLY_CHECK(sb == "Foo");
+  SWIRLY_CHECK(sb == "Foo"_sv);
 }
 
 SWIRLY_TEST_CASE(StringToString)

@@ -25,7 +25,7 @@ static_assert(sizeof(Trader) <= 4 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(TraderToString)
 {
-  Trader trader{"MARAYL", "Mark Aylett", "mark.aylett@gmail.com"};
+  Trader trader{"MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@gmail.com"_sv};
 
   SWIRLY_CHECK(toString(trader) == //
                "{\"mnem\":\"MARAYL\""

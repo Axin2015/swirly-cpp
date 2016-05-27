@@ -17,6 +17,7 @@
 #include <swirly/elm/Posn.hpp>
 
 #include <swirly/ash/JulianDay.hpp>
+#include <swirly/ash/Mnem.hpp>
 
 using namespace std;
 

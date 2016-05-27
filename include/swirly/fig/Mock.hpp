@@ -71,29 +71,28 @@ class SWIRLY_API MockJourn : public Journ {
   MockJourn& operator=(MockJourn&&) noexcept;
 
  protected:
-  void doCreateMarket(std::string_view mnem, std::string_view display, std::string_view contr,
-                      Jday settlDay, Jday expiryDay, MarketState state) override;
+  void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
+                      Jday expiryDay, MarketState state) override;
 
-  void doUpdateMarket(std::string_view mnem, std::string_view display, MarketState state) override;
+  void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state) override;
 
-  void doCreateTrader(std::string_view mnem, std::string_view display,
-                      std::string_view email) override;
+  void doCreateTrader(Mnem mnem, std::string_view display, std::string_view email) override;
 
-  void doUpdateTrader(std::string_view mnem, std::string_view display) override;
+  void doUpdateTrader(Mnem mnem, std::string_view display) override;
 
   void doCreateExec(const Exec& exec) override;
 
-  void doCreateExec(std::string_view market, ArrayView<ConstExecPtr> execs) override;
+  void doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs) override;
 
   void doCreateExec(ArrayView<ConstExecPtr> execs) override;
 
-  void doArchiveOrder(std::string_view market, Iden id, Millis modified) override;
+  void doArchiveOrder(Mnem market, Iden id, Millis modified) override;
 
-  void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
+  void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified) override;
 
-  void doArchiveTrade(std::string_view market, Iden id, Millis modified) override;
+  void doArchiveTrade(Mnem market, Iden id, Millis modified) override;
 
-  void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) override;
+  void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified) override;
 };
 
 /** @} */

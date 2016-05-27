@@ -20,4 +20,4 @@
 
 using namespace swirly;
 
-static_assert(sizeof(MarketBook) <= 6 * 64, "crossed cache-line boundary");
+static_assert(sizeof(MarketBook) <= 5 * 64, "crossed cache-line boundary");

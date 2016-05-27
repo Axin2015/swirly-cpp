@@ -63,18 +63,18 @@ template <std::size_t MaxN>
 class String {
  public:
   template <std::size_t MaxR>
-  constexpr String(const String<MaxR>& rhs) noexcept
+  String(const String<MaxR>& rhs) noexcept
   {
     assign(rhs.data(), rhs.size());
   }
-  constexpr String(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
+  String(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
   constexpr String() noexcept = default;
 
   ~String() noexcept = default;
 
   // Copy.
-  constexpr String(const String& rhs) noexcept { assign(rhs.data(), rhs.size()); }
-  constexpr String& operator=(const String& rhs) noexcept
+  String(const String& rhs) noexcept { assign(rhs.data(), rhs.size()); }
+  String& operator=(const String& rhs) noexcept
   {
     assign(rhs.data(), rhs.size());
     return *this;
@@ -85,32 +85,29 @@ class String {
   constexpr String& operator=(String&&) noexcept = default;
 
   template <std::size_t MaxR>
-  constexpr String& operator=(const String<MaxR>& rhs) noexcept
+  String& operator=(const String<MaxR>& rhs) noexcept
   {
     assign(rhs.data(), rhs.size());
     return *this;
   }
-  constexpr String& operator=(std::string_view rhs) noexcept
+  String& operator=(std::string_view rhs) noexcept
   {
     assign(rhs.data(), rhs.size());
     return *this;
   }
   template <std::size_t MaxR>
-  constexpr int compare(const String<MaxR>& rhs) const noexcept
+  int compare(const String<MaxR>& rhs) const noexcept
   {
     return compare(rhs.data(), rhs.size());
   }
-  constexpr int compare(std::string_view rhs) const noexcept
-  {
-    return compare(rhs.data(), rhs.size());
-  }
+  int compare(std::string_view rhs) const noexcept { return compare(rhs.data(), rhs.size()); }
   constexpr const char* data() const noexcept { return buf_; }
   constexpr bool empty() const noexcept { return len_ == 0; }
   constexpr std::size_t size() const noexcept { return len_; }
   constexpr void clear() noexcept { len_ = 0; }
 
  private:
-  constexpr int compare(const char* rdata, std::size_t rlen) const noexcept
+  int compare(const char* rdata, std::size_t rlen) const noexcept
   {
     int result{std::memcmp(buf_, rdata, std::min(size(), rlen))};
     if (result == 0) {
@@ -118,7 +115,7 @@ class String {
     }
     return result;
   }
-  constexpr void assign(const char* rdata, std::size_t rlen) noexcept
+  void assign(const char* rdata, std::size_t rlen) noexcept
   {
     len_ = std::min(rlen, MaxN);
     if (len_ > 0) {
@@ -138,115 +135,115 @@ constexpr std::string_view operator+(const String<MaxN>& s) noexcept
 }
 
 template <std::size_t MaxL, std::size_t MaxR>
-constexpr bool operator==(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
+bool operator==(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
 {
   return lhs.compare(rhs) == 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator==(const String<MaxN>& lhs, std::string_view rhs) noexcept
+bool operator==(const String<MaxN>& lhs, std::string_view rhs) noexcept
 {
   return lhs.compare(rhs) == 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator==(std::string_view lhs, const String<MaxN>& rhs) noexcept
+bool operator==(std::string_view lhs, const String<MaxN>& rhs) noexcept
 {
   return 0 == rhs.compare(lhs);
 }
 
 template <std::size_t MaxL, std::size_t MaxR>
-constexpr bool operator!=(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
+bool operator!=(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
 {
   return lhs.compare(rhs) != 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator!=(const String<MaxN>& lhs, std::string_view rhs) noexcept
+bool operator!=(const String<MaxN>& lhs, std::string_view rhs) noexcept
 {
   return lhs.compare(rhs) != 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator!=(std::string_view lhs, const String<MaxN>& rhs) noexcept
+bool operator!=(std::string_view lhs, const String<MaxN>& rhs) noexcept
 {
   return 0 != rhs.compare(lhs);
 }
 
 template <std::size_t MaxL, std::size_t MaxR>
-constexpr bool operator<(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
+bool operator<(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
 {
   return lhs.compare(rhs) < 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<(const String<MaxN>& lhs, std::string_view rhs) noexcept
+bool operator<(const String<MaxN>& lhs, std::string_view rhs) noexcept
 {
   return lhs.compare(rhs) < 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<(std::string_view lhs, const String<MaxN>& rhs) noexcept
+bool operator<(std::string_view lhs, const String<MaxN>& rhs) noexcept
 {
   return 0 < rhs.compare(lhs);
 }
 
 template <std::size_t MaxL, std::size_t MaxR>
-constexpr bool operator<=(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
+bool operator<=(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
 {
   return lhs.compare(rhs) <= 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<=(const String<MaxN>& lhs, std::string_view rhs) noexcept
+bool operator<=(const String<MaxN>& lhs, std::string_view rhs) noexcept
 {
   return lhs.compare(rhs) <= 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator<=(std::string_view lhs, const String<MaxN>& rhs) noexcept
+bool operator<=(std::string_view lhs, const String<MaxN>& rhs) noexcept
 {
   return 0 <= rhs.compare(lhs);
 }
 
 template <std::size_t MaxL, std::size_t MaxR>
-constexpr bool operator>(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
+bool operator>(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
 {
   return lhs.compare(rhs) > 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>(const String<MaxN>& lhs, std::string_view rhs) noexcept
+bool operator>(const String<MaxN>& lhs, std::string_view rhs) noexcept
 {
   return lhs.compare(rhs) > 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>(std::string_view lhs, const String<MaxN>& rhs) noexcept
+bool operator>(std::string_view lhs, const String<MaxN>& rhs) noexcept
 {
   return 0 > rhs.compare(lhs);
 }
 
 template <std::size_t MaxL, std::size_t MaxR>
-constexpr bool operator>=(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
+bool operator>=(const String<MaxL>& lhs, const String<MaxR>& rhs) noexcept
 {
   return lhs.compare(rhs) >= 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>=(const String<MaxN>& lhs, std::string_view rhs) noexcept
+bool operator>=(const String<MaxN>& lhs, std::string_view rhs) noexcept
 {
   return lhs.compare(rhs) >= 0;
 }
 
 template <std::size_t MaxN>
-constexpr bool operator>=(std::string_view lhs, const String<MaxN>& rhs) noexcept
+bool operator>=(std::string_view lhs, const String<MaxN>& rhs) noexcept
 {
   return 0 >= rhs.compare(lhs);
 }
 
 template <std::size_t MaxN>
-constexpr std::ostream& operator<<(std::ostream& os, const String<MaxN>& rhs) noexcept
+std::ostream& operator<<(std::ostream& os, const String<MaxN>& rhs)
 {
   return os << +rhs;
 }

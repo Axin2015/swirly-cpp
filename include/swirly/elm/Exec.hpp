@@ -36,10 +36,10 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public Request, public MemAlloc {
  public:
-  Exec(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
-       Iden id, std::string_view ref, Iden orderId, State state, Side side, Lots lots, Ticks ticks,
-       Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId,
-       Role role, std::string_view cpty, Millis created) noexcept
+  Exec(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+       Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
+       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role, Mnem cpty,
+       Millis created) noexcept
     : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
       orderId_{orderId},
       state_{state},
@@ -79,7 +79,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   Lots minLots() const noexcept { return minLots_; }
   Iden matchId() const noexcept { return matchId_; }
   Role role() const noexcept { return role_; }
-  std::string_view cpty() const noexcept { return +cpty_; }
+  Mnem cpty() const noexcept { return cpty_; }
 
   void revise(Lots lots) noexcept
   {
@@ -96,10 +96,9 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
     resd_ = 0_lts;
   }
   void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId, Role role,
-             std::string_view cpty) noexcept;
+             Mnem cpty) noexcept;
 
-  void trade(Lots lastLots, Ticks lastTicks, Iden matchId, Role role,
-             std::string_view cpty) noexcept
+  void trade(Lots lastLots, Ticks lastTicks, Iden matchId, Role role, Mnem cpty) noexcept
   {
     trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, role, cpty);
   }

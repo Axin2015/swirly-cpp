@@ -134,6 +134,14 @@ void bind(sqlite3_stmt& stmt, int col, string_view val)
   }
 }
 
+void bind(sqlite3_stmt& stmt, int col, Mnem val)
+{
+  int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
+  if (rc != SQLITE_OK) {
+    throw Error{errMsg() << "sqlite3_bind_text failed: " << lastError(stmt)};
+  }
+}
+
 TransCtx::TransCtx(sqlite3& db)
   : beginStmt_{prepare(db, "BEGIN TRANSACTION"_sv)},
     commitStmt_{prepare(db, "COMMIT TRANSACTION"_sv)},

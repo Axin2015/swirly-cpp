@@ -19,6 +19,7 @@
 
 #include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/RefCounted.hpp>
 #include <swirly/ash/Types.hpp>
 
@@ -33,8 +34,8 @@ namespace swirly {
 
 class SWIRLY_API Request : public RefCounted {
  public:
-  Request(std::string_view trader, std::string_view market, std::string_view contr, Jday settlDay,
-          Iden id, std::string_view ref, Side side, Lots lots, Millis created) noexcept
+  Request(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+          Side side, Lots lots, Millis created) noexcept
     : trader_{trader},
       market_{market},
       contr_{contr},
@@ -58,9 +59,9 @@ class SWIRLY_API Request : public RefCounted {
 
   virtual void toJson(std::ostream& os) const;
 
-  auto trader() const noexcept { return +trader_; }
-  auto market() const noexcept { return +market_; }
-  auto contr() const noexcept { return +contr_; }
+  auto trader() const noexcept { return trader_; }
+  auto market() const noexcept { return market_; }
+  auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto id() const noexcept { return id_; }
   auto ref() const noexcept { return +ref_; }
@@ -99,7 +100,7 @@ inline std::ostream& operator<<(std::ostream& os, const Request& request)
  */
 template <typename RequestT>
 class RequestIdSet {
-  using Key = std::tuple<std::string_view, Iden>;
+  using Key = std::tuple<Mnem, Iden>;
   struct ValueCompare {
     int compare(const Request& lhs, const Request& rhs) const noexcept
     {
@@ -173,22 +174,22 @@ class RequestIdSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(std::string_view market, Iden id) const noexcept
+  ConstIterator find(Mnem market, Iden id) const noexcept
   {
     return set_.find(std::make_tuple(market, id), KeyValueCompare());
   }
-  Iterator find(std::string_view market, Iden id) noexcept
+  Iterator find(Mnem market, Iden id) noexcept
   {
     return set_.find(std::make_tuple(market, id), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(std::string_view market, Iden id) const noexcept
+  std::pair<ConstIterator, bool> findHint(Mnem market, Iden id) const noexcept
   {
     const auto key = std::make_tuple(market, id);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(std::string_view market, Iden id) noexcept
+  std::pair<Iterator, bool> findHint(Mnem market, Iden id) noexcept
   {
     const auto key = std::make_tuple(market, id);
     const auto comp = KeyValueCompare();

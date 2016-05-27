@@ -69,22 +69,21 @@ class SWIRLY_API Serv {
 
   TraderSet& traders() const noexcept;
 
-  MarketBook& market(std::string_view mnem) const;
+  MarketBook& market(Mnem mnem) const;
 
-  TraderSess& trader(std::string_view mnem) const;
+  TraderSess& trader(Mnem mnem) const;
 
   TraderSess* findTraderByEmail(std::string_view email) const;
 
-  MarketBook& createMarket(std::string_view mnem, std::string_view display, std::string_view contr,
-                           Jday settlDay, Jday expiryDay, MarketState state, Millis now);
+  MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
+                           Jday expiryDay, MarketState state, Millis now);
 
-  MarketBook& updateMarket(std::string_view mnem, std::optional<std::string_view> display,
+  MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
                            std::optional<MarketState> state, Millis now);
 
-  TraderSess& createTrader(std::string_view mnem, std::string_view display, std::string_view email,
-                           Millis now);
+  TraderSess& createTrader(Mnem mnem, std::string_view display, std::string_view email, Millis now);
 
-  TraderSess& updateTrader(std::string_view mnem, std::string_view display, Millis now);
+  TraderSess& updateTrader(Mnem mnem, std::string_view display, Millis now);
 
   void createOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);
@@ -125,19 +124,18 @@ class SWIRLY_API Serv {
 
   void archiveOrder(TraderSess& sess, const Order& order, Millis now);
 
-  void archiveOrder(TraderSess& sess, std::string_view market, Iden id, Millis now);
+  void archiveOrder(TraderSess& sess, Mnem market, Iden id, Millis now);
 
-  void archiveOrder(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
+  void archiveOrder(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Millis now);
 
   ConstExecPtr createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
-                           Lots lots, Ticks ticks, Role role, std::string_view cpty,
-                           Millis created);
+                           Lots lots, Ticks ticks, Role role, Mnem cpty, Millis created);
 
   void archiveTrade(TraderSess& sess, const Exec& trade, Millis now);
 
-  void archiveTrade(TraderSess& sess, std::string_view market, Iden id, Millis now);
+  void archiveTrade(TraderSess& sess, Mnem market, Iden id, Millis now);
 
-  void archiveTrade(TraderSess& sess, std::string_view market, ArrayView<Iden> ids, Millis now);
+  void archiveTrade(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Millis now);
 
   /**
    * This method may partially fail.
