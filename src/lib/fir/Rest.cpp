@@ -78,7 +78,7 @@ void Rest::getAsset(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getAsset(string_view mnem, Millis now, ostream& out) const
+void Rest::getAsset(Mnem mnem, Millis now, ostream& out) const
 {
   const auto& assets = serv_.assets();
   auto it = assets.find(mnem);
@@ -96,7 +96,7 @@ void Rest::getContr(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getContr(string_view mnem, Millis now, ostream& out) const
+void Rest::getContr(Mnem mnem, Millis now, ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   auto it = contrs.find(mnem);
@@ -114,7 +114,7 @@ void Rest::getMarket(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getMarket(string_view mnem, Millis now, ostream& out) const
+void Rest::getMarket(Mnem mnem, Millis now, ostream& out) const
 {
   out << serv_.market(mnem);
 }
@@ -127,12 +127,12 @@ void Rest::getTrader(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getTrader(string_view mnem, Millis now, ostream& out) const
+void Rest::getTrader(Mnem mnem, Millis now, ostream& out) const
 {
   out << serv_.trader(mnem);
 }
 
-void Rest::getSess(string_view trader, EntitySet es, Millis now, ostream& out) const
+void Rest::getSess(Mnem trader, EntitySet es, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   int i{0};
@@ -169,7 +169,7 @@ void Rest::getSess(string_view trader, EntitySet es, Millis now, ostream& out) c
   out << '}';
 }
 
-void Rest::getOrder(string_view trader, Millis now, ostream& out) const
+void Rest::getOrder(Mnem trader, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& orders = sess.orders();
@@ -178,7 +178,7 @@ void Rest::getOrder(string_view trader, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getOrder(string_view trader, string_view market, Millis now, ostream& out) const
+void Rest::getOrder(Mnem trader, Mnem market, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& orders = sess.orders();
@@ -188,7 +188,7 @@ void Rest::getOrder(string_view trader, string_view market, Millis now, ostream&
   out << ']';
 }
 
-void Rest::getOrder(string_view trader, string_view market, Iden id, Millis now, ostream& out) const
+void Rest::getOrder(Mnem trader, Mnem market, Iden id, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& orders = sess.orders();
@@ -199,7 +199,7 @@ void Rest::getOrder(string_view trader, string_view market, Iden id, Millis now,
   out << *it;
 }
 
-void Rest::getTrade(string_view trader, Millis now, ostream& out) const
+void Rest::getTrade(Mnem trader, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& trades = sess.trades();
@@ -208,7 +208,7 @@ void Rest::getTrade(string_view trader, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getTrade(string_view trader, string_view market, Millis now, ostream& out) const
+void Rest::getTrade(Mnem trader, Mnem market, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& trades = sess.trades();
@@ -218,7 +218,7 @@ void Rest::getTrade(string_view trader, string_view market, Millis now, ostream&
   out << ']';
 }
 
-void Rest::getTrade(string_view trader, string_view market, Iden id, Millis now, ostream& out) const
+void Rest::getTrade(Mnem trader, Mnem market, Iden id, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& trades = sess.trades();
@@ -229,7 +229,7 @@ void Rest::getTrade(string_view trader, string_view market, Iden id, Millis now,
   out << *it;
 }
 
-void Rest::getPosn(string_view trader, Millis now, ostream& out) const
+void Rest::getPosn(Mnem trader, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& posns = sess.posns();
@@ -238,7 +238,7 @@ void Rest::getPosn(string_view trader, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getPosn(string_view trader, string_view contr, Millis now, ostream& out) const
+void Rest::getPosn(Mnem trader, Mnem contr, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& posns = sess.posns();
@@ -248,8 +248,7 @@ void Rest::getPosn(string_view trader, string_view contr, Millis now, ostream& o
   out << ']';
 }
 
-void Rest::getPosn(string_view trader, string_view contr, IsoDate settlDate, Millis now,
-                   ostream& out) const
+void Rest::getPosn(Mnem trader, Mnem contr, IsoDate settlDate, Millis now, ostream& out) const
 {
   auto& sess = serv_.trader(trader);
   const auto& posns = sess.posns();
@@ -270,7 +269,7 @@ void Rest::getView(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getView(ArrayView<string_view> markets, Millis now, std::ostream& out) const
+void Rest::getView(ArrayView<Mnem> markets, Millis now, std::ostream& out) const
 {
   if (markets.size() == 1) {
     out << serv_.market(markets[0]).view();
@@ -282,7 +281,7 @@ void Rest::getView(ArrayView<string_view> markets, Millis now, std::ostream& out
   }
 }
 
-void Rest::postMarket(string_view mnem, string_view display, string_view contr, IsoDate settlDate,
+void Rest::postMarket(Mnem mnem, string_view display, Mnem contr, IsoDate settlDate,
                       IsoDate expiryDate, MarketState state, Millis now, ostream& out)
 {
   const auto settlDay = maybeIsoToJd(settlDate);
@@ -291,28 +290,27 @@ void Rest::postMarket(string_view mnem, string_view display, string_view contr, 
   out << book;
 }
 
-void Rest::putMarket(string_view mnem, optional<string_view> display, optional<MarketState> state,
+void Rest::putMarket(Mnem mnem, optional<string_view> display, optional<MarketState> state,
                      Millis now, ostream& out)
 {
   const auto& book = serv_.updateMarket(mnem, display, state, now);
   out << book;
 }
 
-void Rest::postTrader(string_view mnem, string_view display, string_view email, Millis now,
-                      ostream& out)
+void Rest::postTrader(Mnem mnem, string_view display, string_view email, Millis now, ostream& out)
 {
   const auto& trader = serv_.createTrader(mnem, display, email, now);
   out << trader;
 }
 
-void Rest::putTrader(string_view mnem, string_view display, Millis now, ostream& out)
+void Rest::putTrader(Mnem mnem, string_view display, Millis now, ostream& out)
 {
   const auto& trader = serv_.updateTrader(mnem, display, now);
   out << trader;
 }
 
-void Rest::postOrder(string_view trader, string_view market, string_view ref, Side side, Lots lots,
-                     Ticks ticks, Lots minLots, Millis now, ostream& out)
+void Rest::postOrder(Mnem trader, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
+                     Lots minLots, Millis now, ostream& out)
 {
   auto& sess = serv_.trader(trader);
   auto& book = serv_.market(market);
@@ -321,8 +319,8 @@ void Rest::postOrder(string_view trader, string_view market, string_view ref, Si
   out << resp;
 }
 
-void Rest::putOrder(string_view trader, string_view market, ArrayView<Iden> ids, Lots lots,
-                    Millis now, ostream& out)
+void Rest::putOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
+                    ostream& out)
 {
   auto& sess = serv_.trader(trader);
   auto& book = serv_.market(market);
@@ -343,7 +341,7 @@ void Rest::putOrder(string_view trader, string_view market, ArrayView<Iden> ids,
   out << resp;
 }
 
-void Rest::deleteOrder(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)
+void Rest::deleteOrder(Mnem market, ArrayView<Iden> ids, Millis now, ostream& out)
 {
   // FIXME: Not implemented.
   out << "{\"market\":\"" << market << "\",\"ids\":[";
@@ -351,13 +349,13 @@ void Rest::deleteOrder(string_view market, ArrayView<Iden> ids, Millis now, ostr
   out << "]}";
 }
 
-void Rest::postTrade(string_view market, Millis now, ostream& out)
+void Rest::postTrade(Mnem market, Millis now, ostream& out)
 {
   // FIXME: Not implemented.
   out << "{\"market\":\"" << market << "\"}";
 }
 
-void Rest::deleteTrade(string_view market, ArrayView<Iden> ids, Millis now, ostream& out)
+void Rest::deleteTrade(Mnem market, ArrayView<Iden> ids, Millis now, ostream& out)
 {
   // FIXME: Not implemented.
   out << "{\"market\":\"" << market << "\",\"ids\":[";

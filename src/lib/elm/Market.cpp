@@ -24,8 +24,8 @@ using namespace std;
 
 namespace swirly {
 
-Market::Market(string_view mnem, string_view display, string_view contr, Jday settlDay,
-               Jday expiryDay, MarketState state) noexcept
+Market::Market(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+               MarketState state) noexcept
   : Rec{RecType::Market, mnem, display},
     contr_{contr},
     settlDay_{settlDay},

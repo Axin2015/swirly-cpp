@@ -59,9 +59,9 @@ inline std::ostream& operator<<(std::ostream& os, const MarketView& view)
 
 class SWIRLY_API MarketBook : public Market {
  public:
-  MarketBook(std::string_view mnem, std::string_view display, std::string_view contr, Jday settlDay,
-             Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime,
-             Iden maxOrderId, Iden maxExecId) noexcept;
+  MarketBook(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+             MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime, Iden maxOrderId,
+             Iden maxExecId) noexcept;
 
   ~MarketBook() noexcept override;
 

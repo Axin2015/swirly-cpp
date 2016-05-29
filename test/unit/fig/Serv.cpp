@@ -274,15 +274,17 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, Fixture)
 SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
 {
   // Mnemonic too short.
-  SWIRLY_CHECK_THROW(serv.createTrader("x", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now),
-                     InvalidException);
+  SWIRLY_CHECK_THROW(
+    serv.createTrader("x"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
+    InvalidException);
 
   // Mnemonic contains invalid characters.
   SWIRLY_CHECK_THROW(
-    serv.createTrader("PIP AYL", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now),
+    serv.createTrader("PIP AYL"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
     InvalidException);
 
-  auto& sess = serv.createTrader("PIPAYL", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now);
+  auto& sess
+    = serv.createTrader("PIPAYL"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now);
   SWIRLY_CHECK(sess.mnem() == "PIPAYL"_sv);
   SWIRLY_CHECK(sess.display() == "Pippin Aylett"_sv);
 
@@ -298,18 +300,19 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
 
   // Already exists.
   SWIRLY_CHECK_THROW(
-    serv.createTrader("PIPAYL", "Pippin Aylett", "pippin.aylett@swirlycloud.com", Now),
+    serv.createTrader("PIPAYL"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
     AlreadyExistsException);
 
   // Email already exists.
   SWIRLY_CHECK_THROW(
-    serv.createTrader("PIPAYL2", "Pippin Aylett 2", "pippin.aylett@swirlycloud.com", Now),
+    serv.createTrader("PIPAYL2"_sv, "Pippin Aylett 2"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
     AlreadyExistsException);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
 {
-  auto& orig = serv.createTrader("PIPAYL", "Pippin Aylettx", "pippin.aylett@swirlycloud.com", Now);
+  auto& orig
+    = serv.createTrader("PIPAYL"_sv, "Pippin Aylettx"_sv, "pippin.aylett@swirlycloud.com"_sv, Now);
   auto& sess = serv.updateTrader("PIPAYL"_sv, "Pippin Aylett"_sv, Now);
 
   SWIRLY_CHECK(&sess == &orig);

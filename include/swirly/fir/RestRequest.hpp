@@ -19,6 +19,7 @@
 
 #include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/Types.hpp>
 
 namespace swirly {
@@ -60,11 +61,11 @@ class SWIRLY_API RestRequest {
   RestRequest& operator=(RestRequest&&) = delete;
 
   unsigned fields() const noexcept { return fields_; }
-  std::string_view mnem() const noexcept { return +mnem_; }
+  swirly::Mnem mnem() const noexcept { return +mnem_; }
   std::string_view display() const noexcept { return +display_; }
   std::string_view email() const noexcept { return +email_; }
-  std::string_view trader() const noexcept { return +trader_; }
-  std::string_view contr() const noexcept { return +contr_; }
+  swirly::Mnem trader() const noexcept { return +trader_; }
+  swirly::Mnem contr() const noexcept { return +contr_; }
   IsoDate settlDate() const noexcept { return settlDate_; }
   IsoDate expiryDate() const noexcept { return expiryDate_; }
   std::string_view ref() const noexcept { return +ref_; }
@@ -74,7 +75,7 @@ class SWIRLY_API RestRequest {
   swirly::Ticks ticks() const noexcept { return ticks_; }
   swirly::Lots minLots() const noexcept { return minLots_; }
   swirly::Role role() const noexcept { return role_; }
-  std::string_view cpty() const noexcept { return +cpty_; }
+  swirly::Mnem cpty() const noexcept { return +cpty_; }
   /**
    * Validate fields.
    *

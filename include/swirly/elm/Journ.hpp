@@ -20,6 +20,7 @@
 #include <swirly/elm/Types.hpp>
 
 #include <swirly/ash/Array.hpp>
+#include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/Types.hpp>
 
 namespace swirly {
@@ -47,32 +48,29 @@ class SWIRLY_API Journ {
   /**
    * Create Market.
    */
-  void createMarket(std::string_view mnem, std::string_view display, std::string_view contr,
-                    Jday settlDay, Jday expiryDay, MarketState state)
+  void createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+                    MarketState state)
   {
     doCreateMarket(mnem, display, contr, settlDay, expiryDay, state);
   }
   /**
    * Update Market.
    */
-  void updateMarket(std::string_view mnem, std::string_view display, MarketState state)
+  void updateMarket(Mnem mnem, std::string_view display, MarketState state)
   {
     doUpdateMarket(mnem, display, state);
   }
   /**
    * Create Trader.
    */
-  void createTrader(std::string_view mnem, std::string_view display, std::string_view email)
+  void createTrader(Mnem mnem, std::string_view display, std::string_view email)
   {
     doCreateTrader(mnem, display, email);
   }
   /**
    * Update Trader.
    */
-  void updateTrader(std::string_view mnem, std::string_view display)
-  {
-    doUpdateTrader(mnem, display);
-  }
+  void updateTrader(Mnem mnem, std::string_view display) { doUpdateTrader(mnem, display); }
   /**
    * Create Execution.
    */
@@ -80,10 +78,7 @@ class SWIRLY_API Journ {
   /**
    * Create Executions.
    */
-  void createExec(std::string_view market, ArrayView<ConstExecPtr> execs)
-  {
-    doCreateExec(market, execs);
-  }
+  void createExec(Mnem market, ArrayView<ConstExecPtr> execs) { doCreateExec(market, execs); }
   /**
    * Create Executions. This overload may be less efficient than ones that are market-specific.
    */
@@ -91,60 +86,50 @@ class SWIRLY_API Journ {
   /**
    * Archive Order.
    */
-  void archiveOrder(std::string_view market, Iden id, Millis modified)
-  {
-    doArchiveOrder(market, id, modified);
-  }
+  void archiveOrder(Mnem market, Iden id, Millis modified) { doArchiveOrder(market, id, modified); }
   /**
    * Archive Orders.
    */
-  void archiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified)
+  void archiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified)
   {
     doArchiveOrder(market, ids, modified);
   }
   /**
    * Archive Trade.
    */
-  void archiveTrade(std::string_view market, Iden id, Millis modified)
-  {
-    doArchiveTrade(market, id, modified);
-  }
+  void archiveTrade(Mnem market, Iden id, Millis modified) { doArchiveTrade(market, id, modified); }
   /**
    * Archive Trades.
    */
-  void archiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified)
+  void archiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified)
   {
     doArchiveTrade(market, ids, modified);
   }
 
  protected:
-  virtual void doCreateMarket(std::string_view mnem, std::string_view display,
-                              std::string_view contr, Jday settlDay, Jday expiryDay,
-                              MarketState state)
+  virtual void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
+                              Jday expiryDay, MarketState state)
     = 0;
 
-  virtual void doUpdateMarket(std::string_view mnem, std::string_view display, MarketState state)
-    = 0;
+  virtual void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state) = 0;
 
-  virtual void doCreateTrader(std::string_view mnem, std::string_view display,
-                              std::string_view email)
-    = 0;
+  virtual void doCreateTrader(Mnem mnem, std::string_view display, std::string_view email) = 0;
 
-  virtual void doUpdateTrader(std::string_view mnem, std::string_view display) = 0;
+  virtual void doUpdateTrader(Mnem mnem, std::string_view display) = 0;
 
   virtual void doCreateExec(const Exec& exec) = 0;
 
-  virtual void doCreateExec(std::string_view market, ArrayView<ConstExecPtr> execs) = 0;
+  virtual void doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs) = 0;
 
   virtual void doCreateExec(ArrayView<ConstExecPtr> execs) = 0;
 
-  virtual void doArchiveOrder(std::string_view market, Iden id, Millis modified) = 0;
+  virtual void doArchiveOrder(Mnem market, Iden id, Millis modified) = 0;
 
-  virtual void doArchiveOrder(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
+  virtual void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified) = 0;
 
-  virtual void doArchiveTrade(std::string_view market, Iden id, Millis modified) = 0;
+  virtual void doArchiveTrade(Mnem market, Iden id, Millis modified) = 0;
 
-  virtual void doArchiveTrade(std::string_view market, ArrayView<Iden> ids, Millis modified) = 0;
+  virtual void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified) = 0;
 };
 
 /**

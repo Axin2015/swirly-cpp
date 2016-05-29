@@ -87,7 +87,7 @@ void Exec::toJson(ostream& os) const
 }
 
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId,
-                 Role role, string_view cpty) noexcept
+                 Role role, Mnem cpty) noexcept
 {
   using namespace enumops;
   state_ = State::Trade;

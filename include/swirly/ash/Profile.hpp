@@ -34,7 +34,7 @@ namespace swirly {
  */
 class SWIRLY_API Profile {
  public:
-  constexpr Profile(std::string_view name) noexcept : name_{name} {}
+  Profile(std::string_view name) noexcept : name_{name} {}
   ~Profile() noexcept;
 
   // Copy.

@@ -41,11 +41,11 @@ constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
 
 template <typename EnumT>
 struct EnumTraits {
-  static void print(std::ostream& os, EnumT val) noexcept { os << unbox(val); }
+  static void print(std::ostream& os, EnumT val) { os << unbox(val); }
 };
 
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
-std::ostream& operator<<(std::ostream& os, EnumT val) noexcept
+std::ostream& operator<<(std::ostream& os, EnumT val)
 {
   EnumTraits<EnumT>::print(os, val);
   return os;
@@ -139,7 +139,7 @@ constexpr EnumT& operator^=(EnumT& lhs, EnumT rhs) noexcept
  * Bitwise left shift assignment.
  */
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
-constexpr EnumT& operator<<=(EnumT& lhs, EnumT rhs) noexcept
+constexpr EnumT& operator<<=(EnumT& lhs, EnumT rhs)
 {
   lhs = box<EnumT>(unbox(lhs) << unbox(rhs));
   return lhs;
@@ -304,7 +304,7 @@ constexpr EnumT operator^(EnumT lhs, EnumT rhs) noexcept
  * Bitwise left shift.
  */
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
-constexpr EnumT operator<<(EnumT lhs, EnumT rhs) noexcept
+constexpr EnumT operator<<(EnumT lhs, EnumT rhs)
 {
   return box<EnumT>(unbox(lhs) << unbox(rhs));
 }

@@ -24,7 +24,7 @@ using namespace swirly;
 namespace {
 class Foo : public Rec {
  public:
-  Foo(string_view mnem, string_view display, int& alive) noexcept
+  Foo(Mnem mnem, string_view display, int& alive) noexcept
     : Rec{RecType::Asset, mnem, display}, alive_{alive}
   {
     ++alive;
@@ -43,23 +43,23 @@ SWIRLY_TEST_CASE(RecSet)
   {
     RecSet<Foo> s;
 
-    Foo& foo1{*s.emplace("FOO", "Foo One", alive)};
+    Foo& foo1{*s.emplace("FOO"_sv, "Foo One"_sv, alive)};
     SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(foo1.mnem() == "FOO");
-    SWIRLY_CHECK(foo1.display() == "Foo One");
-    SWIRLY_CHECK(s.find("FOO") != s.end());
+    SWIRLY_CHECK(foo1.mnem() == "FOO"_sv);
+    SWIRLY_CHECK(foo1.display() == "Foo One"_sv);
+    SWIRLY_CHECK(s.find("FOO"_sv) != s.end());
 
     // Duplicate.
-    Foo& foo2{*s.emplace("FOO", "Foo Two", alive)};
+    Foo& foo2{*s.emplace("FOO"_sv, "Foo Two"_sv, alive)};
     SWIRLY_CHECK(alive == 1);
     SWIRLY_CHECK(&foo2 == &foo1);
 
     // Replace.
-    Foo& foo3{*s.emplaceOrReplace("FOO", "Foo Three", alive)};
+    Foo& foo3{*s.emplaceOrReplace("FOO"_sv, "Foo Three"_sv, alive)};
     SWIRLY_CHECK(alive == 1);
     SWIRLY_CHECK(&foo3 != &foo1);
-    SWIRLY_CHECK(foo3.mnem() == "FOO");
-    SWIRLY_CHECK(foo3.display() == "Foo Three");
+    SWIRLY_CHECK(foo3.mnem() == "FOO"_sv);
+    SWIRLY_CHECK(foo3.display() == "Foo Three"_sv);
   }
   SWIRLY_CHECK(alive == 0);
 }

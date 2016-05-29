@@ -26,13 +26,13 @@ TraderSess::~TraderSess() noexcept = default;
 
 TraderSess::TraderSess(TraderSess&&) = default;
 
-PosnPtr TraderSess::lazyPosn(string_view contr, Jday settlDay) throw(std::bad_alloc)
+PosnPtr TraderSess::lazyPosn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
 {
   TraderPosnSet::Iterator it;
   bool found;
   tie(it, found) = posns_.findHint(contr, settlDay);
   if (!found) {
-    it = posns_.insertHint(it, factory_.newPosn(+mnem_, contr, settlDay));
+    it = posns_.insertHint(it, factory_.newPosn(mnem_, contr, settlDay));
   }
   return &*it;
 }

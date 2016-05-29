@@ -22,9 +22,8 @@ using namespace std;
 
 namespace swirly {
 
-Contr::Contr(string_view mnem, string_view display, string_view asset, string_view ccy,
-             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-             Lots maxLots) noexcept
+Contr::Contr(Mnem mnem, string_view display, Mnem asset, Mnem ccy, int lotNumer, int lotDenom,
+             int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept
   : Rec{RecType::Contr, mnem, display},
     asset_{asset},
     ccy_{ccy},

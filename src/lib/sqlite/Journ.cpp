@@ -77,7 +77,7 @@ Journ::Journ(Journ&&) = default;
 
 Journ& Journ::operator=(Journ&&) = default;
 
-void Journ::doCreateMarket(string_view mnem, string_view display, string_view contr, Jday settlDay,
+void Journ::doCreateMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
                            Jday expiryDay, MarketState state)
 {
   auto& stmt = *insertMarketStmt_;
@@ -93,7 +93,7 @@ void Journ::doCreateMarket(string_view mnem, string_view display, string_view co
   stepOnce(stmt);
 }
 
-void Journ::doUpdateMarket(string_view mnem, string_view display, MarketState state)
+void Journ::doUpdateMarket(Mnem mnem, string_view display, MarketState state)
 {
   auto& stmt = *updateMarketStmt_;
 
@@ -105,7 +105,7 @@ void Journ::doUpdateMarket(string_view mnem, string_view display, MarketState st
   stepOnce(stmt);
 }
 
-void Journ::doCreateTrader(string_view mnem, string_view display, string_view email)
+void Journ::doCreateTrader(Mnem mnem, string_view display, string_view email)
 {
   auto& stmt = *insertTraderStmt_;
 
@@ -117,7 +117,7 @@ void Journ::doCreateTrader(string_view mnem, string_view display, string_view em
   stepOnce(stmt);
 }
 
-void Journ::doUpdateTrader(string_view mnem, string_view display)
+void Journ::doUpdateTrader(Mnem mnem, string_view display)
 {
   auto& stmt = *updateTraderStmt_;
 
@@ -165,7 +165,7 @@ void Journ::doCreateExec(const Exec& exec)
   stepOnce(stmt);
 }
 
-void Journ::doCreateExec(string_view market, ArrayView<ConstExecPtr> execs)
+void Journ::doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs)
 {
   // N.B. the market parameter is unused in the SQLite implementation.
   doCreateExec(execs);
@@ -184,7 +184,7 @@ void Journ::doCreateExec(ArrayView<ConstExecPtr> execs)
   }
 }
 
-void Journ::doArchiveOrder(string_view market, Iden id, Millis modified)
+void Journ::doArchiveOrder(Mnem market, Iden id, Millis modified)
 {
   auto& stmt = *updateOrderStmt_;
 
@@ -196,7 +196,7 @@ void Journ::doArchiveOrder(string_view market, Iden id, Millis modified)
   stepOnce(stmt);
 }
 
-void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modified)
+void Journ::doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified)
 {
   if (ids.size() == 1) {
     doArchiveOrder(market, ids.front(), modified);
@@ -209,7 +209,7 @@ void Journ::doArchiveOrder(string_view market, ArrayView<Iden> ids, Millis modif
   }
 }
 
-void Journ::doArchiveTrade(string_view market, Iden id, Millis modified)
+void Journ::doArchiveTrade(Mnem market, Iden id, Millis modified)
 {
   auto& stmt = *updateExecStmt_;
 
@@ -221,7 +221,7 @@ void Journ::doArchiveTrade(string_view market, Iden id, Millis modified)
   stepOnce(stmt);
 }
 
-void Journ::doArchiveTrade(string_view market, ArrayView<Iden> ids, Millis modified)
+void Journ::doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified)
 {
   if (ids.size() == 1) {
     doArchiveTrade(market, ids.front(), modified);

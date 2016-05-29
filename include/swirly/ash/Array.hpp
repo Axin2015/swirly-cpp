@@ -45,7 +45,7 @@ class ArrayView {
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
   using reverse_iterator = const_reverse_iterator;
 
-  using difference_type = ptrdiff_t;
+  using difference_type = std::ptrdiff_t;
   using size_type = std::size_t;
 
   constexpr ArrayView(const ValueT* ptr, std::size_t len) noexcept : len_{len}, ptr_{ptr} {}
@@ -82,7 +82,7 @@ class ArrayView {
   constexpr const ValueT* data() const noexcept { return ptr_; }
   constexpr bool empty() const noexcept { return len_ == 0; }
   constexpr std::size_t size() const noexcept { return len_; }
-  void clear() noexcept
+  constexpr void clear() noexcept
   {
     len_ = 0;
     ptr_ = nullptr;

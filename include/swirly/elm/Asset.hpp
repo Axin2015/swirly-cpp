@@ -33,7 +33,7 @@ namespace swirly {
  */
 class SWIRLY_API Asset : public Rec {
  public:
-  Asset(std::string_view mnem, std::string_view display, AssetType type) noexcept
+  Asset(Mnem mnem, std::string_view display, AssetType type) noexcept
     : Rec{RecType::Asset, mnem, display}, type_{type}
   {
   }

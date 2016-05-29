@@ -48,7 +48,7 @@ class ScopedIdens {
 
 class ScopedMnems {
  public:
-  ScopedMnems(string_view sv, vector<string_view>& mnems) noexcept : mnems_{mnems}
+  ScopedMnems(string_view sv, vector<Mnem>& mnems) noexcept : mnems_{mnems}
   {
     Tokeniser<','> toks{sv};
     while (!toks.empty()) {
@@ -59,7 +59,7 @@ class ScopedMnems {
   ~ScopedMnems() noexcept { mnems_.clear(); }
 
  private:
-  vector<string_view>& mnems_;
+  vector<Mnem>& mnems_;
 };
 
 Millis getSwirlyTime(HttpMessage data, const char* httpTime = nullptr) noexcept

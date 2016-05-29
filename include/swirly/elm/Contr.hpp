@@ -31,9 +31,8 @@ namespace swirly {
  */
 class SWIRLY_API Contr : public Rec {
  public:
-  Contr(std::string_view mnem, std::string_view display, std::string_view asset,
-        std::string_view ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-        Lots minLots, Lots maxLots) noexcept;
+  Contr(Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer, int lotDenom,
+        int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
 
   ~Contr() noexcept override;
 
@@ -47,8 +46,8 @@ class SWIRLY_API Contr : public Rec {
 
   void toJson(std::ostream& os) const override;
 
-  auto asset() const noexcept { return +asset_; }
-  auto ccy() const noexcept { return +ccy_; }
+  auto asset() const noexcept { return asset_; }
+  auto ccy() const noexcept { return ccy_; }
   auto lotNumer() const noexcept { return lotNumer_; }
   auto lotDenom() const noexcept { return lotDenom_; }
   auto qtyInc() const noexcept { return qtyInc_; }

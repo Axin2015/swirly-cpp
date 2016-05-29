@@ -89,7 +89,7 @@ class RestServ : public mg::Mgr<RestServ> {
     MatchMask = MatchMethod | MatchUri
   };
 
-  std::string_view trader(mg::HttpMessage data) const
+  Mnem trader(mg::HttpMessage data) const
   {
     auto mnem = data.header(httpUser_);
     if (mnem.empty()) {
@@ -106,7 +106,7 @@ class RestServ : public mg::Mgr<RestServ> {
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;
-  std::vector<std::string_view> mnems_;
+  std::vector<Mnem> mnems_;
   RestRequest request_;
   mg::OStream out_;
   Profile profile_;
