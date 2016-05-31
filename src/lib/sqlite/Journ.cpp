@@ -26,6 +26,10 @@ namespace swirly {
 namespace sqlite {
 namespace {
 
+constexpr auto BeginSql = "BEGIN TRANSACTION"_sv;
+constexpr auto CommitSql = "COMMIT TRANSACTION"_sv;
+constexpr auto RollbackSql = "ROLLBACK TRANSACTION"_sv;
+
 constexpr auto InsertMarketSql = //
   "INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)" //
   " VALUES (?, ?, ?, ?, ?, ?)"_sv;
@@ -60,7 +64,9 @@ constexpr auto UpdateExecSql = //
 
 Journ::Journ(const Conf& conf)
   : db_{openDb(conf.get("sqlite_journ", "swirly.db"), SQLITE_OPEN_READWRITE, conf)},
-    ctx_{*db_},
+    beginStmt_{prepare(*db_, BeginSql)},
+    commitStmt_{prepare(*db_, CommitSql)},
+    rollbackStmt_{prepare(*db_, RollbackSql)},
     insertMarketStmt_{prepare(*db_, InsertMarketSql)},
     updateMarketStmt_{prepare(*db_, UpdateMarketSql)},
     insertTraderStmt_{prepare(*db_, InsertTraderSql)},
@@ -76,6 +82,26 @@ Journ::~Journ() noexcept = default;
 Journ::Journ(Journ&&) = default;
 
 Journ& Journ::operator=(Journ&&) = default;
+
+void Journ::doBegin()
+{
+  stepOnce(*beginStmt_);
+}
+
+void Journ::doCommit()
+{
+  stepOnce(*commitStmt_);
+}
+
+void Journ::doRollback()
+{
+  stepOnce(*rollbackStmt_);
+}
+
+void Journ::doReset() noexcept
+{
+  Transactional::reset();
+}
 
 void Journ::doCreateMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
                            Jday expiryDay, MarketState state)
@@ -128,8 +154,12 @@ void Journ::doUpdateTrader(Mnem mnem, string_view display)
   stepOnce(stmt);
 }
 
-void Journ::doCreateExec(const Exec& exec)
+void Journ::doCreateExec(const Exec& exec, More more)
 {
+  Transaction trans{*this, more};
+  if (failed()) {
+    return;
+  }
   auto& stmt = *insertExecStmt_;
 
   ScopedBind bind{stmt};
@@ -165,27 +195,12 @@ void Journ::doCreateExec(const Exec& exec)
   stepOnce(stmt);
 }
 
-void Journ::doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs)
+void Journ::doArchiveOrder(Mnem market, Iden id, Millis modified, More more)
 {
-  // N.B. the market parameter is unused in the SQLite implementation.
-  doCreateExec(execs);
-}
-
-void Journ::doCreateExec(ArrayView<ConstExecPtr> execs)
-{
-  if (execs.size() == 1) {
-    doCreateExec(*execs.front());
-  } else {
-    ScopedTrans trans{ctx_};
-    for (const auto& exec : execs) {
-      doCreateExec(*exec);
-    }
-    trans.commit();
+  Transaction trans{*this, more};
+  if (failed()) {
+    return;
   }
-}
-
-void Journ::doArchiveOrder(Mnem market, Iden id, Millis modified)
-{
   auto& stmt = *updateOrderStmt_;
 
   ScopedBind bind{stmt};
@@ -196,21 +211,12 @@ void Journ::doArchiveOrder(Mnem market, Iden id, Millis modified)
   stepOnce(stmt);
 }
 
-void Journ::doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified)
+void Journ::doArchiveTrade(Mnem market, Iden id, Millis modified, More more)
 {
-  if (ids.size() == 1) {
-    doArchiveOrder(market, ids.front(), modified);
-  } else {
-    ScopedTrans trans{ctx_};
-    for (const auto id : ids) {
-      doArchiveOrder(market, id, modified);
-    }
-    trans.commit();
+  Transaction trans{*this, more};
+  if (failed()) {
+    return;
   }
-}
-
-void Journ::doArchiveTrade(Mnem market, Iden id, Millis modified)
-{
   auto& stmt = *updateExecStmt_;
 
   ScopedBind bind{stmt};
@@ -219,19 +225,6 @@ void Journ::doArchiveTrade(Mnem market, Iden id, Millis modified)
   bind(modified);
 
   stepOnce(stmt);
-}
-
-void Journ::doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified)
-{
-  if (ids.size() == 1) {
-    doArchiveTrade(market, ids.front(), modified);
-  } else {
-    ScopedTrans trans{ctx_};
-    for (const auto id : ids) {
-      doArchiveTrade(market, id, modified);
-    }
-    trans.commit();
-  }
 }
 
 } // sqlite

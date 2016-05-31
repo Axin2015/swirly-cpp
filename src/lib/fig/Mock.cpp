@@ -149,6 +149,10 @@ MockJourn& MockJourn::operator=(const MockJourn&) noexcept = default;
 constexpr MockJourn::MockJourn(MockJourn&&) noexcept = default;
 MockJourn& MockJourn::operator=(MockJourn&&) noexcept = default;
 
+void MockJourn::doReset() noexcept
+{
+}
+
 void MockJourn::doCreateMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
                                Jday expiryDay, MarketState state)
 {
@@ -166,31 +170,15 @@ void MockJourn::doUpdateTrader(Mnem mnem, string_view display)
 {
 }
 
-void MockJourn::doCreateExec(const Exec& exec)
+void MockJourn::doCreateExec(const Exec& exec, More more)
 {
 }
 
-void MockJourn::doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs)
+void MockJourn::doArchiveOrder(Mnem market, Iden id, Millis modified, More more)
 {
 }
 
-void MockJourn::doCreateExec(ArrayView<ConstExecPtr> execs)
-{
-}
-
-void MockJourn::doArchiveOrder(Mnem market, Iden id, Millis modified)
-{
-}
-
-void MockJourn::doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified)
-{
-}
-
-void MockJourn::doArchiveTrade(Mnem market, Iden id, Millis modified)
-{
-}
-
-void MockJourn::doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified)
+void MockJourn::doArchiveTrade(Mnem market, Iden id, Millis modified, More more)
 {
 }
 

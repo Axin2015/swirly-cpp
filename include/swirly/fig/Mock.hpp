@@ -71,6 +71,8 @@ class SWIRLY_API MockJourn : public Journ {
   MockJourn& operator=(MockJourn&&) noexcept;
 
  protected:
+  void doReset() noexcept override;
+
   void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                       Jday expiryDay, MarketState state) override;
 
@@ -80,19 +82,11 @@ class SWIRLY_API MockJourn : public Journ {
 
   void doUpdateTrader(Mnem mnem, std::string_view display) override;
 
-  void doCreateExec(const Exec& exec) override;
+  void doCreateExec(const Exec& exec, More more) override;
 
-  void doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs) override;
+  void doArchiveOrder(Mnem market, Iden id, Millis modified, More more) override;
 
-  void doCreateExec(ArrayView<ConstExecPtr> execs) override;
-
-  void doArchiveOrder(Mnem market, Iden id, Millis modified) override;
-
-  void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified) override;
-
-  void doArchiveTrade(Mnem market, Iden id, Millis modified) override;
-
-  void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified) override;
+  void doArchiveTrade(Mnem market, Iden id, Millis modified, More more) override;
 };
 
 /** @} */

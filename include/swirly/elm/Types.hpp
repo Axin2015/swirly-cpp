@@ -259,6 +259,15 @@ using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
 /** @} */
 
+/**
+ * @addtogroup IO
+ * @{
+ */
+
+enum class More { No, Yes };
+
+/** @} */
+
 } // swirly
 
 #endif // SWIRLY_ELM_TYPES_HPP

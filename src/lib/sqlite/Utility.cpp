@@ -142,23 +142,5 @@ void bind(sqlite3_stmt& stmt, int col, Mnem val)
   }
 }
 
-TransCtx::TransCtx(sqlite3& db)
-  : beginStmt_{prepare(db, "BEGIN TRANSACTION"_sv)},
-    commitStmt_{prepare(db, "COMMIT TRANSACTION"_sv)},
-    rollbackStmt_{prepare(db, "ROLLBACK TRANSACTION"_sv)}
-{
-}
-
-ScopedTrans::~ScopedTrans() noexcept
-{
-  if (!done_) {
-    try {
-      ctx_.rollback();
-    } catch (const exception& e) {
-      SWIRLY_ERROR(logMsg() << "exception: " << e.what());
-    }
-  }
-}
-
 } // sqlite
 } // swirly
