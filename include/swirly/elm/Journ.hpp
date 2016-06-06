@@ -46,6 +46,11 @@ class SWIRLY_API Journ {
   Journ& operator=(Journ&&) noexcept = default;
 
   /**
+   * Reset multi-part sequence. Must not throw.
+   */
+  void reset() noexcept { doReset(); }
+
+  /**
    * Create Market.
    */
   void createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
@@ -74,39 +79,37 @@ class SWIRLY_API Journ {
   /**
    * Create Execution.
    */
-  void createExec(const Exec& exec) { doCreateExec(exec); }
-  /**
-   * Create Executions.
-   */
-  void createExec(Mnem market, ArrayView<ConstExecPtr> execs) { doCreateExec(market, execs); }
+  void createExec(const Exec& exec) { doCreateExec(exec, More::No); }
   /**
    * Create Executions. This overload may be less efficient than ones that are market-specific.
    */
-  void createExec(ArrayView<ConstExecPtr> execs) { doCreateExec(execs); }
+  void createExec(ArrayView<ConstExecPtr> execs);
   /**
    * Archive Order.
    */
-  void archiveOrder(Mnem market, Iden id, Millis modified) { doArchiveOrder(market, id, modified); }
+  void archiveOrder(Mnem market, Iden id, Millis modified)
+  {
+    doArchiveOrder(market, id, modified, More::No);
+  }
   /**
    * Archive Orders.
    */
-  void archiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified)
-  {
-    doArchiveOrder(market, ids, modified);
-  }
+  void archiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified);
   /**
    * Archive Trade.
    */
-  void archiveTrade(Mnem market, Iden id, Millis modified) { doArchiveTrade(market, id, modified); }
+  void archiveTrade(Mnem market, Iden id, Millis modified)
+  {
+    doArchiveTrade(market, id, modified, More::No);
+  }
   /**
    * Archive Trades.
    */
-  void archiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified)
-  {
-    doArchiveTrade(market, ids, modified);
-  }
+  void archiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified);
 
  protected:
+  virtual void doReset() noexcept = 0;
+
   virtual void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                               Jday expiryDay, MarketState state)
     = 0;
@@ -117,19 +120,11 @@ class SWIRLY_API Journ {
 
   virtual void doUpdateTrader(Mnem mnem, std::string_view display) = 0;
 
-  virtual void doCreateExec(const Exec& exec) = 0;
+  virtual void doCreateExec(const Exec& exec, More more) = 0;
 
-  virtual void doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs) = 0;
+  virtual void doArchiveOrder(Mnem market, Iden id, Millis modified, More more) = 0;
 
-  virtual void doCreateExec(ArrayView<ConstExecPtr> execs) = 0;
-
-  virtual void doArchiveOrder(Mnem market, Iden id, Millis modified) = 0;
-
-  virtual void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified) = 0;
-
-  virtual void doArchiveTrade(Mnem market, Iden id, Millis modified) = 0;
-
-  virtual void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified) = 0;
+  virtual void doArchiveTrade(Mnem market, Iden id, Millis modified, More more) = 0;
 };
 
 /**

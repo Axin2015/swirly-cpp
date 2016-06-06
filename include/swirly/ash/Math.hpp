@@ -125,6 +125,14 @@ inline double pctile999(double mean, double sd) noexcept
   return mean + 3.0902323 * sd;
 }
 
+/**
+ * @return true if size is a power of two.
+ */
+constexpr bool isPow2(std::size_t n) noexcept
+{
+  return n > 0 && (n & (n - 1)) == 0;
+}
+
 /** @} */
 
 } // swirly

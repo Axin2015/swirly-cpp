@@ -426,7 +426,7 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
       }
     });
 
-    impl_->journ.createExec(book.mnem(), resp.execs());
+    impl_->journ.createExec(resp.execs());
     success = true;
   }
 
@@ -524,7 +524,7 @@ void Serv::reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, 
     resp.insertExec(exec);
   }
 
-  impl_->journ.createExec(book.mnem(), resp.execs());
+  impl_->journ.createExec(resp.execs());
 
   // Commit phase.
 
@@ -584,7 +584,7 @@ void Serv::cancelOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, 
     resp.insertExec(exec);
   }
 
-  impl_->journ.createExec(book.mnem(), resp.execs());
+  impl_->journ.createExec(resp.execs());
 
   // Commit phase.
 

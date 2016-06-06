@@ -20,6 +20,7 @@
 #include "Utility.hpp"
 
 #include <swirly/elm/Journ.hpp>
+#include <swirly/elm/Transaction.hpp>
 
 namespace swirly {
 namespace sqlite {
@@ -29,10 +30,10 @@ namespace sqlite {
  * @{
  */
 
-class Journ : public swirly::Journ {
+class Journ : public swirly::Transactional, public swirly::Journ {
  public:
   explicit Journ(const Conf& conf);
-  ~Journ() noexcept;
+  ~Journ() noexcept override;
 
   // Copy.
   Journ(const Journ&) = delete;
@@ -43,6 +44,14 @@ class Journ : public swirly::Journ {
   Journ& operator=(Journ&&);
 
  protected:
+  void doBegin() override;
+
+  void doCommit() override;
+
+  void doRollback() override;
+
+  void doReset() noexcept override;
+
   void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                       Jday expiryDay, MarketState state) override;
 
@@ -52,23 +61,17 @@ class Journ : public swirly::Journ {
 
   void doUpdateTrader(Mnem mnem, std::string_view display) override;
 
-  void doCreateExec(const Exec& exec) override;
+  void doCreateExec(const Exec& exec, More more) override;
 
-  void doCreateExec(Mnem market, ArrayView<ConstExecPtr> execs) override;
+  void doArchiveOrder(Mnem market, Iden id, Millis modified, More more) override;
 
-  void doCreateExec(ArrayView<ConstExecPtr> execs) override;
-
-  void doArchiveOrder(Mnem market, Iden id, Millis modified) override;
-
-  void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified) override;
-
-  void doArchiveTrade(Mnem market, Iden id, Millis modified) override;
-
-  void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified) override;
+  void doArchiveTrade(Mnem market, Iden id, Millis modified, More more) override;
 
  private:
   DbPtr db_;
-  TransCtx ctx_;
+  StmtPtr beginStmt_;
+  StmtPtr commitStmt_;
+  StmtPtr rollbackStmt_;
   StmtPtr insertMarketStmt_;
   StmtPtr updateMarketStmt_;
   StmtPtr insertTraderStmt_;
