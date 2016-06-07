@@ -27,20 +27,12 @@ struct Foo : Transactional {
   int beginCalls{0};
   int commitCalls{0};
   int rollbackCalls{0};
-protected:
-  void doBegin() override
-  {
-    ++beginCalls;
-  }
-  void doCommit() override
-  {
-    ++commitCalls;
-  }
-  void doRollback() override
-  {
-    ++rollbackCalls;
-  }
-public:
+
+ protected:
+  void doBegin() override { ++beginCalls; }
+  void doCommit() override { ++commitCalls; }
+  void doRollback() override { ++rollbackCalls; }
+ public:
   void clear() noexcept
   {
     reset();
