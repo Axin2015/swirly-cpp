@@ -43,10 +43,7 @@ class SWIRLY_API Transactional {
   constexpr Transactional(Transactional&&) noexcept = default;
   Transactional& operator=(Transactional&&) noexcept = default;
 
-  auto failed() const noexcept
-  {
-    return state_ == Failed;
-  }
+  auto failed() const noexcept { return state_ == Failed; }
 
   /**
    * Begin transaction.

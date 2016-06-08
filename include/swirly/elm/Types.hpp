@@ -264,7 +264,7 @@ using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
  * @{
  */
 
-enum class More { No, Yes };
+enum class More : int { No, Yes };
 
 /** @} */
 

@@ -24,23 +24,11 @@ using namespace swirly;
 namespace {
 
 struct Foo : Transactional {
+
   int beginCalls{0};
   int commitCalls{0};
   int rollbackCalls{0};
-protected:
-  void doBegin() override
-  {
-    ++beginCalls;
-  }
-  void doCommit() override
-  {
-    ++commitCalls;
-  }
-  void doRollback() override
-  {
-    ++rollbackCalls;
-  }
-public:
+
   void clear() noexcept
   {
     reset();
@@ -48,11 +36,16 @@ public:
     commitCalls = 0;
     rollbackCalls = 0;
   }
+
+ protected:
+  void doBegin() override { ++beginCalls; }
+  void doCommit() override { ++commitCalls; }
+  void doRollback() override { ++rollbackCalls; }
 };
 
 } // anonymous
 
-SWIRLY_TEST_CASE(TransactionScopedCommit)
+SWIRLY_TEST_CASE(TransScopedCommit)
 {
   Foo foo;
   {
@@ -73,7 +66,7 @@ SWIRLY_TEST_CASE(TransactionScopedCommit)
   SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
-SWIRLY_TEST_CASE(TransactionScopedRollback)
+SWIRLY_TEST_CASE(TransScopedRollback)
 {
   Foo foo;
   {
@@ -92,7 +85,7 @@ SWIRLY_TEST_CASE(TransactionScopedRollback)
   SWIRLY_CHECK(foo.rollbackCalls == 2);
 }
 
-SWIRLY_TEST_CASE(TransactionSingleCommit)
+SWIRLY_TEST_CASE(TransSingleCommit)
 {
   Foo foo;
   {
@@ -117,7 +110,7 @@ SWIRLY_TEST_CASE(TransactionSingleCommit)
   SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
-SWIRLY_TEST_CASE(TransactionSingleRollback)
+SWIRLY_TEST_CASE(TransSingleRollback)
 {
   Foo foo;
   {
@@ -141,7 +134,7 @@ SWIRLY_TEST_CASE(TransactionSingleRollback)
   SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
-SWIRLY_TEST_CASE(TransactionMultiCommit)
+SWIRLY_TEST_CASE(TransMultiCommit)
 {
   Foo foo;
   {
@@ -182,7 +175,7 @@ SWIRLY_TEST_CASE(TransactionMultiCommit)
   SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
-SWIRLY_TEST_CASE(TransactionMultiRollbackFirst)
+SWIRLY_TEST_CASE(TransMultiRollbackFirst)
 {
   Foo foo;
   {
@@ -222,7 +215,7 @@ SWIRLY_TEST_CASE(TransactionMultiRollbackFirst)
   SWIRLY_CHECK(foo.rollbackCalls == 1);
 }
 
-SWIRLY_TEST_CASE(TransactionMultiRollbackSecond)
+SWIRLY_TEST_CASE(TransMultiRollbackSecond)
 {
   Foo foo;
   {
@@ -261,7 +254,7 @@ SWIRLY_TEST_CASE(TransactionMultiRollbackSecond)
   SWIRLY_CHECK(foo.rollbackCalls == 1);
 }
 
-SWIRLY_TEST_CASE(TransactionMultiRollbackAll)
+SWIRLY_TEST_CASE(TransMultiRollbackAll)
 {
   Foo foo;
   {

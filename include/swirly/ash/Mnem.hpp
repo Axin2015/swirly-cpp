@@ -33,7 +33,7 @@ using experimental::string_view;
 namespace swirly {
 
 /**
- * @addtogroup Domain
+ * @addtogroup Util
  * @{
  */
 
@@ -243,6 +243,12 @@ inline bool operator>=(std::string_view lhs, Mnem rhs) noexcept
 inline std::ostream& operator<<(std::ostream& os, Mnem rhs)
 {
   return os << +rhs;
+}
+
+template <std::size_t SizeN>
+std::size_t setCString(char (&lhs)[SizeN], Mnem rhs) noexcept
+{
+  return setCString(lhs, rhs.data(), rhs.size());
 }
 
 /** @} */
