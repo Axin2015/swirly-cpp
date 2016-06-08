@@ -23,6 +23,11 @@
  */
 
 /**
+ * Macro for packed structures.
+ */
+#define SWIRLY_PACKED __attribute__((packed))
+
+/**
  * Macro for exporting weak symbols.
  */
 #define SWIRLY_WEAK __attribute__((visibility("default"), weak))
