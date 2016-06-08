@@ -1,6 +1,7 @@
 language: cpp
 
-sudo: false
+sudo: required
+dist: trusty
 
 matrix:
   include:
@@ -10,8 +11,7 @@ matrix:
         apt:
           sources:
             - boost-latest
-            - george-edison55-precise-backports
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-trusty-3.7
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
           packages:
@@ -28,8 +28,7 @@ matrix:
         apt:
           sources:
             - boost-latest
-            - george-edison55-precise-backports
-            - llvm-toolchain-precise-3.7
+            - llvm-toolchain-trusty-3.7
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
           packages:
@@ -46,7 +45,6 @@ matrix:
         apt:
           sources:
             - boost-latest
-            - george-edison55-precise-backports
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
           packages:
@@ -63,7 +61,6 @@ matrix:
         apt:
           sources:
             - boost-latest
-            - george-edison55-precise-backports
             - travis-ci/sqlite3
             - ubuntu-toolchain-r-test
           packages:
