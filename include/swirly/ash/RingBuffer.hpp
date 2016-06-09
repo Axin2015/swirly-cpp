@@ -20,6 +20,7 @@
 #include <swirly/ash/Math.hpp>
 
 #include <cstdint>
+#include <memory>
 
 namespace swirly {
 
@@ -28,13 +29,13 @@ namespace swirly {
  * @{
  */
 
-template <typename ValueT, std::size_t CapacityN>
+template <typename ValueT>
 class RingBuffer {
-  static_assert(swirly::isPow2(CapacityN), "capacity must be power of two");
-  enum : std::size_t { Mask = CapacityN - 1 };
-
  public:
-  RingBuffer() = default;
+  explicit RingBuffer(std::size_t capacity)
+    : capacity_{nextPow2(capacity)}, mask_{capacity_ - 1}, buf_{new ValueT[capacity_]}
+  {
+  }
   ~RingBuffer() noexcept = default;
 
   // Copy.
@@ -42,29 +43,29 @@ class RingBuffer {
   RingBuffer& operator=(const RingBuffer& rhs) = delete;
 
   // Move.
-  RingBuffer(RingBuffer&&) = delete;
-  RingBuffer& operator=(RingBuffer&&) = delete;
+  RingBuffer(RingBuffer&&) = default;
+  RingBuffer& operator=(RingBuffer&&) = default;
 
   bool empty() const noexcept { return rpos_ == wpos_; }
-  bool full() const noexcept { return size() == CapacityN; }
+  bool full() const noexcept { return size() == capacity_; }
   std::size_t size() const noexcept { return wpos_ - rpos_; }
   void clear() noexcept { rpos_ = wpos_ = 0; }
   void read(ValueT& val)
   {
-    const auto& ref = buf_[rpos_ & Mask];
+    const auto& ref = buf_[rpos_ & mask_];
     val = ref;
     ++rpos_;
   }
   template <typename FnT>
   void read(FnT fn)
   {
-    const auto& ref = buf_[rpos_ & Mask];
+    const auto& ref = buf_[rpos_ & mask_];
     fn(ref);
     ++rpos_;
   }
   void write(const ValueT& val)
   {
-    auto& ref = buf_[wpos_ & Mask];
+    auto& ref = buf_[wpos_ & mask_];
     ref = val;
     if (full()) {
       ++rpos_;
@@ -74,7 +75,7 @@ class RingBuffer {
   template <typename FnT>
   void write(FnT fn)
   {
-    auto& ref = buf_[wpos_ & Mask];
+    auto& ref = buf_[wpos_ & mask_];
     fn(ref);
     if (full()) {
       ++rpos_;
@@ -85,10 +86,12 @@ class RingBuffer {
  private:
   // Ensure that read and write positions are in different cache-lines.
   struct alignas(64) {
+    std::size_t capacity_;
+    std::size_t mask_;
     uint64_t rpos_{0};
   };
   uint64_t wpos_{0};
-  ValueT buf_[CapacityN];
+  std::unique_ptr<ValueT[]> buf_;
 };
 
 /** @} */

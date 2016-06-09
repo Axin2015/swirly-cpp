@@ -25,9 +25,9 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(RingBuffer)
 {
-  using StringRingBuffer = RingBuffer<string, 4>;
+  using StringRingBuffer = RingBuffer<string>;
 
-  StringRingBuffer srb;
+  StringRingBuffer srb{4};
   SWIRLY_CHECK(srb.empty());
   SWIRLY_CHECK(!srb.full());
   SWIRLY_CHECK(srb.size() == 0);

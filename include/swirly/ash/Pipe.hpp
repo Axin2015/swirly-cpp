@@ -31,10 +31,10 @@ namespace swirly {
  * @{
  */
 
-template <typename ValueT, std::size_t CapacityN>
+template <typename ValueT>
 class Pipe {
  public:
-  Pipe() = default;
+  explicit Pipe(std::size_t capacity) : buf_{capacity} {}
   ~Pipe() noexcept = default;
 
   // Copy.
@@ -99,7 +99,7 @@ class Pipe {
   std::condition_variable notEmpty_;
   std::condition_variable notFull_;
   bool closed_{false};
-  RingBuffer<ValueT, CapacityN> buf_;
+  RingBuffer<ValueT> buf_;
 };
 
 /** @} */

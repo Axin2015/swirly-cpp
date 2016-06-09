@@ -23,7 +23,7 @@ using namespace swirly;
 
 namespace {
 
-using IntPipe = Pipe<int, (1 << 4)>;
+using IntPipe = Pipe<int>;
 
 void producer(IntPipe& p)
 {
@@ -37,7 +37,7 @@ void producer(IntPipe& p)
 
 SWIRLY_TEST_CASE(Pipe)
 {
-  IntPipe p;
+  IntPipe p{1 << 4};
   thread t{producer, ref(p)};
   int sum{0};
   while (p.read([&sum](int i) { sum += i; }))
