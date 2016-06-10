@@ -15,9 +15,9 @@
  * 02110-1301, USA.
  */
 #include <swirly/fig/MemPool.hpp>
-#include <swirly/fig/Mock.hpp>
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/Serv.hpp>
+#include <swirly/fig/Test.hpp>
 #include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/MarketBook.hpp>
@@ -111,13 +111,13 @@ int main(int argc, char* argv[])
       journ = swirly::makeJourn(conf);
       model = swirly::makeModel(conf);
     } else {
-      journ = make_unique<MockJourn>();
-      model = make_unique<MockModel>();
+      journ = make_unique<TestJourn>();
+      model = make_unique<TestModel>();
     }
 
     const auto now = getTimeOfDay();
 
-    Serv serv{*journ};
+    Serv serv{*journ, 1 << 10};
     serv.load(*model, now);
     model = nullptr;
 

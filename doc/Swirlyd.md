@@ -56,6 +56,10 @@ nHttp port. Defaults to 8080.
 
 Http user header. The default is "Swirly-User".
 
+### journ_capacity ###
+
+Journal queue capacity. The default is 1024.
+
 Sqlite Config
 -------------
 

@@ -47,7 +47,7 @@ class TraderSess;
 
 class SWIRLY_API Serv {
  public:
-  explicit Serv(Journ& journ);
+  Serv(Journ& journ, std::size_t capacity);
 
   ~Serv() noexcept;
 

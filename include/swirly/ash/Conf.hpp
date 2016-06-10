@@ -77,6 +77,7 @@ class SWIRLY_API Conf {
 
   const char* get(const char* key, const char* dfl = nullptr) const noexcept;
   int get(const char* key, int dfl) const noexcept;
+  long get(const char* key, long dfl) const noexcept;
   bool get(const char* key, bool dfl) const noexcept;
 
   void clear() noexcept { map_.clear(); }

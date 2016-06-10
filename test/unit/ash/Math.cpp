@@ -34,3 +34,24 @@ SWIRLY_TEST_CASE(VarAccum)
   SWIRLY_CHECK(test::isSame(v.min(), 1299));
   SWIRLY_CHECK(test::isSame(v.max(), 1370));
 }
+
+SWIRLY_TEST_CASE(NextPow2)
+{
+  SWIRLY_CHECK(nextPow2(1U) == 1U);
+  SWIRLY_CHECK(nextPow2(2U) == 2U);
+  SWIRLY_CHECK(nextPow2(3U) == 4U);
+  SWIRLY_CHECK(nextPow2(4U) == 4U);
+  SWIRLY_CHECK(nextPow2(5U) == 8U);
+  SWIRLY_CHECK(nextPow2(6U) == 8U);
+  SWIRLY_CHECK(nextPow2(7U) == 8U);
+  SWIRLY_CHECK(nextPow2(8U) == 8U);
+
+  SWIRLY_CHECK(nextPow2(1UL) == 1UL);
+  SWIRLY_CHECK(nextPow2(2UL) == 2UL);
+  SWIRLY_CHECK(nextPow2(3UL) == 4UL);
+  SWIRLY_CHECK(nextPow2(4UL) == 4UL);
+  SWIRLY_CHECK(nextPow2(5UL) == 8UL);
+  SWIRLY_CHECK(nextPow2(6UL) == 8UL);
+  SWIRLY_CHECK(nextPow2(7UL) == 8UL);
+  SWIRLY_CHECK(nextPow2(8UL) == 8UL);
+}

@@ -15,7 +15,7 @@
  * 02110-1301, USA.
  */
 #include <swirly/fig/MemPool.hpp>
-#include <swirly/fig/Mock.hpp>
+#include <swirly/fig/Test.hpp>
 
 #include "RestServ.hpp"
 
@@ -229,13 +229,14 @@ int main(int argc, char* argv[])
       model = swirly::makeModel(conf);
     } else {
       // Use Mock classes for functional testing.
-      journ = make_unique<MockJourn>();
-      model = make_unique<MockModel>();
+      journ = make_unique<TestJourn>();
+      model = make_unique<TestModel>();
     }
     const char* const httpPort{conf.get("http_port", "8080")};
     const char* const httpUser{conf.get("http_user", "Swirly-User")};
 
-    Rest rest{*journ};
+    const long journCapacity{conf.get("journ_capacity", 1L << 10)};
+    Rest rest{*journ, static_cast<size_t>(journCapacity)};
     rest.load(*model, getTimeOfDay());
     model = nullptr;
 
@@ -246,17 +247,19 @@ int main(int argc, char* argv[])
 
     SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << httpPort);
 
-    SWIRLY_INFO(logMsg() << "conf_file: " << opts.confFile);
-    SWIRLY_INFO(logMsg() << "daemon:    " << (opts.daemon ? "yes" : "no"));
-    SWIRLY_INFO(logMsg() << "test_mode: " << (opts.testMode ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "conf_file:      " << opts.confFile);
+    SWIRLY_INFO(logMsg() << "daemon:         " << (opts.daemon ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "test_mode:      " << (opts.testMode ? "yes" : "no"));
 
-    SWIRLY_INFO(logMsg() << "mem_pool:  " << (memPool.capacity() >> 20) << "MiB");
-    SWIRLY_INFO(logMsg() << "file_mode: " << setfill('0') << setw(3) << oct << swirly::fileMode());
-    SWIRLY_INFO(logMsg() << "run_dir:   " << runDir);
-    SWIRLY_INFO(logMsg() << "log_file:  " << logFile);
-    SWIRLY_INFO(logMsg() << "log_level: " << getLogLevel());
-    SWIRLY_INFO(logMsg() << "http_port: " << httpPort);
-    SWIRLY_INFO(logMsg() << "http_user: " << httpUser);
+    SWIRLY_INFO(logMsg() << "mem_pool:       " << (memPool.capacity() >> 20) << "MiB");
+    SWIRLY_INFO(logMsg() << "file_mode:      " << setfill('0') << setw(3) << oct
+                         << swirly::fileMode());
+    SWIRLY_INFO(logMsg() << "run_dir:        " << runDir);
+    SWIRLY_INFO(logMsg() << "log_file:       " << logFile);
+    SWIRLY_INFO(logMsg() << "log_level:      " << getLogLevel());
+    SWIRLY_INFO(logMsg() << "http_port:      " << httpPort);
+    SWIRLY_INFO(logMsg() << "http_user:      " << httpUser);
+    SWIRLY_INFO(logMsg() << "journ_capacity: " << journCapacity);
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);

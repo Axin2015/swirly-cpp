@@ -17,15 +17,14 @@
 #ifndef SWIRLY_ELM_JOURN_HPP
 #define SWIRLY_ELM_JOURN_HPP
 
-#include <swirly/elm/Types.hpp>
+#include <swirly/ash/Defs.hpp>
 
-#include <swirly/ash/Array.hpp>
-#include <swirly/ash/Mnem.hpp>
-#include <swirly/ash/Types.hpp>
+#include <memory>
 
 namespace swirly {
 
 class Conf;
+struct Msg;
 
 /**
  * @addtogroup IO
@@ -45,86 +44,10 @@ class SWIRLY_API Journ {
   constexpr Journ(Journ&&) noexcept = default;
   Journ& operator=(Journ&&) noexcept = default;
 
-  /**
-   * Reset multi-part sequence. Must not throw.
-   */
-  void reset() noexcept { doReset(); }
-
-  /**
-   * Create Market.
-   */
-  void createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
-                    MarketState state)
-  {
-    doCreateMarket(mnem, display, contr, settlDay, expiryDay, state);
-  }
-  /**
-   * Update Market.
-   */
-  void updateMarket(Mnem mnem, std::string_view display, MarketState state)
-  {
-    doUpdateMarket(mnem, display, state);
-  }
-  /**
-   * Create Trader.
-   */
-  void createTrader(Mnem mnem, std::string_view display, std::string_view email)
-  {
-    doCreateTrader(mnem, display, email);
-  }
-  /**
-   * Update Trader.
-   */
-  void updateTrader(Mnem mnem, std::string_view display) { doUpdateTrader(mnem, display); }
-  /**
-   * Create Execution.
-   */
-  void createExec(const Exec& exec) { doCreateExec(exec, More::No); }
-  /**
-   * Create Executions. This overload may be less efficient than ones that are market-specific.
-   */
-  void createExec(ArrayView<ConstExecPtr> execs);
-  /**
-   * Archive Order.
-   */
-  void archiveOrder(Mnem market, Iden id, Millis modified)
-  {
-    doArchiveOrder(market, id, modified, More::No);
-  }
-  /**
-   * Archive Orders.
-   */
-  void archiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified);
-  /**
-   * Archive Trade.
-   */
-  void archiveTrade(Mnem market, Iden id, Millis modified)
-  {
-    doArchiveTrade(market, id, modified, More::No);
-  }
-  /**
-   * Archive Trades.
-   */
-  void archiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified);
+  void update(const Msg& msg) { doUpdate(msg); }
 
  protected:
-  virtual void doReset() noexcept = 0;
-
-  virtual void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                              Jday expiryDay, MarketState state)
-    = 0;
-
-  virtual void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state) = 0;
-
-  virtual void doCreateTrader(Mnem mnem, std::string_view display, std::string_view email) = 0;
-
-  virtual void doUpdateTrader(Mnem mnem, std::string_view display) = 0;
-
-  virtual void doCreateExec(const Exec& exec, More more) = 0;
-
-  virtual void doArchiveOrder(Mnem market, Iden id, Millis modified, More more) = 0;
-
-  virtual void doArchiveTrade(Mnem market, Iden id, Millis modified, More more) = 0;
+  virtual void doUpdate(const Msg& msg) = 0;
 };
 
 /**

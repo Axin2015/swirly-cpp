@@ -314,7 +314,7 @@ void Model::doReadPosn(Jday busDay, const Factory& factory, const ModelCallback<
 
 } // sqlite
 
-SWIRLY_API std::unique_ptr<Model> makeModel(const Conf& conf)
+std::unique_ptr<Model> makeModel(const Conf& conf)
 {
   return make_unique<sqlite::Model>(conf);
 }

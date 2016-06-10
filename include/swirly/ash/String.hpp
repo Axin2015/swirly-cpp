@@ -263,6 +263,12 @@ std::string toString(const ValueT& val)
 }
 
 template <std::size_t SizeN>
+std::string_view toStringView(const char (&val)[SizeN]) noexcept
+{
+  return {val, strnlen(val, SizeN)};
+}
+
+template <std::size_t SizeN>
 std::size_t setCString(char (&lhs)[SizeN], const char* rhs) noexcept
 {
   return stpncpy(lhs, rhs, SizeN) - &lhs[0];

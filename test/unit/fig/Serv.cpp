@@ -18,8 +18,8 @@
 
 #include <swirly/fig/TraderSess.hpp>
 
-#include <swirly/fig/Mock.hpp>
 #include <swirly/fig/Response.hpp>
+#include <swirly/fig/Test.hpp>
 
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/Factory.hpp>
@@ -42,7 +42,7 @@ constexpr auto ExpiryDay = Today + 1_jd;
 
 constexpr auto Now = jdToMs(Today);
 
-class SWIRLY_API TestModel : public MockModel {
+class SWIRLY_API TestModel : public swirly::TestModel {
  protected:
   void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const override
   {
@@ -52,8 +52,8 @@ class SWIRLY_API TestModel : public MockModel {
 };
 
 struct Fixture {
-  Fixture() : serv{journ} { serv.load(TestModel{}, Now); }
-  MockJourn journ;
+  Fixture() : serv{journ, 1 << 10} { serv.load(TestModel{}, Now); }
+  TestJourn journ;
   Serv serv;
 };
 

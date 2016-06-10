@@ -46,6 +46,13 @@ int Conf::get(const char* key, int dfl) const noexcept
   return it != map_.end() ? atoi(it->second.c_str()) : dfl;
 }
 
+long Conf::get(const char* key, long dfl) const noexcept
+{
+  auto it = map_.find(key);
+  // The atoi() function does not throw.
+  return it != map_.end() ? atol(it->second.c_str()) : dfl;
+}
+
 bool Conf::get(const char* key, bool dfl) const noexcept
 {
   auto it = map_.find(key);

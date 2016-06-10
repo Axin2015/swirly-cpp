@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/Mock.hpp>
+#include <swirly/fig/Test.hpp>
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
@@ -26,16 +26,16 @@ using namespace std;
 
 namespace swirly {
 
-MockModel::MockModel() noexcept = default;
-MockModel::~MockModel() noexcept = default;
+TestModel::TestModel() noexcept = default;
+TestModel::~TestModel() noexcept = default;
 
-constexpr MockModel::MockModel(const MockModel&) noexcept = default;
-MockModel& MockModel::operator=(const MockModel&) noexcept = default;
+constexpr TestModel::TestModel(const TestModel&) noexcept = default;
+TestModel& TestModel::operator=(const TestModel&) noexcept = default;
 
-constexpr MockModel::MockModel(MockModel&&) noexcept = default;
-MockModel& MockModel::operator=(MockModel&&) noexcept = default;
+constexpr TestModel::TestModel(TestModel&&) noexcept = default;
+TestModel& TestModel::operator=(TestModel&&) noexcept = default;
 
-void MockModel::doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const
+void TestModel::doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const
 {
   // Forex.
   cb(factory.newAsset("CHF"_sv, "Switzerland, Francs"_sv, AssetType::Currency));
@@ -67,7 +67,7 @@ void MockModel::doReadAsset(const Factory& factory, const ModelCallback<AssetPtr
   cb(factory.newAsset("VZ"_sv, "Verizon Com"_sv, AssetType::Corporate));
 }
 
-void MockModel::doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const
+void TestModel::doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const
 {
   // Forex.
   cb(factory.newContr("EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4, 1_lts,
@@ -116,69 +116,40 @@ void MockModel::doReadContr(const Factory& factory, const ModelCallback<ContrPtr
                       10_lts));
 }
 
-void MockModel::doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
+void TestModel::doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
 {
 }
 
-void MockModel::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const
+void TestModel::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const
 {
   cb(factory.newTrader("EDDAYL"_sv, "Eddie Aylett"_sv, "eddie.aylett@swirlycloud.com"_sv));
   cb(factory.newTrader("GOSAYL"_sv, "Goska Aylett"_sv, "goska.aylett@swirlycloud.com"_sv));
   cb(factory.newTrader("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv));
 }
 
-void MockModel::doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
+void TestModel::doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
 {
 }
 
-void MockModel::doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
+void TestModel::doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
 {
 }
 
-void MockModel::doReadPosn(Jday busDay, const Factory& factory,
+void TestModel::doReadPosn(Jday busDay, const Factory& factory,
                            const ModelCallback<PosnPtr>& cb) const
 {
 }
 
-MockJourn::MockJourn() noexcept = default;
-MockJourn::~MockJourn() noexcept = default;
+TestJourn::TestJourn() noexcept = default;
+TestJourn::~TestJourn() noexcept = default;
 
-constexpr MockJourn::MockJourn(const MockJourn&) noexcept = default;
-MockJourn& MockJourn::operator=(const MockJourn&) noexcept = default;
+constexpr TestJourn::TestJourn(const TestJourn&) noexcept = default;
+TestJourn& TestJourn::operator=(const TestJourn&) noexcept = default;
 
-constexpr MockJourn::MockJourn(MockJourn&&) noexcept = default;
-MockJourn& MockJourn::operator=(MockJourn&&) noexcept = default;
+constexpr TestJourn::TestJourn(TestJourn&&) noexcept = default;
+TestJourn& TestJourn::operator=(TestJourn&&) noexcept = default;
 
-void MockJourn::doReset() noexcept
-{
-}
-
-void MockJourn::doCreateMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
-                               Jday expiryDay, MarketState state)
-{
-}
-
-void MockJourn::doUpdateMarket(Mnem mnem, string_view display, MarketState state)
-{
-}
-
-void MockJourn::doCreateTrader(Mnem mnem, string_view display, string_view email)
-{
-}
-
-void MockJourn::doUpdateTrader(Mnem mnem, string_view display)
-{
-}
-
-void MockJourn::doCreateExec(const Exec& exec, More more)
-{
-}
-
-void MockJourn::doArchiveOrder(Mnem market, Iden id, Millis modified, More more)
-{
-}
-
-void MockJourn::doArchiveTrade(Mnem market, Iden id, Millis modified, More more)
+void TestJourn::doUpdate(const Msg& msg)
 {
 }
 
