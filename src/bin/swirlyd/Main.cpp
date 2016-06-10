@@ -15,7 +15,7 @@
  * 02110-1301, USA.
  */
 #include <swirly/fig/MemPool.hpp>
-#include <swirly/fig/Mock.hpp>
+#include <swirly/fig/Test.hpp>
 
 #include "RestServ.hpp"
 
@@ -229,8 +229,8 @@ int main(int argc, char* argv[])
       model = swirly::makeModel(conf);
     } else {
       // Use Mock classes for functional testing.
-      journ = make_unique<MockJourn>();
-      model = make_unique<MockModel>();
+      journ = make_unique<TestJourn>();
+      model = make_unique<TestModel>();
     }
     const char* const httpPort{conf.get("http_port", "8080")};
     const char* const httpUser{conf.get("http_user", "Swirly-User")};

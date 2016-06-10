@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIG_MOCK_HPP
-#define SWIRLY_FIG_MOCK_HPP
+#ifndef SWIRLY_FIG_TEST_HPP
+#define SWIRLY_FIG_TEST_HPP
 
 #include <swirly/elm/Journ.hpp>
 #include <swirly/elm/Model.hpp>
@@ -27,18 +27,18 @@ namespace swirly {
  * @{
  */
 
-class SWIRLY_API MockModel : public Model {
+class SWIRLY_API TestModel : public Model {
  public:
-  MockModel() noexcept;
-  ~MockModel() noexcept override;
+  TestModel() noexcept;
+  ~TestModel() noexcept override;
 
   // Copy.
-  constexpr MockModel(const MockModel&) noexcept;
-  MockModel& operator=(const MockModel&) noexcept;
+  constexpr TestModel(const TestModel&) noexcept;
+  TestModel& operator=(const TestModel&) noexcept;
 
   // Move.
-  constexpr MockModel(MockModel&&) noexcept;
-  MockModel& operator=(MockModel&&) noexcept;
+  constexpr TestModel(TestModel&&) noexcept;
+  TestModel& operator=(TestModel&&) noexcept;
 
  protected:
   void doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const override;
@@ -57,18 +57,18 @@ class SWIRLY_API MockModel : public Model {
                   const ModelCallback<PosnPtr>& cb) const override;
 };
 
-class SWIRLY_API MockJourn : public Journ {
+class SWIRLY_API TestJourn : public Journ {
  public:
-  MockJourn() noexcept;
-  ~MockJourn() noexcept override;
+  TestJourn() noexcept;
+  ~TestJourn() noexcept override;
 
   // Copy.
-  constexpr MockJourn(const MockJourn&) noexcept;
-  MockJourn& operator=(const MockJourn&) noexcept;
+  constexpr TestJourn(const TestJourn&) noexcept;
+  TestJourn& operator=(const TestJourn&) noexcept;
 
   // Move.
-  constexpr MockJourn(MockJourn&&) noexcept;
-  MockJourn& operator=(MockJourn&&) noexcept;
+  constexpr TestJourn(TestJourn&&) noexcept;
+  TestJourn& operator=(TestJourn&&) noexcept;
 
  protected:
   void doUpdate(const Msg& msg) override;
@@ -78,4 +78,4 @@ class SWIRLY_API MockJourn : public Journ {
 
 } // swirly
 
-#endif // SWIRLY_FIG_MOCK_HPP
+#endif // SWIRLY_FIG_TEST_HPP
