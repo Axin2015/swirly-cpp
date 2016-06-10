@@ -32,7 +32,7 @@ class Journ;
 
 class SWIRLY_API AsyncJourn {
  public:
-  explicit AsyncJourn(Journ& journ, std::size_t capacity = 1 << 10);
+  AsyncJourn(Journ& journ, std::size_t capacity);
   ~AsyncJourn() noexcept;
 
   // Copy.

@@ -59,7 +59,7 @@ struct Serv::Impl {
   using MarketBookPtr = unique_ptr<MarketBook, default_delete<Market>>;
   using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
 
-  explicit Impl(Journ& journ) noexcept : journ{journ} {}
+  Impl(Journ& journ, size_t capacity) noexcept : journ{journ, capacity} {}
   MarketBookPtr newMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
                           MarketState state) const
   {
@@ -204,7 +204,7 @@ struct Serv::Impl {
   vector<Match> matches;
 };
 
-Serv::Serv(Journ& journ) : impl_{make_unique<Impl>(journ)}
+Serv::Serv(Journ& journ, size_t capacity) : impl_{make_unique<Impl>(journ, capacity)}
 {
 }
 

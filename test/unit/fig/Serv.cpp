@@ -52,7 +52,7 @@ class SWIRLY_API TestModel : public swirly::TestModel {
 };
 
 struct Fixture {
-  Fixture() : serv{journ} { serv.load(TestModel{}, Now); }
+  Fixture() : serv{journ, 1 << 10} { serv.load(TestModel{}, Now); }
   TestJourn journ;
   Serv serv;
 };

@@ -30,7 +30,7 @@ namespace swirly {
 
 class SWIRLY_API Rest {
  public:
-  explicit Rest(Journ& journ) : serv_{journ} {}
+  Rest(Journ& journ, size_t capacity) : serv_{journ, capacity} {}
   ~Rest() noexcept;
 
   // Copy.
