@@ -23,7 +23,7 @@
 namespace swirly {
 
 /**
- * @addtogroup IO
+ * @addtogroup Test
  * @{
  */
 
