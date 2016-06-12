@@ -13,25 +13,25 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(RAGEL_EXECUTABLE)
-  ADD_CUSTOM_COMMAND(
+if(RAGEL_EXECUTABLE)
+  add_custom_command(
     OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.cpp"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMAND "${RAGEL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.rl"
             -o "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.cpp"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.rl")
-ENDIF(RAGEL_EXECUTABLE)
+endif(RAGEL_EXECUTABLE)
 
-FILE(GLOB fir_SOURCES "*.cpp")
+file(GLOB fir_SOURCES "*.cpp")
 
-ADD_LIBRARY(fir_static STATIC ${fir_SOURCES})
-SET_TARGET_PROPERTIES(fir_static PROPERTIES OUTPUT_NAME swirly_fir)
-TARGET_LINK_LIBRARIES(fir_static fig_static)
-INSTALL(TARGETS fir_static DESTINATION lib)
+add_library(fir_static STATIC ${fir_SOURCES})
+set_target_properties(fir_static PROPERTIES OUTPUT_NAME swirly_fir)
+target_link_libraries(fir_static fig_static)
+install(TARGETS fir_static DESTINATION lib)
 
-IF(ENABLE_SHARED_LIBS)
-  ADD_LIBRARY(fir_shared SHARED ${fir_SOURCES})
-  SET_TARGET_PROPERTIES(fir_shared PROPERTIES OUTPUT_NAME swirly_fir)
-  TARGET_LINK_LIBRARIES(fir_shared fig_shared)
-  INSTALL(TARGETS fir_shared DESTINATION lib)
-ENDIF()
+if(ENABLE_SHARED_LIBS)
+  add_library(fir_shared SHARED ${fir_SOURCES})
+  set_target_properties(fir_shared PROPERTIES OUTPUT_NAME swirly_fir)
+  target_link_libraries(fir_shared fig_shared)
+  install(TARGETS fir_shared DESTINATION lib)
+endif()

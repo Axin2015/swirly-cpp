@@ -13,11 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/lib/fig")
+include_directories("${PROJECT_SOURCE_DIR}/src/lib/fig")
 
-FILE(GLOB fig_test_SOURCES "*.cpp")
+file(GLOB fig_test_SOURCES "*.cpp")
 
-ADD_EXECUTABLE(swirly_fig_test ${fig_test_SOURCES})
-TARGET_LINK_LIBRARIES(swirly_fig_test ${tea_LIBRARY} ${fig_LIBRARY})
+add_executable(swirly_fig_test ${fig_test_SOURCES})
+target_link_libraries(swirly_fig_test ${tea_LIBRARY} ${fig_LIBRARY})
 
-ADD_TEST(NAME fig_test COMMAND swirly_fig_test)
+add_test(NAME fig_test COMMAND swirly_fig_test)

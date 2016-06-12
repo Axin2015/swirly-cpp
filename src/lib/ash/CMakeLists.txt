@@ -13,16 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-FILE(GLOB ash_SOURCES "*.cpp")
+file(GLOB ash_SOURCES "*.cpp")
 
-ADD_LIBRARY(ash_static STATIC ${ash_SOURCES})
-SET_TARGET_PROPERTIES(ash_static PROPERTIES OUTPUT_NAME swirly_ash)
-TARGET_LINK_LIBRARIES(ash_static pthread)
-INSTALL(TARGETS ash_static DESTINATION lib)
+add_library(ash_static STATIC ${ash_SOURCES})
+set_target_properties(ash_static PROPERTIES OUTPUT_NAME swirly_ash)
+target_link_libraries(ash_static pthread)
+install(TARGETS ash_static DESTINATION lib)
 
-IF(ENABLE_SHARED_LIBS)
-  ADD_LIBRARY(ash_shared SHARED ${ash_SOURCES})
-  SET_TARGET_PROPERTIES(ash_shared PROPERTIES OUTPUT_NAME swirly_ash)
-  TARGET_LINK_LIBRARIES(ash_shared pthread)
-  INSTALL(TARGETS ash_shared DESTINATION lib)
-ENDIF()
+if(ENABLE_SHARED_LIBS)
+  add_library(ash_shared SHARED ${ash_SOURCES})
+  set_target_properties(ash_shared PROPERTIES OUTPUT_NAME swirly_ash)
+  target_link_libraries(ash_shared pthread)
+  install(TARGETS ash_shared DESTINATION lib)
+endif()

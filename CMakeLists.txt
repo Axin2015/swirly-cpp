@@ -13,116 +13,116 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
-PROJECT(swirlyc)
+cmake_minimum_required(VERSION 3.0)
+project(swirlyc)
 
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
-SET(CMAKE_VERBOSE_MAKEFILE 1)
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
+set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # Configuration options:
-SET(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
-SET(MG_ENABLE_DEBUG    OFF CACHE BOOL   "Enable Mongoose debug.")
-SET(SWIRLY_DEPTH       3   CACHE STRING "Depth of book.")
+set(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
+set(MG_ENABLE_DEBUG    OFF CACHE BOOL   "Enable Mongoose debug.")
+set(SWIRLY_DEPTH       3   CACHE STRING "Depth of book.")
 
-IF(NOT CMAKE_BUILD_TYPE)
-  #SET(CMAKE_BUILD_TYPE DEBUG)
-  #SET(CMAKE_BUILD_TYPE RELEASE)
-  SET(CMAKE_BUILD_TYPE RELWITHDEBINFO)
-  #SET(CMAKE_BUILD_TYPE MINSIZEREL)
-ENDIF()
+if(NOT CMAKE_BUILD_TYPE)
+  #set(CMAKE_BUILD_TYPE DEBUG)
+  #set(CMAKE_BUILD_TYPE RELEASE)
+  set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
+  #set(CMAKE_BUILD_TYPE MINSIZEREL)
+endif()
 
 # Enable for use with clang-tidy.
-IF(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
-  SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-ENDIF()
+if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+  set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+endif()
 
-STRING(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
+string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE)
 
-SET(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
-SET(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
+set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter -Wno-unused-variable")
+set(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
 
-IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt -fno-rtti")
-ELSEIF("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
-ENDIF()
-SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-enforce-eh-specs -fnothrow-opt -fno-rtti")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${COMMON_FLAGS} ${COMMON_WARN}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
+endif()
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
-ADD_DEFINITIONS(-DSWIRLY_DEPTH=${SWIRLY_DEPTH})
+add_definitions(-DSWIRLY_DEPTH=${SWIRLY_DEPTH})
 
-ADD_DEFINITIONS(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
-IF(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-  ADD_DEFINITIONS(-DSWIRLY_ENABLE_DEBUG=1)
-ENDIF()
+add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
+if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+  add_definitions(-DSWIRLY_ENABLE_DEBUG=1)
+endif()
 
-SET(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-SET(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
+set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
+set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
 
-FILE(MAKE_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
-FILE(MAKE_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
-FILE(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/html")
+file(MAKE_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
+file(MAKE_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/html")
 
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
 
-FIND_PROGRAM(DOT_EXECUTABLE dot)
-FIND_PROGRAM(ENV_EXECUTABLE env)
-FIND_PROGRAM(RAGEL_EXECUTABLE ragel)
+find_program(DOT_EXECUTABLE dot)
+find_program(ENV_EXECUTABLE env)
+find_program(RAGEL_EXECUTABLE ragel)
 
-FIND_PACKAGE(Boost   1.55  REQUIRED COMPONENTS date_time filesystem system)
+find_package(Boost   1.55  REQUIRED COMPONENTS date_time filesystem system)
 # The sqlite3_errstr() function was added in 3.7.15.
-FIND_PACKAGE(SQLite3 3.7.15 REQUIRED)
+find_package(SQLite3 3.7.15 REQUIRED)
 
-FIND_PACKAGE(Doxygen)                # Optional.
-FIND_PACKAGE(Perl)                   # Optional.
-FIND_PACKAGE(PythonInterp 2.7 EXACT) # Optional.
+find_package(Doxygen)                # Optional.
+find_package(Perl)                   # Optional.
+find_package(PythonInterp 2.7 EXACT) # Optional.
 
-IF(DOXYGEN_FOUND)
+if(DOXYGEN_FOUND)
 
-  CONFIGURE_FILE("${PROJECT_SOURCE_DIR}/Doxyfile.in"
+  configure_file("${PROJECT_SOURCE_DIR}/Doxyfile.in"
     "${PROJECT_BINARY_DIR}/Doxyfile")
 
-  ADD_CUSTOM_TARGET(doc
+  add_custom_target(doc
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     COMMAND "${CMAKE_COMMAND}" -E make_directory "${PROJECT_BINARY_DIR}/share"
     COMMAND "${DOXYGEN_EXECUTABLE}" "${PROJECT_BINARY_DIR}/Doxyfile"
     SOURCES "${PROJECT_BINARY_DIR}/Doxyfile")
 
-  ADD_CUSTOM_COMMAND(TARGET doc POST_BUILD
+  add_custom_command(TARGET doc POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy "${PROJECT_SOURCE_DIR}/CNAME"
             "${PROJECT_BINARY_DIR}/share/doc/html/")
-  ADD_DEPENDENCIES(doc image)
+  add_dependencies(doc image)
 
-  INSTALL(DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/" DESTINATION share/doc)
-ENDIF()
+  install(DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/" DESTINATION share/doc)
+endif()
 
-INCLUDE_DIRECTORIES("${Boost_INCLUDE_DIRS}")
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/contrib")
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/include")
+include_directories("${Boost_INCLUDE_DIRS}")
+include_directories("${PROJECT_SOURCE_DIR}/contrib")
+include_directories("${PROJECT_SOURCE_DIR}/include")
 
-IF(ENABLE_SHARED_LIBS)
-  SET(ash_LIBRARY ash_shared)
-  SET(elm_LIBRARY elm_shared)
-  SET(fig_LIBRARY fig_shared)
-  SET(fir_LIBRARY fir_shared)
-  SET(tea_LIBRARY tea_shared)
-  SET(sqlite_LIBRARY sqlite_shared)
-ELSE()
-  SET(ash_LIBRARY ash_static)
-  SET(elm_LIBRARY elm_static)
-  SET(fig_LIBRARY fig_static)
-  SET(fir_LIBRARY fir_static)
-  SET(tea_LIBRARY tea_static)
-  SET(sqlite_LIBRARY sqlite_static)
-ENDIF()
+if(ENABLE_SHARED_LIBS)
+  set(ash_LIBRARY ash_shared)
+  set(elm_LIBRARY elm_shared)
+  set(fig_LIBRARY fig_shared)
+  set(fir_LIBRARY fir_shared)
+  set(tea_LIBRARY tea_shared)
+  set(sqlite_LIBRARY sqlite_shared)
+else()
+  set(ash_LIBRARY ash_static)
+  set(elm_LIBRARY elm_static)
+  set(fig_LIBRARY fig_static)
+  set(fir_LIBRARY fir_static)
+  set(tea_LIBRARY tea_static)
+  set(sqlite_LIBRARY sqlite_static)
+endif()
 
-ENABLE_TESTING()
+enable_testing()
 
-ADD_SUBDIRECTORY(db)
-ADD_SUBDIRECTORY(etc)
-ADD_SUBDIRECTORY(image)
-ADD_SUBDIRECTORY(include)
-ADD_SUBDIRECTORY(src)
+add_subdirectory(db)
+add_subdirectory(etc)
+add_subdirectory(image)
+add_subdirectory(include)
+add_subdirectory(src)
 
-ADD_SUBDIRECTORY(test)
+add_subdirectory(test)

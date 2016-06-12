@@ -13,10 +13,10 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-IF(PYTHONINTERP_FOUND)
+if(PYTHONINTERP_FOUND)
 
-  ADD_CUSTOM_TARGET(swift
+  add_custom_target(swift
     COMMAND "${ENV_EXECUTABLE}" "SWIRLYD_EXECUTABLE=\"${EXECUTABLE_OUTPUT_PATH}/swirlyd\""
             "${PYTHON_EXECUTABLE}" -m unittest discover -s "${CMAKE_CURRENT_SOURCE_DIR}" -v
     DEPENDS swirlyd)
-ENDIF()
+endif()

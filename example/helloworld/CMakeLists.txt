@@ -13,24 +13,24 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
-PROJECT(helloworld)
+cmake_minimum_required(VERSION 3.0)
+project(helloworld)
 
-IF(DEFINED ENV{SWIRLY_HOME})
-  MESSAGE("SWIRLY_HOME is set to $ENV{SWIRLY_HOME}")
-ELSE()
-  MESSAGE(FATAL_ERROR "SWIRLY_HOME is not set")
-ENDIF()
+if(DEFINED ENV{SWIRLY_HOME})
+  message("SWIRLY_HOME is set to $ENV{SWIRLY_HOME}")
+else()
+  message(FATAL_ERROR "SWIRLY_HOME is not set")
+endif()
 
-SET(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter")
-SET(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
-SET(CMAKE_CXX_FLAGS "-std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
+set(COMMON_WARN "-Wall -Werror -Wextra -Wstrict-aliasing=2 -Wno-unused-parameter")
+set(COMMON_FLAGS "-fstrict-aliasing -fvisibility=hidden")
+set(CMAKE_CXX_FLAGS "-std=c++14 ${COMMON_FLAGS} ${COMMON_WARN} -fno-rtti")
 
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "$ENV{SWIRLY_HOME}/etc")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "$ENV{SWIRLY_HOME}/etc")
 
-FIND_PACKAGE(Swirly REQUIRED)
+find_package(Swirly REQUIRED)
 
-INCLUDE_DIRECTORIES(${SWIRLY_INCLUDE_DIRS})
+include_directories(${SWIRLY_INCLUDE_DIRS})
 
-ADD_EXECUTABLE(helloworld Main.cpp)
-TARGET_LINK_LIBRARIES(helloworld ${SWIRLY_ASH_LIBRARY})
+add_executable(helloworld Main.cpp)
+target_link_libraries(helloworld ${SWIRLY_ASH_LIBRARY})

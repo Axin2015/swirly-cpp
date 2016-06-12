@@ -13,16 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-FILE(GLOB elm_SOURCES "*.cpp")
+file(GLOB elm_SOURCES "*.cpp")
 
-ADD_LIBRARY(elm_static STATIC ${elm_SOURCES})
-SET_TARGET_PROPERTIES(elm_static PROPERTIES OUTPUT_NAME swirly_elm)
-TARGET_LINK_LIBRARIES(elm_static ash_static)
-INSTALL(TARGETS elm_static DESTINATION lib)
+add_library(elm_static STATIC ${elm_SOURCES})
+set_target_properties(elm_static PROPERTIES OUTPUT_NAME swirly_elm)
+target_link_libraries(elm_static ash_static)
+install(TARGETS elm_static DESTINATION lib)
 
-IF(ENABLE_SHARED_LIBS)
-  ADD_LIBRARY(elm_shared SHARED ${elm_SOURCES})
-  SET_TARGET_PROPERTIES(elm_shared PROPERTIES OUTPUT_NAME swirly_elm)
-  TARGET_LINK_LIBRARIES(elm_shared ash_shared)
-  INSTALL(TARGETS elm_shared DESTINATION lib)
-ENDIF()
+if(ENABLE_SHARED_LIBS)
+  add_library(elm_shared SHARED ${elm_SOURCES})
+  set_target_properties(elm_shared PROPERTIES OUTPUT_NAME swirly_elm)
+  target_link_libraries(elm_shared ash_shared)
+  install(TARGETS elm_shared DESTINATION lib)
+endif()
