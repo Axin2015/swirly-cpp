@@ -13,5 +13,5 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-ADD_SUBDIRECTORY(swirlyd)
-ADD_SUBDIRECTORY(tool)
+add_subdirectory(swirlyd)
+add_subdirectory(tool)

@@ -13,16 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-FILE(GLOB fig_SOURCES "*.cpp")
+file(GLOB fig_SOURCES "*.cpp")
 
-ADD_LIBRARY(fig_static STATIC ${fig_SOURCES})
-SET_TARGET_PROPERTIES(fig_static PROPERTIES OUTPUT_NAME swirly_fig)
-TARGET_LINK_LIBRARIES(fig_static elm_static)
-INSTALL(TARGETS fig_static DESTINATION lib)
+add_library(fig_static STATIC ${fig_SOURCES})
+set_target_properties(fig_static PROPERTIES OUTPUT_NAME swirly_fig)
+target_link_libraries(fig_static elm_static)
+install(TARGETS fig_static DESTINATION lib)
 
-IF(ENABLE_SHARED_LIBS)
-  ADD_LIBRARY(fig_shared SHARED ${fig_SOURCES})
-  SET_TARGET_PROPERTIES(fig_shared PROPERTIES OUTPUT_NAME swirly_fig)
-  TARGET_LINK_LIBRARIES(fig_shared elm_shared)
-  INSTALL(TARGETS fig_shared DESTINATION lib)
-ENDIF()
+if(ENABLE_SHARED_LIBS)
+  add_library(fig_shared SHARED ${fig_SOURCES})
+  set_target_properties(fig_shared PROPERTIES OUTPUT_NAME swirly_fig)
+  target_link_libraries(fig_shared elm_shared)
+  install(TARGETS fig_shared DESTINATION lib)
+endif()

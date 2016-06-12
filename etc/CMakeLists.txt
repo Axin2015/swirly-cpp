@@ -13,10 +13,10 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-SET(etc_FILES
+set(etc_FILES
   FindSQLite3.cmake
   FindSwirly.cmake
   swirlyd.conf
 )
 
-INSTALL(FILES ${etc_FILES} DESTINATION etc)
+install(FILES ${etc_FILES} DESTINATION etc)

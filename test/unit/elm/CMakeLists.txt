@@ -13,11 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-INCLUDE_DIRECTORIES("${PROJECT_SOURCE_DIR}/src/elm")
+include_directories("${PROJECT_SOURCE_DIR}/src/elm")
 
-FILE(GLOB elm_test_SOURCES "*.cpp")
+file(GLOB elm_test_SOURCES "*.cpp")
 
-ADD_EXECUTABLE(swirly_elm_test ${elm_test_SOURCES})
-TARGET_LINK_LIBRARIES(swirly_elm_test ${tea_LIBRARY} ${elm_LIBRARY})
+add_executable(swirly_elm_test ${elm_test_SOURCES})
+target_link_libraries(swirly_elm_test ${tea_LIBRARY} ${elm_LIBRARY})
 
-ADD_TEST(NAME elm_test COMMAND swirly_elm_test)
+add_test(NAME elm_test COMMAND swirly_elm_test)

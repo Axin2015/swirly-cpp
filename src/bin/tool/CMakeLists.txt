@@ -13,16 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-SET(bin_FILES
+set(bin_FILES
   swirly_shell
 )
 
-INSTALL(PROGRAMS ${bin_FILES} DESTINATION bin)
+install(PROGRAMS ${bin_FILES} DESTINATION bin)
 
-ADD_EXECUTABLE(swirly_bench Bench.cpp)
-TARGET_LINK_LIBRARIES(swirly_bench ${fig_LIBRARY} ${sqlite_LIBRARY})
-INSTALL(TARGETS swirly_bench DESTINATION bin)
+add_executable(swirly_bench Bench.cpp)
+target_link_libraries(swirly_bench ${fig_LIBRARY} ${sqlite_LIBRARY})
+install(TARGETS swirly_bench DESTINATION bin)
 
-ADD_EXECUTABLE(swirly_dump Dump.cpp)
-TARGET_LINK_LIBRARIES(swirly_dump ${sqlite_LIBRARY})
-INSTALL(TARGETS swirly_dump DESTINATION bin)
+add_executable(swirly_dump Dump.cpp)
+target_link_libraries(swirly_dump ${sqlite_LIBRARY})
+install(TARGETS swirly_dump DESTINATION bin)

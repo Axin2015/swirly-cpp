@@ -13,26 +13,26 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-INCLUDE(AddFileDependencies)
+include(AddFileDependencies)
 
-SET(outfiles)
-IF(DOT_EXECUTABLE)
+set(outfiles)
+if(DOT_EXECUTABLE)
 
-  MESSAGE(STATUS "Dot found: ${DOT_EXECUTABLE}")
+  message(STATUS "Dot found: ${DOT_EXECUTABLE}")
 
-  SET(names
+  set(names
     Ash
     Elm
     Fig
     Fir
   )
 
-  FOREACH(name ${names})
+  foreach(name ${names})
 
-    SET(outfile "${PROJECT_BINARY_DIR}/image/${name}Depend.png")
+    set(outfile "${PROJECT_BINARY_DIR}/image/${name}Depend.png")
 
-    STRING(TOLOWER ${name} lname)
-    ADD_CUSTOM_COMMAND(
+    string(TOLOWER ${name} lname)
+    add_custom_command(
       OUTPUT "${outfile}"
       WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
       COMMAND CXX="${CMAKE_CXX_COMPILER}" "${PERL}" etc/dotdepend.pl ${lname}
@@ -40,9 +40,9 @@ IF(DOT_EXECUTABLE)
       DEPENDS "${PROJECT_SOURCE_DIR}/etc/dotdepend.pl"
               ${lname}_static)
 
-    SET(outfiles ${outfiles} "${outfile}")
-  ENDFOREACH()
+    set(outfiles ${outfiles} "${outfile}")
+  endforeach()
 
-ENDIF()
+endif()
 
-ADD_CUSTOM_TARGET(image ALL DEPENDS ${outfiles})
+add_custom_target(image ALL DEPENDS ${outfiles})

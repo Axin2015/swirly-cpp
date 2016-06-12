@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-INSTALL(DIRECTORY "${PROJECT_SOURCE_DIR}/include/swirly/"
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/swirly/"
                   DESTINATION include/swirly
                   FILES_MATCHING
                   PATTERN "*.h"

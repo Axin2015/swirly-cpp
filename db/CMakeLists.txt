@@ -13,25 +13,25 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-INCLUDE(AddFileDependencies)
+include(AddFileDependencies)
 
-SET(dbfiles)
-IF(SQLITE3_EXECUTABLE)
+set(dbfiles)
+if(SQLITE3_EXECUTABLE)
 
-  MESSAGE(STATUS "Sqlite3 found: ${SQLITE3_EXECUTABLE}")
+  message(STATUS "Sqlite3 found: ${SQLITE3_EXECUTABLE}")
 
-  SET(names
+  set(names
     coal
     coffee
     corp
     forex
   )
 
-  FOREACH(name ${names})
+  foreach(name ${names})
 
-    SET(dbfile "${PROJECT_BINARY_DIR}/db/${name}.db")
+    set(dbfile "${PROJECT_BINARY_DIR}/db/${name}.db")
 
-    ADD_CUSTOM_COMMAND(
+    add_custom_command(
       OUTPUT "${dbfile}"
       WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       COMMAND ${CMAKE_COMMAND} -E remove "${dbfile}"
@@ -39,13 +39,13 @@ IF(SQLITE3_EXECUTABLE)
       COMMAND "${SQLITE3_EXECUTABLE}" "${dbfile}" <${name}.sql
       DEPENDS schema.sql ${name}.sql)
 
-    SET(dbfiles ${dbfiles} "${dbfile}")
-  ENDFOREACH()
+    set(dbfiles ${dbfiles} "${dbfile}")
+  endforeach()
 
-ENDIF()
+endif()
 
-ADD_CUSTOM_TARGET(db ALL DEPENDS ${dbfiles})
+add_custom_target(db ALL DEPENDS ${dbfiles})
 
-FILE(GLOB sqlfiles "*.sql")
-INSTALL(FILES ${sqlfiles}  DESTINATION db)
-INSTALL(FILES ${dbfiles} DESTINATION db)
+file(GLOB sqlfiles "*.sql")
+install(FILES ${sqlfiles}  DESTINATION db)
+install(FILES ${dbfiles} DESTINATION db)

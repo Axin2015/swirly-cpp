@@ -20,6 +20,8 @@ from collections import Counter
 
 import httplib
 import json
+import os
+import shlex
 
 def columnLens(rows):
   lens = Counter()
@@ -55,7 +57,9 @@ class Shell(Cmd):
   def __init__(self, host, port):
     Cmd.__init__(self)
     self.conn = httplib.HTTPConnection(host, port)
-    self.user = None
+    self.env = {
+      'USER': os.environ['USER']
+    }
 
   def __enter__(self):
     return self
@@ -66,9 +70,6 @@ class Shell(Cmd):
   def close(self):
     self.conn.close()
 
-  def setUser(self, user):
-    self.user = user
-
   def send(self, method, uri, **kwargs):
     content = ''
     if kwargs is not None:
@@ -76,8 +77,8 @@ class Shell(Cmd):
     conn = self.conn
     conn.putrequest(method, uri)
     conn.putheader('Accept', 'application/json')
-    if self.user is not None:
-      conn.putheader('Swirly-User', self.user)
+    if 'USER' in self.env:
+      conn.putheader('Swirly-User', self.env['USER'])
     conn.putheader('Content-Length', len(content))
     conn.putheader('Content-Type', 'application/json')
     conn.endheaders()
@@ -134,9 +135,112 @@ class Shell(Cmd):
     )
     printTable(cols, rows, fmt)
 
+  def do_env(self, args):
+    """Print environment."""
+    cols = [
+      'name',
+      'value'
+    ]
+    rows = [{'name': k, 'value': v} for k, v in self.env.iteritems()]
+    fmt = (
+      '|{name:<{nameLen}}'
+      '|{value:<{valueLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_market(self, args):
+    """Print markets."""
+    resp = self.send('GET', '/api/rec/market')
+    cols = [
+      'mnem',
+      'display',
+      'contr',
+      'settlDate',
+      'expiryDate',
+      'state'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{mnem:<{mnemLen}}'
+      '|{display:<{displayLen}}'
+      '|{contr:<{contrLen}}'
+      '|{settlDate:<{settlDateLen}}'
+      '|{expiryDate:<{expiryDateLen}}'
+      '|{state:>{stateLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_submit(self, args):
+    """Submit order."""
+    try:
+      market, side, lots, ticks = shlex.split(args)
+      resp = self.send('POST', '/api/sess/order/' + market,
+                       side = side,
+                       lots = int(lots),
+                       ticks = int(ticks))
+      row = resp.content
+      print row
+    except Exception as e:
+      print "error: {}: {}".format(type(e).__name__, e)
+
+  def do_view(self, args):
+    """Print view."""
+    resp = self.send('GET', '/api/view')
+    cols = [
+      'market',
+      'contr',
+      'settlDate',
+      'lastLots',
+      'lastTicks',
+      'lastTime',
+      'bidTicks',
+      'bidResd',
+      'bidCount',
+      'offerTicks',
+      'offerResd',
+      'offerCount'
+    ]
+    rows = resp.content
+    fn = lambda x: x[0] if isinstance(x, list) else x
+    rows = [{k: fn(v) for k, v in row.iteritems()} for row in rows]
+    fmt = (
+      '|{market:<{marketLen}}'
+      '|{contr:<{contrLen}}'
+      '|{settlDate:<{settlDateLen}}'
+      '|{lastLots:>{lastLotsLen}}'
+      '|{lastTicks:>{lastTicksLen}}'
+      '|{lastTime:<{lastTimeLen}}'
+      '|{bidTicks:>{bidTicksLen}}'
+      '|{bidResd:>{bidResdLen}}'
+      '|{bidCount:>{bidCountLen}}'
+      '|{offerTicks:>{offerTicksLen}}'
+      '|{offerResd:>{offerResdLen}}'
+      '|{offerCount:>{offerCountLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
   def do_quit(self, args):
     """Quit the shell."""
     raise SystemExit
+
+  def do_set(self, args):
+    """Set variable."""
+    try:
+      name, value = shlex.split(args)
+      self.env[name.upper()] = value
+    except Exception as e:
+      print "error: {}: {}".format(type(e).__name__, e)
+
+  def do_unset(self, args):
+    """Unset variable."""
+    try:
+      name, = shlex.split(args)
+      del self.env[name.upper()]
+    except Exception as e:
+      print "error: {}: {}".format(type(e).__name__, e)
 
 if __name__ == '__main__':
   with Shell('localhost', 8080) as shell:

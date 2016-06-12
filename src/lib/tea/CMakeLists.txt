@@ -13,16 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-FILE(GLOB tea_SOURCES "*.cpp")
+file(GLOB tea_SOURCES "*.cpp")
 
-ADD_LIBRARY(tea_static STATIC ${tea_SOURCES})
-SET_TARGET_PROPERTIES(tea_static PROPERTIES OUTPUT_NAME swirly_tea)
-TARGET_LINK_LIBRARIES(tea_static)
-INSTALL(TARGETS tea_static DESTINATION lib)
+add_library(tea_static STATIC ${tea_SOURCES})
+set_target_properties(tea_static PROPERTIES OUTPUT_NAME swirly_tea)
+target_link_libraries(tea_static)
+install(TARGETS tea_static DESTINATION lib)
 
-IF(ENABLE_SHARED_LIBS)
-  ADD_LIBRARY(tea_shared SHARED ${tea_SOURCES})
-  SET_TARGET_PROPERTIES(tea_shared PROPERTIES OUTPUT_NAME swirly_tea)
-  TARGET_LINK_LIBRARIES(tea_shared)
-  INSTALL(TARGETS tea_shared DESTINATION lib)
-ENDIF()
+if(ENABLE_SHARED_LIBS)
+  add_library(tea_shared SHARED ${tea_SOURCES})
+  set_target_properties(tea_shared PROPERTIES OUTPUT_NAME swirly_tea)
+  target_link_libraries(tea_shared)
+  install(TARGETS tea_shared DESTINATION lib)
+endif()
