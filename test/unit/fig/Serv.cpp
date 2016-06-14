@@ -51,15 +51,15 @@ class SWIRLY_API TestModel : public swirly::TestModel {
   }
 };
 
-struct Fixture {
-  Fixture() : serv{journ, 1 << 10} { serv.load(TestModel{}, Now); }
+struct ServFixture {
+  ServFixture() : serv{journ, 1 << 10} { serv.load(TestModel{}, Now); }
   TestJourn journ;
   Serv serv;
 };
 
 } // anonymous
 
-SWIRLY_FIXTURE_TEST_CASE(ServAssets, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
 {
   SWIRLY_CHECK(distance(serv.assets().begin(), serv.assets().end()) == 24);
 
@@ -71,7 +71,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServAssets, Fixture)
   SWIRLY_CHECK(it->assetType() == AssetType::Currency);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServContrs, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServContrs, ServFixture)
 {
   SWIRLY_CHECK(distance(serv.contrs().begin(), serv.contrs().end()) == 21);
 
@@ -94,7 +94,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServContrs, Fixture)
   SWIRLY_CHECK(it->maxLots() == 10_lts);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServMarkets, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
 {
   SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 1);
 
@@ -109,7 +109,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarkets, Fixture)
   SWIRLY_CHECK(it->state() == 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServTraders, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServTraders, ServFixture)
 {
   SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 3);
 
@@ -121,7 +121,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServTraders, Fixture)
   SWIRLY_CHECK(it->email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServMarket, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServMarket, ServFixture)
 {
   // Not found.
   SWIRLY_CHECK_THROW(serv.market("EURUSD.MAR14x"_sv), MarketNotFoundException);
@@ -136,7 +136,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarket, Fixture)
   SWIRLY_CHECK(book.state() == 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServTrader, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServTrader, ServFixture)
 {
   // Not found.
   SWIRLY_CHECK_THROW(serv.trader("MARAYLx"_sv), TraderNotFoundException);
@@ -148,7 +148,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServTrader, Fixture)
   SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServFindTraderByEmail, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServFindTraderByEmail, ServFixture)
 {
   // Not found.
   SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@swirlycloud.comx"_sv) == nullptr);
@@ -161,7 +161,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServFindTraderByEmail, Fixture)
   SWIRLY_CHECK(sess->email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 {
   // Contr does not exist.
   SWIRLY_CHECK_THROW(serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPYx"_sv,
@@ -215,7 +215,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, Fixture)
                      AlreadyExistsException);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 {
   auto& orig
     = serv.createMarket("USDJPY.MAR14"_sv, "first"_sv, "USDJPY"_sv, SettlDay, ExpiryDay, 0x1, Now);
@@ -271,7 +271,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, Fixture)
   }
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, ServFixture)
 {
   // Mnemonic too short.
   SWIRLY_CHECK_THROW(
@@ -309,7 +309,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, Fixture)
     AlreadyExistsException);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, ServFixture)
 {
   auto& orig
     = serv.createTrader("PIPAYL"_sv, "Pippin Aylettx"_sv, "pippin.aylett@swirlycloud.com"_sv, Now);
@@ -328,7 +328,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, Fixture)
   SWIRLY_CHECK(&*it == &sess);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, Fixture)
+SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
   auto& sess = serv.trader("MARAYL"_sv);
   auto& book = serv.market("EURUSD.MAR14"_sv);

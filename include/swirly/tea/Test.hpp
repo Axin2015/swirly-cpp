@@ -114,15 +114,15 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
   void test##name()
 
 #define SWIRLY_FIXTURE_TEST_CASE(name, FixtureT)                                                   \
-  struct name##Fixture : FixtureT {                                                                \
+  struct name##Fixture_ : FixtureT {                                                               \
     void run();                                                                                    \
   };                                                                                               \
   SWIRLY_TEST_CASE(name)                                                                           \
   {                                                                                                \
-    name##Fixture fixture;                                                                         \
+    name##Fixture_ fixture;                                                                        \
     fixture.run();                                                                                 \
   }                                                                                                \
-  void name##Fixture::run()
+  void name##Fixture_::run()
 
 /** @} */
 
