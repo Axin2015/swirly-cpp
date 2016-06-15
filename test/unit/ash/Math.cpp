@@ -55,3 +55,13 @@ SWIRLY_TEST_CASE(NextPow2)
   SWIRLY_CHECK(nextPow2(7UL) == 8UL);
   SWIRLY_CHECK(nextPow2(8UL) == 8UL);
 }
+
+SWIRLY_TEST_CASE(Ceil)
+{
+  SWIRLY_CHECK(ceil(1U, 3U) == 1U);
+  SWIRLY_CHECK(ceil(2U, 3U) == 1U);
+  SWIRLY_CHECK(ceil(3U, 3U) == 1U);
+  SWIRLY_CHECK(ceil(4U, 3U) == 2U);
+  SWIRLY_CHECK(ceil(5U, 3U) == 2U);
+  SWIRLY_CHECK(ceil(6U, 3U) == 2U);
+}

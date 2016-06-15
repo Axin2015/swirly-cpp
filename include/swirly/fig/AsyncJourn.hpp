@@ -30,6 +30,39 @@ class Journ;
  * @{
  */
 
+namespace detail {
+
+template <std::size_t StepN>
+class AsyncWindow {
+ public:
+  explicit AsyncWindow(std::size_t total) noexcept : total_{total} {}
+  ~AsyncWindow() noexcept = default;
+
+  // Copy.
+  AsyncWindow(const AsyncWindow&) = delete;
+  AsyncWindow& operator=(const AsyncWindow&) = delete;
+
+  // Move.
+  AsyncWindow(AsyncWindow&&) = delete;
+  AsyncWindow& operator=(AsyncWindow&&) = delete;
+
+  std::size_t index() const noexcept { return index_; }
+  std::size_t size() const noexcept { return std::min(total_ - index_, StepN); }
+  More more() const noexcept { return total_ - index_ > StepN ? More::Yes : More::No; }
+  bool done() const noexcept { return index_ >= total_; }
+  bool next() noexcept
+  {
+    index_ += StepN;
+    return !done();
+  }
+
+ private:
+  const std::size_t total_;
+  std::size_t index_{0};
+};
+
+} // detail
+
 class SWIRLY_API AsyncJourn {
  public:
   AsyncJourn(Journ& journ, std::size_t capacity);
@@ -87,7 +120,7 @@ class SWIRLY_API AsyncJourn {
    */
   void archiveOrder(Mnem market, Iden id, Millis modified)
   {
-    doArchiveOrder(market, id, modified, More::No);
+    doArchiveOrder(market, {&id, 1}, modified, More::No);
   }
   /**
    * Archive Orders.
@@ -98,7 +131,7 @@ class SWIRLY_API AsyncJourn {
    */
   void archiveTrade(Mnem market, Iden id, Millis modified)
   {
-    doArchiveTrade(market, id, modified, More::No);
+    doArchiveTrade(market, {&id, 1}, modified, More::No);
   }
   /**
    * Archive Trades.
@@ -119,9 +152,9 @@ class SWIRLY_API AsyncJourn {
 
   void doCreateExec(const Exec& exec, More more);
 
-  void doArchiveOrder(Mnem market, Iden id, Millis modified, More more);
+  void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified, More more);
 
-  void doArchiveTrade(Mnem market, Iden id, Millis modified, More more);
+  void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified, More more);
 
   MsgPipe pipe_;
   std::thread thread_;

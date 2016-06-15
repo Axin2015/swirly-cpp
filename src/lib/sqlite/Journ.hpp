@@ -32,8 +32,6 @@ namespace sqlite {
  */
 
 class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHandler<Journ> {
-  friend struct swirly::MsgHandler<Journ>;
-
  public:
   explicit Journ(const Conf& conf);
   ~Journ() noexcept override;
@@ -56,6 +54,9 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
   void doUpdate(const Msg& msg) override;
 
  private:
+  // Crtp.
+  friend struct swirly::MsgHandler<Journ>;
+
   void reset();
 
   void createMarket(const CreateMarketBody& body);

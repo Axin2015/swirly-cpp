@@ -151,6 +151,14 @@ inline unsigned long nextPow2(unsigned long n) noexcept
   return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clzl(n - 1));
 }
 
+/**
+ * @return the ceiling of dividend / divisor.
+ */
+constexpr std::size_t ceil(std::size_t dividend, std::size_t divisor) noexcept
+{
+  return (dividend - 1) / divisor + 1;
+}
+
 /** @} */
 
 } // swirly
