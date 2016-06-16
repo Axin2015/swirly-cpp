@@ -14,7 +14,7 @@
 # 02110-1301, USA.
 
 cmake_minimum_required(VERSION 3.0)
-project(swirlyc)
+project(swirly)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
 set(CMAKE_VERBOSE_MAKEFILE 1)

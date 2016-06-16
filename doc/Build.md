@@ -28,20 +28,20 @@ To build Swirly from source, you will need:
 Build from Source
 -----------------
 
-The following sections assume that `SWIRLY_SOURCE` is equal to `SOURCE_DIR/swirlyc`, and that
-`SWIRLY_BUILD` is equal to `BUILD_DIR/swirlyc`.
+The following sections assume that `SWIRLY_SOURCE` is equal to `SOURCE_DIR/swirly`, and that
+`SWIRLY_BUILD` is equal to `BUILD_DIR/swirly`.
 
 ### Download ###
 
-Clone the project from the [master repository](http://github.com/swirlycloud/swirlyc) or your own
+Clone the project from the [master repository](http://github.com/swirlycloud/swirly) or your own
 personal fork:
 
     $ cd $SOURCE_DIR
-    $ git clone https://github.com/swirlycloud/swirlyc.git swirlyc
+    $ git clone https://github.com/swirlycloud/swirly.git swirly
 
-The `SOURCE_DIR/swirlyc` directory should now contain the source.
+The `SOURCE_DIR/swirly` directory should now contain the source.
 
-A [Zip archive](https://github.com/swirlycloud/swirlyc/archive/master.zip) can also be download as
+A [Zip archive](https://github.com/swirlycloud/swirly/archive/master.zip) can also be download as
 an alternative.
 
 ### Configure ###
@@ -49,14 +49,14 @@ an alternative.
 Configure using `cmake` as follows from the build directory:
 
     $ cd $BUILD_DIR
-    $ mkdir -p swirlyc
-    $ cd swirlyc
-    $ cmake $SOURCE_DIR/swirlyc -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME
+    $ mkdir -p swirly
+    $ cd swirly
+    $ cmake $SOURCE_DIR/swirly -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME
 
 This step will produce Unix Makefiles by default. The build-type and compiler can be set using the
 following options:
 
-    $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
+    $ cmake $SOURCE_DIR/swirly -G "Unix Makefiles" \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DCMAKE_INSTALL_PREFIX=$SWIRLY_HOME \
         -DCMAKE_C_COMPILER=gcc-5 \
@@ -65,7 +65,7 @@ following options:
 Build times can be reduced during development by disabling shared libraries and compiler
 optimisations:
 
-    $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
+    $ cmake $SOURCE_DIR/swirly -G "Unix Makefiles" \
         -DCMAKE_BUILD_TYPE=DEBUG \
         -DENABLE_SHARED_LIBS=OFF
 
@@ -73,7 +73,7 @@ Note that both shared and static libraries are built by default.
 
 Architecture-specific optimisation flags can be specified for release builds:
 
-    $ cmake $SOURCE_DIR/swirlyc -G "Unix Makefiles" \
+    $ cmake $SOURCE_DIR/swirly -G "Unix Makefiles" \
       -DCMAKE_BUILD_TYPE=RELEASE \
       -DCMAKE_C_FLAGS_RELEASE="-march=native -O3" \
       -DCMAKE_CXX_FLAGS_RELEASE="-march=native -O3"
@@ -84,7 +84,7 @@ See [CMake Documentation](https://cmake.org/documentation) for further informati
 
 Compile the code in the build directory using the `make` command:
 
-    $ cd $BUILD_DIR/swirlyc
+    $ cd $BUILD_DIR/swirly
     $ make
 
 ### Install ###

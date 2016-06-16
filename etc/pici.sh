@@ -4,9 +4,9 @@
 set -e
 
 SWIRLY_BRANCH=${SWIRLY_BRANCH:-master}
-SWIRLY_BUILD=${SWIRLY_BUILD:-$HOME/build/swirlyc}
+SWIRLY_BUILD=${SWIRLY_BUILD:-$HOME/build/swirly}
 SWIRLY_EMAIL=${SWIRLY_EMAIL:-mark.aylett@swirlycloud.com}
-SWIRLY_SOURCE=${SWIRLY_SOURCE:-$HOME/repo/swirlyc}
+SWIRLY_SOURCE=${SWIRLY_SOURCE:-$HOME/repo/swirly}
 
 cd $SWIRLY_SOURCE
 

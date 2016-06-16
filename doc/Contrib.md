@@ -20,7 +20,7 @@ Github Fork
 
 Add remote upstream to fork:
 
-    $ git remote add upstream git@github.com:swirlycloud/swirlyc.git
+    $ git remote add upstream git@github.com:swirlycloud/swirly.git
 
 Sync local fork:
 
@@ -58,4 +58,4 @@ symbols to library export tables. RTTI has been disabled in Swirly to avoid this
 writing, Boost's program\_options and unit\_test_framework libraries both depend on RTTI, so they
 are deliberately avoided.
 
-[TravisCI]: http://travis-ci.org/swirlycloud/swirlyc
+[TravisCI]: http://travis-ci.org/swirlycloud/swirly

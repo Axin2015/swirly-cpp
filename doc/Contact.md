@@ -6,8 +6,8 @@ Development
 
 | Resource    | Address                                    |
 | ----------- | ------------------------------             |
-| GitHub      | <http://github.com/swirlycloud/swirlyc>    |
-| Travis CI   | <http://travis-ci.org/swirlycloud/swirlyc> |
+| GitHub      | <http://github.com/swirlycloud/swirly>    |
+| Travis CI   | <http://travis-ci.org/swirlycloud/swirly> |
 
 Email Groups
 ------------
