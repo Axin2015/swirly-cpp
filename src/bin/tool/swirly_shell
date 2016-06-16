@@ -85,8 +85,42 @@ class Shell(Cmd):
     conn.send(content)
     return Response(conn.getresponse())
 
+  def do_quit(self, args):
+    """Usage: quit"""
+    raise SystemExit
+
+  def do_env(self, args):
+    """Usage: env"""
+    cols = [
+      'name',
+      'value'
+    ]
+    rows = [{'name': k, 'value': v} for k, v in self.env.iteritems()]
+    fmt = (
+      '|{name:<{nameLen}}'
+      '|{value:<{valueLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_set(self, args):
+    """Usage: set <name> <value>"""
+    try:
+      name, value = shlex.split(args)
+      self.env[name.upper()] = value
+    except Exception as e:
+      print "error: {}: {}".format(type(e).__name__, e)
+
+  def do_unset(self, args):
+    """Usage: unset <name>"""
+    try:
+      name, = shlex.split(args)
+      del self.env[name.upper()]
+    except Exception as e:
+      print "error: {}: {}".format(type(e).__name__, e)
+
   def do_asset(self, args):
-    """Print assets."""
+    """Usage: asset"""
     resp = self.send('GET', '/api/rec/asset')
     cols = [
       'mnem',
@@ -103,7 +137,7 @@ class Shell(Cmd):
     printTable(cols, rows, fmt)
 
   def do_contr(self, args):
-    """Print contracts."""
+    """Usage: contr"""
     resp = self.send('GET', '/api/rec/contr')
     cols = [
       'mnem',
@@ -135,22 +169,8 @@ class Shell(Cmd):
     )
     printTable(cols, rows, fmt)
 
-  def do_env(self, args):
-    """Print environment."""
-    cols = [
-      'name',
-      'value'
-    ]
-    rows = [{'name': k, 'value': v} for k, v in self.env.iteritems()]
-    fmt = (
-      '|{name:<{nameLen}}'
-      '|{value:<{valueLen}}'
-      '|'
-    )
-    printTable(cols, rows, fmt)
-
   def do_market(self, args):
-    """Print markets."""
+    """Usage: market"""
     resp = self.send('GET', '/api/rec/market')
     cols = [
       'mnem',
@@ -172,21 +192,72 @@ class Shell(Cmd):
     )
     printTable(cols, rows, fmt)
 
-  def do_submit(self, args):
-    """Submit order."""
-    try:
-      market, side, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/api/sess/order/' + market,
-                       side = side,
-                       lots = int(lots),
-                       ticks = int(ticks))
-      row = resp.content
-      print row
-    except Exception as e:
-      print "error: {}: {}".format(type(e).__name__, e)
+  def do_trader(self, args):
+    """Usage: trader"""
+    resp = self.send('GET', '/api/rec/trader')
+    cols = [
+      'mnem',
+      'display',
+      'email'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{mnem:<{mnemLen}}'
+      '|{display:<{displayLen}}'
+      '|{email:<{emailLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_order(self, args):
+    """Usage: order"""
+    resp = self.send('GET', '/api/sess/order')
+    cols = [
+      'trader',
+      'market',
+      'contr',
+      'settlDate',
+      'id',
+      'ref',
+      'state',
+      'side',
+      'lots',
+      'ticks',
+      'resd',
+      'exec',
+      'cost',
+      'lastLots',
+      'lastTicks',
+      'minLots',
+      'created',
+      'modified'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{trader:<{traderLen}}'
+      '|{market:<{marketLen}}'
+      '|{contr:<{contrLen}}'
+      '|{settlDate:<{settlDateLen}}'
+      '|{id:<{idLen}}'
+      '|{ref:<{refLen}}'
+      '|{state:<{stateLen}}'
+      '|{side:<{sideLen}}'
+      '|{lots:<{lotsLen}}'
+      '|{ticks:<{ticksLen}}'
+      '|{resd:<{resdLen}}'
+      '|{exec:<{execLen}}'
+      '|{cost:<{costLen}}'
+      '|{lastLots:<{lastLotsLen}}'
+      '|{lastTicks:<{lastTicksLen}}'
+      '|{minLots:<{minLotsLen}}'
+      '|{created:<{createdLen}}'
+      '|{modified:<{modifiedLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
 
   def do_view(self, args):
-    """Print view."""
+    """Usage: view"""
     resp = self.send('GET', '/api/view')
     cols = [
       'market',
@@ -222,23 +293,29 @@ class Shell(Cmd):
     )
     printTable(cols, rows, fmt)
 
-  def do_quit(self, args):
-    """Quit the shell."""
-    raise SystemExit
-
-  def do_set(self, args):
-    """Set variable."""
+  def do_buy(self, args):
+    """Usage: buy <market> <lots> <ticks>"""
     try:
-      name, value = shlex.split(args)
-      self.env[name.upper()] = value
+      market, lots, ticks = shlex.split(args)
+      resp = self.send('POST', '/api/sess/order/' + market,
+                       side = 'BUY',
+                       lots = int(lots),
+                       ticks = int(ticks))
+      row = resp.content
+      print row
     except Exception as e:
       print "error: {}: {}".format(type(e).__name__, e)
 
-  def do_unset(self, args):
-    """Unset variable."""
+  def do_sell(self, args):
+    """Usage: sell <market> <lots> <ticks>"""
     try:
-      name, = shlex.split(args)
-      del self.env[name.upper()]
+      market, lots, ticks = shlex.split(args)
+      resp = self.send('POST', '/api/sess/order/' + market,
+                       side = 'SELL',
+                       lots = int(lots),
+                       ticks = int(ticks))
+      row = resp.content
+      print row
     except Exception as e:
       print "error: {}: {}".format(type(e).__name__, e)
 

@@ -28,7 +28,7 @@ History
 
 Swirly Cloud started life in 2013 as a set of open-source libraries written in C11. The project was
 originally called, Doobry. These libraries are still available in the
-[GitHub repository](http://github.com/swirlycloud/swirlyc/tree/0.1.0).
+[GitHub repository](http://github.com/swirlycloud/swirly/tree/0.1.0).
 
 In the summer of 2014, the decision was made to port these libraries to Java, so that they could run
 on [Google's Cloud platform](https://cloud.google.com/appengine/). Powerful Java tooling helped

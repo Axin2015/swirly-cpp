@@ -1,6 +1,6 @@
 Swirly is an open-source, restful matching-engine written in C++14. The target platform is
 GNU/Linux. The source-code is
-[freely available on GitHub](http://github.com/swirlycloud/swirlyc). Swirly is designed to run
+[freely available on GitHub](http://github.com/swirlycloud/swirly). Swirly is designed to run
 either in [the Cloud](@ref Cloud) or on dedicated infrastructure.
 
 ![Arch](@ref arch.png)
@@ -28,10 +28,10 @@ Developers
 
 - [Restful API](@ref RestApi)
 - [Swirly Libraries](@ref Library)
-- [GitHub Repo](http://github.com/swirlycloud/swirlyc)
+- [GitHub Repo](http://github.com/swirlycloud/swirly)
 - [Style Guide](@ref Style)
 - [Contributing](@ref Contrib)
-- [Travis CI](http://travis-ci.org/swirlycloud/swirlyc)
+- [Travis CI](http://travis-ci.org/swirlycloud/swirly)
 
 See [other articles](pages.html) for more information.
 
