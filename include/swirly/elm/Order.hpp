@@ -53,7 +53,12 @@ class SWIRLY_API Order : public Request, public MemAlloc {
       modified_{modified}
   {
   }
-
+  Order(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+        Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) noexcept
+    : Order{trader, market, contr, settlDay, id,    ref,   State::New, side,    lots,
+            ticks,  lots,   0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
+  {
+  }
   ~Order() noexcept override;
 
   // Copy.
@@ -63,6 +68,12 @@ class SWIRLY_API Order : public Request, public MemAlloc {
   // Move.
   Order(Order&&);
   Order& operator=(Order&&) = delete;
+
+  template <typename... ArgsT>
+  static OrderPtr make(ArgsT&&... args)
+  {
+    return makeRefCounted<Order>(std::forward<ArgsT>(args)...);
+  }
 
   void toJson(std::ostream& os) const override;
 

@@ -44,6 +44,12 @@ class SWIRLY_API Trader : public Rec {
 
   void toJson(std::ostream& os) const override;
 
+  template <typename... ArgsT>
+  static TraderPtr make(ArgsT&&... args)
+  {
+    return std::make_unique<Trader>(std::forward<ArgsT>(args)...);
+  }
+
   auto email() const noexcept { return +email_; }
   boost::intrusive::set_member_hook<> mnemHook_;
 

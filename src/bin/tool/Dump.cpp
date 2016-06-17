@@ -50,12 +50,12 @@ int main(int argc, char* argv[])
     cout << "{\"assets\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readAsset(factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readAsset([&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "],\"contrs\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readContr(factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readContr([&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "],\"markets\":[";
     {
@@ -70,17 +70,17 @@ int main(int argc, char* argv[])
     cout << "],\"orders\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readOrder(factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readOrder([&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "],\"trades\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readTrade(factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readTrade([&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "],\"posns\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readPosn(busDay(getTimeOfDay()), factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readPosn(busDay(getTimeOfDay()), [&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "]}\n";
 

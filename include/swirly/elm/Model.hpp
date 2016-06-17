@@ -47,14 +47,8 @@ class SWIRLY_API Model {
   constexpr Model(Model&&) noexcept = default;
   Model& operator=(Model&&) noexcept = default;
 
-  void readAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const
-  {
-    doReadAsset(factory, cb);
-  }
-  void readContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const
-  {
-    doReadContr(factory, cb);
-  }
+  void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
+  void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
   void readMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
   {
     doReadMarket(factory, cb);
@@ -63,34 +57,24 @@ class SWIRLY_API Model {
   {
     doReadTrader(factory, cb);
   }
-  void readOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
-  {
-    doReadOrder(factory, cb);
-  }
-  void readTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
-  {
-    doReadTrade(factory, cb);
-  }
-  void readPosn(Jday busDay, const Factory& factory, const ModelCallback<PosnPtr>& cb) const
-  {
-    doReadPosn(busDay, factory, cb);
-  }
+  void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
+  void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
+  void readPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
 
  protected:
-  virtual void doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const = 0;
+  virtual void doReadAsset(const ModelCallback<AssetPtr>& cb) const = 0;
 
-  virtual void doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const = 0;
+  virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
 
   virtual void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const = 0;
 
   virtual void doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const = 0;
 
-  virtual void doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const = 0;
+  virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 
-  virtual void doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const = 0;
+  virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
 
-  virtual void doReadPosn(Jday busDay, const Factory& factory,
-                          const ModelCallback<PosnPtr>& cb) const = 0;
+  virtual void doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
 /**

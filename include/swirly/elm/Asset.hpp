@@ -48,6 +48,12 @@ class SWIRLY_API Asset : public Rec {
   Asset(Asset&&);
   Asset& operator=(Asset&&) = delete;
 
+  template <typename... ArgsT>
+  static AssetPtr make(ArgsT&&... args)
+  {
+    return std::make_unique<Asset>(std::forward<ArgsT>(args)...);
+  }
+
   void toJson(std::ostream& os) const override;
 
   AssetType assetType() const noexcept { return type_; }

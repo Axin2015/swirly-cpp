@@ -16,8 +16,6 @@
  */
 #include <swirly/fig/TraderSess.hpp>
 
-#include <swirly/elm/Factory.hpp>
-
 using namespace std;
 
 namespace swirly {
@@ -32,7 +30,7 @@ PosnPtr TraderSess::lazyPosn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
   bool found;
   tie(it, found) = posns_.findHint(contr, settlDay);
   if (!found) {
-    it = posns_.insertHint(it, factory_.newPosn(mnem_, contr, settlDay));
+    it = posns_.insertHint(it, Posn::make(mnem_, contr, settlDay));
   }
   return &*it;
 }

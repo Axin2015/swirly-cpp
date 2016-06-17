@@ -66,6 +66,12 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   Exec(Exec&&);
   Exec& operator=(Exec&&) = delete;
 
+  template <typename... ArgsT>
+  static ExecPtr make(ArgsT&&... args)
+  {
+    return makeRefCounted<Exec>(std::forward<ArgsT>(args)...);
+  }
+
   void toJson(std::ostream& os) const override;
 
   Iden orderId() const noexcept { return orderId_; }

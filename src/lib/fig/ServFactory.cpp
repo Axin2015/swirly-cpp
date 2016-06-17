@@ -31,13 +31,13 @@ MarketPtr ServFactory::doNewMarket(Mnem mnem, string_view display, Mnem contr, J
                                    Ticks lastTicks, Millis lastTime, Iden maxOrderId,
                                    Iden maxExecId) const
 {
-  return make_unique<MarketBook>(mnem, display, contr, settlDay, expiryDay, state, lastLots,
-                                 lastTicks, lastTime, maxOrderId, maxExecId);
+  return MarketBook::make(mnem, display, contr, settlDay, expiryDay, state, lastLots, lastTicks,
+                          lastTime, maxOrderId, maxExecId);
 }
 
 TraderPtr ServFactory::doNewTrader(Mnem mnem, string_view display, string_view email) const
 {
-  return make_unique<TraderSess>(mnem, display, email, *this);
+  return TraderSess::make(mnem, display, email);
 }
 
 } // swirly

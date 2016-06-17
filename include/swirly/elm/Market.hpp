@@ -46,6 +46,12 @@ class SWIRLY_API Market : public Rec {
   Market(Market&&);
   Market& operator=(Market&&) = delete;
 
+  template <typename... ArgsT>
+  static MarketPtr make(ArgsT&&... args)
+  {
+    return std::make_unique<Market>(std::forward<ArgsT>(args)...);
+  }
+
   void toJson(std::ostream& os) const override;
 
   auto contr() const noexcept { return contr_; }
