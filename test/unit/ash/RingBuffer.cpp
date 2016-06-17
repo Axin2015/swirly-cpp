@@ -18,58 +18,56 @@
 
 #include <swirly/tea/Test.hpp>
 
-#include <string>
-
 using namespace std;
 using namespace swirly;
 
 SWIRLY_TEST_CASE(RingBuffer)
 {
-  using StringRingBuffer = RingBuffer<string>;
+  using IntRingBuffer = RingBuffer<int>;
 
-  StringRingBuffer srb{4};
-  SWIRLY_CHECK(srb.empty());
-  SWIRLY_CHECK(!srb.full());
-  SWIRLY_CHECK(srb.size() == 0);
+  IntRingBuffer rb{4};
+  SWIRLY_CHECK(rb.empty());
+  SWIRLY_CHECK(!rb.full());
+  SWIRLY_CHECK(rb.size() == 0);
 
-  srb.write([](string& s) { s = "first"s; });
-  SWIRLY_CHECK(!srb.empty());
-  SWIRLY_CHECK(!srb.full());
-  SWIRLY_CHECK(srb.size() == 1);
+  rb.write([](int& val) { val = 1; });
+  SWIRLY_CHECK(!rb.empty());
+  SWIRLY_CHECK(!rb.full());
+  SWIRLY_CHECK(rb.size() == 1);
 
-  srb.clear();
-  SWIRLY_CHECK(srb.empty());
-  SWIRLY_CHECK(!srb.full());
-  SWIRLY_CHECK(srb.size() == 0);
+  rb.clear();
+  SWIRLY_CHECK(rb.empty());
+  SWIRLY_CHECK(!rb.full());
+  SWIRLY_CHECK(rb.size() == 0);
 
-  srb.write("first"s);
-  srb.write("second"s);
-  srb.write("third"s);
-  srb.write("fourth"s);
-  SWIRLY_CHECK(!srb.empty());
-  SWIRLY_CHECK(srb.full());
-  SWIRLY_CHECK(srb.size() == 4);
+  rb.write(1);
+  rb.write(2);
+  rb.write(3);
+  rb.write(4);
+  SWIRLY_CHECK(!rb.empty());
+  SWIRLY_CHECK(rb.full());
+  SWIRLY_CHECK(rb.size() == 4);
 
-  srb.write("fifth"s);
-  SWIRLY_CHECK(!srb.empty());
-  SWIRLY_CHECK(srb.full());
-  SWIRLY_CHECK(srb.size() == 4);
+  rb.write(5);
+  SWIRLY_CHECK(!rb.empty());
+  SWIRLY_CHECK(rb.full());
+  SWIRLY_CHECK(rb.size() == 4);
 
-  string s;
-  srb.read([&s](const string& ref) { s = ref; });
-  SWIRLY_CHECK(s == "second");
-  SWIRLY_CHECK(!srb.empty());
-  SWIRLY_CHECK(!srb.full());
-  SWIRLY_CHECK(srb.size() == 3);
+  int val;
+  rb.read([&val](const int& ref) { val = ref; });
+  SWIRLY_CHECK(2);
+  SWIRLY_CHECK(!rb.empty());
+  SWIRLY_CHECK(!rb.full());
+  SWIRLY_CHECK(rb.size() == 3);
 
-  srb.read(s);
-  SWIRLY_CHECK(s == "third");
-  srb.read(s);
-  SWIRLY_CHECK(s == "fourth");
-  srb.read(s);
-  SWIRLY_CHECK(s == "fifth");
+  rb.read(val);
+  SWIRLY_CHECK(val == 3);
+  rb.read(val);
+  SWIRLY_CHECK(val == 4);
+  rb.read(val);
+  SWIRLY_CHECK(val == 5);
 
-  SWIRLY_CHECK(srb.empty());
-  SWIRLY_CHECK(!srb.full());
-  SWIRLY_CHECK(srb.size() == 0);
+  SWIRLY_CHECK(rb.empty());
+  SWIRLY_CHECK(!rb.full());
+  SWIRLY_CHECK(rb.size() == 0);
 }
