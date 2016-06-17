@@ -46,6 +46,10 @@ class SWIRLY_API Posn : public RefCounted {
       sellCost_{sellCost}
   {
   }
+  Posn(Mnem trader, Mnem contr, Jday settlDay) noexcept
+    : Posn{trader, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+  {
+  }
   ~Posn() noexcept override;
 
   // Copy.
@@ -55,6 +59,12 @@ class SWIRLY_API Posn : public RefCounted {
   // Move.
   Posn(Posn&&);
   Posn& operator=(Posn&&) = delete;
+
+  template <typename... ArgsT>
+  static PosnPtr make(ArgsT&&... args)
+  {
+    return makeRefCounted<Posn>(std::forward<ArgsT>(args)...);
+  }
 
   void toJson(std::ostream& os) const;
 

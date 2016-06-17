@@ -30,20 +30,22 @@
 
 namespace swirly {
 
-class Factory;
+class TraderSess;
 
 /**
  * @addtogroup Entity
  * @{
  */
 
+using TraderSessPtr = std::unique_ptr<TraderSess>;
+using ConstTraderSessPtr = std::unique_ptr<const TraderSess>;
+
 class SWIRLY_API TraderSess : public Trader {
   using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
 
  public:
-  TraderSess(Mnem mnem, std::string_view display, std::string_view email,
-             const Factory& factory) noexcept
-    : Trader{mnem, display, email}, factory_{factory}
+  TraderSess(Mnem mnem, std::string_view display, std::string_view email) noexcept
+    : Trader{mnem, display, email}
   {
   }
   ~TraderSess() noexcept override;
@@ -55,6 +57,12 @@ class SWIRLY_API TraderSess : public Trader {
   // Move.
   TraderSess(TraderSess&&);
   TraderSess& operator=(TraderSess&&) = delete;
+
+  template <typename... ArgsT>
+  static TraderSessPtr make(ArgsT&&... args)
+  {
+    return std::make_unique<TraderSess>(std::forward<ArgsT>(args)...);
+  }
 
   const auto& orders() const noexcept { return orders_; }
   const auto& trades() const noexcept { return trades_; }
@@ -121,7 +129,6 @@ class SWIRLY_API TraderSess : public Trader {
   boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 
  private:
-  const Factory& factory_;
   OrderIdSet orders_;
   ExecIdSet trades_;
   TraderPosnSet posns_;

@@ -57,12 +57,22 @@ inline std::ostream& operator<<(std::ostream& os, const MarketView& view)
   return os;
 }
 
+using MarketBookPtr = std::unique_ptr<MarketBook>;
+using ConstMarketBookPtr = std::unique_ptr<const MarketBook>;
+
 class SWIRLY_API MarketBook : public Market {
  public:
   MarketBook(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
-             MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime, Iden maxOrderId,
-             Iden maxExecId) noexcept;
-
+             MarketState state, Lots lastLots = 0_lts, Ticks lastTicks = 0_tks,
+             Millis lastTime = 0_ms, Iden maxOrderId = 0_id, Iden maxExecId = 0_id) noexcept
+    : Market{mnem, display, contr, settlDay, expiryDay, state},
+      lastLots_{lastLots},
+      lastTicks_{lastTicks},
+      lastTime_{lastTime},
+      maxOrderId_{maxOrderId},
+      maxExecId_{maxExecId}
+  {
+  }
   ~MarketBook() noexcept override;
 
   // Copy.
@@ -72,6 +82,12 @@ class SWIRLY_API MarketBook : public Market {
   // Move.
   MarketBook(MarketBook&&) = default;
   MarketBook& operator=(MarketBook&&) = default;
+
+  template <typename... ArgsT>
+  static MarketBookPtr make(ArgsT&&... args)
+  {
+    return std::make_unique<MarketBook>(std::forward<ArgsT>(args)...);
+  }
 
   void toJsonView(std::ostream& os) const;
 

@@ -42,69 +42,20 @@ class SWIRLY_API Factory {
   Factory(Factory&&) noexcept = default;
   Factory& operator=(Factory&&) noexcept = default;
 
-  AssetPtr newAsset(Mnem mnem, std::string_view display, AssetType type) const;
-
-  ContrPtr newContr(Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
-                    int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-                    Lots maxLots) const;
-
   MarketPtr newMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                      Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
-                      Millis lastTime, Iden maxOrderId, Iden maxExecId) const;
-
-  MarketPtr newMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                      Jday expiryDay, MarketState state) const;
+                      Jday expiryDay, MarketState state, Lots lastLots = 0_lts,
+                      Ticks lastTicks = 0_tks, Millis lastTime = 0_ms, Iden maxOrderId = 0_id,
+                      Iden maxExecId = 0_id) const;
 
   TraderPtr newTrader(Mnem mnem, std::string_view display, std::string_view email) const;
 
-  OrderPtr newOrder(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                    std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
-                    Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
-                    Millis created, Millis modified) const;
-
-  OrderPtr newOrder(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                    std::string_view ref, Side side, Lots lots, Ticks ticks, Lots minLots,
-                    Millis created) const;
-
-  ExecPtr newExec(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                  std::string_view ref, Iden orderId, State state, Side side, Lots lots,
-                  Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-                  Lots minLots, Iden matchId, Role role, Mnem cpty, Millis created) const;
-
-  ExecPtr newExec(const Order& order, Iden id, Millis created) const;
-
-  PosnPtr newPosn(Mnem trader, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
-                  Cost sellCost) const;
-
-  PosnPtr newPosn(Mnem trader, Mnem contr, Jday settlDay) const;
-
  protected:
-  virtual AssetPtr doNewAsset(Mnem mnem, std::string_view display, AssetType type) const = 0;
-
-  virtual ContrPtr doNewContr(Mnem mnem, std::string_view display, Mnem asset, Mnem ccy,
-                              int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp,
-                              Lots minLots, Lots maxLots) const = 0;
-
   virtual MarketPtr doNewMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                                 Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
                                 Millis lastTime, Iden maxOrderId, Iden maxExecId) const = 0;
 
   virtual TraderPtr doNewTrader(Mnem mnem, std::string_view display,
                                 std::string_view email) const = 0;
-
-  virtual OrderPtr doNewOrder(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                              std::string_view ref, State state, Side side, Lots lots, Ticks ticks,
-                              Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-                              Lots minLots, Millis created, Millis modified) const = 0;
-
-  virtual ExecPtr doNewExec(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                            std::string_view ref, Iden orderId, State state, Side side, Lots lots,
-                            Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots,
-                            Ticks lastTicks, Lots minLots, Iden matchId, Role role, Mnem cpty,
-                            Millis created) const = 0;
-
-  virtual PosnPtr doNewPosn(Mnem trader, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost,
-                            Lots sellLots, Cost sellCost) const = 0;
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -121,31 +72,11 @@ class SWIRLY_API BasicFactory : public Factory {
   BasicFactory& operator=(BasicFactory&&) noexcept = default;
 
  protected:
-  AssetPtr doNewAsset(Mnem mnem, std::string_view display, AssetType type) const override;
-
-  ContrPtr doNewContr(Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
-                      int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-                      Lots maxLots) const override;
-
   MarketPtr doNewMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                         Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
                         Millis lastTime, Iden maxOrderId, Iden maxExecId) const override;
 
   TraderPtr doNewTrader(Mnem mnem, std::string_view display, std::string_view email) const override;
-
-  OrderPtr doNewOrder(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                      std::string_view ref, State state, Side side, Lots lots, Ticks ticks,
-                      Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
-                      Millis created, Millis modified) const override;
-
-  ExecPtr doNewExec(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id,
-                    std::string_view ref, Iden orderId, State state, Side side, Lots lots,
-                    Ticks ticks, Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks,
-                    Lots minLots, Iden matchId, Role role, Mnem cpty,
-                    Millis created) const override;
-
-  PosnPtr doNewPosn(Mnem trader, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost,
-                    Lots sellLots, Cost sellCost) const override;
 };
 
 /** @} */

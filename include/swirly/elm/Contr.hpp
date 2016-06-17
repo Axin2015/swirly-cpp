@@ -44,6 +44,12 @@ class SWIRLY_API Contr : public Rec {
   Contr(Contr&&);
   Contr& operator=(Contr&&) = delete;
 
+  template <typename... ArgsT>
+  static ContrPtr make(ArgsT&&... args)
+  {
+    return std::make_unique<Contr>(std::forward<ArgsT>(args)...);
+  }
+
   void toJson(std::ostream& os) const override;
 
   auto asset() const noexcept { return asset_; }

@@ -73,7 +73,7 @@ Model::Model(Model&&) = default;
 
 Model& Model::operator=(Model&&) = default;
 
-void Model::doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& cb) const
+void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
   enum {
     Mnem, //
@@ -83,13 +83,13 @@ void Model::doReadAsset(const Factory& factory, const ModelCallback<AssetPtr>& c
 
   StmtPtr stmt{prepare(*db_, SelectAssetSql)};
   while (step(*stmt)) {
-    cb(factory.newAsset(column<string_view>(*stmt, Mnem), //
-                        column<string_view>(*stmt, Display), //
-                        column<AssetType>(*stmt, TypeId)));
+    cb(Asset::make(column<string_view>(*stmt, Mnem), //
+                   column<string_view>(*stmt, Display), //
+                   column<AssetType>(*stmt, TypeId)));
   }
 }
 
-void Model::doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& cb) const
+void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
 {
   enum {
     Mnem, //
@@ -107,17 +107,17 @@ void Model::doReadContr(const Factory& factory, const ModelCallback<ContrPtr>& c
 
   StmtPtr stmt{prepare(*db_, SelectContrSql)};
   while (step(*stmt)) {
-    cb(factory.newContr(column<string_view>(*stmt, Mnem), //
-                        column<string_view>(*stmt, Display), //
-                        column<string_view>(*stmt, Asset), //
-                        column<string_view>(*stmt, Ccy), //
-                        column<int>(*stmt, LotNumer), //
-                        column<int>(*stmt, LotDenom), //
-                        column<int>(*stmt, TickNumer), //
-                        column<int>(*stmt, TickDenom), //
-                        column<int>(*stmt, PipDp), //
-                        column<Lots>(*stmt, MinLots), //
-                        column<Lots>(*stmt, MaxLots)));
+    cb(Contr::make(column<string_view>(*stmt, Mnem), //
+                   column<string_view>(*stmt, Display), //
+                   column<string_view>(*stmt, Asset), //
+                   column<string_view>(*stmt, Ccy), //
+                   column<int>(*stmt, LotNumer), //
+                   column<int>(*stmt, LotDenom), //
+                   column<int>(*stmt, TickNumer), //
+                   column<int>(*stmt, TickDenom), //
+                   column<int>(*stmt, PipDp), //
+                   column<Lots>(*stmt, MinLots), //
+                   column<Lots>(*stmt, MaxLots)));
   }
 }
 
@@ -169,7 +169,7 @@ void Model::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>&
   }
 }
 
-void Model::doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& cb) const
+void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
   enum { //
     Trader, //
@@ -194,28 +194,28 @@ void Model::doReadOrder(const Factory& factory, const ModelCallback<OrderPtr>& c
 
   StmtPtr stmt{prepare(*db_, SelectOrderSql)};
   while (step(*stmt)) {
-    cb(factory.newOrder(column<string_view>(*stmt, Trader), //
-                        column<string_view>(*stmt, Market), //
-                        column<string_view>(*stmt, Contr), //
-                        column<Jday>(*stmt, SettlDay), //
-                        column<Iden>(*stmt, Id), //
-                        column<string_view>(*stmt, Ref), //
-                        column<swirly::State>(*stmt, State), //
-                        column<swirly::Side>(*stmt, Side), //
-                        column<swirly::Lots>(*stmt, Lots), //
-                        column<swirly::Ticks>(*stmt, Ticks), //
-                        column<swirly::Lots>(*stmt, Resd), //
-                        column<swirly::Lots>(*stmt, Exec), //
-                        column<swirly::Cost>(*stmt, Cost), //
-                        column<swirly::Lots>(*stmt, LastLots), //
-                        column<swirly::Ticks>(*stmt, LastTicks), //
-                        column<swirly::Lots>(*stmt, MinLots), //
-                        column<Millis>(*stmt, Created), //
-                        column<Millis>(*stmt, Modified)));
+    cb(Order::make(column<string_view>(*stmt, Trader), //
+                   column<string_view>(*stmt, Market), //
+                   column<string_view>(*stmt, Contr), //
+                   column<Jday>(*stmt, SettlDay), //
+                   column<Iden>(*stmt, Id), //
+                   column<string_view>(*stmt, Ref), //
+                   column<swirly::State>(*stmt, State), //
+                   column<swirly::Side>(*stmt, Side), //
+                   column<swirly::Lots>(*stmt, Lots), //
+                   column<swirly::Ticks>(*stmt, Ticks), //
+                   column<swirly::Lots>(*stmt, Resd), //
+                   column<swirly::Lots>(*stmt, Exec), //
+                   column<swirly::Cost>(*stmt, Cost), //
+                   column<swirly::Lots>(*stmt, LastLots), //
+                   column<swirly::Ticks>(*stmt, LastTicks), //
+                   column<swirly::Lots>(*stmt, MinLots), //
+                   column<Millis>(*stmt, Created), //
+                   column<Millis>(*stmt, Modified)));
   }
 }
 
-void Model::doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb) const
+void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
   enum { //
     Trader, //
@@ -242,31 +242,31 @@ void Model::doReadTrade(const Factory& factory, const ModelCallback<ExecPtr>& cb
 
   StmtPtr stmt{prepare(*db_, SelectTradeSql)};
   while (step(*stmt)) {
-    cb(factory.newExec(column<string_view>(*stmt, Trader), //
-                       column<string_view>(*stmt, Market), //
-                       column<string_view>(*stmt, Contr), //
-                       column<Jday>(*stmt, SettlDay), //
-                       column<Iden>(*stmt, Id), //
-                       column<string_view>(*stmt, Ref), //
-                       column<Iden>(*stmt, OrderId), //
-                       State::Trade, //
-                       column<swirly::Side>(*stmt, Side), //
-                       column<swirly::Lots>(*stmt, Lots), //
-                       column<swirly::Ticks>(*stmt, Ticks), //
-                       column<swirly::Lots>(*stmt, Resd), //
-                       column<swirly::Lots>(*stmt, Exec), //
-                       column<swirly::Cost>(*stmt, Cost), //
-                       column<swirly::Lots>(*stmt, LastLots), //
-                       column<swirly::Ticks>(*stmt, LastTicks), //
-                       column<swirly::Lots>(*stmt, MinLots), //
-                       column<Iden>(*stmt, MatchId), //
-                       column<swirly::Role>(*stmt, Role), //
-                       column<string_view>(*stmt, Cpty), //
-                       column<Millis>(*stmt, Created)));
+    cb(Exec::make(column<string_view>(*stmt, Trader), //
+                  column<string_view>(*stmt, Market), //
+                  column<string_view>(*stmt, Contr), //
+                  column<Jday>(*stmt, SettlDay), //
+                  column<Iden>(*stmt, Id), //
+                  column<string_view>(*stmt, Ref), //
+                  column<Iden>(*stmt, OrderId), //
+                  State::Trade, //
+                  column<swirly::Side>(*stmt, Side), //
+                  column<swirly::Lots>(*stmt, Lots), //
+                  column<swirly::Ticks>(*stmt, Ticks), //
+                  column<swirly::Lots>(*stmt, Resd), //
+                  column<swirly::Lots>(*stmt, Exec), //
+                  column<swirly::Cost>(*stmt, Cost), //
+                  column<swirly::Lots>(*stmt, LastLots), //
+                  column<swirly::Ticks>(*stmt, LastTicks), //
+                  column<swirly::Lots>(*stmt, MinLots), //
+                  column<Iden>(*stmt, MatchId), //
+                  column<swirly::Role>(*stmt, Role), //
+                  column<string_view>(*stmt, Cpty), //
+                  column<Millis>(*stmt, Created)));
   }
 }
 
-void Model::doReadPosn(Jday busDay, const Factory& factory, const ModelCallback<PosnPtr>& cb) const
+void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
 {
   enum { //
     Trader, //
@@ -294,7 +294,7 @@ void Model::doReadPosn(Jday busDay, const Factory& factory, const ModelCallback<
     bool found;
     tie(it, found) = ps.findHint(trader, contr, settlDay);
     if (!found) {
-      it = ps.insertHint(it, factory.newPosn(trader, contr, settlDay));
+      it = ps.insertHint(it, Posn::make(trader, contr, settlDay));
     }
 
     const auto side = column<swirly::Side>(*stmt, Side);

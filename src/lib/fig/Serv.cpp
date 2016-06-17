@@ -56,9 +56,6 @@ Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) no
 
 struct Serv::Impl {
 
-  using MarketBookPtr = unique_ptr<MarketBook, default_delete<Market>>;
-  using TraderSessPtr = unique_ptr<TraderSess, default_delete<Trader>>;
-
   Impl(Journ& journ, size_t capacity) noexcept : journ{journ, capacity} {}
   MarketBookPtr newMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
                           MarketState state) const
@@ -66,20 +63,25 @@ struct Serv::Impl {
     if (!regex_match(mnem.begin(), mnem.end(), MnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
-    auto up = factory.newMarket(mnem, display, contr, settlDay, expiryDay, state);
-    return {static_cast<MarketBook*>(up.release()), move(up.get_deleter())};
+    return MarketBook::make(mnem, display, contr, settlDay, expiryDay, state);
   }
   TraderSessPtr newTrader(Mnem mnem, string_view display, string_view email) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), MnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
-    auto up = factory.newTrader(mnem, display, email);
-    return {static_cast<TraderSess*>(up.release()), move(up.get_deleter())};
+    return TraderSess::make(mnem, display, email);
+  }
+  ExecPtr newExec(const Order& order, Iden id, Millis now) const
+  {
+    return Exec::make(order.trader(), order.market(), order.contr(), order.settlDay(), id,
+                      order.ref(), order.id(), order.state(), order.side(), order.lots(),
+                      order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
+                      order.lastTicks(), order.minLots(), 0_id, Role::None, Mnem{}, now);
   }
   ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
   {
-    return factory.newExec(order, book.allocExecId(), now);
+    return newExec(order, book.allocExecId(), now);
   }
   Match newMatch(MarketBook& book, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
                  Lots sumLots, Cost sumCost, Millis now)
@@ -94,10 +96,10 @@ struct Serv::Impl {
 
     const auto ticks = makerOrder->ticks();
 
-    auto makerTrade = factory.newExec(*makerOrder, makerId, now);
+    auto makerTrade = newExec(*makerOrder, makerId, now);
     makerTrade->trade(lots, ticks, takerId, Role::Maker, takerOrder.trader());
 
-    auto takerTrade = factory.newExec(takerOrder, takerId, now);
+    auto takerTrade = newExec(takerOrder, takerId, now);
     takerTrade->trade(sumLots, sumCost, lots, ticks, makerId, Role::Taker, makerOrder->trader());
 
     return {lots, makerOrder, makerTrade, makerPosn, takerTrade};
@@ -217,10 +219,8 @@ Serv& Serv::operator=(Serv&&) = default;
 void Serv::load(const Model& model, Millis now)
 {
   const auto busDay = impl_->busDay(now);
-  model.readAsset(impl_->factory,
-                  [& assets = impl_->assets](auto&& ptr) { assets.insert(move(ptr)); });
-  model.readContr(impl_->factory,
-                  [& contrs = impl_->contrs](auto&& ptr) { contrs.insert(move(ptr)); });
+  model.readAsset([& assets = impl_->assets](auto&& ptr) { assets.insert(move(ptr)); });
+  model.readContr([& contrs = impl_->contrs](auto&& ptr) { contrs.insert(move(ptr)); });
   model.readMarket(impl_->factory,
                    [& markets = impl_->markets](auto&& ptr) { markets.insert(move(ptr)); });
   model.readTrader(impl_->factory,
@@ -228,17 +228,17 @@ void Serv::load(const Model& model, Millis now)
                      emailIdx.insert(static_cast<TraderSess&>(*ptr));
                      traders.insert(move(ptr));
                    });
-  model.readOrder(impl_->factory, [& traders = impl_->traders](auto&& ptr) {
+  model.readOrder([& traders = impl_->traders](auto&& ptr) {
     auto it = traders.find(ptr->trader());
     assert(it != traders.end());
     static_cast<TraderSess&>(*it).insertOrder(ptr);
   });
-  model.readTrade(impl_->factory, [& traders = impl_->traders](auto&& ptr) {
+  model.readTrade([& traders = impl_->traders](auto&& ptr) {
     auto it = traders.find(ptr->trader());
     assert(it != traders.end());
     static_cast<TraderSess&>(*it).insertTrade(ptr);
   });
-  model.readPosn(busDay, impl_->factory, [& traders = impl_->traders](auto&& ptr) {
+  model.readPosn(busDay, [& traders = impl_->traders](auto&& ptr) {
     auto it = traders.find(ptr->trader());
     assert(it != traders.end());
     static_cast<TraderSess&>(*it).insertPosn(ptr);
@@ -398,8 +398,8 @@ void Serv::createOrder(TraderSess& sess, MarketBook& book, string_view ref, Side
     throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
   }
   const auto orderId = book.allocOrderId();
-  auto order = impl_->factory.newOrder(sess.mnem(), book.mnem(), book.contr(), book.settlDay(),
-                                       orderId, ref, side, lots, ticks, minLots, now);
+  auto order = Order::make(sess.mnem(), book.mnem(), book.contr(), book.settlDay(), orderId, ref,
+                           side, lots, ticks, minLots, now);
   auto exec = impl_->newExec(book, *order, now);
 
   resp.insertOrder(order);

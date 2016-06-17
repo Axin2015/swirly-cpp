@@ -45,18 +45,6 @@ void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostre
 }
 } // anonymous
 
-MarketBook::MarketBook(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
-                       MarketState state, Lots lastLots, Ticks lastTicks, Millis lastTime,
-                       Iden maxOrderId, Iden maxExecId) noexcept
-  : Market{mnem, display, contr, settlDay, expiryDay, state},
-    lastLots_{lastLots},
-    lastTicks_{lastTicks},
-    lastTime_{lastTime},
-    maxOrderId_{maxOrderId},
-    maxExecId_{maxExecId}
-{
-}
-
 MarketBook::~MarketBook() noexcept = default;
 
 void MarketBook::toJsonView(ostream& os) const
