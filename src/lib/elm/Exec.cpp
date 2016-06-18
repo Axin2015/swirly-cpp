@@ -86,6 +86,14 @@ void Exec::toJson(ostream& os) const
      << '}';
 }
 
+ExecPtr Exec::inverse(Iden id) const
+{
+  assert(!cpty_.empty());
+  return make(cpty_, market_, contr_, settlDay_, id, +ref_, orderId_, state_,
+              swirly::inverse(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
+              minLots_, matchId_, swirly::inverse(role_), trader_, created_);
+}
+
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId,
                  Role role, Mnem cpty) noexcept
 {

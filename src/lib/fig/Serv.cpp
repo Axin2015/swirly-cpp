@@ -72,19 +72,43 @@ struct Serv::Impl {
     }
     return TraderSess::make(mnem, display, email);
   }
-  ExecPtr newExec(const Order& order, Iden id, Millis now) const
+  ExecPtr newExec(const Order& order, Iden id, Millis created) const
   {
     return Exec::make(order.trader(), order.market(), order.contr(), order.settlDay(), id,
                       order.ref(), order.id(), order.state(), order.side(), order.lots(),
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
-                      order.lastTicks(), order.minLots(), 0_id, Role::None, Mnem{}, now);
+                      order.lastTicks(), order.minLots(), 0_id, Role::None, Mnem{}, created);
   }
-  ExecPtr newExec(MarketBook& book, const Order& order, Millis now) const
+  ExecPtr newExec(MarketBook& book, const Order& order, Millis created) const
   {
-    return newExec(order, book.allocExecId(), now);
+    return newExec(order, book.allocExecId(), created);
+  }
+  /**
+   * Special factory method for manual trades.
+   */
+  ExecPtr newManual(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, string_view ref,
+                    Side side, Lots lots, Ticks ticks, Role role, Mnem cpty, Millis created) const
+  {
+    const auto orderId = 0_id;
+    const auto state = State::Trade;
+    const auto resd = 0_lts;
+    const auto exec = lots;
+    const auto cost = swirly::cost(lots, ticks);
+    const auto lastLots = lots;
+    const auto lastTicks = ticks;
+    const auto minLots = 1_lts;
+    const auto matchId = 0_id;
+    return Exec::make(trader, market, contr, settlDay, id, ref, orderId, state, side, lots, ticks,
+                      resd, exec, cost, lastLots, lastTicks, minLots, matchId, role, cpty, created);
+  }
+  ExecPtr newManual(Mnem trader, MarketBook& book, string_view ref, Side side, Lots lots,
+                    Ticks ticks, Role role, Mnem cpty, Millis created) const
+  {
+    return newManual(trader, book.mnem(), book.contr(), book.settlDay(), book.allocExecId(), ref,
+                     side, lots, ticks, role, cpty, created);
   }
   Match newMatch(MarketBook& book, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
-                 Lots sumLots, Cost sumCost, Millis now)
+                 Lots sumLots, Cost sumCost, Millis created)
   {
     const auto makerId = book.allocExecId();
     const auto takerId = book.allocExecId();
@@ -96,10 +120,10 @@ struct Serv::Impl {
 
     const auto ticks = makerOrder->ticks();
 
-    auto makerTrade = newExec(*makerOrder, makerId, now);
+    auto makerTrade = newExec(*makerOrder, makerId, created);
     makerTrade->trade(lots, ticks, takerId, Role::Maker, takerOrder.trader());
 
-    auto takerTrade = newExec(takerOrder, takerId, now);
+    auto takerTrade = newExec(takerOrder, takerId, created);
     takerTrade->trade(sumLots, sumCost, lots, ticks, makerId, Role::Taker, makerOrder->trader());
 
     return {lots, makerOrder, makerTrade, makerPosn, takerTrade};
@@ -647,11 +671,35 @@ void Serv::archiveOrder(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Mill
   }
 }
 
-ConstExecPtr Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side,
-                               Lots lots, Ticks ticks, Role role, Mnem cpty, Millis created)
+void Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side, Lots lots,
+                       Ticks ticks, Role role, Mnem cpty, Millis created, Response& resp)
 {
-  // FIXME: Not implemented.
-  return {};
+  auto posn = sess.lazyPosn(book.contr(), book.settlDay());
+  auto trade = impl_->newManual(sess.mnem(), book, ref, side, lots, ticks, role, cpty, created);
+
+  if (!cpty.empty()) {
+
+    // Create back-to-back trade if counter-party is specified.
+    auto& cptySess = trader(cpty);
+    auto cptyPosn = cptySess.lazyPosn(book.contr(), book.settlDay());
+    auto cptyTrade = trade->inverse(book.allocExecId());
+
+    ConstExecPtr trades[] = {cptyTrade, trade};
+    impl_->journ.createExec(trades);
+
+    // Commit phase.
+
+    cptySess.insertTrade(cptyTrade);
+    cptyPosn->addTrade(cptyTrade->side(), cptyTrade->lastLots(), cptyTrade->lastTicks());
+
+  } else {
+
+    impl_->journ.createExec(*trade);
+
+    // Commit phase.
+  }
+  sess.insertTrade(trade);
+  posn->addTrade(trade->side(), trade->lastLots(), trade->lastTicks());
 }
 
 void Serv::archiveTrade(TraderSess& sess, const Exec& trade, Millis now)

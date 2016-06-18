@@ -122,7 +122,11 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
 
   StreamBuf buf{nc.send_mbuf};
   out_.rdbuf(&buf);
-  out_.reset(200, "OK");
+  if (!isSet(MethodDelete)) {
+    out_.reset(200, "OK");
+  } else {
+    out_.reset(204, "No Content");
+  }
   try {
     const auto body = data.body();
     if (!body.empty()) {
@@ -541,7 +545,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     case MethodDelete:
       // DELETE /api/sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteOrder(market, ids_, now, out_);
+      rest_.deleteOrder(trader(data), market, ids_, now);
       break;
     }
     return;
@@ -580,7 +584,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/sess/trade/MARKET
       state_ |= MatchMethod;
-      rest_.postTrade(market, now, out_);
+      rest_.postTrade(trader(data), market, now, out_);
       break;
     }
     return;
@@ -603,7 +607,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodDelete:
       // DELETE /api/sess/trade/MARKET/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteTrade(market, ids_, now, out_);
+      rest_.deleteTrade(trader(data), market, ids_, now);
       break;
     }
     return;

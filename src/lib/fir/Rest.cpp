@@ -341,26 +341,22 @@ void Rest::putOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Lots lots, Mi
   out << resp;
 }
 
-void Rest::deleteOrder(Mnem market, ArrayView<Iden> ids, Millis now, ostream& out)
+void Rest::deleteOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Millis now)
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\",\"ids\":[";
-  copy(ids.begin(), ids.end(), OStreamJoiner(out, ','));
-  out << "]}";
+  auto& sess = serv_.trader(trader);
+  serv_.archiveOrder(sess, market, ids, now);
 }
 
-void Rest::postTrade(Mnem market, Millis now, ostream& out)
+void Rest::postTrade(Mnem trader, Mnem market, Millis now, ostream& out)
 {
   // FIXME: Not implemented.
   out << "{\"market\":\"" << market << "\"}";
 }
 
-void Rest::deleteTrade(Mnem market, ArrayView<Iden> ids, Millis now, ostream& out)
+void Rest::deleteTrade(Mnem trader, Mnem market, ArrayView<Iden> ids, Millis now)
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\",\"ids\":[";
-  copy(ids.begin(), ids.end(), OStreamJoiner(out, ','));
-  out << "]}";
+  auto& sess = serv_.trader(trader);
+  serv_.archiveTrade(sess, market, ids, now);
 }
 
 } // swirly

@@ -173,6 +173,21 @@ enum class Role {
 
 SWIRLY_API const char* enumString(Role role);
 
+constexpr Role inverse(Role role) noexcept
+{
+  switch (role) {
+  case Role::None:
+    break;
+  case Role::Maker:
+    role = Role::Taker;
+    break;
+  case Role::Taker:
+    role = Role::Maker;
+    break;
+  }
+  return role;
+}
+
 template <>
 struct EnumTraits<Role> {
   static void print(std::ostream& os, Role val) { os << enumString(val); }
@@ -181,6 +196,19 @@ struct EnumTraits<Role> {
 enum class Side { Buy = 1, Sell = -1 };
 
 SWIRLY_API const char* enumString(Side side);
+
+constexpr Side inverse(Side side) noexcept
+{
+  switch (side) {
+  case Side::Buy:
+    side = Side::Sell;
+    break;
+  case Side::Sell:
+    side = Side::Buy;
+    break;
+  }
+  return side;
+}
 
 template <>
 struct EnumTraits<Side> {

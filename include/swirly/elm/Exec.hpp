@@ -71,6 +71,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   {
     return makeRefCounted<Exec>(std::forward<ArgsT>(args)...);
   }
+  ExecPtr inverse(Iden id) const;
 
   void toJson(std::ostream& os) const override;
 

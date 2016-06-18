@@ -36,6 +36,7 @@ namespace swirly {
 template <typename ValueT>
 class RingBuffer {
   static_assert(std::is_pod<ValueT>::value, "value-type must be pod");
+
  public:
   explicit RingBuffer(std::size_t capacity)
     : capacity_{nextPow2(capacity)}, mask_{capacity_ - 1}, buf_{new ValueT[capacity_]}
