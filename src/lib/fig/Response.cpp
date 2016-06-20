@@ -56,8 +56,11 @@ void Response::toJson(ostream& os) const
     os << "null";
   }
   os << ",\"view\":";
-  assert(book_);
-  book_->toJsonView(os);
+  if (book_) {
+    book_->toJsonView(os);
+  } else {
+    os << "null";
+  }
   os << '}';
 }
 

@@ -74,22 +74,37 @@ OStream::OStream() : ostream{nullptr}
 
 OStream::~OStream() noexcept = default;
 
+// All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
+// body.
+constexpr bool withBody(int status) noexcept
+{
+  return !((status >= 100 && status < 200) || status == 204 || status == 304);
+}
+
 void OStream::reset(int status, const char* reason) noexcept
 {
   rdbuf()->reset();
   swirly::reset(*this);
 
-  // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space place-holder for
-  // content length. RFC2616 states that field value MAY be preceded by any amount of LWS, though a
-  // single SP is preferred.
-  *this << "HTTP/1.1 " << status << ' ' << reason << "\r\nContent-Length:           \r\n\r\n";
+  *this << "HTTP/1.1 " << status << ' ' << reason;
+  if (withBody(status)) {
+    // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space place-holder
+    // for content length. RFC2616 states that field value MAY be preceded by any amount of LWS,
+    // though a single SP is preferred.
+    *this << "\r\nContent-Length:          0";
+    lengthAt_ = size();
+  } else {
+    lengthAt_ = 0;
+  }
+  *this << "\r\n\r\n";
   headSize_ = size();
-  lengthAt_ = headSize_ - 4;
 }
 
 void OStream::setContentLength() noexcept
 {
-  rdbuf()->setContentLength(lengthAt_, size() - headSize_);
+  if (lengthAt_ > 0) {
+    rdbuf()->setContentLength(lengthAt_, size() - headSize_);
+  }
 }
 
 } // mg
