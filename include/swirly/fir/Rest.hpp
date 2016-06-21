@@ -112,6 +112,12 @@ class SWIRLY_API Rest {
   void deleteTrade(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Millis now);
 
  private:
+  void getOrder(const TraderSess& sess, Millis now, std::ostream& out) const;
+
+  void getTrade(const TraderSess& sess, Millis now, std::ostream& out) const;
+
+  void getPosn(const TraderSess& sess, Millis now, std::ostream& out) const;
+
   Serv serv_;
 };
 

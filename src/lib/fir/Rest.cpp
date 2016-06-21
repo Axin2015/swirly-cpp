@@ -134,12 +134,12 @@ void Rest::getTrader(Mnem mnem, Millis now, ostream& out) const
 
 void Rest::getSess(std::string_view eTrader, EntitySet es, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   int i{0};
   out << '{';
   if (es.order()) {
     out << "\"orders\":";
-    out << "[]";
+    getOrder(sess, now, out);
     ++i;
   }
   if (es.trade()) {
@@ -147,7 +147,7 @@ void Rest::getSess(std::string_view eTrader, EntitySet es, Millis now, ostream& 
       out << ',';
     }
     out << "\"trades\":";
-    out << "[]";
+    getTrade(sess, now, out);
     ++i;
   }
   if (es.posn()) {
@@ -155,7 +155,7 @@ void Rest::getSess(std::string_view eTrader, EntitySet es, Millis now, ostream& 
       out << ',';
     }
     out << "\"posns\":";
-    out << "[]";
+    getPosn(sess, now, out);
     ++i;
   }
   if (es.view()) {
@@ -171,16 +171,12 @@ void Rest::getSess(std::string_view eTrader, EntitySet es, Millis now, ostream& 
 
 void Rest::getOrder(std::string_view eTrader, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
-  const auto& orders = sess.orders();
-  out << '[';
-  copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
-  out << ']';
+  getOrder(serv_.traderFromEmail(eTrader), now, out);
 }
 
 void Rest::getOrder(std::string_view eTrader, Mnem market, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   const auto& orders = sess.orders();
   out << '[';
   copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
@@ -190,7 +186,7 @@ void Rest::getOrder(std::string_view eTrader, Mnem market, Millis now, ostream& 
 
 void Rest::getOrder(std::string_view eTrader, Mnem market, Iden id, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   const auto& orders = sess.orders();
   auto it = orders.find(market, id);
   if (it == orders.end()) {
@@ -201,16 +197,12 @@ void Rest::getOrder(std::string_view eTrader, Mnem market, Iden id, Millis now, 
 
 void Rest::getTrade(std::string_view eTrader, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
-  const auto& trades = sess.trades();
-  out << '[';
-  copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
-  out << ']';
+  getTrade(serv_.traderFromEmail(eTrader), now, out);
 }
 
 void Rest::getTrade(std::string_view eTrader, Mnem market, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   const auto& trades = sess.trades();
   out << '[';
   copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
@@ -220,7 +212,7 @@ void Rest::getTrade(std::string_view eTrader, Mnem market, Millis now, ostream& 
 
 void Rest::getTrade(std::string_view eTrader, Mnem market, Iden id, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   const auto& trades = sess.trades();
   auto it = trades.find(market, id);
   if (it == trades.end()) {
@@ -231,16 +223,12 @@ void Rest::getTrade(std::string_view eTrader, Mnem market, Iden id, Millis now, 
 
 void Rest::getPosn(std::string_view eTrader, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
-  const auto& posns = sess.posns();
-  out << '[';
-  copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
-  out << ']';
+  getPosn(serv_.traderFromEmail(eTrader), now, out);
 }
 
 void Rest::getPosn(std::string_view eTrader, Mnem contr, Millis now, ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   const auto& posns = sess.posns();
   out << '[';
   copy_if(posns.begin(), posns.end(), OStreamJoiner(out, ','),
@@ -251,7 +239,7 @@ void Rest::getPosn(std::string_view eTrader, Mnem contr, Millis now, ostream& ou
 void Rest::getPosn(std::string_view eTrader, Mnem contr, IsoDate settlDate, Millis now,
                    ostream& out) const
 {
-  auto& sess = serv_.traderFromEmail(eTrader);
+  const auto& sess = serv_.traderFromEmail(eTrader);
   const auto& posns = sess.posns();
   auto it = posns.find(contr, maybeIsoToJd(settlDate));
   if (it == posns.end()) {
@@ -358,6 +346,30 @@ void Rest::deleteTrade(std::string_view eTrader, Mnem market, ArrayView<Iden> id
 {
   auto& sess = serv_.traderFromEmail(eTrader);
   serv_.archiveTrade(sess, market, ids, now);
+}
+
+void Rest::getOrder(const TraderSess& sess, Millis now, std::ostream& out) const
+{
+  const auto& orders = sess.orders();
+  out << '[';
+  copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void Rest::getTrade(const TraderSess& sess, Millis now, std::ostream& out) const
+{
+  const auto& trades = sess.trades();
+  out << '[';
+  copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void Rest::getPosn(const TraderSess& sess, Millis now, std::ostream& out) const
+{
+  const auto& posns = sess.posns();
+  out << '[';
+  copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
+  out << ']';
 }
 
 } // swirly
