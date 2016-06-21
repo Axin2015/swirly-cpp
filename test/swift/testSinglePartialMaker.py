@@ -23,15 +23,15 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setUser('MARAYL')
+        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
 
-        conn.setUser('GOSAYL')
+        conn.setAuth('emailAddress=goska.aylett@swirlycloud.com')
         self.takeOrder(conn)
 
-        conn.setUser('MARAYL')
+        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
         self.makerOrder(conn)
         self.makerTrade(conn)
         self.makerPosn(conn)

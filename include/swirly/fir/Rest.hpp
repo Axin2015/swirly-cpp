@@ -61,25 +61,28 @@ class SWIRLY_API Rest {
 
   void getTrader(Mnem mnem, Millis now, std::ostream& out) const;
 
-  void getSess(Mnem trader, EntitySet es, Millis now, std::ostream& out) const;
+  void getSess(std::string_view eTrader, EntitySet es, Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem trader, Millis now, std::ostream& out) const;
+  void getOrder(std::string_view eTrader, Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem trader, Mnem market, Millis now, std::ostream& out) const;
+  void getOrder(std::string_view eTrader, Mnem market, Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem trader, Mnem market, Iden id, Millis now, std::ostream& out) const;
+  void getOrder(std::string_view eTrader, Mnem market, Iden id, Millis now,
+                std::ostream& out) const;
 
-  void getTrade(Mnem trader, Millis now, std::ostream& out) const;
+  void getTrade(std::string_view eTrader, Millis now, std::ostream& out) const;
 
-  void getTrade(Mnem trader, Mnem market, Millis now, std::ostream& out) const;
+  void getTrade(std::string_view eTrader, Mnem market, Millis now, std::ostream& out) const;
 
-  void getTrade(Mnem trader, Mnem market, Iden id, Millis now, std::ostream& out) const;
+  void getTrade(std::string_view eTrader, Mnem market, Iden id, Millis now,
+                std::ostream& out) const;
 
-  void getPosn(Mnem trader, Millis now, std::ostream& out) const;
+  void getPosn(std::string_view eTrader, Millis now, std::ostream& out) const;
 
-  void getPosn(Mnem trader, Mnem contr, Millis now, std::ostream& out) const;
+  void getPosn(std::string_view eTrader, Mnem contr, Millis now, std::ostream& out) const;
 
-  void getPosn(Mnem trader, Mnem contr, IsoDate settlDate, Millis now, std::ostream& out) const;
+  void getPosn(std::string_view eTrader, Mnem contr, IsoDate settlDate, Millis now,
+               std::ostream& out) const;
 
   void getView(Millis now, std::ostream& out) const;
 
@@ -96,17 +99,17 @@ class SWIRLY_API Rest {
 
   void putTrader(Mnem mnem, std::string_view display, Millis now, std::ostream& out);
 
-  void postOrder(Mnem trader, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
-                 Lots minLots, Millis now, std::ostream& out);
+  void postOrder(std::string_view eTrader, Mnem market, std::string_view ref, Side side, Lots lots,
+                 Ticks ticks, Lots minLots, Millis now, std::ostream& out);
 
-  void putOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
+  void putOrder(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
                 std::ostream& out);
 
-  void deleteOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Millis now);
+  void deleteOrder(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Millis now);
 
-  void postTrade(Mnem trader, Mnem market, Millis now, std::ostream& out);
+  void postTrade(std::string_view eTrader, Mnem market, Millis now, std::ostream& out);
 
-  void deleteTrade(Mnem trader, Mnem market, ArrayView<Iden> ids, Millis now);
+  void deleteTrade(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Millis now);
 
  private:
   Serv serv_;

@@ -309,14 +309,13 @@ TraderSess& Serv::trader(Mnem mnem) const
   return trader;
 }
 
-TraderSess* Serv::findTraderByEmail(string_view email) const
+TraderSess& Serv::traderFromEmail(string_view email) const
 {
-  TraderSess* trader{nullptr};
   auto it = impl_->emailIdx.find(email);
-  if (it != impl_->emailIdx.end()) {
-    trader = &*it;
+  if (it == impl_->emailIdx.end()) {
+    throw TraderNotFoundException{errMsg() << "trader '" << email << "' does not exist"};
   }
-  return trader;
+  return *it;
 }
 
 MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,

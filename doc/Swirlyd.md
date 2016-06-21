@@ -50,11 +50,12 @@ Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 
 
 ### http_port ###
 
-nHttp port. Defaults to 8080.
+Http port. Defaults to 8080.
 
-### http_user ###
+### http_auth ###
 
-Http user header. The default is "Swirly-User".
+Http auth header containing the authenticated user's Distinguished Name (DN). The default is
+"Swirly-Auth".
 
 ### journ_capacity ###
 

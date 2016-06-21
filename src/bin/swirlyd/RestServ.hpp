@@ -22,8 +22,6 @@
 
 #include <swirly/fir/RestRequest.hpp>
 
-#include <swirly/elm/Exception.hpp>
-
 #include <swirly/ash/Array.hpp>
 #include <swirly/ash/Profile.hpp>
 #include <swirly/ash/Tokeniser.hpp>
@@ -39,8 +37,8 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  explicit RestServ(Rest& rest, const char* httpUser, const char* httpTime = nullptr) noexcept
-    : rest_(rest), httpUser_{httpUser}, httpTime_{httpTime}, profile_{"profile"_sv}
+  explicit RestServ(Rest& rest, const char* httpAuth, const char* httpTime = nullptr) noexcept
+    : rest_(rest), httpAuth_{httpAuth}, httpTime_{httpTime}, profile_{"profile"_sv}
   {
     memset(&httpOpts_, 0, sizeof(httpOpts_));
   }
@@ -88,19 +86,10 @@ class RestServ : public mg::Mgr<RestServ> {
     // Match result mask.
     MatchMask = MatchMethod | MatchUri
   };
-
-  Mnem trader(mg::HttpMessage data) const
-  {
-    auto mnem = data.header(httpUser_);
-    if (mnem.empty()) {
-      throw UnauthorizedException{"authorisation required"_sv};
-    }
-    return mnem;
-  }
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
 
   Rest& rest_;
-  const char* const httpUser_;
+  const char* const httpAuth_;
   const char* const httpTime_;
   mg_serve_http_opts httpOpts_;
   int state_{0};

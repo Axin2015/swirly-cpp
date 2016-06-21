@@ -73,7 +73,7 @@ class SWIRLY_API Serv {
 
   TraderSess& trader(Mnem mnem) const;
 
-  TraderSess* findTraderByEmail(std::string_view email) const;
+  TraderSess& traderFromEmail(std::string_view email) const;
 
   MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                            Jday expiryDay, MarketState state, Millis now);
