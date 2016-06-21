@@ -21,6 +21,7 @@
 
 #include "mongoose.h"
 
+#include <swirly/ash/Log.hpp>
 #include <swirly/ash/String.hpp>
 
 namespace swirly {
@@ -95,7 +96,11 @@ class Mgr {
   {
     auto* self = static_cast<DerivedT*>(conn->user_data);
     switch (event) {
+    case MG_EV_ACCEPT:
+      SWIRLY_INFO(logMsg() << "http connection accepted");
+      break;
     case MG_EV_CLOSE:
+      SWIRLY_INFO(logMsg() << "http connection closed");
       conn->user_data = nullptr;
       break;
     case MG_EV_HTTP_REQUEST:

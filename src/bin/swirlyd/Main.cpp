@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
     auto& conn = rs.bind(httpPort);
     mg_set_protocol_http_websocket(&conn);
 
-    SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << httpPort);
+    SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
     SWIRLY_INFO(logMsg() << "conf_file:      " << opts.confFile);
     SWIRLY_INFO(logMsg() << "daemon:         " << (opts.daemon ? "yes" : "no"));
@@ -295,6 +295,6 @@ int main(int argc, char* argv[])
   } catch (const exception& e) {
     SWIRLY_ERROR(logMsg() << "exception: " << e.what());
   }
-  SWIRLY_NOTICE("stopped swirlyd server"_sv);
+  SWIRLY_NOTICE("stopped http server"_sv);
   return ret;
 }
