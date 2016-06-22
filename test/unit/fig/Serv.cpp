@@ -148,17 +148,17 @@ SWIRLY_FIXTURE_TEST_CASE(ServTrader, ServFixture)
   SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServFindTraderByEmail, ServFixture)
+SWIRLY_FIXTURE_TEST_CASE(ServTraderFromEmail, ServFixture)
 {
   // Not found.
-  SWIRLY_CHECK(serv.findTraderByEmail("mark.aylett@swirlycloud.comx"_sv) == nullptr);
+  SWIRLY_CHECK_THROW(serv.traderFromEmail("mark.aylett@swirlycloud.comx"_sv),
+                     TraderNotFoundException);
 
-  auto* sess = serv.findTraderByEmail("mark.aylett@swirlycloud.com"_sv);
-  SWIRLY_CHECK(sess != nullptr);
-  SWIRLY_CHECK(sess->mnem() == "MARAYL"_sv);
-  SWIRLY_CHECK(sess->display() == "Mark Aylett"_sv);
+  auto& sess = serv.traderFromEmail("mark.aylett@swirlycloud.com"_sv);
+  SWIRLY_CHECK(sess.mnem() == "MARAYL"_sv);
+  SWIRLY_CHECK(sess.display() == "Mark Aylett"_sv);
 
-  SWIRLY_CHECK(sess->email() == "mark.aylett@swirlycloud.com"_sv);
+  SWIRLY_CHECK(sess.email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
@@ -296,7 +296,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, ServFixture)
   SWIRLY_CHECK(&*it == &sess);
 
   // Email index has been updated.
-  SWIRLY_CHECK(serv.findTraderByEmail("pippin.aylett@swirlycloud.com"_sv) == &sess);
+  SWIRLY_CHECK(&serv.traderFromEmail("pippin.aylett@swirlycloud.com"_sv) == &sess);
 
   // Already exists.
   SWIRLY_CHECK_THROW(

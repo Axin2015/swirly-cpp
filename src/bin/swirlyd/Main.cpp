@@ -233,19 +233,19 @@ int main(int argc, char* argv[])
       model = make_unique<TestModel>();
     }
     const char* const httpPort{conf.get("http_port", "8080")};
-    const char* const httpUser{conf.get("http_user", "Swirly-User")};
+    const char* const httpAuth{conf.get("http_auth", "Swirly-Auth")};
 
     const long journCapacity{conf.get("journ_capacity", 1L << 10)};
     Rest rest{*journ, static_cast<size_t>(journCapacity)};
     rest.load(*model, getTimeOfDay());
     model = nullptr;
 
-    mg::RestServ rs{rest, httpUser, opts.testMode ? "Swirly-Time" : nullptr};
+    mg::RestServ rs{rest, httpAuth, opts.testMode ? "Swirly-Time" : nullptr};
 
     auto& conn = rs.bind(httpPort);
     mg_set_protocol_http_websocket(&conn);
 
-    SWIRLY_NOTICE(logMsg() << "started swirlyd server on port " << httpPort);
+    SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
     SWIRLY_INFO(logMsg() << "conf_file:      " << opts.confFile);
     SWIRLY_INFO(logMsg() << "daemon:         " << (opts.daemon ? "yes" : "no"));
@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
     SWIRLY_INFO(logMsg() << "log_file:       " << logFile);
     SWIRLY_INFO(logMsg() << "log_level:      " << getLogLevel());
     SWIRLY_INFO(logMsg() << "http_port:      " << httpPort);
-    SWIRLY_INFO(logMsg() << "http_user:      " << httpUser);
+    SWIRLY_INFO(logMsg() << "http_auth:      " << httpAuth);
     SWIRLY_INFO(logMsg() << "journ_capacity: " << journCapacity);
 
     signal(SIGHUP, sigHandler);
@@ -295,6 +295,6 @@ int main(int argc, char* argv[])
   } catch (const exception& e) {
     SWIRLY_ERROR(logMsg() << "exception: " << e.what());
   }
-  SWIRLY_NOTICE("stopped swirlyd server"_sv);
+  SWIRLY_NOTICE("stopped http server"_sv);
   return ret;
 }
