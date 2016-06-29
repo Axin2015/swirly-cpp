@@ -252,10 +252,20 @@ void Serv::load(const Model& model, Millis now)
                      emailIdx.insert(static_cast<TraderSess&>(*ptr));
                      traders.insert(move(ptr));
                    });
-  model.readOrder([& traders = impl_->traders](auto&& ptr) {
+  model.readOrder([& markets = impl_->markets, &traders = impl_->traders ](auto&& ptr) {
     auto it = traders.find(ptr->trader());
     assert(it != traders.end());
     static_cast<TraderSess&>(*it).insertOrder(ptr);
+    bool success{false};
+    auto finally = makeFinally([&]() {
+      if (!success) {
+        static_cast<TraderSess&>(*it).removeOrder(*ptr);
+      }
+    });
+    auto jt = markets.find(ptr->market());
+    assert(jt != markets.end());
+    static_cast<MarketBook&>(*jt).insertOrder(ptr);
+    success = true;
   });
   model.readTrade([& traders = impl_->traders](auto&& ptr) {
     auto it = traders.find(ptr->trader());
