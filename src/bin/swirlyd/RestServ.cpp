@@ -445,7 +445,8 @@ void RestServ::traderRequest(HttpMessage data, Millis now)
 
       // FIXME: Incomplete. See BackRecServlet.java
       constexpr auto reqFields = RestRequest::Display;
-      if (request_.fields() != reqFields) {
+      constexpr auto optFields = RestRequest::Email;
+      if (!request_.valid(reqFields, optFields)) {
         throw InvalidException{"request fields are invalid"_sv};
       }
       rest_.putTrader(mnem, request_.display(), now, out_);
