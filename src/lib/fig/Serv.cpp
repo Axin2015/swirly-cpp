@@ -680,20 +680,21 @@ void Serv::archiveOrder(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Mill
   }
 }
 
-void Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side, Lots lots,
-                       Ticks ticks, Role role, Mnem cpty, Millis created, Response& resp)
+TradePair Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side side,
+                            Lots lots, Ticks ticks, Role role, Mnem cpty, Millis created)
 {
   auto posn = sess.lazyPosn(book.contr(), book.settlDay());
   auto trade = impl_->newManual(sess.mnem(), book, ref, side, lots, ticks, role, cpty, created);
+  decltype(trade) cptyTrade;
 
   if (!cpty.empty()) {
 
     // Create back-to-back trade if counter-party is specified.
     auto& cptySess = trader(cpty);
     auto cptyPosn = cptySess.lazyPosn(book.contr(), book.settlDay());
-    auto cptyTrade = trade->inverse(book.allocExecId());
+    cptyTrade = trade->inverse(book.allocExecId());
 
-    ConstExecPtr trades[] = {cptyTrade, trade};
+    ConstExecPtr trades[] = {trade, cptyTrade};
     impl_->journ.createExec(trades);
 
     // Commit phase.
@@ -709,6 +710,8 @@ void Serv::createTrade(TraderSess& sess, MarketBook& book, string_view ref, Side
   }
   sess.insertTrade(trade);
   posn->addTrade(trade->side(), trade->lastLots(), trade->lastTicks());
+
+  return {trade, cptyTrade};
 }
 
 void Serv::archiveTrade(TraderSess& sess, const Exec& trade, Millis now)

@@ -621,7 +621,16 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodPost:
       // POST /api/sess/trade/MARKET
       state_ |= MatchMethod;
-      rest_.postTrade(getETrader(data, httpAuth_), market, now, out_);
+      {
+        constexpr auto reqFields = RestRequest::Trader | RestRequest::Side | RestRequest::Lots;
+        constexpr auto optFields
+          = RestRequest::Ref | RestRequest::Ticks | RestRequest::Role | RestRequest::Cpty;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postTrade(request_.trader(), market, request_.ref(), request_.side(), request_.lots(),
+                        request_.ticks(), request_.role(), request_.cpty(), now, out_);
+      }
       break;
     }
     return;
