@@ -336,10 +336,17 @@ void Rest::deleteOrder(std::string_view eTrader, Mnem market, ArrayView<Iden> id
   serv_.archiveOrder(sess, market, ids, now);
 }
 
-void Rest::postTrade(std::string_view eTrader, Mnem market, Millis now, ostream& out)
+void Rest::postTrade(Mnem trader, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
+                     Role role, Mnem cpty, Millis now, ostream& out)
 {
-  // FIXME: Not implemented.
-  out << "{\"market\":\"" << market << "\"}";
+  auto& sess = serv_.trader(trader);
+  auto& book = serv_.market(market);
+  auto trades = serv_.createTrade(sess, book, ref, side, lots, ticks, role, cpty, now);
+  out << '[' << *trades.first;
+  if (trades.second) {
+    out << ',' << *trades.second;
+  }
+  out << ']';
 }
 
 void Rest::deleteTrade(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Millis now)

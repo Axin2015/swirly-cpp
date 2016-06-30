@@ -45,6 +45,8 @@ class TraderSess;
  * @{
  */
 
+using TradePair = std::pair<ExecPtr, ExecPtr>;
+
 class SWIRLY_API Serv {
  public:
   Serv(Journ& journ, std::size_t capacity);
@@ -128,8 +130,8 @@ class SWIRLY_API Serv {
 
   void archiveOrder(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Millis now);
 
-  void createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
-                   Ticks ticks, Role role, Mnem cpty, Millis created, Response& resp);
+  TradePair createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
+                        Lots lots, Ticks ticks, Role role, Mnem cpty, Millis created);
 
   void archiveTrade(TraderSess& sess, const Exec& trade, Millis now);
 
