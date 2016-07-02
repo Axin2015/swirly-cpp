@@ -76,7 +76,7 @@ class OStream : public std::ostream {
   {
     return static_cast<StreamBuf*>(std::ostream::rdbuf(sb));
   }
-  void reset(int status, const char* reason) noexcept;
+  void reset(int status, const char* reason, bool cache = false) noexcept;
   void setContentLength() noexcept;
 
  private:

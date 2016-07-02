@@ -51,7 +51,7 @@ class RestServ : public mg::Mgr<RestServ> {
   RestServ(RestServ&&) = delete;
   RestServ& operator=(RestServ&&) = delete;
 
-  void reset(mg::HttpMessage data) noexcept;
+  bool reset(mg::HttpMessage data) noexcept;
 
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
   void restRequest(mg::HttpMessage data, Millis now);

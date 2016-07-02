@@ -110,12 +110,21 @@ Millis getTime(HttpMessage data, const char* httpTime = nullptr) noexcept
 
 RestServ::~RestServ() noexcept = default;
 
-void RestServ::reset(HttpMessage data) noexcept
+bool RestServ::reset(HttpMessage data) noexcept
 {
+  bool cache{false};
   state_ = 0;
+
+  auto uri = data.uri();
+  // Remove leading slash.
+  if (uri.front() == '/') {
+    uri.remove_prefix(1);
+  }
+  uri_.reset(uri);
 
   const auto method = data.method();
   if (method == "GET"_sv) {
+    cache = !uri.empty() && uri_.top() == "rec"_sv;
     state_ |= MethodGet;
   } else if (method == "POST"_sv) {
     state_ |= MethodPost;
@@ -125,13 +134,8 @@ void RestServ::reset(HttpMessage data) noexcept
     state_ |= MethodDelete;
   }
 
-  auto uri = data.uri();
-  // Remove leading slash.
-  if (uri.front() == '/') {
-    uri.remove_prefix(1);
-  }
-  uri_.reset(uri);
   request_.reset();
+  return cache;
 }
 
 void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
@@ -144,8 +148,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
       this->profile_.report();
     }
   });
-  reset(data);
-
+  const auto cache = reset(data);
   const auto now = getTime(data, httpTime_);
   // See mg_send().
   nc.last_io_time = unbox(now) / 1000;
@@ -153,7 +156,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
   StreamBuf buf{nc.send_mbuf};
   out_.rdbuf(&buf);
   if (!isSet(MethodDelete)) {
-    out_.reset(200, "OK");
+    out_.reset(200, "OK", cache);
   } else {
     out_.reset(204, "No Content");
   }
