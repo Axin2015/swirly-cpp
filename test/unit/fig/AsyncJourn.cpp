@@ -221,12 +221,13 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournUpdateTrader, AsyncJournFixture)
 SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 {
   ConstExecPtr execs[2];
-  execs[0] = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 1_id,
-                                  "REF"_sv, 2_id, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts,
-                                  0_lts, 0_cst, 0_lts, 0_tks, 1_lts, 0_id, Role::None, Mnem{}, Now);
+  execs[0]
+    = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 1_id, "REF"_sv,
+                           2_id, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts, 0_cst,
+                           0_lts, 0_tks, 1_lts, 0_id, LiqInd::None, Mnem{}, Now);
   execs[1] = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 3_id,
                                   "REF"_sv, 2_id, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
-                                  5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id, Role::Maker,
+                                  5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id, LiqInd::Maker,
                                   "GOSAYL"_sv, Now + 1_ms);
   asyncJourn.createExec(execs);
   {
@@ -253,7 +254,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.lastTicks == 0_tks);
     SWIRLY_CHECK(body.minLots == 1_lts);
     SWIRLY_CHECK(body.matchId == 0_id);
-    SWIRLY_CHECK(body.role == Role::None);
+    SWIRLY_CHECK(body.liqInd == LiqInd::None);
     SWIRLY_CHECK(strncmp(body.cpty, "", sizeof(body.cpty)) == 0);
     SWIRLY_CHECK(body.created == Now);
   }
@@ -281,7 +282,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.lastTicks == 12345_tks);
     SWIRLY_CHECK(body.minLots == 1_lts);
     SWIRLY_CHECK(body.matchId == 4_id);
-    SWIRLY_CHECK(body.role == Role::Maker);
+    SWIRLY_CHECK(body.liqInd == LiqInd::Maker);
     SWIRLY_CHECK(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)) == 0);
     SWIRLY_CHECK(body.created == Now + 1_ms);
   }

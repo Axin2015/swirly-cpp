@@ -204,18 +204,18 @@ SWIRLY_TEST_CASE(RestRequestMinLots)
   SWIRLY_CHECK(rr.minLots() == 0_lts);
 }
 
-SWIRLY_TEST_CASE(RestRequestRole)
+SWIRLY_TEST_CASE(RestRequestLiqInd)
 {
   RestRequest rr;
 
-  SWIRLY_CHECK(rr.parse(R"({"role":"MAKER"})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::Role);
-  SWIRLY_CHECK(rr.role() == Role::Maker);
+  SWIRLY_CHECK(rr.parse(R"({"liqInd":"MAKER"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::LiqInd);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::Maker);
 
   rr.reset(false);
-  rr.parse(R"({"role":null})"_sv);
+  rr.parse(R"({"liqInd":null})"_sv);
   SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.role() == Role::None);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::None);
 }
 
 SWIRLY_TEST_CASE(RestRequestCpty)
@@ -298,7 +298,7 @@ SWIRLY_TEST_CASE(RestRequestAll)
   RestRequest rr;
 
   SWIRLY_CHECK(rr.parse(
-    R"({"mnem":"EURUSD","display":"Euro Dollar","email":"mark.aylett@gmail.com","trader":"MARAYL","contr":"EURUSD","settlDate":20140315,"expiryDate":20140314,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"role":"MAKER","cpty":"MARAYL"})"_sv));
+    R"({"mnem":"EURUSD","display":"Euro Dollar","email":"mark.aylett@gmail.com","trader":"MARAYL","contr":"EURUSD","settlDate":20140315,"expiryDate":20140314,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
   SWIRLY_CHECK(rr.fields() == ((RestRequest::Cpty - 1) | RestRequest::Cpty));
   SWIRLY_CHECK(rr.mnem() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
@@ -313,7 +313,7 @@ SWIRLY_TEST_CASE(RestRequestAll)
   SWIRLY_CHECK(rr.lots() == 101_lts);
   SWIRLY_CHECK(rr.ticks() == 12345_tks);
   SWIRLY_CHECK(rr.minLots() == 101_lts);
-  SWIRLY_CHECK(rr.role() == Role::Maker);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::Maker);
   SWIRLY_CHECK(rr.cpty() == "MARAYL"_sv);
 }
 

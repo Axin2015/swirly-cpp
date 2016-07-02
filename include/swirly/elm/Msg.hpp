@@ -90,7 +90,7 @@ struct SWIRLY_PACKED CreateExecBody {
   Ticks lastTicks;
   Lots minLots;
   Iden matchId;
-  Role role;
+  LiqInd liqInd;
   char cpty[MaxMnem];
   Millis created;
   More more;

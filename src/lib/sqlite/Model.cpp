@@ -54,7 +54,7 @@ constexpr auto SelectOrderSql = //
 
 constexpr auto SelectTradeSql = //
   "SELECT trader, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
-  " exec, cost, last_lots, last_ticks, min_lots, match_id, role_id, cpty, created" //
+  " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
   " FROM exec_t WHERE archive = 0 AND state_id = 4;"_sv;
 
 constexpr auto SelectPosnSql = //
@@ -235,7 +235,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     LastTicks, //
     MinLots, //
     MatchId, //
-    Role, //
+    LiqInd, //
     Cpty, //
     Created //
   };
@@ -260,7 +260,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
                   column<swirly::Ticks>(*stmt, LastTicks), //
                   column<swirly::Lots>(*stmt, MinLots), //
                   column<Iden>(*stmt, MatchId), //
-                  column<swirly::Role>(*stmt, Role), //
+                  column<swirly::LiqInd>(*stmt, LiqInd), //
                   column<string_view>(*stmt, Cpty), //
                   column<Millis>(*stmt, Created)));
   }

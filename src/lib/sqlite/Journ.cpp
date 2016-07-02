@@ -49,7 +49,7 @@ constexpr auto UpdateTraderSql = //
 constexpr auto InsertExecSql = //
   "INSERT INTO exec_t (trader, market, contr, settl_day, id, ref, order_id," //
   " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
-  " min_lots, match_id, role_id, cpty, archive, created, modified)" //
+  " min_lots, match_id, liqInd_id, cpty, archive, created, modified)" //
   " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateOrderSql = //
@@ -190,7 +190,7 @@ void Journ::createExec(const CreateExecBody& body)
   }
   bind(body.minLots);
   bind(body.matchId, MaybeNull);
-  bind(body.role, MaybeNull);
+  bind(body.liqInd, MaybeNull);
   bind(toStringView(body.cpty), MaybeNull);
   bind(0); // Archive.
   bind(body.created); // Created.

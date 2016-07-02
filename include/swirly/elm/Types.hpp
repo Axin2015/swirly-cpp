@@ -156,9 +156,9 @@ struct EnumTraits<RecType> {
   static void print(std::ostream& os, RecType val) { os << enumString(val); }
 };
 
-enum class Role {
+enum class LiqInd {
   /**
-   * No role.
+   * No liqInd.
    */
   None = 0,
   /**
@@ -171,26 +171,26 @@ enum class Role {
   Taker
 };
 
-SWIRLY_API const char* enumString(Role role);
+SWIRLY_API const char* enumString(LiqInd liqInd);
 
-constexpr Role inverse(Role role) noexcept
+constexpr LiqInd inverse(LiqInd liqInd) noexcept
 {
-  switch (role) {
-  case Role::None:
+  switch (liqInd) {
+  case LiqInd::None:
     break;
-  case Role::Maker:
-    role = Role::Taker;
+  case LiqInd::Maker:
+    liqInd = LiqInd::Taker;
     break;
-  case Role::Taker:
-    role = Role::Maker;
+  case LiqInd::Taker:
+    liqInd = LiqInd::Maker;
     break;
   }
-  return role;
+  return liqInd;
 }
 
 template <>
-struct EnumTraits<Role> {
-  static void print(std::ostream& os, Role val) { os << enumString(val); }
+struct EnumTraits<LiqInd> {
+  static void print(std::ostream& os, LiqInd val) { os << enumString(val); }
 };
 
 enum class Side { Buy = 1, Sell = -1 };

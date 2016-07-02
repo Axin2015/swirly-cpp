@@ -337,11 +337,11 @@ void Rest::deleteOrder(std::string_view eTrader, Mnem market, ArrayView<Iden> id
 }
 
 void Rest::postTrade(Mnem trader, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
-                     Role role, Mnem cpty, Millis now, ostream& out)
+                     LiqInd liqInd, Mnem cpty, Millis now, ostream& out)
 {
   auto& sess = serv_.trader(trader);
   auto& book = serv_.market(market);
-  auto trades = serv_.createTrade(sess, book, ref, side, lots, ticks, role, cpty, now);
+  auto trades = serv_.createTrade(sess, book, ref, side, lots, ticks, liqInd, cpty, now);
   out << '[' << *trades.first;
   if (trades.second) {
     out << ',' << *trades.second;

@@ -253,21 +253,21 @@ namespace {
   minLots = 'null' %nullMinLots
     | num %endMinLots;
 
-  action nullRole {
-    fields_ &= ~Role;
-    role_ = swirly::Role::None;
+  action nullLiqInd {
+    fields_ &= ~LiqInd;
+    liqInd_ = swirly::LiqInd::None;
   }
-  action makerRole {
-    fields_ |= Role;
-    role_ = swirly::Role::Maker;
+  action makerLiqInd {
+    fields_ |= LiqInd;
+    liqInd_ = swirly::LiqInd::Maker;
   }
-  action takerRole {
-    fields_ |= Role;
-    role_ = swirly::Role::Taker;
+  action takerLiqInd {
+    fields_ |= LiqInd;
+    liqInd_ = swirly::LiqInd::Taker;
   }
-  role = 'null' %nullRole
-    | '"MAKER"'i %makerRole
-    | '"TAKER"'i %takerRole;
+  liqInd = 'null' %nullLiqInd
+    | '"MAKER"'i %makerLiqInd
+    | '"TAKER"'i %takerLiqInd;
 
   action nullCpty {
     fields_ &= ~Cpty;
@@ -300,7 +300,7 @@ namespace {
     | '"lots"'i colon lots
     | '"ticks"'i colon ticks
     | '"minLots"'i colon minLots
-    | '"role"'i colon role
+    | '"liqInd"'i colon liqInd
     | '"cpty"'i colon cpty;
 
   members = pair (comma pair)*;
@@ -341,7 +341,7 @@ void RestRequest::reset(bool clear) noexcept
   lots_ = 0_lts;
   ticks_ = 0_tks;
   minLots_ = 0_lts;
-  role_ = swirly::Role::None;
+  liqInd_ = swirly::LiqInd::None;
   cpty_.len = 0;
 }
 

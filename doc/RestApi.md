@@ -127,7 +127,7 @@ Get Trade(s) with optional filter by Market and Id.
 | lots        | Long               | Yes   |
 | ticks       | Long               | Yes   |
 | ref         | String             | No    |
-| role        | 'MAKER' or 'TAKER' | No    |
+| liqind      | 'MAKER' or 'TAKER' | No    |
 | cpty        | String             | No    |
 
 Create Trade. Admin only.

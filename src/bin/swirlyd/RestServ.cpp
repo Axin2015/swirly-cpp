@@ -624,12 +624,12 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
       {
         constexpr auto reqFields = RestRequest::Trader | RestRequest::Side | RestRequest::Lots;
         constexpr auto optFields
-          = RestRequest::Ref | RestRequest::Ticks | RestRequest::Role | RestRequest::Cpty;
+          = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
         if (!request_.valid(reqFields, optFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
         rest_.postTrade(request_.trader(), market, request_.ref(), request_.side(), request_.lots(),
-                        request_.ticks(), request_.role(), request_.cpty(), now, out_);
+                        request_.ticks(), request_.liqInd(), request_.cpty(), now, out_);
       }
       break;
     }

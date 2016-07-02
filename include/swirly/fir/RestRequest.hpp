@@ -45,7 +45,7 @@ class SWIRLY_API RestRequest {
     Lots = 1 << 10,
     Ticks = 1 << 11,
     MinLots = 1 << 12,
-    Role = 1 << 13,
+    LiqInd = 1 << 13,
     Cpty = 1 << 14
   };
 
@@ -74,7 +74,7 @@ class SWIRLY_API RestRequest {
   swirly::Lots lots() const noexcept { return lots_; }
   swirly::Ticks ticks() const noexcept { return ticks_; }
   swirly::Lots minLots() const noexcept { return minLots_; }
-  swirly::Role role() const noexcept { return role_; }
+  swirly::LiqInd liqInd() const noexcept { return liqInd_; }
   swirly::Mnem cpty() const noexcept { return +cpty_; }
   /**
    * Validate fields.
@@ -121,7 +121,7 @@ class SWIRLY_API RestRequest {
   swirly::Lots lots_;
   swirly::Ticks ticks_;
   swirly::Lots minLots_;
-  swirly::Role role_;
+  swirly::LiqInd liqInd_;
   StringData<MaxMnem> cpty_;
 
   long num() const noexcept { return num_.sign * num_.digits; }

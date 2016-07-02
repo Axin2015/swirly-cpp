@@ -57,15 +57,15 @@ INSERT INTO direct_t (id, mnem) VALUES (1, 'PAID')
 INSERT INTO direct_t (id, mnem) VALUES (-1, 'GIVEN')
 ;
 
-CREATE TABLE role_t (
+CREATE TABLE liqind_t (
   id INT NOT NULL PRIMARY KEY,
   mnem CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO role_t (id, mnem) VALUES (1, 'MAKER')
+INSERT INTO liqind_t (id, mnem) VALUES (1, 'MAKER')
 ;
-INSERT INTO role_t (id, mnem) VALUES (2, 'TAKER')
+INSERT INTO liqind_t (id, mnem) VALUES (2, 'TAKER')
 ;
 
 CREATE TABLE asset_type_t (
@@ -192,7 +192,7 @@ CREATE TABLE exec_t (
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
   match_id BIGINT NULL DEFAULT NULL,
-  role_id INT NULL DEFAULT NULL,
+  liqind_id INT NULL DEFAULT NULL,
   cpty CHAR(16) NULL DEFAULT NULL,
   archive TINYINT(1) NOT NULL DEFAULT 0,
   created BIGINT NOT NULL,
@@ -205,7 +205,7 @@ CREATE TABLE exec_t (
   FOREIGN KEY (contr) REFERENCES contr_t (mnem),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
-  FOREIGN KEY (role_id) REFERENCES role_t (id),
+  FOREIGN KEY (liqind_id) REFERENCES liqind_t (id),
   FOREIGN KEY (cpty) REFERENCES trader_t (mnem)
 )
 ;
@@ -390,7 +390,7 @@ CREATE VIEW exec_v AS
     e.last_ticks,
     e.min_lots,
     e.match_id,
-    r.mnem role,
+    r.mnem liqind,
     e.cpty,
     e.archive,
     e.created,
@@ -400,8 +400,8 @@ CREATE VIEW exec_v AS
   ON e.state_id = s.id
   LEFT OUTER JOIN side_t a
   ON e.side_id = a.id
-  LEFT OUTER JOIN role_t r
-  ON e.role_id = r.id
+  LEFT OUTER JOIN liqind_t r
+  ON e.liqind_id = r.id
 ;
 
 CREATE VIEW posn_v AS

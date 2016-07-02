@@ -36,7 +36,7 @@ class TestCase(RestTestCase):
                      side = 'BUY',
                      lots = 10,
                      ticks = 12345,
-                     role = 'MAKER',
+                     liqInd = 'MAKER',
                      cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -57,7 +57,7 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resd': 0,
-      u'role': u'MAKER',
+      u'liqInd': u'MAKER',
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
@@ -79,7 +79,7 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resd': 0,
-      u'role': u'TAKER',
+      u'liqInd': u'TAKER',
       u'settlDate': 20170102,
       u'side': u'SELL',
       u'state': u'TRADE',
@@ -94,7 +94,7 @@ class TestCase(RestTestCase):
                      side = 'SELL',
                      lots = 15,
                      ticks = 12345,
-                     role = 'TAKER',
+                     liqInd = 'TAKER',
                      cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
@@ -115,7 +115,7 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resd': 0,
-      u'role': u'TAKER',
+      u'liqInd': u'TAKER',
       u'settlDate': 20170102,
       u'side': u'SELL',
       u'state': u'TRADE',
@@ -137,7 +137,7 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test2',
       u'resd': 0,
-      u'role': u'MAKER',
+      u'liqInd': u'MAKER',
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',

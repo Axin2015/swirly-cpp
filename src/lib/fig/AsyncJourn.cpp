@@ -193,7 +193,7 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
     body.lastTicks = exec.lastTicks();
     body.minLots = exec.minLots();
     body.matchId = exec.matchId();
-    body.role = exec.role();
+    body.liqInd = exec.liqInd();
     setCString(body.cpty, exec.cpty());
     body.created = exec.created();
     body.more = more;
