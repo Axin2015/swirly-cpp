@@ -66,7 +66,7 @@ class TestCase(RestTestCase):
     resp = conn.send('POST', '/api/sess/trade/EURUSD.MAR14',
                      trader = 'MARAYL',
                      ref = 'test1',
-                     side = 'BUY',
+                     side = 'SELL',
                      lots = 10)
 
     self.assertEqual(200, resp.status)
@@ -77,7 +77,7 @@ class TestCase(RestTestCase):
       u'cpty': None,
       u'created': self.now,
       u'exec': 10,
-      u'id': 1,
+      u'id': 2,
       u'lastLots': 10,
       u'lastTicks': 0,
       u'lots': 10,
