@@ -202,7 +202,7 @@ class Connection(object):
 class RestTestCase(unittest.TestCase):
 
   def createMarket(self, conn, mnem, contr, settlDate, expiryDate):
-    resp = conn.send('POST', '/api/rec/market',
+    resp = conn.send('POST', '/rec/market',
                      mnem = mnem,
                      display = mnem,
                      contr = contr,
@@ -214,7 +214,7 @@ class RestTestCase(unittest.TestCase):
     self.assertEqual('OK', resp.reason)
 
   def createOrder(self, conn, market, side, lots, ticks):
-    resp = conn.send('POST', '/api/sess/order/' + market,
+    resp = conn.send('POST', '/sess/order/' + market,
                      side = side,
                      lots = lots,
                      ticks = ticks)

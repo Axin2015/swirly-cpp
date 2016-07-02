@@ -40,7 +40,6 @@ class RestServ : public mg::Mgr<RestServ> {
   explicit RestServ(Rest& rest, const char* httpAuth, const char* httpTime = nullptr) noexcept
     : rest_(rest), httpAuth_{httpAuth}, httpTime_{httpTime}, profile_{"profile"_sv}
   {
-    memset(&httpOpts_, 0, sizeof(httpOpts_));
   }
   ~RestServ() noexcept;
 
@@ -91,7 +90,6 @@ class RestServ : public mg::Mgr<RestServ> {
   Rest& rest_;
   const char* const httpAuth_;
   const char* const httpTime_;
-  mg_serve_http_opts httpOpts_;
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;

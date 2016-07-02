@@ -34,7 +34,7 @@ class TestCase(RestTestCase):
         self.cancelMulti(conn)
 
   def cancelSingle(self, conn):
-    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/2', lots = 0);
+    resp = conn.send('PUT', '/sess/order/EURUSD.MAR14/2', lots = 0);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -100,7 +100,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def cancelMulti(self, conn):
-    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1,3', lots = 0);
+    resp = conn.send('PUT', '/sess/order/EURUSD.MAR14/1,3', lots = 0);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

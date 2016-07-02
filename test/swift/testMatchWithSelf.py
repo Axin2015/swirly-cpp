@@ -30,7 +30,7 @@ class TestCase(RestTestCase):
         self.takeOrder(conn)
 
   def takeOrder(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/sess/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)

@@ -30,7 +30,7 @@ class TestCase(RestTestCase):
         self.createOffer(conn)
 
   def createBid(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/sess/order/EURUSD.MAR14',
                      side = 'BUY',
                      lots = 5,
                      ticks = 12344)
@@ -99,7 +99,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def createOffer(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/sess/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12346)

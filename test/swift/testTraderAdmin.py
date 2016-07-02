@@ -29,7 +29,7 @@ class TestCase(RestTestCase):
         self.updateTrader(conn)
 
   def createTrader(self, conn):
-    resp = conn.send('POST', '/api/rec/trader',
+    resp = conn.send('POST', '/rec/trader',
                      mnem = 'PIPAYL',
                      display = 'Pippin Aylettx',
                      email = 'pippin.aylett@swirlycloud.com')
@@ -43,7 +43,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateTrader(self, conn):
-    resp = conn.send('PUT', '/api/rec/trader/PIPAYL',
+    resp = conn.send('PUT', '/rec/trader/PIPAYL',
                      display = 'Pippin Aylett')
 
     self.assertEqual(200, resp.status)

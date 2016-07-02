@@ -115,13 +115,13 @@ void RestServ::reset(HttpMessage data) noexcept
   state_ = 0;
 
   const auto method = data.method();
-  if (method == "GET") {
+  if (method == "GET"_sv) {
     state_ |= MethodGet;
-  } else if (method == "POST") {
+  } else if (method == "POST"_sv) {
     state_ |= MethodPost;
-  } else if (method == "PUT") {
+  } else if (method == "PUT"_sv) {
     state_ |= MethodPut;
-  } else if (method == "DELETE") {
+  } else if (method == "DELETE"_sv) {
     state_ |= MethodDelete;
   }
 
@@ -145,12 +145,6 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
     }
   });
   reset(data);
-
-  if (uri_.empty() || uri_.top() != "api") {
-    mg_serve_http(&nc, data.get(), httpOpts_);
-    return;
-  }
-  uri_.pop();
 
   const auto now = getTime(data, httpTime_);
   // See mg_send().
@@ -193,21 +187,20 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
 void RestServ::restRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
-    // /api
     return;
   }
 
   const auto tok = uri_.top();
   uri_.pop();
 
-  if (tok == "rec") {
-    // /api/rec
+  if (tok == "rec"_sv) {
+    // /rec
     recRequest(data, now);
-  } else if (tok == "sess") {
-    // /api/sess
+  } else if (tok == "sess"_sv) {
+    // /sess
     sessRequest(data, now);
-  } else if (tok == "view") {
-    // /api/view
+  } else if (tok == "view"_sv) {
+    // /view
     viewRequest(data, now);
   }
 }
@@ -216,11 +209,11 @@ void RestServ::recRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/rec
+    // /rec
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/rec
+      // GET /rec
       state_ |= MatchMethod;
       const int bs{EntitySet::Asset | EntitySet::Contr | EntitySet::Market};
       rest_.getRec(bs, now, out_);
@@ -236,11 +229,11 @@ void RestServ::recRequest(HttpMessage data, Millis now)
 
     if (uri_.empty()) {
 
-      // /api/rec/entity,entity...
+      // /rec/entity,entity...
       state_ |= MatchUri;
 
       if (isSet(MethodGet)) {
-        // GET /api/rec/entity,entity...
+        // GET /rec/entity,entity...
         state_ |= MatchMethod;
         rest_.getRec(es, now, out_);
       }
@@ -268,11 +261,11 @@ void RestServ::assetRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/rec/asset
+    // /rec/asset
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/rec/asset
+      // GET /rec/asset
       state_ |= MatchMethod;
       rest_.getAsset(now, out_);
     }
@@ -284,11 +277,11 @@ void RestServ::assetRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/rec/asset/MNEM
+    // /rec/asset/MNEM
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/rec/asset/MNEM
+      // GET /rec/asset/MNEM
       state_ |= MatchMethod;
       rest_.getAsset(mnem, now, out_);
     }
@@ -300,11 +293,11 @@ void RestServ::contrRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/rec/contr
+    // /rec/contr
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/rec/contr
+      // GET /rec/contr
       state_ |= MatchMethod;
       rest_.getContr(now, out_);
     }
@@ -316,11 +309,11 @@ void RestServ::contrRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/rec/contr/MNEM
+    // /rec/contr/MNEM
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/rec/contr/MNEM
+      // GET /rec/contr/MNEM
       state_ |= MatchMethod;
       rest_.getContr(mnem, now, out_);
     }
@@ -332,17 +325,17 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/rec/market
+    // /rec/market
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/rec/market
+      // GET /rec/market
       state_ |= MatchMethod;
       rest_.getMarket(now, out_);
       break;
     case MethodPost:
-      // POST /api/rec/market
+      // POST /rec/market
       state_ |= MatchMethod;
 
       constexpr auto reqFields = RestRequest::Mnem | RestRequest::Display | RestRequest::Contr;
@@ -363,17 +356,17 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/rec/market/MNEM
+    // /rec/market/MNEM
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/rec/market/MNEM
+      // GET /rec/market/MNEM
       state_ |= MatchMethod;
       rest_.getMarket(mnem, now, out_);
       break;
     case MethodPut:
-      // PUT /api/rec/market/MNEM
+      // PUT /rec/market/MNEM
       state_ |= MatchMethod;
 
       constexpr auto reqFields = 0x0;
@@ -400,17 +393,17 @@ void RestServ::traderRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/rec/trader
+    // /rec/trader
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/rec/trader
+      // GET /rec/trader
       state_ |= MatchMethod;
       rest_.getTrader(now, out_);
       break;
     case MethodPost:
-      // POST /api/rec/market
+      // POST /rec/market
       state_ |= MatchMethod;
 
       // FIXME: Incomplete. See BackRecServlet.java
@@ -430,17 +423,17 @@ void RestServ::traderRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/rec/trader/MNEM
+    // /rec/trader/MNEM
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/rec/trader/MNEM
+      // GET /rec/trader/MNEM
       state_ |= MatchMethod;
       rest_.getTrader(mnem, now, out_);
       break;
     case MethodPut:
-      // PUT /api/rec/trader/MNEM
+      // PUT /rec/trader/MNEM
       state_ |= MatchMethod;
 
       // FIXME: Incomplete. See BackRecServlet.java
@@ -460,11 +453,11 @@ void RestServ::sessRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/sess
+    // /sess
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/sess
+      // GET /sess
       state_ |= MatchMethod;
       const int bs{EntitySet::Order | EntitySet::Trade | EntitySet::Posn | EntitySet::View};
       rest_.getSess(getETrader(data, httpAuth_), bs, now, out_);
@@ -480,11 +473,11 @@ void RestServ::sessRequest(HttpMessage data, Millis now)
 
     if (uri_.empty()) {
 
-      // /api/sess/entity,entity...
+      // /sess/entity,entity...
       state_ |= MatchUri;
 
       if (isSet(MethodGet)) {
-        // GET /api/sess/entity,entity...
+        // GET /sess/entity,entity...
         state_ |= MatchMethod;
         rest_.getSess(getETrader(data, httpAuth_), es, now, out_);
       }
@@ -512,11 +505,11 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/sess/order
+    // /sess/order
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/sess/order
+      // GET /sess/order
       state_ |= MatchMethod;
       rest_.getOrder(getETrader(data, httpAuth_), now, out_);
     }
@@ -528,17 +521,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/sess/order/MARKET
+    // /sess/order/MARKET
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/sess/order/MARKET
+      // GET /sess/order/MARKET
       state_ |= MatchMethod;
       rest_.getOrder(market, now, out_);
       break;
     case MethodPost:
-      // POST /api/sess/order/MARKET
+      // POST /sess/order/MARKET
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
@@ -559,17 +552,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/sess/order/MARKET/ID,ID...
+    // /sess/order/MARKET/ID,ID...
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/sess/order/MARKET/ID
+      // GET /sess/order/MARKET/ID
       state_ |= MatchMethod;
       rest_.getOrder(getETrader(data, httpAuth_), market, ids_[0], now, out_);
       break;
     case MethodPut:
-      // PUT /api/sess/order/MARKET/ID,ID...
+      // PUT /sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Lots;
@@ -580,7 +573,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
       }
       break;
     case MethodDelete:
-      // DELETE /api/sess/order/MARKET/ID,ID...
+      // DELETE /sess/order/MARKET/ID,ID...
       state_ |= MatchMethod;
       rest_.deleteOrder(getETrader(data, httpAuth_), market, ids_, now);
       break;
@@ -593,11 +586,11 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/sess/trade
+    // /sess/trade
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/sess/trade
+      // GET /sess/trade
       state_ |= MatchMethod;
       rest_.getTrade(getETrader(data, httpAuth_), now, out_);
     }
@@ -609,17 +602,17 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/sess/trade/MARKET
+    // /sess/trade/MARKET
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/sess/trade/MARKET
+      // GET /sess/trade/MARKET
       state_ |= MatchMethod;
       rest_.getTrade(market, now, out_);
       break;
     case MethodPost:
-      // POST /api/sess/trade/MARKET
+      // POST /sess/trade/MARKET
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Trader | RestRequest::Side | RestRequest::Lots;
@@ -641,17 +634,17 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/sess/trade/MARKET/ID,ID...
+    // /sess/trade/MARKET/ID,ID...
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /api/sess/trade/MARKET/ID
+      // GET /sess/trade/MARKET/ID
       state_ |= MatchMethod;
       rest_.getTrade(getETrader(data, httpAuth_), market, ids_[0], now, out_);
       break;
     case MethodDelete:
-      // DELETE /api/sess/trade/MARKET/ID,ID...
+      // DELETE /sess/trade/MARKET/ID,ID...
       state_ |= MatchMethod;
       rest_.deleteTrade(getETrader(data, httpAuth_), market, ids_, now);
       break;
@@ -664,11 +657,11 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/sess/posn
+    // /sess/posn
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/sess/posn
+      // GET /sess/posn
       state_ |= MatchMethod;
       rest_.getPosn(getETrader(data, httpAuth_), now, out_);
     }
@@ -680,11 +673,11 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/sess/posn/CONTR
+    // /sess/posn/CONTR
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/sess/posn/CONTR
+      // GET /sess/posn/CONTR
       state_ |= MatchMethod;
       rest_.getPosn(contr, now, out_);
     }
@@ -696,11 +689,11 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/sess/posn/CONTR/SETTL_DATE
+    // /sess/posn/CONTR/SETTL_DATE
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/sess/posn/CONTR/SETTL_DATE
+      // GET /sess/posn/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       rest_.getPosn(getETrader(data, httpAuth_), contr, settlDate, now, out_);
     }
@@ -712,11 +705,11 @@ void RestServ::viewRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /api/view
+    // /view
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/view
+      // GET /view
       state_ |= MatchMethod;
       rest_.getView(now, out_);
     }
@@ -728,11 +721,11 @@ void RestServ::viewRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /api/view/MARKET,MARKET...
+    // /view/MARKET,MARKET...
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /api/view/MARKET,MARKET...
+      // GET /view/MARKET,MARKET...
       state_ |= MatchMethod;
       rest_.getView(mnems_, now, out_);
     }

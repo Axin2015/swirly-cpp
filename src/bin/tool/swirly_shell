@@ -121,7 +121,7 @@ class Shell(Cmd):
 
   def do_asset(self, args):
     """Usage: asset"""
-    resp = self.send('GET', '/api/rec/asset')
+    resp = self.send('GET', '/rec/asset')
     cols = [
       'mnem',
       'display',
@@ -138,7 +138,7 @@ class Shell(Cmd):
 
   def do_contr(self, args):
     """Usage: contr"""
-    resp = self.send('GET', '/api/rec/contr')
+    resp = self.send('GET', '/rec/contr')
     cols = [
       'mnem',
       'display',
@@ -171,7 +171,7 @@ class Shell(Cmd):
 
   def do_market(self, args):
     """Usage: market"""
-    resp = self.send('GET', '/api/rec/market')
+    resp = self.send('GET', '/rec/market')
     cols = [
       'mnem',
       'display',
@@ -194,7 +194,7 @@ class Shell(Cmd):
 
   def do_trader(self, args):
     """Usage: trader"""
-    resp = self.send('GET', '/api/rec/trader')
+    resp = self.send('GET', '/rec/trader')
     cols = [
       'mnem',
       'display',
@@ -211,7 +211,7 @@ class Shell(Cmd):
 
   def do_order(self, args):
     """Usage: order"""
-    resp = self.send('GET', '/api/sess/order')
+    resp = self.send('GET', '/sess/order')
     cols = [
       'trader',
       'market',
@@ -258,7 +258,7 @@ class Shell(Cmd):
 
   def do_view(self, args):
     """Usage: view"""
-    resp = self.send('GET', '/api/view')
+    resp = self.send('GET', '/view')
     cols = [
       'market',
       'contr',
@@ -297,7 +297,7 @@ class Shell(Cmd):
     """Usage: buy <market> <lots> <ticks>"""
     try:
       market, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/api/sess/order/' + market,
+      resp = self.send('POST', '/sess/order/' + market,
                        side = 'BUY',
                        lots = int(lots),
                        ticks = int(ticks))
@@ -310,7 +310,7 @@ class Shell(Cmd):
     """Usage: sell <market> <lots> <ticks>"""
     try:
       market, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/api/sess/order/' + market,
+      resp = self.send('POST', '/sess/order/' + market,
                        side = 'SELL',
                        lots = int(lots),
                        ticks = int(ticks))

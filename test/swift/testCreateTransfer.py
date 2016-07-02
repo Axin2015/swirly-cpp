@@ -30,7 +30,7 @@ class TestCase(RestTestCase):
         self.createWithdraw(conn)
 
   def createDeposit(self, conn):
-    resp = conn.send('POST', '/api/sess/trade/EURUSD.MAR14',
+    resp = conn.send('POST', '/sess/trade/EURUSD.MAR14',
                      trader = 'MARAYL',
                      ref = 'test1',
                      side = 'BUY',
@@ -63,7 +63,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def createWithdraw(self, conn):
-    resp = conn.send('POST', '/api/sess/trade/EURUSD.MAR14',
+    resp = conn.send('POST', '/sess/trade/EURUSD.MAR14',
                      trader = 'MARAYL',
                      ref = 'test1',
                      side = 'SELL',
