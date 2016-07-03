@@ -37,8 +37,8 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  explicit RestServ(Rest& rest, const char* httpAuth, const char* httpTime = nullptr) noexcept
-    : rest_(rest), httpAuth_{httpAuth}, httpTime_{httpTime}, profile_{"profile"_sv}
+  explicit RestServ(Rest& rest, bool testMode = false) noexcept
+    : rest_(rest), testMode_{testMode}, profile_{"profile"_sv}
   {
   }
   ~RestServ() noexcept;
@@ -88,8 +88,7 @@ class RestServ : public mg::Mgr<RestServ> {
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
 
   Rest& rest_;
-  const char* const httpAuth_;
-  const char* const httpTime_;
+  bool testMode_{false};
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;

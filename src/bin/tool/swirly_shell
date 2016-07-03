@@ -57,9 +57,9 @@ class Shell(Cmd):
   def __init__(self, host, port):
     Cmd.__init__(self)
     self.conn = httplib.HTTPConnection(host, port)
-    self.env = {
-      'AUTH': os.environ['SWIRLY_AUTH']
-    }
+    self.env = {}
+    if 'SWIRLY_ACCNT' in os.environ:
+      self.env['ACCNT'] = os.environ['SWIRLY_ACCNT']
 
   def __enter__(self):
     return self
@@ -77,8 +77,8 @@ class Shell(Cmd):
     conn = self.conn
     conn.putrequest(method, uri)
     conn.putheader('Accept', 'application/json')
-    if 'AUTH' in self.env:
-      conn.putheader('Swirly-Auth', self.env['AUTH'])
+    if 'ACCNT' in self.env:
+      conn.putheader('Swirly-Accnt', self.env['ACCNT'])
     conn.putheader('Content-Length', len(content))
     conn.putheader('Content-Type', 'application/json')
     conn.endheaders()

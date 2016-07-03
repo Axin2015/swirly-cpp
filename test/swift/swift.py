@@ -165,7 +165,8 @@ class Connection(object):
   def __init__(self):
     self.conn = httplib.HTTPConnection('localhost', Fixture.port)
     self.time = None
-    self.auth = None
+    self.accnt = None
+    self.role = None
 
   def __enter__(self):
     return self
@@ -179,8 +180,11 @@ class Connection(object):
   def setTime(self, time):
     self.time = time
 
-  def setAuth(self, auth):
-    self.auth = auth
+  def setAccnt(self, accnt):
+    self.accnt = accnt
+
+  def setRole(self, role):
+    self.role = role
 
   def send(self, method, uri, **kwargs):
     content = ''
@@ -191,8 +195,8 @@ class Connection(object):
     conn.putheader('Accept', 'application/json')
     if self.time is not None:
       conn.putheader('Swirly-Time', self.time)
-    if self.auth is not None:
-      conn.putheader('Swirly-Auth', self.auth)
+    if self.accnt is not None:
+      conn.putheader('Swirly-Accnt', self.accnt)
     conn.putheader('Content-Length', len(content))
     conn.putheader('Content-Type', 'application/json')
     conn.endheaders()

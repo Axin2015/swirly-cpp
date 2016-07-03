@@ -23,7 +23,7 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
