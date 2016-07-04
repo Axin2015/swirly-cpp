@@ -57,7 +57,7 @@ class SWIRLY_API Trader : public Rec {
   const Email email_;
 };
 
-using TraderSet = RecSet<Trader>;
+using TraderSet = MnemSet<Trader>;
 
 /** @} */
 

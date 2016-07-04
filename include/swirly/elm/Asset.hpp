@@ -63,7 +63,7 @@ class SWIRLY_API Asset : public Rec {
   const AssetType type_;
 };
 
-using AssetSet = RecSet<Asset>;
+using AssetSet = MnemSet<Asset>;
 
 /** @} */
 

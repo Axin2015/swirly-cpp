@@ -26,6 +26,27 @@ using namespace swirly;
 static_assert(Mnem{}.empty(), "default constructor not constexpr");
 static_assert(Mnem{Mnem{}}.empty(), "copy constructor not constexpr");
 
+namespace {
+class Foo {
+ public:
+  Foo(Mnem mnem, string_view display, int& alive) noexcept
+    : mnem_{mnem}, display_{display}, alive_{alive}
+  {
+    ++alive;
+  }
+  ~Foo() noexcept { --alive_; }
+
+  auto mnem() const noexcept { return mnem_; }
+  auto display() const noexcept { return +display_; }
+  boost::intrusive::set_member_hook<> mnemHook_;
+
+ private:
+  const Mnem mnem_;
+  String<64> display_;
+  int& alive_;
+};
+} // anonymous
+
 SWIRLY_TEST_CASE(MnemEmpty)
 {
   Mnem mnem;
@@ -70,4 +91,31 @@ SWIRLY_TEST_CASE(MnemClear)
   Mnem mnem{"Foo"_sv};
   mnem.clear();
   SWIRLY_CHECK(mnem.empty());
+}
+
+SWIRLY_TEST_CASE(MnemSet)
+{
+  int alive{0};
+  {
+    MnemSet<Foo> s;
+
+    Foo& foo1{*s.emplace("FOO"_sv, "Foo One"_sv, alive)};
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(foo1.mnem() == "FOO"_sv);
+    SWIRLY_CHECK(foo1.display() == "Foo One"_sv);
+    SWIRLY_CHECK(s.find("FOO"_sv) != s.end());
+
+    // Duplicate.
+    Foo& foo2{*s.emplace("FOO"_sv, "Foo Two"_sv, alive)};
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(&foo2 == &foo1);
+
+    // Replace.
+    Foo& foo3{*s.emplaceOrReplace("FOO"_sv, "Foo Three"_sv, alive)};
+    SWIRLY_CHECK(alive == 1);
+    SWIRLY_CHECK(&foo3 != &foo1);
+    SWIRLY_CHECK(foo3.mnem() == "FOO"_sv);
+    SWIRLY_CHECK(foo3.display() == "Foo Three"_sv);
+  }
+  SWIRLY_CHECK(alive == 0);
 }

@@ -68,7 +68,7 @@ class SWIRLY_API Market : public Rec {
   MarketState state_;
 };
 
-using MarketSet = RecSet<Market>;
+using MarketSet = MnemSet<Market>;
 
 /** @} */
 

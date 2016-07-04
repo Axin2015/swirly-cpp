@@ -87,7 +87,7 @@ class SWIRLY_API Contr : public Rec {
   const Lots maxLots_;
 };
 
-using ContrSet = RecSet<Contr>;
+using ContrSet = MnemSet<Contr>;
 
 /** @} */
 
