@@ -14,56 +14,47 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_TRADERSESS_HPP
-#define SWIRLY_ELM_TRADERSESS_HPP
+#ifndef SWIRLY_FIG_ACCNT_HPP
+#define SWIRLY_FIG_ACCNT_HPP
 
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
-#include <swirly/elm/Trader.hpp>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/intrusive/unordered_set.hpp>
-#pragma GCC diagnostic pop
 
 namespace swirly {
 
-class TraderSess;
+class Accnt;
 
 /**
  * @addtogroup Entity
  * @{
  */
 
-using TraderSessPtr = std::unique_ptr<TraderSess>;
-using ConstTraderSessPtr = std::unique_ptr<const TraderSess>;
+using AccntPtr = std::unique_ptr<Accnt>;
+using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
-class SWIRLY_API TraderSess : public Trader {
-  using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
-
+class SWIRLY_API Accnt : public Comparable<Accnt> {
  public:
-  TraderSess(Mnem mnem, std::string_view display, std::string_view email) noexcept
-    : Trader{mnem, display, email}
-  {
-  }
-  ~TraderSess() noexcept override;
+  explicit Accnt(Mnem mnem) noexcept : mnem_{mnem} {}
+  ~Accnt() noexcept;
 
   // Copy.
-  TraderSess(const TraderSess&) = delete;
-  TraderSess& operator=(const TraderSess&) = delete;
+  Accnt(const Accnt&) = delete;
+  Accnt& operator=(const Accnt&) = delete;
 
   // Move.
-  TraderSess(TraderSess&&);
-  TraderSess& operator=(TraderSess&&) = delete;
+  Accnt(Accnt&&);
+  Accnt& operator=(Accnt&&) = delete;
 
   template <typename... ArgsT>
-  static TraderSessPtr make(ArgsT&&... args)
+  static AccntPtr make(ArgsT&&... args)
   {
-    return std::make_unique<TraderSess>(std::forward<ArgsT>(args)...);
+    return std::make_unique<Accnt>(std::forward<ArgsT>(args)...);
   }
 
+  int compare(const Accnt& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  auto mnem() const noexcept { return mnem_; }
   const auto& orders() const noexcept { return orders_; }
   const auto& trades() const noexcept { return trades_; }
   const auto& posns() const noexcept { return posns_; }
@@ -119,24 +110,27 @@ class SWIRLY_API TraderSess : public Trader {
     assert(trade.trader() == mnem_);
     trades_.remove(trade);
   }
+  PosnPtr posn(Mnem contr, Jday settlDay) throw(std::bad_alloc);
+
   void insertPosn(const PosnPtr& posn) noexcept
   {
     assert(posn->trader() == mnem_);
     posns_.insert(posn);
   }
-  PosnPtr lazyPosn(Mnem contr, Jday settlDay) throw(std::bad_alloc);
-
-  boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
+  boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
+  const Mnem mnem_;
   OrderIdSet orders_;
   ExecIdSet trades_;
   TraderPosnSet posns_;
   OrderRefSet refIdx_;
 };
 
+using AccntSet = MnemSet<Accnt>;
+
 /** @} */
 
 } // swirly
 
-#endif // SWIRLY_ELM_TRADERSESS_HPP
+#endif // SWIRLY_FIG_ACCNT_HPP

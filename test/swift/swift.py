@@ -218,7 +218,7 @@ class RestTestCase(unittest.TestCase):
     self.assertEqual('OK', resp.reason)
 
   def createOrder(self, conn, market, side, lots, ticks):
-    resp = conn.send('POST', '/sess/order/' + market,
+    resp = conn.send('POST', '/accnt/order/' + market,
                      side = side,
                      lots = lots,
                      ticks = ticks)

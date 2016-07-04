@@ -109,15 +109,15 @@ void TestModel::doReadContr(const ModelCallback<ContrPtr>& cb) const
   cb(Contr::make("VZ"_sv, "Verizon Com"_sv, "VZ"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
 }
 
-void TestModel::doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
+void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const
 {
 }
 
-void TestModel::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const
+void TestModel::doReadTrader(const ModelCallback<TraderPtr>& cb) const
 {
-  cb(factory.newTrader("EDDAYL"_sv, "Eddie Aylett"_sv, "eddie.aylett@swirlycloud.com"_sv));
-  cb(factory.newTrader("GOSAYL"_sv, "Goska Aylett"_sv, "goska.aylett@swirlycloud.com"_sv));
-  cb(factory.newTrader("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv));
+  cb(Trader::make("EDDAYL"_sv, "Eddie Aylett"_sv, "eddie.aylett@swirlycloud.com"_sv));
+  cb(Trader::make("GOSAYL"_sv, "Goska Aylett"_sv, "goska.aylett@swirlycloud.com"_sv));
+  cb(Trader::make("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv));
 }
 
 void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const

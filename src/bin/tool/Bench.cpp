@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include <swirly/fig/Accnt.hpp>
 #include <swirly/fig/MemPool.hpp>
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/Serv.hpp>
 #include <swirly/fig/Test.hpp>
-#include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/MarketBook.hpp>
 
@@ -42,34 +42,25 @@ MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
   return serv.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
 }
 
-TraderSess& createTrader(Serv& serv, Mnem mnem, string_view display, string_view email, Millis now)
-{
-  auto it = serv.traders().find(mnem);
-  if (it != serv.traders().end()) {
-    return static_cast<TraderSess&>(*it);
-  }
-  return serv.createTrader(mnem, display, email, now);
-}
-
 class Archiver {
  public:
   explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
-  void operator()(TraderSess& sess, Mnem market, Millis now)
+  void operator()(Accnt& accnt, Mnem market, Millis now)
   {
     ids_.clear();
-    for (const auto& order : sess.orders()) {
+    for (const auto& order : accnt.orders()) {
       if (order.market() == market && order.done()) {
         ids_.push_back(order.id());
       }
     }
-    serv_.archiveOrder(sess, market, ids_, now);
+    serv_.archiveOrder(accnt, market, ids_, now);
     ids_.clear();
-    for (const auto& trade : sess.trades()) {
+    for (const auto& trade : accnt.trades()) {
       if (trade.market() == market) {
         ids_.push_back(trade.id());
       }
     }
-    serv_.archiveTrade(sess, market, ids_, now);
+    serv_.archiveTrade(accnt, market, ids_, now);
   }
 
  private:
@@ -123,14 +114,10 @@ int main(int argc, char* argv[])
 
     auto& book = createMarket(serv, "EURUSD"_sv, "EURUSD"_sv, "EURUSD"_sv, 0_jd, 0_jd, 0, now);
 
-    auto& eddayl
-      = createTrader(serv, "EDDAYL"_sv, "Eddie Aylett"_sv, "eddie.aylett@swirlycloud.com"_sv, now);
-    auto& gosayl
-      = createTrader(serv, "GOSAYL"_sv, "Goska Aylett"_sv, "goska.aylett@swirlycloud.com"_sv, now);
-    auto& marayl
-      = createTrader(serv, "MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv, now);
-    auto& pipayl = createTrader(serv, "PIPAYL"_sv, "Pippin Aylett"_sv,
-                                "pippin.aylett@swirlycloud.com"_sv, now);
+    auto& eddayl = serv.accnt("EDDAYL"_sv);
+    auto& gosayl = serv.accnt("GOSAYL"_sv);
+    auto& marayl = serv.accnt("MARAYL"_sv);
+    auto& pipayl = serv.accnt("PIPAYL"_sv);
 
     Profile maker{"maker"_sv};
     Profile taker{"taker"_sv};

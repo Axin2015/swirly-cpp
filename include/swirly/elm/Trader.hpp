@@ -19,6 +19,11 @@
 
 #include <swirly/elm/Rec.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#include <boost/intrusive/unordered_set.hpp>
+#pragma GCC diagnostic pop
+
 namespace swirly {
 
 /**
@@ -27,6 +32,8 @@ namespace swirly {
  */
 
 class SWIRLY_API Trader : public Rec {
+  using LinkModeOption = boost::intrusive::link_mode<boost::intrusive::auto_unlink>;
+
  public:
   Trader(Mnem mnem, std::string_view display, std::string_view email) noexcept
     : Rec{RecType::Market, mnem, display}, email_{email}
@@ -52,6 +59,7 @@ class SWIRLY_API Trader : public Rec {
 
   auto email() const noexcept { return +email_; }
   boost::intrusive::set_member_hook<> mnemHook_;
+  boost::intrusive::unordered_set_member_hook<LinkModeOption> emailHook_;
 
  protected:
   const Email email_;

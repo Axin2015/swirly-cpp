@@ -14,14 +14,14 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "TraderSessSet.hpp"
+#include "EmailSet.hpp"
 
 namespace swirly {
 
-TraderSessSet::~TraderSessSet() noexcept = default;
+EmailSet::~EmailSet() noexcept = default;
 
-TraderSessSet::TraderSessSet(TraderSessSet&&) = default;
+EmailSet::EmailSet(EmailSet&&) = default;
 
-TraderSessSet& TraderSessSet::operator=(TraderSessSet&&) = default;
+EmailSet& EmailSet::operator=(EmailSet&&) = default;
 
 } // swirly

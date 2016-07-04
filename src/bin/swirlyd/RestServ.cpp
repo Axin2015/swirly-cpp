@@ -174,9 +174,9 @@ void RestServ::restRequest(HttpMessage data, Millis now)
   if (tok == "rec"_sv) {
     // /rec
     recRequest(data, now);
-  } else if (tok == "sess"_sv) {
-    // /sess
-    sessRequest(data, now);
+  } else if (tok == "accnt"_sv) {
+    // /accnt
+    accntRequest(data, now);
   } else if (tok == "view"_sv) {
     // /view
     viewRequest(data, now);
@@ -427,18 +427,18 @@ void RestServ::traderRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::sessRequest(HttpMessage data, Millis now)
+void RestServ::accntRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /sess
+    // /accnt
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /sess
+      // GET /accnt
       state_ |= MatchMethod;
       const int bs{EntitySet::Order | EntitySet::Trade | EntitySet::Posn | EntitySet::View};
-      rest_.getSess(getAccnt(data), bs, now, out_);
+      rest_.getAccnt(getAccnt(data), bs, now, out_);
     }
     return;
   }
@@ -451,13 +451,13 @@ void RestServ::sessRequest(HttpMessage data, Millis now)
 
     if (uri_.empty()) {
 
-      // /sess/entity,entity...
+      // /accnt/entity,entity...
       state_ |= MatchUri;
 
       if (isSet(MethodGet)) {
-        // GET /sess/entity,entity...
+        // GET /accnt/entity,entity...
         state_ |= MatchMethod;
-        rest_.getSess(getAccnt(data), es, now, out_);
+        rest_.getAccnt(getAccnt(data), es, now, out_);
       }
     }
     return;
@@ -483,11 +483,11 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /sess/order
+    // /accnt/order
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /sess/order
+      // GET /accnt/order
       state_ |= MatchMethod;
       rest_.getOrder(getAccnt(data), now, out_);
     }
@@ -499,17 +499,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /sess/order/MARKET
+    // /accnt/order/MARKET
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /sess/order/MARKET
+      // GET /accnt/order/MARKET
       state_ |= MatchMethod;
       rest_.getOrder(market, now, out_);
       break;
     case MethodPost:
-      // POST /sess/order/MARKET
+      // POST /accnt/order/MARKET
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
@@ -530,17 +530,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /sess/order/MARKET/ID,ID...
+    // /accnt/order/MARKET/ID,ID...
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /sess/order/MARKET/ID
+      // GET /accnt/order/MARKET/ID
       state_ |= MatchMethod;
       rest_.getOrder(getAccnt(data), market, ids_[0], now, out_);
       break;
     case MethodPut:
-      // PUT /sess/order/MARKET/ID,ID...
+      // PUT /accnt/order/MARKET/ID,ID...
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Lots;
@@ -551,7 +551,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
       }
       break;
     case MethodDelete:
-      // DELETE /sess/order/MARKET/ID,ID...
+      // DELETE /accnt/order/MARKET/ID,ID...
       state_ |= MatchMethod;
       rest_.deleteOrder(getAccnt(data), market, ids_, now);
       break;
@@ -564,11 +564,11 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /sess/trade
+    // /accnt/trade
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /sess/trade
+      // GET /accnt/trade
       state_ |= MatchMethod;
       rest_.getTrade(getAccnt(data), now, out_);
     }
@@ -580,17 +580,17 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /sess/trade/MARKET
+    // /accnt/trade/MARKET
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /sess/trade/MARKET
+      // GET /accnt/trade/MARKET
       state_ |= MatchMethod;
       rest_.getTrade(market, now, out_);
       break;
     case MethodPost:
-      // POST /sess/trade/MARKET
+      // POST /accnt/trade/MARKET
       state_ |= MatchMethod;
       {
         constexpr auto reqFields = RestRequest::Trader | RestRequest::Side | RestRequest::Lots;
@@ -612,17 +612,17 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /sess/trade/MARKET/ID,ID...
+    // /accnt/trade/MARKET/ID,ID...
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /sess/trade/MARKET/ID
+      // GET /accnt/trade/MARKET/ID
       state_ |= MatchMethod;
       rest_.getTrade(getAccnt(data), market, ids_[0], now, out_);
       break;
     case MethodDelete:
-      // DELETE /sess/trade/MARKET/ID,ID...
+      // DELETE /accnt/trade/MARKET/ID,ID...
       state_ |= MatchMethod;
       rest_.deleteTrade(getAccnt(data), market, ids_, now);
       break;
@@ -635,11 +635,11 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /sess/posn
+    // /accnt/posn
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /sess/posn
+      // GET /accnt/posn
       state_ |= MatchMethod;
       rest_.getPosn(getAccnt(data), now, out_);
     }
@@ -651,11 +651,11 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /sess/posn/CONTR
+    // /accnt/posn/CONTR
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /sess/posn/CONTR
+      // GET /accnt/posn/CONTR
       state_ |= MatchMethod;
       rest_.getPosn(contr, now, out_);
     }
@@ -667,11 +667,11 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /sess/posn/CONTR/SETTL_DATE
+    // /accnt/posn/CONTR/SETTL_DATE
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /sess/posn/CONTR/SETTL_DATE
+      // GET /accnt/posn/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       rest_.getPosn(getAccnt(data), contr, settlDate, now, out_);
     }

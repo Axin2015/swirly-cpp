@@ -60,12 +60,12 @@ int main(int argc, char* argv[])
     cout << "],\"markets\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readMarket(factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readMarket([&it](const auto&& ptr) { it = *ptr; }, factory);
     }
     cout << "],\"traders\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readTrader(factory, [&it](const auto&& ptr) { it = *ptr; });
+      model->readTrader([&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "],\"orders\":[";
     {

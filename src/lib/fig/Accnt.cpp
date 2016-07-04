@@ -14,17 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/TraderSess.hpp>
+#include <swirly/fig/Accnt.hpp>
 
 using namespace std;
 
 namespace swirly {
 
-TraderSess::~TraderSess() noexcept = default;
+Accnt::~Accnt() noexcept = default;
 
-TraderSess::TraderSess(TraderSess&&) = default;
+Accnt::Accnt(Accnt&&) = default;
 
-PosnPtr TraderSess::lazyPosn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
+PosnPtr Accnt::posn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
 {
   TraderPosnSet::Iterator it;
   bool found;

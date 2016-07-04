@@ -32,7 +32,7 @@ class TestCase(RestTestCase):
         self.reviseMulti(conn)
 
   def reviseSingle(self, conn):
-    resp = conn.send('PUT', '/sess/order/EURUSD.MAR14/1', lots = 4);
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1', lots = 4);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -98,7 +98,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def reviseMulti(self, conn):
-    resp = conn.send('PUT', '/sess/order/EURUSD.MAR14/1,2', lots = 3);
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,2', lots = 3);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

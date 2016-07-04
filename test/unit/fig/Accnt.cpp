@@ -14,22 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <TraderSessSet.hpp>
+#include <swirly/fig/Accnt.hpp>
 
 #include <swirly/tea/Test.hpp>
 
-using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(TraderSessSet)
-{
-  TraderSessSet s;
-  {
-    auto trader
-      = make_unique<TraderSess>("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@gmail.com"_sv);
-    SWIRLY_CHECK(s.insert(*trader));
-    SWIRLY_CHECK(s.find("mark.aylett@gmail.com"_sv) != s.end());
-    // Auto-unlink.
-  }
-  SWIRLY_CHECK(s.find("mark.aylett@gmail.com"_sv) == s.end());
-}
+static_assert(sizeof(Accnt) <= 6 * 64, "crossed cache-line boundary");

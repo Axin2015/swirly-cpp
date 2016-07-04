@@ -62,7 +62,7 @@ class RestServ : public mg::Mgr<RestServ> {
   void marketRequest(mg::HttpMessage data, Millis now);
   void traderRequest(mg::HttpMessage data, Millis now);
 
-  void sessRequest(mg::HttpMessage data, Millis now);
+  void accntRequest(mg::HttpMessage data, Millis now);
   void orderRequest(mg::HttpMessage data, Millis now);
   void tradeRequest(mg::HttpMessage data, Millis now);
   void posnRequest(mg::HttpMessage data, Millis now);

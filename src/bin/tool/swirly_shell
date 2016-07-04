@@ -211,7 +211,7 @@ class Shell(Cmd):
 
   def do_order(self, args):
     """Usage: order"""
-    resp = self.send('GET', '/sess/order')
+    resp = self.send('GET', '/accnt/order')
     cols = [
       'trader',
       'market',
@@ -297,7 +297,7 @@ class Shell(Cmd):
     """Usage: buy <market> <lots> <ticks>"""
     try:
       market, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/sess/order/' + market,
+      resp = self.send('POST', '/accnt/order/' + market,
                        side = 'BUY',
                        lots = int(lots),
                        ticks = int(ticks))
@@ -310,7 +310,7 @@ class Shell(Cmd):
     """Usage: sell <market> <lots> <ticks>"""
     try:
       market, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/sess/order/' + market,
+      resp = self.send('POST', '/accnt/order/' + market,
                        side = 'SELL',
                        lots = int(lots),
                        ticks = int(ticks))

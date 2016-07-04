@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIG_TRADERSESS_HPP
-#define SWIRLY_FIG_TRADERSESS_HPP
+#ifndef SWIRLY_FIG_EMAILSET_HPP
+#define SWIRLY_FIG_EMAILSET_HPP
 
-#include <swirly/fig/TraderSess.hpp>
+#include <swirly/elm/Trader.hpp>
 
 namespace swirly {
 
@@ -27,29 +27,29 @@ namespace swirly {
  */
 
 /**
- * Unordered TraderSess set keyed by email.
+ * Unordered Trader set keyed by email.
  */
-class SWIRLY_API TraderSessSet {
+class SWIRLY_API EmailSet {
   static constexpr std::size_t BucketCount{101};
   struct ValueHash {
-    std::size_t operator()(const TraderSess& trader) const noexcept
+    std::size_t operator()(const Trader& trader) const noexcept
     {
       return std::hash<std::string_view>()(trader.email());
     }
   };
   struct ValueEqual {
-    bool operator()(const TraderSess& lhs, const TraderSess& rhs) const noexcept
+    bool operator()(const Trader& lhs, const Trader& rhs) const noexcept
     {
       return lhs.email() == rhs.email();
     }
   };
   using KeyHash = std::hash<std::string_view>;
   struct KeyValueEqual {
-    bool operator()(std::string_view lhs, const TraderSess& rhs) const noexcept
+    bool operator()(std::string_view lhs, const Trader& rhs) const noexcept
     {
       return lhs == rhs.email();
     }
-    bool operator()(const TraderSess& lhs, std::string_view rhs) const noexcept
+    bool operator()(const Trader& lhs, std::string_view rhs) const noexcept
     {
       return lhs.email() == rhs;
     }
@@ -58,9 +58,8 @@ class SWIRLY_API TraderSessSet {
   using EqualOption = boost::intrusive::equal<ValueEqual>;
   using HashOption = boost::intrusive::hash<ValueHash>;
   using MemberHookOption
-    = boost::intrusive::member_hook<TraderSess, decltype(TraderSess::emailHook_),
-                                    &TraderSess::emailHook_>;
-  using Set = boost::intrusive::unordered_set<TraderSess, ConstantTimeSizeOption, EqualOption,
+    = boost::intrusive::member_hook<Trader, decltype(Trader::emailHook_), &Trader::emailHook_>;
+  using Set = boost::intrusive::unordered_set<Trader, ConstantTimeSizeOption, EqualOption,
                                               HashOption, MemberHookOption>;
   using BucketType = Set::bucket_type;
   using BucketTraits = Set::bucket_traits;
@@ -72,19 +71,19 @@ class SWIRLY_API TraderSessSet {
   using Iterator = typename Set::iterator;
   using ConstIterator = typename Set::const_iterator;
 
-  TraderSessSet() : set_{BucketTraits{buckets_, BucketCount}} {}
+  EmailSet() : set_{BucketTraits{buckets_, BucketCount}} {}
 
-  ~TraderSessSet() noexcept;
+  ~EmailSet() noexcept;
 
   // Copy.
-  TraderSessSet(const TraderSessSet&) = delete;
-  TraderSessSet& operator=(const TraderSessSet&) = delete;
+  EmailSet(const EmailSet&) = delete;
+  EmailSet& operator=(const EmailSet&) = delete;
 
   // Move.
-  TraderSessSet(TraderSessSet&&);
-  TraderSessSet& operator=(TraderSessSet&&);
+  EmailSet(EmailSet&&);
+  EmailSet& operator=(EmailSet&&);
 
-  bool insert(TraderSess& trader) noexcept
+  bool insert(Trader& trader) noexcept
   {
     bool inserted;
     std::tie(std::ignore, inserted) = set_.insert(trader);
@@ -116,4 +115,4 @@ class SWIRLY_API TraderSessSet {
 
 } // swirly
 
-#endif // SWIRLY_FIG_TRADERSESS_HPP
+#endif // SWIRLY_FIG_EMAILSET_HPP

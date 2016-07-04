@@ -33,11 +33,6 @@ MarketPtr Factory::newMarket(Mnem mnem, string_view display, Mnem contr, Jday se
                      lastTime, maxOrderId, maxExecId);
 }
 
-TraderPtr Factory::newTrader(Mnem mnem, string_view display, string_view email) const
-{
-  return doNewTrader(mnem, display, email);
-}
-
 BasicFactory::~BasicFactory() noexcept = default;
 
 MarketPtr BasicFactory::doNewMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
@@ -47,11 +42,6 @@ MarketPtr BasicFactory::doNewMarket(Mnem mnem, string_view display, Mnem contr, 
 {
   // Note that the last six arguments are unused in this base implementation.
   return Market::make(mnem, display, contr, settlDay, expiryDay, state);
-}
-
-TraderPtr BasicFactory::doNewTrader(Mnem mnem, string_view display, string_view email) const
-{
-  return Trader::make(mnem, display, email);
 }
 
 } // swirly

@@ -37,7 +37,7 @@ class TestCase(RestTestCase):
         self.makerPosn(conn)
 
   def takeOrder(self, conn):
-    resp = conn.send('POST', '/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)
@@ -136,7 +136,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def makerOrder(self, conn):
-    resp = conn.send('GET', '/sess/order')
+    resp = conn.send('GET', '/accnt/order')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -162,7 +162,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def makerTrade(self, conn):
-    resp = conn.send('GET', '/sess/trade')
+    resp = conn.send('GET', '/accnt/trade')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -191,7 +191,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def makerPosn(self, conn):
-    resp = conn.send('GET', '/sess/posn')
+    resp = conn.send('GET', '/accnt/posn')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

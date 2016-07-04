@@ -47,15 +47,10 @@ class SWIRLY_API Factory {
                       Ticks lastTicks = 0_tks, Millis lastTime = 0_ms, Iden maxOrderId = 0_id,
                       Iden maxExecId = 0_id) const;
 
-  TraderPtr newTrader(Mnem mnem, std::string_view display, std::string_view email) const;
-
  protected:
   virtual MarketPtr doNewMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                                 Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
                                 Millis lastTime, Iden maxOrderId, Iden maxExecId) const = 0;
-
-  virtual TraderPtr doNewTrader(Mnem mnem, std::string_view display,
-                                std::string_view email) const = 0;
 };
 
 class SWIRLY_API BasicFactory : public Factory {
@@ -75,8 +70,6 @@ class SWIRLY_API BasicFactory : public Factory {
   MarketPtr doNewMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                         Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
                         Millis lastTime, Iden maxOrderId, Iden maxExecId) const override;
-
-  TraderPtr doNewTrader(Mnem mnem, std::string_view display, std::string_view email) const override;
 };
 
 /** @} */

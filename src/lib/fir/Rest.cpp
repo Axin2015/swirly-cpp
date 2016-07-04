@@ -16,8 +16,8 @@
  */
 #include <swirly/fir/Rest.hpp>
 
+#include <swirly/fig/Accnt.hpp>
 #include <swirly/fig/Response.hpp>
-#include <swirly/fig/TraderSess.hpp>
 
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/MarketBook.hpp>
@@ -132,14 +132,14 @@ void Rest::getTrader(Mnem mnem, Millis now, ostream& out) const
   out << serv_.trader(mnem);
 }
 
-void Rest::getSess(Mnem trader, EntitySet es, Millis now, ostream& out) const
+void Rest::getAccnt(Mnem mnem, EntitySet es, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
+  const auto& accnt = serv_.accnt(mnem);
   int i{0};
   out << '{';
   if (es.order()) {
     out << "\"orders\":";
-    getOrder(sess, now, out);
+    getOrder(accnt, now, out);
     ++i;
   }
   if (es.trade()) {
@@ -147,7 +147,7 @@ void Rest::getSess(Mnem trader, EntitySet es, Millis now, ostream& out) const
       out << ',';
     }
     out << "\"trades\":";
-    getTrade(sess, now, out);
+    getTrade(accnt, now, out);
     ++i;
   }
   if (es.posn()) {
@@ -155,7 +155,7 @@ void Rest::getSess(Mnem trader, EntitySet es, Millis now, ostream& out) const
       out << ',';
     }
     out << "\"posns\":";
-    getPosn(sess, now, out);
+    getPosn(accnt, now, out);
     ++i;
   }
   if (es.view()) {
@@ -169,25 +169,25 @@ void Rest::getSess(Mnem trader, EntitySet es, Millis now, ostream& out) const
   out << '}';
 }
 
-void Rest::getOrder(Mnem trader, Millis now, ostream& out) const
+void Rest::getOrder(Mnem accMnem, Millis now, ostream& out) const
 {
-  getOrder(serv_.trader(trader), now, out);
+  getOrder(serv_.accnt(accMnem), now, out);
 }
 
-void Rest::getOrder(Mnem trader, Mnem market, Millis now, ostream& out) const
+void Rest::getOrder(Mnem accMnem, Mnem market, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
-  const auto& orders = sess.orders();
+  const auto& accnt = serv_.accnt(accMnem);
+  const auto& orders = accnt.orders();
   out << '[';
   copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
           [market](const auto& order) { return order.market() == market; });
   out << ']';
 }
 
-void Rest::getOrder(Mnem trader, Mnem market, Iden id, Millis now, ostream& out) const
+void Rest::getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
-  const auto& orders = sess.orders();
+  const auto& accnt = serv_.accnt(accMnem);
+  const auto& orders = accnt.orders();
   auto it = orders.find(market, id);
   if (it == orders.end()) {
     throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
@@ -195,25 +195,25 @@ void Rest::getOrder(Mnem trader, Mnem market, Iden id, Millis now, ostream& out)
   out << *it;
 }
 
-void Rest::getTrade(Mnem trader, Millis now, ostream& out) const
+void Rest::getTrade(Mnem accMnem, Millis now, ostream& out) const
 {
-  getTrade(serv_.trader(trader), now, out);
+  getTrade(serv_.accnt(accMnem), now, out);
 }
 
-void Rest::getTrade(Mnem trader, Mnem market, Millis now, ostream& out) const
+void Rest::getTrade(Mnem accMnem, Mnem market, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
-  const auto& trades = sess.trades();
+  const auto& accnt = serv_.accnt(accMnem);
+  const auto& trades = accnt.trades();
   out << '[';
   copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
           [market](const auto& trade) { return trade.market() == market; });
   out << ']';
 }
 
-void Rest::getTrade(Mnem trader, Mnem market, Iden id, Millis now, ostream& out) const
+void Rest::getTrade(Mnem accMnem, Mnem market, Iden id, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
-  const auto& trades = sess.trades();
+  const auto& accnt = serv_.accnt(accMnem);
+  const auto& trades = accnt.trades();
   auto it = trades.find(market, id);
   if (it == trades.end()) {
     throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
@@ -221,25 +221,25 @@ void Rest::getTrade(Mnem trader, Mnem market, Iden id, Millis now, ostream& out)
   out << *it;
 }
 
-void Rest::getPosn(Mnem trader, Millis now, ostream& out) const
+void Rest::getPosn(Mnem accMnem, Millis now, ostream& out) const
 {
-  getPosn(serv_.trader(trader), now, out);
+  getPosn(serv_.accnt(accMnem), now, out);
 }
 
-void Rest::getPosn(Mnem trader, Mnem contr, Millis now, ostream& out) const
+void Rest::getPosn(Mnem accMnem, Mnem contr, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
-  const auto& posns = sess.posns();
+  const auto& accnt = serv_.accnt(accMnem);
+  const auto& posns = accnt.posns();
   out << '[';
   copy_if(posns.begin(), posns.end(), OStreamJoiner(out, ','),
           [contr](const auto& posn) { return posn.contr() == contr; });
   out << ']';
 }
 
-void Rest::getPosn(Mnem trader, Mnem contr, IsoDate settlDate, Millis now, ostream& out) const
+void Rest::getPosn(Mnem accMnem, Mnem contr, IsoDate settlDate, Millis now, ostream& out) const
 {
-  const auto& sess = serv_.trader(trader);
-  const auto& posns = sess.posns();
+  const auto& accnt = serv_.accnt(accMnem);
+  const auto& posns = accnt.posns();
   auto it = posns.find(contr, maybeIsoToJd(settlDate));
   if (it == posns.end()) {
     throw NotFoundException{errMsg() << "posn for '" << contr << "' on '" << settlDate
@@ -297,50 +297,50 @@ void Rest::putTrader(Mnem mnem, string_view display, Millis now, ostream& out)
   out << trader;
 }
 
-void Rest::postOrder(Mnem trader, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
+void Rest::postOrder(Mnem accMnem, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
                      Lots minLots, Millis now, ostream& out)
 {
-  auto& sess = serv_.trader(trader);
+  auto& accnt = serv_.accnt(accMnem);
   auto& book = serv_.market(market);
   Response resp;
-  serv_.createOrder(sess, book, ref, side, lots, ticks, minLots, now, resp);
+  serv_.createOrder(accnt, book, ref, side, lots, ticks, minLots, now, resp);
   out << resp;
 }
 
-void Rest::putOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
+void Rest::putOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
                     ostream& out)
 {
-  auto& sess = serv_.trader(trader);
+  auto& accnt = serv_.accnt(accMnem);
   auto& book = serv_.market(market);
   Response resp;
   if (lots > 0_lts) {
     if (ids.size() == 1) {
-      serv_.reviseOrder(sess, book, ids[0], lots, now, resp);
+      serv_.reviseOrder(accnt, book, ids[0], lots, now, resp);
     } else {
-      serv_.reviseOrder(sess, book, ids, lots, now, resp);
+      serv_.reviseOrder(accnt, book, ids, lots, now, resp);
     }
   } else {
     if (ids.size() == 1) {
-      serv_.cancelOrder(sess, book, ids[0], now, resp);
+      serv_.cancelOrder(accnt, book, ids[0], now, resp);
     } else {
-      serv_.cancelOrder(sess, book, ids, now, resp);
+      serv_.cancelOrder(accnt, book, ids, now, resp);
     }
   }
   out << resp;
 }
 
-void Rest::deleteOrder(Mnem trader, Mnem market, ArrayView<Iden> ids, Millis now)
+void Rest::deleteOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now)
 {
-  auto& sess = serv_.trader(trader);
-  serv_.archiveOrder(sess, market, ids, now);
+  auto& accnt = serv_.accnt(accMnem);
+  serv_.archiveOrder(accnt, market, ids, now);
 }
 
-void Rest::postTrade(Mnem trader, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
+void Rest::postTrade(Mnem accMnem, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
                      LiqInd liqInd, Mnem cpty, Millis now, ostream& out)
 {
-  auto& sess = serv_.trader(trader);
+  auto& accnt = serv_.accnt(accMnem);
   auto& book = serv_.market(market);
-  auto trades = serv_.createTrade(sess, book, ref, side, lots, ticks, liqInd, cpty, now);
+  auto trades = serv_.createTrade(accnt, book, ref, side, lots, ticks, liqInd, cpty, now);
   out << '[' << *trades.first;
   if (trades.second) {
     out << ',' << *trades.second;
@@ -348,31 +348,31 @@ void Rest::postTrade(Mnem trader, Mnem market, string_view ref, Side side, Lots 
   out << ']';
 }
 
-void Rest::deleteTrade(Mnem trader, Mnem market, ArrayView<Iden> ids, Millis now)
+void Rest::deleteTrade(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now)
 {
-  auto& sess = serv_.trader(trader);
-  serv_.archiveTrade(sess, market, ids, now);
+  auto& accnt = serv_.accnt(accMnem);
+  serv_.archiveTrade(accnt, market, ids, now);
 }
 
-void Rest::getOrder(const TraderSess& sess, Millis now, std::ostream& out) const
+void Rest::getOrder(const Accnt& accnt, Millis now, std::ostream& out) const
 {
-  const auto& orders = sess.orders();
+  const auto& orders = accnt.orders();
   out << '[';
   copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
   out << ']';
 }
 
-void Rest::getTrade(const TraderSess& sess, Millis now, std::ostream& out) const
+void Rest::getTrade(const Accnt& accnt, Millis now, std::ostream& out) const
 {
-  const auto& trades = sess.trades();
+  const auto& trades = accnt.trades();
   out << '[';
   copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
   out << ']';
 }
 
-void Rest::getPosn(const TraderSess& sess, Millis now, std::ostream& out) const
+void Rest::getPosn(const Accnt& accnt, Millis now, std::ostream& out) const
 {
-  const auto& posns = sess.posns();
+  const auto& posns = accnt.posns();
   out << '[';
   copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
   out << ']';

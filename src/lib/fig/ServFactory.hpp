@@ -43,8 +43,6 @@ class SWIRLY_API ServFactory : public BasicFactory {
   MarketPtr doNewMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                         Jday expiryDay, MarketState state, Lots lastLots, Ticks lastTicks,
                         Millis lastTime, Iden maxOrderId, Iden maxExecId) const override;
-
-  TraderPtr doNewTrader(Mnem mnem, std::string_view display, std::string_view email) const override;
 };
 
 /** @} */

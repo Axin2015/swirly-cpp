@@ -34,11 +34,11 @@ using experimental::nullopt;
 
 namespace swirly {
 
+class Accnt;
 class Journ;
 class MarketBook;
 class Model;
 class Response;
-class TraderSess;
 
 /**
  * @addtogroup App
@@ -73,9 +73,11 @@ class SWIRLY_API Serv {
 
   MarketBook& market(Mnem mnem) const;
 
-  TraderSess& trader(Mnem mnem) const;
+  Trader& trader(Mnem mnem) const;
 
-  TraderSess& traderFromEmail(std::string_view email) const;
+  Trader& traderFromEmail(std::string_view email) const;
+
+  Accnt& accnt(Mnem mnem) const;
 
   MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
                            Jday expiryDay, MarketState state, Millis now);
@@ -83,61 +85,59 @@ class SWIRLY_API Serv {
   MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
                            std::optional<MarketState> state, Millis now);
 
-  TraderSess& createTrader(Mnem mnem, std::string_view display, std::string_view email, Millis now);
+  Trader& createTrader(Mnem mnem, std::string_view display, std::string_view email, Millis now);
 
-  TraderSess& updateTrader(Mnem mnem, std::string_view display, Millis now);
+  Trader& updateTrader(Mnem mnem, std::string_view display, Millis now);
 
-  void createOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Side side, Lots lots,
+  void createOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);
 
-  void reviseOrder(TraderSess& sess, MarketBook& book, Order& order, Lots lots, Millis now,
+  void reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, Millis now,
                    Response& resp);
 
-  void reviseOrder(TraderSess& sess, MarketBook& book, Iden id, Lots lots, Millis now,
+  void reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Millis now, Response& resp);
+
+  void reviseOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Lots lots, Millis now,
                    Response& resp);
 
-  void reviseOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Lots lots, Millis now,
+  void reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
                    Response& resp);
 
-  void reviseOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
+  void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp);
+
+  void cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Response& resp);
+
+  void cancelOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Millis now,
                    Response& resp);
 
-  void cancelOrder(TraderSess& sess, MarketBook& book, Order& order, Millis now, Response& resp);
-
-  void cancelOrder(TraderSess& sess, MarketBook& book, Iden id, Millis now, Response& resp);
-
-  void cancelOrder(TraderSess& sess, MarketBook& book, std::string_view ref, Millis now,
-                   Response& resp);
-
-  void cancelOrder(TraderSess& sess, MarketBook& book, ArrayView<Iden> ids, Millis now,
-                   Response& resp);
+  void cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Millis now, Response& resp);
 
   /**
    * Cancels all orders.
    *
-   * @param sess
-   *            The session.
+   * @param accnt
+   *            The account.
    * @param now
    *            The current time.
    */
-  void cancelOrder(TraderSess& sess, Millis now);
+  void cancelOrder(Accnt& accnt, Millis now);
 
   void cancelOrder(MarketBook& book, Millis now);
 
-  void archiveOrder(TraderSess& sess, const Order& order, Millis now);
+  void archiveOrder(Accnt& accnt, const Order& order, Millis now);
 
-  void archiveOrder(TraderSess& sess, Mnem market, Iden id, Millis now);
+  void archiveOrder(Accnt& accnt, Mnem market, Iden id, Millis now);
 
-  void archiveOrder(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Millis now);
+  void archiveOrder(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now);
 
-  TradePair createTrade(TraderSess& sess, MarketBook& book, std::string_view ref, Side side,
-                        Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created);
+  TradePair createTrade(Accnt& accnt, MarketBook& book, std::string_view ref, Side side, Lots lots,
+                        Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created);
 
-  void archiveTrade(TraderSess& sess, const Exec& trade, Millis now);
+  void archiveTrade(Accnt& accnt, const Exec& trade, Millis now);
 
-  void archiveTrade(TraderSess& sess, Mnem market, Iden id, Millis now);
+  void archiveTrade(Accnt& accnt, Mnem market, Iden id, Millis now);
 
-  void archiveTrade(TraderSess& sess, Mnem market, ArrayView<Iden> ids, Millis now);
+  void archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now);
 
   /**
    * This method may partially fail.

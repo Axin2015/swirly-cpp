@@ -121,7 +121,7 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
   }
 }
 
-void Model::doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const
+void Model::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const
 {
   enum { //
     Mnem, //
@@ -153,7 +153,7 @@ void Model::doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>&
   }
 }
 
-void Model::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const
+void Model::doReadTrader(const ModelCallback<TraderPtr>& cb) const
 {
   enum { //
     Mnem, //
@@ -163,9 +163,9 @@ void Model::doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>&
 
   StmtPtr stmt{prepare(*db_, SelectTraderSql)};
   while (step(*stmt)) {
-    cb(factory.newTrader(column<string_view>(*stmt, Mnem), //
-                         column<string_view>(*stmt, Display), //
-                         column<string_view>(*stmt, Email)));
+    cb(Trader::make(column<string_view>(*stmt, Mnem), //
+                    column<string_view>(*stmt, Display), //
+                    column<string_view>(*stmt, Email)));
   }
 }
 
