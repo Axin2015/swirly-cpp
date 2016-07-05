@@ -23,7 +23,7 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
@@ -31,7 +31,7 @@ class TestCase(RestTestCase):
         self.updateStateOnly(conn)
 
   def createMarket(self, conn):
-    resp = conn.send('POST', '/api/rec/market',
+    resp = conn.send('POST', '/rec/market',
                      mnem = 'USDJPY.MAR14',
                      display = 'first',
                      contr = 'USDJPY',
@@ -51,7 +51,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateDisplayAndState(self, conn):
-    resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = 'second',
                      state = 2)
     self.assertEqual(200, resp.status)
@@ -66,7 +66,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateDisplayOnly(self, conn):
-    resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = 'third',
                      state = None)
 
@@ -82,7 +82,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateStateOnly(self, conn):
-    resp = conn.send('PUT', '/api/rec/market/USDJPY.MAR14',
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = None,
                      state = 3)
     self.assertEqual(200, resp.status)

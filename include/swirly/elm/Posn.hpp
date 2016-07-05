@@ -35,9 +35,9 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted {
  public:
-  Posn(Mnem trader, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
+  Posn(Mnem accnt, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
        Cost sellCost) noexcept
-    : trader_{trader},
+    : accnt_{accnt},
       contr_{contr},
       settlDay_{settlDay},
       buyLots_{buyLots},
@@ -46,8 +46,8 @@ class SWIRLY_API Posn : public RefCounted {
       sellCost_{sellCost}
   {
   }
-  Posn(Mnem trader, Mnem contr, Jday settlDay) noexcept
-    : Posn{trader, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+  Posn(Mnem accnt, Mnem contr, Jday settlDay) noexcept
+    : Posn{accnt, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
   {
   }
   ~Posn() noexcept override;
@@ -68,7 +68,7 @@ class SWIRLY_API Posn : public RefCounted {
 
   void toJson(std::ostream& os) const;
 
-  auto trader() const noexcept { return trader_; }
+  auto accnt() const noexcept { return accnt_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto buyLots() const noexcept { return buyLots_; }
@@ -118,7 +118,7 @@ class SWIRLY_API Posn : public RefCounted {
   boost::intrusive::set_member_hook<> keyHook_;
 
  private:
-  const Mnem trader_;
+  const Mnem accnt_;
   const Mnem contr_;
   Jday settlDay_;
   Lots buyLots_;
@@ -138,7 +138,7 @@ class SWIRLY_API PosnSet {
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
-      int result{lhs.trader().compare(rhs.trader())};
+      int result{lhs.accnt().compare(rhs.accnt())};
       if (result == 0) {
         result = swirly::compare(lhs.settlDay(), rhs.settlDay());
         if (result == 0) {
@@ -155,7 +155,7 @@ class SWIRLY_API PosnSet {
   struct KeyValueCompare {
     bool operator()(const Key& lhs, const Posn& rhs) const noexcept
     {
-      int result{std::get<0>(lhs).compare(rhs.trader())};
+      int result{std::get<0>(lhs).compare(rhs.accnt())};
       if (result == 0) {
         result = swirly::compare(std::get<2>(lhs), rhs.settlDay());
         if (result == 0) {
@@ -166,7 +166,7 @@ class SWIRLY_API PosnSet {
     }
     bool operator()(const Posn& lhs, const Key& rhs) const noexcept
     {
-      int result{lhs.trader().compare(std::get<0>(rhs))};
+      int result{lhs.accnt().compare(std::get<0>(rhs))};
       if (result == 0) {
         result = swirly::compare(lhs.settlDay(), std::get<2>(rhs));
         if (result == 0) {
@@ -210,24 +210,24 @@ class SWIRLY_API PosnSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(Mnem trader, Mnem contr, Jday settlDay) const noexcept
+  ConstIterator find(Mnem accnt, Mnem contr, Jday settlDay) const noexcept
   {
-    return set_.find(std::make_tuple(trader, contr, settlDay), KeyValueCompare());
+    return set_.find(std::make_tuple(accnt, contr, settlDay), KeyValueCompare());
   }
-  Iterator find(Mnem trader, Mnem contr, Jday settlDay) noexcept
+  Iterator find(Mnem accnt, Mnem contr, Jday settlDay) noexcept
   {
-    return set_.find(std::make_tuple(trader, contr, settlDay), KeyValueCompare());
+    return set_.find(std::make_tuple(accnt, contr, settlDay), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(Mnem trader, Mnem contr, Jday settlDay) const noexcept
+  std::pair<ConstIterator, bool> findHint(Mnem accnt, Mnem contr, Jday settlDay) const noexcept
   {
-    const auto key = std::make_tuple(trader, contr, settlDay);
+    const auto key = std::make_tuple(accnt, contr, settlDay);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(Mnem trader, Mnem contr, Jday settlDay) noexcept
+  std::pair<Iterator, bool> findHint(Mnem accnt, Mnem contr, Jday settlDay) noexcept
   {
-    const auto key = std::make_tuple(trader, contr, settlDay);
+    const auto key = std::make_tuple(accnt, contr, settlDay);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
@@ -264,7 +264,7 @@ class SWIRLY_API PosnSet {
   Set set_;
 };
 
-class SWIRLY_API TraderPosnSet {
+class SWIRLY_API AccntPosnSet {
   using Key = std::tuple<Mnem, Jday>;
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
@@ -312,17 +312,17 @@ class SWIRLY_API TraderPosnSet {
   using Iterator = typename Set::iterator;
   using ConstIterator = typename Set::const_iterator;
 
-  TraderPosnSet() = default;
+  AccntPosnSet() = default;
 
-  ~TraderPosnSet() noexcept;
+  ~AccntPosnSet() noexcept;
 
   // Copy.
-  TraderPosnSet(const TraderPosnSet&) = delete;
-  TraderPosnSet& operator=(const TraderPosnSet&) = delete;
+  AccntPosnSet(const AccntPosnSet&) = delete;
+  AccntPosnSet& operator=(const AccntPosnSet&) = delete;
 
   // Move.
-  TraderPosnSet(TraderPosnSet&&);
-  TraderPosnSet& operator=(TraderPosnSet&&);
+  AccntPosnSet(AccntPosnSet&&);
+  AccntPosnSet& operator=(AccntPosnSet&&);
 
   // Begin.
   ConstIterator begin() const noexcept { return set_.begin(); }

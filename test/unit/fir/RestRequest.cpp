@@ -51,32 +51,18 @@ SWIRLY_TEST_CASE(RestRequestDisplay)
   SWIRLY_CHECK(rr.display().empty());
 }
 
-SWIRLY_TEST_CASE(RestRequestEmail)
+SWIRLY_TEST_CASE(RestRequestAccnt)
 {
   RestRequest rr;
 
-  SWIRLY_CHECK(rr.parse(R"({"email":"mark.aylett@gmail.com"})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::Email);
-  SWIRLY_CHECK(rr.email() == "mark.aylett@gmail.com"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"accnt":"MARAYL"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Accnt);
+  SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
 
   rr.reset(false);
-  rr.parse(R"({"email":null})"_sv);
+  rr.parse(R"({"accnt":null})"_sv);
   SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.email().empty());
-}
-
-SWIRLY_TEST_CASE(RestRequestTrader)
-{
-  RestRequest rr;
-
-  SWIRLY_CHECK(rr.parse(R"({"trader":"MARAYL"})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::Trader);
-  SWIRLY_CHECK(rr.trader() == "MARAYL"_sv);
-
-  rr.reset(false);
-  rr.parse(R"({"trader":null})"_sv);
-  SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.trader().empty());
+  SWIRLY_CHECK(rr.accnt().empty());
 }
 
 SWIRLY_TEST_CASE(RestRequestContr)
@@ -204,18 +190,18 @@ SWIRLY_TEST_CASE(RestRequestMinLots)
   SWIRLY_CHECK(rr.minLots() == 0_lts);
 }
 
-SWIRLY_TEST_CASE(RestRequestRole)
+SWIRLY_TEST_CASE(RestRequestLiqInd)
 {
   RestRequest rr;
 
-  SWIRLY_CHECK(rr.parse(R"({"role":"MAKER"})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::Role);
-  SWIRLY_CHECK(rr.role() == Role::Maker);
+  SWIRLY_CHECK(rr.parse(R"({"liqInd":"MAKER"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::LiqInd);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::Maker);
 
   rr.reset(false);
-  rr.parse(R"({"role":null})"_sv);
+  rr.parse(R"({"liqInd":null})"_sv);
   SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.role() == Role::None);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::None);
 }
 
 SWIRLY_TEST_CASE(RestRequestCpty)
@@ -246,9 +232,9 @@ SWIRLY_TEST_CASE(RestRequestDuplicate)
 {
   RestRequest rr;
 
-  SWIRLY_CHECK(rr.parse(R"({"trader":"MARAYL1","trader":"MARAYL2"})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::Trader);
-  SWIRLY_CHECK(rr.trader() == "MARAYL2"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"accnt":"MARAYL1","accnt":"MARAYL2"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Accnt);
+  SWIRLY_CHECK(rr.accnt() == "MARAYL2"_sv);
 }
 
 SWIRLY_TEST_CASE(RestRequestBadField)
@@ -298,12 +284,11 @@ SWIRLY_TEST_CASE(RestRequestAll)
   RestRequest rr;
 
   SWIRLY_CHECK(rr.parse(
-    R"({"mnem":"EURUSD","display":"Euro Dollar","email":"mark.aylett@gmail.com","trader":"MARAYL","contr":"EURUSD","settlDate":20140315,"expiryDate":20140314,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"role":"MAKER","cpty":"MARAYL"})"_sv));
+    R"({"mnem":"EURUSD","display":"Euro Dollar","accnt":"MARAYL","contr":"EURUSD","settlDate":20140315,"expiryDate":20140314,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
   SWIRLY_CHECK(rr.fields() == ((RestRequest::Cpty - 1) | RestRequest::Cpty));
   SWIRLY_CHECK(rr.mnem() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
-  SWIRLY_CHECK(rr.email() == "mark.aylett@gmail.com"_sv);
-  SWIRLY_CHECK(rr.trader() == "MARAYL"_sv);
+  SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
   SWIRLY_CHECK(rr.contr() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.settlDate() == 20140315_dt);
   SWIRLY_CHECK(rr.expiryDate() == 20140314_dt);
@@ -313,7 +298,7 @@ SWIRLY_TEST_CASE(RestRequestAll)
   SWIRLY_CHECK(rr.lots() == 101_lts);
   SWIRLY_CHECK(rr.ticks() == 12345_tks);
   SWIRLY_CHECK(rr.minLots() == 101_lts);
-  SWIRLY_CHECK(rr.role() == Role::Maker);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::Maker);
   SWIRLY_CHECK(rr.cpty() == "MARAYL"_sv);
 }
 

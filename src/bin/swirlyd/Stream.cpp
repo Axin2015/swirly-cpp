@@ -81,12 +81,15 @@ constexpr bool withBody(int status) noexcept
   return !((status >= 100 && status < 200) || status == 204 || status == 304);
 }
 
-void OStream::reset(int status, const char* reason) noexcept
+void OStream::reset(int status, const char* reason, bool cache) noexcept
 {
   rdbuf()->reset();
   swirly::reset(*this);
 
   *this << "HTTP/1.1 " << status << ' ' << reason;
+  if (!cache) {
+    *this << "\r\nCache-Control: no-cache";
+  }
   if (withBody(status)) {
     // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space place-holder
     // for content length. RFC2616 states that field value MAY be preceded by any amount of LWS,

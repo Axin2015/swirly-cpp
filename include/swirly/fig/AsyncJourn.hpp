@@ -97,17 +97,6 @@ class SWIRLY_API AsyncJourn {
     doUpdateMarket(mnem, display, state);
   }
   /**
-   * Create Trader.
-   */
-  void createTrader(Mnem mnem, std::string_view display, std::string_view email)
-  {
-    doCreateTrader(mnem, display, email);
-  }
-  /**
-   * Update Trader.
-   */
-  void updateTrader(Mnem mnem, std::string_view display) { doUpdateTrader(mnem, display); }
-  /**
    * Create Execution.
    */
   void createExec(const Exec& exec) { doCreateExec(exec, More::No); }
@@ -145,10 +134,6 @@ class SWIRLY_API AsyncJourn {
                       Jday expiryDay, MarketState state);
 
   void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state);
-
-  void doCreateTrader(Mnem mnem, std::string_view display, std::string_view email);
-
-  void doUpdateTrader(Mnem mnem, std::string_view display);
 
   void doCreateExec(const Exec& exec, More more);
 

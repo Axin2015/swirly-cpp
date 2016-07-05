@@ -23,15 +23,15 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createDeposit(conn)
         self.createWithdraw(conn)
 
   def createDeposit(self, conn):
-    resp = conn.send('POST', '/api/sess/trade/EURUSD.MAR14',
-                     trader = 'MARAYL',
+    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
+                     accnt = 'MARAYL',
                      ref = 'test1',
                      side = 'BUY',
                      lots = 10)
@@ -39,6 +39,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
@@ -54,30 +55,30 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resd': 0,
-      u'role': None,
+      u'liqInd': None,
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 0,
-      u'trader': u'MARAYL'
+      u'ticks': 0
     }], resp.content)
 
   def createWithdraw(self, conn):
-    resp = conn.send('POST', '/api/sess/trade/EURUSD.MAR14',
-                     trader = 'MARAYL',
+    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
+                     accnt = 'MARAYL',
                      ref = 'test1',
-                     side = 'BUY',
+                     side = 'SELL',
                      lots = 10)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
       u'created': self.now,
       u'exec': 10,
-      u'id': 1,
+      u'id': 2,
       u'lastLots': 10,
       u'lastTicks': 0,
       u'lots': 10,
@@ -87,10 +88,9 @@ class TestCase(RestTestCase):
       u'orderId': 0,
       u'ref': u'test1',
       u'resd': 0,
-      u'role': None,
+      u'liqInd': None,
       u'settlDate': 20170102,
       u'side': u'SELL',
       u'state': u'TRADE',
-      u'ticks': 0,
-      u'trader': u'MARAYL'
+      u'ticks': 0
     }], resp.content)

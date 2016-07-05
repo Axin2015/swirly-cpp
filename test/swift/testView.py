@@ -23,7 +23,7 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 7, 12348)
@@ -48,7 +48,7 @@ class TestCase(RestTestCase):
         self.getViewMulti(conn)
 
   def getViewAll(self, conn):
-    resp = conn.send('GET', '/api/view')
+    resp = conn.send('GET', '/view')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -94,7 +94,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getViewSingle(self, conn):
-    resp = conn.send('GET', '/api/view/EURUSD.MAR14')
+    resp = conn.send('GET', '/view/EURUSD.MAR14')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -114,7 +114,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def getViewMulti(self, conn):
-    resp = conn.send('GET', '/api/view/EURUSD.MAR14,USDCHF.MAR14')
+    resp = conn.send('GET', '/view/EURUSD.MAR14,USDCHF.MAR14')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

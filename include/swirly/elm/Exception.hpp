@@ -303,20 +303,6 @@ class SWIRLY_API OrderNotFoundException : public NotFoundException {
   OrderNotFoundException& operator=(OrderNotFoundException&&) noexcept = default;
 };
 
-class SWIRLY_API TraderNotFoundException : public NotFoundException {
- public:
-  explicit TraderNotFoundException(std::string_view what) noexcept : NotFoundException{what} {}
-  ~TraderNotFoundException() noexcept override;
-
-  // Copy.
-  TraderNotFoundException(const TraderNotFoundException&) noexcept = default;
-  TraderNotFoundException& operator=(const TraderNotFoundException&) noexcept = default;
-
-  // Move.
-  TraderNotFoundException(TraderNotFoundException&&) noexcept = default;
-  TraderNotFoundException& operator=(TraderNotFoundException&&) noexcept = default;
-};
-
 /**
  * The server is currently unable to handle the request due to a temporary overloading or
  * maintenance of the server. The implication is that this is a temporary condition which will be

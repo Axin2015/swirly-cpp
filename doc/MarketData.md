@@ -33,7 +33,7 @@ Subscriptions
 Although the Rest API does not currently support subscriptions, clients can specify a list of
 markets they wish to receive using a `GET` request similar to the following:
 
-    GET /api/view/EURUSD,GBPUSD,USDCHF
+    GET /view/EURUSD,GBPUSD,USDCHF
 
 Streaming API
 -------------

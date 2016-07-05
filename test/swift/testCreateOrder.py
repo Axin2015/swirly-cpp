@@ -23,14 +23,14 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createBid(conn)
         self.createOffer(conn)
 
   def createBid(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'BUY',
                      lots = 5,
                      ticks = 12344)
@@ -39,6 +39,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -54,14 +55,14 @@ class TestCase(RestTestCase):
         u'orderId': 1,
         u'ref': None,
         u'resd': 5,
-        u'role': None,
+        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'NEW',
-        u'ticks': 12344,
-        u'trader': u'MARAYL'
+        u'ticks': 12344
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -78,8 +79,7 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'NEW',
-        u'ticks': 12344,
-        u'trader': u'MARAYL'
+        u'ticks': 12344
       }],
       u'posn': None,
       u'view': {
@@ -99,7 +99,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def createOffer(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12346)
@@ -108,6 +108,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -123,14 +124,14 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 5,
-        u'role': None,
+        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
-        u'ticks': 12346,
-        u'trader': u'MARAYL'
+        u'ticks': 12346
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -147,8 +148,7 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
-        u'ticks': 12346,
-        u'trader': u'MARAYL'
+        u'ticks': 12346
       }],
       u'posn': None,
       u'view': {

@@ -107,35 +107,20 @@ namespace {
   display = 'null' %nullDisplay
     | str >beginDisplay %endDisplay;
 
-  action nullEmail {
-    fields_ &= ~Email;
-    email_.len = 0;
+  action nullAccnt {
+    fields_ &= ~Accnt;
+    accnt_.len = 0;
   }
-  action beginEmail {
-    str_.len = &email_.len;
-    str_.buf = email_.buf;
-    str_.max = MaxEmail;
-  }
-  action endEmail {
-    fields_ |= Email;
-  }
-  email = 'null' %nullEmail
-    | str >beginEmail %endEmail;
-
-  action nullTrader {
-    fields_ &= ~Trader;
-    trader_.len = 0;
-  }
-  action beginTrader {
-    str_.len = &trader_.len;
-    str_.buf = trader_.buf;
+  action beginAccnt {
+    str_.len = &accnt_.len;
+    str_.buf = accnt_.buf;
     str_.max = MaxMnem;
   }
-  action endTrader {
-    fields_ |= Trader;
+  action endAccnt {
+    fields_ |= Accnt;
   }
-  trader = 'null' %nullTrader
-    | str >beginTrader %endTrader;
+  accnt = 'null' %nullAccnt
+    | str >beginAccnt %endAccnt;
 
   action nullContr {
     fields_ &= ~Contr;
@@ -253,21 +238,21 @@ namespace {
   minLots = 'null' %nullMinLots
     | num %endMinLots;
 
-  action nullRole {
-    fields_ &= ~Role;
-    role_ = swirly::Role::None;
+  action nullLiqInd {
+    fields_ &= ~LiqInd;
+    liqInd_ = swirly::LiqInd::None;
   }
-  action makerRole {
-    fields_ |= Role;
-    role_ = swirly::Role::Maker;
+  action makerLiqInd {
+    fields_ |= LiqInd;
+    liqInd_ = swirly::LiqInd::Maker;
   }
-  action takerRole {
-    fields_ |= Role;
-    role_ = swirly::Role::Taker;
+  action takerLiqInd {
+    fields_ |= LiqInd;
+    liqInd_ = swirly::LiqInd::Taker;
   }
-  role = 'null' %nullRole
-    | '"MAKER"'i %makerRole
-    | '"TAKER"'i %takerRole;
+  liqInd = 'null' %nullLiqInd
+    | '"MAKER"'i %makerLiqInd
+    | '"TAKER"'i %takerLiqInd;
 
   action nullCpty {
     fields_ &= ~Cpty;
@@ -289,8 +274,7 @@ namespace {
 
   pair = '"mnem"'i colon mnem
     | '"display"'i colon display
-    | '"email"'i colon email
-    | '"trader"'i colon trader
+    | '"accnt"'i colon accnt
     | '"contr"'i colon contr
     | '"settlDate"'i colon settlDate
     | '"expiryDate"'i colon expiryDate
@@ -300,7 +284,7 @@ namespace {
     | '"lots"'i colon lots
     | '"ticks"'i colon ticks
     | '"minLots"'i colon minLots
-    | '"role"'i colon role
+    | '"liqInd"'i colon liqInd
     | '"cpty"'i colon cpty;
 
   members = pair (comma pair)*;
@@ -330,8 +314,7 @@ void RestRequest::reset(bool clear) noexcept
 
   mnem_.len = 0;
   display_.len = 0;
-  email_.len = 0;
-  trader_.len = 0;
+  accnt_.len = 0;
   contr_.len = 0;
   settlDate_ = 0_dt;
   expiryDate_ = 0_dt;
@@ -341,7 +324,7 @@ void RestRequest::reset(bool clear) noexcept
   lots_ = 0_lts;
   ticks_ = 0_tks;
   minLots_ = 0_lts;
-  role_ = swirly::Role::None;
+  liqInd_ = swirly::LiqInd::None;
   cpty_.len = 0;
 }
 

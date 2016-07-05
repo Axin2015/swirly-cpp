@@ -110,8 +110,6 @@ MarketNotFoundException::~MarketNotFoundException() noexcept = default;
 
 OrderNotFoundException::~OrderNotFoundException() noexcept = default;
 
-TraderNotFoundException::~TraderNotFoundException() noexcept = default;
-
 ServiceUnavailableException::~ServiceUnavailableException() noexcept = default;
 
 int ServiceUnavailableException::httpStatus() const noexcept

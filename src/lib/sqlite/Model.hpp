@@ -47,9 +47,9 @@ class Model : public swirly::Model {
 
   void doReadContr(const ModelCallback<ContrPtr>& cb) const override;
 
-  void doReadMarket(const Factory& factory, const ModelCallback<MarketPtr>& cb) const override;
+  void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
 
-  void doReadTrader(const Factory& factory, const ModelCallback<TraderPtr>& cb) const override;
+  void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const override;
 
   void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
 

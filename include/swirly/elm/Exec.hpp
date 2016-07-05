@@ -36,11 +36,11 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public Request, public MemAlloc {
  public:
-  Exec(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Exec(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
        Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, Role role, Mnem cpty,
-       Millis created) noexcept
-    : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, LiqInd liqInd,
+       Mnem cpty, Millis created) noexcept
+    : Request{accnt, market, contr, settlDay, id, ref, side, lots, created},
       orderId_{orderId},
       state_{state},
       ticks_{ticks},
@@ -51,7 +51,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
       lastTicks_{lastTicks},
       minLots_{minLots},
       matchId_{matchId},
-      role_{role},
+      liqInd_{liqInd},
       cpty_{cpty}
   {
   }
@@ -85,7 +85,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   Ticks lastTicks() const noexcept { return lastTicks_; }
   Lots minLots() const noexcept { return minLots_; }
   Iden matchId() const noexcept { return matchId_; }
-  Role role() const noexcept { return role_; }
+  LiqInd liqInd() const noexcept { return liqInd_; }
   Mnem cpty() const noexcept { return cpty_; }
 
   void revise(Lots lots) noexcept
@@ -102,12 +102,12 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
     state_ = State::Cancel;
     resd_ = 0_lts;
   }
-  void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId, Role role,
-             Mnem cpty) noexcept;
+  void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId,
+             LiqInd liqInd, Mnem cpty) noexcept;
 
-  void trade(Lots lastLots, Ticks lastTicks, Iden matchId, Role role, Mnem cpty) noexcept
+  void trade(Lots lastLots, Ticks lastTicks, Iden matchId, LiqInd liqInd, Mnem cpty) noexcept
   {
-    trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, role, cpty);
+    trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, liqInd, cpty);
   }
 
   boost::intrusive::set_member_hook<> idHook_;
@@ -132,7 +132,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
    */
   const Lots minLots_;
   Iden matchId_;
-  Role role_;
+  LiqInd liqInd_;
   Mnem cpty_;
 };
 

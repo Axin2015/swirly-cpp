@@ -28,8 +28,6 @@ struct Handler : MsgHandler<Handler> {
   int resetCalls{0};
   int createMarketCalls{0};
   int updateMarketCalls{0};
-  int createTraderCalls{0};
-  int updateTraderCalls{0};
   int createExecCalls{0};
   int archiveOrderCalls{0};
   int archiveTradeCalls{0};
@@ -37,8 +35,6 @@ struct Handler : MsgHandler<Handler> {
   void reset() { ++resetCalls; }
   void createMarket(const CreateMarketBody& body) { ++createMarketCalls; }
   void updateMarket(const UpdateMarketBody& body) { ++updateMarketCalls; }
-  void createTrader(const CreateTraderBody& body) { ++createTraderCalls; }
-  void updateTrader(const UpdateTraderBody& body) { ++updateTraderCalls; }
   void createExec(const CreateExecBody& body) { ++createExecCalls; }
   void archiveOrder(const ArchiveBody& body) { ++archiveOrderCalls; }
   void archiveTrade(const ArchiveBody& body) { ++archiveTradeCalls; }
@@ -70,16 +66,6 @@ SWIRLY_TEST_CASE(MsgHandler)
   SWIRLY_CHECK(h.updateMarketCalls == 0);
   h.dispatch(m);
   SWIRLY_CHECK(h.updateMarketCalls == 1);
-
-  m.type = MsgType::CreateTrader;
-  SWIRLY_CHECK(h.createTraderCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.createTraderCalls == 1);
-
-  m.type = MsgType::UpdateTrader;
-  SWIRLY_CHECK(h.updateTraderCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.updateTraderCalls == 1);
 
   m.type = MsgType::CreateExec;
   SWIRLY_CHECK(h.createExecCalls == 0);

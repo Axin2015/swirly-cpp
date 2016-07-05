@@ -34,19 +34,18 @@ class SWIRLY_API RestRequest {
   enum : unsigned {
     Mnem = 1 << 0,
     Display = 1 << 1,
-    Email = 1 << 2,
-    Trader = 1 << 3,
-    Contr = 1 << 4,
-    SettlDate = 1 << 5,
-    ExpiryDate = 1 << 6,
-    Ref = 1 << 7,
-    State = 1 << 8,
-    Side = 1 << 9,
-    Lots = 1 << 10,
-    Ticks = 1 << 11,
-    MinLots = 1 << 12,
-    Role = 1 << 13,
-    Cpty = 1 << 14
+    Accnt = 1 << 2,
+    Contr = 1 << 3,
+    SettlDate = 1 << 4,
+    ExpiryDate = 1 << 5,
+    Ref = 1 << 6,
+    State = 1 << 7,
+    Side = 1 << 8,
+    Lots = 1 << 9,
+    Ticks = 1 << 10,
+    MinLots = 1 << 11,
+    LiqInd = 1 << 12,
+    Cpty = 1 << 13
   };
 
   RestRequest() noexcept { reset(); }
@@ -63,8 +62,7 @@ class SWIRLY_API RestRequest {
   unsigned fields() const noexcept { return fields_; }
   swirly::Mnem mnem() const noexcept { return +mnem_; }
   std::string_view display() const noexcept { return +display_; }
-  std::string_view email() const noexcept { return +email_; }
-  swirly::Mnem trader() const noexcept { return +trader_; }
+  swirly::Mnem accnt() const noexcept { return +accnt_; }
   swirly::Mnem contr() const noexcept { return +contr_; }
   IsoDate settlDate() const noexcept { return settlDate_; }
   IsoDate expiryDate() const noexcept { return expiryDate_; }
@@ -74,7 +72,7 @@ class SWIRLY_API RestRequest {
   swirly::Lots lots() const noexcept { return lots_; }
   swirly::Ticks ticks() const noexcept { return ticks_; }
   swirly::Lots minLots() const noexcept { return minLots_; }
-  swirly::Role role() const noexcept { return role_; }
+  swirly::LiqInd liqInd() const noexcept { return liqInd_; }
   swirly::Mnem cpty() const noexcept { return +cpty_; }
   /**
    * Validate fields.
@@ -110,8 +108,7 @@ class SWIRLY_API RestRequest {
 
   StringData<MaxMnem> mnem_;
   StringData<MaxDisplay> display_;
-  StringData<MaxEmail> email_;
-  StringData<MaxMnem> trader_;
+  StringData<MaxMnem> accnt_;
   StringData<MaxMnem> contr_;
   IsoDate settlDate_;
   IsoDate expiryDate_;
@@ -121,7 +118,7 @@ class SWIRLY_API RestRequest {
   swirly::Lots lots_;
   swirly::Ticks ticks_;
   swirly::Lots minLots_;
-  swirly::Role role_;
+  swirly::LiqInd liqInd_;
   StringData<MaxMnem> cpty_;
 
   long num() const noexcept { return num_.sign * num_.digits; }

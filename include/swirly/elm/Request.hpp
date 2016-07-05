@@ -34,9 +34,9 @@ namespace swirly {
 
 class SWIRLY_API Request : public RefCounted {
  public:
-  Request(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Request(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
           Side side, Lots lots, Millis created) noexcept
-    : trader_{trader},
+    : accnt_{accnt},
       market_{market},
       contr_{contr},
       settlDay_{settlDay},
@@ -59,7 +59,7 @@ class SWIRLY_API Request : public RefCounted {
 
   virtual void toJson(std::ostream& os) const;
 
-  auto trader() const noexcept { return trader_; }
+  auto accnt() const noexcept { return accnt_; }
   auto market() const noexcept { return market_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
@@ -71,9 +71,9 @@ class SWIRLY_API Request : public RefCounted {
 
  protected:
   /**
-   * The executing trader.
+   * The executing accnt.
    */
-  const Mnem trader_;
+  const Mnem accnt_;
   const Mnem market_;
   const Mnem contr_;
   const Jday settlDay_;

@@ -37,10 +37,9 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  explicit RestServ(Rest& rest, const char* httpAuth, const char* httpTime = nullptr) noexcept
-    : rest_(rest), httpAuth_{httpAuth}, httpTime_{httpTime}, profile_{"profile"_sv}
+  explicit RestServ(Rest& rest, bool testMode = false) noexcept
+    : rest_(rest), testMode_{testMode}, profile_{"profile"_sv}
   {
-    memset(&httpOpts_, 0, sizeof(httpOpts_));
   }
   ~RestServ() noexcept;
 
@@ -52,7 +51,7 @@ class RestServ : public mg::Mgr<RestServ> {
   RestServ(RestServ&&) = delete;
   RestServ& operator=(RestServ&&) = delete;
 
-  void reset(mg::HttpMessage data) noexcept;
+  bool reset(mg::HttpMessage data) noexcept;
 
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
   void restRequest(mg::HttpMessage data, Millis now);
@@ -61,9 +60,8 @@ class RestServ : public mg::Mgr<RestServ> {
   void assetRequest(mg::HttpMessage data, Millis now);
   void contrRequest(mg::HttpMessage data, Millis now);
   void marketRequest(mg::HttpMessage data, Millis now);
-  void traderRequest(mg::HttpMessage data, Millis now);
 
-  void sessRequest(mg::HttpMessage data, Millis now);
+  void accntRequest(mg::HttpMessage data, Millis now);
   void orderRequest(mg::HttpMessage data, Millis now);
   void tradeRequest(mg::HttpMessage data, Millis now);
   void posnRequest(mg::HttpMessage data, Millis now);
@@ -89,9 +87,7 @@ class RestServ : public mg::Mgr<RestServ> {
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
 
   Rest& rest_;
-  const char* const httpAuth_;
-  const char* const httpTime_;
-  mg_serve_http_opts httpOpts_;
+  bool testMode_{false};
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Iden> ids_;

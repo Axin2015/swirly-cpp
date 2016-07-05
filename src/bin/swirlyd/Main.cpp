@@ -233,14 +233,13 @@ int main(int argc, char* argv[])
       model = make_unique<TestModel>();
     }
     const char* const httpPort{conf.get("http_port", "8080")};
-    const char* const httpAuth{conf.get("http_auth", "Swirly-Auth")};
 
     const long journCapacity{conf.get("journ_capacity", 1L << 10)};
     Rest rest{*journ, static_cast<size_t>(journCapacity)};
     rest.load(*model, getTimeOfDay());
     model = nullptr;
 
-    mg::RestServ rs{rest, httpAuth, opts.testMode ? "Swirly-Time" : nullptr};
+    mg::RestServ rs{rest, opts.testMode};
 
     auto& conn = rs.bind(httpPort);
     mg_set_protocol_http_websocket(&conn);
@@ -258,7 +257,6 @@ int main(int argc, char* argv[])
     SWIRLY_INFO(logMsg() << "log_file:       " << logFile);
     SWIRLY_INFO(logMsg() << "log_level:      " << getLogLevel());
     SWIRLY_INFO(logMsg() << "http_port:      " << httpPort);
-    SWIRLY_INFO(logMsg() << "http_auth:      " << httpAuth);
     SWIRLY_INFO(logMsg() << "journ_capacity: " << journCapacity);
 
     signal(SIGHUP, sigHandler);

@@ -57,9 +57,9 @@ class Shell(Cmd):
   def __init__(self, host, port):
     Cmd.__init__(self)
     self.conn = httplib.HTTPConnection(host, port)
-    self.env = {
-      'AUTH': os.environ['SWIRLY_AUTH']
-    }
+    self.env = {}
+    if 'SWIRLY_ACCNT' in os.environ:
+      self.env['ACCNT'] = os.environ['SWIRLY_ACCNT']
 
   def __enter__(self):
     return self
@@ -77,8 +77,8 @@ class Shell(Cmd):
     conn = self.conn
     conn.putrequest(method, uri)
     conn.putheader('Accept', 'application/json')
-    if 'AUTH' in self.env:
-      conn.putheader('Swirly-Auth', self.env['AUTH'])
+    if 'ACCNT' in self.env:
+      conn.putheader('Swirly-Accnt', self.env['ACCNT'])
     conn.putheader('Content-Length', len(content))
     conn.putheader('Content-Type', 'application/json')
     conn.endheaders()
@@ -121,7 +121,7 @@ class Shell(Cmd):
 
   def do_asset(self, args):
     """Usage: asset"""
-    resp = self.send('GET', '/api/rec/asset')
+    resp = self.send('GET', '/rec/asset')
     cols = [
       'mnem',
       'display',
@@ -138,7 +138,7 @@ class Shell(Cmd):
 
   def do_contr(self, args):
     """Usage: contr"""
-    resp = self.send('GET', '/api/rec/contr')
+    resp = self.send('GET', '/rec/contr')
     cols = [
       'mnem',
       'display',
@@ -171,7 +171,7 @@ class Shell(Cmd):
 
   def do_market(self, args):
     """Usage: market"""
-    resp = self.send('GET', '/api/rec/market')
+    resp = self.send('GET', '/rec/market')
     cols = [
       'mnem',
       'display',
@@ -192,28 +192,11 @@ class Shell(Cmd):
     )
     printTable(cols, rows, fmt)
 
-  def do_trader(self, args):
-    """Usage: trader"""
-    resp = self.send('GET', '/api/rec/trader')
-    cols = [
-      'mnem',
-      'display',
-      'email'
-    ]
-    rows = resp.content
-    fmt = (
-      '|{mnem:<{mnemLen}}'
-      '|{display:<{displayLen}}'
-      '|{email:<{emailLen}}'
-      '|'
-    )
-    printTable(cols, rows, fmt)
-
   def do_order(self, args):
     """Usage: order"""
-    resp = self.send('GET', '/api/sess/order')
+    resp = self.send('GET', '/accnt/order')
     cols = [
-      'trader',
+      'accnt',
       'market',
       'contr',
       'settlDate',
@@ -234,7 +217,7 @@ class Shell(Cmd):
     ]
     rows = resp.content
     fmt = (
-      '|{trader:<{traderLen}}'
+      '|{accnt:<{accntLen}}'
       '|{market:<{marketLen}}'
       '|{contr:<{contrLen}}'
       '|{settlDate:<{settlDateLen}}'
@@ -258,7 +241,7 @@ class Shell(Cmd):
 
   def do_view(self, args):
     """Usage: view"""
-    resp = self.send('GET', '/api/view')
+    resp = self.send('GET', '/view')
     cols = [
       'market',
       'contr',
@@ -297,7 +280,7 @@ class Shell(Cmd):
     """Usage: buy <market> <lots> <ticks>"""
     try:
       market, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/api/sess/order/' + market,
+      resp = self.send('POST', '/accnt/order/' + market,
                        side = 'BUY',
                        lots = int(lots),
                        ticks = int(ticks))
@@ -310,7 +293,7 @@ class Shell(Cmd):
     """Usage: sell <market> <lots> <ticks>"""
     try:
       market, lots, ticks = shlex.split(args)
-      resp = self.send('POST', '/api/sess/order/' + market,
+      resp = self.send('POST', '/accnt/order/' + market,
                        side = 'SELL',
                        lots = int(lots),
                        ticks = int(ticks))

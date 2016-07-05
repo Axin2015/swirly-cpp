@@ -23,14 +23,14 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
         self.takeOrder(conn)
 
   def takeOrder(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)
@@ -39,6 +39,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -54,13 +55,13 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 5,
-        u'role': None,
+        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 61725,
         u'cpty': u'MARAYL',
@@ -76,13 +77,13 @@ class TestCase(RestTestCase):
         u'orderId': 1,
         u'ref': None,
         u'resd': 0,
-        u'role': u'MAKER',
+        u'liqInd': u'MAKER',
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 61725,
         u'cpty': u'MARAYL',
@@ -98,14 +99,14 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 0,
-        u'role': u'TAKER',
+        u'liqInd': u'TAKER',
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 61725,
         u'created': self.now,
@@ -122,9 +123,9 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 61725,
         u'created': self.now,
@@ -141,17 +142,16 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'posn': {
+        u'accnt': u'MARAYL',
         u'buyCost': 61725,
         u'buyLots': 5,
         u'contr': u'EURUSD',
         u'sellCost': 61725,
         u'sellLots': 5,
-        u'settlDate': 20170102,
-        u'trader': u'MARAYL'
+        u'settlDate': 20170102
       },
       u'view': {
         u'bidCount': [None, None, None],

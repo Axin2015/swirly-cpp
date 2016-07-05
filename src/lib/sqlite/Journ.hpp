@@ -63,10 +63,6 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
 
   void updateMarket(const UpdateMarketBody& body);
 
-  void createTrader(const CreateTraderBody& body);
-
-  void updateTrader(const UpdateTraderBody& body);
-
   void createExec(const CreateExecBody& body);
 
   void archiveOrder(const ArchiveBody& body);
@@ -79,8 +75,6 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
   StmtPtr rollbackStmt_;
   StmtPtr insertMarketStmt_;
   StmtPtr updateMarketStmt_;
-  StmtPtr insertTraderStmt_;
-  StmtPtr updateTraderStmt_;
   StmtPtr insertExecStmt_;
   StmtPtr updateOrderStmt_;
   StmtPtr updateExecStmt_;

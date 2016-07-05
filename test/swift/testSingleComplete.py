@@ -23,21 +23,21 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
 
-        conn.setAuth('emailAddress=goska.aylett@swirlycloud.com')
+        conn.setAccnt('GOSAYL')
         self.takeOrder(conn)
 
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
         self.makerOrder(conn)
         self.makerTrade(conn)
         self.makerPosn(conn)
 
   def takeOrder(self, conn):
-    resp = conn.send('POST', '/api/sess/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)
@@ -46,6 +46,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -61,13 +62,13 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 5,
-        u'role': None,
+        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
-        u'ticks': 12345,
-        u'trader': u'GOSAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
         u'cost': 61725,
         u'cpty': u'MARAYL',
@@ -83,14 +84,14 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 0,
-        u'role': u'TAKER',
+        u'liqInd': u'TAKER',
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'GOSAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
         u'cost': 61725,
         u'created': self.now,
@@ -107,17 +108,16 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'GOSAYL'
+        u'ticks': 12345
       }],
       u'posn': {
+        u'accnt': u'GOSAYL',
         u'buyCost': 0,
         u'buyLots': 0,
         u'contr': u'EURUSD',
         u'sellCost': 61725,
         u'sellLots': 5,
-        u'settlDate': 20170102,
-        u'trader': u'GOSAYL'
+        u'settlDate': 20170102
       },
       u'view': {
         u'bidCount': [None, None, None],
@@ -136,11 +136,12 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def makerOrder(self, conn):
-    resp = conn.send('GET', '/api/sess/order')
+    resp = conn.send('GET', '/accnt/order')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 61725,
       u'created': self.now,
@@ -157,16 +158,16 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'MARAYL'
+      u'ticks': 12345
     }], resp.content)
 
   def makerTrade(self, conn):
-    resp = conn.send('GET', '/api/sess/trade')
+    resp = conn.send('GET', '/accnt/trade')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 61725,
       u'cpty': u'GOSAYL',
@@ -182,25 +183,24 @@ class TestCase(RestTestCase):
       u'orderId': 1,
       u'ref': None,
       u'resd': 0,
-      u'role': u'MAKER',
+      u'liqInd': u'MAKER',
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'MARAYL'
+      u'ticks': 12345
     }], resp.content)
 
   def makerPosn(self, conn):
-    resp = conn.send('GET', '/api/sess/posn')
+    resp = conn.send('GET', '/accnt/posn')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'buyCost': 61725,
       u'buyLots': 5,
       u'contr': u'EURUSD',
       u'sellCost': 0,
       u'sellLots': 0,
-      u'settlDate': 20170102,
-      u'trader': u'MARAYL'
+      u'settlDate': 20170102
     }], resp.content)

@@ -57,32 +57,25 @@ class SWIRLY_API Rest {
 
   void getMarket(Mnem mnem, Millis now, std::ostream& out) const;
 
-  void getTrader(Millis now, std::ostream& out) const;
+  void getAccnt(Mnem mnem, EntitySet es, Millis now, std::ostream& out) const;
 
-  void getTrader(Mnem mnem, Millis now, std::ostream& out) const;
+  void getOrder(Mnem accMnem, Millis now, std::ostream& out) const;
 
-  void getSess(std::string_view eTrader, EntitySet es, Millis now, std::ostream& out) const;
+  void getOrder(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
 
-  void getOrder(std::string_view eTrader, Millis now, std::ostream& out) const;
+  void getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, std::ostream& out) const;
 
-  void getOrder(std::string_view eTrader, Mnem market, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accMnem, Millis now, std::ostream& out) const;
 
-  void getOrder(std::string_view eTrader, Mnem market, Iden id, Millis now,
-                std::ostream& out) const;
+  void getTrade(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
 
-  void getTrade(std::string_view eTrader, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accMnem, Mnem market, Iden id, Millis now, std::ostream& out) const;
 
-  void getTrade(std::string_view eTrader, Mnem market, Millis now, std::ostream& out) const;
+  void getPosn(Mnem accMnem, Millis now, std::ostream& out) const;
 
-  void getTrade(std::string_view eTrader, Mnem market, Iden id, Millis now,
-                std::ostream& out) const;
+  void getPosn(Mnem accMnem, Mnem contr, Millis now, std::ostream& out) const;
 
-  void getPosn(std::string_view eTrader, Millis now, std::ostream& out) const;
-
-  void getPosn(std::string_view eTrader, Mnem contr, Millis now, std::ostream& out) const;
-
-  void getPosn(std::string_view eTrader, Mnem contr, IsoDate settlDate, Millis now,
-               std::ostream& out) const;
+  void getPosn(Mnem accMnem, Mnem contr, IsoDate settlDate, Millis now, std::ostream& out) const;
 
   void getView(Millis now, std::ostream& out) const;
 
@@ -94,30 +87,25 @@ class SWIRLY_API Rest {
   void putMarket(Mnem mnem, std::optional<std::string_view> display,
                  std::optional<MarketState> state, Millis now, std::ostream& out);
 
-  void postTrader(Mnem mnem, std::string_view display, std::string_view email, Millis now,
-                  std::ostream& out);
+  void postOrder(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
+                 Lots minLots, Millis now, std::ostream& out);
 
-  void putTrader(Mnem mnem, std::string_view display, Millis now, std::ostream& out);
-
-  void postOrder(std::string_view eTrader, Mnem market, std::string_view ref, Side side, Lots lots,
-                 Ticks ticks, Lots minLots, Millis now, std::ostream& out);
-
-  void putOrder(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
+  void putOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
                 std::ostream& out);
 
-  void deleteOrder(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Millis now);
+  void deleteOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now);
 
-  void postTrade(Mnem trader, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
-                 Role role, Mnem cpty, Millis now, std::ostream& out);
+  void postTrade(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
+                 LiqInd liqInd, Mnem cpty, Millis now, std::ostream& out);
 
-  void deleteTrade(std::string_view eTrader, Mnem market, ArrayView<Iden> ids, Millis now);
+  void deleteTrade(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now);
 
  private:
-  void getOrder(const TraderSess& sess, Millis now, std::ostream& out) const;
+  void getOrder(const Accnt& accnt, Millis now, std::ostream& out) const;
 
-  void getTrade(const TraderSess& sess, Millis now, std::ostream& out) const;
+  void getTrade(const Accnt& accnt, Millis now, std::ostream& out) const;
 
-  void getPosn(const TraderSess& sess, Millis now, std::ostream& out) const;
+  void getPosn(const Accnt& accnt, Millis now, std::ostream& out) const;
 
   Serv serv_;
 };

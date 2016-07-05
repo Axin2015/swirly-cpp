@@ -38,10 +38,10 @@ class Level;
  */
 class SWIRLY_API Order : public Request, public MemAlloc {
  public:
-  Order(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
         State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
         Lots lastLots, Ticks lastTicks, Lots minLots, Millis created, Millis modified) noexcept
-    : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+    : Request{accnt, market, contr, settlDay, id, ref, side, lots, created},
       state_{state},
       ticks_{ticks},
       resd_{resd},
@@ -53,10 +53,10 @@ class SWIRLY_API Order : public Request, public MemAlloc {
       modified_{modified}
   {
   }
-  Order(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
         Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) noexcept
-    : Order{trader, market, contr, settlDay, id,    ref,   State::New, side,    lots,
-            ticks,  lots,   0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
+    : Order{accnt, market, contr, settlDay, id,    ref,   State::New, side,    lots,
+            ticks, lots,   0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
   {
   }
   ~Order() noexcept override;

@@ -34,8 +34,6 @@ enum class MsgType : int {
   Reset,
   CreateMarket,
   UpdateMarket,
-  CreateTrader,
-  UpdateTrader,
   CreateExec,
   ArchiveOrder,
   ArchiveTrade
@@ -58,21 +56,8 @@ struct SWIRLY_PACKED UpdateMarketBody {
 };
 static_assert(std::is_pod<UpdateMarketBody>::value, "message-type must be pod");
 
-struct SWIRLY_PACKED CreateTraderBody {
-  char mnem[MaxMnem];
-  char display[MaxDisplay];
-  char email[MaxEmail];
-};
-static_assert(std::is_pod<CreateTraderBody>::value, "message-type must be pod");
-
-struct SWIRLY_PACKED UpdateTraderBody {
-  char mnem[MaxMnem];
-  char display[MaxDisplay];
-};
-static_assert(std::is_pod<UpdateTraderBody>::value, "message-type must be pod");
-
 struct SWIRLY_PACKED CreateExecBody {
-  char trader[MaxMnem];
+  char accnt[MaxMnem];
   char market[MaxMnem];
   char contr[MaxMnem];
   Jday settlDay;
@@ -90,7 +75,7 @@ struct SWIRLY_PACKED CreateExecBody {
   Ticks lastTicks;
   Lots minLots;
   Iden matchId;
-  Role role;
+  LiqInd liqInd;
   char cpty[MaxMnem];
   Millis created;
   More more;
@@ -112,8 +97,6 @@ struct SWIRLY_PACKED Msg {
   union {
     CreateMarketBody createMarket;
     UpdateMarketBody updateMarket;
-    CreateTraderBody createTrader;
-    UpdateTraderBody updateTrader;
     CreateExecBody createExec;
     ArchiveBody archive;
   };
@@ -147,12 +130,6 @@ struct MsgHandler {
       break;
     case MsgType::UpdateMarket:
       derived->updateMarket(msg.updateMarket);
-      break;
-    case MsgType::CreateTrader:
-      derived->createTrader(msg.createTrader);
-      break;
-    case MsgType::UpdateTrader:
-      derived->updateTrader(msg.updateTrader);
       break;
     case MsgType::CreateExec:
       derived->createExec(msg.createExec);

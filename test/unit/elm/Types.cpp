@@ -35,9 +35,9 @@ SWIRLY_TEST_CASE(RecType)
   SWIRLY_CHECK(strcmp(enumString(RecType::Asset), "ASSET") == 0);
 }
 
-SWIRLY_TEST_CASE(Role)
+SWIRLY_TEST_CASE(LiqInd)
 {
-  SWIRLY_CHECK(strcmp(enumString(Role::Maker), "MAKER") == 0);
+  SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
 }
 
 SWIRLY_TEST_CASE(Side)

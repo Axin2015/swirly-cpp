@@ -59,20 +59,18 @@ const char* enumString(RecType type)
     return "CONTR";
   case RecType::Market:
     return "MARKET";
-  case RecType::Trader:
-    return "TRADER";
   }
   terminate();
 }
 
-const char* enumString(Role role)
+const char* enumString(LiqInd liqInd)
 {
-  switch (role) {
-  case Role::None:
+  switch (liqInd) {
+  case LiqInd::None:
     return "NONE";
-  case Role::Maker:
+  case LiqInd::Maker:
     return "MAKER";
-  case Role::Taker:
+  case LiqInd::Taker:
     return "TAKER";
   }
   terminate();

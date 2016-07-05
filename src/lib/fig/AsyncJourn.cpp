@@ -149,33 +149,12 @@ void AsyncJourn::doUpdateMarket(Mnem mnem, string_view display, MarketState stat
   });
 }
 
-void AsyncJourn::doCreateTrader(Mnem mnem, string_view display, string_view email)
-{
-  pipe_.write([&mnem, &display, &email](Msg& msg) {
-    msg.type = MsgType::CreateTrader;
-    auto& body = msg.createTrader;
-    setCString(body.mnem, mnem);
-    setCString(body.display, display);
-    setCString(body.email, email);
-  });
-}
-
-void AsyncJourn::doUpdateTrader(Mnem mnem, string_view display)
-{
-  pipe_.write([&mnem, &display](Msg& msg) {
-    msg.type = MsgType::UpdateTrader;
-    auto& body = msg.updateTrader;
-    setCString(body.mnem, mnem);
-    setCString(body.display, display);
-  });
-}
-
 void AsyncJourn::doCreateExec(const Exec& exec, More more)
 {
   pipe_.write([&exec, more](Msg& msg) {
     msg.type = MsgType::CreateExec;
     auto& body = msg.createExec;
-    setCString(body.trader, exec.trader());
+    setCString(body.accnt, exec.accnt());
     setCString(body.market, exec.market());
     setCString(body.contr, exec.contr());
     body.settlDay = exec.settlDay();
@@ -193,7 +172,7 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
     body.lastTicks = exec.lastTicks();
     body.minLots = exec.minLots();
     body.matchId = exec.matchId();
-    body.role = exec.role();
+    body.liqInd = exec.liqInd();
     setCString(body.cpty, exec.cpty());
     body.created = exec.created();
     body.more = more;

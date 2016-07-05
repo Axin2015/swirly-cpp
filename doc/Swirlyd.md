@@ -52,11 +52,6 @@ Set the log-level. Valid range is from 0 to 5 inclusive, where 0=Crit, 1=Error, 
 
 Http port. Defaults to 8080.
 
-### http_auth ###
-
-Http auth header containing the authenticated user's Distinguished Name (DN). The default is
-"Swirly-Auth".
-
 ### journ_capacity ###
 
 Journal queue capacity. The default is 1024.

@@ -127,7 +127,7 @@ void rtrim(std::string& s) noexcept
   s.erase(pos != string_view::npos ? pos + 1 : 0);
 }
 
-pair<string_view, string_view> splitPair(const string_view& s, char delim) noexcept
+pair<string_view, string_view> splitPair(string_view s, char delim) noexcept
 {
   const auto pos = s.find_first_of(delim);
   string_view key, val;

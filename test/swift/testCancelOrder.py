@@ -23,7 +23,7 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAuth('emailAddress=mark.aylett@swirlycloud.com')
+        conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12345)
@@ -34,12 +34,13 @@ class TestCase(RestTestCase):
         self.cancelMulti(conn)
 
   def cancelSingle(self, conn):
-    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/2', lots = 0);
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/2', lots = 0);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -48,6 +49,7 @@ class TestCase(RestTestCase):
         u'id': 5,
         u'lastLots': None,
         u'lastTicks': None,
+        u'liqInd': None,
         u'lots': 5,
         u'market': u'EURUSD.MAR14',
         u'matchId': None,
@@ -55,14 +57,13 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 0,
-        u'role': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -79,8 +80,7 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'posn': None,
       u'view': {
@@ -100,12 +100,13 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def cancelMulti(self, conn):
-    resp = conn.send('PUT', '/api/sess/order/EURUSD.MAR14/1,3', lots = 0);
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,3', lots = 0);
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -121,13 +122,13 @@ class TestCase(RestTestCase):
         u'orderId': 1,
         u'ref': None,
         u'resd': 0,
-        u'role': None,
+        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -143,14 +144,14 @@ class TestCase(RestTestCase):
         u'orderId': 3,
         u'ref': None,
         u'resd': 0,
-        u'role': None,
+        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -167,9 +168,9 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -186,8 +187,7 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'posn': None,
       u'view': {

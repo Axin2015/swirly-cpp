@@ -79,11 +79,6 @@ using MarketState = unsigned;
 constexpr std::size_t MaxDisplay{64};
 
 /**
- * Maximum email characters.
- */
-constexpr std::size_t MaxEmail{64};
-
-/**
  * Maximum reference characters.
  */
 constexpr std::size_t MaxRef{64};
@@ -92,11 +87,6 @@ constexpr std::size_t MaxRef{64};
  * Description suitable for display on user-interface.
  */
 using Display = String<MaxDisplay>;
-
-/**
- * Email address.
- */
-using Email = String<MaxEmail>;
 
 /**
  * Reference.
@@ -142,11 +132,7 @@ enum class RecType {
   /**
    * Market.
    */
-  Market,
-  /**
-   * Trader.
-   */
-  Trader
+  Market
 };
 
 SWIRLY_API const char* enumString(RecType type);
@@ -156,9 +142,9 @@ struct EnumTraits<RecType> {
   static void print(std::ostream& os, RecType val) { os << enumString(val); }
 };
 
-enum class Role {
+enum class LiqInd {
   /**
-   * No role.
+   * No liqInd.
    */
   None = 0,
   /**
@@ -171,26 +157,26 @@ enum class Role {
   Taker
 };
 
-SWIRLY_API const char* enumString(Role role);
+SWIRLY_API const char* enumString(LiqInd liqInd);
 
-constexpr Role inverse(Role role) noexcept
+constexpr LiqInd inverse(LiqInd liqInd) noexcept
 {
-  switch (role) {
-  case Role::None:
+  switch (liqInd) {
+  case LiqInd::None:
     break;
-  case Role::Maker:
-    role = Role::Taker;
+  case LiqInd::Maker:
+    liqInd = LiqInd::Taker;
     break;
-  case Role::Taker:
-    role = Role::Maker;
+  case LiqInd::Taker:
+    liqInd = LiqInd::Maker;
     break;
   }
-  return role;
+  return liqInd;
 }
 
 template <>
-struct EnumTraits<Role> {
-  static void print(std::ostream& os, Role val) { os << enumString(val); }
+struct EnumTraits<LiqInd> {
+  static void print(std::ostream& os, LiqInd val) { os << enumString(val); }
 };
 
 enum class Side { Buy = 1, Sell = -1 };
@@ -265,9 +251,9 @@ class Market;
 using MarketPtr = std::unique_ptr<Market>;
 using ConstMarketPtr = std::unique_ptr<const Market>;
 
-class Trader;
-using TraderPtr = std::unique_ptr<Trader>;
-using ConstTraderPtr = std::unique_ptr<const Trader>;
+class MarketBook;
+using MarketBookPtr = std::unique_ptr<MarketBook>;
+using ConstMarketBookPtr = std::unique_ptr<const MarketBook>;
 
 class Request;
 using RequestPtr = boost::intrusive_ptr<Request>;

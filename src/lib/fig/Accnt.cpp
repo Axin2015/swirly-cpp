@@ -14,6 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Factory.hpp>
+#include <swirly/fig/Accnt.hpp>
 
-#include <swirly/tea/Test.hpp>
+using namespace std;
+
+namespace swirly {
+
+Accnt::~Accnt() noexcept = default;
+
+Accnt::Accnt(Accnt&&) = default;
+
+PosnPtr Accnt::posn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
+{
+  AccntPosnSet::Iterator it;
+  bool found;
+  tie(it, found) = posns_.findHint(contr, settlDay);
+  if (!found) {
+    it = posns_.insertHint(it, Posn::make(mnem_, contr, settlDay));
+  }
+  return &*it;
+}
+
+} // swirly

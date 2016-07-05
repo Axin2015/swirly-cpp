@@ -43,8 +43,6 @@ struct JournState {
   int reset{0};
   int createMarket{0};
   int updateMarket{0};
-  int createTrader{0};
-  int updateTrader{0};
   int createExec{0};
   int archiveOrder{0};
   int archiveTrade{0};
@@ -191,42 +189,16 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
   SWIRLY_CHECK(body.state == body.state);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateTrader, AsyncJournFixture)
-{
-  asyncJourn.createTrader("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv);
-
-  Msg msg;
-  SWIRLY_CHECK(journ.pop(msg));
-  SWIRLY_CHECK(msg.type == MsgType::CreateTrader);
-  const auto& body = msg.createTrader;
-
-  SWIRLY_CHECK(strncmp(body.mnem, "MARAYL", sizeof(body.mnem)) == 0);
-  SWIRLY_CHECK(strncmp(body.display, "Mark Aylett", sizeof(body.display)) == 0);
-  SWIRLY_CHECK(strncmp(body.email, "mark.aylett@swirlycloud.com", sizeof(body.email)) == 0);
-}
-
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournUpdateTrader, AsyncJournFixture)
-{
-  asyncJourn.updateTrader("MARAYL"_sv, "Mark Aylett"_sv);
-
-  Msg msg;
-  SWIRLY_CHECK(journ.pop(msg));
-  SWIRLY_CHECK(msg.type == MsgType::UpdateTrader);
-  const auto& body = msg.updateTrader;
-
-  SWIRLY_CHECK(strncmp(body.mnem, "MARAYL", sizeof(body.mnem)) == 0);
-  SWIRLY_CHECK(strncmp(body.display, "Mark Aylett", sizeof(body.display)) == 0);
-}
-
 SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 {
   ConstExecPtr execs[2];
-  execs[0] = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 1_id,
-                                  "REF"_sv, 2_id, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts,
-                                  0_lts, 0_cst, 0_lts, 0_tks, 1_lts, 0_id, Role::None, Mnem{}, Now);
+  execs[0]
+    = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 1_id, "REF"_sv,
+                           2_id, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts, 0_cst,
+                           0_lts, 0_tks, 1_lts, 0_id, LiqInd::None, Mnem{}, Now);
   execs[1] = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 3_id,
                                   "REF"_sv, 2_id, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
-                                  5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id, Role::Maker,
+                                  5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id, LiqInd::Maker,
                                   "GOSAYL"_sv, Now + 1_ms);
   asyncJourn.createExec(execs);
   {
@@ -235,7 +207,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(msg.type == MsgType::CreateExec);
     const auto& body = msg.createExec;
 
-    SWIRLY_CHECK(strncmp(body.trader, "MARAYL", sizeof(body.trader)) == 0);
+    SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
@@ -253,7 +225,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.lastTicks == 0_tks);
     SWIRLY_CHECK(body.minLots == 1_lts);
     SWIRLY_CHECK(body.matchId == 0_id);
-    SWIRLY_CHECK(body.role == Role::None);
+    SWIRLY_CHECK(body.liqInd == LiqInd::None);
     SWIRLY_CHECK(strncmp(body.cpty, "", sizeof(body.cpty)) == 0);
     SWIRLY_CHECK(body.created == Now);
   }
@@ -263,7 +235,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(msg.type == MsgType::CreateExec);
     const auto& body = msg.createExec;
 
-    SWIRLY_CHECK(strncmp(body.trader, "MARAYL", sizeof(body.trader)) == 0);
+    SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
@@ -281,7 +253,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.lastTicks == 12345_tks);
     SWIRLY_CHECK(body.minLots == 1_lts);
     SWIRLY_CHECK(body.matchId == 4_id);
-    SWIRLY_CHECK(body.role == Role::Maker);
+    SWIRLY_CHECK(body.liqInd == LiqInd::Maker);
     SWIRLY_CHECK(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)) == 0);
     SWIRLY_CHECK(body.created == Now + 1_ms);
   }
