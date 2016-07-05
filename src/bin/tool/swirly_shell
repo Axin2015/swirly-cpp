@@ -192,28 +192,11 @@ class Shell(Cmd):
     )
     printTable(cols, rows, fmt)
 
-  def do_trader(self, args):
-    """Usage: trader"""
-    resp = self.send('GET', '/rec/trader')
-    cols = [
-      'mnem',
-      'display',
-      'email'
-    ]
-    rows = resp.content
-    fmt = (
-      '|{mnem:<{mnemLen}}'
-      '|{display:<{displayLen}}'
-      '|{email:<{emailLen}}'
-      '|'
-    )
-    printTable(cols, rows, fmt)
-
   def do_order(self, args):
     """Usage: order"""
     resp = self.send('GET', '/accnt/order')
     cols = [
-      'trader',
+      'accnt',
       'market',
       'contr',
       'settlDate',
@@ -234,7 +217,7 @@ class Shell(Cmd):
     ]
     rows = resp.content
     fmt = (
-      '|{trader:<{traderLen}}'
+      '|{accnt:<{accntLen}}'
       '|{market:<{marketLen}}'
       '|{contr:<{contrLen}}'
       '|{settlDate:<{settlDateLen}}'

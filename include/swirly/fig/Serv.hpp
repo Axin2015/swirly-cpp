@@ -20,7 +20,6 @@
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Array.hpp>
 
@@ -69,13 +68,7 @@ class SWIRLY_API Serv {
 
   MarketSet& markets() const noexcept;
 
-  TraderSet& traders() const noexcept;
-
   MarketBook& market(Mnem mnem) const;
-
-  Trader& trader(Mnem mnem) const;
-
-  Trader& traderFromEmail(std::string_view email) const;
 
   Accnt& accnt(Mnem mnem) const;
 
@@ -84,10 +77,6 @@ class SWIRLY_API Serv {
 
   MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
                            std::optional<MarketState> state, Millis now);
-
-  Trader& createTrader(Mnem mnem, std::string_view display, std::string_view email, Millis now);
-
-  Trader& updateTrader(Mnem mnem, std::string_view display, Millis now);
 
   void createOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Side side, Lots lots,
                    Ticks ticks, Lots minLots, Millis now, Response& resp);

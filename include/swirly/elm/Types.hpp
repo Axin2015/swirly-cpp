@@ -79,11 +79,6 @@ using MarketState = unsigned;
 constexpr std::size_t MaxDisplay{64};
 
 /**
- * Maximum email characters.
- */
-constexpr std::size_t MaxEmail{64};
-
-/**
  * Maximum reference characters.
  */
 constexpr std::size_t MaxRef{64};
@@ -92,11 +87,6 @@ constexpr std::size_t MaxRef{64};
  * Description suitable for display on user-interface.
  */
 using Display = String<MaxDisplay>;
-
-/**
- * Email address.
- */
-using Email = String<MaxEmail>;
 
 /**
  * Reference.
@@ -142,11 +132,7 @@ enum class RecType {
   /**
    * Market.
    */
-  Market,
-  /**
-   * Trader.
-   */
-  Trader
+  Market
 };
 
 SWIRLY_API const char* enumString(RecType type);
@@ -264,10 +250,6 @@ using ConstContrPtr = std::unique_ptr<const Contr>;
 class Market;
 using MarketPtr = std::unique_ptr<Market>;
 using ConstMarketPtr = std::unique_ptr<const Market>;
-
-class Trader;
-using TraderPtr = std::unique_ptr<Trader>;
-using ConstTraderPtr = std::unique_ptr<const Trader>;
 
 class Request;
 using RequestPtr = boost::intrusive_ptr<Request>;

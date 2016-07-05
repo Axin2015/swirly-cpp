@@ -43,8 +43,6 @@ struct JournState {
   int reset{0};
   int createMarket{0};
   int updateMarket{0};
-  int createTrader{0};
-  int updateTrader{0};
   int createExec{0};
   int archiveOrder{0};
   int archiveTrade{0};
@@ -191,33 +189,6 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournUpdateMarket, AsyncJournFixture)
   SWIRLY_CHECK(body.state == body.state);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateTrader, AsyncJournFixture)
-{
-  asyncJourn.createTrader("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv);
-
-  Msg msg;
-  SWIRLY_CHECK(journ.pop(msg));
-  SWIRLY_CHECK(msg.type == MsgType::CreateTrader);
-  const auto& body = msg.createTrader;
-
-  SWIRLY_CHECK(strncmp(body.mnem, "MARAYL", sizeof(body.mnem)) == 0);
-  SWIRLY_CHECK(strncmp(body.display, "Mark Aylett", sizeof(body.display)) == 0);
-  SWIRLY_CHECK(strncmp(body.email, "mark.aylett@swirlycloud.com", sizeof(body.email)) == 0);
-}
-
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournUpdateTrader, AsyncJournFixture)
-{
-  asyncJourn.updateTrader("MARAYL"_sv, "Mark Aylett"_sv);
-
-  Msg msg;
-  SWIRLY_CHECK(journ.pop(msg));
-  SWIRLY_CHECK(msg.type == MsgType::UpdateTrader);
-  const auto& body = msg.updateTrader;
-
-  SWIRLY_CHECK(strncmp(body.mnem, "MARAYL", sizeof(body.mnem)) == 0);
-  SWIRLY_CHECK(strncmp(body.display, "Mark Aylett", sizeof(body.display)) == 0);
-}
-
 SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 {
   ConstExecPtr execs[2];
@@ -236,7 +207,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(msg.type == MsgType::CreateExec);
     const auto& body = msg.createExec;
 
-    SWIRLY_CHECK(strncmp(body.trader, "MARAYL", sizeof(body.trader)) == 0);
+    SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
@@ -264,7 +235,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(msg.type == MsgType::CreateExec);
     const auto& body = msg.createExec;
 
-    SWIRLY_CHECK(strncmp(body.trader, "MARAYL", sizeof(body.trader)) == 0);
+    SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);

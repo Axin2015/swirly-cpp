@@ -57,10 +57,6 @@ class SWIRLY_API Rest {
 
   void getMarket(Mnem mnem, Millis now, std::ostream& out) const;
 
-  void getTrader(Millis now, std::ostream& out) const;
-
-  void getTrader(Mnem mnem, Millis now, std::ostream& out) const;
-
   void getAccnt(Mnem mnem, EntitySet es, Millis now, std::ostream& out) const;
 
   void getOrder(Mnem accMnem, Millis now, std::ostream& out) const;
@@ -90,11 +86,6 @@ class SWIRLY_API Rest {
 
   void putMarket(Mnem mnem, std::optional<std::string_view> display,
                  std::optional<MarketState> state, Millis now, std::ostream& out);
-
-  void postTrader(Mnem mnem, std::string_view display, std::string_view email, Millis now,
-                  std::ostream& out);
-
-  void putTrader(Mnem mnem, std::string_view display, Millis now, std::ostream& out);
 
   void postOrder(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
                  Lots minLots, Millis now, std::ostream& out);

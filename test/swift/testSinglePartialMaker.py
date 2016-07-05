@@ -46,6 +46,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -65,9 +66,9 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
-        u'ticks': 12345,
-        u'trader': u'GOSAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
         u'cost': 24690,
         u'cpty': u'MARAYL',
@@ -87,10 +88,10 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'GOSAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
         u'cost': 24690,
         u'created': self.now,
@@ -107,17 +108,16 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
-        u'ticks': 12345,
-        u'trader': u'GOSAYL'
+        u'ticks': 12345
       }],
       u'posn': {
+        u'accnt': u'GOSAYL',
         u'buyCost': 0,
         u'buyLots': 0,
         u'contr': u'EURUSD',
         u'sellCost': 24690,
         u'sellLots': 2,
-        u'settlDate': 20170102,
-        u'trader': u'GOSAYL'
+        u'settlDate': 20170102
       },
       u'view': {
         u'bidCount': [1, None, None],
@@ -141,6 +141,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 24690,
       u'created': self.now,
@@ -157,8 +158,7 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'MARAYL'
+      u'ticks': 12345
     }], resp.content)
 
   def makerTrade(self, conn):
@@ -167,6 +167,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 24690,
       u'cpty': u'GOSAYL',
@@ -186,8 +187,7 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'MARAYL'
+      u'ticks': 12345
     }], resp.content)
 
   def makerPosn(self, conn):
@@ -196,11 +196,11 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'buyCost': 24690,
       u'buyLots': 2,
       u'contr': u'EURUSD',
       u'sellCost': 0,
       u'sellLots': 0,
-      u'settlDate': 20170102,
-      u'trader': u'MARAYL'
+      u'settlDate': 20170102
     }], resp.content)

@@ -28,7 +28,7 @@ Request::Request(Request&&) = default;
 
 void Request::toJson(ostream& os) const
 {
-  os << "{\"trader\":\"" << trader_ //
+  os << "{\"accnt\":\"" << accnt_ //
      << "\",\"market\":\"" << market_ //
      << "\",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";

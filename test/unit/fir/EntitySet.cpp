@@ -31,7 +31,6 @@ SWIRLY_TEST_CASE(EntitySetZero)
   SWIRLY_CHECK(!es.asset());
   SWIRLY_CHECK(!es.contr());
   SWIRLY_CHECK(!es.market());
-  SWIRLY_CHECK(!es.trader());
 
   // End.
   SWIRLY_CHECK(es.empty());
@@ -44,7 +43,6 @@ SWIRLY_TEST_CASE(EntitySetOne)
   SWIRLY_CHECK(es.asset());
   SWIRLY_CHECK(!es.contr());
   SWIRLY_CHECK(!es.market());
-  SWIRLY_CHECK(!es.trader());
 
   // First.
   SWIRLY_CHECK(!es.empty());
@@ -61,7 +59,6 @@ SWIRLY_TEST_CASE(EntitySetTwo)
   SWIRLY_CHECK(es.asset());
   SWIRLY_CHECK(es.contr());
   SWIRLY_CHECK(!es.market());
-  SWIRLY_CHECK(!es.trader());
 
   // First.
   SWIRLY_CHECK(!es.empty());
@@ -82,7 +79,6 @@ SWIRLY_TEST_CASE(EntitySetThree)
   SWIRLY_CHECK(es.asset());
   SWIRLY_CHECK(es.contr());
   SWIRLY_CHECK(es.market());
-  SWIRLY_CHECK(!es.trader());
 
   // First.
   SWIRLY_CHECK(!es.empty());
@@ -102,16 +98,15 @@ SWIRLY_TEST_CASE(EntitySetThree)
 
 SWIRLY_TEST_CASE(EntitySetTrailing)
 {
-  auto es = EntitySet::parse("trader,"_sv);
+  auto es = EntitySet::parse("market,"_sv);
   SWIRLY_CHECK(!es.many());
   SWIRLY_CHECK(!es.asset());
   SWIRLY_CHECK(!es.contr());
-  SWIRLY_CHECK(!es.market());
-  SWIRLY_CHECK(es.trader());
+  SWIRLY_CHECK(es.market());
 
   // First.
   SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Trader);
+  SWIRLY_CHECK(es.pop() == EntitySet::Market);
 
   // End.
   SWIRLY_CHECK(es.empty());

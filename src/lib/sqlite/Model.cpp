@@ -23,7 +23,6 @@
 #include <swirly/elm/Market.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
-#include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Conf.hpp>
 
@@ -36,9 +35,6 @@ namespace {
 constexpr auto SelectAssetSql = //
   "SELECT mnem, display, type_id FROM asset_t"_sv;
 
-constexpr auto SelectTraderSql = //
-  "SELECT mnem, display, email FROM trader_t"_sv;
-
 constexpr auto SelectContrSql = //
   "SELECT mnem, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom, pip_dp," //
   " min_lots, max_lots FROM contr_v"_sv;
@@ -48,17 +44,17 @@ constexpr auto SelectMarketSql = //
   " max_order_id, max_exec_id FROM market_v"_sv;
 
 constexpr auto SelectOrderSql = //
-  "SELECT trader, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
+  "SELECT accnt, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
   " FROM order_t WHERE archive = 0 AND resd > 0;"_sv;
 
 constexpr auto SelectTradeSql = //
-  "SELECT trader, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
+  "SELECT accnt, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
   " FROM exec_t WHERE archive = 0 AND state_id = 4;"_sv;
 
 constexpr auto SelectPosnSql = //
-  "SELECT trader, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
+  "SELECT accnt, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
 
 } // anonymous
 
@@ -153,26 +149,10 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& fact
   }
 }
 
-void Model::doReadTrader(const ModelCallback<TraderPtr>& cb) const
-{
-  enum { //
-    Mnem, //
-    Display, //
-    Email //
-  };
-
-  StmtPtr stmt{prepare(*db_, SelectTraderSql)};
-  while (step(*stmt)) {
-    cb(Trader::make(column<string_view>(*stmt, Mnem), //
-                    column<string_view>(*stmt, Display), //
-                    column<string_view>(*stmt, Email)));
-  }
-}
-
 void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
   enum { //
-    Trader, //
+    Accnt, //
     Market, //
     Contr, //
     SettlDay, //
@@ -194,7 +174,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectOrderSql)};
   while (step(*stmt)) {
-    cb(Order::make(column<string_view>(*stmt, Trader), //
+    cb(Order::make(column<string_view>(*stmt, Accnt), //
                    column<string_view>(*stmt, Market), //
                    column<string_view>(*stmt, Contr), //
                    column<Jday>(*stmt, SettlDay), //
@@ -218,7 +198,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
   enum { //
-    Trader, //
+    Accnt, //
     Market, //
     Contr, //
     SettlDay, //
@@ -242,7 +222,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectTradeSql)};
   while (step(*stmt)) {
-    cb(Exec::make(column<string_view>(*stmt, Trader), //
+    cb(Exec::make(column<string_view>(*stmt, Accnt), //
                   column<string_view>(*stmt, Market), //
                   column<string_view>(*stmt, Contr), //
                   column<Jday>(*stmt, SettlDay), //
@@ -269,7 +249,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
 {
   enum { //
-    Trader, //
+    Accnt, //
     Contr, //
     SettlDay, //
     Side, //
@@ -282,7 +262,7 @@ void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectPosnSql)};
   while (step(*stmt)) {
-    const auto trader = column<string_view>(*stmt, Trader);
+    const auto accnt = column<string_view>(*stmt, Accnt);
     const auto contr = column<string_view>(*stmt, Contr);
     auto settlDay = column<Jday>(*stmt, SettlDay);
 
@@ -292,9 +272,9 @@ void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
     }
 
     bool found;
-    tie(it, found) = ps.findHint(trader, contr, settlDay);
+    tie(it, found) = ps.findHint(accnt, contr, settlDay);
     if (!found) {
-      it = ps.insertHint(it, Posn::make(trader, contr, settlDay));
+      it = ps.insertHint(it, Posn::make(accnt, contr, settlDay));
     }
 
     const auto side = column<swirly::Side>(*stmt, Side);

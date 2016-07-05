@@ -6,7 +6,7 @@ Record
 
 `GET /rec[/entity[,entity]...]`
 
-Get Record entities, where entity is: asset, contr, market or trader.
+Get Record entities, where entity is: asset, contr or market.
 
 ### Asset ###
 
@@ -47,33 +47,6 @@ Create Market. Admin only.
 | state       | int (unused)       | No    |
 
 Update Market. Admin only.
-
-### Trader ###
-
-`GET /rec/trader[/MNEM]`
-
-Get all Traders or specific Trader with matching mnemonic.
-
-`POST /rec/trader`
-
-| Name        | Type               | Req'd |
-| ----------- | ------------------ | ----- |
-| mnem        | String             | Yes   |
-| display     | String             | Yes   |
-| email       | String             | No    |
-
-Create Trader. If specified, the email address must agree with that of the logged-in user, unless
-the logged-in user is an admin.
-
-`PUT /rec/trader/MNEM`
-
-| Name        | Type               | Req'd |
-| ----------- | ------------------ | ----- |
-| display     | String             | Yes   |
-| email       | String             | No    |
-
-Update Trader. If specified, the email address must agree with that of the logged-in user, unless
-the logged-in user is an admin.
 
 Account
 -------
@@ -122,7 +95,7 @@ Get Trade(s) with optional filter by Market and Id.
 
 | Name        | Type               | Req'd |
 | ----------- | ------------------ | ----- |
-| trader      | String             | Yes   |
+| accnt       | String             | Yes   |
 | side        | 'BUY' or 'SELL'    | Yes   |
 | lots        | Long               | Yes   |
 | ticks       | Long               | Yes   |

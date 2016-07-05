@@ -29,7 +29,7 @@ Posn::Posn(Posn&&) = default;
 
 void Posn::toJson(ostream& os) const
 {
-  os << "{\"trader\":\"" << trader_ //
+  os << "{\"accnt\":\"" << accnt_ //
      << "\",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
@@ -97,16 +97,16 @@ PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
   return it;
 }
 
-TraderPosnSet::~TraderPosnSet() noexcept
+AccntPosnSet::~AccntPosnSet() noexcept
 {
   set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });
 }
 
-TraderPosnSet::TraderPosnSet(TraderPosnSet&&) = default;
+AccntPosnSet::AccntPosnSet(AccntPosnSet&&) = default;
 
-TraderPosnSet& TraderPosnSet::operator=(TraderPosnSet&&) = default;
+AccntPosnSet& AccntPosnSet::operator=(AccntPosnSet&&) = default;
 
-TraderPosnSet::Iterator TraderPosnSet::insert(const ValuePtr& value) noexcept
+AccntPosnSet::Iterator AccntPosnSet::insert(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;
@@ -118,8 +118,7 @@ TraderPosnSet::Iterator TraderPosnSet::insert(const ValuePtr& value) noexcept
   return it;
 }
 
-TraderPosnSet::Iterator TraderPosnSet::insertHint(ConstIterator hint,
-                                                  const ValuePtr& value) noexcept
+AccntPosnSet::Iterator AccntPosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
 {
   auto it = set_.insert(hint, *value);
   // Take ownership.
@@ -127,7 +126,7 @@ TraderPosnSet::Iterator TraderPosnSet::insertHint(ConstIterator hint,
   return it;
 }
 
-TraderPosnSet::Iterator TraderPosnSet::insertOrReplace(const ValuePtr& value) noexcept
+AccntPosnSet::Iterator AccntPosnSet::insertOrReplace(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;

@@ -60,7 +60,6 @@ class RestServ : public mg::Mgr<RestServ> {
   void assetRequest(mg::HttpMessage data, Millis now);
   void contrRequest(mg::HttpMessage data, Millis now);
   void marketRequest(mg::HttpMessage data, Millis now);
-  void traderRequest(mg::HttpMessage data, Millis now);
 
   void accntRequest(mg::HttpMessage data, Millis now);
   void orderRequest(mg::HttpMessage data, Millis now);

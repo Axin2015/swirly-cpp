@@ -38,16 +38,8 @@ constexpr auto UpdateMarketSql = //
   "UPDATE Market_t SET display = ?2, state = ?3" //
   " WHERE mnem = ?1"_sv;
 
-constexpr auto InsertTraderSql = //
-  "INSERT INTO trader_t (mnem, display, email)" //
-  " VALUES (?, ?, ?)"_sv;
-
-constexpr auto UpdateTraderSql = //
-  "UPDATE trader_t SET display = ?2" //
-  " WHERE mnem = ?1"_sv;
-
 constexpr auto InsertExecSql = //
-  "INSERT INTO exec_t (trader, market, contr, settl_day, id, ref, order_id," //
+  "INSERT INTO exec_t (accnt, market, contr, settl_day, id, ref, order_id," //
   " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
   " min_lots, match_id, liqInd_id, cpty, archive, created, modified)" //
   " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
@@ -69,8 +61,6 @@ Journ::Journ(const Conf& conf)
     rollbackStmt_{prepare(*db_, RollbackSql)},
     insertMarketStmt_{prepare(*db_, InsertMarketSql)},
     updateMarketStmt_{prepare(*db_, UpdateMarketSql)},
-    insertTraderStmt_{prepare(*db_, InsertTraderSql)},
-    updateTraderStmt_{prepare(*db_, UpdateTraderSql)},
     insertExecStmt_{prepare(*db_, InsertExecSql)},
     updateOrderStmt_{prepare(*db_, UpdateOrderSql)},
     updateExecStmt_{prepare(*db_, UpdateExecSql)}
@@ -135,29 +125,6 @@ void Journ::updateMarket(const UpdateMarketBody& body)
   stepOnce(stmt);
 }
 
-void Journ::createTrader(const CreateTraderBody& body)
-{
-  auto& stmt = *insertTraderStmt_;
-
-  ScopedBind bind{stmt};
-  bind(toStringView(body.mnem));
-  bind(toStringView(body.display));
-  bind(toStringView(body.email));
-
-  stepOnce(stmt);
-}
-
-void Journ::updateTrader(const UpdateTraderBody& body)
-{
-  auto& stmt = *updateTraderStmt_;
-
-  ScopedBind bind{stmt};
-  bind(toStringView(body.mnem));
-  bind(toStringView(body.display));
-
-  stepOnce(stmt);
-}
-
 void Journ::createExec(const CreateExecBody& body)
 {
   Transaction trans{*this, body.more};
@@ -167,7 +134,7 @@ void Journ::createExec(const CreateExecBody& body)
   auto& stmt = *insertExecStmt_;
 
   ScopedBind bind{stmt};
-  bind(toStringView(body.trader));
+  bind(toStringView(body.accnt));
   bind(toStringView(body.market));
   bind(toStringView(body.contr));
   bind(body.settlDay, MaybeNull);

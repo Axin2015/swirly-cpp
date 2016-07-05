@@ -36,11 +36,11 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public Request, public MemAlloc {
  public:
-  Exec(Mnem trader, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Exec(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
        Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
        Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, LiqInd liqInd,
        Mnem cpty, Millis created) noexcept
-    : Request{trader, market, contr, settlDay, id, ref, side, lots, created},
+    : Request{accnt, market, contr, settlDay, id, ref, side, lots, created},
       orderId_{orderId},
       state_{state},
       ticks_{ticks},

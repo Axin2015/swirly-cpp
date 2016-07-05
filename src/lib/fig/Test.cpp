@@ -20,7 +20,6 @@
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Trader.hpp>
 
 using namespace std;
 
@@ -111,13 +110,6 @@ void TestModel::doReadContr(const ModelCallback<ContrPtr>& cb) const
 
 void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const
 {
-}
-
-void TestModel::doReadTrader(const ModelCallback<TraderPtr>& cb) const
-{
-  cb(Trader::make("EDDAYL"_sv, "Eddie Aylett"_sv, "eddie.aylett@swirlycloud.com"_sv));
-  cb(Trader::make("GOSAYL"_sv, "Goska Aylett"_sv, "goska.aylett@swirlycloud.com"_sv));
-  cb(Trader::make("MARAYL"_sv, "Mark Aylett"_sv, "mark.aylett@swirlycloud.com"_sv));
 }
 
 void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const

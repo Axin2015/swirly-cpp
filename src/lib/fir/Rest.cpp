@@ -24,6 +24,8 @@
 
 #include <swirly/ash/JulianDay.hpp>
 
+#include <algorithm>
+
 using namespace std;
 
 namespace swirly {
@@ -57,14 +59,6 @@ void Rest::getRec(EntitySet es, Millis now, ostream& out) const
     }
     out << "\"markets\":";
     getMarket(now, out);
-    ++i;
-  }
-  if (es.trader()) {
-    if (i > 0) {
-      out << ',';
-    }
-    out << "\"traders\":";
-    getTrader(now, out);
     ++i;
   }
   out << '}';
@@ -117,19 +111,6 @@ void Rest::getMarket(Millis now, ostream& out) const
 void Rest::getMarket(Mnem mnem, Millis now, ostream& out) const
 {
   out << serv_.market(mnem);
-}
-
-void Rest::getTrader(Millis now, ostream& out) const
-{
-  const auto& traders = serv_.traders();
-  out << '[';
-  copy(traders.begin(), traders.end(), OStreamJoiner(out, ','));
-  out << ']';
-}
-
-void Rest::getTrader(Mnem mnem, Millis now, ostream& out) const
-{
-  out << serv_.trader(mnem);
 }
 
 void Rest::getAccnt(Mnem mnem, EntitySet es, Millis now, ostream& out) const
@@ -283,18 +264,6 @@ void Rest::putMarket(Mnem mnem, optional<string_view> display, optional<MarketSt
 {
   const auto& book = serv_.updateMarket(mnem, display, state, now);
   out << book;
-}
-
-void Rest::postTrader(Mnem mnem, string_view display, string_view email, Millis now, ostream& out)
-{
-  const auto& trader = serv_.createTrader(mnem, display, email, now);
-  out << trader;
-}
-
-void Rest::putTrader(Mnem mnem, string_view display, Millis now, ostream& out)
-{
-  const auto& trader = serv_.updateTrader(mnem, display, now);
-  out << trader;
 }
 
 void Rest::postOrder(Mnem accMnem, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,

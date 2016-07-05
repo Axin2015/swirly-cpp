@@ -40,6 +40,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -48,6 +49,7 @@ class TestCase(RestTestCase):
         u'id': 5,
         u'lastLots': None,
         u'lastTicks': None,
+        u'liqInd': None,
         u'lots': 5,
         u'market': u'EURUSD.MAR14',
         u'matchId': None,
@@ -55,14 +57,13 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 0,
-        u'liqInd': None,
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -79,8 +80,7 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'posn': None,
       u'view': {
@@ -106,6 +106,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'execs': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -125,9 +126,9 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
@@ -147,10 +148,10 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'orders': [{
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -167,9 +168,9 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }, {
+        u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
@@ -186,8 +187,7 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102,
         u'side': u'BUY',
         u'state': u'CANCEL',
-        u'ticks': 12345,
-        u'trader': u'MARAYL'
+        u'ticks': 12345
       }],
       u'posn': None,
       u'view': {

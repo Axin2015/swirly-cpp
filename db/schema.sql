@@ -129,15 +129,8 @@ CREATE TABLE market_t (
 )
 ;
 
-CREATE TABLE trader_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
-  display VARCHAR(64) NOT NULL,
-  email VARCHAR(64) NOT NULL UNIQUE
-)
-;
-
 CREATE TABLE order_t (
-  trader CHAR(16) NOT NULL,
+  accnt CHAR(16) NOT NULL,
   market CHAR(16) NOT NULL,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
@@ -159,9 +152,8 @@ CREATE TABLE order_t (
   modified BIGINT NOT NULL,
 
   PRIMARY KEY (market, id),
-  CONSTRAINT order_trader_ref_unq UNIQUE (trader, ref),
+  CONSTRAINT order_accnt_ref_unq UNIQUE (accnt, ref),
 
-  FOREIGN KEY (trader) REFERENCES trader_t (mnem),
   FOREIGN KEY (market) REFERENCES market_t (mnem),
   FOREIGN KEY (contr) REFERENCES contr_t (mnem),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
@@ -169,12 +161,12 @@ CREATE TABLE order_t (
 )
 ;
 
-CREATE INDEX order_trader_idx ON order_t (trader);
+CREATE INDEX order_accnt_idx ON order_t (accnt);
 CREATE INDEX order_resd_idx ON order_t (resd);
 CREATE INDEX order_archive_idx ON order_t (archive);
 
 CREATE TABLE exec_t (
-  trader CHAR(16) NOT NULL,
+  accnt CHAR(16) NOT NULL,
   market CHAR(16) NOT NULL,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
@@ -201,16 +193,14 @@ CREATE TABLE exec_t (
   PRIMARY KEY (market, id),
 
   FOREIGN KEY (market, order_id) REFERENCES order_t (market, id),
-  FOREIGN KEY (trader) REFERENCES trader_t (mnem),
   FOREIGN KEY (contr) REFERENCES contr_t (mnem),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
-  FOREIGN KEY (liqind_id) REFERENCES liqind_t (id),
-  FOREIGN KEY (cpty) REFERENCES trader_t (mnem)
+  FOREIGN KEY (liqind_id) REFERENCES liqind_t (id)
 )
 ;
 
-CREATE INDEX exec_trader_idx ON exec_t (trader);
+CREATE INDEX exec_accnt_idx ON exec_t (accnt);
 CREATE INDEX exec_state_idx ON exec_t (state_id);
 CREATE INDEX exec_archive_idx ON exec_t (archive);
 
@@ -220,7 +210,7 @@ CREATE TRIGGER before_insert_on_exec1
   AND NEW.state_id = 1
   BEGIN
     INSERT INTO order_t (
-      trader,
+      accnt,
       market,
       contr,
       settl_day,
@@ -240,7 +230,7 @@ CREATE TRIGGER before_insert_on_exec1
       created,
       modified
     ) VALUES (
-      NEW.trader,
+      NEW.accnt,
       NEW.market,
       NEW.contr,
       NEW.settl_day,
@@ -345,7 +335,7 @@ CREATE VIEW market_v AS
 
 CREATE VIEW order_v AS
   SELECT
-    o.trader,
+    o.accnt,
     o.market,
     o.contr,
     o.settl_day,
@@ -373,7 +363,7 @@ CREATE VIEW order_v AS
 
 CREATE VIEW exec_v AS
   SELECT
-    e.trader,
+    e.accnt,
     e.contr,
     e.settl_day,
     e.id,
@@ -406,7 +396,7 @@ CREATE VIEW exec_v AS
 
 CREATE VIEW posn_v AS
   SELECT
-    e.trader,
+    e.accnt,
     e.contr,
     e.settl_day,
     e.side_id,
@@ -414,7 +404,7 @@ CREATE VIEW posn_v AS
     SUM(e.last_lots * e.last_ticks) cost
   FROM exec_t e
   WHERE e.state_id = 4
-  GROUP BY e.trader, e.contr, e.settl_day, e.side_id
+  GROUP BY e.accnt, e.contr, e.settl_day, e.side_id
 ;
 
 COMMIT

@@ -31,7 +31,7 @@ class TestCase(RestTestCase):
 
   def createDeposit(self, conn):
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
-                     trader = 'MARAYL',
+                     accnt = 'MARAYL',
                      ref = 'test1',
                      side = 'BUY',
                      lots = 10)
@@ -39,6 +39,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
@@ -58,13 +59,12 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 0,
-      u'trader': u'MARAYL'
+      u'ticks': 0
     }], resp.content)
 
   def createWithdraw(self, conn):
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
-                     trader = 'MARAYL',
+                     accnt = 'MARAYL',
                      ref = 'test1',
                      side = 'SELL',
                      lots = 10)
@@ -72,6 +72,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
@@ -91,6 +92,5 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'SELL',
       u'state': u'TRADE',
-      u'ticks': 0,
-      u'trader': u'MARAYL'
+      u'ticks': 0
     }], resp.content)

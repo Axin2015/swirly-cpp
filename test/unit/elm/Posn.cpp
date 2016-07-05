@@ -25,11 +25,11 @@ using namespace swirly;
 
 static_assert(sizeof(Posn) <= 2 * 64, "crossed cache-line boundary");
 
-SWIRLY_TEST_CASE(TraderPosnSet)
+SWIRLY_TEST_CASE(AccntPosnSet)
 {
   constexpr auto settlDay = ymdToJd(2014, 2, 14);
 
-  TraderPosnSet s;
+  AccntPosnSet s;
 
   PosnPtr posn1{&*s.emplace("MARAYL"_sv, "EURUSD"_sv, settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn1->refs() == 2);

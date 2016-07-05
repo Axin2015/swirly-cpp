@@ -17,7 +17,6 @@
 #include <swirly/elm/Factory.hpp>
 
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Trader.hpp>
 
 using namespace std;
 

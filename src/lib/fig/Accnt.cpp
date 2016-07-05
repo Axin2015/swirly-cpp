@@ -26,7 +26,7 @@ Accnt::Accnt(Accnt&&) = default;
 
 PosnPtr Accnt::posn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
 {
-  TraderPosnSet::Iterator it;
+  AccntPosnSet::Iterator it;
   bool found;
   tie(it, found) = posns_.findHint(contr, settlDay);
   if (!found) {

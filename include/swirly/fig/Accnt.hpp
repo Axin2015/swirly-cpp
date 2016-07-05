@@ -78,7 +78,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   }
   void insertOrder(const OrderPtr& order) noexcept
   {
-    assert(order->trader() == mnem_);
+    assert(order->accnt() == mnem_);
     orders_.insert(order);
     if (!order->ref().empty()) {
       refIdx_.insert(order);
@@ -86,7 +86,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   }
   void removeOrder(const Order& order) noexcept
   {
-    assert(order.trader() == mnem_);
+    assert(order.accnt() == mnem_);
     orders_.remove(order);
     if (!order.ref().empty()) {
       refIdx_.remove(order);
@@ -102,19 +102,19 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   }
   void insertTrade(const ExecPtr& trade) noexcept
   {
-    assert(trade->trader() == mnem_);
+    assert(trade->accnt() == mnem_);
     trades_.insert(trade);
   }
   void removeTrade(const Exec& trade) noexcept
   {
-    assert(trade.trader() == mnem_);
+    assert(trade.accnt() == mnem_);
     trades_.remove(trade);
   }
   PosnPtr posn(Mnem contr, Jday settlDay) throw(std::bad_alloc);
 
   void insertPosn(const PosnPtr& posn) noexcept
   {
-    assert(posn->trader() == mnem_);
+    assert(posn->accnt() == mnem_);
     posns_.insert(posn);
   }
   boost::intrusive::set_member_hook<> mnemHook_;
@@ -123,7 +123,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   const Mnem mnem_;
   OrderIdSet orders_;
   ExecIdSet trades_;
-  TraderPosnSet posns_;
+  AccntPosnSet posns_;
   OrderRefSet refIdx_;
 };
 

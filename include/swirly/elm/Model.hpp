@@ -53,7 +53,6 @@ class SWIRLY_API Model {
   {
     doReadMarket(cb, factory);
   }
-  void readTrader(const ModelCallback<TraderPtr>& cb) const { doReadTrader(cb); }
   void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
   void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
   void readPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
@@ -64,8 +63,6 @@ class SWIRLY_API Model {
   virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
 
   virtual void doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const = 0;
-
-  virtual void doReadTrader(const ModelCallback<TraderPtr>& cb) const = 0;
 
   virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 

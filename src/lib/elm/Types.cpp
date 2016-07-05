@@ -59,8 +59,6 @@ const char* enumString(RecType type)
     return "CONTR";
   case RecType::Market:
     return "MARKET";
-  case RecType::Trader:
-    return "TRADER";
   }
   terminate();
 }

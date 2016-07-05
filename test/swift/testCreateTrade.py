@@ -31,7 +31,7 @@ class TestCase(RestTestCase):
 
   def createMakerBuy(self, conn):
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
-                     trader = 'MARAYL',
+                     accnt = 'MARAYL',
                      ref = 'test1',
                      side = 'BUY',
                      lots = 10,
@@ -42,6 +42,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'GOSAYL',
@@ -61,9 +62,9 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'MARAYL'
+      u'ticks': 12345
     }, {
+      u'accnt': u'GOSAYL',
       u'contr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'MARAYL',
@@ -83,13 +84,12 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'SELL',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'GOSAYL'
+      u'ticks': 12345
     }], resp.content)
 
   def createTakerSell(self, conn):
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
-                     trader = 'MARAYL',
+                     accnt = 'MARAYL',
                      ref = 'test2',
                      side = 'SELL',
                      lots = 15,
@@ -100,6 +100,7 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
+      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'GOSAYL',
@@ -119,9 +120,9 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'SELL',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'MARAYL'
+      u'ticks': 12345
     }, {
+      u'accnt': u'GOSAYL',
       u'contr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'MARAYL',
@@ -141,6 +142,5 @@ class TestCase(RestTestCase):
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12345,
-      u'trader': u'GOSAYL'
+      u'ticks': 12345
     }], resp.content)

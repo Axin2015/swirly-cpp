@@ -23,7 +23,6 @@
 #include <swirly/elm/Model.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
-#include <swirly/elm/Trader.hpp>
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Stream.hpp>
@@ -61,11 +60,6 @@ int main(int argc, char* argv[])
     {
       OStreamJoiner it(cout, ',');
       model->readMarket([&it](const auto&& ptr) { it = *ptr; }, factory);
-    }
-    cout << "],\"traders\":[";
-    {
-      OStreamJoiner it(cout, ',');
-      model->readTrader([&it](const auto&& ptr) { it = *ptr; });
     }
     cout << "],\"orders\":[";
     {

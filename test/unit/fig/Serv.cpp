@@ -108,18 +108,6 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
   SWIRLY_CHECK(it->state() == 0x1);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServTraders, ServFixture)
-{
-  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 3);
-
-  auto it = serv.traders().find("MARAYL"_sv);
-  SWIRLY_CHECK(it != serv.traders().end());
-  SWIRLY_CHECK(it->mnem() == "MARAYL"_sv);
-  SWIRLY_CHECK(it->display() == "Mark Aylett"_sv);
-
-  SWIRLY_CHECK(it->email() == "mark.aylett@swirlycloud.com"_sv);
-}
-
 SWIRLY_FIXTURE_TEST_CASE(ServMarket, ServFixture)
 {
   // Not found.
@@ -133,31 +121,6 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarket, ServFixture)
   SWIRLY_CHECK(book.settlDay() == SettlDay);
   SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
   SWIRLY_CHECK(book.state() == 0x1);
-}
-
-SWIRLY_FIXTURE_TEST_CASE(ServTrader, ServFixture)
-{
-  // Not found.
-  SWIRLY_CHECK_THROW(serv.trader("MARAYLx"_sv), TraderNotFoundException);
-
-  auto& trader = serv.trader("MARAYL"_sv);
-  SWIRLY_CHECK(trader.mnem() == "MARAYL"_sv);
-  SWIRLY_CHECK(trader.display() == "Mark Aylett"_sv);
-
-  SWIRLY_CHECK(trader.email() == "mark.aylett@swirlycloud.com"_sv);
-}
-
-SWIRLY_FIXTURE_TEST_CASE(ServTraderFromEmail, ServFixture)
-{
-  // Not found.
-  SWIRLY_CHECK_THROW(serv.traderFromEmail("mark.aylett@swirlycloud.comx"_sv),
-                     TraderNotFoundException);
-
-  auto& trader = serv.traderFromEmail("mark.aylett@swirlycloud.com"_sv);
-  SWIRLY_CHECK(trader.mnem() == "MARAYL"_sv);
-  SWIRLY_CHECK(trader.display() == "Mark Aylett"_sv);
-
-  SWIRLY_CHECK(trader.email() == "mark.aylett@swirlycloud.com"_sv);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
@@ -270,63 +233,6 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
   }
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServCreateTrader, ServFixture)
-{
-  // Mnemonic too short.
-  SWIRLY_CHECK_THROW(
-    serv.createTrader("x"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
-    InvalidException);
-
-  // Mnemonic contains invalid characters.
-  SWIRLY_CHECK_THROW(
-    serv.createTrader("PIP AYL"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
-    InvalidException);
-
-  auto& trader
-    = serv.createTrader("PIPAYL"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now);
-  SWIRLY_CHECK(trader.mnem() == "PIPAYL"_sv);
-  SWIRLY_CHECK(trader.display() == "Pippin Aylett"_sv);
-
-  SWIRLY_CHECK(trader.email() == "pippin.aylett@swirlycloud.com"_sv);
-
-  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 4);
-  auto it = serv.traders().find("PIPAYL"_sv);
-  SWIRLY_CHECK(it != serv.traders().end());
-  SWIRLY_CHECK(&*it == &trader);
-
-  // Email index has been updated.
-  SWIRLY_CHECK(&serv.traderFromEmail("pippin.aylett@swirlycloud.com"_sv) == &trader);
-
-  // Already exists.
-  SWIRLY_CHECK_THROW(
-    serv.createTrader("PIPAYL"_sv, "Pippin Aylett"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
-    AlreadyExistsException);
-
-  // Email already exists.
-  SWIRLY_CHECK_THROW(
-    serv.createTrader("PIPAYL2"_sv, "Pippin Aylett 2"_sv, "pippin.aylett@swirlycloud.com"_sv, Now),
-    AlreadyExistsException);
-}
-
-SWIRLY_FIXTURE_TEST_CASE(ServUpdateTrader, ServFixture)
-{
-  auto& orig
-    = serv.createTrader("PIPAYL"_sv, "Pippin Aylettx"_sv, "pippin.aylett@swirlycloud.com"_sv, Now);
-  auto& trader = serv.updateTrader("PIPAYL"_sv, "Pippin Aylett"_sv, Now);
-
-  SWIRLY_CHECK(&trader == &orig);
-
-  SWIRLY_CHECK(trader.mnem() == "PIPAYL"_sv);
-  SWIRLY_CHECK(trader.display() == "Pippin Aylett"_sv);
-
-  SWIRLY_CHECK(trader.email() == "pippin.aylett@swirlycloud.com"_sv);
-
-  SWIRLY_CHECK(distance(serv.traders().begin(), serv.traders().end()) == 4);
-  auto it = serv.traders().find("PIPAYL"_sv);
-  SWIRLY_CHECK(it != serv.traders().end());
-  SWIRLY_CHECK(&*it == &trader);
-}
-
 SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
   auto& accnt = serv.accnt("MARAYL"_sv);
@@ -339,7 +245,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
   SWIRLY_CHECK(resp.execs().size() == 1);
 
   ConstOrderPtr order{resp.orders().front()};
-  SWIRLY_CHECK(order->trader() == accnt.mnem());
+  SWIRLY_CHECK(order->accnt() == accnt.mnem());
   SWIRLY_CHECK(order->market() == book.mnem());
   SWIRLY_CHECK(order->ref().empty());
   SWIRLY_CHECK(order->state() == State::New);
