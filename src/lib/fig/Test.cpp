@@ -18,7 +18,6 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
-#include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Market.hpp>
 
 using namespace std;
@@ -108,7 +107,11 @@ void TestModel::doReadContr(const ModelCallback<ContrPtr>& cb) const
   cb(Contr::make("VZ"_sv, "Verizon Com"_sv, "VZ"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
 }
 
-void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const
+void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
+{
+}
+
+void TestModel::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
 {
 }
 

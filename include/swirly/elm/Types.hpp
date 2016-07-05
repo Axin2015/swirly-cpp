@@ -251,6 +251,10 @@ class Market;
 using MarketPtr = std::unique_ptr<Market>;
 using ConstMarketPtr = std::unique_ptr<const Market>;
 
+class MarketBook;
+using MarketBookPtr = std::unique_ptr<MarketBook>;
+using ConstMarketBookPtr = std::unique_ptr<const MarketBook>;
+
 class Request;
 using RequestPtr = boost::intrusive_ptr<Request>;
 using ConstRequestPtr = boost::intrusive_ptr<const Request>;

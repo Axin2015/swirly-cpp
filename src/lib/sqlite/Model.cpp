@@ -19,8 +19,8 @@
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Exec.hpp>
-#include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Market.hpp>
+#include <swirly/elm/MarketBook.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 
@@ -117,7 +117,29 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
   }
 }
 
-void Model::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const
+void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
+{
+  enum { //
+    Mnem, //
+    Display, //
+    Contr, //
+    SettlDay, //
+    ExpiryDay, //
+    State //
+  };
+
+  StmtPtr stmt{prepare(*db_, SelectMarketSql)};
+  while (step(*stmt)) {
+    cb(Market::make(column<string_view>(*stmt, Mnem), //
+                    column<string_view>(*stmt, Display), //
+                    column<string_view>(*stmt, Contr), //
+                    column<Jday>(*stmt, SettlDay), //
+                    column<Jday>(*stmt, ExpiryDay), //
+                    column<MarketState>(*stmt, State)));
+  }
+}
+
+void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
 {
   enum { //
     Mnem, //
@@ -135,17 +157,17 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& fact
 
   StmtPtr stmt{prepare(*db_, SelectMarketSql)};
   while (step(*stmt)) {
-    cb(factory.newMarket(column<string_view>(*stmt, Mnem), //
-                         column<string_view>(*stmt, Display), //
-                         column<string_view>(*stmt, Contr), //
-                         column<Jday>(*stmt, SettlDay), //
-                         column<Jday>(*stmt, ExpiryDay), //
-                         column<MarketState>(*stmt, State), //
-                         column<Lots>(*stmt, LastLots), //
-                         column<Ticks>(*stmt, LastTicks), //
-                         column<Millis>(*stmt, LastTime), //
-                         column<Iden>(*stmt, MaxOrderId), //
-                         column<Iden>(*stmt, MaxExecId)));
+    cb(MarketBook::make(column<string_view>(*stmt, Mnem), //
+                        column<string_view>(*stmt, Display), //
+                        column<string_view>(*stmt, Contr), //
+                        column<Jday>(*stmt, SettlDay), //
+                        column<Jday>(*stmt, ExpiryDay), //
+                        column<MarketState>(*stmt, State), //
+                        column<Lots>(*stmt, LastLots), //
+                        column<Ticks>(*stmt, LastTicks), //
+                        column<Millis>(*stmt, LastTime), //
+                        column<Iden>(*stmt, MaxOrderId), //
+                        column<Iden>(*stmt, MaxExecId)));
   }
 }
 

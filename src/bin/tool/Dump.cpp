@@ -18,7 +18,6 @@
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Date.hpp>
 #include <swirly/elm/Exec.hpp>
-#include <swirly/elm/Factory.hpp>
 #include <swirly/elm/Market.hpp>
 #include <swirly/elm/Model.hpp>
 #include <swirly/elm/Order.hpp>
@@ -43,7 +42,6 @@ int main(int argc, char* argv[])
       conf.set("sqlite_model", argv[1]);
     }
     const BusinessDay busDay{RollHour, NewYork};
-    const BasicFactory factory{};
     auto model = makeModel(conf);
 
     cout << "{\"assets\":[";
@@ -59,7 +57,7 @@ int main(int argc, char* argv[])
     cout << "],\"markets\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readMarket([&it](const auto&& ptr) { it = *ptr; }, factory);
+      model->readMarket([&it](const MarketPtr&& ptr) { it = *ptr; });
     }
     cout << "],\"orders\":[";
     {

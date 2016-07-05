@@ -21,7 +21,6 @@
 #include <swirly/fig/Test.hpp>
 
 #include <swirly/elm/Exception.hpp>
-#include <swirly/elm/Factory.hpp>
 #include <swirly/elm/MarketBook.hpp>
 
 #include <swirly/ash/JulianDay.hpp>
@@ -43,10 +42,10 @@ constexpr auto Now = jdToMs(Today);
 
 class SWIRLY_API TestModel : public swirly::TestModel {
  protected:
-  void doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const override
+  void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const override
   {
-    cb(factory.newMarket("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay, ExpiryDay,
-                         0x1));
+    cb(MarketBook::make("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay, ExpiryDay,
+                        0x1));
   }
 };
 

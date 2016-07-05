@@ -24,7 +24,6 @@
 namespace swirly {
 
 class Conf;
-class Factory;
 
 /**
  * @addtogroup IO
@@ -49,10 +48,8 @@ class SWIRLY_API Model {
 
   void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
   void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
-  void readMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const
-  {
-    doReadMarket(cb, factory);
-  }
+  void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
+  void readMarket(const ModelCallback<MarketBookPtr>& cb) const { doReadMarket(cb); }
   void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
   void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
   void readPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
@@ -62,7 +59,9 @@ class SWIRLY_API Model {
 
   virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
 
-  virtual void doReadMarket(const ModelCallback<MarketPtr>& cb, const Factory& factory) const = 0;
+  virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
+
+  virtual void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const = 0;
 
   virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 

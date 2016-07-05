@@ -30,7 +30,6 @@
 #include <swirly/ash/JulianDay.hpp>
 
 #include "Match.hpp"
-#include "ServFactory.hpp"
 
 #include <regex>
 
@@ -226,7 +225,6 @@ struct Serv::Impl {
 
   AsyncJourn journ;
   const BusinessDay busDay{RollHour, NewYork};
-  const ServFactory factory{};
   AssetSet assets;
   ContrSet contrs;
   MarketSet markets;
@@ -249,8 +247,9 @@ void Serv::load(const Model& model, Millis now)
   const auto busDay = impl_->busDay(now);
   model.readAsset([& assets = impl_->assets](auto&& ptr) { assets.insert(move(ptr)); });
   model.readContr([& contrs = impl_->contrs](auto&& ptr) { contrs.insert(move(ptr)); });
-  model.readMarket([& markets = impl_->markets](auto&& ptr) { markets.insert(move(ptr)); },
-                   impl_->factory);
+  model.readMarket([& markets = impl_->markets](MarketBookPtr && ptr) {
+    markets.insert(move(ptr));
+  });
   model.readOrder([& impl = *impl_](auto&& ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertOrder(ptr);
