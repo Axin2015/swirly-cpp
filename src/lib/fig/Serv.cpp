@@ -261,7 +261,7 @@ void Serv::load(const Model& model, Millis now)
     });
     auto it = impl.markets.find(ptr->market());
     assert(it != impl.markets.end());
-    static_cast<MarketBook&>(*it).insertOrder(ptr);
+    it->insertOrder(ptr);
     success = true;
   });
   model.readTrade([& impl = *impl_](auto&& ptr) {
@@ -295,8 +295,7 @@ MarketBook& Serv::market(Mnem mnem) const
   if (it == impl_->markets.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
-  auto& market = static_cast<MarketBook&>(*it);
-  return market;
+  return *it;
 }
 
 Accnt& Serv::accnt(Mnem mnem) const
@@ -335,8 +334,7 @@ MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, Jday 
     impl_->journ.createMarket(mnem, display, contr, settlDay, expiryDay, state);
     it = impl_->markets.insertHint(it, move(market));
   }
-  auto& market = static_cast<MarketBook&>(*it);
-  return market;
+  return *it;
 }
 
 MarketBook& Serv::updateMarket(Mnem mnem, optional<string_view> display,
@@ -346,16 +344,14 @@ MarketBook& Serv::updateMarket(Mnem mnem, optional<string_view> display,
   if (it == impl_->markets.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
-  auto& market = static_cast<MarketBook&>(*it);
-  impl_->journ.updateMarket(mnem, display ? *display : market.display(),
-                            state ? *state : market.state());
+  impl_->journ.updateMarket(mnem, display ? *display : it->display(), state ? *state : it->state());
   if (display) {
-    market.setDisplay(*display);
+    it->setDisplay(*display);
   }
   if (state) {
-    market.setState(*state);
+    it->setState(*state);
   }
-  return market;
+  return *it;
 }
 
 void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side side, Lots lots,

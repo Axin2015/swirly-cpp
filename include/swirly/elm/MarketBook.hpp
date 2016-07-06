@@ -135,6 +135,7 @@ class SWIRLY_API MarketBook : public Market {
     using namespace enumops;
     return ++maxExecId_;
   }
+  boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
   BookSide& side(Side side) noexcept { return side == Side::Buy ? bidSide_ : offerSide_; }
@@ -157,6 +158,8 @@ inline void MarketView::toJson(std::ostream& os) const
 {
   book_->toJsonView(os);
 }
+
+using MarketSet = MnemSet<MarketBook>;
 
 /** @} */
 
