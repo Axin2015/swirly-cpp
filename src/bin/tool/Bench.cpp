@@ -37,7 +37,7 @@ MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
 {
   auto it = serv.markets().find(mnem);
   if (it != serv.markets().end()) {
-    return static_cast<MarketBook&>(*it);
+    return *it;
   }
   return serv.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
 }
