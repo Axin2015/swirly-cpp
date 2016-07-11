@@ -126,3 +126,15 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 add_subdirectory(test)
+
+set(CPACK_GENERATOR "TGZ")
+set(CPACK_PACKAGE_NAME "Swirly")
+set(CPACK_PACKAGE_VENDOR "Swirly Cloud Limited")
+set(CPACK_PACKAGE_CONTACT "support@swirlycloud.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Swirly - The Restful Matching-Engine")
+set(CPACK_PACKAGE_VERSION "0.1.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+include(CPack)

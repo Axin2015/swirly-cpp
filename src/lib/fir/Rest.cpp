@@ -255,15 +255,15 @@ void Rest::postMarket(Mnem mnem, string_view display, Mnem contr, IsoDate settlD
 {
   const auto settlDay = maybeIsoToJd(settlDate);
   const auto expiryDay = maybeIsoToJd(expiryDate);
-  const auto& book = serv_.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
-  out << book;
+  const auto& market = serv_.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
+  out << market;
 }
 
 void Rest::putMarket(Mnem mnem, optional<string_view> display, optional<MarketState> state,
                      Millis now, ostream& out)
 {
-  const auto& book = serv_.updateMarket(mnem, display, state, now);
-  out << book;
+  const auto& market = serv_.updateMarket(mnem, display, state, now);
+  out << market;
 }
 
 void Rest::postOrder(Mnem accMnem, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
