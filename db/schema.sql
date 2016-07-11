@@ -152,7 +152,6 @@ CREATE TABLE order_t (
   modified BIGINT NOT NULL,
 
   PRIMARY KEY (market, id),
-  CONSTRAINT order_accnt_ref_unq UNIQUE (accnt, ref),
 
   FOREIGN KEY (market) REFERENCES market_t (mnem),
   FOREIGN KEY (contr) REFERENCES contr_t (mnem),
