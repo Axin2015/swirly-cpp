@@ -26,11 +26,6 @@
 namespace swirly {
 namespace sqlite {
 
-/**
- * @addtogroup IO
- * @{
- */
-
 class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHandler<Journ> {
  public:
   explicit Journ(const Conf& conf);
@@ -79,8 +74,6 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
   StmtPtr updateOrderStmt_;
   StmtPtr updateExecStmt_;
 };
-
-/** @} */
 
 } // sqlite
 } // swirly

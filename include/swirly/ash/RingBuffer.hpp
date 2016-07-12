@@ -26,11 +26,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * This simple RingBuffer design is only intended for use with PODs.
  */
 template <typename ValueT>
@@ -99,8 +94,6 @@ class RingBuffer {
   uint64_t wpos_{0};
   std::unique_ptr<ValueT[]> buf_;
 };
-
-/** @} */
 
 } // swirly
 

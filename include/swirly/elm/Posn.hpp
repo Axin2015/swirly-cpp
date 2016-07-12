@@ -28,11 +28,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Entity
- * @{
- */
-
 class SWIRLY_API Posn : public RefCounted {
  public:
   Posn(Mnem accnt, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
@@ -382,8 +377,6 @@ class SWIRLY_API AccntPosnSet {
  private:
   Set set_;
 };
-
-/** @} */
 
 } // swirly
 

@@ -25,11 +25,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * A statistical profile of observations.
  */
 class SWIRLY_API Profile {
@@ -97,8 +92,6 @@ class SWIRLY_API TimeRecorder {
   Profile& profile_;
   std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
-
-/** @} */
 
 } // swirly
 

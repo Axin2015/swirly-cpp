@@ -28,11 +28,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Date
- * @{
- */
-
-/**
  * Roll at 5pm.
  */
 constexpr int RollHour{17};
@@ -77,8 +72,6 @@ class SWIRLY_API BusinessDay {
    */
   mutable std::pair<int64_t, Jday> cache_[2]{};
 };
-
-/** @} */
 
 } // swirly
 

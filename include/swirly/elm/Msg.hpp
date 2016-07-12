@@ -25,11 +25,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup IO
- * @{
- */
-
 enum class MsgType : int {
   Reset,
   CreateMarket,
@@ -145,8 +140,6 @@ struct MsgHandler {
 };
 
 using MsgPipe = Pipe<Msg>;
-
-/** @} */
 
 } // swirly
 

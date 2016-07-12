@@ -27,11 +27,6 @@ using experimental::string_view;
 
 namespace swirly {
 
-/**
- * @addtogroup Entity
- * @{
- */
-
 class SWIRLY_API EntitySet {
  public:
   enum : int {
@@ -86,8 +81,6 @@ class SWIRLY_API EntitySet {
  private:
   int bs_;
 };
-
-/** @} */
 
 } // swirly
 

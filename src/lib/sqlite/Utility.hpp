@@ -35,11 +35,6 @@ class Conf;
 
 namespace sqlite {
 
-/**
- * @addtogroup IO
- * @{
- */
-
 using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
 using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
 
@@ -189,8 +184,6 @@ class ScopedStep {
  private:
   sqlite3_stmt& stmt_;
 };
-
-/** @} */
 
 } // sqlite
 } // swirly

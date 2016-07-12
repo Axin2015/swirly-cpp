@@ -23,11 +23,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Rest
- * @{
- */
-
 class SWIRLY_API Rest {
  public:
   Rest(Journ& journ, size_t capacity) : serv_{journ, capacity} {}
@@ -109,8 +104,6 @@ class SWIRLY_API Rest {
 
   Serv serv_;
 };
-
-/** @} */
 
 } // swirly
 

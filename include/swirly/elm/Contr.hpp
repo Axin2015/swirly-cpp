@@ -22,11 +22,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Entity
- * @{
- */
-
-/**
  * A specification that stipulates the terms and conditions of sale.
  */
 class SWIRLY_API Contr : public Rec {
@@ -88,8 +83,6 @@ class SWIRLY_API Contr : public Rec {
 };
 
 using ContrSet = MnemSet<Contr>;
-
-/** @} */
 
 } // swirly
 

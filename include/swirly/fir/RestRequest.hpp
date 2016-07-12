@@ -24,11 +24,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Rest
- * @{
- */
-
 class SWIRLY_API RestRequest {
  public:
   enum : unsigned {
@@ -123,8 +118,6 @@ class SWIRLY_API RestRequest {
 
   long num() const noexcept { return num_.sign * num_.digits; }
 };
-
-/** @} */
 
 } // swirly
 

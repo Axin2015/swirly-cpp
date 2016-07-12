@@ -22,11 +22,6 @@
 namespace swirly {
 namespace sqlite {
 
-/**
- * @addtogroup Exception
- * @{
- */
-
 class Error : public Exception {
  public:
   explicit Error(std::string_view what) noexcept : Exception{what} {}
@@ -40,8 +35,6 @@ class Error : public Exception {
   Error(Error&&) noexcept = default;
   Error& operator=(Error&&) noexcept = default;
 };
-
-/** @} */
 
 } // sqlite
 } // swirly

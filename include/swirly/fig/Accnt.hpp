@@ -26,11 +26,6 @@ namespace swirly {
 
 class Accnt;
 
-/**
- * @addtogroup Entity
- * @{
- */
-
 using AccntPtr = std::unique_ptr<Accnt>;
 using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
@@ -128,8 +123,6 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
 };
 
 using AccntSet = MnemSet<Accnt>;
-
-/** @} */
 
 } // swirly
 

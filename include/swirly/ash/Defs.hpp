@@ -18,11 +18,6 @@
 #define SWIRLY_ASH_DEFS_HPP
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * Macro for packed structures.
  */
 #define SWIRLY_PACKED __attribute__((packed))
@@ -36,7 +31,5 @@
  * Macro for exporting classes and functions that compose the public API.
  */
 #define SWIRLY_API __attribute__((visibility("default")))
-
-/** @} */
 
 #endif // SWIRLY_ASH_DEFS_HPP

@@ -22,11 +22,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Log
- * @{
- */
-
-/**
  * Maximum log message length when LogMsg is used.
  */
 constexpr std::size_t MaxLogMsg{2048};
@@ -131,14 +126,7 @@ SWIRLY_API void sysLogger(int level, std::string_view msg) noexcept;
  */
 SWIRLY_API LogMsg& logMsg() noexcept;
 
-/** @} */
-
 } // swirly
-
-/**
- * @addtogroup Log
- * @{
- */
 
 // N.B. varargs help ensure that expressions such as the following work correctly:
 // SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
@@ -160,7 +148,5 @@ SWIRLY_API LogMsg& logMsg() noexcept;
 #else
 #define SWIRLY_DEBUG(...)
 #endif
-
-/** @} */
 
 #endif // SWIRLY_ASH_LOG_HPP

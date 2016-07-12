@@ -24,11 +24,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Entity
- * @{
- */
-
 class SWIRLY_API Rec : public Comparable<Rec> {
  public:
   Rec(RecType type, Mnem mnem, std::string_view display) noexcept
@@ -72,8 +67,6 @@ inline std::ostream& operator<<(std::ostream& os, const Rec& rec)
   rec.toJson(os);
   return os;
 }
-
-/** @} */
 
 } // swirly
 

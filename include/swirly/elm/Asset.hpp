@@ -24,11 +24,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Entity
- * @{
- */
-
-/**
  * An item of value.
  */
 class SWIRLY_API Asset : public Rec {
@@ -64,8 +59,6 @@ class SWIRLY_API Asset : public Rec {
 };
 
 using AssetSet = MnemSet<Asset>;
-
-/** @} */
 
 } // swirly
 

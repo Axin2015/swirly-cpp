@@ -29,11 +29,6 @@ namespace swirly {
 class Level;
 
 /**
- * @addtogroup Entity
- * @{
- */
-
-/**
  * An instruction to buy or sell goods or services.
  */
 class SWIRLY_API Order : public Request, public MemAlloc {
@@ -313,8 +308,6 @@ class SWIRLY_API OrderList {
  private:
   List list_;
 };
-
-/** @} */
 
 } // swirly
 

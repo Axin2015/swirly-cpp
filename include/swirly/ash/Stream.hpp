@@ -29,11 +29,6 @@ using experimental::string_view;
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 SWIRLY_API void reset(std::ostream& os) noexcept;
 
 template <std::size_t MaxN>
@@ -140,8 +135,6 @@ class SWIRLY_API OStreamJoiner {
   char delim_;
   bool first_{true};
 };
-
-/** @} */
 
 } // swirly
 

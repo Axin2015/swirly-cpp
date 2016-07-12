@@ -24,11 +24,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * Base class for referenced counted objects.
  */
 class SWIRLY_API RefCounted {
@@ -76,8 +71,6 @@ inline void intrusive_ptr_release(const RefCounted* ptr) noexcept
 {
   ptr->release();
 }
-
-/** @} */
 
 } // swirly
 

@@ -25,11 +25,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Book
- * @{
- */
-
 using LevelKey = std::underlying_type_t<Ticks>;
 
 namespace detail {
@@ -190,8 +185,6 @@ class SWIRLY_API LevelSet {
  private:
   Set set_;
 };
-
-/** @} */
 
 } // swirly
 

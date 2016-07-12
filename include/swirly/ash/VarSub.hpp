@@ -25,11 +25,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 SWIRLY_API std::string getEnv(const std::string& name);
 
 /**
@@ -71,8 +66,6 @@ class SWIRLY_API VarSub {
 
   std::function<std::string(const std::string&)> fn_;
 };
-
-/** @} */
 
 } // swirly
 

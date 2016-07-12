@@ -39,11 +39,6 @@ class MarketBook;
 class Model;
 class Response;
 
-/**
- * @addtogroup App
- * @{
- */
-
 using TradePair = std::pair<ExecPtr, ExecPtr>;
 
 class SWIRLY_API Serv {
@@ -142,8 +137,6 @@ class SWIRLY_API Serv {
   struct Impl;
   std::unique_ptr<Impl> impl_;
 };
-
-/** @} */
 
 } // swirly
 

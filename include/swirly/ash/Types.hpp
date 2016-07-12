@@ -24,11 +24,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Date
- * @{
- */
-
-/**
  * ISO8601 date in yyymmdd format.
  */
 enum class IsoDate : int {};
@@ -57,8 +52,6 @@ constexpr Millis operator""_ms(unsigned long long val) noexcept
 {
   return box<Millis>(val);
 }
-
-/** @} */
 
 } // swirly
 

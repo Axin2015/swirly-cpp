@@ -21,11 +21,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup App
- * @{
- */
-
 struct Match {
   Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade, const PosnPtr& makerPosn,
         const ExecPtr& takerTrade) noexcept;
@@ -46,8 +41,6 @@ struct Match {
   const PosnPtr makerPosn;
   const ExecPtr takerTrade;
 };
-
-/** @} */
 
 } // swirly
 

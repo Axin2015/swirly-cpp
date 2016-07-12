@@ -26,11 +26,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup App
- * @{
- */
-
 namespace detail {
 
 /**
@@ -138,8 +133,6 @@ class SWIRLY_API MemPool {
   MemBlock<sizeof(Level)>* level_{nullptr};
   MemBlock<sizeof(Order)>* order_{nullptr};
 };
-
-/** @} */
 
 } // swirly
 

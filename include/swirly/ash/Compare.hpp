@@ -21,11 +21,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 template <typename ValueT>
 class Comparable {
  public:
@@ -91,8 +86,6 @@ constexpr int compare(IntegralT lhs, IntegralT rhs) noexcept
   }
   return i;
 }
-
-/** @} */
 
 } // swirly
 

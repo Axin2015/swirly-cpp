@@ -26,11 +26,6 @@ namespace swirly {
 class Conf;
 struct Msg;
 
-/**
- * @addtogroup IO
- * @{
- */
-
 class SWIRLY_API Journ {
  public:
   Journ() noexcept = default;
@@ -56,8 +51,6 @@ class SWIRLY_API Journ {
  * @param conf Configuration.
  */
 SWIRLY_API std::unique_ptr<Journ> makeJourn(const Conf& conf);
-
-/** @} */
 
 } // swirly
 
