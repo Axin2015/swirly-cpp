@@ -25,11 +25,6 @@ namespace swirly {
 class MarketBook;
 
 /**
- * @addtogroup Book
- * @{
- */
-
-/**
  * Adapter that provides stream insertion operator for MarketBook::toJsonView().
  */
 class SWIRLY_API MarketView {
@@ -160,8 +155,6 @@ inline void MarketView::toJson(std::ostream& os) const
 }
 
 using MarketSet = MnemSet<MarketBook>;
-
-/** @} */
 
 } // swirly
 

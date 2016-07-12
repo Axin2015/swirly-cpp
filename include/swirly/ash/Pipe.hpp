@@ -26,11 +26,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 template <typename ValueT>
 class Pipe {
  public:
@@ -101,8 +96,6 @@ class Pipe {
   bool closed_{false};
   RingBuffer<ValueT> buf_;
 };
-
-/** @} */
 
 } // swirly
 

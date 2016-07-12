@@ -23,11 +23,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 template <typename ValueT>
 class ArrayView {
  public:
@@ -111,8 +106,6 @@ constexpr ArrayView<std::remove_cv_t<ValueT>> makeArrayView(ValueT (&arr)[SizeN]
 {
   return {arr};
 }
-
-/** @} */
 
 } // swirly
 

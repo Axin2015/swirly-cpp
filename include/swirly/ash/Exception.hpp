@@ -25,11 +25,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Exception
- * @{
- */
-
-/**
  * Maximum error message length.
  */
 constexpr std::size_t MaxErrMsg{255};
@@ -66,8 +61,6 @@ class SWIRLY_API Exception : public std::exception {
  * called.
  */
 SWIRLY_API ErrMsg& errMsg() noexcept;
-
-/** @} */
 
 } // swirly
 

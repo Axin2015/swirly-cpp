@@ -24,11 +24,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Date
- * @{
- */
-
-/**
  * Gregorian to ISO8601 date.
  */
 constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
@@ -154,8 +149,6 @@ constexpr Jday maybeIsoToJd(IsoDate iso) noexcept
 {
   return iso != 0_dt ? isoToJd(iso) : 0_jd;
 }
-
-/** @} */
 
 } // swirly
 

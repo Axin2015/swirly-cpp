@@ -70,6 +70,7 @@ find_program(DOT_EXECUTABLE dot)
 find_program(ENV_EXECUTABLE env)
 find_program(RAGEL_EXECUTABLE ragel)
 
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost   1.55  REQUIRED COMPONENTS date_time filesystem system)
 # The sqlite3_errstr() function was added in 3.7.15.
 find_package(SQLite3 3.7.15 REQUIRED)
@@ -126,3 +127,15 @@ add_subdirectory(include)
 add_subdirectory(src)
 
 add_subdirectory(test)
+
+set(CPACK_GENERATOR "TGZ")
+set(CPACK_PACKAGE_NAME "Swirly")
+set(CPACK_PACKAGE_VENDOR "Swirly Cloud Limited")
+set(CPACK_PACKAGE_CONTACT "support@swirlycloud.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Swirly - The Restful Matching-Engine")
+set(CPACK_PACKAGE_VERSION "0.1.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+include(CPack)

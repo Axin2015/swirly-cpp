@@ -36,11 +36,6 @@ using experimental::string_view;
 namespace swirly {
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * Maximum mnemonic characters.
  */
 constexpr std::size_t MaxMnem{16};
@@ -372,8 +367,6 @@ class MnemSet {
  private:
   Set set_;
 };
-
-/** @} */
 
 } // swirly
 

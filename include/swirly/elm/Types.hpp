@@ -27,11 +27,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Domain
- * @{
- */
-
 enum class Iden : int64_t {};
 
 constexpr Iden operator""_id(unsigned long long val) noexcept
@@ -232,13 +227,6 @@ struct EnumTraits<State> {
   static void print(std::ostream& os, State val) { os << enumString(val); }
 };
 
-/** @} */
-
-/**
- * @addtogroup Entity
- * @{
- */
-
 class Asset;
 using AssetPtr = std::unique_ptr<Asset>;
 using ConstAssetPtr = std::unique_ptr<const Asset>;
@@ -271,16 +259,7 @@ class Posn;
 using PosnPtr = boost::intrusive_ptr<Posn>;
 using ConstPosnPtr = boost::intrusive_ptr<const Posn>;
 
-/** @} */
-
-/**
- * @addtogroup IO
- * @{
- */
-
 enum class More : int { No, Yes };
-
-/** @} */
 
 } // swirly
 

@@ -23,11 +23,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Exception
- * @{
- */
-
 class SWIRLY_API ServException : public Exception {
  public:
   explicit ServException(std::string_view what) noexcept : Exception{what} {}
@@ -356,8 +351,6 @@ class SWIRLY_API UnauthorizedException : public ServException {
 
   const char* httpReason() const noexcept override;
 };
-
-/** @} */
 
 } // swirly
 

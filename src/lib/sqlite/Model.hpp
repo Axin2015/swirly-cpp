@@ -24,11 +24,6 @@
 namespace swirly {
 namespace sqlite {
 
-/**
- * @addtogroup IO
- * @{
- */
-
 class Model : public swirly::Model {
  public:
   explicit Model(const Conf& conf);
@@ -60,8 +55,6 @@ class Model : public swirly::Model {
  private:
   DbPtr db_;
 };
-
-/** @} */
 
 } // sqlite
 } // swirly

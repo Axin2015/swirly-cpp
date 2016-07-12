@@ -23,16 +23,9 @@
 namespace swirly {
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * Milliseconds since Unix epoch.
  */
 SWIRLY_API Millis getTimeOfDay() noexcept;
-
-/** @} */
 
 } // swirly
 

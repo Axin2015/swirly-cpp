@@ -27,11 +27,6 @@
 namespace swirly {
 namespace test {
 
-/**
- * @addtogroup Test
- * @{
- */
-
 class SWIRLY_API TestException : public std::exception {
   enum { MaxErr = 255 };
   const char* file_;
@@ -86,15 +81,8 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
   return std::abs(lhs - rhs) <= delta;
 }
 
-/** @} */
-
 } // test
 } // swirly
-
-/**
- * @addtogroup Test
- * @{
- */
 
 #define SWIRLY_FAIL_(file, line, what) throw swirly::test::TestException(file, line, what)
 
@@ -123,7 +111,5 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
     fixture.run();                                                                                 \
   }                                                                                                \
   void name##Fixture_::run()
-
-/** @} */
 
 #endif // SWIRLY_TEA_TEST_HPP

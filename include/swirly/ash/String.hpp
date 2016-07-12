@@ -31,11 +31,6 @@ using experimental::string_view;
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 constexpr std::string_view operator""_sv(const char* str, std::size_t len) noexcept
 {
   return {str, len};
@@ -357,8 +352,6 @@ SWIRLY_API std::pair<std::string_view, std::string_view> splitPair(std::string_v
                                                                    char delim) noexcept;
 
 SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim);
-
-/** @} */
 
 } // swirly
 

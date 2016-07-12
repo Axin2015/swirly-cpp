@@ -30,11 +30,6 @@ namespace swirly {
 class Rest;
 namespace mg {
 
-/**
- * @addtogroup App
- * @{
- */
-
 class RestServ : public mg::Mgr<RestServ> {
  public:
   explicit RestServ(Rest& rest, bool testMode = false) noexcept
@@ -96,8 +91,6 @@ class RestServ : public mg::Mgr<RestServ> {
   mg::OStream out_;
   Profile profile_;
 };
-
-/** @} */
 
 } // mg
 } // swirly

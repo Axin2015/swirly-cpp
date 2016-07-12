@@ -357,6 +357,8 @@ MarketBook& Serv::updateMarket(Mnem mnem, optional<string_view> display,
 void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side side, Lots lots,
                        Ticks ticks, Lots minLots, Millis now, Response& resp)
 {
+  // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the database,
+  // and order-refs can be reused so long as only one order is live in the system at any given time.
   if (!ref.empty() && accnt.refIdx().find(ref) != accnt.refIdx().end()) {
     throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
   }

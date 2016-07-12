@@ -25,11 +25,6 @@ using namespace std;
 
 namespace swirly {
 
-/**
- * @addtogroup IO
- * @{
- */
-
 class SWIRLY_API Transactional {
  public:
   Transactional() noexcept = default;
@@ -136,8 +131,6 @@ class SWIRLY_API Transaction {
   More more_;
   bool done_{false};
 };
-
-/** @} */
 
 } // swirly
 

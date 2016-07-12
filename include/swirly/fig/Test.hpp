@@ -22,11 +22,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Test
- * @{
- */
-
 class SWIRLY_API TestModel : public Model {
  public:
   TestModel() noexcept;
@@ -72,8 +67,6 @@ class SWIRLY_API TestJourn : public Journ {
  protected:
   void doUpdate(const Msg& msg) override;
 };
-
-/** @} */
 
 } // swirly
 

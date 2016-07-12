@@ -29,11 +29,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 template <typename FnT>
 void parsePairs(std::istream& is, FnT fn)
 {
@@ -87,8 +82,6 @@ class SWIRLY_API Conf {
  private:
   boost::container::flat_map<std::string, std::string> map_;
 };
-
-/** @} */
 
 } // swirly
 

@@ -25,11 +25,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Entity
- * @{
- */
-
-/**
  * A transaction that occurs as an @ref Order transitions through a workflow.
  *
  * Trade executions represent the exchange of goods or services between counter-parties.
@@ -137,8 +132,6 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
 };
 
 using ExecIdSet = RequestIdSet<Exec>;
-
-/** @} */
 
 } // swirly
 

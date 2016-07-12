@@ -23,11 +23,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Domain
- * @{
- */
-
 constexpr int64_t roundHalfAway(double real) noexcept
 {
   return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
@@ -112,8 +107,6 @@ inline Cost cost(Lots lots, Ticks ticks) noexcept
 {
   return box<Cost>(unbox(lots) * unbox(ticks));
 }
-
-/** @} */
 
 } // swirly
 

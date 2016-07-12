@@ -25,11 +25,6 @@ namespace swirly {
 
 class Journ;
 
-/**
- * @addtogroup IO
- * @{
- */
-
 namespace detail {
 
 template <std::size_t StepN>
@@ -144,8 +139,6 @@ class SWIRLY_API AsyncJourn {
   MsgPipe pipe_;
   std::thread thread_;
 };
-
-/** @} */
 
 } // swirly
 

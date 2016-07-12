@@ -23,11 +23,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 template <char DelimN>
 class Tokeniser {
  public:
@@ -65,8 +60,6 @@ class Tokeniser {
   std::string_view buf_;
   std::string_view::const_iterator i_, j_;
 };
-
-/** @} */
 
 } // swirly
 

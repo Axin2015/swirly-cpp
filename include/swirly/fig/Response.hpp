@@ -25,11 +25,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup App
- * @{
- */
-
 class MarketBook;
 
 class SWIRLY_API Response {
@@ -79,8 +74,6 @@ inline std::ostream& operator<<(std::ostream& os, const Response& resp)
   resp.toJson(os);
   return os;
 }
-
-/** @} */
 
 } // swirly
 

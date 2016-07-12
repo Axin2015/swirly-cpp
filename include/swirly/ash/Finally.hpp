@@ -21,11 +21,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Util
- * @{
- */
-
 template <typename FnT>
 class Finally {
  public:
@@ -48,8 +43,6 @@ auto makeFinally(FnT fn) noexcept
 {
   return Finally<FnT>{std::move(fn)};
 }
-
-/** @} */
 
 } // swirly
 

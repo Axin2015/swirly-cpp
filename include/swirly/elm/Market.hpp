@@ -24,11 +24,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Entity
- * @{
- */
-
-/**
  * A place where buyers and sellers come together to exchange goods or services.
  */
 class SWIRLY_API Market : public Rec {
@@ -66,8 +61,6 @@ class SWIRLY_API Market : public Rec {
   const Jday expiryDay_;
   MarketState state_;
 };
-
-/** @} */
 
 } // swirly
 

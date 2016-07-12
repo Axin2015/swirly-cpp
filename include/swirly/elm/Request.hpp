@@ -27,11 +27,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Entity
- * @{
- */
-
 class SWIRLY_API Request : public RefCounted {
  public:
   Request(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
@@ -252,8 +247,6 @@ class RequestIdSet {
  private:
   Set set_;
 };
-
-/** @} */
 
 } // swirly
 

@@ -22,11 +22,6 @@
 
 namespace swirly {
 
-/**
- * @addtogroup Book
- * @{
- */
-
 class SWIRLY_API BookSide {
  public:
   BookSide() = default;
@@ -119,8 +114,6 @@ class SWIRLY_API BookSide {
   LevelSet levels_;
   OrderList orders_;
 };
-
-/** @} */
 
 } // swirly
 

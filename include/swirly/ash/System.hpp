@@ -24,11 +24,6 @@
 namespace swirly {
 
 /**
- * @addtogroup Util
- * @{
- */
-
-/**
  * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
  */
 SWIRLY_API void daemon();
@@ -37,8 +32,6 @@ SWIRLY_API void daemon();
  * Get current file mode.
  */
 SWIRLY_API mode_t fileMode() noexcept;
-
-/** @} */
 
 } // swirly
 

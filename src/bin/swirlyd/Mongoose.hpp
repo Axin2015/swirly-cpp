@@ -27,11 +27,6 @@
 namespace swirly {
 namespace mg {
 
-/**
- * @addtogroup Web
- * @{
- */
-
 inline std::string_view operator+(const mg_str& str) noexcept
 {
   return {str.p, str.len};
@@ -111,8 +106,6 @@ class Mgr {
 
   mg_mgr mgr_;
 };
-
-/** @} */
 
 } // mg
 } // swirly

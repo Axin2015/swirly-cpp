@@ -24,11 +24,6 @@
 namespace swirly {
 namespace mg {
 
-/**
- * @addtogroup App
- * @{
- */
-
 class StreamBuf : public std::streambuf {
  public:
   explicit StreamBuf(mbuf& buf) throw(std::bad_alloc);
@@ -83,8 +78,6 @@ class OStream : public std::ostream {
   std::size_t headSize_{0};
   std::size_t lengthAt_{0};
 };
-
-/** @} */
 
 } // mg
 } // swirly
