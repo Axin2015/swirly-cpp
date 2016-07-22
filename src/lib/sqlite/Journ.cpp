@@ -164,6 +164,7 @@ void Journ::createExec(const CreateExecBody& body)
   bind(body.created); // Modified.
 
   stepOnce(stmt);
+  trans.commit();
 }
 
 void Journ::archiveOrder(const ArchiveBody& body)
@@ -180,6 +181,7 @@ void Journ::archiveOrder(const ArchiveBody& body)
   bind(body.modified);
 
   stepOnce(stmt);
+  trans.commit();
 }
 
 void Journ::archiveTrade(const ArchiveBody& body)
@@ -196,6 +198,7 @@ void Journ::archiveTrade(const ArchiveBody& body)
   bind(body.modified);
 
   stepOnce(stmt);
+  trans.commit();
 }
 
 } // sqlite
