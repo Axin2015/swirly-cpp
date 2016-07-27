@@ -222,6 +222,63 @@ struct Serv::Impl {
       takerAccnt.insertTrade(takerTrade);
     }
   }
+  void reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, Millis now,
+                   Response& resp)
+  {
+    // Revised lots must not be:
+    // 1. greater than original lots;
+    // 2. less than executed lots;
+    // 3. less than min lots.
+    if (lots == 0_lts //
+        || lots > order.lots() //
+        || lots < order.exec() //
+        || lots < order.minLots()) {
+      throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
+    }
+    auto exec = newExec(book, order, now);
+    exec->revise(lots);
+
+    resp.setBook(book);
+    resp.insertOrder(&order);
+    resp.insertExec(exec);
+
+    journ.createExec(*exec);
+
+    // Commit phase.
+
+    book.reviseOrder(order, lots, now);
+  }
+  void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
+  {
+    auto exec = newExec(book, order, now);
+    exec->cancel();
+
+    resp.setBook(book);
+    resp.insertOrder(&order);
+    resp.insertExec(exec);
+
+    journ.createExec(*exec);
+
+    // Commit phase.
+
+    book.cancelOrder(order, now);
+  }
+  void archiveOrder(Accnt& accnt, const Order& order, Millis now)
+  {
+    journ.archiveOrder(order.market(), order.id(), now);
+
+    // Commit phase.
+
+    accnt.removeOrder(order);
+  }
+  void archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
+  {
+    journ.archiveTrade(trade.market(), trade.id(), now);
+
+    // Commit phase.
+
+    accnt.removeTrade(trade);
+  }
 
   AsyncJourn journ;
   const BusinessDay busDay{RollHour, NewYork};
@@ -434,42 +491,27 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, 
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  // Revised lots must not be:
-  // 1. greater than original lots;
-  // 2. less than executed lots;
-  // 3. less than min lots.
-  if (lots == 0_lts //
-      || lots > order.lots() //
-      || lots < order.exec() //
-      || lots < order.minLots()) {
-    throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
-  }
-  auto exec = impl_->newExec(book, order, now);
-  exec->revise(lots);
-
-  resp.setBook(book);
-  resp.insertOrder(&order);
-  resp.insertExec(exec);
-
-  impl_->journ.createExec(*exec);
-
-  // Commit phase.
-
-  book.reviseOrder(order, lots, now);
+  impl_->reviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Millis now,
                        Response& resp)
 {
   auto& order = accnt.order(book.mnem(), id);
-  reviseOrder(accnt, book, order, lots, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->reviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, string_view ref, Lots lots, Millis now,
                        Response& resp)
 {
   auto& order = accnt.order(ref);
-  reviseOrder(accnt, book, order, lots, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->reviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
@@ -515,30 +557,25 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now,
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  auto exec = impl_->newExec(book, order, now);
-  exec->cancel();
-
-  resp.setBook(book);
-  resp.insertOrder(&order);
-  resp.insertExec(exec);
-
-  impl_->journ.createExec(*exec);
-
-  // Commit phase.
-
-  book.cancelOrder(order, now);
+  impl_->cancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Response& resp)
 {
   auto& order = accnt.order(book.mnem(), id);
-  cancelOrder(accnt, book, order, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->cancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, string_view ref, Millis now, Response& resp)
 {
   auto& order = accnt.order(ref);
-  cancelOrder(accnt, book, order, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->cancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Millis now,
@@ -584,18 +621,16 @@ void Serv::archiveOrder(Accnt& accnt, const Order& order, Millis now)
   if (!order.done()) {
     throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
   }
-
-  impl_->journ.archiveOrder(order.market(), order.id(), now);
-
-  // Commit phase.
-
-  accnt.removeOrder(order);
+  impl_->archiveOrder(accnt, order, now);
 }
 
 void Serv::archiveOrder(Accnt& accnt, Mnem market, Iden id, Millis now)
 {
   auto& order = accnt.order(market, id);
-  archiveOrder(accnt, order, now);
+  if (!order.done()) {
+    throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
+  }
+  impl_->archiveOrder(accnt, order, now);
 }
 
 void Serv::archiveOrder(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
@@ -659,28 +694,19 @@ void Serv::archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
   if (trade.state() != State::Trade) {
     throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
   }
-
-  impl_->journ.archiveTrade(trade.market(), trade.id(), now);
-
-  // Commit phase.
-
-  accnt.removeTrade(trade);
+  impl_->archiveTrade(accnt, trade, now);
 }
 
 void Serv::archiveTrade(Accnt& accnt, Mnem market, Iden id, Millis now)
 {
   auto& trade = accnt.trade(market, id);
-  archiveTrade(accnt, trade, now);
+  impl_->archiveTrade(accnt, trade, now);
 }
 
 void Serv::archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
 {
   for (const auto id : ids) {
-
-    auto& trade = accnt.trade(market, id);
-    if (trade.state() != State::Trade) {
-      throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
-    }
+    accnt.trade(market, id);
   }
 
   impl_->journ.archiveTrade(market, ids, now);
