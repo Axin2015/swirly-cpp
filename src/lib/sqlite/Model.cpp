@@ -41,7 +41,7 @@ constexpr auto SelectContrSql = //
 
 constexpr auto SelectMarketSql = //
   "SELECT mnem, display, contr, settl_day, expiry_day, state, last_lots, last_ticks, last_time," //
-  " max_order_id, max_exec_id FROM market_v"_sv;
+  " max_id FROM market_v"_sv;
 
 constexpr auto SelectOrderSql = //
   "SELECT accnt, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
@@ -151,8 +151,7 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
     LastLots, //
     LastTicks, //
     LastTime, //
-    MaxOrderId, //
-    MaxExecId //
+    MaxId //
   };
 
   StmtPtr stmt{prepare(*db_, SelectMarketSql)};
@@ -166,8 +165,7 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
                         column<Lots>(*stmt, LastLots), //
                         column<Ticks>(*stmt, LastTicks), //
                         column<Millis>(*stmt, LastTime), //
-                        column<Iden>(*stmt, MaxOrderId), //
-                        column<Iden>(*stmt, MaxExecId)));
+                        column<Iden>(*stmt, MaxId)));
   }
 }
 

@@ -27,7 +27,7 @@ namespace swirly {
 /**
  * Maximum error message length.
  */
-constexpr std::size_t MaxErrMsg{255};
+constexpr std::size_t MaxErrMsg{511};
 
 using ErrMsg = StringBuilder<MaxErrMsg>;
 

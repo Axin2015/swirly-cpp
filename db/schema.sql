@@ -147,7 +147,6 @@ CREATE TABLE order_t (
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
   archive TINYINT(1) NOT NULL DEFAULT 0,
-  pecan TINYINT(1) NOT NULL DEFAULT 0,
   created BIGINT NOT NULL,
   modified BIGINT NOT NULL,
 
@@ -324,8 +323,7 @@ CREATE VIEW market_v AS
     m.last_lots,
     m.last_ticks,
     m.last_time,
-    MAX(e.order_id) max_order_id,
-    MAX(e.id) max_exec_id
+    MAX(e.id) max_id
   FROM market_t m
   LEFT OUTER JOIN exec_t e
   ON m.mnem = e.market
@@ -350,7 +348,6 @@ CREATE VIEW order_v AS
     o.last_lots,
     o.last_ticks,
     o.min_lots,
-    o.pecan,
     o.created,
     o.modified
   FROM order_t o

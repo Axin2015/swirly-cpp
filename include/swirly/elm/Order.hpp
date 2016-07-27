@@ -253,9 +253,11 @@ class SWIRLY_API OrderRefSet {
   {
     return insertOrReplace(makeRefCounted<Order>(std::forward<ArgsT>(args)...));
   }
-  void remove(const Order& value) noexcept
+  ValuePtr remove(const Order& ref) noexcept
   {
-    set_.erase_and_dispose(value, [](Order* ptr) { ptr->release(); });
+    ValuePtr value;
+    set_.erase_and_dispose(ref, [&value](Order* ptr) { value = {ptr, false}; });
+    return value;
   }
 
  private:
@@ -303,7 +305,7 @@ class SWIRLY_API OrderList {
 
   Iterator insertBefore(const OrderPtr& value, const Order& next) noexcept;
 
-  void remove(const Order& level) noexcept;
+  ValuePtr remove(const Order& ref) noexcept;
 
  private:
   List list_;

@@ -49,11 +49,11 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   }
 
   int compare(const Accnt& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
   auto mnem() const noexcept { return mnem_; }
   const auto& orders() const noexcept { return orders_; }
   const auto& trades() const noexcept { return trades_; }
   const auto& posns() const noexcept { return posns_; }
-  const auto& refIdx() const noexcept { return refIdx_; }
   auto& orders() noexcept { return orders_; }
   Order& order(Mnem market, Iden id)
   {
@@ -79,13 +79,13 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
       refIdx_.insert(order);
     }
   }
-  void removeOrder(const Order& order) noexcept
+  OrderPtr removeOrder(const Order& order) noexcept
   {
     assert(order.accnt() == mnem_);
-    orders_.remove(order);
     if (!order.ref().empty()) {
       refIdx_.remove(order);
     }
+    return orders_.remove(order);
   }
   Exec& trade(Mnem market, Iden id)
   {
@@ -100,10 +100,10 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     assert(trade->accnt() == mnem_);
     trades_.insert(trade);
   }
-  void removeTrade(const Exec& trade) noexcept
+  ExecPtr removeTrade(const Exec& trade) noexcept
   {
     assert(trade.accnt() == mnem_);
-    trades_.remove(trade);
+    return trades_.remove(trade);
   }
   PosnPtr posn(Mnem contr, Jday settlDay) throw(std::bad_alloc);
 

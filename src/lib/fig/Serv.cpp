@@ -81,10 +81,6 @@ struct Serv::Impl {
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
                       order.lastTicks(), order.minLots(), 0_id, LiqInd::None, Mnem{}, created);
   }
-  ExecPtr newExec(MarketBook& book, const Order& order, Millis created) const
-  {
-    return newExec(order, book.allocExecId(), created);
-  }
   /**
    * Special factory method for manual trades.
    */
@@ -108,14 +104,14 @@ struct Serv::Impl {
   ExecPtr newManual(Mnem accnt, MarketBook& book, string_view ref, Side side, Lots lots,
                     Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created) const
   {
-    return newManual(accnt, book.mnem(), book.contr(), book.settlDay(), book.allocExecId(), ref,
-                     side, lots, ticks, liqInd, cpty, created);
+    return newManual(accnt, book.mnem(), book.contr(), book.settlDay(), book.allocId(), ref, side,
+                     lots, ticks, liqInd, cpty, created);
   }
   Match newMatch(MarketBook& book, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
                  Lots sumLots, Cost sumCost, Millis created)
   {
-    const auto makerId = book.allocExecId();
-    const auto takerId = book.allocExecId();
+    const auto makerId = book.allocId();
+    const auto takerId = book.allocId();
 
     auto it = accnts.find(makerOrder->accnt());
     assert(it != accnts.end());
@@ -164,10 +160,10 @@ struct Serv::Impl {
 
       // Insert order if trade crossed with self.
       if (makerOrder.accnt() == takerAccnt.mnem()) {
-        resp.insertOrder(&makerOrder);
         // Maker updated first because this is consistent with last-look semantics.
         // N.B. the reference count is not incremented here.
         resp.insertExec(match.makerTrade);
+        resp.insertOrder(&makerOrder);
       }
       resp.insertExec(match.takerTrade);
 
@@ -221,6 +217,63 @@ struct Serv::Impl {
       assert(takerTrade);
       takerAccnt.insertTrade(takerTrade);
     }
+  }
+  void reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, Millis now,
+                   Response& resp)
+  {
+    // Revised lots must not be:
+    // 1. greater than original lots;
+    // 2. less than executed lots;
+    // 3. less than min lots.
+    if (lots == 0_lts //
+        || lots > order.lots() //
+        || lots < order.exec() //
+        || lots < order.minLots()) {
+      throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
+    }
+    auto exec = newExec(order, book.allocId(), now);
+    exec->revise(lots);
+
+    resp.setBook(book);
+    resp.insertExec(exec);
+    resp.insertOrder(&order);
+
+    journ.createExec(*exec);
+
+    // Commit phase.
+
+    book.reviseOrder(order, lots, now);
+  }
+  void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
+  {
+    auto exec = newExec(order, book.allocId(), now);
+    exec->cancel();
+
+    resp.setBook(book);
+    resp.insertExec(exec);
+    resp.insertOrder(&order);
+
+    journ.createExec(*exec);
+
+    // Commit phase.
+
+    book.cancelOrder(order, now);
+  }
+  void archiveOrder(Accnt& accnt, const Order& order, Millis now)
+  {
+    journ.archiveOrder(order.market(), order.id(), now);
+
+    // Commit phase.
+
+    accnt.removeOrder(order);
+  }
+  void archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
+  {
+    journ.archiveTrade(trade.market(), trade.id(), now);
+
+    // Commit phase.
+
+    accnt.removeTrade(trade);
   }
 
   AsyncJourn journ;
@@ -359,7 +412,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
 {
   // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the database,
   // and order-refs can be reused so long as only one order is live in the system at any given time.
-  if (!ref.empty() && accnt.refIdx().find(ref) != accnt.refIdx().end()) {
+  if (!ref.empty() && accnt.exists(ref)) {
     throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
   }
 
@@ -371,21 +424,20 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   if (lots == 0_lts || lots < minLots) {
     throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
   }
-  const auto orderId = book.allocOrderId();
-  auto order = Order::make(accnt.mnem(), book.mnem(), book.contr(), book.settlDay(), orderId, ref,
-                           side, lots, ticks, minLots, now);
-  auto exec = impl_->newExec(book, *order, now);
+  const auto id = book.allocId();
+  auto order = Order::make(accnt.mnem(), book.mnem(), book.contr(), book.settlDay(), id, ref, side,
+                           lots, ticks, minLots, now);
+  auto exec = impl_->newExec(*order, id, now);
 
-  resp.insertOrder(order);
   resp.insertExec(exec);
   // Order fields are updated on match.
   impl_->matchOrders(accnt, book, *order, now, resp);
+  resp.insertOrder(order);
   // Ensure that matches are cleared when scope exits.
   auto& matches = impl_->matches;
   auto finally = makeFinally([&matches]() { matches.clear(); });
 
-  // Place incomplete order in market. N.B. done() is sufficient here because the order cannot be
-  // pending cancellation.
+  // Place incomplete order in market.
   if (!order->done()) {
     // This may fail if level cannot be allocated.
     book.insertOrder(order);
@@ -423,8 +475,8 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   // Commit matches.
   if (!matches.empty()) {
     assert(posn);
-    posn->addTrade(order->side(), order->lastLots(), order->lastTicks());
     impl_->commitMatches(accnt, book, now);
+    posn->addTrade(order->side(), order->lastLots(), order->lastTicks());
   }
 }
 
@@ -434,42 +486,27 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, 
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  // Revised lots must not be:
-  // 1. greater than original lots;
-  // 2. less than executed lots;
-  // 3. less than min lots.
-  if (lots == 0_lts //
-      || lots > order.lots() //
-      || lots < order.exec() //
-      || lots < order.minLots()) {
-    throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
-  }
-  auto exec = impl_->newExec(book, order, now);
-  exec->revise(lots);
-
-  resp.setBook(book);
-  resp.insertOrder(&order);
-  resp.insertExec(exec);
-
-  impl_->journ.createExec(*exec);
-
-  // Commit phase.
-
-  book.reviseOrder(order, lots, now);
+  impl_->reviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Millis now,
                        Response& resp)
 {
   auto& order = accnt.order(book.mnem(), id);
-  reviseOrder(accnt, book, order, lots, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->reviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, string_view ref, Lots lots, Millis now,
                        Response& resp)
 {
   auto& order = accnt.order(ref);
-  reviseOrder(accnt, book, order, lots, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->reviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
@@ -492,11 +529,11 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots
         || lots < order.minLots()) {
       throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
     }
-    auto exec = impl_->newExec(book, order, now);
+    auto exec = impl_->newExec(order, book.allocId(), now);
     exec->revise(lots);
 
-    resp.insertOrder(&order);
     resp.insertExec(exec);
+    resp.insertOrder(&order);
   }
 
   impl_->journ.createExec(resp.execs());
@@ -515,30 +552,25 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now,
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  auto exec = impl_->newExec(book, order, now);
-  exec->cancel();
-
-  resp.setBook(book);
-  resp.insertOrder(&order);
-  resp.insertExec(exec);
-
-  impl_->journ.createExec(*exec);
-
-  // Commit phase.
-
-  book.cancelOrder(order, now);
+  impl_->cancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Response& resp)
 {
   auto& order = accnt.order(book.mnem(), id);
-  cancelOrder(accnt, book, order, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->cancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, string_view ref, Millis now, Response& resp)
 {
   auto& order = accnt.order(ref);
-  cancelOrder(accnt, book, order, now, resp);
+  if (order.done()) {
+    throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
+  }
+  impl_->cancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Millis now,
@@ -551,11 +583,11 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     if (order.done()) {
       throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
     }
-    auto exec = impl_->newExec(book, order, now);
+    auto exec = impl_->newExec(order, book.allocId(), now);
     exec->cancel();
 
-    resp.insertOrder(&order);
     resp.insertExec(exec);
+    resp.insertOrder(&order);
   }
 
   impl_->journ.createExec(resp.execs());
@@ -584,18 +616,16 @@ void Serv::archiveOrder(Accnt& accnt, const Order& order, Millis now)
   if (!order.done()) {
     throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
   }
-
-  impl_->journ.archiveOrder(order.market(), order.id(), now);
-
-  // Commit phase.
-
-  accnt.removeOrder(order);
+  impl_->archiveOrder(accnt, order, now);
 }
 
 void Serv::archiveOrder(Accnt& accnt, Mnem market, Iden id, Millis now)
 {
   auto& order = accnt.order(market, id);
-  archiveOrder(accnt, order, now);
+  if (!order.done()) {
+    throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
+  }
+  impl_->archiveOrder(accnt, order, now);
 }
 
 void Serv::archiveOrder(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
@@ -632,7 +662,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
     // Create back-to-back trade if counter-party is specified.
     auto& cptyAccnt = this->accnt(cpty);
     auto cptyPosn = cptyAccnt.posn(book.contr(), book.settlDay());
-    cptyTrade = trade->inverse(book.allocExecId());
+    cptyTrade = trade->inverse(book.allocId());
 
     ConstExecPtr trades[] = {trade, cptyTrade};
     impl_->journ.createExec(trades);
@@ -659,28 +689,19 @@ void Serv::archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
   if (trade.state() != State::Trade) {
     throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
   }
-
-  impl_->journ.archiveTrade(trade.market(), trade.id(), now);
-
-  // Commit phase.
-
-  accnt.removeTrade(trade);
+  impl_->archiveTrade(accnt, trade, now);
 }
 
 void Serv::archiveTrade(Accnt& accnt, Mnem market, Iden id, Millis now)
 {
   auto& trade = accnt.trade(market, id);
-  archiveTrade(accnt, trade, now);
+  impl_->archiveTrade(accnt, trade, now);
 }
 
 void Serv::archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
 {
   for (const auto id : ids) {
-
-    auto& trade = accnt.trade(market, id);
-    if (trade.state() != State::Trade) {
-      throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
-    }
+    accnt.trade(market, id);
   }
 
   impl_->journ.archiveTrade(market, ids, now);
