@@ -28,7 +28,7 @@ namespace swirly {
 namespace test {
 
 class SWIRLY_API TestException : public std::exception {
-  enum { MaxErr = 255 };
+  enum { MaxErr = 511 };
   const char* file_;
   int line_;
   char msg_[MaxErr + 1];
