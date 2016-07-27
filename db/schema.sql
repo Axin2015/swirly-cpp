@@ -147,7 +147,6 @@ CREATE TABLE order_t (
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
   archive TINYINT(1) NOT NULL DEFAULT 0,
-  pecan TINYINT(1) NOT NULL DEFAULT 0,
   created BIGINT NOT NULL,
   modified BIGINT NOT NULL,
 
@@ -350,7 +349,6 @@ CREATE VIEW order_v AS
     o.last_lots,
     o.last_ticks,
     o.min_lots,
-    o.pecan,
     o.created,
     o.modified
   FROM order_t o

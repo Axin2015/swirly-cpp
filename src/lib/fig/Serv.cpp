@@ -441,8 +441,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   auto& matches = impl_->matches;
   auto finally = makeFinally([&matches]() { matches.clear(); });
 
-  // Place incomplete order in market. N.B. done() is sufficient here because the order cannot be
-  // pending cancellation.
+  // Place incomplete order in market.
   if (!order->done()) {
     // This may fail if level cannot be allocated.
     book.insertOrder(order);
