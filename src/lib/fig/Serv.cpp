@@ -359,7 +359,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
 {
   // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the database,
   // and order-refs can be reused so long as only one order is live in the system at any given time.
-  if (!ref.empty() && accnt.refIdx().find(ref) != accnt.refIdx().end()) {
+  if (!ref.empty() && accnt.exists(ref)) {
     throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
   }
 

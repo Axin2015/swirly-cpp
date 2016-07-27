@@ -49,11 +49,11 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   }
 
   int compare(const Accnt& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
   auto mnem() const noexcept { return mnem_; }
   const auto& orders() const noexcept { return orders_; }
   const auto& trades() const noexcept { return trades_; }
   const auto& posns() const noexcept { return posns_; }
-  const auto& refIdx() const noexcept { return refIdx_; }
   auto& orders() noexcept { return orders_; }
   Order& order(Mnem market, Iden id)
   {
