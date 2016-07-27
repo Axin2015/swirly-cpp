@@ -138,9 +138,11 @@ OrderList::Iterator OrderList::insertBefore(const OrderPtr& value, const Order& 
   return it;
 }
 
-void OrderList::remove(const Order& order) noexcept
+OrderList::ValuePtr OrderList::remove(const Order& ref) noexcept
 {
-  list_.erase_and_dispose(List::s_iterator_to(order), [](Order* ptr) { ptr->release(); });
+  ValuePtr value;
+  list_.erase_and_dispose(List::s_iterator_to(ref), [&value](Order* ptr) { value = {ptr, false}; });
+  return value;
 }
 
 } // swirly

@@ -239,9 +239,11 @@ class RequestIdSet {
   {
     return insertOrReplace(makeRefCounted<RequestT>(std::forward<ArgsT>(args)...));
   }
-  void remove(const RequestT& value) noexcept
+  ValuePtr remove(const RequestT& ref) noexcept
   {
-    set_.erase_and_dispose(value, [](Request* ptr) { ptr->release(); });
+    ValuePtr value;
+    set_.erase_and_dispose(ref, [&value](RequestT* ptr) { value = {ptr, false}; });
+    return value;
   }
 
  private:
