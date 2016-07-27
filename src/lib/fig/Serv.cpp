@@ -164,10 +164,10 @@ struct Serv::Impl {
 
       // Insert order if trade crossed with self.
       if (makerOrder.accnt() == takerAccnt.mnem()) {
-        resp.insertOrder(&makerOrder);
         // Maker updated first because this is consistent with last-look semantics.
         // N.B. the reference count is not incremented here.
         resp.insertExec(match.makerTrade);
+        resp.insertOrder(&makerOrder);
       }
       resp.insertExec(match.takerTrade);
 
@@ -239,8 +239,8 @@ struct Serv::Impl {
     exec->revise(lots);
 
     resp.setBook(book);
-    resp.insertOrder(&order);
     resp.insertExec(exec);
+    resp.insertOrder(&order);
 
     journ.createExec(*exec);
 
@@ -254,8 +254,8 @@ struct Serv::Impl {
     exec->cancel();
 
     resp.setBook(book);
-    resp.insertOrder(&order);
     resp.insertExec(exec);
+    resp.insertOrder(&order);
 
     journ.createExec(*exec);
 
@@ -433,10 +433,10 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
                            side, lots, ticks, minLots, now);
   auto exec = impl_->newExec(book, *order, now);
 
-  resp.insertOrder(order);
   resp.insertExec(exec);
   // Order fields are updated on match.
   impl_->matchOrders(accnt, book, *order, now, resp);
+  resp.insertOrder(order);
   // Ensure that matches are cleared when scope exits.
   auto& matches = impl_->matches;
   auto finally = makeFinally([&matches]() { matches.clear(); });
@@ -480,8 +480,8 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   // Commit matches.
   if (!matches.empty()) {
     assert(posn);
-    posn->addTrade(order->side(), order->lastLots(), order->lastTicks());
     impl_->commitMatches(accnt, book, now);
+    posn->addTrade(order->side(), order->lastLots(), order->lastTicks());
   }
 }
 
@@ -537,8 +537,8 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots
     auto exec = impl_->newExec(book, order, now);
     exec->revise(lots);
 
-    resp.insertOrder(&order);
     resp.insertExec(exec);
+    resp.insertOrder(&order);
   }
 
   impl_->journ.createExec(resp.execs());
@@ -591,8 +591,8 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     auto exec = impl_->newExec(book, order, now);
     exec->cancel();
 
-    resp.insertOrder(&order);
     resp.insertExec(exec);
+    resp.insertOrder(&order);
   }
 
   impl_->journ.createExec(resp.execs());
