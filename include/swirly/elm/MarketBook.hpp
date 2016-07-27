@@ -59,13 +59,12 @@ class SWIRLY_API MarketBook : public Market {
  public:
   MarketBook(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
              MarketState state, Lots lastLots = 0_lts, Ticks lastTicks = 0_tks,
-             Millis lastTime = 0_ms, Iden maxOrderId = 0_id, Iden maxExecId = 0_id) noexcept
+             Millis lastTime = 0_ms, Iden maxId = 0_id) noexcept
     : Market{mnem, display, contr, settlDay, expiryDay, state},
       lastLots_{lastLots},
       lastTicks_{lastTicks},
       lastTime_{lastTime},
-      maxOrderId_{maxOrderId},
-      maxExecId_{maxExecId}
+      maxId_{maxId}
   {
   }
   ~MarketBook() noexcept override;
@@ -91,8 +90,7 @@ class SWIRLY_API MarketBook : public Market {
   Millis lastTime() const noexcept { return lastTime_; }
   const BookSide& bidSide() const noexcept { return bidSide_; }
   const BookSide& offerSide() const noexcept { return offerSide_; }
-  Iden maxOrderId() const noexcept { return maxOrderId_; }
-  Iden maxExecId() const noexcept { return maxExecId_; }
+  Iden maxId() const noexcept { return maxId_; }
   MarketView view() const noexcept { return *this; }
   BookSide& bidSide() noexcept { return bidSide_; }
   BookSide& offerSide() noexcept { return offerSide_; }
@@ -120,15 +118,10 @@ class SWIRLY_API MarketBook : public Market {
     lastTicks_ = order.ticks();
     lastTime_ = now;
   }
-  Iden allocOrderId() noexcept
+  Iden allocId() noexcept
   {
     using namespace enumops;
-    return ++maxOrderId_;
-  }
-  Iden allocExecId() noexcept
-  {
-    using namespace enumops;
-    return ++maxExecId_;
+    return ++maxId_;
   }
   boost::intrusive::set_member_hook<> mnemHook_;
 
@@ -145,8 +138,7 @@ class SWIRLY_API MarketBook : public Market {
   // Two sides constitute the book.
   BookSide bidSide_;
   BookSide offerSide_;
-  Iden maxOrderId_;
-  Iden maxExecId_;
+  Iden maxId_;
 };
 
 inline void MarketView::toJson(std::ostream& os) const

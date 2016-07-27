@@ -323,8 +323,7 @@ CREATE VIEW market_v AS
     m.last_lots,
     m.last_ticks,
     m.last_time,
-    MAX(e.order_id) max_order_id,
-    MAX(e.id) max_exec_id
+    MAX(e.id) max_id
   FROM market_t m
   LEFT OUTER JOIN exec_t e
   ON m.mnem = e.market

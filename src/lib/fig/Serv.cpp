@@ -81,10 +81,6 @@ struct Serv::Impl {
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
                       order.lastTicks(), order.minLots(), 0_id, LiqInd::None, Mnem{}, created);
   }
-  ExecPtr newExec(MarketBook& book, const Order& order, Millis created) const
-  {
-    return newExec(order, book.allocExecId(), created);
-  }
   /**
    * Special factory method for manual trades.
    */
@@ -108,14 +104,14 @@ struct Serv::Impl {
   ExecPtr newManual(Mnem accnt, MarketBook& book, string_view ref, Side side, Lots lots,
                     Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created) const
   {
-    return newManual(accnt, book.mnem(), book.contr(), book.settlDay(), book.allocExecId(), ref,
-                     side, lots, ticks, liqInd, cpty, created);
+    return newManual(accnt, book.mnem(), book.contr(), book.settlDay(), book.allocId(), ref, side,
+                     lots, ticks, liqInd, cpty, created);
   }
   Match newMatch(MarketBook& book, const Order& takerOrder, const OrderPtr& makerOrder, Lots lots,
                  Lots sumLots, Cost sumCost, Millis created)
   {
-    const auto makerId = book.allocExecId();
-    const auto takerId = book.allocExecId();
+    const auto makerId = book.allocId();
+    const auto takerId = book.allocId();
 
     auto it = accnts.find(makerOrder->accnt());
     assert(it != accnts.end());
@@ -235,7 +231,7 @@ struct Serv::Impl {
         || lots < order.minLots()) {
       throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
     }
-    auto exec = newExec(book, order, now);
+    auto exec = newExec(order, book.allocId(), now);
     exec->revise(lots);
 
     resp.setBook(book);
@@ -250,7 +246,7 @@ struct Serv::Impl {
   }
   void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
   {
-    auto exec = newExec(book, order, now);
+    auto exec = newExec(order, book.allocId(), now);
     exec->cancel();
 
     resp.setBook(book);
@@ -428,10 +424,10 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   if (lots == 0_lts || lots < minLots) {
     throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
   }
-  const auto orderId = book.allocOrderId();
-  auto order = Order::make(accnt.mnem(), book.mnem(), book.contr(), book.settlDay(), orderId, ref,
-                           side, lots, ticks, minLots, now);
-  auto exec = impl_->newExec(book, *order, now);
+  const auto id = book.allocId();
+  auto order = Order::make(accnt.mnem(), book.mnem(), book.contr(), book.settlDay(), id, ref, side,
+                           lots, ticks, minLots, now);
+  auto exec = impl_->newExec(*order, id, now);
 
   resp.insertExec(exec);
   // Order fields are updated on match.
@@ -533,7 +529,7 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots
         || lots < order.minLots()) {
       throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
     }
-    auto exec = impl_->newExec(book, order, now);
+    auto exec = impl_->newExec(order, book.allocId(), now);
     exec->revise(lots);
 
     resp.insertExec(exec);
@@ -587,7 +583,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     if (order.done()) {
       throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
     }
-    auto exec = impl_->newExec(book, order, now);
+    auto exec = impl_->newExec(order, book.allocId(), now);
     exec->cancel();
 
     resp.insertExec(exec);
@@ -666,7 +662,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
     // Create back-to-back trade if counter-party is specified.
     auto& cptyAccnt = this->accnt(cpty);
     auto cptyPosn = cptyAccnt.posn(book.contr(), book.settlDay());
-    cptyTrade = trade->inverse(book.allocExecId());
+    cptyTrade = trade->inverse(book.allocId());
 
     ConstExecPtr trades[] = {trade, cptyTrade};
     impl_->journ.createExec(trades);
