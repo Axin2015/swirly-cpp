@@ -123,6 +123,14 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, Millis now, ostream& out) const
     getOrder(accnt, now, out);
     ++i;
   }
+  if (es.exec()) {
+    if (i > 0) {
+      out << ',';
+    }
+    out << "\"execs\":";
+    getExec(accnt, now, out);
+    ++i;
+  }
   if (es.trade()) {
     if (i > 0) {
       out << ',';
@@ -174,6 +182,11 @@ void Rest::getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, ostream& out
     throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
   }
   out << *it;
+}
+
+void Rest::getExec(Mnem accMnem, Millis now, ostream& out) const
+{
+  getExec(serv_.accnt(accMnem), now, out);
 }
 
 void Rest::getTrade(Mnem accMnem, Millis now, ostream& out) const
@@ -328,6 +341,15 @@ void Rest::getOrder(const Accnt& accnt, Millis now, std::ostream& out) const
   const auto& orders = accnt.orders();
   out << '[';
   copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void Rest::getExec(const Accnt& accnt, Millis now, std::ostream& out) const
+{
+  const auto& execs = accnt.execs();
+  out << '[';
+  transform(execs.begin(), execs.end(), OStreamJoiner(out, ','),
+            [](const auto& ptr) -> const auto& { return *ptr; });
   out << ']';
 }
 

@@ -26,6 +26,10 @@
 
 #include <swirly/ash/Conf.hpp>
 
+#include <boost/range/adaptor/reversed.hpp>
+
+#include <vector>
+
 using namespace std;
 
 namespace swirly {
@@ -43,15 +47,23 @@ constexpr auto SelectMarketSql = //
   "SELECT mnem, display, contr, settl_day, expiry_day, state, last_lots, last_ticks, last_time," //
   " max_id FROM market_v"_sv;
 
+constexpr auto SelectAccntSql = //
+  "SELECT mnem FROM accnt_t WHERE modified > ?"_sv;
+
 constexpr auto SelectOrderSql = //
   "SELECT accnt, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
-  " FROM order_t WHERE archive = 0 OR resd > 0;"_sv;
+  " FROM order_t WHERE resd > 0 OR archive IS NULL;"_sv;
+
+constexpr auto SelectExecSql = //
+  "SELECT market, contr, settl_day, id, ref, order_id, state_id, side_id, lots, ticks," //
+  " resd, exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
+  " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT 8;"_sv;
 
 constexpr auto SelectTradeSql = //
   "SELECT accnt, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
-  " FROM exec_t WHERE archive = 0 AND state_id = 4;"_sv;
+  " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
 
 constexpr auto SelectPosnSql = //
   "SELECT accnt, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
@@ -169,6 +181,23 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
   }
 }
 
+void Model::doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const
+{
+  using namespace enumops;
+
+  enum { //
+    Mnem //
+  };
+
+  StmtPtr stmt{prepare(*db_, SelectAccntSql)};
+  ScopedBind bind{*stmt};
+  // One week ago.
+  bind(now - 604800000_ms);
+  while (step(*stmt)) {
+    cb(column<string_view>(*stmt, Mnem));
+  }
+}
+
 void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
   enum { //
@@ -212,6 +241,65 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
                    column<swirly::Lots>(*stmt, MinLots), //
                    column<Millis>(*stmt, Created), //
                    column<Millis>(*stmt, Modified)));
+  }
+}
+
+void Model::doReadExec(string_view accnt, const ModelCallback<ExecPtr>& cb) const
+{
+  enum { //
+    Market, //
+    Contr, //
+    SettlDay, //
+    Id, //
+    Ref, //
+    OrderId, //
+    State, //
+    Side, //
+    Lots, //
+    Ticks, //
+    Resd, //
+    Exec, //
+    Cost, //
+    LastLots, //
+    LastTicks, //
+    MinLots, //
+    MatchId, //
+    LiqInd, //
+    Cpty, //
+    Created //
+  };
+
+  vector<ExecPtr> execs;
+  execs.reserve(8);
+
+  StmtPtr stmt{prepare(*db_, SelectExecSql)};
+  ScopedBind bind{*stmt};
+  bind(accnt);
+  while (step(*stmt)) {
+    execs.push_back(Exec::make(accnt, //
+                               column<string_view>(*stmt, Market), //
+                               column<string_view>(*stmt, Contr), //
+                               column<Jday>(*stmt, SettlDay), //
+                               column<Iden>(*stmt, Id), //
+                               column<string_view>(*stmt, Ref), //
+                               column<Iden>(*stmt, OrderId), //
+                               column<swirly::State>(*stmt, State), //
+                               column<swirly::Side>(*stmt, Side), //
+                               column<swirly::Lots>(*stmt, Lots), //
+                               column<swirly::Ticks>(*stmt, Ticks), //
+                               column<swirly::Lots>(*stmt, Resd), //
+                               column<swirly::Lots>(*stmt, Exec), //
+                               column<swirly::Cost>(*stmt, Cost), //
+                               column<swirly::Lots>(*stmt, LastLots), //
+                               column<swirly::Ticks>(*stmt, LastTicks), //
+                               column<swirly::Lots>(*stmt, MinLots), //
+                               column<Iden>(*stmt, MatchId), //
+                               column<swirly::LiqInd>(*stmt, LiqInd), //
+                               column<string_view>(*stmt, Cpty), //
+                               column<Millis>(*stmt, Created)));
+  }
+  for (auto exec : boost::adaptors::reverse(execs)) {
+    cb(exec);
   }
 }
 

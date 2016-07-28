@@ -42,37 +42,45 @@ int main(int argc, char* argv[])
       conf.set("sqlite_model", argv[1]);
     }
     const BusinessDay busDay{RollHour, NewYork};
+
+    const auto now = getTimeOfDay();
     auto model = makeModel(conf);
 
     cout << "{\"assets\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readAsset([&it](const auto&& ptr) { it = *ptr; });
+      model->readAsset([&it](auto ptr) { it = *ptr; });
     }
     cout << "],\"contrs\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readContr([&it](const auto&& ptr) { it = *ptr; });
+      model->readContr([&it](auto ptr) { it = *ptr; });
     }
     cout << "],\"markets\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readMarket([&it](const MarketPtr&& ptr) { it = *ptr; });
+      model->readMarket([&it](MarketPtr ptr) { it = *ptr; });
     }
     cout << "],\"orders\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readOrder([&it](const auto&& ptr) { it = *ptr; });
+      model->readOrder([&it](auto ptr) { it = *ptr; });
+    }
+    cout << "],\"execs\":[";
+    {
+      OStreamJoiner it(cout, ',');
+      model->readAccnt(
+        now, [&model, &it](auto mnem) { model->readExec(mnem, [&it](auto ptr) { it = *ptr; }); });
     }
     cout << "],\"trades\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readTrade([&it](const auto&& ptr) { it = *ptr; });
+      model->readTrade([&it](auto ptr) { it = *ptr; });
     }
     cout << "],\"posns\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readPosn(busDay(getTimeOfDay()), [&it](const auto&& ptr) { it = *ptr; });
+      model->readPosn(busDay(now), [&it](auto ptr) { it = *ptr; });
     }
     cout << "]}\n";
 

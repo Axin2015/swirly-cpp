@@ -147,7 +147,7 @@ class RequestIdSet {
 
   ~RequestIdSet() noexcept
   {
-    set_.clear_and_dispose([](Request* ptr) { ptr->release(); });
+    set_.clear_and_dispose([](const Request* ptr) { ptr->release(); });
   }
 
   // Copy.
