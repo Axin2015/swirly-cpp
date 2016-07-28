@@ -242,7 +242,7 @@ class RequestIdSet {
   ValuePtr remove(const RequestT& ref) noexcept
   {
     ValuePtr value;
-    set_.erase_and_dispose(ref, [&value](RequestT* ptr) { value = {ptr, false}; });
+    set_.erase_and_dispose(ref, [&value](RequestT* ptr) { value = ValuePtr{ptr, false}; });
     return value;
   }
 

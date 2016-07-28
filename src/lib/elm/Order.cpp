@@ -141,7 +141,9 @@ OrderList::Iterator OrderList::insertBefore(const OrderPtr& value, const Order& 
 OrderList::ValuePtr OrderList::remove(const Order& ref) noexcept
 {
   ValuePtr value;
-  list_.erase_and_dispose(List::s_iterator_to(ref), [&value](Order* ptr) { value = {ptr, false}; });
+  list_.erase_and_dispose(List::s_iterator_to(ref), [&value](Order* ptr) {
+    value = ValuePtr{ptr, false};
+  });
   return value;
 }
 

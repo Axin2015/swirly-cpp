@@ -256,7 +256,7 @@ class SWIRLY_API OrderRefSet {
   ValuePtr remove(const Order& ref) noexcept
   {
     ValuePtr value;
-    set_.erase_and_dispose(ref, [&value](Order* ptr) { value = {ptr, false}; });
+    set_.erase_and_dispose(ref, [&value](Order* ptr) { value = ValuePtr{ptr, false}; });
     return value;
   }
 
