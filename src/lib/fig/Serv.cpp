@@ -306,16 +306,18 @@ void Serv::load(const Model& model, Millis now)
   model.readOrder([& impl = *impl_](auto&& ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertOrder(ptr);
-    bool success{false};
-    auto finally = makeFinally([&]() {
-      if (!success) {
-        accnt.removeOrder(*ptr);
-      }
-    });
-    auto it = impl.markets.find(ptr->market());
-    assert(it != impl.markets.end());
-    it->insertOrder(ptr);
-    success = true;
+    if (!ptr->done()) {
+      bool success{false};
+      auto finally = makeFinally([&]() {
+        if (!success) {
+          accnt.removeOrder(*ptr);
+        }
+      });
+      auto it = impl.markets.find(ptr->market());
+      assert(it != impl.markets.end());
+      it->insertOrder(ptr);
+      success = true;
+    }
   });
   model.readTrade([& impl = *impl_](auto&& ptr) {
     auto& accnt = impl.accnt(ptr->accnt());

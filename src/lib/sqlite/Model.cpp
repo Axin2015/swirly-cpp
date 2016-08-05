@@ -46,7 +46,7 @@ constexpr auto SelectMarketSql = //
 constexpr auto SelectOrderSql = //
   "SELECT accnt, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
-  " FROM order_t WHERE archive = 0 AND resd > 0;"_sv;
+  " FROM order_t WHERE archive = 0 OR resd > 0;"_sv;
 
 constexpr auto SelectTradeSql = //
   "SELECT accnt, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
