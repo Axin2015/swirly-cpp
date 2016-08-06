@@ -115,7 +115,15 @@ void TestModel::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
 {
 }
 
+void TestModel::doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const
+{
+}
+
 void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
+{
+}
+
+void TestModel::doReadExec(string_view accnt, const ModelCallback<ExecPtr>& cb) const
 {
 }
 

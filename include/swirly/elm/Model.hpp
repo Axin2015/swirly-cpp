@@ -25,8 +25,8 @@ namespace swirly {
 
 class Conf;
 
-template <typename ValuePtrT>
-using ModelCallback = std::function<void(ValuePtrT&&)>;
+template <typename ValueT>
+using ModelCallback = std::function<void(ValueT)>;
 
 class SWIRLY_API Model {
  public:
@@ -45,7 +45,15 @@ class SWIRLY_API Model {
   void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
   void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
   void readMarket(const ModelCallback<MarketBookPtr>& cb) const { doReadMarket(cb); }
+  void readAccnt(Millis now, const ModelCallback<std::string_view>& cb) const
+  {
+    doReadAccnt(now, cb);
+  }
   void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
+  void readExec(std::string_view accnt, const ModelCallback<ExecPtr>& cb) const
+  {
+    doReadExec(accnt, cb);
+  }
   void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
   void readPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
 
@@ -58,7 +66,11 @@ class SWIRLY_API Model {
 
   virtual void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const = 0;
 
+  virtual void doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const = 0;
+
   virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
+
+  virtual void doReadExec(std::string_view accnt, const ModelCallback<ExecPtr>& cb) const = 0;
 
   virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
 

@@ -162,8 +162,8 @@ struct Serv::Impl {
       if (makerOrder.accnt() == takerAccnt.mnem()) {
         // Maker updated first because this is consistent with last-look semantics.
         // N.B. the reference count is not incremented here.
-        resp.insertExec(match.makerTrade);
         resp.insertOrder(&makerOrder);
+        resp.insertExec(match.makerTrade);
       }
       resp.insertExec(match.takerTrade);
 
@@ -209,12 +209,14 @@ struct Serv::Impl {
       // Update maker.
       const auto makerTrade = match.makerTrade;
       assert(makerTrade);
+      makerAccnt.insertExec(makerTrade);
       makerAccnt.insertTrade(makerTrade);
       match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
                                 makerTrade->lastTicks());
       // Update taker.
       const auto takerTrade = match.takerTrade;
       assert(takerTrade);
+      takerAccnt.insertExec(takerTrade);
       takerAccnt.insertTrade(takerTrade);
     }
   }
@@ -235,14 +237,15 @@ struct Serv::Impl {
     exec->revise(lots);
 
     resp.setBook(book);
-    resp.insertExec(exec);
     resp.insertOrder(&order);
+    resp.insertExec(exec);
 
     journ.createExec(*exec);
 
     // Commit phase.
 
     book.reviseOrder(order, lots, now);
+    accnt.insertExec(exec);
   }
   void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
   {
@@ -250,14 +253,15 @@ struct Serv::Impl {
     exec->cancel();
 
     resp.setBook(book);
-    resp.insertExec(exec);
     resp.insertOrder(&order);
+    resp.insertExec(exec);
 
     journ.createExec(*exec);
 
     // Commit phase.
 
     book.cancelOrder(order, now);
+    accnt.insertExec(exec);
   }
   void archiveOrder(Accnt& accnt, const Order& order, Millis now)
   {
@@ -298,30 +302,34 @@ Serv& Serv::operator=(Serv&&) = default;
 void Serv::load(const Model& model, Millis now)
 {
   const auto busDay = impl_->busDay(now);
-  model.readAsset([& assets = impl_->assets](auto&& ptr) { assets.insert(move(ptr)); });
-  model.readContr([& contrs = impl_->contrs](auto&& ptr) { contrs.insert(move(ptr)); });
-  model.readMarket([& markets = impl_->markets](MarketBookPtr && ptr) {
-    markets.insert(move(ptr));
-  });
-  model.readOrder([& impl = *impl_](auto&& ptr) {
+  model.readAsset([& assets = impl_->assets](auto ptr) { assets.insert(move(ptr)); });
+  model.readContr([& contrs = impl_->contrs](auto ptr) { contrs.insert(move(ptr)); });
+  model.readMarket([& markets = impl_->markets](MarketBookPtr ptr) { markets.insert(move(ptr)); });
+  model.readOrder([& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertOrder(ptr);
-    bool success{false};
-    auto finally = makeFinally([&]() {
-      if (!success) {
-        accnt.removeOrder(*ptr);
-      }
-    });
-    auto it = impl.markets.find(ptr->market());
-    assert(it != impl.markets.end());
-    it->insertOrder(ptr);
-    success = true;
+    if (!ptr->done()) {
+      bool success{false};
+      auto finally = makeFinally([&]() {
+        if (!success) {
+          accnt.removeOrder(*ptr);
+        }
+      });
+      auto it = impl.markets.find(ptr->market());
+      assert(it != impl.markets.end());
+      it->insertOrder(ptr);
+      success = true;
+    }
   });
-  model.readTrade([& impl = *impl_](auto&& ptr) {
+  model.readAccnt(now, [&model, &impl = *impl_ ](auto mnem) {
+    auto& accnt = impl.accnt(mnem);
+    model.readExec(mnem, [&accnt](auto ptr) { accnt.insertExec(ptr); });
+  });
+  model.readTrade([& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertTrade(ptr);
   });
-  model.readPosn(busDay, [& impl = *impl_](auto&& ptr) {
+  model.readPosn(busDay, [& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertPosn(ptr);
   });
@@ -427,12 +435,12 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   const auto id = book.allocId();
   auto order = Order::make(accnt.mnem(), book.mnem(), book.contr(), book.settlDay(), id, ref, side,
                            lots, ticks, minLots, now);
-  auto exec = impl_->newExec(*order, id, now);
+  auto newExec = impl_->newExec(*order, id, now);
 
-  resp.insertExec(exec);
+  resp.insertOrder(order);
+  resp.insertExec(newExec);
   // Order fields are updated on match.
   impl_->matchOrders(accnt, book, *order, now, resp);
-  resp.insertOrder(order);
   // Ensure that matches are cleared when scope exits.
   auto& matches = impl_->matches;
   auto finally = makeFinally([&matches]() { matches.clear(); });
@@ -471,6 +479,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   // Commit phase.
 
   accnt.insertOrder(order);
+  accnt.insertExec(newExec);
 
   // Commit matches.
   if (!matches.empty()) {
@@ -532,18 +541,19 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots
     auto exec = impl_->newExec(order, book.allocId(), now);
     exec->revise(lots);
 
-    resp.insertExec(exec);
     resp.insertOrder(&order);
+    resp.insertExec(exec);
   }
 
   impl_->journ.createExec(resp.execs());
 
   // Commit phase.
 
-  for (const auto id : ids) {
-    auto it = accnt.orders().find(book.mnem(), id);
+  for (const auto& exec : resp.execs()) {
+    auto it = accnt.orders().find(book.mnem(), exec->orderId());
     assert(it != accnt.orders().end());
     book.reviseOrder(*it, lots, now);
+    accnt.insertExec(exec);
   }
 }
 
@@ -586,18 +596,19 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     auto exec = impl_->newExec(order, book.allocId(), now);
     exec->cancel();
 
-    resp.insertExec(exec);
     resp.insertOrder(&order);
+    resp.insertExec(exec);
   }
 
   impl_->journ.createExec(resp.execs());
 
   // Commit phase.
 
-  for (const auto id : ids) {
-    auto it = accnt.orders().find(book.mnem(), id);
+  for (const auto& exec : resp.execs()) {
+    auto it = accnt.orders().find(book.mnem(), exec->orderId());
     assert(it != accnt.orders().end());
     book.cancelOrder(*it, now);
+    accnt.insertExec(exec);
   }
 }
 
@@ -669,6 +680,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
 
     // Commit phase.
 
+    cptyAccnt.insertExec(cptyTrade);
     cptyAccnt.insertTrade(cptyTrade);
     cptyPosn->addTrade(cptyTrade->side(), cptyTrade->lastLots(), cptyTrade->lastTicks());
 
@@ -678,6 +690,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
 
     // Commit phase.
   }
+  accnt.insertExec(trade);
   accnt.insertTrade(trade);
   posn->addTrade(trade->side(), trade->lastLots(), trade->lastTicks());
 

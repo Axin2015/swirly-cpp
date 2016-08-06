@@ -22,6 +22,8 @@
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 
+#include <boost/circular_buffer.hpp>
+
 namespace swirly {
 
 class Accnt;
@@ -52,8 +54,18 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
   auto mnem() const noexcept { return mnem_; }
   const auto& orders() const noexcept { return orders_; }
+  const auto& execs() const noexcept { return execs_; }
   const auto& trades() const noexcept { return trades_; }
+  const Exec& trade(Mnem market, Iden id) const
+  {
+    auto it = trades_.find(market, id);
+    if (it == trades_.end()) {
+      throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
+    }
+    return *it;
+  }
   const auto& posns() const noexcept { return posns_; }
+
   auto& orders() noexcept { return orders_; }
   Order& order(Mnem market, Iden id)
   {
@@ -87,20 +99,18 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     return orders_.remove(order);
   }
-  Exec& trade(Mnem market, Iden id)
+  void insertExec(const ConstExecPtr& exec) noexcept
   {
-    auto it = trades_.find(market, id);
-    if (it == trades_.end()) {
-      throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
-    }
-    return *it;
+    assert(exec->accnt() == mnem_);
+    execs_.push_back(exec);
   }
   void insertTrade(const ExecPtr& trade) noexcept
   {
     assert(trade->accnt() == mnem_);
+    assert(trade->state() == State::Trade);
     trades_.insert(trade);
   }
-  ExecPtr removeTrade(const Exec& trade) noexcept
+  ConstExecPtr removeTrade(const Exec& trade) noexcept
   {
     assert(trade.accnt() == mnem_);
     return trades_.remove(trade);
@@ -117,6 +127,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
  private:
   const Mnem mnem_;
   OrderIdSet orders_;
+  boost::circular_buffer<ConstExecPtr> execs_{8};
   ExecIdSet trades_;
   AccntPosnSet posns_;
   OrderRefSet refIdx_;

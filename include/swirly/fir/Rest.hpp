@@ -60,6 +60,8 @@ class SWIRLY_API Rest {
 
   void getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, std::ostream& out) const;
 
+  void getExec(Mnem accMnem, Millis now, std::ostream& out) const;
+
   void getTrade(Mnem accMnem, Millis now, std::ostream& out) const;
 
   void getTrade(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
@@ -97,6 +99,8 @@ class SWIRLY_API Rest {
 
  private:
   void getOrder(const Accnt& accnt, Millis now, std::ostream& out) const;
+
+  void getExec(const Accnt& accnt, Millis now, std::ostream& out) const;
 
   void getTrade(const Accnt& accnt, Millis now, std::ostream& out) const;
 

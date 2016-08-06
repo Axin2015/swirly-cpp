@@ -41,15 +41,15 @@ constexpr auto UpdateMarketSql = //
 constexpr auto InsertExecSql = //
   "INSERT INTO exec_t (accnt, market, contr, settl_day, id, ref, order_id," //
   " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
-  " min_lots, match_id, liqInd_id, cpty, archive, created, modified)" //
-  " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
+  " min_lots, match_id, liqInd_id, cpty, created)" //
+  " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateOrderSql = //
-  "UPDATE order_t SET archive = 1, modified = ?3" //
+  "UPDATE order_t SET archive = ?3" //
   " WHERE market = ?1 AND id = ?2"_sv;
 
 constexpr auto UpdateExecSql = //
-  "UPDATE exec_t SET archive = 1, modified = ?3" //
+  "UPDATE exec_t SET archive = ?3" //
   " WHERE market = ?1 AND id = ?2"_sv;
 
 } // anonymous
@@ -159,9 +159,7 @@ void Journ::createExec(const CreateExecBody& body)
   bind(body.matchId, MaybeNull);
   bind(body.liqInd, MaybeNull);
   bind(toStringView(body.cpty), MaybeNull);
-  bind(0); // Archive.
   bind(body.created); // Created.
-  bind(body.created); // Modified.
 
   stepOnce(stmt);
   trans.commit();

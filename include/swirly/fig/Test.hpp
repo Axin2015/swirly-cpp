@@ -44,7 +44,11 @@ class SWIRLY_API TestModel : public Model {
 
   void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const override;
 
+  void doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const override;
+
   void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
+
+  void doReadExec(std::string_view accnt, const ModelCallback<ExecPtr>& cb) const override;
 
   void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
 

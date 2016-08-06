@@ -52,7 +52,7 @@ class SWIRLY_API Response {
 
   void setBook(MarketBook& book) noexcept { book_ = &book; }
 
-  void setPosn(PosnPtr posn) noexcept;
+  void setPosn(ConstPosnPtr posn) noexcept;
 
   void clear() noexcept;
 
@@ -66,7 +66,7 @@ class SWIRLY_API Response {
   MarketBook* book_{nullptr};
   Orders orders_;
   Execs execs_;
-  PosnPtr posn_;
+  ConstPosnPtr posn_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Response& resp)

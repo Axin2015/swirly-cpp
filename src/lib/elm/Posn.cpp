@@ -54,7 +54,7 @@ void Posn::toJson(ostream& os) const
 
 PosnSet::~PosnSet() noexcept
 {
-  set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });
+  set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });
 }
 
 PosnSet::PosnSet(PosnSet&&) = default;
@@ -99,7 +99,7 @@ PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
 
 AccntPosnSet::~AccntPosnSet() noexcept
 {
-  set_.clear_and_dispose([](Posn* ptr) { ptr->release(); });
+  set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });
 }
 
 AccntPosnSet::AccntPosnSet(AccntPosnSet&&) = default;

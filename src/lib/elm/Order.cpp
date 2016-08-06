@@ -70,7 +70,7 @@ void Order::toJson(ostream& os) const
 
 OrderRefSet::~OrderRefSet() noexcept
 {
-  set_.clear_and_dispose([](Order* ptr) { ptr->release(); });
+  set_.clear_and_dispose([](const Order* ptr) { ptr->release(); });
 }
 
 OrderRefSet::OrderRefSet(OrderRefSet&&) = default;
@@ -115,7 +115,7 @@ OrderRefSet::Iterator OrderRefSet::insertOrReplace(const ValuePtr& value) noexce
 
 OrderList::~OrderList() noexcept
 {
-  list_.clear_and_dispose([](Order* ptr) { ptr->release(); });
+  list_.clear_and_dispose([](const Order* ptr) { ptr->release(); });
 }
 
 OrderList::OrderList(OrderList&&) = default;
@@ -141,7 +141,9 @@ OrderList::Iterator OrderList::insertBefore(const OrderPtr& value, const Order& 
 OrderList::ValuePtr OrderList::remove(const Order& ref) noexcept
 {
   ValuePtr value;
-  list_.erase_and_dispose(List::s_iterator_to(ref), [&value](Order* ptr) { value = {ptr, false}; });
+  list_.erase_and_dispose(List::s_iterator_to(ref), [&value](Order* ptr) {
+    value = ValuePtr{ptr, false};
+  });
   return value;
 }
 

@@ -374,7 +374,8 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /accnt
       state_ |= MatchMethod;
-      const int bs{EntitySet::Order | EntitySet::Trade | EntitySet::Posn | EntitySet::View};
+      const int bs{EntitySet::Order | EntitySet::Exec | EntitySet::Trade | EntitySet::Posn
+                   | EntitySet::View};
       rest_.getAccnt(getAccnt(data), bs, now, out_);
     }
     return;
@@ -403,6 +404,9 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
   switch (es.get()) {
   case EntitySet::Order:
     orderRequest(data, now);
+    break;
+  case EntitySet::Exec:
+    execRequest(data, now);
     break;
   case EntitySet::Trade:
     tradeRequest(data, now);
@@ -492,6 +496,22 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
       state_ |= MatchMethod;
       rest_.deleteOrder(getAccnt(data), market, ids_, now);
       break;
+    }
+    return;
+  }
+}
+
+void RestServ::execRequest(HttpMessage data, Millis now)
+{
+  if (uri_.empty()) {
+
+    // /accnt/exec
+    state_ |= MatchUri;
+
+    if (isSet(MethodGet)) {
+      // GET /accnt/exec
+      state_ |= MatchMethod;
+      rest_.getExec(getAccnt(data), now, out_);
     }
     return;
   }

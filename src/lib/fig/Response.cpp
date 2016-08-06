@@ -69,7 +69,7 @@ ConstPosnPtr Response::posn() const noexcept
   return posn_;
 }
 
-void Response::setPosn(PosnPtr posn) noexcept
+void Response::setPosn(ConstPosnPtr posn) noexcept
 {
   posn_ = posn;
 }

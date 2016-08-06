@@ -129,6 +129,16 @@ CREATE TABLE market_t (
 )
 ;
 
+CREATE TABLE accnt_t (
+  mnem CHAR(16) NOT NULL PRIMARY KEY,
+  max_id BIGINT NOT NULL DEFAULT 0,
+  created BIGINT NOT NULL,
+  modified BIGINT NOT NULL
+)
+;
+
+CREATE INDEX accnt_modified_idx ON accnt_t (modified);
+
 CREATE TABLE order_t (
   accnt CHAR(16) NOT NULL,
   market CHAR(16) NOT NULL,
@@ -146,9 +156,9 @@ CREATE TABLE order_t (
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
-  archive TINYINT(1) NOT NULL DEFAULT 0,
   created BIGINT NOT NULL,
   modified BIGINT NOT NULL,
+  archive BIGINT NULL DEFAULT NULL,
 
   PRIMARY KEY (market, id),
 
@@ -159,7 +169,6 @@ CREATE TABLE order_t (
 )
 ;
 
-CREATE INDEX order_accnt_idx ON order_t (accnt);
 CREATE INDEX order_resd_idx ON order_t (resd);
 CREATE INDEX order_archive_idx ON order_t (archive);
 
@@ -171,6 +180,7 @@ CREATE TABLE exec_t (
   id BIGINT NOT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
   order_id BIGINT NULL DEFAULT NULL,
+  seq_id BIGINT NULL DEFAULT NULL,
   state_id INT NOT NULL,
   side_id INT NOT NULL,
   lots BIGINT NOT NULL,
@@ -184,9 +194,8 @@ CREATE TABLE exec_t (
   match_id BIGINT NULL DEFAULT NULL,
   liqind_id INT NULL DEFAULT NULL,
   cpty CHAR(16) NULL DEFAULT NULL,
-  archive TINYINT(1) NOT NULL DEFAULT 0,
   created BIGINT NOT NULL,
-  modified BIGINT NOT NULL,
+  archive BIGINT NULL DEFAULT NULL,
 
   PRIMARY KEY (market, id),
 
@@ -198,9 +207,8 @@ CREATE TABLE exec_t (
 )
 ;
 
-CREATE INDEX exec_accnt_idx ON exec_t (accnt);
-CREATE INDEX exec_state_idx ON exec_t (state_id);
-CREATE INDEX exec_archive_idx ON exec_t (archive);
+CREATE INDEX exec_accnt_seq_id_idx ON exec_t (accnt, seq_id);
+CREATE INDEX exec_state_archive_idx ON exec_t (state_id, archive);
 
 CREATE TRIGGER before_insert_on_exec1
   BEFORE INSERT ON exec_t
@@ -224,7 +232,6 @@ CREATE TRIGGER before_insert_on_exec1
       last_lots,
       last_ticks,
       min_lots,
-      archive,
       created,
       modified
     ) VALUES (
@@ -244,9 +251,8 @@ CREATE TRIGGER before_insert_on_exec1
       NEW.last_lots,
       NEW.last_ticks,
       NEW.min_lots,
-      0,
       NEW.created,
-      NEW.modified
+      NEW.created
     );
   END
 ;
@@ -265,7 +271,7 @@ CREATE TRIGGER before_insert_on_exec2
       cost = NEW.cost,
       last_lots = NEW.last_lots,
       last_ticks = NEW.last_ticks,
-      modified = NEW.modified
+      modified = NEW.created
     WHERE id = NEW.order_id;
   END
 ;
@@ -280,6 +286,30 @@ CREATE TRIGGER before_insert_on_exec3
       last_ticks = NEW.last_ticks,
       last_time = NEW.created
     WHERE mnem = NEW.market;
+  END
+;
+
+CREATE TRIGGER after_insert_on_exec1
+  AFTER INSERT ON exec_t
+  BEGIN
+    INSERT OR IGNORE INTO accnt_t (
+      mnem,
+      created,
+      modified
+    ) VALUES (
+      NEW.accnt,
+      NEW.created,
+      NEW.created
+    );
+    UPDATE accnt_t
+    SET
+      max_id = max_id + 1,
+      modified = NEW.created
+    WHERE mnem = NEW.accnt;
+    UPDATE exec_t
+    SET
+      seq_id = (SELECT max_id FROM accnt_t WHERE mnem = NEW.accnt)
+    WHERE market = NEW.market AND id = NEW.id;
   END
 ;
 
@@ -349,7 +379,8 @@ CREATE VIEW order_v AS
     o.last_ticks,
     o.min_lots,
     o.created,
-    o.modified
+    o.modified,
+    o.archive
   FROM order_t o
   LEFT OUTER JOIN state_t s
   ON o.state_id = s.id
@@ -365,6 +396,7 @@ CREATE VIEW exec_v AS
     e.id,
     e.ref,
     e.order_id,
+    e.seq_id,
     s.mnem state,
     a.mnem side,
     e.lots,
@@ -378,9 +410,8 @@ CREATE VIEW exec_v AS
     e.match_id,
     r.mnem liqind,
     e.cpty,
-    e.archive,
     e.created,
-    e.modified
+    e.archive
   FROM exec_t e
   LEFT OUTER JOIN state_t s
   ON e.state_id = s.id

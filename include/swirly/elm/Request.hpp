@@ -147,7 +147,7 @@ class RequestIdSet {
 
   ~RequestIdSet() noexcept
   {
-    set_.clear_and_dispose([](Request* ptr) { ptr->release(); });
+    set_.clear_and_dispose([](const Request* ptr) { ptr->release(); });
   }
 
   // Copy.
@@ -242,7 +242,7 @@ class RequestIdSet {
   ValuePtr remove(const RequestT& ref) noexcept
   {
     ValuePtr value;
-    set_.erase_and_dispose(ref, [&value](RequestT* ptr) { value = {ptr, false}; });
+    set_.erase_and_dispose(ref, [&value](RequestT* ptr) { value = ValuePtr{ptr, false}; });
     return value;
   }
 

@@ -37,6 +37,8 @@ int bit(string_view sv)
     i = EntitySet::Market;
   } else if (sv == "order") {
     i = EntitySet::Order;
+  } else if (sv == "exec") {
+    i = EntitySet::Exec;
   } else if (sv == "trade") {
     i = EntitySet::Trade;
   } else if (sv == "posn") {
