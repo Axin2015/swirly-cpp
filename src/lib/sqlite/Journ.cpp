@@ -168,12 +168,18 @@ void Journ::archiveTrade(const ArchiveTradeBody& body)
   }
   auto& stmt = *updateExecStmt_;
 
-  ScopedBind bind{stmt};
-  bind(toStringView(body.market));
-  bind(body.ids[0]);
-  bind(body.modified);
+  for (size_t i{0}; i < MaxIds; ++i) {
+    const auto id = body.ids[i];
+    if (id == 0_id) {
+      break;
+    }
+    ScopedBind bind{stmt};
+    bind(toStringView(body.market));
+    bind(id);
+    bind(body.modified);
 
-  stepOnce(stmt);
+    stepOnce(stmt);
+  }
   trans.commit();
 }
 
