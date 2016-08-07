@@ -100,17 +100,6 @@ class SWIRLY_API AsyncJourn {
    */
   void createExec(ArrayView<ConstExecPtr> execs);
   /**
-   * Archive Order.
-   */
-  void archiveOrder(Mnem market, Iden id, Millis modified)
-  {
-    doArchiveOrder(market, {&id, 1}, modified, More::No);
-  }
-  /**
-   * Archive Orders.
-   */
-  void archiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified);
-  /**
    * Archive Trade.
    */
   void archiveTrade(Mnem market, Iden id, Millis modified)
@@ -131,8 +120,6 @@ class SWIRLY_API AsyncJourn {
   void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state);
 
   void doCreateExec(const Exec& exec, More more);
-
-  void doArchiveOrder(Mnem market, ArrayView<Iden> ids, Millis modified, More more);
 
   void doArchiveTrade(Mnem market, ArrayView<Iden> ids, Millis modified, More more);
 

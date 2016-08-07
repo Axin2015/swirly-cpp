@@ -33,6 +33,7 @@ class TestCase(RestTestCase):
 
         conn.setAccnt('MARAYL')
         self.makerOrder(conn)
+        self.makerExec(conn)
         self.makerTrade(conn)
         self.makerPosn(conn)
 
@@ -140,19 +141,51 @@ class TestCase(RestTestCase):
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
+    self.assertListEqual([], resp.content)
+
+  def makerExec(self, conn):
+    resp = conn.send('GET', '/accnt/exec')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
-      u'cost': 61725,
+      u'cost': 0,
+      u'cpty': None,
       u'created': self.now,
-      u'exec': 5,
+      u'exec': 0,
       u'id': 1,
-      u'lastLots': 5,
-      u'lastTicks': 12345,
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'liqInd': None,
       u'lots': 5,
       u'market': u'EURUSD.MAR14',
+      u'matchId': None,
       u'minLots': None,
-      u'modified': self.now,
+      u'orderId': 1,
+      u'ref': None,
+      u'resd': 5,
+      u'settlDate': 20170102,
+      u'side': u'BUY',
+      u'state': u'NEW',
+      u'ticks': 12345
+    }, {
+      u'accnt': u'MARAYL',
+      u'contr': u'EURUSD',
+      u'cost': 61725,
+      u'cpty': u'GOSAYL',
+      u'created': self.now,
+      u'exec': 5,
+      u'id': 3,
+      u'lastLots': 5,
+      u'lastTicks': 12345,
+      u'liqInd': u'MAKER',
+      u'lots': 5,
+      u'market': u'EURUSD.MAR14',
+      u'matchId': 4,
+      u'minLots': None,
+      u'orderId': 1,
       u'ref': None,
       u'resd': 0,
       u'settlDate': 20170102,

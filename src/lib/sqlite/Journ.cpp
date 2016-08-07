@@ -44,10 +44,6 @@ constexpr auto InsertExecSql = //
   " min_lots, match_id, liqInd_id, cpty, created)" //
   " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
-constexpr auto UpdateOrderSql = //
-  "UPDATE order_t SET archive = ?3" //
-  " WHERE market = ?1 AND id = ?2"_sv;
-
 constexpr auto UpdateExecSql = //
   "UPDATE exec_t SET archive = ?3" //
   " WHERE market = ?1 AND id = ?2"_sv;
@@ -62,7 +58,6 @@ Journ::Journ(const Conf& conf)
     insertMarketStmt_{prepare(*db_, InsertMarketSql)},
     updateMarketStmt_{prepare(*db_, UpdateMarketSql)},
     insertExecStmt_{prepare(*db_, InsertExecSql)},
-    updateOrderStmt_{prepare(*db_, UpdateOrderSql)},
     updateExecStmt_{prepare(*db_, UpdateExecSql)}
 {
 }
@@ -165,24 +160,7 @@ void Journ::createExec(const CreateExecBody& body)
   trans.commit();
 }
 
-void Journ::archiveOrder(const ArchiveBody& body)
-{
-  Transaction trans{*this, body.more};
-  if (failed()) {
-    return;
-  }
-  auto& stmt = *updateOrderStmt_;
-
-  ScopedBind bind{stmt};
-  bind(toStringView(body.market));
-  bind(body.ids[0]);
-  bind(body.modified);
-
-  stepOnce(stmt);
-  trans.commit();
-}
-
-void Journ::archiveTrade(const ArchiveBody& body)
+void Journ::archiveTrade(const ArchiveTradeBody& body)
 {
   Transaction trans{*this, body.more};
   if (failed()) {

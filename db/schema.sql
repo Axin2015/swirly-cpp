@@ -158,7 +158,6 @@ CREATE TABLE order_t (
   min_lots BIGINT NOT NULL DEFAULT 1,
   created BIGINT NOT NULL,
   modified BIGINT NOT NULL,
-  archive BIGINT NULL DEFAULT NULL,
 
   PRIMARY KEY (market, id),
 
@@ -170,7 +169,6 @@ CREATE TABLE order_t (
 ;
 
 CREATE INDEX order_resd_idx ON order_t (resd);
-CREATE INDEX order_archive_idx ON order_t (archive);
 
 CREATE TABLE exec_t (
   accnt CHAR(16) NOT NULL,
@@ -379,8 +377,7 @@ CREATE VIEW order_v AS
     o.last_ticks,
     o.min_lots,
     o.created,
-    o.modified,
-    o.archive
+    o.modified
   FROM order_t o
   LEFT OUTER JOIN state_t s
   ON o.state_id = s.id

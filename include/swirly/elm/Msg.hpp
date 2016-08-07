@@ -25,14 +25,7 @@
 
 namespace swirly {
 
-enum class MsgType : int {
-  Reset,
-  CreateMarket,
-  UpdateMarket,
-  CreateExec,
-  ArchiveOrder,
-  ArchiveTrade
-};
+enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
 
 struct SWIRLY_PACKED CreateMarketBody {
   char mnem[MaxMnem];
@@ -79,13 +72,13 @@ static_assert(std::is_pod<CreateExecBody>::value, "message-type must be pod");
 
 constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(Millis) - sizeof(More))
                              / sizeof(Iden)};
-struct SWIRLY_PACKED ArchiveBody {
+struct SWIRLY_PACKED ArchiveTradeBody {
   char market[MaxMnem];
   Iden ids[MaxIds];
   Millis modified;
   More more;
 };
-static_assert(std::is_pod<ArchiveBody>::value, "message-type must be pod");
+static_assert(std::is_pod<ArchiveTradeBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED Msg {
   MsgType type;
@@ -93,7 +86,7 @@ struct SWIRLY_PACKED Msg {
     CreateMarketBody createMarket;
     UpdateMarketBody updateMarket;
     CreateExecBody createExec;
-    ArchiveBody archive;
+    ArchiveTradeBody archiveTrade;
   };
 };
 static_assert(std::is_pod<Msg>::value, "message-type must be pod");
@@ -129,11 +122,8 @@ struct MsgHandler {
     case MsgType::CreateExec:
       derived->createExec(msg.createExec);
       break;
-    case MsgType::ArchiveOrder:
-      derived->archiveOrder(msg.archive);
-      break;
     case MsgType::ArchiveTrade:
-      derived->archiveTrade(msg.archive);
+      derived->archiveTrade(msg.archiveTrade);
       break;
     }
   }

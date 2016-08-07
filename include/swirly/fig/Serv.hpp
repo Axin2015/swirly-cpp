@@ -108,12 +108,6 @@ class SWIRLY_API Serv {
 
   void cancelOrder(MarketBook& book, Millis now);
 
-  void archiveOrder(Accnt& accnt, const Order& order, Millis now);
-
-  void archiveOrder(Accnt& accnt, Mnem market, Iden id, Millis now);
-
-  void archiveOrder(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now);
-
   TradePair createTrade(Accnt& accnt, MarketBook& book, std::string_view ref, Side side, Lots lots,
                         Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created);
 

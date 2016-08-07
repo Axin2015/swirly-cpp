@@ -209,6 +209,9 @@ struct Serv::Impl {
       // Update maker.
       const auto makerTrade = match.makerTrade;
       assert(makerTrade);
+      if (makerOrder->done()) {
+        makerAccnt.removeOrder(*makerOrder);
+      }
       makerAccnt.insertExec(makerTrade);
       makerAccnt.insertTrade(makerTrade);
       match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
@@ -261,15 +264,8 @@ struct Serv::Impl {
     // Commit phase.
 
     book.cancelOrder(order, now);
-    accnt.insertExec(exec);
-  }
-  void archiveOrder(Accnt& accnt, const Order& order, Millis now)
-  {
-    journ.archiveOrder(order.market(), order.id(), now);
-
-    // Commit phase.
-
     accnt.removeOrder(order);
+    accnt.insertExec(exec);
   }
   void archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
   {
@@ -308,18 +304,16 @@ void Serv::load(const Model& model, Millis now)
   model.readOrder([& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertOrder(ptr);
-    if (!ptr->done()) {
-      bool success{false};
-      auto finally = makeFinally([&]() {
-        if (!success) {
-          accnt.removeOrder(*ptr);
-        }
-      });
-      auto it = impl.markets.find(ptr->market());
-      assert(it != impl.markets.end());
-      it->insertOrder(ptr);
-      success = true;
-    }
+    bool success{false};
+    auto finally = makeFinally([&]() {
+      if (!success) {
+        accnt.removeOrder(*ptr);
+      }
+    });
+    auto it = impl.markets.find(ptr->market());
+    assert(it != impl.markets.end());
+    it->insertOrder(ptr);
+    success = true;
   });
   model.readAccnt(now, [&model, &impl = *impl_ ](auto mnem) {
     auto& accnt = impl.accnt(mnem);
@@ -445,6 +439,17 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   auto& matches = impl_->matches;
   auto finally = makeFinally([&matches]() { matches.clear(); });
 
+  resp.setBook(book);
+
+  // Avoid allocating position when there are no matches.
+  PosnPtr posn;
+  if (!matches.empty()) {
+    // Avoid allocating position when there are no matches.
+    // N.B. before commit phase, because this may fail.
+    posn = accnt.posn(book.contr(), book.settlDay());
+    resp.setPosn(posn);
+  }
+
   // Place incomplete order in market.
   if (!order->done()) {
     // This may fail if level cannot be allocated.
@@ -465,20 +470,11 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
     success = true;
   }
 
-  resp.setBook(book);
-
-  // Avoid allocating position when there are no matches.
-  PosnPtr posn;
-  if (!matches.empty()) {
-    // Avoid allocating position when there are no matches.
-    // N.B. before commit phase, because this may fail.
-    posn = accnt.posn(book.contr(), book.settlDay());
-    resp.setPosn(posn);
-  }
-
   // Commit phase.
 
-  accnt.insertOrder(order);
+  if (!order->done()) {
+    accnt.insertOrder(order);
+  }
   accnt.insertExec(newExec);
 
   // Commit matches.
@@ -608,6 +604,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     auto it = accnt.orders().find(book.mnem(), exec->orderId());
     assert(it != accnt.orders().end());
     book.cancelOrder(*it, now);
+    accnt.removeOrder(*it);
     accnt.insertExec(exec);
   }
 }
@@ -620,45 +617,6 @@ void Serv::cancelOrder(Accnt& accnt, Millis now)
 void Serv::cancelOrder(MarketBook& book, Millis now)
 {
   // FIXME: Not implemented.
-}
-
-void Serv::archiveOrder(Accnt& accnt, const Order& order, Millis now)
-{
-  if (!order.done()) {
-    throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
-  }
-  impl_->archiveOrder(accnt, order, now);
-}
-
-void Serv::archiveOrder(Accnt& accnt, Mnem market, Iden id, Millis now)
-{
-  auto& order = accnt.order(market, id);
-  if (!order.done()) {
-    throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
-  }
-  impl_->archiveOrder(accnt, order, now);
-}
-
-void Serv::archiveOrder(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
-{
-  for (const auto id : ids) {
-
-    auto& order = accnt.order(market, id);
-    if (!order.done()) {
-      throw InvalidException{errMsg() << "order '" << order.id() << "' is not done"};
-    }
-  }
-
-  impl_->journ.archiveOrder(market, ids, now);
-
-  // Commit phase.
-
-  for (const auto id : ids) {
-
-    auto it = accnt.orders().find(market, id);
-    assert(it != accnt.orders().end());
-    accnt.removeOrder(*it);
-  }
 }
 
 TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Side side, Lots lots,

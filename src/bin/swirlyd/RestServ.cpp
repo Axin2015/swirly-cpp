@@ -491,11 +491,6 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
         rest_.putOrder(getAccnt(data), market, ids_, request_.lots(), now, out_);
       }
       break;
-    case MethodDelete:
-      // DELETE /accnt/order/MARKET/ID,ID...
-      state_ |= MatchMethod;
-      rest_.deleteOrder(getAccnt(data), market, ids_, now);
-      break;
     }
     return;
   }

@@ -48,13 +48,6 @@ class Archiver {
   void operator()(Accnt& accnt, Mnem market, Millis now)
   {
     ids_.clear();
-    for (const auto& order : accnt.orders()) {
-      if (order.market() == market && order.done()) {
-        ids_.push_back(order.id());
-      }
-    }
-    serv_.archiveOrder(accnt, market, ids_, now);
-    ids_.clear();
     for (const auto& trade : accnt.trades()) {
       if (trade.market() == market) {
         ids_.push_back(trade.id());
