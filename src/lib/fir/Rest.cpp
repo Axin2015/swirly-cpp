@@ -311,12 +311,6 @@ void Rest::putOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Lots lots, M
   out << resp;
 }
 
-void Rest::deleteOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now)
-{
-  auto& accnt = serv_.accnt(accMnem);
-  serv_.archiveOrder(accnt, market, ids, now);
-}
-
 void Rest::postTrade(Mnem accMnem, Mnem market, string_view ref, Side side, Lots lots, Ticks ticks,
                      LiqInd liqInd, Mnem cpty, Millis now, ostream& out)
 {

@@ -60,9 +60,7 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
 
   void createExec(const CreateExecBody& body);
 
-  void archiveOrder(const ArchiveBody& body);
-
-  void archiveTrade(const ArchiveBody& body);
+  void archiveTrade(const ArchiveTradeBody& body);
 
   DbPtr db_;
   StmtPtr beginStmt_;
@@ -71,7 +69,6 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
   StmtPtr insertMarketStmt_;
   StmtPtr updateMarketStmt_;
   StmtPtr insertExecStmt_;
-  StmtPtr updateOrderStmt_;
   StmtPtr updateExecStmt_;
 };
 

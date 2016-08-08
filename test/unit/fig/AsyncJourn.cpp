@@ -44,7 +44,6 @@ struct JournState {
   int createMarket{0};
   int updateMarket{0};
   int createExec{0};
-  int archiveOrder{0};
   int archiveTrade{0};
   int total{0};
 };
@@ -259,33 +258,6 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
   }
 }
 
-SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveOrder, AsyncJournFixture)
-{
-  vector<Iden> ids;
-  ids.reserve(101);
-
-  Iden id{};
-  generate_n(back_insert_iterator<decltype(ids)>(ids), ids.capacity(), [&id]() { return ++id; });
-  asyncJourn.archiveOrder("EURUSD.MAR14"_sv, ids, Now);
-
-  auto it = ids.begin();
-  while (it != ids.end()) {
-    Msg msg;
-    SWIRLY_CHECK(journ.pop(msg));
-    SWIRLY_CHECK(msg.type == MsgType::ArchiveOrder);
-    const auto& body = msg.archive;
-    SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
-    SWIRLY_CHECK(body.modified == Now);
-    for (const auto id : body.ids) {
-      if (it != ids.end()) {
-        SWIRLY_CHECK(id == *it++);
-      } else {
-        SWIRLY_CHECK(id == 0_id);
-      }
-    }
-  }
-}
-
 SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
 {
   vector<Iden> ids;
@@ -300,7 +272,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
     Msg msg;
     SWIRLY_CHECK(journ.pop(msg));
     SWIRLY_CHECK(msg.type == MsgType::ArchiveTrade);
-    const auto& body = msg.archive;
+    const auto& body = msg.archiveTrade;
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(body.modified == Now);
     for (const auto id : body.ids) {

@@ -29,15 +29,13 @@ struct Handler : MsgHandler<Handler> {
   int createMarketCalls{0};
   int updateMarketCalls{0};
   int createExecCalls{0};
-  int archiveOrderCalls{0};
   int archiveTradeCalls{0};
 
   void reset() { ++resetCalls; }
   void createMarket(const CreateMarketBody& body) { ++createMarketCalls; }
   void updateMarket(const UpdateMarketBody& body) { ++updateMarketCalls; }
   void createExec(const CreateExecBody& body) { ++createExecCalls; }
-  void archiveOrder(const ArchiveBody& body) { ++archiveOrderCalls; }
-  void archiveTrade(const ArchiveBody& body) { ++archiveTradeCalls; }
+  void archiveTrade(const ArchiveTradeBody& body) { ++archiveTradeCalls; }
 };
 
 } // anonymous
@@ -71,11 +69,6 @@ SWIRLY_TEST_CASE(MsgHandler)
   SWIRLY_CHECK(h.createExecCalls == 0);
   h.dispatch(m);
   SWIRLY_CHECK(h.createExecCalls == 1);
-
-  m.type = MsgType::ArchiveOrder;
-  SWIRLY_CHECK(h.archiveOrderCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.archiveOrderCalls == 1);
 
   m.type = MsgType::ArchiveTrade;
   SWIRLY_CHECK(h.archiveTradeCalls == 0);
