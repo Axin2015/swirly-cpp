@@ -26,7 +26,7 @@ class TestCase(RestTestCase):
         conn.setAccnt('MARAYL')
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12345)
 
         conn.setAccnt('GOSAYL')
         self.takeOrder(conn)
@@ -40,7 +40,7 @@ class TestCase(RestTestCase):
   def takeOrder(self, conn):
     resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
-                     lots = 3,
+                     lots = 5,
                      ticks = 12345)
 
     self.assertEqual(200, resp.status)
@@ -56,14 +56,14 @@ class TestCase(RestTestCase):
         u'id': 2,
         u'lastLots': None,
         u'lastTicks': None,
-        u'lots': 3,
+        u'liqInd': None,
+        u'lots': 5,
         u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 2,
         u'ref': None,
-        u'resd': 3,
-        u'liqInd': None,
+        u'resd': 5,
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'NEW',
@@ -78,14 +78,14 @@ class TestCase(RestTestCase):
         u'id': 4,
         u'lastLots': 3,
         u'lastTicks': 12345,
-        u'lots': 3,
+        u'liqInd': u'TAKER',
+        u'lots': 5,
         u'market': u'EURUSD.MAR14',
         u'matchId': 3,
         u'minLots': None,
         u'orderId': 2,
         u'ref': None,
-        u'resd': 0,
-        u'liqInd': u'TAKER',
+        u'resd': 2,
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
@@ -100,12 +100,12 @@ class TestCase(RestTestCase):
         u'id': 2,
         u'lastLots': 3,
         u'lastTicks': 12345,
-        u'lots': 3,
+        u'lots': 5,
         u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 0,
+        u'resd': 2,
         u'settlDate': 20170102,
         u'side': u'SELL',
         u'state': u'TRADE',
@@ -121,17 +121,17 @@ class TestCase(RestTestCase):
         u'settlDate': 20170102
       },
       u'view': {
-        u'bidCount': [1, None, None],
-        u'bidResd': [2, None, None],
-        u'bidTicks': [12345, None, None],
+        u'bidCount': [None, None, None],
+        u'bidResd': [None, None, None],
+        u'bidTicks': [None, None, None],
         u'contr': u'EURUSD',
         u'lastLots': 3,
         u'lastTicks': 12345,
         u'lastTime': self.now,
         u'market': u'EURUSD.MAR14',
-        u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
-        u'offerTicks': [None, None, None],
+        u'offerCount': [1, None, None],
+        u'offerResd': [2, None, None],
+        u'offerTicks': [12345, None, None],
         u'settlDate': 20170102
       }
     }, resp.content)
@@ -141,26 +141,7 @@ class TestCase(RestTestCase):
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
-    self.assertListEqual([{
-      u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 37035,
-      u'created': self.now,
-      u'exec': 3,
-      u'id': 1,
-      u'lastLots': 3,
-      u'lastTicks': 12345,
-      u'lots': 5,
-      u'market': u'EURUSD.MAR14',
-      u'minLots': None,
-      u'modified': self.now,
-      u'ref': None,
-      u'resd': 2,
-      u'settlDate': 20170102,
-      u'side': u'BUY',
-      u'state': u'TRADE',
-      u'ticks': 12345
-    }], resp.content)
+    self.assertListEqual([], resp.content)
 
   def makerExec(self, conn):
     resp = conn.send('GET', '/accnt/exec')
@@ -178,13 +159,13 @@ class TestCase(RestTestCase):
       u'lastLots': None,
       u'lastTicks': None,
       u'liqInd': None,
-      u'lots': 5,
+      u'lots': 3,
       u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 5,
+      u'resd': 3,
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'NEW',
@@ -200,13 +181,13 @@ class TestCase(RestTestCase):
       u'lastLots': 3,
       u'lastTicks': 12345,
       u'liqInd': u'MAKER',
-      u'lots': 5,
+      u'lots': 3,
       u'market': u'EURUSD.MAR14',
       u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 2,
+      u'resd': 0,
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
@@ -228,14 +209,14 @@ class TestCase(RestTestCase):
       u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 12345,
-      u'lots': 5,
+      u'liqInd': u'MAKER',
+      u'lots': 3,
       u'market': u'EURUSD.MAR14',
       u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 2,
-      u'liqInd': u'MAKER',
+      u'resd': 0,
       u'settlDate': 20170102,
       u'side': u'BUY',
       u'state': u'TRADE',
