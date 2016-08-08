@@ -88,15 +88,18 @@ class SWIRLY_API Posn : public RefCounted {
     sellLots_ += lots;
     sellCost_ += cost;
   }
-  void addTrade(Side side, Lots lastLots, Ticks lastTicks) noexcept
+  void addTrade(Side side, Lots lots, Cost cost) noexcept
   {
-    const auto cost = swirly::cost(lastLots, lastTicks);
     if (side == Side::Buy) {
-      addBuy(lastLots, cost);
+      addBuy(lots, cost);
     } else {
       assert(side == Side::Sell);
-      addSell(lastLots, cost);
+      addSell(lots, cost);
     }
+  }
+  void addTrade(Side side, Lots lots, Ticks ticks) noexcept
+  {
+    addTrade(side, lots, swirly::cost(lots, ticks));
   }
   /**
    * This function is typically used to change the settlement-day to zero during settlement.

@@ -481,7 +481,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   if (!matches.empty()) {
     assert(posn);
     impl_->commitMatches(accnt, book, now);
-    posn->addTrade(order->side(), order->lastLots(), order->lastTicks());
+    posn->addTrade(order->side(), order->exec(), order->cost());
   }
 }
 
