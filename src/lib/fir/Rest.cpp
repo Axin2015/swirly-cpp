@@ -251,7 +251,7 @@ void Rest::getView(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getView(ArrayView<Mnem> markets, Millis now, std::ostream& out) const
+void Rest::getView(ArrayView<Mnem> markets, Millis now, ostream& out) const
 {
   if (markets.size() == 1) {
     out << serv_.market(markets[0]).view();
@@ -330,7 +330,7 @@ void Rest::deleteTrade(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis no
   serv_.archiveTrade(accnt, market, ids, now);
 }
 
-void Rest::getOrder(const Accnt& accnt, Millis now, std::ostream& out) const
+void Rest::getOrder(const Accnt& accnt, Millis now, ostream& out) const
 {
   const auto& orders = accnt.orders();
   out << '[';
@@ -338,7 +338,7 @@ void Rest::getOrder(const Accnt& accnt, Millis now, std::ostream& out) const
   out << ']';
 }
 
-void Rest::getExec(const Accnt& accnt, Millis now, std::ostream& out) const
+void Rest::getExec(const Accnt& accnt, Millis now, ostream& out) const
 {
   const auto& execs = accnt.execs();
   out << '[';
@@ -347,7 +347,7 @@ void Rest::getExec(const Accnt& accnt, Millis now, std::ostream& out) const
   out << ']';
 }
 
-void Rest::getTrade(const Accnt& accnt, Millis now, std::ostream& out) const
+void Rest::getTrade(const Accnt& accnt, Millis now, ostream& out) const
 {
   const auto& trades = accnt.trades();
   out << '[';
@@ -355,7 +355,7 @@ void Rest::getTrade(const Accnt& accnt, Millis now, std::ostream& out) const
   out << ']';
 }
 
-void Rest::getPosn(const Accnt& accnt, Millis now, std::ostream& out) const
+void Rest::getPosn(const Accnt& accnt, Millis now, ostream& out) const
 {
   const auto& posns = accnt.posns();
   out << '[';

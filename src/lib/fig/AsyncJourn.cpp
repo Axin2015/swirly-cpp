@@ -25,10 +25,10 @@ using namespace std;
 
 namespace swirly {
 namespace {
-template <std::size_t StepN>
+template <size_t StepN>
 class MultiPart {
  public:
-  MultiPart(AsyncJourn& journ, std::size_t total) noexcept : journ_{journ}, window_{total} {}
+  MultiPart(AsyncJourn& journ, size_t total) noexcept : journ_{journ}, window_{total} {}
   ~MultiPart() noexcept
   {
     if (!done()) {
@@ -48,8 +48,8 @@ class MultiPart {
   MultiPart(MultiPart&&) = delete;
   MultiPart& operator=(MultiPart&&) = delete;
 
-  std::size_t index() const noexcept { return window_.index(); }
-  std::size_t size() const noexcept { return window_.size(); }
+  size_t index() const noexcept { return window_.index(); }
+  size_t size() const noexcept { return window_.size(); }
   More more() const noexcept { return window_.more(); }
   bool done() const noexcept { return window_.done(); }
   bool next() noexcept { return window_.next(); }

@@ -23,5 +23,5 @@ using namespace swirly;
 SWIRLY_TEST_CASE(Exception)
 {
   Exception e{"Foo"};
-  SWIRLY_CHECK(std::strcmp(e.what(), "Foo") == 0);
+  SWIRLY_CHECK(strcmp(e.what(), "Foo") == 0);
 }

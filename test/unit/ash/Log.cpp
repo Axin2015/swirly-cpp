@@ -41,7 +41,7 @@ ostream& operator<<(ostream& os, const Foo<int, int>& val)
 int lastLevel{};
 string lastMsg{};
 
-void testLogger(int level, std::string_view msg)
+void testLogger(int level, string_view msg)
 {
   lastLevel = level;
   lastMsg.assign(msg.data(), msg.size());

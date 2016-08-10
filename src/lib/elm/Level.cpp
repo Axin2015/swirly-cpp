@@ -82,7 +82,7 @@ LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (!inserted) {
     // Replace if exists.
     ValuePtr prev{&*it};

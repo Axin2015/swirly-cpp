@@ -51,10 +51,10 @@ struct JournState {
 struct TestJourn : Journ {
   bool pop(Msg& msg)
   {
-    std::unique_lock<std::mutex> lock{mutex_};
-    auto now = std::chrono::system_clock::now();
+    unique_lock<mutex> lock{mutex_};
+    auto now = chrono::system_clock::now();
     auto pred = [this]() { return !this->msgs_.empty(); };
-    if (!notEmpty_.wait_until(lock, now + std::chrono::seconds(2), pred)) {
+    if (!notEmpty_.wait_until(lock, now + chrono::seconds(2), pred)) {
       // Timeout.
       return false;
     }
@@ -66,7 +66,7 @@ struct TestJourn : Journ {
  protected:
   void doUpdate(const Msg& msg) override
   {
-    std::unique_lock<std::mutex> lock{mutex_};
+    unique_lock<mutex> lock{mutex_};
     msgs_.push(msg);
     lock.unlock();
     notEmpty_.notify_one();

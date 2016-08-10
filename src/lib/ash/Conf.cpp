@@ -59,7 +59,7 @@ bool Conf::get(const char* key, bool dfl) const noexcept
   return it != map_.end() ? stob(it->second, dfl) : dfl;
 }
 
-void Conf::read(std::istream& is)
+void Conf::read(istream& is)
 {
   VarSub varSub;
   parsePairs(is, [this, &varSub](const auto& key, string val) {

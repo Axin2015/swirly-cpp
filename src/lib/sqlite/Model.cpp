@@ -181,7 +181,7 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
   }
 }
 
-void Model::doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const
+void Model::doReadAccnt(Millis now, const ModelCallback<string_view>& cb) const
 {
   using namespace enumops;
 
@@ -402,7 +402,7 @@ void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
 
 } // sqlite
 
-std::unique_ptr<Model> makeModel(const Conf& conf)
+unique_ptr<Model> makeModel(const Conf& conf)
 {
   return make_unique<sqlite::Model>(conf);
 }

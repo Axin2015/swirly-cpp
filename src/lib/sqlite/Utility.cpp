@@ -75,7 +75,7 @@ DbPtr openDb(const char* path, int flags, const Conf& conf)
   return ptr;
 }
 
-StmtPtr prepare(sqlite3& db, std::string_view sql)
+StmtPtr prepare(sqlite3& db, string_view sql)
 {
   sqlite3_stmt* stmt;
   int rc{sqlite3_prepare_v2(&db, sql.data(), sql.size(), &stmt, nullptr)};
