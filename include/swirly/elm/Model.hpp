@@ -50,9 +50,9 @@ class SWIRLY_API Model {
     doReadAccnt(now, cb);
   }
   void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
-  void readExec(std::string_view accnt, const ModelCallback<ExecPtr>& cb) const
+  void readExec(std::string_view accnt, std::size_t limit, const ModelCallback<ExecPtr>& cb) const
   {
-    doReadExec(accnt, cb);
+    doReadExec(accnt, limit, cb);
   }
   void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
   void readPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
@@ -70,7 +70,8 @@ class SWIRLY_API Model {
 
   virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 
-  virtual void doReadExec(std::string_view accnt, const ModelCallback<ExecPtr>& cb) const = 0;
+  virtual void doReadExec(std::string_view accnt, std::size_t limit,
+                          const ModelCallback<ExecPtr>& cb) const = 0;
 
   virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
 

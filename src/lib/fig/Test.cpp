@@ -123,7 +123,7 @@ void TestModel::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
 }
 
-void TestModel::doReadExec(string_view accnt, const ModelCallback<ExecPtr>& cb) const
+void TestModel::doReadExec(string_view accnt, size_t limit, const ModelCallback<ExecPtr>& cb) const
 {
 }
 

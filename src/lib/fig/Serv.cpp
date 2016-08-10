@@ -317,7 +317,7 @@ void Serv::load(const Model& model, Millis now)
   });
   model.readAccnt(now, [&model, &impl = *impl_ ](auto mnem) {
     auto& accnt = impl.accnt(mnem);
-    model.readExec(mnem, [&accnt](auto ptr) { accnt.insertExec(ptr); });
+    model.readExec(mnem, accnt.execs().capacity(), [&accnt](auto ptr) { accnt.insertExec(ptr); });
   });
   model.readTrade([& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());

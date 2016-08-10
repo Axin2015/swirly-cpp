@@ -58,7 +58,7 @@ constexpr auto SelectOrderSql = //
 constexpr auto SelectExecSql = //
   "SELECT market, contr, settl_day, id, ref, order_id, state_id, side_id, lots, ticks," //
   " resd, exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
-  " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT 8;"_sv;
+  " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"_sv;
 
 constexpr auto SelectTradeSql = //
   "SELECT accnt, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
@@ -244,7 +244,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
   }
 }
 
-void Model::doReadExec(string_view accnt, const ModelCallback<ExecPtr>& cb) const
+void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<ExecPtr>& cb) const
 {
   enum { //
     Market, //
@@ -275,6 +275,7 @@ void Model::doReadExec(string_view accnt, const ModelCallback<ExecPtr>& cb) cons
   StmtPtr stmt{prepare(*db_, SelectExecSql)};
   ScopedBind bind{*stmt};
   bind(accnt);
+  bind(limit);
   while (step(*stmt)) {
     execs.push_back(Exec::make(accnt, //
                                column<string_view>(*stmt, Market), //
