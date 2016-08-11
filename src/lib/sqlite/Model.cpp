@@ -26,10 +26,6 @@
 
 #include <swirly/ash/Conf.hpp>
 
-#include <boost/range/adaptor/reversed.hpp>
-
-#include <vector>
-
 using namespace std;
 
 namespace swirly {
@@ -269,38 +265,32 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
     Created //
   };
 
-  vector<ExecPtr> execs;
-  execs.reserve(8);
-
   StmtPtr stmt{prepare(*db_, SelectExecSql)};
   ScopedBind bind{*stmt};
   bind(accnt);
   bind(limit);
   while (step(*stmt)) {
-    execs.push_back(Exec::make(accnt, //
-                               column<string_view>(*stmt, Market), //
-                               column<string_view>(*stmt, Contr), //
-                               column<Jday>(*stmt, SettlDay), //
-                               column<Iden>(*stmt, Id), //
-                               column<string_view>(*stmt, Ref), //
-                               column<Iden>(*stmt, OrderId), //
-                               column<swirly::State>(*stmt, State), //
-                               column<swirly::Side>(*stmt, Side), //
-                               column<swirly::Lots>(*stmt, Lots), //
-                               column<swirly::Ticks>(*stmt, Ticks), //
-                               column<swirly::Lots>(*stmt, Resd), //
-                               column<swirly::Lots>(*stmt, Exec), //
-                               column<swirly::Cost>(*stmt, Cost), //
-                               column<swirly::Lots>(*stmt, LastLots), //
-                               column<swirly::Ticks>(*stmt, LastTicks), //
-                               column<swirly::Lots>(*stmt, MinLots), //
-                               column<Iden>(*stmt, MatchId), //
-                               column<swirly::LiqInd>(*stmt, LiqInd), //
-                               column<string_view>(*stmt, Cpty), //
-                               column<Millis>(*stmt, Created)));
-  }
-  for (auto exec : boost::adaptors::reverse(execs)) {
-    cb(exec);
+    cb(Exec::make(accnt, //
+                  column<string_view>(*stmt, Market), //
+                  column<string_view>(*stmt, Contr), //
+                  column<Jday>(*stmt, SettlDay), //
+                  column<Iden>(*stmt, Id), //
+                  column<string_view>(*stmt, Ref), //
+                  column<Iden>(*stmt, OrderId), //
+                  column<swirly::State>(*stmt, State), //
+                  column<swirly::Side>(*stmt, Side), //
+                  column<swirly::Lots>(*stmt, Lots), //
+                  column<swirly::Ticks>(*stmt, Ticks), //
+                  column<swirly::Lots>(*stmt, Resd), //
+                  column<swirly::Lots>(*stmt, Exec), //
+                  column<swirly::Cost>(*stmt, Cost), //
+                  column<swirly::Lots>(*stmt, LastLots), //
+                  column<swirly::Ticks>(*stmt, LastTicks), //
+                  column<swirly::Lots>(*stmt, MinLots), //
+                  column<Iden>(*stmt, MatchId), //
+                  column<swirly::LiqInd>(*stmt, LiqInd), //
+                  column<string_view>(*stmt, Cpty), //
+                  column<Millis>(*stmt, Created)));
   }
 }
 

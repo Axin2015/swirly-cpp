@@ -99,10 +99,15 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     return orders_.remove(order);
   }
-  void insertExec(const ConstExecPtr& exec) noexcept
+  void pushExecBack(const ConstExecPtr& exec) noexcept
   {
     assert(exec->accnt() == mnem_);
     execs_.push_back(exec);
+  }
+  void pushExecFront(const ConstExecPtr& exec) noexcept
+  {
+    assert(exec->accnt() == mnem_);
+    execs_.push_front(exec);
   }
   void insertTrade(const ExecPtr& trade) noexcept
   {

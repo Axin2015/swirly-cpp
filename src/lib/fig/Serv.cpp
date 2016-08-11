@@ -212,14 +212,14 @@ struct Serv::Impl {
       if (makerOrder->done()) {
         makerAccnt.removeOrder(*makerOrder);
       }
-      makerAccnt.insertExec(makerTrade);
+      makerAccnt.pushExecFront(makerTrade);
       makerAccnt.insertTrade(makerTrade);
       match.makerPosn->addTrade(makerTrade->side(), makerTrade->lastLots(),
                                 makerTrade->lastTicks());
       // Update taker.
       const auto takerTrade = match.takerTrade;
       assert(takerTrade);
-      takerAccnt.insertExec(takerTrade);
+      takerAccnt.pushExecFront(takerTrade);
       takerAccnt.insertTrade(takerTrade);
     }
   }
@@ -248,7 +248,7 @@ struct Serv::Impl {
     // Commit phase.
 
     book.reviseOrder(order, lots, now);
-    accnt.insertExec(exec);
+    accnt.pushExecFront(exec);
   }
   void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
   {
@@ -265,7 +265,7 @@ struct Serv::Impl {
 
     book.cancelOrder(order, now);
     accnt.removeOrder(order);
-    accnt.insertExec(exec);
+    accnt.pushExecFront(exec);
   }
   void archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
   {
@@ -317,7 +317,7 @@ void Serv::load(const Model& model, Millis now)
   });
   model.readAccnt(now, [&model, &impl = *impl_ ](auto mnem) {
     auto& accnt = impl.accnt(mnem);
-    model.readExec(mnem, accnt.execs().capacity(), [&accnt](auto ptr) { accnt.insertExec(ptr); });
+    model.readExec(mnem, accnt.execs().capacity(), [&accnt](auto ptr) { accnt.pushExecBack(ptr); });
   });
   model.readTrade([& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
@@ -475,7 +475,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   if (!order->done()) {
     accnt.insertOrder(order);
   }
-  accnt.insertExec(newExec);
+  accnt.pushExecFront(newExec);
 
   // Commit matches.
   if (!matches.empty()) {
@@ -549,7 +549,7 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots
     auto it = accnt.orders().find(book.mnem(), exec->orderId());
     assert(it != accnt.orders().end());
     book.reviseOrder(*it, lots, now);
-    accnt.insertExec(exec);
+    accnt.pushExecFront(exec);
   }
 }
 
@@ -605,7 +605,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     assert(it != accnt.orders().end());
     book.cancelOrder(*it, now);
     accnt.removeOrder(*it);
-    accnt.insertExec(exec);
+    accnt.pushExecFront(exec);
   }
 }
 
@@ -638,7 +638,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
 
     // Commit phase.
 
-    cptyAccnt.insertExec(cptyTrade);
+    cptyAccnt.pushExecFront(cptyTrade);
     cptyAccnt.insertTrade(cptyTrade);
     cptyPosn->addTrade(cptyTrade->side(), cptyTrade->lastLots(), cptyTrade->lastTicks());
 
@@ -648,7 +648,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
 
     // Commit phase.
   }
-  accnt.insertExec(trade);
+  accnt.pushExecFront(trade);
   accnt.insertTrade(trade);
   posn->addTrade(trade->side(), trade->lastLots(), trade->lastTicks());
 
