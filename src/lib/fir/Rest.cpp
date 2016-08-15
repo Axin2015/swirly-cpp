@@ -113,7 +113,8 @@ void Rest::getMarket(Mnem mnem, Millis now, ostream& out) const
   out << serv_.market(mnem);
 }
 
-void Rest::getAccnt(Mnem mnem, EntitySet es, Millis now, ostream& out) const
+void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> limit, Millis now,
+                    ostream& out) const
 {
   const auto& accnt = serv_.accnt(mnem);
   int i{0};
@@ -128,7 +129,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, Millis now, ostream& out) const
       out << ',';
     }
     out << "\"execs\":";
-    getExec(accnt, now, out);
+    getExec(accnt, offset, limit, now, out);
     ++i;
   }
   if (es.trade()) {
@@ -184,9 +185,10 @@ void Rest::getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, ostream& out
   out << *it;
 }
 
-void Rest::getExec(Mnem accMnem, Millis now, ostream& out) const
+void Rest::getExec(Mnem accMnem, size_t offset, optional<size_t> limit, Millis now,
+                   ostream& out) const
 {
-  getExec(serv_.accnt(accMnem), now, out);
+  getExec(serv_.accnt(accMnem), offset, limit, now, out);
 }
 
 void Rest::getTrade(Mnem accMnem, Millis now, ostream& out) const
@@ -338,12 +340,25 @@ void Rest::getOrder(const Accnt& accnt, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getExec(const Accnt& accnt, Millis now, ostream& out) const
+void Rest::getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, Millis now,
+                   ostream& out) const
 {
   const auto& execs = accnt.execs();
   out << '[';
-  transform(execs.begin(), execs.end(), OStreamJoiner(out, ','),
-            [](const auto& ptr) -> const auto& { return *ptr; });
+  const auto size = execs.size();
+  if (offset < size) {
+    auto first = execs.begin();
+    advance(first, offset);
+    decltype(first) last;
+    if (limit && *limit < size - offset) {
+      last = first;
+      advance(last, *limit);
+    } else {
+      last = execs.end();
+    }
+    transform(first, last, OStreamJoiner(out, ','),
+              [](const auto& ptr) -> const auto& { return *ptr; });
+  }
   out << ']';
 }
 

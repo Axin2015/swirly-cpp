@@ -132,7 +132,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
  private:
   const Mnem mnem_;
   OrderIdSet orders_;
-  boost::circular_buffer<ConstExecPtr> execs_{8};
+  boost::circular_buffer<ConstExecPtr> execs_{20};
   ExecIdSet trades_;
   AccntPosnSet posns_;
   OrderRefSet refIdx_;

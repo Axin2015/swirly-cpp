@@ -56,6 +56,11 @@ class HttpMessage {
     return val ? +*val : std::string_view{};
   }
   auto body() const noexcept { return +impl_->body; }
+  template <std::size_t SizeN>
+  bool getVar(const char* name, char (&value)[SizeN]) const noexcept
+  {
+    return mg_get_http_var(&impl_->query_string, name, value, SizeN) >= 0;
+  }
 
  private:
   http_message* impl_;

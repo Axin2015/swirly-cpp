@@ -81,6 +81,31 @@ string_view getAccnt(HttpMessage data)
   }
   return accnt;
 }
+
+auto getOffset(HttpMessage data)
+{
+  size_t offset{0};
+  if (!data.queryString().empty()) {
+    char value[20];
+    if (data.getVar("offset", value)) {
+      offset = strtoul(value, nullptr, 0);
+    }
+  }
+  return offset;
+}
+
+auto getLimit(HttpMessage data)
+{
+  optional<size_t> limit;
+  if (!data.queryString().empty()) {
+    char value[20];
+    if (data.getVar("limit", value)) {
+      limit = strtoul(value, nullptr, 0);
+    }
+  }
+  return limit;
+}
+
 } // anonymous
 
 RestServ::~RestServ() noexcept = default;
@@ -374,9 +399,9 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /accnt
       state_ |= MatchMethod;
-      const int bs{EntitySet::Order | EntitySet::Exec | EntitySet::Trade | EntitySet::Posn
-                   | EntitySet::View};
-      rest_.getAccnt(getAccnt(data), bs, now, out_);
+      const auto es
+        = EntitySet::Order | EntitySet::Exec | EntitySet::Trade | EntitySet::Posn | EntitySet::View;
+      rest_.getAccnt(getAccnt(data), es, getOffset(data), getLimit(data), now, out_);
     }
     return;
   }
@@ -395,7 +420,7 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
       if (isSet(MethodGet)) {
         // GET /accnt/entity,entity...
         state_ |= MatchMethod;
-        rest_.getAccnt(getAccnt(data), es, now, out_);
+        rest_.getAccnt(getAccnt(data), es, getOffset(data), getLimit(data), now, out_);
       }
     }
     return;
@@ -506,7 +531,7 @@ void RestServ::execRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /accnt/exec
       state_ |= MatchMethod;
-      rest_.getExec(getAccnt(data), now, out_);
+      rest_.getExec(getAccnt(data), getOffset(data), getLimit(data), now, out_);
     }
     return;
   }

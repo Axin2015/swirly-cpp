@@ -52,7 +52,8 @@ class SWIRLY_API Rest {
 
   void getMarket(Mnem mnem, Millis now, std::ostream& out) const;
 
-  void getAccnt(Mnem mnem, EntitySet es, Millis now, std::ostream& out) const;
+  void getAccnt(Mnem mnem, EntitySet es, std::size_t offset, std::optional<std::size_t> limit,
+                Millis now, std::ostream& out) const;
 
   void getOrder(Mnem accMnem, Millis now, std::ostream& out) const;
 
@@ -60,7 +61,8 @@ class SWIRLY_API Rest {
 
   void getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, std::ostream& out) const;
 
-  void getExec(Mnem accMnem, Millis now, std::ostream& out) const;
+  void getExec(Mnem accMnem, std::size_t offset, std::optional<std::size_t> limit, Millis now,
+               std::ostream& out) const;
 
   void getTrade(Mnem accMnem, Millis now, std::ostream& out) const;
 
@@ -98,7 +100,8 @@ class SWIRLY_API Rest {
  private:
   void getOrder(const Accnt& accnt, Millis now, std::ostream& out) const;
 
-  void getExec(const Accnt& accnt, Millis now, std::ostream& out) const;
+  void getExec(const Accnt& accnt, std::size_t offset, std::optional<std::size_t> limit, Millis now,
+               std::ostream& out) const;
 
   void getTrade(const Accnt& accnt, Millis now, std::ostream& out) const;
 
