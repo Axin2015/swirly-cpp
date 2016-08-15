@@ -23,6 +23,7 @@
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/Numeric.hpp>
 #include <swirly/ash/System.hpp>
 #include <swirly/ash/Time.hpp>
 
@@ -163,18 +164,18 @@ int main(int argc, char* argv[])
       conf.read(is);
     }
 
-    memPool.reserve(conf.get("mem_pool", 1) << 20);
+    memPool.reserve(conf.get<size_t>("mem_pool", 1) << 20);
 
-    const char* const logLevel{conf.get("log_level")};
+    const char* const logLevel{conf.get("log_level", nullptr)};
     if (logLevel) {
       setLogLevel(atoi(logLevel));
     }
 
     // Restrict file creation mask if specified. The umask function is always successful.
-    const char* const fileMode{conf.get("file_mode")};
+    const char* const fileMode{conf.get("file_mode", nullptr)};
     if (fileMode) {
       // Zero base to auto-detect: if the prefix is 0, the base is octal, if the prefix is 0x or 0X.
-      umask(static_cast<mode_t>(strtol(fileMode, nullptr, 0)));
+      umask(numericCast<mode_t>(fileMode));
     } else if (opts.daemon) {
       umask(0027);
     }
@@ -234,8 +235,8 @@ int main(int argc, char* argv[])
     }
     const char* const httpPort{conf.get("http_port", "8080")};
 
-    const long journCapacity{conf.get("journ_capacity", 1L << 10)};
-    Rest rest{*journ, static_cast<size_t>(journCapacity)};
+    const auto journCapacity = conf.get<size_t>("journ_capacity", 1 << 10);
+    Rest rest{*journ, journCapacity};
     rest.load(*model, getTimeOfDay());
     model = nullptr;
 

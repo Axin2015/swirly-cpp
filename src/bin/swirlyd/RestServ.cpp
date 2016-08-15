@@ -22,6 +22,7 @@
 
 #include <swirly/ash/Finally.hpp>
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/Numeric.hpp>
 #include <swirly/ash/Time.hpp>
 
 #include <chrono>
@@ -88,7 +89,7 @@ auto getOffset(HttpMessage data)
   if (!data.queryString().empty()) {
     char value[20];
     if (data.getVar("offset", value)) {
-      offset = strtoul(value, nullptr, 0);
+      offset = numericCast<size_t>(value);
     }
   }
   return offset;
@@ -100,7 +101,7 @@ auto getLimit(HttpMessage data)
   if (!data.queryString().empty()) {
     char value[20];
     if (data.getVar("limit", value)) {
-      limit = strtoul(value, nullptr, 0);
+      limit = numericCast<size_t>(value);
     }
   }
   return limit;

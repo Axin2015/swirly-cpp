@@ -17,6 +17,7 @@
 #ifndef SWIRLY_ASH_CONF_HPP
 #define SWIRLY_ASH_CONF_HPP
 
+#include <swirly/ash/Numeric.hpp>
 #include <swirly/ash/String.hpp>
 
 #pragma GCC diagnostic push
@@ -70,11 +71,22 @@ class SWIRLY_API Conf {
   Conf(Conf&&);
   Conf& operator=(Conf&&);
 
-  const char* get(const char* key, const char* dfl = nullptr) const noexcept;
-  int get(const char* key, int dfl) const noexcept;
-  long get(const char* key, long dfl) const noexcept;
-  bool get(const char* key, bool dfl) const noexcept;
-
+  const char* get(const char* key, const char* dfl) const noexcept
+  {
+    auto it = map_.find(key);
+    return it != map_.end() ? it->second.c_str() : dfl;
+  }
+  bool get(const char* key, bool dfl) const noexcept
+  {
+    auto it = map_.find(key);
+    return it != map_.end() ? stob(it->second, dfl) : dfl;
+  }
+  template <typename ValueT, typename = std::enable_if_t<std::is_arithmetic<ValueT>::value>>
+  ValueT get(const char* key, ValueT dfl) const noexcept
+  {
+    auto it = map_.find(key);
+    return it != map_.end() ? numericCast<ValueT>(it->second.c_str()) : dfl;
+  }
   void clear() noexcept { map_.clear(); }
   void read(std::istream& is);
   void set(std::string key, std::string val) { map_.emplace(std::move(key), std::move(val)); }
