@@ -33,7 +33,7 @@ using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
 class SWIRLY_API Accnt : public Comparable<Accnt> {
  public:
-  explicit Accnt(Mnem mnem) noexcept : mnem_{mnem} {}
+  Accnt(Mnem mnem, std::size_t maxExecs) noexcept : mnem_{mnem}, execs_{maxExecs} {}
   ~Accnt() noexcept;
 
   // Copy.
@@ -132,7 +132,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
  private:
   const Mnem mnem_;
   OrderIdSet orders_;
-  boost::circular_buffer<ConstExecPtr> execs_{20};
+  boost::circular_buffer<ConstExecPtr> execs_;
   ExecIdSet trades_;
   AccntPosnSet posns_;
   OrderRefSet refIdx_;

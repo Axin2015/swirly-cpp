@@ -60,7 +60,7 @@ class AsyncWindow {
 
 class SWIRLY_API AsyncJourn {
  public:
-  AsyncJourn(Journ& journ, std::size_t capacity);
+  AsyncJourn(Journ& journ, std::size_t pipeCapacity);
   ~AsyncJourn() noexcept;
 
   // Copy.

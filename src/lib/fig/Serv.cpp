@@ -54,15 +54,17 @@ Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) no
 
 struct Serv::Impl {
 
-  Impl(Journ& journ, size_t capacity) noexcept : journ{journ, capacity} {}
-
+  Impl(Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
+    : journ{journ, pipeCapacity}, maxExecs{maxExecs}
+  {
+  }
   Accnt& accnt(Mnem mnem) const
   {
     AccntSet::Iterator it;
     bool found;
     tie(it, found) = accnts.findHint(mnem);
     if (!found) {
-      it = accnts.insertHint(it, Accnt::make(mnem));
+      it = accnts.insertHint(it, Accnt::make(mnem, maxExecs));
     }
     return *it;
   }
@@ -278,6 +280,7 @@ struct Serv::Impl {
 
   AsyncJourn journ;
   const BusinessDay busDay{RollHour, NewYork};
+  const size_t maxExecs;
   AssetSet assets;
   ContrSet contrs;
   MarketSet markets;
@@ -285,7 +288,8 @@ struct Serv::Impl {
   vector<Match> matches;
 };
 
-Serv::Serv(Journ& journ, size_t capacity) : impl_{make_unique<Impl>(journ, capacity)}
+Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
+  : impl_{make_unique<Impl>(journ, pipeCapacity, maxExecs)}
 {
 }
 

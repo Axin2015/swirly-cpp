@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
     {
       OStreamJoiner it(cout, ',');
       model->readAccnt(now, [&model, &it](auto mnem) {
-        model->readExec(mnem, 8, [&it](auto ptr) { it = *ptr; });
+        model->readExec(mnem, 1 << 4, [&it](auto ptr) { it = *ptr; });
       });
     }
     cout << "],\"trades\":[";

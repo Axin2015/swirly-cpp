@@ -127,8 +127,8 @@ class Mnem {
   }
   constexpr void assign(const char* rdata, std::size_t rlen) noexcept
   {
-    size_t i{0};
-    const size_t j{std::min(sizeof(buf_), rlen)};
+    std::size_t i{0};
+    const std::size_t j{std::min(sizeof(buf_), rlen)};
 
     for (; i < j; ++i) {
       buf_[i] = rdata[i];

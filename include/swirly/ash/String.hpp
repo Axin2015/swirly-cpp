@@ -272,7 +272,7 @@ std::size_t setCString(char (&lhs)[SizeN], const char* rhs) noexcept
 template <std::size_t SizeN>
 std::size_t setCString(char (&lhs)[SizeN], const char* rdata, std::size_t rlen) noexcept
 {
-  const size_t len{std::min(SizeN, rlen)};
+  const std::size_t len{std::min(SizeN, rlen)};
   if (len > 0) {
     std::memcpy(lhs, rdata, len);
   }

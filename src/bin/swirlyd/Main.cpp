@@ -235,8 +235,9 @@ int main(int argc, char* argv[])
     }
     const char* const httpPort{conf.get("http_port", "8080")};
 
-    const auto journCapacity = conf.get<size_t>("journ_capacity", 1 << 10);
-    Rest rest{*journ, journCapacity};
+    const auto pipeCapacity = conf.get<size_t>("pipe_capacity", 1 << 10);
+    const auto maxExecs = conf.get<size_t>("max_execs", 1 << 4);
+    Rest rest{*journ, pipeCapacity, maxExecs};
     rest.load(*model, getTimeOfDay());
     model = nullptr;
 
@@ -247,18 +248,19 @@ int main(int argc, char* argv[])
 
     SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
-    SWIRLY_INFO(logMsg() << "conf_file:      " << opts.confFile);
-    SWIRLY_INFO(logMsg() << "daemon:         " << (opts.daemon ? "yes" : "no"));
-    SWIRLY_INFO(logMsg() << "test_mode:      " << (opts.testMode ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "conf_file:     " << opts.confFile);
+    SWIRLY_INFO(logMsg() << "daemon:        " << (opts.daemon ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "test_mode:     " << (opts.testMode ? "yes" : "no"));
 
-    SWIRLY_INFO(logMsg() << "mem_pool:       " << (memPool.capacity() >> 20) << "MiB");
-    SWIRLY_INFO(logMsg() << "file_mode:      " << setfill('0') << setw(3) << oct
+    SWIRLY_INFO(logMsg() << "mem_pool:      " << (memPool.capacity() >> 20) << "MiB");
+    SWIRLY_INFO(logMsg() << "file_mode:     " << setfill('0') << setw(3) << oct
                          << swirly::fileMode());
-    SWIRLY_INFO(logMsg() << "run_dir:        " << runDir);
-    SWIRLY_INFO(logMsg() << "log_file:       " << logFile);
-    SWIRLY_INFO(logMsg() << "log_level:      " << getLogLevel());
-    SWIRLY_INFO(logMsg() << "http_port:      " << httpPort);
-    SWIRLY_INFO(logMsg() << "journ_capacity: " << journCapacity);
+    SWIRLY_INFO(logMsg() << "run_dir:       " << runDir);
+    SWIRLY_INFO(logMsg() << "log_file:      " << logFile);
+    SWIRLY_INFO(logMsg() << "log_level:     " << getLogLevel());
+    SWIRLY_INFO(logMsg() << "http_port:     " << httpPort);
+    SWIRLY_INFO(logMsg() << "pipe_capacity: " << pipeCapacity);
+    SWIRLY_INFO(logMsg() << "max_execs:     " << maxExecs);
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);

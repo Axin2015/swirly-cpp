@@ -25,7 +25,10 @@ namespace swirly {
 
 class SWIRLY_API Rest {
  public:
-  Rest(Journ& journ, size_t capacity) : serv_{journ, capacity} {}
+  Rest(Journ& journ, std::size_t pipeCapacity, std::size_t maxExecs)
+    : serv_{journ, pipeCapacity, maxExecs}
+  {
+  }
   ~Rest() noexcept;
 
   // Copy.

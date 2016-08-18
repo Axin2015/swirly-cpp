@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 
     const auto now = getTimeOfDay();
 
-    Serv serv{*journ, 1 << 10};
+    Serv serv{*journ, 1 << 10, 1 << 4};
     serv.load(*model, now);
     model = nullptr;
 

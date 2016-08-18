@@ -75,8 +75,8 @@ void worker(MsgPipe& pipe, Journ& journ)
 }
 } // anonymous
 
-AsyncJourn::AsyncJourn(Journ& journ, size_t capacity)
-  : pipe_{capacity}, thread_{worker, ref(pipe_), ref(journ)}
+AsyncJourn::AsyncJourn(Journ& journ, size_t pipeCapacity)
+  : pipe_{pipeCapacity}, thread_{worker, ref(pipe_), ref(journ)}
 {
 }
 
