@@ -78,16 +78,16 @@ Logger setLogger(Logger logger) noexcept
   return logger_.exchange(logger ? logger : nullLogger, memory_order_acq_rel);
 }
 
-void writeLog(int level, std::string_view msg) noexcept
+void writeLog(int level, string_view msg) noexcept
 {
   acquireLogger()(level, msg);
 }
 
-void nullLogger(int level, std::string_view msg) noexcept
+void nullLogger(int level, string_view msg) noexcept
 {
 }
 
-void stdLogger(int level, std::string_view msg) noexcept
+void stdLogger(int level, string_view msg) noexcept
 {
   const Millis ms{getTimeOfDay()};
   const auto now = static_cast<time_t>(unbox(ms) / 1000);
@@ -120,7 +120,7 @@ void stdLogger(int level, std::string_view msg) noexcept
 #pragma GCC diagnostic pop
 }
 
-void sysLogger(int level, std::string_view msg) noexcept
+void sysLogger(int level, string_view msg) noexcept
 {
   int prio;
   switch (level) {

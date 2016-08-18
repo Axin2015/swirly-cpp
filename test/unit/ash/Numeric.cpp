@@ -14,32 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/Conf.hpp>
+#include <swirly/ash/Numeric.hpp>
 
-#include <swirly/ash/VarSub.hpp>
-
-using namespace std;
-
-namespace swirly {
-
-Conf::Conf() = default;
-Conf::~Conf() noexcept = default;
-
-// Copy.
-Conf::Conf(const Conf&) = default;
-Conf& Conf::operator=(const Conf&) = default;
-
-// Move.
-Conf::Conf(Conf&&) = default;
-Conf& Conf::operator=(Conf&&) = default;
-
-void Conf::read(istream& is)
-{
-  VarSub varSub;
-  parsePairs(is, [this, &varSub](const auto& key, string val) {
-    varSub(val);
-    this->map_.emplace(key, move(val));
-  });
-}
-
-} // swirly
+#include <swirly/tea/Test.hpp>

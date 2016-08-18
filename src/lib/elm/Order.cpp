@@ -81,7 +81,7 @@ OrderRefSet::Iterator OrderRefSet::insert(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (inserted) {
     // Take ownership if inserted.
     value->addRef();
@@ -101,7 +101,7 @@ OrderRefSet::Iterator OrderRefSet::insertOrReplace(const ValuePtr& value) noexce
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (!inserted) {
     // Replace if exists.
     ValuePtr prev{&*it, false};

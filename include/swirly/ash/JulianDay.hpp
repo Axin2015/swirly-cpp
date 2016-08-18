@@ -86,42 +86,6 @@ constexpr IsoDate jdToIso(Jday jd) noexcept
 }
 
 /**
- * Juilian day to Modified Julian day. Epoch is November 17, 1858.
- */
-constexpr Jday jdToMjd(Jday jd) noexcept
-{
-  using namespace enumops;
-  return jd - 2400000_jd;
-}
-
-/**
- * Modified Julian day to Julian day. Epoch is November 17, 1858.
- */
-constexpr Jday mjdToJd(Jday mjd) noexcept
-{
-  using namespace enumops;
-  return mjd + 2400000_jd;
-}
-
-/**
- * Julian day to Truncated Julian day. Epoch is May 24, 1968.
- */
-constexpr Jday jdToTjd(Jday jd) noexcept
-{
-  using namespace enumops;
-  return jd - 2440000_jd;
-}
-
-/**
- * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
- */
-constexpr Jday tjdToJd(Jday tjd) noexcept
-{
-  using namespace enumops;
-  return tjd + 2440000_jd;
-}
-
-/**
  * Julian day to milliseconds since Unix epoch.
  */
 constexpr Millis jdToMs(Jday jd) noexcept

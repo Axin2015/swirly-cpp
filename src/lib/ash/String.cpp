@@ -121,7 +121,7 @@ void rtrim(string_view& s) noexcept
   s.remove_suffix(s.size() - (pos != string_view::npos ? pos + 1 : 0));
 }
 
-void rtrim(std::string& s) noexcept
+void rtrim(string& s) noexcept
 {
   const auto pos = s.find_last_not_of(Space);
   s.erase(pos != string_view::npos ? pos + 1 : 0);
@@ -140,7 +140,7 @@ pair<string_view, string_view> splitPair(string_view s, char delim) noexcept
   return {key, val};
 }
 
-SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, char delim)
+SWIRLY_API pair<string, string> splitPair(const string& s, char delim)
 {
   const auto pos = s.find_first_of(delim);
   string key, val;

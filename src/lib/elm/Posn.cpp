@@ -65,7 +65,7 @@ PosnSet::Iterator PosnSet::insert(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (inserted) {
     // Take ownership if inserted.
     value->addRef();
@@ -85,7 +85,7 @@ PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (!inserted) {
     // Replace if exists.
     ValuePtr prev{&*it, false};
@@ -110,7 +110,7 @@ AccntPosnSet::Iterator AccntPosnSet::insert(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (inserted) {
     // Take ownership if inserted.
     value->addRef();
@@ -130,7 +130,7 @@ AccntPosnSet::Iterator AccntPosnSet::insertOrReplace(const ValuePtr& value) noex
 {
   Iterator it;
   bool inserted;
-  std::tie(it, inserted) = set_.insert(*value);
+  tie(it, inserted) = set_.insert(*value);
   if (!inserted) {
     // Replace if exists.
     ValuePtr prev{&*it, false};

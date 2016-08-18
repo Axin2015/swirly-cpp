@@ -24,7 +24,7 @@ Accnt::~Accnt() noexcept = default;
 
 Accnt::Accnt(Accnt&&) = default;
 
-PosnPtr Accnt::posn(Mnem contr, Jday settlDay) throw(std::bad_alloc)
+PosnPtr Accnt::posn(Mnem contr, Jday settlDay) throw(bad_alloc)
 {
   AccntPosnSet::Iterator it;
   bool found;

@@ -185,7 +185,7 @@ void Journ::archiveTrade(const ArchiveTradeBody& body)
 
 } // sqlite
 
-std::unique_ptr<Journ> makeJourn(const Conf& conf)
+unique_ptr<Journ> makeJourn(const Conf& conf)
 {
   return make_unique<sqlite::Journ>(conf);
 }

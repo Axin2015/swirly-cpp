@@ -69,8 +69,9 @@ int main(int argc, char* argv[])
     cout << "],\"execs\":[";
     {
       OStreamJoiner it(cout, ',');
-      model->readAccnt(
-        now, [&model, &it](auto mnem) { model->readExec(mnem, [&it](auto ptr) { it = *ptr; }); });
+      model->readAccnt(now, [&model, &it](auto mnem) {
+        model->readExec(mnem, 1 << 4, [&it](auto ptr) { it = *ptr; });
+      });
     }
     cout << "],\"trades\":[";
     {
