@@ -47,6 +47,26 @@ void trace(void* unused, const char* sql)
 
 } // anonymous
 
+namespace detail {
+
+void bind32(sqlite3_stmt& stmt, int col, int32_t val)
+{
+  int rc{sqlite3_bind_int(&stmt, col, val)};
+  if (rc != SQLITE_OK) {
+    throw Error{errMsg() << "sqlite3_bind_int failed: " << lastError(stmt)};
+  }
+}
+
+void bind64(sqlite3_stmt& stmt, int col, int64_t val)
+{
+  int rc{sqlite3_bind_int64(&stmt, col, val)};
+  if (rc != SQLITE_OK) {
+    throw Error{errMsg() << "sqlite3_bind_int64 failed: " << lastError(stmt)};
+  }
+}
+
+} // detail
+
 DbPtr openDb(const char* path, int flags, const Conf& conf)
 {
   sqlite3* db;
@@ -107,22 +127,6 @@ void bind(sqlite3_stmt& stmt, int col, nullptr_t)
   int rc{sqlite3_bind_null(&stmt, col)};
   if (rc != SQLITE_OK) {
     throw Error{errMsg() << "sqlite3_bind_null failed: " << lastError(stmt)};
-  }
-}
-
-void bind(sqlite3_stmt& stmt, int col, int val)
-{
-  int rc{sqlite3_bind_int(&stmt, col, val)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_int failed: " << lastError(stmt)};
-  }
-}
-
-void bind(sqlite3_stmt& stmt, int col, int64_t val)
-{
-  int rc{sqlite3_bind_int64(&stmt, col, val)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_int64 failed: " << lastError(stmt)};
   }
 }
 

@@ -35,6 +35,12 @@ namespace swirly {
 class Conf;
 
 namespace sqlite {
+namespace detail {
+
+void bind32(sqlite3_stmt& stmt, int col, int32_t val);
+void bind64(sqlite3_stmt& stmt, int col, int64_t val);
+
+} // detail
 
 using DbPtr = std::unique_ptr<sqlite3, int (*)(sqlite3*)>;
 using StmtPtr = std::unique_ptr<sqlite3_stmt, int (*)(sqlite3_stmt*)>;
@@ -51,17 +57,15 @@ inline bool stepOnce(sqlite3_stmt& stmt)
   return step(stmt);
 }
 
-template <typename ValueT,
-          typename std::enable_if_t<std::is_same<ValueT, int>::value
-                                    || std::is_same<ValueT, unsigned>::value>* = nullptr>
+template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
+                                                     && (sizeof(ValueT) <= 32)>* = nullptr>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
   return sqlite3_column_int(&stmt, col);
 }
 
-template <typename ValueT,
-          typename std::enable_if_t<std::is_same<ValueT, int64_t>::value
-                                    || std::is_same<ValueT, uint64_t>::value>* = nullptr>
+template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
+                                                     && (sizeof(ValueT) > 32)>* = nullptr>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
   return sqlite3_column_int64(&stmt, col);
@@ -84,21 +88,21 @@ inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 
 void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
 
-void bind(sqlite3_stmt& stmt, int col, int val);
-
-inline void bind(sqlite3_stmt& stmt, int col, unsigned val)
-{
-  bind(stmt, col, static_cast<int>(val));
-}
-
-void bind(sqlite3_stmt& stmt, int col, int64_t val);
-
-inline void bind(sqlite3_stmt& stmt, int col, uint64_t val)
-{
-  bind(stmt, col, static_cast<int64_t>(val));
-}
-
 void bind(sqlite3_stmt& stmt, int col, std::string_view val);
+
+template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
+                                                     && (sizeof(ValueT) <= 32)>* = nullptr>
+void bind(sqlite3_stmt& stmt, int col, ValueT val)
+{
+  detail::bind32(stmt, col, val);
+}
+
+template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
+                                                     && (sizeof(ValueT) > 32)>* = nullptr>
+void bind(sqlite3_stmt& stmt, int col, ValueT val)
+{
+  detail::bind64(stmt, col, val);
+}
 
 constexpr struct MaybeNullTag {
 } MaybeNull{};
