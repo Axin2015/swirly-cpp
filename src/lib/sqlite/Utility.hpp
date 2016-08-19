@@ -58,14 +58,14 @@ inline bool stepOnce(sqlite3_stmt& stmt)
 }
 
 template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) <= 32)>* = nullptr>
+                                                     && (sizeof(ValueT) <= 4)>* = nullptr>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
   return sqlite3_column_int(&stmt, col);
 }
 
 template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) > 32)>* = nullptr>
+                                                     && (sizeof(ValueT) > 4)>* = nullptr>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
   return sqlite3_column_int64(&stmt, col);
@@ -91,14 +91,14 @@ void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
 void bind(sqlite3_stmt& stmt, int col, std::string_view val);
 
 template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) <= 32)>* = nullptr>
+                                                     && (sizeof(ValueT) <= 4)>* = nullptr>
 void bind(sqlite3_stmt& stmt, int col, ValueT val)
 {
   detail::bind32(stmt, col, val);
 }
 
 template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) > 32)>* = nullptr>
+                                                     && (sizeof(ValueT) > 4)>* = nullptr>
 void bind(sqlite3_stmt& stmt, int col, ValueT val)
 {
   detail::bind64(stmt, col, val);
