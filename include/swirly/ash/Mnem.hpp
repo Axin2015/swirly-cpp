@@ -127,10 +127,9 @@ class Mnem {
   }
   constexpr void assign(const char* rdata, std::size_t rlen) noexcept
   {
+    const std::size_t len{std::min(sizeof(buf_), rlen)};
     std::size_t i{0};
-    const std::size_t j{std::min(sizeof(buf_), rlen)};
-
-    for (; i < j; ++i) {
+    for (; i < len; ++i) {
       buf_[i] = rdata[i];
     }
     for (; i < sizeof(buf_); ++i) {
@@ -244,9 +243,16 @@ inline std::ostream& operator<<(std::ostream& os, Mnem rhs)
 }
 
 template <std::size_t SizeN>
-std::size_t setCString(char (&lhs)[SizeN], Mnem rhs) noexcept
+void setCString(char (&lhs)[SizeN], Mnem rhs) noexcept
 {
-  return setCString(lhs, rhs.data(), rhs.size());
+  constexpr std::size_t len{std::min(SizeN, MaxMnem)};
+  std::size_t i{0};
+  for (; i < len; ++i) {
+    lhs[i] = rhs[i];
+  }
+  for (; i < SizeN; ++i) {
+    lhs[i] = '\0';
+  }
 }
 
 /**

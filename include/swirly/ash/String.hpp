@@ -264,13 +264,13 @@ std::string_view toStringView(const char (&val)[SizeN]) noexcept
 }
 
 template <std::size_t SizeN>
-std::size_t setCString(char (&lhs)[SizeN], const char* rhs) noexcept
+void setCString(char (&lhs)[SizeN], const char* rhs) noexcept
 {
-  return stpncpy(lhs, rhs, SizeN) - &lhs[0];
+  strncpy(lhs, rhs, SizeN);
 }
 
 template <std::size_t SizeN>
-std::size_t setCString(char (&lhs)[SizeN], const char* rdata, std::size_t rlen) noexcept
+void setCString(char (&lhs)[SizeN], const char* rdata, std::size_t rlen) noexcept
 {
   const std::size_t len{std::min(SizeN, rlen)};
   if (len > 0) {
@@ -279,13 +279,12 @@ std::size_t setCString(char (&lhs)[SizeN], const char* rdata, std::size_t rlen) 
   if (len < SizeN) {
     std::memset(lhs + len, 0, SizeN - len);
   }
-  return len;
 }
 
 template <std::size_t SizeN>
-std::size_t setCString(char (&lhs)[SizeN], std::string_view rhs) noexcept
+void setCString(char (&lhs)[SizeN], std::string_view rhs) noexcept
 {
-  return setCString(lhs, rhs.data(), rhs.size());
+  setCString(lhs, rhs.data(), rhs.size());
 }
 
 SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;

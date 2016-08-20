@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 
     Archiver arch{serv};
     Response resp;
-    for (int i = 0; i < 5100; ++i) {
+    for (int i = 0; i < 25100; ++i) {
 
       // Reset profiles after warmup period.
       if (i == 100) {
