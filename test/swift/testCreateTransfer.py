@@ -23,8 +23,8 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAccnt('MARAYL')
 
+        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
         self.createDeposit(conn)
         self.createWithdraw(conn)
