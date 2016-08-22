@@ -473,7 +473,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     case MethodGet:
       // GET /accnt/order/MARKET
       state_ |= MatchMethod;
-      rest_.getOrder(market, now, out_);
+      rest_.getOrder(getAccnt(data), market, now, out_);
       break;
     case MethodPost:
       // POST /accnt/order/MARKET
@@ -565,7 +565,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     case MethodGet:
       // GET /accnt/trade/MARKET
       state_ |= MatchMethod;
-      rest_.getTrade(market, now, out_);
+      rest_.getTrade(getAccnt(data), market, now, out_);
       break;
     case MethodPost:
       // POST /accnt/trade/MARKET
@@ -635,7 +635,7 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /accnt/posn/CONTR
       state_ |= MatchMethod;
-      rest_.getPosn(contr, now, out_);
+      rest_.getPosn(getAccnt(data), contr, now, out_);
     }
     return;
   }
