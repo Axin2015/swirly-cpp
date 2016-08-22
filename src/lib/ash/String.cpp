@@ -21,11 +21,12 @@ using namespace std;
 namespace swirly {
 namespace {
 constexpr char Space[] = " \t\n\v\f\r";
-} // anonymous
 
-uint64_t stou64(string_view sv) noexcept
+template <typename ValueT>
+ValueT stou(string_view sv) noexcept
 {
-  uint64_t l{0};
+  // ValueT type must be unsigned.
+  enable_if_t<is_unsigned<ValueT>::value, ValueT> u{0};
   auto it = sv.begin(), end = sv.end();
 
   // Skip leading whitespace.
@@ -33,11 +34,23 @@ uint64_t stou64(string_view sv) noexcept
     ++it;
   }
   while (it != end && isdigit(*it)) {
-    l *= 10;
-    l += *it - '0';
+    u *= 10;
+    u += *it - '0';
     ++it;
   }
-  return l;
+  return u;
+}
+
+} // anonymous
+
+uint32_t stou32(string_view sv) noexcept
+{
+  return stou<uint32_t>(sv);
+}
+
+uint64_t stou64(string_view sv) noexcept
+{
+  return stou<uint64_t>(sv);
 }
 
 bool stob(string_view sv, bool dfl) noexcept

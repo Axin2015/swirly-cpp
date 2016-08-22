@@ -23,8 +23,8 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAccnt('MARAYL')
 
+        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
         self.updateDisplayOnly(conn)

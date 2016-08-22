@@ -23,15 +23,17 @@ class TestCase(RestTestCase):
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
-        conn.setAccnt('MARAYL')
 
+        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
+
+        conn.setAuth('MARAYL', 0x2)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
 
-        conn.setAccnt('GOSAYL')
+        conn.setAuth('GOSAYL', 0x2)
         self.takeOrder(conn)
 
-        conn.setAccnt('MARAYL')
+        conn.setAuth('MARAYL', 0x2)
         self.makerOrder(conn)
         self.makerExec(conn)
         self.makerTrade(conn)
