@@ -19,7 +19,7 @@ class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
-    self.now = 1459974268204
+    self.now = 1388534400000
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
@@ -35,8 +35,8 @@ class TestCase(RestTestCase):
                      mnem = 'USDJPY.MAR14',
                      display = 'first',
                      contr = 'USDJPY',
-                     settlDate = 20170102,
-                     expiryDate = 20170101,
+                     settlDate = 20140302,
+                     expiryDate = 20140301,
                      state = 1)
 
     self.assertEqual(200, resp.status)
@@ -44,9 +44,9 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'first',
-      u'expiryDate': 20170101,
+      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
-      u'settlDate': 20170102,
+      u'settlDate': 20140302,
       u'state': 1
     }, resp.content)
 
@@ -59,9 +59,9 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'second',
-      u'expiryDate': 20170101,
+      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
-      u'settlDate': 20170102,
+      u'settlDate': 20140302,
       u'state': 2
     }, resp.content)
 
@@ -75,9 +75,9 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'third',
-      u'expiryDate': 20170101,
+      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
-      u'settlDate': 20170102,
+      u'settlDate': 20140302,
       u'state': 2
     }, resp.content)
 
@@ -90,8 +90,8 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'third',
-      u'expiryDate': 20170101,
+      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
-      u'settlDate': 20170102,
+      u'settlDate': 20140302,
       u'state': 3
     }, resp.content)

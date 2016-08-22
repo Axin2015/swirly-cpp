@@ -19,13 +19,13 @@ class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
-    self.now = 1459974268204
+    self.now = 1388534400000
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
 
         conn.setAuth('ADMIN', 0x1)
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
         self.createDeposit(conn)
         self.createWithdraw(conn)
 
@@ -56,7 +56,7 @@ class TestCase(RestTestCase):
       u'ref': u'test1',
       u'resd': 0,
       u'liqInd': None,
-      u'settlDate': 20170102,
+      u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'TRADE',
       u'ticks': 0
@@ -89,7 +89,7 @@ class TestCase(RestTestCase):
       u'ref': u'test1',
       u'resd': 0,
       u'liqInd': None,
-      u'settlDate': 20170102,
+      u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'TRADE',
       u'ticks': 0

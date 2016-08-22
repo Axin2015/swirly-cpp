@@ -19,13 +19,13 @@ class TestCase(RestTestCase):
 
   def test(self):
     self.maxDiff = None
-    self.now = 1459974268204
+    self.now = 1388534400000
     with Fixture() as fixture:
       with Connection() as conn:
         conn.setTime(self.now)
 
         conn.setAuth('ADMIN', 0x1)
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20170102, 20170101)
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
         conn.setAuth('MARAYL', 0x2)
         self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12345)
@@ -59,7 +59,7 @@ class TestCase(RestTestCase):
         u'orderId': 2,
         u'ref': None,
         u'resd': 0,
-        u'settlDate': 20170102,
+        u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
@@ -79,7 +79,7 @@ class TestCase(RestTestCase):
         u'modified': self.now,
         u'ref': None,
         u'resd': 0,
-        u'settlDate': 20170102,
+        u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
@@ -97,7 +97,7 @@ class TestCase(RestTestCase):
         u'offerCount': [None, None, None],
         u'offerResd': [None, None, None],
         u'offerTicks': [None, None, None],
-        u'settlDate': 20170102
+        u'settlDate': 20140302
       }
     }, resp.content)
 
@@ -125,7 +125,7 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resd': 0,
         u'liqInd': None,
-        u'settlDate': 20170102,
+        u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
@@ -147,7 +147,7 @@ class TestCase(RestTestCase):
         u'ref': None,
         u'resd': 0,
         u'liqInd': None,
-        u'settlDate': 20170102,
+        u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
@@ -167,7 +167,7 @@ class TestCase(RestTestCase):
         u'modified': self.now,
         u'ref': None,
         u'resd': 0,
-        u'settlDate': 20170102,
+        u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
@@ -186,7 +186,7 @@ class TestCase(RestTestCase):
         u'modified': self.now,
         u'ref': None,
         u'resd': 0,
-        u'settlDate': 20170102,
+        u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
@@ -204,6 +204,6 @@ class TestCase(RestTestCase):
         u'offerCount': [None, None, None],
         u'offerResd': [None, None, None],
         u'offerTicks': [None, None, None],
-        u'settlDate': 20170102
+        u'settlDate': 20140302
       }
     }, resp.content)
