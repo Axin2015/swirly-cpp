@@ -22,7 +22,10 @@
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <boost/circular_buffer.hpp>
+#pragma GCC diagnostic pop
 
 namespace swirly {
 
