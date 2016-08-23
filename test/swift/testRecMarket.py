@@ -26,71 +26,50 @@ class TestCase(RestTestCase):
 
         conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
-        self.createDeposit(conn)
-        self.createWithdraw(conn)
+        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
+        self.createMarket(conn, 'USDCHF.MAR14', 'USDCHF', 20140302, 20140301)
 
-  def createDeposit(self, conn):
-    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
-                     accnt = 'MARAYL',
-                     ref = 'test1',
-                     side = 'BUY',
-                     lots = 10)
+        self.getAll(conn)
+        self.getByMnem(conn)
 
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertListEqual([{
-      u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
-      u'cpty': None,
-      u'created': self.now,
-      u'exec': 10,
-      u'id': 1,
-      u'lastLots': 10,
-      u'lastTicks': 0,
-      u'lots': 10,
-      u'market': u'EURUSD.MAR14',
-      u'matchId': None,
-      u'minLots': 1,
-      u'orderId': 0,
-      u'ref': u'test1',
-      u'resd': 0,
-      u'liqInd': None,
-      u'settlDate': 20140302,
-      u'side': u'BUY',
-      u'state': u'TRADE',
-      u'ticks': 0
-    }], resp.content)
-
-  def createWithdraw(self, conn):
-    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
-                     accnt = 'MARAYL',
-                     ref = 'test1',
-                     side = 'SELL',
-                     lots = 10)
+  def getAll(self, conn):
+    resp = conn.send('GET', '/rec/market')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
-      u'accnt': u'MARAYL',
       u'contr': u'EURUSD',
-      u'cost': 0,
-      u'cpty': None,
-      u'created': self.now,
-      u'exec': 10,
-      u'id': 2,
-      u'lastLots': 10,
-      u'lastTicks': 0,
-      u'lots': 10,
-      u'market': u'EURUSD.MAR14',
-      u'matchId': None,
-      u'minLots': 1,
-      u'orderId': 0,
-      u'ref': u'test1',
-      u'resd': 0,
-      u'liqInd': None,
+      u'display': u'EURUSD.MAR14',
+      u'expiryDate': 20140301,
+      u'mnem': u'EURUSD.MAR14',
       u'settlDate': 20140302,
-      u'side': u'SELL',
-      u'state': u'TRADE',
-      u'ticks': 0
+      u'state': 0
+    }, {
+      u'contr': u'GBPUSD',
+      u'display': u'GBPUSD.MAR14',
+      u'expiryDate': 20140301,
+      u'mnem': u'GBPUSD.MAR14',
+      u'settlDate': 20140302,
+      u'state': 0
+    }, {
+      u'contr': u'USDCHF',
+      u'display': u'USDCHF.MAR14',
+      u'expiryDate': 20140301,
+      u'mnem': u'USDCHF.MAR14',
+      u'settlDate': 20140302,
+      u'state': 0
     }], resp.content)
+
+  def getByMnem(self, conn):
+    resp = conn.send('GET', '/rec/market/EURUSD.MAR14')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'contr': u'EURUSD',
+      u'display': u'EURUSD.MAR14',
+      u'expiryDate': 20140301,
+      u'mnem': u'EURUSD.MAR14',
+      u'settlDate': 20140302,
+      u'state': 0
+    }, resp.content)
