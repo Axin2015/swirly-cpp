@@ -180,12 +180,17 @@ class Connection(object):
   def setTime(self, time):
     self.time = time
 
-  def setAuth(self, accnt, perm = None):
-    self.accnt = accnt
-    self.perm = perm
+  def setAnon(self):
+    self.accnt = None
+    self.perm = None
 
-  def setPerm(self, perm):
-    self.role = role
+  def setAdmin(self):
+    self.accnt = 'ADMIN'
+    self.perm = 0x1
+
+  def setTrader(self, accnt):
+    self.accnt = accnt
+    self.perm = 0x2
 
   def send(self, method, uri, **kwargs):
     content = ''
@@ -209,6 +214,7 @@ class Connection(object):
 class RestTestCase(unittest.TestCase):
 
   def createMarket(self, conn, mnem, contr, settlDate, expiryDate):
+    conn.setAdmin()
     resp = conn.send('POST', '/rec/market',
                      mnem = mnem,
                      display = mnem,
@@ -220,7 +226,8 @@ class RestTestCase(unittest.TestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
 
-  def createOrder(self, conn, market, side, lots, ticks):
+  def createOrder(self, conn, accnt, market, side, lots, ticks):
+    conn.setTrader(accnt)
     resp = conn.send('POST', '/accnt/order/' + market,
                      side = side,
                      lots = lots,

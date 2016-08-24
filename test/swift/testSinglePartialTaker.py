@@ -24,22 +24,18 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12345)
 
-        conn.setAuth('GOSAYL', 0x2)
         self.takeOrder(conn)
-
-        conn.setAuth('MARAYL', 0x2)
         self.makerOrder(conn)
         self.makerExec(conn)
         self.makerTrade(conn)
         self.makerPosn(conn)
 
   def takeOrder(self, conn):
+    conn.setTrader('GOSAYL')
     resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
@@ -139,6 +135,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def makerOrder(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/order')
 
     self.assertEqual(200, resp.status)
@@ -146,6 +143,7 @@ class TestCase(RestTestCase):
     self.assertListEqual([], resp.content)
 
   def makerExec(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec')
 
     self.assertEqual(200, resp.status)
@@ -197,6 +195,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def makerTrade(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/trade')
 
     self.assertEqual(200, resp.status)
@@ -226,6 +225,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def makerPosn(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/posn')
 
     self.assertEqual(200, resp.status)

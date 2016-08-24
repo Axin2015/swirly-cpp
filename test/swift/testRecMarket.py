@@ -24,7 +24,6 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
         self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
         self.createMarket(conn, 'USDCHF.MAR14', 'USDCHF', 20140302, 20140301)
@@ -33,6 +32,7 @@ class TestCase(RestTestCase):
         self.getByMnem(conn)
 
   def getAll(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/rec/market')
 
     self.assertEqual(200, resp.status)
@@ -61,6 +61,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getByMnem(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/rec/market/EURUSD.MAR14')
 
     self.assertEqual(200, resp.status)

@@ -24,18 +24,18 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12345)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 7, 12345)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 11, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 7, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 11, 12345)
+
         self.cancelSingle(conn)
         self.cancelMulti(conn)
 
   def cancelSingle(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/2', lots = 0);
 
     self.assertEqual(200, resp.status)
@@ -102,6 +102,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def cancelMulti(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,3', lots = 0);
 
     self.assertEqual(200, resp.status)

@@ -24,13 +24,13 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
         self.updateDisplayOnly(conn)
         self.updateStateOnly(conn)
 
   def createMarket(self, conn):
+    conn.setAdmin()
     resp = conn.send('POST', '/rec/market',
                      mnem = 'USDJPY.MAR14',
                      display = 'first',
@@ -51,6 +51,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateDisplayAndState(self, conn):
+    conn.setAdmin()
     resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = 'second',
                      state = 2)
@@ -66,6 +67,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateDisplayOnly(self, conn):
+    conn.setAdmin()
     resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = 'third',
                      state = None)
@@ -82,6 +84,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateStateOnly(self, conn):
+    conn.setAdmin()
     resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = None,
                      state = 3)

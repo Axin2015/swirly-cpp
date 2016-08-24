@@ -28,6 +28,7 @@ class TestCase(RestTestCase):
         self.getByMnem(conn)
 
   def getAll(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/rec/contr')
 
     self.assertEqual(200, resp.status)
@@ -287,6 +288,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getByMnem(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/rec/contr/EURUSD')
 
     self.assertEqual(200, resp.status)

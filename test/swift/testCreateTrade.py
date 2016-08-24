@@ -24,12 +24,13 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
+
         self.createMakerBuy(conn)
         self.createTakerSell(conn)
 
   def createMakerBuy(self, conn):
+    conn.setAdmin()
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
                      accnt = 'MARAYL',
                      ref = 'test1',
@@ -88,6 +89,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def createTakerSell(self, conn):
+    conn.setAdmin()
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
                      accnt = 'MARAYL',
                      ref = 'test2',

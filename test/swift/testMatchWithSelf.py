@@ -24,14 +24,14 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12345)
+
         self.takeOrder(conn)
 
   def takeOrder(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
                      side = 'SELL',
                      lots = 5,
