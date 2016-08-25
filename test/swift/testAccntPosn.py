@@ -24,26 +24,40 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
         self.createMarket(conn, 'EURUSD.APR14', 'EURUSD', 20140402, 20140401)
         self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 3, 12346)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 3, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12346)
 
-        self.createOrder(conn, 'EURUSD.APR14', 'SELL', 5, 12346)
-        self.createOrder(conn, 'EURUSD.APR14', 'BUY', 5, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.APR14', 'SELL', 5, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.APR14', 'BUY', 5, 12346)
 
-        self.createOrder(conn, 'GBPUSD.MAR14', 'SELL', 7, 15346)
-        self.createOrder(conn, 'GBPUSD.MAR14', 'BUY', 7, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 7, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 7, 15346)
+
+        self.checkAuth(conn)
 
         self.getAll(conn)
         self.getByContr(conn)
         self.getBySettlDate(conn)
 
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x2)
+    resp = conn.send('GET', '/accnt/posn')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = conn.send('GET', '/accnt/posn')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
   def getAll(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/posn')
 
     self.assertEqual(200, resp.status)
@@ -75,6 +89,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getByContr(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/posn/EURUSD')
 
     self.assertEqual(200, resp.status)
@@ -98,6 +113,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getBySettlDate(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/posn/EURUSD/20140302')
 
     self.assertEqual(200, resp.status)

@@ -24,17 +24,32 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12345)
+
+        self.checkAuth(conn)
+
         self.reviseSingle(conn)
         self.reviseMulti(conn)
 
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x2)
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
   def reviseSingle(self, conn):
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1', lots = 4);
+    conn.setTrader('MARAYL')
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1', lots = 4)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -100,7 +115,8 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def reviseMulti(self, conn):
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,2', lots = 3);
+    conn.setTrader('MARAYL')
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,2', lots = 3)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

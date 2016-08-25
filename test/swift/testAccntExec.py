@@ -24,18 +24,18 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
         self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 5, 12347)
-        self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 3, 12346)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12344)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12343)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 5, 12347)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 3, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12344)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12343)
 
-        self.createOrder(conn, 'GBPUSD.MAR14', 'SELL', 3, 15346)
-        self.createOrder(conn, 'GBPUSD.MAR14', 'BUY', 3, 15344)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 3, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 3, 15344)
+
+        self.checkAuth(conn)
 
         self.getAll(conn)
         self.getOffset(conn)
@@ -45,7 +45,21 @@ class TestCase(RestTestCase):
         self.exceedOffset(conn)
         self.exceedLimit(conn)
 
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x2)
+    resp = conn.send('GET', '/accnt/exec')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = conn.send('GET', '/accnt/exec')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
   def getAll(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec')
 
     self.assertEqual(200, resp.status)
@@ -185,6 +199,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getOffset(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec?offset=2')
 
     self.assertEqual(200, resp.status)
@@ -280,6 +295,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getLimit(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec?limit=3')
 
     self.assertEqual(200, resp.status)
@@ -353,6 +369,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getOffsetAndLimit(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec?offset=2&limit=3')
 
     self.assertEqual(200, resp.status)
@@ -426,6 +443,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def exceedOffset(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec?offset=99&limit=3')
 
     self.assertEqual(200, resp.status)
@@ -434,6 +452,7 @@ class TestCase(RestTestCase):
     ], resp.content)
 
   def exceedLimit(self, conn):
+    conn.setTrader('MARAYL')
     resp = conn.send('GET', '/accnt/exec?offset=0&limit=99')
 
     self.assertEqual(200, resp.status)

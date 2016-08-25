@@ -24,32 +24,31 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
         self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
         self.createMarket(conn, 'USDCHF.MAR14', 'USDCHF', 20140302, 20140301)
 
-        conn.setAuth('MARAYL', 0x2)
-        self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 7, 12348)
-        self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 5, 12347)
-        self.createOrder(conn, 'EURUSD.MAR14', 'SELL', 3, 12346)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 3, 12344)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 5, 12343)
-        self.createOrder(conn, 'EURUSD.MAR14', 'BUY', 7, 12343)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 7, 12348)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 5, 12347)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 3, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12344)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12343)
+        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 7, 12343)
 
-        self.createOrder(conn, 'GBPUSD.MAR14', 'SELL', 5, 15346)
-        self.createOrder(conn, 'GBPUSD.MAR14', 'SELL', 3, 15346)
-        self.createOrder(conn, 'GBPUSD.MAR14', 'BUY', 3, 15344)
-        self.createOrder(conn, 'GBPUSD.MAR14', 'BUY', 5, 15343)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 5, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 3, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 3, 15344)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 5, 15343)
 
-        self.createOrder(conn, 'USDCHF.MAR14', 'SELL', 3, 9346)
-        self.createOrder(conn, 'USDCHF.MAR14', 'BUY', 3, 9344)
+        self.createOrder(conn, 'MARAYL', 'USDCHF.MAR14', 'SELL', 3, 9346)
+        self.createOrder(conn, 'MARAYL', 'USDCHF.MAR14', 'BUY', 3, 9344)
 
         self.getAll(conn)
         self.getMulti(conn)
         self.getSingle(conn)
 
   def getAll(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/view')
 
     self.assertEqual(200, resp.status)
@@ -96,6 +95,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getMulti(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/view/EURUSD.MAR14,USDCHF.MAR14')
 
     self.assertEqual(200, resp.status)
@@ -129,6 +129,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def getSingle(self, conn):
+    conn.setAnon()
     resp = conn.send('GET', '/view/EURUSD.MAR14')
 
     self.assertEqual(200, resp.status)

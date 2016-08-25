@@ -24,12 +24,28 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
+
+        self.checkAuth(conn)
+
         self.createMakerBuy(conn)
         self.createTakerSell(conn)
 
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x1)
+    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
   def createMakerBuy(self, conn):
+    conn.setAdmin()
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
                      accnt = 'MARAYL',
                      ref = 'test1',
@@ -88,6 +104,7 @@ class TestCase(RestTestCase):
     }], resp.content)
 
   def createTakerSell(self, conn):
+    conn.setAdmin()
     resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
                      accnt = 'MARAYL',
                      ref = 'test2',

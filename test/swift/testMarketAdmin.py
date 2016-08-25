@@ -24,13 +24,38 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        conn.setAuth('ADMIN', 0x1)
+        self.checkAuth(conn)
+
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
         self.updateDisplayOnly(conn)
         self.updateStateOnly(conn)
 
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x1)
+    resp = conn.send('POST', '/rec/market')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    resp = conn.send('POST', '/rec/market')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
   def createMarket(self, conn):
+    conn.setAdmin()
     resp = conn.send('POST', '/rec/market',
                      mnem = 'USDJPY.MAR14',
                      display = 'first',
@@ -51,6 +76,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateDisplayAndState(self, conn):
+    conn.setAdmin()
     resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = 'second',
                      state = 2)
@@ -66,6 +92,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateDisplayOnly(self, conn):
+    conn.setAdmin()
     resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = 'third',
                      state = None)
@@ -82,6 +109,7 @@ class TestCase(RestTestCase):
     }, resp.content)
 
   def updateStateOnly(self, conn):
+    conn.setAdmin()
     resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
                      display = None,
                      state = 3)
