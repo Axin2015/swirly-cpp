@@ -60,6 +60,8 @@ class Shell(Cmd):
     self.env = {}
     if 'SWIRLY_ACCNT' in os.environ:
       self.env['ACCNT'] = os.environ['SWIRLY_ACCNT']
+    if 'SWIRLY_PERM' in os.environ:
+      self.env['PERM'] = os.environ['SWIRLY_PERM']
 
   def __enter__(self):
     return self
@@ -79,6 +81,8 @@ class Shell(Cmd):
     conn.putheader('Accept', 'application/json')
     if 'ACCNT' in self.env:
       conn.putheader('Swirly-Accnt', self.env['ACCNT'])
+    if 'PERM' in self.env:
+      conn.putheader('Swirly-Perm', self.env['PERM'])
     conn.putheader('Content-Length', len(content))
     conn.putheader('Content-Type', 'application/json')
     conn.endheaders()
@@ -221,20 +225,151 @@ class Shell(Cmd):
       '|{market:<{marketLen}}'
       '|{contr:<{contrLen}}'
       '|{settlDate:<{settlDateLen}}'
-      '|{id:<{idLen}}'
+      '|{id:>{idLen}}'
       '|{ref:<{refLen}}'
       '|{state:<{stateLen}}'
       '|{side:<{sideLen}}'
-      '|{lots:<{lotsLen}}'
-      '|{ticks:<{ticksLen}}'
-      '|{resd:<{resdLen}}'
-      '|{exec:<{execLen}}'
-      '|{cost:<{costLen}}'
-      '|{lastLots:<{lastLotsLen}}'
-      '|{lastTicks:<{lastTicksLen}}'
-      '|{minLots:<{minLotsLen}}'
+      '|{lots:>{lotsLen}}'
+      '|{ticks:>{ticksLen}}'
+      '|{resd:>{resdLen}}'
+      '|{exec:>{execLen}}'
+      '|{cost:>{costLen}}'
+      '|{lastLots:>{lastLotsLen}}'
+      '|{lastTicks:>{lastTicksLen}}'
+      '|{minLots:>{minLotsLen}}'
       '|{created:<{createdLen}}'
       '|{modified:<{modifiedLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_exec(self, args):
+    """Usage: exec"""
+    resp = self.send('GET', '/accnt/exec')
+    cols = [
+      'accnt',
+      'market',
+      'contr',
+      'settlDate',
+      'id',
+      'ref',
+      'orderId',
+      'state',
+      'side',
+      'lots',
+      'ticks',
+      'resd',
+      'exec',
+      'cost',
+      'lastLots',
+      'lastTicks',
+      'minLots',
+      'matchId',
+      'liqInd',
+      'cpty',
+      'created'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{accnt:<{accntLen}}'
+      '|{market:<{marketLen}}'
+      '|{contr:<{contrLen}}'
+      '|{settlDate:<{settlDateLen}}'
+      '|{id:>{idLen}}'
+      '|{ref:<{refLen}}'
+      '|{orderId:>{orderIdLen}}'
+      '|{state:<{stateLen}}'
+      '|{side:<{sideLen}}'
+      '|{lots:>{lotsLen}}'
+      '|{ticks:>{ticksLen}}'
+      '|{resd:>{resdLen}}'
+      '|{exec:>{execLen}}'
+      '|{cost:>{costLen}}'
+      '|{lastLots:>{lastLotsLen}}'
+      '|{lastTicks:>{lastTicksLen}}'
+      '|{minLots:>{minLotsLen}}'
+      '|{matchId:>{matchIdLen}}'
+      '|{liqInd:<{liqIndLen}}'
+      '|{cpty:<{cptyLen}}'
+      '|{created:<{createdLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_trade(self, args):
+    """Usage: trade"""
+    resp = self.send('GET', '/accnt/trade')
+    cols = [
+      'accnt',
+      'market',
+      'contr',
+      'settlDate',
+      'id',
+      'ref',
+      'orderId',
+      'state',
+      'side',
+      'lots',
+      'ticks',
+      'resd',
+      'exec',
+      'cost',
+      'lastLots',
+      'lastTicks',
+      'minLots',
+      'matchId',
+      'liqInd',
+      'cpty',
+      'created'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{accnt:<{accntLen}}'
+      '|{market:<{marketLen}}'
+      '|{contr:<{contrLen}}'
+      '|{settlDate:<{settlDateLen}}'
+      '|{id:>{idLen}}'
+      '|{ref:<{refLen}}'
+      '|{orderId:>{orderIdLen}}'
+      '|{state:<{stateLen}}'
+      '|{side:<{sideLen}}'
+      '|{lots:>{lotsLen}}'
+      '|{ticks:>{ticksLen}}'
+      '|{resd:>{resdLen}}'
+      '|{exec:>{execLen}}'
+      '|{cost:>{costLen}}'
+      '|{lastLots:>{lastLotsLen}}'
+      '|{lastTicks:>{lastTicksLen}}'
+      '|{minLots:>{minLotsLen}}'
+      '|{matchId:>{matchIdLen}}'
+      '|{liqInd:<{liqIndLen}}'
+      '|{cpty:<{cptyLen}}'
+      '|{created:<{createdLen}}'
+      '|'
+    )
+    printTable(cols, rows, fmt)
+
+  def do_posn(self, args):
+    """Usage: posn"""
+    resp = self.send('GET', '/accnt/posn')
+    cols = [
+      'accnt',
+      'contr',
+      'settlDate',
+      'buyLots',
+      'buyCost',
+      'sellLots',
+      'sellCost'
+    ]
+    rows = resp.content
+    fmt = (
+      '|{accnt:<{accntLen}}'
+      '|{contr:<{contrLen}}'
+      '|{settlDate:<{settlDateLen}}'
+      '|{buyLots:>{buyLotsLen}}'
+      '|{buyCost:>{buyCostLen}}'
+      '|{sellLots:>{sellLotsLen}}'
+      '|{sellCost:>{sellCostLen}}'
       '|'
     )
     printTable(cols, rows, fmt)
