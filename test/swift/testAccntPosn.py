@@ -37,9 +37,24 @@ class TestCase(RestTestCase):
         self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 7, 15346)
         self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 7, 15346)
 
+        self.checkAuth(conn)
+
         self.getAll(conn)
         self.getByContr(conn)
         self.getBySettlDate(conn)
+
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x2)
+    resp = conn.send('GET', '/accnt/posn')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = conn.send('GET', '/accnt/posn')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
 
   def getAll(self, conn):
     conn.setTrader('MARAYL')

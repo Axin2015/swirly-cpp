@@ -180,6 +180,10 @@ class Connection(object):
   def setTime(self, time):
     self.time = time
 
+  def setAuth(self, accnt, perm = None):
+    self.accnt = accnt
+    self.perm = perm
+
   def setAnon(self):
     self.accnt = None
     self.perm = None

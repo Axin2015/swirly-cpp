@@ -24,10 +24,35 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
+        self.checkAuth(conn)
+
         self.createMarket(conn)
         self.updateDisplayAndState(conn)
         self.updateDisplayOnly(conn)
         self.updateStateOnly(conn)
+
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x1)
+    resp = conn.send('POST', '/rec/market')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    resp = conn.send('POST', '/rec/market')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
+    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
 
   def createMarket(self, conn):
     conn.setAdmin()

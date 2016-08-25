@@ -26,9 +26,23 @@ class TestCase(RestTestCase):
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
-        conn.setTrader('MARAYL')
+        self.checkAuth(conn)
+
         self.createBid(conn)
         self.createOffer(conn)
+
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x2)
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
 
   def createBid(self, conn):
     conn.setTrader('MARAYL')

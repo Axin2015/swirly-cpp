@@ -26,8 +26,23 @@ class TestCase(RestTestCase):
 
         self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
 
+        self.checkAuth(conn)
+
         self.createDeposit(conn)
         self.createWithdraw(conn)
+
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x1)
+    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
 
   def createDeposit(self, conn):
     conn.setAdmin()

@@ -31,12 +31,27 @@ class TestCase(RestTestCase):
         self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 7, 12345)
         self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 11, 12345)
 
+        self.checkAuth(conn)
+
         self.cancelSingle(conn)
         self.cancelMulti(conn)
 
+  def checkAuth(self, conn):
+    conn.setAuth(None, 0x2)
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1')
+
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
   def cancelSingle(self, conn):
     conn.setTrader('MARAYL')
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/2', lots = 0);
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/2', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -103,7 +118,7 @@ class TestCase(RestTestCase):
 
   def cancelMulti(self, conn):
     conn.setTrader('MARAYL')
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,3', lots = 0);
+    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,3', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
