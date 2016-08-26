@@ -55,16 +55,16 @@ Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) no
 struct Serv::Impl {
 
   Impl(Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
-    : journ{journ, pipeCapacity}, maxExecs{maxExecs}
+    : journ_{journ, pipeCapacity}, maxExecs_{maxExecs}
   {
   }
   Accnt& accnt(Mnem mnem) const
   {
     AccntSet::Iterator it;
     bool found;
-    tie(it, found) = accnts.findHint(mnem);
+    tie(it, found) = accnts_.findHint(mnem);
     if (!found) {
-      it = accnts.insertHint(it, Accnt::make(mnem, maxExecs));
+      it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
     }
     return *it;
   }
@@ -115,8 +115,8 @@ struct Serv::Impl {
     const auto makerId = book.allocId();
     const auto takerId = book.allocId();
 
-    auto it = accnts.find(makerOrder->accnt());
-    assert(it != accnts.end());
+    auto it = accnts_.find(makerOrder->accnt());
+    assert(it != accnts_.end());
     auto& makerAccnt = *it;
     auto makerPosn = makerAccnt.posn(book.contr(), book.settlDay());
 
@@ -169,10 +169,10 @@ struct Serv::Impl {
       }
       resp.insertExec(match.takerTrade);
 
-      matches.push_back(move(match));
+      matches_.push_back(move(match));
     }
 
-    if (!matches.empty()) {
+    if (!matches_.empty()) {
       takerOrder.trade(sumLots, sumCost, lastLots, lastTicks, now);
     }
   }
@@ -198,14 +198,14 @@ struct Serv::Impl {
   // throw.
   void commitMatches(Accnt& takerAccnt, MarketBook& book, Millis now) noexcept
   {
-    for (const auto& match : matches) {
+    for (const auto& match : matches_) {
       const auto makerOrder = match.makerOrder;
       assert(makerOrder);
       // Reduce maker.
       book.takeOrder(*makerOrder, match.lots, now);
       // Must succeed because maker order exists.
-      auto it = accnts.find(makerOrder->accnt());
-      assert(it != accnts.end());
+      auto it = accnts_.find(makerOrder->accnt());
+      assert(it != accnts_.end());
       auto& makerAccnt = *it;
       // Maker updated first because this is consistent with last-look semantics.
       // Update maker.
@@ -225,8 +225,8 @@ struct Serv::Impl {
       takerAccnt.insertTrade(takerTrade);
     }
   }
-  void reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, Millis now,
-                   Response& resp)
+  void doReviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, Millis now,
+                     Response& resp)
   {
     // Revised lots must not be:
     // 1. greater than original lots;
@@ -245,14 +245,14 @@ struct Serv::Impl {
     resp.insertOrder(&order);
     resp.insertExec(exec);
 
-    journ.createExec(*exec);
+    journ_.createExec(*exec);
 
     // Commit phase.
 
     book.reviseOrder(order, lots, now);
     accnt.pushExecFront(exec);
   }
-  void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
+  void doCancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp)
   {
     auto exec = newExec(order, book.allocId(), now);
     exec->cancel();
@@ -261,7 +261,7 @@ struct Serv::Impl {
     resp.insertOrder(&order);
     resp.insertExec(exec);
 
-    journ.createExec(*exec);
+    journ_.createExec(*exec);
 
     // Commit phase.
 
@@ -269,23 +269,23 @@ struct Serv::Impl {
     accnt.removeOrder(order);
     accnt.pushExecFront(exec);
   }
-  void archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
+  void doArchiveTrade(Accnt& accnt, const Exec& trade, Millis now)
   {
-    journ.archiveTrade(trade.market(), trade.id(), now);
+    journ_.archiveTrade(trade.market(), trade.id(), now);
 
     // Commit phase.
 
     accnt.removeTrade(trade);
   }
 
-  AsyncJourn journ;
-  const BusinessDay busDay{RollHour, NewYork};
-  const size_t maxExecs;
-  AssetSet assets;
-  ContrSet contrs;
-  MarketSet markets;
-  mutable AccntSet accnts;
-  vector<Match> matches;
+  AsyncJourn journ_;
+  const BusinessDay busDay_{RollHour, NewYork};
+  const size_t maxExecs_;
+  AssetSet assets_;
+  ContrSet contrs_;
+  MarketSet markets_;
+  mutable AccntSet accnts_;
+  vector<Match> matches_;
 };
 
 Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)
@@ -301,10 +301,10 @@ Serv& Serv::operator=(Serv&&) = default;
 
 void Serv::load(const Model& model, Millis now)
 {
-  const auto busDay = impl_->busDay(now);
-  model.readAsset([& assets = impl_->assets](auto ptr) { assets.insert(move(ptr)); });
-  model.readContr([& contrs = impl_->contrs](auto ptr) { contrs.insert(move(ptr)); });
-  model.readMarket([& markets = impl_->markets](MarketBookPtr ptr) { markets.insert(move(ptr)); });
+  const auto busDay = impl_->busDay_(now);
+  model.readAsset([& assets = impl_->assets_](auto ptr) { assets.insert(move(ptr)); });
+  model.readContr([& contrs = impl_->contrs_](auto ptr) { contrs.insert(move(ptr)); });
+  model.readMarket([& markets = impl_->markets_](MarketBookPtr ptr) { markets.insert(move(ptr)); });
   model.readOrder([& impl = *impl_](auto ptr) {
     auto& accnt = impl.accnt(ptr->accnt());
     accnt.insertOrder(ptr);
@@ -314,8 +314,8 @@ void Serv::load(const Model& model, Millis now)
         accnt.removeOrder(*ptr);
       }
     });
-    auto it = impl.markets.find(ptr->market());
-    assert(it != impl.markets.end());
+    auto it = impl.markets_.find(ptr->market());
+    assert(it != impl.markets_.end());
     it->insertOrder(ptr);
     success = true;
   });
@@ -335,23 +335,23 @@ void Serv::load(const Model& model, Millis now)
 
 AssetSet& Serv::assets() const noexcept
 {
-  return impl_->assets;
+  return impl_->assets_;
 }
 
 ContrSet& Serv::contrs() const noexcept
 {
-  return impl_->contrs;
+  return impl_->contrs_;
 }
 
 MarketSet& Serv::markets() const noexcept
 {
-  return impl_->markets;
+  return impl_->markets_;
 }
 
 MarketBook& Serv::market(Mnem mnem) const
 {
-  auto it = impl_->markets.find(mnem);
-  if (it == impl_->markets.end()) {
+  auto it = impl_->markets_.find(mnem);
+  if (it == impl_->markets_.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
   return *it;
@@ -365,12 +365,12 @@ Accnt& Serv::accnt(Mnem mnem) const
 MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
                                Jday expiryDay, MarketState state, Millis now)
 {
-  if (impl_->contrs.find(contr) == impl_->contrs.end()) {
+  if (impl_->contrs_.find(contr) == impl_->contrs_.end()) {
     throw NotFoundException{errMsg() << "contr '" << contr << "' does not exist"};
   }
   if (settlDay != 0_jd) {
     // busDay <= expiryDay <= settlDay.
-    const auto busDay = impl_->busDay(now);
+    const auto busDay = impl_->busDay_(now);
     if (settlDay < expiryDay) {
       throw InvalidException{"settl-day before expiry-day"_sv};
     }
@@ -384,14 +384,14 @@ MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, Jday 
   }
   MarketSet::Iterator it;
   bool found;
-  tie(it, found) = impl_->markets.findHint(mnem);
+  tie(it, found) = impl_->markets_.findHint(mnem);
   if (found) {
     throw AlreadyExistsException{errMsg() << "market '" << mnem << "' already exists"};
   }
   {
     auto market = impl_->newMarket(mnem, display, contr, settlDay, expiryDay, state);
-    impl_->journ.createMarket(mnem, display, contr, settlDay, expiryDay, state);
-    it = impl_->markets.insertHint(it, move(market));
+    impl_->journ_.createMarket(mnem, display, contr, settlDay, expiryDay, state);
+    it = impl_->markets_.insertHint(it, move(market));
   }
   return *it;
 }
@@ -399,11 +399,12 @@ MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, Jday 
 MarketBook& Serv::updateMarket(Mnem mnem, optional<string_view> display,
                                optional<MarketState> state, Millis now)
 {
-  auto it = impl_->markets.find(mnem);
-  if (it == impl_->markets.end()) {
+  auto it = impl_->markets_.find(mnem);
+  if (it == impl_->markets_.end()) {
     throw MarketNotFoundException{errMsg() << "market '" << mnem << "' does not exist"};
   }
-  impl_->journ.updateMarket(mnem, display ? *display : it->display(), state ? *state : it->state());
+  impl_->journ_.updateMarket(mnem, display ? *display : it->display(),
+                             state ? *state : it->state());
   if (display) {
     it->setDisplay(*display);
   }
@@ -422,7 +423,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
     throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
   }
 
-  const auto busDay = impl_->busDay(now);
+  const auto busDay = impl_->busDay_(now);
   if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
     throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' in '"
                                          << maybeJdToIso(book.settlDay()) << "' has expired"};
@@ -440,7 +441,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
   // Order fields are updated on match.
   impl_->matchOrders(accnt, book, *order, now, resp);
   // Ensure that matches are cleared when scope exits.
-  auto& matches = impl_->matches;
+  auto& matches = impl_->matches_;
   auto finally = makeFinally([&matches]() { matches.clear(); });
 
   resp.setBook(book);
@@ -470,7 +471,7 @@ void Serv::createOrder(Accnt& accnt, MarketBook& book, string_view ref, Side sid
       }
     });
 
-    impl_->journ.createExec(resp.execs());
+    impl_->journ_.createExec(resp.execs());
     success = true;
   }
 
@@ -495,7 +496,7 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, 
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  impl_->reviseOrder(accnt, book, order, lots, now, resp);
+  impl_->doReviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Millis now,
@@ -505,7 +506,7 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Milli
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  impl_->reviseOrder(accnt, book, order, lots, now, resp);
+  impl_->doReviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, string_view ref, Lots lots, Millis now,
@@ -515,7 +516,7 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, string_view ref, Lots lot
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  impl_->reviseOrder(accnt, book, order, lots, now, resp);
+  impl_->doReviseOrder(accnt, book, order, lots, now, resp);
 }
 
 void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
@@ -545,7 +546,7 @@ void Serv::reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots
     resp.insertExec(exec);
   }
 
-  impl_->journ.createExec(resp.execs());
+  impl_->journ_.createExec(resp.execs());
 
   // Commit phase.
 
@@ -562,7 +563,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now,
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  impl_->cancelOrder(accnt, book, order, now, resp);
+  impl_->doCancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Response& resp)
@@ -571,7 +572,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Resp
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  impl_->cancelOrder(accnt, book, order, now, resp);
+  impl_->doCancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, string_view ref, Millis now, Response& resp)
@@ -580,7 +581,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, string_view ref, Millis n
   if (order.done()) {
     throw TooLateException{errMsg() << "order '" << order.id() << "' is done"};
   }
-  impl_->cancelOrder(accnt, book, order, now, resp);
+  impl_->doCancelOrder(accnt, book, order, now, resp);
 }
 
 void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Millis now,
@@ -600,7 +601,7 @@ void Serv::cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Mill
     resp.insertExec(exec);
   }
 
-  impl_->journ.createExec(resp.execs());
+  impl_->journ_.createExec(resp.execs());
 
   // Commit phase.
 
@@ -638,7 +639,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
     cptyTrade = trade->inverse(book.allocId());
 
     ConstExecPtr trades[] = {trade, cptyTrade};
-    impl_->journ.createExec(trades);
+    impl_->journ_.createExec(trades);
 
     // Commit phase.
 
@@ -648,7 +649,7 @@ TradePair Serv::createTrade(Accnt& accnt, MarketBook& book, string_view ref, Sid
 
   } else {
 
-    impl_->journ.createExec(*trade);
+    impl_->journ_.createExec(*trade);
 
     // Commit phase.
   }
@@ -664,13 +665,13 @@ void Serv::archiveTrade(Accnt& accnt, const Exec& trade, Millis now)
   if (trade.state() != State::Trade) {
     throw InvalidException{errMsg() << "exec '" << trade.id() << "' is not a trade"};
   }
-  impl_->archiveTrade(accnt, trade, now);
+  impl_->doArchiveTrade(accnt, trade, now);
 }
 
 void Serv::archiveTrade(Accnt& accnt, Mnem market, Iden id, Millis now)
 {
   auto& trade = accnt.trade(market, id);
-  impl_->archiveTrade(accnt, trade, now);
+  impl_->doArchiveTrade(accnt, trade, now);
 }
 
 void Serv::archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
@@ -679,7 +680,7 @@ void Serv::archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis n
     accnt.trade(market, id);
   }
 
-  impl_->journ.archiveTrade(market, ids, now);
+  impl_->journ_.archiveTrade(market, ids, now);
 
   // Commit phase.
 
