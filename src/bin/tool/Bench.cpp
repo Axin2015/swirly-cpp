@@ -32,8 +32,8 @@ using namespace swirly;
 
 namespace {
 
-MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr, Jday settlDay,
-                         Jday expiryDay, MarketState state, Millis now)
+const MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
+                               Jday settlDay, Jday expiryDay, MarketState state, Millis now)
 {
   auto it = serv.markets().find(mnem);
   if (it != serv.markets().end()) {
@@ -45,7 +45,7 @@ MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
 class Archiver {
  public:
   explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
-  void operator()(Accnt& accnt, Mnem market, Millis now)
+  void operator()(const Accnt& accnt, Mnem market, Millis now)
   {
     ids_.clear();
     for (const auto& trade : accnt.trades()) {

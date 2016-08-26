@@ -39,7 +39,7 @@ class MarketBook;
 class Model;
 class Response;
 
-using TradePair = std::pair<ExecPtr, ExecPtr>;
+using TradePair = std::pair<ConstExecPtr, ConstExecPtr>;
 
 class SWIRLY_API Serv {
  public:
@@ -57,44 +57,47 @@ class SWIRLY_API Serv {
 
   void load(const Model& model, Millis now);
 
-  AssetSet& assets() const noexcept;
+  const AssetSet& assets() const noexcept;
 
-  ContrSet& contrs() const noexcept;
+  const ContrSet& contrs() const noexcept;
 
-  MarketSet& markets() const noexcept;
+  const MarketSet& markets() const noexcept;
 
-  MarketBook& market(Mnem mnem) const;
+  const MarketBook& market(Mnem mnem) const;
 
-  Accnt& accnt(Mnem mnem) const;
+  const Accnt& accnt(Mnem mnem) const;
 
-  MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                           Jday expiryDay, MarketState state, Millis now);
+  const MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
+                                 Jday expiryDay, MarketState state, Millis now);
 
-  MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
-                           std::optional<MarketState> state, Millis now);
+  const MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
+                                 std::optional<MarketState> state, Millis now);
 
-  void createOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Side side, Lots lots,
-                   Ticks ticks, Lots minLots, Millis now, Response& resp);
+  void createOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Side side,
+                   Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp);
 
-  void reviseOrder(Accnt& accnt, MarketBook& book, Order& order, Lots lots, Millis now,
+  void reviseOrder(const Accnt& accnt, const MarketBook& book, const Order& order, Lots lots,
+                   Millis now, Response& resp);
+
+  void reviseOrder(const Accnt& accnt, const MarketBook& book, Iden id, Lots lots, Millis now,
                    Response& resp);
 
-  void reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Millis now, Response& resp);
+  void reviseOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Lots lots,
+                   Millis now, Response& resp);
 
-  void reviseOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Lots lots, Millis now,
+  void reviseOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Iden> ids, Lots lots,
+                   Millis now, Response& resp);
+
+  void cancelOrder(const Accnt& accnt, const MarketBook& book, const Order& order, Millis now,
                    Response& resp);
 
-  void reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
+  void cancelOrder(const Accnt& accnt, const MarketBook& book, Iden id, Millis now, Response& resp);
+
+  void cancelOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Millis now,
                    Response& resp);
 
-  void cancelOrder(Accnt& accnt, MarketBook& book, Order& order, Millis now, Response& resp);
-
-  void cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Response& resp);
-
-  void cancelOrder(Accnt& accnt, MarketBook& book, std::string_view ref, Millis now,
+  void cancelOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Iden> ids, Millis now,
                    Response& resp);
-
-  void cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Millis now, Response& resp);
 
   /**
    * Cancels all orders.
@@ -104,18 +107,18 @@ class SWIRLY_API Serv {
    * @param now
    *            The current time.
    */
-  void cancelOrder(Accnt& accnt, Millis now);
+  void cancelOrder(const Accnt& accnt, Millis now);
 
-  void cancelOrder(MarketBook& book, Millis now);
+  void cancelOrder(const MarketBook& book, Millis now);
 
-  TradePair createTrade(Accnt& accnt, MarketBook& book, std::string_view ref, Side side, Lots lots,
-                        Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created);
+  TradePair createTrade(const Accnt& accnt, const MarketBook& book, std::string_view ref, Side side,
+                        Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created);
 
-  void archiveTrade(Accnt& accnt, const Exec& trade, Millis now);
+  void archiveTrade(const Accnt& accnt, const Exec& trade, Millis now);
 
-  void archiveTrade(Accnt& accnt, Mnem market, Iden id, Millis now);
+  void archiveTrade(const Accnt& accnt, Mnem market, Iden id, Millis now);
 
-  void archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now);
+  void archiveTrade(const Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now);
 
   /**
    * This method may partially fail.
