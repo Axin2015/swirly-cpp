@@ -17,19 +17,21 @@
 #ifndef SWIRLY_ELM_CONTR_HPP
 #define SWIRLY_ELM_CONTR_HPP
 
-#include <swirly/elm/Rec.hpp>
+#include <swirly/elm/Types.hpp>
+
+#include <swirly/ash/Mnem.hpp>
 
 namespace swirly {
 
 /**
  * A specification that stipulates the terms and conditions of sale.
  */
-class SWIRLY_API Contr : public Rec {
+class SWIRLY_API Contr : public Comparable<Contr> {
  public:
   Contr(Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer, int lotDenom,
         int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
 
-  ~Contr() noexcept override;
+  ~Contr() noexcept;
 
   // Copy.
   Contr(const Contr&);
@@ -45,8 +47,11 @@ class SWIRLY_API Contr : public Rec {
     return std::make_unique<Contr>(std::forward<ArgsT>(args)...);
   }
 
-  void toJson(std::ostream& os) const override;
+  void toJson(std::ostream& os) const;
 
+  int compare(const Contr& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  auto mnem() const noexcept { return mnem_; }
+  auto display() const noexcept { return +display_; }
   auto asset() const noexcept { return asset_; }
   auto ccy() const noexcept { return ccy_; }
   auto lotNumer() const noexcept { return lotNumer_; }
@@ -63,6 +68,8 @@ class SWIRLY_API Contr : public Rec {
   boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
+  const Mnem mnem_;
+  const Display display_;
   const Mnem asset_;
   const Mnem ccy_;
   const int lotNumer_;
@@ -81,6 +88,12 @@ class SWIRLY_API Contr : public Rec {
   const Lots minLots_;
   const Lots maxLots_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Contr& contr)
+{
+  contr.toJson(os);
+  return os;
+}
 
 using ContrSet = MnemSet<Contr>;
 

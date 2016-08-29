@@ -17,23 +17,23 @@
 #ifndef SWIRLY_ELM_ASSET_HPP
 #define SWIRLY_ELM_ASSET_HPP
 
-#include <swirly/elm/Rec.hpp>
+#include <swirly/elm/Types.hpp>
 
-#include <swirly/ash/Types.hpp>
+#include <swirly/ash/Mnem.hpp>
 
 namespace swirly {
 
 /**
  * An item of value.
  */
-class SWIRLY_API Asset : public Rec {
+class SWIRLY_API Asset : public Comparable<Asset> {
  public:
   Asset(Mnem mnem, std::string_view display, AssetType type) noexcept
-    : Rec{RecType::Asset, mnem, display}, type_{type}
+    : mnem_{mnem}, display_{display}, type_{type}
   {
   }
 
-  ~Asset() noexcept override;
+  ~Asset() noexcept;
 
   // Copy.
   Asset(const Asset&);
@@ -49,14 +49,25 @@ class SWIRLY_API Asset : public Rec {
     return std::make_unique<Asset>(std::forward<ArgsT>(args)...);
   }
 
-  void toJson(std::ostream& os) const override;
+  void toJson(std::ostream& os) const;
 
-  AssetType assetType() const noexcept { return type_; }
+  int compare(const Asset& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  auto mnem() const noexcept { return mnem_; }
+  auto display() const noexcept { return +display_; }
+  auto type() const noexcept { return type_; }
   boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
+  const Mnem mnem_;
+  const Display display_;
   const AssetType type_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Asset& asset)
+{
+  asset.toJson(os);
+  return os;
+}
 
 using AssetSet = MnemSet<Asset>;
 

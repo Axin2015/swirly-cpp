@@ -24,7 +24,8 @@ namespace swirly {
 
 Contr::Contr(Mnem mnem, string_view display, Mnem asset, Mnem ccy, int lotNumer, int lotDenom,
              int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept
-  : Rec{RecType::Contr, mnem, display},
+  : mnem_{mnem},
+    display_{display},
     asset_{asset},
     ccy_{ccy},
     lotNumer_{lotNumer},

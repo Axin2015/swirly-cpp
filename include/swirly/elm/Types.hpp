@@ -115,28 +115,6 @@ struct EnumTraits<Direct> {
   static void print(std::ostream& os, Direct val) { os << enumString(val); }
 };
 
-enum class RecType {
-  /**
-   * Asset.
-   */
-  Asset = 1,
-  /**
-   * Contract.
-   */
-  Contr,
-  /**
-   * Market.
-   */
-  Market
-};
-
-SWIRLY_API const char* enumString(RecType type);
-
-template <>
-struct EnumTraits<RecType> {
-  static void print(std::ostream& os, RecType val) { os << enumString(val); }
-};
-
 enum class LiqInd {
   /**
    * No liqInd.

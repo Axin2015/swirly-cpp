@@ -66,7 +66,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
   SWIRLY_CHECK(it->mnem() == "CHF"_sv);
   SWIRLY_CHECK(it->display() == "Switzerland, Francs"_sv);
 
-  SWIRLY_CHECK(it->assetType() == AssetType::Currency);
+  SWIRLY_CHECK(it->type() == AssetType::Currency);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServContrs, ServFixture)

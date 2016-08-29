@@ -26,7 +26,8 @@ namespace swirly {
 
 Market::Market(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
                MarketState state) noexcept
-  : Rec{RecType::Market, mnem, display},
+  : mnem_{mnem},
+    display_{display},
     contr_{contr},
     settlDay_{settlDay},
     expiryDay_{expiryDay},

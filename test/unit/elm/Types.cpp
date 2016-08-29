@@ -30,11 +30,6 @@ SWIRLY_TEST_CASE(Direct)
   SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
 }
 
-SWIRLY_TEST_CASE(RecType)
-{
-  SWIRLY_CHECK(strcmp(enumString(RecType::Asset), "ASSET") == 0);
-}
-
 SWIRLY_TEST_CASE(LiqInd)
 {
   SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
