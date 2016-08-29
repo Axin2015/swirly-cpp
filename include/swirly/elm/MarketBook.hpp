@@ -20,6 +20,8 @@
 #include <swirly/elm/BookSide.hpp>
 #include <swirly/elm/Market.hpp>
 
+#include <swirly/ash/Set.hpp>
+
 namespace swirly {
 
 class MarketBook;
