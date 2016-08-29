@@ -72,17 +72,17 @@ class SWIRLY_API Order : public Request, public MemAlloc {
 
   void toJson(std::ostream& os) const override;
 
-  Level* level() const noexcept { return level_; }
-  State state() const noexcept { return state_; }
-  Ticks ticks() const noexcept { return ticks_; }
-  Lots resd() const noexcept { return resd_; }
-  Lots exec() const noexcept { return exec_; }
-  Cost cost() const noexcept { return cost_; }
-  Lots lastLots() const noexcept { return lastLots_; }
-  Ticks lastTicks() const noexcept { return lastTicks_; }
-  Lots minLots() const noexcept { return minLots_; }
-  bool done() const noexcept { return resd_ == 0_lts; }
-  Millis modified() const noexcept { return modified_; }
+  auto* level() const noexcept { return level_; }
+  auto state() const noexcept { return state_; }
+  auto ticks() const noexcept { return ticks_; }
+  auto resd() const noexcept { return resd_; }
+  auto exec() const noexcept { return exec_; }
+  auto cost() const noexcept { return cost_; }
+  auto lastLots() const noexcept { return lastLots_; }
+  auto lastTicks() const noexcept { return lastTicks_; }
+  auto minLots() const noexcept { return minLots_; }
+  auto done() const noexcept { return resd_ == 0_lts; }
+  auto modified() const noexcept { return modified_; }
   void setLevel(Level* level) const noexcept { level_ = level; }
   void create(Millis now) noexcept
   {

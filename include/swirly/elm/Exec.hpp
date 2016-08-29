@@ -70,18 +70,18 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
 
   void toJson(std::ostream& os) const override;
 
-  Iden orderId() const noexcept { return orderId_; }
-  State state() const noexcept { return state_; }
-  Ticks ticks() const noexcept { return ticks_; }
-  Lots resd() const noexcept { return resd_; }
-  Lots exec() const noexcept { return exec_; }
-  Cost cost() const noexcept { return cost_; }
-  Lots lastLots() const noexcept { return lastLots_; }
-  Ticks lastTicks() const noexcept { return lastTicks_; }
-  Lots minLots() const noexcept { return minLots_; }
-  Iden matchId() const noexcept { return matchId_; }
-  LiqInd liqInd() const noexcept { return liqInd_; }
-  Mnem cpty() const noexcept { return cpty_; }
+  auto orderId() const noexcept { return orderId_; }
+  auto state() const noexcept { return state_; }
+  auto ticks() const noexcept { return ticks_; }
+  auto resd() const noexcept { return resd_; }
+  auto exec() const noexcept { return exec_; }
+  auto cost() const noexcept { return cost_; }
+  auto lastLots() const noexcept { return lastLots_; }
+  auto lastTicks() const noexcept { return lastTicks_; }
+  auto minLots() const noexcept { return minLots_; }
+  auto matchId() const noexcept { return matchId_; }
+  auto liqInd() const noexcept { return liqInd_; }
+  auto cpty() const noexcept { return cpty_; }
 
   void revise(Lots lots) noexcept
   {
