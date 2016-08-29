@@ -27,13 +27,6 @@
 
 namespace swirly {
 
-enum class Iden : int64_t {};
-
-constexpr Iden operator""_id(unsigned long long val) noexcept
-{
-  return box<Iden>(val);
-}
-
 using Incs = int64_t;
 
 enum class Lots : Incs {};

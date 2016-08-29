@@ -24,6 +24,16 @@
 namespace swirly {
 
 /**
+ * Identifier.
+ */
+enum class Iden : int64_t {};
+
+constexpr Iden operator""_id(unsigned long long val) noexcept
+{
+  return box<Iden>(val);
+}
+
+/**
  * ISO8601 date in yyymmdd format.
  */
 enum class IsoDate : int {};
