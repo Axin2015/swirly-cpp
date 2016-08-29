@@ -33,20 +33,20 @@ namespace swirly {
 namespace mg {
 namespace {
 
-class ScopedIdens {
+class ScopedIds {
  public:
-  ScopedIdens(string_view sv, vector<Iden>& ids) noexcept : ids_{ids}
+  ScopedIds(string_view sv, vector<Id64>& ids) noexcept : ids_{ids}
   {
     Tokeniser<','> toks{sv};
     while (!toks.empty()) {
-      ids.push_back(static_cast<Iden>(stou64(toks.top())));
+      ids.push_back(static_cast<Id64>(stou64(toks.top())));
       toks.pop();
     }
   }
-  ~ScopedIdens() noexcept { ids_.clear(); }
+  ~ScopedIds() noexcept { ids_.clear(); }
 
  private:
-  vector<Iden>& ids_;
+  vector<Id64>& ids_;
 };
 
 class ScopedMnems {
@@ -519,7 +519,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     return;
   }
 
-  ScopedIdens ids{uri_.top(), ids_};
+  ScopedIds ids{uri_.top(), ids_};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -615,7 +615,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     return;
   }
 
-  ScopedIdens ids{uri_.top(), ids_};
+  ScopedIds ids{uri_.top(), ids_};
   uri_.pop();
 
   if (uri_.empty()) {

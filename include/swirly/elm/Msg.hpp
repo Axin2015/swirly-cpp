@@ -49,9 +49,9 @@ struct SWIRLY_PACKED CreateExecBody {
   char market[MaxMnem];
   char contr[MaxMnem];
   Jday settlDay;
-  Iden id;
+  Id64 id;
   char ref[MaxRef];
-  Iden orderId;
+  Id64 orderId;
   State state;
   Side side;
   Lots lots;
@@ -62,7 +62,7 @@ struct SWIRLY_PACKED CreateExecBody {
   Lots lastLots;
   Ticks lastTicks;
   Lots minLots;
-  Iden matchId;
+  Id64 matchId;
   LiqInd liqInd;
   char cpty[MaxMnem];
   Millis created;
@@ -71,10 +71,10 @@ struct SWIRLY_PACKED CreateExecBody {
 static_assert(std::is_pod<CreateExecBody>::value, "message-type must be pod");
 
 constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(Millis) - sizeof(More))
-                             / sizeof(Iden)};
+                             / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTradeBody {
   char market[MaxMnem];
-  Iden ids[MaxIds];
+  Id64 ids[MaxIds];
   Millis modified;
   More more;
 };

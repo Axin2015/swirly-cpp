@@ -58,7 +58,7 @@ class Archiver {
 
  private:
   Serv& serv_;
-  vector<Iden> ids_;
+  vector<Id64> ids_;
 };
 
 MemPool memPool;

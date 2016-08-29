@@ -170,7 +170,7 @@ void Journ::archiveTrade(const ArchiveTradeBody& body)
 
   for (size_t i{0}; i < MaxIds; ++i) {
     const auto id = body.ids[i];
-    if (id == 0_id) {
+    if (id == 0_id64) {
       break;
     }
     ScopedBind bind{stmt};

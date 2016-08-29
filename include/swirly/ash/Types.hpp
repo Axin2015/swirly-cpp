@@ -24,13 +24,23 @@
 namespace swirly {
 
 /**
- * Identifier.
+ * 32 bit identifier.
  */
-enum class Iden : int64_t {};
+enum class Id32 : int32_t {};
 
-constexpr Iden operator""_id(unsigned long long val) noexcept
+constexpr Id32 operator""_id32(unsigned long long val) noexcept
 {
-  return box<Iden>(val);
+  return box<Id32>(val);
+}
+
+/**
+ * 64 bit identifier.
+ */
+enum class Id64 : int64_t {};
+
+constexpr Id64 operator""_id64(unsigned long long val) noexcept
+{
+  return box<Id64>(val);
 }
 
 /**

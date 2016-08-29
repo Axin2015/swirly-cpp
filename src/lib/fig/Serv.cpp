@@ -272,7 +272,7 @@ struct Serv::Impl {
     doReviseOrder(accnt, book, order, lots, now, resp);
   }
 
-  void reviseOrder(Accnt& accnt, MarketBook& book, Iden id, Lots lots, Millis now, Response& resp)
+  void reviseOrder(Accnt& accnt, MarketBook& book, Id64 id, Lots lots, Millis now, Response& resp)
   {
     auto& order = accnt.order(book.mnem(), id);
     if (order.done()) {
@@ -291,7 +291,7 @@ struct Serv::Impl {
     doReviseOrder(accnt, book, order, lots, now, resp);
   }
 
-  void reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Lots lots, Millis now,
+  void reviseOrder(Accnt& accnt, MarketBook& book, ArrayView<Id64> ids, Lots lots, Millis now,
                    Response& resp)
   {
     resp.setBook(book);
@@ -338,7 +338,7 @@ struct Serv::Impl {
     doCancelOrder(accnt, book, order, now, resp);
   }
 
-  void cancelOrder(Accnt& accnt, MarketBook& book, Iden id, Millis now, Response& resp)
+  void cancelOrder(Accnt& accnt, MarketBook& book, Id64 id, Millis now, Response& resp)
   {
     auto& order = accnt.order(book.mnem(), id);
     if (order.done()) {
@@ -356,7 +356,7 @@ struct Serv::Impl {
     doCancelOrder(accnt, book, order, now, resp);
   }
 
-  void cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Iden> ids, Millis now, Response& resp)
+  void cancelOrder(Accnt& accnt, MarketBook& book, ArrayView<Id64> ids, Millis now, Response& resp)
   {
     resp.setBook(book);
     for (const auto id : ids) {
@@ -439,13 +439,13 @@ struct Serv::Impl {
     doArchiveTrade(accnt, trade, now);
   }
 
-  void archiveTrade(Accnt& accnt, Mnem market, Iden id, Millis now)
+  void archiveTrade(Accnt& accnt, Mnem market, Id64 id, Millis now)
   {
     auto& trade = accnt.trade(market, id);
     doArchiveTrade(accnt, trade, now);
   }
 
-  void archiveTrade(Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
+  void archiveTrade(Accnt& accnt, Mnem market, ArrayView<Id64> ids, Millis now)
   {
     for (const auto id : ids) {
       accnt.trade(market, id);
@@ -483,22 +483,22 @@ struct Serv::Impl {
     return MarketBook::make(mnem, display, contr, settlDay, expiryDay, state);
   }
 
-  ExecPtr newExec(const Order& order, Iden id, Millis created) const
+  ExecPtr newExec(const Order& order, Id64 id, Millis created) const
   {
     return Exec::make(order.accnt(), order.market(), order.contr(), order.settlDay(), id,
                       order.ref(), order.id(), order.state(), order.side(), order.lots(),
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
-                      order.lastTicks(), order.minLots(), 0_id, LiqInd::None, Mnem{}, created);
+                      order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Mnem{}, created);
   }
 
   /**
    * Special factory method for manual trades.
    */
-  ExecPtr newManual(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, string_view ref,
+  ExecPtr newManual(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, string_view ref,
                     Side side, Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty,
                     Millis created) const
   {
-    const auto orderId = 0_id;
+    const auto orderId = 0_id64;
     const auto state = State::Trade;
     const auto resd = 0_lts;
     const auto exec = lots;
@@ -506,7 +506,7 @@ struct Serv::Impl {
     const auto lastLots = lots;
     const auto lastTicks = ticks;
     const auto minLots = 1_lts;
-    const auto matchId = 0_id;
+    const auto matchId = 0_id64;
     return Exec::make(accnt, market, contr, settlDay, id, ref, orderId, state, side, lots, ticks,
                       resd, exec, cost, lastLots, lastTicks, minLots, matchId, liqInd, cpty,
                       created);
@@ -768,7 +768,7 @@ void Serv::reviseOrder(const Accnt& accnt, const MarketBook& book, const Order& 
   impl_->reviseOrder(constCast(accnt), constCast(book), constCast(order), lots, now, resp);
 }
 
-void Serv::reviseOrder(const Accnt& accnt, const MarketBook& book, Iden id, Lots lots, Millis now,
+void Serv::reviseOrder(const Accnt& accnt, const MarketBook& book, Id64 id, Lots lots, Millis now,
                        Response& resp)
 {
   impl_->reviseOrder(constCast(accnt), constCast(book), id, lots, now, resp);
@@ -780,7 +780,7 @@ void Serv::reviseOrder(const Accnt& accnt, const MarketBook& book, string_view r
   impl_->reviseOrder(constCast(accnt), constCast(book), ref, lots, now, resp);
 }
 
-void Serv::reviseOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Iden> ids, Lots lots,
+void Serv::reviseOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Id64> ids, Lots lots,
                        Millis now, Response& resp)
 {
   impl_->reviseOrder(constCast(accnt), constCast(book), ids, lots, now, resp);
@@ -792,7 +792,7 @@ void Serv::cancelOrder(const Accnt& accnt, const MarketBook& book, const Order& 
   impl_->cancelOrder(constCast(accnt), constCast(book), constCast(order), now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, const MarketBook& book, Iden id, Millis now,
+void Serv::cancelOrder(const Accnt& accnt, const MarketBook& book, Id64 id, Millis now,
                        Response& resp)
 {
   impl_->cancelOrder(constCast(accnt), constCast(book), id, now, resp);
@@ -804,7 +804,7 @@ void Serv::cancelOrder(const Accnt& accnt, const MarketBook& book, string_view r
   impl_->cancelOrder(constCast(accnt), constCast(book), ref, now, resp);
 }
 
-void Serv::cancelOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Iden> ids, Millis now,
+void Serv::cancelOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Id64> ids, Millis now,
                        Response& resp)
 {
   impl_->cancelOrder(constCast(accnt), constCast(book), ids, now, resp);
@@ -832,12 +832,12 @@ void Serv::archiveTrade(const Accnt& accnt, const Exec& trade, Millis now)
   impl_->archiveTrade(constCast(accnt), trade, now);
 }
 
-void Serv::archiveTrade(const Accnt& accnt, Mnem market, Iden id, Millis now)
+void Serv::archiveTrade(const Accnt& accnt, Mnem market, Id64 id, Millis now)
 {
   impl_->archiveTrade(constCast(accnt), market, id, now);
 }
 
-void Serv::archiveTrade(const Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now)
+void Serv::archiveTrade(const Accnt& accnt, Mnem market, ArrayView<Id64> ids, Millis now)
 {
   impl_->archiveTrade(constCast(accnt), market, ids, now);
 }

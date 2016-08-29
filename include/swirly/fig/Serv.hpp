@@ -79,24 +79,24 @@ class SWIRLY_API Serv {
   void reviseOrder(const Accnt& accnt, const MarketBook& book, const Order& order, Lots lots,
                    Millis now, Response& resp);
 
-  void reviseOrder(const Accnt& accnt, const MarketBook& book, Iden id, Lots lots, Millis now,
+  void reviseOrder(const Accnt& accnt, const MarketBook& book, Id64 id, Lots lots, Millis now,
                    Response& resp);
 
   void reviseOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Lots lots,
                    Millis now, Response& resp);
 
-  void reviseOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Iden> ids, Lots lots,
+  void reviseOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Id64> ids, Lots lots,
                    Millis now, Response& resp);
 
   void cancelOrder(const Accnt& accnt, const MarketBook& book, const Order& order, Millis now,
                    Response& resp);
 
-  void cancelOrder(const Accnt& accnt, const MarketBook& book, Iden id, Millis now, Response& resp);
+  void cancelOrder(const Accnt& accnt, const MarketBook& book, Id64 id, Millis now, Response& resp);
 
   void cancelOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Millis now,
                    Response& resp);
 
-  void cancelOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Iden> ids, Millis now,
+  void cancelOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Id64> ids, Millis now,
                    Response& resp);
 
   /**
@@ -116,9 +116,9 @@ class SWIRLY_API Serv {
 
   void archiveTrade(const Accnt& accnt, const Exec& trade, Millis now);
 
-  void archiveTrade(const Accnt& accnt, Mnem market, Iden id, Millis now);
+  void archiveTrade(const Accnt& accnt, Mnem market, Id64 id, Millis now);
 
-  void archiveTrade(const Accnt& accnt, Mnem market, ArrayView<Iden> ids, Millis now);
+  void archiveTrade(const Accnt& accnt, Mnem market, ArrayView<Id64> ids, Millis now);
 
   /**
    * This method may partially fail.

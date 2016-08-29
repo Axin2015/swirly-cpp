@@ -59,7 +59,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   const auto& orders() const noexcept { return orders_; }
   const auto& execs() const noexcept { return execs_; }
   const auto& trades() const noexcept { return trades_; }
-  const Exec& trade(Mnem market, Iden id) const
+  const Exec& trade(Mnem market, Id64 id) const
   {
     auto it = trades_.find(market, id);
     if (it == trades_.end()) {
@@ -70,7 +70,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   const auto& posns() const noexcept { return posns_; }
 
   auto& orders() noexcept { return orders_; }
-  Order& order(Mnem market, Iden id)
+  Order& order(Mnem market, Id64 id)
   {
     auto it = orders_.find(market, id);
     if (it == orders_.end()) {

@@ -31,9 +31,9 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public Request, public MemAlloc {
  public:
-  Exec(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
-       Iden orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Iden matchId, LiqInd liqInd,
+  Exec(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
+       Id64 orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
+       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId, LiqInd liqInd,
        Mnem cpty, Millis created) noexcept
     : Request{accnt, market, contr, settlDay, id, ref, side, lots, created},
       orderId_{orderId},
@@ -66,7 +66,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   {
     return makeRefCounted<Exec>(std::forward<ArgsT>(args)...);
   }
-  ExecPtr inverse(Iden id) const;
+  ExecPtr inverse(Id64 id) const;
 
   void toJson(std::ostream& os) const;
 
@@ -97,10 +97,10 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
     state_ = State::Cancel;
     resd_ = 0_lts;
   }
-  void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Iden matchId,
+  void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
              LiqInd liqInd, Mnem cpty) noexcept;
 
-  void trade(Lots lastLots, Ticks lastTicks, Iden matchId, LiqInd liqInd, Mnem cpty) noexcept
+  void trade(Lots lastLots, Ticks lastTicks, Id64 matchId, LiqInd liqInd, Mnem cpty) noexcept
   {
     trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, liqInd, cpty);
   }
@@ -108,7 +108,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   boost::intrusive::set_member_hook<> idHook_;
 
  private:
-  const Iden orderId_;
+  const Id64 orderId_;
   State state_;
   const Ticks ticks_;
   /**
@@ -126,7 +126,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
    * Minimum to be filled by this order.
    */
   const Lots minLots_;
-  Iden matchId_;
+  Id64 matchId_;
   LiqInd liqInd_;
   Mnem cpty_;
 };

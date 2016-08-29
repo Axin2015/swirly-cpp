@@ -62,7 +62,7 @@ class SWIRLY_API Rest {
 
   void getOrder(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, std::ostream& out) const;
+  void getOrder(Mnem accMnem, Mnem market, Id64 id, Millis now, std::ostream& out) const;
 
   void getExec(Mnem accMnem, std::size_t offset, std::optional<std::size_t> limit, Millis now,
                std::ostream& out) const;
@@ -71,7 +71,7 @@ class SWIRLY_API Rest {
 
   void getTrade(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
 
-  void getTrade(Mnem accMnem, Mnem market, Iden id, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accMnem, Mnem market, Id64 id, Millis now, std::ostream& out) const;
 
   void getPosn(Mnem accMnem, Millis now, std::ostream& out) const;
 
@@ -92,13 +92,13 @@ class SWIRLY_API Rest {
   void postOrder(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
                  Lots minLots, Millis now, std::ostream& out);
 
-  void putOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
+  void putOrder(Mnem accMnem, Mnem market, ArrayView<Id64> ids, Lots lots, Millis now,
                 std::ostream& out);
 
   void postTrade(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
                  LiqInd liqInd, Mnem cpty, Millis now, std::ostream& out);
 
-  void deleteTrade(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now);
+  void deleteTrade(Mnem accMnem, Mnem market, ArrayView<Id64> ids, Millis now);
 
  private:
   void getOrder(const Accnt& accnt, Millis now, std::ostream& out) const;
