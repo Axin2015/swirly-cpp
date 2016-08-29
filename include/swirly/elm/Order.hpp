@@ -70,7 +70,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
     return makeRefCounted<Order>(std::forward<ArgsT>(args)...);
   }
 
-  void toJson(std::ostream& os) const override;
+  void toJson(std::ostream& os) const;
 
   auto* level() const noexcept { return level_; }
   auto state() const noexcept { return state_; }
@@ -310,6 +310,12 @@ class SWIRLY_API OrderList {
  private:
   List list_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Order& order)
+{
+  order.toJson(os);
+  return os;
+}
 
 } // swirly
 

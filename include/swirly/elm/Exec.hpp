@@ -68,7 +68,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   }
   ExecPtr inverse(Iden id) const;
 
-  void toJson(std::ostream& os) const override;
+  void toJson(std::ostream& os) const;
 
   auto orderId() const noexcept { return orderId_; }
   auto state() const noexcept { return state_; }
@@ -130,6 +130,12 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   LiqInd liqInd_;
   Mnem cpty_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Exec& exec)
+{
+  exec.toJson(os);
+  return os;
+}
 
 using ExecIdSet = RequestIdSet<Exec>;
 

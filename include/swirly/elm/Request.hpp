@@ -52,8 +52,6 @@ class SWIRLY_API Request : public RefCounted {
   Request(Request&&);
   Request& operator=(Request&&) = delete;
 
-  virtual void toJson(std::ostream& os) const;
-
   auto accnt() const noexcept { return accnt_; }
   auto market() const noexcept { return market_; }
   auto contr() const noexcept { return contr_; }
@@ -81,12 +79,6 @@ class SWIRLY_API Request : public RefCounted {
   Lots lots_;
   const Millis created_;
 };
-
-inline std::ostream& operator<<(std::ostream& os, const Request& request)
-{
-  request.toJson(os);
-  return os;
-}
 
 /**
  * Request set keyed by market and id. Requests are identified by market and id only, so instances
