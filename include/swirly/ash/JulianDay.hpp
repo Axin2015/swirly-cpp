@@ -86,6 +86,22 @@ constexpr IsoDate jdToIso(Jday jd) noexcept
 }
 
 /**
+ * Julian day to Truncated Julian day. Epoch is May 24, 1968.
+ */
+constexpr int32_t jdToTjd(Jday jd) noexcept
+{
+  return unbox(jd) - 2440000;
+}
+
+/**
+ * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
+ */
+constexpr Jday tjdToJd(int32_t tjd) noexcept
+{
+  return box<Jday>(tjd + 2440000);
+}
+
+/**
  * Julian day to milliseconds since Unix epoch.
  */
 constexpr Millis jdToMs(Jday jd) noexcept
