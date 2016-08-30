@@ -86,7 +86,7 @@ class RestServ : public mg::Mgr<RestServ> {
   bool testMode_{false};
   int state_{0};
   Tokeniser<'/'> uri_;
-  std::vector<Iden> ids_;
+  std::vector<Id64> ids_;
   std::vector<Mnem> mnems_;
   RestRequest request_;
   mg::OStream out_;

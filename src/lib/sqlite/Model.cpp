@@ -173,7 +173,7 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
                         column<Lots>(*stmt, LastLots), //
                         column<Ticks>(*stmt, LastTicks), //
                         column<Millis>(*stmt, LastTime), //
-                        column<Iden>(*stmt, MaxId)));
+                        column<Id64>(*stmt, MaxId)));
   }
 }
 
@@ -223,7 +223,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
                    column<string_view>(*stmt, Market), //
                    column<string_view>(*stmt, Contr), //
                    column<Jday>(*stmt, SettlDay), //
-                   column<Iden>(*stmt, Id), //
+                   column<Id64>(*stmt, Id), //
                    column<string_view>(*stmt, Ref), //
                    column<swirly::State>(*stmt, State), //
                    column<swirly::Side>(*stmt, Side), //
@@ -274,9 +274,9 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
                   column<string_view>(*stmt, Market), //
                   column<string_view>(*stmt, Contr), //
                   column<Jday>(*stmt, SettlDay), //
-                  column<Iden>(*stmt, Id), //
+                  column<Id64>(*stmt, Id), //
                   column<string_view>(*stmt, Ref), //
-                  column<Iden>(*stmt, OrderId), //
+                  column<Id64>(*stmt, OrderId), //
                   column<swirly::State>(*stmt, State), //
                   column<swirly::Side>(*stmt, Side), //
                   column<swirly::Lots>(*stmt, Lots), //
@@ -287,7 +287,7 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
                   column<swirly::Lots>(*stmt, LastLots), //
                   column<swirly::Ticks>(*stmt, LastTicks), //
                   column<swirly::Lots>(*stmt, MinLots), //
-                  column<Iden>(*stmt, MatchId), //
+                  column<Id64>(*stmt, MatchId), //
                   column<swirly::LiqInd>(*stmt, LiqInd), //
                   column<string_view>(*stmt, Cpty), //
                   column<Millis>(*stmt, Created)));
@@ -325,9 +325,9 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
                   column<string_view>(*stmt, Market), //
                   column<string_view>(*stmt, Contr), //
                   column<Jday>(*stmt, SettlDay), //
-                  column<Iden>(*stmt, Id), //
+                  column<Id64>(*stmt, Id), //
                   column<string_view>(*stmt, Ref), //
-                  column<Iden>(*stmt, OrderId), //
+                  column<Id64>(*stmt, OrderId), //
                   State::Trade, //
                   column<swirly::Side>(*stmt, Side), //
                   column<swirly::Lots>(*stmt, Lots), //
@@ -338,7 +338,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
                   column<swirly::Lots>(*stmt, LastLots), //
                   column<swirly::Ticks>(*stmt, LastTicks), //
                   column<swirly::Lots>(*stmt, MinLots), //
-                  column<Iden>(*stmt, MatchId), //
+                  column<Id64>(*stmt, MatchId), //
                   column<swirly::LiqInd>(*stmt, LiqInd), //
                   column<string_view>(*stmt, Cpty), //
                   column<Millis>(*stmt, Created)));

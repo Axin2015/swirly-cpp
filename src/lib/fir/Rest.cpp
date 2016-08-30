@@ -174,7 +174,7 @@ void Rest::getOrder(Mnem accMnem, Mnem market, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getOrder(Mnem accMnem, Mnem market, Iden id, Millis now, ostream& out) const
+void Rest::getOrder(Mnem accMnem, Mnem market, Id64 id, Millis now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accMnem);
   const auto& orders = accnt.orders();
@@ -206,7 +206,7 @@ void Rest::getTrade(Mnem accMnem, Mnem market, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getTrade(Mnem accMnem, Mnem market, Iden id, Millis now, ostream& out) const
+void Rest::getTrade(Mnem accMnem, Mnem market, Id64 id, Millis now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accMnem);
   const auto& trades = accnt.trades();
@@ -291,7 +291,7 @@ void Rest::postOrder(Mnem accMnem, Mnem market, string_view ref, Side side, Lots
   out << resp;
 }
 
-void Rest::putOrder(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Lots lots, Millis now,
+void Rest::putOrder(Mnem accMnem, Mnem market, ArrayView<Id64> ids, Lots lots, Millis now,
                     ostream& out)
 {
   auto& accnt = serv_.accnt(accMnem);
@@ -326,7 +326,7 @@ void Rest::postTrade(Mnem accMnem, Mnem market, string_view ref, Side side, Lots
   out << ']';
 }
 
-void Rest::deleteTrade(Mnem accMnem, Mnem market, ArrayView<Iden> ids, Millis now)
+void Rest::deleteTrade(Mnem accMnem, Mnem market, ArrayView<Id64> ids, Millis now)
 {
   auto& accnt = serv_.accnt(accMnem);
   serv_.archiveTrade(accnt, market, ids, now);

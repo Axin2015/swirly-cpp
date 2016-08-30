@@ -192,13 +192,13 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 {
   ConstExecPtr execs[2];
   execs[0]
-    = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 1_id, "REF"_sv,
-                           2_id, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts, 0_cst,
-                           0_lts, 0_tks, 1_lts, 0_id, LiqInd::None, Mnem{}, Now);
-  execs[1] = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 3_id,
-                                  "REF"_sv, 2_id, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
-                                  5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id, LiqInd::Maker,
-                                  "GOSAYL"_sv, Now + 1_ms);
+    = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 1_id64, "REF"_sv,
+                           2_id64, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts, 0_cst,
+                           0_lts, 0_tks, 1_lts, 0_id64, LiqInd::None, Mnem{}, Now);
+  execs[1] = makeRefCounted<Exec>("MARAYL"_sv, "EURUSD.MAR14"_sv, "EURUSD"_sv, SettlDay, 3_id64,
+                                  "REF"_sv, 2_id64, State::Trade, Side::Buy, 10_lts, 12345_tks,
+                                  5_lts, 5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64,
+                                  LiqInd::Maker, "GOSAYL"_sv, Now + 1_ms);
   asyncJourn.createExec(execs);
   {
     Msg msg;
@@ -210,9 +210,9 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
-    SWIRLY_CHECK(body.id == 1_id);
+    SWIRLY_CHECK(body.id == 1_id64);
     SWIRLY_CHECK(strncmp(body.ref, "REF", sizeof(body.ref)) == 0);
-    SWIRLY_CHECK(body.orderId == 2_id);
+    SWIRLY_CHECK(body.orderId == 2_id64);
     SWIRLY_CHECK(body.state == State::New);
     SWIRLY_CHECK(body.side == Side::Buy);
     SWIRLY_CHECK(body.lots == 10_lts);
@@ -223,7 +223,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.lastLots == 0_lts);
     SWIRLY_CHECK(body.lastTicks == 0_tks);
     SWIRLY_CHECK(body.minLots == 1_lts);
-    SWIRLY_CHECK(body.matchId == 0_id);
+    SWIRLY_CHECK(body.matchId == 0_id64);
     SWIRLY_CHECK(body.liqInd == LiqInd::None);
     SWIRLY_CHECK(strncmp(body.cpty, "", sizeof(body.cpty)) == 0);
     SWIRLY_CHECK(body.created == Now);
@@ -238,9 +238,9 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(strncmp(body.market, "EURUSD.MAR14", sizeof(body.market)) == 0);
     SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
-    SWIRLY_CHECK(body.id == 3_id);
+    SWIRLY_CHECK(body.id == 3_id64);
     SWIRLY_CHECK(strncmp(body.ref, "REF", sizeof(body.ref)) == 0);
-    SWIRLY_CHECK(body.orderId == 2_id);
+    SWIRLY_CHECK(body.orderId == 2_id64);
     SWIRLY_CHECK(body.state == State::Trade);
     SWIRLY_CHECK(body.side == Side::Buy);
     SWIRLY_CHECK(body.lots == 10_lts);
@@ -251,7 +251,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.lastLots == 5_lts);
     SWIRLY_CHECK(body.lastTicks == 12345_tks);
     SWIRLY_CHECK(body.minLots == 1_lts);
-    SWIRLY_CHECK(body.matchId == 4_id);
+    SWIRLY_CHECK(body.matchId == 4_id64);
     SWIRLY_CHECK(body.liqInd == LiqInd::Maker);
     SWIRLY_CHECK(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)) == 0);
     SWIRLY_CHECK(body.created == Now + 1_ms);
@@ -260,10 +260,10 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 
 SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
 {
-  vector<Iden> ids;
+  vector<Id64> ids;
   ids.reserve(101);
 
-  Iden id{};
+  Id64 id{};
   generate_n(back_insert_iterator<decltype(ids)>(ids), ids.capacity(), [&id]() { return ++id; });
   asyncJourn.archiveTrade("EURUSD.MAR14"_sv, ids, Now);
 
@@ -279,7 +279,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
       if (it != ids.end()) {
         SWIRLY_CHECK(id == *it++);
       } else {
-        SWIRLY_CHECK(id == 0_id);
+        SWIRLY_CHECK(id == 0_id64);
       }
     }
   }

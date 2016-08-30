@@ -24,6 +24,26 @@
 namespace swirly {
 
 /**
+ * 32 bit identifier.
+ */
+enum class Id32 : int32_t {};
+
+constexpr Id32 operator""_id32(unsigned long long val) noexcept
+{
+  return box<Id32>(val);
+}
+
+/**
+ * 64 bit identifier.
+ */
+enum class Id64 : int64_t {};
+
+constexpr Id64 operator""_id64(unsigned long long val) noexcept
+{
+  return box<Id64>(val);
+}
+
+/**
  * ISO8601 date in yyymmdd format.
  */
 enum class IsoDate : int {};

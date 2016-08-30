@@ -27,13 +27,6 @@
 
 namespace swirly {
 
-enum class Iden : int64_t {};
-
-constexpr Iden operator""_id(unsigned long long val) noexcept
-{
-  return box<Iden>(val);
-}
-
 using Incs = int64_t;
 
 enum class Lots : Incs {};
@@ -113,28 +106,6 @@ SWIRLY_API const char* enumString(Direct direct);
 template <>
 struct EnumTraits<Direct> {
   static void print(std::ostream& os, Direct val) { os << enumString(val); }
-};
-
-enum class RecType {
-  /**
-   * Asset.
-   */
-  Asset = 1,
-  /**
-   * Contract.
-   */
-  Contr,
-  /**
-   * Market.
-   */
-  Market
-};
-
-SWIRLY_API const char* enumString(RecType type);
-
-template <>
-struct EnumTraits<RecType> {
-  static void print(std::ostream& os, RecType val) { os << enumString(val); }
 };
 
 enum class LiqInd {

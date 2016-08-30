@@ -17,8 +17,9 @@
 #ifndef SWIRLY_ELM_MARKET_HPP
 #define SWIRLY_ELM_MARKET_HPP
 
-#include <swirly/elm/Rec.hpp>
+#include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/Types.hpp>
 
 namespace swirly {
@@ -26,12 +27,12 @@ namespace swirly {
 /**
  * A place where buyers and sellers come together to exchange goods or services.
  */
-class SWIRLY_API Market : public Rec {
+class SWIRLY_API Market : public Comparable<Market> {
  public:
   Market(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
          MarketState state) noexcept;
 
-  ~Market() noexcept override;
+  virtual ~Market() noexcept;
 
   // Copy.
   Market(const Market&);
@@ -47,20 +48,32 @@ class SWIRLY_API Market : public Rec {
     return std::make_unique<Market>(std::forward<ArgsT>(args)...);
   }
 
-  void toJson(std::ostream& os) const override;
+  void toJson(std::ostream& os) const;
 
+  int compare(const Market& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  auto mnem() const noexcept { return mnem_; }
+  auto display() const noexcept { return +display_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto expiryDay() const noexcept { return expiryDay_; }
   auto state() const noexcept { return state_; }
+  void setDisplay(std::string_view display) noexcept { display_ = display; }
   void setState(MarketState state) noexcept { state_ = state; }
 
  protected:
+  const Mnem mnem_;
+  Display display_;
   const Mnem contr_;
   const Jday settlDay_;
   const Jday expiryDay_;
   MarketState state_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Market& market)
+{
+  market.toJson(os);
+  return os;
+}
 
 } // swirly
 

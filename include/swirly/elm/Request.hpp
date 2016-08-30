@@ -29,7 +29,7 @@ namespace swirly {
 
 class SWIRLY_API Request : public RefCounted {
  public:
-  Request(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Request(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
           Side side, Lots lots, Millis created) noexcept
     : accnt_{accnt},
       market_{market},
@@ -52,8 +52,6 @@ class SWIRLY_API Request : public RefCounted {
   Request(Request&&);
   Request& operator=(Request&&) = delete;
 
-  virtual void toJson(std::ostream& os) const;
-
   auto accnt() const noexcept { return accnt_; }
   auto market() const noexcept { return market_; }
   auto contr() const noexcept { return contr_; }
@@ -72,7 +70,7 @@ class SWIRLY_API Request : public RefCounted {
   const Mnem market_;
   const Mnem contr_;
   const Jday settlDay_;
-  const Iden id_;
+  const Id64 id_;
   /**
    * Ref is optional.
    */
@@ -82,12 +80,6 @@ class SWIRLY_API Request : public RefCounted {
   const Millis created_;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Request& request)
-{
-  request.toJson(os);
-  return os;
-}
-
 /**
  * Request set keyed by market and id. Requests are identified by market and id only, so instances
  * should not be used as heterogeneous Request containers, where Requests of different types may
@@ -95,7 +87,7 @@ inline std::ostream& operator<<(std::ostream& os, const Request& request)
  */
 template <typename RequestT>
 class RequestIdSet {
-  using Key = std::tuple<Mnem, Iden>;
+  using Key = std::tuple<Mnem, Id64>;
   struct ValueCompare {
     int compare(const Request& lhs, const Request& rhs) const noexcept
     {
@@ -169,22 +161,22 @@ class RequestIdSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(Mnem market, Iden id) const noexcept
+  ConstIterator find(Mnem market, Id64 id) const noexcept
   {
     return set_.find(std::make_tuple(market, id), KeyValueCompare());
   }
-  Iterator find(Mnem market, Iden id) noexcept
+  Iterator find(Mnem market, Id64 id) noexcept
   {
     return set_.find(std::make_tuple(market, id), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(Mnem market, Iden id) const noexcept
+  std::pair<ConstIterator, bool> findHint(Mnem market, Id64 id) const noexcept
   {
     const auto key = std::make_tuple(market, id);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(Mnem market, Iden id) noexcept
+  std::pair<Iterator, bool> findHint(Mnem market, Id64 id) noexcept
   {
     const auto key = std::make_tuple(market, id);
     const auto comp = KeyValueCompare();

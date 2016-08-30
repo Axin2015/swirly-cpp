@@ -50,19 +50,6 @@ const char* enumString(Direct direct)
   terminate();
 }
 
-const char* enumString(RecType type)
-{
-  switch (type) {
-  case RecType::Asset:
-    return "ASSET";
-  case RecType::Contr:
-    return "CONTR";
-  case RecType::Market:
-    return "MARKET";
-  }
-  terminate();
-}
-
 const char* enumString(LiqInd liqInd)
 {
   switch (liqInd) {

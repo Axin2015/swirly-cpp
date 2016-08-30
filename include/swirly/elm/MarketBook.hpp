@@ -20,6 +20,8 @@
 #include <swirly/elm/BookSide.hpp>
 #include <swirly/elm/Market.hpp>
 
+#include <swirly/ash/Set.hpp>
+
 namespace swirly {
 
 class MarketBook;
@@ -59,7 +61,7 @@ class SWIRLY_API MarketBook : public Market {
  public:
   MarketBook(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
              MarketState state, Lots lastLots = 0_lts, Ticks lastTicks = 0_tks,
-             Millis lastTime = 0_ms, Iden maxId = 0_id) noexcept
+             Millis lastTime = 0_ms, Id64 maxId = 0_id64) noexcept
     : Market{mnem, display, contr, settlDay, expiryDay, state},
       lastLots_{lastLots},
       lastTicks_{lastTicks},
@@ -90,7 +92,7 @@ class SWIRLY_API MarketBook : public Market {
   Millis lastTime() const noexcept { return lastTime_; }
   const BookSide& bidSide() const noexcept { return bidSide_; }
   const BookSide& offerSide() const noexcept { return offerSide_; }
-  Iden maxId() const noexcept { return maxId_; }
+  Id64 maxId() const noexcept { return maxId_; }
   MarketView view() const noexcept { return *this; }
   BookSide& bidSide() noexcept { return bidSide_; }
   BookSide& offerSide() noexcept { return offerSide_; }
@@ -118,7 +120,7 @@ class SWIRLY_API MarketBook : public Market {
     lastTicks_ = order.ticks();
     lastTime_ = now;
   }
-  Iden allocId() noexcept
+  Id64 allocId() noexcept
   {
     using namespace enumops;
     return ++maxId_;
@@ -138,7 +140,7 @@ class SWIRLY_API MarketBook : public Market {
   // Two sides constitute the book.
   BookSide bidSide_;
   BookSide offerSide_;
-  Iden maxId_;
+  Id64 maxId_;
 };
 
 inline void MarketView::toJson(std::ostream& os) const

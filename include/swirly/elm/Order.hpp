@@ -33,7 +33,7 @@ class Level;
  */
 class SWIRLY_API Order : public Request, public MemAlloc {
  public:
-  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
         State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
         Lots lastLots, Ticks lastTicks, Lots minLots, Millis created, Millis modified) noexcept
     : Request{accnt, market, contr, settlDay, id, ref, side, lots, created},
@@ -48,7 +48,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
       modified_{modified}
   {
   }
-  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Iden id, std::string_view ref,
+  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
         Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) noexcept
     : Order{accnt, market, contr, settlDay, id,    ref,   State::New, side,    lots,
             ticks, lots,   0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
@@ -70,19 +70,19 @@ class SWIRLY_API Order : public Request, public MemAlloc {
     return makeRefCounted<Order>(std::forward<ArgsT>(args)...);
   }
 
-  void toJson(std::ostream& os) const override;
+  void toJson(std::ostream& os) const;
 
-  Level* level() const noexcept { return level_; }
-  State state() const noexcept { return state_; }
-  Ticks ticks() const noexcept { return ticks_; }
-  Lots resd() const noexcept { return resd_; }
-  Lots exec() const noexcept { return exec_; }
-  Cost cost() const noexcept { return cost_; }
-  Lots lastLots() const noexcept { return lastLots_; }
-  Ticks lastTicks() const noexcept { return lastTicks_; }
-  Lots minLots() const noexcept { return minLots_; }
-  bool done() const noexcept { return resd_ == 0_lts; }
-  Millis modified() const noexcept { return modified_; }
+  auto* level() const noexcept { return level_; }
+  auto state() const noexcept { return state_; }
+  auto ticks() const noexcept { return ticks_; }
+  auto resd() const noexcept { return resd_; }
+  auto exec() const noexcept { return exec_; }
+  auto cost() const noexcept { return cost_; }
+  auto lastLots() const noexcept { return lastLots_; }
+  auto lastTicks() const noexcept { return lastTicks_; }
+  auto minLots() const noexcept { return minLots_; }
+  auto done() const noexcept { return resd_ == 0_lts; }
+  auto modified() const noexcept { return modified_; }
   void setLevel(Level* level) const noexcept { level_ = level; }
   void create(Millis now) noexcept
   {
@@ -310,6 +310,12 @@ class SWIRLY_API OrderList {
  private:
   List list_;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Order& order)
+{
+  order.toJson(os);
+  return os;
+}
 
 } // swirly
 

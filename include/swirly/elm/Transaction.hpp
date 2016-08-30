@@ -17,9 +17,7 @@
 #ifndef SWIRLY_ELM_TRANSACTIONAL_HPP
 #define SWIRLY_ELM_TRANSACTIONAL_HPP
 
-#include <swirly/elm/Rec.hpp>
-
-#include <swirly/ash/Types.hpp>
+#include <swirly/elm/Types.hpp>
 
 using namespace std;
 
