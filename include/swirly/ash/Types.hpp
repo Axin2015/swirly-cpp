@@ -46,9 +46,9 @@ constexpr Id64 operator""_id64(unsigned long long val) noexcept
 /**
  * ISO8601 date in yyymmdd format.
  */
-enum class IsoDate : int {};
+enum class IsoDate : int32_t {};
 
-constexpr IsoDate operator""_dt(unsigned long long val) noexcept
+constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
 {
   return box<IsoDate>(val);
 }
@@ -56,11 +56,11 @@ constexpr IsoDate operator""_dt(unsigned long long val) noexcept
 /**
  * Julian day.
  */
-enum class Jday : int {};
+enum class JDay : int32_t {};
 
-constexpr Jday operator""_jd(unsigned long long val) noexcept
+constexpr JDay operator""_jd(unsigned long long val) noexcept
 {
-  return box<Jday>(val);
+  return box<JDay>(val);
 }
 
 /**

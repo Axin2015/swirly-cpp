@@ -20,7 +20,7 @@
 #include <swirly/elm/Journ.hpp>
 #include <swirly/elm/Msg.hpp>
 
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/ash/Date.hpp>
 #include <swirly/ash/Time.hpp>
 
 #include <swirly/tea/Test.hpp>

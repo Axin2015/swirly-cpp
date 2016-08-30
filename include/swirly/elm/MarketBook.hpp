@@ -59,7 +59,7 @@ using ConstMarketBookPtr = std::unique_ptr<const MarketBook>;
 
 class SWIRLY_API MarketBook : public Market {
  public:
-  MarketBook(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+  MarketBook(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
              MarketState state, Lots lastLots = 0_lts, Ticks lastTicks = 0_tks,
              Millis lastTime = 0_ms, Id64 maxId = 0_id64) noexcept
     : Market{mnem, display, contr, settlDay, expiryDay, state},

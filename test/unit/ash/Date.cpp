@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/ash/Date.hpp>
 
 #include <swirly/tea/Test.hpp>
 
@@ -23,7 +23,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(YmdToIso)
 {
-  SWIRLY_CHECK(20140314_dt == ymdToIso(2014, 2, 14));
+  SWIRLY_CHECK(20140314_ymd == ymdToIso(2014, 2, 14));
 }
 
 SWIRLY_TEST_CASE(YmdToJd)

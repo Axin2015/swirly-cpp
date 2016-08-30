@@ -79,7 +79,7 @@ class SWIRLY_API AsyncJourn {
   /**
    * Create Market.
    */
-  void createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+  void createMarket(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
                     MarketState state)
   {
     doCreateMarket(mnem, display, contr, settlDay, expiryDay, state);
@@ -114,8 +114,8 @@ class SWIRLY_API AsyncJourn {
  private:
   void doReset();
 
-  void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                      Jday expiryDay, MarketState state);
+  void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay,
+                      JDay expiryDay, MarketState state);
 
   void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state);
 

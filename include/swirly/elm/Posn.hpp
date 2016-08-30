@@ -30,7 +30,7 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted {
  public:
-  Posn(Mnem accnt, Mnem contr, Jday settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
+  Posn(Mnem accnt, Mnem contr, JDay settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
        Cost sellCost) noexcept
     : accnt_{accnt},
       contr_{contr},
@@ -41,7 +41,7 @@ class SWIRLY_API Posn : public RefCounted {
       sellCost_{sellCost}
   {
   }
-  Posn(Mnem accnt, Mnem contr, Jday settlDay) noexcept
+  Posn(Mnem accnt, Mnem contr, JDay settlDay) noexcept
     : Posn{accnt, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
   {
   }
@@ -107,7 +107,7 @@ class SWIRLY_API Posn : public RefCounted {
    * @param settlDay
    *        The new settlement-day.
    */
-  void setSettlDay(Jday settlDay) noexcept { settlDay_ = settlDay; }
+  void setSettlDay(JDay settlDay) noexcept { settlDay_ = settlDay; }
   void setBuyLots(Lots buyLots) noexcept { buyLots_ = buyLots; }
   void setBuyCost(Cost buyCost) noexcept { buyCost_ = buyCost; }
   void setSellLots(Lots sellLots) noexcept { sellLots_ = sellLots; }
@@ -118,7 +118,7 @@ class SWIRLY_API Posn : public RefCounted {
  private:
   const Mnem accnt_;
   const Mnem contr_;
-  Jday settlDay_;
+  JDay settlDay_;
   Lots buyLots_;
   Cost buyCost_;
   Lots sellLots_;
@@ -132,7 +132,7 @@ inline std::ostream& operator<<(std::ostream& os, const Posn& posn)
 }
 
 class SWIRLY_API PosnSet {
-  using Key = std::tuple<Mnem, Mnem, Jday>;
+  using Key = std::tuple<Mnem, Mnem, JDay>;
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
@@ -208,22 +208,22 @@ class SWIRLY_API PosnSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(Mnem accnt, Mnem contr, Jday settlDay) const noexcept
+  ConstIterator find(Mnem accnt, Mnem contr, JDay settlDay) const noexcept
   {
     return set_.find(std::make_tuple(accnt, contr, settlDay), KeyValueCompare());
   }
-  Iterator find(Mnem accnt, Mnem contr, Jday settlDay) noexcept
+  Iterator find(Mnem accnt, Mnem contr, JDay settlDay) noexcept
   {
     return set_.find(std::make_tuple(accnt, contr, settlDay), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(Mnem accnt, Mnem contr, Jday settlDay) const noexcept
+  std::pair<ConstIterator, bool> findHint(Mnem accnt, Mnem contr, JDay settlDay) const noexcept
   {
     const auto key = std::make_tuple(accnt, contr, settlDay);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(Mnem accnt, Mnem contr, Jday settlDay) noexcept
+  std::pair<Iterator, bool> findHint(Mnem accnt, Mnem contr, JDay settlDay) noexcept
   {
     const auto key = std::make_tuple(accnt, contr, settlDay);
     const auto comp = KeyValueCompare();
@@ -263,7 +263,7 @@ class SWIRLY_API PosnSet {
 };
 
 class SWIRLY_API AccntPosnSet {
-  using Key = std::tuple<Mnem, Jday>;
+  using Key = std::tuple<Mnem, JDay>;
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
@@ -333,22 +333,22 @@ class SWIRLY_API AccntPosnSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(Mnem contr, Jday settlDay) const noexcept
+  ConstIterator find(Mnem contr, JDay settlDay) const noexcept
   {
     return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
   }
-  Iterator find(Mnem contr, Jday settlDay) noexcept
+  Iterator find(Mnem contr, JDay settlDay) noexcept
   {
     return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(Mnem contr, Jday settlDay) const noexcept
+  std::pair<ConstIterator, bool> findHint(Mnem contr, JDay settlDay) const noexcept
   {
     const auto key = std::make_tuple(contr, settlDay);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(Mnem contr, Jday settlDay) noexcept
+  std::pair<Iterator, bool> findHint(Mnem contr, JDay settlDay) noexcept
   {
     const auto key = std::make_tuple(contr, settlDay);
     const auto comp = KeyValueCompare();

@@ -33,7 +33,7 @@ using namespace swirly;
 namespace {
 
 const MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
-                               Jday settlDay, Jday expiryDay, MarketState state, Millis now)
+                               JDay settlDay, JDay expiryDay, MarketState state, Millis now)
 {
   auto it = serv.markets().find(mnem);
   if (it != serv.markets().end()) {

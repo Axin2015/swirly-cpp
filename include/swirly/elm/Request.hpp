@@ -29,7 +29,7 @@ namespace swirly {
 
 class SWIRLY_API Request : public RefCounted {
  public:
-  Request(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
+  Request(Mnem accnt, Mnem market, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
           Side side, Lots lots, Millis created) noexcept
     : accnt_{accnt},
       market_{market},
@@ -69,7 +69,7 @@ class SWIRLY_API Request : public RefCounted {
   const Mnem accnt_;
   const Mnem market_;
   const Mnem contr_;
-  const Jday settlDay_;
+  const JDay settlDay_;
   const Id64 id_;
   /**
    * Ref is optional.

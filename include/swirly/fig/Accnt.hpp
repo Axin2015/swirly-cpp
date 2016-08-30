@@ -125,7 +125,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     assert(trade.accnt() == mnem_);
     return trades_.remove(trade);
   }
-  PosnPtr posn(Mnem contr, Jday settlDay) throw(std::bad_alloc);
+  PosnPtr posn(Mnem contr, JDay settlDay) throw(std::bad_alloc);
 
   void insertPosn(const PosnPtr& posn) noexcept
   {

@@ -67,8 +67,8 @@ class SWIRLY_API Serv {
 
   const Accnt& accnt(Mnem mnem) const;
 
-  const MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, Jday settlDay,
-                                 Jday expiryDay, MarketState state, Millis now);
+  const MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay,
+                                 JDay expiryDay, MarketState state, Millis now);
 
   const MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
                                  std::optional<MarketState> state, Millis now);

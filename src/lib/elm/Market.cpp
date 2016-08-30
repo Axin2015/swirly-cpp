@@ -16,7 +16,7 @@
  */
 #include <swirly/elm/Market.hpp>
 
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/ash/Date.hpp>
 
 #include <cassert>
 
@@ -24,7 +24,7 @@ using namespace std;
 
 namespace swirly {
 
-Market::Market(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+Market::Market(Mnem mnem, string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
                MarketState state) noexcept
   : mnem_{mnem},
     display_{display},

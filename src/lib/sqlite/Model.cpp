@@ -141,8 +141,8 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     cb(Market::make(column<string_view>(*stmt, Mnem), //
                     column<string_view>(*stmt, Display), //
                     column<string_view>(*stmt, Contr), //
-                    column<Jday>(*stmt, SettlDay), //
-                    column<Jday>(*stmt, ExpiryDay), //
+                    column<JDay>(*stmt, SettlDay), //
+                    column<JDay>(*stmt, ExpiryDay), //
                     column<MarketState>(*stmt, State)));
   }
 }
@@ -167,8 +167,8 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
     cb(MarketBook::make(column<string_view>(*stmt, Mnem), //
                         column<string_view>(*stmt, Display), //
                         column<string_view>(*stmt, Contr), //
-                        column<Jday>(*stmt, SettlDay), //
-                        column<Jday>(*stmt, ExpiryDay), //
+                        column<JDay>(*stmt, SettlDay), //
+                        column<JDay>(*stmt, ExpiryDay), //
                         column<MarketState>(*stmt, State), //
                         column<Lots>(*stmt, LastLots), //
                         column<Ticks>(*stmt, LastTicks), //
@@ -222,7 +222,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     cb(Order::make(column<string_view>(*stmt, Accnt), //
                    column<string_view>(*stmt, Market), //
                    column<string_view>(*stmt, Contr), //
-                   column<Jday>(*stmt, SettlDay), //
+                   column<JDay>(*stmt, SettlDay), //
                    column<Id64>(*stmt, Id), //
                    column<string_view>(*stmt, Ref), //
                    column<swirly::State>(*stmt, State), //
@@ -273,7 +273,7 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
     cb(Exec::make(accnt, //
                   column<string_view>(*stmt, Market), //
                   column<string_view>(*stmt, Contr), //
-                  column<Jday>(*stmt, SettlDay), //
+                  column<JDay>(*stmt, SettlDay), //
                   column<Id64>(*stmt, Id), //
                   column<string_view>(*stmt, Ref), //
                   column<Id64>(*stmt, OrderId), //
@@ -324,7 +324,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     cb(Exec::make(column<string_view>(*stmt, Accnt), //
                   column<string_view>(*stmt, Market), //
                   column<string_view>(*stmt, Contr), //
-                  column<Jday>(*stmt, SettlDay), //
+                  column<JDay>(*stmt, SettlDay), //
                   column<Id64>(*stmt, Id), //
                   column<string_view>(*stmt, Ref), //
                   column<Id64>(*stmt, OrderId), //
@@ -345,7 +345,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
   }
 }
 
-void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
+void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 {
   enum { //
     Accnt, //
@@ -363,7 +363,7 @@ void Model::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
   while (step(*stmt)) {
     const auto accnt = column<string_view>(*stmt, Accnt);
     const auto contr = column<string_view>(*stmt, Contr);
-    auto settlDay = column<Jday>(*stmt, SettlDay);
+    auto settlDay = column<JDay>(*stmt, SettlDay);
 
     // FIXME: review when end of day is implemented.
     if (settlDay != 0_jd && settlDay <= busDay) {
