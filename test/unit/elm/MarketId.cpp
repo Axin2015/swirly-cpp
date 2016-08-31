@@ -14,27 +14,20 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/elm/MarketId.hpp>
+
+#include <swirly/ash/String.hpp>
 
 #include <swirly/tea/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(YmdToIso)
+SWIRLY_TEST_CASE(MarketId)
 {
-  SWIRLY_CHECK(20140314_dt == ymdToIso(2014, 2, 14));
-}
-
-SWIRLY_TEST_CASE(YmdToJd)
-{
-  SWIRLY_CHECK(2456731_jd == ymdToJd(2014, 2, 14));
-  // AD 1978 January 1, 0h UT is JD 2443509.5 and AD 1978 July 21, 15h UT, is JD 2443711.125.
-  SWIRLY_CHECK(2443510_jd == ymdToJd(1978, 0, 1));
-  SWIRLY_CHECK(2443711_jd == ymdToJd(1978, 6, 21));
-}
-
-SWIRLY_TEST_CASE(JdToMillis)
-{
-  SWIRLY_CHECK(1394798400000_ms == jdToMs(ymdToJd(2014, 2, 14)));
+  auto market = MarketId{171_id32, 2492719_jd};
+  SWIRLY_CHECK(market.id() == 0xabcdef);
+  SWIRLY_CHECK(market.contr() == 171_id32);
+  SWIRLY_CHECK(market.settlDay() == 2492719_jd);
+  SWIRLY_CHECK(toString(market) == "11259375"s);
 }

@@ -42,7 +42,7 @@ BusinessDay& BusinessDay::operator=(const BusinessDay& rhs) = default;
 BusinessDay::BusinessDay(BusinessDay&&) noexcept = default;
 BusinessDay& BusinessDay::operator=(BusinessDay&&) noexcept = default;
 
-Jday BusinessDay::operator()(Millis ms) const
+JDay BusinessDay::operator()(Millis ms) const
 {
   const int64_t t{unbox(ms) / 1000L};
   // Returned cached value if it exists.
@@ -53,7 +53,7 @@ Jday BusinessDay::operator()(Millis ms) const
   lt::local_date_time ldt{pt::from_time_t(t), timeZone_};
   // Add 7 hours to 17.00 will roll the date.
   ldt += pt::hours(24 - rollHour_);
-  const auto jd = box<Jday>(ldt.local_time().date().julian_day());
+  const auto jd = box<JDay>(ldt.local_time().date().julian_day());
   // Update cache entry.
   cache_[i] = {t, jd};
   return jd;

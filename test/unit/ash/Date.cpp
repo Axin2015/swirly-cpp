@@ -14,8 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Date.hpp>
-
 #include <swirly/ash/Date.hpp>
 
 #include <swirly/tea/Test.hpp>
@@ -23,19 +21,20 @@
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(GetBusDay)
+SWIRLY_TEST_CASE(YmdToIso)
 {
-  BusinessDay busDay{RollHour, NewYork};
+  SWIRLY_CHECK(20140314_ymd == ymdToIso(2014, 2, 14));
+}
 
-  // Business days roll at 5pm New York.
+SWIRLY_TEST_CASE(YmdToJd)
+{
+  SWIRLY_CHECK(2456731_jd == ymdToJd(2014, 2, 14));
+  // AD 1978 January 1, 0h UT is JD 2443509.5 and AD 1978 July 21, 15h UT, is JD 2443711.125.
+  SWIRLY_CHECK(2443510_jd == ymdToJd(1978, 0, 1));
+  SWIRLY_CHECK(2443711_jd == ymdToJd(1978, 6, 21));
+}
 
-  // Friday, March 14, 2014
-  // 21.00 UTC
-  // 17.00 EDT (UTC-4 hours)
-
-  // 20.59 UTC
-  SWIRLY_CHECK(busDay(1394830799000_ms) == ymdToJd(2014, 2, 14));
-
-  // 21.00 UTC
-  SWIRLY_CHECK(busDay(1394830800000_ms) == ymdToJd(2014, 2, 15));
+SWIRLY_TEST_CASE(JdToMillis)
+{
+  SWIRLY_CHECK(1394798400000_ms == jdToMs(ymdToJd(2014, 2, 14)));
 }

@@ -26,8 +26,8 @@
 #include <swirly/elm/MarketBook.hpp>
 #include <swirly/elm/Model.hpp>
 
+#include <swirly/ash/Date.hpp>
 #include <swirly/ash/Finally.hpp>
-#include <swirly/ash/JulianDay.hpp>
 
 #include "Match.hpp"
 
@@ -137,8 +137,8 @@ struct Serv::Impl {
     return *it;
   }
 
-  const MarketBook& createMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
-                                 Jday expiryDay, MarketState state, Millis now)
+  const MarketBook& createMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
+                                 JDay expiryDay, MarketState state, Millis now)
   {
     if (contrs_.find(contr) == contrs_.end()) {
       throw NotFoundException{errMsg() << "contr '" << contr << "' does not exist"};
@@ -474,7 +474,7 @@ struct Serv::Impl {
   }
 
  private:
-  MarketBookPtr newMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay, Jday expiryDay,
+  MarketBookPtr newMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
                           MarketState state) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), MnemPattern)) {
@@ -494,7 +494,7 @@ struct Serv::Impl {
   /**
    * Special factory method for manual trades.
    */
-  ExecPtr newManual(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, string_view ref,
+  ExecPtr newManual(Mnem accnt, Mnem market, Mnem contr, JDay settlDay, Id64 id, string_view ref,
                     Side side, Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty,
                     Millis created) const
   {
@@ -744,8 +744,8 @@ const Accnt& Serv::accnt(Mnem mnem) const
   return impl_->accnt(mnem);
 }
 
-const MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, Jday settlDay,
-                                     Jday expiryDay, MarketState state, Millis now)
+const MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
+                                     JDay expiryDay, MarketState state, Millis now)
 {
   return impl_->createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
 }

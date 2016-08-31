@@ -54,7 +54,16 @@ class Comparable {
     return lhs.compare(rhs) >= 0;
   }
 
+  // Copy.
+  constexpr Comparable(const Comparable&) noexcept = default;
+  Comparable& operator=(const Comparable&) noexcept = default;
+
+  // Move.
+  constexpr Comparable(Comparable&&) noexcept = default;
+  Comparable& operator=(Comparable&&) noexcept = default;
+
  protected:
+  constexpr Comparable() noexcept = default;
   ~Comparable() noexcept = default;
 };
 

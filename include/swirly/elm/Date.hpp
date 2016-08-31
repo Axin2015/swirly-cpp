@@ -62,7 +62,7 @@ class SWIRLY_API BusinessDay {
    *
    * @return the business day.
    */
-  Jday operator()(Millis ms) const;
+  JDay operator()(Millis ms) const;
 
  private:
   int rollHour_;
@@ -70,7 +70,7 @@ class SWIRLY_API BusinessDay {
   /**
    * Cache entries for odd and even time_t values.
    */
-  mutable std::pair<int64_t, Jday> cache_[2]{};
+  mutable std::pair<int64_t, JDay> cache_[2]{};
 };
 
 } // swirly

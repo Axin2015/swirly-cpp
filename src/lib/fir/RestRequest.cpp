@@ -471,8 +471,8 @@ void RestRequest::reset(bool clear) noexcept
   display_.len = 0;
   accnt_.len = 0;
   contr_.len = 0;
-  settlDate_ = 0_dt;
-  expiryDate_ = 0_dt;
+  settlDate_ = 0_ymd;
+  expiryDate_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;
   side_ = box<swirly::Side>(0);
@@ -689,7 +689,7 @@ _match:
 #line 140 "/home/marayl/repo/swirly/src/lib/fir/RestRequest.rl"
 	{
     fields_ &= ~SettlDate;
-    settlDate_ = 0_dt;
+    settlDate_ = 0_ymd;
   }
 	break;
 	case 18:
@@ -703,7 +703,7 @@ _match:
 #line 151 "/home/marayl/repo/swirly/src/lib/fir/RestRequest.rl"
 	{
     fields_ &= ~ExpiryDate;
-    expiryDate_ = 0_dt;
+    expiryDate_ = 0_ymd;
   }
 	break;
 	case 20:

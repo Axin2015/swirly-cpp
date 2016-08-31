@@ -33,7 +33,7 @@ class Level;
  */
 class SWIRLY_API Order : public Request, public MemAlloc {
  public:
-  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
+  Order(Mnem accnt, Mnem market, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
         State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
         Lots lastLots, Ticks lastTicks, Lots minLots, Millis created, Millis modified) noexcept
     : Request{accnt, market, contr, settlDay, id, ref, side, lots, created},
@@ -48,7 +48,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
       modified_{modified}
   {
   }
-  Order(Mnem accnt, Mnem market, Mnem contr, Jday settlDay, Id64 id, std::string_view ref,
+  Order(Mnem accnt, Mnem market, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
         Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) noexcept
     : Order{accnt, market, contr, settlDay, id,    ref,   State::New, side,    lots,
             ticks, lots,   0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}

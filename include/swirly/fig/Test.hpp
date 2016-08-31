@@ -53,7 +53,7 @@ class SWIRLY_API TestModel : public Model {
 
   void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
 
-  void doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const override;
+  void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
 };
 
 class SWIRLY_API TestJourn : public Journ {

@@ -46,8 +46,7 @@ class Foo {
 
 class Bar {
  public:
-  Bar(Id64 id, string_view display, int& alive) noexcept
-    : id_{id}, display_{display}, alive_{alive}
+  Bar(Id64 id, string_view display, int& alive) noexcept : id_{id}, display_{display}, alive_{alive}
   {
     ++alive;
   }

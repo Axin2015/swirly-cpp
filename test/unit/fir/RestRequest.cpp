@@ -85,12 +85,12 @@ SWIRLY_TEST_CASE(RestRequestSettlDate)
 
   SWIRLY_CHECK(rr.parse(R"({"settlDate":20140314})"_sv));
   SWIRLY_CHECK(rr.fields() == RestRequest::SettlDate);
-  SWIRLY_CHECK(rr.settlDate() == 20140314_dt);
+  SWIRLY_CHECK(rr.settlDate() == 20140314_ymd);
 
   rr.reset(false);
   rr.parse(R"({"settlDate":null})"_sv);
   SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.settlDate() == 0_dt);
+  SWIRLY_CHECK(rr.settlDate() == 0_ymd);
 }
 
 SWIRLY_TEST_CASE(RestRequestExpiryDate)
@@ -99,12 +99,12 @@ SWIRLY_TEST_CASE(RestRequestExpiryDate)
 
   SWIRLY_CHECK(rr.parse(R"({"expiryDate":20140314})"_sv));
   SWIRLY_CHECK(rr.fields() == RestRequest::ExpiryDate);
-  SWIRLY_CHECK(rr.expiryDate() == 20140314_dt);
+  SWIRLY_CHECK(rr.expiryDate() == 20140314_ymd);
 
   rr.reset(false);
   rr.parse(R"({"expiryDate":null})"_sv);
   SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.expiryDate() == 0_dt);
+  SWIRLY_CHECK(rr.expiryDate() == 0_ymd);
 }
 
 SWIRLY_TEST_CASE(RestRequestRef)
@@ -225,7 +225,7 @@ SWIRLY_TEST_CASE(RestRequestMulti)
   SWIRLY_CHECK(rr.parse(R"({"contr":"EURUSD","settlDate":20140314})"_sv));
   SWIRLY_CHECK(rr.fields() == (RestRequest::Contr | RestRequest::SettlDate));
   SWIRLY_CHECK(rr.contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(rr.settlDate() == 20140314_dt);
+  SWIRLY_CHECK(rr.settlDate() == 20140314_ymd);
 }
 
 SWIRLY_TEST_CASE(RestRequestDuplicate)
@@ -290,8 +290,8 @@ SWIRLY_TEST_CASE(RestRequestAll)
   SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
   SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
   SWIRLY_CHECK(rr.contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(rr.settlDate() == 20140315_dt);
-  SWIRLY_CHECK(rr.expiryDate() == 20140314_dt);
+  SWIRLY_CHECK(rr.settlDate() == 20140315_ymd);
+  SWIRLY_CHECK(rr.expiryDate() == 20140314_ymd);
   SWIRLY_CHECK(rr.ref() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.state() == 3U);
   SWIRLY_CHECK(rr.side() == Side::Buy);

@@ -16,7 +16,7 @@
  */
 #include <swirly/elm/MarketBook.hpp>
 
-#include <swirly/ash/JulianDay.hpp>
+#include <swirly/ash/Date.hpp>
 
 #include <cassert>
 

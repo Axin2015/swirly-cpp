@@ -131,7 +131,7 @@ void TestModel::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
 }
 
-void TestModel::doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const
+void TestModel::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 {
 }
 

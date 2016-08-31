@@ -31,8 +31,8 @@ struct SWIRLY_PACKED CreateMarketBody {
   char mnem[MaxMnem];
   char display[MaxDisplay];
   char contr[MaxMnem];
-  Jday settlDay;
-  Jday expiryDay;
+  JDay settlDay;
+  JDay expiryDay;
   MarketState state;
 };
 static_assert(std::is_pod<CreateMarketBody>::value, "message-type must be pod");
@@ -48,7 +48,7 @@ struct SWIRLY_PACKED CreateExecBody {
   char accnt[MaxMnem];
   char market[MaxMnem];
   char contr[MaxMnem];
-  Jday settlDay;
+  JDay settlDay;
   Id64 id;
   char ref[MaxRef];
   Id64 orderId;

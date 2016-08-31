@@ -55,7 +55,7 @@ class SWIRLY_API Model {
     doReadExec(accnt, limit, cb);
   }
   void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
-  void readPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
+  void readPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
 
  protected:
   virtual void doReadAsset(const ModelCallback<AssetPtr>& cb) const = 0;
@@ -75,7 +75,7 @@ class SWIRLY_API Model {
 
   virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
 
-  virtual void doReadPosn(Jday busDay, const ModelCallback<PosnPtr>& cb) const = 0;
+  virtual void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
 /**

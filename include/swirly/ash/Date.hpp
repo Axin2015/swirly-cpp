@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_JULIANDAY_HPP
-#define SWIRLY_ASH_JULIANDAY_HPP
+#ifndef SWIRLY_ASH_DATE_HPP
+#define SWIRLY_ASH_DATE_HPP
 
 #include <swirly/ash/Types.hpp>
 
@@ -36,7 +36,7 @@ constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
 /**
  * Gregorian date to Julian day.
  */
-constexpr Jday ymdToJd(int year, int mon, int mday) noexcept
+constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
 {
   // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
   // for Computers.
@@ -45,7 +45,7 @@ constexpr Jday ymdToJd(int year, int mon, int mday) noexcept
   const auto i = year;
   const auto j = mon + 1;
   const auto k = mday;
-  return box<Jday>(k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
+  return box<JDay>(k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
                    + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
                    - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4);
 }
@@ -53,7 +53,7 @@ constexpr Jday ymdToJd(int year, int mon, int mday) noexcept
 /**
  * ISO8601 to Julian day.
  */
-constexpr Jday isoToJd(IsoDate iso) noexcept
+constexpr JDay isoToJd(IsoDate iso) noexcept
 {
   const auto n = unbox(iso);
   const auto year = n / 10000;
@@ -65,7 +65,7 @@ constexpr Jday isoToJd(IsoDate iso) noexcept
 /**
  * Julian day to ISO8601.
  */
-constexpr IsoDate jdToIso(Jday jd) noexcept
+constexpr IsoDate jdToIso(JDay jd) noexcept
 {
   // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
   // for Computers.
@@ -86,13 +86,29 @@ constexpr IsoDate jdToIso(Jday jd) noexcept
 }
 
 /**
+ * Julian day to Truncated Julian day. Epoch is May 24, 1968.
+ */
+constexpr int32_t jdToTjd(JDay jd) noexcept
+{
+  return unbox(jd) - 2440000;
+}
+
+/**
+ * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
+ */
+constexpr JDay tjdToJd(int32_t tjd) noexcept
+{
+  return box<JDay>(tjd + 2440000);
+}
+
+/**
  * Julian day to milliseconds since Unix epoch.
  */
-constexpr Millis jdToMs(Jday jd) noexcept
+constexpr Millis jdToMs(JDay jd) noexcept
 {
   using namespace enumops;
   // Julian day for January 1st, 1970.
-  const Jday jdUnixEpoc = 2440588_jd;
+  const JDay jdUnixEpoc = 2440588_jd;
   const int64_t msInDay = 24 * 60 * 60 * 1000;
   // Add half day for 12pm.
   return box<Millis>(unbox(jd - jdUnixEpoc) * msInDay + (msInDay >> 1));
@@ -101,19 +117,19 @@ constexpr Millis jdToMs(Jday jd) noexcept
 /**
  * Julian day to ISO8601 if argument is non-zero.
  */
-constexpr IsoDate maybeJdToIso(Jday jd) noexcept
+constexpr IsoDate maybeJdToIso(JDay jd) noexcept
 {
-  return jd != 0_jd ? jdToIso(jd) : 0_dt;
+  return jd != 0_jd ? jdToIso(jd) : 0_ymd;
 }
 
 /**
  * ISO8601 to Julian day if argument is non-zero.
  */
-constexpr Jday maybeIsoToJd(IsoDate iso) noexcept
+constexpr JDay maybeIsoToJd(IsoDate iso) noexcept
 {
-  return iso != 0_dt ? isoToJd(iso) : 0_jd;
+  return iso != 0_ymd ? isoToJd(iso) : 0_jd;
 }
 
 } // swirly
 
-#endif // SWIRLY_ASH_JULIANDAY_HPP
+#endif // SWIRLY_ASH_DATE_HPP
