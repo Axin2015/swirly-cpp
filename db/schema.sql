@@ -88,7 +88,8 @@ INSERT INTO asset_type_t (id, mnem) VALUES (6, 'INDEX')
 ;
 
 CREATE TABLE asset_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
+  id INT NOT NULL PRIMARY KEY,
+  mnem CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
   type_id INT NOT NULL,
 
@@ -97,8 +98,9 @@ CREATE TABLE asset_t (
 ;
 
 CREATE TABLE contr_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
-  display VARCHAR(64) NOT NULL,
+  id INT NOT NULL PRIMARY KEY,
+  mnem CHAR(16) NOT NULL UNIQUE,
+  display VARCHAR(64) NOT NULL UNIQUE,
   asset CHAR(16) NOT NULL,
   ccy CHAR(16) NOT NULL,
   lot_numer INT NOT NULL,
@@ -116,7 +118,7 @@ CREATE TABLE contr_t (
 
 CREATE TABLE market_t (
   mnem CHAR(16) NOT NULL PRIMARY KEY,
-  display VARCHAR(64) NOT NULL,
+  display VARCHAR(64) NOT NULL UNIQUE,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,

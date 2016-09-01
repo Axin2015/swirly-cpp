@@ -61,6 +61,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
 
   auto it = serv.assets().find("CHF"_sv);
   SWIRLY_CHECK(it != serv.assets().end());
+  SWIRLY_CHECK(it->id() == 1_id32);
   SWIRLY_CHECK(it->mnem() == "CHF"_sv);
   SWIRLY_CHECK(it->display() == "Switzerland, Francs"_sv);
 
@@ -73,6 +74,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServContrs, ServFixture)
 
   auto it = serv.contrs().find("EURUSD"_sv);
   SWIRLY_CHECK(it != serv.contrs().end());
+  SWIRLY_CHECK(it->id() == 1_id32);
   SWIRLY_CHECK(it->mnem() == "EURUSD"_sv);
   SWIRLY_CHECK(it->display() == "EURUSD"_sv);
 

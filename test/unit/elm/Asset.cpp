@@ -25,7 +25,7 @@ static_assert(sizeof(Asset) <= 3 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(AssetToString)
 {
-  Asset asset{"GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Currency};
+  Asset asset{1_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Currency};
 
   SWIRLY_CHECK(toString(asset) == //
                "{\"mnem\":\"GBP\""

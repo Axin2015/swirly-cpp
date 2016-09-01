@@ -25,7 +25,8 @@ static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(ContrToString)
 {
-  Contr contr{"EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4, 1_lts, 10_lts};
+  Contr contr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
+              1,      1,           10000,       4,        1_lts,    10_lts};
 
   SWIRLY_CHECK(toString(contr) == //
                "{\"mnem\":\"EURUSD\""

@@ -33,11 +33,11 @@ namespace sqlite {
 namespace {
 
 constexpr auto SelectAssetSql = //
-  "SELECT mnem, display, type_id FROM asset_t"_sv;
+  "SELECT id, mnem, display, type_id FROM asset_t"_sv;
 
 constexpr auto SelectContrSql = //
-  "SELECT mnem, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom, pip_dp," //
-  " min_lots, max_lots FROM contr_v"_sv;
+  "SELECT id, mnem, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom,"
+  " pip_dp, min_lots, max_lots FROM contr_v"_sv;
 
 constexpr auto SelectMarketSql = //
   "SELECT mnem, display, contr, settl_day, state, last_lots, last_ticks, last_time," //
@@ -80,6 +80,7 @@ Model& Model::operator=(Model&&) = default;
 void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
   enum {
+    Id, //
     Mnem, //
     Display, //
     TypeId //
@@ -87,7 +88,8 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectAssetSql)};
   while (step(*stmt)) {
-    cb(Asset::make(column<string_view>(*stmt, Mnem), //
+    cb(Asset::make(column<Id32>(*stmt, Id), //
+                   column<string_view>(*stmt, Mnem), //
                    column<string_view>(*stmt, Display), //
                    column<AssetType>(*stmt, TypeId)));
   }
@@ -96,6 +98,7 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
 {
   enum {
+    Id, //
     Mnem, //
     Display, //
     Asset, //
@@ -111,7 +114,8 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectContrSql)};
   while (step(*stmt)) {
-    cb(Contr::make(column<string_view>(*stmt, Mnem), //
+    cb(Contr::make(column<Id32>(*stmt, Id), //
+                   column<string_view>(*stmt, Mnem), //
                    column<string_view>(*stmt, Display), //
                    column<string_view>(*stmt, Asset), //
                    column<string_view>(*stmt, Ccy), //

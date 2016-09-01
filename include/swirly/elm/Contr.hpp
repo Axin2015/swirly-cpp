@@ -28,8 +28,8 @@ namespace swirly {
  */
 class SWIRLY_API Contr : public Comparable<Contr> {
  public:
-  Contr(Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer, int lotDenom,
-        int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
+  Contr(Id32 id, Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
+        int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
 
   ~Contr() noexcept;
 
@@ -50,6 +50,7 @@ class SWIRLY_API Contr : public Comparable<Contr> {
   void toJson(std::ostream& os) const;
 
   int compare(const Contr& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  auto id() const noexcept { return id_; }
   auto mnem() const noexcept { return mnem_; }
   auto display() const noexcept { return +display_; }
   auto asset() const noexcept { return asset_; }
@@ -68,6 +69,7 @@ class SWIRLY_API Contr : public Comparable<Contr> {
   boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
+  const Id32 id_;
   const Mnem mnem_;
   const Display display_;
   const Mnem asset_;

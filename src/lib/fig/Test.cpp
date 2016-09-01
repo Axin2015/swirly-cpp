@@ -36,75 +36,83 @@ TestModel& TestModel::operator=(TestModel&&) noexcept = default;
 void TestModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
   // Forex.
-  cb(Asset::make("CHF"_sv, "Switzerland, Francs"_sv, AssetType::Currency));
-  cb(Asset::make("EUR"_sv, "Euro Member Countries, Euro"_sv, AssetType::Currency));
-  cb(Asset::make("GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Currency));
-  cb(Asset::make("JPY"_sv, "Japan, Yen"_sv, AssetType::Currency));
-  cb(Asset::make("USD"_sv, "United States of America, Dollars"_sv, AssetType::Currency));
-  cb(Asset::make("ZAR"_sv, "South Africa, Rand"_sv, AssetType::Currency));
+  cb(Asset::make(1_id32, "CHF"_sv, "Switzerland, Francs"_sv, AssetType::Currency));
+  cb(Asset::make(2_id32, "EUR"_sv, "Euro Member Countries, Euro"_sv, AssetType::Currency));
+  cb(Asset::make(3_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Currency));
+  cb(Asset::make(4_id32, "JPY"_sv, "Japan, Yen"_sv, AssetType::Currency));
+  cb(Asset::make(5_id32, "USD"_sv, "United States of America, Dollars"_sv, AssetType::Currency));
+  cb(Asset::make(6_id32, "ZAR"_sv, "South Africa, Rand"_sv, AssetType::Currency));
   // Coal.
-  cb(Asset::make("CAP"_sv, "Central Appalachia Coal"_sv, AssetType::Commodity));
-  cb(Asset::make("NAP"_sv, "Northern Appalachia Coal"_sv, AssetType::Commodity));
-  cb(Asset::make("ILB"_sv, "Illinois Basin Coal"_sv, AssetType::Commodity));
-  cb(Asset::make("PRB"_sv, "Powder River Basin Coal"_sv, AssetType::Commodity));
-  cb(Asset::make("UIB"_sv, "Uinta Basin Coal"_sv, AssetType::Commodity));
+  cb(Asset::make(7_id32, "CAP"_sv, "Central Appalachia Coal"_sv, AssetType::Commodity));
+  cb(Asset::make(8_id32, "NAP"_sv, "Northern Appalachia Coal"_sv, AssetType::Commodity));
+  cb(Asset::make(9_id32, "ILB"_sv, "Illinois Basin Coal"_sv, AssetType::Commodity));
+  cb(Asset::make(10_id32, "PRB"_sv, "Powder River Basin Coal"_sv, AssetType::Commodity));
+  cb(Asset::make(11_id32, "UIB"_sv, "Uinta Basin Coal"_sv, AssetType::Commodity));
   // Coffee.
-  cb(Asset::make("ETB"_sv, "Ethiopia, Birr"_sv, AssetType::Currency));
-  cb(Asset::make("WYCA"_sv, "Yirgachefe A"_sv, AssetType::Commodity));
-  cb(Asset::make("WWNA"_sv, "Wenago A"_sv, AssetType::Commodity));
-  cb(Asset::make("WKCA"_sv, "Kochere A"_sv, AssetType::Commodity));
-  cb(Asset::make("WGAA"_sv, "Gelena Abaya A"_sv, AssetType::Commodity));
+  cb(Asset::make(12_id32, "ETB"_sv, "Ethiopia, Birr"_sv, AssetType::Currency));
+  cb(Asset::make(13_id32, "WYCA"_sv, "Yirgachefe A"_sv, AssetType::Commodity));
+  cb(Asset::make(14_id32, "WWNA"_sv, "Wenago A"_sv, AssetType::Commodity));
+  cb(Asset::make(15_id32, "WKCA"_sv, "Kochere A"_sv, AssetType::Commodity));
+  cb(Asset::make(16_id32, "WGAA"_sv, "Gelena Abaya A"_sv, AssetType::Commodity));
   // US Corporates.
-  cb(Asset::make("CSCO"_sv, "Cisco Systems Inc"_sv, AssetType::Corporate));
-  cb(Asset::make("DIS"_sv, "Walt Disney"_sv, AssetType::Corporate));
-  cb(Asset::make("IBM"_sv, "Ibm Corp"_sv, AssetType::Corporate));
-  cb(Asset::make("INTC"_sv, "Intel Corp"_sv, AssetType::Corporate));
-  cb(Asset::make("MSFT"_sv, "Microsoft Corp"_sv, AssetType::Corporate));
-  cb(Asset::make("VIA"_sv, "Viacom Inc"_sv, AssetType::Corporate));
-  cb(Asset::make("VOD"_sv, "Vodafone Group Plc"_sv, AssetType::Corporate));
-  cb(Asset::make("VZ"_sv, "Verizon Com"_sv, AssetType::Corporate));
+  cb(Asset::make(17_id32, "CSCO"_sv, "Cisco Systems Inc"_sv, AssetType::Corporate));
+  cb(Asset::make(18_id32, "DIS"_sv, "Walt Disney"_sv, AssetType::Corporate));
+  cb(Asset::make(19_id32, "IBM"_sv, "Ibm Corp"_sv, AssetType::Corporate));
+  cb(Asset::make(20_id32, "INTC"_sv, "Intel Corp"_sv, AssetType::Corporate));
+  cb(Asset::make(21_id32, "MSFT"_sv, "Microsoft Corp"_sv, AssetType::Corporate));
+  cb(Asset::make(22_id32, "VIA"_sv, "Viacom Inc"_sv, AssetType::Corporate));
+  cb(Asset::make(23_id32, "VOD"_sv, "Vodafone Group Plc"_sv, AssetType::Corporate));
+  cb(Asset::make(24_id32, "VZ"_sv, "Verizon Com"_sv, AssetType::Corporate));
 }
 
 void TestModel::doReadContr(const ModelCallback<ContrPtr>& cb) const
 {
   // Forex.
-  cb(Contr::make("EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4, 1_lts,
-                 10_lts));
-  cb(Contr::make("GBPUSD"_sv, "GBPUSD"_sv, "GBP"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4, 1_lts,
-                 10_lts));
-  cb(Contr::make("USDCHF"_sv, "USDCHF"_sv, "USD"_sv, "CHF"_sv, 1000000, 1, 1, 10000, 4, 1_lts,
-                 10_lts));
-  cb(Contr::make("USDJPY"_sv, "USDJPY"_sv, "USD"_sv, "JPY"_sv, 1000000, 1, 1, 100, 2, 1_lts,
+  cb(Contr::make(1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4,
+                 1_lts, 10_lts));
+  cb(Contr::make(2_id32, "GBPUSD"_sv, "GBPUSD"_sv, "GBP"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4,
+                 1_lts, 10_lts));
+  cb(Contr::make(3_id32, "USDCHF"_sv, "USDCHF"_sv, "USD"_sv, "CHF"_sv, 1000000, 1, 1, 10000, 4,
+                 1_lts, 10_lts));
+  cb(Contr::make(4_id32, "USDJPY"_sv, "USDJPY"_sv, "USD"_sv, "JPY"_sv, 1000000, 1, 1, 100, 2, 1_lts,
                  10_lts));
   // Coal.
-  cb(Contr::make("CAP"_sv, "Central Appalachia Coal"_sv, "CAP"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
+  cb(Contr::make(5_id32, "CAP"_sv, "Central Appalachia Coal"_sv, "CAP"_sv, "USD"_sv, 1000, 1, 1, 20,
+                 2, 1_lts, 10_lts));
+  cb(Contr::make(6_id32, "NAP"_sv, "Northern Appalachia Coal"_sv, "NAP"_sv, "USD"_sv, 1000, 1, 1,
+                 20, 2, 1_lts, 10_lts));
+  cb(Contr::make(7_id32, "ILB"_sv, "Illinois Basin Coal"_sv, "ILB"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
                  1_lts, 10_lts));
-  cb(Contr::make("NAP"_sv, "Northern Appalachia Coal"_sv, "NAP"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
+  cb(Contr::make(8_id32, "PRB"_sv, "Powder River Basin Coal"_sv, "PRB"_sv, "USD"_sv, 1000, 1, 1, 20,
+                 2, 1_lts, 10_lts));
+  cb(Contr::make(9_id32, "UIB"_sv, "Uinta Basin Coal"_sv, "UIB"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
                  1_lts, 10_lts));
-  cb(Contr::make("ILB"_sv, "Illinois Basin Coal"_sv, "ILB"_sv, "USD"_sv, 1000, 1, 1, 20, 2, 1_lts,
-                 10_lts));
-  cb(Contr::make("PRB"_sv, "Powder River Basin Coal"_sv, "PRB"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
-                 1_lts, 10_lts));
-  cb(Contr::make("UIB"_sv, "Uinta Basin Coal"_sv, "UIB"_sv, "USD"_sv, 1000, 1, 1, 20, 2, 1_lts,
-                 10_lts));
   // Coffee.
-  cb(Contr::make("WYCA"_sv, "Yirgachefe A"_sv, "WYCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  cb(Contr::make("WWNA"_sv, "Wenago A"_sv, "WWNA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  cb(Contr::make("WKCA"_sv, "Kochere A"_sv, "WKCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts, 10_lts));
-  cb(
-    Contr::make("WGAA"_sv, "Gelena Abaya A"_sv, "WGAA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts, 10_lts));
+  cb(Contr::make(10_id32, "WYCA"_sv, "Yirgachefe A"_sv, "WYCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+                 10_lts));
+  cb(Contr::make(11_id32, "WWNA"_sv, "Wenago A"_sv, "WWNA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+                 10_lts));
+  cb(Contr::make(12_id32, "WKCA"_sv, "Kochere A"_sv, "WKCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+                 10_lts));
+  cb(Contr::make(13_id32, "WGAA"_sv, "Gelena Abaya A"_sv, "WGAA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+                 10_lts));
   // US Corporates.
-  cb(Contr::make("CSCO"_sv, "Cisco Systems Inc"_sv, "CSCO"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+  cb(Contr::make(14_id32, "CSCO"_sv, "Cisco Systems Inc"_sv, "CSCO"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
+                 1_lts, 10_lts));
+  cb(Contr::make(15_id32, "DIS"_sv, "Walt Disney"_sv, "DIS"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                  10_lts));
-  cb(Contr::make("DIS"_sv, "Walt Disney"_sv, "DIS"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  cb(Contr::make("IBM"_sv, "Ibm Corp"_sv, "IBM"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  cb(Contr::make("INTC"_sv, "Intel Corp"_sv, "INTC"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  cb(Contr::make("MSFT"_sv, "Microsoft Corp"_sv, "MSFT"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+  cb(Contr::make(16_id32, "IBM"_sv, "Ibm Corp"_sv, "IBM"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                  10_lts));
-  cb(Contr::make("VIA"_sv, "Viacom Inc"_sv, "VIA"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
-  cb(Contr::make("VOD"_sv, "Vodafone Group Plc"_sv, "VOD"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+  cb(Contr::make(17_id32, "INTC"_sv, "Intel Corp"_sv, "INTC"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                  10_lts));
-  cb(Contr::make("VZ"_sv, "Verizon Com"_sv, "VZ"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts, 10_lts));
+  cb(Contr::make(18_id32, "MSFT"_sv, "Microsoft Corp"_sv, "MSFT"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
+                 1_lts, 10_lts));
+  cb(Contr::make(19_id32, "VIA"_sv, "Viacom Inc"_sv, "VIA"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+                 10_lts));
+  cb(Contr::make(20_id32, "VOD"_sv, "Vodafone Group Plc"_sv, "VOD"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
+                 1_lts, 10_lts));
+  cb(Contr::make(21_id32, "VZ"_sv, "Verizon Com"_sv, "VZ"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+                 10_lts));
 }
 
 void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
