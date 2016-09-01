@@ -138,23 +138,16 @@ struct Serv::Impl {
   }
 
   const MarketBook& createMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
-                                 JDay expiryDay, MarketState state, Millis now)
+                                 MarketState state, Millis now)
   {
     if (contrs_.find(contr) == contrs_.end()) {
       throw NotFoundException{errMsg() << "contr '" << contr << "' does not exist"};
     }
     if (settlDay != 0_jd) {
-      // busDay <= expiryDay <= settlDay.
+      // busDay <= settlDay.
       const auto busDay = busDay_(now);
-      if (settlDay < expiryDay) {
-        throw InvalidException{"settl-day before expiry-day"_sv};
-      }
-      if (expiryDay < busDay) {
-        throw InvalidException{"expiry-day before bus-day"_sv};
-      }
-    } else {
-      if (expiryDay != 0_jd) {
-        throw InvalidException{"expiry-day without settl-day"_sv};
+      if (settlDay < busDay) {
+        throw InvalidException{"settl-day before bus-day"_sv};
       }
     }
     MarketSet::Iterator it;
@@ -164,8 +157,8 @@ struct Serv::Impl {
       throw AlreadyExistsException{errMsg() << "market '" << mnem << "' already exists"};
     }
     {
-      auto market = newMarket(mnem, display, contr, settlDay, expiryDay, state);
-      journ_.createMarket(mnem, display, contr, settlDay, expiryDay, state);
+      auto market = newMarket(mnem, display, contr, settlDay, state);
+      journ_.createMarket(mnem, display, contr, settlDay, state);
       it = markets_.insertHint(it, move(market));
     }
     return *it;
@@ -198,9 +191,9 @@ struct Serv::Impl {
     }
 
     const auto busDay = busDay_(now);
-    if (book.expiryDay() != 0_jd && book.expiryDay() < busDay) {
-      throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' in '"
-                                           << maybeJdToIso(book.settlDay()) << "' has expired"};
+    if (book.settlDay() != 0_jd && book.settlDay() < busDay) {
+      throw MarketClosedException{errMsg() << "market for '" << book.contr() << "' on '"
+                                           << jdToIso(book.settlDay()) << "' has closed"};
     }
     if (lots == 0_lts || lots < minLots) {
       throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
@@ -474,13 +467,13 @@ struct Serv::Impl {
   }
 
  private:
-  MarketBookPtr newMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
+  MarketBookPtr newMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
                           MarketState state) const
   {
     if (!regex_match(mnem.begin(), mnem.end(), MnemPattern)) {
       throw InvalidException{errMsg() << "invalid mnem '" << mnem << '\''};
     }
-    return MarketBook::make(mnem, display, contr, settlDay, expiryDay, state);
+    return MarketBook::make(mnem, display, contr, settlDay, state);
   }
 
   ExecPtr newExec(const Order& order, Id64 id, Millis created) const
@@ -745,9 +738,9 @@ const Accnt& Serv::accnt(Mnem mnem) const
 }
 
 const MarketBook& Serv::createMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
-                                     JDay expiryDay, MarketState state, Millis now)
+                                     MarketState state, Millis now)
 {
-  return impl_->createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
+  return impl_->createMarket(mnem, display, contr, settlDay, state, now);
 }
 
 const MarketBook& Serv::updateMarket(Mnem mnem, optional<string_view> display,

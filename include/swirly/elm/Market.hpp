@@ -29,7 +29,7 @@ namespace swirly {
  */
 class SWIRLY_API Market : public Comparable<Market> {
  public:
-  Market(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
+  Market(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay,
          MarketState state) noexcept;
 
   virtual ~Market() noexcept;
@@ -55,7 +55,6 @@ class SWIRLY_API Market : public Comparable<Market> {
   auto display() const noexcept { return +display_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
-  auto expiryDay() const noexcept { return expiryDay_; }
   auto state() const noexcept { return state_; }
   void setDisplay(std::string_view display) noexcept { display_ = display; }
   void setState(MarketState state) noexcept { state_ = state; }
@@ -65,7 +64,6 @@ class SWIRLY_API Market : public Comparable<Market> {
   Display display_;
   const Mnem contr_;
   const JDay settlDay_;
-  const JDay expiryDay_;
   MarketState state_;
 };
 

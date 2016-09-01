@@ -365,13 +365,12 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
       state_ |= MatchMethod;
       getAdmin(data);
       constexpr auto reqFields = RestRequest::Mnem | RestRequest::Display | RestRequest::Contr;
-      constexpr auto optFields
-        = RestRequest::SettlDate | RestRequest::ExpiryDate | RestRequest::State;
+      constexpr auto optFields = RestRequest::SettlDate | RestRequest::State;
       if (!request_.valid(reqFields, optFields)) {
         throw InvalidException{"request fields are invalid"_sv};
       }
       rest_.postMarket(request_.mnem(), request_.display(), request_.contr(), request_.settlDate(),
-                       request_.expiryDate(), request_.state(), now, out_);
+                       request_.state(), now, out_);
       break;
     }
     return;

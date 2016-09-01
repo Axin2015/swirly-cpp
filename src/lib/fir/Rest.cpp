@@ -266,11 +266,10 @@ void Rest::getView(ArrayView<Mnem> markets, Millis now, ostream& out) const
 }
 
 void Rest::postMarket(Mnem mnem, string_view display, Mnem contr, IsoDate settlDate,
-                      IsoDate expiryDate, MarketState state, Millis now, ostream& out)
+                      MarketState state, Millis now, ostream& out)
 {
   const auto settlDay = maybeIsoToJd(settlDate);
-  const auto expiryDay = maybeIsoToJd(expiryDate);
-  const auto& market = serv_.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
+  const auto& market = serv_.createMarket(mnem, display, contr, settlDay, state, now);
   out << market;
 }
 

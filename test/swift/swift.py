@@ -217,14 +217,13 @@ class Connection(object):
 
 class RestTestCase(unittest.TestCase):
 
-  def createMarket(self, conn, mnem, contr, settlDate, expiryDate):
+  def createMarket(self, conn, mnem, contr, settlDate):
     conn.setAdmin()
     resp = conn.send('POST', '/rec/market',
                      mnem = mnem,
                      display = mnem,
                      contr = contr,
                      settlDate = settlDate,
-                     expiryDate = expiryDate,
                      state = 0)
 
     self.assertEqual(200, resp.status)

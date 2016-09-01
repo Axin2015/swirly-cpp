@@ -35,7 +35,6 @@ namespace {
 
 constexpr auto Today = ymdToJd(2014, 2, 11);
 constexpr auto SettlDay = Today + 2_jd;
-constexpr auto ExpiryDay = Today + 1_jd;
 
 constexpr auto Now = jdToMs(Today);
 
@@ -158,8 +157,7 @@ SWIRLY_TEST_CASE(AsyncWindow)
 
 SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
 {
-  asyncJourn.createMarket("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay, ExpiryDay,
-                          0x1);
+  asyncJourn.createMarket("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay, 0x1);
 
   Msg msg;
   SWIRLY_CHECK(journ.pop(msg));
@@ -170,7 +168,6 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
   SWIRLY_CHECK(strncmp(body.display, "EURUSD March 14", sizeof(body.display)) == 0);
   SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
   SWIRLY_CHECK(body.settlDay == body.settlDay);
-  SWIRLY_CHECK(body.expiryDay == body.expiryDay);
   SWIRLY_CHECK(body.state == body.state);
 }
 

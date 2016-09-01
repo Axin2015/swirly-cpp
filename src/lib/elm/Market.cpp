@@ -24,16 +24,10 @@ using namespace std;
 
 namespace swirly {
 
-Market::Market(Mnem mnem, string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
+Market::Market(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
                MarketState state) noexcept
-  : mnem_{mnem},
-    display_{display},
-    contr_{contr},
-    settlDay_{settlDay},
-    expiryDay_{expiryDay},
-    state_{state}
+  : mnem_{mnem}, display_{display}, contr_{contr}, settlDay_{settlDay}, state_{state}
 {
-  assert((settlDay == 0_jd) == (expiryDay == 0_jd));
 }
 
 Market::~Market() noexcept = default;
@@ -54,13 +48,7 @@ void Market::toJson(ostream& os) const
   } else {
     os << "null";
   }
-  os << ",\"expiryDate\":";
 
-  if (expiryDay_ != 0_jd) {
-    os << jdToIso(expiryDay_);
-  } else {
-    os << "null";
-  }
   os << ",\"state\":" << state_ //
      << '}';
 }

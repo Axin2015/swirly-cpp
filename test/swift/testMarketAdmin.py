@@ -61,7 +61,6 @@ class TestCase(RestTestCase):
                      display = 'first',
                      contr = 'USDJPY',
                      settlDate = 20140302,
-                     expiryDate = 20140301,
                      state = 1)
 
     self.assertEqual(200, resp.status)
@@ -69,7 +68,6 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'first',
-      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
       u'settlDate': 20140302,
       u'state': 1
@@ -85,7 +83,6 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'second',
-      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
       u'settlDate': 20140302,
       u'state': 2
@@ -102,7 +99,6 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'third',
-      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
       u'settlDate': 20140302,
       u'state': 2
@@ -118,7 +114,6 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'USDJPY',
       u'display': u'third',
-      u'expiryDate': 20140301,
       u'mnem': u'USDJPY.MAR14',
       u'settlDate': 20140302,
       u'state': 3

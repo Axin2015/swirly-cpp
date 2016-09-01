@@ -31,8 +31,8 @@ constexpr auto CommitSql = "COMMIT TRANSACTION"_sv;
 constexpr auto RollbackSql = "ROLLBACK TRANSACTION"_sv;
 
 constexpr auto InsertMarketSql = //
-  "INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)" //
-  " VALUES (?, ?, ?, ?, ?, ?)"_sv;
+  "INSERT INTO market_t (mnem, display, contr, settl_day, state)" //
+  " VALUES (?, ?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateMarketSql = //
   "UPDATE Market_t SET display = ?2, state = ?3" //
@@ -102,7 +102,6 @@ void Journ::createMarket(const CreateMarketBody& body)
   bind(toStringView(body.display));
   bind(toStringView(body.contr));
   bind(body.settlDay, MaybeNull);
-  bind(body.expiryDay, MaybeNull);
   bind(body.state);
 
   stepOnce(stmt);

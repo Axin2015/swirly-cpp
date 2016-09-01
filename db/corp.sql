@@ -81,25 +81,21 @@ INSERT INTO contr_t (mnem, display, asset, ccy, lot_numer, lot_denom,
        VALUES ('VZ', 'Verizon Com', 'VZ', 'USD', 1, 1, 1, 1000, 3, 1, 10);
 ;
 
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
        VALUES ('CSCO.4.45.20', 'CSCO 4.450 `20', 'CSCO',
-              CAST(JULIANDAY('2020-01-15') AS INTEGER),
-              CAST(JULIANDAY('2020-01-14') AS INTEGER), 0);
+              CAST(JULIANDAY('2020-01-15') AS INTEGER), 0);
 
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
        VALUES ('DIS.1.125.17', 'DIS 1.125 `17', 'DIS',
-              CAST(JULIANDAY('2017-02-15') AS INTEGER),
-              CAST(JULIANDAY('2017-02-14') AS INTEGER), 0);
+              CAST(JULIANDAY('2017-02-15') AS INTEGER), 0);
 
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
        VALUES ('IBM.8.375.19', 'IBM 8.375 `19', 'IBM',
-              CAST(JULIANDAY('2019-11-01') AS INTEGER),
-              CAST(JULIANDAY('2019-10-31') AS INTEGER), 0);
+              CAST(JULIANDAY('2019-11-01') AS INTEGER), 0);
 
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
        VALUES ('INTC.2.7.22', 'INTC 2.700 `22', 'INTC',
-              CAST(JULIANDAY('2022-12-15') AS INTEGER),
-              CAST(JULIANDAY('2022-12-14') AS INTEGER), 0);
+              CAST(JULIANDAY('2022-12-15') AS INTEGER), 0);
 
 COMMIT
 ;

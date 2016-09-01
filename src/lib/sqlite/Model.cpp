@@ -40,7 +40,7 @@ constexpr auto SelectContrSql = //
   " min_lots, max_lots FROM contr_v"_sv;
 
 constexpr auto SelectMarketSql = //
-  "SELECT mnem, display, contr, settl_day, expiry_day, state, last_lots, last_ticks, last_time," //
+  "SELECT mnem, display, contr, settl_day, state, last_lots, last_ticks, last_time," //
   " max_id FROM market_v"_sv;
 
 constexpr auto SelectAccntSql = //
@@ -132,7 +132,6 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     Display, //
     Contr, //
     SettlDay, //
-    ExpiryDay, //
     State //
   };
 
@@ -142,7 +141,6 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
                     column<string_view>(*stmt, Display), //
                     column<string_view>(*stmt, Contr), //
                     column<JDay>(*stmt, SettlDay), //
-                    column<JDay>(*stmt, ExpiryDay), //
                     column<MarketState>(*stmt, State)));
   }
 }
@@ -154,7 +152,6 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
     Display, //
     Contr, //
     SettlDay, //
-    ExpiryDay, //
     State, //
     LastLots, //
     LastTicks, //
@@ -168,7 +165,6 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
                         column<string_view>(*stmt, Display), //
                         column<string_view>(*stmt, Contr), //
                         column<JDay>(*stmt, SettlDay), //
-                        column<JDay>(*stmt, ExpiryDay), //
                         column<MarketState>(*stmt, State), //
                         column<Lots>(*stmt, LastLots), //
                         column<Ticks>(*stmt, LastTicks), //

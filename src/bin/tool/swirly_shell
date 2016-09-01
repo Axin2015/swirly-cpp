@@ -181,7 +181,6 @@ class Shell(Cmd):
       'display',
       'contr',
       'settlDate',
-      'expiryDate',
       'state'
     ]
     rows = resp.content
@@ -190,7 +189,6 @@ class Shell(Cmd):
       '|{display:<{displayLen}}'
       '|{contr:<{contrLen}}'
       '|{settlDate:<{settlDateLen}}'
-      '|{expiryDate:<{expiryDateLen}}'
       '|{state:>{stateLen}}'
       '|'
     )

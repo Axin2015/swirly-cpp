@@ -24,7 +24,7 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302)
 
         self.checkAuth(conn)
 

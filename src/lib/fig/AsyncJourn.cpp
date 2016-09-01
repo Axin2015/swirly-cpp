@@ -116,16 +116,15 @@ void AsyncJourn::doReset()
 }
 
 void AsyncJourn::doCreateMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
-                                JDay expiryDay, MarketState state)
+                                MarketState state)
 {
-  pipe_.write([&mnem, &display, &contr, settlDay, expiryDay, state](Msg& msg) {
+  pipe_.write([&mnem, &display, &contr, settlDay, state](Msg& msg) {
     msg.type = MsgType::CreateMarket;
     auto& body = msg.createMarket;
     setCString(body.mnem, mnem);
     setCString(body.display, display);
     setCString(body.contr, contr);
     body.settlDay = settlDay;
-    body.expiryDay = expiryDay;
     body.state = state;
   });
 }

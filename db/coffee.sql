@@ -81,17 +81,17 @@ INSERT INTO contr_t (mnem, display, asset, ccy, lot_numer, lot_denom,
        VALUES ('WGAB', 'Gelena Abaya B', 'WGAB', 'ETB', 1, 1, 1, 1, 0, 1, 10);
 ;
 
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WYCA', 'Yirgachefe A', 'WYCA', NULL, NULL, 0)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
+       VALUES ('WYCA', 'Yirgachefe A', 'WYCA', NULL, 0)
 ;
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WWNA', 'Wenago A', 'WWNA', NULL, NULL, 0)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
+       VALUES ('WWNA', 'Wenago A', 'WWNA', NULL, 0)
 ;
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WKCA', 'Kochere A', 'WKCA', NULL, NULL, 0)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
+       VALUES ('WKCA', 'Kochere A', 'WKCA', NULL, 0)
 ;
-INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)
-       VALUES ('WGAA', 'Gelena Abaya A', 'WGAA', NULL, NULL, 0)
+INSERT INTO market_t (mnem, display, contr, settl_day, state)
+       VALUES ('WGAA', 'Gelena Abaya A', 'WGAA', NULL, 0)
 ;
 
 COMMIT

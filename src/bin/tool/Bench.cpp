@@ -33,13 +33,13 @@ using namespace swirly;
 namespace {
 
 const MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
-                               JDay settlDay, JDay expiryDay, MarketState state, Millis now)
+                               JDay settlDay, MarketState state, Millis now)
 {
   auto it = serv.markets().find(mnem);
   if (it != serv.markets().end()) {
     return *it;
   }
-  return serv.createMarket(mnem, display, contr, settlDay, expiryDay, state, now);
+  return serv.createMarket(mnem, display, contr, settlDay, state, now);
 }
 
 class Archiver {
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     serv.load(*model, now);
     model = nullptr;
 
-    auto& book = createMarket(serv, "EURUSD"_sv, "EURUSD"_sv, "EURUSD"_sv, 0_jd, 0_jd, 0, now);
+    auto& book = createMarket(serv, "EURUSD"_sv, "EURUSD"_sv, "EURUSD"_sv, 0_jd, 0, now);
 
     auto& eddayl = serv.accnt("EDDAYL"_sv);
     auto& gosayl = serv.accnt("GOSAYL"_sv);

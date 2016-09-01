@@ -24,9 +24,9 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
-        self.createMarket(conn, 'EURUSD.APR14', 'EURUSD', 20140402, 20140401)
-        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302)
+        self.createMarket(conn, 'EURUSD.APR14', 'EURUSD', 20140402)
+        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302)
 
         self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 3, 12346)
         self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12346)

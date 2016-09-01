@@ -93,20 +93,6 @@ SWIRLY_TEST_CASE(RestRequestSettlDate)
   SWIRLY_CHECK(rr.settlDate() == 0_ymd);
 }
 
-SWIRLY_TEST_CASE(RestRequestExpiryDate)
-{
-  RestRequest rr;
-
-  SWIRLY_CHECK(rr.parse(R"({"expiryDate":20140314})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::ExpiryDate);
-  SWIRLY_CHECK(rr.expiryDate() == 20140314_ymd);
-
-  rr.reset(false);
-  rr.parse(R"({"expiryDate":null})"_sv);
-  SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.expiryDate() == 0_ymd);
-}
-
 SWIRLY_TEST_CASE(RestRequestRef)
 {
   RestRequest rr;
@@ -284,14 +270,13 @@ SWIRLY_TEST_CASE(RestRequestAll)
   RestRequest rr;
 
   SWIRLY_CHECK(rr.parse(
-    R"({"mnem":"EURUSD","display":"Euro Dollar","accnt":"MARAYL","contr":"EURUSD","settlDate":20140315,"expiryDate":20140314,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
+    R"({"mnem":"EURUSD","display":"Euro Dollar","accnt":"MARAYL","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
   SWIRLY_CHECK(rr.fields() == ((RestRequest::Cpty - 1) | RestRequest::Cpty));
   SWIRLY_CHECK(rr.mnem() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
   SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
   SWIRLY_CHECK(rr.contr() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.settlDate() == 20140315_ymd);
-  SWIRLY_CHECK(rr.expiryDate() == 20140314_ymd);
   SWIRLY_CHECK(rr.ref() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.state() == 3U);
   SWIRLY_CHECK(rr.side() == Side::Buy);

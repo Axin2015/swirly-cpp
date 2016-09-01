@@ -148,17 +148,6 @@ namespace {
   settlDate = 'null' %nullSettlDate
     | num %endSettlDate;
 
-  action nullExpiryDate {
-    fields_ &= ~ExpiryDate;
-    expiryDate_ = 0_ymd;
-  }
-  action endExpiryDate {
-    fields_ |= ExpiryDate;
-    expiryDate_ = box<IsoDate>(num());
-  }
-  expiryDate = 'null' %nullExpiryDate
-    | num %endExpiryDate;
-
   action nullRef {
     fields_ &= ~Ref;
     ref_.len = 0;
@@ -277,7 +266,6 @@ namespace {
     | '"accnt"'i colon accnt
     | '"contr"'i colon contr
     | '"settlDate"'i colon settlDate
-    | '"expiryDate"'i colon expiryDate
     | '"ref"'i colon ref
     | '"state"'i colon state
     | '"side"'i colon side
@@ -317,7 +305,6 @@ void RestRequest::reset(bool clear) noexcept
   accnt_.len = 0;
   contr_.len = 0;
   settlDate_ = 0_ymd;
-  expiryDate_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;
   side_ = box<swirly::Side>(0);

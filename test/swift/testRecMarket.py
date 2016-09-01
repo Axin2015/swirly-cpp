@@ -24,9 +24,9 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
-        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
-        self.createMarket(conn, 'USDCHF.MAR14', 'USDCHF', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302)
+        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302)
+        self.createMarket(conn, 'USDCHF.MAR14', 'USDCHF', 20140302)
 
         self.getAll(conn)
         self.getByMnem(conn)
@@ -40,21 +40,18 @@ class TestCase(RestTestCase):
     self.assertListEqual([{
       u'contr': u'EURUSD',
       u'display': u'EURUSD.MAR14',
-      u'expiryDate': 20140301,
       u'mnem': u'EURUSD.MAR14',
       u'settlDate': 20140302,
       u'state': 0
     }, {
       u'contr': u'GBPUSD',
       u'display': u'GBPUSD.MAR14',
-      u'expiryDate': 20140301,
       u'mnem': u'GBPUSD.MAR14',
       u'settlDate': 20140302,
       u'state': 0
     }, {
       u'contr': u'USDCHF',
       u'display': u'USDCHF.MAR14',
-      u'expiryDate': 20140301,
       u'mnem': u'USDCHF.MAR14',
       u'settlDate': 20140302,
       u'state': 0
@@ -69,7 +66,6 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'contr': u'EURUSD',
       u'display': u'EURUSD.MAR14',
-      u'expiryDate': 20140301,
       u'mnem': u'EURUSD.MAR14',
       u'settlDate': 20140302,
       u'state': 0

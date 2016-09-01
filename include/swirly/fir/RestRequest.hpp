@@ -32,15 +32,14 @@ class SWIRLY_API RestRequest {
     Accnt = 1 << 2,
     Contr = 1 << 3,
     SettlDate = 1 << 4,
-    ExpiryDate = 1 << 5,
-    Ref = 1 << 6,
-    State = 1 << 7,
-    Side = 1 << 8,
-    Lots = 1 << 9,
-    Ticks = 1 << 10,
-    MinLots = 1 << 11,
-    LiqInd = 1 << 12,
-    Cpty = 1 << 13
+    Ref = 1 << 5,
+    State = 1 << 6,
+    Side = 1 << 7,
+    Lots = 1 << 8,
+    Ticks = 1 << 9,
+    MinLots = 1 << 10,
+    LiqInd = 1 << 11,
+    Cpty = 1 << 12
   };
 
   RestRequest() noexcept { reset(); }
@@ -60,7 +59,6 @@ class SWIRLY_API RestRequest {
   swirly::Mnem accnt() const noexcept { return +accnt_; }
   swirly::Mnem contr() const noexcept { return +contr_; }
   IsoDate settlDate() const noexcept { return settlDate_; }
-  IsoDate expiryDate() const noexcept { return expiryDate_; }
   std::string_view ref() const noexcept { return +ref_; }
   MarketState state() const noexcept { return state_; }
   swirly::Side side() const noexcept { return side_; }
@@ -106,7 +104,6 @@ class SWIRLY_API RestRequest {
   StringData<MaxMnem> accnt_;
   StringData<MaxMnem> contr_;
   IsoDate settlDate_;
-  IsoDate expiryDate_;
   StringData<MaxRef> ref_;
   MarketState state_;
   swirly::Side side_;
