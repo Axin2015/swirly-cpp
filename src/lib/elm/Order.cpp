@@ -29,7 +29,6 @@ Order::Order(Order&&) = default;
 void Order::toJson(ostream& os) const
 {
   os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"market\":\"" << market_ //
      << "\",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {

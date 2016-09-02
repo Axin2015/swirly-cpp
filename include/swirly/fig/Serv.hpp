@@ -19,23 +19,15 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/elm/Market.hpp>
 
 #include <swirly/ash/Array.hpp>
-
-#include <experimental/optional>
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-using experimental::nullopt;
-}
 
 namespace swirly {
 
 class Accnt;
 class Journ;
-class MarketBook;
+class Market;
 class Model;
 class Response;
 
@@ -63,40 +55,40 @@ class SWIRLY_API Serv {
 
   const MarketSet& markets() const noexcept;
 
-  const MarketBook& market(Mnem mnem) const;
+  const Contr& contr(Mnem mnem) const;
+
+  const Market& market(Id64 id) const;
 
   const Accnt& accnt(Mnem mnem) const;
 
-  const MarketBook& createMarket(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay,
-                                 MarketState state, Millis now);
+  const Market& createMarket(const Contr& contr, JDay settlDay, MarketState state, Millis now);
 
-  const MarketBook& updateMarket(Mnem mnem, std::optional<std::string_view> display,
-                                 std::optional<MarketState> state, Millis now);
+  void updateMarket(const Market& market, MarketState state, Millis now);
 
-  void createOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Side side,
+  void createOrder(const Accnt& accnt, const Market& market, std::string_view ref, Side side,
                    Lots lots, Ticks ticks, Lots minLots, Millis now, Response& resp);
 
-  void reviseOrder(const Accnt& accnt, const MarketBook& book, const Order& order, Lots lots,
+  void reviseOrder(const Accnt& accnt, const Market& market, const Order& order, Lots lots,
                    Millis now, Response& resp);
 
-  void reviseOrder(const Accnt& accnt, const MarketBook& book, Id64 id, Lots lots, Millis now,
+  void reviseOrder(const Accnt& accnt, const Market& market, Id64 id, Lots lots, Millis now,
                    Response& resp);
 
-  void reviseOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Lots lots,
+  void reviseOrder(const Accnt& accnt, const Market& market, std::string_view ref, Lots lots,
                    Millis now, Response& resp);
 
-  void reviseOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Id64> ids, Lots lots,
+  void reviseOrder(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Lots lots,
                    Millis now, Response& resp);
 
-  void cancelOrder(const Accnt& accnt, const MarketBook& book, const Order& order, Millis now,
+  void cancelOrder(const Accnt& accnt, const Market& market, const Order& order, Millis now,
                    Response& resp);
 
-  void cancelOrder(const Accnt& accnt, const MarketBook& book, Id64 id, Millis now, Response& resp);
+  void cancelOrder(const Accnt& accnt, const Market& market, Id64 id, Millis now, Response& resp);
 
-  void cancelOrder(const Accnt& accnt, const MarketBook& book, std::string_view ref, Millis now,
+  void cancelOrder(const Accnt& accnt, const Market& market, std::string_view ref, Millis now,
                    Response& resp);
 
-  void cancelOrder(const Accnt& accnt, const MarketBook& book, ArrayView<Id64> ids, Millis now,
+  void cancelOrder(const Accnt& accnt, const Market& market, ArrayView<Id64> ids, Millis now,
                    Response& resp);
 
   /**
@@ -109,16 +101,16 @@ class SWIRLY_API Serv {
    */
   void cancelOrder(const Accnt& accnt, Millis now);
 
-  void cancelOrder(const MarketBook& book, Millis now);
+  void cancelOrder(const Market& market, Millis now);
 
-  TradePair createTrade(const Accnt& accnt, const MarketBook& book, std::string_view ref, Side side,
+  TradePair createTrade(const Accnt& accnt, const Market& market, std::string_view ref, Side side,
                         Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created);
 
   void archiveTrade(const Accnt& accnt, const Exec& trade, Millis now);
 
-  void archiveTrade(const Accnt& accnt, Mnem market, Id64 id, Millis now);
+  void archiveTrade(const Accnt& accnt, Id64 marketId, Id64 id, Millis now);
 
-  void archiveTrade(const Accnt& accnt, Mnem market, ArrayView<Id64> ids, Millis now);
+  void archiveTrade(const Accnt& accnt, Id64 marketId, ArrayView<Id64> ids, Millis now);
 
   /**
    * This method may partially fail.

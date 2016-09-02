@@ -27,38 +27,34 @@ class TestCase(RestTestCase):
         self.checkAuth(conn)
 
         self.createMarket(conn)
-        self.updateDisplayAndState(conn)
-        self.updateDisplayOnly(conn)
-        self.updateStateOnly(conn)
+        self.updateMarket(conn)
 
   def checkAuth(self, conn):
     conn.setAuth(None, 0x1)
-    resp = conn.send('POST', '/rec/market')
+    resp = conn.send('POST', '/market')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14')
+    resp = conn.send('PUT', '/market/USDJPY/20140302')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
-    resp = conn.send('POST', '/rec/market')
+    resp = conn.send('POST', '/market')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14')
+    resp = conn.send('PUT', '/market/USDJPY/20140302')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def createMarket(self, conn):
     conn.setAdmin()
-    resp = conn.send('POST', '/rec/market',
-                     mnem = 'USDJPY.MAR14',
-                     display = 'first',
+    resp = conn.send('POST', '/market',
                      contr = 'USDJPY',
                      settlDate = 20140302,
                      state = 1)
@@ -66,55 +62,37 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
+      u'bidCount': [None, None, None],
+      u'bidResd': [None, None, None],
+      u'bidTicks': [None, None, None],
       u'contr': u'USDJPY',
-      u'display': u'first',
-      u'mnem': u'USDJPY.MAR14',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'offerCount': [None, None, None],
+      u'offerResd': [None, None, None],
+      u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
     }, resp.content)
 
-  def updateDisplayAndState(self, conn):
+  def updateMarket(self, conn):
     conn.setAdmin()
-    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
-                     display = 'second',
+    resp = conn.send('PUT', '/market/USDJPY/20140302',
                      state = 2)
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
+      u'bidCount': [None, None, None],
+      u'bidResd': [None, None, None],
+      u'bidTicks': [None, None, None],
       u'contr': u'USDJPY',
-      u'display': u'second',
-      u'mnem': u'USDJPY.MAR14',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'offerCount': [None, None, None],
+      u'offerResd': [None, None, None],
+      u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 2
-    }, resp.content)
-
-  def updateDisplayOnly(self, conn):
-    conn.setAdmin()
-    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
-                     display = 'third',
-                     state = None)
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertDictEqual({
-      u'contr': u'USDJPY',
-      u'display': u'third',
-      u'mnem': u'USDJPY.MAR14',
-      u'settlDate': 20140302,
-      u'state': 2
-    }, resp.content)
-
-  def updateStateOnly(self, conn):
-    conn.setAdmin()
-    resp = conn.send('PUT', '/rec/market/USDJPY.MAR14',
-                     display = None,
-                     state = 3)
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertDictEqual({
-      u'contr': u'USDJPY',
-      u'display': u'third',
-      u'mnem': u'USDJPY.MAR14',
-      u'settlDate': 20140302,
-      u'state': 3
     }, resp.content)

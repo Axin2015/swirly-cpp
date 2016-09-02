@@ -54,6 +54,7 @@ class RestServ : public mg::Mgr<RestServ> {
   void recRequest(mg::HttpMessage data, Millis now);
   void assetRequest(mg::HttpMessage data, Millis now);
   void contrRequest(mg::HttpMessage data, Millis now);
+
   void marketRequest(mg::HttpMessage data, Millis now);
 
   void accntRequest(mg::HttpMessage data, Millis now);
@@ -61,8 +62,6 @@ class RestServ : public mg::Mgr<RestServ> {
   void execRequest(mg::HttpMessage data, Millis now);
   void tradeRequest(mg::HttpMessage data, Millis now);
   void posnRequest(mg::HttpMessage data, Millis now);
-
-  void viewRequest(mg::HttpMessage data, Millis now);
 
  private:
   enum : int {

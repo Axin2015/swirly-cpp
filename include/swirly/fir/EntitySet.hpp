@@ -37,9 +37,8 @@ class SWIRLY_API EntitySet {
     Exec = 1 << 4,
     Trade = 1 << 5,
     Posn = 1 << 6,
-    View = 1 << 7,
-    RecMask = Asset | Contr | Market,
-    AccntMask = Order | Exec | Trade | Posn | View
+    RecMask = Asset | Contr,
+    AccntMask = Market | Order | Exec | Trade | Posn
   };
 
   constexpr EntitySet(int bs = 0) noexcept : bs_{bs} {}
@@ -70,9 +69,8 @@ class SWIRLY_API EntitySet {
   bool exec() const noexcept { return (bs_ & Exec) != 0; }
   bool trade() const noexcept { return (bs_ & Trade) != 0; }
   bool posn() const noexcept { return (bs_ & Posn) != 0; }
-  bool view() const noexcept { return (bs_ & View) != 0; }
-  bool anyRec() const noexcept { return (bs_ & RecMask) != 0; }
-  bool anyAccnt() const noexcept { return (bs_ & AccntMask) != 0; }
+  bool onlyRec() const noexcept { return (bs_ & ~RecMask) == 0; }
+  bool onlyAccnt() const noexcept { return (bs_ & ~AccntMask) == 0; }
   int pop() noexcept
   {
     const auto i = top();

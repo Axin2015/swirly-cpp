@@ -24,12 +24,12 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302)
+        self.createMarket(conn, 'EURUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12345)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12345)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 7, 12345)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 11, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 11, 12345)
 
         self.checkAuth(conn)
 
@@ -38,24 +38,38 @@ class TestCase(RestTestCase):
 
   def checkAuth(self, conn):
     conn.setAuth(None, 0x2)
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1')
+    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/1')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1')
+    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/1')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def cancelSingle(self, conn):
     conn.setTrader('MARAYL')
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/2', lots = 0)
+    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/2', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
+      u'market': {
+        u'bidCount': [3, None, None],
+        u'bidResd': [21, None, None],
+        u'bidTicks': [12345, None, None],
+        u'contr': u'EURUSD',
+        u'lastLots': None,
+        u'lastTicks': None,
+        u'lastTime': None,
+        u'offerCount': [None, None, None],
+        u'offerResd': [None, None, None],
+        u'offerTicks': [None, None, None],
+        u'settlDate': 20140302,
+        u'state': 0
+      },
       u'execs': [{
         u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
@@ -68,7 +82,6 @@ class TestCase(RestTestCase):
         u'lastTicks': None,
         u'liqInd': None,
         u'lots': 5,
-        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 2,
@@ -89,7 +102,6 @@ class TestCase(RestTestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 5,
-        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
@@ -99,30 +111,30 @@ class TestCase(RestTestCase):
         u'state': u'CANCEL',
         u'ticks': 12345
       }],
-      u'posn': None,
-      u'view': {
-        u'bidCount': [3, None, None],
-        u'bidResd': [21, None, None],
+      u'posn': None
+    }, resp.content)
+
+  def cancelMulti(self, conn):
+    conn.setTrader('MARAYL')
+    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/1,3', lots = 0)
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertDictEqual({
+      u'market': {
+        u'bidCount': [1, None, None],
+        u'bidResd': [11, None, None],
         u'bidTicks': [12345, None, None],
         u'contr': u'EURUSD',
         u'lastLots': None,
         u'lastTicks': None,
         u'lastTime': None,
-        u'market': u'EURUSD.MAR14',
         u'offerCount': [None, None, None],
         u'offerResd': [None, None, None],
         u'offerTicks': [None, None, None],
-        u'settlDate': 20140302
-      }
-    }, resp.content)
-
-  def cancelMulti(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('PUT', '/accnt/order/EURUSD.MAR14/1,3', lots = 0)
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertDictEqual({
+        u'settlDate': 20140302,
+        u'state': 0
+      },
       u'execs': [{
         u'accnt': u'MARAYL',
         u'contr': u'EURUSD',
@@ -134,7 +146,6 @@ class TestCase(RestTestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 3,
-        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 1,
@@ -156,7 +167,6 @@ class TestCase(RestTestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 7,
-        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 3,
@@ -178,7 +188,6 @@ class TestCase(RestTestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 3,
-        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
@@ -197,7 +206,6 @@ class TestCase(RestTestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 7,
-        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
@@ -207,19 +215,5 @@ class TestCase(RestTestCase):
         u'state': u'CANCEL',
         u'ticks': 12345
       }],
-      u'posn': None,
-      u'view': {
-        u'bidCount': [1, None, None],
-        u'bidResd': [11, None, None],
-        u'bidTicks': [12345, None, None],
-        u'contr': u'EURUSD',
-        u'lastLots': None,
-        u'lastTicks': None,
-        u'lastTime': None,
-        u'market': u'EURUSD.MAR14',
-        u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
-        u'offerTicks': [None, None, None],
-        u'settlDate': 20140302
-      }
+      u'posn': None
     }, resp.content)

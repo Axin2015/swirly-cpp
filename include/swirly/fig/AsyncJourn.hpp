@@ -79,18 +79,14 @@ class SWIRLY_API AsyncJourn {
   /**
    * Create Market.
    */
-  void createMarket(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay,
-                    MarketState state)
+  void createMarket(Id64 id, Mnem contr, JDay settlDay, MarketState state)
   {
-    doCreateMarket(mnem, display, contr, settlDay, state);
+    doCreateMarket(id, contr, settlDay, state);
   }
   /**
    * Update Market.
    */
-  void updateMarket(Mnem mnem, std::string_view display, MarketState state)
-  {
-    doUpdateMarket(mnem, display, state);
-  }
+  void updateMarket(Id64 id, MarketState state) { doUpdateMarket(id, state); }
   /**
    * Create Execution.
    */
@@ -102,26 +98,25 @@ class SWIRLY_API AsyncJourn {
   /**
    * Archive Trade.
    */
-  void archiveTrade(Mnem market, Id64 id, Millis modified)
+  void archiveTrade(Id64 marketId, Id64 id, Millis modified)
   {
-    doArchiveTrade(market, {&id, 1}, modified, More::No);
+    doArchiveTrade(marketId, {&id, 1}, modified, More::No);
   }
   /**
    * Archive Trades.
    */
-  void archiveTrade(Mnem market, ArrayView<Id64> ids, Millis modified);
+  void archiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified);
 
  private:
   void doReset();
 
-  void doCreateMarket(Mnem mnem, std::string_view display, Mnem contr, JDay settlDay,
-                      MarketState state);
+  void doCreateMarket(Id64 id, Mnem contr, JDay settlDay, MarketState state);
 
-  void doUpdateMarket(Mnem mnem, std::string_view display, MarketState state);
+  void doUpdateMarket(Id64 id, MarketState state);
 
   void doCreateExec(const Exec& exec, More more);
 
-  void doArchiveTrade(Mnem market, ArrayView<Id64> ids, Millis modified, More more);
+  void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified, More more);
 
   MsgPipe pipe_;
   std::thread thread_;

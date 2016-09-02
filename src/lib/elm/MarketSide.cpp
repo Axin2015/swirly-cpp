@@ -14,17 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/BookSide.hpp>
+#include <swirly/elm/MarketSide.hpp>
 
 using namespace std;
 
 namespace swirly {
 
-BookSide::~BookSide() noexcept = default;
+MarketSide::~MarketSide() noexcept = default;
 
-BookSide::BookSide(BookSide&&) = default;
+MarketSide::MarketSide(MarketSide&&) = default;
 
-void BookSide::insertOrder(const OrderPtr& order) throw(bad_alloc)
+void MarketSide::insertOrder(const OrderPtr& order) throw(bad_alloc)
 {
   assert(order->level() == nullptr);
   assert(order->ticks() != 0_tks);
@@ -45,7 +45,7 @@ void BookSide::insertOrder(const OrderPtr& order) throw(bad_alloc)
   }
 }
 
-LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw(bad_alloc)
+LevelSet::Iterator MarketSide::insertLevel(const OrderPtr& order) throw(bad_alloc)
 {
   LevelSet::Iterator it;
   bool found;
@@ -59,7 +59,7 @@ LevelSet::Iterator BookSide::insertLevel(const OrderPtr& order) throw(bad_alloc)
   return it;
 }
 
-void BookSide::removeOrder(Level& level, const Order& order) noexcept
+void MarketSide::removeOrder(Level& level, const Order& order) noexcept
 {
   level.subOrder(order);
 
@@ -79,7 +79,7 @@ void BookSide::removeOrder(Level& level, const Order& order) noexcept
   order.setLevel(nullptr);
 }
 
-void BookSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcept
+void MarketSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcept
 {
   using namespace enumops;
 

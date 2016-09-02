@@ -102,11 +102,11 @@ void AsyncJourn::createExec(ArrayView<ConstExecPtr> execs)
   } while (mp.next());
 }
 
-void AsyncJourn::archiveTrade(Mnem market, ArrayView<Id64> ids, Millis modified)
+void AsyncJourn::archiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified)
 {
   MultiPart<MaxIds> mp{*this, ids.size()};
   do {
-    doArchiveTrade(market, makeArrayView(&ids[mp.index()], mp.size()), modified, mp.more());
+    doArchiveTrade(marketId, makeArrayView(&ids[mp.index()], mp.size()), modified, mp.more());
   } while (mp.next());
 }
 
@@ -115,27 +115,24 @@ void AsyncJourn::doReset()
   pipe_.write([](Msg& msg) { msg.type = MsgType::Reset; });
 }
 
-void AsyncJourn::doCreateMarket(Mnem mnem, string_view display, Mnem contr, JDay settlDay,
-                                MarketState state)
+void AsyncJourn::doCreateMarket(Id64 id, Mnem contr, JDay settlDay, MarketState state)
 {
-  pipe_.write([&mnem, &display, &contr, settlDay, state](Msg& msg) {
+  pipe_.write([id, &contr, settlDay, state](Msg& msg) {
     msg.type = MsgType::CreateMarket;
     auto& body = msg.createMarket;
-    setCString(body.mnem, mnem);
-    setCString(body.display, display);
+    body.id = id;
     setCString(body.contr, contr);
     body.settlDay = settlDay;
     body.state = state;
   });
 }
 
-void AsyncJourn::doUpdateMarket(Mnem mnem, string_view display, MarketState state)
+void AsyncJourn::doUpdateMarket(Id64 id, MarketState state)
 {
-  pipe_.write([&mnem, &display, state](Msg& msg) {
+  pipe_.write([&id, state](Msg& msg) {
     msg.type = MsgType::UpdateMarket;
     auto& body = msg.updateMarket;
-    setCString(body.mnem, mnem);
-    setCString(body.display, display);
+    body.id = id;
     body.state = state;
   });
 }
@@ -146,7 +143,7 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
     msg.type = MsgType::CreateExec;
     auto& body = msg.createExec;
     setCString(body.accnt, exec.accnt());
-    setCString(body.market, exec.market());
+    body.marketId = exec.marketId();
     setCString(body.contr, exec.contr());
     body.settlDay = exec.settlDay();
     body.id = exec.id();
@@ -170,13 +167,13 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
   });
 }
 
-void AsyncJourn::doArchiveTrade(Mnem market, ArrayView<Id64> ids, Millis modified, More more)
+void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified, More more)
 {
   assert(ids.size() <= MaxIds);
-  pipe_.write([&market, ids, modified, more](Msg& msg) {
+  pipe_.write([&marketId, ids, modified, more](Msg& msg) {
     msg.type = MsgType::ArchiveTrade;
     auto& body = msg.archiveTrade;
-    setCString(body.market, market);
+    body.marketId = marketId;
     // Cannot use copy and fill here because ArchiveBody is a packed struct:
     // auto it = copy(ids.begin(), ids.end(), begin(body.ids));
     // fill(it, end(body.ids), 0);

@@ -29,7 +29,6 @@ Exec::Exec(Exec&&) = default;
 void Exec::toJson(ostream& os) const
 {
   os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"market\":\"" << market_ //
      << "\",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
@@ -89,7 +88,7 @@ void Exec::toJson(ostream& os) const
 ExecPtr Exec::inverse(Id64 id) const
 {
   assert(!cpty_.empty());
-  return make(cpty_, market_, contr_, settlDay_, id, +ref_, orderId_, state_,
+  return make(cpty_, marketId_, contr_, settlDay_, id, +ref_, orderId_, state_,
               swirly::inverse(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
               minLots_, matchId_, swirly::inverse(liqInd_), accnt_, created_);
 }

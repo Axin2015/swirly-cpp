@@ -184,18 +184,5 @@ INSERT INTO contr_t (id, mnem, display, asset, ccy, lot_numer, lot_denom,
        VALUES (24, 'USDZAR', 'USDZAR', 'USD', 'ZAR', 1000000, 1, 1, 1000, 3, 1, 10)
 ;
 
-INSERT INTO market_t (mnem, display, contr, settl_day, state)
-       VALUES ('EURUSD', 'EURUSD', 'EURUSD', NULL, 0)
-;
-INSERT INTO market_t (mnem, display, contr, settl_day, state)
-       VALUES ('GBPUSD', 'GBPUSD', 'GBPUSD', NULL, 0)
-;
-INSERT INTO market_t (mnem, display, contr, settl_day, state)
-       VALUES ('USDCHF', 'USDCHF', 'USDCHF', NULL, 0)
-;
-INSERT INTO market_t (mnem, display, contr, settl_day, state)
-       VALUES ('USDJPY', 'USDJPY', 'USDJPY', NULL, 0)
-;
-
 COMMIT
 ;

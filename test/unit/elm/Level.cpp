@@ -27,9 +27,9 @@ static_assert(sizeof(Level) <= 2 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(LevelSet)
 {
-  const Order order{"MARAYL"_sv, "EURUSD"_sv, "EURUSD"_sv, 0_jd,      0_id64, ""_sv,
-                    State::New,  Side::Buy,   10_lts,      12345_tks, 0_lts,  0_lts,
-                    0_cst,       0_lts,       0_tks,       0_lts,     0_ms,   0_ms};
+  const Order order{"MARAYL"_sv, 1_id64,    "EURUSD"_sv, 0_jd,      0_id64, ""_sv,
+                    State::New,  Side::Buy, 10_lts,      12345_tks, 0_lts,  0_lts,
+                    0_cst,       0_lts,     0_tks,       0_lts,     0_ms,   0_ms};
 
   LevelSet s;
 

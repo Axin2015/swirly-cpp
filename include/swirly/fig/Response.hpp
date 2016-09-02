@@ -25,8 +25,6 @@
 
 namespace swirly {
 
-class MarketBook;
-
 class SWIRLY_API Response {
  public:
   using Orders = std::vector<ConstOrderPtr>;
@@ -45,25 +43,25 @@ class SWIRLY_API Response {
 
   void toJson(std::ostream& os) const;
 
-  const MarketBook& book() const noexcept { return *book_; }
+  ConstMarketPtr market() const noexcept;
   const Orders& orders() const noexcept { return orders_; }
   const Execs& execs() const noexcept { return execs_; }
   ConstPosnPtr posn() const noexcept;
-
-  void setBook(MarketBook& book) noexcept { book_ = &book; }
-
-  void setPosn(ConstPosnPtr posn) noexcept;
 
   void clear() noexcept;
 
   void clearMatches() noexcept;
 
-  void insertOrder(ConstOrderPtr order);
+  void setMarket(const ConstMarketPtr& market) noexcept;
 
-  void insertExec(ConstExecPtr exec);
+  void insertOrder(const ConstOrderPtr& order);
+
+  void insertExec(const ConstExecPtr& exec);
+
+  void setPosn(const ConstPosnPtr& posn) noexcept;
 
  private:
-  MarketBook* book_{nullptr};
+  ConstMarketPtr market_;
   Orders orders_;
   Execs execs_;
   ConstPosnPtr posn_;

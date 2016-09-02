@@ -20,7 +20,8 @@
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/elm/Market.hpp>
+
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 
@@ -40,24 +41,24 @@ constexpr auto SelectContrSql = //
   " pip_dp, min_lots, max_lots FROM contr_v"_sv;
 
 constexpr auto SelectMarketSql = //
-  "SELECT mnem, display, contr, settl_day, state, last_lots, last_ticks, last_time," //
-  " max_id FROM market_v"_sv;
+  "SELECT id, contr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
+  " FROM market_v"_sv;
 
 constexpr auto SelectAccntSql = //
   "SELECT mnem FROM accnt_t WHERE modified > ?"_sv;
 
 constexpr auto SelectOrderSql = //
-  "SELECT accnt, market, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
+  "SELECT accnt, market_id, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
   " FROM order_t WHERE resd > 0;"_sv;
 
 constexpr auto SelectExecSql = //
-  "SELECT market, contr, settl_day, id, ref, order_id, state_id, side_id, lots, ticks," //
+  "SELECT market_id, contr, settl_day, id, ref, order_id, state_id, side_id, lots, ticks," //
   " resd, exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
   " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"_sv;
 
 constexpr auto SelectTradeSql = //
-  "SELECT accnt, market, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
+  "SELECT accnt, market_id, contr, settl_day, id, ref, order_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
   " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
 
@@ -132,28 +133,7 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
 void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
   enum { //
-    Mnem, //
-    Display, //
-    Contr, //
-    SettlDay, //
-    State //
-  };
-
-  StmtPtr stmt{prepare(*db_, SelectMarketSql)};
-  while (step(*stmt)) {
-    cb(Market::make(column<string_view>(*stmt, Mnem), //
-                    column<string_view>(*stmt, Display), //
-                    column<string_view>(*stmt, Contr), //
-                    column<JDay>(*stmt, SettlDay), //
-                    column<MarketState>(*stmt, State)));
-  }
-}
-
-void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
-{
-  enum { //
-    Mnem, //
-    Display, //
+    Id, //
     Contr, //
     SettlDay, //
     State, //
@@ -165,15 +145,14 @@ void Model::doReadMarket(const ModelCallback<MarketBookPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectMarketSql)};
   while (step(*stmt)) {
-    cb(MarketBook::make(column<string_view>(*stmt, Mnem), //
-                        column<string_view>(*stmt, Display), //
-                        column<string_view>(*stmt, Contr), //
-                        column<JDay>(*stmt, SettlDay), //
-                        column<MarketState>(*stmt, State), //
-                        column<Lots>(*stmt, LastLots), //
-                        column<Ticks>(*stmt, LastTicks), //
-                        column<Millis>(*stmt, LastTime), //
-                        column<Id64>(*stmt, MaxId)));
+    cb(Market::make(column<Id64>(*stmt, Id), //
+                    column<string_view>(*stmt, Contr), //
+                    column<JDay>(*stmt, SettlDay), //
+                    column<MarketState>(*stmt, State), //
+                    column<Lots>(*stmt, LastLots), //
+                    column<Ticks>(*stmt, LastTicks), //
+                    column<Millis>(*stmt, LastTime), //
+                    column<Id64>(*stmt, MaxId)));
   }
 }
 
@@ -198,7 +177,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
   enum { //
     Accnt, //
-    Market, //
+    MarketId, //
     Contr, //
     SettlDay, //
     Id, //
@@ -220,7 +199,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
   StmtPtr stmt{prepare(*db_, SelectOrderSql)};
   while (step(*stmt)) {
     cb(Order::make(column<string_view>(*stmt, Accnt), //
-                   column<string_view>(*stmt, Market), //
+                   column<Id64>(*stmt, MarketId), //
                    column<string_view>(*stmt, Contr), //
                    column<JDay>(*stmt, SettlDay), //
                    column<Id64>(*stmt, Id), //
@@ -243,7 +222,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<ExecPtr>& cb) const
 {
   enum { //
-    Market, //
+    MarketId, //
     Contr, //
     SettlDay, //
     Id, //
@@ -271,7 +250,7 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
   bind(limit);
   while (step(*stmt)) {
     cb(Exec::make(accnt, //
-                  column<string_view>(*stmt, Market), //
+                  column<Id64>(*stmt, MarketId), //
                   column<string_view>(*stmt, Contr), //
                   column<JDay>(*stmt, SettlDay), //
                   column<Id64>(*stmt, Id), //
@@ -298,7 +277,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
   enum { //
     Accnt, //
-    Market, //
+    MarketId, //
     Contr, //
     SettlDay, //
     Id, //
@@ -322,7 +301,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
   StmtPtr stmt{prepare(*db_, SelectTradeSql)};
   while (step(*stmt)) {
     cb(Exec::make(column<string_view>(*stmt, Accnt), //
-                  column<string_view>(*stmt, Market), //
+                  column<Id64>(*stmt, MarketId), //
                   column<string_view>(*stmt, Contr), //
                   column<JDay>(*stmt, SettlDay), //
                   column<Id64>(*stmt, Id), //

@@ -43,8 +43,6 @@ int bit(string_view sv)
     i = EntitySet::Trade;
   } else if (sv == "posn") {
     i = EntitySet::Posn;
-  } else if (sv == "view") {
-    i = EntitySet::View;
   } else {
     throw NotFoundException{errMsg() << "unknown entity '" << sv << '\''};
   }

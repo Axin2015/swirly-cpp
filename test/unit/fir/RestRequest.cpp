@@ -37,20 +37,6 @@ SWIRLY_TEST_CASE(RestRequestMnem)
   SWIRLY_CHECK(rr.mnem().empty());
 }
 
-SWIRLY_TEST_CASE(RestRequestDisplay)
-{
-  RestRequest rr;
-
-  SWIRLY_CHECK(rr.parse(R"({"display":"Euro Dollar"})"_sv));
-  SWIRLY_CHECK(rr.fields() == RestRequest::Display);
-  SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
-
-  rr.reset(false);
-  SWIRLY_CHECK(rr.parse(R"({"display":null})"_sv));
-  SWIRLY_CHECK(rr.fields() == 0U);
-  SWIRLY_CHECK(rr.display().empty());
-}
-
 SWIRLY_TEST_CASE(RestRequestAccnt)
 {
   RestRequest rr;
@@ -270,10 +256,9 @@ SWIRLY_TEST_CASE(RestRequestAll)
   RestRequest rr;
 
   SWIRLY_CHECK(rr.parse(
-    R"({"mnem":"EURUSD","display":"Euro Dollar","accnt":"MARAYL","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
+    R"({"mnem":"EURUSD","accnt":"MARAYL","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
   SWIRLY_CHECK(rr.fields() == ((RestRequest::Cpty - 1) | RestRequest::Cpty));
   SWIRLY_CHECK(rr.mnem() == "EURUSD"_sv);
-  SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
   SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
   SWIRLY_CHECK(rr.contr() == "EURUSD"_sv);
   SWIRLY_CHECK(rr.settlDate() == 20140315_ymd);
@@ -292,11 +277,11 @@ SWIRLY_TEST_CASE(RestRequestPartial)
   RestRequest rr;
 
   SWIRLY_CHECK(!rr.parse(R"({"mnem":"E)"_sv));
-  SWIRLY_CHECK(!rr.parse(R"(URUSD","di)"_sv));
-  SWIRLY_CHECK(!rr.parse(R"(splay":"Eu)"_sv));
-  SWIRLY_CHECK(rr.parse(R"(ro Dollar"})"_sv));
+  SWIRLY_CHECK(!rr.parse(R"(URUSD","ac)"_sv));
+  SWIRLY_CHECK(!rr.parse(R"(cnt":"MAR)"_sv));
+  SWIRLY_CHECK(rr.parse(R"(AYL"})"_sv));
 
-  SWIRLY_CHECK(rr.fields() == (RestRequest::Mnem | RestRequest::Display));
+  SWIRLY_CHECK(rr.fields() == (RestRequest::Mnem | RestRequest::Accnt));
   SWIRLY_CHECK(rr.mnem() == "EURUSD"_sv);
-  SWIRLY_CHECK(rr.display() == "Euro Dollar"_sv);
+  SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
 }

@@ -125,7 +125,7 @@ class Shell(Cmd):
 
   def do_asset(self, args):
     """Usage: asset"""
-    resp = self.send('GET', '/rec/asset')
+    resp = self.send('GET', '/ref/asset')
     cols = [
       'mnem',
       'display',
@@ -142,7 +142,7 @@ class Shell(Cmd):
 
   def do_contr(self, args):
     """Usage: contr"""
-    resp = self.send('GET', '/rec/contr')
+    resp = self.send('GET', '/ref/contr')
     cols = [
       'mnem',
       'display',
@@ -175,7 +175,7 @@ class Shell(Cmd):
 
   def do_market(self, args):
     """Usage: market"""
-    resp = self.send('GET', '/rec/market')
+    resp = self.send('GET', '/market')
     cols = [
       'mnem',
       'display',

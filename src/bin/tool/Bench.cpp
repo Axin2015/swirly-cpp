@@ -20,7 +20,8 @@
 #include <swirly/fig/Serv.hpp>
 #include <swirly/fig/Test.hpp>
 
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/elm/Date.hpp>
+#include <swirly/elm/Market.hpp>
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Log.hpp>
@@ -32,28 +33,29 @@ using namespace swirly;
 
 namespace {
 
-const MarketBook& createMarket(Serv& serv, Mnem mnem, string_view display, Mnem contr,
-                               JDay settlDay, MarketState state, Millis now)
+const Market& createMarket(Serv& serv, Mnem contrMnem, JDay settlDay, MarketState state, Millis now)
 {
-  auto it = serv.markets().find(mnem);
+  const auto& contr = serv.contr(contrMnem);
+  const auto marketId = toMarketId(contr.id(), settlDay);
+  auto it = serv.markets().find(marketId);
   if (it != serv.markets().end()) {
     return *it;
   }
-  return serv.createMarket(mnem, display, contr, settlDay, state, now);
+  return serv.createMarket(contr, settlDay, state, now);
 }
 
 class Archiver {
  public:
   explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
-  void operator()(const Accnt& accnt, Mnem market, Millis now)
+  void operator()(const Accnt& accnt, Id64 marketId, Millis now)
   {
     ids_.clear();
     for (const auto& trade : accnt.trades()) {
-      if (trade.market() == market) {
+      if (trade.marketId() == marketId) {
         ids_.push_back(trade.id());
       }
     }
-    serv_.archiveTrade(accnt, market, ids_, now);
+    serv_.archiveTrade(accnt, marketId, ids_, now);
   }
 
  private:
@@ -99,13 +101,14 @@ int main(int argc, char* argv[])
       model = make_unique<TestModel>();
     }
 
+    const BusinessDay busDay{RollHour, NewYork};
     const auto now = getTimeOfDay();
 
     Serv serv{*journ, 1 << 10, 1 << 4};
     serv.load(*model, now);
     model = nullptr;
 
-    auto& book = createMarket(serv, "EURUSD"_sv, "EURUSD"_sv, "EURUSD"_sv, 0_jd, 0, now);
+    auto& market = createMarket(serv, "EURUSD"_sv, busDay(now), 0, now);
 
     auto& eddayl = serv.accnt("EDDAYL"_sv);
     auto& gosayl = serv.accnt("GOSAYL"_sv);
@@ -125,80 +128,78 @@ int main(int argc, char* argv[])
         taker.clear();
       }
 
-      const auto now = getTimeOfDay();
-
       // Maker sell-side.
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 10_lts, 12348_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, market, ""_sv, Side::Sell, 10_lts, 12348_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Sell, 10_lts, 12348_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, market, ""_sv, Side::Sell, 10_lts, 12348_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 10_lts, 12347_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, market, ""_sv, Side::Sell, 10_lts, 12347_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Sell, 5_lts, 12347_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, market, ""_sv, Side::Sell, 5_lts, 12347_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Sell, 5_lts, 12346_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, market, ""_sv, Side::Sell, 5_lts, 12346_tks, 1_lts, now, resp);
       }
 
       // Maker buy-side.
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Buy, 5_lts, 12344_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, market, ""_sv, Side::Buy, 5_lts, 12344_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Buy, 5_lts, 12343_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, market, ""_sv, Side::Buy, 5_lts, 12343_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Buy, 10_lts, 12343_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, market, ""_sv, Side::Buy, 10_lts, 12343_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(gosayl, book, ""_sv, Side::Buy, 10_lts, 12342_tks, 1_lts, now, resp);
+        serv.createOrder(gosayl, market, ""_sv, Side::Buy, 10_lts, 12342_tks, 1_lts, now, resp);
       }
       {
         TimeRecorder tr{maker};
         resp.clear();
-        serv.createOrder(marayl, book, ""_sv, Side::Buy, 10_lts, 12342_tks, 1_lts, now, resp);
+        serv.createOrder(marayl, market, ""_sv, Side::Buy, 10_lts, 12342_tks, 1_lts, now, resp);
       }
 
       // Taker sell-side.
       {
         TimeRecorder tr{taker};
         resp.clear();
-        serv.createOrder(eddayl, book, ""_sv, Side::Sell, 40_lts, 12342_tks, 1_lts, now, resp);
+        serv.createOrder(eddayl, market, ""_sv, Side::Sell, 40_lts, 12342_tks, 1_lts, now, resp);
       }
 
       // Taker buy-side.
       {
         TimeRecorder tr{taker};
         resp.clear();
-        serv.createOrder(pipayl, book, ""_sv, Side::Buy, 40_lts, 12348_tks, 1_lts, now, resp);
+        serv.createOrder(pipayl, market, ""_sv, Side::Buy, 40_lts, 12348_tks, 1_lts, now, resp);
       }
 
-      arch(eddayl, "EURUSD"_sv, now);
-      arch(gosayl, "EURUSD"_sv, now);
-      arch(marayl, "EURUSD"_sv, now);
-      arch(pipayl, "EURUSD"_sv, now);
+      arch(eddayl, market.id(), now);
+      arch(gosayl, market.id(), now);
+      arch(marayl, market.id(), now);
+      arch(pipayl, market.id(), now);
     }
 
     ret = 0;
