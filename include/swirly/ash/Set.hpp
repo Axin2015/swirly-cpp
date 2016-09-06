@@ -18,6 +18,7 @@
 #define SWIRLY_ASH_SET_HPP
 
 #include <swirly/ash/Mnem.hpp>
+#include <swirly/ash/RefCounted.hpp>
 #include <swirly/ash/Types.hpp>
 
 #include <boost/intrusive/set.hpp>
@@ -46,7 +47,7 @@ class IdSet {
     = boost::intrusive::member_hook<ValueT, decltype(ValueT::idHook_), &ValueT::idHook_>;
   using Set
     = boost::intrusive::set<ValueT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
-  using ValuePtr = std::unique_ptr<ValueT>;
+  using ValuePtr = boost::intrusive_ptr<ValueT>;
 
  public:
   using Iterator = typename Set::iterator;
@@ -55,7 +56,7 @@ class IdSet {
   IdSet() = default;
   ~IdSet() noexcept
   {
-    set_.clear_and_dispose([](ValueT* ptr) { delete ptr; });
+    set_.clear_and_dispose([](const ValueT* ptr) { ptr->release(); });
   }
 
   // Copy.
@@ -91,53 +92,59 @@ class IdSet {
     auto it = set_.lower_bound(id, comp);
     return std::make_pair(it, it != set_.end() && !comp(id, *it));
   }
-  Iterator insert(ValuePtr value) noexcept
+  Iterator insert(const ValuePtr& value) noexcept
   {
     Iterator it;
     bool inserted;
     std::tie(it, inserted) = set_.insert(*value);
     if (inserted) {
       // Take ownership if inserted.
-      value.release();
+      value->addRef();
     }
     return it;
   }
-  Iterator insertHint(ConstIterator hint, ValuePtr value) noexcept
+  Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept
   {
     auto it = set_.insert(hint, *value);
     // Take ownership.
-    value.release();
+    value->addRef();
     return it;
   }
-  Iterator insertOrReplace(ValuePtr value) noexcept
+  Iterator insertOrReplace(const ValuePtr& value) noexcept
   {
     Iterator it;
     bool inserted;
     std::tie(it, inserted) = set_.insert(*value);
     if (!inserted) {
       // Replace if exists.
-      ValuePtr prev{&*it};
+      ValuePtr prev{&*it, false};
       set_.replace_node(it, *value);
       it = Set::s_iterator_to(*value);
     }
     // Take ownership.
-    value.release();
+    value->addRef();
     return it;
   }
   template <typename... ArgsT>
   Iterator emplace(ArgsT&&... args)
   {
-    return insert(std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
+    return insert(makeRefCounted<ValueT>(std::forward<ArgsT>(args)...));
   }
   template <typename... ArgsT>
   Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
   {
-    return insertHint(hint, std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
+    return insertHint(hint, makeRefCounted<ValueT>(std::forward<ArgsT>(args)...));
   }
   template <typename... ArgsT>
   Iterator emplaceOrReplace(ArgsT&&... args)
   {
-    return insertOrReplace(std::make_unique<ValueT>(std::forward<ArgsT>(args)...));
+    return insertOrReplace(makeRefCounted<ValueT>(std::forward<ArgsT>(args)...));
+  }
+  ValuePtr remove(const ValueT& ref) noexcept
+  {
+    ValuePtr value;
+    set_.erase_and_dispose(ref, [&value](ValueT* ptr) { value = ValuePtr{ptr, false}; });
+    return value;
   }
 
  private:

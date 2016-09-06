@@ -17,7 +17,7 @@
 #include <swirly/fig/Response.hpp>
 
 #include <swirly/elm/Exec.hpp>
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/elm/Market.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 
@@ -43,7 +43,13 @@ Response& Response::operator=(Response&&) noexcept = default;
 
 void Response::toJson(ostream& os) const
 {
-  os << "{\"orders\":[";
+  os << "{\"market\":";
+  if (market_) {
+    market_->toJson(os);
+  } else {
+    os << "null";
+  }
+  os << ",\"orders\":[";
   transform(orders_.begin(), orders_.end(), OStreamJoiner(os, ','),
             [](const auto& ptr) -> const auto& { return *ptr; });
   os << "],\"execs\":[";
@@ -55,13 +61,12 @@ void Response::toJson(ostream& os) const
   } else {
     os << "null";
   }
-  os << ",\"view\":";
-  if (book_) {
-    book_->toJsonView(os);
-  } else {
-    os << "null";
-  }
   os << '}';
+}
+
+ConstMarketPtr Response::market() const noexcept
+{
+  return market_;
 }
 
 ConstPosnPtr Response::posn() const noexcept
@@ -69,14 +74,9 @@ ConstPosnPtr Response::posn() const noexcept
   return posn_;
 }
 
-void Response::setPosn(ConstPosnPtr posn) noexcept
-{
-  posn_ = posn;
-}
-
 void Response::clear() noexcept
 {
-  book_ = nullptr;
+  market_ = nullptr;
   orders_.clear();
   execs_.clear();
   posn_ = nullptr;
@@ -93,14 +93,24 @@ void Response::clearMatches() noexcept
   posn_ = nullptr;
 }
 
-void Response::insertOrder(ConstOrderPtr order)
+void Response::setMarket(const ConstMarketPtr& market) noexcept
+{
+  market_ = market;
+}
+
+void Response::insertOrder(const ConstOrderPtr& order)
 {
   orders_.push_back(order);
 }
 
-void Response::insertExec(ConstExecPtr exec)
+void Response::insertExec(const ConstExecPtr& exec)
 {
   execs_.push_back(exec);
+}
+
+void Response::setPosn(const ConstPosnPtr& posn) noexcept
+{
+  posn_ = posn;
 }
 
 } // swirly

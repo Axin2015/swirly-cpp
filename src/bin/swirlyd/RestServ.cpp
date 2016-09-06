@@ -49,22 +49,6 @@ class ScopedIds {
   vector<Id64>& ids_;
 };
 
-class ScopedMnems {
- public:
-  ScopedMnems(string_view sv, vector<Mnem>& mnems) noexcept : mnems_{mnems}
-  {
-    Tokeniser<','> toks{sv};
-    while (!toks.empty()) {
-      mnems.push_back(toks.top());
-      toks.pop();
-    }
-  }
-  ~ScopedMnems() noexcept { mnems_.clear(); }
-
- private:
-  vector<Mnem>& mnems_;
-};
-
 Millis getTime(HttpMessage data, bool testMode) noexcept
 {
   string_view val;
@@ -222,15 +206,15 @@ void RestServ::restRequest(HttpMessage data, Millis now)
   const auto tok = uri_.top();
   uri_.pop();
 
-  if (tok == "rec"_sv) {
-    // /rec
+  if (tok == "ref"_sv) {
+    // /ref
     recRequest(data, now);
+  } else if (tok == "market"_sv) {
+    // /market
+    marketRequest(data, now);
   } else if (tok == "accnt"_sv) {
     // /accnt
     accntRequest(data, now);
-  } else if (tok == "view"_sv) {
-    // /view
-    viewRequest(data, now);
   }
 }
 
@@ -238,13 +222,13 @@ void RestServ::recRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /rec
+    // /ref
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /rec
+      // GET /ref
       state_ |= MatchMethod;
-      const int bs{EntitySet::Asset | EntitySet::Contr | EntitySet::Market};
+      const int bs{EntitySet::Asset | EntitySet::Contr};
       rest_.getRec(bs, now, out_);
     }
     return;
@@ -258,11 +242,11 @@ void RestServ::recRequest(HttpMessage data, Millis now)
 
     if (uri_.empty()) {
 
-      // /rec/entity,entity...
+      // /ref/entity,entity...
       state_ |= MatchUri;
 
       if (isSet(MethodGet)) {
-        // GET /rec/entity,entity...
+        // GET /ref/entity,entity...
         state_ |= MatchMethod;
         rest_.getRec(es, now, out_);
       }
@@ -277,9 +261,6 @@ void RestServ::recRequest(HttpMessage data, Millis now)
   case EntitySet::Contr:
     contrRequest(data, now);
     break;
-  case EntitySet::Market:
-    marketRequest(data, now);
-    break;
   }
 }
 
@@ -287,11 +268,11 @@ void RestServ::assetRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /rec/asset
+    // /ref/asset
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /rec/asset
+      // GET /ref/asset
       state_ |= MatchMethod;
       rest_.getAsset(now, out_);
     }
@@ -303,11 +284,11 @@ void RestServ::assetRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /rec/asset/MNEM
+    // /ref/asset/MNEM
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /rec/asset/MNEM
+      // GET /ref/asset/MNEM
       state_ |= MatchMethod;
       rest_.getAsset(mnem, now, out_);
     }
@@ -319,11 +300,11 @@ void RestServ::contrRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /rec/contr
+    // /ref/contr
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /rec/contr
+      // GET /ref/contr
       state_ |= MatchMethod;
       rest_.getContr(now, out_);
     }
@@ -335,11 +316,11 @@ void RestServ::contrRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /rec/contr/MNEM
+    // /ref/contr/MNEM
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /rec/contr/MNEM
+      // GET /ref/contr/MNEM
       state_ |= MatchMethod;
       rest_.getContr(mnem, now, out_);
     }
@@ -351,64 +332,63 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
-    // /rec/market
+    // /market
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /rec/market
+      // GET /market
       state_ |= MatchMethod;
       rest_.getMarket(now, out_);
       break;
     case MethodPost:
-      // POST /rec/market
+      // POST /market
       state_ |= MatchMethod;
       getAdmin(data);
-      constexpr auto reqFields = RestRequest::Mnem | RestRequest::Display | RestRequest::Contr;
-      constexpr auto optFields
-        = RestRequest::SettlDate | RestRequest::ExpiryDate | RestRequest::State;
+      constexpr auto reqFields = RestRequest::Contr | RestRequest::SettlDate;
+      constexpr auto optFields = RestRequest::State;
       if (!request_.valid(reqFields, optFields)) {
         throw InvalidException{"request fields are invalid"_sv};
       }
-      rest_.postMarket(request_.mnem(), request_.display(), request_.contr(), request_.settlDate(),
-                       request_.expiryDate(), request_.state(), now, out_);
+      rest_.postMarket(request_.contr(), request_.settlDate(), request_.state(), now, out_);
       break;
     }
     return;
   }
 
-  const auto mnem = uri_.top();
+  const auto contr = uri_.top();
   uri_.pop();
 
   if (uri_.empty()) {
 
-    // /rec/market/MNEM
+    // /accnt/market/CONTR
+    state_ |= MatchUri;
+    return;
+  }
+
+  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /market/CONTR/SETTL_DATE
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /rec/market/MNEM
+      // GET /market/CONTR/SETTL_DATE
       state_ |= MatchMethod;
-      rest_.getMarket(mnem, now, out_);
+      rest_.getMarket(contr, settlDate, now, out_);
       break;
     case MethodPut:
-      // PUT /rec/market/MNEM
+      // PUT /market/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       getAdmin(data);
-      constexpr auto reqFields = 0x0;
-      constexpr auto optFields = RestRequest::Display | RestRequest::State;
-      if (!request_.valid(reqFields, optFields)) {
+      constexpr auto reqFields = RestRequest::State;
+      if (!request_.valid(reqFields)) {
         throw InvalidException{"request fields are invalid"_sv};
       }
-      optional<string_view> display;
-      if ((request_.fields() & RestRequest::Display)) {
-        display = request_.display();
-      }
-      optional<MarketState> state;
-      if ((request_.fields() & RestRequest::State)) {
-        state = request_.state();
-      }
-      rest_.putMarket(mnem, display, state, now, out_);
+      rest_.putMarket(contr, settlDate, request_.state(), now, out_);
       break;
     }
     return;
@@ -425,8 +405,8 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
     if (isSet(MethodGet)) {
       // GET /accnt
       state_ |= MatchMethod;
-      const auto es
-        = EntitySet::Order | EntitySet::Exec | EntitySet::Trade | EntitySet::Posn | EntitySet::View;
+      const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec | EntitySet::Trade
+        | EntitySet::Posn;
       rest_.getAccnt(getTrader(data), es, getOffset(data), getLimit(data), now, out_);
     }
     return;
@@ -453,6 +433,9 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
   }
 
   switch (es.get()) {
+  case EntitySet::Market:
+    marketRequest(data, now);
+    break;
   case EntitySet::Order:
     orderRequest(data, now);
     break;
@@ -464,9 +447,6 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
     break;
   case EntitySet::Posn:
     posnRequest(data, now);
-    break;
-  case EntitySet::View:
-    viewRequest(data, now);
     break;
   }
 }
@@ -486,22 +466,32 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto market = uri_.top();
+  const auto contr = uri_.top();
   uri_.pop();
 
   if (uri_.empty()) {
 
-    // /accnt/order/MARKET
+    // /accnt/order/CONTR
+    state_ |= MatchUri;
+    return;
+  }
+
+  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /accnt/order/CONTR/SETTL_DATE
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /accnt/order/MARKET
+      // GET /accnt/order/CONTR/SETTL_DATE
       state_ |= MatchMethod;
-      rest_.getOrder(getTrader(data), market, now, out_);
+      rest_.getOrder(getTrader(data), contr, settlDate, now, out_);
       break;
     case MethodPost:
-      // POST /accnt/order/MARKET
+      // POST /accnt/order/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       {
         // Validate account before request.
@@ -511,7 +501,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
         if (!request_.valid(reqFields, optFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postOrder(accnt, market, request_.ref(), request_.side(), request_.lots(),
+        rest_.postOrder(accnt, contr, settlDate, request_.ref(), request_.side(), request_.lots(),
                         request_.ticks(), request_.minLots(), now, out_);
       }
       break;
@@ -524,17 +514,17 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /accnt/order/MARKET/ID,ID...
+    // /accnt/order/CONTR/SETTL_DATE/ID,ID...
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /accnt/order/MARKET/ID
+      // GET /accnt/order/CONTR/SETTL_DATE/ID
       state_ |= MatchMethod;
-      rest_.getOrder(getTrader(data), market, ids_[0], now, out_);
+      rest_.getOrder(getTrader(data), contr, settlDate, ids_[0], now, out_);
       break;
     case MethodPut:
-      // PUT /accnt/order/MARKET/ID,ID...
+      // PUT /accnt/order/CONTR/SETTL_DATE/ID,ID...
       state_ |= MatchMethod;
       {
         // Validate account before request.
@@ -543,7 +533,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
         if (request_.fields() != reqFields) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.putOrder(accnt, market, ids_, request_.lots(), now, out_);
+        rest_.putOrder(accnt, contr, settlDate, ids_, request_.lots(), now, out_);
       }
       break;
     }
@@ -582,22 +572,32 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto market = uri_.top();
+  const auto contr = uri_.top();
   uri_.pop();
 
   if (uri_.empty()) {
 
-    // /accnt/trade/MARKET
+    // /accnt/trade/CONTR
+    state_ |= MatchUri;
+    return;
+  }
+
+  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  uri_.pop();
+
+  if (uri_.empty()) {
+
+    // /accnt/trade/CONTR/SETTL_DATE
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /accnt/trade/MARKET
+      // GET /accnt/trade/CONTR/SETTL_DATE
       state_ |= MatchMethod;
-      rest_.getTrade(getTrader(data), market, now, out_);
+      rest_.getTrade(getTrader(data), contr, settlDate, now, out_);
       break;
     case MethodPost:
-      // POST /accnt/trade/MARKET
+      // POST /accnt/trade/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       getAdmin(data);
       {
@@ -607,8 +607,9 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
         if (!request_.valid(reqFields, optFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postTrade(request_.accnt(), market, request_.ref(), request_.side(), request_.lots(),
-                        request_.ticks(), request_.liqInd(), request_.cpty(), now, out_);
+        rest_.postTrade(request_.accnt(), contr, settlDate, request_.ref(), request_.side(),
+                        request_.lots(), request_.ticks(), request_.liqInd(), request_.cpty(), now,
+                        out_);
       }
       break;
     }
@@ -620,19 +621,19 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 
   if (uri_.empty()) {
 
-    // /accnt/trade/MARKET/ID,ID...
+    // /accnt/trade/CONTR/SETTL_DATE/ID,ID...
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
     case MethodGet:
-      // GET /accnt/trade/MARKET/ID
+      // GET /accnt/trade/CONTR/SETTL_DATE/ID
       state_ |= MatchMethod;
-      rest_.getTrade(getTrader(data), market, ids_[0], now, out_);
+      rest_.getTrade(getTrader(data), contr, settlDate, ids_[0], now, out_);
       break;
     case MethodDelete:
-      // DELETE /accnt/trade/MARKET/ID,ID...
+      // DELETE /accnt/trade/CONTR/SETTL_DATE/ID,ID...
       state_ |= MatchMethod;
-      rest_.deleteTrade(getTrader(data), market, ids_, now);
+      rest_.deleteTrade(getTrader(data), contr, settlDate, ids_, now);
       break;
     }
     return;
@@ -682,38 +683,6 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
       // GET /accnt/posn/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       rest_.getPosn(getTrader(data), contr, settlDate, now, out_);
-    }
-    return;
-  }
-}
-
-void RestServ::viewRequest(HttpMessage data, Millis now)
-{
-  if (uri_.empty()) {
-
-    // /view
-    state_ |= MatchUri;
-
-    if (isSet(MethodGet)) {
-      // GET /view
-      state_ |= MatchMethod;
-      rest_.getView(now, out_);
-    }
-    return;
-  }
-
-  ScopedMnems mnems{uri_.top(), mnems_};
-  uri_.pop();
-
-  if (uri_.empty()) {
-
-    // /view/MARKET,MARKET...
-    state_ |= MatchUri;
-
-    if (isSet(MethodGet)) {
-      // GET /view/MARKET,MARKET...
-      state_ |= MatchMethod;
-      rest_.getView(mnems_, now, out_);
     }
     return;
   }

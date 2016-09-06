@@ -24,32 +24,31 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
-        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
-        self.createMarket(conn, 'USDCHF.MAR14', 'USDCHF', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD', 20140302)
+        self.createMarket(conn, 'GBPUSD', 20140302)
+        self.createMarket(conn, 'USDCHF', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 7, 12348)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 5, 12347)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 3, 12346)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12344)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12343)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 7, 12343)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 7, 12348)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 5, 12347)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12344)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12343)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12343)
 
-        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 5, 15346)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 3, 15346)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 3, 15344)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 5, 15343)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 5, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15344)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 5, 15343)
 
-        self.createOrder(conn, 'MARAYL', 'USDCHF.MAR14', 'SELL', 3, 9346)
-        self.createOrder(conn, 'MARAYL', 'USDCHF.MAR14', 'BUY', 3, 9344)
+        self.createOrder(conn, 'MARAYL', 'USDCHF', 20140302, 'SELL', 3, 9346)
+        self.createOrder(conn, 'MARAYL', 'USDCHF', 20140302, 'BUY', 3, 9344)
 
         self.getAll(conn)
-        self.getMulti(conn)
         self.getSingle(conn)
 
   def getAll(self, conn):
     conn.setAnon()
-    resp = conn.send('GET', '/view')
+    resp = conn.send('GET', '/market')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -61,11 +60,11 @@ class TestCase(RestTestCase):
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
-      u'market': u'EURUSD.MAR14',
       u'offerCount': [1, 1, 1],
       u'offerResd': [3, 5, 7],
       u'offerTicks': [12346, 12347, 12348],
-      u'settlDate': 20140302
+      u'settlDate': 20140302,
+      u'state': 0
     }, {
       u'bidCount': [1, 1, None],
       u'bidResd': [3, 5, None],
@@ -74,11 +73,11 @@ class TestCase(RestTestCase):
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
-      u'market': u'GBPUSD.MAR14',
       u'offerCount': [2, None, None],
       u'offerResd': [8, None, None],
       u'offerTicks': [15346, None, None],
-      u'settlDate': 20140302
+      u'settlDate': 20140302,
+      u'state': 0
     }, {
       u'bidCount': [1, None, None],
       u'bidResd': [3, None, None],
@@ -87,50 +86,16 @@ class TestCase(RestTestCase):
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
-      u'market': u'USDCHF.MAR14',
       u'offerCount': [1, None, None],
       u'offerResd': [3, None, None],
       u'offerTicks': [9346, None, None],
-      u'settlDate': 20140302
-    }], resp.content)
-
-  def getMulti(self, conn):
-    conn.setAnon()
-    resp = conn.send('GET', '/view/EURUSD.MAR14,USDCHF.MAR14')
-
-    self.assertEqual(200, resp.status)
-    self.assertEqual('OK', resp.reason)
-    self.assertListEqual([{
-      u'bidCount': [1, 2, None],
-      u'bidResd': [3, 12, None],
-      u'bidTicks': [12344, 12343, None],
-      u'contr': u'EURUSD',
-      u'lastLots': None,
-      u'lastTicks': None,
-      u'lastTime': None,
-      u'market': u'EURUSD.MAR14',
-      u'offerCount': [1, 1, 1],
-      u'offerResd': [3, 5, 7],
-      u'offerTicks': [12346, 12347, 12348],
-      u'settlDate': 20140302
-    }, {
-      u'bidCount': [1, None, None],
-      u'bidResd': [3, None, None],
-      u'bidTicks': [9344, None, None],
-      u'contr': u'USDCHF',
-      u'lastLots': None,
-      u'lastTicks': None,
-      u'lastTime': None,
-      u'market': u'USDCHF.MAR14',
-      u'offerCount': [1, None, None],
-      u'offerResd': [3, None, None],
-      u'offerTicks': [9346, None, None],
-      u'settlDate': 20140302
+      u'settlDate': 20140302,
+      u'state': 0
     }], resp.content)
 
   def getSingle(self, conn):
     conn.setAnon()
-    resp = conn.send('GET', '/view/EURUSD.MAR14')
+    resp = conn.send('GET', '/market/EURUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -142,9 +107,9 @@ class TestCase(RestTestCase):
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
-      u'market': u'EURUSD.MAR14',
       u'offerCount': [1, 1, 1],
       u'offerResd': [3, 5, 7],
       u'offerTicks': [12346, 12347, 12348],
-      u'settlDate': 20140302
+      u'settlDate': 20140302,
+      u'state': 0
     }, resp.content)

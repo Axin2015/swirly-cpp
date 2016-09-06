@@ -28,19 +28,17 @@ class SWIRLY_API RestRequest {
  public:
   enum : unsigned {
     Mnem = 1 << 0,
-    Display = 1 << 1,
-    Accnt = 1 << 2,
-    Contr = 1 << 3,
-    SettlDate = 1 << 4,
-    ExpiryDate = 1 << 5,
-    Ref = 1 << 6,
-    State = 1 << 7,
-    Side = 1 << 8,
-    Lots = 1 << 9,
-    Ticks = 1 << 10,
-    MinLots = 1 << 11,
-    LiqInd = 1 << 12,
-    Cpty = 1 << 13
+    Accnt = 1 << 1,
+    Contr = 1 << 2,
+    SettlDate = 1 << 3,
+    Ref = 1 << 4,
+    State = 1 << 5,
+    Side = 1 << 6,
+    Lots = 1 << 7,
+    Ticks = 1 << 8,
+    MinLots = 1 << 9,
+    LiqInd = 1 << 10,
+    Cpty = 1 << 11
   };
 
   RestRequest() noexcept { reset(); }
@@ -56,11 +54,9 @@ class SWIRLY_API RestRequest {
 
   unsigned fields() const noexcept { return fields_; }
   swirly::Mnem mnem() const noexcept { return +mnem_; }
-  std::string_view display() const noexcept { return +display_; }
   swirly::Mnem accnt() const noexcept { return +accnt_; }
   swirly::Mnem contr() const noexcept { return +contr_; }
   IsoDate settlDate() const noexcept { return settlDate_; }
-  IsoDate expiryDate() const noexcept { return expiryDate_; }
   std::string_view ref() const noexcept { return +ref_; }
   MarketState state() const noexcept { return state_; }
   swirly::Side side() const noexcept { return side_; }
@@ -78,7 +74,7 @@ class SWIRLY_API RestRequest {
    *
    * @return true if fields are value.
    */
-  bool valid(unsigned required, unsigned optional) const noexcept
+  bool valid(unsigned required, unsigned optional = 0x0) const noexcept
   {
     return (fields_ & required) == required && (fields_ & ~(required | optional)) == 0;
   }
@@ -102,11 +98,9 @@ class SWIRLY_API RestRequest {
   unsigned fields_;
 
   StringData<MaxMnem> mnem_;
-  StringData<MaxDisplay> display_;
   StringData<MaxMnem> accnt_;
   StringData<MaxMnem> contr_;
   IsoDate settlDate_;
-  IsoDate expiryDate_;
   StringData<MaxRef> ref_;
   MarketState state_;
   swirly::Side side_;

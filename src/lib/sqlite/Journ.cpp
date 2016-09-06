@@ -31,22 +31,22 @@ constexpr auto CommitSql = "COMMIT TRANSACTION"_sv;
 constexpr auto RollbackSql = "ROLLBACK TRANSACTION"_sv;
 
 constexpr auto InsertMarketSql = //
-  "INSERT INTO market_t (mnem, display, contr, settl_day, expiry_day, state)" //
-  " VALUES (?, ?, ?, ?, ?, ?)"_sv;
+  "INSERT INTO market_t (id, contr, settl_day, state)" //
+  " VALUES (?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateMarketSql = //
-  "UPDATE Market_t SET display = ?2, state = ?3" //
-  " WHERE mnem = ?1"_sv;
+  "UPDATE Market_t SET state = ?2" //
+  " WHERE id = ?1"_sv;
 
 constexpr auto InsertExecSql = //
-  "INSERT INTO exec_t (accnt, market, contr, settl_day, id, ref, order_id," //
+  "INSERT INTO exec_t (accnt, market_id, contr, settl_day, id, ref, order_id," //
   " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
   " min_lots, match_id, liqInd_id, cpty, created)" //
   " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateExecSql = //
   "UPDATE exec_t SET archive = ?3" //
-  " WHERE market = ?1 AND id = ?2"_sv;
+  " WHERE market_id = ?1 AND id = ?2"_sv;
 
 } // anonymous
 
@@ -98,11 +98,9 @@ void Journ::createMarket(const CreateMarketBody& body)
   auto& stmt = *insertMarketStmt_;
 
   ScopedBind bind{stmt};
-  bind(toStringView(body.mnem));
-  bind(toStringView(body.display));
+  bind(body.id);
   bind(toStringView(body.contr));
   bind(body.settlDay, MaybeNull);
-  bind(body.expiryDay, MaybeNull);
   bind(body.state);
 
   stepOnce(stmt);
@@ -113,8 +111,7 @@ void Journ::updateMarket(const UpdateMarketBody& body)
   auto& stmt = *updateMarketStmt_;
 
   ScopedBind bind{stmt};
-  bind(toStringView(body.mnem));
-  bind(toStringView(body.display));
+  bind(body.id);
   bind(body.state);
 
   stepOnce(stmt);
@@ -130,7 +127,7 @@ void Journ::createExec(const CreateExecBody& body)
 
   ScopedBind bind{stmt};
   bind(toStringView(body.accnt));
-  bind(toStringView(body.market));
+  bind(body.marketId);
   bind(toStringView(body.contr));
   bind(body.settlDay, MaybeNull);
   bind(body.id);
@@ -174,7 +171,7 @@ void Journ::archiveTrade(const ArchiveTradeBody& body)
       break;
     }
     ScopedBind bind{stmt};
-    bind(toStringView(body.market));
+    bind(body.marketId);
     bind(id);
     bind(body.modified);
 

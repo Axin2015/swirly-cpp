@@ -24,9 +24,9 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12345)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
 
         self.takeOrder(conn)
         self.makerOrder(conn)
@@ -36,7 +36,7 @@ class TestCase(RestTestCase):
 
   def takeOrder(self, conn):
     conn.setTrader('GOSAYL')
-    resp = conn.send('POST', '/accnt/order/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/order/EURUSD/20140302',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)
@@ -44,6 +44,20 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
+      u'market': {
+        u'bidCount': [None, None, None],
+        u'bidResd': [None, None, None],
+        u'bidTicks': [None, None, None],
+        u'contr': u'EURUSD',
+        u'lastLots': 5,
+        u'lastTicks': 12345,
+        u'lastTime': self.now,
+        u'offerCount': [None, None, None],
+        u'offerResd': [None, None, None],
+        u'offerTicks': [None, None, None],
+        u'settlDate': 20140302,
+        u'state': 0
+      },
       u'execs': [{
         u'accnt': u'GOSAYL',
         u'contr': u'EURUSD',
@@ -55,7 +69,6 @@ class TestCase(RestTestCase):
         u'lastLots': None,
         u'lastTicks': None,
         u'lots': 5,
-        u'market': u'EURUSD.MAR14',
         u'matchId': None,
         u'minLots': None,
         u'orderId': 2,
@@ -77,7 +90,6 @@ class TestCase(RestTestCase):
         u'lastLots': 5,
         u'lastTicks': 12345,
         u'lots': 5,
-        u'market': u'EURUSD.MAR14',
         u'matchId': 3,
         u'minLots': None,
         u'orderId': 2,
@@ -99,7 +111,6 @@ class TestCase(RestTestCase):
         u'lastLots': 5,
         u'lastTicks': 12345,
         u'lots': 5,
-        u'market': u'EURUSD.MAR14',
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
@@ -116,20 +127,6 @@ class TestCase(RestTestCase):
         u'contr': u'EURUSD',
         u'sellCost': 61725,
         u'sellLots': 5,
-        u'settlDate': 20140302
-      },
-      u'view': {
-        u'bidCount': [None, None, None],
-        u'bidResd': [None, None, None],
-        u'bidTicks': [None, None, None],
-        u'contr': u'EURUSD',
-        u'lastLots': 5,
-        u'lastTicks': 12345,
-        u'lastTime': self.now,
-        u'market': u'EURUSD.MAR14',
-        u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
-        u'offerTicks': [None, None, None],
         u'settlDate': 20140302
       }
     }, resp.content)
@@ -160,7 +157,6 @@ class TestCase(RestTestCase):
       u'lastTicks': 12345,
       u'liqInd': u'MAKER',
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,
@@ -182,7 +178,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
@@ -211,7 +206,6 @@ class TestCase(RestTestCase):
       u'lastLots': 5,
       u'lastTicks': 12345,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,

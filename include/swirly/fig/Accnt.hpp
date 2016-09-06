@@ -61,9 +61,9 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   const auto& orders() const noexcept { return orders_; }
   const auto& execs() const noexcept { return execs_; }
   const auto& trades() const noexcept { return trades_; }
-  const Exec& trade(Mnem market, Id64 id) const
+  const Exec& trade(Id64 marketId, Id64 id) const
   {
-    auto it = trades_.find(market, id);
+    auto it = trades_.find(marketId, id);
     if (it == trades_.end()) {
       throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
     }
@@ -72,9 +72,9 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
   const auto& posns() const noexcept { return posns_; }
 
   auto& orders() noexcept { return orders_; }
-  Order& order(Mnem market, Id64 id)
+  Order& order(Id64 marketId, Id64 id)
   {
-    auto it = orders_.find(market, id);
+    auto it = orders_.find(marketId, id);
     if (it == orders_.end()) {
       throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
     }

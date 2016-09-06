@@ -24,7 +24,7 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD', 20140302)
 
         self.checkAuth(conn)
 
@@ -33,20 +33,20 @@ class TestCase(RestTestCase):
 
   def checkAuth(self, conn):
     conn.setAuth(None, 0x1)
-    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14')
+    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
-    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14')
+    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def createMakerBuy(self, conn):
     conn.setAdmin()
-    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302',
                      accnt = 'MARAYL',
                      ref = 'test1',
                      side = 'BUY',
@@ -68,7 +68,6 @@ class TestCase(RestTestCase):
       u'lastLots': 10,
       u'lastTicks': 12345,
       u'lots': 10,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': 1,
       u'orderId': 0,
@@ -90,7 +89,6 @@ class TestCase(RestTestCase):
       u'lastLots': 10,
       u'lastTicks': 12345,
       u'lots': 10,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': 1,
       u'orderId': 0,
@@ -105,7 +103,7 @@ class TestCase(RestTestCase):
 
   def createTakerSell(self, conn):
     conn.setAdmin()
-    resp = conn.send('POST', '/accnt/trade/EURUSD.MAR14',
+    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302',
                      accnt = 'MARAYL',
                      ref = 'test2',
                      side = 'SELL',
@@ -127,7 +125,6 @@ class TestCase(RestTestCase):
       u'lastLots': 15,
       u'lastTicks': 12345,
       u'lots': 15,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': 1,
       u'orderId': 0,
@@ -149,7 +146,6 @@ class TestCase(RestTestCase):
       u'lastLots': 15,
       u'lastTicks': 12345,
       u'lots': 15,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': 1,
       u'orderId': 0,

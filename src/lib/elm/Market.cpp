@@ -20,49 +20,75 @@
 
 #include <cassert>
 
+#ifndef SWIRLY_DEPTH
+#define SWIRLY_DEPTH 3
+#endif // SWIRLY_DEPTH
+
 using namespace std;
 
 namespace swirly {
-
-Market::Market(Mnem mnem, string_view display, Mnem contr, JDay settlDay, JDay expiryDay,
-               MarketState state) noexcept
-  : mnem_{mnem},
-    display_{display},
-    contr_{contr},
-    settlDay_{settlDay},
-    expiryDay_{expiryDay},
-    state_{state}
+namespace {
+template <typename FnT>
+void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostream& os, FnT fn)
 {
-  assert((settlDay == 0_jd) == (expiryDay == 0_jd));
+  for (int i{0}; i < SWIRLY_DEPTH; ++i) {
+    if (i > 0) {
+      os << ',';
+    }
+    if (it != end) {
+      os << fn(*it);
+      ++it;
+    } else {
+      os << "null";
+    }
+  }
 }
+} // anonymous
 
 Market::~Market() noexcept = default;
-
-Market::Market(const Market&) = default;
 
 Market::Market(Market&&) = default;
 
 void Market::toJson(ostream& os) const
 {
-  os << "{\"mnem\":\"" << mnem_ //
-     << "\",\"display\":\"" << display_ //
-     << "\",\"contr\":\"" << contr_ //
+  os << "{\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
-
   if (settlDay_ != 0_jd) {
     os << jdToIso(settlDay_);
   } else {
     os << "null";
   }
-  os << ",\"expiryDate\":";
-
-  if (expiryDay_ != 0_jd) {
-    os << jdToIso(expiryDay_);
+  os << ",\"state\":" << state_;
+  if (lastLots_ != 0_lts) {
+    os << ",\"lastLots\":" << lastLots_ //
+       << ",\"lastTicks\":" << lastTicks_ //
+       << ",\"lastTime\":" << lastTime_;
   } else {
-    os << "null";
+    os << ",\"lastLots\":null,\"lastTicks\":null,\"lastTime\":null";
   }
-  os << ",\"state\":" << state_ //
-     << '}';
+
+  const auto& bidLevels = bidSide_.levels();
+  os << ",\"bidTicks\":[";
+  toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
+               [](const auto& level) { return level.ticks(); });
+  os << "],\"bidResd\":[";
+  toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
+               [](const auto& level) { return level.resd(); });
+  os << "],\"bidCount\":[";
+  toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
+               [](const auto& level) { return level.count(); });
+
+  const auto& offerLevels = offerSide_.levels();
+  os << "],\"offerTicks\":[";
+  toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
+               [](const auto& level) { return level.ticks(); });
+  os << "],\"offerResd\":[";
+  toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
+               [](const auto& level) { return level.resd(); });
+  os << "],\"offerCount\":[";
+  toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
+               [](const auto& level) { return level.count(); });
+  os << "]}";
 }
 
 } // swirly

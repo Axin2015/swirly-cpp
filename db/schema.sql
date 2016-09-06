@@ -88,7 +88,8 @@ INSERT INTO asset_type_t (id, mnem) VALUES (6, 'INDEX')
 ;
 
 CREATE TABLE asset_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
+  id INT NOT NULL PRIMARY KEY,
+  mnem CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
   type_id INT NOT NULL,
 
@@ -97,8 +98,9 @@ CREATE TABLE asset_t (
 ;
 
 CREATE TABLE contr_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
-  display VARCHAR(64) NOT NULL,
+  id INT NOT NULL PRIMARY KEY,
+  mnem CHAR(16) NOT NULL UNIQUE,
+  display VARCHAR(64) NOT NULL UNIQUE,
   asset CHAR(16) NOT NULL,
   ccy CHAR(16) NOT NULL,
   lot_numer INT NOT NULL,
@@ -115,11 +117,9 @@ CREATE TABLE contr_t (
 ;
 
 CREATE TABLE market_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
-  display VARCHAR(64) NOT NULL,
+  id BIGINT NOT NULL PRIMARY KEY,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
-  expiry_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
@@ -141,7 +141,7 @@ CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
 CREATE TABLE order_t (
   accnt CHAR(16) NOT NULL,
-  market CHAR(16) NOT NULL,
+  market_id BIGINT NOT NULL,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
@@ -159,9 +159,9 @@ CREATE TABLE order_t (
   created BIGINT NOT NULL,
   modified BIGINT NOT NULL,
 
-  PRIMARY KEY (market, id),
+  PRIMARY KEY (market_id, id),
 
-  FOREIGN KEY (market) REFERENCES market_t (mnem),
+  FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (contr) REFERENCES contr_t (mnem),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id)
@@ -172,7 +172,7 @@ CREATE INDEX order_resd_idx ON order_t (resd);
 
 CREATE TABLE exec_t (
   accnt CHAR(16) NOT NULL,
-  market CHAR(16) NOT NULL,
+  market_id BIGINT NOT NULL,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
@@ -195,9 +195,10 @@ CREATE TABLE exec_t (
   created BIGINT NOT NULL,
   archive BIGINT NULL DEFAULT NULL,
 
-  PRIMARY KEY (market, id),
+  PRIMARY KEY (market_id, id),
 
-  FOREIGN KEY (market, order_id) REFERENCES order_t (market, id),
+  FOREIGN KEY (market_id) REFERENCES market_t (id),
+  FOREIGN KEY (market_id, order_id) REFERENCES order_t (market_id, id),
   FOREIGN KEY (contr) REFERENCES contr_t (mnem),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
@@ -215,7 +216,7 @@ CREATE TRIGGER before_insert_on_exec1
   BEGIN
     INSERT INTO order_t (
       accnt,
-      market,
+      market_id,
       contr,
       settl_day,
       id,
@@ -234,7 +235,7 @@ CREATE TRIGGER before_insert_on_exec1
       modified
     ) VALUES (
       NEW.accnt,
-      NEW.market,
+      NEW.market_id,
       NEW.contr,
       NEW.settl_day,
       NEW.order_id,
@@ -283,7 +284,7 @@ CREATE TRIGGER before_insert_on_exec3
       last_lots = NEW.last_lots,
       last_ticks = NEW.last_ticks,
       last_time = NEW.created
-    WHERE mnem = NEW.market;
+    WHERE id = NEW.market_id;
   END
 ;
 
@@ -307,12 +308,14 @@ CREATE TRIGGER after_insert_on_exec1
     UPDATE exec_t
     SET
       seq_id = (SELECT max_id FROM accnt_t WHERE mnem = NEW.accnt)
-    WHERE market = NEW.market AND id = NEW.id;
+    WHERE market_id = NEW.market_id
+    AND id = NEW.id;
   END
 ;
 
 CREATE VIEW asset_v AS
   SELECT
+    a.id,
     a.mnem,
     a.display,
     t.mnem type
@@ -323,6 +326,7 @@ CREATE VIEW asset_v AS
 
 CREATE VIEW contr_v AS
   SELECT
+    c.id,
     c.mnem,
     c.display,
     a.type,
@@ -342,11 +346,9 @@ CREATE VIEW contr_v AS
 
 CREATE VIEW market_v AS
   SELECT
-    m.mnem,
-    m.display,
+    m.id,
     m.contr,
     m.settl_day,
-    m.expiry_day,
     m.state,
     m.last_lots,
     m.last_ticks,
@@ -354,14 +356,14 @@ CREATE VIEW market_v AS
     MAX(e.id) max_id
   FROM market_t m
   LEFT OUTER JOIN exec_t e
-  ON m.mnem = e.market
-  GROUP BY m.mnem
+  ON m.id = e.market_id
+  GROUP BY m.id
 ;
 
 CREATE VIEW order_v AS
   SELECT
     o.accnt,
-    o.market,
+    o.market_id,
     o.contr,
     o.settl_day,
     o.id,
@@ -388,6 +390,7 @@ CREATE VIEW order_v AS
 CREATE VIEW exec_v AS
   SELECT
     e.accnt,
+    e.market_id,
     e.contr,
     e.settl_day,
     e.id,

@@ -21,6 +21,14 @@
 
 #include <swirly/fig/Serv.hpp>
 
+#include <experimental/optional>
+
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+}
+
 namespace swirly {
 
 class SWIRLY_API Rest {
@@ -51,54 +59,58 @@ class SWIRLY_API Rest {
 
   void getContr(Mnem mnem, Millis now, std::ostream& out) const;
 
-  void getMarket(Millis now, std::ostream& out) const;
-
-  void getMarket(Mnem mnem, Millis now, std::ostream& out) const;
-
   void getAccnt(Mnem mnem, EntitySet es, std::size_t offset, std::optional<std::size_t> limit,
                 Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem accMnem, Millis now, std::ostream& out) const;
+  void getMarket(Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
+  void getMarket(Mnem contrMnem, Millis now, std::ostream& out) const;
 
-  void getOrder(Mnem accMnem, Mnem market, Id64 id, Millis now, std::ostream& out) const;
+  void getMarket(Mnem contrMnem, IsoDate settlDate, Millis now, std::ostream& out) const;
 
-  void getExec(Mnem accMnem, std::size_t offset, std::optional<std::size_t> limit, Millis now,
+  void getOrder(Mnem accntMnem, Millis now, std::ostream& out) const;
+
+  void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
+                std::ostream& out) const;
+
+  void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Millis now,
+                std::ostream& out) const;
+
+  void getExec(Mnem accntMnem, std::size_t offset, std::optional<std::size_t> limit, Millis now,
                std::ostream& out) const;
 
-  void getTrade(Mnem accMnem, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accntMnem, Millis now, std::ostream& out) const;
 
-  void getTrade(Mnem accMnem, Mnem market, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
+                std::ostream& out) const;
 
-  void getTrade(Mnem accMnem, Mnem market, Id64 id, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Millis now,
+                std::ostream& out) const;
 
-  void getPosn(Mnem accMnem, Millis now, std::ostream& out) const;
+  void getPosn(Mnem accntMnem, Millis now, std::ostream& out) const;
 
-  void getPosn(Mnem accMnem, Mnem contr, Millis now, std::ostream& out) const;
+  void getPosn(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
 
-  void getPosn(Mnem accMnem, Mnem contr, IsoDate settlDate, Millis now, std::ostream& out) const;
+  void getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
+               std::ostream& out) const;
 
-  void getView(Millis now, std::ostream& out) const;
+  void postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Millis now,
+                  std::ostream& out);
 
-  void getView(ArrayView<Mnem> markets, Millis now, std::ostream& out) const;
+  void putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Millis now,
+                 std::ostream& out);
 
-  void postMarket(Mnem mnem, std::string_view display, Mnem contr, IsoDate settlDate,
-                  IsoDate expiryDate, MarketState state, Millis now, std::ostream& out);
+  void postOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, std::string_view ref, Side side,
+                 Lots lots, Ticks ticks, Lots minLots, Millis now, std::ostream& out);
 
-  void putMarket(Mnem mnem, std::optional<std::string_view> display,
-                 std::optional<MarketState> state, Millis now, std::ostream& out);
+  void putOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids, Lots lots,
+                Millis now, std::ostream& out);
 
-  void postOrder(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
-                 Lots minLots, Millis now, std::ostream& out);
+  void postTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, std::string_view ref, Side side,
+                 Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Millis now, std::ostream& out);
 
-  void putOrder(Mnem accMnem, Mnem market, ArrayView<Id64> ids, Lots lots, Millis now,
-                std::ostream& out);
-
-  void postTrade(Mnem accMnem, Mnem market, std::string_view ref, Side side, Lots lots, Ticks ticks,
-                 LiqInd liqInd, Mnem cpty, Millis now, std::ostream& out);
-
-  void deleteTrade(Mnem accMnem, Mnem market, ArrayView<Id64> ids, Millis now);
+  void deleteTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids,
+                   Millis now);
 
  private:
   void getOrder(const Accnt& accnt, Millis now, std::ostream& out) const;

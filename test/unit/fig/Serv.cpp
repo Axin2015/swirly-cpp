@@ -21,7 +21,7 @@
 #include <swirly/fig/Test.hpp>
 
 #include <swirly/elm/Exception.hpp>
-#include <swirly/elm/MarketBook.hpp>
+#include <swirly/elm/Market.hpp>
 
 #include <swirly/ash/Date.hpp>
 #include <swirly/ash/Time.hpp>
@@ -36,16 +36,15 @@ namespace {
 
 constexpr auto Today = ymdToJd(2014, 2, 11);
 constexpr auto SettlDay = Today + 2_jd;
-constexpr auto ExpiryDay = Today + 1_jd;
+constexpr auto MarketId = toMarketId(1_id32, SettlDay);
 
 constexpr auto Now = jdToMs(Today);
 
 class SWIRLY_API TestModel : public swirly::TestModel {
  protected:
-  void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const override
+  void doReadMarket(const ModelCallback<MarketPtr>& cb) const override
   {
-    cb(MarketBook::make("EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, SettlDay, ExpiryDay,
-                        0x1));
+    cb(Market::make(MarketId, "EURUSD"_sv, SettlDay, 0x1U));
   }
 };
 
@@ -63,6 +62,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
 
   auto it = serv.assets().find("CHF"_sv);
   SWIRLY_CHECK(it != serv.assets().end());
+  SWIRLY_CHECK(it->id() == 1_id32);
   SWIRLY_CHECK(it->mnem() == "CHF"_sv);
   SWIRLY_CHECK(it->display() == "Switzerland, Francs"_sv);
 
@@ -75,6 +75,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServContrs, ServFixture)
 
   auto it = serv.contrs().find("EURUSD"_sv);
   SWIRLY_CHECK(it != serv.contrs().end());
+  SWIRLY_CHECK(it->id() == 1_id32);
   SWIRLY_CHECK(it->mnem() == "EURUSD"_sv);
   SWIRLY_CHECK(it->display() == "EURUSD"_sv);
 
@@ -96,156 +97,84 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
 {
   SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 1);
 
-  auto it = serv.markets().find("EURUSD.MAR14"_sv);
+  auto it = serv.markets().find(MarketId);
   SWIRLY_CHECK(it != serv.markets().end());
-  SWIRLY_CHECK(it->mnem() == "EURUSD.MAR14"_sv);
-  SWIRLY_CHECK(it->display() == "EURUSD March 14"_sv);
+  SWIRLY_CHECK(it->id() == MarketId);
 
   SWIRLY_CHECK(it->contr() == "EURUSD"_sv);
   SWIRLY_CHECK(it->settlDay() == SettlDay);
-  SWIRLY_CHECK(it->expiryDay() == ExpiryDay);
   SWIRLY_CHECK(it->state() == 0x1);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServMarket, ServFixture)
 {
   // Not found.
-  SWIRLY_CHECK_THROW(serv.market("EURUSD.MAR14x"_sv), MarketNotFoundException);
+  SWIRLY_CHECK_THROW(serv.market(1_id64), MarketNotFoundException);
 
-  auto& book = serv.market("EURUSD.MAR14"_sv);
-  SWIRLY_CHECK(book.mnem() == "EURUSD.MAR14"_sv);
-  SWIRLY_CHECK(book.display() == "EURUSD March 14"_sv);
+  auto& market = serv.market(MarketId);
+  SWIRLY_CHECK(market.id() == MarketId);
 
-  SWIRLY_CHECK(book.contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(book.settlDay() == SettlDay);
-  SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
-  SWIRLY_CHECK(book.state() == 0x1);
+  SWIRLY_CHECK(market.contr() == "EURUSD"_sv);
+  SWIRLY_CHECK(market.settlDay() == SettlDay);
+  SWIRLY_CHECK(market.state() == 0x1);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 {
-  // Contr does not exist.
-  SWIRLY_CHECK_THROW(serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPYx"_sv,
-                                       SettlDay, ExpiryDay, 0x1, Now),
-                     NotFoundException);
+  const Contr& contr = serv.contr("USDJPY"_sv);
+  const auto marketId = toMarketId(contr.id(), SettlDay);
 
-  // Settl-day before expiry-day.
-  SWIRLY_CHECK_THROW(serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPY"_sv,
-                                       Today + 1_jd, Today + 2_jd, 0x1, Now),
-                     InvalidException);
+  // Settl-day before bus-day.
+  SWIRLY_CHECK_THROW(serv.createMarket(contr, Today - 1_jd, 0x1, Now), InvalidException);
 
-  // Expiry-day before bus-day.
-  SWIRLY_CHECK_THROW(serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPY"_sv,
-                                       SettlDay, Today - 1_jd, 0x1, Now),
-                     InvalidException);
+  auto& market = serv.createMarket(contr, SettlDay, 0x1, Now);
 
-  // Expiry-day without settl-day.
-  SWIRLY_CHECK_THROW(serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPY"_sv, 0_jd,
-                                       ExpiryDay, 0x1, Now),
-                     InvalidException);
+  SWIRLY_CHECK(market.id() == marketId);
 
-  // Mnemonic too short.
-  SWIRLY_CHECK_THROW(
-    serv.createMarket("x"_sv, "USDJPY March 14"_sv, "USDJPY"_sv, SettlDay, ExpiryDay, 0x1, Now),
-    InvalidException);
-
-  // Mnemonic contains invalid characters.
-  SWIRLY_CHECK_THROW(serv.createMarket("USDJPY/MAR14"_sv, "USDJPY March 14"_sv, "USDJPY"_sv,
-                                       SettlDay, ExpiryDay, 0x1, Now),
-                     InvalidException);
-
-  auto& book = serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPY"_sv, SettlDay,
-                                 ExpiryDay, 0x1, Now);
-
-  SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
-  SWIRLY_CHECK(book.display() == "USDJPY March 14"_sv);
-
-  SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
-  SWIRLY_CHECK(book.settlDay() == SettlDay);
-  SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
-  SWIRLY_CHECK(book.state() == 0x1);
+  SWIRLY_CHECK(market.contr() == "USDJPY"_sv);
+  SWIRLY_CHECK(market.settlDay() == SettlDay);
+  SWIRLY_CHECK(market.state() == 0x1);
 
   SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 2);
-  auto it = serv.markets().find("USDJPY.MAR14"_sv);
+  auto it = serv.markets().find(marketId);
   SWIRLY_CHECK(it != serv.markets().end());
-  SWIRLY_CHECK(&*it == &book);
+  SWIRLY_CHECK(&*it == &market);
 
   // Already exists.
-  SWIRLY_CHECK_THROW(serv.createMarket("USDJPY.MAR14"_sv, "USDJPY March 14"_sv, "USDJPY"_sv,
-                                       SettlDay, ExpiryDay, 0x1, Now),
-                     AlreadyExistsException);
+  SWIRLY_CHECK_THROW(serv.createMarket(contr, SettlDay, 0x1, Now), AlreadyExistsException);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 {
-  auto& orig
-    = serv.createMarket("USDJPY.MAR14"_sv, "first"_sv, "USDJPY"_sv, SettlDay, ExpiryDay, 0x1, Now);
+  const Contr& contr = serv.contr("USDJPY"_sv);
+  const auto marketId = toMarketId(contr.id(), SettlDay);
+  auto& market = serv.createMarket(contr, SettlDay, 0x1, Now);
 
-  // Update display and state.
-  {
-    auto& book = serv.updateMarket("USDJPY.MAR14"_sv, "second"_sv, 0x2, Now);
+  serv.updateMarket(market, 0x2, Now);
 
-    SWIRLY_CHECK(&book == &orig);
+  SWIRLY_CHECK(market.id() == marketId);
 
-    SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
-    SWIRLY_CHECK(book.display() == "second"_sv);
-
-    SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
-    SWIRLY_CHECK(book.settlDay() == SettlDay);
-    SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
-    SWIRLY_CHECK(book.state() == 0x2);
-
-    SWIRLY_CHECK(distance(serv.markets().begin(), serv.markets().end()) == 2);
-    auto it = serv.markets().find("USDJPY.MAR14"_sv);
-    SWIRLY_CHECK(it != serv.markets().end());
-    SWIRLY_CHECK(&*it == &book);
-  }
-
-  // Update display only.
-  {
-    auto& book = serv.updateMarket("USDJPY.MAR14"_sv, "third"_sv, nullopt, Now);
-
-    SWIRLY_CHECK(&book == &orig);
-
-    SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
-    SWIRLY_CHECK(book.display() == "third"_sv);
-
-    SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
-    SWIRLY_CHECK(book.settlDay() == SettlDay);
-    SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
-    SWIRLY_CHECK(book.state() == 0x2);
-  }
-
-  // Update state only.
-  {
-    auto& book = serv.updateMarket("USDJPY.MAR14"_sv, nullopt, 0x3, Now);
-
-    SWIRLY_CHECK(&book == &orig);
-
-    SWIRLY_CHECK(book.mnem() == "USDJPY.MAR14"_sv);
-    SWIRLY_CHECK(book.display() == "third"_sv);
-
-    SWIRLY_CHECK(book.contr() == "USDJPY"_sv);
-    SWIRLY_CHECK(book.settlDay() == SettlDay);
-    SWIRLY_CHECK(book.expiryDay() == ExpiryDay);
-    SWIRLY_CHECK(book.state() == 0x3);
-  }
+  SWIRLY_CHECK(market.contr() == "USDJPY"_sv);
+  SWIRLY_CHECK(market.settlDay() == SettlDay);
+  SWIRLY_CHECK(market.state() == 0x2);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
   auto& accnt = serv.accnt("MARAYL"_sv);
-  auto& book = serv.market("EURUSD.MAR14"_sv);
+  const Contr& contr = serv.contr("EURUSD"_sv);
+  const auto marketId = toMarketId(contr.id(), SettlDay);
+  auto& market = serv.market(marketId);
 
   Response resp;
-  serv.createOrder(accnt, book, ""_sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
+  serv.createOrder(accnt, market, ""_sv, Side::Buy, 5_lts, 12345_tks, 1_lts, Now, resp);
 
   SWIRLY_CHECK(resp.orders().size() == 1);
   SWIRLY_CHECK(resp.execs().size() == 1);
 
   ConstOrderPtr order{resp.orders().front()};
   SWIRLY_CHECK(order->accnt() == accnt.mnem());
-  SWIRLY_CHECK(order->market() == book.mnem());
+  SWIRLY_CHECK(order->marketId() == market.id());
   SWIRLY_CHECK(order->ref().empty());
   SWIRLY_CHECK(order->state() == State::New);
   SWIRLY_CHECK(order->side() == Side::Buy);

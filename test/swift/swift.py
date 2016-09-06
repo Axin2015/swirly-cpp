@@ -217,22 +217,19 @@ class Connection(object):
 
 class RestTestCase(unittest.TestCase):
 
-  def createMarket(self, conn, mnem, contr, settlDate, expiryDate):
+  def createMarket(self, conn, contr, settlDate):
     conn.setAdmin()
-    resp = conn.send('POST', '/rec/market',
-                     mnem = mnem,
-                     display = mnem,
+    resp = conn.send('POST', '/market',
                      contr = contr,
                      settlDate = settlDate,
-                     expiryDate = expiryDate,
                      state = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
 
-  def createOrder(self, conn, accnt, market, side, lots, ticks):
+  def createOrder(self, conn, accnt, contr, settlDate, side, lots, ticks):
     conn.setTrader(accnt)
-    resp = conn.send('POST', '/accnt/order/' + market,
+    resp = conn.send('POST', '/accnt/order/' + contr + '/' + str(settlDate),
                      side = side,
                      lots = lots,
                      ticks = ticks)

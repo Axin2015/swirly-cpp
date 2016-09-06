@@ -28,25 +28,22 @@ namespace swirly {
 enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
 
 struct SWIRLY_PACKED CreateMarketBody {
-  char mnem[MaxMnem];
-  char display[MaxDisplay];
+  Id64 id;
   char contr[MaxMnem];
   JDay settlDay;
-  JDay expiryDay;
   MarketState state;
 };
 static_assert(std::is_pod<CreateMarketBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED UpdateMarketBody {
-  char mnem[MaxMnem];
-  char display[MaxDisplay];
+  Id64 id;
   MarketState state;
 };
 static_assert(std::is_pod<UpdateMarketBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED CreateExecBody {
   char accnt[MaxMnem];
-  char market[MaxMnem];
+  Id64 marketId;
   char contr[MaxMnem];
   JDay settlDay;
   Id64 id;
@@ -73,7 +70,7 @@ static_assert(std::is_pod<CreateExecBody>::value, "message-type must be pod");
 constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(Millis) - sizeof(More))
                              / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTradeBody {
-  char market[MaxMnem];
+  Id64 marketId;
   Id64 ids[MaxIds];
   Millis modified;
   More more;
@@ -90,7 +87,7 @@ struct SWIRLY_PACKED Msg {
   };
 };
 static_assert(std::is_pod<Msg>::value, "message-type must be pod");
-static_assert(sizeof(Msg) == 248, "unexpected message length");
+static_assert(sizeof(Msg) == 240, "unexpected message length");
 
 template <typename DerivedT>
 struct MsgHandler {

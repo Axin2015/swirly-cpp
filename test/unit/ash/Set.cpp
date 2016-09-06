@@ -44,13 +44,13 @@ class Foo {
   int& alive_;
 };
 
-class Bar {
+class Bar : public RefCounted {
  public:
   Bar(Id64 id, string_view display, int& alive) noexcept : id_{id}, display_{display}, alive_{alive}
   {
     ++alive;
   }
-  ~Bar() noexcept { --alive_; }
+  ~Bar() noexcept override { --alive_; }
 
   auto id() const noexcept { return id_; }
   auto display() const noexcept { return +display_; }

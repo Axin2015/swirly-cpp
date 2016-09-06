@@ -14,22 +14,31 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Asset.hpp>
+#include <swirly/ash/Utility.hpp>
 
-#include <swirly/tea/Test.hpp>
+namespace swirly {
 
-using namespace std;
-using namespace swirly;
-
-static_assert(sizeof(Asset) <= 3 * 64, "crossed cache-line boundary");
-
-SWIRLY_TEST_CASE(AssetToString)
+int hexDigits(int64_t i) noexcept
 {
-  Asset asset{1_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Currency};
-
-  SWIRLY_CHECK(toString(asset) == //
-               "{\"mnem\":\"GBP\""
-               ",\"display\":\"United Kingdom, Pounds\""
-               ",\"type\":\"CURRENCY\""
-               "}");
+  int n{0};
+  if (i & 0xffffffff00000000) {
+    n += 8;
+    i >>= 32;
+  }
+  if (i & 0xffff0000) {
+    n += 4;
+    i >>= 16;
+  }
+  if (i & 0xff00) {
+    n += 2;
+    i >>= 8;
+  }
+  if (i & 0xf0) {
+    n += 2;
+  } else if (i & 0x0f) {
+    ++n;
+  }
+  return n;
 }
+
+} // swirly

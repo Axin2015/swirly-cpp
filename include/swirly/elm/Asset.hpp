@@ -28,8 +28,8 @@ namespace swirly {
  */
 class SWIRLY_API Asset : public Comparable<Asset> {
  public:
-  Asset(Mnem mnem, std::string_view display, AssetType type) noexcept
-    : mnem_{mnem}, display_{display}, type_{type}
+  Asset(Id32 id, Mnem mnem, std::string_view display, AssetType type) noexcept
+    : id_{id}, mnem_{mnem}, display_{display}, type_{type}
   {
   }
 
@@ -52,12 +52,14 @@ class SWIRLY_API Asset : public Comparable<Asset> {
   void toJson(std::ostream& os) const;
 
   int compare(const Asset& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+  auto id() const noexcept { return id_; }
   auto mnem() const noexcept { return mnem_; }
   auto display() const noexcept { return +display_; }
   auto type() const noexcept { return type_; }
   boost::intrusive::set_member_hook<> mnemHook_;
 
  private:
+  const Id32 id_;
   const Mnem mnem_;
   const Display display_;
   const AssetType type_;

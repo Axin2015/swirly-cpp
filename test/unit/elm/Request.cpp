@@ -24,8 +24,8 @@ using namespace swirly;
 namespace {
 class Foo : public Request {
  public:
-  Foo(Mnem market, Id64 id, int& alive) noexcept
-    : Request{{}, market, {}, 0_jd, id, {}, Side::Buy, 0_lts, 0_ms}, alive_{alive}
+  Foo(Id64 marketId, Id64 id, int& alive) noexcept
+    : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, 0_ms}, alive_{alive}
   {
     ++alive;
   }
@@ -46,26 +46,26 @@ SWIRLY_TEST_CASE(RequestIdSet)
   {
     RequestIdSet<Foo> s;
 
-    FooPtr foo1{&*s.emplace("FOO"_sv, 1_id64, alive)};
+    FooPtr foo1{&*s.emplace(1_id64, 2_id64, alive)};
     SWIRLY_CHECK(alive == 1);
     SWIRLY_CHECK(foo1->refs() == 2);
-    SWIRLY_CHECK(foo1->market() == "FOO"_sv);
-    SWIRLY_CHECK(foo1->id() == 1_id64);
-    SWIRLY_CHECK(s.find("FOO"_sv, 1_id64) != s.end());
+    SWIRLY_CHECK(foo1->marketId() == 1_id64);
+    SWIRLY_CHECK(foo1->id() == 2_id64);
+    SWIRLY_CHECK(s.find(1_id64, 2_id64) != s.end());
 
     // Duplicate.
-    FooPtr foo2{&*s.emplace("FOO"_sv, 1_id64, alive)};
+    FooPtr foo2{&*s.emplace(1_id64, 2_id64, alive)};
     SWIRLY_CHECK(alive == 1);
     SWIRLY_CHECK(foo2->refs() == 3);
     SWIRLY_CHECK(foo2 == foo1);
 
     // Replace.
-    FooPtr foo3{&*s.emplaceOrReplace("FOO"_sv, 1_id64, alive)};
+    FooPtr foo3{&*s.emplaceOrReplace(1_id64, 2_id64, alive)};
     SWIRLY_CHECK(alive == 2);
     SWIRLY_CHECK(foo3->refs() == 2);
     SWIRLY_CHECK(foo3 != foo1);
-    SWIRLY_CHECK(foo3->market() == "FOO"_sv);
-    SWIRLY_CHECK(foo3->id() == 1_id64);
+    SWIRLY_CHECK(foo3->marketId() == 1_id64);
+    SWIRLY_CHECK(foo3->id() == 2_id64);
   }
   SWIRLY_CHECK(alive == 0);
 }

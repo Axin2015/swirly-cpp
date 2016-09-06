@@ -24,16 +24,16 @@ class TestCase(RestTestCase):
       with Connection() as conn:
         conn.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD.MAR14', 'EURUSD', 20140302, 20140301)
-        self.createMarket(conn, 'GBPUSD.MAR14', 'GBPUSD', 20140302, 20140301)
+        self.createMarket(conn, 'EURUSD', 20140302)
+        self.createMarket(conn, 'GBPUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 5, 12347)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'SELL', 3, 12346)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 3, 12344)
-        self.createOrder(conn, 'MARAYL', 'EURUSD.MAR14', 'BUY', 5, 12343)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 5, 12347)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12344)
+        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12343)
 
-        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'SELL', 3, 15346)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD.MAR14', 'BUY', 3, 15344)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
+        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15344)
 
         self.checkAuth(conn)
 
@@ -76,7 +76,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'GBPUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -98,7 +97,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'GBPUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
@@ -120,7 +118,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 4,
@@ -142,7 +139,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 3,
@@ -164,7 +160,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -186,7 +181,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
@@ -216,7 +210,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 4,
@@ -238,7 +231,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 3,
@@ -260,7 +252,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -282,7 +273,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
@@ -312,7 +302,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'GBPUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -334,7 +323,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'GBPUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
@@ -356,7 +344,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 4,
@@ -386,7 +373,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 4,
@@ -408,7 +394,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 3,
@@ -430,7 +415,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -469,7 +453,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'GBPUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -491,7 +474,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'GBPUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,
@@ -513,7 +495,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 4,
@@ -535,7 +516,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 3,
@@ -557,7 +537,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 3,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 2,
@@ -579,7 +558,6 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'liqInd': None,
       u'lots': 5,
-      u'market': u'EURUSD.MAR14',
       u'matchId': None,
       u'minLots': None,
       u'orderId': 1,

@@ -20,36 +20,50 @@
 
 #include <swirly/tea/Test.hpp>
 
+#include <iostream>
 using namespace std;
 using namespace swirly;
 
-static_assert(sizeof(Market) <= 3 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Market) <= 4 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(MarketToString)
 {
-  Market market{"EURUSD.MAR14"_sv,    "EURUSD March 14"_sv, "EURUSD"_sv,
-                ymdToJd(2014, 2, 14), ymdToJd(2014, 2, 12), 0x01};
+  Market market{1_id64, "EURUSD"_sv, ymdToJd(2014, 2, 14), 0x01};
 
+  cout << toString(market) << endl;
   SWIRLY_CHECK(toString(market) == //
-               "{\"mnem\":\"EURUSD.MAR14\""
-               ",\"display\":\"EURUSD March 14\""
-               ",\"contr\":\"EURUSD\""
+               "{\"contr\":\"EURUSD\""
                ",\"settlDate\":20140314"
-               ",\"expiryDate\":20140312"
                ",\"state\":1"
+               ",\"lastLots\":null"
+               ",\"lastTicks\":null"
+               ",\"lastTime\":null"
+               ",\"bidTicks\":[null,null,null]"
+               ",\"bidResd\":[null,null,null]"
+               ",\"bidCount\":[null,null,null]"
+               ",\"offerTicks\":[null,null,null]"
+               ",\"offerResd\":[null,null,null]"
+               ",\"offerCount\":[null,null,null]"
                "}");
 }
 
 SWIRLY_TEST_CASE(MarketToStringNull)
 {
-  Market market{"EURUSD.MAR14"_sv, "EURUSD March 14"_sv, "EURUSD"_sv, 0_jd, 0_jd, 0x01};
+  Market market{1_id64, "EURUSD"_sv, 0_jd, 0x01};
 
+  cout << toString(market) << endl;
   SWIRLY_CHECK(toString(market) == //
-               "{\"mnem\":\"EURUSD.MAR14\""
-               ",\"display\":\"EURUSD March 14\""
-               ",\"contr\":\"EURUSD\""
+               "{\"contr\":\"EURUSD\""
                ",\"settlDate\":null"
-               ",\"expiryDate\":null"
                ",\"state\":1"
+               ",\"lastLots\":null"
+               ",\"lastTicks\":null"
+               ",\"lastTime\":null"
+               ",\"bidTicks\":[null,null,null]"
+               ",\"bidResd\":[null,null,null]"
+               ",\"bidCount\":[null,null,null]"
+               ",\"offerTicks\":[null,null,null]"
+               ",\"offerResd\":[null,null,null]"
+               ",\"offerCount\":[null,null,null]"
                "}");
 }

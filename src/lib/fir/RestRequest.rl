@@ -92,21 +92,6 @@ namespace {
   mnem = 'null' %nullMnem
     | str >beginMnem %endMnem;
 
-  action nullDisplay {
-    fields_ &= ~Display;
-    display_.len = 0;
-  }
-  action beginDisplay {
-    str_.len = &display_.len;
-    str_.buf = display_.buf;
-    str_.max = MaxDisplay;
-  }
-  action endDisplay {
-    fields_ |= Display;
-  }
-  display = 'null' %nullDisplay
-    | str >beginDisplay %endDisplay;
-
   action nullAccnt {
     fields_ &= ~Accnt;
     accnt_.len = 0;
@@ -147,17 +132,6 @@ namespace {
   }
   settlDate = 'null' %nullSettlDate
     | num %endSettlDate;
-
-  action nullExpiryDate {
-    fields_ &= ~ExpiryDate;
-    expiryDate_ = 0_ymd;
-  }
-  action endExpiryDate {
-    fields_ |= ExpiryDate;
-    expiryDate_ = box<IsoDate>(num());
-  }
-  expiryDate = 'null' %nullExpiryDate
-    | num %endExpiryDate;
 
   action nullRef {
     fields_ &= ~Ref;
@@ -273,11 +247,9 @@ namespace {
   comma = space* ',' space*;
 
   pair = '"mnem"'i colon mnem
-    | '"display"'i colon display
     | '"accnt"'i colon accnt
     | '"contr"'i colon contr
     | '"settlDate"'i colon settlDate
-    | '"expiryDate"'i colon expiryDate
     | '"ref"'i colon ref
     | '"state"'i colon state
     | '"side"'i colon side
@@ -313,11 +285,9 @@ void RestRequest::reset(bool clear) noexcept
   fields_ = 0;
 
   mnem_.len = 0;
-  display_.len = 0;
   accnt_.len = 0;
   contr_.len = 0;
   settlDate_ = 0_ymd;
-  expiryDate_ = 0_ymd;
   ref_.len = 0;
   state_ = 0;
   side_ = box<swirly::Side>(0);

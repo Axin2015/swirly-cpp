@@ -44,7 +44,6 @@ class SWIRLY_API Model {
   void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
   void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
   void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
-  void readMarket(const ModelCallback<MarketBookPtr>& cb) const { doReadMarket(cb); }
   void readAccnt(Millis now, const ModelCallback<std::string_view>& cb) const
   {
     doReadAccnt(now, cb);
@@ -63,8 +62,6 @@ class SWIRLY_API Model {
   virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
 
   virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
-
-  virtual void doReadMarket(const ModelCallback<MarketBookPtr>& cb) const = 0;
 
   virtual void doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const = 0;
 

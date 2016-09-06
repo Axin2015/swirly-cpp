@@ -14,27 +14,27 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_BOOKSIDE_HPP
-#define SWIRLY_ELM_BOOKSIDE_HPP
+#ifndef SWIRLY_ELM_MARKETSIDE_HPP
+#define SWIRLY_ELM_MARKETSIDE_HPP
 
 #include <swirly/elm/Level.hpp>
 #include <swirly/elm/Order.hpp>
 
 namespace swirly {
 
-class SWIRLY_API BookSide {
+class SWIRLY_API MarketSide {
  public:
-  BookSide() = default;
+  MarketSide() = default;
 
-  ~BookSide() noexcept;
+  ~MarketSide() noexcept;
 
   // Copy.
-  BookSide(const BookSide&) = delete;
-  BookSide& operator=(const BookSide&) = delete;
+  MarketSide(const MarketSide&) = delete;
+  MarketSide& operator=(const MarketSide&) = delete;
 
   // Move.
-  BookSide(BookSide&&);
-  BookSide& operator=(BookSide&&) = delete;
+  MarketSide(MarketSide&&);
+  MarketSide& operator=(MarketSide&&) = delete;
 
   const LevelSet& levels() const noexcept { return levels_; }
   const OrderList& orders() const noexcept { return orders_; }
@@ -117,4 +117,4 @@ class SWIRLY_API BookSide {
 
 } // swirly
 
-#endif // SWIRLY_ELM_BOOKSIDE_HPP
+#endif // SWIRLY_ELM_MARKETSIDE_HPP
