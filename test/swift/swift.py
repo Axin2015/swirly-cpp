@@ -20,6 +20,7 @@ import httplib
 import json
 import os
 import socket
+import sqlite3
 import subprocess
 import tempfile
 import time
@@ -31,8 +32,7 @@ class Process(object):
     proc = subprocess.Popen([
       prog,
       '-f' + confFile,
-      '-n',
-      '-t'
+      '-n'
     ])
     self.proc = proc
 
@@ -54,7 +54,13 @@ def getPort():
     return port
 
 def getProg():
-  return os.getenv('SWIRLYD_EXECUTABLE', 'swirlyd')
+  return os.getenv('SWIRLY_PROGRAM', 'swirlyd')
+
+def getSchema():
+  return os.getenv('SWIRLY_SCHEMA', 'schema.sql')
+
+def getRefData():
+  return os.getenv('SWIRLY_REFDATA', 'test.sql')
 
 def readLine(file):
   while True:
@@ -87,6 +93,31 @@ class ConfFile(object):
   def name(self):
     return self.temp.name
 
+class DbFile(object):
+  def __init__(self):
+    self.temp = tempfile.NamedTemporaryFile(delete = True)
+
+  def __enter__(self):
+    return self
+
+  def __exit__(self, extype, exval, bt):
+    self.close()
+
+  def close(self):
+    self.temp.close()
+    self.temp = None
+
+  def execute(self, path):
+    with sqlite3.connect(self.temp.name) as conn:
+      cur = conn.cursor()
+      with open(path, 'r') as fd:
+        script = fd.read()
+        cur.executescript(script)
+
+  @property
+  def name(self):
+    return self.temp.name
+
 class LogFile(object):
   def __init__(self):
     self.temp = tempfile.NamedTemporaryFile(delete = True)
@@ -114,16 +145,27 @@ class Fixture(object):
 
   port = getPort()
   prog = getProg()
+  schema = getSchema()
+  refData = getRefData()
 
   def __init__(self):
-    confFile = ConfFile()
+    confFile = None
+    dbFile = None
     logFile = None
     proc = None
     try:
+      confFile = ConfFile()
+      dbFile = DbFile()
+      dbFile.execute(Fixture.schema)
+      dbFile.execute(Fixture.refData)
       logFile = LogFile()
       confFile.set('log_file', logFile.name)
       confFile.set('log_level', 5)
       confFile.set('http_port', Fixture.port)
+      confFile.set('sqlite_journ', dbFile.name)
+      confFile.set('sqlite_model', dbFile.name)
+      confFile.set('sqlite_enable_trace', 'yes')
+      confFile.set('sqlite_enable_fkey', 'yes')
       proc = Process(Fixture.prog, confFile.name)
       logFile.wait()
     except:
@@ -131,10 +173,14 @@ class Fixture(object):
         proc.close()
       if logFile is not None:
         logFile.close()
-      confFile.close()
+      if dbFile is not None:
+        dbFile.close()
+      if confFile is not None:
+        confFile.close()
       raise
 
     self.confFile = confFile
+    self.dbFile = dbFile
     self.logFile = logFile
     self.proc = proc
 
@@ -147,6 +193,7 @@ class Fixture(object):
   def close(self):
     self.proc.close()
     self.logFile.close()
+    self.dbFile.close()
     self.confFile.close()
 
 class Response(object):
