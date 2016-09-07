@@ -49,12 +49,9 @@ class ScopedIds {
   vector<Id64>& ids_;
 };
 
-Millis getTime(HttpMessage data, bool testMode) noexcept
+Millis getTime(HttpMessage data) noexcept
 {
-  string_view val;
-  if (testMode) {
-    val = data.header("Swirly-Time");
-  }
+  const string_view val{data.header("Swirly-Time")};
   return val.empty() ? getTimeOfDay() : box<Millis>(stou64(val));
 }
 
@@ -159,7 +156,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
     }
   });
   const auto cache = reset(data);
-  const auto now = getTime(data, testMode_);
+  const auto now = getTime(data);
   // See mg_send().
   nc.last_io_time = unbox(now) / 1000;
 
@@ -186,11 +183,15 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
                                                << "' is not allowed"};
     }
   } catch (const ServException& e) {
+    SWIRLY_ERROR(logMsg() << "exception: status=" << e.httpStatus() << ", reason=" << e.httpReason()
+                          << ", detail=" << e.what());
     out_.reset(e.httpStatus(), e.httpReason());
     out_ << e;
   } catch (const exception& e) {
     const int status{500};
     const char* const reason{"Internal Server Error"};
+    SWIRLY_ERROR(logMsg() << "exception: status=" << status << ", reason=" << reason
+                          << ", detail=" << e.what());
     out_.reset(status, reason);
     ServException::toJson(status, reason, e.what(), out_);
   }

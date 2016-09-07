@@ -32,10 +32,7 @@ namespace mg {
 
 class RestServ : public mg::Mgr<RestServ> {
  public:
-  explicit RestServ(Rest& rest, bool testMode = false) noexcept
-    : rest_(rest), testMode_{testMode}, profile_{"profile"_sv}
-  {
-  }
+  explicit RestServ(Rest& rest) noexcept : rest_(rest), profile_{"profile"_sv} {}
   ~RestServ() noexcept;
 
   // Copy.
@@ -82,7 +79,6 @@ class RestServ : public mg::Mgr<RestServ> {
   bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
 
   Rest& rest_;
-  bool testMode_{false};
   int state_{0};
   Tokeniser<'/'> uri_;
   std::vector<Id64> ids_;

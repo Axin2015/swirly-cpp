@@ -15,11 +15,13 @@
  * 02110-1301, USA.
  */
 #include <swirly/fig/MemPool.hpp>
-#include <swirly/fig/Test.hpp>
 
 #include "RestServ.hpp"
 
 #include <swirly/fir/Rest.hpp>
+
+#include <swirly/elm/Journ.hpp>
+#include <swirly/elm/Model.hpp>
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Log.hpp>
@@ -75,7 +77,6 @@ void openLogFile(const char* path)
 struct Opts {
   fs::path confFile;
   bool daemon{true};
-  bool testMode{false};
 };
 
 void printUsage(ostream& os)
@@ -86,7 +87,6 @@ Options:
   -h                Show this help message.
   -f path           Path to configuration file.
   -n                Do not daemonise. I.e. run in the foreground.
-  -t                Run in functional test mode.
 
 Report bugs to: support@swirlycloud.com
 )==";
@@ -106,9 +106,6 @@ void getOpts(int argc, char* argv[], Opts& opts)
       exit(0);
     case 'n':
       opts.daemon = false;
-      break;
-    case 't':
-      opts.testMode = true;
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
@@ -223,34 +220,13 @@ int main(int argc, char* argv[])
       openLogFile(logFile.c_str());
     }
 
-    unique_ptr<Journ> journ;
-    unique_ptr<Model> model;
-    if (!opts.testMode) {
-      journ = swirly::makeJourn(conf);
-      model = swirly::makeModel(conf);
-    } else {
-      // Use Mock classes for functional testing.
-      journ = make_unique<TestJourn>();
-      model = make_unique<TestModel>();
-    }
     const char* const httpPort{conf.get("http_port", "8080")};
-
     const auto pipeCapacity = conf.get<size_t>("pipe_capacity", 1 << 10);
     const auto maxExecs = conf.get<size_t>("max_execs", 1 << 4);
-    Rest rest{*journ, pipeCapacity, maxExecs};
-    rest.load(*model, getTimeOfDay());
-    model = nullptr;
 
-    mg::RestServ rs{rest, opts.testMode};
-
-    auto& conn = rs.bind(httpPort);
-    mg_set_protocol_http_websocket(&conn);
-
-    SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
-
+    SWIRLY_NOTICE("initialising daemon");
     SWIRLY_INFO(logMsg() << "conf_file:     " << opts.confFile);
     SWIRLY_INFO(logMsg() << "daemon:        " << (opts.daemon ? "yes" : "no"));
-    SWIRLY_INFO(logMsg() << "test_mode:     " << (opts.testMode ? "yes" : "no"));
 
     SWIRLY_INFO(logMsg() << "mem_pool:      " << (memPool.capacity() >> 20) << "MiB");
     SWIRLY_INFO(logMsg() << "file_mode:     " << setfill('0') << setw(3) << oct
@@ -261,6 +237,19 @@ int main(int argc, char* argv[])
     SWIRLY_INFO(logMsg() << "http_port:     " << httpPort);
     SWIRLY_INFO(logMsg() << "pipe_capacity: " << pipeCapacity);
     SWIRLY_INFO(logMsg() << "max_execs:     " << maxExecs);
+
+    auto journ = swirly::makeJourn(conf);
+    auto model = swirly::makeModel(conf);
+    Rest rest{*journ, pipeCapacity, maxExecs};
+    rest.load(*model, getTimeOfDay());
+    model = nullptr;
+
+    mg::RestServ rs{rest};
+
+    auto& conn = rs.bind(httpPort);
+    mg_set_protocol_http_websocket(&conn);
+
+    SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
 
     signal(SIGHUP, sigHandler);
     signal(SIGINT, sigHandler);
