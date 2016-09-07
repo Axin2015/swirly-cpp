@@ -77,6 +77,7 @@ void openLogFile(const char* path)
 struct Opts {
   fs::path confFile;
   bool daemon{true};
+  Millis startTime{0_ms};
 };
 
 void printUsage(ostream& os)
@@ -84,9 +85,10 @@ void printUsage(ostream& os)
   os << R"==(Usage: swirlyd [options]
 
 Options:
-  -h                Show this help message.
-  -f path           Path to configuration file.
-  -n                Do not daemonise. I.e. run in the foreground.
+  -h           Show this help message.
+  -f path      Path to configuration file.
+  -n           Do not daemonise. I.e. run in the foreground.
+  -s           Initial time of day in millis since epoch.
 
 Report bugs to: support@swirlycloud.com
 )==";
@@ -96,7 +98,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
 {
   opterr = 0;
   int ch;
-  while ((ch = getopt(argc, argv, ":f:hnt")) != -1) {
+  while ((ch = getopt(argc, argv, ":f:hns:")) != -1) {
     switch (ch) {
     case 'f':
       opts.confFile = optarg;
@@ -106,6 +108,9 @@ void getOpts(int argc, char* argv[], Opts& opts)
       exit(0);
     case 'n':
       opts.daemon = false;
+      break;
+    case 's':
+      opts.startTime = box<Millis>(stou64(optarg));
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
@@ -151,6 +156,10 @@ int main(int argc, char* argv[])
 
     Opts opts;
     getOpts(argc, argv, opts);
+
+    if (opts.startTime == 0_ms) {
+      opts.startTime = getTimeOfDay();
+    }
 
     Conf conf;
     if (!opts.confFile.empty()) {
@@ -227,6 +236,7 @@ int main(int argc, char* argv[])
     SWIRLY_NOTICE("initialising daemon");
     SWIRLY_INFO(logMsg() << "conf_file:     " << opts.confFile);
     SWIRLY_INFO(logMsg() << "daemon:        " << (opts.daemon ? "yes" : "no"));
+    SWIRLY_INFO(logMsg() << "start-time:    " << opts.startTime);
 
     SWIRLY_INFO(logMsg() << "mem_pool:      " << (memPool.capacity() >> 20) << "MiB");
     SWIRLY_INFO(logMsg() << "file_mode:     " << setfill('0') << setw(3) << oct
@@ -241,7 +251,7 @@ int main(int argc, char* argv[])
     auto journ = swirly::makeJourn(conf);
     auto model = swirly::makeModel(conf);
     Rest rest{*journ, pipeCapacity, maxExecs};
-    rest.load(*model, getTimeOfDay());
+    rest.load(*model, opts.startTime);
     model = nullptr;
 
     mg::RestServ rs{rest};

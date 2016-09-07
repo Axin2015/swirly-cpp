@@ -20,19 +20,20 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
 
-        self.takeOrder(conn)
+          self.takeOrder(client)
 
-  def takeOrder(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('POST', '/accnt/order/EURUSD/20140302',
+  def takeOrder(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)

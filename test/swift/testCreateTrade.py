@@ -20,33 +20,34 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
 
-        self.checkAuth(conn)
+          self.checkAuth(client)
 
-        self.createMakerBuy(conn)
-        self.createTakerSell(conn)
+          self.createMakerBuy(client)
+          self.createTakerSell(client)
 
-  def checkAuth(self, conn):
-    conn.setAuth(None, 0x1)
-    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302')
+  def checkAuth(self, client):
+    client.setAuth(None, 0x1)
+    resp = client.send('POST', '/accnt/trade/EURUSD/20140302')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
-    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302')
+    client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    resp = client.send('POST', '/accnt/trade/EURUSD/20140302')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createMakerBuy(self, conn):
-    conn.setAdmin()
-    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302',
+  def createMakerBuy(self, client):
+    client.setAdmin()
+    resp = client.send('POST', '/accnt/trade/EURUSD/20140302',
                      accnt = 'MARAYL',
                      ref = 'test1',
                      side = 'BUY',
@@ -101,9 +102,9 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createTakerSell(self, conn):
-    conn.setAdmin()
-    resp = conn.send('POST', '/accnt/trade/EURUSD/20140302',
+  def createTakerSell(self, client):
+    client.setAdmin()
+    resp = client.send('POST', '/accnt/trade/EURUSD/20140302',
                      accnt = 'MARAYL',
                      ref = 'test2',
                      side = 'SELL',

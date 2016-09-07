@@ -20,33 +20,34 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
 
-        self.checkAuth(conn)
+          self.checkAuth(client)
 
-        self.createBid(conn)
-        self.createOffer(conn)
+          self.createBid(client)
+          self.createOffer(client)
 
-  def checkAuth(self, conn):
-    conn.setAuth(None, 0x2)
-    resp = conn.send('POST', '/accnt/order/EURUSD/20140302')
+  def checkAuth(self, client):
+    client.setAuth(None, 0x2)
+    resp = client.send('POST', '/accnt/order/EURUSD/20140302')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
-    resp = conn.send('POST', '/accnt/order/EURUSD/20140302')
+    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = client.send('POST', '/accnt/order/EURUSD/20140302')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createBid(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('POST', '/accnt/order/EURUSD/20140302',
+  def createBid(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
                      side = 'BUY',
                      lots = 5,
                      ticks = 12344)
@@ -112,9 +113,9 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createOffer(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('POST', '/accnt/order/EURUSD/20140302',
+  def createOffer(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12346)

@@ -15,8 +15,8 @@
 
 from contextlib import closing
 
+import errno
 import httplib
-
 import json
 import os
 import socket
@@ -26,26 +26,29 @@ import tempfile
 import time
 import unittest
 
-class Process(object):
+def waitForService(server, port, timeout):
+  end = time.time() + timeout
+  while True:
 
-  def __init__(self, prog, confFile):
-    proc = subprocess.Popen([
-      prog,
-      '-f' + confFile,
-      '-n'
-    ])
-    self.proc = proc
+    nextTimeout = end - time.time()
+    if nextTimeout <= 0:
+      return False
 
-  def __enter__(self):
-    return self
+    try:
+      # Sleep for 10ms before attempting to connect.
+      time.sleep(0.01)
+      with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
+        sock.settimeout(nextTimeout)
+        sock.connect((server, port))
 
-  def __exit__(self, extype, exval, bt):
-    self.close()
+    except socket.timeout, err:
+      return False
 
-  def close(self):
-    proc = self.proc
-    proc.terminate()
-    proc.wait()
+    except socket.error, err:
+      if type(err.args) != tuple or err[0] != errno.ECONNREFUSED:
+        raise
+    else:
+      return True
 
 def getPort():
   with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as sock:
@@ -62,14 +65,11 @@ def getSchema():
 def getRefData():
   return os.getenv('SWIRLY_REFDATA', 'test.sql')
 
-def readLine(file):
-  while True:
-    file.seek(0)
-    line = file.readline()
-    if not line:
-      time.sleep(0.1)
-    else:
-      return line
+def executeScript(conn, path):
+  cur = conn.cursor()
+  with open(path, 'r') as fd:
+    script = fd.read()
+    cur.executescript(script)
 
 class ConfFile(object):
   def __init__(self):
@@ -94,8 +94,20 @@ class ConfFile(object):
     return self.temp.name
 
 class DbFile(object):
+
+  schema = getSchema()
+  refData = getRefData()
+
   def __init__(self):
-    self.temp = tempfile.NamedTemporaryFile(delete = True)
+    temp = tempfile.NamedTemporaryFile(delete = True)
+    try:
+      with sqlite3.connect(temp.name) as conn:
+        executeScript(conn, DbFile.schema)
+        executeScript(conn, DbFile.refData)
+    except:
+      temp.close()
+      raise
+    self.temp = temp
 
   def __enter__(self):
     return self
@@ -106,13 +118,6 @@ class DbFile(object):
   def close(self):
     self.temp.close()
     self.temp = None
-
-  def execute(self, path):
-    with sqlite3.connect(self.temp.name) as conn:
-      cur = conn.cursor()
-      with open(path, 'r') as fd:
-        script = fd.read()
-        cur.executescript(script)
 
   @property
   def name(self):
@@ -134,53 +139,64 @@ class LogFile(object):
     self.temp.close()
     self.temp = None
 
-  def wait(self):
-    readLine(self.temp)
-
   @property
   def name(self):
     return self.temp.name
 
-class Fixture(object):
+class Process(object):
+
+  def __init__(self, prog, confFile, startTime):
+    proc = subprocess.Popen([
+      prog,
+      '-f' + confFile,
+      '-n',
+      '-s' + str(startTime)
+    ])
+    self.proc = proc
+
+  def __enter__(self):
+    return self
+
+  def __exit__(self, extype, exval, bt):
+    self.close()
+
+  def close(self):
+    proc = self.proc
+    proc.terminate()
+    proc.wait()
+
+class Server(object):
 
   port = getPort()
   prog = getProg()
-  schema = getSchema()
-  refData = getRefData()
 
-  def __init__(self):
+  def __init__(self, dbFile, startTime):
     confFile = None
-    dbFile = None
     logFile = None
     proc = None
     try:
       confFile = ConfFile()
-      dbFile = DbFile()
-      dbFile.execute(Fixture.schema)
-      dbFile.execute(Fixture.refData)
       logFile = LogFile()
       confFile.set('log_file', logFile.name)
       confFile.set('log_level', 5)
-      confFile.set('http_port', Fixture.port)
+      confFile.set('http_port', Server.port)
       confFile.set('sqlite_journ', dbFile.name)
       confFile.set('sqlite_model', dbFile.name)
       confFile.set('sqlite_enable_trace', 'yes')
       confFile.set('sqlite_enable_fkey', 'yes')
-      proc = Process(Fixture.prog, confFile.name)
-      logFile.wait()
+      proc = Process(Server.prog, confFile.name, startTime)
+      if not waitForService('localhost', Server.port, 5):
+        raise RuntimeError, 'Failed to start service'
     except:
       if proc is not None:
         proc.close()
       if logFile is not None:
         logFile.close()
-      if dbFile is not None:
-        dbFile.close()
       if confFile is not None:
         confFile.close()
       raise
 
     self.confFile = confFile
-    self.dbFile = dbFile
     self.logFile = logFile
     self.proc = proc
 
@@ -193,7 +209,6 @@ class Fixture(object):
   def close(self):
     self.proc.close()
     self.logFile.close()
-    self.dbFile.close()
     self.confFile.close()
 
 class Response(object):
@@ -207,10 +222,10 @@ class Response(object):
     return ('Response(status={},reason="{}",content="{}")'
             .format(self.status, self.reason, self.content))
 
-class Connection(object):
+class Client(object):
 
   def __init__(self):
-    self.conn = httplib.HTTPConnection('localhost', Fixture.port)
+    self.conn = httplib.HTTPConnection('localhost', Server.port)
     self.time = None
     self.accnt = None
     self.perm = None
@@ -264,22 +279,22 @@ class Connection(object):
 
 class RestTestCase(unittest.TestCase):
 
-  def createMarket(self, conn, contr, settlDate):
-    conn.setAdmin()
-    resp = conn.send('POST', '/market',
-                     contr = contr,
-                     settlDate = settlDate,
-                     state = 0)
+  def createMarket(self, client, contr, settlDate):
+    client.setAdmin()
+    resp = client.send('POST', '/market',
+                       contr = contr,
+                       settlDate = settlDate,
+                       state = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
 
-  def createOrder(self, conn, accnt, contr, settlDate, side, lots, ticks):
-    conn.setTrader(accnt)
-    resp = conn.send('POST', '/accnt/order/' + contr + '/' + str(settlDate),
-                     side = side,
-                     lots = lots,
-                     ticks = ticks)
+  def createOrder(self, client, accnt, contr, settlDate, side, lots, ticks):
+    client.setTrader(accnt)
+    resp = client.send('POST', '/accnt/order/' + contr + '/' + str(settlDate),
+                       side = side,
+                       lots = lots,
+                       ticks = ticks)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

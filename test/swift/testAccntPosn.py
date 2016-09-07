@@ -20,45 +20,54 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
-        self.createMarket(conn, 'EURUSD', 20140402)
-        self.createMarket(conn, 'GBPUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140402)
+          self.createMarket(client, 'GBPUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12346)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140402, 'SELL', 5, 12346)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140402, 'BUY', 5, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'SELL', 5, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'BUY', 5, 12346)
 
-        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 7, 15346)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 7, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 7, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 7, 15346)
 
-        self.checkAuth(conn)
+          self.checkAuth(client)
 
-        self.getAll(conn)
-        self.getByContr(conn)
-        self.getBySettlDate(conn)
+          self.getAll(client)
+          self.getByContr(client)
+          self.getBySettlDate(client)
 
-  def checkAuth(self, conn):
-    conn.setAuth(None, 0x2)
-    resp = conn.send('GET', '/accnt/posn')
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
+
+          self.getAll(client)
+          self.getByContr(client)
+          self.getBySettlDate(client)
+
+  def checkAuth(self, client):
+    client.setAuth(None, 0x2)
+    resp = client.send('GET', '/accnt/posn')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
-    resp = conn.send('GET', '/accnt/posn')
+    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = client.send('GET', '/accnt/posn')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def getAll(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/posn')
+  def getAll(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/posn')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -88,9 +97,9 @@ class TestCase(RestTestCase):
       u'settlDate': 20140402
     }], resp.content)
 
-  def getByContr(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/posn/EURUSD')
+  def getByContr(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/posn/EURUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -112,9 +121,9 @@ class TestCase(RestTestCase):
       u'settlDate': 20140402
     }], resp.content)
 
-  def getBySettlDate(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/posn/EURUSD/20140302')
+  def getBySettlDate(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/posn/EURUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
