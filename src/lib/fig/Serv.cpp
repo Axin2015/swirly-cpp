@@ -63,6 +63,8 @@ struct Serv::Impl {
   Impl(Journ& journ, size_t pipeCapacity, size_t maxExecs) noexcept
     : journ_{journ, pipeCapacity}, maxExecs_{maxExecs}
   {
+    matches_.reserve(8);
+    execs_.reserve(1 + 16);
   }
 
   void load(const Model& model, Millis now)
@@ -202,10 +204,15 @@ struct Serv::Impl {
 
     resp.insertOrder(order);
     resp.insertExec(exec);
+
+    // Ensure that matches are cleared when scope exits.
+    auto finally = makeFinally([this]() {
+      this->matches_.clear();
+      this->execs_.clear();
+    });
+    execs_.push_back(exec);
     // Order fields are updated on match.
     matchOrders(accnt, market, *order, now, resp);
-    // Ensure that matches are cleared when scope exits.
-    auto finally = makeFinally([& matches = matches_]() { matches.clear(); });
 
     resp.setMarket(&market);
 
@@ -234,7 +241,7 @@ struct Serv::Impl {
         }
       });
 
-      journ_.createExec(resp.execs());
+      journ_.createExec(execs_);
       success = true;
     }
 
@@ -562,6 +569,8 @@ struct Serv::Impl {
       resp.insertExec(match.takerTrade);
 
       matches_.push_back(move(match));
+      execs_.push_back(match.makerTrade);
+      execs_.push_back(match.takerTrade);
     }
 
     if (!matches_.empty()) {
@@ -682,6 +691,7 @@ struct Serv::Impl {
   MarketSet markets_;
   mutable AccntSet accnts_;
   vector<Match> matches_;
+  vector<ConstExecPtr> execs_;
 };
 
 Serv::Serv(Journ& journ, size_t pipeCapacity, size_t maxExecs)

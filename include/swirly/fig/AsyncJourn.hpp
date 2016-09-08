@@ -92,7 +92,7 @@ class SWIRLY_API AsyncJourn {
    */
   void createExec(const Exec& exec) { doCreateExec(exec, More::No); }
   /**
-   * Create Executions. This overload may be less efficient than ones that are market-specific.
+   * Create Executions.
    */
   void createExec(ArrayView<ConstExecPtr> execs);
   /**
