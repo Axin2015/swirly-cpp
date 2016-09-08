@@ -175,6 +175,16 @@ void Rest::getOrder(Mnem accntMnem, Millis now, ostream& out) const
   getOrder(serv_.accnt(accntMnem), now, out);
 }
 
+void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, ostream& out) const
+{
+  const auto& accnt = serv_.accnt(accntMnem);
+  const auto& orders = accnt.orders();
+  out << '[';
+  copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
+          [contrMnem](const auto& order) { return order.contr() == contrMnem; });
+  out << ']';
+}
+
 void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                     ostream& out) const
 {

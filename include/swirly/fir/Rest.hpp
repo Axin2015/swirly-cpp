@@ -70,6 +70,8 @@ class SWIRLY_API Rest {
 
   void getOrder(Mnem accntMnem, Millis now, std::ostream& out) const;
 
+  void getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
+
   void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                 std::ostream& out) const;
 

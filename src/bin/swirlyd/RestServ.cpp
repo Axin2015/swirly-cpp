@@ -459,10 +459,29 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     // /accnt/order
     state_ |= MatchUri;
 
-    if (isSet(MethodGet)) {
+    switch (state_ & MethodMask) {
+    case MethodGet:
       // GET /accnt/order
       state_ |= MatchMethod;
       rest_.getOrder(getTrader(data), now, out_);
+      break;
+    case MethodPost:
+      // POST /accnt/order
+      state_ |= MatchMethod;
+      {
+        // Validate account before request.
+        const auto accnt = getTrader(data);
+        constexpr auto reqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Side
+          | RestRequest::Lots | RestRequest::Ticks;
+        constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postOrder(accnt, request_.contr(), request_.settlDate(), request_.ref(),
+                        request_.side(), request_.lots(), request_.ticks(), request_.minLots(), now,
+                        out_);
+      }
+      break;
     }
     return;
   }
@@ -474,6 +493,30 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
 
     // /accnt/order/CONTR
     state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /accnt/order/CONTR
+      state_ |= MatchMethod;
+      rest_.getOrder(getTrader(data), contr, now, out_);
+      break;
+    case MethodPost:
+      // POST /accnt/order/CONTR
+      state_ |= MatchMethod;
+      {
+        // Validate account before request.
+        const auto accnt = getTrader(data);
+        constexpr auto reqFields
+          = RestRequest::SettlDate | RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
+        constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postOrder(accnt, contr, request_.settlDate(), request_.ref(), request_.side(),
+                        request_.lots(), request_.ticks(), request_.minLots(), now, out_);
+      }
+      break;
+    }
     return;
   }
 
