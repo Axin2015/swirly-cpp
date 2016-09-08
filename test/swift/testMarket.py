@@ -20,35 +20,43 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
-        self.createMarket(conn, 'GBPUSD', 20140302)
-        self.createMarket(conn, 'USDCHF', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
+          self.createMarket(client, 'GBPUSD', 20140302)
+          self.createMarket(client, 'USDCHF', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 7, 12348)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 5, 12347)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12344)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12343)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12343)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 7, 12348)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 5, 12347)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12344)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12343)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12343)
 
-        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 5, 15346)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15344)
-        self.createOrder(conn, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 5, 15343)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 5, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15344)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 5, 15343)
 
-        self.createOrder(conn, 'MARAYL', 'USDCHF', 20140302, 'SELL', 3, 9346)
-        self.createOrder(conn, 'MARAYL', 'USDCHF', 20140302, 'BUY', 3, 9344)
+          self.createOrder(client, 'MARAYL', 'USDCHF', 20140302, 'SELL', 3, 9346)
+          self.createOrder(client, 'MARAYL', 'USDCHF', 20140302, 'BUY', 3, 9344)
 
-        self.getAll(conn)
-        self.getSingle(conn)
+          self.getAll(client)
+          self.getSingle(client)
 
-  def getAll(self, conn):
-    conn.setAnon()
-    resp = conn.send('GET', '/market')
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
+
+          self.getAll(client)
+          self.getSingle(client)
+
+  def getAll(self, client):
+    client.setAnon()
+    resp = client.send('GET', '/market')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -93,9 +101,9 @@ class TestCase(RestTestCase):
       u'state': 0
     }], resp.content)
 
-  def getSingle(self, conn):
-    conn.setAnon()
-    resp = conn.send('GET', '/market/EURUSD/20140302')
+  def getSingle(self, client):
+    client.setAnon()
+    resp = client.send('GET', '/market/EURUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

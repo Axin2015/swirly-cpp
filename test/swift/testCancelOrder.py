@@ -20,38 +20,39 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12345)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12345)
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 11, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 7, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 11, 12345)
 
-        self.checkAuth(conn)
+          self.checkAuth(client)
 
-        self.cancelSingle(conn)
-        self.cancelMulti(conn)
+          self.cancelSingle(client)
+          self.cancelMulti(client)
 
-  def checkAuth(self, conn):
-    conn.setAuth(None, 0x2)
-    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/1')
+  def checkAuth(self, client):
+    client.setAuth(None, 0x2)
+    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    conn.setAuth('MARAYL', ~0x2 & 0x7fffffff)
-    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/1')
+    client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
+    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def cancelSingle(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/2', lots = 0)
+  def cancelSingle(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/2', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -114,9 +115,9 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def cancelMulti(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('PUT', '/accnt/order/EURUSD/20140302/1,3', lots = 0)
+  def cancelMulti(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1,3', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

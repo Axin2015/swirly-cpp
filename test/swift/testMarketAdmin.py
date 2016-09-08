@@ -20,41 +20,42 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.checkAuth(conn)
+          self.checkAuth(client)
 
-        self.createMarket(conn)
-        self.updateMarket(conn)
+          self.createMarket(client)
+          self.updateMarket(client)
 
-  def checkAuth(self, conn):
-    conn.setAuth(None, 0x1)
-    resp = conn.send('POST', '/market')
-
-    self.assertEqual(401, resp.status)
-    self.assertEqual('Unauthorized', resp.reason)
-
-    resp = conn.send('PUT', '/market/USDJPY/20140302')
+  def checkAuth(self, client):
+    client.setAuth(None, 0x1)
+    resp = client.send('POST', '/market')
 
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    conn.setAuth('ADMIN', ~0x1 & 0x7fffffff)
-    resp = conn.send('POST', '/market')
+    resp = client.send('PUT', '/market/USDJPY/20140302')
+
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
+    resp = client.send('POST', '/market')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = conn.send('PUT', '/market/USDJPY/20140302')
+    resp = client.send('PUT', '/market/USDJPY/20140302')
 
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-  def createMarket(self, conn):
-    conn.setAdmin()
-    resp = conn.send('POST', '/market',
+  def createMarket(self, client):
+    client.setAdmin()
+    resp = client.send('POST', '/market',
                      contr = 'USDJPY',
                      settlDate = 20140302,
                      state = 1)
@@ -76,9 +77,9 @@ class TestCase(RestTestCase):
       u'state': 1
     }, resp.content)
 
-  def updateMarket(self, conn):
-    conn.setAdmin()
-    resp = conn.send('PUT', '/market/USDJPY/20140302',
+  def updateMarket(self, client):
+    client.setAdmin()
+    resp = client.send('PUT', '/market/USDJPY/20140302',
                      state = 2)
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

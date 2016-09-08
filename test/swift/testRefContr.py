@@ -20,16 +20,17 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.getAll(conn)
-        self.getByMnem(conn)
+          self.getAll(client)
+          self.getByMnem(client)
 
-  def getAll(self, conn):
-    conn.setAnon()
-    resp = conn.send('GET', '/ref/contr')
+  def getAll(self, client):
+    client.setAnon()
+    resp = client.send('GET', '/ref/contr')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -287,9 +288,9 @@ class TestCase(RestTestCase):
       u'tickNumer': 1
     }], resp.content)
 
-  def getByMnem(self, conn):
-    conn.setAnon()
-    resp = conn.send('GET', '/ref/contr/EURUSD')
+  def getByMnem(self, client):
+    client.setAnon()
+    resp = client.send('GET', '/ref/contr/EURUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

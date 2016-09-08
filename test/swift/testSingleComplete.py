@@ -20,23 +20,34 @@ class TestCase(RestTestCase):
   def test(self):
     self.maxDiff = None
     self.now = 1388534400000
-    with Fixture() as fixture:
-      with Connection() as conn:
-        conn.setTime(self.now)
+    with DbFile() as dbFile:
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
 
-        self.createMarket(conn, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140302)
 
-        self.createOrder(conn, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12345)
 
-        self.takeOrder(conn)
-        self.makerOrder(conn)
-        self.makerExec(conn)
-        self.makerTrade(conn)
-        self.makerPosn(conn)
+          self.takeOrder(client)
 
-  def takeOrder(self, conn):
-    conn.setTrader('GOSAYL')
-    resp = conn.send('POST', '/accnt/order/EURUSD/20140302',
+          self.makerOrder(client)
+          self.makerExec(client)
+          self.makerTrade(client)
+          self.makerPosn(client)
+
+      with Server(dbFile, self.now) as server:
+        with Client() as client:
+          client.setTime(self.now)
+
+          self.makerOrder(client)
+          self.makerExec(client)
+          self.makerTrade(client)
+          self.makerPosn(client)
+
+  def takeOrder(self, client):
+    client.setTrader('GOSAYL')
+    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
                      side = 'SELL',
                      lots = 5,
                      ticks = 12345)
@@ -131,17 +142,17 @@ class TestCase(RestTestCase):
       }
     }, resp.content)
 
-  def makerOrder(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/order')
+  def makerOrder(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/order')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([], resp.content)
 
-  def makerExec(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/exec')
+  def makerExec(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/exec')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -189,9 +200,9 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def makerTrade(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/trade')
+  def makerTrade(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/trade')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -218,9 +229,9 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def makerPosn(self, conn):
-    conn.setTrader('MARAYL')
-    resp = conn.send('GET', '/accnt/posn')
+  def makerPosn(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/posn')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
