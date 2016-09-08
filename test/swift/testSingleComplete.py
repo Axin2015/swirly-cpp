@@ -48,9 +48,9 @@ class TestCase(RestTestCase):
   def takeOrder(self, client):
     client.setTrader('GOSAYL')
     resp = client.send('POST', '/accnt/order/EURUSD/20140302',
-                     side = 'SELL',
-                     lots = 5,
-                     ticks = 12345)
+                       side = 'SELL',
+                       lots = 5,
+                       ticks = 12345)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

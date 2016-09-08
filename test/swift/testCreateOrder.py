@@ -48,9 +48,9 @@ class TestCase(RestTestCase):
   def createBid(self, client):
     client.setTrader('MARAYL')
     resp = client.send('POST', '/accnt/order/EURUSD/20140302',
-                     side = 'BUY',
-                     lots = 5,
-                     ticks = 12344)
+                       side = 'BUY',
+                       lots = 5,
+                       ticks = 12344)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -116,9 +116,9 @@ class TestCase(RestTestCase):
   def createOffer(self, client):
     client.setTrader('MARAYL')
     resp = client.send('POST', '/accnt/order/EURUSD/20140302',
-                     side = 'SELL',
-                     lots = 5,
-                     ticks = 12346)
+                       side = 'SELL',
+                       lots = 5,
+                       ticks = 12346)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

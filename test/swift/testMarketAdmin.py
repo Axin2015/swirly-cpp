@@ -56,9 +56,9 @@ class TestCase(RestTestCase):
   def createMarket(self, client):
     client.setAdmin()
     resp = client.send('POST', '/market',
-                     contr = 'USDJPY',
-                     settlDate = 20140302,
-                     state = 1)
+                       contr = 'USDJPY',
+                       settlDate = 20140302,
+                       state = 1)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -80,7 +80,7 @@ class TestCase(RestTestCase):
   def updateMarket(self, client):
     client.setAdmin()
     resp = client.send('PUT', '/market/USDJPY/20140302',
-                     state = 2)
+                       state = 2)
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({

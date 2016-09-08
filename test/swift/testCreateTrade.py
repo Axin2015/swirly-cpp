@@ -48,13 +48,13 @@ class TestCase(RestTestCase):
   def createMakerBuy(self, client):
     client.setAdmin()
     resp = client.send('POST', '/accnt/trade/EURUSD/20140302',
-                     accnt = 'MARAYL',
-                     ref = 'test1',
-                     side = 'BUY',
-                     lots = 10,
-                     ticks = 12345,
-                     liqInd = 'MAKER',
-                     cpty = 'GOSAYL')
+                       accnt = 'MARAYL',
+                       ref = 'test1',
+                       side = 'BUY',
+                       lots = 10,
+                       ticks = 12345,
+                       liqInd = 'MAKER',
+                       cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -105,13 +105,13 @@ class TestCase(RestTestCase):
   def createTakerSell(self, client):
     client.setAdmin()
     resp = client.send('POST', '/accnt/trade/EURUSD/20140302',
-                     accnt = 'MARAYL',
-                     ref = 'test2',
-                     side = 'SELL',
-                     lots = 15,
-                     ticks = 12345,
-                     liqInd = 'TAKER',
-                     cpty = 'GOSAYL')
+                       accnt = 'MARAYL',
+                       ref = 'test2',
+                       side = 'SELL',
+                       lots = 15,
+                       ticks = 12345,
+                       liqInd = 'TAKER',
+                       cpty = 'GOSAYL')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
