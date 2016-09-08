@@ -364,6 +364,25 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
 
     // /accnt/market/CONTR
     state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /market/CONTR
+      state_ |= MatchMethod;
+      rest_.getMarket(contr, now, out_);
+      break;
+    case MethodPost:
+      // POST /market/CONTR
+      state_ |= MatchMethod;
+      getAdmin(data);
+      constexpr auto reqFields = RestRequest::SettlDate;
+      constexpr auto optFields = RestRequest::State;
+      if (!request_.valid(reqFields, optFields)) {
+        throw InvalidException{"request fields are invalid"_sv};
+      }
+      rest_.postMarket(contr, request_.settlDate(), request_.state(), now, out_);
+      break;
+    }
     return;
   }
 
@@ -381,15 +400,30 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
       state_ |= MatchMethod;
       rest_.getMarket(contr, settlDate, now, out_);
       break;
+    case MethodPost:
+      // POST /market/CONTR/SETTL_DATE
+      state_ |= MatchMethod;
+      getAdmin(data);
+      {
+        constexpr auto reqFields = 0;
+        constexpr auto optFields = RestRequest::State;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postMarket(contr, settlDate, request_.state(), now, out_);
+      }
+      break;
     case MethodPut:
       // PUT /market/CONTR/SETTL_DATE
       state_ |= MatchMethod;
       getAdmin(data);
-      constexpr auto reqFields = RestRequest::State;
-      if (!request_.valid(reqFields)) {
-        throw InvalidException{"request fields are invalid"_sv};
+      {
+        constexpr auto reqFields = RestRequest::State;
+        if (!request_.valid(reqFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.putMarket(contr, settlDate, request_.state(), now, out_);
       }
-      rest_.putMarket(contr, settlDate, request_.state(), now, out_);
       break;
     }
     return;
