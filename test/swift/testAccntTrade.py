@@ -26,12 +26,14 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.createMarket(client, 'EURUSD', 20140302)
+          self.createMarket(client, 'EURUSD', 20140402)
           self.createMarket(client, 'GBPUSD', 20140302)
 
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 5, 12347)
           self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 3, 12346)
           self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 3, 12346)
-          self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'BUY', 5, 12347)
+
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'SELL', 5, 12347)
+          self.createOrder(client, 'MARAYL', 'EURUSD', 20140402, 'BUY', 5, 12347)
 
           self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'SELL', 3, 15346)
           self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15346)
@@ -39,6 +41,7 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.getAll(client)
+          self.getByContr(client)
           self.getByMarket(client)
           self.getById(client)
 
@@ -47,6 +50,7 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.getAll(client)
+          self.getByContr(client)
           self.getByMarket(client)
           self.getById(client)
 
@@ -57,9 +61,25 @@ class TestCase(RestTestCase):
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
+    resp = client.send('GET', '/accnt/trade/EURUSD')
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
+    resp = client.send('GET', '/accnt/trade/EURUSD/20140302')
+    self.assertEqual(401, resp.status)
+    self.assertEqual('Unauthorized', resp.reason)
+
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
     resp = client.send('GET', '/accnt/trade')
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
+    resp = client.send('GET', '/accnt/trade/EURUSD')
+    self.assertEqual(403, resp.status)
+    self.assertEqual('Forbidden', resp.reason)
+
+    resp = client.send('GET', '/accnt/trade/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
@@ -76,14 +96,14 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 3,
-      u'id': 4,
+      u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 12346,
       u'liqInd': u'MAKER',
       u'lots': 3,
-      u'matchId': 5,
+      u'matchId': 4,
       u'minLots': None,
-      u'orderId': 2,
+      u'orderId': 1,
       u'ref': None,
       u'resd': 0,
       u'settlDate': 20140302,
@@ -97,14 +117,14 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 3,
-      u'id': 5,
+      u'id': 4,
       u'lastLots': 3,
       u'lastTicks': 12346,
       u'liqInd': u'TAKER',
       u'lots': 3,
-      u'matchId': 4,
+      u'matchId': 3,
       u'minLots': None,
-      u'orderId': 3,
+      u'orderId': 2,
       u'ref': None,
       u'resd': 0,
       u'settlDate': 20140302,
@@ -118,17 +138,17 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 5,
-      u'id': 7,
+      u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12347,
       u'liqInd': u'MAKER',
       u'lots': 5,
-      u'matchId': 8,
+      u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
       u'resd': 0,
-      u'settlDate': 20140302,
+      u'settlDate': 20140402,
       u'side': u'SELL',
       u'state': u'TRADE',
       u'ticks': 12347
@@ -139,17 +159,17 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 5,
-      u'id': 8,
+      u'id': 4,
       u'lastLots': 5,
       u'lastTicks': 12347,
       u'liqInd': u'TAKER',
       u'lots': 5,
-      u'matchId': 7,
+      u'matchId': 3,
       u'minLots': None,
-      u'orderId': 6,
+      u'orderId': 2,
       u'ref': None,
       u'resd': 0,
-      u'settlDate': 20140302,
+      u'settlDate': 20140402,
       u'side': u'BUY',
       u'state': u'TRADE',
       u'ticks': 12347
@@ -197,9 +217,9 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }], resp.content)
 
-  def getByMarket(self, client):
+  def getByContr(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade/EURUSD/20140302')
+    resp = client.send('GET', '/accnt/trade/EURUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -210,14 +230,14 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 3,
-      u'id': 4,
+      u'id': 3,
       u'lastLots': 3,
       u'lastTicks': 12346,
       u'liqInd': u'MAKER',
       u'lots': 3,
-      u'matchId': 5,
+      u'matchId': 4,
       u'minLots': None,
-      u'orderId': 2,
+      u'orderId': 1,
       u'ref': None,
       u'resd': 0,
       u'settlDate': 20140302,
@@ -231,14 +251,14 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 3,
-      u'id': 5,
+      u'id': 4,
       u'lastLots': 3,
       u'lastTicks': 12346,
       u'liqInd': u'TAKER',
       u'lots': 3,
-      u'matchId': 4,
+      u'matchId': 3,
       u'minLots': None,
-      u'orderId': 3,
+      u'orderId': 2,
       u'ref': None,
       u'resd': 0,
       u'settlDate': 20140302,
@@ -252,17 +272,17 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 5,
-      u'id': 7,
+      u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12347,
       u'liqInd': u'MAKER',
       u'lots': 5,
-      u'matchId': 8,
+      u'matchId': 4,
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
       u'resd': 0,
-      u'settlDate': 20140302,
+      u'settlDate': 20140402,
       u'side': u'SELL',
       u'state': u'TRADE',
       u'ticks': 12347
@@ -273,20 +293,70 @@ class TestCase(RestTestCase):
       u'cpty': u'MARAYL',
       u'created': self.now,
       u'exec': 5,
-      u'id': 8,
+      u'id': 4,
       u'lastLots': 5,
       u'lastTicks': 12347,
       u'liqInd': u'TAKER',
       u'lots': 5,
-      u'matchId': 7,
+      u'matchId': 3,
       u'minLots': None,
-      u'orderId': 6,
+      u'orderId': 2,
+      u'ref': None,
+      u'resd': 0,
+      u'settlDate': 20140402,
+      u'side': u'BUY',
+      u'state': u'TRADE',
+      u'ticks': 12347
+    }], resp.content)
+
+  def getByMarket(self, client):
+    client.setTrader('MARAYL')
+    resp = client.send('GET', '/accnt/trade/GBPUSD/20140302')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertListEqual([{
+      u'accnt': u'MARAYL',
+      u'contr': u'GBPUSD',
+      u'cost': 46038,
+      u'cpty': u'MARAYL',
+      u'created': self.now,
+      u'exec': 3,
+      u'id': 3,
+      u'lastLots': 3,
+      u'lastTicks': 15346,
+      u'liqInd': u'MAKER',
+      u'lots': 3,
+      u'matchId': 4,
+      u'minLots': None,
+      u'orderId': 1,
+      u'ref': None,
+      u'resd': 0,
+      u'settlDate': 20140302,
+      u'side': u'SELL',
+      u'state': u'TRADE',
+      u'ticks': 15346
+    }, {
+      u'accnt': u'MARAYL',
+      u'contr': u'GBPUSD',
+      u'cost': 46038,
+      u'cpty': u'MARAYL',
+      u'created': self.now,
+      u'exec': 3,
+      u'id': 4,
+      u'lastLots': 3,
+      u'lastTicks': 15346,
+      u'liqInd': u'TAKER',
+      u'lots': 3,
+      u'matchId': 3,
+      u'minLots': None,
+      u'orderId': 2,
       u'ref': None,
       u'resd': 0,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'TRADE',
-      u'ticks': 12347
+      u'ticks': 15346
     }], resp.content)
 
   def getById(self, client):

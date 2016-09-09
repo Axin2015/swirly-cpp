@@ -608,10 +608,29 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     // /accnt/trade
     state_ |= MatchUri;
 
-    if (isSet(MethodGet)) {
+    switch (state_ & MethodMask) {
+    case MethodGet:
       // GET /accnt/trade
       state_ |= MatchMethod;
       rest_.getTrade(getTrader(data), now, out_);
+      break;
+    case MethodPost:
+      // POST /accnt/trade
+      state_ |= MatchMethod;
+      getAdmin(data);
+      {
+        constexpr auto reqFields = RestRequest::Accnt | RestRequest::Contr | RestRequest::SettlDate
+          | RestRequest::Side | RestRequest::Lots;
+        constexpr auto optFields
+          = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postTrade(request_.accnt(), request_.contr(), request_.settlDate(), request_.ref(),
+                        request_.side(), request_.lots(), request_.ticks(), request_.liqInd(),
+                        request_.cpty(), now, out_);
+      }
+      break;
     }
     return;
   }
@@ -623,6 +642,31 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
 
     // /accnt/trade/CONTR
     state_ |= MatchUri;
+
+    switch (state_ & MethodMask) {
+    case MethodGet:
+      // GET /accnt/trade/CONTR
+      state_ |= MatchMethod;
+      rest_.getTrade(getTrader(data), contr, now, out_);
+      break;
+    case MethodPost:
+      // POST /accnt/trade/CONTR
+      state_ |= MatchMethod;
+      getAdmin(data);
+      {
+        constexpr auto reqFields
+          = RestRequest::Accnt | RestRequest::SettlDate | RestRequest::Side | RestRequest::Lots;
+        constexpr auto optFields
+          = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
+        if (!request_.valid(reqFields, optFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postTrade(request_.accnt(), contr, request_.settlDate(), request_.ref(),
+                        request_.side(), request_.lots(), request_.ticks(), request_.liqInd(),
+                        request_.cpty(), now, out_);
+      }
+      break;
+    }
     return;
   }
 

@@ -223,6 +223,16 @@ void Rest::getTrade(Mnem accntMnem, Millis now, ostream& out) const
   getTrade(serv_.accnt(accntMnem), now, out);
 }
 
+void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const
+{
+  const auto& accnt = serv_.accnt(accntMnem);
+  const auto& trades = accnt.trades();
+  out << '[';
+  copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
+          [contrMnem](const auto& trade) { return trade.contr() == contrMnem; });
+  out << ']';
+}
+
 void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                     ostream& out) const
 {

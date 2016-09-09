@@ -83,6 +83,8 @@ class SWIRLY_API Rest {
 
   void getTrade(Mnem accntMnem, Millis now, std::ostream& out) const;
 
+  void getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
+
   void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                 std::ostream& out) const;
 
