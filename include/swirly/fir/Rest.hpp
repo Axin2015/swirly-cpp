@@ -49,7 +49,7 @@ class SWIRLY_API Rest {
 
   void load(const Model& model, Millis now) { serv_.load(model, now); }
 
-  void getRec(EntitySet es, Millis now, std::ostream& out) const;
+  void getRefData(EntitySet es, Millis now, std::ostream& out) const;
 
   void getAsset(Millis now, std::ostream& out) const;
 

@@ -36,7 +36,7 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
-void Rest::getRec(EntitySet es, Millis now, ostream& out) const
+void Rest::getRefData(EntitySet es, Millis now, ostream& out) const
 {
   int i{0};
   out << '{';

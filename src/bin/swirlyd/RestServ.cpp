@@ -131,7 +131,7 @@ bool RestServ::reset(HttpMessage data) noexcept
 
   const auto method = data.method();
   if (method == "GET"_sv) {
-    cache = !uri.empty() && uri_.top() == "rec"_sv;
+    cache = !uri.empty() && uri_.top() == "ref"_sv;
     state_ |= MethodGet;
   } else if (method == "POST"_sv) {
     state_ |= MethodPost;
@@ -209,7 +209,7 @@ void RestServ::restRequest(HttpMessage data, Millis now)
 
   if (tok == "ref"_sv) {
     // /ref
-    recRequest(data, now);
+    refDataRequest(data, now);
   } else if (tok == "market"_sv) {
     // /market
     marketRequest(data, now);
@@ -219,7 +219,7 @@ void RestServ::restRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::recRequest(HttpMessage data, Millis now)
+void RestServ::refDataRequest(HttpMessage data, Millis now)
 {
   if (uri_.empty()) {
 
@@ -230,7 +230,7 @@ void RestServ::recRequest(HttpMessage data, Millis now)
       // GET /ref
       state_ |= MatchMethod;
       const int bs{EntitySet::Asset | EntitySet::Contr};
-      rest_.getRec(bs, now, out_);
+      rest_.getRefData(bs, now, out_);
     }
     return;
   }
@@ -249,7 +249,7 @@ void RestServ::recRequest(HttpMessage data, Millis now)
       if (isSet(MethodGet)) {
         // GET /ref/entity,entity...
         state_ |= MatchMethod;
-        rest_.getRec(es, now, out_);
+        rest_.getRefData(es, now, out_);
       }
     }
     return;
