@@ -49,7 +49,7 @@ class SWIRLY_API Rest {
 
   void load(const Model& model, Millis now) { serv_.load(model, now); }
 
-  void getRec(EntitySet es, Millis now, std::ostream& out) const;
+  void getRefData(EntitySet es, Millis now, std::ostream& out) const;
 
   void getAsset(Millis now, std::ostream& out) const;
 
@@ -70,6 +70,8 @@ class SWIRLY_API Rest {
 
   void getOrder(Mnem accntMnem, Millis now, std::ostream& out) const;
 
+  void getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
+
   void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                 std::ostream& out) const;
 
@@ -80,6 +82,8 @@ class SWIRLY_API Rest {
                std::ostream& out) const;
 
   void getTrade(Mnem accntMnem, Millis now, std::ostream& out) const;
+
+  void getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
 
   void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                 std::ostream& out) const;

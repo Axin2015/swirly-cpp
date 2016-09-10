@@ -37,14 +37,14 @@ class TestCase(RestTestCase):
 
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
 
+    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
 
+    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 

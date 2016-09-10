@@ -27,6 +27,7 @@ class TestCase(RestTestCase):
 
           self.createMarket(client, 'EURUSD', 20140302)
           self.createMarket(client, 'GBPUSD', 20140302)
+          self.createMarket(client, 'GBPUSD', 20140402)
           self.createMarket(client, 'USDCHF', 20140302)
 
           self.createOrder(client, 'MARAYL', 'EURUSD', 20140302, 'SELL', 7, 12348)
@@ -41,18 +42,23 @@ class TestCase(RestTestCase):
           self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 3, 15344)
           self.createOrder(client, 'MARAYL', 'GBPUSD', 20140302, 'BUY', 5, 15343)
 
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140402, 'SELL', 7, 15347)
+          self.createOrder(client, 'MARAYL', 'GBPUSD', 20140402, 'BUY', 7, 15342)
+
           self.createOrder(client, 'MARAYL', 'USDCHF', 20140302, 'SELL', 3, 9346)
           self.createOrder(client, 'MARAYL', 'USDCHF', 20140302, 'BUY', 3, 9344)
 
           self.getAll(client)
-          self.getSingle(client)
+          self.getByContr(client)
+          self.getByMarket(client)
 
       with Server(dbFile, self.now) as server:
         with Client() as client:
           client.setTime(self.now)
 
           self.getAll(client)
-          self.getSingle(client)
+          self.getByContr(client)
+          self.getByMarket(client)
 
   def getAll(self, client):
     client.setAnon()
@@ -88,6 +94,19 @@ class TestCase(RestTestCase):
       u'state': 0
     }, {
       u'bidCount': [1, None, None],
+      u'bidResd': [7, None, None],
+      u'bidTicks': [15342, None, None],
+      u'contr': u'GBPUSD',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'offerCount': [1, None, None],
+      u'offerResd': [7, None, None],
+      u'offerTicks': [15347, None, None],
+      u'settlDate': 20140402,
+      u'state': 0
+    }, {
+      u'bidCount': [1, None, None],
       u'bidResd': [3, None, None],
       u'bidTicks': [9344, None, None],
       u'contr': u'USDCHF',
@@ -101,23 +120,57 @@ class TestCase(RestTestCase):
       u'state': 0
     }], resp.content)
 
-  def getSingle(self, client):
+  def getByContr(self, client):
     client.setAnon()
-    resp = client.send('GET', '/market/EURUSD/20140302')
+    resp = client.send('GET', '/market/GBPUSD')
+
+    self.assertEqual(200, resp.status)
+    self.assertEqual('OK', resp.reason)
+    self.assertListEqual([{
+      u'bidCount': [1, 1, None],
+      u'bidResd': [3, 5, None],
+      u'bidTicks': [15344, 15343, None],
+      u'contr': u'GBPUSD',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'offerCount': [2, None, None],
+      u'offerResd': [8, None, None],
+      u'offerTicks': [15346, None, None],
+      u'settlDate': 20140302,
+      u'state': 0
+    }, {
+      u'bidCount': [1, None, None],
+      u'bidResd': [7, None, None],
+      u'bidTicks': [15342, None, None],
+      u'contr': u'GBPUSD',
+      u'lastLots': None,
+      u'lastTicks': None,
+      u'lastTime': None,
+      u'offerCount': [1, None, None],
+      u'offerResd': [7, None, None],
+      u'offerTicks': [15347, None, None],
+      u'settlDate': 20140402,
+      u'state': 0
+    }], resp.content)
+
+  def getByMarket(self, client):
+    client.setAnon()
+    resp = client.send('GET', '/market/GBPUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'bidCount': [1, 2, None],
-      u'bidResd': [3, 12, None],
-      u'bidTicks': [12344, 12343, None],
-      u'contr': u'EURUSD',
+      u'bidCount': [1, 1, None],
+      u'bidResd': [3, 5, None],
+      u'bidTicks': [15344, 15343, None],
+      u'contr': u'GBPUSD',
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
-      u'offerCount': [1, 1, 1],
-      u'offerResd': [3, 5, 7],
-      u'offerTicks': [12346, 12347, 12348],
+      u'offerCount': [2, None, None],
+      u'offerResd': [8, None, None],
+      u'offerTicks': [15346, None, None],
       u'settlDate': 20140302,
       u'state': 0
     }, resp.content)

@@ -48,7 +48,7 @@ class RestServ : public mg::Mgr<RestServ> {
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
   void restRequest(mg::HttpMessage data, Millis now);
 
-  void recRequest(mg::HttpMessage data, Millis now);
+  void refDataRequest(mg::HttpMessage data, Millis now);
   void assetRequest(mg::HttpMessage data, Millis now);
   void contrRequest(mg::HttpMessage data, Millis now);
 

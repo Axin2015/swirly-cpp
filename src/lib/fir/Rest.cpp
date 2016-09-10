@@ -36,7 +36,7 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
-void Rest::getRec(EntitySet es, Millis now, ostream& out) const
+void Rest::getRefData(EntitySet es, Millis now, ostream& out) const
 {
   int i{0};
   out << '{';
@@ -175,6 +175,16 @@ void Rest::getOrder(Mnem accntMnem, Millis now, ostream& out) const
   getOrder(serv_.accnt(accntMnem), now, out);
 }
 
+void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, ostream& out) const
+{
+  const auto& accnt = serv_.accnt(accntMnem);
+  const auto& orders = accnt.orders();
+  out << '[';
+  copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
+          [contrMnem](const auto& order) { return order.contr() == contrMnem; });
+  out << ']';
+}
+
 void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
                     ostream& out) const
 {
@@ -211,6 +221,16 @@ void Rest::getExec(Mnem accntMnem, size_t offset, optional<size_t> limit, Millis
 void Rest::getTrade(Mnem accntMnem, Millis now, ostream& out) const
 {
   getTrade(serv_.accnt(accntMnem), now, out);
+}
+
+void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const
+{
+  const auto& accnt = serv_.accnt(accntMnem);
+  const auto& trades = accnt.trades();
+  out << '[';
+  copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
+          [contrMnem](const auto& trade) { return trade.contr() == contrMnem; });
+  out << ']';
 }
 
 void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
