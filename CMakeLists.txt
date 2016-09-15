@@ -64,8 +64,6 @@ file(MAKE_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
 file(MAKE_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
 file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/html")
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
-
 find_program(DOT_EXECUTABLE dot)
 find_program(ENV_EXECUTABLE env)
 find_program(RAGEL_EXECUTABLE ragel)
@@ -78,6 +76,9 @@ find_package(SQLite3 3.7.15 REQUIRED)
 find_package(Doxygen)                # Optional.
 find_package(Perl)                   # Optional.
 find_package(PythonInterp 2.7 EXACT) # Optional.
+# Find the QtWidgets library.
+find_package(Qt5Widgets QUIET)
+find_package(Qt5Network QUIET)
 
 if(DOXYGEN_FOUND)
 
