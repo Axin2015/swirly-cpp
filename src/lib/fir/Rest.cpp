@@ -108,14 +108,14 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
   int i{0};
   out << '{';
   if (es.market()) {
-    if (i > 0) {
-      out << ',';
-    }
     out << "\"markets\":";
     getMarket(now, out);
     ++i;
   }
   if (es.order()) {
+    if (i > 0) {
+      out << ',';
+    }
     out << "\"orders\":";
     getOrder(accnt, now, out);
     ++i;
