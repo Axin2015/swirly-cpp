@@ -48,7 +48,7 @@ class Contr {
   Contr() = default;
   ~Contr() noexcept = default;
 
-  static Contr parse(const QJsonObject& obj);
+  static Contr fromJson(const QJsonObject& obj);
 
   const QString& mnem() const noexcept { return mnem_; }
   const QString& display() const noexcept { return display_; }

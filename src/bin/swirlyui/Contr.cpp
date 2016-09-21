@@ -14,7 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-
 #include "Contr.hpp"
 
 #include "Json.hpp"
@@ -25,8 +24,9 @@
 namespace swirly {
 namespace ui {
 
-Contr Contr::parse(const QJsonObject& obj)
+Contr Contr::fromJson(const QJsonObject& obj)
 {
+  using swirly::ui::fromJson;
   return Contr{fromJson<QString>(obj["mnem"]),  fromJson<QString>(obj["display"]),
                fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
                fromJson<int>(obj["lotNumer"]),  fromJson<int>(obj["lotDenom"]),

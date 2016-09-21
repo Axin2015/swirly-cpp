@@ -14,58 +14,61 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_MARKET_HPP
-#define SWIRLYUI_MARKET_HPP
+#ifndef SWIRLYUI_POSN_HPP
+#define SWIRLYUI_POSN_HPP
+
+#include "Types.hpp"
 
 #include <QDate>
 #include <QMetaType>
 #include <QString>
-
-#include "Types.hpp"
 
 class QJsonObject;
 
 namespace swirly {
 namespace ui {
 
-class Market {
+class Posn {
  public:
-  Market(const QString& contr, QDate settlDate, MarketState state, Lots lastLots, Ticks lastTicks,
-         const QDateTime& lastTime)
-    : contr_{contr},
+  Posn(const QString& accnt, const QString& contr, QDate settlDate, Lots buyLots, Cost buyCost,
+       Lots sellLots, Cost sellCost)
+    : accnt_{accnt},
+      contr_{contr},
       settlDate_{settlDate},
-      state_{state},
-      lastLots_{lastLots},
-      lastTicks_{lastTicks},
-      lastTime_{lastTime}
+      buyLots_{buyLots},
+      buyCost_{buyCost},
+      sellLots_{sellLots},
+      sellCost_{sellCost}
   {
   }
-  Market() = default;
-  ~Market() noexcept = default;
+  Posn() = default;
+  ~Posn() noexcept = default;
 
-  static Market fromJson(const QJsonObject& obj);
+  static Posn fromJson(const QJsonObject& obj);
 
+  const QString& accnt() const noexcept { return accnt_; }
   const QString& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
-  MarketState state() const noexcept { return state_; }
-  Lots lastLots() const noexcept { return lastLots_; }
-  Ticks lastTicks() const noexcept { return lastTicks_; }
-  const QDateTime& lastTime() const noexcept { return lastTime_; }
+  Lots buyLots() const noexcept { return buyLots_; }
+  Cost buyCost() const noexcept { return buyCost_; }
+  Lots sellLots() const noexcept { return sellLots_; }
+  Cost sellCost() const noexcept { return sellCost_; }
 
  private:
-  QString contr_{};
-  QDate settlDate_{};
-  MarketState state_{};
-  Lots lastLots_{};
-  Ticks lastTicks_{};
-  QDateTime lastTime_{};
+  QString accnt_;
+  QString contr_;
+  QDate settlDate_;
+  Lots buyLots_;
+  Cost buyCost_;
+  Lots sellLots_;
+  Cost sellCost_;
 };
 
-QDebug operator<<(QDebug debug, const Market& market);
+QDebug operator<<(QDebug debug, const Posn& posn);
 
 } // ui
 } // swirly
 
-Q_DECLARE_METATYPE(swirly::ui::Market)
+Q_DECLARE_METATYPE(swirly::ui::Posn)
 
-#endif // SWIRLYUI_MARKET_HPP
+#endif // SWIRLYUI_POSN_HPP

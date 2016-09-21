@@ -17,6 +17,8 @@
 #ifndef SWIRLYUI_ASSET_HPP
 #define SWIRLYUI_ASSET_HPP
 
+#include "Types.hpp"
+
 #include <QMetaType>
 #include <QString>
 
@@ -27,23 +29,23 @@ namespace ui {
 
 class Asset {
  public:
-  Asset(const QString& mnem, const QString& display, const QString& type)
+  Asset(const QString& mnem, const QString& display, AssetType type)
     : mnem_{mnem}, display_{display}, type_{type}
   {
   }
   Asset() = default;
   ~Asset() noexcept = default;
 
-  static Asset parse(const QJsonObject& obj);
+  static Asset fromJson(const QJsonObject& obj);
 
   const QString& mnem() const noexcept { return mnem_; }
   const QString& display() const noexcept { return display_; }
-  const QString& type() const noexcept { return type_; }
+  AssetType type() const noexcept { return type_; }
 
  private:
   QString mnem_{};
   QString display_{};
-  QString type_{};
+  AssetType type_{};
 };
 
 QDebug operator<<(QDebug debug, const Asset& asset);

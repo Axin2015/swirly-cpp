@@ -14,7 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-
 #include "Market.hpp"
 
 #include "Json.hpp"
@@ -25,8 +24,9 @@
 namespace swirly {
 namespace ui {
 
-Market Market::parse(const QJsonObject& obj)
+Market Market::fromJson(const QJsonObject& obj)
 {
+  using swirly::ui::fromJson;
   return Market{fromJson<QString>(obj["contr"]),     fromJson<QDate>(obj["settlDate"]),
                 fromJson<MarketState>(obj["state"]), fromJson<Lots>(obj["lastLots"]),
                 fromJson<Ticks>(obj["lastTicks"]),   fromJson<QDateTime>(obj["lastTime"])};
