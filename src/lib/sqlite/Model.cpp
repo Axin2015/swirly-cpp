@@ -20,7 +20,6 @@
 #include <swirly/elm/Contr.hpp>
 #include <swirly/elm/Exec.hpp>
 #include <swirly/elm/Market.hpp>
-#include <swirly/elm/Market.hpp>
 
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>

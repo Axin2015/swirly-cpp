@@ -13,8 +13,26 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-add_subdirectory(swirlyd)
-if(Qt5Widgets_FOUND AND Qt5Network_FOUND)
-  add_subdirectory(swirlyui)
-endif()
-add_subdirectory(tool)
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# Find includes in corresponding build directories.
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+add_executable(swirlyui
+  Application.qrc
+  Asset.cpp
+  AssetModel.cpp
+  AssetView.cpp
+  Contr.cpp
+  ContrModel.cpp
+  ContrView.cpp
+  HttpClient.cpp
+  Json.cpp
+  Main.cpp
+  MainWindow.cpp
+  Market.cpp)
+
+# Use the Widgets module from Qt 5.
+target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)
