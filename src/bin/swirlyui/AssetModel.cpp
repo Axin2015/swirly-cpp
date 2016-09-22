@@ -14,7 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-
 #include "AssetModel.hpp"
 
 #include <algorithm>
@@ -75,7 +74,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
       var = asset.display();
       break;
     case Type:
-      var = asset.type();
+      var = enumString(asset.type());
       break;
     }
   }

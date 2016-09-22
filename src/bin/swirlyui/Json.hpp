@@ -17,6 +17,8 @@
 #ifndef SWIRLYUI_JSON_HPP
 #define SWIRLYUI_JSON_HPP
 
+#include "Types.hpp"
+
 #include <QDate>
 #include <QJsonValue>
 
@@ -73,6 +75,36 @@ struct JsonTraits<QDateTime> {
     return QDateTime::fromMSecsSinceEpoch(value.toDouble());
   }
   static QJsonValue toJson(const QDateTime& value) { return value.toMSecsSinceEpoch(); }
+};
+
+template <>
+struct JsonTraits<AssetType> {
+  static AssetType fromJson(const QJsonValue& value);
+  static QJsonValue toJson(AssetType value) { return enumString(value); }
+};
+
+template <>
+struct JsonTraits<Direct> {
+  static Direct fromJson(const QJsonValue& value);
+  static QJsonValue toJson(Direct value) { return enumString(value); }
+};
+
+template <>
+struct JsonTraits<LiqInd> {
+  static LiqInd fromJson(const QJsonValue& value);
+  static QJsonValue toJson(LiqInd value) { return enumString(value); }
+};
+
+template <>
+struct JsonTraits<Side> {
+  static Side fromJson(const QJsonValue& value);
+  static QJsonValue toJson(Side value) { return enumString(value); }
+};
+
+template <>
+struct JsonTraits<State> {
+  static State fromJson(const QJsonValue& value);
+  static QJsonValue toJson(State value) { return enumString(value); }
 };
 
 template <typename ValueT>

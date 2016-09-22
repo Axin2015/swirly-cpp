@@ -28,11 +28,15 @@ add_executable(swirlyui
   Contr.cpp
   ContrModel.cpp
   ContrView.cpp
+  Exec.cpp
   HttpClient.cpp
   Json.cpp
   Main.cpp
   MainWindow.cpp
-  Market.cpp)
+  Market.cpp
+  Order.cpp
+  Posn.cpp
+  Types.cpp)
 
 # Use the Widgets module from Qt 5.
 target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)

@@ -14,13 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-
 #include "HttpClient.hpp"
 
 #include "Asset.hpp"
 #include "Contr.hpp"
+#include "Exec.hpp"
 #include "Json.hpp"
 #include "Market.hpp"
+#include "Order.hpp"
+#include "Posn.hpp"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -129,9 +131,9 @@ void HttpClient::getAccnt()
 
 void HttpClient::getRefDataReply(QNetworkReply* reply)
 {
-  auto body = reply->readAll();
-  qDebug() << "getRefDataReply:" << body;
+  qDebug() << "getRefDataReply";
 
+  auto body = reply->readAll();
   QJsonParseError error;
   const auto doc = QJsonDocument::fromJson(body, &error);
   if (error.error != QJsonParseError::NoError) {
@@ -141,27 +143,28 @@ void HttpClient::getRefDataReply(QNetworkReply* reply)
 
   const auto obj = doc.object();
   for (const auto elem : obj["assets"].toArray()) {
-    const auto asset = Asset::parse(elem.toObject());
-    qDebug() << asset;
+    const auto asset = Asset::fromJson(elem.toObject());
+    qDebug() << "asset:" << asset;
     emit notifyAsset(asset);
   }
   for (const auto elem : obj["contrs"].toArray()) {
-    const auto contr = Contr::parse(elem.toObject());
-    qDebug() << contr;
+    const auto contr = Contr::fromJson(elem.toObject());
+    qDebug() << "contr:" << contr;
     emit notifyContr(contr);
   }
 
-  //postMarket("EURUSD", 20160923, 0);
-  //postOrder("EURUSD", 20160923, "test", "Buy", 10, 12345);
+  //postMarket("EURUSD", QDate{2016, 9, 23}, 0);
+  //postOrder("EURUSD", QDate{2016, 9, 23}, "foo", "Buy", 10, 12345);
+  //postOrder("EURUSD", QDate{2016, 9, 23}, "bar", "Sell", 5, 12345);
   getAccnt();
   startTimer(2000);
 }
 
 void HttpClient::getAccntReply(QNetworkReply* reply)
 {
-  auto body = reply->readAll();
-  qDebug() << "getAccntReply:" << body;
+  qDebug() << "getAccntReply";
 
+  auto body = reply->readAll();
   QJsonParseError error;
   const auto doc = QJsonDocument::fromJson(body, &error);
   if (error.error != QJsonParseError::NoError) {
@@ -171,8 +174,24 @@ void HttpClient::getAccntReply(QNetworkReply* reply)
 
   const auto obj = doc.object();
   for (const auto elem : obj["markets"].toArray()) {
-    const auto market = Market::parse(elem.toObject());
-    qDebug() << market;
+    const auto market = Market::fromJson(elem.toObject());
+    qDebug() << "market:" << market;
+  }
+  for (const auto elem : obj["orders"].toArray()) {
+    const auto order = Order::fromJson(elem.toObject());
+    qDebug() << "order:" << order;
+  }
+  for (const auto elem : obj["execs"].toArray()) {
+    const auto exec = Exec::fromJson(elem.toObject());
+    qDebug() << "exec:" << exec;
+  }
+  for (const auto elem : obj["trades"].toArray()) {
+    const auto trade = Exec::fromJson(elem.toObject());
+    qDebug() << "trade:" << trade;
+  }
+  for (const auto elem : obj["posns"].toArray()) {
+    const auto posn = Posn::fromJson(elem.toObject());
+    qDebug() << "posn:" << posn;
   }
 }
 

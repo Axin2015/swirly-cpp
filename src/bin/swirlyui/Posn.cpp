@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Asset.hpp"
+#include "Posn.hpp"
 
 #include "Json.hpp"
 
@@ -24,18 +24,24 @@
 namespace swirly {
 namespace ui {
 
-Asset Asset::fromJson(const QJsonObject& obj)
+Posn Posn::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Asset{fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
-               fromJson<AssetType>(obj["type"])};
+  return Posn{fromJson<QString>(obj["accnt"]),   fromJson<QString>(obj["contr"]),
+              fromJson<QDate>(obj["settlDate"]), fromJson<Lots>(obj["buyLots"]),
+              fromJson<Cost>(obj["buyCost"]),    fromJson<Lots>(obj["sellLots"]),
+              fromJson<Cost>(obj["sellCost"])};
 }
 
-QDebug operator<<(QDebug debug, const Asset& asset)
+QDebug operator<<(QDebug debug, const Posn& posn)
 {
-  debug.nospace() << "mnem=" << asset.mnem() //
-                  << ",display=" << asset.display() //
-                  << ",type=" << asset.type();
+  debug.nospace() << "accnt=" << posn.accnt() //
+                  << ",contr=" << posn.contr() //
+                  << ",settlDate=" << posn.settlDate() //
+                  << ",buyLots=" << posn.buyLots() //
+                  << ",buyCost=" << posn.buyCost() //
+                  << ",sellLots=" << posn.sellLots() //
+                  << ",sellCost=" << posn.sellCost();
   return debug;
 }
 
