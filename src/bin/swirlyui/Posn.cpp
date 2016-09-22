@@ -35,13 +35,14 @@ Posn Posn::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Posn& posn)
 {
-  debug.nospace() << "accnt=" << posn.accnt() //
+  debug.nospace() << "Posn{accnt=" << posn.accnt() //
                   << ",contr=" << posn.contr() //
                   << ",settlDate=" << posn.settlDate() //
                   << ",buyLots=" << posn.buyLots() //
                   << ",buyCost=" << posn.buyCost() //
                   << ",sellLots=" << posn.sellLots() //
-                  << ",sellCost=" << posn.sellCost();
+                  << ",sellCost=" << posn.sellCost() //
+                  << '}';
   return debug;
 }
 

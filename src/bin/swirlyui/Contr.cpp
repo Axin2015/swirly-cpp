@@ -37,7 +37,7 @@ Contr Contr::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Contr& contr)
 {
-  debug.nospace() << "mnem=" << contr.mnem() //
+  debug.nospace() << "Contr{mnem=" << contr.mnem() //
                   << ",display=" << contr.display() //
                   << ",asset=" << contr.asset() //
                   << ",ccy=" << contr.ccy() //
@@ -47,7 +47,8 @@ QDebug operator<<(QDebug debug, const Contr& contr)
                   << ",tickDenom=" << contr.tickDenom() //
                   << ",pipDp=" << contr.pipDp() //
                   << ",minLots=" << contr.minLots() //
-                  << ",maxLots=" << contr.maxLots();
+                  << ",maxLots=" << contr.maxLots() //
+                  << '}';
   return debug;
 }
 

@@ -19,27 +19,57 @@
 #include "Json.hpp"
 
 #include <QDebug>
+#include <QJsonArray>
 #include <QJsonObject>
+
+using namespace std;
 
 namespace swirly {
 namespace ui {
+namespace {
+
+void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray& count,
+              Market::Levels& levels)
+{
+  for (size_t i{0}; i < Market::Depth; ++i) {
+    levels[i] = {fromJson<Ticks>(ticks[i]), fromJson<Lots>(resd[i]), fromJson<int>(count[i])};
+  }
+}
+
+} // anonymous
 
 Market Market::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Market{fromJson<QString>(obj["contr"]),     fromJson<QDate>(obj["settlDate"]),
+
+  Market market{fromJson<QString>(obj["contr"]),     fromJson<QDate>(obj["settlDate"]),
                 fromJson<MarketState>(obj["state"]), fromJson<Lots>(obj["lastLots"]),
                 fromJson<Ticks>(obj["lastTicks"]),   fromJson<QDateTime>(obj["lastTime"])};
+
+  const auto bidTicks = obj["bidTicks"].toArray();
+  const auto bidResd = obj["bidResd"].toArray();
+  const auto bidCount = obj["bidCount"].toArray();
+  toLevels(bidTicks, bidResd, bidCount, market.bids_);
+
+  const auto offerTicks = obj["offerTicks"].toArray();
+  const auto offerResd = obj["offerResd"].toArray();
+  const auto offerCount = obj["offerCount"].toArray();
+  toLevels(bidTicks, bidResd, bidCount, market.offers_);
+
+  return market;
 }
 
 QDebug operator<<(QDebug debug, const Market& market)
 {
-  debug.nospace() << "contr=" << market.contr() //
+  debug.nospace() << "Market{contr=" << market.contr() //
                   << ",settlDate=" << market.settlDate() //
                   << ",state=" << market.state() //
                   << ",lastLots=" << market.lastLots() //
                   << ",lastTicks=" << market.lastTicks() //
-                  << ",lastTime=" << market.lastTime();
+                  << ",lastTime=" << market.lastTime() //
+                  << ",bestBid=" << market.bids().front() //
+                  << ",bestOffer=" << market.offers().front() //
+                  << '}';
   return debug;
 }
 

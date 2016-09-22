@@ -40,7 +40,7 @@ Order Order::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Order& order)
 {
-  debug.nospace() << "accnt=" << order.accnt() //
+  debug.nospace() << "Order{accnt=" << order.accnt() //
                   << ",contr=" << order.contr() //
                   << ",settlDate=" << order.settlDate() //
                   << ",id=" << order.id() //
@@ -56,7 +56,8 @@ QDebug operator<<(QDebug debug, const Order& order)
                   << ",lastTicks=" << order.lastTicks() //
                   << ",minLots=" << order.minLots() //
                   << ",created=" << order.created() //
-                  << ",modified=" << order.modified();
+                  << ",modified=" << order.modified() //
+                  << '}';
   return debug;
 }
 

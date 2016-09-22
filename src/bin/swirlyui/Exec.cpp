@@ -41,7 +41,7 @@ Exec Exec::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Exec& exec)
 {
-  debug.nospace() << "accnt=" << exec.accnt() //
+  debug.nospace() << "Exec{accnt=" << exec.accnt() //
                   << ",contr=" << exec.contr() //
                   << ",settlDate=" << exec.settlDate() //
                   << ",id=" << exec.id() //
@@ -60,7 +60,8 @@ QDebug operator<<(QDebug debug, const Exec& exec)
                   << ",matchId=" << exec.matchId() //
                   << ",liqInd=" << exec.liqInd() //
                   << ",cpty=" << exec.cpty() //
-                  << ",created=" << exec.created();
+                  << ",created=" << exec.created() //
+                  << '}';
   return debug;
 }
 

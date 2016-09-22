@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Asset.hpp"
+#include "Level.hpp"
 
 #include "Json.hpp"
 
@@ -24,18 +24,18 @@
 namespace swirly {
 namespace ui {
 
-Asset Asset::fromJson(const QJsonObject& obj)
+Level Level::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Asset{fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
-               fromJson<AssetType>(obj["type"])};
+  return Level{fromJson<Ticks>(obj["ticks"]), fromJson<Lots>(obj["resd"]),
+               fromJson<int>(obj["count"])};
 }
 
-QDebug operator<<(QDebug debug, const Asset& asset)
+QDebug operator<<(QDebug debug, const Level& level)
 {
-  debug.nospace() << "Asset{mnem=" << asset.mnem() //
-                  << ",display=" << asset.display() //
-                  << ",type=" << asset.type() //
+  debug.nospace() << "Level{ticks=" << level.ticks() //
+                  << ",resd=" << level.resd() //
+                  << ",count=" << level.count() //
                   << '}';
   return debug;
 }

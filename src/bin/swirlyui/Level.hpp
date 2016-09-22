@@ -14,31 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Asset.hpp"
+#ifndef SWIRLYUI_LEVEL_HPP
+#define SWIRLYUI_LEVEL_HPP
 
-#include "Json.hpp"
+#include "Types.hpp"
 
-#include <QDebug>
-#include <QJsonObject>
+#include <QMetaType>
+
+class QJsonObject;
 
 namespace swirly {
 namespace ui {
 
-Asset Asset::fromJson(const QJsonObject& obj)
-{
-  using swirly::ui::fromJson;
-  return Asset{fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
-               fromJson<AssetType>(obj["type"])};
-}
+class Level {
+ public:
+  Level(Ticks ticks, Lots resd, int count) : ticks_{ticks}, resd_{resd}, count_{count} {}
+  Level() = default;
+  ~Level() noexcept = default;
 
-QDebug operator<<(QDebug debug, const Asset& asset)
-{
-  debug.nospace() << "Asset{mnem=" << asset.mnem() //
-                  << ",display=" << asset.display() //
-                  << ",type=" << asset.type() //
-                  << '}';
-  return debug;
-}
+  static Level fromJson(const QJsonObject& obj);
+
+  Ticks ticks() const noexcept { return ticks_; }
+  Lots resd() const noexcept { return resd_; }
+  int count() const noexcept { return count_; }
+
+ private:
+  Ticks ticks_{};
+  Lots resd_{};
+  int count_{};
+};
+
+QDebug operator<<(QDebug debug, const Level& level);
 
 } // ui
 } // swirly
+
+Q_DECLARE_METATYPE(swirly::ui::Level)
+
+#endif // SWIRLYUI_LEVEL_HPP
