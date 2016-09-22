@@ -29,9 +29,14 @@ MainWindow::MainWindow() : contrView_{new ContrView{contrModel_}}
 {
   setCentralWidget(contrView_);
 
-  connect(&client_, &HttpClient::notifyAsset, this, &MainWindow::slotNotifyAsset);
-  connect(&client_, &HttpClient::notifyContr, this, &MainWindow::slotNotifyContr);
-  connect(&client_, &HttpClient::notifyError, this, &MainWindow::slotNotifyError);
+  connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
+  connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
+  connect(&client_, &HttpClient::updateAsset, this, &MainWindow::slotUpdateAsset);
+  connect(&client_, &HttpClient::updateContr, this, &MainWindow::slotUpdateContr);
+  connect(&client_, &HttpClient::updateOrder, this, &MainWindow::slotUpdateOrder);
+  connect(&client_, &HttpClient::updateExec, this, &MainWindow::slotUpdateExec);
+  connect(&client_, &HttpClient::updateTrade, this, &MainWindow::slotUpdateTrade);
+  connect(&client_, &HttpClient::updatePosn, this, &MainWindow::slotUpdatePosn);
 
   createActions();
   createStatusBar();
@@ -52,21 +57,46 @@ void MainWindow::closeEvent(QCloseEvent* event)
   }
 }
 
-void MainWindow::slotNotifyAsset(const Asset& asset)
+void MainWindow::slotRefDataComplete()
 {
-  qDebug() << "slotNotifyAsset";
+  qDebug() << "slotRefDataComplete";
+}
+
+void MainWindow::slotServiceError(const QString& error)
+{
+  qDebug() << "slotServiceError:" << error;
+}
+
+void MainWindow::slotUpdateAsset(const Asset& asset)
+{
+  qDebug() << "slotUpdateAsset";
   assetModel_.insertRow(asset);
 }
 
-void MainWindow::slotNotifyContr(const Contr& contr)
+void MainWindow::slotUpdateContr(const Contr& contr)
 {
-  qDebug() << "slotNotifyContr";
+  qDebug() << "slotUpdateContr";
   contrModel_.insertRow(contr);
 }
 
-void MainWindow::slotNotifyError(const QString& error)
+void MainWindow::slotUpdateOrder(const Order& order)
 {
-  qDebug() << "slotNotifyError:" << error;
+  qDebug() << "slotUpdateOrder";
+}
+
+void MainWindow::slotUpdateExec(const Exec& exec)
+{
+  qDebug() << "slotUpdateExec";
+}
+
+void MainWindow::slotUpdateTrade(const Exec& trade)
+{
+  qDebug() << "slotUpdateTrade";
+}
+
+void MainWindow::slotUpdatePosn(const Posn& posn)
+{
+  qDebug() << "slotUpdatePosn";
 }
 
 void MainWindow::slotAbout()

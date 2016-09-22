@@ -39,9 +39,14 @@ class MainWindow : public QMainWindow {
   void closeEvent(QCloseEvent* event) override;
 
  private slots:
-  void slotNotifyAsset(const Asset& asset);
-  void slotNotifyContr(const Contr& contr);
-  void slotNotifyError(const QString& error);
+  void slotRefDataComplete();
+  void slotServiceError(const QString& error);
+  void slotUpdateAsset(const Asset& asset);
+  void slotUpdateContr(const Contr& contr);
+  void slotUpdateOrder(const Order& order);
+  void slotUpdateExec(const Exec& exec);
+  void slotUpdateTrade(const Exec& trade);
+  void slotUpdatePosn(const Posn& posn);
   void slotAbout();
 
  private:
