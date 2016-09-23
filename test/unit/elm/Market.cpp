@@ -26,12 +26,6 @@ using namespace swirly;
 
 static_assert(sizeof(Market) <= 4 * 64, "crossed cache-line boundary");
 
-SWIRLY_TEST_CASE(toMarketId)
-{
-  const auto id = toMarketId(171_id32, 2492719_jd);
-  SWIRLY_CHECK(id == 0xabcdef_id64);
-}
-
 SWIRLY_TEST_CASE(MarketToString)
 {
   Market market{1_id64, "EURUSD"_sv, ymdToJd(2014, 2, 14), 0x01};

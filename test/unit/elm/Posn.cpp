@@ -16,9 +16,10 @@
  */
 #include <swirly/elm/Posn.hpp>
 
-#include <swirly/elm/Market.hpp>
+#include <swirly/elm/MarketId.hpp>
 
 #include <swirly/ash/Date.hpp>
+#include <swirly/ash/Set.hpp>
 
 #include <swirly/tea/Test.hpp>
 
@@ -26,6 +27,8 @@ using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Posn) <= 2 * 64, "crossed cache-line boundary");
+
+using AccntPosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
 SWIRLY_TEST_CASE(AccntPosnSet)
 {
@@ -39,7 +42,7 @@ SWIRLY_TEST_CASE(AccntPosnSet)
   SWIRLY_CHECK(posn1->refs() == 2);
   SWIRLY_CHECK(posn1->contr() == "EURUSD"_sv);
   SWIRLY_CHECK(posn1->settlDay() == settlDay);
-  SWIRLY_CHECK(s.find("EURUSD"_sv, settlDay) != s.end());
+  SWIRLY_CHECK(s.find(marketId) != s.end());
 
   // Duplicate.
   PosnPtr posn2{

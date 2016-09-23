@@ -17,23 +17,12 @@
 #ifndef SWIRLY_ELM_MARKET_HPP
 #define SWIRLY_ELM_MARKET_HPP
 
-#include <swirly/elm/Market.hpp>
 #include <swirly/elm/MarketSide.hpp>
 
 #include <swirly/ash/Date.hpp>
 #include <swirly/ash/Set.hpp>
 
 namespace swirly {
-
-constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
-{
-  return box<Id64>((unbox(contrId) << 16) | (jdToTjd(settlDay) & 0xffff));
-}
-
-constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
-{
-  return toMarketId(contrId, maybeIsoToJd(settlDate));
-}
 
 using MarketPtr = boost::intrusive_ptr<Market>;
 using ConstMarketPtr = boost::intrusive_ptr<const Market>;

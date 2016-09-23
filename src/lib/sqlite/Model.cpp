@@ -352,7 +352,7 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     }
 
     bool found;
-    tie(it, found) = ps.findHint(accnt, contr, settlDay);
+    tie(it, found) = ps.findHint(accnt, marketId);
     if (!found) {
       it = ps.insertHint(it, Posn::make(accnt, marketId, contr, settlDay));
     }

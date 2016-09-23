@@ -14,25 +14,29 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/Accnt.hpp>
+#ifndef SWIRLY_ELM_MARKETID_HPP
+#define SWIRLY_ELM_MARKETID_HPP
 
-using namespace std;
+#include <swirly/ash/Date.hpp>
 
 namespace swirly {
 
-Accnt::~Accnt() noexcept = default;
-
-Accnt::Accnt(Accnt&&) = default;
-
-PosnPtr Accnt::posn(Id64 marketId, Mnem contr, JDay settlDay) throw(bad_alloc)
+constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
 {
-  PosnSet::Iterator it;
-  bool found;
-  tie(it, found) = posns_.findHint(marketId);
-  if (!found) {
-    it = posns_.insertHint(it, Posn::make(mnem_, marketId, contr, settlDay));
-  }
-  return &*it;
+  return box<Id64>((unbox(contrId) << 16) | (jdToTjd(settlDay) & 0xffff));
 }
 
+constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
+{
+  return toMarketId(contrId, maybeIsoToJd(settlDate));
+}
+
+template <typename ValueT>
+struct MarketIdTraits {
+  using Id = Id64;
+  static Id id(const ValueT& value) noexcept { return value.marketId(); }
+};
+
 } // swirly
+
+#endif // SWIRLY_ELM_MARKETID_HPP

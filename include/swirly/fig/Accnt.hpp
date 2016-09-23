@@ -19,6 +19,7 @@
 
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/Exec.hpp>
+#include <swirly/elm/MarketId.hpp>
 #include <swirly/elm/Order.hpp>
 #include <swirly/elm/Posn.hpp>
 
@@ -133,13 +134,14 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     posns_.insert(posn);
   }
   boost::intrusive::set_member_hook<> mnemHook_;
+  using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
  private:
   const Mnem mnem_;
   OrderIdSet orders_;
   boost::circular_buffer<ConstExecPtr> execs_;
   ExecIdSet trades_;
-  AccntPosnSet posns_;
+  PosnSet posns_;
   OrderRefSet refIdx_;
 };
 

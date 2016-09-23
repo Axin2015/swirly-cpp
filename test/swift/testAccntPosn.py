@@ -97,20 +97,20 @@ class TestCase(RestTestCase):
       u'settlDate': 20140302
     }, {
       u'accnt': u'MARAYL',
-      u'buyCost': 107422,
-      u'buyLots': 7,
-      u'contr': u'GBPUSD',
-      u'sellCost': 107422,
-      u'sellLots': 7,
-      u'settlDate': 20140302
-    }, {
-      u'accnt': u'MARAYL',
       u'buyCost': 61730,
       u'buyLots': 5,
       u'contr': u'EURUSD',
       u'sellCost': 61730,
       u'sellLots': 5,
       u'settlDate': 20140402
+    }, {
+      u'accnt': u'MARAYL',
+      u'buyCost': 107422,
+      u'buyLots': 7,
+      u'contr': u'GBPUSD',
+      u'sellCost': 107422,
+      u'sellLots': 7,
+      u'settlDate': 20140302
     }], resp.content)
 
   def getByContr(self, client):
