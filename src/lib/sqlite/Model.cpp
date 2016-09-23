@@ -62,7 +62,7 @@ constexpr auto SelectTradeSql = //
   " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
 
 constexpr auto SelectPosnSql = //
-  "SELECT accnt, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
+  "SELECT accnt, market_id, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
 
 } // anonymous
 
@@ -327,6 +327,7 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 {
   enum { //
     Accnt, //
+    MarketId, //
     Contr, //
     SettlDay, //
     Side, //
@@ -340,18 +341,20 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
   StmtPtr stmt{prepare(*db_, SelectPosnSql)};
   while (step(*stmt)) {
     const auto accnt = column<string_view>(*stmt, Accnt);
+    auto marketId = column<Id64>(*stmt, MarketId);
     const auto contr = column<string_view>(*stmt, Contr);
     auto settlDay = column<JDay>(*stmt, SettlDay);
 
     // FIXME: review when end of day is implemented.
     if (settlDay != 0_jd && settlDay <= busDay) {
+      marketId = box<Id64>(unbox(marketId) & ~0xffff);
       settlDay = 0_jd;
     }
 
     bool found;
     tie(it, found) = ps.findHint(accnt, contr, settlDay);
     if (!found) {
-      it = ps.insertHint(it, Posn::make(accnt, contr, settlDay));
+      it = ps.insertHint(it, Posn::make(accnt, marketId, contr, settlDay));
     }
 
     const auto side = column<swirly::Side>(*stmt, Side);

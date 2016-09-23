@@ -221,7 +221,7 @@ struct Serv::Impl {
     if (!matches_.empty()) {
       // Avoid allocating position when there are no matches.
       // N.B. before commit phase, because this may fail.
-      posn = accnt.posn(market.contr(), market.settlDay());
+      posn = accnt.posn(market.id(), market.contr(), market.settlDay());
       resp.setPosn(posn);
     }
 
@@ -395,7 +395,7 @@ struct Serv::Impl {
   TradePair createTrade(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
                         Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created)
   {
-    auto posn = accnt.posn(market.contr(), market.settlDay());
+    auto posn = accnt.posn(market.id(), market.contr(), market.settlDay());
     auto trade = newManual(accnt.mnem(), market, ref, side, lots, ticks, liqInd, cpty, created);
     decltype(trade) cptyTrade;
 
@@ -403,7 +403,7 @@ struct Serv::Impl {
 
       // Create back-to-back trade if counter-party is specified.
       auto& cptyAccnt = this->accnt(cpty);
-      auto cptyPosn = cptyAccnt.posn(market.contr(), market.settlDay());
+      auto cptyPosn = cptyAccnt.posn(market.id(), market.contr(), market.settlDay());
       cptyTrade = trade->inverse(market.allocId());
 
       ConstExecPtr trades[] = {trade, cptyTrade};
@@ -516,7 +516,7 @@ struct Serv::Impl {
     auto it = accnts_.find(makerOrder->accnt());
     assert(it != accnts_.end());
     auto& makerAccnt = *it;
-    auto makerPosn = makerAccnt.posn(market.contr(), market.settlDay());
+    auto makerPosn = makerAccnt.posn(market.id(), market.contr(), market.settlDay());
 
     const auto ticks = makerOrder->ticks();
 

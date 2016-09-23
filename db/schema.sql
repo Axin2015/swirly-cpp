@@ -424,6 +424,7 @@ CREATE VIEW exec_v AS
 CREATE VIEW posn_v AS
   SELECT
     e.accnt,
+    e.market_id,
     e.contr,
     e.settl_day,
     e.side_id,
@@ -431,7 +432,7 @@ CREATE VIEW posn_v AS
     SUM(e.last_lots * e.last_ticks) cost
   FROM exec_t e
   WHERE e.state_id = 4
-  GROUP BY e.accnt, e.contr, e.settl_day, e.side_id
+  GROUP BY e.accnt, e.market_id, e.side_id
 ;
 
 COMMIT

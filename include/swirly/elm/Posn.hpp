@@ -30,9 +30,10 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted {
  public:
-  Posn(Mnem accnt, Mnem contr, JDay settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
-       Cost sellCost) noexcept
+  Posn(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Lots buyLots, Cost buyCost,
+       Lots sellLots, Cost sellCost) noexcept
     : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDay_{settlDay},
       buyLots_{buyLots},
@@ -41,8 +42,8 @@ class SWIRLY_API Posn : public RefCounted {
       sellCost_{sellCost}
   {
   }
-  Posn(Mnem accnt, Mnem contr, JDay settlDay) noexcept
-    : Posn{accnt, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+  Posn(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay) noexcept
+    : Posn{accnt, marketId, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
   {
   }
   ~Posn() noexcept override;
@@ -64,6 +65,7 @@ class SWIRLY_API Posn : public RefCounted {
   void toJson(std::ostream& os) const;
 
   auto accnt() const noexcept { return accnt_; }
+  auto marketId() const noexcept { return marketId_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto buyLots() const noexcept { return buyLots_; }
@@ -101,13 +103,6 @@ class SWIRLY_API Posn : public RefCounted {
   {
     addTrade(side, lots, swirly::cost(lots, ticks));
   }
-  /**
-   * This function is typically used to change the settlement-day to zero during settlement.
-   *
-   * @param settlDay
-   *        The new settlement-day.
-   */
-  void setSettlDay(JDay settlDay) noexcept { settlDay_ = settlDay; }
   void setBuyLots(Lots buyLots) noexcept { buyLots_ = buyLots; }
   void setBuyCost(Cost buyCost) noexcept { buyCost_ = buyCost; }
   void setSellLots(Lots sellLots) noexcept { sellLots_ = sellLots; }
@@ -117,6 +112,7 @@ class SWIRLY_API Posn : public RefCounted {
 
  private:
   const Mnem accnt_;
+  const Id64 marketId_;
   const Mnem contr_;
   JDay settlDay_;
   Lots buyLots_;
