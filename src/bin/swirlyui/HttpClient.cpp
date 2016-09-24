@@ -157,9 +157,9 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
   }
   emit refDataComplete();
 
-  //postMarket("EURUSD", QDate{2016, 9, 23}, 0);
-  //postOrder("EURUSD", QDate{2016, 9, 23}, "foo", "Buy", 10, 12345);
-  //postOrder("EURUSD", QDate{2016, 9, 23}, "bar", "Sell", 5, 12345);
+  //postMarket("EURUSD", QDate{2016, 9, 30}, 0);
+  //postOrder("EURUSD", QDate{2016, 9, 30}, "foo", "Buy", 10, 12345);
+  //postOrder("EURUSD", QDate{2016, 9, 30}, "bar", "Sell", 5, 12345);
   getAccnt();
   startTimer(2000);
 }

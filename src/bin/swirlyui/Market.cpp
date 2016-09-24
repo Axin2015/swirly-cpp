@@ -42,9 +42,10 @@ Market Market::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
 
-  Market market{fromJson<QString>(obj["contr"]),     fromJson<QDate>(obj["settlDate"]),
-                fromJson<MarketState>(obj["state"]), fromJson<Lots>(obj["lastLots"]),
-                fromJson<Ticks>(obj["lastTicks"]),   fromJson<QDateTime>(obj["lastTime"])};
+  Market market{fromJson<Id64>(obj["id"]),           fromJson<QString>(obj["contr"]),
+                fromJson<QDate>(obj["settlDate"]),   fromJson<MarketState>(obj["state"]),
+                fromJson<Lots>(obj["lastLots"]),     fromJson<Ticks>(obj["lastTicks"]),
+                fromJson<QDateTime>(obj["lastTime"])};
 
   const auto bidTicks = obj["bidTicks"].toArray();
   const auto bidResd = obj["bidResd"].toArray();
@@ -61,7 +62,8 @@ Market Market::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Market& market)
 {
-  debug.nospace() << "Market{contr=" << market.contr() //
+  debug.nospace() << "Market{id=" << market.id() //
+                  << ",contr=" << market.contr() //
                   << ",settlDate=" << market.settlDate() //
                   << ",state=" << market.state() //
                   << ",lastLots=" << market.lastLots() //

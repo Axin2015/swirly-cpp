@@ -27,21 +27,23 @@ namespace ui {
 Exec Exec::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Exec{fromJson<QString>(obj["accnt"]),   fromJson<QString>(obj["contr"]),
-              fromJson<QDate>(obj["settlDate"]), fromJson<Id64>(obj["id"]),
-              fromJson<QString>(obj["ref"]),     fromJson<Id64>(obj["orderId"]),
-              fromJson<State>(obj["state"]),     fromJson<Side>(obj["side"]),
-              fromJson<Lots>(obj["lots"]),       fromJson<Ticks>(obj["ticks"]),
-              fromJson<Lots>(obj["resd"]),       fromJson<Lots>(obj["exec"]),
-              fromJson<Cost>(obj["cost"]),       fromJson<Lots>(obj["lastLots"]),
-              fromJson<Ticks>(obj["lastTicks"]), fromJson<Lots>(obj["minLots"]),
-              fromJson<Id64>(obj["matchId"]),    fromJson<LiqInd>(obj["liqInd"]),
-              fromJson<QString>(obj["cpty"]),    fromJson<QDateTime>(obj["created"])};
+  return Exec{fromJson<QString>(obj["accnt"]),    fromJson<Id64>(obj["marketId"]),
+              fromJson<QString>(obj["contr"]),    fromJson<QDate>(obj["settlDate"]),
+              fromJson<Id64>(obj["id"]),          fromJson<QString>(obj["ref"]),
+              fromJson<Id64>(obj["orderId"]),     fromJson<State>(obj["state"]),
+              fromJson<Side>(obj["side"]),        fromJson<Lots>(obj["lots"]),
+              fromJson<Ticks>(obj["ticks"]),      fromJson<Lots>(obj["resd"]),
+              fromJson<Lots>(obj["exec"]),        fromJson<Cost>(obj["cost"]),
+              fromJson<Lots>(obj["lastLots"]),    fromJson<Ticks>(obj["lastTicks"]),
+              fromJson<Lots>(obj["minLots"]),     fromJson<Id64>(obj["matchId"]),
+              fromJson<LiqInd>(obj["liqInd"]),    fromJson<QString>(obj["cpty"]),
+              fromJson<QDateTime>(obj["created"])};
 }
 
 QDebug operator<<(QDebug debug, const Exec& exec)
 {
   debug.nospace() << "Exec{accnt=" << exec.accnt() //
+                  << ",marketId=" << exec.marketId() //
                   << ",contr=" << exec.contr() //
                   << ",settlDate=" << exec.settlDate() //
                   << ",id=" << exec.id() //

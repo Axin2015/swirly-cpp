@@ -37,9 +37,10 @@ class Market {
   static constexpr std::size_t Depth{SWIRLY_DEPTH};
   using Levels = std::array<Level, Depth>;
 
-  Market(const QString& contr, QDate settlDate, MarketState state, Lots lastLots, Ticks lastTicks,
-         const QDateTime& lastTime)
-    : contr_{contr},
+  Market(Id64 id, const QString& contr, QDate settlDate, MarketState state, Lots lastLots,
+         Ticks lastTicks, const QDateTime& lastTime)
+    : id_{id},
+      contr_{contr},
       settlDate_{settlDate},
       state_{state},
       lastLots_{lastLots},
@@ -52,6 +53,7 @@ class Market {
 
   static Market fromJson(const QJsonObject& obj);
 
+  Id64 id() const noexcept { return id_; }
   const QString& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   MarketState state() const noexcept { return state_; }
@@ -64,6 +66,7 @@ class Market {
   const Level& bestOffer() const noexcept { return offers_.front(); }
 
  private:
+  Id64 id_{};
   QString contr_{};
   QDate settlDate_{};
   MarketState state_{};

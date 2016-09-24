@@ -30,11 +30,12 @@ namespace ui {
 
 class Exec {
  public:
-  Exec(const QString& accnt, const QString& contr, QDate settlDate, Id64 id, const QString& ref,
-       Id64 orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-       Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId, LiqInd liqInd,
-       const QString& cpty, const QDateTime& created)
+  Exec(const QString& accnt, Id64 marketId, const QString& contr, QDate settlDate, Id64 id,
+       const QString& ref, Id64 orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd,
+       Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
+       LiqInd liqInd, const QString& cpty, const QDateTime& created)
     : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDate_{settlDate},
       id_{id},
@@ -62,6 +63,7 @@ class Exec {
   static Exec fromJson(const QJsonObject& obj);
 
   const QString& accnt() const noexcept { return accnt_; }
+  Id64 marketId() const noexcept { return marketId_; }
   const QString& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
@@ -84,6 +86,7 @@ class Exec {
 
  private:
   QString accnt_;
+  Id64 marketId_;
   QString contr_;
   QDate settlDate_;
   Id64 id_;

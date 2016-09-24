@@ -30,9 +30,10 @@ namespace ui {
 
 class Posn {
  public:
-  Posn(const QString& accnt, const QString& contr, QDate settlDate, Lots buyLots, Cost buyCost,
-       Lots sellLots, Cost sellCost)
+  Posn(const QString& accnt, Id64 marketId, const QString& contr, QDate settlDate, Lots buyLots,
+       Cost buyCost, Lots sellLots, Cost sellCost)
     : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDate_{settlDate},
       buyLots_{buyLots},
@@ -47,6 +48,7 @@ class Posn {
   static Posn fromJson(const QJsonObject& obj);
 
   const QString& accnt() const noexcept { return accnt_; }
+  Id64 marketId() const noexcept { return marketId_; }
   const QString& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Lots buyLots() const noexcept { return buyLots_; }
@@ -56,6 +58,7 @@ class Posn {
 
  private:
   QString accnt_;
+  Id64 marketId_{};
   QString contr_;
   QDate settlDate_;
   Lots buyLots_;

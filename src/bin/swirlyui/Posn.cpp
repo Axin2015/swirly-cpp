@@ -27,15 +27,16 @@ namespace ui {
 Posn Posn::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Posn{fromJson<QString>(obj["accnt"]),   fromJson<QString>(obj["contr"]),
-              fromJson<QDate>(obj["settlDate"]), fromJson<Lots>(obj["buyLots"]),
-              fromJson<Cost>(obj["buyCost"]),    fromJson<Lots>(obj["sellLots"]),
-              fromJson<Cost>(obj["sellCost"])};
+  return Posn{fromJson<QString>(obj["accnt"]), fromJson<Id64>(obj["marketId"]),
+              fromJson<QString>(obj["contr"]), fromJson<QDate>(obj["settlDate"]),
+              fromJson<Lots>(obj["buyLots"]),  fromJson<Cost>(obj["buyCost"]),
+              fromJson<Lots>(obj["sellLots"]), fromJson<Cost>(obj["sellCost"])};
 }
 
 QDebug operator<<(QDebug debug, const Posn& posn)
 {
   debug.nospace() << "Posn{accnt=" << posn.accnt() //
+                  << ",marketId=" << posn.marketId() //
                   << ",contr=" << posn.contr() //
                   << ",settlDate=" << posn.settlDate() //
                   << ",buyLots=" << posn.buyLots() //

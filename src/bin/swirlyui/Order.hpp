@@ -30,11 +30,12 @@ namespace ui {
 
 class Order {
  public:
-  Order(const QString& accnt, const QString& contr, QDate settlDate, Id64 id, const QString& ref,
-        State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
-        Lots lastLots, Ticks lastTicks, Lots minLots, const QDateTime& created,
+  Order(const QString& accnt, Id64 marketId, const QString& contr, QDate settlDate, Id64 id,
+        const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
+        Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, const QDateTime& created,
         const QDateTime& modified)
     : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDate_{settlDate},
       id_{id},
@@ -59,6 +60,7 @@ class Order {
   static Order fromJson(const QJsonObject& obj);
 
   const QString& accnt() const noexcept { return accnt_; }
+  Id64 marketId() const noexcept { return marketId_; }
   const QString& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
@@ -78,6 +80,7 @@ class Order {
 
  private:
   QString accnt_;
+  Id64 marketId_{};
   QString contr_;
   QDate settlDate_;
   Id64 id_;
