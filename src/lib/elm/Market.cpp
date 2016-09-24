@@ -51,7 +51,8 @@ Market::Market(Market&&) = default;
 
 void Market::toJson(ostream& os) const
 {
-  os << "{\"contr\":\"" << contr_ //
+  os << "{\"id\":" << id_ //
+     << ",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
     os << jdToIso(settlDay_);

@@ -29,7 +29,8 @@ Exec::Exec(Exec&&) = default;
 void Exec::toJson(ostream& os) const
 {
   os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"contr\":\"" << contr_ //
+     << "\",\"marketId\":" << marketId_ //
+     << ",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
     os << jdToIso(settlDay_);
