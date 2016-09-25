@@ -172,8 +172,11 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
   SWIRLY_CHECK(resp.execs().size() == 1);
 
   ConstOrderPtr order{resp.orders().front()};
-  SWIRLY_CHECK(order->accnt() == accnt.mnem());
   SWIRLY_CHECK(order->marketId() == market.id());
+  SWIRLY_CHECK(order->contr() == contr.mnem());
+  SWIRLY_CHECK(order->settlDay() == SettlDay);
+  SWIRLY_CHECK(order->id() == 1_id64);
+  SWIRLY_CHECK(order->accnt() == accnt.mnem());
   SWIRLY_CHECK(order->ref().empty());
   SWIRLY_CHECK(order->state() == State::New);
   SWIRLY_CHECK(order->side() == Side::Buy);

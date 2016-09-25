@@ -27,10 +27,10 @@ namespace ui {
 Exec Exec::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Exec{fromJson<QString>(obj["accnt"]),    fromJson<Id64>(obj["marketId"]),
-              fromJson<QString>(obj["contr"]),    fromJson<QDate>(obj["settlDate"]),
-              fromJson<Id64>(obj["id"]),          fromJson<QString>(obj["ref"]),
-              fromJson<Id64>(obj["orderId"]),     fromJson<State>(obj["state"]),
+  return Exec{fromJson<Id64>(obj["marketId"]),    fromJson<QString>(obj["contr"]),
+              fromJson<QDate>(obj["settlDate"]),  fromJson<Id64>(obj["id"]),
+              fromJson<Id64>(obj["orderId"]),     fromJson<QString>(obj["accnt"]),
+              fromJson<QString>(obj["ref"]),      fromJson<State>(obj["state"]),
               fromJson<Side>(obj["side"]),        fromJson<Lots>(obj["lots"]),
               fromJson<Ticks>(obj["ticks"]),      fromJson<Lots>(obj["resd"]),
               fromJson<Lots>(obj["exec"]),        fromJson<Cost>(obj["cost"]),
@@ -42,13 +42,13 @@ Exec Exec::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Exec& exec)
 {
-  debug.nospace() << "Exec{accnt=" << exec.accnt() //
-                  << ",marketId=" << exec.marketId() //
+  debug.nospace() << "Exec{marketId=" << exec.marketId() //
                   << ",contr=" << exec.contr() //
                   << ",settlDate=" << exec.settlDate() //
                   << ",id=" << exec.id() //
-                  << ",ref=" << exec.ref() //
                   << ",orderId=" << exec.orderId() //
+                  << ",accnt=" << exec.accnt() //
+                  << ",ref=" << exec.ref() //
                   << ",state=" << exec.state() //
                   << ",side=" << exec.side() //
                   << ",lots=" << exec.lots() //

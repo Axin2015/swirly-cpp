@@ -28,8 +28,7 @@ Order::Order(Order&&) = default;
 
 void Order::toJson(ostream& os) const
 {
-  os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"marketId\":" << marketId_ //
+  os << "{\"marketId\":" << marketId_ //
      << ",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
@@ -38,7 +37,8 @@ void Order::toJson(ostream& os) const
     os << "null";
   }
   os << ",\"id\":" << id_ //
-     << ",\"ref\":";
+     << ",\"accnt\":\"" << accnt_ //
+     << "\",\"ref\":";
   if (!ref_.empty()) {
     os << '"' << ref_ << '"';
   } else {

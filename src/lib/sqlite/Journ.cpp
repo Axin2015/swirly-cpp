@@ -39,7 +39,7 @@ constexpr auto UpdateMarketSql = //
   " WHERE id = ?1"_sv;
 
 constexpr auto InsertExecSql = //
-  "INSERT INTO exec_t (accnt, market_id, contr, settl_day, id, ref, order_id," //
+  "INSERT INTO exec_t (market_id, contr, settl_day, id, order_id, accnt, ref," //
   " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
   " min_lots, match_id, liqInd_id, cpty, created)" //
   " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
@@ -126,13 +126,13 @@ void Journ::createExec(const CreateExecBody& body)
   auto& stmt = *insertExecStmt_;
 
   ScopedBind bind{stmt};
-  bind(toStringView(body.accnt));
   bind(body.marketId);
   bind(toStringView(body.contr));
   bind(body.settlDay, MaybeNull);
   bind(body.id);
-  bind(toStringView(body.ref), MaybeNull);
   bind(body.orderId, MaybeNull);
+  bind(toStringView(body.accnt));
+  bind(toStringView(body.ref), MaybeNull);
   bind(body.state);
   bind(body.side);
   bind(body.lots);

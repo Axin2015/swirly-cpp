@@ -30,17 +30,17 @@ namespace ui {
 
 class Exec {
  public:
-  Exec(const QString& accnt, Id64 marketId, const QString& contr, QDate settlDate, Id64 id,
-       const QString& ref, Id64 orderId, State state, Side side, Lots lots, Ticks ticks, Lots resd,
-       Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
+  Exec(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, Id64 orderId,
+       const QString& accnt, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
+       Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
        LiqInd liqInd, const QString& cpty, const QDateTime& created)
-    : accnt_{accnt},
-      marketId_{marketId},
+    : marketId_{marketId},
       contr_{contr},
       settlDate_{settlDate},
       id_{id},
-      ref_{ref},
       orderId_{orderId},
+      accnt_{accnt},
+      ref_{ref},
       state_{state},
       side_{side},
       lots_{lots},
@@ -62,13 +62,13 @@ class Exec {
 
   static Exec fromJson(const QJsonObject& obj);
 
-  const QString& accnt() const noexcept { return accnt_; }
   Id64 marketId() const noexcept { return marketId_; }
   const QString& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
-  const QString& ref() const noexcept { return ref_; }
   Id64 orderId() const noexcept { return orderId_; }
+  const QString& accnt() const noexcept { return accnt_; }
+  const QString& ref() const noexcept { return ref_; }
   State state() const noexcept { return state_; }
   Side side() const noexcept { return side_; }
   Lots lots() const noexcept { return lots_; }
@@ -85,13 +85,13 @@ class Exec {
   const QDateTime& created() const noexcept { return created_; }
 
  private:
-  QString accnt_;
   Id64 marketId_;
   QString contr_;
   QDate settlDate_;
   Id64 id_;
-  QString ref_;
   Id64 orderId_;
+  QString accnt_;
+  QString ref_;
   State state_;
   Side side_;
   Lots lots_;

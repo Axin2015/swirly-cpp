@@ -29,8 +29,7 @@ Posn::Posn(Posn&&) = default;
 
 void Posn::toJson(ostream& os) const
 {
-  os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"marketId\":" << marketId_ //
+  os << "{\"marketId\":" << marketId_ //
      << ",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
@@ -38,11 +37,12 @@ void Posn::toJson(ostream& os) const
   } else {
     os << "null";
   }
+  os << ",\"accnt\":\"" << accnt_;
   if (buyLots_ != 0_lts) {
-    os << ",\"buyLots\":" << buyLots_ //
+    os << "\",\"buyLots\":" << buyLots_ //
        << ",\"buyCost\":" << buyCost_;
   } else {
-    os << ",\"buyLots\":0,\"buyCost\":0";
+    os << "\",\"buyLots\":0,\"buyCost\":0";
   }
   if (sellLots_ != 0_lts) {
     os << ",\"sellLots\":" << sellLots_ //

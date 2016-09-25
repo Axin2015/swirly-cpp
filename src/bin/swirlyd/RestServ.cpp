@@ -653,7 +653,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
       state_ |= MatchMethod;
       getAdmin(data);
       {
-        constexpr auto reqFields = RestRequest::Accnt | RestRequest::Contr | RestRequest::SettlDate
+        constexpr auto reqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Accnt
           | RestRequest::Side | RestRequest::Lots;
         constexpr auto optFields
           = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
@@ -689,7 +689,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
       getAdmin(data);
       {
         constexpr auto reqFields
-          = RestRequest::Accnt | RestRequest::SettlDate | RestRequest::Side | RestRequest::Lots;
+          = RestRequest::SettlDate | RestRequest::Accnt | RestRequest::Side | RestRequest::Lots;
         constexpr auto optFields
           = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
         if (!request_.valid(reqFields, optFields)) {

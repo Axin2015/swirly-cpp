@@ -197,7 +197,7 @@ struct Serv::Impl {
       throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
     }
     const auto id = market.allocId();
-    auto order = Order::make(accnt.mnem(), market.id(), market.contr(), market.settlDay(), id, ref,
+    auto order = Order::make(market.id(), market.contr(), market.settlDay(), id, accnt.mnem(), ref,
                              side, lots, ticks, minLots, now);
     auto exec = newExec(*order, id, now);
 
@@ -472,8 +472,8 @@ struct Serv::Impl {
  private:
   ExecPtr newExec(const Order& order, Id64 id, Millis created) const
   {
-    return Exec::make(order.accnt(), order.marketId(), order.contr(), order.settlDay(), id,
-                      order.ref(), order.id(), order.state(), order.side(), order.lots(),
+    return Exec::make(order.marketId(), order.contr(), order.settlDay(), id, order.id(),
+                      order.accnt(), order.ref(), order.state(), order.side(), order.lots(),
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
                       order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Mnem{}, created);
   }
@@ -481,7 +481,7 @@ struct Serv::Impl {
   /**
    * Special factory method for manual trades.
    */
-  ExecPtr newManual(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, string_view ref,
+  ExecPtr newManual(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, string_view ref,
                     Side side, Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty,
                     Millis created) const
   {
@@ -494,7 +494,7 @@ struct Serv::Impl {
     const auto lastTicks = ticks;
     const auto minLots = 1_lts;
     const auto matchId = 0_id64;
-    return Exec::make(accnt, marketId, contr, settlDay, id, ref, orderId, state, side, lots, ticks,
+    return Exec::make(marketId, contr, settlDay, id, orderId, accnt, ref, state, side, lots, ticks,
                       resd, exec, cost, lastLots, lastTicks, minLots, matchId, liqInd, cpty,
                       created);
   }
@@ -502,7 +502,7 @@ struct Serv::Impl {
   ExecPtr newManual(Mnem accnt, Market& market, string_view ref, Side side, Lots lots, Ticks ticks,
                     LiqInd liqInd, Mnem cpty, Millis created) const
   {
-    return newManual(accnt, market.id(), market.contr(), market.settlDay(), market.allocId(), ref,
+    return newManual(market.id(), market.contr(), market.settlDay(), market.allocId(), accnt, ref,
                      side, lots, ticks, liqInd, cpty, created);
   }
 
