@@ -73,8 +73,8 @@ class Market {
   Lots lastLots_{};
   Ticks lastTicks_{};
   QDateTime lastTime_{};
-  Levels bids_;
-  Levels offers_;
+  Levels bids_{};
+  Levels offers_{};
 };
 
 QDebug operator<<(QDebug debug, const Market& market);

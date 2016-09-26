@@ -58,13 +58,13 @@ class Posn {
 
  private:
   Id64 marketId_{};
-  QString contr_;
-  QDate settlDate_;
-  QString accnt_;
-  Lots buyLots_;
-  Cost buyCost_;
-  Lots sellLots_;
-  Cost sellCost_;
+  QString contr_{};
+  QDate settlDate_{};
+  QString accnt_{};
+  Lots buyLots_{};
+  Cost buyCost_{};
+  Lots sellLots_{};
+  Cost sellCost_{};
 };
 
 QDebug operator<<(QDebug debug, const Posn& posn);
