@@ -29,19 +29,20 @@ Posn::Posn(Posn&&) = default;
 
 void Posn::toJson(ostream& os) const
 {
-  os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"contr\":\"" << contr_ //
+  os << "{\"marketId\":" << marketId_ //
+     << ",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
     os << jdToIso(settlDay_);
   } else {
     os << "null";
   }
+  os << ",\"accnt\":\"" << accnt_;
   if (buyLots_ != 0_lts) {
-    os << ",\"buyLots\":" << buyLots_ //
+    os << "\",\"buyLots\":" << buyLots_ //
        << ",\"buyCost\":" << buyCost_;
   } else {
-    os << ",\"buyLots\":0,\"buyCost\":0";
+    os << "\",\"buyLots\":0,\"buyCost\":0";
   }
   if (sellLots_ != 0_lts) {
     os << ",\"sellLots\":" << sellLots_ //
@@ -82,51 +83,6 @@ PosnSet::Iterator PosnSet::insertHint(ConstIterator hint, const ValuePtr& value)
 }
 
 PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
-{
-  Iterator it;
-  bool inserted;
-  tie(it, inserted) = set_.insert(*value);
-  if (!inserted) {
-    // Replace if exists.
-    ValuePtr prev{&*it, false};
-    set_.replace_node(it, *value);
-    it = Set::s_iterator_to(*value);
-  }
-  // Take ownership.
-  value->addRef();
-  return it;
-}
-
-AccntPosnSet::~AccntPosnSet() noexcept
-{
-  set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });
-}
-
-AccntPosnSet::AccntPosnSet(AccntPosnSet&&) = default;
-
-AccntPosnSet& AccntPosnSet::operator=(AccntPosnSet&&) = default;
-
-AccntPosnSet::Iterator AccntPosnSet::insert(const ValuePtr& value) noexcept
-{
-  Iterator it;
-  bool inserted;
-  tie(it, inserted) = set_.insert(*value);
-  if (inserted) {
-    // Take ownership if inserted.
-    value->addRef();
-  }
-  return it;
-}
-
-AccntPosnSet::Iterator AccntPosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
-{
-  auto it = set_.insert(hint, *value);
-  // Take ownership.
-  value->addRef();
-  return it;
-}
-
-AccntPosnSet::Iterator AccntPosnSet::insertOrReplace(const ValuePtr& value) noexcept
 {
   Iterator it;
   bool inserted;

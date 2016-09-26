@@ -23,7 +23,6 @@
 #include <swirly/elm/Date.hpp>
 #include <swirly/elm/Exception.hpp>
 #include <swirly/elm/Journ.hpp>
-#include <swirly/elm/Market.hpp>
 #include <swirly/elm/Model.hpp>
 
 #include <swirly/ash/Date.hpp>
@@ -198,7 +197,7 @@ struct Serv::Impl {
       throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
     }
     const auto id = market.allocId();
-    auto order = Order::make(accnt.mnem(), market.id(), market.contr(), market.settlDay(), id, ref,
+    auto order = Order::make(market.id(), market.contr(), market.settlDay(), id, accnt.mnem(), ref,
                              side, lots, ticks, minLots, now);
     auto exec = newExec(*order, id, now);
 
@@ -221,7 +220,7 @@ struct Serv::Impl {
     if (!matches_.empty()) {
       // Avoid allocating position when there are no matches.
       // N.B. before commit phase, because this may fail.
-      posn = accnt.posn(market.contr(), market.settlDay());
+      posn = accnt.posn(market.id(), market.contr(), market.settlDay());
       resp.setPosn(posn);
     }
 
@@ -395,7 +394,7 @@ struct Serv::Impl {
   TradePair createTrade(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
                         Ticks ticks, LiqInd liqInd, Mnem cpty, Millis created)
   {
-    auto posn = accnt.posn(market.contr(), market.settlDay());
+    auto posn = accnt.posn(market.id(), market.contr(), market.settlDay());
     auto trade = newManual(accnt.mnem(), market, ref, side, lots, ticks, liqInd, cpty, created);
     decltype(trade) cptyTrade;
 
@@ -403,7 +402,7 @@ struct Serv::Impl {
 
       // Create back-to-back trade if counter-party is specified.
       auto& cptyAccnt = this->accnt(cpty);
-      auto cptyPosn = cptyAccnt.posn(market.contr(), market.settlDay());
+      auto cptyPosn = cptyAccnt.posn(market.id(), market.contr(), market.settlDay());
       cptyTrade = trade->inverse(market.allocId());
 
       ConstExecPtr trades[] = {trade, cptyTrade};
@@ -473,8 +472,8 @@ struct Serv::Impl {
  private:
   ExecPtr newExec(const Order& order, Id64 id, Millis created) const
   {
-    return Exec::make(order.accnt(), order.marketId(), order.contr(), order.settlDay(), id,
-                      order.ref(), order.id(), order.state(), order.side(), order.lots(),
+    return Exec::make(order.marketId(), order.contr(), order.settlDay(), id, order.id(),
+                      order.accnt(), order.ref(), order.state(), order.side(), order.lots(),
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
                       order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Mnem{}, created);
   }
@@ -482,7 +481,7 @@ struct Serv::Impl {
   /**
    * Special factory method for manual trades.
    */
-  ExecPtr newManual(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, string_view ref,
+  ExecPtr newManual(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, string_view ref,
                     Side side, Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty,
                     Millis created) const
   {
@@ -495,7 +494,7 @@ struct Serv::Impl {
     const auto lastTicks = ticks;
     const auto minLots = 1_lts;
     const auto matchId = 0_id64;
-    return Exec::make(accnt, marketId, contr, settlDay, id, ref, orderId, state, side, lots, ticks,
+    return Exec::make(marketId, contr, settlDay, id, orderId, accnt, ref, state, side, lots, ticks,
                       resd, exec, cost, lastLots, lastTicks, minLots, matchId, liqInd, cpty,
                       created);
   }
@@ -503,7 +502,7 @@ struct Serv::Impl {
   ExecPtr newManual(Mnem accnt, Market& market, string_view ref, Side side, Lots lots, Ticks ticks,
                     LiqInd liqInd, Mnem cpty, Millis created) const
   {
-    return newManual(accnt, market.id(), market.contr(), market.settlDay(), market.allocId(), ref,
+    return newManual(market.id(), market.contr(), market.settlDay(), market.allocId(), accnt, ref,
                      side, lots, ticks, liqInd, cpty, created);
   }
 
@@ -516,7 +515,7 @@ struct Serv::Impl {
     auto it = accnts_.find(makerOrder->accnt());
     assert(it != accnts_.end());
     auto& makerAccnt = *it;
-    auto makerPosn = makerAccnt.posn(market.contr(), market.settlDay());
+    auto makerPosn = makerAccnt.posn(market.id(), market.contr(), market.settlDay());
 
     const auto ticks = makerOrder->ticks();
 

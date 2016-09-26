@@ -27,26 +27,28 @@ namespace ui {
 Exec Exec::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Exec{fromJson<QString>(obj["accnt"]),   fromJson<QString>(obj["contr"]),
-              fromJson<QDate>(obj["settlDate"]), fromJson<Id64>(obj["id"]),
-              fromJson<QString>(obj["ref"]),     fromJson<Id64>(obj["orderId"]),
-              fromJson<State>(obj["state"]),     fromJson<Side>(obj["side"]),
-              fromJson<Lots>(obj["lots"]),       fromJson<Ticks>(obj["ticks"]),
-              fromJson<Lots>(obj["resd"]),       fromJson<Lots>(obj["exec"]),
-              fromJson<Cost>(obj["cost"]),       fromJson<Lots>(obj["lastLots"]),
-              fromJson<Ticks>(obj["lastTicks"]), fromJson<Lots>(obj["minLots"]),
-              fromJson<Id64>(obj["matchId"]),    fromJson<LiqInd>(obj["liqInd"]),
-              fromJson<QString>(obj["cpty"]),    fromJson<QDateTime>(obj["created"])};
+  return Exec{fromJson<Id64>(obj["marketId"]),    fromJson<QString>(obj["contr"]),
+              fromJson<QDate>(obj["settlDate"]),  fromJson<Id64>(obj["id"]),
+              fromJson<Id64>(obj["orderId"]),     fromJson<QString>(obj["accnt"]),
+              fromJson<QString>(obj["ref"]),      fromJson<State>(obj["state"]),
+              fromJson<Side>(obj["side"]),        fromJson<Lots>(obj["lots"]),
+              fromJson<Ticks>(obj["ticks"]),      fromJson<Lots>(obj["resd"]),
+              fromJson<Lots>(obj["exec"]),        fromJson<Cost>(obj["cost"]),
+              fromJson<Lots>(obj["lastLots"]),    fromJson<Ticks>(obj["lastTicks"]),
+              fromJson<Lots>(obj["minLots"]),     fromJson<Id64>(obj["matchId"]),
+              fromJson<LiqInd>(obj["liqInd"]),    fromJson<QString>(obj["cpty"]),
+              fromJson<QDateTime>(obj["created"])};
 }
 
 QDebug operator<<(QDebug debug, const Exec& exec)
 {
-  debug.nospace() << "accnt=" << exec.accnt() //
+  debug.nospace() << "Exec{marketId=" << exec.marketId() //
                   << ",contr=" << exec.contr() //
                   << ",settlDate=" << exec.settlDate() //
                   << ",id=" << exec.id() //
-                  << ",ref=" << exec.ref() //
                   << ",orderId=" << exec.orderId() //
+                  << ",accnt=" << exec.accnt() //
+                  << ",ref=" << exec.ref() //
                   << ",state=" << exec.state() //
                   << ",side=" << exec.side() //
                   << ",lots=" << exec.lots() //
@@ -60,7 +62,8 @@ QDebug operator<<(QDebug debug, const Exec& exec)
                   << ",matchId=" << exec.matchId() //
                   << ",liqInd=" << exec.liqInd() //
                   << ",cpty=" << exec.cpty() //
-                  << ",created=" << exec.created();
+                  << ",created=" << exec.created() //
+                  << '}';
   return debug;
 }
 

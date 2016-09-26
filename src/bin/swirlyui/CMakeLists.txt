@@ -15,28 +15,15 @@
 
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 
 # Find includes in corresponding build directories.
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_executable(swirlyui
-  Application.qrc
-  Asset.cpp
-  AssetModel.cpp
-  AssetView.cpp
-  Contr.cpp
-  ContrModel.cpp
-  ContrView.cpp
-  Exec.cpp
-  HttpClient.cpp
-  Json.cpp
-  Main.cpp
-  MainWindow.cpp
-  Market.cpp
-  Order.cpp
-  Posn.cpp
-  Types.cpp)
+# FIXME: currently fails on some toolsets, so prefer QT5_ADD_RESOURCES for now.
+#set(CMAKE_AUTORCC ON)
+qt5_add_resources(swirlyui_RESOURCES Application.qrc)
 
-# Use the Widgets module from Qt 5.
+file(GLOB swirlyui_SOURCES "*.cpp")
+
+add_executable(swirlyui ${swirlyui_RESOURCES} ${swirlyui_SOURCES})
 target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)

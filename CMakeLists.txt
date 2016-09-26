@@ -76,7 +76,7 @@ find_package(SQLite3 3.7.15 REQUIRED)
 find_package(Doxygen)                # Optional.
 find_package(Perl)                   # Optional.
 find_package(PythonInterp 2.7 EXACT) # Optional.
-# Find the QtWidgets library.
+# Find Qt components.
 find_package(Qt5Widgets QUIET)
 find_package(Qt5Network QUIET)
 

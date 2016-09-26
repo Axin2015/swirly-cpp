@@ -140,11 +140,11 @@ CREATE TABLE accnt_t (
 CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
 CREATE TABLE order_t (
-  accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
+  accnt CHAR(16) NOT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
   state_id INT NOT NULL,
   side_id INT NOT NULL,
@@ -171,13 +171,13 @@ CREATE TABLE order_t (
 CREATE INDEX order_resd_idx ON order_t (resd);
 
 CREATE TABLE exec_t (
-  accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
   contr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
-  ref VARCHAR(64) NULL DEFAULT NULL,
   order_id BIGINT NULL DEFAULT NULL,
+  accnt CHAR(16) NOT NULL,
+  ref VARCHAR(64) NULL DEFAULT NULL,
   seq_id BIGINT NULL DEFAULT NULL,
   state_id INT NOT NULL,
   side_id INT NOT NULL,
@@ -215,11 +215,11 @@ CREATE TRIGGER before_insert_on_exec1
   AND NEW.state_id = 1
   BEGIN
     INSERT INTO order_t (
-      accnt,
       market_id,
       contr,
       settl_day,
       id,
+      accnt,
       ref,
       state_id,
       side_id,
@@ -234,11 +234,11 @@ CREATE TRIGGER before_insert_on_exec1
       created,
       modified
     ) VALUES (
-      NEW.accnt,
       NEW.market_id,
       NEW.contr,
       NEW.settl_day,
       NEW.order_id,
+      NEW.accnt,
       NEW.ref,
       NEW.state_id,
       NEW.side_id,
@@ -362,11 +362,11 @@ CREATE VIEW market_v AS
 
 CREATE VIEW order_v AS
   SELECT
-    o.accnt,
     o.market_id,
     o.contr,
     o.settl_day,
     o.id,
+    o.accnt,
     o.ref,
     s.mnem state,
     a.mnem side,
@@ -389,13 +389,13 @@ CREATE VIEW order_v AS
 
 CREATE VIEW exec_v AS
   SELECT
-    e.accnt,
     e.market_id,
     e.contr,
     e.settl_day,
     e.id,
-    e.ref,
     e.order_id,
+    e.accnt,
+    e.ref,
     e.seq_id,
     s.mnem state,
     a.mnem side,
@@ -423,15 +423,16 @@ CREATE VIEW exec_v AS
 
 CREATE VIEW posn_v AS
   SELECT
-    e.accnt,
+    e.market_id,
     e.contr,
     e.settl_day,
+    e.accnt,
     e.side_id,
     SUM(e.last_lots) lots,
     SUM(e.last_lots * e.last_ticks) cost
   FROM exec_t e
   WHERE e.state_id = 4
-  GROUP BY e.accnt, e.contr, e.settl_day, e.side_id
+  GROUP BY e.market_id, e.accnt, e.side_id
 ;
 
 COMMIT

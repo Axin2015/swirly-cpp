@@ -16,7 +16,10 @@
  */
 #include <swirly/elm/Posn.hpp>
 
+#include <swirly/elm/MarketId.hpp>
+
 #include <swirly/ash/Date.hpp>
+#include <swirly/ash/Set.hpp>
 
 #include <swirly/tea/Test.hpp>
 
@@ -25,26 +28,31 @@ using namespace swirly;
 
 static_assert(sizeof(Posn) <= 2 * 64, "crossed cache-line boundary");
 
+using AccntPosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
+
 SWIRLY_TEST_CASE(AccntPosnSet)
 {
   constexpr auto settlDay = ymdToJd(2014, 2, 14);
+  constexpr auto marketId = toMarketId(1_id32, settlDay);
 
   AccntPosnSet s;
 
-  PosnPtr posn1{&*s.emplace("MARAYL"_sv, "EURUSD"_sv, settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
+  PosnPtr posn1{
+    &*s.emplace(marketId, "EURUSD"_sv, settlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn1->refs() == 2);
   SWIRLY_CHECK(posn1->contr() == "EURUSD"_sv);
   SWIRLY_CHECK(posn1->settlDay() == settlDay);
-  SWIRLY_CHECK(s.find("EURUSD"_sv, settlDay) != s.end());
+  SWIRLY_CHECK(s.find(marketId) != s.end());
 
   // Duplicate.
-  PosnPtr posn2{&*s.emplace("MARAYL"_sv, "EURUSD"_sv, settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
+  PosnPtr posn2{
+    &*s.emplace(marketId, "EURUSD"_sv, settlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn2->refs() == 3);
   SWIRLY_CHECK(posn2 == posn1);
 
   // Replace.
   PosnPtr posn3{
-    &*s.emplaceOrReplace("MARAYL"_sv, "EURUSD"_sv, settlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
+    &*s.emplaceOrReplace(marketId, "EURUSD"_sv, settlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn3->refs() == 2);
   SWIRLY_CHECK(posn3 != posn1);
   SWIRLY_CHECK(posn3->contr() == "EURUSD"_sv);

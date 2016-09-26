@@ -14,29 +14,31 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_MARKETID_HPP
-#define SWIRLY_ELM_MARKETID_HPP
+#include "Level.hpp"
 
-#include <swirly/ash/Date.hpp>
+#include "Json.hpp"
+
+#include <QDebug>
+#include <QJsonObject>
 
 namespace swirly {
+namespace ui {
 
-constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
+Level Level::fromJson(const QJsonObject& obj)
 {
-  return box<Id64>((unbox(contrId) << 16) | (jdToTjd(settlDay) & 0xffff));
+  using swirly::ui::fromJson;
+  return Level{fromJson<Ticks>(obj["ticks"]), fromJson<Lots>(obj["resd"]),
+               fromJson<int>(obj["count"])};
 }
 
-constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
+QDebug operator<<(QDebug debug, const Level& level)
 {
-  return toMarketId(contrId, maybeIsoToJd(settlDate));
+  debug.nospace() << "Level{ticks=" << level.ticks() //
+                  << ",resd=" << level.resd() //
+                  << ",count=" << level.count() //
+                  << '}';
+  return debug;
 }
 
-template <typename ValueT>
-struct MarketIdTraits {
-  using Id = Id64;
-  static Id id(const ValueT& value) noexcept { return value.marketId(); }
-};
-
+} // ui
 } // swirly
-
-#endif // SWIRLY_ELM_MARKETID_HPP

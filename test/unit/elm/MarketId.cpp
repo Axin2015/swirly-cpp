@@ -16,18 +16,12 @@
  */
 #include <swirly/elm/MarketId.hpp>
 
-#include <swirly/ash/String.hpp>
-
 #include <swirly/tea/Test.hpp>
 
-using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(MarketId)
+SWIRLY_TEST_CASE(toMarketId)
 {
-  auto market = MarketId{171_id32, 2492719_jd};
-  SWIRLY_CHECK(market.id() == 0xabcdef);
-  SWIRLY_CHECK(market.contr() == 171_id32);
-  SWIRLY_CHECK(market.settlDay() == 2492719_jd);
-  SWIRLY_CHECK(toString(market) == "11259375"s);
+  const auto id = toMarketId(171_id32, 2492719_jd);
+  SWIRLY_CHECK(id == 0xabcdef_id64);
 }

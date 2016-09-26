@@ -33,9 +33,10 @@ Asset Asset::fromJson(const QJsonObject& obj)
 
 QDebug operator<<(QDebug debug, const Asset& asset)
 {
-  debug.nospace() << "mnem=" << asset.mnem() //
+  debug.nospace() << "Asset{mnem=" << asset.mnem() //
                   << ",display=" << asset.display() //
-                  << ",type=" << asset.type();
+                  << ",type=" << asset.type() //
+                  << '}';
   return debug;
 }
 

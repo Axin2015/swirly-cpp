@@ -14,29 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_MARKETID_HPP
-#define SWIRLY_ELM_MARKETID_HPP
+#ifndef SWIRLYUI_LEVEL_HPP
+#define SWIRLYUI_LEVEL_HPP
 
-#include <swirly/ash/Date.hpp>
+#include "Types.hpp"
+
+#include <QMetaType>
+
+class QJsonObject;
 
 namespace swirly {
+namespace ui {
 
-constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
-{
-  return box<Id64>((unbox(contrId) << 16) | (jdToTjd(settlDay) & 0xffff));
-}
+class Level {
+ public:
+  Level(Ticks ticks, Lots resd, int count) : ticks_{ticks}, resd_{resd}, count_{count} {}
+  Level() = default;
+  ~Level() noexcept = default;
 
-constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
-{
-  return toMarketId(contrId, maybeIsoToJd(settlDate));
-}
+  static Level fromJson(const QJsonObject& obj);
 
-template <typename ValueT>
-struct MarketIdTraits {
-  using Id = Id64;
-  static Id id(const ValueT& value) noexcept { return value.marketId(); }
+  Ticks ticks() const noexcept { return ticks_; }
+  Lots resd() const noexcept { return resd_; }
+  int count() const noexcept { return count_; }
+
+ private:
+  Ticks ticks_{};
+  Lots resd_{};
+  int count_{};
 };
 
+QDebug operator<<(QDebug debug, const Level& level);
+
+} // ui
 } // swirly
 
-#endif // SWIRLY_ELM_MARKETID_HPP
+Q_DECLARE_METATYPE(swirly::ui::Level)
+
+#endif // SWIRLYUI_LEVEL_HPP

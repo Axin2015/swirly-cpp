@@ -30,19 +30,20 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted {
  public:
-  Posn(Mnem accnt, Mnem contr, JDay settlDay, Lots buyLots, Cost buyCost, Lots sellLots,
-       Cost sellCost) noexcept
-    : accnt_{accnt},
+  Posn(Id64 marketId, Mnem contr, JDay settlDay, Mnem accnt, Lots buyLots, Cost buyCost,
+       Lots sellLots, Cost sellCost) noexcept
+    : marketId_{marketId},
       contr_{contr},
       settlDay_{settlDay},
+      accnt_{accnt},
       buyLots_{buyLots},
       buyCost_{buyCost},
       sellLots_{sellLots},
       sellCost_{sellCost}
   {
   }
-  Posn(Mnem accnt, Mnem contr, JDay settlDay) noexcept
-    : Posn{accnt, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+  Posn(Id64 marketId, Mnem contr, JDay settlDay, Mnem accnt) noexcept
+    : Posn{marketId, contr, settlDay, accnt, 0_lts, 0_cst, 0_lts, 0_cst}
   {
   }
   ~Posn() noexcept override;
@@ -63,9 +64,10 @@ class SWIRLY_API Posn : public RefCounted {
 
   void toJson(std::ostream& os) const;
 
-  auto accnt() const noexcept { return accnt_; }
+  auto marketId() const noexcept { return marketId_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
+  auto accnt() const noexcept { return accnt_; }
   auto buyLots() const noexcept { return buyLots_; }
   auto buyCost() const noexcept { return buyCost_; }
   auto sellLots() const noexcept { return sellLots_; }
@@ -101,24 +103,18 @@ class SWIRLY_API Posn : public RefCounted {
   {
     addTrade(side, lots, swirly::cost(lots, ticks));
   }
-  /**
-   * This function is typically used to change the settlement-day to zero during settlement.
-   *
-   * @param settlDay
-   *        The new settlement-day.
-   */
-  void setSettlDay(JDay settlDay) noexcept { settlDay_ = settlDay; }
   void setBuyLots(Lots buyLots) noexcept { buyLots_ = buyLots; }
   void setBuyCost(Cost buyCost) noexcept { buyCost_ = buyCost; }
   void setSellLots(Lots sellLots) noexcept { sellLots_ = sellLots; }
   void setSellCost(Cost sellCost) noexcept { sellCost_ = sellCost; }
 
-  boost::intrusive::set_member_hook<> keyHook_;
+  boost::intrusive::set_member_hook<> idHook_;
 
  private:
-  const Mnem accnt_;
+  const Id64 marketId_;
   const Mnem contr_;
   JDay settlDay_;
+  const Mnem accnt_;
   Lots buyLots_;
   Cost buyCost_;
   Lots sellLots_;
@@ -132,16 +128,13 @@ inline std::ostream& operator<<(std::ostream& os, const Posn& posn)
 }
 
 class SWIRLY_API PosnSet {
-  using Key = std::tuple<Mnem, Mnem, JDay>;
+  using Key = std::tuple<Id64, Mnem>;
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
-      int result{lhs.accnt().compare(rhs.accnt())};
+      int result{swirly::compare(lhs.marketId(), rhs.marketId())};
       if (result == 0) {
-        result = swirly::compare(lhs.settlDay(), rhs.settlDay());
-        if (result == 0) {
-          result = lhs.contr().compare(rhs.contr());
-        }
+        result = lhs.accnt().compare(rhs.accnt());
       }
       return result;
     }
@@ -153,23 +146,17 @@ class SWIRLY_API PosnSet {
   struct KeyValueCompare {
     bool operator()(const Key& lhs, const Posn& rhs) const noexcept
     {
-      int result{std::get<0>(lhs).compare(rhs.accnt())};
+      int result{swirly::compare(std::get<0>(lhs), rhs.marketId())};
       if (result == 0) {
-        result = swirly::compare(std::get<2>(lhs), rhs.settlDay());
-        if (result == 0) {
-          result = std::get<1>(lhs).compare(rhs.contr());
-        }
+        result = std::get<1>(lhs).compare(rhs.accnt());
       }
       return result < 0;
     }
     bool operator()(const Posn& lhs, const Key& rhs) const noexcept
     {
-      int result{lhs.accnt().compare(std::get<0>(rhs))};
+      int result{swirly::compare(lhs.marketId(), std::get<0>(rhs))};
       if (result == 0) {
-        result = swirly::compare(lhs.settlDay(), std::get<2>(rhs));
-        if (result == 0) {
-          result = lhs.contr().compare(std::get<1>(rhs));
-        }
+        result = lhs.accnt().compare(std::get<1>(rhs));
       }
       return result < 0;
     }
@@ -177,7 +164,7 @@ class SWIRLY_API PosnSet {
   using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
   using CompareOption = boost::intrusive::compare<ValueCompare>;
   using MemberHookOption
-    = boost::intrusive::member_hook<Posn, decltype(Posn::keyHook_), &Posn::keyHook_>;
+    = boost::intrusive::member_hook<Posn, decltype(Posn::idHook_), &Posn::idHook_>;
   using Set = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
   using ValuePtr = boost::intrusive_ptr<Posn>;
 
@@ -208,24 +195,24 @@ class SWIRLY_API PosnSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(Mnem accnt, Mnem contr, JDay settlDay) const noexcept
+  ConstIterator find(Id64 marketId, Mnem accnt) const noexcept
   {
-    return set_.find(std::make_tuple(accnt, contr, settlDay), KeyValueCompare());
+    return set_.find(std::make_tuple(marketId, accnt), KeyValueCompare());
   }
-  Iterator find(Mnem accnt, Mnem contr, JDay settlDay) noexcept
+  Iterator find(Id64 marketId, Mnem accnt) noexcept
   {
-    return set_.find(std::make_tuple(accnt, contr, settlDay), KeyValueCompare());
+    return set_.find(std::make_tuple(marketId, accnt), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(Mnem accnt, Mnem contr, JDay settlDay) const noexcept
+  std::pair<ConstIterator, bool> findHint(Id64 marketId, Mnem accnt) const noexcept
   {
-    const auto key = std::make_tuple(accnt, contr, settlDay);
+    const auto key = std::make_tuple(marketId, accnt);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(Mnem accnt, Mnem contr, JDay settlDay) noexcept
+  std::pair<Iterator, bool> findHint(Id64 marketId, Mnem accnt) noexcept
   {
-    const auto key = std::make_tuple(accnt, contr, settlDay);
+    const auto key = std::make_tuple(marketId, accnt);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
@@ -256,125 +243,6 @@ class SWIRLY_API PosnSet {
     ValuePtr ptr{&*it, false};
     set_.erase(it);
     return ptr;
-  }
-
- private:
-  Set set_;
-};
-
-class SWIRLY_API AccntPosnSet {
-  using Key = std::tuple<Mnem, JDay>;
-  struct ValueCompare {
-    int compare(const Posn& lhs, const Posn& rhs) const noexcept
-    {
-      // Perform fastest comparisons first.
-      int result{swirly::compare(lhs.settlDay(), rhs.settlDay())};
-      if (result == 0) {
-        result = lhs.contr().compare(rhs.contr());
-      }
-      return result;
-    }
-    bool operator()(const Posn& lhs, const Posn& rhs) const noexcept
-    {
-      return compare(lhs, rhs) < 0;
-    }
-  };
-  struct KeyValueCompare {
-    bool operator()(const Key& lhs, const Posn& rhs) const noexcept
-    {
-      // Perform fastest comparisons first.
-      int result{swirly::compare(std::get<1>(lhs), rhs.settlDay())};
-      if (result == 0) {
-        result = std::get<0>(lhs).compare(rhs.contr());
-      }
-      return result < 0;
-    }
-    bool operator()(const Posn& lhs, const Key& rhs) const noexcept
-    {
-      // Perform fastest comparisons first.
-      int result{swirly::compare(lhs.settlDay(), std::get<1>(rhs))};
-      if (result == 0) {
-        result = lhs.contr().compare(std::get<0>(rhs));
-      }
-      return result < 0;
-    }
-  };
-  using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
-  using CompareOption = boost::intrusive::compare<ValueCompare>;
-  using MemberHookOption
-    = boost::intrusive::member_hook<Posn, decltype(Posn::keyHook_), &Posn::keyHook_>;
-  using Set = boost::intrusive::set<Posn, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
-  using ValuePtr = boost::intrusive_ptr<Posn>;
-
- public:
-  using Iterator = typename Set::iterator;
-  using ConstIterator = typename Set::const_iterator;
-
-  AccntPosnSet() = default;
-
-  ~AccntPosnSet() noexcept;
-
-  // Copy.
-  AccntPosnSet(const AccntPosnSet&) = delete;
-  AccntPosnSet& operator=(const AccntPosnSet&) = delete;
-
-  // Move.
-  AccntPosnSet(AccntPosnSet&&);
-  AccntPosnSet& operator=(AccntPosnSet&&);
-
-  // Begin.
-  ConstIterator begin() const noexcept { return set_.begin(); }
-  ConstIterator cbegin() const noexcept { return set_.cbegin(); }
-  Iterator begin() noexcept { return set_.begin(); }
-
-  // End.
-  ConstIterator end() const noexcept { return set_.end(); }
-  ConstIterator cend() const noexcept { return set_.cend(); }
-  Iterator end() noexcept { return set_.end(); }
-
-  // Find.
-  ConstIterator find(Mnem contr, JDay settlDay) const noexcept
-  {
-    return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
-  }
-  Iterator find(Mnem contr, JDay settlDay) noexcept
-  {
-    return set_.find(std::make_tuple(contr, settlDay), KeyValueCompare());
-  }
-  std::pair<ConstIterator, bool> findHint(Mnem contr, JDay settlDay) const noexcept
-  {
-    const auto key = std::make_tuple(contr, settlDay);
-    const auto comp = KeyValueCompare();
-    auto it = set_.lower_bound(key, comp);
-    return std::make_pair(it, it != set_.end() && !comp(key, *it));
-  }
-  std::pair<Iterator, bool> findHint(Mnem contr, JDay settlDay) noexcept
-  {
-    const auto key = std::make_tuple(contr, settlDay);
-    const auto comp = KeyValueCompare();
-    auto it = set_.lower_bound(key, comp);
-    return std::make_pair(it, it != set_.end() && !comp(key, *it));
-  }
-  Iterator insert(const ValuePtr& value) noexcept;
-
-  Iterator insertHint(ConstIterator hint, const ValuePtr& value) noexcept;
-
-  Iterator insertOrReplace(const ValuePtr& value) noexcept;
-
-  template <typename... ArgsT>
-  Iterator emplace(ArgsT&&... args)
-  {
-    return insert(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
-  }
-  template <typename... ArgsT>
-  Iterator emplaceHint(ConstIterator hint, ArgsT&&... args)
-  {
-    return insertHint(hint, makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
-  }
-  template <typename... ArgsT>
-  Iterator emplaceOrReplace(ArgsT&&... args)
-  {
-    return insertOrReplace(makeRefCounted<Posn>(std::forward<ArgsT>(args)...));
   }
 
  private:

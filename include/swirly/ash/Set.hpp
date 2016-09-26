@@ -25,21 +25,27 @@
 
 namespace swirly {
 
+template <typename ValueT>
+struct IdTraits {
+  using Id = Id64;
+  static Id id(const ValueT& value) noexcept { return value.id(); }
+};
+
 /**
  * Set keyed by identifier.
  */
-template <typename ValueT>
+template <typename ValueT, typename TraitsT = IdTraits<ValueT>>
 class IdSet {
-  using Id = decltype(std::declval<ValueT>().id());
+  using Id = typename TraitsT::Id;
   struct ValueCompare {
     bool operator()(const ValueT& lhs, const ValueT& rhs) const noexcept
     {
-      return lhs.id() < rhs.id();
+      return TraitsT::id(lhs) < TraitsT::id(rhs);
     }
   };
   struct KeyValueCompare {
-    bool operator()(Id lhs, const ValueT& rhs) const noexcept { return lhs < rhs.id(); }
-    bool operator()(const ValueT& lhs, Id rhs) const noexcept { return lhs.id() < rhs; }
+    bool operator()(Id lhs, const ValueT& rhs) const noexcept { return lhs < TraitsT::id(rhs); }
+    bool operator()(const ValueT& lhs, Id rhs) const noexcept { return TraitsT::id(lhs) < rhs; }
   };
   using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
   using CompareOption = boost::intrusive::compare<ValueCompare>;

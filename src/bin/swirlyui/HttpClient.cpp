@@ -93,20 +93,23 @@ void HttpClient::slotFinished(QNetworkReply* reply)
   reply->deleteLater();
 
   if (reply->error() != QNetworkReply::NoError) {
-    emit notifyError(reply->errorString());
+    emit serviceError(reply->errorString());
     return;
   }
 
   const auto attr = reply->request().attribute(QNetworkRequest::User);
   switch (attr.value<int>()) {
   case GetRefData:
-    getRefDataReply(reply);
+    getRefDataReply(*reply);
     break;
   case GetAccnt:
-    getAccntReply(reply);
+    getAccntReply(*reply);
+    break;
+  case PostMarket:
+    postMarketReply(*reply);
     break;
   case PostOrder:
-    postOrderReply(reply);
+    postOrderReply(*reply);
     break;
   }
 }
@@ -129,15 +132,15 @@ void HttpClient::getAccnt()
   nam_.get(request);
 }
 
-void HttpClient::getRefDataReply(QNetworkReply* reply)
+void HttpClient::getRefDataReply(QNetworkReply& reply)
 {
   qDebug() << "getRefDataReply";
 
-  auto body = reply->readAll();
+  auto body = reply.readAll();
   QJsonParseError error;
   const auto doc = QJsonDocument::fromJson(body, &error);
   if (error.error != QJsonParseError::NoError) {
-    emit notifyError(error.errorString());
+    emit serviceError(error.errorString());
     return;
   }
 
@@ -145,30 +148,31 @@ void HttpClient::getRefDataReply(QNetworkReply* reply)
   for (const auto elem : obj["assets"].toArray()) {
     const auto asset = Asset::fromJson(elem.toObject());
     qDebug() << "asset:" << asset;
-    emit notifyAsset(asset);
+    emit updateAsset(asset);
   }
   for (const auto elem : obj["contrs"].toArray()) {
     const auto contr = Contr::fromJson(elem.toObject());
     qDebug() << "contr:" << contr;
-    emit notifyContr(contr);
+    emit updateContr(contr);
   }
+  emit refDataComplete();
 
-  //postMarket("EURUSD", QDate{2016, 9, 23}, 0);
-  //postOrder("EURUSD", QDate{2016, 9, 23}, "foo", "Buy", 10, 12345);
-  //postOrder("EURUSD", QDate{2016, 9, 23}, "bar", "Sell", 5, 12345);
+  //postMarket("EURUSD", QDate{2016, 9, 30}, 0);
+  //postOrder("EURUSD", QDate{2016, 9, 30}, "foo", "Buy", 10, 12345);
+  //postOrder("EURUSD", QDate{2016, 9, 30}, "bar", "Sell", 5, 12345);
   getAccnt();
   startTimer(2000);
 }
 
-void HttpClient::getAccntReply(QNetworkReply* reply)
+void HttpClient::getAccntReply(QNetworkReply& reply)
 {
   qDebug() << "getAccntReply";
 
-  auto body = reply->readAll();
+  auto body = reply.readAll();
   QJsonParseError error;
   const auto doc = QJsonDocument::fromJson(body, &error);
   if (error.error != QJsonParseError::NoError) {
-    emit notifyError(error.errorString());
+    emit serviceError(error.errorString());
     return;
   }
 
@@ -195,15 +199,15 @@ void HttpClient::getAccntReply(QNetworkReply* reply)
   }
 }
 
-void HttpClient::postMarketReply(QNetworkReply* reply)
+void HttpClient::postMarketReply(QNetworkReply& reply)
 {
-  auto body = reply->readAll();
+  auto body = reply.readAll();
   qDebug() << "postMarketReply:" << body;
 }
 
-void HttpClient::postOrderReply(QNetworkReply* reply)
+void HttpClient::postOrderReply(QNetworkReply& reply)
 {
-  auto body = reply->readAll();
+  auto body = reply.readAll();
   qDebug() << "postOrderReply:" << body;
 }
 

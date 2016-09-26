@@ -32,7 +32,8 @@ SWIRLY_TEST_CASE(MarketToString)
 
   cout << toString(market) << endl;
   SWIRLY_CHECK(toString(market) == //
-               "{\"contr\":\"EURUSD\""
+               "{\"id\":1"
+               ",\"contr\":\"EURUSD\""
                ",\"settlDate\":20140314"
                ",\"state\":1"
                ",\"lastLots\":null"
@@ -53,7 +54,8 @@ SWIRLY_TEST_CASE(MarketToStringNull)
 
   cout << toString(market) << endl;
   SWIRLY_CHECK(toString(market) == //
-               "{\"contr\":\"EURUSD\""
+               "{\"id\":1"
+               ",\"contr\":\"EURUSD\""
                ",\"settlDate\":null"
                ",\"state\":1"
                ",\"lastLots\":null"

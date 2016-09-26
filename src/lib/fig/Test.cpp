@@ -18,7 +18,6 @@
 
 #include <swirly/elm/Asset.hpp>
 #include <swirly/elm/Contr.hpp>
-#include <swirly/elm/Market.hpp>
 
 using namespace std;
 

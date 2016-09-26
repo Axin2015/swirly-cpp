@@ -20,7 +20,6 @@
 #include <swirly/fig/Response.hpp>
 
 #include <swirly/elm/Exception.hpp>
-#include <swirly/elm/Market.hpp>
 
 #include <swirly/ash/Date.hpp>
 
@@ -279,8 +278,10 @@ void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now
                    ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
+  const auto& contr = serv_.contr(contrMnem);
+  const auto marketId = toMarketId(contr.id(), settlDate);
   const auto& posns = accnt.posns();
-  auto it = posns.find(contrMnem, maybeIsoToJd(settlDate));
+  auto it = posns.find(marketId);
   if (it == posns.end()) {
     throw NotFoundException{errMsg() << "posn for '" << contrMnem << "' on " << settlDate
                                      << " does not exist"};

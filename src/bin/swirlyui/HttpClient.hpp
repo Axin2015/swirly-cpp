@@ -26,6 +26,9 @@ namespace ui {
 
 class Asset;
 class Contr;
+class Order;
+class Exec;
+class Posn;
 
 class HttpClient : public QObject {
   Q_OBJECT
@@ -43,9 +46,14 @@ class HttpClient : public QObject {
   void timerEvent(QTimerEvent* event) override;
 
  signals:
-  void notifyAsset(const Asset& asset);
-  void notifyContr(const Contr& contr);
-  void notifyError(const QString& error);
+  void refDataComplete();
+  void serviceError(const QString& error);
+  void updateAsset(const Asset& asset);
+  void updateContr(const Contr& contr);
+  void updateOrder(const Order& order);
+  void updateExec(const Exec& exec);
+  void updateTrade(const Exec& trade);
+  void updatePosn(const Posn& posn);
 
  private slots:
   void slotFinished(QNetworkReply* reply);
@@ -54,10 +62,10 @@ class HttpClient : public QObject {
   void getRefData();
   void getAccnt();
 
-  void getRefDataReply(QNetworkReply* reply);
-  void getAccntReply(QNetworkReply* reply);
-  void postMarketReply(QNetworkReply* reply);
-  void postOrderReply(QNetworkReply* reply);
+  void getRefDataReply(QNetworkReply& reply);
+  void getAccntReply(QNetworkReply& reply);
+  void postMarketReply(QNetworkReply& reply);
+  void postOrderReply(QNetworkReply& reply);
 
   QNetworkAccessManager nam_;
 };
