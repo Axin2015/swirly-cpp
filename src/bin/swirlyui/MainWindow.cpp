@@ -29,14 +29,18 @@ namespace ui {
 
 MainWindow::~MainWindow() noexcept = default;
 
-MainWindow::MainWindow() : tabs_{new QTabWidget{}}
+MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 {
-  tabs_->addTab(new AssetView{assetModel_}, tr("Asset"));
-  tabs_->addTab(new ContrView{contrModel_}, tr("Contr"));
-  tabs_->addTab(new MarketView{marketModel_}, tr("Market"));
-  tabs_->addTab(new OrderView{orderModel_}, tr("Order"));
-  tabs_->addTab(new TradeView{tradeModel_}, tr("Trade"));
-  setCentralWidget(tabs_);
+  QTabWidget* const tabs{new QTabWidget{}};
+  tabs->addTab(new AssetView{assetModel_}, tr("Asset"));
+  tabs->addTab(new ContrView{contrModel_}, tr("Contr"));
+  tabs->addTab(new OrderView{orderModel_}, tr("Order"));
+  tabs->addTab(new TradeView{tradeModel_}, tr("Trade"));
+
+  splitter_->addWidget(new MarketView{marketModel_});
+  splitter_->addWidget(tabs);
+
+  setCentralWidget(splitter_);
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);

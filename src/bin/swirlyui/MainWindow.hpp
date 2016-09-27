@@ -26,7 +26,7 @@
 
 #include <QMainWindow>
 
-class QTabWidget;
+class QSplitter;
 
 namespace swirly {
 namespace ui {
@@ -66,7 +66,7 @@ class MainWindow : public QMainWindow {
   MarketModel marketModel_;
   OrderModel orderModel_;
   TradeModel tradeModel_;
-  QTabWidget* const tabs_;
+  QSplitter* const splitter_;
 };
 
 } // ui
