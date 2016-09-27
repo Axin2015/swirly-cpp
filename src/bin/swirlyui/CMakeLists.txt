@@ -43,6 +43,8 @@ set(swirlyui_SOURCES
   OrderModel.cpp
   OrderView.cpp
   Posn.cpp
+  TradeModel.cpp
+  TradeView.cpp
   Types.cpp)
 
 add_executable(swirlyui ${swirlyui_RESOURCES} ${swirlyui_SOURCES})

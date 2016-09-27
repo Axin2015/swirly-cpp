@@ -21,6 +21,7 @@
 #include "ContrModel.hpp"
 #include "HttpClient.hpp"
 #include "OrderModel.hpp"
+#include "TradeModel.hpp"
 
 #include <QMainWindow>
 
@@ -61,6 +62,7 @@ class MainWindow : public QMainWindow {
   AssetModel assetModel_;
   ContrModel contrModel_;
   OrderModel orderModel_;
+  TradeModel tradeModel_;
   QTabWidget* const tabs_;
 };
 
