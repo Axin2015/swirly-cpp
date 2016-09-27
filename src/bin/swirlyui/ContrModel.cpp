@@ -22,7 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace {
+namespace column {
 
 enum { //
   Mnem, //
@@ -42,17 +42,17 @@ enum { //
 
 ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[Mnem] = tr("Mnem");
-  header_[Display] = tr("Display");
-  header_[Asset] = tr("Asset");
-  header_[Ccy] = tr("Ccy");
-  header_[LotNumer] = tr("LotNumer");
-  header_[LotDenom] = tr("LotDenom");
-  header_[TickNumer] = tr("TickNumer");
-  header_[TickDenom] = tr("TickDenom");
-  header_[PipDp] = tr("PipDp");
-  header_[MinLots] = tr("MinLots");
-  header_[MaxLots] = tr("MaxLots");
+  header_[column::Mnem] = tr("Mnem");
+  header_[column::Display] = tr("Display");
+  header_[column::Asset] = tr("Asset");
+  header_[column::Ccy] = tr("Ccy");
+  header_[column::LotNumer] = tr("LotNumer");
+  header_[column::LotDenom] = tr("LotDenom");
+  header_[column::TickNumer] = tr("TickNumer");
+  header_[column::TickDenom] = tr("TickDenom");
+  header_[column::PipDp] = tr("PipDp");
+  header_[column::MinLots] = tr("MinLots");
+  header_[column::MaxLots] = tr("MaxLots");
 }
 
 int ContrModel::rowCount(const QModelIndex& parent) const
@@ -83,37 +83,37 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
   if (role == Qt::DisplayRole) {
     const auto& contr = rows_.nth(index.row())->second;
     switch (index.column()) {
-    case Mnem:
+    case column::Mnem:
       var = contr.mnem();
       break;
-    case Display:
+    case column::Display:
       var = contr.display();
       break;
-    case Asset:
+    case column::Asset:
       var = contr.asset();
       break;
-    case Ccy:
+    case column::Ccy:
       var = contr.ccy();
       break;
-    case LotNumer:
+    case column::LotNumer:
       var = contr.lotNumer();
       break;
-    case LotDenom:
+    case column::LotDenom:
       var = contr.lotDenom();
       break;
-    case TickNumer:
+    case column::TickNumer:
       var = contr.tickNumer();
       break;
-    case TickDenom:
+    case column::TickDenom:
       var = contr.tickDenom();
       break;
-    case PipDp:
+    case column::PipDp:
       var = contr.pipDp();
       break;
-    case MinLots:
+    case column::MinLots:
       var = contr.minLots();
       break;
-    case MaxLots:
+    case column::MaxLots:
       var = contr.maxLots();
       break;
     }
@@ -129,13 +129,17 @@ QVariant ContrModel::headerData(int section, Qt::Orientation orientation, int ro
   return header_[section];
 }
 
-void ContrModel::insertRow(const Contr& contr)
+void ContrModel::updateRow(const Contr& contr)
 {
   auto it = rows_.lower_bound(contr.mnem());
+  const int i = distance(rows_.begin(), it);
+
   const bool found{it != rows_.end() && !rows_.key_comp()(contr.mnem(), it->first)};
-  if (!found) {
+  if (found) {
+    it->second = contr;
+    emit dataChanged(index(i, 0), index(i, Columns - 1));
+  } else {
     // If not found then insert.
-    const int i = distance(rows_.begin(), it);
     beginInsertRows(QModelIndex{}, i, i);
     rows_.emplace_hint(it, contr.mnem(), contr);
     endInsertRows();

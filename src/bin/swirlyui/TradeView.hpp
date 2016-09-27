@@ -14,43 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRMODEL_HPP
-#define SWIRLYUI_CONTRMODEL_HPP
+#ifndef SWIRLYUI_TRADEVIEW_HPP
+#define SWIRLYUI_TRADEVIEW_HPP
 
-#include "Contr.hpp"
+#include <QWidget>
 
-#include <QAbstractTableModel>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
-#pragma GCC diagnostic pop
+class QModelIndex;
 
 namespace swirly {
 namespace ui {
 
-class ContrModel : public QAbstractTableModel {
+class Exec;
+class TradeModel;
+
+class TradeView : public QWidget {
+  Q_OBJECT
+
  public:
-  ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept = default;
+  TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  ~TradeView() noexcept = default;
 
-  int rowCount(const QModelIndex& parent) const override;
+ signals:
+  void currentChanged(const Exec& trade);
 
-  int columnCount(const QModelIndex& parent) const override;
+  void doubleClicked(const Exec& trade);
 
-  QVariant data(const QModelIndex& index, int role) const override;
+ private slots:
+  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-  void updateRow(const Contr& contr);
+  void slotDoubleClicked(const QModelIndex& index);
 
  private:
-  enum { Columns = 11 };
-  QVariant header_[Columns];
-  boost::container::flat_map<QString, Contr, std::less<QString>> rows_;
+  TradeModel& model_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRMODEL_HPP
+#endif // SWIRLYUI_TRADEVIEW_HPP

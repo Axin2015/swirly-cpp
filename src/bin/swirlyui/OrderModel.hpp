@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRMODEL_HPP
-#define SWIRLYUI_CONTRMODEL_HPP
+#ifndef SWIRLYUI_ORDERMODEL_HPP
+#define SWIRLYUI_ORDERMODEL_HPP
 
-#include "Contr.hpp"
+#include "Order.hpp"
 
 #include <QAbstractTableModel>
 
@@ -29,10 +29,10 @@
 namespace swirly {
 namespace ui {
 
-class ContrModel : public QAbstractTableModel {
+class OrderModel : public QAbstractTableModel {
  public:
-  ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept = default;
+  OrderModel(QObject* parent = nullptr);
+  ~OrderModel() noexcept = default;
 
   int rowCount(const QModelIndex& parent) const override;
 
@@ -42,15 +42,16 @@ class ContrModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Contr& contr);
+  void updateRow(const Order& order);
 
  private:
-  enum { Columns = 11 };
+  enum { Columns = 18 };
   QVariant header_[Columns];
-  boost::container::flat_map<QString, Contr, std::less<QString>> rows_;
+  using Key = std::pair<Id64, Id64>;
+  boost::container::flat_map<Key, Order, std::less<Key>> rows_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRMODEL_HPP
+#endif // SWIRLYUI_ORDERMODEL_HPP

@@ -180,22 +180,27 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
   for (const auto elem : obj["markets"].toArray()) {
     const auto market = Market::fromJson(elem.toObject());
     qDebug() << "market:" << market;
+    emit updateMarket(market);
   }
   for (const auto elem : obj["orders"].toArray()) {
     const auto order = Order::fromJson(elem.toObject());
     qDebug() << "order:" << order;
+    emit updateOrder(order);
   }
   for (const auto elem : obj["execs"].toArray()) {
     const auto exec = Exec::fromJson(elem.toObject());
     qDebug() << "exec:" << exec;
+    emit updateExec(exec);
   }
   for (const auto elem : obj["trades"].toArray()) {
     const auto trade = Exec::fromJson(elem.toObject());
     qDebug() << "trade:" << trade;
+    emit updateTrade(trade);
   }
   for (const auto elem : obj["posns"].toArray()) {
     const auto posn = Posn::fromJson(elem.toObject());
     qDebug() << "posn:" << posn;
+    emit updatePosn(posn);
   }
 }
 

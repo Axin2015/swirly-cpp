@@ -85,27 +85,27 @@ class Exec {
   const QDateTime& created() const noexcept { return created_; }
 
  private:
-  Id64 marketId_;
-  QString contr_;
-  QDate settlDate_;
-  Id64 id_;
-  Id64 orderId_;
-  QString accnt_;
-  QString ref_;
-  State state_;
-  Side side_;
-  Lots lots_;
-  Ticks ticks_;
-  Lots resd_;
-  Lots exec_;
-  Cost cost_;
-  Lots lastLots_;
-  Ticks lastTicks_;
-  Lots minLots_;
-  Id64 matchId_;
-  LiqInd liqInd_;
-  QString cpty_;
-  QDateTime created_;
+  Id64 marketId_{};
+  QString contr_{};
+  QDate settlDate_{};
+  Id64 id_{};
+  Id64 orderId_{};
+  QString accnt_{};
+  QString ref_{};
+  State state_{};
+  Side side_{};
+  Lots lots_{};
+  Ticks ticks_{};
+  Lots resd_{};
+  Lots exec_{};
+  Cost cost_{};
+  Lots lastLots_{};
+  Ticks lastTicks_{};
+  Lots minLots_{};
+  Id64 matchId_{};
+  LiqInd liqInd_{};
+  QString cpty_{};
+  QDateTime created_{};
 };
 
 QDebug operator<<(QDebug debug, const Exec& exec);

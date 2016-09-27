@@ -22,7 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace {
+namespace column {
 
 enum { //
   Mnem, //
@@ -34,9 +34,9 @@ enum { //
 
 AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[Mnem] = tr("Mnem");
-  header_[Display] = tr("Display");
-  header_[Type] = tr("Type");
+  header_[column::Mnem] = tr("Mnem");
+  header_[column::Display] = tr("Display");
+  header_[column::Type] = tr("Type");
 }
 
 int AssetModel::rowCount(const QModelIndex& parent) const
@@ -67,13 +67,13 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
   if (role == Qt::DisplayRole) {
     const auto& asset = rows_.nth(index.row())->second;
     switch (index.column()) {
-    case Mnem:
+    case column::Mnem:
       var = asset.mnem();
       break;
-    case Display:
+    case column::Display:
       var = asset.display();
       break;
-    case Type:
+    case column::Type:
       var = enumString(asset.type());
       break;
     }
@@ -89,13 +89,17 @@ QVariant AssetModel::headerData(int section, Qt::Orientation orientation, int ro
   return header_[section];
 }
 
-void AssetModel::insertRow(const Asset& asset)
+void AssetModel::updateRow(const Asset& asset)
 {
   auto it = rows_.lower_bound(asset.mnem());
+  const int i = distance(rows_.begin(), it);
+
   const bool found{it != rows_.end() && !rows_.key_comp()(asset.mnem(), it->first)};
-  if (!found) {
+  if (found) {
+    it->second = asset;
+    emit dataChanged(index(i, 0), index(i, Columns - 1));
+  } else {
     // If not found then insert.
-    const int i = distance(rows_.begin(), it);
     beginInsertRows(QModelIndex{}, i, i);
     rows_.emplace_hint(it, asset.mnem(), asset);
     endInsertRows();

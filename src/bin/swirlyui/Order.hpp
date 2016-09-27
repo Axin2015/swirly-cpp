@@ -80,23 +80,23 @@ class Order {
 
  private:
   Id64 marketId_{};
-  QString contr_;
-  QDate settlDate_;
-  Id64 id_;
-  QString accnt_;
-  QString ref_;
-  State state_;
-  Side side_;
-  Lots lots_;
-  Ticks ticks_;
-  Lots resd_;
-  Lots exec_;
-  Cost cost_;
-  Lots lastLots_;
-  Ticks lastTicks_;
-  Lots minLots_;
-  QDateTime created_;
-  QDateTime modified_;
+  QString contr_{};
+  QDate settlDate_{};
+  Id64 id_{};
+  QString accnt_{};
+  QString ref_{};
+  State state_{};
+  Side side_{};
+  Lots lots_{};
+  Ticks ticks_{};
+  Lots resd_{};
+  Lots exec_{};
+  Cost cost_{};
+  Lots lastLots_{};
+  Ticks lastTicks_{};
+  Lots minLots_{};
+  QDateTime created_{};
+  QDateTime modified_{};
 };
 
 QDebug operator<<(QDebug debug, const Order& order);

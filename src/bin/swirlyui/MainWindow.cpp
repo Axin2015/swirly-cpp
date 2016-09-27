@@ -16,7 +16,10 @@
  */
 #include "MainWindow.hpp"
 
+#include "AssetView.hpp"
 #include "ContrView.hpp"
+#include "OrderView.hpp"
+#include "TradeView.hpp"
 
 #include <QtWidgets>
 
@@ -25,9 +28,13 @@ namespace ui {
 
 MainWindow::~MainWindow() noexcept = default;
 
-MainWindow::MainWindow() : contrView_{new ContrView{contrModel_}}
+MainWindow::MainWindow() : tabs_{new QTabWidget{}}
 {
-  setCentralWidget(contrView_);
+  tabs_->addTab(new AssetView{assetModel_}, tr("Asset"));
+  tabs_->addTab(new ContrView{contrModel_}, tr("Contr"));
+  tabs_->addTab(new OrderView{orderModel_}, tr("Order"));
+  tabs_->addTab(new TradeView{tradeModel_}, tr("Trade"));
+  setCentralWidget(tabs_);
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
@@ -70,18 +77,19 @@ void MainWindow::slotServiceError(const QString& error)
 void MainWindow::slotUpdateAsset(const Asset& asset)
 {
   qDebug() << "slotUpdateAsset";
-  assetModel_.insertRow(asset);
+  assetModel_.updateRow(asset);
 }
 
 void MainWindow::slotUpdateContr(const Contr& contr)
 {
   qDebug() << "slotUpdateContr";
-  contrModel_.insertRow(contr);
+  contrModel_.updateRow(contr);
 }
 
 void MainWindow::slotUpdateOrder(const Order& order)
 {
   qDebug() << "slotUpdateOrder";
+  orderModel_.updateRow(order);
 }
 
 void MainWindow::slotUpdateExec(const Exec& exec)
@@ -92,6 +100,7 @@ void MainWindow::slotUpdateExec(const Exec& exec)
 void MainWindow::slotUpdateTrade(const Exec& trade)
 {
   qDebug() << "slotUpdateTrade";
+  tradeModel_.updateRow(trade);
 }
 
 void MainWindow::slotUpdatePosn(const Posn& posn)

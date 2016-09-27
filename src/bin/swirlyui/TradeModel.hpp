@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRMODEL_HPP
-#define SWIRLYUI_CONTRMODEL_HPP
+#ifndef SWIRLYUI_TRADEMODEL_HPP
+#define SWIRLYUI_TRADEMODEL_HPP
 
-#include "Contr.hpp"
+#include "Exec.hpp"
 
 #include <QAbstractTableModel>
 
@@ -29,10 +29,10 @@
 namespace swirly {
 namespace ui {
 
-class ContrModel : public QAbstractTableModel {
+class TradeModel : public QAbstractTableModel {
  public:
-  ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept = default;
+  TradeModel(QObject* parent = nullptr);
+  ~TradeModel() noexcept = default;
 
   int rowCount(const QModelIndex& parent) const override;
 
@@ -42,15 +42,16 @@ class ContrModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Contr& contr);
+  void updateRow(const Exec& trade);
 
  private:
-  enum { Columns = 11 };
+  enum { Columns = 21 };
   QVariant header_[Columns];
-  boost::container::flat_map<QString, Contr, std::less<QString>> rows_;
+  using Key = std::pair<Id64, Id64>;
+  boost::container::flat_map<Key, Exec, std::less<Key>> rows_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRMODEL_HPP
+#endif // SWIRLYUI_TRADEMODEL_HPP
