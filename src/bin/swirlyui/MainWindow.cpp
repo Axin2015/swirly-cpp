@@ -18,6 +18,7 @@
 
 #include "AssetView.hpp"
 #include "ContrView.hpp"
+#include "MarketView.hpp"
 #include "OrderView.hpp"
 #include "TradeView.hpp"
 
@@ -32,6 +33,7 @@ MainWindow::MainWindow() : tabs_{new QTabWidget{}}
 {
   tabs_->addTab(new AssetView{assetModel_}, tr("Asset"));
   tabs_->addTab(new ContrView{contrModel_}, tr("Contr"));
+  tabs_->addTab(new MarketView{marketModel_}, tr("Market"));
   tabs_->addTab(new OrderView{orderModel_}, tr("Order"));
   tabs_->addTab(new TradeView{tradeModel_}, tr("Trade"));
   setCentralWidget(tabs_);
@@ -40,6 +42,7 @@ MainWindow::MainWindow() : tabs_{new QTabWidget{}}
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
   connect(&client_, &HttpClient::updateAsset, this, &MainWindow::slotUpdateAsset);
   connect(&client_, &HttpClient::updateContr, this, &MainWindow::slotUpdateContr);
+  connect(&client_, &HttpClient::updateMarket, this, &MainWindow::slotUpdateMarket);
   connect(&client_, &HttpClient::updateOrder, this, &MainWindow::slotUpdateOrder);
   connect(&client_, &HttpClient::updateExec, this, &MainWindow::slotUpdateExec);
   connect(&client_, &HttpClient::updateTrade, this, &MainWindow::slotUpdateTrade);
@@ -84,6 +87,12 @@ void MainWindow::slotUpdateContr(const Contr& contr)
 {
   qDebug() << "slotUpdateContr";
   contrModel_.updateRow(contr);
+}
+
+void MainWindow::slotUpdateMarket(const Market& market)
+{
+  qDebug() << "slotUpdateMarket";
+  marketModel_.updateRow(market);
 }
 
 void MainWindow::slotUpdateOrder(const Order& order)

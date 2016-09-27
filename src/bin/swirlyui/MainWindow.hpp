@@ -20,6 +20,7 @@
 #include "AssetModel.hpp"
 #include "ContrModel.hpp"
 #include "HttpClient.hpp"
+#include "MarketModel.hpp"
 #include "OrderModel.hpp"
 #include "TradeModel.hpp"
 
@@ -45,6 +46,7 @@ class MainWindow : public QMainWindow {
   void slotServiceError(const QString& error);
   void slotUpdateAsset(const Asset& asset);
   void slotUpdateContr(const Contr& contr);
+  void slotUpdateMarket(const Market& market);
   void slotUpdateOrder(const Order& order);
   void slotUpdateExec(const Exec& exec);
   void slotUpdateTrade(const Exec& trade);
@@ -61,6 +63,7 @@ class MainWindow : public QMainWindow {
   HttpClient client_;
   AssetModel assetModel_;
   ContrModel contrModel_;
+  MarketModel marketModel_;
   OrderModel orderModel_;
   TradeModel tradeModel_;
   QTabWidget* const tabs_;

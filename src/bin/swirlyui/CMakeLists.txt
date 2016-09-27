@@ -39,6 +39,8 @@ set(swirlyui_SOURCES
   Main.cpp
   MainWindow.cpp
   Market.cpp
+  MarketModel.cpp
+  MarketView.cpp
   Order.cpp
   OrderModel.cpp
   OrderView.cpp
