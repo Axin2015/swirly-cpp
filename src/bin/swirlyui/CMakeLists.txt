@@ -23,7 +23,25 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 #set(CMAKE_AUTORCC ON)
 qt5_add_resources(swirlyui_RESOURCES Application.qrc)
 
-file(GLOB swirlyui_SOURCES "*.cpp")
+# Explicitly list sources to avoid accidentally including moc sources
+# when build and source directories are the same.
+set(swirlyui_SOURCES
+  Asset.cpp
+  AssetModel.cpp
+  AssetView.cpp
+  Contr.cpp
+  ContrModel.cpp
+  ContrView.cpp
+  Exec.cpp
+  HttpClient.cpp
+  Json.cpp
+  Level.cpp
+  Main.cpp
+  MainWindow.cpp
+  Market.cpp
+  Order.cpp
+  Posn.cpp
+  Types.cpp)
 
 add_executable(swirlyui ${swirlyui_RESOURCES} ${swirlyui_SOURCES})
 target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)
