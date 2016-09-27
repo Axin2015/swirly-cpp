@@ -42,7 +42,7 @@ class ContrModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void insertRow(const Contr& contr);
+  void updateRow(const Contr& contr);
 
  private:
   enum { Columns = 11 };

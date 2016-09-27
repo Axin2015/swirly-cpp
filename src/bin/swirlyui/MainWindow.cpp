@@ -73,13 +73,13 @@ void MainWindow::slotServiceError(const QString& error)
 void MainWindow::slotUpdateAsset(const Asset& asset)
 {
   qDebug() << "slotUpdateAsset";
-  assetModel_.insertRow(asset);
+  assetModel_.updateRow(asset);
 }
 
 void MainWindow::slotUpdateContr(const Contr& contr)
 {
   qDebug() << "slotUpdateContr";
-  contrModel_.insertRow(contr);
+  contrModel_.updateRow(contr);
 }
 
 void MainWindow::slotUpdateOrder(const Order& order)

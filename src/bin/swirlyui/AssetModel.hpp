@@ -42,7 +42,7 @@ class AssetModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void insertRow(const Asset& asset);
+  void updateRow(const Asset& asset);
 
  private:
   enum { Columns = 3 };

@@ -26,6 +26,7 @@ namespace ui {
 
 class Asset;
 class Contr;
+class Market;
 class Order;
 class Exec;
 class Posn;
@@ -50,6 +51,7 @@ class HttpClient : public QObject {
   void serviceError(const QString& error);
   void updateAsset(const Asset& asset);
   void updateContr(const Contr& contr);
+  void updateMarket(const Market& market);
   void updateOrder(const Order& order);
   void updateExec(const Exec& exec);
   void updateTrade(const Exec& trade);
