@@ -16,6 +16,7 @@
  */
 #include "MainWindow.hpp"
 
+#include "AssetView.hpp"
 #include "ContrView.hpp"
 
 #include <QtWidgets>
@@ -25,9 +26,11 @@ namespace ui {
 
 MainWindow::~MainWindow() noexcept = default;
 
-MainWindow::MainWindow() : contrView_{new ContrView{contrModel_}}
+MainWindow::MainWindow() : tabs_{new QTabWidget{}}
 {
-  setCentralWidget(contrView_);
+  tabs_->addTab(new AssetView{assetModel_}, tr("Asset"));
+  tabs_->addTab(new ContrView{contrModel_}, tr("Contr"));
+  setCentralWidget(tabs_);
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);

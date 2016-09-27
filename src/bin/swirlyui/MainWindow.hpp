@@ -23,10 +23,10 @@
 
 #include <QMainWindow>
 
+class QTabWidget;
+
 namespace swirly {
 namespace ui {
-
-class ContrView;
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -59,7 +59,7 @@ class MainWindow : public QMainWindow {
   HttpClient client_;
   AssetModel assetModel_;
   ContrModel contrModel_;
-  ContrView* const contrView_;
+  QTabWidget* const tabs_;
 };
 
 } // ui
