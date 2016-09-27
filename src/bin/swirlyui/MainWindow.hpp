@@ -20,6 +20,7 @@
 #include "AssetModel.hpp"
 #include "ContrModel.hpp"
 #include "HttpClient.hpp"
+#include "OrderModel.hpp"
 
 #include <QMainWindow>
 
@@ -59,6 +60,7 @@ class MainWindow : public QMainWindow {
   HttpClient client_;
   AssetModel assetModel_;
   ContrModel contrModel_;
+  OrderModel orderModel_;
   QTabWidget* const tabs_;
 };
 

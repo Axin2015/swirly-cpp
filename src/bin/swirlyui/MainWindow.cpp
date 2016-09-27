@@ -18,6 +18,7 @@
 
 #include "AssetView.hpp"
 #include "ContrView.hpp"
+#include "OrderView.hpp"
 
 #include <QtWidgets>
 
@@ -30,6 +31,7 @@ MainWindow::MainWindow() : tabs_{new QTabWidget{}}
 {
   tabs_->addTab(new AssetView{assetModel_}, tr("Asset"));
   tabs_->addTab(new ContrView{contrModel_}, tr("Contr"));
+  tabs_->addTab(new OrderView{orderModel_}, tr("Order"));
   setCentralWidget(tabs_);
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
@@ -85,6 +87,7 @@ void MainWindow::slotUpdateContr(const Contr& contr)
 void MainWindow::slotUpdateOrder(const Order& order)
 {
   qDebug() << "slotUpdateOrder";
+  orderModel_.updateRow(order);
 }
 
 void MainWindow::slotUpdateExec(const Exec& exec)

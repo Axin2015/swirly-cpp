@@ -40,6 +40,8 @@ set(swirlyui_SOURCES
   MainWindow.cpp
   Market.cpp
   Order.cpp
+  OrderModel.cpp
+  OrderView.cpp
   Posn.cpp
   Types.cpp)
 
