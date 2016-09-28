@@ -18,6 +18,7 @@
 
 #include "AssetView.hpp"
 #include "ContrView.hpp"
+#include "ExecView.hpp"
 #include "MarketView.hpp"
 #include "OrderView.hpp"
 #include "PosnView.hpp"
@@ -36,6 +37,7 @@ MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
   tabs->addTab(new AssetView{assetModel_}, tr("Asset"));
   tabs->addTab(new ContrView{contrModel_}, tr("Contr"));
   tabs->addTab(new OrderView{orderModel_}, tr("Order"));
+  tabs->addTab(new ExecView{execModel_}, tr("Exec"));
   tabs->addTab(new TradeView{tradeModel_}, tr("Trade"));
   tabs->addTab(new PosnView{posnModel_}, tr("Posn"));
 
@@ -110,6 +112,7 @@ void MainWindow::slotUpdateOrder(const Order& order)
 void MainWindow::slotUpdateExec(const Exec& exec)
 {
   qDebug() << "slotUpdateExec";
+  execModel_.updateRow(exec);
 }
 
 void MainWindow::slotUpdateTrade(const Exec& trade)

@@ -19,6 +19,7 @@
 
 #include "AssetModel.hpp"
 #include "ContrModel.hpp"
+#include "ExecModel.hpp"
 #include "HttpClient.hpp"
 #include "MarketModel.hpp"
 #include "OrderModel.hpp"
@@ -66,6 +67,7 @@ class MainWindow : public QMainWindow {
   ContrModel contrModel_;
   MarketModel marketModel_;
   OrderModel orderModel_;
+  ExecModel execModel_;
   TradeModel tradeModel_;
   PosnModel posnModel_;
   QSplitter* const splitter_;

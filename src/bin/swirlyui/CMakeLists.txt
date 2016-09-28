@@ -33,6 +33,8 @@ set(swirlyui_SOURCES
   ContrModel.cpp
   ContrView.cpp
   Exec.cpp
+  ExecModel.cpp
+  ExecView.cpp
   HttpClient.cpp
   Json.cpp
   Level.cpp
