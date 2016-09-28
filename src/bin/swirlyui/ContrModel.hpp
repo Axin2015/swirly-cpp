@@ -32,7 +32,7 @@ namespace ui {
 class ContrModel : public QAbstractTableModel {
  public:
   ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept = default;
+  ~ContrModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 

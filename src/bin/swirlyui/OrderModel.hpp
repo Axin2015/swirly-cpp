@@ -32,7 +32,7 @@ namespace ui {
 class OrderModel : public QAbstractTableModel {
  public:
   OrderModel(QObject* parent = nullptr);
-  ~OrderModel() noexcept = default;
+  ~OrderModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 

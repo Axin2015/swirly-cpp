@@ -55,6 +55,8 @@ ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::MaxLots] = tr("MaxLots");
 }
 
+ContrModel::~ContrModel() noexcept = default;
+
 int ContrModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

@@ -59,6 +59,8 @@ MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::OfferCount] = tr("OfferCount");
 }
 
+MarketModel::~MarketModel() noexcept = default;
+
 int MarketModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

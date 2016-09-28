@@ -69,6 +69,8 @@ OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Modified] = tr("Modified");
 }
 
+OrderModel::~OrderModel() noexcept = default;
+
 int OrderModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

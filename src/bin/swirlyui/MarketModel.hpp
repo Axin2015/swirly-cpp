@@ -32,7 +32,7 @@ namespace ui {
 class MarketModel : public QAbstractTableModel {
  public:
   MarketModel(QObject* parent = nullptr);
-  ~MarketModel() noexcept = default;
+  ~MarketModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 

@@ -75,6 +75,8 @@ ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Created] = tr("Created");
 }
 
+ExecModel::~ExecModel() noexcept = default;
+
 int ExecModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

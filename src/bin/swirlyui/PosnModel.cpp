@@ -49,6 +49,8 @@ PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::SellCost] = tr("SellCost");
 }
 
+PosnModel::~PosnModel() noexcept = default;
+
 int PosnModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

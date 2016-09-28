@@ -29,6 +29,22 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
+TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
+  : QWidget{parent, f}, model_{model}
+{
+  QTableView* const table{new QTableView(this)};
+  unique_ptr<QAbstractItemModel> prev(table->model());
+  table->setModel(&model);
+
+  table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  table->setSelectionMode(QAbstractItemView::SingleSelection);
+
+  QGridLayout* const layout{new QGridLayout(this)};
+  layout->addWidget(table, 0, 0);
+}
+
+TradeView::~TradeView() noexcept = default;
+
 void TradeView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
 {
   if (current.isValid()) {
@@ -43,20 +59,6 @@ void TradeView::slotDoubleClicked(const QModelIndex& index)
     QVariant var{model_.data(index, Qt::UserRole)};
     emit doubleClicked(var.value<Exec>());
   }
-}
-
-TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_{model}
-{
-  QTableView* const table{new QTableView(this)};
-  unique_ptr<QAbstractItemModel> prev(table->model());
-  table->setModel(&model);
-
-  table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::SingleSelection);
-
-  QGridLayout* const layout{new QGridLayout(this)};
-  layout->addWidget(table, 0, 0);
 }
 
 } // ui

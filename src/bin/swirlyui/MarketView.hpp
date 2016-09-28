@@ -32,7 +32,7 @@ class MarketView : public QWidget {
 
  public:
   MarketView(MarketModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~MarketView() noexcept = default;
+  ~MarketView() noexcept override;
 
  signals:
   void currentChanged(const Market& market);

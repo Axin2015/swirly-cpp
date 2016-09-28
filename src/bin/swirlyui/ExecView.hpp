@@ -32,7 +32,7 @@ class ExecView : public QWidget {
 
  public:
   ExecView(ExecModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~ExecView() noexcept = default;
+  ~ExecView() noexcept override;
 
  signals:
   void currentChanged(const Exec& exec);

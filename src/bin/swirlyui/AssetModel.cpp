@@ -39,6 +39,8 @@ AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Type] = tr("Type");
 }
 
+AssetModel::~AssetModel() noexcept = default;
+
 int AssetModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

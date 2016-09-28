@@ -75,6 +75,8 @@ TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Created] = tr("Created");
 }
 
+TradeModel::~TradeModel() noexcept = default;
+
 int TradeModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();

@@ -32,7 +32,7 @@ class PosnView : public QWidget {
 
  public:
   PosnView(PosnModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~PosnView() noexcept = default;
+  ~PosnView() noexcept override;
 
  signals:
   void currentChanged(const Posn& posn);

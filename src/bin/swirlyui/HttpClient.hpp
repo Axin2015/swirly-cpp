@@ -36,7 +36,7 @@ class HttpClient : public QObject {
 
  public:
   HttpClient(QObject* parent = nullptr);
-  ~HttpClient() noexcept = default;
+  ~HttpClient() noexcept override;
 
   void postMarket(const QString& contr, QDate settlDate, MarketState state);
 

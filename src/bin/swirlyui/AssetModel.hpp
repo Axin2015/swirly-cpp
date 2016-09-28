@@ -32,7 +32,7 @@ namespace ui {
 class AssetModel : public QAbstractTableModel {
  public:
   AssetModel(QObject* parent = nullptr);
-  ~AssetModel() noexcept = default;
+  ~AssetModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 

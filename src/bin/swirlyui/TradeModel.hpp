@@ -32,7 +32,7 @@ namespace ui {
 class TradeModel : public QAbstractTableModel {
  public:
   TradeModel(QObject* parent = nullptr);
-  ~TradeModel() noexcept = default;
+  ~TradeModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 

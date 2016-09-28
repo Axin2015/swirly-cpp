@@ -32,7 +32,7 @@ class TradeView : public QWidget {
 
  public:
   TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~TradeView() noexcept = default;
+  ~TradeView() noexcept override;
 
  signals:
   void currentChanged(const Exec& trade);

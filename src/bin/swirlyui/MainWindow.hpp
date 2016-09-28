@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow {
 
  public:
   MainWindow();
-  ~MainWindow() noexcept;
+  ~MainWindow() noexcept override;
 
  protected:
   void closeEvent(QCloseEvent* event) override;

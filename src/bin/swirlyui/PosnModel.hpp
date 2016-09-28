@@ -32,7 +32,7 @@ namespace ui {
 class PosnModel : public QAbstractTableModel {
  public:
   PosnModel(QObject* parent = nullptr);
-  ~PosnModel() noexcept = default;
+  ~PosnModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 

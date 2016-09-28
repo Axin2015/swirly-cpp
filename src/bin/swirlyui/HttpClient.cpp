@@ -43,6 +43,8 @@ HttpClient::HttpClient(QObject* parent) : QObject{parent}
   getRefData();
 }
 
+HttpClient::~HttpClient() noexcept = default;
+
 void HttpClient::timerEvent(QTimerEvent* event)
 {
   qDebug() << "timerEvent";

@@ -29,8 +29,6 @@
 namespace swirly {
 namespace ui {
 
-MainWindow::~MainWindow() noexcept = default;
-
 MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 {
   QTabWidget* const topTabs{new QTabWidget{}};
@@ -66,6 +64,8 @@ MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 
   setUnifiedTitleAndToolBarOnMac(true);
 }
+
+MainWindow::~MainWindow() noexcept = default;
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
