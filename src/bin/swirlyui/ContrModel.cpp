@@ -22,23 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  Mnem, //
-  Display, //
-  Asset, //
-  Ccy, //
-  LotNumer, //
-  LotDenom, //
-  TickNumer, //
-  TickDenom, //
-  PipDp, //
-  MinLots, //
-  MaxLots //
-};
-
-} // anonymous
+using namespace contr;
 
 ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
 {
@@ -64,7 +48,7 @@ int ContrModel::rowCount(const QModelIndex& parent) const
 
 int ContrModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant ContrModel::data(const QModelIndex& index, int role) const
@@ -139,7 +123,7 @@ void ContrModel::updateRow(const Contr& contr)
   const bool found{it != rows_.end() && !rows_.key_comp()(contr.mnem(), it->first)};
   if (found) {
     it->second = contr;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

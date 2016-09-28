@@ -22,15 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  Mnem, //
-  Display, //
-  Type //
-};
-
-} // anonymous
+using namespace asset;
 
 AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
 {
@@ -48,7 +40,7 @@ int AssetModel::rowCount(const QModelIndex& parent) const
 
 int AssetModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant AssetModel::data(const QModelIndex& index, int role) const
@@ -99,7 +91,7 @@ void AssetModel::updateRow(const Asset& asset)
   const bool found{it != rows_.end() && !rows_.key_comp()(asset.mnem(), it->first)};
   if (found) {
     it->second = asset;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

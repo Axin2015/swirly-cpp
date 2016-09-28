@@ -45,8 +45,7 @@ class AssetModel : public QAbstractTableModel {
   void updateRow(const Asset& asset);
 
  private:
-  enum { Columns = 3 };
-  QVariant header_[Columns];
+  QVariant header_[asset::column::Count];
   boost::container::flat_map<QString, Asset, std::less<QString>> rows_;
 };
 

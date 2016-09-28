@@ -22,33 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  MarketId, //
-  Contr, //
-  SettlDate, //
-  Id, //
-  OrderId, //
-  Accnt, //
-  Ref, //
-  State, //
-  Side, //
-  Lots, //
-  Ticks, //
-  Resd, //
-  Exec, //
-  Cost, //
-  LastLots, //
-  LastTicks, //
-  MinLots, //
-  MatchId, //
-  LiqInd, //
-  Cpty, //
-  Created //
-};
-
-} // anonymous
+using namespace exec;
 
 TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
 {
@@ -84,7 +58,7 @@ int TradeModel::rowCount(const QModelIndex& parent) const
 
 int TradeModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant TradeModel::data(const QModelIndex& index, int role) const
@@ -190,7 +164,7 @@ void TradeModel::updateRow(const Exec& trade)
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
     it->second = trade;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

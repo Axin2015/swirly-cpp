@@ -26,6 +26,18 @@ class QJsonObject;
 
 namespace swirly {
 namespace ui {
+namespace asset {
+namespace column {
+
+enum { //
+  Mnem, //
+  Display, //
+  Type, //
+  Count
+};
+
+} // column
+} // asset
 
 class Asset {
  public:

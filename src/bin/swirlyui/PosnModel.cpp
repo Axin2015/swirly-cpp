@@ -22,20 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  MarketId, //
-  Contr, //
-  SettlDate, //
-  Accnt, //
-  BuyLots, //
-  BuyCost, //
-  SellLots, //
-  SellCost //
-};
-
-} // anonymous
+using namespace posn;
 
 PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
 {
@@ -58,7 +45,7 @@ int PosnModel::rowCount(const QModelIndex& parent) const
 
 int PosnModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant PosnModel::data(const QModelIndex& index, int role) const
@@ -124,7 +111,7 @@ void PosnModel::updateRow(const Posn& posn)
   const bool found{it != rows_.end() && !rows_.key_comp()(posn.marketId(), it->first)};
   if (found) {
     it->second = posn;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

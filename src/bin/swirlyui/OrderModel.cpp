@@ -22,30 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  MarketId, //
-  Contr, //
-  SettlDate, //
-  Id, //
-  Accnt, //
-  Ref, //
-  State, //
-  Side, //
-  Lots, //
-  Ticks, //
-  Resd, //
-  Exec, //
-  Cost, //
-  LastLots, //
-  LastTicks, //
-  MinLots, //
-  Created, //
-  Modified //
-};
-
-} // anonymous
+using namespace order;
 
 OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
 {
@@ -78,7 +55,7 @@ int OrderModel::rowCount(const QModelIndex& parent) const
 
 int OrderModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant OrderModel::data(const QModelIndex& index, int role) const
@@ -175,7 +152,7 @@ void OrderModel::updateRow(const Order& order)
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
     it->second = order;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);
