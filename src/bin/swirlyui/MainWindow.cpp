@@ -31,16 +31,16 @@ namespace ui {
 
 MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 {
-  QTabWidget* const topTabs{new QTabWidget{}};
-  topTabs->addTab(new AssetView{assetModel_}, tr("Asset"));
-  topTabs->addTab(new ContrView{contrModel_}, tr("Contr"));
-  topTabs->addTab(new MarketView{marketModel_}, tr("Market"));
+  auto* const topTabs{new QTabWidget{}};
+  topTabs->addTab(new AssetView{client_.assetModel()}, tr("Asset"));
+  topTabs->addTab(new ContrView{client_.contrModel()}, tr("Contr"));
+  topTabs->addTab(new MarketView{client_.marketModel()}, tr("Market"));
 
-  QTabWidget* const bottomTabs{new QTabWidget{}};
-  bottomTabs->addTab(new OrderView{orderModel_}, tr("Order"));
-  bottomTabs->addTab(new ExecView{execModel_}, tr("Exec"));
-  bottomTabs->addTab(new TradeView{tradeModel_}, tr("Trade"));
-  bottomTabs->addTab(new PosnView{posnModel_}, tr("Posn"));
+  auto* const bottomTabs{new QTabWidget{}};
+  bottomTabs->addTab(new OrderView{client_.orderModel()}, tr("Order"));
+  bottomTabs->addTab(new ExecView{client_.execModel()}, tr("Exec"));
+  bottomTabs->addTab(new TradeView{client_.tradeModel()}, tr("Trade"));
+  bottomTabs->addTab(new PosnView{client_.posnModel()}, tr("Posn"));
 
   splitter_->addWidget(topTabs);
   splitter_->addWidget(bottomTabs);
@@ -49,13 +49,6 @@ MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
-  connect(&client_, &HttpClient::updateAsset, this, &MainWindow::slotUpdateAsset);
-  connect(&client_, &HttpClient::updateContr, this, &MainWindow::slotUpdateContr);
-  connect(&client_, &HttpClient::updateMarket, this, &MainWindow::slotUpdateMarket);
-  connect(&client_, &HttpClient::updateOrder, this, &MainWindow::slotUpdateOrder);
-  connect(&client_, &HttpClient::updateExec, this, &MainWindow::slotUpdateExec);
-  connect(&client_, &HttpClient::updateTrade, this, &MainWindow::slotUpdateTrade);
-  connect(&client_, &HttpClient::updatePosn, this, &MainWindow::slotUpdatePosn);
 
   createActions();
   createStatusBar();
@@ -86,48 +79,6 @@ void MainWindow::slotRefDataComplete()
 void MainWindow::slotServiceError(const QString& error)
 {
   qDebug() << "slotServiceError:" << error;
-}
-
-void MainWindow::slotUpdateAsset(const Asset& asset)
-{
-  qDebug() << "slotUpdateAsset";
-  assetModel_.updateRow(asset);
-}
-
-void MainWindow::slotUpdateContr(const Contr& contr)
-{
-  qDebug() << "slotUpdateContr";
-  contrModel_.updateRow(contr);
-}
-
-void MainWindow::slotUpdateMarket(const Market& market)
-{
-  qDebug() << "slotUpdateMarket";
-  marketModel_.updateRow(market);
-}
-
-void MainWindow::slotUpdateOrder(const Order& order)
-{
-  qDebug() << "slotUpdateOrder";
-  orderModel_.updateRow(order);
-}
-
-void MainWindow::slotUpdateExec(const Exec& exec)
-{
-  qDebug() << "slotUpdateExec";
-  execModel_.updateRow(exec);
-}
-
-void MainWindow::slotUpdateTrade(const Exec& trade)
-{
-  qDebug() << "slotUpdateTrade";
-  tradeModel_.updateRow(trade);
-}
-
-void MainWindow::slotUpdatePosn(const Posn& posn)
-{
-  qDebug() << "slotUpdatePosn";
-  posnModel_.updateRow(posn);
 }
 
 void MainWindow::slotAbout()

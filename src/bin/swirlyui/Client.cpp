@@ -14,45 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_MAINWINDOW_HPP
-#define SWIRLYUI_MAINWINDOW_HPP
-
-#include "HttpClient.hpp"
-
-#include <QMainWindow>
-
-class QSplitter;
+#include "Client.hpp"
 
 namespace swirly {
 namespace ui {
+namespace {
 
-class MainWindow : public QMainWindow {
-  Q_OBJECT
+} // anonymous
 
- public:
-  MainWindow();
-  ~MainWindow() noexcept override;
-
- protected:
-  void closeEvent(QCloseEvent* event) override;
-
- private slots:
-  void slotRefDataComplete();
-  void slotServiceError(const QString& error);
-  void slotAbout();
-
- private:
-  void createActions();
-  void createStatusBar();
-  void readSettings();
-  void writeSettings();
-  bool canClose();
-
-  HttpClient client_;
-  QSplitter* const splitter_;
-};
+Client::Client(QObject* parent) : QObject{parent}
+{
+}
 
 } // ui
 } // swirly
-
-#endif // SWIRLYUI_MAINWINDOW_HPP
