@@ -33,9 +33,9 @@ MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::LastLots] = tr("LastLots");
   header_[column::LastTicks] = tr("LastTicks");
   header_[column::LastTime] = tr("LastTime");
-  header_[column::BidCount] = tr("BidCount");
-  header_[column::BidResd] = tr("BidResd");
   header_[column::BidTicks] = tr("BidTicks");
+  header_[column::BidResd] = tr("BidResd");
+  header_[column::BidCount] = tr("BidCount");
   header_[column::OfferTicks] = tr("OfferTicks");
   header_[column::OfferResd] = tr("OfferResd");
   header_[column::OfferCount] = tr("OfferCount");

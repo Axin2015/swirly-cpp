@@ -35,6 +35,7 @@ MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
   topTabs->addTab(new AssetView{client_.assetModel()}, tr("Asset"));
   topTabs->addTab(new ContrView{client_.contrModel()}, tr("Contr"));
   topTabs->addTab(new MarketView{client_.marketModel()}, tr("Market"));
+  topTabs->setCurrentIndex(2);
 
   auto* const bottomTabs{new QTabWidget{}};
   bottomTabs->addTab(new OrderView{client_.orderModel()}, tr("Order"));

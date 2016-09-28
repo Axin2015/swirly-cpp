@@ -39,12 +39,12 @@ enum { //
   Contr, //
   SettlDate, //
   State, //
-  LastLots, //
-  LastTicks, //
-  LastTime, //
   BidCount, //
   BidResd, //
   BidTicks, //
+  LastLots, //
+  LastTicks, //
+  LastTime, //
   OfferTicks, //
   OfferResd, //
   OfferCount, //

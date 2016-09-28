@@ -28,6 +28,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
+using namespace market;
 
 MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
@@ -35,6 +36,11 @@ MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   QTableView* const table{new QTableView(this)};
   unique_ptr<QAbstractItemModel> prev(table->model());
   table->setModel(&model);
+
+  table->setColumnHidden(column::Id, true);
+  table->setColumnHidden(column::State, true);
+  table->setColumnHidden(column::LastLots, true);
+  table->setColumnHidden(column::LastTime, true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);

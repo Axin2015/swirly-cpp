@@ -28,6 +28,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
+using namespace exec;
 
 TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
@@ -35,6 +36,11 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   QTableView* const table{new QTableView(this)};
   unique_ptr<QAbstractItemModel> prev(table->model());
   table->setModel(&model);
+
+  table->setColumnHidden(column::MarketId, true);
+  table->setColumnHidden(column::Accnt, true);
+  table->setColumnHidden(column::State, true);
+  table->setColumnHidden(column::MinLots, true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);

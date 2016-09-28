@@ -28,6 +28,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
+using namespace posn;
 
 PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
@@ -35,6 +36,9 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
   QTableView* const table{new QTableView(this)};
   unique_ptr<QAbstractItemModel> prev(table->model());
   table->setModel(&model);
+
+  table->setColumnHidden(column::MarketId, true);
+  table->setColumnHidden(column::Accnt, true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
