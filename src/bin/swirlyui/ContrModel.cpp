@@ -30,13 +30,13 @@ ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Display] = tr("Display");
   header_[column::Asset] = tr("Asset");
   header_[column::Ccy] = tr("Ccy");
-  header_[column::LotNumer] = tr("LotNumer");
-  header_[column::LotDenom] = tr("LotDenom");
-  header_[column::TickNumer] = tr("TickNumer");
-  header_[column::TickDenom] = tr("TickDenom");
-  header_[column::PipDp] = tr("PipDp");
-  header_[column::MinLots] = tr("MinLots");
-  header_[column::MaxLots] = tr("MaxLots");
+  header_[column::LotNumer] = tr("Lot Numer");
+  header_[column::LotDenom] = tr("Lot Denom");
+  header_[column::TickNumer] = tr("Tick Numer");
+  header_[column::TickDenom] = tr("Tick Denom");
+  header_[column::PipDp] = tr("Pip Dp");
+  header_[column::MinLots] = tr("Min Lots");
+  header_[column::MaxLots] = tr("Max Lots");
 }
 
 ContrModel::~ContrModel() noexcept = default;

@@ -26,11 +26,11 @@ using namespace exec;
 
 TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::MarketId] = tr("MarketId");
+  header_[column::MarketId] = tr("Market Id");
   header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("SettlDate");
+  header_[column::SettlDate] = tr("Settl Date");
   header_[column::Id] = tr("Id");
-  header_[column::OrderId] = tr("OrderId");
+  header_[column::OrderId] = tr("Order Id");
   header_[column::Accnt] = tr("Accnt");
   header_[column::Ref] = tr("Ref");
   header_[column::State] = tr("State");
@@ -40,11 +40,11 @@ TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Resd] = tr("Resd");
   header_[column::Exec] = tr("Exec");
   header_[column::Cost] = tr("Cost");
-  header_[column::LastLots] = tr("LastLots");
-  header_[column::LastTicks] = tr("LastTicks");
-  header_[column::MinLots] = tr("MinLots");
-  header_[column::MatchId] = tr("MatchId");
-  header_[column::LiqInd] = tr("LiqInd");
+  header_[column::LastLots] = tr("Last Lots");
+  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::MinLots] = tr("Min Lots");
+  header_[column::MatchId] = tr("Match Id");
+  header_[column::LiqInd] = tr("Liq Ind");
   header_[column::Cpty] = tr("Cpty");
   header_[column::Created] = tr("Created");
 }

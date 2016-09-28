@@ -26,14 +26,14 @@ using namespace posn;
 
 PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::MarketId] = tr("MarketId");
+  header_[column::MarketId] = tr("Market Id");
   header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("SettlDate");
+  header_[column::SettlDate] = tr("Settl Date");
   header_[column::Accnt] = tr("Accnt");
-  header_[column::BuyLots] = tr("BuyLots");
-  header_[column::BuyCost] = tr("BuyCost");
-  header_[column::SellLots] = tr("SellLots");
-  header_[column::SellCost] = tr("SellCost");
+  header_[column::BuyLots] = tr("Buy Lots");
+  header_[column::BuyCost] = tr("Buy Cost");
+  header_[column::SellLots] = tr("Sell Lots");
+  header_[column::SellCost] = tr("Sell Cost");
 }
 
 PosnModel::~PosnModel() noexcept = default;

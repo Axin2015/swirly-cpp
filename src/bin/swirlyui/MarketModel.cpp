@@ -28,17 +28,17 @@ MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
 {
   header_[column::Id] = tr("Id");
   header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("SettlDate");
+  header_[column::SettlDate] = tr("Settl Date");
   header_[column::State] = tr("State");
-  header_[column::LastLots] = tr("LastLots");
-  header_[column::LastTicks] = tr("LastTicks");
-  header_[column::LastTime] = tr("LastTime");
-  header_[column::BidTicks] = tr("BidTicks");
-  header_[column::BidResd] = tr("BidResd");
-  header_[column::BidCount] = tr("BidCount");
-  header_[column::OfferTicks] = tr("OfferTicks");
-  header_[column::OfferResd] = tr("OfferResd");
-  header_[column::OfferCount] = tr("OfferCount");
+  header_[column::LastLots] = tr("Last Lots");
+  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastTime] = tr("Last Time");
+  header_[column::BidTicks] = tr("Bid Ticks");
+  header_[column::BidResd] = tr("Bid Resd");
+  header_[column::BidCount] = tr("Bid Count");
+  header_[column::OfferTicks] = tr("Offer Ticks");
+  header_[column::OfferResd] = tr("Offer Resd");
+  header_[column::OfferCount] = tr("Offer Count");
 }
 
 MarketModel::~MarketModel() noexcept = default;
