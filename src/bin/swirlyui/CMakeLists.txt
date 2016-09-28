@@ -45,6 +45,8 @@ set(swirlyui_SOURCES
   OrderModel.cpp
   OrderView.cpp
   Posn.cpp
+  PosnModel.cpp
+  PosnView.cpp
   TradeModel.cpp
   TradeView.cpp
   Types.cpp)

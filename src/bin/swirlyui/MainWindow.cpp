@@ -20,6 +20,7 @@
 #include "ContrView.hpp"
 #include "MarketView.hpp"
 #include "OrderView.hpp"
+#include "PosnView.hpp"
 #include "TradeView.hpp"
 
 #include <QtWidgets>
@@ -36,6 +37,7 @@ MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
   tabs->addTab(new ContrView{contrModel_}, tr("Contr"));
   tabs->addTab(new OrderView{orderModel_}, tr("Order"));
   tabs->addTab(new TradeView{tradeModel_}, tr("Trade"));
+  tabs->addTab(new PosnView{posnModel_}, tr("Posn"));
 
   splitter_->addWidget(new MarketView{marketModel_});
   splitter_->addWidget(tabs);
@@ -119,6 +121,7 @@ void MainWindow::slotUpdateTrade(const Exec& trade)
 void MainWindow::slotUpdatePosn(const Posn& posn)
 {
   qDebug() << "slotUpdatePosn";
+  posnModel_.updateRow(posn);
 }
 
 void MainWindow::slotAbout()

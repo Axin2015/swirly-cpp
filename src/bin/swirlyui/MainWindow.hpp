@@ -22,6 +22,7 @@
 #include "HttpClient.hpp"
 #include "MarketModel.hpp"
 #include "OrderModel.hpp"
+#include "PosnModel.hpp"
 #include "TradeModel.hpp"
 
 #include <QMainWindow>
@@ -66,6 +67,7 @@ class MainWindow : public QMainWindow {
   MarketModel marketModel_;
   OrderModel orderModel_;
   TradeModel tradeModel_;
+  PosnModel posnModel_;
   QSplitter* const splitter_;
 };
 
