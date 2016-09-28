@@ -33,16 +33,19 @@ MainWindow::~MainWindow() noexcept = default;
 
 MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 {
-  QTabWidget* const tabs{new QTabWidget{}};
-  tabs->addTab(new AssetView{assetModel_}, tr("Asset"));
-  tabs->addTab(new ContrView{contrModel_}, tr("Contr"));
-  tabs->addTab(new OrderView{orderModel_}, tr("Order"));
-  tabs->addTab(new ExecView{execModel_}, tr("Exec"));
-  tabs->addTab(new TradeView{tradeModel_}, tr("Trade"));
-  tabs->addTab(new PosnView{posnModel_}, tr("Posn"));
+  QTabWidget* const topTabs{new QTabWidget{}};
+  topTabs->addTab(new AssetView{assetModel_}, tr("Asset"));
+  topTabs->addTab(new ContrView{contrModel_}, tr("Contr"));
+  topTabs->addTab(new MarketView{marketModel_}, tr("Market"));
 
-  splitter_->addWidget(new MarketView{marketModel_});
-  splitter_->addWidget(tabs);
+  QTabWidget* const bottomTabs{new QTabWidget{}};
+  bottomTabs->addTab(new OrderView{orderModel_}, tr("Order"));
+  bottomTabs->addTab(new ExecView{execModel_}, tr("Exec"));
+  bottomTabs->addTab(new TradeView{tradeModel_}, tr("Trade"));
+  bottomTabs->addTab(new PosnView{posnModel_}, tr("Posn"));
+
+  splitter_->addWidget(topTabs);
+  splitter_->addWidget(bottomTabs);
 
   setCentralWidget(splitter_);
 
