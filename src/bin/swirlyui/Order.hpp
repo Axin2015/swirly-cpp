@@ -17,13 +17,9 @@
 #ifndef SWIRLYUI_ORDER_HPP
 #define SWIRLYUI_ORDER_HPP
 
-#include "Types.hpp"
+#include "Contr.hpp"
 
 #include <QDate>
-#include <QMetaType>
-#include <QString>
-
-class QJsonObject;
 
 namespace swirly {
 namespace ui {
@@ -57,17 +53,17 @@ enum { //
 
 class Order {
  public:
-  Order(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, const QString& accnt,
+  Order(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, const QString& accnt,
         const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
         Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, const QDateTime& created,
         const QDateTime& modified);
   Order() = default;
   ~Order() noexcept = default;
 
-  static Order fromJson(const QJsonObject& obj);
+  static Order fromJson(const Contr& contr, const QJsonObject& obj);
 
   Id64 marketId() const noexcept { return marketId_; }
-  const QString& contr() const noexcept { return contr_; }
+  const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
   const QString& accnt() const noexcept { return accnt_; }
@@ -87,7 +83,7 @@ class Order {
 
  private:
   Id64 marketId_{};
-  QString contr_{};
+  Contr contr_{};
   QDate settlDate_{};
   Id64 id_{};
   QString accnt_{};

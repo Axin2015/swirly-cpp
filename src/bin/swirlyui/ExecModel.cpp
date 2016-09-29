@@ -83,7 +83,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       var = exec.marketId();
       break;
     case column::Contr:
-      var = exec.contr();
+      var = exec.contr().mnem();
       break;
     case column::SettlDate:
       var = exec.settlDate();

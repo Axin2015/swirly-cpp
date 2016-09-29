@@ -83,7 +83,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       var = trade.marketId();
       break;
     case column::Contr:
-      var = trade.contr();
+      var = trade.contr().mnem();
       break;
     case column::SettlDate:
       var = trade.settlDate();

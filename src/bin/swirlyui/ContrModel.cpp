@@ -115,6 +115,16 @@ QVariant ContrModel::headerData(int section, Qt::Orientation orientation, int ro
   return header_[section];
 }
 
+Contr ContrModel::find(const QString& mnem) const
+{
+  Contr contr;
+  auto it = rows_.find(mnem);
+  if (it != rows_.end()) {
+    contr = it->second;
+  }
+  return contr;
+}
+
 void ContrModel::updateRow(const Contr& contr)
 {
   auto it = rows_.lower_bound(contr.mnem());

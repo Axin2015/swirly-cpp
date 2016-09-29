@@ -24,7 +24,7 @@
 namespace swirly {
 namespace ui {
 
-Exec::Exec(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, Id64 orderId,
+Exec::Exec(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, Id64 orderId,
            const QString& accnt, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
            Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
            Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created)
@@ -52,10 +52,10 @@ Exec::Exec(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, Id64 o
 {
 }
 
-Exec Exec::fromJson(const QJsonObject& obj)
+Exec Exec::fromJson(const Contr& contr, const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Exec{fromJson<Id64>(obj["marketId"]),    fromJson<QString>(obj["contr"]),
+  return Exec{fromJson<Id64>(obj["marketId"]),    contr,
               fromJson<QDate>(obj["settlDate"]),  fromJson<Id64>(obj["id"]),
               fromJson<Id64>(obj["orderId"]),     fromJson<QString>(obj["accnt"]),
               fromJson<QString>(obj["ref"]),      fromJson<State>(obj["state"]),

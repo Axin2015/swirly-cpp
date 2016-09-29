@@ -80,7 +80,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       var = order.marketId();
       break;
     case column::Contr:
-      var = order.contr();
+      var = order.contr().mnem();
       break;
     case column::SettlDate:
       var = order.settlDate();

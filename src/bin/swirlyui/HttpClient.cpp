@@ -116,6 +116,11 @@ void HttpClient::slotFinished(QNetworkReply* reply)
   }
 }
 
+Contr HttpClient::findContr(const QJsonObject& obj) const
+{
+  return contrModel().find(fromJson<QString>(obj["contr"]));
+}
+
 void HttpClient::getRefData()
 {
   QNetworkRequest request{QUrl{"http://127.0.0.1:8080/ref"}};
@@ -180,29 +185,29 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
 
   const auto obj = doc.object();
   for (const auto elem : obj["markets"].toArray()) {
-    const auto market = Market::fromJson(elem.toObject());
-    qDebug() << "market:" << market;
-    marketModel().updateRow(market);
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    marketModel().updateRow(Market::fromJson(contr, obj));
   }
   for (const auto elem : obj["orders"].toArray()) {
-    const auto order = Order::fromJson(elem.toObject());
-    qDebug() << "order:" << order;
-    orderModel().updateRow(order);
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    orderModel().updateRow(Order::fromJson(contr, obj));
   }
   for (const auto elem : obj["execs"].toArray()) {
-    const auto exec = Exec::fromJson(elem.toObject());
-    qDebug() << "exec:" << exec;
-    execModel().updateRow(exec);
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    execModel().updateRow(Exec::fromJson(contr, obj));
   }
   for (const auto elem : obj["trades"].toArray()) {
-    const auto trade = Exec::fromJson(elem.toObject());
-    qDebug() << "trade:" << trade;
-    tradeModel().updateRow(trade);
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    tradeModel().updateRow(Exec::fromJson(contr, obj));
   }
   for (const auto elem : obj["posns"].toArray()) {
-    const auto posn = Posn::fromJson(elem.toObject());
-    qDebug() << "posn:" << posn;
-    posnModel().updateRow(posn);
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    posnModel().updateRow(Posn::fromJson(contr, obj));
   }
 }
 

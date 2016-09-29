@@ -38,11 +38,11 @@ void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray&
 
 } // anonymous
 
-Market Market::fromJson(const QJsonObject& obj)
+Market Market::fromJson(const Contr& contr, const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
 
-  Market market{fromJson<Id64>(obj["id"]),           fromJson<QString>(obj["contr"]),
+  Market market{fromJson<Id64>(obj["id"]),           contr,
                 fromJson<QDate>(obj["settlDate"]),   fromJson<MarketState>(obj["state"]),
                 fromJson<Lots>(obj["lastLots"]),     fromJson<Ticks>(obj["lastTicks"]),
                 fromJson<QDateTime>(obj["lastTime"])};
@@ -63,7 +63,7 @@ Market Market::fromJson(const QJsonObject& obj)
 QDebug operator<<(QDebug debug, const Market& market)
 {
   debug.nospace() << "Market{id=" << market.id() //
-                  << ",contr=" << market.contr() //
+                  << ",contr=" << market.contr().mnem() //
                   << ",settlDate=" << market.settlDate() //
                   << ",state=" << market.state() //
                   << ",lastLots=" << market.lastLots() //
