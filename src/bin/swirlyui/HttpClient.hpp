@@ -17,26 +17,19 @@
 #ifndef SWIRLYUI_HTTPCLIENT_HPP
 #define SWIRLYUI_HTTPCLIENT_HPP
 
-#include "Types.hpp"
+#include "Client.hpp"
 
 #include <QNetworkAccessManager>
 
 namespace swirly {
 namespace ui {
 
-class Asset;
-class Contr;
-class Market;
-class Order;
-class Exec;
-class Posn;
-
-class HttpClient : public QObject {
+class HttpClient : public Client {
   Q_OBJECT
 
  public:
   HttpClient(QObject* parent = nullptr);
-  ~HttpClient() noexcept = default;
+  ~HttpClient() noexcept override;
 
   void postMarket(const QString& contr, QDate settlDate, MarketState state);
 
@@ -47,15 +40,6 @@ class HttpClient : public QObject {
   void timerEvent(QTimerEvent* event) override;
 
  signals:
-  void refDataComplete();
-  void serviceError(const QString& error);
-  void updateAsset(const Asset& asset);
-  void updateContr(const Contr& contr);
-  void updateMarket(const Market& market);
-  void updateOrder(const Order& order);
-  void updateExec(const Exec& exec);
-  void updateTrade(const Exec& trade);
-  void updatePosn(const Posn& posn);
 
  private slots:
   void slotFinished(QNetworkReply* reply);

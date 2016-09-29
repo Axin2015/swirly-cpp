@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "TradeView.hpp"
+#include "PosnView.hpp"
 
-#include "TradeModel.hpp"
+#include "PosnModel.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -28,9 +28,9 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-using namespace exec;
+using namespace posn;
 
-TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
+PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
 {
   QTableView* const table{new QTableView(this)};
@@ -39,8 +39,6 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
 
   table->setColumnHidden(column::MarketId, true);
   table->setColumnHidden(column::Accnt, true);
-  table->setColumnHidden(column::State, true);
-  table->setColumnHidden(column::MinLots, true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -49,21 +47,21 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   layout->addWidget(table, 0, 0);
 }
 
-TradeView::~TradeView() noexcept = default;
+PosnView::~PosnView() noexcept = default;
 
-void TradeView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void PosnView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
 {
   if (current.isValid()) {
     QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Exec>());
+    emit currentChanged(var.value<Posn>());
   }
 }
 
-void TradeView::slotDoubleClicked(const QModelIndex& index)
+void PosnView::slotDoubleClicked(const QModelIndex& index)
 {
   if (index.isValid()) {
     QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Exec>());
+    emit doubleClicked(var.value<Posn>());
   }
 }
 

@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "AssetModel.hpp"
+#include "PosnModel.hpp"
 
 #include <algorithm>
 
@@ -22,28 +22,33 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-using namespace asset;
+using namespace posn;
 
-AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
+PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::Mnem] = tr("Mnem");
-  header_[column::Display] = tr("Display");
-  header_[column::Type] = tr("Type");
+  header_[column::MarketId] = tr("Market Id");
+  header_[column::Contr] = tr("Contr");
+  header_[column::SettlDate] = tr("Settl Date");
+  header_[column::Accnt] = tr("Accnt");
+  header_[column::BuyLots] = tr("Buy Lots");
+  header_[column::BuyCost] = tr("Buy Cost");
+  header_[column::SellLots] = tr("Sell Lots");
+  header_[column::SellCost] = tr("Sell Cost");
 }
 
-AssetModel::~AssetModel() noexcept = default;
+PosnModel::~PosnModel() noexcept = default;
 
-int AssetModel::rowCount(const QModelIndex& parent) const
+int PosnModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();
 }
 
-int AssetModel::columnCount(const QModelIndex& parent) const
+int PosnModel::columnCount(const QModelIndex& parent) const
 {
   return column::Count;
 }
 
-QVariant AssetModel::data(const QModelIndex& index, int role) const
+QVariant PosnModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid()) {
     return QVariant{};
@@ -59,23 +64,38 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
 
   QVariant var;
   if (role == Qt::DisplayRole) {
-    const auto& asset = rows_.nth(index.row())->second;
+    const auto& posn = rows_.nth(index.row())->second;
     switch (index.column()) {
-    case column::Mnem:
-      var = asset.mnem();
+    case column::MarketId:
+      var = posn.marketId();
       break;
-    case column::Display:
-      var = asset.display();
+    case column::Contr:
+      var = posn.contr();
       break;
-    case column::Type:
-      var = enumString(asset.type());
+    case column::SettlDate:
+      var = posn.settlDate();
+      break;
+    case column::Accnt:
+      var = posn.accnt();
+      break;
+    case column::BuyLots:
+      var = posn.buyLots();
+      break;
+    case column::BuyCost:
+      var = posn.buyCost();
+      break;
+    case column::SellLots:
+      var = posn.sellLots();
+      break;
+    case column::SellCost:
+      var = posn.sellCost();
       break;
     }
   }
   return var;
 }
 
-QVariant AssetModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant PosnModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
     return QVariant{};
@@ -83,19 +103,19 @@ QVariant AssetModel::headerData(int section, Qt::Orientation orientation, int ro
   return header_[section];
 }
 
-void AssetModel::updateRow(const Asset& asset)
+void PosnModel::updateRow(const Posn& posn)
 {
-  auto it = rows_.lower_bound(asset.mnem());
+  auto it = rows_.lower_bound(posn.marketId());
   const int i = distance(rows_.begin(), it);
 
-  const bool found{it != rows_.end() && !rows_.key_comp()(asset.mnem(), it->first)};
+  const bool found{it != rows_.end() && !rows_.key_comp()(posn.marketId(), it->first)};
   if (found) {
-    it->second = asset;
+    it->second = posn;
     emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, asset.mnem(), asset);
+    rows_.emplace_hint(it, posn.marketId(), posn);
     endInsertRows();
   }
 }

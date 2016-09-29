@@ -14,41 +14,42 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_TRADEVIEW_HPP
-#define SWIRLYUI_TRADEVIEW_HPP
+#ifndef SWIRLYUI_POSNMODEL_HPP
+#define SWIRLYUI_POSNMODEL_HPP
 
-#include <QWidget>
+#include "Posn.hpp"
 
-class QModelIndex;
+#include <QAbstractTableModel>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#include <boost/container/flat_map.hpp>
+#pragma GCC diagnostic pop
 
 namespace swirly {
 namespace ui {
 
-class Exec;
-class TradeModel;
-
-class TradeView : public QWidget {
-  Q_OBJECT
-
+class PosnModel : public QAbstractTableModel {
  public:
-  TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~TradeView() noexcept override;
+  PosnModel(QObject* parent = nullptr);
+  ~PosnModel() noexcept override;
 
- signals:
-  void currentChanged(const Exec& trade);
+  int rowCount(const QModelIndex& parent) const override;
 
-  void doubleClicked(const Exec& trade);
+  int columnCount(const QModelIndex& parent) const override;
 
- private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
+  QVariant data(const QModelIndex& index, int role) const override;
 
-  void slotDoubleClicked(const QModelIndex& index);
+  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+  void updateRow(const Posn& posn);
 
  private:
-  TradeModel& model_;
+  QVariant header_[posn::column::Count];
+  boost::container::flat_map<Id64, Posn, std::less<Id64>> rows_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_TRADEVIEW_HPP
+#endif // SWIRLYUI_POSNMODEL_HPP

@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "TradeView.hpp"
+#include "MarketView.hpp"
 
-#include "TradeModel.hpp"
+#include "MarketModel.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -28,19 +28,19 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-using namespace exec;
+using namespace market;
 
-TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
+MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
 {
   QTableView* const table{new QTableView(this)};
   unique_ptr<QAbstractItemModel> prev(table->model());
   table->setModel(&model);
 
-  table->setColumnHidden(column::MarketId, true);
-  table->setColumnHidden(column::Accnt, true);
+  table->setColumnHidden(column::Id, true);
   table->setColumnHidden(column::State, true);
-  table->setColumnHidden(column::MinLots, true);
+  table->setColumnHidden(column::LastLots, true);
+  table->setColumnHidden(column::LastTime, true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -49,21 +49,21 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   layout->addWidget(table, 0, 0);
 }
 
-TradeView::~TradeView() noexcept = default;
+MarketView::~MarketView() noexcept = default;
 
-void TradeView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void MarketView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
 {
   if (current.isValid()) {
     QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Exec>());
+    emit currentChanged(var.value<Market>());
   }
 }
 
-void TradeView::slotDoubleClicked(const QModelIndex& index)
+void MarketView::slotDoubleClicked(const QModelIndex& index)
 {
   if (index.isValid()) {
     QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Exec>());
+    emit doubleClicked(var.value<Market>());
   }
 }
 

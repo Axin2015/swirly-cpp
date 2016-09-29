@@ -32,7 +32,7 @@ namespace ui {
 class ContrModel : public QAbstractTableModel {
  public:
   ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept = default;
+  ~ContrModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 
@@ -45,8 +45,7 @@ class ContrModel : public QAbstractTableModel {
   void updateRow(const Contr& contr);
 
  private:
-  enum { Columns = 11 };
-  QVariant header_[Columns];
+  QVariant header_[contr::column::Count];
   boost::container::flat_map<QString, Contr, std::less<QString>> rows_;
 };
 

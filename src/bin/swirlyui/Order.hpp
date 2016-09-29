@@ -27,6 +27,33 @@ class QJsonObject;
 
 namespace swirly {
 namespace ui {
+namespace order {
+namespace column {
+
+enum { //
+  MarketId, //
+  Contr, //
+  SettlDate, //
+  Id, //
+  Accnt, //
+  Ref, //
+  State, //
+  Side, //
+  Lots, //
+  Ticks, //
+  Resd, //
+  Exec, //
+  Cost, //
+  LastLots, //
+  LastTicks, //
+  MinLots, //
+  Created, //
+  Modified, //
+  Count
+};
+
+} // column
+} // order
 
 class Order {
  public:

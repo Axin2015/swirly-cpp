@@ -29,20 +29,27 @@ set(swirlyui_SOURCES
   Asset.cpp
   AssetModel.cpp
   AssetView.cpp
+  Client.cpp
   Contr.cpp
   ContrModel.cpp
   ContrView.cpp
   Exec.cpp
+  ExecModel.cpp
+  ExecView.cpp
   HttpClient.cpp
   Json.cpp
   Level.cpp
   Main.cpp
   MainWindow.cpp
   Market.cpp
+  MarketModel.cpp
+  MarketView.cpp
   Order.cpp
   OrderModel.cpp
   OrderView.cpp
   Posn.cpp
+  PosnModel.cpp
+  PosnView.cpp
   TradeModel.cpp
   TradeView.cpp
   Types.cpp)

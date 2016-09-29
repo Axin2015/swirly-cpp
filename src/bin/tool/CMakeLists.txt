@@ -13,10 +13,6 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-set(bin_FILES
-  swirly_shell
-)
-
 install(PROGRAMS ${bin_FILES} DESTINATION bin)
 
 add_executable(swirly_bench Bench.cpp)

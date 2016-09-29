@@ -32,7 +32,7 @@ class ContrView : public QWidget {
 
  public:
   ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~ContrView() noexcept = default;
+  ~ContrView() noexcept override;
 
  signals:
   void currentChanged(const Contr& contr);

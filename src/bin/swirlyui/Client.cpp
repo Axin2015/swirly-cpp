@@ -14,41 +14,17 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_TRADEVIEW_HPP
-#define SWIRLYUI_TRADEVIEW_HPP
-
-#include <QWidget>
-
-class QModelIndex;
+#include "Client.hpp"
 
 namespace swirly {
 namespace ui {
+namespace {
 
-class Exec;
-class TradeModel;
+} // anonymous
 
-class TradeView : public QWidget {
-  Q_OBJECT
-
- public:
-  TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~TradeView() noexcept override;
-
- signals:
-  void currentChanged(const Exec& trade);
-
-  void doubleClicked(const Exec& trade);
-
- private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
-
- private:
-  TradeModel& model_;
-};
+Client::Client(QObject* parent) : QObject{parent}
+{
+}
 
 } // ui
 } // swirly
-
-#endif // SWIRLYUI_TRADEVIEW_HPP

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_TRADEVIEW_HPP
-#define SWIRLYUI_TRADEVIEW_HPP
+#ifndef SWIRLYUI_MARKETVIEW_HPP
+#define SWIRLYUI_MARKETVIEW_HPP
 
 #include <QWidget>
 
@@ -24,20 +24,20 @@ class QModelIndex;
 namespace swirly {
 namespace ui {
 
-class Exec;
-class TradeModel;
+class Market;
+class MarketModel;
 
-class TradeView : public QWidget {
+class MarketView : public QWidget {
   Q_OBJECT
 
  public:
-  TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~TradeView() noexcept override;
+  MarketView(MarketModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  ~MarketView() noexcept override;
 
  signals:
-  void currentChanged(const Exec& trade);
+  void currentChanged(const Market& market);
 
-  void doubleClicked(const Exec& trade);
+  void doubleClicked(const Market& market);
 
  private slots:
   void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
@@ -45,10 +45,10 @@ class TradeView : public QWidget {
   void slotDoubleClicked(const QModelIndex& index);
 
  private:
-  TradeModel& model_;
+  MarketModel& model_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_TRADEVIEW_HPP
+#endif // SWIRLYUI_MARKETVIEW_HPP

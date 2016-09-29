@@ -32,7 +32,7 @@ namespace ui {
 class OrderModel : public QAbstractTableModel {
  public:
   OrderModel(QObject* parent = nullptr);
-  ~OrderModel() noexcept = default;
+  ~OrderModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 
@@ -45,8 +45,7 @@ class OrderModel : public QAbstractTableModel {
   void updateRow(const Order& order);
 
  private:
-  enum { Columns = 18 };
-  QVariant header_[Columns];
+  QVariant header_[order::column::Count];
   using Key = std::pair<Id64, Id64>;
   boost::container::flat_map<Key, Order, std::less<Key>> rows_;
 };

@@ -26,6 +26,26 @@ class QJsonObject;
 
 namespace swirly {
 namespace ui {
+namespace contr {
+namespace column {
+
+enum { //
+  Mnem, //
+  Display, //
+  Asset, //
+  Ccy, //
+  LotNumer, //
+  LotDenom, //
+  TickNumer, //
+  TickDenom, //
+  PipDp, //
+  MinLots, //
+  MaxLots, //
+  Count
+};
+
+} // column
+} // contr
 
 class Contr {
  public:

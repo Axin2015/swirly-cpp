@@ -17,15 +17,11 @@
 #ifndef SWIRLYUI_MAINWINDOW_HPP
 #define SWIRLYUI_MAINWINDOW_HPP
 
-#include "AssetModel.hpp"
-#include "ContrModel.hpp"
 #include "HttpClient.hpp"
-#include "OrderModel.hpp"
-#include "TradeModel.hpp"
 
 #include <QMainWindow>
 
-class QTabWidget;
+class QSplitter;
 
 namespace swirly {
 namespace ui {
@@ -35,7 +31,7 @@ class MainWindow : public QMainWindow {
 
  public:
   MainWindow();
-  ~MainWindow() noexcept;
+  ~MainWindow() noexcept override;
 
  protected:
   void closeEvent(QCloseEvent* event) override;
@@ -43,12 +39,6 @@ class MainWindow : public QMainWindow {
  private slots:
   void slotRefDataComplete();
   void slotServiceError(const QString& error);
-  void slotUpdateAsset(const Asset& asset);
-  void slotUpdateContr(const Contr& contr);
-  void slotUpdateOrder(const Order& order);
-  void slotUpdateExec(const Exec& exec);
-  void slotUpdateTrade(const Exec& trade);
-  void slotUpdatePosn(const Posn& posn);
   void slotAbout();
 
  private:
@@ -59,11 +49,7 @@ class MainWindow : public QMainWindow {
   bool canClose();
 
   HttpClient client_;
-  AssetModel assetModel_;
-  ContrModel contrModel_;
-  OrderModel orderModel_;
-  TradeModel tradeModel_;
-  QTabWidget* const tabs_;
+  QSplitter* const splitter_;
 };
 
 } // ui

@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "TradeModel.hpp"
+#include "ExecModel.hpp"
 
 #include <algorithm>
 
@@ -24,7 +24,7 @@ namespace swirly {
 namespace ui {
 using namespace exec;
 
-TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
+ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
 {
   header_[column::MarketId] = tr("Market Id");
   header_[column::Contr] = tr("Contr");
@@ -49,19 +49,19 @@ TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Created] = tr("Created");
 }
 
-TradeModel::~TradeModel() noexcept = default;
+ExecModel::~ExecModel() noexcept = default;
 
-int TradeModel::rowCount(const QModelIndex& parent) const
+int ExecModel::rowCount(const QModelIndex& parent) const
 {
   return rows_.size();
 }
 
-int TradeModel::columnCount(const QModelIndex& parent) const
+int ExecModel::columnCount(const QModelIndex& parent) const
 {
   return column::Count;
 }
 
-QVariant TradeModel::data(const QModelIndex& index, int role) const
+QVariant ExecModel::data(const QModelIndex& index, int role) const
 {
   if (!index.isValid()) {
     return QVariant{};
@@ -77,77 +77,77 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
 
   QVariant var;
   if (role == Qt::DisplayRole) {
-    const auto& trade = rows_.nth(index.row())->second;
+    const auto& exec = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
-      var = trade.marketId();
+      var = exec.marketId();
       break;
     case column::Contr:
-      var = trade.contr();
+      var = exec.contr();
       break;
     case column::SettlDate:
-      var = trade.settlDate();
+      var = exec.settlDate();
       break;
     case column::Id:
-      var = trade.id();
+      var = exec.id();
       break;
     case column::OrderId:
-      var = trade.orderId();
+      var = exec.orderId();
       break;
     case column::Accnt:
-      var = trade.accnt();
+      var = exec.accnt();
       break;
     case column::Ref:
-      var = trade.ref();
+      var = exec.ref();
       break;
     case column::State:
-      var = enumString(trade.state());
+      var = enumString(exec.state());
       break;
     case column::Side:
-      var = enumString(trade.side());
+      var = enumString(exec.side());
       break;
     case column::Lots:
-      var = trade.lots();
+      var = exec.lots();
       break;
     case column::Ticks:
-      var = trade.ticks();
+      var = exec.ticks();
       break;
     case column::Resd:
-      var = trade.resd();
+      var = exec.resd();
       break;
     case column::Exec:
-      var = trade.exec();
+      var = exec.exec();
       break;
     case column::Cost:
-      var = trade.cost();
+      var = exec.cost();
       break;
     case column::LastLots:
-      var = trade.lastLots();
+      var = exec.lastLots();
       break;
     case column::LastTicks:
-      var = trade.lastTicks();
+      var = exec.lastTicks();
       break;
     case column::MinLots:
-      var = trade.minLots();
+      var = exec.minLots();
       break;
     case column::MatchId:
-      var = trade.matchId();
+      var = exec.matchId();
       break;
     case column::LiqInd:
-      var = enumString(trade.liqInd());
+      var = enumString(exec.liqInd());
       break;
     case column::Cpty:
-      var = trade.cpty();
+      var = exec.cpty();
       break;
     case column::Created:
-      var = trade.created();
+      var = exec.created();
       break;
     }
   }
   return var;
 }
 
-QVariant TradeModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ExecModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
     return QVariant{};
@@ -155,20 +155,20 @@ QVariant TradeModel::headerData(int section, Qt::Orientation orientation, int ro
   return header_[section];
 }
 
-void TradeModel::updateRow(const Exec& trade)
+void ExecModel::updateRow(const Exec& exec)
 {
-  const auto key = make_pair(trade.marketId(), trade.id());
+  const auto key = make_pair(exec.marketId(), exec.id());
   auto it = rows_.lower_bound(key);
   const int i = distance(rows_.begin(), it);
 
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
-    it->second = trade;
+    it->second = exec;
     emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, key, trade);
+    rows_.emplace_hint(it, key, exec);
     endInsertRows();
   }
 }

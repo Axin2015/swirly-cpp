@@ -32,7 +32,7 @@ class OrderView : public QWidget {
 
  public:
   OrderView(OrderModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~OrderView() noexcept = default;
+  ~OrderView() noexcept override;
 
  signals:
   void currentChanged(const Order& order);

@@ -22,23 +22,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  Mnem, //
-  Display, //
-  Asset, //
-  Ccy, //
-  LotNumer, //
-  LotDenom, //
-  TickNumer, //
-  TickDenom, //
-  PipDp, //
-  MinLots, //
-  MaxLots //
-};
-
-} // anonymous
+using namespace contr;
 
 ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
 {
@@ -46,14 +30,16 @@ ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Display] = tr("Display");
   header_[column::Asset] = tr("Asset");
   header_[column::Ccy] = tr("Ccy");
-  header_[column::LotNumer] = tr("LotNumer");
-  header_[column::LotDenom] = tr("LotDenom");
-  header_[column::TickNumer] = tr("TickNumer");
-  header_[column::TickDenom] = tr("TickDenom");
-  header_[column::PipDp] = tr("PipDp");
-  header_[column::MinLots] = tr("MinLots");
-  header_[column::MaxLots] = tr("MaxLots");
+  header_[column::LotNumer] = tr("Lot Numer");
+  header_[column::LotDenom] = tr("Lot Denom");
+  header_[column::TickNumer] = tr("Tick Numer");
+  header_[column::TickDenom] = tr("Tick Denom");
+  header_[column::PipDp] = tr("Pip Dp");
+  header_[column::MinLots] = tr("Min Lots");
+  header_[column::MaxLots] = tr("Max Lots");
 }
+
+ContrModel::~ContrModel() noexcept = default;
 
 int ContrModel::rowCount(const QModelIndex& parent) const
 {
@@ -62,7 +48,7 @@ int ContrModel::rowCount(const QModelIndex& parent) const
 
 int ContrModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant ContrModel::data(const QModelIndex& index, int role) const
@@ -137,7 +123,7 @@ void ContrModel::updateRow(const Contr& contr)
   const bool found{it != rows_.end() && !rows_.key_comp()(contr.mnem(), it->first)};
   if (found) {
     it->second = contr;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

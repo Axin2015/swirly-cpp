@@ -22,36 +22,13 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-namespace column {
-
-enum { //
-  MarketId, //
-  Contr, //
-  SettlDate, //
-  Id, //
-  Accnt, //
-  Ref, //
-  State, //
-  Side, //
-  Lots, //
-  Ticks, //
-  Resd, //
-  Exec, //
-  Cost, //
-  LastLots, //
-  LastTicks, //
-  MinLots, //
-  Created, //
-  Modified //
-};
-
-} // anonymous
+using namespace order;
 
 OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::MarketId] = tr("MarketId");
+  header_[column::MarketId] = tr("Market Id");
   header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("SettlDate");
+  header_[column::SettlDate] = tr("Settl Date");
   header_[column::Id] = tr("Id");
   header_[column::Accnt] = tr("Accnt");
   header_[column::Ref] = tr("Ref");
@@ -62,12 +39,14 @@ OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::Resd] = tr("Resd");
   header_[column::Exec] = tr("Exec");
   header_[column::Cost] = tr("Cost");
-  header_[column::LastLots] = tr("LastLots");
-  header_[column::LastTicks] = tr("LastTicks");
-  header_[column::MinLots] = tr("MinLots");
+  header_[column::LastLots] = tr("Last Lots");
+  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::MinLots] = tr("Min Lots");
   header_[column::Created] = tr("Created");
   header_[column::Modified] = tr("Modified");
 }
+
+OrderModel::~OrderModel() noexcept = default;
 
 int OrderModel::rowCount(const QModelIndex& parent) const
 {
@@ -76,7 +55,7 @@ int OrderModel::rowCount(const QModelIndex& parent) const
 
 int OrderModel::columnCount(const QModelIndex& parent) const
 {
-  return Columns;
+  return column::Count;
 }
 
 QVariant OrderModel::data(const QModelIndex& index, int role) const
@@ -173,7 +152,7 @@ void OrderModel::updateRow(const Order& order)
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
     it->second = order;
-    emit dataChanged(index(i, 0), index(i, Columns - 1));
+    emit dataChanged(index(i, 0), index(i, column::Count - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

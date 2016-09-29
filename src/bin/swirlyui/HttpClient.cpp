@@ -37,11 +37,13 @@ enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder };
 
 } // anonymous
 
-HttpClient::HttpClient(QObject* parent) : QObject{parent}
+HttpClient::HttpClient(QObject* parent) : Client{parent}
 {
   connect(&nam_, &QNetworkAccessManager::finished, this, &HttpClient::slotFinished);
   getRefData();
 }
+
+HttpClient::~HttpClient() noexcept = default;
 
 void HttpClient::timerEvent(QTimerEvent* event)
 {
@@ -148,12 +150,12 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
   for (const auto elem : obj["assets"].toArray()) {
     const auto asset = Asset::fromJson(elem.toObject());
     qDebug() << "asset:" << asset;
-    emit updateAsset(asset);
+    assetModel().updateRow(asset);
   }
   for (const auto elem : obj["contrs"].toArray()) {
     const auto contr = Contr::fromJson(elem.toObject());
     qDebug() << "contr:" << contr;
-    emit updateContr(contr);
+    contrModel().updateRow(contr);
   }
   emit refDataComplete();
 
@@ -180,27 +182,27 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
   for (const auto elem : obj["markets"].toArray()) {
     const auto market = Market::fromJson(elem.toObject());
     qDebug() << "market:" << market;
-    emit updateMarket(market);
+    marketModel().updateRow(market);
   }
   for (const auto elem : obj["orders"].toArray()) {
     const auto order = Order::fromJson(elem.toObject());
     qDebug() << "order:" << order;
-    emit updateOrder(order);
+    orderModel().updateRow(order);
   }
   for (const auto elem : obj["execs"].toArray()) {
     const auto exec = Exec::fromJson(elem.toObject());
     qDebug() << "exec:" << exec;
-    emit updateExec(exec);
+    execModel().updateRow(exec);
   }
   for (const auto elem : obj["trades"].toArray()) {
     const auto trade = Exec::fromJson(elem.toObject());
     qDebug() << "trade:" << trade;
-    emit updateTrade(trade);
+    tradeModel().updateRow(trade);
   }
   for (const auto elem : obj["posns"].toArray()) {
     const auto posn = Posn::fromJson(elem.toObject());
     qDebug() << "posn:" << posn;
-    emit updatePosn(posn);
+    posnModel().updateRow(posn);
   }
 }
 

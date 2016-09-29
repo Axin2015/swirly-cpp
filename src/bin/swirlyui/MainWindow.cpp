@@ -18,7 +18,10 @@
 
 #include "AssetView.hpp"
 #include "ContrView.hpp"
+#include "ExecView.hpp"
+#include "MarketView.hpp"
 #include "OrderView.hpp"
+#include "PosnView.hpp"
 #include "TradeView.hpp"
 
 #include <QtWidgets>
@@ -26,24 +29,27 @@
 namespace swirly {
 namespace ui {
 
-MainWindow::~MainWindow() noexcept = default;
-
-MainWindow::MainWindow() : tabs_{new QTabWidget{}}
+MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
 {
-  tabs_->addTab(new AssetView{assetModel_}, tr("Asset"));
-  tabs_->addTab(new ContrView{contrModel_}, tr("Contr"));
-  tabs_->addTab(new OrderView{orderModel_}, tr("Order"));
-  tabs_->addTab(new TradeView{tradeModel_}, tr("Trade"));
-  setCentralWidget(tabs_);
+  auto* const topTabs{new QTabWidget{}};
+  topTabs->addTab(new AssetView{client_.assetModel()}, tr("Asset"));
+  topTabs->addTab(new ContrView{client_.contrModel()}, tr("Contr"));
+  topTabs->addTab(new MarketView{client_.marketModel()}, tr("Market"));
+  topTabs->setCurrentIndex(2);
+
+  auto* const bottomTabs{new QTabWidget{}};
+  bottomTabs->addTab(new OrderView{client_.orderModel()}, tr("Order"));
+  bottomTabs->addTab(new ExecView{client_.execModel()}, tr("Exec"));
+  bottomTabs->addTab(new TradeView{client_.tradeModel()}, tr("Trade"));
+  bottomTabs->addTab(new PosnView{client_.posnModel()}, tr("Posn"));
+
+  splitter_->addWidget(topTabs);
+  splitter_->addWidget(bottomTabs);
+
+  setCentralWidget(splitter_);
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
-  connect(&client_, &HttpClient::updateAsset, this, &MainWindow::slotUpdateAsset);
-  connect(&client_, &HttpClient::updateContr, this, &MainWindow::slotUpdateContr);
-  connect(&client_, &HttpClient::updateOrder, this, &MainWindow::slotUpdateOrder);
-  connect(&client_, &HttpClient::updateExec, this, &MainWindow::slotUpdateExec);
-  connect(&client_, &HttpClient::updateTrade, this, &MainWindow::slotUpdateTrade);
-  connect(&client_, &HttpClient::updatePosn, this, &MainWindow::slotUpdatePosn);
 
   createActions();
   createStatusBar();
@@ -52,6 +58,8 @@ MainWindow::MainWindow() : tabs_{new QTabWidget{}}
 
   setUnifiedTitleAndToolBarOnMac(true);
 }
+
+MainWindow::~MainWindow() noexcept = default;
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
@@ -72,40 +80,6 @@ void MainWindow::slotRefDataComplete()
 void MainWindow::slotServiceError(const QString& error)
 {
   qDebug() << "slotServiceError:" << error;
-}
-
-void MainWindow::slotUpdateAsset(const Asset& asset)
-{
-  qDebug() << "slotUpdateAsset";
-  assetModel_.updateRow(asset);
-}
-
-void MainWindow::slotUpdateContr(const Contr& contr)
-{
-  qDebug() << "slotUpdateContr";
-  contrModel_.updateRow(contr);
-}
-
-void MainWindow::slotUpdateOrder(const Order& order)
-{
-  qDebug() << "slotUpdateOrder";
-  orderModel_.updateRow(order);
-}
-
-void MainWindow::slotUpdateExec(const Exec& exec)
-{
-  qDebug() << "slotUpdateExec";
-}
-
-void MainWindow::slotUpdateTrade(const Exec& trade)
-{
-  qDebug() << "slotUpdateTrade";
-  tradeModel_.updateRow(trade);
-}
-
-void MainWindow::slotUpdatePosn(const Posn& posn)
-{
-  qDebug() << "slotUpdatePosn";
 }
 
 void MainWindow::slotAbout()

@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "TradeView.hpp"
+#include "ExecView.hpp"
 
-#include "TradeModel.hpp"
+#include "ExecModel.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -30,7 +30,7 @@ namespace swirly {
 namespace ui {
 using namespace exec;
 
-TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
+ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
 {
   QTableView* const table{new QTableView(this)};
@@ -39,7 +39,6 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
 
   table->setColumnHidden(column::MarketId, true);
   table->setColumnHidden(column::Accnt, true);
-  table->setColumnHidden(column::State, true);
   table->setColumnHidden(column::MinLots, true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -49,9 +48,9 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   layout->addWidget(table, 0, 0);
 }
 
-TradeView::~TradeView() noexcept = default;
+ExecView::~ExecView() noexcept = default;
 
-void TradeView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void ExecView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
 {
   if (current.isValid()) {
     QVariant var{model_.data(current, Qt::UserRole)};
@@ -59,7 +58,7 @@ void TradeView::slotCurrentChanged(const QModelIndex& current, const QModelIndex
   }
 }
 
-void TradeView::slotDoubleClicked(const QModelIndex& index)
+void ExecView::slotDoubleClicked(const QModelIndex& index)
 {
   if (index.isValid()) {
     QVariant var{model_.data(index, Qt::UserRole)};

@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_ASSETMODEL_HPP
-#define SWIRLYUI_ASSETMODEL_HPP
+#ifndef SWIRLYUI_EXECMODEL_HPP
+#define SWIRLYUI_EXECMODEL_HPP
 
-#include "Asset.hpp"
+#include "Exec.hpp"
 
 #include <QAbstractTableModel>
 
@@ -29,10 +29,10 @@
 namespace swirly {
 namespace ui {
 
-class AssetModel : public QAbstractTableModel {
+class ExecModel : public QAbstractTableModel {
  public:
-  AssetModel(QObject* parent = nullptr);
-  ~AssetModel() noexcept override;
+  ExecModel(QObject* parent = nullptr);
+  ~ExecModel() noexcept override;
 
   int rowCount(const QModelIndex& parent) const override;
 
@@ -42,14 +42,16 @@ class AssetModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Asset& asset);
+  void updateRow(const Exec& exec);
 
  private:
-  QVariant header_[asset::column::Count];
-  boost::container::flat_map<QString, Asset, std::less<QString>> rows_;
+  QVariant header_[exec::column::Count];
+  using Key = std::pair<Id64, Id64>;
+  // FIXME: use circular buffer.
+  boost::container::flat_map<Key, Exec, std::less<Key>> rows_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_ASSETMODEL_HPP
+#endif // SWIRLYUI_EXECMODEL_HPP
