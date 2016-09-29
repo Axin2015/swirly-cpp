@@ -22,6 +22,8 @@
 #include <QMetaType>
 #include <QString>
 
+#include <memory>
+
 class QJsonObject;
 
 namespace swirly {
@@ -47,52 +49,66 @@ enum { //
 } // column
 } // contr
 
+// Cheap copies.
 class Contr {
  public:
   Contr(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
         int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-        Lots maxLots);
+        Lots maxLots)
+    : impl_{std::make_shared<const Impl>(mnem, display, asset, ccy, lotNumer, lotDenom, tickNumer,
+                                         tickDenom, pipDp, minLots, maxLots)}
+  {
+  }
   Contr() = default;
   ~Contr() noexcept = default;
 
   static Contr fromJson(const QJsonObject& obj);
 
-  const QString& mnem() const noexcept { return mnem_; }
-  const QString& display() const noexcept { return display_; }
-  const QString& asset() const noexcept { return asset_; }
-  const QString& ccy() const noexcept { return ccy_; }
-  int lotNumer() const noexcept { return lotNumer_; }
-  int lotDenom() const noexcept { return lotDenom_; }
-  double qtyInc() const noexcept { return qtyInc_; }
-  int tickNumer() const noexcept { return tickNumer_; }
-  int tickDenom() const noexcept { return tickDenom_; }
-  double priceInc() const noexcept { return priceInc_; }
-  int pipDp() const noexcept { return pipDp_; }
-  int qtyDp() const noexcept { return qtyDp_; }
-  int priceDp() const noexcept { return priceDp_; }
-  Lots minLots() const noexcept { return minLots_; }
-  Lots maxLots() const noexcept { return maxLots_; }
+  const QString& mnem() const noexcept { return impl_->mnem; }
+  const QString& display() const noexcept { return impl_->display; }
+  const QString& asset() const noexcept { return impl_->asset; }
+  const QString& ccy() const noexcept { return impl_->ccy; }
+  int lotNumer() const noexcept { return impl_->lotNumer; }
+  int lotDenom() const noexcept { return impl_->lotDenom; }
+  double qtyInc() const noexcept { return impl_->qtyInc; }
+  int tickNumer() const noexcept { return impl_->tickNumer; }
+  int tickDenom() const noexcept { return impl_->tickDenom; }
+  double priceInc() const noexcept { return impl_->priceInc; }
+  int pipDp() const noexcept { return impl_->pipDp; }
+  int qtyDp() const noexcept { return impl_->qtyDp; }
+  int priceDp() const noexcept { return impl_->priceDp; }
+  Lots minLots() const noexcept { return impl_->minLots; }
+  Lots maxLots() const noexcept { return impl_->maxLots; }
 
  private:
-  QString mnem_{};
-  QString display_{};
-  QString asset_{};
-  QString ccy_{};
-  int lotNumer_{};
-  int lotDenom_{};
-  // Transient.
-  double qtyInc_{};
-  int tickNumer_{};
-  int tickDenom_{};
-  // Transient.
-  double priceInc_{};
-  int pipDp_{};
-  // Transient.
-  int qtyDp_{};
-  // Transient.
-  int priceDp_{};
-  Lots minLots_{};
-  Lots maxLots_{};
+  struct Impl {
+    Impl(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
+         int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+         Lots maxLots);
+    Impl() = default;
+    ~Impl() noexcept = default;
+    QString mnem{};
+    QString display{};
+    QString asset{};
+    QString ccy{};
+    int lotNumer{};
+    int lotDenom{};
+    // Transient.
+    double qtyInc{};
+    int tickNumer{};
+    int tickDenom{};
+    // Transient.
+    double priceInc{};
+    int pipDp{};
+    // Transient.
+    int qtyDp{};
+    // Transient.
+    int priceDp{};
+    Lots minLots{};
+    Lots maxLots{};
+  };
+  static std::shared_ptr<const Impl> empty();
+  std::shared_ptr<const Impl> impl_{empty()};
 };
 
 QDebug operator<<(QDebug debug, const Contr& contr);

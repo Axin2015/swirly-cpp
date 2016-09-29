@@ -22,39 +22,47 @@
 #include <QDebug>
 #include <QJsonObject>
 
+using namespace std;
+
 namespace swirly {
 namespace ui {
 
-Contr::Contr(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
-             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-             Lots maxLots)
-  : mnem_{mnem},
-    display_{display},
-    asset_{asset},
-    ccy_{ccy},
-    lotNumer_{lotNumer},
-    lotDenom_{lotDenom},
-    qtyInc_{fractToReal(lotNumer, lotDenom)},
-    tickNumer_{tickNumer},
-    tickDenom_{tickDenom},
-    priceInc_{fractToReal(tickNumer, tickDenom)},
-    pipDp_{pipDp},
-    qtyDp_{realToDp(qtyInc_)},
-    priceDp_{realToDp(priceInc_)},
-    minLots_{minLots},
-    maxLots_{maxLots}
+Contr::Impl::Impl(const QString& mnem, const QString& display, const QString& asset,
+                  const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+                  int pipDp, Lots minLots, Lots maxLots)
+  : mnem{mnem},
+    display{display},
+    asset{asset},
+    ccy{ccy},
+    lotNumer{lotNumer},
+    lotDenom{lotDenom},
+    qtyInc{fractToReal(lotNumer, lotDenom)},
+    tickNumer{tickNumer},
+    tickDenom{tickDenom},
+    priceInc{fractToReal(tickNumer, tickDenom)},
+    pipDp{pipDp},
+    qtyDp{realToDp(qtyInc)},
+    priceDp{realToDp(priceInc)},
+    minLots{minLots},
+    maxLots{maxLots}
 {
 }
 
 Contr Contr::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Contr{fromJson<QString>(obj["mnem"]),  fromJson<QString>(obj["display"]),
+  return Contr(fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
                fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
-               fromJson<int>(obj["lotNumer"]),  fromJson<int>(obj["lotDenom"]),
+               fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
                fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
-               fromJson<int>(obj["pipDp"]),     fromJson<qint64>(obj["minLots"]),
-               fromJson<qint64>(obj["maxLots"])};
+               fromJson<int>(obj["pipDp"]), fromJson<qint64>(obj["minLots"]),
+               fromJson<qint64>(obj["maxLots"]));
+}
+
+shared_ptr<const Contr::Impl> Contr::empty()
+{
+  static auto impl = make_shared<const Impl>();
+  return impl;
 }
 
 QDebug operator<<(QDebug debug, const Contr& contr)
