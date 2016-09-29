@@ -24,6 +24,31 @@
 namespace swirly {
 namespace ui {
 
+Order::Order(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, const QString& accnt,
+             const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
+             Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+             const QDateTime& created, const QDateTime& modified)
+  : marketId_{marketId},
+    contr_{contr},
+    settlDate_{settlDate},
+    id_{id},
+    accnt_{accnt},
+    ref_{ref},
+    state_{state},
+    side_{side},
+    lots_{lots},
+    ticks_{ticks},
+    resd_{resd},
+    exec_{exec},
+    cost_{cost},
+    lastLots_{lastLots},
+    lastTicks_{lastTicks},
+    minLots_{minLots},
+    created_{created},
+    modified_{modified}
+{
+}
+
 Order Order::fromJson(const QJsonObject& obj)
 {
   using swirly::ui::fromJson;

@@ -51,20 +51,7 @@ class Contr {
  public:
   Contr(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
         int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-        Lots maxLots)
-    : mnem_{mnem},
-      display_{display},
-      asset_{asset},
-      ccy_{ccy},
-      lotNumer_{lotNumer},
-      lotDenom_{lotDenom},
-      tickNumer_{tickNumer},
-      tickDenom_{tickDenom},
-      pipDp_{pipDp},
-      minLots_{minLots},
-      maxLots_{maxLots}
-  {
-  }
+        Lots maxLots);
   Contr() = default;
   ~Contr() noexcept = default;
 
@@ -76,9 +63,13 @@ class Contr {
   const QString& ccy() const noexcept { return ccy_; }
   int lotNumer() const noexcept { return lotNumer_; }
   int lotDenom() const noexcept { return lotDenom_; }
+  double qtyInc() const noexcept { return qtyInc_; }
   int tickNumer() const noexcept { return tickNumer_; }
   int tickDenom() const noexcept { return tickDenom_; }
+  double priceInc() const noexcept { return priceInc_; }
   int pipDp() const noexcept { return pipDp_; }
+  int qtyDp() const noexcept { return qtyDp_; }
+  int priceDp() const noexcept { return priceDp_; }
   Lots minLots() const noexcept { return minLots_; }
   Lots maxLots() const noexcept { return maxLots_; }
 
@@ -89,9 +80,17 @@ class Contr {
   QString ccy_{};
   int lotNumer_{};
   int lotDenom_{};
+  // Transient.
+  double qtyInc_{};
   int tickNumer_{};
   int tickDenom_{};
+  // Transient.
+  double priceInc_{};
   int pipDp_{};
+  // Transient.
+  int qtyDp_{};
+  // Transient.
+  int priceDp_{};
   Lots minLots_{};
   Lots maxLots_{};
 };

@@ -16,6 +16,7 @@
  */
 #include "Contr.hpp"
 
+#include "Conv.hpp"
 #include "Json.hpp"
 
 #include <QDebug>
@@ -23,6 +24,27 @@
 
 namespace swirly {
 namespace ui {
+
+Contr::Contr(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
+             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+             Lots maxLots)
+  : mnem_{mnem},
+    display_{display},
+    asset_{asset},
+    ccy_{ccy},
+    lotNumer_{lotNumer},
+    lotDenom_{lotDenom},
+    qtyInc_{fractToReal(lotNumer, lotDenom)},
+    tickNumer_{tickNumer},
+    tickDenom_{tickDenom},
+    priceInc_{fractToReal(tickNumer, tickDenom)},
+    pipDp_{pipDp},
+    qtyDp_{realToDp(qtyInc_)},
+    priceDp_{realToDp(priceInc_)},
+    minLots_{minLots},
+    maxLots_{maxLots}
+{
+}
 
 Contr Contr::fromJson(const QJsonObject& obj)
 {

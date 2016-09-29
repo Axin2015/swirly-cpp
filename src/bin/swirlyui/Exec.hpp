@@ -63,30 +63,7 @@ class Exec {
   Exec(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, Id64 orderId,
        const QString& accnt, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
        Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
-       LiqInd liqInd, const QString& cpty, const QDateTime& created)
-    : marketId_{marketId},
-      contr_{contr},
-      settlDate_{settlDate},
-      id_{id},
-      orderId_{orderId},
-      accnt_{accnt},
-      ref_{ref},
-      state_{state},
-      side_{side},
-      lots_{lots},
-      ticks_{ticks},
-      resd_{resd},
-      exec_{exec},
-      cost_{cost},
-      lastLots_{lastLots},
-      lastTicks_{lastTicks},
-      minLots_{minLots},
-      matchId_{matchId},
-      liqInd_{liqInd},
-      cpty_{cpty},
-      created_{created}
-  {
-  }
+       LiqInd liqInd, const QString& cpty, const QDateTime& created);
   Exec() = default;
   ~Exec() noexcept = default;
 
