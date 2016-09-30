@@ -34,6 +34,11 @@ constexpr double fractToReal(int numer, int denom) noexcept
   return static_cast<double>(numer) / static_cast<double>(denom);
 }
 
+constexpr double fractToReal(Incs numer, Incs denom) noexcept
+{
+  return static_cast<double>(numer) / static_cast<double>(denom);
+}
+
 constexpr Incs realToIncs(double real, double incSize) noexcept
 {
   return roundHalfAway(real / incSize);

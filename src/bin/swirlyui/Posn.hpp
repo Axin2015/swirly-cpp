@@ -32,9 +32,9 @@ enum { //
   SettlDate, //
   Accnt, //
   BuyLots, //
-  BuyCost, //
+  BuyAvgPrice, //
   SellLots, //
-  SellCost, //
+  SellAvgPrice, //
   Count
 };
 

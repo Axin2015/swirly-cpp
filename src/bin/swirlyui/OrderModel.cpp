@@ -35,12 +35,12 @@ OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::State] = tr("State");
   header_[column::Side] = tr("Side");
   header_[column::Lots] = tr("Lots");
-  header_[column::Ticks] = tr("Ticks");
+  header_[column::Price] = tr("Price");
   header_[column::Resd] = tr("Resd");
   header_[column::Exec] = tr("Exec");
-  header_[column::Cost] = tr("Cost");
+  header_[column::AvgPrice] = tr("Avg Price");
   header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastPrice] = tr("Last Price");
   header_[column::MinLots] = tr("Min Lots");
   header_[column::Created] = tr("Created");
   header_[column::Modified] = tr("Modified");
@@ -103,8 +103,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     case column::Lots:
       var = order.lots();
       break;
-    case column::Ticks:
-      var = order.ticks();
+    case column::Price:
+      var = ticksToPriceString(order.ticks(), order.contr());
       break;
     case column::Resd:
       var = order.resd();
@@ -112,14 +112,14 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     case column::Exec:
       var = order.exec();
       break;
-    case column::Cost:
-      var = order.cost();
+    case column::AvgPrice:
+      var = ticksToAvgPriceString(order.exec(), order.cost(), order.contr());
       break;
     case column::LastLots:
       var = order.lastLots();
       break;
-    case column::LastTicks:
-      var = order.lastTicks();
+    case column::LastPrice:
+      var = ticksToPriceString(order.lastTicks(), order.contr());
       break;
     case column::MinLots:
       var = order.minLots();

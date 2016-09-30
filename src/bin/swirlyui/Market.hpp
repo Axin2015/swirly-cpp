@@ -38,11 +38,11 @@ enum { //
   State, //
   BidCount, //
   BidResd, //
-  BidTicks, //
+  BidPrice, //
   LastLots, //
-  LastTicks, //
+  LastPrice, //
   LastTime, //
-  OfferTicks, //
+  OfferPrice, //
   OfferResd, //
   OfferCount, //
   Count

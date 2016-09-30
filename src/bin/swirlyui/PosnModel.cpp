@@ -31,9 +31,9 @@ PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::SettlDate] = tr("Settl Date");
   header_[column::Accnt] = tr("Accnt");
   header_[column::BuyLots] = tr("Buy Lots");
-  header_[column::BuyCost] = tr("Buy Cost");
+  header_[column::BuyAvgPrice] = tr("Buy Avg Price");
   header_[column::SellLots] = tr("Sell Lots");
-  header_[column::SellCost] = tr("Sell Cost");
+  header_[column::SellAvgPrice] = tr("Sell Avg Price");
 }
 
 PosnModel::~PosnModel() noexcept = default;
@@ -81,14 +81,14 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     case column::BuyLots:
       var = posn.buyLots();
       break;
-    case column::BuyCost:
-      var = posn.buyCost();
+    case column::BuyAvgPrice:
+      var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
       break;
     case column::SellLots:
       var = posn.sellLots();
       break;
-    case column::SellCost:
-      var = posn.sellCost();
+    case column::SellAvgPrice:
+      var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
       break;
     }
   }

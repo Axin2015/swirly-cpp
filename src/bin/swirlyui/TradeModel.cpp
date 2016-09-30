@@ -36,12 +36,12 @@ TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::State] = tr("State");
   header_[column::Side] = tr("Side");
   header_[column::Lots] = tr("Lots");
-  header_[column::Ticks] = tr("Ticks");
+  header_[column::Price] = tr("Price");
   header_[column::Resd] = tr("Resd");
   header_[column::Exec] = tr("Exec");
-  header_[column::Cost] = tr("Cost");
+  header_[column::AvgPrice] = tr("Avg Price");
   header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastPrice] = tr("Last Price");
   header_[column::MinLots] = tr("Min Lots");
   header_[column::MatchId] = tr("Match Id");
   header_[column::LiqInd] = tr("Liq Ind");
@@ -109,8 +109,8 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     case column::Lots:
       var = trade.lots();
       break;
-    case column::Ticks:
-      var = trade.ticks();
+    case column::Price:
+      var = ticksToPriceString(trade.ticks(), trade.contr());
       break;
     case column::Resd:
       var = trade.resd();
@@ -118,14 +118,14 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     case column::Exec:
       var = trade.exec();
       break;
-    case column::Cost:
-      var = trade.cost();
+    case column::AvgPrice:
+      var = ticksToAvgPriceString(trade.exec(), trade.cost(), trade.contr());
       break;
     case column::LastLots:
       var = trade.lastLots();
       break;
-    case column::LastTicks:
-      var = trade.lastTicks();
+    case column::LastPrice:
+      var = ticksToPriceString(trade.lastTicks(), trade.contr());
       break;
     case column::MinLots:
       var = trade.minLots();

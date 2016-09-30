@@ -37,12 +37,12 @@ enum { //
   State, //
   Side, //
   Lots, //
-  Ticks, //
+  Price, //
   Resd, //
   Exec, //
-  Cost, //
+  AvgPrice, //
   LastLots, //
-  LastTicks, //
+  LastPrice, //
   MinLots, //
   MatchId, //
   LiqInd, //

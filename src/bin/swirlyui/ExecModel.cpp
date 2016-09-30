@@ -36,12 +36,12 @@ ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::State] = tr("State");
   header_[column::Side] = tr("Side");
   header_[column::Lots] = tr("Lots");
-  header_[column::Ticks] = tr("Ticks");
+  header_[column::Price] = tr("Price");
   header_[column::Resd] = tr("Resd");
   header_[column::Exec] = tr("Exec");
-  header_[column::Cost] = tr("Cost");
+  header_[column::AvgPrice] = tr("Avg Price");
   header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastPrice] = tr("Last Price");
   header_[column::MinLots] = tr("Min Lots");
   header_[column::MatchId] = tr("Match Id");
   header_[column::LiqInd] = tr("Liq Ind");
@@ -109,8 +109,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     case column::Lots:
       var = exec.lots();
       break;
-    case column::Ticks:
-      var = exec.ticks();
+    case column::Price:
+      var = ticksToPriceString(exec.ticks(), exec.contr());
       break;
     case column::Resd:
       var = exec.resd();
@@ -118,14 +118,14 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     case column::Exec:
       var = exec.exec();
       break;
-    case column::Cost:
-      var = exec.cost();
+    case column::AvgPrice:
+      var = ticksToAvgPriceString(exec.exec(), exec.cost(), exec.contr());
       break;
     case column::LastLots:
       var = exec.lastLots();
       break;
-    case column::LastTicks:
-      var = exec.lastTicks();
+    case column::LastPrice:
+      var = ticksToPriceString(exec.lastTicks(), exec.contr());
       break;
     case column::MinLots:
       var = exec.minLots();

@@ -31,12 +31,12 @@ MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::SettlDate] = tr("Settl Date");
   header_[column::State] = tr("State");
   header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastPrice] = tr("Last Price");
   header_[column::LastTime] = tr("Last Time");
-  header_[column::BidTicks] = tr("Bid Ticks");
+  header_[column::BidPrice] = tr("Bid Price");
   header_[column::BidResd] = tr("Bid Resd");
   header_[column::BidCount] = tr("Bid Count");
-  header_[column::OfferTicks] = tr("Offer Ticks");
+  header_[column::OfferPrice] = tr("Offer Price");
   header_[column::OfferResd] = tr("Offer Resd");
   header_[column::OfferCount] = tr("Offer Count");
 }
@@ -86,14 +86,14 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     case column::LastLots:
       var = market.lastLots();
       break;
-    case column::LastTicks:
-      var = market.lastTicks();
+    case column::LastPrice:
+      var = ticksToPriceString(market.lastTicks(), market.contr());
       break;
     case column::LastTime:
       var = market.lastTime();
       break;
-    case column::BidTicks:
-      var = market.bestBid().ticks();
+    case column::BidPrice:
+      var = ticksToPriceString(market.bestBid().ticks(), market.contr());
       break;
     case column::BidResd:
       var = market.bestBid().resd();
@@ -101,8 +101,8 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     case column::BidCount:
       var = market.bestBid().count();
       break;
-    case column::OfferTicks:
-      var = market.bestOffer().ticks();
+    case column::OfferPrice:
+      var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
       break;
     case column::OfferResd:
       var = market.bestOffer().resd();

@@ -18,6 +18,7 @@
 #define SWIRLYUI_ORDER_HPP
 
 #include "Contr.hpp"
+#include "Conv.hpp"
 
 #include <QDate>
 
@@ -36,12 +37,12 @@ enum { //
   State, //
   Side, //
   Lots, //
-  Ticks, //
+  Price, //
   Resd, //
   Exec, //
-  Cost, //
+  AvgPrice, //
   LastLots, //
-  LastTicks, //
+  LastPrice, //
   MinLots, //
   Created, //
   Modified, //

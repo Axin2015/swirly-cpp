@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_CONTR_HPP
 #define SWIRLYUI_CONTR_HPP
 
-#include "Types.hpp"
+#include "Conv.hpp"
 
 #include <QMetaType>
 #include <QString>
@@ -112,6 +112,43 @@ class Contr {
 };
 
 QDebug operator<<(QDebug debug, const Contr& contr);
+
+inline double lotsToQty(Lots lots, const Contr& contr) noexcept
+{
+  return lotsToQty(lots, contr.qtyInc());
+}
+
+inline QString lotsToQtyString(Lots lots, const Contr& contr)
+{
+  const auto qty = lotsToQty(lots, contr);
+  return QString::number(qty, 'f', contr.qtyDp());
+}
+
+inline double ticksToPrice(Ticks ticks, const Contr& contr) noexcept
+{
+  return ticksToPrice(ticks, contr.priceInc());
+}
+
+inline QString ticksToPriceString(Ticks ticks, const Contr& contr)
+{
+  const auto price = ticksToPrice(ticks, contr);
+  return QString::number(price, 'f', contr.priceDp());
+}
+
+inline double ticksToAvgPrice(Lots lots, Cost cost, const Contr& contr) noexcept
+{
+  double ticks = 0;
+  if (lots != 0) {
+    ticks = fractToReal(cost, lots);
+  }
+  return ticks * contr.priceInc();
+}
+
+inline QString ticksToAvgPriceString(Lots lots, Cost cost, const Contr& contr)
+{
+  const auto price = ticksToAvgPrice(lots, cost, contr);
+  return QString::number(price, 'f', contr.priceDp() + 1);
+}
 
 } // ui
 } // swirly
