@@ -37,6 +37,14 @@ class Client : public QObject {
   Client(QObject* parent = nullptr);
   ~Client() noexcept = default;
 
+  const AssetModel& assetModel() const noexcept { return assetModel_; }
+  const ContrModel& contrModel() const noexcept { return contrModel_; }
+  const MarketModel& marketModel() const noexcept { return marketModel_; }
+  const OrderModel& orderModel() const noexcept { return orderModel_; }
+  const ExecModel& execModel() const noexcept { return execModel_; }
+  const TradeModel& tradeModel() const noexcept { return tradeModel_; }
+  const PosnModel& posnModel() const noexcept { return posnModel_; }
+
   AssetModel& assetModel() noexcept { return assetModel_; }
   ContrModel& contrModel() noexcept { return contrModel_; }
   MarketModel& marketModel() noexcept { return marketModel_; }

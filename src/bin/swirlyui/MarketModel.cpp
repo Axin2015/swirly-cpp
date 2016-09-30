@@ -31,12 +31,12 @@ MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::SettlDate] = tr("Settl Date");
   header_[column::State] = tr("State");
   header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastPrice] = tr("Last Price");
   header_[column::LastTime] = tr("Last Time");
-  header_[column::BidTicks] = tr("Bid Ticks");
+  header_[column::BidPrice] = tr("Bid Price");
   header_[column::BidResd] = tr("Bid Resd");
   header_[column::BidCount] = tr("Bid Count");
-  header_[column::OfferTicks] = tr("Offer Ticks");
+  header_[column::OfferPrice] = tr("Offer Price");
   header_[column::OfferResd] = tr("Offer Resd");
   header_[column::OfferCount] = tr("Offer Count");
 }
@@ -55,27 +55,17 @@ int MarketModel::columnCount(const QModelIndex& parent) const
 
 QVariant MarketModel::data(const QModelIndex& index, int role) const
 {
+  QVariant var{};
   if (!index.isValid()) {
-    return QVariant{};
-  }
-
-  if (role == Qt::TextAlignmentRole) {
-    return QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-  }
-
-  if (role == Qt::UserRole) {
-    return QVariant::fromValue(rows_.nth(index.row())->second);
-  }
-
-  QVariant var;
-  if (role == Qt::DisplayRole) {
+    // No-op.
+  } else if (role == Qt::DisplayRole) {
     const auto& market = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::Id:
       var = market.id();
       break;
     case column::Contr:
-      var = market.contr();
+      var = market.contr().mnem();
       break;
     case column::SettlDate:
       var = market.settlDate();
@@ -86,14 +76,14 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     case column::LastLots:
       var = market.lastLots();
       break;
-    case column::LastTicks:
-      var = market.lastTicks();
+    case column::LastPrice:
+      var = ticksToPriceString(market.lastTicks(), market.contr());
       break;
     case column::LastTime:
       var = market.lastTime();
       break;
-    case column::BidTicks:
-      var = market.bestBid().ticks();
+    case column::BidPrice:
+      var = ticksToPriceString(market.bestBid().ticks(), market.contr());
       break;
     case column::BidResd:
       var = market.bestBid().resd();
@@ -101,8 +91,8 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     case column::BidCount:
       var = market.bestBid().count();
       break;
-    case column::OfferTicks:
-      var = market.bestOffer().ticks();
+    case column::OfferPrice:
+      var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
       break;
     case column::OfferResd:
       var = market.bestOffer().resd();
@@ -111,6 +101,28 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       var = market.bestOffer().count();
       break;
     }
+  } else if (role == Qt::TextAlignmentRole) {
+    switch (index.column()) {
+    case column::Contr:
+    case column::State:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::Id:
+    case column::SettlDate:
+    case column::LastLots:
+    case column::LastPrice:
+    case column::LastTime:
+    case column::BidPrice:
+    case column::BidResd:
+    case column::BidCount:
+    case column::OfferPrice:
+    case column::OfferResd:
+    case column::OfferCount:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
+  } else if (role == Qt::UserRole) {
+    var = QVariant::fromValue(rows_.nth(index.row())->second);
   }
   return var;
 }

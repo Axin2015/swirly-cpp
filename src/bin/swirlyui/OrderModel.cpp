@@ -35,12 +35,12 @@ OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::State] = tr("State");
   header_[column::Side] = tr("Side");
   header_[column::Lots] = tr("Lots");
-  header_[column::Ticks] = tr("Ticks");
+  header_[column::Price] = tr("Price");
   header_[column::Resd] = tr("Resd");
   header_[column::Exec] = tr("Exec");
-  header_[column::Cost] = tr("Cost");
+  header_[column::AvgPrice] = tr("Avg Price");
   header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastTicks] = tr("Last Ticks");
+  header_[column::LastPrice] = tr("Last Price");
   header_[column::MinLots] = tr("Min Lots");
   header_[column::Created] = tr("Created");
   header_[column::Modified] = tr("Modified");
@@ -60,27 +60,17 @@ int OrderModel::columnCount(const QModelIndex& parent) const
 
 QVariant OrderModel::data(const QModelIndex& index, int role) const
 {
+  QVariant var{};
   if (!index.isValid()) {
-    return QVariant{};
-  }
-
-  if (role == Qt::TextAlignmentRole) {
-    return QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-  }
-
-  if (role == Qt::UserRole) {
-    return QVariant::fromValue(rows_.nth(index.row())->second);
-  }
-
-  QVariant var;
-  if (role == Qt::DisplayRole) {
+    // No-op.
+  } else if (role == Qt::DisplayRole) {
     const auto& order = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
       var = order.marketId();
       break;
     case column::Contr:
-      var = order.contr();
+      var = order.contr().mnem();
       break;
     case column::SettlDate:
       var = order.settlDate();
@@ -103,8 +93,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     case column::Lots:
       var = order.lots();
       break;
-    case column::Ticks:
-      var = order.ticks();
+    case column::Price:
+      var = ticksToPriceString(order.ticks(), order.contr());
       break;
     case column::Resd:
       var = order.resd();
@@ -112,14 +102,14 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     case column::Exec:
       var = order.exec();
       break;
-    case column::Cost:
-      var = order.cost();
+    case column::AvgPrice:
+      var = ticksToAvgPriceString(order.exec(), order.cost(), order.contr());
       break;
     case column::LastLots:
       var = order.lastLots();
       break;
-    case column::LastTicks:
-      var = order.lastTicks();
+    case column::LastPrice:
+      var = ticksToPriceString(order.lastTicks(), order.contr());
       break;
     case column::MinLots:
       var = order.minLots();
@@ -131,6 +121,33 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       var = order.modified();
       break;
     }
+  } else if (role == Qt::TextAlignmentRole) {
+    switch (index.column()) {
+    case column::Contr:
+    case column::Accnt:
+    case column::Ref:
+    case column::State:
+    case column::Side:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::MarketId:
+    case column::SettlDate:
+    case column::Id:
+    case column::Lots:
+    case column::Price:
+    case column::Resd:
+    case column::Exec:
+    case column::AvgPrice:
+    case column::LastLots:
+    case column::LastPrice:
+    case column::MinLots:
+    case column::Created:
+    case column::Modified:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
+  } else if (role == Qt::UserRole) {
+    var = QVariant::fromValue(rows_.nth(index.row())->second);
   }
   return var;
 }

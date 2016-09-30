@@ -17,13 +17,9 @@
 #ifndef SWIRLYUI_POSN_HPP
 #define SWIRLYUI_POSN_HPP
 
-#include "Types.hpp"
+#include "Contr.hpp"
 
 #include <QDate>
-#include <QMetaType>
-#include <QString>
-
-class QJsonObject;
 
 namespace swirly {
 namespace ui {
@@ -36,9 +32,9 @@ enum { //
   SettlDate, //
   Accnt, //
   BuyLots, //
-  BuyCost, //
+  BuyAvgPrice, //
   SellLots, //
-  SellCost, //
+  SellAvgPrice, //
   Count
 };
 
@@ -47,7 +43,7 @@ enum { //
 
 class Posn {
  public:
-  Posn(Id64 marketId, const QString& contr, QDate settlDate, const QString& accnt, Lots buyLots,
+  Posn(Id64 marketId, const Contr& contr, QDate settlDate, const QString& accnt, Lots buyLots,
        Cost buyCost, Lots sellLots, Cost sellCost)
     : marketId_{marketId},
       contr_{contr},
@@ -62,10 +58,10 @@ class Posn {
   Posn() = default;
   ~Posn() noexcept = default;
 
-  static Posn fromJson(const QJsonObject& obj);
+  static Posn fromJson(const Contr& contr, const QJsonObject& obj);
 
   Id64 marketId() const noexcept { return marketId_; }
-  const QString& contr() const noexcept { return contr_; }
+  const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   const QString& accnt() const noexcept { return accnt_; }
   Lots buyLots() const noexcept { return buyLots_; }
@@ -75,7 +71,7 @@ class Posn {
 
  private:
   Id64 marketId_{};
-  QString contr_{};
+  Contr contr_{};
   QDate settlDate_{};
   QString accnt_{};
   Lots buyLots_{};

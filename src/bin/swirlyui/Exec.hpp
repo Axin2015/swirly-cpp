@@ -17,13 +17,9 @@
 #ifndef SWIRLYUI_EXEC_HPP
 #define SWIRLYUI_EXEC_HPP
 
-#include "Types.hpp"
+#include "Contr.hpp"
 
 #include <QDate>
-#include <QMetaType>
-#include <QString>
-
-class QJsonObject;
 
 namespace swirly {
 namespace ui {
@@ -41,12 +37,12 @@ enum { //
   State, //
   Side, //
   Lots, //
-  Ticks, //
+  Price, //
   Resd, //
   Exec, //
-  Cost, //
+  AvgPrice, //
   LastLots, //
-  LastTicks, //
+  LastPrice, //
   MinLots, //
   MatchId, //
   LiqInd, //
@@ -60,40 +56,17 @@ enum { //
 
 class Exec {
  public:
-  Exec(Id64 marketId, const QString& contr, QDate settlDate, Id64 id, Id64 orderId,
+  Exec(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, Id64 orderId,
        const QString& accnt, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
        Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
-       LiqInd liqInd, const QString& cpty, const QDateTime& created)
-    : marketId_{marketId},
-      contr_{contr},
-      settlDate_{settlDate},
-      id_{id},
-      orderId_{orderId},
-      accnt_{accnt},
-      ref_{ref},
-      state_{state},
-      side_{side},
-      lots_{lots},
-      ticks_{ticks},
-      resd_{resd},
-      exec_{exec},
-      cost_{cost},
-      lastLots_{lastLots},
-      lastTicks_{lastTicks},
-      minLots_{minLots},
-      matchId_{matchId},
-      liqInd_{liqInd},
-      cpty_{cpty},
-      created_{created}
-  {
-  }
+       LiqInd liqInd, const QString& cpty, const QDateTime& created);
   Exec() = default;
   ~Exec() noexcept = default;
 
-  static Exec fromJson(const QJsonObject& obj);
+  static Exec fromJson(const Contr& contr, const QJsonObject& obj);
 
   Id64 marketId() const noexcept { return marketId_; }
-  const QString& contr() const noexcept { return contr_; }
+  const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
   Id64 orderId() const noexcept { return orderId_; }
@@ -116,7 +89,7 @@ class Exec {
 
  private:
   Id64 marketId_{};
-  QString contr_{};
+  Contr contr_{};
   QDate settlDate_{};
   Id64 id_{};
   Id64 orderId_{};

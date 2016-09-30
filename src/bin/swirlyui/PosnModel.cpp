@@ -31,9 +31,9 @@ PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
   header_[column::SettlDate] = tr("Settl Date");
   header_[column::Accnt] = tr("Accnt");
   header_[column::BuyLots] = tr("Buy Lots");
-  header_[column::BuyCost] = tr("Buy Cost");
+  header_[column::BuyAvgPrice] = tr("Buy Avg Price");
   header_[column::SellLots] = tr("Sell Lots");
-  header_[column::SellCost] = tr("Sell Cost");
+  header_[column::SellAvgPrice] = tr("Sell Avg Price");
 }
 
 PosnModel::~PosnModel() noexcept = default;
@@ -50,27 +50,17 @@ int PosnModel::columnCount(const QModelIndex& parent) const
 
 QVariant PosnModel::data(const QModelIndex& index, int role) const
 {
+  QVariant var{};
   if (!index.isValid()) {
-    return QVariant{};
-  }
-
-  if (role == Qt::TextAlignmentRole) {
-    return QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-  }
-
-  if (role == Qt::UserRole) {
-    return QVariant::fromValue(rows_.nth(index.row())->second);
-  }
-
-  QVariant var;
-  if (role == Qt::DisplayRole) {
+    // No-op.
+  } else if (role == Qt::DisplayRole) {
     const auto& posn = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
       var = posn.marketId();
       break;
     case column::Contr:
-      var = posn.contr();
+      var = posn.contr().mnem();
       break;
     case column::SettlDate:
       var = posn.settlDate();
@@ -81,16 +71,33 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     case column::BuyLots:
       var = posn.buyLots();
       break;
-    case column::BuyCost:
-      var = posn.buyCost();
+    case column::BuyAvgPrice:
+      var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
       break;
     case column::SellLots:
       var = posn.sellLots();
       break;
-    case column::SellCost:
-      var = posn.sellCost();
+    case column::SellAvgPrice:
+      var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
       break;
     }
+  } else if (role == Qt::TextAlignmentRole) {
+    switch (index.column()) {
+    case column::Contr:
+    case column::Accnt:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::MarketId:
+    case column::SettlDate:
+    case column::BuyLots:
+    case column::BuyAvgPrice:
+    case column::SellLots:
+    case column::SellAvgPrice:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
+  } else if (role == Qt::UserRole) {
+    var = QVariant::fromValue(rows_.nth(index.row())->second);
   }
   return var;
 }

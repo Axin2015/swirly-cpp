@@ -14,18 +14,19 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_CONV_HPP
-#define SWIRLY_ELM_CONV_HPP
+#ifndef SWIRLYUI_CONV_HPP
+#define SWIRLYUI_CONV_HPP
 
-#include <swirly/elm/Types.hpp>
+#include "Types.hpp"
 
 #include <cmath>
 
 namespace swirly {
+namespace ui {
 
-constexpr int64_t roundHalfAway(double real) noexcept
+constexpr qint32 roundHalfAway(double real) noexcept
 {
-  return static_cast<int64_t>(real < 0.0 ? real - 0.5 : real + 0.5);
+  return static_cast<qint32>(real < 0.0 ? real - 0.5 : real + 0.5);
 }
 
 constexpr double fractToReal(int numer, int denom) noexcept
@@ -53,7 +54,7 @@ constexpr double incsToReal(Incs incs, double incSize) noexcept
  */
 constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
 {
-  return box<Lots>(realToIncs(qty, qtyInc));
+  return realToIncs(qty, qtyInc);
 }
 
 /**
@@ -61,7 +62,7 @@ constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
  */
 constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
 {
-  return incsToReal(unbox(lots), qtyInc);
+  return incsToReal(lots, qtyInc);
 }
 
 /**
@@ -69,7 +70,7 @@ constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
  */
 constexpr Ticks priceToTicks(double price, double priceInc) noexcept
 {
-  return box<Ticks>(realToIncs(price, priceInc));
+  return realToIncs(price, priceInc);
 }
 
 /**
@@ -77,7 +78,7 @@ constexpr Ticks priceToTicks(double price, double priceInc) noexcept
  */
 constexpr double ticksToPrice(Ticks ticks, double priceInc) noexcept
 {
-  return incsToReal(unbox(ticks), priceInc);
+  return incsToReal(ticks, priceInc);
 }
 
 /**
@@ -110,9 +111,10 @@ inline double dpToReal(int dp) noexcept
  */
 constexpr Cost cost(Lots lots, Ticks ticks) noexcept
 {
-  return box<Cost>(unbox(lots) * unbox(ticks));
+  return lots * ticks;
 }
 
+} // ui
 } // swirly
 
-#endif // SWIRLY_ELM_CONV_HPP
+#endif // SWIRLYUI_CONV_HPP

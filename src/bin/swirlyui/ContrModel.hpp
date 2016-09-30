@@ -42,6 +42,8 @@ class ContrModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+  Contr find(const QString& mnem) const;
+
   void updateRow(const Contr& contr);
 
  private:

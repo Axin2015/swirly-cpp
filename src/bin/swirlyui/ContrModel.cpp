@@ -53,20 +53,10 @@ int ContrModel::columnCount(const QModelIndex& parent) const
 
 QVariant ContrModel::data(const QModelIndex& index, int role) const
 {
+  QVariant var{};
   if (!index.isValid()) {
-    return QVariant{};
-  }
-
-  if (role == Qt::TextAlignmentRole) {
-    return QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-  }
-
-  if (role == Qt::UserRole) {
-    return QVariant::fromValue(rows_.nth(index.row())->second);
-  }
-
-  QVariant var;
-  if (role == Qt::DisplayRole) {
+    // No-op.
+  } else if (role == Qt::DisplayRole) {
     const auto& contr = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::Mnem:
@@ -103,6 +93,26 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
       var = contr.maxLots();
       break;
     }
+  } else if (role == Qt::TextAlignmentRole) {
+    switch (index.column()) {
+    case column::Mnem:
+    case column::Display:
+    case column::Asset:
+    case column::Ccy:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::LotNumer:
+    case column::LotDenom:
+    case column::TickNumer:
+    case column::TickDenom:
+    case column::PipDp:
+    case column::MinLots:
+    case column::MaxLots:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
+  } else if (role == Qt::UserRole) {
+    var = QVariant::fromValue(rows_.nth(index.row())->second);
   }
   return var;
 }
@@ -113,6 +123,16 @@ QVariant ContrModel::headerData(int section, Qt::Orientation orientation, int ro
     return QVariant{};
   }
   return header_[section];
+}
+
+Contr ContrModel::find(const QString& mnem) const
+{
+  Contr contr;
+  auto it = rows_.find(mnem);
+  if (it != rows_.end()) {
+    contr = it->second;
+  }
+  return contr;
 }
 
 void ContrModel::updateRow(const Contr& contr)
