@@ -122,7 +122,30 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+    switch (index.column()) {
+    case column::Contr:
+    case column::Accnt:
+    case column::Ref:
+    case column::State:
+    case column::Side:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::MarketId:
+    case column::SettlDate:
+    case column::Id:
+    case column::Lots:
+    case column::Price:
+    case column::Resd:
+    case column::Exec:
+    case column::AvgPrice:
+    case column::LastLots:
+    case column::LastPrice:
+    case column::MinLots:
+    case column::Created:
+    case column::Modified:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
   } else if (role == Qt::UserRole) {
     var = QVariant::fromValue(rows_.nth(index.row())->second);
   }

@@ -102,7 +102,25 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+    switch (index.column()) {
+    case column::Contr:
+    case column::State:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::Id:
+    case column::SettlDate:
+    case column::LastLots:
+    case column::LastPrice:
+    case column::LastTime:
+    case column::BidPrice:
+    case column::BidResd:
+    case column::BidCount:
+    case column::OfferPrice:
+    case column::OfferResd:
+    case column::OfferCount:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
   } else if (role == Qt::UserRole) {
     var = QVariant::fromValue(rows_.nth(index.row())->second);
   }

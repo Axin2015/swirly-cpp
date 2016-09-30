@@ -62,7 +62,13 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+    switch (index.column()) {
+    case column::Mnem:
+    case column::Display:
+    case column::Type:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    }
   } else if (role == Qt::UserRole) {
     var = QVariant::fromValue(rows_.nth(index.row())->second);
   }

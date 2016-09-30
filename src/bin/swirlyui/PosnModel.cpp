@@ -82,7 +82,20 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+    switch (index.column()) {
+    case column::Contr:
+    case column::Accnt:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::MarketId:
+    case column::SettlDate:
+    case column::BuyLots:
+    case column::BuyAvgPrice:
+    case column::SellLots:
+    case column::SellAvgPrice:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
   } else if (role == Qt::UserRole) {
     var = QVariant::fromValue(rows_.nth(index.row())->second);
   }

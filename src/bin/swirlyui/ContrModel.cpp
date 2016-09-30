@@ -94,7 +94,23 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+    switch (index.column()) {
+    case column::Mnem:
+    case column::Display:
+    case column::Asset:
+    case column::Ccy:
+      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+      break;
+    case column::LotNumer:
+    case column::LotDenom:
+    case column::TickNumer:
+    case column::TickDenom:
+    case column::PipDp:
+    case column::MinLots:
+    case column::MaxLots:
+      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+      break;
+    }
   } else if (role == Qt::UserRole) {
     var = QVariant::fromValue(rows_.nth(index.row())->second);
   }
