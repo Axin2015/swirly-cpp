@@ -21,8 +21,6 @@
 
 #include <QMainWindow>
 
-class QSplitter;
-
 namespace swirly {
 namespace ui {
 
@@ -49,7 +47,6 @@ class MainWindow : public QMainWindow {
   bool canClose();
 
   HttpClient client_;
-  QSplitter* const splitter_;
 };
 
 } // ui

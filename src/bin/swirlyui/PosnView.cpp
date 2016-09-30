@@ -33,8 +33,8 @@ using namespace posn;
 PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
 {
-  QTableView* const table{new QTableView(this)};
-  unique_ptr<QAbstractItemModel> prev(table->model());
+  auto table = make_unique<QTableView>();
+  unique_ptr<QAbstractItemModel> prev{table->model()};
   table->setModel(&model);
 
   table->setColumnHidden(column::MarketId, true);
@@ -43,8 +43,9 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  QGridLayout* const layout{new QGridLayout(this)};
-  layout->addWidget(table, 0, 0);
+  auto layout = make_unique<QGridLayout>();
+  layout->addWidget(table.release(), 0, 0);
+  setLayout(layout.release());
 }
 
 PosnView::~PosnView() noexcept = default;
