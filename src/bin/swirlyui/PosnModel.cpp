@@ -50,20 +50,10 @@ int PosnModel::columnCount(const QModelIndex& parent) const
 
 QVariant PosnModel::data(const QModelIndex& index, int role) const
 {
+  QVariant var{};
   if (!index.isValid()) {
-    return QVariant{};
-  }
-
-  if (role == Qt::TextAlignmentRole) {
-    return QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-  }
-
-  if (role == Qt::UserRole) {
-    return QVariant::fromValue(rows_.nth(index.row())->second);
-  }
-
-  QVariant var;
-  if (role == Qt::DisplayRole) {
+    // No-op.
+  } else if (role == Qt::DisplayRole) {
     const auto& posn = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
@@ -91,6 +81,10 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
       var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
       break;
     }
+  } else if (role == Qt::TextAlignmentRole) {
+    var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+  } else if (role == Qt::UserRole) {
+    var = QVariant::fromValue(rows_.nth(index.row())->second);
   }
   return var;
 }
