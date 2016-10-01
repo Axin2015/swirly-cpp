@@ -16,6 +16,7 @@
  */
 #include "MarketView.hpp"
 
+#include "MarketForm.hpp"
 #include "MarketModel.hpp"
 
 #include <QGridLayout>
@@ -45,8 +46,9 @@ MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  auto layout = make_unique<QGridLayout>();
-  layout->addWidget(table.release(), 0, 0);
+  auto layout = make_unique<QVBoxLayout>();
+  layout->addWidget(new MarketForm);
+  layout->addWidget(table.release());
   setLayout(layout.release());
 }
 
