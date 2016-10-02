@@ -34,16 +34,10 @@ constexpr typename std::underlying_type_t<EnumT> unbox(EnumT val) noexcept
   return static_cast<typename std::underlying_type_t<EnumT>>(val);
 }
 
-template <typename EnumT>
-struct EnumTraits {
-  static void print(std::ostream& os, EnumT val) { os << unbox(val); }
-};
-
 template <typename EnumT, typename = std::enable_if_t<std::is_enum<EnumT>::value>>
 std::ostream& operator<<(std::ostream& os, EnumT val)
 {
-  EnumTraits<EnumT>::print(os, val);
-  return os;
+  return os << unbox(val);
 }
 
 namespace enumops {

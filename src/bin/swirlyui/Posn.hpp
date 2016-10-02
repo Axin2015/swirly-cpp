@@ -19,8 +19,6 @@
 
 #include "Contr.hpp"
 
-#include <QDate>
-
 namespace swirly {
 namespace ui {
 namespace posn {

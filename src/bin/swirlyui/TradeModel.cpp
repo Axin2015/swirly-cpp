@@ -70,7 +70,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     const auto& trade = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
-      var = trade.marketId();
+      var = toVariant(trade.marketId());
       break;
     case column::Contr:
       var = trade.contr().mnem();
@@ -79,10 +79,10 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       var = trade.settlDate();
       break;
     case column::Id:
-      var = trade.id();
+      var = toVariant(trade.id());
       break;
     case column::OrderId:
-      var = trade.orderId();
+      var = toVariant(trade.orderId());
       break;
     case column::Accnt:
       var = trade.accnt();
@@ -97,31 +97,31 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       var = enumString(trade.side());
       break;
     case column::Lots:
-      var = trade.lots();
+      var = toVariant(trade.lots());
       break;
     case column::Price:
       var = ticksToPriceString(trade.ticks(), trade.contr());
       break;
     case column::Resd:
-      var = trade.resd();
+      var = toVariant(trade.resd());
       break;
     case column::Exec:
-      var = trade.exec();
+      var = toVariant(trade.exec());
       break;
     case column::AvgPrice:
       var = ticksToAvgPriceString(trade.exec(), trade.cost(), trade.contr());
       break;
     case column::LastLots:
-      var = trade.lastLots();
+      var = toVariant(trade.lastLots());
       break;
     case column::LastPrice:
       var = ticksToPriceString(trade.lastTicks(), trade.contr());
       break;
     case column::MinLots:
-      var = trade.minLots();
+      var = toVariant(trade.minLots());
       break;
     case column::MatchId:
-      var = trade.matchId();
+      var = toVariant(trade.matchId());
       break;
     case column::LiqInd:
       var = enumString(trade.liqInd());

@@ -67,7 +67,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     const auto& order = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
-      var = order.marketId();
+      var = toVariant(order.marketId());
       break;
     case column::Contr:
       var = order.contr().mnem();
@@ -76,7 +76,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       var = order.settlDate();
       break;
     case column::Id:
-      var = order.id();
+      var = toVariant(order.id());
       break;
     case column::Accnt:
       var = order.accnt();
@@ -91,28 +91,28 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       var = enumString(order.side());
       break;
     case column::Lots:
-      var = order.lots();
+      var = toVariant(order.lots());
       break;
     case column::Price:
       var = ticksToPriceString(order.ticks(), order.contr());
       break;
     case column::Resd:
-      var = order.resd();
+      var = toVariant(order.resd());
       break;
     case column::Exec:
-      var = order.exec();
+      var = toVariant(order.exec());
       break;
     case column::AvgPrice:
       var = ticksToAvgPriceString(order.exec(), order.cost(), order.contr());
       break;
     case column::LastLots:
-      var = order.lastLots();
+      var = toVariant(order.lastLots());
       break;
     case column::LastPrice:
       var = ticksToPriceString(order.lastTicks(), order.contr());
       break;
     case column::MinLots:
-      var = order.minLots();
+      var = toVariant(order.minLots());
       break;
     case column::Created:
       var = order.created();

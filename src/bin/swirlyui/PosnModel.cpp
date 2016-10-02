@@ -57,7 +57,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     const auto& posn = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
-      var = posn.marketId();
+      var = toVariant(posn.marketId());
       break;
     case column::Contr:
       var = posn.contr().mnem();
@@ -69,13 +69,13 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
       var = posn.accnt();
       break;
     case column::BuyLots:
-      var = posn.buyLots();
+      var = toVariant(posn.buyLots());
       break;
     case column::BuyAvgPrice:
       var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
       break;
     case column::SellLots:
-      var = posn.sellLots();
+      var = toVariant(posn.sellLots());
       break;
     case column::SellAvgPrice:
       var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());

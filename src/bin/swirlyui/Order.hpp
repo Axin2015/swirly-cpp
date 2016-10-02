@@ -18,9 +18,6 @@
 #define SWIRLYUI_ORDER_HPP
 
 #include "Contr.hpp"
-#include "Conv.hpp"
-
-#include <QDate>
 
 namespace swirly {
 namespace ui {

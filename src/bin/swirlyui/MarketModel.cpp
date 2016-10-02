@@ -62,7 +62,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     const auto& market = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::Id:
-      var = market.id();
+      var = toVariant(market.id());
       break;
     case column::Contr:
       var = market.contr().mnem();
@@ -74,7 +74,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       var = market.state();
       break;
     case column::LastLots:
-      var = market.lastLots();
+      var = toVariant(market.lastLots());
       break;
     case column::LastPrice:
       var = ticksToPriceString(market.lastTicks(), market.contr());
@@ -86,7 +86,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       var = ticksToPriceString(market.bestBid().ticks(), market.contr());
       break;
     case column::BidResd:
-      var = market.bestBid().resd();
+      var = toVariant(market.bestBid().resd());
       break;
     case column::BidCount:
       var = market.bestBid().count();
@@ -95,7 +95,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
       break;
     case column::OfferResd:
-      var = market.bestOffer().resd();
+      var = toVariant(market.bestOffer().resd());
       break;
     case column::OfferCount:
       var = market.bestOffer().count();

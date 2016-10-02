@@ -16,9 +16,6 @@
  */
 #include "Order.hpp"
 
-#include "Json.hpp"
-
-#include <QDebug>
 #include <QJsonObject>
 
 namespace swirly {

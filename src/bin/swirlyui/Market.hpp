@@ -20,8 +20,6 @@
 #include "Contr.hpp"
 #include "Level.hpp"
 
-#include <QDate>
-
 #ifndef SWIRLY_DEPTH
 #define SWIRLY_DEPTH 3
 #endif // SWIRLY_DEPTH

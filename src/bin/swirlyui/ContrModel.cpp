@@ -87,10 +87,10 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
       var = contr.pipDp();
       break;
     case column::MinLots:
-      var = contr.minLots();
+      var = toVariant(contr.minLots());
       break;
     case column::MaxLots:
-      var = contr.maxLots();
+      var = toVariant(contr.maxLots());
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {

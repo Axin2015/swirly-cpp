@@ -14,11 +14,35 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Conv.hpp"
+#include <swirly/elm/BasicTypes.hpp>
 
-using namespace std;
+#include <swirly/tea/Test.hpp>
 
-namespace swirly {
-namespace ui {
-} // ui
-} // swirly
+#include <cstring>
+
+using namespace swirly;
+
+SWIRLY_TEST_CASE(AssetType)
+{
+  SWIRLY_CHECK(strcmp(enumString(AssetType::Commodity), "COMMODITY") == 0);
+}
+
+SWIRLY_TEST_CASE(Direct)
+{
+  SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
+}
+
+SWIRLY_TEST_CASE(LiqInd)
+{
+  SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
+}
+
+SWIRLY_TEST_CASE(Side)
+{
+  SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
+}
+
+SWIRLY_TEST_CASE(State)
+{
+  SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
+}

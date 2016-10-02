@@ -16,9 +16,6 @@
  */
 #include "Market.hpp"
 
-#include "Json.hpp"
-
-#include <QDebug>
 #include <QJsonArray>
 #include <QJsonObject>
 

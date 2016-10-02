@@ -70,7 +70,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     const auto& exec = rows_.nth(index.row())->second;
     switch (index.column()) {
     case column::MarketId:
-      var = exec.marketId();
+      var = toVariant(exec.marketId());
       break;
     case column::Contr:
       var = exec.contr().mnem();
@@ -79,10 +79,10 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       var = exec.settlDate();
       break;
     case column::Id:
-      var = exec.id();
+      var = toVariant(exec.id());
       break;
     case column::OrderId:
-      var = exec.orderId();
+      var = toVariant(exec.orderId());
       break;
     case column::Accnt:
       var = exec.accnt();
@@ -97,31 +97,31 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       var = enumString(exec.side());
       break;
     case column::Lots:
-      var = exec.lots();
+      var = toVariant(exec.lots());
       break;
     case column::Price:
       var = ticksToPriceString(exec.ticks(), exec.contr());
       break;
     case column::Resd:
-      var = exec.resd();
+      var = toVariant(exec.resd());
       break;
     case column::Exec:
-      var = exec.exec();
+      var = toVariant(exec.exec());
       break;
     case column::AvgPrice:
       var = ticksToAvgPriceString(exec.exec(), exec.cost(), exec.contr());
       break;
     case column::LastLots:
-      var = exec.lastLots();
+      var = toVariant(exec.lastLots());
       break;
     case column::LastPrice:
       var = ticksToPriceString(exec.lastTicks(), exec.contr());
       break;
     case column::MinLots:
-      var = exec.minLots();
+      var = toVariant(exec.minLots());
       break;
     case column::MatchId:
-      var = exec.matchId();
+      var = toVariant(exec.matchId());
       break;
     case column::LiqInd:
       var = enumString(exec.liqInd());

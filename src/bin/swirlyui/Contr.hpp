@@ -17,7 +17,9 @@
 #ifndef SWIRLYUI_CONTR_HPP
 #define SWIRLYUI_CONTR_HPP
 
-#include "Conv.hpp"
+#include "Types.hpp"
+
+#include <swirly/elm/Conv.hpp>
 
 #include <QMetaType>
 #include <QString>
@@ -138,8 +140,8 @@ inline QString ticksToPriceString(Ticks ticks, const Contr& contr)
 inline double ticksToAvgPrice(Lots lots, Cost cost, const Contr& contr) noexcept
 {
   double ticks = 0;
-  if (lots != 0) {
-    ticks = fractToReal(cost, lots);
+  if (lots != 0_lts) {
+    ticks = fractToReal(unbox(cost), unbox(lots));
   }
   return ticks * contr.priceInc();
 }

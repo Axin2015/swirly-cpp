@@ -17,49 +17,15 @@
 #ifndef SWIRLY_ELM_TYPES_HPP
 #define SWIRLY_ELM_TYPES_HPP
 
-#include <swirly/ash/Enum.hpp>
+#include <swirly/elm/BasicTypes.hpp>
+
 #include <swirly/ash/String.hpp>
 
 #include <boost/intrusive_ptr.hpp>
 
-#include <cstdint>
 #include <memory>
 
 namespace swirly {
-
-using Incs = int64_t;
-
-enum class Lots : Incs {};
-
-constexpr Lots operator""_lts(unsigned long long val) noexcept
-{
-  return box<Lots>(val);
-}
-
-/**
- * Unit representing the minimum price increment.
- */
-enum class Ticks : Incs {};
-
-constexpr Ticks operator""_tks(unsigned long long val) noexcept
-{
-  return box<Ticks>(val);
-}
-
-/**
- * Sum of lots and ticks.
- */
-enum class Cost : Incs {};
-
-constexpr Cost operator""_cst(unsigned long long val) noexcept
-{
-  return box<Cost>(val);
-}
-
-/**
- * Bitfield representing the state of a Market.
- */
-using MarketState = unsigned;
 
 /**
  * Maximum display characters.
@@ -80,123 +46,6 @@ using Display = String<MaxDisplay>;
  * Reference.
  */
 using Ref = String<MaxRef>;
-
-enum class AssetType { Commodity = 1, Corporate, Currency, Equity, Government, Index };
-
-SWIRLY_API const char* enumString(AssetType type);
-
-template <>
-struct EnumTraits<AssetType> {
-  static void print(std::ostream& os, AssetType val) { os << enumString(val); }
-};
-
-enum class Direct {
-  /**
-   * Aggressor bought. Taker lifted the offer resulting in a market uptick.
-   */
-  Paid = 1,
-  /**
-   * Aggressor sold. Taker hit the bid resulting in a market dow
-   */
-  Given = -1
-};
-
-SWIRLY_API const char* enumString(Direct direct);
-
-template <>
-struct EnumTraits<Direct> {
-  static void print(std::ostream& os, Direct val) { os << enumString(val); }
-};
-
-enum class LiqInd {
-  /**
-   * No liqInd.
-   */
-  None = 0,
-  /**
-   * Passive buyer or seller that receives the spread.
-   */
-  Maker,
-  /**
-   * Aggressive buyer or seller that crosses the market and pays the spread.
-   */
-  Taker
-};
-
-SWIRLY_API const char* enumString(LiqInd liqInd);
-
-constexpr LiqInd inverse(LiqInd liqInd) noexcept
-{
-  switch (liqInd) {
-  case LiqInd::None:
-    break;
-  case LiqInd::Maker:
-    liqInd = LiqInd::Taker;
-    break;
-  case LiqInd::Taker:
-    liqInd = LiqInd::Maker;
-    break;
-  }
-  return liqInd;
-}
-
-template <>
-struct EnumTraits<LiqInd> {
-  static void print(std::ostream& os, LiqInd val) { os << enumString(val); }
-};
-
-enum class Side { Buy = 1, Sell = -1 };
-
-SWIRLY_API const char* enumString(Side side);
-
-constexpr Side inverse(Side side) noexcept
-{
-  switch (side) {
-  case Side::Buy:
-    side = Side::Sell;
-    break;
-  case Side::Sell:
-    side = Side::Buy;
-    break;
-  }
-  return side;
-}
-
-template <>
-struct EnumTraits<Side> {
-  static void print(std::ostream& os, Side val) { os << enumString(val); }
-};
-
-/**
- * Order states.
- * @image html OrderState.png
- */
-enum class State {
-  None = 0,
-  /**
-   * Initial state of a resting order placed in the order-book.
-   */
-  New,
-  /**
-   * State of a resting order that has been revised.
-   */
-  Revise,
-  /**
-   * State of a resting order that has been cancelled.
-   */
-  Cancel,
-  /**
-   * State of an order that has been partially or fully filled.
-   */
-  Trade
-};
-
-SWIRLY_API const char* enumString(State state);
-
-template <>
-struct EnumTraits<State> {
-  static void print(std::ostream& os, State val) { os << enumString(val); }
-};
 
 class Asset;
 using AssetPtr = std::unique_ptr<Asset>;
