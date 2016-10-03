@@ -60,7 +60,7 @@ struct TypeTraits<QDate> {
   {
     const auto n = value.toInt();
     const auto y = n / 10000;
-    const auto m = (n / 100 % 100) - 1;
+    const auto m = (n / 100) % 100;
     const auto d = n % 100;
     return {y, m, d};
   }

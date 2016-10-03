@@ -30,7 +30,7 @@ namespace swirly {
 namespace ui {
 
 ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_{model}
+  : QWidget{parent, f}, model_(model)
 {
   auto table = make_unique<QTableView>();
   unique_ptr<QAbstractItemModel> prev{table->model()};

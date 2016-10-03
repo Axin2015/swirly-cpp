@@ -31,10 +31,10 @@ class HttpClient : public Client {
   HttpClient(QObject* parent = nullptr);
   ~HttpClient() noexcept override;
 
-  void postMarket(const QString& contr, QDate settlDate, MarketState state);
+  void createMarket(const QString& contr, QDate settlDate, MarketState state) override;
 
-  void postOrder(const QString& contr, QDate settlDate, const QString& ref, const QString& side,
-                 Lots lots, Ticks ticks);
+  void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+                   Ticks ticks) override;
 
  protected:
   void timerEvent(QTimerEvent* event) override;

@@ -16,7 +16,14 @@
  */
 #include "MarketForm.hpp"
 
+#include "ContrModel.hpp"
+
+#include <QAbstractItemModel>
+#include <QApplication>
+#include <QComboBox>
+#include <QDateEdit>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 
@@ -27,24 +34,38 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-MarketForm::MarketForm(QWidget* parent, Qt::WindowFlags f) : QWidget{parent, f}
+MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags f)
+  : QWidget{parent, f}, contrModel_(contrModel)
 {
-  auto contrEdit = make_unique<QLineEdit>();
-  contrEdit->setPlaceholderText(tr("Contr"));
-  auto settlDateEdit = make_unique<QLineEdit>();
-  settlDateEdit->setPlaceholderText(tr("Settl Date"));
+  auto contrComboBox = make_unique<QComboBox>();
+  contrComboBox->setModel(&contrModel);
+  QFontMetrics fm{QApplication::font()};
+  contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
+
+  auto settlDateEdit = make_unique<QDateEdit>(QDate{2016, 10, 28});
   auto lotsEdit = make_unique<QLineEdit>();
   lotsEdit->setPlaceholderText(tr("Lots"));
+  lotsEdit->setValidator(&lotsValidator_);
   auto priceEdit = make_unique<QLineEdit>();
   priceEdit->setPlaceholderText(tr("Price"));
+  priceEdit->setValidator(&priceValidator_);
   auto buyButton = make_unique<QPushButton>(tr("Buy"));
   auto sellButton = make_unique<QPushButton>(tr("Sell"));
 
+  connect(contrComboBox.get(),
+          static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+          &MarketForm::slotContrChanged);
+  connect(buyButton.get(), &QPushButton::clicked,
+          [this]() { this->slotBuyOrSellClicked(Side::Buy); });
+  connect(sellButton.get(), &QPushButton::clicked,
+          [this]() { this->slotBuyOrSellClicked(Side::Sell); });
+
   auto layout = make_unique<QHBoxLayout>();
-  layout->addWidget(contrEdit.release());
-  layout->addWidget(settlDateEdit.release());
-  layout->addWidget(lotsEdit.release());
-  layout->addWidget(priceEdit.release());
+  layout->addWidget(contrComboBox_ = contrComboBox.release());
+  layout->addWidget(settlDateEdit_ = settlDateEdit.release());
+  layout->addWidget(lotsEdit_ = lotsEdit.release());
+  layout->addWidget(new QLabel{tr("@")});
+  layout->addWidget(priceEdit_ = priceEdit.release());
   layout->addWidget(buyButton.release());
   layout->addWidget(sellButton.release());
   layout->addStretch(1);
@@ -53,6 +74,26 @@ MarketForm::MarketForm(QWidget* parent, Qt::WindowFlags f) : QWidget{parent, f}
 }
 
 MarketForm::~MarketForm() noexcept = default;
+
+void MarketForm::slotContrChanged(int index)
+{
+  if (index < 0) {
+    // No item selected.
+    return;
+  }
+  auto contr = contrComboBox_->currentData().value<Contr>();
+  qDebug() << "slotContrChanged:" << contr;
+  lotsValidator_.setRange(unbox(contr.minLots()), unbox(contr.maxLots()));
+  priceValidator_.setDecimals(contr.priceDp());
+}
+
+void MarketForm::slotBuyOrSellClicked(Side side)
+{
+  auto contr = contrComboBox_->currentData().value<Contr>();
+  const auto lots = box<Lots>(lotsEdit_->text().toLongLong());
+  const auto ticks = priceToTicks(priceEdit_->text().toDouble(), contr);
+  emit createOrder(contr, settlDateEdit_->date(), "", side, lots, ticks);
+}
 
 } // ui
 } // swirly

@@ -17,6 +17,8 @@
 #ifndef SWIRLYUI_MARKETVIEW_HPP
 #define SWIRLYUI_MARKETVIEW_HPP
 
+#include "Types.hpp"
+
 #include <QWidget>
 
 class QModelIndex;
@@ -24,6 +26,8 @@ class QModelIndex;
 namespace swirly {
 namespace ui {
 
+class Contr;
+class ContrModel;
 class Market;
 class MarketModel;
 
@@ -31,13 +35,17 @@ class MarketView : public QWidget {
   Q_OBJECT
 
  public:
-  MarketView(MarketModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  MarketView(ContrModel& contrModel, MarketModel& model, QWidget* parent = nullptr,
+             Qt::WindowFlags f = Qt::WindowFlags{});
   ~MarketView() noexcept override;
 
  signals:
   void currentChanged(const Market& market);
 
   void doubleClicked(const Market& market);
+
+  void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+                   Ticks ticks);
 
  private slots:
   void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
