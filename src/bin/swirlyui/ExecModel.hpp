@@ -45,7 +45,7 @@ class ExecModel : public QAbstractTableModel {
   void updateRow(const Exec& exec);
 
  private:
-  QVariant header_[exec::column::Count];
+  QVariant header_[exec::ColumnCount];
   using Key = std::pair<Id64, Id64>;
   // FIXME: use circular buffer.
   boost::container::flat_map<Key, Exec, std::less<Key>> rows_;

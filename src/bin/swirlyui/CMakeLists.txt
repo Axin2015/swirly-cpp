@@ -33,16 +33,15 @@ set(swirlyui_SOURCES
   Contr.cpp
   ContrModel.cpp
   ContrView.cpp
-  Conv.cpp
   Exec.cpp
   ExecModel.cpp
   ExecView.cpp
   HttpClient.cpp
-  Json.cpp
   Level.cpp
   Main.cpp
   MainWindow.cpp
   Market.cpp
+  MarketForm.cpp
   MarketModel.cpp
   MarketView.cpp
   Order.cpp

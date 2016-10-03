@@ -26,27 +26,27 @@ using namespace exec;
 
 ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::MarketId] = tr("Market Id");
-  header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("Settl Date");
-  header_[column::Id] = tr("Id");
-  header_[column::OrderId] = tr("Order Id");
-  header_[column::Accnt] = tr("Accnt");
-  header_[column::Ref] = tr("Ref");
-  header_[column::State] = tr("State");
-  header_[column::Side] = tr("Side");
-  header_[column::Lots] = tr("Lots");
-  header_[column::Price] = tr("Price");
-  header_[column::Resd] = tr("Resd");
-  header_[column::Exec] = tr("Exec");
-  header_[column::AvgPrice] = tr("Avg Price");
-  header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastPrice] = tr("Last Price");
-  header_[column::MinLots] = tr("Min Lots");
-  header_[column::MatchId] = tr("Match Id");
-  header_[column::LiqInd] = tr("Liq Ind");
-  header_[column::Cpty] = tr("Cpty");
-  header_[column::Created] = tr("Created");
+  header_[unbox(Column::MarketId)] = tr("Market Id");
+  header_[unbox(Column::Contr)] = tr("Contr");
+  header_[unbox(Column::SettlDate)] = tr("Settl Date");
+  header_[unbox(Column::Id)] = tr("Id");
+  header_[unbox(Column::OrderId)] = tr("Order Id");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
+  header_[unbox(Column::Ref)] = tr("Ref");
+  header_[unbox(Column::State)] = tr("State");
+  header_[unbox(Column::Side)] = tr("Side");
+  header_[unbox(Column::Lots)] = tr("Lots");
+  header_[unbox(Column::Price)] = tr("Price");
+  header_[unbox(Column::Resd)] = tr("Resd");
+  header_[unbox(Column::Exec)] = tr("Exec");
+  header_[unbox(Column::AvgPrice)] = tr("Avg Price");
+  header_[unbox(Column::LastLots)] = tr("Last Lots");
+  header_[unbox(Column::LastPrice)] = tr("Last Price");
+  header_[unbox(Column::MinLots)] = tr("Min Lots");
+  header_[unbox(Column::MatchId)] = tr("Match Id");
+  header_[unbox(Column::LiqInd)] = tr("Liq Ind");
+  header_[unbox(Column::Cpty)] = tr("Cpty");
+  header_[unbox(Column::Created)] = tr("Created");
 }
 
 ExecModel::~ExecModel() noexcept = default;
@@ -58,7 +58,7 @@ int ExecModel::rowCount(const QModelIndex& parent) const
 
 int ExecModel::columnCount(const QModelIndex& parent) const
 {
-  return column::Count;
+  return ColumnCount;
 }
 
 QVariant ExecModel::data(const QModelIndex& index, int role) const
@@ -68,96 +68,96 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     // No-op.
   } else if (role == Qt::DisplayRole) {
     const auto& exec = rows_.nth(index.row())->second;
-    switch (index.column()) {
-    case column::MarketId:
-      var = exec.marketId();
+    switch (box<Column>(index.column())) {
+    case Column::MarketId:
+      var = toVariant(exec.marketId());
       break;
-    case column::Contr:
+    case Column::Contr:
       var = exec.contr().mnem();
       break;
-    case column::SettlDate:
+    case Column::SettlDate:
       var = exec.settlDate();
       break;
-    case column::Id:
-      var = exec.id();
+    case Column::Id:
+      var = toVariant(exec.id());
       break;
-    case column::OrderId:
-      var = exec.orderId();
+    case Column::OrderId:
+      var = toVariant(exec.orderId());
       break;
-    case column::Accnt:
+    case Column::Accnt:
       var = exec.accnt();
       break;
-    case column::Ref:
+    case Column::Ref:
       var = exec.ref();
       break;
-    case column::State:
+    case Column::State:
       var = enumString(exec.state());
       break;
-    case column::Side:
+    case Column::Side:
       var = enumString(exec.side());
       break;
-    case column::Lots:
-      var = exec.lots();
+    case Column::Lots:
+      var = toVariant(exec.lots());
       break;
-    case column::Price:
+    case Column::Price:
       var = ticksToPriceString(exec.ticks(), exec.contr());
       break;
-    case column::Resd:
-      var = exec.resd();
+    case Column::Resd:
+      var = toVariant(exec.resd());
       break;
-    case column::Exec:
-      var = exec.exec();
+    case Column::Exec:
+      var = toVariant(exec.exec());
       break;
-    case column::AvgPrice:
+    case Column::AvgPrice:
       var = ticksToAvgPriceString(exec.exec(), exec.cost(), exec.contr());
       break;
-    case column::LastLots:
-      var = exec.lastLots();
+    case Column::LastLots:
+      var = toVariant(exec.lastLots());
       break;
-    case column::LastPrice:
+    case Column::LastPrice:
       var = ticksToPriceString(exec.lastTicks(), exec.contr());
       break;
-    case column::MinLots:
-      var = exec.minLots();
+    case Column::MinLots:
+      var = toVariant(exec.minLots());
       break;
-    case column::MatchId:
-      var = exec.matchId();
+    case Column::MatchId:
+      var = toVariant(exec.matchId());
       break;
-    case column::LiqInd:
+    case Column::LiqInd:
       var = enumString(exec.liqInd());
       break;
-    case column::Cpty:
+    case Column::Cpty:
       var = exec.cpty();
       break;
-    case column::Created:
+    case Column::Created:
       var = exec.created();
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    switch (index.column()) {
-    case column::Contr:
-    case column::Accnt:
-    case column::Ref:
-    case column::State:
-    case column::Side:
-    case column::LiqInd:
-    case column::Cpty:
+    switch (box<Column>(index.column())) {
+    case Column::Contr:
+    case Column::Accnt:
+    case Column::Ref:
+    case Column::State:
+    case Column::Side:
+    case Column::LiqInd:
+    case Column::Cpty:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
-    case column::MarketId:
-    case column::SettlDate:
-    case column::Id:
-    case column::OrderId:
-    case column::Lots:
-    case column::Price:
-    case column::Resd:
-    case column::Exec:
-    case column::AvgPrice:
-    case column::LastLots:
-    case column::LastPrice:
-    case column::MinLots:
-    case column::MatchId:
-    case column::Created:
+    case Column::MarketId:
+    case Column::SettlDate:
+    case Column::Id:
+    case Column::OrderId:
+    case Column::Lots:
+    case Column::Price:
+    case Column::Resd:
+    case Column::Exec:
+    case Column::AvgPrice:
+    case Column::LastLots:
+    case Column::LastPrice:
+    case Column::MinLots:
+    case Column::MatchId:
+    case Column::Created:
       var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
       break;
     }
@@ -184,7 +184,7 @@ void ExecModel::updateRow(const Exec& exec)
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
     it->second = exec;
-    emit dataChanged(index(i, 0), index(i, column::Count - 1));
+    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

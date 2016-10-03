@@ -45,7 +45,7 @@ class PosnModel : public QAbstractTableModel {
   void updateRow(const Posn& posn);
 
  private:
-  QVariant header_[posn::column::Count];
+  QVariant header_[posn::ColumnCount];
   boost::container::flat_map<Id64, Posn, std::less<Id64>> rows_;
 };
 

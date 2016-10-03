@@ -27,16 +27,14 @@ class QJsonObject;
 namespace swirly {
 namespace ui {
 namespace asset {
-namespace column {
 
-enum { //
+enum class Column : int { //
   Mnem, //
   Display, //
-  Type, //
-  Count
+  Type
 };
+constexpr int ColumnCount{unbox(Column::Type) + 1};
 
-} // column
 } // asset
 
 class Asset {

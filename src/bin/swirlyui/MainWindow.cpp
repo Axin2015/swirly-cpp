@@ -26,27 +26,32 @@
 
 #include <QtWidgets>
 
+#include <memory>
+
+using namespace std;
+
 namespace swirly {
 namespace ui {
 
-MainWindow::MainWindow() : splitter_{new QSplitter{Qt::Vertical}}
+MainWindow::MainWindow()
 {
-  auto* const topTabs{new QTabWidget{}};
+  auto topTabs = make_unique<QTabWidget>();
   topTabs->addTab(new AssetView{client_.assetModel()}, tr("Asset"));
   topTabs->addTab(new ContrView{client_.contrModel()}, tr("Contr"));
   topTabs->addTab(new MarketView{client_.marketModel()}, tr("Market"));
   topTabs->setCurrentIndex(2);
 
-  auto* const bottomTabs{new QTabWidget{}};
+  auto bottomTabs = make_unique<QTabWidget>();
   bottomTabs->addTab(new OrderView{client_.orderModel()}, tr("Order"));
   bottomTabs->addTab(new ExecView{client_.execModel()}, tr("Exec"));
   bottomTabs->addTab(new TradeView{client_.tradeModel()}, tr("Trade"));
   bottomTabs->addTab(new PosnView{client_.posnModel()}, tr("Posn"));
 
-  splitter_->addWidget(topTabs);
-  splitter_->addWidget(bottomTabs);
+  auto splitter = make_unique<QSplitter>(Qt::Vertical);
+  splitter->addWidget(topTabs.release());
+  splitter->addWidget(bottomTabs.release());
 
-  setCentralWidget(splitter_);
+  setCentralWidget(splitter.release());
 
   connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);

@@ -16,6 +16,7 @@
  */
 #include "MarketView.hpp"
 
+#include "MarketForm.hpp"
 #include "MarketModel.hpp"
 
 #include <QGridLayout>
@@ -33,20 +34,22 @@ using namespace market;
 MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_{model}
 {
-  QTableView* const table{new QTableView(this)};
-  unique_ptr<QAbstractItemModel> prev(table->model());
+  auto table = make_unique<QTableView>();
+  unique_ptr<QAbstractItemModel> prev{table->model()};
   table->setModel(&model);
 
-  table->setColumnHidden(column::Id, true);
-  table->setColumnHidden(column::State, true);
-  table->setColumnHidden(column::LastLots, true);
-  table->setColumnHidden(column::LastTime, true);
+  table->setColumnHidden(unbox(Column::Id), true);
+  table->setColumnHidden(unbox(Column::State), true);
+  table->setColumnHidden(unbox(Column::LastLots), true);
+  table->setColumnHidden(unbox(Column::LastTime), true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
-  QGridLayout* const layout{new QGridLayout(this)};
-  layout->addWidget(table, 0, 0);
+  auto layout = make_unique<QVBoxLayout>();
+  layout->addWidget(new MarketForm);
+  layout->addWidget(table.release());
+  setLayout(layout.release());
 }
 
 MarketView::~MarketView() noexcept = default;

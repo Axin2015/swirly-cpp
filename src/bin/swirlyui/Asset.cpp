@@ -16,9 +16,6 @@
  */
 #include "Asset.hpp"
 
-#include "Json.hpp"
-
-#include <QDebug>
 #include <QJsonObject>
 
 namespace swirly {

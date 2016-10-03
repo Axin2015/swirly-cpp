@@ -16,10 +16,6 @@
  */
 #include "Contr.hpp"
 
-#include "Conv.hpp"
-#include "Json.hpp"
-
-#include <QDebug>
 #include <QJsonObject>
 
 using namespace std;
@@ -55,8 +51,8 @@ Contr Contr::fromJson(const QJsonObject& obj)
                fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
                fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
                fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
-               fromJson<int>(obj["pipDp"]), fromJson<qint64>(obj["minLots"]),
-               fromJson<qint64>(obj["maxLots"]));
+               fromJson<int>(obj["pipDp"]), fromJson<Lots>(obj["minLots"]),
+               fromJson<Lots>(obj["maxLots"]));
 }
 
 shared_ptr<const Contr::Impl> Contr::empty()

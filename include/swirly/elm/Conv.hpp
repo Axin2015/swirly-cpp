@@ -17,7 +17,7 @@
 #ifndef SWIRLY_ELM_CONV_HPP
 #define SWIRLY_ELM_CONV_HPP
 
-#include <swirly/elm/Types.hpp>
+#include <swirly/elm/BasicTypes.hpp>
 
 #include <cmath>
 

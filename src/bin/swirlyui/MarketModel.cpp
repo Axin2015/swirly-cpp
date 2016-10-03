@@ -26,19 +26,19 @@ using namespace market;
 
 MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::Id] = tr("Id");
-  header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("Settl Date");
-  header_[column::State] = tr("State");
-  header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastPrice] = tr("Last Price");
-  header_[column::LastTime] = tr("Last Time");
-  header_[column::BidPrice] = tr("Bid Price");
-  header_[column::BidResd] = tr("Bid Resd");
-  header_[column::BidCount] = tr("Bid Count");
-  header_[column::OfferPrice] = tr("Offer Price");
-  header_[column::OfferResd] = tr("Offer Resd");
-  header_[column::OfferCount] = tr("Offer Count");
+  header_[unbox(Column::Id)] = tr("Id");
+  header_[unbox(Column::Contr)] = tr("Contr");
+  header_[unbox(Column::SettlDate)] = tr("Settl Date");
+  header_[unbox(Column::State)] = tr("State");
+  header_[unbox(Column::LastLots)] = tr("Last Lots");
+  header_[unbox(Column::LastPrice)] = tr("Last Price");
+  header_[unbox(Column::LastTime)] = tr("Last Time");
+  header_[unbox(Column::BidPrice)] = tr("Bid Price");
+  header_[unbox(Column::BidResd)] = tr("Bid Resd");
+  header_[unbox(Column::BidCount)] = tr("Bid Count");
+  header_[unbox(Column::OfferPrice)] = tr("Offer Price");
+  header_[unbox(Column::OfferResd)] = tr("Offer Resd");
+  header_[unbox(Column::OfferCount)] = tr("Offer Count");
 }
 
 MarketModel::~MarketModel() noexcept = default;
@@ -50,7 +50,7 @@ int MarketModel::rowCount(const QModelIndex& parent) const
 
 int MarketModel::columnCount(const QModelIndex& parent) const
 {
-  return column::Count;
+  return ColumnCount;
 }
 
 QVariant MarketModel::data(const QModelIndex& index, int role) const
@@ -60,64 +60,64 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     // No-op.
   } else if (role == Qt::DisplayRole) {
     const auto& market = rows_.nth(index.row())->second;
-    switch (index.column()) {
-    case column::Id:
-      var = market.id();
+    switch (box<Column>(index.column())) {
+    case Column::Id:
+      var = toVariant(market.id());
       break;
-    case column::Contr:
+    case Column::Contr:
       var = market.contr().mnem();
       break;
-    case column::SettlDate:
+    case Column::SettlDate:
       var = market.settlDate();
       break;
-    case column::State:
+    case Column::State:
       var = market.state();
       break;
-    case column::LastLots:
-      var = market.lastLots();
+    case Column::LastLots:
+      var = toVariant(market.lastLots());
       break;
-    case column::LastPrice:
+    case Column::LastPrice:
       var = ticksToPriceString(market.lastTicks(), market.contr());
       break;
-    case column::LastTime:
+    case Column::LastTime:
       var = market.lastTime();
       break;
-    case column::BidPrice:
+    case Column::BidPrice:
       var = ticksToPriceString(market.bestBid().ticks(), market.contr());
       break;
-    case column::BidResd:
-      var = market.bestBid().resd();
+    case Column::BidResd:
+      var = toVariant(market.bestBid().resd());
       break;
-    case column::BidCount:
+    case Column::BidCount:
       var = market.bestBid().count();
       break;
-    case column::OfferPrice:
+    case Column::OfferPrice:
       var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
       break;
-    case column::OfferResd:
-      var = market.bestOffer().resd();
+    case Column::OfferResd:
+      var = toVariant(market.bestOffer().resd());
       break;
-    case column::OfferCount:
+    case Column::OfferCount:
       var = market.bestOffer().count();
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    switch (index.column()) {
-    case column::Contr:
-    case column::State:
+    switch (box<Column>(index.column())) {
+    case Column::Contr:
+    case Column::State:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
-    case column::Id:
-    case column::SettlDate:
-    case column::LastLots:
-    case column::LastPrice:
-    case column::LastTime:
-    case column::BidPrice:
-    case column::BidResd:
-    case column::BidCount:
-    case column::OfferPrice:
-    case column::OfferResd:
-    case column::OfferCount:
+    case Column::Id:
+    case Column::SettlDate:
+    case Column::LastLots:
+    case Column::LastPrice:
+    case Column::LastTime:
+    case Column::BidPrice:
+    case Column::BidResd:
+    case Column::BidCount:
+    case Column::OfferPrice:
+    case Column::OfferResd:
+    case Column::OfferCount:
       var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
       break;
     }
@@ -143,7 +143,7 @@ void MarketModel::updateRow(const Market& market)
   const bool found{it != rows_.end() && !rows_.key_comp()(market.id(), it->first)};
   if (found) {
     it->second = market;
-    emit dataChanged(index(i, 0), index(i, column::Count - 1));
+    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

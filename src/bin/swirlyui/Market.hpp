@@ -20,8 +20,6 @@
 #include "Contr.hpp"
 #include "Level.hpp"
 
-#include <QDate>
-
 #ifndef SWIRLY_DEPTH
 #define SWIRLY_DEPTH 3
 #endif // SWIRLY_DEPTH
@@ -29,9 +27,8 @@
 namespace swirly {
 namespace ui {
 namespace market {
-namespace column {
 
-enum { //
+enum class Column : int { //
   Id, //
   Contr, //
   SettlDate, //
@@ -44,11 +41,10 @@ enum { //
   LastTime, //
   OfferPrice, //
   OfferResd, //
-  OfferCount, //
-  Count
+  OfferCount
 };
+constexpr int ColumnCount{unbox(Column::OfferCount) + 1};
 
-} // column
 } // market
 
 class Market {

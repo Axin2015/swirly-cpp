@@ -14,42 +14,35 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_MAINWINDOW_HPP
-#define SWIRLYUI_MAINWINDOW_HPP
+#include <swirly/elm/BasicTypes.hpp>
 
-#include "HttpClient.hpp"
+#include <swirly/tea/Test.hpp>
 
-#include <QMainWindow>
+#include <cstring>
 
-namespace swirly {
-namespace ui {
+using namespace swirly;
 
-class MainWindow : public QMainWindow {
-  Q_OBJECT
+SWIRLY_TEST_CASE(AssetType)
+{
+  SWIRLY_CHECK(strcmp(enumString(AssetType::Commodity), "COMMODITY") == 0);
+}
 
- public:
-  MainWindow();
-  ~MainWindow() noexcept override;
+SWIRLY_TEST_CASE(Direct)
+{
+  SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
+}
 
- protected:
-  void closeEvent(QCloseEvent* event) override;
+SWIRLY_TEST_CASE(LiqInd)
+{
+  SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
+}
 
- private slots:
-  void slotRefDataComplete();
-  void slotServiceError(const QString& error);
-  void slotAbout();
+SWIRLY_TEST_CASE(Side)
+{
+  SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
+}
 
- private:
-  void createActions();
-  void createStatusBar();
-  void readSettings();
-  void writeSettings();
-  bool canClose();
-
-  HttpClient client_;
-};
-
-} // ui
-} // swirly
-
-#endif // SWIRLYUI_MAINWINDOW_HPP
+SWIRLY_TEST_CASE(State)
+{
+  SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
+}

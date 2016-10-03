@@ -45,7 +45,7 @@ class OrderModel : public QAbstractTableModel {
   void updateRow(const Order& order);
 
  private:
-  QVariant header_[order::column::Count];
+  QVariant header_[order::ColumnCount];
   using Key = std::pair<Id64, Id64>;
   boost::container::flat_map<Key, Order, std::less<Key>> rows_;
 };

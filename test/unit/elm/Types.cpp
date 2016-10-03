@@ -19,28 +19,3 @@
 #include <swirly/tea/Test.hpp>
 
 using namespace swirly;
-
-SWIRLY_TEST_CASE(AssetType)
-{
-  SWIRLY_CHECK(strcmp(enumString(AssetType::Commodity), "COMMODITY") == 0);
-}
-
-SWIRLY_TEST_CASE(Direct)
-{
-  SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
-}
-
-SWIRLY_TEST_CASE(LiqInd)
-{
-  SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
-}
-
-SWIRLY_TEST_CASE(Side)
-{
-  SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
-}
-
-SWIRLY_TEST_CASE(State)
-{
-  SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
-}

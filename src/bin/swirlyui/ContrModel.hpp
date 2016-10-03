@@ -47,7 +47,7 @@ class ContrModel : public QAbstractTableModel {
   void updateRow(const Contr& contr);
 
  private:
-  QVariant header_[contr::column::Count];
+  QVariant header_[contr::ColumnCount];
   boost::container::flat_map<QString, Contr, std::less<QString>> rows_;
 };
 

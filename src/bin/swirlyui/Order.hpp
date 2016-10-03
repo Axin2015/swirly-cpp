@@ -18,16 +18,12 @@
 #define SWIRLYUI_ORDER_HPP
 
 #include "Contr.hpp"
-#include "Conv.hpp"
-
-#include <QDate>
 
 namespace swirly {
 namespace ui {
 namespace order {
-namespace column {
 
-enum { //
+enum class Column : int { //
   MarketId, //
   Contr, //
   SettlDate, //
@@ -45,11 +41,10 @@ enum { //
   LastPrice, //
   MinLots, //
   Created, //
-  Modified, //
-  Count
+  Modified
 };
+constexpr int ColumnCount{unbox(Column::Modified) + 1};
 
-} // column
 } // order
 
 class Order {

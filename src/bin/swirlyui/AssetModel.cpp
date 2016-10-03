@@ -26,9 +26,9 @@ using namespace asset;
 
 AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::Mnem] = tr("Mnem");
-  header_[column::Display] = tr("Display");
-  header_[column::Type] = tr("Type");
+  header_[unbox(Column::Mnem)] = tr("Mnem");
+  header_[unbox(Column::Display)] = tr("Display");
+  header_[unbox(Column::Type)] = tr("Type");
 }
 
 AssetModel::~AssetModel() noexcept = default;
@@ -40,7 +40,7 @@ int AssetModel::rowCount(const QModelIndex& parent) const
 
 int AssetModel::columnCount(const QModelIndex& parent) const
 {
-  return column::Count;
+  return ColumnCount;
 }
 
 QVariant AssetModel::data(const QModelIndex& index, int role) const
@@ -50,22 +50,22 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
     // No-op.
   } else if (role == Qt::DisplayRole) {
     const auto& asset = rows_.nth(index.row())->second;
-    switch (index.column()) {
-    case column::Mnem:
+    switch (box<Column>(index.column())) {
+    case Column::Mnem:
       var = asset.mnem();
       break;
-    case column::Display:
+    case Column::Display:
       var = asset.display();
       break;
-    case column::Type:
+    case Column::Type:
       var = enumString(asset.type());
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    switch (index.column()) {
-    case column::Mnem:
-    case column::Display:
-    case column::Type:
+    switch (box<Column>(index.column())) {
+    case Column::Mnem:
+    case Column::Display:
+    case Column::Type:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
     }
@@ -91,7 +91,7 @@ void AssetModel::updateRow(const Asset& asset)
   const bool found{it != rows_.end() && !rows_.key_comp()(asset.mnem(), it->first)};
   if (found) {
     it->second = asset;
-    emit dataChanged(index(i, 0), index(i, column::Count - 1));
+    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

@@ -19,7 +19,6 @@
 #include "Asset.hpp"
 #include "Contr.hpp"
 #include "Exec.hpp"
-#include "Json.hpp"
 #include "Market.hpp"
 #include "Order.hpp"
 #include "Posn.hpp"
@@ -82,8 +81,8 @@ void HttpClient::postOrder(const QString& contr, QDate settlDate, const QString&
   obj["settlDate"] = toJson(settlDate);
   obj["ref"] = ref;
   obj["side"] = side;
-  obj["lots"] = lots;
-  obj["ticks"] = ticks;
+  obj["lots"] = toJson(lots);
+  obj["ticks"] = toJson(ticks);
 
   QJsonDocument doc(obj);
   nam_.post(request, doc.toJson());

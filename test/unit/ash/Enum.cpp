@@ -48,10 +48,10 @@ const char* enumString(Test t)
   terminate();
 }
 
-template <>
-struct EnumTraits<Test> {
-  static void print(ostream& os, Test val) { os << enumString(val); }
-};
+inline ostream& operator<<(ostream& os, Test t)
+{
+  return os << enumString(t);
+}
 
 } // swirly
 

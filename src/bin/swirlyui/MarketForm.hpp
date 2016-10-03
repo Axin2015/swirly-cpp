@@ -14,11 +14,29 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Conv.hpp"
+#ifndef SWIRLYUI_MARKETFORM_HPP
+#define SWIRLYUI_MARKETFORM_HPP
 
-using namespace std;
+#include <QWidget>
 
 namespace swirly {
 namespace ui {
+
+class MarketForm : public QWidget {
+  Q_OBJECT
+
+ public:
+  MarketForm(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  ~MarketForm() noexcept override;
+
+ signals:
+
+ private slots:
+
+ private:
+};
+
 } // ui
 } // swirly
+
+#endif // SWIRLYUI_MARKETFORM_HPP
