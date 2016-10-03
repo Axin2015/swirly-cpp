@@ -22,9 +22,8 @@
 namespace swirly {
 namespace ui {
 namespace exec {
-namespace column {
 
-enum { //
+enum class Column : int { //
   MarketId, //
   Contr, //
   SettlDate, //
@@ -45,11 +44,10 @@ enum { //
   MatchId, //
   LiqInd, //
   Cpty, //
-  Created, //
-  Count
+  Created
 };
+constexpr int ColumnCount{unbox(Column::Created) + 1};
 
-} // column
 } // exec
 
 class Exec {

@@ -45,7 +45,7 @@ class TradeModel : public QAbstractTableModel {
   void updateRow(const Exec& trade);
 
  private:
-  QVariant header_[exec::column::Count];
+  QVariant header_[exec::ColumnCount];
   using Key = std::pair<Id64, Id64>;
   boost::container::flat_map<Key, Exec, std::less<Key>> rows_;
 };

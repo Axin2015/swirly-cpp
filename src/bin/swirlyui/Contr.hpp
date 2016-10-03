@@ -31,9 +31,8 @@ class QJsonObject;
 namespace swirly {
 namespace ui {
 namespace contr {
-namespace column {
 
-enum { //
+enum class Column : int { //
   Mnem, //
   Display, //
   Asset, //
@@ -44,11 +43,10 @@ enum { //
   TickDenom, //
   PipDp, //
   MinLots, //
-  MaxLots, //
-  Count
+  MaxLots
 };
+constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 
-} // column
 } // contr
 
 // Cheap copies.

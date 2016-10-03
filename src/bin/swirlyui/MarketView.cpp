@@ -38,10 +38,10 @@ MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   unique_ptr<QAbstractItemModel> prev{table->model()};
   table->setModel(&model);
 
-  table->setColumnHidden(column::Id, true);
-  table->setColumnHidden(column::State, true);
-  table->setColumnHidden(column::LastLots, true);
-  table->setColumnHidden(column::LastTime, true);
+  table->setColumnHidden(unbox(Column::Id), true);
+  table->setColumnHidden(unbox(Column::State), true);
+  table->setColumnHidden(unbox(Column::LastLots), true);
+  table->setColumnHidden(unbox(Column::LastTime), true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);

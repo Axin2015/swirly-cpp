@@ -37,10 +37,10 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   unique_ptr<QAbstractItemModel> prev{table->model()};
   table->setModel(&model);
 
-  table->setColumnHidden(column::MarketId, true);
-  table->setColumnHidden(column::Accnt, true);
-  table->setColumnHidden(column::State, true);
-  table->setColumnHidden(column::MinLots, true);
+  table->setColumnHidden(unbox(Column::MarketId), true);
+  table->setColumnHidden(unbox(Column::Accnt), true);
+  table->setColumnHidden(unbox(Column::State), true);
+  table->setColumnHidden(unbox(Column::MinLots), true);
 
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);

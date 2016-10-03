@@ -22,9 +22,8 @@
 namespace swirly {
 namespace ui {
 namespace posn {
-namespace column {
 
-enum { //
+enum class Column : int { //
   MarketId, //
   Contr, //
   SettlDate, //
@@ -32,11 +31,10 @@ enum { //
   BuyLots, //
   BuyAvgPrice, //
   SellLots, //
-  SellAvgPrice, //
-  Count
+  SellAvgPrice
 };
+constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
 
-} // column
 } // posn
 
 class Posn {

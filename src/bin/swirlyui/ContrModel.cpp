@@ -26,17 +26,17 @@ using namespace contr;
 
 ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::Mnem] = tr("Mnem");
-  header_[column::Display] = tr("Display");
-  header_[column::Asset] = tr("Asset");
-  header_[column::Ccy] = tr("Ccy");
-  header_[column::LotNumer] = tr("Lot Numer");
-  header_[column::LotDenom] = tr("Lot Denom");
-  header_[column::TickNumer] = tr("Tick Numer");
-  header_[column::TickDenom] = tr("Tick Denom");
-  header_[column::PipDp] = tr("Pip Dp");
-  header_[column::MinLots] = tr("Min Lots");
-  header_[column::MaxLots] = tr("Max Lots");
+  header_[unbox(Column::Mnem)] = tr("Mnem");
+  header_[unbox(Column::Display)] = tr("Display");
+  header_[unbox(Column::Asset)] = tr("Asset");
+  header_[unbox(Column::Ccy)] = tr("Ccy");
+  header_[unbox(Column::LotNumer)] = tr("Lot Numer");
+  header_[unbox(Column::LotDenom)] = tr("Lot Denom");
+  header_[unbox(Column::TickNumer)] = tr("Tick Numer");
+  header_[unbox(Column::TickDenom)] = tr("Tick Denom");
+  header_[unbox(Column::PipDp)] = tr("Pip Dp");
+  header_[unbox(Column::MinLots)] = tr("Min Lots");
+  header_[unbox(Column::MaxLots)] = tr("Max Lots");
 }
 
 ContrModel::~ContrModel() noexcept = default;
@@ -48,7 +48,7 @@ int ContrModel::rowCount(const QModelIndex& parent) const
 
 int ContrModel::columnCount(const QModelIndex& parent) const
 {
-  return column::Count;
+  return ColumnCount;
 }
 
 QVariant ContrModel::data(const QModelIndex& index, int role) const
@@ -58,56 +58,56 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
     // No-op.
   } else if (role == Qt::DisplayRole) {
     const auto& contr = rows_.nth(index.row())->second;
-    switch (index.column()) {
-    case column::Mnem:
+    switch (box<Column>(index.column())) {
+    case Column::Mnem:
       var = contr.mnem();
       break;
-    case column::Display:
+    case Column::Display:
       var = contr.display();
       break;
-    case column::Asset:
+    case Column::Asset:
       var = contr.asset();
       break;
-    case column::Ccy:
+    case Column::Ccy:
       var = contr.ccy();
       break;
-    case column::LotNumer:
+    case Column::LotNumer:
       var = contr.lotNumer();
       break;
-    case column::LotDenom:
+    case Column::LotDenom:
       var = contr.lotDenom();
       break;
-    case column::TickNumer:
+    case Column::TickNumer:
       var = contr.tickNumer();
       break;
-    case column::TickDenom:
+    case Column::TickDenom:
       var = contr.tickDenom();
       break;
-    case column::PipDp:
+    case Column::PipDp:
       var = contr.pipDp();
       break;
-    case column::MinLots:
+    case Column::MinLots:
       var = toVariant(contr.minLots());
       break;
-    case column::MaxLots:
+    case Column::MaxLots:
       var = toVariant(contr.maxLots());
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    switch (index.column()) {
-    case column::Mnem:
-    case column::Display:
-    case column::Asset:
-    case column::Ccy:
+    switch (box<Column>(index.column())) {
+    case Column::Mnem:
+    case Column::Display:
+    case Column::Asset:
+    case Column::Ccy:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
-    case column::LotNumer:
-    case column::LotDenom:
-    case column::TickNumer:
-    case column::TickDenom:
-    case column::PipDp:
-    case column::MinLots:
-    case column::MaxLots:
+    case Column::LotNumer:
+    case Column::LotDenom:
+    case Column::TickNumer:
+    case Column::TickDenom:
+    case Column::PipDp:
+    case Column::MinLots:
+    case Column::MaxLots:
       var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
       break;
     }
@@ -143,7 +143,7 @@ void ContrModel::updateRow(const Contr& contr)
   const bool found{it != rows_.end() && !rows_.key_comp()(contr.mnem(), it->first)};
   if (found) {
     it->second = contr;
-    emit dataChanged(index(i, 0), index(i, column::Count - 1));
+    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

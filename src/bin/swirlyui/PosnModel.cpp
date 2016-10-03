@@ -26,14 +26,14 @@ using namespace posn;
 
 PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::MarketId] = tr("Market Id");
-  header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("Settl Date");
-  header_[column::Accnt] = tr("Accnt");
-  header_[column::BuyLots] = tr("Buy Lots");
-  header_[column::BuyAvgPrice] = tr("Buy Avg Price");
-  header_[column::SellLots] = tr("Sell Lots");
-  header_[column::SellAvgPrice] = tr("Sell Avg Price");
+  header_[unbox(Column::MarketId)] = tr("Market Id");
+  header_[unbox(Column::Contr)] = tr("Contr");
+  header_[unbox(Column::SettlDate)] = tr("Settl Date");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
+  header_[unbox(Column::BuyLots)] = tr("Buy Lots");
+  header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg Price");
+  header_[unbox(Column::SellLots)] = tr("Sell Lots");
+  header_[unbox(Column::SellAvgPrice)] = tr("Sell Avg Price");
 }
 
 PosnModel::~PosnModel() noexcept = default;
@@ -45,7 +45,7 @@ int PosnModel::rowCount(const QModelIndex& parent) const
 
 int PosnModel::columnCount(const QModelIndex& parent) const
 {
-  return column::Count;
+  return ColumnCount;
 }
 
 QVariant PosnModel::data(const QModelIndex& index, int role) const
@@ -55,44 +55,44 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     // No-op.
   } else if (role == Qt::DisplayRole) {
     const auto& posn = rows_.nth(index.row())->second;
-    switch (index.column()) {
-    case column::MarketId:
+    switch (box<Column>(index.column())) {
+    case Column::MarketId:
       var = toVariant(posn.marketId());
       break;
-    case column::Contr:
+    case Column::Contr:
       var = posn.contr().mnem();
       break;
-    case column::SettlDate:
+    case Column::SettlDate:
       var = posn.settlDate();
       break;
-    case column::Accnt:
+    case Column::Accnt:
       var = posn.accnt();
       break;
-    case column::BuyLots:
+    case Column::BuyLots:
       var = toVariant(posn.buyLots());
       break;
-    case column::BuyAvgPrice:
+    case Column::BuyAvgPrice:
       var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
       break;
-    case column::SellLots:
+    case Column::SellLots:
       var = toVariant(posn.sellLots());
       break;
-    case column::SellAvgPrice:
+    case Column::SellAvgPrice:
       var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    switch (index.column()) {
-    case column::Contr:
-    case column::Accnt:
+    switch (box<Column>(index.column())) {
+    case Column::Contr:
+    case Column::Accnt:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
-    case column::MarketId:
-    case column::SettlDate:
-    case column::BuyLots:
-    case column::BuyAvgPrice:
-    case column::SellLots:
-    case column::SellAvgPrice:
+    case Column::MarketId:
+    case Column::SettlDate:
+    case Column::BuyLots:
+    case Column::BuyAvgPrice:
+    case Column::SellLots:
+    case Column::SellAvgPrice:
       var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
       break;
     }
@@ -118,7 +118,7 @@ void PosnModel::updateRow(const Posn& posn)
   const bool found{it != rows_.end() && !rows_.key_comp()(posn.marketId(), it->first)};
   if (found) {
     it->second = posn;
-    emit dataChanged(index(i, 0), index(i, column::Count - 1));
+    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);

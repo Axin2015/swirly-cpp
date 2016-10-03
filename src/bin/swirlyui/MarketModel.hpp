@@ -45,7 +45,7 @@ class MarketModel : public QAbstractTableModel {
   void updateRow(const Market& market);
 
  private:
-  QVariant header_[market::column::Count];
+  QVariant header_[market::ColumnCount];
   boost::container::flat_map<Id64, Market, std::less<Id64>> rows_;
 };
 

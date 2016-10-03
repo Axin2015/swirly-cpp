@@ -27,9 +27,8 @@
 namespace swirly {
 namespace ui {
 namespace market {
-namespace column {
 
-enum { //
+enum class Column : int { //
   Id, //
   Contr, //
   SettlDate, //
@@ -42,11 +41,10 @@ enum { //
   LastTime, //
   OfferPrice, //
   OfferResd, //
-  OfferCount, //
-  Count
+  OfferCount
 };
+constexpr int ColumnCount{unbox(Column::OfferCount) + 1};
 
-} // column
 } // market
 
 class Market {

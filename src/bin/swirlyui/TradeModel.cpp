@@ -26,27 +26,27 @@ using namespace exec;
 
 TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
 {
-  header_[column::MarketId] = tr("Market Id");
-  header_[column::Contr] = tr("Contr");
-  header_[column::SettlDate] = tr("Settl Date");
-  header_[column::Id] = tr("Id");
-  header_[column::OrderId] = tr("Order Id");
-  header_[column::Accnt] = tr("Accnt");
-  header_[column::Ref] = tr("Ref");
-  header_[column::State] = tr("State");
-  header_[column::Side] = tr("Side");
-  header_[column::Lots] = tr("Lots");
-  header_[column::Price] = tr("Price");
-  header_[column::Resd] = tr("Resd");
-  header_[column::Exec] = tr("Exec");
-  header_[column::AvgPrice] = tr("Avg Price");
-  header_[column::LastLots] = tr("Last Lots");
-  header_[column::LastPrice] = tr("Last Price");
-  header_[column::MinLots] = tr("Min Lots");
-  header_[column::MatchId] = tr("Match Id");
-  header_[column::LiqInd] = tr("Liq Ind");
-  header_[column::Cpty] = tr("Cpty");
-  header_[column::Created] = tr("Created");
+  header_[unbox(Column::MarketId)] = tr("Market Id");
+  header_[unbox(Column::Contr)] = tr("Contr");
+  header_[unbox(Column::SettlDate)] = tr("Settl Date");
+  header_[unbox(Column::Id)] = tr("Id");
+  header_[unbox(Column::OrderId)] = tr("Order Id");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
+  header_[unbox(Column::Ref)] = tr("Ref");
+  header_[unbox(Column::State)] = tr("State");
+  header_[unbox(Column::Side)] = tr("Side");
+  header_[unbox(Column::Lots)] = tr("Lots");
+  header_[unbox(Column::Price)] = tr("Price");
+  header_[unbox(Column::Resd)] = tr("Resd");
+  header_[unbox(Column::Exec)] = tr("Exec");
+  header_[unbox(Column::AvgPrice)] = tr("Avg Price");
+  header_[unbox(Column::LastLots)] = tr("Last Lots");
+  header_[unbox(Column::LastPrice)] = tr("Last Price");
+  header_[unbox(Column::MinLots)] = tr("Min Lots");
+  header_[unbox(Column::MatchId)] = tr("Match Id");
+  header_[unbox(Column::LiqInd)] = tr("Liq Ind");
+  header_[unbox(Column::Cpty)] = tr("Cpty");
+  header_[unbox(Column::Created)] = tr("Created");
 }
 
 TradeModel::~TradeModel() noexcept = default;
@@ -58,7 +58,7 @@ int TradeModel::rowCount(const QModelIndex& parent) const
 
 int TradeModel::columnCount(const QModelIndex& parent) const
 {
-  return column::Count;
+  return ColumnCount;
 }
 
 QVariant TradeModel::data(const QModelIndex& index, int role) const
@@ -68,96 +68,96 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     // No-op.
   } else if (role == Qt::DisplayRole) {
     const auto& trade = rows_.nth(index.row())->second;
-    switch (index.column()) {
-    case column::MarketId:
+    switch (box<Column>(index.column())) {
+    case Column::MarketId:
       var = toVariant(trade.marketId());
       break;
-    case column::Contr:
+    case Column::Contr:
       var = trade.contr().mnem();
       break;
-    case column::SettlDate:
+    case Column::SettlDate:
       var = trade.settlDate();
       break;
-    case column::Id:
+    case Column::Id:
       var = toVariant(trade.id());
       break;
-    case column::OrderId:
+    case Column::OrderId:
       var = toVariant(trade.orderId());
       break;
-    case column::Accnt:
+    case Column::Accnt:
       var = trade.accnt();
       break;
-    case column::Ref:
+    case Column::Ref:
       var = trade.ref();
       break;
-    case column::State:
+    case Column::State:
       var = enumString(trade.state());
       break;
-    case column::Side:
+    case Column::Side:
       var = enumString(trade.side());
       break;
-    case column::Lots:
+    case Column::Lots:
       var = toVariant(trade.lots());
       break;
-    case column::Price:
+    case Column::Price:
       var = ticksToPriceString(trade.ticks(), trade.contr());
       break;
-    case column::Resd:
+    case Column::Resd:
       var = toVariant(trade.resd());
       break;
-    case column::Exec:
+    case Column::Exec:
       var = toVariant(trade.exec());
       break;
-    case column::AvgPrice:
+    case Column::AvgPrice:
       var = ticksToAvgPriceString(trade.exec(), trade.cost(), trade.contr());
       break;
-    case column::LastLots:
+    case Column::LastLots:
       var = toVariant(trade.lastLots());
       break;
-    case column::LastPrice:
+    case Column::LastPrice:
       var = ticksToPriceString(trade.lastTicks(), trade.contr());
       break;
-    case column::MinLots:
+    case Column::MinLots:
       var = toVariant(trade.minLots());
       break;
-    case column::MatchId:
+    case Column::MatchId:
       var = toVariant(trade.matchId());
       break;
-    case column::LiqInd:
+    case Column::LiqInd:
       var = enumString(trade.liqInd());
       break;
-    case column::Cpty:
+    case Column::Cpty:
       var = trade.cpty();
       break;
-    case column::Created:
+    case Column::Created:
       var = trade.created();
       break;
     }
   } else if (role == Qt::TextAlignmentRole) {
-    switch (index.column()) {
-    case column::Contr:
-    case column::Accnt:
-    case column::Ref:
-    case column::State:
-    case column::Side:
-    case column::LiqInd:
-    case column::Cpty:
+    switch (box<Column>(index.column())) {
+    case Column::Contr:
+    case Column::Accnt:
+    case Column::Ref:
+    case Column::State:
+    case Column::Side:
+    case Column::LiqInd:
+    case Column::Cpty:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
-    case column::MarketId:
-    case column::SettlDate:
-    case column::Id:
-    case column::OrderId:
-    case column::Lots:
-    case column::Price:
-    case column::Resd:
-    case column::Exec:
-    case column::AvgPrice:
-    case column::LastLots:
-    case column::LastPrice:
-    case column::MinLots:
-    case column::MatchId:
-    case column::Created:
+    case Column::MarketId:
+    case Column::SettlDate:
+    case Column::Id:
+    case Column::OrderId:
+    case Column::Lots:
+    case Column::Price:
+    case Column::Resd:
+    case Column::Exec:
+    case Column::AvgPrice:
+    case Column::LastLots:
+    case Column::LastPrice:
+    case Column::MinLots:
+    case Column::MatchId:
+    case Column::Created:
       var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
       break;
     }
@@ -184,7 +184,7 @@ void TradeModel::updateRow(const Exec& trade)
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
     it->second = trade;
-    emit dataChanged(index(i, 0), index(i, column::Count - 1));
+    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
     // If not found then insert.
     beginInsertRows(QModelIndex{}, i, i);
