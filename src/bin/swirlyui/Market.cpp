@@ -52,7 +52,7 @@ Market Market::fromJson(const Contr& contr, const QJsonObject& obj)
   const auto offerTicks = obj["offerTicks"].toArray();
   const auto offerResd = obj["offerResd"].toArray();
   const auto offerCount = obj["offerCount"].toArray();
-  toLevels(bidTicks, bidResd, bidCount, market.offers_);
+  toLevels(offerTicks, offerResd, offerCount, market.offers_);
 
   return market;
 }
