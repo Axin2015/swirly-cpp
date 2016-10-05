@@ -28,7 +28,7 @@ namespace {
 void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray& count,
               Market::Levels& levels)
 {
-  for (size_t i{0}; i < Market::Depth; ++i) {
+  for (size_t i{0}; i < MaxLevels; ++i) {
     levels[i] = {fromJson<Ticks>(ticks[i]), fromJson<Lots>(resd[i]), fromJson<int>(count[i])};
   }
 }

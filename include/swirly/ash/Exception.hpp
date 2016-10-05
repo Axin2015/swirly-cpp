@@ -17,17 +17,13 @@
 #ifndef SWIRLY_ASH_EXCEPTION_HPP
 #define SWIRLY_ASH_EXCEPTION_HPP
 
+#include <swirly/ash/Limits.hpp>
 #include <swirly/ash/Stream.hpp>
 
 #include <cstring> // strcpy()
 #include <exception>
 
 namespace swirly {
-
-/**
- * Maximum error message length.
- */
-constexpr std::size_t MaxErrMsg{511};
 
 using ErrMsg = StringBuilder<MaxErrMsg>;
 

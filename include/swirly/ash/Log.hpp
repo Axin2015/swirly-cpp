@@ -17,14 +17,10 @@
 #ifndef SWIRLY_ASH_LOG_HPP
 #define SWIRLY_ASH_LOG_HPP
 
+#include <swirly/ash/Limits.hpp>
 #include <swirly/ash/Stream.hpp>
 
 namespace swirly {
-
-/**
- * Maximum log message length when LogMsg is used.
- */
-constexpr std::size_t MaxLogMsg{2048};
 
 /**
  * Logger callback function.

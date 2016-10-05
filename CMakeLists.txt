@@ -23,7 +23,7 @@ set(CMAKE_VERBOSE_MAKEFILE 1)
 # Configuration options:
 set(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
 set(MG_ENABLE_DEBUG    OFF CACHE BOOL   "Enable Mongoose debug.")
-set(SWIRLY_DEPTH       3   CACHE STRING "Depth of book.")
+set(SWIRLY_MAX_LEVELS  3   CACHE STRING "Maximum price levels.")
 
 if(NOT CMAKE_BUILD_TYPE)
   #set(CMAKE_BUILD_TYPE DEBUG)
@@ -53,7 +53,7 @@ elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 endif()
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 
-add_definitions(-DSWIRLY_DEPTH=${SWIRLY_DEPTH})
+add_definitions(-DSWIRLY_MAX_LEVELS=${SWIRLY_MAX_LEVELS})
 
 add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")

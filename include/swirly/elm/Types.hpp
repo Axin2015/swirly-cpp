@@ -18,6 +18,7 @@
 #define SWIRLY_ELM_TYPES_HPP
 
 #include <swirly/elm/BasicTypes.hpp>
+#include <swirly/elm/Limits.hpp>
 
 #include <swirly/ash/String.hpp>
 
@@ -26,16 +27,6 @@
 #include <memory>
 
 namespace swirly {
-
-/**
- * Maximum display characters.
- */
-constexpr std::size_t MaxDisplay{64};
-
-/**
- * Maximum reference characters.
- */
-constexpr std::size_t MaxRef{64};
 
 /**
  * Description suitable for display on user-interface.
