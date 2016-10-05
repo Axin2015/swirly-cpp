@@ -33,6 +33,8 @@
 namespace swirly {
 namespace ui {
 
+constexpr std::size_t MaxExecs{12};
+
 template <typename ValueT, typename EnableT = void>
 struct TypeTraits;
 
