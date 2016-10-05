@@ -17,6 +17,7 @@
 #include "AssetView.hpp"
 
 #include "AssetModel.hpp"
+#include "Utility.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -33,9 +34,10 @@ AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_(model)
 {
   auto table = make_unique<QTableView>();
-  unique_ptr<QAbstractItemModel> prev{table->model()};
-  table->setModel(&model);
-
+  {
+    auto del = makeDeleter(table->model());
+    table->setModel(&model);
+  }
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 

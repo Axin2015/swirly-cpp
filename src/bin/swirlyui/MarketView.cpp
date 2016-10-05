@@ -18,6 +18,7 @@
 
 #include "MarketForm.hpp"
 #include "MarketModel.hpp"
+#include "Utility.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -39,9 +40,10 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
   connect(form.get(), &MarketForm::createOrder, this, &MarketView::createOrder);
 
   auto table = make_unique<QTableView>();
-  unique_ptr<QAbstractItemModel> prev{table->model()};
-  table->setModel(&model);
-
+  {
+    auto del = makeDeleter(table->model());
+    table->setModel(&model);
+  }
   table->setColumnHidden(unbox(Column::Id), true);
   table->setColumnHidden(unbox(Column::State), true);
   table->setColumnHidden(unbox(Column::LastLots), true);

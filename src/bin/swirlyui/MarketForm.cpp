@@ -17,6 +17,7 @@
 #include "MarketForm.hpp"
 
 #include "ContrModel.hpp"
+#include "Utility.hpp"
 
 #include <QAbstractItemModel>
 #include <QApplication>
@@ -38,17 +39,26 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
   : QWidget{parent, f}, contrModel_(contrModel)
 {
   auto contrComboBox = make_unique<QComboBox>();
-  contrComboBox->setModel(&contrModel);
+  {
+    auto del = makeDeleter(contrComboBox->model());
+    contrComboBox->setModel(&contrModel);
+  }
   QFontMetrics fm{QApplication::font()};
   contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
 
   auto settlDateEdit = make_unique<QDateEdit>(QDate{2016, 10, 28});
   auto lotsEdit = make_unique<QLineEdit>();
   lotsEdit->setPlaceholderText(tr("Lots"));
-  lotsEdit->setValidator(&lotsValidator_);
+  {
+    auto del = makeDeleter(const_cast<QValidator*>(lotsEdit->validator()));
+    lotsEdit->setValidator(&lotsValidator_);
+  }
   auto priceEdit = make_unique<QLineEdit>();
   priceEdit->setPlaceholderText(tr("Price"));
-  priceEdit->setValidator(&priceValidator_);
+  {
+    auto del = makeDeleter(const_cast<QValidator*>(priceEdit->validator()));
+    priceEdit->setValidator(&priceValidator_);
+  }
   auto buyButton = make_unique<QPushButton>(tr("Buy"));
   auto sellButton = make_unique<QPushButton>(tr("Sell"));
 

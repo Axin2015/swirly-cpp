@@ -17,6 +17,7 @@
 #include "OrderView.hpp"
 
 #include "OrderModel.hpp"
+#include "Utility.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -34,9 +35,10 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_(model)
 {
   auto table = make_unique<QTableView>();
-  unique_ptr<QAbstractItemModel> prev{table->model()};
-  table->setModel(&model);
-
+  {
+    auto del = makeDeleter(table->model());
+    table->setModel(&model);
+  }
   table->setColumnHidden(unbox(Column::MarketId), true);
   table->setColumnHidden(unbox(Column::Accnt), true);
   table->setColumnHidden(unbox(Column::MinLots), true);
