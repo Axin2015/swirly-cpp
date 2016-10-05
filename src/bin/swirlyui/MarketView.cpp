@@ -18,6 +18,7 @@
 
 #include "MarketForm.hpp"
 #include "MarketModel.hpp"
+#include "Utility.hpp"
 
 #include <QGridLayout>
 #include <QModelIndex>
@@ -31,13 +32,18 @@ namespace swirly {
 namespace ui {
 using namespace market;
 
-MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_{model}
+MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* parent,
+                       Qt::WindowFlags f)
+  : QWidget{parent, f}, model_(model)
 {
-  auto table = make_unique<QTableView>();
-  unique_ptr<QAbstractItemModel> prev{table->model()};
-  table->setModel(&model);
+  auto form = make_unique<MarketForm>(contrModel);
+  connect(form.get(), &MarketForm::createOrder, this, &MarketView::createOrder);
 
+  auto table = make_unique<QTableView>();
+  {
+    auto del = makeDeleter(table->model());
+    table->setModel(&model);
+  }
   table->setColumnHidden(unbox(Column::Id), true);
   table->setColumnHidden(unbox(Column::State), true);
   table->setColumnHidden(unbox(Column::LastLots), true);
@@ -47,7 +53,7 @@ MarketView::MarketView(MarketModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
   auto layout = make_unique<QVBoxLayout>();
-  layout->addWidget(new MarketForm);
+  layout->addWidget(form.release());
   layout->addWidget(table.release());
   setLayout(layout.release());
 }

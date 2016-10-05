@@ -52,7 +52,8 @@ set(swirlyui_SOURCES
   PosnView.cpp
   TradeModel.cpp
   TradeView.cpp
-  Types.cpp)
+  Types.cpp
+  Utility.cpp)
 
 add_executable(swirlyui ${swirlyui_RESOURCES} ${swirlyui_SOURCES})
 target_link_libraries(swirlyui Qt5::Widgets Qt5::Network)

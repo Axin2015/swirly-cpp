@@ -14,22 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <QApplication>
+#ifndef SWIRLYUI_UTILITY_HPP
+#define SWIRLYUI_UTILITY_HPP
 
-#include "MainWindow.hpp"
+#include <QObject>
 
-int main(int argc, char* argv[])
+#include <memory>
+
+namespace swirly {
+namespace ui {
+
+inline auto makeDeleter(QObject* obj) noexcept
 {
-  Q_INIT_RESOURCE(Application);
-
-  QApplication app(argc, argv);
-  QCoreApplication::setOrganizationName("swirlycloud");
-  QCoreApplication::setApplicationName("swirlyui");
-  QCoreApplication::setApplicationVersion(QT_VERSION_STR);
-
-  QGuiApplication::setApplicationDisplayName("Swirly UI");
-
-  swirly::ui::MainWindow win;
-  win.show();
-  return app.exec();
+  if (obj) {
+    obj->setParent(nullptr);
+  }
+  return std::unique_ptr<QObject>{obj};
 }
+
+} // ui
+} // swirly
+
+#endif // SWIRLYUI_UTILITY_HPP

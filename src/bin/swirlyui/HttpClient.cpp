@@ -50,7 +50,7 @@ void HttpClient::timerEvent(QTimerEvent* event)
   getAccnt();
 }
 
-void HttpClient::postMarket(const QString& contr, QDate settlDate, MarketState state)
+void HttpClient::createMarket(const QString& contr, QDate settlDate, MarketState state)
 {
   QNetworkRequest request{QUrl{"http://127.0.0.1:8080/market"}};
   request.setAttribute(QNetworkRequest::User, PostMarket);
@@ -67,8 +67,8 @@ void HttpClient::postMarket(const QString& contr, QDate settlDate, MarketState s
   nam_.post(request, doc.toJson());
 }
 
-void HttpClient::postOrder(const QString& contr, QDate settlDate, const QString& ref,
-                           const QString& side, Lots lots, Ticks ticks)
+void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+                             Lots lots, Ticks ticks)
 {
   QNetworkRequest request{QUrl{"http://127.0.0.1:8080/accnt/order"}};
   request.setAttribute(QNetworkRequest::User, PostOrder);
@@ -76,11 +76,12 @@ void HttpClient::postOrder(const QString& contr, QDate settlDate, const QString&
   request.setRawHeader("Swirly-Accnt", "MARAYL");
   request.setRawHeader("Swirly-Perm", "2");
 
+  qDebug() << toJson(settlDate);
   QJsonObject obj;
-  obj["contr"] = contr;
+  obj["contr"] = contr.mnem();
   obj["settlDate"] = toJson(settlDate);
   obj["ref"] = ref;
-  obj["side"] = side;
+  obj["side"] = toJson(side);
   obj["lots"] = toJson(lots);
   obj["ticks"] = toJson(ticks);
 
@@ -163,9 +164,7 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
   }
   emit refDataComplete();
 
-  //postMarket("EURUSD", QDate{2016, 9, 30}, 0);
-  //postOrder("EURUSD", QDate{2016, 9, 30}, "foo", "Buy", 10, 12345);
-  //postOrder("EURUSD", QDate{2016, 9, 30}, "bar", "Sell", 5, 12345);
+  createMarket("EURUSD", QDate{2016, 10, 28}, 0);
   getAccnt();
   startTimer(2000);
 }

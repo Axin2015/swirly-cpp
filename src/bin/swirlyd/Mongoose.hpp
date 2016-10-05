@@ -52,7 +52,7 @@ class HttpMessage {
   auto queryString() const noexcept { return +impl_->query_string; }
   auto header(const char* name) const noexcept
   {
-    auto* val = mg_get_http_header(impl_, name);
+    auto* const val = mg_get_http_header(impl_, name);
     return val ? +*val : std::string_view{};
   }
   auto body() const noexcept { return +impl_->body; }
@@ -79,7 +79,7 @@ class Mgr {
 
   mg_connection& bind(const char* addr)
   {
-    auto* conn = mg_bind(&mgr_, addr, handler);
+    auto* const conn = mg_bind(&mgr_, addr, handler);
     if (!conn)
       throw Error{"mg_bind() failed"};
     conn->user_data = this;
@@ -94,7 +94,7 @@ class Mgr {
  private:
   static void handler(mg_connection* conn, int event, void* data)
   {
-    auto* self = static_cast<DerivedT*>(conn->user_data);
+    auto* const self = static_cast<DerivedT*>(conn->user_data);
     switch (event) {
     case MG_EV_ACCEPT:
       SWIRLY_INFO(logMsg() << "http connection accepted");

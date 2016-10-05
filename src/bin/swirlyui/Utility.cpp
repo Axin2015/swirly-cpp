@@ -14,22 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <QApplication>
+#include "Utility.hpp"
 
-#include "MainWindow.hpp"
+using namespace std;
 
-int main(int argc, char* argv[])
-{
-  Q_INIT_RESOURCE(Application);
+namespace swirly {
+namespace ui {
 
-  QApplication app(argc, argv);
-  QCoreApplication::setOrganizationName("swirlycloud");
-  QCoreApplication::setApplicationName("swirlyui");
-  QCoreApplication::setApplicationVersion(QT_VERSION_STR);
-
-  QGuiApplication::setApplicationDisplayName("Swirly UI");
-
-  swirly::ui::MainWindow win;
-  win.show();
-  return app.exec();
-}
+} // ui
+} // swirly

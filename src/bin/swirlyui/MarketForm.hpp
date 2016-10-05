@@ -17,23 +17,46 @@
 #ifndef SWIRLYUI_MARKETFORM_HPP
 #define SWIRLYUI_MARKETFORM_HPP
 
+#include "Types.hpp"
+
+#include <QDoubleValidator>
+#include <QIntValidator>
 #include <QWidget>
+
+class QComboBox;
+class QDateEdit;
+class QLineEdit;
 
 namespace swirly {
 namespace ui {
+
+class Contr;
+class ContrModel;
 
 class MarketForm : public QWidget {
   Q_OBJECT
 
  public:
-  MarketForm(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  MarketForm(ContrModel& contrModel, QWidget* parent = nullptr,
+             Qt::WindowFlags f = Qt::WindowFlags{});
   ~MarketForm() noexcept override;
 
  signals:
+  void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+                   Ticks ticks);
 
  private slots:
+  void slotContrChanged(int index);
+  void slotBuyOrSellClicked(Side side);
 
  private:
+  ContrModel& contrModel_;
+  QComboBox* contrComboBox_{nullptr};
+  QDateEdit* settlDateEdit_{nullptr};
+  QLineEdit* lotsEdit_{nullptr};
+  QLineEdit* priceEdit_{nullptr};
+  QIntValidator lotsValidator_;
+  QDoubleValidator priceValidator_;
 };
 
 } // ui

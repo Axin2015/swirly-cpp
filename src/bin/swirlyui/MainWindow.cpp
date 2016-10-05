@@ -35,10 +35,16 @@ namespace ui {
 
 MainWindow::MainWindow()
 {
+  connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
+  connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
+
+  auto marketView = make_unique<MarketView>(client_.contrModel(), client_.marketModel());
+  connect(marketView.get(), &MarketView::createOrder, this, &MainWindow::slotCreateOrder);
+
   auto topTabs = make_unique<QTabWidget>();
   topTabs->addTab(new AssetView{client_.assetModel()}, tr("Asset"));
   topTabs->addTab(new ContrView{client_.contrModel()}, tr("Contr"));
-  topTabs->addTab(new MarketView{client_.marketModel()}, tr("Market"));
+  topTabs->addTab(marketView.release(), tr("Market"));
   topTabs->setCurrentIndex(2);
 
   auto bottomTabs = make_unique<QTabWidget>();
@@ -52,9 +58,6 @@ MainWindow::MainWindow()
   splitter->addWidget(bottomTabs.release());
 
   setCentralWidget(splitter.release());
-
-  connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
-  connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
 
   createActions();
   createStatusBar();
@@ -85,6 +88,18 @@ void MainWindow::slotRefDataComplete()
 void MainWindow::slotServiceError(const QString& error)
 {
   qDebug() << "slotServiceError:" << error;
+}
+
+void MainWindow::slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+                                 Lots lots, Ticks ticks)
+{
+  qDebug() << "slotCreateOrder: contr=" << contr //
+           << ",settlDate=" << settlDate //
+           << ",ref=" << ref //
+           << ",side=" << side //
+           << ",lots=" << lots //
+           << ",ticks=" << ticks;
+  client_.createOrder(contr, settlDate, ref, side, lots, ticks);
 }
 
 void MainWindow::slotAbout()

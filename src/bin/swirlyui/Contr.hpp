@@ -113,9 +113,14 @@ class Contr {
 
 QDebug operator<<(QDebug debug, const Contr& contr);
 
+inline Lots qtyToLots(double qty, const Contr& contr) noexcept
+{
+  return swirly::qtyToLots(qty, contr.qtyInc());
+}
+
 inline double lotsToQty(Lots lots, const Contr& contr) noexcept
 {
-  return lotsToQty(lots, contr.qtyInc());
+  return swirly::lotsToQty(lots, contr.qtyInc());
 }
 
 inline QString lotsToQtyString(Lots lots, const Contr& contr)
@@ -124,9 +129,14 @@ inline QString lotsToQtyString(Lots lots, const Contr& contr)
   return QString::number(qty, 'f', contr.qtyDp());
 }
 
+inline Ticks priceToTicks(double price, const Contr& contr) noexcept
+{
+  return swirly::priceToTicks(price, contr.priceInc());
+}
+
 inline double ticksToPrice(Ticks ticks, const Contr& contr) noexcept
 {
-  return ticksToPrice(ticks, contr.priceInc());
+  return swirly::ticksToPrice(ticks, contr.priceInc());
 }
 
 inline QString ticksToPriceString(Ticks ticks, const Contr& contr)
