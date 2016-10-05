@@ -105,7 +105,7 @@ struct MsgHandler {
 
   void dispatch(const Msg& msg)
   {
-    auto* derived = static_cast<DerivedT*>(this);
+    auto* const derived = static_cast<DerivedT*>(this);
     switch (msg.type) {
     case MsgType::Reset:
       derived->reset();
