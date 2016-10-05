@@ -27,6 +27,8 @@ int main(int argc, char* argv[])
   QCoreApplication::setApplicationName("swirlyui");
   QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
+  QGuiApplication::setApplicationDisplayName("Swirly UI");
+
   swirly::ui::MainWindow win;
   win.show();
   return app.exec();
