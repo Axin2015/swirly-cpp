@@ -201,7 +201,7 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
   for (const auto elem : obj["execs"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    execModel().updateRow(Exec::fromJson(contr, obj));
+    execModel().insertRow(Exec::fromJson(contr, obj));
   }
   for (const auto elem : obj["trades"].toArray()) {
     const auto obj = elem.toObject();

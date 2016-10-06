@@ -23,7 +23,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
+#include <boost/circular_buffer.hpp>
 #pragma GCC diagnostic pop
 
 namespace swirly {
@@ -42,13 +42,12 @@ class ExecModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Exec& exec);
+  void insertRow(const Exec& exec);
 
  private:
   QVariant header_[exec::ColumnCount];
   using Key = std::pair<Id64, Id64>;
-  // FIXME: use circular buffer.
-  boost::container::flat_map<Key, Exec, std::less<Key>> rows_;
+  boost::circular_buffer<Exec> rows_{MaxExecs};
 };
 
 } // ui
