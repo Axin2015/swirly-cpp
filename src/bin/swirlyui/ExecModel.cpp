@@ -26,6 +26,7 @@ using namespace exec;
 
 ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
@@ -66,9 +67,15 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
+  } else if (role == Qt::CheckStateRole) {
+    if (box<Column>(index.column()) == Column::CheckState) {
+      var = Qt::Unchecked;
+    }
   } else if (role == Qt::DisplayRole) {
     const auto& exec = rows_[index.row()];
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::MarketId:
       var = toVariant(exec.marketId());
       break;
@@ -135,6 +142,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Contr:
     case Column::Accnt:
     case Column::Ref:

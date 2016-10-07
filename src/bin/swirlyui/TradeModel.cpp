@@ -26,6 +26,7 @@ using namespace exec;
 
 TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
@@ -66,9 +67,20 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
+  } else if (role == Qt::CheckStateRole) {
+    const auto& trade = rows_.nth(index.row())->second;
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = trade.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
+    }
   } else if (role == Qt::DisplayRole) {
     const auto& trade = rows_.nth(index.row())->second;
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::MarketId:
       var = toVariant(trade.marketId());
       break;
@@ -135,6 +147,8 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Contr:
     case Column::Accnt:
     case Column::Ref:
@@ -176,6 +190,24 @@ QVariant TradeModel::headerData(int section, Qt::Orientation orientation, int ro
   return var;
 }
 
+Qt::ItemFlags TradeModel::flags(const QModelIndex& index) const
+{
+  Qt::ItemFlags flags;
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+  } else {
+    flags = QAbstractTableModel::flags(index);
+  }
+  return flags;
+}
+
+void TradeModel::toggleCheckState(int row)
+{
+  auto& trade = rows_.nth(row)->second;
+  trade.setChecked(!trade.checked());
+  emit dataChanged(index(row, unbox(Column::CheckState)), index(row, unbox(Column::CheckState)));
+}
+
 void TradeModel::updateRow(const Exec& trade)
 {
   const auto key = make_pair(trade.marketId(), trade.id());
@@ -184,6 +216,7 @@ void TradeModel::updateRow(const Exec& trade)
 
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
+    trade.setChecked(it->second.checked());
     it->second = trade;
     emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
