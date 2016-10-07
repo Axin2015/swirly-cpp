@@ -52,6 +52,8 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
+  connect(table.get(), &QTableView::clicked, this, &MarketView::slotClicked);
+
   auto layout = make_unique<QVBoxLayout>();
   layout->addWidget(form.release());
   layout->addWidget(table.release());
@@ -60,20 +62,8 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
 
 MarketView::~MarketView() noexcept = default;
 
-void MarketView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void MarketView::slotClicked(const QModelIndex& index)
 {
-  if (current.isValid()) {
-    QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Market>());
-  }
-}
-
-void MarketView::slotDoubleClicked(const QModelIndex& index)
-{
-  if (index.isValid()) {
-    QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Market>());
-  }
 }
 
 } // ui

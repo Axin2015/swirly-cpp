@@ -46,6 +46,8 @@ ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
+  connect(table.get(), &QTableView::clicked, this, &ExecView::slotClicked);
+
   auto layout = make_unique<QGridLayout>();
   layout->addWidget(table.release(), 0, 0);
   setLayout(layout.release());
@@ -53,20 +55,8 @@ ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
 
 ExecView::~ExecView() noexcept = default;
 
-void ExecView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void ExecView::slotClicked(const QModelIndex& index)
 {
-  if (current.isValid()) {
-    QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Exec>());
-  }
-}
-
-void ExecView::slotDoubleClicked(const QModelIndex& index)
-{
-  if (index.isValid()) {
-    QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Exec>());
-  }
 }
 
 } // ui

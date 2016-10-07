@@ -41,6 +41,8 @@ ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
+  connect(table.get(), &QTableView::clicked, this, &ContrView::slotClicked);
+
   auto layout = make_unique<QGridLayout>();
   layout->addWidget(table.release(), 0, 0);
   setLayout(layout.release());
@@ -48,20 +50,8 @@ ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
 
 ContrView::~ContrView() noexcept = default;
 
-void ContrView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void ContrView::slotClicked(const QModelIndex& index)
 {
-  if (current.isValid()) {
-    QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Contr>());
-  }
-}
-
-void ContrView::slotDoubleClicked(const QModelIndex& index)
-{
-  if (index.isValid()) {
-    QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Contr>());
-  }
 }
 
 } // ui

@@ -35,14 +35,9 @@ class OrderView : public QWidget {
   ~OrderView() noexcept override;
 
  signals:
-  void currentChanged(const Order& order);
-
-  void doubleClicked(const Order& order);
 
  private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
+  void slotClicked(const QModelIndex& index);
 
  private:
   OrderModel& model_;

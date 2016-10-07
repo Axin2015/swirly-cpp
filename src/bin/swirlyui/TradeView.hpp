@@ -35,14 +35,9 @@ class TradeView : public QWidget {
   ~TradeView() noexcept override;
 
  signals:
-  void currentChanged(const Exec& trade);
-
-  void doubleClicked(const Exec& trade);
 
  private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
+  void slotClicked(const QModelIndex& index);
 
  private:
   TradeModel& model_;

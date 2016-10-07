@@ -77,10 +77,11 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
 
 QVariant AssetModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
-    return QVariant{};
+  QVariant var{};
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+    var = header_[section];
   }
-  return header_[section];
+  return var;
 }
 
 void AssetModel::updateRow(const Asset& asset)
