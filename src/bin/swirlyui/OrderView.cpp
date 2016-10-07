@@ -39,6 +39,8 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
     auto del = makeDeleter(table->model());
     table->setModel(&model);
   }
+  table->resizeColumnToContents(unbox(Column::CheckState));
+
   table->setColumnHidden(unbox(Column::MarketId), true);
   table->setColumnHidden(unbox(Column::Accnt), true);
   table->setColumnHidden(unbox(Column::MinLots), true);
@@ -57,6 +59,9 @@ OrderView::~OrderView() noexcept = default;
 
 void OrderView::slotClicked(const QModelIndex& index)
 {
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    model_.toggleCheckState(index.row());
+  }
 }
 
 } // ui

@@ -26,6 +26,7 @@ using namespace order;
 
 OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
@@ -63,9 +64,20 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
+  } else if (role == Qt::CheckStateRole) {
+    const auto& order = rows_.nth(index.row())->second;
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = order.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
+    }
   } else if (role == Qt::DisplayRole) {
     const auto& order = rows_.nth(index.row())->second;
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::MarketId:
       var = toVariant(order.marketId());
       break;
@@ -123,6 +135,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Contr:
     case Column::Accnt:
     case Column::Ref:
@@ -161,6 +175,24 @@ QVariant OrderModel::headerData(int section, Qt::Orientation orientation, int ro
   return var;
 }
 
+Qt::ItemFlags OrderModel::flags(const QModelIndex& index) const
+{
+  Qt::ItemFlags flags;
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+  } else {
+    flags = QAbstractTableModel::flags(index);
+  }
+  return flags;
+}
+
+void OrderModel::toggleCheckState(int row)
+{
+  auto& order = rows_.nth(row)->second;
+  order.setChecked(!order.checked());
+  emit dataChanged(index(row, unbox(Column::CheckState)), index(row, unbox(Column::CheckState)));
+}
+
 void OrderModel::updateRow(const Order& order)
 {
   const auto key = make_pair(order.marketId(), order.id());
@@ -169,6 +201,7 @@ void OrderModel::updateRow(const Order& order)
 
   const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
   if (found) {
+    order.setChecked(it->second.checked());
     it->second = order;
     emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
   } else {
