@@ -35,14 +35,9 @@ class ExecView : public QWidget {
   ~ExecView() noexcept override;
 
  signals:
-  void currentChanged(const Exec& exec);
-
-  void doubleClicked(const Exec& exec);
 
  private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
+  void slotClicked(const QModelIndex& index);
 
  private:
   ExecModel& model_;

@@ -26,6 +26,7 @@ using namespace exec;
 
 ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
@@ -66,9 +67,15 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
+  } else if (role == Qt::CheckStateRole) {
+    if (box<Column>(index.column()) == Column::CheckState) {
+      var = Qt::Unchecked;
+    }
   } else if (role == Qt::DisplayRole) {
-    const auto& exec = rows_.nth(index.row())->second;
+    const auto& exec = rows_[index.row()];
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::MarketId:
       var = toVariant(exec.marketId());
       break;
@@ -135,6 +142,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Contr:
     case Column::Accnt:
     case Column::Ref:
@@ -162,33 +171,29 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(rows_[index.row()]);
   }
   return var;
 }
 
 QVariant ExecModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  if (orientation != Qt::Horizontal || role != Qt::DisplayRole) {
-    return QVariant{};
+  QVariant var{};
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+    var = header_[section];
   }
-  return header_[section];
+  return var;
 }
 
-void ExecModel::updateRow(const Exec& exec)
+void ExecModel::insertRow(const Exec& exec)
 {
-  const auto key = make_pair(exec.marketId(), exec.id());
-  auto it = rows_.lower_bound(key);
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
-  if (found) {
-    it->second = exec;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
+  if (rows_.full()) {
+    rows_.push_back(exec);
+    // All rows changed due to rotation.
+    emit dataChanged(index(0, 0), index(MaxExecs - 1, ColumnCount - 1));
   } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, key, exec);
+    beginInsertRows(QModelIndex{}, rows_.size(), rows_.size());
+    rows_.push_back(exec);
     endInsertRows();
   }
 }

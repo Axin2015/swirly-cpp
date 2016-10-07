@@ -45,6 +45,8 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
+  connect(table.get(), &QTableView::clicked, this, &PosnView::slotClicked);
+
   auto layout = make_unique<QGridLayout>();
   layout->addWidget(table.release(), 0, 0);
   setLayout(layout.release());
@@ -52,20 +54,8 @@ PosnView::PosnView(PosnModel& model, QWidget* parent, Qt::WindowFlags f)
 
 PosnView::~PosnView() noexcept = default;
 
-void PosnView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void PosnView::slotClicked(const QModelIndex& index)
 {
-  if (current.isValid()) {
-    QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Posn>());
-  }
-}
-
-void PosnView::slotDoubleClicked(const QModelIndex& index)
-{
-  if (index.isValid()) {
-    QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Posn>());
-  }
 }
 
 } // ui

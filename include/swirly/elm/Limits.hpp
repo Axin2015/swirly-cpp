@@ -14,36 +14,32 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRVIEW_HPP
-#define SWIRLYUI_CONTRVIEW_HPP
+#ifndef SWIRLY_ELM_LIMITS_HPP
+#define SWIRLY_ELM_LIMITS_HPP
 
-#include <QWidget>
+#include <cstddef> // size_t
 
-class QModelIndex;
+#ifndef SWIRLY_MAX_LEVELS
+#define SWIRLY_MAX_LEVELS 3
+#endif // SWIRLY_MAX_LEVELS
 
 namespace swirly {
-namespace ui {
 
-class Contr;
-class ContrModel;
+/**
+ * Maximum display characters.
+ */
+constexpr std::size_t MaxDisplay{64};
 
-class ContrView : public QWidget {
-  Q_OBJECT
+/**
+ * Maximum number of price levels.
+ */
+constexpr std::size_t MaxLevels{SWIRLY_MAX_LEVELS};
 
- public:
-  ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~ContrView() noexcept override;
+/**
+ * Maximum reference characters.
+ */
+constexpr std::size_t MaxRef{64};
 
- signals:
-
- private slots:
-  void slotClicked(const QModelIndex& index);
-
- private:
-  ContrModel& model_;
-};
-
-} // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRVIEW_HPP
+#endif // SWIRLY_ELM_LIMITS_HPP

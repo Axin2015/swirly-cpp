@@ -17,15 +17,23 @@
 #ifndef SWIRLYUI_TYPES_HPP
 #define SWIRLYUI_TYPES_HPP
 
+#include <swirly/ash/Limits.hpp>
 #include <swirly/ash/Types.hpp>
 #include <swirly/elm/BasicTypes.hpp>
+#include <swirly/elm/Conv.hpp>
+#include <swirly/elm/Limits.hpp>
 
 #include <QDate>
 #include <QDebug>
 #include <QJsonValue>
 
+// This is acceptable in private header that is only visible to and under the control of the Swirly
+// build.
+
 namespace swirly {
 namespace ui {
+
+constexpr std::size_t MaxExecs{12};
 
 template <typename ValueT, typename EnableT = void>
 struct TypeTraits;

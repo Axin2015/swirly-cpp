@@ -27,6 +27,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkReply>
+#include <QUrlQuery>
 
 namespace swirly {
 namespace ui {
@@ -132,7 +133,12 @@ void HttpClient::getRefData()
 
 void HttpClient::getAccnt()
 {
-  QNetworkRequest request{QUrl{"http://127.0.0.1:8080/accnt"}};
+  QUrl url{"http://127.0.0.1:8080/accnt"};
+  QUrlQuery query;
+  query.addQueryItem("limit", QString::number(MaxExecs));
+  url.setQuery(query.query());
+
+  QNetworkRequest request{url};
   request.setAttribute(QNetworkRequest::User, GetAccnt);
   request.setRawHeader("Swirly-Accnt", "MARAYL");
   request.setRawHeader("Swirly-Perm", "2");
@@ -195,7 +201,7 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
   for (const auto elem : obj["execs"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    execModel().updateRow(Exec::fromJson(contr, obj));
+    execModel().insertRow(Exec::fromJson(contr, obj));
   }
   for (const auto elem : obj["trades"].toArray()) {
     const auto obj = elem.toObject();

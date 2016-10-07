@@ -19,10 +19,10 @@
 
 #include <swirly/ash/Compare.hpp>
 #include <swirly/ash/Defs.hpp>
+#include <swirly/ash/Limits.hpp>
 
 #include <experimental/string_view>
 
-#include <cstddef> // ptrdiff_t
 #include <cstdint>
 #include <cstring>
 #include <memory>
@@ -33,10 +33,7 @@ using experimental::string_view;
 
 namespace swirly {
 
-/**
- * Maximum mnemonic characters.
- */
-constexpr std::size_t MaxMnem{16};
+static_assert(MaxMnem == 16, "unexpected max mnemonic");
 
 /**
  * Memorable identifier.

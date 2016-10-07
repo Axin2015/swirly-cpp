@@ -40,17 +40,11 @@ class MarketView : public QWidget {
   ~MarketView() noexcept override;
 
  signals:
-  void currentChanged(const Market& market);
-
-  void doubleClicked(const Market& market);
-
   void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
                    Ticks ticks);
 
  private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
+  void slotClicked(const QModelIndex& index);
 
  private:
   MarketModel& model_;

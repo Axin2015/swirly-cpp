@@ -14,36 +14,28 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRVIEW_HPP
-#define SWIRLYUI_CONTRVIEW_HPP
+#ifndef SWIRLY_ASH_LIMITS_HPP
+#define SWIRLY_ASH_LIMITS_HPP
 
-#include <QWidget>
-
-class QModelIndex;
+#include <cstddef> // size_t
 
 namespace swirly {
-namespace ui {
 
-class Contr;
-class ContrModel;
+/**
+ * Maximum error message length.
+ */
+constexpr std::size_t MaxErrMsg{511};
 
-class ContrView : public QWidget {
-  Q_OBJECT
+/**
+ * Maximum log message length when LogMsg is used.
+ */
+constexpr std::size_t MaxLogMsg{2048};
 
- public:
-  ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~ContrView() noexcept override;
+/**
+ * Maximum mnemonic characters.
+ */
+constexpr std::size_t MaxMnem{16};
 
- signals:
-
- private slots:
-  void slotClicked(const QModelIndex& index);
-
- private:
-  ContrModel& model_;
-};
-
-} // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRVIEW_HPP
+#endif // SWIRLY_ASH_LIMITS_HPP

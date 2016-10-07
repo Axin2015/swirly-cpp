@@ -20,10 +20,6 @@
 #include "Contr.hpp"
 #include "Level.hpp"
 
-#ifndef SWIRLY_DEPTH
-#define SWIRLY_DEPTH 3
-#endif // SWIRLY_DEPTH
-
 namespace swirly {
 namespace ui {
 namespace market {
@@ -49,8 +45,7 @@ constexpr int ColumnCount{unbox(Column::OfferCount) + 1};
 
 class Market {
  public:
-  static constexpr std::size_t Depth{SWIRLY_DEPTH};
-  using Levels = std::array<Level, Depth>;
+  using Levels = std::array<Level, MaxLevels>;
 
   Market(Id64 id, const Contr& contr, QDate settlDate, MarketState state, Lots lastLots,
          Ticks lastTicks, const QDateTime& lastTime)

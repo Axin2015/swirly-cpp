@@ -35,14 +35,9 @@ class PosnView : public QWidget {
   ~PosnView() noexcept override;
 
  signals:
-  void currentChanged(const Posn& posn);
-
-  void doubleClicked(const Posn& posn);
 
  private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
+  void slotClicked(const QModelIndex& index);
 
  private:
   PosnModel& model_;

@@ -39,6 +39,8 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
     auto del = makeDeleter(table->model());
     table->setModel(&model);
   }
+  table->resizeColumnToContents(unbox(Column::CheckState));
+
   table->setColumnHidden(unbox(Column::MarketId), true);
   table->setColumnHidden(unbox(Column::Accnt), true);
   table->setColumnHidden(unbox(Column::State), true);
@@ -47,6 +49,8 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
+  connect(table.get(), &QTableView::clicked, this, &TradeView::slotClicked);
+
   auto layout = make_unique<QGridLayout>();
   layout->addWidget(table.release(), 0, 0);
   setLayout(layout.release());
@@ -54,19 +58,10 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
 
 TradeView::~TradeView() noexcept = default;
 
-void TradeView::slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous)
+void TradeView::slotClicked(const QModelIndex& index)
 {
-  if (current.isValid()) {
-    QVariant var{model_.data(current, Qt::UserRole)};
-    emit currentChanged(var.value<Exec>());
-  }
-}
-
-void TradeView::slotDoubleClicked(const QModelIndex& index)
-{
-  if (index.isValid()) {
-    QVariant var{model_.data(index, Qt::UserRole)};
-    emit doubleClicked(var.value<Exec>());
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    model_.toggleCheckState(index.row());
   }
 }
 

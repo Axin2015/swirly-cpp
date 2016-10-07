@@ -19,8 +19,6 @@
 
 #include "Types.hpp"
 
-#include <swirly/elm/Conv.hpp>
-
 #include <QMetaType>
 #include <QString>
 

@@ -35,14 +35,9 @@ class AssetView : public QWidget {
   ~AssetView() noexcept override;
 
  signals:
-  void currentChanged(const Asset& asset);
-
-  void doubleClicked(const Asset& asset);
 
  private slots:
-  void slotCurrentChanged(const QModelIndex& current, const QModelIndex& previous);
-
-  void slotDoubleClicked(const QModelIndex& index);
+  void slotClicked(const QModelIndex& index);
 
  private:
   AssetModel& model_;

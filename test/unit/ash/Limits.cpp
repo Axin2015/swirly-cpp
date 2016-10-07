@@ -14,36 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRVIEW_HPP
-#define SWIRLYUI_CONTRVIEW_HPP
+#include <swirly/ash/Limits.hpp>
 
-#include <QWidget>
-
-class QModelIndex;
-
-namespace swirly {
-namespace ui {
-
-class Contr;
-class ContrModel;
-
-class ContrView : public QWidget {
-  Q_OBJECT
-
- public:
-  ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~ContrView() noexcept override;
-
- signals:
-
- private slots:
-  void slotClicked(const QModelIndex& index);
-
- private:
-  ContrModel& model_;
-};
-
-} // ui
-} // swirly
-
-#endif // SWIRLYUI_CONTRVIEW_HPP
+#include <swirly/tea/Test.hpp>
