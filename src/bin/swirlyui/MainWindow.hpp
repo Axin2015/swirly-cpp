@@ -37,6 +37,7 @@ class MainWindow : public QMainWindow {
  private slots:
   void slotRefDataComplete();
   void slotServiceError(const QString& error);
+  void slotCreateMarket(const Contr& contr, QDate settlDate);
   void slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
                        Lots lots, Ticks ticks);
   void slotAbout();

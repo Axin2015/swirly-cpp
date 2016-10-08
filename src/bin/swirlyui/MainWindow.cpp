@@ -39,6 +39,7 @@ MainWindow::MainWindow()
   connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
 
   auto marketView = make_unique<MarketView>(client_.contrModel(), client_.marketModel());
+  connect(marketView.get(), &MarketView::createMarket, this, &MainWindow::slotCreateMarket);
   connect(marketView.get(), &MarketView::createOrder, this, &MainWindow::slotCreateOrder);
 
   auto topTabs = make_unique<QTabWidget>();
@@ -88,6 +89,13 @@ void MainWindow::slotRefDataComplete()
 void MainWindow::slotServiceError(const QString& error)
 {
   qDebug() << "slotServiceError:" << error;
+}
+
+void MainWindow::slotCreateMarket(const Contr& contr, QDate settlDate)
+{
+  qDebug() << "slotCreateMarket: contr=" << contr //
+           << ",settlDate=" << settlDate;
+  client_.createMarket(contr, settlDate);
 }
 
 void MainWindow::slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,

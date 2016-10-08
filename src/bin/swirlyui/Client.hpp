@@ -53,7 +53,7 @@ class Client : public QObject {
   TradeModel& tradeModel() noexcept { return tradeModel_; }
   PosnModel& posnModel() noexcept { return posnModel_; }
 
-  virtual void createMarket(const QString& contr, QDate settlDate, MarketState state) = 0;
+  virtual void createMarket(const Contr& contr, QDate settlDate) = 0;
   virtual void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
                            Lots lots, Ticks ticks)
     = 0;

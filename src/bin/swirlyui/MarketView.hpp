@@ -40,6 +40,7 @@ class MarketView : public QWidget {
   ~MarketView() noexcept override;
 
  signals:
+  void createMarket(const Contr& contr, QDate settlDate);
   void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
                    Ticks ticks);
 

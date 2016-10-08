@@ -42,11 +42,13 @@ class MarketForm : public QWidget {
   ~MarketForm() noexcept override;
 
  signals:
+  void createMarket(const Contr& contr, QDate settlDate);
   void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
                    Ticks ticks);
 
  private slots:
   void slotContrChanged(int index);
+  void slotCreateClicked();
   void slotBuyOrSellClicked(Side side);
 
  private:

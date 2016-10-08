@@ -59,12 +59,14 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
     auto del = makeDeleter(const_cast<QValidator*>(priceEdit->validator()));
     priceEdit->setValidator(&priceValidator_);
   }
+  auto createButton = make_unique<QPushButton>(tr("Create"));
   auto buyButton = make_unique<QPushButton>(tr("Buy"));
   auto sellButton = make_unique<QPushButton>(tr("Sell"));
 
   connect(contrComboBox.get(),
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
           &MarketForm::slotContrChanged);
+  connect(createButton.get(), &QPushButton::clicked, [this]() { this->slotCreateClicked(); });
   connect(buyButton.get(), &QPushButton::clicked,
           [this]() { this->slotBuyOrSellClicked(Side::Buy); });
   connect(sellButton.get(), &QPushButton::clicked,
@@ -76,6 +78,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
   layout->addWidget(lotsEdit_ = lotsEdit.release());
   layout->addWidget(new QLabel{tr("@")});
   layout->addWidget(priceEdit_ = priceEdit.release());
+  layout->addWidget(createButton.release());
   layout->addWidget(buyButton.release());
   layout->addWidget(sellButton.release());
   layout->addStretch(1);
@@ -95,6 +98,12 @@ void MarketForm::slotContrChanged(int index)
   qDebug() << "slotContrChanged:" << contr;
   lotsValidator_.setRange(unbox(contr.minLots()), unbox(contr.maxLots()));
   priceValidator_.setDecimals(contr.priceDp());
+}
+
+void MarketForm::slotCreateClicked()
+{
+  auto contr = contrComboBox_->currentData().value<Contr>();
+  emit createMarket(contr, settlDateEdit_->date());
 }
 
 void MarketForm::slotBuyOrSellClicked(Side side)
