@@ -24,6 +24,9 @@
 namespace swirly {
 namespace ui {
 
+class AssetView;
+class ContrView;
+
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
@@ -50,6 +53,8 @@ class MainWindow : public QMainWindow {
   bool canClose();
 
   HttpClient client_;
+  AssetView* assetView_{nullptr};
+  ContrView* contrView_{nullptr};
 };
 
 } // ui

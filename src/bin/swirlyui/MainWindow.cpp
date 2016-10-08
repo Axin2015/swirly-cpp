@@ -43,8 +43,8 @@ MainWindow::MainWindow()
   connect(marketView.get(), &MarketView::createOrder, this, &MainWindow::slotCreateOrder);
 
   auto topTabs = make_unique<QTabWidget>();
-  topTabs->addTab(new AssetView{client_.assetModel()}, tr("Asset"));
-  topTabs->addTab(new ContrView{client_.contrModel()}, tr("Contr"));
+  topTabs->addTab(assetView_ = new AssetView{client_.assetModel()}, tr("Asset"));
+  topTabs->addTab(contrView_ = new ContrView{client_.contrModel()}, tr("Contr"));
   topTabs->addTab(marketView.release(), tr("Market"));
   topTabs->setCurrentIndex(2);
 
@@ -84,6 +84,8 @@ void MainWindow::closeEvent(QCloseEvent* event)
 void MainWindow::slotRefDataComplete()
 {
   qDebug() << "slotRefDataComplete";
+  assetView_->resizeColumnsToContents();
+  contrView_->resizeColumnsToContents();
 }
 
 void MainWindow::slotServiceError(const QString& error)
