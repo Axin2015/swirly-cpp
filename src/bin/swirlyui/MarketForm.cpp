@@ -46,7 +46,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
   QFontMetrics fm{QApplication::font()};
   contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
 
-  auto settlDateEdit = make_unique<QDateEdit>(QDate{2016, 10, 28});
+  auto settlDateEdit = make_unique<QDateEdit>(QDate::currentDate().addDays(2));
   auto lotsEdit = make_unique<QLineEdit>();
   lotsEdit->setPlaceholderText(tr("Lots"));
   {
