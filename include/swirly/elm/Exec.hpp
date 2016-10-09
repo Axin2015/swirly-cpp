@@ -85,7 +85,6 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
 
   void revise(Lots lots) noexcept
   {
-    using namespace enumops;
     state_ = State::Revise;
     const auto delta = lots_ - lots;
     assert(delta >= 0_lts);

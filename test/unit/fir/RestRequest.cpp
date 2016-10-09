@@ -46,7 +46,7 @@ SWIRLY_TEST_CASE(RestRequestContr)
   SWIRLY_CHECK(rr.contr() == "EURUSD"_sv);
 
   rr.reset(false);
-  rr.parse(R"({"contr":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"contr":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.contr().empty());
 }
@@ -60,7 +60,7 @@ SWIRLY_TEST_CASE(RestRequestSettlDate)
   SWIRLY_CHECK(rr.settlDate() == 20140314_ymd);
 
   rr.reset(false);
-  rr.parse(R"({"settlDate":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"settlDate":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.settlDate() == 0_ymd);
 }
@@ -74,7 +74,7 @@ SWIRLY_TEST_CASE(RestRequestAccnt)
   SWIRLY_CHECK(rr.accnt() == "MARAYL"_sv);
 
   rr.reset(false);
-  rr.parse(R"({"accnt":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"accnt":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.accnt().empty());
 }
@@ -88,7 +88,7 @@ SWIRLY_TEST_CASE(RestRequestRef)
   SWIRLY_CHECK(rr.ref() == "EURUSD"_sv);
 
   rr.reset(false);
-  rr.parse(R"({"ref":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"ref":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.ref().empty());
 }
@@ -102,7 +102,7 @@ SWIRLY_TEST_CASE(RestRequestState)
   SWIRLY_CHECK(rr.state() == 3U);
 
   rr.reset(false);
-  rr.parse(R"({"state":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"state":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.state() == 0U);
 }
@@ -116,8 +116,9 @@ SWIRLY_TEST_CASE(RestRequestSide)
   SWIRLY_CHECK(rr.side() == Side::Buy);
 
   rr.reset(false);
-  rr.parse(R"({"side":null})"_sv);
-  SWIRLY_CHECK(rr.fields() == 0U);
+  SWIRLY_CHECK(rr.parse(R"({"side":"SELL"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::Side);
+  SWIRLY_CHECK(rr.side() == Side::Sell);
 }
 
 SWIRLY_TEST_CASE(RestRequestLots)
@@ -129,7 +130,7 @@ SWIRLY_TEST_CASE(RestRequestLots)
   SWIRLY_CHECK(rr.lots() == 101_lts);
 
   rr.reset(false);
-  rr.parse(R"({"lots":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"lots":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.lots() == 0_lts);
 }
@@ -143,7 +144,7 @@ SWIRLY_TEST_CASE(RestRequestTicks)
   SWIRLY_CHECK(rr.ticks() == 12345_tks);
 
   rr.reset(false);
-  rr.parse(R"({"ticks":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"ticks":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.ticks() == 0_tks);
 }
@@ -157,7 +158,7 @@ SWIRLY_TEST_CASE(RestRequestMinLots)
   SWIRLY_CHECK(rr.minLots() == 101_lts);
 
   rr.reset(false);
-  rr.parse(R"({"minLots":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"minLots":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.minLots() == 0_lts);
 }
@@ -171,7 +172,12 @@ SWIRLY_TEST_CASE(RestRequestLiqInd)
   SWIRLY_CHECK(rr.liqInd() == LiqInd::Maker);
 
   rr.reset(false);
-  rr.parse(R"({"liqInd":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"liqInd":"TAKER"})"_sv));
+  SWIRLY_CHECK(rr.fields() == RestRequest::LiqInd);
+  SWIRLY_CHECK(rr.liqInd() == LiqInd::Taker);
+
+  rr.reset(false);
+  SWIRLY_CHECK(rr.parse(R"({"liqInd":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.liqInd() == LiqInd::None);
 }
@@ -185,7 +191,7 @@ SWIRLY_TEST_CASE(RestRequestCpty)
   SWIRLY_CHECK(rr.cpty() == "MARAYL"_sv);
 
   rr.reset(false);
-  rr.parse(R"({"cpty":null})"_sv);
+  SWIRLY_CHECK(rr.parse(R"({"cpty":null})"_sv));
   SWIRLY_CHECK(rr.fields() == 0U);
   SWIRLY_CHECK(rr.cpty().empty());
 }
@@ -239,8 +245,6 @@ SWIRLY_TEST_CASE(RestRequestMaxLen)
 
 SWIRLY_TEST_CASE(RestRequestNegative)
 {
-  using namespace enumops;
-
   RestRequest rr;
 
   SWIRLY_CHECK(rr.parse(R"({"ticks":-1})"_sv));

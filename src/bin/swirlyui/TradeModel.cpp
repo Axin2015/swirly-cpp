@@ -194,7 +194,8 @@ Qt::ItemFlags TradeModel::flags(const QModelIndex& index) const
 {
   Qt::ItemFlags flags;
   if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable;
+    flags = static_cast<Qt::ItemFlags>(Qt::ItemIsEnabled | Qt::ItemIsSelectable
+                                       | Qt::ItemIsUserCheckable);
   } else {
     flags = QAbstractTableModel::flags(index);
   }

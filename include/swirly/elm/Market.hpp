@@ -98,11 +98,7 @@ class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
     lastTicks_ = order.ticks();
     lastTime_ = now;
   }
-  Id64 allocId() noexcept
-  {
-    using namespace enumops;
-    return ++maxId_;
-  }
+  Id64 allocId() noexcept { return ++maxId_; }
   boost::intrusive::set_member_hook<> idHook_;
 
  private:

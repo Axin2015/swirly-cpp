@@ -81,8 +81,6 @@ void MarketSide::removeOrder(Level& level, const Order& order) noexcept
 
 void MarketSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcept
 {
-  using namespace enumops;
-
   assert(delta >= 0_lts);
   assert(delta <= order.resd());
 

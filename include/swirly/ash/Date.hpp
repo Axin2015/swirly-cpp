@@ -30,7 +30,7 @@ constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
 {
   assert(mon <= 11);
   assert(mday <= 31);
-  return box<IsoDate>(year * 10000 + (mon + 1) * 100 + mday);
+  return IsoDate{year * 10000 + (mon + 1) * 100 + mday};
 }
 
 /**
@@ -45,9 +45,9 @@ constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
   const auto i = year;
   const auto j = mon + 1;
   const auto k = mday;
-  return box<JDay>(k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
-                   + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
-                   - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4);
+  return JDay{k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
+              + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
+              - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4};
 }
 
 /**
@@ -55,7 +55,7 @@ constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
  */
 constexpr JDay isoToJd(IsoDate iso) noexcept
 {
-  const auto n = unbox(iso);
+  const auto n = iso.count();
   const auto year = n / 10000;
   const auto mon = (n / 100 % 100) - 1;
   const auto mday = n % 100;
@@ -71,7 +71,7 @@ constexpr IsoDate jdToIso(JDay jd) noexcept
   // for Computers.
   // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-  auto l = unbox(jd) + 68569;
+  auto l = jd.count() + 68569;
   const auto n = 4 * l / 146097;
   l = l - (146097 * n + 3) / 4;
   auto i = 4000 * (l + 1) / 1461001;
@@ -82,7 +82,7 @@ constexpr IsoDate jdToIso(JDay jd) noexcept
   j = j + 2 - 12 * l;
   i = 100 * (n - 49) + i + l;
 
-  return box<IsoDate>(i * 10000 + j * 100 + k);
+  return IsoDate{i * 10000 + j * 100 + k};
 }
 
 /**
@@ -90,7 +90,7 @@ constexpr IsoDate jdToIso(JDay jd) noexcept
  */
 constexpr int32_t jdToTjd(JDay jd) noexcept
 {
-  return unbox(jd) - 2440000;
+  return jd.count() - 2440000;
 }
 
 /**
@@ -98,7 +98,7 @@ constexpr int32_t jdToTjd(JDay jd) noexcept
  */
 constexpr JDay tjdToJd(int32_t tjd) noexcept
 {
-  return box<JDay>(tjd + 2440000);
+  return JDay{tjd + 2440000};
 }
 
 /**
@@ -106,12 +106,11 @@ constexpr JDay tjdToJd(int32_t tjd) noexcept
  */
 constexpr Millis jdToMs(JDay jd) noexcept
 {
-  using namespace enumops;
   // Julian day for January 1st, 1970.
   const JDay jdUnixEpoc = 2440588_jd;
   const int64_t msInDay = 24 * 60 * 60 * 1000;
   // Add half day for 12pm.
-  return box<Millis>(unbox(jd - jdUnixEpoc) * msInDay + (msInDay >> 1));
+  return Millis{(jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1)};
 }
 
 /**

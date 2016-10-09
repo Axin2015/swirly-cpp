@@ -37,14 +37,12 @@ Level::Level(Level&&) = default;
 
 void Level::addOrder(const Order& order) noexcept
 {
-  using namespace enumops;
   resd_ += order.resd();
   ++count_;
 }
 
 void Level::subOrder(const Order& order) noexcept
 {
-  using namespace enumops;
   resd_ -= order.resd();
   --count_;
 }

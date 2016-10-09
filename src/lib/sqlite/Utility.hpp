@@ -17,7 +17,9 @@
 #ifndef SWIRLY_SQLITE_UTILITY_HPP
 #define SWIRLY_SQLITE_UTILITY_HPP
 
+#include <swirly/ash/Enum.hpp>
 #include <swirly/ash/Finally.hpp>
+#include <swirly/ash/IntWrapper.hpp>
 
 #include <experimental/string_view>
 
@@ -76,6 +78,12 @@ template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
   return static_cast<ValueT>(column<std::underlying_type_t<ValueT>>(stmt, col));
+}
+
+template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
+inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
+{
+  return ValueT{column<typename ValueT::ValueType>(stmt, col)};
 }
 
 template <typename ValueT,
@@ -138,6 +146,18 @@ template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value
 inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 {
   bind(stmt, col, unbox(val), MaybeNull);
+}
+
+template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
+inline void bind(sqlite3_stmt& stmt, int col, ValueT val)
+{
+  bind(stmt, col, val.count());
+}
+
+template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
+inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
+{
+  bind(stmt, col, val.count(), MaybeNull);
 }
 
 class ScopedBind {

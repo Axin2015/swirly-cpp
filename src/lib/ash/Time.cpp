@@ -24,9 +24,9 @@ Millis getTimeOfDay() noexcept
 {
   timeval tv;
   gettimeofday(&tv, nullptr);
-  int64_t ms{tv.tv_sec * 1000L};
+  std::int64_t ms{tv.tv_sec * 1000L};
   ms += (tv.tv_usec + 500L) / 1000L;
-  return box<Millis>(ms);
+  return Millis{ms};
 }
 
 } // swirly

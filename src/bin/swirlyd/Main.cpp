@@ -110,7 +110,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
       opts.daemon = false;
       break;
     case 's':
-      opts.startTime = box<Millis>(stou64(optarg));
+      opts.startTime = Millis{stou64(optarg)};
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";

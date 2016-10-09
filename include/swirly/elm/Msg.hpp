@@ -79,7 +79,7 @@ static_assert(std::is_pod<ArchiveTradeBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED Msg {
   MsgType type;
-  union {
+  union SWIRLY_PACKED {
     CreateMarketBody createMarket;
     UpdateMarketBody updateMarket;
     CreateExecBody createExec;

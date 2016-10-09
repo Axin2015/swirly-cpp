@@ -53,7 +53,7 @@ constexpr double incsToReal(Incs incs, double incSize) noexcept
  */
 constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
 {
-  return box<Lots>(realToIncs(qty, qtyInc));
+  return Lots{realToIncs(qty, qtyInc)};
 }
 
 /**
@@ -61,7 +61,7 @@ constexpr Lots qtyToLots(double qty, double qtyInc) noexcept
  */
 constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
 {
-  return incsToReal(unbox(lots), qtyInc);
+  return incsToReal(lots.count(), qtyInc);
 }
 
 /**
@@ -69,7 +69,7 @@ constexpr double lotsToQty(Lots lots, double qtyInc) noexcept
  */
 constexpr Ticks priceToTicks(double price, double priceInc) noexcept
 {
-  return box<Ticks>(realToIncs(price, priceInc));
+  return Ticks{realToIncs(price, priceInc)};
 }
 
 /**
@@ -77,7 +77,7 @@ constexpr Ticks priceToTicks(double price, double priceInc) noexcept
  */
 constexpr double ticksToPrice(Ticks ticks, double priceInc) noexcept
 {
-  return incsToReal(unbox(ticks), priceInc);
+  return incsToReal(ticks.count(), priceInc);
 }
 
 /**
@@ -110,7 +110,7 @@ inline double dpToReal(int dp) noexcept
  */
 constexpr Cost cost(Lots lots, Ticks ticks) noexcept
 {
-  return box<Cost>(unbox(lots) * unbox(ticks));
+  return Cost{lots.count() * ticks.count()};
 }
 
 } // swirly

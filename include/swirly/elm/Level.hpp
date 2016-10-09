@@ -25,7 +25,7 @@
 
 namespace swirly {
 
-using LevelKey = std::underlying_type_t<Ticks>;
+using LevelKey = Ticks::ValueType;
 
 namespace detail {
 
@@ -34,8 +34,7 @@ namespace detail {
  */
 constexpr LevelKey composeKey(Side side, Ticks ticks) noexcept
 {
-  using namespace enumops;
-  return unbox(side == Side::Buy ? -ticks : ticks);
+  return (side == Side::Buy ? -ticks : ticks).count();
 }
 
 } // detail
@@ -67,11 +66,7 @@ class SWIRLY_API Level : public Comparable<Level>, public MemAlloc {
   Lots resd() const noexcept { return resd_; }
   int count() const noexcept { return count_; }
   void setFirstOrder(const Order& firstOrder) noexcept { firstOrder_ = &firstOrder; }
-  void reduce(Lots delta) noexcept
-  {
-    using namespace enumops;
-    resd_ -= delta;
-  }
+  void reduce(Lots delta) noexcept { resd_ -= delta; }
   void addOrder(const Order& order) noexcept;
 
   void subOrder(const Order& order) noexcept;

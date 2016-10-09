@@ -96,7 +96,6 @@ class SWIRLY_API Order : public Request, public MemAlloc {
   }
   void revise(Lots lots, Millis now) noexcept
   {
-    using namespace enumops;
     assert(lots > 0_lts);
     assert(lots >= exec_);
     assert(lots >= minLots_);
@@ -117,7 +116,6 @@ class SWIRLY_API Order : public Request, public MemAlloc {
   }
   void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks, Millis now) noexcept
   {
-    using namespace enumops;
     state_ = State::Trade;
     resd_ -= takenLots;
     exec_ += takenLots;

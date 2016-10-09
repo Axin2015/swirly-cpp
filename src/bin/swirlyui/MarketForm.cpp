@@ -96,7 +96,7 @@ void MarketForm::slotContrChanged(int index)
   }
   auto contr = contrComboBox_->currentData().value<Contr>();
   qDebug() << "slotContrChanged:" << contr;
-  lotsValidator_.setRange(unbox(contr.minLots()), unbox(contr.maxLots()));
+  lotsValidator_.setRange(contr.minLots().count(), contr.maxLots().count());
   priceValidator_.setDecimals(contr.priceDp());
 }
 
@@ -109,7 +109,7 @@ void MarketForm::slotCreateClicked()
 void MarketForm::slotBuyOrSellClicked(Side side)
 {
   auto contr = contrComboBox_->currentData().value<Contr>();
-  const auto lots = box<Lots>(lotsEdit_->text().toLongLong());
+  const auto lots = Lots{lotsEdit_->text().toLongLong()};
   const auto ticks = priceToTicks(priceEdit_->text().toDouble(), contr);
   emit createOrder(contr, settlDateEdit_->date(), "", side, lots, ticks);
 }

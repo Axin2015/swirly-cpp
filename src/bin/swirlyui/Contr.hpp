@@ -147,7 +147,7 @@ inline double ticksToAvgPrice(Lots lots, Cost cost, const Contr& contr) noexcept
 {
   double ticks = 0;
   if (lots != 0_lts) {
-    ticks = fractToReal(unbox(cost), unbox(lots));
+    ticks = fractToReal(cost.count(), lots.count());
   }
   return ticks * contr.priceInc();
 }
