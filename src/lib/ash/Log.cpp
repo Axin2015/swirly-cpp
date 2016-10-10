@@ -90,7 +90,7 @@ void nullLogger(int level, string_view msg) noexcept
 void stdLogger(int level, string_view msg) noexcept
 {
   const Millis ms{getTimeOfDay()};
-  const auto now = static_cast<time_t>(unbox(ms) / 1000);
+  const auto now = static_cast<time_t>(ms.count() / 1000);
 
   struct tm tm;
   localtime_r(&now, &tm);
@@ -103,7 +103,7 @@ void stdLogger(int level, string_view msg) noexcept
   // <---------------------------------------->
   char head[42 + 1];
   size_t hlen = strftime(head, sizeof(head), "%b %d %H:%M:%S", &tm);
-  hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(unbox(ms) % 1000),
+  hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms.count() % 1000),
                   logLabel(level), static_cast<int>(getpid()));
   char tail = '\n';
   iovec iov[] = {

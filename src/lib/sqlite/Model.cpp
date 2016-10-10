@@ -157,8 +157,6 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 
 void Model::doReadAccnt(Millis now, const ModelCallback<string_view>& cb) const
 {
-  using namespace enumops;
-
   enum { //
     Mnem //
   };
@@ -347,7 +345,7 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 
     // FIXME: review when end of day is implemented.
     if (settlDay != 0_jd && settlDay <= busDay) {
-      marketId = box<Id64>(unbox(marketId) & ~0xffff);
+      marketId &= Id64{~0xffff};
       settlDay = 0_jd;
     }
 

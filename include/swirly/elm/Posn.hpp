@@ -80,13 +80,11 @@ class SWIRLY_API Posn : public RefCounted {
   }
   void addBuy(Lots lots, Cost cost) noexcept
   {
-    using namespace enumops;
     buyLots_ += lots;
     buyCost_ += cost;
   }
   void addSell(Lots lots, Cost cost) noexcept
   {
-    using namespace enumops;
     sellLots_ += lots;
     sellCost_ += cost;
   }

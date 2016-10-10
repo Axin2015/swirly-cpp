@@ -41,7 +41,6 @@ const regex MnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
 {
-  using namespace enumops;
   return direct == Direct::Paid
     // Paid when the taker lifts the offer.
     ? makerOrder.ticks() - takerOrder.ticks()
@@ -531,8 +530,6 @@ struct Serv::Impl {
   void matchOrders(const Accnt& takerAccnt, Market& market, Order& takerOrder, MarketSide& side,
                    Direct direct, Millis now, Response& resp)
   {
-    using namespace enumops;
-
     auto sumLots = 0_lts;
     auto sumCost = 0_cst;
     auto lastLots = 0_lts;

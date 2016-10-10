@@ -37,6 +37,7 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
   : QWidget{parent, f}, model_(model)
 {
   auto form = make_unique<MarketForm>(contrModel);
+  connect(form.get(), &MarketForm::createMarket, this, &MarketView::createMarket);
   connect(form.get(), &MarketForm::createOrder, this, &MarketView::createOrder);
 
   auto table = make_unique<QTableView>();

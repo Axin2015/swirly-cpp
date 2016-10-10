@@ -97,7 +97,6 @@ ExecPtr Exec::inverse(Id64 id) const
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
                  LiqInd liqInd, Mnem cpty) noexcept
 {
-  using namespace enumops;
   state_ = State::Trade;
   resd_ -= sumLots;
   exec_ += sumLots;

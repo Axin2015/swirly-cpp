@@ -85,38 +85,28 @@ MemPool& MemPool::operator=(MemPool&&) noexcept = default;
 void* MemPool::alloc(size_t size)
 {
   void* addr;
-  switch (size) {
-  case sizeof(Exec):
+  if (size == sizeof(Exec)) {
     addr = allocBlock(exec_);
-    break;
-  case sizeof(Level):
-    addr = allocBlock(level_);
-    break;
-  case sizeof(Order):
+  } else if (size == sizeof(Order)) {
     addr = allocBlock(order_);
-    break;
-  default:
+  } else if (size == sizeof(Level)) {
+    addr = allocBlock(level_);
+  } else {
     addr = malloc(size);
-    break;
   }
   return addr;
 }
 
 void MemPool::dealloc(void* ptr, size_t size) noexcept
 {
-  switch (size) {
-  case sizeof(Exec):
+  if (size == sizeof(Exec)) {
     deallocBlock(exec_, ptr);
-    break;
-  case sizeof(Level):
-    deallocBlock(level_, ptr);
-    break;
-  case sizeof(Order):
+  } else if (size == sizeof(Order)) {
     deallocBlock(order_, ptr);
-    break;
-  default:
+  } else if (size == sizeof(Level)) {
+    deallocBlock(level_, ptr);
+  } else {
     free(ptr);
-    break;
   }
 }
 

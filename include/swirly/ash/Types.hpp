@@ -17,60 +17,70 @@
 #ifndef SWIRLY_ASH_TYPES_HPP
 #define SWIRLY_ASH_TYPES_HPP
 
-#include <swirly/ash/Enum.hpp>
+#include <swirly/ash/IntWrapper.hpp>
 
 #include <cstdint>
 
 namespace swirly {
+struct Id32Policy : Int32Policy {
+};
+struct Id64Policy : Int64Policy {
+};
+struct IsoDatePolicy : Int32Policy {
+};
+struct JDayPolicy : Int32Policy {
+};
+struct MillisPolicy : Int64Policy {
+};
 
 /**
  * 32 bit identifier.
  */
-enum class Id32 : int32_t {};
+using Id32 = IntWrapper<Id32Policy>;
 
 constexpr Id32 operator""_id32(unsigned long long val) noexcept
 {
-  return box<Id32>(val);
+  return Id32{val};
 }
 
 /**
  * 64 bit identifier.
  */
-enum class Id64 : int64_t {};
+using Id64 = IntWrapper<Id64Policy>;
 
 constexpr Id64 operator""_id64(unsigned long long val) noexcept
 {
-  return box<Id64>(val);
+  return Id64{val};
 }
 
 /**
  * ISO8601 date in yyymmdd format.
  */
-enum class IsoDate : int32_t {};
+using IsoDate = IntWrapper<IsoDatePolicy>;
 
 constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
 {
-  return box<IsoDate>(val);
+  return IsoDate{val};
 }
 
 /**
  * Julian day.
  */
-enum class JDay : int32_t {};
+using JDay = IntWrapper<JDayPolicy>;
 
 constexpr JDay operator""_jd(unsigned long long val) noexcept
 {
-  return box<JDay>(val);
+  return JDay{val};
 }
 
 /**
  * Milliseconds since Unix epoch.
  */
-enum class Millis : int64_t {};
+using Millis = IntWrapper<MillisPolicy>;
 
 constexpr Millis operator""_ms(unsigned long long val) noexcept
 {
-  return box<Millis>(val);
+  return Millis{val};
 }
 
 } // swirly

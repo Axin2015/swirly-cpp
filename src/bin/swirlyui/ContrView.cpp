@@ -44,11 +44,16 @@ ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
   connect(table.get(), &QTableView::clicked, this, &ContrView::slotClicked);
 
   auto layout = make_unique<QGridLayout>();
-  layout->addWidget(table.release(), 0, 0);
+  layout->addWidget(table_ = table.release(), 0, 0);
   setLayout(layout.release());
 }
 
 ContrView::~ContrView() noexcept = default;
+
+void ContrView::resizeColumnsToContents()
+{
+  table_->resizeColumnsToContents();
+}
 
 void ContrView::slotClicked(const QModelIndex& index)
 {

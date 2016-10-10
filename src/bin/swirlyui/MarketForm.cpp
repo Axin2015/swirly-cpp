@@ -46,7 +46,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
   QFontMetrics fm{QApplication::font()};
   contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
 
-  auto settlDateEdit = make_unique<QDateEdit>(QDate{2016, 10, 28});
+  auto settlDateEdit = make_unique<QDateEdit>(QDate::currentDate().addDays(2));
   auto lotsEdit = make_unique<QLineEdit>();
   lotsEdit->setPlaceholderText(tr("Lots"));
   {
@@ -59,12 +59,14 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
     auto del = makeDeleter(const_cast<QValidator*>(priceEdit->validator()));
     priceEdit->setValidator(&priceValidator_);
   }
+  auto createButton = make_unique<QPushButton>(tr("Create"));
   auto buyButton = make_unique<QPushButton>(tr("Buy"));
   auto sellButton = make_unique<QPushButton>(tr("Sell"));
 
   connect(contrComboBox.get(),
           static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
           &MarketForm::slotContrChanged);
+  connect(createButton.get(), &QPushButton::clicked, [this]() { this->slotCreateClicked(); });
   connect(buyButton.get(), &QPushButton::clicked,
           [this]() { this->slotBuyOrSellClicked(Side::Buy); });
   connect(sellButton.get(), &QPushButton::clicked,
@@ -76,6 +78,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
   layout->addWidget(lotsEdit_ = lotsEdit.release());
   layout->addWidget(new QLabel{tr("@")});
   layout->addWidget(priceEdit_ = priceEdit.release());
+  layout->addWidget(createButton.release());
   layout->addWidget(buyButton.release());
   layout->addWidget(sellButton.release());
   layout->addStretch(1);
@@ -93,14 +96,20 @@ void MarketForm::slotContrChanged(int index)
   }
   auto contr = contrComboBox_->currentData().value<Contr>();
   qDebug() << "slotContrChanged:" << contr;
-  lotsValidator_.setRange(unbox(contr.minLots()), unbox(contr.maxLots()));
+  lotsValidator_.setRange(contr.minLots().count(), contr.maxLots().count());
   priceValidator_.setDecimals(contr.priceDp());
+}
+
+void MarketForm::slotCreateClicked()
+{
+  auto contr = contrComboBox_->currentData().value<Contr>();
+  emit createMarket(contr, settlDateEdit_->date());
 }
 
 void MarketForm::slotBuyOrSellClicked(Side side)
 {
   auto contr = contrComboBox_->currentData().value<Contr>();
-  const auto lots = box<Lots>(lotsEdit_->text().toLongLong());
+  const auto lots = Lots{lotsEdit_->text().toLongLong()};
   const auto ticks = priceToTicks(priceEdit_->text().toDouble(), contr);
   emit createOrder(contr, settlDateEdit_->date(), "", side, lots, ticks);
 }

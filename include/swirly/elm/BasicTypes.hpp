@@ -18,40 +18,48 @@
 #define SWIRLY_ELM_BASICTYPES_HPP
 
 #include <swirly/ash/Defs.hpp>
-#include <swirly/ash/Enum.hpp>
+#include <swirly/ash/IntWrapper.hpp>
 
 #include <cstdint>
 #include <ostream>
 
 namespace swirly {
 
-using Incs = int64_t;
+using Incs = std::int64_t;
+using IncsPolicy = IntPolicy<Incs>;
 
-enum class Lots : Incs {};
+struct LotsPolicy : IncsPolicy {
+};
+struct TicksPolicy : IncsPolicy {
+};
+struct CostPolicy : IncsPolicy {
+};
+
+using Lots = IntWrapper<LotsPolicy>;
 
 constexpr Lots operator""_lts(unsigned long long val) noexcept
 {
-  return box<Lots>(val);
+  return Lots{val};
 }
 
 /**
  * Unit representing the minimum price increment.
  */
-enum class Ticks : Incs {};
+using Ticks = IntWrapper<TicksPolicy>;
 
 constexpr Ticks operator""_tks(unsigned long long val) noexcept
 {
-  return box<Ticks>(val);
+  return Ticks{val};
 }
 
 /**
  * Sum of lots and ticks.
  */
-enum class Cost : Incs {};
+using Cost = IntWrapper<CostPolicy>;
 
 constexpr Cost operator""_cst(unsigned long long val) noexcept
 {
-  return box<Cost>(val);
+  return Cost{val};
 }
 
 /**

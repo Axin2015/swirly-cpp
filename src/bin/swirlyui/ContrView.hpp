@@ -20,6 +20,7 @@
 #include <QWidget>
 
 class QModelIndex;
+class QTableView;
 
 namespace swirly {
 namespace ui {
@@ -34,6 +35,8 @@ class ContrView : public QWidget {
   ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~ContrView() noexcept override;
 
+  void resizeColumnsToContents();
+
  signals:
 
  private slots:
@@ -41,6 +44,7 @@ class ContrView : public QWidget {
 
  private:
   ContrModel& model_;
+  QTableView* table_{nullptr};
 };
 
 } // ui

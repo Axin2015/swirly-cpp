@@ -113,7 +113,7 @@ namespace {
   }
   action endSettlDate {
     fields_ |= SettlDate;
-    settlDate_ = box<IsoDate>(num());
+    settlDate_ = IsoDate{num()};
   }
   settlDate = 'null' %nullSettlDate
     | num %endSettlDate;
@@ -169,15 +169,11 @@ namespace {
   }
   action endTicks {
     fields_ |= Ticks;
-    ticks_ = box<swirly::Ticks>(num());
+    ticks_ = swirly::Ticks{num()};
   }
   ticks = 'null' %nullTicks
     | num %endTicks;
 
-  action nullSide {
-    fields_ &= ~Side;
-    side_ = box<swirly::Side>(0);
-  }
   action buySide {
     fields_ |= Side;
     side_ = swirly::Side::Buy;
@@ -186,8 +182,7 @@ namespace {
     fields_ |= Side;
     side_ = swirly::Side::Sell;
   }
-  side = 'null' %nullSide
-    | '"BUY"'i %buySide
+  side = '"BUY"'i %buySide
     | '"SELL"'i %sellSide;
 
   action nullLots {
@@ -196,7 +191,7 @@ namespace {
   }
   action endLots {
     fields_ |= Lots;
-    lots_ = box<swirly::Lots>(num());
+    lots_ = swirly::Lots{num()};
   }
   lots = 'null' %nullLots
     | num %endLots;
@@ -207,7 +202,7 @@ namespace {
   }
   action endMinLots {
     fields_ |= MinLots;
-    minLots_ = box<swirly::Lots>(num());
+    minLots_ = swirly::Lots{num()};
   }
   minLots = 'null' %nullMinLots
     | num %endMinLots;
@@ -290,7 +285,7 @@ void RestRequest::reset(bool clear) noexcept
   accnt_.len = 0;
   ref_.len = 0;
   state_ = 0;
-  side_ = box<swirly::Side>(0);
+  side_ = static_cast<swirly::Side>(0);
   lots_ = 0_lts;
   ticks_ = 0_tks;
   minLots_ = 0_lts;

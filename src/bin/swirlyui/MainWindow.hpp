@@ -24,6 +24,9 @@
 namespace swirly {
 namespace ui {
 
+class AssetView;
+class ContrView;
+
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
@@ -37,6 +40,7 @@ class MainWindow : public QMainWindow {
  private slots:
   void slotRefDataComplete();
   void slotServiceError(const QString& error);
+  void slotCreateMarket(const Contr& contr, QDate settlDate);
   void slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
                        Lots lots, Ticks ticks);
   void slotAbout();
@@ -49,6 +53,8 @@ class MainWindow : public QMainWindow {
   bool canClose();
 
   HttpClient client_;
+  AssetView* assetView_{nullptr};
+  ContrView* contrView_{nullptr};
 };
 
 } // ui

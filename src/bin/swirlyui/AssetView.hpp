@@ -20,6 +20,7 @@
 #include <QWidget>
 
 class QModelIndex;
+class QTableView;
 
 namespace swirly {
 namespace ui {
@@ -34,6 +35,8 @@ class AssetView : public QWidget {
   AssetView(AssetModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
   ~AssetView() noexcept override;
 
+  void resizeColumnsToContents();
+
  signals:
 
  private slots:
@@ -41,6 +44,7 @@ class AssetView : public QWidget {
 
  private:
   AssetModel& model_;
+  QTableView* table_{nullptr};
 };
 
 } // ui

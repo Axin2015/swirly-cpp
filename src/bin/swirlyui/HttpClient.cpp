@@ -51,7 +51,7 @@ void HttpClient::timerEvent(QTimerEvent* event)
   getAccnt();
 }
 
-void HttpClient::createMarket(const QString& contr, QDate settlDate, MarketState state)
+void HttpClient::createMarket(const Contr& contr, QDate settlDate)
 {
   QNetworkRequest request{QUrl{"http://127.0.0.1:8080/market"}};
   request.setAttribute(QNetworkRequest::User, PostMarket);
@@ -60,9 +60,9 @@ void HttpClient::createMarket(const QString& contr, QDate settlDate, MarketState
   request.setRawHeader("Swirly-Perm", "1");
 
   QJsonObject obj;
-  obj["contr"] = contr;
+  obj["contr"] = contr.mnem();
   obj["settlDate"] = toJson(settlDate);
-  obj["state"] = static_cast<int>(state);
+  obj["state"] = 0;
 
   QJsonDocument doc(obj);
   nam_.post(request, doc.toJson());
@@ -170,7 +170,6 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
   }
   emit refDataComplete();
 
-  createMarket("EURUSD", QDate{2016, 10, 28}, 0);
   getAccnt();
   startTimer(2000);
 }

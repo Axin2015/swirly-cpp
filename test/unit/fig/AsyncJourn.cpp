@@ -30,7 +30,6 @@
 
 using namespace std;
 using namespace swirly;
-using namespace swirly::enumops;
 
 namespace {
 

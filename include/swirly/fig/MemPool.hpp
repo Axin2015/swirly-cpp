@@ -94,8 +94,8 @@ class SWIRLY_API MemPool {
   {
     region_ = detail::MemRegion{capacity};
     exec_ = nullptr;
-    level_ = nullptr;
     order_ = nullptr;
+    level_ = nullptr;
   }
   void* alloc(std::size_t size);
 
@@ -130,8 +130,8 @@ class SWIRLY_API MemPool {
 
   detail::MemRegion region_;
   MemBlock<sizeof(Exec)>* exec_{nullptr};
-  MemBlock<sizeof(Level)>* level_{nullptr};
   MemBlock<sizeof(Order)>* order_{nullptr};
+  MemBlock<sizeof(Level)>* level_{nullptr};
 };
 
 } // swirly

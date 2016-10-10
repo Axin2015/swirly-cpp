@@ -44,11 +44,16 @@ AssetView::AssetView(AssetModel& model, QWidget* parent, Qt::WindowFlags f)
   connect(table.get(), &QTableView::clicked, this, &AssetView::slotClicked);
 
   auto layout = make_unique<QGridLayout>();
-  layout->addWidget(table.release(), 0, 0);
+  layout->addWidget(table_ = table.release(), 0, 0);
   setLayout(layout.release());
 }
 
 AssetView::~AssetView() noexcept = default;
+
+void AssetView::resizeColumnsToContents()
+{
+  table_->resizeColumnsToContents();
+}
 
 void AssetView::slotClicked(const QModelIndex& index)
 {

@@ -66,8 +66,6 @@ class SWIRLY_API MarketSide {
   }
   void reviseOrder(Order& order, Lots lots, Millis now) noexcept
   {
-    using namespace enumops;
-
     assert(lots > 0_lts);
     assert(lots >= order.exec());
     assert(lots >= order.minLots());

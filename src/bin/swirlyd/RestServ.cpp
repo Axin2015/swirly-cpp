@@ -52,7 +52,7 @@ class ScopedIds {
 Millis getTime(HttpMessage data) noexcept
 {
   const string_view val{data.header("Swirly-Time")};
-  return val.empty() ? getTimeOfDay() : box<Millis>(stou64(val));
+  return val.empty() ? getTimeOfDay() : Millis{stou64(val)};
 }
 
 string_view getAccnt(HttpMessage data)
@@ -158,7 +158,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
   const auto cache = reset(data);
   const auto now = getTime(data);
   // See mg_send().
-  nc.last_io_time = unbox(now) / 1000;
+  nc.last_io_time = now.count() / 1000;
 
   StreamBuf buf{nc.send_mbuf};
   out_.rdbuf(&buf);
@@ -386,7 +386,7 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  const auto settlDate = IsoDate{stou64(uri_.top())};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -554,7 +554,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  const auto settlDate = IsoDate{stou64(uri_.top())};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -704,7 +704,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  const auto settlDate = IsoDate{stou64(uri_.top())};
   uri_.pop();
 
   if (uri_.empty()) {
@@ -793,7 +793,7 @@ void RestServ::posnRequest(HttpMessage data, Millis now)
     return;
   }
 
-  const auto settlDate = box<IsoDate>(stou64(uri_.top()));
+  const auto settlDate = IsoDate{stou64(uri_.top())};
   uri_.pop();
 
   if (uri_.empty()) {
