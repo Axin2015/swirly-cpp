@@ -19,7 +19,8 @@
 
 #include <swirly/elm/Types.hpp>
 
-#include <swirly/ash/Types.hpp>
+#include <swirly/ash/Date.hpp>
+#include <swirly/ash/Time.hpp>
 
 namespace swirly {
 
@@ -44,7 +45,7 @@ class SWIRLY_API Model {
   void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
   void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
   void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
-  void readAccnt(Millis now, const ModelCallback<std::string_view>& cb) const
+  void readAccnt(Time now, const ModelCallback<std::string_view>& cb) const
   {
     doReadAccnt(now, cb);
   }
@@ -63,7 +64,7 @@ class SWIRLY_API Model {
 
   virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
 
-  virtual void doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const = 0;
+  virtual void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const = 0;
 
   virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 

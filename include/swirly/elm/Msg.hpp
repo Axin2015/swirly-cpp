@@ -19,9 +19,10 @@
 
 #include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/BasicTypes.hpp>
+#include <swirly/ash/Date.hpp>
 #include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/Pipe.hpp>
-#include <swirly/ash/Types.hpp>
 
 namespace swirly {
 
@@ -62,17 +63,19 @@ struct SWIRLY_PACKED CreateExecBody {
   Id64 matchId;
   LiqInd liqInd;
   char cpty[MaxMnem];
-  Millis created;
+  // std::chrono::time_point is not pod.
+  int64_t created;
   More more;
 };
 static_assert(std::is_pod<CreateExecBody>::value, "message-type must be pod");
 
-constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(Millis) - sizeof(More))
+constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(int64_t) - sizeof(More))
                              / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTradeBody {
   Id64 marketId;
   Id64 ids[MaxIds];
-  Millis modified;
+  // std::chrono::time_point is not pod.
+  int64_t modified;
   More more;
 };
 static_assert(std::is_pod<ArchiveTradeBody>::value, "message-type must be pod");

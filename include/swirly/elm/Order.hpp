@@ -35,7 +35,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
  public:
   Order(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
         State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
-        Lots lastLots, Ticks lastTicks, Lots minLots, Millis created, Millis modified) noexcept
+        Lots lastLots, Ticks lastTicks, Lots minLots, Time created, Time modified) noexcept
     : Request{marketId, contr, settlDay, id, accnt, ref, side, lots, created},
       state_{state},
       ticks_{ticks},
@@ -49,7 +49,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
   {
   }
   Order(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
-        Side side, Lots lots, Ticks ticks, Lots minLots, Millis created) noexcept
+        Side side, Lots lots, Ticks ticks, Lots minLots, Time created) noexcept
     : Order{marketId, contr, settlDay, id,    accnt, ref,   State::New, side,    lots,
             ticks,    lots,  0_lts,    0_cst, 0_lts, 0_tks, minLots,    created, created}
   {
@@ -84,7 +84,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
   auto done() const noexcept { return resd_ == 0_lts; }
   auto modified() const noexcept { return modified_; }
   void setLevel(Level* level) const noexcept { level_ = level; }
-  void create(Millis now) noexcept
+  void create(Time now) noexcept
   {
     assert(lots_ > 0_lts);
     assert(lots_ >= minLots_);
@@ -94,7 +94,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
     cost_ = 0_cst;
     modified_ = now;
   }
-  void revise(Lots lots, Millis now) noexcept
+  void revise(Lots lots, Time now) noexcept
   {
     assert(lots > 0_lts);
     assert(lots >= exec_);
@@ -107,14 +107,14 @@ class SWIRLY_API Order : public Request, public MemAlloc {
     resd_ -= delta;
     modified_ = now;
   }
-  void cancel(Millis now) noexcept
+  void cancel(Time now) noexcept
   {
     state_ = State::Cancel;
     // Note that executed lots is not affected.
     resd_ = 0_lts;
     modified_ = now;
   }
-  void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks, Millis now) noexcept
+  void trade(Lots takenLots, Cost takenCost, Lots lastLots, Ticks lastTicks, Time now) noexcept
   {
     state_ = State::Trade;
     resd_ -= takenLots;
@@ -124,7 +124,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
     lastTicks_ = lastTicks;
     modified_ = now;
   }
-  void trade(Lots lastLots, Ticks lastTicks, Millis now) noexcept
+  void trade(Lots lastLots, Ticks lastTicks, Time now) noexcept
   {
     trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, now);
   }
@@ -153,7 +153,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
    * Minimum to be filled by this order.
    */
   const Lots minLots_;
-  Millis modified_;
+  Time modified_;
 };
 
 using OrderIdSet = RequestIdSet<Order>;

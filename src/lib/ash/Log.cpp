@@ -17,7 +17,6 @@
 #include <swirly/ash/Log.hpp>
 
 #include <swirly/ash/Time.hpp>
-#include <swirly/ash/Types.hpp>
 
 #include <algorithm> // max()
 #include <atomic>
@@ -89,11 +88,12 @@ void nullLogger(int level, string_view msg) noexcept
 
 void stdLogger(int level, string_view msg) noexcept
 {
-  const Millis ms{getTimeOfDay()};
-  const auto now = static_cast<time_t>(ms.count() / 1000);
+  const auto now = UnixClock::now();
+  const auto t = UnixClock::to_time_t(now);
+  const auto ms = timeToMs(now);
 
   struct tm tm;
-  localtime_r(&now, &tm);
+  localtime_r(&t, &tm);
 
   // The following format has an upper-bound of 42 characters:
   // "%b %d %H:%M:%S.%03d %-7s [%d]: "
@@ -103,8 +103,8 @@ void stdLogger(int level, string_view msg) noexcept
   // <---------------------------------------->
   char head[42 + 1];
   size_t hlen = strftime(head, sizeof(head), "%b %d %H:%M:%S", &tm);
-  hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms.count() % 1000),
-                  logLabel(level), static_cast<int>(getpid()));
+  hlen += sprintf(head + hlen, ".%03d %-7s [%d]: ", static_cast<int>(ms % 1000), logLabel(level),
+                  static_cast<int>(getpid()));
   char tail = '\n';
   iovec iov[] = {
     {head, hlen}, //

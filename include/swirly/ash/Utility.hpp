@@ -18,7 +18,8 @@
 #define SWIRLY_ASH_UTILITY_HPP
 
 #include <swirly/ash/Defs.hpp>
-#include <swirly/ash/Types.hpp>
+
+#include <cstdint>
 
 namespace swirly {
 

@@ -102,7 +102,7 @@ void AsyncJourn::createExec(ArrayView<ConstExecPtr> execs)
   } while (mp.next());
 }
 
-void AsyncJourn::archiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified)
+void AsyncJourn::archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified)
 {
   MultiPart<MaxIds> mp{*this, ids.size()};
   do {
@@ -162,12 +162,12 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
     body.matchId = exec.matchId();
     body.liqInd = exec.liqInd();
     setCString(body.cpty, exec.cpty());
-    body.created = exec.created();
+    body.created = timeToMs(exec.created());
     body.more = more;
   });
 }
 
-void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified, More more)
+void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified, More more)
 {
   assert(ids.size() <= MaxIds);
   pipe_.write([&marketId, ids, modified, more](Msg& msg) {
@@ -184,7 +184,7 @@ void AsyncJourn::doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modif
     for (; i < MaxIds; ++i) {
       body.ids[i] = 0_id64;
     }
-    body.modified = modified;
+    body.modified = timeToMs(modified);
     body.more = more;
   });
 }

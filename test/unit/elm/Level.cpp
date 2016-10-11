@@ -29,7 +29,7 @@ SWIRLY_TEST_CASE(LevelSet)
 {
   const Order order{1_id64,     "EURUSD"_sv, 0_jd,   0_id64,    "MARAYL"_sv, ""_sv,
                     State::New, Side::Buy,   10_lts, 12345_tks, 0_lts,       0_lts,
-                    0_cst,      0_lts,       0_tks,  0_lts,     0_ms,        0_ms};
+                    0_cst,      0_lts,       0_tks,  0_lts,     {},          {}};
 
   LevelSet s;
 

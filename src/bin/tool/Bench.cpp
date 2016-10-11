@@ -32,7 +32,7 @@ using namespace swirly;
 
 namespace {
 
-const Market& createMarket(Serv& serv, Mnem contrMnem, JDay settlDay, MarketState state, Millis now)
+const Market& createMarket(Serv& serv, Mnem contrMnem, JDay settlDay, MarketState state, Time now)
 {
   const auto& contr = serv.contr(contrMnem);
   const auto marketId = toMarketId(contr.id(), settlDay);
@@ -46,7 +46,7 @@ const Market& createMarket(Serv& serv, Mnem contrMnem, JDay settlDay, MarketStat
 class Archiver {
  public:
   explicit Archiver(Serv& serv) noexcept : serv_(serv) {}
-  void operator()(const Accnt& accnt, Id64 marketId, Millis now)
+  void operator()(const Accnt& accnt, Id64 marketId, Time now)
   {
     ids_.clear();
     for (const auto& trade : accnt.trades()) {
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
     }
 
     const BusinessDay busDay{RollHour, NewYork};
-    const auto now = getTimeOfDay();
+    const auto now = UnixClock::now();
 
     Serv serv{*journ, 1 << 10, 1 << 4};
     serv.load(*model, now);

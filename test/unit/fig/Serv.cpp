@@ -36,7 +36,7 @@ constexpr auto Today = ymdToJd(2014, 2, 11);
 constexpr auto SettlDay = Today + 2_jd;
 constexpr auto MarketId = toMarketId(1_id32, SettlDay);
 
-constexpr auto Now = jdToMs(Today);
+constexpr auto Now = jdToTime(Today);
 
 class SWIRLY_API TestModel : public swirly::TestModel {
  protected:

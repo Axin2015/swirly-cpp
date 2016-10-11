@@ -118,7 +118,7 @@ void TestModel::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
 }
 
-void TestModel::doReadAccnt(Millis now, const ModelCallback<string_view>& cb) const
+void TestModel::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
 {
 }
 

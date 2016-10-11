@@ -30,7 +30,7 @@ using ConstMarketPtr = boost::intrusive_ptr<const Market>;
 class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
  public:
   Market(Id64 id, Mnem contr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
-         Ticks lastTicks = 0_tks, Millis lastTime = 0_ms, Id64 maxId = 0_id64) noexcept
+         Ticks lastTicks = 0_tks, Time lastTime = {}, Id64 maxId = 0_id64) noexcept
     : id_{id},
       contr_{contr},
       settlDay_{settlDay},
@@ -66,7 +66,7 @@ class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
   auto state() const noexcept { return state_; }
   Lots lastLots() const noexcept { return lastLots_; }
   Ticks lastTicks() const noexcept { return lastTicks_; }
-  Millis lastTime() const noexcept { return lastTime_; }
+  Time lastTime() const noexcept { return lastTime_; }
   const MarketSide& bidSide() const noexcept { return bidSide_; }
   const MarketSide& offerSide() const noexcept { return offerSide_; }
   Id64 maxId() const noexcept { return maxId_; }
@@ -79,19 +79,16 @@ class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
     side(order->side()).insertOrder(order);
   }
   void removeOrder(const Order& order) noexcept { side(order.side()).removeOrder(order); }
-  void createOrder(const OrderPtr& order, Millis now) throw(std::bad_alloc)
+  void createOrder(const OrderPtr& order, Time now) throw(std::bad_alloc)
   {
     side(order->side()).createOrder(order, now);
   }
-  void reviseOrder(Order& order, Lots lots, Millis now) noexcept
+  void reviseOrder(Order& order, Lots lots, Time now) noexcept
   {
     side(order.side()).reviseOrder(order, lots, now);
   }
-  void cancelOrder(Order& order, Millis now) noexcept
-  {
-    side(order.side()).cancelOrder(order, now);
-  }
-  void takeOrder(Order& order, Lots lots, Millis now) noexcept
+  void cancelOrder(Order& order, Time now) noexcept { side(order.side()).cancelOrder(order, now); }
+  void takeOrder(Order& order, Lots lots, Time now) noexcept
   {
     side(order.side()).takeOrder(order, lots, now);
     lastLots_ = lots;
@@ -114,7 +111,7 @@ class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
   MarketState state_;
   Lots lastLots_;
   Ticks lastTicks_;
-  Millis lastTime_;
+  Time lastTime_;
   // Two sides constitute the market.
   MarketSide bidSide_;
   MarketSide offerSide_;

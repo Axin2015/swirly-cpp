@@ -21,9 +21,9 @@
 #include <swirly/elm/Conv.hpp>
 #include <swirly/elm/Limits.hpp>
 
+#include <swirly/ash/BasicTypes.hpp>
 #include <swirly/ash/Enum.hpp>
 #include <swirly/ash/Limits.hpp>
-#include <swirly/ash/Types.hpp>
 
 #include <QDate>
 #include <QDebug>
@@ -55,6 +55,34 @@ struct TypeTraits<unsigned> {
   static QJsonValue toJson(unsigned value) { return static_cast<int>(value); }
   static QVariant toVariant(unsigned value) { return value; }
 };
+
+template <typename ValueT>
+struct TypeTraits<ValueT, typename std::enable_if_t< //
+                            isIntWrapper<ValueT> //
+                            && (sizeof(typename ValueT::ValueType) <= 4) //
+                            >> {
+  static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toInt()}; }
+  static ValueT fromVariant(const QVariant& value) { return ValueT{value.toInt()}; }
+  static QJsonValue toJson(ValueT value) { return static_cast<int>(value.count()); }
+  static QVariant toVariant(ValueT value) { return static_cast<int>(value.count()); }
+};
+
+template <typename ValueT>
+struct TypeTraits<ValueT, typename std::enable_if_t< //
+                            isIntWrapper<ValueT> //
+                            && (sizeof(typename ValueT::ValueType) > 4) //
+                            >> {
+  static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toDouble()}; }
+  static ValueT fromVariant(const QVariant& value) { return ValueT{value.toLongLong()}; }
+  static QJsonValue toJson(ValueT value) { return static_cast<qint64>(value.count()); }
+  static QVariant toVariant(ValueT value) { return static_cast<qlonglong>(value.count()); }
+};
+
+template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
+QDebug operator<<(QDebug debug, ValueT val)
+{
+  return debug.nospace() << val.count();
+}
 
 template <>
 struct TypeTraits<QString> {
@@ -92,34 +120,6 @@ struct TypeTraits<QDateTime> {
   static QJsonValue toJson(const QDateTime& value) { return value.toMSecsSinceEpoch(); }
   static QVariant toVariant(const QDateTime& value) { return value; }
 };
-
-template <typename ValueT>
-struct TypeTraits<ValueT, typename std::enable_if_t< //
-                            isIntWrapper<ValueT> //
-                            && (sizeof(typename ValueT::ValueType) <= 4) //
-                            >> {
-  static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toInt()}; }
-  static ValueT fromVariant(const QVariant& value) { return ValueT{value.toInt()}; }
-  static QJsonValue toJson(ValueT value) { return static_cast<int>(value.count()); }
-  static QVariant toVariant(ValueT value) { return static_cast<int>(value.count()); }
-};
-
-template <typename ValueT>
-struct TypeTraits<ValueT, typename std::enable_if_t< //
-                            isIntWrapper<ValueT> //
-                            && (sizeof(typename ValueT::ValueType) > 4) //
-                            >> {
-  static ValueT fromJson(const QJsonValue& value) { return ValueT{value.toDouble()}; }
-  static ValueT fromVariant(const QVariant& value) { return ValueT{value.toLongLong()}; }
-  static QJsonValue toJson(ValueT value) { return static_cast<qint64>(value.count()); }
-  static QVariant toVariant(ValueT value) { return static_cast<qlonglong>(value.count()); }
-};
-
-template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
-QDebug operator<<(QDebug debug, ValueT val)
-{
-  return debug.nospace() << val.count();
-}
 
 template <>
 struct TypeTraits<AssetType> {

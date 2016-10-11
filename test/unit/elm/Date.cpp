@@ -34,8 +34,8 @@ SWIRLY_TEST_CASE(GetBusDay)
   // 17.00 EDT (UTC-4 hours)
 
   // 20.59 UTC
-  SWIRLY_CHECK(busDay(1394830799000_ms) == ymdToJd(2014, 2, 14));
+  SWIRLY_CHECK(busDay(Time{1394830799000ms}) == ymdToJd(2014, 2, 14));
 
   // 21.00 UTC
-  SWIRLY_CHECK(busDay(1394830800000_ms) == ymdToJd(2014, 2, 15));
+  SWIRLY_CHECK(busDay(Time{1394830800000ms}) == ymdToJd(2014, 2, 15));
 }

@@ -20,6 +20,7 @@
 #include <swirly/ash/Enum.hpp>
 #include <swirly/ash/Finally.hpp>
 #include <swirly/ash/IntWrapper.hpp>
+#include <swirly/ash/Time.hpp>
 
 #include <experimental/string_view>
 
@@ -41,6 +42,101 @@ namespace detail {
 
 void bind32(sqlite3_stmt& stmt, int col, int32_t val);
 void bind64(sqlite3_stmt& stmt, int col, int64_t val);
+void bindsv(sqlite3_stmt& stmt, int col, std::string_view val);
+
+template <typename ValueT, typename EnableT = void>
+struct DbTraits;
+
+/**
+ * Integer 32bit.
+ */
+template <typename ValueT>
+struct DbTraits<ValueT,
+                std::enable_if_t<std::is_integral<ValueT>::value && (sizeof(ValueT) <= 4)>> {
+  static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
+  static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
+  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+  {
+    return sqlite3_column_int(&stmt, col);
+  }
+};
+
+/**
+ * Integer 64bit.
+ */
+template <typename ValueT>
+struct DbTraits<ValueT, std::enable_if_t<std::is_integral<ValueT>::value && (sizeof(ValueT) > 4)>> {
+  static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
+  static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
+  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+  {
+    return sqlite3_column_int64(&stmt, col);
+  }
+};
+
+/**
+ * IntWrapper.
+ */
+template <typename ValueT>
+struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
+
+  using UnderlyingTraits = DbTraits<typename ValueT::ValueType>;
+
+  static constexpr bool isNull(ValueT val) noexcept { return val == ValueT{0}; }
+  static void bind(sqlite3_stmt& stmt, int col, ValueT val)
+  {
+    UnderlyingTraits::bind(stmt, col, val.count());
+  }
+  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+  {
+    return ValueT{UnderlyingTraits::column(stmt, col)};
+  }
+};
+
+/**
+ * Enum.
+ */
+template <typename ValueT>
+struct DbTraits<ValueT, std::enable_if_t<std::is_enum<ValueT>::value>> {
+
+  using UnderlyingTraits = DbTraits<std::underlying_type_t<ValueT>>;
+
+  static constexpr bool isNull(ValueT val) noexcept { return unbox(val) == 0; }
+  static void bind(sqlite3_stmt& stmt, int col, ValueT val)
+  {
+    UnderlyingTraits::bind(stmt, col, unbox(val));
+  }
+  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+  {
+    return static_cast<ValueT>(UnderlyingTraits::column(stmt, col));
+  }
+};
+
+/**
+ * Time.
+ */
+template <>
+struct DbTraits<Time> {
+  static constexpr bool isNull(Time val) noexcept { return val == Time{}; }
+  static void bind(sqlite3_stmt& stmt, int col, Time val) { bind64(stmt, col, timeToMs(val)); }
+  static Time column(sqlite3_stmt& stmt, int col) noexcept
+  {
+    return msToTime(sqlite3_column_int64(&stmt, col));
+  }
+};
+
+/**
+ * StringView.
+ */
+template <>
+struct DbTraits<std::string_view> {
+  static constexpr bool isNull(std::string_view val) noexcept { return val.empty(); }
+  static void bind(sqlite3_stmt& stmt, int col, std::string_view val) { bindsv(stmt, col, val); }
+  static std::string_view column(sqlite3_stmt& stmt, int col) noexcept
+  {
+    return reinterpret_cast<const char*>(sqlite3_column_text(&stmt, col));
+  }
+};
 
 } // detail
 
@@ -59,105 +155,34 @@ inline bool stepOnce(sqlite3_stmt& stmt)
   return step(stmt);
 }
 
-template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) <= 4)>* = nullptr>
+template <typename ValueT>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
-  return sqlite3_column_int(&stmt, col);
-}
-
-template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) > 4)>* = nullptr>
-inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
-{
-  return sqlite3_column_int64(&stmt, col);
-}
-
-// FIXME: use is_enum_v<> when C++17.
-template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value>* = nullptr>
-inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
-{
-  return static_cast<ValueT>(column<std::underlying_type_t<ValueT>>(stmt, col));
-}
-
-template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
-inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
-{
-  return ValueT{column<typename ValueT::ValueType>(stmt, col)};
-}
-
-template <typename ValueT,
-          typename std::enable_if_t<std::is_same<ValueT, const char*>::value
-                                    || std::is_same<ValueT, std::string_view>::value>* = nullptr>
-inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
-{
-  return reinterpret_cast<const char*>(sqlite3_column_text(&stmt, col));
-}
-
-void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
-
-void bind(sqlite3_stmt& stmt, int col, std::string_view val);
-
-template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) <= 4)>* = nullptr>
-void bind(sqlite3_stmt& stmt, int col, ValueT val)
-{
-  detail::bind32(stmt, col, val);
-}
-
-template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value
-                                                     && (sizeof(ValueT) > 4)>* = nullptr>
-void bind(sqlite3_stmt& stmt, int col, ValueT val)
-{
-  detail::bind64(stmt, col, val);
+  using Traits = detail::DbTraits<ValueT>;
+  return Traits::column(stmt, col);
 }
 
 constexpr struct MaybeNullTag {
 } MaybeNull{};
 
-template <typename ValueT, typename std::enable_if_t<std::is_integral<ValueT>::value>* = nullptr>
-inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
+void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
+
+template <typename ValueT>
+void bind(sqlite3_stmt& stmt, int col, ValueT val)
 {
-  if (val != 0) {
+  using Traits = detail::DbTraits<ValueT>;
+  Traits::bind(stmt, col, val);
+}
+
+template <typename ValueT>
+void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
+{
+  using Traits = detail::DbTraits<ValueT>;
+  if (!Traits::isNull(val)) {
     bind(stmt, col, val);
   } else {
     bind(stmt, col, nullptr);
   }
-}
-
-template <typename ValueT,
-          typename std::enable_if_t<std::is_same<ValueT, std::string_view>::value>* = nullptr>
-inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
-{
-  if (!val.empty()) {
-    bind(stmt, col, val);
-  } else {
-    bind(stmt, col, nullptr);
-  }
-}
-
-template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value>* = nullptr>
-inline void bind(sqlite3_stmt& stmt, int col, ValueT val)
-{
-  bind(stmt, col, unbox(val));
-}
-
-template <typename ValueT, typename std::enable_if_t<std::is_enum<ValueT>::value>* = nullptr>
-inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
-{
-  bind(stmt, col, unbox(val), MaybeNull);
-}
-
-template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
-inline void bind(sqlite3_stmt& stmt, int col, ValueT val)
-{
-  bind(stmt, col, val.count());
-}
-
-template <typename ValueT, typename std::enable_if_t<isIntWrapper<ValueT>>* = nullptr>
-inline void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
-{
-  bind(stmt, col, val.count(), MaybeNull);
 }
 
 class ScopedBind {

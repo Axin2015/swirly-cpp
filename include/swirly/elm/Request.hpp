@@ -19,9 +19,10 @@
 
 #include <swirly/elm/Types.hpp>
 
+#include <swirly/ash/BasicTypes.hpp>
+#include <swirly/ash/Date.hpp>
 #include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/RefCounted.hpp>
-#include <swirly/ash/Types.hpp>
 
 #include <boost/intrusive/set.hpp>
 
@@ -30,7 +31,7 @@ namespace swirly {
 class SWIRLY_API Request : public RefCounted {
  public:
   Request(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
-          Side side, Lots lots, Millis created) noexcept
+          Side side, Lots lots, Time created) noexcept
     : marketId_{marketId},
       contr_{contr},
       settlDay_{settlDay},
@@ -77,7 +78,7 @@ class SWIRLY_API Request : public RefCounted {
   const Ref ref_;
   const Side side_;
   Lots lots_;
-  const Millis created_;
+  const Time created_;
 };
 
 /**
