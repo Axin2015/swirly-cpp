@@ -148,8 +148,8 @@ void HttpClient::getAccnt()
 void HttpClient::getRefDataReply(QNetworkReply& reply)
 {
   qDebug() << "getRefDataReply";
-
   auto body = reply.readAll();
+
   QJsonParseError error;
   const auto doc = QJsonDocument::fromJson(body, &error);
   if (error.error != QJsonParseError::NoError) {
@@ -177,8 +177,8 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
 void HttpClient::getAccntReply(QNetworkReply& reply)
 {
   qDebug() << "getAccntReply";
-
   auto body = reply.readAll();
+
   QJsonParseError error;
   const auto doc = QJsonDocument::fromJson(body, &error);
   if (error.error != QJsonParseError::NoError) {
@@ -216,14 +216,64 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
 
 void HttpClient::postMarketReply(QNetworkReply& reply)
 {
+  qDebug() << "postMarketReply";
   auto body = reply.readAll();
-  qDebug() << "postMarketReply:" << body;
+
+  QJsonParseError error;
+  const auto doc = QJsonDocument::fromJson(body, &error);
+  if (error.error != QJsonParseError::NoError) {
+    emit serviceError(error.errorString());
+    return;
+  }
+
+  const auto obj = doc.object();
+  const auto contr = findContr(obj);
+  marketModel().updateRow(Market::fromJson(contr, obj));
 }
 
 void HttpClient::postOrderReply(QNetworkReply& reply)
 {
+  qDebug() << "postOrderReply";
   auto body = reply.readAll();
-  qDebug() << "postOrderReply:" << body;
+
+  QJsonParseError error;
+  const auto doc = QJsonDocument::fromJson(body, &error);
+  if (error.error != QJsonParseError::NoError) {
+    emit serviceError(error.errorString());
+    return;
+  }
+
+  const auto obj = doc.object();
+  {
+    const auto elem = obj["market"];
+    if (!elem.isNull()) {
+      const auto obj = elem.toObject();
+      const auto contr = findContr(obj);
+      marketModel().updateRow(Market::fromJson(contr, obj));
+    }
+  }
+  for (const auto elem : obj["orders"].toArray()) {
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    orderModel().updateRow(Order::fromJson(contr, obj));
+  }
+  for (const auto elem : obj["execs"].toArray()) {
+    const auto obj = elem.toObject();
+    const auto contr = findContr(obj);
+    const auto exec = Exec::fromJson(contr, obj);
+    execModel().insertRow(exec);
+    if (exec.state() == State::Trade) {
+      tradeModel().updateRow(exec);
+    }
+  }
+  {
+    const auto elem = obj["posn"];
+    if (!elem.isNull()) {
+      const auto obj = elem.toObject();
+      const auto contr = findContr(obj);
+      posnModel().updateRow(Posn::fromJson(contr, obj));
+    }
+  }
 }
 
 } // ui
