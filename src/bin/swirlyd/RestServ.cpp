@@ -49,10 +49,10 @@ class ScopedIds {
   vector<Id64>& ids_;
 };
 
-Millis getTime(HttpMessage data) noexcept
+Time getTime(HttpMessage data) noexcept
 {
   const string_view val{data.header("Swirly-Time")};
-  return val.empty() ? getTimeOfDay() : Millis{stou64(val)};
+  return val.empty() ? UnixClock::now() : msToTime(stou64(val));
 }
 
 string_view getAccnt(HttpMessage data)
@@ -158,7 +158,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
   const auto cache = reset(data);
   const auto now = getTime(data);
   // See mg_send().
-  nc.last_io_time = now.count() / 1000;
+  nc.last_io_time = UnixClock::to_time_t(now);
 
   StreamBuf buf{nc.send_mbuf};
   out_.rdbuf(&buf);
@@ -198,7 +198,7 @@ void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
   out_.setContentLength();
 }
 
-void RestServ::restRequest(HttpMessage data, Millis now)
+void RestServ::restRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
     return;
@@ -219,7 +219,7 @@ void RestServ::restRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::refDataRequest(HttpMessage data, Millis now)
+void RestServ::refDataRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -265,7 +265,7 @@ void RestServ::refDataRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::assetRequest(HttpMessage data, Millis now)
+void RestServ::assetRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -297,7 +297,7 @@ void RestServ::assetRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::contrRequest(HttpMessage data, Millis now)
+void RestServ::contrRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -329,7 +329,7 @@ void RestServ::contrRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::marketRequest(HttpMessage data, Millis now)
+void RestServ::marketRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -430,7 +430,7 @@ void RestServ::marketRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::accntRequest(HttpMessage data, Millis now)
+void RestServ::accntRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -486,7 +486,7 @@ void RestServ::accntRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::orderRequest(HttpMessage data, Millis now)
+void RestServ::orderRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -619,7 +619,7 @@ void RestServ::orderRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::execRequest(HttpMessage data, Millis now)
+void RestServ::execRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -635,7 +635,7 @@ void RestServ::execRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::tradeRequest(HttpMessage data, Millis now)
+void RestServ::tradeRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
@@ -762,7 +762,7 @@ void RestServ::tradeRequest(HttpMessage data, Millis now)
   }
 }
 
-void RestServ::posnRequest(HttpMessage data, Millis now)
+void RestServ::posnRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 

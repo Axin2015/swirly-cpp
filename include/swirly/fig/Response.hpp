@@ -19,8 +19,6 @@
 
 #include <swirly/elm/Types.hpp>
 
-#include <swirly/ash/Types.hpp>
-
 #include <vector>
 
 namespace swirly {

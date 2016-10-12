@@ -65,6 +65,14 @@ void bind64(sqlite3_stmt& stmt, int col, int64_t val)
   }
 }
 
+void bindsv(sqlite3_stmt& stmt, int col, string_view val)
+{
+  int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
+  if (rc != SQLITE_OK) {
+    throw Error{errMsg() << "sqlite3_bind_text failed: " << lastError(stmt)};
+  }
+}
+
 } // detail
 
 DbPtr openDb(const char* path, int flags, const Conf& conf)
@@ -127,14 +135,6 @@ void bind(sqlite3_stmt& stmt, int col, nullptr_t)
   int rc{sqlite3_bind_null(&stmt, col)};
   if (rc != SQLITE_OK) {
     throw Error{errMsg() << "sqlite3_bind_null failed: " << lastError(stmt)};
-  }
-}
-
-void bind(sqlite3_stmt& stmt, int col, string_view val)
-{
-  int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_text failed: " << lastError(stmt)};
   }
 }
 

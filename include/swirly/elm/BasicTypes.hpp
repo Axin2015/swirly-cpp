@@ -17,10 +17,8 @@
 #ifndef SWIRLY_ELM_BASICTYPES_HPP
 #define SWIRLY_ELM_BASICTYPES_HPP
 
-#include <swirly/ash/Defs.hpp>
 #include <swirly/ash/IntWrapper.hpp>
 
-#include <cstdint>
 #include <ostream>
 
 namespace swirly {

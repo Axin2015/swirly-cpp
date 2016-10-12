@@ -98,14 +98,14 @@ class SWIRLY_API AsyncJourn {
   /**
    * Archive Trade.
    */
-  void archiveTrade(Id64 marketId, Id64 id, Millis modified)
+  void archiveTrade(Id64 marketId, Id64 id, Time modified)
   {
     doArchiveTrade(marketId, {&id, 1}, modified, More::No);
   }
   /**
    * Archive Trades.
    */
-  void archiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified);
+  void archiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified);
 
  private:
   void doReset();
@@ -116,7 +116,7 @@ class SWIRLY_API AsyncJourn {
 
   void doCreateExec(const Exec& exec, More more);
 
-  void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Millis modified, More more);
+  void doArchiveTrade(Id64 marketId, ArrayView<Id64> ids, Time modified, More more);
 
   MsgPipe pipe_;
   std::thread thread_;

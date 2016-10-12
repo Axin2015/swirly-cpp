@@ -14,30 +14,37 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_MARKETID_HPP
-#define SWIRLY_ELM_MARKETID_HPP
+#ifndef SWIRLY_ASH_BASICTYPES_HPP
+#define SWIRLY_ASH_BASICTYPES_HPP
 
-#include <swirly/ash/BasicTypes.hpp>
-#include <swirly/ash/Date.hpp>
+#include <swirly/ash/IntWrapper.hpp>
 
 namespace swirly {
-
-constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
-{
-  return Id64{(contrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
-}
-
-constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
-{
-  return toMarketId(contrId, maybeIsoToJd(settlDate));
-}
-
-template <typename ValueT>
-struct MarketIdTraits {
-  using Id = Id64;
-  static Id id(const ValueT& value) noexcept { return value.marketId(); }
+struct Id32Policy : Int32Policy {
 };
+struct Id64Policy : Int64Policy {
+};
+
+/**
+ * 32 bit identifier.
+ */
+using Id32 = IntWrapper<Id32Policy>;
+
+constexpr Id32 operator""_id32(unsigned long long val) noexcept
+{
+  return Id32{val};
+}
+
+/**
+ * 64 bit identifier.
+ */
+using Id64 = IntWrapper<Id64Policy>;
+
+constexpr Id64 operator""_id64(unsigned long long val) noexcept
+{
+  return Id64{val};
+}
 
 } // swirly
 
-#endif // SWIRLY_ELM_MARKETID_HPP
+#endif // SWIRLY_ASH_BASICTYPES_HPP

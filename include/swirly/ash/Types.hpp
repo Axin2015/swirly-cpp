@@ -17,72 +17,10 @@
 #ifndef SWIRLY_ASH_TYPES_HPP
 #define SWIRLY_ASH_TYPES_HPP
 
-#include <swirly/ash/IntWrapper.hpp>
-
-#include <cstdint>
+#include <swirly/ash/BasicTypes.hpp>
+#include <swirly/ash/Date.hpp>
 
 namespace swirly {
-struct Id32Policy : Int32Policy {
-};
-struct Id64Policy : Int64Policy {
-};
-struct IsoDatePolicy : Int32Policy {
-};
-struct JDayPolicy : Int32Policy {
-};
-struct MillisPolicy : Int64Policy {
-};
-
-/**
- * 32 bit identifier.
- */
-using Id32 = IntWrapper<Id32Policy>;
-
-constexpr Id32 operator""_id32(unsigned long long val) noexcept
-{
-  return Id32{val};
-}
-
-/**
- * 64 bit identifier.
- */
-using Id64 = IntWrapper<Id64Policy>;
-
-constexpr Id64 operator""_id64(unsigned long long val) noexcept
-{
-  return Id64{val};
-}
-
-/**
- * ISO8601 date in yyymmdd format.
- */
-using IsoDate = IntWrapper<IsoDatePolicy>;
-
-constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
-{
-  return IsoDate{val};
-}
-
-/**
- * Julian day.
- */
-using JDay = IntWrapper<JDayPolicy>;
-
-constexpr JDay operator""_jd(unsigned long long val) noexcept
-{
-  return JDay{val};
-}
-
-/**
- * Milliseconds since Unix epoch.
- */
-using Millis = IntWrapper<MillisPolicy>;
-
-constexpr Millis operator""_ms(unsigned long long val) noexcept
-{
-  return Millis{val};
-}
-
 } // swirly
 
 #endif // SWIRLY_ASH_TYPES_HPP

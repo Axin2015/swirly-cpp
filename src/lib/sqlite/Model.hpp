@@ -44,7 +44,7 @@ class Model : public swirly::Model {
 
   void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
 
-  void doReadAccnt(Millis now, const ModelCallback<std::string_view>& cb) const override;
+  void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const override;
 
   void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
 

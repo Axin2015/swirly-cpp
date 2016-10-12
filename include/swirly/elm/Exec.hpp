@@ -34,7 +34,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
   Exec(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Id64 orderId, Mnem accnt,
        std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
        Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId, LiqInd liqInd,
-       Mnem cpty, Millis created) noexcept
+       Mnem cpty, Time created) noexcept
     : Request{marketId, contr, settlDay, id, accnt, ref, side, lots, created},
       orderId_{orderId},
       state_{state},

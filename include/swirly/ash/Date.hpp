@@ -17,11 +17,37 @@
 #ifndef SWIRLY_ASH_DATE_HPP
 #define SWIRLY_ASH_DATE_HPP
 
-#include <swirly/ash/Types.hpp>
+#include <swirly/ash/IntWrapper.hpp>
+#include <swirly/ash/Time.hpp>
 
 #include <cassert>
 
 namespace swirly {
+
+struct IsoDatePolicy : Int32Policy {
+};
+struct JDayPolicy : Int32Policy {
+};
+
+/**
+ * ISO8601 date in yyymmdd format.
+ */
+using IsoDate = IntWrapper<IsoDatePolicy>;
+
+constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
+{
+  return IsoDate{val};
+}
+
+/**
+ * Julian day.
+ */
+using JDay = IntWrapper<JDayPolicy>;
+
+constexpr JDay operator""_jd(unsigned long long val) noexcept
+{
+  return JDay{val};
+}
 
 /**
  * Gregorian to ISO8601 date.
@@ -102,15 +128,15 @@ constexpr JDay tjdToJd(int32_t tjd) noexcept
 }
 
 /**
- * Julian day to milliseconds since Unix epoch.
+ * Julian day to Unix time.
  */
-constexpr Millis jdToMs(JDay jd) noexcept
+constexpr Time jdToTime(JDay jd) noexcept
 {
   // Julian day for January 1st, 1970.
   const JDay jdUnixEpoc = 2440588_jd;
   const int64_t msInDay = 24 * 60 * 60 * 1000;
   // Add half day for 12pm.
-  return Millis{(jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1)};
+  return msToTime((jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1));
 }
 
 /**

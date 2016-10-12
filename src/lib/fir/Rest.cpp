@@ -35,7 +35,7 @@ Rest::Rest(Rest&&) = default;
 
 Rest& Rest::operator=(Rest&&) = default;
 
-void Rest::getRefData(EntitySet es, Millis now, ostream& out) const
+void Rest::getRefData(EntitySet es, Time now, ostream& out) const
 {
   int i{0};
   out << '{';
@@ -64,7 +64,7 @@ void Rest::getRefData(EntitySet es, Millis now, ostream& out) const
   out << '}';
 }
 
-void Rest::getAsset(Millis now, ostream& out) const
+void Rest::getAsset(Time now, ostream& out) const
 {
   const auto& assets = serv_.assets();
   out << '[';
@@ -72,7 +72,7 @@ void Rest::getAsset(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getAsset(Mnem mnem, Millis now, ostream& out) const
+void Rest::getAsset(Mnem mnem, Time now, ostream& out) const
 {
   const auto& assets = serv_.assets();
   auto it = assets.find(mnem);
@@ -82,7 +82,7 @@ void Rest::getAsset(Mnem mnem, Millis now, ostream& out) const
   out << *it;
 }
 
-void Rest::getContr(Millis now, ostream& out) const
+void Rest::getContr(Time now, ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   out << '[';
@@ -90,7 +90,7 @@ void Rest::getContr(Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getContr(Mnem mnem, Millis now, ostream& out) const
+void Rest::getContr(Mnem mnem, Time now, ostream& out) const
 {
   const auto& contrs = serv_.contrs();
   auto it = contrs.find(mnem);
@@ -100,7 +100,7 @@ void Rest::getContr(Mnem mnem, Millis now, ostream& out) const
   out << *it;
 }
 
-void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> limit, Millis now,
+void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> limit, Time now,
                     ostream& out) const
 {
   const auto& accnt = serv_.accnt(mnem);
@@ -146,7 +146,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
   out << '}';
 }
 
-void Rest::getMarket(Millis now, std::ostream& out) const
+void Rest::getMarket(Time now, std::ostream& out) const
 {
   const auto& markets = serv_.markets();
   out << '[';
@@ -154,7 +154,7 @@ void Rest::getMarket(Millis now, std::ostream& out) const
   out << ']';
 }
 
-void Rest::getMarket(Mnem contrMnem, Millis now, std::ostream& out) const
+void Rest::getMarket(Mnem contrMnem, Time now, std::ostream& out) const
 {
   const auto& markets = serv_.markets();
   out << '[';
@@ -163,18 +163,18 @@ void Rest::getMarket(Mnem contrMnem, Millis now, std::ostream& out) const
   out << ']';
 }
 
-void Rest::getMarket(Mnem contrMnem, IsoDate settlDate, Millis now, std::ostream& out) const
+void Rest::getMarket(Mnem contrMnem, IsoDate settlDate, Time now, std::ostream& out) const
 {
   const auto id = toMarketId(serv_.contr(contrMnem).id(), settlDate);
   out << serv_.market(id);
 }
 
-void Rest::getOrder(Mnem accntMnem, Millis now, ostream& out) const
+void Rest::getOrder(Mnem accntMnem, Time now, ostream& out) const
 {
   getOrder(serv_.accnt(accntMnem), now, out);
 }
 
-void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, ostream& out) const
+void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Time now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& orders = accnt.orders();
@@ -184,8 +184,7 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, ostream& out) co
   out << ']';
 }
 
-void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
-                    ostream& out) const
+void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -197,7 +196,7 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis no
   out << ']';
 }
 
-void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Millis now,
+void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
                     ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
@@ -211,18 +210,18 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
   out << *it;
 }
 
-void Rest::getExec(Mnem accntMnem, size_t offset, optional<size_t> limit, Millis now,
+void Rest::getExec(Mnem accntMnem, size_t offset, optional<size_t> limit, Time now,
                    ostream& out) const
 {
   getExec(serv_.accnt(accntMnem), offset, limit, now, out);
 }
 
-void Rest::getTrade(Mnem accntMnem, Millis now, ostream& out) const
+void Rest::getTrade(Mnem accntMnem, Time now, ostream& out) const
 {
   getTrade(serv_.accnt(accntMnem), now, out);
 }
 
-void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const
+void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Time now, std::ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& trades = accnt.trades();
@@ -232,8 +231,7 @@ void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& ou
   out << ']';
 }
 
-void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
-                    ostream& out) const
+void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -245,7 +243,7 @@ void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis no
   out << ']';
 }
 
-void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Millis now,
+void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
                     ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
@@ -259,12 +257,12 @@ void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
   out << *it;
 }
 
-void Rest::getPosn(Mnem accntMnem, Millis now, ostream& out) const
+void Rest::getPosn(Mnem accntMnem, Time now, ostream& out) const
 {
   getPosn(serv_.accnt(accntMnem), now, out);
 }
 
-void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, Millis now, ostream& out) const
+void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, Time now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& posns = accnt.posns();
@@ -274,8 +272,7 @@ void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, Millis now, ostream& out) con
   out << ']';
 }
 
-void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
-                   ostream& out) const
+void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -289,8 +286,7 @@ void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now
   out << *it;
 }
 
-void Rest::postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Millis now,
-                      ostream& out)
+void Rest::postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Time now, ostream& out)
 {
   const auto& contr = serv_.contr(contrMnem);
   const auto settlDay = maybeIsoToJd(settlDate);
@@ -298,7 +294,7 @@ void Rest::postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Mill
   out << market;
 }
 
-void Rest::putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Millis now, ostream& out)
+void Rest::putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Time now, ostream& out)
 {
   const auto& contr = serv_.contr(contrMnem);
   const auto id = toMarketId(contr.id(), settlDate);
@@ -308,7 +304,7 @@ void Rest::putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Milli
 }
 
 void Rest::postOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_view ref, Side side,
-                     Lots lots, Ticks ticks, Lots minLots, Millis now, ostream& out)
+                     Lots lots, Ticks ticks, Lots minLots, Time now, ostream& out)
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -320,7 +316,7 @@ void Rest::postOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_v
 }
 
 void Rest::putOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids,
-                    Lots lots, Millis now, ostream& out)
+                    Lots lots, Time now, ostream& out)
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -344,7 +340,7 @@ void Rest::putOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView
 }
 
 void Rest::postTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_view ref, Side side,
-                     Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Millis now, ostream& out)
+                     Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Time now, ostream& out)
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -359,7 +355,7 @@ void Rest::postTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_v
 }
 
 void Rest::deleteTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids,
-                       Millis now)
+                       Time now)
 {
   const auto& accnt = serv_.accnt(accntMnem);
   const auto& contr = serv_.contr(contrMnem);
@@ -367,7 +363,7 @@ void Rest::deleteTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayV
   serv_.archiveTrade(accnt, marketId, ids, now);
 }
 
-void Rest::getOrder(const Accnt& accnt, Millis now, ostream& out) const
+void Rest::getOrder(const Accnt& accnt, Time now, ostream& out) const
 {
   const auto& orders = accnt.orders();
   out << '[';
@@ -375,7 +371,7 @@ void Rest::getOrder(const Accnt& accnt, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, Millis now,
+void Rest::getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, Time now,
                    ostream& out) const
 {
   const auto& execs = accnt.execs();
@@ -397,7 +393,7 @@ void Rest::getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, Mi
   out << ']';
 }
 
-void Rest::getTrade(const Accnt& accnt, Millis now, ostream& out) const
+void Rest::getTrade(const Accnt& accnt, Time now, ostream& out) const
 {
   const auto& trades = accnt.trades();
   out << '[';
@@ -405,7 +401,7 @@ void Rest::getTrade(const Accnt& accnt, Millis now, ostream& out) const
   out << ']';
 }
 
-void Rest::getPosn(const Accnt& accnt, Millis now, ostream& out) const
+void Rest::getPosn(const Accnt& accnt, Time now, ostream& out) const
 {
   const auto& posns = accnt.posns();
   out << '[';

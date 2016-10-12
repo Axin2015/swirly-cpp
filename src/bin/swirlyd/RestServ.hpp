@@ -23,6 +23,7 @@
 #include <swirly/fir/RestRequest.hpp>
 
 #include <swirly/ash/Array.hpp>
+#include <swirly/ash/BasicTypes.hpp>
 #include <swirly/ash/Profile.hpp>
 #include <swirly/ash/Tokeniser.hpp>
 
@@ -46,19 +47,19 @@ class RestServ : public mg::Mgr<RestServ> {
   bool reset(mg::HttpMessage data) noexcept;
 
   void httpRequest(mg_connection& nc, mg::HttpMessage data);
-  void restRequest(mg::HttpMessage data, Millis now);
+  void restRequest(mg::HttpMessage data, Time now);
 
-  void refDataRequest(mg::HttpMessage data, Millis now);
-  void assetRequest(mg::HttpMessage data, Millis now);
-  void contrRequest(mg::HttpMessage data, Millis now);
+  void refDataRequest(mg::HttpMessage data, Time now);
+  void assetRequest(mg::HttpMessage data, Time now);
+  void contrRequest(mg::HttpMessage data, Time now);
 
-  void marketRequest(mg::HttpMessage data, Millis now);
+  void marketRequest(mg::HttpMessage data, Time now);
 
-  void accntRequest(mg::HttpMessage data, Millis now);
-  void orderRequest(mg::HttpMessage data, Millis now);
-  void execRequest(mg::HttpMessage data, Millis now);
-  void tradeRequest(mg::HttpMessage data, Millis now);
-  void posnRequest(mg::HttpMessage data, Millis now);
+  void accntRequest(mg::HttpMessage data, Time now);
+  void orderRequest(mg::HttpMessage data, Time now);
+  void execRequest(mg::HttpMessage data, Time now);
+  void tradeRequest(mg::HttpMessage data, Time now);
+  void posnRequest(mg::HttpMessage data, Time now);
 
  private:
   enum : int {

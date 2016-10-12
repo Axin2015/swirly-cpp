@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     }
     const BusinessDay busDay{RollHour, NewYork};
 
-    const auto now = getTimeOfDay();
+    const auto now = UnixClock::now();
     auto model = makeModel(conf);
 
     cout << "{\"assets\":[";

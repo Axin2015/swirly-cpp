@@ -59,12 +59,12 @@ class SWIRLY_API MarketSide {
       removeOrder(*level, order);
     }
   }
-  void createOrder(const OrderPtr& order, Millis now) throw(std::bad_alloc)
+  void createOrder(const OrderPtr& order, Time now) throw(std::bad_alloc)
   {
     order->create(now);
     insertOrder(order);
   }
-  void reviseOrder(Order& order, Lots lots, Millis now) noexcept
+  void reviseOrder(Order& order, Lots lots, Time now) noexcept
   {
     assert(lots > 0_lts);
     assert(lots >= order.exec());
@@ -78,7 +78,7 @@ class SWIRLY_API MarketSide {
     }
     order.revise(lots, now);
   }
-  void cancelOrder(Order& order, Millis now) noexcept
+  void cancelOrder(Order& order, Time now) noexcept
   {
     Level* const level{order.level()};
     if (level != nullptr) {
@@ -90,7 +90,7 @@ class SWIRLY_API MarketSide {
    * Reduce residual lots by lots. If the resulting residual is zero, then the order is removed from
    * the side.
    */
-  void takeOrder(Order& order, Lots lots, Millis now) noexcept
+  void takeOrder(Order& order, Lots lots, Time now) noexcept
   {
     Level* const level{order.level()};
     if (level != nullptr) {

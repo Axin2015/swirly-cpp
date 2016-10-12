@@ -42,9 +42,10 @@ BusinessDay& BusinessDay::operator=(const BusinessDay& rhs) = default;
 BusinessDay::BusinessDay(BusinessDay&&) noexcept = default;
 BusinessDay& BusinessDay::operator=(BusinessDay&&) noexcept = default;
 
-JDay BusinessDay::operator()(Millis ms) const
+JDay BusinessDay::operator()(Time time) const
 {
-  const int64_t t{ms.count() / 1000L};
+  const auto t = UnixClock::to_time_t(time);
+
   // Returned cached value if it exists.
   const auto i = t & 1;
   if (cache_[i].first == t) {

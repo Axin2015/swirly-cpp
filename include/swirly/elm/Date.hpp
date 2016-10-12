@@ -17,8 +17,7 @@
 #ifndef SWIRLY_ELM_DATE_HPP
 #define SWIRLY_ELM_DATE_HPP
 
-#include <swirly/ash/Defs.hpp>
-#include <swirly/ash/Types.hpp>
+#include <swirly/ash/Date.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
@@ -58,11 +57,11 @@ class SWIRLY_API BusinessDay {
   /**
    * Get the business day from a transaction time.
    *
-   * @param ms The milliseconds since epoch.
+   * @param time Unix time.
    *
    * @return the business day.
    */
-  JDay operator()(Millis ms) const;
+  JDay operator()(Time time) const;
 
  private:
   int rollHour_;

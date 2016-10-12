@@ -47,84 +47,83 @@ class SWIRLY_API Rest {
   Rest(Rest&&);
   Rest& operator=(Rest&&);
 
-  void load(const Model& model, Millis now) { serv_.load(model, now); }
+  void load(const Model& model, Time now) { serv_.load(model, now); }
 
-  void getRefData(EntitySet es, Millis now, std::ostream& out) const;
+  void getRefData(EntitySet es, Time now, std::ostream& out) const;
 
-  void getAsset(Millis now, std::ostream& out) const;
+  void getAsset(Time now, std::ostream& out) const;
 
-  void getAsset(Mnem mnem, Millis now, std::ostream& out) const;
+  void getAsset(Mnem mnem, Time now, std::ostream& out) const;
 
-  void getContr(Millis now, std::ostream& out) const;
+  void getContr(Time now, std::ostream& out) const;
 
-  void getContr(Mnem mnem, Millis now, std::ostream& out) const;
+  void getContr(Mnem mnem, Time now, std::ostream& out) const;
 
   void getAccnt(Mnem mnem, EntitySet es, std::size_t offset, std::optional<std::size_t> limit,
-                Millis now, std::ostream& out) const;
+                Time now, std::ostream& out) const;
 
-  void getMarket(Millis now, std::ostream& out) const;
+  void getMarket(Time now, std::ostream& out) const;
 
-  void getMarket(Mnem contrMnem, Millis now, std::ostream& out) const;
+  void getMarket(Mnem contrMnem, Time now, std::ostream& out) const;
 
-  void getMarket(Mnem contrMnem, IsoDate settlDate, Millis now, std::ostream& out) const;
+  void getMarket(Mnem contrMnem, IsoDate settlDate, Time now, std::ostream& out) const;
 
-  void getOrder(Mnem accntMnem, Millis now, std::ostream& out) const;
+  void getOrder(Mnem accntMnem, Time now, std::ostream& out) const;
 
-  void getOrder(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
+  void getOrder(Mnem accntMnem, Mnem contrMnem, Time now, std::ostream& out) const;
 
-  void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
+  void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now,
                 std::ostream& out) const;
 
-  void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Millis now,
+  void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
                 std::ostream& out) const;
 
-  void getExec(Mnem accntMnem, std::size_t offset, std::optional<std::size_t> limit, Millis now,
+  void getExec(Mnem accntMnem, std::size_t offset, std::optional<std::size_t> limit, Time now,
                std::ostream& out) const;
 
-  void getTrade(Mnem accntMnem, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accntMnem, Time now, std::ostream& out) const;
 
-  void getTrade(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
+  void getTrade(Mnem accntMnem, Mnem contrMnem, Time now, std::ostream& out) const;
 
-  void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
+  void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now,
                 std::ostream& out) const;
 
-  void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Millis now,
+  void getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
                 std::ostream& out) const;
 
-  void getPosn(Mnem accntMnem, Millis now, std::ostream& out) const;
+  void getPosn(Mnem accntMnem, Time now, std::ostream& out) const;
 
-  void getPosn(Mnem accntMnem, Mnem contrMnem, Millis now, std::ostream& out) const;
+  void getPosn(Mnem accntMnem, Mnem contrMnem, Time now, std::ostream& out) const;
 
-  void getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Millis now,
+  void getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now,
                std::ostream& out) const;
 
-  void postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Millis now,
+  void postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Time now,
                   std::ostream& out);
 
-  void putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Millis now,
-                 std::ostream& out);
+  void putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Time now, std::ostream& out);
 
   void postOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, std::string_view ref, Side side,
-                 Lots lots, Ticks ticks, Lots minLots, Millis now, std::ostream& out);
+                 Lots lots, Ticks ticks, Lots minLots, Time now, std::ostream& out);
 
   void putOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids, Lots lots,
-                Millis now, std::ostream& out);
+                Time now, std::ostream& out);
 
   void postTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, std::string_view ref, Side side,
-                 Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Millis now, std::ostream& out);
+                 Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Time now, std::ostream& out);
 
   void deleteTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids,
-                   Millis now);
+                   Time now);
 
  private:
-  void getOrder(const Accnt& accnt, Millis now, std::ostream& out) const;
+  void getOrder(const Accnt& accnt, Time now, std::ostream& out) const;
 
-  void getExec(const Accnt& accnt, std::size_t offset, std::optional<std::size_t> limit, Millis now,
+  void getExec(const Accnt& accnt, std::size_t offset, std::optional<std::size_t> limit, Time now,
                std::ostream& out) const;
 
-  void getTrade(const Accnt& accnt, Millis now, std::ostream& out) const;
+  void getTrade(const Accnt& accnt, Time now, std::ostream& out) const;
 
-  void getPosn(const Accnt& accnt, Millis now, std::ostream& out) const;
+  void getPosn(const Accnt& accnt, Time now, std::ostream& out) const;
 
   Serv serv_;
 };

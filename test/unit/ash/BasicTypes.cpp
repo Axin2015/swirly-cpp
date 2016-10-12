@@ -14,30 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ELM_MARKETID_HPP
-#define SWIRLY_ELM_MARKETID_HPP
-
 #include <swirly/ash/BasicTypes.hpp>
-#include <swirly/ash/Date.hpp>
 
-namespace swirly {
-
-constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
-{
-  return Id64{(contrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
-}
-
-constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
-{
-  return toMarketId(contrId, maybeIsoToJd(settlDate));
-}
-
-template <typename ValueT>
-struct MarketIdTraits {
-  using Id = Id64;
-  static Id id(const ValueT& value) noexcept { return value.marketId(); }
-};
-
-} // swirly
-
-#endif // SWIRLY_ELM_MARKETID_HPP
+#include <swirly/tea/Test.hpp>

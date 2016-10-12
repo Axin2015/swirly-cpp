@@ -37,7 +37,7 @@ constexpr auto Today = ymdToJd(2014, 2, 11);
 constexpr auto SettlDay = Today + 2_jd;
 constexpr auto MarketId = toMarketId(1_id32, SettlDay);
 
-constexpr auto Now = jdToMs(Today);
+constexpr auto Now = jdToTime(Today);
 
 struct JournState {
   int reset{0};
@@ -193,7 +193,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
   execs[1]
     = makeRefCounted<Exec>(MarketId, "EURUSD"_sv, SettlDay, 3_id64, 2_id64, "MARAYL"_sv, "REF"_sv,
                            State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts, 5_lts, 61725_cst,
-                           5_lts, 12345_tks, 1_lts, 4_id64, LiqInd::Maker, "GOSAYL"_sv, Now + 1_ms);
+                           5_lts, 12345_tks, 1_lts, 4_id64, LiqInd::Maker, "GOSAYL"_sv, Now + 1ms);
   asyncJourn.createExec(execs);
   {
     Msg msg;
@@ -221,7 +221,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.matchId == 0_id64);
     SWIRLY_CHECK(body.liqInd == LiqInd::None);
     SWIRLY_CHECK(strncmp(body.cpty, "", sizeof(body.cpty)) == 0);
-    SWIRLY_CHECK(body.created == Now);
+    SWIRLY_CHECK(body.created == timeToMs(Now));
   }
   {
     Msg msg;
@@ -249,7 +249,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     SWIRLY_CHECK(body.matchId == 4_id64);
     SWIRLY_CHECK(body.liqInd == LiqInd::Maker);
     SWIRLY_CHECK(strncmp(body.cpty, "GOSAYL", sizeof(body.cpty)) == 0);
-    SWIRLY_CHECK(body.created == Now + 1_ms);
+    SWIRLY_CHECK(body.created == timeToMs(Now + 1ms));
   }
 }
 
@@ -269,7 +269,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournArchiveTrade, AsyncJournFixture)
     SWIRLY_CHECK(msg.type == MsgType::ArchiveTrade);
     const auto& body = msg.archiveTrade;
     SWIRLY_CHECK(body.marketId == MarketId);
-    SWIRLY_CHECK(body.modified == Now);
+    SWIRLY_CHECK(body.modified == timeToMs(Now));
     for (const auto id : body.ids) {
       if (it != ids.end()) {
         SWIRLY_CHECK(id == *it++);

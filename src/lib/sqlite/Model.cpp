@@ -150,12 +150,12 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
                     column<MarketState>(*stmt, State), //
                     column<Lots>(*stmt, LastLots), //
                     column<Ticks>(*stmt, LastTicks), //
-                    column<Millis>(*stmt, LastTime), //
+                    column<Time>(*stmt, LastTime), //
                     column<Id64>(*stmt, MaxId)));
   }
 }
 
-void Model::doReadAccnt(Millis now, const ModelCallback<string_view>& cb) const
+void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
 {
   enum { //
     Mnem //
@@ -164,7 +164,7 @@ void Model::doReadAccnt(Millis now, const ModelCallback<string_view>& cb) const
   StmtPtr stmt{prepare(*db_, SelectAccntSql)};
   ScopedBind bind{*stmt};
   // One week ago.
-  bind(now - 604800000_ms);
+  bind(now - 604800000ms);
   while (step(*stmt)) {
     cb(column<string_view>(*stmt, Mnem));
   }
@@ -211,8 +211,8 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
                    column<swirly::Lots>(*stmt, LastLots), //
                    column<swirly::Ticks>(*stmt, LastTicks), //
                    column<swirly::Lots>(*stmt, MinLots), //
-                   column<Millis>(*stmt, Created), //
-                   column<Millis>(*stmt, Modified)));
+                   column<Time>(*stmt, Created), //
+                   column<Time>(*stmt, Modified)));
   }
 }
 
@@ -266,7 +266,7 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
                   column<Id64>(*stmt, MatchId), //
                   column<swirly::LiqInd>(*stmt, LiqInd), //
                   column<string_view>(*stmt, Cpty), //
-                  column<Millis>(*stmt, Created)));
+                  column<Time>(*stmt, Created)));
   }
 }
 
@@ -317,7 +317,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
                   column<Id64>(*stmt, MatchId), //
                   column<swirly::LiqInd>(*stmt, LiqInd), //
                   column<string_view>(*stmt, Cpty), //
-                  column<Millis>(*stmt, Created)));
+                  column<Time>(*stmt, Created)));
   }
 }
 

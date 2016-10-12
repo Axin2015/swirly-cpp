@@ -17,9 +17,9 @@
 #ifndef SWIRLY_ASH_SET_HPP
 #define SWIRLY_ASH_SET_HPP
 
+#include <swirly/ash/BasicTypes.hpp>
 #include <swirly/ash/Mnem.hpp>
 #include <swirly/ash/RefCounted.hpp>
-#include <swirly/ash/Types.hpp>
 
 #include <boost/intrusive/set.hpp>
 

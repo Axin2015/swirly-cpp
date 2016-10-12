@@ -77,7 +77,7 @@ void openLogFile(const char* path)
 struct Opts {
   fs::path confFile;
   bool daemon{true};
-  Millis startTime{0_ms};
+  Time startTime{};
 };
 
 void printUsage(ostream& os)
@@ -110,7 +110,7 @@ void getOpts(int argc, char* argv[], Opts& opts)
       opts.daemon = false;
       break;
     case 's':
-      opts.startTime = Millis{stou64(optarg)};
+      opts.startTime = msToTime(stou64(optarg));
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
@@ -157,8 +157,8 @@ int main(int argc, char* argv[])
     Opts opts;
     getOpts(argc, argv, opts);
 
-    if (opts.startTime == 0_ms) {
-      opts.startTime = getTimeOfDay();
+    if (opts.startTime == Time{}) {
+      opts.startTime = UnixClock::now();
     }
 
     Conf conf;
