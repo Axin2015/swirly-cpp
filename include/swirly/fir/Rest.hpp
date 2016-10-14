@@ -116,15 +116,6 @@ class SWIRLY_API Rest {
                    Time now);
 
  private:
-  void getOrder(const Accnt& accnt, Time now, std::ostream& out) const;
-
-  void getExec(const Accnt& accnt, std::size_t offset, std::optional<std::size_t> limit, Time now,
-               std::ostream& out) const;
-
-  void getTrade(const Accnt& accnt, Time now, std::ostream& out) const;
-
-  void getPosn(const Accnt& accnt, Time now, std::ostream& out) const;
-
   Serv serv_;
 };
 
