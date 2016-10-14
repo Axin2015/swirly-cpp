@@ -45,6 +45,9 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
     auto del = makeDeleter(table->model());
     table->setModel(&model);
   }
+  table->resizeColumnToContents(unbox(Column::CheckState));
+
+  table->setColumnHidden(unbox(Column::CheckState), true);
   table->setColumnHidden(unbox(Column::Id), true);
   table->setColumnHidden(unbox(Column::State), true);
   table->setColumnHidden(unbox(Column::LastLots), true);
@@ -65,6 +68,9 @@ MarketView::~MarketView() noexcept = default;
 
 void MarketView::slotClicked(const QModelIndex& index)
 {
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    model_.toggleCheckState(index.row());
+  }
 }
 
 } // ui

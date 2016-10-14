@@ -56,6 +56,7 @@ class HttpClient : public Client {
   void postOrderReply(QNetworkReply& reply);
 
   QNetworkAccessManager nam_;
+  std::uint64_t tag_{0};
 };
 
 } // ui

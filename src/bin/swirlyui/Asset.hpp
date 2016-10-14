@@ -29,6 +29,7 @@ namespace ui {
 namespace asset {
 
 enum class Column : int { //
+  CheckState, //
   Mnem, //
   Display, //
   Type
@@ -59,6 +60,12 @@ class Asset {
 };
 
 QDebug operator<<(QDebug debug, const Asset& asset);
+
+inline bool isModified(const Asset& prev, const Asset& next) noexcept
+{
+  // Immutable.
+  return false;
+}
 
 } // ui
 } // swirly

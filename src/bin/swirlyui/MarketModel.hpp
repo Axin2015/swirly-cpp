@@ -18,35 +18,28 @@
 #define SWIRLYUI_MARKETMODEL_HPP
 
 #include "Market.hpp"
-
-#include <QAbstractTableModel>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
-#pragma GCC diagnostic pop
+#include "TableModel.hpp"
 
 namespace swirly {
 namespace ui {
 
-class MarketModel : public QAbstractTableModel {
+class MarketModel
+  : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
  public:
   MarketModel(QObject* parent = nullptr);
   ~MarketModel() noexcept override;
-
-  int rowCount(const QModelIndex& parent) const override;
-
-  int columnCount(const QModelIndex& parent) const override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Market& market);
+  void updateRow(std::uint64_t tag, const Market& market)
+  {
+    TableModel::updateRow(market.id(), tag, market);
+  }
 
  private:
   QVariant header_[market::ColumnCount];
-  boost::container::flat_map<Id64, Market, std::less<Id64>> rows_;
 };
 
 } // ui

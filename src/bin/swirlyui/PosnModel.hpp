@@ -18,35 +18,28 @@
 #define SWIRLYUI_POSNMODEL_HPP
 
 #include "Posn.hpp"
-
-#include <QAbstractTableModel>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
-#pragma GCC diagnostic pop
+#include "TableModel.hpp"
 
 namespace swirly {
 namespace ui {
 
-class PosnModel : public QAbstractTableModel {
+class PosnModel
+  : public TableModel<Id64, Posn, unbox(posn::Column::CheckState), posn::ColumnCount> {
  public:
   PosnModel(QObject* parent = nullptr);
   ~PosnModel() noexcept override;
-
-  int rowCount(const QModelIndex& parent) const override;
-
-  int columnCount(const QModelIndex& parent) const override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Posn& posn);
+  void updateRow(std::uint64_t tag, const Posn& posn)
+  {
+    TableModel::updateRow(posn.marketId(), tag, posn);
+  }
 
  private:
   QVariant header_[posn::ColumnCount];
-  boost::container::flat_map<Id64, Posn, std::less<Id64>> rows_;
 };
 
 } // ui

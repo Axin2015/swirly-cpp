@@ -50,6 +50,8 @@ set(swirlyui_SOURCES
   Posn.cpp
   PosnModel.cpp
   PosnView.cpp
+  Row.cpp
+  TableModel.cpp
   TradeModel.cpp
   TradeView.cpp
   Types.cpp

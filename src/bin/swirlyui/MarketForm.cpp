@@ -42,6 +42,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
   {
     auto del = makeDeleter(contrComboBox->model());
     contrComboBox->setModel(&contrModel);
+    contrComboBox->setModelColumn(unbox(contr::Column::Mnem));
   }
   QFontMetrics fm{QApplication::font()};
   contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);

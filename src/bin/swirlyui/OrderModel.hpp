@@ -18,40 +18,29 @@
 #define SWIRLYUI_ORDERMODEL_HPP
 
 #include "Order.hpp"
-
-#include <QAbstractTableModel>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
-#pragma GCC diagnostic pop
+#include "TableModel.hpp"
 
 namespace swirly {
 namespace ui {
 
-class OrderModel : public QAbstractTableModel {
+class OrderModel : public TableModel<std::pair<Id64, Id64>, Order, unbox(order::Column::CheckState),
+                                     order::ColumnCount> {
  public:
   OrderModel(QObject* parent = nullptr);
   ~OrderModel() noexcept override;
-
-  int rowCount(const QModelIndex& parent) const override;
-
-  int columnCount(const QModelIndex& parent) const override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-  void toggleCheckState(int row);
-
-  void updateRow(const Order& order);
+  void updateRow(std::uint64_t tag, const Order& order)
+  {
+    const auto key = std::make_pair(order.marketId(), order.id());
+    TableModel::updateRow(key, tag, order);
+  }
 
  private:
   QVariant header_[order::ColumnCount];
-  using Key = std::pair<Id64, Id64>;
-  boost::container::flat_map<Key, Order, std::less<Key>> rows_;
 };
 
 } // ui

@@ -29,6 +29,7 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
+using namespace contr;
 
 ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_(model)
@@ -38,6 +39,10 @@ ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
     auto del = makeDeleter(table->model());
     table->setModel(&model);
   }
+  table->resizeColumnToContents(unbox(Column::CheckState));
+
+  table->setColumnHidden(unbox(Column::CheckState), true);
+
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setSelectionMode(QAbstractItemView::SingleSelection);
 
@@ -57,6 +62,9 @@ void ContrView::resizeColumnsToContents()
 
 void ContrView::slotClicked(const QModelIndex& index)
 {
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    model_.toggleCheckState(index.row());
+  }
 }
 
 } // ui

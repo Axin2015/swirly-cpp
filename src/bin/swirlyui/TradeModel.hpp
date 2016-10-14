@@ -18,40 +18,29 @@
 #define SWIRLYUI_TRADEMODEL_HPP
 
 #include "Exec.hpp"
-
-#include <QAbstractTableModel>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
-#pragma GCC diagnostic pop
+#include "TableModel.hpp"
 
 namespace swirly {
 namespace ui {
 
-class TradeModel : public QAbstractTableModel {
+class TradeModel : public TableModel<std::pair<Id64, Id64>, Exec, unbox(exec::Column::CheckState),
+                                     exec::ColumnCount> {
  public:
   TradeModel(QObject* parent = nullptr);
   ~TradeModel() noexcept override;
-
-  int rowCount(const QModelIndex& parent) const override;
-
-  int columnCount(const QModelIndex& parent) const override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-
-  void toggleCheckState(int row);
-
-  void updateRow(const Exec& trade);
+  void updateRow(std::uint64_t tag, const Exec& trade)
+  {
+    const auto key = std::make_pair(trade.marketId(), trade.id());
+    TableModel::updateRow(key, tag, trade);
+  }
 
  private:
   QVariant header_[exec::ColumnCount];
-  using Key = std::pair<Id64, Id64>;
-  boost::container::flat_map<Key, Exec, std::less<Key>> rows_;
 };
 
 } // ui

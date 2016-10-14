@@ -16,15 +16,13 @@
  */
 #include "OrderModel.hpp"
 
-#include <algorithm>
-
 using namespace std;
 
 namespace swirly {
 namespace ui {
 using namespace order;
 
-OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
+OrderModel::OrderModel(QObject* parent) : TableModel{parent}
 {
   header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
@@ -49,32 +47,22 @@ OrderModel::OrderModel(QObject* parent) : QAbstractTableModel{parent}
 
 OrderModel::~OrderModel() noexcept = default;
 
-int OrderModel::rowCount(const QModelIndex& parent) const
-{
-  return rows_.size();
-}
-
-int OrderModel::columnCount(const QModelIndex& parent) const
-{
-  return ColumnCount;
-}
-
 QVariant OrderModel::data(const QModelIndex& index, int role) const
 {
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
   } else if (role == Qt::CheckStateRole) {
-    const auto& order = rows_.nth(index.row())->second;
+    const auto& row = rowAt(index.row());
     switch (box<Column>(index.column())) {
     case Column::CheckState:
-      var = order.checked() ? Qt::Checked : Qt::Unchecked;
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
       break;
     default:
       break;
     }
   } else if (role == Qt::DisplayRole) {
-    const auto& order = rows_.nth(index.row())->second;
+    const auto& order = valueAt(index.row());
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
@@ -161,7 +149,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -173,44 +161,6 @@ QVariant OrderModel::headerData(int section, Qt::Orientation orientation, int ro
     var = header_[section];
   }
   return var;
-}
-
-Qt::ItemFlags OrderModel::flags(const QModelIndex& index) const
-{
-  Qt::ItemFlags flags;
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    flags = static_cast<Qt::ItemFlags>(Qt::ItemIsEnabled | Qt::ItemIsSelectable
-                                       | Qt::ItemIsUserCheckable);
-  } else {
-    flags = QAbstractTableModel::flags(index);
-  }
-  return flags;
-}
-
-void OrderModel::toggleCheckState(int row)
-{
-  auto& order = rows_.nth(row)->second;
-  order.setChecked(!order.checked());
-  emit dataChanged(index(row, unbox(Column::CheckState)), index(row, unbox(Column::CheckState)));
-}
-
-void OrderModel::updateRow(const Order& order)
-{
-  const auto key = make_pair(order.marketId(), order.id());
-  auto it = rows_.lower_bound(key);
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
-  if (found) {
-    order.setChecked(it->second.checked());
-    it->second = order;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
-  } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, key, order);
-    endInsertRows();
-  }
 }
 
 } // ui

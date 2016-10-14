@@ -18,6 +18,7 @@
 #define SWIRLYUI_EXECMODEL_HPP
 
 #include "Exec.hpp"
+#include "Row.hpp"
 
 #include <QAbstractTableModel>
 
@@ -42,12 +43,24 @@ class ExecModel : public QAbstractTableModel {
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void insertRow(const Exec& exec);
+  const Exec& valueAt(int n) const { return rowAt(n).value(); }
+
+  void toggleCheckState(int n)
+  {
+    auto& row = rowAt(n);
+    row.setChecked(!row.checked());
+    const auto i = index(n, unbox(exec::Column::CheckState));
+    emit dataChanged(i, i);
+  }
+
+  void updateRow(std::uint64_t tag, const Exec& exec);
 
  private:
+  const Row<Exec>& rowAt(int n) const { return rows_[n]; }
+  Row<Exec>& rowAt(int n) { return rows_[n]; }
+
   QVariant header_[exec::ColumnCount];
-  using Key = std::pair<Id64, Id64>;
-  boost::circular_buffer<Exec> rows_{MaxExecs};
+  boost::circular_buffer<Row<Exec>> rows_{MaxExecs};
 };
 
 } // ui

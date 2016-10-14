@@ -29,6 +29,8 @@
 #include <QNetworkReply>
 #include <QUrlQuery>
 
+#include <boost/range/adaptor/reversed.hpp>
+
 namespace swirly {
 namespace ui {
 namespace {
@@ -157,17 +159,22 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
     return;
   }
 
+  // New tag for mark and sweep.
+  ++tag_;
+
   const auto obj = doc.object();
   for (const auto elem : obj["assets"].toArray()) {
     const auto asset = Asset::fromJson(elem.toObject());
     qDebug() << "asset:" << asset;
-    assetModel().updateRow(asset);
+    assetModel().updateRow(tag_, asset);
   }
+  assetModel().sweep(tag_);
   for (const auto elem : obj["contrs"].toArray()) {
     const auto contr = Contr::fromJson(elem.toObject());
     qDebug() << "contr:" << contr;
-    contrModel().updateRow(contr);
+    contrModel().updateRow(tag_, contr);
   }
+  contrModel().sweep(tag_);
   emit refDataComplete();
 
   getAccnt();
@@ -186,32 +193,40 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
     return;
   }
 
+  // New tag for mark and sweep.
+  ++tag_;
+
   const auto obj = doc.object();
   for (const auto elem : obj["markets"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    marketModel().updateRow(Market::fromJson(contr, obj));
+    marketModel().updateRow(tag_, Market::fromJson(contr, obj));
   }
+  marketModel().sweep(tag_);
   for (const auto elem : obj["orders"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    orderModel().updateRow(Order::fromJson(contr, obj));
+    orderModel().updateRow(tag_, Order::fromJson(contr, obj));
   }
-  for (const auto elem : obj["execs"].toArray()) {
+  orderModel().sweep(tag_);
+  using boost::adaptors::reverse;
+  for (const auto elem : reverse(obj["execs"].toArray())) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    execModel().insertRow(Exec::fromJson(contr, obj));
+    execModel().updateRow(tag_, Exec::fromJson(contr, obj));
   }
   for (const auto elem : obj["trades"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    tradeModel().updateRow(Exec::fromJson(contr, obj));
+    tradeModel().updateRow(tag_, Exec::fromJson(contr, obj));
   }
+  tradeModel().sweep(tag_);
   for (const auto elem : obj["posns"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    posnModel().updateRow(Posn::fromJson(contr, obj));
+    posnModel().updateRow(tag_, Posn::fromJson(contr, obj));
   }
+  posnModel().sweep(tag_);
 }
 
 void HttpClient::postMarketReply(QNetworkReply& reply)
@@ -228,7 +243,7 @@ void HttpClient::postMarketReply(QNetworkReply& reply)
 
   const auto obj = doc.object();
   const auto contr = findContr(obj);
-  marketModel().updateRow(Market::fromJson(contr, obj));
+  marketModel().updateRow(tag_, Market::fromJson(contr, obj));
 }
 
 void HttpClient::postOrderReply(QNetworkReply& reply)
@@ -249,21 +264,22 @@ void HttpClient::postOrderReply(QNetworkReply& reply)
     if (!elem.isNull()) {
       const auto obj = elem.toObject();
       const auto contr = findContr(obj);
-      marketModel().updateRow(Market::fromJson(contr, obj));
+      marketModel().updateRow(tag_, Market::fromJson(contr, obj));
     }
   }
   for (const auto elem : obj["orders"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    orderModel().updateRow(Order::fromJson(contr, obj));
+    orderModel().updateRow(tag_, Order::fromJson(contr, obj));
   }
-  for (const auto elem : obj["execs"].toArray()) {
+  using boost::adaptors::reverse;
+  for (const auto elem : reverse(obj["execs"].toArray())) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
     const auto exec = Exec::fromJson(contr, obj);
-    execModel().insertRow(exec);
+    execModel().updateRow(tag_, exec);
     if (exec.state() == State::Trade) {
-      tradeModel().updateRow(exec);
+      tradeModel().updateRow(tag_, exec);
     }
   }
   {
@@ -271,7 +287,7 @@ void HttpClient::postOrderReply(QNetworkReply& reply)
     if (!elem.isNull()) {
       const auto obj = elem.toObject();
       const auto contr = findContr(obj);
-      posnModel().updateRow(Posn::fromJson(contr, obj));
+      posnModel().updateRow(tag_, Posn::fromJson(contr, obj));
     }
   }
 }
