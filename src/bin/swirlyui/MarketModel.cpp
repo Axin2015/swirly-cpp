@@ -16,16 +16,15 @@
  */
 #include "MarketModel.hpp"
 
-#include <algorithm>
-
 using namespace std;
 
 namespace swirly {
 namespace ui {
 using namespace market;
 
-MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
+MarketModel::MarketModel(QObject* parent) : TableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::Id)] = tr("Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
@@ -43,24 +42,25 @@ MarketModel::MarketModel(QObject* parent) : QAbstractTableModel{parent}
 
 MarketModel::~MarketModel() noexcept = default;
 
-int MarketModel::rowCount(const QModelIndex& parent) const
-{
-  return rows_.size();
-}
-
-int MarketModel::columnCount(const QModelIndex& parent) const
-{
-  return ColumnCount;
-}
-
 QVariant MarketModel::data(const QModelIndex& index, int role) const
 {
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
-  } else if (role == Qt::DisplayRole) {
-    const auto& market = rows_.nth(index.row())->second;
+  } else if (role == Qt::CheckStateRole) {
+    const auto& row = rowAt(index.row());
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
+    }
+  } else if (role == Qt::DisplayRole) {
+    const auto& market = valueAt(index.row());
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Id:
       var = toVariant(market.id());
       break;
@@ -103,6 +103,8 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Contr:
     case Column::State:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
@@ -122,7 +124,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -134,23 +136,6 @@ QVariant MarketModel::headerData(int section, Qt::Orientation orientation, int r
     var = header_[section];
   }
   return var;
-}
-
-void MarketModel::updateRow(const Market& market)
-{
-  auto it = rows_.lower_bound(market.id());
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(market.id(), it->first)};
-  if (found) {
-    it->second = market;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
-  } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, market.id(), market);
-    endInsertRows();
-  }
 }
 
 } // ui

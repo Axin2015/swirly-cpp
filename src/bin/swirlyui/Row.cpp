@@ -14,37 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRMODEL_HPP
-#define SWIRLYUI_CONTRMODEL_HPP
-
-#include "Contr.hpp"
-#include "TableModel.hpp"
+#include "Row.hpp"
 
 namespace swirly {
 namespace ui {
 
-class ContrModel
-  : public TableModel<QString, Contr, unbox(contr::Column::CheckState), contr::ColumnCount> {
- public:
-  ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept override;
-
-  QVariant data(const QModelIndex& index, int role) const override;
-
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-  Contr find(const QString& mnem) const;
-
-  void updateRow(std::uint64_t tag, const Contr& contr)
-  {
-    TableModel::updateRow(contr.mnem(), tag, contr);
-  }
-
- private:
-  QVariant header_[contr::ColumnCount];
-};
-
 } // ui
 } // swirly
-
-#endif // SWIRLYUI_CONTRMODEL_HPP

@@ -60,6 +60,9 @@ ExecView::~ExecView() noexcept = default;
 
 void ExecView::slotClicked(const QModelIndex& index)
 {
+  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+    model_.toggleCheckState(index.row());
+  }
 }
 
 } // ui

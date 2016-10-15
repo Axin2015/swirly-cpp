@@ -24,6 +24,7 @@ namespace ui {
 namespace posn {
 
 enum class Column : int { //
+  CheckState, //
   MarketId, //
   Contr, //
   SettlDate, //
@@ -77,6 +78,14 @@ class Posn {
 };
 
 QDebug operator<<(QDebug debug, const Posn& posn);
+
+inline bool isModified(const Posn& prev, const Posn& next) noexcept
+{
+  return prev.buyLots() != next.buyLots() //
+    || prev.buyCost() != next.buyCost() //
+    || prev.sellLots() != next.sellLots() //
+    || prev.sellCost() != next.sellCost();
+}
 
 } // ui
 } // swirly

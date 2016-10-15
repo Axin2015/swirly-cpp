@@ -16,16 +16,15 @@
  */
 #include "ContrModel.hpp"
 
-#include <algorithm>
-
 using namespace std;
 
 namespace swirly {
 namespace ui {
 using namespace contr;
 
-ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
+ContrModel::ContrModel(QObject* parent) : TableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::Mnem)] = tr("Mnem");
   header_[unbox(Column::Display)] = tr("Display");
   header_[unbox(Column::Asset)] = tr("Asset");
@@ -41,24 +40,25 @@ ContrModel::ContrModel(QObject* parent) : QAbstractTableModel{parent}
 
 ContrModel::~ContrModel() noexcept = default;
 
-int ContrModel::rowCount(const QModelIndex& parent) const
-{
-  return rows_.size();
-}
-
-int ContrModel::columnCount(const QModelIndex& parent) const
-{
-  return ColumnCount;
-}
-
 QVariant ContrModel::data(const QModelIndex& index, int role) const
 {
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
-  } else if (role == Qt::DisplayRole) {
-    const auto& contr = rows_.nth(index.row())->second;
+  } else if (role == Qt::CheckStateRole) {
+    const auto& row = rowAt(index.row());
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
+    }
+  } else if (role == Qt::DisplayRole) {
+    const auto& contr = valueAt(index.row());
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Mnem:
       var = contr.mnem();
       break;
@@ -95,6 +95,8 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Mnem:
     case Column::Display:
     case Column::Asset:
@@ -112,7 +114,7 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -131,26 +133,9 @@ Contr ContrModel::find(const QString& mnem) const
   Contr contr;
   auto it = rows_.find(mnem);
   if (it != rows_.end()) {
-    contr = it->second;
+    contr = it->second.value();
   }
   return contr;
-}
-
-void ContrModel::updateRow(const Contr& contr)
-{
-  auto it = rows_.lower_bound(contr.mnem());
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(contr.mnem(), it->first)};
-  if (found) {
-    it->second = contr;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
-  } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, contr.mnem(), contr);
-    endInsertRows();
-  }
 }
 
 } // ui

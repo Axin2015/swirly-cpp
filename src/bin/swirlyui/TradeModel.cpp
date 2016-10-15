@@ -16,15 +16,13 @@
  */
 #include "TradeModel.hpp"
 
-#include <algorithm>
-
 using namespace std;
 
 namespace swirly {
 namespace ui {
 using namespace exec;
 
-TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
+TradeModel::TradeModel(QObject* parent) : TableModel{parent}
 {
   header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
@@ -52,32 +50,22 @@ TradeModel::TradeModel(QObject* parent) : QAbstractTableModel{parent}
 
 TradeModel::~TradeModel() noexcept = default;
 
-int TradeModel::rowCount(const QModelIndex& parent) const
-{
-  return rows_.size();
-}
-
-int TradeModel::columnCount(const QModelIndex& parent) const
-{
-  return ColumnCount;
-}
-
 QVariant TradeModel::data(const QModelIndex& index, int role) const
 {
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
   } else if (role == Qt::CheckStateRole) {
-    const auto& trade = rows_.nth(index.row())->second;
+    const auto& row = rowAt(index.row());
     switch (box<Column>(index.column())) {
     case Column::CheckState:
-      var = trade.checked() ? Qt::Checked : Qt::Unchecked;
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
       break;
     default:
       break;
     }
   } else if (role == Qt::DisplayRole) {
-    const auto& trade = rows_.nth(index.row())->second;
+    const auto& trade = valueAt(index.row());
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
@@ -176,7 +164,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -188,44 +176,6 @@ QVariant TradeModel::headerData(int section, Qt::Orientation orientation, int ro
     var = header_[section];
   }
   return var;
-}
-
-Qt::ItemFlags TradeModel::flags(const QModelIndex& index) const
-{
-  Qt::ItemFlags flags;
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    flags = static_cast<Qt::ItemFlags>(Qt::ItemIsEnabled | Qt::ItemIsSelectable
-                                       | Qt::ItemIsUserCheckable);
-  } else {
-    flags = QAbstractTableModel::flags(index);
-  }
-  return flags;
-}
-
-void TradeModel::toggleCheckState(int row)
-{
-  auto& trade = rows_.nth(row)->second;
-  trade.setChecked(!trade.checked());
-  emit dataChanged(index(row, unbox(Column::CheckState)), index(row, unbox(Column::CheckState)));
-}
-
-void TradeModel::updateRow(const Exec& trade)
-{
-  const auto key = make_pair(trade.marketId(), trade.id());
-  auto it = rows_.lower_bound(key);
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(key, it->first)};
-  if (found) {
-    trade.setChecked(it->second.checked());
-    it->second = trade;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
-  } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, key, trade);
-    endInsertRows();
-  }
 }
 
 } // ui

@@ -25,6 +25,7 @@ namespace ui {
 namespace market {
 
 enum class Column : int { //
+  CheckState, //
   Id, //
   Contr, //
   SettlDate, //
@@ -88,6 +89,12 @@ class Market {
 };
 
 QDebug operator<<(QDebug debug, const Market& market);
+
+inline bool isModified(const Market& prev, const Market& next) noexcept
+{
+  // Assume market-data has changed.
+  return true;
+}
 
 } // ui
 } // swirly

@@ -62,7 +62,6 @@ class Exec {
 
   static Exec fromJson(const Contr& contr, const QJsonObject& obj);
 
-  bool checked() const noexcept { return checked_; }
   Id64 marketId() const noexcept { return marketId_; }
   const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
@@ -85,10 +84,7 @@ class Exec {
   const QString& cpty() const noexcept { return cpty_; }
   const QDateTime& created() const noexcept { return created_; }
 
-  void setChecked(bool checked = true) const noexcept { checked_ = checked; }
-
  private:
-  mutable bool checked_{false};
   Id64 marketId_{};
   Contr contr_{};
   QDate settlDate_{};
@@ -113,6 +109,12 @@ class Exec {
 };
 
 QDebug operator<<(QDebug debug, const Exec& exec);
+
+inline bool isModified(const Exec& prev, const Exec& next) noexcept
+{
+  // Immutable.
+  return false;
+}
 
 } // ui
 } // swirly

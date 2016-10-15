@@ -14,37 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRMODEL_HPP
-#define SWIRLYUI_CONTRMODEL_HPP
+#ifndef SWIRLYUI_ROW_HPP
+#define SWIRLYUI_ROW_HPP
 
-#include "Contr.hpp"
-#include "TableModel.hpp"
+#include <cstdint>
 
 namespace swirly {
 namespace ui {
 
-class ContrModel
-  : public TableModel<QString, Contr, unbox(contr::Column::CheckState), contr::ColumnCount> {
+template <typename ValueT>
+class Row {
  public:
-  ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept override;
-
-  QVariant data(const QModelIndex& index, int role) const override;
-
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-  Contr find(const QString& mnem) const;
-
-  void updateRow(std::uint64_t tag, const Contr& contr)
+  explicit Row(std::uint64_t tag = 0, const ValueT& value = ValueT{}) noexcept : value_{value}
   {
-    TableModel::updateRow(contr.mnem(), tag, contr);
+    tag_ = tag;
+    checked_ = 0;
   }
+  ~Row() noexcept = default;
+
+  std::uint64_t tag() const noexcept { return tag_; }
+  bool checked() const noexcept { return checked_ == 1; }
+  const ValueT& value() const noexcept { return value_; }
+
+  void setTag(std::uint64_t tag) noexcept { tag_ = tag; }
+  void setChecked(bool checked = true) noexcept { checked_ = checked ? 1 : 0; }
+  void setValue(const ValueT& value) noexcept { value_ = value; }
 
  private:
-  QVariant header_[contr::ColumnCount];
+  struct {
+    std::uint64_t tag_ : 63;
+    std::uint64_t checked_ : 1;
+  };
+  ValueT value_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRMODEL_HPP
+#endif // SWIRLYUI_ROW_HPP

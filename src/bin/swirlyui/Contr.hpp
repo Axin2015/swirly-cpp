@@ -31,6 +31,7 @@ namespace ui {
 namespace contr {
 
 enum class Column : int { //
+  CheckState, //
   Mnem, //
   Display, //
   Asset, //
@@ -110,6 +111,12 @@ class Contr {
 };
 
 QDebug operator<<(QDebug debug, const Contr& contr);
+
+inline bool isModified(const Contr& prev, const Contr& next) noexcept
+{
+  // Immutable.
+  return false;
+}
 
 inline Lots qtyToLots(double qty, const Contr& contr) noexcept
 {

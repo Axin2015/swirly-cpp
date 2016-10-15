@@ -28,6 +28,56 @@
 using namespace std;
 
 namespace swirly {
+namespace detail {
+namespace {
+
+void getOrder(const Accnt& accnt, ostream& out)
+{
+  const auto& orders = accnt.orders();
+  out << '[';
+  copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, ostream& out)
+{
+  const auto& execs = accnt.execs();
+  out << '[';
+  const auto size = execs.size();
+  if (offset < size) {
+    auto first = execs.begin();
+    advance(first, offset);
+    decltype(first) last;
+    if (limit && *limit < size - offset) {
+      last = first;
+      advance(last, *limit);
+    } else {
+      last = execs.end();
+    }
+    transform(first, last, OStreamJoiner(out, ','),
+              [](const auto& ptr) -> const auto& { return *ptr; });
+  }
+  out << ']';
+}
+
+void getTrade(const Accnt& accnt, ostream& out)
+{
+  const auto& trades = accnt.trades();
+  out << '[';
+  copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+void getPosn(const Accnt& accnt, ostream& out)
+{
+  const auto& posns = accnt.posns();
+  out << '[';
+  copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
+  out << ']';
+}
+
+} // anonymous
+} // detail
 
 Rest::~Rest() noexcept = default;
 
@@ -116,7 +166,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
       out << ',';
     }
     out << "\"orders\":";
-    getOrder(accnt, now, out);
+    detail::getOrder(accnt, out);
     ++i;
   }
   if (es.exec()) {
@@ -124,7 +174,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
       out << ',';
     }
     out << "\"execs\":";
-    getExec(accnt, offset, limit, now, out);
+    detail::getExec(accnt, offset, limit, out);
     ++i;
   }
   if (es.trade()) {
@@ -132,7 +182,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
       out << ',';
     }
     out << "\"trades\":";
-    getTrade(accnt, now, out);
+    detail::getTrade(accnt, out);
     ++i;
   }
   if (es.posn()) {
@@ -140,7 +190,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
       out << ',';
     }
     out << "\"posns\":";
-    getPosn(accnt, now, out);
+    detail::getPosn(accnt, out);
     ++i;
   }
   out << '}';
@@ -171,7 +221,7 @@ void Rest::getMarket(Mnem contrMnem, IsoDate settlDate, Time now, std::ostream& 
 
 void Rest::getOrder(Mnem accntMnem, Time now, ostream& out) const
 {
-  getOrder(serv_.accnt(accntMnem), now, out);
+  detail::getOrder(serv_.accnt(accntMnem), out);
 }
 
 void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Time now, ostream& out) const
@@ -213,12 +263,12 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
 void Rest::getExec(Mnem accntMnem, size_t offset, optional<size_t> limit, Time now,
                    ostream& out) const
 {
-  getExec(serv_.accnt(accntMnem), offset, limit, now, out);
+  detail::getExec(serv_.accnt(accntMnem), offset, limit, out);
 }
 
 void Rest::getTrade(Mnem accntMnem, Time now, ostream& out) const
 {
-  getTrade(serv_.accnt(accntMnem), now, out);
+  detail::getTrade(serv_.accnt(accntMnem), out);
 }
 
 void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Time now, std::ostream& out) const
@@ -259,7 +309,7 @@ void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
 
 void Rest::getPosn(Mnem accntMnem, Time now, ostream& out) const
 {
-  getPosn(serv_.accnt(accntMnem), now, out);
+  detail::getPosn(serv_.accnt(accntMnem), out);
 }
 
 void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, Time now, ostream& out) const
@@ -361,52 +411,6 @@ void Rest::deleteTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayV
   const auto& contr = serv_.contr(contrMnem);
   const auto marketId = toMarketId(contr.id(), settlDate);
   serv_.archiveTrade(accnt, marketId, ids, now);
-}
-
-void Rest::getOrder(const Accnt& accnt, Time now, ostream& out) const
-{
-  const auto& orders = accnt.orders();
-  out << '[';
-  copy(orders.begin(), orders.end(), OStreamJoiner(out, ','));
-  out << ']';
-}
-
-void Rest::getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, Time now,
-                   ostream& out) const
-{
-  const auto& execs = accnt.execs();
-  out << '[';
-  const auto size = execs.size();
-  if (offset < size) {
-    auto first = execs.begin();
-    advance(first, offset);
-    decltype(first) last;
-    if (limit && *limit < size - offset) {
-      last = first;
-      advance(last, *limit);
-    } else {
-      last = execs.end();
-    }
-    transform(first, last, OStreamJoiner(out, ','),
-              [](const auto& ptr) -> const auto& { return *ptr; });
-  }
-  out << ']';
-}
-
-void Rest::getTrade(const Accnt& accnt, Time now, ostream& out) const
-{
-  const auto& trades = accnt.trades();
-  out << '[';
-  copy(trades.begin(), trades.end(), OStreamJoiner(out, ','));
-  out << ']';
-}
-
-void Rest::getPosn(const Accnt& accnt, Time now, ostream& out) const
-{
-  const auto& posns = accnt.posns();
-  out << '[';
-  copy(posns.begin(), posns.end(), OStreamJoiner(out, ','));
-  out << ']';
 }
 
 } // swirly

@@ -68,11 +68,16 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
   if (!index.isValid()) {
     // No-op.
   } else if (role == Qt::CheckStateRole) {
-    if (box<Column>(index.column()) == Column::CheckState) {
-      var = Qt::Unchecked;
+    const auto& row = rowAt(index.row());
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
     }
   } else if (role == Qt::DisplayRole) {
-    const auto& exec = rows_[index.row()];
+    const auto& exec = valueAt(index.row());
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
@@ -171,7 +176,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_[index.row()]);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -185,16 +190,31 @@ QVariant ExecModel::headerData(int section, Qt::Orientation orientation, int rol
   return var;
 }
 
-void ExecModel::insertRow(const Exec& exec)
+void ExecModel::updateRow(uint64_t tag, const Exec& exec)
 {
-  if (rows_.full()) {
-    rows_.push_back(exec);
-    // All rows changed due to rotation.
-    emit dataChanged(index(0, 0), index(MaxExecs - 1, ColumnCount - 1));
+  // Linear search is acceptable on small circular buffer.
+  auto it = find_if(rows_.begin(), rows_.end(), [&exec](const auto& row) {
+    return row.value().marketId() == exec.marketId() && row.value().id() == exec.id();
+  });
+
+  if (it != rows_.end()) {
+    // Update tag for completeness. Note that this is not strictly necessary because the sweep
+    // operation in not supported.
+    it->setTag(tag);
+    if (isModified(it->value(), exec)) {
+      it->setValue(exec);
+      const int row = distance(rows_.begin(), it);
+      emit dataChanged(index(row, 0), index(row, ColumnCount - 1));
+    }
   } else {
-    beginInsertRows(QModelIndex{}, rows_.size(), rows_.size());
-    rows_.push_back(exec);
-    endInsertRows();
+    if (rows_.full()) {
+      rows_.push_front(Row<Exec>{tag, exec});
+      emit dataChanged(index(0, 0), index(rows_.size() - 1, ColumnCount - 1));
+    } else {
+      beginInsertRows(QModelIndex{}, 0, 0);
+      rows_.push_front(Row<Exec>{tag, exec});
+      endInsertRows();
+    }
   }
 }
 

@@ -59,7 +59,6 @@ class Order {
 
   static Order fromJson(const Contr& contr, const QJsonObject& obj);
 
-  bool checked() const noexcept { return checked_; }
   Id64 marketId() const noexcept { return marketId_; }
   const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
@@ -79,10 +78,7 @@ class Order {
   const QDateTime& created() const noexcept { return created_; }
   const QDateTime& modified() const noexcept { return modified_; }
 
-  void setChecked(bool checked = true) const noexcept { checked_ = checked; }
-
  private:
-  mutable bool checked_{false};
   Id64 marketId_{};
   Contr contr_{};
   QDate settlDate_{};
@@ -104,6 +100,18 @@ class Order {
 };
 
 QDebug operator<<(QDebug debug, const Order& order);
+
+inline bool isModified(const Order& prev, const Order& next) noexcept
+{
+  return prev.state() != next.state() //
+    || prev.lots() != next.lots() //
+    || prev.resd() != next.resd() //
+    || prev.exec() != next.exec() //
+    || prev.cost() != next.cost() //
+    || prev.lastLots() != next.lastLots() //
+    || prev.lastTicks() != next.lastTicks() //
+    || prev.modified() != next.modified();
+}
 
 } // ui
 } // swirly

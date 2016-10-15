@@ -16,16 +16,15 @@
  */
 #include "AssetModel.hpp"
 
-#include <algorithm>
-
 using namespace std;
 
 namespace swirly {
 namespace ui {
 using namespace asset;
 
-AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
+AssetModel::AssetModel(QObject* parent) : TableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::Mnem)] = tr("Mnem");
   header_[unbox(Column::Display)] = tr("Display");
   header_[unbox(Column::Type)] = tr("Type");
@@ -33,24 +32,25 @@ AssetModel::AssetModel(QObject* parent) : QAbstractTableModel{parent}
 
 AssetModel::~AssetModel() noexcept = default;
 
-int AssetModel::rowCount(const QModelIndex& parent) const
-{
-  return rows_.size();
-}
-
-int AssetModel::columnCount(const QModelIndex& parent) const
-{
-  return ColumnCount;
-}
-
 QVariant AssetModel::data(const QModelIndex& index, int role) const
 {
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
-  } else if (role == Qt::DisplayRole) {
-    const auto& asset = rows_.nth(index.row())->second;
+  } else if (role == Qt::CheckStateRole) {
+    const auto& row = rowAt(index.row());
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
+    }
+  } else if (role == Qt::DisplayRole) {
+    const auto& asset = valueAt(index.row());
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Mnem:
       var = asset.mnem();
       break;
@@ -63,6 +63,8 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Mnem:
     case Column::Display:
     case Column::Type:
@@ -70,7 +72,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -82,23 +84,6 @@ QVariant AssetModel::headerData(int section, Qt::Orientation orientation, int ro
     var = header_[section];
   }
   return var;
-}
-
-void AssetModel::updateRow(const Asset& asset)
-{
-  auto it = rows_.lower_bound(asset.mnem());
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(asset.mnem(), it->first)};
-  if (found) {
-    it->second = asset;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
-  } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, asset.mnem(), asset);
-    endInsertRows();
-  }
 }
 
 } // ui

@@ -24,8 +24,9 @@ namespace swirly {
 namespace ui {
 using namespace posn;
 
-PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
+PosnModel::PosnModel(QObject* parent) : TableModel{parent}
 {
+  header_[unbox(Column::CheckState)] = tr("");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
@@ -38,24 +39,25 @@ PosnModel::PosnModel(QObject* parent) : QAbstractTableModel{parent}
 
 PosnModel::~PosnModel() noexcept = default;
 
-int PosnModel::rowCount(const QModelIndex& parent) const
-{
-  return rows_.size();
-}
-
-int PosnModel::columnCount(const QModelIndex& parent) const
-{
-  return ColumnCount;
-}
-
 QVariant PosnModel::data(const QModelIndex& index, int role) const
 {
   QVariant var{};
   if (!index.isValid()) {
     // No-op.
-  } else if (role == Qt::DisplayRole) {
-    const auto& posn = rows_.nth(index.row())->second;
+  } else if (role == Qt::CheckStateRole) {
+    const auto& row = rowAt(index.row());
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      var = row.checked() ? Qt::Checked : Qt::Unchecked;
+      break;
+    default:
+      break;
+    }
+  } else if (role == Qt::DisplayRole) {
+    const auto& posn = valueAt(index.row());
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::MarketId:
       var = toVariant(posn.marketId());
       break;
@@ -83,6 +85,8 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     }
   } else if (role == Qt::TextAlignmentRole) {
     switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      break;
     case Column::Contr:
     case Column::Accnt:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
@@ -97,7 +101,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
       break;
     }
   } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(rows_.nth(index.row())->second);
+    var = QVariant::fromValue(valueAt(index.row()));
   }
   return var;
 }
@@ -109,23 +113,6 @@ QVariant PosnModel::headerData(int section, Qt::Orientation orientation, int rol
     var = header_[section];
   }
   return var;
-}
-
-void PosnModel::updateRow(const Posn& posn)
-{
-  auto it = rows_.lower_bound(posn.marketId());
-  const int i = distance(rows_.begin(), it);
-
-  const bool found{it != rows_.end() && !rows_.key_comp()(posn.marketId(), it->first)};
-  if (found) {
-    it->second = posn;
-    emit dataChanged(index(i, 0), index(i, ColumnCount - 1));
-  } else {
-    // If not found then insert.
-    beginInsertRows(QModelIndex{}, i, i);
-    rows_.emplace_hint(it, posn.marketId(), posn);
-    endInsertRows();
-  }
 }
 
 } // ui

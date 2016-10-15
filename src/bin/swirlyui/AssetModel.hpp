@@ -18,35 +18,28 @@
 #define SWIRLYUI_ASSETMODEL_HPP
 
 #include "Asset.hpp"
-
-#include <QAbstractTableModel>
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#include <boost/container/flat_map.hpp>
-#pragma GCC diagnostic pop
+#include "TableModel.hpp"
 
 namespace swirly {
 namespace ui {
 
-class AssetModel : public QAbstractTableModel {
+class AssetModel
+  : public TableModel<QString, Asset, unbox(asset::Column::CheckState), asset::ColumnCount> {
  public:
   AssetModel(QObject* parent = nullptr);
   ~AssetModel() noexcept override;
-
-  int rowCount(const QModelIndex& parent) const override;
-
-  int columnCount(const QModelIndex& parent) const override;
 
   QVariant data(const QModelIndex& index, int role) const override;
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void updateRow(const Asset& asset);
+  void updateRow(std::uint64_t tag, const Asset& asset)
+  {
+    TableModel::updateRow(asset.mnem(), tag, asset);
+  }
 
  private:
   QVariant header_[asset::ColumnCount];
-  boost::container::flat_map<QString, Asset, std::less<QString>> rows_;
 };
 
 } // ui
