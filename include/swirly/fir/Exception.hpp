@@ -14,6 +14,27 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Msg.hpp>
+#ifndef SWIRLY_FIR_EXCEPTION_HPP
+#define SWIRLY_FIR_EXCEPTION_HPP
 
-#include <swirly/tea/Test.hpp>
+#include <swirly/ash/Exception.hpp>
+
+namespace swirly {
+
+class SWIRLY_API ParseException : public Exception {
+ public:
+  explicit ParseException(std::string_view what) noexcept : Exception{what} {}
+  ~ParseException() noexcept override;
+
+  // Copy.
+  ParseException(const ParseException&) noexcept = default;
+  ParseException& operator=(const ParseException&) noexcept = default;
+
+  // Move.
+  ParseException(ParseException&&) noexcept = default;
+  ParseException& operator=(ParseException&&) noexcept = default;
+};
+
+} // swirly
+
+#endif // SWIRLY_FIR_EXCEPTION_HPP

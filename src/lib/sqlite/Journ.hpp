@@ -20,13 +20,16 @@
 #include "Utility.hpp"
 
 #include <swirly/elm/Journ.hpp>
-#include <swirly/elm/Msg.hpp>
+#include <swirly/elm/MsgHandler.hpp>
 #include <swirly/elm/Transaction.hpp>
 
 namespace swirly {
 namespace sqlite {
 
-class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHandler<Journ> {
+class Journ : public Transactional, public swirly::Journ, BasicMsgHandler<Journ> {
+  // Crtp.
+  friend struct BasicMsgHandler<Journ>;
+
  public:
   explicit Journ(const Conf& conf);
   ~Journ() noexcept override;
@@ -49,18 +52,15 @@ class Journ : public swirly::Transactional, public swirly::Journ, swirly::MsgHan
   void doUpdate(const Msg& msg) override;
 
  private:
-  // Crtp.
-  friend struct swirly::MsgHandler<Journ>;
+  void onReset();
 
-  void reset();
+  void onCreateMarket(const CreateMarketBody& body);
 
-  void createMarket(const CreateMarketBody& body);
+  void onUpdateMarket(const UpdateMarketBody& body);
 
-  void updateMarket(const UpdateMarketBody& body);
+  void onCreateExec(const CreateExecBody& body);
 
-  void createExec(const CreateExecBody& body);
-
-  void archiveTrade(const ArchiveTradeBody& body);
+  void onArchiveTrade(const ArchiveTradeBody& body);
 
   DbPtr db_;
   StmtPtr beginStmt_;

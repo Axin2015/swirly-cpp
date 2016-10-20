@@ -14,6 +14,34 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Msg.hpp>
+#include <swirly/fir/Url.hpp>
 
 #include <swirly/tea/Test.hpp>
+
+using namespace std;
+using namespace swirly;
+
+namespace {
+
+class Url : public BasicUrl<Url> {
+ public:
+  explicit Url(const string& url) : url_{url} { parse(); }
+  const auto& url() const noexcept { return url_; }
+
+ private:
+  string url_;
+};
+
+} // anonymous
+
+SWIRLY_TEST_CASE(UrlSchemaHostAndPath)
+{
+  Url url{"http://www.somehost.com/path/file.html"s};
+  SWIRLY_CHECK(url.schema() == "http"s);
+  SWIRLY_CHECK(url.host() == "www.somehost.com"s);
+  SWIRLY_CHECK(url.port().empty());
+  SWIRLY_CHECK(url.path() == "/path/file.html"s);
+  SWIRLY_CHECK(url.query().empty());
+  SWIRLY_CHECK(url.fragment().empty());
+  SWIRLY_CHECK(url.userInfo().empty());
+}

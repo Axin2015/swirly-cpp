@@ -14,6 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Msg.hpp>
+#include <swirly/fir/Exception.hpp>
 
-#include <swirly/tea/Test.hpp>
+namespace swirly {
+
+ParseException::~ParseException() noexcept = default;
+
+} // swirly
