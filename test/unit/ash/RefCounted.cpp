@@ -22,10 +22,10 @@ using namespace std;
 using namespace swirly;
 
 namespace {
-class Foo : public RefCounted {
+class Foo : public RefCounted<Foo> {
  public:
   explicit Foo(int& alive) noexcept : alive_{alive} { ++alive; }
-  ~Foo() noexcept override { --alive_; }
+  ~Foo() noexcept { --alive_; }
 
  private:
   int& alive_;

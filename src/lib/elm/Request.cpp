@@ -18,8 +18,8 @@
 
 namespace swirly {
 
-Request::~Request() noexcept = default;
-
 Request::Request(Request&&) = default;
+
+Request::~Request() noexcept = default;
 
 } // swirly

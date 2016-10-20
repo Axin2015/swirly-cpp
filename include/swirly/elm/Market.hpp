@@ -27,7 +27,7 @@ namespace swirly {
 using MarketPtr = boost::intrusive_ptr<Market>;
 using ConstMarketPtr = boost::intrusive_ptr<const Market>;
 
-class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
+class SWIRLY_API Market : public RefCounted<Market>, public Comparable<Market> {
  public:
   Market(Id64 id, Mnem contr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
          Ticks lastTicks = 0_tks, Time lastTime = {}, Id64 maxId = 0_id64) noexcept
@@ -41,7 +41,7 @@ class SWIRLY_API Market : public RefCounted, public Comparable<Market> {
       maxId_{maxId}
   {
   }
-  ~Market() noexcept override;
+  ~Market() noexcept;
 
   // Copy.
   Market(const Market&) = delete;
