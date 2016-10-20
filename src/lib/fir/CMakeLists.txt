@@ -22,7 +22,11 @@ if(RAGEL_EXECUTABLE)
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.rl")
 endif(RAGEL_EXECUTABLE)
 
-set(fir_SOURCES EntitySet.cpp Rest.cpp RestRequest.cpp)
+set(fir_SOURCES
+  EntitySet.cpp
+  Rest.cpp
+  RestRequest.cpp
+  http_parser.c)
 
 add_library(fir_static STATIC ${fir_SOURCES})
 set_target_properties(fir_static PROPERTIES OUTPUT_NAME swirly_fir)
