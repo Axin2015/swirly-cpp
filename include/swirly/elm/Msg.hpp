@@ -92,43 +92,6 @@ struct SWIRLY_PACKED Msg {
 static_assert(std::is_pod<Msg>::value, "message-type must be pod");
 static_assert(sizeof(Msg) == 240, "unexpected message length");
 
-template <typename DerivedT>
-struct MsgHandler {
-
-  MsgHandler() noexcept = default;
-  ~MsgHandler() noexcept = default;
-
-  // Copy.
-  MsgHandler(const MsgHandler&) noexcept = default;
-  MsgHandler& operator=(const MsgHandler&) noexcept = default;
-
-  // Move.
-  MsgHandler(MsgHandler&&) noexcept = default;
-  MsgHandler& operator=(MsgHandler&&) noexcept = default;
-
-  void dispatch(const Msg& msg)
-  {
-    auto* const derived = static_cast<DerivedT*>(this);
-    switch (msg.type) {
-    case MsgType::Reset:
-      derived->reset();
-      break;
-    case MsgType::CreateMarket:
-      derived->createMarket(msg.createMarket);
-      break;
-    case MsgType::UpdateMarket:
-      derived->updateMarket(msg.updateMarket);
-      break;
-    case MsgType::CreateExec:
-      derived->createExec(msg.createExec);
-      break;
-    case MsgType::ArchiveTrade:
-      derived->archiveTrade(msg.archiveTrade);
-      break;
-    }
-  }
-};
-
 using MsgPipe = Pipe<Msg>;
 
 } // swirly
