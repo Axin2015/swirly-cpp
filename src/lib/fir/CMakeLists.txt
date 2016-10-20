@@ -24,6 +24,7 @@ endif(RAGEL_EXECUTABLE)
 
 set(fir_SOURCES
   EntitySet.cpp
+  Exception.cpp
   Rest.cpp
   RestRequest.cpp
   http_parser.c)
