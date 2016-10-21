@@ -40,15 +40,15 @@ SWIRLY_TEST_CASE(RingBuffer)
   SWIRLY_CHECK(!rb.full());
   SWIRLY_CHECK(rb.size() == 0);
 
-  rb.write(1);
-  rb.write(2);
-  rb.write(3);
-  rb.write(4);
+  rb.push(1);
+  rb.push(2);
+  rb.push(3);
+  rb.push(4);
   SWIRLY_CHECK(!rb.empty());
   SWIRLY_CHECK(rb.full());
   SWIRLY_CHECK(rb.size() == 4);
 
-  rb.write(5);
+  rb.push(5);
   SWIRLY_CHECK(!rb.empty());
   SWIRLY_CHECK(rb.full());
   SWIRLY_CHECK(rb.size() == 4);
@@ -60,12 +60,12 @@ SWIRLY_TEST_CASE(RingBuffer)
   SWIRLY_CHECK(!rb.full());
   SWIRLY_CHECK(rb.size() == 3);
 
-  rb.read(val);
-  SWIRLY_CHECK(val == 3);
-  rb.read(val);
-  SWIRLY_CHECK(val == 4);
-  rb.read(val);
-  SWIRLY_CHECK(val == 5);
+  SWIRLY_CHECK(rb.front() == 3);
+  rb.pop();
+  SWIRLY_CHECK(rb.front() == 4);
+  rb.pop();
+  SWIRLY_CHECK(rb.front() == 5);
+  rb.pop();
 
   SWIRLY_CHECK(rb.empty());
   SWIRLY_CHECK(!rb.full());
