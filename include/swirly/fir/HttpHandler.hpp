@@ -99,6 +99,8 @@ class BasicHttpHandler {
   bool shouldKeepAlive() const noexcept { return http_should_keep_alive(&parser_) != 0; }
   bool bodyIsFinal() const noexcept { return http_body_is_final(&parser_) != 0; }
 
+  void pause() noexcept { http_parser_pause(&parser_, 1); }
+
  protected:
   ~BasicHttpHandler() noexcept = default;
 
@@ -112,9 +114,15 @@ class BasicHttpHandler {
   {
     static http_parser_settings settings{makeSettings()};
     const auto rc = http_parser_execute(&parser_, &settings, buf.data(), buf.size());
-    if (parser_.http_errno != HPE_OK) {
-      const auto err = static_cast<http_errno>(parser_.http_errno);
-      throw ParseException{errMsg() << http_errno_name(err) << ": " << http_errno_description(err)};
+    const auto err = static_cast<http_errno>(parser_.http_errno);
+    if (err != HPE_OK) {
+      if (err == HPE_PAUSED) {
+        // Clear pause state.
+        http_parser_pause(&parser_, 0);
+      } else {
+        throw ParseException{errMsg() << http_errno_name(err) << ": "
+                                      << http_errno_description(err)};
+      }
     }
     return rc;
   }

@@ -26,7 +26,8 @@ namespace swirly {
 /**
  * Base class for referenced counted objects.
  */
-class SWIRLY_API RefCounted {
+template <typename DerivedT>
+class RefCounted {
  public:
   constexpr RefCounted() noexcept = default;
 
@@ -42,19 +43,17 @@ class SWIRLY_API RefCounted {
   void release() const noexcept
   {
     if (--refs_ <= 0) {
-      delete this;
+      delete static_cast<const DerivedT*>(this);
     }
   }
   int refs() const noexcept { return refs_; }
 
  protected:
-  virtual ~RefCounted() noexcept;
+  ~RefCounted() noexcept = default;
 
  private:
   mutable int refs_ = 1;
 };
-
-using RefCountedPtr = boost::intrusive_ptr<RefCounted>;
 
 template <typename ValueT, typename... ArgsT>
 boost::intrusive_ptr<ValueT> makeRefCounted(ArgsT&&... args)
@@ -62,12 +61,14 @@ boost::intrusive_ptr<ValueT> makeRefCounted(ArgsT&&... args)
   return {new ValueT{std::forward<ArgsT>(args)...}, false};
 }
 
-inline void intrusive_ptr_add_ref(const RefCounted* ptr) noexcept
+template <typename DerivedT>
+void intrusive_ptr_add_ref(const RefCounted<DerivedT>* ptr) noexcept
 {
   ptr->addRef();
 }
 
-inline void intrusive_ptr_release(const RefCounted* ptr) noexcept
+template <typename DerivedT>
+void intrusive_ptr_release(const RefCounted<DerivedT>* ptr) noexcept
 {
   ptr->release();
 }

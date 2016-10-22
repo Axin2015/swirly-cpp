@@ -21,17 +21,11 @@
 
 #include <cstdint>
 #include <memory>
-#include <type_traits>
 
 namespace swirly {
 
-/**
- * This simple RingBuffer design is only intended for use with PODs.
- */
 template <typename ValueT>
 class RingBuffer {
-  static_assert(std::is_pod<ValueT>::value, "value-type must be pod");
-
  public:
   explicit RingBuffer(std::size_t capacity)
     : capacity_{nextPow2(capacity)}, mask_{capacity_ - 1}, buf_{new ValueT[capacity_]}
@@ -50,21 +44,11 @@ class RingBuffer {
   bool empty() const noexcept { return rpos_ == wpos_; }
   bool full() const noexcept { return size() == capacity_; }
   std::size_t size() const noexcept { return wpos_ - rpos_; }
+  const ValueT& front() const noexcept { return buf_[rpos_ & mask_]; }
+  const ValueT& back() const noexcept { return buf_[wpos_ & mask_]; }
   void clear() noexcept { rpos_ = wpos_ = 0; }
-  void read(ValueT& val)
-  {
-    const auto& ref = buf_[rpos_ & mask_];
-    val = ref;
-    ++rpos_;
-  }
-  template <typename FnT>
-  void read(FnT fn)
-  {
-    const auto& ref = buf_[rpos_ & mask_];
-    fn(ref);
-    ++rpos_;
-  }
-  void write(const ValueT& val)
+  void pop() noexcept { ++rpos_; }
+  void push(const ValueT& val)
   {
     auto& ref = buf_[wpos_ & mask_];
     ref = val;
@@ -72,6 +56,13 @@ class RingBuffer {
       ++rpos_;
     }
     ++wpos_;
+  }
+  template <typename FnT>
+  void read(FnT fn)
+  {
+    const auto& ref = buf_[rpos_ & mask_];
+    fn(ref);
+    ++rpos_;
   }
   template <typename FnT>
   void write(FnT fn)

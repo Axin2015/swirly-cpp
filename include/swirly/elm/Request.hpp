@@ -28,7 +28,7 @@
 
 namespace swirly {
 
-class SWIRLY_API Request : public RefCounted {
+class SWIRLY_API Request {
  public:
   Request(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
           Side side, Lots lots, Time created) noexcept
@@ -43,7 +43,6 @@ class SWIRLY_API Request : public RefCounted {
       created_{created}
   {
   }
-  ~Request() noexcept override;
 
   // Copy.
   Request(const Request&) = delete;
@@ -64,6 +63,8 @@ class SWIRLY_API Request : public RefCounted {
   auto created() const noexcept { return created_; }
 
  protected:
+  ~Request() noexcept;
+
   const Id64 marketId_;
   const Mnem contr_;
   const JDay settlDay_;

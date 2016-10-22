@@ -25,7 +25,7 @@ using namespace swirly;
 
 namespace {
 
-class Foo {
+class Foo : public RefCounted<Foo> {
  public:
   Foo(Mnem mnem, string_view display, int& alive) noexcept
     : mnem_{mnem}, display_{display}, alive_{alive}
@@ -44,13 +44,13 @@ class Foo {
   int& alive_;
 };
 
-class Bar : public RefCounted {
+class Bar : public RefCounted<Bar> {
  public:
   Bar(Id64 id, string_view display, int& alive) noexcept : id_{id}, display_{display}, alive_{alive}
   {
     ++alive;
   }
-  ~Bar() noexcept override { --alive_; }
+  ~Bar() noexcept { --alive_; }
 
   auto id() const noexcept { return id_; }
   auto display() const noexcept { return +display_; }

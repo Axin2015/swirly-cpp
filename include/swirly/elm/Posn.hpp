@@ -29,7 +29,7 @@
 
 namespace swirly {
 
-class SWIRLY_API Posn : public RefCounted {
+class SWIRLY_API Posn : public RefCounted<Posn> {
  public:
   Posn(Id64 marketId, Mnem contr, JDay settlDay, Mnem accnt, Lots buyLots, Cost buyCost,
        Lots sellLots, Cost sellCost) noexcept
@@ -47,7 +47,7 @@ class SWIRLY_API Posn : public RefCounted {
     : Posn{marketId, contr, settlDay, accnt, 0_lts, 0_cst, 0_lts, 0_cst}
   {
   }
-  ~Posn() noexcept override;
+  ~Posn() noexcept;
 
   // Copy.
   Posn(const Posn&) = delete;

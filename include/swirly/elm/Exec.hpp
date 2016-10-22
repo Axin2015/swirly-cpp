@@ -29,7 +29,7 @@ namespace swirly {
  *
  * Trade executions represent the exchange of goods or services between counter-parties.
  */
-class SWIRLY_API Exec : public Request, public MemAlloc {
+class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc {
  public:
   Exec(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Id64 orderId, Mnem accnt,
        std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
@@ -50,8 +50,7 @@ class SWIRLY_API Exec : public Request, public MemAlloc {
       cpty_{cpty}
   {
   }
-
-  ~Exec() noexcept override;
+  ~Exec() noexcept;
 
   // Copy.
   Exec(const Exec&) = delete;

@@ -31,7 +31,7 @@ class Level;
 /**
  * An instruction to buy or sell goods or services.
  */
-class SWIRLY_API Order : public Request, public MemAlloc {
+class SWIRLY_API Order : public RefCounted<Order>, public Request, public MemAlloc {
  public:
   Order(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
         State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
@@ -54,7 +54,7 @@ class SWIRLY_API Order : public Request, public MemAlloc {
             ticks,    lots,  0_lts,    0_cst, 0_lts, 0_tks, minLots,    created, created}
   {
   }
-  ~Order() noexcept override;
+  ~Order() noexcept;
 
   // Copy.
   Order(const Order&) = delete;
