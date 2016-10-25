@@ -81,6 +81,7 @@ class Session : public RefCounted<Session>, //
   }
   void consume()
   {
+    SWIRLY_DEBUG("consume"_sv);
     // FIXME: close socket on parse exception.
     const auto size = asio::buffer_size(input_);
     if (size > 0) {
@@ -94,47 +95,48 @@ class Session : public RefCounted<Session>, //
       readSome();
     }
   }
-  void produce(string_view data)
-  {
-    const auto wasEmpty = output_.empty();
-    output_.write([data](auto& ref) { ref.assign(data.data(), data.size()); });
-    if (wasEmpty) {
-      writeNext();
-    }
-  }
   using BasicHttpHandler<Session>::parse;
   void readSome()
   {
+    SWIRLY_DEBUG("readSome"_sv);
     SessionPtr session{this};
     socket_.async_read_some(asio::buffer(data_, MaxData), [this, session](auto ec, auto len) {
+      SWIRLY_DEBUG("async_read_some"_sv);
       if (!ec) {
         input_ = asio::buffer(data_, len);
         this->consume();
         this->resetTimeout();
+        if (!this->output_.empty() && !pending_) {
+          this->write();
+        }
       } else if (ec == asio::error::eof) {
       } else if (ec != asio::error::operation_aborted) {
-        SWIRLY_INFO("read cancelled");
+        SWIRLY_INFO("read cancelled"_sv);
       }
     });
   }
-  void writeNext()
+  void write()
   {
+    SWIRLY_DEBUG("write"_sv);
     const auto& data = output_.front();
     SessionPtr session{this};
     asio::async_write(socket_, asio::buffer(data), [this, session](auto ec, auto len) {
+      --pending_;
+      SWIRLY_DEBUG("async_write"_sv);
       if (!ec) {
         const auto wasFull = output_.full();
         this->output_.pop();
         if (wasFull) {
           this->consume();
         }
-        if (!this->output_.empty()) {
-          this->writeNext();
+        if (!this->output_.empty() && !pending_) {
+          this->write();
         }
       } else if (ec != asio::error::operation_aborted) {
-        SWIRLY_WARNING("write cancelled");
+        SWIRLY_WARNING("write cancelled"_sv);
       }
     });
+    ++pending_;
   }
   void resetTimeout()
   {
@@ -149,7 +151,7 @@ class Session : public RefCounted<Session>, //
       if (!ec) {
         this->stop();
       } else if (ec != asio::error::operation_aborted) {
-        SWIRLY_INFO("timer cancelled");
+        SWIRLY_INFO("timer cancelled"_sv);
       }
     });
   }
@@ -195,7 +197,8 @@ class Session : public RefCounted<Session>, //
       "Hello, World!\r\n"_sv;
 
     BasicUrl<Session>::parse();
-    produce(Message);
+    const string_view data = Message;
+    output_.write([data](auto& ref) { ref.assign(data.data(), data.size()); });
     if (output_.full()) {
       // Interrupt parser if output buffer is full.
       pause();
@@ -219,6 +222,8 @@ class Session : public RefCounted<Session>, //
   char data_[MaxData];
   boost::asio::const_buffer input_;
   RingBuffer<string> output_{8};
+  // Number of pending write operations.
+  int pending_{0};
 };
 
 class Server {
