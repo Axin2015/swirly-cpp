@@ -74,6 +74,20 @@ SWIRLY_TEST_CASE(StringAssign)
   SWIRLY_CHECK(sb == "Foo"_sv);
 }
 
+SWIRLY_TEST_CASE(StringAppend)
+{
+  String<6> sb;
+  sb = "Foo"_sv;
+  sb += "Bar"_sv;
+  SWIRLY_CHECK(sb.size() == 6UL);
+  SWIRLY_CHECK(sb == "FooBar"_sv);
+
+  sb = "Foo"_sv;
+  sb += "Barx"_sv;
+  SWIRLY_CHECK(sb.size() == 6UL);
+  SWIRLY_CHECK(sb == "FooBar"_sv);
+}
+
 SWIRLY_TEST_CASE(StringToString)
 {
   SWIRLY_CHECK(toString("foo"_sv) == "foo"s);

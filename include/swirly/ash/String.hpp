@@ -101,6 +101,33 @@ class String {
   constexpr std::size_t size() const noexcept { return len_; }
   constexpr void clear() noexcept { len_ = 0; }
 
+  void assign(const char* rdata, std::size_t rlen) noexcept
+  {
+    len_ = std::min(rlen, MaxN);
+    if (len_ > 0) {
+      std::memcpy(buf_, rdata, len_);
+    }
+  }
+  void append(const char* rdata, std::size_t rlen) noexcept
+  {
+    rlen = std::min(rlen, MaxN - len_);
+    if (rlen > 0) {
+      std::memcpy(buf_ + len_, rdata, rlen);
+      len_ += rlen;
+    }
+  }
+  template <std::size_t MaxR>
+  String& operator+=(const String<MaxR>& rhs) noexcept
+  {
+    append(rhs.data(), rhs.size());
+    return *this;
+  }
+  String& operator+=(std::string_view rhs) noexcept
+  {
+    append(rhs.data(), rhs.size());
+    return *this;
+  }
+
  private:
   int compare(const char* rdata, std::size_t rlen) const noexcept
   {
@@ -109,13 +136,6 @@ class String {
       result = swirly::compare(size(), rlen);
     }
     return result;
-  }
-  void assign(const char* rdata, std::size_t rlen) noexcept
-  {
-    len_ = std::min(rlen, MaxN);
-    if (len_ > 0) {
-      std::memcpy(buf_, rdata, len_);
-    }
   }
   // Length in the first cache-line.
   // Use int to save space.
