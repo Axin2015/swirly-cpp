@@ -25,11 +25,18 @@ set(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
 set(MG_ENABLE_DEBUG    OFF CACHE BOOL   "Enable Mongoose debug.")
 set(SWIRLY_MAX_LEVELS  3   CACHE STRING "Maximum price levels.")
 
+# Intended for use with Linux Perf:
+# $ perf record -g swirly_bench
+# $ perf report -g "graph,0.5,caller"
+SET(CMAKE_C_FLAGS_PERF    "${CMAKE_C_FLAGS_RELEASE} -fno-omit-frame-pointer")
+SET(CMAKE_CXX_FLAGS_PERF  "${CMAKE_CXX_FLAGS_RELEASE} -fno-omit-frame-pointer")
+
 if(NOT CMAKE_BUILD_TYPE)
   #set(CMAKE_BUILD_TYPE DEBUG)
   #set(CMAKE_BUILD_TYPE RELEASE)
   set(CMAKE_BUILD_TYPE RELWITHDEBINFO)
   #set(CMAKE_BUILD_TYPE MINSIZEREL)
+  #set(CMAKE_BUILD_TYPE PERF)
 endif()
 
 # Enable for use with clang-tidy.
