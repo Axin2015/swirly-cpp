@@ -18,6 +18,7 @@
 // Experimental replacement for Mongoose. This is a work in progress.
 
 #include <swirly/fir/HttpHandler.hpp>
+#include <swirly/fir/RestRequest.hpp>
 #include <swirly/fir/Url.hpp>
 
 #include <swirly/ash/Log.hpp>
@@ -25,10 +26,10 @@
 #include <swirly/ash/RingBuffer.hpp>
 #include <swirly/ash/String.hpp>
 
+#define BOOST_ASIO_DISABLE_THREADS 1
 #include <boost/asio.hpp>
 
 #include <cstdlib>
-#include <deque>
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -39,22 +40,54 @@ using namespace swirly;
 
 using asio::ip::tcp;
 
-class Session;
-using SessionPtr = intrusive_ptr<Session>;
+class HttpSession;
+using HttpSessionPtr = intrusive_ptr<HttpSession>;
 
-class Session : public RefCounted<Session>, //
-                public BasicHttpHandler<Session>, //
-                public BasicUrl<Session> {
+class HttpMessage : public BasicUrl<HttpMessage> {
+ public:
+  const auto& url() const noexcept { return url_; }
+  void clear() noexcept
+  {
+    BasicUrl<HttpMessage>::reset();
+    url_.clear();
+    headerField_.clear();
+    headerValue_.clear();
+    request_.reset();
+  }
+  void flush() { BasicUrl<HttpMessage>::parse(); }
+  void appendUrl(string_view sv) { url_ += sv; }
+  void appendHeaderField(string_view sv, bool create)
+  {
+    if (create) {
+      headerField_ = sv;
+      headerValue_.clear();
+    } else {
+      headerValue_ += sv;
+    }
+  }
+  void appendHeaderValue(string_view sv) { headerValue_ += sv; }
+  void appendBody(string_view sv) { request_.parse(sv); }
+ private:
+  // Header fields:
+  // Swirly-Time
+  // Swirly-Accnt
+  // Swirly-Perm
+  String<128> url_;
+  String<16> headerField_;
+  String<24> headerValue_;
+  RestRequest request_;
+};
 
-  friend class BasicHttpHandler<Session>;
+class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<HttpSession> {
+
+  friend class BasicHttpHandler<HttpSession>;
   enum { IdleTimeout = 5, MaxData = 4096 };
 
  public:
-  explicit Session(asio::io_service& service)
-    : BasicHttpHandler<Session>{HttpType::Request}, socket_{service}, timeout_(service)
+  explicit HttpSession(asio::io_service& service)
+    : BasicHttpHandler<HttpSession>{HttpType::Request}, socket_{service}, timeout_(service)
   {
   }
-  const auto& url() const noexcept { return url_; }
   void start()
   {
     readSome();
@@ -72,13 +105,6 @@ class Session : public RefCounted<Session>, //
   tcp::socket& socket() { return socket_; }
 
  private:
-  void clear() noexcept
-  {
-    url_.clear();
-    status_.clear();
-    headers_.clear();
-    body_.clear();
-  }
   void consume()
   {
     SWIRLY_DEBUG("consume"_sv);
@@ -95,20 +121,17 @@ class Session : public RefCounted<Session>, //
       readSome();
     }
   }
-  using BasicHttpHandler<Session>::parse;
+  using BasicHttpHandler<HttpSession>::parse;
   void readSome()
   {
     SWIRLY_DEBUG("readSome"_sv);
-    SessionPtr session{this};
+    HttpSessionPtr session{this};
     socket_.async_read_some(asio::buffer(data_, MaxData), [this, session](auto ec, auto len) {
       SWIRLY_DEBUG("async_read_some"_sv);
       if (!ec) {
         input_ = asio::buffer(data_, len);
         this->consume();
         this->resetTimeout();
-        if (!this->output_.empty() && !pending_) {
-          this->write();
-        }
       } else if (ec == asio::error::eof) {
       } else if (ec != asio::error::operation_aborted) {
         SWIRLY_INFO("read cancelled"_sv);
@@ -119,24 +142,22 @@ class Session : public RefCounted<Session>, //
   {
     SWIRLY_DEBUG("write"_sv);
     const auto& data = output_.front();
-    SessionPtr session{this};
+    HttpSessionPtr session{this};
     asio::async_write(socket_, asio::buffer(data), [this, session](auto ec, auto len) {
-      --pending_;
       SWIRLY_DEBUG("async_write"_sv);
       if (!ec) {
         const auto wasFull = output_.full();
         this->output_.pop();
+        if (!this->output_.empty()) {
+          this->write();
+        }
         if (wasFull) {
           this->consume();
-        }
-        if (!this->output_.empty() && !pending_) {
-          this->write();
         }
       } else if (ec != asio::error::operation_aborted) {
         SWIRLY_WARNING("write cancelled"_sv);
       }
     });
-    ++pending_;
   }
   void resetTimeout()
   {
@@ -146,7 +167,7 @@ class Session : public RefCounted<Session>, //
     timeout_.cancel(e);
     timeout_.expires_from_now(posix_time::seconds{IdleTimeout});
 
-    SessionPtr session{this};
+    HttpSessionPtr session{this};
     timeout_.async_wait([this, session](auto ec) {
       if (!ec) {
         this->stop();
@@ -158,33 +179,53 @@ class Session : public RefCounted<Session>, //
   bool onMessageBegin() noexcept { return true; }
   bool onUrl(string_view sv) noexcept
   {
-    url_.append(sv.data(), sv.size());
-    return true;
+    bool ret{false};
+    try {
+      message_.appendUrl(sv);
+      ret = true;
+    } catch (const std::exception& e) {
+      SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    return ret;
   }
   bool onStatus(string_view sv) noexcept
   {
-    status_.append(sv.data(), sv.size());
-    return true;
+    // Only supported for HTTP responses.
+    return false;
   }
   bool onHeaderField(string_view sv, bool create) noexcept
   {
-    if (create) {
-      headers_.emplace_back(string{sv.data(), sv.size()}, "");
-    } else {
-      headers_.back().first.append(sv.data(), sv.size());
+    bool ret{false};
+    try {
+      message_.appendHeaderField(sv, create);
+      ret = true;
+    } catch (const std::exception& e) {
+      SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }
-    return true;
+    return ret;
   }
   bool onHeaderValue(string_view sv) noexcept
   {
-    headers_.back().second.append(sv.data(), sv.size());
-    return true;
+    bool ret{false};
+    try {
+      message_.appendHeaderValue(sv);
+      ret = true;
+    } catch (const std::exception& e) {
+      SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    return ret;
   }
   bool onHeadersEnd() noexcept { return true; }
   bool onBody(string_view sv) noexcept
   {
-    body_.append(sv.data(), sv.size());
-    return true;
+    bool ret{false};
+    try {
+      message_.appendBody(sv);
+      ret = true;
+    } catch (const std::exception& e) {
+      SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    return ret;
   }
   bool onMessageEnd() noexcept
   {
@@ -196,39 +237,41 @@ class Session : public RefCounted<Session>, //
       "\r\n" //
       "Hello, World!\r\n"_sv;
 
-    BasicUrl<Session>::parse();
-    const string_view data = Message;
-    output_.write([data](auto& ref) { ref.assign(data.data(), data.size()); });
-    if (output_.full()) {
-      // Interrupt parser if output buffer is full.
-      pause();
+    bool ret{false};
+    try {
+      message_.flush();
+      const string_view data = Message;
+      const auto wasEmpty = output_.empty();
+      output_.write([data](auto& ref) { ref.assign(data.data(), data.size()); });
+      if (wasEmpty) {
+        write();
+      }
+      message_.clear();
+      if (output_.full()) {
+        // Interrupt parser if output buffer is full.
+        pause();
+      }
+      ret = true;
+    } catch (const std::exception& e) {
+      SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }
-    // Reset HTTP message content.
-    BasicUrl<Session>::reset();
-    clear();
-    return true;
+    return ret;
   }
   bool onChunkHeader(size_t len) noexcept { return true; }
   bool onChunkEnd() noexcept { return true; }
-
-  string url_;
-  string status_;
-  vector<pair<string, string>> headers_;
-  string body_;
 
   tcp::socket socket_;
   // Close session if client is inactive.
   asio::deadline_timer timeout_;
   char data_[MaxData];
   boost::asio::const_buffer input_;
+  HttpMessage message_;
   RingBuffer<string> output_{8};
-  // Number of pending write operations.
-  int pending_{0};
 };
 
-class Server {
+class HttpServer {
  public:
-  Server(asio::io_service& service, std::uint16_t port) : service_{service}, acceptor_{service}
+  HttpServer(asio::io_service& service, std::uint16_t port) : service_{service}, acceptor_{service}
   {
     tcp::endpoint endpoint{asio::ip::tcp::v4(), port};
     acceptor_.open(endpoint.protocol());
@@ -242,7 +285,7 @@ class Server {
  private:
   void accept()
   {
-    auto session = makeRefCounted<Session>(service_);
+    auto session = makeRefCounted<HttpSession>(service_);
     acceptor_.async_accept(session->socket(), [this, session](auto ec) {
       if (!ec) {
         session->start();
@@ -265,7 +308,7 @@ int main(int argc, char* argv[])
       return 1;
     }
     asio::io_service service;
-    Server server{service, static_cast<uint16_t>(atoi(argv[1]))};
+    HttpServer server{service, static_cast<uint16_t>(atoi(argv[1]))};
     service.run();
     ret = 0;
   } catch (const std::exception& e) {
