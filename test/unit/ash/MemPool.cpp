@@ -14,16 +14,26 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/MemPool.hpp>
-
-#include <swirly/elm/Exec.hpp>
-#include <swirly/elm/Level.hpp>
-#include <swirly/elm/Order.hpp>
+#include <swirly/ash/MemPool.hpp>
 
 #include <swirly/tea/Test.hpp>
 
+#include <cstring>
+
 using namespace std;
 using namespace swirly;
+
+namespace {
+
+struct Foo {
+  char data[2 << 6];
+};
+
+struct Bar {
+  char data[5 << 6];
+};
+
+} // anonymous
 
 SWIRLY_TEST_CASE(MemPool)
 {
@@ -33,9 +43,8 @@ SWIRLY_TEST_CASE(MemPool)
   SWIRLY_CHECK(memPool.capacity() == 0);
 
   // These should all call the custom allocator with zero capacity.
-  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Exec)), bad_alloc);
-  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Level)), bad_alloc);
-  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Order)), bad_alloc);
+  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Foo)), bad_alloc);
+  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Bar)), bad_alloc);
 
   {
     memPool.reserve(1024);
@@ -46,13 +55,13 @@ SWIRLY_TEST_CASE(MemPool)
     SWIRLY_CHECK(memPool.capacity() == 4096);
   }
 
-  char* p1{static_cast<char*>(memPool.alloc(sizeof(Exec)))};
+  char* p1{static_cast<char*>(memPool.alloc(sizeof(Foo)))};
   // Check that it's writable.
   strcpy(p1, "test");
-  memPool.dealloc(p1, sizeof(Exec));
+  memPool.dealloc(p1, sizeof(Foo));
 
   // Check that the same address is returned.
-  char* p2{static_cast<char*>(memPool.alloc(sizeof(Exec)))};
+  char* p2{static_cast<char*>(memPool.alloc(sizeof(Foo)))};
   SWIRLY_CHECK(p1 == p2);
-  memPool.dealloc(p2, sizeof(Exec));
+  memPool.dealloc(p2, sizeof(Foo));
 }

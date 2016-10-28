@@ -15,7 +15,6 @@
  * 02110-1301, USA.
  */
 #include <swirly/fig/Accnt.hpp>
-#include <swirly/fig/MemPool.hpp>
 #include <swirly/fig/Response.hpp>
 #include <swirly/fig/Serv.hpp>
 #include <swirly/fig/Test.hpp>
@@ -24,6 +23,7 @@
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/MemPool.hpp>
 #include <swirly/ash/Profile.hpp>
 #include <swirly/ash/Time.hpp>
 

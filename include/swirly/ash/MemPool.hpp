@@ -14,12 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIG_MEMPOOL_HPP
-#define SWIRLY_FIG_MEMPOOL_HPP
+#ifndef SWIRLY_ASH_MEMPOOL_HPP
+#define SWIRLY_ASH_MEMPOOL_HPP
 
-#include <swirly/elm/Exec.hpp>
-#include <swirly/elm/Level.hpp>
-#include <swirly/elm/Order.hpp>
+#include <swirly/ash/Defs.hpp>
 
 #include <cstddef> // size_t
 #include <new>
@@ -93,9 +91,11 @@ class SWIRLY_API MemPool {
   void reserve(std::size_t capacity)
   {
     region_ = detail::MemRegion{capacity};
-    exec_ = nullptr;
-    order_ = nullptr;
-    level_ = nullptr;
+    head1_ = nullptr;
+    head2_ = nullptr;
+    head3_ = nullptr;
+    head4_ = nullptr;
+    head5_ = nullptr;
   }
   void* alloc(std::size_t size);
 
@@ -129,11 +129,18 @@ class SWIRLY_API MemPool {
   }
 
   detail::MemRegion region_;
-  MemBlock<sizeof(Exec)>* exec_{nullptr};
-  MemBlock<sizeof(Order)>* order_{nullptr};
-  MemBlock<sizeof(Level)>* level_{nullptr};
+  MemBlock<(1 << 6)>* head1_{nullptr};
+  MemBlock<(2 << 6)>* head2_{nullptr};
+  MemBlock<(3 << 6)>* head3_{nullptr};
+  MemBlock<(4 << 6)>* head4_{nullptr};
+  MemBlock<(5 << 6)>* head5_{nullptr};
 };
+
+constexpr std::size_t roundCacheLine(std::size_t size) noexcept
+{
+  return ((size + 63) >> 6) << 6;
+}
 
 } // swirly
 
-#endif // SWIRLY_FIG_MEMPOOL_HPP
+#endif // SWIRLY_ASH_MEMPOOL_HPP

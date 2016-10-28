@@ -14,8 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/MemPool.hpp>
+#include <swirly/ash/MemPool.hpp>
 
+#include <cassert>
 #include <system_error>
 
 #include <sys/mman.h>
@@ -85,13 +86,23 @@ MemPool& MemPool::operator=(MemPool&&) noexcept = default;
 void* MemPool::alloc(size_t size)
 {
   void* addr;
-  if (size == sizeof(Exec)) {
-    addr = allocBlock(exec_);
-  } else if (size == sizeof(Order)) {
-    addr = allocBlock(order_);
-  } else if (size == sizeof(Level)) {
-    addr = allocBlock(level_);
-  } else {
+  switch (roundCacheLine(size)) {
+  case 1 << 6:
+    addr = allocBlock(head1_);
+    break;
+  case 2 << 6:
+    addr = allocBlock(head2_);
+    break;
+  case 3 << 6:
+    addr = allocBlock(head3_);
+    break;
+  case 4 << 6:
+    addr = allocBlock(head4_);
+    break;
+  case 5 << 6:
+    addr = allocBlock(head5_);
+    break;
+  default:
     addr = malloc(size);
   }
   return addr;
@@ -99,13 +110,23 @@ void* MemPool::alloc(size_t size)
 
 void MemPool::dealloc(void* ptr, size_t size) noexcept
 {
-  if (size == sizeof(Exec)) {
-    deallocBlock(exec_, ptr);
-  } else if (size == sizeof(Order)) {
-    deallocBlock(order_, ptr);
-  } else if (size == sizeof(Level)) {
-    deallocBlock(level_, ptr);
-  } else {
+  switch (roundCacheLine(size)) {
+  case 1 << 6:
+    deallocBlock(head1_, ptr);
+    break;
+  case 2 << 6:
+    deallocBlock(head2_, ptr);
+    break;
+  case 3 << 6:
+    deallocBlock(head3_, ptr);
+    break;
+  case 4 << 6:
+    deallocBlock(head4_, ptr);
+    break;
+  case 5 << 6:
+    deallocBlock(head5_, ptr);
+    break;
+  default:
     free(ptr);
   }
 }
