@@ -131,7 +131,7 @@ bool RestServ::reset(HttpMessage data) noexcept
 
   const auto method = data.method();
   if (method == "GET"_sv) {
-    cache = !uri.empty() && uri_.top() == "ref"_sv;
+    cache = !uri.empty() && uri_.top() == "refdata"_sv;
     state_ |= MethodGet;
   } else if (method == "POST"_sv) {
     state_ |= MethodPost;
@@ -207,8 +207,8 @@ void RestServ::restRequest(HttpMessage data, Time now)
   const auto tok = uri_.top();
   uri_.pop();
 
-  if (tok == "ref"_sv) {
-    // /ref
+  if (tok == "refdata"_sv) {
+    // /refdata
     refDataRequest(data, now);
   } else if (tok == "market"_sv) {
     // /market
@@ -223,11 +223,11 @@ void RestServ::refDataRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
-    // /ref
+    // /refdata
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /ref
+      // GET /refdata
       state_ |= MatchMethod;
       const int bs{EntitySet::Asset | EntitySet::Contr};
       rest_.getRefData(bs, now, out_);
@@ -243,11 +243,11 @@ void RestServ::refDataRequest(HttpMessage data, Time now)
 
     if (uri_.empty()) {
 
-      // /ref/entity,entity...
+      // /refdata/entity,entity...
       state_ |= MatchUri;
 
       if (isSet(MethodGet)) {
-        // GET /ref/entity,entity...
+        // GET /refdata/entity,entity...
         state_ |= MatchMethod;
         rest_.getRefData(es, now, out_);
       }
@@ -269,11 +269,11 @@ void RestServ::assetRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
-    // /ref/asset
+    // /refdata/asset
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /ref/asset
+      // GET /refdata/asset
       state_ |= MatchMethod;
       rest_.getAsset(now, out_);
     }
@@ -285,11 +285,11 @@ void RestServ::assetRequest(HttpMessage data, Time now)
 
   if (uri_.empty()) {
 
-    // /ref/asset/MNEM
+    // /refdata/asset/MNEM
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /ref/asset/MNEM
+      // GET /refdata/asset/MNEM
       state_ |= MatchMethod;
       rest_.getAsset(mnem, now, out_);
     }
@@ -301,11 +301,11 @@ void RestServ::contrRequest(HttpMessage data, Time now)
 {
   if (uri_.empty()) {
 
-    // /ref/contr
+    // /refdata/contr
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /ref/contr
+      // GET /refdata/contr
       state_ |= MatchMethod;
       rest_.getContr(now, out_);
     }
@@ -317,11 +317,11 @@ void RestServ::contrRequest(HttpMessage data, Time now)
 
   if (uri_.empty()) {
 
-    // /ref/contr/MNEM
+    // /refdata/contr/MNEM
     state_ |= MatchUri;
 
     if (isSet(MethodGet)) {
-      // GET /ref/contr/MNEM
+      // GET /refdata/contr/MNEM
       state_ |= MatchMethod;
       rest_.getContr(mnem, now, out_);
     }
@@ -362,7 +362,7 @@ void RestServ::marketRequest(HttpMessage data, Time now)
 
   if (uri_.empty()) {
 
-    // /accnt/market/CONTR
+    // /market/CONTR
     state_ |= MatchUri;
 
     switch (state_ & MethodMask) {
