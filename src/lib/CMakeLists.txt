@@ -13,11 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-add_subdirectory(ash)
-add_subdirectory(elm)
-add_subdirectory(fig)
-add_subdirectory(fir)
-add_subdirectory(tea)
+add_subdirectory(unit)
+add_subdirectory(util)
+add_subdirectory(fin)
+add_subdirectory(om)
+add_subdirectory(ws)
 
 # FIXME: the following libraries should be modules.
 add_subdirectory(sqlite)

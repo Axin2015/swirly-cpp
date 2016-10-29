@@ -16,14 +16,14 @@
  */
 #include "RestServ.hpp"
 
-#include <swirly/fir/Rest.hpp>
+#include <swirly/ws/Rest.hpp>
 
-#include <swirly/elm/Exception.hpp>
+#include <swirly/fin/Exception.hpp>
 
-#include <swirly/ash/Finally.hpp>
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/Numeric.hpp>
-#include <swirly/ash/Time.hpp>
+#include <swirly/util/Finally.hpp>
+#include <swirly/util/Log.hpp>
+#include <swirly/util/Numeric.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <chrono>
 

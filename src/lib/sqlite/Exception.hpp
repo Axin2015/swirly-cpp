@@ -17,7 +17,7 @@
 #ifndef SWIRLY_SQLITE_EXCEPTION_HPP
 #define SWIRLY_SQLITE_EXCEPTION_HPP
 
-#include <swirly/ash/Exception.hpp>
+#include <swirly/util/Exception.hpp>
 
 namespace swirly {
 namespace sqlite {

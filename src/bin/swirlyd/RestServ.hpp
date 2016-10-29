@@ -20,12 +20,12 @@
 #include "Mongoose.hpp"
 #include "Stream.hpp"
 
-#include <swirly/fir/RestRequest.hpp>
+#include <swirly/ws/RestRequest.hpp>
 
-#include <swirly/ash/Array.hpp>
-#include <swirly/ash/BasicTypes.hpp>
-#include <swirly/ash/Profile.hpp>
-#include <swirly/ash/Tokeniser.hpp>
+#include <swirly/util/Array.hpp>
+#include <swirly/util/BasicTypes.hpp>
+#include <swirly/util/Profile.hpp>
+#include <swirly/util/Tokeniser.hpp>
 
 namespace swirly {
 class Rest;

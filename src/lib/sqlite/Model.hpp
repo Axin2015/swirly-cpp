@@ -19,7 +19,7 @@
 
 #include "Utility.hpp"
 
-#include <swirly/elm/Model.hpp>
+#include <swirly/fin/Model.hpp>
 
 namespace swirly {
 namespace sqlite {

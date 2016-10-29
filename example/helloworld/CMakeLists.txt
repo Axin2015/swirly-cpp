@@ -33,4 +33,4 @@ find_package(Swirly REQUIRED)
 include_directories(${SWIRLY_INCLUDE_DIRS})
 
 add_executable(helloworld Main.cpp)
-target_link_libraries(helloworld ${SWIRLY_ASH_LIBRARY})
+target_link_libraries(helloworld ${SWIRLY_UTIL_LIBRARY})

@@ -17,7 +17,7 @@
 #ifndef SWIRLYD_EXCEPTION_HPP
 #define SWIRLYD_EXCEPTION_HPP
 
-#include <swirly/ash/Exception.hpp>
+#include <swirly/util/Exception.hpp>
 
 namespace swirly {
 namespace mg {

@@ -14,18 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/Accnt.hpp>
-#include <swirly/fig/Response.hpp>
-#include <swirly/fig/Serv.hpp>
-#include <swirly/fig/Test.hpp>
+#include <swirly/om/Accnt.hpp>
+#include <swirly/om/Response.hpp>
+#include <swirly/om/Serv.hpp>
+#include <swirly/om/Test.hpp>
 
-#include <swirly/elm/Date.hpp>
+#include <swirly/fin/Date.hpp>
 
-#include <swirly/ash/Conf.hpp>
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/MemPool.hpp>
-#include <swirly/ash/Profile.hpp>
-#include <swirly/ash/Time.hpp>
+#include <swirly/util/Conf.hpp>
+#include <swirly/util/Log.hpp>
+#include <swirly/util/MemPool.hpp>
+#include <swirly/util/Profile.hpp>
+#include <swirly/util/Time.hpp>
 
 using namespace std;
 using namespace swirly;
