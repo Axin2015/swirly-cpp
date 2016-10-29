@@ -19,9 +19,9 @@
 
 #include "Utility.hpp"
 
-#include <swirly/elm/Journ.hpp>
-#include <swirly/elm/MsgHandler.hpp>
-#include <swirly/elm/Transaction.hpp>
+#include <swirly/fin/Journ.hpp>
+#include <swirly/fin/MsgHandler.hpp>
+#include <swirly/fin/Transaction.hpp>
 
 namespace swirly {
 namespace sqlite {

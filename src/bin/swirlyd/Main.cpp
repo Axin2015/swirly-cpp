@@ -16,17 +16,17 @@
  */
 #include "RestServ.hpp"
 
-#include <swirly/fir/Rest.hpp>
+#include <swirly/ws/Rest.hpp>
 
-#include <swirly/elm/Journ.hpp>
-#include <swirly/elm/Model.hpp>
+#include <swirly/fin/Journ.hpp>
+#include <swirly/fin/Model.hpp>
 
-#include <swirly/ash/Conf.hpp>
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/MemPool.hpp>
-#include <swirly/ash/Numeric.hpp>
-#include <swirly/ash/System.hpp>
-#include <swirly/ash/Time.hpp>
+#include <swirly/util/Conf.hpp>
+#include <swirly/util/Log.hpp>
+#include <swirly/util/MemPool.hpp>
+#include <swirly/util/Numeric.hpp>
+#include <swirly/util/System.hpp>
+#include <swirly/util/Time.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"

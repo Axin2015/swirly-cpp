@@ -17,15 +17,15 @@
 
 // Experimental replacement for Mongoose. This is a work in progress.
 
-#include <swirly/fir/HttpHandler.hpp>
-#include <swirly/fir/RestRequest.hpp>
-#include <swirly/fir/Url.hpp>
+#include <swirly/ws/HttpHandler.hpp>
+#include <swirly/ws/RestRequest.hpp>
+#include <swirly/ws/Url.hpp>
 
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/MemPool.hpp>
-#include <swirly/ash/RefCounted.hpp>
-#include <swirly/ash/RingBuffer.hpp>
-#include <swirly/ash/String.hpp>
+#include <swirly/util/Log.hpp>
+#include <swirly/util/MemPool.hpp>
+#include <swirly/util/RefCounted.hpp>
+#include <swirly/util/RingBuffer.hpp>
+#include <swirly/util/String.hpp>
 
 #define BOOST_ASIO_DISABLE_THREADS 1
 #include <boost/asio.hpp>

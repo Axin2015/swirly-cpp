@@ -21,8 +21,8 @@
 
 #include "mongoose.h"
 
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/String.hpp>
+#include <swirly/util/Log.hpp>
+#include <swirly/util/String.hpp>
 
 namespace swirly {
 namespace mg {

@@ -17,10 +17,10 @@
 #ifndef SWIRLY_SQLITE_UTILITY_HPP
 #define SWIRLY_SQLITE_UTILITY_HPP
 
-#include <swirly/ash/Enum.hpp>
-#include <swirly/ash/Finally.hpp>
-#include <swirly/ash/IntWrapper.hpp>
-#include <swirly/ash/Time.hpp>
+#include <swirly/util/Enum.hpp>
+#include <swirly/util/Finally.hpp>
+#include <swirly/util/IntWrapper.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <experimental/string_view>
 

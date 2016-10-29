@@ -16,8 +16,8 @@
  */
 #include "Stream.hpp"
 
-#include <swirly/ash/Stream.hpp>
-#include <swirly/ash/String.hpp>
+#include <swirly/util/Stream.hpp>
+#include <swirly/util/String.hpp>
 
 using namespace std;
 

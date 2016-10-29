@@ -18,9 +18,9 @@
 
 #include "Exception.hpp"
 
-#include <swirly/ash/Conf.hpp>
-#include <swirly/ash/Log.hpp>
-#include <swirly/ash/String.hpp>
+#include <swirly/util/Conf.hpp>
+#include <swirly/util/Log.hpp>
+#include <swirly/util/String.hpp>
 
 #include <cassert>
 

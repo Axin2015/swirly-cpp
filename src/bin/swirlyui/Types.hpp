@@ -17,13 +17,13 @@
 #ifndef SWIRLYUI_TYPES_HPP
 #define SWIRLYUI_TYPES_HPP
 
-#include <swirly/elm/BasicTypes.hpp>
-#include <swirly/elm/Conv.hpp>
-#include <swirly/elm/Limits.hpp>
+#include <swirly/fin/BasicTypes.hpp>
+#include <swirly/fin/Conv.hpp>
+#include <swirly/fin/Limits.hpp>
 
-#include <swirly/ash/BasicTypes.hpp>
-#include <swirly/ash/Enum.hpp>
-#include <swirly/ash/Limits.hpp>
+#include <swirly/util/BasicTypes.hpp>
+#include <swirly/util/Enum.hpp>
+#include <swirly/util/Limits.hpp>
 
 #include <QDate>
 #include <QDebug>

@@ -50,6 +50,6 @@ add_definitions(-DMG_DISABLE_WS_RANDOM_MASK)
 file(GLOB swirlyd_SOURCES "*.cpp")
 
 add_executable(swirlyd ${swirlyd_SOURCES} "${PROJECT_SOURCE_DIR}/contrib/mongoose.c")
-target_link_libraries(swirlyd ${sqlite_LIBRARY} ${fir_LIBRARY}
+target_link_libraries(swirlyd ${ws_LIBRARY} ${sqlite_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY})
 install(TARGETS swirlyd DESTINATION bin)

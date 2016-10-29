@@ -16,9 +16,9 @@
  */
 #include "Journ.hpp"
 
-#include <swirly/elm/Exec.hpp>
+#include <swirly/fin/Exec.hpp>
 
-#include <swirly/ash/Conf.hpp>
+#include <swirly/util/Conf.hpp>
 
 using namespace std;
 

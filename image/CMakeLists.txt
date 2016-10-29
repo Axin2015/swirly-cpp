@@ -21,10 +21,10 @@ if(DOT_EXECUTABLE)
   message(STATUS "Dot found: ${DOT_EXECUTABLE}")
 
   set(names
-    Ash
-    Elm
-    Fig
-    Fir
+    Util
+    Fin
+    Om
+    Ws
   )
 
   foreach(name ${names})

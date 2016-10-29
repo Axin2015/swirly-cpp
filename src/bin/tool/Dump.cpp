@@ -14,18 +14,18 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/elm/Asset.hpp>
-#include <swirly/elm/Contr.hpp>
-#include <swirly/elm/Date.hpp>
-#include <swirly/elm/Exec.hpp>
-#include <swirly/elm/Market.hpp>
-#include <swirly/elm/Model.hpp>
-#include <swirly/elm/Order.hpp>
-#include <swirly/elm/Posn.hpp>
+#include <swirly/fin/Asset.hpp>
+#include <swirly/fin/Contr.hpp>
+#include <swirly/fin/Date.hpp>
+#include <swirly/fin/Exec.hpp>
+#include <swirly/fin/Market.hpp>
+#include <swirly/fin/Model.hpp>
+#include <swirly/fin/Order.hpp>
+#include <swirly/fin/Posn.hpp>
 
-#include <swirly/ash/Conf.hpp>
-#include <swirly/ash/Stream.hpp>
-#include <swirly/ash/Time.hpp>
+#include <swirly/util/Conf.hpp>
+#include <swirly/util/Stream.hpp>
+#include <swirly/util/Time.hpp>
 
 #include <iostream>
 
