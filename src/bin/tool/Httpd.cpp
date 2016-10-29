@@ -22,6 +22,7 @@
 #include <swirly/fir/Url.hpp>
 
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/MemPool.hpp>
 #include <swirly/ash/RefCounted.hpp>
 #include <swirly/ash/RingBuffer.hpp>
 #include <swirly/ash/String.hpp>
@@ -35,10 +36,64 @@
 #include <utility>
 
 using namespace boost;
-using namespace std;
 using namespace swirly;
 
 using asio::ip::tcp;
+
+namespace {
+
+MemPool memPool;
+
+} // anonymous
+
+namespace swirly {
+
+void* alloc(size_t size)
+{
+  return memPool.alloc(size);
+}
+
+void dealloc(void* ptr, size_t size) noexcept
+{
+  return memPool.dealloc(ptr, size);
+}
+
+} // swirly
+
+template <typename FnT>
+class AllocHandler {
+ public:
+  explicit AllocHandler(FnT fn) noexcept : fn_{std::move(fn)} {}
+  ~AllocHandler() noexcept = default;
+
+  // Copy.
+  AllocHandler(const AllocHandler&) = default;
+  AllocHandler& operator=(const AllocHandler&) = default;
+
+  // Move.
+  AllocHandler(AllocHandler&&) = default;
+  AllocHandler& operator=(AllocHandler&&) = default;
+
+  template <typename... ArgsT>
+  void operator()(ArgsT&&... args)
+  {
+    fn_(std::forward<ArgsT>(args)...);
+  }
+  friend void* asio_handler_allocate(std::size_t size, AllocHandler<FnT>*) { return alloc(size); }
+  friend void asio_handler_deallocate(void* pointer, std::size_t size, AllocHandler<FnT>*) noexcept
+  {
+    dealloc(pointer, size);
+  }
+
+ private:
+  FnT fn_;
+};
+
+template <typename FnT>
+auto makeAllocHandler(FnT fn)
+{
+  return AllocHandler<FnT>{std::move(fn)};
+}
 
 class HttpSession;
 using HttpSessionPtr = intrusive_ptr<HttpSession>;
@@ -55,8 +110,8 @@ class HttpMessage : public BasicUrl<HttpMessage> {
     request_.reset();
   }
   void flush() { BasicUrl<HttpMessage>::parse(); }
-  void appendUrl(string_view sv) { url_ += sv; }
-  void appendHeaderField(string_view sv, bool create)
+  void appendUrl(std::string_view sv) { url_ += sv; }
+  void appendHeaderField(std::string_view sv, bool create)
   {
     if (create) {
       headerField_ = sv;
@@ -65,8 +120,8 @@ class HttpMessage : public BasicUrl<HttpMessage> {
       headerValue_ += sv;
     }
   }
-  void appendHeaderValue(string_view sv) { headerValue_ += sv; }
-  void appendBody(string_view sv) { request_.parse(sv); }
+  void appendHeaderValue(std::string_view sv) { headerValue_ += sv; }
+  void appendBody(std::string_view sv) { request_.parse(sv); }
  private:
   // Header fields:
   // Swirly-Time
@@ -126,38 +181,41 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
   {
     SWIRLY_DEBUG("readSome"_sv);
     HttpSessionPtr session{this};
-    socket_.async_read_some(asio::buffer(data_, MaxData), [this, session](auto ec, auto len) {
-      SWIRLY_DEBUG("async_read_some"_sv);
-      if (!ec) {
-        input_ = asio::buffer(data_, len);
-        this->consume();
-        this->resetTimeout();
-      } else if (ec == asio::error::eof) {
-      } else if (ec != asio::error::operation_aborted) {
-        SWIRLY_INFO("read cancelled"_sv);
-      }
-    });
+
+    socket_.async_read_some(asio::buffer(data_, MaxData),
+                            makeAllocHandler([this, session](auto ec, auto len) {
+                              SWIRLY_DEBUG("async_read_some"_sv);
+                              if (!ec) {
+                                input_ = asio::buffer(data_, len);
+                                this->consume();
+                                this->resetTimeout();
+                              } else if (ec == asio::error::eof) {
+                              } else if (ec != asio::error::operation_aborted) {
+                                SWIRLY_INFO("read cancelled"_sv);
+                              }
+                            }));
   }
   void write()
   {
     SWIRLY_DEBUG("write"_sv);
     const auto& data = output_.front();
     HttpSessionPtr session{this};
-    asio::async_write(socket_, asio::buffer(data), [this, session](auto ec, auto len) {
-      SWIRLY_DEBUG("async_write"_sv);
-      if (!ec) {
-        const auto wasFull = output_.full();
-        this->output_.pop();
-        if (!this->output_.empty()) {
-          this->write();
-        }
-        if (wasFull) {
-          this->consume();
-        }
-      } else if (ec != asio::error::operation_aborted) {
-        SWIRLY_WARNING("write cancelled"_sv);
-      }
-    });
+    asio::async_write(socket_, asio::buffer(data),
+                      makeAllocHandler([this, session](auto ec, auto len) {
+                        SWIRLY_DEBUG("async_write"_sv);
+                        if (!ec) {
+                          const auto wasFull = output_.full();
+                          this->output_.pop();
+                          if (!this->output_.empty()) {
+                            this->write();
+                          }
+                          if (wasFull) {
+                            this->consume();
+                          }
+                        } else if (ec != asio::error::operation_aborted) {
+                          SWIRLY_WARNING("write cancelled"_sv);
+                        }
+                      }));
   }
   void resetTimeout()
   {
@@ -177,7 +235,7 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
     });
   }
   bool onMessageBegin() noexcept { return true; }
-  bool onUrl(string_view sv) noexcept
+  bool onUrl(std::string_view sv) noexcept
   {
     bool ret{false};
     try {
@@ -188,12 +246,12 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
     }
     return ret;
   }
-  bool onStatus(string_view sv) noexcept
+  bool onStatus(std::string_view sv) noexcept
   {
     // Only supported for HTTP responses.
     return false;
   }
-  bool onHeaderField(string_view sv, bool create) noexcept
+  bool onHeaderField(std::string_view sv, bool create) noexcept
   {
     bool ret{false};
     try {
@@ -204,7 +262,7 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
     }
     return ret;
   }
-  bool onHeaderValue(string_view sv) noexcept
+  bool onHeaderValue(std::string_view sv) noexcept
   {
     bool ret{false};
     try {
@@ -216,7 +274,7 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
     return ret;
   }
   bool onHeadersEnd() noexcept { return true; }
-  bool onBody(string_view sv) noexcept
+  bool onBody(std::string_view sv) noexcept
   {
     bool ret{false};
     try {
@@ -240,7 +298,7 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
     bool ret{false};
     try {
       message_.flush();
-      const string_view data = Message;
+      const std::string_view data = Message;
       const auto wasEmpty = output_.empty();
       output_.write([data](auto& ref) { ref.assign(data.data(), data.size()); });
       if (wasEmpty) {
@@ -266,7 +324,7 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
   char data_[MaxData];
   boost::asio::const_buffer input_;
   HttpMessage message_;
-  RingBuffer<string> output_{8};
+  RingBuffer<std::string> output_{8};
 };
 
 class HttpServer {
@@ -307,6 +365,7 @@ int main(int argc, char* argv[])
       cerr << "usage: swirly_server <port>\n";
       return 1;
     }
+    memPool.reserve(1 << 20);
     asio::io_service service;
     HttpServer server{service, static_cast<uint16_t>(atoi(argv[1]))};
     service.run();

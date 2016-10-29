@@ -14,8 +14,6 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fig/MemPool.hpp>
-
 #include "RestServ.hpp"
 
 #include <swirly/fir/Rest.hpp>
@@ -25,6 +23,7 @@
 
 #include <swirly/ash/Conf.hpp>
 #include <swirly/ash/Log.hpp>
+#include <swirly/ash/MemPool.hpp>
 #include <swirly/ash/Numeric.hpp>
 #include <swirly/ash/System.hpp>
 #include <swirly/ash/Time.hpp>

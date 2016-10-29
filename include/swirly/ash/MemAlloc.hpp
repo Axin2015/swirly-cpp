@@ -28,7 +28,7 @@ SWIRLY_API void dealloc(void* ptr, std::size_t size) noexcept;
 
 struct MemAlloc {
   static void* operator new(std::size_t size) { return alloc(size); }
-  static void operator delete(void* ptr, std::size_t size) { return dealloc(ptr, size); }
+  static void operator delete(void* ptr, std::size_t size) noexcept { return dealloc(ptr, size); }
 };
 
 } // swirly

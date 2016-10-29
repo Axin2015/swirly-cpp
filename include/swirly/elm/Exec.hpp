@@ -129,6 +129,8 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
   Mnem cpty_;
 };
 
+static_assert(sizeof(Exec) <= 5 * 64, "mempool size exceeded");
+
 inline std::ostream& operator<<(std::ostream& os, const Exec& exec)
 {
   exec.toJson(os);
