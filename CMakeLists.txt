@@ -22,7 +22,6 @@ set(CMAKE_VERBOSE_MAKEFILE 1)
 
 # Configuration options:
 set(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
-set(MG_ENABLE_DEBUG    OFF CACHE BOOL   "Enable Mongoose debug.")
 set(SWIRLY_MAX_LEVELS  3   CACHE STRING "Maximum price levels.")
 
 # Intended for use with Linux Perf:
@@ -63,6 +62,8 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 add_definitions(-DSWIRLY_MAX_LEVELS=${SWIRLY_MAX_LEVELS})
 
 add_definitions(-DBOOST_NO_AUTO_PTR=1 -DBOOST_NO_RTTI=1 -DBOOST_NO_TYPEID=1)
+add_definitions(-DBOOST_ASIO_DISABLE_THREADS=1)
+
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
   add_definitions(-DSWIRLY_ENABLE_DEBUG=1)
 endif()

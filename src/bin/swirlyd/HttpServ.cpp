@@ -14,12 +14,40 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Exception.hpp"
+#include "HttpServ.hpp"
+
+#include "HttpSess.hpp"
+
+using namespace boost;
+using namespace std;
+
+using asio::ip::tcp;
 
 namespace swirly {
-namespace mg {
 
-Error::~Error() noexcept = default;
+HttpServ::HttpServ(asio::io_service& ioServ, uint16_t port, RestServ& restServ)
+  : ioServ_(ioServ), acceptor_{ioServ}, restServ_(restServ)
+{
+  tcp::endpoint endpoint{tcp::v4(), port};
+  acceptor_.open(endpoint.protocol());
+  acceptor_.set_option(tcp::acceptor::reuse_address{true});
+  acceptor_.bind(endpoint);
+  acceptor_.listen();
 
-} // mg
+  asyncAccept();
+}
+
+HttpServ::~HttpServ() noexcept = default;
+
+void HttpServ::asyncAccept()
+{
+  auto sess = makeRefCounted<HttpSess>(ioServ_, restServ_);
+  acceptor_.async_accept(sess->socket(), [this, sess](auto ec) {
+    if (!ec) {
+      sess->start();
+    }
+    this->asyncAccept();
+  });
+}
+
 } // swirly

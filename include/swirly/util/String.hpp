@@ -101,6 +101,21 @@ class String {
   constexpr std::size_t size() const noexcept { return len_; }
   constexpr void clear() noexcept { len_ = 0; }
 
+  void assign(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
+  void append(std::string_view rhs) noexcept { append(rhs.data(), rhs.size()); }
+  template <std::size_t MaxR>
+  String& operator+=(const String<MaxR>& rhs) noexcept
+  {
+    append(rhs.data(), rhs.size());
+    return *this;
+  }
+  String& operator+=(std::string_view rhs) noexcept
+  {
+    append(rhs.data(), rhs.size());
+    return *this;
+  }
+
+ private:
   void assign(const char* rdata, std::size_t rlen) noexcept
   {
     len_ = std::min(rlen, MaxN);
@@ -116,19 +131,6 @@ class String {
       len_ += rlen;
     }
   }
-  template <std::size_t MaxR>
-  String& operator+=(const String<MaxR>& rhs) noexcept
-  {
-    append(rhs.data(), rhs.size());
-    return *this;
-  }
-  String& operator+=(std::string_view rhs) noexcept
-  {
-    append(rhs.data(), rhs.size());
-    return *this;
-  }
-
- private:
   int compare(const char* rdata, std::size_t rlen) const noexcept
   {
     int result{std::memcmp(buf_, rdata, std::min(size(), rlen))};

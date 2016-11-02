@@ -14,29 +14,41 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
+#ifndef SWIRLYD_HTTPSERV_HPP
+#define SWIRLYD_HTTPSERV_HPP
 
-#include <swirly/util/Exception.hpp>
+#include <swirly/util/Defs.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#include <boost/asio.hpp>
+#pragma GCC diagnostic pop
 
 namespace swirly {
-namespace mg {
 
-class Error : public Exception {
+class RestServ;
+
+class HttpServ {
  public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
+  HttpServ(boost::asio::io_service& ioServ, std::uint16_t port, RestServ& restServ);
+  ~HttpServ() noexcept;
 
   // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
+  HttpServ(const HttpServ&) = delete;
+  HttpServ& operator=(const HttpServ&) = delete;
 
   // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
+  HttpServ(HttpServ&&) = delete;
+  HttpServ& operator=(HttpServ&&) = delete;
+
+ private:
+  void asyncAccept();
+
+  boost::asio::io_service& ioServ_;
+  boost::asio::ip::tcp::acceptor acceptor_;
+  RestServ& restServ_;
 };
 
-} // mg
 } // swirly
 
-#endif // SWIRLYD_EXCEPTION_HPP
+#endif // SWIRLYD_HTTPSERV_HPP
