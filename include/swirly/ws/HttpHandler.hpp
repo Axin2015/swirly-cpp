@@ -158,15 +158,26 @@ class BasicHttpHandler {
   static int cbHeaderField(http_parser* parser, const char* at, size_t length) noexcept
   {
     auto* const obj = static_cast<DerivedT*>(parser->data);
-    const bool create{obj->lastHeaderElem_ != Field};
-    obj->lastHeaderElem_ = Field;
-    return obj->onHeaderField({at, length}, create) ? 0 : -1;
+    bool first;
+    if (obj->lastHeaderElem_ != Field) {
+      obj->lastHeaderElem_ = Field;
+      first = true;
+    } else {
+      first = false;
+    }
+    return obj->onHeaderField({at, length}, first) ? 0 : -1;
   }
   static int cbHeaderValue(http_parser* parser, const char* at, size_t length) noexcept
   {
     auto* const obj = static_cast<DerivedT*>(parser->data);
-    obj->lastHeaderElem_ = Value;
-    return static_cast<DerivedT*>(parser->data)->onHeaderValue({at, length}) ? 0 : -1;
+    bool first;
+    if (obj->lastHeaderElem_ != Value) {
+      obj->lastHeaderElem_ = Value;
+      first = true;
+    } else {
+      first = false;
+    }
+    return obj->onHeaderValue({at, length}, first) ? 0 : -1;
   }
   static int cbHeadersEnd(http_parser* parser) noexcept
   {

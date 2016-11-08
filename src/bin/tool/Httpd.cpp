@@ -111,16 +111,16 @@ class HttpMessage : public BasicUrl<HttpMessage> {
   }
   void flush() { BasicUrl<HttpMessage>::parse(); }
   void appendUrl(std::string_view sv) { url_ += sv; }
-  void appendHeaderField(std::string_view sv, bool create)
+  void appendHeaderField(std::string_view sv, bool first)
   {
-    if (create) {
+    if (first) {
       headerField_ = sv;
       headerValue_.clear();
     } else {
       headerValue_ += sv;
     }
   }
-  void appendHeaderValue(std::string_view sv) { headerValue_ += sv; }
+  void appendHeaderValue(std::string_view sv, bool first) { headerValue_ += sv; }
   void appendBody(std::string_view sv) { request_.parse(sv); }
  private:
   // Header fields:
@@ -251,22 +251,22 @@ class HttpSession : public RefCounted<HttpSession>, public BasicHttpHandler<Http
     // Only supported for HTTP responses.
     return false;
   }
-  bool onHeaderField(std::string_view sv, bool create) noexcept
+  bool onHeaderField(std::string_view sv, bool first) noexcept
   {
     bool ret{false};
     try {
-      message_.appendHeaderField(sv, create);
+      message_.appendHeaderField(sv, first);
       ret = true;
     } catch (const std::exception& e) {
       SWIRLY_ERROR(logMsg() << "exception: " << e.what());
     }
     return ret;
   }
-  bool onHeaderValue(std::string_view sv) noexcept
+  bool onHeaderValue(std::string_view sv, bool first) noexcept
   {
     bool ret{false};
     try {
-      message_.appendHeaderValue(sv);
+      message_.appendHeaderValue(sv, first);
       ret = true;
     } catch (const std::exception& e) {
       SWIRLY_ERROR(logMsg() << "exception: " << e.what());
