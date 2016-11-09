@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_SYSTEM_HPP
-#define SWIRLY_ASH_SYSTEM_HPP
+#ifndef SWIRLY_UTIL_SYSTEM_HPP
+#define SWIRLY_UTIL_SYSTEM_HPP
 
 #include <swirly/util/Defs.hpp>
 
@@ -35,4 +35,4 @@ SWIRLY_API mode_t fileMode() noexcept;
 
 } // swirly
 
-#endif // SWIRLY_ASH_SYSTEM_HPP
+#endif // SWIRLY_UTIL_SYSTEM_HPP
