@@ -30,7 +30,7 @@ class TestCase(RestTestCase):
 
   def getAll(self, client):
     client.setAnon()
-    resp = client.send('GET', '/ref/asset')
+    resp = client.send('GET', '/refdata/asset')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -63,7 +63,7 @@ class TestCase(RestTestCase):
 
   def getByMnem(self, client):
     client.setAnon()
-    resp = client.send('GET', '/ref/asset/EUR')
+    resp = client.send('GET', '/refdata/asset/EUR')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

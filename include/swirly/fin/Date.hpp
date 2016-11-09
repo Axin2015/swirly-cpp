@@ -45,6 +45,7 @@ constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
 class SWIRLY_API BusinessDay {
  public:
   explicit BusinessDay(int rollHour, const char* timeZone);
+  ~BusinessDay() noexcept;
 
   // Copy.
   BusinessDay(const BusinessDay& rhs) noexcept;

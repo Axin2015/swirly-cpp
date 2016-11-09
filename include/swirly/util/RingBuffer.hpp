@@ -46,6 +46,9 @@ class RingBuffer {
   std::size_t size() const noexcept { return wpos_ - rpos_; }
   const ValueT& front() const noexcept { return buf_[rpos_ & mask_]; }
   const ValueT& back() const noexcept { return buf_[wpos_ & mask_]; }
+
+  ValueT& front() noexcept { return buf_[rpos_ & mask_]; }
+  ValueT& back() noexcept { return buf_[wpos_ & mask_]; }
   void clear() noexcept { rpos_ = wpos_ = 0; }
   void pop() noexcept { ++rpos_; }
   void push(const ValueT& val)

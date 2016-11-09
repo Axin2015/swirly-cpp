@@ -34,6 +34,8 @@ BusinessDay::BusinessDay(int rollHour, const char* tzname)
 {
 }
 
+BusinessDay::~BusinessDay() noexcept = default;
+
 // Copy.
 BusinessDay::BusinessDay(const BusinessDay& rhs) noexcept = default;
 BusinessDay& BusinessDay::operator=(const BusinessDay& rhs) = default;

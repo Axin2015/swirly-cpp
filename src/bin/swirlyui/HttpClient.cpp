@@ -126,7 +126,7 @@ Contr HttpClient::findContr(const QJsonObject& obj) const
 
 void HttpClient::getRefData()
 {
-  QNetworkRequest request{QUrl{"http://127.0.0.1:8080/ref"}};
+  QNetworkRequest request{QUrl{"http://127.0.0.1:8080/refdata"}};
   request.setAttribute(QNetworkRequest::User, GetRefData);
   request.setRawHeader("Swirly-Accnt", "MARAYL");
   request.setRawHeader("Swirly-Perm", "2");

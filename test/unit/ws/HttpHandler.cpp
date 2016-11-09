@@ -69,16 +69,16 @@ class HttpHandler : public BasicHttpHandler<HttpHandler>, public BasicUrl<HttpHa
     status_.append(sv.data(), sv.size());
     return true;
   }
-  bool onHeaderField(string_view sv, bool create) noexcept
+  bool onHeaderField(string_view sv, bool first) noexcept
   {
-    if (create) {
+    if (first) {
       headers_.emplace_back(string{sv.data(), sv.size()}, "");
     } else {
       headers_.back().first.append(sv.data(), sv.size());
     }
     return true;
   }
-  bool onHeaderValue(string_view sv) noexcept
+  bool onHeaderValue(string_view sv, bool first) noexcept
   {
     headers_.back().second.append(sv.data(), sv.size());
     return true;
