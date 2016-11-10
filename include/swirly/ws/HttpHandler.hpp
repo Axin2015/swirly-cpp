@@ -70,6 +70,11 @@ inline const char* enumString(HttpMethod method)
   return http_method_str(static_cast<http_method>(method));
 }
 
+inline std::ostream& operator<<(std::ostream& os, HttpMethod method)
+{
+  return os << enumString(method);
+}
+
 enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
 
 template <typename DerivedT>
