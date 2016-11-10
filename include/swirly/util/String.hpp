@@ -307,6 +307,8 @@ void setCString(char (&lhs)[SizeN], std::string_view rhs) noexcept
   setCString(lhs, rhs.data(), rhs.size());
 }
 
+SWIRLY_API uint16_t stou16(std::string_view sv) noexcept;
+
 SWIRLY_API uint32_t stou32(std::string_view sv) noexcept;
 
 SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
