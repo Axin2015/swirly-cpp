@@ -32,29 +32,29 @@ using AccntPosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
 SWIRLY_TEST_CASE(AccntPosnSet)
 {
-  constexpr auto settlDay = ymdToJd(2014, 2, 14);
-  constexpr auto marketId = toMarketId(1_id32, settlDay);
+  constexpr auto SettlDay = ymdToJd(2014, 2, 14);
+  constexpr auto MarketId = toMarketId(1_id32, SettlDay);
 
   AccntPosnSet s;
 
   PosnPtr posn1{
-    &*s.emplace(marketId, "EURUSD"_sv, settlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
+    &*s.emplace(MarketId, "EURUSD"_sv, SettlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn1->refs() == 2);
   SWIRLY_CHECK(posn1->contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(posn1->settlDay() == settlDay);
-  SWIRLY_CHECK(s.find(marketId) != s.end());
+  SWIRLY_CHECK(posn1->settlDay() == SettlDay);
+  SWIRLY_CHECK(s.find(MarketId) != s.end());
 
   // Duplicate.
   PosnPtr posn2{
-    &*s.emplace(marketId, "EURUSD"_sv, settlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
+    &*s.emplace(MarketId, "EURUSD"_sv, SettlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn2->refs() == 3);
   SWIRLY_CHECK(posn2 == posn1);
 
   // Replace.
   PosnPtr posn3{
-    &*s.emplaceOrReplace(marketId, "EURUSD"_sv, settlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
+    &*s.emplaceOrReplace(MarketId, "EURUSD"_sv, SettlDay, "MARAYL"_sv, 0_lts, 0_cst, 0_lts, 0_cst)};
   SWIRLY_CHECK(posn3->refs() == 2);
   SWIRLY_CHECK(posn3 != posn1);
   SWIRLY_CHECK(posn3->contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(posn3->settlDay() == settlDay);
+  SWIRLY_CHECK(posn3->settlDay() == SettlDay);
 }
