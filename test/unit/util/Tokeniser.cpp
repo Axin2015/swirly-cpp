@@ -22,17 +22,17 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(TokeniserEmpty)
 {
-  Tokeniser<','> toks;
+  Tokeniser toks;
 
   SWIRLY_CHECK(toks.empty());
 
-  toks = Tokeniser<','>{""_sv};
+  toks = Tokeniser{""_sv, ","_sv};
   SWIRLY_CHECK(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserDelim)
+SWIRLY_TEST_CASE(TokeniserMultiEmpty)
 {
-  Tokeniser<','> toks{","_sv};
+  Tokeniser toks{","_sv, ","_sv};
 
   SWIRLY_CHECK(toks.top().empty());
 
@@ -40,9 +40,9 @@ SWIRLY_TEST_CASE(TokeniserDelim)
   SWIRLY_CHECK(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserSingle)
+SWIRLY_TEST_CASE(TokeniserSingleValue)
 {
-  Tokeniser<','> toks{"foo"_sv};
+  Tokeniser toks{"foo"_sv, ","_sv};
 
   SWIRLY_CHECK(toks.top() == "foo");
 
@@ -50,9 +50,25 @@ SWIRLY_TEST_CASE(TokeniserSingle)
   SWIRLY_CHECK(toks.empty());
 }
 
-SWIRLY_TEST_CASE(TokeniserMany)
+SWIRLY_TEST_CASE(TokeniserMultiValue)
 {
-  Tokeniser<','> toks{"foo,bar,baz"_sv};
+  Tokeniser toks{"foo,bar,baz"_sv, ","_sv};
+
+  SWIRLY_CHECK(toks.top() == "foo");
+
+  toks.pop();
+  SWIRLY_CHECK(toks.top() == "bar");
+
+  toks.pop();
+  SWIRLY_CHECK(toks.top() == "baz");
+
+  toks.pop();
+  SWIRLY_CHECK(toks.empty());
+}
+
+SWIRLY_TEST_CASE(TokeniserMultiDelim)
+{
+  Tokeniser toks{"foo,bar;baz"_sv, ",;"_sv};
 
   SWIRLY_CHECK(toks.top() == "foo");
 
@@ -68,7 +84,7 @@ SWIRLY_TEST_CASE(TokeniserMany)
 
 SWIRLY_TEST_CASE(TokeniserLeading)
 {
-  Tokeniser<','> toks{",foo"_sv};
+  Tokeniser toks{",foo"_sv, ","_sv};
 
   SWIRLY_CHECK(toks.top().empty());
 
@@ -81,7 +97,7 @@ SWIRLY_TEST_CASE(TokeniserLeading)
 
 SWIRLY_TEST_CASE(TokeniserTrailing)
 {
-  Tokeniser<','> toks{"foo,"_sv};
+  Tokeniser toks{"foo,"_sv, ","_sv};
 
   SWIRLY_CHECK(toks.top() == "foo");
 

@@ -81,7 +81,7 @@ class RestServ : public mg::Mgr<RestServ> {
 
   Rest& rest_;
   int state_{0};
-  Tokeniser<'/'> uri_;
+  Tokeniser uri_;
   std::vector<Id64> ids_;
   std::vector<Mnem> mnems_;
   RestRequest request_;

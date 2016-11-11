@@ -23,11 +23,10 @@
 
 namespace swirly {
 
-template <char DelimN>
 class Tokeniser {
  public:
-  explicit Tokeniser(std::string_view buf) noexcept { reset(buf); }
-  explicit Tokeniser() noexcept { reset(""); }
+  Tokeniser(std::string_view buf, std::string_view toks) noexcept { reset(buf, toks); }
+  Tokeniser() noexcept { reset(""_sv, ""_sv); }
   ~Tokeniser() noexcept = default;
 
   // Copy.
@@ -40,17 +39,18 @@ class Tokeniser {
 
   std::string_view top() const noexcept { return buf_.substr(i_ - buf_.cbegin(), j_ - i_); }
   bool empty() const noexcept { return i_ == buf_.cend(); }
-  void reset(std::string_view buf) noexcept
+  void reset(std::string_view buf, std::string_view toks) noexcept
   {
     buf_ = buf;
+    toks_ = toks;
     i_ = buf_.cbegin();
-    j_ = std::find(i_, buf_.cend(), DelimN);
+    j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
   }
   void pop() noexcept
   {
     if (j_ != buf_.cend()) {
       i_ = j_ + 1;
-      j_ = std::find(i_, buf_.cend(), DelimN);
+      j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
     } else {
       i_ = j_;
     }
@@ -58,6 +58,7 @@ class Tokeniser {
 
  private:
   std::string_view buf_;
+  std::string_view toks_;
   std::string_view::const_iterator i_, j_;
 };
 
