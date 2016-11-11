@@ -37,7 +37,7 @@ class ScopedIds {
  public:
   ScopedIds(string_view sv, vector<Id64>& ids) noexcept : ids_{ids}
   {
-    Tokeniser<','> toks{sv};
+    Tokeniser toks{sv, ","_sv};
     while (!toks.empty()) {
       ids.push_back(static_cast<Id64>(stou64(toks.top())));
       toks.pop();
@@ -127,7 +127,7 @@ bool RestServ::reset(HttpMessage data) noexcept
   if (uri.front() == '/') {
     uri.remove_prefix(1);
   }
-  uri_.reset(uri);
+  uri_.reset(uri, "/"_sv);
 
   const auto method = data.method();
   if (method == "GET"_sv) {

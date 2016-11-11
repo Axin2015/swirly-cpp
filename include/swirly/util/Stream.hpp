@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_STREAM_HPP
-#define SWIRLY_ASH_STREAM_HPP
+#ifndef SWIRLY_UTIL_STREAM_HPP
+#define SWIRLY_UTIL_STREAM_HPP
 
 #include <swirly/util/Defs.hpp>
 
@@ -138,4 +138,4 @@ class SWIRLY_API OStreamJoiner {
 
 } // swirly
 
-#endif // SWIRLY_ASH_STREAM_HPP
+#endif // SWIRLY_UTIL_STREAM_HPP

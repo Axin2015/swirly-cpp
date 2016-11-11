@@ -43,6 +43,11 @@ ValueT stou(string_view sv) noexcept
 
 } // anonymous
 
+uint16_t stou16(string_view sv) noexcept
+{
+  return stou<uint16_t>(sv);
+}
+
 uint32_t stou32(string_view sv) noexcept
 {
   return stou<uint32_t>(sv);

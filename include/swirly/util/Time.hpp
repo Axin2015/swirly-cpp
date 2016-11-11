@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_TIME_HPP
-#define SWIRLY_ASH_TIME_HPP
+#ifndef SWIRLY_UTIL_TIME_HPP
+#define SWIRLY_UTIL_TIME_HPP
 
 #include <swirly/util/Defs.hpp>
 
@@ -75,4 +75,4 @@ SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);
 
 } // swirly
 
-#endif // SWIRLY_ASH_TIME_HPP
+#endif // SWIRLY_UTIL_TIME_HPP

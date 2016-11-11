@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_STRING_HPP
-#define SWIRLY_ASH_STRING_HPP
+#ifndef SWIRLY_UTIL_STRING_HPP
+#define SWIRLY_UTIL_STRING_HPP
 
 #include <swirly/util/Compare.hpp>
 #include <swirly/util/Defs.hpp>
@@ -307,6 +307,8 @@ void setCString(char (&lhs)[SizeN], std::string_view rhs) noexcept
   setCString(lhs, rhs.data(), rhs.size());
 }
 
+SWIRLY_API uint16_t stou16(std::string_view sv) noexcept;
+
 SWIRLY_API uint32_t stou32(std::string_view sv) noexcept;
 
 SWIRLY_API uint64_t stou64(std::string_view sv) noexcept;
@@ -376,4 +378,4 @@ SWIRLY_API std::pair<std::string, std::string> splitPair(const std::string& s, c
 
 } // swirly
 
-#endif // SWIRLY_ASH_STRING_HPP
+#endif // SWIRLY_UTIL_STRING_HPP

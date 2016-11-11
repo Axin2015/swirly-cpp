@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_VARSUB_HPP
-#define SWIRLY_ASH_VARSUB_HPP
+#ifndef SWIRLY_UTIL_VARSUB_HPP
+#define SWIRLY_UTIL_VARSUB_HPP
 
 #include <swirly/util/Defs.hpp>
 
@@ -69,4 +69,4 @@ class SWIRLY_API VarSub {
 
 } // swirly
 
-#endif // SWIRLY_ASH_VARSUB_HPP
+#endif // SWIRLY_UTIL_VARSUB_HPP

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WS_HTTPPARSER_HPP
-#define SWIRLY_WS_HTTPPARSER_HPP
+#ifndef SWIRLY_WS_HTTPHANDLER_HPP
+#define SWIRLY_WS_HTTPHANDLER_HPP
 
 #include <swirly/ws/Exception.hpp>
 
@@ -68,6 +68,11 @@ enum class HttpMethod : int {
 inline const char* enumString(HttpMethod method)
 {
   return http_method_str(static_cast<http_method>(method));
+}
+
+inline std::ostream& operator<<(std::ostream& os, HttpMethod method)
+{
+  return os << enumString(method);
 }
 
 enum class HttpType : int { Request = HTTP_REQUEST, Response = HTTP_RESPONSE };
@@ -207,4 +212,4 @@ class BasicHttpHandler {
 
 } // swirly
 
-#endif // SWIRLY_WS_HTTPPARSER_HPP
+#endif // SWIRLY_WS_HTTPHANDLER_HPP

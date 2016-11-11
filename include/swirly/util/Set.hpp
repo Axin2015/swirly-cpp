@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_ASH_SET_HPP
-#define SWIRLY_ASH_SET_HPP
+#ifndef SWIRLY_UTIL_SET_HPP
+#define SWIRLY_UTIL_SET_HPP
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Mnem.hpp>
@@ -278,4 +278,4 @@ class MnemSet {
 
 } // swirly
 
-#endif // SWIRLY_ASH_SET_HPP
+#endif // SWIRLY_UTIL_SET_HPP
