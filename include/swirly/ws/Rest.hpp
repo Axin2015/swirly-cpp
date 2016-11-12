@@ -18,16 +18,9 @@
 #define SWIRLY_WS_REST_HPP
 
 #include <swirly/ws/EntitySet.hpp>
+#include <swirly/ws/Page.hpp>
 
 #include <swirly/om/Serv.hpp>
-
-#include <experimental/optional>
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-using experimental::nullopt;
-}
 
 namespace swirly {
 
@@ -59,8 +52,7 @@ class SWIRLY_API Rest {
 
   void getContr(Mnem mnem, Time now, std::ostream& out) const;
 
-  void getAccnt(Mnem mnem, EntitySet es, std::size_t offset, std::optional<std::size_t> limit,
-                Time now, std::ostream& out) const;
+  void getAccnt(Mnem mnem, EntitySet es, Page page, Time now, std::ostream& out) const;
 
   void getMarket(Time now, std::ostream& out) const;
 
@@ -78,8 +70,7 @@ class SWIRLY_API Rest {
   void getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
                 std::ostream& out) const;
 
-  void getExec(Mnem accntMnem, std::size_t offset, std::optional<std::size_t> limit, Time now,
-               std::ostream& out) const;
+  void getExec(Mnem accntMnem, Page page, Time now, std::ostream& out) const;
 
   void getTrade(Mnem accntMnem, Time now, std::ostream& out) const;
 

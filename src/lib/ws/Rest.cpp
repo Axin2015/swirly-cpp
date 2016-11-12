@@ -39,18 +39,18 @@ void getOrder(const Accnt& accnt, ostream& out)
   out << ']';
 }
 
-void getExec(const Accnt& accnt, size_t offset, optional<size_t> limit, ostream& out)
+void getExec(const Accnt& accnt, Page page, ostream& out)
 {
   const auto& execs = accnt.execs();
   out << '[';
   const auto size = execs.size();
-  if (offset < size) {
+  if (page.offset < size) {
     auto first = execs.begin();
-    advance(first, offset);
+    advance(first, page.offset);
     decltype(first) last;
-    if (limit && *limit < size - offset) {
+    if (page.limit && *page.limit < size - page.offset) {
       last = first;
-      advance(last, *limit);
+      advance(last, *page.limit);
     } else {
       last = execs.end();
     }
@@ -150,8 +150,7 @@ void Rest::getContr(Mnem mnem, Time now, ostream& out) const
   out << *it;
 }
 
-void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> limit, Time now,
-                    ostream& out) const
+void Rest::getAccnt(Mnem mnem, EntitySet es, Page page, Time now, ostream& out) const
 {
   const auto& accnt = serv_.accnt(mnem);
   int i{0};
@@ -174,7 +173,7 @@ void Rest::getAccnt(Mnem mnem, EntitySet es, size_t offset, optional<size_t> lim
       out << ',';
     }
     out << "\"execs\":";
-    detail::getExec(accnt, offset, limit, out);
+    detail::getExec(accnt, page, out);
     ++i;
   }
   if (es.trade()) {
@@ -260,10 +259,9 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
   out << *it;
 }
 
-void Rest::getExec(Mnem accntMnem, size_t offset, optional<size_t> limit, Time now,
-                   ostream& out) const
+void Rest::getExec(Mnem accntMnem, Page page, Time now, ostream& out) const
 {
-  detail::getExec(serv_.accnt(accntMnem), offset, limit, out);
+  detail::getExec(serv_.accnt(accntMnem), page, out);
 }
 
 void Rest::getTrade(Mnem accntMnem, Time now, ostream& out) const

@@ -442,7 +442,7 @@ void RestServ::accntRequest(HttpMessage data, Time now)
       state_ |= MatchMethod;
       const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec | EntitySet::Trade
         | EntitySet::Posn;
-      rest_.getAccnt(getTrader(data), es, getOffset(data), getLimit(data), now, out_);
+      rest_.getAccnt(getTrader(data), es, {getOffset(data), getLimit(data)}, now, out_);
     }
     return;
   }
@@ -461,7 +461,7 @@ void RestServ::accntRequest(HttpMessage data, Time now)
       if (isSet(MethodGet)) {
         // GET /accnt/entity,entity...
         state_ |= MatchMethod;
-        rest_.getAccnt(getTrader(data), es, getOffset(data), getLimit(data), now, out_);
+        rest_.getAccnt(getTrader(data), es, {getOffset(data), getLimit(data)}, now, out_);
       }
     }
     return;
@@ -629,7 +629,7 @@ void RestServ::execRequest(HttpMessage data, Time now)
     if (isSet(MethodGet)) {
       // GET /accnt/exec
       state_ |= MatchMethod;
-      rest_.getExec(getTrader(data), getOffset(data), getLimit(data), now, out_);
+      rest_.getExec(getTrader(data), {getOffset(data), getLimit(data)}, now, out_);
     }
     return;
   }
