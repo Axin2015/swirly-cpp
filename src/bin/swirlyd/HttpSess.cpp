@@ -19,7 +19,6 @@
 #include "HttpResponse.hpp"
 #include "RestServ.hpp"
 
-#include <swirly/util/Log.hpp>
 #include <swirly/util/MemAlloc.hpp>
 
 using namespace boost;
@@ -69,22 +68,21 @@ HttpSess::~HttpSess() noexcept = default;
 
 void HttpSess::start()
 {
+  SWIRLY_INFO(logMsg() << "start session");
   asyncReadSome();
   resetTimeout();
 }
 
 void HttpSess::stop() noexcept
 {
-  try {
-    system::error_code e;
-    // Any asynchronous send, receive or connect operations will be cancelled immediately, and will
-    // complete with the asio::error::operation_aborted error.
-    sock_.close(e);
-    // Cancelling timers should result in a zero reference count and destruction.
-    timeout_.cancel(e);
-  } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
-  }
+  SWIRLY_INFO(logMsg() << "stop session");
+
+  system::error_code ec;
+  // Any asynchronous send, receive or connect operations will be cancelled immediately, and will
+  // complete with the asio::error::operation_aborted error.
+  sock_.close(ec);
+  // Cancelling timers should result in a zero reference count and destruction.
+  timeout_.cancel(ec);
 }
 
 void HttpSess::parse()
@@ -106,8 +104,8 @@ void HttpSess::resetTimeout()
 {
   // Timeout timer fires when client is idle. The client is expected to send regular heartbeats to
   // prevent this.
-  system::error_code e;
-  timeout_.cancel(e);
+  system::error_code ec;
+  timeout_.cancel(ec);
   timeout_.expires_from_now(posix_time::seconds{IdleTimeout});
 
   HttpSessPtr session{this};
@@ -115,9 +113,9 @@ void HttpSess::resetTimeout()
     if (!ec) {
       this->stop();
     } else if (ec == asio::error::operation_aborted) {
-      SWIRLY_INFO("timer cancelled"_sv);
+      SWIRLY_DEBUG(this->logMsg() << "timer cancelled");
     } else {
-      SWIRLY_ERROR(logMsg() << "exception: " << ec);
+      SWIRLY_ERROR(this->logMsg() << "exception on async timeout: " << ec);
       this->stop();
     }
   });
@@ -129,11 +127,12 @@ void HttpSess::asyncReadSome()
   auto fn = [this, session](auto ec, auto len) {
     if (!ec) {
       this->onReadSome(len);
-    } else if (ec == asio::error::eof) {
     } else if (ec == asio::error::operation_aborted) {
-      SWIRLY_INFO("read cancelled"_sv);
+      SWIRLY_INFO(this->logMsg() << "read cancelled");
     } else {
-      SWIRLY_ERROR(logMsg() << "exception: " << ec);
+      if (ec != asio::error::eof) {
+        SWIRLY_ERROR(this->logMsg() << "exception on async read: " << ec);
+      }
       this->stop();
     }
   };
@@ -148,9 +147,9 @@ void HttpSess::asyncWrite()
     if (!ec) {
       this->onWrite();
     } else if (ec == asio::error::operation_aborted) {
-      SWIRLY_WARNING("write cancelled"_sv);
+      SWIRLY_WARNING(this->logMsg() << "write cancelled");
     } else {
-      SWIRLY_ERROR(logMsg() << "exception: " << ec);
+      SWIRLY_ERROR(this->logMsg() << "exception on async write: " << ec);
       this->stop();
     }
   };
@@ -164,7 +163,7 @@ void HttpSess::onReadSome(size_t len) noexcept
     parse();
     resetTimeout();
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling read: " << e.what());
     stop();
   }
 }
@@ -181,7 +180,7 @@ void HttpSess::onWrite() noexcept
       parse();
     }
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling write: " << e.what());
     stop();
   }
 }
@@ -193,7 +192,7 @@ bool HttpSess::onUrl(string_view sv) noexcept
     req_.appendUrl(sv);
     ret = true;
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling url: " << e.what());
     pause();
     stop();
   }
@@ -207,7 +206,7 @@ bool HttpSess::onHeaderField(string_view sv, bool first) noexcept
     req_.appendHeaderField(sv, first);
     ret = true;
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling header field: " << e.what());
     pause();
     stop();
   }
@@ -221,7 +220,7 @@ bool HttpSess::onHeaderValue(string_view sv, bool first) noexcept
     req_.appendHeaderValue(sv, first);
     ret = true;
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling header value: " << e.what());
     pause();
     stop();
   }
@@ -241,7 +240,7 @@ bool HttpSess::onBody(string_view sv) noexcept
     req_.appendBody(sv);
     ret = true;
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling body: " << e.what());
     pause();
     stop();
   }
@@ -268,7 +267,7 @@ bool HttpSess::onMessageEnd() noexcept
     }
     ret = true;
   } catch (const std::exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    SWIRLY_ERROR(logMsg() << "exception handling message: " << e.what());
     pause();
     stop();
   }

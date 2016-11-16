@@ -21,6 +21,7 @@
 
 #include <swirly/ws/HttpHandler.hpp>
 
+#include <swirly/util/Log.hpp>
 #include <swirly/util/RefCounted.hpp>
 #include <swirly/util/RingBuffer.hpp>
 
@@ -57,9 +58,17 @@ class HttpSess : public RefCounted<HttpSess>, public BasicHttpHandler<HttpSess> 
   HttpSess(HttpSess&&) = delete;
   HttpSess& operator=(HttpSess&&) = delete;
 
+  LogMsg& logMsg() noexcept
+  {
+    auto& ref = swirly::logMsg();
+    boost::system::error_code ec;
+    ref << '<' << sock_.remote_endpoint(ec) << "> ";
+    return ref;
+  }
+
   void start();
   void stop() noexcept;
-  auto& socket() { return sock_; }
+  auto& socket() noexcept { return sock_; }
 
  private:
   void parse();
