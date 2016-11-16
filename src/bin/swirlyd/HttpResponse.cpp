@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Stream.hpp"
+#include "HttpResponse.hpp"
 
 #include <swirly/util/Stream.hpp>
 #include <swirly/util/String.hpp>
@@ -22,57 +22,34 @@
 using namespace std;
 
 namespace swirly {
-namespace mg {
 
-StreamBuf::StreamBuf(mbuf& buf) throw(bad_alloc) : buf_(buf)
+HttpResponseBuf::~HttpResponseBuf() noexcept = default;
+
+void HttpResponseBuf::setContentLength(size_t pos, size_t len) noexcept
 {
-  if (!buf_.buf) {
-    // Pre-allocate buffer.
-    mbuf_init(&buf_, 4096);
-    if (!buf_.buf) {
-      throw bad_alloc{};
-    }
-  }
-}
-
-StreamBuf::~StreamBuf() noexcept = default;
-
-void StreamBuf::reset() noexcept
-{
-  buf_.len = 0;
-}
-
-void StreamBuf::setContentLength(size_t pos, size_t len) noexcept
-{
-  char* ptr{buf_.buf + pos};
+  auto it = buf_.begin() + pos;
   do {
-    --ptr;
-    *ptr = '0' + len % 10;
+    --it;
+    *it = '0' + len % 10;
     len /= 10;
   } while (len > 0);
 }
 
-StreamBuf::int_type StreamBuf::overflow(int_type c) noexcept
+HttpResponseBuf::int_type HttpResponseBuf::overflow(int_type c) noexcept
 {
   if (c != traits_type::eof()) {
-    const char z = c;
-    if (mbuf_append(&buf_, &z, 1) != 1) {
-      c = traits_type::eof();
-    }
+    buf_ += c;
   }
   return c;
 }
 
-streamsize StreamBuf::xsputn(const char_type* s, streamsize count) noexcept
+streamsize HttpResponseBuf::xsputn(const char_type* s, streamsize count) noexcept
 {
-  return mbuf_append(&buf_, s, count);
+  buf_.append(s, count);
+  return count;
 }
 
-OStream::OStream() : ostream{nullptr}
-{
-}
-
-OStream::~OStream() noexcept = default;
+HttpResponse::~HttpResponse() noexcept = default;
 
 // All 1xx (informational), 204 (no content), and 304 (not modified) responses must not include a
 // body.
@@ -81,9 +58,9 @@ constexpr bool withBody(int status) noexcept
   return !((status >= 100 && status < 200) || status == 204 || status == 304);
 }
 
-void OStream::reset(int status, const char* reason, bool cache) noexcept
+void HttpResponse::reset(int status, const char* reason, bool cache)
 {
-  rdbuf()->reset();
+  buf_.reset();
   swirly::reset(*this);
 
   *this << "HTTP/1.1 " << status << ' ' << reason;
@@ -105,12 +82,11 @@ void OStream::reset(int status, const char* reason, bool cache) noexcept
   headSize_ = size();
 }
 
-void OStream::setContentLength() noexcept
+void HttpResponse::setContentLength() noexcept
 {
   if (lengthAt_ > 0) {
-    rdbuf()->setContentLength(lengthAt_, size() - headSize_);
+    buf_.setContentLength(lengthAt_, size() - headSize_);
   }
 }
 
-} // mg
 } // swirly

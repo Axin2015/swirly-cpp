@@ -14,29 +14,32 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYD_EXCEPTION_HPP
-#define SWIRLYD_EXCEPTION_HPP
+#ifndef SWIRLY_WS_PAGE_HPP
+#define SWIRLY_WS_PAGE_HPP
 
-#include <swirly/util/Exception.hpp>
+#include <swirly/util/Defs.hpp>
+
+#include <experimental/optional>
+#include <experimental/string_view>
+
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+using experimental::string_view;
+}
 
 namespace swirly {
-namespace mg {
 
-class Error : public Exception {
- public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
-
-  // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
-
-  // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
+struct Page {
+  std::size_t offset{0};
+  std::optional<std::size_t> limit;
 };
 
-} // mg
+// Parse Page arguments from URL Query String. Note that special characters and percent encodings
+// are not supported for simplicity.
+SWIRLY_API Page parseQuery(std::string_view query) noexcept;
+
 } // swirly
 
-#endif // SWIRLYD_EXCEPTION_HPP
+#endif // SWIRLY_WS_PAGE_HPP

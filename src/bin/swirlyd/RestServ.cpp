@@ -16,21 +16,21 @@
  */
 #include "RestServ.hpp"
 
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
+
 #include <swirly/ws/Rest.hpp>
 
 #include <swirly/fin/Exception.hpp>
 
 #include <swirly/util/Finally.hpp>
 #include <swirly/util/Log.hpp>
-#include <swirly/util/Numeric.hpp>
-#include <swirly/util/Time.hpp>
 
 #include <chrono>
 
 using namespace std;
 
 namespace swirly {
-namespace mg {
 namespace {
 
 class ScopedIds {
@@ -49,207 +49,166 @@ class ScopedIds {
   vector<Id64>& ids_;
 };
 
-Time getTime(HttpMessage data) noexcept
+Time getTime(const HttpRequest& req) noexcept
 {
-  const string_view val{data.header("Swirly-Time")};
+  const string_view val{req.time()};
   return val.empty() ? UnixClock::now() : msToTime(stou64(val));
 }
 
-string_view getAccnt(HttpMessage data)
+string_view getAccnt(const HttpRequest& req)
 {
-  const string_view accnt{data.header("Swirly-Accnt")};
+  const string_view accnt{req.accnt()};
   if (accnt.empty()) {
     throw UnauthorizedException{"user account not specified"_sv};
   }
   return accnt;
 }
 
-uint32_t getPerm(HttpMessage data)
+uint32_t getPerm(const HttpRequest& req)
 {
-  return stou32(data.header("Swirly-Perm"));
+  return stou32(req.perm());
 }
 
-string_view getAdmin(HttpMessage data)
+string_view getAdmin(const HttpRequest& req)
 {
-  const auto accnt = getAccnt(data);
-  const auto perm = getPerm(data);
+  const auto accnt = getAccnt(req);
+  const auto perm = getPerm(req);
   if (!(perm & 0x1)) {
     throw ForbiddenException{"user account does not have admin permission "_sv};
   }
   return accnt;
 }
 
-string_view getTrader(HttpMessage data)
+string_view getTrader(const HttpRequest& req)
 {
-  const auto accnt = getAccnt(data);
-  const auto perm = getPerm(data);
+  const auto accnt = getAccnt(req);
+  const auto perm = getPerm(req);
   if (!(perm & 0x2)) {
     throw ForbiddenException{"user account does not have trade permission "_sv};
   }
   return accnt;
 }
 
-auto getOffset(HttpMessage data)
-{
-  size_t offset{0};
-  if (!data.queryString().empty()) {
-    char value[20];
-    if (data.getVar("offset", value)) {
-      offset = numericCast<size_t>(value);
-    }
-  }
-  return offset;
-}
-
-auto getLimit(HttpMessage data)
-{
-  optional<size_t> limit;
-  if (!data.queryString().empty()) {
-    char value[20];
-    if (data.getVar("limit", value)) {
-      limit = numericCast<size_t>(value);
-    }
-  }
-  return limit;
-}
-
 } // anonymous
 
 RestServ::~RestServ() noexcept = default;
 
-bool RestServ::reset(HttpMessage data) noexcept
+void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept
 {
-  bool cache{false};
-  state_ = 0;
-
-  auto uri = data.uri();
-  // Remove leading slash.
-  if (uri.front() == '/') {
-    uri.remove_prefix(1);
-  }
-  uri_.reset(uri, "/"_sv);
-
-  const auto method = data.method();
-  if (method == "GET"_sv) {
-    cache = !uri.empty() && uri_.top() == "refdata"_sv;
-    state_ |= MethodGet;
-  } else if (method == "POST"_sv) {
-    state_ |= MethodPost;
-  } else if (method == "PUT"_sv) {
-    state_ |= MethodPut;
-  } else if (method == "DELETE"_sv) {
-    state_ |= MethodDelete;
-  }
-
-  request_.reset();
-  return cache;
-}
-
-void RestServ::httpRequest(mg_connection& nc, HttpMessage data)
-{
-  using namespace chrono;
-
   TimeRecorder tr{profile_};
   auto finally = makeFinally([this]() {
     if (this->profile_.size() % 10 == 0) {
       this->profile_.report();
     }
   });
-  const auto cache = reset(data);
-  const auto now = getTime(data);
-  // See mg_send().
-  nc.last_io_time = UnixClock::to_time_t(now);
+  const auto cache = reset(req); // noexcept
+  const auto now = getTime(req); // noexcept
 
-  StreamBuf buf{nc.send_mbuf};
-  out_.rdbuf(&buf);
-  if (!isSet(MethodDelete)) {
-    out_.reset(200, "OK", cache);
+  if (req.method() != HttpMethod::Delete) {
+    resp.reset(200, "OK", cache); // noexcept
   } else {
-    out_.reset(204, "No Content");
+    resp.reset(204, "No Content"); // noexcept
   }
   try {
-    const auto body = data.body();
-    if (!body.empty()) {
-      if (!request_.parse(data.body())) {
-        throw BadRequestException{"request body is incomplete"_sv};
-      }
+    const auto& body = req.body();
+    if (req.partial()) {
+      throw BadRequestException{"request body is incomplete"_sv};
     }
-    restRequest(data, now);
-    if (!isSet(MatchUri)) {
-      throw NotFoundException{errMsg() << "resource '" << data.uri() << "' does not exist"};
+    restRequest(req, now, resp);
+    if (!matchPath_) {
+      throw NotFoundException{errMsg() << "resource '" << req.path() << "' does not exist"};
     }
-    if (!isSet(MatchMethod)) {
-      throw MethodNotAllowedException{errMsg() << "method '" << data.method()
-                                               << "' is not allowed"};
+    if (!matchMethod_) {
+      throw MethodNotAllowedException{errMsg() << "method '" << req.method() << "' is not allowed"};
     }
   } catch (const ServException& e) {
     SWIRLY_ERROR(logMsg() << "exception: status=" << e.httpStatus() << ", reason=" << e.httpReason()
                           << ", detail=" << e.what());
-    out_.reset(e.httpStatus(), e.httpReason());
-    out_ << e;
+    resp.reset(e.httpStatus(), e.httpReason());
+    resp << e;
   } catch (const exception& e) {
     const int status{500};
     const char* const reason{"Internal Server Error"};
     SWIRLY_ERROR(logMsg() << "exception: status=" << status << ", reason=" << reason
                           << ", detail=" << e.what());
-    out_.reset(status, reason);
-    ServException::toJson(status, reason, e.what(), out_);
+    resp.reset(status, reason);
+    ServException::toJson(status, reason, e.what(), resp);
   }
-  out_.setContentLength();
+  resp.setContentLength(); // noexcept
 }
 
-void RestServ::restRequest(HttpMessage data, Time now)
+bool RestServ::reset(const HttpRequest& req) noexcept
 {
-  if (uri_.empty()) {
+  matchMethod_ = false;
+  matchPath_ = false;
+
+  auto path = req.path();
+  // Remove leading slash.
+  if (path.front() == '/') {
+    path.remove_prefix(1);
+  }
+  path_.reset(path, "/"_sv);
+
+  if (req.method() != HttpMethod::Get) {
+    // No cache.
+    return false;
+  }
+  // Cache if GET for refdata.
+  return !path.empty() && path_.top() == "refdata"_sv;
+}
+
+void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+{
+  if (path_.empty()) {
     return;
   }
 
-  const auto tok = uri_.top();
-  uri_.pop();
+  const auto tok = path_.top();
+  path_.pop();
 
   if (tok == "refdata"_sv) {
     // /refdata
-    refDataRequest(data, now);
+    refDataRequest(req, now, resp);
   } else if (tok == "market"_sv) {
     // /market
-    marketRequest(data, now);
+    marketRequest(req, now, resp);
   } else if (tok == "accnt"_sv) {
     // /accnt
-    accntRequest(data, now);
+    accntRequest(req, now, resp);
   }
 }
 
-void RestServ::refDataRequest(HttpMessage data, Time now)
+void RestServ::refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /refdata
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /refdata
-      state_ |= MatchMethod;
+      matchMethod_ = true;
       const int bs{EntitySet::Asset | EntitySet::Contr};
-      rest_.getRefData(bs, now, out_);
+      rest_.getRefData(bs, now, resp);
     }
     return;
   }
 
-  const auto tok = uri_.top();
-  uri_.pop();
+  const auto tok = path_.top();
+  path_.pop();
 
   const auto es = EntitySet::parse(tok);
   if (es.many()) {
 
-    if (uri_.empty()) {
+    if (path_.empty()) {
 
       // /refdata/entity,entity...
-      state_ |= MatchUri;
+      matchPath_ = true;
 
-      if (isSet(MethodGet)) {
+      if (req.method() == HttpMethod::Get) {
         // GET /refdata/entity,entity...
-        state_ |= MatchMethod;
-        rest_.getRefData(es, now, out_);
+        matchMethod_ = true;
+        rest_.getRefData(es, now, resp);
       }
     }
     return;
@@ -257,211 +216,221 @@ void RestServ::refDataRequest(HttpMessage data, Time now)
 
   switch (es.get()) {
   case EntitySet::Asset:
-    assetRequest(data, now);
+    assetRequest(req, now, resp);
     break;
   case EntitySet::Contr:
-    contrRequest(data, now);
+    contrRequest(req, now, resp);
     break;
   }
 }
 
-void RestServ::assetRequest(HttpMessage data, Time now)
+void RestServ::assetRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /refdata/asset
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /refdata/asset
-      state_ |= MatchMethod;
-      rest_.getAsset(now, out_);
+      matchMethod_ = true;
+      rest_.getAsset(now, resp);
     }
     return;
   }
 
-  const auto mnem = uri_.top();
-  uri_.pop();
+  const auto mnem = path_.top();
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /refdata/asset/MNEM
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /refdata/asset/MNEM
-      state_ |= MatchMethod;
-      rest_.getAsset(mnem, now, out_);
+      matchMethod_ = true;
+      rest_.getAsset(mnem, now, resp);
     }
     return;
   }
 }
 
-void RestServ::contrRequest(HttpMessage data, Time now)
+void RestServ::contrRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /refdata/contr
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /refdata/contr
-      state_ |= MatchMethod;
-      rest_.getContr(now, out_);
+      matchMethod_ = true;
+      rest_.getContr(now, resp);
     }
     return;
   }
 
-  const auto mnem = uri_.top();
-  uri_.pop();
+  const auto mnem = path_.top();
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /refdata/contr/MNEM
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /refdata/contr/MNEM
-      state_ |= MatchMethod;
-      rest_.getContr(mnem, now, out_);
+      matchMethod_ = true;
+      rest_.getContr(mnem, now, resp);
     }
     return;
   }
 }
 
-void RestServ::marketRequest(HttpMessage data, Time now)
+void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /market
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /market
-      state_ |= MatchMethod;
-      rest_.getMarket(now, out_);
+      matchMethod_ = true;
+      rest_.getMarket(now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /market
-      state_ |= MatchMethod;
-      getAdmin(data);
-      constexpr auto reqFields = RestRequest::Contr | RestRequest::SettlDate;
-      constexpr auto optFields = RestRequest::State;
-      if (!request_.valid(reqFields, optFields)) {
-        throw InvalidException{"request fields are invalid"_sv};
+      matchMethod_ = true;
+      getAdmin(req);
+      {
+        constexpr auto ReqFields = RestRequest::Contr | RestRequest::SettlDate;
+        constexpr auto OptFields = RestRequest::State;
+        if (!req.body().valid(ReqFields, OptFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postMarket(req.body().contr(), req.body().settlDate(), req.body().state(), now, resp);
       }
-      rest_.postMarket(request_.contr(), request_.settlDate(), request_.state(), now, out_);
+      break;
+    default:
       break;
     }
     return;
   }
 
-  const auto contr = uri_.top();
-  uri_.pop();
+  const auto contr = path_.top();
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /market/CONTR
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /market/CONTR
-      state_ |= MatchMethod;
-      rest_.getMarket(contr, now, out_);
+      matchMethod_ = true;
+      rest_.getMarket(contr, now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /market/CONTR
-      state_ |= MatchMethod;
-      getAdmin(data);
-      constexpr auto reqFields = RestRequest::SettlDate;
-      constexpr auto optFields = RestRequest::State;
-      if (!request_.valid(reqFields, optFields)) {
-        throw InvalidException{"request fields are invalid"_sv};
+      matchMethod_ = true;
+      getAdmin(req);
+      {
+        constexpr auto ReqFields = RestRequest::SettlDate;
+        constexpr auto OptFields = RestRequest::State;
+        if (!req.body().valid(ReqFields, OptFields)) {
+          throw InvalidException{"request fields are invalid"_sv};
+        }
+        rest_.postMarket(contr, req.body().settlDate(), req.body().state(), now, resp);
       }
-      rest_.postMarket(contr, request_.settlDate(), request_.state(), now, out_);
+      break;
+    default:
       break;
     }
     return;
   }
 
-  const auto settlDate = IsoDate{stou64(uri_.top())};
-  uri_.pop();
+  const auto settlDate = IsoDate{stou64(path_.top())};
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /market/CONTR/SETTL_DATE
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /market/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      rest_.getMarket(contr, settlDate, now, out_);
+      matchMethod_ = true;
+      rest_.getMarket(contr, settlDate, now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /market/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      getAdmin(data);
+      matchMethod_ = true;
+      getAdmin(req);
       {
-        constexpr auto reqFields = 0;
-        constexpr auto optFields = RestRequest::State;
-        if (!request_.valid(reqFields, optFields)) {
+        constexpr auto ReqFields = 0;
+        constexpr auto OptFields = RestRequest::State;
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postMarket(contr, settlDate, request_.state(), now, out_);
+        rest_.postMarket(contr, settlDate, req.body().state(), now, resp);
       }
       break;
-    case MethodPut:
+    case HttpMethod::Put:
       // PUT /market/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      getAdmin(data);
+      matchMethod_ = true;
+      getAdmin(req);
       {
-        constexpr auto reqFields = RestRequest::State;
-        if (!request_.valid(reqFields)) {
+        constexpr auto ReqFields = RestRequest::State;
+        if (!req.body().valid(ReqFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.putMarket(contr, settlDate, request_.state(), now, out_);
+        rest_.putMarket(contr, settlDate, req.body().state(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 }
 
-void RestServ::accntRequest(HttpMessage data, Time now)
+void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /accnt
-      state_ |= MatchMethod;
+      matchMethod_ = true;
       const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec | EntitySet::Trade
         | EntitySet::Posn;
-      rest_.getAccnt(getTrader(data), es, getOffset(data), getLimit(data), now, out_);
+      rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
     }
     return;
   }
 
-  const auto tok = uri_.top();
-  uri_.pop();
+  const auto tok = path_.top();
+  path_.pop();
 
   const auto es = EntitySet::parse(tok);
   if (es.many()) {
 
-    if (uri_.empty()) {
+    if (path_.empty()) {
 
       // /accnt/entity,entity...
-      state_ |= MatchUri;
+      matchPath_ = true;
 
-      if (isSet(MethodGet)) {
+      if (req.method() == HttpMethod::Get) {
         // GET /accnt/entity,entity...
-        state_ |= MatchMethod;
-        rest_.getAccnt(getTrader(data), es, getOffset(data), getLimit(data), now, out_);
+        matchMethod_ = true;
+        rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
       }
     }
     return;
@@ -469,346 +438,361 @@ void RestServ::accntRequest(HttpMessage data, Time now)
 
   switch (es.get()) {
   case EntitySet::Market:
-    marketRequest(data, now);
+    marketRequest(req, now, resp);
     break;
   case EntitySet::Order:
-    orderRequest(data, now);
+    orderRequest(req, now, resp);
     break;
   case EntitySet::Exec:
-    execRequest(data, now);
+    execRequest(req, now, resp);
     break;
   case EntitySet::Trade:
-    tradeRequest(data, now);
+    tradeRequest(req, now, resp);
     break;
   case EntitySet::Posn:
-    posnRequest(data, now);
+    posnRequest(req, now, resp);
     break;
   }
 }
 
-void RestServ::orderRequest(HttpMessage data, Time now)
+void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/order
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/order
-      state_ |= MatchMethod;
-      rest_.getOrder(getTrader(data), now, out_);
+      matchMethod_ = true;
+      rest_.getOrder(getTrader(req), now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /accnt/order
-      state_ |= MatchMethod;
+      matchMethod_ = true;
       {
         // Validate account before request.
-        const auto accnt = getTrader(data);
-        constexpr auto reqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Side
+        const auto accnt = getTrader(req);
+        constexpr auto ReqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Side
           | RestRequest::Lots | RestRequest::Ticks;
-        constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
-        if (!request_.valid(reqFields, optFields)) {
+        constexpr auto OptFields = RestRequest::Ref | RestRequest::MinLots;
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postOrder(accnt, request_.contr(), request_.settlDate(), request_.ref(),
-                        request_.side(), request_.lots(), request_.ticks(), request_.minLots(), now,
-                        out_);
+        rest_.postOrder(accnt, req.body().contr(), req.body().settlDate(), req.body().ref(),
+                        req.body().side(), req.body().lots(), req.body().ticks(),
+                        req.body().minLots(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 
-  const auto contr = uri_.top();
-  uri_.pop();
+  const auto contr = path_.top();
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/order/CONTR
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/order/CONTR
-      state_ |= MatchMethod;
-      rest_.getOrder(getTrader(data), contr, now, out_);
+      matchMethod_ = true;
+      rest_.getOrder(getTrader(req), contr, now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /accnt/order/CONTR
-      state_ |= MatchMethod;
+      matchMethod_ = true;
       {
         // Validate account before request.
-        const auto accnt = getTrader(data);
-        constexpr auto reqFields
+        const auto accnt = getTrader(req);
+        constexpr auto ReqFields
           = RestRequest::SettlDate | RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
-        constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
-        if (!request_.valid(reqFields, optFields)) {
+        constexpr auto OptFields = RestRequest::Ref | RestRequest::MinLots;
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postOrder(accnt, contr, request_.settlDate(), request_.ref(), request_.side(),
-                        request_.lots(), request_.ticks(), request_.minLots(), now, out_);
+        rest_.postOrder(accnt, contr, req.body().settlDate(), req.body().ref(), req.body().side(),
+                        req.body().lots(), req.body().ticks(), req.body().minLots(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 
-  const auto settlDate = IsoDate{stou64(uri_.top())};
-  uri_.pop();
+  const auto settlDate = IsoDate{stou64(path_.top())};
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/order/CONTR/SETTL_DATE
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/order/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      rest_.getOrder(getTrader(data), contr, settlDate, now, out_);
+      matchMethod_ = true;
+      rest_.getOrder(getTrader(req), contr, settlDate, now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /accnt/order/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
+      matchMethod_ = true;
       {
         // Validate account before request.
-        const auto accnt = getTrader(data);
-        constexpr auto reqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
-        constexpr auto optFields = RestRequest::Ref | RestRequest::MinLots;
-        if (!request_.valid(reqFields, optFields)) {
+        const auto accnt = getTrader(req);
+        constexpr auto ReqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
+        constexpr auto OptFields = RestRequest::Ref | RestRequest::MinLots;
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postOrder(accnt, contr, settlDate, request_.ref(), request_.side(), request_.lots(),
-                        request_.ticks(), request_.minLots(), now, out_);
+        rest_.postOrder(accnt, contr, settlDate, req.body().ref(), req.body().side(),
+                        req.body().lots(), req.body().ticks(), req.body().minLots(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 
-  ScopedIds ids{uri_.top(), ids_};
-  uri_.pop();
+  ScopedIds ids{path_.top(), ids_};
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/order/CONTR/SETTL_DATE/ID,ID...
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/order/CONTR/SETTL_DATE/ID
-      state_ |= MatchMethod;
-      rest_.getOrder(getTrader(data), contr, settlDate, ids_[0], now, out_);
+      matchMethod_ = true;
+      rest_.getOrder(getTrader(req), contr, settlDate, ids_[0], now, resp);
       break;
-    case MethodPut:
+    case HttpMethod::Put:
       // PUT /accnt/order/CONTR/SETTL_DATE/ID,ID...
-      state_ |= MatchMethod;
+      matchMethod_ = true;
       {
         // Validate account before request.
-        const auto accnt = getTrader(data);
-        constexpr auto reqFields = RestRequest::Lots;
-        if (request_.fields() != reqFields) {
+        const auto accnt = getTrader(req);
+        constexpr auto ReqFields = RestRequest::Lots;
+        if (req.body().fields() != ReqFields) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.putOrder(accnt, contr, settlDate, ids_, request_.lots(), now, out_);
+        rest_.putOrder(accnt, contr, settlDate, ids_, req.body().lots(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 }
 
-void RestServ::execRequest(HttpMessage data, Time now)
+void RestServ::execRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/exec
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /accnt/exec
-      state_ |= MatchMethod;
-      rest_.getExec(getTrader(data), getOffset(data), getLimit(data), now, out_);
+      matchMethod_ = true;
+      rest_.getExec(getTrader(req), parseQuery(req.query()), now, resp);
     }
     return;
   }
 }
 
-void RestServ::tradeRequest(HttpMessage data, Time now)
+void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/trade
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/trade
-      state_ |= MatchMethod;
-      rest_.getTrade(getTrader(data), now, out_);
+      matchMethod_ = true;
+      rest_.getTrade(getTrader(req), now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /accnt/trade
-      state_ |= MatchMethod;
-      getAdmin(data);
+      matchMethod_ = true;
+      getAdmin(req);
       {
-        constexpr auto reqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Accnt
+        constexpr auto ReqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Accnt
           | RestRequest::Side | RestRequest::Lots;
-        constexpr auto optFields
+        constexpr auto OptFields
           = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
-        if (!request_.valid(reqFields, optFields)) {
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postTrade(request_.accnt(), request_.contr(), request_.settlDate(), request_.ref(),
-                        request_.side(), request_.lots(), request_.ticks(), request_.liqInd(),
-                        request_.cpty(), now, out_);
+        rest_.postTrade(req.body().accnt(), req.body().contr(), req.body().settlDate(),
+                        req.body().ref(), req.body().side(), req.body().lots(), req.body().ticks(),
+                        req.body().liqInd(), req.body().cpty(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 
-  const auto contr = uri_.top();
-  uri_.pop();
+  const auto contr = path_.top();
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/trade/CONTR
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/trade/CONTR
-      state_ |= MatchMethod;
-      rest_.getTrade(getTrader(data), contr, now, out_);
+      matchMethod_ = true;
+      rest_.getTrade(getTrader(req), contr, now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /accnt/trade/CONTR
-      state_ |= MatchMethod;
-      getAdmin(data);
+      matchMethod_ = true;
+      getAdmin(req);
       {
-        constexpr auto reqFields
+        constexpr auto ReqFields
           = RestRequest::SettlDate | RestRequest::Accnt | RestRequest::Side | RestRequest::Lots;
-        constexpr auto optFields
+        constexpr auto OptFields
           = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
-        if (!request_.valid(reqFields, optFields)) {
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postTrade(request_.accnt(), contr, request_.settlDate(), request_.ref(),
-                        request_.side(), request_.lots(), request_.ticks(), request_.liqInd(),
-                        request_.cpty(), now, out_);
+        rest_.postTrade(req.body().accnt(), contr, req.body().settlDate(), req.body().ref(),
+                        req.body().side(), req.body().lots(), req.body().ticks(),
+                        req.body().liqInd(), req.body().cpty(), now, resp);
       }
+      break;
+    default:
       break;
     }
     return;
   }
 
-  const auto settlDate = IsoDate{stou64(uri_.top())};
-  uri_.pop();
+  const auto settlDate = IsoDate{stou64(path_.top())};
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/trade/CONTR/SETTL_DATE
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/trade/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      rest_.getTrade(getTrader(data), contr, settlDate, now, out_);
+      matchMethod_ = true;
+      rest_.getTrade(getTrader(req), contr, settlDate, now, resp);
       break;
-    case MethodPost:
+    case HttpMethod::Post:
       // POST /accnt/trade/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      getAdmin(data);
+      matchMethod_ = true;
+      getAdmin(req);
       {
-        constexpr auto reqFields = RestRequest::Accnt | RestRequest::Side | RestRequest::Lots;
-        constexpr auto optFields
+        constexpr auto ReqFields = RestRequest::Accnt | RestRequest::Side | RestRequest::Lots;
+        constexpr auto OptFields
           = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
-        if (!request_.valid(reqFields, optFields)) {
+        if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
-        rest_.postTrade(request_.accnt(), contr, settlDate, request_.ref(), request_.side(),
-                        request_.lots(), request_.ticks(), request_.liqInd(), request_.cpty(), now,
-                        out_);
+        rest_.postTrade(req.body().accnt(), contr, settlDate, req.body().ref(), req.body().side(),
+                        req.body().lots(), req.body().ticks(), req.body().liqInd(),
+                        req.body().cpty(), now, resp);
       }
       break;
+    default:
+      break;
     }
     return;
   }
 
-  ScopedIds ids{uri_.top(), ids_};
-  uri_.pop();
+  ScopedIds ids{path_.top(), ids_};
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/trade/CONTR/SETTL_DATE/ID,ID...
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    switch (state_ & MethodMask) {
-    case MethodGet:
+    switch (req.method()) {
+    case HttpMethod::Get:
       // GET /accnt/trade/CONTR/SETTL_DATE/ID
-      state_ |= MatchMethod;
-      rest_.getTrade(getTrader(data), contr, settlDate, ids_[0], now, out_);
+      matchMethod_ = true;
+      rest_.getTrade(getTrader(req), contr, settlDate, ids_[0], now, resp);
       break;
-    case MethodDelete:
+    case HttpMethod::Delete:
       // DELETE /accnt/trade/CONTR/SETTL_DATE/ID,ID...
-      state_ |= MatchMethod;
-      rest_.deleteTrade(getTrader(data), contr, settlDate, ids_, now);
+      matchMethod_ = true;
+      rest_.deleteTrade(getTrader(req), contr, settlDate, ids_, now);
+      break;
+    default:
       break;
     }
     return;
   }
 }
 
-void RestServ::posnRequest(HttpMessage data, Time now)
+void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/posn
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /accnt/posn
-      state_ |= MatchMethod;
-      rest_.getPosn(getTrader(data), now, out_);
+      matchMethod_ = true;
+      rest_.getPosn(getTrader(req), now, resp);
     }
     return;
   }
 
-  const auto contr = uri_.top();
-  uri_.pop();
+  const auto contr = path_.top();
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/posn/CONTR
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /accnt/posn/CONTR
-      state_ |= MatchMethod;
-      rest_.getPosn(getTrader(data), contr, now, out_);
+      matchMethod_ = true;
+      rest_.getPosn(getTrader(req), contr, now, resp);
     }
     return;
   }
 
-  const auto settlDate = IsoDate{stou64(uri_.top())};
-  uri_.pop();
+  const auto settlDate = IsoDate{stou64(path_.top())};
+  path_.pop();
 
-  if (uri_.empty()) {
+  if (path_.empty()) {
 
     // /accnt/posn/CONTR/SETTL_DATE
-    state_ |= MatchUri;
+    matchPath_ = true;
 
-    if (isSet(MethodGet)) {
+    if (req.method() == HttpMethod::Get) {
       // GET /accnt/posn/CONTR/SETTL_DATE
-      state_ |= MatchMethod;
-      rest_.getPosn(getTrader(data), contr, settlDate, now, out_);
+      matchMethod_ = true;
+      rest_.getPosn(getTrader(req), contr, settlDate, now, resp);
     }
     return;
   }
 }
 
-} // mg
 } // swirly

@@ -17,21 +17,21 @@
 #ifndef SWIRLYD_RESTSERV_HPP
 #define SWIRLYD_RESTSERV_HPP
 
-#include "Mongoose.hpp"
-#include "Stream.hpp"
-
-#include <swirly/ws/RestRequest.hpp>
-
-#include <swirly/util/Array.hpp>
 #include <swirly/util/BasicTypes.hpp>
+#include <swirly/util/Mnem.hpp>
 #include <swirly/util/Profile.hpp>
+#include <swirly/util/Time.hpp>
 #include <swirly/util/Tokeniser.hpp>
 
-namespace swirly {
-class Rest;
-namespace mg {
+#include <vector>
 
-class RestServ : public mg::Mgr<RestServ> {
+namespace swirly {
+
+class HttpRequest;
+class HttpResponse;
+class Rest;
+
+class RestServ {
  public:
   explicit RestServ(Rest& rest) noexcept : rest_(rest), profile_{"profile"_sv} {}
   ~RestServ() noexcept;
@@ -44,52 +44,34 @@ class RestServ : public mg::Mgr<RestServ> {
   RestServ(RestServ&&) = delete;
   RestServ& operator=(RestServ&&) = delete;
 
-  bool reset(mg::HttpMessage data) noexcept;
-
-  void httpRequest(mg_connection& nc, mg::HttpMessage data);
-  void restRequest(mg::HttpMessage data, Time now);
-
-  void refDataRequest(mg::HttpMessage data, Time now);
-  void assetRequest(mg::HttpMessage data, Time now);
-  void contrRequest(mg::HttpMessage data, Time now);
-
-  void marketRequest(mg::HttpMessage data, Time now);
-
-  void accntRequest(mg::HttpMessage data, Time now);
-  void orderRequest(mg::HttpMessage data, Time now);
-  void execRequest(mg::HttpMessage data, Time now);
-  void tradeRequest(mg::HttpMessage data, Time now);
-  void posnRequest(mg::HttpMessage data, Time now);
+  void handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept;
 
  private:
-  enum : int {
-    // Method values are represented as powers of two for simplicity.
-    MethodGet = 1 << 0,
-    MethodPost = 1 << 1,
-    MethodPut = 1 << 2,
-    MethodDelete = 1 << 3,
-    // Method value mask.
-    MethodMask = MethodGet | MethodPost | MethodPut | MethodDelete,
+  bool reset(const HttpRequest& req) noexcept;
 
-    // Subsequent bits represent matching components.
-    MatchMethod = 1 << 4,
-    MatchUri = 1 << 5,
-    // Match result mask.
-    MatchMask = MatchMethod | MatchUri
-  };
-  bool isSet(int bs) const noexcept { return (state_ & bs) == bs; }
+  void restRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+
+  void refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+  void assetRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+  void contrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+
+  void marketRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+
+  void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+  void orderRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+  void execRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+  void tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+  void posnRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
   Rest& rest_;
-  int state_{0};
-  Tokeniser uri_;
+  bool matchMethod_{false};
+  bool matchPath_{false};
+  Tokeniser path_;
   std::vector<Id64> ids_;
   std::vector<Mnem> mnems_;
-  RestRequest request_;
-  mg::OStream out_;
   Profile profile_;
 };
 
-} // mg
 } // swirly
 
 #endif // SWIRLYD_RESTSERV_HPP

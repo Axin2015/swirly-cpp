@@ -14,6 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
+#include "HttpServ.hpp"
 #include "RestServ.hpp"
 
 #include <swirly/ws/Rest.hpp>
@@ -22,23 +23,20 @@
 #include <swirly/fin/Model.hpp>
 
 #include <swirly/util/Conf.hpp>
+#include <swirly/util/Exception.hpp>
 #include <swirly/util/Log.hpp>
 #include <swirly/util/MemPool.hpp>
-#include <swirly/util/Numeric.hpp>
 #include <swirly/util/System.hpp>
-#include <swirly/util/Time.hpp>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #pragma GCC diagnostic pop
 
 #include <iomanip>
 #include <iostream>
-#include <system_error>
-
-#include <cerrno>
 
 #include <fcntl.h> // open()
 #include <syslog.h>
@@ -51,16 +49,6 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-volatile sig_atomic_t sig_{0};
-
-void sigHandler(int sig) noexcept
-{
-  sig_ = sig;
-
-  // Re-install signal handler.
-  signal(sig, sigHandler);
-}
-
 void openLogFile(const char* path)
 {
   const int fd{open(path, O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP)};
@@ -72,6 +60,61 @@ void openLogFile(const char* path)
   dup2(fd, STDERR_FILENO);
   close(fd);
 }
+
+class SigHandler {
+ public:
+  SigHandler(boost::asio::io_service& ioServ, const fs::path& logFile)
+    : ioServ_(ioServ), signals_{ioServ}, logFile_{logFile}
+  {
+    signals_.add(SIGHUP);
+    signals_.add(SIGINT);
+    signals_.add(SIGTERM);
+
+    wait();
+  }
+  ~SigHandler() noexcept = default;
+
+  // Copy.
+  SigHandler(const SigHandler&) = delete;
+  SigHandler& operator=(const SigHandler&) = delete;
+
+  // Move.
+  SigHandler(SigHandler&&) = delete;
+  SigHandler& operator=(SigHandler&&) = delete;
+
+ private:
+  void wait() noexcept
+  {
+    // FIXME: implement clean shutdown that attempts to deliver pending messages on a best effort
+    // basis.
+    signals_.async_wait([this](auto ec, int sig) {
+      if (!ec) {
+        switch (sig) {
+        case SIGHUP:
+          SWIRLY_INFO("received SIGHUP"_sv);
+          if (!logFile_.empty()) {
+            SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile_);
+            openLogFile(logFile_.c_str());
+          }
+          break;
+        case SIGINT:
+          SWIRLY_INFO("received SIGINT"_sv);
+          ioServ_.stop();
+          break;
+        case SIGTERM:
+          SWIRLY_INFO("received SIGTERM"_sv);
+          ioServ_.stop();
+          break;
+        }
+      }
+      this->wait();
+    });
+  }
+
+  boost::asio::io_service& ioServ_;
+  boost::asio::signal_set signals_;
+  fs::path logFile_;
+};
 
 struct Opts {
   fs::path confFile;
@@ -253,42 +296,14 @@ int main(int argc, char* argv[])
     rest.load(*model, opts.startTime);
     model = nullptr;
 
-    mg::RestServ rs{rest};
+    boost::asio::io_service ioServ;
+    SigHandler sigHandler{ioServ, logFile};
 
-    auto& conn = rs.bind(httpPort);
-    mg_set_protocol_http_websocket(&conn);
+    RestServ restServ{rest};
+    HttpServ serv{ioServ, stou16(httpPort), restServ};
 
     SWIRLY_NOTICE(logMsg() << "started http server on port " << httpPort);
-
-    signal(SIGHUP, sigHandler);
-    signal(SIGINT, sigHandler);
-    signal(SIGTERM, sigHandler);
-
-    bool quit{false};
-    do {
-      rs.poll(1000);
-
-      int sig{sig_};
-      sig_ = 0;
-      switch (sig) {
-      case SIGHUP:
-        SWIRLY_INFO("received SIGHUP"_sv);
-        if (!logFile.empty()) {
-          SWIRLY_NOTICE(logMsg() << "reopening log file: " << logFile);
-          openLogFile(logFile.c_str());
-        }
-        break;
-      case SIGINT:
-        SWIRLY_INFO("received SIGINT"_sv);
-        quit = true;
-        break;
-      case SIGTERM:
-        SWIRLY_INFO("received SIGTERM"_sv);
-        quit = true;
-        break;
-      }
-    } while (!quit);
-
+    ioServ.run();
     ret = 0;
 
   } catch (const exception& e) {
