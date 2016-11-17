@@ -49,6 +49,12 @@ class TableModel : public QAbstractTableModel {
     return flags;
   }
   const ValueT& valueAt(int n) const { return rowAt(n).value(); }
+  void reset()
+  {
+    beginResetModel();
+    rows_.clear();
+    endResetModel();
+  }
   void sweep(std::uint64_t tag)
   {
     auto it = rows_.begin();

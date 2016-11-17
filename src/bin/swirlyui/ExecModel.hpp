@@ -45,6 +45,12 @@ class ExecModel : public QAbstractTableModel {
 
   const Exec& valueAt(int n) const { return rowAt(n).value(); }
 
+  void reset()
+  {
+    beginResetModel();
+    rows_.clear();
+    endResetModel();
+  }
   void toggleCheckState(int n)
   {
     auto& row = rowAt(n);

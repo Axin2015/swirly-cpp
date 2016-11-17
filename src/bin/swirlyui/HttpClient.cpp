@@ -43,14 +43,23 @@ HttpClient::HttpClient(QObject* parent) : Client{parent}
 {
   connect(&nam_, &QNetworkAccessManager::finished, this, &HttpClient::slotFinished);
   getRefData();
+  startTimer(2000);
 }
 
 HttpClient::~HttpClient() noexcept = default;
 
 void HttpClient::timerEvent(QTimerEvent* event)
 {
-  qDebug() << "timerEvent";
-  getAccnt();
+  qDebug().nospace() << "timerEvent: errors=" << errors_ << ", pending=" << pending_;
+  if (errors_ > 0) {
+    if (!pending_) {
+      errors_ = 0;
+      reset();
+      getRefData();
+    }
+  } else {
+    getAccnt();
+  }
 }
 
 void HttpClient::createMarket(const Contr& contr, QDate settlDate)
@@ -68,6 +77,7 @@ void HttpClient::createMarket(const Contr& contr, QDate settlDate)
 
   QJsonDocument doc(obj);
   nam_.post(request, doc.toJson());
+  ++pending_;
 }
 
 void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
@@ -90,14 +100,17 @@ void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString&
 
   QJsonDocument doc(obj);
   nam_.post(request, doc.toJson());
+  ++pending_;
 }
 
 void HttpClient::slotFinished(QNetworkReply* reply)
 {
   qDebug() << "slotFinished";
+  --pending_;
   reply->deleteLater();
 
   if (reply->error() != QNetworkReply::NoError) {
+    ++errors_;
     emit serviceError(reply->errorString());
     return;
   }
@@ -131,6 +144,7 @@ void HttpClient::getRefData()
   request.setRawHeader("Swirly-Accnt", "MARAYL");
   request.setRawHeader("Swirly-Perm", "2");
   nam_.get(request);
+  ++pending_;
 }
 
 void HttpClient::getAccnt()
@@ -145,6 +159,7 @@ void HttpClient::getAccnt()
   request.setRawHeader("Swirly-Accnt", "MARAYL");
   request.setRawHeader("Swirly-Perm", "2");
   nam_.get(request);
+  ++pending_;
 }
 
 void HttpClient::getRefDataReply(QNetworkReply& reply)
@@ -178,7 +193,6 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
   emit refDataComplete();
 
   getAccnt();
-  startTimer(2000);
 }
 
 void HttpClient::getAccntReply(QNetworkReply& reply)

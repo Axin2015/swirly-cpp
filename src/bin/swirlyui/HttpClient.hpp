@@ -36,10 +36,10 @@ class HttpClient : public Client {
   void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
                    Ticks ticks) override;
 
+ signals:
+
  protected:
   void timerEvent(QTimerEvent* event) override;
-
- signals:
 
  private slots:
   void slotFinished(QNetworkReply* reply);
@@ -57,6 +57,8 @@ class HttpClient : public Client {
 
   QNetworkAccessManager nam_;
   std::uint64_t tag_{0};
+  int errors_{0};
+  int pending_{0};
 };
 
 } // ui
