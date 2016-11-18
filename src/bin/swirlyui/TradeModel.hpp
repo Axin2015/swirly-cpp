@@ -33,6 +33,11 @@ class TradeModel : public TableModel<std::pair<Id64, Id64>, Exec, unbox(exec::Co
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+  void removeRow(std::uint64_t tag, const Exec& trade)
+  {
+    const auto key = std::make_pair(trade.marketId(), trade.id());
+    TableModel::removeRow(key);
+  }
   void updateRow(std::uint64_t tag, const Exec& trade)
   {
     const auto key = std::make_pair(trade.marketId(), trade.id());

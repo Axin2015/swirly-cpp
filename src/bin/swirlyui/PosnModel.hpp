@@ -33,6 +33,7 @@ class PosnModel
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+  void removeRow(const Posn& posn) { TableModel::removeRow(posn.marketId()); }
   void updateRow(std::uint64_t tag, const Posn& posn)
   {
     TableModel::updateRow(posn.marketId(), tag, posn);

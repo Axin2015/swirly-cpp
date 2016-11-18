@@ -33,6 +33,7 @@ class MarketModel
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+  void removeRow(const Market& market) { TableModel::removeRow(market.id()); }
   void updateRow(std::uint64_t tag, const Market& market)
   {
     TableModel::updateRow(market.id(), tag, market);

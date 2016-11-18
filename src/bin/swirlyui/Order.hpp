@@ -75,6 +75,7 @@ class Order {
   Lots lastLots() const noexcept { return lastLots_; }
   Ticks lastTicks() const noexcept { return lastTicks_; }
   Lots minLots() const noexcept { return minLots_; }
+  bool done() const noexcept { return resd_ == 0_lts; }
   const QDateTime& created() const noexcept { return created_; }
   const QDateTime& modified() const noexcept { return modified_; }
 

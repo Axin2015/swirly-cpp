@@ -80,6 +80,16 @@ class TableModel : public QAbstractTableModel {
  protected:
   const Row<ValueT>& rowAt(int n) const { return rows_.nth(n)->second; }
   Row<ValueT>& rowAt(int n) { return rows_.nth(n)->second; }
+  void removeRow(const KeyT& key)
+  {
+    auto it = rows_.find(key);
+    if (it != rows_.end()) {
+      const int row = distance(rows_.begin(), it);
+      beginRemoveRows(QModelIndex{}, row, row);
+      rows_.erase(it);
+      endRemoveRows();
+    }
+  }
   void updateRow(const KeyT& key, uint64_t tag, const ValueT& val)
   {
     auto it = rows_.lower_bound(key);

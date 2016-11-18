@@ -220,7 +220,12 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
   for (const auto elem : obj["orders"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    orderModel().updateRow(tag_, Order::fromJson(contr, obj));
+    const auto order = Order::fromJson(contr, obj);
+    if (!order.done()) {
+      orderModel().updateRow(tag_, order);
+    } else {
+      orderModel().removeRow(order);
+    }
   }
   orderModel().sweep(tag_);
   using boost::adaptors::reverse;
@@ -284,7 +289,12 @@ void HttpClient::postOrderReply(QNetworkReply& reply)
   for (const auto elem : obj["orders"].toArray()) {
     const auto obj = elem.toObject();
     const auto contr = findContr(obj);
-    orderModel().updateRow(tag_, Order::fromJson(contr, obj));
+    const auto order = Order::fromJson(contr, obj);
+    if (!order.done()) {
+      orderModel().updateRow(tag_, order);
+    } else {
+      orderModel().removeRow(order);
+    }
   }
   using boost::adaptors::reverse;
   for (const auto elem : reverse(obj["execs"].toArray())) {
