@@ -35,6 +35,7 @@ class ContrModel
 
   Contr find(const QString& mnem) const;
 
+  void removeRow(const Contr& contr) { TableModel::removeRow(contr.mnem()); }
   void updateRow(std::uint64_t tag, const Contr& contr)
   {
     TableModel::updateRow(contr.mnem(), tag, contr);

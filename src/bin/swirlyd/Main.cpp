@@ -17,6 +17,8 @@
 #include "HttpServ.hpp"
 #include "RestServ.hpp"
 
+#include <swirly/om/Test.hpp>
+
 #include <swirly/ws/Rest.hpp>
 
 #include <swirly/fin/Journ.hpp>
@@ -118,7 +120,8 @@ class SigHandler {
 
 struct Opts {
   fs::path confFile;
-  bool daemon{true};
+  bool daemon{false};
+  bool test{false};
   Time startTime{};
 };
 
@@ -128,9 +131,10 @@ void printUsage(ostream& os)
 
 Options:
   -h           Show this help message.
+  -d           Run in the background as a daemon process.
   -f path      Path to configuration file.
-  -n           Do not daemonise. I.e. run in the foreground.
-  -s           Initial time of day in millis since epoch.
+  -s time      Initial time of day in millis since epoch.
+  -t           Test mode.
 
 Report bugs to: support@swirlycloud.com
 )==";
@@ -140,19 +144,22 @@ void getOpts(int argc, char* argv[], Opts& opts)
 {
   opterr = 0;
   int ch;
-  while ((ch = getopt(argc, argv, ":f:hns:")) != -1) {
+  while ((ch = getopt(argc, argv, ":df:hs:t")) != -1) {
     switch (ch) {
+    case 'd':
+      opts.daemon = true;
+      break;
     case 'f':
       opts.confFile = optarg;
       break;
     case 'h':
       printUsage(cout);
       exit(0);
-    case 'n':
-      opts.daemon = false;
-      break;
     case 's':
       opts.startTime = msToTime(stou64(optarg));
+      break;
+    case 't':
+      opts.test = true;
       break;
     case ':':
       cerr << "Option '" << static_cast<char>(optopt) << "' requires an argument\n";
@@ -278,7 +285,8 @@ int main(int argc, char* argv[])
     SWIRLY_NOTICE("initialising daemon");
     SWIRLY_INFO(logMsg() << "conf_file:     " << opts.confFile);
     SWIRLY_INFO(logMsg() << "daemon:        " << (opts.daemon ? "yes" : "no"));
-    SWIRLY_INFO(logMsg() << "start-time:    " << opts.startTime);
+    SWIRLY_INFO(logMsg() << "start_time:    " << opts.startTime);
+    SWIRLY_INFO(logMsg() << "test_mode:     " << (opts.test ? "yes" : "no"));
 
     SWIRLY_INFO(logMsg() << "mem_pool:      " << (memPool.capacity() >> 20) << "MiB");
     SWIRLY_INFO(logMsg() << "file_mode:     " << setfill('0') << setw(3) << oct
@@ -290,7 +298,12 @@ int main(int argc, char* argv[])
     SWIRLY_INFO(logMsg() << "pipe_capacity: " << pipeCapacity);
     SWIRLY_INFO(logMsg() << "max_execs:     " << maxExecs);
 
-    auto journ = swirly::makeJourn(conf);
+    unique_ptr<Journ> journ;
+    if (!opts.test) {
+      journ = swirly::makeJourn(conf);
+    } else {
+      journ = make_unique<TestJourn>();
+    }
     auto model = swirly::makeModel(conf);
     Rest rest{*journ, pipeCapacity, maxExecs};
     rest.load(*model, opts.startTime);

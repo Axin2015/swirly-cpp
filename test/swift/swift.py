@@ -149,7 +149,6 @@ class Process(object):
     proc = subprocess.Popen([
       prog,
       '-f' + confFile,
-      '-n',
       '-s' + str(startTime)
     ])
     self.proc = proc

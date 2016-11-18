@@ -26,5 +26,16 @@ Client::Client(QObject* parent) : QObject{parent}
 {
 }
 
+void Client::reset()
+{
+  posnModel_.reset();
+  tradeModel_.reset();
+  execModel_.reset();
+  orderModel_.reset();
+  marketModel_.reset();
+  contrModel_.reset();
+  assetModel_.reset();
+}
+
 } // ui
 } // swirly

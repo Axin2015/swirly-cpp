@@ -58,10 +58,12 @@ class Client : public QObject {
                            Lots lots, Ticks ticks)
     = 0;
 
- protected:
  signals:
   void refDataComplete();
   void serviceError(const QString& error);
+
+ protected:
+  void reset();
 
  private slots:
 

@@ -33,6 +33,11 @@ class OrderModel : public TableModel<std::pair<Id64, Id64>, Order, unbox(order::
 
   QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+  void removeRow(const Order& order)
+  {
+    const auto key = std::make_pair(order.marketId(), order.id());
+    TableModel::removeRow(key);
+  }
   void updateRow(std::uint64_t tag, const Order& order)
   {
     const auto key = std::make_pair(order.marketId(), order.id());
