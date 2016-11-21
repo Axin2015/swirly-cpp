@@ -17,6 +17,8 @@
 #ifndef SWIRLYUI_ORDERVIEW_HPP
 #define SWIRLYUI_ORDERVIEW_HPP
 
+#include "Types.hpp"
+
 #include <QWidget>
 
 class QModelIndex;
@@ -31,10 +33,12 @@ class OrderView : public QWidget {
   Q_OBJECT
 
  public:
-  OrderView(OrderModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+  explicit OrderView(OrderModel& model, QWidget* parent = nullptr,
+                     Qt::WindowFlags f = Qt::WindowFlags{});
   ~OrderView() noexcept override;
 
  signals:
+  void cancelOrders(const OrderKeys& keys);
 
  private slots:
   void slotClicked(const QModelIndex& index);

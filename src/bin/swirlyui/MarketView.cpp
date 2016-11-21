@@ -20,9 +20,9 @@
 #include "MarketModel.hpp"
 #include "Utility.hpp"
 
-#include <QGridLayout>
 #include <QModelIndex>
 #include <QTableView>
+#include <QVBoxLayout>
 
 #include <memory>
 

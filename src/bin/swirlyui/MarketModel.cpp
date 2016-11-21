@@ -138,5 +138,15 @@ QVariant MarketModel::headerData(int section, Qt::Orientation orientation, int r
   return var;
 }
 
+Market MarketModel::find(Id64 id) const
+{
+  Market market;
+  auto it = rows_.find(id);
+  if (it != rows_.end()) {
+    market = it->second.value();
+  }
+  return market;
+}
+
 } // ui
 } // swirly

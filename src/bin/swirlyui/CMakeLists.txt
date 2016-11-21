@@ -45,6 +45,7 @@ set(swirlyui_SOURCES
   MarketModel.cpp
   MarketView.cpp
   Order.cpp
+  OrderForm.cpp
   OrderModel.cpp
   OrderView.cpp
   Posn.cpp

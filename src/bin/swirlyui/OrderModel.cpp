@@ -163,5 +163,17 @@ QVariant OrderModel::headerData(int section, Qt::Orientation orientation, int ro
   return var;
 }
 
+OrderKeys OrderModel::checked() const
+{
+  OrderKeys keys;
+  for (const auto& row : rows_) {
+    if (row.second.checked()) {
+      keys.push_back(row.first);
+    }
+  }
+  std::sort(keys.begin(), keys.end());
+  return keys;
+}
+
 } // ui
 } // swirly

@@ -23,8 +23,8 @@
 namespace swirly {
 namespace ui {
 
-class TradeModel : public TableModel<std::pair<Id64, Id64>, Exec, unbox(exec::Column::CheckState),
-                                     exec::ColumnCount> {
+class TradeModel
+  : public TableModel<ExecKey, Exec, unbox(exec::Column::CheckState), exec::ColumnCount> {
  public:
   TradeModel(QObject* parent = nullptr);
   ~TradeModel() noexcept override;
@@ -35,12 +35,12 @@ class TradeModel : public TableModel<std::pair<Id64, Id64>, Exec, unbox(exec::Co
 
   void removeRow(std::uint64_t tag, const Exec& trade)
   {
-    const auto key = std::make_pair(trade.marketId(), trade.id());
+    const ExecKey key{trade.marketId(), trade.id()};
     TableModel::removeRow(key);
   }
   void updateRow(std::uint64_t tag, const Exec& trade)
   {
-    const auto key = std::make_pair(trade.marketId(), trade.id());
+    const ExecKey key{trade.marketId(), trade.id()};
     TableModel::updateRow(key, tag, trade);
   }
 

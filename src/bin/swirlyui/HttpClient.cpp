@@ -35,7 +35,7 @@ namespace swirly {
 namespace ui {
 namespace {
 
-enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder };
+enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
 
 } // anonymous
 
@@ -102,6 +102,35 @@ void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString&
   ++pending_;
 }
 
+void HttpClient::cancelOrders(const OrderKeys& keys)
+{
+  qDebug() << "cancelOrders";
+
+  QString str;
+  QTextStream out{&str};
+  Market market;
+
+  for (const auto& key : keys) {
+    const auto id = key.second.count();
+    if (key.first != market.id()) {
+      if (!str.isEmpty()) {
+        putOrder(QUrl{str});
+        str.clear();
+        out.reset();
+      }
+      market = marketModel().find(key.first);
+      out << "http://127.0.0.1:8080/accnt/order/" << market.contr().mnem() //
+          << '/' << dateToIso(market.settlDate()) //
+          << '/' << id;
+    } else {
+      out << ',' << id;
+    }
+  }
+  if (!str.isEmpty()) {
+    putOrder(QUrl{str});
+  }
+}
+
 void HttpClient::slotFinished(QNetworkReply* reply)
 {
   qDebug() << "slotFinished";
@@ -117,16 +146,19 @@ void HttpClient::slotFinished(QNetworkReply* reply)
   const auto attr = reply->request().attribute(QNetworkRequest::User);
   switch (attr.value<int>()) {
   case GetRefData:
-    getRefDataReply(*reply);
+    onRefDataReply(*reply);
     break;
   case GetAccnt:
-    getAccntReply(*reply);
+    onAccntReply(*reply);
     break;
   case PostMarket:
-    postMarketReply(*reply);
+    onMarketReply(*reply);
     break;
   case PostOrder:
-    postOrderReply(*reply);
+    onOrderReply(*reply);
+    break;
+  case PutOrder:
+    onOrderReply(*reply);
     break;
   }
 }
@@ -161,9 +193,21 @@ void HttpClient::getAccnt()
   ++pending_;
 }
 
-void HttpClient::getRefDataReply(QNetworkReply& reply)
+void HttpClient::putOrder(const QUrl& url)
 {
-  qDebug() << "getRefDataReply";
+  QNetworkRequest request{url};
+  request.setAttribute(QNetworkRequest::User, PutOrder);
+  request.setRawHeader("Content-Type", "application/json");
+  request.setRawHeader("Swirly-Accnt", "MARAYL");
+  request.setRawHeader("Swirly-Perm", "2");
+
+  nam_.put(request, "{\"lots\":0}");
+  ++pending_;
+}
+
+void HttpClient::onRefDataReply(QNetworkReply& reply)
+{
+  qDebug() << "onRefDataReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
@@ -194,9 +238,9 @@ void HttpClient::getRefDataReply(QNetworkReply& reply)
   getAccnt();
 }
 
-void HttpClient::getAccntReply(QNetworkReply& reply)
+void HttpClient::onAccntReply(QNetworkReply& reply)
 {
-  qDebug() << "getAccntReply";
+  qDebug() << "onAccntReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
@@ -250,9 +294,9 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
   posnModel().sweep(tag_);
 }
 
-void HttpClient::postMarketReply(QNetworkReply& reply)
+void HttpClient::onMarketReply(QNetworkReply& reply)
 {
-  qDebug() << "postMarketReply";
+  qDebug() << "onMarketReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
@@ -267,9 +311,9 @@ void HttpClient::postMarketReply(QNetworkReply& reply)
   marketModel().updateRow(tag_, Market::fromJson(contr, obj));
 }
 
-void HttpClient::postOrderReply(QNetworkReply& reply)
+void HttpClient::onOrderReply(QNetworkReply& reply)
 {
-  qDebug() << "postOrderReply";
+  qDebug() << "onOrderReply";
   auto body = reply.readAll();
 
   QJsonParseError error;

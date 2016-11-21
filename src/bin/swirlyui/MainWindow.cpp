@@ -42,6 +42,9 @@ MainWindow::MainWindow()
   connect(marketView.get(), &MarketView::createMarket, this, &MainWindow::slotCreateMarket);
   connect(marketView.get(), &MarketView::createOrder, this, &MainWindow::slotCreateOrder);
 
+  auto orderView = make_unique<OrderView>(client_.orderModel());
+  connect(orderView.get(), &OrderView::cancelOrders, this, &MainWindow::slotCancelOrders);
+
   auto topTabs = make_unique<QTabWidget>();
   topTabs->addTab(assetView_ = new AssetView{client_.assetModel()}, tr("Asset"));
   topTabs->addTab(contrView_ = new ContrView{client_.contrModel()}, tr("Contr"));
@@ -49,7 +52,7 @@ MainWindow::MainWindow()
   topTabs->setCurrentIndex(2);
 
   auto bottomTabs = make_unique<QTabWidget>();
-  bottomTabs->addTab(new OrderView{client_.orderModel()}, tr("Order"));
+  bottomTabs->addTab(orderView.release(), tr("Order"));
   bottomTabs->addTab(new ExecView{client_.execModel()}, tr("Exec"));
   bottomTabs->addTab(new TradeView{client_.tradeModel()}, tr("Trade"));
   bottomTabs->addTab(new PosnView{client_.posnModel()}, tr("Posn"));
@@ -110,6 +113,12 @@ void MainWindow::slotCreateOrder(const Contr& contr, QDate settlDate, const QStr
                      << ",lots=" << lots //
                      << ",ticks=" << ticks;
   client_.createOrder(contr, settlDate, ref, side, lots, ticks);
+}
+
+void MainWindow::slotCancelOrders(const OrderKeys& keys)
+{
+  qDebug() << "slotCancelOrders";
+  client_.cancelOrders(keys);
 }
 
 void MainWindow::slotAbout()

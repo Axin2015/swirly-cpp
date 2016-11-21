@@ -92,6 +92,11 @@ struct TypeTraits<QString> {
   static QVariant toVariant(const QString& value) { return value; }
 };
 
+constexpr auto dateToIso(const QDate& value) noexcept
+{
+  return value.year() * 10000 + value.month() * 100 + value.day();
+}
+
 template <>
 struct TypeTraits<QDate> {
   static QDate fromJson(const QJsonValue& value)
@@ -103,10 +108,7 @@ struct TypeTraits<QDate> {
     return {y, m, d};
   }
   static QDate fromVariant(const QVariant& value) { return value.toDate(); }
-  static QJsonValue toJson(const QDate& value)
-  {
-    return value.year() * 10000 + value.month() * 100 + value.day();
-  }
+  static QJsonValue toJson(const QDate& value) { return dateToIso(value); }
   static QVariant toVariant(const QDate& value) { return value; }
 };
 
@@ -214,6 +216,12 @@ QVariant toVariant(const ValueT& value)
 {
   return TypeTraits<ValueT>::toVariant(value);
 }
+
+using ExecKey = std::pair<Id64, Id64>;
+using ExecKeys = std::vector<ExecKey>;
+
+using OrderKey = std::pair<Id64, Id64>;
+using OrderKeys = std::vector<OrderKey>;
 
 } // ui
 } // swirly
