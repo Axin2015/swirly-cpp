@@ -228,11 +228,14 @@ void HttpClient::getAccntReply(QNetworkReply& reply)
     }
   }
   orderModel().sweep(tag_);
-  using boost::adaptors::reverse;
-  for (const auto elem : reverse(obj["execs"].toArray())) {
-    const auto obj = elem.toObject();
-    const auto contr = findContr(obj);
-    execModel().updateRow(tag_, Exec::fromJson(contr, obj));
+  {
+    using boost::adaptors::reverse;
+    auto arr = obj["execs"].toArray();
+    for (const auto elem : reverse(arr)) {
+      const auto obj = elem.toObject();
+      const auto contr = findContr(obj);
+      execModel().updateRow(tag_, Exec::fromJson(contr, obj));
+    }
   }
   for (const auto elem : obj["trades"].toArray()) {
     const auto obj = elem.toObject();
@@ -296,14 +299,17 @@ void HttpClient::postOrderReply(QNetworkReply& reply)
       orderModel().removeRow(order);
     }
   }
-  using boost::adaptors::reverse;
-  for (const auto elem : reverse(obj["execs"].toArray())) {
-    const auto obj = elem.toObject();
-    const auto contr = findContr(obj);
-    const auto exec = Exec::fromJson(contr, obj);
-    execModel().updateRow(tag_, exec);
-    if (exec.state() == State::Trade) {
-      tradeModel().updateRow(tag_, exec);
+  {
+    using boost::adaptors::reverse;
+    auto arr = obj["execs"].toArray();
+    for (const auto elem : reverse(arr)) {
+      const auto obj = elem.toObject();
+      const auto contr = findContr(obj);
+      const auto exec = Exec::fromJson(contr, obj);
+      execModel().updateRow(tag_, exec);
+      if (exec.state() == State::Trade) {
+        tradeModel().updateRow(tag_, exec);
+      }
     }
   }
   {
