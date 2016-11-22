@@ -20,8 +20,6 @@
 
 #include <swirly/unit/Test.hpp>
 
-#include <iostream>
-using namespace std;
 using namespace swirly;
 
 static_assert(sizeof(Market) <= 4 * 64, "crossed cache-line boundary");
@@ -30,7 +28,6 @@ SWIRLY_TEST_CASE(MarketToString)
 {
   Market market{1_id64, "EURUSD"_sv, ymdToJd(2014, 2, 14), 0x01};
 
-  cout << toString(market) << endl;
   SWIRLY_CHECK(toString(market) == //
                "{\"id\":1"
                ",\"contr\":\"EURUSD\""
@@ -52,7 +49,6 @@ SWIRLY_TEST_CASE(MarketToStringNull)
 {
   Market market{1_id64, "EURUSD"_sv, 0_jd, 0x01};
 
-  cout << toString(market) << endl;
   SWIRLY_CHECK(toString(market) == //
                "{\"id\":1"
                ",\"contr\":\"EURUSD\""

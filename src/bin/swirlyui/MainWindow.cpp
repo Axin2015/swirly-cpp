@@ -90,25 +90,25 @@ void MainWindow::slotRefDataComplete()
 
 void MainWindow::slotServiceError(const QString& error)
 {
-  qDebug() << "slotServiceError:" << error;
+  qDebug().nospace() << "slotServiceError: " << error;
 }
 
 void MainWindow::slotCreateMarket(const Contr& contr, QDate settlDate)
 {
-  qDebug() << "slotCreateMarket: contr=" << contr //
-           << ",settlDate=" << settlDate;
+  qDebug().nospace() << "slotCreateMarket: contr=" << contr //
+                     << ",settlDate=" << settlDate;
   client_.createMarket(contr, settlDate);
 }
 
 void MainWindow::slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
                                  Lots lots, Ticks ticks)
 {
-  qDebug() << "slotCreateOrder: contr=" << contr //
-           << ",settlDate=" << settlDate //
-           << ",ref=" << ref //
-           << ",side=" << side //
-           << ",lots=" << lots //
-           << ",ticks=" << ticks;
+  qDebug().nospace() << "slotCreateOrder: contr=" << contr //
+                     << ",settlDate=" << settlDate //
+                     << ",ref=" << ref //
+                     << ",side=" << side //
+                     << ",lots=" << lots //
+                     << ",ticks=" << ticks;
   client_.createOrder(contr, settlDate, ref, side, lots, ticks);
 }
 

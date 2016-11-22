@@ -96,7 +96,7 @@ void MarketForm::slotContrChanged(int index)
     return;
   }
   auto contr = contrComboBox_->currentData().value<Contr>();
-  qDebug() << "slotContrChanged:" << contr;
+  qDebug().nospace() << "slotContrChanged: " << contr;
   lotsValidator_.setRange(contr.minLots().count(), contr.maxLots().count());
   priceValidator_.setDecimals(contr.priceDp());
 }
