@@ -22,3 +22,7 @@ install(TARGETS swirly_bench DESTINATION bin)
 add_executable(swirly_dump Dump.cpp)
 target_link_libraries(swirly_dump ${sqlite_LIBRARY})
 install(TARGETS swirly_dump DESTINATION bin)
+
+# Reserved as an ad-hoc scratch pad.
+add_executable(swirly_scratch Scratch.cpp)
+target_link_libraries(swirly_scratch ${util_LIBRARY})
