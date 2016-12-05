@@ -15,7 +15,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/ws/RestRequest.hpp>
+#include <swirly/ws/RestBody.hpp>
 
 #include <swirly/fin/Exception.hpp>
 
@@ -266,9 +266,9 @@ namespace {
 
 } // anonymous
 
-RestRequest::~RestRequest() noexcept = default;
+RestBody::~RestBody() noexcept = default;
 
-void RestRequest::reset(bool clear) noexcept
+void RestBody::reset(bool clear) noexcept
 {
   decltype(cs_) cs;
   %% write init;
@@ -293,7 +293,7 @@ void RestRequest::reset(bool clear) noexcept
   cpty_.len = 0;
 }
 
-bool RestRequest::parse(string_view buf)
+bool RestBody::parse(string_view buf)
 {
   const char* p{buf.data()};
   const char* pe{p + buf.size()};

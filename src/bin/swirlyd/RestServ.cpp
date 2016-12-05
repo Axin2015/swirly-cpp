@@ -306,8 +306,8 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
       matchMethod_ = true;
       getAdmin(req);
       {
-        constexpr auto ReqFields = RestRequest::Contr | RestRequest::SettlDate;
-        constexpr auto OptFields = RestRequest::State;
+        constexpr auto ReqFields = RestBody::Contr | RestBody::SettlDate;
+        constexpr auto OptFields = RestBody::State;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -339,8 +339,8 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
       matchMethod_ = true;
       getAdmin(req);
       {
-        constexpr auto ReqFields = RestRequest::SettlDate;
-        constexpr auto OptFields = RestRequest::State;
+        constexpr auto ReqFields = RestBody::SettlDate;
+        constexpr auto OptFields = RestBody::State;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -373,7 +373,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
       getAdmin(req);
       {
         constexpr auto ReqFields = 0;
-        constexpr auto OptFields = RestRequest::State;
+        constexpr auto OptFields = RestBody::State;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -385,7 +385,7 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
       matchMethod_ = true;
       getAdmin(req);
       {
-        constexpr auto ReqFields = RestRequest::State;
+        constexpr auto ReqFields = RestBody::State;
         if (!req.body().valid(ReqFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -474,9 +474,9 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
       {
         // Validate account before request.
         const auto accnt = getTrader(req);
-        constexpr auto ReqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Side
-          | RestRequest::Lots | RestRequest::Ticks;
-        constexpr auto OptFields = RestRequest::Ref | RestRequest::MinLots;
+        constexpr auto ReqFields = RestBody::Contr | RestBody::SettlDate | RestBody::Side
+          | RestBody::Lots | RestBody::Ticks;
+        constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -512,8 +512,8 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
         // Validate account before request.
         const auto accnt = getTrader(req);
         constexpr auto ReqFields
-          = RestRequest::SettlDate | RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
-        constexpr auto OptFields = RestRequest::Ref | RestRequest::MinLots;
+          = RestBody::SettlDate | RestBody::Side | RestBody::Lots | RestBody::Ticks;
+        constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -547,8 +547,8 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
       {
         // Validate account before request.
         const auto accnt = getTrader(req);
-        constexpr auto ReqFields = RestRequest::Side | RestRequest::Lots | RestRequest::Ticks;
-        constexpr auto OptFields = RestRequest::Ref | RestRequest::MinLots;
+        constexpr auto ReqFields = RestBody::Side | RestBody::Lots | RestBody::Ticks;
+        constexpr auto OptFields = RestBody::Ref | RestBody::MinLots;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -582,7 +582,7 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
       {
         // Validate account before request.
         const auto accnt = getTrader(req);
-        constexpr auto ReqFields = RestRequest::Lots;
+        constexpr auto ReqFields = RestBody::Lots;
         if (req.body().fields() != ReqFields) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -630,10 +630,10 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
       matchMethod_ = true;
       getAdmin(req);
       {
-        constexpr auto ReqFields = RestRequest::Contr | RestRequest::SettlDate | RestRequest::Accnt
-          | RestRequest::Side | RestRequest::Lots;
+        constexpr auto ReqFields = RestBody::Contr | RestBody::SettlDate | RestBody::Accnt
+          | RestBody::Side | RestBody::Lots;
         constexpr auto OptFields
-          = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
+          = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -668,9 +668,9 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
       getAdmin(req);
       {
         constexpr auto ReqFields
-          = RestRequest::SettlDate | RestRequest::Accnt | RestRequest::Side | RestRequest::Lots;
+          = RestBody::SettlDate | RestBody::Accnt | RestBody::Side | RestBody::Lots;
         constexpr auto OptFields
-          = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
+          = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
@@ -704,9 +704,9 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
       matchMethod_ = true;
       getAdmin(req);
       {
-        constexpr auto ReqFields = RestRequest::Accnt | RestRequest::Side | RestRequest::Lots;
+        constexpr auto ReqFields = RestBody::Accnt | RestBody::Side | RestBody::Lots;
         constexpr auto OptFields
-          = RestRequest::Ref | RestRequest::Ticks | RestRequest::LiqInd | RestRequest::Cpty;
+          = RestBody::Ref | RestBody::Ticks | RestBody::LiqInd | RestBody::Cpty;
         if (!req.body().valid(ReqFields, OptFields)) {
           throw InvalidException{"request fields are invalid"_sv};
         }
