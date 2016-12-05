@@ -123,7 +123,7 @@ void MainWindow::slotCancelOrders(const OrderKeys& keys)
 
 void MainWindow::slotAbout()
 {
-  qDebug() << "slotFinished";
+  qDebug() << "slotAbout";
   QMessageBox::about(this, tr("About Swiry UI"), tr("The Swirly UI."));
 }
 

@@ -50,7 +50,6 @@ HttpClient::~HttpClient() noexcept = default;
 
 void HttpClient::timerEvent(QTimerEvent* event)
 {
-  qDebug().nospace() << "timerEvent: errors=" << errors_ << ",pending=" << pending_;
   if (errors_ > 0) {
     if (!pending_) {
       errors_ = 0;
@@ -104,8 +103,6 @@ void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString&
 
 void HttpClient::cancelOrders(const OrderKeys& keys)
 {
-  qDebug() << "cancelOrders";
-
   QString str;
   QTextStream out{&str};
   Market market;
@@ -133,7 +130,6 @@ void HttpClient::cancelOrders(const OrderKeys& keys)
 
 void HttpClient::slotFinished(QNetworkReply* reply)
 {
-  qDebug() << "slotFinished";
   --pending_;
   reply->deleteLater();
 
@@ -207,7 +203,6 @@ void HttpClient::putOrder(const QUrl& url)
 
 void HttpClient::onRefDataReply(QNetworkReply& reply)
 {
-  qDebug() << "onRefDataReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
@@ -240,7 +235,6 @@ void HttpClient::onRefDataReply(QNetworkReply& reply)
 
 void HttpClient::onAccntReply(QNetworkReply& reply)
 {
-  qDebug() << "onAccntReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
@@ -296,7 +290,6 @@ void HttpClient::onAccntReply(QNetworkReply& reply)
 
 void HttpClient::onMarketReply(QNetworkReply& reply)
 {
-  qDebug() << "onMarketReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
@@ -313,7 +306,6 @@ void HttpClient::onMarketReply(QNetworkReply& reply)
 
 void HttpClient::onOrderReply(QNetworkReply& reply)
 {
-  qDebug() << "onOrderReply";
   auto body = reply.readAll();
 
   QJsonParseError error;
