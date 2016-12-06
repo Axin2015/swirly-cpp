@@ -36,6 +36,8 @@ class HttpClient : public Client {
   void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
                    Ticks ticks) override;
 
+  void cancelOrders(const OrderKeys& keys) override;
+
  signals:
 
  protected:
@@ -44,16 +46,19 @@ class HttpClient : public Client {
  private slots:
   void slotFinished(QNetworkReply* reply);
 
+  void slotNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
+
  private:
   Contr findContr(const QJsonObject& obj) const;
 
   void getRefData();
   void getAccnt();
+  void putOrder(const QUrl& url);
 
-  void getRefDataReply(QNetworkReply& reply);
-  void getAccntReply(QNetworkReply& reply);
-  void postMarketReply(QNetworkReply& reply);
-  void postOrderReply(QNetworkReply& reply);
+  void onRefDataReply(QNetworkReply& reply);
+  void onAccntReply(QNetworkReply& reply);
+  void onMarketReply(QNetworkReply& reply);
+  void onOrderReply(QNetworkReply& reply);
 
   QNetworkAccessManager nam_;
   std::uint64_t tag_{0};

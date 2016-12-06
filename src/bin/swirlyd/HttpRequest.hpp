@@ -18,7 +18,7 @@
 #define SWIRLYD_HTTPREQUEST_HPP
 
 #include <swirly/ws/HttpHandler.hpp>
-#include <swirly/ws/RestRequest.hpp>
+#include <swirly/ws/RestBody.hpp>
 #include <swirly/ws/Url.hpp>
 
 namespace swirly {
@@ -96,8 +96,7 @@ class HttpRequest : public BasicUrl<HttpRequest> {
   String<24> time_;
   String<24> accnt_;
   String<24> perm_;
-  // FIXME: rename to RestBody.
-  RestRequest body_;
+  RestBody body_;
   bool partial_{false};
 };
 

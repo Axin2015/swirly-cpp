@@ -15,11 +15,11 @@
 
 if(RAGEL_EXECUTABLE)
   add_custom_command(
-    OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.cpp"
+    OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.cpp"
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    COMMAND "${RAGEL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.rl"
-            -o "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.cpp"
-    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/RestRequest.rl")
+    COMMAND "${RAGEL_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.rl"
+            -o "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.cpp"
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/RestBody.rl")
 endif(RAGEL_EXECUTABLE)
 
 set(ws_SOURCES
@@ -27,7 +27,7 @@ set(ws_SOURCES
   Exception.cpp
   Page.cpp
   Rest.cpp
-  RestRequest.cpp
+  RestBody.cpp
   http_parser.c)
 
 add_library(ws_static STATIC ${ws_SOURCES})

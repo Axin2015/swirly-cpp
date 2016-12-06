@@ -16,12 +16,13 @@
  */
 #include "OrderView.hpp"
 
+#include "OrderForm.hpp"
 #include "OrderModel.hpp"
 #include "Utility.hpp"
 
-#include <QGridLayout>
 #include <QModelIndex>
 #include <QTableView>
+#include <QVBoxLayout>
 
 #include <memory>
 
@@ -34,6 +35,9 @@ using namespace order;
 OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
   : QWidget{parent, f}, model_(model)
 {
+  auto form = make_unique<OrderForm>(model);
+  connect(form.get(), &OrderForm::cancelOrders, this, &OrderView::cancelOrders);
+
   auto table = make_unique<QTableView>();
   {
     auto del = makeDeleter(table->model());
@@ -50,7 +54,8 @@ OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
 
   connect(table.get(), &QTableView::clicked, this, &OrderView::slotClicked);
 
-  auto layout = make_unique<QGridLayout>();
+  auto layout = make_unique<QVBoxLayout>();
+  layout->addWidget(form.release(), 0, 0);
   layout->addWidget(table.release(), 0, 0);
   setLayout(layout.release());
 }

@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_WS_RESTREQUEST_HPP
-#define SWIRLY_WS_RESTREQUEST_HPP
+#ifndef SWIRLY_WS_RESTBODY_HPP
+#define SWIRLY_WS_RESTBODY_HPP
 
 #include <swirly/fin/Types.hpp>
 
@@ -24,7 +24,7 @@
 
 namespace swirly {
 
-class SWIRLY_API RestRequest {
+class SWIRLY_API RestBody {
  public:
   enum : unsigned {
     Mnem = 1 << 0,
@@ -41,16 +41,16 @@ class SWIRLY_API RestRequest {
     Cpty = 1 << 11
   };
 
-  RestRequest() noexcept { reset(); }
-  ~RestRequest() noexcept;
+  RestBody() noexcept { reset(); }
+  ~RestBody() noexcept;
 
   // Copy.
-  RestRequest(const RestRequest&) = delete;
-  RestRequest& operator=(const RestRequest&) = delete;
+  RestBody(const RestBody&) = delete;
+  RestBody& operator=(const RestBody&) = delete;
 
   // Move.
-  RestRequest(RestRequest&&) = delete;
-  RestRequest& operator=(RestRequest&&) = delete;
+  RestBody(RestBody&&) = delete;
+  RestBody& operator=(RestBody&&) = delete;
 
   unsigned fields() const noexcept { return fields_; }
   swirly::Mnem mnem() const noexcept { return +mnem_; }
@@ -115,4 +115,4 @@ class SWIRLY_API RestRequest {
 
 } // swirly
 
-#endif // SWIRLY_WS_RESTREQUEST_HPP
+#endif // SWIRLY_WS_RESTBODY_HPP

@@ -57,6 +57,7 @@ class Client : public QObject {
   virtual void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
                            Lots lots, Ticks ticks)
     = 0;
+  virtual void cancelOrders(const OrderKeys& keys) = 0;
 
  signals:
   void refDataComplete();

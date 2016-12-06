@@ -14,43 +14,39 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_ORDERMODEL_HPP
-#define SWIRLYUI_ORDERMODEL_HPP
+#ifndef SWIRLYUI_ORDERFORM_HPP
+#define SWIRLYUI_ORDERFORM_HPP
 
-#include "Order.hpp"
-#include "TableModel.hpp"
+#include "Types.hpp"
+
+#include <QWidget>
 
 namespace swirly {
 namespace ui {
 
-class OrderModel
-  : public TableModel<OrderKey, Order, unbox(order::Column::CheckState), order::ColumnCount> {
+class OrderModel;
+
+class OrderForm : public QWidget {
+  Q_OBJECT
+
  public:
-  OrderModel(QObject* parent = nullptr);
-  ~OrderModel() noexcept override;
+  OrderForm(OrderModel& orderModel, QWidget* parent = nullptr,
+            Qt::WindowFlags f = Qt::WindowFlags{});
+  ~OrderForm() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+ signals:
+  void cancelOrders(const OrderKeys& keys);
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-
-  OrderKeys checked() const;
-
-  void removeRow(const Order& order)
-  {
-    const OrderKey key{order.marketId(), order.id()};
-    TableModel::removeRow(key);
-  }
-  void updateRow(std::uint64_t tag, const Order& order)
-  {
-    const OrderKey key{order.marketId(), order.id()};
-    TableModel::updateRow(key, tag, order);
-  }
+ private slots:
+  void slotSelectAllClicked();
+  void slotSelectNoneClicked();
+  void slotCancelOrdersClicked();
 
  private:
-  QVariant header_[order::ColumnCount];
+  OrderModel& orderModel_;
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_ORDERMODEL_HPP
+#endif // SWIRLYUI_ORDERFORM_HPP

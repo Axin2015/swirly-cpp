@@ -59,6 +59,7 @@ class Order {
 
   static Order fromJson(const Contr& contr, const QJsonObject& obj);
 
+  OrderKey key() const noexcept { return {marketId_, id_}; }
   Id64 marketId() const noexcept { return marketId_; }
   const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }

@@ -14,40 +14,24 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_ORDERVIEW_HPP
-#define SWIRLYUI_ORDERVIEW_HPP
-
-#include "Types.hpp"
-
-#include <QWidget>
-
-class QModelIndex;
+#include <swirly/util/Log.hpp>
 
 namespace swirly {
-namespace ui {
-
-class Order;
-class OrderModel;
-
-class OrderView : public QWidget {
-  Q_OBJECT
-
- public:
-  explicit OrderView(OrderModel& model, QWidget* parent = nullptr,
-                     Qt::WindowFlags f = Qt::WindowFlags{});
-  ~OrderView() noexcept override;
-
- signals:
-  void cancelOrders(const OrderKeys& keys);
-
- private slots:
-  void slotClicked(const QModelIndex& index);
-
- private:
-  OrderModel& model_;
-};
-
-} // ui
 } // swirly
 
-#endif // SWIRLYUI_ORDERVIEW_HPP
+using namespace std;
+using namespace swirly;
+
+namespace {
+} // anonymous
+
+int main(int argc, char* argv[])
+{
+  int ret = 1;
+  try {
+    ret = 0;
+  } catch (const exception& e) {
+    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+  }
+  return ret;
+}

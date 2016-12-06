@@ -102,9 +102,6 @@ if(DOXYGEN_FOUND)
     COMMAND "${DOXYGEN_EXECUTABLE}" "${PROJECT_BINARY_DIR}/Doxyfile"
     SOURCES "${PROJECT_BINARY_DIR}/Doxyfile")
 
-  add_custom_command(TARGET doc POST_BUILD
-    COMMAND "${CMAKE_COMMAND}" -E copy "${PROJECT_SOURCE_DIR}/CNAME"
-            "${PROJECT_BINARY_DIR}/share/doc/html/")
   add_dependencies(doc image)
 
   install(DIRECTORY "${PROJECT_BINARY_DIR}/share/doc/" DESTINATION share/doc)

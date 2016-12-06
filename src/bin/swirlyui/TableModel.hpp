@@ -69,6 +69,15 @@ class TableModel : public QAbstractTableModel {
       }
     }
   }
+  void setChecked(bool checked = true)
+  {
+    if (!rows_.empty()) {
+      for (auto& row : rows_) {
+        row.second.setChecked(checked);
+      }
+      emit dataChanged(index(0, CheckStateN), index(rows_.size() - 1, CheckStateN));
+    }
+  }
   void toggleCheckState(int n)
   {
     auto& row = rowAt(n);
