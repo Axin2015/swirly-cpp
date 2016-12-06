@@ -135,8 +135,11 @@ void HttpClient::slotFinished(QNetworkReply* reply)
   --pending_;
   reply->deleteLater();
 
+  const auto statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
   if (reply->error() != QNetworkReply::NoError) {
-    ++errors_;
+    if (statusCode.isNull()) {
+      ++errors_;
+    }
     emit serviceError(reply->errorString());
     return;
   }
