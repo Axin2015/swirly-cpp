@@ -46,6 +46,8 @@ class HttpClient : public Client {
  private slots:
   void slotFinished(QNetworkReply* reply);
 
+  void slotNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
+
  private:
   Contr findContr(const QJsonObject& obj) const;
 

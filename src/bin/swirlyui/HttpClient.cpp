@@ -42,6 +42,8 @@ enum : int { GetRefData = 1, GetAccnt, PostMarket, PostOrder, PutOrder };
 HttpClient::HttpClient(QObject* parent) : Client{parent}
 {
   connect(&nam_, &QNetworkAccessManager::finished, this, &HttpClient::slotFinished);
+  connect(&nam_, &QNetworkAccessManager::networkAccessibleChanged, this,
+          &HttpClient::slotNetworkAccessibleChanged);
   getRefData();
   startTimer(2000);
 }
@@ -157,6 +159,22 @@ void HttpClient::slotFinished(QNetworkReply* reply)
     onOrderReply(*reply);
     break;
   }
+}
+
+void HttpClient::slotNetworkAccessibleChanged(
+  QNetworkAccessManager::NetworkAccessibility accessible)
+{
+  switch (accessible) {
+  case QNetworkAccessManager::UnknownAccessibility:
+    qDebug() << "network accessibility unknown";
+    break;
+  case QNetworkAccessManager::NotAccessible:
+    qDebug() << "network is not accessible";
+    break;
+  case QNetworkAccessManager::Accessible:
+    qDebug() << "network is accessible";
+    break;
+  };
 }
 
 Contr HttpClient::findContr(const QJsonObject& obj) const
