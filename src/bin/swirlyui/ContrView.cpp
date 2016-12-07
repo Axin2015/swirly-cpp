@@ -43,8 +43,9 @@ ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
 
   table->setColumnHidden(unbox(Column::CheckState), true);
 
+  table->setFocusPolicy(Qt::NoFocus);
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::SingleSelection);
+  table->setSelectionMode(QAbstractItemView::NoSelection);
 
   connect(table.get(), &QTableView::clicked, this, &ContrView::slotClicked);
 

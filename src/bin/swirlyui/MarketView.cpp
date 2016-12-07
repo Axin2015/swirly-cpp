@@ -53,8 +53,9 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
   table->setColumnHidden(unbox(Column::LastLots), true);
   table->setColumnHidden(unbox(Column::LastTime), true);
 
+  table->setFocusPolicy(Qt::NoFocus);
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::SingleSelection);
+  table->setSelectionMode(QAbstractItemView::NoSelection);
 
   connect(table.get(), &QTableView::clicked, this, &MarketView::slotClicked);
 
