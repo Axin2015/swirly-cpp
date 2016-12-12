@@ -138,5 +138,15 @@ Contr ContrModel::find(const QString& mnem) const
   return contr;
 }
 
+int ContrModel::indexOf(const QString& mnem) const
+{
+  int i{-1};
+  auto it = rows_.find(mnem);
+  if (it != rows_.end()) {
+    i = distance(rows_.begin(), it);
+  }
+  return i;
+}
+
 } // ui
 } // swirly

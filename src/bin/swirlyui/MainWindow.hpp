@@ -26,6 +26,7 @@ namespace ui {
 
 class AssetView;
 class ContrView;
+class MarketView;
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -56,6 +57,7 @@ class MainWindow : public QMainWindow {
   HttpClient client_;
   AssetView* assetView_{nullptr};
   ContrView* contrView_{nullptr};
+  MarketView* marketView_{nullptr};
 };
 
 } // ui

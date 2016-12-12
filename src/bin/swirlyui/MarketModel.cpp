@@ -148,5 +148,15 @@ Market MarketModel::find(Id64 id) const
   return market;
 }
 
+int MarketModel::indexOf(Id64 id) const
+{
+  int i{-1};
+  auto it = rows_.find(id);
+  if (it != rows_.end()) {
+    i = distance(rows_.begin(), it);
+  }
+  return i;
+}
+
 } // ui
 } // swirly

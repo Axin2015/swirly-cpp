@@ -60,17 +60,65 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
   connect(table.get(), &QTableView::clicked, this, &MarketView::slotClicked);
 
   auto layout = make_unique<QVBoxLayout>();
-  layout->addWidget(form.release());
+  layout->addWidget(marketForm_ = form.release());
   layout->addWidget(table.release());
   setLayout(layout.release());
 }
 
 MarketView::~MarketView() noexcept = default;
 
+void MarketView::setFields(const QString& contrMnem, QDate settlDate, optional<Lots> lots,
+                           optional<Ticks> ticks)
+{
+  marketForm_->setFields(contrMnem, settlDate, lots, ticks);
+}
+
 void MarketView::slotClicked(const QModelIndex& index)
 {
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    model_.toggleCheckState(index.row());
+  if (index.isValid()) {
+    const auto& market = model_.valueAt(index.row());
+    optional<Lots> lots;
+    optional<Ticks> ticks;
+    switch (box<Column>(index.column())) {
+    case Column::CheckState:
+      model_.toggleCheckState(index.row());
+    // Fall-through.
+    case Column::Id:
+    case Column::Contr:
+    case Column::SettlDate:
+    case Column::State:
+    case Column::LastLots:
+    case Column::LastPrice:
+    case Column::LastTime:
+      if (market.lastLots() != 0_lts) {
+        lots = market.lastLots();
+        ticks = market.lastTicks();
+      }
+      break;
+    case Column::BidCount:
+    case Column::BidResd:
+    case Column::BidPrice:
+      if (market.bestBid().resd() != 0_lts) {
+        lots = market.bestBid().resd();
+        ticks = market.bestBid().ticks();
+      } else if (market.lastLots() != 0_lts) {
+        lots = market.lastLots();
+        ticks = market.lastTicks();
+      }
+      break;
+    case Column::OfferPrice:
+    case Column::OfferResd:
+    case Column::OfferCount:
+      if (market.bestOffer().resd() != 0_lts) {
+        lots = market.bestOffer().resd();
+        ticks = market.bestOffer().ticks();
+      } else if (market.lastLots() != 0_lts) {
+        lots = market.lastLots();
+        ticks = market.lastTicks();
+      }
+      break;
+    }
+    setFields(market.contr().mnem(), market.settlDate(), lots, ticks);
   }
 }
 

@@ -35,6 +35,8 @@ class MarketModel
 
   Market find(Id64 id) const;
 
+  int indexOf(Id64 id) const;
+
   void removeRow(const Market& market) { TableModel::removeRow(market.id()); }
   void updateRow(std::uint64_t tag, const Market& market)
   {
