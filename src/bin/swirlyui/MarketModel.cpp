@@ -77,13 +77,17 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       var = toVariant(market.lastLots());
       break;
     case Column::LastPrice:
-      var = ticksToPriceString(market.lastTicks(), market.contr());
+      if (market.lastLots() != 0_lts) {
+        var = ticksToPriceString(market.lastTicks(), market.contr());
+      }
       break;
     case Column::LastTime:
       var = market.lastTime();
       break;
     case Column::BidPrice:
-      var = ticksToPriceString(market.bestBid().ticks(), market.contr());
+      if (market.bestBid().resd() != 0_lts) {
+        var = ticksToPriceString(market.bestBid().ticks(), market.contr());
+      }
       break;
     case Column::BidResd:
       var = toVariant(market.bestBid().resd());
@@ -92,7 +96,9 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
       var = market.bestBid().count();
       break;
     case Column::OfferPrice:
-      var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
+      if (market.bestOffer().resd() != 0_lts) {
+        var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
+      }
       break;
     case Column::OfferResd:
       var = toVariant(market.bestOffer().resd());
@@ -146,6 +152,16 @@ Market MarketModel::find(Id64 id) const
     market = it->second.value();
   }
   return market;
+}
+
+int MarketModel::indexOf(Id64 id) const
+{
+  int i{-1};
+  auto it = rows_.find(id);
+  if (it != rows_.end()) {
+    i = distance(rows_.begin(), it);
+  }
+  return i;
 }
 
 } // ui

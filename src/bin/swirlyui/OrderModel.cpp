@@ -94,7 +94,9 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       var = toVariant(order.lots());
       break;
     case Column::Price:
-      var = ticksToPriceString(order.ticks(), order.contr());
+      if (order.lots() != 0_lts) {
+        var = ticksToPriceString(order.ticks(), order.contr());
+      }
       break;
     case Column::Resd:
       var = toVariant(order.resd());
@@ -109,7 +111,9 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       var = toVariant(order.lastLots());
       break;
     case Column::LastPrice:
-      var = ticksToPriceString(order.lastTicks(), order.contr());
+      if (order.lastLots() != 0_lts) {
+        var = ticksToPriceString(order.lastTicks(), order.contr());
+      }
       break;
     case Column::MinLots:
       var = toVariant(order.minLots());

@@ -21,7 +21,15 @@
 
 #include <QWidget>
 
+#include <experimental/optional>
+
 class QModelIndex;
+
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+}
 
 namespace swirly {
 namespace ui {
@@ -29,6 +37,7 @@ namespace ui {
 class Contr;
 class ContrModel;
 class Market;
+class MarketForm;
 class MarketModel;
 
 class MarketView : public QWidget {
@@ -38,6 +47,9 @@ class MarketView : public QWidget {
   MarketView(ContrModel& contrModel, MarketModel& model, QWidget* parent = nullptr,
              Qt::WindowFlags f = Qt::WindowFlags{});
   ~MarketView() noexcept override;
+
+  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                 std::optional<Ticks> ticks);
 
  signals:
   void createMarket(const Contr& contr, QDate settlDate);
@@ -49,6 +61,7 @@ class MarketView : public QWidget {
 
  private:
   MarketModel& model_;
+  MarketForm* marketForm_{nullptr};
 };
 
 } // ui

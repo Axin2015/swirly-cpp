@@ -23,9 +23,17 @@
 #include <QIntValidator>
 #include <QWidget>
 
+#include <experimental/optional>
+
 class QComboBox;
 class QDateEdit;
 class QLineEdit;
+
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+}
 
 namespace swirly {
 namespace ui {
@@ -40,6 +48,9 @@ class MarketForm : public QWidget {
   MarketForm(ContrModel& contrModel, QWidget* parent = nullptr,
              Qt::WindowFlags f = Qt::WindowFlags{});
   ~MarketForm() noexcept override;
+
+  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                 std::optional<Ticks> ticks);
 
  signals:
   void createMarket(const Contr& contr, QDate settlDate);

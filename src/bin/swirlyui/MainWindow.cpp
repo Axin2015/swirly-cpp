@@ -48,7 +48,7 @@ MainWindow::MainWindow()
   auto topTabs = make_unique<QTabWidget>();
   topTabs->addTab(assetView_ = new AssetView{client_.assetModel()}, tr("Asset"));
   topTabs->addTab(contrView_ = new ContrView{client_.contrModel()}, tr("Contr"));
-  topTabs->addTab(marketView.release(), tr("Market"));
+  topTabs->addTab(marketView_ = marketView.release(), tr("Market"));
   topTabs->setCurrentIndex(2);
 
   auto bottomTabs = make_unique<QTabWidget>();

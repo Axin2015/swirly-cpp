@@ -46,8 +46,9 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   table->setColumnHidden(unbox(Column::State), true);
   table->setColumnHidden(unbox(Column::MinLots), true);
 
+  table->setFocusPolicy(Qt::NoFocus);
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::SingleSelection);
+  table->setSelectionMode(QAbstractItemView::NoSelection);
 
   connect(table.get(), &QTableView::clicked, this, &TradeView::slotClicked);
 

@@ -100,7 +100,9 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       var = toVariant(trade.lots());
       break;
     case Column::Price:
-      var = ticksToPriceString(trade.ticks(), trade.contr());
+      if (trade.lots() != 0_lts) {
+        var = ticksToPriceString(trade.ticks(), trade.contr());
+      }
       break;
     case Column::Resd:
       var = toVariant(trade.resd());
@@ -115,7 +117,9 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       var = toVariant(trade.lastLots());
       break;
     case Column::LastPrice:
-      var = ticksToPriceString(trade.lastTicks(), trade.contr());
+      if (trade.lastLots() != 0_lts) {
+        var = ticksToPriceString(trade.lastTicks(), trade.contr());
+      }
       break;
     case Column::MinLots:
       var = toVariant(trade.minLots());
