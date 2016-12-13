@@ -112,7 +112,9 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       var = toVariant(exec.lots());
       break;
     case Column::Price:
-      var = ticksToPriceString(exec.ticks(), exec.contr());
+      if (exec.lots() != 0_lts) {
+        var = ticksToPriceString(exec.ticks(), exec.contr());
+      }
       break;
     case Column::Resd:
       var = toVariant(exec.resd());
@@ -127,19 +129,27 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       var = toVariant(exec.lastLots());
       break;
     case Column::LastPrice:
-      var = ticksToPriceString(exec.lastTicks(), exec.contr());
+      if (exec.lastLots() != 0_lts) {
+        var = ticksToPriceString(exec.lastTicks(), exec.contr());
+      }
       break;
     case Column::MinLots:
       var = toVariant(exec.minLots());
       break;
     case Column::MatchId:
-      var = toVariant(exec.matchId());
+      if (exec.matchId() != 0_id64) {
+        var = toVariant(exec.matchId());
+      }
       break;
     case Column::LiqInd:
-      var = enumString(exec.liqInd());
+      if (exec.matchId() != 0_id64) {
+        var = enumString(exec.liqInd());
+      }
       break;
     case Column::Cpty:
-      var = exec.cpty();
+      if (exec.matchId() != 0_id64) {
+        var = exec.cpty();
+      }
       break;
     case Column::Created:
       var = exec.created();
