@@ -92,7 +92,7 @@ struct TypeTraits<QString> {
   static QVariant toVariant(const QString& value) { return value; }
 };
 
-constexpr auto dateToIso(const QDate& value) noexcept
+inline auto dateToIso(const QDate& value) noexcept
 {
   return value.year() * 10000 + value.month() * 100 + value.day();
 }
