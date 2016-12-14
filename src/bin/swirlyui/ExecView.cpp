@@ -64,6 +64,17 @@ void ExecView::slotClicked(const QModelIndex& index)
   if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
     model_.toggleCheckState(index.row());
   }
+  optional<Lots> lots;
+  optional<Ticks> ticks;
+  const auto& exec = model_.valueAt(index.row());
+  if (exec.matchId() != 0_id64) {
+    lots = exec.lastLots();
+    ticks = exec.lastTicks();
+  } else {
+    lots = exec.resd() > 0_lts ? exec.resd() : exec.lots();
+    ticks = exec.ticks();
+  }
+  emit setFields(exec.contr().mnem(), exec.settlDate(), lots, ticks);
 }
 
 } // ui

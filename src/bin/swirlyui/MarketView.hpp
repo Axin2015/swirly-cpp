@@ -21,15 +21,7 @@
 
 #include <QWidget>
 
-#include <experimental/optional>
-
 class QModelIndex;
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-using experimental::nullopt;
-}
 
 namespace swirly {
 namespace ui {

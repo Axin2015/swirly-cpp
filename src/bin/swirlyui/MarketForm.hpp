@@ -23,17 +23,9 @@
 #include <QIntValidator>
 #include <QWidget>
 
-#include <experimental/optional>
-
 class QComboBox;
 class QDateEdit;
 class QLineEdit;
-
-namespace std {
-template <typename T>
-using optional = experimental::optional<T>;
-using experimental::nullopt;
-}
 
 namespace swirly {
 namespace ui {

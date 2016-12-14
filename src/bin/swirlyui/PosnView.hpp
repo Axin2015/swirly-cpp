@@ -17,6 +17,8 @@
 #ifndef SWIRLYUI_POSNVIEW_HPP
 #define SWIRLYUI_POSNVIEW_HPP
 
+#include "Types.hpp"
+
 #include <QWidget>
 
 class QModelIndex;
@@ -35,6 +37,8 @@ class PosnView : public QWidget {
   ~PosnView() noexcept override;
 
  signals:
+  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                 std::optional<Ticks> ticks);
 
  private slots:
   void slotClicked(const QModelIndex& index);

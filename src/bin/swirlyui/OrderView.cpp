@@ -68,6 +68,10 @@ void OrderView::slotClicked(const QModelIndex& index)
   if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
     model_.toggleCheckState(index.row());
   }
+  const auto& order = model_.valueAt(index.row());
+  const auto lots = order.resd() > 0_lts ? order.resd() : order.lots();
+  const auto ticks = order.ticks();
+  emit setFields(order.contr().mnem(), order.settlDate(), lots, ticks);
 }
 
 } // ui

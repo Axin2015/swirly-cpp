@@ -64,6 +64,10 @@ void TradeView::slotClicked(const QModelIndex& index)
   if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
     model_.toggleCheckState(index.row());
   }
+  const auto& trade = model_.valueAt(index.row());
+  const auto lots = trade.resd() > 0_lts ? trade.resd() : trade.lots();
+  const auto ticks = trade.ticks();
+  emit setFields(trade.contr().mnem(), trade.settlDate(), lots, ticks);
 }
 
 } // ui
