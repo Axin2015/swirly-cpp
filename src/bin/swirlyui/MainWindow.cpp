@@ -44,6 +44,16 @@ MainWindow::MainWindow()
 
   auto orderView = make_unique<OrderView>(client_.orderModel());
   connect(orderView.get(), &OrderView::cancelOrders, this, &MainWindow::slotCancelOrders);
+  connect(orderView.get(), &OrderView::setFields, marketView.get(), &MarketView::setFields);
+
+  auto execView = make_unique<ExecView>(client_.execModel());
+  connect(execView.get(), &ExecView::setFields, marketView.get(), &MarketView::setFields);
+
+  auto tradeView = make_unique<TradeView>(client_.tradeModel());
+  connect(tradeView.get(), &TradeView::setFields, marketView.get(), &MarketView::setFields);
+
+  auto posnView = make_unique<PosnView>(client_.posnModel());
+  connect(posnView.get(), &PosnView::setFields, marketView.get(), &MarketView::setFields);
 
   auto topTabs = make_unique<QTabWidget>();
   topTabs->addTab(assetView_ = new AssetView{client_.assetModel()}, tr("Asset"));
@@ -53,9 +63,9 @@ MainWindow::MainWindow()
 
   auto bottomTabs = make_unique<QTabWidget>();
   bottomTabs->addTab(orderView.release(), tr("Order"));
-  bottomTabs->addTab(new ExecView{client_.execModel()}, tr("Exec"));
-  bottomTabs->addTab(new TradeView{client_.tradeModel()}, tr("Trade"));
-  bottomTabs->addTab(new PosnView{client_.posnModel()}, tr("Posn"));
+  bottomTabs->addTab(execView.release(), tr("Exec"));
+  bottomTabs->addTab(tradeView.release(), tr("Trade"));
+  bottomTabs->addTab(posnView.release(), tr("Posn"));
 
   auto splitter = make_unique<QSplitter>(Qt::Vertical);
   splitter->addWidget(topTabs.release());

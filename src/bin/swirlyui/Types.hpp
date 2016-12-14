@@ -29,6 +29,14 @@
 #include <QDebug>
 #include <QJsonValue>
 
+#include <experimental/optional>
+
+namespace std {
+template <typename T>
+using optional = experimental::optional<T>;
+using experimental::nullopt;
+}
+
 // This is acceptable in private header that is only visible to and under the control of the Swirly
 // build.
 
@@ -92,7 +100,7 @@ struct TypeTraits<QString> {
   static QVariant toVariant(const QString& value) { return value; }
 };
 
-constexpr auto dateToIso(const QDate& value) noexcept
+inline auto dateToIso(const QDate& value) noexcept
 {
   return value.year() * 10000 + value.month() * 100 + value.day();
 }

@@ -63,6 +63,10 @@ void PosnView::slotClicked(const QModelIndex& index)
   if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
     model_.toggleCheckState(index.row());
   }
+  optional<Lots> lots;
+  optional<Ticks> ticks;
+  const auto& posn = model_.valueAt(index.row());
+  emit setFields(posn.contr().mnem(), posn.settlDate(), lots, ticks);
 }
 
 } // ui
