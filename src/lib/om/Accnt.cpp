@@ -30,7 +30,7 @@ PosnPtr Accnt::posn(Id64 marketId, Mnem contr, JDay settlDay) throw(bad_alloc)
   bool found;
   tie(it, found) = posns_.findHint(marketId);
   if (!found) {
-    it = posns_.insertHint(it, Posn::make(marketId, contr, settlDay, mnem_));
+    it = posns_.insertHint(it, Posn::make(mnem_, marketId, contr, settlDay));
   }
   return &*it;
 }

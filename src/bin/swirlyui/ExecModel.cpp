@@ -27,12 +27,12 @@ using namespace exec;
 ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
 {
   header_[unbox(Column::CheckState)] = tr("");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
   header_[unbox(Column::Id)] = tr("Id");
   header_[unbox(Column::OrderId)] = tr("Order Id");
-  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::Ref)] = tr("Ref");
   header_[unbox(Column::State)] = tr("State");
   header_[unbox(Column::Side)] = tr("Side");
@@ -81,6 +81,9 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
+    case Column::Accnt:
+      var = exec.accnt();
+      break;
     case Column::MarketId:
       var = toVariant(exec.marketId());
       break;
@@ -95,9 +98,6 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       break;
     case Column::OrderId:
       var = toVariant(exec.orderId());
-      break;
-    case Column::Accnt:
-      var = exec.accnt();
       break;
     case Column::Ref:
       var = exec.ref();
@@ -159,8 +159,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
-    case Column::Contr:
     case Column::Accnt:
+    case Column::Contr:
     case Column::Ref:
     case Column::State:
     case Column::Side:

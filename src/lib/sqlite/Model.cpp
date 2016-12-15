@@ -47,7 +47,7 @@ constexpr auto SelectAccntSql = //
   "SELECT mnem FROM accnt_t WHERE modified > ?"_sv;
 
 constexpr auto SelectOrderSql = //
-  "SELECT market_id, contr, settl_day, id, accnt, ref, state_id, side_id, lots, ticks, resd," //
+  "SELECT accnt, market_id, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
   " FROM order_t WHERE resd > 0;"_sv;
 
@@ -57,12 +57,12 @@ constexpr auto SelectExecSql = //
   " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"_sv;
 
 constexpr auto SelectTradeSql = //
-  "SELECT market_id, contr, settl_day, id, order_id, accnt, ref, side_id, lots, ticks, resd," //
+  "SELECT accnt, market_id, contr, settl_day, id, order_id, ref, side_id, lots, ticks, resd," //
   " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
   " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
 
 constexpr auto SelectPosnSql = //
-  "SELECT market_id, contr, settl_day, accnt, side_id, lots, cost FROM posn_v;"_sv;
+  "SELECT accnt, market_id, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
 
 } // anonymous
 
@@ -173,11 +173,11 @@ void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
 void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 {
   enum { //
+    Accnt, //
     MarketId, //
     Contr, //
     SettlDay, //
     Id, //
-    Accnt, //
     Ref, //
     State, //
     Side, //
@@ -195,11 +195,11 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectOrderSql)};
   while (step(*stmt)) {
-    cb(Order::make(column<Id64>(*stmt, MarketId), //
+    cb(Order::make(column<string_view>(*stmt, Accnt), //
+                   column<Id64>(*stmt, MarketId), //
                    column<string_view>(*stmt, Contr), //
                    column<JDay>(*stmt, SettlDay), //
                    column<Id64>(*stmt, Id), //
-                   column<string_view>(*stmt, Accnt), //
                    column<string_view>(*stmt, Ref), //
                    column<swirly::State>(*stmt, State), //
                    column<swirly::Side>(*stmt, Side), //
@@ -246,12 +246,12 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
   bind(accnt);
   bind(limit);
   while (step(*stmt)) {
-    cb(Exec::make(column<Id64>(*stmt, MarketId), //
+    cb(Exec::make(accnt, //
+                  column<Id64>(*stmt, MarketId), //
                   column<string_view>(*stmt, Contr), //
                   column<JDay>(*stmt, SettlDay), //
                   column<Id64>(*stmt, Id), //
                   column<Id64>(*stmt, OrderId), //
-                  accnt, //
                   column<string_view>(*stmt, Ref), //
                   column<swirly::State>(*stmt, State), //
                   column<swirly::Side>(*stmt, Side), //
@@ -273,12 +273,12 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
 void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 {
   enum { //
+    Accnt, //
     MarketId, //
     Contr, //
     SettlDay, //
     Id, //
     OrderId, //
-    Accnt, //
     Ref, //
     Side, //
     Lots, //
@@ -297,12 +297,12 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectTradeSql)};
   while (step(*stmt)) {
-    cb(Exec::make(column<Id64>(*stmt, MarketId), //
+    cb(Exec::make(column<string_view>(*stmt, Accnt), //
+                  column<Id64>(*stmt, MarketId), //
                   column<string_view>(*stmt, Contr), //
                   column<JDay>(*stmt, SettlDay), //
                   column<Id64>(*stmt, Id), //
                   column<Id64>(*stmt, OrderId), //
-                  column<string_view>(*stmt, Accnt), //
                   column<string_view>(*stmt, Ref), //
                   State::Trade, //
                   column<swirly::Side>(*stmt, Side), //
@@ -324,10 +324,10 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
 void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 {
   enum { //
+    Accnt, //
     MarketId, //
     Contr, //
     SettlDay, //
-    Accnt, //
     Side, //
     Lots, //
     Cost //
@@ -338,10 +338,10 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
 
   StmtPtr stmt{prepare(*db_, SelectPosnSql)};
   while (step(*stmt)) {
+    const auto accnt = column<string_view>(*stmt, Accnt);
     auto marketId = column<Id64>(*stmt, MarketId);
     const auto contr = column<string_view>(*stmt, Contr);
     auto settlDay = column<JDay>(*stmt, SettlDay);
-    const auto accnt = column<string_view>(*stmt, Accnt);
 
     // FIXME: review when end of day is implemented.
     if (settlDay != 0_jd && settlDay <= busDay) {
@@ -350,9 +350,9 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     }
 
     bool found;
-    tie(it, found) = ps.findHint(marketId, accnt);
+    tie(it, found) = ps.findHint(accnt, marketId);
     if (!found) {
-      it = ps.insertHint(it, Posn::make(marketId, contr, settlDay, accnt));
+      it = ps.insertHint(it, Posn::make(accnt, marketId, contr, settlDay));
     }
 
     const auto side = column<swirly::Side>(*stmt, Side);

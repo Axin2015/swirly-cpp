@@ -37,6 +37,20 @@ SWIRLY_TEST_CASE(RestBodyMnem)
   SWIRLY_CHECK(rb.mnem().empty());
 }
 
+SWIRLY_TEST_CASE(RestBodyAccnt)
+{
+  RestBody rb;
+
+  SWIRLY_CHECK(rb.parse(R"({"accnt":"MARAYL"})"_sv));
+  SWIRLY_CHECK(rb.fields() == RestBody::Accnt);
+  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
+
+  rb.reset(false);
+  SWIRLY_CHECK(rb.parse(R"({"accnt":null})"_sv));
+  SWIRLY_CHECK(rb.fields() == 0U);
+  SWIRLY_CHECK(rb.accnt().empty());
+}
+
 SWIRLY_TEST_CASE(RestBodyContr)
 {
   RestBody rb;
@@ -63,20 +77,6 @@ SWIRLY_TEST_CASE(RestBodySettlDate)
   SWIRLY_CHECK(rb.parse(R"({"settlDate":null})"_sv));
   SWIRLY_CHECK(rb.fields() == 0U);
   SWIRLY_CHECK(rb.settlDate() == 0_ymd);
-}
-
-SWIRLY_TEST_CASE(RestBodyAccnt)
-{
-  RestBody rb;
-
-  SWIRLY_CHECK(rb.parse(R"({"accnt":"MARAYL"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Accnt);
-  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
-
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"accnt":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.accnt().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodyRef)
@@ -260,12 +260,12 @@ SWIRLY_TEST_CASE(RestBodyAll)
   RestBody rb;
 
   SWIRLY_CHECK(rb.parse(
-    R"({"mnem":"EURUSD","contr":"EURUSD","settlDate":20140315,"accnt":"MARAYL","ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
+    R"({"accnt":"MARAYL","mnem":"EURUSD","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
   SWIRLY_CHECK(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
   SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
   SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
   SWIRLY_CHECK(rb.settlDate() == 20140315_ymd);
-  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
   SWIRLY_CHECK(rb.ref() == "EURUSD"_sv);
   SWIRLY_CHECK(rb.state() == 3U);
   SWIRLY_CHECK(rb.side() == Side::Buy);

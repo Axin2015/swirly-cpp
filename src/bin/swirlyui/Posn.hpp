@@ -25,10 +25,10 @@ namespace posn {
 
 enum class Column : int { //
   CheckState, //
+  Accnt, //
   MarketId, //
   Contr, //
   SettlDate, //
-  Accnt, //
   BuyLots, //
   BuyAvgPrice, //
   SellLots, //
@@ -40,12 +40,12 @@ constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
 
 class Posn {
  public:
-  Posn(Id64 marketId, const Contr& contr, QDate settlDate, const QString& accnt, Lots buyLots,
+  Posn(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Lots buyLots,
        Cost buyCost, Lots sellLots, Cost sellCost)
-    : marketId_{marketId},
+    : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDate_{settlDate},
-      accnt_{accnt},
       buyLots_{buyLots},
       buyCost_{buyCost},
       sellLots_{sellLots},
@@ -57,20 +57,20 @@ class Posn {
 
   static Posn fromJson(const Contr& contr, const QJsonObject& obj);
 
+  const QString& accnt() const noexcept { return accnt_; }
   Id64 marketId() const noexcept { return marketId_; }
   const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
-  const QString& accnt() const noexcept { return accnt_; }
   Lots buyLots() const noexcept { return buyLots_; }
   Cost buyCost() const noexcept { return buyCost_; }
   Lots sellLots() const noexcept { return sellLots_; }
   Cost sellCost() const noexcept { return sellCost_; }
 
  private:
+  QString accnt_{};
   Id64 marketId_{};
   Contr contr_{};
   QDate settlDate_{};
-  QString accnt_{};
   Lots buyLots_{};
   Cost buyCost_{};
   Lots sellLots_{};

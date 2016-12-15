@@ -25,12 +25,12 @@ using namespace exec;
 TradeModel::TradeModel(QObject* parent) : TableModel{parent}
 {
   header_[unbox(Column::CheckState)] = tr("");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
   header_[unbox(Column::Id)] = tr("Id");
   header_[unbox(Column::OrderId)] = tr("Order Id");
-  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::Ref)] = tr("Ref");
   header_[unbox(Column::State)] = tr("State");
   header_[unbox(Column::Side)] = tr("Side");
@@ -69,6 +69,9 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
+    case Column::Accnt:
+      var = trade.accnt();
+      break;
     case Column::MarketId:
       var = toVariant(trade.marketId());
       break;
@@ -83,9 +86,6 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       break;
     case Column::OrderId:
       var = toVariant(trade.orderId());
-      break;
-    case Column::Accnt:
-      var = trade.accnt();
       break;
     case Column::Ref:
       var = trade.ref();
@@ -141,8 +141,8 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
-    case Column::Contr:
     case Column::Accnt:
+    case Column::Contr:
     case Column::Ref:
     case Column::State:
     case Column::Side:

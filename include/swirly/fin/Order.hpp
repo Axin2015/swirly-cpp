@@ -33,10 +33,10 @@ class Level;
  */
 class SWIRLY_API Order : public RefCounted<Order>, public Request, public MemAlloc {
  public:
-  Order(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
+  Order(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
         State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec, Cost cost,
         Lots lastLots, Ticks lastTicks, Lots minLots, Time created, Time modified) noexcept
-    : Request{marketId, contr, settlDay, id, accnt, ref, side, lots, created},
+    : Request{accnt, marketId, contr, settlDay, id, ref, side, lots, created},
       state_{state},
       ticks_{ticks},
       resd_{resd},
@@ -48,10 +48,10 @@ class SWIRLY_API Order : public RefCounted<Order>, public Request, public MemAll
       modified_{modified}
   {
   }
-  Order(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
+  Order(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
         Side side, Lots lots, Ticks ticks, Lots minLots, Time created) noexcept
-    : Order{marketId, contr, settlDay, id,    accnt, ref,   State::New, side,    lots,
-            ticks,    lots,  0_lts,    0_cst, 0_lts, 0_tks, minLots,    created, created}
+    : Order{accnt, marketId, contr, settlDay, id,    ref,   State::New, side,    lots,
+            ticks, lots,     0_lts, 0_cst,    0_lts, 0_tks, minLots,    created, created}
   {
   }
   ~Order() noexcept;

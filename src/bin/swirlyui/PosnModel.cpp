@@ -27,10 +27,10 @@ using namespace posn;
 PosnModel::PosnModel(QObject* parent) : TableModel{parent}
 {
   header_[unbox(Column::CheckState)] = tr("");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
-  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::BuyLots)] = tr("Buy Lots");
   header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg Price");
   header_[unbox(Column::SellLots)] = tr("Sell Lots");
@@ -58,6 +58,9 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
+    case Column::Accnt:
+      var = posn.accnt();
+      break;
     case Column::MarketId:
       var = toVariant(posn.marketId());
       break;
@@ -66,9 +69,6 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
       break;
     case Column::SettlDate:
       var = posn.settlDate();
-      break;
-    case Column::Accnt:
-      var = posn.accnt();
       break;
     case Column::BuyLots:
       var = toVariant(posn.buyLots());
@@ -87,11 +87,11 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
-    case Column::Contr:
     case Column::Accnt:
       var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
       break;
     case Column::MarketId:
+    case Column::Contr:
     case Column::SettlDate:
     case Column::BuyLots:
     case Column::BuyAvgPrice:

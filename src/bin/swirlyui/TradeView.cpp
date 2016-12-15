@@ -41,8 +41,8 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
   }
   table->resizeColumnToContents(unbox(Column::CheckState));
 
-  table->setColumnHidden(unbox(Column::MarketId), true);
   table->setColumnHidden(unbox(Column::Accnt), true);
+  table->setColumnHidden(unbox(Column::MarketId), true);
   table->setColumnHidden(unbox(Column::State), true);
   table->setColumnHidden(unbox(Column::MinLots), true);
 

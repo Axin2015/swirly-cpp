@@ -31,20 +31,20 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted<Posn> {
  public:
-  Posn(Id64 marketId, Mnem contr, JDay settlDay, Mnem accnt, Lots buyLots, Cost buyCost,
+  Posn(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Lots buyLots, Cost buyCost,
        Lots sellLots, Cost sellCost) noexcept
-    : marketId_{marketId},
+    : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDay_{settlDay},
-      accnt_{accnt},
       buyLots_{buyLots},
       buyCost_{buyCost},
       sellLots_{sellLots},
       sellCost_{sellCost}
   {
   }
-  Posn(Id64 marketId, Mnem contr, JDay settlDay, Mnem accnt) noexcept
-    : Posn{marketId, contr, settlDay, accnt, 0_lts, 0_cst, 0_lts, 0_cst}
+  Posn(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay) noexcept
+    : Posn{accnt, marketId, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
   {
   }
   ~Posn() noexcept;
@@ -65,10 +65,10 @@ class SWIRLY_API Posn : public RefCounted<Posn> {
 
   void toJson(std::ostream& os) const;
 
+  auto accnt() const noexcept { return accnt_; }
   auto marketId() const noexcept { return marketId_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
-  auto accnt() const noexcept { return accnt_; }
   auto buyLots() const noexcept { return buyLots_; }
   auto buyCost() const noexcept { return buyCost_; }
   auto sellLots() const noexcept { return sellLots_; }
@@ -110,10 +110,10 @@ class SWIRLY_API Posn : public RefCounted<Posn> {
   boost::intrusive::set_member_hook<> idHook_;
 
  private:
+  const Mnem accnt_;
   const Id64 marketId_;
   const Mnem contr_;
   JDay settlDay_;
-  const Mnem accnt_;
   Lots buyLots_;
   Cost buyCost_;
   Lots sellLots_;
@@ -127,13 +127,13 @@ inline std::ostream& operator<<(std::ostream& os, const Posn& posn)
 }
 
 class SWIRLY_API PosnSet {
-  using Key = std::tuple<Id64, Mnem>;
+  using Key = std::tuple<Mnem, Id64>;
   struct ValueCompare {
     int compare(const Posn& lhs, const Posn& rhs) const noexcept
     {
-      int result{swirly::compare(lhs.marketId(), rhs.marketId())};
+      int result{lhs.accnt().compare(rhs.accnt())};
       if (result == 0) {
-        result = lhs.accnt().compare(rhs.accnt());
+        result = swirly::compare(lhs.marketId(), rhs.marketId());
       }
       return result;
     }
@@ -145,17 +145,17 @@ class SWIRLY_API PosnSet {
   struct KeyValueCompare {
     bool operator()(const Key& lhs, const Posn& rhs) const noexcept
     {
-      int result{swirly::compare(std::get<0>(lhs), rhs.marketId())};
+      int result{std::get<0>(lhs).compare(rhs.accnt())};
       if (result == 0) {
-        result = std::get<1>(lhs).compare(rhs.accnt());
+        result = swirly::compare(std::get<1>(lhs), rhs.marketId());
       }
       return result < 0;
     }
     bool operator()(const Posn& lhs, const Key& rhs) const noexcept
     {
-      int result{swirly::compare(lhs.marketId(), std::get<0>(rhs))};
+      int result{lhs.accnt().compare(std::get<0>(rhs))};
       if (result == 0) {
-        result = lhs.accnt().compare(std::get<1>(rhs));
+        result = swirly::compare(lhs.marketId(), std::get<1>(rhs));
       }
       return result < 0;
     }
@@ -194,24 +194,24 @@ class SWIRLY_API PosnSet {
   Iterator end() noexcept { return set_.end(); }
 
   // Find.
-  ConstIterator find(Id64 marketId, Mnem accnt) const noexcept
+  ConstIterator find(Mnem accnt, Id64 marketId) const noexcept
   {
-    return set_.find(std::make_tuple(marketId, accnt), KeyValueCompare());
+    return set_.find(std::make_tuple(accnt, marketId), KeyValueCompare());
   }
-  Iterator find(Id64 marketId, Mnem accnt) noexcept
+  Iterator find(Mnem accnt, Id64 marketId) noexcept
   {
-    return set_.find(std::make_tuple(marketId, accnt), KeyValueCompare());
+    return set_.find(std::make_tuple(accnt, marketId), KeyValueCompare());
   }
-  std::pair<ConstIterator, bool> findHint(Id64 marketId, Mnem accnt) const noexcept
+  std::pair<ConstIterator, bool> findHint(Mnem accnt, Id64 marketId) const noexcept
   {
-    const auto key = std::make_tuple(marketId, accnt);
+    const auto key = std::make_tuple(accnt, marketId);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));
   }
-  std::pair<Iterator, bool> findHint(Id64 marketId, Mnem accnt) noexcept
+  std::pair<Iterator, bool> findHint(Mnem accnt, Id64 marketId) noexcept
   {
-    const auto key = std::make_tuple(marketId, accnt);
+    const auto key = std::make_tuple(accnt, marketId);
     const auto comp = KeyValueCompare();
     auto it = set_.lower_bound(key, comp);
     return std::make_pair(it, it != set_.end() && !comp(key, *it));

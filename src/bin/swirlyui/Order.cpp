@@ -21,15 +21,15 @@
 namespace swirly {
 namespace ui {
 
-Order::Order(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, const QString& accnt,
+Order::Order(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Id64 id,
              const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
              Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
              const QDateTime& created, const QDateTime& modified)
-  : marketId_{marketId},
+  : accnt_{accnt},
+    marketId_{marketId},
     contr_{contr},
     settlDate_{settlDate},
     id_{id},
-    accnt_{accnt},
     ref_{ref},
     state_{state},
     side_{side},
@@ -49,24 +49,33 @@ Order::Order(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, const 
 Order Order::fromJson(const Contr& contr, const QJsonObject& obj)
 {
   using swirly::ui::fromJson;
-  return Order{fromJson<Id64>(obj["marketId"]),     contr,
-               fromJson<QDate>(obj["settlDate"]),   fromJson<Id64>(obj["id"]),
-               fromJson<QString>(obj["accnt"]),     fromJson<QString>(obj["ref"]),
-               fromJson<State>(obj["state"]),       fromJson<Side>(obj["side"]),
-               fromJson<Lots>(obj["lots"]),         fromJson<Ticks>(obj["ticks"]),
-               fromJson<Lots>(obj["resd"]),         fromJson<Lots>(obj["exec"]),
-               fromJson<Cost>(obj["cost"]),         fromJson<Lots>(obj["lastLots"]),
-               fromJson<Ticks>(obj["lastTicks"]),   fromJson<Lots>(obj["minLots"]),
-               fromJson<QDateTime>(obj["created"]), fromJson<QDateTime>(obj["modified"])};
+  return Order{fromJson<QString>(obj["accnt"]),
+               fromJson<Id64>(obj["marketId"]),
+               contr,
+               fromJson<QDate>(obj["settlDate"]),
+               fromJson<Id64>(obj["id"]),
+               fromJson<QString>(obj["ref"]),
+               fromJson<State>(obj["state"]),
+               fromJson<Side>(obj["side"]),
+               fromJson<Lots>(obj["lots"]),
+               fromJson<Ticks>(obj["ticks"]),
+               fromJson<Lots>(obj["resd"]),
+               fromJson<Lots>(obj["exec"]),
+               fromJson<Cost>(obj["cost"]),
+               fromJson<Lots>(obj["lastLots"]),
+               fromJson<Ticks>(obj["lastTicks"]),
+               fromJson<Lots>(obj["minLots"]),
+               fromJson<QDateTime>(obj["created"]),
+               fromJson<QDateTime>(obj["modified"])};
 }
 
 QDebug operator<<(QDebug debug, const Order& order)
 {
-  debug.nospace() << "Order{marketId=" << order.marketId() //
+  debug.nospace() << "Order{accnt=" << order.accnt() //
+                  << ",marketId=" << order.marketId() //
                   << ",contr=" << order.contr() //
                   << ",settlDate=" << order.settlDate() //
                   << ",id=" << order.id() //
-                  << ",accnt=" << order.accnt() //
                   << ",ref=" << order.ref() //
                   << ",state=" << order.state() //
                   << ",side=" << order.side() //

@@ -55,9 +55,9 @@ class RestServ {
   void assetRequest(const HttpRequest& req, Time now, HttpResponse& resp);
   void contrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
+  void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
   void marketRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
-  void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
   void orderRequest(const HttpRequest& req, Time now, HttpResponse& resp);
   void execRequest(const HttpRequest& req, Time now, HttpResponse& resp);
   void tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp);

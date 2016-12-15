@@ -70,6 +70,11 @@ struct Serv::Impl {
     const auto busDay = busDay_(now);
     model.readAsset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
     model.readContr([& contrs = contrs_](auto ptr) { contrs.insert(move(ptr)); });
+    model.readAccnt(now, [this, &model](auto mnem) {
+      auto& accnt = this->accnt(mnem);
+      model.readExec(mnem, accnt.execs().capacity(),
+                     [&accnt](auto ptr) { accnt.pushExecBack(ptr); });
+    });
     model.readMarket([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
     model.readOrder([this](auto ptr) {
       auto& accnt = this->accnt(ptr->accnt());
@@ -85,11 +90,6 @@ struct Serv::Impl {
       it->insertOrder(ptr);
       success = true;
     });
-    model.readAccnt(now, [this, &model](auto mnem) {
-      auto& accnt = this->accnt(mnem);
-      model.readExec(mnem, accnt.execs().capacity(),
-                     [&accnt](auto ptr) { accnt.pushExecBack(ptr); });
-    });
     model.readTrade([this](auto ptr) {
       auto& accnt = this->accnt(ptr->accnt());
       accnt.insertTrade(ptr);
@@ -102,15 +102,24 @@ struct Serv::Impl {
 
   const AssetSet& assets() const noexcept { return assets_; }
 
-  const ContrSet& contrs() const noexcept { return contrs_; }
-
-  const MarketSet& markets() const noexcept { return markets_; }
-
   const Contr& contr(Mnem mnem) const
   {
     auto it = contrs_.find(mnem);
     if (it == contrs_.end()) {
       throw MarketNotFoundException{errMsg() << "contract '" << mnem << "' does not exist"};
+    }
+    return *it;
+  }
+
+  const ContrSet& contrs() const noexcept { return contrs_; }
+
+  const Accnt& accnt(Mnem mnem) const
+  {
+    AccntSet::ConstIterator it;
+    bool found;
+    tie(it, found) = accnts_.findHint(mnem);
+    if (!found) {
+      it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
     }
     return *it;
   }
@@ -124,16 +133,7 @@ struct Serv::Impl {
     return *it;
   }
 
-  const Accnt& accnt(Mnem mnem) const
-  {
-    AccntSet::ConstIterator it;
-    bool found;
-    tie(it, found) = accnts_.findHint(mnem);
-    if (!found) {
-      it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
-    }
-    return *it;
-  }
+  const MarketSet& markets() const noexcept { return markets_; }
 
   Accnt& accnt(Mnem mnem)
   {
@@ -182,7 +182,8 @@ struct Serv::Impl {
                    Lots minLots, Time now, Response& resp)
   {
     // N.B. we only check for duplicates in the refIdx; no unique constraint exists in the database,
-    // and order-refs can be reused so long as only one order is live in the system at any given time.
+    // and order-refs can be reused so long as only one order is live in the system at any given
+    // time.
     if (!ref.empty() && accnt.exists(ref)) {
       throw RefAlreadyExistsException{errMsg() << "order '" << ref << "' already exists"};
     }
@@ -196,7 +197,7 @@ struct Serv::Impl {
       throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
     }
     const auto id = market.allocId();
-    auto order = Order::make(market.id(), market.contr(), market.settlDay(), id, accnt.mnem(), ref,
+    auto order = Order::make(accnt.mnem(), market.id(), market.contr(), market.settlDay(), id, ref,
                              side, lots, ticks, minLots, now);
     auto exec = newExec(*order, id, now);
 
@@ -470,8 +471,8 @@ struct Serv::Impl {
  private:
   ExecPtr newExec(const Order& order, Id64 id, Time created) const
   {
-    return Exec::make(order.marketId(), order.contr(), order.settlDay(), id, order.id(),
-                      order.accnt(), order.ref(), order.state(), order.side(), order.lots(),
+    return Exec::make(order.accnt(), order.marketId(), order.contr(), order.settlDay(), id,
+                      order.id(), order.ref(), order.state(), order.side(), order.lots(),
                       order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
                       order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Mnem{}, created);
   }
@@ -491,7 +492,7 @@ struct Serv::Impl {
     const auto lastTicks = ticks;
     const auto minLots = 1_lts;
     const auto matchId = 0_id64;
-    return Exec::make(marketId, contr, settlDay, id, orderId, accnt, ref, state, side, lots, ticks,
+    return Exec::make(accnt, marketId, contr, settlDay, id, orderId, ref, state, side, lots, ticks,
                       resd, exec, cost, lastLots, lastTicks, minLots, matchId, liqInd, cpty,
                       created);
   }

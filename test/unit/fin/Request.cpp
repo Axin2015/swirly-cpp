@@ -25,7 +25,7 @@ namespace {
 class Foo : public RefCounted<Foo>, public Request {
  public:
   Foo(Id64 marketId, Id64 id, int& alive) noexcept
-    : Request{marketId, {}, 0_jd, id, {}, {}, Side::Buy, 0_lts, {}}, alive_{alive}
+    : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}, alive_{alive}
   {
     ++alive;
   }

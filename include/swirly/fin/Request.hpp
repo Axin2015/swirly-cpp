@@ -30,13 +30,13 @@ namespace swirly {
 
 class SWIRLY_API Request {
  public:
-  Request(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt, std::string_view ref,
+  Request(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
           Side side, Lots lots, Time created) noexcept
-    : marketId_{marketId},
+    : accnt_{accnt},
+      marketId_{marketId},
       contr_{contr},
       settlDay_{settlDay},
       id_{id},
-      accnt_{accnt},
       ref_{ref},
       side_{side},
       lots_{lots},
@@ -52,11 +52,11 @@ class SWIRLY_API Request {
   Request(Request&&);
   Request& operator=(Request&&) = delete;
 
+  auto accnt() const noexcept { return accnt_; }
   auto marketId() const noexcept { return marketId_; }
   auto contr() const noexcept { return contr_; }
   auto settlDay() const noexcept { return settlDay_; }
   auto id() const noexcept { return id_; }
-  auto accnt() const noexcept { return accnt_; }
   auto ref() const noexcept { return +ref_; }
   auto side() const noexcept { return side_; }
   auto lots() const noexcept { return lots_; }
@@ -65,14 +65,14 @@ class SWIRLY_API Request {
  protected:
   ~Request() noexcept;
 
-  const Id64 marketId_;
-  const Mnem contr_;
-  const JDay settlDay_;
-  const Id64 id_;
   /**
    * The executing accnt.
    */
   const Mnem accnt_;
+  const Id64 marketId_;
+  const Mnem contr_;
+  const JDay settlDay_;
+  const Id64 id_;
   /**
    * Ref is optional.
    */
