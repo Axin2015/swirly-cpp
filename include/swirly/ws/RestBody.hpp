@@ -28,9 +28,9 @@ class SWIRLY_API RestBody {
  public:
   enum : unsigned {
     Mnem = 1 << 0,
-    Contr = 1 << 1,
-    SettlDate = 1 << 2,
-    Accnt = 1 << 3,
+    Accnt = 1 << 1,
+    Contr = 1 << 2,
+    SettlDate = 1 << 3,
     Ref = 1 << 4,
     State = 1 << 5,
     Side = 1 << 6,
@@ -54,9 +54,9 @@ class SWIRLY_API RestBody {
 
   unsigned fields() const noexcept { return fields_; }
   swirly::Mnem mnem() const noexcept { return +mnem_; }
+  swirly::Mnem accnt() const noexcept { return +accnt_; }
   swirly::Mnem contr() const noexcept { return +contr_; }
   IsoDate settlDate() const noexcept { return settlDate_; }
-  swirly::Mnem accnt() const noexcept { return +accnt_; }
   std::string_view ref() const noexcept { return +ref_; }
   MarketState state() const noexcept { return state_; }
   swirly::Side side() const noexcept { return side_; }
@@ -98,9 +98,9 @@ class SWIRLY_API RestBody {
   unsigned fields_;
 
   StringData<MaxMnem> mnem_;
+  StringData<MaxMnem> accnt_;
   StringData<MaxMnem> contr_;
   IsoDate settlDate_;
-  StringData<MaxMnem> accnt_;
   StringData<MaxRef> ref_;
   MarketState state_;
   swirly::Side side_;

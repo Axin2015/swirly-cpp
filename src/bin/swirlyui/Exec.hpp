@@ -25,12 +25,12 @@ namespace exec {
 
 enum class Column : int { //
   CheckState, //
+  Accnt, //
   MarketId, //
   Contr, //
   SettlDate, //
   Id, //
   OrderId, //
-  Accnt, //
   Ref, //
   State, //
   Side, //
@@ -53,9 +53,9 @@ constexpr int ColumnCount{unbox(Column::Created) + 1};
 
 class Exec {
  public:
-  Exec(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, Id64 orderId,
-       const QString& accnt, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
-       Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
+  Exec(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Id64 id,
+       Id64 orderId, const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
+       Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
        LiqInd liqInd, const QString& cpty, const QDateTime& created);
   Exec() = default;
   ~Exec() noexcept = default;
@@ -63,12 +63,12 @@ class Exec {
   static Exec fromJson(const Contr& contr, const QJsonObject& obj);
 
   ExecKey key() const noexcept { return {marketId_, id_}; }
+  const QString& accnt() const noexcept { return accnt_; }
   Id64 marketId() const noexcept { return marketId_; }
   const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
   Id64 orderId() const noexcept { return orderId_; }
-  const QString& accnt() const noexcept { return accnt_; }
   const QString& ref() const noexcept { return ref_; }
   State state() const noexcept { return state_; }
   Side side() const noexcept { return side_; }
@@ -86,12 +86,12 @@ class Exec {
   const QDateTime& created() const noexcept { return created_; }
 
  private:
+  QString accnt_{};
   Id64 marketId_{};
   Contr contr_{};
   QDate settlDate_{};
   Id64 id_{};
   Id64 orderId_{};
-  QString accnt_{};
   QString ref_{};
   State state_{};
   Side side_{};

@@ -38,9 +38,9 @@ class HttpRequest : public BasicUrl<HttpRequest> {
 
   auto method() const noexcept { return method_; }
   auto url() const noexcept { return +url_; }
-  auto time() const noexcept { return +time_; }
   auto accnt() const noexcept { return +accnt_; }
   auto perm() const noexcept { return +perm_; }
+  auto time() const noexcept { return +time_; }
   const auto& body() const noexcept { return body_; }
   auto partial() const noexcept { return partial_; }
   void clear() noexcept
@@ -51,9 +51,9 @@ class HttpRequest : public BasicUrl<HttpRequest> {
     field_.clear();
     value_ = nullptr;
 
-    time_.clear();
     accnt_.clear();
     perm_.clear();
+    time_.clear();
     body_.reset();
     partial_ = false;
   }
@@ -71,12 +71,12 @@ class HttpRequest : public BasicUrl<HttpRequest> {
   void appendHeaderValue(std::string_view sv, bool first)
   {
     if (first) {
-      if (field_ == "Swirly-Time"_sv) {
-        value_ = &time_;
-      } else if (field_ == "Swirly-Accnt"_sv) {
+      if (field_ == "Swirly-Accnt"_sv) {
         value_ = &accnt_;
       } else if (field_ == "Swirly-Perm"_sv) {
         value_ = &perm_;
+      } else if (field_ == "Swirly-Time"_sv) {
+        value_ = &time_;
       } else {
         value_ = nullptr;
       }
@@ -93,9 +93,9 @@ class HttpRequest : public BasicUrl<HttpRequest> {
   String<16> field_;
   String<24>* value_{nullptr};
   // Header fields.
-  String<24> time_;
   String<24> accnt_;
   String<24> perm_;
+  String<24> time_;
   RestBody body_;
   bool partial_{false};
 };

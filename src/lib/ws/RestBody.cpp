@@ -36,13 +36,13 @@ namespace {
 static const char _json_actions[] = {
 	0, 1, 0, 1, 2, 1, 4, 1, 
 	5, 1, 7, 1, 8, 1, 10, 1, 
-	11, 1, 12, 1, 13, 1, 15, 1, 
+	11, 1, 13, 1, 14, 1, 15, 1, 
 	16, 1, 18, 1, 19, 1, 20, 1, 
 	21, 1, 22, 1, 23, 1, 24, 1, 
 	25, 1, 26, 1, 27, 1, 28, 1, 
 	29, 1, 30, 1, 31, 1, 32, 1, 
 	34, 2, 0, 1, 2, 0, 2, 2, 
-	6, 3, 2, 9, 3, 2, 14, 3, 
+	6, 3, 2, 9, 3, 2, 12, 3, 
 	2, 17, 3, 2, 33, 3
 };
 
@@ -300,16 +300,16 @@ static const char _json_trans_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 69, 0, 0, 0, 0, 
-	0, 5, 21, 21, 21, 21, 0, 0, 
+	0, 0, 0, 66, 0, 0, 0, 0, 
+	0, 5, 13, 13, 13, 13, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	5, 0, 0, 0, 0, 0, 0, 19, 
-	19, 19, 19, 0, 0, 0, 0, 0, 
+	5, 0, 0, 0, 0, 0, 0, 11, 
+	11, 11, 11, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 66, 0, 0, 0, 0, 0, 5, 
-	13, 13, 13, 13, 0, 5, 0, 0, 
-	0, 0, 0, 0, 11, 11, 11, 11, 
+	0, 69, 0, 0, 0, 0, 0, 5, 
+	17, 17, 17, 17, 0, 5, 0, 0, 
+	0, 0, 0, 0, 15, 15, 15, 15, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 75, 0, 
 	0, 0, 0, 0, 5, 55, 55, 55, 
@@ -350,9 +350,9 @@ static const char _json_trans_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 1, 
-	57, 0, 0, 60, 0, 3, 0, 17, 
-	17, 17, 17, 3, 0, 0, 0, 0, 
-	0, 0, 0, 15, 15, 15, 15, 0, 
+	57, 0, 0, 60, 0, 3, 0, 21, 
+	21, 21, 21, 3, 0, 0, 0, 0, 
+	0, 0, 0, 19, 19, 19, 19, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
@@ -404,9 +404,9 @@ void RestBody::reset(bool clear) noexcept
   fields_ = 0;
 
   mnem_.len = 0;
+  accnt_.len = 0;
   contr_.len = 0;
   settlDate_ = 0_ymd;
-  accnt_.len = 0;
   ref_.len = 0;
   state_ = 0;
   side_ = static_cast<swirly::Side>(0);
@@ -559,57 +559,57 @@ _match:
 	case 8:
 #line 95 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
 	{
-    fields_ &= ~Contr;
-    contr_.len = 0;
-  }
-	break;
-	case 9:
-#line 99 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
-	{
-    str_.len = &contr_.len;
-    str_.buf = contr_.buf;
-    str_.max = MaxMnem;
-  }
-	break;
-	case 10:
-#line 104 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
-	{
-    fields_ |= Contr;
-  }
-	break;
-	case 11:
-#line 110 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
-	{
-    fields_ &= ~SettlDate;
-    settlDate_ = 0_ymd;
-  }
-	break;
-	case 12:
-#line 114 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
-	{
-    fields_ |= SettlDate;
-    settlDate_ = IsoDate{num()};
-  }
-	break;
-	case 13:
-#line 121 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
-	{
     fields_ &= ~Accnt;
     accnt_.len = 0;
   }
 	break;
-	case 14:
-#line 125 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	case 9:
+#line 99 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
 	{
     str_.len = &accnt_.len;
     str_.buf = accnt_.buf;
     str_.max = MaxMnem;
   }
 	break;
-	case 15:
-#line 130 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	case 10:
+#line 104 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
 	{
     fields_ |= Accnt;
+  }
+	break;
+	case 11:
+#line 110 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	{
+    fields_ &= ~Contr;
+    contr_.len = 0;
+  }
+	break;
+	case 12:
+#line 114 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	{
+    str_.len = &contr_.len;
+    str_.buf = contr_.buf;
+    str_.max = MaxMnem;
+  }
+	break;
+	case 13:
+#line 119 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	{
+    fields_ |= Contr;
+  }
+	break;
+	case 14:
+#line 125 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	{
+    fields_ &= ~SettlDate;
+    settlDate_ = 0_ymd;
+  }
+	break;
+	case 15:
+#line 129 "/home/marayl/repo/swirly/src/lib/ws/RestBody.rl"
+	{
+    fields_ |= SettlDate;
+    settlDate_ = IsoDate{num()};
   }
 	break;
 	case 16:

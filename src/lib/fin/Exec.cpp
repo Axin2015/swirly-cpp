@@ -28,7 +28,8 @@ Exec::Exec(Exec&&) = default;
 
 void Exec::toJson(ostream& os) const
 {
-  os << "{\"marketId\":" << marketId_ //
+  os << "{\"accnt\":\"" << accnt_ //
+     << "\",\"marketId\":" << marketId_ //
      << ",\"contr\":\"" << contr_ //
      << "\",\"settlDate\":";
   if (settlDay_ != 0_jd) {
@@ -38,8 +39,7 @@ void Exec::toJson(ostream& os) const
   }
   os << ",\"id\":" << id_ //
      << ",\"orderId\":" << orderId_ //
-     << ",\"accnt\":\"" << accnt_ //
-     << "\",\"ref\":";
+     << ",\"ref\":";
   if (!ref_.empty()) {
     os << '"' << ref_ << '"';
   } else {
@@ -89,7 +89,7 @@ void Exec::toJson(ostream& os) const
 ExecPtr Exec::inverse(Id64 id) const
 {
   assert(!cpty_.empty());
-  return make(marketId_, contr_, settlDay_, id, orderId_, cpty_, +ref_, state_,
+  return make(cpty_, marketId_, contr_, settlDay_, id, orderId_, +ref_, state_,
               swirly::inverse(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
               minLots_, matchId_, swirly::inverse(liqInd_), accnt_, created_);
 }

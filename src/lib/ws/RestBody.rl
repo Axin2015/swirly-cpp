@@ -92,6 +92,21 @@ namespace {
   mnem = 'null' %nullMnem
     | str >beginMnem %endMnem;
 
+  action nullAccnt {
+    fields_ &= ~Accnt;
+    accnt_.len = 0;
+  }
+  action beginAccnt {
+    str_.len = &accnt_.len;
+    str_.buf = accnt_.buf;
+    str_.max = MaxMnem;
+  }
+  action endAccnt {
+    fields_ |= Accnt;
+  }
+  accnt = 'null' %nullAccnt
+    | str >beginAccnt %endAccnt;
+
   action nullContr {
     fields_ &= ~Contr;
     contr_.len = 0;
@@ -117,21 +132,6 @@ namespace {
   }
   settlDate = 'null' %nullSettlDate
     | num %endSettlDate;
-
-  action nullAccnt {
-    fields_ &= ~Accnt;
-    accnt_.len = 0;
-  }
-  action beginAccnt {
-    str_.len = &accnt_.len;
-    str_.buf = accnt_.buf;
-    str_.max = MaxMnem;
-  }
-  action endAccnt {
-    fields_ |= Accnt;
-  }
-  accnt = 'null' %nullAccnt
-    | str >beginAccnt %endAccnt;
 
   action nullRef {
     fields_ &= ~Ref;
@@ -242,9 +242,9 @@ namespace {
   comma = space* ',' space*;
 
   pair = '"mnem"'i colon mnem
+    | '"accnt"'i colon accnt
     | '"contr"'i colon contr
     | '"settlDate"'i colon settlDate
-    | '"accnt"'i colon accnt
     | '"ref"'i colon ref
     | '"state"'i colon state
     | '"side"'i colon side
@@ -280,9 +280,9 @@ void RestBody::reset(bool clear) noexcept
   fields_ = 0;
 
   mnem_.len = 0;
+  accnt_.len = 0;
   contr_.len = 0;
   settlDate_ = 0_ymd;
-  accnt_.len = 0;
   ref_.len = 0;
   state_ = 0;
   side_ = static_cast<swirly::Side>(0);

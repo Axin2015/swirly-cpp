@@ -25,11 +25,11 @@ using namespace order;
 OrderModel::OrderModel(QObject* parent) : TableModel{parent}
 {
   header_[unbox(Column::CheckState)] = tr("");
+  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::MarketId)] = tr("Market Id");
   header_[unbox(Column::Contr)] = tr("Contr");
   header_[unbox(Column::SettlDate)] = tr("Settl Date");
   header_[unbox(Column::Id)] = tr("Id");
-  header_[unbox(Column::Accnt)] = tr("Accnt");
   header_[unbox(Column::Ref)] = tr("Ref");
   header_[unbox(Column::State)] = tr("State");
   header_[unbox(Column::Side)] = tr("Side");
@@ -66,6 +66,9 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
+    case Column::Accnt:
+      var = order.accnt();
+      break;
     case Column::MarketId:
       var = toVariant(order.marketId());
       break;
@@ -77,9 +80,6 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
       break;
     case Column::Id:
       var = toVariant(order.id());
-      break;
-    case Column::Accnt:
-      var = order.accnt();
       break;
     case Column::Ref:
       var = order.ref();
@@ -129,8 +129,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
     switch (box<Column>(index.column())) {
     case Column::CheckState:
       break;
-    case Column::Contr:
     case Column::Accnt:
+    case Column::Contr:
     case Column::Ref:
     case Column::State:
     case Column::Side:

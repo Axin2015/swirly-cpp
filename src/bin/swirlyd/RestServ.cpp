@@ -49,12 +49,6 @@ class ScopedIds {
   vector<Id64>& ids_;
 };
 
-Time getTime(const HttpRequest& req) noexcept
-{
-  const string_view val{req.time()};
-  return val.empty() ? UnixClock::now() : msToTime(stou64(val));
-}
-
 string_view getAccnt(const HttpRequest& req)
 {
   const string_view accnt{req.accnt()};
@@ -67,6 +61,12 @@ string_view getAccnt(const HttpRequest& req)
 uint32_t getPerm(const HttpRequest& req)
 {
   return stou32(req.perm());
+}
+
+Time getTime(const HttpRequest& req) noexcept
+{
+  const string_view val{req.time()};
+  return val.empty() ? UnixClock::now() : msToTime(stou64(val));
 }
 
 string_view getAdmin(const HttpRequest& req)
@@ -169,12 +169,12 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
   if (tok == "refdata"_sv) {
     // /refdata
     refDataRequest(req, now, resp);
-  } else if (tok == "market"_sv) {
-    // /market
-    marketRequest(req, now, resp);
   } else if (tok == "accnt"_sv) {
     // /accnt
     accntRequest(req, now, resp);
+  } else if (tok == "market"_sv) {
+    // /market
+    marketRequest(req, now, resp);
   }
 }
 
@@ -288,6 +288,62 @@ void RestServ::contrRequest(const HttpRequest& req, Time now, HttpResponse& resp
   }
 }
 
+void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp)
+{
+  if (path_.empty()) {
+
+    // /accnt
+    matchPath_ = true;
+
+    if (req.method() == HttpMethod::Get) {
+      // GET /accnt
+      matchMethod_ = true;
+      const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec | EntitySet::Trade
+        | EntitySet::Posn;
+      rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
+    }
+    return;
+  }
+
+  const auto tok = path_.top();
+  path_.pop();
+
+  const auto es = EntitySet::parse(tok);
+  if (es.many()) {
+
+    if (path_.empty()) {
+
+      // /accnt/entity,entity...
+      matchPath_ = true;
+
+      if (req.method() == HttpMethod::Get) {
+        // GET /accnt/entity,entity...
+        matchMethod_ = true;
+        rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
+      }
+    }
+    return;
+  }
+
+  switch (es.get()) {
+  case EntitySet::Market:
+    marketRequest(req, now, resp);
+    break;
+  case EntitySet::Order:
+    orderRequest(req, now, resp);
+    break;
+  case EntitySet::Exec:
+    execRequest(req, now, resp);
+    break;
+  case EntitySet::Trade:
+    tradeRequest(req, now, resp);
+    break;
+  case EntitySet::Posn:
+    posnRequest(req, now, resp);
+    break;
+  }
+}
+
 void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
   if (path_.empty()) {
@@ -396,62 +452,6 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
       break;
     }
     return;
-  }
-}
-
-void RestServ::accntRequest(const HttpRequest& req, Time now, HttpResponse& resp)
-{
-  if (path_.empty()) {
-
-    // /accnt
-    matchPath_ = true;
-
-    if (req.method() == HttpMethod::Get) {
-      // GET /accnt
-      matchMethod_ = true;
-      const auto es = EntitySet::Market | EntitySet::Order | EntitySet::Exec | EntitySet::Trade
-        | EntitySet::Posn;
-      rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
-    }
-    return;
-  }
-
-  const auto tok = path_.top();
-  path_.pop();
-
-  const auto es = EntitySet::parse(tok);
-  if (es.many()) {
-
-    if (path_.empty()) {
-
-      // /accnt/entity,entity...
-      matchPath_ = true;
-
-      if (req.method() == HttpMethod::Get) {
-        // GET /accnt/entity,entity...
-        matchMethod_ = true;
-        rest_.getAccnt(getTrader(req), es, parseQuery(req.query()), now, resp);
-      }
-    }
-    return;
-  }
-
-  switch (es.get()) {
-  case EntitySet::Market:
-    marketRequest(req, now, resp);
-    break;
-  case EntitySet::Order:
-    orderRequest(req, now, resp);
-    break;
-  case EntitySet::Exec:
-    execRequest(req, now, resp);
-    break;
-  case EntitySet::Trade:
-    tradeRequest(req, now, resp);
-    break;
-  case EntitySet::Posn:
-    posnRequest(req, now, resp);
-    break;
   }
 }
 

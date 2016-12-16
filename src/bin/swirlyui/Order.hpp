@@ -25,11 +25,11 @@ namespace order {
 
 enum class Column : int { //
   CheckState, //
+  Accnt, //
   MarketId, //
   Contr, //
   SettlDate, //
   Id, //
-  Accnt, //
   Ref, //
   State, //
   Side, //
@@ -50,7 +50,7 @@ constexpr int ColumnCount{unbox(Column::Modified) + 1};
 
 class Order {
  public:
-  Order(Id64 marketId, const Contr& contr, QDate settlDate, Id64 id, const QString& accnt,
+  Order(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Id64 id,
         const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
         Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, const QDateTime& created,
         const QDateTime& modified);
@@ -60,11 +60,11 @@ class Order {
   static Order fromJson(const Contr& contr, const QJsonObject& obj);
 
   OrderKey key() const noexcept { return {marketId_, id_}; }
+  const QString& accnt() const noexcept { return accnt_; }
   Id64 marketId() const noexcept { return marketId_; }
   const Contr& contr() const noexcept { return contr_; }
   QDate settlDate() const noexcept { return settlDate_; }
   Id64 id() const noexcept { return id_; }
-  const QString& accnt() const noexcept { return accnt_; }
   const QString& ref() const noexcept { return ref_; }
   State state() const noexcept { return state_; }
   Side side() const noexcept { return side_; }
@@ -81,11 +81,11 @@ class Order {
   const QDateTime& modified() const noexcept { return modified_; }
 
  private:
+  QString accnt_{};
   Id64 marketId_{};
   Contr contr_{};
   QDate settlDate_{};
   Id64 id_{};
-  QString accnt_{};
   QString ref_{};
   State state_{};
   Side side_{};

@@ -142,12 +142,12 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
   pipe_.write([&exec, more](Msg& msg) {
     msg.type = MsgType::CreateExec;
     auto& body = msg.createExec;
+    setCString(body.accnt, exec.accnt());
     body.marketId = exec.marketId();
     setCString(body.contr, exec.contr());
     body.settlDay = exec.settlDay();
     body.id = exec.id();
     body.orderId = exec.orderId();
-    setCString(body.accnt, exec.accnt());
     setCString(body.ref, exec.ref());
     body.state = exec.state();
     body.side = exec.side();

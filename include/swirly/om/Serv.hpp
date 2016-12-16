@@ -51,15 +51,15 @@ class SWIRLY_API Serv {
 
   const AssetSet& assets() const noexcept;
 
+  const Contr& contr(Mnem mnem) const;
+
   const ContrSet& contrs() const noexcept;
 
-  const MarketSet& markets() const noexcept;
-
-  const Contr& contr(Mnem mnem) const;
+  const Accnt& accnt(Mnem mnem) const;
 
   const Market& market(Id64 id) const;
 
-  const Accnt& accnt(Mnem mnem) const;
+  const MarketSet& markets() const noexcept;
 
   const Market& createMarket(const Contr& contr, JDay settlDay, MarketState state, Time now);
 
