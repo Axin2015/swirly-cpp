@@ -91,7 +91,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
       var = trade.ref();
       break;
     case Column::State:
-      var = enumString(trade.state());
+      var = enumString(trade.state(), trade.resd());
       break;
     case Column::Side:
       var = enumString(trade.side());

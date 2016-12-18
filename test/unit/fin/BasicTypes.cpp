@@ -46,3 +46,9 @@ SWIRLY_TEST_CASE(State)
 {
   SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
 }
+
+SWIRLY_TEST_CASE(StateResd)
+{
+  SWIRLY_CHECK(strcmp(enumString(State::Trade, 0_lts), "COMPLETE") == 0);
+  SWIRLY_CHECK(strcmp(enumString(State::Trade, 1_lts), "PARTIAL") == 0);
+}

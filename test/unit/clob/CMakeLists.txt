@@ -13,11 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-include_directories("${PROJECT_SOURCE_DIR}/src/lib/om")
+include_directories("${PROJECT_SOURCE_DIR}/src/lib/clob")
 
-file(GLOB om_test_SOURCES "*.cpp")
+file(GLOB clob_test_SOURCES "*.cpp")
 
-add_executable(swirly_om_test ${om_test_SOURCES})
-target_link_libraries(swirly_om_test ${om_LIBRARY} ${unit_LIBRARY})
+add_executable(swirly_clob_test ${clob_test_SOURCES})
+target_link_libraries(swirly_clob_test ${clob_LIBRARY} ${unit_LIBRARY})
 
-add_test(NAME om_test COMMAND swirly_om_test)
+add_test(NAME clob_test COMMAND swirly_clob_test)

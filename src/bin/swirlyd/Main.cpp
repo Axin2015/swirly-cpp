@@ -17,7 +17,7 @@
 #include "HttpServ.hpp"
 #include "RestServ.hpp"
 
-#include <swirly/om/Test.hpp>
+#include <swirly/clob/Test.hpp>
 
 #include <swirly/ws/Rest.hpp>
 

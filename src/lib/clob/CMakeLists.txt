@@ -13,16 +13,16 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-file(GLOB om_SOURCES "*.cpp")
+file(GLOB clob_SOURCES "*.cpp")
 
-add_library(om_static STATIC ${om_SOURCES})
-set_target_properties(om_static PROPERTIES OUTPUT_NAME swirly_om)
-target_link_libraries(om_static fin_static)
-install(TARGETS om_static DESTINATION lib)
+add_library(clob_static STATIC ${clob_SOURCES})
+set_target_properties(clob_static PROPERTIES OUTPUT_NAME swirly_om)
+target_link_libraries(clob_static fin_static)
+install(TARGETS clob_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
-  add_library(om_shared SHARED ${om_SOURCES})
-  set_target_properties(om_shared PROPERTIES OUTPUT_NAME swirly_om)
-  target_link_libraries(om_shared fin_shared)
-  install(TARGETS om_shared DESTINATION lib)
+  add_library(clob_shared SHARED ${clob_SOURCES})
+  set_target_properties(clob_shared PROPERTIES OUTPUT_NAME swirly_om)
+  target_link_libraries(clob_shared fin_shared)
+  install(TARGETS clob_shared DESTINATION lib)
 endif()

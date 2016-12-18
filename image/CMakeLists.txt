@@ -23,7 +23,7 @@ if(DOT_EXECUTABLE)
   set(names
     Util
     Fin
-    Om
+    Clob
     Ws
   )
 

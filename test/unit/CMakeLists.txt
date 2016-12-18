@@ -15,5 +15,5 @@
 
 add_subdirectory(util)
 add_subdirectory(fin)
-add_subdirectory(om)
+add_subdirectory(clob)
 add_subdirectory(ws)

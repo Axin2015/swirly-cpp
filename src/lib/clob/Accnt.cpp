@@ -14,14 +14,25 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/om/Response.hpp>
+#include <swirly/clob/Accnt.hpp>
 
-#include <swirly/unit/Test.hpp>
+using namespace std;
 
-using namespace swirly;
+namespace swirly {
 
-SWIRLY_TEST_CASE(Response)
+Accnt::~Accnt() noexcept = default;
+
+Accnt::Accnt(Accnt&&) = default;
+
+PosnPtr Accnt::posn(Id64 marketId, Mnem contr, JDay settlDay) throw(bad_alloc)
 {
-  Response r;
-  Response s{r};
+  PosnSet::Iterator it;
+  bool found;
+  tie(it, found) = posns_.findHint(marketId);
+  if (!found) {
+    it = posns_.insertHint(it, Posn::make(mnem_, marketId, contr, settlDay));
+  }
+  return &*it;
 }
+
+} // swirly

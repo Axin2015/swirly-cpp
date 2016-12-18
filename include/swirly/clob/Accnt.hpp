@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_OM_ACCNT_HPP
-#define SWIRLY_OM_ACCNT_HPP
+#ifndef SWIRLY_CLOB_ACCNT_HPP
+#define SWIRLY_CLOB_ACCNT_HPP
 
 #include <swirly/fin/Exception.hpp>
 #include <swirly/fin/Exec.hpp>
@@ -149,4 +149,4 @@ using AccntSet = MnemSet<Accnt>;
 
 } // swirly
 
-#endif // SWIRLY_OM_ACCNT_HPP
+#endif // SWIRLY_CLOB_ACCNT_HPP

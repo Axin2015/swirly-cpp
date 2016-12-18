@@ -16,8 +16,8 @@
  */
 #include <swirly/ws/Rest.hpp>
 
-#include <swirly/om/Accnt.hpp>
-#include <swirly/om/Response.hpp>
+#include <swirly/clob/Accnt.hpp>
+#include <swirly/clob/Response.hpp>
 
 #include <swirly/fin/Exception.hpp>
 

@@ -16,7 +16,7 @@
 install(PROGRAMS ${bin_FILES} DESTINATION bin)
 
 add_executable(swirly_bench Bench.cpp)
-target_link_libraries(swirly_bench ${om_LIBRARY} ${sqlite_LIBRARY})
+target_link_libraries(swirly_bench ${clob_LIBRARY} ${sqlite_LIBRARY})
 install(TARGETS swirly_bench DESTINATION bin)
 
 add_executable(swirly_dump Dump.cpp)

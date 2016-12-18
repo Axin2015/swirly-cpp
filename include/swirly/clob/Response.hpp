@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_OM_RESPONSE_HPP
-#define SWIRLY_OM_RESPONSE_HPP
+#ifndef SWIRLY_CLOB_RESPONSE_HPP
+#define SWIRLY_CLOB_RESPONSE_HPP
 
 #include <swirly/fin/Types.hpp>
 
@@ -73,4 +73,4 @@ inline std::ostream& operator<<(std::ostream& os, const Response& resp)
 
 } // swirly
 
-#endif // SWIRLY_OM_RESPONSE_HPP
+#endif // SWIRLY_CLOB_RESPONSE_HPP
