@@ -43,7 +43,6 @@ TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
 
   table->setColumnHidden(unbox(Column::Accnt), true);
   table->setColumnHidden(unbox(Column::MarketId), true);
-  table->setColumnHidden(unbox(Column::State), true);
   table->setColumnHidden(unbox(Column::MinLots), true);
 
   table->setFocusPolicy(Qt::NoFocus);

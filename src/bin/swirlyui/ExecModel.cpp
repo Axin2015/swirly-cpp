@@ -103,7 +103,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
       var = exec.ref();
       break;
     case Column::State:
-      var = enumString(exec.state());
+      var = enumString(exec.state(), exec.resd());
       break;
     case Column::Side:
       var = enumString(exec.side());
