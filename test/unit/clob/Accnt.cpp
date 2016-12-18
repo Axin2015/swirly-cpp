@@ -14,34 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_OM_MATCH_HPP
-#define SWIRLY_OM_MATCH_HPP
+#include <swirly/clob/Accnt.hpp>
 
-#include <swirly/fin/Types.hpp>
+#include <swirly/unit/Test.hpp>
 
-namespace swirly {
+using namespace swirly;
 
-struct Match {
-  Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade, const PosnPtr& makerPosn,
-        const ExecPtr& takerTrade) noexcept;
-
-  ~Match() noexcept;
-
-  // Copy.
-  Match(const Match&);
-  Match& operator=(const Match&) = delete;
-
-  // Move.
-  Match(Match&&);
-  Match& operator=(Match&&) = delete;
-
-  const Lots lots;
-  const OrderPtr makerOrder;
-  const ExecPtr makerTrade;
-  const PosnPtr makerPosn;
-  const ExecPtr takerTrade;
-};
-
-} // swirly
-
-#endif // SWIRLY_OM_MATCH_HPP
+static_assert(sizeof(Accnt) <= 6 * 64, "crossed cache-line boundary");

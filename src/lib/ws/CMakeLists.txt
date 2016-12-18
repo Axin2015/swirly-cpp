@@ -32,12 +32,12 @@ set(ws_SOURCES
 
 add_library(ws_static STATIC ${ws_SOURCES})
 set_target_properties(ws_static PROPERTIES OUTPUT_NAME swirly_ws)
-target_link_libraries(ws_static om_static)
+target_link_libraries(ws_static clob_static)
 install(TARGETS ws_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
   add_library(ws_shared SHARED ${ws_SOURCES})
   set_target_properties(ws_shared PROPERTIES OUTPUT_NAME swirly_ws)
-  target_link_libraries(ws_shared om_shared)
+  target_link_libraries(ws_shared clob_shared)
   install(TARGETS ws_shared DESTINATION lib)
 endif()

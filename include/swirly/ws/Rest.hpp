@@ -20,7 +20,7 @@
 #include <swirly/ws/EntitySet.hpp>
 #include <swirly/ws/Page.hpp>
 
-#include <swirly/om/Serv.hpp>
+#include <swirly/clob/Serv.hpp>
 
 namespace swirly {
 
