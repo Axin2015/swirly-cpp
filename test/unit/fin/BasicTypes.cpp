@@ -24,7 +24,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(AssetType)
 {
-  SWIRLY_CHECK(strcmp(enumString(AssetType::Commodity), "COMMODITY") == 0);
+  SWIRLY_CHECK(strcmp(enumString(AssetType::Cmdty), "CMDTY") == 0);
 }
 
 SWIRLY_TEST_CASE(Direct)

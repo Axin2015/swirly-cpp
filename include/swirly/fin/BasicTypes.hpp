@@ -65,21 +65,21 @@ constexpr Cost operator""_cst(unsigned long long val) noexcept
  */
 using MarketState = unsigned;
 
-enum class AssetType { Commodity = 1, Corporate, Currency, Equity, Government, Index };
+enum class AssetType { Cmdty = 1, Corp, Ccy, Eqty, Govt, Index };
 
 inline const char* enumString(AssetType type) noexcept
 {
   switch (type) {
-  case AssetType::Commodity:
-    return "COMMODITY";
-  case AssetType::Corporate:
-    return "CORPORATE";
-  case AssetType::Currency:
-    return "CURRENCY";
-  case AssetType::Equity:
-    return "EQUITY";
-  case AssetType::Government:
-    return "GOVERNMENT";
+  case AssetType::Cmdty:
+    return "CMDTY";
+  case AssetType::Corp:
+    return "CORP";
+  case AssetType::Ccy:
+    return "CCY";
+  case AssetType::Eqty:
+    return "EQTY";
+  case AssetType::Govt:
+    return "GOVT";
   case AssetType::Index:
     return "INDEX";
   }

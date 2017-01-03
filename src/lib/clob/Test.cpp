@@ -35,33 +35,33 @@ TestModel& TestModel::operator=(TestModel&&) noexcept = default;
 void TestModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
   // Forex.
-  cb(Asset::make(1_id32, "CHF"_sv, "Switzerland, Francs"_sv, AssetType::Currency));
-  cb(Asset::make(2_id32, "EUR"_sv, "Euro Member Countries, Euro"_sv, AssetType::Currency));
-  cb(Asset::make(3_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Currency));
-  cb(Asset::make(4_id32, "JPY"_sv, "Japan, Yen"_sv, AssetType::Currency));
-  cb(Asset::make(5_id32, "USD"_sv, "United States of America, Dollars"_sv, AssetType::Currency));
-  cb(Asset::make(6_id32, "ZAR"_sv, "South Africa, Rand"_sv, AssetType::Currency));
+  cb(Asset::make(1_id32, "CHF"_sv, "Switzerland, Francs"_sv, AssetType::Ccy));
+  cb(Asset::make(2_id32, "EUR"_sv, "Euro Member Countries, Euro"_sv, AssetType::Ccy));
+  cb(Asset::make(3_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Ccy));
+  cb(Asset::make(4_id32, "JPY"_sv, "Japan, Yen"_sv, AssetType::Ccy));
+  cb(Asset::make(5_id32, "USD"_sv, "United States of America, Dollars"_sv, AssetType::Ccy));
+  cb(Asset::make(6_id32, "ZAR"_sv, "South Africa, Rand"_sv, AssetType::Ccy));
   // Coal.
-  cb(Asset::make(7_id32, "CAP"_sv, "Central Appalachia Coal"_sv, AssetType::Commodity));
-  cb(Asset::make(8_id32, "NAP"_sv, "Northern Appalachia Coal"_sv, AssetType::Commodity));
-  cb(Asset::make(9_id32, "ILB"_sv, "Illinois Basin Coal"_sv, AssetType::Commodity));
-  cb(Asset::make(10_id32, "PRB"_sv, "Powder River Basin Coal"_sv, AssetType::Commodity));
-  cb(Asset::make(11_id32, "UIB"_sv, "Uinta Basin Coal"_sv, AssetType::Commodity));
+  cb(Asset::make(7_id32, "CAP"_sv, "Central Appalachia Coal"_sv, AssetType::Cmdty));
+  cb(Asset::make(8_id32, "NAP"_sv, "Northern Appalachia Coal"_sv, AssetType::Cmdty));
+  cb(Asset::make(9_id32, "ILB"_sv, "Illinois Basin Coal"_sv, AssetType::Cmdty));
+  cb(Asset::make(10_id32, "PRB"_sv, "Powder River Basin Coal"_sv, AssetType::Cmdty));
+  cb(Asset::make(11_id32, "UIB"_sv, "Uinta Basin Coal"_sv, AssetType::Cmdty));
   // Coffee.
-  cb(Asset::make(12_id32, "ETB"_sv, "Ethiopia, Birr"_sv, AssetType::Currency));
-  cb(Asset::make(13_id32, "WYCA"_sv, "Yirgachefe A"_sv, AssetType::Commodity));
-  cb(Asset::make(14_id32, "WWNA"_sv, "Wenago A"_sv, AssetType::Commodity));
-  cb(Asset::make(15_id32, "WKCA"_sv, "Kochere A"_sv, AssetType::Commodity));
-  cb(Asset::make(16_id32, "WGAA"_sv, "Gelena Abaya A"_sv, AssetType::Commodity));
+  cb(Asset::make(12_id32, "ETB"_sv, "Ethiopia, Birr"_sv, AssetType::Ccy));
+  cb(Asset::make(13_id32, "WYCA"_sv, "Yirgachefe A"_sv, AssetType::Cmdty));
+  cb(Asset::make(14_id32, "WWNA"_sv, "Wenago A"_sv, AssetType::Cmdty));
+  cb(Asset::make(15_id32, "WKCA"_sv, "Kochere A"_sv, AssetType::Cmdty));
+  cb(Asset::make(16_id32, "WGAA"_sv, "Gelena Abaya A"_sv, AssetType::Cmdty));
   // US Corporates.
-  cb(Asset::make(17_id32, "CSCO"_sv, "Cisco Systems Inc"_sv, AssetType::Corporate));
-  cb(Asset::make(18_id32, "DIS"_sv, "Walt Disney"_sv, AssetType::Corporate));
-  cb(Asset::make(19_id32, "IBM"_sv, "Ibm Corp"_sv, AssetType::Corporate));
-  cb(Asset::make(20_id32, "INTC"_sv, "Intel Corp"_sv, AssetType::Corporate));
-  cb(Asset::make(21_id32, "MSFT"_sv, "Microsoft Corp"_sv, AssetType::Corporate));
-  cb(Asset::make(22_id32, "VIA"_sv, "Viacom Inc"_sv, AssetType::Corporate));
-  cb(Asset::make(23_id32, "VOD"_sv, "Vodafone Group Plc"_sv, AssetType::Corporate));
-  cb(Asset::make(24_id32, "VZ"_sv, "Verizon Com"_sv, AssetType::Corporate));
+  cb(Asset::make(17_id32, "CSCO"_sv, "Cisco Systems Inc"_sv, AssetType::Corp));
+  cb(Asset::make(18_id32, "DIS"_sv, "Walt Disney"_sv, AssetType::Corp));
+  cb(Asset::make(19_id32, "IBM"_sv, "Ibm Corp"_sv, AssetType::Corp));
+  cb(Asset::make(20_id32, "INTC"_sv, "Intel Corp"_sv, AssetType::Corp));
+  cb(Asset::make(21_id32, "MSFT"_sv, "Microsoft Corp"_sv, AssetType::Corp));
+  cb(Asset::make(22_id32, "VIA"_sv, "Viacom Inc"_sv, AssetType::Corp));
+  cb(Asset::make(23_id32, "VOD"_sv, "Vodafone Group Plc"_sv, AssetType::Corp));
+  cb(Asset::make(24_id32, "VZ"_sv, "Verizon Com"_sv, AssetType::Corp));
 }
 
 void TestModel::doReadContr(const ModelCallback<ContrPtr>& cb) const

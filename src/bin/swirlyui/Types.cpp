@@ -24,16 +24,16 @@ namespace ui {
 AssetType TypeTraits<AssetType>::fromString(const QString& value)
 {
   AssetType type;
-  if (value == "COMMODITY") {
-    type = AssetType::Commodity;
-  } else if (value == "CORPORATE") {
-    type = AssetType::Corporate;
-  } else if (value == "CURRENCY") {
-    type = AssetType::Currency;
-  } else if (value == "EQUITY") {
-    type = AssetType::Equity;
-  } else if (value == "GOVERNMENT") {
-    type = AssetType::Government;
+  if (value == "CMDTY") {
+    type = AssetType::Cmdty;
+  } else if (value == "CORP") {
+    type = AssetType::Corp;
+  } else if (value == "CCY") {
+    type = AssetType::Ccy;
+  } else if (value == "EQTY") {
+    type = AssetType::Eqty;
+  } else if (value == "GOVT") {
+    type = AssetType::Govt;
   } else if (value == "INDEX") {
     type = AssetType::Index;
   } else {
