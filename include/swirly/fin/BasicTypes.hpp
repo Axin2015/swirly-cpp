@@ -146,7 +146,7 @@ inline const char* enumString(LiqInd liqInd) noexcept
   std::terminate();
 }
 
-constexpr LiqInd inverse(LiqInd liqInd) noexcept
+constexpr LiqInd opposite(LiqInd liqInd) noexcept
 {
   switch (liqInd) {
   case LiqInd::None:
@@ -179,7 +179,7 @@ inline const char* enumString(Side side) noexcept
   std::terminate();
 }
 
-constexpr Side inverse(Side side) noexcept
+constexpr Side opposite(Side side) noexcept
 {
   switch (side) {
   case Side::Buy:

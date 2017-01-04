@@ -65,7 +65,7 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
   {
     return makeRefCounted<Exec>(std::forward<ArgsT>(args)...);
   }
-  ExecPtr inverse(Id64 id) const;
+  ExecPtr opposite(Id64 id) const;
 
   void toJson(std::ostream& os) const;
 

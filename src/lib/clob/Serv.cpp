@@ -402,7 +402,7 @@ struct Serv::Impl {
       // Create back-to-back trade if counter-party is specified.
       auto& cptyAccnt = this->accnt(cpty);
       auto cptyPosn = cptyAccnt.posn(market.id(), market.contr(), market.settlDay());
-      cptyTrade = trade->inverse(market.allocId());
+      cptyTrade = trade->opposite(market.allocId());
 
       ConstExecPtr trades[] = {trade, cptyTrade};
       journ_.createExec(trades);

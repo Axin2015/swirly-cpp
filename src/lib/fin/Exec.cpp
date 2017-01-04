@@ -86,12 +86,12 @@ void Exec::toJson(ostream& os) const
      << '}';
 }
 
-ExecPtr Exec::inverse(Id64 id) const
+ExecPtr Exec::opposite(Id64 id) const
 {
   assert(!cpty_.empty());
   return make(cpty_, marketId_, contr_, settlDay_, id, orderId_, +ref_, state_,
-              swirly::inverse(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
-              minLots_, matchId_, swirly::inverse(liqInd_), accnt_, created_);
+              swirly::opposite(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
+              minLots_, matchId_, swirly::opposite(liqInd_), accnt_, created_);
 }
 
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
