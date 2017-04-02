@@ -34,7 +34,7 @@ struct JDayPolicy : Int32Policy {
  */
 using IsoDate = IntWrapper<IsoDatePolicy>;
 
-constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
+constexpr auto operator""_ymd(unsigned long long val) noexcept
 {
     return IsoDate{val};
 }
@@ -44,7 +44,7 @@ constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
  */
 using JDay = IntWrapper<JDayPolicy>;
 
-constexpr JDay operator""_jd(unsigned long long val) noexcept
+constexpr auto operator""_jd(unsigned long long val) noexcept
 {
     return JDay{val};
 }
@@ -52,7 +52,7 @@ constexpr JDay operator""_jd(unsigned long long val) noexcept
 /**
  * Gregorian to ISO8601 date.
  */
-constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
+inline auto ymdToIso(int year, int mon, int mday) noexcept
 {
     assert(mon <= 11);
     assert(mday <= 31);
@@ -62,7 +62,7 @@ constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
 /**
  * Gregorian date to Julian day.
  */
-constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
+constexpr auto ymdToJd(int year, int mon, int mday) noexcept
 {
     // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
     // for Computers.
@@ -79,7 +79,7 @@ constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
 /**
  * ISO8601 to Julian day.
  */
-constexpr JDay isoToJd(IsoDate iso) noexcept
+constexpr auto isoToJd(IsoDate iso) noexcept
 {
     const auto n = iso.count();
     const auto year = n / 10000;
@@ -91,7 +91,7 @@ constexpr JDay isoToJd(IsoDate iso) noexcept
 /**
  * Julian day to ISO8601.
  */
-constexpr IsoDate jdToIso(JDay jd) noexcept
+constexpr auto jdToIso(JDay jd) noexcept
 {
     // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
     // Almanac for Computers.
@@ -116,15 +116,15 @@ constexpr IsoDate jdToIso(JDay jd) noexcept
  */
 constexpr std::int32_t jdToMjd(JDay jd) noexcept
 {
-    return jd - 2400000;
+    return jd.count() - 2400000;
 }
 
 /**
  * Modified Julian day to Julian day. Epoch is November 17, 1858.
  */
-constexpr JDay mjdToJd(std::int32_t mjd) noexcept
+constexpr auto mjdToJd(std::int32_t mjd) noexcept
 {
-    return mjd + 2400000;
+    return JDay{mjd + 2400000};
 }
 
 /**
@@ -150,7 +150,7 @@ constexpr Time jdToTime(JDay jd) noexcept
 {
     // Julian day for January 1st, 1970.
     const JDay jdUnixEpoc = 2440588_jd;
-    const int64_t msInDay = 24 * 60 * 60 * 1000;
+    const std::int64_t msInDay = 24 * 60 * 60 * 1000;
     // Add half day for 12pm.
     return msToTime((jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1));
 }
