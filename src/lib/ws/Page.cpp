@@ -26,19 +26,19 @@ namespace swirly {
 
 Page parseQuery(string_view query) noexcept
 {
-  Page page;
-  Tokeniser toks{query, "&;"_sv};
-  while (!toks.empty()) {
-    string_view key, val;
-    tie(key, val) = splitPair(toks.top(), '=');
-    if (key == "offset"_sv) {
-      page.offset = stou64(val);
-    } else if (key == "limit"_sv) {
-      page.limit = stou64(val);
+    Page page;
+    Tokeniser toks{query, "&;"_sv};
+    while (!toks.empty()) {
+        string_view key, val;
+        tie(key, val) = splitPair(toks.top(), '=');
+        if (key == "offset"_sv) {
+            page.offset = stou64(val);
+        } else if (key == "limit"_sv) {
+            page.limit = stou64(val);
+        }
+        toks.pop();
     }
-    toks.pop();
-  }
-  return page;
+    return page;
 }
 
 } // swirly

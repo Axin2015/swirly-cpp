@@ -29,24 +29,24 @@ namespace swirly {
 class RestServ;
 
 class HttpServ {
- public:
-  HttpServ(boost::asio::io_service& ioServ, std::uint16_t port, RestServ& restServ);
-  ~HttpServ() noexcept;
+  public:
+    HttpServ(boost::asio::io_service& ioServ, std::uint16_t port, RestServ& restServ);
+    ~HttpServ() noexcept;
 
-  // Copy.
-  HttpServ(const HttpServ&) = delete;
-  HttpServ& operator=(const HttpServ&) = delete;
+    // Copy.
+    HttpServ(const HttpServ&) = delete;
+    HttpServ& operator=(const HttpServ&) = delete;
 
-  // Move.
-  HttpServ(HttpServ&&) = delete;
-  HttpServ& operator=(HttpServ&&) = delete;
+    // Move.
+    HttpServ(HttpServ&&) = delete;
+    HttpServ& operator=(HttpServ&&) = delete;
 
- private:
-  void asyncAccept();
+  private:
+    void asyncAccept();
 
-  boost::asio::io_service& ioServ_;
-  boost::asio::ip::tcp::acceptor acceptor_;
-  RestServ& restServ_;
+    boost::asio::io_service& ioServ_;
+    boost::asio::ip::tcp::acceptor acceptor_;
+    RestServ& restServ_;
 };
 
 } // swirly

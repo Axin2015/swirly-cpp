@@ -25,92 +25,92 @@
 namespace swirly {
 
 class SWIRLY_API RestBody {
- public:
-  enum : unsigned {
-    Mnem = 1 << 0,
-    Accnt = 1 << 1,
-    Contr = 1 << 2,
-    SettlDate = 1 << 3,
-    Ref = 1 << 4,
-    State = 1 << 5,
-    Side = 1 << 6,
-    Lots = 1 << 7,
-    Ticks = 1 << 8,
-    MinLots = 1 << 9,
-    LiqInd = 1 << 10,
-    Cpty = 1 << 11
-  };
+  public:
+    enum : unsigned {
+        Mnem = 1 << 0,
+        Accnt = 1 << 1,
+        Contr = 1 << 2,
+        SettlDate = 1 << 3,
+        Ref = 1 << 4,
+        State = 1 << 5,
+        Side = 1 << 6,
+        Lots = 1 << 7,
+        Ticks = 1 << 8,
+        MinLots = 1 << 9,
+        LiqInd = 1 << 10,
+        Cpty = 1 << 11
+    };
 
-  RestBody() noexcept { reset(); }
-  ~RestBody() noexcept;
+    RestBody() noexcept { reset(); }
+    ~RestBody() noexcept;
 
-  // Copy.
-  RestBody(const RestBody&) = delete;
-  RestBody& operator=(const RestBody&) = delete;
+    // Copy.
+    RestBody(const RestBody&) = delete;
+    RestBody& operator=(const RestBody&) = delete;
 
-  // Move.
-  RestBody(RestBody&&) = delete;
-  RestBody& operator=(RestBody&&) = delete;
+    // Move.
+    RestBody(RestBody&&) = delete;
+    RestBody& operator=(RestBody&&) = delete;
 
-  unsigned fields() const noexcept { return fields_; }
-  swirly::Mnem mnem() const noexcept { return +mnem_; }
-  swirly::Mnem accnt() const noexcept { return +accnt_; }
-  swirly::Mnem contr() const noexcept { return +contr_; }
-  IsoDate settlDate() const noexcept { return settlDate_; }
-  std::string_view ref() const noexcept { return +ref_; }
-  MarketState state() const noexcept { return state_; }
-  swirly::Side side() const noexcept { return side_; }
-  swirly::Lots lots() const noexcept { return lots_; }
-  swirly::Ticks ticks() const noexcept { return ticks_; }
-  swirly::Lots minLots() const noexcept { return minLots_; }
-  swirly::LiqInd liqInd() const noexcept { return liqInd_; }
-  swirly::Mnem cpty() const noexcept { return +cpty_; }
-  /**
-   * Validate fields.
-   *
-   * @param required Required fields.
-   *
-   * @param optional Optional fields.
-   *
-   * @return true if fields are value.
-   */
-  bool valid(unsigned required, unsigned optional = 0x0) const noexcept
-  {
-    return (fields_ & required) == required && (fields_ & ~(required | optional)) == 0;
-  }
-  void reset(bool clear = true) noexcept;
+    unsigned fields() const noexcept { return fields_; }
+    swirly::Mnem mnem() const noexcept { return +mnem_; }
+    swirly::Mnem accnt() const noexcept { return +accnt_; }
+    swirly::Mnem contr() const noexcept { return +contr_; }
+    IsoDate settlDate() const noexcept { return settlDate_; }
+    std::string_view ref() const noexcept { return +ref_; }
+    MarketState state() const noexcept { return state_; }
+    swirly::Side side() const noexcept { return side_; }
+    swirly::Lots lots() const noexcept { return lots_; }
+    swirly::Ticks ticks() const noexcept { return ticks_; }
+    swirly::Lots minLots() const noexcept { return minLots_; }
+    swirly::LiqInd liqInd() const noexcept { return liqInd_; }
+    swirly::Mnem cpty() const noexcept { return +cpty_; }
+    /**
+     * Validate fields.
+     *
+     * @param required Required fields.
+     *
+     * @param optional Optional fields.
+     *
+     * @return true if fields are value.
+     */
+    bool valid(unsigned required, unsigned optional = 0x0) const noexcept
+    {
+        return (fields_ & required) == required && (fields_ & ~(required | optional)) == 0;
+    }
+    void reset(bool clear = true) noexcept;
 
-  bool parse(std::string_view buf);
+    bool parse(std::string_view buf);
 
- private:
-  int cs_;
-  union {
-    struct {
-      int sign;
-      std::size_t digits;
-    } num_;
-    struct {
-      int* len;
-      char* buf;
-      int max;
-    } str_;
-  };
-  unsigned fields_;
+  private:
+    int cs_;
+    union {
+        struct {
+            int sign;
+            std::size_t digits;
+        } num_;
+        struct {
+            int* len;
+            char* buf;
+            int max;
+        } str_;
+    };
+    unsigned fields_;
 
-  StringData<MaxMnem> mnem_;
-  StringData<MaxMnem> accnt_;
-  StringData<MaxMnem> contr_;
-  IsoDate settlDate_;
-  StringData<MaxRef> ref_;
-  MarketState state_;
-  swirly::Side side_;
-  swirly::Lots lots_;
-  swirly::Ticks ticks_;
-  swirly::Lots minLots_;
-  swirly::LiqInd liqInd_;
-  StringData<MaxMnem> cpty_;
+    StringData<MaxMnem> mnem_;
+    StringData<MaxMnem> accnt_;
+    StringData<MaxMnem> contr_;
+    IsoDate settlDate_;
+    StringData<MaxRef> ref_;
+    MarketState state_;
+    swirly::Side side_;
+    swirly::Lots lots_;
+    swirly::Ticks ticks_;
+    swirly::Lots minLots_;
+    swirly::LiqInd liqInd_;
+    StringData<MaxMnem> cpty_;
 
-  long num() const noexcept { return num_.sign * num_.digits; }
+    long num() const noexcept { return num_.sign * num_.digits; }
 };
 
 } // swirly

@@ -26,93 +26,93 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(EntitySetZero)
 {
-  const auto es = EntitySet::parse(""_sv);
-  SWIRLY_CHECK(!es.many());
-  SWIRLY_CHECK(!es.asset());
-  SWIRLY_CHECK(!es.contr());
-  SWIRLY_CHECK(!es.market());
+    const auto es = EntitySet::parse(""_sv);
+    SWIRLY_CHECK(!es.many());
+    SWIRLY_CHECK(!es.asset());
+    SWIRLY_CHECK(!es.contr());
+    SWIRLY_CHECK(!es.market());
 
-  // End.
-  SWIRLY_CHECK(es.empty());
+    // End.
+    SWIRLY_CHECK(es.empty());
 }
 
 SWIRLY_TEST_CASE(EntitySetOne)
 {
-  auto es = EntitySet::parse("asset"_sv);
-  SWIRLY_CHECK(!es.many());
-  SWIRLY_CHECK(es.asset());
-  SWIRLY_CHECK(!es.contr());
-  SWIRLY_CHECK(!es.market());
+    auto es = EntitySet::parse("asset"_sv);
+    SWIRLY_CHECK(!es.many());
+    SWIRLY_CHECK(es.asset());
+    SWIRLY_CHECK(!es.contr());
+    SWIRLY_CHECK(!es.market());
 
-  // First.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Asset);
+    // First.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Asset);
 
-  // End.
-  SWIRLY_CHECK(es.empty());
+    // End.
+    SWIRLY_CHECK(es.empty());
 }
 
 SWIRLY_TEST_CASE(EntitySetTwo)
 {
-  auto es = EntitySet::parse("asset,contr"_sv);
-  SWIRLY_CHECK(es.many());
-  SWIRLY_CHECK(es.asset());
-  SWIRLY_CHECK(es.contr());
-  SWIRLY_CHECK(!es.market());
+    auto es = EntitySet::parse("asset,contr"_sv);
+    SWIRLY_CHECK(es.many());
+    SWIRLY_CHECK(es.asset());
+    SWIRLY_CHECK(es.contr());
+    SWIRLY_CHECK(!es.market());
 
-  // First.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Asset);
+    // First.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Asset);
 
-  // Second.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Contr);
+    // Second.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Contr);
 
-  // End.
-  SWIRLY_CHECK(es.empty());
+    // End.
+    SWIRLY_CHECK(es.empty());
 }
 
 SWIRLY_TEST_CASE(EntitySetThree)
 {
-  auto es = EntitySet::parse("market,contr,asset"_sv);
-  SWIRLY_CHECK(es.many());
-  SWIRLY_CHECK(es.asset());
-  SWIRLY_CHECK(es.contr());
-  SWIRLY_CHECK(es.market());
+    auto es = EntitySet::parse("market,contr,asset"_sv);
+    SWIRLY_CHECK(es.many());
+    SWIRLY_CHECK(es.asset());
+    SWIRLY_CHECK(es.contr());
+    SWIRLY_CHECK(es.market());
 
-  // First.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Asset);
+    // First.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Asset);
 
-  // Second.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Contr);
+    // Second.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Contr);
 
-  // Third.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Market);
+    // Third.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Market);
 
-  // End.
-  SWIRLY_CHECK(es.empty());
+    // End.
+    SWIRLY_CHECK(es.empty());
 }
 
 SWIRLY_TEST_CASE(EntitySetTrailing)
 {
-  auto es = EntitySet::parse("market,"_sv);
-  SWIRLY_CHECK(!es.many());
-  SWIRLY_CHECK(!es.asset());
-  SWIRLY_CHECK(!es.contr());
-  SWIRLY_CHECK(es.market());
+    auto es = EntitySet::parse("market,"_sv);
+    SWIRLY_CHECK(!es.many());
+    SWIRLY_CHECK(!es.asset());
+    SWIRLY_CHECK(!es.contr());
+    SWIRLY_CHECK(es.market());
 
-  // First.
-  SWIRLY_CHECK(!es.empty());
-  SWIRLY_CHECK(es.pop() == EntitySet::Market);
+    // First.
+    SWIRLY_CHECK(!es.empty());
+    SWIRLY_CHECK(es.pop() == EntitySet::Market);
 
-  // End.
-  SWIRLY_CHECK(es.empty());
+    // End.
+    SWIRLY_CHECK(es.empty());
 }
 
 SWIRLY_TEST_CASE(EntitySetBadEntity)
 {
-  SWIRLY_CHECK_THROW(EntitySet::parse("bad"_sv), NotFoundException);
+    SWIRLY_CHECK_THROW(EntitySet::parse("bad"_sv), NotFoundException);
 }

@@ -26,93 +26,93 @@ using namespace posn;
 
 PosnModel::PosnModel(QObject* parent) : TableModel{parent}
 {
-  header_[unbox(Column::CheckState)] = tr("");
-  header_[unbox(Column::Accnt)] = tr("Accnt");
-  header_[unbox(Column::MarketId)] = tr("Market Id");
-  header_[unbox(Column::Contr)] = tr("Contr");
-  header_[unbox(Column::SettlDate)] = tr("Settl Date");
-  header_[unbox(Column::BuyLots)] = tr("Buy Lots");
-  header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg Price");
-  header_[unbox(Column::SellLots)] = tr("Sell Lots");
-  header_[unbox(Column::SellAvgPrice)] = tr("Sell Avg Price");
+    header_[unbox(Column::CheckState)] = tr("");
+    header_[unbox(Column::Accnt)] = tr("Accnt");
+    header_[unbox(Column::MarketId)] = tr("Market Id");
+    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::SettlDate)] = tr("Settl Date");
+    header_[unbox(Column::BuyLots)] = tr("Buy Lots");
+    header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg Price");
+    header_[unbox(Column::SellLots)] = tr("Sell Lots");
+    header_[unbox(Column::SellAvgPrice)] = tr("Sell Avg Price");
 }
 
 PosnModel::~PosnModel() noexcept = default;
 
 QVariant PosnModel::data(const QModelIndex& index, int role) const
 {
-  QVariant var{};
-  if (!index.isValid()) {
-    // No-op.
-  } else if (role == Qt::CheckStateRole) {
-    const auto& row = rowAt(index.row());
-    switch (box<Column>(index.column())) {
-    case Column::CheckState:
-      var = row.checked() ? Qt::Checked : Qt::Unchecked;
-      break;
-    default:
-      break;
+    QVariant var{};
+    if (!index.isValid()) {
+        // No-op.
+    } else if (role == Qt::CheckStateRole) {
+        const auto& row = rowAt(index.row());
+        switch (box<Column>(index.column())) {
+        case Column::CheckState:
+            var = row.checked() ? Qt::Checked : Qt::Unchecked;
+            break;
+        default:
+            break;
+        }
+    } else if (role == Qt::DisplayRole) {
+        const auto& posn = valueAt(index.row());
+        switch (box<Column>(index.column())) {
+        case Column::CheckState:
+            break;
+        case Column::Accnt:
+            var = posn.accnt();
+            break;
+        case Column::MarketId:
+            var = toVariant(posn.marketId());
+            break;
+        case Column::Contr:
+            var = posn.contr().mnem();
+            break;
+        case Column::SettlDate:
+            var = posn.settlDate();
+            break;
+        case Column::BuyLots:
+            var = toVariant(posn.buyLots());
+            break;
+        case Column::BuyAvgPrice:
+            var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
+            break;
+        case Column::SellLots:
+            var = toVariant(posn.sellLots());
+            break;
+        case Column::SellAvgPrice:
+            var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
+            break;
+        }
+    } else if (role == Qt::TextAlignmentRole) {
+        switch (box<Column>(index.column())) {
+        case Column::CheckState:
+            break;
+        case Column::Accnt:
+            var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
+            break;
+        case Column::MarketId:
+        case Column::Contr:
+        case Column::SettlDate:
+        case Column::BuyLots:
+        case Column::BuyAvgPrice:
+        case Column::SellLots:
+        case Column::SellAvgPrice:
+            var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
+            break;
+        }
+    } else if (role == Qt::UserRole) {
+        var = QVariant::fromValue(valueAt(index.row()));
     }
-  } else if (role == Qt::DisplayRole) {
-    const auto& posn = valueAt(index.row());
-    switch (box<Column>(index.column())) {
-    case Column::CheckState:
-      break;
-    case Column::Accnt:
-      var = posn.accnt();
-      break;
-    case Column::MarketId:
-      var = toVariant(posn.marketId());
-      break;
-    case Column::Contr:
-      var = posn.contr().mnem();
-      break;
-    case Column::SettlDate:
-      var = posn.settlDate();
-      break;
-    case Column::BuyLots:
-      var = toVariant(posn.buyLots());
-      break;
-    case Column::BuyAvgPrice:
-      var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
-      break;
-    case Column::SellLots:
-      var = toVariant(posn.sellLots());
-      break;
-    case Column::SellAvgPrice:
-      var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
-      break;
-    }
-  } else if (role == Qt::TextAlignmentRole) {
-    switch (box<Column>(index.column())) {
-    case Column::CheckState:
-      break;
-    case Column::Accnt:
-      var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
-      break;
-    case Column::MarketId:
-    case Column::Contr:
-    case Column::SettlDate:
-    case Column::BuyLots:
-    case Column::BuyAvgPrice:
-    case Column::SellLots:
-    case Column::SellAvgPrice:
-      var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
-      break;
-    }
-  } else if (role == Qt::UserRole) {
-    var = QVariant::fromValue(valueAt(index.row()));
-  }
-  return var;
+    return var;
 }
 
 QVariant PosnModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-  QVariant var{};
-  if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-    var = header_[section];
-  }
-  return var;
+    QVariant var{};
+    if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        var = header_[section];
+    }
+    return var;
 }
 
 } // ui

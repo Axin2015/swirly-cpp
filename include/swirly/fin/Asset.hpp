@@ -27,48 +27,48 @@ namespace swirly {
  * An item of value.
  */
 class SWIRLY_API Asset : public Comparable<Asset> {
- public:
-  Asset(Id32 id, Mnem mnem, std::string_view display, AssetType type) noexcept
-    : id_{id}, mnem_{mnem}, display_{display}, type_{type}
-  {
-  }
+  public:
+    Asset(Id32 id, Mnem mnem, std::string_view display, AssetType type) noexcept
+        : id_{id}, mnem_{mnem}, display_{display}, type_{type}
+    {
+    }
 
-  ~Asset() noexcept;
+    ~Asset() noexcept;
 
-  // Copy.
-  Asset(const Asset&);
-  Asset& operator=(const Asset&) = delete;
+    // Copy.
+    Asset(const Asset&);
+    Asset& operator=(const Asset&) = delete;
 
-  // Move.
-  Asset(Asset&&);
-  Asset& operator=(Asset&&) = delete;
+    // Move.
+    Asset(Asset&&);
+    Asset& operator=(Asset&&) = delete;
 
-  template <typename... ArgsT>
-  static AssetPtr make(ArgsT&&... args)
-  {
-    return std::make_unique<Asset>(std::forward<ArgsT>(args)...);
-  }
+    template <typename... ArgsT>
+    static AssetPtr make(ArgsT&&... args)
+    {
+        return std::make_unique<Asset>(std::forward<ArgsT>(args)...);
+    }
 
-  void toJson(std::ostream& os) const;
+    void toJson(std::ostream& os) const;
 
-  int compare(const Asset& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
-  auto id() const noexcept { return id_; }
-  auto mnem() const noexcept { return mnem_; }
-  auto display() const noexcept { return +display_; }
-  auto type() const noexcept { return type_; }
-  boost::intrusive::set_member_hook<> mnemHook_;
+    int compare(const Asset& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+    auto id() const noexcept { return id_; }
+    auto mnem() const noexcept { return mnem_; }
+    auto display() const noexcept { return +display_; }
+    auto type() const noexcept { return type_; }
+    boost::intrusive::set_member_hook<> mnemHook_;
 
- private:
-  const Id32 id_;
-  const Mnem mnem_;
-  const Display display_;
-  const AssetType type_;
+  private:
+    const Id32 id_;
+    const Mnem mnem_;
+    const Display display_;
+    const AssetType type_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Asset& asset)
 {
-  asset.toJson(os);
-  return os;
+    asset.toJson(os);
+    return os;
 }
 
 using AssetSet = MnemSet<Asset>;

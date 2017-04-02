@@ -26,13 +26,13 @@ Accnt::Accnt(Accnt&&) = default;
 
 PosnPtr Accnt::posn(Id64 marketId, Mnem contr, JDay settlDay) throw(bad_alloc)
 {
-  PosnSet::Iterator it;
-  bool found;
-  tie(it, found) = posns_.findHint(marketId);
-  if (!found) {
-    it = posns_.insertHint(it, Posn::make(mnem_, marketId, contr, settlDay));
-  }
-  return &*it;
+    PosnSet::Iterator it;
+    bool found;
+    tie(it, found) = posns_.findHint(marketId);
+    if (!found) {
+        it = posns_.insertHint(it, Posn::make(mnem_, marketId, contr, settlDay));
+    }
+    return &*it;
 }
 
 } // swirly

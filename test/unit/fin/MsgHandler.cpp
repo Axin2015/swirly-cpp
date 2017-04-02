@@ -25,53 +25,53 @@ namespace {
 
 struct MsgHandler : BasicMsgHandler<MsgHandler> {
 
-  int resetCalls{0};
-  int createMarketCalls{0};
-  int updateMarketCalls{0};
-  int createExecCalls{0};
-  int archiveTradeCalls{0};
+    int resetCalls{0};
+    int createMarketCalls{0};
+    int updateMarketCalls{0};
+    int createExecCalls{0};
+    int archiveTradeCalls{0};
 
-  void onReset() { ++resetCalls; }
-  void onCreateMarket(const CreateMarketBody& body) { ++createMarketCalls; }
-  void onUpdateMarket(const UpdateMarketBody& body) { ++updateMarketCalls; }
-  void onCreateExec(const CreateExecBody& body) { ++createExecCalls; }
-  void onArchiveTrade(const ArchiveTradeBody& body) { ++archiveTradeCalls; }
+    void onReset() { ++resetCalls; }
+    void onCreateMarket(const CreateMarketBody& body) { ++createMarketCalls; }
+    void onUpdateMarket(const UpdateMarketBody& body) { ++updateMarketCalls; }
+    void onCreateExec(const CreateExecBody& body) { ++createExecCalls; }
+    void onArchiveTrade(const ArchiveTradeBody& body) { ++archiveTradeCalls; }
 };
 
 } // anonymous
 
 SWIRLY_TEST_CASE(BasicMsgHandler)
 {
-  MsgHandler h;
-  Msg m;
-  memset(&m, 0, sizeof(m));
+    MsgHandler h;
+    Msg m;
+    memset(&m, 0, sizeof(m));
 
-  SWIRLY_CHECK(h.resetCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.resetCalls == 1);
+    SWIRLY_CHECK(h.resetCalls == 0);
+    h.dispatch(m);
+    SWIRLY_CHECK(h.resetCalls == 1);
 
-  m.type = MsgType::Reset;
-  SWIRLY_CHECK(h.resetCalls == 1);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.resetCalls == 2);
+    m.type = MsgType::Reset;
+    SWIRLY_CHECK(h.resetCalls == 1);
+    h.dispatch(m);
+    SWIRLY_CHECK(h.resetCalls == 2);
 
-  m.type = MsgType::CreateMarket;
-  SWIRLY_CHECK(h.createMarketCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.createMarketCalls == 1);
+    m.type = MsgType::CreateMarket;
+    SWIRLY_CHECK(h.createMarketCalls == 0);
+    h.dispatch(m);
+    SWIRLY_CHECK(h.createMarketCalls == 1);
 
-  m.type = MsgType::UpdateMarket;
-  SWIRLY_CHECK(h.updateMarketCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.updateMarketCalls == 1);
+    m.type = MsgType::UpdateMarket;
+    SWIRLY_CHECK(h.updateMarketCalls == 0);
+    h.dispatch(m);
+    SWIRLY_CHECK(h.updateMarketCalls == 1);
 
-  m.type = MsgType::CreateExec;
-  SWIRLY_CHECK(h.createExecCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.createExecCalls == 1);
+    m.type = MsgType::CreateExec;
+    SWIRLY_CHECK(h.createExecCalls == 0);
+    h.dispatch(m);
+    SWIRLY_CHECK(h.createExecCalls == 1);
 
-  m.type = MsgType::ArchiveTrade;
-  SWIRLY_CHECK(h.archiveTradeCalls == 0);
-  h.dispatch(m);
-  SWIRLY_CHECK(h.archiveTradeCalls == 1);
+    m.type = MsgType::ArchiveTrade;
+    SWIRLY_CHECK(h.archiveTradeCalls == 0);
+    h.dispatch(m);
+    SWIRLY_CHECK(h.archiveTradeCalls == 1);
 }

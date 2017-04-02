@@ -24,17 +24,17 @@ namespace swirly {
 
 UnixClock::time_point UnixClock::now() noexcept
 {
-  using std::chrono::milliseconds;
-  timeval tv;
-  gettimeofday(&tv, nullptr);
-  std::int64_t ms{tv.tv_sec * 1000L};
-  ms += (tv.tv_usec + 500L) / 1000L;
-  return time_point{milliseconds{ms}};
+    using std::chrono::milliseconds;
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    std::int64_t ms{tv.tv_sec * 1000L};
+    ms += (tv.tv_usec + 500L) / 1000L;
+    return time_point{milliseconds{ms}};
 }
 
 std::ostream& operator<<(std::ostream& os, Time time)
 {
-  return os << timeToMs(time);
+    return os << timeToMs(time);
 }
 
 } // swirly

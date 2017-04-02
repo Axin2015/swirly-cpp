@@ -24,51 +24,51 @@
 namespace swirly {
 
 class SWIRLY_API Response {
- public:
-  using Orders = std::vector<ConstOrderPtr>;
-  using Execs = std::vector<ConstExecPtr>;
+  public:
+    using Orders = std::vector<ConstOrderPtr>;
+    using Execs = std::vector<ConstExecPtr>;
 
-  Response() noexcept;
-  ~Response() noexcept;
+    Response() noexcept;
+    ~Response() noexcept;
 
-  // Copy.
-  Response(const Response&);
-  Response& operator=(const Response&);
+    // Copy.
+    Response(const Response&);
+    Response& operator=(const Response&);
 
-  // Move.
-  Response(Response&&) noexcept;
-  Response& operator=(Response&&) noexcept;
+    // Move.
+    Response(Response&&) noexcept;
+    Response& operator=(Response&&) noexcept;
 
-  void toJson(std::ostream& os) const;
+    void toJson(std::ostream& os) const;
 
-  ConstMarketPtr market() const noexcept;
-  const Orders& orders() const noexcept { return orders_; }
-  const Execs& execs() const noexcept { return execs_; }
-  ConstPosnPtr posn() const noexcept;
+    ConstMarketPtr market() const noexcept;
+    const Orders& orders() const noexcept { return orders_; }
+    const Execs& execs() const noexcept { return execs_; }
+    ConstPosnPtr posn() const noexcept;
 
-  void clear() noexcept;
+    void clear() noexcept;
 
-  void clearMatches() noexcept;
+    void clearMatches() noexcept;
 
-  void setMarket(const ConstMarketPtr& market) noexcept;
+    void setMarket(const ConstMarketPtr& market) noexcept;
 
-  void insertOrder(const ConstOrderPtr& order);
+    void insertOrder(const ConstOrderPtr& order);
 
-  void insertExec(const ConstExecPtr& exec);
+    void insertExec(const ConstExecPtr& exec);
 
-  void setPosn(const ConstPosnPtr& posn) noexcept;
+    void setPosn(const ConstPosnPtr& posn) noexcept;
 
- private:
-  ConstMarketPtr market_;
-  Orders orders_;
-  Execs execs_;
-  ConstPosnPtr posn_;
+  private:
+    ConstMarketPtr market_;
+    Orders orders_;
+    Execs execs_;
+    ConstPosnPtr posn_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Response& resp)
 {
-  resp.toJson(os);
-  return os;
+    resp.toJson(os);
+    return os;
 }
 
 } // swirly

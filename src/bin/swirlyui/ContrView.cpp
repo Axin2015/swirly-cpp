@@ -32,40 +32,40 @@ namespace ui {
 using namespace contr;
 
 ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_(model)
+    : QWidget{parent, f}, model_(model)
 {
-  auto table = make_unique<QTableView>();
-  {
-    auto del = makeDeleter(table->model());
-    table->setModel(&model);
-  }
-  table->resizeColumnToContents(unbox(Column::CheckState));
+    auto table = make_unique<QTableView>();
+    {
+        auto del = makeDeleter(table->model());
+        table->setModel(&model);
+    }
+    table->resizeColumnToContents(unbox(Column::CheckState));
 
-  table->setColumnHidden(unbox(Column::CheckState), true);
+    table->setColumnHidden(unbox(Column::CheckState), true);
 
-  table->setFocusPolicy(Qt::NoFocus);
-  table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::NoSelection);
+    table->setFocusPolicy(Qt::NoFocus);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::NoSelection);
 
-  connect(table.get(), &QTableView::clicked, this, &ContrView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &ContrView::slotClicked);
 
-  auto layout = make_unique<QGridLayout>();
-  layout->addWidget(table_ = table.release(), 0, 0);
-  setLayout(layout.release());
+    auto layout = make_unique<QGridLayout>();
+    layout->addWidget(table_ = table.release(), 0, 0);
+    setLayout(layout.release());
 }
 
 ContrView::~ContrView() noexcept = default;
 
 void ContrView::resizeColumnsToContents()
 {
-  table_->resizeColumnsToContents();
+    table_->resizeColumnsToContents();
 }
 
 void ContrView::slotClicked(const QModelIndex& index)
 {
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    model_.toggleCheckState(index.row());
-  }
+    if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+        model_.toggleCheckState(index.row());
+    }
 }
 
 } // ui

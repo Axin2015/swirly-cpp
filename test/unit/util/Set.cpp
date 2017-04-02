@@ -26,94 +26,95 @@ using namespace swirly;
 namespace {
 
 class Foo : public RefCounted<Foo> {
- public:
-  Foo(Mnem mnem, string_view display, int& alive) noexcept
-    : mnem_{mnem}, display_{display}, alive_{alive}
-  {
-    ++alive;
-  }
-  ~Foo() noexcept { --alive_; }
+  public:
+    Foo(Mnem mnem, string_view display, int& alive) noexcept
+        : mnem_{mnem}, display_{display}, alive_{alive}
+    {
+        ++alive;
+    }
+    ~Foo() noexcept { --alive_; }
 
-  auto mnem() const noexcept { return mnem_; }
-  auto display() const noexcept { return +display_; }
-  boost::intrusive::set_member_hook<> mnemHook_;
+    auto mnem() const noexcept { return mnem_; }
+    auto display() const noexcept { return +display_; }
+    boost::intrusive::set_member_hook<> mnemHook_;
 
- private:
-  const Mnem mnem_;
-  String<64> display_;
-  int& alive_;
+  private:
+    const Mnem mnem_;
+    String<64> display_;
+    int& alive_;
 };
 
 class Bar : public RefCounted<Bar> {
- public:
-  Bar(Id64 id, string_view display, int& alive) noexcept : id_{id}, display_{display}, alive_{alive}
-  {
-    ++alive;
-  }
-  ~Bar() noexcept { --alive_; }
+  public:
+    Bar(Id64 id, string_view display, int& alive) noexcept
+        : id_{id}, display_{display}, alive_{alive}
+    {
+        ++alive;
+    }
+    ~Bar() noexcept { --alive_; }
 
-  auto id() const noexcept { return id_; }
-  auto display() const noexcept { return +display_; }
-  boost::intrusive::set_member_hook<> idHook_;
+    auto id() const noexcept { return id_; }
+    auto display() const noexcept { return +display_; }
+    boost::intrusive::set_member_hook<> idHook_;
 
- private:
-  const Id64 id_;
-  String<64> display_;
-  int& alive_;
+  private:
+    const Id64 id_;
+    String<64> display_;
+    int& alive_;
 };
 
 } // anonymous
 
 SWIRLY_TEST_CASE(MnemSet)
 {
-  int alive{0};
-  {
-    MnemSet<Foo> s;
+    int alive{0};
+    {
+        MnemSet<Foo> s;
 
-    Foo& foo1{*s.emplace("FOO"_sv, "Foo One"_sv, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(foo1.mnem() == "FOO"_sv);
-    SWIRLY_CHECK(foo1.display() == "Foo One"_sv);
-    SWIRLY_CHECK(s.find("FOO"_sv) != s.end());
+        Foo& foo1{*s.emplace("FOO"_sv, "Foo One"_sv, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(foo1.mnem() == "FOO"_sv);
+        SWIRLY_CHECK(foo1.display() == "Foo One"_sv);
+        SWIRLY_CHECK(s.find("FOO"_sv) != s.end());
 
-    // Duplicate.
-    Foo& foo2{*s.emplace("FOO"_sv, "Foo Two"_sv, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(&foo2 == &foo1);
+        // Duplicate.
+        Foo& foo2{*s.emplace("FOO"_sv, "Foo Two"_sv, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(&foo2 == &foo1);
 
-    // Replace.
-    Foo& foo3{*s.emplaceOrReplace("FOO"_sv, "Foo Three"_sv, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(&foo3 != &foo1);
-    SWIRLY_CHECK(foo3.mnem() == "FOO"_sv);
-    SWIRLY_CHECK(foo3.display() == "Foo Three"_sv);
-  }
-  SWIRLY_CHECK(alive == 0);
+        // Replace.
+        Foo& foo3{*s.emplaceOrReplace("FOO"_sv, "Foo Three"_sv, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(&foo3 != &foo1);
+        SWIRLY_CHECK(foo3.mnem() == "FOO"_sv);
+        SWIRLY_CHECK(foo3.display() == "Foo Three"_sv);
+    }
+    SWIRLY_CHECK(alive == 0);
 }
 
 SWIRLY_TEST_CASE(IdSet)
 {
-  int alive{0};
-  {
-    IdSet<Bar> s;
+    int alive{0};
+    {
+        IdSet<Bar> s;
 
-    Bar& bar1{*s.emplace(1_id64, "Bar One"_sv, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(bar1.id() == 1_id64);
-    SWIRLY_CHECK(bar1.display() == "Bar One"_sv);
-    SWIRLY_CHECK(s.find(1_id64) != s.end());
+        Bar& bar1{*s.emplace(1_id64, "Bar One"_sv, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(bar1.id() == 1_id64);
+        SWIRLY_CHECK(bar1.display() == "Bar One"_sv);
+        SWIRLY_CHECK(s.find(1_id64) != s.end());
 
-    // Duplicate.
-    Bar& bar2{*s.emplace(1_id64, "Bar Two"_sv, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(&bar2 == &bar1);
+        // Duplicate.
+        Bar& bar2{*s.emplace(1_id64, "Bar Two"_sv, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(&bar2 == &bar1);
 
-    // Replace.
-    Bar& bar3{*s.emplaceOrReplace(1_id64, "Bar Three"_sv, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(&bar3 != &bar1);
-    SWIRLY_CHECK(bar3.id() == 1_id64);
-    SWIRLY_CHECK(bar3.display() == "Bar Three"_sv);
-  }
-  SWIRLY_CHECK(alive == 0);
+        // Replace.
+        Bar& bar3{*s.emplaceOrReplace(1_id64, "Bar Three"_sv, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(&bar3 != &bar1);
+        SWIRLY_CHECK(bar3.id() == 1_id64);
+        SWIRLY_CHECK(bar3.display() == "Bar Three"_sv);
+    }
+    SWIRLY_CHECK(alive == 0);
 }

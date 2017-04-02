@@ -25,17 +25,17 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(GetBusDay)
 {
-  BusinessDay busDay{RollHour, NewYork};
+    BusinessDay busDay{RollHour, NewYork};
 
-  // Business days roll at 5pm New York.
+    // Business days roll at 5pm New York.
 
-  // Friday, March 14, 2014
-  // 21.00 UTC
-  // 17.00 EDT (UTC-4 hours)
+    // Friday, March 14, 2014
+    // 21.00 UTC
+    // 17.00 EDT (UTC-4 hours)
 
-  // 20.59 UTC
-  SWIRLY_CHECK(busDay(Time{1394830799000ms}) == ymdToJd(2014, 2, 14));
+    // 20.59 UTC
+    SWIRLY_CHECK(busDay(Time{1394830799000ms}) == ymdToJd(2014, 2, 14));
 
-  // 21.00 UTC
-  SWIRLY_CHECK(busDay(Time{1394830800000ms}) == ymdToJd(2014, 2, 15));
+    // 21.00 UTC
+    SWIRLY_CHECK(busDay(Time{1394830800000ms}) == ymdToJd(2014, 2, 15));
 }

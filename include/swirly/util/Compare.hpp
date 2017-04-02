@@ -23,62 +23,62 @@ namespace swirly {
 
 template <typename ValueT>
 class Comparable {
- public:
-  friend constexpr bool operator==(const ValueT& lhs, const ValueT& rhs) noexcept
-  {
-    return lhs.compare(rhs) == 0;
-  }
+  public:
+    friend constexpr bool operator==(const ValueT& lhs, const ValueT& rhs) noexcept
+    {
+        return lhs.compare(rhs) == 0;
+    }
 
-  friend constexpr bool operator!=(const ValueT& lhs, const ValueT& rhs) noexcept
-  {
-    return lhs.compare(rhs) != 0;
-  }
+    friend constexpr bool operator!=(const ValueT& lhs, const ValueT& rhs) noexcept
+    {
+        return lhs.compare(rhs) != 0;
+    }
 
-  friend constexpr bool operator<(const ValueT& lhs, const ValueT& rhs) noexcept
-  {
-    return lhs.compare(rhs) < 0;
-  }
+    friend constexpr bool operator<(const ValueT& lhs, const ValueT& rhs) noexcept
+    {
+        return lhs.compare(rhs) < 0;
+    }
 
-  friend constexpr bool operator<=(const ValueT& lhs, const ValueT& rhs) noexcept
-  {
-    return lhs.compare(rhs) <= 0;
-  }
+    friend constexpr bool operator<=(const ValueT& lhs, const ValueT& rhs) noexcept
+    {
+        return lhs.compare(rhs) <= 0;
+    }
 
-  friend constexpr bool operator>(const ValueT& lhs, const ValueT& rhs) noexcept
-  {
-    return lhs.compare(rhs) > 0;
-  }
+    friend constexpr bool operator>(const ValueT& lhs, const ValueT& rhs) noexcept
+    {
+        return lhs.compare(rhs) > 0;
+    }
 
-  friend constexpr bool operator>=(const ValueT& lhs, const ValueT& rhs) noexcept
-  {
-    return lhs.compare(rhs) >= 0;
-  }
+    friend constexpr bool operator>=(const ValueT& lhs, const ValueT& rhs) noexcept
+    {
+        return lhs.compare(rhs) >= 0;
+    }
 
-  // Copy.
-  constexpr Comparable(const Comparable&) noexcept = default;
-  Comparable& operator=(const Comparable&) noexcept = default;
+    // Copy.
+    constexpr Comparable(const Comparable&) noexcept = default;
+    Comparable& operator=(const Comparable&) noexcept = default;
 
-  // Move.
-  constexpr Comparable(Comparable&&) noexcept = default;
-  Comparable& operator=(Comparable&&) noexcept = default;
+    // Move.
+    constexpr Comparable(Comparable&&) noexcept = default;
+    Comparable& operator=(Comparable&&) noexcept = default;
 
- protected:
-  constexpr Comparable() noexcept = default;
-  ~Comparable() noexcept = default;
+  protected:
+    constexpr Comparable() noexcept = default;
+    ~Comparable() noexcept = default;
 };
 
 template <typename ValueT>
 constexpr int compare(ValueT lhs, ValueT rhs) noexcept
 {
-  int i{};
-  if (lhs < rhs) {
-    i = -1;
-  } else if (lhs > rhs) {
-    i = 1;
-  } else {
-    i = 0;
-  }
-  return i;
+    int i{};
+    if (lhs < rhs) {
+        i = -1;
+    } else if (lhs > rhs) {
+        i = 1;
+    } else {
+        i = 0;
+    }
+    return i;
 }
 
 } // swirly

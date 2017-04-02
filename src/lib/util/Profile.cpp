@@ -24,45 +24,46 @@ namespace swirly {
 
 Profile::~Profile() noexcept
 {
-  report();
+    report();
 }
 
 void Profile::report() const noexcept
 {
-  const auto sd = stdev(var_);
-  if (!std::isnan(sd)) {
-    SWIRLY_INFO(logMsg() << '<' << name_ //
-                         << "> {\"size\":" << var_.size() //
-                         << ",\"mean\":" << var_.mean() //
-                         << ",\"stdevp\":" << sd //
-                         << ",\"pctile95\":" << pctile95(var_.mean(), sd) //
-                         << ",\"pctile99\":" << pctile99(var_.mean(), sd) //
-                         << ",\"pctile999\":" << pctile999(var_.mean(), sd) //
-                         << ",\"min\":" << var_.min() //
-                         << ",\"max\":" << var_.max() //
-                         << '}');
-  }
+    const auto sd = stdev(var_);
+    if (!std::isnan(sd)) {
+        SWIRLY_INFO(logMsg() << '<' << name_ //
+                             << "> {\"size\":" << var_.size() //
+                             << ",\"mean\":" << var_.mean() //
+                             << ",\"stdevp\":" << sd //
+                             << ",\"pctile95\":" << pctile95(var_.mean(), sd) //
+                             << ",\"pctile99\":" << pctile99(var_.mean(), sd) //
+                             << ",\"pctile999\":" << pctile999(var_.mean(), sd) //
+                             << ",\"min\":" << var_.min() //
+                             << ",\"max\":" << var_.max() //
+                             << '}');
+    }
 }
 
 void Profile::record(double val) noexcept
 {
-  var_.append(val);
-  const auto sd = stdev(var_);
-  if (!std::isnan(sd)) {
-    const auto z = zscore(var_.mean(), sd, val);
-    // NORMSINV(0.999) = 3.0902323
-    if (z > 3.0902323) {
-      SWIRLY_WARNING(logMsg() << '<' << name_ << "> outlier " << val << " with z-score " << z);
+    var_.append(val);
+    const auto sd = stdev(var_);
+    if (!std::isnan(sd)) {
+        const auto z = zscore(var_.mean(), sd, val);
+        // NORMSINV(0.999) = 3.0902323
+        if (z > 3.0902323) {
+            SWIRLY_WARNING(logMsg() << '<' << name_ << "> outlier " << val << " with z-score "
+                                    << z);
+        }
     }
-  }
 }
 
 TimeRecorder::~TimeRecorder() noexcept
 {
-  const auto end = chrono::high_resolution_clock::now();
-  const chrono::duration<double, micro> diff{end - start_};
-  const auto usec = diff.count();
-  profile_.record(usec);
+    const auto end = chrono::high_resolution_clock::now();
+    const chrono::duration<double, micro> diff{end - start_};
+    const auto usec = diff.count();
+    profile_.record(usec);
 }
 
 } // swirly

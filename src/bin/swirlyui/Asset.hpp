@@ -29,42 +29,42 @@ namespace ui {
 namespace asset {
 
 enum class Column : int { //
-  CheckState, //
-  Mnem, //
-  Display, //
-  Type
+    CheckState, //
+    Mnem, //
+    Display, //
+    Type
 };
 constexpr int ColumnCount{unbox(Column::Type) + 1};
 
 } // asset
 
 class Asset {
- public:
-  Asset(const QString& mnem, const QString& display, AssetType type)
-    : mnem_{mnem}, display_{display}, type_{type}
-  {
-  }
-  Asset() = default;
-  ~Asset() noexcept = default;
+  public:
+    Asset(const QString& mnem, const QString& display, AssetType type)
+        : mnem_{mnem}, display_{display}, type_{type}
+    {
+    }
+    Asset() = default;
+    ~Asset() noexcept = default;
 
-  static Asset fromJson(const QJsonObject& obj);
+    static Asset fromJson(const QJsonObject& obj);
 
-  const QString& mnem() const noexcept { return mnem_; }
-  const QString& display() const noexcept { return display_; }
-  AssetType type() const noexcept { return type_; }
+    const QString& mnem() const noexcept { return mnem_; }
+    const QString& display() const noexcept { return display_; }
+    AssetType type() const noexcept { return type_; }
 
- private:
-  QString mnem_{};
-  QString display_{};
-  AssetType type_{};
+  private:
+    QString mnem_{};
+    QString display_{};
+    AssetType type_{};
 };
 
 QDebug operator<<(QDebug debug, const Asset& asset);
 
 inline bool isModified(const Asset& prev, const Asset& next) noexcept
 {
-  // Immutable.
-  return false;
+    // Immutable.
+    return false;
 }
 
 } // ui

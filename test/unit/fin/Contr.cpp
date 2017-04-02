@@ -25,20 +25,20 @@ static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(ContrToString)
 {
-  Contr contr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
-              1,      1,           10000,       4,        1_lts,    10_lts};
+    Contr contr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
+                1,      1,           10000,       4,        1_lts,    10_lts};
 
-  SWIRLY_CHECK(toString(contr) == //
-               "{\"mnem\":\"EURUSD\""
-               ",\"display\":\"EURUSD\""
-               ",\"asset\":\"EUR\""
-               ",\"ccy\":\"USD\""
-               ",\"lotNumer\":1000000"
-               ",\"lotDenom\":1"
-               ",\"tickNumer\":1"
-               ",\"tickDenom\":10000"
-               ",\"pipDp\":4"
-               ",\"minLots\":1"
-               ",\"maxLots\":10"
-               "}");
+    SWIRLY_CHECK(toString(contr) == //
+                 "{\"mnem\":\"EURUSD\""
+                 ",\"display\":\"EURUSD\""
+                 ",\"asset\":\"EUR\""
+                 ",\"ccy\":\"USD\""
+                 ",\"lotNumer\":1000000"
+                 ",\"lotDenom\":1"
+                 ",\"tickNumer\":1"
+                 ",\"tickDenom\":10000"
+                 ",\"pipDp\":4"
+                 ",\"minLots\":1"
+                 ",\"maxLots\":10"
+                 "}");
 }

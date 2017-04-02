@@ -37,7 +37,7 @@ using Lots = IntWrapper<LotsPolicy>;
 
 constexpr Lots operator""_lts(unsigned long long val) noexcept
 {
-  return Lots{val};
+    return Lots{val};
 }
 
 /**
@@ -47,7 +47,7 @@ using Ticks = IntWrapper<TicksPolicy>;
 
 constexpr Ticks operator""_tks(unsigned long long val) noexcept
 {
-  return Ticks{val};
+    return Ticks{val};
 }
 
 /**
@@ -57,7 +57,7 @@ using Cost = IntWrapper<CostPolicy>;
 
 constexpr Cost operator""_cst(unsigned long long val) noexcept
 {
-  return Cost{val};
+    return Cost{val};
 }
 
 /**
@@ -69,132 +69,132 @@ enum class AssetType { Cmdty = 1, Corp, Ccy, Eqty, Govt, Index };
 
 inline const char* enumString(AssetType type) noexcept
 {
-  switch (type) {
-  case AssetType::Cmdty:
-    return "CMDTY";
-  case AssetType::Corp:
-    return "CORP";
-  case AssetType::Ccy:
-    return "CCY";
-  case AssetType::Eqty:
-    return "EQTY";
-  case AssetType::Govt:
-    return "GOVT";
-  case AssetType::Index:
-    return "INDEX";
-  }
-  std::terminate();
+    switch (type) {
+    case AssetType::Cmdty:
+        return "CMDTY";
+    case AssetType::Corp:
+        return "CORP";
+    case AssetType::Ccy:
+        return "CCY";
+    case AssetType::Eqty:
+        return "EQTY";
+    case AssetType::Govt:
+        return "GOVT";
+    case AssetType::Index:
+        return "INDEX";
+    }
+    std::terminate();
 }
 
 inline std::ostream& operator<<(std::ostream& os, AssetType type)
 {
-  return os << enumString(type);
+    return os << enumString(type);
 }
 
 enum class Direct {
-  /**
-   * Aggressor bought. Taker lifted the offer resulting in a market uptick.
-   */
-  Paid = 1,
-  /**
-   * Aggressor sold. Taker hit the bid resulting in a market dow
-   */
-  Given = -1
+    /**
+     * Aggressor bought. Taker lifted the offer resulting in a market uptick.
+     */
+    Paid = 1,
+    /**
+     * Aggressor sold. Taker hit the bid resulting in a market dow
+     */
+    Given = -1
 };
 
 inline const char* enumString(Direct direct) noexcept
 {
-  switch (direct) {
-  case Direct::Paid:
-    return "PAID";
-  case Direct::Given:
-    return "GIVEN";
-  }
-  std::terminate();
+    switch (direct) {
+    case Direct::Paid:
+        return "PAID";
+    case Direct::Given:
+        return "GIVEN";
+    }
+    std::terminate();
 }
 
 inline std::ostream& operator<<(std::ostream& os, Direct direct)
 {
-  return os << enumString(direct);
+    return os << enumString(direct);
 }
 
 enum class LiqInd {
-  /**
-   * No liqInd.
-   */
-  None = 0,
-  /**
-   * Passive buyer or seller that receives the spread.
-   */
-  Maker,
-  /**
-   * Aggressive buyer or seller that crosses the market and pays the spread.
-   */
-  Taker
+    /**
+     * No liqInd.
+     */
+    None = 0,
+    /**
+     * Passive buyer or seller that receives the spread.
+     */
+    Maker,
+    /**
+     * Aggressive buyer or seller that crosses the market and pays the spread.
+     */
+    Taker
 };
 
 inline const char* enumString(LiqInd liqInd) noexcept
 {
-  switch (liqInd) {
-  case LiqInd::None:
-    return "NONE";
-  case LiqInd::Maker:
-    return "MAKER";
-  case LiqInd::Taker:
-    return "TAKER";
-  }
-  std::terminate();
+    switch (liqInd) {
+    case LiqInd::None:
+        return "NONE";
+    case LiqInd::Maker:
+        return "MAKER";
+    case LiqInd::Taker:
+        return "TAKER";
+    }
+    std::terminate();
 }
 
 constexpr LiqInd opposite(LiqInd liqInd) noexcept
 {
-  switch (liqInd) {
-  case LiqInd::None:
-    break;
-  case LiqInd::Maker:
-    liqInd = LiqInd::Taker;
-    break;
-  case LiqInd::Taker:
-    liqInd = LiqInd::Maker;
-    break;
-  }
-  return liqInd;
+    switch (liqInd) {
+    case LiqInd::None:
+        break;
+    case LiqInd::Maker:
+        liqInd = LiqInd::Taker;
+        break;
+    case LiqInd::Taker:
+        liqInd = LiqInd::Maker;
+        break;
+    }
+    return liqInd;
 }
 
 inline std::ostream& operator<<(std::ostream& os, LiqInd liqInd)
 {
-  return os << enumString(liqInd);
+    return os << enumString(liqInd);
 }
 
 enum class Side { Buy = 1, Sell = -1 };
 
 inline const char* enumString(Side side) noexcept
 {
-  switch (side) {
-  case Side::Buy:
-    return "BUY";
-  case Side::Sell:
-    return "SELL";
-  }
-  std::terminate();
+    switch (side) {
+    case Side::Buy:
+        return "BUY";
+    case Side::Sell:
+        return "SELL";
+    }
+    std::terminate();
 }
 
 constexpr Side opposite(Side side) noexcept
 {
-  switch (side) {
-  case Side::Buy:
-    side = Side::Sell;
-    break;
-  case Side::Sell:
-    side = Side::Buy;
-    break;
-  }
-  return side;
+    switch (side) {
+    case Side::Buy:
+        side = Side::Sell;
+        break;
+    case Side::Sell:
+        side = Side::Buy;
+        break;
+    }
+    return side;
 }
 
 inline std::ostream& operator<<(std::ostream& os, Side side)
 {
-  return os << enumString(side);
+    return os << enumString(side);
 }
 
 /**
@@ -202,62 +202,62 @@ inline std::ostream& operator<<(std::ostream& os, Side side)
  * @image html OrderState.png
  */
 enum class State {
-  None = 0,
-  /**
-   * Initial state of a resting order placed in the order-book.
-   */
-  New,
-  /**
-   * State of a resting order that has been revised.
-   */
-  Revise,
-  /**
-   * State of a resting order that has been cancelled.
-   */
-  Cancel,
-  /**
-   * State of an order that has been partially or fully filled.
-   */
-  Trade
+    None = 0,
+    /**
+     * Initial state of a resting order placed in the order-book.
+     */
+    New,
+    /**
+     * State of a resting order that has been revised.
+     */
+    Revise,
+    /**
+     * State of a resting order that has been cancelled.
+     */
+    Cancel,
+    /**
+     * State of an order that has been partially or fully filled.
+     */
+    Trade
 };
 
 inline const char* enumString(State state) noexcept
 {
-  switch (state) {
-  case State::None:
-    return "NONE";
-  case State::New:
-    return "NEW";
-  case State::Revise:
-    return "REVISE";
-  case State::Cancel:
-    return "CANCEL";
-  case State::Trade:
-    return "TRADE";
-  }
-  std::terminate();
+    switch (state) {
+    case State::None:
+        return "NONE";
+    case State::New:
+        return "NEW";
+    case State::Revise:
+        return "REVISE";
+    case State::Cancel:
+        return "CANCEL";
+    case State::Trade:
+        return "TRADE";
+    }
+    std::terminate();
 }
 
 inline const char* enumString(State state, Lots resd) noexcept
 {
-  switch (state) {
-  case State::None:
-    return "NONE";
-  case State::New:
-    return "NEW";
-  case State::Revise:
-    return "REVISE";
-  case State::Cancel:
-    return "CANCEL";
-  case State::Trade:
-    return resd == 0_lts ? "COMPLETE" : "PARTIAL";
-  }
-  std::terminate();
+    switch (state) {
+    case State::None:
+        return "NONE";
+    case State::New:
+        return "NEW";
+    case State::Revise:
+        return "REVISE";
+    case State::Cancel:
+        return "CANCEL";
+    case State::Trade:
+        return resd == 0_lts ? "COMPLETE" : "PARTIAL";
+    }
+    std::terminate();
 }
 
 inline std::ostream& operator<<(std::ostream& os, State state)
 {
-  return os << enumString(state);
+    return os << enumString(state);
 }
 
 } // swirly

@@ -23,11 +23,11 @@ using namespace std;
 namespace swirly {
 
 Level::Level(const Order& firstOrder) noexcept
-  : firstOrder_{&firstOrder},
-    key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
-    ticks_{firstOrder.ticks()},
-    resd_{firstOrder.resd()},
-    count_{1}
+    : firstOrder_{&firstOrder},
+      key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
+      ticks_{firstOrder.ticks()},
+      resd_{firstOrder.resd()},
+      count_{1}
 {
 }
 
@@ -37,19 +37,19 @@ Level::Level(Level&&) = default;
 
 void Level::addOrder(const Order& order) noexcept
 {
-  resd_ += order.resd();
-  ++count_;
+    resd_ += order.resd();
+    ++count_;
 }
 
 void Level::subOrder(const Order& order) noexcept
 {
-  resd_ -= order.resd();
-  --count_;
+    resd_ -= order.resd();
+    --count_;
 }
 
 LevelSet::~LevelSet() noexcept
 {
-  set_.clear_and_dispose([](Level* ptr) { delete ptr; });
+    set_.clear_and_dispose([](Level* ptr) { delete ptr; });
 }
 
 LevelSet::LevelSet(LevelSet&&) = default;
@@ -58,43 +58,43 @@ LevelSet& LevelSet::operator=(LevelSet&&) = default;
 
 LevelSet::Iterator LevelSet::insert(ValuePtr value) noexcept
 {
-  Iterator it;
-  bool inserted;
-  tie(it, inserted) = set_.insert(*value);
-  if (inserted) {
-    // Take ownership if inserted.
-    value.release();
-  }
-  return it;
+    Iterator it;
+    bool inserted;
+    tie(it, inserted) = set_.insert(*value);
+    if (inserted) {
+        // Take ownership if inserted.
+        value.release();
+    }
+    return it;
 }
 
 LevelSet::Iterator LevelSet::insertHint(ConstIterator hint, ValuePtr value) noexcept
 {
-  auto it = set_.insert(hint, *value);
-  // Take ownership.
-  value.release();
-  return it;
+    auto it = set_.insert(hint, *value);
+    // Take ownership.
+    value.release();
+    return it;
 }
 
 LevelSet::Iterator LevelSet::insertOrReplace(ValuePtr value) noexcept
 {
-  Iterator it;
-  bool inserted;
-  tie(it, inserted) = set_.insert(*value);
-  if (!inserted) {
-    // Replace if exists.
-    ValuePtr prev{&*it};
-    set_.replace_node(it, *value);
-    it = Set::s_iterator_to(*value);
-  }
-  // Take ownership.
-  value.release();
-  return it;
+    Iterator it;
+    bool inserted;
+    tie(it, inserted) = set_.insert(*value);
+    if (!inserted) {
+        // Replace if exists.
+        ValuePtr prev{&*it};
+        set_.replace_node(it, *value);
+        it = Set::s_iterator_to(*value);
+    }
+    // Take ownership.
+    value.release();
+    return it;
 }
 
 void LevelSet::remove(const Level& level) noexcept
 {
-  set_.erase_and_dispose(Set::s_iterator_to(level), [](Level* ptr) { delete ptr; });
+    set_.erase_and_dispose(Set::s_iterator_to(level), [](Level* ptr) { delete ptr; });
 }
 
 } // swirly

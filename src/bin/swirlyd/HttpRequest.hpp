@@ -24,80 +24,80 @@
 namespace swirly {
 
 class HttpRequest : public BasicUrl<HttpRequest> {
- public:
-  HttpRequest() noexcept = default;
-  ~HttpRequest() noexcept;
+  public:
+    HttpRequest() noexcept = default;
+    ~HttpRequest() noexcept;
 
-  // Copy.
-  HttpRequest(const HttpRequest&) = delete;
-  HttpRequest& operator=(const HttpRequest&) = delete;
+    // Copy.
+    HttpRequest(const HttpRequest&) = delete;
+    HttpRequest& operator=(const HttpRequest&) = delete;
 
-  // Move.
-  HttpRequest(HttpRequest&&) = delete;
-  HttpRequest& operator=(HttpRequest&&) = delete;
+    // Move.
+    HttpRequest(HttpRequest&&) = delete;
+    HttpRequest& operator=(HttpRequest&&) = delete;
 
-  auto method() const noexcept { return method_; }
-  auto url() const noexcept { return +url_; }
-  auto accnt() const noexcept { return +accnt_; }
-  auto perm() const noexcept { return +perm_; }
-  auto time() const noexcept { return +time_; }
-  const auto& body() const noexcept { return body_; }
-  auto partial() const noexcept { return partial_; }
-  void clear() noexcept
-  {
-    BasicUrl<HttpRequest>::reset();
-    method_ = HttpMethod::Get;
-    url_.clear();
-    field_.clear();
-    value_ = nullptr;
-
-    accnt_.clear();
-    perm_.clear();
-    time_.clear();
-    body_.reset();
-    partial_ = false;
-  }
-  void flush() { BasicUrl<HttpRequest>::parse(); }
-  void setMethod(HttpMethod method) noexcept { method_ = method; }
-  void appendUrl(std::string_view sv) { url_ += sv; }
-  void appendHeaderField(std::string_view sv, bool first)
-  {
-    if (first) {
-      field_ = sv;
-    } else {
-      field_ += sv;
-    }
-  }
-  void appendHeaderValue(std::string_view sv, bool first)
-  {
-    if (first) {
-      if (field_ == "Swirly-Accnt"_sv) {
-        value_ = &accnt_;
-      } else if (field_ == "Swirly-Perm"_sv) {
-        value_ = &perm_;
-      } else if (field_ == "Swirly-Time"_sv) {
-        value_ = &time_;
-      } else {
+    auto method() const noexcept { return method_; }
+    auto url() const noexcept { return +url_; }
+    auto accnt() const noexcept { return +accnt_; }
+    auto perm() const noexcept { return +perm_; }
+    auto time() const noexcept { return +time_; }
+    const auto& body() const noexcept { return body_; }
+    auto partial() const noexcept { return partial_; }
+    void clear() noexcept
+    {
+        BasicUrl<HttpRequest>::reset();
+        method_ = HttpMethod::Get;
+        url_.clear();
+        field_.clear();
         value_ = nullptr;
-      }
-    }
-    if (value_) {
-      value_->append(sv);
-    }
-  }
-  void appendBody(std::string_view sv) { partial_ = !body_.parse(sv); }
 
- private:
-  HttpMethod method_{HttpMethod::Get};
-  String<128> url_;
-  String<16> field_;
-  String<24>* value_{nullptr};
-  // Header fields.
-  String<24> accnt_;
-  String<24> perm_;
-  String<24> time_;
-  RestBody body_;
-  bool partial_{false};
+        accnt_.clear();
+        perm_.clear();
+        time_.clear();
+        body_.reset();
+        partial_ = false;
+    }
+    void flush() { BasicUrl<HttpRequest>::parse(); }
+    void setMethod(HttpMethod method) noexcept { method_ = method; }
+    void appendUrl(std::string_view sv) { url_ += sv; }
+    void appendHeaderField(std::string_view sv, bool first)
+    {
+        if (first) {
+            field_ = sv;
+        } else {
+            field_ += sv;
+        }
+    }
+    void appendHeaderValue(std::string_view sv, bool first)
+    {
+        if (first) {
+            if (field_ == "Swirly-Accnt"_sv) {
+                value_ = &accnt_;
+            } else if (field_ == "Swirly-Perm"_sv) {
+                value_ = &perm_;
+            } else if (field_ == "Swirly-Time"_sv) {
+                value_ = &time_;
+            } else {
+                value_ = nullptr;
+            }
+        }
+        if (value_) {
+            value_->append(sv);
+        }
+    }
+    void appendBody(std::string_view sv) { partial_ = !body_.parse(sv); }
+
+  private:
+    HttpMethod method_{HttpMethod::Get};
+    String<128> url_;
+    String<16> field_;
+    String<24>* value_{nullptr};
+    // Header fields.
+    String<24> accnt_;
+    String<24> perm_;
+    String<24> time_;
+    RestBody body_;
+    bool partial_{false};
 };
 
 } // swirly

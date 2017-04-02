@@ -30,7 +30,7 @@ using namespace std;
 namespace swirly {
 
 BusinessDay::BusinessDay(int rollHour, const char* tzname)
-  : rollHour_{rollHour}, timeZone_{new lt::posix_time_zone{tzname}}
+    : rollHour_{rollHour}, timeZone_{new lt::posix_time_zone{tzname}}
 {
 }
 
@@ -46,20 +46,20 @@ BusinessDay& BusinessDay::operator=(BusinessDay&&) noexcept = default;
 
 JDay BusinessDay::operator()(Time time) const
 {
-  const auto t = UnixClock::to_time_t(time);
+    const auto t = UnixClock::to_time_t(time);
 
-  // Returned cached value if it exists.
-  const auto i = t & 1;
-  if (cache_[i].first == t) {
-    return cache_[i].second;
-  }
-  lt::local_date_time ldt{pt::from_time_t(t), timeZone_};
-  // Add 7 hours to 17.00 will roll the date.
-  ldt += pt::hours(24 - rollHour_);
-  const auto jd = JDay{ldt.local_time().date().julian_day()};
-  // Update cache entry.
-  cache_[i] = {t, jd};
-  return jd;
+    // Returned cached value if it exists.
+    const auto i = t & 1;
+    if (cache_[i].first == t) {
+        return cache_[i].second;
+    }
+    lt::local_date_time ldt{pt::from_time_t(t), timeZone_};
+    // Add 7 hours to 17.00 will roll the date.
+    ldt += pt::hours(24 - rollHour_);
+    const auto jd = JDay{ldt.local_time().date().julian_day()};
+    // Update cache entry.
+    cache_[i] = {t, jd};
+    return jd;
 }
 
 } // swirly

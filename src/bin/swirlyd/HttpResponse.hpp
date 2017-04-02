@@ -22,57 +22,57 @@
 namespace swirly {
 
 class HttpResponseBuf : public std::streambuf {
- public:
-  explicit HttpResponseBuf(std::string& buf) noexcept : buf_(buf) {}
-  ~HttpResponseBuf() noexcept override;
+  public:
+    explicit HttpResponseBuf(std::string& buf) noexcept : buf_(buf) {}
+    ~HttpResponseBuf() noexcept override;
 
-  // Copy.
-  HttpResponseBuf(const HttpResponseBuf& rhs) = delete;
-  HttpResponseBuf& operator=(const HttpResponseBuf& rhs) = delete;
+    // Copy.
+    HttpResponseBuf(const HttpResponseBuf& rhs) = delete;
+    HttpResponseBuf& operator=(const HttpResponseBuf& rhs) = delete;
 
-  // Move.
-  HttpResponseBuf(HttpResponseBuf&&) = delete;
-  HttpResponseBuf& operator=(HttpResponseBuf&&) = delete;
+    // Move.
+    HttpResponseBuf(HttpResponseBuf&&) = delete;
+    HttpResponseBuf& operator=(HttpResponseBuf&&) = delete;
 
-  const char_type* data() const noexcept { return buf_.data(); }
-  std::streamsize size() const noexcept { return buf_.size(); }
-  void reset() noexcept { buf_.clear(); }
-  void setContentLength(size_t pos, std::size_t len) noexcept;
+    const char_type* data() const noexcept { return buf_.data(); }
+    std::streamsize size() const noexcept { return buf_.size(); }
+    void reset() noexcept { buf_.clear(); }
+    void setContentLength(size_t pos, std::size_t len) noexcept;
 
- protected:
-  int_type overflow(int_type c) noexcept override;
+  protected:
+    int_type overflow(int_type c) noexcept override;
 
-  std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
+    std::streamsize xsputn(const char_type* s, std::streamsize count) noexcept override;
 
- private:
-  std::string& buf_;
+  private:
+    std::string& buf_;
 };
 
 class HttpResponse : public std::ostream {
- public:
-  explicit HttpResponse(std::string& buf) noexcept : std::ostream{nullptr}, buf_{buf}
-  {
-    rdbuf(&buf_);
-  }
-  ~HttpResponse() noexcept override;
+  public:
+    explicit HttpResponse(std::string& buf) noexcept : std::ostream{nullptr}, buf_{buf}
+    {
+        rdbuf(&buf_);
+    }
+    ~HttpResponse() noexcept override;
 
-  // Copy.
-  HttpResponse(const HttpResponse& rhs) = delete;
-  HttpResponse& operator=(const HttpResponse& rhs) = delete;
+    // Copy.
+    HttpResponse(const HttpResponse& rhs) = delete;
+    HttpResponse& operator=(const HttpResponse& rhs) = delete;
 
-  // Move.
-  HttpResponse(HttpResponse&&) = delete;
-  HttpResponse& operator=(HttpResponse&&) = delete;
+    // Move.
+    HttpResponse(HttpResponse&&) = delete;
+    HttpResponse& operator=(HttpResponse&&) = delete;
 
-  const char_type* data() const noexcept { return buf_.data(); }
-  std::streamsize size() const noexcept { return buf_.size(); }
-  void reset(int status, const char* reason, bool cache = false);
-  void setContentLength() noexcept;
+    const char_type* data() const noexcept { return buf_.data(); }
+    std::streamsize size() const noexcept { return buf_.size(); }
+    void reset(int status, const char* reason, bool cache = false);
+    void setContentLength() noexcept;
 
- private:
-  HttpResponseBuf buf_;
-  std::size_t headSize_{0};
-  std::size_t lengthAt_{0};
+  private:
+    HttpResponseBuf buf_;
+    std::size_t headSize_{0};
+    std::size_t lengthAt_{0};
 };
 
 } // swirly

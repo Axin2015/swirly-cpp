@@ -27,74 +27,75 @@ namespace swirly {
  * A specification that stipulates the terms and conditions of sale.
  */
 class SWIRLY_API Contr : public Comparable<Contr> {
- public:
-  Contr(Id32 id, Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
-        int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots, Lots maxLots) noexcept;
+  public:
+    Contr(Id32 id, Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
+          int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+          Lots maxLots) noexcept;
 
-  ~Contr() noexcept;
+    ~Contr() noexcept;
 
-  // Copy.
-  Contr(const Contr&);
-  Contr& operator=(const Contr&) = delete;
+    // Copy.
+    Contr(const Contr&);
+    Contr& operator=(const Contr&) = delete;
 
-  // Move.
-  Contr(Contr&&);
-  Contr& operator=(Contr&&) = delete;
+    // Move.
+    Contr(Contr&&);
+    Contr& operator=(Contr&&) = delete;
 
-  template <typename... ArgsT>
-  static ContrPtr make(ArgsT&&... args)
-  {
-    return std::make_unique<Contr>(std::forward<ArgsT>(args)...);
-  }
+    template <typename... ArgsT>
+    static ContrPtr make(ArgsT&&... args)
+    {
+        return std::make_unique<Contr>(std::forward<ArgsT>(args)...);
+    }
 
-  void toJson(std::ostream& os) const;
+    void toJson(std::ostream& os) const;
 
-  int compare(const Contr& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
-  auto id() const noexcept { return id_; }
-  auto mnem() const noexcept { return mnem_; }
-  auto display() const noexcept { return +display_; }
-  auto asset() const noexcept { return asset_; }
-  auto ccy() const noexcept { return ccy_; }
-  auto lotNumer() const noexcept { return lotNumer_; }
-  auto lotDenom() const noexcept { return lotDenom_; }
-  auto qtyInc() const noexcept { return qtyInc_; }
-  auto tickNumer() const noexcept { return tickNumer_; }
-  auto tickDenom() const noexcept { return tickDenom_; }
-  auto priceInc() const noexcept { return priceInc_; }
-  auto pipDp() const noexcept { return pipDp_; }
-  auto qtyDp() const noexcept { return qtyDp_; }
-  auto priceDp() const noexcept { return priceDp_; }
-  auto minLots() const noexcept { return minLots_; }
-  auto maxLots() const noexcept { return maxLots_; }
-  boost::intrusive::set_member_hook<> mnemHook_;
+    int compare(const Contr& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+    auto id() const noexcept { return id_; }
+    auto mnem() const noexcept { return mnem_; }
+    auto display() const noexcept { return +display_; }
+    auto asset() const noexcept { return asset_; }
+    auto ccy() const noexcept { return ccy_; }
+    auto lotNumer() const noexcept { return lotNumer_; }
+    auto lotDenom() const noexcept { return lotDenom_; }
+    auto qtyInc() const noexcept { return qtyInc_; }
+    auto tickNumer() const noexcept { return tickNumer_; }
+    auto tickDenom() const noexcept { return tickDenom_; }
+    auto priceInc() const noexcept { return priceInc_; }
+    auto pipDp() const noexcept { return pipDp_; }
+    auto qtyDp() const noexcept { return qtyDp_; }
+    auto priceDp() const noexcept { return priceDp_; }
+    auto minLots() const noexcept { return minLots_; }
+    auto maxLots() const noexcept { return maxLots_; }
+    boost::intrusive::set_member_hook<> mnemHook_;
 
- private:
-  const Id32 id_;
-  const Mnem mnem_;
-  const Display display_;
-  const Mnem asset_;
-  const Mnem ccy_;
-  const int lotNumer_;
-  const int lotDenom_;
-  // Transient.
-  const double qtyInc_;
-  const int tickNumer_;
-  const int tickDenom_;
-  // Transient.
-  const double priceInc_;
-  const int pipDp_;
-  // Transient.
-  const int qtyDp_;
-  // Transient.
-  const int priceDp_;
-  const Lots minLots_;
-  const Lots maxLots_;
+  private:
+    const Id32 id_;
+    const Mnem mnem_;
+    const Display display_;
+    const Mnem asset_;
+    const Mnem ccy_;
+    const int lotNumer_;
+    const int lotDenom_;
+    // Transient.
+    const double qtyInc_;
+    const int tickNumer_;
+    const int tickDenom_;
+    // Transient.
+    const double priceInc_;
+    const int pipDp_;
+    // Transient.
+    const int qtyDp_;
+    // Transient.
+    const int priceDp_;
+    const Lots minLots_;
+    const Lots maxLots_;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Contr& contr)
 {
-  contr.toJson(os);
-  return os;
+    contr.toJson(os);
+    return os;
 }
 
 using ContrSet = MnemSet<Contr>;

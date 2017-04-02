@@ -29,40 +29,40 @@ namespace swirly {
 namespace ui {
 
 OrderForm::OrderForm(OrderModel& orderModel, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, orderModel_(orderModel)
+    : QWidget{parent, f}, orderModel_(orderModel)
 {
-  auto selectAllButton = make_unique<QPushButton>(tr("Select All"));
-  auto selectNoneButton = make_unique<QPushButton>(tr("Select None"));
-  auto cancelButton = make_unique<QPushButton>(tr("Cancel"));
+    auto selectAllButton = make_unique<QPushButton>(tr("Select All"));
+    auto selectNoneButton = make_unique<QPushButton>(tr("Select None"));
+    auto cancelButton = make_unique<QPushButton>(tr("Cancel"));
 
-  connect(selectAllButton.get(), &QPushButton::clicked, this, &OrderForm::slotSelectAllClicked);
-  connect(selectNoneButton.get(), &QPushButton::clicked, this, &OrderForm::slotSelectNoneClicked);
-  connect(cancelButton.get(), &QPushButton::clicked, this, &OrderForm::slotCancelOrdersClicked);
+    connect(selectAllButton.get(), &QPushButton::clicked, this, &OrderForm::slotSelectAllClicked);
+    connect(selectNoneButton.get(), &QPushButton::clicked, this, &OrderForm::slotSelectNoneClicked);
+    connect(cancelButton.get(), &QPushButton::clicked, this, &OrderForm::slotCancelOrdersClicked);
 
-  auto layout = make_unique<QHBoxLayout>();
-  layout->addWidget(selectAllButton.release());
-  layout->addWidget(selectNoneButton.release());
-  layout->addWidget(cancelButton.release());
-  layout->addStretch(1);
+    auto layout = make_unique<QHBoxLayout>();
+    layout->addWidget(selectAllButton.release());
+    layout->addWidget(selectNoneButton.release());
+    layout->addWidget(cancelButton.release());
+    layout->addStretch(1);
 
-  setLayout(layout.release());
+    setLayout(layout.release());
 }
 
 OrderForm::~OrderForm() noexcept = default;
 
 void OrderForm::slotSelectAllClicked()
 {
-  orderModel_.setChecked(true);
+    orderModel_.setChecked(true);
 }
 
 void OrderForm::slotSelectNoneClicked()
 {
-  orderModel_.setChecked(false);
+    orderModel_.setChecked(false);
 }
 
 void OrderForm::slotCancelOrdersClicked()
 {
-  emit cancelOrders(orderModel_.checked());
+    emit cancelOrders(orderModel_.checked());
 }
 
 } // ui

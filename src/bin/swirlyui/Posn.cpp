@@ -23,29 +23,29 @@ namespace ui {
 
 Posn Posn::fromJson(const Contr& contr, const QJsonObject& obj)
 {
-  using swirly::ui::fromJson;
-  return Posn{fromJson<QString>(obj["accnt"]),
-              fromJson<Id64>(obj["marketId"]),
-              contr,
-              fromJson<QDate>(obj["settlDate"]),
-              fromJson<Lots>(obj["buyLots"]),
-              fromJson<Cost>(obj["buyCost"]),
-              fromJson<Lots>(obj["sellLots"]),
-              fromJson<Cost>(obj["sellCost"])};
+    using swirly::ui::fromJson;
+    return Posn{fromJson<QString>(obj["accnt"]),
+                fromJson<Id64>(obj["marketId"]),
+                contr,
+                fromJson<QDate>(obj["settlDate"]),
+                fromJson<Lots>(obj["buyLots"]),
+                fromJson<Cost>(obj["buyCost"]),
+                fromJson<Lots>(obj["sellLots"]),
+                fromJson<Cost>(obj["sellCost"])};
 }
 
 QDebug operator<<(QDebug debug, const Posn& posn)
 {
-  debug.nospace() << "Posn{accnt=" << posn.accnt() //
-                  << ",marketId=" << posn.marketId() //
-                  << ",contr=" << posn.contr().mnem() //
-                  << ",settlDate=" << posn.settlDate() //
-                  << ",buyLots=" << posn.buyLots() //
-                  << ",buyCost=" << posn.buyCost() //
-                  << ",sellLots=" << posn.sellLots() //
-                  << ",sellCost=" << posn.sellCost() //
-                  << '}';
-  return debug;
+    debug.nospace() << "Posn{accnt=" << posn.accnt() //
+                    << ",marketId=" << posn.marketId() //
+                    << ",contr=" << posn.contr().mnem() //
+                    << ",settlDate=" << posn.settlDate() //
+                    << ",buyLots=" << posn.buyLots() //
+                    << ",buyCost=" << posn.buyCost() //
+                    << ",sellLots=" << posn.sellLots() //
+                    << ",sellCost=" << posn.sellCost() //
+                    << '}';
+    return debug;
 }
 
 } // ui

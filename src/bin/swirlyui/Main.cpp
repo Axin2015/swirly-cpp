@@ -20,16 +20,16 @@
 
 int main(int argc, char* argv[])
 {
-  Q_INIT_RESOURCE(Application);
+    Q_INIT_RESOURCE(Application);
 
-  QApplication app(argc, argv);
-  QCoreApplication::setOrganizationName("swirlycloud");
-  QCoreApplication::setApplicationName("swirlyui");
-  QCoreApplication::setApplicationVersion(QT_VERSION_STR);
+    QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("swirlycloud");
+    QCoreApplication::setApplicationName("swirlyui");
+    QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
-  QGuiApplication::setApplicationDisplayName("Swirly UI");
+    QGuiApplication::setApplicationDisplayName("Swirly UI");
 
-  swirly::ui::MainWindow win;
-  win.show();
-  return app.exec();
+    swirly::ui::MainWindow win;
+    win.show();
+    return app.exec();
 }

@@ -24,11 +24,11 @@ namespace swirly {
 
 Match::Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
              const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept
-  : lots{lots},
-    makerOrder{makerOrder},
-    makerTrade{makerTrade},
-    makerPosn{makerPosn},
-    takerTrade{takerTrade}
+    : lots{lots},
+      makerOrder{makerOrder},
+      makerTrade{makerTrade},
+      makerPosn{makerPosn},
+      takerTrade{takerTrade}
 {
 }
 

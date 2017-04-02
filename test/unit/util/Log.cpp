@@ -29,13 +29,13 @@ namespace {
 
 template <typename T, typename U>
 struct Foo {
-  T first;
-  U second;
+    T first;
+    U second;
 };
 
 ostream& operator<<(ostream& os, const Foo<int, int>& val)
 {
-  return os << '(' << val.first << ',' << val.second << ')';
+    return os << '(' << val.first << ',' << val.second << ')';
 }
 
 int lastLevel{};
@@ -43,59 +43,59 @@ string lastMsg{};
 
 void testLogger(int level, string_view msg)
 {
-  lastLevel = level;
-  lastMsg.assign(msg.data(), msg.size());
+    lastLevel = level;
+    lastMsg.assign(msg.data(), msg.size());
 }
 
 } // anonymous
 
 SWIRLY_TEST_CASE(LogLabel)
 {
-  SWIRLY_CHECK(strcmp(logLabel(-1), "CRIT") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(LogCrit), "CRIT") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(LogError), "ERROR") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(LogWarning), "WARNING") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(LogNotice), "NOTICE") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(LogInfo), "INFO") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(LogDebug), "DEBUG") == 0);
-  SWIRLY_CHECK(strcmp(logLabel(99), "DEBUG") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(-1), "CRIT") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(LogCrit), "CRIT") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(LogError), "ERROR") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(LogWarning), "WARNING") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(LogNotice), "NOTICE") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(LogInfo), "INFO") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(LogDebug), "DEBUG") == 0);
+    SWIRLY_CHECK(strcmp(logLabel(99), "DEBUG") == 0);
 }
 
 SWIRLY_TEST_CASE(LogMacro)
 {
-  auto prevLevel = setLogLevel(LogInfo);
-  auto prevLogger = setLogger(testLogger);
-  auto finally = makeFinally([prevLevel, prevLogger]() {
-    setLogLevel(prevLevel);
-    setLogger(prevLogger);
-  });
+    auto prevLevel = setLogLevel(LogInfo);
+    auto prevLogger = setLogger(testLogger);
+    auto finally = makeFinally([prevLevel, prevLogger]() {
+        setLogLevel(prevLevel);
+        setLogger(prevLogger);
+    });
 
-  SWIRLY_LOG(LogInfo, logMsg() << "test1: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogInfo);
-  SWIRLY_CHECK(lastMsg == "test1: (10,20)");
+    SWIRLY_LOG(LogInfo, logMsg() << "test1: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogInfo);
+    SWIRLY_CHECK(lastMsg == "test1: (10,20)");
 
-  SWIRLY_CRIT(logMsg() << "test2: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogCrit);
-  SWIRLY_CHECK(lastMsg == "test2: (10,20)");
+    SWIRLY_CRIT(logMsg() << "test2: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogCrit);
+    SWIRLY_CHECK(lastMsg == "test2: (10,20)");
 
-  SWIRLY_ERROR(logMsg() << "test3: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogError);
-  SWIRLY_CHECK(lastMsg == "test3: (10,20)");
+    SWIRLY_ERROR(logMsg() << "test3: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogError);
+    SWIRLY_CHECK(lastMsg == "test3: (10,20)");
 
-  SWIRLY_WARNING(logMsg() << "test4: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogWarning);
-  SWIRLY_CHECK(lastMsg == "test4: (10,20)");
+    SWIRLY_WARNING(logMsg() << "test4: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogWarning);
+    SWIRLY_CHECK(lastMsg == "test4: (10,20)");
 
-  SWIRLY_NOTICE(logMsg() << "test5: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogNotice);
-  SWIRLY_CHECK(lastMsg == "test5: (10,20)");
+    SWIRLY_NOTICE(logMsg() << "test5: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogNotice);
+    SWIRLY_CHECK(lastMsg == "test5: (10,20)");
 
-  SWIRLY_INFO(logMsg() << "test6: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogInfo);
-  SWIRLY_CHECK(lastMsg == "test6: (10,20)");
+    SWIRLY_INFO(logMsg() << "test6: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogInfo);
+    SWIRLY_CHECK(lastMsg == "test6: (10,20)");
 
-  // This should not be logged.
-  SWIRLY_DEBUG(logMsg() << "test7: " << Foo<int, int>{10, 20});
-  SWIRLY_CHECK(lastLevel == LogInfo);
-  SWIRLY_CHECK(lastMsg == "test6: (10,20)");
+    // This should not be logged.
+    SWIRLY_DEBUG(logMsg() << "test7: " << Foo<int, int>{10, 20});
+    SWIRLY_CHECK(lastLevel == LogInfo);
+    SWIRLY_CHECK(lastMsg == "test6: (10,20)");
 }

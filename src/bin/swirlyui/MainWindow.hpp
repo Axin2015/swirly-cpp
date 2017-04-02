@@ -29,35 +29,35 @@ class ContrView;
 class MarketView;
 
 class MainWindow : public QMainWindow {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  MainWindow();
-  ~MainWindow() noexcept override;
+  public:
+    MainWindow();
+    ~MainWindow() noexcept override;
 
- protected:
-  void closeEvent(QCloseEvent* event) override;
+  protected:
+    void closeEvent(QCloseEvent* event) override;
 
- private slots:
-  void slotRefDataComplete();
-  void slotServiceError(const QString& error);
-  void slotCreateMarket(const Contr& contr, QDate settlDate);
-  void slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
-                       Lots lots, Ticks ticks);
-  void slotCancelOrders(const OrderKeys& keys);
-  void slotAbout();
+  private slots:
+    void slotRefDataComplete();
+    void slotServiceError(const QString& error);
+    void slotCreateMarket(const Contr& contr, QDate settlDate);
+    void slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+                         Lots lots, Ticks ticks);
+    void slotCancelOrders(const OrderKeys& keys);
+    void slotAbout();
 
- private:
-  void createActions();
-  void createStatusBar();
-  void readSettings();
-  void writeSettings();
-  bool canClose();
+  private:
+    void createActions();
+    void createStatusBar();
+    void readSettings();
+    void writeSettings();
+    bool canClose();
 
-  HttpClient client_;
-  AssetView* assetView_{nullptr};
-  ContrView* contrView_{nullptr};
-  MarketView* marketView_{nullptr};
+    HttpClient client_;
+    AssetView* assetView_{nullptr};
+    ContrView* contrView_{nullptr};
+    MarketView* marketView_{nullptr};
 };
 
 } // ui

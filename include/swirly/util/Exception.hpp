@@ -28,27 +28,27 @@ namespace swirly {
 using ErrMsg = StringBuilder<MaxErrMsg>;
 
 class SWIRLY_API Exception : public std::exception {
- public:
-  explicit Exception(std::string_view what) noexcept;
+  public:
+    explicit Exception(std::string_view what) noexcept;
 
-  ~Exception() noexcept override;
+    ~Exception() noexcept override;
 
-  // Copy.
-  Exception(const Exception& rhs) noexcept { *this = rhs; }
-  Exception& operator=(const Exception& rhs) noexcept
-  {
-    std::strcpy(what_, rhs.what_);
-    return *this;
-  }
+    // Copy.
+    Exception(const Exception& rhs) noexcept { *this = rhs; }
+    Exception& operator=(const Exception& rhs) noexcept
+    {
+        std::strcpy(what_, rhs.what_);
+        return *this;
+    }
 
-  // Move.
-  Exception(Exception&&) noexcept = default;
-  Exception& operator=(Exception&&) noexcept = default;
+    // Move.
+    Exception(Exception&&) noexcept = default;
+    Exception& operator=(Exception&&) noexcept = default;
 
-  const char* what() const noexcept override;
+    const char* what() const noexcept override;
 
- private:
-  char what_[MaxErrMsg + 1];
+  private:
+    char what_[MaxErrMsg + 1];
 };
 
 /**

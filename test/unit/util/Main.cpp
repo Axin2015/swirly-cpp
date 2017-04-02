@@ -18,5 +18,5 @@
 
 int main(int argc, char* argv[])
 {
-  return swirly::test::run(argc, argv);
+    return swirly::test::run(argc, argv);
 }

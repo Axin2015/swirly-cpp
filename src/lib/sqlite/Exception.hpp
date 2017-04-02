@@ -23,17 +23,17 @@ namespace swirly {
 namespace sqlite {
 
 class Error : public Exception {
- public:
-  explicit Error(std::string_view what) noexcept : Exception{what} {}
-  ~Error() noexcept;
+  public:
+    explicit Error(std::string_view what) noexcept : Exception{what} {}
+    ~Error() noexcept;
 
-  // Copy.
-  Error(const Error&) noexcept = default;
-  Error& operator=(const Error&) noexcept = default;
+    // Copy.
+    Error(const Error&) noexcept = default;
+    Error& operator=(const Error&) noexcept = default;
 
-  // Move.
-  Error(Error&&) noexcept = default;
-  Error& operator=(Error&&) noexcept = default;
+    // Move.
+    Error(Error&&) noexcept = default;
+    Error& operator=(Error&&) noexcept = default;
 };
 
 } // sqlite

@@ -25,7 +25,7 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(ParsePairs)
 {
-  const string text{R"(
+    const string text{R"(
 # comment
   # indented comment
 ab
@@ -39,15 +39,15 @@ st = = uv =
 
 )"};
 
-  istringstream is{text};
-  map<string, string> conf;
-  parsePairs(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
-  SWIRLY_CHECK(conf.size() == 7);
-  SWIRLY_CHECK(conf["ab"] == "");
-  SWIRLY_CHECK(conf["cd"] == "");
-  SWIRLY_CHECK(conf["ef"] == "gh");
-  SWIRLY_CHECK(conf[""] == "ij");
-  SWIRLY_CHECK(conf["kl"] == "mn");
-  SWIRLY_CHECK(conf["op"] == "qr");
-  SWIRLY_CHECK(conf["st"] == "= uv =");
+    istringstream is{text};
+    map<string, string> conf;
+    parsePairs(is, [&conf](const auto& key, const auto& val) { conf.emplace(key, val); });
+    SWIRLY_CHECK(conf.size() == 7);
+    SWIRLY_CHECK(conf["ab"] == "");
+    SWIRLY_CHECK(conf["cd"] == "");
+    SWIRLY_CHECK(conf["ef"] == "gh");
+    SWIRLY_CHECK(conf[""] == "ij");
+    SWIRLY_CHECK(conf["kl"] == "mn");
+    SWIRLY_CHECK(conf["op"] == "qr");
+    SWIRLY_CHECK(conf["st"] == "= uv =");
 }

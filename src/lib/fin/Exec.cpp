@@ -28,84 +28,84 @@ Exec::Exec(Exec&&) = default;
 
 void Exec::toJson(ostream& os) const
 {
-  os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"marketId\":" << marketId_ //
-     << ",\"contr\":\"" << contr_ //
-     << "\",\"settlDate\":";
-  if (settlDay_ != 0_jd) {
-    os << jdToIso(settlDay_);
-  } else {
-    os << "null";
-  }
-  os << ",\"id\":" << id_ //
-     << ",\"orderId\":" << orderId_ //
-     << ",\"ref\":";
-  if (!ref_.empty()) {
-    os << '"' << ref_ << '"';
-  } else {
-    os << "null";
-  }
-  os << ",\"state\":\"" << state_ //
-     << "\",\"side\":\"" << side_ //
-     << "\",\"lots\":" << lots_ //
-     << ",\"ticks\":" << ticks_ //
-     << ",\"resd\":" << resd_ //
-     << ",\"exec\":" << exec_ //
-     << ",\"cost\":" << cost_;
-  if (lastLots_ != 0_lts) {
-    os << ",\"lastLots\":" << lastLots_ //
-       << ",\"lastTicks\":" << lastTicks_;
-  } else {
-    os << ",\"lastLots\":null,\"lastTicks\":null";
-  }
-  os << ",\"minLots\":";
-  if (minLots_ != 0_lts) {
-    os << minLots_;
-  } else {
-    os << "null";
-  }
-  os << ",\"matchId\":";
-  if (matchId_ != 0_id64) {
-    os << matchId_;
-  } else {
-    os << "null";
-  }
-  os << ",\"liqInd\":";
-  if (liqInd_ != LiqInd::None) {
-    os << '"' << liqInd_ << '"';
-  } else {
-    os << "null";
-  }
-  os << ",\"cpty\":";
-  if (!cpty_.empty()) {
-    os << '"' << cpty_ << '"';
-  } else {
-    os << "null";
-  }
-  os << ",\"created\":" << created_ //
-     << '}';
+    os << "{\"accnt\":\"" << accnt_ //
+       << "\",\"marketId\":" << marketId_ //
+       << ",\"contr\":\"" << contr_ //
+       << "\",\"settlDate\":";
+    if (settlDay_ != 0_jd) {
+        os << jdToIso(settlDay_);
+    } else {
+        os << "null";
+    }
+    os << ",\"id\":" << id_ //
+       << ",\"orderId\":" << orderId_ //
+       << ",\"ref\":";
+    if (!ref_.empty()) {
+        os << '"' << ref_ << '"';
+    } else {
+        os << "null";
+    }
+    os << ",\"state\":\"" << state_ //
+       << "\",\"side\":\"" << side_ //
+       << "\",\"lots\":" << lots_ //
+       << ",\"ticks\":" << ticks_ //
+       << ",\"resd\":" << resd_ //
+       << ",\"exec\":" << exec_ //
+       << ",\"cost\":" << cost_;
+    if (lastLots_ != 0_lts) {
+        os << ",\"lastLots\":" << lastLots_ //
+           << ",\"lastTicks\":" << lastTicks_;
+    } else {
+        os << ",\"lastLots\":null,\"lastTicks\":null";
+    }
+    os << ",\"minLots\":";
+    if (minLots_ != 0_lts) {
+        os << minLots_;
+    } else {
+        os << "null";
+    }
+    os << ",\"matchId\":";
+    if (matchId_ != 0_id64) {
+        os << matchId_;
+    } else {
+        os << "null";
+    }
+    os << ",\"liqInd\":";
+    if (liqInd_ != LiqInd::None) {
+        os << '"' << liqInd_ << '"';
+    } else {
+        os << "null";
+    }
+    os << ",\"cpty\":";
+    if (!cpty_.empty()) {
+        os << '"' << cpty_ << '"';
+    } else {
+        os << "null";
+    }
+    os << ",\"created\":" << created_ //
+       << '}';
 }
 
 ExecPtr Exec::opposite(Id64 id) const
 {
-  assert(!cpty_.empty());
-  return make(cpty_, marketId_, contr_, settlDay_, id, orderId_, +ref_, state_,
-              swirly::opposite(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
-              minLots_, matchId_, swirly::opposite(liqInd_), accnt_, created_);
+    assert(!cpty_.empty());
+    return make(cpty_, marketId_, contr_, settlDay_, id, orderId_, +ref_, state_,
+                swirly::opposite(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
+                minLots_, matchId_, swirly::opposite(liqInd_), accnt_, created_);
 }
 
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
                  LiqInd liqInd, Mnem cpty) noexcept
 {
-  state_ = State::Trade;
-  resd_ -= sumLots;
-  exec_ += sumLots;
-  cost_ += sumCost;
-  lastLots_ = lastLots;
-  lastTicks_ = lastTicks;
-  matchId_ = matchId;
-  liqInd_ = liqInd;
-  cpty_ = cpty;
+    state_ = State::Trade;
+    resd_ -= sumLots;
+    exec_ += sumLots;
+    cost_ += sumCost;
+    lastLots_ = lastLots;
+    lastTicks_ = lastTicks;
+    matchId_ = matchId;
+    liqInd_ = liqInd;
+    cpty_ = cpty;
 }
 
 } // swirly

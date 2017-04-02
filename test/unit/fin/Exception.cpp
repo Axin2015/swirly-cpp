@@ -24,11 +24,11 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(ExceptionToString)
 {
-  const NotFoundException e{"this is a test"};
+    const NotFoundException e{"this is a test"};
 
-  SWIRLY_CHECK(toString(e) == //
-               "{\"status\":404"
-               ",\"reason\":\"Not Found\""
-               ",\"detail\":\"this is a test\""
-               "}");
+    SWIRLY_CHECK(toString(e) == //
+                 "{\"status\":404"
+                 ",\"reason\":\"Not Found\""
+                 ",\"detail\":\"this is a test\""
+                 "}");
 }

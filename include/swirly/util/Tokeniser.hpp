@@ -24,42 +24,42 @@
 namespace swirly {
 
 class Tokeniser {
- public:
-  Tokeniser(std::string_view buf, std::string_view toks) noexcept { reset(buf, toks); }
-  Tokeniser() noexcept { reset(""_sv, ""_sv); }
-  ~Tokeniser() noexcept = default;
+  public:
+    Tokeniser(std::string_view buf, std::string_view toks) noexcept { reset(buf, toks); }
+    Tokeniser() noexcept { reset(""_sv, ""_sv); }
+    ~Tokeniser() noexcept = default;
 
-  // Copy.
-  Tokeniser(const Tokeniser& rhs) noexcept = default;
-  Tokeniser& operator=(const Tokeniser& rhs) noexcept = default;
+    // Copy.
+    Tokeniser(const Tokeniser& rhs) noexcept = default;
+    Tokeniser& operator=(const Tokeniser& rhs) noexcept = default;
 
-  // Move.
-  Tokeniser(Tokeniser&&) noexcept = default;
-  Tokeniser& operator=(Tokeniser&&) noexcept = default;
+    // Move.
+    Tokeniser(Tokeniser&&) noexcept = default;
+    Tokeniser& operator=(Tokeniser&&) noexcept = default;
 
-  std::string_view top() const noexcept { return buf_.substr(i_ - buf_.cbegin(), j_ - i_); }
-  bool empty() const noexcept { return i_ == buf_.cend(); }
-  void reset(std::string_view buf, std::string_view toks) noexcept
-  {
-    buf_ = buf;
-    toks_ = toks;
-    i_ = buf_.cbegin();
-    j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
-  }
-  void pop() noexcept
-  {
-    if (j_ != buf_.cend()) {
-      i_ = j_ + 1;
-      j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
-    } else {
-      i_ = j_;
+    std::string_view top() const noexcept { return buf_.substr(i_ - buf_.cbegin(), j_ - i_); }
+    bool empty() const noexcept { return i_ == buf_.cend(); }
+    void reset(std::string_view buf, std::string_view toks) noexcept
+    {
+        buf_ = buf;
+        toks_ = toks;
+        i_ = buf_.cbegin();
+        j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
     }
-  }
+    void pop() noexcept
+    {
+        if (j_ != buf_.cend()) {
+            i_ = j_ + 1;
+            j_ = std::find_first_of(i_, buf_.cend(), toks_.cbegin(), toks_.cend());
+        } else {
+            i_ = j_;
+        }
+    }
 
- private:
-  std::string_view buf_;
-  std::string_view toks_;
-  std::string_view::const_iterator i_, j_;
+  private:
+    std::string_view buf_;
+    std::string_view toks_;
+    std::string_view::const_iterator i_, j_;
 };
 
 } // swirly

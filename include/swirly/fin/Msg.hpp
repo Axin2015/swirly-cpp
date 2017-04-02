@@ -29,65 +29,65 @@ namespace swirly {
 enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, ArchiveTrade };
 
 struct SWIRLY_PACKED CreateMarketBody {
-  Id64 id;
-  char contr[MaxMnem];
-  JDay settlDay;
-  MarketState state;
+    Id64 id;
+    char contr[MaxMnem];
+    JDay settlDay;
+    MarketState state;
 };
 static_assert(std::is_pod<CreateMarketBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED UpdateMarketBody {
-  Id64 id;
-  MarketState state;
+    Id64 id;
+    MarketState state;
 };
 static_assert(std::is_pod<UpdateMarketBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED CreateExecBody {
-  char accnt[MaxMnem];
-  Id64 marketId;
-  char contr[MaxMnem];
-  JDay settlDay;
-  Id64 id;
-  Id64 orderId;
-  char ref[MaxRef];
-  State state;
-  Side side;
-  Lots lots;
-  Ticks ticks;
-  Lots resd;
-  Lots exec;
-  Cost cost;
-  Lots lastLots;
-  Ticks lastTicks;
-  Lots minLots;
-  Id64 matchId;
-  LiqInd liqInd;
-  char cpty[MaxMnem];
-  // std::chrono::time_point is not pod.
-  int64_t created;
-  More more;
+    char accnt[MaxMnem];
+    Id64 marketId;
+    char contr[MaxMnem];
+    JDay settlDay;
+    Id64 id;
+    Id64 orderId;
+    char ref[MaxRef];
+    State state;
+    Side side;
+    Lots lots;
+    Ticks ticks;
+    Lots resd;
+    Lots exec;
+    Cost cost;
+    Lots lastLots;
+    Ticks lastTicks;
+    Lots minLots;
+    Id64 matchId;
+    LiqInd liqInd;
+    char cpty[MaxMnem];
+    // std::chrono::time_point is not pod.
+    int64_t created;
+    More more;
 };
 static_assert(std::is_pod<CreateExecBody>::value, "message-type must be pod");
 
 constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(int64_t) - sizeof(More))
                              / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTradeBody {
-  Id64 marketId;
-  Id64 ids[MaxIds];
-  // std::chrono::time_point is not pod.
-  int64_t modified;
-  More more;
+    Id64 marketId;
+    Id64 ids[MaxIds];
+    // std::chrono::time_point is not pod.
+    int64_t modified;
+    More more;
 };
 static_assert(std::is_pod<ArchiveTradeBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED Msg {
-  MsgType type;
-  union SWIRLY_PACKED {
-    CreateMarketBody createMarket;
-    UpdateMarketBody updateMarket;
-    CreateExecBody createExec;
-    ArchiveTradeBody archiveTrade;
-  };
+    MsgType type;
+    union SWIRLY_PACKED {
+        CreateMarketBody createMarket;
+        UpdateMarketBody updateMarket;
+        CreateExecBody createExec;
+        ArchiveTradeBody archiveTrade;
+    };
 };
 static_assert(std::is_pod<Msg>::value, "message-type must be pod");
 static_assert(sizeof(Msg) == 240, "unexpected message length");

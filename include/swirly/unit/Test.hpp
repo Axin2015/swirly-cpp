@@ -28,40 +28,40 @@ namespace swirly {
 namespace test {
 
 class SWIRLY_API TestException : public std::exception {
-  enum { MaxErr = 511 };
-  const char* file_;
-  int line_;
-  char msg_[MaxErr + 1];
+    enum { MaxErr = 511 };
+    const char* file_;
+    int line_;
+    char msg_[MaxErr + 1];
 
- public:
-  TestException(const char* file, int line, const char* msg) noexcept;
+  public:
+    TestException(const char* file, int line, const char* msg) noexcept;
 
-  ~TestException() noexcept override;
+    ~TestException() noexcept override;
 
-  // Copy.
-  TestException(const TestException& rhs) noexcept = default;
-  TestException& operator=(const TestException& rhs) noexcept = default;
+    // Copy.
+    TestException(const TestException& rhs) noexcept = default;
+    TestException& operator=(const TestException& rhs) noexcept = default;
 
-  // Move.
-  TestException(TestException&&) noexcept = default;
-  TestException& operator=(TestException&&) noexcept = default;
+    // Move.
+    TestException(TestException&&) noexcept = default;
+    TestException& operator=(TestException&&) noexcept = default;
 
-  const char* what() const noexcept override;
-  const char* file() const noexcept { return file_; }
-  int line() const noexcept { return line_; }
+    const char* what() const noexcept override;
+    const char* file() const noexcept { return file_; }
+    int line() const noexcept { return line_; }
 };
 
 template <typename ExceptionT, typename FnT>
 bool checkThrow(FnT fn)
 {
-  bool pass{false};
-  try {
-    fn();
-  } catch (const ExceptionT&) {
-    pass = true;
-  } catch (...) {
-  }
-  return pass;
+    bool pass{false};
+    try {
+        fn();
+    } catch (const ExceptionT&) {
+        pass = true;
+    } catch (...) {
+    }
+    return pass;
 }
 
 /**
@@ -78,7 +78,7 @@ constexpr auto Epsilon = 1e-7;
 
 inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
 {
-  return std::abs(lhs - rhs) <= delta;
+    return std::abs(lhs - rhs) <= delta;
 }
 
 } // test
@@ -91,25 +91,25 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
 #define SWIRLY_CHECK(expr) (expr) ? (void)0 : SWIRLY_FAIL("assertion [" #expr "] failed")
 
 #define SWIRLY_CHECK_THROW(expr, ExceptionT)                                                       \
-  swirly::test::checkThrow<ExceptionT>([&]() { expr; })                                            \
-    ? (void)0                                                                                      \
-    : SWIRLY_FAIL("throw expression [" #expr "] failed")
+    swirly::test::checkThrow<ExceptionT>([&]() { expr; })                                          \
+        ? (void)0                                                                                  \
+        : SWIRLY_FAIL("throw expression [" #expr "] failed")
 
 #define SWIRLY_TEST_CASE(name)                                                                     \
-  void init##name() __attribute__((constructor));                                                  \
-  void test##name();                                                                               \
-  void init##name() { swirly::test::addTestCase(#name, test##name); }                              \
-  void test##name()
+    void init##name() __attribute__((constructor));                                                \
+    void test##name();                                                                             \
+    void init##name() { swirly::test::addTestCase(#name, test##name); }                            \
+    void test##name()
 
 #define SWIRLY_FIXTURE_TEST_CASE(name, FixtureT)                                                   \
-  struct name##Fixture_ : FixtureT {                                                               \
-    void run();                                                                                    \
-  };                                                                                               \
-  SWIRLY_TEST_CASE(name)                                                                           \
-  {                                                                                                \
-    name##Fixture_ fixture;                                                                        \
-    fixture.run();                                                                                 \
-  }                                                                                                \
-  void name##Fixture_::run()
+    struct name##Fixture_ : FixtureT {                                                             \
+        void run();                                                                                \
+    };                                                                                             \
+    SWIRLY_TEST_CASE(name)                                                                         \
+    {                                                                                              \
+        name##Fixture_ fixture;                                                                    \
+        fixture.run();                                                                             \
+    }                                                                                              \
+    void name##Fixture_::run()
 
 #endif // SWIRLY_UNIT_TEST_HPP

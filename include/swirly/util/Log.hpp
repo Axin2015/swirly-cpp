@@ -33,30 +33,30 @@ using LogMsg = StringBuilder<MaxLogMsg>;
 using Logger = void (*)(int, std::string_view);
 
 enum : int {
-  /**
-   * Critical.
-   */
-  LogCrit,
-  /**
-   * Error.
-   */
-  LogError,
-  /**
-   * Warning.
-   */
-  LogWarning,
-  /**
-   * Notice.
-   */
-  LogNotice,
-  /**
-   * Information.
-   */
-  LogInfo,
-  /**
-   * Debug.
-   */
-  LogDebug
+    /**
+     * Critical.
+     */
+    LogCrit,
+    /**
+     * Error.
+     */
+    LogError,
+    /**
+     * Warning.
+     */
+    LogWarning,
+    /**
+     * Notice.
+     */
+    LogNotice,
+    /**
+     * Information.
+     */
+    LogInfo,
+    /**
+     * Debug.
+     */
+    LogDebug
 };
 
 /**
@@ -74,7 +74,7 @@ SWIRLY_API int getLogLevel() noexcept;
  */
 inline bool isLogLevel(int level) noexcept
 {
-  return level <= getLogLevel();
+    return level <= getLogLevel();
 }
 
 /**
@@ -128,10 +128,10 @@ SWIRLY_API LogMsg& logMsg() noexcept;
 // SWIRLY_LOG(LogInfo, logMsg() << "test: " << Foo<int, int>{10, 20});
 
 #define SWIRLY_LOG(level, ...)                                                                     \
-  do {                                                                                             \
-    if (swirly::isLogLevel(level))                                                                 \
-      swirly::writeLog(level, __VA_ARGS__);                                                        \
-  } while (false)
+    do {                                                                                           \
+        if (swirly::isLogLevel(level))                                                             \
+            swirly::writeLog(level, __VA_ARGS__);                                                  \
+    } while (false)
 
 #define SWIRLY_CRIT(...) SWIRLY_LOG(swirly::LogCrit, __VA_ARGS__)
 #define SWIRLY_ERROR(...) SWIRLY_LOG(swirly::LogError, __VA_ARGS__)

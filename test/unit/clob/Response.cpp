@@ -22,6 +22,6 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(Response)
 {
-  Response r;
-  Response s{r};
+    Response r;
+    Response s{r};
 }

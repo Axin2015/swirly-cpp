@@ -24,23 +24,23 @@ namespace swirly {
 namespace ui {
 
 class PosnModel
-  : public TableModel<Id64, Posn, unbox(posn::Column::CheckState), posn::ColumnCount> {
- public:
-  PosnModel(QObject* parent = nullptr);
-  ~PosnModel() noexcept override;
+    : public TableModel<Id64, Posn, unbox(posn::Column::CheckState), posn::ColumnCount> {
+  public:
+    PosnModel(QObject* parent = nullptr);
+    ~PosnModel() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void removeRow(const Posn& posn) { TableModel::removeRow(posn.marketId()); }
-  void updateRow(std::uint64_t tag, const Posn& posn)
-  {
-    TableModel::updateRow(posn.marketId(), tag, posn);
-  }
+    void removeRow(const Posn& posn) { TableModel::removeRow(posn.marketId()); }
+    void updateRow(std::uint64_t tag, const Posn& posn)
+    {
+        TableModel::updateRow(posn.marketId(), tag, posn);
+    }
 
- private:
-  QVariant header_[posn::ColumnCount];
+  private:
+    QVariant header_[posn::ColumnCount];
 };
 
 } // ui

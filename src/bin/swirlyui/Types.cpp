@@ -23,85 +23,85 @@ namespace ui {
 
 AssetType TypeTraits<AssetType>::fromString(const QString& value)
 {
-  AssetType type;
-  if (value == "CMDTY") {
-    type = AssetType::Cmdty;
-  } else if (value == "CORP") {
-    type = AssetType::Corp;
-  } else if (value == "CCY") {
-    type = AssetType::Ccy;
-  } else if (value == "EQTY") {
-    type = AssetType::Eqty;
-  } else if (value == "GOVT") {
-    type = AssetType::Govt;
-  } else if (value == "INDEX") {
-    type = AssetType::Index;
-  } else {
-    throw domain_error{"invalid asset-type"};
-  }
-  return type;
+    AssetType type;
+    if (value == "CMDTY") {
+        type = AssetType::Cmdty;
+    } else if (value == "CORP") {
+        type = AssetType::Corp;
+    } else if (value == "CCY") {
+        type = AssetType::Ccy;
+    } else if (value == "EQTY") {
+        type = AssetType::Eqty;
+    } else if (value == "GOVT") {
+        type = AssetType::Govt;
+    } else if (value == "INDEX") {
+        type = AssetType::Index;
+    } else {
+        throw domain_error{"invalid asset-type"};
+    }
+    return type;
 }
 
 Direct TypeTraits<Direct>::fromString(const QString& value)
 {
-  Direct direct;
-  if (value == "PAID") {
-    direct = Direct::Paid;
-  } else if (value == "GIVEN") {
-    direct = Direct::Given;
-  } else {
-    throw domain_error{"invalid direction"};
-  }
-  return direct;
+    Direct direct;
+    if (value == "PAID") {
+        direct = Direct::Paid;
+    } else if (value == "GIVEN") {
+        direct = Direct::Given;
+    } else {
+        throw domain_error{"invalid direction"};
+    }
+    return direct;
 }
 
 LiqInd TypeTraits<LiqInd>::fromString(const QString& value)
 {
-  LiqInd liqInd;
-  if (value.isNull()) {
-    liqInd = LiqInd::None;
-  } else {
-    if (value == "MAKER") {
-      liqInd = LiqInd::Maker;
-    } else if (value == "TAKER") {
-      liqInd = LiqInd::Taker;
+    LiqInd liqInd;
+    if (value.isNull()) {
+        liqInd = LiqInd::None;
     } else {
-      throw domain_error{"invalid liquidity-indicator"};
+        if (value == "MAKER") {
+            liqInd = LiqInd::Maker;
+        } else if (value == "TAKER") {
+            liqInd = LiqInd::Taker;
+        } else {
+            throw domain_error{"invalid liquidity-indicator"};
+        }
     }
-  }
-  return liqInd;
+    return liqInd;
 }
 
 Side TypeTraits<Side>::fromString(const QString& value)
 {
-  Side side;
-  if (value == "BUY") {
-    side = Side::Buy;
-  } else if (value == "SELL") {
-    side = Side::Sell;
-  } else {
-    throw domain_error{"invalid side"};
-  }
-  return side;
+    Side side;
+    if (value == "BUY") {
+        side = Side::Buy;
+    } else if (value == "SELL") {
+        side = Side::Sell;
+    } else {
+        throw domain_error{"invalid side"};
+    }
+    return side;
 }
 
 State TypeTraits<State>::fromString(const QString& value)
 {
-  State state;
-  if (value == "NONE") {
-    state = State::None;
-  } else if (value == "NEW") {
-    state = State::New;
-  } else if (value == "REVISE") {
-    state = State::Revise;
-  } else if (value == "CANCEL") {
-    state = State::Cancel;
-  } else if (value == "TRADE") {
-    state = State::Trade;
-  } else {
-    throw domain_error{"invalid state"};
-  }
-  return state;
+    State state;
+    if (value == "NONE") {
+        state = State::None;
+    } else if (value == "NEW") {
+        state = State::New;
+    } else if (value == "REVISE") {
+        state = State::Revise;
+    } else if (value == "CANCEL") {
+        state = State::Cancel;
+    } else if (value == "TRADE") {
+        state = State::Trade;
+    } else {
+        throw domain_error{"invalid state"};
+    }
+    return state;
 }
 
 } // ui

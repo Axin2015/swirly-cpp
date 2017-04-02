@@ -32,7 +32,7 @@ using Id32 = IntWrapper<Id32Policy>;
 
 constexpr Id32 operator""_id32(unsigned long long val) noexcept
 {
-  return Id32{val};
+    return Id32{val};
 }
 
 /**
@@ -42,7 +42,7 @@ using Id64 = IntWrapper<Id64Policy>;
 
 constexpr Id64 operator""_id64(unsigned long long val) noexcept
 {
-  return Id64{val};
+    return Id64{val};
 }
 
 } // swirly

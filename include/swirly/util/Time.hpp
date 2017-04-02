@@ -27,27 +27,27 @@ namespace swirly {
 using namespace std::literals::chrono_literals;
 
 struct SWIRLY_API UnixClock {
-  using duration = std::chrono::milliseconds;
-  using rep = duration::rep;
-  using period = duration::period;
-  using time_point = std::chrono::time_point<UnixClock, duration>;
+    using duration = std::chrono::milliseconds;
+    using rep = duration::rep;
+    using period = duration::period;
+    using time_point = std::chrono::time_point<UnixClock, duration>;
 
-  static constexpr bool is_steady = false;
+    static constexpr bool is_steady = false;
 
-  static time_point now() noexcept;
+    static time_point now() noexcept;
 
-  static std::time_t to_time_t(const time_point& tp) noexcept
-  {
-    using namespace std::chrono;
-    return duration_cast<seconds>(tp.time_since_epoch()).count();
-  }
+    static std::time_t to_time_t(const time_point& tp) noexcept
+    {
+        using namespace std::chrono;
+        return duration_cast<seconds>(tp.time_since_epoch()).count();
+    }
 
-  static time_point from_time_t(std::time_t t) noexcept
-  {
-    using namespace std::chrono;
-    using FromPoint = std::chrono::time_point<UnixClock, seconds>;
-    return time_point_cast<UnixClock::duration>(FromPoint{seconds{t}});
-  }
+    static time_point from_time_t(std::time_t t) noexcept
+    {
+        using namespace std::chrono;
+        using FromPoint = std::chrono::time_point<UnixClock, seconds>;
+        return time_point_cast<UnixClock::duration>(FromPoint{seconds{t}});
+    }
 };
 
 using Time = UnixClock::time_point;
@@ -57,8 +57,8 @@ using Time = UnixClock::time_point;
  */
 constexpr Time msToTime(std::int64_t ms) noexcept
 {
-  using std::chrono::milliseconds;
-  return Time{milliseconds{ms}};
+    using std::chrono::milliseconds;
+    return Time{milliseconds{ms}};
 }
 
 /**
@@ -66,9 +66,9 @@ constexpr Time msToTime(std::int64_t ms) noexcept
  */
 constexpr std::int64_t timeToMs(Time time) noexcept
 {
-  using std::chrono::milliseconds;
-  const milliseconds ms{time.time_since_epoch()};
-  return ms.count();
+    using std::chrono::milliseconds;
+    const milliseconds ms{time.time_since_epoch()};
+    return ms.count();
 }
 
 SWIRLY_API std::ostream& operator<<(std::ostream& os, Time time);

@@ -28,46 +28,46 @@ static_assert(Mnem{Mnem{}}.empty(), "copy constructor not constexpr");
 
 SWIRLY_TEST_CASE(MnemEmpty)
 {
-  Mnem mnem;
-  SWIRLY_CHECK(mnem.empty());
-  SWIRLY_CHECK(mnem.size() == 0UL);
-  SWIRLY_CHECK(mnem.compare(""_sv) == 0);
-  SWIRLY_CHECK(mnem == Mnem{""_sv});
+    Mnem mnem;
+    SWIRLY_CHECK(mnem.empty());
+    SWIRLY_CHECK(mnem.size() == 0UL);
+    SWIRLY_CHECK(mnem.compare(""_sv) == 0);
+    SWIRLY_CHECK(mnem == Mnem{""_sv});
 }
 
 SWIRLY_TEST_CASE(MnemNonEmpty)
 {
-  Mnem mnem{"Foo"_sv};
-  SWIRLY_CHECK(!mnem.empty());
-  SWIRLY_CHECK(mnem.size() == 3UL);
-  SWIRLY_CHECK(mnem.compare("Foo"_sv) == 0);
-  SWIRLY_CHECK(mnem == Mnem{"Foo"_sv});
+    Mnem mnem{"Foo"_sv};
+    SWIRLY_CHECK(!mnem.empty());
+    SWIRLY_CHECK(mnem.size() == 3UL);
+    SWIRLY_CHECK(mnem.compare("Foo"_sv) == 0);
+    SWIRLY_CHECK(mnem == Mnem{"Foo"_sv});
 }
 
 SWIRLY_TEST_CASE(MnemUpperBound)
 {
-  Mnem mnem{"0123456789ABCDEFx"_sv};
-  SWIRLY_CHECK(mnem.size() == MaxMnem);
-  SWIRLY_CHECK(mnem == "0123456789ABCDEF"_sv);
+    Mnem mnem{"0123456789ABCDEFx"_sv};
+    SWIRLY_CHECK(mnem.size() == MaxMnem);
+    SWIRLY_CHECK(mnem == "0123456789ABCDEF"_sv);
 
-  mnem = "0123456789abcdefx"_sv;
-  SWIRLY_CHECK(mnem.size() == MaxMnem);
-  SWIRLY_CHECK(mnem == "0123456789abcdef"_sv);
+    mnem = "0123456789abcdefx"_sv;
+    SWIRLY_CHECK(mnem.size() == MaxMnem);
+    SWIRLY_CHECK(mnem == "0123456789abcdef"_sv);
 }
 
 SWIRLY_TEST_CASE(MnemIndex)
 {
-  Mnem mnem{"Bar"_sv};
-  SWIRLY_CHECK(mnem[0] == 'B');
-  SWIRLY_CHECK(mnem[1] == 'a');
-  SWIRLY_CHECK(mnem[2] == 'r');
-  SWIRLY_CHECK(mnem.front() == 'B');
-  SWIRLY_CHECK(mnem.back() == 'r');
+    Mnem mnem{"Bar"_sv};
+    SWIRLY_CHECK(mnem[0] == 'B');
+    SWIRLY_CHECK(mnem[1] == 'a');
+    SWIRLY_CHECK(mnem[2] == 'r');
+    SWIRLY_CHECK(mnem.front() == 'B');
+    SWIRLY_CHECK(mnem.back() == 'r');
 }
 
 SWIRLY_TEST_CASE(MnemClear)
 {
-  Mnem mnem{"Foo"_sv};
-  mnem.clear();
-  SWIRLY_CHECK(mnem.empty());
+    Mnem mnem{"Foo"_sv};
+    mnem.clear();
+    SWIRLY_CHECK(mnem.empty());
 }

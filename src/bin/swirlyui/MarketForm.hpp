@@ -34,34 +34,34 @@ class Contr;
 class ContrModel;
 
 class MarketForm : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  MarketForm(ContrModel& contrModel, QWidget* parent = nullptr,
-             Qt::WindowFlags f = Qt::WindowFlags{});
-  ~MarketForm() noexcept override;
+  public:
+    MarketForm(ContrModel& contrModel, QWidget* parent = nullptr,
+               Qt::WindowFlags f = Qt::WindowFlags{});
+    ~MarketForm() noexcept override;
 
-  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
-                 std::optional<Ticks> ticks);
+    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                   std::optional<Ticks> ticks);
 
- signals:
-  void createMarket(const Contr& contr, QDate settlDate);
-  void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
-                   Ticks ticks);
+  signals:
+    void createMarket(const Contr& contr, QDate settlDate);
+    void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+                     Ticks ticks);
 
- private slots:
-  void slotContrChanged(int index);
-  void slotCreateClicked();
-  void slotBuyOrSellClicked(Side side);
+  private slots:
+    void slotContrChanged(int index);
+    void slotCreateClicked();
+    void slotBuyOrSellClicked(Side side);
 
- private:
-  ContrModel& contrModel_;
-  QComboBox* contrComboBox_{nullptr};
-  QDateEdit* settlDateEdit_{nullptr};
-  QLineEdit* lotsEdit_{nullptr};
-  QLineEdit* priceEdit_{nullptr};
-  QIntValidator lotsValidator_;
-  QDoubleValidator priceValidator_;
+  private:
+    ContrModel& contrModel_;
+    QComboBox* contrComboBox_{nullptr};
+    QDateEdit* settlDateEdit_{nullptr};
+    QLineEdit* lotsEdit_{nullptr};
+    QLineEdit* priceEdit_{nullptr};
+    QIntValidator lotsValidator_;
+    QDoubleValidator priceValidator_;
 };
 
 } // ui

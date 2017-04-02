@@ -29,33 +29,33 @@ Posn::Posn(Posn&&) = default;
 
 void Posn::toJson(ostream& os) const
 {
-  os << "{\"accnt\":\"" << accnt_ //
-     << "\",\"marketId\":" << marketId_ //
-     << ",\"contr\":\"" << contr_ //
-     << "\",\"settlDate\":";
-  if (settlDay_ != 0_jd) {
-    os << jdToIso(settlDay_);
-  } else {
-    os << "null";
-  }
-  if (buyLots_ != 0_lts) {
-    os << ",\"buyLots\":" << buyLots_ //
-       << ",\"buyCost\":" << buyCost_;
-  } else {
-    os << ",\"buyLots\":0,\"buyCost\":0";
-  }
-  if (sellLots_ != 0_lts) {
-    os << ",\"sellLots\":" << sellLots_ //
-       << ",\"sellCost\":" << sellCost_;
-  } else {
-    os << ",\"sellLots\":0,\"sellCost\":0";
-  }
-  os << '}';
+    os << "{\"accnt\":\"" << accnt_ //
+       << "\",\"marketId\":" << marketId_ //
+       << ",\"contr\":\"" << contr_ //
+       << "\",\"settlDate\":";
+    if (settlDay_ != 0_jd) {
+        os << jdToIso(settlDay_);
+    } else {
+        os << "null";
+    }
+    if (buyLots_ != 0_lts) {
+        os << ",\"buyLots\":" << buyLots_ //
+           << ",\"buyCost\":" << buyCost_;
+    } else {
+        os << ",\"buyLots\":0,\"buyCost\":0";
+    }
+    if (sellLots_ != 0_lts) {
+        os << ",\"sellLots\":" << sellLots_ //
+           << ",\"sellCost\":" << sellCost_;
+    } else {
+        os << ",\"sellLots\":0,\"sellCost\":0";
+    }
+    os << '}';
 }
 
 PosnSet::~PosnSet() noexcept
 {
-  set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });
+    set_.clear_and_dispose([](const Posn* ptr) { ptr->release(); });
 }
 
 PosnSet::PosnSet(PosnSet&&) = default;
@@ -64,38 +64,38 @@ PosnSet& PosnSet::operator=(PosnSet&&) = default;
 
 PosnSet::Iterator PosnSet::insert(const ValuePtr& value) noexcept
 {
-  Iterator it;
-  bool inserted;
-  tie(it, inserted) = set_.insert(*value);
-  if (inserted) {
-    // Take ownership if inserted.
-    value->addRef();
-  }
-  return it;
+    Iterator it;
+    bool inserted;
+    tie(it, inserted) = set_.insert(*value);
+    if (inserted) {
+        // Take ownership if inserted.
+        value->addRef();
+    }
+    return it;
 }
 
 PosnSet::Iterator PosnSet::insertHint(ConstIterator hint, const ValuePtr& value) noexcept
 {
-  auto it = set_.insert(hint, *value);
-  // Take ownership.
-  value->addRef();
-  return it;
+    auto it = set_.insert(hint, *value);
+    // Take ownership.
+    value->addRef();
+    return it;
 }
 
 PosnSet::Iterator PosnSet::insertOrReplace(const ValuePtr& value) noexcept
 {
-  Iterator it;
-  bool inserted;
-  tie(it, inserted) = set_.insert(*value);
-  if (!inserted) {
-    // Replace if exists.
-    ValuePtr prev{&*it, false};
-    set_.replace_node(it, *value);
-    it = Set::s_iterator_to(*value);
-  }
-  // Take ownership.
-  value->addRef();
-  return it;
+    Iterator it;
+    bool inserted;
+    tie(it, inserted) = set_.insert(*value);
+    if (!inserted) {
+        // Replace if exists.
+        ValuePtr prev{&*it, false};
+        set_.replace_node(it, *value);
+        it = Set::s_iterator_to(*value);
+    }
+    // Take ownership.
+    value->addRef();
+    return it;
 }
 
 } // swirly

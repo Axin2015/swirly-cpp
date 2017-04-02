@@ -25,99 +25,99 @@
 namespace swirly {
 
 class SWIRLY_API VarAccum {
- public:
-  constexpr VarAccum() noexcept = default;
-  ~VarAccum() noexcept = default;
+  public:
+    constexpr VarAccum() noexcept = default;
+    ~VarAccum() noexcept = default;
 
-  // Copy.
-  constexpr VarAccum(const VarAccum& rhs) noexcept = default;
-  VarAccum& operator=(const VarAccum& rhs) noexcept = default;
+    // Copy.
+    constexpr VarAccum(const VarAccum& rhs) noexcept = default;
+    VarAccum& operator=(const VarAccum& rhs) noexcept = default;
 
-  // Move.
-  constexpr VarAccum(VarAccum&&) noexcept = default;
-  VarAccum& operator=(VarAccum&&) noexcept = default;
+    // Move.
+    constexpr VarAccum(VarAccum&&) noexcept = default;
+    VarAccum& operator=(VarAccum&&) noexcept = default;
 
-  bool empty() const noexcept { return size_ == 0; }
-  std::size_t size() const noexcept { return size_; }
-  double mean() const noexcept { return mean_; }
-  double sum2() const noexcept { return sum2_; }
-  double min() const noexcept { return min_; }
-  double max() const noexcept { return max_; }
+    bool empty() const noexcept { return size_ == 0; }
+    std::size_t size() const noexcept { return size_; }
+    double mean() const noexcept { return mean_; }
+    double sum2() const noexcept { return sum2_; }
+    double min() const noexcept { return min_; }
+    double max() const noexcept { return max_; }
 
-  void clear() noexcept
-  {
-    size_ = 0;
-    mean_ = 0.0;
-    sum2_ = 0.0;
-    min_ = std::numeric_limits<double>::max();
-    max_ = std::numeric_limits<double>::min();
-  }
-  void append(double val) noexcept
-  {
-    ++size_;
-    double delta{val - mean_};
-    mean_ += delta / size_;
-    sum2_ += delta * (val - mean_);
-    min_ = std::min(min_, val);
-    max_ = std::max(max_, val);
-  }
-  template <typename... ArgsT>
-  void append(double first, ArgsT... args) noexcept
-  {
-    append(first);
-    // Recursively apply to tail.
-    append(args...);
-  }
+    void clear() noexcept
+    {
+        size_ = 0;
+        mean_ = 0.0;
+        sum2_ = 0.0;
+        min_ = std::numeric_limits<double>::max();
+        max_ = std::numeric_limits<double>::min();
+    }
+    void append(double val) noexcept
+    {
+        ++size_;
+        double delta{val - mean_};
+        mean_ += delta / size_;
+        sum2_ += delta * (val - mean_);
+        min_ = std::min(min_, val);
+        max_ = std::max(max_, val);
+    }
+    template <typename... ArgsT>
+    void append(double first, ArgsT... args) noexcept
+    {
+        append(first);
+        // Recursively apply to tail.
+        append(args...);
+    }
 
- private:
-  std::size_t size_{0};
-  double mean_{0.0};
-  double sum2_{0.0};
-  double min_{std::numeric_limits<double>::max()};
-  double max_{std::numeric_limits<double>::min()};
+  private:
+    std::size_t size_{0};
+    double mean_{0.0};
+    double sum2_{0.0};
+    double min_{std::numeric_limits<double>::max()};
+    double max_{std::numeric_limits<double>::min()};
 };
 
 inline double var(const VarAccum& v) noexcept
 {
-  return v.size() > 1 ? v.sum2() / (v.size() - 1) : std::numeric_limits<double>::quiet_NaN();
+    return v.size() > 1 ? v.sum2() / (v.size() - 1) : std::numeric_limits<double>::quiet_NaN();
 }
 
 inline double varp(const VarAccum& v) noexcept
 {
-  return !v.empty() ? v.sum2() / v.size() : std::numeric_limits<double>::quiet_NaN();
+    return !v.empty() ? v.sum2() / v.size() : std::numeric_limits<double>::quiet_NaN();
 }
 
 inline double stdev(const VarAccum& v) noexcept
 {
-  return std::sqrt(var(v));
+    return std::sqrt(var(v));
 }
 
 inline double stdevp(const VarAccum& v) noexcept
 {
-  return std::sqrt(varp(v));
+    return std::sqrt(varp(v));
 }
 
 inline double zscore(double mean, double sd, double val) noexcept
 {
-  return (val - mean) / sd;
+    return (val - mean) / sd;
 }
 
 inline double pctile95(double mean, double sd) noexcept
 {
-  // NORMSINV(0.95) = 1.6448536
-  return mean + 1.6448536 * sd;
+    // NORMSINV(0.95) = 1.6448536
+    return mean + 1.6448536 * sd;
 }
 
 inline double pctile99(double mean, double sd) noexcept
 {
-  // NORMSINV(0.99) = 2.3263479
-  return mean + 2.3263479 * sd;
+    // NORMSINV(0.99) = 2.3263479
+    return mean + 2.3263479 * sd;
 }
 
 inline double pctile999(double mean, double sd) noexcept
 {
-  // NORMSINV(0.999) = 3.0902323
-  return mean + 3.0902323 * sd;
+    // NORMSINV(0.999) = 3.0902323
+    return mean + 3.0902323 * sd;
 }
 
 /**
@@ -125,7 +125,7 @@ inline double pctile999(double mean, double sd) noexcept
  */
 constexpr bool isPow2(std::size_t n) noexcept
 {
-  return n > 0 && (n & (n - 1)) == 0;
+    return n > 0 && (n & (n - 1)) == 0;
 }
 
 /**
@@ -133,8 +133,8 @@ constexpr bool isPow2(std::size_t n) noexcept
  */
 inline unsigned nextPow2(unsigned n) noexcept
 {
-  // The result of __builtin_clz is undefined for zero values.
-  return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clz(n - 1));
+    // The result of __builtin_clz is undefined for zero values.
+    return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clz(n - 1));
 }
 
 /**
@@ -142,8 +142,8 @@ inline unsigned nextPow2(unsigned n) noexcept
  */
 inline unsigned long nextPow2(unsigned long n) noexcept
 {
-  // The result of __builtin_clzl is undefined for zero values.
-  return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clzl(n - 1));
+    // The result of __builtin_clzl is undefined for zero values.
+    return n <= 1 ? 1 : 1 << (sizeof(n) * 8 - __builtin_clzl(n - 1));
 }
 
 /**
@@ -151,7 +151,7 @@ inline unsigned long nextPow2(unsigned long n) noexcept
  */
 constexpr std::size_t ceil(std::size_t dividend, std::size_t divisor) noexcept
 {
-  return (dividend - 1) / divisor + 1;
+    return (dividend - 1) / divisor + 1;
 }
 
 } // swirly

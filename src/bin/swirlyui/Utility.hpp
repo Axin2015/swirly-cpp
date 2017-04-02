@@ -26,10 +26,10 @@ namespace ui {
 
 inline auto makeDeleter(QObject* obj) noexcept
 {
-  if (obj) {
-    obj->setParent(nullptr);
-  }
-  return std::unique_ptr<QObject>{obj};
+    if (obj) {
+        obj->setParent(nullptr);
+    }
+    return std::unique_ptr<QObject>{obj};
 }
 
 } // ui

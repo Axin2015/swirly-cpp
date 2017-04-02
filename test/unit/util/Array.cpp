@@ -26,29 +26,29 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(ArrayView)
 {
-  SWIRLY_CHECK(!ArrayView<int>{}.data());
-  SWIRLY_CHECK(ArrayView<int>{}.empty());
-  SWIRLY_CHECK(ArrayView<int>{}.size() == 0UL);
+    SWIRLY_CHECK(!ArrayView<int>{}.data());
+    SWIRLY_CHECK(ArrayView<int>{}.empty());
+    SWIRLY_CHECK(ArrayView<int>{}.size() == 0UL);
 
-  const int arr[] = {101, 202, 303};
-  ArrayView<int> av{arr};
+    const int arr[] = {101, 202, 303};
+    ArrayView<int> av{arr};
 
-  SWIRLY_CHECK(av.data());
-  SWIRLY_CHECK(!av.empty());
-  SWIRLY_CHECK(av.size() == 3UL);
+    SWIRLY_CHECK(av.data());
+    SWIRLY_CHECK(!av.empty());
+    SWIRLY_CHECK(av.size() == 3UL);
 
-  SWIRLY_CHECK(av[0] == arr[0]);
-  SWIRLY_CHECK(av[1] == arr[1]);
-  SWIRLY_CHECK(av[2] == arr[2]);
+    SWIRLY_CHECK(av[0] == arr[0]);
+    SWIRLY_CHECK(av[1] == arr[1]);
+    SWIRLY_CHECK(av[2] == arr[2]);
 
-  SWIRLY_CHECK(av.front() == arr[0]);
-  SWIRLY_CHECK(av.back() == arr[2]);
+    SWIRLY_CHECK(av.front() == arr[0]);
+    SWIRLY_CHECK(av.back() == arr[2]);
 
-  SWIRLY_CHECK(equal(av.begin(), av.end(), arr));
-  int rev[] = {303, 202, 101};
+    SWIRLY_CHECK(equal(av.begin(), av.end(), arr));
+    int rev[] = {303, 202, 101};
 
-  SWIRLY_CHECK(equal(av.rbegin(), av.rend(), rev));
+    SWIRLY_CHECK(equal(av.rbegin(), av.rend(), rev));
 
-  SWIRLY_CHECK(makeArrayView(arr, 2).size() == 2UL);
-  SWIRLY_CHECK(makeArrayView(arr).size() == 3UL);
+    SWIRLY_CHECK(makeArrayView(arr, 2).size() == 2UL);
+    SWIRLY_CHECK(makeArrayView(arr).size() == 3UL);
 }

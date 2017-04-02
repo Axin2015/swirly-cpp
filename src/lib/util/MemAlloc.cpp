@@ -25,12 +25,12 @@ SWIRLY_WEAK void dealloc(void* ptr, size_t size) noexcept;
 
 void* alloc(size_t size)
 {
-  return ::operator new(size);
+    return ::operator new(size);
 }
 
 void dealloc(void* ptr, size_t size) noexcept
 {
-  ::operator delete(ptr);
+    ::operator delete(ptr);
 }
 
 } // swirly

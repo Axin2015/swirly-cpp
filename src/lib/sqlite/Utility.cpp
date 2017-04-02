@@ -32,17 +32,17 @@ namespace {
 
 const char* lastError(sqlite3& db)
 {
-  return sqlite3_errmsg(&db);
+    return sqlite3_errmsg(&db);
 }
 
 const char* lastError(sqlite3_stmt& stmt)
 {
-  return sqlite3_errmsg(sqlite3_db_handle(&stmt));
+    return sqlite3_errmsg(sqlite3_db_handle(&stmt));
 }
 
 void trace(void* unused, const char* sql)
 {
-  SWIRLY_INFO(sql);
+    SWIRLY_INFO(sql);
 }
 
 } // anonymous
@@ -51,91 +51,91 @@ namespace detail {
 
 void bind32(sqlite3_stmt& stmt, int col, int32_t val)
 {
-  int rc{sqlite3_bind_int(&stmt, col, val)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_int failed: " << lastError(stmt)};
-  }
+    int rc{sqlite3_bind_int(&stmt, col, val)};
+    if (rc != SQLITE_OK) {
+        throw Error{errMsg() << "sqlite3_bind_int failed: " << lastError(stmt)};
+    }
 }
 
 void bind64(sqlite3_stmt& stmt, int col, int64_t val)
 {
-  int rc{sqlite3_bind_int64(&stmt, col, val)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_int64 failed: " << lastError(stmt)};
-  }
+    int rc{sqlite3_bind_int64(&stmt, col, val)};
+    if (rc != SQLITE_OK) {
+        throw Error{errMsg() << "sqlite3_bind_int64 failed: " << lastError(stmt)};
+    }
 }
 
 void bindsv(sqlite3_stmt& stmt, int col, string_view val)
 {
-  int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_text failed: " << lastError(stmt)};
-  }
+    int rc{sqlite3_bind_text(&stmt, col, val.data(), val.size(), SQLITE_STATIC)};
+    if (rc != SQLITE_OK) {
+        throw Error{errMsg() << "sqlite3_bind_text failed: " << lastError(stmt)};
+    }
 }
 
 } // detail
 
 DbPtr openDb(const char* path, int flags, const Conf& conf)
 {
-  sqlite3* db;
-  int rc{sqlite3_open_v2(path, &db, flags, nullptr)};
-  DbPtr ptr{db, sqlite3_close};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_open_v2 failed: " << path << ": " << lastError(*db)};
-  }
-  if (conf.get("sqlite_enable_trace", false)) {
-    sqlite3_trace(db, trace, nullptr);
-  }
-  if (conf.get("sqlite_enable_fkey", false)) {
-    rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, nullptr);
+    sqlite3* db;
+    int rc{sqlite3_open_v2(path, &db, flags, nullptr)};
+    DbPtr ptr{db, sqlite3_close};
     if (rc != SQLITE_OK) {
-      throw Error{errMsg() << "sqlite3_db_config failed: " << path << ": " << lastError(*db)};
+        throw Error{errMsg() << "sqlite3_open_v2 failed: " << path << ": " << lastError(*db)};
     }
-  }
-  {
-    StmtPtr stmt{prepare(*db, "PRAGMA journal_mode = MEMORY"_sv)};
-    stepOnce(*stmt);
-  }
-  {
-    StmtPtr stmt{prepare(*db, "PRAGMA synchronous = OFF"_sv)};
-    stepOnce(*stmt);
-  }
-  return ptr;
+    if (conf.get("sqlite_enable_trace", false)) {
+        sqlite3_trace(db, trace, nullptr);
+    }
+    if (conf.get("sqlite_enable_fkey", false)) {
+        rc = sqlite3_db_config(db, SQLITE_DBCONFIG_ENABLE_FKEY, 1, nullptr);
+        if (rc != SQLITE_OK) {
+            throw Error{errMsg() << "sqlite3_db_config failed: " << path << ": " << lastError(*db)};
+        }
+    }
+    {
+        StmtPtr stmt{prepare(*db, "PRAGMA journal_mode = MEMORY"_sv)};
+        stepOnce(*stmt);
+    }
+    {
+        StmtPtr stmt{prepare(*db, "PRAGMA synchronous = OFF"_sv)};
+        stepOnce(*stmt);
+    }
+    return ptr;
 }
 
 StmtPtr prepare(sqlite3& db, string_view sql)
 {
-  sqlite3_stmt* stmt;
-  int rc{sqlite3_prepare_v2(&db, sql.data(), sql.size(), &stmt, nullptr)};
-  StmtPtr ptr{stmt, sqlite3_finalize};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_prepare_v2 failed: " << sql << ": " << lastError(db)};
-  }
-  return ptr;
+    sqlite3_stmt* stmt;
+    int rc{sqlite3_prepare_v2(&db, sql.data(), sql.size(), &stmt, nullptr)};
+    StmtPtr ptr{stmt, sqlite3_finalize};
+    if (rc != SQLITE_OK) {
+        throw Error{errMsg() << "sqlite3_prepare_v2 failed: " << sql << ": " << lastError(db)};
+    }
+    return ptr;
 }
 
 bool step(sqlite3_stmt& stmt)
 {
-  int rc{sqlite3_step(&stmt)};
-  switch (rc) {
-  case SQLITE_OK:
-    assert(false);
-  case SQLITE_ROW:
-    return true;
-  case SQLITE_DONE:
-    return false;
-  default:
-    throw Error{errMsg() << "sqlite3_step failed: " << lastError(stmt)};
-    break;
-  }
+    int rc{sqlite3_step(&stmt)};
+    switch (rc) {
+    case SQLITE_OK:
+        assert(false);
+    case SQLITE_ROW:
+        return true;
+    case SQLITE_DONE:
+        return false;
+    default:
+        throw Error{errMsg() << "sqlite3_step failed: " << lastError(stmt)};
+        break;
+    }
 }
 
 void bind(sqlite3_stmt& stmt, int col, nullptr_t)
 {
-  int rc{sqlite3_bind_null(&stmt, col)};
-  if (rc != SQLITE_OK) {
-    throw Error{errMsg() << "sqlite3_bind_null failed: " << lastError(stmt)};
-  }
+    int rc{sqlite3_bind_null(&stmt, col)};
+    if (rc != SQLITE_OK) {
+        throw Error{errMsg() << "sqlite3_bind_null failed: " << lastError(stmt)};
+    }
 }
 
 } // sqlite

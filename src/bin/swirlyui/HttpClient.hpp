@@ -25,45 +25,45 @@ namespace swirly {
 namespace ui {
 
 class HttpClient : public Client {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  HttpClient(QObject* parent = nullptr);
-  ~HttpClient() noexcept override;
+  public:
+    HttpClient(QObject* parent = nullptr);
+    ~HttpClient() noexcept override;
 
-  void createMarket(const Contr& contr, QDate settlDate) override;
+    void createMarket(const Contr& contr, QDate settlDate) override;
 
-  void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
-                   Ticks ticks) override;
+    void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+                     Ticks ticks) override;
 
-  void cancelOrders(const OrderKeys& keys) override;
+    void cancelOrders(const OrderKeys& keys) override;
 
- signals:
+  signals:
 
- protected:
-  void timerEvent(QTimerEvent* event) override;
+  protected:
+    void timerEvent(QTimerEvent* event) override;
 
- private slots:
-  void slotFinished(QNetworkReply* reply);
+  private slots:
+    void slotFinished(QNetworkReply* reply);
 
-  void slotNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
+    void slotNetworkAccessibleChanged(QNetworkAccessManager::NetworkAccessibility accessible);
 
- private:
-  Contr findContr(const QJsonObject& obj) const;
+  private:
+    Contr findContr(const QJsonObject& obj) const;
 
-  void getRefData();
-  void getAccnt();
-  void putOrder(const QUrl& url);
+    void getRefData();
+    void getAccnt();
+    void putOrder(const QUrl& url);
 
-  void onRefDataReply(QNetworkReply& reply);
-  void onAccntReply(QNetworkReply& reply);
-  void onMarketReply(QNetworkReply& reply);
-  void onOrderReply(QNetworkReply& reply);
+    void onRefDataReply(QNetworkReply& reply);
+    void onAccntReply(QNetworkReply& reply);
+    void onMarketReply(QNetworkReply& reply);
+    void onOrderReply(QNetworkReply& reply);
 
-  QNetworkAccessManager nam_;
-  std::uint64_t tag_{0};
-  int errors_{0};
-  int pending_{0};
+    QNetworkAccessManager nam_;
+    std::uint64_t tag_{0};
+    int errors_{0};
+    int pending_{0};
 };
 
 } // ui

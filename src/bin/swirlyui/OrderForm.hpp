@@ -27,23 +27,23 @@ namespace ui {
 class OrderModel;
 
 class OrderForm : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  OrderForm(OrderModel& orderModel, QWidget* parent = nullptr,
-            Qt::WindowFlags f = Qt::WindowFlags{});
-  ~OrderForm() noexcept override;
+  public:
+    OrderForm(OrderModel& orderModel, QWidget* parent = nullptr,
+              Qt::WindowFlags f = Qt::WindowFlags{});
+    ~OrderForm() noexcept override;
 
- signals:
-  void cancelOrders(const OrderKeys& keys);
+  signals:
+    void cancelOrders(const OrderKeys& keys);
 
- private slots:
-  void slotSelectAllClicked();
-  void slotSelectNoneClicked();
-  void slotCancelOrdersClicked();
+  private slots:
+    void slotSelectAllClicked();
+    void slotSelectNoneClicked();
+    void slotCancelOrdersClicked();
 
- private:
-  OrderModel& orderModel_;
+  private:
+    OrderModel& orderModel_;
 };
 
 } // ui

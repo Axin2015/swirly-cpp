@@ -24,30 +24,30 @@ namespace swirly {
 namespace ui {
 
 class OrderModel
-  : public TableModel<OrderKey, Order, unbox(order::Column::CheckState), order::ColumnCount> {
- public:
-  OrderModel(QObject* parent = nullptr);
-  ~OrderModel() noexcept override;
+    : public TableModel<OrderKey, Order, unbox(order::Column::CheckState), order::ColumnCount> {
+  public:
+    OrderModel(QObject* parent = nullptr);
+    ~OrderModel() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  OrderKeys checked() const;
+    OrderKeys checked() const;
 
-  void removeRow(const Order& order)
-  {
-    const OrderKey key{order.marketId(), order.id()};
-    TableModel::removeRow(key);
-  }
-  void updateRow(std::uint64_t tag, const Order& order)
-  {
-    const OrderKey key{order.marketId(), order.id()};
-    TableModel::updateRow(key, tag, order);
-  }
+    void removeRow(const Order& order)
+    {
+        const OrderKey key{order.marketId(), order.id()};
+        TableModel::removeRow(key);
+    }
+    void updateRow(std::uint64_t tag, const Order& order)
+    {
+        const OrderKey key{order.marketId(), order.id()};
+        TableModel::updateRow(key, tag, order);
+    }
 
- private:
-  QVariant header_[order::ColumnCount];
+  private:
+    QVariant header_[order::ColumnCount];
 };
 
 } // ui

@@ -26,22 +26,22 @@ ServException::~ServException() noexcept = default;
 
 void ServException::toJson(int status, const char* reason, const char* detail, ostream& os)
 {
-  os << "{\"status\":" << status //
-     << ",\"reason\":\"" << reason //
-     << "\",\"detail\":\"" << detail //
-     << "\"}";
+    os << "{\"status\":" << status //
+       << ",\"reason\":\"" << reason //
+       << "\",\"detail\":\"" << detail //
+       << "\"}";
 }
 
 BadRequestException::~BadRequestException() noexcept = default;
 
 int BadRequestException::httpStatus() const noexcept
 {
-  return 400;
+    return 400;
 }
 
 const char* BadRequestException::httpReason() const noexcept
 {
-  return "Bad Request";
+    return "Bad Request";
 }
 
 AlreadyExistsException::~AlreadyExistsException() noexcept = default;
@@ -60,48 +60,48 @@ ForbiddenException::~ForbiddenException() noexcept = default;
 
 int ForbiddenException::httpStatus() const noexcept
 {
-  return 403;
+    return 403;
 }
 
 const char* ForbiddenException::httpReason() const noexcept
 {
-  return "Forbidden";
+    return "Forbidden";
 }
 
 InternalException::~InternalException() noexcept = default;
 
 int InternalException::httpStatus() const noexcept
 {
-  return 500;
+    return 500;
 }
 
 const char* InternalException::httpReason() const noexcept
 {
-  return "Internal Server Error";
+    return "Internal Server Error";
 }
 
 MethodNotAllowedException::~MethodNotAllowedException() noexcept = default;
 
 int MethodNotAllowedException::httpStatus() const noexcept
 {
-  return 405;
+    return 405;
 }
 
 const char* MethodNotAllowedException::httpReason() const noexcept
 {
-  return "Method Not Allowed";
+    return "Method Not Allowed";
 }
 
 NotFoundException::~NotFoundException() noexcept = default;
 
 int NotFoundException::httpStatus() const noexcept
 {
-  return 404;
+    return 404;
 }
 
 const char* NotFoundException::httpReason() const noexcept
 {
-  return "Not Found";
+    return "Not Found";
 }
 
 MarketClosedException::~MarketClosedException() noexcept = default;
@@ -114,24 +114,24 @@ ServiceUnavailableException::~ServiceUnavailableException() noexcept = default;
 
 int ServiceUnavailableException::httpStatus() const noexcept
 {
-  return 503;
+    return 503;
 }
 
 const char* ServiceUnavailableException::httpReason() const noexcept
 {
-  return "Service Unavailable";
+    return "Service Unavailable";
 }
 
 UnauthorizedException::~UnauthorizedException() noexcept = default;
 
 int UnauthorizedException::httpStatus() const noexcept
 {
-  return 401;
+    return 401;
 }
 
 const char* UnauthorizedException::httpReason() const noexcept
 {
-  return "Unauthorized";
+    return "Unauthorized";
 }
 
 } // swirly

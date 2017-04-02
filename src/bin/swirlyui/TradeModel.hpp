@@ -24,28 +24,28 @@ namespace swirly {
 namespace ui {
 
 class TradeModel
-  : public TableModel<ExecKey, Exec, unbox(exec::Column::CheckState), exec::ColumnCount> {
- public:
-  TradeModel(QObject* parent = nullptr);
-  ~TradeModel() noexcept override;
+    : public TableModel<ExecKey, Exec, unbox(exec::Column::CheckState), exec::ColumnCount> {
+  public:
+    TradeModel(QObject* parent = nullptr);
+    ~TradeModel() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void removeRow(std::uint64_t tag, const Exec& trade)
-  {
-    const ExecKey key{trade.marketId(), trade.id()};
-    TableModel::removeRow(key);
-  }
-  void updateRow(std::uint64_t tag, const Exec& trade)
-  {
-    const ExecKey key{trade.marketId(), trade.id()};
-    TableModel::updateRow(key, tag, trade);
-  }
+    void removeRow(std::uint64_t tag, const Exec& trade)
+    {
+        const ExecKey key{trade.marketId(), trade.id()};
+        TableModel::removeRow(key);
+    }
+    void updateRow(std::uint64_t tag, const Exec& trade)
+    {
+        const ExecKey key{trade.marketId(), trade.id()};
+        TableModel::updateRow(key, tag, trade);
+    }
 
- private:
-  QVariant header_[exec::ColumnCount];
+  private:
+    QVariant header_[exec::ColumnCount];
 };
 
 } // ui

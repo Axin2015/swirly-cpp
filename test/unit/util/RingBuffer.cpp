@@ -23,51 +23,51 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(RingBuffer)
 {
-  using IntRingBuffer = RingBuffer<int>;
+    using IntRingBuffer = RingBuffer<int>;
 
-  IntRingBuffer rb{4};
-  SWIRLY_CHECK(rb.empty());
-  SWIRLY_CHECK(!rb.full());
-  SWIRLY_CHECK(rb.size() == 0);
+    IntRingBuffer rb{4};
+    SWIRLY_CHECK(rb.empty());
+    SWIRLY_CHECK(!rb.full());
+    SWIRLY_CHECK(rb.size() == 0);
 
-  rb.write([](int& val) { val = 1; });
-  SWIRLY_CHECK(!rb.empty());
-  SWIRLY_CHECK(!rb.full());
-  SWIRLY_CHECK(rb.size() == 1);
+    rb.write([](int& val) { val = 1; });
+    SWIRLY_CHECK(!rb.empty());
+    SWIRLY_CHECK(!rb.full());
+    SWIRLY_CHECK(rb.size() == 1);
 
-  rb.clear();
-  SWIRLY_CHECK(rb.empty());
-  SWIRLY_CHECK(!rb.full());
-  SWIRLY_CHECK(rb.size() == 0);
+    rb.clear();
+    SWIRLY_CHECK(rb.empty());
+    SWIRLY_CHECK(!rb.full());
+    SWIRLY_CHECK(rb.size() == 0);
 
-  rb.push(1);
-  rb.push(2);
-  rb.push(3);
-  rb.push(4);
-  SWIRLY_CHECK(!rb.empty());
-  SWIRLY_CHECK(rb.full());
-  SWIRLY_CHECK(rb.size() == 4);
+    rb.push(1);
+    rb.push(2);
+    rb.push(3);
+    rb.push(4);
+    SWIRLY_CHECK(!rb.empty());
+    SWIRLY_CHECK(rb.full());
+    SWIRLY_CHECK(rb.size() == 4);
 
-  rb.push(5);
-  SWIRLY_CHECK(!rb.empty());
-  SWIRLY_CHECK(rb.full());
-  SWIRLY_CHECK(rb.size() == 4);
+    rb.push(5);
+    SWIRLY_CHECK(!rb.empty());
+    SWIRLY_CHECK(rb.full());
+    SWIRLY_CHECK(rb.size() == 4);
 
-  int val;
-  rb.read([&val](const int& ref) { val = ref; });
-  SWIRLY_CHECK(2);
-  SWIRLY_CHECK(!rb.empty());
-  SWIRLY_CHECK(!rb.full());
-  SWIRLY_CHECK(rb.size() == 3);
+    int val;
+    rb.read([&val](const int& ref) { val = ref; });
+    SWIRLY_CHECK(2);
+    SWIRLY_CHECK(!rb.empty());
+    SWIRLY_CHECK(!rb.full());
+    SWIRLY_CHECK(rb.size() == 3);
 
-  SWIRLY_CHECK(rb.front() == 3);
-  rb.pop();
-  SWIRLY_CHECK(rb.front() == 4);
-  rb.pop();
-  SWIRLY_CHECK(rb.front() == 5);
-  rb.pop();
+    SWIRLY_CHECK(rb.front() == 3);
+    rb.pop();
+    SWIRLY_CHECK(rb.front() == 4);
+    rb.pop();
+    SWIRLY_CHECK(rb.front() == 5);
+    rb.pop();
 
-  SWIRLY_CHECK(rb.empty());
-  SWIRLY_CHECK(!rb.full());
-  SWIRLY_CHECK(rb.size() == 0);
+    SWIRLY_CHECK(rb.empty());
+    SWIRLY_CHECK(!rb.full());
+    SWIRLY_CHECK(rb.size() == 0);
 }

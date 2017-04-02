@@ -27,21 +27,21 @@ namespace swirly {
 namespace ui {
 
 class Level {
- public:
-  Level(Ticks ticks, Lots resd, int count) : ticks_{ticks}, resd_{resd}, count_{count} {}
-  Level() = default;
-  ~Level() noexcept = default;
+  public:
+    Level(Ticks ticks, Lots resd, int count) : ticks_{ticks}, resd_{resd}, count_{count} {}
+    Level() = default;
+    ~Level() noexcept = default;
 
-  static Level fromJson(const QJsonObject& obj);
+    static Level fromJson(const QJsonObject& obj);
 
-  Ticks ticks() const noexcept { return ticks_; }
-  Lots resd() const noexcept { return resd_; }
-  int count() const noexcept { return count_; }
+    Ticks ticks() const noexcept { return ticks_; }
+    Lots resd() const noexcept { return resd_; }
+    int count() const noexcept { return count_; }
 
- private:
-  Ticks ticks_{};
-  Lots resd_{};
-  int count_{};
+  private:
+    Ticks ticks_{};
+    Lots resd_{};
+    int count_{};
 };
 
 QDebug operator<<(QDebug debug, const Level& level);

@@ -28,46 +28,46 @@ namespace detail {
 
 MemRegion::MemRegion(size_t capacity) : capacity_{capacity}
 {
-  // The mmap system call is used instead of sbrk, because it allows us to free the memory.
-  const int prot{PROT_READ | PROT_WRITE};
-  const int flags{MAP_ANON | MAP_PRIVATE};
-  addr_ = mmap(nullptr, capacity, prot, flags, -1, 0);
-  if (addr_ == MAP_FAILED) {
-    throw system_error{errno, system_category(), "mmap failed"};
-  }
+    // The mmap system call is used instead of sbrk, because it allows us to free the memory.
+    const int prot{PROT_READ | PROT_WRITE};
+    const int flags{MAP_ANON | MAP_PRIVATE};
+    addr_ = mmap(nullptr, capacity, prot, flags, -1, 0);
+    if (addr_ == MAP_FAILED) {
+        throw system_error{errno, system_category(), "mmap failed"};
+    }
 }
 
 MemRegion::MemRegion() noexcept = default;
 
 MemRegion::~MemRegion() noexcept
 {
-  if (addr_) {
-    munmap(addr_, capacity_);
-  }
+    if (addr_) {
+        munmap(addr_, capacity_);
+    }
 }
 
 // Move.
 MemRegion::MemRegion(MemRegion&& rhs) noexcept
-  : capacity_{rhs.capacity_}, addr_{rhs.addr_}, used_{rhs.used_}
+    : capacity_{rhs.capacity_}, addr_{rhs.addr_}, used_{rhs.used_}
 {
-  rhs.capacity_ = 0;
-  rhs.addr_ = nullptr;
-  rhs.used_ = 0;
+    rhs.capacity_ = 0;
+    rhs.addr_ = nullptr;
+    rhs.used_ = 0;
 }
 
 MemRegion& MemRegion::operator=(MemRegion&& rhs) noexcept
 {
-  assert(this != &rhs);
-  if (addr_) {
-    munmap(addr_, capacity_);
-  }
-  capacity_ = rhs.capacity_;
-  addr_ = rhs.addr_;
-  used_ = rhs.used_;
-  rhs.capacity_ = 0;
-  rhs.addr_ = nullptr;
-  rhs.used_ = 0;
-  return *this;
+    assert(this != &rhs);
+    if (addr_) {
+        munmap(addr_, capacity_);
+    }
+    capacity_ = rhs.capacity_;
+    addr_ = rhs.addr_;
+    used_ = rhs.used_;
+    rhs.capacity_ = 0;
+    rhs.addr_ = nullptr;
+    rhs.used_ = 0;
+    return *this;
 }
 
 } // detail
@@ -85,50 +85,50 @@ MemPool& MemPool::operator=(MemPool&&) noexcept = default;
 
 void* MemPool::alloc(size_t size)
 {
-  void* addr;
-  switch (roundCacheLine(size)) {
-  case 1 << 6:
-    addr = allocBlock(head1_);
-    break;
-  case 2 << 6:
-    addr = allocBlock(head2_);
-    break;
-  case 3 << 6:
-    addr = allocBlock(head3_);
-    break;
-  case 4 << 6:
-    addr = allocBlock(head4_);
-    break;
-  case 5 << 6:
-    addr = allocBlock(head5_);
-    break;
-  default:
-    addr = malloc(size);
-  }
-  return addr;
+    void* addr;
+    switch (roundCacheLine(size)) {
+    case 1 << 6:
+        addr = allocBlock(head1_);
+        break;
+    case 2 << 6:
+        addr = allocBlock(head2_);
+        break;
+    case 3 << 6:
+        addr = allocBlock(head3_);
+        break;
+    case 4 << 6:
+        addr = allocBlock(head4_);
+        break;
+    case 5 << 6:
+        addr = allocBlock(head5_);
+        break;
+    default:
+        addr = malloc(size);
+    }
+    return addr;
 }
 
 void MemPool::dealloc(void* ptr, size_t size) noexcept
 {
-  switch (roundCacheLine(size)) {
-  case 1 << 6:
-    deallocBlock(head1_, ptr);
-    break;
-  case 2 << 6:
-    deallocBlock(head2_, ptr);
-    break;
-  case 3 << 6:
-    deallocBlock(head3_, ptr);
-    break;
-  case 4 << 6:
-    deallocBlock(head4_, ptr);
-    break;
-  case 5 << 6:
-    deallocBlock(head5_, ptr);
-    break;
-  default:
-    free(ptr);
-  }
+    switch (roundCacheLine(size)) {
+    case 1 << 6:
+        deallocBlock(head1_, ptr);
+        break;
+    case 2 << 6:
+        deallocBlock(head2_, ptr);
+        break;
+    case 3 << 6:
+        deallocBlock(head3_, ptr);
+        break;
+    case 4 << 6:
+        deallocBlock(head4_, ptr);
+        break;
+    case 5 << 6:
+        deallocBlock(head5_, ptr);
+        break;
+    default:
+        free(ptr);
+    }
 }
 
 } // swirly

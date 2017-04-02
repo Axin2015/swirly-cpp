@@ -25,38 +25,38 @@ namespace swirly {
 namespace sqlite {
 
 class Model : public swirly::Model {
- public:
-  explicit Model(const Conf& conf);
-  ~Model() noexcept;
+  public:
+    explicit Model(const Conf& conf);
+    ~Model() noexcept;
 
-  // Copy.
-  Model(const Model&) = delete;
-  Model& operator=(const Model&) = delete;
+    // Copy.
+    Model(const Model&) = delete;
+    Model& operator=(const Model&) = delete;
 
-  // Move.
-  Model(Model&&);
-  Model& operator=(Model&&);
+    // Move.
+    Model(Model&&);
+    Model& operator=(Model&&);
 
- protected:
-  void doReadAsset(const ModelCallback<AssetPtr>& cb) const override;
+  protected:
+    void doReadAsset(const ModelCallback<AssetPtr>& cb) const override;
 
-  void doReadContr(const ModelCallback<ContrPtr>& cb) const override;
+    void doReadContr(const ModelCallback<ContrPtr>& cb) const override;
 
-  void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
+    void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
 
-  void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const override;
+    void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const override;
 
-  void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
+    void doReadOrder(const ModelCallback<OrderPtr>& cb) const override;
 
-  void doReadExec(std::string_view accnt, std::size_t limit,
-                  const ModelCallback<ExecPtr>& cb) const override;
+    void doReadExec(std::string_view accnt, std::size_t limit,
+                    const ModelCallback<ExecPtr>& cb) const override;
 
-  void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
+    void doReadTrade(const ModelCallback<ExecPtr>& cb) const override;
 
-  void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
+    void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const override;
 
- private:
-  DbPtr db_;
+  private:
+    DbPtr db_;
 };
 
 } // sqlite

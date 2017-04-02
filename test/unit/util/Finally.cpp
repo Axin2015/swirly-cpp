@@ -22,10 +22,10 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(Finally)
 {
-  bool success{false};
-  {
-    auto finally = makeFinally([&success]() { success = true; });
-    SWIRLY_CHECK(!success);
-  }
-  SWIRLY_CHECK(success);
+    bool success{false};
+    {
+        auto finally = makeFinally([&success]() { success = true; });
+        SWIRLY_CHECK(!success);
+    }
+    SWIRLY_CHECK(success);
 }

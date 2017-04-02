@@ -27,49 +27,49 @@ namespace swirly {
 namespace sqlite {
 
 class Journ : public Transactional, public swirly::Journ, BasicMsgHandler<Journ> {
-  // Crtp.
-  friend struct BasicMsgHandler<Journ>;
+    // Crtp.
+    friend struct BasicMsgHandler<Journ>;
 
- public:
-  explicit Journ(const Conf& conf);
-  ~Journ() noexcept override;
+  public:
+    explicit Journ(const Conf& conf);
+    ~Journ() noexcept override;
 
-  // Copy.
-  Journ(const Journ&) = delete;
-  Journ& operator=(const Journ&) = delete;
+    // Copy.
+    Journ(const Journ&) = delete;
+    Journ& operator=(const Journ&) = delete;
 
-  // Move.
-  Journ(Journ&&);
-  Journ& operator=(Journ&&);
+    // Move.
+    Journ(Journ&&);
+    Journ& operator=(Journ&&);
 
- protected:
-  void doBegin() override;
+  protected:
+    void doBegin() override;
 
-  void doCommit() override;
+    void doCommit() override;
 
-  void doRollback() override;
+    void doRollback() override;
 
-  void doUpdate(const Msg& msg) override;
+    void doUpdate(const Msg& msg) override;
 
- private:
-  void onReset();
+  private:
+    void onReset();
 
-  void onCreateMarket(const CreateMarketBody& body);
+    void onCreateMarket(const CreateMarketBody& body);
 
-  void onUpdateMarket(const UpdateMarketBody& body);
+    void onUpdateMarket(const UpdateMarketBody& body);
 
-  void onCreateExec(const CreateExecBody& body);
+    void onCreateExec(const CreateExecBody& body);
 
-  void onArchiveTrade(const ArchiveTradeBody& body);
+    void onArchiveTrade(const ArchiveTradeBody& body);
 
-  DbPtr db_;
-  StmtPtr beginStmt_;
-  StmtPtr commitStmt_;
-  StmtPtr rollbackStmt_;
-  StmtPtr insertMarketStmt_;
-  StmtPtr updateMarketStmt_;
-  StmtPtr insertExecStmt_;
-  StmtPtr updateExecStmt_;
+    DbPtr db_;
+    StmtPtr beginStmt_;
+    StmtPtr commitStmt_;
+    StmtPtr rollbackStmt_;
+    StmtPtr insertMarketStmt_;
+    StmtPtr updateMarketStmt_;
+    StmtPtr insertExecStmt_;
+    StmtPtr updateExecStmt_;
 };
 
 } // sqlite

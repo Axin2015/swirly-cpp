@@ -26,19 +26,19 @@ Transactional::~Transactional() noexcept = default;
 
 Transaction::~Transaction() noexcept
 {
-  if (more_ == More::No) {
-    try {
-      target_.reset();
-    } catch (const exception& e) {
-      SWIRLY_ERROR(logMsg() << "failed to reset transaction: " << e.what());
+    if (more_ == More::No) {
+        try {
+            target_.reset();
+        } catch (const exception& e) {
+            SWIRLY_ERROR(logMsg() << "failed to reset transaction: " << e.what());
+        }
+    } else if (!done_) {
+        try {
+            target_.tryRollback();
+        } catch (const exception& e) {
+            SWIRLY_ERROR(logMsg() << "failed to rollback transaction: " << e.what());
+        }
     }
-  } else if (!done_) {
-    try {
-      target_.tryRollback();
-    } catch (const exception& e) {
-      SWIRLY_ERROR(logMsg() << "failed to rollback transaction: " << e.what());
-    }
-  }
 }
 
 } // swirly

@@ -23,17 +23,17 @@ using namespace swirly;
 
 namespace {
 class Foo : public RefCounted<Foo>, public Request {
- public:
-  Foo(Id64 marketId, Id64 id, int& alive) noexcept
-    : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}, alive_{alive}
-  {
-    ++alive;
-  }
-  ~Foo() noexcept { --alive_; }
-  boost::intrusive::set_member_hook<> idHook_;
+  public:
+    Foo(Id64 marketId, Id64 id, int& alive) noexcept
+        : Request{{}, marketId, {}, 0_jd, id, {}, Side::Buy, 0_lts, {}}, alive_{alive}
+    {
+        ++alive;
+    }
+    ~Foo() noexcept { --alive_; }
+    boost::intrusive::set_member_hook<> idHook_;
 
- private:
-  int& alive_;
+  private:
+    int& alive_;
 };
 
 using FooPtr = boost::intrusive_ptr<Foo>;
@@ -42,30 +42,30 @@ using FooPtr = boost::intrusive_ptr<Foo>;
 
 SWIRLY_TEST_CASE(RequestIdSet)
 {
-  int alive{0};
-  {
-    RequestIdSet<Foo> s;
+    int alive{0};
+    {
+        RequestIdSet<Foo> s;
 
-    FooPtr foo1{&*s.emplace(1_id64, 2_id64, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(foo1->refs() == 2);
-    SWIRLY_CHECK(foo1->marketId() == 1_id64);
-    SWIRLY_CHECK(foo1->id() == 2_id64);
-    SWIRLY_CHECK(s.find(1_id64, 2_id64) != s.end());
+        FooPtr foo1{&*s.emplace(1_id64, 2_id64, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(foo1->refs() == 2);
+        SWIRLY_CHECK(foo1->marketId() == 1_id64);
+        SWIRLY_CHECK(foo1->id() == 2_id64);
+        SWIRLY_CHECK(s.find(1_id64, 2_id64) != s.end());
 
-    // Duplicate.
-    FooPtr foo2{&*s.emplace(1_id64, 2_id64, alive)};
-    SWIRLY_CHECK(alive == 1);
-    SWIRLY_CHECK(foo2->refs() == 3);
-    SWIRLY_CHECK(foo2 == foo1);
+        // Duplicate.
+        FooPtr foo2{&*s.emplace(1_id64, 2_id64, alive)};
+        SWIRLY_CHECK(alive == 1);
+        SWIRLY_CHECK(foo2->refs() == 3);
+        SWIRLY_CHECK(foo2 == foo1);
 
-    // Replace.
-    FooPtr foo3{&*s.emplaceOrReplace(1_id64, 2_id64, alive)};
-    SWIRLY_CHECK(alive == 2);
-    SWIRLY_CHECK(foo3->refs() == 2);
-    SWIRLY_CHECK(foo3 != foo1);
-    SWIRLY_CHECK(foo3->marketId() == 1_id64);
-    SWIRLY_CHECK(foo3->id() == 2_id64);
-  }
-  SWIRLY_CHECK(alive == 0);
+        // Replace.
+        FooPtr foo3{&*s.emplaceOrReplace(1_id64, 2_id64, alive)};
+        SWIRLY_CHECK(alive == 2);
+        SWIRLY_CHECK(foo3->refs() == 2);
+        SWIRLY_CHECK(foo3 != foo1);
+        SWIRLY_CHECK(foo3->marketId() == 1_id64);
+        SWIRLY_CHECK(foo3->id() == 2_id64);
+    }
+    SWIRLY_CHECK(alive == 0);
 }

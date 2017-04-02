@@ -27,22 +27,22 @@ static_assert(sizeof(Level) <= 2 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(LevelSet)
 {
-  const Order order{"MARAYL"_sv, 1_id64,    "EURUSD"_sv, 0_jd,      0_id64, ""_sv,
-                    State::New,  Side::Buy, 10_lts,      12345_tks, 0_lts,  0_lts,
-                    0_cst,       0_lts,     0_tks,       0_lts,     {},     {}};
+    const Order order{"MARAYL"_sv, 1_id64,    "EURUSD"_sv, 0_jd,      0_id64, ""_sv,
+                      State::New,  Side::Buy, 10_lts,      12345_tks, 0_lts,  0_lts,
+                      0_cst,       0_lts,     0_tks,       0_lts,     {},     {}};
 
-  LevelSet s;
+    LevelSet s;
 
-  Level& level1{*s.emplace(order)};
-  SWIRLY_CHECK(level1.key() == -12345);
-  SWIRLY_CHECK(s.find(Side::Buy, 12345_tks) != s.end());
+    Level& level1{*s.emplace(order)};
+    SWIRLY_CHECK(level1.key() == -12345);
+    SWIRLY_CHECK(s.find(Side::Buy, 12345_tks) != s.end());
 
-  // Duplicate.
-  Level& level2{*s.emplace(order)};
-  SWIRLY_CHECK(&level2 == &level1);
+    // Duplicate.
+    Level& level2{*s.emplace(order)};
+    SWIRLY_CHECK(&level2 == &level1);
 
-  // Replace.
-  Level& level3{*s.emplaceOrReplace(order)};
-  SWIRLY_CHECK(&level3 != &level1);
-  SWIRLY_CHECK(level3.key() == -12345);
+    // Replace.
+    Level& level3{*s.emplaceOrReplace(order)};
+    SWIRLY_CHECK(&level3 != &level1);
+    SWIRLY_CHECK(level3.key() == -12345);
 }

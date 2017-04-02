@@ -24,8 +24,8 @@ namespace swirly {
 
 string getEnv(const string& name)
 {
-  const char* const val{getenv(name.c_str())};
-  return val ? string{val} : string{};
+    const char* const val{getenv(name.c_str())};
+    return val ? string{val} : string{};
 }
 
 VarSub::~VarSub() noexcept = default;
@@ -40,65 +40,65 @@ VarSub& VarSub::operator=(VarSub&&) = default;
 
 bool VarSub::substitute(string& s, const size_t i, size_t j, set<string>* outer) const
 {
-  // Position of last substitution.
-  size_t last{0};
-  // Names substituted at 'last' position.
-  set<string> inner;
+    // Position of last substitution.
+    size_t last{0};
+    // Names substituted at 'last' position.
+    set<string> inner;
 
-  int state{0};
-  while (j < s.size()) {
-    if (state == '\\') {
-      state = 0;
-      // Remove backslash.
-      s.erase(j - 1, 1);
-    } else {
-      const auto ch = s[j];
-      if (state == '$') {
-        state = 0;
-        if (ch == '{') {
-          if (j > last) {
-            // Position has advanced.
-            last = j;
-            inner.clear();
-          }
-          // Reverse to '$'.
-          --j;
-          // Descend: search for closing brace and substitute.
-          if (!substitute(s, j, j + 2, &inner)) {
-            return false;
-          }
-          continue;
+    int state{0};
+    while (j < s.size()) {
+        if (state == '\\') {
+            state = 0;
+            // Remove backslash.
+            s.erase(j - 1, 1);
+        } else {
+            const auto ch = s[j];
+            if (state == '$') {
+                state = 0;
+                if (ch == '{') {
+                    if (j > last) {
+                        // Position has advanced.
+                        last = j;
+                        inner.clear();
+                    }
+                    // Reverse to '$'.
+                    --j;
+                    // Descend: search for closing brace and substitute.
+                    if (!substitute(s, j, j + 2, &inner)) {
+                        return false;
+                    }
+                    continue;
+                }
+            }
+            switch (ch) {
+            case '$':
+            case '\\':
+                state = ch;
+                break;
+            case '}':
+                // If outer is null then the closing brace was found at the top level. I.e. there is no
+                // matching opening brace.
+                if (outer) {
+                    // Substitute variable.
+                    const auto n = j - i;
+                    auto name = s.substr(i + 2, n - 2);
+                    if (outer->count(name) == 0) {
+                        s.replace(i, n + 1, fn_(name));
+                        outer->insert(move(name));
+                    } else {
+                        // Loop detected: this name has already been substituted at this position.
+                        s.erase(i, n + 1);
+                    }
+                    // Ascend: matched closing brace.
+                    return true;
+                }
+                break;
+            }
         }
-      }
-      switch (ch) {
-      case '$':
-      case '\\':
-        state = ch;
-        break;
-      case '}':
-        // If outer is null then the closing brace was found at the top level. I.e. there is no
-        // matching opening brace.
-        if (outer) {
-          // Substitute variable.
-          const auto n = j - i;
-          auto name = s.substr(i + 2, n - 2);
-          if (outer->count(name) == 0) {
-            s.replace(i, n + 1, fn_(name));
-            outer->insert(move(name));
-          } else {
-            // Loop detected: this name has already been substituted at this position.
-            s.erase(i, n + 1);
-          }
-          // Ascend: matched closing brace.
-          return true;
-        }
-        break;
-      }
+        ++j;
     }
-    ++j;
-  }
-  // Ascend: no closing brace.
-  return false;
+    // Ascend: no closing brace.
+    return false;
 }
 
 } // swirly

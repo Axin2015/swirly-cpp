@@ -23,18 +23,18 @@ namespace ui {
 
 Level Level::fromJson(const QJsonObject& obj)
 {
-  using swirly::ui::fromJson;
-  return Level{fromJson<Ticks>(obj["ticks"]), fromJson<Lots>(obj["resd"]),
-               fromJson<int>(obj["count"])};
+    using swirly::ui::fromJson;
+    return Level{fromJson<Ticks>(obj["ticks"]), fromJson<Lots>(obj["resd"]),
+                 fromJson<int>(obj["count"])};
 }
 
 QDebug operator<<(QDebug debug, const Level& level)
 {
-  debug.nospace() << "Level{ticks=" << level.ticks() //
-                  << ",resd=" << level.resd() //
-                  << ",count=" << level.count() //
-                  << '}';
-  return debug;
+    debug.nospace() << "Level{ticks=" << level.ticks() //
+                    << ",resd=" << level.resd() //
+                    << ",count=" << level.count() //
+                    << '}';
+    return debug;
 }
 
 } // ui

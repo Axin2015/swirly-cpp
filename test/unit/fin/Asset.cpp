@@ -25,11 +25,11 @@ static_assert(sizeof(Asset) <= 3 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(AssetToString)
 {
-  Asset asset{1_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Ccy};
+    Asset asset{1_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Ccy};
 
-  SWIRLY_CHECK(toString(asset) == //
-               "{\"mnem\":\"GBP\""
-               ",\"display\":\"United Kingdom, Pounds\""
-               ",\"type\":\"CCY\""
-               "}");
+    SWIRLY_CHECK(toString(asset) == //
+                 "{\"mnem\":\"GBP\""
+                 ",\"display\":\"United Kingdom, Pounds\""
+                 ",\"type\":\"CCY\""
+                 "}");
 }

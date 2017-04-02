@@ -33,45 +33,45 @@ namespace ui {
 using namespace order;
 
 OrderView::OrderView(OrderModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_(model)
+    : QWidget{parent, f}, model_(model)
 {
-  auto form = make_unique<OrderForm>(model);
-  connect(form.get(), &OrderForm::cancelOrders, this, &OrderView::cancelOrders);
+    auto form = make_unique<OrderForm>(model);
+    connect(form.get(), &OrderForm::cancelOrders, this, &OrderView::cancelOrders);
 
-  auto table = make_unique<QTableView>();
-  {
-    auto del = makeDeleter(table->model());
-    table->setModel(&model);
-  }
-  table->resizeColumnToContents(unbox(Column::CheckState));
+    auto table = make_unique<QTableView>();
+    {
+        auto del = makeDeleter(table->model());
+        table->setModel(&model);
+    }
+    table->resizeColumnToContents(unbox(Column::CheckState));
 
-  table->setColumnHidden(unbox(Column::Accnt), true);
-  table->setColumnHidden(unbox(Column::MarketId), true);
-  table->setColumnHidden(unbox(Column::MinLots), true);
+    table->setColumnHidden(unbox(Column::Accnt), true);
+    table->setColumnHidden(unbox(Column::MarketId), true);
+    table->setColumnHidden(unbox(Column::MinLots), true);
 
-  table->setFocusPolicy(Qt::NoFocus);
-  table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::NoSelection);
+    table->setFocusPolicy(Qt::NoFocus);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::NoSelection);
 
-  connect(table.get(), &QTableView::clicked, this, &OrderView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &OrderView::slotClicked);
 
-  auto layout = make_unique<QVBoxLayout>();
-  layout->addWidget(form.release(), 0, 0);
-  layout->addWidget(table.release(), 0, 0);
-  setLayout(layout.release());
+    auto layout = make_unique<QVBoxLayout>();
+    layout->addWidget(form.release(), 0, 0);
+    layout->addWidget(table.release(), 0, 0);
+    setLayout(layout.release());
 }
 
 OrderView::~OrderView() noexcept = default;
 
 void OrderView::slotClicked(const QModelIndex& index)
 {
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    model_.toggleCheckState(index.row());
-  }
-  const auto& order = model_.valueAt(index.row());
-  const auto lots = order.resd() > 0_lts ? order.resd() : order.lots();
-  const auto ticks = order.ticks();
-  emit setFields(order.contr().mnem(), order.settlDate(), lots, ticks);
+    if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+        model_.toggleCheckState(index.row());
+    }
+    const auto& order = model_.valueAt(index.row());
+    const auto lots = order.resd() > 0_lts ? order.resd() : order.lots();
+    const auto ticks = order.ticks();
+    emit setFields(order.contr().mnem(), order.settlDate(), lots, ticks);
 }
 
 } // ui

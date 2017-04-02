@@ -32,49 +32,49 @@ namespace ui {
 using namespace exec;
 
 ExecView::ExecView(ExecModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_(model)
+    : QWidget{parent, f}, model_(model)
 {
-  auto table = make_unique<QTableView>();
-  {
-    auto del = makeDeleter(table->model());
-    table->setModel(&model);
-  }
-  table->resizeColumnToContents(unbox(Column::CheckState));
+    auto table = make_unique<QTableView>();
+    {
+        auto del = makeDeleter(table->model());
+        table->setModel(&model);
+    }
+    table->resizeColumnToContents(unbox(Column::CheckState));
 
-  table->setColumnHidden(unbox(Column::CheckState), true);
-  table->setColumnHidden(unbox(Column::Accnt), true);
-  table->setColumnHidden(unbox(Column::MarketId), true);
-  table->setColumnHidden(unbox(Column::MinLots), true);
+    table->setColumnHidden(unbox(Column::CheckState), true);
+    table->setColumnHidden(unbox(Column::Accnt), true);
+    table->setColumnHidden(unbox(Column::MarketId), true);
+    table->setColumnHidden(unbox(Column::MinLots), true);
 
-  table->setFocusPolicy(Qt::NoFocus);
-  table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::NoSelection);
+    table->setFocusPolicy(Qt::NoFocus);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::NoSelection);
 
-  connect(table.get(), &QTableView::clicked, this, &ExecView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &ExecView::slotClicked);
 
-  auto layout = make_unique<QGridLayout>();
-  layout->addWidget(table.release(), 0, 0);
-  setLayout(layout.release());
+    auto layout = make_unique<QGridLayout>();
+    layout->addWidget(table.release(), 0, 0);
+    setLayout(layout.release());
 }
 
 ExecView::~ExecView() noexcept = default;
 
 void ExecView::slotClicked(const QModelIndex& index)
 {
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    model_.toggleCheckState(index.row());
-  }
-  optional<Lots> lots;
-  optional<Ticks> ticks;
-  const auto& exec = model_.valueAt(index.row());
-  if (exec.matchId() != 0_id64) {
-    lots = exec.lastLots();
-    ticks = exec.lastTicks();
-  } else {
-    lots = exec.resd() > 0_lts ? exec.resd() : exec.lots();
-    ticks = exec.ticks();
-  }
-  emit setFields(exec.contr().mnem(), exec.settlDate(), lots, ticks);
+    if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+        model_.toggleCheckState(index.row());
+    }
+    optional<Lots> lots;
+    optional<Ticks> ticks;
+    const auto& exec = model_.valueAt(index.row());
+    if (exec.matchId() != 0_id64) {
+        lots = exec.lastLots();
+        ticks = exec.lastTicks();
+    } else {
+        lots = exec.resd() > 0_lts ? exec.resd() : exec.lots();
+        ticks = exec.ticks();
+    }
+    emit setFields(exec.contr().mnem(), exec.settlDate(), lots, ticks);
 }
 
 } // ui

@@ -32,41 +32,41 @@ namespace ui {
 using namespace exec;
 
 TradeView::TradeView(TradeModel& model, QWidget* parent, Qt::WindowFlags f)
-  : QWidget{parent, f}, model_(model)
+    : QWidget{parent, f}, model_(model)
 {
-  auto table = make_unique<QTableView>();
-  {
-    auto del = makeDeleter(table->model());
-    table->setModel(&model);
-  }
-  table->resizeColumnToContents(unbox(Column::CheckState));
+    auto table = make_unique<QTableView>();
+    {
+        auto del = makeDeleter(table->model());
+        table->setModel(&model);
+    }
+    table->resizeColumnToContents(unbox(Column::CheckState));
 
-  table->setColumnHidden(unbox(Column::Accnt), true);
-  table->setColumnHidden(unbox(Column::MarketId), true);
-  table->setColumnHidden(unbox(Column::MinLots), true);
+    table->setColumnHidden(unbox(Column::Accnt), true);
+    table->setColumnHidden(unbox(Column::MarketId), true);
+    table->setColumnHidden(unbox(Column::MinLots), true);
 
-  table->setFocusPolicy(Qt::NoFocus);
-  table->setSelectionBehavior(QAbstractItemView::SelectRows);
-  table->setSelectionMode(QAbstractItemView::NoSelection);
+    table->setFocusPolicy(Qt::NoFocus);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::NoSelection);
 
-  connect(table.get(), &QTableView::clicked, this, &TradeView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &TradeView::slotClicked);
 
-  auto layout = make_unique<QGridLayout>();
-  layout->addWidget(table.release(), 0, 0);
-  setLayout(layout.release());
+    auto layout = make_unique<QGridLayout>();
+    layout->addWidget(table.release(), 0, 0);
+    setLayout(layout.release());
 }
 
 TradeView::~TradeView() noexcept = default;
 
 void TradeView::slotClicked(const QModelIndex& index)
 {
-  if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
-    model_.toggleCheckState(index.row());
-  }
-  const auto& trade = model_.valueAt(index.row());
-  const auto lots = trade.resd() > 0_lts ? trade.resd() : trade.lots();
-  const auto ticks = trade.ticks();
-  emit setFields(trade.contr().mnem(), trade.settlDate(), lots, ticks);
+    if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
+        model_.toggleCheckState(index.row());
+    }
+    const auto& trade = model_.valueAt(index.row());
+    const auto lots = trade.resd() > 0_lts ? trade.resd() : trade.lots();
+    const auto ticks = trade.ticks();
+    emit setFields(trade.contr().mnem(), trade.settlDate(), lots, ticks);
 }
 
 } // ui

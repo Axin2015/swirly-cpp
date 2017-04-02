@@ -27,21 +27,21 @@ using IntPipe = Pipe<int>;
 
 void producer(IntPipe& p)
 {
-  for (int i{1}; i <= 100; ++i) {
-    p.write([i](int& ref) { ref = i; });
-  }
-  p.close();
+    for (int i{1}; i <= 100; ++i) {
+        p.write([i](int& ref) { ref = i; });
+    }
+    p.close();
 }
 
 } // anonymous
 
 SWIRLY_TEST_CASE(Pipe)
 {
-  IntPipe p{1 << 4};
-  thread t{producer, ref(p)};
-  int sum{0};
-  while (p.read([&sum](int i) { sum += i; }))
-    ;
-  t.join();
-  SWIRLY_CHECK(sum == 5050);
+    IntPipe p{1 << 4};
+    thread t{producer, ref(p)};
+    int sum{0};
+    while (p.read([&sum](int i) { sum += i; }))
+        ;
+    t.join();
+    SWIRLY_CHECK(sum == 5050);
 }

@@ -22,24 +22,24 @@
 namespace swirly {
 
 struct Match {
-  Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade, const PosnPtr& makerPosn,
-        const ExecPtr& takerTrade) noexcept;
+    Match(Lots lots, const OrderPtr& makerOrder, const ExecPtr& makerTrade,
+          const PosnPtr& makerPosn, const ExecPtr& takerTrade) noexcept;
 
-  ~Match() noexcept;
+    ~Match() noexcept;
 
-  // Copy.
-  Match(const Match&);
-  Match& operator=(const Match&) = delete;
+    // Copy.
+    Match(const Match&);
+    Match& operator=(const Match&) = delete;
 
-  // Move.
-  Match(Match&&);
-  Match& operator=(Match&&) = delete;
+    // Move.
+    Match(Match&&);
+    Match& operator=(Match&&) = delete;
 
-  const Lots lots;
-  const OrderPtr makerOrder;
-  const ExecPtr makerTrade;
-  const PosnPtr makerPosn;
-  const ExecPtr takerTrade;
+    const Lots lots;
+    const OrderPtr makerOrder;
+    const ExecPtr makerTrade;
+    const PosnPtr makerPosn;
+    const ExecPtr takerTrade;
 };
 
 } // swirly

@@ -33,66 +33,66 @@ namespace swirly {
 template <typename FnT>
 void parsePairs(std::istream& is, FnT fn)
 {
-  std::string line;
-  while (std::getline(is, line)) {
+    std::string line;
+    while (std::getline(is, line)) {
 
-    trim(line);
+        trim(line);
 
-    // Ignore empty lines and comments.
+        // Ignore empty lines and comments.
 
-    if (line.empty() || line[0] == '#') {
-      continue;
+        if (line.empty() || line[0] == '#') {
+            continue;
+        }
+
+        std::string key, val;
+        std::tie(key, val) = splitPair(line, '=');
+        rtrim(key);
+        ltrim(val);
+
+        fn(key, val);
     }
-
-    std::string key, val;
-    std::tie(key, val) = splitPair(line, '=');
-    rtrim(key);
-    ltrim(val);
-
-    fn(key, val);
-  }
 }
 
 /**
  * Simple config reader with environment variable substitution.
  */
 class SWIRLY_API Conf {
- public:
-  explicit Conf(std::istream& is) { read(is); }
+  public:
+    explicit Conf(std::istream& is) { read(is); }
 
-  Conf();
-  ~Conf() noexcept;
+    Conf();
+    ~Conf() noexcept;
 
-  // Copy.
-  Conf(const Conf&);
-  Conf& operator=(const Conf&);
+    // Copy.
+    Conf(const Conf&);
+    Conf& operator=(const Conf&);
 
-  // Move.
-  Conf(Conf&&);
-  Conf& operator=(Conf&&);
+    // Move.
+    Conf(Conf&&);
+    Conf& operator=(Conf&&);
 
-  const char* get(const char* key, const char* dfl) const noexcept
-  {
-    auto it = map_.find(key);
-    return it != map_.end() ? it->second.c_str() : dfl;
-  }
-  bool get(const char* key, bool dfl) const noexcept
-  {
-    auto it = map_.find(key);
-    return it != map_.end() ? stob(it->second, dfl) : dfl;
-  }
-  template <typename ValueT, typename = std::enable_if_t<std::is_arithmetic<ValueT>::value>>
-  ValueT get(const char* key, ValueT dfl) const noexcept
-  {
-    auto it = map_.find(key);
-    return it != map_.end() ? numericCast<ValueT>(it->second.c_str()) : dfl;
-  }
-  void clear() noexcept { map_.clear(); }
-  void read(std::istream& is);
-  void set(std::string key, std::string val) { map_.emplace(std::move(key), std::move(val)); }
+    const char* get(const char* key, const char* dfl) const noexcept
+    {
+        auto it = map_.find(key);
+        return it != map_.end() ? it->second.c_str() : dfl;
+    }
+    bool get(const char* key, bool dfl) const noexcept
+    {
+        auto it = map_.find(key);
+        return it != map_.end() ? stob(it->second, dfl) : dfl;
+    }
+    template <typename ValueT, typename = std::enable_if_t<std::is_arithmetic<ValueT>::value>>
+    ValueT get(const char* key, ValueT dfl) const noexcept
+    {
+        auto it = map_.find(key);
+        return it != map_.end() ? numericCast<ValueT>(it->second.c_str()) : dfl;
+    }
+    void clear() noexcept { map_.clear(); }
+    void read(std::istream& is);
+    void set(std::string key, std::string val) { map_.emplace(std::move(key), std::move(val)); }
 
- private:
-  boost::container::flat_map<std::string, std::string> map_;
+  private:
+    boost::container::flat_map<std::string, std::string> map_;
 };
 
 } // swirly

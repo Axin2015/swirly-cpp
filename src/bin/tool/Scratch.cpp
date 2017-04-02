@@ -27,11 +27,11 @@ namespace {
 
 int main(int argc, char* argv[])
 {
-  int ret = 1;
-  try {
-    ret = 0;
-  } catch (const exception& e) {
-    SWIRLY_ERROR(logMsg() << "exception: " << e.what());
-  }
-  return ret;
+    int ret = 1;
+    try {
+        ret = 0;
+    } catch (const exception& e) {
+        SWIRLY_ERROR(logMsg() << "exception: " << e.what());
+    }
+    return ret;
 }

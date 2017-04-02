@@ -24,28 +24,28 @@ namespace ui {
 
 template <typename ValueT>
 class Row {
- public:
-  explicit Row(std::uint64_t tag = 0, const ValueT& value = ValueT{}) noexcept : value_{value}
-  {
-    tag_ = tag;
-    checked_ = 0;
-  }
-  ~Row() noexcept = default;
+  public:
+    explicit Row(std::uint64_t tag = 0, const ValueT& value = ValueT{}) noexcept : value_{value}
+    {
+        tag_ = tag;
+        checked_ = 0;
+    }
+    ~Row() noexcept = default;
 
-  std::uint64_t tag() const noexcept { return tag_; }
-  bool checked() const noexcept { return checked_ == 1; }
-  const ValueT& value() const noexcept { return value_; }
+    std::uint64_t tag() const noexcept { return tag_; }
+    bool checked() const noexcept { return checked_ == 1; }
+    const ValueT& value() const noexcept { return value_; }
 
-  void setTag(std::uint64_t tag) noexcept { tag_ = tag; }
-  void setChecked(bool checked = true) noexcept { checked_ = checked ? 1 : 0; }
-  void setValue(const ValueT& value) noexcept { value_ = value; }
+    void setTag(std::uint64_t tag) noexcept { tag_ = tag; }
+    void setChecked(bool checked = true) noexcept { checked_ = checked ? 1 : 0; }
+    void setValue(const ValueT& value) noexcept { value_ = value; }
 
- private:
-  struct {
-    std::uint64_t tag_ : 63;
-    std::uint64_t checked_ : 1;
-  };
-  ValueT value_;
+  private:
+    struct {
+        std::uint64_t tag_ : 63;
+        std::uint64_t checked_ : 1;
+    };
+    ValueT value_;
 };
 
 } // ui

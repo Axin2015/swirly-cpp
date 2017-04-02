@@ -30,21 +30,21 @@ class Exec;
 class TradeModel;
 
 class TradeView : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~TradeView() noexcept override;
+  public:
+    TradeView(TradeModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~TradeView() noexcept override;
 
- signals:
-  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
-                 std::optional<Ticks> ticks);
+  signals:
+    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                   std::optional<Ticks> ticks);
 
- private slots:
-  void slotClicked(const QModelIndex& index);
+  private slots:
+    void slotClicked(const QModelIndex& index);
 
- private:
-  TradeModel& model_;
+  private:
+    TradeModel& model_;
 };
 
 } // ui

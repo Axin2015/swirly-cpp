@@ -30,35 +30,35 @@ enum class Test : int { Foo = 1, Bar = 2, Baz = 4, Qux = 8 };
 
 constexpr Test operator""_test(unsigned long long val) noexcept
 {
-  return box<Test>(val);
+    return box<Test>(val);
 }
 
 const char* enumString(Test t)
 {
-  switch (t) {
-  case Test::Foo:
-    return "FOO";
-  case Test::Bar:
-    return "BAR";
-  case Test::Baz:
-    return "BAZ";
-  case Test::Qux:
-    return "QUX";
-  }
-  terminate();
+    switch (t) {
+    case Test::Foo:
+        return "FOO";
+    case Test::Bar:
+        return "BAR";
+    case Test::Baz:
+        return "BAZ";
+    case Test::Qux:
+        return "QUX";
+    }
+    terminate();
 }
 
 inline ostream& operator<<(ostream& os, Test t)
 {
-  return os << enumString(t);
+    return os << enumString(t);
 }
 
 } // swirly
 
 SWIRLY_TEST_CASE(EnumString)
 {
-  SWIRLY_CHECK(lexical_cast<string>(Test::Foo) == "FOO");
-  SWIRLY_CHECK(lexical_cast<string>(Test::Bar) == "BAR");
-  SWIRLY_CHECK(lexical_cast<string>(Test::Baz) == "BAZ");
-  SWIRLY_CHECK(lexical_cast<string>(Test::Qux) == "QUX");
+    SWIRLY_CHECK(lexical_cast<string>(Test::Foo) == "FOO");
+    SWIRLY_CHECK(lexical_cast<string>(Test::Bar) == "BAR");
+    SWIRLY_CHECK(lexical_cast<string>(Test::Baz) == "BAZ");
+    SWIRLY_CHECK(lexical_cast<string>(Test::Qux) == "QUX");
 }

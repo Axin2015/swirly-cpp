@@ -24,27 +24,27 @@ namespace swirly {
 namespace ui {
 
 class ContrModel
-  : public TableModel<QString, Contr, unbox(contr::Column::CheckState), contr::ColumnCount> {
- public:
-  ContrModel(QObject* parent = nullptr);
-  ~ContrModel() noexcept override;
+    : public TableModel<QString, Contr, unbox(contr::Column::CheckState), contr::ColumnCount> {
+  public:
+    ContrModel(QObject* parent = nullptr);
+    ~ContrModel() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  Contr find(const QString& mnem) const;
+    Contr find(const QString& mnem) const;
 
-  int indexOf(const QString& mnem) const;
+    int indexOf(const QString& mnem) const;
 
-  void removeRow(const Contr& contr) { TableModel::removeRow(contr.mnem()); }
-  void updateRow(std::uint64_t tag, const Contr& contr)
-  {
-    TableModel::updateRow(contr.mnem(), tag, contr);
-  }
+    void removeRow(const Contr& contr) { TableModel::removeRow(contr.mnem()); }
+    void updateRow(std::uint64_t tag, const Contr& contr)
+    {
+        TableModel::updateRow(contr.mnem(), tag, contr);
+    }
 
- private:
-  QVariant header_[contr::ColumnCount];
+  private:
+    QVariant header_[contr::ColumnCount];
 };
 
 } // ui

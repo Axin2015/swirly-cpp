@@ -27,45 +27,45 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(ParseQueryNone)
 {
-  auto page = parseQuery(""_sv);
-  SWIRLY_CHECK(page.offset == 0);
-  SWIRLY_CHECK(!page.limit);
+    auto page = parseQuery(""_sv);
+    SWIRLY_CHECK(page.offset == 0);
+    SWIRLY_CHECK(!page.limit);
 }
 
 SWIRLY_TEST_CASE(ParseQueryOffset)
 {
-  auto page = parseQuery("offset=1"_sv);
-  SWIRLY_CHECK(page.offset == 1);
-  SWIRLY_CHECK(!page.limit);
+    auto page = parseQuery("offset=1"_sv);
+    SWIRLY_CHECK(page.offset == 1);
+    SWIRLY_CHECK(!page.limit);
 }
 
 SWIRLY_TEST_CASE(ParseQueryLimit)
 {
-  auto page = parseQuery("limit=2"_sv);
-  SWIRLY_CHECK(page.offset == 0);
-  SWIRLY_CHECK(page.limit);
-  SWIRLY_CHECK(*page.limit == 2);
+    auto page = parseQuery("limit=2"_sv);
+    SWIRLY_CHECK(page.offset == 0);
+    SWIRLY_CHECK(page.limit);
+    SWIRLY_CHECK(*page.limit == 2);
 }
 
 SWIRLY_TEST_CASE(ParseQueryOffsetAndLimit)
 {
-  auto page = parseQuery("offset=1&limit=2"_sv);
-  SWIRLY_CHECK(page.offset == 1);
-  SWIRLY_CHECK(page.limit);
-  SWIRLY_CHECK(*page.limit == 2);
+    auto page = parseQuery("offset=1&limit=2"_sv);
+    SWIRLY_CHECK(page.offset == 1);
+    SWIRLY_CHECK(page.limit);
+    SWIRLY_CHECK(*page.limit == 2);
 }
 
 SWIRLY_TEST_CASE(ParseQueryLimitAndOffset)
 {
-  auto page = parseQuery("limit=2&offset=1"_sv);
-  SWIRLY_CHECK(page.offset == 1);
-  SWIRLY_CHECK(page.limit);
-  SWIRLY_CHECK(*page.limit == 2);
+    auto page = parseQuery("limit=2&offset=1"_sv);
+    SWIRLY_CHECK(page.offset == 1);
+    SWIRLY_CHECK(page.limit);
+    SWIRLY_CHECK(*page.limit == 2);
 }
 
 SWIRLY_TEST_CASE(ParseQueryOther)
 {
-  auto page = parseQuery("foo=1&bar=2"_sv);
-  SWIRLY_CHECK(page.offset == 0);
-  SWIRLY_CHECK(!page.limit);
+    auto page = parseQuery("foo=1&bar=2"_sv);
+    SWIRLY_CHECK(page.offset == 0);
+    SWIRLY_CHECK(!page.limit);
 }

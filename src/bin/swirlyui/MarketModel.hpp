@@ -24,27 +24,27 @@ namespace swirly {
 namespace ui {
 
 class MarketModel
-  : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
- public:
-  MarketModel(QObject* parent = nullptr);
-  ~MarketModel() noexcept override;
+    : public TableModel<Id64, Market, unbox(market::Column::CheckState), market::ColumnCount> {
+  public:
+    MarketModel(QObject* parent = nullptr);
+    ~MarketModel() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  Market find(Id64 id) const;
+    Market find(Id64 id) const;
 
-  int indexOf(Id64 id) const;
+    int indexOf(Id64 id) const;
 
-  void removeRow(const Market& market) { TableModel::removeRow(market.id()); }
-  void updateRow(std::uint64_t tag, const Market& market)
-  {
-    TableModel::updateRow(market.id(), tag, market);
-  }
+    void removeRow(const Market& market) { TableModel::removeRow(market.id()); }
+    void updateRow(std::uint64_t tag, const Market& market)
+    {
+        TableModel::updateRow(market.id(), tag, market);
+    }
 
- private:
-  QVariant header_[market::ColumnCount];
+  private:
+    QVariant header_[market::ColumnCount];
 };
 
 } // ui

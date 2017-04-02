@@ -30,23 +30,23 @@ class Order;
 class OrderModel;
 
 class OrderView : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  explicit OrderView(OrderModel& model, QWidget* parent = nullptr,
-                     Qt::WindowFlags f = Qt::WindowFlags{});
-  ~OrderView() noexcept override;
+  public:
+    explicit OrderView(OrderModel& model, QWidget* parent = nullptr,
+                       Qt::WindowFlags f = Qt::WindowFlags{});
+    ~OrderView() noexcept override;
 
- signals:
-  void cancelOrders(const OrderKeys& keys);
-  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
-                 std::optional<Ticks> ticks);
+  signals:
+    void cancelOrders(const OrderKeys& keys);
+    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                   std::optional<Ticks> ticks);
 
- private slots:
-  void slotClicked(const QModelIndex& index);
+  private slots:
+    void slotClicked(const QModelIndex& index);
 
- private:
-  OrderModel& model_;
+  private:
+    OrderModel& model_;
 };
 
 } // ui

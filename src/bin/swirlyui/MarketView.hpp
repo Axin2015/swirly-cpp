@@ -33,27 +33,27 @@ class MarketForm;
 class MarketModel;
 
 class MarketView : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  MarketView(ContrModel& contrModel, MarketModel& model, QWidget* parent = nullptr,
-             Qt::WindowFlags f = Qt::WindowFlags{});
-  ~MarketView() noexcept override;
+  public:
+    MarketView(ContrModel& contrModel, MarketModel& model, QWidget* parent = nullptr,
+               Qt::WindowFlags f = Qt::WindowFlags{});
+    ~MarketView() noexcept override;
 
-  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
-                 std::optional<Ticks> ticks);
+    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                   std::optional<Ticks> ticks);
 
- signals:
-  void createMarket(const Contr& contr, QDate settlDate);
-  void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
-                   Ticks ticks);
+  signals:
+    void createMarket(const Contr& contr, QDate settlDate);
+    void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+                     Ticks ticks);
 
- private slots:
-  void slotClicked(const QModelIndex& index);
+  private slots:
+    void slotClicked(const QModelIndex& index);
 
- private:
-  MarketModel& model_;
-  MarketForm* marketForm_{nullptr};
+  private:
+    MarketModel& model_;
+    MarketForm* marketForm_{nullptr};
 };
 
 } // ui

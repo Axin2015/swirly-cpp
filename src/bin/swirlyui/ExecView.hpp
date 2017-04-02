@@ -30,21 +30,21 @@ class Exec;
 class ExecModel;
 
 class ExecView : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  ExecView(ExecModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~ExecView() noexcept override;
+  public:
+    ExecView(ExecModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~ExecView() noexcept override;
 
- signals:
-  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
-                 std::optional<Ticks> ticks);
+  signals:
+    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                   std::optional<Ticks> ticks);
 
- private slots:
-  void slotClicked(const QModelIndex& index);
+  private slots:
+    void slotClicked(const QModelIndex& index);
 
- private:
-  ExecModel& model_;
+  private:
+    ExecModel& model_;
 };
 
 } // ui

@@ -28,44 +28,44 @@ namespace swirly {
  * A statistical profile of observations.
  */
 class SWIRLY_API Profile {
- public:
-  Profile(std::string_view name) noexcept : name_{name} {}
-  ~Profile() noexcept;
+  public:
+    Profile(std::string_view name) noexcept : name_{name} {}
+    ~Profile() noexcept;
 
-  // Copy.
-  Profile(const Profile& rhs) noexcept = default;
-  Profile& operator=(const Profile& rhs) noexcept = default;
+    // Copy.
+    Profile(const Profile& rhs) noexcept = default;
+    Profile& operator=(const Profile& rhs) noexcept = default;
 
-  // Move.
-  Profile(Profile&&) noexcept = default;
-  Profile& operator=(Profile&&) noexcept = default;
+    // Move.
+    Profile(Profile&&) noexcept = default;
+    Profile& operator=(Profile&&) noexcept = default;
 
-  /**
-   * Write report to log if sufficient observations exists.
-   */
-  void report() const noexcept;
-  /**
-   * @return true if there are no observations.
-   */
-  bool empty() const noexcept { return var_.empty(); }
-  /**
-   * @return the number of observations.
-   */
-  std::size_t size() const noexcept { return var_.size(); }
-  /**
-   * Clear profile.
-   */
-  void clear() noexcept { var_.clear(); }
-  /**
-   * Add observation to profile.
-   *
-   * @param val The observation.
-   */
-  void record(double val) noexcept;
+    /**
+     * Write report to log if sufficient observations exists.
+     */
+    void report() const noexcept;
+    /**
+     * @return true if there are no observations.
+     */
+    bool empty() const noexcept { return var_.empty(); }
+    /**
+     * @return the number of observations.
+     */
+    std::size_t size() const noexcept { return var_.size(); }
+    /**
+     * Clear profile.
+     */
+    void clear() noexcept { var_.clear(); }
+    /**
+     * Add observation to profile.
+     *
+     * @param val The observation.
+     */
+    void record(double val) noexcept;
 
- private:
-  String<16> name_;
-  VarAccum var_;
+  private:
+    String<16> name_;
+    VarAccum var_;
 };
 
 /**
@@ -73,24 +73,24 @@ class SWIRLY_API Profile {
  * elapsed time is recorded in the Profile object during destruction.
  */
 class SWIRLY_API TimeRecorder {
- public:
-  explicit TimeRecorder(Profile& profile) noexcept
-    : profile_(profile), start_{std::chrono::high_resolution_clock::now()}
-  {
-  }
-  ~TimeRecorder() noexcept;
+  public:
+    explicit TimeRecorder(Profile& profile) noexcept
+        : profile_(profile), start_{std::chrono::high_resolution_clock::now()}
+    {
+    }
+    ~TimeRecorder() noexcept;
 
-  // Copy.
-  TimeRecorder(const TimeRecorder& rhs) = delete;
-  TimeRecorder& operator=(const TimeRecorder& rhs) = delete;
+    // Copy.
+    TimeRecorder(const TimeRecorder& rhs) = delete;
+    TimeRecorder& operator=(const TimeRecorder& rhs) = delete;
 
-  // Move.
-  TimeRecorder(TimeRecorder&&) = delete;
-  TimeRecorder& operator=(TimeRecorder&&) = delete;
+    // Move.
+    TimeRecorder(TimeRecorder&&) = delete;
+    TimeRecorder& operator=(TimeRecorder&&) = delete;
 
- private:
-  Profile& profile_;
-  std::chrono::time_point<std::chrono::high_resolution_clock> start_;
+  private:
+    Profile& profile_;
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_;
 };
 
 } // swirly

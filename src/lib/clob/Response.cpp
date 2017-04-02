@@ -43,74 +43,74 @@ Response& Response::operator=(Response&&) noexcept = default;
 
 void Response::toJson(ostream& os) const
 {
-  os << "{\"market\":";
-  if (market_) {
-    market_->toJson(os);
-  } else {
-    os << "null";
-  }
-  os << ",\"orders\":[";
-  transform(orders_.begin(), orders_.end(), OStreamJoiner(os, ','),
-            [](const auto& ptr) -> const auto& { return *ptr; });
-  os << "],\"execs\":[";
-  transform(execs_.rbegin(), execs_.rend(), OStreamJoiner(os, ','),
-            [](const auto& ptr) -> const auto& { return *ptr; });
-  os << "],\"posn\":";
-  if (posn_) {
-    os << *posn_;
-  } else {
-    os << "null";
-  }
-  os << '}';
+    os << "{\"market\":";
+    if (market_) {
+        market_->toJson(os);
+    } else {
+        os << "null";
+    }
+    os << ",\"orders\":[";
+    transform(orders_.begin(), orders_.end(), OStreamJoiner(os, ','),
+              [](const auto& ptr) -> const auto& { return *ptr; });
+    os << "],\"execs\":[";
+    transform(execs_.rbegin(), execs_.rend(), OStreamJoiner(os, ','),
+              [](const auto& ptr) -> const auto& { return *ptr; });
+    os << "],\"posn\":";
+    if (posn_) {
+        os << *posn_;
+    } else {
+        os << "null";
+    }
+    os << '}';
 }
 
 ConstMarketPtr Response::market() const noexcept
 {
-  return market_;
+    return market_;
 }
 
 ConstPosnPtr Response::posn() const noexcept
 {
-  return posn_;
+    return posn_;
 }
 
 void Response::clear() noexcept
 {
-  market_ = nullptr;
-  orders_.clear();
-  execs_.clear();
-  posn_ = nullptr;
+    market_ = nullptr;
+    orders_.clear();
+    execs_.clear();
+    posn_ = nullptr;
 }
 
 void Response::clearMatches() noexcept
 {
-  if (!orders_.empty()) {
-    orders_.resize(1);
-  }
-  if (!execs_.empty()) {
-    execs_.resize(1);
-  }
-  posn_ = nullptr;
+    if (!orders_.empty()) {
+        orders_.resize(1);
+    }
+    if (!execs_.empty()) {
+        execs_.resize(1);
+    }
+    posn_ = nullptr;
 }
 
 void Response::setMarket(const ConstMarketPtr& market) noexcept
 {
-  market_ = market;
+    market_ = market;
 }
 
 void Response::insertOrder(const ConstOrderPtr& order)
 {
-  orders_.push_back(order);
+    orders_.push_back(order);
 }
 
 void Response::insertExec(const ConstExecPtr& exec)
 {
-  execs_.push_back(exec);
+    execs_.push_back(exec);
 }
 
 void Response::setPosn(const ConstPosnPtr& posn) noexcept
 {
-  posn_ = posn;
+    posn_ = posn;
 }
 
 } // swirly

@@ -26,45 +26,45 @@ using namespace swirly;
 namespace {
 
 class UrlString : public BasicUrl<UrlString> {
- public:
-  explicit UrlString(const string& url) : url_{url} { parse(); }
-  const auto& url() const noexcept { return url_; }
+  public:
+    explicit UrlString(const string& url) : url_{url} { parse(); }
+    const auto& url() const noexcept { return url_; }
 
- private:
-  string url_;
+  private:
+    string url_;
 };
 
 class UrlStringView : public BasicUrl<UrlStringView> {
- public:
-  explicit UrlStringView(const string_view& url) : url_{url} { parse(); }
-  const auto& url() const noexcept { return url_; }
+  public:
+    explicit UrlStringView(const string_view& url) : url_{url} { parse(); }
+    const auto& url() const noexcept { return url_; }
 
- private:
-  string_view url_;
+  private:
+    string_view url_;
 };
 
 } // anonymous
 
 SWIRLY_TEST_CASE(UrlString)
 {
-  UrlString url{"http://www.swirlycloud.com:8080/accnt/exec?offset=3&limit5"s};
-  SWIRLY_CHECK(url.schema() == "http"s);
-  SWIRLY_CHECK(url.host() == "www.swirlycloud.com"s);
-  SWIRLY_CHECK(url.port() == "8080"s);
-  SWIRLY_CHECK(url.path() == "/accnt/exec"s);
-  SWIRLY_CHECK(url.query() == "offset=3&limit5"s);
-  SWIRLY_CHECK(url.fragment().empty());
-  SWIRLY_CHECK(url.userInfo().empty());
+    UrlString url{"http://www.swirlycloud.com:8080/accnt/exec?offset=3&limit5"s};
+    SWIRLY_CHECK(url.schema() == "http"s);
+    SWIRLY_CHECK(url.host() == "www.swirlycloud.com"s);
+    SWIRLY_CHECK(url.port() == "8080"s);
+    SWIRLY_CHECK(url.path() == "/accnt/exec"s);
+    SWIRLY_CHECK(url.query() == "offset=3&limit5"s);
+    SWIRLY_CHECK(url.fragment().empty());
+    SWIRLY_CHECK(url.userInfo().empty());
 }
 
 SWIRLY_TEST_CASE(UrlStringView)
 {
-  UrlStringView url{"http://www.swirlycloud.com:8080/accnt/exec?offset=3&limit5"_sv};
-  SWIRLY_CHECK(url.schema() == "http"_sv);
-  SWIRLY_CHECK(url.host() == "www.swirlycloud.com"_sv);
-  SWIRLY_CHECK(url.port() == "8080"_sv);
-  SWIRLY_CHECK(url.path() == "/accnt/exec"_sv);
-  SWIRLY_CHECK(url.query() == "offset=3&limit5"_sv);
-  SWIRLY_CHECK(url.fragment().empty());
-  SWIRLY_CHECK(url.userInfo().empty());
+    UrlStringView url{"http://www.swirlycloud.com:8080/accnt/exec?offset=3&limit5"_sv};
+    SWIRLY_CHECK(url.schema() == "http"_sv);
+    SWIRLY_CHECK(url.host() == "www.swirlycloud.com"_sv);
+    SWIRLY_CHECK(url.port() == "8080"_sv);
+    SWIRLY_CHECK(url.path() == "/accnt/exec"_sv);
+    SWIRLY_CHECK(url.query() == "offset=3&limit5"_sv);
+    SWIRLY_CHECK(url.fragment().empty());
+    SWIRLY_CHECK(url.userInfo().empty());
 }

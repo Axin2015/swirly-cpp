@@ -28,25 +28,25 @@ namespace {
 
 int bit(string_view sv)
 {
-  int i;
-  if (sv == "asset") {
-    i = EntitySet::Asset;
-  } else if (sv == "contr") {
-    i = EntitySet::Contr;
-  } else if (sv == "market") {
-    i = EntitySet::Market;
-  } else if (sv == "order") {
-    i = EntitySet::Order;
-  } else if (sv == "exec") {
-    i = EntitySet::Exec;
-  } else if (sv == "trade") {
-    i = EntitySet::Trade;
-  } else if (sv == "posn") {
-    i = EntitySet::Posn;
-  } else {
-    throw NotFoundException{errMsg() << "unknown entity '" << sv << '\''};
-  }
-  return i;
+    int i;
+    if (sv == "asset") {
+        i = EntitySet::Asset;
+    } else if (sv == "contr") {
+        i = EntitySet::Contr;
+    } else if (sv == "market") {
+        i = EntitySet::Market;
+    } else if (sv == "order") {
+        i = EntitySet::Order;
+    } else if (sv == "exec") {
+        i = EntitySet::Exec;
+    } else if (sv == "trade") {
+        i = EntitySet::Trade;
+    } else if (sv == "posn") {
+        i = EntitySet::Posn;
+    } else {
+        throw NotFoundException{errMsg() << "unknown entity '" << sv << '\''};
+    }
+    return i;
 }
 
 } // anonymous
@@ -55,13 +55,13 @@ EntitySet::~EntitySet() noexcept = default;
 
 EntitySet EntitySet::parse(string_view sv)
 {
-  int bs{0};
-  Tokeniser toks{sv, ","_sv};
-  while (!toks.empty()) {
-    bs |= bit(toks.top());
-    toks.pop();
-  }
-  return {bs};
+    int bs{0};
+    Tokeniser toks{sv, ","_sv};
+    while (!toks.empty()) {
+        bs |= bit(toks.top());
+        toks.pop();
+    }
+    return {bs};
 }
 
 } // swirly

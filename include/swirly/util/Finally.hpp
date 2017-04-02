@@ -23,25 +23,25 @@ namespace swirly {
 
 template <typename FnT>
 class Finally {
- public:
-  explicit Finally(FnT fn) noexcept : fn_{std::move(fn)} {}
-  ~Finally() noexcept { fn_(); }
-  // Copy.
-  Finally(const Finally&) = delete;
-  Finally& operator=(const Finally&) = delete;
+  public:
+    explicit Finally(FnT fn) noexcept : fn_{std::move(fn)} {}
+    ~Finally() noexcept { fn_(); }
+    // Copy.
+    Finally(const Finally&) = delete;
+    Finally& operator=(const Finally&) = delete;
 
-  // Move.
-  Finally(Finally&&) = default;
-  Finally& operator=(Finally&&) = delete;
+    // Move.
+    Finally(Finally&&) = default;
+    Finally& operator=(Finally&&) = delete;
 
- private:
-  FnT fn_;
+  private:
+    FnT fn_;
 };
 
 template <typename FnT>
 auto makeFinally(FnT fn) noexcept
 {
-  return Finally<FnT>{std::move(fn)};
+    return Finally<FnT>{std::move(fn)};
 }
 
 } // swirly

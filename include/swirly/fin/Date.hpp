@@ -38,39 +38,38 @@ constexpr int RollHour{17};
 constexpr char NewYork[]{"EST-5EDT,M3.2.0/2,M11.1.0/2"};
 
 /**
- * Business day functor. Date calculations on the critical path can become a performance
- * bottleneck. This class improves performance for the most common use-case by caching the most
- * recent results.
+ * Business day functor. Date calculations on the critical path can become a performance bottleneck.
+ * This class improves performance for the most common use-case by caching the most recent results.
  */
 class SWIRLY_API BusinessDay {
- public:
-  explicit BusinessDay(int rollHour, const char* timeZone);
-  ~BusinessDay() noexcept;
+  public:
+    explicit BusinessDay(int rollHour, const char* timeZone);
+    ~BusinessDay() noexcept;
 
-  // Copy.
-  BusinessDay(const BusinessDay& rhs) noexcept;
-  BusinessDay& operator=(const BusinessDay& rhs);
+    // Copy.
+    BusinessDay(const BusinessDay& rhs) noexcept;
+    BusinessDay& operator=(const BusinessDay& rhs);
 
-  // Move.
-  BusinessDay(BusinessDay&&) noexcept;
-  BusinessDay& operator=(BusinessDay&&) noexcept;
+    // Move.
+    BusinessDay(BusinessDay&&) noexcept;
+    BusinessDay& operator=(BusinessDay&&) noexcept;
 
-  /**
-   * Get the business day from a transaction time.
-   *
-   * @param time Unix time.
-   *
-   * @return the business day.
-   */
-  JDay operator()(Time time) const;
+    /**
+     * Get the business day from a transaction time.
+     *
+     * @param time Unix time.
+     *
+     * @return the business day.
+     */
+    JDay operator()(Time time) const;
 
- private:
-  int rollHour_;
-  boost::local_time::time_zone_ptr timeZone_;
-  /**
-   * Cache entries for odd and even time_t values.
-   */
-  mutable std::pair<int64_t, JDay> cache_[2]{};
+  private:
+    int rollHour_;
+    boost::local_time::time_zone_ptr timeZone_;
+    /**
+     * Cache entries for odd and even time_t values.
+     */
+    mutable std::pair<int64_t, JDay> cache_[2]{};
 };
 
 } // swirly

@@ -28,10 +28,10 @@ Asset::Asset(Asset&&) = default;
 
 void Asset::toJson(ostream& os) const
 {
-  os << "{\"mnem\":\"" << mnem_ //
-     << "\",\"display\":\"" << display_ //
-     << "\",\"type\":\"" << type_ //
-     << "\"}";
+    os << "{\"mnem\":\"" << mnem_ //
+       << "\",\"display\":\"" << display_ //
+       << "\",\"type\":\"" << type_ //
+       << "\"}";
 }
 
 } // swirly

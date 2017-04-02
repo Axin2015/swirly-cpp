@@ -27,42 +27,42 @@ struct NumericTraits;
 
 template <>
 struct NumericTraits<short> {
-  static short cast(const char* str) noexcept { return std::strtol(str, nullptr, 0); }
+    static short cast(const char* str) noexcept { return std::strtol(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<unsigned short> {
-  static unsigned short cast(const char* str) noexcept { return std::strtoul(str, nullptr, 0); }
+    static unsigned short cast(const char* str) noexcept { return std::strtoul(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<int> {
-  static int cast(const char* str) noexcept { return std::strtol(str, nullptr, 0); }
+    static int cast(const char* str) noexcept { return std::strtol(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<unsigned int> {
-  static unsigned int cast(const char* str) noexcept { return std::strtoul(str, nullptr, 0); }
+    static unsigned int cast(const char* str) noexcept { return std::strtoul(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<long> {
-  static auto cast(const char* str) noexcept { return std::strtol(str, nullptr, 0); }
+    static auto cast(const char* str) noexcept { return std::strtol(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<unsigned long> {
-  static auto cast(const char* str) noexcept { return std::strtoul(str, nullptr, 0); }
+    static auto cast(const char* str) noexcept { return std::strtoul(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<long long> {
-  static auto cast(const char* str) noexcept { return std::strtoll(str, nullptr, 0); }
+    static auto cast(const char* str) noexcept { return std::strtoll(str, nullptr, 0); }
 };
 
 template <>
 struct NumericTraits<unsigned long long> {
-  static auto cast(const char* str) noexcept { return std::strtoull(str, nullptr, 0); }
+    static auto cast(const char* str) noexcept { return std::strtoull(str, nullptr, 0); }
 };
 
 } // detail
@@ -70,7 +70,7 @@ struct NumericTraits<unsigned long long> {
 template <typename ValueT>
 inline ValueT numericCast(const char* str) noexcept
 {
-  return detail::NumericTraits<ValueT>::cast(str);
+    return detail::NumericTraits<ValueT>::cast(str);
 }
 
 } // swirly

@@ -30,50 +30,50 @@ template <typename ValueT>
 using ModelCallback = std::function<void(ValueT)>;
 
 class SWIRLY_API Model {
- public:
-  Model() noexcept = default;
-  virtual ~Model() noexcept;
+  public:
+    Model() noexcept = default;
+    virtual ~Model() noexcept;
 
-  // Copy.
-  constexpr Model(const Model&) noexcept = default;
-  Model& operator=(const Model&) noexcept = default;
+    // Copy.
+    constexpr Model(const Model&) noexcept = default;
+    Model& operator=(const Model&) noexcept = default;
 
-  // Move.
-  constexpr Model(Model&&) noexcept = default;
-  Model& operator=(Model&&) noexcept = default;
+    // Move.
+    constexpr Model(Model&&) noexcept = default;
+    Model& operator=(Model&&) noexcept = default;
 
-  void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
-  void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
-  void readAccnt(Time now, const ModelCallback<std::string_view>& cb) const
-  {
-    doReadAccnt(now, cb);
-  }
-  void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
-  void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
-  void readExec(std::string_view accnt, std::size_t limit, const ModelCallback<ExecPtr>& cb) const
-  {
-    doReadExec(accnt, limit, cb);
-  }
-  void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
-  void readPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
+    void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
+    void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
+    void readAccnt(Time now, const ModelCallback<std::string_view>& cb) const
+    {
+        doReadAccnt(now, cb);
+    }
+    void readMarket(const ModelCallback<MarketPtr>& cb) const { doReadMarket(cb); }
+    void readOrder(const ModelCallback<OrderPtr>& cb) const { doReadOrder(cb); }
+    void readExec(std::string_view accnt, std::size_t limit, const ModelCallback<ExecPtr>& cb) const
+    {
+        doReadExec(accnt, limit, cb);
+    }
+    void readTrade(const ModelCallback<ExecPtr>& cb) const { doReadTrade(cb); }
+    void readPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const { doReadPosn(busDay, cb); }
 
- protected:
-  virtual void doReadAsset(const ModelCallback<AssetPtr>& cb) const = 0;
+  protected:
+    virtual void doReadAsset(const ModelCallback<AssetPtr>& cb) const = 0;
 
-  virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
+    virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
 
-  virtual void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const = 0;
+    virtual void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const = 0;
 
-  virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
+    virtual void doReadMarket(const ModelCallback<MarketPtr>& cb) const = 0;
 
-  virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
+    virtual void doReadOrder(const ModelCallback<OrderPtr>& cb) const = 0;
 
-  virtual void doReadExec(std::string_view accnt, std::size_t limit,
-                          const ModelCallback<ExecPtr>& cb) const = 0;
+    virtual void doReadExec(std::string_view accnt, std::size_t limit,
+                            const ModelCallback<ExecPtr>& cb) const = 0;
 
-  virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
+    virtual void doReadTrade(const ModelCallback<ExecPtr>& cb) const = 0;
 
-  virtual void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const = 0;
+    virtual void doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const = 0;
 };
 
 /**

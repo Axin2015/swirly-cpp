@@ -34,96 +34,96 @@ using TestCases = map<string, void (*)(void)>;
 // during static initialisation.
 TestCases& testCases()
 {
-  static TestCases testCases;
-  return testCases;
+    static TestCases testCases;
+    return testCases;
 }
 
 bool runTestCase(const string& name, void (*fn)(void))
 {
-  using namespace std;
+    using namespace std;
 
-  bool pass{false};
+    bool pass{false};
 
-  cout << "checking " << name << " ... ";
-  cout.flush();
-  try {
-    fn();
-    cout << "pass" << endl;
-    pass = true;
-  } catch (const TestException& e) {
-    cout << "fail" << endl;
-    cerr << e.file() << ':' << e.line() << ": " << e.what() << endl;
-  } catch (const exception& e) {
-    cout << "fail" << endl;
-    cerr << "exception: " << e.what() << endl;
-  }
-  return pass;
+    cout << "checking " << name << " ... ";
+    cout.flush();
+    try {
+        fn();
+        cout << "pass" << endl;
+        pass = true;
+    } catch (const TestException& e) {
+        cout << "fail" << endl;
+        cerr << e.file() << ':' << e.line() << ": " << e.what() << endl;
+    } catch (const exception& e) {
+        cout << "fail" << endl;
+        cerr << "exception: " << e.what() << endl;
+    }
+    return pass;
 }
 } // anonymous
 
 TestException::TestException(const char* file, int line, const char* msg) noexcept
 {
-  file_ = file;
-  line_ = line;
-  strncpy(msg_, msg, MaxErr);
-  msg_[MaxErr] = '\0';
+    file_ = file;
+    line_ = line;
+    strncpy(msg_, msg, MaxErr);
+    msg_[MaxErr] = '\0';
 }
 
 TestException::~TestException() noexcept = default;
 
 const char* TestException::what() const noexcept
 {
-  return msg_;
+    return msg_;
 }
 
 // Test-cases use this function to register themselves during static initialisation.
 void addTestCase(const char* name, void (*fn)(void))
 {
-  testCases().emplace(name, fn);
+    testCases().emplace(name, fn);
 }
 
 int run(int argc, char* argv[])
 {
-  srand(time(nullptr));
+    srand(time(nullptr));
 
-  int ret{1};
-  try {
-    int failed{0}, total{0};
-    if (argc > 1) {
-      // Run specific test-cases according to regex arguments.
-      for (int i{1}; i < argc; ++i) {
-        const regex pattern{argv[i]};
-        for (auto& tc : testCases()) {
-          if (regex_match(tc.first, pattern)) {
-            if (!runTestCase(tc.first, tc.second)) {
-              ++failed;
+    int ret{1};
+    try {
+        int failed{0}, total{0};
+        if (argc > 1) {
+            // Run specific test-cases according to regex arguments.
+            for (int i{1}; i < argc; ++i) {
+                const regex pattern{argv[i]};
+                for (auto& tc : testCases()) {
+                    if (regex_match(tc.first, pattern)) {
+                        if (!runTestCase(tc.first, tc.second)) {
+                            ++failed;
+                        }
+                        ++total;
+                    }
+                }
             }
-            ++total;
-          }
+        } else {
+            // Run all test-cases.
+            for (auto& tc : testCases()) {
+                if (!runTestCase(tc.first, tc.second)) {
+                    ++failed;
+                }
+                ++total;
+            }
         }
-      }
-    } else {
-      // Run all test-cases.
-      for (auto& tc : testCases()) {
-        if (!runTestCase(tc.first, tc.second)) {
-          ++failed;
+        if (total == 0) {
+            cerr << "no tests found\n";
+        } else if (failed > 0) {
+            cerr << failed << " test(s) out of " << total << " failed\n";
+        } else {
+            cout << "all tests passed\n";
+            ret = 0;
         }
-        ++total;
-      }
+    } catch (const exception& e) {
+        // Most likely due to a regex compilation error.
+        cerr << "exception: " << e.what() << endl;
     }
-    if (total == 0) {
-      cerr << "no tests found\n";
-    } else if (failed > 0) {
-      cerr << failed << " test(s) out of " << total << " failed\n";
-    } else {
-      cout << "all tests passed\n";
-      ret = 0;
-    }
-  } catch (const exception& e) {
-    // Most likely due to a regex compilation error.
-    cerr << "exception: " << e.what() << endl;
-  }
-  return ret;
+    return ret;
 }
 
 } // test

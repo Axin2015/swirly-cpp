@@ -31,42 +31,42 @@ namespace swirly {
 namespace ui {
 
 class ExecModel : public QAbstractTableModel {
- public:
-  ExecModel(QObject* parent = nullptr);
-  ~ExecModel() noexcept override;
+  public:
+    ExecModel(QObject* parent = nullptr);
+    ~ExecModel() noexcept override;
 
-  int rowCount(const QModelIndex& parent) const override;
+    int rowCount(const QModelIndex& parent) const override;
 
-  int columnCount(const QModelIndex& parent) const override;
+    int columnCount(const QModelIndex& parent) const override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  const Exec& valueAt(int n) const { return rowAt(n).value(); }
+    const Exec& valueAt(int n) const { return rowAt(n).value(); }
 
-  void reset()
-  {
-    beginResetModel();
-    rows_.clear();
-    endResetModel();
-  }
-  void toggleCheckState(int n)
-  {
-    auto& row = rowAt(n);
-    row.setChecked(!row.checked());
-    const auto i = index(n, unbox(exec::Column::CheckState));
-    emit dataChanged(i, i);
-  }
+    void reset()
+    {
+        beginResetModel();
+        rows_.clear();
+        endResetModel();
+    }
+    void toggleCheckState(int n)
+    {
+        auto& row = rowAt(n);
+        row.setChecked(!row.checked());
+        const auto i = index(n, unbox(exec::Column::CheckState));
+        emit dataChanged(i, i);
+    }
 
-  void updateRow(std::uint64_t tag, const Exec& exec);
+    void updateRow(std::uint64_t tag, const Exec& exec);
 
- private:
-  const Row<Exec>& rowAt(int n) const { return rows_[n]; }
-  Row<Exec>& rowAt(int n) { return rows_[n]; }
+  private:
+    const Row<Exec>& rowAt(int n) const { return rows_[n]; }
+    Row<Exec>& rowAt(int n) { return rows_[n]; }
 
-  QVariant header_[exec::ColumnCount];
-  boost::circular_buffer<Row<Exec>> rows_{MaxExecs};
+    QVariant header_[exec::ColumnCount];
+    boost::circular_buffer<Row<Exec>> rows_{MaxExecs};
 };
 
 } // ui

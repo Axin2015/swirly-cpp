@@ -32,8 +32,8 @@ using experimental::string_view;
 namespace swirly {
 
 struct Page {
-  std::size_t offset{0};
-  std::optional<std::size_t> limit;
+    std::size_t offset{0};
+    std::optional<std::size_t> limit;
 };
 
 // Parse Page arguments from URL Query String. Note that special characters and percent encodings

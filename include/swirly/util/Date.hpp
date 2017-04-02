@@ -36,7 +36,7 @@ using IsoDate = IntWrapper<IsoDatePolicy>;
 
 constexpr IsoDate operator""_ymd(unsigned long long val) noexcept
 {
-  return IsoDate{val};
+    return IsoDate{val};
 }
 
 /**
@@ -46,7 +46,7 @@ using JDay = IntWrapper<JDayPolicy>;
 
 constexpr JDay operator""_jd(unsigned long long val) noexcept
 {
-  return JDay{val};
+    return JDay{val};
 }
 
 /**
@@ -54,9 +54,9 @@ constexpr JDay operator""_jd(unsigned long long val) noexcept
  */
 constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
 {
-  assert(mon <= 11);
-  assert(mday <= 31);
-  return IsoDate{year * 10000 + (mon + 1) * 100 + mday};
+    assert(mon <= 11);
+    assert(mday <= 31);
+    return IsoDate{year * 10000 + (mon + 1) * 100 + mday};
 }
 
 /**
@@ -64,16 +64,16 @@ constexpr IsoDate ymdToIso(int year, int mon, int mday) noexcept
  */
 constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
 {
-  // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
-  // for Computers.
-  // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
+    // The formula given below was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
+    // for Computers.
+    // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-  const auto i = year;
-  const auto j = mon + 1;
-  const auto k = mday;
-  return JDay{k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
-              + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
-              - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4};
+    const auto i = year;
+    const auto j = mon + 1;
+    const auto k = mday;
+    return JDay{k - 32075 + 1461 * (i + 4800 + (j - 14) / 12) / 4
+                + 367 * (j - 2 - (j - 14) / 12 * 12) / 12
+                - 3 * ((i + 4900 + (j - 14) / 12) / 100) / 4};
 }
 
 /**
@@ -81,11 +81,11 @@ constexpr JDay ymdToJd(int year, int mon, int mday) noexcept
  */
 constexpr JDay isoToJd(IsoDate iso) noexcept
 {
-  const auto n = iso.count();
-  const auto year = n / 10000;
-  const auto mon = (n / 100 % 100) - 1;
-  const auto mday = n % 100;
-  return ymdToJd(year, mon, mday);
+    const auto n = iso.count();
+    const auto year = n / 10000;
+    const auto mon = (n / 100 % 100) - 1;
+    const auto mday = n % 100;
+    return ymdToJd(year, mon, mday);
 }
 
 /**
@@ -93,38 +93,54 @@ constexpr JDay isoToJd(IsoDate iso) noexcept
  */
 constexpr IsoDate jdToIso(JDay jd) noexcept
 {
-  // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's Almanac
-  // for Computers.
-  // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
+    // The formula given above was taken from the 1990 edition of the U.S. Naval Observatory's
+    // Almanac for Computers.
+    // See http://aa.usno.navy.mil/faq/docs/JD_Formula.php.
 
-  auto l = jd.count() + 68569;
-  const auto n = 4 * l / 146097;
-  l = l - (146097 * n + 3) / 4;
-  auto i = 4000 * (l + 1) / 1461001;
-  l = l - 1461 * i / 4 + 31;
-  auto j = 80 * l / 2447;
-  const auto k = l - 2447 * j / 80;
-  l = j / 11;
-  j = j + 2 - 12 * l;
-  i = 100 * (n - 49) + i + l;
+    auto l = jd.count() + 68569;
+    const auto n = 4 * l / 146097;
+    l = l - (146097 * n + 3) / 4;
+    auto i = 4000 * (l + 1) / 1461001;
+    l = l - 1461 * i / 4 + 31;
+    auto j = 80 * l / 2447;
+    const auto k = l - 2447 * j / 80;
+    l = j / 11;
+    j = j + 2 - 12 * l;
+    i = 100 * (n - 49) + i + l;
 
-  return IsoDate{i * 10000 + j * 100 + k};
+    return IsoDate{i * 10000 + j * 100 + k};
+}
+
+/**
+ * Juilian day to Modified Julian day. Epoch is November 17, 1858.
+ */
+constexpr std::int32_t jdToMjd(JDay jd) noexcept
+{
+    return jd - 2400000;
+}
+
+/**
+ * Modified Julian day to Julian day. Epoch is November 17, 1858.
+ */
+constexpr JDay mjdToJd(std::int32_t mjd) noexcept
+{
+    return mjd + 2400000;
 }
 
 /**
  * Julian day to Truncated Julian day. Epoch is May 24, 1968.
  */
-constexpr int32_t jdToTjd(JDay jd) noexcept
+constexpr std::int32_t jdToTjd(JDay jd) noexcept
 {
-  return jd.count() - 2440000;
+    return jd.count() - 2440000;
 }
 
 /**
  * Truncated Julian day to Gregorian date. Epoch is May 24, 1968.
  */
-constexpr JDay tjdToJd(int32_t tjd) noexcept
+constexpr JDay tjdToJd(std::int32_t tjd) noexcept
 {
-  return JDay{tjd + 2440000};
+    return JDay{tjd + 2440000};
 }
 
 /**
@@ -132,11 +148,11 @@ constexpr JDay tjdToJd(int32_t tjd) noexcept
  */
 constexpr Time jdToTime(JDay jd) noexcept
 {
-  // Julian day for January 1st, 1970.
-  const JDay jdUnixEpoc = 2440588_jd;
-  const int64_t msInDay = 24 * 60 * 60 * 1000;
-  // Add half day for 12pm.
-  return msToTime((jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1));
+    // Julian day for January 1st, 1970.
+    const JDay jdUnixEpoc = 2440588_jd;
+    const int64_t msInDay = 24 * 60 * 60 * 1000;
+    // Add half day for 12pm.
+    return msToTime((jd - jdUnixEpoc).count() * msInDay + (msInDay >> 1));
 }
 
 /**
@@ -144,7 +160,7 @@ constexpr Time jdToTime(JDay jd) noexcept
  */
 constexpr IsoDate maybeJdToIso(JDay jd) noexcept
 {
-  return jd != 0_jd ? jdToIso(jd) : 0_ymd;
+    return jd != 0_jd ? jdToIso(jd) : 0_ymd;
 }
 
 /**
@@ -152,7 +168,7 @@ constexpr IsoDate maybeJdToIso(JDay jd) noexcept
  */
 constexpr JDay maybeIsoToJd(IsoDate iso) noexcept
 {
-  return iso != 0_ymd ? isoToJd(iso) : 0_jd;
+    return iso != 0_ymd ? isoToJd(iso) : 0_jd;
 }
 
 } // swirly

@@ -38,111 +38,111 @@ using AccntPtr = std::unique_ptr<Accnt>;
 using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
 class SWIRLY_API Accnt : public Comparable<Accnt> {
- public:
-  Accnt(Mnem mnem, std::size_t maxExecs) noexcept : mnem_{mnem}, execs_{maxExecs} {}
-  ~Accnt() noexcept;
+  public:
+    Accnt(Mnem mnem, std::size_t maxExecs) noexcept : mnem_{mnem}, execs_{maxExecs} {}
+    ~Accnt() noexcept;
 
-  // Copy.
-  Accnt(const Accnt&) = delete;
-  Accnt& operator=(const Accnt&) = delete;
+    // Copy.
+    Accnt(const Accnt&) = delete;
+    Accnt& operator=(const Accnt&) = delete;
 
-  // Move.
-  Accnt(Accnt&&);
-  Accnt& operator=(Accnt&&) = delete;
+    // Move.
+    Accnt(Accnt&&);
+    Accnt& operator=(Accnt&&) = delete;
 
-  template <typename... ArgsT>
-  static AccntPtr make(ArgsT&&... args)
-  {
-    return std::make_unique<Accnt>(std::forward<ArgsT>(args)...);
-  }
-
-  int compare(const Accnt& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
-  bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
-  auto mnem() const noexcept { return mnem_; }
-  const auto& orders() const noexcept { return orders_; }
-  const auto& execs() const noexcept { return execs_; }
-  const auto& trades() const noexcept { return trades_; }
-  const Exec& trade(Id64 marketId, Id64 id) const
-  {
-    auto it = trades_.find(marketId, id);
-    if (it == trades_.end()) {
-      throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
+    template <typename... ArgsT>
+    static AccntPtr make(ArgsT&&... args)
+    {
+        return std::make_unique<Accnt>(std::forward<ArgsT>(args)...);
     }
-    return *it;
-  }
-  const auto& posns() const noexcept { return posns_; }
 
-  auto& orders() noexcept { return orders_; }
-  Order& order(Id64 marketId, Id64 id)
-  {
-    auto it = orders_.find(marketId, id);
-    if (it == orders_.end()) {
-      throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
+    int compare(const Accnt& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+    bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
+    auto mnem() const noexcept { return mnem_; }
+    const auto& orders() const noexcept { return orders_; }
+    const auto& execs() const noexcept { return execs_; }
+    const auto& trades() const noexcept { return trades_; }
+    const Exec& trade(Id64 marketId, Id64 id) const
+    {
+        auto it = trades_.find(marketId, id);
+        if (it == trades_.end()) {
+            throw NotFoundException{errMsg() << "trade '" << id << "' does not exist"};
+        }
+        return *it;
     }
-    return *it;
-  }
-  Order& order(std::string_view ref)
-  {
-    auto it = refIdx_.find(ref);
-    if (it == refIdx_.end()) {
-      throw OrderNotFoundException{errMsg() << "order '" << ref << "' does not exist"};
-    }
-    return *it;
-  }
-  void insertOrder(const OrderPtr& order) noexcept
-  {
-    assert(order->accnt() == mnem_);
-    orders_.insert(order);
-    if (!order->ref().empty()) {
-      refIdx_.insert(order);
-    }
-  }
-  OrderPtr removeOrder(const Order& order) noexcept
-  {
-    assert(order.accnt() == mnem_);
-    if (!order.ref().empty()) {
-      refIdx_.remove(order);
-    }
-    return orders_.remove(order);
-  }
-  void pushExecBack(const ConstExecPtr& exec) noexcept
-  {
-    assert(exec->accnt() == mnem_);
-    execs_.push_back(exec);
-  }
-  void pushExecFront(const ConstExecPtr& exec) noexcept
-  {
-    assert(exec->accnt() == mnem_);
-    execs_.push_front(exec);
-  }
-  void insertTrade(const ExecPtr& trade) noexcept
-  {
-    assert(trade->accnt() == mnem_);
-    assert(trade->state() == State::Trade);
-    trades_.insert(trade);
-  }
-  ConstExecPtr removeTrade(const Exec& trade) noexcept
-  {
-    assert(trade.accnt() == mnem_);
-    return trades_.remove(trade);
-  }
-  PosnPtr posn(Id64 marketId, Mnem contr, JDay settlDay) throw(std::bad_alloc);
+    const auto& posns() const noexcept { return posns_; }
 
-  void insertPosn(const PosnPtr& posn) noexcept
-  {
-    assert(posn->accnt() == mnem_);
-    posns_.insert(posn);
-  }
-  boost::intrusive::set_member_hook<> mnemHook_;
-  using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
+    auto& orders() noexcept { return orders_; }
+    Order& order(Id64 marketId, Id64 id)
+    {
+        auto it = orders_.find(marketId, id);
+        if (it == orders_.end()) {
+            throw OrderNotFoundException{errMsg() << "order '" << id << "' does not exist"};
+        }
+        return *it;
+    }
+    Order& order(std::string_view ref)
+    {
+        auto it = refIdx_.find(ref);
+        if (it == refIdx_.end()) {
+            throw OrderNotFoundException{errMsg() << "order '" << ref << "' does not exist"};
+        }
+        return *it;
+    }
+    void insertOrder(const OrderPtr& order) noexcept
+    {
+        assert(order->accnt() == mnem_);
+        orders_.insert(order);
+        if (!order->ref().empty()) {
+            refIdx_.insert(order);
+        }
+    }
+    OrderPtr removeOrder(const Order& order) noexcept
+    {
+        assert(order.accnt() == mnem_);
+        if (!order.ref().empty()) {
+            refIdx_.remove(order);
+        }
+        return orders_.remove(order);
+    }
+    void pushExecBack(const ConstExecPtr& exec) noexcept
+    {
+        assert(exec->accnt() == mnem_);
+        execs_.push_back(exec);
+    }
+    void pushExecFront(const ConstExecPtr& exec) noexcept
+    {
+        assert(exec->accnt() == mnem_);
+        execs_.push_front(exec);
+    }
+    void insertTrade(const ExecPtr& trade) noexcept
+    {
+        assert(trade->accnt() == mnem_);
+        assert(trade->state() == State::Trade);
+        trades_.insert(trade);
+    }
+    ConstExecPtr removeTrade(const Exec& trade) noexcept
+    {
+        assert(trade.accnt() == mnem_);
+        return trades_.remove(trade);
+    }
+    PosnPtr posn(Id64 marketId, Mnem contr, JDay settlDay) throw(std::bad_alloc);
 
- private:
-  const Mnem mnem_;
-  OrderIdSet orders_;
-  boost::circular_buffer<ConstExecPtr> execs_;
-  ExecIdSet trades_;
-  PosnSet posns_;
-  OrderRefSet refIdx_;
+    void insertPosn(const PosnPtr& posn) noexcept
+    {
+        assert(posn->accnt() == mnem_);
+        posns_.insert(posn);
+    }
+    boost::intrusive::set_member_hook<> mnemHook_;
+    using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
+
+  private:
+    const Mnem mnem_;
+    OrderIdSet orders_;
+    boost::circular_buffer<ConstExecPtr> execs_;
+    ExecIdSet trades_;
+    PosnSet posns_;
+    OrderRefSet refIdx_;
 };
 
 using AccntSet = MnemSet<Accnt>;

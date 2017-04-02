@@ -24,67 +24,67 @@ namespace ui {
 namespace posn {
 
 enum class Column : int { //
-  CheckState, //
-  Accnt, //
-  MarketId, //
-  Contr, //
-  SettlDate, //
-  BuyLots, //
-  BuyAvgPrice, //
-  SellLots, //
-  SellAvgPrice
+    CheckState, //
+    Accnt, //
+    MarketId, //
+    Contr, //
+    SettlDate, //
+    BuyLots, //
+    BuyAvgPrice, //
+    SellLots, //
+    SellAvgPrice
 };
 constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
 
 } // posn
 
 class Posn {
- public:
-  Posn(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Lots buyLots,
-       Cost buyCost, Lots sellLots, Cost sellCost)
-    : accnt_{accnt},
-      marketId_{marketId},
-      contr_{contr},
-      settlDate_{settlDate},
-      buyLots_{buyLots},
-      buyCost_{buyCost},
-      sellLots_{sellLots},
-      sellCost_{sellCost}
-  {
-  }
-  Posn() = default;
-  ~Posn() noexcept = default;
+  public:
+    Posn(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Lots buyLots,
+         Cost buyCost, Lots sellLots, Cost sellCost)
+        : accnt_{accnt},
+          marketId_{marketId},
+          contr_{contr},
+          settlDate_{settlDate},
+          buyLots_{buyLots},
+          buyCost_{buyCost},
+          sellLots_{sellLots},
+          sellCost_{sellCost}
+    {
+    }
+    Posn() = default;
+    ~Posn() noexcept = default;
 
-  static Posn fromJson(const Contr& contr, const QJsonObject& obj);
+    static Posn fromJson(const Contr& contr, const QJsonObject& obj);
 
-  const QString& accnt() const noexcept { return accnt_; }
-  Id64 marketId() const noexcept { return marketId_; }
-  const Contr& contr() const noexcept { return contr_; }
-  QDate settlDate() const noexcept { return settlDate_; }
-  Lots buyLots() const noexcept { return buyLots_; }
-  Cost buyCost() const noexcept { return buyCost_; }
-  Lots sellLots() const noexcept { return sellLots_; }
-  Cost sellCost() const noexcept { return sellCost_; }
+    const QString& accnt() const noexcept { return accnt_; }
+    Id64 marketId() const noexcept { return marketId_; }
+    const Contr& contr() const noexcept { return contr_; }
+    QDate settlDate() const noexcept { return settlDate_; }
+    Lots buyLots() const noexcept { return buyLots_; }
+    Cost buyCost() const noexcept { return buyCost_; }
+    Lots sellLots() const noexcept { return sellLots_; }
+    Cost sellCost() const noexcept { return sellCost_; }
 
- private:
-  QString accnt_{};
-  Id64 marketId_{};
-  Contr contr_{};
-  QDate settlDate_{};
-  Lots buyLots_{};
-  Cost buyCost_{};
-  Lots sellLots_{};
-  Cost sellCost_{};
+  private:
+    QString accnt_{};
+    Id64 marketId_{};
+    Contr contr_{};
+    QDate settlDate_{};
+    Lots buyLots_{};
+    Cost buyCost_{};
+    Lots sellLots_{};
+    Cost sellCost_{};
 };
 
 QDebug operator<<(QDebug debug, const Posn& posn);
 
 inline bool isModified(const Posn& prev, const Posn& next) noexcept
 {
-  return prev.buyLots() != next.buyLots() //
-    || prev.buyCost() != next.buyCost() //
-    || prev.sellLots() != next.sellLots() //
-    || prev.sellCost() != next.sellCost();
+    return prev.buyLots() != next.buyLots() //
+        || prev.buyCost() != next.buyCost() //
+        || prev.sellLots() != next.sellLots() //
+        || prev.sellCost() != next.sellCost();
 }
 
 } // ui

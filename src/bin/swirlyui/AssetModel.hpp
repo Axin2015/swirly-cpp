@@ -24,23 +24,23 @@ namespace swirly {
 namespace ui {
 
 class AssetModel
-  : public TableModel<QString, Asset, unbox(asset::Column::CheckState), asset::ColumnCount> {
- public:
-  AssetModel(QObject* parent = nullptr);
-  ~AssetModel() noexcept override;
+    : public TableModel<QString, Asset, unbox(asset::Column::CheckState), asset::ColumnCount> {
+  public:
+    AssetModel(QObject* parent = nullptr);
+    ~AssetModel() noexcept override;
 
-  QVariant data(const QModelIndex& index, int role) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
 
-  QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-  void removeRow(const Asset& asset) { TableModel::removeRow(asset.mnem()); }
-  void updateRow(std::uint64_t tag, const Asset& asset)
-  {
-    TableModel::updateRow(asset.mnem(), tag, asset);
-  }
+    void removeRow(const Asset& asset) { TableModel::removeRow(asset.mnem()); }
+    void updateRow(std::uint64_t tag, const Asset& asset)
+    {
+        TableModel::updateRow(asset.mnem(), tag, asset);
+    }
 
- private:
-  QVariant header_[asset::ColumnCount];
+  private:
+    QVariant header_[asset::ColumnCount];
 };
 
 } // ui

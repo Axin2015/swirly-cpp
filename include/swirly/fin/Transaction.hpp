@@ -24,110 +24,110 @@ using namespace std;
 namespace swirly {
 
 class SWIRLY_API Transactional {
- public:
-  Transactional() noexcept = default;
-  virtual ~Transactional() noexcept;
+  public:
+    Transactional() noexcept = default;
+    virtual ~Transactional() noexcept;
 
-  // Copy.
-  constexpr Transactional(const Transactional&) noexcept = default;
-  Transactional& operator=(const Transactional&) noexcept = default;
+    // Copy.
+    constexpr Transactional(const Transactional&) noexcept = default;
+    Transactional& operator=(const Transactional&) noexcept = default;
 
-  // Move.
-  constexpr Transactional(Transactional&&) noexcept = default;
-  Transactional& operator=(Transactional&&) noexcept = default;
+    // Move.
+    constexpr Transactional(Transactional&&) noexcept = default;
+    Transactional& operator=(Transactional&&) noexcept = default;
 
-  auto failed() const noexcept { return state_ == Failed; }
+    auto failed() const noexcept { return state_ == Failed; }
 
-  /**
-   * Begin transaction.
-   */
-  void tryBegin()
-  {
-    if (state_ == None) {
-      state_ = Active;
-      doBegin();
+    /**
+     * Begin transaction.
+     */
+    void tryBegin()
+    {
+        if (state_ == None) {
+            state_ = Active;
+            doBegin();
+        }
     }
-  }
 
-  /**
-   * Commit transaction.
-   */
-  void tryCommit()
-  {
-    if (state_ == Active) {
-      state_ = None;
-      doCommit();
+    /**
+     * Commit transaction.
+     */
+    void tryCommit()
+    {
+        if (state_ == Active) {
+            state_ = None;
+            doCommit();
+        }
     }
-  }
 
-  /**
-   * Rollback transaction.
-   */
-  void tryRollback()
-  {
-    if (state_ == Active) {
-      state_ = Failed;
-      doRollback();
+    /**
+     * Rollback transaction.
+     */
+    void tryRollback()
+    {
+        if (state_ == Active) {
+            state_ = Failed;
+            doRollback();
+        }
     }
-  }
 
-  /**
-   * Reset transaction.
-   */
-  void reset()
-  {
-    auto prev = state_;
-    state_ = None;
-    if (prev == Active) {
-      doRollback();
+    /**
+     * Reset transaction.
+     */
+    void reset()
+    {
+        auto prev = state_;
+        state_ = None;
+        if (prev == Active) {
+            doRollback();
+        }
     }
-  }
 
- protected:
-  virtual void doBegin() = 0;
+  protected:
+    virtual void doBegin() = 0;
 
-  virtual void doCommit() = 0;
+    virtual void doCommit() = 0;
 
-  virtual void doRollback() = 0;
+    virtual void doRollback() = 0;
 
- private:
-  enum { None, Active, Failed } state_{None};
+  private:
+    enum { None, Active, Failed } state_{None};
 };
 
 class SWIRLY_API Transaction {
- public:
-  Transaction(Transactional& target, More more) : target_(target), more_{more}
-  {
-    if (more == More::Yes) {
-      target_.tryBegin();
+  public:
+    Transaction(Transactional& target, More more) : target_(target), more_{more}
+    {
+        if (more == More::Yes) {
+            target_.tryBegin();
+        }
     }
-  }
-  explicit Transaction(Transactional& target) : target_(target), more_{More::No}
-  {
-    target_.tryBegin();
-  }
-  ~Transaction() noexcept;
-
-  // Copy.
-  Transaction(const Transaction&) = delete;
-  Transaction& operator=(const Transaction&) = delete;
-
-  // Move.
-  Transaction(Transaction&&) = delete;
-  Transaction& operator=(Transaction&&) = delete;
-
-  void commit()
-  {
-    if (more_ == More::No) {
-      target_.tryCommit();
+    explicit Transaction(Transactional& target) : target_(target), more_{More::No}
+    {
+        target_.tryBegin();
     }
-    done_ = true;
-  }
+    ~Transaction() noexcept;
 
- private:
-  Transactional& target_;
-  More more_;
-  bool done_{false};
+    // Copy.
+    Transaction(const Transaction&) = delete;
+    Transaction& operator=(const Transaction&) = delete;
+
+    // Move.
+    Transaction(Transaction&&) = delete;
+    Transaction& operator=(Transaction&&) = delete;
+
+    void commit()
+    {
+        if (more_ == More::No) {
+            target_.tryCommit();
+        }
+        done_ = true;
+    }
+
+  private:
+    Transactional& target_;
+    More more_;
+    bool done_{false};
 };
 
 } // swirly

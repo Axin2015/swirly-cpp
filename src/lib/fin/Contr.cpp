@@ -25,22 +25,22 @@ namespace swirly {
 Contr::Contr(Id32 id, Mnem mnem, string_view display, Mnem asset, Mnem ccy, int lotNumer,
              int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
-  : id_{id},
-    mnem_{mnem},
-    display_{display},
-    asset_{asset},
-    ccy_{ccy},
-    lotNumer_{lotNumer},
-    lotDenom_{lotDenom},
-    qtyInc_{fractToReal(lotNumer, lotDenom)},
-    tickNumer_{tickNumer},
-    tickDenom_{tickDenom},
-    priceInc_{fractToReal(tickNumer, tickDenom)},
-    pipDp_{pipDp},
-    qtyDp_{realToDp(qtyInc_)},
-    priceDp_{realToDp(priceInc_)},
-    minLots_{minLots},
-    maxLots_{maxLots}
+    : id_{id},
+      mnem_{mnem},
+      display_{display},
+      asset_{asset},
+      ccy_{ccy},
+      lotNumer_{lotNumer},
+      lotDenom_{lotDenom},
+      qtyInc_{fractToReal(lotNumer, lotDenom)},
+      tickNumer_{tickNumer},
+      tickDenom_{tickDenom},
+      priceInc_{fractToReal(tickNumer, tickDenom)},
+      pipDp_{pipDp},
+      qtyDp_{realToDp(qtyInc_)},
+      priceDp_{realToDp(priceInc_)},
+      minLots_{minLots},
+      maxLots_{maxLots}
 {
 }
 
@@ -52,18 +52,18 @@ Contr::Contr(Contr&&) = default;
 
 void Contr::toJson(ostream& os) const
 {
-  os << "{\"mnem\":\"" << mnem_ //
-     << "\",\"display\":\"" << display_ //
-     << "\",\"asset\":\"" << asset_ //
-     << "\",\"ccy\":\"" << ccy_ //
-     << "\",\"lotNumer\":" << lotNumer_ //
-     << ",\"lotDenom\":" << lotDenom_ //
-     << ",\"tickNumer\":" << tickNumer_ //
-     << ",\"tickDenom\":" << tickDenom_ //
-     << ",\"pipDp\":" << pipDp_ //
-     << ",\"minLots\":" << minLots_ //
-     << ",\"maxLots\":" << maxLots_ //
-     << "}";
+    os << "{\"mnem\":\"" << mnem_ //
+       << "\",\"display\":\"" << display_ //
+       << "\",\"asset\":\"" << asset_ //
+       << "\",\"ccy\":\"" << ccy_ //
+       << "\",\"lotNumer\":" << lotNumer_ //
+       << ",\"lotDenom\":" << lotDenom_ //
+       << ",\"tickNumer\":" << tickNumer_ //
+       << ",\"tickDenom\":" << tickDenom_ //
+       << ",\"pipDp\":" << pipDp_ //
+       << ",\"minLots\":" << minLots_ //
+       << ",\"maxLots\":" << maxLots_ //
+       << "}";
 }
 
 } // swirly

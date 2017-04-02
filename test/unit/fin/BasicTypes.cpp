@@ -24,31 +24,31 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(AssetType)
 {
-  SWIRLY_CHECK(strcmp(enumString(AssetType::Cmdty), "CMDTY") == 0);
+    SWIRLY_CHECK(strcmp(enumString(AssetType::Cmdty), "CMDTY") == 0);
 }
 
 SWIRLY_TEST_CASE(Direct)
 {
-  SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
+    SWIRLY_CHECK(strcmp(enumString(Direct::Paid), "PAID") == 0);
 }
 
 SWIRLY_TEST_CASE(LiqInd)
 {
-  SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
+    SWIRLY_CHECK(strcmp(enumString(LiqInd::Maker), "MAKER") == 0);
 }
 
 SWIRLY_TEST_CASE(Side)
 {
-  SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
+    SWIRLY_CHECK(strcmp(enumString(Side::Buy), "BUY") == 0);
 }
 
 SWIRLY_TEST_CASE(State)
 {
-  SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
+    SWIRLY_CHECK(strcmp(enumString(State::New), "NEW") == 0);
 }
 
 SWIRLY_TEST_CASE(StateResd)
 {
-  SWIRLY_CHECK(strcmp(enumString(State::Trade, 0_lts), "COMPLETE") == 0);
-  SWIRLY_CHECK(strcmp(enumString(State::Trade, 1_lts), "PARTIAL") == 0);
+    SWIRLY_CHECK(strcmp(enumString(State::Trade, 0_lts), "COMPLETE") == 0);
+    SWIRLY_CHECK(strcmp(enumString(State::Trade, 1_lts), "PARTIAL") == 0);
 }

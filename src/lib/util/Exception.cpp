@@ -25,24 +25,24 @@ thread_local ErrMsg errMsg_;
 
 Exception::Exception(string_view what) noexcept
 {
-  const auto len = min(what.size(), MaxErrMsg);
-  if (len > 0) {
-    memcpy(what_, what.data(), len);
-  }
-  what_[len] = '\0';
+    const auto len = min(what.size(), MaxErrMsg);
+    if (len > 0) {
+        memcpy(what_, what.data(), len);
+    }
+    what_[len] = '\0';
 }
 
 Exception::~Exception() noexcept = default;
 
 const char* Exception::what() const noexcept
 {
-  return what_;
+    return what_;
 }
 
 ErrMsg& errMsg() noexcept
 {
-  errMsg_.reset();
-  return errMsg_;
+    errMsg_.reset();
+    return errMsg_;
 }
 
 } // swirly

@@ -32,44 +32,44 @@ class HttpResponse;
 class Rest;
 
 class RestServ {
- public:
-  explicit RestServ(Rest& rest) noexcept : rest_(rest), profile_{"profile"_sv} {}
-  ~RestServ() noexcept;
+  public:
+    explicit RestServ(Rest& rest) noexcept : rest_(rest), profile_{"profile"_sv} {}
+    ~RestServ() noexcept;
 
-  // Copy.
-  RestServ(const RestServ& rhs) = delete;
-  RestServ& operator=(const RestServ& rhs) = delete;
+    // Copy.
+    RestServ(const RestServ& rhs) = delete;
+    RestServ& operator=(const RestServ& rhs) = delete;
 
-  // Move.
-  RestServ(RestServ&&) = delete;
-  RestServ& operator=(RestServ&&) = delete;
+    // Move.
+    RestServ(RestServ&&) = delete;
+    RestServ& operator=(RestServ&&) = delete;
 
-  void handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept;
+    void handleRequest(const HttpRequest& req, HttpResponse& resp) noexcept;
 
- private:
-  bool reset(const HttpRequest& req) noexcept;
+  private:
+    bool reset(const HttpRequest& req) noexcept;
 
-  void restRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void restRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
-  void refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-  void assetRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-  void contrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void assetRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void contrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
-  void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-  void marketRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void marketRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
-  void orderRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-  void execRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-  void tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-  void posnRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void orderRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void execRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void posnRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
-  Rest& rest_;
-  bool matchMethod_{false};
-  bool matchPath_{false};
-  Tokeniser path_;
-  std::vector<Id64> ids_;
-  std::vector<Mnem> mnems_;
-  Profile profile_;
+    Rest& rest_;
+    bool matchMethod_{false};
+    bool matchPath_{false};
+    Tokeniser path_;
+    std::vector<Id64> ids_;
+    std::vector<Mnem> mnems_;
+    Profile profile_;
 };
 
 } // swirly

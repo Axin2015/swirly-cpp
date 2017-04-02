@@ -53,12 +53,12 @@ struct DbTraits;
 template <typename ValueT>
 struct DbTraits<ValueT,
                 std::enable_if_t<std::is_integral<ValueT>::value && (sizeof(ValueT) <= 4)>> {
-  static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
-  static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
-  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
-  {
-    return sqlite3_column_int(&stmt, col);
-  }
+    static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
+    static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind32(stmt, col, val); }
+    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    {
+        return sqlite3_column_int(&stmt, col);
+    }
 };
 
 /**
@@ -66,12 +66,12 @@ struct DbTraits<ValueT,
  */
 template <typename ValueT>
 struct DbTraits<ValueT, std::enable_if_t<std::is_integral<ValueT>::value && (sizeof(ValueT) > 4)>> {
-  static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
-  static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
-  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
-  {
-    return sqlite3_column_int64(&stmt, col);
-  }
+    static constexpr bool isNull(ValueT val) noexcept { return val == 0; }
+    static void bind(sqlite3_stmt& stmt, int col, ValueT val) { bind64(stmt, col, val); }
+    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    {
+        return sqlite3_column_int64(&stmt, col);
+    }
 };
 
 /**
@@ -80,17 +80,17 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_integral<ValueT>::value && (siz
 template <typename ValueT>
 struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
 
-  using UnderlyingTraits = DbTraits<typename ValueT::ValueType>;
+    using UnderlyingTraits = DbTraits<typename ValueT::ValueType>;
 
-  static constexpr bool isNull(ValueT val) noexcept { return val == ValueT{0}; }
-  static void bind(sqlite3_stmt& stmt, int col, ValueT val)
-  {
-    UnderlyingTraits::bind(stmt, col, val.count());
-  }
-  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
-  {
-    return ValueT{UnderlyingTraits::column(stmt, col)};
-  }
+    static constexpr bool isNull(ValueT val) noexcept { return val == ValueT{0}; }
+    static void bind(sqlite3_stmt& stmt, int col, ValueT val)
+    {
+        UnderlyingTraits::bind(stmt, col, val.count());
+    }
+    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    {
+        return ValueT{UnderlyingTraits::column(stmt, col)};
+    }
 };
 
 /**
@@ -99,17 +99,17 @@ struct DbTraits<ValueT, std::enable_if_t<isIntWrapper<ValueT>>> {
 template <typename ValueT>
 struct DbTraits<ValueT, std::enable_if_t<std::is_enum<ValueT>::value>> {
 
-  using UnderlyingTraits = DbTraits<std::underlying_type_t<ValueT>>;
+    using UnderlyingTraits = DbTraits<std::underlying_type_t<ValueT>>;
 
-  static constexpr bool isNull(ValueT val) noexcept { return unbox(val) == 0; }
-  static void bind(sqlite3_stmt& stmt, int col, ValueT val)
-  {
-    UnderlyingTraits::bind(stmt, col, unbox(val));
-  }
-  static ValueT column(sqlite3_stmt& stmt, int col) noexcept
-  {
-    return static_cast<ValueT>(UnderlyingTraits::column(stmt, col));
-  }
+    static constexpr bool isNull(ValueT val) noexcept { return unbox(val) == 0; }
+    static void bind(sqlite3_stmt& stmt, int col, ValueT val)
+    {
+        UnderlyingTraits::bind(stmt, col, unbox(val));
+    }
+    static ValueT column(sqlite3_stmt& stmt, int col) noexcept
+    {
+        return static_cast<ValueT>(UnderlyingTraits::column(stmt, col));
+    }
 };
 
 /**
@@ -117,12 +117,12 @@ struct DbTraits<ValueT, std::enable_if_t<std::is_enum<ValueT>::value>> {
  */
 template <>
 struct DbTraits<Time> {
-  static constexpr bool isNull(Time val) noexcept { return val == Time{}; }
-  static void bind(sqlite3_stmt& stmt, int col, Time val) { bind64(stmt, col, timeToMs(val)); }
-  static Time column(sqlite3_stmt& stmt, int col) noexcept
-  {
-    return msToTime(sqlite3_column_int64(&stmt, col));
-  }
+    static constexpr bool isNull(Time val) noexcept { return val == Time{}; }
+    static void bind(sqlite3_stmt& stmt, int col, Time val) { bind64(stmt, col, timeToMs(val)); }
+    static Time column(sqlite3_stmt& stmt, int col) noexcept
+    {
+        return msToTime(sqlite3_column_int64(&stmt, col));
+    }
 };
 
 /**
@@ -130,12 +130,12 @@ struct DbTraits<Time> {
  */
 template <>
 struct DbTraits<std::string_view> {
-  static constexpr bool isNull(std::string_view val) noexcept { return val.empty(); }
-  static void bind(sqlite3_stmt& stmt, int col, std::string_view val) { bindsv(stmt, col, val); }
-  static std::string_view column(sqlite3_stmt& stmt, int col) noexcept
-  {
-    return reinterpret_cast<const char*>(sqlite3_column_text(&stmt, col));
-  }
+    static constexpr bool isNull(std::string_view val) noexcept { return val.empty(); }
+    static void bind(sqlite3_stmt& stmt, int col, std::string_view val) { bindsv(stmt, col, val); }
+    static std::string_view column(sqlite3_stmt& stmt, int col) noexcept
+    {
+        return reinterpret_cast<const char*>(sqlite3_column_text(&stmt, col));
+    }
 };
 
 } // detail
@@ -151,15 +151,15 @@ bool step(sqlite3_stmt& stmt);
 
 inline bool stepOnce(sqlite3_stmt& stmt)
 {
-  auto finally = makeFinally([&stmt]() { sqlite3_reset(&stmt); });
-  return step(stmt);
+    auto finally = makeFinally([&stmt]() { sqlite3_reset(&stmt); });
+    return step(stmt);
 }
 
 template <typename ValueT>
 inline ValueT column(sqlite3_stmt& stmt, int col) noexcept
 {
-  using Traits = detail::DbTraits<ValueT>;
-  return Traits::column(stmt, col);
+    using Traits = detail::DbTraits<ValueT>;
+    return Traits::column(stmt, col);
 }
 
 constexpr struct MaybeNullTag {
@@ -170,66 +170,66 @@ void bind(sqlite3_stmt& stmt, int col, std::nullptr_t);
 template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val)
 {
-  using Traits = detail::DbTraits<ValueT>;
-  Traits::bind(stmt, col, val);
+    using Traits = detail::DbTraits<ValueT>;
+    Traits::bind(stmt, col, val);
 }
 
 template <typename ValueT>
 void bind(sqlite3_stmt& stmt, int col, ValueT val, MaybeNullTag)
 {
-  using Traits = detail::DbTraits<ValueT>;
-  if (!Traits::isNull(val)) {
-    bind(stmt, col, val);
-  } else {
-    bind(stmt, col, nullptr);
-  }
+    using Traits = detail::DbTraits<ValueT>;
+    if (!Traits::isNull(val)) {
+        bind(stmt, col, val);
+    } else {
+        bind(stmt, col, nullptr);
+    }
 }
 
 class ScopedBind {
- public:
-  explicit ScopedBind(sqlite3_stmt& stmt) noexcept : stmt_{stmt} {}
-  ~ScopedBind() noexcept { sqlite3_clear_bindings(&stmt_); }
-  // Copy.
-  ScopedBind(const ScopedBind&) = delete;
-  ScopedBind& operator=(const ScopedBind&) = delete;
+  public:
+    explicit ScopedBind(sqlite3_stmt& stmt) noexcept : stmt_{stmt} {}
+    ~ScopedBind() noexcept { sqlite3_clear_bindings(&stmt_); }
+    // Copy.
+    ScopedBind(const ScopedBind&) = delete;
+    ScopedBind& operator=(const ScopedBind&) = delete;
 
-  // Move.
-  ScopedBind(ScopedBind&&) = delete;
-  ScopedBind& operator=(ScopedBind&&) = delete;
+    // Move.
+    ScopedBind(ScopedBind&&) = delete;
+    ScopedBind& operator=(ScopedBind&&) = delete;
 
-  template <typename ValueT>
-  void operator()(ValueT val)
-  {
-    sqlite::bind(stmt_, ++col_, val);
-  }
+    template <typename ValueT>
+    void operator()(ValueT val)
+    {
+        sqlite::bind(stmt_, ++col_, val);
+    }
 
-  template <typename ValueT>
-  void operator()(ValueT val, MaybeNullTag)
-  {
-    sqlite::bind(stmt_, ++col_, val, MaybeNull);
-  }
+    template <typename ValueT>
+    void operator()(ValueT val, MaybeNullTag)
+    {
+        sqlite::bind(stmt_, ++col_, val, MaybeNull);
+    }
 
- private:
-  sqlite3_stmt& stmt_;
-  int col_{0};
+  private:
+    sqlite3_stmt& stmt_;
+    int col_{0};
 };
 
 class ScopedStep {
- public:
-  explicit ScopedStep(sqlite3_stmt& stmt) noexcept : stmt_{stmt} {}
-  ~ScopedStep() noexcept { sqlite3_reset(&stmt_); }
-  // Copy.
-  ScopedStep(const ScopedStep&) = delete;
-  ScopedStep& operator=(const ScopedStep&) = delete;
+  public:
+    explicit ScopedStep(sqlite3_stmt& stmt) noexcept : stmt_{stmt} {}
+    ~ScopedStep() noexcept { sqlite3_reset(&stmt_); }
+    // Copy.
+    ScopedStep(const ScopedStep&) = delete;
+    ScopedStep& operator=(const ScopedStep&) = delete;
 
-  // Move.
-  ScopedStep(ScopedStep&&) = delete;
-  ScopedStep& operator=(ScopedStep&&) = delete;
+    // Move.
+    ScopedStep(ScopedStep&&) = delete;
+    ScopedStep& operator=(ScopedStep&&) = delete;
 
-  bool operator()() { return sqlite::step(stmt_); }
+    bool operator()() { return sqlite::step(stmt_); }
 
- private:
-  sqlite3_stmt& stmt_;
+  private:
+    sqlite3_stmt& stmt_;
 };
 
 } // sqlite

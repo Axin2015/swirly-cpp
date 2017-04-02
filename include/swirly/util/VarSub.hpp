@@ -31,40 +31,40 @@ SWIRLY_API std::string getEnv(const std::string& name);
  * Variable substitution.
  */
 class SWIRLY_API VarSub {
- public:
-  explicit VarSub(std::function<std::string(const std::string&)> fn = getEnv) : fn_{std::move(fn)}
-  {
-  }
-  ~VarSub() noexcept;
+  public:
+    explicit VarSub(std::function<std::string(const std::string&)> fn = getEnv) : fn_{std::move(fn)}
+    {
+    }
+    ~VarSub() noexcept;
 
-  // Copy.
-  VarSub(const VarSub&);
-  VarSub& operator=(const VarSub&);
+    // Copy.
+    VarSub(const VarSub&);
+    VarSub& operator=(const VarSub&);
 
-  // Move.
-  VarSub(VarSub&&);
-  VarSub& operator=(VarSub&&);
+    // Move.
+    VarSub(VarSub&&);
+    VarSub& operator=(VarSub&&);
 
-  void operator()(std::string& s) const { substitute(s, std::string::npos, 0); }
+    void operator()(std::string& s) const { substitute(s, std::string::npos, 0); }
 
- private:
-  /**
-   * Substitute variables.
-   *
-   * @param s The string to substitute.
-   *
-   * @param i Position of opening brace or std::string::npos if top-level.
-   *
-   * @param j Starting position of search. The search space is [j, size).
-   *
-   * @param outer Set of names seen at the same position in outer level.
-   *
-   * @return true if closing brace was found for brace at position i.
-   */
-  bool substitute(std::string& s, const std::size_t i, std::size_t j,
-                  std::set<std::string>* outer = nullptr) const;
+  private:
+    /**
+     * Substitute variables.
+     *
+     * @param s The string to substitute.
+     *
+     * @param i Position of opening brace or std::string::npos if top-level.
+     *
+     * @param j Starting position of search. The search space is [j, size).
+     *
+     * @param outer Set of names seen at the same position in outer level.
+     *
+     * @return true if closing brace was found for brace at position i.
+     */
+    bool substitute(std::string& s, const std::size_t i, std::size_t j,
+                    std::set<std::string>* outer = nullptr) const;
 
-  std::function<std::string(const std::string&)> fn_;
+    std::function<std::string(const std::string&)> fn_;
 };
 
 } // swirly

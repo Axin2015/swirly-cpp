@@ -30,21 +30,21 @@ class Posn;
 class PosnModel;
 
 class PosnView : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  PosnView(PosnModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~PosnView() noexcept override;
+  public:
+    PosnView(PosnModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~PosnView() noexcept override;
 
- signals:
-  void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
-                 std::optional<Ticks> ticks);
+  signals:
+    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+                   std::optional<Ticks> ticks);
 
- private slots:
-  void slotClicked(const QModelIndex& index);
+  private slots:
+    void slotClicked(const QModelIndex& index);
 
- private:
-  PosnModel& model_;
+  private:
+    PosnModel& model_;
 };
 
 } // ui

@@ -25,269 +25,269 @@ namespace {
 
 struct Foo : Transactional {
 
-  int beginCalls{0};
-  int commitCalls{0};
-  int rollbackCalls{0};
+    int beginCalls{0};
+    int commitCalls{0};
+    int rollbackCalls{0};
 
-  void clear() noexcept
-  {
-    reset();
-    beginCalls = 0;
-    commitCalls = 0;
-    rollbackCalls = 0;
-  }
+    void clear() noexcept
+    {
+        reset();
+        beginCalls = 0;
+        commitCalls = 0;
+        rollbackCalls = 0;
+    }
 
- protected:
-  void doBegin() override { ++beginCalls; }
-  void doCommit() override { ++commitCalls; }
-  void doRollback() override { ++rollbackCalls; }
+  protected:
+    void doBegin() override { ++beginCalls; }
+    void doCommit() override { ++commitCalls; }
+    void doRollback() override { ++rollbackCalls; }
 };
 
 } // anonymous
 
 SWIRLY_TEST_CASE(TransScopedCommit)
 {
-  Foo foo;
-  {
-    Transaction trans{foo};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
-  {
-    Transaction trans{foo};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 2);
-  SWIRLY_CHECK(foo.commitCalls == 2);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+    Foo foo;
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 2);
+    SWIRLY_CHECK(foo.commitCalls == 2);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
 SWIRLY_TEST_CASE(TransScopedRollback)
 {
-  Foo foo;
-  {
-    Transaction trans{foo};
-    SWIRLY_CHECK(!foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
-  {
-    Transaction trans{foo};
-    SWIRLY_CHECK(!foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 2);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 2);
+    Foo foo;
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 2);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 2);
 }
 
 SWIRLY_TEST_CASE(TransSingleCommit)
 {
-  Foo foo;
-  {
-    Transaction trans{foo, More::No};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 0);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+    Foo foo;
+    {
+        Transaction trans{foo, More::No};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 0);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 
-  SWIRLY_CHECK(!foo.failed());
-
-  // Next.
-  {
-    Transaction trans{foo};
     SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+
+    // Next.
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
 SWIRLY_TEST_CASE(TransSingleRollback)
 {
-  Foo foo;
-  {
-    Transaction trans{foo, More::No};
-    SWIRLY_CHECK(!foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 0);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+    Foo foo;
+    {
+        Transaction trans{foo, More::No};
+        SWIRLY_CHECK(!foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 0);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 
-  SWIRLY_CHECK(!foo.failed());
-
-  // Next.
-  {
-    Transaction trans{foo};
     SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+
+    // Next.
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
 SWIRLY_TEST_CASE(TransMultiCommit)
 {
-  Foo foo;
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
-  {
-    Transaction trans{foo, More::No};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+    Foo foo;
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
+    {
+        Transaction trans{foo, More::No};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 
-  SWIRLY_CHECK(!foo.failed());
-
-  // Next.
-  {
-    Transaction trans{foo};
     SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 2);
-  SWIRLY_CHECK(foo.commitCalls == 2);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
+
+    // Next.
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 2);
+    SWIRLY_CHECK(foo.commitCalls == 2);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
 }
 
 SWIRLY_TEST_CASE(TransMultiRollbackFirst)
 {
-  Foo foo;
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(!foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
-  {
-    Transaction trans{foo, More::No};
-    SWIRLY_CHECK(foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
+    Foo foo;
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(!foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
+    {
+        Transaction trans{foo, More::No};
+        SWIRLY_CHECK(foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
 
-  SWIRLY_CHECK(!foo.failed());
-
-  // Next.
-  {
-    Transaction trans{foo};
     SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 2);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
+
+    // Next.
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 2);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
 }
 
 SWIRLY_TEST_CASE(TransMultiRollbackSecond)
 {
-  Foo foo;
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 0);
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(!foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
-  {
-    Transaction trans{foo, More::No};
-    SWIRLY_CHECK(foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
+    Foo foo;
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 0);
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(!foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
+    {
+        Transaction trans{foo, More::No};
+        SWIRLY_CHECK(foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
 
-  SWIRLY_CHECK(!foo.failed());
-
-  // Next.
-  {
-    Transaction trans{foo};
     SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 2);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
+
+    // Next.
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 2);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
 }
 
 SWIRLY_TEST_CASE(TransMultiRollbackAll)
 {
-  Foo foo;
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(!foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
-  {
-    Transaction trans{foo, More::Yes};
-    SWIRLY_CHECK(foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
-  {
-    Transaction trans{foo, More::No};
-    SWIRLY_CHECK(foo.failed());
-  }
-  SWIRLY_CHECK(foo.beginCalls == 1);
-  SWIRLY_CHECK(foo.commitCalls == 0);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
+    Foo foo;
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(!foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
+    {
+        Transaction trans{foo, More::Yes};
+        SWIRLY_CHECK(foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
+    {
+        Transaction trans{foo, More::No};
+        SWIRLY_CHECK(foo.failed());
+    }
+    SWIRLY_CHECK(foo.beginCalls == 1);
+    SWIRLY_CHECK(foo.commitCalls == 0);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
 
-  SWIRLY_CHECK(!foo.failed());
-
-  // Next.
-  {
-    Transaction trans{foo};
     SWIRLY_CHECK(!foo.failed());
-    trans.commit();
-  }
-  SWIRLY_CHECK(foo.beginCalls == 2);
-  SWIRLY_CHECK(foo.commitCalls == 1);
-  SWIRLY_CHECK(foo.rollbackCalls == 1);
+
+    // Next.
+    {
+        Transaction trans{foo};
+        SWIRLY_CHECK(!foo.failed());
+        trans.commit();
+    }
+    SWIRLY_CHECK(foo.beginCalls == 2);
+    SWIRLY_CHECK(foo.commitCalls == 1);
+    SWIRLY_CHECK(foo.rollbackCalls == 1);
 }

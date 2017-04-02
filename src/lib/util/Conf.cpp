@@ -35,11 +35,11 @@ Conf& Conf::operator=(Conf&&) = default;
 
 void Conf::read(istream& is)
 {
-  VarSub varSub;
-  parsePairs(is, [this, &varSub](const auto& key, string val) {
-    varSub(val);
-    this->map_.emplace(key, move(val));
-  });
+    VarSub varSub;
+    parsePairs(is, [this, &varSub](const auto& key, string val) {
+        varSub(val);
+        this->map_.emplace(key, move(val));
+    });
 }
 
 } // swirly

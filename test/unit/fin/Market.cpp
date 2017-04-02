@@ -26,42 +26,42 @@ static_assert(sizeof(Market) <= 4 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(MarketToString)
 {
-  Market market{1_id64, "EURUSD"_sv, ymdToJd(2014, 2, 14), 0x01};
+    Market market{1_id64, "EURUSD"_sv, ymdToJd(2014, 2, 14), 0x01};
 
-  SWIRLY_CHECK(toString(market) == //
-               "{\"id\":1"
-               ",\"contr\":\"EURUSD\""
-               ",\"settlDate\":20140314"
-               ",\"state\":1"
-               ",\"lastLots\":null"
-               ",\"lastTicks\":null"
-               ",\"lastTime\":null"
-               ",\"bidTicks\":[null,null,null]"
-               ",\"bidResd\":[null,null,null]"
-               ",\"bidCount\":[null,null,null]"
-               ",\"offerTicks\":[null,null,null]"
-               ",\"offerResd\":[null,null,null]"
-               ",\"offerCount\":[null,null,null]"
-               "}");
+    SWIRLY_CHECK(toString(market) == //
+                 "{\"id\":1"
+                 ",\"contr\":\"EURUSD\""
+                 ",\"settlDate\":20140314"
+                 ",\"state\":1"
+                 ",\"lastLots\":null"
+                 ",\"lastTicks\":null"
+                 ",\"lastTime\":null"
+                 ",\"bidTicks\":[null,null,null]"
+                 ",\"bidResd\":[null,null,null]"
+                 ",\"bidCount\":[null,null,null]"
+                 ",\"offerTicks\":[null,null,null]"
+                 ",\"offerResd\":[null,null,null]"
+                 ",\"offerCount\":[null,null,null]"
+                 "}");
 }
 
 SWIRLY_TEST_CASE(MarketToStringNull)
 {
-  Market market{1_id64, "EURUSD"_sv, 0_jd, 0x01};
+    Market market{1_id64, "EURUSD"_sv, 0_jd, 0x01};
 
-  SWIRLY_CHECK(toString(market) == //
-               "{\"id\":1"
-               ",\"contr\":\"EURUSD\""
-               ",\"settlDate\":null"
-               ",\"state\":1"
-               ",\"lastLots\":null"
-               ",\"lastTicks\":null"
-               ",\"lastTime\":null"
-               ",\"bidTicks\":[null,null,null]"
-               ",\"bidResd\":[null,null,null]"
-               ",\"bidCount\":[null,null,null]"
-               ",\"offerTicks\":[null,null,null]"
-               ",\"offerResd\":[null,null,null]"
-               ",\"offerCount\":[null,null,null]"
-               "}");
+    SWIRLY_CHECK(toString(market) == //
+                 "{\"id\":1"
+                 ",\"contr\":\"EURUSD\""
+                 ",\"settlDate\":null"
+                 ",\"state\":1"
+                 ",\"lastLots\":null"
+                 ",\"lastTicks\":null"
+                 ",\"lastTime\":null"
+                 ",\"bidTicks\":[null,null,null]"
+                 ",\"bidResd\":[null,null,null]"
+                 ",\"bidCount\":[null,null,null]"
+                 ",\"offerTicks\":[null,null,null]"
+                 ",\"offerResd\":[null,null,null]"
+                 ",\"offerCount\":[null,null,null]"
+                 "}");
 }

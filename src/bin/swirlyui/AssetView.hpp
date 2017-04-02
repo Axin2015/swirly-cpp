@@ -29,22 +29,22 @@ class Asset;
 class AssetModel;
 
 class AssetView : public QWidget {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  AssetView(AssetModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-  ~AssetView() noexcept override;
+  public:
+    AssetView(AssetModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~AssetView() noexcept override;
 
-  void resizeColumnsToContents();
+    void resizeColumnsToContents();
 
- signals:
+  signals:
 
- private slots:
-  void slotClicked(const QModelIndex& index);
+  private slots:
+    void slotClicked(const QModelIndex& index);
 
- private:
-  AssetModel& model_;
-  QTableView* table_{nullptr};
+  private:
+    AssetModel& model_;
+    QTableView* table_{nullptr};
 };
 
 } // ui

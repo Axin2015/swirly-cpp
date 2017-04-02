@@ -24,40 +24,40 @@ namespace swirly {
 template <typename DerivedT>
 struct BasicMsgHandler {
 
-  BasicMsgHandler() noexcept = default;
+    BasicMsgHandler() noexcept = default;
 
-  // Copy.
-  BasicMsgHandler(const BasicMsgHandler&) noexcept = default;
-  BasicMsgHandler& operator=(const BasicMsgHandler&) noexcept = default;
+    // Copy.
+    BasicMsgHandler(const BasicMsgHandler&) noexcept = default;
+    BasicMsgHandler& operator=(const BasicMsgHandler&) noexcept = default;
 
-  // Move.
-  BasicMsgHandler(BasicMsgHandler&&) noexcept = default;
-  BasicMsgHandler& operator=(BasicMsgHandler&&) noexcept = default;
+    // Move.
+    BasicMsgHandler(BasicMsgHandler&&) noexcept = default;
+    BasicMsgHandler& operator=(BasicMsgHandler&&) noexcept = default;
 
-  void dispatch(const Msg& msg)
-  {
-    auto* const derived = static_cast<DerivedT*>(this);
-    switch (msg.type) {
-    case MsgType::Reset:
-      derived->onReset();
-      break;
-    case MsgType::CreateMarket:
-      derived->onCreateMarket(msg.createMarket);
-      break;
-    case MsgType::UpdateMarket:
-      derived->onUpdateMarket(msg.updateMarket);
-      break;
-    case MsgType::CreateExec:
-      derived->onCreateExec(msg.createExec);
-      break;
-    case MsgType::ArchiveTrade:
-      derived->onArchiveTrade(msg.archiveTrade);
-      break;
+    void dispatch(const Msg& msg)
+    {
+        auto* const derived = static_cast<DerivedT*>(this);
+        switch (msg.type) {
+        case MsgType::Reset:
+            derived->onReset();
+            break;
+        case MsgType::CreateMarket:
+            derived->onCreateMarket(msg.createMarket);
+            break;
+        case MsgType::UpdateMarket:
+            derived->onUpdateMarket(msg.updateMarket);
+            break;
+        case MsgType::CreateExec:
+            derived->onCreateExec(msg.createExec);
+            break;
+        case MsgType::ArchiveTrade:
+            derived->onArchiveTrade(msg.archiveTrade);
+            break;
+        }
     }
-  }
 
- protected:
-  ~BasicMsgHandler() noexcept = default;
+  protected:
+    ~BasicMsgHandler() noexcept = default;
 };
 
 } // swirly

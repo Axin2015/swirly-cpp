@@ -37,71 +37,71 @@ class RestServ;
 
 class HttpSess : public RefCounted<HttpSess>, public BasicHttpHandler<HttpSess> {
 
-  friend class BasicHttpHandler<HttpSess>;
-  enum { IdleTimeout = 5, MaxData = 4096 };
+    friend class BasicHttpHandler<HttpSess>;
+    enum { IdleTimeout = 5, MaxData = 4096 };
 
- public:
-  HttpSess(boost::asio::io_service& ioServ, RestServ& restServ)
-    : BasicHttpHandler<HttpSess>{HttpType::Request},
-      sock_{ioServ},
-      timeout_{ioServ},
-      restServ_(restServ)
-  {
-  }
-  ~HttpSess() noexcept;
+  public:
+    HttpSess(boost::asio::io_service& ioServ, RestServ& restServ)
+        : BasicHttpHandler<HttpSess>{HttpType::Request},
+          sock_{ioServ},
+          timeout_{ioServ},
+          restServ_(restServ)
+    {
+    }
+    ~HttpSess() noexcept;
 
-  // Copy.
-  HttpSess(const HttpSess&) = delete;
-  HttpSess& operator=(const HttpSess&) = delete;
+    // Copy.
+    HttpSess(const HttpSess&) = delete;
+    HttpSess& operator=(const HttpSess&) = delete;
 
-  // Move.
-  HttpSess(HttpSess&&) = delete;
-  HttpSess& operator=(HttpSess&&) = delete;
+    // Move.
+    HttpSess(HttpSess&&) = delete;
+    HttpSess& operator=(HttpSess&&) = delete;
 
-  LogMsg& logMsg() noexcept
-  {
-    auto& ref = swirly::logMsg();
-    boost::system::error_code ec;
-    ref << '<' << sock_.remote_endpoint(ec) << "> ";
-    return ref;
-  }
+    LogMsg& logMsg() noexcept
+    {
+        auto& ref = swirly::logMsg();
+        boost::system::error_code ec;
+        ref << '<' << sock_.remote_endpoint(ec) << "> ";
+        return ref;
+    }
 
-  void start();
-  void stop() noexcept;
-  auto& socket() noexcept { return sock_; }
+    void start();
+    void stop() noexcept;
+    auto& socket() noexcept { return sock_; }
 
- private:
-  void parse();
-  void resetTimeout();
+  private:
+    void parse();
+    void resetTimeout();
 
-  void asyncReadSome();
-  void asyncWrite();
-  void onReadSome(std::size_t len) noexcept;
-  void onWrite() noexcept;
+    void asyncReadSome();
+    void asyncWrite();
+    void onReadSome(std::size_t len) noexcept;
+    void onWrite() noexcept;
 
-  bool onMessageBegin() noexcept { return true; }
-  bool onUrl(std::string_view sv) noexcept;
-  bool onStatus(std::string_view sv) noexcept
-  {
-    // Only supported for HTTP responses.
-    return false;
-  }
-  bool onHeaderField(std::string_view sv, bool first) noexcept;
-  bool onHeaderValue(std::string_view sv, bool first) noexcept;
-  bool onHeadersEnd() noexcept;
-  bool onBody(std::string_view sv) noexcept;
-  bool onMessageEnd() noexcept;
-  bool onChunkHeader(size_t len) noexcept { return true; }
-  bool onChunkEnd() noexcept { return true; }
+    bool onMessageBegin() noexcept { return true; }
+    bool onUrl(std::string_view sv) noexcept;
+    bool onStatus(std::string_view sv) noexcept
+    {
+        // Only supported for HTTP responses.
+        return false;
+    }
+    bool onHeaderField(std::string_view sv, bool first) noexcept;
+    bool onHeaderValue(std::string_view sv, bool first) noexcept;
+    bool onHeadersEnd() noexcept;
+    bool onBody(std::string_view sv) noexcept;
+    bool onMessageEnd() noexcept;
+    bool onChunkHeader(size_t len) noexcept { return true; }
+    bool onChunkEnd() noexcept { return true; }
 
-  boost::asio::ip::tcp::socket sock_;
-  // Close session if client is inactive.
-  boost::asio::deadline_timer timeout_;
-  RestServ& restServ_;
-  char data_[MaxData];
-  boost::asio::const_buffer inbuf_;
-  HttpRequest req_;
-  RingBuffer<std::string> outbuf_{8};
+    boost::asio::ip::tcp::socket sock_;
+    // Close session if client is inactive.
+    boost::asio::deadline_timer timeout_;
+    RestServ& restServ_;
+    char data_[MaxData];
+    boost::asio::const_buffer inbuf_;
+    HttpRequest req_;
+    RingBuffer<std::string> outbuf_{8};
 };
 
 using HttpSessPtr = boost::intrusive_ptr<HttpSess>;

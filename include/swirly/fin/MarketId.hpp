@@ -24,18 +24,18 @@ namespace swirly {
 
 constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
 {
-  return Id64{(contrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
+    return Id64{(contrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
 }
 
 constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
 {
-  return toMarketId(contrId, maybeIsoToJd(settlDate));
+    return toMarketId(contrId, maybeIsoToJd(settlDate));
 }
 
 template <typename ValueT>
 struct MarketIdTraits {
-  using Id = Id64;
-  static Id id(const ValueT& value) noexcept { return value.marketId(); }
+    using Id = Id64;
+    static Id id(const ValueT& value) noexcept { return value.marketId(); }
 };
 
 } // swirly

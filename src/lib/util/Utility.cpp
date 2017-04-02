@@ -20,25 +20,25 @@ namespace swirly {
 
 int hexDigits(int64_t i) noexcept
 {
-  int n{0};
-  if (i & 0xffffffff00000000) {
-    n += 8;
-    i >>= 32;
-  }
-  if (i & 0xffff0000) {
-    n += 4;
-    i >>= 16;
-  }
-  if (i & 0xff00) {
-    n += 2;
-    i >>= 8;
-  }
-  if (i & 0xf0) {
-    n += 2;
-  } else if (i & 0x0f) {
-    ++n;
-  }
-  return n;
+    int n{0};
+    if (i & 0xffffffff00000000) {
+        n += 8;
+        i >>= 32;
+    }
+    if (i & 0xffff0000) {
+        n += 4;
+        i >>= 16;
+    }
+    if (i & 0xff00) {
+        n += 2;
+        i >>= 8;
+    }
+    if (i & 0xf0) {
+        n += 2;
+    } else if (i & 0x0f) {
+        ++n;
+    }
+    return n;
 }
 
 } // swirly

@@ -22,6 +22,6 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(toMarketId)
 {
-  const auto id = toMarketId(171_id32, 2492719_jd);
-  SWIRLY_CHECK(id == 0xabcdef_id64);
+    const auto id = toMarketId(171_id32, 2492719_jd);
+    SWIRLY_CHECK(id == 0xabcdef_id64);
 }

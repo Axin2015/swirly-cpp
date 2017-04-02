@@ -26,42 +26,42 @@ using namespace swirly;
 namespace {
 
 struct Foo {
-  char data[2 << 6];
+    char data[2 << 6];
 };
 
 struct Bar {
-  char data[5 << 6];
+    char data[5 << 6];
 };
 
 } // anonymous
 
 SWIRLY_TEST_CASE(MemPool)
 {
-  MemPool memPool;
+    MemPool memPool;
 
-  // Throw if no memory has been reserved.
-  SWIRLY_CHECK(memPool.capacity() == 0);
+    // Throw if no memory has been reserved.
+    SWIRLY_CHECK(memPool.capacity() == 0);
 
-  // These should all call the custom allocator with zero capacity.
-  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Foo)), bad_alloc);
-  SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Bar)), bad_alloc);
+    // These should all call the custom allocator with zero capacity.
+    SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Foo)), bad_alloc);
+    SWIRLY_CHECK_THROW(memPool.alloc(sizeof(Bar)), bad_alloc);
 
-  {
-    memPool.reserve(1024);
-    SWIRLY_CHECK(memPool.capacity() == 1024);
-  }
-  {
-    memPool = MemPool{4096};
-    SWIRLY_CHECK(memPool.capacity() == 4096);
-  }
+    {
+        memPool.reserve(1024);
+        SWIRLY_CHECK(memPool.capacity() == 1024);
+    }
+    {
+        memPool = MemPool{4096};
+        SWIRLY_CHECK(memPool.capacity() == 4096);
+    }
 
-  char* p1{static_cast<char*>(memPool.alloc(sizeof(Foo)))};
-  // Check that it's writable.
-  strcpy(p1, "test");
-  memPool.dealloc(p1, sizeof(Foo));
+    char* p1{static_cast<char*>(memPool.alloc(sizeof(Foo)))};
+    // Check that it's writable.
+    strcpy(p1, "test");
+    memPool.dealloc(p1, sizeof(Foo));
 
-  // Check that the same address is returned.
-  char* p2{static_cast<char*>(memPool.alloc(sizeof(Foo)))};
-  SWIRLY_CHECK(p1 == p2);
-  memPool.dealloc(p2, sizeof(Foo));
+    // Check that the same address is returned.
+    char* p2{static_cast<char*>(memPool.alloc(sizeof(Foo)))};
+    SWIRLY_CHECK(p1 == p2);
+    memPool.dealloc(p2, sizeof(Foo));
 }

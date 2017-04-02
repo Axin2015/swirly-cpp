@@ -27,22 +27,22 @@ class Conf;
 struct Msg;
 
 class SWIRLY_API Journ {
- public:
-  Journ() noexcept = default;
-  virtual ~Journ() noexcept;
+  public:
+    Journ() noexcept = default;
+    virtual ~Journ() noexcept;
 
-  // Copy.
-  constexpr Journ(const Journ&) noexcept = default;
-  Journ& operator=(const Journ&) noexcept = default;
+    // Copy.
+    constexpr Journ(const Journ&) noexcept = default;
+    Journ& operator=(const Journ&) noexcept = default;
 
-  // Move.
-  constexpr Journ(Journ&&) noexcept = default;
-  Journ& operator=(Journ&&) noexcept = default;
+    // Move.
+    constexpr Journ(Journ&&) noexcept = default;
+    Journ& operator=(Journ&&) noexcept = default;
 
-  void update(const Msg& msg) { doUpdate(msg); }
+    void update(const Msg& msg) { doUpdate(msg); }
 
- protected:
-  virtual void doUpdate(const Msg& msg) = 0;
+  protected:
+    virtual void doUpdate(const Msg& msg) = 0;
 };
 
 /**

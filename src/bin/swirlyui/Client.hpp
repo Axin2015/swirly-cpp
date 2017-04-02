@@ -31,51 +31,51 @@ namespace swirly {
 namespace ui {
 
 class Client : public QObject {
-  Q_OBJECT
+    Q_OBJECT
 
- public:
-  Client(QObject* parent = nullptr);
-  ~Client() noexcept = default;
+  public:
+    Client(QObject* parent = nullptr);
+    ~Client() noexcept = default;
 
-  const AssetModel& assetModel() const noexcept { return assetModel_; }
-  const ContrModel& contrModel() const noexcept { return contrModel_; }
-  const MarketModel& marketModel() const noexcept { return marketModel_; }
-  const OrderModel& orderModel() const noexcept { return orderModel_; }
-  const ExecModel& execModel() const noexcept { return execModel_; }
-  const TradeModel& tradeModel() const noexcept { return tradeModel_; }
-  const PosnModel& posnModel() const noexcept { return posnModel_; }
+    const AssetModel& assetModel() const noexcept { return assetModel_; }
+    const ContrModel& contrModel() const noexcept { return contrModel_; }
+    const MarketModel& marketModel() const noexcept { return marketModel_; }
+    const OrderModel& orderModel() const noexcept { return orderModel_; }
+    const ExecModel& execModel() const noexcept { return execModel_; }
+    const TradeModel& tradeModel() const noexcept { return tradeModel_; }
+    const PosnModel& posnModel() const noexcept { return posnModel_; }
 
-  AssetModel& assetModel() noexcept { return assetModel_; }
-  ContrModel& contrModel() noexcept { return contrModel_; }
-  MarketModel& marketModel() noexcept { return marketModel_; }
-  OrderModel& orderModel() noexcept { return orderModel_; }
-  ExecModel& execModel() noexcept { return execModel_; }
-  TradeModel& tradeModel() noexcept { return tradeModel_; }
-  PosnModel& posnModel() noexcept { return posnModel_; }
+    AssetModel& assetModel() noexcept { return assetModel_; }
+    ContrModel& contrModel() noexcept { return contrModel_; }
+    MarketModel& marketModel() noexcept { return marketModel_; }
+    OrderModel& orderModel() noexcept { return orderModel_; }
+    ExecModel& execModel() noexcept { return execModel_; }
+    TradeModel& tradeModel() noexcept { return tradeModel_; }
+    PosnModel& posnModel() noexcept { return posnModel_; }
 
-  virtual void createMarket(const Contr& contr, QDate settlDate) = 0;
-  virtual void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
-                           Lots lots, Ticks ticks)
-    = 0;
-  virtual void cancelOrders(const OrderKeys& keys) = 0;
+    virtual void createMarket(const Contr& contr, QDate settlDate) = 0;
+    virtual void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+                             Lots lots, Ticks ticks)
+        = 0;
+    virtual void cancelOrders(const OrderKeys& keys) = 0;
 
- signals:
-  void refDataComplete();
-  void serviceError(const QString& error);
+  signals:
+    void refDataComplete();
+    void serviceError(const QString& error);
 
- protected:
-  void reset();
+  protected:
+    void reset();
 
- private slots:
+  private slots:
 
- private:
-  AssetModel assetModel_;
-  ContrModel contrModel_;
-  MarketModel marketModel_;
-  OrderModel orderModel_;
-  ExecModel execModel_;
-  TradeModel tradeModel_;
-  PosnModel posnModel_;
+  private:
+    AssetModel assetModel_;
+    ContrModel contrModel_;
+    MarketModel marketModel_;
+    OrderModel orderModel_;
+    ExecModel execModel_;
+    TradeModel tradeModel_;
+    PosnModel posnModel_;
 };
 
 } // ui
