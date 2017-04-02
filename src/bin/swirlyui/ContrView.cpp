@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "ContrView.hpp"
+#include "ContrView.hxx"
 
-#include "ContrModel.hpp"
-#include "Utility.hpp"
+#include "ContrModel.hxx"
+#include "Utility.hxx"
 
 #include <QGridLayout>
 #include <QModelIndex>

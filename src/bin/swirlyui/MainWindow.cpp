@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "MainWindow.hpp"
+#include "MainWindow.hxx"
 
-#include "AssetView.hpp"
-#include "ContrView.hpp"
-#include "ExecView.hpp"
-#include "MarketView.hpp"
-#include "OrderView.hpp"
-#include "PosnView.hpp"
-#include "TradeView.hpp"
+#include "AssetView.hxx"
+#include "ContrView.hxx"
+#include "ExecView.hxx"
+#include "MarketView.hxx"
+#include "OrderView.hxx"
+#include "PosnView.hxx"
+#include "TradeView.hxx"
 
 #include <QtWidgets>
 

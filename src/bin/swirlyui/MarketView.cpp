@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "MarketView.hpp"
+#include "MarketView.hxx"
 
-#include "MarketForm.hpp"
-#include "MarketModel.hpp"
-#include "Utility.hpp"
+#include "MarketForm.hxx"
+#include "MarketModel.hxx"
+#include "Utility.hxx"
 
 #include <QModelIndex>
 #include <QTableView>

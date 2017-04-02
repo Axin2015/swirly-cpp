@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Model.hpp"
+#include "Model.hxx"
 
 #include <swirly/fin/Asset.hpp>
 #include <swirly/fin/Contr.hpp>

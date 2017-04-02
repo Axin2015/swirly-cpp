@@ -16,7 +16,7 @@
  */
 #include <QApplication>
 
-#include "MainWindow.hpp"
+#include "MainWindow.hxx"
 
 int main(int argc, char* argv[])
 {

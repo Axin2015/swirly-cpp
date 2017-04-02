@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "ExecView.hpp"
+#include "ExecView.hxx"
 
-#include "ExecModel.hpp"
-#include "Utility.hpp"
+#include "ExecModel.hxx"
+#include "Utility.hxx"
 
 #include <QGridLayout>
 #include <QModelIndex>

@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Utility.hpp"
+#include "Utility.hxx"
 
-#include "Exception.hpp"
+#include "Exception.hxx"
 
 #include <swirly/util/Conf.hpp>
 #include <swirly/util/Log.hpp>

@@ -28,7 +28,7 @@
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Finally.hpp>
 
-#include "Match.hpp"
+#include "Match.hxx"
 
 #include <regex>
 

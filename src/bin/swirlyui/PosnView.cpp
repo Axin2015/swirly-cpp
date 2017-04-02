@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "PosnView.hpp"
+#include "PosnView.hxx"
 
-#include "PosnModel.hpp"
-#include "Utility.hpp"
+#include "PosnModel.hxx"
+#include "Utility.hxx"
 
 #include <QGridLayout>
 #include <QModelIndex>

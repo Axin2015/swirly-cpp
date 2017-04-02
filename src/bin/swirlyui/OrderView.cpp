@@ -14,11 +14,11 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "OrderView.hpp"
+#include "OrderView.hxx"
 
-#include "OrderForm.hpp"
-#include "OrderModel.hpp"
-#include "Utility.hpp"
+#include "OrderForm.hxx"
+#include "OrderModel.hxx"
+#include "Utility.hxx"
 
 #include <QModelIndex>
 #include <QTableView>

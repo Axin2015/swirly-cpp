@@ -14,14 +14,14 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "HttpClient.hpp"
+#include "HttpClient.hxx"
 
-#include "Asset.hpp"
-#include "Contr.hpp"
-#include "Exec.hpp"
-#include "Market.hpp"
-#include "Order.hpp"
-#include "Posn.hpp"
+#include "Asset.hxx"
+#include "Contr.hxx"
+#include "Exec.hxx"
+#include "Market.hxx"
+#include "Order.hxx"
+#include "Posn.hxx"
 
 #include <QJsonArray>
 #include <QJsonDocument>
