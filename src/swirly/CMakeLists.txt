@@ -21,3 +21,10 @@ add_subdirectory(ws)
 
 # FIXME: the following libraries should be modules.
 add_subdirectory(sqlite)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                  DESTINATION include
+                  FILES_MATCHING
+                  PATTERN "*.h"
+                  PATTERN "*.hpp"
+                  PATTERN "Doxyfile.h" EXCLUDE)

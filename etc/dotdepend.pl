@@ -23,7 +23,7 @@ my $cxx = $ENV{CXX} || 'g++';
 my $lib = shift;
 $lib or die "Library name not specified";
 
-my $makedepend = "$cxx -std=c++14 -MM -MG -Iinclude include/swirly/$lib/*.hpp src/swirly/$lib/*.[ch]pp";
+my $makedepend = "$cxx -std=c++14 -MM -MG -Isrc src/swirly/$lib/*.[ch]pp";
 my $tred = 'tred';
 
 sub ltrim {

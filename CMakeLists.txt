@@ -108,8 +108,7 @@ if(DOXYGEN_FOUND)
 endif()
 
 include_directories("${Boost_INCLUDE_DIRS}")
-include_directories("${PROJECT_SOURCE_DIR}/contrib")
-include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/src")
 
 if(ENABLE_SHARED_LIBS)
   set(unit_LIBRARY unit_shared)
@@ -132,7 +131,6 @@ enable_testing()
 add_subdirectory(db)
 add_subdirectory(etc)
 add_subdirectory(image)
-add_subdirectory(include)
 add_subdirectory(src)
 
 add_subdirectory(test)
