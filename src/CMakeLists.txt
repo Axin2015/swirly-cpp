@@ -14,4 +14,9 @@
 # 02110-1301, USA.
 
 add_subdirectory(swirly)
-add_subdirectory(bin)
+
+add_subdirectory(swirlyd)
+if(Qt5Widgets_FOUND AND Qt5Network_FOUND)
+  add_subdirectory(swirlyui)
+endif()
+add_subdirectory(tool)
