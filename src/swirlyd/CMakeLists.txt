@@ -13,7 +13,13 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-file(GLOB swirlyd_SOURCES "*.cpp")
+set(swirlyd_SOURCES
+  HttpRequest.cpp
+  HttpResponse.cpp
+  HttpServ.cpp
+  HttpSess.cpp
+  Main.cpp
+  RestServ.cpp)
 
 add_executable(swirlyd ${swirlyd_SOURCES})
 target_link_libraries(swirlyd ${ws_LIBRARY} ${sqlite_LIBRARY}

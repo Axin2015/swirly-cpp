@@ -46,6 +46,13 @@ endif()
 
 add_custom_target(db ALL DEPENDS ${dbfiles})
 
-file(GLOB sqlfiles "*.sql")
+set(sqlfiles
+  coal.sql
+  coffee.sql
+  corp.sql
+  forex.sql
+  schema.sql
+  test.sql)
+
 install(FILES ${sqlfiles}  DESTINATION db)
 install(FILES ${dbfiles} DESTINATION db)

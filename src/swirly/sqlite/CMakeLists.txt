@@ -13,7 +13,11 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-file(GLOB sqlite_SOURCES "*.cpp")
+set(sqlite_SOURCES
+  Exception.cpp
+  Journ.cpp
+  Model.cpp
+  Utility.cpp)
 
 include_directories(${SQLITE3_INCLUDE_DIRS})
 

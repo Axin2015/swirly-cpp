@@ -41,3 +41,17 @@ if(ENABLE_SHARED_LIBS)
   target_link_libraries(ws_shared clob_shared)
   install(TARGETS ws_shared DESTINATION lib)
 endif()
+
+set(ws_test_SOURCES
+  EntitySetTest.cpp
+  HttpHandlerTest.cpp
+  MainTest.cpp
+  PageTest.cpp
+  RestBodyTest.cpp
+  RestTest.cpp
+  UrlTest.cpp)
+
+add_executable(swirly_ws_test ${ws_test_SOURCES})
+target_link_libraries(swirly_ws_test ${ws_LIBRARY} ${unit_LIBRARY})
+
+add_test(NAME ws_test COMMAND swirly_ws_test)

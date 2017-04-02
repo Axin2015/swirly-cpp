@@ -13,7 +13,8 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-file(GLOB unit_SOURCES "*.cpp")
+set(unit_SOURCES
+  Test.cpp)
 
 add_library(unit_static STATIC ${unit_SOURCES})
 set_target_properties(unit_static PROPERTIES OUTPUT_NAME swirly_unit)

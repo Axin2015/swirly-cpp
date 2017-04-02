@@ -13,16 +13,35 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-file(GLOB clob_SOURCES "*.cpp")
+set(clob_SOURCES
+  Accnt.cpp
+  AsyncJourn.cpp
+  Match.cpp
+  Response.cpp
+  Serv.cpp
+  Test.cpp)
 
 add_library(clob_static STATIC ${clob_SOURCES})
-set_target_properties(clob_static PROPERTIES OUTPUT_NAME swirly_om)
+set_target_properties(clob_static PROPERTIES OUTPUT_NAME swirly_clob)
 target_link_libraries(clob_static fin_static)
 install(TARGETS clob_static DESTINATION lib)
 
 if(ENABLE_SHARED_LIBS)
   add_library(clob_shared SHARED ${clob_SOURCES})
-  set_target_properties(clob_shared PROPERTIES OUTPUT_NAME swirly_om)
+  set_target_properties(clob_shared PROPERTIES OUTPUT_NAME swirly_clob)
   target_link_libraries(clob_shared fin_shared)
   install(TARGETS clob_shared DESTINATION lib)
 endif()
+
+set(clob_test_SOURCES
+  AccntTest.cpp
+  AsyncJournTest.cpp
+  MainTest.cpp
+  MatchTest.cpp
+  ResponseTest.cpp
+  ServTest.cpp)
+
+add_executable(swirly_clob_test ${clob_test_SOURCES})
+target_link_libraries(swirly_clob_test ${clob_LIBRARY} ${unit_LIBRARY})
+
+add_test(NAME clob_test COMMAND swirly_clob_test)

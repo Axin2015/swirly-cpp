@@ -13,7 +13,21 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-file(GLOB fin_SOURCES "*.cpp")
+set(fin_SOURCES
+  Asset.cpp
+  Contr.cpp
+  Date.cpp
+  Exception.cpp
+  Exec.cpp
+  Journ.cpp
+  Level.cpp
+  Market.cpp
+  MarketSide.cpp
+  Model.cpp
+  Order.cpp
+  Posn.cpp
+  Request.cpp
+  Transaction.cpp)
 
 add_library(fin_static STATIC ${fin_SOURCES})
 set_target_properties(fin_static PROPERTIES OUTPUT_NAME swirly_fin)
@@ -26,3 +40,32 @@ if(ENABLE_SHARED_LIBS)
   target_link_libraries(fin_shared util_shared)
   install(TARGETS fin_shared DESTINATION lib)
 endif()
+
+set(fin_test_SOURCES
+  AssetTest.cpp
+  BasicTypesTest.cpp
+  ContrTest.cpp
+  ConvTest.cpp
+  DateTest.cpp
+  ExceptionTest.cpp
+  ExecTest.cpp
+  JournTest.cpp
+  LevelTest.cpp
+  LimitsTest.cpp
+  MainTest.cpp
+  MarketIdTest.cpp
+  MarketSideTest.cpp
+  MarketTest.cpp
+  ModelTest.cpp
+  MsgHandlerTest.cpp
+  MsgTest.cpp
+  OrderTest.cpp
+  PosnTest.cpp
+  RequestTest.cpp
+  TransactionTest.cpp
+  TypesTest.cpp)
+
+add_executable(swirly_fin_test ${fin_test_SOURCES})
+target_link_libraries(swirly_fin_test ${fin_LIBRARY} ${unit_LIBRARY})
+
+add_test(NAME fin_test COMMAND swirly_fin_test)

@@ -133,8 +133,6 @@ add_subdirectory(etc)
 add_subdirectory(image)
 add_subdirectory(src)
 
-add_subdirectory(test)
-
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_NAME "Swirly")
 set(CPACK_PACKAGE_VENDOR "Swirly Cloud Limited")
