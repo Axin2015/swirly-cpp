@@ -13,7 +13,7 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-include_directories("${PROJECT_SOURCE_DIR}/src/lib/clob")
+include_directories("${PROJECT_SOURCE_DIR}/src/swirly/clob")
 
 file(GLOB clob_test_SOURCES "*.cpp")
 
