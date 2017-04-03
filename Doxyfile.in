@@ -152,7 +152,7 @@ FULL_PATH_NAMES        = YES
 # will be relative from the directory where doxygen is started.
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
-STRIP_FROM_PATH        = "${PROJECT_SOURCE_DIR}/include/swirly"
+STRIP_FROM_PATH        = "${PROJECT_SOURCE_DIR}/src/swirly"
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -161,7 +161,7 @@ STRIP_FROM_PATH        = "${PROJECT_SOURCE_DIR}/include/swirly"
 # specify the list of include paths that are normally passed to the compiler
 # using the -I flag.
 
-STRIP_FROM_INC_PATH    = "${PROJECT_SOURCE_DIR}/include"
+STRIP_FROM_INC_PATH    = "${PROJECT_SOURCE_DIR}/src"
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter (but
 # less readable) file names. This can be useful is your file systems doesn't
@@ -772,7 +772,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = "${PROJECT_SOURCE_DIR}/doc" \
-                         "${PROJECT_SOURCE_DIR}/include/swirly"
+                         "${PROJECT_SOURCE_DIR}/src/swirly"
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -797,7 +797,8 @@ INPUT_ENCODING         = UTF-8
 # *.m, *.markdown, *.md, *.mm, *.dox, *.py, *.pyw, *.f90, *.f, *.for, *.tcl,
 # *.vhd, *.vhdl, *.ucf, *.qsf, *.as and *.js.
 
-FILE_PATTERNS          = *.h \
+FILE_PATTERNS          = *.cpp \
+                         *.h \
                          *.hpp \
                          *.md
 
@@ -847,8 +848,7 @@ EXCLUDE_SYMBOLS        =
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = "${PROJECT_SOURCE_DIR}/example" \
-                         "${PROJECT_SOURCE_DIR}/test"
+EXAMPLE_PATH           = "${PROJECT_SOURCE_DIR}/example"
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
@@ -939,7 +939,7 @@ USE_MDFILE_AS_MAINPAGE = doc/Home.md
 # also VERBATIM_HEADERS is set to NO.
 # The default value is: NO.
 
-SOURCE_BROWSER         = NO
+SOURCE_BROWSER         = YES
 
 # Setting the INLINE_SOURCES tag to YES will include the body of functions,
 # classes and enums directly into the documentation.
