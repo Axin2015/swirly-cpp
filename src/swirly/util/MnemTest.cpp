@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/util/Mnem.hpp>
+#include "Mnem.hpp"
 
 #include <swirly/unit/Test.hpp>
 
@@ -22,9 +22,6 @@
 
 using namespace std;
 using namespace swirly;
-
-static_assert(Mnem{}.empty(), "default constructor not constexpr");
-static_assert(Mnem{Mnem{}}.empty(), "copy constructor not constexpr");
 
 SWIRLY_TEST_CASE(MnemEmpty)
 {

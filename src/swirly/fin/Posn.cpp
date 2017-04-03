@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Posn.hpp>
+#include "Posn.hpp"
 
 #include <swirly/util/Date.hpp>
 #include <swirly/util/Mnem.hpp>
@@ -22,6 +22,8 @@
 using namespace std;
 
 namespace swirly {
+
+static_assert(sizeof(Posn) <= 2 * 64, "crossed cache-line boundary");
 
 Posn::~Posn() noexcept = default;
 

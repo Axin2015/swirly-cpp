@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Posn.hpp>
+#include "Posn.hpp"
 
 #include <swirly/fin/MarketId.hpp>
 
@@ -25,8 +25,6 @@
 
 using namespace std;
 using namespace swirly;
-
-static_assert(sizeof(Posn) <= 2 * 64, "crossed cache-line boundary");
 
 using AccntPosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 

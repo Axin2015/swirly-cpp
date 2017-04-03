@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/clob/Serv.hpp>
+#include "Serv.hpp"
 
 #include <swirly/clob/Accnt.hpp>
 #include <swirly/clob/Response.hpp>

@@ -14,25 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Utility.hpp"
-
-#include <swirly/unit/Test.hpp>
-
-using namespace std;
-using namespace swirly;
-
-SWIRLY_TEST_CASE(HexDigits)
-{
-    SWIRLY_CHECK(hexDigits(0x1) == 1);
-    SWIRLY_CHECK(hexDigits(0xf) == 1);
-    SWIRLY_CHECK(hexDigits(0x10) == 2);
-    SWIRLY_CHECK(hexDigits(0xff) == 2);
-
-    SWIRLY_CHECK(hexDigits(0xcdef) == 4);
-    SWIRLY_CHECK(hexDigits(0x10000) == 5);
-    SWIRLY_CHECK(hexDigits(0x89abcdef) == 8);
-    SWIRLY_CHECK(hexDigits(0x100000000) == 9);
-    SWIRLY_CHECK(hexDigits(0x567890abcdef) == 12);
-    SWIRLY_CHECK(hexDigits(0x1000000000000) == 13);
-    SWIRLY_CHECK(hexDigits(0x1234567890abcdef) == 16);
-}
+#include "Numeric.hpp"

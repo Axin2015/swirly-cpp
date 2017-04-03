@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Market.hpp>
+#include "Market.hpp"
 
 #include <swirly/util/Date.hpp>
 
@@ -23,6 +23,9 @@
 using namespace std;
 
 namespace swirly {
+
+static_assert(sizeof(Market) <= 4 * 64, "crossed cache-line boundary");
+
 namespace {
 template <typename FnT>
 void toJsonLevels(LevelSet::ConstIterator it, LevelSet::ConstIterator end, ostream& os, FnT fn)

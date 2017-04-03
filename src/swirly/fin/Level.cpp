@@ -14,13 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Level.hpp>
+#include "Level.hpp"
 
 #include <swirly/fin/Order.hpp>
 
 using namespace std;
 
 namespace swirly {
+
+static_assert(sizeof(Level) <= 2 * 64, "crossed cache-line boundary");
 
 Level::Level(const Order& firstOrder) noexcept
     : firstOrder_{&firstOrder},

@@ -14,16 +14,34 @@
 # 02110-1301, USA.
 
 set(util_SOURCES
+  Array.cpp
+  BasicTypes.cpp
+  Compare.cpp
   Conf.cpp
+  Date.cpp
+  Defs.cpp
+  Enum.cpp
   Exception.cpp
+  Finally.cpp
+  IntWrapper.cpp
+  Limits.cpp
   Log.cpp
+  Math.cpp
   MemAlloc.cpp
   MemPool.cpp
+  Mnem.cpp
+  Numeric.cpp
+  Pipe.cpp
   Profile.cpp
+  RefCounted.cpp
+  RingBuffer.cpp
+  Set.cpp
   Stream.cpp
   String.cpp
   System.cpp
   Time.cpp
+  Tokeniser.cpp
+  Types.cpp
   Utility.cpp
   VarSub.cpp)
 
@@ -41,38 +59,30 @@ endif()
 
 set(util_test_SOURCES
   ArrayTest.cpp
-  BasicTypesTest.cpp
-  CompareTest.cpp
   ConfTest.cpp
   DateTest.cpp
-  DefsTest.cpp
   EnumTest.cpp
   ExceptionTest.cpp
   FinallyTest.cpp
   IntWrapperTest.cpp
-  LimitsTest.cpp
   LogTest.cpp
-  MainTest.cpp
   MathTest.cpp
-  MemAllocTest.cpp
   MemPoolTest.cpp
   MnemTest.cpp
-  NumericTest.cpp
   PipeTest.cpp
-  ProfileTest.cpp
   RefCountedTest.cpp
   RingBufferTest.cpp
   SetTest.cpp
   StreamTest.cpp
   StringTest.cpp
-  SystemTest.cpp
-  TimeTest.cpp
   TokeniserTest.cpp
-  TypesTest.cpp
   UtilityTest.cpp
   VarSubTest.cpp)
 
-add_executable(swirly_util_test ${util_test_SOURCES})
-target_link_libraries(swirly_util_test ${util_LIBRARY} ${unit_LIBRARY})
-
-add_test(NAME util_test COMMAND swirly_util_test)
+foreach(file ${util_test_SOURCES})
+  get_filename_component (name ${file} NAME_WE)
+  set(name "util${name}")
+  add_executable(${name} ${file})
+  target_link_libraries(${name} ${util_LIBRARY} ${unit_LIBRARY})
+  add_test(NAME ${name} COMMAND ${name})
+endforeach()

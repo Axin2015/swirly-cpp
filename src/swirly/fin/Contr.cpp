@@ -14,13 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Contr.hpp>
+#include "Contr.hpp"
 
 #include <swirly/fin/Conv.hpp>
 
 using namespace std;
 
 namespace swirly {
+
+static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
 
 Contr::Contr(Id32 id, Mnem mnem, string_view display, Mnem asset, Mnem ccy, int lotNumer,
              int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,

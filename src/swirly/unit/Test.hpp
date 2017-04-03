@@ -112,4 +112,11 @@ inline bool isSame(double lhs, double rhs, double delta = Epsilon) noexcept
     }                                                                                              \
     void name##Fixture_::run()
 
+#if !defined(SWIRLY_TEST_NO_MAIN)
+int main(int argc, char* argv[])
+{
+    return swirly::test::run(argc, argv);
+}
+#endif
+
 #endif // SWIRLY_UNIT_TEST_HPP

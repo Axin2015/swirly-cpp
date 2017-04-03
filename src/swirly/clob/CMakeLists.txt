@@ -34,14 +34,14 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(clob_test_SOURCES
-  AccntTest.cpp
   AsyncJournTest.cpp
-  MainTest.cpp
-  MatchTest.cpp
   ResponseTest.cpp
   ServTest.cpp)
 
-add_executable(swirly_clob_test ${clob_test_SOURCES})
-target_link_libraries(swirly_clob_test ${clob_LIBRARY} ${unit_LIBRARY})
-
-add_test(NAME clob_test COMMAND swirly_clob_test)
+foreach(file ${clob_test_SOURCES})
+  get_filename_component (name ${file} NAME_WE)
+  set(name "clob${name}")
+  add_executable(${name} ${file})
+  target_link_libraries(${name} ${clob_LIBRARY} ${unit_LIBRARY})
+  add_test(NAME ${name} COMMAND ${name})
+endforeach()

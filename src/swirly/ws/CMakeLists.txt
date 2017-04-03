@@ -25,9 +25,11 @@ endif(RAGEL_EXECUTABLE)
 set(ws_SOURCES
   EntitySet.cpp
   Exception.cpp
+  HttpHandler.cpp
   Page.cpp
-  Rest.cpp
   RestBody.cpp
+  Rest.cpp
+  Url.cpp
   http_parser.c)
 
 add_library(ws_static STATIC ${ws_SOURCES})
@@ -45,13 +47,14 @@ endif()
 set(ws_test_SOURCES
   EntitySetTest.cpp
   HttpHandlerTest.cpp
-  MainTest.cpp
   PageTest.cpp
   RestBodyTest.cpp
-  RestTest.cpp
   UrlTest.cpp)
 
-add_executable(swirly_ws_test ${ws_test_SOURCES})
-target_link_libraries(swirly_ws_test ${ws_LIBRARY} ${unit_LIBRARY})
-
-add_test(NAME ws_test COMMAND swirly_ws_test)
+foreach(file ${ws_test_SOURCES})
+  get_filename_component (name ${file} NAME_WE)
+  set(name "ws${name}")
+  add_executable(${name} ${file})
+  target_link_libraries(${name} ${ws_LIBRARY} ${unit_LIBRARY})
+  add_test(NAME ${name} COMMAND ${name})
+endforeach()

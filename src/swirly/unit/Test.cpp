@@ -14,7 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/unit/Test.hpp>
+#define SWIRLY_TEST_NO_MAIN
+#include "Test.hpp"
 
 #include <cstring>
 #include <iostream>

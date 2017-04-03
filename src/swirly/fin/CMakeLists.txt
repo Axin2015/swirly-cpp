@@ -15,19 +15,26 @@
 
 set(fin_SOURCES
   Asset.cpp
+  BasicTypes.cpp
   Contr.cpp
+  Conv.cpp
   Date.cpp
   Exception.cpp
   Exec.cpp
   Journ.cpp
   Level.cpp
+  Limits.cpp
   Market.cpp
+  MarketId.cpp
   MarketSide.cpp
   Model.cpp
+  Msg.cpp
+  MsgHandler.cpp
   Order.cpp
   Posn.cpp
   Request.cpp
-  Transaction.cpp)
+  Transaction.cpp
+  Types.cpp)
 
 add_library(fin_static STATIC ${fin_SOURCES})
 set_target_properties(fin_static PROPERTIES OUTPUT_NAME swirly_fin)
@@ -45,27 +52,20 @@ set(fin_test_SOURCES
   AssetTest.cpp
   BasicTypesTest.cpp
   ContrTest.cpp
-  ConvTest.cpp
   DateTest.cpp
   ExceptionTest.cpp
-  ExecTest.cpp
-  JournTest.cpp
   LevelTest.cpp
-  LimitsTest.cpp
-  MainTest.cpp
   MarketIdTest.cpp
-  MarketSideTest.cpp
   MarketTest.cpp
-  ModelTest.cpp
   MsgHandlerTest.cpp
-  MsgTest.cpp
-  OrderTest.cpp
   PosnTest.cpp
   RequestTest.cpp
-  TransactionTest.cpp
-  TypesTest.cpp)
+  TransactionTest.cpp)
 
-add_executable(swirly_fin_test ${fin_test_SOURCES})
-target_link_libraries(swirly_fin_test ${fin_LIBRARY} ${unit_LIBRARY})
-
-add_test(NAME fin_test COMMAND swirly_fin_test)
+foreach(file ${fin_test_SOURCES})
+  get_filename_component (name ${file} NAME_WE)
+  set(name "fin${name}")
+  add_executable(${name} ${file})
+  target_link_libraries(${name} ${fin_LIBRARY} ${unit_LIBRARY})
+  add_test(NAME ${name} COMMAND ${name})
+endforeach()

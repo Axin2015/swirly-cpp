@@ -14,13 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Order.hpp>
+#include "Order.hpp"
 
 #include <swirly/util/Date.hpp>
 
 using namespace std;
 
 namespace swirly {
+
+static_assert(sizeof(Order) <= 6 * 64, "crossed cache-line boundary");
 
 Order::~Order() noexcept = default;
 

@@ -14,9 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/unit/Test.hpp>
-
-int main(int argc, char* argv[])
-{
-    return swirly::test::run(argc, argv);
-}
+#include "Finally.hpp"

@@ -14,14 +14,12 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Asset.hpp>
+#include "Asset.hpp"
 
 #include <swirly/unit/Test.hpp>
 
 using namespace std;
 using namespace swirly;
-
-static_assert(sizeof(Asset) <= 3 * 64, "crossed cache-line boundary");
 
 SWIRLY_TEST_CASE(AssetToString)
 {

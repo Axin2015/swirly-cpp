@@ -14,10 +14,4 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include <swirly/fin/Order.hpp>
-
-#include <swirly/unit/Test.hpp>
-
-using namespace swirly;
-
-static_assert(sizeof(Order) <= 6 * 64, "crossed cache-line boundary");
+#include "Limits.hpp"
