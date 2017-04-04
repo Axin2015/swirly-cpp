@@ -34,9 +34,9 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(clob_test_SOURCES
-  AsyncJournTest.cpp
-  ResponseTest.cpp
-  ServTest.cpp)
+  AsyncJournTest.cxx
+  ResponseTest.cxx
+  ServTest.cxx)
 
 foreach(file ${clob_test_SOURCES})
   get_filename_component (name ${file} NAME_WE)

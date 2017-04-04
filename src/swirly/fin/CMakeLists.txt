@@ -49,18 +49,18 @@ if(ENABLE_SHARED_LIBS)
 endif()
 
 set(fin_test_SOURCES
-  AssetTest.cpp
-  BasicTypesTest.cpp
-  ContrTest.cpp
-  DateTest.cpp
-  ExceptionTest.cpp
-  LevelTest.cpp
-  MarketIdTest.cpp
-  MarketTest.cpp
-  MsgHandlerTest.cpp
-  PosnTest.cpp
-  RequestTest.cpp
-  TransactionTest.cpp)
+  AssetTest.cxx
+  BasicTypesTest.cxx
+  ContrTest.cxx
+  DateTest.cxx
+  ExceptionTest.cxx
+  LevelTest.cxx
+  MarketIdTest.cxx
+  MarketTest.cxx
+  MsgHandlerTest.cxx
+  PosnTest.cxx
+  RequestTest.cxx
+  TransactionTest.cxx)
 
 foreach(file ${fin_test_SOURCES})
   get_filename_component (name ${file} NAME_WE)
