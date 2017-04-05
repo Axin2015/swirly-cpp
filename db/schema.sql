@@ -1,5 +1,5 @@
 -- The Restful Matching-Engine.
--- Copyright (C) 2013, 2016 Swirly Cloud Limited.
+-- Copyright (C) 2013, 2017 Swirly Cloud Limited.
 --
 -- This program is free software; you can redistribute it and/or modify it under the terms of the
 -- GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -74,15 +74,15 @@ CREATE TABLE asset_type_t (
 )
 ;
 
-INSERT INTO asset_type_t (id, mnem) VALUES (1, 'COMMODITY')
+INSERT INTO asset_type_t (id, mnem) VALUES (1, 'CMDTY')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (2, 'CORPORATE')
+INSERT INTO asset_type_t (id, mnem) VALUES (2, 'CORP')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (3, 'CURRENCY')
+INSERT INTO asset_type_t (id, mnem) VALUES (3, 'CCY')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (4, 'EQUITY')
+INSERT INTO asset_type_t (id, mnem) VALUES (4, 'EQTY')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (5, 'GOVERNMENT')
+INSERT INTO asset_type_t (id, mnem) VALUES (5, 'GOVT')
 ;
 INSERT INTO asset_type_t (id, mnem) VALUES (6, 'INDEX')
 ;

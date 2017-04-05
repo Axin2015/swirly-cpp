@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 # The Restful Matching-Engine.
-# Copyright (C) 2013, 2016 Swirly Cloud Limited.
+# Copyright (C) 2013, 2017 Swirly Cloud Limited.
 #
 # This program is free software; you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -23,7 +23,7 @@ my $cxx = $ENV{CXX} || 'g++';
 my $lib = shift;
 $lib or die "Library name not specified";
 
-my $makedepend = "$cxx -std=c++14 -MM -MG -Iinclude include/swirly/$lib/*.hpp src/lib/$lib/*.[ch]pp";
+my $makedepend = "$cxx -std=c++14 -MM -MG -Isrc src/swirly/$lib/*.[ch]pp";
 my $tred = 'tred';
 
 sub ltrim {

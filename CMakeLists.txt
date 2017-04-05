@@ -1,5 +1,5 @@
 # The Restful Matching-Engine.
-# Copyright (C) 2013, 2016 Swirly Cloud Limited.
+# Copyright (C) 2013, 2017 Swirly Cloud Limited.
 #
 # This program is free software; you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -18,7 +18,7 @@ cmake_minimum_required(VERSION 3.1)
 project(swirly)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${PROJECT_SOURCE_DIR}/etc")
-set(CMAKE_VERBOSE_MAKEFILE 1)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Configuration options:
 set(ENABLE_SHARED_LIBS ON  CACHE BOOL   "Enable shared libs.")
@@ -69,7 +69,11 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 endif()
 
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
+set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib64")
+
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib64")
 
 file(MAKE_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
 file(MAKE_DIRECTORY "${LIBRARY_OUTPUT_PATH}")
@@ -108,8 +112,7 @@ if(DOXYGEN_FOUND)
 endif()
 
 include_directories("${Boost_INCLUDE_DIRS}")
-include_directories("${PROJECT_SOURCE_DIR}/contrib")
-include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/src")
 
 if(ENABLE_SHARED_LIBS)
   set(unit_LIBRARY unit_shared)
@@ -132,10 +135,7 @@ enable_testing()
 add_subdirectory(db)
 add_subdirectory(etc)
 add_subdirectory(image)
-add_subdirectory(include)
 add_subdirectory(src)
-
-add_subdirectory(test)
 
 set(CPACK_GENERATOR "TGZ")
 set(CPACK_PACKAGE_NAME "Swirly")

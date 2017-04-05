@@ -1,5 +1,5 @@
 # The Restful Matching-Engine.
-# Copyright (C) 2013, 2016 Swirly Cloud Limited.
+# Copyright (C) 2013, 2017 Swirly Cloud Limited.
 #
 # This program is free software; you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -29,7 +29,7 @@ FIND_LIBRARY(SWIRLY_UNIT_LIBRARY NAMES swirly_unit
              HINTS "$ENV{SWIRLY_HOME}/lib")
 FIND_LIBRARY(SWIRLY_WS_LIBRARY NAMES swirly_ws
              HINTS "$ENV{SWIRLY_HOME}/lib")
-FIND_LIBRARY(SWIRLY_CLOB_LIBRARY NAMES swirly_om
+FIND_LIBRARY(SWIRLY_CLOB_LIBRARY NAMES swirly_clob
              HINTS "$ENV{SWIRLY_HOME}/lib")
 FIND_LIBRARY(SWIRLY_FIN_LIBRARY NAMES swirly_fin
              HINTS "$ENV{SWIRLY_HOME}/lib")

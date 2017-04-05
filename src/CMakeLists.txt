@@ -1,5 +1,5 @@
 # The Restful Matching-Engine.
-# Copyright (C) 2013, 2016 Swirly Cloud Limited.
+# Copyright (C) 2013, 2017 Swirly Cloud Limited.
 #
 # This program is free software; you can redistribute it and/or modify it under the terms of the
 # GNU General Public License as published by the Free Software Foundation; either version 2 of the
@@ -13,5 +13,10 @@
 # not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301, USA.
 
-add_subdirectory(bin)
-add_subdirectory(lib)
+add_subdirectory(swirly)
+add_subdirectory(swirlyd)
+if(Qt5Widgets_FOUND AND Qt5Network_FOUND)
+  add_subdirectory(swirlyui)
+endif()
+add_subdirectory(tool)
+add_subdirectory(swift)
