@@ -20,5 +20,4 @@ namespace swirly {
 
 static_assert(Mnem{}.empty(), "default constructor not constexpr");
 static_assert(Mnem{Mnem{}}.empty(), "copy constructor not constexpr");
-
 }

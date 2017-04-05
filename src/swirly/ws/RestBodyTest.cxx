@@ -25,267 +25,267 @@ using namespace swirly;
 
 SWIRLY_TEST_CASE(RestBodyMnem)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"mnem":"EURUSD"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Mnem);
-  SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"mnem":"EURUSD"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Mnem);
+    SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"mnem":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.mnem().empty());
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"mnem":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.mnem().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodyAccnt)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"accnt":"MARAYL"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Accnt);
-  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"accnt":"MARAYL"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Accnt);
+    SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"accnt":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.accnt().empty());
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"accnt":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.accnt().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodyContr)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"contr":"EURUSD"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Contr);
-  SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"contr":"EURUSD"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Contr);
+    SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"contr":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.contr().empty());
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"contr":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.contr().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodySettlDate)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"settlDate":20140314})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::SettlDate);
-  SWIRLY_CHECK(rb.settlDate() == 20140314_ymd);
+    SWIRLY_CHECK(rb.parse(R"({"settlDate":20140314})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::SettlDate);
+    SWIRLY_CHECK(rb.settlDate() == 20140314_ymd);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"settlDate":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.settlDate() == 0_ymd);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"settlDate":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.settlDate() == 0_ymd);
 }
 
 SWIRLY_TEST_CASE(RestBodyRef)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"ref":"EURUSD"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Ref);
-  SWIRLY_CHECK(rb.ref() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"ref":"EURUSD"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Ref);
+    SWIRLY_CHECK(rb.ref() == "EURUSD"_sv);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"ref":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.ref().empty());
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"ref":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.ref().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodyState)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"state":3})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::State);
-  SWIRLY_CHECK(rb.state() == 3U);
+    SWIRLY_CHECK(rb.parse(R"({"state":3})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::State);
+    SWIRLY_CHECK(rb.state() == 3U);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"state":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.state() == 0U);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"state":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.state() == 0U);
 }
 
 SWIRLY_TEST_CASE(RestBodySide)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"side":"BUY"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Side);
-  SWIRLY_CHECK(rb.side() == Side::Buy);
+    SWIRLY_CHECK(rb.parse(R"({"side":"BUY"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Side);
+    SWIRLY_CHECK(rb.side() == Side::Buy);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"side":"SELL"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Side);
-  SWIRLY_CHECK(rb.side() == Side::Sell);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"side":"SELL"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Side);
+    SWIRLY_CHECK(rb.side() == Side::Sell);
 }
 
 SWIRLY_TEST_CASE(RestBodyLots)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"lots":101})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Lots);
-  SWIRLY_CHECK(rb.lots() == 101_lts);
+    SWIRLY_CHECK(rb.parse(R"({"lots":101})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Lots);
+    SWIRLY_CHECK(rb.lots() == 101_lts);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"lots":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.lots() == 0_lts);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"lots":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.lots() == 0_lts);
 }
 
 SWIRLY_TEST_CASE(RestBodyTicks)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"ticks":12345})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Ticks);
-  SWIRLY_CHECK(rb.ticks() == 12345_tks);
+    SWIRLY_CHECK(rb.parse(R"({"ticks":12345})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Ticks);
+    SWIRLY_CHECK(rb.ticks() == 12345_tks);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"ticks":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.ticks() == 0_tks);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"ticks":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.ticks() == 0_tks);
 }
 
 SWIRLY_TEST_CASE(RestBodyMinLots)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"minLots":101})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::MinLots);
-  SWIRLY_CHECK(rb.minLots() == 101_lts);
+    SWIRLY_CHECK(rb.parse(R"({"minLots":101})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::MinLots);
+    SWIRLY_CHECK(rb.minLots() == 101_lts);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"minLots":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.minLots() == 0_lts);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"minLots":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.minLots() == 0_lts);
 }
 
 SWIRLY_TEST_CASE(RestBodyLiqInd)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"liqInd":"MAKER"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::LiqInd);
-  SWIRLY_CHECK(rb.liqInd() == LiqInd::Maker);
+    SWIRLY_CHECK(rb.parse(R"({"liqInd":"MAKER"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::LiqInd);
+    SWIRLY_CHECK(rb.liqInd() == LiqInd::Maker);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"liqInd":"TAKER"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::LiqInd);
-  SWIRLY_CHECK(rb.liqInd() == LiqInd::Taker);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"liqInd":"TAKER"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::LiqInd);
+    SWIRLY_CHECK(rb.liqInd() == LiqInd::Taker);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"liqInd":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.liqInd() == LiqInd::None);
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"liqInd":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.liqInd() == LiqInd::None);
 }
 
 SWIRLY_TEST_CASE(RestBodyCpty)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"cpty":"MARAYL"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Cpty);
-  SWIRLY_CHECK(rb.cpty() == "MARAYL"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"cpty":"MARAYL"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Cpty);
+    SWIRLY_CHECK(rb.cpty() == "MARAYL"_sv);
 
-  rb.reset(false);
-  SWIRLY_CHECK(rb.parse(R"({"cpty":null})"_sv));
-  SWIRLY_CHECK(rb.fields() == 0U);
-  SWIRLY_CHECK(rb.cpty().empty());
+    rb.reset(false);
+    SWIRLY_CHECK(rb.parse(R"({"cpty":null})"_sv));
+    SWIRLY_CHECK(rb.fields() == 0U);
+    SWIRLY_CHECK(rb.cpty().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodyMulti)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"contr":"EURUSD","settlDate":20140314})"_sv));
-  SWIRLY_CHECK(rb.fields() == (RestBody::Contr | RestBody::SettlDate));
-  SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(rb.settlDate() == 20140314_ymd);
+    SWIRLY_CHECK(rb.parse(R"({"contr":"EURUSD","settlDate":20140314})"_sv));
+    SWIRLY_CHECK(rb.fields() == (RestBody::Contr | RestBody::SettlDate));
+    SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.settlDate() == 20140314_ymd);
 }
 
 SWIRLY_TEST_CASE(RestBodyDuplicate)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"accnt":"MARAYL1","accnt":"MARAYL2"})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Accnt);
-  SWIRLY_CHECK(rb.accnt() == "MARAYL2"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"accnt":"MARAYL1","accnt":"MARAYL2"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Accnt);
+    SWIRLY_CHECK(rb.accnt() == "MARAYL2"_sv);
 }
 
 SWIRLY_TEST_CASE(RestBodyBadField)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK_THROW(rb.parse(R"({"foo":null})"_sv), BadRequestException);
+    SWIRLY_CHECK_THROW(rb.parse(R"({"foo":null})"_sv), BadRequestException);
 }
 
 SWIRLY_TEST_CASE(RestBodyBadType)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK_THROW(rb.parse(R"({"ticks":"101"})"_sv), BadRequestException);
+    SWIRLY_CHECK_THROW(rb.parse(R"({"ticks":"101"})"_sv), BadRequestException);
 }
 
 SWIRLY_TEST_CASE(RestBodyBadObject)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK_THROW(rb.parse(R"([{"ticks":101}])"_sv), BadRequestException);
+    SWIRLY_CHECK_THROW(rb.parse(R"([{"ticks":101}])"_sv), BadRequestException);
 }
 
 SWIRLY_TEST_CASE(RestBodyMaxLen)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK_THROW(rb.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), BadRequestException);
+    SWIRLY_CHECK_THROW(rb.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), BadRequestException);
 }
 
 SWIRLY_TEST_CASE(RestBodyNegative)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(R"({"ticks":-1})"_sv));
-  SWIRLY_CHECK(rb.fields() == RestBody::Ticks);
-  SWIRLY_CHECK(rb.ticks() == -1_tks);
+    SWIRLY_CHECK(rb.parse(R"({"ticks":-1})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Ticks);
+    SWIRLY_CHECK(rb.ticks() == -1_tks);
 
-  rb.reset();
-  SWIRLY_CHECK_THROW(rb.parse(R"({"state":-1})"_sv), BadRequestException);
+    rb.reset();
+    SWIRLY_CHECK_THROW(rb.parse(R"({"state":-1})"_sv), BadRequestException);
 }
 
 SWIRLY_TEST_CASE(RestBodyAll)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(rb.parse(
-    R"({"accnt":"MARAYL","mnem":"EURUSD","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
-  SWIRLY_CHECK(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
-  SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
-  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
-  SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
-  SWIRLY_CHECK(rb.settlDate() == 20140315_ymd);
-  SWIRLY_CHECK(rb.ref() == "EURUSD"_sv);
-  SWIRLY_CHECK(rb.state() == 3U);
-  SWIRLY_CHECK(rb.side() == Side::Buy);
-  SWIRLY_CHECK(rb.lots() == 101_lts);
-  SWIRLY_CHECK(rb.ticks() == 12345_tks);
-  SWIRLY_CHECK(rb.minLots() == 101_lts);
-  SWIRLY_CHECK(rb.liqInd() == LiqInd::Maker);
-  SWIRLY_CHECK(rb.cpty() == "MARAYL"_sv);
+    SWIRLY_CHECK(rb.parse(
+        R"({"accnt":"MARAYL","mnem":"EURUSD","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
+    SWIRLY_CHECK(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
+    SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
+    SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.settlDate() == 20140315_ymd);
+    SWIRLY_CHECK(rb.ref() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.state() == 3U);
+    SWIRLY_CHECK(rb.side() == Side::Buy);
+    SWIRLY_CHECK(rb.lots() == 101_lts);
+    SWIRLY_CHECK(rb.ticks() == 12345_tks);
+    SWIRLY_CHECK(rb.minLots() == 101_lts);
+    SWIRLY_CHECK(rb.liqInd() == LiqInd::Maker);
+    SWIRLY_CHECK(rb.cpty() == "MARAYL"_sv);
 }
 
 SWIRLY_TEST_CASE(RestBodyPartial)
 {
-  RestBody rb;
+    RestBody rb;
 
-  SWIRLY_CHECK(!rb.parse(R"({"mnem":"E)"_sv));
-  SWIRLY_CHECK(!rb.parse(R"(URUSD","ac)"_sv));
-  SWIRLY_CHECK(!rb.parse(R"(cnt":"MAR)"_sv));
-  SWIRLY_CHECK(rb.parse(R"(AYL"})"_sv));
+    SWIRLY_CHECK(!rb.parse(R"({"mnem":"E)"_sv));
+    SWIRLY_CHECK(!rb.parse(R"(URUSD","ac)"_sv));
+    SWIRLY_CHECK(!rb.parse(R"(cnt":"MAR)"_sv));
+    SWIRLY_CHECK(rb.parse(R"(AYL"})"_sv));
 
-  SWIRLY_CHECK(rb.fields() == (RestBody::Mnem | RestBody::Accnt));
-  SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
-  SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
+    SWIRLY_CHECK(rb.fields() == (RestBody::Mnem | RestBody::Accnt));
+    SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
 }
