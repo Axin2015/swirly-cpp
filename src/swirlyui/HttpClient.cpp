@@ -72,7 +72,7 @@ void HttpClient::createMarket(const Contr& contr, QDate settlDate)
     request.setRawHeader("Swirly-Perm", "1");
 
     QJsonObject obj;
-    obj["contr"] = contr.mnem();
+    obj["contr"] = contr.symbol();
     obj["settlDate"] = toJson(settlDate);
     obj["state"] = 0;
 
@@ -91,7 +91,7 @@ void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString&
     request.setRawHeader("Swirly-Perm", "2");
 
     QJsonObject obj;
-    obj["contr"] = contr.mnem();
+    obj["contr"] = contr.symbol();
     obj["settlDate"] = toJson(settlDate);
     obj["ref"] = ref;
     obj["side"] = toJson(side);
@@ -118,7 +118,7 @@ void HttpClient::cancelOrders(const OrderKeys& keys)
                 out.reset();
             }
             market = marketModel().find(key.first);
-            out << "http://127.0.0.1:8080/accnt/order/" << market.contr().mnem() //
+            out << "http://127.0.0.1:8080/accnt/order/" << market.contr().symbol() //
                 << '/' << dateToIso(market.settlDate()) //
                 << '/' << id;
         } else {

@@ -240,18 +240,18 @@ void RestServ::assetRequest(const HttpRequest& req, Time now, HttpResponse& resp
         return;
     }
 
-    const auto mnem = path_.top();
+    const auto symbol = path_.top();
     path_.pop();
 
     if (path_.empty()) {
 
-        // /refdata/asset/MNEM
+        // /refdata/asset/SYMBOL
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /refdata/asset/MNEM
+            // GET /refdata/asset/SYMBOL
             matchMethod_ = true;
-            rest_.getAsset(mnem, now, resp);
+            rest_.getAsset(symbol, now, resp);
         }
         return;
     }
@@ -272,18 +272,18 @@ void RestServ::contrRequest(const HttpRequest& req, Time now, HttpResponse& resp
         return;
     }
 
-    const auto mnem = path_.top();
+    const auto symbol = path_.top();
     path_.pop();
 
     if (path_.empty()) {
 
-        // /refdata/contr/MNEM
+        // /refdata/contr/SYMBOL
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /refdata/contr/MNEM
+            // GET /refdata/contr/SYMBOL
             matchMethod_ = true;
-            rest_.getContr(mnem, now, resp);
+            rest_.getContr(symbol, now, resp);
         }
         return;
     }

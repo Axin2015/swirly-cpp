@@ -17,7 +17,7 @@
 #include "Posn.hpp"
 
 #include <swirly/util/Date.hpp>
-#include <swirly/util/Mnem.hpp>
+#include <swirly/util/Symbol.hpp>
 
 using namespace std;
 

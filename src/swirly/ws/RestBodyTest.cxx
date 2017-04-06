@@ -23,18 +23,18 @@
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(RestBodyMnem)
+SWIRLY_TEST_CASE(RestBodySymbol)
 {
     RestBody rb;
 
-    SWIRLY_CHECK(rb.parse(R"({"mnem":"EURUSD"})"_sv));
-    SWIRLY_CHECK(rb.fields() == RestBody::Mnem);
-    SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"symbol":"EURUSD"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Symbol);
+    SWIRLY_CHECK(rb.symbol() == "EURUSD"_sv);
 
     rb.reset(false);
-    SWIRLY_CHECK(rb.parse(R"({"mnem":null})"_sv));
+    SWIRLY_CHECK(rb.parse(R"({"symbol":null})"_sv));
     SWIRLY_CHECK(rb.fields() == 0U);
-    SWIRLY_CHECK(rb.mnem().empty());
+    SWIRLY_CHECK(rb.symbol().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodyAccnt)
@@ -240,7 +240,7 @@ SWIRLY_TEST_CASE(RestBodyMaxLen)
 {
     RestBody rb;
 
-    SWIRLY_CHECK_THROW(rb.parse(R"({"mnem":"0123456789ABCDEFx"})"_sv), BadRequestException);
+    SWIRLY_CHECK_THROW(rb.parse(R"({"symbol":"0123456789ABCDEFx"})"_sv), BadRequestException);
 }
 
 SWIRLY_TEST_CASE(RestBodyNegative)
@@ -260,9 +260,9 @@ SWIRLY_TEST_CASE(RestBodyAll)
     RestBody rb;
 
     SWIRLY_CHECK(rb.parse(
-        R"({"accnt":"MARAYL","mnem":"EURUSD","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
+        R"({"accnt":"MARAYL","symbol":"EURUSD","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
     SWIRLY_CHECK(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
-    SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.symbol() == "EURUSD"_sv);
     SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
     SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
     SWIRLY_CHECK(rb.settlDate() == 20140315_ymd);
@@ -276,16 +276,26 @@ SWIRLY_TEST_CASE(RestBodyAll)
     SWIRLY_CHECK(rb.cpty() == "MARAYL"_sv);
 }
 
+#include <iostream>
 SWIRLY_TEST_CASE(RestBodyPartial)
 {
     RestBody rb;
 
-    SWIRLY_CHECK(!rb.parse(R"({"mnem":"E)"_sv));
+    cerr << __LINE__ << endl;
+    SWIRLY_CHECK(!rb.parse(R"({"symbol":"E)"_sv));
+    cerr << __LINE__ << endl;
     SWIRLY_CHECK(!rb.parse(R"(URUSD","ac)"_sv));
+    cerr << __LINE__ << endl;
     SWIRLY_CHECK(!rb.parse(R"(cnt":"MAR)"_sv));
+    cerr << __LINE__ << endl;
     SWIRLY_CHECK(rb.parse(R"(AYL"})"_sv));
+    cerr << __LINE__ << endl;
 
-    SWIRLY_CHECK(rb.fields() == (RestBody::Mnem | RestBody::Accnt));
-    SWIRLY_CHECK(rb.mnem() == "EURUSD"_sv);
+    cerr << __LINE__ << endl;
+    SWIRLY_CHECK(rb.fields() == (RestBody::Symbol | RestBody::Accnt));
+    cerr << __LINE__ << endl;
+    SWIRLY_CHECK(rb.symbol() == "EURUSD"_sv);
+    cerr << __LINE__ << endl;
     SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
+    cerr << __LINE__ << endl;
 }

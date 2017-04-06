@@ -61,7 +61,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
     auto it = serv.assets().find("CHF"_sv);
     SWIRLY_CHECK(it != serv.assets().end());
     SWIRLY_CHECK(it->id() == 1_id32);
-    SWIRLY_CHECK(it->mnem() == "CHF"_sv);
+    SWIRLY_CHECK(it->symbol() == "CHF"_sv);
     SWIRLY_CHECK(it->display() == "Switzerland, Francs"_sv);
 
     SWIRLY_CHECK(it->type() == AssetType::Ccy);
@@ -74,7 +74,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServContrs, ServFixture)
     auto it = serv.contrs().find("EURUSD"_sv);
     SWIRLY_CHECK(it != serv.contrs().end());
     SWIRLY_CHECK(it->id() == 1_id32);
-    SWIRLY_CHECK(it->mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(it->symbol() == "EURUSD"_sv);
     SWIRLY_CHECK(it->display() == "EURUSD"_sv);
 
     SWIRLY_CHECK(it->asset() == "EUR"_sv);
@@ -172,10 +172,10 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 
     ConstOrderPtr order{resp.orders().front()};
     SWIRLY_CHECK(order->marketId() == market.id());
-    SWIRLY_CHECK(order->contr() == contr.mnem());
+    SWIRLY_CHECK(order->contr() == contr.symbol());
     SWIRLY_CHECK(order->settlDay() == SettlDay);
     SWIRLY_CHECK(order->id() == 1_id64);
-    SWIRLY_CHECK(order->accnt() == accnt.mnem());
+    SWIRLY_CHECK(order->accnt() == accnt.symbol());
     SWIRLY_CHECK(order->ref().empty());
     SWIRLY_CHECK(order->state() == State::New);
     SWIRLY_CHECK(order->side() == Side::Buy);

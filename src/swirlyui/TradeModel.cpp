@@ -76,7 +76,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             var = toVariant(trade.marketId());
             break;
         case Column::Contr:
-            var = trade.contr().mnem();
+            var = trade.contr().symbol();
             break;
         case Column::SettlDate:
             var = trade.settlDate();

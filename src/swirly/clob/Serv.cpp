@@ -37,7 +37,7 @@ using namespace std;
 namespace swirly {
 namespace {
 
-const regex MnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
+const regex SymbolPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
 {
@@ -70,9 +70,9 @@ struct Serv::Impl {
         const auto busDay = busDay_(now);
         model.readAsset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
         model.readContr([& contrs = contrs_](auto ptr) { contrs.insert(move(ptr)); });
-        model.readAccnt(now, [this, &model](auto mnem) {
-            auto& accnt = this->accnt(mnem);
-            model.readExec(mnem, accnt.execs().capacity(),
+        model.readAccnt(now, [this, &model](auto symbol) {
+            auto& accnt = this->accnt(symbol);
+            model.readExec(symbol, accnt.execs().capacity(),
                            [&accnt](auto ptr) { accnt.pushExecBack(ptr); });
         });
         model.readMarket([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
@@ -102,24 +102,24 @@ struct Serv::Impl {
 
     const AssetSet& assets() const noexcept { return assets_; }
 
-    const Contr& contr(Mnem mnem) const
+    const Contr& contr(Symbol symbol) const
     {
-        auto it = contrs_.find(mnem);
+        auto it = contrs_.find(symbol);
         if (it == contrs_.end()) {
-            throw MarketNotFoundException{errMsg() << "contract '" << mnem << "' does not exist"};
+            throw MarketNotFoundException{errMsg() << "contract '" << symbol << "' does not exist"};
         }
         return *it;
     }
 
     const ContrSet& contrs() const noexcept { return contrs_; }
 
-    const Accnt& accnt(Mnem mnem) const
+    const Accnt& accnt(Symbol symbol) const
     {
         AccntSet::ConstIterator it;
         bool found;
-        tie(it, found) = accnts_.findHint(mnem);
+        tie(it, found) = accnts_.findHint(symbol);
         if (!found) {
-            it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
+            it = accnts_.insertHint(it, Accnt::make(symbol, maxExecs_));
         }
         return *it;
     }
@@ -135,13 +135,13 @@ struct Serv::Impl {
 
     const MarketSet& markets() const noexcept { return markets_; }
 
-    Accnt& accnt(Mnem mnem)
+    Accnt& accnt(Symbol symbol)
     {
         AccntSet::Iterator it;
         bool found;
-        tie(it, found) = accnts_.findHint(mnem);
+        tie(it, found) = accnts_.findHint(symbol);
         if (!found) {
-            it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
+            it = accnts_.insertHint(it, Accnt::make(symbol, maxExecs_));
         }
         return *it;
     }
@@ -161,12 +161,12 @@ struct Serv::Impl {
         bool found;
         tie(it, found) = markets_.findHint(id);
         if (found) {
-            throw AlreadyExistsException{errMsg() << "market for '" << contr.mnem() << "' on "
+            throw AlreadyExistsException{errMsg() << "market for '" << contr.symbol() << "' on "
                                                   << jdToIso(settlDay) << " already exists"};
         }
         {
-            auto market = Market::make(id, contr.mnem(), settlDay, state);
-            journ_.createMarket(id, contr.mnem(), settlDay, state);
+            auto market = Market::make(id, contr.symbol(), settlDay, state);
+            journ_.createMarket(id, contr.symbol(), settlDay, state);
             it = markets_.insertHint(it, market);
         }
         return *it;
@@ -197,7 +197,7 @@ struct Serv::Impl {
             throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
         }
         const auto id = market.allocId();
-        auto order = Order::make(accnt.mnem(), market.id(), market.contr(), market.settlDay(), id,
+        auto order = Order::make(accnt.symbol(), market.id(), market.contr(), market.settlDay(), id,
                                  ref, side, lots, ticks, minLots, now);
         auto exec = newExec(*order, id, now);
 
@@ -392,10 +392,11 @@ struct Serv::Impl {
     }
 
     TradePair createTrade(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
-                          Ticks ticks, LiqInd liqInd, Mnem cpty, Time created)
+                          Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
     {
         auto posn = accnt.posn(market.id(), market.contr(), market.settlDay());
-        auto trade = newManual(accnt.mnem(), market, ref, side, lots, ticks, liqInd, cpty, created);
+        auto trade
+            = newManual(accnt.symbol(), market, ref, side, lots, ticks, liqInd, cpty, created);
         decltype(trade) cptyTrade;
 
         if (!cpty.empty()) {
@@ -475,16 +476,16 @@ struct Serv::Impl {
         return Exec::make(order.accnt(), order.marketId(), order.contr(), order.settlDay(), id,
                           order.id(), order.ref(), order.state(), order.side(), order.lots(),
                           order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
-                          order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Mnem{},
+                          order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Symbol{},
                           created);
     }
 
     /**
      * Special factory method for manual trades.
      */
-    ExecPtr newManual(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt,
-                      string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty,
-                      Time created) const
+    ExecPtr newManual(Id64 marketId, Symbol contr, JDay settlDay, Id64 id, Symbol accnt,
+                      string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liqInd,
+                      Symbol cpty, Time created) const
     {
         const auto orderId = 0_id64;
         const auto state = State::Trade;
@@ -500,8 +501,8 @@ struct Serv::Impl {
                           cpty, created);
     }
 
-    ExecPtr newManual(Mnem accnt, Market& market, string_view ref, Side side, Lots lots,
-                      Ticks ticks, LiqInd liqInd, Mnem cpty, Time created) const
+    ExecPtr newManual(Symbol accnt, Market& market, string_view ref, Side side, Lots lots,
+                      Ticks ticks, LiqInd liqInd, Symbol cpty, Time created) const
     {
         return newManual(market.id(), market.contr(), market.settlDay(), market.allocId(), accnt,
                          ref, side, lots, ticks, liqInd, cpty, created);
@@ -559,7 +560,7 @@ struct Serv::Impl {
             auto match = newMatch(market, takerOrder, &makerOrder, lots, sumLots, sumCost, now);
 
             // Insert order if trade crossed with self.
-            if (makerOrder.accnt() == takerAccnt.mnem()) {
+            if (makerOrder.accnt() == takerAccnt.symbol()) {
                 // Maker updated first because this is consistent with last-look semantics.
                 // N.B. the reference count is not incremented here.
                 resp.insertOrder(&makerOrder);
@@ -724,9 +725,9 @@ const MarketSet& Serv::markets() const noexcept
     return impl_->markets();
 }
 
-const Contr& Serv::contr(Mnem mnem) const
+const Contr& Serv::contr(Symbol symbol) const
 {
-    return impl_->contr(mnem);
+    return impl_->contr(symbol);
 }
 
 const Market& Serv::market(Id64 id) const
@@ -734,9 +735,9 @@ const Market& Serv::market(Id64 id) const
     return impl_->market(id);
 }
 
-const Accnt& Serv::accnt(Mnem mnem) const
+const Accnt& Serv::accnt(Symbol symbol) const
 {
-    return impl_->accnt(mnem);
+    return impl_->accnt(symbol);
 }
 
 const Market& Serv::createMarket(const Contr& contr, JDay settlDay, MarketState state, Time now)
@@ -814,7 +815,7 @@ void Serv::cancelOrder(const Market& market, Time now)
 }
 
 TradePair Serv::createTrade(const Accnt& accnt, const Market& market, string_view ref, Side side,
-                            Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Time created)
+                            Lots lots, Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
 {
     return impl_->createTrade(constCast(accnt), constCast(market), ref, side, lots, ticks, liqInd,
                               cpty, created);

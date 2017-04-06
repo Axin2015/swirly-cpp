@@ -33,10 +33,10 @@ namespace sqlite {
 namespace {
 
 constexpr auto SelectAssetSql = //
-    "SELECT id, mnem, display, type_id FROM asset_t"_sv;
+    "SELECT id, symbol, display, type_id FROM asset_t"_sv;
 
 constexpr auto SelectContrSql = //
-    "SELECT id, mnem, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom,"
+    "SELECT id, symbol, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom,"
     " pip_dp, min_lots, max_lots FROM contr_v"_sv;
 
 constexpr auto SelectMarketSql = //
@@ -44,7 +44,7 @@ constexpr auto SelectMarketSql = //
     " FROM market_v"_sv;
 
 constexpr auto SelectAccntSql = //
-    "SELECT mnem FROM accnt_t WHERE modified > ?"_sv;
+    "SELECT symbol FROM accnt_t WHERE modified > ?"_sv;
 
 constexpr auto SelectOrderSql = //
     "SELECT accnt, market_id, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
@@ -81,7 +81,7 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
     enum {
         Id, //
-        Mnem, //
+        Symbol, //
         Display, //
         TypeId //
     };
@@ -89,7 +89,7 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     StmtPtr stmt{prepare(*db_, SelectAssetSql)};
     while (step(*stmt)) {
         cb(Asset::make(column<Id32>(*stmt, Id), //
-                       column<string_view>(*stmt, Mnem), //
+                       column<string_view>(*stmt, Symbol), //
                        column<string_view>(*stmt, Display), //
                        column<AssetType>(*stmt, TypeId)));
     }
@@ -99,7 +99,7 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
 {
     enum {
         Id, //
-        Mnem, //
+        Symbol, //
         Display, //
         Asset, //
         Ccy, //
@@ -115,7 +115,7 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
     StmtPtr stmt{prepare(*db_, SelectContrSql)};
     while (step(*stmt)) {
         cb(Contr::make(column<Id32>(*stmt, Id), //
-                       column<string_view>(*stmt, Mnem), //
+                       column<string_view>(*stmt, Symbol), //
                        column<string_view>(*stmt, Display), //
                        column<string_view>(*stmt, Asset), //
                        column<string_view>(*stmt, Ccy), //
@@ -158,7 +158,7 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
 {
     enum { //
-        Mnem //
+        Symbol //
     };
 
     StmtPtr stmt{prepare(*db_, SelectAccntSql)};
@@ -166,7 +166,7 @@ void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
     // One week ago.
     bind(now - 604800000ms);
     while (step(*stmt)) {
-        cb(column<string_view>(*stmt, Mnem));
+        cb(column<string_view>(*stmt, Symbol));
     }
 }
 

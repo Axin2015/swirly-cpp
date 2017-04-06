@@ -38,7 +38,7 @@ QDebug operator<<(QDebug debug, const Posn& posn)
 {
     debug.nospace() << "Posn{accnt=" << posn.accnt() //
                     << ",marketId=" << posn.marketId() //
-                    << ",contr=" << posn.contr().mnem() //
+                    << ",contr=" << posn.contr().symbol() //
                     << ",settlDate=" << posn.settlDate() //
                     << ",buyLots=" << posn.buyLots() //
                     << ",buyCost=" << posn.buyCost() //

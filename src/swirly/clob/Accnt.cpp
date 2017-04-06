@@ -26,13 +26,13 @@ Accnt::~Accnt() noexcept = default;
 
 Accnt::Accnt(Accnt&&) = default;
 
-PosnPtr Accnt::posn(Id64 marketId, Mnem contr, JDay settlDay) throw(bad_alloc)
+PosnPtr Accnt::posn(Id64 marketId, Symbol contr, JDay settlDay) throw(bad_alloc)
 {
     PosnSet::Iterator it;
     bool found;
     tie(it, found) = posns_.findHint(marketId);
     if (!found) {
-        it = posns_.insertHint(it, Posn::make(mnem_, marketId, contr, settlDay));
+        it = posns_.insertHint(it, Posn::make(symbol_, marketId, contr, settlDay));
     }
     return &*it;
 }

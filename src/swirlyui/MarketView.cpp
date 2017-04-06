@@ -67,10 +67,10 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
 
 MarketView::~MarketView() noexcept = default;
 
-void MarketView::setFields(const QString& contrMnem, QDate settlDate, optional<Lots> lots,
+void MarketView::setFields(const QString& contrSymbol, QDate settlDate, optional<Lots> lots,
                            optional<Ticks> ticks)
 {
-    marketForm_->setFields(contrMnem, settlDate, lots, ticks);
+    marketForm_->setFields(contrSymbol, settlDate, lots, ticks);
 }
 
 void MarketView::slotClicked(const QModelIndex& index)
@@ -118,7 +118,7 @@ void MarketView::slotClicked(const QModelIndex& index)
             }
             break;
         }
-        setFields(market.contr().mnem(), market.settlDate(), lots, ticks);
+        setFields(market.contr().symbol(), market.settlDate(), lots, ticks);
     }
 }
 

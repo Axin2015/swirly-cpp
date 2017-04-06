@@ -29,7 +29,6 @@ set(util_SOURCES
   Math.cpp
   MemAlloc.cpp
   MemPool.cpp
-  Mnem.cpp
   Numeric.cpp
   Pipe.cpp
   Profile.cpp
@@ -38,6 +37,7 @@ set(util_SOURCES
   Set.cpp
   Stream.cpp
   String.cpp
+  Symbol.cpp
   System.cpp
   Time.cpp
   Tokeniser.cpp
@@ -68,13 +68,13 @@ set(util_test_SOURCES
   LogTest.cxx
   MathTest.cxx
   MemPoolTest.cxx
-  MnemTest.cxx
   PipeTest.cxx
   RefCountedTest.cxx
   RingBufferTest.cxx
   SetTest.cxx
   StreamTest.cxx
   StringTest.cxx
+  SymbolTest.cxx
   TokeniserTest.cxx
   UtilityTest.cxx
   VarSubTest.cxx)

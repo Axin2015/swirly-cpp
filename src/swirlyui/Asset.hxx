@@ -30,7 +30,7 @@ namespace asset {
 
 enum class Column : int { //
     CheckState, //
-    Mnem, //
+    Symbol, //
     Display, //
     Type
 };
@@ -40,8 +40,8 @@ constexpr int ColumnCount{unbox(Column::Type) + 1};
 
 class Asset {
   public:
-    Asset(const QString& mnem, const QString& display, AssetType type)
-        : mnem_{mnem}, display_{display}, type_{type}
+    Asset(const QString& symbol, const QString& display, AssetType type)
+        : symbol_{symbol}, display_{display}, type_{type}
     {
     }
     Asset() = default;
@@ -49,12 +49,12 @@ class Asset {
 
     static Asset fromJson(const QJsonObject& obj);
 
-    const QString& mnem() const noexcept { return mnem_; }
+    const QString& symbol() const noexcept { return symbol_; }
     const QString& display() const noexcept { return display_; }
     AssetType type() const noexcept { return type_; }
 
   private:
-    QString mnem_{};
+    QString symbol_{};
     QString display_{};
     AssetType type_{};
 };

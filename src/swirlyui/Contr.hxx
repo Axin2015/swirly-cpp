@@ -32,7 +32,7 @@ namespace contr {
 
 enum class Column : int { //
     CheckState, //
-    Mnem, //
+    Symbol, //
     Display, //
     Asset, //
     Ccy, //
@@ -51,10 +51,10 @@ constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 // Cheap copies.
 class Contr {
   public:
-    Contr(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
+    Contr(const QString& symbol, const QString& display, const QString& asset, const QString& ccy,
           int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots)
-        : impl_{std::make_shared<const Impl>(mnem, display, asset, ccy, lotNumer, lotDenom,
+        : impl_{std::make_shared<const Impl>(symbol, display, asset, ccy, lotNumer, lotDenom,
                                              tickNumer, tickDenom, pipDp, minLots, maxLots)}
     {
     }
@@ -63,7 +63,7 @@ class Contr {
 
     static Contr fromJson(const QJsonObject& obj);
 
-    const QString& mnem() const noexcept { return impl_->mnem; }
+    const QString& symbol() const noexcept { return impl_->symbol; }
     const QString& display() const noexcept { return impl_->display; }
     const QString& asset() const noexcept { return impl_->asset; }
     const QString& ccy() const noexcept { return impl_->ccy; }
@@ -81,12 +81,12 @@ class Contr {
 
   private:
     struct Impl {
-        Impl(const QString& mnem, const QString& display, const QString& asset, const QString& ccy,
-             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-             Lots maxLots);
+        Impl(const QString& symbol, const QString& display, const QString& asset,
+             const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+             int pipDp, Lots minLots, Lots maxLots);
         Impl() = default;
         ~Impl() noexcept = default;
-        QString mnem{};
+        QString symbol{};
         QString display{};
         QString asset{};
         QString ccy{};

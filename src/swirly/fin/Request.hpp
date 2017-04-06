@@ -21,8 +21,8 @@
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
-#include <swirly/util/Mnem.hpp>
 #include <swirly/util/RefCounted.hpp>
+#include <swirly/util/Symbol.hpp>
 
 #include <boost/intrusive/set.hpp>
 
@@ -30,7 +30,7 @@ namespace swirly {
 
 class SWIRLY_API Request {
   public:
-    Request(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, std::string_view ref,
+    Request(Symbol accnt, Id64 marketId, Symbol contr, JDay settlDay, Id64 id, std::string_view ref,
             Side side, Lots lots, Time created) noexcept
         : accnt_{accnt},
           marketId_{marketId},
@@ -68,9 +68,9 @@ class SWIRLY_API Request {
     /**
      * The executing accnt.
      */
-    const Mnem accnt_;
+    const Symbol accnt_;
     const Id64 marketId_;
-    const Mnem contr_;
+    const Symbol contr_;
     const JDay settlDay_;
     const Id64 id_;
     /**

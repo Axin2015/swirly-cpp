@@ -33,10 +33,10 @@ class AssetModel
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    void removeRow(const Asset& asset) { TableModel::removeRow(asset.mnem()); }
+    void removeRow(const Asset& asset) { TableModel::removeRow(asset.symbol()); }
     void updateRow(std::uint64_t tag, const Asset& asset)
     {
-        TableModel::updateRow(asset.mnem(), tag, asset);
+        TableModel::updateRow(asset.symbol(), tag, asset);
     }
 
   private:

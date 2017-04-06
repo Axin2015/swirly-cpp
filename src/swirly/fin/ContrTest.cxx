@@ -27,7 +27,7 @@ SWIRLY_TEST_CASE(ContrToString)
                 1,      1,           10000,       4,        1_lts,    10_lts};
 
     SWIRLY_CHECK(toString(contr) == //
-                 "{\"mnem\":\"EURUSD\""
+                 "{\"symbol\":\"EURUSD\""
                  ",\"display\":\"EURUSD\""
                  ",\"asset\":\"EUR\""
                  ",\"ccy\":\"USD\""

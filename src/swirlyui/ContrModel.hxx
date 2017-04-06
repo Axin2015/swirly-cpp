@@ -33,14 +33,14 @@ class ContrModel
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    Contr find(const QString& mnem) const;
+    Contr find(const QString& symbol) const;
 
-    int indexOf(const QString& mnem) const;
+    int indexOf(const QString& symbol) const;
 
-    void removeRow(const Contr& contr) { TableModel::removeRow(contr.mnem()); }
+    void removeRow(const Contr& contr) { TableModel::removeRow(contr.symbol()); }
     void updateRow(std::uint64_t tag, const Contr& contr)
     {
-        TableModel::updateRow(contr.mnem(), tag, contr);
+        TableModel::updateRow(contr.symbol(), tag, contr);
     }
 
   private:

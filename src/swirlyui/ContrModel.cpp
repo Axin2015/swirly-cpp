@@ -25,7 +25,7 @@ using namespace contr;
 ContrModel::ContrModel(QObject* parent) : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
-    header_[unbox(Column::Mnem)] = tr("Mnem");
+    header_[unbox(Column::Symbol)] = tr("Symbol");
     header_[unbox(Column::Display)] = tr("Display");
     header_[unbox(Column::Asset)] = tr("Asset");
     header_[unbox(Column::Ccy)] = tr("Ccy");
@@ -59,8 +59,8 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Mnem:
-            var = contr.mnem();
+        case Column::Symbol:
+            var = contr.symbol();
             break;
         case Column::Display:
             var = contr.display();
@@ -97,7 +97,7 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Mnem:
+        case Column::Symbol:
         case Column::Display:
         case Column::Asset:
         case Column::Ccy:
@@ -128,20 +128,20 @@ QVariant ContrModel::headerData(int section, Qt::Orientation orientation, int ro
     return var;
 }
 
-Contr ContrModel::find(const QString& mnem) const
+Contr ContrModel::find(const QString& symbol) const
 {
     Contr contr;
-    auto it = rows_.find(mnem);
+    auto it = rows_.find(symbol);
     if (it != rows_.end()) {
         contr = it->second.value();
     }
     return contr;
 }
 
-int ContrModel::indexOf(const QString& mnem) const
+int ContrModel::indexOf(const QString& symbol) const
 {
     int i{-1};
-    auto it = rows_.find(mnem);
+    auto it = rows_.find(symbol);
     if (it != rows_.end()) {
         i = distance(rows_.begin(), it);
     }

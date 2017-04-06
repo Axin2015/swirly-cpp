@@ -51,11 +51,11 @@ class SWIRLY_API Serv {
 
     const AssetSet& assets() const noexcept;
 
-    const Contr& contr(Mnem mnem) const;
+    const Contr& contr(Symbol symbol) const;
 
     const ContrSet& contrs() const noexcept;
 
-    const Accnt& accnt(Mnem mnem) const;
+    const Accnt& accnt(Symbol symbol) const;
 
     const Market& market(Id64 id) const;
 
@@ -104,7 +104,7 @@ class SWIRLY_API Serv {
     void cancelOrder(const Market& market, Time now);
 
     TradePair createTrade(const Accnt& accnt, const Market& market, std::string_view ref, Side side,
-                          Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Time created);
+                          Lots lots, Ticks ticks, LiqInd liqInd, Symbol cpty, Time created);
 
     void archiveTrade(const Accnt& accnt, const Exec& trade, Time now);
 

@@ -77,20 +77,20 @@ namespace {
     )
   ) >beginStr;
 
-  action nullMnem {
-    fields_ &= ~Mnem;
-    mnem_.len = 0;
+  action nullSymbol {
+    fields_ &= ~Symbol;
+    symbol_.len = 0;
   }
-  action beginMnem {
-    str_.len = &mnem_.len;
-    str_.buf = mnem_.buf;
-    str_.max = MaxMnem;
+  action beginSymbol {
+    str_.len = &symbol_.len;
+    str_.buf = symbol_.buf;
+    str_.max = MaxSymbol;
   }
-  action endMnem {
-    fields_ |= Mnem;
+  action endSymbol {
+    fields_ |= Symbol;
   }
-  mnem = 'null' %nullMnem
-    | str >beginMnem %endMnem;
+  symbol = 'null' %nullSymbol
+    | str >beginSymbol %endSymbol;
 
   action nullAccnt {
     fields_ &= ~Accnt;
@@ -99,7 +99,7 @@ namespace {
   action beginAccnt {
     str_.len = &accnt_.len;
     str_.buf = accnt_.buf;
-    str_.max = MaxMnem;
+    str_.max = MaxSymbol;
   }
   action endAccnt {
     fields_ |= Accnt;
@@ -114,7 +114,7 @@ namespace {
   action beginContr {
     str_.len = &contr_.len;
     str_.buf = contr_.buf;
-    str_.max = MaxMnem;
+    str_.max = MaxSymbol;
   }
   action endContr {
     fields_ |= Contr;
@@ -230,7 +230,7 @@ namespace {
   action beginCpty {
     str_.len = &cpty_.len;
     str_.buf = cpty_.buf;
-    str_.max = MaxMnem;
+    str_.max = MaxSymbol;
   }
   action endCpty {
     fields_ |= Cpty;
@@ -241,7 +241,7 @@ namespace {
   colon = space* ':' space*;
   comma = space* ',' space*;
 
-  pair = '"mnem"'i colon mnem
+  pair = '"symbol"'i colon symbol
     | '"accnt"'i colon accnt
     | '"contr"'i colon contr
     | '"settlDate"'i colon settlDate
@@ -279,7 +279,7 @@ void RestBody::reset(bool clear) noexcept
   }
   fields_ = 0;
 
-  mnem_.len = 0;
+  symbol_.len = 0;
   accnt_.len = 0;
   contr_.len = 0;
   settlDate_ = 0_ymd;

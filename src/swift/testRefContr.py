@@ -26,7 +26,7 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.getAll(client)
-          self.getByMnem(client)
+          self.getBySymbol(client)
 
   def getAll(self, client):
     client.setAnon()
@@ -42,7 +42,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'CAP',
+      u'symbol': u'CAP',
       u'pipDp': 2,
       u'tickDenom': 20,
       u'tickNumer': 1
@@ -54,7 +54,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'CSCO',
+      u'symbol': u'CSCO',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -66,7 +66,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'DIS',
+      u'symbol': u'DIS',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -78,7 +78,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'EURUSD',
+      u'symbol': u'EURUSD',
       u'pipDp': 4,
       u'tickDenom': 10000,
       u'tickNumer': 1
@@ -90,7 +90,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'GBPUSD',
+      u'symbol': u'GBPUSD',
       u'pipDp': 4,
       u'tickDenom': 10000,
       u'tickNumer': 1
@@ -102,7 +102,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'IBM',
+      u'symbol': u'IBM',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -114,7 +114,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'ILB',
+      u'symbol': u'ILB',
       u'pipDp': 2,
       u'tickDenom': 20,
       u'tickNumer': 1
@@ -126,7 +126,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'INTC',
+      u'symbol': u'INTC',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -138,7 +138,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'MSFT',
+      u'symbol': u'MSFT',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -150,7 +150,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'NAP',
+      u'symbol': u'NAP',
       u'pipDp': 2,
       u'tickDenom': 20,
       u'tickNumer': 1
@@ -162,7 +162,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'PRB',
+      u'symbol': u'PRB',
       u'pipDp': 2,
       u'tickDenom': 20,
       u'tickNumer': 1
@@ -174,7 +174,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'UIB',
+      u'symbol': u'UIB',
       u'pipDp': 2,
       u'tickDenom': 20,
       u'tickNumer': 1
@@ -186,7 +186,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'USDCHF',
+      u'symbol': u'USDCHF',
       u'pipDp': 4,
       u'tickDenom': 10000,
       u'tickNumer': 1
@@ -198,7 +198,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'USDJPY',
+      u'symbol': u'USDJPY',
       u'pipDp': 2,
       u'tickDenom': 100,
       u'tickNumer': 1
@@ -210,7 +210,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'VIA',
+      u'symbol': u'VIA',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -222,7 +222,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'VOD',
+      u'symbol': u'VOD',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -234,7 +234,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'VZ',
+      u'symbol': u'VZ',
       u'pipDp': 3,
       u'tickDenom': 1000,
       u'tickNumer': 1
@@ -246,7 +246,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'WGAA',
+      u'symbol': u'WGAA',
       u'pipDp': 0,
       u'tickDenom': 1,
       u'tickNumer': 1
@@ -258,7 +258,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'WKCA',
+      u'symbol': u'WKCA',
       u'pipDp': 0,
       u'tickDenom': 1,
       u'tickNumer': 1
@@ -270,7 +270,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'WWNA',
+      u'symbol': u'WWNA',
       u'pipDp': 0,
       u'tickDenom': 1,
       u'tickNumer': 1
@@ -282,13 +282,13 @@ class TestCase(RestTestCase):
       u'lotNumer': 1,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'WYCA',
+      u'symbol': u'WYCA',
       u'pipDp': 0,
       u'tickDenom': 1,
       u'tickNumer': 1
     }], resp.content)
 
-  def getByMnem(self, client):
+  def getBySymbol(self, client):
     client.setAnon()
     resp = client.send('GET', '/refdata/contr/EURUSD')
 
@@ -302,7 +302,7 @@ class TestCase(RestTestCase):
       u'lotNumer': 1000000,
       u'maxLots': 10,
       u'minLots': 1,
-      u'mnem': u'EURUSD',
+      u'symbol': u'EURUSD',
       u'pipDp': 4,
       u'tickDenom': 10000,
       u'tickNumer': 1

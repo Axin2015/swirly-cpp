@@ -39,7 +39,7 @@ class OrderView : public QWidget {
 
   signals:
     void cancelOrders(const OrderKeys& keys);
-    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+    void setFields(const QString& contrSymbol, QDate settlDate, std::optional<Lots> lots,
                    std::optional<Ticks> ticks);
 
   private slots:

@@ -32,9 +32,10 @@ using namespace swirly;
 
 namespace {
 
-const Market& createMarket(Serv& serv, Mnem contrMnem, JDay settlDay, MarketState state, Time now)
+const Market& createMarket(Serv& serv, Symbol contrSymbol, JDay settlDay, MarketState state,
+                           Time now)
 {
-    const auto& contr = serv.contr(contrMnem);
+    const auto& contr = serv.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDay);
     auto it = serv.markets().find(marketId);
     if (it != serv.markets().end()) {

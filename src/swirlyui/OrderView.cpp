@@ -71,7 +71,7 @@ void OrderView::slotClicked(const QModelIndex& index)
     const auto& order = model_.valueAt(index.row());
     const auto lots = order.resd() > 0_lts ? order.resd() : order.lots();
     const auto ticks = order.ticks();
-    emit setFields(order.contr().mnem(), order.settlDate(), lots, ticks);
+    emit setFields(order.contr().symbol(), order.settlDate(), lots, ticks);
 }
 
 } // ui

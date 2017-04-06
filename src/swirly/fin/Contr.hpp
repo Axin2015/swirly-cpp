@@ -28,7 +28,7 @@ namespace swirly {
  */
 class SWIRLY_API Contr : public Comparable<Contr> {
   public:
-    Contr(Id32 id, Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
+    Contr(Id32 id, Symbol symbol, std::string_view display, Symbol asset, Symbol ccy, int lotNumer,
           int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots) noexcept;
 
@@ -50,9 +50,9 @@ class SWIRLY_API Contr : public Comparable<Contr> {
 
     void toJson(std::ostream& os) const;
 
-    int compare(const Contr& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+    int compare(const Contr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     auto id() const noexcept { return id_; }
-    auto mnem() const noexcept { return mnem_; }
+    auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
     auto asset() const noexcept { return asset_; }
     auto ccy() const noexcept { return ccy_; }
@@ -67,14 +67,14 @@ class SWIRLY_API Contr : public Comparable<Contr> {
     auto priceDp() const noexcept { return priceDp_; }
     auto minLots() const noexcept { return minLots_; }
     auto maxLots() const noexcept { return maxLots_; }
-    boost::intrusive::set_member_hook<> mnemHook_;
+    boost::intrusive::set_member_hook<> symbolHook_;
 
   private:
     const Id32 id_;
-    const Mnem mnem_;
+    const Symbol symbol_;
     const Display display_;
-    const Mnem asset_;
-    const Mnem ccy_;
+    const Symbol asset_;
+    const Symbol ccy_;
     const int lotNumer_;
     const int lotDenom_;
     // Transient.
@@ -98,7 +98,7 @@ inline std::ostream& operator<<(std::ostream& os, const Contr& contr)
     return os;
 }
 
-using ContrSet = MnemSet<Contr>;
+using ContrSet = SymbolSet<Contr>;
 
 } // swirly
 

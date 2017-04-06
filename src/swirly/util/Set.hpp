@@ -18,8 +18,8 @@
 #define SWIRLY_UTIL_SET_HPP
 
 #include <swirly/util/BasicTypes.hpp>
-#include <swirly/util/Mnem.hpp>
 #include <swirly/util/RefCounted.hpp>
+#include <swirly/util/Symbol.hpp>
 
 #include <boost/intrusive/set.hpp>
 
@@ -158,24 +158,24 @@ class IdSet {
 };
 
 /**
- * Set keyed by mnemonic.
+ * Set keyed by symbolonic.
  */
 template <typename ValueT>
-class MnemSet {
+class SymbolSet {
     struct ValueCompare {
         bool operator()(const ValueT& lhs, const ValueT& rhs) const noexcept
         {
-            return lhs.mnem() < rhs.mnem();
+            return lhs.symbol() < rhs.symbol();
         }
     };
     struct KeyValueCompare {
-        bool operator()(Mnem lhs, const ValueT& rhs) const noexcept { return lhs < rhs.mnem(); }
-        bool operator()(const ValueT& lhs, Mnem rhs) const noexcept { return lhs.mnem() < rhs; }
+        bool operator()(Symbol lhs, const ValueT& rhs) const noexcept { return lhs < rhs.symbol(); }
+        bool operator()(const ValueT& lhs, Symbol rhs) const noexcept { return lhs.symbol() < rhs; }
     };
     using ConstantTimeSizeOption = boost::intrusive::constant_time_size<false>;
     using CompareOption = boost::intrusive::compare<ValueCompare>;
-    using MemberHookOption
-        = boost::intrusive::member_hook<ValueT, decltype(ValueT::mnemHook_), &ValueT::mnemHook_>;
+    using MemberHookOption = boost::intrusive::member_hook<ValueT, decltype(ValueT::symbolHook_),
+                                                           &ValueT::symbolHook_>;
     using Set
         = boost::intrusive::set<ValueT, ConstantTimeSizeOption, CompareOption, MemberHookOption>;
     using ValuePtr = std::unique_ptr<ValueT>;
@@ -184,19 +184,19 @@ class MnemSet {
     using Iterator = typename Set::iterator;
     using ConstIterator = typename Set::const_iterator;
 
-    MnemSet() = default;
-    ~MnemSet() noexcept
+    SymbolSet() = default;
+    ~SymbolSet() noexcept
     {
         set_.clear_and_dispose([](ValueT* ptr) { delete ptr; });
     }
 
     // Copy.
-    MnemSet(const MnemSet&) = delete;
-    MnemSet& operator=(const MnemSet&) = delete;
+    SymbolSet(const SymbolSet&) = delete;
+    SymbolSet& operator=(const SymbolSet&) = delete;
 
     // Move.
-    MnemSet(MnemSet&&) = default;
-    MnemSet& operator=(MnemSet&&) = default;
+    SymbolSet(SymbolSet&&) = default;
+    SymbolSet& operator=(SymbolSet&&) = default;
 
     // Begin.
     ConstIterator begin() const noexcept { return set_.begin(); }
@@ -209,19 +209,22 @@ class MnemSet {
     Iterator end() noexcept { return set_.end(); }
 
     // Find.
-    ConstIterator find(Mnem mnem) const noexcept { return set_.find(mnem, KeyValueCompare()); }
-    Iterator find(Mnem mnem) noexcept { return set_.find(mnem, KeyValueCompare()); }
-    std::pair<ConstIterator, bool> findHint(Mnem mnem) const noexcept
+    ConstIterator find(Symbol symbol) const noexcept
     {
-        const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(mnem, comp);
-        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
+        return set_.find(symbol, KeyValueCompare());
     }
-    std::pair<Iterator, bool> findHint(Mnem mnem) noexcept
+    Iterator find(Symbol symbol) noexcept { return set_.find(symbol, KeyValueCompare()); }
+    std::pair<ConstIterator, bool> findHint(Symbol symbol) const noexcept
     {
         const auto comp = KeyValueCompare();
-        auto it = set_.lower_bound(mnem, comp);
-        return std::make_pair(it, it != set_.end() && !comp(mnem, *it));
+        auto it = set_.lower_bound(symbol, comp);
+        return std::make_pair(it, it != set_.end() && !comp(symbol, *it));
+    }
+    std::pair<Iterator, bool> findHint(Symbol symbol) noexcept
+    {
+        const auto comp = KeyValueCompare();
+        auto it = set_.lower_bound(symbol, comp);
+        return std::make_pair(it, it != set_.end() && !comp(symbol, *it));
     }
     Iterator insert(ValuePtr value) noexcept
     {

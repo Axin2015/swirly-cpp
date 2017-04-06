@@ -42,7 +42,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
     {
         auto del = makeDeleter(contrComboBox->model());
         contrComboBox->setModel(&contrModel);
-        contrComboBox->setModelColumn(unbox(contr::Column::Mnem));
+        contrComboBox->setModelColumn(unbox(contr::Column::Symbol));
     }
     QFontMetrics fm{QApplication::font()};
     contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
@@ -89,11 +89,11 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
 
 MarketForm::~MarketForm() noexcept = default;
 
-void MarketForm::setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+void MarketForm::setFields(const QString& contrSymbol, QDate settlDate, std::optional<Lots> lots,
                            std::optional<Ticks> ticks)
 {
-    if (!contrMnem.isNull()) {
-        const auto i = contrModel_.indexOf(contrMnem);
+    if (!contrSymbol.isNull()) {
+        const auto i = contrModel_.indexOf(contrSymbol);
         if (i >= 0) {
             contrComboBox_->setCurrentIndex(i);
         }

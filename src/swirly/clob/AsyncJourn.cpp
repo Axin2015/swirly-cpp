@@ -115,7 +115,7 @@ void AsyncJourn::doReset()
     pipe_.write([](Msg& msg) { msg.type = MsgType::Reset; });
 }
 
-void AsyncJourn::doCreateMarket(Id64 id, Mnem contr, JDay settlDay, MarketState state)
+void AsyncJourn::doCreateMarket(Id64 id, Symbol contr, JDay settlDay, MarketState state)
 {
     pipe_.write([id, &contr, settlDay, state](Msg& msg) {
         msg.type = MsgType::CreateMarket;

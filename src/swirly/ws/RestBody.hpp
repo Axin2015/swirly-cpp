@@ -20,14 +20,14 @@
 #include <swirly/fin/Types.hpp>
 
 #include <swirly/util/Date.hpp>
-#include <swirly/util/Mnem.hpp>
+#include <swirly/util/Symbol.hpp>
 
 namespace swirly {
 
 class SWIRLY_API RestBody {
   public:
     enum : unsigned {
-        Mnem = 1 << 0,
+        Symbol = 1 << 0,
         Accnt = 1 << 1,
         Contr = 1 << 2,
         SettlDate = 1 << 3,
@@ -53,9 +53,9 @@ class SWIRLY_API RestBody {
     RestBody& operator=(RestBody&&) = delete;
 
     unsigned fields() const noexcept { return fields_; }
-    swirly::Mnem mnem() const noexcept { return +mnem_; }
-    swirly::Mnem accnt() const noexcept { return +accnt_; }
-    swirly::Mnem contr() const noexcept { return +contr_; }
+    swirly::Symbol symbol() const noexcept { return +symbol_; }
+    swirly::Symbol accnt() const noexcept { return +accnt_; }
+    swirly::Symbol contr() const noexcept { return +contr_; }
     IsoDate settlDate() const noexcept { return settlDate_; }
     std::string_view ref() const noexcept { return +ref_; }
     MarketState state() const noexcept { return state_; }
@@ -64,7 +64,7 @@ class SWIRLY_API RestBody {
     swirly::Ticks ticks() const noexcept { return ticks_; }
     swirly::Lots minLots() const noexcept { return minLots_; }
     swirly::LiqInd liqInd() const noexcept { return liqInd_; }
-    swirly::Mnem cpty() const noexcept { return +cpty_; }
+    swirly::Symbol cpty() const noexcept { return +cpty_; }
     /**
      * Validate fields.
      *
@@ -97,9 +97,9 @@ class SWIRLY_API RestBody {
     };
     unsigned fields_;
 
-    StringData<MaxMnem> mnem_;
-    StringData<MaxMnem> accnt_;
-    StringData<MaxMnem> contr_;
+    StringData<MaxSymbol> symbol_;
+    StringData<MaxSymbol> accnt_;
+    StringData<MaxSymbol> contr_;
     IsoDate settlDate_;
     StringData<MaxRef> ref_;
     MarketState state_;
@@ -108,7 +108,7 @@ class SWIRLY_API RestBody {
     swirly::Ticks ticks_;
     swirly::Lots minLots_;
     swirly::LiqInd liqInd_;
-    StringData<MaxMnem> cpty_;
+    StringData<MaxSymbol> cpty_;
 
     long num() const noexcept { return num_.sign * num_.digits; }
 };

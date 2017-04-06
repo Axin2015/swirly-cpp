@@ -32,9 +32,9 @@ constexpr std::size_t MaxErrMsg{511};
 constexpr std::size_t MaxLogMsg{2048};
 
 /**
- * Maximum mnemonic characters.
+ * Maximum symbolonic characters.
  */
-constexpr std::size_t MaxMnem{16};
+constexpr std::size_t MaxSymbol{16};
 
 } // swirly
 

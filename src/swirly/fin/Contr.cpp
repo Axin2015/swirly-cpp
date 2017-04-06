@@ -24,11 +24,11 @@ namespace swirly {
 
 static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
 
-Contr::Contr(Id32 id, Mnem mnem, string_view display, Mnem asset, Mnem ccy, int lotNumer,
+Contr::Contr(Id32 id, Symbol symbol, string_view display, Symbol asset, Symbol ccy, int lotNumer,
              int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
     : id_{id},
-      mnem_{mnem},
+      symbol_{symbol},
       display_{display},
       asset_{asset},
       ccy_{ccy},
@@ -54,7 +54,7 @@ Contr::Contr(Contr&&) = default;
 
 void Contr::toJson(ostream& os) const
 {
-    os << "{\"mnem\":\"" << mnem_ //
+    os << "{\"symbol\":\"" << symbol_ //
        << "\",\"display\":\"" << display_ //
        << "\",\"asset\":\"" << asset_ //
        << "\",\"ccy\":\"" << ccy_ //

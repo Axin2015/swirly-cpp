@@ -65,7 +65,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = toVariant(posn.marketId());
             break;
         case Column::Contr:
-            var = posn.contr().mnem();
+            var = posn.contr().symbol();
             break;
         case Column::SettlDate:
             var = posn.settlDate();

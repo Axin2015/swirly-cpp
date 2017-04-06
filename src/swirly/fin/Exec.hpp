@@ -31,10 +31,10 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc {
   public:
-    Exec(Mnem accnt, Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Id64 orderId,
+    Exec(Symbol accnt, Id64 marketId, Symbol contr, JDay settlDay, Id64 id, Id64 orderId,
          std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
          Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId, LiqInd liqInd,
-         Mnem cpty, Time created) noexcept
+         Symbol cpty, Time created) noexcept
         : Request{accnt, marketId, contr, settlDay, id, ref, side, lots, created},
           orderId_{orderId},
           state_{state},
@@ -96,9 +96,9 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
         resd_ = 0_lts;
     }
     void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
-               LiqInd liqInd, Mnem cpty) noexcept;
+               LiqInd liqInd, Symbol cpty) noexcept;
 
-    void trade(Lots lastLots, Ticks lastTicks, Id64 matchId, LiqInd liqInd, Mnem cpty) noexcept
+    void trade(Lots lastLots, Ticks lastTicks, Id64 matchId, LiqInd liqInd, Symbol cpty) noexcept
     {
         trade(lastLots, swirly::cost(lastLots, lastTicks), lastLots, lastTicks, matchId, liqInd,
               cpty);
@@ -127,7 +127,7 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
     const Lots minLots_;
     Id64 matchId_;
     LiqInd liqInd_;
-    Mnem cpty_;
+    Symbol cpty_;
 };
 
 static_assert(sizeof(Exec) <= 5 * 64, "mempool size exceeded");

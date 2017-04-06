@@ -97,7 +97,7 @@ ExecPtr Exec::opposite(Id64 id) const
 }
 
 void Exec::trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
-                 LiqInd liqInd, Mnem cpty) noexcept
+                 LiqInd liqInd, Symbol cpty) noexcept
 {
     state_ = State::Trade;
     resd_ -= sumLots;

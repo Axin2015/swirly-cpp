@@ -14,10 +14,10 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Mnem.hpp"
+#include "Symbol.hpp"
 
 namespace swirly {
 
-static_assert(Mnem{}.empty(), "default constructor not constexpr");
-static_assert(Mnem{Mnem{}}.empty(), "copy constructor not constexpr");
+static_assert(Symbol{}.empty(), "default constructor not constexpr");
+static_assert(Symbol{Symbol{}}.empty(), "copy constructor not constexpr");
 }

@@ -24,13 +24,13 @@ namespace ui {
 Asset Asset::fromJson(const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
-    return Asset{fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
+    return Asset{fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
                  fromJson<AssetType>(obj["type"])};
 }
 
 QDebug operator<<(QDebug debug, const Asset& asset)
 {
-    debug.nospace() << "Asset{mnem=" << asset.mnem() //
+    debug.nospace() << "Asset{symbol=" << asset.symbol() //
                     << ",display=" << asset.display() //
                     << ",type=" << asset.type() //
                     << '}';

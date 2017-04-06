@@ -23,10 +23,10 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-Contr::Impl::Impl(const QString& mnem, const QString& display, const QString& asset,
+Contr::Impl::Impl(const QString& symbol, const QString& display, const QString& asset,
                   const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
                   int pipDp, Lots minLots, Lots maxLots)
-    : mnem{mnem},
+    : symbol{symbol},
       display{display},
       asset{asset},
       ccy{ccy},
@@ -47,7 +47,7 @@ Contr::Impl::Impl(const QString& mnem, const QString& display, const QString& as
 Contr Contr::fromJson(const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
-    return Contr(fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
+    return Contr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
                  fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
                  fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
                  fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
@@ -63,7 +63,7 @@ shared_ptr<const Contr::Impl> Contr::empty()
 
 QDebug operator<<(QDebug debug, const Contr& contr)
 {
-    debug.nospace() << "Contr{mnem=" << contr.mnem() //
+    debug.nospace() << "Contr{symbol=" << contr.symbol() //
                     << ",display=" << contr.display() //
                     << ",asset=" << contr.asset() //
                     << ",ccy=" << contr.ccy() //

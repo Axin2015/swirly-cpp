@@ -122,12 +122,12 @@ void Rest::getAsset(Time now, ostream& out) const
     out << ']';
 }
 
-void Rest::getAsset(Mnem mnem, Time now, ostream& out) const
+void Rest::getAsset(Symbol symbol, Time now, ostream& out) const
 {
     const auto& assets = serv_.assets();
-    auto it = assets.find(mnem);
+    auto it = assets.find(symbol);
     if (it == assets.end()) {
-        throw NotFoundException{errMsg() << "asset '" << mnem << "' does not exist"};
+        throw NotFoundException{errMsg() << "asset '" << symbol << "' does not exist"};
     }
     out << *it;
 }
@@ -140,19 +140,19 @@ void Rest::getContr(Time now, ostream& out) const
     out << ']';
 }
 
-void Rest::getContr(Mnem mnem, Time now, ostream& out) const
+void Rest::getContr(Symbol symbol, Time now, ostream& out) const
 {
     const auto& contrs = serv_.contrs();
-    auto it = contrs.find(mnem);
+    auto it = contrs.find(symbol);
     if (it == contrs.end()) {
-        throw NotFoundException{errMsg() << "contr '" << mnem << "' does not exist"};
+        throw NotFoundException{errMsg() << "contr '" << symbol << "' does not exist"};
     }
     out << *it;
 }
 
-void Rest::getAccnt(Mnem mnem, EntitySet es, Page page, Time now, ostream& out) const
+void Rest::getAccnt(Symbol symbol, EntitySet es, Page page, Time now, ostream& out) const
 {
-    const auto& accnt = serv_.accnt(mnem);
+    const auto& accnt = serv_.accnt(symbol);
     int i{0};
     out << '{';
     if (es.market()) {
@@ -203,40 +203,41 @@ void Rest::getMarket(Time now, std::ostream& out) const
     out << ']';
 }
 
-void Rest::getMarket(Mnem contrMnem, Time now, std::ostream& out) const
+void Rest::getMarket(Symbol contrSymbol, Time now, std::ostream& out) const
 {
     const auto& markets = serv_.markets();
     out << '[';
     copy_if(markets.begin(), markets.end(), OStreamJoiner(out, ','),
-            [contrMnem](const auto& market) { return market.contr() == contrMnem; });
+            [contrSymbol](const auto& market) { return market.contr() == contrSymbol; });
     out << ']';
 }
 
-void Rest::getMarket(Mnem contrMnem, IsoDate settlDate, Time now, std::ostream& out) const
+void Rest::getMarket(Symbol contrSymbol, IsoDate settlDate, Time now, std::ostream& out) const
 {
-    const auto id = toMarketId(serv_.contr(contrMnem).id(), settlDate);
+    const auto id = toMarketId(serv_.contr(contrSymbol).id(), settlDate);
     out << serv_.market(id);
 }
 
-void Rest::getOrder(Mnem accntMnem, Time now, ostream& out) const
+void Rest::getOrder(Symbol accntSymbol, Time now, ostream& out) const
 {
-    detail::getOrder(serv_.accnt(accntMnem), out);
+    detail::getOrder(serv_.accnt(accntSymbol), out);
 }
 
-void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, Time now, ostream& out) const
+void Rest::getOrder(Symbol accntSymbol, Symbol contrSymbol, Time now, ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
     const auto& orders = accnt.orders();
     out << '[';
     copy_if(orders.begin(), orders.end(), OStreamJoiner(out, ','),
-            [contrMnem](const auto& order) { return order.contr() == contrMnem; });
+            [contrSymbol](const auto& order) { return order.contr() == contrSymbol; });
     out << ']';
 }
 
-void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now, ostream& out) const
+void Rest::getOrder(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, Time now,
+                    ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& orders = accnt.orders();
     out << '[';
@@ -245,11 +246,11 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now,
     out << ']';
 }
 
-void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
+void Rest::getOrder(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, Id64 id, Time now,
                     ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& orders = accnt.orders();
     auto it = orders.find(marketId, id);
@@ -259,30 +260,31 @@ void Rest::getOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
     out << *it;
 }
 
-void Rest::getExec(Mnem accntMnem, Page page, Time now, ostream& out) const
+void Rest::getExec(Symbol accntSymbol, Page page, Time now, ostream& out) const
 {
-    detail::getExec(serv_.accnt(accntMnem), page, out);
+    detail::getExec(serv_.accnt(accntSymbol), page, out);
 }
 
-void Rest::getTrade(Mnem accntMnem, Time now, ostream& out) const
+void Rest::getTrade(Symbol accntSymbol, Time now, ostream& out) const
 {
-    detail::getTrade(serv_.accnt(accntMnem), out);
+    detail::getTrade(serv_.accnt(accntSymbol), out);
 }
 
-void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, Time now, std::ostream& out) const
+void Rest::getTrade(Symbol accntSymbol, Symbol contrSymbol, Time now, std::ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
     const auto& trades = accnt.trades();
     out << '[';
     copy_if(trades.begin(), trades.end(), OStreamJoiner(out, ','),
-            [contrMnem](const auto& trade) { return trade.contr() == contrMnem; });
+            [contrSymbol](const auto& trade) { return trade.contr() == contrSymbol; });
     out << ']';
 }
 
-void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now, ostream& out) const
+void Rest::getTrade(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, Time now,
+                    ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& trades = accnt.trades();
     out << '[';
@@ -291,11 +293,11 @@ void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now,
     out << ']';
 }
 
-void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, Time now,
+void Rest::getTrade(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, Id64 id, Time now,
                     ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& trades = accnt.trades();
     auto it = trades.find(marketId, id);
@@ -305,57 +307,60 @@ void Rest::getTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Id64 id, 
     out << *it;
 }
 
-void Rest::getPosn(Mnem accntMnem, Time now, ostream& out) const
+void Rest::getPosn(Symbol accntSymbol, Time now, ostream& out) const
 {
-    detail::getPosn(serv_.accnt(accntMnem), out);
+    detail::getPosn(serv_.accnt(accntSymbol), out);
 }
 
-void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, Time now, ostream& out) const
+void Rest::getPosn(Symbol accntSymbol, Symbol contrSymbol, Time now, ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
     const auto& posns = accnt.posns();
     out << '[';
     copy_if(posns.begin(), posns.end(), OStreamJoiner(out, ','),
-            [contrMnem](const auto& posn) { return posn.contr() == contrMnem; });
+            [contrSymbol](const auto& posn) { return posn.contr() == contrSymbol; });
     out << ']';
 }
 
-void Rest::getPosn(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, Time now, ostream& out) const
+void Rest::getPosn(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, Time now,
+                   ostream& out) const
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& posns = accnt.posns();
     auto it = posns.find(marketId);
     if (it == posns.end()) {
-        throw NotFoundException{errMsg() << "posn for '" << contrMnem << "' on " << settlDate
+        throw NotFoundException{errMsg() << "posn for '" << contrSymbol << "' on " << settlDate
                                          << " does not exist"};
     }
     out << *it;
 }
 
-void Rest::postMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Time now, ostream& out)
+void Rest::postMarket(Symbol contrSymbol, IsoDate settlDate, MarketState state, Time now,
+                      ostream& out)
 {
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto settlDay = maybeIsoToJd(settlDate);
     const auto& market = serv_.createMarket(contr, settlDay, state, now);
     out << market;
 }
 
-void Rest::putMarket(Mnem contrMnem, IsoDate settlDate, MarketState state, Time now, ostream& out)
+void Rest::putMarket(Symbol contrSymbol, IsoDate settlDate, MarketState state, Time now,
+                     ostream& out)
 {
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto id = toMarketId(contr.id(), settlDate);
     const auto& market = serv_.market(id);
     serv_.updateMarket(market, state, now);
     out << market;
 }
 
-void Rest::postOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_view ref, Side side,
-                     Lots lots, Ticks ticks, Lots minLots, Time now, ostream& out)
+void Rest::postOrder(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, string_view ref,
+                     Side side, Lots lots, Ticks ticks, Lots minLots, Time now, ostream& out)
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& market = serv_.market(marketId);
     Response resp;
@@ -363,11 +368,11 @@ void Rest::postOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_v
     out << resp;
 }
 
-void Rest::putOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids,
+void Rest::putOrder(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, ArrayView<Id64> ids,
                     Lots lots, Time now, ostream& out)
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& market = serv_.market(marketId);
     Response resp;
@@ -387,11 +392,12 @@ void Rest::putOrder(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView
     out << resp;
 }
 
-void Rest::postTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_view ref, Side side,
-                     Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Time now, ostream& out)
+void Rest::postTrade(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate, string_view ref,
+                     Side side, Lots lots, Ticks ticks, LiqInd liqInd, Symbol cpty, Time now,
+                     ostream& out)
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     const auto& market = serv_.market(marketId);
     auto trades = serv_.createTrade(accnt, market, ref, side, lots, ticks, liqInd, cpty, now);
@@ -402,11 +408,11 @@ void Rest::postTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, string_v
     out << ']';
 }
 
-void Rest::deleteTrade(Mnem accntMnem, Mnem contrMnem, IsoDate settlDate, ArrayView<Id64> ids,
-                       Time now)
+void Rest::deleteTrade(Symbol accntSymbol, Symbol contrSymbol, IsoDate settlDate,
+                       ArrayView<Id64> ids, Time now)
 {
-    const auto& accnt = serv_.accnt(accntMnem);
-    const auto& contr = serv_.contr(contrMnem);
+    const auto& accnt = serv_.accnt(accntSymbol);
+    const auto& contr = serv_.contr(contrSymbol);
     const auto marketId = toMarketId(contr.id(), settlDate);
     serv_.archiveTrade(accnt, marketId, ids, now);
 }
