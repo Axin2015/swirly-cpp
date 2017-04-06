@@ -40,7 +40,7 @@ class Model : public swirly::Model {
   protected:
     void doReadAsset(const ModelCallback<AssetPtr>& cb) const override;
 
-    void doReadContr(const ModelCallback<ContrPtr>& cb) const override;
+    void doReadInstr(const ModelCallback<InstrPtr>& cb) const override;
 
     void doReadMarket(const ModelCallback<MarketPtr>& cb) const override;
 

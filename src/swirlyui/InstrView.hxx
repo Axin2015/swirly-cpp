@@ -14,29 +14,40 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Contr.hpp"
+#ifndef SWIRLYUI_INSTRVIEW_HXX
+#define SWIRLYUI_INSTRVIEW_HXX
 
-#include <swirly/unit/Test.hpp>
+#include <QWidget>
 
-using namespace std;
-using namespace swirly;
+class QModelIndex;
+class QTableView;
 
-SWIRLY_TEST_CASE(ContrToString)
-{
-    Contr contr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
-                1,      1,           10000,       4,        1_lts,    10_lts};
+namespace swirly {
+namespace ui {
 
-    SWIRLY_CHECK(toString(contr) == //
-                 "{\"symbol\":\"EURUSD\""
-                 ",\"display\":\"EURUSD\""
-                 ",\"asset\":\"EUR\""
-                 ",\"ccy\":\"USD\""
-                 ",\"lotNumer\":1000000"
-                 ",\"lotDenom\":1"
-                 ",\"tickNumer\":1"
-                 ",\"tickDenom\":10000"
-                 ",\"pipDp\":4"
-                 ",\"minLots\":1"
-                 ",\"maxLots\":10"
-                 "}");
-}
+class Instr;
+class InstrModel;
+
+class InstrView : public QWidget {
+    Q_OBJECT
+
+  public:
+    InstrView(InstrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~InstrView() noexcept override;
+
+    void resizeColumnsToContents();
+
+  signals:
+
+  private slots:
+    void slotClicked(const QModelIndex& index);
+
+  private:
+    InstrModel& model_;
+    QTableView* table_{nullptr};
+};
+
+} // ui
+} // swirly
+
+#endif // SWIRLYUI_INSTRVIEW_HXX

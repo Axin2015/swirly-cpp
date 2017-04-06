@@ -38,7 +38,7 @@ class SWIRLY_API TestModel : public Model {
   protected:
     void doReadAsset(const ModelCallback<AssetPtr>& cb) const override;
 
-    void doReadContr(const ModelCallback<ContrPtr>& cb) const override;
+    void doReadInstr(const ModelCallback<InstrPtr>& cb) const override;
 
     void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const override;
 

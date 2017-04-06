@@ -166,7 +166,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
     const auto& body = msg.createMarket;
 
     SWIRLY_CHECK(body.id == MarketId);
-    SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
+    SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
     SWIRLY_CHECK(body.state == 0x1);
 }
@@ -204,7 +204,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 
         SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
         SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
+        SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
         SWIRLY_CHECK(body.settlDay == SettlDay);
         SWIRLY_CHECK(body.id == 1_id64);
         SWIRLY_CHECK(body.orderId == 2_id64);
@@ -231,7 +231,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         const auto& body = msg.createExec;
 
         SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
+        SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
         SWIRLY_CHECK(body.settlDay == SettlDay);
         SWIRLY_CHECK(body.id == 3_id64);
         SWIRLY_CHECK(body.orderId == 2_id64);

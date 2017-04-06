@@ -44,13 +44,13 @@ void daemon()
         _exit(0);
     }
 
-    // Detach from controlling terminal by making process a session leader.
+    // Detach from instrolling terminal by making process a session leader.
     if (setsid() < 0) {
         throw system_error{errno, system_category(), "setsid failed"};
     }
 
     // Forking again ensures that the daemon process is not a session leader, and therefore cannot
-    // regain access to a controlling terminal.
+    // regain access to a instrolling terminal.
     pid = fork();
     if (pid < 0) {
         throw system_error{errno, system_category(), "fork failed"};

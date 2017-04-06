@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Contr.hxx"
+#include "Instr.hxx"
 
 #include <QJsonObject>
 
@@ -23,7 +23,7 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-Contr::Impl::Impl(const QString& symbol, const QString& display, const QString& asset,
+Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& asset,
                   const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
                   int pipDp, Lots minLots, Lots maxLots)
     : symbol{symbol},
@@ -44,10 +44,10 @@ Contr::Impl::Impl(const QString& symbol, const QString& display, const QString& 
 {
 }
 
-Contr Contr::fromJson(const QJsonObject& obj)
+Instr Instr::fromJson(const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
-    return Contr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
+    return Instr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
                  fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
                  fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
                  fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
@@ -55,25 +55,25 @@ Contr Contr::fromJson(const QJsonObject& obj)
                  fromJson<Lots>(obj["maxLots"]));
 }
 
-shared_ptr<const Contr::Impl> Contr::empty()
+shared_ptr<const Instr::Impl> Instr::empty()
 {
     static auto impl = make_shared<const Impl>();
     return impl;
 }
 
-QDebug operator<<(QDebug debug, const Contr& contr)
+QDebug operator<<(QDebug debug, const Instr& instr)
 {
-    debug.nospace() << "Contr{symbol=" << contr.symbol() //
-                    << ",display=" << contr.display() //
-                    << ",asset=" << contr.asset() //
-                    << ",ccy=" << contr.ccy() //
-                    << ",lotNumer=" << contr.lotNumer() //
-                    << ",lotDenom=" << contr.lotDenom() //
-                    << ",tickNumer=" << contr.tickNumer() //
-                    << ",tickDenom=" << contr.tickDenom() //
-                    << ",pipDp=" << contr.pipDp() //
-                    << ",minLots=" << contr.minLots() //
-                    << ",maxLots=" << contr.maxLots() //
+    debug.nospace() << "Instr{symbol=" << instr.symbol() //
+                    << ",display=" << instr.display() //
+                    << ",asset=" << instr.asset() //
+                    << ",ccy=" << instr.ccy() //
+                    << ",lotNumer=" << instr.lotNumer() //
+                    << ",lotDenom=" << instr.lotDenom() //
+                    << ",tickNumer=" << instr.tickNumer() //
+                    << ",tickDenom=" << instr.tickDenom() //
+                    << ",pipDp=" << instr.pipDp() //
+                    << ",minLots=" << instr.minLots() //
+                    << ",maxLots=" << instr.maxLots() //
                     << '}';
     return debug;
 }

@@ -97,7 +97,7 @@ CREATE TABLE asset_t (
 )
 ;
 
-CREATE TABLE contr_t (
+CREATE TABLE instr_t (
   id INT NOT NULL PRIMARY KEY,
   symbol CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
@@ -128,21 +128,21 @@ CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
 CREATE TABLE market_t (
   id BIGINT NOT NULL PRIMARY KEY,
-  contr CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   last_time BIGINT NULL DEFAULT NULL,
 
-  FOREIGN KEY (contr) REFERENCES contr_t (symbol)
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol)
 )
 ;
 
 CREATE TABLE order_t (
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  contr CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE order_t (
   PRIMARY KEY (market_id, id),
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
-  FOREIGN KEY (contr) REFERENCES contr_t (symbol),
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id)
 )
@@ -173,7 +173,7 @@ CREATE INDEX order_resd_idx ON order_t (resd);
 CREATE TABLE exec_t (
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  contr CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   order_id BIGINT NULL DEFAULT NULL,
@@ -199,7 +199,7 @@ CREATE TABLE exec_t (
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (market_id, order_id) REFERENCES order_t (market_id, id),
-  FOREIGN KEY (contr) REFERENCES contr_t (symbol),
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
   FOREIGN KEY (liqind_id) REFERENCES liqind_t (id)
@@ -217,7 +217,7 @@ CREATE TRIGGER before_insert_on_exec1
     INSERT INTO order_t (
       accnt,
       market_id,
-      contr,
+      instr,
       settl_day,
       id,
       ref,
@@ -236,7 +236,7 @@ CREATE TRIGGER before_insert_on_exec1
     ) VALUES (
       NEW.accnt,
       NEW.market_id,
-      NEW.contr,
+      NEW.instr,
       NEW.settl_day,
       NEW.order_id,
       NEW.ref,
@@ -324,7 +324,7 @@ CREATE VIEW asset_v AS
   ON a.type_id = t.id
 ;
 
-CREATE VIEW contr_v AS
+CREATE VIEW instr_v AS
   SELECT
     c.id,
     c.symbol,
@@ -339,7 +339,7 @@ CREATE VIEW contr_v AS
     c.pip_dp,
     c.min_lots,
     c.max_lots
-  FROM contr_t c
+  FROM instr_t c
   LEFT OUTER JOIN asset_v a
   ON c.asset = a.symbol
 ;
@@ -347,7 +347,7 @@ CREATE VIEW contr_v AS
 CREATE VIEW market_v AS
   SELECT
     m.id,
-    m.contr,
+    m.instr,
     m.settl_day,
     m.state,
     m.last_lots,
@@ -364,7 +364,7 @@ CREATE VIEW order_v AS
   SELECT
     o.accnt,
     o.market_id,
-    o.contr,
+    o.instr,
     o.settl_day,
     o.id,
     o.ref,
@@ -391,7 +391,7 @@ CREATE VIEW exec_v AS
   SELECT
     e.accnt,
     e.market_id,
-    e.contr,
+    e.instr,
     e.settl_day,
     e.id,
     e.order_id,
@@ -425,7 +425,7 @@ CREATE VIEW posn_v AS
   SELECT
     e.accnt,
     e.market_id,
-    e.contr,
+    e.instr,
     e.settl_day,
     e.side_id,
     SUM(e.last_lots) lots,

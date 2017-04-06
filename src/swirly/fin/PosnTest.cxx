@@ -38,7 +38,7 @@ SWIRLY_TEST_CASE(AccntPosnSet)
     PosnPtr posn1{
         &*s.emplace("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 0_lts, 0_cst, 0_lts, 0_cst)};
     SWIRLY_CHECK(posn1->refs() == 2);
-    SWIRLY_CHECK(posn1->contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(posn1->instr() == "EURUSD"_sv);
     SWIRLY_CHECK(posn1->settlDay() == SettlDay);
     SWIRLY_CHECK(s.find(MarketId) != s.end());
 
@@ -53,6 +53,6 @@ SWIRLY_TEST_CASE(AccntPosnSet)
                                        0_lts, 0_cst)};
     SWIRLY_CHECK(posn3->refs() == 2);
     SWIRLY_CHECK(posn3 != posn1);
-    SWIRLY_CHECK(posn3->contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(posn3->instr() == "EURUSD"_sv);
     SWIRLY_CHECK(posn3->settlDay() == SettlDay);
 }

@@ -65,7 +65,7 @@ void HttpResponse::reset(int status, const char* reason, bool cache)
 
     *this << "HTTP/1.1 " << status << ' ' << reason;
     if (!cache) {
-        *this << "\r\nCache-Control: no-cache";
+        *this << "\r\nCache-Instrol: no-cache";
     }
     if (withBody(status)) {
         // Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF. Use 10 space place-holder

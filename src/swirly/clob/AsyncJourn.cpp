@@ -115,13 +115,13 @@ void AsyncJourn::doReset()
     pipe_.write([](Msg& msg) { msg.type = MsgType::Reset; });
 }
 
-void AsyncJourn::doCreateMarket(Id64 id, Symbol contr, JDay settlDay, MarketState state)
+void AsyncJourn::doCreateMarket(Id64 id, Symbol instr, JDay settlDay, MarketState state)
 {
-    pipe_.write([id, &contr, settlDay, state](Msg& msg) {
+    pipe_.write([id, &instr, settlDay, state](Msg& msg) {
         msg.type = MsgType::CreateMarket;
         auto& body = msg.createMarket;
         body.id = id;
-        setCString(body.contr, contr);
+        setCString(body.instr, instr);
         body.settlDay = settlDay;
         body.state = state;
     });
@@ -144,7 +144,7 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
         auto& body = msg.createExec;
         setCString(body.accnt, exec.accnt());
         body.marketId = exec.marketId();
-        setCString(body.contr, exec.contr());
+        setCString(body.instr, exec.instr());
         body.settlDay = exec.settlDay();
         body.id = exec.id();
         body.orderId = exec.orderId();

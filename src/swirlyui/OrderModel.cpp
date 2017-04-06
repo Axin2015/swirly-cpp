@@ -27,7 +27,7 @@ OrderModel::OrderModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::Ref)] = tr("Ref");
@@ -72,8 +72,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = toVariant(order.marketId());
             break;
-        case Column::Contr:
-            var = order.contr().symbol();
+        case Column::Instr:
+            var = order.instr().symbol();
             break;
         case Column::SettlDate:
             var = order.settlDate();
@@ -95,7 +95,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (order.lots() != 0_lts) {
-                var = ticksToPriceString(order.ticks(), order.contr());
+                var = ticksToPriceString(order.ticks(), order.instr());
             }
             break;
         case Column::Resd:
@@ -105,14 +105,14 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             var = toVariant(order.exec());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(order.exec(), order.cost(), order.contr());
+            var = ticksToAvgPriceString(order.exec(), order.cost(), order.instr());
             break;
         case Column::LastLots:
             var = toVariant(order.lastLots());
             break;
         case Column::LastPrice:
             if (order.lastLots() != 0_lts) {
-                var = ticksToPriceString(order.lastTicks(), order.contr());
+                var = ticksToPriceString(order.lastTicks(), order.instr());
             }
             break;
         case Column::MinLots:
@@ -130,7 +130,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::CheckState:
             break;
         case Column::Accnt:
-        case Column::Contr:
+        case Column::Instr:
         case Column::Ref:
         case Column::State:
         case Column::Side:

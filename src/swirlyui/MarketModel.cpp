@@ -26,7 +26,7 @@ MarketModel::MarketModel(QObject* parent) : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Id)] = tr("Id");
-    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::State)] = tr("State");
     header_[unbox(Column::LastLots)] = tr("Last Lots");
@@ -64,8 +64,8 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
         case Column::Id:
             var = toVariant(market.id());
             break;
-        case Column::Contr:
-            var = market.contr().symbol();
+        case Column::Instr:
+            var = market.instr().symbol();
             break;
         case Column::SettlDate:
             var = market.settlDate();
@@ -78,7 +78,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             break;
         case Column::LastPrice:
             if (market.lastLots() != 0_lts) {
-                var = ticksToPriceString(market.lastTicks(), market.contr());
+                var = ticksToPriceString(market.lastTicks(), market.instr());
             }
             break;
         case Column::LastTime:
@@ -86,7 +86,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             break;
         case Column::BidPrice:
             if (market.bestBid().resd() != 0_lts) {
-                var = ticksToPriceString(market.bestBid().ticks(), market.contr());
+                var = ticksToPriceString(market.bestBid().ticks(), market.instr());
             }
             break;
         case Column::BidResd:
@@ -97,7 +97,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             break;
         case Column::OfferPrice:
             if (market.bestOffer().resd() != 0_lts) {
-                var = ticksToPriceString(market.bestOffer().ticks(), market.contr());
+                var = ticksToPriceString(market.bestOffer().ticks(), market.instr());
             }
             break;
         case Column::OfferResd:
@@ -111,7 +111,7 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Contr:
+        case Column::Instr:
         case Column::State:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;

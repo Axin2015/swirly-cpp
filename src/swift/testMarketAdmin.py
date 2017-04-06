@@ -28,7 +28,7 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.createMarket(client)
-          self.createMarketByContr(client)
+          self.createMarketByInstr(client)
           self.createMarketByMarket(client)
           self.updateMarket(client)
 
@@ -72,7 +72,7 @@ class TestCase(RestTestCase):
   def createMarket(self, client):
     client.setAdmin()
     resp = client.send('POST', '/market',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        state = 1)
 
@@ -82,7 +82,7 @@ class TestCase(RestTestCase):
       u'bidCount': [None, None, None],
       u'bidResd': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'id': 82255,
       u'lastLots': None,
       u'lastTicks': None,
@@ -94,7 +94,7 @@ class TestCase(RestTestCase):
       u'state': 1
     }, resp.content)
 
-  def createMarketByContr(self, client):
+  def createMarketByInstr(self, client):
     client.setAdmin()
     resp = client.send('POST', '/market/GBPUSD',
                        settlDate = 20140302,
@@ -106,7 +106,7 @@ class TestCase(RestTestCase):
       u'bidCount': [None, None, None],
       u'bidResd': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147791,
       u'lastLots': None,
       u'lastTicks': None,
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
       u'bidCount': [None, None, None],
       u'bidResd': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'USDJPY',
+      u'instr': u'USDJPY',
       u'id': 278863,
       u'lastLots': None,
       u'lastTicks': None,
@@ -151,7 +151,7 @@ class TestCase(RestTestCase):
       u'bidCount': [None, None, None],
       u'bidResd': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'USDJPY',
+      u'instr': u'USDJPY',
       u'id': 278863,
       u'lastLots': None,
       u'lastTicks': None,

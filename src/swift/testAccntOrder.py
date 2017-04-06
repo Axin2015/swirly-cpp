@@ -41,7 +41,7 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.getAll(client)
-          self.getByContr(client)
+          self.getByInstr(client)
           self.getByMarket(client)
           self.getById(client)
 
@@ -50,7 +50,7 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.getAll(client)
-          self.getByContr(client)
+          self.getByInstr(client)
           self.getByMarket(client)
           self.getById(client)
 
@@ -91,7 +91,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -110,7 +110,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -148,7 +148,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -167,7 +167,7 @@ class TestCase(RestTestCase):
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -186,7 +186,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -205,7 +205,7 @@ class TestCase(RestTestCase):
       u'ticks': 15344
     }], resp.content)
 
-  def getByContr(self, client):
+  def getByInstr(self, client):
     client.setTrader('MARAYL')
     resp = client.send('GET', '/accnt/order/EURUSD')
 
@@ -213,7 +213,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -232,7 +232,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -251,7 +251,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -270,7 +270,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -297,7 +297,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -316,7 +316,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,
@@ -343,7 +343,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 0,
       u'created': self.now,
       u'exec': 0,

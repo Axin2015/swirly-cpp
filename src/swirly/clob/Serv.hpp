@@ -18,7 +18,7 @@
 #define SWIRLY_CLOB_SERV_HPP
 
 #include <swirly/fin/Asset.hpp>
-#include <swirly/fin/Contr.hpp>
+#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
 
 #include <swirly/util/Array.hpp>
@@ -51,9 +51,9 @@ class SWIRLY_API Serv {
 
     const AssetSet& assets() const noexcept;
 
-    const Contr& contr(Symbol symbol) const;
+    const Instr& instr(Symbol symbol) const;
 
-    const ContrSet& contrs() const noexcept;
+    const InstrSet& instrs() const noexcept;
 
     const Accnt& accnt(Symbol symbol) const;
 
@@ -61,7 +61,7 @@ class SWIRLY_API Serv {
 
     const MarketSet& markets() const noexcept;
 
-    const Market& createMarket(const Contr& contr, JDay settlDay, MarketState state, Time now);
+    const Market& createMarket(const Instr& instr, JDay settlDay, MarketState state, Time now);
 
     void updateMarket(const Market& market, MarketState state, Time now);
 

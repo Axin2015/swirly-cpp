@@ -30,11 +30,11 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.createBid(client)
-          self.createBidByContr(client)
+          self.createBidByInstr(client)
           self.createBidByMarket(client)
 
           self.createOffer(client)
-          self.createOfferByContr(client)
+          self.createOfferByInstr(client)
           self.createOfferByMarket(client)
 
   def checkAuth(self, client):
@@ -69,7 +69,7 @@ class TestCase(RestTestCase):
   def createBid(self, client):
     client.setTrader('MARAYL')
     resp = client.send('POST', '/accnt/order',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'BUY',
                        lots = 3,
@@ -82,7 +82,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, None, None],
         u'bidResd': [3, None, None],
         u'bidTicks': [12344, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -95,7 +95,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -118,7 +118,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -139,10 +139,10 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createBidByContr(self, client):
+  def createBidByInstr(self, client):
     client.setTrader('GOSAYL')
     resp = client.send('POST', '/accnt/order',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'BUY',
                        lots = 5,
@@ -155,7 +155,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, 1, None],
         u'bidResd': [3, 5, None],
         u'bidTicks': [12344, 12343, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -168,7 +168,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -191,7 +191,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -226,7 +226,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, 1, 1],
         u'bidResd': [3, 5, 7],
         u'bidTicks': [12344, 12343, 12342],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -239,7 +239,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'EDIAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -262,7 +262,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'EDIAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -286,7 +286,7 @@ class TestCase(RestTestCase):
   def createOffer(self, client):
     client.setTrader('MARAYL')
     resp = client.send('POST', '/accnt/order',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'SELL',
                        lots = 3,
@@ -299,7 +299,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, 1, 1],
         u'bidResd': [3, 5, 7],
         u'bidTicks': [12344, 12343, 12342],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -312,7 +312,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -335,7 +335,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -356,10 +356,10 @@ class TestCase(RestTestCase):
       u'posn': None
     }, resp.content)
 
-  def createOfferByContr(self, client):
+  def createOfferByInstr(self, client):
     client.setTrader('GOSAYL')
     resp = client.send('POST', '/accnt/order',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'SELL',
                        lots = 5,
@@ -372,7 +372,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, 1, 1],
         u'bidResd': [3, 5, 7],
         u'bidTicks': [12344, 12343, 12342],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -385,7 +385,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -408,7 +408,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -443,7 +443,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, 1, 1],
         u'bidResd': [3, 5, 7],
         u'bidTicks': [12344, 12343, 12342],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -456,7 +456,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'EDIAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -479,7 +479,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'EDIAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,

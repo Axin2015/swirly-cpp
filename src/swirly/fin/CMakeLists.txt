@@ -16,7 +16,7 @@
 set(fin_SOURCES
   Asset.cpp
   BasicTypes.cpp
-  Contr.cpp
+  Instr.cpp
   Conv.cpp
   Date.cpp
   Exception.cpp
@@ -51,7 +51,7 @@ endif()
 set(fin_test_SOURCES
   AssetTest.cxx
   BasicTypesTest.cxx
-  ContrTest.cxx
+  InstrTest.cxx
   DateTest.cxx
   ExceptionTest.cxx
   LevelTest.cxx

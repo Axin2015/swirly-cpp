@@ -28,7 +28,7 @@ SWIRLY_TEST_CASE(MarketToString)
 
     SWIRLY_CHECK(toString(market) == //
                  "{\"id\":1"
-                 ",\"contr\":\"EURUSD\""
+                 ",\"instr\":\"EURUSD\""
                  ",\"settlDate\":20140314"
                  ",\"state\":1"
                  ",\"lastLots\":null"
@@ -49,7 +49,7 @@ SWIRLY_TEST_CASE(MarketToStringNull)
 
     SWIRLY_CHECK(toString(market) == //
                  "{\"id\":1"
-                 ",\"contr\":\"EURUSD\""
+                 ",\"instr\":\"EURUSD\""
                  ",\"settlDate\":null"
                  ",\"state\":1"
                  ",\"lastLots\":null"

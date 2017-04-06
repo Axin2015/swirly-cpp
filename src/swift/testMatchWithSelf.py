@@ -45,7 +45,7 @@ class TestCase(RestTestCase):
         u'bidCount': [None, None, None],
         u'bidResd': [None, None, None],
         u'bidTicks': [None, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': 5,
         u'lastTicks': 12345,
@@ -58,7 +58,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 61725,
         u'cpty': u'MARAYL',
         u'created': self.now,
@@ -80,7 +80,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 61725,
         u'cpty': u'MARAYL',
         u'created': self.now,
@@ -102,7 +102,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -125,7 +125,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 61725,
         u'created': self.now,
         u'exec': 5,
@@ -144,7 +144,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 61725,
         u'created': self.now,
         u'exec': 5,
@@ -166,7 +166,7 @@ class TestCase(RestTestCase):
         u'accnt': u'MARAYL',
         u'buyCost': 61725,
         u'buyLots': 5,
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'marketId': 82255,
         u'sellCost': 61725,
         u'sellLots': 5,

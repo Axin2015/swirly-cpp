@@ -29,7 +29,7 @@ ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::OrderId)] = tr("Order Id");
@@ -87,8 +87,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = toVariant(exec.marketId());
             break;
-        case Column::Contr:
-            var = exec.contr().symbol();
+        case Column::Instr:
+            var = exec.instr().symbol();
             break;
         case Column::SettlDate:
             var = exec.settlDate();
@@ -113,7 +113,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (exec.lots() != 0_lts) {
-                var = ticksToPriceString(exec.ticks(), exec.contr());
+                var = ticksToPriceString(exec.ticks(), exec.instr());
             }
             break;
         case Column::Resd:
@@ -123,14 +123,14 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = toVariant(exec.exec());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(exec.exec(), exec.cost(), exec.contr());
+            var = ticksToAvgPriceString(exec.exec(), exec.cost(), exec.instr());
             break;
         case Column::LastLots:
             var = toVariant(exec.lastLots());
             break;
         case Column::LastPrice:
             if (exec.lastLots() != 0_lts) {
-                var = ticksToPriceString(exec.lastTicks(), exec.contr());
+                var = ticksToPriceString(exec.lastTicks(), exec.instr());
             }
             break;
         case Column::MinLots:
@@ -160,7 +160,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         case Column::CheckState:
             break;
         case Column::Accnt:
-        case Column::Contr:
+        case Column::Instr:
         case Column::Ref:
         case Column::State:
         case Column::Side:

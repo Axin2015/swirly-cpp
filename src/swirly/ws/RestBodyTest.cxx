@@ -51,18 +51,18 @@ SWIRLY_TEST_CASE(RestBodyAccnt)
     SWIRLY_CHECK(rb.accnt().empty());
 }
 
-SWIRLY_TEST_CASE(RestBodyContr)
+SWIRLY_TEST_CASE(RestBodyInstr)
 {
     RestBody rb;
 
-    SWIRLY_CHECK(rb.parse(R"({"contr":"EURUSD"})"_sv));
-    SWIRLY_CHECK(rb.fields() == RestBody::Contr);
-    SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"instr":"EURUSD"})"_sv));
+    SWIRLY_CHECK(rb.fields() == RestBody::Instr);
+    SWIRLY_CHECK(rb.instr() == "EURUSD"_sv);
 
     rb.reset(false);
-    SWIRLY_CHECK(rb.parse(R"({"contr":null})"_sv));
+    SWIRLY_CHECK(rb.parse(R"({"instr":null})"_sv));
     SWIRLY_CHECK(rb.fields() == 0U);
-    SWIRLY_CHECK(rb.contr().empty());
+    SWIRLY_CHECK(rb.instr().empty());
 }
 
 SWIRLY_TEST_CASE(RestBodySettlDate)
@@ -200,9 +200,9 @@ SWIRLY_TEST_CASE(RestBodyMulti)
 {
     RestBody rb;
 
-    SWIRLY_CHECK(rb.parse(R"({"contr":"EURUSD","settlDate":20140314})"_sv));
-    SWIRLY_CHECK(rb.fields() == (RestBody::Contr | RestBody::SettlDate));
-    SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.parse(R"({"instr":"EURUSD","settlDate":20140314})"_sv));
+    SWIRLY_CHECK(rb.fields() == (RestBody::Instr | RestBody::SettlDate));
+    SWIRLY_CHECK(rb.instr() == "EURUSD"_sv);
     SWIRLY_CHECK(rb.settlDate() == 20140314_ymd);
 }
 
@@ -260,11 +260,11 @@ SWIRLY_TEST_CASE(RestBodyAll)
     RestBody rb;
 
     SWIRLY_CHECK(rb.parse(
-        R"({"accnt":"MARAYL","symbol":"EURUSD","contr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
+        R"({"accnt":"MARAYL","symbol":"EURUSD","instr":"EURUSD","settlDate":20140315,"ref":"EURUSD","state":3,"side":"BUY","lots":101,"ticks":12345,"minLots":101,"liqInd":"MAKER","cpty":"MARAYL"})"_sv));
     SWIRLY_CHECK(rb.fields() == ((RestBody::Cpty - 1) | RestBody::Cpty));
     SWIRLY_CHECK(rb.symbol() == "EURUSD"_sv);
     SWIRLY_CHECK(rb.accnt() == "MARAYL"_sv);
-    SWIRLY_CHECK(rb.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(rb.instr() == "EURUSD"_sv);
     SWIRLY_CHECK(rb.settlDate() == 20140315_ymd);
     SWIRLY_CHECK(rb.ref() == "EURUSD"_sv);
     SWIRLY_CHECK(rb.state() == 3U);

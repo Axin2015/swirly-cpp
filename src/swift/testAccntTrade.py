@@ -41,7 +41,7 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.getAll(client)
-          self.getByContr(client)
+          self.getByInstr(client)
           self.getByMarket(client)
           self.getById(client)
 
@@ -50,7 +50,7 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.getAll(client)
-          self.getByContr(client)
+          self.getByInstr(client)
           self.getByMarket(client)
           self.getById(client)
 
@@ -91,7 +91,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -113,7 +113,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -135,7 +135,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 61735,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -157,7 +157,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 61735,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -179,7 +179,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 46038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -201,7 +201,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 46038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -223,7 +223,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }], resp.content)
 
-  def getByContr(self, client):
+  def getByInstr(self, client):
     client.setTrader('MARAYL')
     resp = client.send('GET', '/accnt/trade/EURUSD')
 
@@ -231,7 +231,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -253,7 +253,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -275,7 +275,7 @@ class TestCase(RestTestCase):
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 61735,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -297,7 +297,7 @@ class TestCase(RestTestCase):
       u'ticks': 12347
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 61735,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -327,7 +327,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 46038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -349,7 +349,7 @@ class TestCase(RestTestCase):
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 46038,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -379,7 +379,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'cost': 46038,
       u'cpty': u'MARAYL',
       u'created': self.now,

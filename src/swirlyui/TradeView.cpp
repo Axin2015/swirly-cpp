@@ -66,7 +66,7 @@ void TradeView::slotClicked(const QModelIndex& index)
     const auto& trade = model_.valueAt(index.row());
     const auto lots = trade.resd() > 0_lts ? trade.resd() : trade.lots();
     const auto ticks = trade.ticks();
-    emit setFields(trade.contr().symbol(), trade.settlDate(), lots, ticks);
+    emit setFields(trade.instr().symbol(), trade.settlDate(), lots, ticks);
 }
 
 } // ui

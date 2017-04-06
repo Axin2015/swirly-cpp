@@ -21,13 +21,13 @@
 namespace swirly {
 namespace ui {
 
-Order::Order(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Id64 id,
+Order::Order(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
              const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
              Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
              const QDateTime& created, const QDateTime& modified)
     : accnt_{accnt},
       marketId_{marketId},
-      contr_{contr},
+      instr_{instr},
       settlDate_{settlDate},
       id_{id},
       ref_{ref},
@@ -46,12 +46,12 @@ Order::Order(const QString& accnt, Id64 marketId, const Contr& contr, QDate sett
 {
 }
 
-Order Order::fromJson(const Contr& contr, const QJsonObject& obj)
+Order Order::fromJson(const Instr& instr, const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
     return Order{fromJson<QString>(obj["accnt"]),
                  fromJson<Id64>(obj["marketId"]),
-                 contr,
+                 instr,
                  fromJson<QDate>(obj["settlDate"]),
                  fromJson<Id64>(obj["id"]),
                  fromJson<QString>(obj["ref"]),
@@ -73,7 +73,7 @@ QDebug operator<<(QDebug debug, const Order& order)
 {
     debug.nospace() << "Order{accnt=" << order.accnt() //
                     << ",marketId=" << order.marketId() //
-                    << ",contr=" << order.contr() //
+                    << ",instr=" << order.instr() //
                     << ",settlDate=" << order.settlDate() //
                     << ",id=" << order.id() //
                     << ",ref=" << order.ref() //

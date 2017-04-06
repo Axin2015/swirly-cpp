@@ -61,7 +61,7 @@ class TestCase(RestTestCase):
         u'bidCount': [3, None, None],
         u'bidResd': [21, None, None],
         u'bidTicks': [12345, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -74,7 +74,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -97,7 +97,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, None, None],
         u'bidResd': [11, None, None],
         u'bidTicks': [12345, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
@@ -142,7 +142,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -164,7 +164,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -187,7 +187,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,
@@ -206,7 +206,7 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'created': self.now,
         u'exec': 0,

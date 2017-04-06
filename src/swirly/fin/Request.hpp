@@ -30,11 +30,11 @@ namespace swirly {
 
 class SWIRLY_API Request {
   public:
-    Request(Symbol accnt, Id64 marketId, Symbol contr, JDay settlDay, Id64 id, std::string_view ref,
+    Request(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, std::string_view ref,
             Side side, Lots lots, Time created) noexcept
         : accnt_{accnt},
           marketId_{marketId},
-          contr_{contr},
+          instr_{instr},
           settlDay_{settlDay},
           id_{id},
           ref_{ref},
@@ -54,7 +54,7 @@ class SWIRLY_API Request {
 
     auto accnt() const noexcept { return accnt_; }
     auto marketId() const noexcept { return marketId_; }
-    auto contr() const noexcept { return contr_; }
+    auto instr() const noexcept { return instr_; }
     auto settlDay() const noexcept { return settlDay_; }
     auto id() const noexcept { return id_; }
     auto ref() const noexcept { return +ref_; }
@@ -70,7 +70,7 @@ class SWIRLY_API Request {
      */
     const Symbol accnt_;
     const Id64 marketId_;
-    const Symbol contr_;
+    const Symbol instr_;
     const JDay settlDay_;
     const Id64 id_;
     /**

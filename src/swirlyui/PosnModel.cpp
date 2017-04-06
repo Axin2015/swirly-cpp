@@ -29,7 +29,7 @@ PosnModel::PosnModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::BuyLots)] = tr("Buy Lots");
     header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg Price");
@@ -64,8 +64,8 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = toVariant(posn.marketId());
             break;
-        case Column::Contr:
-            var = posn.contr().symbol();
+        case Column::Instr:
+            var = posn.instr().symbol();
             break;
         case Column::SettlDate:
             var = posn.settlDate();
@@ -74,13 +74,13 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = toVariant(posn.buyLots());
             break;
         case Column::BuyAvgPrice:
-            var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.contr());
+            var = ticksToAvgPriceString(posn.buyLots(), posn.buyCost(), posn.instr());
             break;
         case Column::SellLots:
             var = toVariant(posn.sellLots());
             break;
         case Column::SellAvgPrice:
-            var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.contr());
+            var = ticksToAvgPriceString(posn.sellLots(), posn.sellCost(), posn.instr());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -91,7 +91,7 @@ QVariant PosnModel::data(const QModelIndex& index, int role) const
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
         case Column::MarketId:
-        case Column::Contr:
+        case Column::Instr:
         case Column::SettlDate:
         case Column::BuyLots:
         case Column::BuyAvgPrice:

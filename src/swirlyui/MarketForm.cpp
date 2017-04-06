@@ -16,7 +16,7 @@
  */
 #include "MarketForm.hxx"
 
-#include "ContrModel.hxx"
+#include "InstrModel.hxx"
 #include "Utility.hxx"
 
 #include <QAbstractItemModel>
@@ -35,17 +35,17 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags f)
-    : QWidget{parent, f}, contrModel_(contrModel)
+MarketForm::MarketForm(InstrModel& instrModel, QWidget* parent, Qt::WindowFlags f)
+    : QWidget{parent, f}, instrModel_(instrModel)
 {
-    auto contrComboBox = make_unique<QComboBox>();
+    auto instrComboBox = make_unique<QComboBox>();
     {
-        auto del = makeDeleter(contrComboBox->model());
-        contrComboBox->setModel(&contrModel);
-        contrComboBox->setModelColumn(unbox(contr::Column::Symbol));
+        auto del = makeDeleter(instrComboBox->model());
+        instrComboBox->setModel(&instrModel);
+        instrComboBox->setModelColumn(unbox(instr::Column::Symbol));
     }
     QFontMetrics fm{QApplication::font()};
-    contrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
+    instrComboBox->setMinimumWidth(fm.averageCharWidth() * 12);
 
     auto settlDateEdit = make_unique<QDateEdit>(QDate::currentDate().addDays(2));
     auto lotsEdit = make_unique<QLineEdit>();
@@ -64,9 +64,9 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
     auto buyButton = make_unique<QPushButton>(tr("Buy"));
     auto sellButton = make_unique<QPushButton>(tr("Sell"));
 
-    connect(contrComboBox.get(),
+    connect(instrComboBox.get(),
             static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-            &MarketForm::slotContrChanged);
+            &MarketForm::slotInstrChanged);
     connect(createButton.get(), &QPushButton::clicked, [this]() { this->slotCreateClicked(); });
     connect(buyButton.get(), &QPushButton::clicked,
             [this]() { this->slotBuyOrSellClicked(Side::Buy); });
@@ -74,7 +74,7 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
             [this]() { this->slotBuyOrSellClicked(Side::Sell); });
 
     auto layout = make_unique<QHBoxLayout>();
-    layout->addWidget(contrComboBox_ = contrComboBox.release());
+    layout->addWidget(instrComboBox_ = instrComboBox.release());
     layout->addWidget(settlDateEdit_ = settlDateEdit.release());
     layout->addWidget(lotsEdit_ = lotsEdit.release());
     layout->addWidget(new QLabel{tr("@")});
@@ -89,51 +89,51 @@ MarketForm::MarketForm(ContrModel& contrModel, QWidget* parent, Qt::WindowFlags 
 
 MarketForm::~MarketForm() noexcept = default;
 
-void MarketForm::setFields(const QString& contrSymbol, QDate settlDate, std::optional<Lots> lots,
+void MarketForm::setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
                            std::optional<Ticks> ticks)
 {
-    if (!contrSymbol.isNull()) {
-        const auto i = contrModel_.indexOf(contrSymbol);
+    if (!instrSymbol.isNull()) {
+        const auto i = instrModel_.indexOf(instrSymbol);
         if (i >= 0) {
-            contrComboBox_->setCurrentIndex(i);
+            instrComboBox_->setCurrentIndex(i);
         }
     }
     if (!settlDate.isNull()) {
         settlDateEdit_->setDate(settlDate);
     }
-    const auto contr = contrComboBox_->currentData().value<Contr>();
+    const auto instr = instrComboBox_->currentData().value<Instr>();
     if (lots) {
         lotsEdit_->setText(QString::number(lots->count()));
     }
     if (ticks) {
-        priceEdit_->setText(ticksToPriceString(*ticks, contr));
+        priceEdit_->setText(ticksToPriceString(*ticks, instr));
     }
 }
 
-void MarketForm::slotContrChanged(int index)
+void MarketForm::slotInstrChanged(int index)
 {
     if (index < 0) {
         // No item selected.
         return;
     }
-    const auto contr = contrComboBox_->currentData().value<Contr>();
-    qDebug().nospace() << "slotContrChanged: " << contr;
-    lotsValidator_.setRange(contr.minLots().count(), contr.maxLots().count());
-    priceValidator_.setDecimals(contr.priceDp());
+    const auto instr = instrComboBox_->currentData().value<Instr>();
+    qDebug().nospace() << "slotInstrChanged: " << instr;
+    lotsValidator_.setRange(instr.minLots().count(), instr.maxLots().count());
+    priceValidator_.setDecimals(instr.priceDp());
 }
 
 void MarketForm::slotCreateClicked()
 {
-    const auto contr = contrComboBox_->currentData().value<Contr>();
-    emit createMarket(contr, settlDateEdit_->date());
+    const auto instr = instrComboBox_->currentData().value<Instr>();
+    emit createMarket(instr, settlDateEdit_->date());
 }
 
 void MarketForm::slotBuyOrSellClicked(Side side)
 {
-    const auto contr = contrComboBox_->currentData().value<Contr>();
+    const auto instr = instrComboBox_->currentData().value<Instr>();
     const auto lots = Lots{lotsEdit_->text().toLongLong()};
-    const auto ticks = priceToTicks(priceEdit_->text().toDouble(), contr);
-    emit createOrder(contr, settlDateEdit_->date(), "", side, lots, ticks);
+    const auto ticks = priceToTicks(priceEdit_->text().toDouble(), instr);
+    emit createOrder(instr, settlDateEdit_->date(), "", side, lots, ticks);
 }
 
 } // ui

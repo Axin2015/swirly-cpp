@@ -14,40 +14,29 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRVIEW_HXX
-#define SWIRLYUI_CONTRVIEW_HXX
+#include "Instr.hpp"
 
-#include <QWidget>
+#include <swirly/unit/Test.hpp>
 
-class QModelIndex;
-class QTableView;
+using namespace std;
+using namespace swirly;
 
-namespace swirly {
-namespace ui {
+SWIRLY_TEST_CASE(InstrToString)
+{
+    Instr instr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
+                1,      1,           10000,       4,        1_lts,    10_lts};
 
-class Contr;
-class ContrModel;
-
-class ContrView : public QWidget {
-    Q_OBJECT
-
-  public:
-    ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-    ~ContrView() noexcept override;
-
-    void resizeColumnsToContents();
-
-  signals:
-
-  private slots:
-    void slotClicked(const QModelIndex& index);
-
-  private:
-    ContrModel& model_;
-    QTableView* table_{nullptr};
-};
-
-} // ui
-} // swirly
-
-#endif // SWIRLYUI_CONTRVIEW_HXX
+    SWIRLY_CHECK(toString(instr) == //
+                 "{\"symbol\":\"EURUSD\""
+                 ",\"display\":\"EURUSD\""
+                 ",\"asset\":\"EUR\""
+                 ",\"ccy\":\"USD\""
+                 ",\"lotNumer\":1000000"
+                 ",\"lotDenom\":1"
+                 ",\"tickNumer\":1"
+                 ",\"tickDenom\":10000"
+                 ",\"pipDp\":4"
+                 ",\"minLots\":1"
+                 ",\"maxLots\":10"
+                 "}");
+}

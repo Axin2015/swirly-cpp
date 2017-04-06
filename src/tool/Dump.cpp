@@ -15,9 +15,9 @@
  * 02110-1301, USA.
  */
 #include <swirly/fin/Asset.hpp>
-#include <swirly/fin/Contr.hpp>
 #include <swirly/fin/Date.hpp>
 #include <swirly/fin/Exec.hpp>
+#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
 #include <swirly/fin/Model.hpp>
 #include <swirly/fin/Order.hpp>
@@ -51,10 +51,10 @@ int main(int argc, char* argv[])
             OStreamJoiner it(cout, ',');
             model->readAsset([&it](auto ptr) { it = *ptr; });
         }
-        cout << "],\"contrs\":[";
+        cout << "],\"instrs\":[";
         {
             OStreamJoiner it(cout, ',');
-            model->readContr([&it](auto ptr) { it = *ptr; });
+            model->readInstr([&it](auto ptr) { it = *ptr; });
         }
         cout << "],\"markets\":[";
         {

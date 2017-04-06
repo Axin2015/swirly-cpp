@@ -30,7 +30,7 @@ enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, Archiv
 
 struct SWIRLY_PACKED CreateMarketBody {
     Id64 id;
-    char contr[MaxSymbol];
+    char instr[MaxSymbol];
     JDay settlDay;
     MarketState state;
 };
@@ -45,7 +45,7 @@ static_assert(std::is_pod<UpdateMarketBody>::value, "message-type must be pod");
 struct SWIRLY_PACKED CreateExecBody {
     char accnt[MaxSymbol];
     Id64 marketId;
-    char contr[MaxSymbol];
+    char instr[MaxSymbol];
     JDay settlDay;
     Id64 id;
     Id64 orderId;

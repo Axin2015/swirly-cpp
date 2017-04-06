@@ -39,23 +39,23 @@ INSERT INTO asset_t (id, symbol, display, type_id)
        VALUES (6, 'UIB', 'Uinta Basin Coal', 1)
 ;
 
-INSERT INTO contr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (1, 'CAP', 'Central Appalachia Coal', 'CAP', 'USD', 1000, 1, 1, 20, 2, 1, 10);
 ;
-INSERT INTO contr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (2, 'NAP', 'Northern Appalachia Coal', 'NAP', 'USD', 1000, 1, 1, 20, 2, 1, 10);
 ;
-INSERT INTO contr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (3, 'ILB', 'Illinois Basin Coal', 'ILB', 'USD', 1000, 1, 1, 20, 2, 1, 10);
 ;
-INSERT INTO contr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (4, 'PRB', 'Powder River Basin Coal', 'PRB', 'USD', 1000, 1, 1, 20, 2, 1, 10);
 ;
-INSERT INTO contr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
+INSERT INTO instr_t (id, symbol, display, asset, ccy, lot_numer, lot_denom,
        tick_numer, tick_denom, pip_dp, min_lots, max_lots)
        VALUES (5, 'UIB', 'Uinta Basin Coal', 'UIB', 'USD', 1000, 1, 1, 20, 2, 1, 10);
 ;

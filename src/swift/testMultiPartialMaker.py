@@ -61,7 +61,7 @@ class TestCase(RestTestCase):
         u'bidCount': [1, None, None],
         u'bidResd': [4, None, None],
         u'bidTicks': [12344, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': 3,
         u'lastTicks': 12344,
@@ -74,7 +74,7 @@ class TestCase(RestTestCase):
       },
       u'execs': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 135787,
         u'cpty': u'MARAYL',
         u'created': self.now,
@@ -96,7 +96,7 @@ class TestCase(RestTestCase):
         u'ticks': 12344
       }, {
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 98755,
         u'cpty': u'MARAYL',
         u'created': self.now,
@@ -118,7 +118,7 @@ class TestCase(RestTestCase):
         u'ticks': 12344
       }, {
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 37035,
         u'cpty': u'MARAYL',
         u'created': self.now,
@@ -140,7 +140,7 @@ class TestCase(RestTestCase):
         u'ticks': 12344
       }, {
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 0,
         u'cpty': None,
         u'created': self.now,
@@ -163,7 +163,7 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'cost': 135787,
         u'created': self.now,
         u'exec': 11,
@@ -185,7 +185,7 @@ class TestCase(RestTestCase):
         u'accnt': u'GOSAYL',
         u'buyCost': 0,
         u'buyLots': 0,
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'marketId': 82255,
         u'sellCost': 135787,
         u'sellLots': 11,
@@ -201,7 +201,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37032,
       u'created': self.now,
       u'exec': 3,
@@ -228,7 +228,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37032,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -250,7 +250,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 61720,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -272,7 +272,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37035,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -294,7 +294,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
       u'created': self.now,
@@ -316,7 +316,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
       u'created': self.now,
@@ -338,7 +338,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 0,
       u'cpty': None,
       u'created': self.now,
@@ -368,7 +368,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37035,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -390,7 +390,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 61720,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -412,7 +412,7 @@ class TestCase(RestTestCase):
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 37032,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -444,7 +444,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 135787,
       u'buyLots': 11,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82255,
       u'sellCost': 0,
       u'sellLots': 0,

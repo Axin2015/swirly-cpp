@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_CONTR_HPP
-#define SWIRLY_FIN_CONTR_HPP
+#ifndef SWIRLY_FIN_INSTR_HPP
+#define SWIRLY_FIN_INSTR_HPP
 
 #include <swirly/fin/Types.hpp>
 
@@ -26,31 +26,31 @@ namespace swirly {
 /**
  * A specification that stipulates the terms and conditions of sale.
  */
-class SWIRLY_API Contr : public Comparable<Contr> {
+class SWIRLY_API Instr : public Comparable<Instr> {
   public:
-    Contr(Id32 id, Symbol symbol, std::string_view display, Symbol asset, Symbol ccy, int lotNumer,
+    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol asset, Symbol ccy, int lotNumer,
           int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots) noexcept;
 
-    ~Contr() noexcept;
+    ~Instr() noexcept;
 
     // Copy.
-    Contr(const Contr&);
-    Contr& operator=(const Contr&) = delete;
+    Instr(const Instr&);
+    Instr& operator=(const Instr&) = delete;
 
     // Move.
-    Contr(Contr&&);
-    Contr& operator=(Contr&&) = delete;
+    Instr(Instr&&);
+    Instr& operator=(Instr&&) = delete;
 
     template <typename... ArgsT>
-    static ContrPtr make(ArgsT&&... args)
+    static InstrPtr make(ArgsT&&... args)
     {
-        return std::make_unique<Contr>(std::forward<ArgsT>(args)...);
+        return std::make_unique<Instr>(std::forward<ArgsT>(args)...);
     }
 
     void toJson(std::ostream& os) const;
 
-    int compare(const Contr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
+    int compare(const Instr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     auto id() const noexcept { return id_; }
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
@@ -92,14 +92,14 @@ class SWIRLY_API Contr : public Comparable<Contr> {
     const Lots maxLots_;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Contr& contr)
+inline std::ostream& operator<<(std::ostream& os, const Instr& instr)
 {
-    contr.toJson(os);
+    instr.toJson(os);
     return os;
 }
 
-using ContrSet = SymbolSet<Contr>;
+using InstrSet = SymbolSet<Instr>;
 
 } // swirly
 
-#endif // SWIRLY_FIN_CONTR_HPP
+#endif // SWIRLY_FIN_INSTR_HPP

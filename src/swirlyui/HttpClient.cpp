@@ -17,8 +17,8 @@
 #include "HttpClient.hxx"
 
 #include "Asset.hxx"
-#include "Contr.hxx"
 #include "Exec.hxx"
+#include "Instr.hxx"
 #include "Market.hxx"
 #include "Order.hxx"
 #include "Posn.hxx"
@@ -63,7 +63,7 @@ void HttpClient::timerEvent(QTimerEvent* event)
     }
 }
 
-void HttpClient::createMarket(const Contr& contr, QDate settlDate)
+void HttpClient::createMarket(const Instr& instr, QDate settlDate)
 {
     QNetworkRequest request{QUrl{"http://127.0.0.1:8080/market"}};
     request.setAttribute(QNetworkRequest::User, PostMarket);
@@ -72,7 +72,7 @@ void HttpClient::createMarket(const Contr& contr, QDate settlDate)
     request.setRawHeader("Swirly-Perm", "1");
 
     QJsonObject obj;
-    obj["contr"] = contr.symbol();
+    obj["instr"] = instr.symbol();
     obj["settlDate"] = toJson(settlDate);
     obj["state"] = 0;
 
@@ -81,7 +81,7 @@ void HttpClient::createMarket(const Contr& contr, QDate settlDate)
     ++pending_;
 }
 
-void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+void HttpClient::createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
                              Lots lots, Ticks ticks)
 {
     QNetworkRequest request{QUrl{"http://127.0.0.1:8080/accnt/order"}};
@@ -91,7 +91,7 @@ void HttpClient::createOrder(const Contr& contr, QDate settlDate, const QString&
     request.setRawHeader("Swirly-Perm", "2");
 
     QJsonObject obj;
-    obj["contr"] = contr.symbol();
+    obj["instr"] = instr.symbol();
     obj["settlDate"] = toJson(settlDate);
     obj["ref"] = ref;
     obj["side"] = toJson(side);
@@ -118,7 +118,7 @@ void HttpClient::cancelOrders(const OrderKeys& keys)
                 out.reset();
             }
             market = marketModel().find(key.first);
-            out << "http://127.0.0.1:8080/accnt/order/" << market.contr().symbol() //
+            out << "http://127.0.0.1:8080/accnt/order/" << market.instr().symbol() //
                 << '/' << dateToIso(market.settlDate()) //
                 << '/' << id;
         } else {
@@ -180,9 +180,9 @@ void HttpClient::slotNetworkAccessibleChanged(
     };
 }
 
-Contr HttpClient::findContr(const QJsonObject& obj) const
+Instr HttpClient::findInstr(const QJsonObject& obj) const
 {
-    return contrModel().find(fromJson<QString>(obj["contr"]));
+    return instrModel().find(fromJson<QString>(obj["instr"]));
 }
 
 void HttpClient::getRefData()
@@ -243,12 +243,12 @@ void HttpClient::onRefDataReply(QNetworkReply& reply)
         assetModel().updateRow(tag_, asset);
     }
     assetModel().sweep(tag_);
-    for (const auto elem : obj["contrs"].toArray()) {
-        const auto contr = Contr::fromJson(elem.toObject());
-        qDebug().nospace() << "contr: " << contr;
-        contrModel().updateRow(tag_, contr);
+    for (const auto elem : obj["instrs"].toArray()) {
+        const auto instr = Instr::fromJson(elem.toObject());
+        qDebug().nospace() << "instr: " << instr;
+        instrModel().updateRow(tag_, instr);
     }
-    contrModel().sweep(tag_);
+    instrModel().sweep(tag_);
     emit refDataComplete();
 
     getAccnt();
@@ -271,14 +271,14 @@ void HttpClient::onAccntReply(QNetworkReply& reply)
     const auto obj = doc.object();
     for (const auto elem : obj["markets"].toArray()) {
         const auto obj = elem.toObject();
-        const auto contr = findContr(obj);
-        marketModel().updateRow(tag_, Market::fromJson(contr, obj));
+        const auto instr = findInstr(obj);
+        marketModel().updateRow(tag_, Market::fromJson(instr, obj));
     }
     marketModel().sweep(tag_);
     for (const auto elem : obj["orders"].toArray()) {
         const auto obj = elem.toObject();
-        const auto contr = findContr(obj);
-        const auto order = Order::fromJson(contr, obj);
+        const auto instr = findInstr(obj);
+        const auto order = Order::fromJson(instr, obj);
         if (!order.done()) {
             orderModel().updateRow(tag_, order);
         } else {
@@ -291,20 +291,20 @@ void HttpClient::onAccntReply(QNetworkReply& reply)
         auto arr = obj["execs"].toArray();
         for (const auto elem : reverse(arr)) {
             const auto obj = elem.toObject();
-            const auto contr = findContr(obj);
-            execModel().updateRow(tag_, Exec::fromJson(contr, obj));
+            const auto instr = findInstr(obj);
+            execModel().updateRow(tag_, Exec::fromJson(instr, obj));
         }
     }
     for (const auto elem : obj["trades"].toArray()) {
         const auto obj = elem.toObject();
-        const auto contr = findContr(obj);
-        tradeModel().updateRow(tag_, Exec::fromJson(contr, obj));
+        const auto instr = findInstr(obj);
+        tradeModel().updateRow(tag_, Exec::fromJson(instr, obj));
     }
     tradeModel().sweep(tag_);
     for (const auto elem : obj["posns"].toArray()) {
         const auto obj = elem.toObject();
-        const auto contr = findContr(obj);
-        posnModel().updateRow(tag_, Posn::fromJson(contr, obj));
+        const auto instr = findInstr(obj);
+        posnModel().updateRow(tag_, Posn::fromJson(instr, obj));
     }
     posnModel().sweep(tag_);
 }
@@ -321,8 +321,8 @@ void HttpClient::onMarketReply(QNetworkReply& reply)
     }
 
     const auto obj = doc.object();
-    const auto contr = findContr(obj);
-    marketModel().updateRow(tag_, Market::fromJson(contr, obj));
+    const auto instr = findInstr(obj);
+    marketModel().updateRow(tag_, Market::fromJson(instr, obj));
 }
 
 void HttpClient::onOrderReply(QNetworkReply& reply)
@@ -341,14 +341,14 @@ void HttpClient::onOrderReply(QNetworkReply& reply)
         const auto elem = obj["market"];
         if (!elem.isNull()) {
             const auto obj = elem.toObject();
-            const auto contr = findContr(obj);
-            marketModel().updateRow(tag_, Market::fromJson(contr, obj));
+            const auto instr = findInstr(obj);
+            marketModel().updateRow(tag_, Market::fromJson(instr, obj));
         }
     }
     for (const auto elem : obj["orders"].toArray()) {
         const auto obj = elem.toObject();
-        const auto contr = findContr(obj);
-        const auto order = Order::fromJson(contr, obj);
+        const auto instr = findInstr(obj);
+        const auto order = Order::fromJson(instr, obj);
         if (!order.done()) {
             orderModel().updateRow(tag_, order);
         } else {
@@ -360,8 +360,8 @@ void HttpClient::onOrderReply(QNetworkReply& reply)
         auto arr = obj["execs"].toArray();
         for (const auto elem : reverse(arr)) {
             const auto obj = elem.toObject();
-            const auto contr = findContr(obj);
-            const auto exec = Exec::fromJson(contr, obj);
+            const auto instr = findInstr(obj);
+            const auto exec = Exec::fromJson(instr, obj);
             execModel().updateRow(tag_, exec);
             if (exec.state() == State::Trade) {
                 tradeModel().updateRow(tag_, exec);
@@ -372,8 +372,8 @@ void HttpClient::onOrderReply(QNetworkReply& reply)
         const auto elem = obj["posn"];
         if (!elem.isNull()) {
             const auto obj = elem.toObject();
-            const auto contr = findContr(obj);
-            posnModel().updateRow(tag_, Posn::fromJson(contr, obj));
+            const auto instr = findInstr(obj);
+            posnModel().updateRow(tag_, Posn::fromJson(instr, obj));
         }
     }
 }

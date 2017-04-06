@@ -31,11 +31,11 @@ namespace swirly {
 
 class SWIRLY_API Posn : public RefCounted<Posn> {
   public:
-    Posn(Symbol accnt, Id64 marketId, Symbol contr, JDay settlDay, Lots buyLots, Cost buyCost,
+    Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Lots buyLots, Cost buyCost,
          Lots sellLots, Cost sellCost) noexcept
         : accnt_{accnt},
           marketId_{marketId},
-          contr_{contr},
+          instr_{instr},
           settlDay_{settlDay},
           buyLots_{buyLots},
           buyCost_{buyCost},
@@ -43,8 +43,8 @@ class SWIRLY_API Posn : public RefCounted<Posn> {
           sellCost_{sellCost}
     {
     }
-    Posn(Symbol accnt, Id64 marketId, Symbol contr, JDay settlDay) noexcept
-        : Posn{accnt, marketId, contr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
+    Posn(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay) noexcept
+        : Posn{accnt, marketId, instr, settlDay, 0_lts, 0_cst, 0_lts, 0_cst}
     {
     }
     ~Posn() noexcept;
@@ -67,7 +67,7 @@ class SWIRLY_API Posn : public RefCounted<Posn> {
 
     auto accnt() const noexcept { return accnt_; }
     auto marketId() const noexcept { return marketId_; }
-    auto contr() const noexcept { return contr_; }
+    auto instr() const noexcept { return instr_; }
     auto settlDay() const noexcept { return settlDay_; }
     auto buyLots() const noexcept { return buyLots_; }
     auto buyCost() const noexcept { return buyCost_; }
@@ -112,7 +112,7 @@ class SWIRLY_API Posn : public RefCounted<Posn> {
   private:
     const Symbol accnt_;
     const Id64 marketId_;
-    const Symbol contr_;
+    const Symbol instr_;
     JDay settlDay_;
     Lots buyLots_;
     Cost buyCost_;

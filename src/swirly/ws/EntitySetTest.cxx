@@ -29,7 +29,7 @@ SWIRLY_TEST_CASE(EntitySetZero)
     const auto es = EntitySet::parse(""_sv);
     SWIRLY_CHECK(!es.many());
     SWIRLY_CHECK(!es.asset());
-    SWIRLY_CHECK(!es.contr());
+    SWIRLY_CHECK(!es.instr());
     SWIRLY_CHECK(!es.market());
 
     // End.
@@ -41,7 +41,7 @@ SWIRLY_TEST_CASE(EntitySetOne)
     auto es = EntitySet::parse("asset"_sv);
     SWIRLY_CHECK(!es.many());
     SWIRLY_CHECK(es.asset());
-    SWIRLY_CHECK(!es.contr());
+    SWIRLY_CHECK(!es.instr());
     SWIRLY_CHECK(!es.market());
 
     // First.
@@ -54,10 +54,10 @@ SWIRLY_TEST_CASE(EntitySetOne)
 
 SWIRLY_TEST_CASE(EntitySetTwo)
 {
-    auto es = EntitySet::parse("asset,contr"_sv);
+    auto es = EntitySet::parse("asset,instr"_sv);
     SWIRLY_CHECK(es.many());
     SWIRLY_CHECK(es.asset());
-    SWIRLY_CHECK(es.contr());
+    SWIRLY_CHECK(es.instr());
     SWIRLY_CHECK(!es.market());
 
     // First.
@@ -66,7 +66,7 @@ SWIRLY_TEST_CASE(EntitySetTwo)
 
     // Second.
     SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Contr);
+    SWIRLY_CHECK(es.pop() == EntitySet::Instr);
 
     // End.
     SWIRLY_CHECK(es.empty());
@@ -74,10 +74,10 @@ SWIRLY_TEST_CASE(EntitySetTwo)
 
 SWIRLY_TEST_CASE(EntitySetThree)
 {
-    auto es = EntitySet::parse("market,contr,asset"_sv);
+    auto es = EntitySet::parse("market,instr,asset"_sv);
     SWIRLY_CHECK(es.many());
     SWIRLY_CHECK(es.asset());
-    SWIRLY_CHECK(es.contr());
+    SWIRLY_CHECK(es.instr());
     SWIRLY_CHECK(es.market());
 
     // First.
@@ -86,7 +86,7 @@ SWIRLY_TEST_CASE(EntitySetThree)
 
     // Second.
     SWIRLY_CHECK(!es.empty());
-    SWIRLY_CHECK(es.pop() == EntitySet::Contr);
+    SWIRLY_CHECK(es.pop() == EntitySet::Instr);
 
     // Third.
     SWIRLY_CHECK(!es.empty());
@@ -101,7 +101,7 @@ SWIRLY_TEST_CASE(EntitySetTrailing)
     auto es = EntitySet::parse("market,"_sv);
     SWIRLY_CHECK(!es.many());
     SWIRLY_CHECK(!es.asset());
-    SWIRLY_CHECK(!es.contr());
+    SWIRLY_CHECK(!es.instr());
     SWIRLY_CHECK(es.market());
 
     // First.

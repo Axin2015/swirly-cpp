@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Contr.hpp"
+#include "Instr.hpp"
 
 #include <swirly/fin/Conv.hpp>
 
@@ -22,9 +22,9 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Instr) <= 4 * 64, "crossed cache-line boundary");
 
-Contr::Contr(Id32 id, Symbol symbol, string_view display, Symbol asset, Symbol ccy, int lotNumer,
+Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol asset, Symbol ccy, int lotNumer,
              int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
     : id_{id},
@@ -46,13 +46,13 @@ Contr::Contr(Id32 id, Symbol symbol, string_view display, Symbol asset, Symbol c
 {
 }
 
-Contr::~Contr() noexcept = default;
+Instr::~Instr() noexcept = default;
 
-Contr::Contr(const Contr&) = default;
+Instr::Instr(const Instr&) = default;
 
-Contr::Contr(Contr&&) = default;
+Instr::Instr(Instr&&) = default;
 
-void Contr::toJson(ostream& os) const
+void Instr::toJson(ostream& os) const
 {
     os << "{\"symbol\":\"" << symbol_ //
        << "\",\"display\":\"" << display_ //

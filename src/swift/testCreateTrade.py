@@ -32,8 +32,8 @@ class TestCase(RestTestCase):
           self.createMakerBuy(client)
           self.createTakerSell(client)
 
-          self.createMakerBuyByContr(client)
-          self.createTakerSellByContr(client)
+          self.createMakerBuyByInstr(client)
+          self.createTakerSellByInstr(client)
 
           self.createMakerBuyByMarket(client)
           self.createTakerSellByMarket(client)
@@ -71,7 +71,7 @@ class TestCase(RestTestCase):
     client.setAdmin()
     resp = client.send('POST', '/accnt/trade',
                        accnt = 'MARAYL',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        ref = 'test1',
                        side = 'BUY',
@@ -84,7 +84,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -106,7 +106,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -132,7 +132,7 @@ class TestCase(RestTestCase):
     client.setAdmin()
     resp = client.send('POST', '/accnt/trade',
                        accnt = 'MARAYL',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        ref = 'test2',
                        side = 'SELL',
@@ -145,7 +145,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -167,7 +167,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -189,7 +189,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createMakerBuyByContr(self, client):
+  def createMakerBuyByInstr(self, client):
     client.setAdmin()
     resp = client.send('POST', '/accnt/trade/EURUSD',
                        accnt = 'MARAYL',
@@ -205,7 +205,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -227,7 +227,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -249,7 +249,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createTakerSellByContr(self, client):
+  def createTakerSellByInstr(self, client):
     client.setAdmin()
     resp = client.send('POST', '/accnt/trade/EURUSD',
                        accnt = 'MARAYL',
@@ -265,7 +265,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -287,7 +287,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -324,7 +324,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -346,7 +346,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 123450,
       u'cpty': u'MARAYL',
       u'created': self.now,
@@ -383,7 +383,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'GOSAYL',
       u'created': self.now,
@@ -405,7 +405,7 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'cost': 185175,
       u'cpty': u'MARAYL',
       u'created': self.now,

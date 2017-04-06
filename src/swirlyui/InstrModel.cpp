@@ -14,15 +14,15 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "ContrModel.hxx"
+#include "InstrModel.hxx"
 
 using namespace std;
 
 namespace swirly {
 namespace ui {
-using namespace contr;
+using namespace instr;
 
-ContrModel::ContrModel(QObject* parent) : TableModel{parent}
+InstrModel::InstrModel(QObject* parent) : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Symbol)] = tr("Symbol");
@@ -38,9 +38,9 @@ ContrModel::ContrModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::MaxLots)] = tr("Max Lots");
 }
 
-ContrModel::~ContrModel() noexcept = default;
+InstrModel::~InstrModel() noexcept = default;
 
-QVariant ContrModel::data(const QModelIndex& index, int role) const
+QVariant InstrModel::data(const QModelIndex& index, int role) const
 {
     QVariant var{};
     if (!index.isValid()) {
@@ -55,42 +55,42 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
             break;
         }
     } else if (role == Qt::DisplayRole) {
-        const auto& contr = valueAt(index.row());
+        const auto& instr = valueAt(index.row());
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
         case Column::Symbol:
-            var = contr.symbol();
+            var = instr.symbol();
             break;
         case Column::Display:
-            var = contr.display();
+            var = instr.display();
             break;
         case Column::Asset:
-            var = contr.asset();
+            var = instr.asset();
             break;
         case Column::Ccy:
-            var = contr.ccy();
+            var = instr.ccy();
             break;
         case Column::LotNumer:
-            var = contr.lotNumer();
+            var = instr.lotNumer();
             break;
         case Column::LotDenom:
-            var = contr.lotDenom();
+            var = instr.lotDenom();
             break;
         case Column::TickNumer:
-            var = contr.tickNumer();
+            var = instr.tickNumer();
             break;
         case Column::TickDenom:
-            var = contr.tickDenom();
+            var = instr.tickDenom();
             break;
         case Column::PipDp:
-            var = contr.pipDp();
+            var = instr.pipDp();
             break;
         case Column::MinLots:
-            var = toVariant(contr.minLots());
+            var = toVariant(instr.minLots());
             break;
         case Column::MaxLots:
-            var = toVariant(contr.maxLots());
+            var = toVariant(instr.maxLots());
             break;
         }
     } else if (role == Qt::TextAlignmentRole) {
@@ -119,7 +119,7 @@ QVariant ContrModel::data(const QModelIndex& index, int role) const
     return var;
 }
 
-QVariant ContrModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant InstrModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     QVariant var{};
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
@@ -128,17 +128,17 @@ QVariant ContrModel::headerData(int section, Qt::Orientation orientation, int ro
     return var;
 }
 
-Contr ContrModel::find(const QString& symbol) const
+Instr InstrModel::find(const QString& symbol) const
 {
-    Contr contr;
+    Instr instr;
     auto it = rows_.find(symbol);
     if (it != rows_.end()) {
-        contr = it->second.value();
+        instr = it->second.value();
     }
-    return contr;
+    return instr;
 }
 
-int ContrModel::indexOf(const QString& symbol) const
+int InstrModel::indexOf(const QString& symbol) const
 {
     int i{-1};
     auto it = rows_.find(symbol);

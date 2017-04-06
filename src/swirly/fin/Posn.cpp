@@ -33,7 +33,7 @@ void Posn::toJson(ostream& os) const
 {
     os << "{\"accnt\":\"" << accnt_ //
        << "\",\"marketId\":" << marketId_ //
-       << ",\"contr\":\"" << contr_ //
+       << ",\"instr\":\"" << instr_ //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);

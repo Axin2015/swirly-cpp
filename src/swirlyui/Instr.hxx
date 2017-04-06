@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTR_HXX
-#define SWIRLYUI_CONTR_HXX
+#ifndef SWIRLYUI_INSTR_HXX
+#define SWIRLYUI_INSTR_HXX
 
 #include "Types.hxx"
 
@@ -28,7 +28,7 @@ class QJsonObject;
 
 namespace swirly {
 namespace ui {
-namespace contr {
+namespace instr {
 
 enum class Column : int { //
     CheckState, //
@@ -46,22 +46,22 @@ enum class Column : int { //
 };
 constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 
-} // contr
+} // instr
 
 // Cheap copies.
-class Contr {
+class Instr {
   public:
-    Contr(const QString& symbol, const QString& display, const QString& asset, const QString& ccy,
+    Instr(const QString& symbol, const QString& display, const QString& asset, const QString& ccy,
           int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots)
         : impl_{std::make_shared<const Impl>(symbol, display, asset, ccy, lotNumer, lotDenom,
                                              tickNumer, tickDenom, pipDp, minLots, maxLots)}
     {
     }
-    Contr() = default;
-    ~Contr() noexcept = default;
+    Instr() = default;
+    ~Instr() noexcept = default;
 
-    static Contr fromJson(const QJsonObject& obj);
+    static Instr fromJson(const QJsonObject& obj);
 
     const QString& symbol() const noexcept { return impl_->symbol; }
     const QString& display() const noexcept { return impl_->display; }
@@ -110,64 +110,64 @@ class Contr {
     std::shared_ptr<const Impl> impl_{empty()};
 };
 
-QDebug operator<<(QDebug debug, const Contr& contr);
+QDebug operator<<(QDebug debug, const Instr& instr);
 
-inline bool isModified(const Contr& prev, const Contr& next) noexcept
+inline bool isModified(const Instr& prev, const Instr& next) noexcept
 {
     // Immutable.
     return false;
 }
 
-inline Lots qtyToLots(double qty, const Contr& contr) noexcept
+inline Lots qtyToLots(double qty, const Instr& instr) noexcept
 {
-    return swirly::qtyToLots(qty, contr.qtyInc());
+    return swirly::qtyToLots(qty, instr.qtyInc());
 }
 
-inline double lotsToQty(Lots lots, const Contr& contr) noexcept
+inline double lotsToQty(Lots lots, const Instr& instr) noexcept
 {
-    return swirly::lotsToQty(lots, contr.qtyInc());
+    return swirly::lotsToQty(lots, instr.qtyInc());
 }
 
-inline QString lotsToQtyString(Lots lots, const Contr& contr)
+inline QString lotsToQtyString(Lots lots, const Instr& instr)
 {
-    const auto qty = lotsToQty(lots, contr);
-    return QString::number(qty, 'f', contr.qtyDp());
+    const auto qty = lotsToQty(lots, instr);
+    return QString::number(qty, 'f', instr.qtyDp());
 }
 
-inline Ticks priceToTicks(double price, const Contr& contr) noexcept
+inline Ticks priceToTicks(double price, const Instr& instr) noexcept
 {
-    return swirly::priceToTicks(price, contr.priceInc());
+    return swirly::priceToTicks(price, instr.priceInc());
 }
 
-inline double ticksToPrice(Ticks ticks, const Contr& contr) noexcept
+inline double ticksToPrice(Ticks ticks, const Instr& instr) noexcept
 {
-    return swirly::ticksToPrice(ticks, contr.priceInc());
+    return swirly::ticksToPrice(ticks, instr.priceInc());
 }
 
-inline QString ticksToPriceString(Ticks ticks, const Contr& contr)
+inline QString ticksToPriceString(Ticks ticks, const Instr& instr)
 {
-    const auto price = ticksToPrice(ticks, contr);
-    return QString::number(price, 'f', contr.priceDp());
+    const auto price = ticksToPrice(ticks, instr);
+    return QString::number(price, 'f', instr.priceDp());
 }
 
-inline double ticksToAvgPrice(Lots lots, Cost cost, const Contr& contr) noexcept
+inline double ticksToAvgPrice(Lots lots, Cost cost, const Instr& instr) noexcept
 {
     double ticks = 0;
     if (lots != 0_lts) {
         ticks = fractToReal(cost.count(), lots.count());
     }
-    return ticks * contr.priceInc();
+    return ticks * instr.priceInc();
 }
 
-inline QString ticksToAvgPriceString(Lots lots, Cost cost, const Contr& contr)
+inline QString ticksToAvgPriceString(Lots lots, Cost cost, const Instr& instr)
 {
-    const auto price = ticksToAvgPrice(lots, cost, contr);
-    return QString::number(price, 'f', contr.priceDp() + 1);
+    const auto price = ticksToAvgPrice(lots, cost, instr);
+    return QString::number(price, 'f', instr.priceDp() + 1);
 }
 
 } // ui
 } // swirly
 
-Q_DECLARE_METATYPE(swirly::ui::Contr)
+Q_DECLARE_METATYPE(swirly::ui::Instr)
 
-#endif // SWIRLYUI_CONTR_HXX
+#endif // SWIRLYUI_INSTR_HXX

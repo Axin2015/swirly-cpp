@@ -31,11 +31,11 @@ namespace swirly {
  */
 class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc {
   public:
-    Exec(Symbol accnt, Id64 marketId, Symbol contr, JDay settlDay, Id64 id, Id64 orderId,
+    Exec(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Id64 orderId,
          std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
          Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId, LiqInd liqInd,
          Symbol cpty, Time created) noexcept
-        : Request{accnt, marketId, contr, settlDay, id, ref, side, lots, created},
+        : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created},
           orderId_{orderId},
           state_{state},
           ticks_{ticks},

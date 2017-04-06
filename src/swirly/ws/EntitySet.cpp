@@ -31,8 +31,8 @@ int bit(string_view sv)
     int i;
     if (sv == "asset") {
         i = EntitySet::Asset;
-    } else if (sv == "contr") {
-        i = EntitySet::Contr;
+    } else if (sv == "instr") {
+        i = EntitySet::Instr;
     } else if (sv == "market") {
         i = EntitySet::Market;
     } else if (sv == "order") {

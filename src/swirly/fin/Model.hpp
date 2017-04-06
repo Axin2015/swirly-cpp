@@ -43,7 +43,7 @@ class SWIRLY_API Model {
     Model& operator=(Model&&) noexcept = default;
 
     void readAsset(const ModelCallback<AssetPtr>& cb) const { doReadAsset(cb); }
-    void readContr(const ModelCallback<ContrPtr>& cb) const { doReadContr(cb); }
+    void readInstr(const ModelCallback<InstrPtr>& cb) const { doReadInstr(cb); }
     void readAccnt(Time now, const ModelCallback<std::string_view>& cb) const
     {
         doReadAccnt(now, cb);
@@ -60,7 +60,7 @@ class SWIRLY_API Model {
   protected:
     virtual void doReadAsset(const ModelCallback<AssetPtr>& cb) const = 0;
 
-    virtual void doReadContr(const ModelCallback<ContrPtr>& cb) const = 0;
+    virtual void doReadInstr(const ModelCallback<InstrPtr>& cb) const = 0;
 
     virtual void doReadAccnt(Time now, const ModelCallback<std::string_view>& cb) const = 0;
 

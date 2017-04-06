@@ -32,7 +32,7 @@ void Exec::toJson(ostream& os) const
 {
     os << "{\"accnt\":\"" << accnt_ //
        << "\",\"marketId\":" << marketId_ //
-       << ",\"contr\":\"" << contr_ //
+       << ",\"instr\":\"" << instr_ //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);
@@ -91,7 +91,7 @@ void Exec::toJson(ostream& os) const
 ExecPtr Exec::opposite(Id64 id) const
 {
     assert(!cpty_.empty());
-    return make(cpty_, marketId_, contr_, settlDay_, id, orderId_, +ref_, state_,
+    return make(cpty_, marketId_, instr_, settlDay_, id, orderId_, +ref_, state_,
                 swirly::opposite(side_), lots_, ticks_, resd_, exec_, cost_, lastLots_, lastTicks_,
                 minLots_, matchId_, swirly::opposite(liqInd_), accnt_, created_);
 }
