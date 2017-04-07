@@ -35,8 +35,8 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
-      u'asset': u'CAP',
-      u'ccy': u'USD',
+      u'baseAsset': u'CAP',
+      u'termCcy': u'USD',
       u'display': u'Central Appalachia Coal',
       u'lotDenom': 1,
       u'lotNumer': 1000,
@@ -47,8 +47,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 20,
       u'tickNumer': 1
     }, {
-      u'asset': u'CSCO',
-      u'ccy': u'USD',
+      u'baseAsset': u'CSCO',
+      u'termCcy': u'USD',
       u'display': u'Cisco Systems Inc',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -59,8 +59,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'DIS',
-      u'ccy': u'USD',
+      u'baseAsset': u'DIS',
+      u'termCcy': u'USD',
       u'display': u'Walt Disney',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -71,8 +71,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'EUR',
-      u'ccy': u'USD',
+      u'baseAsset': u'EUR',
+      u'termCcy': u'USD',
       u'display': u'EURUSD',
       u'lotDenom': 1,
       u'lotNumer': 1000000,
@@ -83,8 +83,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 10000,
       u'tickNumer': 1
     }, {
-      u'asset': u'GBP',
-      u'ccy': u'USD',
+      u'baseAsset': u'GBP',
+      u'termCcy': u'USD',
       u'display': u'GBPUSD',
       u'lotDenom': 1,
       u'lotNumer': 1000000,
@@ -95,8 +95,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 10000,
       u'tickNumer': 1
     }, {
-      u'asset': u'IBM',
-      u'ccy': u'USD',
+      u'baseAsset': u'IBM',
+      u'termCcy': u'USD',
       u'display': u'Ibm Corp',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -107,8 +107,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'ILB',
-      u'ccy': u'USD',
+      u'baseAsset': u'ILB',
+      u'termCcy': u'USD',
       u'display': u'Illinois Basin Coal',
       u'lotDenom': 1,
       u'lotNumer': 1000,
@@ -119,8 +119,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 20,
       u'tickNumer': 1
     }, {
-      u'asset': u'INTC',
-      u'ccy': u'USD',
+      u'baseAsset': u'INTC',
+      u'termCcy': u'USD',
       u'display': u'Intel Corp',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -131,8 +131,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'MSFT',
-      u'ccy': u'USD',
+      u'baseAsset': u'MSFT',
+      u'termCcy': u'USD',
       u'display': u'Microsoft Corp',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -143,8 +143,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'NAP',
-      u'ccy': u'USD',
+      u'baseAsset': u'NAP',
+      u'termCcy': u'USD',
       u'display': u'Northern Appalachia Coal',
       u'lotDenom': 1,
       u'lotNumer': 1000,
@@ -155,8 +155,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 20,
       u'tickNumer': 1
     }, {
-      u'asset': u'PRB',
-      u'ccy': u'USD',
+      u'baseAsset': u'PRB',
+      u'termCcy': u'USD',
       u'display': u'Powder River Basin Coal',
       u'lotDenom': 1,
       u'lotNumer': 1000,
@@ -167,8 +167,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 20,
       u'tickNumer': 1
     }, {
-      u'asset': u'UIB',
-      u'ccy': u'USD',
+      u'baseAsset': u'UIB',
+      u'termCcy': u'USD',
       u'display': u'Uinta Basin Coal',
       u'lotDenom': 1,
       u'lotNumer': 1000,
@@ -179,8 +179,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 20,
       u'tickNumer': 1
     }, {
-      u'asset': u'USD',
-      u'ccy': u'CHF',
+      u'baseAsset': u'USD',
+      u'termCcy': u'CHF',
       u'display': u'USDCHF',
       u'lotDenom': 1,
       u'lotNumer': 1000000,
@@ -191,8 +191,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 10000,
       u'tickNumer': 1
     }, {
-      u'asset': u'USD',
-      u'ccy': u'JPY',
+      u'baseAsset': u'USD',
+      u'termCcy': u'JPY',
       u'display': u'USDJPY',
       u'lotDenom': 1,
       u'lotNumer': 1000000,
@@ -203,8 +203,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 100,
       u'tickNumer': 1
     }, {
-      u'asset': u'VIA',
-      u'ccy': u'USD',
+      u'baseAsset': u'VIA',
+      u'termCcy': u'USD',
       u'display': u'Viacom Inc',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -215,8 +215,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'VOD',
-      u'ccy': u'USD',
+      u'baseAsset': u'VOD',
+      u'termCcy': u'USD',
       u'display': u'Vodafone Group Plc',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -227,8 +227,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'VZ',
-      u'ccy': u'USD',
+      u'baseAsset': u'VZ',
+      u'termCcy': u'USD',
       u'display': u'Verizon Com',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -239,8 +239,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1000,
       u'tickNumer': 1
     }, {
-      u'asset': u'WGAA',
-      u'ccy': u'ETB',
+      u'baseAsset': u'WGAA',
+      u'termCcy': u'ETB',
       u'display': u'Gelena Abaya A',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -251,8 +251,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1,
       u'tickNumer': 1
     }, {
-      u'asset': u'WKCA',
-      u'ccy': u'ETB',
+      u'baseAsset': u'WKCA',
+      u'termCcy': u'ETB',
       u'display': u'Kochere A',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -263,8 +263,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1,
       u'tickNumer': 1
     }, {
-      u'asset': u'WWNA',
-      u'ccy': u'ETB',
+      u'baseAsset': u'WWNA',
+      u'termCcy': u'ETB',
       u'display': u'Wenago A',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -275,8 +275,8 @@ class TestCase(RestTestCase):
       u'tickDenom': 1,
       u'tickNumer': 1
     }, {
-      u'asset': u'WYCA',
-      u'ccy': u'ETB',
+      u'baseAsset': u'WYCA',
+      u'termCcy': u'ETB',
       u'display': u'Yirgachefe A',
       u'lotDenom': 1,
       u'lotNumer': 1,
@@ -295,8 +295,8 @@ class TestCase(RestTestCase):
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
-      u'asset': u'EUR',
-      u'ccy': u'USD',
+      u'baseAsset': u'EUR',
+      u'termCcy': u'USD',
       u'display': u'EURUSD',
       u'lotDenom': 1,
       u'lotNumer': 1000000,

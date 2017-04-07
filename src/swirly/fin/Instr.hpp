@@ -28,8 +28,8 @@ namespace swirly {
  */
 class SWIRLY_API Instr : public Comparable<Instr> {
   public:
-    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol asset, Symbol ccy, int lotNumer,
-          int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol baseAsset, Symbol termCcy,
+          int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots) noexcept;
 
     ~Instr() noexcept;
@@ -54,8 +54,8 @@ class SWIRLY_API Instr : public Comparable<Instr> {
     auto id() const noexcept { return id_; }
     auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
-    auto asset() const noexcept { return asset_; }
-    auto ccy() const noexcept { return ccy_; }
+    auto baseAsset() const noexcept { return baseAsset_; }
+    auto termCcy() const noexcept { return termCcy_; }
     auto lotNumer() const noexcept { return lotNumer_; }
     auto lotDenom() const noexcept { return lotDenom_; }
     auto qtyInc() const noexcept { return qtyInc_; }
@@ -73,8 +73,8 @@ class SWIRLY_API Instr : public Comparable<Instr> {
     const Id32 id_;
     const Symbol symbol_;
     const Display display_;
-    const Symbol asset_;
-    const Symbol ccy_;
+    const Symbol baseAsset_;
+    const Symbol termCcy_;
     const int lotNumer_;
     const int lotDenom_;
     // Transient.

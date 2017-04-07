@@ -31,13 +31,13 @@ enum class Column : int { //
     SettlDate, //
     State, //
     BidCount, //
-    BidResd, //
+    BidLots, //
     BidPrice, //
     LastLots, //
     LastPrice, //
     LastTime, //
     OfferPrice, //
-    OfferResd, //
+    OfferLots, //
     OfferCount
 };
 constexpr int ColumnCount{unbox(Column::OfferCount) + 1};

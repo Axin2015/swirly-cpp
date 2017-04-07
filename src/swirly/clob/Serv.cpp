@@ -256,7 +256,7 @@ struct Serv::Impl {
         if (!matches_.empty()) {
             assert(posn);
             commitMatches(accnt, market, now);
-            posn->addTrade(order->side(), order->exec(), order->cost());
+            posn->addTrade(order->side(), order->execLots(), order->execCost());
         }
     }
 
@@ -304,7 +304,7 @@ struct Serv::Impl {
             // 3. less than min lots.
             if (lots == 0_lts //
                 || lots > order.lots() //
-                || lots < order.exec() //
+                || lots < order.execLots() //
                 || lots < order.minLots()) {
                 throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
             }
@@ -476,9 +476,9 @@ struct Serv::Impl {
     {
         return Exec::make(order.accnt(), order.marketId(), order.instr(), order.settlDay(), id,
                           order.id(), order.ref(), order.state(), order.side(), order.lots(),
-                          order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
-                          order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Symbol{},
-                          created);
+                          order.ticks(), order.resdLots(), order.execLots(), order.execCost(),
+                          order.lastLots(), order.lastTicks(), order.minLots(), 0_id64,
+                          LiqInd::None, Symbol{}, created);
     }
 
     /**
@@ -542,7 +542,7 @@ struct Serv::Impl {
 
         for (auto& makerOrder : side.orders()) {
             // Break if order is fully filled.
-            if (sumLots == takerOrder.resd()) {
+            if (sumLots == takerOrder.resdLots()) {
                 break;
             }
             // Only consider orders while prices cross.
@@ -550,7 +550,7 @@ struct Serv::Impl {
                 break;
             }
 
-            const auto lots = min(takerOrder.resd() - sumLots, makerOrder.resd());
+            const auto lots = min(takerOrder.resdLots() - sumLots, makerOrder.resdLots());
             const auto ticks = makerOrder.ticks();
 
             sumLots += lots;
@@ -639,7 +639,7 @@ struct Serv::Impl {
         // 3. less than min lots.
         if (lots == 0_lts //
             || lots > order.lots() //
-            || lots < order.exec() //
+            || lots < order.execLots() //
             || lots < order.minLots()) {
             throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
         }

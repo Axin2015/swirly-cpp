@@ -36,8 +36,8 @@ TradeModel::TradeModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::Side)] = tr("Side");
     header_[unbox(Column::Lots)] = tr("Lots");
     header_[unbox(Column::Price)] = tr("Price");
-    header_[unbox(Column::Resd)] = tr("Resd");
-    header_[unbox(Column::Exec)] = tr("Exec");
+    header_[unbox(Column::ResdLots)] = tr("Resd Lots");
+    header_[unbox(Column::ExecLots)] = tr("Exec Lots");
     header_[unbox(Column::AvgPrice)] = tr("Avg Price");
     header_[unbox(Column::LastLots)] = tr("Last Lots");
     header_[unbox(Column::LastPrice)] = tr("Last Price");
@@ -91,7 +91,7 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
             var = trade.ref();
             break;
         case Column::State:
-            var = enumString(trade.state(), trade.resd());
+            var = enumString(trade.state(), trade.resdLots());
             break;
         case Column::Side:
             var = enumString(trade.side());
@@ -104,14 +104,14 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
                 var = ticksToPriceString(trade.ticks(), trade.instr());
             }
             break;
-        case Column::Resd:
-            var = toVariant(trade.resd());
+        case Column::ResdLots:
+            var = toVariant(trade.resdLots());
             break;
-        case Column::Exec:
-            var = toVariant(trade.exec());
+        case Column::ExecLots:
+            var = toVariant(trade.execLots());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(trade.exec(), trade.cost(), trade.instr());
+            var = ticksToAvgPriceString(trade.execLots(), trade.execCost(), trade.instr());
             break;
         case Column::LastLots:
             var = toVariant(trade.lastLots());
@@ -156,8 +156,8 @@ QVariant TradeModel::data(const QModelIndex& index, int role) const
         case Column::OrderId:
         case Column::Lots:
         case Column::Price:
-        case Column::Resd:
-        case Column::Exec:
+        case Column::ResdLots:
+        case Column::ExecLots:
         case Column::AvgPrice:
         case Column::LastLots:
         case Column::LastPrice:

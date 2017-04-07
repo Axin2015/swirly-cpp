@@ -77,8 +77,8 @@ SWIRLY_FIXTURE_TEST_CASE(ServInstrs, ServFixture)
     SWIRLY_CHECK(it->symbol() == "EURUSD"_sv);
     SWIRLY_CHECK(it->display() == "EURUSD"_sv);
 
-    SWIRLY_CHECK(it->asset() == "EUR"_sv);
-    SWIRLY_CHECK(it->ccy() == "USD"_sv);
+    SWIRLY_CHECK(it->baseAsset() == "EUR"_sv);
+    SWIRLY_CHECK(it->termCcy() == "USD"_sv);
     SWIRLY_CHECK(it->lotNumer() == 1000000);
     SWIRLY_CHECK(it->lotDenom() == 1);
     SWIRLY_CHECK(test::isSame(it->qtyInc(), 1e6, 0.1));
@@ -181,9 +181,9 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
     SWIRLY_CHECK(order->side() == Side::Buy);
     SWIRLY_CHECK(order->lots() == 5_lts);
     SWIRLY_CHECK(order->ticks() == 12345_tks);
-    SWIRLY_CHECK(order->resd() == 5_lts);
-    SWIRLY_CHECK(order->exec() == 0_lts);
-    SWIRLY_CHECK(order->cost() == 0_cst);
+    SWIRLY_CHECK(order->resdLots() == 5_lts);
+    SWIRLY_CHECK(order->execLots() == 0_lts);
+    SWIRLY_CHECK(order->execCost() == 0_cst);
     SWIRLY_CHECK(order->lastLots() == 0_lts);
     SWIRLY_CHECK(order->lastTicks() == 0_tks);
     SWIRLY_CHECK(order->minLots() == 1_lts);

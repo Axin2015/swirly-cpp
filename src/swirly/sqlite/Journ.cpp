@@ -40,8 +40,8 @@ constexpr auto UpdateMarketSql = //
 
 constexpr auto InsertExecSql = //
     "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref," //
-    " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
-    " min_lots, match_id, liqInd_id, cpty, created)" //
+    " state_id, side_id, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots," //
+    " last_ticks, min_lots, match_id, liqInd_id, cpty, created)" //
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateExecSql = //
@@ -137,9 +137,9 @@ void Journ::onCreateExec(const CreateExecBody& body)
     bind(body.side);
     bind(body.lots);
     bind(body.ticks);
-    bind(body.resd);
-    bind(body.exec);
-    bind(body.cost);
+    bind(body.resdLots);
+    bind(body.execLots);
+    bind(body.execCost);
     if (body.lastLots > 0_lts) {
         bind(body.lastLots);
         bind(body.lastTicks);

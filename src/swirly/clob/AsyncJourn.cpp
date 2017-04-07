@@ -153,9 +153,9 @@ void AsyncJourn::doCreateExec(const Exec& exec, More more)
         body.side = exec.side();
         body.lots = exec.lots();
         body.ticks = exec.ticks();
-        body.resd = exec.resd();
-        body.exec = exec.exec();
-        body.cost = exec.cost();
+        body.resdLots = exec.resdLots();
+        body.execLots = exec.execLots();
+        body.execCost = exec.execCost();
         body.lastLots = exec.lastLots();
         body.lastTicks = exec.lastTicks();
         body.minLots = exec.minLots();

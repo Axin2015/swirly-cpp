@@ -80,7 +80,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
       u'instr': u'EURUSD',
       u'id': 82255,
@@ -88,7 +88,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
@@ -104,7 +104,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
       u'instr': u'GBPUSD',
       u'id': 147791,
@@ -112,7 +112,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
@@ -127,7 +127,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
       u'instr': u'USDJPY',
       u'id': 278863,
@@ -135,7 +135,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
@@ -149,7 +149,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
       u'instr': u'USDJPY',
       u'id': 278863,
@@ -157,7 +157,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 2

@@ -33,10 +33,10 @@ MarketModel::MarketModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::LastPrice)] = tr("Last Price");
     header_[unbox(Column::LastTime)] = tr("Last Time");
     header_[unbox(Column::BidPrice)] = tr("Bid Price");
-    header_[unbox(Column::BidResd)] = tr("Bid Resd");
+    header_[unbox(Column::BidLots)] = tr("Bid Resd");
     header_[unbox(Column::BidCount)] = tr("Bid Count");
     header_[unbox(Column::OfferPrice)] = tr("Offer Price");
-    header_[unbox(Column::OfferResd)] = tr("Offer Resd");
+    header_[unbox(Column::OfferLots)] = tr("Offer Resd");
     header_[unbox(Column::OfferCount)] = tr("Offer Count");
 }
 
@@ -85,23 +85,23 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
             var = market.lastTime();
             break;
         case Column::BidPrice:
-            if (market.bestBid().resd() != 0_lts) {
+            if (market.bestBid().lots() != 0_lts) {
                 var = ticksToPriceString(market.bestBid().ticks(), market.instr());
             }
             break;
-        case Column::BidResd:
-            var = toVariant(market.bestBid().resd());
+        case Column::BidLots:
+            var = toVariant(market.bestBid().lots());
             break;
         case Column::BidCount:
             var = market.bestBid().count();
             break;
         case Column::OfferPrice:
-            if (market.bestOffer().resd() != 0_lts) {
+            if (market.bestOffer().lots() != 0_lts) {
                 var = ticksToPriceString(market.bestOffer().ticks(), market.instr());
             }
             break;
-        case Column::OfferResd:
-            var = toVariant(market.bestOffer().resd());
+        case Column::OfferLots:
+            var = toVariant(market.bestOffer().lots());
             break;
         case Column::OfferCount:
             var = market.bestOffer().count();
@@ -121,10 +121,10 @@ QVariant MarketModel::data(const QModelIndex& index, int role) const
         case Column::LastPrice:
         case Column::LastTime:
         case Column::BidPrice:
-        case Column::BidResd:
+        case Column::BidLots:
         case Column::BidCount:
         case Column::OfferPrice:
-        case Column::OfferResd:
+        case Column::OfferLots:
         case Column::OfferCount:
             var = QVariant{Qt::AlignRight | Qt::AlignVCenter};
             break;

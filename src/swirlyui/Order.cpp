@@ -22,8 +22,8 @@ namespace swirly {
 namespace ui {
 
 Order::Order(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
-             const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd,
-             Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+             const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
+             Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
              const QDateTime& created, const QDateTime& modified)
     : accnt_{accnt},
       marketId_{marketId},
@@ -35,9 +35,9 @@ Order::Order(const QString& accnt, Id64 marketId, const Instr& instr, QDate sett
       side_{side},
       lots_{lots},
       ticks_{ticks},
-      resd_{resd},
-      exec_{exec},
-      cost_{cost},
+      resdLots_{resdLots},
+      execLots_{execLots},
+      execCost_{execCost},
       lastLots_{lastLots},
       lastTicks_{lastTicks},
       minLots_{minLots},
@@ -59,9 +59,9 @@ Order Order::fromJson(const Instr& instr, const QJsonObject& obj)
                  fromJson<Side>(obj["side"]),
                  fromJson<Lots>(obj["lots"]),
                  fromJson<Ticks>(obj["ticks"]),
-                 fromJson<Lots>(obj["resd"]),
-                 fromJson<Lots>(obj["exec"]),
-                 fromJson<Cost>(obj["cost"]),
+                 fromJson<Lots>(obj["resdLots"]),
+                 fromJson<Lots>(obj["execLots"]),
+                 fromJson<Cost>(obj["execCost"]),
                  fromJson<Lots>(obj["lastLots"]),
                  fromJson<Ticks>(obj["lastTicks"]),
                  fromJson<Lots>(obj["minLots"]),
@@ -81,9 +81,9 @@ QDebug operator<<(QDebug debug, const Order& order)
                     << ",side=" << order.side() //
                     << ",lots=" << order.lots() //
                     << ",ticks=" << order.ticks() //
-                    << ",resd=" << order.resd() //
-                    << ",exec=" << order.exec() //
-                    << ",cost=" << order.cost() //
+                    << ",resdLots=" << order.resdLots() //
+                    << ",execLots=" << order.execLots() //
+                    << ",execCost=" << order.execCost() //
                     << ",lastLots=" << order.lastLots() //
                     << ",lastTicks=" << order.lastTicks() //
                     << ",minLots=" << order.minLots() //

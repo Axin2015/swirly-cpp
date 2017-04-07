@@ -32,16 +32,16 @@ namespace swirly {
 class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc {
   public:
     Exec(Symbol accnt, Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Id64 orderId,
-         std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-         Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId, LiqInd liqInd,
-         Symbol cpty, Time created) noexcept
+         std::string_view ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
+         Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots, Id64 matchId,
+         LiqInd liqInd, Symbol cpty, Time created) noexcept
         : Request{accnt, marketId, instr, settlDay, id, ref, side, lots, created},
           orderId_{orderId},
           state_{state},
           ticks_{ticks},
-          resd_{resd},
-          exec_{exec},
-          cost_{cost},
+          resdLots_{resdLots},
+          execLots_{execLots},
+          execCost_{execCost},
           lastLots_{lastLots},
           lastTicks_{lastTicks},
           minLots_{minLots},
@@ -72,9 +72,9 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
     auto orderId() const noexcept { return orderId_; }
     auto state() const noexcept { return state_; }
     auto ticks() const noexcept { return ticks_; }
-    auto resd() const noexcept { return resd_; }
-    auto exec() const noexcept { return exec_; }
-    auto cost() const noexcept { return cost_; }
+    auto resdLots() const noexcept { return resdLots_; }
+    auto execLots() const noexcept { return execLots_; }
+    auto execCost() const noexcept { return execCost_; }
     auto lastLots() const noexcept { return lastLots_; }
     auto lastTicks() const noexcept { return lastTicks_; }
     auto minLots() const noexcept { return minLots_; }
@@ -88,12 +88,12 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
         const auto delta = lots_ - lots;
         assert(delta >= 0_lts);
         lots_ = lots;
-        resd_ -= delta;
+        resdLots_ -= delta;
     }
     void cancel() noexcept
     {
         state_ = State::Cancel;
-        resd_ = 0_lts;
+        resdLots_ = 0_lts;
     }
     void trade(Lots sumLots, Cost sumCost, Lots lastLots, Ticks lastTicks, Id64 matchId,
                LiqInd liqInd, Symbol cpty) noexcept;
@@ -113,12 +113,12 @@ class SWIRLY_API Exec : public RefCounted<Exec>, public Request, public MemAlloc
     /**
      * Must be greater than zero.
      */
-    Lots resd_;
+    Lots resdLots_;
     /**
      * Must not be greater that lots.
      */
-    Lots exec_;
-    Cost cost_;
+    Lots execLots_;
+    Cost execCost_;
     Lots lastLots_;
     Ticks lastTicks_;
     /**

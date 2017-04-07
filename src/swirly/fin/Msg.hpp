@@ -54,9 +54,9 @@ struct SWIRLY_PACKED CreateExecBody {
     Side side;
     Lots lots;
     Ticks ticks;
-    Lots resd;
-    Lots exec;
-    Cost cost;
+    Lots resdLots;
+    Lots execLots;
+    Cost execCost;
     Lots lastLots;
     Ticks lastTicks;
     Lots minLots;

@@ -71,7 +71,7 @@ void ExecView::slotClicked(const QModelIndex& index)
         lots = exec.lastLots();
         ticks = exec.lastTicks();
     } else {
-        lots = exec.resd() > 0_lts ? exec.resd() : exec.lots();
+        lots = exec.resdLots() > 0_lts ? exec.resdLots() : exec.lots();
         ticks = exec.ticks();
     }
     emit setFields(exec.instr().symbol(), exec.settlDate(), lots, ticks);

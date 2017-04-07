@@ -23,13 +23,13 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& asset,
-                  const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
+                  const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
                   int pipDp, Lots minLots, Lots maxLots)
     : symbol{symbol},
       display{display},
-      asset{asset},
-      ccy{ccy},
+      baseAsset{baseAsset},
+      termCcy{termCcy},
       lotNumer{lotNumer},
       lotDenom{lotDenom},
       qtyInc{fractToReal(lotNumer, lotDenom)},
@@ -48,7 +48,7 @@ Instr Instr::fromJson(const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
     return Instr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
-                 fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
+                 fromJson<QString>(obj["baseAsset"]), fromJson<QString>(obj["termCcy"]),
                  fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
                  fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
                  fromJson<int>(obj["pipDp"]), fromJson<Lots>(obj["minLots"]),
@@ -65,8 +65,8 @@ QDebug operator<<(QDebug debug, const Instr& instr)
 {
     debug.nospace() << "Instr{symbol=" << instr.symbol() //
                     << ",display=" << instr.display() //
-                    << ",asset=" << instr.asset() //
-                    << ",ccy=" << instr.ccy() //
+                    << ",baseAsset=" << instr.baseAsset() //
+                    << ",termCcy=" << instr.termCcy() //
                     << ",lotNumer=" << instr.lotNumer() //
                     << ",lotDenom=" << instr.lotDenom() //
                     << ",tickNumer=" << instr.tickNumer() //

@@ -36,8 +36,8 @@ constexpr auto SelectAssetSql = //
     "SELECT id, symbol, display, type_id FROM asset_t"_sv;
 
 constexpr auto SelectInstrSql = //
-    "SELECT id, symbol, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom,"
-    " pip_dp, min_lots, max_lots FROM instr_v"_sv;
+    "SELECT id, symbol, display, base_asset, term_ccy, tick_numer, tick_denom," //
+    " lot_numer, lot_denom, pip_dp, min_lots, max_lots FROM instr_v"_sv;
 
 constexpr auto SelectMarketSql = //
     "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
@@ -47,18 +47,20 @@ constexpr auto SelectAccntSql = //
     "SELECT symbol FROM accnt_t WHERE modified > ?"_sv;
 
 constexpr auto SelectOrderSql = //
-    "SELECT accnt, market_id, instr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
-    " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
-    " FROM order_t WHERE resd > 0;"_sv;
+    "SELECT accnt, market_id, instr, settl_day, id, ref, state_id, side_id, lots, ticks," //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created, modified" //
+    " FROM order_t WHERE resd_lots > 0;"_sv;
 
 constexpr auto SelectExecSql = //
     "SELECT market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots, ticks," //
-    " resd, exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
+    " cpty, created" //
     " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"_sv;
 
 constexpr auto SelectTradeSql = //
-    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks, resd," //
-    " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
+    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks," //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
+    " cpty, created" //
     " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
 
 constexpr auto SelectPosnSql = //
@@ -101,8 +103,8 @@ void Model::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         Id, //
         Symbol, //
         Display, //
-        Asset, //
-        Ccy, //
+        BaseAsset, //
+        TermCcy, //
         TickNumer, //
         TickDenom, //
         LotNumer, //
@@ -117,8 +119,8 @@ void Model::doReadInstr(const ModelCallback<InstrPtr>& cb) const
         cb(Instr::make(column<Id32>(*stmt, Id), //
                        column<string_view>(*stmt, Symbol), //
                        column<string_view>(*stmt, Display), //
-                       column<string_view>(*stmt, Asset), //
-                       column<string_view>(*stmt, Ccy), //
+                       column<string_view>(*stmt, BaseAsset), //
+                       column<string_view>(*stmt, TermCcy), //
                        column<int>(*stmt, LotNumer), //
                        column<int>(*stmt, LotDenom), //
                        column<int>(*stmt, TickNumer), //
@@ -183,9 +185,9 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
         Side, //
         Lots, //
         Ticks, //
-        Resd, //
-        Exec, //
-        Cost, //
+        ResdLots, //
+        ExecLots, //
+        ExecCost, //
         LastLots, //
         LastTicks, //
         MinLots, //
@@ -205,9 +207,9 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
                        column<swirly::Side>(*stmt, Side), //
                        column<swirly::Lots>(*stmt, Lots), //
                        column<swirly::Ticks>(*stmt, Ticks), //
-                       column<swirly::Lots>(*stmt, Resd), //
-                       column<swirly::Lots>(*stmt, Exec), //
-                       column<swirly::Cost>(*stmt, Cost), //
+                       column<swirly::Lots>(*stmt, ResdLots), //
+                       column<swirly::Lots>(*stmt, ExecLots), //
+                       column<swirly::Cost>(*stmt, ExecCost), //
                        column<swirly::Lots>(*stmt, LastLots), //
                        column<swirly::Ticks>(*stmt, LastTicks), //
                        column<swirly::Lots>(*stmt, MinLots), //
@@ -229,9 +231,9 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
         Side, //
         Lots, //
         Ticks, //
-        Resd, //
-        Exec, //
-        Cost, //
+        ResdLots, //
+        ExecLots, //
+        ExecCost, //
         LastLots, //
         LastTicks, //
         MinLots, //
@@ -257,9 +259,9 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
                       column<swirly::Side>(*stmt, Side), //
                       column<swirly::Lots>(*stmt, Lots), //
                       column<swirly::Ticks>(*stmt, Ticks), //
-                      column<swirly::Lots>(*stmt, Resd), //
-                      column<swirly::Lots>(*stmt, Exec), //
-                      column<swirly::Cost>(*stmt, Cost), //
+                      column<swirly::Lots>(*stmt, ResdLots), //
+                      column<swirly::Lots>(*stmt, ExecLots), //
+                      column<swirly::Cost>(*stmt, ExecCost), //
                       column<swirly::Lots>(*stmt, LastLots), //
                       column<swirly::Ticks>(*stmt, LastTicks), //
                       column<swirly::Lots>(*stmt, MinLots), //
@@ -283,9 +285,9 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
         Side, //
         Lots, //
         Ticks, //
-        Resd, //
-        Exec, //
-        Cost, //
+        ResdLots, //
+        ExecLots, //
+        ExecCost, //
         LastLots, //
         LastTicks, //
         MinLots, //
@@ -308,9 +310,9 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
                       column<swirly::Side>(*stmt, Side), //
                       column<swirly::Lots>(*stmt, Lots), //
                       column<swirly::Ticks>(*stmt, Ticks), //
-                      column<swirly::Lots>(*stmt, Resd), //
-                      column<swirly::Lots>(*stmt, Exec), //
-                      column<swirly::Cost>(*stmt, Cost), //
+                      column<swirly::Lots>(*stmt, ResdLots), //
+                      column<swirly::Lots>(*stmt, ExecLots), //
+                      column<swirly::Cost>(*stmt, ExecCost), //
                       column<swirly::Lots>(*stmt, LastLots), //
                       column<swirly::Ticks>(*stmt, LastTicks), //
                       column<swirly::Lots>(*stmt, MinLots), //

@@ -35,10 +35,10 @@ SWIRLY_TEST_CASE(MarketToString)
                  ",\"lastTicks\":null"
                  ",\"lastTime\":null"
                  ",\"bidTicks\":[null,null,null]"
-                 ",\"bidResd\":[null,null,null]"
+                 ",\"bidLots\":[null,null,null]"
                  ",\"bidCount\":[null,null,null]"
                  ",\"offerTicks\":[null,null,null]"
-                 ",\"offerResd\":[null,null,null]"
+                 ",\"offerLots\":[null,null,null]"
                  ",\"offerCount\":[null,null,null]"
                  "}");
 }
@@ -56,10 +56,10 @@ SWIRLY_TEST_CASE(MarketToStringNull)
                  ",\"lastTicks\":null"
                  ",\"lastTime\":null"
                  ",\"bidTicks\":[null,null,null]"
-                 ",\"bidResd\":[null,null,null]"
+                 ",\"bidLots\":[null,null,null]"
                  ",\"bidCount\":[null,null,null]"
                  ",\"offerTicks\":[null,null,null]"
-                 ",\"offerResd\":[null,null,null]"
+                 ",\"offerLots\":[null,null,null]"
                  ",\"offerCount\":[null,null,null]"
                  "}");
 }

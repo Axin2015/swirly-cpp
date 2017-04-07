@@ -23,8 +23,8 @@ namespace ui {
 
 Exec::Exec(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
            Id64 orderId, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
-           Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
-           Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created)
+           Lots resdLots, Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks,
+           Lots minLots, Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created)
     : accnt_{accnt},
       marketId_{marketId},
       instr_{instr},
@@ -36,9 +36,9 @@ Exec::Exec(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlD
       side_{side},
       lots_{lots},
       ticks_{ticks},
-      resd_{resd},
-      exec_{exec},
-      cost_{cost},
+      resdLots_{resdLots},
+      execLots_{execLots},
+      execCost_{execCost},
       lastLots_{lastLots},
       lastTicks_{lastTicks},
       minLots_{minLots},
@@ -63,9 +63,9 @@ Exec Exec::fromJson(const Instr& instr, const QJsonObject& obj)
                 fromJson<Side>(obj["side"]),
                 fromJson<Lots>(obj["lots"]),
                 fromJson<Ticks>(obj["ticks"]),
-                fromJson<Lots>(obj["resd"]),
-                fromJson<Lots>(obj["exec"]),
-                fromJson<Cost>(obj["cost"]),
+                fromJson<Lots>(obj["resdLots"]),
+                fromJson<Lots>(obj["execLots"]),
+                fromJson<Cost>(obj["execCost"]),
                 fromJson<Lots>(obj["lastLots"]),
                 fromJson<Ticks>(obj["lastTicks"]),
                 fromJson<Lots>(obj["minLots"]),
@@ -88,9 +88,9 @@ QDebug operator<<(QDebug debug, const Exec& exec)
                     << ",side=" << exec.side() //
                     << ",lots=" << exec.lots() //
                     << ",ticks=" << exec.ticks() //
-                    << ",resd=" << exec.resd() //
-                    << ",exec=" << exec.exec() //
-                    << ",cost=" << exec.cost() //
+                    << ",resdLots=" << exec.resdLots() //
+                    << ",execLots=" << exec.execLots() //
+                    << ",execCost=" << exec.execCost() //
                     << ",lastLots=" << exec.lastLots() //
                     << ",lastTicks=" << exec.lastTicks() //
                     << ",minLots=" << exec.minLots() //

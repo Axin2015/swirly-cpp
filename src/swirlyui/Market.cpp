@@ -45,14 +45,14 @@ Market Market::fromJson(const Instr& instr, const QJsonObject& obj)
                   fromJson<QDateTime>(obj["lastTime"])};
 
     const auto bidTicks = obj["bidTicks"].toArray();
-    const auto bidResd = obj["bidResd"].toArray();
+    const auto bidLots = obj["bidLots"].toArray();
     const auto bidCount = obj["bidCount"].toArray();
-    toLevels(bidTicks, bidResd, bidCount, market.bids_);
+    toLevels(bidTicks, bidLots, bidCount, market.bids_);
 
     const auto offerTicks = obj["offerTicks"].toArray();
-    const auto offerResd = obj["offerResd"].toArray();
+    const auto offerLots = obj["offerLots"].toArray();
     const auto offerCount = obj["offerCount"].toArray();
-    toLevels(offerTicks, offerResd, offerCount, market.offers_);
+    toLevels(offerTicks, offerLots, offerCount, market.offers_);
 
     return market;
 }

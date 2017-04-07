@@ -213,9 +213,9 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         SWIRLY_CHECK(body.side == Side::Buy);
         SWIRLY_CHECK(body.lots == 10_lts);
         SWIRLY_CHECK(body.ticks == 12345_tks);
-        SWIRLY_CHECK(body.resd == 10_lts);
-        SWIRLY_CHECK(body.exec == 0_lts);
-        SWIRLY_CHECK(body.cost == 0_cst);
+        SWIRLY_CHECK(body.resdLots == 10_lts);
+        SWIRLY_CHECK(body.execLots == 0_lts);
+        SWIRLY_CHECK(body.execCost == 0_cst);
         SWIRLY_CHECK(body.lastLots == 0_lts);
         SWIRLY_CHECK(body.lastTicks == 0_tks);
         SWIRLY_CHECK(body.minLots == 1_lts);
@@ -241,9 +241,9 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         SWIRLY_CHECK(body.side == Side::Buy);
         SWIRLY_CHECK(body.lots == 10_lts);
         SWIRLY_CHECK(body.ticks == 12345_tks);
-        SWIRLY_CHECK(body.resd == 5_lts);
-        SWIRLY_CHECK(body.exec == 5_lts);
-        SWIRLY_CHECK(body.cost == 61725_cst);
+        SWIRLY_CHECK(body.resdLots == 5_lts);
+        SWIRLY_CHECK(body.execLots == 5_lts);
+        SWIRLY_CHECK(body.execCost == 61725_cst);
         SWIRLY_CHECK(body.lastLots == 5_lts);
         SWIRLY_CHECK(body.lastTicks == 12345_tks);
         SWIRLY_CHECK(body.minLots == 1_lts);

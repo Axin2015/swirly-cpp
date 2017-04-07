@@ -68,7 +68,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'bidCount': [1, 2, None],
-      u'bidResd': [3, 12, None],
+      u'bidLots': [3, 12, None],
       u'bidTicks': [12344, 12343, None],
       u'instr': u'EURUSD',
       u'id': 82255,
@@ -76,13 +76,13 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [1, 1, 1],
-      u'offerResd': [3, 5, 7],
+      u'offerLots': [3, 5, 7],
       u'offerTicks': [12346, 12347, 12348],
       u'settlDate': 20140302,
       u'state': 0
     }, {
       u'bidCount': [1, 1, None],
-      u'bidResd': [3, 5, None],
+      u'bidLots': [3, 5, None],
       u'bidTicks': [15344, 15343, None],
       u'instr': u'GBPUSD',
       u'id': 147791,
@@ -90,13 +90,13 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [2, None, None],
-      u'offerResd': [8, None, None],
+      u'offerLots': [8, None, None],
       u'offerTicks': [15346, None, None],
       u'settlDate': 20140302,
       u'state': 0
     }, {
       u'bidCount': [1, None, None],
-      u'bidResd': [7, None, None],
+      u'bidLots': [7, None, None],
       u'bidTicks': [15342, None, None],
       u'instr': u'GBPUSD',
       u'id': 147822,
@@ -104,13 +104,13 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [1, None, None],
-      u'offerResd': [7, None, None],
+      u'offerLots': [7, None, None],
       u'offerTicks': [15347, None, None],
       u'settlDate': 20140402,
       u'state': 0
     }, {
       u'bidCount': [1, None, None],
-      u'bidResd': [3, None, None],
+      u'bidLots': [3, None, None],
       u'bidTicks': [9344, None, None],
       u'instr': u'USDCHF',
       u'id': 213327,
@@ -118,7 +118,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [1, None, None],
-      u'offerResd': [3, None, None],
+      u'offerLots': [3, None, None],
       u'offerTicks': [9346, None, None],
       u'settlDate': 20140302,
       u'state': 0
@@ -132,7 +132,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'bidCount': [1, 1, None],
-      u'bidResd': [3, 5, None],
+      u'bidLots': [3, 5, None],
       u'bidTicks': [15344, 15343, None],
       u'instr': u'GBPUSD',
       u'id': 147791,
@@ -140,13 +140,13 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [2, None, None],
-      u'offerResd': [8, None, None],
+      u'offerLots': [8, None, None],
       u'offerTicks': [15346, None, None],
       u'settlDate': 20140302,
       u'state': 0
     }, {
       u'bidCount': [1, None, None],
-      u'bidResd': [7, None, None],
+      u'bidLots': [7, None, None],
       u'bidTicks': [15342, None, None],
       u'instr': u'GBPUSD',
       u'id': 147822,
@@ -154,7 +154,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [1, None, None],
-      u'offerResd': [7, None, None],
+      u'offerLots': [7, None, None],
       u'offerTicks': [15347, None, None],
       u'settlDate': 20140402,
       u'state': 0
@@ -168,7 +168,7 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [1, 1, None],
-      u'bidResd': [3, 5, None],
+      u'bidLots': [3, 5, None],
       u'bidTicks': [15344, 15343, None],
       u'instr': u'GBPUSD',
       u'id': 147791,
@@ -176,7 +176,7 @@ class TestCase(RestTestCase):
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [2, None, None],
-      u'offerResd': [8, None, None],
+      u'offerLots': [8, None, None],
       u'offerTicks': [15346, None, None],
       u'settlDate': 20140302,
       u'state': 0

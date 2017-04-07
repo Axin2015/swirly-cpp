@@ -63,10 +63,10 @@ class SWIRLY_API Level : public Comparable<Level>, public MemAlloc {
     const Order& firstOrder() const noexcept { return *firstOrder_; }
     LevelKey key() const noexcept { return key_; }
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resd() const noexcept { return resd_; }
+    Lots lots() const noexcept { return lots_; }
     int count() const noexcept { return count_; }
     void setFirstOrder(const Order& firstOrder) noexcept { firstOrder_ = &firstOrder; }
-    void reduce(Lots delta) noexcept { resd_ -= delta; }
+    void reduce(Lots delta) noexcept { lots_ -= delta; }
     void addOrder(const Order& order) noexcept;
 
     void subOrder(const Order& order) noexcept;
@@ -80,7 +80,7 @@ class SWIRLY_API Level : public Comparable<Level>, public MemAlloc {
     /**
      * Must be greater than zero.
      */
-    Lots resd_;
+    Lots lots_;
     /**
      * Must be greater than zero.
      */

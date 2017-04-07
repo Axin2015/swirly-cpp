@@ -29,8 +29,8 @@ SWIRLY_TEST_CASE(InstrToString)
     SWIRLY_CHECK(toString(instr) == //
                  "{\"symbol\":\"EURUSD\""
                  ",\"display\":\"EURUSD\""
-                 ",\"asset\":\"EUR\""
-                 ",\"ccy\":\"USD\""
+                 ",\"baseAsset\":\"EUR\""
+                 ",\"termCcy\":\"USD\""
                  ",\"lotNumer\":1000000"
                  ",\"lotDenom\":1"
                  ",\"tickNumer\":1"

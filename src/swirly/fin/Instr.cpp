@@ -24,14 +24,14 @@ namespace swirly {
 
 static_assert(sizeof(Instr) <= 4 * 64, "crossed cache-line boundary");
 
-Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol asset, Symbol ccy, int lotNumer,
-             int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
+             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
     : id_{id},
       symbol_{symbol},
       display_{display},
-      asset_{asset},
-      ccy_{ccy},
+      baseAsset_{baseAsset},
+      termCcy_{termCcy},
       lotNumer_{lotNumer},
       lotDenom_{lotDenom},
       qtyInc_{fractToReal(lotNumer, lotDenom)},
@@ -56,8 +56,8 @@ void Instr::toJson(ostream& os) const
 {
     os << "{\"symbol\":\"" << symbol_ //
        << "\",\"display\":\"" << display_ //
-       << "\",\"asset\":\"" << asset_ //
-       << "\",\"ccy\":\"" << ccy_ //
+       << "\",\"baseAsset\":\"" << baseAsset_ //
+       << "\",\"termCcy\":\"" << termCcy_ //
        << "\",\"lotNumer\":" << lotNumer_ //
        << ",\"lotDenom\":" << lotDenom_ //
        << ",\"tickNumer\":" << tickNumer_ //

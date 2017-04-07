@@ -71,9 +71,9 @@ void Market::toJson(ostream& os) const
     os << ",\"bidTicks\":[";
     toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
                  [](const auto& level) { return level.ticks(); });
-    os << "],\"bidResd\":[";
+    os << "],\"bidLots\":[";
     toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
-                 [](const auto& level) { return level.resd(); });
+                 [](const auto& level) { return level.lots(); });
     os << "],\"bidCount\":[";
     toJsonLevels(bidLevels.begin(), bidLevels.end(), os,
                  [](const auto& level) { return level.count(); });
@@ -82,9 +82,9 @@ void Market::toJson(ostream& os) const
     os << "],\"offerTicks\":[";
     toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
                  [](const auto& level) { return level.ticks(); });
-    os << "],\"offerResd\":[";
+    os << "],\"offerLots\":[";
     toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
-                 [](const auto& level) { return level.resd(); });
+                 [](const auto& level) { return level.lots(); });
     os << "],\"offerCount\":[";
     toJsonLevels(offerLevels.begin(), offerLevels.end(), os,
                  [](const auto& level) { return level.count(); });

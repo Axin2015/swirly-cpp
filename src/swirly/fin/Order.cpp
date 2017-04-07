@@ -50,9 +50,9 @@ void Order::toJson(ostream& os) const
        << "\",\"side\":\"" << side_ //
        << "\",\"lots\":" << lots_ //
        << ",\"ticks\":" << ticks_ //
-       << ",\"resd\":" << resd_ //
-       << ",\"exec\":" << exec_ //
-       << ",\"cost\":" << cost_;
+       << ",\"resdLots\":" << resdLots_ //
+       << ",\"execLots\":" << execLots_ //
+       << ",\"execCost\":" << execCost_;
     if (lastLots_ != 0_lts) {
         os << ",\"lastLots\":" << lastLots_ //
            << ",\"lastTicks\":" << lastTicks_;

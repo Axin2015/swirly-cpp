@@ -101,8 +101,8 @@ CREATE TABLE instr_t (
   id INT NOT NULL PRIMARY KEY,
   symbol CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
-  asset CHAR(16) NOT NULL,
-  ccy CHAR(16) NOT NULL,
+  base_asset CHAR(16) NOT NULL,
+  term_ccy CHAR(16) NOT NULL,
   lot_numer INT NOT NULL,
   lot_denom INT NOT NULL,
   tick_numer INT NOT NULL,
@@ -111,8 +111,8 @@ CREATE TABLE instr_t (
   min_lots BIGINT NOT NULL DEFAULT 1,
   max_lots BIGINT NOT NULL,
 
-  FOREIGN KEY (asset) REFERENCES asset_t (symbol),
-  FOREIGN KEY (ccy) REFERENCES asset_t (symbol)
+  FOREIGN KEY (base_asset) REFERENCES asset_t (symbol),
+  FOREIGN KEY (term_ccy) REFERENCES asset_t (symbol)
 )
 ;
 
@@ -150,9 +150,9 @@ CREATE TABLE order_t (
   side_id INT NOT NULL,
   lots BIGINT NOT NULL,
   ticks BIGINT NOT NULL,
-  resd BIGINT NOT NULL,
-  exec BIGINT NOT NULL,
-  cost BIGINT NOT NULL,
+  resd_lots BIGINT NOT NULL,
+  exec_lots BIGINT NOT NULL,
+  exec_cost BIGINT NOT NULL,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
@@ -168,7 +168,7 @@ CREATE TABLE order_t (
 )
 ;
 
-CREATE INDEX order_resd_idx ON order_t (resd);
+CREATE INDEX order_resd_idx ON order_t (resd_lots);
 
 CREATE TABLE exec_t (
   accnt CHAR(16) NOT NULL,
@@ -183,9 +183,9 @@ CREATE TABLE exec_t (
   side_id INT NOT NULL,
   lots BIGINT NOT NULL,
   ticks BIGINT NOT NULL,
-  resd BIGINT NOT NULL,
-  exec BIGINT NOT NULL,
-  cost BIGINT NOT NULL,
+  resd_lots BIGINT NOT NULL,
+  exec_lots BIGINT NOT NULL,
+  exec_cost BIGINT NOT NULL,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
@@ -225,9 +225,9 @@ CREATE TRIGGER before_insert_on_exec1
       side_id,
       lots,
       ticks,
-      resd,
-      exec,
-      cost,
+      resd_lots,
+      exec_lots,
+      exec_cost,
       last_lots,
       last_ticks,
       min_lots,
@@ -244,9 +244,9 @@ CREATE TRIGGER before_insert_on_exec1
       NEW.side_id,
       NEW.lots,
       NEW.ticks,
-      NEW.resd,
-      NEW.exec,
-      NEW.cost,
+      NEW.resd_lots,
+      NEW.exec_lots,
+      NEW.exec_cost,
       NEW.last_lots,
       NEW.last_ticks,
       NEW.min_lots,
@@ -265,9 +265,9 @@ CREATE TRIGGER before_insert_on_exec2
     SET
       state_id = NEW.state_id,
       lots = NEW.lots,
-      resd = NEW.resd,
-      exec = NEW.exec,
-      cost = NEW.cost,
+      resd_lots = NEW.resd_lots,
+      exec_lots = NEW.exec_lots,
+      exec_cost = NEW.exec_cost,
       last_lots = NEW.last_lots,
       last_ticks = NEW.last_ticks,
       modified = NEW.created
@@ -330,8 +330,8 @@ CREATE VIEW instr_v AS
     c.symbol,
     c.display,
     a.type,
-    c.asset,
-    c.ccy,
+    c.base_asset,
+    c.term_ccy,
     c.lot_numer,
     c.lot_denom,
     c.tick_numer,
@@ -341,7 +341,7 @@ CREATE VIEW instr_v AS
     c.max_lots
   FROM instr_t c
   LEFT OUTER JOIN asset_v a
-  ON c.asset = a.symbol
+  ON c.base_asset = a.symbol
 ;
 
 CREATE VIEW market_v AS
@@ -372,9 +372,9 @@ CREATE VIEW order_v AS
     a.symbol side,
     o.lots,
     o.ticks,
-    o.resd,
-    o.exec,
-    o.cost,
+    o.resd_lots,
+    o.exec_lots,
+    o.exec_cost,
     o.last_lots,
     o.last_ticks,
     o.min_lots,
@@ -401,9 +401,9 @@ CREATE VIEW exec_v AS
     a.symbol side,
     e.lots,
     e.ticks,
-    e.resd,
-    e.exec,
-    e.cost,
+    e.resd_lots,
+    e.exec_lots,
+    e.exec_cost,
     e.last_lots,
     e.last_ticks,
     e.min_lots,

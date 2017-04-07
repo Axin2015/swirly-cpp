@@ -36,8 +36,8 @@ enum class Column : int { //
     Side, //
     Lots, //
     Price, //
-    Resd, //
-    Exec, //
+    ResdLots, //
+    ExecLots, //
     AvgPrice, //
     LastLots, //
     LastPrice, //
@@ -55,7 +55,7 @@ class Exec {
   public:
     Exec(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
          Id64 orderId, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
-         Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+         Lots resdLots, Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
          Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created);
     Exec() = default;
     ~Exec() noexcept = default;
@@ -74,9 +74,9 @@ class Exec {
     Side side() const noexcept { return side_; }
     Lots lots() const noexcept { return lots_; }
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resd() const noexcept { return resd_; }
-    Lots exec() const noexcept { return exec_; }
-    Cost cost() const noexcept { return cost_; }
+    Lots resdLots() const noexcept { return resdLots_; }
+    Lots execLots() const noexcept { return execLots_; }
+    Cost execCost() const noexcept { return execCost_; }
     Lots lastLots() const noexcept { return lastLots_; }
     Ticks lastTicks() const noexcept { return lastTicks_; }
     Lots minLots() const noexcept { return minLots_; }
@@ -97,9 +97,9 @@ class Exec {
     Side side_{};
     Lots lots_{};
     Ticks ticks_{};
-    Lots resd_{};
-    Lots exec_{};
-    Cost cost_{};
+    Lots resdLots_{};
+    Lots execLots_{};
+    Cost execCost_{};
     Lots lastLots_{};
     Ticks lastTicks_{};
     Lots minLots_{};

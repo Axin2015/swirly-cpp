@@ -34,8 +34,8 @@ enum class Column : int { //
     CheckState, //
     Symbol, //
     Display, //
-    Asset, //
-    Ccy, //
+    BaseAsset, //
+    TermCcy, //
     LotNumer, //
     LotDenom, //
     TickNumer, //
@@ -51,11 +51,12 @@ constexpr int ColumnCount{unbox(Column::MaxLots) + 1};
 // Cheap copies.
 class Instr {
   public:
-    Instr(const QString& symbol, const QString& display, const QString& asset, const QString& ccy,
-          int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
-          Lots maxLots)
-        : impl_{std::make_shared<const Impl>(symbol, display, asset, ccy, lotNumer, lotDenom,
-                                             tickNumer, tickDenom, pipDp, minLots, maxLots)}
+    Instr(const QString& symbol, const QString& display, const QString& baseAsset,
+          const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+          int pipDp, Lots minLots, Lots maxLots)
+        : impl_{std::make_shared<const Impl>(symbol, display, baseAsset, termCcy, lotNumer,
+                                             lotDenom, tickNumer, tickDenom, pipDp, minLots,
+                                             maxLots)}
     {
     }
     Instr() = default;
@@ -65,8 +66,8 @@ class Instr {
 
     const QString& symbol() const noexcept { return impl_->symbol; }
     const QString& display() const noexcept { return impl_->display; }
-    const QString& asset() const noexcept { return impl_->asset; }
-    const QString& ccy() const noexcept { return impl_->ccy; }
+    const QString& baseAsset() const noexcept { return impl_->baseAsset; }
+    const QString& termCcy() const noexcept { return impl_->termCcy; }
     int lotNumer() const noexcept { return impl_->lotNumer; }
     int lotDenom() const noexcept { return impl_->lotDenom; }
     double qtyInc() const noexcept { return impl_->qtyInc; }
@@ -81,15 +82,15 @@ class Instr {
 
   private:
     struct Impl {
-        Impl(const QString& symbol, const QString& display, const QString& asset,
-             const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+        Impl(const QString& symbol, const QString& display, const QString& baseAsset,
+             const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
              int pipDp, Lots minLots, Lots maxLots);
         Impl() = default;
         ~Impl() noexcept = default;
         QString symbol{};
         QString display{};
-        QString asset{};
-        QString ccy{};
+        QString baseAsset{};
+        QString termCcy{};
         int lotNumer{};
         int lotDenom{};
         // Transient.

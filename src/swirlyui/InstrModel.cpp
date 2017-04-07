@@ -27,8 +27,8 @@ InstrModel::InstrModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Symbol)] = tr("Symbol");
     header_[unbox(Column::Display)] = tr("Display");
-    header_[unbox(Column::Asset)] = tr("Asset");
-    header_[unbox(Column::Ccy)] = tr("Ccy");
+    header_[unbox(Column::BaseAsset)] = tr("Base Asset");
+    header_[unbox(Column::TermCcy)] = tr("Term Ccy");
     header_[unbox(Column::LotNumer)] = tr("Lot Numer");
     header_[unbox(Column::LotDenom)] = tr("Lot Denom");
     header_[unbox(Column::TickNumer)] = tr("Tick Numer");
@@ -65,11 +65,11 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
         case Column::Display:
             var = instr.display();
             break;
-        case Column::Asset:
-            var = instr.asset();
+        case Column::BaseAsset:
+            var = instr.baseAsset();
             break;
-        case Column::Ccy:
-            var = instr.ccy();
+        case Column::TermCcy:
+            var = instr.termCcy();
             break;
         case Column::LotNumer:
             var = instr.lotNumer();
@@ -99,8 +99,8 @@ QVariant InstrModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Symbol:
         case Column::Display:
-        case Column::Asset:
-        case Column::Ccy:
+        case Column::BaseAsset:
+        case Column::TermCcy:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};
             break;
         case Column::LotNumer:
