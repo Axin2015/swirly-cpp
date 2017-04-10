@@ -32,9 +32,9 @@ PosnModel::PosnModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::BuyLots)] = tr("Buy Lots");
-    header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg Price");
+    header_[unbox(Column::BuyAvgPrice)] = tr("Buy Avg");
     header_[unbox(Column::SellLots)] = tr("Sell Lots");
-    header_[unbox(Column::SellAvgPrice)] = tr("Sell Avg Price");
+    header_[unbox(Column::SellAvgPrice)] = tr("Sell Avg");
 }
 
 PosnModel::~PosnModel() noexcept = default;
