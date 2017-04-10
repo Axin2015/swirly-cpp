@@ -39,7 +39,7 @@ using ConstAccntPtr = std::unique_ptr<const Accnt>;
 
 class SWIRLY_API Accnt : public Comparable<Accnt> {
   public:
-    Accnt(Mnem mnem, std::size_t maxExecs) noexcept : mnem_{mnem}, execs_{maxExecs} {}
+    Accnt(Symbol symbol, std::size_t maxExecs) noexcept : symbol_{symbol}, execs_{maxExecs} {}
     ~Accnt() noexcept;
 
     // Copy.
@@ -56,9 +56,9 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
         return std::make_unique<Accnt>(std::forward<ArgsT>(args)...);
     }
 
-    int compare(const Accnt& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+    int compare(const Accnt& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     bool exists(std::string_view ref) const noexcept { return refIdx_.find(ref) != refIdx_.end(); }
-    auto mnem() const noexcept { return mnem_; }
+    auto symbol() const noexcept { return symbol_; }
     const auto& orders() const noexcept { return orders_; }
     const auto& execs() const noexcept { return execs_; }
     const auto& trades() const noexcept { return trades_; }
@@ -91,7 +91,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     void insertOrder(const OrderPtr& order) noexcept
     {
-        assert(order->accnt() == mnem_);
+        assert(order->accnt() == symbol_);
         orders_.insert(order);
         if (!order->ref().empty()) {
             refIdx_.insert(order);
@@ -99,7 +99,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     OrderPtr removeOrder(const Order& order) noexcept
     {
-        assert(order.accnt() == mnem_);
+        assert(order.accnt() == symbol_);
         if (!order.ref().empty()) {
             refIdx_.remove(order);
         }
@@ -107,37 +107,37 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     }
     void pushExecBack(const ConstExecPtr& exec) noexcept
     {
-        assert(exec->accnt() == mnem_);
+        assert(exec->accnt() == symbol_);
         execs_.push_back(exec);
     }
     void pushExecFront(const ConstExecPtr& exec) noexcept
     {
-        assert(exec->accnt() == mnem_);
+        assert(exec->accnt() == symbol_);
         execs_.push_front(exec);
     }
     void insertTrade(const ExecPtr& trade) noexcept
     {
-        assert(trade->accnt() == mnem_);
+        assert(trade->accnt() == symbol_);
         assert(trade->state() == State::Trade);
         trades_.insert(trade);
     }
     ConstExecPtr removeTrade(const Exec& trade) noexcept
     {
-        assert(trade.accnt() == mnem_);
+        assert(trade.accnt() == symbol_);
         return trades_.remove(trade);
     }
-    PosnPtr posn(Id64 marketId, Mnem contr, JDay settlDay) throw(std::bad_alloc);
+    PosnPtr posn(Id64 marketId, Symbol instr, JDay settlDay) throw(std::bad_alloc);
 
     void insertPosn(const PosnPtr& posn) noexcept
     {
-        assert(posn->accnt() == mnem_);
+        assert(posn->accnt() == symbol_);
         posns_.insert(posn);
     }
-    boost::intrusive::set_member_hook<> mnemHook_;
+    boost::intrusive::set_member_hook<> symbolHook_;
     using PosnSet = IdSet<Posn, MarketIdTraits<Posn>>;
 
   private:
-    const Mnem mnem_;
+    const Symbol symbol_;
     OrderIdSet orders_;
     boost::circular_buffer<ConstExecPtr> execs_;
     ExecIdSet trades_;
@@ -145,7 +145,7 @@ class SWIRLY_API Accnt : public Comparable<Accnt> {
     OrderRefSet refIdx_;
 };
 
-using AccntSet = MnemSet<Accnt>;
+using AccntSet = SymbolSet<Accnt>;
 
 } // swirly
 

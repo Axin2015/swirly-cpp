@@ -17,7 +17,7 @@
 #include "Test.hpp"
 
 #include <swirly/fin/Asset.hpp>
-#include <swirly/fin/Contr.hpp>
+#include <swirly/fin/Instr.hpp>
 
 using namespace std;
 
@@ -64,53 +64,53 @@ void TestModel::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     cb(Asset::make(24_id32, "VZ"_sv, "Verizon Com"_sv, AssetType::Corp));
 }
 
-void TestModel::doReadContr(const ModelCallback<ContrPtr>& cb) const
+void TestModel::doReadInstr(const ModelCallback<InstrPtr>& cb) const
 {
     // Forex.
-    cb(Contr::make(1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4,
+    cb(Instr::make(1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4,
                    1_lts, 10_lts));
-    cb(Contr::make(2_id32, "GBPUSD"_sv, "GBPUSD"_sv, "GBP"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4,
+    cb(Instr::make(2_id32, "GBPUSD"_sv, "GBPUSD"_sv, "GBP"_sv, "USD"_sv, 1000000, 1, 1, 10000, 4,
                    1_lts, 10_lts));
-    cb(Contr::make(3_id32, "USDCHF"_sv, "USDCHF"_sv, "USD"_sv, "CHF"_sv, 1000000, 1, 1, 10000, 4,
+    cb(Instr::make(3_id32, "USDCHF"_sv, "USDCHF"_sv, "USD"_sv, "CHF"_sv, 1000000, 1, 1, 10000, 4,
                    1_lts, 10_lts));
-    cb(Contr::make(4_id32, "USDJPY"_sv, "USDJPY"_sv, "USD"_sv, "JPY"_sv, 1000000, 1, 1, 100, 2,
+    cb(Instr::make(4_id32, "USDJPY"_sv, "USDJPY"_sv, "USD"_sv, "JPY"_sv, 1000000, 1, 1, 100, 2,
                    1_lts, 10_lts));
     // Coal.
-    cb(Contr::make(5_id32, "CAP"_sv, "Central Appalachia Coal"_sv, "CAP"_sv, "USD"_sv, 1000, 1, 1,
+    cb(Instr::make(5_id32, "CAP"_sv, "Central Appalachia Coal"_sv, "CAP"_sv, "USD"_sv, 1000, 1, 1,
                    20, 2, 1_lts, 10_lts));
-    cb(Contr::make(6_id32, "NAP"_sv, "Northern Appalachia Coal"_sv, "NAP"_sv, "USD"_sv, 1000, 1, 1,
+    cb(Instr::make(6_id32, "NAP"_sv, "Northern Appalachia Coal"_sv, "NAP"_sv, "USD"_sv, 1000, 1, 1,
                    20, 2, 1_lts, 10_lts));
-    cb(Contr::make(7_id32, "ILB"_sv, "Illinois Basin Coal"_sv, "ILB"_sv, "USD"_sv, 1000, 1, 1, 20,
+    cb(Instr::make(7_id32, "ILB"_sv, "Illinois Basin Coal"_sv, "ILB"_sv, "USD"_sv, 1000, 1, 1, 20,
                    2, 1_lts, 10_lts));
-    cb(Contr::make(8_id32, "PRB"_sv, "Powder River Basin Coal"_sv, "PRB"_sv, "USD"_sv, 1000, 1, 1,
+    cb(Instr::make(8_id32, "PRB"_sv, "Powder River Basin Coal"_sv, "PRB"_sv, "USD"_sv, 1000, 1, 1,
                    20, 2, 1_lts, 10_lts));
-    cb(Contr::make(9_id32, "UIB"_sv, "Uinta Basin Coal"_sv, "UIB"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
+    cb(Instr::make(9_id32, "UIB"_sv, "Uinta Basin Coal"_sv, "UIB"_sv, "USD"_sv, 1000, 1, 1, 20, 2,
                    1_lts, 10_lts));
     // Coffee.
-    cb(Contr::make(10_id32, "WYCA"_sv, "Yirgachefe A"_sv, "WYCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+    cb(Instr::make(10_id32, "WYCA"_sv, "Yirgachefe A"_sv, "WYCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
                    10_lts));
-    cb(Contr::make(11_id32, "WWNA"_sv, "Wenago A"_sv, "WWNA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+    cb(Instr::make(11_id32, "WWNA"_sv, "Wenago A"_sv, "WWNA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
                    10_lts));
-    cb(Contr::make(12_id32, "WKCA"_sv, "Kochere A"_sv, "WKCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
+    cb(Instr::make(12_id32, "WKCA"_sv, "Kochere A"_sv, "WKCA"_sv, "ETB"_sv, 1, 1, 1, 1, 0, 1_lts,
                    10_lts));
-    cb(Contr::make(13_id32, "WGAA"_sv, "Gelena Abaya A"_sv, "WGAA"_sv, "ETB"_sv, 1, 1, 1, 1, 0,
+    cb(Instr::make(13_id32, "WGAA"_sv, "Gelena Abaya A"_sv, "WGAA"_sv, "ETB"_sv, 1, 1, 1, 1, 0,
                    1_lts, 10_lts));
     // US Corporates.
-    cb(Contr::make(14_id32, "CSCO"_sv, "Cisco Systems Inc"_sv, "CSCO"_sv, "USD"_sv, 1, 1, 1, 1000,
+    cb(Instr::make(14_id32, "CSCO"_sv, "Cisco Systems Inc"_sv, "CSCO"_sv, "USD"_sv, 1, 1, 1, 1000,
                    3, 1_lts, 10_lts));
-    cb(Contr::make(15_id32, "DIS"_sv, "Walt Disney"_sv, "DIS"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+    cb(Instr::make(15_id32, "DIS"_sv, "Walt Disney"_sv, "DIS"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                    10_lts));
-    cb(Contr::make(16_id32, "IBM"_sv, "Ibm Corp"_sv, "IBM"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+    cb(Instr::make(16_id32, "IBM"_sv, "Ibm Corp"_sv, "IBM"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                    10_lts));
-    cb(Contr::make(17_id32, "INTC"_sv, "Intel Corp"_sv, "INTC"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
+    cb(Instr::make(17_id32, "INTC"_sv, "Intel Corp"_sv, "INTC"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
                    1_lts, 10_lts));
-    cb(Contr::make(18_id32, "MSFT"_sv, "Microsoft Corp"_sv, "MSFT"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
+    cb(Instr::make(18_id32, "MSFT"_sv, "Microsoft Corp"_sv, "MSFT"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
                    1_lts, 10_lts));
-    cb(Contr::make(19_id32, "VIA"_sv, "Viacom Inc"_sv, "VIA"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+    cb(Instr::make(19_id32, "VIA"_sv, "Viacom Inc"_sv, "VIA"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                    10_lts));
-    cb(Contr::make(20_id32, "VOD"_sv, "Vodafone Group Plc"_sv, "VOD"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
+    cb(Instr::make(20_id32, "VOD"_sv, "Vodafone Group Plc"_sv, "VOD"_sv, "USD"_sv, 1, 1, 1, 1000, 3,
                    1_lts, 10_lts));
-    cb(Contr::make(21_id32, "VZ"_sv, "Verizon Com"_sv, "VZ"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
+    cb(Instr::make(21_id32, "VZ"_sv, "Verizon Com"_sv, "VZ"_sv, "USD"_sv, 1, 1, 1, 1000, 3, 1_lts,
                    10_lts));
 }
 

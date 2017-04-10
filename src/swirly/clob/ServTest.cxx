@@ -61,24 +61,24 @@ SWIRLY_FIXTURE_TEST_CASE(ServAssets, ServFixture)
     auto it = serv.assets().find("CHF"_sv);
     SWIRLY_CHECK(it != serv.assets().end());
     SWIRLY_CHECK(it->id() == 1_id32);
-    SWIRLY_CHECK(it->mnem() == "CHF"_sv);
+    SWIRLY_CHECK(it->symbol() == "CHF"_sv);
     SWIRLY_CHECK(it->display() == "Switzerland, Francs"_sv);
 
     SWIRLY_CHECK(it->type() == AssetType::Ccy);
 }
 
-SWIRLY_FIXTURE_TEST_CASE(ServContrs, ServFixture)
+SWIRLY_FIXTURE_TEST_CASE(ServInstrs, ServFixture)
 {
-    SWIRLY_CHECK(distance(serv.contrs().begin(), serv.contrs().end()) == 21);
+    SWIRLY_CHECK(distance(serv.instrs().begin(), serv.instrs().end()) == 21);
 
-    auto it = serv.contrs().find("EURUSD"_sv);
-    SWIRLY_CHECK(it != serv.contrs().end());
+    auto it = serv.instrs().find("EURUSD"_sv);
+    SWIRLY_CHECK(it != serv.instrs().end());
     SWIRLY_CHECK(it->id() == 1_id32);
-    SWIRLY_CHECK(it->mnem() == "EURUSD"_sv);
+    SWIRLY_CHECK(it->symbol() == "EURUSD"_sv);
     SWIRLY_CHECK(it->display() == "EURUSD"_sv);
 
-    SWIRLY_CHECK(it->asset() == "EUR"_sv);
-    SWIRLY_CHECK(it->ccy() == "USD"_sv);
+    SWIRLY_CHECK(it->baseAsset() == "EUR"_sv);
+    SWIRLY_CHECK(it->termCcy() == "USD"_sv);
     SWIRLY_CHECK(it->lotNumer() == 1000000);
     SWIRLY_CHECK(it->lotDenom() == 1);
     SWIRLY_CHECK(test::isSame(it->qtyInc(), 1e6, 0.1));
@@ -99,7 +99,7 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarkets, ServFixture)
     SWIRLY_CHECK(it != serv.markets().end());
     SWIRLY_CHECK(it->id() == MarketId);
 
-    SWIRLY_CHECK(it->contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(it->instr() == "EURUSD"_sv);
     SWIRLY_CHECK(it->settlDay() == SettlDay);
     SWIRLY_CHECK(it->state() == 0x1);
 }
@@ -112,24 +112,24 @@ SWIRLY_FIXTURE_TEST_CASE(ServMarket, ServFixture)
     auto& market = serv.market(MarketId);
     SWIRLY_CHECK(market.id() == MarketId);
 
-    SWIRLY_CHECK(market.contr() == "EURUSD"_sv);
+    SWIRLY_CHECK(market.instr() == "EURUSD"_sv);
     SWIRLY_CHECK(market.settlDay() == SettlDay);
     SWIRLY_CHECK(market.state() == 0x1);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
 {
-    const Contr& contr = serv.contr("USDJPY"_sv);
-    const auto marketId = toMarketId(contr.id(), SettlDay);
+    const Instr& instr = serv.instr("USDJPY"_sv);
+    const auto marketId = toMarketId(instr.id(), SettlDay);
 
     // Settl-day before bus-day.
-    SWIRLY_CHECK_THROW(serv.createMarket(contr, Today - 1_jd, 0x1, Now), InvalidException);
+    SWIRLY_CHECK_THROW(serv.createMarket(instr, Today - 1_jd, 0x1, Now), InvalidException);
 
-    auto& market = serv.createMarket(contr, SettlDay, 0x1, Now);
+    auto& market = serv.createMarket(instr, SettlDay, 0x1, Now);
 
     SWIRLY_CHECK(market.id() == marketId);
 
-    SWIRLY_CHECK(market.contr() == "USDJPY"_sv);
+    SWIRLY_CHECK(market.instr() == "USDJPY"_sv);
     SWIRLY_CHECK(market.settlDay() == SettlDay);
     SWIRLY_CHECK(market.state() == 0x1);
 
@@ -139,20 +139,20 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateMarket, ServFixture)
     SWIRLY_CHECK(&*it == &market);
 
     // Already exists.
-    SWIRLY_CHECK_THROW(serv.createMarket(contr, SettlDay, 0x1, Now), AlreadyExistsException);
+    SWIRLY_CHECK_THROW(serv.createMarket(instr, SettlDay, 0x1, Now), AlreadyExistsException);
 }
 
 SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 {
-    const Contr& contr = serv.contr("USDJPY"_sv);
-    const auto marketId = toMarketId(contr.id(), SettlDay);
-    auto& market = serv.createMarket(contr, SettlDay, 0x1, Now);
+    const Instr& instr = serv.instr("USDJPY"_sv);
+    const auto marketId = toMarketId(instr.id(), SettlDay);
+    auto& market = serv.createMarket(instr, SettlDay, 0x1, Now);
 
     serv.updateMarket(market, 0x2, Now);
 
     SWIRLY_CHECK(market.id() == marketId);
 
-    SWIRLY_CHECK(market.contr() == "USDJPY"_sv);
+    SWIRLY_CHECK(market.instr() == "USDJPY"_sv);
     SWIRLY_CHECK(market.settlDay() == SettlDay);
     SWIRLY_CHECK(market.state() == 0x2);
 }
@@ -160,8 +160,8 @@ SWIRLY_FIXTURE_TEST_CASE(ServUpdateMarket, ServFixture)
 SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 {
     auto& accnt = serv.accnt("MARAYL"_sv);
-    const Contr& contr = serv.contr("EURUSD"_sv);
-    const auto marketId = toMarketId(contr.id(), SettlDay);
+    const Instr& instr = serv.instr("EURUSD"_sv);
+    const auto marketId = toMarketId(instr.id(), SettlDay);
     auto& market = serv.market(marketId);
 
     Response resp;
@@ -172,18 +172,18 @@ SWIRLY_FIXTURE_TEST_CASE(ServCreateOrder, ServFixture)
 
     ConstOrderPtr order{resp.orders().front()};
     SWIRLY_CHECK(order->marketId() == market.id());
-    SWIRLY_CHECK(order->contr() == contr.mnem());
+    SWIRLY_CHECK(order->instr() == instr.symbol());
     SWIRLY_CHECK(order->settlDay() == SettlDay);
     SWIRLY_CHECK(order->id() == 1_id64);
-    SWIRLY_CHECK(order->accnt() == accnt.mnem());
+    SWIRLY_CHECK(order->accnt() == accnt.symbol());
     SWIRLY_CHECK(order->ref().empty());
     SWIRLY_CHECK(order->state() == State::New);
     SWIRLY_CHECK(order->side() == Side::Buy);
     SWIRLY_CHECK(order->lots() == 5_lts);
     SWIRLY_CHECK(order->ticks() == 12345_tks);
-    SWIRLY_CHECK(order->resd() == 5_lts);
-    SWIRLY_CHECK(order->exec() == 0_lts);
-    SWIRLY_CHECK(order->cost() == 0_cst);
+    SWIRLY_CHECK(order->resdLots() == 5_lts);
+    SWIRLY_CHECK(order->execLots() == 0_lts);
+    SWIRLY_CHECK(order->execCost() == 0_cst);
     SWIRLY_CHECK(order->lastLots() == 0_lts);
     SWIRLY_CHECK(order->lastTicks() == 0_tks);
     SWIRLY_CHECK(order->minLots() == 1_lts);

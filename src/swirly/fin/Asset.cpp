@@ -30,7 +30,7 @@ Asset::Asset(Asset&&) = default;
 
 void Asset::toJson(ostream& os) const
 {
-    os << "{\"mnem\":\"" << mnem_ //
+    os << "{\"symbol\":\"" << symbol_ //
        << "\",\"display\":\"" << display_ //
        << "\",\"type\":\"" << type_ //
        << "\"}";

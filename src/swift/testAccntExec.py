@@ -61,29 +61,29 @@ class TestCase(RestTestCase):
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
-    resp = client.send('GET', '/accnt/exec')
+    resp = client.send('GET', '/accnt/execs')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('GET', '/accnt/exec')
+    resp = client.send('GET', '/accnt/execs')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def getAll(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec')
+    resp = client.send('GET', '/accnt/execs')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
-      u'cost': 0,
+      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -94,18 +94,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 15344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
-      u'cost': 0,
+      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -116,18 +116,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 4,
       u'lastLots': None,
       u'lastTicks': None,
@@ -138,18 +138,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 4,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 3,
       u'lastLots': None,
       u'lastTicks': None,
@@ -160,18 +160,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 3,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -182,18 +182,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -204,7 +204,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
@@ -213,17 +213,17 @@ class TestCase(RestTestCase):
 
   def getOffset(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec?offset=2')
+    resp = client.send('GET', '/accnt/execs?offset=2')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 4,
       u'lastLots': None,
       u'lastTicks': None,
@@ -234,18 +234,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 4,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 3,
       u'lastLots': None,
       u'lastTicks': None,
@@ -256,18 +256,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 3,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -278,18 +278,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -300,7 +300,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
@@ -309,17 +309,17 @@ class TestCase(RestTestCase):
 
   def getLimit(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec?limit=3')
+    resp = client.send('GET', '/accnt/execs?limit=3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
-      u'cost': 0,
+      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -330,18 +330,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 15344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
-      u'cost': 0,
+      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -352,18 +352,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 4,
       u'lastLots': None,
       u'lastTicks': None,
@@ -374,7 +374,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 4,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
@@ -383,17 +383,17 @@ class TestCase(RestTestCase):
 
   def getOffsetAndLimit(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec?offset=2&limit=3')
+    resp = client.send('GET', '/accnt/execs?offset=2&limit=3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 4,
       u'lastLots': None,
       u'lastTicks': None,
@@ -404,18 +404,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 4,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 3,
       u'lastLots': None,
       u'lastTicks': None,
@@ -426,18 +426,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 3,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -448,7 +448,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
@@ -457,7 +457,7 @@ class TestCase(RestTestCase):
 
   def exceedOffset(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec?offset=99&limit=3')
+    resp = client.send('GET', '/accnt/execs?offset=99&limit=3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -466,17 +466,17 @@ class TestCase(RestTestCase):
 
   def exceedLimit(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec?offset=0&limit=99')
+    resp = client.send('GET', '/accnt/execs?offset=0&limit=99')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
-      u'cost': 0,
+      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -487,18 +487,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 15344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'GBPUSD',
-      u'cost': 0,
+      u'instr': u'GBPUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -509,18 +509,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
       u'ticks': 15346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 4,
       u'lastLots': None,
       u'lastTicks': None,
@@ -531,18 +531,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 4,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12343
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 3,
       u'lastLots': None,
       u'lastTicks': None,
@@ -553,18 +553,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 3,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
       u'ticks': 12344
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 2,
       u'lastLots': None,
       u'lastTicks': None,
@@ -575,18 +575,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 2,
       u'ref': None,
-      u'resd': 3,
+      u'resdLots': 3,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',
       u'ticks': 12346
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -597,7 +597,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'SELL',
       u'state': u'NEW',

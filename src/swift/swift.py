@@ -278,19 +278,19 @@ class Client(object):
 
 class RestTestCase(unittest.TestCase):
 
-  def createMarket(self, client, contr, settlDate):
+  def createMarket(self, client, instr, settlDate):
     client.setAdmin()
-    resp = client.send('POST', '/market',
-                       contr = contr,
+    resp = client.send('POST', '/markets',
+                       instr = instr,
                        settlDate = settlDate,
                        state = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
 
-  def createOrder(self, client, accnt, contr, settlDate, side, lots, ticks):
+  def createOrder(self, client, accnt, instr, settlDate, side, lots, ticks):
     client.setTrader(accnt)
-    resp = client.send('POST', '/accnt/order/' + contr + '/' + str(settlDate),
+    resp = client.send('POST', '/accnt/orders/' + instr + '/' + str(settlDate),
                        side = side,
                        lots = lots,
                        ticks = ticks)

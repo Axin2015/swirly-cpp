@@ -22,14 +22,14 @@
 
 namespace swirly {
 
-constexpr Id64 toMarketId(Id32 contrId, JDay settlDay) noexcept
+constexpr Id64 toMarketId(Id32 instrId, JDay settlDay) noexcept
 {
-    return Id64{(contrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
+    return Id64{(instrId.count() << 16) | (jdToTjd(settlDay) & 0xffff)};
 }
 
-constexpr Id64 toMarketId(Id32 contrId, IsoDate settlDate) noexcept
+constexpr Id64 toMarketId(Id32 instrId, IsoDate settlDate) noexcept
 {
-    return toMarketId(contrId, maybeIsoToJd(settlDate));
+    return toMarketId(instrId, maybeIsoToJd(settlDate));
 }
 
 template <typename ValueT>

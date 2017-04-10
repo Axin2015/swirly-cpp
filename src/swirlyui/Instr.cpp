@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Contr.hxx"
+#include "Instr.hxx"
 
 #include <QJsonObject>
 
@@ -23,13 +23,13 @@ using namespace std;
 namespace swirly {
 namespace ui {
 
-Contr::Impl::Impl(const QString& mnem, const QString& display, const QString& asset,
-                  const QString& ccy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
+Instr::Impl::Impl(const QString& symbol, const QString& display, const QString& baseAsset,
+                  const QString& termCcy, int lotNumer, int lotDenom, int tickNumer, int tickDenom,
                   int pipDp, Lots minLots, Lots maxLots)
-    : mnem{mnem},
+    : symbol{symbol},
       display{display},
-      asset{asset},
-      ccy{ccy},
+      baseAsset{baseAsset},
+      termCcy{termCcy},
       lotNumer{lotNumer},
       lotDenom{lotDenom},
       qtyInc{fractToReal(lotNumer, lotDenom)},
@@ -44,36 +44,36 @@ Contr::Impl::Impl(const QString& mnem, const QString& display, const QString& as
 {
 }
 
-Contr Contr::fromJson(const QJsonObject& obj)
+Instr Instr::fromJson(const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
-    return Contr(fromJson<QString>(obj["mnem"]), fromJson<QString>(obj["display"]),
-                 fromJson<QString>(obj["asset"]), fromJson<QString>(obj["ccy"]),
+    return Instr(fromJson<QString>(obj["symbol"]), fromJson<QString>(obj["display"]),
+                 fromJson<QString>(obj["baseAsset"]), fromJson<QString>(obj["termCcy"]),
                  fromJson<int>(obj["lotNumer"]), fromJson<int>(obj["lotDenom"]),
                  fromJson<int>(obj["tickNumer"]), fromJson<int>(obj["tickDenom"]),
                  fromJson<int>(obj["pipDp"]), fromJson<Lots>(obj["minLots"]),
                  fromJson<Lots>(obj["maxLots"]));
 }
 
-shared_ptr<const Contr::Impl> Contr::empty()
+shared_ptr<const Instr::Impl> Instr::empty()
 {
     static auto impl = make_shared<const Impl>();
     return impl;
 }
 
-QDebug operator<<(QDebug debug, const Contr& contr)
+QDebug operator<<(QDebug debug, const Instr& instr)
 {
-    debug.nospace() << "Contr{mnem=" << contr.mnem() //
-                    << ",display=" << contr.display() //
-                    << ",asset=" << contr.asset() //
-                    << ",ccy=" << contr.ccy() //
-                    << ",lotNumer=" << contr.lotNumer() //
-                    << ",lotDenom=" << contr.lotDenom() //
-                    << ",tickNumer=" << contr.tickNumer() //
-                    << ",tickDenom=" << contr.tickDenom() //
-                    << ",pipDp=" << contr.pipDp() //
-                    << ",minLots=" << contr.minLots() //
-                    << ",maxLots=" << contr.maxLots() //
+    debug.nospace() << "Instr{symbol=" << instr.symbol() //
+                    << ",display=" << instr.display() //
+                    << ",baseAsset=" << instr.baseAsset() //
+                    << ",termCcy=" << instr.termCcy() //
+                    << ",lotNumer=" << instr.lotNumer() //
+                    << ",lotDenom=" << instr.lotDenom() //
+                    << ",tickNumer=" << instr.tickNumer() //
+                    << ",tickDenom=" << instr.tickDenom() //
+                    << ",pipDp=" << instr.pipDp() //
+                    << ",minLots=" << instr.minLots() //
+                    << ",maxLots=" << instr.maxLots() //
                     << '}';
     return debug;
 }

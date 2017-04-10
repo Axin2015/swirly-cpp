@@ -17,8 +17,8 @@
 #include "Model.hxx"
 
 #include <swirly/fin/Asset.hpp>
-#include <swirly/fin/Contr.hpp>
 #include <swirly/fin/Exec.hpp>
+#include <swirly/fin/Instr.hpp>
 #include <swirly/fin/Market.hpp>
 
 #include <swirly/fin/Order.hpp>
@@ -33,36 +33,38 @@ namespace sqlite {
 namespace {
 
 constexpr auto SelectAssetSql = //
-    "SELECT id, mnem, display, type_id FROM asset_t"_sv;
+    "SELECT id, symbol, display, type_id FROM asset_t"_sv;
 
-constexpr auto SelectContrSql = //
-    "SELECT id, mnem, display, asset, ccy, tick_numer, tick_denom, lot_numer, lot_denom,"
-    " pip_dp, min_lots, max_lots FROM contr_v"_sv;
+constexpr auto SelectInstrSql = //
+    "SELECT id, symbol, display, base_asset, term_ccy, tick_numer, tick_denom," //
+    " lot_numer, lot_denom, pip_dp, min_lots, max_lots FROM instr_v"_sv;
 
 constexpr auto SelectMarketSql = //
-    "SELECT id, contr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
+    "SELECT id, instr, settl_day, state, last_lots, last_ticks, last_time, max_id" //
     " FROM market_v"_sv;
 
 constexpr auto SelectAccntSql = //
-    "SELECT mnem FROM accnt_t WHERE modified > ?"_sv;
+    "SELECT symbol FROM accnt_t WHERE modified > ?"_sv;
 
 constexpr auto SelectOrderSql = //
-    "SELECT accnt, market_id, contr, settl_day, id, ref, state_id, side_id, lots, ticks, resd," //
-    " exec, cost, last_lots, last_ticks, min_lots, created, modified" //
-    " FROM order_t WHERE resd > 0;"_sv;
+    "SELECT accnt, market_id, instr, settl_day, id, ref, state_id, side_id, lots, ticks," //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, created, modified" //
+    " FROM order_t WHERE resd_lots > 0;"_sv;
 
 constexpr auto SelectExecSql = //
-    "SELECT market_id, contr, settl_day, id, order_id, ref, state_id, side_id, lots, ticks," //
-    " resd, exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
+    "SELECT market_id, instr, settl_day, id, order_id, ref, state_id, side_id, lots, ticks," //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
+    " cpty, created" //
     " FROM exec_t WHERE accnt = ? ORDER BY seq_id DESC LIMIT ?;"_sv;
 
 constexpr auto SelectTradeSql = //
-    "SELECT accnt, market_id, contr, settl_day, id, order_id, ref, side_id, lots, ticks, resd," //
-    " exec, cost, last_lots, last_ticks, min_lots, match_id, liqInd_id, cpty, created" //
+    "SELECT accnt, market_id, instr, settl_day, id, order_id, ref, side_id, lots, ticks," //
+    " resd_lots, exec_lots, exec_cost, last_lots, last_ticks, min_lots, match_id, liqInd_id," //
+    " cpty, created" //
     " FROM exec_t WHERE state_id = 4 AND archive IS NULL;"_sv;
 
 constexpr auto SelectPosnSql = //
-    "SELECT accnt, market_id, contr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
+    "SELECT accnt, market_id, instr, settl_day, side_id, lots, cost FROM posn_v;"_sv;
 
 } // anonymous
 
@@ -81,7 +83,7 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
 {
     enum {
         Id, //
-        Mnem, //
+        Symbol, //
         Display, //
         TypeId //
     };
@@ -89,20 +91,20 @@ void Model::doReadAsset(const ModelCallback<AssetPtr>& cb) const
     StmtPtr stmt{prepare(*db_, SelectAssetSql)};
     while (step(*stmt)) {
         cb(Asset::make(column<Id32>(*stmt, Id), //
-                       column<string_view>(*stmt, Mnem), //
+                       column<string_view>(*stmt, Symbol), //
                        column<string_view>(*stmt, Display), //
                        column<AssetType>(*stmt, TypeId)));
     }
 }
 
-void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
+void Model::doReadInstr(const ModelCallback<InstrPtr>& cb) const
 {
     enum {
         Id, //
-        Mnem, //
+        Symbol, //
         Display, //
-        Asset, //
-        Ccy, //
+        BaseAsset, //
+        TermCcy, //
         TickNumer, //
         TickDenom, //
         LotNumer, //
@@ -112,13 +114,13 @@ void Model::doReadContr(const ModelCallback<ContrPtr>& cb) const
         MaxLots //
     };
 
-    StmtPtr stmt{prepare(*db_, SelectContrSql)};
+    StmtPtr stmt{prepare(*db_, SelectInstrSql)};
     while (step(*stmt)) {
-        cb(Contr::make(column<Id32>(*stmt, Id), //
-                       column<string_view>(*stmt, Mnem), //
+        cb(Instr::make(column<Id32>(*stmt, Id), //
+                       column<string_view>(*stmt, Symbol), //
                        column<string_view>(*stmt, Display), //
-                       column<string_view>(*stmt, Asset), //
-                       column<string_view>(*stmt, Ccy), //
+                       column<string_view>(*stmt, BaseAsset), //
+                       column<string_view>(*stmt, TermCcy), //
                        column<int>(*stmt, LotNumer), //
                        column<int>(*stmt, LotDenom), //
                        column<int>(*stmt, TickNumer), //
@@ -133,7 +135,7 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 {
     enum { //
         Id, //
-        Contr, //
+        Instr, //
         SettlDay, //
         State, //
         LastLots, //
@@ -145,7 +147,7 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
     StmtPtr stmt{prepare(*db_, SelectMarketSql)};
     while (step(*stmt)) {
         cb(Market::make(column<Id64>(*stmt, Id), //
-                        column<string_view>(*stmt, Contr), //
+                        column<string_view>(*stmt, Instr), //
                         column<JDay>(*stmt, SettlDay), //
                         column<MarketState>(*stmt, State), //
                         column<Lots>(*stmt, LastLots), //
@@ -158,7 +160,7 @@ void Model::doReadMarket(const ModelCallback<MarketPtr>& cb) const
 void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
 {
     enum { //
-        Mnem //
+        Symbol //
     };
 
     StmtPtr stmt{prepare(*db_, SelectAccntSql)};
@@ -166,7 +168,7 @@ void Model::doReadAccnt(Time now, const ModelCallback<string_view>& cb) const
     // One week ago.
     bind(now - 604800000ms);
     while (step(*stmt)) {
-        cb(column<string_view>(*stmt, Mnem));
+        cb(column<string_view>(*stmt, Symbol));
     }
 }
 
@@ -175,7 +177,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     enum { //
         Accnt, //
         MarketId, //
-        Contr, //
+        Instr, //
         SettlDay, //
         Id, //
         Ref, //
@@ -183,9 +185,9 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
         Side, //
         Lots, //
         Ticks, //
-        Resd, //
-        Exec, //
-        Cost, //
+        ResdLots, //
+        ExecLots, //
+        ExecCost, //
         LastLots, //
         LastTicks, //
         MinLots, //
@@ -197,7 +199,7 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
     while (step(*stmt)) {
         cb(Order::make(column<string_view>(*stmt, Accnt), //
                        column<Id64>(*stmt, MarketId), //
-                       column<string_view>(*stmt, Contr), //
+                       column<string_view>(*stmt, Instr), //
                        column<JDay>(*stmt, SettlDay), //
                        column<Id64>(*stmt, Id), //
                        column<string_view>(*stmt, Ref), //
@@ -205,9 +207,9 @@ void Model::doReadOrder(const ModelCallback<OrderPtr>& cb) const
                        column<swirly::Side>(*stmt, Side), //
                        column<swirly::Lots>(*stmt, Lots), //
                        column<swirly::Ticks>(*stmt, Ticks), //
-                       column<swirly::Lots>(*stmt, Resd), //
-                       column<swirly::Lots>(*stmt, Exec), //
-                       column<swirly::Cost>(*stmt, Cost), //
+                       column<swirly::Lots>(*stmt, ResdLots), //
+                       column<swirly::Lots>(*stmt, ExecLots), //
+                       column<swirly::Cost>(*stmt, ExecCost), //
                        column<swirly::Lots>(*stmt, LastLots), //
                        column<swirly::Ticks>(*stmt, LastTicks), //
                        column<swirly::Lots>(*stmt, MinLots), //
@@ -220,7 +222,7 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
 {
     enum { //
         MarketId, //
-        Contr, //
+        Instr, //
         SettlDay, //
         Id, //
         OrderId, //
@@ -229,9 +231,9 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
         Side, //
         Lots, //
         Ticks, //
-        Resd, //
-        Exec, //
-        Cost, //
+        ResdLots, //
+        ExecLots, //
+        ExecCost, //
         LastLots, //
         LastTicks, //
         MinLots, //
@@ -248,7 +250,7 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
     while (step(*stmt)) {
         cb(Exec::make(accnt, //
                       column<Id64>(*stmt, MarketId), //
-                      column<string_view>(*stmt, Contr), //
+                      column<string_view>(*stmt, Instr), //
                       column<JDay>(*stmt, SettlDay), //
                       column<Id64>(*stmt, Id), //
                       column<Id64>(*stmt, OrderId), //
@@ -257,9 +259,9 @@ void Model::doReadExec(string_view accnt, size_t limit, const ModelCallback<Exec
                       column<swirly::Side>(*stmt, Side), //
                       column<swirly::Lots>(*stmt, Lots), //
                       column<swirly::Ticks>(*stmt, Ticks), //
-                      column<swirly::Lots>(*stmt, Resd), //
-                      column<swirly::Lots>(*stmt, Exec), //
-                      column<swirly::Cost>(*stmt, Cost), //
+                      column<swirly::Lots>(*stmt, ResdLots), //
+                      column<swirly::Lots>(*stmt, ExecLots), //
+                      column<swirly::Cost>(*stmt, ExecCost), //
                       column<swirly::Lots>(*stmt, LastLots), //
                       column<swirly::Ticks>(*stmt, LastTicks), //
                       column<swirly::Lots>(*stmt, MinLots), //
@@ -275,7 +277,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     enum { //
         Accnt, //
         MarketId, //
-        Contr, //
+        Instr, //
         SettlDay, //
         Id, //
         OrderId, //
@@ -283,9 +285,9 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
         Side, //
         Lots, //
         Ticks, //
-        Resd, //
-        Exec, //
-        Cost, //
+        ResdLots, //
+        ExecLots, //
+        ExecCost, //
         LastLots, //
         LastTicks, //
         MinLots, //
@@ -299,7 +301,7 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
     while (step(*stmt)) {
         cb(Exec::make(column<string_view>(*stmt, Accnt), //
                       column<Id64>(*stmt, MarketId), //
-                      column<string_view>(*stmt, Contr), //
+                      column<string_view>(*stmt, Instr), //
                       column<JDay>(*stmt, SettlDay), //
                       column<Id64>(*stmt, Id), //
                       column<Id64>(*stmt, OrderId), //
@@ -308,9 +310,9 @@ void Model::doReadTrade(const ModelCallback<ExecPtr>& cb) const
                       column<swirly::Side>(*stmt, Side), //
                       column<swirly::Lots>(*stmt, Lots), //
                       column<swirly::Ticks>(*stmt, Ticks), //
-                      column<swirly::Lots>(*stmt, Resd), //
-                      column<swirly::Lots>(*stmt, Exec), //
-                      column<swirly::Cost>(*stmt, Cost), //
+                      column<swirly::Lots>(*stmt, ResdLots), //
+                      column<swirly::Lots>(*stmt, ExecLots), //
+                      column<swirly::Cost>(*stmt, ExecCost), //
                       column<swirly::Lots>(*stmt, LastLots), //
                       column<swirly::Ticks>(*stmt, LastTicks), //
                       column<swirly::Lots>(*stmt, MinLots), //
@@ -326,7 +328,7 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     enum { //
         Accnt, //
         MarketId, //
-        Contr, //
+        Instr, //
         SettlDay, //
         Side, //
         Lots, //
@@ -340,7 +342,7 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
     while (step(*stmt)) {
         const auto accnt = column<string_view>(*stmt, Accnt);
         auto marketId = column<Id64>(*stmt, MarketId);
-        const auto contr = column<string_view>(*stmt, Contr);
+        const auto instr = column<string_view>(*stmt, Instr);
         auto settlDay = column<JDay>(*stmt, SettlDay);
 
         // FIXME: review when end of day is implemented.
@@ -352,7 +354,7 @@ void Model::doReadPosn(JDay busDay, const ModelCallback<PosnPtr>& cb) const
         bool found;
         tie(it, found) = ps.findHint(accnt, marketId);
         if (!found) {
-            it = ps.insertHint(it, Posn::make(accnt, marketId, contr, settlDay));
+            it = ps.insertHint(it, Posn::make(accnt, marketId, instr, settlDay));
         }
 
         const auto side = column<swirly::Side>(*stmt, Side);

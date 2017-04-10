@@ -18,8 +18,8 @@
 #define SWIRLYUI_CLIENT_HXX
 
 #include "AssetModel.hxx"
-#include "ContrModel.hxx"
 #include "ExecModel.hxx"
+#include "InstrModel.hxx"
 #include "MarketModel.hxx"
 #include "OrderModel.hxx"
 #include "PosnModel.hxx"
@@ -38,7 +38,7 @@ class Client : public QObject {
     ~Client() noexcept = default;
 
     const AssetModel& assetModel() const noexcept { return assetModel_; }
-    const ContrModel& contrModel() const noexcept { return contrModel_; }
+    const InstrModel& instrModel() const noexcept { return instrModel_; }
     const MarketModel& marketModel() const noexcept { return marketModel_; }
     const OrderModel& orderModel() const noexcept { return orderModel_; }
     const ExecModel& execModel() const noexcept { return execModel_; }
@@ -46,15 +46,15 @@ class Client : public QObject {
     const PosnModel& posnModel() const noexcept { return posnModel_; }
 
     AssetModel& assetModel() noexcept { return assetModel_; }
-    ContrModel& contrModel() noexcept { return contrModel_; }
+    InstrModel& instrModel() noexcept { return instrModel_; }
     MarketModel& marketModel() noexcept { return marketModel_; }
     OrderModel& orderModel() noexcept { return orderModel_; }
     ExecModel& execModel() noexcept { return execModel_; }
     TradeModel& tradeModel() noexcept { return tradeModel_; }
     PosnModel& posnModel() noexcept { return posnModel_; }
 
-    virtual void createMarket(const Contr& contr, QDate settlDate) = 0;
-    virtual void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+    virtual void createMarket(const Instr& instr, QDate settlDate) = 0;
+    virtual void createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
                              Lots lots, Ticks ticks)
         = 0;
     virtual void cancelOrders(const OrderKeys& keys) = 0;
@@ -70,7 +70,7 @@ class Client : public QObject {
 
   private:
     AssetModel assetModel_;
-    ContrModel contrModel_;
+    InstrModel instrModel_;
     MarketModel marketModel_;
     OrderModel orderModel_;
     ExecModel execModel_;

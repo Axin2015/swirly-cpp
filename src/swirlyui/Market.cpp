@@ -35,24 +35,24 @@ void toLevels(const QJsonArray& ticks, const QJsonArray& resd, const QJsonArray&
 
 } // anonymous
 
-Market Market::fromJson(const Contr& contr, const QJsonObject& obj)
+Market Market::fromJson(const Instr& instr, const QJsonObject& obj)
 {
     using swirly::ui::fromJson;
 
-    Market market{fromJson<Id64>(obj["id"]),           contr,
+    Market market{fromJson<Id64>(obj["id"]),           instr,
                   fromJson<QDate>(obj["settlDate"]),   fromJson<MarketState>(obj["state"]),
                   fromJson<Lots>(obj["lastLots"]),     fromJson<Ticks>(obj["lastTicks"]),
                   fromJson<QDateTime>(obj["lastTime"])};
 
     const auto bidTicks = obj["bidTicks"].toArray();
-    const auto bidResd = obj["bidResd"].toArray();
+    const auto bidLots = obj["bidLots"].toArray();
     const auto bidCount = obj["bidCount"].toArray();
-    toLevels(bidTicks, bidResd, bidCount, market.bids_);
+    toLevels(bidTicks, bidLots, bidCount, market.bids_);
 
     const auto offerTicks = obj["offerTicks"].toArray();
-    const auto offerResd = obj["offerResd"].toArray();
+    const auto offerLots = obj["offerLots"].toArray();
     const auto offerCount = obj["offerCount"].toArray();
-    toLevels(offerTicks, offerResd, offerCount, market.offers_);
+    toLevels(offerTicks, offerLots, offerCount, market.offers_);
 
     return market;
 }
@@ -60,7 +60,7 @@ Market Market::fromJson(const Contr& contr, const QJsonObject& obj)
 QDebug operator<<(QDebug debug, const Market& market)
 {
     debug.nospace() << "Market{id=" << market.id() //
-                    << ",contr=" << market.contr().mnem() //
+                    << ",instr=" << market.instr().symbol() //
                     << ",settlDate=" << market.settlDate() //
                     << ",state=" << market.state() //
                     << ",lastLots=" << market.lastLots() //

@@ -32,11 +32,11 @@ namespace swirly {
 namespace ui {
 using namespace market;
 
-MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* parent,
+MarketView::MarketView(InstrModel& instrModel, MarketModel& model, QWidget* parent,
                        Qt::WindowFlags f)
     : QWidget{parent, f}, model_(model)
 {
-    auto form = make_unique<MarketForm>(contrModel);
+    auto form = make_unique<MarketForm>(instrModel);
     connect(form.get(), &MarketForm::createMarket, this, &MarketView::createMarket);
     connect(form.get(), &MarketForm::createOrder, this, &MarketView::createOrder);
 
@@ -67,10 +67,10 @@ MarketView::MarketView(ContrModel& contrModel, MarketModel& model, QWidget* pare
 
 MarketView::~MarketView() noexcept = default;
 
-void MarketView::setFields(const QString& contrMnem, QDate settlDate, optional<Lots> lots,
+void MarketView::setFields(const QString& instrSymbol, QDate settlDate, optional<Lots> lots,
                            optional<Ticks> ticks)
 {
-    marketForm_->setFields(contrMnem, settlDate, lots, ticks);
+    marketForm_->setFields(instrSymbol, settlDate, lots, ticks);
 }
 
 void MarketView::slotClicked(const QModelIndex& index)
@@ -84,7 +84,7 @@ void MarketView::slotClicked(const QModelIndex& index)
             model_.toggleCheckState(index.row());
         // Fall-through.
         case Column::Id:
-        case Column::Contr:
+        case Column::Instr:
         case Column::SettlDate:
         case Column::State:
         case Column::LastLots:
@@ -96,10 +96,10 @@ void MarketView::slotClicked(const QModelIndex& index)
             }
             break;
         case Column::BidCount:
-        case Column::BidResd:
+        case Column::BidLots:
         case Column::BidPrice:
-            if (market.bestBid().resd() != 0_lts) {
-                lots = market.bestBid().resd();
+            if (market.bestBid().lots() != 0_lts) {
+                lots = market.bestBid().lots();
                 ticks = market.bestBid().ticks();
             } else if (market.lastLots() != 0_lts) {
                 lots = market.lastLots();
@@ -107,10 +107,10 @@ void MarketView::slotClicked(const QModelIndex& index)
             }
             break;
         case Column::OfferPrice:
-        case Column::OfferResd:
+        case Column::OfferLots:
         case Column::OfferCount:
-            if (market.bestOffer().resd() != 0_lts) {
-                lots = market.bestOffer().resd();
+            if (market.bestOffer().lots() != 0_lts) {
+                lots = market.bestOffer().lots();
                 ticks = market.bestOffer().ticks();
             } else if (market.lastLots() != 0_lts) {
                 lots = market.lastLots();
@@ -118,7 +118,7 @@ void MarketView::slotClicked(const QModelIndex& index)
             }
             break;
         }
-        setFields(market.contr().mnem(), market.settlDate(), lots, ticks);
+        setFields(market.instr().symbol(), market.settlDate(), lots, ticks);
     }
 }
 

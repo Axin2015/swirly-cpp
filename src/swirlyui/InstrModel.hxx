@@ -14,40 +14,40 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRMODEL_HXX
-#define SWIRLYUI_CONTRMODEL_HXX
+#ifndef SWIRLYUI_INSTRMODEL_HXX
+#define SWIRLYUI_INSTRMODEL_HXX
 
-#include "Contr.hxx"
+#include "Instr.hxx"
 #include "TableModel.hxx"
 
 namespace swirly {
 namespace ui {
 
-class ContrModel
-    : public TableModel<QString, Contr, unbox(contr::Column::CheckState), contr::ColumnCount> {
+class InstrModel
+    : public TableModel<QString, Instr, unbox(instr::Column::CheckState), instr::ColumnCount> {
   public:
-    ContrModel(QObject* parent = nullptr);
-    ~ContrModel() noexcept override;
+    InstrModel(QObject* parent = nullptr);
+    ~InstrModel() noexcept override;
 
     QVariant data(const QModelIndex& index, int role) const override;
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
-    Contr find(const QString& mnem) const;
+    Instr find(const QString& symbol) const;
 
-    int indexOf(const QString& mnem) const;
+    int indexOf(const QString& symbol) const;
 
-    void removeRow(const Contr& contr) { TableModel::removeRow(contr.mnem()); }
-    void updateRow(std::uint64_t tag, const Contr& contr)
+    void removeRow(const Instr& instr) { TableModel::removeRow(instr.symbol()); }
+    void updateRow(std::uint64_t tag, const Instr& instr)
     {
-        TableModel::updateRow(contr.mnem(), tag, contr);
+        TableModel::updateRow(instr.symbol(), tag, instr);
     }
 
   private:
-    QVariant header_[contr::ColumnCount];
+    QVariant header_[instr::ColumnCount];
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRMODEL_HXX
+#endif // SWIRLYUI_INSTRMODEL_HXX

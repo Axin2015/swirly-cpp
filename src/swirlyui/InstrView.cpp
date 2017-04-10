@@ -14,9 +14,9 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "ContrView.hxx"
+#include "InstrView.hxx"
 
-#include "ContrModel.hxx"
+#include "InstrModel.hxx"
 #include "Utility.hxx"
 
 #include <QGridLayout>
@@ -29,9 +29,9 @@ using namespace std;
 
 namespace swirly {
 namespace ui {
-using namespace contr;
+using namespace instr;
 
-ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
+InstrView::InstrView(InstrModel& model, QWidget* parent, Qt::WindowFlags f)
     : QWidget{parent, f}, model_(model)
 {
     auto table = make_unique<QTableView>();
@@ -47,21 +47,21 @@ ContrView::ContrView(ContrModel& model, QWidget* parent, Qt::WindowFlags f)
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::NoSelection);
 
-    connect(table.get(), &QTableView::clicked, this, &ContrView::slotClicked);
+    connect(table.get(), &QTableView::clicked, this, &InstrView::slotClicked);
 
     auto layout = make_unique<QGridLayout>();
     layout->addWidget(table_ = table.release(), 0, 0);
     setLayout(layout.release());
 }
 
-ContrView::~ContrView() noexcept = default;
+InstrView::~InstrView() noexcept = default;
 
-void ContrView::resizeColumnsToContents()
+void InstrView::resizeColumnsToContents()
 {
     table_->resizeColumnsToContents();
 }
 
-void ContrView::slotClicked(const QModelIndex& index)
+void InstrView::slotClicked(const QModelIndex& index)
 {
     if (index.isValid() && box<Column>(index.column()) == Column::CheckState) {
         model_.toggleCheckState(index.row());

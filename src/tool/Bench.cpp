@@ -32,15 +32,16 @@ using namespace swirly;
 
 namespace {
 
-const Market& createMarket(Serv& serv, Mnem contrMnem, JDay settlDay, MarketState state, Time now)
+const Market& createMarket(Serv& serv, Symbol instrSymbol, JDay settlDay, MarketState state,
+                           Time now)
 {
-    const auto& contr = serv.contr(contrMnem);
-    const auto marketId = toMarketId(contr.id(), settlDay);
+    const auto& instr = serv.instr(instrSymbol);
+    const auto marketId = toMarketId(instr.id(), settlDay);
     auto it = serv.markets().find(marketId);
     if (it != serv.markets().end()) {
         return *it;
     }
-    return serv.createMarket(contr, settlDay, state, now);
+    return serv.createMarket(instr, settlDay, state, now);
 }
 
 class Archiver {

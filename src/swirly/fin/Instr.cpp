@@ -14,7 +14,7 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Contr.hpp"
+#include "Instr.hpp"
 
 #include <swirly/fin/Conv.hpp>
 
@@ -22,16 +22,16 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Contr) <= 4 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Instr) <= 4 * 64, "crossed cache-line boundary");
 
-Contr::Contr(Id32 id, Mnem mnem, string_view display, Mnem asset, Mnem ccy, int lotNumer,
-             int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
+             int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
              Lots maxLots) noexcept
     : id_{id},
-      mnem_{mnem},
+      symbol_{symbol},
       display_{display},
-      asset_{asset},
-      ccy_{ccy},
+      baseAsset_{baseAsset},
+      termCcy_{termCcy},
       lotNumer_{lotNumer},
       lotDenom_{lotDenom},
       qtyInc_{fractToReal(lotNumer, lotDenom)},
@@ -46,18 +46,18 @@ Contr::Contr(Id32 id, Mnem mnem, string_view display, Mnem asset, Mnem ccy, int 
 {
 }
 
-Contr::~Contr() noexcept = default;
+Instr::~Instr() noexcept = default;
 
-Contr::Contr(const Contr&) = default;
+Instr::Instr(const Instr&) = default;
 
-Contr::Contr(Contr&&) = default;
+Instr::Instr(Instr&&) = default;
 
-void Contr::toJson(ostream& os) const
+void Instr::toJson(ostream& os) const
 {
-    os << "{\"mnem\":\"" << mnem_ //
+    os << "{\"symbol\":\"" << symbol_ //
        << "\",\"display\":\"" << display_ //
-       << "\",\"asset\":\"" << asset_ //
-       << "\",\"ccy\":\"" << ccy_ //
+       << "\",\"baseAsset\":\"" << baseAsset_ //
+       << "\",\"termCcy\":\"" << termCcy_ //
        << "\",\"lotNumer\":" << lotNumer_ //
        << ",\"lotDenom\":" << lotDenom_ //
        << ",\"tickNumer\":" << tickNumer_ //

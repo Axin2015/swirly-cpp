@@ -27,7 +27,7 @@ OrderModel::OrderModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::Ref)] = tr("Ref");
@@ -35,8 +35,8 @@ OrderModel::OrderModel(QObject* parent) : TableModel{parent}
     header_[unbox(Column::Side)] = tr("Side");
     header_[unbox(Column::Lots)] = tr("Lots");
     header_[unbox(Column::Price)] = tr("Price");
-    header_[unbox(Column::Resd)] = tr("Resd");
-    header_[unbox(Column::Exec)] = tr("Exec");
+    header_[unbox(Column::ResdLots)] = tr("Resd Lots");
+    header_[unbox(Column::ExecLots)] = tr("Exec Lots");
     header_[unbox(Column::AvgPrice)] = tr("Avg Price");
     header_[unbox(Column::LastLots)] = tr("Last Lots");
     header_[unbox(Column::LastPrice)] = tr("Last Price");
@@ -72,8 +72,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = toVariant(order.marketId());
             break;
-        case Column::Contr:
-            var = order.contr().mnem();
+        case Column::Instr:
+            var = order.instr().symbol();
             break;
         case Column::SettlDate:
             var = order.settlDate();
@@ -95,24 +95,24 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (order.lots() != 0_lts) {
-                var = ticksToPriceString(order.ticks(), order.contr());
+                var = ticksToPriceString(order.ticks(), order.instr());
             }
             break;
-        case Column::Resd:
-            var = toVariant(order.resd());
+        case Column::ResdLots:
+            var = toVariant(order.resdLots());
             break;
-        case Column::Exec:
-            var = toVariant(order.exec());
+        case Column::ExecLots:
+            var = toVariant(order.execLots());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(order.exec(), order.cost(), order.contr());
+            var = ticksToAvgPriceString(order.execLots(), order.execCost(), order.instr());
             break;
         case Column::LastLots:
             var = toVariant(order.lastLots());
             break;
         case Column::LastPrice:
             if (order.lastLots() != 0_lts) {
-                var = ticksToPriceString(order.lastTicks(), order.contr());
+                var = ticksToPriceString(order.lastTicks(), order.instr());
             }
             break;
         case Column::MinLots:
@@ -130,7 +130,7 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::CheckState:
             break;
         case Column::Accnt:
-        case Column::Contr:
+        case Column::Instr:
         case Column::Ref:
         case Column::State:
         case Column::Side:
@@ -141,8 +141,8 @@ QVariant OrderModel::data(const QModelIndex& index, int role) const
         case Column::Id:
         case Column::Lots:
         case Column::Price:
-        case Column::Resd:
-        case Column::Exec:
+        case Column::ResdLots:
+        case Column::ExecLots:
         case Column::AvgPrice:
         case Column::LastLots:
         case Column::LastPrice:

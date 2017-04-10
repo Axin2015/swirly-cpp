@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_ORDER_HXX
 #define SWIRLYUI_ORDER_HXX
 
-#include "Contr.hxx"
+#include "Instr.hxx"
 
 namespace swirly {
 namespace ui {
@@ -27,7 +27,7 @@ enum class Column : int { //
     CheckState, //
     Accnt, //
     MarketId, //
-    Contr, //
+    Instr, //
     SettlDate, //
     Id, //
     Ref, //
@@ -35,8 +35,8 @@ enum class Column : int { //
     Side, //
     Lots, //
     Price, //
-    Resd, //
-    Exec, //
+    ResdLots, //
+    ExecLots, //
     AvgPrice, //
     LastLots, //
     LastPrice, //
@@ -50,19 +50,19 @@ constexpr int ColumnCount{unbox(Column::Modified) + 1};
 
 class Order {
   public:
-    Order(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Id64 id,
-          const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resd, Lots exec,
-          Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots, const QDateTime& created,
-          const QDateTime& modified);
+    Order(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
+          const QString& ref, State state, Side side, Lots lots, Ticks ticks, Lots resdLots,
+          Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
+          const QDateTime& created, const QDateTime& modified);
     Order() = default;
     ~Order() noexcept = default;
 
-    static Order fromJson(const Contr& contr, const QJsonObject& obj);
+    static Order fromJson(const Instr& instr, const QJsonObject& obj);
 
     OrderKey key() const noexcept { return {marketId_, id_}; }
     const QString& accnt() const noexcept { return accnt_; }
     Id64 marketId() const noexcept { return marketId_; }
-    const Contr& contr() const noexcept { return contr_; }
+    const Instr& instr() const noexcept { return instr_; }
     QDate settlDate() const noexcept { return settlDate_; }
     Id64 id() const noexcept { return id_; }
     const QString& ref() const noexcept { return ref_; }
@@ -70,20 +70,20 @@ class Order {
     Side side() const noexcept { return side_; }
     Lots lots() const noexcept { return lots_; }
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resd() const noexcept { return resd_; }
-    Lots exec() const noexcept { return exec_; }
-    Cost cost() const noexcept { return cost_; }
+    Lots resdLots() const noexcept { return resdLots_; }
+    Lots execLots() const noexcept { return execLots_; }
+    Cost execCost() const noexcept { return execCost_; }
     Lots lastLots() const noexcept { return lastLots_; }
     Ticks lastTicks() const noexcept { return lastTicks_; }
     Lots minLots() const noexcept { return minLots_; }
-    bool done() const noexcept { return resd_ == 0_lts; }
+    bool done() const noexcept { return resdLots_ == 0_lts; }
     const QDateTime& created() const noexcept { return created_; }
     const QDateTime& modified() const noexcept { return modified_; }
 
   private:
     QString accnt_{};
     Id64 marketId_{};
-    Contr contr_{};
+    Instr instr_{};
     QDate settlDate_{};
     Id64 id_{};
     QString ref_{};
@@ -91,9 +91,9 @@ class Order {
     Side side_{};
     Lots lots_{};
     Ticks ticks_{};
-    Lots resd_{};
-    Lots exec_{};
-    Cost cost_{};
+    Lots resdLots_{};
+    Lots execLots_{};
+    Cost execCost_{};
     Lots lastLots_{};
     Ticks lastTicks_{};
     Lots minLots_{};
@@ -107,9 +107,9 @@ inline bool isModified(const Order& prev, const Order& next) noexcept
 {
     return prev.state() != next.state() //
         || prev.lots() != next.lots() //
-        || prev.resd() != next.resd() //
-        || prev.exec() != next.exec() //
-        || prev.cost() != next.cost() //
+        || prev.resdLots() != next.resdLots() //
+        || prev.execLots() != next.execLots() //
+        || prev.execCost() != next.execCost() //
         || prev.lastLots() != next.lastLots() //
         || prev.lastTicks() != next.lastTicks() //
         || prev.modified() != next.modified();

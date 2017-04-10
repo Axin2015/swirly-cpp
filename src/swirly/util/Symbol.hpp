@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_UTIL_MNEM_HPP
-#define SWIRLY_UTIL_MNEM_HPP
+#ifndef SWIRLY_UTIL_SYMBOL_HPP
+#define SWIRLY_UTIL_SYMBOL_HPP
 
 #include <swirly/util/Compare.hpp>
 #include <swirly/util/Defs.hpp>
@@ -33,12 +33,12 @@ using experimental::string_view;
 
 namespace swirly {
 
-static_assert(MaxMnem == 16, "unexpected max mnemonic");
+static_assert(MaxSymbol == 16, "unexpected max symbolonic");
 
 /**
  * Memorable identifier.
  */
-class Mnem {
+class Symbol {
   public:
     using value_type = char;
 
@@ -57,13 +57,13 @@ class Mnem {
     using difference_type = std::ptrdiff_t;
     using size_type = std::size_t;
 
-    Mnem(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
-    constexpr Mnem() noexcept : u64_{0, 0} {}
-    ~Mnem() noexcept = default;
+    Symbol(std::string_view rhs) noexcept { assign(rhs.data(), rhs.size()); }
+    constexpr Symbol() noexcept : u64_{0, 0} {}
+    ~Symbol() noexcept = default;
 
     // Copy.
-    constexpr Mnem(const Mnem& rhs) noexcept : u64_{rhs.u64_[0], rhs.u64_[1]} {}
-    constexpr Mnem& operator=(const Mnem& rhs) noexcept
+    constexpr Symbol(const Symbol& rhs) noexcept : u64_{rhs.u64_[0], rhs.u64_[1]} {}
+    constexpr Symbol& operator=(const Symbol& rhs) noexcept
     {
         u64_[0] = rhs.u64_[0];
         u64_[1] = rhs.u64_[1];
@@ -71,10 +71,10 @@ class Mnem {
     }
 
     // Move.
-    constexpr Mnem(Mnem&&) noexcept = default;
-    Mnem& operator=(Mnem&&) noexcept = default;
+    constexpr Symbol(Symbol&&) noexcept = default;
+    Symbol& operator=(Symbol&&) noexcept = default;
 
-    Mnem& operator=(std::string_view rhs) noexcept
+    Symbol& operator=(std::string_view rhs) noexcept
     {
         assign(rhs.data(), rhs.size());
         return *this;
@@ -91,7 +91,7 @@ class Mnem {
     constexpr const char& front() const noexcept { return buf_[0]; }
     const char& back() const noexcept { return buf_[size() - 1]; }
 
-    int compare(const Mnem& rhs) const noexcept
+    int compare(const Symbol& rhs) const noexcept
     {
         // This function is on the critical path. Avoid memcmp when possible.
         return equal(rhs) ? 0 : std::memcmp(buf_, rhs.buf_, sizeof(buf_));
@@ -99,7 +99,7 @@ class Mnem {
     int compare(std::string_view rhs) const noexcept { return compare(rhs.data(), rhs.size()); }
     constexpr const char* data() const noexcept { return buf_; }
     constexpr bool empty() const noexcept { return u64_[0] == 0 && u64_[1] == 0; }
-    constexpr bool equal(const Mnem& rhs) const noexcept
+    constexpr bool equal(const Symbol& rhs) const noexcept
     {
         return u64_[0] == rhs.u64_[0] && u64_[1] == rhs.u64_[1];
     }
@@ -133,114 +133,114 @@ class Mnem {
     }
     union {
         int64_t u64_[2];
-        char buf_[MaxMnem];
+        char buf_[MaxSymbol];
     };
 };
 
-inline std::string_view operator+(Mnem mnem) noexcept
+inline std::string_view operator+(Symbol symbol) noexcept
 {
-    return {mnem.data(), mnem.size()};
+    return {symbol.data(), symbol.size()};
 }
 
-constexpr bool operator==(Mnem lhs, Mnem rhs) noexcept
+constexpr bool operator==(Symbol lhs, Symbol rhs) noexcept
 {
     return lhs.equal(rhs);
 }
 
-inline bool operator==(Mnem lhs, std::string_view rhs) noexcept
+inline bool operator==(Symbol lhs, std::string_view rhs) noexcept
 {
     return lhs.compare(rhs) == 0;
 }
 
-inline bool operator==(std::string_view lhs, Mnem rhs) noexcept
+inline bool operator==(std::string_view lhs, Symbol rhs) noexcept
 {
     return 0 == rhs.compare(lhs);
 }
 
-constexpr bool operator!=(Mnem lhs, Mnem rhs) noexcept
+constexpr bool operator!=(Symbol lhs, Symbol rhs) noexcept
 {
     return !lhs.equal(rhs);
 }
 
-inline bool operator!=(Mnem lhs, std::string_view rhs) noexcept
+inline bool operator!=(Symbol lhs, std::string_view rhs) noexcept
 {
     return lhs.compare(rhs) != 0;
 }
 
-inline bool operator!=(std::string_view lhs, Mnem rhs) noexcept
+inline bool operator!=(std::string_view lhs, Symbol rhs) noexcept
 {
     return 0 != rhs.compare(lhs);
 }
 
-inline bool operator<(Mnem lhs, Mnem rhs) noexcept
+inline bool operator<(Symbol lhs, Symbol rhs) noexcept
 {
     return lhs.compare(rhs) < 0;
 }
 
-inline bool operator<(Mnem lhs, std::string_view rhs) noexcept
+inline bool operator<(Symbol lhs, std::string_view rhs) noexcept
 {
     return lhs.compare(rhs) < 0;
 }
 
-inline bool operator<(std::string_view lhs, Mnem rhs) noexcept
+inline bool operator<(std::string_view lhs, Symbol rhs) noexcept
 {
     return 0 < rhs.compare(lhs);
 }
 
-inline bool operator<=(Mnem lhs, Mnem rhs) noexcept
+inline bool operator<=(Symbol lhs, Symbol rhs) noexcept
 {
     return lhs.compare(rhs) <= 0;
 }
 
-inline bool operator<=(Mnem lhs, std::string_view rhs) noexcept
+inline bool operator<=(Symbol lhs, std::string_view rhs) noexcept
 {
     return lhs.compare(rhs) <= 0;
 }
 
-inline bool operator<=(std::string_view lhs, Mnem rhs) noexcept
+inline bool operator<=(std::string_view lhs, Symbol rhs) noexcept
 {
     return 0 <= rhs.compare(lhs);
 }
 
-inline bool operator>(Mnem lhs, Mnem rhs) noexcept
+inline bool operator>(Symbol lhs, Symbol rhs) noexcept
 {
     return lhs.compare(rhs) > 0;
 }
 
-inline bool operator>(Mnem lhs, std::string_view rhs) noexcept
+inline bool operator>(Symbol lhs, std::string_view rhs) noexcept
 {
     return lhs.compare(rhs) > 0;
 }
 
-inline bool operator>(std::string_view lhs, Mnem rhs) noexcept
+inline bool operator>(std::string_view lhs, Symbol rhs) noexcept
 {
     return 0 > rhs.compare(lhs);
 }
 
-inline bool operator>=(Mnem lhs, Mnem rhs) noexcept
+inline bool operator>=(Symbol lhs, Symbol rhs) noexcept
 {
     return lhs.compare(rhs) >= 0;
 }
 
-inline bool operator>=(Mnem lhs, std::string_view rhs) noexcept
+inline bool operator>=(Symbol lhs, std::string_view rhs) noexcept
 {
     return lhs.compare(rhs) >= 0;
 }
 
-inline bool operator>=(std::string_view lhs, Mnem rhs) noexcept
+inline bool operator>=(std::string_view lhs, Symbol rhs) noexcept
 {
     return 0 >= rhs.compare(lhs);
 }
 
-inline std::ostream& operator<<(std::ostream& os, Mnem rhs)
+inline std::ostream& operator<<(std::ostream& os, Symbol rhs)
 {
     return os << +rhs;
 }
 
 template <std::size_t SizeN>
-void setCString(char (&lhs)[SizeN], Mnem rhs) noexcept
+void setCString(char (&lhs)[SizeN], Symbol rhs) noexcept
 {
-    constexpr std::size_t len{std::min(SizeN, MaxMnem)};
+    constexpr std::size_t len{std::min(SizeN, MaxSymbol)};
     std::size_t i{0};
     for (; i < len; ++i) {
         lhs[i] = rhs[i];
@@ -252,4 +252,4 @@ void setCString(char (&lhs)[SizeN], Mnem rhs) noexcept
 
 } // swirly
 
-#endif // SWIRLY_UTIL_MNEM_HPP
+#endif // SWIRLY_UTIL_SYMBOL_HPP

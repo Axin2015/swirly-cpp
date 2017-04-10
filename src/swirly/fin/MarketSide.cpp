@@ -28,8 +28,8 @@ void MarketSide::insertOrder(const OrderPtr& order) throw(bad_alloc)
 {
     assert(order->level() == nullptr);
     assert(order->ticks() != 0_tks);
-    assert(order->resd() > 0_lts);
-    assert(order->exec() <= order->lots());
+    assert(order->resdLots() > 0_lts);
+    assert(order->execLots() <= order->lots());
     assert(order->lots() > 0_lts);
     assert(order->minLots() >= 0_lts);
 
@@ -65,7 +65,7 @@ void MarketSide::removeOrder(Level& level, const Order& order) noexcept
 
     if (level.count() == 0) {
         // Remove level.
-        assert(level.resd() == 0_lts);
+        assert(level.lots() == 0_lts);
         levels_.remove(level);
     } else if (&level.firstOrder() == &order) {
         // First order at this level is being removed.
@@ -82,13 +82,13 @@ void MarketSide::removeOrder(Level& level, const Order& order) noexcept
 void MarketSide::reduceLevel(Level& level, const Order& order, Lots delta) noexcept
 {
     assert(delta >= 0_lts);
-    assert(delta <= order.resd());
+    assert(delta <= order.resdLots());
 
-    if (delta < order.resd()) {
+    if (delta < order.resdLots()) {
         // Reduce level's resd by delta.
         level.reduce(delta);
     } else {
-        assert(delta == order.resd());
+        assert(delta == order.resdLots());
         removeOrder(level, order);
     }
 }

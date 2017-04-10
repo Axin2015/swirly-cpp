@@ -25,7 +25,7 @@ using namespace asset;
 AssetModel::AssetModel(QObject* parent) : TableModel{parent}
 {
     header_[unbox(Column::CheckState)] = tr("");
-    header_[unbox(Column::Mnem)] = tr("Mnem");
+    header_[unbox(Column::Symbol)] = tr("Symbol");
     header_[unbox(Column::Display)] = tr("Display");
     header_[unbox(Column::Type)] = tr("Type");
 }
@@ -51,8 +51,8 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Mnem:
-            var = asset.mnem();
+        case Column::Symbol:
+            var = asset.symbol();
             break;
         case Column::Display:
             var = asset.display();
@@ -65,7 +65,7 @@ QVariant AssetModel::data(const QModelIndex& index, int role) const
         switch (box<Column>(index.column())) {
         case Column::CheckState:
             break;
-        case Column::Mnem:
+        case Column::Symbol:
         case Column::Display:
         case Column::Type:
             var = QVariant{Qt::AlignLeft | Qt::AlignVCenter};

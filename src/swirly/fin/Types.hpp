@@ -42,9 +42,9 @@ class Asset;
 using AssetPtr = std::unique_ptr<Asset>;
 using ConstAssetPtr = std::unique_ptr<const Asset>;
 
-class Contr;
-using ContrPtr = std::unique_ptr<Contr>;
-using ConstContrPtr = std::unique_ptr<const Contr>;
+class Instr;
+using InstrPtr = std::unique_ptr<Instr>;
+using ConstInstrPtr = std::unique_ptr<const Instr>;
 
 class Market;
 using MarketPtr = boost::intrusive_ptr<Market>;

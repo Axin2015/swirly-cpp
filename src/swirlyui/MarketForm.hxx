@@ -30,33 +30,33 @@ class QLineEdit;
 namespace swirly {
 namespace ui {
 
-class Contr;
-class ContrModel;
+class Instr;
+class InstrModel;
 
 class MarketForm : public QWidget {
     Q_OBJECT
 
   public:
-    MarketForm(ContrModel& contrModel, QWidget* parent = nullptr,
+    MarketForm(InstrModel& instrModel, QWidget* parent = nullptr,
                Qt::WindowFlags f = Qt::WindowFlags{});
     ~MarketForm() noexcept override;
 
-    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+    void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
                    std::optional<Ticks> ticks);
 
   signals:
-    void createMarket(const Contr& contr, QDate settlDate);
-    void createOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side, Lots lots,
+    void createMarket(const Instr& instr, QDate settlDate);
+    void createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side, Lots lots,
                      Ticks ticks);
 
   private slots:
-    void slotContrChanged(int index);
+    void slotInstrChanged(int index);
     void slotCreateClicked();
     void slotBuyOrSellClicked(Side side);
 
   private:
-    ContrModel& contrModel_;
-    QComboBox* contrComboBox_{nullptr};
+    InstrModel& instrModel_;
+    QComboBox* instrComboBox_{nullptr};
     QDateEdit* settlDateEdit_{nullptr};
     QLineEdit* lotsEdit_{nullptr};
     QLineEdit* priceEdit_{nullptr};

@@ -27,19 +27,19 @@ namespace {
 
 class Foo : public RefCounted<Foo> {
   public:
-    Foo(Mnem mnem, string_view display, int& alive) noexcept
-        : mnem_{mnem}, display_{display}, alive_{alive}
+    Foo(Symbol symbol, string_view display, int& alive) noexcept
+        : symbol_{symbol}, display_{display}, alive_{alive}
     {
         ++alive;
     }
     ~Foo() noexcept { --alive_; }
 
-    auto mnem() const noexcept { return mnem_; }
+    auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
-    boost::intrusive::set_member_hook<> mnemHook_;
+    boost::intrusive::set_member_hook<> symbolHook_;
 
   private:
-    const Mnem mnem_;
+    const Symbol symbol_;
     String<64> display_;
     int& alive_;
 };
@@ -65,15 +65,15 @@ class Bar : public RefCounted<Bar> {
 
 } // anonymous
 
-SWIRLY_TEST_CASE(MnemSet)
+SWIRLY_TEST_CASE(SymbolSet)
 {
     int alive{0};
     {
-        MnemSet<Foo> s;
+        SymbolSet<Foo> s;
 
         Foo& foo1{*s.emplace("FOO"_sv, "Foo One"_sv, alive)};
         SWIRLY_CHECK(alive == 1);
-        SWIRLY_CHECK(foo1.mnem() == "FOO"_sv);
+        SWIRLY_CHECK(foo1.symbol() == "FOO"_sv);
         SWIRLY_CHECK(foo1.display() == "Foo One"_sv);
         SWIRLY_CHECK(s.find("FOO"_sv) != s.end());
 
@@ -86,7 +86,7 @@ SWIRLY_TEST_CASE(MnemSet)
         Foo& foo3{*s.emplaceOrReplace("FOO"_sv, "Foo Three"_sv, alive)};
         SWIRLY_CHECK(alive == 1);
         SWIRLY_CHECK(&foo3 != &foo1);
-        SWIRLY_CHECK(foo3.mnem() == "FOO"_sv);
+        SWIRLY_CHECK(foo3.symbol() == "FOO"_sv);
         SWIRLY_CHECK(foo3.display() == "Foo Three"_sv);
     }
     SWIRLY_CHECK(alive == 0);

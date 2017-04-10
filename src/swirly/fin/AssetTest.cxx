@@ -26,7 +26,7 @@ SWIRLY_TEST_CASE(AssetToString)
     Asset asset{1_id32, "GBP"_sv, "United Kingdom, Pounds"_sv, AssetType::Ccy};
 
     SWIRLY_CHECK(toString(asset) == //
-                 "{\"mnem\":\"GBP\""
+                 "{\"symbol\":\"GBP\""
                  ",\"display\":\"United Kingdom, Pounds\""
                  ",\"type\":\"CCY\""
                  "}");

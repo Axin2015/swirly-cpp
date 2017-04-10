@@ -28,51 +28,51 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.createMarket(client)
-          self.createMarketByContr(client)
+          self.createMarketByInstr(client)
           self.createMarketByMarket(client)
           self.updateMarket(client)
 
   def checkAuth(self, client):
     client.setAuth(None, 0x1)
 
-    resp = client.send('POST', '/market')
+    resp = client.send('POST', '/markets')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/market/USDJPY')
+    resp = client.send('POST', '/markets/USDJPY')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/market/USDJPY/20140302')
+    resp = client.send('POST', '/markets/USDJPY/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('PUT', '/market/USDJPY/20140302')
+    resp = client.send('PUT', '/markets/USDJPY/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
 
-    resp = client.send('POST', '/market')
+    resp = client.send('POST', '/markets')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/market/USDJPY')
+    resp = client.send('POST', '/markets/USDJPY')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/market/USDJPY/20140302')
+    resp = client.send('POST', '/markets/USDJPY/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('PUT', '/market/USDJPY/20140302')
+    resp = client.send('PUT', '/markets/USDJPY/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def createMarket(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/market',
-                       contr = 'EURUSD',
+    resp = client.send('POST', '/markets',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        state = 1)
 
@@ -80,23 +80,23 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'id': 82255,
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
     }, resp.content)
 
-  def createMarketByContr(self, client):
+  def createMarketByInstr(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/market/GBPUSD',
+    resp = client.send('POST', '/markets/GBPUSD',
                        settlDate = 20140302,
                        state = 1)
 
@@ -104,15 +104,15 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'id': 147791,
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
@@ -120,22 +120,22 @@ class TestCase(RestTestCase):
 
   def createMarketByMarket(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/market/USDJPY/20140302',
+    resp = client.send('POST', '/markets/USDJPY/20140302',
                        state = 1)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'USDJPY',
+      u'instr': u'USDJPY',
       u'id': 278863,
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 1
@@ -143,21 +143,21 @@ class TestCase(RestTestCase):
 
   def updateMarket(self, client):
     client.setAdmin()
-    resp = client.send('PUT', '/market/USDJPY/20140302',
+    resp = client.send('PUT', '/markets/USDJPY/20140302',
                        state = 2)
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'bidCount': [None, None, None],
-      u'bidResd': [None, None, None],
+      u'bidLots': [None, None, None],
       u'bidTicks': [None, None, None],
-      u'contr': u'USDJPY',
+      u'instr': u'USDJPY',
       u'id': 278863,
       u'lastLots': None,
       u'lastTicks': None,
       u'lastTime': None,
       u'offerCount': [None, None, None],
-      u'offerResd': [None, None, None],
+      u'offerLots': [None, None, None],
       u'offerTicks': [None, None, None],
       u'settlDate': 20140302,
       u'state': 2

@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_EXEC_HXX
 #define SWIRLYUI_EXEC_HXX
 
-#include "Contr.hxx"
+#include "Instr.hxx"
 
 namespace swirly {
 namespace ui {
@@ -27,7 +27,7 @@ enum class Column : int { //
     CheckState, //
     Accnt, //
     MarketId, //
-    Contr, //
+    Instr, //
     SettlDate, //
     Id, //
     OrderId, //
@@ -36,8 +36,8 @@ enum class Column : int { //
     Side, //
     Lots, //
     Price, //
-    Resd, //
-    Exec, //
+    ResdLots, //
+    ExecLots, //
     AvgPrice, //
     LastLots, //
     LastPrice, //
@@ -53,19 +53,19 @@ constexpr int ColumnCount{unbox(Column::Created) + 1};
 
 class Exec {
   public:
-    Exec(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Id64 id,
+    Exec(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Id64 id,
          Id64 orderId, const QString& ref, State state, Side side, Lots lots, Ticks ticks,
-         Lots resd, Lots exec, Cost cost, Lots lastLots, Ticks lastTicks, Lots minLots,
+         Lots resdLots, Lots execLots, Cost execCost, Lots lastLots, Ticks lastTicks, Lots minLots,
          Id64 matchId, LiqInd liqInd, const QString& cpty, const QDateTime& created);
     Exec() = default;
     ~Exec() noexcept = default;
 
-    static Exec fromJson(const Contr& contr, const QJsonObject& obj);
+    static Exec fromJson(const Instr& instr, const QJsonObject& obj);
 
     ExecKey key() const noexcept { return {marketId_, id_}; }
     const QString& accnt() const noexcept { return accnt_; }
     Id64 marketId() const noexcept { return marketId_; }
-    const Contr& contr() const noexcept { return contr_; }
+    const Instr& instr() const noexcept { return instr_; }
     QDate settlDate() const noexcept { return settlDate_; }
     Id64 id() const noexcept { return id_; }
     Id64 orderId() const noexcept { return orderId_; }
@@ -74,9 +74,9 @@ class Exec {
     Side side() const noexcept { return side_; }
     Lots lots() const noexcept { return lots_; }
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resd() const noexcept { return resd_; }
-    Lots exec() const noexcept { return exec_; }
-    Cost cost() const noexcept { return cost_; }
+    Lots resdLots() const noexcept { return resdLots_; }
+    Lots execLots() const noexcept { return execLots_; }
+    Cost execCost() const noexcept { return execCost_; }
     Lots lastLots() const noexcept { return lastLots_; }
     Ticks lastTicks() const noexcept { return lastTicks_; }
     Lots minLots() const noexcept { return minLots_; }
@@ -88,7 +88,7 @@ class Exec {
   private:
     QString accnt_{};
     Id64 marketId_{};
-    Contr contr_{};
+    Instr instr_{};
     QDate settlDate_{};
     Id64 id_{};
     Id64 orderId_{};
@@ -97,9 +97,9 @@ class Exec {
     Side side_{};
     Lots lots_{};
     Ticks ticks_{};
-    Lots resd_{};
-    Lots exec_{};
-    Cost cost_{};
+    Lots resdLots_{};
+    Lots execLots_{};
+    Cost execCost_{};
     Lots lastLots_{};
     Ticks lastTicks_{};
     Lots minLots_{};

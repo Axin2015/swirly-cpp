@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLYUI_CONTRVIEW_HXX
-#define SWIRLYUI_CONTRVIEW_HXX
+#ifndef SWIRLYUI_INSTRVIEW_HXX
+#define SWIRLYUI_INSTRVIEW_HXX
 
 #include <QWidget>
 
@@ -25,15 +25,15 @@ class QTableView;
 namespace swirly {
 namespace ui {
 
-class Contr;
-class ContrModel;
+class Instr;
+class InstrModel;
 
-class ContrView : public QWidget {
+class InstrView : public QWidget {
     Q_OBJECT
 
   public:
-    ContrView(ContrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
-    ~ContrView() noexcept override;
+    InstrView(InstrModel& model, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags{});
+    ~InstrView() noexcept override;
 
     void resizeColumnsToContents();
 
@@ -43,11 +43,11 @@ class ContrView : public QWidget {
     void slotClicked(const QModelIndex& index);
 
   private:
-    ContrModel& model_;
+    InstrModel& model_;
     QTableView* table_{nullptr};
 };
 
 } // ui
 } // swirly
 
-#endif // SWIRLYUI_CONTRVIEW_HXX
+#endif // SWIRLYUI_INSTRVIEW_HXX

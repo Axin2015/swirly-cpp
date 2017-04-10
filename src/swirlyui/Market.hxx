@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_MARKET_HXX
 #define SWIRLYUI_MARKET_HXX
 
-#include "Contr.hxx"
+#include "Instr.hxx"
 #include "Level.hxx"
 
 namespace swirly {
@@ -27,17 +27,17 @@ namespace market {
 enum class Column : int { //
     CheckState, //
     Id, //
-    Contr, //
+    Instr, //
     SettlDate, //
     State, //
     BidCount, //
-    BidResd, //
+    BidLots, //
     BidPrice, //
     LastLots, //
     LastPrice, //
     LastTime, //
     OfferPrice, //
-    OfferResd, //
+    OfferLots, //
     OfferCount
 };
 constexpr int ColumnCount{unbox(Column::OfferCount) + 1};
@@ -48,10 +48,10 @@ class Market {
   public:
     using Levels = std::array<Level, MaxLevels>;
 
-    Market(Id64 id, const Contr& contr, QDate settlDate, MarketState state, Lots lastLots,
+    Market(Id64 id, const Instr& instr, QDate settlDate, MarketState state, Lots lastLots,
            Ticks lastTicks, const QDateTime& lastTime)
         : id_{id},
-          contr_{contr},
+          instr_{instr},
           settlDate_{settlDate},
           state_{state},
           lastLots_{lastLots},
@@ -62,10 +62,10 @@ class Market {
     Market() = default;
     ~Market() noexcept = default;
 
-    static Market fromJson(const Contr& contr, const QJsonObject& obj);
+    static Market fromJson(const Instr& instr, const QJsonObject& obj);
 
     Id64 id() const noexcept { return id_; }
-    const Contr& contr() const noexcept { return contr_; }
+    const Instr& instr() const noexcept { return instr_; }
     QDate settlDate() const noexcept { return settlDate_; }
     MarketState state() const noexcept { return state_; }
     Lots lastLots() const noexcept { return lastLots_; }
@@ -78,7 +78,7 @@ class Market {
 
   private:
     Id64 id_{};
-    Contr contr_{};
+    Instr instr_{};
     QDate settlDate_{};
     MarketState state_{};
     Lots lastLots_{};

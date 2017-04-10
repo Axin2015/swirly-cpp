@@ -18,8 +18,8 @@
 #define SWIRLYD_RESTSERV_HPP
 
 #include <swirly/util/BasicTypes.hpp>
-#include <swirly/util/Mnem.hpp>
 #include <swirly/util/Profile.hpp>
+#include <swirly/util/Symbol.hpp>
 #include <swirly/util/Time.hpp>
 #include <swirly/util/Tokeniser.hpp>
 
@@ -53,7 +53,7 @@ class RestServ {
 
     void refDataRequest(const HttpRequest& req, Time now, HttpResponse& resp);
     void assetRequest(const HttpRequest& req, Time now, HttpResponse& resp);
-    void contrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
+    void instrRequest(const HttpRequest& req, Time now, HttpResponse& resp);
 
     void accntRequest(const HttpRequest& req, Time now, HttpResponse& resp);
     void marketRequest(const HttpRequest& req, Time now, HttpResponse& resp);
@@ -68,7 +68,7 @@ class RestServ {
     bool matchPath_{false};
     Tokeniser path_;
     std::vector<Id64> ids_;
-    std::vector<Mnem> mnems_;
+    std::vector<Symbol> symbols_;
     Profile profile_;
 };
 

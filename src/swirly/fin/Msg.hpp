@@ -21,8 +21,8 @@
 
 #include <swirly/util/BasicTypes.hpp>
 #include <swirly/util/Date.hpp>
-#include <swirly/util/Mnem.hpp>
 #include <swirly/util/Pipe.hpp>
+#include <swirly/util/Symbol.hpp>
 
 namespace swirly {
 
@@ -30,7 +30,7 @@ enum class MsgType : int { Reset, CreateMarket, UpdateMarket, CreateExec, Archiv
 
 struct SWIRLY_PACKED CreateMarketBody {
     Id64 id;
-    char contr[MaxMnem];
+    char instr[MaxSymbol];
     JDay settlDay;
     MarketState state;
 };
@@ -43,9 +43,9 @@ struct SWIRLY_PACKED UpdateMarketBody {
 static_assert(std::is_pod<UpdateMarketBody>::value, "message-type must be pod");
 
 struct SWIRLY_PACKED CreateExecBody {
-    char accnt[MaxMnem];
+    char accnt[MaxSymbol];
     Id64 marketId;
-    char contr[MaxMnem];
+    char instr[MaxSymbol];
     JDay settlDay;
     Id64 id;
     Id64 orderId;
@@ -54,22 +54,22 @@ struct SWIRLY_PACKED CreateExecBody {
     Side side;
     Lots lots;
     Ticks ticks;
-    Lots resd;
-    Lots exec;
-    Cost cost;
+    Lots resdLots;
+    Lots execLots;
+    Cost execCost;
     Lots lastLots;
     Ticks lastTicks;
     Lots minLots;
     Id64 matchId;
     LiqInd liqInd;
-    char cpty[MaxMnem];
+    char cpty[MaxSymbol];
     // std::chrono::time_point is not pod.
     int64_t created;
     More more;
 };
 static_assert(std::is_pod<CreateExecBody>::value, "message-type must be pod");
 
-constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxMnem - sizeof(int64_t) - sizeof(More))
+constexpr std::size_t MaxIds{(sizeof(CreateExecBody) - MaxSymbol - sizeof(int64_t) - sizeof(More))
                              / sizeof(Id64)};
 struct SWIRLY_PACKED ArchiveTradeBody {
     Id64 marketId;

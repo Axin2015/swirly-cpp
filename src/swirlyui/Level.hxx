@@ -28,19 +28,19 @@ namespace ui {
 
 class Level {
   public:
-    Level(Ticks ticks, Lots resd, int count) : ticks_{ticks}, resd_{resd}, count_{count} {}
+    Level(Ticks ticks, Lots lots, int count) : ticks_{ticks}, lots_{lots}, count_{count} {}
     Level() = default;
     ~Level() noexcept = default;
 
     static Level fromJson(const QJsonObject& obj);
 
     Ticks ticks() const noexcept { return ticks_; }
-    Lots resd() const noexcept { return resd_; }
+    Lots lots() const noexcept { return lots_; }
     int count() const noexcept { return count_; }
 
   private:
     Ticks ticks_{};
-    Lots resd_{};
+    Lots lots_{};
     int count_{};
 };
 

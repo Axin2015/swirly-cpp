@@ -29,10 +29,10 @@ using ConstMarketPtr = boost::intrusive_ptr<const Market>;
 
 class SWIRLY_API Market : public RefCounted<Market>, public Comparable<Market> {
   public:
-    Market(Id64 id, Mnem contr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
+    Market(Id64 id, Symbol instr, JDay settlDay, MarketState state, Lots lastLots = 0_lts,
            Ticks lastTicks = 0_tks, Time lastTime = {}, Id64 maxId = 0_id64) noexcept
         : id_{id},
-          contr_{contr},
+          instr_{instr},
           settlDay_{settlDay},
           state_{state},
           lastLots_{lastLots},
@@ -61,7 +61,7 @@ class SWIRLY_API Market : public RefCounted<Market>, public Comparable<Market> {
 
     int compare(const Market& rhs) const noexcept { return swirly::compare(id_, rhs.id_); }
     auto id() const noexcept { return id_; }
-    auto contr() const noexcept { return contr_; }
+    auto instr() const noexcept { return instr_; }
     auto settlDay() const noexcept { return settlDay_; }
     auto state() const noexcept { return state_; }
     Lots lastLots() const noexcept { return lastLots_; }
@@ -109,7 +109,7 @@ class SWIRLY_API Market : public RefCounted<Market>, public Comparable<Market> {
     }
 
     const Id64 id_;
-    const Mnem contr_;
+    const Symbol instr_;
     const JDay settlDay_;
     MarketState state_;
     Lots lastLots_;

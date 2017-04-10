@@ -32,8 +32,8 @@ class TestCase(RestTestCase):
           self.createMakerBuy(client)
           self.createTakerSell(client)
 
-          self.createMakerBuyByContr(client)
-          self.createTakerSellByContr(client)
+          self.createMakerBuyByInstr(client)
+          self.createTakerSellByInstr(client)
 
           self.createMakerBuyByMarket(client)
           self.createTakerSellByMarket(client)
@@ -41,37 +41,37 @@ class TestCase(RestTestCase):
   def checkAuth(self, client):
     client.setAuth(None, 0x1)
 
-    resp = client.send('POST', '/accnt/trade')
+    resp = client.send('POST', '/accnt/trades')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/accnt/trade/EURUSD')
+    resp = client.send('POST', '/accnt/trades/EURUSD')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/accnt/trade/EURUSD/20140302')
+    resp = client.send('POST', '/accnt/trades/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('ADMIN', ~0x1 & 0x7fffffff)
 
-    resp = client.send('POST', '/accnt/trade')
+    resp = client.send('POST', '/accnt/trades')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/accnt/trade/EURUSD')
+    resp = client.send('POST', '/accnt/trades/EURUSD')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/accnt/trade/EURUSD/20140302')
+    resp = client.send('POST', '/accnt/trades/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def createMakerBuy(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/accnt/trade',
+    resp = client.send('POST', '/accnt/trades',
                        accnt = 'MARAYL',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        ref = 'test1',
                        side = 'BUY',
@@ -84,11 +84,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 123450,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 10,
+      u'execCost': 123450,
+      u'execLots': 10,
       u'id': 1,
       u'lastLots': 10,
       u'lastTicks': 12345,
@@ -98,7 +98,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test1',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',
@@ -106,11 +106,11 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
-      u'cost': 123450,
+      u'instr': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
-      u'exec': 10,
+      u'execCost': 123450,
+      u'execLots': 10,
       u'id': 2,
       u'lastLots': 10,
       u'lastTicks': 12345,
@@ -120,7 +120,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test1',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'TAKER',
       u'settlDate': 20140302,
       u'side': u'SELL',
@@ -130,9 +130,9 @@ class TestCase(RestTestCase):
 
   def createTakerSell(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/accnt/trade',
+    resp = client.send('POST', '/accnt/trades',
                        accnt = 'MARAYL',
-                       contr = 'EURUSD',
+                       instr = 'EURUSD',
                        settlDate = 20140302,
                        ref = 'test2',
                        side = 'SELL',
@@ -145,11 +145,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 185175,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 15,
+      u'execCost': 185175,
+      u'execLots': 15,
       u'id': 3,
       u'lastLots': 15,
       u'lastTicks': 12345,
@@ -159,7 +159,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test2',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'TAKER',
       u'settlDate': 20140302,
       u'side': u'SELL',
@@ -167,11 +167,11 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
-      u'cost': 185175,
+      u'instr': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
-      u'exec': 15,
+      u'execCost': 185175,
+      u'execLots': 15,
       u'id': 4,
       u'lastLots': 15,
       u'lastTicks': 12345,
@@ -181,7 +181,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test2',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',
@@ -189,9 +189,9 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createMakerBuyByContr(self, client):
+  def createMakerBuyByInstr(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/accnt/trade/EURUSD',
+    resp = client.send('POST', '/accnt/trades/EURUSD',
                        accnt = 'MARAYL',
                        settlDate = 20140302,
                        ref = 'test1',
@@ -205,11 +205,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 123450,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 10,
+      u'execCost': 123450,
+      u'execLots': 10,
       u'id': 5,
       u'lastLots': 10,
       u'lastTicks': 12345,
@@ -219,7 +219,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test1',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',
@@ -227,11 +227,11 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
-      u'cost': 123450,
+      u'instr': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
-      u'exec': 10,
+      u'execCost': 123450,
+      u'execLots': 10,
       u'id': 6,
       u'lastLots': 10,
       u'lastTicks': 12345,
@@ -241,7 +241,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test1',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'TAKER',
       u'settlDate': 20140302,
       u'side': u'SELL',
@@ -249,9 +249,9 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }], resp.content)
 
-  def createTakerSellByContr(self, client):
+  def createTakerSellByInstr(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/accnt/trade/EURUSD',
+    resp = client.send('POST', '/accnt/trades/EURUSD',
                        accnt = 'MARAYL',
                        settlDate = 20140302,
                        ref = 'test2',
@@ -265,11 +265,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 185175,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 15,
+      u'execCost': 185175,
+      u'execLots': 15,
       u'id': 7,
       u'lastLots': 15,
       u'lastTicks': 12345,
@@ -279,7 +279,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test2',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'TAKER',
       u'settlDate': 20140302,
       u'side': u'SELL',
@@ -287,11 +287,11 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
-      u'cost': 185175,
+      u'instr': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
-      u'exec': 15,
+      u'execCost': 185175,
+      u'execLots': 15,
       u'id': 8,
       u'lastLots': 15,
       u'lastTicks': 12345,
@@ -301,7 +301,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test2',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',
@@ -311,7 +311,7 @@ class TestCase(RestTestCase):
 
   def createMakerBuyByMarket(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/accnt/trade/EURUSD/20140302',
+    resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test1',
                        side = 'BUY',
@@ -324,11 +324,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 123450,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 10,
+      u'execCost': 123450,
+      u'execLots': 10,
       u'id': 9,
       u'lastLots': 10,
       u'lastTicks': 12345,
@@ -338,7 +338,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test1',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',
@@ -346,11 +346,11 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
-      u'cost': 123450,
+      u'instr': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
-      u'exec': 10,
+      u'execCost': 123450,
+      u'execLots': 10,
       u'id': 10,
       u'lastLots': 10,
       u'lastTicks': 12345,
@@ -360,7 +360,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test1',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'TAKER',
       u'settlDate': 20140302,
       u'side': u'SELL',
@@ -370,7 +370,7 @@ class TestCase(RestTestCase):
 
   def createTakerSellByMarket(self, client):
     client.setAdmin()
-    resp = client.send('POST', '/accnt/trade/EURUSD/20140302',
+    resp = client.send('POST', '/accnt/trades/EURUSD/20140302',
                        accnt = 'MARAYL',
                        ref = 'test2',
                        side = 'SELL',
@@ -383,11 +383,11 @@ class TestCase(RestTestCase):
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 185175,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 15,
+      u'execCost': 185175,
+      u'execLots': 15,
       u'id': 11,
       u'lastLots': 15,
       u'lastTicks': 12345,
@@ -397,7 +397,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test2',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'TAKER',
       u'settlDate': 20140302,
       u'side': u'SELL',
@@ -405,11 +405,11 @@ class TestCase(RestTestCase):
       u'ticks': 12345
     }, {
       u'accnt': u'GOSAYL',
-      u'contr': u'EURUSD',
-      u'cost': 185175,
+      u'instr': u'EURUSD',
       u'cpty': u'MARAYL',
       u'created': self.now,
-      u'exec': 15,
+      u'execCost': 185175,
+      u'execLots': 15,
       u'id': 12,
       u'lastLots': 15,
       u'lastTicks': 12345,
@@ -419,7 +419,7 @@ class TestCase(RestTestCase):
       u'minLots': 1,
       u'orderId': 0,
       u'ref': u'test2',
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',

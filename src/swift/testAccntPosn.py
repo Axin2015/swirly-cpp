@@ -41,7 +41,7 @@ class TestCase(RestTestCase):
           self.checkAuth(client)
 
           self.getAll(client)
-          self.getByContr(client)
+          self.getByInstr(client)
           self.getBySettlDate(client)
 
       with Server(dbFile, self.now) as server:
@@ -49,41 +49,41 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.getAll(client)
-          self.getByContr(client)
+          self.getByInstr(client)
           self.getBySettlDate(client)
 
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
-    resp = client.send('GET', '/accnt/posn')
+    resp = client.send('GET', '/accnt/posns')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/accnt/posn/EURUSD')
+    resp = client.send('GET', '/accnt/posns/EURUSD')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/accnt/posn/EURUSD/20140302')
+    resp = client.send('GET', '/accnt/posns/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('GET', '/accnt/posn')
+    resp = client.send('GET', '/accnt/posns')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/accnt/posn/EURUSD')
+    resp = client.send('GET', '/accnt/posns/EURUSD')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/accnt/posn/EURUSD/20140302')
+    resp = client.send('GET', '/accnt/posns/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def getAll(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/posn')
+    resp = client.send('GET', '/accnt/posns')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -91,7 +91,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 37038,
       u'buyLots': 3,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82255,
       u'sellCost': 37038,
       u'sellLots': 3,
@@ -100,7 +100,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 61730,
       u'buyLots': 5,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82286,
       u'sellCost': 61730,
       u'sellLots': 5,
@@ -109,16 +109,16 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 107422,
       u'buyLots': 7,
-      u'contr': u'GBPUSD',
+      u'instr': u'GBPUSD',
       u'marketId': 147791,
       u'sellCost': 107422,
       u'sellLots': 7,
       u'settlDate': 20140302
     }], resp.content)
 
-  def getByContr(self, client):
+  def getByInstr(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/posn/EURUSD')
+    resp = client.send('GET', '/accnt/posns/EURUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -126,7 +126,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 37038,
       u'buyLots': 3,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82255,
       u'sellCost': 37038,
       u'sellLots': 3,
@@ -135,7 +135,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 61730,
       u'buyLots': 5,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82286,
       u'sellCost': 61730,
       u'sellLots': 5,
@@ -144,7 +144,7 @@ class TestCase(RestTestCase):
 
   def getBySettlDate(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/posn/EURUSD/20140302')
+    resp = client.send('GET', '/accnt/posns/EURUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -152,7 +152,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 37038,
       u'buyLots': 3,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82255,
       u'sellCost': 37038,
       u'sellLots': 3,

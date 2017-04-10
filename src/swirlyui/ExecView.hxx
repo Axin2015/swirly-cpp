@@ -37,7 +37,7 @@ class ExecView : public QWidget {
     ~ExecView() noexcept override;
 
   signals:
-    void setFields(const QString& contrMnem, QDate settlDate, std::optional<Lots> lots,
+    void setFields(const QString& instrSymbol, QDate settlDate, std::optional<Lots> lots,
                    std::optional<Ticks> ticks);
 
   private slots:

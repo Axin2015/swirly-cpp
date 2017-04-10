@@ -28,11 +28,15 @@ namespace {
 
 int bit(string_view sv)
 {
+    // Support both plural and singular forms.
+    if (!sv.empty() && sv.back() == 's') {
+        sv.remove_suffix(1);
+    }
     int i;
     if (sv == "asset") {
         i = EntitySet::Asset;
-    } else if (sv == "contr") {
-        i = EntitySet::Contr;
+    } else if (sv == "instr") {
+        i = EntitySet::Instr;
     } else if (sv == "market") {
         i = EntitySet::Market;
     } else if (sv == "order") {

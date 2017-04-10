@@ -29,7 +29,7 @@ ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
     header_[unbox(Column::CheckState)] = tr("");
     header_[unbox(Column::Accnt)] = tr("Accnt");
     header_[unbox(Column::MarketId)] = tr("Market Id");
-    header_[unbox(Column::Contr)] = tr("Contr");
+    header_[unbox(Column::Instr)] = tr("Instr");
     header_[unbox(Column::SettlDate)] = tr("Settl Date");
     header_[unbox(Column::Id)] = tr("Id");
     header_[unbox(Column::OrderId)] = tr("Order Id");
@@ -38,8 +38,8 @@ ExecModel::ExecModel(QObject* parent) : QAbstractTableModel{parent}
     header_[unbox(Column::Side)] = tr("Side");
     header_[unbox(Column::Lots)] = tr("Lots");
     header_[unbox(Column::Price)] = tr("Price");
-    header_[unbox(Column::Resd)] = tr("Resd");
-    header_[unbox(Column::Exec)] = tr("Exec");
+    header_[unbox(Column::ResdLots)] = tr("Resd Lots");
+    header_[unbox(Column::ExecLots)] = tr("Exec Lots");
     header_[unbox(Column::AvgPrice)] = tr("Avg Price");
     header_[unbox(Column::LastLots)] = tr("Last Lots");
     header_[unbox(Column::LastPrice)] = tr("Last Price");
@@ -87,8 +87,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         case Column::MarketId:
             var = toVariant(exec.marketId());
             break;
-        case Column::Contr:
-            var = exec.contr().mnem();
+        case Column::Instr:
+            var = exec.instr().symbol();
             break;
         case Column::SettlDate:
             var = exec.settlDate();
@@ -103,7 +103,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             var = exec.ref();
             break;
         case Column::State:
-            var = enumString(exec.state(), exec.resd());
+            var = enumString(exec.state(), exec.resdLots());
             break;
         case Column::Side:
             var = enumString(exec.side());
@@ -113,24 +113,24 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
             break;
         case Column::Price:
             if (exec.lots() != 0_lts) {
-                var = ticksToPriceString(exec.ticks(), exec.contr());
+                var = ticksToPriceString(exec.ticks(), exec.instr());
             }
             break;
-        case Column::Resd:
-            var = toVariant(exec.resd());
+        case Column::ResdLots:
+            var = toVariant(exec.resdLots());
             break;
-        case Column::Exec:
-            var = toVariant(exec.exec());
+        case Column::ExecLots:
+            var = toVariant(exec.execLots());
             break;
         case Column::AvgPrice:
-            var = ticksToAvgPriceString(exec.exec(), exec.cost(), exec.contr());
+            var = ticksToAvgPriceString(exec.execLots(), exec.execCost(), exec.instr());
             break;
         case Column::LastLots:
             var = toVariant(exec.lastLots());
             break;
         case Column::LastPrice:
             if (exec.lastLots() != 0_lts) {
-                var = ticksToPriceString(exec.lastTicks(), exec.contr());
+                var = ticksToPriceString(exec.lastTicks(), exec.instr());
             }
             break;
         case Column::MinLots:
@@ -160,7 +160,7 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         case Column::CheckState:
             break;
         case Column::Accnt:
-        case Column::Contr:
+        case Column::Instr:
         case Column::Ref:
         case Column::State:
         case Column::Side:
@@ -174,8 +174,8 @@ QVariant ExecModel::data(const QModelIndex& index, int role) const
         case Column::OrderId:
         case Column::Lots:
         case Column::Price:
-        case Column::Resd:
-        case Column::Exec:
+        case Column::ResdLots:
+        case Column::ExecLots:
         case Column::AvgPrice:
         case Column::LastLots:
         case Column::LastPrice:

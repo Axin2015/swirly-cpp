@@ -166,7 +166,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateMarket, AsyncJournFixture)
     const auto& body = msg.createMarket;
 
     SWIRLY_CHECK(body.id == MarketId);
-    SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
+    SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
     SWIRLY_CHECK(body.settlDay == SettlDay);
     SWIRLY_CHECK(body.state == 0x1);
 }
@@ -190,7 +190,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
     execs[0]
         = makeRefCounted<Exec>("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 1_id64, 2_id64,
                                "REF"_sv, State::New, Side::Buy, 10_lts, 12345_tks, 10_lts, 0_lts,
-                               0_cst, 0_lts, 0_tks, 1_lts, 0_id64, LiqInd::None, Mnem{}, Now);
+                               0_cst, 0_lts, 0_tks, 1_lts, 0_id64, LiqInd::None, Symbol{}, Now);
     execs[1] = makeRefCounted<Exec>("MARAYL"_sv, MarketId, "EURUSD"_sv, SettlDay, 3_id64, 2_id64,
                                     "REF"_sv, State::Trade, Side::Buy, 10_lts, 12345_tks, 5_lts,
                                     5_lts, 61725_cst, 5_lts, 12345_tks, 1_lts, 4_id64,
@@ -204,7 +204,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
 
         SWIRLY_CHECK(strncmp(body.accnt, "MARAYL", sizeof(body.accnt)) == 0);
         SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
+        SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
         SWIRLY_CHECK(body.settlDay == SettlDay);
         SWIRLY_CHECK(body.id == 1_id64);
         SWIRLY_CHECK(body.orderId == 2_id64);
@@ -213,9 +213,9 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         SWIRLY_CHECK(body.side == Side::Buy);
         SWIRLY_CHECK(body.lots == 10_lts);
         SWIRLY_CHECK(body.ticks == 12345_tks);
-        SWIRLY_CHECK(body.resd == 10_lts);
-        SWIRLY_CHECK(body.exec == 0_lts);
-        SWIRLY_CHECK(body.cost == 0_cst);
+        SWIRLY_CHECK(body.resdLots == 10_lts);
+        SWIRLY_CHECK(body.execLots == 0_lts);
+        SWIRLY_CHECK(body.execCost == 0_cst);
         SWIRLY_CHECK(body.lastLots == 0_lts);
         SWIRLY_CHECK(body.lastTicks == 0_tks);
         SWIRLY_CHECK(body.minLots == 1_lts);
@@ -231,7 +231,7 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         const auto& body = msg.createExec;
 
         SWIRLY_CHECK(body.marketId == MarketId);
-        SWIRLY_CHECK(strncmp(body.contr, "EURUSD", sizeof(body.contr)) == 0);
+        SWIRLY_CHECK(strncmp(body.instr, "EURUSD", sizeof(body.instr)) == 0);
         SWIRLY_CHECK(body.settlDay == SettlDay);
         SWIRLY_CHECK(body.id == 3_id64);
         SWIRLY_CHECK(body.orderId == 2_id64);
@@ -241,9 +241,9 @@ SWIRLY_FIXTURE_TEST_CASE(AsyncJournCreateExec, AsyncJournFixture)
         SWIRLY_CHECK(body.side == Side::Buy);
         SWIRLY_CHECK(body.lots == 10_lts);
         SWIRLY_CHECK(body.ticks == 12345_tks);
-        SWIRLY_CHECK(body.resd == 5_lts);
-        SWIRLY_CHECK(body.exec == 5_lts);
-        SWIRLY_CHECK(body.cost == 61725_cst);
+        SWIRLY_CHECK(body.resdLots == 5_lts);
+        SWIRLY_CHECK(body.execLots == 5_lts);
+        SWIRLY_CHECK(body.execCost == 61725_cst);
         SWIRLY_CHECK(body.lastLots == 5_lts);
         SWIRLY_CHECK(body.lastTicks == 12345_tks);
         SWIRLY_CHECK(body.minLots == 1_lts);

@@ -47,7 +47,7 @@ class TestCase(RestTestCase):
 
   def takeOrder(self, client):
     client.setTrader('GOSAYL')
-    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
+    resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'SELL',
                        lots = 5,
                        ticks = 12345)
@@ -57,26 +57,26 @@ class TestCase(RestTestCase):
     self.assertDictEqual({
       u'market': {
         u'bidCount': [None, None, None],
-        u'bidResd': [None, None, None],
+        u'bidLots': [None, None, None],
         u'bidTicks': [None, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': 5,
         u'lastTicks': 12345,
         u'lastTime': self.now,
         u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
+        u'offerLots': [None, None, None],
         u'offerTicks': [None, None, None],
         u'settlDate': 20140302,
         u'state': 0
       },
       u'execs': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
-        u'cost': 61725,
+        u'instr': u'EURUSD',
         u'cpty': u'MARAYL',
         u'created': self.now,
-        u'exec': 5,
+        u'execCost': 61725,
+        u'execLots': 5,
         u'id': 4,
         u'lastLots': 5,
         u'lastTicks': 12345,
@@ -86,7 +86,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'orderId': 2,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'liqInd': u'TAKER',
         u'settlDate': 20140302,
         u'side': u'SELL',
@@ -94,11 +94,11 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 2,
         u'lastLots': None,
         u'lastTicks': None,
@@ -108,7 +108,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'orderId': 2,
         u'ref': None,
-        u'resd': 5,
+        u'resdLots': 5,
         u'liqInd': None,
         u'settlDate': 20140302,
         u'side': u'SELL',
@@ -117,10 +117,10 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'GOSAYL',
-        u'contr': u'EURUSD',
-        u'cost': 61725,
+        u'instr': u'EURUSD',
         u'created': self.now,
-        u'exec': 5,
+        u'execCost': 61725,
+        u'execLots': 5,
         u'id': 2,
         u'lastLots': 5,
         u'lastTicks': 12345,
@@ -129,7 +129,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'settlDate': 20140302,
         u'side': u'SELL',
         u'state': u'TRADE',
@@ -139,7 +139,7 @@ class TestCase(RestTestCase):
         u'accnt': u'GOSAYL',
         u'buyCost': 0,
         u'buyLots': 0,
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'marketId': 82255,
         u'sellCost': 61725,
         u'sellLots': 5,
@@ -149,7 +149,7 @@ class TestCase(RestTestCase):
 
   def makerOrder(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/order')
+    resp = client.send('GET', '/accnt/orders')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -157,17 +157,17 @@ class TestCase(RestTestCase):
 
   def makerExec(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec')
+    resp = client.send('GET', '/accnt/execs')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 61725,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 5,
+      u'execCost': 61725,
+      u'execLots': 5,
       u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12345,
@@ -178,18 +178,18 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 0,
+      u'resdLots': 0,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'TRADE',
       u'ticks': 12345
     }, {
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 0,
+      u'instr': u'EURUSD',
       u'cpty': None,
       u'created': self.now,
-      u'exec': 0,
+      u'execCost': 0,
+      u'execLots': 0,
       u'id': 1,
       u'lastLots': None,
       u'lastTicks': None,
@@ -200,7 +200,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 5,
+      u'resdLots': 5,
       u'settlDate': 20140302,
       u'side': u'BUY',
       u'state': u'NEW',
@@ -209,17 +209,17 @@ class TestCase(RestTestCase):
 
   def makerTrade(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade')
+    resp = client.send('GET', '/accnt/trades')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([{
       u'accnt': u'MARAYL',
-      u'contr': u'EURUSD',
-      u'cost': 61725,
+      u'instr': u'EURUSD',
       u'cpty': u'GOSAYL',
       u'created': self.now,
-      u'exec': 5,
+      u'execCost': 61725,
+      u'execLots': 5,
       u'id': 3,
       u'lastLots': 5,
       u'lastTicks': 12345,
@@ -229,7 +229,7 @@ class TestCase(RestTestCase):
       u'minLots': None,
       u'orderId': 1,
       u'ref': None,
-      u'resd': 0,
+      u'resdLots': 0,
       u'liqInd': u'MAKER',
       u'settlDate': 20140302,
       u'side': u'BUY',
@@ -239,7 +239,7 @@ class TestCase(RestTestCase):
 
   def makerPosn(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/posn')
+    resp = client.send('GET', '/accnt/posns')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -247,7 +247,7 @@ class TestCase(RestTestCase):
       u'accnt': u'MARAYL',
       u'buyCost': 61725,
       u'buyLots': 5,
-      u'contr': u'EURUSD',
+      u'instr': u'EURUSD',
       u'marketId': 82255,
       u'sellCost': 0,
       u'sellLots': 0,

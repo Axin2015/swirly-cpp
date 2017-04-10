@@ -17,8 +17,8 @@
 #include "MainWindow.hxx"
 
 #include "AssetView.hxx"
-#include "ContrView.hxx"
 #include "ExecView.hxx"
+#include "InstrView.hxx"
 #include "MarketView.hxx"
 #include "OrderView.hxx"
 #include "PosnView.hxx"
@@ -38,7 +38,7 @@ MainWindow::MainWindow()
     connect(&client_, &HttpClient::refDataComplete, this, &MainWindow::slotRefDataComplete);
     connect(&client_, &HttpClient::serviceError, this, &MainWindow::slotServiceError);
 
-    auto marketView = make_unique<MarketView>(client_.contrModel(), client_.marketModel());
+    auto marketView = make_unique<MarketView>(client_.instrModel(), client_.marketModel());
     connect(marketView.get(), &MarketView::createMarket, this, &MainWindow::slotCreateMarket);
     connect(marketView.get(), &MarketView::createOrder, this, &MainWindow::slotCreateOrder);
 
@@ -57,7 +57,7 @@ MainWindow::MainWindow()
 
     auto topTabs = make_unique<QTabWidget>();
     topTabs->addTab(assetView_ = new AssetView{client_.assetModel()}, tr("Asset"));
-    topTabs->addTab(contrView_ = new ContrView{client_.contrModel()}, tr("Contr"));
+    topTabs->addTab(instrView_ = new InstrView{client_.instrModel()}, tr("Instr"));
     topTabs->addTab(marketView_ = marketView.release(), tr("Market"));
     topTabs->setCurrentIndex(2);
 
@@ -98,7 +98,7 @@ void MainWindow::slotRefDataComplete()
 {
     qDebug() << "slotRefDataComplete";
     assetView_->resizeColumnsToContents();
-    contrView_->resizeColumnsToContents();
+    instrView_->resizeColumnsToContents();
 }
 
 void MainWindow::slotServiceError(const QString& error)
@@ -106,23 +106,23 @@ void MainWindow::slotServiceError(const QString& error)
     qDebug().nospace() << "slotServiceError: " << error;
 }
 
-void MainWindow::slotCreateMarket(const Contr& contr, QDate settlDate)
+void MainWindow::slotCreateMarket(const Instr& instr, QDate settlDate)
 {
-    qDebug().nospace() << "slotCreateMarket: contr=" << contr //
+    qDebug().nospace() << "slotCreateMarket: instr=" << instr //
                        << ",settlDate=" << settlDate;
-    client_.createMarket(contr, settlDate);
+    client_.createMarket(instr, settlDate);
 }
 
-void MainWindow::slotCreateOrder(const Contr& contr, QDate settlDate, const QString& ref, Side side,
+void MainWindow::slotCreateOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
                                  Lots lots, Ticks ticks)
 {
-    qDebug().nospace() << "slotCreateOrder: contr=" << contr //
+    qDebug().nospace() << "slotCreateOrder: instr=" << instr //
                        << ",settlDate=" << settlDate //
                        << ",ref=" << ref //
                        << ",side=" << side //
                        << ",lots=" << lots //
                        << ",ticks=" << ticks;
-    client_.createOrder(contr, settlDate, ref, side, lots, ticks);
+    client_.createOrder(instr, settlDate, ref, side, lots, ticks);
 }
 
 void MainWindow::slotCancelOrders(const OrderKeys& keys)

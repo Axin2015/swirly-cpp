@@ -17,7 +17,7 @@
 #include "Posn.hpp"
 
 #include <swirly/util/Date.hpp>
-#include <swirly/util/Mnem.hpp>
+#include <swirly/util/Symbol.hpp>
 
 using namespace std;
 
@@ -33,7 +33,7 @@ void Posn::toJson(ostream& os) const
 {
     os << "{\"accnt\":\"" << accnt_ //
        << "\",\"marketId\":" << marketId_ //
-       << ",\"contr\":\"" << contr_ //
+       << ",\"instr\":\"" << instr_ //
        << "\",\"settlDate\":";
     if (settlDay_ != 0_jd) {
         os << jdToIso(settlDay_);

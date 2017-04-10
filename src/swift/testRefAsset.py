@@ -26,49 +26,49 @@ class TestCase(RestTestCase):
           client.setTime(self.now)
 
           self.getAll(client)
-          self.getByMnem(client)
+          self.getBySymbol(client)
 
   def getAll(self, client):
     client.setAnon()
-    resp = client.send('GET', '/refdata/asset')
+    resp = client.send('GET', '/refdata/assets')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertListEqual([
-      {u'display': u'Central Appalachia Coal', u'mnem': u'CAP',  u'type': u'CMDTY'},
-      {u'display': u'Switzerland, Francs', u'mnem': u'CHF', u'type': u'CCY'},
-      {u'display': u'Cisco Systems Inc', u'mnem': u'CSCO', u'type': u'CORP'},
-      {u'display': u'Walt Disney', u'mnem': u'DIS', u'type': u'CORP'},
-      {u'display': u'Ethiopia, Birr', u'mnem': u'ETB', u'type': u'CCY'},
-      {u'display': u'Euro Member Countries, Euro', u'mnem': u'EUR', u'type': u'CCY'},
-      {u'display': u'United Kingdom, Pounds', u'mnem': u'GBP',  u'type': u'CCY'},
-      {u'display': u'Ibm Corp', u'mnem': u'IBM', u'type': u'CORP'},
-      {u'display': u'Illinois Basin Coal', u'mnem': u'ILB', u'type': u'CMDTY'},
-      {u'display': u'Intel Corp', u'mnem': u'INTC', u'type': u'CORP'},
-      {u'display': u'Japan, Yen', u'mnem': u'JPY', u'type': u'CCY'},
-      {u'display': u'Microsoft Corp', u'mnem': u'MSFT', u'type': u'CORP'},
-      {u'display': u'Northern Appalachia Coal', u'mnem': u'NAP', u'type': u'CMDTY'},
-      {u'display': u'Powder River Basin Coal', u'mnem': u'PRB', u'type': u'CMDTY'},
-      {u'display': u'Uinta Basin Coal', u'mnem': u'UIB', u'type': u'CMDTY'},
-      {u'display': u'United States of America, Dollars', u'mnem': u'USD', u'type': u'CCY'},
-      {u'display': u'Viacom Inc', u'mnem': u'VIA', u'type': u'CORP'},
-      {u'display': u'Vodafone Group Plc', u'mnem': u'VOD', u'type': u'CORP'},
-      {u'display': u'Verizon Com', u'mnem': u'VZ', u'type': u'CORP'},
-      {u'display': u'Gelena Abaya A', u'mnem': u'WGAA', u'type': u'CMDTY'},
-      {u'display': u'Kochere A', u'mnem': u'WKCA', u'type': u'CMDTY'},
-      {u'display': u'Wenago A', u'mnem': u'WWNA', u'type': u'CMDTY'},
-      {u'display': u'Yirgachefe A', u'mnem': u'WYCA', u'type': u'CMDTY'},
-      {u'display': u'South Africa, Rand', u'mnem': u'ZAR', u'type': u'CCY'}
+      {u'display': u'Central Appalachia Coal', u'symbol': u'CAP',  u'type': u'CMDTY'},
+      {u'display': u'Switzerland, Francs', u'symbol': u'CHF', u'type': u'CCY'},
+      {u'display': u'Cisco Systems Inc', u'symbol': u'CSCO', u'type': u'CORP'},
+      {u'display': u'Walt Disney', u'symbol': u'DIS', u'type': u'CORP'},
+      {u'display': u'Ethiopia, Birr', u'symbol': u'ETB', u'type': u'CCY'},
+      {u'display': u'Euro Member Countries, Euro', u'symbol': u'EUR', u'type': u'CCY'},
+      {u'display': u'United Kingdom, Pounds', u'symbol': u'GBP',  u'type': u'CCY'},
+      {u'display': u'Ibm Corp', u'symbol': u'IBM', u'type': u'CORP'},
+      {u'display': u'Illinois Basin Coal', u'symbol': u'ILB', u'type': u'CMDTY'},
+      {u'display': u'Intel Corp', u'symbol': u'INTC', u'type': u'CORP'},
+      {u'display': u'Japan, Yen', u'symbol': u'JPY', u'type': u'CCY'},
+      {u'display': u'Microsoft Corp', u'symbol': u'MSFT', u'type': u'CORP'},
+      {u'display': u'Northern Appalachia Coal', u'symbol': u'NAP', u'type': u'CMDTY'},
+      {u'display': u'Powder River Basin Coal', u'symbol': u'PRB', u'type': u'CMDTY'},
+      {u'display': u'Uinta Basin Coal', u'symbol': u'UIB', u'type': u'CMDTY'},
+      {u'display': u'United States of America, Dollars', u'symbol': u'USD', u'type': u'CCY'},
+      {u'display': u'Viacom Inc', u'symbol': u'VIA', u'type': u'CORP'},
+      {u'display': u'Vodafone Group Plc', u'symbol': u'VOD', u'type': u'CORP'},
+      {u'display': u'Verizon Com', u'symbol': u'VZ', u'type': u'CORP'},
+      {u'display': u'Gelena Abaya A', u'symbol': u'WGAA', u'type': u'CMDTY'},
+      {u'display': u'Kochere A', u'symbol': u'WKCA', u'type': u'CMDTY'},
+      {u'display': u'Wenago A', u'symbol': u'WWNA', u'type': u'CMDTY'},
+      {u'display': u'Yirgachefe A', u'symbol': u'WYCA', u'type': u'CMDTY'},
+      {u'display': u'South Africa, Rand', u'symbol': u'ZAR', u'type': u'CCY'}
     ], resp.content)
 
-  def getByMnem(self, client):
+  def getBySymbol(self, client):
     client.setAnon()
-    resp = client.send('GET', '/refdata/asset/EUR')
+    resp = client.send('GET', '/refdata/assets/EUR')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'display': u'Euro Member Countries, Euro',
-      u'mnem': u'EUR',
+      u'symbol': u'EUR',
       u'type': u'CCY'
     }, resp.content)

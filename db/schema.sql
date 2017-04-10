@@ -22,74 +22,74 @@ BEGIN TRANSACTION
 
 CREATE TABLE state_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE
+  symbol CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO state_t (id, mnem) VALUES (1, 'NEW')
+INSERT INTO state_t (id, symbol) VALUES (1, 'NEW')
 ;
-INSERT INTO state_t (id, mnem) VALUES (2, 'REVISE')
+INSERT INTO state_t (id, symbol) VALUES (2, 'REVISE')
 ;
-INSERT INTO state_t (id, mnem) VALUES (3, 'CANCEL')
+INSERT INTO state_t (id, symbol) VALUES (3, 'CANCEL')
 ;
-INSERT INTO state_t (id, mnem) VALUES (4, 'TRADE')
+INSERT INTO state_t (id, symbol) VALUES (4, 'TRADE')
 ;
 
 CREATE TABLE side_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE
+  symbol CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO side_t (id, mnem) VALUES (1, 'BUY')
+INSERT INTO side_t (id, symbol) VALUES (1, 'BUY')
 ;
-INSERT INTO side_t (id, mnem) VALUES (-1, 'SELL')
+INSERT INTO side_t (id, symbol) VALUES (-1, 'SELL')
 ;
 
 CREATE TABLE direct_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE
+  symbol CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO direct_t (id, mnem) VALUES (1, 'PAID')
+INSERT INTO direct_t (id, symbol) VALUES (1, 'PAID')
 ;
-INSERT INTO direct_t (id, mnem) VALUES (-1, 'GIVEN')
+INSERT INTO direct_t (id, symbol) VALUES (-1, 'GIVEN')
 ;
 
 CREATE TABLE liqind_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE
+  symbol CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO liqind_t (id, mnem) VALUES (1, 'MAKER')
+INSERT INTO liqind_t (id, symbol) VALUES (1, 'MAKER')
 ;
-INSERT INTO liqind_t (id, mnem) VALUES (2, 'TAKER')
+INSERT INTO liqind_t (id, symbol) VALUES (2, 'TAKER')
 ;
 
 CREATE TABLE asset_type_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE
+  symbol CHAR(16) NOT NULL UNIQUE
 )
 ;
 
-INSERT INTO asset_type_t (id, mnem) VALUES (1, 'CMDTY')
+INSERT INTO asset_type_t (id, symbol) VALUES (1, 'CMDTY')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (2, 'CORP')
+INSERT INTO asset_type_t (id, symbol) VALUES (2, 'CORP')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (3, 'CCY')
+INSERT INTO asset_type_t (id, symbol) VALUES (3, 'CCY')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (4, 'EQTY')
+INSERT INTO asset_type_t (id, symbol) VALUES (4, 'EQTY')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (5, 'GOVT')
+INSERT INTO asset_type_t (id, symbol) VALUES (5, 'GOVT')
 ;
-INSERT INTO asset_type_t (id, mnem) VALUES (6, 'INDEX')
+INSERT INTO asset_type_t (id, symbol) VALUES (6, 'INDEX')
 ;
 
 CREATE TABLE asset_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE,
+  symbol CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
   type_id INT NOT NULL,
 
@@ -97,12 +97,12 @@ CREATE TABLE asset_t (
 )
 ;
 
-CREATE TABLE contr_t (
+CREATE TABLE instr_t (
   id INT NOT NULL PRIMARY KEY,
-  mnem CHAR(16) NOT NULL UNIQUE,
+  symbol CHAR(16) NOT NULL UNIQUE,
   display VARCHAR(64) NOT NULL UNIQUE,
-  asset CHAR(16) NOT NULL,
-  ccy CHAR(16) NOT NULL,
+  base_asset CHAR(16) NOT NULL,
+  term_ccy CHAR(16) NOT NULL,
   lot_numer INT NOT NULL,
   lot_denom INT NOT NULL,
   tick_numer INT NOT NULL,
@@ -111,13 +111,13 @@ CREATE TABLE contr_t (
   min_lots BIGINT NOT NULL DEFAULT 1,
   max_lots BIGINT NOT NULL,
 
-  FOREIGN KEY (asset) REFERENCES asset_t (mnem),
-  FOREIGN KEY (ccy) REFERENCES asset_t (mnem)
+  FOREIGN KEY (base_asset) REFERENCES asset_t (symbol),
+  FOREIGN KEY (term_ccy) REFERENCES asset_t (symbol)
 )
 ;
 
 CREATE TABLE accnt_t (
-  mnem CHAR(16) NOT NULL PRIMARY KEY,
+  symbol CHAR(16) NOT NULL PRIMARY KEY,
   max_id BIGINT NOT NULL DEFAULT 0,
   created BIGINT NOT NULL,
   modified BIGINT NOT NULL
@@ -128,21 +128,21 @@ CREATE INDEX accnt_modified_idx ON accnt_t (modified);
 
 CREATE TABLE market_t (
   id BIGINT NOT NULL PRIMARY KEY,
-  contr CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   state INT NOT NULL DEFAULT 0,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   last_time BIGINT NULL DEFAULT NULL,
 
-  FOREIGN KEY (contr) REFERENCES contr_t (mnem)
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol)
 )
 ;
 
 CREATE TABLE order_t (
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  contr CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   ref VARCHAR(64) NULL DEFAULT NULL,
@@ -150,9 +150,9 @@ CREATE TABLE order_t (
   side_id INT NOT NULL,
   lots BIGINT NOT NULL,
   ticks BIGINT NOT NULL,
-  resd BIGINT NOT NULL,
-  exec BIGINT NOT NULL,
-  cost BIGINT NOT NULL,
+  resd_lots BIGINT NOT NULL,
+  exec_lots BIGINT NOT NULL,
+  exec_cost BIGINT NOT NULL,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
@@ -162,18 +162,18 @@ CREATE TABLE order_t (
   PRIMARY KEY (market_id, id),
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
-  FOREIGN KEY (contr) REFERENCES contr_t (mnem),
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id)
 )
 ;
 
-CREATE INDEX order_resd_idx ON order_t (resd);
+CREATE INDEX order_resd_idx ON order_t (resd_lots);
 
 CREATE TABLE exec_t (
   accnt CHAR(16) NOT NULL,
   market_id BIGINT NOT NULL,
-  contr CHAR(16) NOT NULL,
+  instr CHAR(16) NOT NULL,
   settl_day INT NULL DEFAULT NULL,
   id BIGINT NOT NULL,
   order_id BIGINT NULL DEFAULT NULL,
@@ -183,9 +183,9 @@ CREATE TABLE exec_t (
   side_id INT NOT NULL,
   lots BIGINT NOT NULL,
   ticks BIGINT NOT NULL,
-  resd BIGINT NOT NULL,
-  exec BIGINT NOT NULL,
-  cost BIGINT NOT NULL,
+  resd_lots BIGINT NOT NULL,
+  exec_lots BIGINT NOT NULL,
+  exec_cost BIGINT NOT NULL,
   last_lots BIGINT NULL DEFAULT NULL,
   last_ticks BIGINT NULL DEFAULT NULL,
   min_lots BIGINT NOT NULL DEFAULT 1,
@@ -199,7 +199,7 @@ CREATE TABLE exec_t (
 
   FOREIGN KEY (market_id) REFERENCES market_t (id),
   FOREIGN KEY (market_id, order_id) REFERENCES order_t (market_id, id),
-  FOREIGN KEY (contr) REFERENCES contr_t (mnem),
+  FOREIGN KEY (instr) REFERENCES instr_t (symbol),
   FOREIGN KEY (state_id) REFERENCES state_t (id),
   FOREIGN KEY (side_id) REFERENCES side_t (id),
   FOREIGN KEY (liqind_id) REFERENCES liqind_t (id)
@@ -217,7 +217,7 @@ CREATE TRIGGER before_insert_on_exec1
     INSERT INTO order_t (
       accnt,
       market_id,
-      contr,
+      instr,
       settl_day,
       id,
       ref,
@@ -225,9 +225,9 @@ CREATE TRIGGER before_insert_on_exec1
       side_id,
       lots,
       ticks,
-      resd,
-      exec,
-      cost,
+      resd_lots,
+      exec_lots,
+      exec_cost,
       last_lots,
       last_ticks,
       min_lots,
@@ -236,7 +236,7 @@ CREATE TRIGGER before_insert_on_exec1
     ) VALUES (
       NEW.accnt,
       NEW.market_id,
-      NEW.contr,
+      NEW.instr,
       NEW.settl_day,
       NEW.order_id,
       NEW.ref,
@@ -244,9 +244,9 @@ CREATE TRIGGER before_insert_on_exec1
       NEW.side_id,
       NEW.lots,
       NEW.ticks,
-      NEW.resd,
-      NEW.exec,
-      NEW.cost,
+      NEW.resd_lots,
+      NEW.exec_lots,
+      NEW.exec_cost,
       NEW.last_lots,
       NEW.last_ticks,
       NEW.min_lots,
@@ -265,9 +265,9 @@ CREATE TRIGGER before_insert_on_exec2
     SET
       state_id = NEW.state_id,
       lots = NEW.lots,
-      resd = NEW.resd,
-      exec = NEW.exec,
-      cost = NEW.cost,
+      resd_lots = NEW.resd_lots,
+      exec_lots = NEW.exec_lots,
+      exec_cost = NEW.exec_cost,
       last_lots = NEW.last_lots,
       last_ticks = NEW.last_ticks,
       modified = NEW.created
@@ -292,7 +292,7 @@ CREATE TRIGGER after_insert_on_exec1
   AFTER INSERT ON exec_t
   BEGIN
     INSERT OR IGNORE INTO accnt_t (
-      mnem,
+      symbol,
       created,
       modified
     ) VALUES (
@@ -304,10 +304,10 @@ CREATE TRIGGER after_insert_on_exec1
     SET
       max_id = max_id + 1,
       modified = NEW.created
-    WHERE mnem = NEW.accnt;
+    WHERE symbol = NEW.accnt;
     UPDATE exec_t
     SET
-      seq_id = (SELECT max_id FROM accnt_t WHERE mnem = NEW.accnt)
+      seq_id = (SELECT max_id FROM accnt_t WHERE symbol = NEW.accnt)
     WHERE market_id = NEW.market_id
     AND id = NEW.id;
   END
@@ -316,22 +316,22 @@ CREATE TRIGGER after_insert_on_exec1
 CREATE VIEW asset_v AS
   SELECT
     a.id,
-    a.mnem,
+    a.symbol,
     a.display,
-    t.mnem type
+    t.symbol type
   FROM asset_t a
   LEFT OUTER JOIN asset_type_t t
   ON a.type_id = t.id
 ;
 
-CREATE VIEW contr_v AS
+CREATE VIEW instr_v AS
   SELECT
     c.id,
-    c.mnem,
+    c.symbol,
     c.display,
     a.type,
-    c.asset,
-    c.ccy,
+    c.base_asset,
+    c.term_ccy,
     c.lot_numer,
     c.lot_denom,
     c.tick_numer,
@@ -339,15 +339,15 @@ CREATE VIEW contr_v AS
     c.pip_dp,
     c.min_lots,
     c.max_lots
-  FROM contr_t c
+  FROM instr_t c
   LEFT OUTER JOIN asset_v a
-  ON c.asset = a.mnem
+  ON c.base_asset = a.symbol
 ;
 
 CREATE VIEW market_v AS
   SELECT
     m.id,
-    m.contr,
+    m.instr,
     m.settl_day,
     m.state,
     m.last_lots,
@@ -364,17 +364,17 @@ CREATE VIEW order_v AS
   SELECT
     o.accnt,
     o.market_id,
-    o.contr,
+    o.instr,
     o.settl_day,
     o.id,
     o.ref,
-    s.mnem state,
-    a.mnem side,
+    s.symbol state,
+    a.symbol side,
     o.lots,
     o.ticks,
-    o.resd,
-    o.exec,
-    o.cost,
+    o.resd_lots,
+    o.exec_lots,
+    o.exec_cost,
     o.last_lots,
     o.last_ticks,
     o.min_lots,
@@ -391,24 +391,24 @@ CREATE VIEW exec_v AS
   SELECT
     e.accnt,
     e.market_id,
-    e.contr,
+    e.instr,
     e.settl_day,
     e.id,
     e.order_id,
     e.ref,
     e.seq_id,
-    s.mnem state,
-    a.mnem side,
+    s.symbol state,
+    a.symbol side,
     e.lots,
     e.ticks,
-    e.resd,
-    e.exec,
-    e.cost,
+    e.resd_lots,
+    e.exec_lots,
+    e.exec_cost,
     e.last_lots,
     e.last_ticks,
     e.min_lots,
     e.match_id,
-    r.mnem liqind,
+    r.symbol liqind,
     e.cpty,
     e.created,
     e.archive
@@ -425,7 +425,7 @@ CREATE VIEW posn_v AS
   SELECT
     e.accnt,
     e.market_id,
-    e.contr,
+    e.instr,
     e.settl_day,
     e.side_id,
     SUM(e.last_lots) lots,

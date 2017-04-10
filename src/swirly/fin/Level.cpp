@@ -28,7 +28,7 @@ Level::Level(const Order& firstOrder) noexcept
     : firstOrder_{&firstOrder},
       key_{detail::composeKey(firstOrder.side(), firstOrder.ticks())},
       ticks_{firstOrder.ticks()},
-      resd_{firstOrder.resd()},
+      lots_{firstOrder.resdLots()},
       count_{1}
 {
 }
@@ -39,13 +39,13 @@ Level::Level(Level&&) = default;
 
 void Level::addOrder(const Order& order) noexcept
 {
-    resd_ += order.resd();
+    lots_ += order.resdLots();
     ++count_;
 }
 
 void Level::subOrder(const Order& order) noexcept
 {
-    resd_ -= order.resd();
+    lots_ -= order.resdLots();
     --count_;
 }
 

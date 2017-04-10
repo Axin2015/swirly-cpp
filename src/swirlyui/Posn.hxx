@@ -17,7 +17,7 @@
 #ifndef SWIRLYUI_POSN_HXX
 #define SWIRLYUI_POSN_HXX
 
-#include "Contr.hxx"
+#include "Instr.hxx"
 
 namespace swirly {
 namespace ui {
@@ -27,7 +27,7 @@ enum class Column : int { //
     CheckState, //
     Accnt, //
     MarketId, //
-    Contr, //
+    Instr, //
     SettlDate, //
     BuyLots, //
     BuyAvgPrice, //
@@ -40,11 +40,11 @@ constexpr int ColumnCount{unbox(Column::SellAvgPrice) + 1};
 
 class Posn {
   public:
-    Posn(const QString& accnt, Id64 marketId, const Contr& contr, QDate settlDate, Lots buyLots,
+    Posn(const QString& accnt, Id64 marketId, const Instr& instr, QDate settlDate, Lots buyLots,
          Cost buyCost, Lots sellLots, Cost sellCost)
         : accnt_{accnt},
           marketId_{marketId},
-          contr_{contr},
+          instr_{instr},
           settlDate_{settlDate},
           buyLots_{buyLots},
           buyCost_{buyCost},
@@ -55,11 +55,11 @@ class Posn {
     Posn() = default;
     ~Posn() noexcept = default;
 
-    static Posn fromJson(const Contr& contr, const QJsonObject& obj);
+    static Posn fromJson(const Instr& instr, const QJsonObject& obj);
 
     const QString& accnt() const noexcept { return accnt_; }
     Id64 marketId() const noexcept { return marketId_; }
-    const Contr& contr() const noexcept { return contr_; }
+    const Instr& instr() const noexcept { return instr_; }
     QDate settlDate() const noexcept { return settlDate_; }
     Lots buyLots() const noexcept { return buyLots_; }
     Cost buyCost() const noexcept { return buyCost_; }
@@ -69,7 +69,7 @@ class Posn {
   private:
     QString accnt_{};
     Id64 marketId_{};
-    Contr contr_{};
+    Instr instr_{};
     QDate settlDate_{};
     Lots buyLots_{};
     Cost buyCost_{};

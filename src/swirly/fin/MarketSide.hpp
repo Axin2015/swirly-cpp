@@ -67,7 +67,7 @@ class SWIRLY_API MarketSide {
     void reviseOrder(Order& order, Lots lots, Time now) noexcept
     {
         assert(lots > 0_lts);
-        assert(lots >= order.exec());
+        assert(lots >= order.execLots());
         assert(lots >= order.minLots());
         assert(lots <= order.lots());
 

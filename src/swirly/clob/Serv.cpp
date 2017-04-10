@@ -37,7 +37,7 @@ using namespace std;
 namespace swirly {
 namespace {
 
-const regex MnemPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
+const regex SymbolPattern{R"(^[0-9A-Za-z-._]{3,16}$)"};
 
 Ticks spread(const Order& takerOrder, const Order& makerOrder, Direct direct) noexcept
 {
@@ -69,10 +69,10 @@ struct Serv::Impl {
     {
         const auto busDay = busDay_(now);
         model.readAsset([& assets = assets_](auto ptr) { assets.insert(move(ptr)); });
-        model.readContr([& contrs = contrs_](auto ptr) { contrs.insert(move(ptr)); });
-        model.readAccnt(now, [this, &model](auto mnem) {
-            auto& accnt = this->accnt(mnem);
-            model.readExec(mnem, accnt.execs().capacity(),
+        model.readInstr([& instrs = instrs_](auto ptr) { instrs.insert(move(ptr)); });
+        model.readAccnt(now, [this, &model](auto symbol) {
+            auto& accnt = this->accnt(symbol);
+            model.readExec(symbol, accnt.execs().capacity(),
                            [&accnt](auto ptr) { accnt.pushExecBack(ptr); });
         });
         model.readMarket([& markets = markets_](MarketPtr ptr) { markets.insert(ptr); });
@@ -102,24 +102,25 @@ struct Serv::Impl {
 
     const AssetSet& assets() const noexcept { return assets_; }
 
-    const Contr& contr(Mnem mnem) const
+    const Instr& instr(Symbol symbol) const
     {
-        auto it = contrs_.find(mnem);
-        if (it == contrs_.end()) {
-            throw MarketNotFoundException{errMsg() << "contract '" << mnem << "' does not exist"};
+        auto it = instrs_.find(symbol);
+        if (it == instrs_.end()) {
+            throw MarketNotFoundException{errMsg() << "instrument '" << symbol
+                                                   << "' does not exist"};
         }
         return *it;
     }
 
-    const ContrSet& contrs() const noexcept { return contrs_; }
+    const InstrSet& instrs() const noexcept { return instrs_; }
 
-    const Accnt& accnt(Mnem mnem) const
+    const Accnt& accnt(Symbol symbol) const
     {
         AccntSet::ConstIterator it;
         bool found;
-        tie(it, found) = accnts_.findHint(mnem);
+        tie(it, found) = accnts_.findHint(symbol);
         if (!found) {
-            it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
+            it = accnts_.insertHint(it, Accnt::make(symbol, maxExecs_));
         }
         return *it;
     }
@@ -135,18 +136,18 @@ struct Serv::Impl {
 
     const MarketSet& markets() const noexcept { return markets_; }
 
-    Accnt& accnt(Mnem mnem)
+    Accnt& accnt(Symbol symbol)
     {
         AccntSet::Iterator it;
         bool found;
-        tie(it, found) = accnts_.findHint(mnem);
+        tie(it, found) = accnts_.findHint(symbol);
         if (!found) {
-            it = accnts_.insertHint(it, Accnt::make(mnem, maxExecs_));
+            it = accnts_.insertHint(it, Accnt::make(symbol, maxExecs_));
         }
         return *it;
     }
 
-    const Market& createMarket(const Contr& contr, JDay settlDay, MarketState state, Time now)
+    const Market& createMarket(const Instr& instr, JDay settlDay, MarketState state, Time now)
     {
         if (settlDay != 0_jd) {
             // busDay <= settlDay.
@@ -155,18 +156,18 @@ struct Serv::Impl {
                 throw InvalidException{"settl-day before bus-day"_sv};
             }
         }
-        const auto id = toMarketId(contr.id(), settlDay);
+        const auto id = toMarketId(instr.id(), settlDay);
 
         MarketSet::Iterator it;
         bool found;
         tie(it, found) = markets_.findHint(id);
         if (found) {
-            throw AlreadyExistsException{errMsg() << "market for '" << contr.mnem() << "' on "
+            throw AlreadyExistsException{errMsg() << "market for '" << instr.symbol() << "' on "
                                                   << jdToIso(settlDay) << " already exists"};
         }
         {
-            auto market = Market::make(id, contr.mnem(), settlDay, state);
-            journ_.createMarket(id, contr.mnem(), settlDay, state);
+            auto market = Market::make(id, instr.symbol(), settlDay, state);
+            journ_.createMarket(id, instr.symbol(), settlDay, state);
             it = markets_.insertHint(it, market);
         }
         return *it;
@@ -190,14 +191,14 @@ struct Serv::Impl {
 
         const auto busDay = busDay_(now);
         if (market.settlDay() != 0_jd && market.settlDay() < busDay) {
-            throw MarketClosedException{errMsg() << "market for '" << market.contr() << "' on "
+            throw MarketClosedException{errMsg() << "market for '" << market.instr() << "' on "
                                                  << jdToIso(market.settlDay()) << " has closed"};
         }
         if (lots == 0_lts || lots < minLots) {
             throw InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
         }
         const auto id = market.allocId();
-        auto order = Order::make(accnt.mnem(), market.id(), market.contr(), market.settlDay(), id,
+        auto order = Order::make(accnt.symbol(), market.id(), market.instr(), market.settlDay(), id,
                                  ref, side, lots, ticks, minLots, now);
         auto exec = newExec(*order, id, now);
 
@@ -220,7 +221,7 @@ struct Serv::Impl {
         if (!matches_.empty()) {
             // Avoid allocating position when there are no matches.
             // N.B. before commit phase, because this may fail.
-            posn = accnt.posn(market.id(), market.contr(), market.settlDay());
+            posn = accnt.posn(market.id(), market.instr(), market.settlDay());
             resp.setPosn(posn);
         }
 
@@ -255,7 +256,7 @@ struct Serv::Impl {
         if (!matches_.empty()) {
             assert(posn);
             commitMatches(accnt, market, now);
-            posn->addTrade(order->side(), order->exec(), order->cost());
+            posn->addTrade(order->side(), order->execLots(), order->execCost());
         }
     }
 
@@ -303,7 +304,7 @@ struct Serv::Impl {
             // 3. less than min lots.
             if (lots == 0_lts //
                 || lots > order.lots() //
-                || lots < order.exec() //
+                || lots < order.execLots() //
                 || lots < order.minLots()) {
                 throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
             }
@@ -392,17 +393,18 @@ struct Serv::Impl {
     }
 
     TradePair createTrade(Accnt& accnt, Market& market, string_view ref, Side side, Lots lots,
-                          Ticks ticks, LiqInd liqInd, Mnem cpty, Time created)
+                          Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
     {
-        auto posn = accnt.posn(market.id(), market.contr(), market.settlDay());
-        auto trade = newManual(accnt.mnem(), market, ref, side, lots, ticks, liqInd, cpty, created);
+        auto posn = accnt.posn(market.id(), market.instr(), market.settlDay());
+        auto trade
+            = newManual(accnt.symbol(), market, ref, side, lots, ticks, liqInd, cpty, created);
         decltype(trade) cptyTrade;
 
         if (!cpty.empty()) {
 
             // Create back-to-back trade if counter-party is specified.
             auto& cptyAccnt = this->accnt(cpty);
-            auto cptyPosn = cptyAccnt.posn(market.id(), market.contr(), market.settlDay());
+            auto cptyPosn = cptyAccnt.posn(market.id(), market.instr(), market.settlDay());
             cptyTrade = trade->opposite(market.allocId());
 
             ConstExecPtr trades[] = {trade, cptyTrade};
@@ -472,19 +474,19 @@ struct Serv::Impl {
   private:
     ExecPtr newExec(const Order& order, Id64 id, Time created) const
     {
-        return Exec::make(order.accnt(), order.marketId(), order.contr(), order.settlDay(), id,
+        return Exec::make(order.accnt(), order.marketId(), order.instr(), order.settlDay(), id,
                           order.id(), order.ref(), order.state(), order.side(), order.lots(),
-                          order.ticks(), order.resd(), order.exec(), order.cost(), order.lastLots(),
-                          order.lastTicks(), order.minLots(), 0_id64, LiqInd::None, Mnem{},
-                          created);
+                          order.ticks(), order.resdLots(), order.execLots(), order.execCost(),
+                          order.lastLots(), order.lastTicks(), order.minLots(), 0_id64,
+                          LiqInd::None, Symbol{}, created);
     }
 
     /**
      * Special factory method for manual trades.
      */
-    ExecPtr newManual(Id64 marketId, Mnem contr, JDay settlDay, Id64 id, Mnem accnt,
-                      string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty,
-                      Time created) const
+    ExecPtr newManual(Id64 marketId, Symbol instr, JDay settlDay, Id64 id, Symbol accnt,
+                      string_view ref, Side side, Lots lots, Ticks ticks, LiqInd liqInd,
+                      Symbol cpty, Time created) const
     {
         const auto orderId = 0_id64;
         const auto state = State::Trade;
@@ -495,15 +497,15 @@ struct Serv::Impl {
         const auto lastTicks = ticks;
         const auto minLots = 1_lts;
         const auto matchId = 0_id64;
-        return Exec::make(accnt, marketId, contr, settlDay, id, orderId, ref, state, side, lots,
+        return Exec::make(accnt, marketId, instr, settlDay, id, orderId, ref, state, side, lots,
                           ticks, resd, exec, cost, lastLots, lastTicks, minLots, matchId, liqInd,
                           cpty, created);
     }
 
-    ExecPtr newManual(Mnem accnt, Market& market, string_view ref, Side side, Lots lots,
-                      Ticks ticks, LiqInd liqInd, Mnem cpty, Time created) const
+    ExecPtr newManual(Symbol accnt, Market& market, string_view ref, Side side, Lots lots,
+                      Ticks ticks, LiqInd liqInd, Symbol cpty, Time created) const
     {
-        return newManual(market.id(), market.contr(), market.settlDay(), market.allocId(), accnt,
+        return newManual(market.id(), market.instr(), market.settlDay(), market.allocId(), accnt,
                          ref, side, lots, ticks, liqInd, cpty, created);
     }
 
@@ -516,7 +518,7 @@ struct Serv::Impl {
         auto it = accnts_.find(makerOrder->accnt());
         assert(it != accnts_.end());
         auto& makerAccnt = *it;
-        auto makerPosn = makerAccnt.posn(market.id(), market.contr(), market.settlDay());
+        auto makerPosn = makerAccnt.posn(market.id(), market.instr(), market.settlDay());
 
         const auto ticks = makerOrder->ticks();
 
@@ -540,7 +542,7 @@ struct Serv::Impl {
 
         for (auto& makerOrder : side.orders()) {
             // Break if order is fully filled.
-            if (sumLots == takerOrder.resd()) {
+            if (sumLots == takerOrder.resdLots()) {
                 break;
             }
             // Only consider orders while prices cross.
@@ -548,7 +550,7 @@ struct Serv::Impl {
                 break;
             }
 
-            const auto lots = min(takerOrder.resd() - sumLots, makerOrder.resd());
+            const auto lots = min(takerOrder.resdLots() - sumLots, makerOrder.resdLots());
             const auto ticks = makerOrder.ticks();
 
             sumLots += lots;
@@ -559,7 +561,7 @@ struct Serv::Impl {
             auto match = newMatch(market, takerOrder, &makerOrder, lots, sumLots, sumCost, now);
 
             // Insert order if trade crossed with self.
-            if (makerOrder.accnt() == takerAccnt.mnem()) {
+            if (makerOrder.accnt() == takerAccnt.symbol()) {
                 // Maker updated first because this is consistent with last-look semantics.
                 // N.B. the reference count is not incremented here.
                 resp.insertOrder(&makerOrder);
@@ -637,7 +639,7 @@ struct Serv::Impl {
         // 3. less than min lots.
         if (lots == 0_lts //
             || lots > order.lots() //
-            || lots < order.exec() //
+            || lots < order.execLots() //
             || lots < order.minLots()) {
             throw new InvalidLotsException{errMsg() << "invalid lots '" << lots << '\''};
         }
@@ -686,7 +688,7 @@ struct Serv::Impl {
     const BusinessDay busDay_{RollHour, NewYork};
     const size_t maxExecs_;
     AssetSet assets_;
-    ContrSet contrs_;
+    InstrSet instrs_;
     MarketSet markets_;
     mutable AccntSet accnts_;
     vector<Match> matches_;
@@ -714,9 +716,9 @@ const AssetSet& Serv::assets() const noexcept
     return impl_->assets();
 }
 
-const ContrSet& Serv::contrs() const noexcept
+const InstrSet& Serv::instrs() const noexcept
 {
-    return impl_->contrs();
+    return impl_->instrs();
 }
 
 const MarketSet& Serv::markets() const noexcept
@@ -724,9 +726,9 @@ const MarketSet& Serv::markets() const noexcept
     return impl_->markets();
 }
 
-const Contr& Serv::contr(Mnem mnem) const
+const Instr& Serv::instr(Symbol symbol) const
 {
-    return impl_->contr(mnem);
+    return impl_->instr(symbol);
 }
 
 const Market& Serv::market(Id64 id) const
@@ -734,14 +736,14 @@ const Market& Serv::market(Id64 id) const
     return impl_->market(id);
 }
 
-const Accnt& Serv::accnt(Mnem mnem) const
+const Accnt& Serv::accnt(Symbol symbol) const
 {
-    return impl_->accnt(mnem);
+    return impl_->accnt(symbol);
 }
 
-const Market& Serv::createMarket(const Contr& contr, JDay settlDay, MarketState state, Time now)
+const Market& Serv::createMarket(const Instr& instr, JDay settlDay, MarketState state, Time now)
 {
-    return impl_->createMarket(contr, settlDay, state, now);
+    return impl_->createMarket(instr, settlDay, state, now);
 }
 
 void Serv::updateMarket(const Market& market, MarketState state, Time now)
@@ -814,7 +816,7 @@ void Serv::cancelOrder(const Market& market, Time now)
 }
 
 TradePair Serv::createTrade(const Accnt& accnt, const Market& market, string_view ref, Side side,
-                            Lots lots, Ticks ticks, LiqInd liqInd, Mnem cpty, Time created)
+                            Lots lots, Ticks ticks, LiqInd liqInd, Symbol cpty, Time created)
 {
     return impl_->createTrade(constCast(accnt), constCast(market), ref, side, lots, ticks, liqInd,
                               cpty, created);

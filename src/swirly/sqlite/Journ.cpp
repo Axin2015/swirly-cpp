@@ -31,7 +31,7 @@ constexpr auto CommitSql = "COMMIT TRANSACTION"_sv;
 constexpr auto RollbackSql = "ROLLBACK TRANSACTION"_sv;
 
 constexpr auto InsertMarketSql = //
-    "INSERT INTO market_t (id, contr, settl_day, state)" //
+    "INSERT INTO market_t (id, instr, settl_day, state)" //
     " VALUES (?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateMarketSql = //
@@ -39,9 +39,9 @@ constexpr auto UpdateMarketSql = //
     " WHERE id = ?1"_sv;
 
 constexpr auto InsertExecSql = //
-    "INSERT INTO exec_t (market_id, contr, settl_day, id, order_id, accnt, ref," //
-    " state_id, side_id, lots, ticks, resd, exec, cost, last_lots, last_ticks," //
-    " min_lots, match_id, liqInd_id, cpty, created)" //
+    "INSERT INTO exec_t (market_id, instr, settl_day, id, order_id, accnt, ref," //
+    " state_id, side_id, lots, ticks, resd_lots, exec_lots, exec_cost, last_lots," //
+    " last_ticks, min_lots, match_id, liqInd_id, cpty, created)" //
     " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"_sv;
 
 constexpr auto UpdateExecSql = //
@@ -99,7 +99,7 @@ void Journ::onCreateMarket(const CreateMarketBody& body)
 
     ScopedBind bind{stmt};
     bind(body.id);
-    bind(toStringView(body.contr));
+    bind(toStringView(body.instr));
     bind(body.settlDay, MaybeNull);
     bind(body.state);
 
@@ -127,7 +127,7 @@ void Journ::onCreateExec(const CreateExecBody& body)
 
     ScopedBind bind{stmt};
     bind(body.marketId);
-    bind(toStringView(body.contr));
+    bind(toStringView(body.instr));
     bind(body.settlDay, MaybeNull);
     bind(body.id);
     bind(body.orderId, MaybeNull);
@@ -137,9 +137,9 @@ void Journ::onCreateExec(const CreateExecBody& body)
     bind(body.side);
     bind(body.lots);
     bind(body.ticks);
-    bind(body.resd);
-    bind(body.exec);
-    bind(body.cost);
+    bind(body.resdLots);
+    bind(body.execLots);
+    bind(body.execCost);
     if (body.lastLots > 0_lts) {
         bind(body.lastLots);
         bind(body.lastTicks);

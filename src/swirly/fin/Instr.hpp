@@ -14,8 +14,8 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#ifndef SWIRLY_FIN_CONTR_HPP
-#define SWIRLY_FIN_CONTR_HPP
+#ifndef SWIRLY_FIN_INSTR_HPP
+#define SWIRLY_FIN_INSTR_HPP
 
 #include <swirly/fin/Types.hpp>
 
@@ -26,36 +26,36 @@ namespace swirly {
 /**
  * A specification that stipulates the terms and conditions of sale.
  */
-class SWIRLY_API Contr : public Comparable<Contr> {
+class SWIRLY_API Instr : public Comparable<Instr> {
   public:
-    Contr(Id32 id, Mnem mnem, std::string_view display, Mnem asset, Mnem ccy, int lotNumer,
-          int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
+    Instr(Id32 id, Symbol symbol, std::string_view display, Symbol baseAsset, Symbol termCcy,
+          int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
           Lots maxLots) noexcept;
 
-    ~Contr() noexcept;
+    ~Instr() noexcept;
 
     // Copy.
-    Contr(const Contr&);
-    Contr& operator=(const Contr&) = delete;
+    Instr(const Instr&);
+    Instr& operator=(const Instr&) = delete;
 
     // Move.
-    Contr(Contr&&);
-    Contr& operator=(Contr&&) = delete;
+    Instr(Instr&&);
+    Instr& operator=(Instr&&) = delete;
 
     template <typename... ArgsT>
-    static ContrPtr make(ArgsT&&... args)
+    static InstrPtr make(ArgsT&&... args)
     {
-        return std::make_unique<Contr>(std::forward<ArgsT>(args)...);
+        return std::make_unique<Instr>(std::forward<ArgsT>(args)...);
     }
 
     void toJson(std::ostream& os) const;
 
-    int compare(const Contr& rhs) const noexcept { return mnem_.compare(rhs.mnem_); }
+    int compare(const Instr& rhs) const noexcept { return symbol_.compare(rhs.symbol_); }
     auto id() const noexcept { return id_; }
-    auto mnem() const noexcept { return mnem_; }
+    auto symbol() const noexcept { return symbol_; }
     auto display() const noexcept { return +display_; }
-    auto asset() const noexcept { return asset_; }
-    auto ccy() const noexcept { return ccy_; }
+    auto baseAsset() const noexcept { return baseAsset_; }
+    auto termCcy() const noexcept { return termCcy_; }
     auto lotNumer() const noexcept { return lotNumer_; }
     auto lotDenom() const noexcept { return lotDenom_; }
     auto qtyInc() const noexcept { return qtyInc_; }
@@ -67,14 +67,14 @@ class SWIRLY_API Contr : public Comparable<Contr> {
     auto priceDp() const noexcept { return priceDp_; }
     auto minLots() const noexcept { return minLots_; }
     auto maxLots() const noexcept { return maxLots_; }
-    boost::intrusive::set_member_hook<> mnemHook_;
+    boost::intrusive::set_member_hook<> symbolHook_;
 
   private:
     const Id32 id_;
-    const Mnem mnem_;
+    const Symbol symbol_;
     const Display display_;
-    const Mnem asset_;
-    const Mnem ccy_;
+    const Symbol baseAsset_;
+    const Symbol termCcy_;
     const int lotNumer_;
     const int lotDenom_;
     // Transient.
@@ -92,14 +92,14 @@ class SWIRLY_API Contr : public Comparable<Contr> {
     const Lots maxLots_;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Contr& contr)
+inline std::ostream& operator<<(std::ostream& os, const Instr& instr)
 {
-    contr.toJson(os);
+    instr.toJson(os);
     return os;
 }
 
-using ContrSet = MnemSet<Contr>;
+using InstrSet = SymbolSet<Instr>;
 
 } // swirly
 
-#endif // SWIRLY_FIN_CONTR_HPP
+#endif // SWIRLY_FIN_INSTR_HPP

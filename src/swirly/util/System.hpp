@@ -24,7 +24,7 @@
 namespace swirly {
 
 /**
- * Daemonise process. Detach from controlling terminal and run in the background as a system daemon.
+ * Daemonise process. Detach from instrolling terminal and run in the background as a system daemon.
  */
 SWIRLY_API void daemon();
 

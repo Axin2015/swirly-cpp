@@ -40,45 +40,45 @@ class TestCase(RestTestCase):
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def cancelSingle(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/2', lots = 0)
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/2', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'market': {
         u'bidCount': [3, None, None],
-        u'bidResd': [21, None, None],
+        u'bidLots': [21, None, None],
         u'bidTicks': [12345, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
         u'lastTime': None,
         u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
+        u'offerLots': [None, None, None],
         u'offerTicks': [None, None, None],
         u'settlDate': 20140302,
         u'state': 0
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 5,
         u'lastLots': None,
         u'lastTicks': None,
@@ -89,7 +89,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'orderId': 2,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
@@ -97,10 +97,10 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 2,
         u'lastLots': None,
         u'lastTicks': None,
@@ -109,7 +109,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
@@ -120,33 +120,33 @@ class TestCase(RestTestCase):
 
   def cancelMulti(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1,3', lots = 0)
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1,3', lots = 0)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
     self.assertDictEqual({
       u'market': {
         u'bidCount': [1, None, None],
-        u'bidResd': [11, None, None],
+        u'bidLots': [11, None, None],
         u'bidTicks': [12345, None, None],
-        u'contr': u'EURUSD',
+        u'instr': u'EURUSD',
         u'id': 82255,
         u'lastLots': None,
         u'lastTicks': None,
         u'lastTime': None,
         u'offerCount': [None, None, None],
-        u'offerResd': [None, None, None],
+        u'offerLots': [None, None, None],
         u'offerTicks': [None, None, None],
         u'settlDate': 20140302,
         u'state': 0
       },
       u'execs': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 7,
         u'lastLots': None,
         u'lastTicks': None,
@@ -156,7 +156,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'orderId': 3,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'liqInd': None,
         u'settlDate': 20140302,
         u'side': u'BUY',
@@ -164,11 +164,11 @@ class TestCase(RestTestCase):
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'cpty': None,
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 6,
         u'lastLots': None,
         u'lastTicks': None,
@@ -178,7 +178,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'orderId': 1,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'liqInd': None,
         u'settlDate': 20140302,
         u'side': u'BUY',
@@ -187,10 +187,10 @@ class TestCase(RestTestCase):
       }],
       u'orders': [{
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 1,
         u'lastLots': None,
         u'lastTicks': None,
@@ -199,17 +199,17 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',
         u'ticks': 12345
       }, {
         u'accnt': u'MARAYL',
-        u'contr': u'EURUSD',
-        u'cost': 0,
+        u'instr': u'EURUSD',
         u'created': self.now,
-        u'exec': 0,
+        u'execCost': 0,
+        u'execLots': 0,
         u'id': 3,
         u'lastLots': None,
         u'lastTicks': None,
@@ -218,7 +218,7 @@ class TestCase(RestTestCase):
         u'minLots': None,
         u'modified': self.now,
         u'ref': None,
-        u'resd': 0,
+        u'resdLots': 0,
         u'settlDate': 20140302,
         u'side': u'BUY',
         u'state': u'CANCEL',

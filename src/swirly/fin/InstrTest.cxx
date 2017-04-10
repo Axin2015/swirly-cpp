@@ -14,23 +14,23 @@
  * not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  */
-#include "Contr.hpp"
+#include "Instr.hpp"
 
 #include <swirly/unit/Test.hpp>
 
 using namespace std;
 using namespace swirly;
 
-SWIRLY_TEST_CASE(ContrToString)
+SWIRLY_TEST_CASE(InstrToString)
 {
-    Contr contr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
+    Instr instr{1_id32, "EURUSD"_sv, "EURUSD"_sv, "EUR"_sv, "USD"_sv, 1000000,
                 1,      1,           10000,       4,        1_lts,    10_lts};
 
-    SWIRLY_CHECK(toString(contr) == //
-                 "{\"mnem\":\"EURUSD\""
+    SWIRLY_CHECK(toString(instr) == //
+                 "{\"symbol\":\"EURUSD\""
                  ",\"display\":\"EURUSD\""
-                 ",\"asset\":\"EUR\""
-                 ",\"ccy\":\"USD\""
+                 ",\"baseAsset\":\"EUR\""
+                 ",\"termCcy\":\"USD\""
                  ",\"lotNumer\":1000000"
                  ",\"lotDenom\":1"
                  ",\"tickNumer\":1"

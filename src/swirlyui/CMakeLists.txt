@@ -30,9 +30,9 @@ set(swirlyui_SOURCES
   AssetModel.cpp
   AssetView.cpp
   Client.cpp
-  Contr.cpp
-  ContrModel.cpp
-  ContrView.cpp
+  Instr.cpp
+  InstrModel.cpp
+  InstrView.cpp
   Exec.cpp
   ExecModel.cpp
   ExecView.cpp
