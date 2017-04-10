@@ -28,6 +28,10 @@ namespace {
 
 int bit(string_view sv)
 {
+    // Support both plural and singular forms.
+    if (!sv.empty() && sv.back() == 's') {
+        sv.remove_suffix(1);
+    }
     int i;
     if (sv == "asset") {
         i = EntitySet::Asset;

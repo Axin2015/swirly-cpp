@@ -57,35 +57,35 @@ class TestCase(RestTestCase):
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
-    resp = client.send('GET', '/accnt/trade')
+    resp = client.send('GET', '/accnt/trades')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/accnt/trade/EURUSD')
+    resp = client.send('GET', '/accnt/trades/EURUSD')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('GET', '/accnt/trade/EURUSD/20140302')
+    resp = client.send('GET', '/accnt/trades/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('GET', '/accnt/trade')
+    resp = client.send('GET', '/accnt/trades')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/accnt/trade/EURUSD')
+    resp = client.send('GET', '/accnt/trades/EURUSD')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('GET', '/accnt/trade/EURUSD/20140302')
+    resp = client.send('GET', '/accnt/trades/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def getAll(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade')
+    resp = client.send('GET', '/accnt/trades')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -225,7 +225,7 @@ class TestCase(RestTestCase):
 
   def getByInstr(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade/EURUSD')
+    resp = client.send('GET', '/accnt/trades/EURUSD')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -321,7 +321,7 @@ class TestCase(RestTestCase):
 
   def getByMarket(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade/GBPUSD/20140302')
+    resp = client.send('GET', '/accnt/trades/GBPUSD/20140302')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -373,7 +373,7 @@ class TestCase(RestTestCase):
 
   def getById(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade/GBPUSD/20140302/3')
+    resp = client.send('GET', '/accnt/trades/GBPUSD/20140302/3')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

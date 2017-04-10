@@ -40,35 +40,35 @@ class TestCase(RestTestCase):
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
-    resp = client.send('POST', '/accnt/order')
+    resp = client.send('POST', '/accnt/orders')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/accnt/order/EURUSD')
+    resp = client.send('POST', '/accnt/orders/EURUSD')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
-    resp = client.send('POST', '/accnt/order/EURUSD/20140302')
+    resp = client.send('POST', '/accnt/orders/EURUSD/20140302')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('POST', '/accnt/order')
+    resp = client.send('POST', '/accnt/orders')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/accnt/order/EURUSD')
+    resp = client.send('POST', '/accnt/orders/EURUSD')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
-    resp = client.send('POST', '/accnt/order/EURUSD/20140302')
+    resp = client.send('POST', '/accnt/orders/EURUSD/20140302')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def createBid(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('POST', '/accnt/order',
+    resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'BUY',
@@ -141,7 +141,7 @@ class TestCase(RestTestCase):
 
   def createBidByInstr(self, client):
     client.setTrader('GOSAYL')
-    resp = client.send('POST', '/accnt/order',
+    resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'BUY',
@@ -214,7 +214,7 @@ class TestCase(RestTestCase):
 
   def createBidByMarket(self, client):
     client.setTrader('EDIAYL')
-    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
+    resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'BUY',
                        lots = 7,
                        ticks = 12342)
@@ -285,7 +285,7 @@ class TestCase(RestTestCase):
 
   def createOffer(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('POST', '/accnt/order',
+    resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'SELL',
@@ -358,7 +358,7 @@ class TestCase(RestTestCase):
 
   def createOfferByInstr(self, client):
     client.setTrader('GOSAYL')
-    resp = client.send('POST', '/accnt/order',
+    resp = client.send('POST', '/accnt/orders',
                        instr = 'EURUSD',
                        settlDate = 20140302,
                        side = 'SELL',
@@ -431,7 +431,7 @@ class TestCase(RestTestCase):
 
   def createOfferByMarket(self, client):
     client.setTrader('EDIAYL')
-    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
+    resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'SELL',
                        lots = 7,
                        ticks = 12348)

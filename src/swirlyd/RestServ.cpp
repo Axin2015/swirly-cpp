@@ -164,7 +164,7 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
         return;
     }
 
-    const auto tok = path_.top();
+    auto tok = path_.top();
     path_.pop();
 
     if (tok == "refdata"_sv) {
@@ -173,9 +173,15 @@ void RestServ::restRequest(const HttpRequest& req, Time now, HttpResponse& resp)
     } else if (tok == "accnt"_sv) {
         // /accnt
         accntRequest(req, now, resp);
-    } else if (tok == "market"_sv) {
-        // /market
-        marketRequest(req, now, resp);
+    } else {
+        // Support both plural and singular forms.
+        if (!tok.empty() && tok.back() == 's') {
+            tok.remove_suffix(1);
+        }
+        if (tok == "market"_sv) {
+            // /markets
+            marketRequest(req, now, resp);
+        }
     }
 }
 
@@ -261,11 +267,11 @@ void RestServ::instrRequest(const HttpRequest& req, Time now, HttpResponse& resp
 {
     if (path_.empty()) {
 
-        // /refdata/instr
+        // /refdata/instrs
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /refdata/instr
+            // GET /refdata/instrs
             matchMethod_ = true;
             rest_.getInstr(now, resp);
         }
@@ -277,11 +283,11 @@ void RestServ::instrRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /refdata/instr/SYMBOL
+        // /refdata/instrs/SYMBOL
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /refdata/instr/SYMBOL
+            // GET /refdata/instrs/SYMBOL
             matchMethod_ = true;
             rest_.getInstr(symbol, now, resp);
         }
@@ -349,17 +355,17 @@ void RestServ::marketRequest(const HttpRequest& req, Time now, HttpResponse& res
 {
     if (path_.empty()) {
 
-        // /market
+        // /markets
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /market
+            // GET /markets
             matchMethod_ = true;
             rest_.getMarket(now, resp);
             break;
         case HttpMethod::Post:
-            // POST /market
+            // POST /markets
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -461,17 +467,17 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
 {
     if (path_.empty()) {
 
-        // /accnt/order
+        // /accnt/orders
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/order
+            // GET /accnt/orders
             matchMethod_ = true;
             rest_.getOrder(getTrader(req), now, resp);
             break;
         case HttpMethod::Post:
-            // POST /accnt/order
+            // POST /accnt/orders
             matchMethod_ = true;
             {
                 // Validate account before request.
@@ -498,17 +504,17 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /accnt/order/INSTR
+        // /accnt/orders/INSTR
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/order/INSTR
+            // GET /accnt/orders/INSTR
             matchMethod_ = true;
             rest_.getOrder(getTrader(req), instr, now, resp);
             break;
         case HttpMethod::Post:
-            // POST /accnt/order/INSTR
+            // POST /accnt/orders/INSTR
             matchMethod_ = true;
             {
                 // Validate account before request.
@@ -535,17 +541,17 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /accnt/order/INSTR/SETTL_DATE
+        // /accnt/orders/INSTR/SETTL_DATE
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/order/INSTR/SETTL_DATE
+            // GET /accnt/orders/INSTR/SETTL_DATE
             matchMethod_ = true;
             rest_.getOrder(getTrader(req), instr, settlDate, now, resp);
             break;
         case HttpMethod::Post:
-            // POST /accnt/order/INSTR/SETTL_DATE
+            // POST /accnt/orders/INSTR/SETTL_DATE
             matchMethod_ = true;
             {
                 // Validate account before request.
@@ -571,17 +577,17 @@ void RestServ::orderRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /accnt/order/INSTR/SETTL_DATE/ID,ID...
+        // /accnt/orders/INSTR/SETTL_DATE/ID,ID...
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/order/INSTR/SETTL_DATE/ID
+            // GET /accnt/orders/INSTR/SETTL_DATE/ID
             matchMethod_ = true;
             rest_.getOrder(getTrader(req), instr, settlDate, ids_[0], now, resp);
             break;
         case HttpMethod::Put:
-            // PUT /accnt/order/INSTR/SETTL_DATE/ID,ID...
+            // PUT /accnt/orders/INSTR/SETTL_DATE/ID,ID...
             matchMethod_ = true;
             {
                 // Validate account before request.
@@ -604,11 +610,11 @@ void RestServ::execRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
     if (path_.empty()) {
 
-        // /accnt/exec
+        // /accnt/execs
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /accnt/exec
+            // GET /accnt/execs
             matchMethod_ = true;
             rest_.getExec(getTrader(req), parseQuery(req.query()), now, resp);
         }
@@ -620,17 +626,17 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
 {
     if (path_.empty()) {
 
-        // /accnt/trade
+        // /accnt/trades
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/trade
+            // GET /accnt/trades
             matchMethod_ = true;
             rest_.getTrade(getTrader(req), now, resp);
             break;
         case HttpMethod::Post:
-            // POST /accnt/trade
+            // POST /accnt/trades
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -658,17 +664,17 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /accnt/trade/INSTR
+        // /accnt/trades/INSTR
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/trade/INSTR
+            // GET /accnt/trades/INSTR
             matchMethod_ = true;
             rest_.getTrade(getTrader(req), instr, now, resp);
             break;
         case HttpMethod::Post:
-            // POST /accnt/trade/INSTR
+            // POST /accnt/trades/INSTR
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -695,17 +701,17 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /accnt/trade/INSTR/SETTL_DATE
+        // /accnt/trades/INSTR/SETTL_DATE
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/trade/INSTR/SETTL_DATE
+            // GET /accnt/trades/INSTR/SETTL_DATE
             matchMethod_ = true;
             rest_.getTrade(getTrader(req), instr, settlDate, now, resp);
             break;
         case HttpMethod::Post:
-            // POST /accnt/trade/INSTR/SETTL_DATE
+            // POST /accnt/trades/INSTR/SETTL_DATE
             matchMethod_ = true;
             getAdmin(req);
             {
@@ -731,17 +737,17 @@ void RestServ::tradeRequest(const HttpRequest& req, Time now, HttpResponse& resp
 
     if (path_.empty()) {
 
-        // /accnt/trade/INSTR/SETTL_DATE/ID,ID...
+        // /accnt/trades/INSTR/SETTL_DATE/ID,ID...
         matchPath_ = true;
 
         switch (req.method()) {
         case HttpMethod::Get:
-            // GET /accnt/trade/INSTR/SETTL_DATE/ID
+            // GET /accnt/trades/INSTR/SETTL_DATE/ID
             matchMethod_ = true;
             rest_.getTrade(getTrader(req), instr, settlDate, ids_[0], now, resp);
             break;
         case HttpMethod::Delete:
-            // DELETE /accnt/trade/INSTR/SETTL_DATE/ID,ID...
+            // DELETE /accnt/trades/INSTR/SETTL_DATE/ID,ID...
             matchMethod_ = true;
             rest_.deleteTrade(getTrader(req), instr, settlDate, ids_, now);
             break;
@@ -756,11 +762,11 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 {
     if (path_.empty()) {
 
-        // /accnt/posn
+        // /accnt/posns
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /accnt/posn
+            // GET /accnt/posns
             matchMethod_ = true;
             rest_.getPosn(getTrader(req), now, resp);
         }
@@ -772,11 +778,11 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 
     if (path_.empty()) {
 
-        // /accnt/posn/INSTR
+        // /accnt/posns/INSTR
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /accnt/posn/INSTR
+            // GET /accnt/posns/INSTR
             matchMethod_ = true;
             rest_.getPosn(getTrader(req), instr, now, resp);
         }
@@ -788,11 +794,11 @@ void RestServ::posnRequest(const HttpRequest& req, Time now, HttpResponse& resp)
 
     if (path_.empty()) {
 
-        // /accnt/posn/INSTR/SETTL_DATE
+        // /accnt/posns/INSTR/SETTL_DATE
         matchPath_ = true;
 
         if (req.method() == HttpMethod::Get) {
-            // GET /accnt/posn/INSTR/SETTL_DATE
+            // GET /accnt/posns/INSTR/SETTL_DATE
             matchMethod_ = true;
             rest_.getPosn(getTrader(req), instr, settlDate, now, resp);
         }

@@ -38,7 +38,7 @@ SWIRLY_TEST_CASE(EntitySetZero)
 
 SWIRLY_TEST_CASE(EntitySetOne)
 {
-    auto es = EntitySet::parse("asset"_sv);
+    auto es = EntitySet::parse("assets"_sv);
     SWIRLY_CHECK(!es.many());
     SWIRLY_CHECK(es.asset());
     SWIRLY_CHECK(!es.instr());
@@ -54,7 +54,7 @@ SWIRLY_TEST_CASE(EntitySetOne)
 
 SWIRLY_TEST_CASE(EntitySetTwo)
 {
-    auto es = EntitySet::parse("asset,instr"_sv);
+    auto es = EntitySet::parse("assets,instrs"_sv);
     SWIRLY_CHECK(es.many());
     SWIRLY_CHECK(es.asset());
     SWIRLY_CHECK(es.instr());
@@ -74,7 +74,7 @@ SWIRLY_TEST_CASE(EntitySetTwo)
 
 SWIRLY_TEST_CASE(EntitySetThree)
 {
-    auto es = EntitySet::parse("market,instr,asset"_sv);
+    auto es = EntitySet::parse("markets,instrs,assets"_sv);
     SWIRLY_CHECK(es.many());
     SWIRLY_CHECK(es.asset());
     SWIRLY_CHECK(es.instr());
@@ -98,7 +98,7 @@ SWIRLY_TEST_CASE(EntitySetThree)
 
 SWIRLY_TEST_CASE(EntitySetTrailing)
 {
-    auto es = EntitySet::parse("market,"_sv);
+    auto es = EntitySet::parse("markets,"_sv);
     SWIRLY_CHECK(!es.many());
     SWIRLY_CHECK(!es.asset());
     SWIRLY_CHECK(!es.instr());

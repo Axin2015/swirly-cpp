@@ -47,7 +47,7 @@ class TestCase(RestTestCase):
 
   def takeOrder(self, client):
     client.setTrader('GOSAYL')
-    resp = client.send('POST', '/accnt/order/EURUSD/20140302',
+    resp = client.send('POST', '/accnt/orders/EURUSD/20140302',
                        side = 'SELL',
                        lots = 5,
                        ticks = 12345)
@@ -149,7 +149,7 @@ class TestCase(RestTestCase):
 
   def makerOrder(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/order')
+    resp = client.send('GET', '/accnt/orders')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -157,7 +157,7 @@ class TestCase(RestTestCase):
 
   def makerExec(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/exec')
+    resp = client.send('GET', '/accnt/execs')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -209,7 +209,7 @@ class TestCase(RestTestCase):
 
   def makerTrade(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/trade')
+    resp = client.send('GET', '/accnt/trades')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -239,7 +239,7 @@ class TestCase(RestTestCase):
 
   def makerPosn(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('GET', '/accnt/posn')
+    resp = client.send('GET', '/accnt/posns')
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

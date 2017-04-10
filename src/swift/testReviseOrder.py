@@ -38,19 +38,19 @@ class TestCase(RestTestCase):
   def checkAuth(self, client):
     client.setAuth(None, 0x2)
 
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1')
     self.assertEqual(401, resp.status)
     self.assertEqual('Unauthorized', resp.reason)
 
     client.setAuth('MARAYL', ~0x2 & 0x7fffffff)
 
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1')
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1')
     self.assertEqual(403, resp.status)
     self.assertEqual('Forbidden', resp.reason)
 
   def reviseSingle(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1', lots = 4)
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1', lots = 4)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)
@@ -118,7 +118,7 @@ class TestCase(RestTestCase):
 
   def reviseMulti(self, client):
     client.setTrader('MARAYL')
-    resp = client.send('PUT', '/accnt/order/EURUSD/20140302/1,2', lots = 3)
+    resp = client.send('PUT', '/accnt/orders/EURUSD/20140302/1,2', lots = 3)
 
     self.assertEqual(200, resp.status)
     self.assertEqual('OK', resp.reason)

@@ -65,7 +65,7 @@ void HttpClient::timerEvent(QTimerEvent* event)
 
 void HttpClient::createMarket(const Instr& instr, QDate settlDate)
 {
-    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/market"}};
+    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/markets"}};
     request.setAttribute(QNetworkRequest::User, PostMarket);
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Swirly-Accnt", "MARAYL");
@@ -84,7 +84,7 @@ void HttpClient::createMarket(const Instr& instr, QDate settlDate)
 void HttpClient::createOrder(const Instr& instr, QDate settlDate, const QString& ref, Side side,
                              Lots lots, Ticks ticks)
 {
-    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/accnt/order"}};
+    QNetworkRequest request{QUrl{"http://127.0.0.1:8080/accnt/orders"}};
     request.setAttribute(QNetworkRequest::User, PostOrder);
     request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Swirly-Accnt", "MARAYL");
@@ -118,7 +118,7 @@ void HttpClient::cancelOrders(const OrderKeys& keys)
                 out.reset();
             }
             market = marketModel().find(key.first);
-            out << "http://127.0.0.1:8080/accnt/order/" << market.instr().symbol() //
+            out << "http://127.0.0.1:8080/accnt/orders/" << market.instr().symbol() //
                 << '/' << dateToIso(market.settlDate()) //
                 << '/' << id;
         } else {
