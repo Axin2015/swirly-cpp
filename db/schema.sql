@@ -326,22 +326,22 @@ CREATE VIEW asset_v AS
 
 CREATE VIEW instr_v AS
   SELECT
-    c.id,
-    c.symbol,
-    c.display,
+    i.id,
+    i.symbol,
+    i.display,
     a.type,
-    c.base_asset,
-    c.term_ccy,
-    c.lot_numer,
-    c.lot_denom,
-    c.tick_numer,
-    c.tick_denom,
-    c.pip_dp,
-    c.min_lots,
-    c.max_lots
-  FROM instr_t c
+    i.base_asset,
+    i.term_ccy,
+    i.lot_numer,
+    i.lot_denom,
+    i.tick_numer,
+    i.tick_denom,
+    i.pip_dp,
+    i.min_lots,
+    i.max_lots
+  FROM instr_t i
   LEFT OUTER JOIN asset_v a
-  ON c.base_asset = a.symbol
+  ON i.base_asset = a.symbol
 ;
 
 CREATE VIEW market_v AS
