@@ -86,7 +86,7 @@ MemPool& MemPool::operator=(MemPool&&) noexcept = default;
 void* MemPool::alloc(size_t size)
 {
     void* addr;
-    switch (roundCacheLine(size)) {
+    switch (ceilCacheLine(size)) {
     case 1 << 6:
         addr = allocBlock(head1_);
         break;
@@ -110,7 +110,7 @@ void* MemPool::alloc(size_t size)
 
 void MemPool::dealloc(void* ptr, size_t size) noexcept
 {
-    switch (roundCacheLine(size)) {
+    switch (ceilCacheLine(size)) {
     case 1 << 6:
         deallocBlock(head1_, ptr);
         break;

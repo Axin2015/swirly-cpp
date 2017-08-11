@@ -136,7 +136,7 @@ class SWIRLY_API MemPool {
     MemBlock<(5 << 6)>* head5_{nullptr};
 };
 
-constexpr std::size_t roundCacheLine(std::size_t size) noexcept
+constexpr std::size_t ceilCacheLine(std::size_t size) noexcept
 {
     return ((size + 63) >> 6) << 6;
 }
