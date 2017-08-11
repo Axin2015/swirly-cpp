@@ -157,7 +157,7 @@ class SWIRLY_API Order : public RefCounted<Order>, public Request, public MemAll
     Time modified_;
 };
 
-static_assert(sizeof(Order) <= 5 * 64, "mempool size exceeded");
+static_assert(sizeof(Order) <= 5 * 64, "no greater than specified cache-lines");
 
 using OrderIdSet = RequestIdSet<Order>;
 

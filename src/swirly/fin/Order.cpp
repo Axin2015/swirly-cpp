@@ -22,7 +22,7 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Order) <= 6 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Order) <= 6 * 64, "no greater than specified cache-lines");
 
 Order::~Order() noexcept = default;
 

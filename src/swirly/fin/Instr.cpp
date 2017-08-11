@@ -22,7 +22,7 @@ using namespace std;
 
 namespace swirly {
 
-static_assert(sizeof(Instr) <= 4 * 64, "crossed cache-line boundary");
+static_assert(sizeof(Instr) <= 4 * 64, "no greater than specified cache-lines");
 
 Instr::Instr(Id32 id, Symbol symbol, string_view display, Symbol baseAsset, Symbol termCcy,
              int lotNumer, int lotDenom, int tickNumer, int tickDenom, int pipDp, Lots minLots,
