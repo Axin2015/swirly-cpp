@@ -119,8 +119,8 @@ void RestServ::handleRequest(const HttpRequest& req, HttpResponse& resp) noexcep
             throw NotFoundException{errMsg() << "resource '" << req.path() << "' does not exist"};
         }
         if (!matchMethod_) {
-            throw MethodNotAllowedException{errMsg() << "method '" << req.method()
-                                                     << "' is not allowed"};
+            throw MethodNotAllowedException{errMsg()
+                                            << "method '" << req.method() << "' is not allowed"};
         }
     } catch (const ServException& e) {
         SWIRLY_ERROR(logMsg() << "exception: status=" << e.httpStatus()

@@ -50,6 +50,7 @@ class StringBuf : public std::streambuf {
     std::size_t size() const noexcept { return pptr() - pbase(); }
     std::string_view str() const noexcept { return {data(), size()}; }
     void reset() noexcept { setp(buf_, buf_ + MaxN); };
+
   private:
     char buf_[MaxN];
 };
