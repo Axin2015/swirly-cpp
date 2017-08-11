@@ -22,12 +22,14 @@ set(util_SOURCES
   Defs.cpp
   Enum.cpp
   Exception.cpp
+  File.cpp
   Finally.cpp
   IntWrapper.cpp
   Limits.cpp
   Log.cpp
   Math.cpp
   MemAlloc.cpp
+  MemMap.cpp
   MemPool.cpp
   Numeric.cpp
   Pipe.cpp
